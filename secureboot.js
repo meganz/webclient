@@ -16,19 +16,19 @@ function isMobile()
 
 function geoStaticpath(eu)
 {
-	if (!eu) {
-		try {
-			if (!sessionStorage.skipcdn) {
-				var cc = 'FR DE NL ES PT DK CH IT UK GB NO SE FI PL CZ SK AT GR RO HU IE TR VA MC SM LI AD JE GG UA BG LT LV EE AX IS MA DZ LY TN EG RU BY HR SI AL ME RS KO EU FO CY IL LB SY SA JO IQ BA CV PS EH GI GL IM LU MK SJ BF BI BJ BW CF CG CM DJ ER ET GA GH GM GN GN GW KE KM LR LS MG ZA AE ML MR MT MU MV MW MZ NA NE QA RW SD SS SL SZ TD TG TZ UG YE ZA ZM ZR ZW';
-				var cm = String(document.cookie).match(/geoip\s*\=\s*([A-Z]{2})/);
-				if (cm && cm[1] && cc.indexOf(cm[1]) == -1)
-					return 'https://g.cdn1.mega.co.nz/3/';
-			}
-		} catch(e) {
-			setTimeout(function() { throw e; }, 2100);
-		}
-	}
-	return 'https://eu.static.mega.co.nz/3/';
+    if (!eu) {
+        try {
+            if (!sessionStorage.skipcdn) {
+                var cc = 'FR DE NL ES PT DK CH IT UK GB NO SE FI PL CZ SK AT GR RO HU IE TR VA MC SM LI AD JE GG UA BG LT LV EE AX IS MA DZ LY TN EG RU BY HR SI AL ME RS KO EU FO CY IL LB SY SA JO IQ BA CV PS EH GI GL IM LU MK SJ BF BI BJ BW CF CG CM DJ ER ET GA GH GM GN GN GW KE KM LR LS MG ZA AE ML MR MT MU MV MW MZ NA NE QA RW SD SS SL SZ TD TG TZ UG YE ZA ZM ZR ZW';
+                var cm = String(document.cookie).match(/geoip\s*\=\s*([A-Z]{2})/);
+                if (cm && cm[1] && cc.indexOf(cm[1]) == -1)
+                    return 'https://g.cdn1.mega.co.nz/3/';
+            }
+        } catch(e) {
+            setTimeout(function() { throw e; }, 2100);
+        }
+    }
+    return 'https://eu.static.mega.co.nz/3/';
 }
 
 if (ua.indexOf('chrome') > -1 && ua.indexOf('mobile') == -1 && parseInt(window.navigator.appVersion.match(/Chrome\/(\d+)\./)[1], 10) < 22) b_u = 1;
@@ -40,75 +40,75 @@ if (!(myURL=URL)) b_u=1;
 
 if (!b_u) try
 {
-	if (is_chrome_firefox)
-	{
-		var Cc = Components.classes, Ci = Components.interfaces, Cu = Components.utils;
+    if (is_chrome_firefox)
+    {
+        var Cc = Components.classes, Ci = Components.interfaces, Cu = Components.utils;
 
-		Cu['import']("resource://gre/modules/XPCOMUtils.jsm");
-		Cu['import']("resource://gre/modules/Services.jsm");
-		XPCOMUtils.defineLazyModuleGetter(this, "NetUtil", "resource://gre/modules/NetUtil.jsm");
+        Cu['import']("resource://gre/modules/XPCOMUtils.jsm");
+        Cu['import']("resource://gre/modules/Services.jsm");
+        XPCOMUtils.defineLazyModuleGetter(this, "NetUtil", "resource://gre/modules/NetUtil.jsm");
 
-		(function(global) {
-			global.loadSubScript = function(file,scope) {
-				if (global.d) {
-					Services.scriptloader.loadSubScriptWithOptions(file,{
-						target : scope||global, charset: "UTF-8",
-						ignoreCache : true
-					});
-				} else {
-					Services.scriptloader.loadSubScript(file,scope||global);
-				}
-			};
-		})(this);
+        (function(global) {
+            global.loadSubScript = function(file,scope) {
+                if (global.d) {
+                    Services.scriptloader.loadSubScriptWithOptions(file,{
+                        target : scope||global, charset: "UTF-8",
+                        ignoreCache : true
+                    });
+                } else {
+                    Services.scriptloader.loadSubScript(file,scope||global);
+                }
+            };
+        })(this);
 
-		try {
-			var mozBrowserID =
-			[	Services.appinfo.name,
-				Services.appinfo.platformVersion,
-				Services.appinfo.platformBuildID,
-				Services.appinfo.OS,
-				Services.appinfo.XPCOMABI].join(" ");
-		} catch(e) {
-			var mozBrowserID = ua;
-		}
+        try {
+            var mozBrowserID =
+            [    Services.appinfo.name,
+                Services.appinfo.platformVersion,
+                Services.appinfo.platformBuildID,
+                Services.appinfo.OS,
+                Services.appinfo.XPCOMABI].join(" ");
+        } catch(e) {
+            var mozBrowserID = ua;
+        }
 
-		loadSubScript('chrome://mega/content/strg2.js');
+        loadSubScript('chrome://mega/content/strg2.js');
 
-		if(!(localStorage instanceof Ci.nsIDOMStorage)) {
-			throw new Error('Invalid DOM Storage instance.');
-		}
-		var d = !!localStorage.d;
-	}
-	if (typeof localStorage == 'undefined') b_u = 1;
-	else
-	{
-		var contenterror = 0;
-		var nocontentcheck = !!localStorage.dd;
-		if (localStorage.dd) {
- 			var devhost = window.location.host;
-			// handle subdirs
-			var pathSuffix = window.location.pathname;
-			pathSuffix = pathSuffix.split("/").slice(0,-1).join("/");
-			// set the staticpath for debug mode
-			localStorage.staticpath = window.location.protocol + "//" + devhost + pathSuffix + "/";
-			// localStorage.staticpath = location.protocol + "//" + location.host + location.pathname.replace(/[^/]+$/,'');
-		}
-		staticpath = localStorage.staticpath || geoStaticpath();
-		apipath = localStorage.apipath || 'https://eu.api.mega.co.nz/';
-	}
+        if(!(localStorage instanceof Ci.nsIDOMStorage)) {
+            throw new Error('Invalid DOM Storage instance.');
+        }
+        var d = !!localStorage.d;
+    }
+    if (typeof localStorage == 'undefined') b_u = 1;
+    else
+    {
+        var contenterror = 0;
+        var nocontentcheck = !!localStorage.dd;
+        if (localStorage.dd) {
+             var devhost = window.location.host;
+            // handle subdirs
+            var pathSuffix = window.location.pathname;
+            pathSuffix = pathSuffix.split("/").slice(0,-1).join("/");
+            // set the staticpath for debug mode
+            localStorage.staticpath = window.location.protocol + "//" + devhost + pathSuffix + "/";
+            // localStorage.staticpath = location.protocol + "//" + location.host + location.pathname.replace(/[^/]+$/,'');
+        }
+        staticpath = localStorage.staticpath || geoStaticpath();
+        apipath = localStorage.apipath || 'https://eu.api.mega.co.nz/';
+    }
 }
 catch(e)
 {
-	alert(
-		"Sorry, we were unable to initialize the browser's local storage, "+
-		"either you're using an outdated browser or it's something from our side.\n"+
-		"\n"+
-		"If you think it's our fault, please report the issue back to us.\n"+
-		"\n"+
-		"Reason: " + (e.message || e)+
-		"\nBrowser: " + (typeof mozBrowserID !== 'undefined' ? mozBrowserID : ua)
-	);
-	b_u = 1;
+    alert(
+        "Sorry, we were unable to initialize the browser's local storage, "+
+        "either you're using an outdated browser or it's something from our side.\n"+
+        "\n"+
+        "If you think it's our fault, please report the issue back to us.\n"+
+        "\n"+
+        "Reason: " + (e.message || e)+
+        "\nBrowser: " + (typeof mozBrowserID !== 'undefined' ? mozBrowserID : ua)
+    );
+    b_u = 1;
 }
 
 var bootstaticpath = staticpath;
@@ -116,33 +116,33 @@ var urlrootfile = '';
 
 if (!b_u && is_extension)
 {
-	nocontentcheck=true;
+    nocontentcheck=true;
 
-	if (is_chrome_firefox)
-	{
-		bootstaticpath = 'chrome://mega/content/';
-		urlrootfile = 'secure.html';
-		if (d) staticpath = bootstaticpath;
-		  else staticpath = 'https://eu.static.mega.co.nz/3/';
-		try {
-			loadSubScript(bootstaticpath + 'fileapi.js');
-		} catch(e) {
-			b_u = 1;
-			Cu.reportError(e);
-			alert('Unable to initialize core functionality:\n\n' + e + '\n\n' + mozBrowserID);
-		}
-	}
-	else /* Google Chrome */
-	{
-		bootstaticpath = chrome.extension.getURL("mega/");
-		urlrootfile = 'mega/secure.html';
-	}
+    if (is_chrome_firefox)
+    {
+        bootstaticpath = 'chrome://mega/content/';
+        urlrootfile = 'secure.html';
+        if (d) staticpath = bootstaticpath;
+          else staticpath = 'https://eu.static.mega.co.nz/3/';
+        try {
+            loadSubScript(bootstaticpath + 'fileapi.js');
+        } catch(e) {
+            b_u = 1;
+            Cu.reportError(e);
+            alert('Unable to initialize core functionality:\n\n' + e + '\n\n' + mozBrowserID);
+        }
+    }
+    else /* Google Chrome */
+    {
+        bootstaticpath = chrome.extension.getURL("mega/");
+        urlrootfile = 'mega/secure.html';
+    }
 
-	Object.defineProperty(window, 'eval', {
-		value : function eval(code) {
-			throw new Error('Unsafe eval is not allowed, code: ' + String(code).replace(/\s+/g,' ').substr(0,60) + '...');
-		}
-	});
+    Object.defineProperty(window, 'eval', {
+        value : function eval(code) {
+            throw new Error('Unsafe eval is not allowed, code: ' + String(code).replace(/\s+/g,' ').substr(0,60) + '...');
+        }
+    });
 }
 
 if (b_u) document.location = 'update.html';
@@ -444,12 +444,12 @@ if (m)
     }
     if (mobileblog)
     {
-		document.body.innerHTML = '';
-		var script = document.createElement('script');
-		script.type = "text/javascript";
-		document.head.appendChild(script);
-		//script.src = 'https://mega.nz/blog.js'
-		script.src = '/html/js/blog.js'
+        document.body.innerHTML = '';
+        var script = document.createElement('script');
+        script.type = "text/javascript";
+        document.head.appendChild(script);
+        //script.src = 'https://mega.nz/blog.js'
+        script.src = '/html/js/blog.js'
     }
 }
 else if (page == '#android')
@@ -458,791 +458,790 @@ else if (page == '#android')
 }
 else if (!b_u)
 {
-	{
-		var d = localStorage.d || 0,l;
-		var jj = localStorage.jj || 0;
-		var onBetaW = location.hostname === 'beta.mega.nz' || location.hostname.indexOf("developers.") === 0;
-		var languages = {'en':['en','en-'],'es':['es','es-'],'fr':['fr','fr-'],'de':['de','de-'],'it':['it','it-'],'nl':['nl','nl-'],'pt':['pt'],'br':['pt-br'],'dk':['da'],'se':['sv'],'fi':['fi'],'no':['no'],'pl':['pl'],'cz':['cz','cz-'],'sk':['sk','sk-'],'sl':['sl','sl-'],'hu':['hu','hu-'],'jp':['ja'],'cn':['zh','zh-cn'],'ct':['zh-hk','zh-sg','zh-tw'],'kr':['ko'],'ru':['ru','ru-mo'],'ar':['ar','ar-'],'he':['he'],'id':['id'],'ca':['ca','ca-'],'eu':['eu','eu-'],'af':['af','af-'],'bs':['bs','bs-'],'sg':[],'tr':['tr','tr-'],'mk':[],'hi':[],'hr':['hr'],'ro':['ro','ro-'],'uk':['||'],'gl':['||'],'sr':['||'],'lt':['||'],'th':['||'],'lv':['||'],'fa':['||'],'ee':['et'],'ms':['ms'],'cy':['cy'],'bg':['bg'],'be':['br'],'tl':['en-ph'],'ka':['||']};
-		if (typeof console == "undefined") { this.console = { log: function() {}, error: function() {}}}
-		if (d && !console.time) (function(c)
-		{
-			var timers = {};
-			c.time = function(n) { timers[n] = new Date().getTime()};
-			c.timeEnd = function(n) {
-				if(timers[n]) {
-					c.log(n + ': ' + (new Date().getTime() - timers[n]) + 'ms');
-					delete timers[n];
-				}
-			};
-		})(console);
+    var d = localStorage.d || 0,l;
+    var jj = localStorage.jj || 0;
+    var onBetaW = location.hostname === 'beta.mega.nz' || location.hostname.indexOf("developers.") === 0;
+    var languages = {'en':['en','en-'],'es':['es','es-'],'fr':['fr','fr-'],'de':['de','de-'],'it':['it','it-'],'nl':['nl','nl-'],'pt':['pt'],'br':['pt-br'],'dk':['da'],'se':['sv'],'fi':['fi'],'no':['no'],'pl':['pl'],'cz':['cz','cz-'],'sk':['sk','sk-'],'sl':['sl','sl-'],'hu':['hu','hu-'],'jp':['ja'],'cn':['zh','zh-cn'],'ct':['zh-hk','zh-sg','zh-tw'],'kr':['ko'],'ru':['ru','ru-mo'],'ar':['ar','ar-'],'he':['he'],'id':['id'],'ca':['ca','ca-'],'eu':['eu','eu-'],'af':['af','af-'],'bs':['bs','bs-'],'sg':[],'tr':['tr','tr-'],'mk':[],'hi':[],'hr':['hr'],'ro':['ro','ro-'],'uk':['||'],'gl':['||'],'sr':['||'],'lt':['||'],'th':['||'],'lv':['||'],'fa':['||'],'ee':['et'],'ms':['ms'],'cy':['cy'],'bg':['bg'],'be':['br'],'tl':['en-ph'],'ka':['||']};
+    if (typeof console == "undefined") { this.console = { log: function() {}, error: function() {}}}
+    if (d && !console.time) (function(c)
+    {
+        var timers = {};
+        c.time = function(n) { timers[n] = new Date().getTime()};
+        c.timeEnd = function(n) {
+            if(timers[n]) {
+                c.log(n + ': ' + (new Date().getTime() - timers[n]) + 'ms');
+                delete timers[n];
+            }
+        };
+    })(console);
 
-		Object.defineProperty(window, "__cd_v", { value : 9, writable : false });
-		if (!d || onBetaW)
-		{
-			var __cdumps = [], __cd_t;
-			window.onerror = function __MEGAExceptionHandler(msg, url, ln, cn, errobj)
-			{
-				function mTrim(s)
-				{
-					return s
-						.replace(/resource:.+->\s/,'')
-						.replace(/blob:[^:\s]+/, '..')
-						.replace(/\.\.:\/\/[^:\s]+/, '..')
-						.replace('chrome://mega/content','..')
-						.replace(/file:.+extensions/,'..fx')
-						.replace(/(?: line \d+ > eval)+/g,' >.eval')
-				}
-				if (__cdumps.length > 3) return false;
-
-				var dump = {
-					m : ('' + msg).replace(/'(\w+:\/\/+[^/]+)[^']+'/,"'$1...'").replace(/^Uncaught\s*/,''),
-					f : mTrim('' + url), l : ln
-				}, cc, sbid = +(''+(document.querySelector('script[src*="secureboot"]')||{}).src).split('=').pop()|0;
-
-				if (~dump.m.indexOf('took +10s'))
-				{
-					var lrc = +localStorage.ttfbReportCount || 0;
-					if (lrc > 20)
-					{
-						var eid = localStorage.ttfbReport;
-						localStorage.ttfbReport = sbid;
-						if (!eid || eid == sbid) return false;
-						lrc = 1;
-					}
-					localStorage.ttfbReportCount = lrc + 1;
-				}
-
-				if (errobj)
-				{
-					if (errobj.udata) dump.d = errobj.udata;
-					if (errobj.stack)
-					{
-						dump.s = ('' + errobj.stack).split("\n").splice(0,9).map(mTrim).join("\n");
-					}
-				}
-				if (cn) dump.c = cn;
-
-				if (ln == 0 && !dump.s)
-				{
-					if (dump.m.toLowerCase().indexOf('out of memory') != -1) dump.m = '!Fatal! Out Of Memory.';
-					else dump.m = dump.m.replace(/[^\s\w]/gi,'') || ('[!] ' + msg);
-				}
-				if (location.hostname === 'beta.mega.nz' || location.hostname.indexOf("developers.") > -1) dump.m = '[' + location.hostname + '] ' + dump.m;
-
-				try
-				{
-					var crashes = JSON.parse(localStorage.crashes || '{}');
-					var checksum = MurmurHash3(JSON.stringify(dump), 0x4ef5391a);
-
-					if (crashes.v != sbid) crashes = { v : sbid };
-
-					if (crashes[checksum])
-					{
-						// Reported less than 10 days ago?
-						if (Date.now() - crashes[checksum] < 864000000) return false;
-					}
-					dump.x = checksum;
-					crashes[checksum] = Date.now();
-					localStorage.crashes = JSON.stringify(crashes);
-					cc = $.len(crashes);
-				}
-				catch(e) {
-					delete localStorage.crashes;
-				}
-
-				__cdumps.push(dump);
-				if (__cd_t) clearTimeout(__cd_t);
-				__cd_t = setTimeout(safeCall(function()
-				{
-					function ctx(id)
-					{
-						return {
-							callback : function(res)
-							{
-								if (res === EOVERQUOTA)
-								{
-									__cdumps = new Array(4);
-									if (__cd_t) clearTimeout(__cd_t);
-
-									if (id)
-									{
-										var crashes = JSON.parse(localStorage.crashes || '{}');
-										delete crashes[id];
-										localStorage.crashes = JSON.stringify(crashes);
-									}
-								}
-							}
-						};
-					}
-					var ids = [], uds = [], r = 1;
-					for (var i in __cdumps)
-					{
-						var dump = __cdumps[i];
-
-						if (dump.x) { ids.push(dump.x); delete dump.x; }
-						if (dump.d) { uds.push(dump.d); delete dump.d; }
-						if (dump.l < 0) r = 0;
-					}
-
-					var report = {};
-					report.ua = navigator.userAgent;
-					report.io = window.dlMethod && dlMethod.name;
-					report.sb = sbid;
-					report.tp = $.transferprogress;
-					report.id = ids.join(",");
-					report.ud = uds;
-					report.cc = cc;
-
-					if (is_chrome_firefox)
-					{
-						report.mo = mozBrowserID + '::' + is_chrome_firefox + '::' + mozMEGAExtensionVersion;
-					}
-					report = JSON.stringify(r? report:{});
-
-					for (var i in __cdumps)
-					{
-						api_req({ a : 'cd', c : JSON.stringify(__cdumps[i]), v : report, t : +__cd_v }, ctx(ids[i]));
-					}
-					__cd_t = 0;
-					__cdumps = [];
-
-				}), 3000);
-
-				return false;
-			};
-		}
-		function detectlang()
-		{
-			if (!navigator.language) return 'en';
-			var bl = navigator.language.toLowerCase();
-			var l2 = languages;
-			for (var l in l2) for (b in l2[l]) if (l2[l][b] == bl) return l;
-			for (var l in l2) for (b in l2[l]) if (l2[l][b].substring(0,3)==bl.substring(0,3)) return l;
-			return 'en';
-		}
-		var lang = detectlang(), langv = '', jsl = [];
-		if (typeof localStorage.lang !== 'undefined' && languages[localStorage.lang]) lang = localStorage.lang;
-		if (typeof lv != 'undefined') langv = '_' + lv[lang];
-
-		jsl.push({f:'lang/' + lang + langv + '.json', n: 'lang', j:3});
-		jsl.push({f:'sjcl.js', n: 'sjcl_js', j:1}); // Will be replaced with asmCrypto soon
-		jsl.push({f:'js/asmcrypto.js',n:'asmcrypto_js',j:1,w:1});
-        jsl.push({f:'js/tlvstore.js', n: 'tlvstore_js', j:1});
-		jsl.push({f:'js/crypto.js', n: 'crypto_js', j:1,w:5});
-        jsl.push({f:'js/jsbn.js', n: 'jsbn_js', j:1,w:2});
-		jsl.push({f:'js/jsbn2.js', n: 'jsbn2_js', j:1,w:2});
-		jsl.push({f:'js/jodid25519.js', n: 'jodid25519_js', j:1,w:7});
-        jsl.push({f:'js/stringcrypt.js', n: 'stringcrypt_js', j:1});
-        jsl.push({f:'js/user.js', n: 'user_js', j:1});
-        jsl.push({f:'js/authring.js', n: 'authring_js', j:1});
-        jsl.push({f:'js/mouse.js', n: 'mouse_js', j:1});
-        jsl.push({f:'js/jquery-2.1.1.js', n: 'jquery', j:1,w:10});
-        jsl.push({f:'js/functions.js', n: 'functions_js', j:1});
-        jsl.push({f:'js/megaLogger.js', n: 'megaLogger_js', j:1});
-        jsl.push({f:'js/jquery-ui-1.11.2.js', n: 'jqueryui_js', j:1,w:10});
-        jsl.push({f:'js/base64.js', n: 'base64_js', j:1});
-        jsl.push({f:'js/filedrag.js', n: 'filedrag_js', j:1});
-        jsl.push({f:'js/jquery.mousewheel.js', n: 'jquerymouse_js', j:1});
-        jsl.push({f:'js/jquery.jscrollpane.js', n: 'jscrollpane_js', j:1});
-        jsl.push({f:'js/jquery.tokeninput.js', n: 'jquerytokeninput_js', j:1});
-        jsl.push({f:'js/jquery.misc.js', n: 'jquerymisc_js', j:1});
-        jsl.push({f:'js/mDB.js', n: 'mDB_js', j:1});
-        jsl.push({f:'js/thumbnail.js', n: 'thumbnail_js', j:1});
-        jsl.push({f:'js/exif.js', n: 'exif_js', j:1,w:3});
-        jsl.push({f:'js/megapix.js', n: 'megapix_js', j:1});
-        jsl.push({f:'js/smartcrop.js', n: 'smartcrop_js', j:1,w:7});
-        jsl.push({f:'js/mega.js', n: 'mega_js', j:1,w:7});
-        jsl.push({f:'js/jquery.fullscreen.js', n: 'jquery_fullscreen', j:1,w:10});
-        jsl.push({f:'js/vendor/jquery.window-active.js', n: 'jquery_windowactive', j:1,w:2});
-        jsl.push({f:'js/megaPromise.js', n: 'megapromise_js', j:1,w:5});
-        jsl.push({f:'js/vendor/db.js', n: 'db_js', j:1,w:5});
-        jsl.push({f:'js/megaDbEncryptionPlugin.js', n: 'megadbenc_js', j:1,w:5});
-        jsl.push({f:'js/megaDb.js', n: 'megadb_js', j:1,w:5});
-        jsl.push({f:'js/megaKvStorage.js', n: 'megakvstorage_js', j:1,w:5});
-
-        jsl.push({f:'js/chat/mpenc.js', n: 'mega_js', j:1,w:7});
-        jsl.push({f:'js/chat/opQueue.js', n: 'mega_js', j:1,w:7});
-
-        jsl.push({f:'js/vendor/chat/strophe.js', n: 'mega_js', j:1,w:7});
-        jsl.push({f:'js/vendor/chat/strophe.disco.js', n: 'mega_js', j:1,w:7});
-        jsl.push({f:'js/vendor/chat/strophe.jingle.js', n: 'mega_js', j:1,w:7});
-        jsl.push({f:'js/vendor/chat/strophe.jingle.session.js', n: 'mega_js', j:1,w:7});
-        jsl.push({f:'js/vendor/chat/strophe.jingle.sdp.js', n: 'mega_js', j:1,w:7});
-        jsl.push({f:'js/vendor/chat/strophe.jingle.adapter.js', n: 'mega_js', j:1,w:7});
-        jsl.push({f:'js/vendor/chat/strophe.muc.js', n: 'mega_js', j:1,w:7});
-        jsl.push({f:'js/vendor/chat/strophe.roster.js', n: 'mega_js', j:1,w:7});
-        jsl.push({f:'js/vendor/chat/wildemitter.patched.js', n: 'mega_js', j:1,w:7});
-        jsl.push({f:'js/vendor/chat/hark.patched.js', n: 'mega_js', j:1,w:7});
-        jsl.push({f:'js/vendor/chat/base32.js', n: 'mega_js', j:1,w:7});
-
-        // direct transfer deps.
-        jsl.push({f:'js/vendor/chat/cryptojs-core.js', n: 'mega_js', j:1,w:7});
-        jsl.push({f:'js/vendor/chat/cryptojs-sha1.js', n: 'mega_js', j:1,w:7});
-        jsl.push({f:'js/vendor/chat/cryptojs-hmac.js', n: 'mega_js', j:1,w:7});
-        jsl.push({f:'js/vendor/chat/cryptojs-lib-typedarrays.js', n: 'mega_js', j:1,w:7});
-
-        // Other
-        jsl.push({f:'js/vendor/Autolinker.js', n: 'mega_js', j:1,w:7});
-
-		// Google Import Contacts
-        jsl.push({f:'js/gContacts.js', n: 'gcontacts_js', j:1,w:3});
-
-        // MEGA CHAT
-        jsl.push({f:'js/chat/rtcStats.js', n: 'mega_js', j:1,w:7});
-        jsl.push({f:'js/chat/rtcSession.js', n: 'mega_js', j:1,w:7});
-        jsl.push({f:'js/chat/fileTransfer.js', n: 'mega_js', j:1,w:7});
-
-        jsl.push({f:'js/ui/filepicker.js', n: 'mega_js', j:1,w:7});
-        jsl.push({f:'js/ui/dialog.js', n: 'mega_js', j:1,w:7});
-        jsl.push({f:'js/chat/ui/incomingCallDialog.js', n: 'mega_js', j:1,w:7});
-
-        // notifications
-        jsl.push({f:'js/megaNotifications.js', n: 'meganotifications_js', j:1,w:7});
-        jsl.push({f:'js/vendor/ion.sound.js', n: 'ionsound_js', j:1,w:7});
-        jsl.push({f:'js/vendor/favico.js', n: 'favico_js', j:1,w:7});
-        jsl.push({f:'js/vendor/notification.js', n: 'notification_js', j:1,w:7});
-
-        jsl.push({f:'js/chat/plugins/urlFilter.js', n: 'mega_js', j:1,w:7});
-        jsl.push({f:'js/chat/plugins/emoticonsFilter.js', n: 'mega_js', j:1,w:7});
-        jsl.push({f:'js/chat/plugins/attachmentsFilter.js', n: 'mega_js', j:1,w:7});
-        jsl.push({f:'js/chat/plugins/encryptionFilter.js', n: 'mega_js', j:1,w:7});
-        jsl.push({f:'js/chat/plugins/chatStore.js', n: 'chatstore_js', j:1,w:7});
-        jsl.push({f:'js/chat/plugins/chatNotifications.js', n: 'chatnotifications_js', j:1,w:7});
-
-        jsl.push({f:'js/chat/karereEventObjects.js', n: 'keo_js', j:1,w:7});
-        jsl.push({f:'js/chat/karere.js', n: 'karere_js', j:1,w:7});
-        jsl.push({f:'js/chat/chat.js', n: 'chat_js', j:1,w:7});
-        jsl.push({f:'js/chat/chatRoom.js', n: 'chat_js', j:1,w:7});
-
-        // END OF MEGA CHAT
-
-        jsl.push({f:'js/fm.js', n: 'fm_js', j:1,w:12});
-        jsl.push({f:'js/filetypes.js', n: 'filetypes_js', j:1});
-        jsl.push({f:'js/miniui.js', n: 'miniui_js', j:1});
-        if (is_extension)
+    Object.defineProperty(window, "__cd_v", { value : 9, writable : false });
+    if (!d || onBetaW)
+    {
+        var __cdumps = [], __cd_t;
+        window.onerror = function __MEGAExceptionHandler(msg, url, ln, cn, errobj)
         {
-                jsl.push({f:'js/dcraw.js', n: 'dcraw_js', j:1});
-        }
-        /* better download */
-        jsl.push({f:'js/xhr.js', n: 'xhr_js', j:1});
-        jsl.push({f:'js/events.js', n: 'events', j:1,w:4});
-        jsl.push({f:'js/queue.js', n: 'queue', j:1,w:4});
-        jsl.push({f:'js/downloadChrome.js', n: 'dl_chrome', j:1,w:3});
-        if (is_chrome_firefox && parseInt(Services.appinfo.version) > 27)
-        {
-            is_chrome_firefox |= 4;
-            jsl.push({f:'js/downloadFirefox.js', n: 'dl_firefox', j:1,w:3});
-        }
-        else
-        {
-            jsl.push({f:'js/downloadMemory.js', n: 'dl_memory', j:1,w:3});
-            jsl.push({f:'js/downloadFlash.js', n: 'dl_flash', j:1,w:3});
-        }
-        jsl.push({f:'js/downloader.js', n: 'dl_downloader', j:1,w:3});
-        jsl.push({f:'js/download2.js', n: 'dl_js', j:1,w:3});
-        jsl.push({f:'js/upload2.js', n: 'upload_js', j:1,w:2});
-        /* end better download */
-        jsl.push({f:'index.js', n: 'index', j:1,w:4});
-        jsl.push({f:'html/start.html', n: 'start', j:0});
-        jsl.push({f:'html/megainfo.html', n: 'megainfo', j:0});
-        jsl.push({f:'html/js/start.js', n: 'start_js', j:1});
-        jsl.push({f:'html/bottom2.html', n: 'bottom2',j:0});
-        jsl.push({f:'html/key.html', n: 'key', j:0});
-        jsl.push({f:'html/js/key.js', n: 'key_js', j:1});
-        jsl.push({f:'html/pro.html', n: 'pro', j:0});
-        jsl.push({f:'html/js/pro.js', n: 'pro_js', j:1});
-        jsl.push({f:'html/login.html', n: 'login', j:0});
-        jsl.push({f:'html/js/login.js', n: 'login_js', j:1});
-        jsl.push({f:'html/fm.html', n: 'fm', j:0,w:3});
-        jsl.push({f:'html/top.html', n: 'top', j:0});
-        jsl.push({f:'js/notifications.js', n: 'notifications_js', j:1});
-        jsl.push({f:'css/style.css', n: 'style_css', j:2,w:30,c:1,d:1,cache:1});
-        jsl.push({f:'js/avatar.js', n: 'avatar_js', j:1,w:3});
-        jsl.push({f:'js/countries.js', n: 'countries_js', j:1});
-        jsl.push({f:'html/dialogs.html', n: 'dialogs', j:0,w:2});
-        jsl.push({f:'html/transferwidget.html', n: 'transferwidget', j:0});
-        jsl.push({f:'js/checkboxes.js', n: 'checkboxes_js', j:1});
-        jsl.push({f:'js/Int64.js', n: 'int64_js', j:1});
-        jsl.push({f:'js/zip64.js', n: 'zip_js', j:1});
-        jsl.push({f:'js/cms.js', n: 'cms_js', j:1});
-        jsl.push({f:'js/analytics.js', n: 'analytics_js', j:1});
+            function mTrim(s)
+            {
+                return s
+                    .replace(/resource:.+->\s/,'')
+                    .replace(/blob:[^:\s]+/, '..')
+                    .replace(/\.\.:\/\/[^:\s]+/, '..')
+                    .replace('chrome://mega/content','..')
+                    .replace(/file:.+extensions/,'..fx')
+                    .replace(/(?: line \d+ > eval)+/g,' >.eval')
+            }
+            if (__cdumps.length > 3) return false;
 
-        // only used on beta
-        if(onBetaW) {
-            jsl.push({f: 'js/betacrashes.js', n: 'betacrashes_js', j: 1});
-        }
+            var dump = {
+                m : ('' + msg).replace(/'(\w+:\/\/+[^/]+)[^']+'/,"'$1...'").replace(/^Uncaught\s*/,''),
+                f : mTrim('' + url), l : ln
+            }, cc, sbid = +(''+(document.querySelector('script[src*="secureboot"]')||{}).src).split('=').pop()|0;
+
+            if (~dump.m.indexOf('took +10s'))
+            {
+                var lrc = +localStorage.ttfbReportCount || 0;
+                if (lrc > 20)
+                {
+                    var eid = localStorage.ttfbReport;
+                    localStorage.ttfbReport = sbid;
+                    if (!eid || eid == sbid) return false;
+                    lrc = 1;
+                }
+                localStorage.ttfbReportCount = lrc + 1;
+            }
+
+            if (errobj)
+            {
+                if (errobj.udata) dump.d = errobj.udata;
+                if (errobj.stack)
+                {
+                    dump.s = ('' + errobj.stack).split("\n").splice(0,9).map(mTrim).join("\n");
+                }
+            }
+            if (cn) dump.c = cn;
+
+            if (ln == 0 && !dump.s)
+            {
+                if (dump.m.toLowerCase().indexOf('out of memory') != -1) dump.m = '!Fatal! Out Of Memory.';
+                else dump.m = dump.m.replace(/[^\s\w]/gi,'') || ('[!] ' + msg);
+            }
+            if (location.hostname === 'beta.mega.nz' || location.hostname.indexOf("developers.") > -1) dump.m = '[' + location.hostname + '] ' + dump.m;
+
+            try
+            {
+                var crashes = JSON.parse(localStorage.crashes || '{}');
+                var checksum = MurmurHash3(JSON.stringify(dump), 0x4ef5391a);
+
+                if (crashes.v != sbid) crashes = { v : sbid };
+
+                if (crashes[checksum])
+                {
+                    // Reported less than 10 days ago?
+                    if (Date.now() - crashes[checksum] < 864000000) return false;
+                }
+                dump.x = checksum;
+                crashes[checksum] = Date.now();
+                localStorage.crashes = JSON.stringify(crashes);
+                cc = $.len(crashes);
+            }
+            catch(e) {
+                delete localStorage.crashes;
+            }
+
+            __cdumps.push(dump);
+            if (__cd_t) clearTimeout(__cd_t);
+            __cd_t = setTimeout(safeCall(function()
+            {
+                function ctx(id)
+                {
+                    return {
+                        callback : function(res)
+                        {
+                            if (res === EOVERQUOTA)
+                            {
+                                __cdumps = new Array(4);
+                                if (__cd_t) clearTimeout(__cd_t);
+
+                                if (id)
+                                {
+                                    var crashes = JSON.parse(localStorage.crashes || '{}');
+                                    delete crashes[id];
+                                    localStorage.crashes = JSON.stringify(crashes);
+                                }
+                            }
+                        }
+                    };
+                }
+                var ids = [], uds = [], r = 1;
+                for (var i in __cdumps)
+                {
+                    var dump = __cdumps[i];
+
+                    if (dump.x) { ids.push(dump.x); delete dump.x; }
+                    if (dump.d) { uds.push(dump.d); delete dump.d; }
+                    if (dump.l < 0) r = 0;
+                }
+
+                var report = {};
+                report.ua = navigator.userAgent;
+                report.io = window.dlMethod && dlMethod.name;
+                report.sb = sbid;
+                report.tp = $.transferprogress;
+                report.id = ids.join(",");
+                report.ud = uds;
+                report.cc = cc;
+
+                if (is_chrome_firefox)
+                {
+                    report.mo = mozBrowserID + '::' + is_chrome_firefox + '::' + mozMEGAExtensionVersion;
+                }
+                report = JSON.stringify(r? report:{});
+
+                for (var i in __cdumps)
+                {
+                    api_req({ a : 'cd', c : JSON.stringify(__cdumps[i]), v : report, t : +__cd_v }, ctx(ids[i]));
+                }
+                __cd_t = 0;
+                __cdumps = [];
+
+            }), 3000);
+
+            return false;
+        };
+    }
+    function detectlang()
+    {
+        if (!navigator.language) return 'en';
+        var bl = navigator.language.toLowerCase();
+        var l2 = languages;
+        for (var l in l2) for (b in l2[l]) if (l2[l][b] == bl) return l;
+        for (var l in l2) for (b in l2[l]) if (l2[l][b].substring(0,3)==bl.substring(0,3)) return l;
+        return 'en';
+    }
+    var lang = detectlang(), langv = '', jsl = [];
+    if (typeof localStorage.lang !== 'undefined' && languages[localStorage.lang]) lang = localStorage.lang;
+    if (typeof lv != 'undefined') langv = '_' + lv[lang];
+
+    jsl.push({f:'lang/' + lang + langv + '.json', n: 'lang', j:3});
+    jsl.push({f:'sjcl.js', n: 'sjcl_js', j:1}); // Will be replaced with asmCrypto soon
+    jsl.push({f:'js/asmcrypto.js',n:'asmcrypto_js',j:1,w:1});
+    jsl.push({f:'js/tlvstore.js', n: 'tlvstore_js', j:1});
+    jsl.push({f:'js/crypto.js', n: 'crypto_js', j:1,w:5});
+    jsl.push({f:'js/jsbn.js', n: 'jsbn_js', j:1,w:2});
+    jsl.push({f:'js/jsbn2.js', n: 'jsbn2_js', j:1,w:2});
+    jsl.push({f:'js/jodid25519.js', n: 'jodid25519_js', j:1,w:7});
+    jsl.push({f:'js/stringcrypt.js', n: 'stringcrypt_js', j:1});
+    jsl.push({f:'js/user.js', n: 'user_js', j:1});
+    jsl.push({f:'js/authring.js', n: 'authring_js', j:1});
+    jsl.push({f:'js/mouse.js', n: 'mouse_js', j:1});
+    jsl.push({f:'js/jquery-2.1.1.js', n: 'jquery', j:1,w:10});
+    jsl.push({f:'js/functions.js', n: 'functions_js', j:1});
+    jsl.push({f:'js/megaLogger.js', n: 'megaLogger_js', j:1});
+    jsl.push({f:'js/jquery-ui-1.11.2.js', n: 'jqueryui_js', j:1,w:10});
+    jsl.push({f:'js/base64.js', n: 'base64_js', j:1});
+    jsl.push({f:'js/filedrag.js', n: 'filedrag_js', j:1});
+    jsl.push({f:'js/jquery.mousewheel.js', n: 'jquerymouse_js', j:1});
+    jsl.push({f:'js/jquery.jscrollpane.js', n: 'jscrollpane_js', j:1});
+    jsl.push({f:'js/jquery.tokeninput.js', n: 'jquerytokeninput_js', j:1});
+    jsl.push({f:'js/jquery.misc.js', n: 'jquerymisc_js', j:1});
+    jsl.push({f:'js/mDB.js', n: 'mDB_js', j:1});
+    jsl.push({f:'js/thumbnail.js', n: 'thumbnail_js', j:1});
+    jsl.push({f:'js/exif.js', n: 'exif_js', j:1,w:3});
+    jsl.push({f:'js/megapix.js', n: 'megapix_js', j:1});
+    jsl.push({f:'js/smartcrop.js', n: 'smartcrop_js', j:1,w:7});
+    jsl.push({f:'js/mega.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/jquery.fullscreen.js', n: 'jquery_fullscreen', j:1,w:10});
+    jsl.push({f:'js/vendor/jquery.window-active.js', n: 'jquery_windowactive', j:1,w:2});
+    jsl.push({f:'js/megaPromise.js', n: 'megapromise_js', j:1,w:5});
+    jsl.push({f:'js/vendor/db.js', n: 'db_js', j:1,w:5});
+    jsl.push({f:'js/megaDbEncryptionPlugin.js', n: 'megadbenc_js', j:1,w:5});
+    jsl.push({f:'js/megaDb.js', n: 'megadb_js', j:1,w:5});
+    jsl.push({f:'js/megaKvStorage.js', n: 'megakvstorage_js', j:1,w:5});
+
+    jsl.push({f:'js/chat/mpenc.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/chat/opQueue.js', n: 'mega_js', j:1,w:7});
+
+    jsl.push({f:'js/vendor/chat/strophe.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/vendor/chat/strophe.disco.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/vendor/chat/strophe.jingle.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/vendor/chat/strophe.jingle.session.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/vendor/chat/strophe.jingle.sdp.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/vendor/chat/strophe.jingle.adapter.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/vendor/chat/strophe.muc.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/vendor/chat/strophe.roster.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/vendor/chat/wildemitter.patched.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/vendor/chat/hark.patched.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/vendor/chat/base32.js', n: 'mega_js', j:1,w:7});
+
+    // direct transfer deps.
+    jsl.push({f:'js/vendor/chat/cryptojs-core.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/vendor/chat/cryptojs-sha1.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/vendor/chat/cryptojs-hmac.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/vendor/chat/cryptojs-lib-typedarrays.js', n: 'mega_js', j:1,w:7});
+
+    // Other
+    jsl.push({f:'js/vendor/Autolinker.js', n: 'mega_js', j:1,w:7});
+
+    // Google Import Contacts
+    jsl.push({f:'js/gContacts.js', n: 'gcontacts_js', j:1,w:3});
+
+    // MEGA CHAT
+    jsl.push({f:'js/chat/rtcStats.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/chat/rtcSession.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/chat/fileTransfer.js', n: 'mega_js', j:1,w:7});
+
+    jsl.push({f:'js/ui/filepicker.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/ui/dialog.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/chat/ui/incomingCallDialog.js', n: 'mega_js', j:1,w:7});
+
+    // notifications
+    jsl.push({f:'js/megaNotifications.js', n: 'meganotifications_js', j:1,w:7});
+    jsl.push({f:'js/vendor/ion.sound.js', n: 'ionsound_js', j:1,w:7});
+    jsl.push({f:'js/vendor/favico.js', n: 'favico_js', j:1,w:7});
+    jsl.push({f:'js/vendor/notification.js', n: 'notification_js', j:1,w:7});
+
+    jsl.push({f:'js/chat/plugins/urlFilter.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/chat/plugins/emoticonsFilter.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/chat/plugins/attachmentsFilter.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/chat/plugins/encryptionFilter.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/chat/plugins/chatStore.js', n: 'chatstore_js', j:1,w:7});
+    jsl.push({f:'js/chat/plugins/chatNotifications.js', n: 'chatnotifications_js', j:1,w:7});
+
+    jsl.push({f:'js/chat/karereEventObjects.js', n: 'keo_js', j:1,w:7});
+    jsl.push({f:'js/chat/karere.js', n: 'karere_js', j:1,w:7});
+    jsl.push({f:'js/chat/chat.js', n: 'chat_js', j:1,w:7});
+    jsl.push({f:'js/chat/chatRoom.js', n: 'chat_js', j:1,w:7});
+
+    // END OF MEGA CHAT
+
+    jsl.push({f:'js/fm.js', n: 'fm_js', j:1,w:12});
+    jsl.push({f:'js/filetypes.js', n: 'filetypes_js', j:1});
+    jsl.push({f:'js/miniui.js', n: 'miniui_js', j:1});
+    if (is_extension)
+    {
+            jsl.push({f:'js/dcraw.js', n: 'dcraw_js', j:1});
+    }
+    /* better download */
+    jsl.push({f:'js/xhr.js', n: 'xhr_js', j:1});
+    jsl.push({f:'js/events.js', n: 'events', j:1,w:4});
+    jsl.push({f:'js/queue.js', n: 'queue', j:1,w:4});
+    jsl.push({f:'js/downloadChrome.js', n: 'dl_chrome', j:1,w:3});
+    if (is_chrome_firefox && parseInt(Services.appinfo.version) > 27)
+    {
+        is_chrome_firefox |= 4;
+        jsl.push({f:'js/downloadFirefox.js', n: 'dl_firefox', j:1,w:3});
+    }
+    else
+    {
+        jsl.push({f:'js/downloadMemory.js', n: 'dl_memory', j:1,w:3});
+        jsl.push({f:'js/downloadFlash.js', n: 'dl_flash', j:1,w:3});
+    }
+    jsl.push({f:'js/downloader.js', n: 'dl_downloader', j:1,w:3});
+    jsl.push({f:'js/download2.js', n: 'dl_js', j:1,w:3});
+    jsl.push({f:'js/upload2.js', n: 'upload_js', j:1,w:2});
+    /* end better download */
+    jsl.push({f:'index.js', n: 'index', j:1,w:4});
+    jsl.push({f:'html/start.html', n: 'start', j:0});
+    jsl.push({f:'html/megainfo.html', n: 'megainfo', j:0});
+    jsl.push({f:'html/js/start.js', n: 'start_js', j:1});
+    jsl.push({f:'html/bottom2.html', n: 'bottom2',j:0});
+    jsl.push({f:'html/key.html', n: 'key', j:0});
+    jsl.push({f:'html/js/key.js', n: 'key_js', j:1});
+    jsl.push({f:'html/pro.html', n: 'pro', j:0});
+    jsl.push({f:'html/js/pro.js', n: 'pro_js', j:1});
+    jsl.push({f:'html/login.html', n: 'login', j:0});
+    jsl.push({f:'html/js/login.js', n: 'login_js', j:1});
+    jsl.push({f:'html/fm.html', n: 'fm', j:0,w:3});
+    jsl.push({f:'html/top.html', n: 'top', j:0});
+    jsl.push({f:'js/notifications.js', n: 'notifications_js', j:1});
+    jsl.push({f:'css/style.css', n: 'style_css', j:2,w:30,c:1,d:1,cache:1});
+    jsl.push({f:'js/avatar.js', n: 'avatar_js', j:1,w:3});
+    jsl.push({f:'js/countries.js', n: 'countries_js', j:1});
+    jsl.push({f:'html/dialogs.html', n: 'dialogs', j:0,w:2});
+    jsl.push({f:'html/transferwidget.html', n: 'transferwidget', j:0});
+    jsl.push({f:'js/checkboxes.js', n: 'checkboxes_js', j:1});
+    jsl.push({f:'js/Int64.js', n: 'int64_js', j:1});
+    jsl.push({f:'js/zip64.js', n: 'zip_js', j:1});
+    jsl.push({f:'js/cms.js', n: 'cms_js', j:1});
+    jsl.push({f:'js/analytics.js', n: 'analytics_js', j:1});
+
+    // only used on beta
+    if(onBetaW) {
+        jsl.push({f: 'js/betacrashes.js', n: 'betacrashes_js', j: 1});
+    }
 
 //        jsl.push({f:'html/register.html', n: 'register', j:0});
 //        jsl.push({f:'html/js/register.js', n: 'register_js', j:1});
 
-        var jsl2 =
-        {
-            'about': {f:'html/about.html', n: 'about', j:0},
-            'blog': {f:'html/blog.html', n: 'blog', j:0},
-            'blog_js': {f:'html/js/blog.js', n: 'blog_js', j:1},
-            'blogarticle': {f:'html/blogarticle.html', n: 'blogarticle', j:0},
-            'blogarticle_js': {f:'html/js/blogarticle.js', n: 'blogarticle_js', j:1},
-            'register': {f:'html/register.html', n: 'register', j:0},
-            'register_js': {f:'html/js/register.js', n: 'register_js', j:1},
-            'resellers': {f:'html/resellers.html', n: 'resellers', j:0},
-            'download': {f:'html/download.html', n: 'download', j:0},
-            'download_js': {f:'html/js/download.js', n: 'download_js', j:1},
-            'copyright': {f:'html/copyright.html', n: 'copyright', j:0},
-            'copyrightnotice': {f:'html/copyrightnotice.html', n: 'copyrightnotice', j:0},
-            'copyrightnotice_js': {f:'html/js/copyrightnotice.js', n: 'copyrightnotice_js', j:1},
-            'privacy': {f:'html/privacy.html', n: 'privacy', j:0},
-            'terms': {f:'html/terms.html', n: 'terms', j:0},
-            'backup': {f:'html/backup.html', n: 'backup', j:0},
-            'backup_js': {f:'html/js/backup.js', n: 'backup_js', j:1},
-            'reset': {f:'html/reset.html', n: 'reset', j:0},
-            'reset_js': {f:'html/js/reset.js', n: 'reset_js', j:1},
-            'filesaver': {f:'js/filesaver.js', n: 'filesaver', j:1},
-            'recovery': {f:'html/recovery.html', n: 'recovery', j:0},
-            'recovery_js': {f:'html/js/recovery.js', n: 'recovery_js', j:1},
-            'credits': {f:'html/credits.html', n: 'credits', j:0},
-            'takedown': {f:'html/takedown.html', n: 'takedown', j:0},
-            'dev': {f:'html/dev.html', n: 'dev', j:0},
-            'arkanoid_js': {f:'js/arkanoid.js', n: 'arkanoid_js', j:1},
-            'dev_js': {f:'html/js/dev.js', n: 'dev_js', j:1},
-            'sdkterms': {f:'html/sdkterms.html', n: 'sdkterms', j:0},
-            'help_js': {f:'html/js/help.js', n: 'help_js', j:1},
-            'firefox': {f:'html/firefox.html', n: 'firefox', j:0},
-            'sync': {f:'html/sync.html', n: 'sync', j:0},
-			'sync_js': {f:'html/js/sync.js', n: 'sync_js', j:1},
-            'mobile': {f:'html/mobile.html', n: 'mobile', j:0},
-            'affiliates': {f:'html/affiliates.html', n: 'affiliates', j:0},
-            'affiliate_js': {f:'html/js/affiliate.js', n: 'affiliate_js', j:0},
-            'affiliateterms': {f:'html/affiliateterms.html', n: 'affiliateterms', j:0},
-            'affiliatesignup': {f:'html/affiliatesignup.html', n: 'affiliatesignup', j:0},
-            'affiliatesignup_js': {f:'html/js/affiliatesignup.js', n: 'affiliatesignup_js', j:1},
-            'affiliatemember': {f:'html/affiliatemember.html', n: 'affiliatemember', j:0},
-            'affiliatemember_js': {f:'html/js/affiliatemember.js', n: 'affiliatemember_js', j:1},
-            'contact': {f:'html/contact.html', n: 'contact', j:0},
-            'privacycompany': {f:'html/privacycompany.html', n: 'privacycompany', j:0},
-            'chrome': {f:'html/chrome.html', n: 'chrome', j:0},
-            'zxcvbn_js': {f:'js/zxcvbn.js', n: 'zxcvbn_js', j:1}
-        };
-        var subpages =
-        {
-            'about': ['about'],
-            'terms': ['terms'],
-            'credits': ['credits'],
-            'backup': ['backup','backup_js','filesaver'],
-            'recovery': ['recovery','recovery_js'],
-            'reset': ['reset','reset_js'],
-            'blog': ['blog','blog_js','blogarticle','blogarticle_js'],
-            'register': ['register','register_js'],
-            'android': ['android'],
-            'resellers': ['resellers'],
-            '!': ['download','download_js'],
-            'copyright': ['copyright'],
-            'key':['arkanoid_js'],
-            'copyrightnotice': ['copyrightnotice','copyrightnotice_js'],
-            'privacy': ['privacy','privacycompany'],
-            'takedown': ['takedown'],
-            'firefox': ['firefox'],
-            'mobile': ['mobile'],
-            'sync': ['sync','sync_js'],
-            'contact': ['contact'],
-            'dev': ['dev','dev_js','sdkterms'],
-            'sdk': ['dev','dev_js','sdkterms'],
-            'doc': ['dev','dev_js','sdkterms'],
-            'help': ['help_js'],
-            'chrome': ['chrome'],
-            'plugin': ['chrome','firefox'],
-            'affiliate': ['affiliates','affiliateterms','affiliatesignup','affiliatesignup_js','affiliatemember','affiliatemember_js','affiliate_js'],
-            'recover': ['reset','reset_js']
-        };
+    var jsl2 =
+    {
+        'about': {f:'html/about.html', n: 'about', j:0},
+        'blog': {f:'html/blog.html', n: 'blog', j:0},
+        'blog_js': {f:'html/js/blog.js', n: 'blog_js', j:1},
+        'blogarticle': {f:'html/blogarticle.html', n: 'blogarticle', j:0},
+        'blogarticle_js': {f:'html/js/blogarticle.js', n: 'blogarticle_js', j:1},
+        'register': {f:'html/register.html', n: 'register', j:0},
+        'register_js': {f:'html/js/register.js', n: 'register_js', j:1},
+        'resellers': {f:'html/resellers.html', n: 'resellers', j:0},
+        'download': {f:'html/download.html', n: 'download', j:0},
+        'download_js': {f:'html/js/download.js', n: 'download_js', j:1},
+        'copyright': {f:'html/copyright.html', n: 'copyright', j:0},
+        'copyrightnotice': {f:'html/copyrightnotice.html', n: 'copyrightnotice', j:0},
+        'copyrightnotice_js': {f:'html/js/copyrightnotice.js', n: 'copyrightnotice_js', j:1},
+        'privacy': {f:'html/privacy.html', n: 'privacy', j:0},
+        'terms': {f:'html/terms.html', n: 'terms', j:0},
+        'backup': {f:'html/backup.html', n: 'backup', j:0},
+        'backup_js': {f:'html/js/backup.js', n: 'backup_js', j:1},
+        'reset': {f:'html/reset.html', n: 'reset', j:0},
+        'reset_js': {f:'html/js/reset.js', n: 'reset_js', j:1},
+        'filesaver': {f:'js/filesaver.js', n: 'filesaver', j:1},
+        'recovery': {f:'html/recovery.html', n: 'recovery', j:0},
+        'recovery_js': {f:'html/js/recovery.js', n: 'recovery_js', j:1},
+        'credits': {f:'html/credits.html', n: 'credits', j:0},
+        'takedown': {f:'html/takedown.html', n: 'takedown', j:0},
+        'dev': {f:'html/dev.html', n: 'dev', j:0},
+        'arkanoid_js': {f:'js/arkanoid.js', n: 'arkanoid_js', j:1},
+        'dev_js': {f:'html/js/dev.js', n: 'dev_js', j:1},
+        'sdkterms': {f:'html/sdkterms.html', n: 'sdkterms', j:0},
+        'help_js': {f:'html/js/help.js', n: 'help_js', j:1},
+        'firefox': {f:'html/firefox.html', n: 'firefox', j:0},
+        'sync': {f:'html/sync.html', n: 'sync', j:0},
+        'sync_js': {f:'html/js/sync.js', n: 'sync_js', j:1},
+        'mobile': {f:'html/mobile.html', n: 'mobile', j:0},
+        'affiliates': {f:'html/affiliates.html', n: 'affiliates', j:0},
+        'affiliate_js': {f:'html/js/affiliate.js', n: 'affiliate_js', j:0},
+        'affiliateterms': {f:'html/affiliateterms.html', n: 'affiliateterms', j:0},
+        'affiliatesignup': {f:'html/affiliatesignup.html', n: 'affiliatesignup', j:0},
+        'affiliatesignup_js': {f:'html/js/affiliatesignup.js', n: 'affiliatesignup_js', j:1},
+        'affiliatemember': {f:'html/affiliatemember.html', n: 'affiliatemember', j:0},
+        'affiliatemember_js': {f:'html/js/affiliatemember.js', n: 'affiliatemember_js', j:1},
+        'contact': {f:'html/contact.html', n: 'contact', j:0},
+        'privacycompany': {f:'html/privacycompany.html', n: 'privacycompany', j:0},
+        'chrome': {f:'html/chrome.html', n: 'chrome', j:0},
+        'zxcvbn_js': {f:'js/zxcvbn.js', n: 'zxcvbn_js', j:1}
+    };
+    var subpages =
+    {
+        'about': ['about'],
+        'terms': ['terms'],
+        'credits': ['credits'],
+        'backup': ['backup','backup_js','filesaver'],
+        'recovery': ['recovery','recovery_js'],
+        'reset': ['reset','reset_js'],
+        'blog': ['blog','blog_js','blogarticle','blogarticle_js'],
+        'register': ['register','register_js'],
+        'android': ['android'],
+        'resellers': ['resellers'],
+        '!': ['download','download_js'],
+        'copyright': ['copyright'],
+        'key':['arkanoid_js'],
+        'copyrightnotice': ['copyrightnotice','copyrightnotice_js'],
+        'privacy': ['privacy','privacycompany'],
+        'takedown': ['takedown'],
+        'firefox': ['firefox'],
+        'mobile': ['mobile'],
+        'sync': ['sync','sync_js'],
+        'contact': ['contact'],
+        'dev': ['dev','dev_js','sdkterms'],
+        'sdk': ['dev','dev_js','sdkterms'],
+        'doc': ['dev','dev_js','sdkterms'],
+        'help': ['help_js'],
+        'chrome': ['chrome'],
+        'plugin': ['chrome','firefox'],
+        'affiliate': ['affiliates','affiliateterms','affiliatesignup','affiliatesignup_js','affiliatemember','affiliatemember_js','affiliate_js'],
+        'recover': ['reset','reset_js']
+    };
 
-        if (page)
+    if (page)
+    {
+        if (page.indexOf('%25') !== -1)
         {
-            if (page.indexOf('%25') !== -1)
-            {
-                do {
-                    page = page.replace('%25','%', 'g');
-                } while (~page.indexOf('%25'));
-            }
-            if (page.indexOf('%21') !== -1)
-            {
-                page = page.replace('%21','!', 'g');
-                document.location.hash = page;
-            }
+            do {
+                page = page.replace('%25','%', 'g');
+            } while (~page.indexOf('%25'));
+        }
+        if (page.indexOf('%21') !== -1)
+        {
+            page = page.replace('%21','!', 'g');
+            document.location.hash = page;
+        }
 
-            page = page.replace('#','');
-            for (var p in subpages)
+        page = page.replace('#','');
+        for (var p in subpages)
+        {
+            if (page.substr(0,p.length) == p)
             {
-                if (page.substr(0,p.length) == p)
-                {
-                    for (var i in subpages[p]) jsl.push(jsl2[subpages[p][i]]);
-                }
+                for (var i in subpages[p]) jsl.push(jsl2[subpages[p][i]]);
             }
         }
-        var downloading = false;
-        var ul_uploading = false;
-        var lightweight=false;
-		var waitingToBeLoaded = 0,jsl_done,jj_done = !jj;
-        var fx_startup_cache = is_chrome_firefox && nocontentcheck;
-        if (!fx_startup_cache && !nocontentcheck)
+    }
+    var downloading = false;
+    var ul_uploading = false;
+    var lightweight=false;
+    var waitingToBeLoaded = 0,jsl_done,jj_done = !jj;
+    var fx_startup_cache = is_chrome_firefox && nocontentcheck;
+    if (!fx_startup_cache && !nocontentcheck)
+    {
+        if (window.URL) evalscript_url([sjcl_sha_js]);
+        else evalscript(sjcl_sha_js);
+    }
+    if ((typeof Worker !== 'undefined') && (typeof window.URL !== 'undefined') && !fx_startup_cache && !nocontentcheck)
+    {
+        var hashdata = ['self.postMessage = self.webkitPostMessage || self.postMessage;',sjcl_sha_js,'self.onmessage = function(e) { try { e.data.hash = sha256(e.data.text);  self.postMessage(e.data); } catch(err) { e.data.error = err.message; self.postMessage(e.data);  } };'];
+        var hash_url = mObjectURL(hashdata, "text/javascript");
+        var hash_workers = [];
+        var i =0;
+        while (i < 2)
         {
-            if (window.URL) evalscript_url([sjcl_sha_js]);
-            else evalscript(sjcl_sha_js);
-        }
-        if ((typeof Worker !== 'undefined') && (typeof window.URL !== 'undefined') && !fx_startup_cache && !nocontentcheck)
-        {
-            var hashdata = ['self.postMessage = self.webkitPostMessage || self.postMessage;',sjcl_sha_js,'self.onmessage = function(e) { try { e.data.hash = sha256(e.data.text);  self.postMessage(e.data); } catch(err) { e.data.error = err.message; self.postMessage(e.data);  } };'];
-            var hash_url = mObjectURL(hashdata, "text/javascript");
-            var hash_workers = [];
-            var i =0;
-            while (i < 2)
+            try
             {
-                try
+                hash_workers[i] = new Worker(hash_url);
+                hash_workers[i].postMessage = hash_workers[i].webkitPostMessage || hash_workers[i].postMessage;
+                hash_workers[i].onmessage = function(e)
                 {
-                    hash_workers[i] = new Worker(hash_url);
-                    hash_workers[i].postMessage = hash_workers[i].webkitPostMessage || hash_workers[i].postMessage;
-                    hash_workers[i].onmessage = function(e)
+                    if (e.data.error)
                     {
-                        if (e.data.error)
-                        {
-                            console.log('error',e.data.error);
-                            console.log(e.data.text);
-                            alert('error');
-                        }
-                        if (!nocontentcheck && !cmparrays(e.data.hash,sh1[jsl[e.data.jsi].f]))
-                        {
-                            if (bootstaticpath.indexOf('cdn') > -1)
-                            {
-                                sessionStorage.skipcdn=1;
-                                document.location.reload();
-                            }
-                            else alert('An error occurred while loading MEGA. The file ' + bootstaticpath+jsl[e.data.jsi].f + ' is corrupt. Please try again later. We apologize for the inconvenience.');
-
-                            contenterror=1;
-                        }
-                        if (!contenterror)
-                        {
-                            jsl_current += jsl[e.data.jsi].w || 1;
-                            jsl_progress();
-                            if (++jslcomplete == jsl.length) initall();
-                            else jsl_load(e.data.xhri);
-                        }
-                    };
-                }
-                catch(e)
-                {
-                    hash_workers = undefined;
-                    break;
-                }
-                i++;
-            }
-        }
-
-        if (jj)
-        {
-			var headElement = document.querySelector("head");
-			var _queueWaitToBeLoaded = function(id, elem) {
-				waitingToBeLoaded++;
-				elem.onload = function() {
-                    if (d) console.log('jj.progress...', waitingToBeLoaded);
-					if (--waitingToBeLoaded == 0) {
-                        jj_done = true;
-						boot_done();
-                        _queueWaitToBeLoaded = headElement = undefined;
-					}
-                    elem.onload = null;
-				};
-			};
-
-			var createScriptTag = function(id, src) {
-				var elem = document.createElement("script");
-				_queueWaitToBeLoaded(id, elem);
-				elem.async = false;
-				elem.src = src;
-				headElement.appendChild(elem);
-				return elem;
-			};
-			var createStyleTag = function(id, src) {
-				var elem = document.createElement("link");
-				elem.rel = "stylesheet";
-				elem.type = "text/css";
-				_queueWaitToBeLoaded(id, elem);
-				elem.href = src;
-				headElement.appendChild(elem);
-				return elem;
-			};
-
-            l=[];
-            var i = 3000, r = '?r=' + (new Date().toISOString().replace(/[^\w]/g,''));
-            if (!localStorage.jjnocache) r = '';
-            while (i--) l[i]='l';
-            for (var i in jsl)
-            {
-                if (jsl[i].j === 1) {
-					createScriptTag("jsl" + i, bootstaticpath + jsl[i].f + r);
-				}
-                else if (jsl[i].j === 2)
-                {
-                    if ((m && (jsl[i].m)) || ((!m) && (jsl[i].d))) {
-						createStyleTag("jsl" + i, bootstaticpath + jsl[i].f + r);
-					}
-                }
-            }
-            if (d) console.log('jj.total...', waitingToBeLoaded);
-        }
-
-        var pages = [];
-        function getxhr()
-        {
-            return (typeof XDomainRequest != 'undefined' && typeof ArrayBuffer == 'undefined') ? new XDomainRequest() : new XMLHttpRequest();
-        }
-
-        var xhr_progress,xhr_stack,jsl_fm_current,jsl_current,jsl_total,jsl_perc,jsli,jslcomplete;
-
-        function jsl_start()
-        {
-            jslcomplete = 0;
-            if(d && jj) {
-                xhr_progress = [0, 0, 0, 0, 0];
-            } else {
-                xhr_progress = [0, 0];
-            }
-            xhr_stack = Array(xhr_progress.length);
-            jsl_fm_current = 0;
-            jsl_current = 0;
-            jsl_total = 0;
-            jsl_perc = 0;
-            jsli=0;
-            for (var i = jsl.length; i--;) if (!jsl[i].text) jsl_total += jsl[i].w || 1;
-            if (fx_startup_cache)
-            {
-                var step = function(jsi)
-                {
-                    jsl_current += jsl[jsi].w || 1;
-                    jsl_progress();
-                    if (++jslcomplete == jsl.length) initall();
-                    else
-                    {
-                        // mozRunAsync(next.bind(this, jsli++));
-                        next(jsli++);
+                        console.log('error',e.data.error);
+                        console.log(e.data.text);
+                        alert('error');
                     }
-                };
-                var next = function(jsi)
-                {
-                    var file = bootstaticpath + jsl[jsi].f;
-
-                    if (jsl[jsi].j == 1)
+                    if (!nocontentcheck && !cmparrays(e.data.hash,sh1[jsl[e.data.jsi].f]))
                     {
-                        try
+                        if (bootstaticpath.indexOf('cdn') > -1)
                         {
-                            loadSubScript(file);
+                            sessionStorage.skipcdn=1;
+                            document.location.reload();
                         }
-                        catch(e)
-                        {
-                            Cu.reportError(e);
+                        else alert('An error occurred while loading MEGA. The file ' + bootstaticpath+jsl[e.data.jsi].f + ' is corrupt. Please try again later. We apologize for the inconvenience.');
 
-                            alert('An error occurred while loading MEGA.\n\nFilename: '
-                                + file + "\n" + e + '\n\n' + mozBrowserID);
-                        }
-                        step(jsi);
-                    }
-                    else
-                    {
-                        var ch = NetUtil.newChannel(file);
-                        ch.contentType = jsl[jsi].j == 3
-                            ? "application/json":"text/plain";
-
-                        NetUtil.asyncFetch(ch, function(is, s)
-                        {
-                            if (!Components.isSuccessCode(s))
-                            {
-                                alert('An error occurred while loading MEGA.' +
-                                    ' The file ' + file + ' could not be loaded.');
-                            }
-                            else
-                            {
-                                jsl[jsi].text = NetUtil.readInputStreamToString(is, is.available());
-                                if (jsl[jsi].j == 3) l = JSON.parse(jsl[jsi].text);
-                                step(jsi);
-                            }
-                        });
-                    }
-                };
-                next(jsli++);
-            }
-            else
-            {
-                for (var i = xhr_progress.length; i--; ) jsl_load(i);
-            }
-        }
-
-        var xhr_timeout=30000;
-
-        function xhr_error()
-        {
-            xhr_timeout+=10000;
-            console.log(xhr_timeout);
-            if (bootstaticpath.indexOf('cdn') > -1)
-            {
-                bootstaticpath = geoStaticpath(1);
-                staticpath = geoStaticpath(1);
-            }
-            xhr_progress[this.xhri] = 0;
-            xhr_load(this.url,this.jsi,this.xhri);
-        }
-
-        function xhr_load(url,jsi,xhri)
-        {
-            if(d && jj) {
-                if(jsl[jsi].j == 1 || jsl[jsi].j == 2) {
-                    // DON'T load via XHR any js or css files...since when jj == 1, secureboot will append them in the doc.
-
-                    jsl_current += jsl[jsi].w || 1;
-                    jsl_progress();
-                    if (++jslcomplete == jsl.length) initall();
-                    else jsl_load(xhri);
-
-                    return;
-                }
-            }
-            xhr_stack[xhri] = getxhr();
-            xhr_stack[xhri].onload = function()
-            {
-                jsl[this.jsi].text = this.response || this.responseText;
-
-                if (typeof hash_workers !== 'undefined' && !nocontentcheck)
-                {
-                    hash_workers[this.xhri].postMessage({'text':jsl[this.jsi].text,'xhr':'test','jsi':this.jsi,'xhri':this.xhri});
-                }
-                else
-                {
-                    if (!nocontentcheck && !cmparrays(sha256(jsl[this.jsi].text),sh1[jsl[this.jsi].f]))
-                    {
-                        alert('An error occurred while loading MEGA. The file ' + bootstaticpath+jsl[this.jsi].f + ' is corrupt. Please try again later. We apologize for the inconvenience.');
                         contenterror=1;
                     }
                     if (!contenterror)
                     {
-                        jsl_current += jsl[this.jsi].w || 1;
+                        jsl_current += jsl[e.data.jsi].w || 1;
                         jsl_progress();
                         if (++jslcomplete == jsl.length) initall();
-                        else jsl_load(this.xhri);
+                        else jsl_load(e.data.xhri);
                     }
-                }
+                };
             }
-            xhr_stack[xhri].onreadystatechange = function()
+            catch(e)
             {
-                try
-                {
-                    if (this.readyState == 1) this.timeout=0;
-                }
-                catch(e)
-                {
-
-                }
+                hash_workers = undefined;
+                break;
             }
-            xhr_stack[xhri].onerror = xhr_error;
-            xhr_stack[xhri].ontimeout = xhr_error;
-            if (jsl[jsi].text)
-            {
-                if (++jslcomplete == jsl.length) initall();
-                else jsl_load(xhri);
-            }
-            else
-            {
-                xhr_stack[xhri].url = url;
-                xhr_stack[xhri].jsi = jsi;
-                xhr_stack[xhri].xhri = xhri;
-                if (localStorage.dd) url += '?t=' + Date.now();
-                xhr_stack[xhri].open("GET", bootstaticpath + url, true);
-                xhr_stack[xhri].timeout = xhr_timeout;
-                if (is_chrome_firefox) xhr_stack[xhri].overrideMimeType('text/plain');
-                xhr_stack[xhri].send(null);
-            }
-        }
-        window.onload = function ()
-        {
-            if (!maintenance && !androidsplash) jsl_start();
-        }
-        function jsl_load(xhri)
-        {
-            if (jsl[jsli]) xhr_load(jsl[jsli].f, jsli++,xhri);
-        }
-        function jsl_progress()
-        {
-            // if (d) console.log('done',(jsl_current+jsl_fm_current));
-            // if (d) console.log('total',jsl_total);
-            var p = Math.floor((jsl_current+jsl_fm_current)/jsl_total*100);
-            if ((p > jsl_perc) && (p <= 100))
-            {
-                jsl_perc = p;
-                if (d) console.log('jsl.progress... ' + p + '%', (jsl_current+jsl_fm_current), jsl_total);
-                if (is_extension) p=100;
-                document.getElementById('loadinganim').className = 'loading-progress-bar percents-'+p;
-            }
-        }
-        var jsl_loaded={};
-        function initall()
-        {
-            var jsar = [];
-            var cssar = [];
-            //for(var i in localStorage) if (i.substr(0,6) == 'cache!') delete localStorage[i];
-            for (var i in jsl)
-            {
-                jsl_loaded[jsl[i].n]=1;
-                if ((jsl[i].j == 1) && (!jj))
-                {
-                    if (!fx_startup_cache)
-                    {
-                        if (window.URL) jsar.push(jsl[i].text + '\n\n');
-                        else evalscript(jsl[i].text);
-                    }
-                }
-                else if ((jsl[i].j == 2) && (!jj))
-                {
-                    if (document.getElementById('bootbottom')) document.getElementById('bootbottom').style.display='none';
-                    if (!is_chrome_firefox && window.URL)
-                    {
-                        cssar.push(jsl[i].text.replace(/\.\.\//g,staticpath).replace(new RegExp( "\\/en\\/", "g"),'/' + lang + '/'));
-                    }
-                    else
-                    {
-                        var css = document.createElement('style');
-                        css.type = "text/css";
-                        css.rel = 'stylesheet';
-                        document.getElementsByTagName('head')[0].appendChild(css);
-                        css.textContent = jsl[i].text.replace(/\.\.\//g,staticpath).replace(new RegExp( "\\/en\\/", "g"),'/' + lang + '/');
-                    }
-                }
-                else if (jsl[i].j == 3) l = !jj && l || JSON.parse(jsl[i].text);
-                else if (jsl[i].j == 0) pages[jsl[i].n] = jsl[i].text;
-            }
-            if (window.URL)
-            {
-                cssar = cssar.length && mObjectURL(cssar, "text/css");
-                if (cssar)
-                {
-                    var link = document.createElement('link');
-                    link.setAttribute('rel', 'stylesheet');
-                    link.type = 'text/css';
-                    link.href = cssar;
-                    document.head.appendChild(link);
-                }
-                if (!jsl_done || jsar.length) {
-                    jsar.push('jsl_done=true; boot_done();');
-                } else {
-                    boot_done();
-                }
-                if (jsar.length) evalscript_url(jsar);
-                jsar=undefined;
-                cssar=undefined;
-            }
-            else
-            {
-                jsl_done=true;
-				boot_done();
-            }
-            jj = 0; //prevent further 'silent_loading' loads from failing..
+            i++;
         }
     }
+
+    if (jj)
+    {
+        var headElement = document.querySelector("head");
+        var _queueWaitToBeLoaded = function(id, elem) {
+            waitingToBeLoaded++;
+            elem.onload = function() {
+                if (d) console.log('jj.progress...', waitingToBeLoaded);
+                if (--waitingToBeLoaded == 0) {
+                    jj_done = true;
+                    boot_done();
+                    _queueWaitToBeLoaded = headElement = undefined;
+                }
+                elem.onload = null;
+            };
+        };
+
+        var createScriptTag = function(id, src) {
+            var elem = document.createElement("script");
+            _queueWaitToBeLoaded(id, elem);
+            elem.async = false;
+            elem.src = src;
+            headElement.appendChild(elem);
+            return elem;
+        };
+        var createStyleTag = function(id, src) {
+            var elem = document.createElement("link");
+            elem.rel = "stylesheet";
+            elem.type = "text/css";
+            _queueWaitToBeLoaded(id, elem);
+            elem.href = src;
+            headElement.appendChild(elem);
+            return elem;
+        };
+
+        l=[];
+        var i = 3000, r = '?r=' + (new Date().toISOString().replace(/[^\w]/g,''));
+        if (!localStorage.jjnocache) r = '';
+        while (i--) l[i]='l';
+        for (var i in jsl)
+        {
+            if (jsl[i].j === 1) {
+                createScriptTag("jsl" + i, bootstaticpath + jsl[i].f + r);
+            }
+            else if (jsl[i].j === 2)
+            {
+                if ((m && (jsl[i].m)) || ((!m) && (jsl[i].d))) {
+                    createStyleTag("jsl" + i, bootstaticpath + jsl[i].f + r);
+                }
+            }
+        }
+        if (d) console.log('jj.total...', waitingToBeLoaded);
+    }
+
+    var pages = [];
+    function getxhr()
+    {
+        return (typeof XDomainRequest != 'undefined' && typeof ArrayBuffer == 'undefined') ? new XDomainRequest() : new XMLHttpRequest();
+    }
+
+    var xhr_progress,xhr_stack,jsl_fm_current,jsl_current,jsl_total,jsl_perc,jsli,jslcomplete;
+
+    function jsl_start()
+    {
+        jslcomplete = 0;
+        if(d && jj) {
+            xhr_progress = [0, 0, 0, 0, 0];
+        } else {
+            xhr_progress = [0, 0];
+        }
+        xhr_stack = Array(xhr_progress.length);
+        jsl_fm_current = 0;
+        jsl_current = 0;
+        jsl_total = 0;
+        jsl_perc = 0;
+        jsli=0;
+        for (var i = jsl.length; i--;) if (!jsl[i].text) jsl_total += jsl[i].w || 1;
+        if (fx_startup_cache)
+        {
+            var step = function(jsi)
+            {
+                jsl_current += jsl[jsi].w || 1;
+                jsl_progress();
+                if (++jslcomplete == jsl.length) initall();
+                else
+                {
+                    // mozRunAsync(next.bind(this, jsli++));
+                    next(jsli++);
+                }
+            };
+            var next = function(jsi)
+            {
+                var file = bootstaticpath + jsl[jsi].f;
+
+                if (jsl[jsi].j == 1)
+                {
+                    try
+                    {
+                        loadSubScript(file);
+                    }
+                    catch(e)
+                    {
+                        Cu.reportError(e);
+
+                        alert('An error occurred while loading MEGA.\n\nFilename: '
+                            + file + "\n" + e + '\n\n' + mozBrowserID);
+                    }
+                    step(jsi);
+                }
+                else
+                {
+                    var ch = NetUtil.newChannel(file);
+                    ch.contentType = jsl[jsi].j == 3
+                        ? "application/json":"text/plain";
+
+                    NetUtil.asyncFetch(ch, function(is, s)
+                    {
+                        if (!Components.isSuccessCode(s))
+                        {
+                            alert('An error occurred while loading MEGA.' +
+                                ' The file ' + file + ' could not be loaded.');
+                        }
+                        else
+                        {
+                            jsl[jsi].text = NetUtil.readInputStreamToString(is, is.available());
+                            if (jsl[jsi].j == 3) l = JSON.parse(jsl[jsi].text);
+                            step(jsi);
+                        }
+                    });
+                }
+            };
+            next(jsli++);
+        }
+        else
+        {
+            for (var i = xhr_progress.length; i--; ) jsl_load(i);
+        }
+    }
+
+    var xhr_timeout=30000;
+
+    function xhr_error()
+    {
+        xhr_timeout+=10000;
+        console.log(xhr_timeout);
+        if (bootstaticpath.indexOf('cdn') > -1)
+        {
+            bootstaticpath = geoStaticpath(1);
+            staticpath = geoStaticpath(1);
+        }
+        xhr_progress[this.xhri] = 0;
+        xhr_load(this.url,this.jsi,this.xhri);
+    }
+
+    function xhr_load(url,jsi,xhri)
+    {
+        if(d && jj) {
+            if(jsl[jsi].j == 1 || jsl[jsi].j == 2) {
+                // DON'T load via XHR any js or css files...since when jj == 1, secureboot will append them in the doc.
+
+                jsl_current += jsl[jsi].w || 1;
+                jsl_progress();
+                if (++jslcomplete == jsl.length) initall();
+                else jsl_load(xhri);
+
+                return;
+            }
+        }
+        xhr_stack[xhri] = getxhr();
+        xhr_stack[xhri].onload = function()
+        {
+            jsl[this.jsi].text = this.response || this.responseText;
+
+            if (typeof hash_workers !== 'undefined' && !nocontentcheck)
+            {
+                hash_workers[this.xhri].postMessage({'text':jsl[this.jsi].text,'xhr':'test','jsi':this.jsi,'xhri':this.xhri});
+            }
+            else
+            {
+                if (!nocontentcheck && !cmparrays(sha256(jsl[this.jsi].text),sh1[jsl[this.jsi].f]))
+                {
+                    alert('An error occurred while loading MEGA. The file ' + bootstaticpath+jsl[this.jsi].f + ' is corrupt. Please try again later. We apologize for the inconvenience.');
+                    contenterror=1;
+                }
+                if (!contenterror)
+                {
+                    jsl_current += jsl[this.jsi].w || 1;
+                    jsl_progress();
+                    if (++jslcomplete == jsl.length) initall();
+                    else jsl_load(this.xhri);
+                }
+            }
+        }
+        xhr_stack[xhri].onreadystatechange = function()
+        {
+            try
+            {
+                if (this.readyState == 1) this.timeout=0;
+            }
+            catch(e)
+            {
+
+            }
+        }
+        xhr_stack[xhri].onerror = xhr_error;
+        xhr_stack[xhri].ontimeout = xhr_error;
+        if (jsl[jsi].text)
+        {
+            if (++jslcomplete == jsl.length) initall();
+            else jsl_load(xhri);
+        }
+        else
+        {
+            xhr_stack[xhri].url = url;
+            xhr_stack[xhri].jsi = jsi;
+            xhr_stack[xhri].xhri = xhri;
+            if (localStorage.dd) url += '?t=' + Date.now();
+            xhr_stack[xhri].open("GET", bootstaticpath + url, true);
+            xhr_stack[xhri].timeout = xhr_timeout;
+            if (is_chrome_firefox) xhr_stack[xhri].overrideMimeType('text/plain');
+            xhr_stack[xhri].send(null);
+        }
+    }
+    window.onload = function ()
+    {
+        if (!maintenance && !androidsplash) jsl_start();
+    }
+    function jsl_load(xhri)
+    {
+        if (jsl[jsli]) xhr_load(jsl[jsli].f, jsli++,xhri);
+    }
+    function jsl_progress()
+    {
+        // if (d) console.log('done',(jsl_current+jsl_fm_current));
+        // if (d) console.log('total',jsl_total);
+        var p = Math.floor((jsl_current+jsl_fm_current)/jsl_total*100);
+        if ((p > jsl_perc) && (p <= 100))
+        {
+            jsl_perc = p;
+            if (d) console.log('jsl.progress... ' + p + '%', (jsl_current+jsl_fm_current), jsl_total);
+            if (is_extension) p=100;
+            document.getElementById('loadinganim').className = 'loading-progress-bar percents-'+p;
+        }
+    }
+    var jsl_loaded={};
+    function initall()
+    {
+        var jsar = [];
+        var cssar = [];
+        //for(var i in localStorage) if (i.substr(0,6) == 'cache!') delete localStorage[i];
+        for (var i in jsl)
+        {
+            jsl_loaded[jsl[i].n]=1;
+            if ((jsl[i].j == 1) && (!jj))
+            {
+                if (!fx_startup_cache)
+                {
+                    if (window.URL) jsar.push(jsl[i].text + '\n\n');
+                    else evalscript(jsl[i].text);
+                }
+            }
+            else if ((jsl[i].j == 2) && (!jj))
+            {
+                if (document.getElementById('bootbottom')) document.getElementById('bootbottom').style.display='none';
+                if (!is_chrome_firefox && window.URL)
+                {
+                    cssar.push(jsl[i].text.replace(/\.\.\//g,staticpath).replace(new RegExp( "\\/en\\/", "g"),'/' + lang + '/'));
+                }
+                else
+                {
+                    var css = document.createElement('style');
+                    css.type = "text/css";
+                    css.rel = 'stylesheet';
+                    document.getElementsByTagName('head')[0].appendChild(css);
+                    css.textContent = jsl[i].text.replace(/\.\.\//g,staticpath).replace(new RegExp( "\\/en\\/", "g"),'/' + lang + '/');
+                }
+            }
+            else if (jsl[i].j == 3) l = !jj && l || JSON.parse(jsl[i].text);
+            else if (jsl[i].j == 0) pages[jsl[i].n] = jsl[i].text;
+        }
+        if (window.URL)
+        {
+            cssar = cssar.length && mObjectURL(cssar, "text/css");
+            if (cssar)
+            {
+                var link = document.createElement('link');
+                link.setAttribute('rel', 'stylesheet');
+                link.type = 'text/css';
+                link.href = cssar;
+                document.head.appendChild(link);
+            }
+            if (!jsl_done || jsar.length) {
+                jsar.push('jsl_done=true; boot_done();');
+            } else {
+                boot_done();
+            }
+            if (jsar.length) evalscript_url(jsar);
+            jsar=undefined;
+            cssar=undefined;
+        }
+        else
+        {
+            jsl_done=true;
+            boot_done();
+        }
+        jj = 0; //prevent further 'silent_loading' loads from failing..
+    }
+
     if (ua.indexOf('android') > 0 && !sessionStorage.androidsplash && document.location.hash.indexOf('#confirm') == -1)
     {
         if (document.location.hash == '#android')
@@ -1270,7 +1269,7 @@ else if (!b_u)
         if (document.location.href.substr(0,19) == 'chrome-extension://')  istaticpath = '../';
         else if (is_chrome_firefox) istaticpath = 'chrome://mega/content/';
 
-        document.write('<style type="text/css">.div, span, input {outline: none;}.hidden {display: none;}.clear {clear: both;margin: 0px;padding: 0px;display: block;}.loading-main-block {width: 100%;height: 100%;overflow: auto;font-family:Arial, Helvetica, sans-serif;}.loading-mid-white-block {height: 100%;width:100%;}.mid-centered-block {position: absolute;width: 494px;min-height: 158px;top: 50%;left: 50%;margin: -95px 0 0 -247px;}.loading-main-bottom {max-width: 940px;width: 100%;position: absolute;bottom: 20px;left: 50%;margin: 0 0 0 -470px;text-align: center;}.loading-bottom-button {height: 29px;width: 29px;float: left;background-image: url(' + istaticpath + 'images/mega/loading-sprite1.png);background-repeat: no-repeat;cursor: pointer;}.st-social-block-load {position: absolute;bottom: 20px;left: 0;width: 100%;height: 43px;text-align: center;}.st-bottom-button {height: 29px;width: 29px;display: inline-block;background-image: url(' + istaticpath + 'images/mega/new-startpage-spite1.png?v=1);background-repeat: no-repeat;cursor: pointer;}.st-bottom-button.st-google-button {background-position: -93px -1233px;position: relative;margin: 0 5px;}.st-bottom-button.st-google-button:hover {background-position: -93px -1173px;}.st-bottom-button.st-facebook-button {background-position: -49px -1233px;margin: 0 5px;}.st-bottom-button.st-facebook-button:hover {background-position: -49px -1173px;}.st-bottom-button.st-twitter-button {background-position: left -1233px;margin: 0 5px;}.st-bottom-button.st-twitter-button:hover {background-position: left -1173px;}.loading-cloud {width: 222px;height: 158px;background-image: url(' + istaticpath + 'images/mega/loading-sprite1.png);background-repeat: no-repeat;background-position: 0 -2128px;margin: 0 auto;-webkit-box-sizing: border-box;-moz-box-sizing: border-box;-ms-box-sizing: border-box;box-sizing: border-box;padding-top: 55px;}.loading-progress-bar, .loading-progress-bar div {width: 80px;height: 80px;margin: 0 0 0 71px;background-image: url(' + istaticpath + 'images/mega/loading-sprite1.png);background-repeat: no-repeat;background-position: 0 top;}.loading-progress-bar div {background-position: -71px -2183px;margin: 0;}.maintance-block {position: absolute;width: 484px;min-height: 94px;border: 2px solid #d9d9d9;-moz-border-radius: 7px;-webkit-border-radius: 7px;border-radius: 7px;padding: 10px;color: #333333;font-size: 13px;line-height: 30px;padding: 15px 15px 15px 102px;-webkit-box-sizing: border-box;-moz-box-sizing: border-box;-ms-box-sizing: border-box;box-sizing: border-box;background-image: url(' + istaticpath + 'images/mega/loading-sprite1.png);background-repeat: no-repeat;background-position: -60px -2428px;margin-top: 45px;}.loading-progress-bar.percents-0 {background-position: 0 0;}.loading-progress-bar.percents-1, .loading-progress-bar.percents-2, .loading-progress-bar.percents-3 {background-position: -130px 0;}.loading-progress-bar.percents-4, .loading-progress-bar.percents-5, .loading-progress-bar.percents-6 {background-position: 0 -100px;}.loading-progress-bar.percents-7, .loading-progress-bar.percents-8, .loading-progress-bar.percents-9 {background-position: -130px -100px;}.loading-progress-bar.percents-10, .loading-progress-bar.percents-11, .loading-progress-bar.percents-12 {background-position: 0 -200px;}.loading-progress-bar.percents-13, .loading-progress-bar.percents-14, .loading-progress-bar.percents-15 {background-position: -130px -200px;}.loading-progress-bar.percents-16, .loading-progress-bar.percents-17, .loading-progress-bar.percents-18 {background-position: 0 -300px;}.loading-progress-bar.percents-19, .loading-progress-bar.percents-20, .loading-progress-bar.percents-21 {background-position: -130px -300px;}.loading-progress-bar.percents-22, .loading-progress-bar.percents-23, .loading-progress-bar.percents-24 {background-position: 0 -400px;}.loading-progress-bar.percents-25, .loading-progress-bar.percents-26, .loading-progress-bar.percents-27 {background-position: -130px -400px;}.loading-progress-bar.percents-28, .loading-progress-bar.percents-29, .loading-progress-bar.percents-30 {background-position: 0 -500px;}.loading-progress-bar.percents-31, .loading-progress-bar.percents-32, .loading-progress-bar.percents-33 {background-position: -130px -500px;}.loading-progress-bar.percents-34, .loading-progress-bar.percents-35 {background-position: 0 -600px;}.loading-progress-bar.percents-36, .loading-progress-bar.percents-37 {background-position: -130px -600px;}.loading-progress-bar.percents-38, .loading-progress-bar.percents-39 {background-position: 0 -700px;}.loading-progress-bar.percents-40, .loading-progress-bar.percents-41 {background-position: -130px -700px;}.loading-progress-bar.percents-42, .loading-progress-bar.percents-43 {background-position: 0 -800px;}.loading-progress-bar.percents-44, .loading-progress-bar.percents-45 {background-position: -130px -800px;}.loading-progress-bar.percents-46, .loading-progress-bar.percents-47 {background-position: 0 -900px;}.loading-progress-bar.percents-48, .loading-progress-bar.percents-49 {background-position: -130px -900px;}.loading-progress-bar.percents-50 {background-position: 0 -1000px;}.loading-progress-bar.percents-51, .loading-progress-bar.percents-52, .loading-progress-bar.percents-53 {background-position: -130px -1000px;}.loading-progress-bar.percents-54, .loading-progress-bar.percents-55, .loading-progress-bar.percents-56 {background-position: 0 -1100px;}.loading-progress-bar.percents-57, .loading-progress-bar.percents-58, .loading-progress-bar.percents-59 {background-position: -130px -1100px;}.loading-progress-bar.percents-60, .loading-progress-bar.percents-61, .loading-progress-bar.percents-62 {background-position: 0 -1200px;}.loading-progress-bar.percents-63, .loading-progress-bar.percents-64, .loading-progress-bar.percents-65 {background-position: -130px -1200px;}.loading-progress-bar.percents-66, .loading-progress-bar.percents-67, .loading-progress-bar.percents-68 {background-position: 0 -1300px;}.loading-progress-bar.percents-69, .loading-progress-bar.percents-70, .loading-progress-bar.percents-71 {background-position: -130px -1300px;}.loading-progress-bar.percents-72, .loading-progress-bar.percents-73, .loading-progress-bar.percents-74 {background-position: 0 -1400px;}.loading-progress-bar.percents-75, .loading-progress-bar.percents-76, .loading-progress-bar.percents-77 {background-position: -130px -1400px;}.loading-progress-bar.percents-78, .loading-progress-bar.percents-79, .loading-progress-bar.percents-80 {background-position: 0 -1500px;}.loading-progress-bar.percents-81, .loading-progress-bar.percents-82, .loading-progress-bar.percents-83 {background-position: -130px -1500px;}.loading-progress-bar.percents-84, .loading-progress-bar.percents-85, .loading-progress-bar.percents-86 {background-position: 0 -1600px;}.loading-progress-bar.percents-87, .loading-progress-bar.percents-88, .loading-progress-bar.percents-89 {background-position: -130px -1600px;}.loading-progress-bar.percents-90, .loading-progress-bar.percents-91, .loading-progress-bar.percents-92 {background-position: 0 -1800px;}.loading-progress-bar.percents-93, .loading-progress-bar.percents-94, .loading-progress-bar.percents-95 {background-position: -130px -1800px;}.loading-progress-bar.percents-96, .loading-progress-bar.percents-97 {background-position: 0 -1900px;}.loading-progress-bar.percents-98, .loading-progress-bar.percents-99 {background-position: -130px -1900px;}.loading-progress-bar.percents-100 {background-position: 0 -2000px;}.follow-txt {text-decoration:none; line-height: 28px; float:right; color:#666666; font-size:12px;}@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {.maintance-block, .loading-progress-bar, .loading-progress-bar div, .loading-cloud, .loading-bottom-button {background-image: url(' + istaticpath + 'images/mega/loading-sprite1@2x.png);	background-size: 222px auto;}.st-bottom-button, .st-bottom-scroll-button {background-image: url(' + istaticpath + 'images/mega/new-startpage-spite1@2x.png?v=1);background-size: 356px auto;}}</style><div class="loading-main-block" id="loading"><div class="loading-mid-white-block"><div class="mid-centered-block"><div class="loading-cloud"><div class="loading-progress-bar percents-1" id="loadinganim"><div></div></div></div><div class="maintance-block hidden">Scheduled System Maintenance - Expect Disruptions<br/>Sunday 04:00 - 10:00 UTC </div></div><div class="st-social-block-load" id="bootbottom"><a href="https://www.facebook.com/MEGAprivacy" target="_blank" class="st-bottom-button st-facebook-button"></a><a href="https://www.twitter.com/MEGAprivacy" target="_blank" class="st-bottom-button st-twitter-button"></a><a href="https://plus.google.com/b/108055545377490138410/" target="_blank" class="st-bottom-button st-google-button"></a></div></div></div>');
+        document.write('<style type="text/css">.div, span, input {outline: none;}.hidden {display: none;}.clear {clear: both;margin: 0px;padding: 0px;display: block;}.loading-main-block {width: 100%;height: 100%;overflow: auto;font-family:Arial, Helvetica, sans-serif;}.loading-mid-white-block {height: 100%;width:100%;}.mid-centered-block {position: absolute;width: 494px;min-height: 158px;top: 50%;left: 50%;margin: -95px 0 0 -247px;}.loading-main-bottom {max-width: 940px;width: 100%;position: absolute;bottom: 20px;left: 50%;margin: 0 0 0 -470px;text-align: center;}.loading-bottom-button {height: 29px;width: 29px;float: left;background-image: url(' + istaticpath + 'images/mega/loading-sprite1.png);background-repeat: no-repeat;cursor: pointer;}.st-social-block-load {position: absolute;bottom: 20px;left: 0;width: 100%;height: 43px;text-align: center;}.st-bottom-button {height: 29px;width: 29px;display: inline-block;background-image: url(' + istaticpath + 'images/mega/new-startpage-spite1.png?v=1);background-repeat: no-repeat;cursor: pointer;}.st-bottom-button.st-google-button {background-position: -93px -1233px;position: relative;margin: 0 5px;}.st-bottom-button.st-google-button:hover {background-position: -93px -1173px;}.st-bottom-button.st-facebook-button {background-position: -49px -1233px;margin: 0 5px;}.st-bottom-button.st-facebook-button:hover {background-position: -49px -1173px;}.st-bottom-button.st-twitter-button {background-position: left -1233px;margin: 0 5px;}.st-bottom-button.st-twitter-button:hover {background-position: left -1173px;}.loading-cloud {width: 222px;height: 158px;background-image: url(' + istaticpath + 'images/mega/loading-sprite1.png);background-repeat: no-repeat;background-position: 0 -2128px;margin: 0 auto;-webkit-box-sizing: border-box;-moz-box-sizing: border-box;-ms-box-sizing: border-box;box-sizing: border-box;padding-top: 55px;}.loading-progress-bar, .loading-progress-bar div {width: 80px;height: 80px;margin: 0 0 0 71px;background-image: url(' + istaticpath + 'images/mega/loading-sprite1.png);background-repeat: no-repeat;background-position: 0 top;}.loading-progress-bar div {background-position: -71px -2183px;margin: 0;}.maintance-block {position: absolute;width: 484px;min-height: 94px;border: 2px solid #d9d9d9;-moz-border-radius: 7px;-webkit-border-radius: 7px;border-radius: 7px;padding: 10px;color: #333333;font-size: 13px;line-height: 30px;padding: 15px 15px 15px 102px;-webkit-box-sizing: border-box;-moz-box-sizing: border-box;-ms-box-sizing: border-box;box-sizing: border-box;background-image: url(' + istaticpath + 'images/mega/loading-sprite1.png);background-repeat: no-repeat;background-position: -60px -2428px;margin-top: 45px;}.loading-progress-bar.percents-0 {background-position: 0 0;}.loading-progress-bar.percents-1, .loading-progress-bar.percents-2, .loading-progress-bar.percents-3 {background-position: -130px 0;}.loading-progress-bar.percents-4, .loading-progress-bar.percents-5, .loading-progress-bar.percents-6 {background-position: 0 -100px;}.loading-progress-bar.percents-7, .loading-progress-bar.percents-8, .loading-progress-bar.percents-9 {background-position: -130px -100px;}.loading-progress-bar.percents-10, .loading-progress-bar.percents-11, .loading-progress-bar.percents-12 {background-position: 0 -200px;}.loading-progress-bar.percents-13, .loading-progress-bar.percents-14, .loading-progress-bar.percents-15 {background-position: -130px -200px;}.loading-progress-bar.percents-16, .loading-progress-bar.percents-17, .loading-progress-bar.percents-18 {background-position: 0 -300px;}.loading-progress-bar.percents-19, .loading-progress-bar.percents-20, .loading-progress-bar.percents-21 {background-position: -130px -300px;}.loading-progress-bar.percents-22, .loading-progress-bar.percents-23, .loading-progress-bar.percents-24 {background-position: 0 -400px;}.loading-progress-bar.percents-25, .loading-progress-bar.percents-26, .loading-progress-bar.percents-27 {background-position: -130px -400px;}.loading-progress-bar.percents-28, .loading-progress-bar.percents-29, .loading-progress-bar.percents-30 {background-position: 0 -500px;}.loading-progress-bar.percents-31, .loading-progress-bar.percents-32, .loading-progress-bar.percents-33 {background-position: -130px -500px;}.loading-progress-bar.percents-34, .loading-progress-bar.percents-35 {background-position: 0 -600px;}.loading-progress-bar.percents-36, .loading-progress-bar.percents-37 {background-position: -130px -600px;}.loading-progress-bar.percents-38, .loading-progress-bar.percents-39 {background-position: 0 -700px;}.loading-progress-bar.percents-40, .loading-progress-bar.percents-41 {background-position: -130px -700px;}.loading-progress-bar.percents-42, .loading-progress-bar.percents-43 {background-position: 0 -800px;}.loading-progress-bar.percents-44, .loading-progress-bar.percents-45 {background-position: -130px -800px;}.loading-progress-bar.percents-46, .loading-progress-bar.percents-47 {background-position: 0 -900px;}.loading-progress-bar.percents-48, .loading-progress-bar.percents-49 {background-position: -130px -900px;}.loading-progress-bar.percents-50 {background-position: 0 -1000px;}.loading-progress-bar.percents-51, .loading-progress-bar.percents-52, .loading-progress-bar.percents-53 {background-position: -130px -1000px;}.loading-progress-bar.percents-54, .loading-progress-bar.percents-55, .loading-progress-bar.percents-56 {background-position: 0 -1100px;}.loading-progress-bar.percents-57, .loading-progress-bar.percents-58, .loading-progress-bar.percents-59 {background-position: -130px -1100px;}.loading-progress-bar.percents-60, .loading-progress-bar.percents-61, .loading-progress-bar.percents-62 {background-position: 0 -1200px;}.loading-progress-bar.percents-63, .loading-progress-bar.percents-64, .loading-progress-bar.percents-65 {background-position: -130px -1200px;}.loading-progress-bar.percents-66, .loading-progress-bar.percents-67, .loading-progress-bar.percents-68 {background-position: 0 -1300px;}.loading-progress-bar.percents-69, .loading-progress-bar.percents-70, .loading-progress-bar.percents-71 {background-position: -130px -1300px;}.loading-progress-bar.percents-72, .loading-progress-bar.percents-73, .loading-progress-bar.percents-74 {background-position: 0 -1400px;}.loading-progress-bar.percents-75, .loading-progress-bar.percents-76, .loading-progress-bar.percents-77 {background-position: -130px -1400px;}.loading-progress-bar.percents-78, .loading-progress-bar.percents-79, .loading-progress-bar.percents-80 {background-position: 0 -1500px;}.loading-progress-bar.percents-81, .loading-progress-bar.percents-82, .loading-progress-bar.percents-83 {background-position: -130px -1500px;}.loading-progress-bar.percents-84, .loading-progress-bar.percents-85, .loading-progress-bar.percents-86 {background-position: 0 -1600px;}.loading-progress-bar.percents-87, .loading-progress-bar.percents-88, .loading-progress-bar.percents-89 {background-position: -130px -1600px;}.loading-progress-bar.percents-90, .loading-progress-bar.percents-91, .loading-progress-bar.percents-92 {background-position: 0 -1800px;}.loading-progress-bar.percents-93, .loading-progress-bar.percents-94, .loading-progress-bar.percents-95 {background-position: -130px -1800px;}.loading-progress-bar.percents-96, .loading-progress-bar.percents-97 {background-position: 0 -1900px;}.loading-progress-bar.percents-98, .loading-progress-bar.percents-99 {background-position: -130px -1900px;}.loading-progress-bar.percents-100 {background-position: 0 -2000px;}.follow-txt {text-decoration:none; line-height: 28px; float:right; color:#666666; font-size:12px;}@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {.maintance-block, .loading-progress-bar, .loading-progress-bar div, .loading-cloud, .loading-bottom-button {background-image: url(' + istaticpath + 'images/mega/loading-sprite1@2x.png);    background-size: 222px auto;}.st-bottom-button, .st-bottom-scroll-button {background-image: url(' + istaticpath + 'images/mega/new-startpage-spite1@2x.png?v=1);background-size: 356px auto;}}</style><div class="loading-main-block" id="loading"><div class="loading-mid-white-block"><div class="mid-centered-block"><div class="loading-cloud"><div class="loading-progress-bar percents-1" id="loadinganim"><div></div></div></div><div class="maintance-block hidden">Scheduled System Maintenance - Expect Disruptions<br/>Sunday 04:00 - 10:00 UTC </div></div><div class="st-social-block-load" id="bootbottom"><a href="https://www.facebook.com/MEGAprivacy" target="_blank" class="st-bottom-button st-facebook-button"></a><a href="https://www.twitter.com/MEGAprivacy" target="_blank" class="st-bottom-button st-twitter-button"></a><a href="https://plus.google.com/b/108055545377490138410/" target="_blank" class="st-bottom-button st-google-button"></a></div></div></div>');
     }
     var u_storage,loginresponse,u_sid,dl_res;
     u_storage = init_storage( localStorage.sid ? localStorage : sessionStorage );
@@ -1296,7 +1295,7 @@ else if (!b_u)
         lxhr.onerror = function()
         {
             loginresponse= false;
-			boot_done();
+            boot_done();
         }
         lxhr.open("POST", apipath + 'cs?id=0&sid='+u_storage.sid, true);
         lxhr.send(JSON.stringify([{'a':'ug'}]));
@@ -1346,7 +1345,7 @@ else if (!b_u)
         dlxhr.onerror = function()
         {
             dl_res= false;
-			boot_done();
+            boot_done();
         }
         dlxhr.open("POST", apipath + 'cs?id=0', true);
         dlxhr.send(JSON.stringify([{'a':'g',p:page.substr(1,8)}]));

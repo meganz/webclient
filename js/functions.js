@@ -307,6 +307,7 @@ function populate_l()
 	l[231] = l[231].replace('No thanks, I\'ll wait','I\'ll wait');
 
 	l['year'] = new Date().getFullYear();
+	date_months = [l[408], l[409], l[410], l[411], l[412], l[413], l[414], l[415], l[416], l[417], l[418], l[419]];
 }
 
 function GetNextNode(labelid)
@@ -450,11 +451,6 @@ if (typeof (l) == 'undefined') {
 }
 
 var date_months = []
-
-$(window).on('onMegaLoaded', function() {
-	date_months = [l[408], l[409], l[410], l[411], l[412], l[413], l[414], l[415], l[416], l[417], l[418], l[419]];
-});
-
 function acc_time2date(unixtime)
 {
 	var MyDate = new Date(unixtime*1000);

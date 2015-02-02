@@ -8,7 +8,8 @@ if (!window.IDBTransaction)
 
 var mDBact, mDBv = 7;
 
-if (indexedDB)
+// Turn off IndexedDB on mega.nz for now (need to investigate inconsistencies)
+if ( 0 && indexedDB)
 {
     var mDB=1;
     var request;
@@ -50,15 +51,14 @@ if (indexedDB)
                 loadfm();
             }
         }
-        
-        // Turn off IndexedDB on mega.nz for now (need to investigate inconsistencies)
-        //if (localStorage[u_handle + '_mDBactive'] && parseInt(localStorage[u_handle + '_mDBactive'])+4000 > Date.now())
-        //{            
-            //if (d) console.log('existing mDB session, fetch live data');
+
+        if (localStorage[u_handle + '_mDBactive'] && parseInt(localStorage[u_handle + '_mDBactive'])+4000 > Date.now())
+        {
+            if (d) console.log('existing mDB session, fetch live data');
             mDB=undefined;
             loadfm();
             return;
-        //}
+        }
         mDBact = Math.random();
         mDBactive(mDBact);
         loadingDialog.show();

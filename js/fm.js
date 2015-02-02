@@ -6360,7 +6360,7 @@ function fillShareDialogWithContent()
             // Additional check of 'c' grants that only active 
             // contacts will be addded, this prevents contact
             //  duplication in share dialog contact list
-            if (M.u[userHandle] && M.u[userHandle].c)
+            if (M.u[userHandle] && M.u[userHandle].c && M.u[userHandle].c === 1 )
             {
                 var user = M.u[userHandle];
                 var email = user.m;

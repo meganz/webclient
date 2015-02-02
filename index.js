@@ -31,6 +31,8 @@ var pro_json = '[[["N02zLAiWqRU",1,500,1024,1,"9.99","EUR"],["zqdkqTtOtGc",1,500
 
 function startMega()
 {
+    mBroadcaster.sendMessage('startMega');
+
 	if (silent_loading)
 	{
 		silent_loading();
@@ -47,10 +49,7 @@ function startMega()
 	}
 	jsl=[];
 	init_page();
-	if (localStorage.sid && localStorage[u_handle + '_maxaction']) {
-		maxaction = localStorage[u_handle + '_maxaction']
-		getsc(); // start pulling *for* CMS and other public events
-	}
+    init_chat();
 }
 
 function mainScroll()
@@ -75,19 +74,8 @@ function scrollMenu()
 	});
 }
 
-if(!MegaChatDisabled) {
-    $(window).unbind('megaAuthenticationFinished.megaChat');
-    $(window).bind('megaAuthenticationFinished.megaChat', function() {
-        if(u_type && !megaChat.is_initialized) {
-            megaChat.init();
-        }
-    });
-}
-
 function init_page()
 {
-    $(window).trigger('onMegaLoaded');
-
 	if ('-fa-ar-he-'.indexOf('-'+lang+'-') > -1) $('body').addClass('rtl');
 
 	if ($.startscroll) delete $.startscroll;

@@ -5,7 +5,6 @@ var is_chrome_firefox = document.location.protocol === 'chrome:' && document.loc
 var is_extension = is_chrome_firefox || document.location.href.substr(0,19) == 'chrome-extension://';
 var storage_version = '1'; // clear localStorage when version doesn't match
 var page = document.location.hash;
-var boot_done_called = false;
 
 function isMobile()
 {
@@ -36,8 +35,8 @@ if (ua.indexOf('chrome') > -1 && ua.indexOf('mobile') == -1 && parseInt(window.n
 else if (ua.indexOf('firefox') > -1 && typeof DataView == 'undefined') b_u = 1;
 else if (ua.indexOf('opera') > -1 && typeof window.webkitRequestFileSystem == 'undefined') b_u = 1;
 var apipath, staticpath = 'https://eu.static.mega.co.nz/3/';
-var myURL = window.URL || window.webkitURL;
-if (!myURL) b_u=1;
+var myURL, URL = window.URL || window.webkitURL;
+if (!(myURL=URL)) b_u=1;
 
 if (!b_u) try
 {
@@ -148,8 +147,6 @@ if (!b_u && is_extension)
 
 if (b_u) document.location = 'update.html';
 
-window.URL = window.URL || window.webkitURL;
-
 var ln ={}; ln.en = 'English'; ln.cn = '简体中文';  ln.ct = '中文繁體'; ln.ru = 'Pусский'; ln.es = 'Español'; ln.fr = 'Français'; ln.de = 'Deutsch'; ln.it = 'Italiano'; ln.br = 'Português Brasil'; ln.mi = 'Māori'; ln.vn = 'Tiếng Việt'; ln.nl = 'Nederlands'; ln.kr = '한국어';   ln.ar = 'العربية'; ln.jp = '日本語'; ln.pt = 'Português'; ln.he = 'עברית'; ln.pl = 'Polski'; ln.ca = 'Català'; ln.eu = 'Euskara'; ln.sk = 'Slovenský'; ln.af = 'Afrikaans'; ln.cz = 'Čeština'; ln.ro = 'Română'; ln.fi = 'Suomi'; ln.no = 'Norsk'; ln.se = 'Svenska'; ln.bs = 'Bosanski'; ln.hu = 'Magyar'; ln.sr = 'српски'; ln.dk = 'Dansk'; ln.sl = 'Slovenščina'; ln.tr = 'Türkçe';  ln.id = 'Bahasa Indonesia';  ln.hr = 'Hrvatski';  ln.el = 'ελληνικά'; ln.uk = 'Українська'; ln.gl = 'Galego'; ln.sr = 'српски'; ln.lt = 'Lietuvos'; ln.th = 'ภาษาไทย'; ln.lv = 'Latviešu'; ln.bg = 'български';  ln.mk = 'македонски'; ln.hi = 'हिंदी'; ln.fa = 'فارسی '; ln.ee = 'Eesti'; ln.ms = 'Bahasa Malaysia'; ln.cy = 'Cymraeg'; ln.be = 'Breton'; ln.tl = 'Tagalog'; ln.ka = 'ქართული';
 
 var ln2 ={}; ln2.en = 'English'; ln2.cn = 'Chinese';  ln2.ct = 'Traditional Chinese'; ln2.ru = 'Russian'; ln2.es = 'Spanish'; ln2.fr = 'French'; ln2.de = 'German'; ln2.it = 'Italian'; ln2.br = 'Brazilian Portuguese'; ln2.mi = 'Maori'; ln2.vn = 'Vietnamese'; ln2.nl = 'Dutch'; ln2.kr = 'Korean';   ln2.ar = 'Arabic'; ln2.jp = 'Japanese'; ln2.pt = 'Portuguese'; ln2.he = 'Hebrew'; ln2.pl = 'Polish'; ln2.ca = 'Catalan'; ln2.eu = 'Basque'; ln2.sk = 'Slovak'; ln2.af = 'Afrikaans'; ln2.cz = 'Czech'; ln2.ro = 'Romanian'; ln2.fi = 'Finnish'; ln2.no = 'Norwegian'; ln2.se = 'Swedish'; ln2.bs = 'Bosnian'; ln2.hu = 'Hungarian'; ln2.sr = 'Serbian'; ln2.dk = 'Danish'; ln2.sl = 'Slovenian'; ln2.tr = 'Turkish'; ln2.id = 'Indonesian'; ln2.hr = 'Croatian'; ln2.el = 'Greek'; ln2.uk = 'Ukrainian'; ln2.gl = 'Galician'; ln2.sr = 'Serbian'; ln2.lt = 'Lithuanian'; ln2.th = 'Thai'; ln2.lv = 'Latvian'; ln2.bg = 'Bulgarian'; ln2.mk = 'Macedonian'; ln2.hi = 'Hindi'; ln2.fa = 'Farsi'; ln2.ee = 'Estonian';  ln2.ms = 'Malaysian'; ln2.cy = 'Welsh'; ln2.be = 'Breton'; ln2.tl = 'Tagalog'; ln2.ka = 'Georgian';
@@ -166,29 +163,103 @@ function evalscript(text)
 
 function evalscript_url(jarray)
 {
-    try
-    {
-        var blob = new Blob(jarray, { type: "text/javascript" });
-    }
-    catch(e)
-    {
-        window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder || window.MSBlobBuilder;
-        var bb = new BlobBuilder();
-        for (var i in jarray) bb.append(jarray[i]);
-        var blob = bb.getBlob('text/javascript');
-    }
+    var head = document.head || document.getElementsByTagName('head')[0];
     var script = document.createElement('script');
     script.type = "text/javascript";
-    document.getElementsByTagName('head')[0].appendChild(script);
-    var url = window.URL.createObjectURL(blob);
+    head.appendChild(script);
+    var url = mObjectURL(jarray, script.type);
     script.src = url;
     return url;
 }
 
-if (!nocontentcheck)
+function mObjectURL(data, type)
 {
-    if (window.URL) evalscript_url([sjcl_sha_js]);
-    else evalscript(sjcl_sha_js);
+    var blob;
+    try {
+        blob = new Blob( data, { type: type });
+    } catch(e) {
+        if (d) console.error(e);
+        if (!window.BlobBuilder) {
+            window.BlobBuilder = window.WebKitBlobBuilder || window.MozBlobBuilder || window.MSBlobBuilder;
+        }
+        if (window.BlobBuilder) {
+            var bb = new BlobBuilder();
+            bb.append(data.join("\n"));
+            blob = bb.getBlob(type);
+        }
+    }
+    return blob && URL.createObjectURL(blob);
+}
+
+var mBroadcaster = {
+    _topics : {},
+
+    addListener: function mBroadcaster_addListener(topic, options) {
+        if (typeof options === 'function') {
+            options = {
+                callback : options
+            };
+        }
+        if (typeof options.callback !== 'function') {
+            return false;
+        }
+
+        if (!this._topics.hasOwnProperty(topic)) {
+            this._topics[topic] = {};
+        }
+
+        var id = Math.random().toString(26);
+        this._topics[topic][id] = options;
+
+        if (d) console.log('Adding broadcast listener', topic, id, options);
+
+        return id;
+    },
+
+    removeListener: function mBroadcaster_removeListenr(token) {
+        if (d) console.log('Removing broadcast listener', token);
+        for (var topic in this._topics) {
+            if (this._topics[topic][token]) {
+                delete this._topics[topic][token];
+                if (!Object.keys(this._topics[topic]).length) {
+                    delete this._topics[topic];
+                }
+                return true;
+            }
+        }
+        return false;
+    },
+
+    sendMessage: function mBroadcaster_sendMessage(topic) {
+        if (d) console.log('Broadcasting ' + topic);
+        if (this._topics.hasOwnProperty(topic)) {
+            var args = Array.prototype.slice.call(arguments, 1);
+            var idr = [];
+
+            for (var id in this._topics[topic]) {
+                var ev = this._topics[topic][id];
+                try {
+                    ev.callback.apply(ev.scope, args);
+                } catch (ex) {
+                    if (d) console.error(ex);
+                }
+                if (ev.once)
+                    idr.push(id);
+            }
+            if (idr.length)
+                idr.forEach(this.removeListener.bind(this));
+        }
+    },
+
+    once: function mBroadcaster_once(topic, callback) {
+        this.addListener(topic, {
+            once : true,
+            callback : callback
+        });
+    }
+};
+if (typeof Object.freeze === 'function') {
+    mBroadcaster = Object.freeze(mBroadcaster);
 }
 
 var sh = [];
@@ -352,9 +423,9 @@ if (m)
     if (window.location.hash.substr(1,1) == '!' || window.location.hash.substr(1,2) == 'F!')
     {
         if (app) {
-		document.getElementById('m_title').innerHTML = 'Install the free MEGA app to access this file from your mobile';
-		document.getElementById('m_appbtn').href += '&referrer=link';
-	}
+            document.getElementById('m_title').innerHTML = 'Install the free MEGA app to access this file from your mobile';
+            document.getElementById('m_appbtn').href += '&referrer=link';
+        }
         if (ua.indexOf('chrome') > -1)
         {
             setTimeout(function()
@@ -385,9 +456,8 @@ else if (page == '#android')
 {
     document.location = 'https://play.google.com/store/apps/details?id=com.flyingottersoftware.mega';
 }
-else
+else if (!b_u)
 {
-	if (!b_u)
 	{
 		var d = localStorage.d || 0,l;
 		var jj = localStorage.jj || 0;
@@ -550,12 +620,9 @@ else
 			for (var l in l2) for (b in l2[l]) if (l2[l][b].substring(0,3)==bl.substring(0,3)) return l;
 			return 'en';
 		}
-		var init_f = [];
-		var lang = detectlang();
-		if ((typeof localStorage != 'undefined') && (localStorage.lang)) if (languages[localStorage.lang]) lang = localStorage.lang;
-		var langv = '';
+		var lang = detectlang(), langv = '', jsl = [];
+		if (typeof localStorage.lang !== 'undefined' && languages[localStorage.lang]) lang = localStorage.lang;
 		if (typeof lv != 'undefined') langv = '_' + lv[lang];
-		var jsl = [];
 
 		jsl.push({f:'lang/' + lang + langv + '.json', n: 'lang', j:3});
 		jsl.push({f:'sjcl.js', n: 'sjcl_js', j:1}); // Will be replaced with asmCrypto soon
@@ -565,7 +632,7 @@ else
         jsl.push({f:'js/jsbn.js', n: 'jsbn_js', j:1,w:2});
 		jsl.push({f:'js/jsbn2.js', n: 'jsbn2_js', j:1,w:2});
 		jsl.push({f:'js/jodid25519.js', n: 'jodid25519_js', j:1,w:7});
-        jsl.push({f:'js/stringcrypt.js', n: 'stringcrypt_js', j:1});		
+        jsl.push({f:'js/stringcrypt.js', n: 'stringcrypt_js', j:1});
         jsl.push({f:'js/user.js', n: 'user_js', j:1});
         jsl.push({f:'js/authring.js', n: 'authring_js', j:1});
         jsl.push({f:'js/mouse.js', n: 'mouse_js', j:1});
@@ -620,7 +687,6 @@ else
 		// Google Import Contacts
         jsl.push({f:'js/gContacts.js', n: 'gcontacts_js', j:1,w:3});
 
-
         // MEGA CHAT
         jsl.push({f:'js/chat/rtcStats.js', n: 'mega_js', j:1,w:7});
         jsl.push({f:'js/chat/rtcSession.js', n: 'mega_js', j:1,w:7});
@@ -643,14 +709,13 @@ else
         jsl.push({f:'js/chat/plugins/chatStore.js', n: 'chatstore_js', j:1,w:7});
         jsl.push({f:'js/chat/plugins/chatNotifications.js', n: 'chatnotifications_js', j:1,w:7});
 
-
         jsl.push({f:'js/chat/karereEventObjects.js', n: 'keo_js', j:1,w:7});
         jsl.push({f:'js/chat/karere.js', n: 'karere_js', j:1,w:7});
         jsl.push({f:'js/chat/chat.js', n: 'chat_js', j:1,w:7});
         jsl.push({f:'js/chat/chatRoom.js', n: 'chat_js', j:1,w:7});
 
         // END OF MEGA CHAT
-        
+
         jsl.push({f:'js/fm.js', n: 'fm_js', j:1,w:12});
         jsl.push({f:'js/filetypes.js', n: 'filetypes_js', j:1});
         jsl.push({f:'js/miniui.js', n: 'miniui_js', j:1});
@@ -706,7 +771,6 @@ else
         if(onBetaW) {
             jsl.push({f: 'js/betacrashes.js', n: 'betacrashes_js', j: 1});
         }
-
 
 //        jsl.push({f:'html/register.html', n: 'register', j:0});
 //        jsl.push({f:'html/js/register.js', n: 'register_js', j:1});
@@ -816,21 +880,17 @@ else
         var downloading = false;
         var ul_uploading = false;
         var lightweight=false;
-		var waitingToBeLoaded = {};
-        var njsl = [];
+		var waitingToBeLoaded = 0,jsl_done,jj_done = !jj;
         var fx_startup_cache = is_chrome_firefox && nocontentcheck;
+        if (!fx_startup_cache && !nocontentcheck)
+        {
+            if (window.URL) evalscript_url([sjcl_sha_js]);
+            else evalscript(sjcl_sha_js);
+        }
         if ((typeof Worker !== 'undefined') && (typeof window.URL !== 'undefined') && !fx_startup_cache && !nocontentcheck)
         {
             var hashdata = ['self.postMessage = self.webkitPostMessage || self.postMessage;',sjcl_sha_js,'self.onmessage = function(e) { try { e.data.hash = sha256(e.data.text);  self.postMessage(e.data); } catch(err) { e.data.error = err.message; self.postMessage(e.data);  } };'];
-            try  { var blob = new Blob(hashdata, { type: "text/javascript" }); }
-            catch(e)
-            {
-                window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder || window.MSBlobBuilder;
-                var bb = new BlobBuilder();
-                for (var i in hashdata) bb.append(hashdata[i]);
-                var blob = bb.getBlob('text/javascript');
-            }
-            var hash_url = window.URL.createObjectURL(blob);
+            var hash_url = mObjectURL(hashdata, "text/javascript");
             var hash_workers = [];
             var i =0;
             while (i < 2)
@@ -870,6 +930,7 @@ else
                 catch(e)
                 {
                     hash_workers = undefined;
+                    break;
                 }
                 i++;
             }
@@ -877,37 +938,35 @@ else
 
         if (jj)
         {
-
 			var headElement = document.querySelector("head");
 			var _queueWaitToBeLoaded = function(id, elem) {
-				waitingToBeLoaded[id] = true;
+				waitingToBeLoaded++;
 				elem.onload = function() {
-					delete waitingToBeLoaded[id];
-
-					if(Object.keys(waitingToBeLoaded).length === 0) {
+                    if (d) console.log('jj.progress...', waitingToBeLoaded);
+					if (--waitingToBeLoaded == 0) {
+                        jj_done = true;
 						boot_done();
+                        _queueWaitToBeLoaded = headElement = undefined;
 					}
+                    elem.onload = null;
 				};
 			};
 
 			var createScriptTag = function(id, src) {
 				var elem = document.createElement("script");
-				headElement.appendChild(elem);
-				elem.id = id;
-				elem.async = false;
 				_queueWaitToBeLoaded(id, elem);
+				elem.async = false;
 				elem.src = src;
+				headElement.appendChild(elem);
 				return elem;
 			};
 			var createStyleTag = function(id, src) {
 				var elem = document.createElement("link");
 				elem.rel = "stylesheet";
 				elem.type = "text/css";
-
-				headElement.appendChild(elem);
-				elem.id = id;
 				_queueWaitToBeLoaded(id, elem);
 				elem.href = src;
+				headElement.appendChild(elem);
 				return elem;
 			};
 
@@ -927,9 +986,10 @@ else
 					}
                 }
             }
+            if (d) console.log('jj.total...', waitingToBeLoaded);
         }
 
-        var pages = [], scripts = {};
+        var pages = [];
         function getxhr()
         {
             return (typeof XDomainRequest != 'undefined' && typeof ArrayBuffer == 'undefined') ? new XDomainRequest() : new XMLHttpRequest();
@@ -1048,7 +1108,7 @@ else
             {
                 jsl[this.jsi].text = this.response || this.responseText;
 
-                if (typeof hash_workers != 'undefined' && !nocontentcheck)
+                if (typeof hash_workers !== 'undefined' && !nocontentcheck)
                 {
                     hash_workers[this.xhri].postMessage({'text':jsl[this.jsi].text,'xhr':'test','jsi':this.jsi,'xhri':this.xhri});
                 }
@@ -1108,12 +1168,13 @@ else
         }
         function jsl_progress()
         {
-            if (d) console.log('done',(jsl_current+jsl_fm_current));
-            if (d) console.log('total',jsl_total);
+            // if (d) console.log('done',(jsl_current+jsl_fm_current));
+            // if (d) console.log('total',jsl_total);
             var p = Math.floor((jsl_current+jsl_fm_current)/jsl_total*100);
             if ((p > jsl_perc) && (p <= 100))
             {
                 jsl_perc = p;
+                if (d) console.log('jsl.progress... ' + p + '%', (jsl_current+jsl_fm_current), jsl_total);
                 if (is_extension) p=100;
                 document.getElementById('loadinganim').className = 'loading-progress-bar percents-'+p;
             }
@@ -1152,54 +1213,34 @@ else
                     }
                 }
                 else if (jsl[i].j == 3) l = !jj && l || JSON.parse(jsl[i].text);
-                else if (jsl[i].j == 4) scripts[jsl[i].f] = jsl[i].text;
                 else if (jsl[i].j == 0) pages[jsl[i].n] = jsl[i].text;
             }
             if (window.URL)
             {
-                var blob;
-                if (cssar.length) try
-                {
-                    blob = new Blob(cssar, { type: "text/css" });
-                    for ( var f in scripts ) {
-                        if (!scripts[f].match(/^blob:/)) {
-                            scripts[f] = window.URL.createObjectURL( new Blob( [ scripts[f] ], { type: 'text/javascript' } ) );
-                        }
-                    }
-                }
-                catch(e)
-                {
-                    window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder || window.MSBlobBuilder;
-                    var bb = new BlobBuilder();
-                    for (var i in cssar) bb.append(cssar[i]);
-                    blob = bb.getBlob('text/css');
-                    for ( var f in scripts ) {
-                        if (!scripts[f].match(/^blob:/)) {
-                            bb = new BlobBuilder();
-                            bb.append( scripts[f] );
-                            scripts[f] = window.URL.createObjectURL( bb.getBlob('text/javascript') );
-                        }
-                    }
-                }
-                if (blob)
+                cssar = cssar.length && mObjectURL(cssar, "text/css");
+                if (cssar)
                 {
                     var link = document.createElement('link');
                     link.setAttribute('rel', 'stylesheet');
                     link.type = 'text/css';
-                    link.href = window.URL.createObjectURL(blob);
+                    link.href = cssar;
                     document.head.appendChild(link);
                 }
-                cssar=undefined;
-                jsar.push('jsl_done=true; boot_done();');
-                evalscript_url(jsar);
+                if (!jsl_done || jsar.length) {
+                    jsar.push('jsl_done=true; boot_done();');
+                } else {
+                    boot_done();
+                }
+                if (jsar.length) evalscript_url(jsar);
                 jsar=undefined;
+                cssar=undefined;
             }
             else
             {
                 jsl_done=true;
-				if(Object.keys(waitingToBeLoaded).length === 0) boot_done();
+				boot_done();
             }
-	    jj = 0; //prevent further 'silent_loading' loads from failing..
+            jj = 0; //prevent further 'silent_loading' loads from failing..
         }
     }
     if (ua.indexOf('android') > 0 && !sessionStorage.androidsplash && document.location.hash.indexOf('#confirm') == -1)
@@ -1231,7 +1272,7 @@ else
 
         document.write('<style type="text/css">.div, span, input {outline: none;}.hidden {display: none;}.clear {clear: both;margin: 0px;padding: 0px;display: block;}.loading-main-block {width: 100%;height: 100%;overflow: auto;font-family:Arial, Helvetica, sans-serif;}.loading-mid-white-block {height: 100%;width:100%;}.mid-centered-block {position: absolute;width: 494px;min-height: 158px;top: 50%;left: 50%;margin: -95px 0 0 -247px;}.loading-main-bottom {max-width: 940px;width: 100%;position: absolute;bottom: 20px;left: 50%;margin: 0 0 0 -470px;text-align: center;}.loading-bottom-button {height: 29px;width: 29px;float: left;background-image: url(' + istaticpath + 'images/mega/loading-sprite1.png);background-repeat: no-repeat;cursor: pointer;}.st-social-block-load {position: absolute;bottom: 20px;left: 0;width: 100%;height: 43px;text-align: center;}.st-bottom-button {height: 29px;width: 29px;display: inline-block;background-image: url(' + istaticpath + 'images/mega/new-startpage-spite1.png?v=1);background-repeat: no-repeat;cursor: pointer;}.st-bottom-button.st-google-button {background-position: -93px -1233px;position: relative;margin: 0 5px;}.st-bottom-button.st-google-button:hover {background-position: -93px -1173px;}.st-bottom-button.st-facebook-button {background-position: -49px -1233px;margin: 0 5px;}.st-bottom-button.st-facebook-button:hover {background-position: -49px -1173px;}.st-bottom-button.st-twitter-button {background-position: left -1233px;margin: 0 5px;}.st-bottom-button.st-twitter-button:hover {background-position: left -1173px;}.loading-cloud {width: 222px;height: 158px;background-image: url(' + istaticpath + 'images/mega/loading-sprite1.png);background-repeat: no-repeat;background-position: 0 -2128px;margin: 0 auto;-webkit-box-sizing: border-box;-moz-box-sizing: border-box;-ms-box-sizing: border-box;box-sizing: border-box;padding-top: 55px;}.loading-progress-bar, .loading-progress-bar div {width: 80px;height: 80px;margin: 0 0 0 71px;background-image: url(' + istaticpath + 'images/mega/loading-sprite1.png);background-repeat: no-repeat;background-position: 0 top;}.loading-progress-bar div {background-position: -71px -2183px;margin: 0;}.maintance-block {position: absolute;width: 484px;min-height: 94px;border: 2px solid #d9d9d9;-moz-border-radius: 7px;-webkit-border-radius: 7px;border-radius: 7px;padding: 10px;color: #333333;font-size: 13px;line-height: 30px;padding: 15px 15px 15px 102px;-webkit-box-sizing: border-box;-moz-box-sizing: border-box;-ms-box-sizing: border-box;box-sizing: border-box;background-image: url(' + istaticpath + 'images/mega/loading-sprite1.png);background-repeat: no-repeat;background-position: -60px -2428px;margin-top: 45px;}.loading-progress-bar.percents-0 {background-position: 0 0;}.loading-progress-bar.percents-1, .loading-progress-bar.percents-2, .loading-progress-bar.percents-3 {background-position: -130px 0;}.loading-progress-bar.percents-4, .loading-progress-bar.percents-5, .loading-progress-bar.percents-6 {background-position: 0 -100px;}.loading-progress-bar.percents-7, .loading-progress-bar.percents-8, .loading-progress-bar.percents-9 {background-position: -130px -100px;}.loading-progress-bar.percents-10, .loading-progress-bar.percents-11, .loading-progress-bar.percents-12 {background-position: 0 -200px;}.loading-progress-bar.percents-13, .loading-progress-bar.percents-14, .loading-progress-bar.percents-15 {background-position: -130px -200px;}.loading-progress-bar.percents-16, .loading-progress-bar.percents-17, .loading-progress-bar.percents-18 {background-position: 0 -300px;}.loading-progress-bar.percents-19, .loading-progress-bar.percents-20, .loading-progress-bar.percents-21 {background-position: -130px -300px;}.loading-progress-bar.percents-22, .loading-progress-bar.percents-23, .loading-progress-bar.percents-24 {background-position: 0 -400px;}.loading-progress-bar.percents-25, .loading-progress-bar.percents-26, .loading-progress-bar.percents-27 {background-position: -130px -400px;}.loading-progress-bar.percents-28, .loading-progress-bar.percents-29, .loading-progress-bar.percents-30 {background-position: 0 -500px;}.loading-progress-bar.percents-31, .loading-progress-bar.percents-32, .loading-progress-bar.percents-33 {background-position: -130px -500px;}.loading-progress-bar.percents-34, .loading-progress-bar.percents-35 {background-position: 0 -600px;}.loading-progress-bar.percents-36, .loading-progress-bar.percents-37 {background-position: -130px -600px;}.loading-progress-bar.percents-38, .loading-progress-bar.percents-39 {background-position: 0 -700px;}.loading-progress-bar.percents-40, .loading-progress-bar.percents-41 {background-position: -130px -700px;}.loading-progress-bar.percents-42, .loading-progress-bar.percents-43 {background-position: 0 -800px;}.loading-progress-bar.percents-44, .loading-progress-bar.percents-45 {background-position: -130px -800px;}.loading-progress-bar.percents-46, .loading-progress-bar.percents-47 {background-position: 0 -900px;}.loading-progress-bar.percents-48, .loading-progress-bar.percents-49 {background-position: -130px -900px;}.loading-progress-bar.percents-50 {background-position: 0 -1000px;}.loading-progress-bar.percents-51, .loading-progress-bar.percents-52, .loading-progress-bar.percents-53 {background-position: -130px -1000px;}.loading-progress-bar.percents-54, .loading-progress-bar.percents-55, .loading-progress-bar.percents-56 {background-position: 0 -1100px;}.loading-progress-bar.percents-57, .loading-progress-bar.percents-58, .loading-progress-bar.percents-59 {background-position: -130px -1100px;}.loading-progress-bar.percents-60, .loading-progress-bar.percents-61, .loading-progress-bar.percents-62 {background-position: 0 -1200px;}.loading-progress-bar.percents-63, .loading-progress-bar.percents-64, .loading-progress-bar.percents-65 {background-position: -130px -1200px;}.loading-progress-bar.percents-66, .loading-progress-bar.percents-67, .loading-progress-bar.percents-68 {background-position: 0 -1300px;}.loading-progress-bar.percents-69, .loading-progress-bar.percents-70, .loading-progress-bar.percents-71 {background-position: -130px -1300px;}.loading-progress-bar.percents-72, .loading-progress-bar.percents-73, .loading-progress-bar.percents-74 {background-position: 0 -1400px;}.loading-progress-bar.percents-75, .loading-progress-bar.percents-76, .loading-progress-bar.percents-77 {background-position: -130px -1400px;}.loading-progress-bar.percents-78, .loading-progress-bar.percents-79, .loading-progress-bar.percents-80 {background-position: 0 -1500px;}.loading-progress-bar.percents-81, .loading-progress-bar.percents-82, .loading-progress-bar.percents-83 {background-position: -130px -1500px;}.loading-progress-bar.percents-84, .loading-progress-bar.percents-85, .loading-progress-bar.percents-86 {background-position: 0 -1600px;}.loading-progress-bar.percents-87, .loading-progress-bar.percents-88, .loading-progress-bar.percents-89 {background-position: -130px -1600px;}.loading-progress-bar.percents-90, .loading-progress-bar.percents-91, .loading-progress-bar.percents-92 {background-position: 0 -1800px;}.loading-progress-bar.percents-93, .loading-progress-bar.percents-94, .loading-progress-bar.percents-95 {background-position: -130px -1800px;}.loading-progress-bar.percents-96, .loading-progress-bar.percents-97 {background-position: 0 -1900px;}.loading-progress-bar.percents-98, .loading-progress-bar.percents-99 {background-position: -130px -1900px;}.loading-progress-bar.percents-100 {background-position: 0 -2000px;}.follow-txt {text-decoration:none; line-height: 28px; float:right; color:#666666; font-size:12px;}@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {.maintance-block, .loading-progress-bar, .loading-progress-bar div, .loading-cloud, .loading-bottom-button {background-image: url(' + istaticpath + 'images/mega/loading-sprite1@2x.png);	background-size: 222px auto;}.st-bottom-button, .st-bottom-scroll-button {background-image: url(' + istaticpath + 'images/mega/new-startpage-spite1@2x.png?v=1);background-size: 356px auto;}}</style><div class="loading-main-block" id="loading"><div class="loading-mid-white-block"><div class="mid-centered-block"><div class="loading-cloud"><div class="loading-progress-bar percents-1" id="loadinganim"><div></div></div></div><div class="maintance-block hidden">Scheduled System Maintenance - Expect Disruptions<br/>Sunday 04:00 - 10:00 UTC </div></div><div class="st-social-block-load" id="bootbottom"><a href="https://www.facebook.com/MEGAprivacy" target="_blank" class="st-bottom-button st-facebook-button"></a><a href="https://www.twitter.com/MEGAprivacy" target="_blank" class="st-bottom-button st-twitter-button"></a><a href="https://plus.google.com/b/108055545377490138410/" target="_blank" class="st-bottom-button st-google-button"></a></div></div></div>');
     }
-    var u_storage,loginresponse,u_sid,jsl_done,dlresponse,dl_res;
+    var u_storage,loginresponse,u_sid,dl_res;
     u_storage = init_storage( localStorage.sid ? localStorage : sessionStorage );
     if ((u_sid = u_storage.sid))
     {
@@ -1239,6 +1280,7 @@ else
         var lxhr = getxhr();
         lxhr.onload = function()
         {
+            loginresponse = false;
             if (this.status == 200)
             {
                 try
@@ -1246,24 +1288,15 @@ else
                     loginresponse = this.response || this.responseText;
                     if (loginresponse && loginresponse[0] == '[') loginresponse = JSON.parse(loginresponse);
                     else loginresponse = false;
-					if(Object.keys(waitingToBeLoaded).length === 0) boot_done();
                 }
-                catch (e)
-                {
-                    loginresponse= false;
-					if(Object.keys(waitingToBeLoaded).length === 0) boot_done();
-                }
+                catch (e) {}
             }
-            else
-            {
-                loginresponse= false;
-				if(Object.keys(waitingToBeLoaded).length === 0) boot_done();
-            }
+            boot_done();
         }
         lxhr.onerror = function()
         {
             loginresponse= false;
-			if(Object.keys(waitingToBeLoaded).length === 0) boot_done();
+			boot_done();
         }
         lxhr.open("POST", apipath + 'cs?id=0&sid='+u_storage.sid, true);
         lxhr.send(JSON.stringify([{'a':'ug'}]));
@@ -1274,34 +1307,30 @@ else
         u_checked=true;
         startMega();
     }
-
     function boot_done()
     {
-		/**
-		 * TODO: this is called twice: 1 time from the login success, 1 time from the loading finished. The secure boot
-		 * should be rewritten to have a proper ASYNC flow/process of doing loading + doing auth, without actually
-		 * triggering 2 boot_done calls, because this causes different race conditions on different connection speeds,
-		 * which are almost impossible to track.
-		 */
-		if(!boot_done_called) {
-			boot_done_called = true;
-			$(window).trigger('MegaLoaded');
-		}
-
         lxhr = dlxhr = undefined;
-        if (loginresponse === true || dl_res === true || !jsl_done) return;
+
+        if (d) console.log('boot_done', loginresponse === true, dl_res === true, !jsl_done, !jj_done);
+
+        if (loginresponse === true || dl_res === true || !jsl_done || !jj_done) return;
+
+        if (u_checked) startMega();
         else if (loginresponse)
         {
             api_setsid(u_sid);
             u_checklogin3a(loginresponse[0],{checkloginresult:boot_auth});
+            loginresponse = undefined;
         }
         else u_checklogin({checkloginresult:boot_auth},false);
     }
     if (page.substr(0,1) == '!' && page.length > 1)
     {
-        var dlxhr = getxhr(),dl_res = true;
+        dl_res = true;
+        var dlxhr = getxhr();
         dlxhr.onload = function()
         {
+            dl_res = false;
             if (this.status == 200)
             {
                 try
@@ -1309,24 +1338,15 @@ else
                     dl_res = this.response || this.responseText;
                     if (dl_res[0] == '[') dl_res = JSON.parse(dl_res);
                     if (dl_res[0]) dl_res = dl_res[0];
-					if(Object.keys(waitingToBeLoaded).length === 0) boot_done();
                 }
-                catch (e)
-                {
-                    dl_res = false;
-					if(Object.keys(waitingToBeLoaded).length === 0) boot_done();
-                }
+                catch (e) {}
             }
-            else
-            {
-                dl_res = false;
-				if(Object.keys(waitingToBeLoaded).length === 0) boot_done();
-            }
+            boot_done();
         }
         dlxhr.onerror = function()
         {
             dl_res= false;
-			if(Object.keys(waitingToBeLoaded).length === 0) boot_done();
+			boot_done();
         }
         dlxhr.open("POST", apipath + 'cs?id=0', true);
         dlxhr.send(JSON.stringify([{'a':'g',p:page.substr(1,8)}]));

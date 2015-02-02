@@ -219,7 +219,7 @@ Object.keys(MegaLogger.LEVELS).forEach(function(k) {
     };
 });
 
-$(window).bind('onMegaLoaded', function() {
+mBroadcaster.once('startMega', function() {
     MegaLogger.rootLogger = new MegaLogger(
         "", {
             isEnabled: function() {

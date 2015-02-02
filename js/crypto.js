@@ -1131,8 +1131,7 @@ var waitbackoff = 125;
 var waittimeout;
 var waitbegin;
 var waitid = 0;
-var cmsNotifHandler = 'Nc4AFJZK'
-if (localStorage.cmsNotificationID) cmsNotifHandler = localStorage.cmsNotificationID
+var cmsNotifHandler = localStorage.cmsNotificationID || 'Nc4AFJZK';
 
 function stopsc()
 {
@@ -1152,7 +1151,7 @@ function stopsc()
 // calls execsc() with server-client requests received
 function getsc(fm)
 {
-    api_req('sn=' + (maxaction||"") + '&ssl=1&e=' + cmsNotifHandler,{
+    api_req('sn=' + maxaction + '&ssl=1&e=' + cmsNotifHandler,{
         fm : fm,
         callback : function __onGetSC(res,ctx)
         {
@@ -3316,7 +3315,7 @@ function u_initAuthentication2(res, ctx) {
     };
     getUserAttribute(u_handle, 'sigPubk', true, false, storeSigPubkCallback);
 
-    eventuallyTriggerAuthIfRequired();
+    mBroadcaster.sendMessage('pubEd25519');
 }
 
 function _checkFingerprintEd25519(userhandle) {

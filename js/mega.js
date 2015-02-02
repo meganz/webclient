@@ -1134,8 +1134,6 @@ function MegaData()
                     M.openFolder('shares', true);
                 });
             }
-
-            Soon(eventuallyTriggerAuthIfRequired);
         }
     };
 
@@ -5163,6 +5161,22 @@ function folderreqerr(c, e)
     });
 }
 
+function init_chat() {
+    function __init_chat() {
+        if(u_type && !megaChat.is_initialized) {
+            if (d) console.log('Initializing the chat...');
+            megaChat.init();
+        }
+    }
+    if(!MegaChatDisabled) {
+        if (pubEd25519[u_handle]) {
+            __init_chat();
+        } else {
+            mBroadcaster.once('pubEd25519', __init_chat);
+        }
+    }
+}
+
 function loadfm_callback(res)
 {
     if (pfkey && res.f && res.f[0])
@@ -5212,6 +5226,7 @@ function loadfm_callback(res)
             localStorage[u_handle + '_maxaction'] = maxaction;
         }
 
+        init_chat();
         renderfm();
 
         if (!pfkey) {

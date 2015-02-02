@@ -199,6 +199,9 @@
         get: function() {
             return this.data("tokenInputObject").getTokens();
         },
+        getSettings: function() {
+            return this.data("settings");
+        },
         toggleDisabled: function(disable) {
             this.data("tokenInputObject").toggleDisabled(disable);
             return this;

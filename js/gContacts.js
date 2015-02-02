@@ -128,7 +128,7 @@
                 else
                 {            
                     var gData = self._readAllEmails(res);
-                    if (self.where === 'shared') {
+                    if (where === 'shared') {
                         addImportedDataToSharedDialog(gData, 'gmail');
                     } else if (where === 'contacts') {
                         addImportedDataToAddContactsDialog(gData, 'gmail');

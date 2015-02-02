@@ -1269,7 +1269,8 @@ function topmenuUI() {
 				if (u_attr.p)
 				{
 					$('.membership-popup.pro-popup .membership-icon').addClass('pro' + u_attr.p);
-					$('.membership-popup.pro-popup .membership-icon-txt-bl .membershtip-medium-txt').html(l[987] + ' <span class="red">' + time2date(account.expiry) + '</span>');
+					var p = account.stype == 'S' ? '' : (l[987] + ' <span class="red">' + time2date(account.expiry) + '</span>');
+					$('.membership-popup.pro-popup .membership-icon-txt-bl .membershtip-medium-txt').html(p);
 				}
 				else
 				{

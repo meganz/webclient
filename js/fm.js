@@ -2688,10 +2688,14 @@ function accountUI()
 			{
 				// subscription
 				$('.fm-account-header.typetitle').text(l[434]);
-				if (u.stime == 'W') $('.membership-big-txt.type').text(l[747]);
-				else if (u.stime == 'M') $('.membership-big-txt.type').text(l[748]);
-				else if (u.stime == 'Y') $('.membership-big-txt.type').text(l[749]);
-				$('.membershtip-medium-txt.expiry').html(htmlentities(l[750]) + ' <span class="red">' + time2date(account.scycle) + '</span>');
+				// if (u.stime == 'W') $('.membership-big-txt.type').text(l[747]);
+				// else if (u.stime == 'M') $('.membership-big-txt.type').text(l[748]);
+				// else if (u.stime == 'Y') $('.membership-big-txt.type').text(l[749]);
+				// $('.membershtip-medium-txt.expiry').html(htmlentities(l[750]) + ' <span class="red">' + time2date(account.scycle) + '</span>');
+				if (account.scycle == '1 M') $('.membership-big-txt.type').text(l[748]);
+				else if (account.scycle == '1 Y') $('.membership-big-txt.type').text(l[749]);
+				else $('.membership-big-txt.type').text('');
+				$('.membershtip-medium-txt.expiry').html(htmlentities('(' + account.sgw.join(",") + ')'));
 			}
 			else if (account.stype == 'O')
 			{

@@ -2642,10 +2642,13 @@ function MegaData()
 
                     if (typeof res == 'object')
                     {
+                        for (var i in res) {
+                            ctx.account[i] = res[i];
+                        }
                         ctx.account.type = res.utype;
                         ctx.account.stype = res.stype;
-                        ctx.account.stime = res.scycle;
-                        ctx.account.scycle = res.snext;
+                        // ctx.account.stime = res.scycle;
+                        // ctx.account.scycle = res.snext;
                         ctx.account.expiry = res.suntil;
                         ctx.account.space = Math.round(res.mstrg);
                         ctx.account.space_used = Math.round(res.cstrg);

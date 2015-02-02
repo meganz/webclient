@@ -1094,7 +1094,7 @@ function MegaData()
                 function prepareShareMenuHandler(e) {
                     e.preventDefault();
                     e.stopPropagation();
-                    e.currentTarget = $('#treeli_' + M.currentdirid);
+                    e.currentTarget = $('#treea_' + M.currentdirid);
                     e.calculatePosition = true;
                     $.selected = [M.currentdirid];
                 }

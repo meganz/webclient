@@ -5785,7 +5785,7 @@ function sectionUIopen(id) {
         case 'contacts':
         case 'ipc':
         case 'opc':
-            headertxt = 'My contacts';
+            headertxt = l[5903];
             break;
         case 'conversations':
             headertxt = 'My conversations';
@@ -8209,7 +8209,7 @@ function propertiesDialog(close)
                     rights = l[57];
                 }
                 p.t4 = rights;
-                p.t6 = 'Owner';
+                p.t6 = l[5905];
                 p.t7 = user.name;
                 p.t8 = l[894] + ':';
                 p.t9 = bytesToSize(size);

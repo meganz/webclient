@@ -1458,6 +1458,7 @@ function addContactUI()
     });
     //end of Contact request textfiled scripts
 
+    // Prevent double initialization of token input
     if (!$('.add-contact-multiple-input').tokenInput("getSettings")) {
         
         // Plugin configuration
@@ -6355,7 +6356,11 @@ function fillShareDialogWithContent()
     {
         if (shares.hasOwnProperty(userHandle)) {
             
-            if (M.u[userHandle])
+            // Don't add removed contacts from contact list
+            // Additional check of 'c' grants that only active 
+            // contacts will be addded, this prevents contact
+            //  duplication in share dialog contact list
+            if (M.u[userHandle] && M.u[userHandle].c)
             {
                 var user = M.u[userHandle];
                 var email = user.m;
@@ -6524,6 +6529,7 @@ function initShareDialog()
         }, 3000);
     }
 
+    // Prevent double initialization of token input
     if (!$('.share-multiple-input').tokenInput("getSettings")) {
 
         // Plugin configuration

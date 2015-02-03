@@ -6772,11 +6772,9 @@ function initShareDialog()
     });
 
     $('.share-dialog .import-contacts-service').unbind('click');
-    $('.share-dialog .import-contacts-service').bind('click', function()
-    {
+    $('.share-dialog .import-contacts-service').bind('click', function() {
         // NOT imported
-        if (!$(this).is('.imported'))
-        {
+        if (!$(this).is('.imported')) {
             var contacts = new mega.GContacts({'where': 'shared'});
 
             // NOT failed
@@ -6785,9 +6783,7 @@ function initShareDialog()
             } else {
                 closeImportContactNotification('.share-dialog');
             }
-        }
-        else
-        {
+        } else {
             var n = $('.imported-contacts-notification');
             n.css('margin-left', '-' + n.outerWidth() / 2 + 'px');
             n.fadeIn(200);
@@ -7078,6 +7074,7 @@ function addImportedDataToAddContactsDialog(data, from) {
 }
 
 function closeImportContactNotification(c) {
+    loadingDialog.hide();
     $('.imported-contacts-notification').fadeOut(200);
     $(c + ' .import-contacts-dialog').fadeOut(200);
     $('.import-contacts-link').removeClass('active');

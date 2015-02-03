@@ -6771,63 +6771,6 @@ function initShareDialog()
         }
     });
 
-    $('.share-dialog .import-contacts-service').unbind('click');
-    $('.share-dialog .import-contacts-service').bind('click', function() {
-        // NOT imported
-        if (!$(this).is('.imported')) {
-            var contacts = new mega.GContacts({'where': 'shared'});
-
-            // NOT failed
-            if (!contacts.options.failed) {
-                contacts.importGoogleContacts();
-            } else {
-                closeImportContactNotification('.share-dialog');
-            }
-        } else {
-            var n = $('.imported-contacts-notification');
-            n.css('margin-left', '-' + n.outerWidth() / 2 + 'px');
-            n.fadeIn(200);
-            $('.share-dialog .import-contacts-dialog').fadeOut(200);
-        }
-    });
-
-    $('.share-dialog .import-contacts-link').unbind('click');
-    $('.share-dialog .import-contacts-link').bind('click', function(e)
-    {
-        $('.permissions-menu').fadeOut(200);
-        $('.share-dialog-permissions').removeClass('active');
-        $('.permissions-icon').removeClass('active');
-        if (!$(this).is('.active'))
-        {
-            $('.share-dialog .import-contacts-link').addClass('active');
-            $('.share-dialog .import-contacts-dialog').fadeIn(200);
-
-            $('.imported-notification-close').unbind('click');
-            $('.imported-notification-close').bind('click', function()
-            {
-                $('.imported-contacts-notification').fadeOut(200);
-            });
-        }
-        else
-        {
-            $('.share-dialog .import-contacts-link').removeClass('active');
-            $('.share-dialog .import-contacts-dialog').fadeOut(200);
-            $('.imported-contacts-notification').fadeOut(200);
-        }
-
-        e.stopPropagation();
-    });
-
-    $('.share-dialog .import-contacts-info').unbind('mouseover');
-    $('.share-dialog .import-contacts-info').bind('mouseover', function() {
-        $('.share-dialog .import-contacts-info-txt').fadeIn(200);
-    });
-
-    $('.share-dialog .import-contacts-info').unbind('mouseout');
-    $('.share-dialog .import-contacts-info').bind('mouseout', function() {
-        $('.share-dialog .import-contacts-info-txt').fadeOut(200);
-    });
-
     $(document).off('click', '.share-dialog-remove-button');
     $(document).on('click', '.share-dialog-remove-button', function(e)
     {

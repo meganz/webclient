@@ -1240,6 +1240,7 @@ function MegaData()
                 window.location = megaChat.getCurrentRoom().getRoomUrl();
                 return;
             }
+            megaChat.refreshConversations();
             treeUI();
         } else if (id && id.substr(0, 7) === 'account')
             accountUI();
@@ -3994,6 +3995,7 @@ function renderfm()
 {
     if (d)
         console.time('renderfm');
+
     initUI();
     loadingDialog.hide();
     M.sortByName();
@@ -4005,6 +4007,7 @@ function renderfm()
         $('.fm-tree-header.cloud-drive-item').addClass('opened');
         $('#treesub_' + M.RootID).addClass('opened');
     }
+
     M.openFolder(M.currentdirid);
     if (!MegaChatDisabled) {
         megaChat.renderContactTree();
@@ -4499,14 +4502,24 @@ function fm_commitkeyupdate()
 
 function loadfm()
 {
-    M.reset();
     fminitialized = false;
     loadingDialog.show();
-    api_req({a: 'f', c: 1, r: 1}, {
-        callback: loadfm_callback
-    }, n_h ? 1 : 0);
+    loadfmdata();
 
 }
+function loadfmdata() {
+    loadfmdata.isLoading = true;
+    api_req({a: 'f', c: 1, r: 1}, {
+        callback: function() {
+            loadfmdata.isLoading = false;
+
+            M.reset(); // clear JUST before the new data is parsed.
+
+            loadfm_callback.apply(this, arguments);
+        }
+    }, n_h ? 1 : 0);
+};
+loadfmdata.isLoading = false;
 
 function RightsbyID(id)
 {
@@ -5232,7 +5245,12 @@ function loadfm_callback(res)
         }
 
         init_chat();
-        renderfm();
+
+        if((M.currentdirid !== false && window.location.hash.indexOf("#fm") !== -1) || $('.fm-main.default').is(":visible")) { // are we actually on an #fm/* page?
+            renderfm();
+        } else { // nah, just a static page! just hide the loading dialog
+            loadingDialog.hide();
+        }
 
         if (!pfkey) {
             notifyPopup.pollNotifications();

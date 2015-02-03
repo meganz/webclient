@@ -309,6 +309,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
             $('.btn-chat-call', self.$header).addClass("disabled");
 
             var doAnswer = function() {
+                self.activateWindow();
                 self.show();
                 self.megaChat.incomingCallDialog.hide();
 
@@ -324,9 +325,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
                     mediaOptions: self.getMediaOptions()
                 });
 
-                if(self.megaChat.getCurrentRoomJid() != self.roomJid) {
-                    self.activateWindow();
-                }
+
                 self.megaChat.trigger('onCallAnswered', [self, eventData]);
                 self.trigger('onCallAnswered', [eventData]);
 
@@ -777,6 +776,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
             var targetUserJid = self.getParticipantsExceptMe()[0];
             var targetUserNode = self.megaChat.getContactFromJid(targetUserJid);
             assert(M.u, 'M.u does not exists');
+
             assert(targetUserNode && targetUserNode.u, 'No hash found for participant');
             assert(M.u[targetUserNode.u], 'User not found in M.u');
 
@@ -1462,16 +1462,16 @@ ChatRoom.prototype._resetCallStateInCall = function() {
         );
     }
 
-    self._currentCallCounter = 0;
-    if(self._currentCallTimer) {
-        clearInterval(self._currentCallTimer);
+    self.megaChat._currentCallCounter = 0;
+    if(self.megaChat._currentCallTimer) {
+        clearInterval(self.megaChat._currentCallTimer);
     }
-    self._currentCallTimer = setInterval(function() {
+    self.megaChat._currentCallTimer = setInterval(function() {
         $('.nw-conversations-item.current-calling .chat-time-txt').text(
-            secondsToTime(self._currentCallCounter)
+            secondsToTime(self.megaChat._currentCallCounter)
         );
 
-        self._currentCallCounter++;
+        self.megaChat._currentCallCounter++;
     }, 1000);
 
     self.megaChat.renderContactTree();
@@ -2065,7 +2065,6 @@ ChatRoom.prototype.activateWindow = function() {
     var self = this;
 
     window.location = self.getRoomUrl();
-
 };
 
 /**

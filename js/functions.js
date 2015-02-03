@@ -1278,7 +1278,18 @@ function array_random(arr) {
  */
 function megaUserIdEncodeForXmpp(handle) {
     var s = base64urldecode(handle);
-    return baseenc.b32encode(s).replace(/=/g, "");
+    return base32.encode(s);
+}
+
+/**
+ * Simple method that will convert base32 strings -> Mega user ids
+ *
+ * @param handle {string} mega user id
+ * @returns {string} base32 formatted user id to be used when doing xmpp auth
+ */
+function megaJidToUserId(jid) {
+    var s = base32.decode(jid.split("@")[0]);
+    return base64urlencode(s).replace(/=/g, "");
 }
 
 /**

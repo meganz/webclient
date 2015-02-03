@@ -1964,15 +1964,26 @@ makeMetaAware(Karere);
 
 
         var joinedTimeout = setTimeout(function() {
-            self.logger.warn(
-                self.getNickname(),
-                (new Date()),
-                "Timeout waiting for user to " + (eventName == "Joined" ? "join" : "leave") + ": ",
-                userJid
-            );
+            if(megaChat.karere.userExistsInChat(roomJid, userJid)) {
+                self.logger.warn(self.getNickname(), "User " + eventName + ": ", roomJid, userJid);
 
-            self.unbind(generatedEventName);
-            $promise.reject(roomJid, userJid);
+                self.unbind(generatedEventName);
+                clearTimeout(joinedTimeout);
+
+                $promise.resolve(
+                    roomJid, userJid
+                );
+            } else {
+                self.logger.warn(
+                    self.getNickname(),
+                    (new Date()),
+                    "Timeout waiting for user to " + (eventName == "Joined" ? "join" : "leave") + ": ",
+                    userJid
+                );
+
+                self.unbind(generatedEventName);
+                $promise.reject(roomJid, userJid);
+            }
         }, self.options.waitForUserPresenceInRoomTimeout);
 
         var searchKey = eventName == "Joined" ? "newUsers" : "leftUsers";

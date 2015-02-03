@@ -31,6 +31,8 @@ var chatui;
 
         $('.fm-right-files-block').removeClass('hidden');
 
+        megaChat.refreshConversations();
+
         var chatJids = id.split("chat/").pop();
         if(chatJids) {
             chatJids = chatJids.split(",");
@@ -1256,11 +1258,9 @@ Chat.prototype.init = function() {
 
     self.$container = $('.fm-chat-block');
 
+
     self.$header_tpl = $('.fm-right-header', self.$container).clone().removeClass("template");
-    if(self.$header_tpl.length === 0) {
-      self.logger.warn("Header template not found.");
-        return;
-    }
+    assert(self.$header_tpl.length > 0, "Header template not found.");
 
     self.$messages_tpl = $('.fm-chat-message-scroll', self.$container).clone().removeClass("template");
     assert(self.$messages_tpl.length > 0, "Messages template not found.");
@@ -1353,7 +1353,10 @@ Chat.prototype.init = function() {
 
                     return;
                 }
-                var resp = self.openChat([fromBareJid], "private");
+                var chatJids = [fromBareJid]
+                chatJids.push(self.karere.getBareJid());
+
+                var resp = self.openChat(chatJids, "private");
 
                 resp[2].done(function(roomJid, room) {
                     room.trigger(e, eventData);
@@ -1793,18 +1796,18 @@ Chat.prototype.getContacts = function() {
 Chat.prototype.getContactFromJid = function(jid) {
     var self = this;
 
-
     assert(jid, "Missing jid");
 
+    if(jid === self.karere.getBareJid()) {
+        return u_handle;
+    }
+
     jid = Karere.getNormalizedBareJid(jid); // always convert to bare jid
+    var h = megaJidToUserId(jid);
 
     var contact = null;
-    $.each(M.u, function(k, v) {
-        if((v.c == 1 || v.c == 2) && self.getJidFromNodeId(k) == jid) {
-            contact = v;
-            return false; // break;
-        }
-    });
+    contact = M.u[h];
+
     if(!contact) {
         // this can happen if:
         // user A added user B
@@ -2176,6 +2179,18 @@ Chat.prototype.getJidFromNodeId = function(nodeId) {
 };
 
 /**
+ * Jid -> Mega User ID (NodeID)
+ *
+ * @param nodeId {String}
+ * @returns {string}
+ */
+Chat.prototype.getNodeIdFromJid = function(jid) {
+    assert(jid, "Missing jid for getNodeIdFromJid");
+
+    return megaUserIdEncodeForXmpp(nodeId) + "@" + this.options.xmppDomain;
+};
+
+/**
  * Placeholder function that should return my password for authenticating w/ the XMPP server
  *
  * @returns {String}
@@ -2443,6 +2458,18 @@ Chat.prototype.processRemovedUser = function(u) {
 Chat.prototype.refreshConversations = function() {
     var self = this;
 
+    if(!self.$container && !megaChat.is_initialized && u_type == 0) {
+        $('.fm-chat-block').hide();
+        return false;
+    }
+    // move to the proper place if loaded before the FM
+    if(self.$container.parent('.fm-right-files-block').size() == 0) {
+        $('.fm-right-files-block').append(self.$container);
+        $('video', self.$container).each(function() {
+            this.play();
+        });
+    }
+
     // remove any dom elements for rooms which were destroyed
     $('.content-panel .conversations .nw-conversations-item').each(function() {
         if($(this).data('chatRoomId') && !self.chats[$(this).data('chatRoomId')]) {
@@ -2494,13 +2521,13 @@ Chat.prototype.getBoshServiceUrl = function() {
                     $promise.resolve("https://" + r.xmpp[0].host + ":" + r.xmpp[0].port + "/bosh");
                 } else {
                     var server = array_random(self.options.fallbackXmppServers);
-                    self.logger.warn("Got empty list from the load balancing service for xmpp, will fallback to: " + server + ".");
+                    self.logger.error("Got empty list from the load balancing service for xmpp, will fallback to: " + server + ".");
                     $promise.resolve(server);
                 }
             })
             .fail(function() {
                 var server = array_random(self.options.fallbackXmppServers);
-                self.logger.warn("Could not connect to load balancing service for xmpp, will fallback to: " + server + ".");
+                self.logger.error("Could not connect to load balancing service for xmpp, will fallback to: " + server + ".");
 
                 $promise.resolve(server);
             });

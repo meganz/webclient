@@ -99,8 +99,10 @@
                     window.clearInterval(pollTimer);
                     var url = win.document.URL;
                     self.accessToken = self._extractQueryValue(url, 'access_token');
+                    loadingDialog.show();
                     win.close();
                     self.isImported = self.getContactList(self.options.where);
+                    loadingDialog.hide();
                 }
             } catch (e) {
             }
@@ -116,17 +118,12 @@
 
         var url = self.options.retreiveAllUrl + "?access_token=" + self.accessToken + "&v=3.0&alt=json&max-results=999";
 
-        api_req({ a: 'prox', url: url },
-        {
-            callback: function(res)
-            {
-                if (typeof res == 'number')
-                {
+        api_req({ a: 'prox', url: url }, {
+            callback: function(res) {
+                if (typeof res == 'number') {
                     console.log("Contact import failed");
                     return false;
-                }
-                else
-                {            
+                } else {            
                     var gData = self._readAllEmails(res);
                     if (where === 'shared') {
                         addImportedDataToSharedDialog(gData, 'gmail');

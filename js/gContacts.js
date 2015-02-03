@@ -94,19 +94,20 @@
 
         var pollTimer = window.setInterval(function() {
             try {
-                console.log(win.document.URL);
+//                console.log(win.document.URL);
                 if (win.document.URL.indexOf(self.redirect_uri) !== -1) {
                     window.clearInterval(pollTimer);
                     var url = win.document.URL;
                     self.accessToken = self._extractQueryValue(url, 'access_token');
-                    loadingDialog.show();
                     win.close();
+                    
+                    // Importing contacts can take some time
+                    loadingDialog.show();
                     self.isImported = self.getContactList(self.options.where);
-                    loadingDialog.hide();
                 }
             } catch (e) {
             }
-        }, 1500);
+        }, 3000);
     };
 
     /**
@@ -121,7 +122,7 @@
         api_req({ a: 'prox', url: url }, {
             callback: function(res) {
                 if (typeof res == 'number') {
-                    console.log("Contact import failed");
+                    console.log("Contacts importing failed.");
                     return false;
                 } else {            
                     var gData = self._readAllEmails(res);

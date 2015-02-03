@@ -1496,16 +1496,12 @@ function addContactUI()
             onHolder: function() {
                 errorMsg('No need for that, you are THE owner!');
             },
-            onAdd: function()
-            {
+            onAdd: function() {
                 var itemNum = $('.token-input-list-mega .token-input-token-mega').length;
-                if (itemNum === 1)
-                {
+                if (itemNum === 1) {
                     $('.add-user-popup-button.add').removeClass('disabled');
                     $('.add-user-popup .nw-fm-dialog-title').text(l[71]);
-                }
-                else
-                {
+                } else {
                     $('.add-user-popup-button.add').removeClass('disabled');
                     $('.add-user-popup .nw-fm-dialog-title').text('Add Contacts');
 
@@ -1514,8 +1510,7 @@ function addContactUI()
                     var h1 = $a.outerHeight(true);// margin included
                     var h2 = $b.height();
 
-                    if (5 <= h2 / h1 && h2 / h1 < 6)
-                    {
+                    if (5 <= h2 / h1 && h2 / h1 < 6) {
                         $b.jScrollPane({
                             enableKeyboardNavigation: false,
                             showArrows: true,
@@ -1528,26 +1523,20 @@ function addContactUI()
                     }
                 }
             },
-            onDelete: function()
-            {
+            onDelete: function() {
                 setTimeout(function() {
                     $('.add-user-popup .token-input-input-token-mega input').blur();
                 }, 0);
                 var itemNum = $('.token-input-list-mega .token-input-token-mega').length;
-                if (itemNum === 0)
-                {
+                if (itemNum === 0) {
                     $('.add-user-popup-button.add').addClass('disabled');
                     $('.add-user-popup .nw-fm-dialog-title').text(l[71]);
 
-                }
-                else if (itemNum === 1)
-                {
+                } else if (itemNum === 1) {
                     $('.add-user-popup-button.add').removeClass('disabled');
                     $('.add-user-popup .nw-fm-dialog-title').text(l[71]);
 
-                }
-                else
-                {
+                } else {
                     $('.add-user-popup-button.add').removeClass('disabled');
                     $('.add-user-popup .nw-fm-dialog-title').text('Add Contacts');
 
@@ -1556,13 +1545,13 @@ function addContactUI()
                     var $c = $('.add-user-popup .multiple-input .jspPane')[0];
                     var h1 = $a.outerHeight(true);// margin included
                     var h2;
-                    if ($c)
+                    if ($c) {
                         h2 = $c.scrollHeight;
-                    else
+                    } else {
                         h2 = $b.height();
+                    }
 
-                    if (h2 / h1 < 6)
-                    {
+                    if (h2 / h1 < 6) {
                         clearScrollPanel('.add-user-popup');
                     }
                 }
@@ -7072,7 +7061,7 @@ function closeDialog()
             var email = $(v).contents().eq(1).text();
             $('.share-multiple-input').tokenInput("removeContact", {id: email}, '.share-multiple-input');
         });
-        $('.add-contact-multiple-input').tokenInput("clear");
+        $('.add-contact-multiple-input').tokenInput("clearOnCancel");
 
         clearScrollPanel('.add-user-popup');
 

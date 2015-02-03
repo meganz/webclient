@@ -309,6 +309,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
             $('.btn-chat-call', self.$header).addClass("disabled");
 
             var doAnswer = function() {
+                self.activateWindow();
                 self.show();
                 self.megaChat.incomingCallDialog.hide();
 
@@ -324,9 +325,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
                     mediaOptions: self.getMediaOptions()
                 });
 
-                if(self.megaChat.getCurrentRoomJid() != self.roomJid) {
-                    self.activateWindow();
-                }
+
                 self.megaChat.trigger('onCallAnswered', [self, eventData]);
                 self.trigger('onCallAnswered', [eventData]);
 
@@ -711,6 +710,46 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
             self._othersAvElement = obj.player;
         }
 
+        self.callStats = {};
+        obj.stats = {
+            scanPeriod: 1, maxSamplePeriod: 5,
+            onSample: function(stats, type) {
+                if (type == 1) {
+                    self.callStats.stats = stats;
+                } else if (type == 0) {
+                    self.callStats.commonStats = stats;
+                }
+            }
+        };
+        self.megaChat.dumpCallStats = self.dumpCallStats = function() {
+            var s = self.callStats.stats ? RTC.Stats.statItemToString(self.callStats.stats) : "";
+            s += self.callStats.commonStats ? RTC.Stats.statItemToString(self.callStats.commonStats) : "";
+            s = s.replace(/\n/g, '<br/>\n');
+
+            var $inlineDialog = self.generateInlineDialog(
+                "alert-info",
+                self.megaChat.karere.getJid(),
+                "debug",
+                "Debug Call Stats...",
+                [],
+                {},
+                !self.isActive()
+            );
+            $('.chat-message-txt', $inlineDialog).html(
+                "Debug Call Stats: <br/>" + s
+            );
+
+            self.appendDomMessage(
+                $inlineDialog
+            );
+
+            return {
+                'str': s,
+                'stats': self.callStats.stats,
+                'commonStats': self.callStats.commonStats
+            };
+        };
+
 
         if(self.options.mediaOptions.video === false) {
             $('.others-av-screen .video-only', self.$header).hide();
@@ -777,6 +816,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
             var targetUserJid = self.getParticipantsExceptMe()[0];
             var targetUserNode = self.megaChat.getContactFromJid(targetUserJid);
             assert(M.u, 'M.u does not exists');
+
             assert(targetUserNode && targetUserNode.u, 'No hash found for participant');
             assert(M.u[targetUserNode.u], 'User not found in M.u');
 
@@ -1462,16 +1502,16 @@ ChatRoom.prototype._resetCallStateInCall = function() {
         );
     }
 
-    self._currentCallCounter = 0;
-    if(self._currentCallTimer) {
-        clearInterval(self._currentCallTimer);
+    self.megaChat._currentCallCounter = 0;
+    if(self.megaChat._currentCallTimer) {
+        clearInterval(self.megaChat._currentCallTimer);
     }
-    self._currentCallTimer = setInterval(function() {
+    self.megaChat._currentCallTimer = setInterval(function() {
         $('.nw-conversations-item.current-calling .chat-time-txt').text(
-            secondsToTime(self._currentCallCounter)
+            secondsToTime(self.megaChat._currentCallCounter)
         );
 
-        self._currentCallCounter++;
+        self.megaChat._currentCallCounter++;
     }, 1000);
 
     self.megaChat.renderContactTree();
@@ -2065,7 +2105,6 @@ ChatRoom.prototype.activateWindow = function() {
     var self = this;
 
     window.location = self.getRoomUrl();
-
 };
 
 /**

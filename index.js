@@ -47,9 +47,17 @@ function startMega()
 		$('body').append(translate(pages['dialogs'].replace(/{staticpath}/g,staticpath)));
 		delete pages['dialogs'];
 	}
+	if (pages['chat'])
+	{
+		$('body').append(translate(pages['chat'].replace(/{staticpath}/g,staticpath)));
+		delete pages['chat'];
+	}
 	jsl=[];
 	init_page();
     init_chat();
+	if(u_handle && loadfmdata.isLoading === false) {
+		loadfmdata();
+	}
 }
 
 function mainScroll()
@@ -1544,6 +1552,7 @@ window.onhashchange = function()
 		document.location.hash = hash;
 		return false;
 	}
+
 	if (tpage == '#info' && page == 'start')
 	{
 		if (!$.infoscroll) startpageScroll();

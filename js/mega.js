@@ -4123,7 +4123,6 @@ function execsc(actionPackets, callback) {
                     $.each(actionPacket.u, function(k, v) {
                         megaChat[v.c == 0 ? "processRemovedUser" : "processNewUser"](v.u);
                     });
-                    megaChat.karere.forceReconnect();
                 }
             }
             else if (actionPacket.a === 'opc') {    // Outgoing pending contact
@@ -5137,9 +5136,9 @@ function process_u(u) {
         M.addUser(u[i]);
     }
 
-    if(megaChat && megaChat.karere && megaChat.karere.getConnectionState() === Karere.CONNECTION_STATE.CONNECTED) {
-        megaChat.karere.forceReconnect();
-    }
+    //if(megaChat && megaChat.karere && megaChat.karere.getConnectionState() === Karere.CONNECTION_STATE.CONNECTED) {
+    //    megaChat.karere.forceReconnect();
+    //}
 }
 
 function process_ok(ok)

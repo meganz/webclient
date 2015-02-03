@@ -1799,7 +1799,7 @@ Chat.prototype.getContactFromJid = function(jid) {
     assert(jid, "Missing jid");
 
     if(jid === self.karere.getBareJid()) {
-        return u_handle;
+        return M.u[u_handle];
     }
 
     jid = Karere.getNormalizedBareJid(jid); // always convert to bare jid

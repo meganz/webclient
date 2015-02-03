@@ -489,11 +489,11 @@ function MegaData()
      */
     this.drawReceivedContactRequests = function(ipc, clearGrid) {
         DEBUG('Draw received contacts grid.');
+        var html, email, av_color, shortcut, ps, trClass, id,
+            type = '',
+            drawn = false,
+            t = '.grid-table.contact-requests';
         if (M.currentdirid === 'ipc') {
-            var html, email, av_color, shortcut, ps, trClass, id,
-                type = '',
-                drawn = false,
-                t = '.grid-table.contact-requests';
 
             if (clearGrid) {
                 $(t + ' tr').remove();
@@ -585,9 +585,10 @@ function MegaData()
      */
     this.drawSentContactRequests = function(opc, clearGrid) {
         DEBUG('Draw sent invites.');
+        var html, hideCancel, hideReinvite, hideOPC,
+            drawn = false,
+            t = '.grid-table.sent-requests';
         if (M.currentdirid === 'opc') {
-            var html, hideCancel, hideReinvite, hideOPC,
-                t = '.grid-table.sent-requests';
 
             if (clearGrid) {
                 $(t + ' tr').remove();
@@ -622,17 +623,22 @@ function MegaData()
                 </tr>';
 
                 $(t).append(html);
+                
+                drawn = true;
             }
-            // Hide received grids
-            $('.empty-contact-requests').addClass('hidden');
-            $('.contact-requests-grid').addClass('hidden');
+            
+            if (drawn) {
+                // Hide received grids
+                $('.empty-contact-requests').addClass('hidden');
+                $('.contact-requests-grid').addClass('hidden');
 
-            // Show sent grids
-            $('.sent-requests-grid').removeClass('hidden');
-            $('.empty-sent-requests').addClass('hidden');
+                // Show sent grids
+                $('.sent-requests-grid').removeClass('hidden');
+                $('.empty-sent-requests').addClass('hidden');
 
-            initOpcGridScrolling();
-            initBindOPC();
+                initOpcGridScrolling();
+                initBindOPC();
+            }
         }
     };
 
@@ -1088,7 +1094,7 @@ function MegaData()
                 function prepareShareMenuHandler(e) {
                     e.preventDefault();
                     e.stopPropagation();
-                    e.currentTarget = $('#treeli_' + M.currentdirid);
+                    e.currentTarget = $('#treea_' + M.currentdirid);
                     e.calculatePosition = true;
                     $.selected = [M.currentdirid];
                 }
@@ -1134,8 +1140,6 @@ function MegaData()
                     M.openFolder('shares', true);
                 });
             }
-
-            Soon(eventuallyTriggerAuthIfRequired);
         }
     };
 
@@ -5162,6 +5166,22 @@ function folderreqerr(c, e)
     });
 }
 
+function init_chat() {
+    function __init_chat() {
+        if(u_type && !megaChat.is_initialized) {
+            if (d) console.log('Initializing the chat...');
+            megaChat.init();
+        }
+    }
+    if(!MegaChatDisabled) {
+        if (pubEd25519[u_handle]) {
+            __init_chat();
+        } else {
+            mBroadcaster.once('pubEd25519', __init_chat);
+        }
+    }
+}
+
 function loadfm_callback(res)
 {
     if (pfkey && res.f && res.f[0])
@@ -5211,6 +5231,7 @@ function loadfm_callback(res)
             localStorage[u_handle + '_maxaction'] = maxaction;
         }
 
+        init_chat();
         renderfm();
 
         if (!pfkey) {

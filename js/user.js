@@ -654,17 +654,6 @@ function setUserAttribute(attribute, value, pub, nonHistoric, callback,
     api_req(apiCall, myCtx);
 }
 
-
-(function(scope) {
-    var _is_authenticated = false;
-    scope.eventuallyTriggerAuthIfRequired = function() {
-        if(!_is_authenticated) {
-            $(window).trigger('megaAuthenticationFinished');
-            _is_authenticated = true;
-        }
-    };
-})(window);
-
 function isNonActivatedAccount() {
     return (!u_privk && typeof(u_attr.p) !== 'undefined' && (u_attr.p == 1 || u_attr.p == 2 || u_attr.p == 3));
 }

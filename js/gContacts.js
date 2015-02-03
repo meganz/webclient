@@ -114,7 +114,7 @@
     GContacts.prototype.getContactList = function(where) {
         var self = this;
 
-        var url = self.options.retreiveAllUrl + "?access_token=" + self.accessToken + "&v=3.0&alt=json";
+        var url = self.options.retreiveAllUrl + "?access_token=" + self.accessToken + "&v=3.0&alt=json&max-results=999";
 
         api_req({ a: 'prox', url: url },
         {
@@ -128,7 +128,7 @@
                 else
                 {            
                     var gData = self._readAllEmails(res);
-                    if (self.where === 'shared') {
+                    if (where === 'shared') {
                         addImportedDataToSharedDialog(gData, 'gmail');
                     } else if (where === 'contacts') {
                         addImportedDataToAddContactsDialog(gData, 'gmail');

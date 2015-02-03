@@ -380,11 +380,11 @@ ChatStore.prototype.restoreConversationsFromDb = function() {
             });
     };
 
-    if(!boot_done_called) {
-        $(window).bind('MegaLoaded', _restore);
-    } else {
+    // if(!boot_done_called) {
+        // $(window).bind('MegaLoaded', _restore);
+    // } else {
         _restore();
-    }
+    // }
 };
 ChatStore.prototype.cleanup = function() {
     var self = this;

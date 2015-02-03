@@ -1,8 +1,8 @@
 var linuxsync = 
 [{
 	'name':'CentOS 7.0',
-	'64':'CentOS_7/x86_64/megasync-1.0.37-13.1.x86_64.rpm',
-	'64n':'CentOS_7/x86_64/nautilus-megasync-1.0.37-5.1.x86_64.rpm',
+	'64':'CentOS_7/x86_64/megasync-CentOS_7.x86_64.rpm',
+	'64n':'CentOS_7/x86_64/nautilus-megasync-CentOS_7.x86_64.rpm',
 	'c':'sudo yum localinstall'
 },
 {
@@ -79,8 +79,8 @@ var linuxsync =
 },
 {
 	'name':'Red Hat 7',
-	'64':'RHEL_7/x86_64/megasync-1.0.37-13.1.x86_64.rpm',
-	'64n':'RHEL_7/x86_64/nautilus-megasync-1.0.37-5.1.x86_64.rpm',
+	'64':'RHEL_7/x86_64/megasync-RHEL_7.x86_64.rpm',
+	'64n':'RHEL_7/x86_64/nautilus-megasync-RHEL_7.x86_64.rpm',
 	'c':'sudo yum localinstall'
 },
 {

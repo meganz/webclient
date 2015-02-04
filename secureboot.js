@@ -282,7 +282,7 @@ var sh = [];
 function compareHashes(hashFromWorker, hashFromDeployment, fileName) {
 
     if (hashFromWorker === hashFromDeployment) {
-        console.log('Hash match on file: ' + fileName + '. Hash from worker thread: ' + hashFromWorker + ' Hash from deployment script: ' + hashFromDeployment);
+        // console.log('Hash match on file: ' + fileName + '. Hash from worker thread: ' + hashFromWorker + ' Hash from deployment script: ' + hashFromDeployment);
         return true;
     }
     else {

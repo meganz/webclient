@@ -608,12 +608,53 @@ function showNonActivatedAccountDialog(log)
     var $dialog = $('.top-warning-popup');
     $dialog.addClass('not-activated');
     $('.warning-green-icon', $dialog).remove();
-    $('.fm-notifications-bottom', $dialog).remove();
+    $('.fm-notifications-bottom', $dialog).hide();
     $('.warning-popup-body', $dialog)
         .unbind('click')
         .empty()
         .append($("<div class='warning-gray-icon mailbox-icon'></div>"))
         .append(l[5847]); //TODO: l[]
+}
+
+/**
+ * Shows a dialog with a message that the user is over quota
+ */
+function showOverQuotaDialog()
+{
+    // Show the dialog
+    var $dialog = $('.top-warning-popup');
+    $dialog.addClass('active');
+    
+    // Unhide the warning icon and show the button
+    $('.warning-popup-icon').removeClass('hidden');
+    $('.fm-notifications-bottom', $dialog).show();
+    
+    // Add a click event on the warning icon to hide and show the dialog
+    $('.warning-icon-area').unbind('click');
+    $('.warning-icon-area').click(function()
+    {
+        if ($dialog.hasClass('active')) {
+            $dialog.removeClass('active');
+        }
+        else {
+            $dialog.addClass('active');
+        }
+    });
+    
+    // Change contents of dialog text
+    $('.warning-green-icon', $dialog).remove();
+    $('.warning-popup-body', $dialog).unbind('click').html(
+        '<div class="warning-header">' + l[1010] + '</div>' + /* Todo: change string below to l[5929] when translations are updated */
+        'You are significantly over your allowed storage allocation and your uploads have been disabled. Please ensure you are on the correct MEGA PRO plan, or contact support@mega.co.nz.'
+    );
+    
+    // Set button text to 'Upgrade Account'
+    $('.warning-button span').text(l[5549]);
+   
+    // Redirect to Pro signup page on button click
+    $('.warning-button').click(function() {
+       document.location.hash = 'pro';
+    });
 }
 
 function countDif(strPassword)

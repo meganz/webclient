@@ -304,18 +304,37 @@ var UploadManager =
 
 function ul_get_posturl(File) {
 	return function(res, ctx) {
-		if (!File.ul) return; /* cancelled */
-		delete ul_queue[ctx.reqindex].posturl; /* reset in case of a retry */
-		if (typeof res == 'object') {
+        
+        // If cancelled
+		if (!File.ul) {
+            return;
+        }
+		
+        // If the response is that the user is over quota
+        if (res === EOVERQUOTA) {
+          
+            // Show a warning dialog
+            showOverQuotaDialog();
+            
+            // Return early so it does not retry automatically and spam the API server with requests
+            return false;
+        }
+        
+        // Reset in case of a retry
+        delete ul_queue[ctx.reqindex].posturl;
+		
+        if (typeof res == 'object') {
 			if (typeof res.p == "string" && res.p.length > 0) {
 				ul_queue[ctx.reqindex].posturl = res.p;
 			}
 		}
+        
 		if (ctx.reqindex == File.ul.pos) {
 			if (ul_queue[ctx.reqindex].posturl) {
 				ul_upload(File);
-			} else {
-				/* retry */
+			}
+            else {
+				// Retry
 				ul_start(File);
 			}
 		}

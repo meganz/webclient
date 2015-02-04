@@ -4508,6 +4508,12 @@ function loadfm()
 
 }
 function loadfmdata() {
+    if(loadfmdata.isLoading) {
+        console.error("Already loading fmdata");
+        return;
+    } else {
+        console.error("Will stat loading fmdata");
+    }
     loadfmdata.isLoading = true;
     api_req({a: 'f', c: 1, r: 1}, {
         callback: function() {
@@ -4520,6 +4526,11 @@ function loadfmdata() {
     }, n_h ? 1 : 0);
 };
 loadfmdata.isLoading = false;
+
+
+function is_fm_data_loaded() {
+    return Object.keys(M.d).length > 0;
+}
 
 function RightsbyID(id)
 {
@@ -5244,17 +5255,12 @@ function loadfm_callback(res)
             localStorage[u_handle + '_maxaction'] = maxaction;
         }
 
-        init_chat();
-
-        if((M.currentdirid !== false && window.location.hash.indexOf("#fm") !== -1) || $('.fm-main.default').is(":visible")) { // are we actually on an #fm/* page?
-            renderfm();
-        } else { // nah, just a static page! just hide the loading dialog
-            loadingDialog.hide();
-        }
+        loadfm_rendering_cb();
 
         if (!pfkey) {
             notifyPopup.pollNotifications();
         }
+
         if (res.cr) {
             crypto_procmcr(res.cr);
         }
@@ -5266,6 +5272,17 @@ function loadfm_callback(res)
     });
 }
 
+function loadfm_rendering_cb() {
+    init_chat();
+
+    if(is_fm() || $('.fm-main.default').is(":visible")) { // are we actually on an #fm/* page?
+        renderfm();
+    } else { // nah, just a static page! just hide the loading dialog
+        loadingDialog.hide();
+    }
+
+
+}
 function storefmconfig(n, c)
 {
     fmconfig[n] = c;

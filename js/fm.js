@@ -1660,12 +1660,16 @@ function addContactUI()
     $('.fm-received-requests, .empty-sent-requests-button').off('click');
     $('.fm-received-requests, .empty-sent-requests-button').on('click', function() {
         M.openFolder('ipc');
+		$('.fm-contact-requests').removeClass('active');
+		$(this).addClass('active');
     });
 
     // View sent contact requests, M.opc
     $('.fm-contact-requests, .empty-contact-requests-button').off('click');
     $('.fm-contact-requests, .empty-contact-requests-button').on('click', function() {
         M.openFolder('opc');
+		$('.fm-received-requests').removeClass('active');
+		$(this).addClass('active');
     });
 
     $('.add-user-size-icon').off('click');
@@ -2535,6 +2539,7 @@ function fmtopUI() {
     $('.fm-clearbin-button,.fm-add-user,.fm-new-folder,.fm-file-upload,\n\
         .fm-folder-upload,.fm-contact-requests,.fm-received-requests').addClass('hidden');
     $('.fm-new-folder').removeClass('filled-input');
+	$('.fm-left-panel').removeClass('contacts-panel');
 
     if (RootbyId(M.currentdirid) === M.RubbishID) {
         $('.fm-clearbin-button').removeClass('hidden');
@@ -2545,16 +2550,9 @@ function fmtopUI() {
             if (d) {
                 console.log('Inbox');
             }
-        } else if (M.currentdirid === 'contacts') {
-            $('.fm-add-user, .fm-received-requests').removeClass('hidden');
-        } else if (M.currentdirid === 'opc') {
-            $('.fm-add-user,.fm-contact-requests').removeClass('hidden');
-            $('.fm-contact-requests').addClass('hidden');// Button 'View sent requests', hide
-            $('.fm-received-requests').removeClass('hidden');// Button, 'View received requests', show
-        } else if (M.currentdirid === 'ipc') {
-            $('.fm-add-user,.fm-contact-requests').removeClass('hidden');
-            $('.fm-received-requests').addClass('hidden');// Button, 'View received requests', hide
-            $('.fm-contact-requests').removeClass('hidden');// Button 'View sent requests', show
+        } else if (M.currentdirid === 'contacts' || M.currentdirid === 'ipc' || M.currentdirid === 'opc') {
+            $('.fm-add-user').removeClass('hidden');
+			$('.fm-left-panel').addClass('contacts-panel');
         } else if (M.currentdirid.length === 8 && RightsbyID(M.currentdirid) > 0) {
             $('.fm-new-folder').removeClass('hidden');
             $('.fm-file-upload').removeClass('hidden');
@@ -5711,7 +5709,8 @@ function sectionUIopen(id) {
     $('.nw-fm-left-icon.' + tmpId).addClass('active');
     $('.content-panel.' + tmpId).addClass('active');
     $('.fm-left-menu').removeClass('cloud-drive shared-with-me rubbish-bin contacts conversations opc ipc').addClass(tmpId);
-
+    $('.fm-left-panel').removeClass('contacts-panel');
+	$('.fm-contact-requests, .fm-received-requests').removeClass('active');
     $('.fm-right-header, .fm-import-to-cloudrive, .fm-download-as-zip').addClass('hidden');
     $('.fm-import-to-cloudrive, .fm-download-as-zip').unbind('click');
 

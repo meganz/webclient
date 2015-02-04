@@ -1406,7 +1406,7 @@ function MegaData()
             if (!treesearch || (treesearch && contacts[i].name && contacts[i].name.toLowerCase().indexOf(treesearch.toLowerCase()) > -1)) {
                 html += '<div class="nw-contact-item ' + onlinestatus[1] + '" id="contact_' + htmlentities(contacts[i].u)
                     + '"><div class="nw-contact-status"></div><div class="nw-contact-name">'
-                    + htmlentities(contacts[i].name) + ' <a href="#" class="button start-chat-button"></a></div></div>';
+                    + htmlentities(contacts[i].name) + ' <a href="#" class="button start-chat-button"><span></span></a></div></div>';
             }
         }
 

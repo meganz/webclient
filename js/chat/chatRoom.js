@@ -1328,7 +1328,10 @@ ChatRoom.prototype._resetCallStateNoCall = function() {
             .removeClass('selected');
 
         self.getNavElement().show();
-        clearInterval(self._currentCallTimer);
+
+        if(self.megaChat._currentCallTimer) {
+            clearInterval(self.megaChat._currentCallTimer);
+        }
     }
 
 

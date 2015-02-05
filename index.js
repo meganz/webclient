@@ -56,7 +56,9 @@ function startMega()
 	init_page();
     init_chat();
 	if(u_handle && loadfmdata.isLoading === false) {
-		loadfmdata();
+		if(!is_fm_data_loaded()) {
+			loadfmdata();
+		}
 	}
 }
 
@@ -743,7 +745,11 @@ function init_page()
 			if (typeof mDB !== 'undefined' && !pfid) {
                 mDBstart();
             } else {
-                loadfm();
+				if(!is_fm_data_loaded()) {
+					loadfm();
+				} else {
+					loadfm_rendering_cb();
+				}
             }
 			andreiScripts();
 			if (pfid) {

@@ -782,14 +782,13 @@ function ul_cancel() {
 }
 
 function ul_finalize(file, target) {
-	var p
 
-	DEBUG(file.name, "ul_finalize", file.target, target)
+	DEBUG(file.name, "ul_finalize", file.target, target);
 
 	if (is_chrome_firefox && file._close) file._close();
-	if (file.repair) file.target = M.RubbishID;
-	else if (!target && (''+file.target).substr(0,4) === 'chat')
-	{
+	if (file.repair) {
+        file.target = M.RubbishID;
+    } else if (!target && (''+file.target).substr(0,4) === 'chat') {
 		return fm_requestfolderid(null,'My chat files', {
 			callback : SoonFc(function(meh, h) {
 				ul_finalize(file, h);
@@ -799,7 +798,7 @@ function ul_finalize(file, target) {
 
 	var dirs = (file.path||"").split(/\//g).filter(function(a) {
 		return a.length > 0;
-	})
+	});
 
 	if (dirs.length > 0 && dirs[dirs.length-1] == file.name) {
 		dirs.pop();

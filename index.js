@@ -54,10 +54,12 @@ function startMega()
 	}
 	jsl=[];
 	init_page();
-    init_chat();
+
 	if(u_handle && loadfmdata.isLoading === false) {
 		if(!is_fm_data_loaded()) {
 			loadfmdata();
+		} else {
+			init_chat();
 		}
 	}
 }

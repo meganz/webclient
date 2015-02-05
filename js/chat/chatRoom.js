@@ -985,6 +985,10 @@ ChatRoom.prototype._startCall = function() {
     var participants = self.getParticipantsExceptMe();
     assert(participants.length > 0, "No participants.");
 
+    if(!self.megaChat.rtc) {
+        msgDialog('warninga', 'Error', 'Your browser does not have the required audio/video capabilities for making calls.');
+        return;
+    }
     if(self._conv_ended === true) {
         self._restartConversation();
     }

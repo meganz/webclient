@@ -408,6 +408,12 @@ if (m)
         document.body.className = 'ios full-mode supported';
         document.getElementById('m_desc').innerHTML = 'Free 50 GB - End-to-end encryption';
     }
+    else if (ua.indexOf('windows phone') > -1)
+    {
+        app='zune://navigate/?phoneappID=1b70a4ef-8b9c-4058-adca-3b9ac8cc194a';
+        document.body.className = 'wp full-mode supported';
+        document.getElementById('m_desc').innerHTML = 'Free 50 GB - End-to-end encryption';
+    }
     else document.body.className = 'another-os full-mode unsupported';
 
     if (app)
@@ -422,6 +428,9 @@ if (m)
     }
     if (window.location.hash.substr(1,1) == '!' || window.location.hash.substr(1,2) == 'F!')
     {
+        var i=0;
+        if (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1 || ua.indexOf('ipod') > -1 || ua.indexOf('windows phone') > -1) i=1;
+
         if (app) {
             document.getElementById('m_title').innerHTML = 'Install the free MEGA app to access this file from your mobile';
             document.getElementById('m_appbtn').href += '&referrer=link';
@@ -433,12 +442,12 @@ if (m)
                 if (confirm('Do you already have the MEGA app installed?')) document.location = 'mega://' + window.location.hash;
             },2500);
         }
-        else document.getElementById('m_iframe').src = 'mega://' + window.location.hash;
+        else document.getElementById('m_iframe').src = 'mega://' + window.location.hash.substr(i);
     }
     else if (window.location.hash.substr(1,7) == 'confirm' || window.location.hash.substr(1,7) == 'account')
     {
         var i=0;
-        if (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1 || ua.indexOf('ipod') > -1) i=1;
+        if (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1 || ua.indexOf('ipod') > -1 || ua.indexOf('windows phone') > -1) i=1;
         if (ua.indexOf('chrome') > -1) window.location ='mega://' + window.location.hash.substr(i);
         else document.getElementById('m_iframe').src = 'mega://' + window.location.hash.substr(i);
     }

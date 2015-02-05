@@ -4503,11 +4503,12 @@ function loadfm()
 }
 function loadfmdata() {
     if(loadfmdata.isLoading) {
-        console.error("Already loading fmdata");
+        //console.error("Already loading fmdata");
         return;
     } else {
-        console.error("Will stat loading fmdata");
+        //console.error("Will start loading fmdata");
     }
+
     loadfmdata.isLoading = true;
     api_req({a: 'f', c: 1, r: 1}, {
         callback: function() {
@@ -5271,12 +5272,9 @@ function loadfm_rendering_cb() {
 
     if(is_fm() || $('.fm-main.default').is(":visible")) { // are we actually on an #fm/* page?
         renderfm();
-    } else { // nah, just a static page! just hide the loading dialog
-        loadingDialog.hide();
     }
-
-
 }
+
 function storefmconfig(n, c)
 {
     fmconfig[n] = c;

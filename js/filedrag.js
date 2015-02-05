@@ -103,34 +103,42 @@ var dir_inflight = 0;
 var file_inflight=0;
 var filedrag_u = [];
 
-function traverseFileTree(item, path) {
+function traverseFileTree(item, path)
+{
 	path = path || "";
-	if (item.isFile) {
+	if (item.isFile)
+	{
 		dir_inflight++;
-		item.file(function(file) {
+		item.file(function(file)
+		{
 			if (d) console.log(file);
-			file.path = path + item.name;
+			file.path = path;
 			filedrag_u.push(file);
-			if (--dir_inflight == 0 && $.dostart) {
+			if (--dir_inflight == 0 && $.dostart)
+			{
 				addupload(filedrag_u);
 				filedrag_u = [];
 				if (page == 'start') start_upload();
 			}
 		});
-	} else if (item.isDirectory) {
+	}
+	else if (item.isDirectory)
+	{
 		dir_inflight++;
 		var dirReader = item.createReader();
-		dirReader.readEntries(function(entries) {
-			for (var i=0; i < entries.length; i++) {
+		dirReader.readEntries(function(entries)
+		{
+			for (var i=0; i < entries.length; i++)
+			{
 				traverseFileTree(entries[i], path + item.name + "/");
 			}
-			if (--dir_inflight == 0) {
+			if (--dir_inflight == 0)
+			{
 				addupload(filedrag_u);
 				filedrag_u = [];
 			}
 		});
 	}
-    
 	if (d && dir_inflight == 0) console.log('end');
 }
 
@@ -164,88 +172,90 @@ function start_anoupload()
 }
 
 // file selection
-function FileSelectHandler(e) {
+function FileSelectHandler(e)
+{
 	if (e.stopPropagation) e.stopPropagation();
 	if (e.preventDefault) e.preventDefault();
 
 	$($.ddhelper).remove();
 	$.ddhelper=undefined;
 
-	if (folderlink || (RightsbyID(M.currentdirid || '') | 0) < 1) {
+	if (folderlink || (RightsbyID(M.currentdirid || '') | 0) < 1)
+	{
 		msgDialog('warningb', l[1676], l[1023]);
 		return true;
 	}
 
-	if (page == 'start') {
-		if ($('#fmholder').html() == '') {
-            $('#fmholder').html('<div id="topmenu"></div>' + translate(pages['fm'].replace(/{staticpath}/g, staticpath)));
-        }
+	if (page == 'start')
+	{
+		if ($('#fmholder').html() == '') $('#fmholder').html('<div id="topmenu"></div>' + translate(pages['fm'].replace(/{staticpath}/g,staticpath)));
 		start_out();
-		setTimeout(function() {
+		setTimeout(function()
+		{
 			$('.st-main-cursor,.st-main-info').show();
 		},500);
-	} else {
+	}
+	else
+	{
 		$('span.nw-fm-tree-folder').css('background-color','');
 	}
 
 	var dataTransfer = e.dataTransfer;
 	var files = e.target.files || (dataTransfer && dataTransfer.files);
-    
-    // Don't upload empty folders or empty files
-	if (!files || files.length === 0) {
-        return false;
-    }
-    
-    if (e.dataTransfer && e.dataTransfer.items && e.dataTransfer.items.length > 0 && e.dataTransfer.items[0].webkitGetAsEntry) {
-        
-        // Get roots of dragged dirs
+	if (!files || files.length == 0) return false;
+	if (e.dataTransfer && e.dataTransfer.items && e.dataTransfer.items.length > 0 && e.dataTransfer.items[0].webkitGetAsEntry)
+	{
 		var items = e.dataTransfer.items;
-		for (var i = 0; i < items.length; i++) {
-			if (items[i].webkitGetAsEntry) {
+		for (var i=0; i<items.length; i++)
+		{
+			if (items[i].webkitGetAsEntry)
+			{
 				var item = items[i].webkitGetAsEntry();
-				if (item) {
+				if (item)
+				{
 					filedrag_u=[];
-
-                    // Start with download when all items are processed
-					if (i == items.length - 1) {
-                        $.dostart = true;
-                    }
+					if (i == items.length-1) $.dostart=true;
 					traverseFileTree(item);
 				}
 			}
 		}
-	} else if (is_chrome_firefox && e.dataTransfer) {
-		try {
-			for (var i = 0, m = e.dataTransfer.mozItemCount ; i < m ; ++i) {
+	}
+	else if (is_chrome_firefox && e.dataTransfer)
+	{
+		try
+		{
+			for (var i=0, m=e.dataTransfer.mozItemCount ; i<m ; ++i)
+			{
 				var file = e.dataTransfer.mozGetDataAt("application/x-moz-file", i);
-				if (file instanceof Ci.nsIFile) {
+				if (file instanceof Ci.nsIFile)
+				{
 					filedrag_u=[];
-					if (i === m - 1) {
-                        $.dostart=true;
-                    }
+					if (i == m-1) $.dostart=true;
 					traverseFileTree(new mozDirtyGetAsEntry(file/*,e.dataTransfer*/));
-				} else {
+				}
+				else
+				{
 					if (d) console.log('FileSelectHandler: Not a nsIFile', file);
 				}
 				// e.dataTransfer.mozClearDataAt("application/x-moz-file", i);
 			}
-		} catch (e) {
+		}
+		catch (e)
+		{
 			alert(e);
 			Cu.reportError(e);
 		}
-	} else {
+	}
+	else
+	{
 		var u=[];
-		var gecko = dataTransfer && ("mozItemCount" in dataTransfer) || browserdetails(ua).browser === 'Firefox';
-		for (var i = 0, f; f = files[i]; i++) {
-			if (f.webkitRelativePath) {
-                f.path = f.webkitRelativePath;
-            }
-			if (gecko) {
-                f.gecko = true;
-            }
-			if (f.name != '.') {
-                u.push(f);
-            }
+		var gecko = dataTransfer && ("mozItemCount" in dataTransfer)
+				|| browserdetails(ua).browser === 'Firefox';
+		for (var i = 0, f; f = files[i]; i++)
+		{
+			if (f.webkitRelativePath) f.path = f.webkitRelativePath;
+			if (gecko) f.gecko = true;
+			if (f.name != '.') u.push(f);
 		}
 		addupload(u);
 		if (page == 'start') start_upload();
@@ -263,13 +273,13 @@ function FileSelectHandler(e) {
 }
 
 // initialize
-scope.InitFileDrag = function() {
+scope.InitFileDrag = function()
+{
 	var i = 5;
-	while (i--) {
+	while(i--)
+	{
 		var o = document.getElementById(i? 'fileselect' + i : 'start-upload');
-		if (o) {
-            o.addEventListener("change", FileSelectHandler, false);
-        }
+		if (o) o.addEventListener("change", FileSelectHandler, false);
 	}
 
 	document.getElementById("fmholder").addEventListener("dragover", FileDragHover, false);
@@ -279,32 +289,34 @@ scope.InitFileDrag = function() {
 	document.getElementById("startholder").addEventListener("dragleave", FileDragLeave, false);
 	document.getElementById("startholder").addEventListener("drop", FileSelectHandler, false);
 
-	if (is_chrome_firefox) {
-		$('input[webkitdirectory]').click(function(e) {
+	if(is_chrome_firefox)
+	{
+		$('input[webkitdirectory]').click(function(e)
+		{
 			var file = mozFilePicker(0,2,{/*gfp:1,*/title:l[98]});
 
-			if (file) {
+			if ( file )
+			{
 				e.target = {
 					files : [-1]
 				};
 				e.dataTransfer = {
 					mozItemCount : 1,
-					mozGetDataAt : function() {
+					mozGetDataAt : function()
+					{
 						return file;
 					}
 				};
 				FileSelectHandler(e);
 				file = undefined;
-			} else {
-				if (e.stopPropagation) {
-                    e.stopPropagation();
-                }
-				if (e.preventDefault) {
-                    e.preventDefault();
-                }
+			}
+			else
+			{
+				if (e.stopPropagation) e.stopPropagation();
+				if (e.preventDefault) e.preventDefault();
 			}
 		});
 	}
-};
+}
 
 })(this);

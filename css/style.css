@@ -20824,23 +20824,48 @@ video.localViewport {
 	-moz-transform: rotateY(180deg); /* Firefox */
 }
  @media only screen and (max-width: 1593px) {
-.ads .download-mid-centered-block {
+.download-mid-centered-block {
 	min-width: 648px;
 	margin-left: -334px;
 }
-.ads .download-mid-centered-block.not-available-some-reason {
+.download-mid-centered-block.not-available-some-reason {
 	min-width: 728px;
 	margin-left: -384px;
 }
 }
 @media only screen and (max-width: 1362px) {
-.ads .downloading-progress {
+.downloading-progress {
 	width: 300px;
 }
 }
 @media only screen and (max-height: 292px) {
 .video-call .fm-right-header {
 	min-height: 48px;
+}
+}
+@media only screen and (max-width: 1323px) {
+.download-mid-centered-block {
+	min-width: 635px;
+}
+.download-mid-centered-block.not-available-some-reason {
+	min-width: 728px;
+	margin-left: -384px;
+}
+.fr .new-download-button-txt2 {
+	font-size: 10px;
+	line-height: 18px;
+}
+}
+@media only screen and (max-width: 1296px) {
+.download-mid-centered-block.not-available-some-reason {
+	min-width: 428px;
+	margin-left: -214px;
+}
+.download-mid-centered-block.not-available-some-reason .new-download-icon {
+	display: none;
+}
+.download-mid-centered-block.not-available-some-reason .new-download-right-block {
+	margin-left: 0;
 }
 }
 @media only screen and (max-width: 1157px) {
@@ -20852,6 +20877,29 @@ video.localViewport {
 }
 .download-mid-centered-block.not-available-some-reason {
 	margin-left: -64px;
+}
+}
+@media only screen and (max-height:  833px) {
+.ads-tablet .ads-right-bottom-txt, .ads-ipad .ads-right-bottom-txt {
+	display: none;
+}
+.ads-tablet .ads-svg-container, .ads-ipad .ads-svg-container {
+	top: 48%;
+}
+}
+@media only screen and (max-height: 758px) {
+.ads-svg-container {
+	top: 53%;
+}
+.ads-iphone .ads-svg-container {
+	top: 52%;
+}
+.ads-right-bottom-txt {
+	display: none;
+}
+.ads-tablet .ads-svg-container, .ads-ipad .ads-svg-container {
+	height: 230px;
+	top: 51%;
 }
 }
  @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {

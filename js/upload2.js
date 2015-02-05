@@ -797,13 +797,7 @@ function ul_finalize(file, target) {
 		});
 	}
 
-	var dirs = (file.path||"").split(/\//g).filter(function(a) {
-		return a.length > 0;
-	})
-
-	if (dirs.length > 0 && dirs[dirs.length-1] == file.name) {
-		dirs.pop();
-	}
+    var dirs = fm_safepath(file.path);
 
 	ASSERT(file.filekey, "*** filekey is missing ***");
 

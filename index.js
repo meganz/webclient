@@ -88,6 +88,8 @@ function scrollMenu()
 
 function init_page()
 {
+	if (!u_type) $('body').attr('class','not-logged');
+		else $('body').attr('class',''); // Todo: check if cleaning the whole class is ok..
 	if ('-fa-ar-he-'.indexOf('-'+lang+'-') > -1) $('body').addClass('rtl');
 
 	if ($.startscroll) delete $.startscroll;
@@ -764,8 +766,6 @@ function init_page()
             M.openFolder(id);
         }
 		$('#topmenu').html(parsetopmenu());
-		if (!u_type) $('body').attr('class','not-logged');
-		else $('body').attr('class','');
 		$('#pageholder').hide();
 		$('#startholder').hide();
 		if ($('#fmholder:visible').length == 0)

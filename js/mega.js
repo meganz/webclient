@@ -528,10 +528,10 @@ function MegaData()
                         </td>\n\
                         <td>' + ps + '</td>\n\
                         <td>\n\
-                            <div class="contact-request-button delete">' + l[5858] + '</div>\n\
-                            <div class="contact-request-button accept">' + l[5856] + '</div>\n\
-                            <div class="contact-request-button ignore">' + l[5860] + '</div>\n\
-                            <div class="contact-request-ignored">' + l[5864] + '</div>\n\
+                            <div class="contact-request-button delete"><span>' + l[5858] + '</span></div>\n\
+                            <div class="contact-request-button accept"><span>' + l[5856] + '</span></div>\n\
+                            <div class="contact-request-button ignore"><span>' + l[5860] + '</span></div>\n\
+                            <div class="contact-request-ignored"><span>' + l[5864] + '</span></div>\n\
                             <div class="clear"></div>\n\
                         </td>\n\
                     </tr>';
@@ -544,13 +544,12 @@ function MegaData()
 
             // If at least one new item is added then ajust grid
             if (drawn) {
+				$('.fm-empty-contacts').addClass('hidden');
                 // Hide sent grid
                 $('.sent-requests-grid').addClass('hidden');
-                $('.empty-sent-requests').addClass('hidden');
 
                 // Show received grid
                 $('.contact-requests-grid').removeClass('hidden');
-                $('.empty-contact-requests').addClass('hidden');
 
                 initIpcGridScrolling();
                 initBindIPC();
@@ -617,8 +616,8 @@ function MegaData()
                                <div class="contact-email">' + htmlentities(opc[i].m) + '</div>\n\
                             </div>\n\
                         </div>\n\
-                        <div class="contact-request-button cancel ' + hideCancel + '">' + l[156] + ' ' + l[738].toLowerCase() + '</div>\n\
-                        <div class="contact-request-button reinvite ' + hideReinvite + '">' + l[5861] + '</div>\n\
+                        <div class="contact-request-button cancel ' + hideCancel + '"><span>' + l[156] + ' ' + l[738].toLowerCase() + '</span></div>\n\
+                        <div class="contact-request-button reinvite ' + hideReinvite + '"><span>' + l[5861] + '</span></div>\n\
                     </td>\n\
                 </tr>';
 
@@ -628,13 +627,12 @@ function MegaData()
             }
             
             if (drawn) {
+				$('.fm-empty-contacts').addClass('hidden');
                 // Hide received grids
-                $('.empty-contact-requests').addClass('hidden');
                 $('.contact-requests-grid').addClass('hidden');
 
                 // Show sent grids
                 $('.sent-requests-grid').removeClass('hidden');
-                $('.empty-sent-requests').addClass('hidden');
 
                 initOpcGridScrolling();
                 initBindOPC();
@@ -774,12 +772,8 @@ function MegaData()
         if (this.v.length === 0) {
             if (M.currentdirid === M.RubbishID) {
                 $('.fm-empty-trashbin').removeClass('hidden');
-            } else if (M.currentdirid === 'contacts') {
+            } else if (M.currentdirid === 'contacts' || M.currentdirid === 'opc' || M.currentdirid === 'ipc') {
                 $('.fm-empty-contacts').removeClass('hidden');
-            } else if (M.currentdirid === 'opc') {
-                $('.empty-sent-requests').removeClass('hidden');
-            } else if (M.currentdirid === 'ipc') {
-                $('.empty-contact-requests').removeClass('hidden');
             } else if (M.currentdirid.substr(0, 7) === 'search/') {
                 $('.fm-empty-search').removeClass('hidden');
             } else if (M.currentdirid === M.RootID && folderlink) {
@@ -5024,7 +5018,7 @@ function processOPC(opc) {
                     delete M.opc[k];
                     if ((Object.keys(M.opc).length === 0) && (M.currentdirid === 'opc')) {
                         $('.sent-requests-grid').addClass('hidden');
-                        $('.empty-sent-requests').removeClass('hidden');
+                        $('.fm-empty-contacts').removeClass('hidden');
                     }
                     break;
                 }
@@ -5134,7 +5128,7 @@ function processUPCO(ap) {
             $('#opc_' + ap[i].p).remove();
             if ((Object.keys(M.opc).length === 0) && (M.currentdirid === 'opc')) {
                 $('.sent-requests-grid').addClass('hidden');
-                $('.empty-sent-requests').removeClass('hidden');
+                $('.fm-empty-contacts').removeClass('hidden');
             }
         }
     }

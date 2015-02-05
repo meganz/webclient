@@ -322,7 +322,6 @@ function cacheselect()
 function hideEmptyGrids() {
     $('.fm-empty-trashbin,.fm-empty-contacts,.fm-empty-search,.fm-empty-cloud').addClass('hidden');
     $('.fm-empty-messages,.fm-empty-folder,.fm-empty-conversations,.fm-empty-incoming').addClass('hidden');
-    $('.empty-sent-requests,.empty-contact-requests').addClass('hidden');
     $('.fm-empty-pad.fm-empty-sharef').remove();
 }
 
@@ -1716,7 +1715,6 @@ function addContactUI()
                     $mails.each(function(index, value) {
                         email = $(value).contents().eq(1).text();
                         if (!M.inviteContact(M.u[u_handle].m, email, emailText)) {
-                            $('.empty-sent-requests').addClass('hidden');
                             if (index === mailNum - 1) {
                                 if (mailNum === 1) {
                                     title = l[150];
@@ -2539,7 +2537,6 @@ function fmtopUI() {
     $('.fm-clearbin-button,.fm-add-user,.fm-new-folder,.fm-file-upload,\n\
         .fm-folder-upload,.fm-contact-requests,.fm-received-requests').addClass('hidden');
     $('.fm-new-folder').removeClass('filled-input');
-	$('.fm-left-panel').removeClass('contacts-panel');
 
     if (RootbyId(M.currentdirid) === M.RubbishID) {
         $('.fm-clearbin-button').removeClass('hidden');
@@ -2553,6 +2550,13 @@ function fmtopUI() {
         } else if (M.currentdirid === 'contacts' || M.currentdirid === 'ipc' || M.currentdirid === 'opc') {
             $('.fm-add-user').removeClass('hidden');
 			$('.fm-left-panel').addClass('contacts-panel');
+			if (M.currentdirid === 'ipc') {
+			    $('.fm-received-requests').addClass('active');
+			    $('.fm-right-header').addClass('requests-panel');
+		    } else if (M.currentdirid === 'opc') {
+			    $('.fm-contact-requests').addClass('active');
+			    $('.fm-right-header').addClass('requests-panel');
+		    } 
         } else if (M.currentdirid.length === 8 && RightsbyID(M.currentdirid) > 0) {
             $('.fm-new-folder').removeClass('hidden');
             $('.fm-file-upload').removeClass('hidden');
@@ -2562,6 +2566,7 @@ function fmtopUI() {
                 $('.fm-file-upload').addClass('last-button');
             }
         }
+		
     }
     $('.fm-clearbin-button').unbind('click');
     $('.fm-clearbin-button').bind('click', function() {
@@ -5709,8 +5714,6 @@ function sectionUIopen(id) {
     $('.nw-fm-left-icon.' + tmpId).addClass('active');
     $('.content-panel.' + tmpId).addClass('active');
     $('.fm-left-menu').removeClass('cloud-drive shared-with-me rubbish-bin contacts conversations opc ipc').addClass(tmpId);
-    $('.fm-left-panel').removeClass('contacts-panel');
-	$('.fm-contact-requests, .fm-received-requests').removeClass('active');
     $('.fm-right-header, .fm-import-to-cloudrive, .fm-download-as-zip').addClass('hidden');
     $('.fm-import-to-cloudrive, .fm-download-as-zip').unbind('click');
 
@@ -5755,6 +5758,13 @@ function sectionUIopen(id) {
         $('.files-grid-view.fm').addClass('hidden');
         $('.fm-blocks-view.fm').addClass('hidden');
     }
+	
+	if (id !== 'contacts' && id !== 'opc' && id !== 'ipc') {
+		$('.fm-left-panel').removeClass('contacts-panel');
+	    $('.fm-right-header').removeClass('requests-panel');
+		$('.fm-received-requests').removeClass('active');
+		$('.fm-contact-requests').removeClass('active');
+	}
 
     if (id !== 'contacts') {
         $('.contacts-details-block').addClass('hidden');
@@ -5764,11 +5774,9 @@ function sectionUIopen(id) {
 
     if (id !== 'opc') {
         $('.sent-requests-grid').addClass('hidden');
-        $('.empty-sent-requests').addClass('hidden');
     }
 
     if (id !== 'ipc') {
-        $('.empty-contact-requests').addClass('hidden');
         $('.contact-requests-grid').addClass('hidden');
     }
 

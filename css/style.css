@@ -15268,8 +15268,8 @@ span.browsers-update {
 .m-client-bottom-block {
 	text-align: center;
 	padding: 47px 30px 42px 20px;
-	line-height:0;
-	font-size:0;
+	line-height: 0;
+	font-size: 0;
 }
 .ff-bottom-block {
 	text-align: center;
@@ -15287,7 +15287,7 @@ span.browsers-update {
 	display: inline-block;
 	border: 2px solid rgba(0,0,0,0.3);
 	-webkit-background-clip: padding-box;
-    background-clip: padding-box;
+	background-clip: padding-box;
 	background-color: white;
 	margin: 3px 5px;
 	cursor: pointer;
@@ -15368,19 +15368,19 @@ span.browsers-update {
 }
 .google-play-button {
 	background-position: -336px -1449px;
-	width:220px;
+	width: 220px;
 }
 .google-play-button:hover {
-	width:226px;
+	width: 226px;
 	min-width: 184px;
 }
 .win-phone-button {
 	background-position: 16px -1450px;
-	width:251px;
+	width: 251px;
 	min-width: 184px;
 }
 .win-phone-button:hover {
-	width:257px;
+	width: 257px;
 }
 .chrome-app-button {
 	background-image: url(../images/mega/chrome-app1.png);
@@ -15431,19 +15431,19 @@ span.browsers-update {
 }
 .blackberry-button {
 	background-position: 22px -1560px;
-	width:184px;
+	width: 184px;
 	min-width: 184px;
 }
 .blackberry-button:hover {
-	width:190px;
+	width: 190px;
 }
 .ios-button {
 	background-position: -340px -1565px;
-	width:204px;
+	width: 204px;
 	min-width: 184px;
 }
 .ios-button:hover {
-	width:210px;
+	width: 210px;
 }
 .ff-bott-button {
 	background-position: 10px -249px;
@@ -20843,63 +20843,15 @@ video.localViewport {
 	min-height: 48px;
 }
 }
-@media only screen and (max-width: 1323px) {
-.ads .download-mid-centered-block {
-	min-width: 635px;
-}
-.ads .download-mid-centered-block.not-available-some-reason {
-	min-width: 728px;
-	margin-left: -384px;
-}
-.ads.fr .new-download-button-txt2 {
-	font-size: 10px;
-	line-height: 18px;
-}
-}
-@media only screen and (max-width: 1296px) {
-.ads .download-mid-centered-block.not-available-some-reason {
-	min-width: 428px;
-	margin-left: -214px;
-}
-.ads .download-mid-centered-block.not-available-some-reason .new-download-icon {
-	display: none;
-}
-.ads .download-mid-centered-block.not-available-some-reason .new-download-right-block {
-	margin-left: 0;
-}
-}
 @media only screen and (max-width: 1157px) {
-.ads .ads-right-block {
+.ads-right-block, .products-right-block {
 	display: none;
 }
-.ads .download-mid-centered-block {
+.download-mid-centered-block {
 	margin-left: -190px;
 }
-.ads .download-mid-centered-block.not-available-some-reason {
+.download-mid-centered-block.not-available-some-reason {
 	margin-left: -64px;
-}
-}
-@media only screen and (max-height:  833px) {
-.ads-tablet .ads-right-bottom-txt, .ads-ipad .ads-right-bottom-txt {
-	display: none;
-}
-.ads-tablet .ads-svg-container, .ads-ipad .ads-svg-container {
-	top: 48%;
-}
-}
-@media only screen and (max-height: 758px) {
-.ads-svg-container {
-	top: 53%;
-}
-.ads-iphone .ads-svg-container {
-	top: 52%;
-}
-.ads-right-bottom-txt {
-	display: none;
-}
-.ads-tablet .ads-svg-container, .ads-ipad .ads-svg-container {
-	height: 230px;
-	top: 51%;
 }
 }
  @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {

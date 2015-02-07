@@ -3051,7 +3051,8 @@ function accountUI()
                     $('#account-new-password').focus();
                 });
             }
-            else if ($('#account-confirm-password').val() !== '' && $('#account-password').val() !== '')
+            else if ($('#account-confirm-password').val() !== '' && $('#account-password').val() !== ''
+                && $('#account-confirm-password').val() !== $('#account-password').val())
             {
                 loadingDialog.show();
                 changepw($('#account-password').val(), $('#account-confirm-password').val(), {callback: function(res)

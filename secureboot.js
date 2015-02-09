@@ -552,7 +552,7 @@ else if (!b_u)
                 dump.x = checksum;
                 crashes[checksum] = Date.now();
                 localStorage.crashes = JSON.stringify(crashes);
-                cc = $.len(crashes);
+                cc = Object.keys(crashes).length;
             }
             catch(e) {
                 delete localStorage.crashes;
@@ -596,7 +596,7 @@ else if (!b_u)
                 report.ua = navigator.userAgent;
                 report.io = window.dlMethod && dlMethod.name;
                 report.sb = sbid;
-                report.tp = $.transferprogress;
+                report.tp = typeof $ !== 'undefined' && $.transferprogress;
                 report.id = ids.join(",");
                 report.ud = uds;
                 report.cc = cc;
@@ -1222,7 +1222,20 @@ else if (!b_u)
                     css.textContent = jsl[i].text.replace(/\.\.\//g,staticpath).replace(new RegExp( "\\/en\\/", "g"),'/' + lang + '/');
                 }
             }
-            else if (jsl[i].j == 3) l = !jj && l || JSON.parse(jsl[i].text);
+            else if (jsl[i].j == 3) {
+                try {
+                    l = !jj && l || JSON.parse(jsl[i].text);
+                } catch(ex) {
+                    console.error(ex);
+                    if (lang !== 'en') {
+                        localStorage.lang = 'en';
+                        setTimeout(function() {
+                            document.location.reload();
+                        }, 300);
+                    }
+                    throw new Error('Error parsing language file '+lang+'.json');
+                }
+            }
             else if (jsl[i].j == 0) pages[jsl[i].n] = jsl[i].text;
         }
         if (window.URL)

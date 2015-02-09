@@ -2149,8 +2149,8 @@ function initContextUI()
         mcDialog();
     });
 
-    $(c + '.sharing-item').unbind('click');
-    $(c + '.sharing-item').bind('click', function()
+    $(c + '.sh4r1ng-item').unbind('click');
+    $(c + '.sh4r1ng-item').bind('click', function()
     {
         if (u_type === 0)
             ephemeralDialog(l[1006]);
@@ -5169,7 +5169,7 @@ function menuItems()
     if (n && $.selected.length == 1 && is_image(n))
         items['preview'] = 1;
     if (n && sourceRoot == M.RootID && $.selected.length == 1 && n.t && !folderlink)
-        items['sharing'] = 1;
+        items['sh4r1ng'] = 1;
     if (sourceRoot == M.RootID && !folderlink)
     {
         items['move'] = 1;

@@ -322,7 +322,6 @@ function cacheselect()
 function hideEmptyGrids() {
     $('.fm-empty-trashbin,.fm-empty-contacts,.fm-empty-search,.fm-empty-cloud').addClass('hidden');
     $('.fm-empty-messages,.fm-empty-folder,.fm-empty-conversations,.fm-empty-incoming').addClass('hidden');
-    $('.empty-sent-requests,.empty-contact-requests').addClass('hidden');
     $('.fm-empty-pad.fm-empty-sharef').remove();
 }
 
@@ -1660,12 +1659,16 @@ function addContactUI()
     $('.fm-received-requests, .empty-sent-requests-button').off('click');
     $('.fm-received-requests, .empty-sent-requests-button').on('click', function() {
         M.openFolder('ipc');
+		$('.fm-contact-requests').removeClass('active');
+		$(this).addClass('active');
     });
 
     // View sent contact requests, M.opc
     $('.fm-contact-requests, .empty-contact-requests-button').off('click');
     $('.fm-contact-requests, .empty-contact-requests-button').on('click', function() {
         M.openFolder('opc');
+		$('.fm-received-requests').removeClass('active');
+		$(this).addClass('active');
     });
 
     $('.add-user-size-icon').off('click');
@@ -1712,7 +1715,6 @@ function addContactUI()
                     $mails.each(function(index, value) {
                         email = $(value).contents().eq(1).text();
                         if (!M.inviteContact(M.u[u_handle].m, email, emailText)) {
-                            $('.empty-sent-requests').addClass('hidden');
                             if (index === mailNum - 1) {
                                 if (mailNum === 1) {
                                     title = l[150];
@@ -2147,8 +2149,8 @@ function initContextUI()
         mcDialog();
     });
 
-    $(c + '.sharing-item').unbind('click');
-    $(c + '.sharing-item').bind('click', function()
+    $(c + '.sh4r1ng-item').unbind('click');
+    $(c + '.sh4r1ng-item').bind('click', function()
     {
         if (u_type === 0)
             ephemeralDialog(l[1006]);
@@ -2545,16 +2547,16 @@ function fmtopUI() {
             if (d) {
                 console.log('Inbox');
             }
-        } else if (M.currentdirid === 'contacts') {
-            $('.fm-add-user, .fm-received-requests').removeClass('hidden');
-        } else if (M.currentdirid === 'opc') {
-            $('.fm-add-user,.fm-contact-requests').removeClass('hidden');
-            $('.fm-contact-requests').addClass('hidden');// Button 'View sent requests', hide
-            $('.fm-received-requests').removeClass('hidden');// Button, 'View received requests', show
-        } else if (M.currentdirid === 'ipc') {
-            $('.fm-add-user,.fm-contact-requests').removeClass('hidden');
-            $('.fm-received-requests').addClass('hidden');// Button, 'View received requests', hide
-            $('.fm-contact-requests').removeClass('hidden');// Button 'View sent requests', show
+        } else if (M.currentdirid === 'contacts' || M.currentdirid === 'ipc' || M.currentdirid === 'opc') {
+            $('.fm-add-user').removeClass('hidden');
+			$('.fm-left-panel').addClass('contacts-panel');
+			if (M.currentdirid === 'ipc') {
+			    $('.fm-received-requests').addClass('active');
+			    $('.fm-right-header').addClass('requests-panel');
+		    } else if (M.currentdirid === 'opc') {
+			    $('.fm-contact-requests').addClass('active');
+			    $('.fm-right-header').addClass('requests-panel');
+		    } 
         } else if (M.currentdirid.length === 8 && RightsbyID(M.currentdirid) > 0) {
             $('.fm-new-folder').removeClass('hidden');
             $('.fm-file-upload').removeClass('hidden');
@@ -2564,6 +2566,7 @@ function fmtopUI() {
                 $('.fm-file-upload').addClass('last-button');
             }
         }
+		
     }
     $('.fm-clearbin-button').unbind('click');
     $('.fm-clearbin-button').bind('click', function() {
@@ -3048,7 +3051,8 @@ function accountUI()
                     $('#account-new-password').focus();
                 });
             }
-            else if ($('#account-confirm-password').val() !== '' && $('#account-password').val() !== '')
+            else if ($('#account-confirm-password').val() !== '' && $('#account-password').val() !== ''
+                && $('#account-confirm-password').val() !== $('#account-password').val())
             {
                 loadingDialog.show();
                 changepw($('#account-password').val(), $('#account-confirm-password').val(), {callback: function(res)
@@ -5165,7 +5169,7 @@ function menuItems()
     if (n && $.selected.length == 1 && is_image(n))
         items['preview'] = 1;
     if (n && sourceRoot == M.RootID && $.selected.length == 1 && n.t && !folderlink)
-        items['sharing'] = 1;
+        items['sh4r1ng'] = 1;
     if (sourceRoot == M.RootID && !folderlink)
     {
         items['move'] = 1;
@@ -5711,7 +5715,6 @@ function sectionUIopen(id) {
     $('.nw-fm-left-icon.' + tmpId).addClass('active');
     $('.content-panel.' + tmpId).addClass('active');
     $('.fm-left-menu').removeClass('cloud-drive shared-with-me rubbish-bin contacts conversations opc ipc').addClass(tmpId);
-
     $('.fm-right-header, .fm-import-to-cloudrive, .fm-download-as-zip').addClass('hidden');
     $('.fm-import-to-cloudrive, .fm-download-as-zip').unbind('click');
 
@@ -5756,6 +5759,13 @@ function sectionUIopen(id) {
         $('.files-grid-view.fm').addClass('hidden');
         $('.fm-blocks-view.fm').addClass('hidden');
     }
+	
+	if (id !== 'contacts' && id !== 'opc' && id !== 'ipc') {
+		$('.fm-left-panel').removeClass('contacts-panel');
+	    $('.fm-right-header').removeClass('requests-panel');
+		$('.fm-received-requests').removeClass('active');
+		$('.fm-contact-requests').removeClass('active');
+	}
 
     if (id !== 'contacts') {
         $('.contacts-details-block').addClass('hidden');
@@ -5765,11 +5775,9 @@ function sectionUIopen(id) {
 
     if (id !== 'opc') {
         $('.sent-requests-grid').addClass('hidden');
-        $('.empty-sent-requests').addClass('hidden');
     }
 
     if (id !== 'ipc') {
-        $('.empty-contact-requests').addClass('hidden');
         $('.contact-requests-grid').addClass('hidden');
     }
 

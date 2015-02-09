@@ -54,9 +54,13 @@ function startMega()
 	}
 	jsl=[];
 	init_page();
-    init_chat();
+
 	if(u_handle && loadfmdata.isLoading === false) {
-		loadfmdata();
+		if(!is_fm_data_loaded()) {
+			loadfmdata();
+		} else {
+			init_chat();
+		}
 	}
 }
 
@@ -84,6 +88,8 @@ function scrollMenu()
 
 function init_page()
 {
+	if (!u_type) $('body').attr('class','not-logged');
+		else $('body').attr('class',''); // Todo: check if cleaning the whole class is ok..
 	if ('-fa-ar-he-'.indexOf('-'+lang+'-') > -1) $('body').addClass('rtl');
 
 	if ($.startscroll) delete $.startscroll;
@@ -751,7 +757,11 @@ function init_page()
 			if (typeof mDB !== 'undefined' && !pfid) {
                 mDBstart();
             } else {
-                loadfm();
+				if(!is_fm_data_loaded()) {
+					loadfm();
+				} else {
+					loadfm_rendering_cb();
+				}
             }
 			andreiScripts();
 			if (pfid) {
@@ -764,8 +774,6 @@ function init_page()
             M.openFolder(id);
         }
 		$('#topmenu').html(parsetopmenu());
-		if (!u_type) $('body').attr('class','not-logged');
-		else $('body').attr('class','');
 		$('#pageholder').hide();
 		$('#startholder').hide();
 		if ($('#fmholder:visible').length == 0)

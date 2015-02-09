@@ -528,10 +528,10 @@ function MegaData()
                         </td>\n\
                         <td>' + ps + '</td>\n\
                         <td>\n\
-                            <div class="contact-request-button delete">' + l[5858] + '</div>\n\
-                            <div class="contact-request-button accept">' + l[5856] + '</div>\n\
-                            <div class="contact-request-button ignore">' + l[5860] + '</div>\n\
-                            <div class="contact-request-ignored">' + l[5864] + '</div>\n\
+                            <div class="contact-request-button delete"><span>' + l[5858] + '</span></div>\n\
+                            <div class="contact-request-button accept"><span>' + l[5856] + '</span></div>\n\
+                            <div class="contact-request-button ignore"><span>' + l[5860] + '</span></div>\n\
+                            <div class="contact-request-ignored"><span>' + l[5864] + '</span></div>\n\
                             <div class="clear"></div>\n\
                         </td>\n\
                     </tr>';
@@ -544,13 +544,12 @@ function MegaData()
 
             // If at least one new item is added then ajust grid
             if (drawn) {
+				$('.fm-empty-contacts').addClass('hidden');
                 // Hide sent grid
                 $('.sent-requests-grid').addClass('hidden');
-                $('.empty-sent-requests').addClass('hidden');
 
                 // Show received grid
                 $('.contact-requests-grid').removeClass('hidden');
-                $('.empty-contact-requests').addClass('hidden');
 
                 initIpcGridScrolling();
                 initBindIPC();
@@ -617,8 +616,8 @@ function MegaData()
                                <div class="contact-email">' + htmlentities(opc[i].m) + '</div>\n\
                             </div>\n\
                         </div>\n\
-                        <div class="contact-request-button cancel ' + hideCancel + '">' + l[156] + ' ' + l[738].toLowerCase() + '</div>\n\
-                        <div class="contact-request-button reinvite ' + hideReinvite + '">' + l[5861] + '</div>\n\
+                        <div class="contact-request-button cancel ' + hideCancel + '"><span>' + l[156] + ' ' + l[738].toLowerCase() + '</span></div>\n\
+                        <div class="contact-request-button reinvite ' + hideReinvite + '"><span>' + l[5861] + '</span></div>\n\
                     </td>\n\
                 </tr>';
 
@@ -628,13 +627,12 @@ function MegaData()
             }
             
             if (drawn) {
+				$('.fm-empty-contacts').addClass('hidden');
                 // Hide received grids
-                $('.empty-contact-requests').addClass('hidden');
                 $('.contact-requests-grid').addClass('hidden');
 
                 // Show sent grids
                 $('.sent-requests-grid').removeClass('hidden');
-                $('.empty-sent-requests').addClass('hidden');
 
                 initOpcGridScrolling();
                 initBindOPC();
@@ -774,12 +772,8 @@ function MegaData()
         if (this.v.length === 0) {
             if (M.currentdirid === M.RubbishID) {
                 $('.fm-empty-trashbin').removeClass('hidden');
-            } else if (M.currentdirid === 'contacts') {
+            } else if (M.currentdirid === 'contacts' || M.currentdirid === 'opc' || M.currentdirid === 'ipc') {
                 $('.fm-empty-contacts').removeClass('hidden');
-            } else if (M.currentdirid === 'opc') {
-                $('.empty-sent-requests').removeClass('hidden');
-            } else if (M.currentdirid === 'ipc') {
-                $('.empty-contact-requests').removeClass('hidden');
             } else if (M.currentdirid.substr(0, 7) === 'search/') {
                 $('.fm-empty-search').removeClass('hidden');
             } else if (M.currentdirid === M.RootID && folderlink) {
@@ -1406,7 +1400,7 @@ function MegaData()
             if (!treesearch || (treesearch && contacts[i].name && contacts[i].name.toLowerCase().indexOf(treesearch.toLowerCase()) > -1)) {
                 html += '<div class="nw-contact-item ' + onlinestatus[1] + '" id="contact_' + htmlentities(contacts[i].u)
                     + '"><div class="nw-contact-status"></div><div class="nw-contact-name">'
-                    + htmlentities(contacts[i].name) + ' <a href="#" class="button start-chat-button"></a></div></div>';
+                    + htmlentities(contacts[i].name) + ' <a href="#" class="button start-chat-button"><span></span></a></div></div>';
             }
         }
 
@@ -4508,6 +4502,13 @@ function loadfm()
 
 }
 function loadfmdata() {
+    if(loadfmdata.isLoading) {
+        //console.error("Already loading fmdata");
+        return;
+    } else {
+        //console.error("Will start loading fmdata");
+    }
+
     loadfmdata.isLoading = true;
     api_req({a: 'f', c: 1, r: 1}, {
         callback: function() {
@@ -4520,6 +4521,11 @@ function loadfmdata() {
     }, n_h ? 1 : 0);
 };
 loadfmdata.isLoading = false;
+
+
+function is_fm_data_loaded() {
+    return Object.keys(M.d).length > 0;
+}
 
 function RightsbyID(id)
 {
@@ -5013,7 +5019,7 @@ function processOPC(opc) {
                     delete M.opc[k];
                     if ((Object.keys(M.opc).length === 0) && (M.currentdirid === 'opc')) {
                         $('.sent-requests-grid').addClass('hidden');
-                        $('.empty-sent-requests').removeClass('hidden');
+                        $('.fm-empty-contacts').removeClass('hidden');
                     }
                     break;
                 }
@@ -5123,7 +5129,7 @@ function processUPCO(ap) {
             $('#opc_' + ap[i].p).remove();
             if ((Object.keys(M.opc).length === 0) && (M.currentdirid === 'opc')) {
                 $('.sent-requests-grid').addClass('hidden');
-                $('.empty-sent-requests').removeClass('hidden');
+                $('.fm-empty-contacts').removeClass('hidden');
             }
         }
     }
@@ -5244,17 +5250,12 @@ function loadfm_callback(res)
             localStorage[u_handle + '_maxaction'] = maxaction;
         }
 
-        init_chat();
-
-        if((M.currentdirid !== false && window.location.hash.indexOf("#fm") !== -1) || $('.fm-main.default').is(":visible")) { // are we actually on an #fm/* page?
-            renderfm();
-        } else { // nah, just a static page! just hide the loading dialog
-            loadingDialog.hide();
-        }
+        loadfm_rendering_cb();
 
         if (!pfkey) {
             notifyPopup.pollNotifications();
         }
+
         if (res.cr) {
             crypto_procmcr(res.cr);
         }
@@ -5264,6 +5265,14 @@ function loadfm_callback(res)
 
         getsc();
     });
+}
+
+function loadfm_rendering_cb() {
+    init_chat();
+
+    if(is_fm() || $('.fm-main.default').is(":visible")) { // are we actually on an #fm/* page?
+        renderfm();
+    }
 }
 
 function storefmconfig(n, c)

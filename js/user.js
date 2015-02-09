@@ -200,13 +200,15 @@ function u_logout(logout)
 		$('#fmholder').html('');
 		$('#fmholder').attr('class','fmholder');
 		M = new MegaData();
-        mDBcls(); // resets mDBloaded
 		$.hideContextMenu = function () {};
 		api_reset();
 		if (waitxhr)
 		{
 			waitxhr.abort();
 			waitxhr=undefined;
+		}
+		if (typeof mDBcls === 'function') {
+			mDBcls(); // resets mDBloaded
 		}
 	}
 }

@@ -138,6 +138,12 @@ function dl_g(res)
 		else mKeyDialog(dlpage_ph);
 	}
 	else $('.download-mid-centered-block').addClass('not-available-some-reason');
+	
+	var pf = navigator.platform.toUpperCase();
+	if (page.substr(-5) == 'linux') sync_switchOS('linux');	
+	else if (pf.indexOf('MAC')>=0) sync_switchOS('mac');
+	else if (pf.indexOf('LINUX')>=0) sync_switchOS('linux');
+	else sync_switchOS('windows');
 }
 
 function closedlpopup()
@@ -316,6 +322,7 @@ function sync_switchOS(os)
 	}
 	else if (os == 'mac')
 	{
+		
 		syncurl = 'https://mega.co.nz/MEGAsyncSetup.dmg';
 		var ostxt = 'For Mac';
 		if (l[1158].indexOf('Windows') > -1) ostxt = l[1158].replace('Windows','Mac');
@@ -358,6 +365,7 @@ function ImgError(source){
 /**
  * Changes the animated product images on the download page
  */
+	
 var gifSlider = {
     
     // Speed to fade in/out the images and text
@@ -513,13 +521,33 @@ var gifSlider = {
         var slideImgSrc = gifSlider.images[side][slideIndex].image.src;
         var slideLink = gifSlider.images[side][slideIndex].href;
 
+
         // Change the link and fade in the new image
-        $('.products-' + side + '-block .currentLink').attr('href', slideLink);
+        $('.ads-' + side + '-block .currentLink').attr('href', slideLink);
         $('.animations-' + side + '-container .currentLink').attr('href', slideLink);
         $('.animations-' + side + '-container .currentImage').attr('src', slideImgSrc).css({ width: '260px', height: '300px'}).fadeIn(gifSlider.fadeInSpeed);
-
+		
+		
         // Set title and description
-        $('.products-' + side + '-block .products-top-txt .red').html(slideTitle).fadeIn(gifSlider.fadeInSpeed);
-        $('.products-' + side + '-block .products-top-txt .description').text(slideDescription).fadeIn(gifSlider.fadeInSpeed);
+        $('.ads-' + side + '-block .products-top-txt .red').html(slideTitle).fadeIn(gifSlider.fadeInSpeed);
+        $('.ads-' + side + '-block .products-top-txt .description').text(slideDescription).fadeIn(gifSlider.fadeInSpeed);
+		
+		// Applications buttons
+		if(side==='right') {
+		  $('.button0,.button1,.button2,.button3, .button4').fadeOut(gifSlider.fadeInSpeed);
+		  $('.button'+slideIndex).fadeIn(gifSlider.fadeInSpeed).css('display', 'block');
+		  
+		  if (slideIndex==2) {
+			  setTimeout(function() {
+                $('.button2').fadeOut(gifSlider.fadeInSpeed);
+		        $('.button3').fadeIn(gifSlider.fadeInSpeed).css('display', 'block');
+                setTimeout(function() {
+                   $('.button3').fadeOut(gifSlider.fadeInSpeed);
+		           $('.button4').fadeIn(gifSlider.fadeInSpeed).css('display', 'block');
+                }, 5000);
+              }, 5000);
+          }
+		  
+		} 
     }
 };

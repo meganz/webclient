@@ -605,8 +605,8 @@ var Chat = function() {
         'xmppDomain': xmppDomain,
         'loadbalancerService': 'gelb530n001.karere.mega.nz:443',
         'fallbackXmppServers': [
-            //"https://pxy270n001.karere.mega.nz/bosh",
-            //"https://pxy270n002.karere.mega.nz/bosh",
+            "https://pxy270n001.karere.mega.nz/bosh",
+            "https://pxy270n002.karere.mega.nz/bosh",
             "https://pxy302n001.karere.mega.nz/bosh",
             "https://pxy302n002.karere.mega.nz/bosh"
         ],
@@ -2320,9 +2320,10 @@ Chat.prototype.generatePrivateRoomName = function(jids) {
     newJids.sort();
     var roomName = "prv";
     $.each(newJids, function(k, jid) {
-        roomName = roomName + "_" + fastHashFunction(jid.split("@")[0]);
+        roomName = roomName + jid.split("@")[0];
     });
 
+    roomName = base32.encode(asmCrypto.SHA256.hex(roomName).substr(0, 32))
     return roomName;
 };
 

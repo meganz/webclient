@@ -1309,7 +1309,7 @@ function array_unique(arr) {
 }
 
 function array_random(arr) {
-    return arr[rand(arr.length - 1)];
+    return arr[rand(arr.length)];
 }
 /**
  * Simple method that will convert Mega user ids to base32 strings (that should be used when doing XMPP auth)
@@ -2225,4 +2225,60 @@ function flashIsEnabled() {
  */
 function getBaseUrl() {
     return 'https://' + (((location.protocol === 'https:') && location.host) || 'mega.co.nz');
+}
+
+/**
+ * http://stackoverflow.com/a/16344621/402133
+ *
+ * @param ms
+ * @returns {string}
+ */
+function ms2Time(ms) {
+    var secs = ms / 1000;
+    ms = Math.floor(ms % 1000);
+    var minutes = secs / 60;
+    secs = Math.floor(secs % 60);
+    var hours = minutes / 60;
+    minutes = Math.floor(minutes % 60);
+    hours = Math.floor(hours % 24);
+    return hours + ":" + minutes + ":" + secs;
+}
+
+function secToDuration(s, sep) {
+    var dur = ms2Time(s * 1000).split(":");
+    var durStr = "";
+    sep = sep || ", ";
+    if(!secToDuration.regExp) { //regexp compile cache
+        secToDuration.regExp = {};
+    }
+
+    if(!secToDuration.regExp[sep]) {
+        secToDuration.regExp[sep] = new RegExp("" + sep + "$");
+    }
+
+    for(var i = 0; i < dur.length; i++) {
+        var unit;
+        var v = dur[i];
+        if(v === "0") {
+            if(durStr.length !== 0 && i !== 0) {
+                continue;
+            } else if(i < 2) {
+                continue;
+            }
+        }
+
+        if(i === 0) {
+            unit = v != 1 ? "hours" : "hour";
+        } else if(i === 1) {
+            unit = v != 1 ? "minutes" : "minute";
+        } else if(i === 2) {
+            unit = v != 1 ? "seconds" : "second";
+        } else {
+            throw new Error("this should never happen.");
+        }
+
+        durStr += v + " " + unit + sep;
+    }
+
+    return durStr.replace(secToDuration.regExp[sep], "");
 }

@@ -1533,8 +1533,8 @@ makeMetaAware(Karere);
     /**
      * Change the currently logged in user presence
      *
-     * @param presence {Karere.PRESENCE}
-     * @param status
+     * @param [presence] {Karere.PRESENCE}
+     * @param [status]
      * @param [delay] Number unix timestamp that should be used for sending a urn:xmpp:delay w/ the presence stanza
      */
     Karere.prototype.setPresence = function(presence, status, delay) {

@@ -144,7 +144,7 @@ function u_checklogin3a(res,ctx)
 
 // erase all local user/session information
 function u_logout(logout)
-{
+{     
 	var a = [localStorage,sessionStorage];
 	for (var i = 2; i--; )
 	{
@@ -161,9 +161,9 @@ function u_logout(logout)
 
 	if (logout)
 	{
-        if(!MegaChatDisabled) {
+        if (!MegaChatDisabled) {
+            
             localStorage.removeItem("audioVideoScreenSize");
-
 
             if(megaChat.is_initialized) {
                 megaChat.destroy(/* isLogout: */ true).always(function() {

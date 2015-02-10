@@ -644,8 +644,7 @@ function showOverQuotaDialog()
     // Change contents of dialog text
     $('.warning-green-icon', $dialog).remove();
     $('.warning-popup-body', $dialog).unbind('click').html(
-        '<div class="warning-header">' + l[1010] + '</div>' + /* Todo: change string below to l[5929] when translations are updated */
-        'You are significantly over your allowed storage allocation and your uploads have been disabled. Please ensure you are on the correct MEGA PRO plan, or contact support@mega.co.nz.'
+        '<div class="warning-header">' + l[1010] + '</div>' + l[5929]
     );
     
     // Set button text to 'Upgrade Account'

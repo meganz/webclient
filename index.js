@@ -584,18 +584,26 @@ function init_page()
 	{
 		parsepage(pages['about']);
 		$('.team-person-block').removeClass('first');
-		var html ='';
-		var a=4;
-		$('.team-person-block').sort( function(){return (Math.round(Math.random())-0.5)}).each(function(i,e)
-		{
+		var html = '';
+		var a = 4;
+        
+		$('.team-person-block').sort(function() {
+            return (Math.round(Math.random()) - 0.5);
+        })
+        .each(function(i, element)
+		{            
 			if (a == 4)
 			{
-				html += e.outerHTML.replace('team-person-block','team-person-block first');
+				html += element.outerHTML.replace('team-person-block', 'team-person-block first');
 				a=0;
 			}
-			else html += e.outerHTML;
+			else 
+            {  
+                html += element.outerHTML;
+            }
 			a++;
 		});
+                
 		$('#emailp').html($('#emailp').text().replace('jobs@mega.co.nz','<a href="mailto:jobs@mega.co.nz">jobs@mega.co.nz</a>'));
 		$('.new-bottom-pages.about').html(html + '<div class="clear"></div>');
 		mainScroll();

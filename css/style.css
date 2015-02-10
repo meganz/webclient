@@ -15267,7 +15267,7 @@ span.browsers-update {
 }
 .m-client-bottom-block {
 	text-align: center;
-	padding: 47px 30px 42px 20px;
+	padding: 32px 30px 47px 20px;
 	line-height: 0;
 	font-size: 0;
 }
@@ -15427,7 +15427,7 @@ span.browsers-update {
 	font-size: 11px;
 	color: #666666;
 	line-height: 14px;
-	padding-top: 7px;
+	padding-top: 5px;
 }
 .blackberry-button {
 	background-position: 22px -1560px;
@@ -18695,6 +18695,16 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 .password-dialog .fm-dialog-body {
 	padding: 14px 20px 14px 20px;
 }
+.ads-left-block, .ads-right-block {
+	background-color: #d9d8d8;
+	height: 100%;
+	width: 300px;
+	position: absolute;
+	min-height: 620px;
+}
+.ads-right-block {
+	right: 0;
+}
 .products-left-block, .products-right-block {
 	background-color: #d9d8d8;
 	height: 100%;
@@ -18725,22 +18735,26 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 	line-height: 26px;
 }
 .animations-left-container, .animations-right-container {
-	left: 20px;
 	position: absolute;
 	top: 50%;
-	margin-top: -125px;
+	margin-top: -145px;
+	width: 100%;
+	text-align: center;
+}
+.animations-left-container. currentLink, .animations-right-container .currentLink {
+ display:block;
 }
 .products-bottom-block {
 	height: 130px;
 	width: 100%;
 	position: absolute;
 	bottom: 50px;
-	padding: 30px 30px 0 30px;
+	padding: 32px 28px 0 28px;
 	-moz-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
 	background-color: #c5c3c3;
-	display: none;
+	display: block;
 }
 .products-bottom-block .sync-bottom-txt {
 	font-size: 11px;
@@ -18759,11 +18773,12 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 	position: absolute;
 	width: 20px;
 	height: 9px;
-	left: 145px;
+	left: 137px;
 	top: 2px;
 	background-image: url(../images/mega/mobile-sprite-v6.png?v=1);
 	background-position: right -1449px;
 	background-repeat: no-repeat;
+	display: none;
 }
 .products-top-notification {
 	position: absolute;
@@ -18776,6 +18791,10 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 	-webkit-border-radius: 5px;
 	border-radius: 5px;
 	cursor: pointer;
+	display: none;
+}
+.not-logged .products-top-arrow, .not-logged .products-top-notification {
+	display: block;
 }
 .products-top-white-txt1 {
 	font-size: 30px;
@@ -18829,13 +18848,40 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 .products-slides-button.active {
 	background-color: white;
 }
-.products-bottom-block .sync-button, .products-bottom-block .chrome-app-button, .products-bottom-block .ios-button, .products-bottom-block .google-play-button {
-	display: inline-block;
+.products-bottom-block .sync-button, .products-bottom-block .chrome-app-button, .products-bottom-block .ios-button, .products-bottom-block .google-play-button, .products-bottom-block .ff-bott-button, .products-bottom-block .win-phone-button {
+	display: block;
 	min-width: 234px;
 	width: auto;
 	border-color: #8d8c8c;
+	position: absolute;
 }
-.products-bottom-block .sync-button:hover, .products-bottom-block .chrome-app-button:hover, .products-bottom-block .ios-button:hover, .products-bottom-block .google-play-button:hover {
+.products-bottom-block .sync-button {
+	position: static;
+}
+.products-bottom-block .win-phone-button {
+	width: 234px;
+}
+.products-bottom-block .win-phone-button:hover {
+	width: 240px;
+}
+.products-bottom-block .ff-bott-button {
+	min-width: 234px;
+	width: 234px;
+	white-space: normal;
+	padding: 8px 15px 0 0;
+}
+.products-bottom-block .ff-bott-button .sync-button-txt {
+	white-space: normal;
+	line-height: 21px;
+}
+.products-bottom-block .sync-button.hidden, .products-bottom-block .chrome-app-button.hidden, .products-bottom-block .ios-button.hidden, .products-bottom-block .google-play-button.hidden, .products-bottom-block .ff-bott-button.hidden, .products-bottom-block .win-phone-button.hidden {
+	display: none;
+}
+.products-bottom-block .ff-bott-button:hover {
+	min-width: 238px;
+	width: 238px;
+}
+.products-bottom-block .sync-button:hover, .products-bottom-block .chrome-app-button:hover, .products-bottom-block .ios-button:hover, .products-bottom-block .google-play-button:hover, .products-bottom-block .ff-bott-button:hover, .products-bottom-block .win-phone-button:hover {
 	border-color: #DB3200;
 	min-width: 240px;
 }
@@ -20887,19 +20933,13 @@ video.localViewport {
 	top: 48%;
 }
 }
-@media only screen and (max-height: 758px) {
-.ads-svg-container {
-	top: 53%;
+@media only screen and (max-height: 730px) {
+.currentLink img {
+	width: auto !important;
+	max-height: 250px;
 }
-.ads-iphone .ads-svg-container {
-	top: 52%;
-}
-.ads-right-bottom-txt {
-	display: none;
-}
-.ads-tablet .ads-svg-container, .ads-ipad .ads-svg-container {
-	height: 230px;
-	top: 51%;
+.animations-left-container, .animations-right-container {
+	margin-top: -120px;
 }
 }
  @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {

@@ -996,10 +996,15 @@ function mLogout()
 		}
 		else
 		{
-			u_logout(1);
-			document.location.reload();
+            // Use the 'Session Management Logout' API call to kill the current session
+            api_req({ 'a': 'sml' }, { callback: function(result)
+            {
+                // After the API call, clear other data and reload page
+                u_logout(true);
+                document.location.reload(); 
+            }});
 		}
-	}
+	};
 	var cnt=0;
 	if (M.c[M.RootID] && u_type === 0) for (var i in M.c[M.RootID]) cnt++;
 	if (u_type === 0 && cnt > 0)

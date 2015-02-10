@@ -322,7 +322,6 @@ function cacheselect()
 function hideEmptyGrids() {
     $('.fm-empty-trashbin,.fm-empty-contacts,.fm-empty-search,.fm-empty-cloud').addClass('hidden');
     $('.fm-empty-messages,.fm-empty-folder,.fm-empty-conversations,.fm-empty-incoming').addClass('hidden');
-    $('.empty-sent-requests,.empty-contact-requests').addClass('hidden');
     $('.fm-empty-pad.fm-empty-sharef').remove();
 }
 
@@ -1496,16 +1495,12 @@ function addContactUI()
             onHolder: function() {
                 errorMsg('No need for that, you are THE owner!');
             },
-            onAdd: function()
-            {
+            onAdd: function() {
                 var itemNum = $('.token-input-list-mega .token-input-token-mega').length;
-                if (itemNum === 1)
-                {
+                if (itemNum === 1) {
                     $('.add-user-popup-button.add').removeClass('disabled');
                     $('.add-user-popup .nw-fm-dialog-title').text(l[71]);
-                }
-                else
-                {
+                } else {
                     $('.add-user-popup-button.add').removeClass('disabled');
                     $('.add-user-popup .nw-fm-dialog-title').text('Add Contacts');
 
@@ -1514,8 +1509,7 @@ function addContactUI()
                     var h1 = $a.outerHeight(true);// margin included
                     var h2 = $b.height();
 
-                    if (5 <= h2 / h1 && h2 / h1 < 6)
-                    {
+                    if (5 <= h2 / h1 && h2 / h1 < 6) {
                         $b.jScrollPane({
                             enableKeyboardNavigation: false,
                             showArrows: true,
@@ -1528,26 +1522,20 @@ function addContactUI()
                     }
                 }
             },
-            onDelete: function()
-            {
+            onDelete: function() {
                 setTimeout(function() {
                     $('.add-user-popup .token-input-input-token-mega input').blur();
                 }, 0);
                 var itemNum = $('.token-input-list-mega .token-input-token-mega').length;
-                if (itemNum === 0)
-                {
+                if (itemNum === 0) {
                     $('.add-user-popup-button.add').addClass('disabled');
                     $('.add-user-popup .nw-fm-dialog-title').text(l[71]);
 
-                }
-                else if (itemNum === 1)
-                {
+                } else if (itemNum === 1) {
                     $('.add-user-popup-button.add').removeClass('disabled');
                     $('.add-user-popup .nw-fm-dialog-title').text(l[71]);
 
-                }
-                else
-                {
+                } else {
                     $('.add-user-popup-button.add').removeClass('disabled');
                     $('.add-user-popup .nw-fm-dialog-title').text('Add Contacts');
 
@@ -1556,13 +1544,13 @@ function addContactUI()
                     var $c = $('.add-user-popup .multiple-input .jspPane')[0];
                     var h1 = $a.outerHeight(true);// margin included
                     var h2;
-                    if ($c)
+                    if ($c) {
                         h2 = $c.scrollHeight;
-                    else
+                    } else {
                         h2 = $b.height();
+                    }
 
-                    if (h2 / h1 < 6)
-                    {
+                    if (h2 / h1 < 6) {
                         clearScrollPanel('.add-user-popup');
                     }
                 }
@@ -1671,12 +1659,16 @@ function addContactUI()
     $('.fm-received-requests, .empty-sent-requests-button').off('click');
     $('.fm-received-requests, .empty-sent-requests-button').on('click', function() {
         M.openFolder('ipc');
+		$('.fm-contact-requests').removeClass('active');
+		$(this).addClass('active');
     });
 
     // View sent contact requests, M.opc
     $('.fm-contact-requests, .empty-contact-requests-button').off('click');
     $('.fm-contact-requests, .empty-contact-requests-button').on('click', function() {
         M.openFolder('opc');
+		$('.fm-received-requests').removeClass('active');
+		$(this).addClass('active');
     });
 
     $('.add-user-size-icon').off('click');
@@ -1723,7 +1715,6 @@ function addContactUI()
                     $mails.each(function(index, value) {
                         email = $(value).contents().eq(1).text();
                         if (!M.inviteContact(M.u[u_handle].m, email, emailText)) {
-                            $('.empty-sent-requests').addClass('hidden');
                             if (index === mailNum - 1) {
                                 if (mailNum === 1) {
                                     title = l[150];
@@ -2158,8 +2149,8 @@ function initContextUI()
         mcDialog();
     });
 
-    $(c + '.sharing-item').unbind('click');
-    $(c + '.sharing-item').bind('click', function()
+    $(c + '.sh4r1ng-item').unbind('click');
+    $(c + '.sh4r1ng-item').bind('click', function()
     {
         if (u_type === 0)
             ephemeralDialog(l[1006]);
@@ -2556,16 +2547,16 @@ function fmtopUI() {
             if (d) {
                 console.log('Inbox');
             }
-        } else if (M.currentdirid === 'contacts') {
-            $('.fm-add-user, .fm-received-requests').removeClass('hidden');
-        } else if (M.currentdirid === 'opc') {
-            $('.fm-add-user,.fm-contact-requests').removeClass('hidden');
-            $('.fm-contact-requests').addClass('hidden');// Button 'View sent requests', hide
-            $('.fm-received-requests').removeClass('hidden');// Button, 'View received requests', show
-        } else if (M.currentdirid === 'ipc') {
-            $('.fm-add-user,.fm-contact-requests').removeClass('hidden');
-            $('.fm-received-requests').addClass('hidden');// Button, 'View received requests', hide
-            $('.fm-contact-requests').removeClass('hidden');// Button 'View sent requests', show
+        } else if (M.currentdirid === 'contacts' || M.currentdirid === 'ipc' || M.currentdirid === 'opc') {
+            $('.fm-add-user').removeClass('hidden');
+			$('.fm-left-panel').addClass('contacts-panel');
+			if (M.currentdirid === 'ipc') {
+			    $('.fm-received-requests').addClass('active');
+			    $('.fm-right-header').addClass('requests-panel');
+		    } else if (M.currentdirid === 'opc') {
+			    $('.fm-contact-requests').addClass('active');
+			    $('.fm-right-header').addClass('requests-panel');
+		    } 
         } else if (M.currentdirid.length === 8 && RightsbyID(M.currentdirid) > 0) {
             $('.fm-new-folder').removeClass('hidden');
             $('.fm-file-upload').removeClass('hidden');
@@ -2575,6 +2566,7 @@ function fmtopUI() {
                 $('.fm-file-upload').addClass('last-button');
             }
         }
+		
     }
     $('.fm-clearbin-button').unbind('click');
     $('.fm-clearbin-button').bind('click', function() {
@@ -3059,7 +3051,8 @@ function accountUI()
                     $('#account-new-password').focus();
                 });
             }
-            else if ($('#account-confirm-password').val() !== '' && $('#account-password').val() !== '')
+            else if ($('#account-confirm-password').val() !== '' && $('#account-password').val() !== ''
+                && $('#account-confirm-password').val() !== $('#account-password').val())
             {
                 loadingDialog.show();
                 changepw($('#account-password').val(), $('#account-confirm-password').val(), {callback: function(res)
@@ -5176,7 +5169,7 @@ function menuItems()
     if (n && $.selected.length == 1 && is_image(n))
         items['preview'] = 1;
     if (n && sourceRoot == M.RootID && $.selected.length == 1 && n.t && !folderlink)
-        items['sharing'] = 1;
+        items['sh4r1ng'] = 1;
     if (sourceRoot == M.RootID && !folderlink)
     {
         items['move'] = 1;
@@ -5722,7 +5715,6 @@ function sectionUIopen(id) {
     $('.nw-fm-left-icon.' + tmpId).addClass('active');
     $('.content-panel.' + tmpId).addClass('active');
     $('.fm-left-menu').removeClass('cloud-drive shared-with-me rubbish-bin contacts conversations opc ipc').addClass(tmpId);
-
     $('.fm-right-header, .fm-import-to-cloudrive, .fm-download-as-zip').addClass('hidden');
     $('.fm-import-to-cloudrive, .fm-download-as-zip').unbind('click');
 
@@ -5767,6 +5759,13 @@ function sectionUIopen(id) {
         $('.files-grid-view.fm').addClass('hidden');
         $('.fm-blocks-view.fm').addClass('hidden');
     }
+	
+	if (id !== 'contacts' && id !== 'opc' && id !== 'ipc') {
+		$('.fm-left-panel').removeClass('contacts-panel');
+	    $('.fm-right-header').removeClass('requests-panel');
+		$('.fm-received-requests').removeClass('active');
+		$('.fm-contact-requests').removeClass('active');
+	}
 
     if (id !== 'contacts') {
         $('.contacts-details-block').addClass('hidden');
@@ -5776,11 +5775,9 @@ function sectionUIopen(id) {
 
     if (id !== 'opc') {
         $('.sent-requests-grid').addClass('hidden');
-        $('.empty-sent-requests').addClass('hidden');
     }
 
     if (id !== 'ipc') {
-        $('.empty-contact-requests').addClass('hidden');
         $('.contact-requests-grid').addClass('hidden');
     }
 
@@ -6360,7 +6357,7 @@ function fillShareDialogWithContent()
             // Additional check of 'c' grants that only active 
             // contacts will be addded, this prevents contact
             //  duplication in share dialog contact list
-            if (M.u[userHandle] && M.u[userHandle].c)
+            if (M.u[userHandle] && M.u[userHandle].c && M.u[userHandle].c === 1 )
             {
                 var user = M.u[userHandle];
                 var email = user.m;
@@ -6771,67 +6768,6 @@ function initShareDialog()
         }
     });
 
-    $('.share-dialog .import-contacts-service').unbind('click');
-    $('.share-dialog .import-contacts-service').bind('click', function()
-    {
-        // NOT imported
-        if (!$(this).is('.imported'))
-        {
-            var contacts = new mega.GContacts({'where': 'shared'});
-
-            // NOT failed
-            if (!contacts.options.failed) {
-                contacts.importGoogleContacts();
-            } else {
-                closeImportContactNotification('.share-dialog');
-            }
-        }
-        else
-        {
-            var n = $('.imported-contacts-notification');
-            n.css('margin-left', '-' + n.outerWidth() / 2 + 'px');
-            n.fadeIn(200);
-            $('.share-dialog .import-contacts-dialog').fadeOut(200);
-        }
-    });
-
-    $('.share-dialog .import-contacts-link').unbind('click');
-    $('.share-dialog .import-contacts-link').bind('click', function(e)
-    {
-        $('.permissions-menu').fadeOut(200);
-        $('.share-dialog-permissions').removeClass('active');
-        $('.permissions-icon').removeClass('active');
-        if (!$(this).is('.active'))
-        {
-            $('.share-dialog .import-contacts-link').addClass('active');
-            $('.share-dialog .import-contacts-dialog').fadeIn(200);
-
-            $('.imported-notification-close').unbind('click');
-            $('.imported-notification-close').bind('click', function()
-            {
-                $('.imported-contacts-notification').fadeOut(200);
-            });
-        }
-        else
-        {
-            $('.share-dialog .import-contacts-link').removeClass('active');
-            $('.share-dialog .import-contacts-dialog').fadeOut(200);
-            $('.imported-contacts-notification').fadeOut(200);
-        }
-
-        e.stopPropagation();
-    });
-
-    $('.share-dialog .import-contacts-info').unbind('mouseover');
-    $('.share-dialog .import-contacts-info').bind('mouseover', function() {
-        $('.share-dialog .import-contacts-info-txt').fadeIn(200);
-    });
-
-    $('.share-dialog .import-contacts-info').unbind('mouseout');
-    $('.share-dialog .import-contacts-info').bind('mouseout', function() {
-        $('.share-dialog .import-contacts-info-txt').fadeOut(200);
-    });
-
     $(document).off('click', '.share-dialog-remove-button');
     $(document).on('click', '.share-dialog-remove-button', function(e)
     {
@@ -7078,6 +7014,7 @@ function addImportedDataToAddContactsDialog(data, from) {
 }
 
 function closeImportContactNotification(c) {
+    loadingDialog.hide();
     $('.imported-contacts-notification').fadeOut(200);
     $(c + ' .import-contacts-dialog').fadeOut(200);
     $('.import-contacts-link').removeClass('active');
@@ -7132,7 +7069,7 @@ function closeDialog()
             var email = $(v).contents().eq(1).text();
             $('.share-multiple-input').tokenInput("removeContact", {id: email}, '.share-multiple-input');
         });
-        $('.add-contact-multiple-input').tokenInput("clear");
+        $('.add-contact-multiple-input').tokenInput("clearOnCancel");
 
         clearScrollPanel('.add-user-popup');
 

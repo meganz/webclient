@@ -144,7 +144,7 @@ function u_checklogin3a(res,ctx)
 
 // erase all local user/session information
 function u_logout(logout)
-{
+{     
 	var a = [localStorage,sessionStorage];
 	for (var i = 2; i--; )
 	{
@@ -161,9 +161,9 @@ function u_logout(logout)
 
 	if (logout)
 	{
-        if(!MegaChatDisabled) {
+        if (!MegaChatDisabled) {
+            
             localStorage.removeItem("audioVideoScreenSize");
-
 
             if(megaChat.is_initialized) {
                 megaChat.destroy(/* isLogout: */ true).always(function() {
@@ -200,13 +200,15 @@ function u_logout(logout)
 		$('#fmholder').html('');
 		$('#fmholder').attr('class','fmholder');
 		M = new MegaData();
-        mDBcls(); // resets mDBloaded
 		$.hideContextMenu = function () {};
 		api_reset();
 		if (waitxhr)
 		{
 			waitxhr.abort();
 			waitxhr=undefined;
+		}
+		if (typeof mDBcls === 'function') {
+			mDBcls(); // resets mDBloaded
 		}
 	}
 }

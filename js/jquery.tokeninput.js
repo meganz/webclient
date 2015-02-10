@@ -182,6 +182,13 @@
             }
             return false;
         },
+        clearOnCancel: function() {
+            if (this.data("tokenInputObject")) {
+                this.data("tokenInputObject").clearOnCancel();
+                return this;
+            }
+            return false;
+        },
         add: function(item) {
             if (this.data("tokenInputObject")) {
                 this.data("tokenInputObject").add(item);
@@ -559,6 +566,14 @@
             });
         };
 
+        this.clearOnCancel = function() {
+            token_list.children("li").each(function() {
+                if ($(this).children("input").length === 0) {
+                    delete_all_tokens($(this));
+                }
+            });
+        };
+        
         this.add = function(item) {
             add_token(item);
         };
@@ -861,8 +876,9 @@
             var callback = $(input).data("settings").onDelete;
 
             var index = token.prevAll().length;
-            if (index > selected_token_index)
+            if (index > selected_token_index) {
                 index--;
+            }
 
             // Delete the token
             token.remove();
@@ -873,17 +889,17 @@
 
             // Remove this token from the saved list
             saved_tokens = saved_tokens.slice(0, index).concat(saved_tokens.slice(index + 1));
-            if (saved_tokens.length == 0) {
-                input_box.attr("placeholder", settings.placeholder)
+            if (saved_tokens.length === 0) {
+                input_box.attr("placeholder", settings.placeholder);
             }
-            if (index < selected_token_index)
+            if (index < selected_token_index) {
                 selected_token_index--;
+            }
 
             // Update the hidden input
             update_hidden_input(saved_tokens, hidden_input);
 
             token_count -= 1;
-
 
             if ($(input).data("settings").tokenLimit !== null) {
                 input_box
@@ -895,15 +911,63 @@
             // Execute the onDelete callback if defined
             if ($.isFunction(callback)) {
                 callback.call(hidden_input, token_data);
-                var ld = $(input).data("settings").local_data
-                for (var n in ld)
-                {
-                    if (ld[n].id === token_data.id)
+                var ld = $(input).data("settings").local_data;
+                for (var n in ld) {
+                    if (ld[n].id === token_data.id) {
                         $(input).data("settings").local_data.splice(n, 1);
+                        break;
+                    }
                 }
             }
         }
 
+        // Delete a token from the token list
+        function delete_all_tokens(token) {
+            
+            // Remove the id from the saved list
+            var token_data = $.data(token.get(0), "tokeninput");
+
+            var index = token.prevAll().length;
+            if (index > selected_token_index) {
+                index--;
+            }
+
+            token.remove();
+            selected_token = null;
+
+            // Show the input box and give it focus again
+            focus_with_timeout(input_box);
+
+            // Remove this token from the saved list
+            saved_tokens = saved_tokens.slice(0, index).concat(saved_tokens.slice(index + 1));
+            
+            if (saved_tokens.length === 0) {
+                input_box.attr("placeholder", settings.placeholder);
+            }
+            if (index < selected_token_index) {
+                selected_token_index--;
+            }
+
+            // Update the hidden input
+            update_hidden_input(saved_tokens, hidden_input);
+
+            token_count -= 1;
+
+            if ($(input).data("settings").tokenLimit !== null) {
+                input_box
+                    .show()
+                    .val("");
+                focus_with_timeout(input_box);
+            }
+
+            var ld = $(input).data("settings").local_data;
+            for (var n in ld) {
+                if (ld[n].id === token_data.id) {
+                    $(input).data("settings").local_data.splice(n, 1);
+                    break;
+                }
+            }
+        }
 
         // Email validation
         function IsEmail(email) {

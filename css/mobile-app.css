@@ -382,6 +382,12 @@ span.select-txt {
 }
 .blackberry .main-button, .blackberry.ios .main-button {
 	background-image: url(https://eu.static.mega.co.nz/images/mobile/main-bg-blackberry.png);
+	width: 175px;
+	background-position: 13px -272px;
+}
+.wp .main-button, .wp.ios .main-button {
+	background-image: url(https://eu.static.mega.co.nz/images/mobile/main-bg-wp.png);
+	width: 232px;
 }
 .ios .main-button, .another-os .main-button {
 	background-image: url(https://eu.static.mega.co.nz/images/mobile/main-bg-ios.png);

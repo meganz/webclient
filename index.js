@@ -47,9 +47,21 @@ function startMega()
 		$('body').append(translate(pages['dialogs'].replace(/{staticpath}/g,staticpath)));
 		delete pages['dialogs'];
 	}
+	if (pages['chat'])
+	{
+		$('body').append(translate(pages['chat'].replace(/{staticpath}/g,staticpath)));
+		delete pages['chat'];
+	}
 	jsl=[];
 	init_page();
-    init_chat();
+
+	if(u_handle && loadfmdata.isLoading === false) {
+		if(!is_fm_data_loaded()) {
+			loadfmdata();
+		} else {
+			init_chat();
+		}
+	}
 }
 
 function mainScroll()
@@ -76,6 +88,8 @@ function scrollMenu()
 
 function init_page()
 {
+	if (!u_type) $('body').attr('class','not-logged');
+		else $('body').attr('class',''); // Todo: check if cleaning the whole class is ok..
 	if ('-fa-ar-he-'.indexOf('-'+lang+'-') > -1) $('body').addClass('rtl');
 
 	if ($.startscroll) delete $.startscroll;
@@ -570,18 +584,26 @@ function init_page()
 	{
 		parsepage(pages['about']);
 		$('.team-person-block').removeClass('first');
-		var html ='';
-		var a=4;
-		$('.team-person-block').sort( function(){return (Math.round(Math.random())-0.5)}).each(function(i,e)
-		{
+		var html = '';
+		var a = 4;
+        
+		$('.team-person-block').sort(function() {
+            return (Math.round(Math.random()) - 0.5);
+        })
+        .each(function(i, element)
+		{            
 			if (a == 4)
 			{
-				html += e.outerHTML.replace('team-person-block','team-person-block first');
+				html += element.outerHTML.replace('team-person-block', 'team-person-block first');
 				a=0;
 			}
-			else html += e.outerHTML;
+			else 
+            {  
+                html += element.outerHTML;
+            }
 			a++;
 		});
+                
 		$('#emailp').html($('#emailp').text().replace('jobs@mega.co.nz','<a href="mailto:jobs@mega.co.nz">jobs@mega.co.nz</a>'));
 		$('.new-bottom-pages.about').html(html + '<div class="clear"></div>');
 		mainScroll();
@@ -735,7 +757,11 @@ function init_page()
 			if (typeof mDB !== 'undefined' && !pfid) {
                 mDBstart();
             } else {
-                loadfm();
+				if(!is_fm_data_loaded()) {
+					loadfm();
+				} else {
+					loadfm_rendering_cb();
+				}
             }
 			andreiScripts();
 			if (pfid) {
@@ -748,8 +774,6 @@ function init_page()
             M.openFolder(id);
         }
 		$('#topmenu').html(parsetopmenu());
-		if (!u_type) $('body').attr('class','not-logged');
-		else $('body').attr('class','');
 		$('#pageholder').hide();
 		$('#startholder').hide();
 		if ($('#fmholder:visible').length == 0)
@@ -972,10 +996,15 @@ function mLogout()
 		}
 		else
 		{
-			u_logout(1);
-			document.location.reload();
+            // Use the 'Session Management Logout' API call to kill the current session
+            api_req({ 'a': 'sml' }, { callback: function(result)
+            {
+                // After the API call, clear other data and reload page
+                u_logout(true);
+                document.location.reload(); 
+            }});
 		}
-	}
+	};
 	var cnt=0;
 	if (M.c[M.RootID] && u_type === 0) for (var i in M.c[M.RootID]) cnt++;
 	if (u_type === 0 && cnt > 0)
@@ -1544,6 +1573,7 @@ window.onhashchange = function()
 		document.location.hash = hash;
 		return false;
 	}
+
 	if (tpage == '#info' && page == 'start')
 	{
 		if (!$.infoscroll) startpageScroll();

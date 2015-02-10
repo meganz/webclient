@@ -429,6 +429,12 @@ if (m)
         document.body.className = 'ios full-mode supported';
         document.getElementById('m_desc').innerHTML = 'Free 50 GB - End-to-end encryption';
     }
+    else if (ua.indexOf('windows phone') > -1)
+    {
+        app='zune://navigate/?phoneappID=1b70a4ef-8b9c-4058-adca-3b9ac8cc194a';
+        document.body.className = 'wp full-mode supported';
+        document.getElementById('m_desc').innerHTML = 'Free 50 GB - End-to-end encryption';
+    }
     else document.body.className = 'another-os full-mode unsupported';
 
     if (app)
@@ -443,6 +449,9 @@ if (m)
     }
     if (window.location.hash.substr(1,1) == '!' || window.location.hash.substr(1,2) == 'F!')
     {
+        var i=0;
+        if (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1 || ua.indexOf('ipod') > -1 || ua.indexOf('windows phone') > -1) i=1;
+
         if (app) {
             document.getElementById('m_title').innerHTML = 'Install the free MEGA app to access this file from your mobile';
             document.getElementById('m_appbtn').href += '&referrer=link';
@@ -454,12 +463,12 @@ if (m)
                 if (confirm('Do you already have the MEGA app installed?')) document.location = 'mega://' + window.location.hash;
             },2500);
         }
-        else document.getElementById('m_iframe').src = 'mega://' + window.location.hash;
+        else document.getElementById('m_iframe').src = 'mega://' + window.location.hash.substr(i);
     }
     else if (window.location.hash.substr(1,7) == 'confirm' || window.location.hash.substr(1,7) == 'account')
     {
         var i=0;
-        if (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1 || ua.indexOf('ipod') > -1) i=1;
+        if (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1 || ua.indexOf('ipod') > -1 || ua.indexOf('windows phone') > -1) i=1;
         if (ua.indexOf('chrome') > -1) window.location ='mega://' + window.location.hash.substr(i);
         else document.getElementById('m_iframe').src = 'mega://' + window.location.hash.substr(i);
     }
@@ -564,7 +573,7 @@ else if (!b_u)
                 dump.x = checksum;
                 crashes[checksum] = Date.now();
                 localStorage.crashes = JSON.stringify(crashes);
-                cc = $.len(crashes);
+                cc = Object.keys(crashes).length;
             }
             catch(e) {
                 delete localStorage.crashes;
@@ -608,7 +617,7 @@ else if (!b_u)
                 report.ua = navigator.userAgent;
                 report.io = window.dlMethod && dlMethod.name;
                 report.sb = sbid;
-                report.tp = $.transferprogress;
+                report.tp = typeof $ !== 'undefined' && $.transferprogress;
                 report.id = ids.join(",");
                 report.ud = uds;
                 report.cc = cc;
@@ -731,117 +740,119 @@ else if (!b_u)
 
     jsl.push({f:'js/chat/karereEventObjects.js', n: 'keo_js', j:1,w:7});
     jsl.push({f:'js/chat/karere.js', n: 'karere_js', j:1,w:7});
+	jsl.push({f:'html/chat.html', n: 'chat', j:0});
     jsl.push({f:'js/chat/chat.js', n: 'chat_js', j:1,w:7});
     jsl.push({f:'js/chat/chatRoom.js', n: 'chat_js', j:1,w:7});
 
     // END OF MEGA CHAT
 
-    jsl.push({f:'js/fm.js', n: 'fm_js', j:1,w:12});
-    jsl.push({f:'js/filetypes.js', n: 'filetypes_js', j:1});
-    jsl.push({f:'js/miniui.js', n: 'miniui_js', j:1});
-    if (is_extension)
-    {
-            jsl.push({f:'js/dcraw.js', n: 'dcraw_js', j:1});
-    }
-    /* better download */
-    jsl.push({f:'js/xhr.js', n: 'xhr_js', j:1});
-    jsl.push({f:'js/events.js', n: 'events', j:1,w:4});
-    jsl.push({f:'js/queue.js', n: 'queue', j:1,w:4});
-    jsl.push({f:'js/downloadChrome.js', n: 'dl_chrome', j:1,w:3});
-    if (is_chrome_firefox && parseInt(Services.appinfo.version) > 27)
-    {
-        is_chrome_firefox |= 4;
-        jsl.push({f:'js/downloadFirefox.js', n: 'dl_firefox', j:1,w:3});
-    }
-    else
-    {
-        jsl.push({f:'js/downloadMemory.js', n: 'dl_memory', j:1,w:3});
-        jsl.push({f:'js/downloadFlash.js', n: 'dl_flash', j:1,w:3});
-    }
-    jsl.push({f:'js/downloader.js', n: 'dl_downloader', j:1,w:3});
-    jsl.push({f:'js/download2.js', n: 'dl_js', j:1,w:3});
-    jsl.push({f:'js/upload2.js', n: 'upload_js', j:1,w:2});
-    /* end better download */
-    jsl.push({f:'index.js', n: 'index', j:1,w:4});
-    jsl.push({f:'html/start.html', n: 'start', j:0});
-    jsl.push({f:'html/megainfo.html', n: 'megainfo', j:0});
-    jsl.push({f:'html/js/start.js', n: 'start_js', j:1});
-    jsl.push({f:'html/bottom2.html', n: 'bottom2',j:0});
-    jsl.push({f:'html/key.html', n: 'key', j:0});
-    jsl.push({f:'html/js/key.js', n: 'key_js', j:1});
-    jsl.push({f:'html/pro.html', n: 'pro', j:0});
-    jsl.push({f:'html/js/pro.js', n: 'pro_js', j:1});
-    jsl.push({f:'html/login.html', n: 'login', j:0});
-    jsl.push({f:'html/js/login.js', n: 'login_js', j:1});
-    jsl.push({f:'html/fm.html', n: 'fm', j:0,w:3});
-    jsl.push({f:'html/top.html', n: 'top', j:0});
-    jsl.push({f:'js/notifications.js', n: 'notifications_js', j:1});
-    jsl.push({f:'css/style.css', n: 'style_css', j:2,w:30,c:1,d:1,cache:1});
-    jsl.push({f:'js/avatar.js', n: 'avatar_js', j:1,w:3});
-    jsl.push({f:'js/countries.js', n: 'countries_js', j:1});
-    jsl.push({f:'html/dialogs.html', n: 'dialogs', j:0,w:2});
-    jsl.push({f:'html/transferwidget.html', n: 'transferwidget', j:0});
-    jsl.push({f:'js/checkboxes.js', n: 'checkboxes_js', j:1});
-    jsl.push({f:'js/Int64.js', n: 'int64_js', j:1});
-    jsl.push({f:'js/zip64.js', n: 'zip_js', j:1});
-    jsl.push({f:'js/cms.js', n: 'cms_js', j:1});
-    jsl.push({f:'js/analytics.js', n: 'analytics_js', j:1});
+	jsl.push({f:'js/fm.js', n: 'fm_js', j:1,w:12});
+	jsl.push({f:'js/filetypes.js', n: 'filetypes_js', j:1});
+	jsl.push({f:'js/miniui.js', n: 'miniui_js', j:1});
+	if (is_extension)
+	{
+		jsl.push({f:'js/dcraw.js', n: 'dcraw_js', j:1});
+	}
+	/* better download */
+	jsl.push({f:'js/xhr.js', n: 'xhr_js', j:1});
+	jsl.push({f:'js/events.js', n: 'events', j:1,w:4});
+	jsl.push({f:'js/queue.js', n: 'queue', j:1,w:4});
+	jsl.push({f:'js/downloadChrome.js', n: 'dl_chrome', j:1,w:3});
+	if (is_chrome_firefox && parseInt(Services.appinfo.version) > 27)
+	{
+		is_chrome_firefox |= 4;
+		jsl.push({f:'js/downloadFirefox.js', n: 'dl_firefox', j:1,w:3});
+	}
+	else
+	{
+		jsl.push({f:'js/downloadMemory.js', n: 'dl_memory', j:1,w:3});
+		jsl.push({f:'js/downloadFlash.js', n: 'dl_flash', j:1,w:3});
+	}
+	jsl.push({f:'js/downloader.js', n: 'dl_downloader', j:1,w:3});
+	jsl.push({f:'js/download2.js', n: 'dl_js', j:1,w:3});
+	jsl.push({f:'js/upload2.js', n: 'upload_js', j:1,w:2});
+	/* end better download */
+	jsl.push({f:'index.js', n: 'index', j:1,w:4});
+	jsl.push({f:'html/start.html', n: 'start', j:0});
+	jsl.push({f:'html/megainfo.html', n: 'megainfo', j:0});
+	jsl.push({f:'html/js/start.js', n: 'start_js', j:1});
+	jsl.push({f:'html/bottom2.html', n: 'bottom2',j:0});
+	jsl.push({f:'html/key.html', n: 'key', j:0});
+	jsl.push({f:'html/js/key.js', n: 'key_js', j:1});
+	jsl.push({f:'html/pro.html', n: 'pro', j:0});
+	jsl.push({f:'html/js/pro.js', n: 'pro_js', j:1});
+	jsl.push({f:'html/login.html', n: 'login', j:0});
+	jsl.push({f:'html/js/login.js', n: 'login_js', j:1});
+	jsl.push({f:'html/fm.html', n: 'fm', j:0,w:3});
+	jsl.push({f:'html/top.html', n: 'top', j:0});
+	jsl.push({f:'js/notifications.js', n: 'notifications_js', j:1});
+	jsl.push({f:'css/style.css', n: 'style_css', j:2,w:30,c:1,d:1,cache:1});
+	jsl.push({f:'js/avatar.js', n: 'avatar_js', j:1,w:3});
+	jsl.push({f:'js/countries.js', n: 'countries_js', j:1});
+	jsl.push({f:'html/dialogs.html', n: 'dialogs', j:0,w:2});
+	jsl.push({f:'html/transferwidget.html', n: 'transferwidget', j:0});
+	jsl.push({f:'js/checkboxes.js', n: 'checkboxes_js', j:1});
+	jsl.push({f:'js/Int64.js', n: 'int64_js', j:1});
+	jsl.push({f:'js/zip64.js', n: 'zip_js', j:1});
+	jsl.push({f:'js/cms.js', n: 'cms_js', j:1});
+	jsl.push({f:'js/analytics.js', n: 'analytics_js', j:1});
 
-    // only used on beta
-    if(onBetaW) {
-        jsl.push({f: 'js/betacrashes.js', n: 'betacrashes_js', j: 1});
-    }
+	// only used on beta
+	if(onBetaW) {
+		jsl.push({f: 'js/betacrashes.js', n: 'betacrashes_js', j: 1});
+	}
 
 //        jsl.push({f:'html/register.html', n: 'register', j:0});
 //        jsl.push({f:'html/js/register.js', n: 'register_js', j:1});
 
-    var jsl2 =
-    {
-        'about': {f:'html/about.html', n: 'about', j:0},
-        'blog': {f:'html/blog.html', n: 'blog', j:0},
-        'blog_js': {f:'html/js/blog.js', n: 'blog_js', j:1},
-        'blogarticle': {f:'html/blogarticle.html', n: 'blogarticle', j:0},
-        'blogarticle_js': {f:'html/js/blogarticle.js', n: 'blogarticle_js', j:1},
-        'register': {f:'html/register.html', n: 'register', j:0},
-        'register_js': {f:'html/js/register.js', n: 'register_js', j:1},
-        'resellers': {f:'html/resellers.html', n: 'resellers', j:0},
-        'download': {f:'html/download.html', n: 'download', j:0},
-        'download_js': {f:'html/js/download.js', n: 'download_js', j:1},
-        'copyright': {f:'html/copyright.html', n: 'copyright', j:0},
-        'copyrightnotice': {f:'html/copyrightnotice.html', n: 'copyrightnotice', j:0},
-        'copyrightnotice_js': {f:'html/js/copyrightnotice.js', n: 'copyrightnotice_js', j:1},
-        'privacy': {f:'html/privacy.html', n: 'privacy', j:0},
-        'terms': {f:'html/terms.html', n: 'terms', j:0},
-        'backup': {f:'html/backup.html', n: 'backup', j:0},
-        'backup_js': {f:'html/js/backup.js', n: 'backup_js', j:1},
-        'reset': {f:'html/reset.html', n: 'reset', j:0},
-        'reset_js': {f:'html/js/reset.js', n: 'reset_js', j:1},
-        'filesaver': {f:'js/filesaver.js', n: 'filesaver', j:1},
-        'recovery': {f:'html/recovery.html', n: 'recovery', j:0},
-        'recovery_js': {f:'html/js/recovery.js', n: 'recovery_js', j:1},
-        'credits': {f:'html/credits.html', n: 'credits', j:0},
-        'takedown': {f:'html/takedown.html', n: 'takedown', j:0},
-        'dev': {f:'html/dev.html', n: 'dev', j:0},
-        'arkanoid_js': {f:'js/arkanoid.js', n: 'arkanoid_js', j:1},
-        'dev_js': {f:'html/js/dev.js', n: 'dev_js', j:1},
-        'sdkterms': {f:'html/sdkterms.html', n: 'sdkterms', j:0},
-        'help_js': {f:'html/js/help.js', n: 'help_js', j:1},
-        'firefox': {f:'html/firefox.html', n: 'firefox', j:0},
-        'sync': {f:'html/sync.html', n: 'sync', j:0},
-        'sync_js': {f:'html/js/sync.js', n: 'sync_js', j:1},
-        'mobile': {f:'html/mobile.html', n: 'mobile', j:0},
-        'affiliates': {f:'html/affiliates.html', n: 'affiliates', j:0},
-        'affiliate_js': {f:'html/js/affiliate.js', n: 'affiliate_js', j:0},
-        'affiliateterms': {f:'html/affiliateterms.html', n: 'affiliateterms', j:0},
-        'affiliatesignup': {f:'html/affiliatesignup.html', n: 'affiliatesignup', j:0},
-        'affiliatesignup_js': {f:'html/js/affiliatesignup.js', n: 'affiliatesignup_js', j:1},
-        'affiliatemember': {f:'html/affiliatemember.html', n: 'affiliatemember', j:0},
-        'affiliatemember_js': {f:'html/js/affiliatemember.js', n: 'affiliatemember_js', j:1},
-        'contact': {f:'html/contact.html', n: 'contact', j:0},
-        'privacycompany': {f:'html/privacycompany.html', n: 'privacycompany', j:0},
-        'chrome': {f:'html/chrome.html', n: 'chrome', j:0},
-        'zxcvbn_js': {f:'js/zxcvbn.js', n: 'zxcvbn_js', j:1}
-    };
+	var jsl2 =
+	{
+		'about': {f:'html/about.html', n: 'about', j:0},
+		'blog': {f:'html/blog.html', n: 'blog', j:0},
+		'blog_js': {f:'html/js/blog.js', n: 'blog_js', j:1},
+		'blogarticle': {f:'html/blogarticle.html', n: 'blogarticle', j:0},
+		'blogarticle_js': {f:'html/js/blogarticle.js', n: 'blogarticle_js', j:1},
+		'register': {f:'html/register.html', n: 'register', j:0},
+		'register_js': {f:'html/js/register.js', n: 'register_js', j:1},
+		'resellers': {f:'html/resellers.html', n: 'resellers', j:0},
+		'download': {f:'html/download.html', n: 'download', j:0},
+		'download_js': {f:'html/js/download.js', n: 'download_js', j:1},
+		'copyright': {f:'html/copyright.html', n: 'copyright', j:0},
+		'copyrightnotice': {f:'html/copyrightnotice.html', n: 'copyrightnotice', j:0},
+		'copyrightnotice_js': {f:'html/js/copyrightnotice.js', n: 'copyrightnotice_js', j:1},
+		'privacy': {f:'html/privacy.html', n: 'privacy', j:0},
+		'terms': {f:'html/terms.html', n: 'terms', j:0},
+		'backup': {f:'html/backup.html', n: 'backup', j:0},
+		'backup_js': {f:'html/js/backup.js', n: 'backup_js', j:1},
+		'reset': {f:'html/reset.html', n: 'reset', j:0},
+		'reset_js': {f:'html/js/reset.js', n: 'reset_js', j:1},
+		'filesaver': {f:'js/filesaver.js', n: 'filesaver', j:1},
+		'recovery': {f:'html/recovery.html', n: 'recovery', j:0},
+		'recovery_js': {f:'html/js/recovery.js', n: 'recovery_js', j:1},
+		'credits': {f:'html/credits.html', n: 'credits', j:0},
+		'takedown': {f:'html/takedown.html', n: 'takedown', j:0},
+		'dev': {f:'html/dev.html', n: 'dev', j:0},
+		'arkanoid_js': {f:'js/arkanoid.js', n: 'arkanoid_js', j:1},
+		'dev_js': {f:'html/js/dev.js', n: 'dev_js', j:1},
+		'sdkterms': {f:'html/sdkterms.html', n: 'sdkterms', j:0},
+		'help_js': {f:'html/js/help.js', n: 'help_js', j:1},
+		'firefox': {f:'html/firefox.html', n: 'firefox', j:0},
+		'sync': {f:'html/sync.html', n: 'sync', j:0},
+		'sync_js': {f:'html/js/sync.js', n: 'sync_js', j:1},
+		'mobile': {f:'html/mobile.html', n: 'mobile', j:0},
+		'affiliates': {f:'html/affiliates.html', n: 'affiliates', j:0},
+		'affiliate_js': {f:'html/js/affiliate.js', n: 'affiliate_js', j:0},
+		'affiliateterms': {f:'html/affiliateterms.html', n: 'affiliateterms', j:0},
+		'affiliatesignup': {f:'html/affiliatesignup.html', n: 'affiliatesignup', j:0},
+		'affiliatesignup_js': {f:'html/js/affiliatesignup.js', n: 'affiliatesignup_js', j:1},
+		'affiliatemember': {f:'html/affiliatemember.html', n: 'affiliatemember', j:0},
+		'affiliatemember_js': {f:'html/js/affiliatemember.js', n: 'affiliatemember_js', j:1},
+		'contact': {f:'html/contact.html', n: 'contact', j:0},
+		'privacycompany': {f:'html/privacycompany.html', n: 'privacycompany', j:0},
+		'chrome': {f:'html/chrome.html', n: 'chrome', j:0},
+		'zxcvbn_js': {f:'js/zxcvbn.js', n: 'zxcvbn_js', j:1}
+	};
+	
     var subpages =
     {
         'about': ['about'],
@@ -1243,7 +1254,20 @@ else if (!b_u)
                     css.textContent = jsl[i].text.replace(/\.\.\//g,staticpath).replace(new RegExp( "\\/en\\/", "g"),'/' + lang + '/');
                 }
             }
-            else if (jsl[i].j == 3) l = !jj && l || JSON.parse(jsl[i].text);
+            else if (jsl[i].j == 3) {
+                try {
+                    l = !jj && l || JSON.parse(jsl[i].text);
+                } catch(ex) {
+                    console.error(ex);
+                    if (lang !== 'en') {
+                        localStorage.lang = 'en';
+                        setTimeout(function() {
+                            document.location.reload();
+                        }, 300);
+                    }
+                    throw new Error('Error parsing language file '+lang+'.json');
+                }
+            }
             else if (jsl[i].j == 0) pages[jsl[i].n] = jsl[i].text;
         }
         if (window.URL)

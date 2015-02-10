@@ -1639,14 +1639,14 @@ function addContactUI()
     // List of elements related to pending contacts
     //
     // Received requests:
-    // empty grid: empty-contact-requests (have button on it, .empty-contact-requests-button with label 'View sent requests')
+    // empty grid: fm-empty-contacts (have button on it, .empty-contact-requests-button with label 'View sent requests')
     // full grid: contact-requests-grid (have action buttons,
     //  'Accept': .contact-request-button.accept
     //  'Delete': .contact-request-button.delete
     //  'Ignore': .contact-request-button.ignore
     //
     // Sent requests:
-    // empty grid: empty-sent-requests (have button on it, .empty-sent-request-button with label 'View received requests')
+    // empty grid: fm-empty-contacts (have button on it, .empty-sent-request-button with label 'View received requests')
     // full grid: sent-requests-grid (have action buttons,
     //  'ReInvite': .contact-request-button.reinvite
     //  'Cancel Reques': .contact-request-button.cancel
@@ -2534,8 +2534,8 @@ function docreatefolderUI(e)
  * @returns {undefined}
  */
 function fmtopUI() {
-    $('.fm-clearbin-button,.fm-add-user,.fm-new-folder,.fm-file-upload,\n\
-        .fm-folder-upload,.fm-contact-requests,.fm-received-requests').addClass('hidden');
+    $('.fm-clearbin-button,.fm-add-user,.fm-new-folder,.fm-file-upload,.fm-folder-upload').addClass('hidden');
+    $('.fm-contact-requests,.fm-received-requests').removeClass('active');
     $('.fm-new-folder').removeClass('filled-input');
 
     if (RootbyId(M.currentdirid) === M.RubbishID) {
@@ -5775,10 +5775,16 @@ function sectionUIopen(id) {
 
     if (id !== 'opc') {
         $('.sent-requests-grid').addClass('hidden');
+        
+        // this's button in left panel of contacts tab
+        $('.fm-recived-requests').removeClass('active');
     }
 
     if (id !== 'ipc') {
         $('.contact-requests-grid').addClass('hidden');
+        
+        // this's button in left panel of contacts tab
+        $('.fm-contact-requests').removeClass('active');
     }
 
     if (id !== 'shared-with-me') {

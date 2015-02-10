@@ -545,10 +545,9 @@ function MegaData()
             // If at least one new item is added then ajust grid
             if (drawn) {
 				$('.fm-empty-contacts').addClass('hidden');
-                // Hide sent grid
+                
+                // hide/show sent/received grid
                 $('.sent-requests-grid').addClass('hidden');
-
-                // Show received grid
                 $('.contact-requests-grid').removeClass('hidden');
 
                 initIpcGridScrolling();
@@ -628,10 +627,9 @@ function MegaData()
             
             if (drawn) {
 				$('.fm-empty-contacts').addClass('hidden');
-                // Hide received grids
-                $('.contact-requests-grid').addClass('hidden');
 
-                // Show sent grids
+                // hide/show received/sent grids
+                $('.contact-requests-grid').addClass('hidden');
                 $('.sent-requests-grid').removeClass('hidden');
 
                 initOpcGridScrolling();
@@ -1915,17 +1913,9 @@ function MegaData()
         } else if (this.currentdirid && this.currentdirid === 'opc') {
             DEBUG('Render Path OPC');
             $('.fm-breadcrumbs-block').html(contactBreadcrumb + html);
-//            $('.fm-breadcrumbs.received-requests').remove();
-//            $('.fm-breadcrumbs.contacts')
-//                .addClass('has-next-button')
-//                .after(sentBreadcrumb);
         } else if (this.currentdirid && this.currentdirid === 'ipc') {
             DEBUG('Render Path IPC');
             $('.fm-breadcrumbs-block').html(contactBreadcrumb + html);
-//            $('.fm-breadcrumbs.sent-requests').remove();
-//            $('.fm-breadcrumbs.contacts')
-//                .addClass('has-next-button')
-//                .after(receivedBreadcrumb);
         } else {
             $('.search-files-result').addClass('hidden');
             $('.fm-breadcrumbs-block').html(html);
@@ -1958,6 +1948,10 @@ function MegaData()
             } else if (M.currentdirid && M.currentdirid.substr(0, 7) === 'search/') {
                 return false;
             }
+            
+            // Remove focus from view ipc/opc buttons
+            $('.fm-received-requests').removeClass('active');
+            $('.fm-contact-requests').removeClass('active');
             M.openFolder($(this).attr('id').replace('path_', ''));
         });
 
@@ -4986,7 +4980,7 @@ function processIPC(ipc) {
             delete M.ipc[ipc[i].p];
             if ((Object.keys(M.ipc).length === 0) && (M.currentdirid === 'ipc')) {
                 $('.contact-requests-grid').addClass('hidden');
-                $('.empty-contact-requests').removeClass('hidden');
+                $('.fm-empty-contacts').removeClass('hidden');
             }
         }
     }
@@ -5089,19 +5083,12 @@ function processUPCI(ap) {
     DEBUG('processUPCI');
     for (var i in ap) {
         if (ap[i].s) {
-//            if (ap[i].s === 1) { // Ignore received pending request
-//                M.addIPC(ap[i], 'ignoreDB');
-//            } else if (ap[i].s === 2) { // Accept received pending request
-//                delete M.ipc[ap[i].p];
-//            } else if (ap[i].s === 3) { // Deny received pending request
-//                M.addIPC(ap[i], 'ignoreDB');
-//            }
             delete M.ipc[ap[i].p];
             M.delIPC(ap[i].p);// Remove from localStorage
             $('#ipc_' + ap[i].p).remove();
             if ((Object.keys(M.ipc).length === 0) && (M.currentdirid === 'ipc')) {
                 $('.contact-requests-grid').addClass('hidden');
-                $('.empty-contact-requests').removeClass('hidden');
+                $('.fm-empty-contacts').removeClass('hidden');
             }
         }
     }

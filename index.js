@@ -584,18 +584,26 @@ function init_page()
 	{
 		parsepage(pages['about']);
 		$('.team-person-block').removeClass('first');
-		var html ='';
-		var a=4;
-		$('.team-person-block').sort( function(){return (Math.round(Math.random())-0.5)}).each(function(i,e)
-		{
+		var html = '';
+		var a = 4;
+        
+		$('.team-person-block').sort(function() {
+            return (Math.round(Math.random()) - 0.5);
+        })
+        .each(function(i, element)
+		{            
 			if (a == 4)
 			{
-				html += e.outerHTML.replace('team-person-block','team-person-block first');
+				html += element.outerHTML.replace('team-person-block', 'team-person-block first');
 				a=0;
 			}
-			else html += e.outerHTML;
+			else 
+            {  
+                html += element.outerHTML;
+            }
 			a++;
 		});
+                
 		$('#emailp').html($('#emailp').text().replace('jobs@mega.co.nz','<a href="mailto:jobs@mega.co.nz">jobs@mega.co.nz</a>'));
 		$('.new-bottom-pages.about').html(html + '<div class="clear"></div>');
 		mainScroll();
@@ -988,10 +996,15 @@ function mLogout()
 		}
 		else
 		{
-			u_logout(1);
-			document.location.reload();
+            // Use the 'Session Management Logout' API call to kill the current session
+            api_req({ 'a': 'sml' }, { callback: function(result)
+            {
+                // After the API call, clear other data and reload page
+                u_logout(true);
+                document.location.reload(); 
+            }});
 		}
-	}
+	};
 	var cnt=0;
 	if (M.c[M.RootID] && u_type === 0) for (var i in M.c[M.RootID]) cnt++;
 	if (u_type === 0 && cnt > 0)

@@ -655,6 +655,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
 
         // Substitute email into language string
         var msg = l[5889].replace('[X]', self.megaChat.getContactNameFromJid(eventData.peer));
+        msg += " Call duration: [X].".replace("[X]", secToDuration(self.megaChat._currentCallCounter));
 
         if(eventData.reason == "security" || eventData.reason == "initiate-timeout") {
             self.appendDomMessage(
@@ -952,7 +953,12 @@ ChatRoom.prototype._retrieveTurnServerFromLoadBalancer = function() {
 
     var $promise = new MegaPromise();
 
-    $.get("https://" + self.megaChat.options.loadbalancerService + "/?service=turn")
+    var anonId = "";
+
+    if(self.megaChat.rtc && self.megaChat.rtc.ownAnonId) {
+        anonId = self.megaChat.rtc.ownAnonId;
+    }
+    $.get("https://" + self.megaChat.options.loadbalancerService + "/?service=turn&anonid=" + anonId)
         .done(function(r) {
             if(r.turn && r.turn.length > 0) {
                 var servers = [];

@@ -2150,12 +2150,10 @@ function initContextUI()
     });
 
     $(c + '.sh4r1ng-item').unbind('click');
-    $(c + '.sh4r1ng-item').bind('click', function()
-    {
-        if (u_type === 0)
+    $(c + '.sh4r1ng-item').bind('click', function() {
+        if (u_type === 0) {
             ephemeralDialog(l[1006]);
-        else
-        {
+        } else {
             $.dialog = 'share';// this is used like identifier when key with key code 27 is pressed
             $.hideContextMenu();
 
@@ -6307,34 +6305,30 @@ function handleDialogContent(s, m, c, n, t, i)
 }
 
 /**
- * Taking care about dialog button state, and scroll
+ * Taking care about share dialog button 'Share' enabled/disabled and scroll
  * @returns {undefined}
  *
  */
-function shareDialogContentCheck()
-{
+function shareDialogContentCheck() {
     var dc = '.share-dialog';
+    
     // Disable/enable button
     var $btn = $('.fm-dialog-button .dialog-share-button');
 
     var num = $(dc + ' .share-dialog-contacts .share-dialog-contact-bl').length;
-    if (num)
-    {
+    if (num) {
         $btn.removeClass('disabled');
         $(dc + ' .share-dialog-img').addClass('hidden');
         $(dc + ' .share-dialog-contacts').removeClass('hidden');
         handleDialogScroll(num, dc);
-    }
-    else
-    {
+    } else {
         $btn.addClass('disabled');
         $(dc + ' .share-dialog-img').removeClass('hidden');
         $(dc + ' .share-dialog-contacts').addClass('hidden');
     }
 }
 
-function addShareDialogContactToContent(type, id, av_color, av, name, permClass, permText)
-{
+function addShareDialogContactToContent(type, id, av_color, av, name, permClass, permText) {
     var html = '<div class="share-dialog-contact-bl ' + type + '" id="sdcbl_' + id + '">\n\
 					<div class="nw-contact-avatar color' + av_color + '">' + av + '</div>\n\
 					<div class="fm-chat-user-info"><div class="fm-chat-user">' + name + '</div></div>\n\
@@ -6347,24 +6341,21 @@ function addShareDialogContactToContent(type, id, av_color, av, name, permClass,
     return html + htmlEnd;
 }
 
-function fillShareDialogWithContent()
-{
+function fillShareDialogWithContent() {
     var selectedNodeHandle = $.selected[0];
-    $.sharedTokens = [];    // Holds items currently visible in share folder content (above multi-input)
+    $.sharedTokens = [];// Holds items currently visible in share folder content (above multi-input)
     
     var shares = M.d[selectedNodeHandle].shares;
 
     // List users that are already use item
-    for (var userHandle in shares)
-    {
+    for (var userHandle in shares) {
         if (shares.hasOwnProperty(userHandle)) {
             
             // Don't add removed contacts from contact list
             // Additional check of 'c' grants that only active 
             // contacts will be addded, this prevents contact
             //  duplication in share dialog contact list
-            if (M.u[userHandle] && M.u[userHandle].c && M.u[userHandle].c === 1 )
-            {
+            if (M.u[userHandle] && M.u[userHandle].c && M.u[userHandle].c === 1) {
                 var user = M.u[userHandle];
                 var email = user.m;
                 var name = (user.name && user.name.length > 1) ? user.name : user.m;
@@ -6377,8 +6368,7 @@ function fillShareDialogWithContent()
     
     for (var pendingShareHandle in M.ps) {
         
-        if (M.ps.hasOwnProperty(pendingShareHandle))
-        {
+        if (M.ps.hasOwnProperty(pendingShareHandle)) {
             var pendingShare = M.ps[pendingShareHandle];
             
             // Is the pending share related to the selected node
@@ -6452,11 +6442,11 @@ function handleDialogScroll(num, dc)
     }
 }
 
-function handleShareDialogContent()
-{
+function handleShareDialogContent() {
 
     fillShareDialogWithContent();
 
+    // Taking care about share dialog button 'Share' and scroll
     shareDialogContentCheck();
 
     var dc = '.share-dialog';
@@ -6514,20 +6504,18 @@ function checkIfContactExists(email) {
     return userIsAlreadyContact;
 }
 
-function initShareDialog()
-{
-    if (!u_type)
+function initShareDialog() {
+    if (!u_type) {
         return; // not for ephemeral
+    }
 
     $.shareTokens = [];
-    function errorMsg(msg)
-    {
+    function errorMsg(msg) {
         var $d = $('.share-dialog');
         var $s = $('.share-dialog .multiple-input-warning span');
         $s.text(msg);
         $d.addClass('error');
-        setTimeout(function()
-        {
+        setTimeout(function() {
             $d.removeClass('error');
         }, 3000);
     }
@@ -6661,8 +6649,7 @@ function initShareDialog()
      * @param {array} perm, permission class and text
      * @returns {undefined}
      */
-    determineContactParams = function(item, perm)
-    {
+    determineContactParams = function(item, perm) {
         var email = item;// email address
         var id = '';
         /*for (var i in M.u)
@@ -6722,19 +6709,15 @@ function initShareDialog()
     });
 
     $('.share-dialog .dialog-share-button').unbind('click');
-    $('.share-dialog .dialog-share-button').bind('click', function()
-    {
+    $('.share-dialog .dialog-share-button').bind('click', function() {
         // If share button is NOT disabled
-        if (!$(this).is('.disabled'))
-        {
+        if (!$(this).is('.disabled')) {
             // If there's a contacts in multi-input add them to top
             loadingDialog.show();
             var $items = $('.share-dialog .token-input-list-mega .token-input-token-mega');
 
-            if ($items.length)
-            {
-                $.each($items, function(ind, val)
-                {
+            if ($items.length) {
+                $.each($items, function(ind, val) {
                     determineContactParams($(val).contents().eq(1).text(), checkMultiInputPermission($('.share-dialog .permissions-icon')));
                 });
             }
@@ -6745,29 +6728,32 @@ function initShareDialog()
             var perm, aPerm;
             var $items = $('.share-dialog-contact-bl');// Get all items available in dialog content block (avatar, name/email, permission)
 
-            $.each($items, function(ind, val)
-            {
+            $.each($items, function(ind, val) {
                 id = $(val).attr('id').replace('sdcbl_', '');// extract id of contact
-                if (id === '')// ToDo: This should not be happening, expand this to make sure all contacts are with id and exist in M.u
+                if (id === '') {// ToDo: This should not be happening, expand this to make sure all contacts are with id and exist in M.u
                     id = $(val).find('.fm-chat-user').text();
+                }
 
                 aPerm = $(val).find('.share-dialog-permissions');
 
-                if ($(aPerm).is('.read-and-write'))
+                if ($(aPerm).is('.read-and-write')) {
                     perm = 1;
-                else if ($(aPerm).is('.full-access'))
+                } else if ($(aPerm).is('.full-access')) {
                     perm = 2;
-                else
+                } else {
                     perm = 0;
-
-                if (!s || !s[id] || s[id].r !== perm)
+                }
+                
+                if (!s || !s[id] || s[id].r !== perm) {
                     targets.push({u: id, r: perm});
+                }
             });
 
             closeDialog();
-            if (targets.length > 0)
-            {
-                doshare($.selected[0], targets, true, 'Message');// ToDo: Update Message with appropriate field once UI html is available
+            if (targets.length > 0) {
+                
+                // ToDo: Update Message with appropriate field once UI html is available
+                doshare($.selected[0], targets, true, 'Message');
             }
 
             loadingDialog.hide();
@@ -7045,8 +7031,7 @@ function clearScrollPanel(from)
     }    
 }
 
-function closeDialog()
-{
+function closeDialog() {
     if (d) console.log('closeDialog', $.dialog);
     if($('.fm-dialog.incoming-call-dialog').is(':visible') === true) {
         // managing dialogs should be done properly in the future, so that we won't need ^^ bad stuff like this one

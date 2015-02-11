@@ -2437,9 +2437,20 @@ function MegaData()
      * @returns {undefined}
      */
     this.addUser = function(u, ignoreDB) {
-        this.u[u.u] = u;
-        if (typeof mDB === 'object' && !ignoreDB && !pfkey)
-            mDBadd('u', clone(u));
+        var userId = '';
+        if (u && u.u) {
+            userId = u.u;
+            if (this.u[userId]) {
+                for (var key in u) {
+                    this.u[userId].key = u.key;
+                }
+            } else {
+                this.u[u.u] = u;
+            }
+            if (typeof mDB === 'object' && !ignoreDB && !pfkey) {
+                mDBadd('u', clone(u));
+            }
+        }
     };
 
     // Update M.opc and related localStorage
@@ -2850,24 +2861,25 @@ function MegaData()
         }
     };
 
-    this.nodeShare = function(h, s, ignoreDB)
-    {
-        if (this.d[h])
-        {
-            if (typeof this.d[h].shares == 'undefined')
+    this.nodeShare = function(h, s, ignoreDB) {
+        if (this.d[h]) {
+            if (typeof this.d[h].shares == 'undefined') {
                 this.d[h].shares = [];
+            }
             this.d[h].shares[s.u] = s;
-            if (typeof mDB === 'object')
-            {
+            if (typeof mDB === 'object') {
                 s['h_u'] = h + '_' + s.u;
-                if (!ignoreDB && !pfkey)
+                if (!ignoreDB && !pfkey) {
                     mDBadd('s', clone(s));
+                }
             }
             sharedUInode(h, 1);
-            if ($.dialog == 'sharing' && $.selected && $.selected[0] == h)
+            if ($.dialog == 'sharing' && $.selected && $.selected[0] == h) {
                 shareDialog();
-            if (typeof mDB === 'object' && !pfkey)
+            }
+            if (typeof mDB === 'object' && !pfkey) {
                 mDBadd('ok', {h: h, k: a32_to_base64(encrypt_key(u_k_aes, u_sharekeys[h])), ha: crypto_handleauth(h)});
+            }
         }
     };
 
@@ -4745,8 +4757,7 @@ function getuid(email)
     return false;
 }
 
-function doshare(h, targets, dontShowShareDialog)
-{
+function doshare(h, targets, dontShowShareDialog) {
     var $promise = new $.Deferred();
 
     nodeids = fm_getnodes(h);
@@ -4756,32 +4767,27 @@ function doshare(h, targets, dontShowShareDialog)
         {
             t: targets,
             h: h,
-            done: function(res, ctx)
-            {
+            done: function(res, ctx) {
                 var i;
 
-                if (res.r && res.r[0] == '0')
-                {
-                    for (i in res.u)
+                if (res.r && res.r[0] == '0') {
+                    for (i in res.u) {
                         M.addUser(res.u[i]);
+                    }
 
-                    for (i in res.r)
-                    {
-                        if (res.r[i] == 0)
-                        {
+                    for (i in res.r) {
+                        if (res.r[i] == 0) {
                             var rights = ctx.t[i].r;
                             var user = ctx.t[i].u;
 
-                            if (user.indexOf('@') >= 0)
-                            {
+                            if (user.indexOf('@') >= 0) {
                                 user = getuid(ctx.t[i].u);
                             }
 
                             // A pending share may not have a corresponding user and should not be added
                             // A pending share can also be identified by a user who is only a '0' contact
                             // level (passive)
-                            if (user != false && M.u[user].c != 0)
-                            {
+                            if (user != false && M.u[user].c != 0) {
                                 M.nodeShare(ctx.h, {h: h, r: rights, u: user, ts: Math.floor(new Date().getTime() / 1000)});
                             }
                         }
@@ -4796,9 +4802,7 @@ function doshare(h, targets, dontShowShareDialog)
                         shareDialog();
                     }
                     $promise.resolve();
-                }
-                else
-                {
+                } else {
                     $('.fm-dialog.share-dialog').removeClass('hidden');
                     loadingDialog.hide();
                     $promise.reject(res);

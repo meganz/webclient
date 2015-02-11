@@ -31,11 +31,17 @@ Strophe.Bosh.prototype._hitError = function (reqStatus) {
     } else {
         karere.forceDisconnect();
 
-        setTimeout(function() {
+        if(megaChat.karere._connectionRetryInProgress) {
+            clearTimeout(
+                megaChat.karere._connectionRetryInProgress
+            );
+        }
+        megaChat.karere._connectionRetryInProgress = setTimeout(function() {
             if(karere.getConnectionState() != Karere.CONNECTION_STATE.CONNECTED && karere.getConnectionState() != Karere.CONNECTION_STATE.CONNECTING) {
                 karere.reconnect();
             }
-        }, karere._connectionRetries * 1500)
+        }, karere._connectionRetries * karere.options.reconnectDelay);
+
     }
 };
 
@@ -205,6 +211,9 @@ var Karere = function(user_options) {
 
     // cleanup after disconnecting
     self.bind("onDisconnected", function() {
+        if(self._$connectingPromise && self._$connectingPromise.state() == 'pending') {
+            self._$connectingPromise.reject();
+        }
         self._presenceCache = {};
         self._presenceBareCache = {};
 
@@ -310,7 +319,7 @@ Karere.DEFAULTS = {
      * Connection retry delay in ms (reconnection will be triggered with a timeout calculated as:
      * self._connectionRetries * this value)
      */
-    reconnectDelay: 2550,
+    reconnectDelay: 500,
 
 
     /**
@@ -513,11 +522,13 @@ makeMetaAware(Karere);
                             $promise.reject(status);
                         }
                         self.trigger('onConnfail');
+                        self.trigger('onConnectionClosed');
                     } else if (status == Karere.CONNECTION_STATE.AUTHFAIL) {
                         self.logger.warn(self.getNickname(), 'Karere failed to connect - Authentication issue.');
 
                         $promise.reject(status);
                         self.trigger('onAuthfail');
+                        self.trigger('onConnectionClosed');
                     } else if (status == Karere.CONNECTION_STATE.DISCONNECTING) {
                         self.logger.warn(self.getNickname(), 'Karere is disconnecting.');
 
@@ -533,6 +544,7 @@ makeMetaAware(Karere);
                             $promise.reject(status);
                         }
                         self.trigger('onDisconnected');
+                        self.trigger('onConnectionClosed');
                     } else if (status == Karere.CONNECTION_STATE.CONNECTED) {
                         self.logger.info(self.getNickname(), 'Karere is connected.');
 
@@ -695,7 +707,7 @@ makeMetaAware(Karere);
         var self = this;
         self.forceDisconnect();
         self._jid = self._jid.split("/")[0] + "/" + self._generateNewResource();
-        self.reconnect();
+        return self.reconnect();
     };
 
     /**
@@ -706,12 +718,20 @@ makeMetaAware(Karere);
     Karere.prototype.reconnect = function() {
         var self = this;
 
+        if(self._myPresence === Karere.PRESENCE.OFFLINE) {
+            self.logger.error("Will halt the reconnect operation, my presence is set to 'offline'.");
+            return MegaPromise.reject(Karere.CONNECTION_STATE.DISCONNTED);
+        }
         if(!self._jid || !self._password) {
             throw new Error("Missing jid or password.");
         }
 
         if(self.getConnectionState() == Karere.CONNECTION_STATE.DISCONNECTING) {
             self.forceDisconnect();
+
+            return MegaPromise.reject(Karere.CONNECTION_STATE.DISCONNTED);
+        } else if(self.getConnectionState() == Karere.CONNECTION_STATE.CONNECTING && self._$connectingPromise) {
+            return self._$connectingPromise;
         } else if(self.getConnectionState() != Karere.CONNECTION_STATE.DISCONNECTED && self.getConnectionState() != Karere.CONNECTION_STATE.AUTHFAIL) {
             throw new Error("Invalid connection state. Karere should be DISCONNECTED, before calling .reconnect.");
         }
@@ -1544,6 +1564,8 @@ makeMetaAware(Karere);
         delay = delay ? parseFloat(delay) : undefined;
 
         var self = this;
+
+        self._myPresence = presence;
 
         if(self.getConnectionState() == Karere.CONNECTION_STATE.CONNECTED) {
             var msg = $pres({id: self.generateMessageId("presence", status)})

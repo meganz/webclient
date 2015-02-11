@@ -1944,7 +1944,7 @@ function fmremove() {
                 avatar = '<img src="' + av_meta.avatarUrl + '">';
 
             $('#msgDialog .fm-del-contact-avatar').attr('class', 'fm-del-contact-avatar two-letters ' + htmlentities(user.h) + ' color' + av_color)
-            $('#msgDialog .fm-del-contact-avatar span').html(avatar)
+            $('#msgDialog .fm-del-contact-avatar span').html(avatar);
         }
     } else if (RootbyId($.selected[0]) === M.RubbishID) {
         msgDialog('clear-bin', l[1003], l[76].replace('[X]', (filecnt + foldercnt)) + ' ' + l[77], l[1007], function(e) {
@@ -6329,11 +6329,11 @@ function shareDialogContentCheck() {
 }
 
 function addShareDialogContactToContent(type, id, av_color, av, name, permClass, permText) {
-    var html = '<div class="share-dialog-contact-bl ' + type + '" id="sdcbl_' + id + '">\n\
-					<div class="nw-contact-avatar color' + av_color + '">' + av + '</div>\n\
-					<div class="fm-chat-user-info"><div class="fm-chat-user">' + name + '</div></div>\n\
-					<div class="share-dialog-permissions ' + permClass + '">\n\
-						<span></span>' + permText + '\n\
+    var html = '<div class="share-dialog-contact-bl ' + htmlentities(type) + '" id="sdcbl_' + htmlentities(id) + '">\n\
+					<div class="nw-contact-avatar color' + htmlentities(av_color) + '">' + htmlentities(av) + '</div>\n\
+					<div class="fm-chat-user-info"><div class="fm-chat-user">' + htmlentities(name) + '</div></div>\n\
+					<div class="share-dialog-permissions ' + htmlentities(permClass) + '">\n\
+						<span></span>' + htmlentities(permText) + '\n\
 					</div>';
 
     var htmlEnd = '<div class="share-dialog-remove-button"></div><div class="clear"></div></div>';
@@ -6392,30 +6392,25 @@ function fillShareDialogWithContent() {
  * @param {Number} shareRights
  * @param {String} userHandle Optional
  */
-function generateShareDialogRow(displayNameOrEmail, email, shareRights, userHandle)
-{
+function generateShareDialogRow(displayNameOrEmail, email, shareRights, userHandle) {
     var av_color = displayNameOrEmail.charCodeAt(0) % 6 + displayNameOrEmail.charCodeAt(1) % 6;
     var av = (avatars[userHandle] && avatars[userHandle].url) ? '<img src="' + avatars[userHandle].url + '">' : (displayNameOrEmail.charAt(0) + displayNameOrEmail.charAt(1));
     var perm = '';
     var permissionLevel = 0;
     
-    if (typeof shareRights != 'undefined')
+    if (typeof shareRights != 'undefined') {
         permissionLevel = shareRights;
-
-    // Permission level
-    switch (permissionLevel)
-    {
-        case 1: // Read and write
-            perm = ['read-and-write', l[56]];
-            break;
-        case 2: // Full Access
-            perm = ['full-access', l[57]];
-            break;
-        default: // 0 or any === read only
-            perm = ['read-only', l[55]];
-            break;
     }
 
+    // Permission level
+    if (permissionLevel === 1) {
+        perm = ['read-and-write', l[56]];
+    } else if (permissionLevel === 2) {
+        perm = ['full-access', l[57]];
+    } else {
+        perm = ['read-only', l[55]];
+    }
+    
     // Add contact
     $.sharedTokens.push(email);
     
@@ -6761,8 +6756,7 @@ function initShareDialog() {
     });
 
     $(document).off('click', '.share-dialog-remove-button');
-    $(document).on('click', '.share-dialog-remove-button', function(e)
-    {
+    $(document).on('click', '.share-dialog-remove-button', function() {
         var $this = $(this);
 
         var handleOrEmail = $this.parent().attr('id').replace('sdcbl_', '');
@@ -6771,19 +6765,15 @@ function initShareDialog() {
             .remove();
 
         var selectedNodeHandle = $.selected[0];
-        if (handleOrEmail !== '')
-        {
+        if (handleOrEmail !== '') {
             // Due to pending shares, the id could be an email instead of a handle
             var userEmail = handleOrEmail;
             
             // If it was a user handle, the share must be a full share
             if (M.u[handleOrEmail]) {
-                
                 userEmail = M.u[handleOrEmail].m;
                 M.delnodeShare( selectedNodeHandle, handleOrEmail);
-            }
-            else
-            {
+            } else {
                 // Pending share 
                 // Work out pendingContactId
                 var pendingContactId = M.findOutgoingPendingContactIdByEmail(userEmail);

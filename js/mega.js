@@ -912,19 +912,23 @@ function MegaData()
             }
 
             if (this.currentdirid === 'shares') {
-                var cs = this.contactstatus(this.v[i].h);
-                var contains = fm_contains(cs.files, cs.folders);
+                var cs = this.contactstatus(this.v[i].h),
+                    contains = fm_contains(cs.files, cs.folders);
+                    u_h = this.v[i].p,
+                    user = M.d[u_h],
+                    userName = (user.name && user.name.length > 1) ? user.name : user.email,
+                    av_meta = generateAvatarMeta(u_h),
+                    avatar = av_meta.shortName,
+                    av_color = av_meta.color,
+                    rights = l[55],
+                    rightsclass = ' read-only',
+                    onlinestatus = this.onlineStatusClass(megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h)));
                 if (cs.files == 0 && cs.folders == 0) {
                     contains = l[1050];
                 }
-                var u_h = this.v[i].p;
-                var user = M.d[u_h];
-                var av_meta = generateAvatarMeta(u_h);
-                var avatar = av_meta.shortName, av_color = av_meta.color;
                 if (av_meta.avatarUrl) {
                     avatar = '<img src="' + av_meta.avatarUrl + '">';
                 }
-                var rights = l[55], rightsclass = ' read-only';
                 if (M.v[i].r === 1) {
                     rights = l[56];
                     rightsclass = ' read-and-write';
@@ -932,15 +936,32 @@ function MegaData()
                     rights = l[57];
                     rightsclass = ' full-access';
                 }
-                var onlinestatus = this.onlineStatusClass(megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h)));
+                
                 if (this.viewmode === 1) {
                     t = '.shared-blocks-scrolling';
                     el = 'a';
-                    html = '<a class="file-block folder" id="' + htmlentities(this.v[i].h) + '"><span class="file-status-icon ' + star + '"></span><span class="shared-folder-access ' + rightsclass + '"></span><span class="file-icon-area"><span class="block-view-file-type folder"></span></span><span class="nw-contact-avatar ' + htmlentities(u_h) + ' color' + av_color + '">' + avatar + '</span><span class="shared-folder-info-block"><span class="shared-folder-name">' + htmlentities(this.v[i].name) + '</span><span class="shared-folder-info">by ' + htmlentities(user.name) + '</span></span></a>';
+                    html = '<a class="file-block folder" id="'
+                        + htmlentities(this.v[i].h) + '"><span class="file-status-icon '
+                        + htmlentities(star) + '"></span><span class="shared-folder-access '
+                        + htmlentities(rightsclass) + '"></span><span class="file-icon-area">\n\
+                        <span class="block-view-file-type folder"></span></span><span class="nw-contact-avatar '
+                        + htmlentities(u_h) + ' color' + htmlentities(av_color) + '">' + htmlentities(avatar)
+                        + '</span><span class="shared-folder-info-block"><span class="shared-folder-name">'
+                        + htmlentities(this.v[i].name) + '</span><span class="shared-folder-info">by '
+                        + htmlentities(userName) + '</span></span></a>';
                 } else {
                     t = '.shared-grid-view .grid-table.shared-with-me';
                     el = 'tr';
-                    html = '<tr id="' + htmlentities(this.v[i].h) + '"><td width="30"><span class="grid-status-icon ' + star + '"></span></td><td><div class="shared-folder-icon"></div><div class="shared-folder-info-block"><div class="shared-folder-name">' + htmlentities(this.v[i].name) + '</div><div class="shared-folder-info">' + contains + '</div></div> </td><td width="240"><div class="nw-contact-avatar ' + htmlentities(u_h) + ' color' + av_color + '">' + avatar + '</div><div class="fm-chat-user-info todo-star ustatus ' + htmlentities(u_h) + ' ' + onlinestatus[1] + '"><div class="todo-fm-chat-user-star"></div><div class="fm-chat-user">' + htmlentities(user.name) + '</div><div class="nw-contact-status"></div><div class="fm-chat-user-status ' + htmlentities(u_h) + '">' + onlinestatus[0] + '</div><div class="clear"></div></div></td><td width="270"><div class="shared-folder-access' + rightsclass + '">' + rights + '</div></td></tr>';
+                    html = '<tr id="' + htmlentities(this.v[i].h) + '"><td width="30"><span class="grid-status-icon ' + htmlentities(star)
+                        + '"></span></td><td><div class="shared-folder-icon"></div><div class="shared-folder-info-block"><div class="shared-folder-name">'
+                        + htmlentities(this.v[i].name) + '</div><div class="shared-folder-info">' + htmlentities(contains)
+                        + '</div></div> </td><td width="240"><div class="nw-contact-avatar '
+                        + htmlentities(u_h) + ' color' + htmlentities(av_color) + '">' + htmlentities(avatar)
+                        + '</div><div class="fm-chat-user-info todo-star ustatus ' + htmlentities(u_h) + ' '
+                        + htmlentities(onlinestatus[1]) + '"><div class="todo-fm-chat-user-star"></div><div class="fm-chat-user">'
+                        + htmlentities(userName) + '</div><div class="nw-contact-status"></div><div class="fm-chat-user-status ' + htmlentities(htmlentities(u_h)) + '">' + htmlentities(onlinestatus[0])
+                        + '</div><div class="clear"></div></div></td><td width="270"><div class="shared-folder-access'
+                        + htmlentities(rightsclass) + '">' + htmlentities(rights) + '</div></td></tr>';
                 }
             } else if (this.currentdirid.length === 11 && this.currentrootid === 'contacts') {
                 var cs = this.contactstatus(this.v[i].h);
@@ -1126,7 +1147,7 @@ function MegaData()
                     var shareId = window.location.hash.replace('#fm/', '');
 
                     // Remove user from the share
-                    removeShare(shareId);
+                    removeShare (shareId);
 
                     // Open the shares folder
                     M.openFolder('shares', true);
@@ -2442,10 +2463,11 @@ function MegaData()
             userId = u.u;
             if (this.u[userId]) {
                 for (var key in u) {
-                    this.u[userId].key = u.key;
+                    this.u[userId][key] = u[key];
                 }
+                u = this.u[userId];
             } else {
-                this.u[u.u] = u;
+                this.u[userId] = u;
             }
             if (typeof mDB === 'object' && !ignoreDB && !pfkey) {
                 mDBadd('u', clone(u));
@@ -2474,8 +2496,7 @@ function MegaData()
     };
 
     // Update M.ipc and related localStorage
-    this.addIPC = function(u, ignoreDB)
-    {
+    this.addIPC = function(u, ignoreDB) {
         this.ipc[u.p] = u;
         if (typeof mDB === 'object' && !ignoreDB && !pfkey) {
             mDBadd('ipc', clone(u));
@@ -4193,12 +4214,14 @@ function execsc(actionPackets, callback) {
 
             if (actionPacket.o === u_handle) {
                 if (typeof actionPacket.r == "undefined") {
+                    
                     // I deleted my share
                     M.delnodeShare(actionPacket.n, actionPacket.u);
                 } else if (M.d[actionPacket.n]
                     && typeof M.d[actionPacket.n].shares != 'undefined'
                     && M.d[actionPacket.n].shares[actionPacket.u]
                     || actionPacket.ha == crypto_handleauth(actionPacket.n)) {
+                    
                     // I updated or created my share
                     u_sharekeys[actionPacket.n] = decrypt_key(u_k_aes, base64_to_a32(actionPacket.ok));
                     M.nodeShare(actionPacket.n, {
@@ -4299,7 +4322,7 @@ function execsc(actionPackets, callback) {
                         });
                         newnodes.push(M.d[n.h]);
                     }
-                }
+                }r
             }
 
             crypto_share_rsa2aes();
@@ -4341,6 +4364,7 @@ function execsc(actionPackets, callback) {
             if (fminitialized && !folderlink && actionPacket.ou && actionPacket.ou != u_handle
                 && actionPacket.t && actionPacket.t.f && actionPacket.t.f[0]
                 && actionPacket.t.f[0].p.length < 11 && !tmoveid && !tparentid) {
+                
                 var targetid = actionPacket.t.f[0].p;
                 var pnodes = [];
                 for (var i in actionPacket.t.f) {
@@ -5041,29 +5065,23 @@ function processPS(pendingShares, fromGettree) {
     DEBUG('processPS');
 
     for (var i in pendingShares) {
-        if (fromGettree)
-        {
+        if (fromGettree) {
             // As this is from gettree and the node tree may not have been processed yet, the 'hasPendingShares'
             // flag will be set on the node after gettree is processed
             M.addPS(pendingShares[i]);
-        }
-        else
-        {
+        } else {
             var nodeHandle = pendingShares[i].n;
             var pendingContactId = pendingShares[i].p;
             var shareRights = pendingShares[i].r;
             var timeStamp = pendingShares[i].ts;
 
-            if (typeof shareRights === 'undefined')
-            {
+            if (typeof shareRights === 'undefined') {
                 // This is a delete packet, we should remove the pending share if this was not triggered by our own client
                 if (pendingShares[i].i == requesti) continue;
 
                 // Delete the pending share
                 delete M.ps[pendingShares[i].p];
-            }
-            else
-            {
+            } else {
                 // We need to record that this node has a pending share, as this is not gettree
                 M.d[nodeHandle].hasPendingShares = true;
 

@@ -1,4 +1,4 @@
-﻿var b_u=0;
+var b_u = 0;
 var maintenance=false;
 var ua = window.navigator.userAgent.toLowerCase();
 var is_chrome_firefox = document.location.protocol === 'chrome:' && document.location.host === 'mega' || document.location.protocol === 'mega:';
@@ -275,14 +275,18 @@ var sh = [];
 /**
  * Check that the hexadecimal hash of the file from the worker thread matches the correct one created at deployment time
  * @param {String} hashFromWorker A hexadecimal string
- * @param {String} hashFromDeployment A hexadecimal string
- * @param {String} fileName The file name
+ * @param {String} fileName The file name with the SHA-256 hash appended at the end
  * @returns {Boolean}
  */
-function compareHashes(hashFromWorker, hashFromDeployment, fileName) {
+function compareHashes(hashFromWorker, fileName) {
 
+    // Retrieve the SHA-256 hash that was appended to the file name
+    var startOfHash = fileName.lastIndexOf('_') + 1;
+    var endOfHash = fileName.lastIndexOf('.');
+    var hashFromDeployment = fileName.substring(startOfHash, endOfHash);
+    
     if (hashFromWorker === hashFromDeployment) {
-        // console.log('Hash match on file: ' + fileName + '. Hash from worker thread: ' + hashFromWorker + ' Hash from deployment script: ' + hashFromDeployment);
+        console.log('Hash match on file: ' + fileName + '. Hash from worker thread: ' + hashFromWorker + ' Hash from deployment script: ' + hashFromDeployment);
         return true;
     }
     else {
@@ -640,6 +644,7 @@ else if (!b_u)
             return false;
         };
     }
+    
     function detectlang()
     {
         if (!navigator.language) return 'en';
@@ -649,11 +654,48 @@ else if (!b_u)
         for (var l in l2) for (b in l2[l]) if (l2[l][b].substring(0,3)==bl.substring(0,3)) return l;
         return 'en';
     }
-    var lang = detectlang(), langv = '', jsl = [];
-    if (typeof localStorage.lang !== 'undefined' && languages[localStorage.lang]) lang = localStorage.lang;
-    if (typeof lv != 'undefined') langv = '_' + lv[lang];
+    
+    /**
+     * Gets the file path for a language file
+     * @param {String} language
+     * @returns {String}
+     */
+    function getLanguageFilePath(language)
+    {
+        // If the sh1 (filename with hashes) array has been created from deploy script
+        if (sh1) {
+            
+            // Search the array
+            for (var i = 0, length = sh1.length; i < length; i++)
+            {
+                var filePath = sh1[i];
 
-    jsl.push({f:'lang/' + lang + langv + '.json', n: 'lang', j:3});
+                // If the language e.g. 'en' matches part of the filename from the deploy script e.g. 
+                // 'lang/en_0a8e1591149050ef1884b0c4abfbbeb759bbe9eaf062fa54e5b856fdb78e1eb3.json'
+                if (filePath.indexOf('lang/' + language) > -1)
+                {
+                    return filePath;
+                }
+            }
+        }
+        else {
+            // Otherwise return the filename.json when in Development
+            return 'lang/' + language + '.json';
+        }
+    }
+    
+    var lang = detectlang();
+    var jsl = [];
+    
+    // If they've already selected a language, use that
+    if (typeof localStorage.lang !== 'undefined' && languages[localStorage.lang]) {
+        lang = localStorage.lang;
+    }
+    
+    // Get the language file path e.g. lang/en.json or 'lang/en_7a8e15911490...f1878e1eb3.json'
+    var langFilepath = getLanguageFilePath(lang);
+
+    jsl.push({f: langFilepath, n: 'lang', j:3});
     jsl.push({f:'sjcl.js', n: 'sjcl_js', j:1}); // Will be replaced with asmCrypto soon
     jsl.push({f:'js/asmcrypto.js',n:'asmcrypto_js',j:1,w:1});
     jsl.push({f:'js/tlvstore.js', n: 'tlvstore_js', j:1});
@@ -938,18 +980,18 @@ else if (!b_u)
                         console.log(e.data.text);
                         alert('error');
                     }
-                    if (!nocontentcheck && !compareHashes(e.data.hash, sh1[jsl[e.data.jsi].f], jsl[e.data.jsi].f))
+                    if (!nocontentcheck && !compareHashes(e.data.hash, jsl[e.data.jsi].f))
                     {
                         if (bootstaticpath.indexOf('cdn') > -1)
                         {
-                            sessionStorage.skipcdn=1;
+                            sessionStorage.skipcdn = 1;
                             document.location.reload();
                         }
                         else {
                             alert('An error occurred while loading MEGA. The file ' + bootstaticpath+jsl[e.data.jsi].f + ' is corrupt. Please try again later. We apologize for the inconvenience.');
                         }
 
-                        contenterror=1;
+                        contenterror = 1;
                     }
                     if (!contenterror)
                     {
@@ -1154,10 +1196,10 @@ else if (!b_u)
                     var hashHex = sjcl_sha256.codec.hex.fromBits(hash);
                     
                     // Compare the hash from the file and the correct hash determined at deployment time
-                    if (!compareHashes(hashHex, sh1[jsl[e.data.jsi].f], jsl[e.data.jsi].f))
+                    if (!compareHashes(hashHex, jsl[e.data.jsi].f))
                     {
                         alert('An error occurred while loading MEGA. The file ' + bootstaticpath + jsl[this.jsi].f + ' is corrupt. Please try again later. We apologize for the inconvenience.');
-                        contenterror=1;
+                        contenterror = 1;
                     }
                 }
                 

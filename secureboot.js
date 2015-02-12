@@ -663,7 +663,7 @@ else if (!b_u)
     function getLanguageFilePath(language)
     {
         // If the sh1 (filename with hashes) array has been created from deploy script
-        if (sh1) {
+        if (typeof sh1 !== 'undefined') {
             
             // Search the array
             for (var i = 0, length = sh1.length; i < length; i++)

@@ -603,12 +603,14 @@ var Chat = function() {
     this.options = {
         'delaySendMessageIfRoomNotAvailableTimeout': 3000,
         'xmppDomain': xmppDomain,
-        'loadbalancerService': 'gelb530n001.karere.mega.nz:443',
+        'loadbalancerService': 'gelb530n001.karere.mega.nz',
         'fallbackXmppServers': [
-            //"https://pxy270n001.karere.mega.nz/bosh",
-            //"https://pxy270n002.karere.mega.nz/bosh",
-            "https://pxy302n001.karere.mega.nz/bosh",
-            "https://pxy302n002.karere.mega.nz/bosh"
+             "https://xmpp270n001.karere.mega.nz/bosh",
+             "https://xmpp270n002.karere.mega.nz/bosh",
+             "https://xmpp270n003.karere.mega.nz/bosh",
+             "https://xmpp302n001.karere.mega.nz/bosh",
+             "https://xmpp302n002.karere.mega.nz/bosh",
+             "https://xmpp302n003.karere.mega.nz/bosh"
         ],
         'rtcSession': {
             'crypto': {
@@ -1210,12 +1212,14 @@ Chat.prototype.init = function() {
         $('.top-user-status-popup').removeClass("active");
 
         if(self.karere.getConnectionState() != Karere.CONNECTION_STATE.CONNECTED && presence != Karere.PRESENCE.OFFLINE) {
+            self.karere._myPresence = presence;
             self.connect().done(function() {
                 self.karere.setPresence(presence, undefined, localStorage.megaChatPresenceMtime);
             });
             return true;
         } else {
             if(presence == Karere.PRESENCE.OFFLINE) {
+                self.karere.setPresence(presence, undefined, localStorage.megaChatPresenceMtime);
                 self.karere.resetConnectionRetries();
                 self.karere.disconnect();
             } else {
@@ -1492,8 +1496,37 @@ Chat.prototype.init = function() {
                 // force re-render
                 room.show();
             }
-        })
+        });
     // always last
+
+    // trigger reconnect on mouse move
+    self.karere.bind('onDisconnected', function() {
+        if(self.karere._connectionRetryInProgress && self.karere.getConnectionState() === Karere.CONNECTION_STATE.DISCONNECTED) {
+            $(document).bind("mousemove.megaChatRetry", function() {
+                $(document).unbind("onmousemove.megaChatRetry");
+                if(self.karere._connectionRetryInProgress && self.karere.getConnectionState() === Karere.CONNECTION_STATE.DISCONNECTED) {
+                    clearTimeout(self.karere._connectionRetryInProgress);
+                    self.karere._connectionRetryInProgress = setTimeout(function () {
+                        if(
+                            self.karere._connectionRetryInProgress &&
+                            (
+                                self.karere.getConnectionState() === Karere.CONNECTION_STATE.DISCONNECTED ||
+                                self.karere.getConnectionState() === Karere.CONNECTION_STATE.AUTHFAIL ||
+                                self.karere.getConnectionState() === Karere.CONNECTION_STATE.CONNFAIL
+                            )
+                        ) {
+                            self.karere.reconnect();
+                        }
+
+                        if(self.karere._connectionRetryInProgress) {
+                            self.karere._connectionRetryInProgress = null;
+                        }
+                    }, rand(1500));
+                }
+            })
+        }
+    });
+
     self.trigger("onInit");
 };
 
@@ -1506,7 +1539,7 @@ Chat.prototype.connect = function() {
     var self = this;
 
     // connection flow already started/in progress?
-    if(self.karere.getConnectionState() == Karere.CONNECTION_STATE.CONNECTING || (self.karere._$connectingPromise && self.karere._$connectingPromise.state() == 'pending')) {
+    if(self.karere.getConnectionState() == Karere.CONNECTION_STATE.CONNECTING && (self.karere._$connectingPromise && self.karere._$connectingPromise.state() == 'pending')) {
         return self.karere._$connectingPromise.always(function() {
             self.renderMyStatus();
         });
@@ -2320,9 +2353,10 @@ Chat.prototype.generatePrivateRoomName = function(jids) {
     newJids.sort();
     var roomName = "prv";
     $.each(newJids, function(k, jid) {
-        roomName = roomName + "_" + fastHashFunction(jid.split("@")[0]);
+        roomName = roomName + jid.split("@")[0];
     });
 
+    roomName = base32.encode(asmCrypto.SHA256.hex(roomName).substr(0, 32))
     return roomName;
 };
 

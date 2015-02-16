@@ -774,6 +774,16 @@ function init_page()
             M.openFolder(id);
         }
 		$('#topmenu').html(parsetopmenu());
+
+		$('.feedback-button')
+			.removeClass("hidden")
+			.rebind("click.feedbackDialog", function() {
+				var feedbackDialog = mega.ui.FeedbackDialog.singleton($(this));
+				feedbackDialog._type = "top-button";
+
+				return false;
+			});
+
 		$('#pageholder').hide();
 		$('#startholder').hide();
 		if ($('#fmholder:visible').length == 0)

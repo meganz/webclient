@@ -6996,10 +6996,10 @@ table {
 	color: rgba(43,166,222,1);
 }
 /* red border */
-.fm-chat-end:hover, .fm-chat-end.active, .fm-chat-file-button.secondary-button:hover, .fm-chat-file-button.secondary-button.active, .fm-dialog-button.red:hover, .nw-chat-button.red:hover, .multiple-sharing.expanded .main-body .nw-chat-button.red:hover, .fm-chat-attach-button.red:hover, .fm-chat-contact-button.red:hover, .fm-dialog-button.red.active, .nw-chat-button.red.active, .multiple-sharing.expanded .main-body .nw-chat-button.red.active, .fm-chat-attach-button.red.active, .fm-chat-contact-button.red.active, .fm-clearbin-button:hover, .fm-clearbin-button.active, .fm-leave-share:hover, .fm-leave-share.active, .clear-bin-dialog .fm-dialog-button.notification-button.confirm:hover, .clear-bin-dialog .fm-dialog-button.notification-button.confirm.active, .contact-request-button.delete:hover, .contact-request-button.delete.active, .contact-request-button.cancel:hover, .contact-request-button.cancel.active {
+.fm-chat-end:hover, .fm-chat-end.active, .fm-chat-file-button.secondary-button:hover, .fm-chat-file-button.secondary-button.active, .fm-dialog-button.red:hover, .nw-chat-button.red:hover, .multiple-sharing.expanded .main-body .nw-chat-button.red:hover, .fm-chat-attach-button.red:hover, .fm-chat-contact-button.red:hover, .fm-dialog-button.red.active, .nw-chat-button.red.active, .multiple-sharing.expanded .main-body .nw-chat-button.red.active, .fm-chat-attach-button.red.active, .fm-chat-contact-button.red.active, .fm-clearbin-button:hover, .fm-clearbin-button.active, .fm-leave-share:hover, .fm-leave-share.active, .clear-bin-dialog .fm-dialog-button.notification-button.confirm:hover, .clear-bin-dialog .fm-dialog-button.notification-button.confirm.active, .contact-request-button.delete:hover, .contact-request-button.delete.active, .contact-request-button.cancel:hover, .contact-request-button.cancel.active, .fm-dialog-button.fm-dialog-button-red:hover, .fm-dialog-button.fm-dialog-button-red.active {
 	background-color: rgba(217,0,7,0.2);
 }
-.fm-chat-end:hover span, .fm-chat-end.active span, .fm-chat-file-button.secondary-button:hover span, .fm-chat-file-button.secondary-button.active span, .fm-dialog-button.red:hover span, .nw-chat-button.red:hover span, .multiple-sharing.expanded .main-body .nw-chat-button.red:hover span, .fm-chat-attach-button.red:hover span, .fm-chat-contact-button.red:hover span, .fm-dialog-button.red.active span, .nw-chat-button.red.active span, .multiple-sharing.expanded .main-body .nw-chat-button.red.active span, .fm-chat-attach-button.red.active span, .fm-chat-contact-button.red.active span, .fm-clearbin-button:hover span, .fm-clearbin-button.active span, .fm-leave-share:hover, .fm-leave-share:hover span, .fm-leave-share.active span, .clear-bin-dialog .fm-dialog-button.notification-button.confirm:hover span, .clear-bin-dialog .fm-dialog-button.notification-button.confirm.active span, .contact-request-button.delete:hover span, .contact-request-button.delete.active span, .contact-request-button.cancel:hover span, .contact-request-button.cancel.active span {
+.fm-chat-end:hover span, .fm-chat-end.active span, .fm-chat-file-button.secondary-button:hover span, .fm-chat-file-button.secondary-button.active span, .fm-dialog-button.red:hover span, .nw-chat-button.red:hover span, .multiple-sharing.expanded .main-body .nw-chat-button.red:hover span, .fm-chat-attach-button.red:hover span, .fm-chat-contact-button.red:hover span, .fm-dialog-button.red.active span, .nw-chat-button.red.active span, .multiple-sharing.expanded .main-body .nw-chat-button.red.active span, .fm-chat-attach-button.red.active span, .fm-chat-contact-button.red.active span, .fm-clearbin-button:hover span, .fm-clearbin-button.active span, .fm-leave-share:hover, .fm-leave-share:hover span, .fm-leave-share.active span, .clear-bin-dialog .fm-dialog-button.notification-button.confirm:hover span, .clear-bin-dialog .fm-dialog-button.notification-button.confirm.active span, .contact-request-button.delete:hover span, .contact-request-button.delete.active span, .contact-request-button.cancel:hover span, .contact-request-button.cancel.active span, .fm-dialog-button.fm-dialog-button-red:hover span, .fm-dialog-button.fm-dialog-button-red.active span {
 	color: rgba(217,0,7,1);
 }
 /*orange border*/
@@ -7010,10 +7010,10 @@ table {
 	color: #FFA500;
 }
 /* green border */
-.fm-add-user:hover, .fm-add-user.active, .fm-chat-file-button.primary-button:hover, .fm-chat-file-button.primary-button.active, .fm-verify:hover, .fm-verify.active, .fm-share-copy:hover, .fm-share-copy.active, .fm-new-folder:hover, .fm-new-folder.active, .create-folder-button:hover, .create-folder-button.active, .add-user-popup-button.add:hover, .add-user-popup-button.add.active, .fm-dialog-new-folder-button:hover, .fm-dialog-new-folder-button.active, .rename-dialog-button.rename:hover, .rename-dialog-button.rename.active, .fm-dialog-button.notifications-button:hover, .fm-dialog-button.notifications-button.active, .fm-dialog-button.links-button:hover, .fm-dialog-button.links-button.active, .fm-dialog-button.dialog-move-button:hover, .fm-dialog-button.dialog-move-button.active, .fm-dialog-button.dialog-newfolder-button:hover, .fm-dialog-button.dialog-newfolder-button.active, .fm-dialog-button.dialog-copy-button:hover, .fm-dialog-button.dialog-copy-button.active, .fm-dialog-button.notification-button.confirm:hover, .fm-dialog-button.notification-button.confirm.active, .contact-request-button.accept:hover, .contact-request-button.accept.active {
+.fm-add-user:hover, .fm-add-user.active, .fm-chat-file-button.primary-button:hover, .fm-chat-file-button.primary-button.active, .fm-verify:hover, .fm-verify.active, .fm-share-copy:hover, .fm-share-copy.active, .fm-new-folder:hover, .fm-new-folder.active, .create-folder-button:hover, .create-folder-button.active, .add-user-popup-button.add:hover, .add-user-popup-button.add.active, .fm-dialog-new-folder-button:hover, .fm-dialog-new-folder-button.active, .rename-dialog-button.rename:hover, .rename-dialog-button.rename.active, .fm-dialog-button.notifications-button:hover, .fm-dialog-button.notifications-button.active, .fm-dialog-button.links-button:hover, .fm-dialog-button.links-button.active, .fm-dialog-button.dialog-move-button:hover, .fm-dialog-button.dialog-move-button.active, .fm-dialog-button.dialog-newfolder-button:hover, .fm-dialog-button.dialog-newfolder-button.active, .fm-dialog-button.dialog-copy-button:hover, .fm-dialog-button.dialog-copy-button.active, .fm-dialog-button.notification-button.confirm:hover, .fm-dialog-button.notification-button.confirm.active, .contact-request-button.accept:hover, .contact-request-button.accept.active, .fm-dialog-button.fm-dialog-button-green:hover, .fm-dialog-button.fm-dialog-button-green.active {
 	background-color: rgba(49,181,0,0.2);
 }
-.fm-add-user:hover span, .fm-add-user.active span, .fm-chat-file-button.primary-button:hover span, .fm-chat-file-button.primary-button.active span, .fm-verify:hover span, .fm-verify.active span, .fm-share-copy:hover span, .fm-share-copy.active span, .fm-new-folder:hover span, .fm-new-folder.active span, .create-folder-button:hover span, .create-folder-button.active span, .add-user-popup-button.add:hover span, .add-user-popup-button.add.active span, .fm-dialog-new-folder-button:hover span, .fm-dialog-new-folder-button.active span, .rename-dialog-button.rename:hover span, .rename-dialog-button.rename.active span, .fm-dialog-button.notifications-button:hover span, .fm-dialog-button.notifications-button.active span, .fm-dialog-button.links-button:hover span, .fm-dialog-button.links-button.active span, .fm-dialog-button.dialog-move-button:hover span, .fm-dialog-button.dialog-move-button.active span, .fm-dialog-button.dialog-newfolder-button:hover span, .fm-dialog-button.dialog-newfolder-button.active span, .fm-dialog-button.dialog-copy-button:hover span, .fm-dialog-button.dialog-copy-button.active span, .fm-dialog-button.notification-button.confirm:hover span, .fm-dialog-button.notification-button.confirm.active span, .contact-request-button.accept:hover span, .contact-request-button.accept.active span {
+.fm-add-user:hover span, .fm-add-user.active span, .fm-chat-file-button.primary-button:hover span, .fm-chat-file-button.primary-button.active span, .fm-verify:hover span, .fm-verify.active span, .fm-share-copy:hover span, .fm-share-copy.active span, .fm-new-folder:hover span, .fm-new-folder.active span, .create-folder-button:hover span, .create-folder-button.active span, .add-user-popup-button.add:hover span, .add-user-popup-button.add.active span, .fm-dialog-new-folder-button:hover span, .fm-dialog-new-folder-button.active span, .rename-dialog-button.rename:hover span, .rename-dialog-button.rename.active span, .fm-dialog-button.notifications-button:hover span, .fm-dialog-button.notifications-button.active span, .fm-dialog-button.links-button:hover span, .fm-dialog-button.links-button.active span, .fm-dialog-button.dialog-move-button:hover span, .fm-dialog-button.dialog-move-button.active span, .fm-dialog-button.dialog-newfolder-button:hover span, .fm-dialog-button.dialog-newfolder-button.active span, .fm-dialog-button.dialog-copy-button:hover span, .fm-dialog-button.dialog-copy-button.active span, .fm-dialog-button.notification-button.confirm:hover span, .fm-dialog-button.notification-button.confirm.active span, .contact-request-button.accept:hover span, .contact-request-button.accept.active span, .fm-dialog-button.fm-dialog-button-green:hover span, .fm-dialog-button.fm-dialog-button-green.active span  {
 	color: rgba(49,181,0,1);
 }
 /* disabled */
@@ -22434,7 +22434,10 @@ background-color:#1DA2E9
 	-webkit-border-bottom-right-radius: 7px;
 	-moz-border-radius-bottomright: 7px;
 	border-bottom-right-radius: 7px;
-	padding-right: 4px;
+	padding-right: 6px;
+}
+.fm-mega-dialog-bottom > .fm-dialog-button {
+	margin-right: 2px;
 }
 /**
  * Start chat elements
@@ -22580,4 +22583,237 @@ a.top-login-forgot-pass {
 }
 .tree-item-on-search-hidden {
 	display: none !important;
+}
+
+
+/** call feedback buttons in chat **/
+.fm-chat-messages-block .callfeedback-buttons {
+	display: inline-block;
+	height: 18px;
+	margin-left: 8px;
+}
+.fm-chat-messages-block .callfeedback-buttons .blog-new-recomend {
+	margin-right: 2px;
+}
+.fm-chat-messages-block .callfeedback-buttons > a {
+	-webkit-transition: opacity 200ms ease-in-out;
+	-moz-transition: opacity 200ms ease-in-out;
+	-o-transition: opacity 200ms ease-in-out;
+	-ms-transition: opacity 200ms ease-in-out;
+	transition: opacity 200ms ease-in-out;
+
+	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
+	-moz-opacity: 0.7;
+	-khtml-opacity: 0.7;
+	opacity: 0.7;
+}
+.fm-chat-messages-block .callfeedback-buttons > a:hover {
+	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+	-moz-opacity: 1;
+	-khtml-opacity: 1;
+	opacity: 1;
+}
+
+/** top header feedback button **/
+.feedback-button {
+	margin-left: 70px;
+	border: 1px solid #f1f1f1;
+	color: #888;
+	padding: 2px 6px;
+	margin-top: 14px;
+	display: inline-block;
+	border-radius: 12px;
+	text-transform: uppercase;
+	background-image: url(../images/mega/contact-new-sprite@2x.png);
+	background-position: 5px -228px;
+	background-size: 270px 244px;
+	background-color: white;
+	padding-left: 24px;
+	background-repeat: no-repeat;
+
+	-webkit-transition: opacity 200ms ease-in-out;
+	-moz-transition: opacity 200ms ease-in-out;
+	-o-transition: opacity 200ms ease-in-out;
+	-ms-transition: opacity 200ms ease-in-out;
+	transition: opacity 200ms ease-in-out;
+
+	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
+	-moz-opacity: 0.8;
+	-khtml-opacity: 0.8;
+	opacity: 0.8;
+}
+.feedback-button:hover {
+	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+	-moz-opacity: 1;
+	-khtml-opacity: 1;
+	opacity: 1;
+}
+
+.feedback-dialog {
+	width: 420px;
+	z-index: 1200;
+}
+
+.feedback-dialog .content {
+	width: 100%;
+	overflow: auto;
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+.feedback-dialog textarea {
+	width: 80%;
+	max-width: 80%;
+	height: 60px;
+	margin: 0 auto;
+	display: block;
+	margin-top: 16px;
+}
+.feedback-dialog .reply label {
+	width: 82%;
+	padding-top: 18px;
+}
+.feedback-dialog .rating {
+	width: 320px;
+	margin: 0 auto;
+	text-align: center;
+}
+
+.feedback-dialog .rating .rate.faded {
+	opacity: 0.3;
+}
+.feedback-dialog input[type="checkbox"] {
+	cursor: pointer;
+}
+
+.feedback-dialog .stats-button {
+	margin-top: 20px;
+	margin-left: -20px;
+}
+
+.feedback-dialog .reply {
+	width: 390px;
+	min-height: 56px;
+	display: inline-block;
+	clear: both;
+}
+
+.feedback-dialog .reply .radio-txt {
+	margin-bottom: 4px;
+}
+.feedback-dialog input[name="email"] {
+	width: 50%;
+	margin: 0 36px;
+	display: block;
+	border-radius: 4px;
+
+
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	background-color: white;
+	line-height: 18px;
+
+	font-size: 12px;
+	padding: 6px 10px 8px 10px;
+
+	border: 0;
+
+	background: rgba(0,0,0,0.3);
+	color: white;
+}
+
+.feedback-dialog .rating .rate {
+	display: inline-block;
+	width: 50px;
+	height: 50px;
+	border: 4px solid black;
+	background-color: white;
+	margin-right: 8px;
+	margin-left: 8px;
+	border-radius: 100%;
+	color: white;
+
+
+	background-repeat: no-repeat;
+	background-image: url(../images/mega/feedback/emotions.svg);
+
+	-webkit-transition: box-shadow 100ms ease-in-out, border-color 200ms ease-in-out, background-color 50ms ease-in-out, color 150ms ease-in-out, background-position 450ms ease, opacity 350ms ease-in-out;
+	-moz-transition: box-shadow 100ms ease-in-out, border-color 200ms ease-in-out, background-color 50ms ease-in-out, color 150ms ease-in-out, background-position 450ms ease, opacity 350ms ease-in-out;
+	-o-transition: box-shadow 100ms ease-in-out, border-color 200ms ease-in-out, background-color 50ms ease-in-out, color 150ms ease-in-out, background-position 450ms ease, opacity 350ms ease-in-out;
+	-ms-transition: box-shadow 100ms ease-in-out, border-color 200ms ease-in-out, background-color 50ms ease-in-out, color 150ms ease-in-out, background-position 450ms ease, opacity 350ms ease-in-out;
+	transition: box-shadow 100ms ease-in-out, border-color 200ms ease-in-out, background-color 50ms ease-in-out, color 150ms ease-in-out, background-position 450ms ease, opacity 350ms ease-in-out;
+
+	box-shadow: inset 0 0px 0px 0px rgba(0, 0, 0, 0.1), 0 1px 2px 1px rgba(0, 0, 0, 0.1);
+	opacity: 1;
+}
+
+
+
+.feedback-dialog .rating .rate.unhappy {
+	border-color: #FF1A53;
+	background-position: 10px 6px;
+}
+.feedback-dialog .rating .rate.neutral {
+	border-color: #B0DAEB;
+	background-position: -44px 6px;
+}
+.feedback-dialog .rating .rate.happy {
+	border-color: #61D2FF;
+	background-position: -101px 6px;
+}
+.feedback-dialog .rating .rate.awesome {
+	border-color: #13E03C;
+	background-position: -157px 6px;
+}
+
+.feedback-dialog .rating .rate.unhappy:hover, .feedback-dialog .rating .rate.unhappy.active {
+	box-shadow: inset -1px 0 1px 1px rgba(0, 0, 0, 0.1), 0 1px 2px 1px rgba(0, 0, 0, 0.1), 0 0 0 6px rgba(255, 26, 83, 0.1), 0 0 0 4px rgba(255, 26, 83, 0.4);
+	background-color: #FF1A53;
+	border-color: white;
+	color: white;
+
+	background-position: 10px -45px;
+
+	opacity: 1;
+}
+.feedback-dialog .rating .rate.neutral:hover, .feedback-dialog .rating .rate.neutral.active {
+	box-shadow: inset -1px 0 1px 1px rgba(0, 0, 0, 0.1), 0 1px 2px 1px rgba(0, 0, 0, 0.1), 0 0 0 6px rgba(176, 218, 235, 0.1), 0 0 0 4px rgba(176, 218, 235, 0.4);
+	background-color: #B0DAEB;
+	border-color: white;
+	color: white;
+	background-position: -44px -45px;
+
+	opacity: 1;
+}
+.feedback-dialog .rating .rate.happy:hover, .feedback-dialog .rating .rate.happy.active {
+	box-shadow: inset -1px 0 1px 1px rgba(0, 0, 0, 0.1), 0 1px 2px 1px rgba(0, 0, 0, 0.1), 0 0 0 6px rgba(97, 210, 255, 0.1), 0 0 0 4px rgba(97, 210, 255, 0.4);
+	background-color: #61D2FF;
+	border-color: white;
+	color: white;
+	background-position: -101px -45px;
+
+	opacity: 1;
+}
+.feedback-dialog .rating .rate.awesome:hover, .feedback-dialog .rating .rate.awesome.active {
+	box-shadow: inset -1px 0 1px 1px rgba(0, 0, 0, 0.1), 0 1px 2px 1px rgba(0, 0, 0, 0.1), 0 0 0 6px rgba(19, 224, 60, 0.1), 0 0 0 4px rgba(19, 224, 60, 0.4);
+	background-color: #13E03C;
+	border-color: white;
+	color: white;
+	background-position: -157px -45px;
+
+	opacity: 1;
+}
+
+.collected-data-review-dialog {
+    z-index: 1250;
+    width: 70%;
+}
+.collected-data-review-dialog textarea {
+    display: block;
+    width: 99%;
+    min-height: 200px;
+    margin: 0 auto;
+}
+.fm-chat-inline-dialog-button-sendFeedback {
+    margin-left: 4px;
 }

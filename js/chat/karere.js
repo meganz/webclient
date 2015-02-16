@@ -319,7 +319,7 @@ Karere.DEFAULTS = {
      * Connection retry delay in ms (reconnection will be triggered with a timeout calculated as:
      * self._connectionRetries * this value)
      */
-    reconnectDelay: 500,
+    reconnectDelay: 10,
 
 
     /**

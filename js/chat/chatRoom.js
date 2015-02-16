@@ -1603,7 +1603,7 @@ ChatRoom.prototype.setState = function(newState, isRecover) {
  *
  * @returns {String}
  */
-ChatRoom.prototype.getStateAsText = function(state) {
+ChatRoom.prototype.getStateAsText = function() {
     var self = this;
     return ChatRoom.stateToText(self.state);
 };

@@ -603,12 +603,14 @@ var Chat = function() {
     this.options = {
         'delaySendMessageIfRoomNotAvailableTimeout': 3000,
         'xmppDomain': xmppDomain,
-        'loadbalancerService': 'gelb530n001.karere.mega.nz:443',
+        'loadbalancerService': 'gelb530n001.karere.mega.nz',
         'fallbackXmppServers': [
-            "https://pxy270n001.karere.mega.nz/bosh",
-            "https://pxy270n002.karere.mega.nz/bosh",
-            "https://pxy302n001.karere.mega.nz/bosh",
-            "https://pxy302n002.karere.mega.nz/bosh"
+             "https://xmpp270n001.karere.mega.nz/bosh",
+             "https://xmpp270n002.karere.mega.nz/bosh",
+             "https://xmpp270n003.karere.mega.nz/bosh",
+             "https://xmpp302n001.karere.mega.nz/bosh",
+             "https://xmpp302n002.karere.mega.nz/bosh",
+             "https://xmpp302n003.karere.mega.nz/bosh"
         ],
         'rtcSession': {
             'crypto': {

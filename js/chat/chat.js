@@ -697,7 +697,8 @@ var Chat = function() {
         'plugins': {
             'urlFilter': UrlFilter,
             'emoticonsFilter': EmoticonsFilter,
-            'attachmentsFilter': AttachmentsFilter
+            'attachmentsFilter': AttachmentsFilter,
+            'callFeedback': CallFeedback
         },
         'chatNotificationOptions': {
             'textMessages': {

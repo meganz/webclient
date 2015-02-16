@@ -2281,3 +2281,148 @@ function secToDuration(s, sep) {
 
     return durStr.replace(secToDuration.regExp[sep], "");
 }
+
+
+function generateAnonymousReport() {
+    var $promise = new MegaPromise();
+    var report = {};
+    report.ua = navigator.userAgent;
+    report.ut = u_type;
+    report.io = window.dlMethod && dlMethod.name;
+    report.sb = +(''+$('script[src*="secureboot"]').attr('src')).split('=').pop();
+    report.tp = $.transferprogress;
+    report.karereState = megaChat.karere.getConnectionState();
+    report.karereCurrentConnRetries = megaChat.karere._connectionRetries;
+    report.myPresence = megaChat.karere.getPresence(megaChat.karere.getJid());
+    report.karereServer = megaChat.karere.connection.service;
+    report.numOpenedChats = Object.keys(megaChat.chats).length;
+    report.haveRtc = megaChat.rtc ? true : false;
+    if(report.haveRtc) {
+        report.rtcStatsAnonymousId = megaChat.rtc.ownAnonId;
+    }
+
+    var chatStates = [];
+    var userAnonMap = {};
+    var userAnonIdx = 0;
+
+    Object.keys(megaChat.chats).forEach(function(k) {
+        var v = megaChat.chats[k];
+
+        var participants = v.getParticipants();
+
+        participants.forEach(function(v, k) {
+            var cc = megaChat.getContactFromJid(v);
+            if(cc && cc.u && !userAnonMap[cc.u]) {
+                userAnonMap[cc.u] = {
+                    anonId: userAnonIdx++ + rand(1000),
+                    pres: megaChat.karere.getPresence(v)
+                };
+            }
+            participants[k] = cc && cc.u ? userAnonMap[cc.u] : v;
+        });
+
+
+        var r = {
+            'roomUniqueId': k,
+            'roomState': v.getStateAsText(),
+            'roomParticipants': participants,
+            'encState': v.encryptionHandler ? v.encryptionHandler.state : "not defined",
+            'opQueueQueueCount': v.encryptionOpQueue ? v.encryptionOpQueue._queue.length : "not defined",
+            'opQueueErrRetries': v.encryptionOpQueue ? v.encryptionOpQueue._error_retries : "not defined",
+            'opQueueCurrentOp': v.encryptionOpQueue && v.encryptionOpQueue._queue.length > 0 ? v.encryptionOpQueue._queue[0][0] : "not defined"
+        };
+
+        if(report.haveRtc) {
+            if(v.callStats) {
+                r.rtcCallStats = v.callStats;
+            }
+        }
+
+        chatStates.push(r);
+    });
+
+    report.chatRoomState = chatStates;
+
+
+    if (is_chrome_firefox)
+    {
+        report.mo = mozBrowserID + '::' + is_chrome_firefox + '::' + mozMEGAExtensionVersion;
+    }
+
+    var apireqHaveBackOffs = {};
+    apixs.forEach(function(v, k) {
+        if(v.backoff > 0) {
+            apireqHaveBackOffs[k] = v.backoff;
+        }
+    });
+
+    if(Object.keys(apireqHaveBackOffs).length > 0) {
+        report.apireqbackoffs = apireqHaveBackOffs;
+    }
+
+    report.hadLoadedRsaKeys = Object.keys(u_authring.RSA).length > 0;
+    report.hadLoadedEd25519Keys = Object.keys(u_authring.Ed25519).length > 0;
+    report.totalDomElements = $("*").length;
+    report.totalScriptElements = $("script").length;
+
+    report.totalD = Object.keys(M.d).length;
+    report.totalU = Object.keys(M.u).length;
+    report.totalC = Object.keys(M.c).length;
+    report.totalIpc = Object.keys(M.ipc).length;
+    report.totalOpc = Object.keys(M.opc).length;
+    report.totalPs = Object.keys(M.ps).length;
+    report.l = lang;
+    report.scrnSize = window.screen.availWidth + "x" + window.screen.availHeight;
+
+    if(typeof(window.devicePixelRatio) != 'undefined') {
+        report.pixRatio = window.devicePixelRatio;
+    }
+
+    try {
+        report.perfTiming = JSON.parse(JSON.stringify(window.performance.timing));
+        report.memUsed = window.performance.memory.usedJSHeapSize;
+        report.memTotal = window.performance.memory.totalJSHeapSize;
+        report.memLim = window.performance.memory.jsHeapSizeLimit;
+    } catch(e) {}
+
+    report.jslC = jslcomplete;
+    report.jslI = jsli;
+    report.scripts = {};
+    report.host = window.location.host;
+
+
+
+    var promises = [];
+
+    $('script').each(function() {
+        var self = this;
+        var src = self.src.replace(window.location.host, "$current");
+        promises.push(
+            $.ajax({
+                url: self.src,
+                dataType: "text"
+            })
+            .done(function(r) {
+                report.scripts[src] = [
+                        MurmurHash3(r, 0x4ef5391a),
+                        r.length
+                    ];
+            })
+            .fail(function(r) {
+                    report.scripts[src] = false;
+            })
+        );
+    });
+
+    report.version = null; // TODO: how can we find this?
+
+    MegaPromise.allDone(promises)
+        .done(function() {
+            $promise.resolve(report);
+        })
+        .fail(function() {
+            $promise.resolve(report)
+        });
+
+    return $promise;
+}

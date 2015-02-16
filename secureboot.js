@@ -702,6 +702,7 @@ else if (!b_u)
 
     jsl.push({f:'js/ui/filepicker.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/ui/dialog.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/ui/feedbackDialog.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/chat/ui/incomingCallDialog.js', n: 'mega_js', j:1,w:7});
 
     // notifications
@@ -710,12 +711,13 @@ else if (!b_u)
     jsl.push({f:'js/vendor/favico.js', n: 'favico_js', j:1,w:7});
     jsl.push({f:'js/vendor/notification.js', n: 'notification_js', j:1,w:7});
 
-    jsl.push({f:'js/chat/plugins/urlFilter.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/chat/plugins/emoticonsFilter.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/chat/plugins/attachmentsFilter.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/chat/plugins/encryptionFilter.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/chat/plugins/urlFilter.js', n: 'urlFilter_js', j:1,w:7});
+    jsl.push({f:'js/chat/plugins/emoticonsFilter.js', n: 'emoticonsFilter_js', j:1,w:7});
+    jsl.push({f:'js/chat/plugins/attachmentsFilter.js', n: 'attachmentsFilter_js', j:1,w:7});
+    jsl.push({f:'js/chat/plugins/encryptionFilter.js', n: 'encryptionFilter_js', j:1,w:7});
     jsl.push({f:'js/chat/plugins/chatStore.js', n: 'chatstore_js', j:1,w:7});
     jsl.push({f:'js/chat/plugins/chatNotifications.js', n: 'chatnotifications_js', j:1,w:7});
+    jsl.push({f:'js/chat/plugins/callFeedback.js', n: 'callfeedback_js', j:1,w:7});
 
     jsl.push({f:'js/chat/karereEventObjects.js', n: 'keo_js', j:1,w:7});
     jsl.push({f:'js/chat/karere.js', n: 'karere_js', j:1,w:7});

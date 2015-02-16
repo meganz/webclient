@@ -1,5 +1,6 @@
 (function($, scope) {
     var dialogIdx = 0;
+    var startingZIndex = 1300;
 
     /**
      * Prototype of reusable Dialog, which will eventually implement the following features:
@@ -96,6 +97,21 @@
         if(self.options.title) {
             $('.nw-fm-dialog-title', self.$dialog).text(self.options.title);
         }
+
+        // link dialog size with the textareas when/if resized by the user using the native resize func
+        $('textarea', self.$dialog)
+            .bind('mouseup mousemove',function(){
+                if(this.oldwidth  === null){this.oldwidth  = this.style.width;}
+                if(this.oldheight === null){this.oldheight = this.style.height;}
+                if(this.style.width != this.oldwidth || this.style.height != this.oldheight){
+                    $(this).resize();
+                    this.oldwidth  = this.style.width;
+                    this.oldheight = this.style.height;
+                }
+            })
+            .bind('resize', function() {
+                self.reposition();
+            })
     };
 
 
@@ -109,21 +125,22 @@
             var $container = $('<div class="' + self.options.buttonContainerClassName + '"/>');
 
             self.options.buttons.forEach(function(buttonMeta, k) {
-                var $button = $("<div/>");
+                var $button = $('<div class="fm-dialog-button"><span></span></div>');
                 $button
-                    .text(
-                        buttonMeta.label
-                    )
                     .addClass(
                         buttonMeta.className
                     )
                     .rebind('click.dialog' + self._getEventSuffix(), function() {
                         buttonMeta.callback.apply(self, [buttonMeta]);
-                    });
+                    })
+                    .find('span')
+                        .text(
+                            buttonMeta.label
+                        );
                 $container.append($button);
             });
 
-            $('.' + self.options.buttonPlaceholderClassName).append($container);
+            $('.' + self.options.buttonPlaceholderClassName, self.$dialog).append($container);
         }
     };
 
@@ -186,6 +203,9 @@
         if(self.visible) {
             return;
         }
+        if(!self.$dialog.css('z-index')) {
+            self.$dialog.css('z-index', dialogIdx + startingZIndex);
+        }
 
         self.trigger('onBeforeShow');
 
@@ -199,12 +219,13 @@
         }
         if(self.options.closable) {
             $(document.body).rebind('mousedown.dialogClose' + self.dialogIdx, function(e) {
-                if($(self.$dialog).find(e.target).length == 0 && $(self.$dialog).is(e.target) === false) {
+                if($(self.$dialog).find(e.target).length == 0 && $(self.$dialog).is(e.target) === false && !$(self.$dialog).is(".fm-mega-dialog")) {
                     self.hide();
+                    return false;
                 }
             });
         }
-        if(!self.options.expandable && self.options.requiresOverlay) {
+        if(!self.options.expandable || self.options.requiresOverlay) {
             self._showOverlay();
         }
 

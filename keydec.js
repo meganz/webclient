@@ -1,10 +1,6136 @@
-!function(a,b){"use strict";function c(){var a=Error.apply(this,arguments);this.message=a.message,this.stack=a.stack}function d(){var a=Error.apply(this,arguments);this.message=a.message,this.stack=a.stack}function e(){var a=Error.apply(this,arguments);this.message=a.message,this.stack=a.stack}function f(a){for(var b=a.length,c=new Uint8Array(b),d=0;b>d;d++){var e=a.charCodeAt(d);if(e>>>8)throw new Error("Wide characters are not allowed");c[d]=e}return c}function g(a){var b,c=[],d=a.length;for(1&d&&(a="0"+a,d++),b=0;d>b;b+=2)c.push(parseInt(a.substr(b,2),16));return new Uint8Array(c)}function h(a){return f(atob(a))}function i(a){for(var b="",c=0;c<a.length;c++)b+=String.fromCharCode(a[c]);return b}function j(a){for(var b="",c=0;c<a.length;c++){var d=(255&a[c]).toString(16);d.length<2&&(b+="0"),b+=d}return b}function k(a){return btoa(i(a))}function l(a){return a-=1,a|=a>>>1,a|=a>>>2,a|=a>>>4,a|=a>>>8,a|=a>>>16,a+=1}function m(a){return"number"==typeof a}function n(a){return"string"==typeof a}function o(a){return a instanceof ArrayBuffer}function p(a){return a instanceof Uint8Array}function q(a){return a instanceof Int8Array||a instanceof Uint8Array||a instanceof Int16Array||a instanceof Uint16Array||a instanceof Int32Array||a instanceof Uint32Array||a instanceof Float32Array||a instanceof Float64Array}function r(a,b){var c=b.heap,d=c?c.byteLength:b.heapSize||4096;if(4095&d||0>=d)throw new Error("heap size must be a positive integer and a multiple of 4096");return c=c||new a(new ArrayBuffer(d))}function s(a,b,c,d,e){var f=a.length-b,g=e>f?f:e;return a.set(c.subarray(d,d+g),b),g}function t(a,b,c){"use asm";var d=0,e=0,f=0,g=0,h=0,i=0,j=0,k=0,l=0,m=0,n=0,o=0,p=0,q=0,r=0,s=0;var u=0;var v=0,w=0,x=0,y=0,z=0,A=0,B=0,C=0;var D=0,E=0,F=0,G=0,H=0,I=0,J=0,K=0,L=0,M=0,N=0,O=0,P=0,Q=0,R=0,S=0,T=0,U=0,V=0,W=0,X=0,Y=0,Z=0,$=0,_=0,ab=0,bb=0,cb=0,db=0,eb=0,fb=0,gb=0,hb=0,ib=0,jb=0,kb=0,lb=0,mb=0,nb=0,ob=0,pb=0,qb=0,rb=0,sb=0,tb=0,ub=0,vb=0,wb=0,xb=0,yb=0,zb=0,Ab=0,Bb=0,Cb=0,Db=0,Eb=0,Fb=0,Gb=0,Hb=0,Ib=0,Jb=0,Kb=0,Lb=0,Mb=0,Nb=0,Ob=0,Pb=0,Qb=0,Rb=0,Sb=0,Tb=0,Ub=0,Vb=0,Wb=0,Xb=0,Yb=0,Zb=0,$b=0,_b=0,ac=0,bc=0,cc=0,dc=0,ec=0,fc=0,gc=0,hc=0,ic=0,jc=0,kc=0,lc=0,mc=0,nc=0,oc=0,pc=0,qc=0,rc=0,sc=0,tc=0,uc=0,vc=0,wc=0,xc=0,yc=0,zc=0,Ac=0,Bc=0,Cc=0,Dc=0,Ec=0,Fc=0,Gc=0,Hc=0,Ic=0,Jc=0,Kc=0,Lc=0,Mc=0,Nc=0,Oc=0,Pc=0,Qc=0,Rc=0,Sc=0,Tc=0,Uc=0,Vc=0,Wc=0,Xc=0,Yc=0,Zc=0,$c=0,_c=0,ad=0,bd=0,cd=0,dd=0,ed=0,fd=0,gd=0,hd=0,id=0,jd=0,kd=0,ld=0,md=0,nd=0,od=0,pd=0,qd=0,rd=0,sd=0,td=0,ud=0,vd=0,wd=0,xd=0,yd=0,zd=0,Ad=0,Bd=0,Cd=0,Dd=0,Ed=0,Fd=0,Gd=0,Hd=0,Id=0,Jd=0,Kd=0,Ld=0,Md=0,Nd=0,Od=0,Pd=0,Qd=0,Rd=0,Sd=0,Td=0,Ud=0,Vd=0,Wd=0,Xd=0,Yd=0,Zd=0,$d=0,_d=0,ae=0,be=0,ce=0,de=0,ee=0,fe=0,ge=0,he=0,ie=0,je=0,ke=0,le=0,me=0,ne=0,oe=0,pe=0,qe=0,re=0,se=0,te=0,ue=0,ve=0,we=0,xe=0,ye=0,ze=0,Ae=0,Be=0,Ce=0,De=0,Ee=0,Fe=0,Ge=0,He=0,Ie=0,Je=0,Ke=0,Le=0,Me=0,Ne=0,Oe=0,Pe=0,Qe=0,Re=0,Se=0,Te=0,Ue=0,Ve=0,We=0,Xe=0,Ye=0,Ze=0,$e=0;var _e=new a.Uint8Array(c);function af(){var yf=0;T=D^_e[yf|Q]^1;U=E^_e[yf|R];V=F^_e[yf|S];W=G^_e[yf|P];X=H^T;Y=I^U;Z=J^V;$=K^W;_=L^X;ab=M^Y;bb=N^Z;cb=O^$;db=P^_;eb=Q^ab;fb=R^bb;gb=S^cb;hb=T^_e[yf|eb]^2;ib=U^_e[yf|fb];jb=V^_e[yf|gb];kb=W^_e[yf|db];lb=X^hb;mb=Y^ib;nb=Z^jb;ob=$^kb;pb=_^lb;qb=ab^mb;rb=bb^nb;sb=cb^ob;tb=db^pb;ub=eb^qb;vb=fb^rb;wb=gb^sb;xb=hb^_e[yf|ub]^4;yb=ib^_e[yf|vb];zb=jb^_e[yf|wb];Ab=kb^_e[yf|tb];Bb=lb^xb;Cb=mb^yb;Db=nb^zb;Eb=ob^Ab;Fb=pb^Bb;Gb=qb^Cb;Hb=rb^Db;Ib=sb^Eb;Jb=tb^Fb;Kb=ub^Gb;Lb=vb^Hb;Mb=wb^Ib;Nb=xb^_e[yf|Kb]^8;Ob=yb^_e[yf|Lb];Pb=zb^_e[yf|Mb];Qb=Ab^_e[yf|Jb];Rb=Bb^Nb;Sb=Cb^Ob;Tb=Db^Pb;Ub=Eb^Qb;Vb=Fb^Rb;Wb=Gb^Sb;Xb=Hb^Tb;Yb=Ib^Ub;Zb=Jb^Vb;$b=Kb^Wb;_b=Lb^Xb;ac=Mb^Yb;bc=Nb^_e[yf|$b]^16;cc=Ob^_e[yf|_b];dc=Pb^_e[yf|ac];ec=Qb^_e[yf|Zb];fc=Rb^bc;gc=Sb^cc;hc=Tb^dc;ic=Ub^ec;jc=Vb^fc;kc=Wb^gc;lc=Xb^hc;mc=Yb^ic;nc=Zb^jc;oc=$b^kc;pc=_b^lc;qc=ac^mc;rc=bc^_e[yf|oc]^32;sc=cc^_e[yf|pc];tc=dc^_e[yf|qc];uc=ec^_e[yf|nc];vc=fc^rc;wc=gc^sc;xc=hc^tc;yc=ic^uc;zc=jc^vc;Ac=kc^wc;Bc=lc^xc;Cc=mc^yc;Dc=nc^zc;Ec=oc^Ac;Fc=pc^Bc;Gc=qc^Cc;Hc=rc^_e[yf|Ec]^64;Ic=sc^_e[yf|Fc];Jc=tc^_e[yf|Gc];Kc=uc^_e[yf|Dc];Lc=vc^Hc;Mc=wc^Ic;Nc=xc^Jc;Oc=yc^Kc;Pc=zc^Lc;Qc=Ac^Mc;Rc=Bc^Nc;Sc=Cc^Oc;Tc=Dc^Pc;Uc=Ec^Qc;Vc=Fc^Rc;Wc=Gc^Sc;Xc=Hc^_e[yf|Uc]^128;Yc=Ic^_e[yf|Vc];Zc=Jc^_e[yf|Wc];$c=Kc^_e[yf|Tc];_c=Lc^Xc;ad=Mc^Yc;bd=Nc^Zc;cd=Oc^$c;dd=Pc^_c;ed=Qc^ad;fd=Rc^bd;gd=Sc^cd;hd=Tc^dd;id=Uc^ed;jd=Vc^fd;kd=Wc^gd;ld=Xc^_e[yf|id]^27;md=Yc^_e[yf|jd];nd=Zc^_e[yf|kd];od=$c^_e[yf|hd];pd=_c^ld;qd=ad^md;rd=bd^nd;sd=cd^od;td=dd^pd;ud=ed^qd;vd=fd^rd;wd=gd^sd;xd=hd^td;yd=id^ud;zd=jd^vd;Ad=kd^wd;Bd=ld^_e[yf|yd]^54;Cd=md^_e[yf|zd];Dd=nd^_e[yf|Ad];Ed=od^_e[yf|xd];Fd=pd^Bd;Gd=qd^Cd;Hd=rd^Dd;Id=sd^Ed;Jd=td^Fd;Kd=ud^Gd;Ld=vd^Hd;Md=wd^Id;Nd=xd^Jd;Od=yd^Kd;Pd=zd^Ld;Qd=Ad^Md}function bf(){var yf=0;hb=D^_e[yf|eb]^1;ib=E^_e[yf|fb];jb=F^_e[yf|gb];kb=G^_e[yf|db];lb=H^hb;mb=I^ib;nb=J^jb;ob=K^kb;pb=L^lb;qb=M^mb;rb=N^nb;sb=O^ob;tb=P^pb;ub=Q^qb;vb=R^rb;wb=S^sb;xb=T^_e[yf|tb];yb=U^_e[yf|ub];zb=V^_e[yf|vb];Ab=W^_e[yf|wb];Bb=X^xb;Cb=Y^yb;Db=Z^zb;Eb=$^Ab;Fb=_^Bb;Gb=ab^Cb;Hb=bb^Db;Ib=cb^Eb;Jb=db^Fb;Kb=eb^Gb;Lb=fb^Hb;Mb=gb^Ib;Nb=hb^_e[yf|Kb]^2;Ob=ib^_e[yf|Lb];Pb=jb^_e[yf|Mb];Qb=kb^_e[yf|Jb];Rb=lb^Nb;Sb=mb^Ob;Tb=nb^Pb;Ub=ob^Qb;Vb=pb^Rb;Wb=qb^Sb;Xb=rb^Tb;Yb=sb^Ub;Zb=tb^Vb;$b=ub^Wb;_b=vb^Xb;ac=wb^Yb;bc=xb^_e[yf|Zb];cc=yb^_e[yf|$b];dc=zb^_e[yf|_b];ec=Ab^_e[yf|ac];fc=Bb^bc;gc=Cb^cc;hc=Db^dc;ic=Eb^ec;jc=Fb^fc;kc=Gb^gc;lc=Hb^hc;mc=Ib^ic;nc=Jb^jc;oc=Kb^kc;pc=Lb^lc;qc=Mb^mc;rc=Nb^_e[yf|oc]^4;sc=Ob^_e[yf|pc];tc=Pb^_e[yf|qc];uc=Qb^_e[yf|nc];vc=Rb^rc;wc=Sb^sc;xc=Tb^tc;yc=Ub^uc;zc=Vb^vc;Ac=Wb^wc;Bc=Xb^xc;Cc=Yb^yc;Dc=Zb^zc;Ec=$b^Ac;Fc=_b^Bc;Gc=ac^Cc;Hc=bc^_e[yf|Dc];Ic=cc^_e[yf|Ec];Jc=dc^_e[yf|Fc];Kc=ec^_e[yf|Gc];Lc=fc^Hc;Mc=gc^Ic;Nc=hc^Jc;Oc=ic^Kc;Pc=jc^Lc;Qc=kc^Mc;Rc=lc^Nc;Sc=mc^Oc;Tc=nc^Pc;Uc=oc^Qc;Vc=pc^Rc;Wc=qc^Sc;Xc=rc^_e[yf|Uc]^8;Yc=sc^_e[yf|Vc];Zc=tc^_e[yf|Wc];$c=uc^_e[yf|Tc];_c=vc^Xc;ad=wc^Yc;bd=xc^Zc;cd=yc^$c;dd=zc^_c;ed=Ac^ad;fd=Bc^bd;gd=Cc^cd;hd=Dc^dd;id=Ec^ed;jd=Fc^fd;kd=Gc^gd;ld=Hc^_e[yf|hd];md=Ic^_e[yf|id];nd=Jc^_e[yf|jd];od=Kc^_e[yf|kd];pd=Lc^ld;qd=Mc^md;rd=Nc^nd;sd=Oc^od;td=Pc^pd;ud=Qc^qd;vd=Rc^rd;wd=Sc^sd;xd=Tc^td;yd=Uc^ud;zd=Vc^vd;Ad=Wc^wd;Bd=Xc^_e[yf|yd]^16;Cd=Yc^_e[yf|zd];Dd=Zc^_e[yf|Ad];Ed=$c^_e[yf|xd];Fd=_c^Bd;Gd=ad^Cd;Hd=bd^Dd;Id=cd^Ed;Jd=dd^Fd;Kd=ed^Gd;Ld=fd^Hd;Md=gd^Id;Nd=hd^Jd;Od=id^Kd;Pd=jd^Ld;Qd=kd^Md;Rd=ld^_e[yf|Nd];Sd=md^_e[yf|Od];Td=nd^_e[yf|Pd];Ud=od^_e[yf|Qd];Vd=pd^Rd;Wd=qd^Sd;Xd=rd^Td;Yd=sd^Ud;Zd=td^Vd;$d=ud^Wd;_d=vd^Xd;ae=wd^Yd;be=xd^Zd;ce=yd^$d;de=zd^_d;ee=Ad^ae;fe=Bd^_e[yf|ce]^32;ge=Cd^_e[yf|de];he=Dd^_e[yf|ee];ie=Ed^_e[yf|be];je=Fd^fe;ke=Gd^ge;le=Hd^he;me=Id^ie;ne=Jd^je;oe=Kd^ke;pe=Ld^le;qe=Md^me;re=Nd^ne;se=Od^oe;te=Pd^pe;ue=Qd^qe;ve=Rd^_e[yf|re];we=Sd^_e[yf|se];xe=Td^_e[yf|te];ye=Ud^_e[yf|ue];ze=Vd^ve;Ae=Wd^we;Be=Xd^xe;Ce=Yd^ye;De=Zd^ze;Ee=$d^Ae;Fe=_d^Be;Ge=ae^Ce;He=be^De;Ie=ce^Ee;Je=de^Fe;Ke=ee^Ge;Le=fe^_e[yf|Ie]^64;Me=ge^_e[yf|Je];Ne=he^_e[yf|Ke];Oe=ie^_e[yf|He];Pe=je^Le;Qe=ke^Me;Re=le^Ne;Se=me^Oe;Te=ne^Pe;Ue=oe^Qe;Ve=pe^Re;We=qe^Se;Xe=re^Te;Ye=se^Ue;Ze=te^Ve;$e=ue^We}function cf(yf,zf,Af,Bf,Cf,Df,Ef,Ff,Gf,Hf,If,Jf,Kf,Lf,Mf,Nf){yf=yf|0;zf=zf|0;Af=Af|0;Bf=Bf|0;Cf=Cf|0;Df=Df|0;Ef=Ef|0;Ff=Ff|0;Gf=Gf|0;Hf=Hf|0;If=If|0;Jf=Jf|0;Kf=Kf|0;Lf=Lf|0;Mf=Mf|0;Nf=Nf|0;var Of=0,Pf=0,Qf=0,Rf=0,Sf=0,Tf=0,Uf=0,Vf=0,Wf=0,Xf=0,Yf=0,Zf=0,$f=0,_f=0,ag=0,bg=0,cg=0,dg=512,eg=768;yf=yf^D;zf=zf^E;Af=Af^F;Bf=Bf^G;Cf=Cf^H;Df=Df^I;Ef=Ef^J;Ff=Ff^K;Gf=Gf^L;Hf=Hf^M;If=If^N;Jf=Jf^O;Kf=Kf^P;Lf=Lf^Q;Mf=Mf^R;Nf=Nf^S;Of=_e[dg|yf]^_e[eg|Df]^_e[cg|If]^_e[cg|Nf]^T;Pf=_e[cg|yf]^_e[dg|Df]^_e[eg|If]^_e[cg|Nf]^U;Qf=_e[cg|yf]^_e[cg|Df]^_e[dg|If]^_e[eg|Nf]^V;Rf=_e[eg|yf]^_e[cg|Df]^_e[cg|If]^_e[dg|Nf]^W;Sf=_e[dg|Cf]^_e[eg|Hf]^_e[cg|Mf]^_e[cg|Bf]^X;Tf=_e[cg|Cf]^_e[dg|Hf]^_e[eg|Mf]^_e[cg|Bf]^Y;Uf=_e[cg|Cf]^_e[cg|Hf]^_e[dg|Mf]^_e[eg|Bf]^Z;Vf=_e[eg|Cf]^_e[cg|Hf]^_e[cg|Mf]^_e[dg|Bf]^$;Wf=_e[dg|Gf]^_e[eg|Lf]^_e[cg|Af]^_e[cg|Ff]^_;Xf=_e[cg|Gf]^_e[dg|Lf]^_e[eg|Af]^_e[cg|Ff]^ab;Yf=_e[cg|Gf]^_e[cg|Lf]^_e[dg|Af]^_e[eg|Ff]^bb;Zf=_e[eg|Gf]^_e[cg|Lf]^_e[cg|Af]^_e[dg|Ff]^cb;$f=_e[dg|Kf]^_e[eg|zf]^_e[cg|Ef]^_e[cg|Jf]^db;_f=_e[cg|Kf]^_e[dg|zf]^_e[eg|Ef]^_e[cg|Jf]^eb;ag=_e[cg|Kf]^_e[cg|zf]^_e[dg|Ef]^_e[eg|Jf]^fb;bg=_e[eg|Kf]^_e[cg|zf]^_e[cg|Ef]^_e[dg|Jf]^gb;yf=_e[dg|Of]^_e[eg|Tf]^_e[cg|Yf]^_e[cg|bg]^hb;zf=_e[cg|Of]^_e[dg|Tf]^_e[eg|Yf]^_e[cg|bg]^ib;Af=_e[cg|Of]^_e[cg|Tf]^_e[dg|Yf]^_e[eg|bg]^jb;Bf=_e[eg|Of]^_e[cg|Tf]^_e[cg|Yf]^_e[dg|bg]^kb;Cf=_e[dg|Sf]^_e[eg|Xf]^_e[cg|ag]^_e[cg|Rf]^lb;Df=_e[cg|Sf]^_e[dg|Xf]^_e[eg|ag]^_e[cg|Rf]^mb;Ef=_e[cg|Sf]^_e[cg|Xf]^_e[dg|ag]^_e[eg|Rf]^nb;Ff=_e[eg|Sf]^_e[cg|Xf]^_e[cg|ag]^_e[dg|Rf]^ob;Gf=_e[dg|Wf]^_e[eg|_f]^_e[cg|Qf]^_e[cg|Vf]^pb;Hf=_e[cg|Wf]^_e[dg|_f]^_e[eg|Qf]^_e[cg|Vf]^qb;If=_e[cg|Wf]^_e[cg|_f]^_e[dg|Qf]^_e[eg|Vf]^rb;Jf=_e[eg|Wf]^_e[cg|_f]^_e[cg|Qf]^_e[dg|Vf]^sb;Kf=_e[dg|$f]^_e[eg|Pf]^_e[cg|Uf]^_e[cg|Zf]^tb;Lf=_e[cg|$f]^_e[dg|Pf]^_e[eg|Uf]^_e[cg|Zf]^ub;Mf=_e[cg|$f]^_e[cg|Pf]^_e[dg|Uf]^_e[eg|Zf]^vb;Nf=_e[eg|$f]^_e[cg|Pf]^_e[cg|Uf]^_e[dg|Zf]^wb;Of=_e[dg|yf]^_e[eg|Df]^_e[cg|If]^_e[cg|Nf]^xb;Pf=_e[cg|yf]^_e[dg|Df]^_e[eg|If]^_e[cg|Nf]^yb;Qf=_e[cg|yf]^_e[cg|Df]^_e[dg|If]^_e[eg|Nf]^zb;Rf=_e[eg|yf]^_e[cg|Df]^_e[cg|If]^_e[dg|Nf]^Ab;Sf=_e[dg|Cf]^_e[eg|Hf]^_e[cg|Mf]^_e[cg|Bf]^Bb;Tf=_e[cg|Cf]^_e[dg|Hf]^_e[eg|Mf]^_e[cg|Bf]^Cb;Uf=_e[cg|Cf]^_e[cg|Hf]^_e[dg|Mf]^_e[eg|Bf]^Db;Vf=_e[eg|Cf]^_e[cg|Hf]^_e[cg|Mf]^_e[dg|Bf]^Eb;Wf=_e[dg|Gf]^_e[eg|Lf]^_e[cg|Af]^_e[cg|Ff]^Fb;Xf=_e[cg|Gf]^_e[dg|Lf]^_e[eg|Af]^_e[cg|Ff]^Gb;Yf=_e[cg|Gf]^_e[cg|Lf]^_e[dg|Af]^_e[eg|Ff]^Hb;Zf=_e[eg|Gf]^_e[cg|Lf]^_e[cg|Af]^_e[dg|Ff]^Ib;$f=_e[dg|Kf]^_e[eg|zf]^_e[cg|Ef]^_e[cg|Jf]^Jb;_f=_e[cg|Kf]^_e[dg|zf]^_e[eg|Ef]^_e[cg|Jf]^Kb;ag=_e[cg|Kf]^_e[cg|zf]^_e[dg|Ef]^_e[eg|Jf]^Lb;bg=_e[eg|Kf]^_e[cg|zf]^_e[cg|Ef]^_e[dg|Jf]^Mb;yf=_e[dg|Of]^_e[eg|Tf]^_e[cg|Yf]^_e[cg|bg]^Nb;zf=_e[cg|Of]^_e[dg|Tf]^_e[eg|Yf]^_e[cg|bg]^Ob;Af=_e[cg|Of]^_e[cg|Tf]^_e[dg|Yf]^_e[eg|bg]^Pb;Bf=_e[eg|Of]^_e[cg|Tf]^_e[cg|Yf]^_e[dg|bg]^Qb;Cf=_e[dg|Sf]^_e[eg|Xf]^_e[cg|ag]^_e[cg|Rf]^Rb;Df=_e[cg|Sf]^_e[dg|Xf]^_e[eg|ag]^_e[cg|Rf]^Sb;Ef=_e[cg|Sf]^_e[cg|Xf]^_e[dg|ag]^_e[eg|Rf]^Tb;Ff=_e[eg|Sf]^_e[cg|Xf]^_e[cg|ag]^_e[dg|Rf]^Ub;Gf=_e[dg|Wf]^_e[eg|_f]^_e[cg|Qf]^_e[cg|Vf]^Vb;Hf=_e[cg|Wf]^_e[dg|_f]^_e[eg|Qf]^_e[cg|Vf]^Wb;If=_e[cg|Wf]^_e[cg|_f]^_e[dg|Qf]^_e[eg|Vf]^Xb;Jf=_e[eg|Wf]^_e[cg|_f]^_e[cg|Qf]^_e[dg|Vf]^Yb;Kf=_e[dg|$f]^_e[eg|Pf]^_e[cg|Uf]^_e[cg|Zf]^Zb;Lf=_e[cg|$f]^_e[dg|Pf]^_e[eg|Uf]^_e[cg|Zf]^$b;Mf=_e[cg|$f]^_e[cg|Pf]^_e[dg|Uf]^_e[eg|Zf]^_b;Nf=_e[eg|$f]^_e[cg|Pf]^_e[cg|Uf]^_e[dg|Zf]^ac;Of=_e[dg|yf]^_e[eg|Df]^_e[cg|If]^_e[cg|Nf]^bc;Pf=_e[cg|yf]^_e[dg|Df]^_e[eg|If]^_e[cg|Nf]^cc;Qf=_e[cg|yf]^_e[cg|Df]^_e[dg|If]^_e[eg|Nf]^dc;Rf=_e[eg|yf]^_e[cg|Df]^_e[cg|If]^_e[dg|Nf]^ec;Sf=_e[dg|Cf]^_e[eg|Hf]^_e[cg|Mf]^_e[cg|Bf]^fc;Tf=_e[cg|Cf]^_e[dg|Hf]^_e[eg|Mf]^_e[cg|Bf]^gc;Uf=_e[cg|Cf]^_e[cg|Hf]^_e[dg|Mf]^_e[eg|Bf]^hc;Vf=_e[eg|Cf]^_e[cg|Hf]^_e[cg|Mf]^_e[dg|Bf]^ic;Wf=_e[dg|Gf]^_e[eg|Lf]^_e[cg|Af]^_e[cg|Ff]^jc;Xf=_e[cg|Gf]^_e[dg|Lf]^_e[eg|Af]^_e[cg|Ff]^kc;Yf=_e[cg|Gf]^_e[cg|Lf]^_e[dg|Af]^_e[eg|Ff]^lc;Zf=_e[eg|Gf]^_e[cg|Lf]^_e[cg|Af]^_e[dg|Ff]^mc;$f=_e[dg|Kf]^_e[eg|zf]^_e[cg|Ef]^_e[cg|Jf]^nc;_f=_e[cg|Kf]^_e[dg|zf]^_e[eg|Ef]^_e[cg|Jf]^oc;ag=_e[cg|Kf]^_e[cg|zf]^_e[dg|Ef]^_e[eg|Jf]^pc;bg=_e[eg|Kf]^_e[cg|zf]^_e[cg|Ef]^_e[dg|Jf]^qc;yf=_e[dg|Of]^_e[eg|Tf]^_e[cg|Yf]^_e[cg|bg]^rc;zf=_e[cg|Of]^_e[dg|Tf]^_e[eg|Yf]^_e[cg|bg]^sc;Af=_e[cg|Of]^_e[cg|Tf]^_e[dg|Yf]^_e[eg|bg]^tc;Bf=_e[eg|Of]^_e[cg|Tf]^_e[cg|Yf]^_e[dg|bg]^uc;Cf=_e[dg|Sf]^_e[eg|Xf]^_e[cg|ag]^_e[cg|Rf]^vc;Df=_e[cg|Sf]^_e[dg|Xf]^_e[eg|ag]^_e[cg|Rf]^wc;Ef=_e[cg|Sf]^_e[cg|Xf]^_e[dg|ag]^_e[eg|Rf]^xc;Ff=_e[eg|Sf]^_e[cg|Xf]^_e[cg|ag]^_e[dg|Rf]^yc;Gf=_e[dg|Wf]^_e[eg|_f]^_e[cg|Qf]^_e[cg|Vf]^zc;Hf=_e[cg|Wf]^_e[dg|_f]^_e[eg|Qf]^_e[cg|Vf]^Ac;If=_e[cg|Wf]^_e[cg|_f]^_e[dg|Qf]^_e[eg|Vf]^Bc;Jf=_e[eg|Wf]^_e[cg|_f]^_e[cg|Qf]^_e[dg|Vf]^Cc;Kf=_e[dg|$f]^_e[eg|Pf]^_e[cg|Uf]^_e[cg|Zf]^Dc;Lf=_e[cg|$f]^_e[dg|Pf]^_e[eg|Uf]^_e[cg|Zf]^Ec;Mf=_e[cg|$f]^_e[cg|Pf]^_e[dg|Uf]^_e[eg|Zf]^Fc;Nf=_e[eg|$f]^_e[cg|Pf]^_e[cg|Uf]^_e[dg|Zf]^Gc;Of=_e[dg|yf]^_e[eg|Df]^_e[cg|If]^_e[cg|Nf]^Hc;Pf=_e[cg|yf]^_e[dg|Df]^_e[eg|If]^_e[cg|Nf]^Ic;Qf=_e[cg|yf]^_e[cg|Df]^_e[dg|If]^_e[eg|Nf]^Jc;Rf=_e[eg|yf]^_e[cg|Df]^_e[cg|If]^_e[dg|Nf]^Kc;Sf=_e[dg|Cf]^_e[eg|Hf]^_e[cg|Mf]^_e[cg|Bf]^Lc;Tf=_e[cg|Cf]^_e[dg|Hf]^_e[eg|Mf]^_e[cg|Bf]^Mc;Uf=_e[cg|Cf]^_e[cg|Hf]^_e[dg|Mf]^_e[eg|Bf]^Nc;Vf=_e[eg|Cf]^_e[cg|Hf]^_e[cg|Mf]^_e[dg|Bf]^Oc;Wf=_e[dg|Gf]^_e[eg|Lf]^_e[cg|Af]^_e[cg|Ff]^Pc;Xf=_e[cg|Gf]^_e[dg|Lf]^_e[eg|Af]^_e[cg|Ff]^Qc;Yf=_e[cg|Gf]^_e[cg|Lf]^_e[dg|Af]^_e[eg|Ff]^Rc;Zf=_e[eg|Gf]^_e[cg|Lf]^_e[cg|Af]^_e[dg|Ff]^Sc;$f=_e[dg|Kf]^_e[eg|zf]^_e[cg|Ef]^_e[cg|Jf]^Tc;_f=_e[cg|Kf]^_e[dg|zf]^_e[eg|Ef]^_e[cg|Jf]^Uc;ag=_e[cg|Kf]^_e[cg|zf]^_e[dg|Ef]^_e[eg|Jf]^Vc;bg=_e[eg|Kf]^_e[cg|zf]^_e[cg|Ef]^_e[dg|Jf]^Wc;yf=_e[dg|Of]^_e[eg|Tf]^_e[cg|Yf]^_e[cg|bg]^Xc;zf=_e[cg|Of]^_e[dg|Tf]^_e[eg|Yf]^_e[cg|bg]^Yc;Af=_e[cg|Of]^_e[cg|Tf]^_e[dg|Yf]^_e[eg|bg]^Zc;Bf=_e[eg|Of]^_e[cg|Tf]^_e[cg|Yf]^_e[dg|bg]^$c;Cf=_e[dg|Sf]^_e[eg|Xf]^_e[cg|ag]^_e[cg|Rf]^_c;Df=_e[cg|Sf]^_e[dg|Xf]^_e[eg|ag]^_e[cg|Rf]^ad;Ef=_e[cg|Sf]^_e[cg|Xf]^_e[dg|ag]^_e[eg|Rf]^bd;Ff=_e[eg|Sf]^_e[cg|Xf]^_e[cg|ag]^_e[dg|Rf]^cd;Gf=_e[dg|Wf]^_e[eg|_f]^_e[cg|Qf]^_e[cg|Vf]^dd;Hf=_e[cg|Wf]^_e[dg|_f]^_e[eg|Qf]^_e[cg|Vf]^ed;If=_e[cg|Wf]^_e[cg|_f]^_e[dg|Qf]^_e[eg|Vf]^fd;Jf=_e[eg|Wf]^_e[cg|_f]^_e[cg|Qf]^_e[dg|Vf]^gd;Kf=_e[dg|$f]^_e[eg|Pf]^_e[cg|Uf]^_e[cg|Zf]^hd;Lf=_e[cg|$f]^_e[dg|Pf]^_e[eg|Uf]^_e[cg|Zf]^id;Mf=_e[cg|$f]^_e[cg|Pf]^_e[dg|Uf]^_e[eg|Zf]^jd;Nf=_e[eg|$f]^_e[cg|Pf]^_e[cg|Uf]^_e[dg|Zf]^kd;Of=_e[dg|yf]^_e[eg|Df]^_e[cg|If]^_e[cg|Nf]^ld;Pf=_e[cg|yf]^_e[dg|Df]^_e[eg|If]^_e[cg|Nf]^md;Qf=_e[cg|yf]^_e[cg|Df]^_e[dg|If]^_e[eg|Nf]^nd;Rf=_e[eg|yf]^_e[cg|Df]^_e[cg|If]^_e[dg|Nf]^od;Sf=_e[dg|Cf]^_e[eg|Hf]^_e[cg|Mf]^_e[cg|Bf]^pd;Tf=_e[cg|Cf]^_e[dg|Hf]^_e[eg|Mf]^_e[cg|Bf]^qd;Uf=_e[cg|Cf]^_e[cg|Hf]^_e[dg|Mf]^_e[eg|Bf]^rd;Vf=_e[eg|Cf]^_e[cg|Hf]^_e[cg|Mf]^_e[dg|Bf]^sd;Wf=_e[dg|Gf]^_e[eg|Lf]^_e[cg|Af]^_e[cg|Ff]^td;Xf=_e[cg|Gf]^_e[dg|Lf]^_e[eg|Af]^_e[cg|Ff]^ud;Yf=_e[cg|Gf]^_e[cg|Lf]^_e[dg|Af]^_e[eg|Ff]^vd;Zf=_e[eg|Gf]^_e[cg|Lf]^_e[cg|Af]^_e[dg|Ff]^wd;$f=_e[dg|Kf]^_e[eg|zf]^_e[cg|Ef]^_e[cg|Jf]^xd;_f=_e[cg|Kf]^_e[dg|zf]^_e[eg|Ef]^_e[cg|Jf]^yd;ag=_e[cg|Kf]^_e[cg|zf]^_e[dg|Ef]^_e[eg|Jf]^zd;bg=_e[eg|Kf]^_e[cg|zf]^_e[cg|Ef]^_e[dg|Jf]^Ad;if((u|0)==16){d=_e[cg|Of]^Bd;e=_e[cg|Tf]^Cd;f=_e[cg|Yf]^Dd;g=_e[cg|bg]^Ed;h=_e[cg|Sf]^Fd;i=_e[cg|Xf]^Gd;j=_e[cg|ag]^Hd;k=_e[cg|Rf]^Id;l=_e[cg|Wf]^Jd;m=_e[cg|_f]^Kd;n=_e[cg|Qf]^Ld;o=_e[cg|Vf]^Md;p=_e[cg|$f]^Nd;q=_e[cg|Pf]^Od;r=_e[cg|Uf]^Pd;s=_e[cg|Zf]^Qd;return}yf=_e[dg|Of]^_e[eg|Tf]^_e[cg|Yf]^_e[cg|bg]^Bd;zf=_e[cg|Of]^_e[dg|Tf]^_e[eg|Yf]^_e[cg|bg]^Cd;Af=_e[cg|Of]^_e[cg|Tf]^_e[dg|Yf]^_e[eg|bg]^Dd;Bf=_e[eg|Of]^_e[cg|Tf]^_e[cg|Yf]^_e[dg|bg]^Ed;Cf=_e[dg|Sf]^_e[eg|Xf]^_e[cg|ag]^_e[cg|Rf]^Fd;Df=_e[cg|Sf]^_e[dg|Xf]^_e[eg|ag]^_e[cg|Rf]^Gd;Ef=_e[cg|Sf]^_e[cg|Xf]^_e[dg|ag]^_e[eg|Rf]^Hd;Ff=_e[eg|Sf]^_e[cg|Xf]^_e[cg|ag]^_e[dg|Rf]^Id;Gf=_e[dg|Wf]^_e[eg|_f]^_e[cg|Qf]^_e[cg|Vf]^Jd;Hf=_e[cg|Wf]^_e[dg|_f]^_e[eg|Qf]^_e[cg|Vf]^Kd;If=_e[cg|Wf]^_e[cg|_f]^_e[dg|Qf]^_e[eg|Vf]^Ld;Jf=_e[eg|Wf]^_e[cg|_f]^_e[cg|Qf]^_e[dg|Vf]^Md;Kf=_e[dg|$f]^_e[eg|Pf]^_e[cg|Uf]^_e[cg|Zf]^Nd;Lf=_e[cg|$f]^_e[dg|Pf]^_e[eg|Uf]^_e[cg|Zf]^Od;Mf=_e[cg|$f]^_e[cg|Pf]^_e[dg|Uf]^_e[eg|Zf]^Pd;Nf=_e[eg|$f]^_e[cg|Pf]^_e[cg|Uf]^_e[dg|Zf]^Qd;Of=_e[dg|yf]^_e[eg|Df]^_e[cg|If]^_e[cg|Nf]^Rd;Pf=_e[cg|yf]^_e[dg|Df]^_e[eg|If]^_e[cg|Nf]^Sd;Qf=_e[cg|yf]^_e[cg|Df]^_e[dg|If]^_e[eg|Nf]^Td;Rf=_e[eg|yf]^_e[cg|Df]^_e[cg|If]^_e[dg|Nf]^Ud;Sf=_e[dg|Cf]^_e[eg|Hf]^_e[cg|Mf]^_e[cg|Bf]^Vd;Tf=_e[cg|Cf]^_e[dg|Hf]^_e[eg|Mf]^_e[cg|Bf]^Wd;Uf=_e[cg|Cf]^_e[cg|Hf]^_e[dg|Mf]^_e[eg|Bf]^Xd;Vf=_e[eg|Cf]^_e[cg|Hf]^_e[cg|Mf]^_e[dg|Bf]^Yd;Wf=_e[dg|Gf]^_e[eg|Lf]^_e[cg|Af]^_e[cg|Ff]^Zd;Xf=_e[cg|Gf]^_e[dg|Lf]^_e[eg|Af]^_e[cg|Ff]^$d;Yf=_e[cg|Gf]^_e[cg|Lf]^_e[dg|Af]^_e[eg|Ff]^_d;Zf=_e[eg|Gf]^_e[cg|Lf]^_e[cg|Af]^_e[dg|Ff]^ae;$f=_e[dg|Kf]^_e[eg|zf]^_e[cg|Ef]^_e[cg|Jf]^be;_f=_e[cg|Kf]^_e[dg|zf]^_e[eg|Ef]^_e[cg|Jf]^ce;ag=_e[cg|Kf]^_e[cg|zf]^_e[dg|Ef]^_e[eg|Jf]^de;bg=_e[eg|Kf]^_e[cg|zf]^_e[cg|Ef]^_e[dg|Jf]^ee;yf=_e[dg|Of]^_e[eg|Tf]^_e[cg|Yf]^_e[cg|bg]^fe;zf=_e[cg|Of]^_e[dg|Tf]^_e[eg|Yf]^_e[cg|bg]^ge;Af=_e[cg|Of]^_e[cg|Tf]^_e[dg|Yf]^_e[eg|bg]^he;Bf=_e[eg|Of]^_e[cg|Tf]^_e[cg|Yf]^_e[dg|bg]^ie;Cf=_e[dg|Sf]^_e[eg|Xf]^_e[cg|ag]^_e[cg|Rf]^je;Df=_e[cg|Sf]^_e[dg|Xf]^_e[eg|ag]^_e[cg|Rf]^ke;Ef=_e[cg|Sf]^_e[cg|Xf]^_e[dg|ag]^_e[eg|Rf]^le;Ff=_e[eg|Sf]^_e[cg|Xf]^_e[cg|ag]^_e[dg|Rf]^me;Gf=_e[dg|Wf]^_e[eg|_f]^_e[cg|Qf]^_e[cg|Vf]^ne;Hf=_e[cg|Wf]^_e[dg|_f]^_e[eg|Qf]^_e[cg|Vf]^oe;If=_e[cg|Wf]^_e[cg|_f]^_e[dg|Qf]^_e[eg|Vf]^pe;Jf=_e[eg|Wf]^_e[cg|_f]^_e[cg|Qf]^_e[dg|Vf]^qe;Kf=_e[dg|$f]^_e[eg|Pf]^_e[cg|Uf]^_e[cg|Zf]^re;Lf=_e[cg|$f]^_e[dg|Pf]^_e[eg|Uf]^_e[cg|Zf]^se;Mf=_e[cg|$f]^_e[cg|Pf]^_e[dg|Uf]^_e[eg|Zf]^te;Nf=_e[eg|$f]^_e[cg|Pf]^_e[cg|Uf]^_e[dg|Zf]^ue;Of=_e[dg|yf]^_e[eg|Df]^_e[cg|If]^_e[cg|Nf]^ve;Pf=_e[cg|yf]^_e[dg|Df]^_e[eg|If]^_e[cg|Nf]^we;Qf=_e[cg|yf]^_e[cg|Df]^_e[dg|If]^_e[eg|Nf]^xe;Rf=_e[eg|yf]^_e[cg|Df]^_e[cg|If]^_e[dg|Nf]^ye;Sf=_e[dg|Cf]^_e[eg|Hf]^_e[cg|Mf]^_e[cg|Bf]^ze;Tf=_e[cg|Cf]^_e[dg|Hf]^_e[eg|Mf]^_e[cg|Bf]^Ae;Uf=_e[cg|Cf]^_e[cg|Hf]^_e[dg|Mf]^_e[eg|Bf]^Be;Vf=_e[eg|Cf]^_e[cg|Hf]^_e[cg|Mf]^_e[dg|Bf]^Ce;Wf=_e[dg|Gf]^_e[eg|Lf]^_e[cg|Af]^_e[cg|Ff]^De;Xf=_e[cg|Gf]^_e[dg|Lf]^_e[eg|Af]^_e[cg|Ff]^Ee;Yf=_e[cg|Gf]^_e[cg|Lf]^_e[dg|Af]^_e[eg|Ff]^Fe;Zf=_e[eg|Gf]^_e[cg|Lf]^_e[cg|Af]^_e[dg|Ff]^Ge;$f=_e[dg|Kf]^_e[eg|zf]^_e[cg|Ef]^_e[cg|Jf]^He;_f=_e[cg|Kf]^_e[dg|zf]^_e[eg|Ef]^_e[cg|Jf]^Ie;ag=_e[cg|Kf]^_e[cg|zf]^_e[dg|Ef]^_e[eg|Jf]^Je;bg=_e[eg|Kf]^_e[cg|zf]^_e[cg|Ef]^_e[dg|Jf]^Ke;d=_e[cg|Of]^Le;e=_e[cg|Tf]^Me;f=_e[cg|Yf]^Ne;g=_e[cg|bg]^Oe;h=_e[cg|Sf]^Pe;i=_e[cg|Xf]^Qe;j=_e[cg|ag]^Re;k=_e[cg|Rf]^Se;l=_e[cg|Wf]^Te;m=_e[cg|_f]^Ue;n=_e[cg|Qf]^Ve;o=_e[cg|Vf]^We;p=_e[cg|$f]^Xe;q=_e[cg|Pf]^Ye;r=_e[cg|Uf]^Ze;s=_e[cg|Zf]^$e}function df(yf,zf,Af,Bf,Cf,Df,Ef,Ff,Gf,Hf,If,Jf,Kf,Lf,Mf,Nf){yf=yf|0;zf=zf|0;Af=Af|0;Bf=Bf|0;Cf=Cf|0;Df=Df|0;Ef=Ef|0;Ff=Ff|0;Gf=Gf|0;Hf=Hf|0;If=If|0;Jf=Jf|0;Kf=Kf|0;Lf=Lf|0;Mf=Mf|0;Nf=Nf|0;var Of=0,Pf=0,Qf=0,Rf=0,Sf=0,Tf=0,Uf=0,Vf=0,Wf=0,Xf=0,Yf=0,Zf=0,$f=0,_f=0,ag=0,bg=0,cg=256,dg=1024,eg=1280,fg=1536,gg=1792;if((u|0)==32){Of=_e[cg|yf^Le]^ve;Pf=_e[cg|Lf^Ye]^we;Qf=_e[cg|If^Ve]^xe;Rf=_e[cg|Ff^Se]^ye;Sf=_e[cg|Cf^Pe]^ze;Tf=_e[cg|zf^Me]^Ae;Uf=_e[cg|Mf^Ze]^Be;Vf=_e[cg|Jf^We]^Ce;Wf=_e[cg|Gf^Te]^De;Xf=_e[cg|Df^Qe]^Ee;Yf=_e[cg|Af^Ne]^Fe;Zf=_e[cg|Nf^$e]^Ge;$f=_e[cg|Kf^Xe]^He;_f=_e[cg|Hf^Ue]^Ie;ag=_e[cg|Ef^Re]^Je;bg=_e[cg|Bf^Oe]^Ke;yf=_e[gg|Of]^_e[eg|Pf]^_e[fg|Qf]^_e[dg|Rf];zf=_e[dg|$f]^_e[gg|_f]^_e[eg|ag]^_e[fg|bg];Af=_e[fg|Wf]^_e[dg|Xf]^_e[gg|Yf]^_e[eg|Zf];Bf=_e[eg|Sf]^_e[fg|Tf]^_e[dg|Uf]^_e[gg|Vf];Cf=_e[gg|Sf]^_e[eg|Tf]^_e[fg|Uf]^_e[dg|Vf];Df=_e[dg|Of]^_e[gg|Pf]^_e[eg|Qf]^_e[fg|Rf];Ef=_e[fg|$f]^_e[dg|_f]^_e[gg|ag]^_e[eg|bg];Ff=_e[eg|Wf]^_e[fg|Xf]^_e[dg|Yf]^_e[gg|Zf];Gf=_e[gg|Wf]^_e[eg|Xf]^_e[fg|Yf]^_e[dg|Zf];Hf=_e[dg|Sf]^_e[gg|Tf]^_e[eg|Uf]^_e[fg|Vf];If=_e[fg|Of]^_e[dg|Pf]^_e[gg|Qf]^_e[eg|Rf];Jf=_e[eg|$f]^_e[fg|_f]^_e[dg|ag]^_e[gg|bg];Kf=_e[gg|$f]^_e[eg|_f]^_e[fg|ag]^_e[dg|bg];Lf=_e[dg|Wf]^_e[gg|Xf]^_e[eg|Yf]^_e[fg|Zf];Mf=_e[fg|Sf]^_e[dg|Tf]^_e[gg|Uf]^_e[eg|Vf];Nf=_e[eg|Of]^_e[fg|Pf]^_e[dg|Qf]^_e[gg|Rf];Of=_e[cg|yf]^fe;Pf=_e[cg|zf]^ge;Qf=_e[cg|Af]^he;Rf=_e[cg|Bf]^ie;Sf=_e[cg|Cf]^je;Tf=_e[cg|Df]^ke;Uf=_e[cg|Ef]^le;Vf=_e[cg|Ff]^me;Wf=_e[cg|Gf]^ne;Xf=_e[cg|Hf]^oe;Yf=_e[cg|If]^pe;Zf=_e[cg|Jf]^qe;$f=_e[cg|Kf]^re;_f=_e[cg|Lf]^se;ag=_e[cg|Mf]^te;bg=_e[cg|Nf]^ue;yf=_e[gg|Of]^_e[eg|Pf]^_e[fg|Qf]^_e[dg|Rf];zf=_e[dg|$f]^_e[gg|_f]^_e[eg|ag]^_e[fg|bg];Af=_e[fg|Wf]^_e[dg|Xf]^_e[gg|Yf]^_e[eg|Zf];Bf=_e[eg|Sf]^_e[fg|Tf]^_e[dg|Uf]^_e[gg|Vf];Cf=_e[gg|Sf]^_e[eg|Tf]^_e[fg|Uf]^_e[dg|Vf];Df=_e[dg|Of]^_e[gg|Pf]^_e[eg|Qf]^_e[fg|Rf];Ef=_e[fg|$f]^_e[dg|_f]^_e[gg|ag]^_e[eg|bg];Ff=_e[eg|Wf]^_e[fg|Xf]^_e[dg|Yf]^_e[gg|Zf];Gf=_e[gg|Wf]^_e[eg|Xf]^_e[fg|Yf]^_e[dg|Zf];Hf=_e[dg|Sf]^_e[gg|Tf]^_e[eg|Uf]^_e[fg|Vf];If=_e[fg|Of]^_e[dg|Pf]^_e[gg|Qf]^_e[eg|Rf];Jf=_e[eg|$f]^_e[fg|_f]^_e[dg|ag]^_e[gg|bg];Kf=_e[gg|$f]^_e[eg|_f]^_e[fg|ag]^_e[dg|bg];Lf=_e[dg|Wf]^_e[gg|Xf]^_e[eg|Yf]^_e[fg|Zf];Mf=_e[fg|Sf]^_e[dg|Tf]^_e[gg|Uf]^_e[eg|Vf];Nf=_e[eg|Of]^_e[fg|Pf]^_e[dg|Qf]^_e[gg|Rf];Of=_e[cg|yf]^Rd;Pf=_e[cg|zf]^Sd;Qf=_e[cg|Af]^Td;Rf=_e[cg|Bf]^Ud;Sf=_e[cg|Cf]^Vd;Tf=_e[cg|Df]^Wd;Uf=_e[cg|Ef]^Xd;Vf=_e[cg|Ff]^Yd;Wf=_e[cg|Gf]^Zd;Xf=_e[cg|Hf]^$d;Yf=_e[cg|If]^_d;Zf=_e[cg|Jf]^ae;$f=_e[cg|Kf]^be;_f=_e[cg|Lf]^ce;ag=_e[cg|Mf]^de;bg=_e[cg|Nf]^ee;yf=_e[gg|Of]^_e[eg|Pf]^_e[fg|Qf]^_e[dg|Rf];zf=_e[dg|$f]^_e[gg|_f]^_e[eg|ag]^_e[fg|bg];Af=_e[fg|Wf]^_e[dg|Xf]^_e[gg|Yf]^_e[eg|Zf];Bf=_e[eg|Sf]^_e[fg|Tf]^_e[dg|Uf]^_e[gg|Vf];Cf=_e[gg|Sf]^_e[eg|Tf]^_e[fg|Uf]^_e[dg|Vf];Df=_e[dg|Of]^_e[gg|Pf]^_e[eg|Qf]^_e[fg|Rf];Ef=_e[fg|$f]^_e[dg|_f]^_e[gg|ag]^_e[eg|bg];Ff=_e[eg|Wf]^_e[fg|Xf]^_e[dg|Yf]^_e[gg|Zf];Gf=_e[gg|Wf]^_e[eg|Xf]^_e[fg|Yf]^_e[dg|Zf];Hf=_e[dg|Sf]^_e[gg|Tf]^_e[eg|Uf]^_e[fg|Vf];If=_e[fg|Of]^_e[dg|Pf]^_e[gg|Qf]^_e[eg|Rf];Jf=_e[eg|$f]^_e[fg|_f]^_e[dg|ag]^_e[gg|bg];Kf=_e[gg|$f]^_e[eg|_f]^_e[fg|ag]^_e[dg|bg];Lf=_e[dg|Wf]^_e[gg|Xf]^_e[eg|Yf]^_e[fg|Zf];Mf=_e[fg|Sf]^_e[dg|Tf]^_e[gg|Uf]^_e[eg|Vf];Nf=_e[eg|Of]^_e[fg|Pf]^_e[dg|Qf]^_e[gg|Rf];Of=_e[cg|yf]^Bd;Pf=_e[cg|zf]^Cd;Qf=_e[cg|Af]^Dd;Rf=_e[cg|Bf]^Ed;Sf=_e[cg|Cf]^Fd;Tf=_e[cg|Df]^Gd;Uf=_e[cg|Ef]^Hd;Vf=_e[cg|Ff]^Id;Wf=_e[cg|Gf]^Jd;Xf=_e[cg|Hf]^Kd;Yf=_e[cg|If]^Ld;Zf=_e[cg|Jf]^Md;$f=_e[cg|Kf]^Nd;_f=_e[cg|Lf]^Od;ag=_e[cg|Mf]^Pd;bg=_e[cg|Nf]^Qd;yf=_e[gg|Of]^_e[eg|Pf]^_e[fg|Qf]^_e[dg|Rf];zf=_e[dg|$f]^_e[gg|_f]^_e[eg|ag]^_e[fg|bg];Af=_e[fg|Wf]^_e[dg|Xf]^_e[gg|Yf]^_e[eg|Zf];Bf=_e[eg|Sf]^_e[fg|Tf]^_e[dg|Uf]^_e[gg|Vf];Cf=_e[gg|Sf]^_e[eg|Tf]^_e[fg|Uf]^_e[dg|Vf];Df=_e[dg|Of]^_e[gg|Pf]^_e[eg|Qf]^_e[fg|Rf];Ef=_e[fg|$f]^_e[dg|_f]^_e[gg|ag]^_e[eg|bg];Ff=_e[eg|Wf]^_e[fg|Xf]^_e[dg|Yf]^_e[gg|Zf];Gf=_e[gg|Wf]^_e[eg|Xf]^_e[fg|Yf]^_e[dg|Zf];Hf=_e[dg|Sf]^_e[gg|Tf]^_e[eg|Uf]^_e[fg|Vf];If=_e[fg|Of]^_e[dg|Pf]^_e[gg|Qf]^_e[eg|Rf];Jf=_e[eg|$f]^_e[fg|_f]^_e[dg|ag]^_e[gg|bg];Kf=_e[gg|$f]^_e[eg|_f]^_e[fg|ag]^_e[dg|bg];Lf=_e[dg|Wf]^_e[gg|Xf]^_e[eg|Yf]^_e[fg|Zf];Mf=_e[fg|Sf]^_e[dg|Tf]^_e[gg|Uf]^_e[eg|Vf];Nf=_e[eg|Of]^_e[fg|Pf]^_e[dg|Qf]^_e[gg|Rf];Of=_e[cg|yf]^ld;Pf=_e[cg|zf]^md;Qf=_e[cg|Af]^nd;Rf=_e[cg|Bf]^od;Sf=_e[cg|Cf]^pd;Tf=_e[cg|Df]^qd;Uf=_e[cg|Ef]^rd;Vf=_e[cg|Ff]^sd;Wf=_e[cg|Gf]^td;Xf=_e[cg|Hf]^ud;Yf=_e[cg|If]^vd;Zf=_e[cg|Jf]^wd;$f=_e[cg|Kf]^xd;_f=_e[cg|Lf]^yd;ag=_e[cg|Mf]^zd;bg=_e[cg|Nf]^Ad}else{Of=_e[cg|yf^Bd]^ld;Pf=_e[cg|Lf^Od]^md;Qf=_e[cg|If^Ld]^nd;Rf=_e[cg|Ff^Id]^od;Sf=_e[cg|Cf^Fd]^pd;Tf=_e[cg|zf^Cd]^qd;Uf=_e[cg|Mf^Pd]^rd;Vf=_e[cg|Jf^Md]^sd;Wf=_e[cg|Gf^Jd]^td;Xf=_e[cg|Df^Gd]^ud;Yf=_e[cg|Af^Dd]^vd;Zf=_e[cg|Nf^Qd]^wd;$f=_e[cg|Kf^Nd]^xd;_f=_e[cg|Hf^Kd]^yd;ag=_e[cg|Ef^Hd]^zd;bg=_e[cg|Bf^Ed]^Ad}yf=_e[gg|Of]^_e[eg|Pf]^_e[fg|Qf]^_e[dg|Rf];zf=_e[dg|$f]^_e[gg|_f]^_e[eg|ag]^_e[fg|bg];Af=_e[fg|Wf]^_e[dg|Xf]^_e[gg|Yf]^_e[eg|Zf];Bf=_e[eg|Sf]^_e[fg|Tf]^_e[dg|Uf]^_e[gg|Vf];Cf=_e[gg|Sf]^_e[eg|Tf]^_e[fg|Uf]^_e[dg|Vf];Df=_e[dg|Of]^_e[gg|Pf]^_e[eg|Qf]^_e[fg|Rf];Ef=_e[fg|$f]^_e[dg|_f]^_e[gg|ag]^_e[eg|bg];Ff=_e[eg|Wf]^_e[fg|Xf]^_e[dg|Yf]^_e[gg|Zf];Gf=_e[gg|Wf]^_e[eg|Xf]^_e[fg|Yf]^_e[dg|Zf];Hf=_e[dg|Sf]^_e[gg|Tf]^_e[eg|Uf]^_e[fg|Vf];If=_e[fg|Of]^_e[dg|Pf]^_e[gg|Qf]^_e[eg|Rf];Jf=_e[eg|$f]^_e[fg|_f]^_e[dg|ag]^_e[gg|bg];Kf=_e[gg|$f]^_e[eg|_f]^_e[fg|ag]^_e[dg|bg];Lf=_e[dg|Wf]^_e[gg|Xf]^_e[eg|Yf]^_e[fg|Zf];Mf=_e[fg|Sf]^_e[dg|Tf]^_e[gg|Uf]^_e[eg|Vf];Nf=_e[eg|Of]^_e[fg|Pf]^_e[dg|Qf]^_e[gg|Rf];Of=_e[cg|yf]^Xc;Pf=_e[cg|zf]^Yc;Qf=_e[cg|Af]^Zc;Rf=_e[cg|Bf]^$c;Sf=_e[cg|Cf]^_c;Tf=_e[cg|Df]^ad;Uf=_e[cg|Ef]^bd;Vf=_e[cg|Ff]^cd;Wf=_e[cg|Gf]^dd;Xf=_e[cg|Hf]^ed;Yf=_e[cg|If]^fd;Zf=_e[cg|Jf]^gd;$f=_e[cg|Kf]^hd;_f=_e[cg|Lf]^id;ag=_e[cg|Mf]^jd;bg=_e[cg|Nf]^kd;yf=_e[gg|Of]^_e[eg|Pf]^_e[fg|Qf]^_e[dg|Rf];zf=_e[dg|$f]^_e[gg|_f]^_e[eg|ag]^_e[fg|bg];Af=_e[fg|Wf]^_e[dg|Xf]^_e[gg|Yf]^_e[eg|Zf];Bf=_e[eg|Sf]^_e[fg|Tf]^_e[dg|Uf]^_e[gg|Vf];Cf=_e[gg|Sf]^_e[eg|Tf]^_e[fg|Uf]^_e[dg|Vf];Df=_e[dg|Of]^_e[gg|Pf]^_e[eg|Qf]^_e[fg|Rf];Ef=_e[fg|$f]^_e[dg|_f]^_e[gg|ag]^_e[eg|bg];Ff=_e[eg|Wf]^_e[fg|Xf]^_e[dg|Yf]^_e[gg|Zf];Gf=_e[gg|Wf]^_e[eg|Xf]^_e[fg|Yf]^_e[dg|Zf];Hf=_e[dg|Sf]^_e[gg|Tf]^_e[eg|Uf]^_e[fg|Vf];If=_e[fg|Of]^_e[dg|Pf]^_e[gg|Qf]^_e[eg|Rf];Jf=_e[eg|$f]^_e[fg|_f]^_e[dg|ag]^_e[gg|bg];Kf=_e[gg|$f]^_e[eg|_f]^_e[fg|ag]^_e[dg|bg];Lf=_e[dg|Wf]^_e[gg|Xf]^_e[eg|Yf]^_e[fg|Zf];Mf=_e[fg|Sf]^_e[dg|Tf]^_e[gg|Uf]^_e[eg|Vf];Nf=_e[eg|Of]^_e[fg|Pf]^_e[dg|Qf]^_e[gg|Rf];Of=_e[cg|yf]^Hc;Pf=_e[cg|zf]^Ic;Qf=_e[cg|Af]^Jc;Rf=_e[cg|Bf]^Kc;Sf=_e[cg|Cf]^Lc;Tf=_e[cg|Df]^Mc;Uf=_e[cg|Ef]^Nc;Vf=_e[cg|Ff]^Oc;Wf=_e[cg|Gf]^Pc;Xf=_e[cg|Hf]^Qc;Yf=_e[cg|If]^Rc;Zf=_e[cg|Jf]^Sc;$f=_e[cg|Kf]^Tc;_f=_e[cg|Lf]^Uc;ag=_e[cg|Mf]^Vc;bg=_e[cg|Nf]^Wc;yf=_e[gg|Of]^_e[eg|Pf]^_e[fg|Qf]^_e[dg|Rf];zf=_e[dg|$f]^_e[gg|_f]^_e[eg|ag]^_e[fg|bg];Af=_e[fg|Wf]^_e[dg|Xf]^_e[gg|Yf]^_e[eg|Zf];Bf=_e[eg|Sf]^_e[fg|Tf]^_e[dg|Uf]^_e[gg|Vf];Cf=_e[gg|Sf]^_e[eg|Tf]^_e[fg|Uf]^_e[dg|Vf];Df=_e[dg|Of]^_e[gg|Pf]^_e[eg|Qf]^_e[fg|Rf];Ef=_e[fg|$f]^_e[dg|_f]^_e[gg|ag]^_e[eg|bg];Ff=_e[eg|Wf]^_e[fg|Xf]^_e[dg|Yf]^_e[gg|Zf];Gf=_e[gg|Wf]^_e[eg|Xf]^_e[fg|Yf]^_e[dg|Zf];Hf=_e[dg|Sf]^_e[gg|Tf]^_e[eg|Uf]^_e[fg|Vf];If=_e[fg|Of]^_e[dg|Pf]^_e[gg|Qf]^_e[eg|Rf];Jf=_e[eg|$f]^_e[fg|_f]^_e[dg|ag]^_e[gg|bg];Kf=_e[gg|$f]^_e[eg|_f]^_e[fg|ag]^_e[dg|bg];Lf=_e[dg|Wf]^_e[gg|Xf]^_e[eg|Yf]^_e[fg|Zf];Mf=_e[fg|Sf]^_e[dg|Tf]^_e[gg|Uf]^_e[eg|Vf];Nf=_e[eg|Of]^_e[fg|Pf]^_e[dg|Qf]^_e[gg|Rf];Of=_e[cg|yf]^rc;Pf=_e[cg|zf]^sc;Qf=_e[cg|Af]^tc;Rf=_e[cg|Bf]^uc;Sf=_e[cg|Cf]^vc;Tf=_e[cg|Df]^wc;Uf=_e[cg|Ef]^xc;Vf=_e[cg|Ff]^yc;Wf=_e[cg|Gf]^zc;Xf=_e[cg|Hf]^Ac;Yf=_e[cg|If]^Bc;Zf=_e[cg|Jf]^Cc;$f=_e[cg|Kf]^Dc;_f=_e[cg|Lf]^Ec;ag=_e[cg|Mf]^Fc;bg=_e[cg|Nf]^Gc;yf=_e[gg|Of]^_e[eg|Pf]^_e[fg|Qf]^_e[dg|Rf];zf=_e[dg|$f]^_e[gg|_f]^_e[eg|ag]^_e[fg|bg];Af=_e[fg|Wf]^_e[dg|Xf]^_e[gg|Yf]^_e[eg|Zf];Bf=_e[eg|Sf]^_e[fg|Tf]^_e[dg|Uf]^_e[gg|Vf];Cf=_e[gg|Sf]^_e[eg|Tf]^_e[fg|Uf]^_e[dg|Vf];Df=_e[dg|Of]^_e[gg|Pf]^_e[eg|Qf]^_e[fg|Rf];Ef=_e[fg|$f]^_e[dg|_f]^_e[gg|ag]^_e[eg|bg];Ff=_e[eg|Wf]^_e[fg|Xf]^_e[dg|Yf]^_e[gg|Zf];Gf=_e[gg|Wf]^_e[eg|Xf]^_e[fg|Yf]^_e[dg|Zf];Hf=_e[dg|Sf]^_e[gg|Tf]^_e[eg|Uf]^_e[fg|Vf];If=_e[fg|Of]^_e[dg|Pf]^_e[gg|Qf]^_e[eg|Rf];Jf=_e[eg|$f]^_e[fg|_f]^_e[dg|ag]^_e[gg|bg];Kf=_e[gg|$f]^_e[eg|_f]^_e[fg|ag]^_e[dg|bg];Lf=_e[dg|Wf]^_e[gg|Xf]^_e[eg|Yf]^_e[fg|Zf];Mf=_e[fg|Sf]^_e[dg|Tf]^_e[gg|Uf]^_e[eg|Vf];Nf=_e[eg|Of]^_e[fg|Pf]^_e[dg|Qf]^_e[gg|Rf];Of=_e[cg|yf]^bc;Pf=_e[cg|zf]^cc;Qf=_e[cg|Af]^dc;Rf=_e[cg|Bf]^ec;Sf=_e[cg|Cf]^fc;Tf=_e[cg|Df]^gc;Uf=_e[cg|Ef]^hc;Vf=_e[cg|Ff]^ic;Wf=_e[cg|Gf]^jc;Xf=_e[cg|Hf]^kc;Yf=_e[cg|If]^lc;Zf=_e[cg|Jf]^mc;$f=_e[cg|Kf]^nc;_f=_e[cg|Lf]^oc;ag=_e[cg|Mf]^pc;bg=_e[cg|Nf]^qc;yf=_e[gg|Of]^_e[eg|Pf]^_e[fg|Qf]^_e[dg|Rf];zf=_e[dg|$f]^_e[gg|_f]^_e[eg|ag]^_e[fg|bg];Af=_e[fg|Wf]^_e[dg|Xf]^_e[gg|Yf]^_e[eg|Zf];Bf=_e[eg|Sf]^_e[fg|Tf]^_e[dg|Uf]^_e[gg|Vf];Cf=_e[gg|Sf]^_e[eg|Tf]^_e[fg|Uf]^_e[dg|Vf];Df=_e[dg|Of]^_e[gg|Pf]^_e[eg|Qf]^_e[fg|Rf];Ef=_e[fg|$f]^_e[dg|_f]^_e[gg|ag]^_e[eg|bg];Ff=_e[eg|Wf]^_e[fg|Xf]^_e[dg|Yf]^_e[gg|Zf];Gf=_e[gg|Wf]^_e[eg|Xf]^_e[fg|Yf]^_e[dg|Zf];Hf=_e[dg|Sf]^_e[gg|Tf]^_e[eg|Uf]^_e[fg|Vf];If=_e[fg|Of]^_e[dg|Pf]^_e[gg|Qf]^_e[eg|Rf];Jf=_e[eg|$f]^_e[fg|_f]^_e[dg|ag]^_e[gg|bg];Kf=_e[gg|$f]^_e[eg|_f]^_e[fg|ag]^_e[dg|bg];Lf=_e[dg|Wf]^_e[gg|Xf]^_e[eg|Yf]^_e[fg|Zf];Mf=_e[fg|Sf]^_e[dg|Tf]^_e[gg|Uf]^_e[eg|Vf];Nf=_e[eg|Of]^_e[fg|Pf]^_e[dg|Qf]^_e[gg|Rf];Of=_e[cg|yf]^Nb;Pf=_e[cg|zf]^Ob;Qf=_e[cg|Af]^Pb;Rf=_e[cg|Bf]^Qb;Sf=_e[cg|Cf]^Rb;Tf=_e[cg|Df]^Sb;Uf=_e[cg|Ef]^Tb;Vf=_e[cg|Ff]^Ub;Wf=_e[cg|Gf]^Vb;Xf=_e[cg|Hf]^Wb;Yf=_e[cg|If]^Xb;Zf=_e[cg|Jf]^Yb;$f=_e[cg|Kf]^Zb;_f=_e[cg|Lf]^$b;ag=_e[cg|Mf]^_b;bg=_e[cg|Nf]^ac;yf=_e[gg|Of]^_e[eg|Pf]^_e[fg|Qf]^_e[dg|Rf];zf=_e[dg|$f]^_e[gg|_f]^_e[eg|ag]^_e[fg|bg];Af=_e[fg|Wf]^_e[dg|Xf]^_e[gg|Yf]^_e[eg|Zf];Bf=_e[eg|Sf]^_e[fg|Tf]^_e[dg|Uf]^_e[gg|Vf];Cf=_e[gg|Sf]^_e[eg|Tf]^_e[fg|Uf]^_e[dg|Vf];Df=_e[dg|Of]^_e[gg|Pf]^_e[eg|Qf]^_e[fg|Rf];Ef=_e[fg|$f]^_e[dg|_f]^_e[gg|ag]^_e[eg|bg];Ff=_e[eg|Wf]^_e[fg|Xf]^_e[dg|Yf]^_e[gg|Zf];Gf=_e[gg|Wf]^_e[eg|Xf]^_e[fg|Yf]^_e[dg|Zf];Hf=_e[dg|Sf]^_e[gg|Tf]^_e[eg|Uf]^_e[fg|Vf];If=_e[fg|Of]^_e[dg|Pf]^_e[gg|Qf]^_e[eg|Rf];Jf=_e[eg|$f]^_e[fg|_f]^_e[dg|ag]^_e[gg|bg];Kf=_e[gg|$f]^_e[eg|_f]^_e[fg|ag]^_e[dg|bg];Lf=_e[dg|Wf]^_e[gg|Xf]^_e[eg|Yf]^_e[fg|Zf];Mf=_e[fg|Sf]^_e[dg|Tf]^_e[gg|Uf]^_e[eg|Vf];Nf=_e[eg|Of]^_e[fg|Pf]^_e[dg|Qf]^_e[gg|Rf];Of=_e[cg|yf]^xb;Pf=_e[cg|zf]^yb;Qf=_e[cg|Af]^zb;Rf=_e[cg|Bf]^Ab;Sf=_e[cg|Cf]^Bb;Tf=_e[cg|Df]^Cb;Uf=_e[cg|Ef]^Db;Vf=_e[cg|Ff]^Eb;Wf=_e[cg|Gf]^Fb;Xf=_e[cg|Hf]^Gb;Yf=_e[cg|If]^Hb;Zf=_e[cg|Jf]^Ib;$f=_e[cg|Kf]^Jb;_f=_e[cg|Lf]^Kb;ag=_e[cg|Mf]^Lb;bg=_e[cg|Nf]^Mb;yf=_e[gg|Of]^_e[eg|Pf]^_e[fg|Qf]^_e[dg|Rf];zf=_e[dg|$f]^_e[gg|_f]^_e[eg|ag]^_e[fg|bg];Af=_e[fg|Wf]^_e[dg|Xf]^_e[gg|Yf]^_e[eg|Zf];Bf=_e[eg|Sf]^_e[fg|Tf]^_e[dg|Uf]^_e[gg|Vf];Cf=_e[gg|Sf]^_e[eg|Tf]^_e[fg|Uf]^_e[dg|Vf];Df=_e[dg|Of]^_e[gg|Pf]^_e[eg|Qf]^_e[fg|Rf];Ef=_e[fg|$f]^_e[dg|_f]^_e[gg|ag]^_e[eg|bg];Ff=_e[eg|Wf]^_e[fg|Xf]^_e[dg|Yf]^_e[gg|Zf];Gf=_e[gg|Wf]^_e[eg|Xf]^_e[fg|Yf]^_e[dg|Zf];Hf=_e[dg|Sf]^_e[gg|Tf]^_e[eg|Uf]^_e[fg|Vf];If=_e[fg|Of]^_e[dg|Pf]^_e[gg|Qf]^_e[eg|Rf];Jf=_e[eg|$f]^_e[fg|_f]^_e[dg|ag]^_e[gg|bg];Kf=_e[gg|$f]^_e[eg|_f]^_e[fg|ag]^_e[dg|bg];Lf=_e[dg|Wf]^_e[gg|Xf]^_e[eg|Yf]^_e[fg|Zf];Mf=_e[fg|Sf]^_e[dg|Tf]^_e[gg|Uf]^_e[eg|Vf];Nf=_e[eg|Of]^_e[fg|Pf]^_e[dg|Qf]^_e[gg|Rf];Of=_e[cg|yf]^hb;Pf=_e[cg|zf]^ib;Qf=_e[cg|Af]^jb;Rf=_e[cg|Bf]^kb;Sf=_e[cg|Cf]^lb;Tf=_e[cg|Df]^mb;Uf=_e[cg|Ef]^nb;Vf=_e[cg|Ff]^ob;Wf=_e[cg|Gf]^pb;Xf=_e[cg|Hf]^qb;Yf=_e[cg|If]^rb;Zf=_e[cg|Jf]^sb;$f=_e[cg|Kf]^tb;_f=_e[cg|Lf]^ub;ag=_e[cg|Mf]^vb;bg=_e[cg|Nf]^wb;yf=_e[gg|Of]^_e[eg|Pf]^_e[fg|Qf]^_e[dg|Rf];zf=_e[dg|$f]^_e[gg|_f]^_e[eg|ag]^_e[fg|bg];Af=_e[fg|Wf]^_e[dg|Xf]^_e[gg|Yf]^_e[eg|Zf];Bf=_e[eg|Sf]^_e[fg|Tf]^_e[dg|Uf]^_e[gg|Vf];Cf=_e[gg|Sf]^_e[eg|Tf]^_e[fg|Uf]^_e[dg|Vf];Df=_e[dg|Of]^_e[gg|Pf]^_e[eg|Qf]^_e[fg|Rf];Ef=_e[fg|$f]^_e[dg|_f]^_e[gg|ag]^_e[eg|bg];Ff=_e[eg|Wf]^_e[fg|Xf]^_e[dg|Yf]^_e[gg|Zf];Gf=_e[gg|Wf]^_e[eg|Xf]^_e[fg|Yf]^_e[dg|Zf];Hf=_e[dg|Sf]^_e[gg|Tf]^_e[eg|Uf]^_e[fg|Vf];If=_e[fg|Of]^_e[dg|Pf]^_e[gg|Qf]^_e[eg|Rf];Jf=_e[eg|$f]^_e[fg|_f]^_e[dg|ag]^_e[gg|bg];Kf=_e[gg|$f]^_e[eg|_f]^_e[fg|ag]^_e[dg|bg];Lf=_e[dg|Wf]^_e[gg|Xf]^_e[eg|Yf]^_e[fg|Zf];Mf=_e[fg|Sf]^_e[dg|Tf]^_e[gg|Uf]^_e[eg|Vf];Nf=_e[eg|Of]^_e[fg|Pf]^_e[dg|Qf]^_e[gg|Rf];Of=_e[cg|yf]^T;Pf=_e[cg|zf]^U;Qf=_e[cg|Af]^V;Rf=_e[cg|Bf]^W;Sf=_e[cg|Cf]^X;Tf=_e[cg|Df]^Y;Uf=_e[cg|Ef]^Z;Vf=_e[cg|Ff]^$;Wf=_e[cg|Gf]^_;Xf=_e[cg|Hf]^ab;Yf=_e[cg|If]^bb;Zf=_e[cg|Jf]^cb;$f=_e[cg|Kf]^db;_f=_e[cg|Lf]^eb;ag=_e[cg|Mf]^fb;bg=_e[cg|Nf]^gb;yf=_e[gg|Of]^_e[eg|Pf]^_e[fg|Qf]^_e[dg|Rf];zf=_e[dg|$f]^_e[gg|_f]^_e[eg|ag]^_e[fg|bg];Af=_e[fg|Wf]^_e[dg|Xf]^_e[gg|Yf]^_e[eg|Zf];Bf=_e[eg|Sf]^_e[fg|Tf]^_e[dg|Uf]^_e[gg|Vf];Cf=_e[gg|Sf]^_e[eg|Tf]^_e[fg|Uf]^_e[dg|Vf];Df=_e[dg|Of]^_e[gg|Pf]^_e[eg|Qf]^_e[fg|Rf];Ef=_e[fg|$f]^_e[dg|_f]^_e[gg|ag]^_e[eg|bg];Ff=_e[eg|Wf]^_e[fg|Xf]^_e[dg|Yf]^_e[gg|Zf];Gf=_e[gg|Wf]^_e[eg|Xf]^_e[fg|Yf]^_e[dg|Zf];Hf=_e[dg|Sf]^_e[gg|Tf]^_e[eg|Uf]^_e[fg|Vf];If=_e[fg|Of]^_e[dg|Pf]^_e[gg|Qf]^_e[eg|Rf];Jf=_e[eg|$f]^_e[fg|_f]^_e[dg|ag]^_e[gg|bg];Kf=_e[gg|$f]^_e[eg|_f]^_e[fg|ag]^_e[dg|bg];Lf=_e[dg|Wf]^_e[gg|Xf]^_e[eg|Yf]^_e[fg|Zf];Mf=_e[fg|Sf]^_e[dg|Tf]^_e[gg|Uf]^_e[eg|Vf];Nf=_e[eg|Of]^_e[fg|Pf]^_e[dg|Qf]^_e[gg|Rf];d=_e[cg|yf]^D;e=_e[cg|zf]^E;f=_e[cg|Af]^F;g=_e[cg|Bf]^G;h=_e[cg|Cf]^H;i=_e[cg|Df]^I;j=_e[cg|Ef]^J;k=_e[cg|Ff]^K;l=_e[cg|Gf]^L;m=_e[cg|Hf]^M;n=_e[cg|If]^N;o=_e[cg|Jf]^O;p=_e[cg|Kf]^P;q=_e[cg|Lf]^Q;r=_e[cg|Mf]^R;s=_e[cg|Nf]^S}function ef(yf,zf,Af,Bf,Cf,Df,Ef,Ff,Gf,Hf,If,Jf,Kf,Lf,Mf,Nf){yf=yf|0;zf=zf|0;Af=Af|0;Bf=Bf|0;Cf=Cf|0;Df=Df|0;Ef=Ef|0;Ff=Ff|0;Gf=Gf|0;Hf=Hf|0;If=If|0;Jf=Jf|0;Kf=Kf|0;Lf=Lf|0;Mf=Mf|0;Nf=Nf|0;d=yf;e=zf;f=Af;g=Bf;h=Cf;i=Df;j=Ef;k=Ff;l=Gf;m=Hf;n=If;o=Jf;p=Kf;q=Lf;r=Mf;s=Nf}function ff(yf){yf=yf|0;_e[yf]=d;_e[yf|1]=e;_e[yf|2]=f;_e[yf|3]=g;_e[yf|4]=h;_e[yf|5]=i;_e[yf|6]=j;_e[yf|7]=k;_e[yf|8]=l;_e[yf|9]=m;_e[yf|10]=n;_e[yf|11]=o;_e[yf|12]=p;_e[yf|13]=q;_e[yf|14]=r;_e[yf|15]=s}function gf(yf,zf,Af,Bf,Cf,Df,Ef,Ff,Gf,Hf,If,Jf,Kf,Lf,Mf,Nf){yf=yf|0;zf=zf|0;Af=Af|0;Bf=Bf|0;Cf=Cf|0;Df=Df|0;Ef=Ef|0;Ff=Ff|0;Gf=Gf|0;Hf=Hf|0;If=If|0;Jf=Jf|0;Kf=Kf|0;Lf=Lf|0;Mf=Mf|0;Nf=Nf|0;D=yf;E=zf;F=Af;G=Bf;H=Cf;I=Df;J=Ef;K=Ff;L=Gf;M=Hf;N=If;O=Jf;P=Kf;Q=Lf;R=Mf;S=Nf;u=16;af()}function hf(yf,zf,Af,Bf,Cf,Df,Ef,Ff,Gf,Hf,If,Jf,Kf,Lf,Mf,Nf,Of,Pf,Qf,Rf,Sf,Tf,Uf,Vf,Wf,Xf,Yf,Zf,$f,_f,ag,bg){yf=yf|0;zf=zf|0;Af=Af|0;Bf=Bf|0;Cf=Cf|0;Df=Df|0;Ef=Ef|0;Ff=Ff|0;Gf=Gf|0;Hf=Hf|0;If=If|0;Jf=Jf|0;Kf=Kf|0;Lf=Lf|0;Mf=Mf|0;Nf=Nf|0;Of=Of|0;Pf=Pf|0;Qf=Qf|0;Rf=Rf|0;Sf=Sf|0;Tf=Tf|0;Uf=Uf|0;Vf=Vf|0;Wf=Wf|0;Xf=Xf|0;Yf=Yf|0;Zf=Zf|0;$f=$f|0;_f=_f|0;ag=ag|0;bg=bg|0;D=yf;E=zf;F=Af;G=Bf;H=Cf;I=Df;J=Ef;K=Ff;L=Gf;M=Hf;N=If;O=Jf;P=Kf;Q=Lf;R=Mf;S=Nf;T=Of;U=Pf;V=Qf;W=Rf;X=Sf;Y=Tf;Z=Uf;$=Vf;_=Wf;ab=Xf;bb=Yf;cb=Zf;db=$f;eb=_f;fb=ag;gb=bg;u=32;bf()}function jf(yf,zf){yf=yf|0;zf=zf|0;var Af=0;if(yf&15)return-1;while((zf|0)>=16){cf(_e[yf]|0,_e[yf|1]|0,_e[yf|2]|0,_e[yf|3]|0,_e[yf|4]|0,_e[yf|5]|0,_e[yf|6]|0,_e[yf|7]|0,_e[yf|8]|0,_e[yf|9]|0,_e[yf|10]|0,_e[yf|11]|0,_e[yf|12]|0,_e[yf|13]|0,_e[yf|14]|0,_e[yf|15]|0);
-_e[yf]=d;_e[yf|1]=e;_e[yf|2]=f;_e[yf|3]=g;_e[yf|4]=h;_e[yf|5]=i;_e[yf|6]=j;_e[yf|7]=k;_e[yf|8]=l;_e[yf|9]=m;_e[yf|10]=n;_e[yf|11]=o;_e[yf|12]=p;_e[yf|13]=q;_e[yf|14]=r;_e[yf|15]=s;yf=yf+16|0;zf=zf-16|0;Af=Af+16|0}return Af|0}function kf(yf,zf){yf=yf|0;zf=zf|0;var Af=0;if(yf&15)return-1;while((zf|0)>=16){df(_e[yf]|0,_e[yf|1]|0,_e[yf|2]|0,_e[yf|3]|0,_e[yf|4]|0,_e[yf|5]|0,_e[yf|6]|0,_e[yf|7]|0,_e[yf|8]|0,_e[yf|9]|0,_e[yf|10]|0,_e[yf|11]|0,_e[yf|12]|0,_e[yf|13]|0,_e[yf|14]|0,_e[yf|15]|0);_e[yf]=d;_e[yf|1]=e;_e[yf|2]=f;_e[yf|3]=g;_e[yf|4]=h;_e[yf|5]=i;_e[yf|6]=j;_e[yf|7]=k;_e[yf|8]=l;_e[yf|9]=m;_e[yf|10]=n;_e[yf|11]=o;_e[yf|12]=p;_e[yf|13]=q;_e[yf|14]=r;_e[yf|15]=s;yf=yf+16|0;zf=zf-16|0;Af=Af+16|0}return Af|0}function lf(yf,zf){yf=yf|0;zf=zf|0;var Af=0;if(yf&15)return-1;while((zf|0)>=16){cf(d^_e[yf],e^_e[yf|1],f^_e[yf|2],g^_e[yf|3],h^_e[yf|4],i^_e[yf|5],j^_e[yf|6],k^_e[yf|7],l^_e[yf|8],m^_e[yf|9],n^_e[yf|10],o^_e[yf|11],p^_e[yf|12],q^_e[yf|13],r^_e[yf|14],s^_e[yf|15]);_e[yf]=d;_e[yf|1]=e;_e[yf|2]=f;_e[yf|3]=g;_e[yf|4]=h;_e[yf|5]=i;_e[yf|6]=j;_e[yf|7]=k;_e[yf|8]=l;_e[yf|9]=m;_e[yf|10]=n;_e[yf|11]=o;_e[yf|12]=p;_e[yf|13]=q;_e[yf|14]=r;_e[yf|15]=s;yf=yf+16|0;zf=zf-16|0;Af=Af+16|0}return Af|0}function mf(yf,zf){yf=yf|0;zf=zf|0;var Af=0,Bf=0,Cf=0,Df=0,Ef=0,Ff=0,Gf=0,Hf=0,If=0,Jf=0,Kf=0,Lf=0,Mf=0,Nf=0,Of=0,Pf=0,Qf=0;if(yf&15)return-1;Af=d;Bf=e;Cf=f;Df=g;Ef=h;Ff=i;Gf=j;Hf=k;If=l;Jf=m;Kf=n;Lf=o;Mf=p;Nf=q;Of=r;Pf=s;while((zf|0)>=16){df(_e[yf]|0,_e[yf|1]|0,_e[yf|2]|0,_e[yf|3]|0,_e[yf|4]|0,_e[yf|5]|0,_e[yf|6]|0,_e[yf|7]|0,_e[yf|8]|0,_e[yf|9]|0,_e[yf|10]|0,_e[yf|11]|0,_e[yf|12]|0,_e[yf|13]|0,_e[yf|14]|0,_e[yf|15]|0);d=d^Af;Af=_e[yf]|0;e=e^Bf;Bf=_e[yf|1]|0;f=f^Cf;Cf=_e[yf|2]|0;g=g^Df;Df=_e[yf|3]|0;h=h^Ef;Ef=_e[yf|4]|0;i=i^Ff;Ff=_e[yf|5]|0;j=j^Gf;Gf=_e[yf|6]|0;k=k^Hf;Hf=_e[yf|7]|0;l=l^If;If=_e[yf|8]|0;m=m^Jf;Jf=_e[yf|9]|0;n=n^Kf;Kf=_e[yf|10]|0;o=o^Lf;Lf=_e[yf|11]|0;p=p^Mf;Mf=_e[yf|12]|0;q=q^Nf;Nf=_e[yf|13]|0;r=r^Of;Of=_e[yf|14]|0;s=s^Pf;Pf=_e[yf|15]|0;_e[yf]=d;_e[yf|1]=e;_e[yf|2]=f;_e[yf|3]=g;_e[yf|4]=h;_e[yf|5]=i;_e[yf|6]=j;_e[yf|7]=k;_e[yf|8]=l;_e[yf|9]=m;_e[yf|10]=n;_e[yf|11]=o;_e[yf|12]=p;_e[yf|13]=q;_e[yf|14]=r;_e[yf|15]=s;yf=yf+16|0;zf=zf-16|0;Qf=Qf+16|0}d=Af;e=Bf;f=Cf;g=Df;h=Ef;i=Ff;j=Gf;k=Hf;l=If;m=Jf;n=Kf;o=Lf;p=Mf;q=Nf;r=Of;s=Pf;return Qf|0}function nf(yf,zf,Af){yf=yf|0;zf=zf|0;Af=Af|0;if(yf&15)return-1;if(~Af)if(Af&31)return-1;while((zf|0)>=16){cf(d^_e[yf],e^_e[yf|1],f^_e[yf|2],g^_e[yf|3],h^_e[yf|4],i^_e[yf|5],j^_e[yf|6],k^_e[yf|7],l^_e[yf|8],m^_e[yf|9],n^_e[yf|10],o^_e[yf|11],p^_e[yf|12],q^_e[yf|13],r^_e[yf|14],s^_e[yf|15]);yf=yf+16|0;zf=zf-16|0}if((zf|0)>0){d=d^_e[yf];if((zf|0)>1)e=e^_e[yf|1];if((zf|0)>2)f=f^_e[yf|2];if((zf|0)>3)g=g^_e[yf|3];if((zf|0)>4)h=h^_e[yf|4];if((zf|0)>5)i=i^_e[yf|5];if((zf|0)>6)j=j^_e[yf|6];if((zf|0)>7)k=k^_e[yf|7];if((zf|0)>8)l=l^_e[yf|8];if((zf|0)>9)m=m^_e[yf|9];if((zf|0)>10)n=n^_e[yf|10];if((zf|0)>11)o=o^_e[yf|11];if((zf|0)>12)p=p^_e[yf|12];if((zf|0)>13)q=q^_e[yf|13];if((zf|0)>14)r=r^_e[yf|14];cf(d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s);yf=yf+zf|0;zf=0}if(~Af){_e[Af|0]=d;_e[Af|1]=e;_e[Af|2]=f;_e[Af|3]=g;_e[Af|4]=h;_e[Af|5]=i;_e[Af|6]=j;_e[Af|7]=k;_e[Af|8]=l;_e[Af|9]=m;_e[Af|10]=n;_e[Af|11]=o;_e[Af|12]=p;_e[Af|13]=q;_e[Af|14]=r;_e[Af|15]=s}return 0}function of(yf,zf,Af,Bf,Cf,Df,Ef,Ff,Gf,Hf,If,Jf,Kf,Lf,Mf){yf=yf|0;zf=zf|0;Af=Af|0;Bf=Bf|0;Cf=Cf|0;Df=Df|0;Ef=Ef|0;Ff=Ff|0;Gf=Gf|0;Hf=Hf|0;If=If|0;Jf=Jf|0;Kf=Kf|0;Lf=Lf|0;Mf=Mf|0;var Nf=0;while((zf|0)>=16){cf(Af,Bf,Cf,Df,Ef,Ff,Gf,Hf,If,Jf,Kf,Lf,Mf>>>24,Mf>>>16&255,Mf>>>8&255,Mf&255);_e[yf|0]=_e[yf|0]^d;_e[yf|1]=_e[yf|1]^e;_e[yf|2]=_e[yf|2]^f;_e[yf|3]=_e[yf|3]^g;_e[yf|4]=_e[yf|4]^h;_e[yf|5]=_e[yf|5]^i;_e[yf|6]=_e[yf|6]^j;_e[yf|7]=_e[yf|7]^k;_e[yf|8]=_e[yf|8]^l;_e[yf|9]=_e[yf|9]^m;_e[yf|10]=_e[yf|10]^n;_e[yf|11]=_e[yf|11]^o;_e[yf|12]=_e[yf|12]^p;_e[yf|13]=_e[yf|13]^q;_e[yf|14]=_e[yf|14]^r;_e[yf|15]=_e[yf|15]^s;yf=yf+16|0;zf=zf-16|0;Nf=Nf+16|0;Mf=Mf+1|0}return Nf|0}function pf(yf,zf,Af,Bf,Cf,Df,Ef,Ff,Gf,Hf,If,Jf,Kf,Lf,Mf,Nf,Of,Pf){yf=yf|0;zf=zf|0;Af=Af|0;Bf=Bf|0;Cf=Cf|0;Df=Df|0;Ef=Ef|0;Ff=Ff|0;Gf=Gf|0;Hf=Hf|0;If=If|0;Jf=Jf|0;Kf=Kf|0;Lf=Lf|0;Mf=Mf|0;Nf=Nf|0;Of=Of|0;Pf=Pf|0;var Qf=0,Rf=0,Sf=0,Tf=0,Uf=0,Vf=0,Wf=0,Xf=0,Yf=0,Zf=0,$f=0,_f=0,ag=0,bg=0,cg=0,dg=0,eg=0,fg=0,gg=0,hg=0,ig=0,jg=0,kg=0,lg=0,mg=0,ng=0,og=0,pg=0,qg=0,rg=0,sg=0,tg=0,ug=0;if(yf&15)return-1;Qf=d,Rf=e,Sf=f,Tf=g,Uf=h,Vf=i,Wf=j,Xf=k,Yf=l,Zf=m,$f=n,_f=o,ag=p,bg=q,cg=r,dg=s;while((zf|0)>=16){eg=_e[yf]|0;fg=_e[yf|1]|0;gg=_e[yf|2]|0;hg=_e[yf|3]|0;ig=_e[yf|4]|0;jg=_e[yf|5]|0;kg=_e[yf|6]|0;lg=_e[yf|7]|0;mg=_e[yf|8]|0;ng=_e[yf|9]|0;og=_e[yf|10]|0;pg=_e[yf|11]|0;qg=_e[yf|12]|0;rg=_e[yf|13]|0;sg=_e[yf|14]|0;tg=_e[yf|15]|0;cf(Af,Bf,Cf,Df,Ef,Ff,Gf,Hf,If^Of>>>24,Jf^Of>>>16&255,Kf^Of>>>8&255,Lf^Of&255,Mf^Pf>>>24,Nf^Pf>>>16&255,Pf>>>8&255,Pf&255);_e[yf]=eg^d;_e[yf|1]=fg^e;_e[yf|2]=gg^f;_e[yf|3]=hg^g;_e[yf|4]=ig^h;_e[yf|5]=jg^i;_e[yf|6]=kg^j;_e[yf|7]=lg^k;_e[yf|8]=mg^l;_e[yf|9]=ng^m;_e[yf|10]=og^n;_e[yf|11]=pg^o;_e[yf|12]=qg^p;_e[yf|13]=rg^q;_e[yf|14]=sg^r;_e[yf|15]=tg^s;cf(eg^Qf,fg^Rf,gg^Sf,hg^Tf,ig^Uf,jg^Vf,kg^Wf,lg^Xf,mg^Yf,ng^Zf,og^$f,pg^_f,qg^ag,rg^bg,sg^cg,tg^dg);Qf=d,Rf=e,Sf=f,Tf=g,Uf=h,Vf=i,Wf=j,Xf=k,Yf=l,Zf=m,$f=n,_f=o,ag=p,bg=q,cg=r,dg=s;ug=ug+16|0;yf=yf+16|0;zf=zf-16|0;Pf=Pf+1|0;if((Pf|0)==0)Of=Of+1|0}if((zf|0)>0){eg=_e[yf]|0;fg=(zf|0)>1?_e[yf|1]|0:0;gg=(zf|0)>2?_e[yf|2]|0:0;hg=(zf|0)>3?_e[yf|3]|0:0;ig=(zf|0)>4?_e[yf|4]|0:0;jg=(zf|0)>5?_e[yf|5]|0:0;kg=(zf|0)>6?_e[yf|6]|0:0;lg=(zf|0)>7?_e[yf|7]|0:0;mg=(zf|0)>8?_e[yf|8]|0:0;ng=(zf|0)>9?_e[yf|9]|0:0;og=(zf|0)>10?_e[yf|10]|0:0;pg=(zf|0)>11?_e[yf|11]|0:0;qg=(zf|0)>12?_e[yf|12]|0:0;rg=(zf|0)>13?_e[yf|13]|0:0;sg=(zf|0)>14?_e[yf|14]|0:0;cf(Af,Bf,Cf,Df,Ef,Ff,Gf,Hf,If^Of>>>24,Jf^Of>>>16&255,Kf^Of>>>8&255,Lf^Of&255,Mf^Pf>>>24,Nf^Pf>>>16&255,Pf>>>8&255,Pf&255);_e[yf]=eg^d;if((zf|0)>1)_e[yf|1]=fg^e;if((zf|0)>2)_e[yf|2]=gg^f;if((zf|0)>3)_e[yf|3]=hg^g;if((zf|0)>4)_e[yf|4]=ig^h;if((zf|0)>5)_e[yf|5]=jg^i;if((zf|0)>6)_e[yf|6]=kg^j;if((zf|0)>7)_e[yf|7]=lg^k;if((zf|0)>8)_e[yf|8]=mg^l;if((zf|0)>9)_e[yf|9]=ng^m;if((zf|0)>10)_e[yf|10]=og^n;if((zf|0)>11)_e[yf|11]=pg^o;if((zf|0)>12)_e[yf|12]=qg^p;if((zf|0)>13)_e[yf|13]=rg^q;if((zf|0)>14)_e[yf|14]=sg^r;cf(eg^Qf,fg^Rf,gg^Sf,hg^Tf,ig^Uf,jg^Vf,kg^Wf,lg^Xf,mg^Yf,ng^Zf,og^$f,pg^_f,qg^ag,rg^bg,sg^cg,dg);Qf=d,Rf=e,Sf=f,Tf=g,Uf=h,Vf=i,Wf=j,Xf=k,Yf=l,Zf=m,$f=n,_f=o,ag=p,bg=q,cg=r,dg=s;ug=ug+zf|0;yf=yf+zf|0;zf=0;Pf=Pf+1|0;if((Pf|0)==0)Of=Of+1|0}return ug|0}function qf(yf,zf,Af,Bf,Cf,Df,Ef,Ff,Gf,Hf,If,Jf,Kf,Lf,Mf,Nf,Of,Pf){yf=yf|0;zf=zf|0;Af=Af|0;Bf=Bf|0;Cf=Cf|0;Df=Df|0;Ef=Ef|0;Ff=Ff|0;Gf=Gf|0;Hf=Hf|0;If=If|0;Jf=Jf|0;Kf=Kf|0;Lf=Lf|0;Mf=Mf|0;Nf=Nf|0;Of=Of|0;Pf=Pf|0;var Qf=0,Rf=0,Sf=0,Tf=0,Uf=0,Vf=0,Wf=0,Xf=0,Yf=0,Zf=0,$f=0,_f=0,ag=0,bg=0,cg=0,dg=0,eg=0,fg=0,gg=0,hg=0,ig=0,jg=0,kg=0,lg=0,mg=0,ng=0,og=0,pg=0,qg=0,rg=0,sg=0,tg=0,ug=0;if(yf&15)return-1;Qf=d,Rf=e,Sf=f,Tf=g,Uf=h,Vf=i,Wf=j,Xf=k,Yf=l,Zf=m,$f=n,_f=o,ag=p,bg=q,cg=r,dg=s;while((zf|0)>=16){cf(Af,Bf,Cf,Df,Ef,Ff,Gf,Hf,If^Of>>>24,Jf^Of>>>16&255,Kf^Of>>>8&255,Lf^Of&255,Mf^Pf>>>24,Nf^Pf>>>16&255,Pf>>>8&255,Pf&255);_e[yf]=eg=_e[yf]^d;_e[yf|1]=fg=_e[yf|1]^e;_e[yf|2]=gg=_e[yf|2]^f;_e[yf|3]=hg=_e[yf|3]^g;_e[yf|4]=ig=_e[yf|4]^h;_e[yf|5]=jg=_e[yf|5]^i;_e[yf|6]=kg=_e[yf|6]^j;_e[yf|7]=lg=_e[yf|7]^k;_e[yf|8]=mg=_e[yf|8]^l;_e[yf|9]=ng=_e[yf|9]^m;_e[yf|10]=og=_e[yf|10]^n;_e[yf|11]=pg=_e[yf|11]^o;_e[yf|12]=qg=_e[yf|12]^p;_e[yf|13]=rg=_e[yf|13]^q;_e[yf|14]=sg=_e[yf|14]^r;_e[yf|15]=tg=_e[yf|15]^s;cf(eg^Qf,fg^Rf,gg^Sf,hg^Tf,ig^Uf,jg^Vf,kg^Wf,lg^Xf,mg^Yf,ng^Zf,og^$f,pg^_f,qg^ag,rg^bg,sg^cg,tg^dg);Qf=d,Rf=e,Sf=f,Tf=g,Uf=h,Vf=i,Wf=j,Xf=k,Yf=l,Zf=m,$f=n,_f=o,ag=p,bg=q,cg=r,dg=s;ug=ug+16|0;yf=yf+16|0;zf=zf-16|0;Pf=Pf+1|0;if((Pf|0)==0)Of=Of+1|0}if((zf|0)>0){cf(Af,Bf,Cf,Df,Ef,Ff,Gf,Hf,If^Of>>>24,Jf^Of>>>16&255,Kf^Of>>>8&255,Lf^Of&255,Mf^Pf>>>24,Nf^Pf>>>16&255,Pf>>>8&255,Pf&255);eg=_e[yf]^d;fg=(zf|0)>1?_e[yf|1]^e:0;gg=(zf|0)>2?_e[yf|2]^f:0;hg=(zf|0)>3?_e[yf|3]^g:0;ig=(zf|0)>4?_e[yf|4]^h:0;jg=(zf|0)>5?_e[yf|5]^i:0;kg=(zf|0)>6?_e[yf|6]^j:0;lg=(zf|0)>7?_e[yf|7]^k:0;mg=(zf|0)>8?_e[yf|8]^l:0;ng=(zf|0)>9?_e[yf|9]^m:0;og=(zf|0)>10?_e[yf|10]^n:0;pg=(zf|0)>11?_e[yf|11]^o:0;qg=(zf|0)>12?_e[yf|12]^p:0;rg=(zf|0)>13?_e[yf|13]^q:0;sg=(zf|0)>14?_e[yf|14]^r:0;tg=(zf|0)>15?_e[yf|15]^s:0;_e[yf]=eg;if((zf|0)>1)_e[yf|1]=fg;if((zf|0)>2)_e[yf|2]=gg;if((zf|0)>3)_e[yf|3]=hg;if((zf|0)>4)_e[yf|4]=ig;if((zf|0)>5)_e[yf|5]=jg;if((zf|0)>6)_e[yf|6]=kg;if((zf|0)>7)_e[yf|7]=lg;if((zf|0)>8)_e[yf|8]=mg;if((zf|0)>9)_e[yf|9]=ng;if((zf|0)>10)_e[yf|10]=og;if((zf|0)>11)_e[yf|11]=pg;if((zf|0)>12)_e[yf|12]=qg;if((zf|0)>13)_e[yf|13]=rg;if((zf|0)>14)_e[yf|14]=sg;cf(eg^Qf,fg^Rf,gg^Sf,hg^Tf,ig^Uf,jg^Vf,kg^Wf,lg^Xf,mg^Yf,ng^Zf,og^$f,pg^_f,qg^ag,rg^bg,sg^cg,tg^dg);Qf=d,Rf=e,Sf=f,Tf=g,Uf=h,Vf=i,Wf=j,Xf=k,Yf=l,Zf=m,$f=n,_f=o,ag=p,bg=q,cg=r,dg=s;ug=ug+zf|0;yf=yf+zf|0;zf=0;Pf=Pf+1|0;if((Pf|0)==0)Of=Of+1|0}return ug|0}function rf(yf,zf){yf=yf|0;zf=zf|0;var Af=0;if(yf&15)return-1;while((zf|0)>=16){cf(d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s);d=d^_e[yf];e=e^_e[yf|1];f=f^_e[yf|2];g=g^_e[yf|3];h=h^_e[yf|4];i=i^_e[yf|5];j=j^_e[yf|6];k=k^_e[yf|7];l=l^_e[yf|8];m=m^_e[yf|9];n=n^_e[yf|10];o=o^_e[yf|11];p=p^_e[yf|12];q=q^_e[yf|13];r=r^_e[yf|14];s=s^_e[yf|15];_e[yf]=d;_e[yf|1]=e;_e[yf|2]=f;_e[yf|3]=g;_e[yf|4]=h;_e[yf|5]=i;_e[yf|6]=j;_e[yf|7]=k;_e[yf|8]=l;_e[yf|9]=m;_e[yf|10]=n;_e[yf|11]=o;_e[yf|12]=p;_e[yf|13]=q;_e[yf|14]=r;_e[yf|15]=s;yf=yf+16|0;zf=zf-16|0;Af=Af+16|0}if((zf|0)>0){cf(d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s);_e[yf]=_e[yf]^d;if((zf|0)>1)_e[yf|1]=_e[yf|1]^e;if((zf|0)>2)_e[yf|2]=_e[yf|2]^f;if((zf|0)>3)_e[yf|3]=_e[yf|3]^g;if((zf|0)>4)_e[yf|4]=_e[yf|4]^h;if((zf|0)>5)_e[yf|5]=_e[yf|5]^i;if((zf|0)>6)_e[yf|6]=_e[yf|6]^j;if((zf|0)>7)_e[yf|7]=_e[yf|7]^k;if((zf|0)>8)_e[yf|8]=_e[yf|8]^l;if((zf|0)>9)_e[yf|9]=_e[yf|9]^m;if((zf|0)>10)_e[yf|10]=_e[yf|10]^n;if((zf|0)>11)_e[yf|11]=_e[yf|11]^o;if((zf|0)>12)_e[yf|12]=_e[yf|12]^p;if((zf|0)>13)_e[yf|13]=_e[yf|13]^q;if((zf|0)>14)_e[yf|14]=_e[yf|14]^r;Af=Af+zf|0;yf=yf+zf|0;zf=0}return Af|0}function sf(yf,zf){yf=yf|0;zf=zf|0;var Af=0,Bf=0,Cf=0,Df=0,Ef=0,Ff=0,Gf=0,Hf=0,If=0,Jf=0,Kf=0,Lf=0,Mf=0,Nf=0,Of=0,Pf=0,Qf=0;if(yf&15)return-1;while((zf|0)>=16){cf(d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s);Af=_e[yf]|0;Bf=_e[yf|1]|0;Cf=_e[yf|2]|0;Df=_e[yf|3]|0;Ef=_e[yf|4]|0;Ff=_e[yf|5]|0;Gf=_e[yf|6]|0;Hf=_e[yf|7]|0;If=_e[yf|8]|0;Jf=_e[yf|9]|0;Kf=_e[yf|10]|0;Lf=_e[yf|11]|0;Mf=_e[yf|12]|0;Nf=_e[yf|13]|0;Of=_e[yf|14]|0;Pf=_e[yf|15]|0;_e[yf]=d^Af;_e[yf|1]=e^Bf;_e[yf|2]=f^Cf;_e[yf|3]=g^Df;_e[yf|4]=h^Ef;_e[yf|5]=i^Ff;_e[yf|6]=j^Gf;_e[yf|7]=k^Hf;_e[yf|8]=l^If;_e[yf|9]=m^Jf;_e[yf|10]=n^Kf;_e[yf|11]=o^Lf;_e[yf|12]=p^Mf;_e[yf|13]=q^Nf;_e[yf|14]=r^Of;_e[yf|15]=s^Pf;d=Af;e=Bf;f=Cf;g=Df;h=Ef;i=Ff;j=Gf;k=Hf;l=If;m=Jf;n=Kf;o=Lf;p=Mf;q=Nf;r=Of;s=Pf;yf=yf+16|0;zf=zf-16|0;Qf=Qf+16|0}if((zf|0)>0){cf(d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s);_e[yf]=_e[yf]^d;if((zf|0)>1)_e[yf|1]=_e[yf|1]^e;if((zf|0)>2)_e[yf|2]=_e[yf|2]^f;if((zf|0)>3)_e[yf|3]=_e[yf|3]^g;if((zf|0)>4)_e[yf|4]=_e[yf|4]^h;if((zf|0)>5)_e[yf|5]=_e[yf|5]^i;if((zf|0)>6)_e[yf|6]=_e[yf|6]^j;if((zf|0)>7)_e[yf|7]=_e[yf|7]^k;if((zf|0)>8)_e[yf|8]=_e[yf|8]^l;if((zf|0)>9)_e[yf|9]=_e[yf|9]^m;if((zf|0)>10)_e[yf|10]=_e[yf|10]^n;if((zf|0)>11)_e[yf|11]=_e[yf|11]^o;if((zf|0)>12)_e[yf|12]=_e[yf|12]^p;if((zf|0)>13)_e[yf|13]=_e[yf|13]^q;if((zf|0)>14)_e[yf|14]=_e[yf|14]^r;Qf=Qf+zf|0;yf=yf+zf|0;zf=0}return Qf|0}function tf(yf,zf,Af,Bf){yf=yf|0;zf=zf|0;Af=Af|0;Bf=Bf|0;var Cf=0,Df=0,Ef=0,Ff=0,Gf=0,Hf=0,If=0,Jf=0,Kf=0,Lf=0;Cf=v|0,Df=w|0,Ef=x|0,Ff=y|0;for(;(Kf|0)<128;Kf=Kf+1|0){if(Cf>>>31){Gf=Gf^yf,Hf=Hf^zf,If=If^Af,Jf=Jf^Bf}Cf=Cf<<1|Df>>>31,Df=Df<<1|Ef>>>31,Ef=Ef<<1|Ff>>>31,Ff=Ff<<1;Lf=Bf&1;Bf=Bf>>>1|Af<<31,Af=Af>>>1|zf<<31,zf=zf>>>1|yf<<31,yf=yf>>>1;if(Lf)yf=yf^3774873600}z=Gf,A=Hf,B=If,C=Jf}function uf(){cf(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0),v=d<<24|e<<16|f<<8|g,w=h<<24|i<<16|j<<8|k,x=l<<24|m<<16|n<<8|o,y=p<<24|q<<16|r<<8|s;z=A=B=C=0}function vf(yf,zf){yf=yf|0;zf=zf|0;var Af=0;if(yf&15)return-1;z=d<<24|e<<16|f<<8|g,A=h<<24|i<<16|j<<8|k,B=l<<24|m<<16|n<<8|o,C=p<<24|q<<16|r<<8|s;while((zf|0)>=16){tf(z^(_e[yf|0]<<24|_e[yf|1]<<16|_e[yf|2]<<8|_e[yf|3]),A^(_e[yf|4]<<24|_e[yf|5]<<16|_e[yf|6]<<8|_e[yf|7]),B^(_e[yf|8]<<24|_e[yf|9]<<16|_e[yf|10]<<8|_e[yf|11]),C^(_e[yf|12]<<24|_e[yf|13]<<16|_e[yf|14]<<8|_e[yf|15]));yf=yf+16|0,zf=zf-16|0,Af=Af+16|0}d=z>>>24,e=z>>>16&255,f=z>>>8&255,g=z&255,h=A>>>24,i=A>>>16&255,j=A>>>8&255,k=A&255,l=B>>>24,m=B>>>16&255,n=B>>>8&255,o=B&255,p=C>>>24,q=C>>>16&255,r=C>>>8&255,s=C&255;return Af|0}function wf(yf,zf,Af,Bf,Cf,Df,Ef,Ff,Gf,Hf,If,Jf,Kf,Lf,Mf){yf=yf|0;zf=zf|0;Af=Af|0;Bf=Bf|0;Cf=Cf|0;Df=Df|0;Ef=Ef|0;Ff=Ff|0;Gf=Gf|0;Hf=Hf|0;If=If|0;Jf=Jf|0;Kf=Kf|0;Lf=Lf|0;Mf=Mf|0;var Nf=0,Of=0,Pf=0,Qf=0,Rf=0,Sf=0,Tf=0,Uf=0,Vf=0,Wf=0,Xf=0,Yf=0,Zf=0,$f=0,_f=0,ag=0,bg=0;if(yf&15)return-1;while((zf|0)>=16){cf(Af,Bf,Cf,Df,Ef,Ff,Gf,Hf,If,Jf,Kf,Lf,Mf>>>24,Mf>>>16&255,Mf>>>8&255,Mf&255);_e[yf|0]=Nf=_e[yf|0]^d,_e[yf|1]=Of=_e[yf|1]^e,_e[yf|2]=Pf=_e[yf|2]^f,_e[yf|3]=Qf=_e[yf|3]^g,_e[yf|4]=Rf=_e[yf|4]^h,_e[yf|5]=Sf=_e[yf|5]^i,_e[yf|6]=Tf=_e[yf|6]^j,_e[yf|7]=Uf=_e[yf|7]^k,_e[yf|8]=Vf=_e[yf|8]^l,_e[yf|9]=Wf=_e[yf|9]^m,_e[yf|10]=Xf=_e[yf|10]^n,_e[yf|11]=Yf=_e[yf|11]^o,_e[yf|12]=Zf=_e[yf|12]^p,_e[yf|13]=$f=_e[yf|13]^q,_e[yf|14]=_f=_e[yf|14]^r,_e[yf|15]=ag=_e[yf|15]^s;tf(z^(Nf<<24|Of<<16|Pf<<8|Qf),A^(Rf<<24|Sf<<16|Tf<<8|Uf),B^(Vf<<24|Wf<<16|Xf<<8|Yf),C^(Zf<<24|$f<<16|_f<<8|ag));Mf=Mf+1|0;yf=yf+16|0,zf=zf-16|0,bg=bg+16|0}if((zf|0)>0){cf(Af,Bf,Cf,Df,Ef,Ff,Gf,Hf,If,Jf,Kf,Lf,Mf>>>24,Mf>>>16&255,Mf>>>8&255,Mf&255);Nf=_e[yf|0]^d,Of=(zf|0)>1?_e[yf|1]^e:0,Pf=(zf|0)>2?_e[yf|2]^f:0,Qf=(zf|0)>3?_e[yf|3]^g:0,Rf=(zf|0)>4?_e[yf|4]^h:0,Sf=(zf|0)>5?_e[yf|5]^i:0,Tf=(zf|0)>6?_e[yf|6]^j:0,Uf=(zf|0)>7?_e[yf|7]^k:0,Vf=(zf|0)>8?_e[yf|8]^l:0,Wf=(zf|0)>9?_e[yf|9]^m:0,Xf=(zf|0)>10?_e[yf|10]^n:0,Yf=(zf|0)>11?_e[yf|11]^o:0,Zf=(zf|0)>12?_e[yf|12]^p:0,$f=(zf|0)>13?_e[yf|13]^q:0,_f=(zf|0)>14?_e[yf|14]^r:0;ag=0;_e[yf]=Nf;if((zf|0)>1)_e[yf|1]=Of;if((zf|0)>2)_e[yf|2]=Pf;if((zf|0)>3)_e[yf|3]=Qf;if((zf|0)>4)_e[yf|4]=Rf;if((zf|0)>5)_e[yf|5]=Sf;if((zf|0)>6)_e[yf|6]=Tf;if((zf|0)>7)_e[yf|7]=Uf;if((zf|0)>8)_e[yf|8]=Vf;if((zf|0)>9)_e[yf|9]=Wf;if((zf|0)>10)_e[yf|10]=Xf;if((zf|0)>11)_e[yf|11]=Yf;if((zf|0)>12)_e[yf|12]=Zf;if((zf|0)>13)_e[yf|13]=$f;if((zf|0)>14)_e[yf|14]=_f;tf(z^(Nf<<24|Of<<16|Pf<<8|Qf),A^(Rf<<24|Sf<<16|Tf<<8|Uf),B^(Vf<<24|Wf<<16|Xf<<8|Yf),C^(Zf<<24|$f<<16|_f<<8|ag));Mf=Mf+1|0;bg=bg+zf|0}d=z>>>24,e=z>>>16&255,f=z>>>8&255,g=z&255,h=A>>>24,i=A>>>16&255,j=A>>>8&255,k=A&255,l=B>>>24,m=B>>>16&255,n=B>>>8&255,o=B&255,p=C>>>24,q=C>>>16&255,r=C>>>8&255,s=C&255;return bg|0}function xf(yf,zf,Af,Bf,Cf,Df,Ef,Ff,Gf,Hf,If,Jf,Kf,Lf,Mf){yf=yf|0;zf=zf|0;Af=Af|0;Bf=Bf|0;Cf=Cf|0;Df=Df|0;Ef=Ef|0;Ff=Ff|0;Gf=Gf|0;Hf=Hf|0;If=If|0;Jf=Jf|0;Kf=Kf|0;Lf=Lf|0;Mf=Mf|0;var Nf=0,Of=0,Pf=0,Qf=0,Rf=0,Sf=0,Tf=0,Uf=0,Vf=0,Wf=0,Xf=0,Yf=0,Zf=0,$f=0,_f=0,ag=0,bg=0;if(yf&15)return-1;while((zf|0)>=16){Nf=_e[yf|0]|0,Of=_e[yf|1]|0,Pf=_e[yf|2]|0,Qf=_e[yf|3]|0,Rf=_e[yf|4]|0,Sf=_e[yf|5]|0,Tf=_e[yf|6]|0,Uf=_e[yf|7]|0,Vf=_e[yf|8]|0,Wf=_e[yf|9]|0,Xf=_e[yf|10]|0,Yf=_e[yf|11]|0,Zf=_e[yf|12]|0,$f=_e[yf|13]|0,_f=_e[yf|14]|0,ag=_e[yf|15]|0;tf(z^(Nf<<24|Of<<16|Pf<<8|Qf),A^(Rf<<24|Sf<<16|Tf<<8|Uf),B^(Vf<<24|Wf<<16|Xf<<8|Yf),C^(Zf<<24|$f<<16|_f<<8|ag));cf(Af,Bf,Cf,Df,Ef,Ff,Gf,Hf,If,Jf,Kf,Lf,Mf>>>24,Mf>>>16&255,Mf>>>8&255,Mf&255);_e[yf|0]=Nf^d,_e[yf|1]=Of^e,_e[yf|2]=Pf^f,_e[yf|3]=Qf^g,_e[yf|4]=Rf^h,_e[yf|5]=Sf^i,_e[yf|6]=Tf^j,_e[yf|7]=Uf^k,_e[yf|8]=Vf^l,_e[yf|9]=Wf^m,_e[yf|10]=Xf^n,_e[yf|11]=Yf^o,_e[yf|12]=Zf^p,_e[yf|13]=$f^q,_e[yf|14]=_f^r,_e[yf|15]=ag^s;Mf=Mf+1|0;yf=yf+16|0,zf=zf-16|0,bg=bg+16|0}if((zf|0)>0){Nf=_e[yf|0]|0,Of=(zf|0)>1?_e[yf|1]|0:0,Pf=(zf|0)>2?_e[yf|2]|0:0,Qf=(zf|0)>3?_e[yf|3]|0:0,Rf=(zf|0)>4?_e[yf|4]|0:0,Sf=(zf|0)>5?_e[yf|5]|0:0,Tf=(zf|0)>6?_e[yf|6]|0:0,Uf=(zf|0)>7?_e[yf|7]|0:0,Vf=(zf|0)>8?_e[yf|8]|0:0,Wf=(zf|0)>9?_e[yf|9]|0:0,Xf=(zf|0)>10?_e[yf|10]|0:0,Yf=(zf|0)>11?_e[yf|11]|0:0,Zf=(zf|0)>12?_e[yf|12]|0:0,$f=(zf|0)>13?_e[yf|13]|0:0,_f=(zf|0)>14?_e[yf|14]|0:0;ag=0;tf(z^(Nf<<24|Of<<16|Pf<<8|Qf),A^(Rf<<24|Sf<<16|Tf<<8|Uf),B^(Vf<<24|Wf<<16|Xf<<8|Yf),C^(Zf<<24|$f<<16|_f<<8|ag));cf(Af,Bf,Cf,Df,Ef,Ff,Gf,Hf,If,Jf,Kf,Lf,Mf>>>24,Mf>>>16&255,Mf>>>8&255,Mf&255);_e[yf]=Nf^d;if((zf|0)>1)_e[yf|1]=Of^e;if((zf|0)>2)_e[yf|2]=Pf^f;if((zf|0)>3)_e[yf|3]=Qf^g;if((zf|0)>4)_e[yf|4]=Rf^h;if((zf|0)>5)_e[yf|5]=Sf^i;if((zf|0)>6)_e[yf|6]=Tf^j;if((zf|0)>7)_e[yf|7]=Uf^k;if((zf|0)>8)_e[yf|8]=Vf^l;if((zf|0)>9)_e[yf|9]=Wf^m;if((zf|0)>10)_e[yf|10]=Xf^n;if((zf|0)>11)_e[yf|11]=Yf^o;if((zf|0)>12)_e[yf|12]=Zf^p;if((zf|0)>13)_e[yf|13]=$f^q;if((zf|0)>14)_e[yf|14]=_f^r;Mf=Mf+1|0;bg=bg+zf|0}d=z>>>24,e=z>>>16&255,f=z>>>8&255,g=z&255,h=A>>>24,i=A>>>16&255,j=A>>>8&255,k=A&255,l=B>>>24,m=B>>>16&255,n=B>>>8&255,o=B&255,p=C>>>24,q=C>>>16&255,r=C>>>8&255,s=C&255;return bg|0}return{init_state:ef,save_state:ff,init_key_128:gf,init_key_256:hf,ecb_encrypt:jf,ecb_decrypt:kf,cbc_encrypt:lf,cbc_decrypt:mf,cbc_mac:nf,ctr_encrypt:of,ctr_decrypt:of,ccm_encrypt:pf,ccm_decrypt:qf,cfb_encrypt:rf,cfb_decrypt:sf,gcm_init:uf,gcm_ghash:vf,gcm_encrypt:wf,gcm_decrypt:xf}}function u(a,b,c){var d=new Uint8Array(c);return d.set(Qb),t(a,b,c)}function v(a){a=a||{},this.BLOCK_SIZE=Sb,this.heap=r(Uint8Array,a),this.asm=a.asm||u(b,null,this.heap.buffer),this.pos=Rb,this.len=0,this.key=null,this.result=null,this.reset(a)}function w(a){a=a||{},this.result=null,this.pos=Rb,this.len=0;var b=this.asm,c=a.key;if(void 0!==c){if(o(c)||p(c))c=new Uint8Array(c);else{if(!n(c))throw new TypeError("unexpected key type");c=f(c)}if(16===c.length)b.init_key_128(c[0],c[1],c[2],c[3],c[4],c[5],c[6],c[7],c[8],c[9],c[10],c[11],c[12],c[13],c[14],c[15]);else{if(24===c.length)throw new d("illegal key size");if(32!==c.length)throw new d("illegal key size");b.init_key_256(c[0],c[1],c[2],c[3],c[4],c[5],c[6],c[7],c[8],c[9],c[10],c[11],c[12],c[13],c[14],c[15],c[16],c[17],c[18],c[19],c[20],c[21],c[22],c[23],c[24],c[25],c[26],c[27],c[28],c[29],c[30],c[31])}this.key=c}return this}function x(a){var b=this.asm;if(void 0!==a){if(o(a)||p(a))a=new Uint8Array(a);else{if(!n(a))throw new TypeError("unexpected iv type");a=f(a)}if(a.length!==Sb)throw new d("illegal iv size");this.iv=a,b.init_state(a[0],a[1],a[2],a[3],a[4],a[5],a[6],a[7],a[8],a[9],a[10],a[11],a[12],a[13],a[14],a[15])}else this.iv=null,b.init_state(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)}function y(a){this.padding=!0,this.mode="cbc",this.iv=null,v.call(this,a)}function z(a){y.call(this,a)}function A(a){y.call(this,a)}function B(a){a=a||{},w.call(this,a);var b=a.padding;return this.padding=void 0!==b?!!b:!0,x.call(this,a.iv),this}function C(a){if(!this.key)throw new c("no key is associated with the instance");if(n(a)&&(a=f(a)),o(a)&&(a=new Uint8Array(a)),!p(a))throw new TypeError("data isn't of expected type");for(var b=0,d=a.length||0,e=this.asm,g=this.heap,h=this.pos,i=this.len,j=0,k=Sb*Math.floor((i+d)/Sb),l=0,m=new Uint8Array(k);d>0;)l=s(g,h+i,a,b,d),i+=l,b+=l,d-=l,l=e.cbc_encrypt(h,i),m.set(g.subarray(h,h+l),j),j+=l,i>l?(h+=l,i-=l):(h=Rb,i=0);return this.result=m,this.pos=h,this.len=i,this}function D(){if(!this.key)throw new c("no key is associated with the instance");var a=this.asm,b=this.heap,e=this.padding,f=this.pos,g=this.len,h=Sb*Math.ceil(g/Sb);if(g%Sb===0)e&&(h+=Sb);else if(!e)throw new d("data length must be a multiple of "+Sb);var i=new Uint8Array(h);if(h>g){for(var j=Sb-g%Sb,k=0;j>k;++k)b[f+g+k]=j;g+=j}return g>0&&(a.cbc_encrypt(f,g),i.set(b.subarray(f,f+g))),this.result=i,this.pos=Rb,this.len=0,this}function E(a){var b,c=C.call(this,a).result,d=D.call(this).result;return b=new Uint8Array(c.length+d.length),b.set(c),d.length>0&&b.set(d,c.length),this.result=b,this}function F(a){if(!this.key)throw new c("no key is associated with the instance");if(n(a)&&(a=f(a)),o(a)&&(a=new Uint8Array(a)),!p(a))throw new TypeError("data isn't of expected type");for(var b=0,d=a.length||0,e=this.asm,g=this.heap,h=this.padding,i=this.pos,j=this.len,k=0,l=Sb*Math.floor((j+d)/Sb),m=0,q=new Uint8Array(l);d>0;)m=s(g,i+j,a,b,d),j+=m,b+=m,d-=m,m=e.cbc_decrypt(i,j-(h&&0===d&&j%Sb===0?Sb:0)),q.set(g.subarray(i,i+m),k),k+=m,j>m?(i+=m,j-=m):(i=Rb,j=0);return this.result=q.subarray(0,k),this.pos=i,this.len=j,this}function G(){if(!this.key)throw new c("no key is associated with the instance");var a=this.asm,b=this.heap,e=this.padding,f=this.pos,g=this.len;if(0===g){if(e)throw new c("padding not found");return this.result=new Uint8Array(0),this.pos=Rb,this.len=0,this}if(g%Sb!==0)throw new d("data length must be a multiple of "+Sb);var h=new Uint8Array(g);if(g>0&&(a.cbc_decrypt(f,g),h.set(b.subarray(f,f+g))),e){var i=h[g-1];h=h.subarray(0,g-i)}return this.result=h,this.pos=Rb,this.len=0,this}function H(a){var b,c=F.call(this,a).result,d=G.call(this).result;return b=new Uint8Array(c.length+d.length),b.set(c),d.length>0&&b.set(d,c.length),this.result=b,this}function I(a,b,c,d){if(void 0===a)throw new SyntaxError("data required");if(void 0===b)throw new SyntaxError("key required");return Yb.reset({key:b,padding:c,iv:d}).encrypt(a).result}function J(a,b,c,d){if(void 0===a)throw new SyntaxError("data required");if(void 0===b)throw new SyntaxError("key required");return Yb.reset({key:b,padding:c,iv:d}).decrypt(a).result}function K(){return this.result=null,this.pos=0,this.len=0,this.asm.reset(),this}function L(a){if(null!==this.result)throw new c("state must be reset before processing new data");if(n(a)&&(a=f(a)),o(a)&&(a=new Uint8Array(a)),!p(a))throw new TypeError("data isn't of expected type");for(var b=this.asm,d=this.heap,e=this.pos,g=this.len,h=0,i=a.length,j=0;i>0;)j=s(d,e+g,a,h,i),g+=j,h+=j,i-=j,j=b.process(e,g),e+=j,g-=j,g||(e=0);return this.pos=e,this.len=g,this}function M(){if(null!==this.result)throw new c("state must be reset before processing new data");return this.asm.finish(this.pos,this.len,0),this.result=new Uint8Array(this.HASH_SIZE),this.result.set(this.heap.subarray(0,this.HASH_SIZE)),this.pos=0,this.len=0,this}function N(a,b,c){"use asm";var d=0,e=0,f=0,g=0,h=0,i=0,j=0,k=0,l=0;var m=0,n=0,o=0,p=0,q=0,r=0,s=0,t=0,u=0,v=0,w=0,x=0,y=0,z=0,A=0,B=0;var C=new a.Uint8Array(c);function D(Q,R,S,T,U,V,W,X,Y,Z,$,_,ab,bb,cb,db){Q=Q|0;R=R|0;S=S|0;T=T|0;U=U|0;V=V|0;W=W|0;X=X|0;Y=Y|0;Z=Z|0;$=$|0;_=_|0;ab=ab|0;bb=bb|0;cb=cb|0;db=db|0;var eb=0,fb=0,gb=0,hb=0,ib=0,jb=0,kb=0,lb=0,mb=0;eb=d;fb=e;gb=f;hb=g;ib=h;jb=i;kb=j;lb=k;mb=Q+lb+(ib>>>6^ib>>>11^ib>>>25^ib<<26^ib<<21^ib<<7)+(kb^ib&(jb^kb))+1116352408|0;lb=kb;kb=jb;jb=ib;ib=hb+mb|0;hb=gb;gb=fb;fb=eb;eb=mb+(fb&gb^hb&(fb^gb))+(fb>>>2^fb>>>13^fb>>>22^fb<<30^fb<<19^fb<<10)|0;mb=R+lb+(ib>>>6^ib>>>11^ib>>>25^ib<<26^ib<<21^ib<<7)+(kb^ib&(jb^kb))+1899447441|0;lb=kb;kb=jb;jb=ib;ib=hb+mb|0;hb=gb;gb=fb;fb=eb;eb=mb+(fb&gb^hb&(fb^gb))+(fb>>>2^fb>>>13^fb>>>22^fb<<30^fb<<19^fb<<10)|0;mb=S+lb+(ib>>>6^ib>>>11^ib>>>25^ib<<26^ib<<21^ib<<7)+(kb^ib&(jb^kb))+3049323471|0;lb=kb;kb=jb;jb=ib;ib=hb+mb|0;hb=gb;gb=fb;fb=eb;eb=mb+(fb&gb^hb&(fb^gb))+(fb>>>2^fb>>>13^fb>>>22^fb<<30^fb<<19^fb<<10)|0;mb=T+lb+(ib>>>6^ib>>>11^ib>>>25^ib<<26^ib<<21^ib<<7)+(kb^ib&(jb^kb))+3921009573|0;lb=kb;kb=jb;jb=ib;ib=hb+mb|0;hb=gb;gb=fb;fb=eb;eb=mb+(fb&gb^hb&(fb^gb))+(fb>>>2^fb>>>13^fb>>>22^fb<<30^fb<<19^fb<<10)|0;mb=U+lb+(ib>>>6^ib>>>11^ib>>>25^ib<<26^ib<<21^ib<<7)+(kb^ib&(jb^kb))+961987163|0;lb=kb;kb=jb;jb=ib;ib=hb+mb|0;hb=gb;gb=fb;fb=eb;eb=mb+(fb&gb^hb&(fb^gb))+(fb>>>2^fb>>>13^fb>>>22^fb<<30^fb<<19^fb<<10)|0;mb=V+lb+(ib>>>6^ib>>>11^ib>>>25^ib<<26^ib<<21^ib<<7)+(kb^ib&(jb^kb))+1508970993|0;lb=kb;kb=jb;jb=ib;ib=hb+mb|0;hb=gb;gb=fb;fb=eb;eb=mb+(fb&gb^hb&(fb^gb))+(fb>>>2^fb>>>13^fb>>>22^fb<<30^fb<<19^fb<<10)|0;mb=W+lb+(ib>>>6^ib>>>11^ib>>>25^ib<<26^ib<<21^ib<<7)+(kb^ib&(jb^kb))+2453635748|0;lb=kb;kb=jb;jb=ib;ib=hb+mb|0;hb=gb;gb=fb;fb=eb;eb=mb+(fb&gb^hb&(fb^gb))+(fb>>>2^fb>>>13^fb>>>22^fb<<30^fb<<19^fb<<10)|0;mb=X+lb+(ib>>>6^ib>>>11^ib>>>25^ib<<26^ib<<21^ib<<7)+(kb^ib&(jb^kb))+2870763221|0;lb=kb;kb=jb;jb=ib;ib=hb+mb|0;hb=gb;gb=fb;fb=eb;eb=mb+(fb&gb^hb&(fb^gb))+(fb>>>2^fb>>>13^fb>>>22^fb<<30^fb<<19^fb<<10)|0;mb=Y+lb+(ib>>>6^ib>>>11^ib>>>25^ib<<26^ib<<21^ib<<7)+(kb^ib&(jb^kb))+3624381080|0;lb=kb;kb=jb;jb=ib;ib=hb+mb|0;hb=gb;gb=fb;fb=eb;eb=mb+(fb&gb^hb&(fb^gb))+(fb>>>2^fb>>>13^fb>>>22^fb<<30^fb<<19^fb<<10)|0;mb=Z+lb+(ib>>>6^ib>>>11^ib>>>25^ib<<26^ib<<21^ib<<7)+(kb^ib&(jb^kb))+310598401|0;lb=kb;kb=jb;jb=ib;ib=hb+mb|0;hb=gb;gb=fb;fb=eb;eb=mb+(fb&gb^hb&(fb^gb))+(fb>>>2^fb>>>13^fb>>>22^fb<<30^fb<<19^fb<<10)|0;mb=$+lb+(ib>>>6^ib>>>11^ib>>>25^ib<<26^ib<<21^ib<<7)+(kb^ib&(jb^kb))+607225278|0;lb=kb;kb=jb;jb=ib;ib=hb+mb|0;hb=gb;gb=fb;fb=eb;eb=mb+(fb&gb^hb&(fb^gb))+(fb>>>2^fb>>>13^fb>>>22^fb<<30^fb<<19^fb<<10)|0;mb=_+lb+(ib>>>6^ib>>>11^ib>>>25^ib<<26^ib<<21^ib<<7)+(kb^ib&(jb^kb))+1426881987|0;lb=kb;kb=jb;jb=ib;ib=hb+mb|0;hb=gb;gb=fb;fb=eb;eb=mb+(fb&gb^hb&(fb^gb))+(fb>>>2^fb>>>13^fb>>>22^fb<<30^fb<<19^fb<<10)|0;mb=ab+lb+(ib>>>6^ib>>>11^ib>>>25^ib<<26^ib<<21^ib<<7)+(kb^ib&(jb^kb))+1925078388|0;lb=kb;kb=jb;jb=ib;ib=hb+mb|0;hb=gb;gb=fb;fb=eb;eb=mb+(fb&gb^hb&(fb^gb))+(fb>>>2^fb>>>13^fb>>>22^fb<<30^fb<<19^fb<<10)|0;mb=bb+lb+(ib>>>6^ib>>>11^ib>>>25^ib<<26^ib<<21^ib<<7)+(kb^ib&(jb^kb))+2162078206|0;lb=kb;kb=jb;jb=ib;ib=hb+mb|0;hb=gb;gb=fb;fb=eb;eb=mb+(fb&gb^hb&(fb^gb))+(fb>>>2^fb>>>13^fb>>>22^fb<<30^fb<<19^fb<<10)|0;mb=cb+lb+(ib>>>6^ib>>>11^ib>>>25^ib<<26^ib<<21^ib<<7)+(kb^ib&(jb^kb))+2614888103|0;lb=kb;kb=jb;jb=ib;ib=hb+mb|0;hb=gb;gb=fb;fb=eb;eb=mb+(fb&gb^hb&(fb^gb))+(fb>>>2^fb>>>13^fb>>>22^fb<<30^fb<<19^fb<<10)|0;mb=db+lb+(ib>>>6^ib>>>11^ib>>>25^ib<<26^ib<<21^ib<<7)+(kb^ib&(jb^kb))+3248222580|0;lb=kb;kb=jb;jb=ib;ib=hb+mb|0;hb=gb;gb=fb;fb=eb;eb=mb+(fb&gb^hb&(fb^gb))+(fb>>>2^fb>>>13^fb>>>22^fb<<30^fb<<19^fb<<10)|0;Q=mb=(R>>>7^R>>>18^R>>>3^R<<25^R<<14)+(cb>>>17^cb>>>19^cb>>>10^cb<<15^cb<<13)+Q+Z|0;mb=mb+lb+(ib>>>6^ib>>>11^ib>>>25^ib<<26^ib<<21^ib<<7)+(kb^ib&(jb^kb))+3835390401|0;lb=kb;kb=jb;jb=ib;ib=hb+mb|0;hb=gb;gb=fb;fb=eb;eb=mb+(fb&gb^hb&(fb^gb))+(fb>>>2^fb>>>13^fb>>>22^fb<<30^fb<<19^fb<<10)|0;R=mb=(S>>>7^S>>>18^S>>>3^S<<25^S<<14)+(db>>>17^db>>>19^db>>>10^db<<15^db<<13)+R+$|0;mb=mb+lb+(ib>>>6^ib>>>11^ib>>>25^ib<<26^ib<<21^ib<<7)+(kb^ib&(jb^kb))+4022224774|0;lb=kb;kb=jb;jb=ib;ib=hb+mb|0;hb=gb;gb=fb;fb=eb;eb=mb+(fb&gb^hb&(fb^gb))+(fb>>>2^fb>>>13^fb>>>22^fb<<30^fb<<19^fb<<10)|0;S=mb=(T>>>7^T>>>18^T>>>3^T<<25^T<<14)+(Q>>>17^Q>>>19^Q>>>10^Q<<15^Q<<13)+S+_|0;mb=mb+lb+(ib>>>6^ib>>>11^ib>>>25^ib<<26^ib<<21^ib<<7)+(kb^ib&(jb^kb))+264347078|0;lb=kb;kb=jb;jb=ib;ib=hb+mb|0;hb=gb;gb=fb;fb=eb;eb=mb+(fb&gb^hb&(fb^gb))+(fb>>>2^fb>>>13^fb>>>22^fb<<30^fb<<19^fb<<10)|0;T=mb=(U>>>7^U>>>18^U>>>3^U<<25^U<<14)+(R>>>17^R>>>19^R>>>10^R<<15^R<<13)+T+ab|0;mb=mb+lb+(ib>>>6^ib>>>11^ib>>>25^ib<<26^ib<<21^ib<<7)+(kb^ib&(jb^kb))+604807628|0;lb=kb;kb=jb;jb=ib;ib=hb+mb|0;hb=gb;gb=fb;fb=eb;eb=mb+(fb&gb^hb&(fb^gb))+(fb>>>2^fb>>>13^fb>>>22^fb<<30^fb<<19^fb<<10)|0;U=mb=(V>>>7^V>>>18^V>>>3^V<<25^V<<14)+(S>>>17^S>>>19^S>>>10^S<<15^S<<13)+U+bb|0;mb=mb+lb+(ib>>>6^ib>>>11^ib>>>25^ib<<26^ib<<21^ib<<7)+(kb^ib&(jb^kb))+770255983|0;lb=kb;kb=jb;jb=ib;ib=hb+mb|0;hb=gb;gb=fb;fb=eb;eb=mb+(fb&gb^hb&(fb^gb))+(fb>>>2^fb>>>13^fb>>>22^fb<<30^fb<<19^fb<<10)|0;V=mb=(W>>>7^W>>>18^W>>>3^W<<25^W<<14)+(T>>>17^T>>>19^T>>>10^T<<15^T<<13)+V+cb|0;mb=mb+lb+(ib>>>6^ib>>>11^ib>>>25^ib<<26^ib<<21^ib<<7)+(kb^ib&(jb^kb))+1249150122|0;lb=kb;kb=jb;jb=ib;ib=hb+mb|0;hb=gb;gb=fb;fb=eb;eb=mb+(fb&gb^hb&(fb^gb))+(fb>>>2^fb>>>13^fb>>>22^fb<<30^fb<<19^fb<<10)|0;W=mb=(X>>>7^X>>>18^X>>>3^X<<25^X<<14)+(U>>>17^U>>>19^U>>>10^U<<15^U<<13)+W+db|0;mb=mb+lb+(ib>>>6^ib>>>11^ib>>>25^ib<<26^ib<<21^ib<<7)+(kb^ib&(jb^kb))+1555081692|0;lb=kb;kb=jb;jb=ib;ib=hb+mb|0;hb=gb;gb=fb;fb=eb;eb=mb+(fb&gb^hb&(fb^gb))+(fb>>>2^fb>>>13^fb>>>22^fb<<30^fb<<19^fb<<10)|0;X=mb=(Y>>>7^Y>>>18^Y>>>3^Y<<25^Y<<14)+(V>>>17^V>>>19^V>>>10^V<<15^V<<13)+X+Q|0;mb=mb+lb+(ib>>>6^ib>>>11^ib>>>25^ib<<26^ib<<21^ib<<7)+(kb^ib&(jb^kb))+1996064986|0;lb=kb;kb=jb;jb=ib;ib=hb+mb|0;hb=gb;gb=fb;fb=eb;eb=mb+(fb&gb^hb&(fb^gb))+(fb>>>2^fb>>>13^fb>>>22^fb<<30^fb<<19^fb<<10)|0;Y=mb=(Z>>>7^Z>>>18^Z>>>3^Z<<25^Z<<14)+(W>>>17^W>>>19^W>>>10^W<<15^W<<13)+Y+R|0;mb=mb+lb+(ib>>>6^ib>>>11^ib>>>25^ib<<26^ib<<21^ib<<7)+(kb^ib&(jb^kb))+2554220882|0;lb=kb;kb=jb;jb=ib;ib=hb+mb|0;hb=gb;gb=fb;fb=eb;eb=mb+(fb&gb^hb&(fb^gb))+(fb>>>2^fb>>>13^fb>>>22^fb<<30^fb<<19^fb<<10)|0;Z=mb=($>>>7^$>>>18^$>>>3^$<<25^$<<14)+(X>>>17^X>>>19^X>>>10^X<<15^X<<13)+Z+S|0;mb=mb+lb+(ib>>>6^ib>>>11^ib>>>25^ib<<26^ib<<21^ib<<7)+(kb^ib&(jb^kb))+2821834349|0;lb=kb;kb=jb;jb=ib;ib=hb+mb|0;hb=gb;gb=fb;fb=eb;eb=mb+(fb&gb^hb&(fb^gb))+(fb>>>2^fb>>>13^fb>>>22^fb<<30^fb<<19^fb<<10)|0;$=mb=(_>>>7^_>>>18^_>>>3^_<<25^_<<14)+(Y>>>17^Y>>>19^Y>>>10^Y<<15^Y<<13)+$+T|0;mb=mb+lb+(ib>>>6^ib>>>11^ib>>>25^ib<<26^ib<<21^ib<<7)+(kb^ib&(jb^kb))+2952996808|0;lb=kb;kb=jb;jb=ib;ib=hb+mb|0;hb=gb;gb=fb;fb=eb;eb=mb+(fb&gb^hb&(fb^gb))+(fb>>>2^fb>>>13^fb>>>22^fb<<30^fb<<19^fb<<10)|0;_=mb=(ab>>>7^ab>>>18^ab>>>3^ab<<25^ab<<14)+(Z>>>17^Z>>>19^Z>>>10^Z<<15^Z<<13)+_+U|0;mb=mb+lb+(ib>>>6^ib>>>11^ib>>>25^ib<<26^ib<<21^ib<<7)+(kb^ib&(jb^kb))+3210313671|0;lb=kb;kb=jb;jb=ib;ib=hb+mb|0;hb=gb;gb=fb;fb=eb;eb=mb+(fb&gb^hb&(fb^gb))+(fb>>>2^fb>>>13^fb>>>22^fb<<30^fb<<19^fb<<10)|0;ab=mb=(bb>>>7^bb>>>18^bb>>>3^bb<<25^bb<<14)+($>>>17^$>>>19^$>>>10^$<<15^$<<13)+ab+V|0;mb=mb+lb+(ib>>>6^ib>>>11^ib>>>25^ib<<26^ib<<21^ib<<7)+(kb^ib&(jb^kb))+3336571891|0;lb=kb;kb=jb;jb=ib;ib=hb+mb|0;hb=gb;gb=fb;fb=eb;eb=mb+(fb&gb^hb&(fb^gb))+(fb>>>2^fb>>>13^fb>>>22^fb<<30^fb<<19^fb<<10)|0;bb=mb=(cb>>>7^cb>>>18^cb>>>3^cb<<25^cb<<14)+(_>>>17^_>>>19^_>>>10^_<<15^_<<13)+bb+W|0;mb=mb+lb+(ib>>>6^ib>>>11^ib>>>25^ib<<26^ib<<21^ib<<7)+(kb^ib&(jb^kb))+3584528711|0;lb=kb;kb=jb;jb=ib;ib=hb+mb|0;hb=gb;gb=fb;fb=eb;eb=mb+(fb&gb^hb&(fb^gb))+(fb>>>2^fb>>>13^fb>>>22^fb<<30^fb<<19^fb<<10)|0;cb=mb=(db>>>7^db>>>18^db>>>3^db<<25^db<<14)+(ab>>>17^ab>>>19^ab>>>10^ab<<15^ab<<13)+cb+X|0;mb=mb+lb+(ib>>>6^ib>>>11^ib>>>25^ib<<26^ib<<21^ib<<7)+(kb^ib&(jb^kb))+113926993|0;lb=kb;kb=jb;jb=ib;ib=hb+mb|0;hb=gb;gb=fb;fb=eb;eb=mb+(fb&gb^hb&(fb^gb))+(fb>>>2^fb>>>13^fb>>>22^fb<<30^fb<<19^fb<<10)|0;db=mb=(Q>>>7^Q>>>18^Q>>>3^Q<<25^Q<<14)+(bb>>>17^bb>>>19^bb>>>10^bb<<15^bb<<13)+db+Y|0;mb=mb+lb+(ib>>>6^ib>>>11^ib>>>25^ib<<26^ib<<21^ib<<7)+(kb^ib&(jb^kb))+338241895|0;lb=kb;kb=jb;jb=ib;ib=hb+mb|0;hb=gb;gb=fb;fb=eb;eb=mb+(fb&gb^hb&(fb^gb))+(fb>>>2^fb>>>13^fb>>>22^fb<<30^fb<<19^fb<<10)|0;Q=mb=(R>>>7^R>>>18^R>>>3^R<<25^R<<14)+(cb>>>17^cb>>>19^cb>>>10^cb<<15^cb<<13)+Q+Z|0;mb=mb+lb+(ib>>>6^ib>>>11^ib>>>25^ib<<26^ib<<21^ib<<7)+(kb^ib&(jb^kb))+666307205|0;lb=kb;kb=jb;jb=ib;ib=hb+mb|0;hb=gb;gb=fb;fb=eb;eb=mb+(fb&gb^hb&(fb^gb))+(fb>>>2^fb>>>13^fb>>>22^fb<<30^fb<<19^fb<<10)|0;R=mb=(S>>>7^S>>>18^S>>>3^S<<25^S<<14)+(db>>>17^db>>>19^db>>>10^db<<15^db<<13)+R+$|0;mb=mb+lb+(ib>>>6^ib>>>11^ib>>>25^ib<<26^ib<<21^ib<<7)+(kb^ib&(jb^kb))+773529912|0;lb=kb;kb=jb;jb=ib;ib=hb+mb|0;hb=gb;gb=fb;fb=eb;eb=mb+(fb&gb^hb&(fb^gb))+(fb>>>2^fb>>>13^fb>>>22^fb<<30^fb<<19^fb<<10)|0;S=mb=(T>>>7^T>>>18^T>>>3^T<<25^T<<14)+(Q>>>17^Q>>>19^Q>>>10^Q<<15^Q<<13)+S+_|0;mb=mb+lb+(ib>>>6^ib>>>11^ib>>>25^ib<<26^ib<<21^ib<<7)+(kb^ib&(jb^kb))+1294757372|0;lb=kb;kb=jb;jb=ib;ib=hb+mb|0;hb=gb;gb=fb;fb=eb;eb=mb+(fb&gb^hb&(fb^gb))+(fb>>>2^fb>>>13^fb>>>22^fb<<30^fb<<19^fb<<10)|0;T=mb=(U>>>7^U>>>18^U>>>3^U<<25^U<<14)+(R>>>17^R>>>19^R>>>10^R<<15^R<<13)+T+ab|0;mb=mb+lb+(ib>>>6^ib>>>11^ib>>>25^ib<<26^ib<<21^ib<<7)+(kb^ib&(jb^kb))+1396182291|0;lb=kb;kb=jb;jb=ib;ib=hb+mb|0;hb=gb;gb=fb;fb=eb;eb=mb+(fb&gb^hb&(fb^gb))+(fb>>>2^fb>>>13^fb>>>22^fb<<30^fb<<19^fb<<10)|0;U=mb=(V>>>7^V>>>18^V>>>3^V<<25^V<<14)+(S>>>17^S>>>19^S>>>10^S<<15^S<<13)+U+bb|0;mb=mb+lb+(ib>>>6^ib>>>11^ib>>>25^ib<<26^ib<<21^ib<<7)+(kb^ib&(jb^kb))+1695183700|0;lb=kb;kb=jb;jb=ib;ib=hb+mb|0;hb=gb;gb=fb;fb=eb;eb=mb+(fb&gb^hb&(fb^gb))+(fb>>>2^fb>>>13^fb>>>22^fb<<30^fb<<19^fb<<10)|0;V=mb=(W>>>7^W>>>18^W>>>3^W<<25^W<<14)+(T>>>17^T>>>19^T>>>10^T<<15^T<<13)+V+cb|0;mb=mb+lb+(ib>>>6^ib>>>11^ib>>>25^ib<<26^ib<<21^ib<<7)+(kb^ib&(jb^kb))+1986661051|0;lb=kb;kb=jb;jb=ib;ib=hb+mb|0;hb=gb;gb=fb;fb=eb;eb=mb+(fb&gb^hb&(fb^gb))+(fb>>>2^fb>>>13^fb>>>22^fb<<30^fb<<19^fb<<10)|0;W=mb=(X>>>7^X>>>18^X>>>3^X<<25^X<<14)+(U>>>17^U>>>19^U>>>10^U<<15^U<<13)+W+db|0;mb=mb+lb+(ib>>>6^ib>>>11^ib>>>25^ib<<26^ib<<21^ib<<7)+(kb^ib&(jb^kb))+2177026350|0;lb=kb;kb=jb;jb=ib;ib=hb+mb|0;hb=gb;gb=fb;fb=eb;eb=mb+(fb&gb^hb&(fb^gb))+(fb>>>2^fb>>>13^fb>>>22^fb<<30^fb<<19^fb<<10)|0;X=mb=(Y>>>7^Y>>>18^Y>>>3^Y<<25^Y<<14)+(V>>>17^V>>>19^V>>>10^V<<15^V<<13)+X+Q|0;mb=mb+lb+(ib>>>6^ib>>>11^ib>>>25^ib<<26^ib<<21^ib<<7)+(kb^ib&(jb^kb))+2456956037|0;lb=kb;kb=jb;jb=ib;ib=hb+mb|0;
-hb=gb;gb=fb;fb=eb;eb=mb+(fb&gb^hb&(fb^gb))+(fb>>>2^fb>>>13^fb>>>22^fb<<30^fb<<19^fb<<10)|0;Y=mb=(Z>>>7^Z>>>18^Z>>>3^Z<<25^Z<<14)+(W>>>17^W>>>19^W>>>10^W<<15^W<<13)+Y+R|0;mb=mb+lb+(ib>>>6^ib>>>11^ib>>>25^ib<<26^ib<<21^ib<<7)+(kb^ib&(jb^kb))+2730485921|0;lb=kb;kb=jb;jb=ib;ib=hb+mb|0;hb=gb;gb=fb;fb=eb;eb=mb+(fb&gb^hb&(fb^gb))+(fb>>>2^fb>>>13^fb>>>22^fb<<30^fb<<19^fb<<10)|0;Z=mb=($>>>7^$>>>18^$>>>3^$<<25^$<<14)+(X>>>17^X>>>19^X>>>10^X<<15^X<<13)+Z+S|0;mb=mb+lb+(ib>>>6^ib>>>11^ib>>>25^ib<<26^ib<<21^ib<<7)+(kb^ib&(jb^kb))+2820302411|0;lb=kb;kb=jb;jb=ib;ib=hb+mb|0;hb=gb;gb=fb;fb=eb;eb=mb+(fb&gb^hb&(fb^gb))+(fb>>>2^fb>>>13^fb>>>22^fb<<30^fb<<19^fb<<10)|0;$=mb=(_>>>7^_>>>18^_>>>3^_<<25^_<<14)+(Y>>>17^Y>>>19^Y>>>10^Y<<15^Y<<13)+$+T|0;mb=mb+lb+(ib>>>6^ib>>>11^ib>>>25^ib<<26^ib<<21^ib<<7)+(kb^ib&(jb^kb))+3259730800|0;lb=kb;kb=jb;jb=ib;ib=hb+mb|0;hb=gb;gb=fb;fb=eb;eb=mb+(fb&gb^hb&(fb^gb))+(fb>>>2^fb>>>13^fb>>>22^fb<<30^fb<<19^fb<<10)|0;_=mb=(ab>>>7^ab>>>18^ab>>>3^ab<<25^ab<<14)+(Z>>>17^Z>>>19^Z>>>10^Z<<15^Z<<13)+_+U|0;mb=mb+lb+(ib>>>6^ib>>>11^ib>>>25^ib<<26^ib<<21^ib<<7)+(kb^ib&(jb^kb))+3345764771|0;lb=kb;kb=jb;jb=ib;ib=hb+mb|0;hb=gb;gb=fb;fb=eb;eb=mb+(fb&gb^hb&(fb^gb))+(fb>>>2^fb>>>13^fb>>>22^fb<<30^fb<<19^fb<<10)|0;ab=mb=(bb>>>7^bb>>>18^bb>>>3^bb<<25^bb<<14)+($>>>17^$>>>19^$>>>10^$<<15^$<<13)+ab+V|0;mb=mb+lb+(ib>>>6^ib>>>11^ib>>>25^ib<<26^ib<<21^ib<<7)+(kb^ib&(jb^kb))+3516065817|0;lb=kb;kb=jb;jb=ib;ib=hb+mb|0;hb=gb;gb=fb;fb=eb;eb=mb+(fb&gb^hb&(fb^gb))+(fb>>>2^fb>>>13^fb>>>22^fb<<30^fb<<19^fb<<10)|0;bb=mb=(cb>>>7^cb>>>18^cb>>>3^cb<<25^cb<<14)+(_>>>17^_>>>19^_>>>10^_<<15^_<<13)+bb+W|0;mb=mb+lb+(ib>>>6^ib>>>11^ib>>>25^ib<<26^ib<<21^ib<<7)+(kb^ib&(jb^kb))+3600352804|0;lb=kb;kb=jb;jb=ib;ib=hb+mb|0;hb=gb;gb=fb;fb=eb;eb=mb+(fb&gb^hb&(fb^gb))+(fb>>>2^fb>>>13^fb>>>22^fb<<30^fb<<19^fb<<10)|0;cb=mb=(db>>>7^db>>>18^db>>>3^db<<25^db<<14)+(ab>>>17^ab>>>19^ab>>>10^ab<<15^ab<<13)+cb+X|0;mb=mb+lb+(ib>>>6^ib>>>11^ib>>>25^ib<<26^ib<<21^ib<<7)+(kb^ib&(jb^kb))+4094571909|0;lb=kb;kb=jb;jb=ib;ib=hb+mb|0;hb=gb;gb=fb;fb=eb;eb=mb+(fb&gb^hb&(fb^gb))+(fb>>>2^fb>>>13^fb>>>22^fb<<30^fb<<19^fb<<10)|0;db=mb=(Q>>>7^Q>>>18^Q>>>3^Q<<25^Q<<14)+(bb>>>17^bb>>>19^bb>>>10^bb<<15^bb<<13)+db+Y|0;mb=mb+lb+(ib>>>6^ib>>>11^ib>>>25^ib<<26^ib<<21^ib<<7)+(kb^ib&(jb^kb))+275423344|0;lb=kb;kb=jb;jb=ib;ib=hb+mb|0;hb=gb;gb=fb;fb=eb;eb=mb+(fb&gb^hb&(fb^gb))+(fb>>>2^fb>>>13^fb>>>22^fb<<30^fb<<19^fb<<10)|0;Q=mb=(R>>>7^R>>>18^R>>>3^R<<25^R<<14)+(cb>>>17^cb>>>19^cb>>>10^cb<<15^cb<<13)+Q+Z|0;mb=mb+lb+(ib>>>6^ib>>>11^ib>>>25^ib<<26^ib<<21^ib<<7)+(kb^ib&(jb^kb))+430227734|0;lb=kb;kb=jb;jb=ib;ib=hb+mb|0;hb=gb;gb=fb;fb=eb;eb=mb+(fb&gb^hb&(fb^gb))+(fb>>>2^fb>>>13^fb>>>22^fb<<30^fb<<19^fb<<10)|0;R=mb=(S>>>7^S>>>18^S>>>3^S<<25^S<<14)+(db>>>17^db>>>19^db>>>10^db<<15^db<<13)+R+$|0;mb=mb+lb+(ib>>>6^ib>>>11^ib>>>25^ib<<26^ib<<21^ib<<7)+(kb^ib&(jb^kb))+506948616|0;lb=kb;kb=jb;jb=ib;ib=hb+mb|0;hb=gb;gb=fb;fb=eb;eb=mb+(fb&gb^hb&(fb^gb))+(fb>>>2^fb>>>13^fb>>>22^fb<<30^fb<<19^fb<<10)|0;S=mb=(T>>>7^T>>>18^T>>>3^T<<25^T<<14)+(Q>>>17^Q>>>19^Q>>>10^Q<<15^Q<<13)+S+_|0;mb=mb+lb+(ib>>>6^ib>>>11^ib>>>25^ib<<26^ib<<21^ib<<7)+(kb^ib&(jb^kb))+659060556|0;lb=kb;kb=jb;jb=ib;ib=hb+mb|0;hb=gb;gb=fb;fb=eb;eb=mb+(fb&gb^hb&(fb^gb))+(fb>>>2^fb>>>13^fb>>>22^fb<<30^fb<<19^fb<<10)|0;T=mb=(U>>>7^U>>>18^U>>>3^U<<25^U<<14)+(R>>>17^R>>>19^R>>>10^R<<15^R<<13)+T+ab|0;mb=mb+lb+(ib>>>6^ib>>>11^ib>>>25^ib<<26^ib<<21^ib<<7)+(kb^ib&(jb^kb))+883997877|0;lb=kb;kb=jb;jb=ib;ib=hb+mb|0;hb=gb;gb=fb;fb=eb;eb=mb+(fb&gb^hb&(fb^gb))+(fb>>>2^fb>>>13^fb>>>22^fb<<30^fb<<19^fb<<10)|0;U=mb=(V>>>7^V>>>18^V>>>3^V<<25^V<<14)+(S>>>17^S>>>19^S>>>10^S<<15^S<<13)+U+bb|0;mb=mb+lb+(ib>>>6^ib>>>11^ib>>>25^ib<<26^ib<<21^ib<<7)+(kb^ib&(jb^kb))+958139571|0;lb=kb;kb=jb;jb=ib;ib=hb+mb|0;hb=gb;gb=fb;fb=eb;eb=mb+(fb&gb^hb&(fb^gb))+(fb>>>2^fb>>>13^fb>>>22^fb<<30^fb<<19^fb<<10)|0;V=mb=(W>>>7^W>>>18^W>>>3^W<<25^W<<14)+(T>>>17^T>>>19^T>>>10^T<<15^T<<13)+V+cb|0;mb=mb+lb+(ib>>>6^ib>>>11^ib>>>25^ib<<26^ib<<21^ib<<7)+(kb^ib&(jb^kb))+1322822218|0;lb=kb;kb=jb;jb=ib;ib=hb+mb|0;hb=gb;gb=fb;fb=eb;eb=mb+(fb&gb^hb&(fb^gb))+(fb>>>2^fb>>>13^fb>>>22^fb<<30^fb<<19^fb<<10)|0;W=mb=(X>>>7^X>>>18^X>>>3^X<<25^X<<14)+(U>>>17^U>>>19^U>>>10^U<<15^U<<13)+W+db|0;mb=mb+lb+(ib>>>6^ib>>>11^ib>>>25^ib<<26^ib<<21^ib<<7)+(kb^ib&(jb^kb))+1537002063|0;lb=kb;kb=jb;jb=ib;ib=hb+mb|0;hb=gb;gb=fb;fb=eb;eb=mb+(fb&gb^hb&(fb^gb))+(fb>>>2^fb>>>13^fb>>>22^fb<<30^fb<<19^fb<<10)|0;X=mb=(Y>>>7^Y>>>18^Y>>>3^Y<<25^Y<<14)+(V>>>17^V>>>19^V>>>10^V<<15^V<<13)+X+Q|0;mb=mb+lb+(ib>>>6^ib>>>11^ib>>>25^ib<<26^ib<<21^ib<<7)+(kb^ib&(jb^kb))+1747873779|0;lb=kb;kb=jb;jb=ib;ib=hb+mb|0;hb=gb;gb=fb;fb=eb;eb=mb+(fb&gb^hb&(fb^gb))+(fb>>>2^fb>>>13^fb>>>22^fb<<30^fb<<19^fb<<10)|0;Y=mb=(Z>>>7^Z>>>18^Z>>>3^Z<<25^Z<<14)+(W>>>17^W>>>19^W>>>10^W<<15^W<<13)+Y+R|0;mb=mb+lb+(ib>>>6^ib>>>11^ib>>>25^ib<<26^ib<<21^ib<<7)+(kb^ib&(jb^kb))+1955562222|0;lb=kb;kb=jb;jb=ib;ib=hb+mb|0;hb=gb;gb=fb;fb=eb;eb=mb+(fb&gb^hb&(fb^gb))+(fb>>>2^fb>>>13^fb>>>22^fb<<30^fb<<19^fb<<10)|0;Z=mb=($>>>7^$>>>18^$>>>3^$<<25^$<<14)+(X>>>17^X>>>19^X>>>10^X<<15^X<<13)+Z+S|0;mb=mb+lb+(ib>>>6^ib>>>11^ib>>>25^ib<<26^ib<<21^ib<<7)+(kb^ib&(jb^kb))+2024104815|0;lb=kb;kb=jb;jb=ib;ib=hb+mb|0;hb=gb;gb=fb;fb=eb;eb=mb+(fb&gb^hb&(fb^gb))+(fb>>>2^fb>>>13^fb>>>22^fb<<30^fb<<19^fb<<10)|0;$=mb=(_>>>7^_>>>18^_>>>3^_<<25^_<<14)+(Y>>>17^Y>>>19^Y>>>10^Y<<15^Y<<13)+$+T|0;mb=mb+lb+(ib>>>6^ib>>>11^ib>>>25^ib<<26^ib<<21^ib<<7)+(kb^ib&(jb^kb))+2227730452|0;lb=kb;kb=jb;jb=ib;ib=hb+mb|0;hb=gb;gb=fb;fb=eb;eb=mb+(fb&gb^hb&(fb^gb))+(fb>>>2^fb>>>13^fb>>>22^fb<<30^fb<<19^fb<<10)|0;_=mb=(ab>>>7^ab>>>18^ab>>>3^ab<<25^ab<<14)+(Z>>>17^Z>>>19^Z>>>10^Z<<15^Z<<13)+_+U|0;mb=mb+lb+(ib>>>6^ib>>>11^ib>>>25^ib<<26^ib<<21^ib<<7)+(kb^ib&(jb^kb))+2361852424|0;lb=kb;kb=jb;jb=ib;ib=hb+mb|0;hb=gb;gb=fb;fb=eb;eb=mb+(fb&gb^hb&(fb^gb))+(fb>>>2^fb>>>13^fb>>>22^fb<<30^fb<<19^fb<<10)|0;ab=mb=(bb>>>7^bb>>>18^bb>>>3^bb<<25^bb<<14)+($>>>17^$>>>19^$>>>10^$<<15^$<<13)+ab+V|0;mb=mb+lb+(ib>>>6^ib>>>11^ib>>>25^ib<<26^ib<<21^ib<<7)+(kb^ib&(jb^kb))+2428436474|0;lb=kb;kb=jb;jb=ib;ib=hb+mb|0;hb=gb;gb=fb;fb=eb;eb=mb+(fb&gb^hb&(fb^gb))+(fb>>>2^fb>>>13^fb>>>22^fb<<30^fb<<19^fb<<10)|0;bb=mb=(cb>>>7^cb>>>18^cb>>>3^cb<<25^cb<<14)+(_>>>17^_>>>19^_>>>10^_<<15^_<<13)+bb+W|0;mb=mb+lb+(ib>>>6^ib>>>11^ib>>>25^ib<<26^ib<<21^ib<<7)+(kb^ib&(jb^kb))+2756734187|0;lb=kb;kb=jb;jb=ib;ib=hb+mb|0;hb=gb;gb=fb;fb=eb;eb=mb+(fb&gb^hb&(fb^gb))+(fb>>>2^fb>>>13^fb>>>22^fb<<30^fb<<19^fb<<10)|0;cb=mb=(db>>>7^db>>>18^db>>>3^db<<25^db<<14)+(ab>>>17^ab>>>19^ab>>>10^ab<<15^ab<<13)+cb+X|0;mb=mb+lb+(ib>>>6^ib>>>11^ib>>>25^ib<<26^ib<<21^ib<<7)+(kb^ib&(jb^kb))+3204031479|0;lb=kb;kb=jb;jb=ib;ib=hb+mb|0;hb=gb;gb=fb;fb=eb;eb=mb+(fb&gb^hb&(fb^gb))+(fb>>>2^fb>>>13^fb>>>22^fb<<30^fb<<19^fb<<10)|0;db=mb=(Q>>>7^Q>>>18^Q>>>3^Q<<25^Q<<14)+(bb>>>17^bb>>>19^bb>>>10^bb<<15^bb<<13)+db+Y|0;mb=mb+lb+(ib>>>6^ib>>>11^ib>>>25^ib<<26^ib<<21^ib<<7)+(kb^ib&(jb^kb))+3329325298|0;lb=kb;kb=jb;jb=ib;ib=hb+mb|0;hb=gb;gb=fb;fb=eb;eb=mb+(fb&gb^hb&(fb^gb))+(fb>>>2^fb>>>13^fb>>>22^fb<<30^fb<<19^fb<<10)|0;d=d+eb|0;e=e+fb|0;f=f+gb|0;g=g+hb|0;h=h+ib|0;i=i+jb|0;j=j+kb|0;k=k+lb|0}function E(Q){Q=Q|0;D(C[Q|0]<<24|C[Q|1]<<16|C[Q|2]<<8|C[Q|3],C[Q|4]<<24|C[Q|5]<<16|C[Q|6]<<8|C[Q|7],C[Q|8]<<24|C[Q|9]<<16|C[Q|10]<<8|C[Q|11],C[Q|12]<<24|C[Q|13]<<16|C[Q|14]<<8|C[Q|15],C[Q|16]<<24|C[Q|17]<<16|C[Q|18]<<8|C[Q|19],C[Q|20]<<24|C[Q|21]<<16|C[Q|22]<<8|C[Q|23],C[Q|24]<<24|C[Q|25]<<16|C[Q|26]<<8|C[Q|27],C[Q|28]<<24|C[Q|29]<<16|C[Q|30]<<8|C[Q|31],C[Q|32]<<24|C[Q|33]<<16|C[Q|34]<<8|C[Q|35],C[Q|36]<<24|C[Q|37]<<16|C[Q|38]<<8|C[Q|39],C[Q|40]<<24|C[Q|41]<<16|C[Q|42]<<8|C[Q|43],C[Q|44]<<24|C[Q|45]<<16|C[Q|46]<<8|C[Q|47],C[Q|48]<<24|C[Q|49]<<16|C[Q|50]<<8|C[Q|51],C[Q|52]<<24|C[Q|53]<<16|C[Q|54]<<8|C[Q|55],C[Q|56]<<24|C[Q|57]<<16|C[Q|58]<<8|C[Q|59],C[Q|60]<<24|C[Q|61]<<16|C[Q|62]<<8|C[Q|63])}function F(Q){Q=Q|0;C[Q|0]=d>>>24;C[Q|1]=d>>>16&255;C[Q|2]=d>>>8&255;C[Q|3]=d&255;C[Q|4]=e>>>24;C[Q|5]=e>>>16&255;C[Q|6]=e>>>8&255;C[Q|7]=e&255;C[Q|8]=f>>>24;C[Q|9]=f>>>16&255;C[Q|10]=f>>>8&255;C[Q|11]=f&255;C[Q|12]=g>>>24;C[Q|13]=g>>>16&255;C[Q|14]=g>>>8&255;C[Q|15]=g&255;C[Q|16]=h>>>24;C[Q|17]=h>>>16&255;C[Q|18]=h>>>8&255;C[Q|19]=h&255;C[Q|20]=i>>>24;C[Q|21]=i>>>16&255;C[Q|22]=i>>>8&255;C[Q|23]=i&255;C[Q|24]=j>>>24;C[Q|25]=j>>>16&255;C[Q|26]=j>>>8&255;C[Q|27]=j&255;C[Q|28]=k>>>24;C[Q|29]=k>>>16&255;C[Q|30]=k>>>8&255;C[Q|31]=k&255}function G(){d=1779033703;e=3144134277;f=1013904242;g=2773480762;h=1359893119;i=2600822924;j=528734635;k=1541459225;l=0}function H(Q,R,S,T,U,V,W,X,Y){Q=Q|0;R=R|0;S=S|0;T=T|0;U=U|0;V=V|0;W=W|0;X=X|0;Y=Y|0;d=Q;e=R;f=S;g=T;h=U;i=V;j=W;k=X;l=Y}function I(Q,R){Q=Q|0;R=R|0;var S=0;if(Q&63)return-1;while((R|0)>=64){E(Q);Q=Q+64|0;R=R-64|0;S=S+64|0}l=l+S|0;return S|0}function J(Q,R,S){Q=Q|0;R=R|0;S=S|0;var T=0,U=0;if(Q&63)return-1;if(~S)if(S&31)return-1;if((R|0)>=64){T=I(Q,R)|0;if((T|0)==-1)return-1;Q=Q+T|0;R=R-T|0}T=T+R|0;l=l+R|0;C[Q|R]=128;if((R|0)>=56){for(U=R+1|0;(U|0)<64;U=U+1|0)C[Q|U]=0;E(Q);R=0;C[Q|0]=0}for(U=R+1|0;(U|0)<59;U=U+1|0)C[Q|U]=0;C[Q|59]=l>>>29;C[Q|60]=l>>>21&255;C[Q|61]=l>>>13&255;C[Q|62]=l>>>5&255;C[Q|63]=l<<3&255;E(Q);if(~S)F(S);return T|0}function K(){d=m;e=n;f=o;g=p;h=q;i=r;j=s;k=t;l=64}function L(){d=u;e=v;f=w;g=x;h=y;i=z;j=A;k=B;l=64}function M(Q,R,S,T,U,V,W,X,Y,Z,$,_,ab,bb,cb,db){Q=Q|0;R=R|0;S=S|0;T=T|0;U=U|0;V=V|0;W=W|0;X=X|0;Y=Y|0;Z=Z|0;$=$|0;_=_|0;ab=ab|0;bb=bb|0;cb=cb|0;db=db|0;G();D(Q^1549556828,R^1549556828,S^1549556828,T^1549556828,U^1549556828,V^1549556828,W^1549556828,X^1549556828,Y^1549556828,Z^1549556828,$^1549556828,_^1549556828,ab^1549556828,bb^1549556828,cb^1549556828,db^1549556828);u=d;v=e;w=f;x=g;y=h;z=i;A=j;B=k;G();D(Q^909522486,R^909522486,S^909522486,T^909522486,U^909522486,V^909522486,W^909522486,X^909522486,Y^909522486,Z^909522486,$^909522486,_^909522486,ab^909522486,bb^909522486,cb^909522486,db^909522486);m=d;n=e;o=f;p=g;q=h;r=i;s=j;t=k;l=64}function O(Q,R,S){Q=Q|0;R=R|0;S=S|0;var T=0,U=0,V=0,W=0,X=0,Y=0,Z=0,$=0,_=0;if(Q&63)return-1;if(~S)if(S&31)return-1;_=J(Q,R,-1)|0;T=d,U=e,V=f,W=g,X=h,Y=i,Z=j,$=k;L();D(T,U,V,W,X,Y,Z,$,2147483648,0,0,0,0,0,0,768);if(~S)F(S);return _|0}function P(Q,R,S,T,U){Q=Q|0;R=R|0;S=S|0;T=T|0;U=U|0;var V=0,W=0,X=0,Y=0,Z=0,$=0,_=0,ab=0,bb=0,cb=0,db=0,eb=0,fb=0,gb=0,hb=0,ib=0;if(Q&63)return-1;if(~U)if(U&31)return-1;C[Q+R|0]=S>>>24;C[Q+R+1|0]=S>>>16&255;C[Q+R+2|0]=S>>>8&255;C[Q+R+3|0]=S&255;O(Q,R+4|0,-1)|0;V=bb=d,W=cb=e,X=db=f,Y=eb=g,Z=fb=h,$=gb=i,_=hb=j,ab=ib=k;T=T-1|0;while((T|0)>0){K();D(bb,cb,db,eb,fb,gb,hb,ib,2147483648,0,0,0,0,0,0,768);bb=d,cb=e,db=f,eb=g,fb=h,gb=i,hb=j,ib=k;L();D(bb,cb,db,eb,fb,gb,hb,ib,2147483648,0,0,0,0,0,0,768);bb=d,cb=e,db=f,eb=g,fb=h,gb=i,hb=j,ib=k;V=V^d;W=W^e;X=X^f;Y=Y^g;Z=Z^h;$=$^i;_=_^j;ab=ab^k;T=T-1|0}d=V;e=W;f=X;g=Y;h=Z;i=$;j=_;k=ab;if(~U)F(U);return 0}return{reset:G,init:H,process:I,finish:J,hmac_reset:K,hmac_init:M,hmac_finish:O,pbkdf2_generate_block:P}}function O(a){a=a||{},this.heap=r(Uint8Array,a),this.asm=a.asm||N(b,null,this.heap.buffer),this.BLOCK_SIZE=Zb,this.HASH_SIZE=$b,this.reset()}function P(){return null===ac&&(ac=new O({heapSize:1048576})),ac}function Q(a){if(a=a||{},!a.hash)throw new SyntaxError("option 'hash' is required");if(!a.hash.HASH_SIZE)throw new SyntaxError("option 'hash' supplied doesn't seem to be a valid hash function");return this.hash=a.hash,this.BLOCK_SIZE=this.hash.BLOCK_SIZE,this.HMAC_SIZE=this.hash.HASH_SIZE,this.key=null,this.verify=null,this.result=null,(void 0!==a.password||void 0!==a.verify)&&this.reset(a),this}function R(a,b){if(o(b)&&(b=new Uint8Array(b)),n(b)&&(b=f(b)),!p(b))throw new TypeError("password isn't of expected type");var c=new Uint8Array(a.BLOCK_SIZE);return c.set(b.length>a.BLOCK_SIZE?a.reset().process(b).finish().result:b),c}function S(a){if(o(a)||p(a))a=new Uint8Array(a);else{if(!n(a))throw new TypeError("verify tag isn't of expected type");a=f(a)}if(a.length!==this.HMAC_SIZE)throw new d("illegal verification tag size");this.verify=a}function T(a){a=a||{};var b=a.password;if(null===this.key&&!n(b)&&!b)throw new c("no key is associated with the instance");this.result=null,this.hash.reset(),(b||n(b))&&(this.key=R(this.hash,b));for(var d=new Uint8Array(this.key),e=0;e<d.length;++e)d[e]^=54;this.hash.process(d);var f=a.verify;return void 0!==f?S.call(this,f):this.verify=null,this}function U(a){if(null===this.key)throw new c("no key is associated with the instance");if(null!==this.result)throw new c("state must be reset before processing new data");return this.hash.process(a),this}function V(){if(null===this.key)throw new c("no key is associated with the instance");if(null!==this.result)throw new c("state must be reset before processing new data");for(var a=this.hash.finish().result,b=new Uint8Array(this.key),d=0;d<b.length;++d)b[d]^=92;var e=this.verify,f=this.hash.reset().process(b).process(a).finish().result;if(e)if(e.length===f.length){for(var g=0,d=0;d<e.length;d++)g|=e[d]^f[d];this.result=!g}else this.result=!1;else this.result=f;return this}function W(a){return a=a||{},a.hash instanceof O||(a.hash=P()),Q.call(this,a),this}function X(a){a=a||{},this.result=null,this.hash.reset();var b=a.password;if(void 0!==b){n(b)&&(b=f(b));var c=this.key=R(this.hash,b);this.hash.reset().asm.hmac_init(c[0]<<24|c[1]<<16|c[2]<<8|c[3],c[4]<<24|c[5]<<16|c[6]<<8|c[7],c[8]<<24|c[9]<<16|c[10]<<8|c[11],c[12]<<24|c[13]<<16|c[14]<<8|c[15],c[16]<<24|c[17]<<16|c[18]<<8|c[19],c[20]<<24|c[21]<<16|c[22]<<8|c[23],c[24]<<24|c[25]<<16|c[26]<<8|c[27],c[28]<<24|c[29]<<16|c[30]<<8|c[31],c[32]<<24|c[33]<<16|c[34]<<8|c[35],c[36]<<24|c[37]<<16|c[38]<<8|c[39],c[40]<<24|c[41]<<16|c[42]<<8|c[43],c[44]<<24|c[45]<<16|c[46]<<8|c[47],c[48]<<24|c[49]<<16|c[50]<<8|c[51],c[52]<<24|c[53]<<16|c[54]<<8|c[55],c[56]<<24|c[57]<<16|c[58]<<8|c[59],c[60]<<24|c[61]<<16|c[62]<<8|c[63])}else this.hash.asm.hmac_reset();var d=a.verify;return void 0!==d?S.call(this,d):this.verify=null,this}function Y(){if(null===this.key)throw new c("no key is associated with the instance");if(null!==this.result)throw new c("state must be reset before processing new data");var a=this.hash,b=this.hash.asm,d=this.hash.heap;b.hmac_finish(a.pos,a.len,0);var e=this.verify,f=new Uint8Array($b);if(f.set(d.subarray(0,$b)),e)if(e.length===f.length){for(var g=0,h=0;h<e.length;h++)g|=e[h]^f[h];this.result=!g}else this.result=!1;else this.result=f;return this}function Z(){return null===dc&&(dc=new W),dc}function $(a){if(a=a||{},!a.hmac)throw new SyntaxError("option 'hmac' is required");if(!a.hmac.HMAC_SIZE)throw new SyntaxError("option 'hmac' supplied doesn't seem to be a valid HMAC function");this.hmac=a.hmac,this.count=a.count||4096,this.length=a.length||this.hmac.HMAC_SIZE,this.result=null;var b=a.password;return(b||n(b))&&this.reset(a),this}function _(a){return this.result=null,this.hmac.reset(a),this}function ab(a,b,e){if(null!==this.result)throw new c("state must be reset before processing new data");if(!a&&!n(a))throw new d("bad 'salt' value");b=b||this.count,e=e||this.length,this.result=new Uint8Array(e);for(var f=Math.ceil(e/this.hmac.HMAC_SIZE),g=1;f>=g;++g){var h=(g-1)*this.hmac.HMAC_SIZE,i=(f>g?0:e%this.hmac.HMAC_SIZE)||this.hmac.HMAC_SIZE,j=new Uint8Array(this.hmac.reset().process(a).process(new Uint8Array([g>>>24&255,g>>>16&255,g>>>8&255,255&g])).finish().result);this.result.set(j.subarray(0,i),h);for(var k=1;b>k;++k){j=new Uint8Array(this.hmac.reset().process(j).finish().result);for(var l=0;i>l;++l)this.result[h+l]^=j[l]}}return this}function bb(a){return a=a||{},a.hmac instanceof W||(a.hmac=Z()),$.call(this,a),this}function cb(a,b,e){if(null!==this.result)throw new c("state must be reset before processing new data");if(!a&&!n(a))throw new d("bad 'salt' value");b=b||this.count,e=e||this.length,this.result=new Uint8Array(e);for(var f=Math.ceil(e/this.hmac.HMAC_SIZE),g=1;f>=g;++g){var h=(g-1)*this.hmac.HMAC_SIZE,i=(f>g?0:e%this.hmac.HMAC_SIZE)||this.hmac.HMAC_SIZE;this.hmac.reset().process(a),this.hmac.hash.asm.pbkdf2_generate_block(this.hmac.hash.pos,this.hmac.hash.len,g,b,0),this.result.set(this.hmac.hash.heap.subarray(0,i),h)}return this}function db(){return null===hc&&(hc=new bb),hc}function eb(){if(void 0!==nc)d=new Uint8Array(32),gc.call(nc,d),qc(d);else{var a,c,d=new Pb(3);d[0]=lc(),d[1]=kc(),d[2]=oc(),d=new Uint8Array(d.buffer);var e=db();for(a=0;100>a;a++)d=e.reset({password:d}).generate(b.location.href,1e3,32).result,c=oc(),d[0]^=c>>>24,d[1]^=c>>>16,d[2]^=c>>>8,d[3]^=c;qc(d)}rc=0,sc=!0}function fb(a){if(sc||eb(),!tc&&void 0===nc){if(!uc)throw new e("No strong PRNGs available. Use asmCrypto.random.seed().");void 0!==jc&&jc.error("No strong PRNGs available; your security is greatly lowered. Use asmCrypto.random.seed().")}if(!vc&&!tc&&void 0!==nc&&void 0!==jc){var b=(new Error).stack;wc[b]|=0,wc[b]++||jc.warn("asmCrypto PRNG not seeded; your security relies on your system PRNG. If this is not acceptable, use asmCrypto.random.seed().")}if(!o(a)&&!q(a))throw new TypeError("unexpected buffer type");var c,d,f=a.byteOffset||0,g=a.byteLength||a.length,h=new Uint8Array(a.buffer||a,f,g);for(void 0!==nc&&gc.call(nc,h),c=0;g>c;c++)0===(3&c)&&(rc>=1099511627776&&eb(),d=pc(),rc++),h[c]^=d,d>>>=8}function gb(a,b){return a*b|0}function hb(a,b,c){"use asm";var d=0;var e=new a.Uint32Array(c);var f=a.Math.imul;function g(u){u=u|0;d=u=u+31&-32;return u|0}function h(u){u=u|0;var v=0;v=d;d=v+(u+31&-32)|0;return v|0}function i(u){u=u|0;d=d-(u+31&-32)|0}function j(u,v,w){u=u|0;v=v|0;w=w|0;var x=0;if((v|0)>(w|0)){for(;(x|0)<(u|0);x=x+4|0){e[w+x>>2]=e[v+x>>2]}}else{for(x=u-4|0;(x|0)>=0;x=x-4|0){e[w+x>>2]=e[v+x>>2]}}}function k(u,v,w){u=u|0;v=v|0;w=w|0;var x=0;for(;(x|0)<(u|0);x=x+4|0){e[w+x>>2]=v}}function l(u,v,w,x){u=u|0;v=v|0;w=w|0;x=x|0;var y=0,z=0,A=0,B=0,C=0;if((x|0)<=0)x=v;if((x|0)<(v|0))v=x;z=1;for(;(C|0)<(v|0);C=C+4|0){y=~e[u+C>>2];A=(y&65535)+z|0;B=(y>>>16)+(A>>>16)|0;e[w+C>>2]=B<<16|A&65535;z=B>>>16}for(;(C|0)<(x|0);C=C+4|0){e[w+C>>2]=z-1|0}return z|0}function m(u,v,w,x){u=u|0;v=v|0;w=w|0;x=x|0;var y=0,z=0,A=0;if((v|0)>(x|0)){for(A=v-4|0;(A|0)>=(x|0);A=A-4|0){if(e[u+A>>2]|0)return 1}}else{for(A=x-4|0;(A|0)>=(v|0);A=A-4|0){if(e[w+A>>2]|0)return-1}}for(;(A|0)>=0;A=A-4|0){y=e[u+A>>2]|0,z=e[w+A>>2]|0;if(y>>>0<z>>>0)return-1;if(y>>>0>z>>>0)return 1}return 0}function n(u,v){u=u|0;v=v|0;var w=0;for(w=v-4|0;(w|0)>=0;w=w-4|0){if(e[u+w>>2]|0)return w+4|0}return 0}function o(u,v,w,x,y,z){u=u|0;v=v|0;w=w|0;x=x|0;y=y|0;z=z|0;var A=0,B=0,C=0,D=0,E=0,F=0;if((v|0)<(x|0)){D=u,u=w,w=D;D=v,v=x,x=D}if((z|0)<=0)z=v+4|0;if((z|0)<(x|0))v=x=z;for(;(F|0)<(x|0);F=F+4|0){A=e[u+F>>2]|0;B=e[w+F>>2]|0;D=((A&65535)+(B&65535)|0)+C|0;E=((A>>>16)+(B>>>16)|0)+(D>>>16)|0;e[y+F>>2]=D&65535|E<<16;C=E>>>16}for(;(F|0)<(v|0);F=F+4|0){A=e[u+F>>2]|0;D=(A&65535)+C|0;E=(A>>>16)+(D>>>16)|0;e[y+F>>2]=D&65535|E<<16;C=E>>>16}for(;(F|0)<(z|0);F=F+4|0){e[y+F>>2]=C|0;C=0}return C|0}function p(u,v,w,x,y,z){u=u|0;v=v|0;w=w|0;x=x|0;y=y|0;z=z|0;var A=0,B=0,C=0,D=0,E=0,F=0;if((z|0)<=0)z=(v|0)>(x|0)?v+4|0:x+4|0;if((z|0)<(v|0))v=z;if((z|0)<(x|0))x=z;if((v|0)<(x|0)){for(;(F|0)<(v|0);F=F+4|0){A=e[u+F>>2]|0;B=e[w+F>>2]|0;D=((A&65535)-(B&65535)|0)+C|0;E=((A>>>16)-(B>>>16)|0)+(D>>16)|0;e[y+F>>2]=D&65535|E<<16;C=E>>16}for(;(F|0)<(x|0);F=F+4|0){B=e[w+F>>2]|0;D=C-(B&65535)|0;E=(D>>16)-(B>>>16)|0;e[y+F>>2]=D&65535|E<<16;C=E>>16}}else{for(;(F|0)<(x|0);F=F+4|0){A=e[u+F>>2]|0;B=e[w+F>>2]|0;D=((A&65535)-(B&65535)|0)+C|0;E=((A>>>16)-(B>>>16)|0)+(D>>16)|0;e[y+F>>2]=D&65535|E<<16;C=E>>16}for(;(F|0)<(v|0);F=F+4|0){A=e[u+F>>2]|0;D=(A&65535)+C|0;E=(A>>>16)+(D>>16)|0;e[y+F>>2]=D&65535|E<<16;C=E>>16}}for(;(F|0)<(z|0);F=F+4|0){e[y+F>>2]=C|0}return C|0}function q(u,v,w,x,y,z){u=u|0;v=v|0;w=w|0;x=x|0;y=y|0;z=z|0;var A=0,B=0,C=0,D=0,E=0,F=0,G=0,H=0,I=0,J=0,K=0,L=0,M=0,N=0,O=0,P=0,Q=0,R=0,S=0,T=0,U=0,V=0,W=0,X=0,Y=0,Z=0,$=0,_=0,ab=0,bb=0,cb=0,db=0,eb=0,fb=0,gb=0,hb=0,ib=0,jb=0,kb=0,lb=0,mb=0,nb=0,ob=0,pb=0,qb=0,rb=0,sb=0,tb=0,ub=0,vb=0,wb=0,xb=0,yb=0,zb=0,Ab=0,Bb=0,Cb=0;if((v|0)>(x|0)){ub=u,vb=v;u=w,v=x;w=ub,x=vb}xb=v+x|0;if((z|0)>(xb|0)|(z|0)<=0)z=xb;if((z|0)<(v|0))v=z;if((z|0)<(x|0))x=z;for(;(yb|0)<(v|0);yb=yb+32|0){zb=u+yb|0;I=e[(zb|0)>>2]|0,J=e[(zb|4)>>2]|0,K=e[(zb|8)>>2]|0,L=e[(zb|12)>>2]|0,M=e[(zb|16)>>2]|0,N=e[(zb|20)>>2]|0,O=e[(zb|24)>>2]|0,P=e[(zb|28)>>2]|0,A=I&65535,B=J&65535,C=K&65535,D=L&65535,E=M&65535,F=N&65535,G=O&65535,H=P&65535,I=I>>>16,J=J>>>16,K=K>>>16,L=L>>>16,M=M>>>16,N=N>>>16,O=O>>>16,P=P>>>16;mb=nb=ob=pb=qb=rb=sb=tb=0;for(Ab=0;(Ab|0)<(x|0);Ab=Ab+32|0){Bb=w+Ab|0;Cb=y+(yb+Ab|0)|0;Y=e[(Bb|0)>>2]|0,Z=e[(Bb|4)>>2]|0,$=e[(Bb|8)>>2]|0,_=e[(Bb|12)>>2]|0,ab=e[(Bb|16)>>2]|0,bb=e[(Bb|20)>>2]|0,cb=e[(Bb|24)>>2]|0,db=e[(Bb|28)>>2]|0,Q=Y&65535,R=Z&65535,S=$&65535,T=_&65535,U=ab&65535,V=bb&65535,W=cb&65535,X=db&65535,Y=Y>>>16,Z=Z>>>16,$=$>>>16,_=_>>>16,ab=ab>>>16,bb=bb>>>16,cb=cb>>>16,db=db>>>16;eb=e[(Cb|0)>>2]|0,fb=e[(Cb|4)>>2]|0,gb=e[(Cb|8)>>2]|0,hb=e[(Cb|12)>>2]|0,ib=e[(Cb|16)>>2]|0,jb=e[(Cb|20)>>2]|0,kb=e[(Cb|24)>>2]|0,lb=e[(Cb|28)>>2]|0;ub=((f(A,Q)|0)+(mb&65535)|0)+(eb&65535)|0;vb=((f(I,Q)|0)+(mb>>>16)|0)+(eb>>>16)|0;wb=((f(A,Y)|0)+(vb&65535)|0)+(ub>>>16)|0;xb=((f(I,Y)|0)+(vb>>>16)|0)+(wb>>>16)|0;eb=wb<<16|ub&65535;ub=((f(A,R)|0)+(xb&65535)|0)+(fb&65535)|0;vb=((f(I,R)|0)+(xb>>>16)|0)+(fb>>>16)|0;wb=((f(A,Z)|0)+(vb&65535)|0)+(ub>>>16)|0;xb=((f(I,Z)|0)+(vb>>>16)|0)+(wb>>>16)|0;fb=wb<<16|ub&65535;ub=((f(A,S)|0)+(xb&65535)|0)+(gb&65535)|0;vb=((f(I,S)|0)+(xb>>>16)|0)+(gb>>>16)|0;wb=((f(A,$)|0)+(vb&65535)|0)+(ub>>>16)|0;xb=((f(I,$)|0)+(vb>>>16)|0)+(wb>>>16)|0;gb=wb<<16|ub&65535;ub=((f(A,T)|0)+(xb&65535)|0)+(hb&65535)|0;vb=((f(I,T)|0)+(xb>>>16)|0)+(hb>>>16)|0;wb=((f(A,_)|0)+(vb&65535)|0)+(ub>>>16)|0;xb=((f(I,_)|0)+(vb>>>16)|0)+(wb>>>16)|0;hb=wb<<16|ub&65535;ub=((f(A,U)|0)+(xb&65535)|0)+(ib&65535)|0;vb=((f(I,U)|0)+(xb>>>16)|0)+(ib>>>16)|0;wb=((f(A,ab)|0)+(vb&65535)|0)+(ub>>>16)|0;xb=((f(I,ab)|0)+(vb>>>16)|0)+(wb>>>16)|0;ib=wb<<16|ub&65535;ub=((f(A,V)|0)+(xb&65535)|0)+(jb&65535)|0;vb=((f(I,V)|0)+(xb>>>16)|0)+(jb>>>16)|0;wb=((f(A,bb)|0)+(vb&65535)|0)+(ub>>>16)|0;xb=((f(I,bb)|0)+(vb>>>16)|0)+(wb>>>16)|0;jb=wb<<16|ub&65535;ub=((f(A,W)|0)+(xb&65535)|0)+(kb&65535)|0;vb=((f(I,W)|0)+(xb>>>16)|0)+(kb>>>16)|0;wb=((f(A,cb)|0)+(vb&65535)|0)+(ub>>>16)|0;xb=((f(I,cb)|0)+(vb>>>16)|0)+(wb>>>16)|0;kb=wb<<16|ub&65535;ub=((f(A,X)|0)+(xb&65535)|0)+(lb&65535)|0;vb=((f(I,X)|0)+(xb>>>16)|0)+(lb>>>16)|0;wb=((f(A,db)|0)+(vb&65535)|0)+(ub>>>16)|0;xb=((f(I,db)|0)+(vb>>>16)|0)+(wb>>>16)|0;lb=wb<<16|ub&65535;mb=xb;ub=((f(B,Q)|0)+(nb&65535)|0)+(fb&65535)|0;vb=((f(J,Q)|0)+(nb>>>16)|0)+(fb>>>16)|0;wb=((f(B,Y)|0)+(vb&65535)|0)+(ub>>>16)|0;xb=((f(J,Y)|0)+(vb>>>16)|0)+(wb>>>16)|0;fb=wb<<16|ub&65535;ub=((f(B,R)|0)+(xb&65535)|0)+(gb&65535)|0;vb=((f(J,R)|0)+(xb>>>16)|0)+(gb>>>16)|0;wb=((f(B,Z)|0)+(vb&65535)|0)+(ub>>>16)|0;xb=((f(J,Z)|0)+(vb>>>16)|0)+(wb>>>16)|0;gb=wb<<16|ub&65535;ub=((f(B,S)|0)+(xb&65535)|0)+(hb&65535)|0;vb=((f(J,S)|0)+(xb>>>16)|0)+(hb>>>16)|0;wb=((f(B,$)|0)+(vb&65535)|0)+(ub>>>16)|0;xb=((f(J,$)|0)+(vb>>>16)|0)+(wb>>>16)|0;hb=wb<<16|ub&65535;ub=((f(B,T)|0)+(xb&65535)|0)+(ib&65535)|0;vb=((f(J,T)|0)+(xb>>>16)|0)+(ib>>>16)|0;wb=((f(B,_)|0)+(vb&65535)|0)+(ub>>>16)|0;xb=((f(J,_)|0)+(vb>>>16)|0)+(wb>>>16)|0;ib=wb<<16|ub&65535;ub=((f(B,U)|0)+(xb&65535)|0)+(jb&65535)|0;vb=((f(J,U)|0)+(xb>>>16)|0)+(jb>>>16)|0;wb=((f(B,ab)|0)+(vb&65535)|0)+(ub>>>16)|0;xb=((f(J,ab)|0)+(vb>>>16)|0)+(wb>>>16)|0;jb=wb<<16|ub&65535;ub=((f(B,V)|0)+(xb&65535)|0)+(kb&65535)|0;vb=((f(J,V)|0)+(xb>>>16)|0)+(kb>>>16)|0;wb=((f(B,bb)|0)+(vb&65535)|0)+(ub>>>16)|0;xb=((f(J,bb)|0)+(vb>>>16)|0)+(wb>>>16)|0;kb=wb<<16|ub&65535;ub=((f(B,W)|0)+(xb&65535)|0)+(lb&65535)|0;vb=((f(J,W)|0)+(xb>>>16)|0)+(lb>>>16)|0;wb=((f(B,cb)|0)+(vb&65535)|0)+(ub>>>16)|0;xb=((f(J,cb)|0)+(vb>>>16)|0)+(wb>>>16)|0;lb=wb<<16|ub&65535;ub=((f(B,X)|0)+(xb&65535)|0)+(mb&65535)|0;vb=((f(J,X)|0)+(xb>>>16)|0)+(mb>>>16)|0;wb=((f(B,db)|0)+(vb&65535)|0)+(ub>>>16)|0;xb=((f(J,db)|0)+(vb>>>16)|0)+(wb>>>16)|0;mb=wb<<16|ub&65535;nb=xb;ub=((f(C,Q)|0)+(ob&65535)|0)+(gb&65535)|0;vb=((f(K,Q)|0)+(ob>>>16)|0)+(gb>>>16)|0;wb=((f(C,Y)|0)+(vb&65535)|0)+(ub>>>16)|0;xb=((f(K,Y)|0)+(vb>>>16)|0)+(wb>>>16)|0;gb=wb<<16|ub&65535;ub=((f(C,R)|0)+(xb&65535)|0)+(hb&65535)|0;vb=((f(K,R)|0)+(xb>>>16)|0)+(hb>>>16)|0;wb=((f(C,Z)|0)+(vb&65535)|0)+(ub>>>16)|0;xb=((f(K,Z)|0)+(vb>>>16)|0)+(wb>>>16)|0;hb=wb<<16|ub&65535;ub=((f(C,S)|0)+(xb&65535)|0)+(ib&65535)|0;vb=((f(K,S)|0)+(xb>>>16)|0)+(ib>>>16)|0;wb=((f(C,$)|0)+(vb&65535)|0)+(ub>>>16)|0;xb=((f(K,$)|0)+(vb>>>16)|0)+(wb>>>16)|0;ib=wb<<16|ub&65535;ub=((f(C,T)|0)+(xb&65535)|0)+(jb&65535)|0;vb=((f(K,T)|0)+(xb>>>16)|0)+(jb>>>16)|0;wb=((f(C,_)|0)+(vb&65535)|0)+(ub>>>16)|0;xb=((f(K,_)|0)+(vb>>>16)|0)+(wb>>>16)|0;jb=wb<<16|ub&65535;ub=((f(C,U)|0)+(xb&65535)|0)+(kb&65535)|0;vb=((f(K,U)|0)+(xb>>>16)|0)+(kb>>>16)|0;wb=((f(C,ab)|0)+(vb&65535)|0)+(ub>>>16)|0;xb=((f(K,ab)|0)+(vb>>>16)|0)+(wb>>>16)|0;kb=wb<<16|ub&65535;ub=((f(C,V)|0)+(xb&65535)|0)+(lb&65535)|0;vb=((f(K,V)|0)+(xb>>>16)|0)+(lb>>>16)|0;wb=((f(C,bb)|0)+(vb&65535)|0)+(ub>>>16)|0;xb=((f(K,bb)|0)+(vb>>>16)|0)+(wb>>>16)|0;lb=wb<<16|ub&65535;ub=((f(C,W)|0)+(xb&65535)|0)+(mb&65535)|0;vb=((f(K,W)|0)+(xb>>>16)|0)+(mb>>>16)|0;wb=((f(C,cb)|0)+(vb&65535)|0)+(ub>>>16)|0;xb=((f(K,cb)|0)+(vb>>>16)|0)+(wb>>>16)|0;mb=wb<<16|ub&65535;ub=((f(C,X)|0)+(xb&65535)|0)+(nb&65535)|0;vb=((f(K,X)|0)+(xb>>>16)|0)+(nb>>>16)|0;wb=((f(C,db)|0)+(vb&65535)|0)+(ub>>>16)|0;xb=((f(K,db)|0)+(vb>>>16)|0)+(wb>>>16)|0;nb=wb<<16|ub&65535;ob=xb;ub=((f(D,Q)|0)+(pb&65535)|0)+(hb&65535)|0;vb=((f(L,Q)|0)+(pb>>>16)|0)+(hb>>>16)|0;wb=((f(D,Y)|0)+(vb&65535)|0)+(ub>>>16)|0;xb=((f(L,Y)|0)+(vb>>>16)|0)+(wb>>>16)|0;hb=wb<<16|ub&65535;ub=((f(D,R)|0)+(xb&65535)|0)+(ib&65535)|0;vb=((f(L,R)|0)+(xb>>>16)|0)+(ib>>>16)|0;wb=((f(D,Z)|0)+(vb&65535)|0)+(ub>>>16)|0;xb=((f(L,Z)|0)+(vb>>>16)|0)+(wb>>>16)|0;ib=wb<<16|ub&65535;ub=((f(D,S)|0)+(xb&65535)|0)+(jb&65535)|0;vb=((f(L,S)|0)+(xb>>>16)|0)+(jb>>>16)|0;wb=((f(D,$)|0)+(vb&65535)|0)+(ub>>>16)|0;xb=((f(L,$)|0)+(vb>>>16)|0)+(wb>>>16)|0;jb=wb<<16|ub&65535;ub=((f(D,T)|0)+(xb&65535)|0)+(kb&65535)|0;vb=((f(L,T)|0)+(xb>>>16)|0)+(kb>>>16)|0;wb=((f(D,_)|0)+(vb&65535)|0)+(ub>>>16)|0;xb=((f(L,_)|0)+(vb>>>16)|0)+(wb>>>16)|0;kb=wb<<16|ub&65535;ub=((f(D,U)|0)+(xb&65535)|0)+(lb&65535)|0;vb=((f(L,U)|0)+(xb>>>16)|0)+(lb>>>16)|0;wb=((f(D,ab)|0)+(vb&65535)|0)+(ub>>>16)|0;xb=((f(L,ab)|0)+(vb>>>16)|0)+(wb>>>16)|0;lb=wb<<16|ub&65535;ub=((f(D,V)|0)+(xb&65535)|0)+(mb&65535)|0;vb=((f(L,V)|0)+(xb>>>16)|0)+(mb>>>16)|0;wb=((f(D,bb)|0)+(vb&65535)|0)+(ub>>>16)|0;xb=((f(L,bb)|0)+(vb>>>16)|0)+(wb>>>16)|0;mb=wb<<16|ub&65535;ub=((f(D,W)|0)+(xb&65535)|0)+(nb&65535)|0;vb=((f(L,W)|0)+(xb>>>16)|0)+(nb>>>16)|0;wb=((f(D,cb)|0)+(vb&65535)|0)+(ub>>>16)|0;xb=((f(L,cb)|0)+(vb>>>16)|0)+(wb>>>16)|0;nb=wb<<16|ub&65535;ub=((f(D,X)|0)+(xb&65535)|0)+(ob&65535)|0;vb=((f(L,X)|0)+(xb>>>16)|0)+(ob>>>16)|0;wb=((f(D,db)|0)+(vb&65535)|0)+(ub>>>16)|0;xb=((f(L,db)|0)+(vb>>>16)|0)+(wb>>>16)|0;ob=wb<<16|ub&65535;pb=xb;ub=((f(E,Q)|0)+(qb&65535)|0)+(ib&65535)|0;vb=((f(M,Q)|0)+(qb>>>16)|0)+(ib>>>16)|0;wb=((f(E,Y)|0)+(vb&65535)|0)+(ub>>>16)|0;xb=((f(M,Y)|0)+(vb>>>16)|0)+(wb>>>16)|0;ib=wb<<16|ub&65535;ub=((f(E,R)|0)+(xb&65535)|0)+(jb&65535)|0;vb=((f(M,R)|0)+(xb>>>16)|0)+(jb>>>16)|0;wb=((f(E,Z)|0)+(vb&65535)|0)+(ub>>>16)|0;xb=((f(M,Z)|0)+(vb>>>16)|0)+(wb>>>16)|0;jb=wb<<16|ub&65535;ub=((f(E,S)|0)+(xb&65535)|0)+(kb&65535)|0;vb=((f(M,S)|0)+(xb>>>16)|0)+(kb>>>16)|0;wb=((f(E,$)|0)+(vb&65535)|0)+(ub>>>16)|0;xb=((f(M,$)|0)+(vb>>>16)|0)+(wb>>>16)|0;kb=wb<<16|ub&65535;ub=((f(E,T)|0)+(xb&65535)|0)+(lb&65535)|0;vb=((f(M,T)|0)+(xb>>>16)|0)+(lb>>>16)|0;wb=((f(E,_)|0)+(vb&65535)|0)+(ub>>>16)|0;xb=((f(M,_)|0)+(vb>>>16)|0)+(wb>>>16)|0;lb=wb<<16|ub&65535;ub=((f(E,U)|0)+(xb&65535)|0)+(mb&65535)|0;vb=((f(M,U)|0)+(xb>>>16)|0)+(mb>>>16)|0;wb=((f(E,ab)|0)+(vb&65535)|0)+(ub>>>16)|0;xb=((f(M,ab)|0)+(vb>>>16)|0)+(wb>>>16)|0;mb=wb<<16|ub&65535;ub=((f(E,V)|0)+(xb&65535)|0)+(nb&65535)|0;vb=((f(M,V)|0)+(xb>>>16)|0)+(nb>>>16)|0;wb=((f(E,bb)|0)+(vb&65535)|0)+(ub>>>16)|0;xb=((f(M,bb)|0)+(vb>>>16)|0)+(wb>>>16)|0;nb=wb<<16|ub&65535;ub=((f(E,W)|0)+(xb&65535)|0)+(ob&65535)|0;vb=((f(M,W)|0)+(xb>>>16)|0)+(ob>>>16)|0;wb=((f(E,cb)|0)+(vb&65535)|0)+(ub>>>16)|0;xb=((f(M,cb)|0)+(vb>>>16)|0)+(wb>>>16)|0;ob=wb<<16|ub&65535;ub=((f(E,X)|0)+(xb&65535)|0)+(pb&65535)|0;vb=((f(M,X)|0)+(xb>>>16)|0)+(pb>>>16)|0;wb=((f(E,db)|0)+(vb&65535)|0)+(ub>>>16)|0;xb=((f(M,db)|0)+(vb>>>16)|0)+(wb>>>16)|0;pb=wb<<16|ub&65535;qb=xb;ub=((f(F,Q)|0)+(rb&65535)|0)+(jb&65535)|0;vb=((f(N,Q)|0)+(rb>>>16)|0)+(jb>>>16)|0;wb=((f(F,Y)|0)+(vb&65535)|0)+(ub>>>16)|0;xb=((f(N,Y)|0)+(vb>>>16)|0)+(wb>>>16)|0;jb=wb<<16|ub&65535;ub=((f(F,R)|0)+(xb&65535)|0)+(kb&65535)|0;vb=((f(N,R)|0)+(xb>>>16)|0)+(kb>>>16)|0;wb=((f(F,Z)|0)+(vb&65535)|0)+(ub>>>16)|0;xb=((f(N,Z)|0)+(vb>>>16)|0)+(wb>>>16)|0;kb=wb<<16|ub&65535;ub=((f(F,S)|0)+(xb&65535)|0)+(lb&65535)|0;vb=((f(N,S)|0)+(xb>>>16)|0)+(lb>>>16)|0;wb=((f(F,$)|0)+(vb&65535)|0)+(ub>>>16)|0;xb=((f(N,$)|0)+(vb>>>16)|0)+(wb>>>16)|0;lb=wb<<16|ub&65535;ub=((f(F,T)|0)+(xb&65535)|0)+(mb&65535)|0;vb=((f(N,T)|0)+(xb>>>16)|0)+(mb>>>16)|0;wb=((f(F,_)|0)+(vb&65535)|0)+(ub>>>16)|0;xb=((f(N,_)|0)+(vb>>>16)|0)+(wb>>>16)|0;mb=wb<<16|ub&65535;ub=((f(F,U)|0)+(xb&65535)|0)+(nb&65535)|0;vb=((f(N,U)|0)+(xb>>>16)|0)+(nb>>>16)|0;wb=((f(F,ab)|0)+(vb&65535)|0)+(ub>>>16)|0;xb=((f(N,ab)|0)+(vb>>>16)|0)+(wb>>>16)|0;nb=wb<<16|ub&65535;ub=((f(F,V)|0)+(xb&65535)|0)+(ob&65535)|0;vb=((f(N,V)|0)+(xb>>>16)|0)+(ob>>>16)|0;wb=((f(F,bb)|0)+(vb&65535)|0)+(ub>>>16)|0;xb=((f(N,bb)|0)+(vb>>>16)|0)+(wb>>>16)|0;ob=wb<<16|ub&65535;ub=((f(F,W)|0)+(xb&65535)|0)+(pb&65535)|0;vb=((f(N,W)|0)+(xb>>>16)|0)+(pb>>>16)|0;wb=((f(F,cb)|0)+(vb&65535)|0)+(ub>>>16)|0;xb=((f(N,cb)|0)+(vb>>>16)|0)+(wb>>>16)|0;pb=wb<<16|ub&65535;ub=((f(F,X)|0)+(xb&65535)|0)+(qb&65535)|0;vb=((f(N,X)|0)+(xb>>>16)|0)+(qb>>>16)|0;wb=((f(F,db)|0)+(vb&65535)|0)+(ub>>>16)|0;xb=((f(N,db)|0)+(vb>>>16)|0)+(wb>>>16)|0;qb=wb<<16|ub&65535;rb=xb;ub=((f(G,Q)|0)+(sb&65535)|0)+(kb&65535)|0;vb=((f(O,Q)|0)+(sb>>>16)|0)+(kb>>>16)|0;wb=((f(G,Y)|0)+(vb&65535)|0)+(ub>>>16)|0;xb=((f(O,Y)|0)+(vb>>>16)|0)+(wb>>>16)|0;kb=wb<<16|ub&65535;ub=((f(G,R)|0)+(xb&65535)|0)+(lb&65535)|0;vb=((f(O,R)|0)+(xb>>>16)|0)+(lb>>>16)|0;wb=((f(G,Z)|0)+(vb&65535)|0)+(ub>>>16)|0;xb=((f(O,Z)|0)+(vb>>>16)|0)+(wb>>>16)|0;lb=wb<<16|ub&65535;ub=((f(G,S)|0)+(xb&65535)|0)+(mb&65535)|0;vb=((f(O,S)|0)+(xb>>>16)|0)+(mb>>>16)|0;wb=((f(G,$)|0)+(vb&65535)|0)+(ub>>>16)|0;xb=((f(O,$)|0)+(vb>>>16)|0)+(wb>>>16)|0;mb=wb<<16|ub&65535;ub=((f(G,T)|0)+(xb&65535)|0)+(nb&65535)|0;vb=((f(O,T)|0)+(xb>>>16)|0)+(nb>>>16)|0;wb=((f(G,_)|0)+(vb&65535)|0)+(ub>>>16)|0;xb=((f(O,_)|0)+(vb>>>16)|0)+(wb>>>16)|0;nb=wb<<16|ub&65535;ub=((f(G,U)|0)+(xb&65535)|0)+(ob&65535)|0;vb=((f(O,U)|0)+(xb>>>16)|0)+(ob>>>16)|0;wb=((f(G,ab)|0)+(vb&65535)|0)+(ub>>>16)|0;xb=((f(O,ab)|0)+(vb>>>16)|0)+(wb>>>16)|0;ob=wb<<16|ub&65535;ub=((f(G,V)|0)+(xb&65535)|0)+(pb&65535)|0;vb=((f(O,V)|0)+(xb>>>16)|0)+(pb>>>16)|0;wb=((f(G,bb)|0)+(vb&65535)|0)+(ub>>>16)|0;xb=((f(O,bb)|0)+(vb>>>16)|0)+(wb>>>16)|0;pb=wb<<16|ub&65535;ub=((f(G,W)|0)+(xb&65535)|0)+(qb&65535)|0;vb=((f(O,W)|0)+(xb>>>16)|0)+(qb>>>16)|0;wb=((f(G,cb)|0)+(vb&65535)|0)+(ub>>>16)|0;xb=((f(O,cb)|0)+(vb>>>16)|0)+(wb>>>16)|0;qb=wb<<16|ub&65535;ub=((f(G,X)|0)+(xb&65535)|0)+(rb&65535)|0;vb=((f(O,X)|0)+(xb>>>16)|0)+(rb>>>16)|0;wb=((f(G,db)|0)+(vb&65535)|0)+(ub>>>16)|0;xb=((f(O,db)|0)+(vb>>>16)|0)+(wb>>>16)|0;rb=wb<<16|ub&65535;sb=xb;ub=((f(H,Q)|0)+(tb&65535)|0)+(lb&65535)|0;vb=((f(P,Q)|0)+(tb>>>16)|0)+(lb>>>16)|0;wb=((f(H,Y)|0)+(vb&65535)|0)+(ub>>>16)|0;xb=((f(P,Y)|0)+(vb>>>16)|0)+(wb>>>16)|0;lb=wb<<16|ub&65535;ub=((f(H,R)|0)+(xb&65535)|0)+(mb&65535)|0;vb=((f(P,R)|0)+(xb>>>16)|0)+(mb>>>16)|0;wb=((f(H,Z)|0)+(vb&65535)|0)+(ub>>>16)|0;xb=((f(P,Z)|0)+(vb>>>16)|0)+(wb>>>16)|0;mb=wb<<16|ub&65535;ub=((f(H,S)|0)+(xb&65535)|0)+(nb&65535)|0;vb=((f(P,S)|0)+(xb>>>16)|0)+(nb>>>16)|0;wb=((f(H,$)|0)+(vb&65535)|0)+(ub>>>16)|0;xb=((f(P,$)|0)+(vb>>>16)|0)+(wb>>>16)|0;nb=wb<<16|ub&65535;ub=((f(H,T)|0)+(xb&65535)|0)+(ob&65535)|0;vb=((f(P,T)|0)+(xb>>>16)|0)+(ob>>>16)|0;wb=((f(H,_)|0)+(vb&65535)|0)+(ub>>>16)|0;xb=((f(P,_)|0)+(vb>>>16)|0)+(wb>>>16)|0;ob=wb<<16|ub&65535;ub=((f(H,U)|0)+(xb&65535)|0)+(pb&65535)|0;vb=((f(P,U)|0)+(xb>>>16)|0)+(pb>>>16)|0;wb=((f(H,ab)|0)+(vb&65535)|0)+(ub>>>16)|0;xb=((f(P,ab)|0)+(vb>>>16)|0)+(wb>>>16)|0;pb=wb<<16|ub&65535;ub=((f(H,V)|0)+(xb&65535)|0)+(qb&65535)|0;vb=((f(P,V)|0)+(xb>>>16)|0)+(qb>>>16)|0;
-wb=((f(H,bb)|0)+(vb&65535)|0)+(ub>>>16)|0;xb=((f(P,bb)|0)+(vb>>>16)|0)+(wb>>>16)|0;qb=wb<<16|ub&65535;ub=((f(H,W)|0)+(xb&65535)|0)+(rb&65535)|0;vb=((f(P,W)|0)+(xb>>>16)|0)+(rb>>>16)|0;wb=((f(H,cb)|0)+(vb&65535)|0)+(ub>>>16)|0;xb=((f(P,cb)|0)+(vb>>>16)|0)+(wb>>>16)|0;rb=wb<<16|ub&65535;ub=((f(H,X)|0)+(xb&65535)|0)+(sb&65535)|0;vb=((f(P,X)|0)+(xb>>>16)|0)+(sb>>>16)|0;wb=((f(H,db)|0)+(vb&65535)|0)+(ub>>>16)|0;xb=((f(P,db)|0)+(vb>>>16)|0)+(wb>>>16)|0;sb=wb<<16|ub&65535;tb=xb;e[(Cb|0)>>2]=eb,e[(Cb|4)>>2]=fb,e[(Cb|8)>>2]=gb,e[(Cb|12)>>2]=hb,e[(Cb|16)>>2]=ib,e[(Cb|20)>>2]=jb,e[(Cb|24)>>2]=kb,e[(Cb|28)>>2]=lb}Cb=y+(yb+Ab|0)|0;e[(Cb|0)>>2]=mb,e[(Cb|4)>>2]=nb,e[(Cb|8)>>2]=ob,e[(Cb|12)>>2]=pb,e[(Cb|16)>>2]=qb,e[(Cb|20)>>2]=rb,e[(Cb|24)>>2]=sb,e[(Cb|28)>>2]=tb}}function r(u,v,w){u=u|0;v=v|0;w=w|0;var x=0,y=0,z=0,A=0,B=0,C=0,D=0,E=0,F=0,G=0,H=0,I=0,J=0,K=0,L=0,M=0,N=0,O=0,P=0,Q=0,R=0,S=0,T=0,U=0,V=0,W=0,X=0,Y=0,Z=0,$=0,_=0,ab=0,bb=0,cb=0,db=0,eb=0,fb=0,gb=0,hb=0,ib=0,jb=0,kb=0,lb=0,mb=0,nb=0,ob=0,pb=0,qb=0,rb=0,sb=0,tb=0,ub=0,vb=0,wb=0,xb=0,yb=0,zb=0,Ab=0,Bb=0,Cb=0,Db=0,Eb=0,Fb=0,Gb=0;for(;(Bb|0)<(v|0);Bb=Bb+4|0){Gb=w+(Bb<<1)|0;F=e[u+Bb>>2]|0,x=F&65535,F=F>>>16;rb=f(x,x)|0;sb=(f(x,F)|0)+(rb>>>17)|0;tb=(f(F,F)|0)+(sb>>>15)|0;e[Gb>>2]=sb<<17|rb&131071;e[(Gb|4)>>2]=tb}for(Ab=0;(Ab|0)<(v|0);Ab=Ab+8|0){Eb=u+Ab|0,Gb=w+(Ab<<1)|0;F=e[Eb>>2]|0,x=F&65535,F=F>>>16;V=e[(Eb|4)>>2]|0,N=V&65535,V=V>>>16;rb=f(x,N)|0;sb=(f(x,V)|0)+(rb>>>16)|0;tb=(f(F,N)|0)+(sb&65535)|0;wb=((f(F,V)|0)+(sb>>>16)|0)+(tb>>>16)|0;xb=e[(Gb|4)>>2]|0;rb=(xb&65535)+((rb&65535)<<1)|0;tb=((xb>>>16)+((tb&65535)<<1)|0)+(rb>>>16)|0;e[(Gb|4)>>2]=tb<<16|rb&65535;ub=tb>>>16;xb=e[(Gb|8)>>2]|0;rb=((xb&65535)+((wb&65535)<<1)|0)+ub|0;tb=((xb>>>16)+(wb>>>16<<1)|0)+(rb>>>16)|0;e[(Gb|8)>>2]=tb<<16|rb&65535;ub=tb>>>16;if(ub){xb=e[(Gb|12)>>2]|0;rb=(xb&65535)+ub|0;tb=(xb>>>16)+(rb>>>16)|0;e[(Gb|12)>>2]=tb<<16|rb&65535}}for(Ab=0;(Ab|0)<(v|0);Ab=Ab+16|0){Eb=u+Ab|0,Gb=w+(Ab<<1)|0;F=e[Eb>>2]|0,x=F&65535,F=F>>>16,G=e[(Eb|4)>>2]|0,y=G&65535,G=G>>>16;V=e[(Eb|8)>>2]|0,N=V&65535,V=V>>>16,W=e[(Eb|12)>>2]|0,O=W&65535,W=W>>>16;rb=f(x,N)|0;sb=f(F,N)|0;tb=((f(x,V)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(F,V)|0)+(sb>>>16)|0)+(tb>>>16)|0;bb=tb<<16|rb&65535;rb=(f(x,O)|0)+(wb&65535)|0;sb=(f(F,O)|0)+(wb>>>16)|0;tb=((f(x,W)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(F,W)|0)+(sb>>>16)|0)+(tb>>>16)|0;cb=tb<<16|rb&65535;db=wb;rb=(f(y,N)|0)+(cb&65535)|0;sb=(f(G,N)|0)+(cb>>>16)|0;tb=((f(y,V)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(G,V)|0)+(sb>>>16)|0)+(tb>>>16)|0;cb=tb<<16|rb&65535;rb=((f(y,O)|0)+(db&65535)|0)+(wb&65535)|0;sb=((f(G,O)|0)+(db>>>16)|0)+(wb>>>16)|0;tb=((f(y,W)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(G,W)|0)+(sb>>>16)|0)+(tb>>>16)|0;db=tb<<16|rb&65535;eb=wb;xb=e[(Gb|8)>>2]|0;rb=(xb&65535)+((bb&65535)<<1)|0;tb=((xb>>>16)+(bb>>>16<<1)|0)+(rb>>>16)|0;e[(Gb|8)>>2]=tb<<16|rb&65535;ub=tb>>>16;xb=e[(Gb|12)>>2]|0;rb=((xb&65535)+((cb&65535)<<1)|0)+ub|0;tb=((xb>>>16)+(cb>>>16<<1)|0)+(rb>>>16)|0;e[(Gb|12)>>2]=tb<<16|rb&65535;ub=tb>>>16;xb=e[(Gb|16)>>2]|0;rb=((xb&65535)+((db&65535)<<1)|0)+ub|0;tb=((xb>>>16)+(db>>>16<<1)|0)+(rb>>>16)|0;e[(Gb|16)>>2]=tb<<16|rb&65535;ub=tb>>>16;xb=e[(Gb|20)>>2]|0;rb=((xb&65535)+((eb&65535)<<1)|0)+ub|0;tb=((xb>>>16)+(eb>>>16<<1)|0)+(rb>>>16)|0;e[(Gb|20)>>2]=tb<<16|rb&65535;ub=tb>>>16;for(Db=24;!!ub&(Db|0)<32;Db=Db+4|0){xb=e[(Gb|Db)>>2]|0;rb=(xb&65535)+ub|0;tb=(xb>>>16)+(rb>>>16)|0;e[(Gb|Db)>>2]=tb<<16|rb&65535;ub=tb>>>16}}for(Ab=0;(Ab|0)<(v|0);Ab=Ab+32|0){Eb=u+Ab|0,Gb=w+(Ab<<1)|0;F=e[Eb>>2]|0,x=F&65535,F=F>>>16,G=e[(Eb|4)>>2]|0,y=G&65535,G=G>>>16,H=e[(Eb|8)>>2]|0,z=H&65535,H=H>>>16,I=e[(Eb|12)>>2]|0,A=I&65535,I=I>>>16;V=e[(Eb|16)>>2]|0,N=V&65535,V=V>>>16,W=e[(Eb|20)>>2]|0,O=W&65535,W=W>>>16,X=e[(Eb|24)>>2]|0,P=X&65535,X=X>>>16,Y=e[(Eb|28)>>2]|0,Q=Y&65535,Y=Y>>>16;rb=f(x,N)|0;sb=f(F,N)|0;tb=((f(x,V)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(F,V)|0)+(sb>>>16)|0)+(tb>>>16)|0;bb=tb<<16|rb&65535;rb=(f(x,O)|0)+(wb&65535)|0;sb=(f(F,O)|0)+(wb>>>16)|0;tb=((f(x,W)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(F,W)|0)+(sb>>>16)|0)+(tb>>>16)|0;cb=tb<<16|rb&65535;rb=(f(x,P)|0)+(wb&65535)|0;sb=(f(F,P)|0)+(wb>>>16)|0;tb=((f(x,X)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(F,X)|0)+(sb>>>16)|0)+(tb>>>16)|0;db=tb<<16|rb&65535;rb=(f(x,Q)|0)+(wb&65535)|0;sb=(f(F,Q)|0)+(wb>>>16)|0;tb=((f(x,Y)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(F,Y)|0)+(sb>>>16)|0)+(tb>>>16)|0;eb=tb<<16|rb&65535;fb=wb;rb=(f(y,N)|0)+(cb&65535)|0;sb=(f(G,N)|0)+(cb>>>16)|0;tb=((f(y,V)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(G,V)|0)+(sb>>>16)|0)+(tb>>>16)|0;cb=tb<<16|rb&65535;rb=((f(y,O)|0)+(db&65535)|0)+(wb&65535)|0;sb=((f(G,O)|0)+(db>>>16)|0)+(wb>>>16)|0;tb=((f(y,W)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(G,W)|0)+(sb>>>16)|0)+(tb>>>16)|0;db=tb<<16|rb&65535;rb=((f(y,P)|0)+(eb&65535)|0)+(wb&65535)|0;sb=((f(G,P)|0)+(eb>>>16)|0)+(wb>>>16)|0;tb=((f(y,X)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(G,X)|0)+(sb>>>16)|0)+(tb>>>16)|0;eb=tb<<16|rb&65535;rb=((f(y,Q)|0)+(fb&65535)|0)+(wb&65535)|0;sb=((f(G,Q)|0)+(fb>>>16)|0)+(wb>>>16)|0;tb=((f(y,Y)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(G,Y)|0)+(sb>>>16)|0)+(tb>>>16)|0;fb=tb<<16|rb&65535;gb=wb;rb=(f(z,N)|0)+(db&65535)|0;sb=(f(H,N)|0)+(db>>>16)|0;tb=((f(z,V)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(H,V)|0)+(sb>>>16)|0)+(tb>>>16)|0;db=tb<<16|rb&65535;rb=((f(z,O)|0)+(eb&65535)|0)+(wb&65535)|0;sb=((f(H,O)|0)+(eb>>>16)|0)+(wb>>>16)|0;tb=((f(z,W)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(H,W)|0)+(sb>>>16)|0)+(tb>>>16)|0;eb=tb<<16|rb&65535;rb=((f(z,P)|0)+(fb&65535)|0)+(wb&65535)|0;sb=((f(H,P)|0)+(fb>>>16)|0)+(wb>>>16)|0;tb=((f(z,X)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(H,X)|0)+(sb>>>16)|0)+(tb>>>16)|0;fb=tb<<16|rb&65535;rb=((f(z,Q)|0)+(gb&65535)|0)+(wb&65535)|0;sb=((f(H,Q)|0)+(gb>>>16)|0)+(wb>>>16)|0;tb=((f(z,Y)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(H,Y)|0)+(sb>>>16)|0)+(tb>>>16)|0;gb=tb<<16|rb&65535;hb=wb;rb=(f(A,N)|0)+(eb&65535)|0;sb=(f(I,N)|0)+(eb>>>16)|0;tb=((f(A,V)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(I,V)|0)+(sb>>>16)|0)+(tb>>>16)|0;eb=tb<<16|rb&65535;rb=((f(A,O)|0)+(fb&65535)|0)+(wb&65535)|0;sb=((f(I,O)|0)+(fb>>>16)|0)+(wb>>>16)|0;tb=((f(A,W)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(I,W)|0)+(sb>>>16)|0)+(tb>>>16)|0;fb=tb<<16|rb&65535;rb=((f(A,P)|0)+(gb&65535)|0)+(wb&65535)|0;sb=((f(I,P)|0)+(gb>>>16)|0)+(wb>>>16)|0;tb=((f(A,X)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(I,X)|0)+(sb>>>16)|0)+(tb>>>16)|0;gb=tb<<16|rb&65535;rb=((f(A,Q)|0)+(hb&65535)|0)+(wb&65535)|0;sb=((f(I,Q)|0)+(hb>>>16)|0)+(wb>>>16)|0;tb=((f(A,Y)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(I,Y)|0)+(sb>>>16)|0)+(tb>>>16)|0;hb=tb<<16|rb&65535;ib=wb;xb=e[(Gb|16)>>2]|0;rb=(xb&65535)+((bb&65535)<<1)|0;tb=((xb>>>16)+(bb>>>16<<1)|0)+(rb>>>16)|0;e[(Gb|16)>>2]=tb<<16|rb&65535;ub=tb>>>16;xb=e[(Gb|20)>>2]|0;rb=((xb&65535)+((cb&65535)<<1)|0)+ub|0;tb=((xb>>>16)+(cb>>>16<<1)|0)+(rb>>>16)|0;e[(Gb|20)>>2]=tb<<16|rb&65535;ub=tb>>>16;xb=e[(Gb|24)>>2]|0;rb=((xb&65535)+((db&65535)<<1)|0)+ub|0;tb=((xb>>>16)+(db>>>16<<1)|0)+(rb>>>16)|0;e[(Gb|24)>>2]=tb<<16|rb&65535;ub=tb>>>16;xb=e[(Gb|28)>>2]|0;rb=((xb&65535)+((eb&65535)<<1)|0)+ub|0;tb=((xb>>>16)+(eb>>>16<<1)|0)+(rb>>>16)|0;e[(Gb|28)>>2]=tb<<16|rb&65535;ub=tb>>>16;xb=e[Gb+32>>2]|0;rb=((xb&65535)+((fb&65535)<<1)|0)+ub|0;tb=((xb>>>16)+(fb>>>16<<1)|0)+(rb>>>16)|0;e[Gb+32>>2]=tb<<16|rb&65535;ub=tb>>>16;xb=e[Gb+36>>2]|0;rb=((xb&65535)+((gb&65535)<<1)|0)+ub|0;tb=((xb>>>16)+(gb>>>16<<1)|0)+(rb>>>16)|0;e[Gb+36>>2]=tb<<16|rb&65535;ub=tb>>>16;xb=e[Gb+40>>2]|0;rb=((xb&65535)+((hb&65535)<<1)|0)+ub|0;tb=((xb>>>16)+(hb>>>16<<1)|0)+(rb>>>16)|0;e[Gb+40>>2]=tb<<16|rb&65535;ub=tb>>>16;xb=e[Gb+44>>2]|0;rb=((xb&65535)+((ib&65535)<<1)|0)+ub|0;tb=((xb>>>16)+(ib>>>16<<1)|0)+(rb>>>16)|0;e[Gb+44>>2]=tb<<16|rb&65535;ub=tb>>>16;for(Db=48;!!ub&(Db|0)<64;Db=Db+4|0){xb=e[Gb+Db>>2]|0;rb=(xb&65535)+ub|0;tb=(xb>>>16)+(rb>>>16)|0;e[Gb+Db>>2]=tb<<16|rb&65535;ub=tb>>>16}}for(yb=32;(yb|0)<(v|0);yb=yb<<1){zb=yb<<1;for(Ab=0;(Ab|0)<(v|0);Ab=Ab+zb|0){Gb=w+(Ab<<1)|0;vb=0;for(Bb=0;(Bb|0)<(yb|0);Bb=Bb+32|0){Eb=(u+Ab|0)+Bb|0;F=e[Eb>>2]|0,x=F&65535,F=F>>>16,G=e[(Eb|4)>>2]|0,y=G&65535,G=G>>>16,H=e[(Eb|8)>>2]|0,z=H&65535,H=H>>>16,I=e[(Eb|12)>>2]|0,A=I&65535,I=I>>>16,J=e[(Eb|16)>>2]|0,B=J&65535,J=J>>>16,K=e[(Eb|20)>>2]|0,C=K&65535,K=K>>>16,L=e[(Eb|24)>>2]|0,D=L&65535,L=L>>>16,M=e[(Eb|28)>>2]|0,E=M&65535,M=M>>>16;jb=kb=lb=mb=nb=ob=pb=qb=ub=0;for(Cb=0;(Cb|0)<(yb|0);Cb=Cb+32|0){Fb=((u+Ab|0)+yb|0)+Cb|0;V=e[Fb>>2]|0,N=V&65535,V=V>>>16,W=e[(Fb|4)>>2]|0,O=W&65535,W=W>>>16,X=e[(Fb|8)>>2]|0,P=X&65535,X=X>>>16,Y=e[(Fb|12)>>2]|0,Q=Y&65535,Y=Y>>>16,Z=e[(Fb|16)>>2]|0,R=Z&65535,Z=Z>>>16,$=e[(Fb|20)>>2]|0,S=$&65535,$=$>>>16,_=e[(Fb|24)>>2]|0,T=_&65535,_=_>>>16,ab=e[(Fb|28)>>2]|0,U=ab&65535,ab=ab>>>16;bb=cb=db=eb=fb=gb=hb=ib=0;rb=((f(x,N)|0)+(bb&65535)|0)+(jb&65535)|0;sb=((f(F,N)|0)+(bb>>>16)|0)+(jb>>>16)|0;tb=((f(x,V)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(F,V)|0)+(sb>>>16)|0)+(tb>>>16)|0;bb=tb<<16|rb&65535;rb=((f(x,O)|0)+(cb&65535)|0)+(wb&65535)|0;sb=((f(F,O)|0)+(cb>>>16)|0)+(wb>>>16)|0;tb=((f(x,W)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(F,W)|0)+(sb>>>16)|0)+(tb>>>16)|0;cb=tb<<16|rb&65535;rb=((f(x,P)|0)+(db&65535)|0)+(wb&65535)|0;sb=((f(F,P)|0)+(db>>>16)|0)+(wb>>>16)|0;tb=((f(x,X)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(F,X)|0)+(sb>>>16)|0)+(tb>>>16)|0;db=tb<<16|rb&65535;rb=((f(x,Q)|0)+(eb&65535)|0)+(wb&65535)|0;sb=((f(F,Q)|0)+(eb>>>16)|0)+(wb>>>16)|0;tb=((f(x,Y)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(F,Y)|0)+(sb>>>16)|0)+(tb>>>16)|0;eb=tb<<16|rb&65535;rb=((f(x,R)|0)+(fb&65535)|0)+(wb&65535)|0;sb=((f(F,R)|0)+(fb>>>16)|0)+(wb>>>16)|0;tb=((f(x,Z)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(F,Z)|0)+(sb>>>16)|0)+(tb>>>16)|0;fb=tb<<16|rb&65535;rb=((f(x,S)|0)+(gb&65535)|0)+(wb&65535)|0;sb=((f(F,S)|0)+(gb>>>16)|0)+(wb>>>16)|0;tb=((f(x,$)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(F,$)|0)+(sb>>>16)|0)+(tb>>>16)|0;gb=tb<<16|rb&65535;rb=((f(x,T)|0)+(hb&65535)|0)+(wb&65535)|0;sb=((f(F,T)|0)+(hb>>>16)|0)+(wb>>>16)|0;tb=((f(x,_)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(F,_)|0)+(sb>>>16)|0)+(tb>>>16)|0;hb=tb<<16|rb&65535;rb=((f(x,U)|0)+(ib&65535)|0)+(wb&65535)|0;sb=((f(F,U)|0)+(ib>>>16)|0)+(wb>>>16)|0;tb=((f(x,ab)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(F,ab)|0)+(sb>>>16)|0)+(tb>>>16)|0;ib=tb<<16|rb&65535;jb=wb;rb=((f(y,N)|0)+(cb&65535)|0)+(kb&65535)|0;sb=((f(G,N)|0)+(cb>>>16)|0)+(kb>>>16)|0;tb=((f(y,V)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(G,V)|0)+(sb>>>16)|0)+(tb>>>16)|0;cb=tb<<16|rb&65535;rb=((f(y,O)|0)+(db&65535)|0)+(wb&65535)|0;sb=((f(G,O)|0)+(db>>>16)|0)+(wb>>>16)|0;tb=((f(y,W)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(G,W)|0)+(sb>>>16)|0)+(tb>>>16)|0;db=tb<<16|rb&65535;rb=((f(y,P)|0)+(eb&65535)|0)+(wb&65535)|0;sb=((f(G,P)|0)+(eb>>>16)|0)+(wb>>>16)|0;tb=((f(y,X)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(G,X)|0)+(sb>>>16)|0)+(tb>>>16)|0;eb=tb<<16|rb&65535;rb=((f(y,Q)|0)+(fb&65535)|0)+(wb&65535)|0;sb=((f(G,Q)|0)+(fb>>>16)|0)+(wb>>>16)|0;tb=((f(y,Y)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(G,Y)|0)+(sb>>>16)|0)+(tb>>>16)|0;fb=tb<<16|rb&65535;rb=((f(y,R)|0)+(gb&65535)|0)+(wb&65535)|0;sb=((f(G,R)|0)+(gb>>>16)|0)+(wb>>>16)|0;tb=((f(y,Z)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(G,Z)|0)+(sb>>>16)|0)+(tb>>>16)|0;gb=tb<<16|rb&65535;rb=((f(y,S)|0)+(hb&65535)|0)+(wb&65535)|0;sb=((f(G,S)|0)+(hb>>>16)|0)+(wb>>>16)|0;tb=((f(y,$)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(G,$)|0)+(sb>>>16)|0)+(tb>>>16)|0;hb=tb<<16|rb&65535;rb=((f(y,T)|0)+(ib&65535)|0)+(wb&65535)|0;sb=((f(G,T)|0)+(ib>>>16)|0)+(wb>>>16)|0;tb=((f(y,_)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(G,_)|0)+(sb>>>16)|0)+(tb>>>16)|0;ib=tb<<16|rb&65535;rb=((f(y,U)|0)+(jb&65535)|0)+(wb&65535)|0;sb=((f(G,U)|0)+(jb>>>16)|0)+(wb>>>16)|0;tb=((f(y,ab)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(G,ab)|0)+(sb>>>16)|0)+(tb>>>16)|0;jb=tb<<16|rb&65535;kb=wb;rb=((f(z,N)|0)+(db&65535)|0)+(lb&65535)|0;sb=((f(H,N)|0)+(db>>>16)|0)+(lb>>>16)|0;tb=((f(z,V)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(H,V)|0)+(sb>>>16)|0)+(tb>>>16)|0;db=tb<<16|rb&65535;rb=((f(z,O)|0)+(eb&65535)|0)+(wb&65535)|0;sb=((f(H,O)|0)+(eb>>>16)|0)+(wb>>>16)|0;tb=((f(z,W)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(H,W)|0)+(sb>>>16)|0)+(tb>>>16)|0;eb=tb<<16|rb&65535;rb=((f(z,P)|0)+(fb&65535)|0)+(wb&65535)|0;sb=((f(H,P)|0)+(fb>>>16)|0)+(wb>>>16)|0;tb=((f(z,X)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(H,X)|0)+(sb>>>16)|0)+(tb>>>16)|0;fb=tb<<16|rb&65535;rb=((f(z,Q)|0)+(gb&65535)|0)+(wb&65535)|0;sb=((f(H,Q)|0)+(gb>>>16)|0)+(wb>>>16)|0;tb=((f(z,Y)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(H,Y)|0)+(sb>>>16)|0)+(tb>>>16)|0;gb=tb<<16|rb&65535;rb=((f(z,R)|0)+(hb&65535)|0)+(wb&65535)|0;sb=((f(H,R)|0)+(hb>>>16)|0)+(wb>>>16)|0;tb=((f(z,Z)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(H,Z)|0)+(sb>>>16)|0)+(tb>>>16)|0;hb=tb<<16|rb&65535;rb=((f(z,S)|0)+(ib&65535)|0)+(wb&65535)|0;sb=((f(H,S)|0)+(ib>>>16)|0)+(wb>>>16)|0;tb=((f(z,$)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(H,$)|0)+(sb>>>16)|0)+(tb>>>16)|0;ib=tb<<16|rb&65535;rb=((f(z,T)|0)+(jb&65535)|0)+(wb&65535)|0;sb=((f(H,T)|0)+(jb>>>16)|0)+(wb>>>16)|0;tb=((f(z,_)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(H,_)|0)+(sb>>>16)|0)+(tb>>>16)|0;jb=tb<<16|rb&65535;rb=((f(z,U)|0)+(kb&65535)|0)+(wb&65535)|0;sb=((f(H,U)|0)+(kb>>>16)|0)+(wb>>>16)|0;tb=((f(z,ab)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(H,ab)|0)+(sb>>>16)|0)+(tb>>>16)|0;kb=tb<<16|rb&65535;lb=wb;rb=((f(A,N)|0)+(eb&65535)|0)+(mb&65535)|0;sb=((f(I,N)|0)+(eb>>>16)|0)+(mb>>>16)|0;tb=((f(A,V)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(I,V)|0)+(sb>>>16)|0)+(tb>>>16)|0;eb=tb<<16|rb&65535;rb=((f(A,O)|0)+(fb&65535)|0)+(wb&65535)|0;sb=((f(I,O)|0)+(fb>>>16)|0)+(wb>>>16)|0;tb=((f(A,W)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(I,W)|0)+(sb>>>16)|0)+(tb>>>16)|0;fb=tb<<16|rb&65535;rb=((f(A,P)|0)+(gb&65535)|0)+(wb&65535)|0;sb=((f(I,P)|0)+(gb>>>16)|0)+(wb>>>16)|0;tb=((f(A,X)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(I,X)|0)+(sb>>>16)|0)+(tb>>>16)|0;gb=tb<<16|rb&65535;rb=((f(A,Q)|0)+(hb&65535)|0)+(wb&65535)|0;sb=((f(I,Q)|0)+(hb>>>16)|0)+(wb>>>16)|0;tb=((f(A,Y)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(I,Y)|0)+(sb>>>16)|0)+(tb>>>16)|0;hb=tb<<16|rb&65535;rb=((f(A,R)|0)+(ib&65535)|0)+(wb&65535)|0;sb=((f(I,R)|0)+(ib>>>16)|0)+(wb>>>16)|0;tb=((f(A,Z)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(I,Z)|0)+(sb>>>16)|0)+(tb>>>16)|0;ib=tb<<16|rb&65535;rb=((f(A,S)|0)+(jb&65535)|0)+(wb&65535)|0;sb=((f(I,S)|0)+(jb>>>16)|0)+(wb>>>16)|0;tb=((f(A,$)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(I,$)|0)+(sb>>>16)|0)+(tb>>>16)|0;jb=tb<<16|rb&65535;rb=((f(A,T)|0)+(kb&65535)|0)+(wb&65535)|0;sb=((f(I,T)|0)+(kb>>>16)|0)+(wb>>>16)|0;tb=((f(A,_)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(I,_)|0)+(sb>>>16)|0)+(tb>>>16)|0;kb=tb<<16|rb&65535;rb=((f(A,U)|0)+(lb&65535)|0)+(wb&65535)|0;sb=((f(I,U)|0)+(lb>>>16)|0)+(wb>>>16)|0;tb=((f(A,ab)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(I,ab)|0)+(sb>>>16)|0)+(tb>>>16)|0;lb=tb<<16|rb&65535;mb=wb;rb=((f(B,N)|0)+(fb&65535)|0)+(nb&65535)|0;sb=((f(J,N)|0)+(fb>>>16)|0)+(nb>>>16)|0;tb=((f(B,V)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(J,V)|0)+(sb>>>16)|0)+(tb>>>16)|0;fb=tb<<16|rb&65535;rb=((f(B,O)|0)+(gb&65535)|0)+(wb&65535)|0;sb=((f(J,O)|0)+(gb>>>16)|0)+(wb>>>16)|0;tb=((f(B,W)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(J,W)|0)+(sb>>>16)|0)+(tb>>>16)|0;gb=tb<<16|rb&65535;rb=((f(B,P)|0)+(hb&65535)|0)+(wb&65535)|0;sb=((f(J,P)|0)+(hb>>>16)|0)+(wb>>>16)|0;tb=((f(B,X)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(J,X)|0)+(sb>>>16)|0)+(tb>>>16)|0;hb=tb<<16|rb&65535;rb=((f(B,Q)|0)+(ib&65535)|0)+(wb&65535)|0;sb=((f(J,Q)|0)+(ib>>>16)|0)+(wb>>>16)|0;tb=((f(B,Y)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(J,Y)|0)+(sb>>>16)|0)+(tb>>>16)|0;ib=tb<<16|rb&65535;rb=((f(B,R)|0)+(jb&65535)|0)+(wb&65535)|0;sb=((f(J,R)|0)+(jb>>>16)|0)+(wb>>>16)|0;tb=((f(B,Z)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(J,Z)|0)+(sb>>>16)|0)+(tb>>>16)|0;jb=tb<<16|rb&65535;rb=((f(B,S)|0)+(kb&65535)|0)+(wb&65535)|0;sb=((f(J,S)|0)+(kb>>>16)|0)+(wb>>>16)|0;tb=((f(B,$)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(J,$)|0)+(sb>>>16)|0)+(tb>>>16)|0;kb=tb<<16|rb&65535;rb=((f(B,T)|0)+(lb&65535)|0)+(wb&65535)|0;sb=((f(J,T)|0)+(lb>>>16)|0)+(wb>>>16)|0;tb=((f(B,_)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(J,_)|0)+(sb>>>16)|0)+(tb>>>16)|0;lb=tb<<16|rb&65535;rb=((f(B,U)|0)+(mb&65535)|0)+(wb&65535)|0;sb=((f(J,U)|0)+(mb>>>16)|0)+(wb>>>16)|0;tb=((f(B,ab)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(J,ab)|0)+(sb>>>16)|0)+(tb>>>16)|0;mb=tb<<16|rb&65535;nb=wb;rb=((f(C,N)|0)+(gb&65535)|0)+(ob&65535)|0;sb=((f(K,N)|0)+(gb>>>16)|0)+(ob>>>16)|0;tb=((f(C,V)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(K,V)|0)+(sb>>>16)|0)+(tb>>>16)|0;gb=tb<<16|rb&65535;rb=((f(C,O)|0)+(hb&65535)|0)+(wb&65535)|0;sb=((f(K,O)|0)+(hb>>>16)|0)+(wb>>>16)|0;tb=((f(C,W)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(K,W)|0)+(sb>>>16)|0)+(tb>>>16)|0;hb=tb<<16|rb&65535;rb=((f(C,P)|0)+(ib&65535)|0)+(wb&65535)|0;sb=((f(K,P)|0)+(ib>>>16)|0)+(wb>>>16)|0;tb=((f(C,X)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(K,X)|0)+(sb>>>16)|0)+(tb>>>16)|0;ib=tb<<16|rb&65535;rb=((f(C,Q)|0)+(jb&65535)|0)+(wb&65535)|0;sb=((f(K,Q)|0)+(jb>>>16)|0)+(wb>>>16)|0;tb=((f(C,Y)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(K,Y)|0)+(sb>>>16)|0)+(tb>>>16)|0;jb=tb<<16|rb&65535;rb=((f(C,R)|0)+(kb&65535)|0)+(wb&65535)|0;sb=((f(K,R)|0)+(kb>>>16)|0)+(wb>>>16)|0;tb=((f(C,Z)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(K,Z)|0)+(sb>>>16)|0)+(tb>>>16)|0;kb=tb<<16|rb&65535;rb=((f(C,S)|0)+(lb&65535)|0)+(wb&65535)|0;sb=((f(K,S)|0)+(lb>>>16)|0)+(wb>>>16)|0;tb=((f(C,$)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(K,$)|0)+(sb>>>16)|0)+(tb>>>16)|0;lb=tb<<16|rb&65535;rb=((f(C,T)|0)+(mb&65535)|0)+(wb&65535)|0;sb=((f(K,T)|0)+(mb>>>16)|0)+(wb>>>16)|0;tb=((f(C,_)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(K,_)|0)+(sb>>>16)|0)+(tb>>>16)|0;mb=tb<<16|rb&65535;rb=((f(C,U)|0)+(nb&65535)|0)+(wb&65535)|0;sb=((f(K,U)|0)+(nb>>>16)|0)+(wb>>>16)|0;tb=((f(C,ab)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(K,ab)|0)+(sb>>>16)|0)+(tb>>>16)|0;nb=tb<<16|rb&65535;ob=wb;rb=((f(D,N)|0)+(hb&65535)|0)+(pb&65535)|0;sb=((f(L,N)|0)+(hb>>>16)|0)+(pb>>>16)|0;tb=((f(D,V)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(L,V)|0)+(sb>>>16)|0)+(tb>>>16)|0;hb=tb<<16|rb&65535;rb=((f(D,O)|0)+(ib&65535)|0)+(wb&65535)|0;sb=((f(L,O)|0)+(ib>>>16)|0)+(wb>>>16)|0;tb=((f(D,W)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(L,W)|0)+(sb>>>16)|0)+(tb>>>16)|0;ib=tb<<16|rb&65535;rb=((f(D,P)|0)+(jb&65535)|0)+(wb&65535)|0;sb=((f(L,P)|0)+(jb>>>16)|0)+(wb>>>16)|0;tb=((f(D,X)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(L,X)|0)+(sb>>>16)|0)+(tb>>>16)|0;jb=tb<<16|rb&65535;rb=((f(D,Q)|0)+(kb&65535)|0)+(wb&65535)|0;sb=((f(L,Q)|0)+(kb>>>16)|0)+(wb>>>16)|0;tb=((f(D,Y)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(L,Y)|0)+(sb>>>16)|0)+(tb>>>16)|0;kb=tb<<16|rb&65535;rb=((f(D,R)|0)+(lb&65535)|0)+(wb&65535)|0;sb=((f(L,R)|0)+(lb>>>16)|0)+(wb>>>16)|0;tb=((f(D,Z)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(L,Z)|0)+(sb>>>16)|0)+(tb>>>16)|0;lb=tb<<16|rb&65535;rb=((f(D,S)|0)+(mb&65535)|0)+(wb&65535)|0;sb=((f(L,S)|0)+(mb>>>16)|0)+(wb>>>16)|0;tb=((f(D,$)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(L,$)|0)+(sb>>>16)|0)+(tb>>>16)|0;mb=tb<<16|rb&65535;rb=((f(D,T)|0)+(nb&65535)|0)+(wb&65535)|0;sb=((f(L,T)|0)+(nb>>>16)|0)+(wb>>>16)|0;tb=((f(D,_)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(L,_)|0)+(sb>>>16)|0)+(tb>>>16)|0;nb=tb<<16|rb&65535;rb=((f(D,U)|0)+(ob&65535)|0)+(wb&65535)|0;sb=((f(L,U)|0)+(ob>>>16)|0)+(wb>>>16)|0;tb=((f(D,ab)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(L,ab)|0)+(sb>>>16)|0)+(tb>>>16)|0;ob=tb<<16|rb&65535;pb=wb;rb=((f(E,N)|0)+(ib&65535)|0)+(qb&65535)|0;sb=((f(M,N)|0)+(ib>>>16)|0)+(qb>>>16)|0;tb=((f(E,V)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(M,V)|0)+(sb>>>16)|0)+(tb>>>16)|0;ib=tb<<16|rb&65535;rb=((f(E,O)|0)+(jb&65535)|0)+(wb&65535)|0;sb=((f(M,O)|0)+(jb>>>16)|0)+(wb>>>16)|0;tb=((f(E,W)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(M,W)|0)+(sb>>>16)|0)+(tb>>>16)|0;jb=tb<<16|rb&65535;rb=((f(E,P)|0)+(kb&65535)|0)+(wb&65535)|0;sb=((f(M,P)|0)+(kb>>>16)|0)+(wb>>>16)|0;tb=((f(E,X)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(M,X)|0)+(sb>>>16)|0)+(tb>>>16)|0;kb=tb<<16|rb&65535;rb=((f(E,Q)|0)+(lb&65535)|0)+(wb&65535)|0;sb=((f(M,Q)|0)+(lb>>>16)|0)+(wb>>>16)|0;tb=((f(E,Y)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(M,Y)|0)+(sb>>>16)|0)+(tb>>>16)|0;lb=tb<<16|rb&65535;rb=((f(E,R)|0)+(mb&65535)|0)+(wb&65535)|0;sb=((f(M,R)|0)+(mb>>>16)|0)+(wb>>>16)|0;tb=((f(E,Z)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(M,Z)|0)+(sb>>>16)|0)+(tb>>>16)|0;mb=tb<<16|rb&65535;rb=((f(E,S)|0)+(nb&65535)|0)+(wb&65535)|0;sb=((f(M,S)|0)+(nb>>>16)|0)+(wb>>>16)|0;tb=((f(E,$)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(M,$)|0)+(sb>>>16)|0)+(tb>>>16)|0;nb=tb<<16|rb&65535;rb=((f(E,T)|0)+(ob&65535)|0)+(wb&65535)|0;sb=((f(M,T)|0)+(ob>>>16)|0)+(wb>>>16)|0;tb=((f(E,_)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(M,_)|0)+(sb>>>16)|0)+(tb>>>16)|0;ob=tb<<16|rb&65535;rb=((f(E,U)|0)+(pb&65535)|0)+(wb&65535)|0;sb=((f(M,U)|0)+(pb>>>16)|0)+(wb>>>16)|0;tb=((f(E,ab)|0)+(sb&65535)|0)+(rb>>>16)|0;wb=((f(M,ab)|0)+(sb>>>16)|0)+(tb>>>16)|0;pb=tb<<16|rb&65535;qb=wb;Db=yb+(Bb+Cb|0)|0;xb=e[Gb+Db>>2]|0;rb=((xb&65535)+((bb&65535)<<1)|0)+ub|0;tb=((xb>>>16)+(bb>>>16<<1)|0)+(rb>>>16)|0;e[Gb+Db>>2]=tb<<16|rb&65535;ub=tb>>>16;Db=Db+4|0;xb=e[Gb+Db>>2]|0;rb=((xb&65535)+((cb&65535)<<1)|0)+ub|0;tb=((xb>>>16)+(cb>>>16<<1)|0)+(rb>>>16)|0;e[Gb+Db>>2]=tb<<16|rb&65535;ub=tb>>>16;Db=Db+4|0;xb=e[Gb+Db>>2]|0;rb=((xb&65535)+((db&65535)<<1)|0)+ub|0;tb=((xb>>>16)+(db>>>16<<1)|0)+(rb>>>16)|0;e[Gb+Db>>2]=tb<<16|rb&65535;ub=tb>>>16;Db=Db+4|0;xb=e[Gb+Db>>2]|0;rb=((xb&65535)+((eb&65535)<<1)|0)+ub|0;tb=((xb>>>16)+(eb>>>16<<1)|0)+(rb>>>16)|0;e[Gb+Db>>2]=tb<<16|rb&65535;ub=tb>>>16;Db=Db+4|0;xb=e[Gb+Db>>2]|0;rb=((xb&65535)+((fb&65535)<<1)|0)+ub|0;tb=((xb>>>16)+(fb>>>16<<1)|0)+(rb>>>16)|0;e[Gb+Db>>2]=tb<<16|rb&65535;ub=tb>>>16;Db=Db+4|0;xb=e[Gb+Db>>2]|0;rb=((xb&65535)+((gb&65535)<<1)|0)+ub|0;tb=((xb>>>16)+(gb>>>16<<1)|0)+(rb>>>16)|0;e[Gb+Db>>2]=tb<<16|rb&65535;ub=tb>>>16;Db=Db+4|0;xb=e[Gb+Db>>2]|0;rb=((xb&65535)+((hb&65535)<<1)|0)+ub|0;tb=((xb>>>16)+(hb>>>16<<1)|0)+(rb>>>16)|0;e[Gb+Db>>2]=tb<<16|rb&65535;ub=tb>>>16;Db=Db+4|0;xb=e[Gb+Db>>2]|0;rb=((xb&65535)+((ib&65535)<<1)|0)+ub|0;tb=((xb>>>16)+(ib>>>16<<1)|0)+(rb>>>16)|0;e[Gb+Db>>2]=tb<<16|rb&65535;ub=tb>>>16}Db=yb+(Bb+Cb|0)|0;xb=e[Gb+Db>>2]|0;rb=(((xb&65535)+((jb&65535)<<1)|0)+ub|0)+vb|0;tb=((xb>>>16)+(jb>>>16<<1)|0)+(rb>>>16)|0;e[Gb+Db>>2]=tb<<16|rb&65535;ub=tb>>>16;Db=Db+4|0;xb=e[Gb+Db>>2]|0;rb=((xb&65535)+((kb&65535)<<1)|0)+ub|0;tb=((xb>>>16)+(kb>>>16<<1)|0)+(rb>>>16)|0;e[Gb+Db>>2]=tb<<16|rb&65535;ub=tb>>>16;Db=Db+4|0;xb=e[Gb+Db>>2]|0;rb=((xb&65535)+((lb&65535)<<1)|0)+ub|0;tb=((xb>>>16)+(lb>>>16<<1)|0)+(rb>>>16)|0;e[Gb+Db>>2]=tb<<16|rb&65535;ub=tb>>>16;Db=Db+4|0;xb=e[Gb+Db>>2]|0;rb=((xb&65535)+((mb&65535)<<1)|0)+ub|0;tb=((xb>>>16)+(mb>>>16<<1)|0)+(rb>>>16)|0;e[Gb+Db>>2]=tb<<16|rb&65535;ub=tb>>>16;Db=Db+4|0;xb=e[Gb+Db>>2]|0;rb=((xb&65535)+((nb&65535)<<1)|0)+ub|0;tb=((xb>>>16)+(nb>>>16<<1)|0)+(rb>>>16)|0;e[Gb+Db>>2]=tb<<16|rb&65535;ub=tb>>>16;Db=Db+4|0;xb=e[Gb+Db>>2]|0;rb=((xb&65535)+((ob&65535)<<1)|0)+ub|0;tb=((xb>>>16)+(ob>>>16<<1)|0)+(rb>>>16)|0;e[Gb+Db>>2]=tb<<16|rb&65535;ub=tb>>>16;Db=Db+4|0;xb=e[Gb+Db>>2]|0;rb=((xb&65535)+((pb&65535)<<1)|0)+ub|0;tb=((xb>>>16)+(pb>>>16<<1)|0)+(rb>>>16)|0;e[Gb+Db>>2]=tb<<16|rb&65535;ub=tb>>>16;Db=Db+4|0;xb=e[Gb+Db>>2]|0;rb=((xb&65535)+((qb&65535)<<1)|0)+ub|0;tb=((xb>>>16)+(qb>>>16<<1)|0)+(rb>>>16)|0;e[Gb+Db>>2]=tb<<16|rb&65535;vb=tb>>>16}for(Db=Db+4|0;!!vb&(Db|0)<zb<<1;Db=Db+4|0){xb=e[Gb+Db>>2]|0;rb=(xb&65535)+vb|0;tb=(xb>>>16)+(rb>>>16)|0;e[Gb+Db>>2]=tb<<16|rb&65535;vb=tb>>>16}}}}function s(u,v,w,x,y,z){u=u|0;v=v|0;w=w|0;x=x|0;y=y|0;z=z|0;var A=0,B=0,C=0,D=0,E=0,F=0,G=0,H=0,I=0,J=0,K=0,L=0,M=0,N=0,O=0,P=0,Q=0,R=0,S=0;j(v,u,y);for(Q=v-1&-4;(Q|0)>=0;Q=Q-4|0){A=e[u+Q>>2]|0;if(A){v=Q;break}}for(Q=x-1&-4;(Q|0)>=0;Q=Q-4|0){B=e[w+Q>>2]|0;if(B){x=Q;break}}while((B&2147483648)==0){B=B<<1;C=C+1|0}E=e[u+v>>2]|0;if(C)D=E>>>(32-C|0);for(Q=v-4|0;(Q|0)>=0;Q=Q-4|0){A=e[u+Q>>2]|0;e[y+Q+4>>2]=E<<C|(C?A>>>(32-C|0):0);E=A}e[y>>2]=E<<C;if(C){F=e[w+x>>2]|0;for(Q=x-4|0;(Q|0)>=0;Q=Q-4|0){B=e[w+Q>>2]|0;e[w+Q+4>>2]=F<<C|B>>>(32-C|0);F=B}e[w>>2]=F<<C}F=e[w+x>>2]|0;G=F>>>16,H=F&65535;for(Q=v;(Q|0)>=(x|0);Q=Q-4|0){R=Q-x|0;E=e[y+Q>>2]|0;I=(D>>>0)/(G>>>0)|0,K=(D>>>0)%(G>>>0)|0,M=f(I,H)|0;while((I|0)==65536|M>>>0>(K<<16|E>>>16)>>>0){I=I-1|0,K=K+G|0,M=M-H|0;if((K|0)>=65536)break}O=0,P=0;for(S=0;(S|0)<=(x|0);S=S+4|0){B=e[w+S>>2]|0;M=(f(I,B&65535)|0)+(O>>>16)|0;N=(f(I,B>>>16)|0)+(M>>>16)|0;B=O&65535|M<<16;O=N;A=e[y+R+S>>2]|0;M=((A&65535)-(B&65535)|0)+P|0;N=((A>>>16)-(B>>>16)|0)+(M>>16)|0;e[y+R+S>>2]=N<<16|M&65535;P=N>>16}M=((D&65535)-(O&65535)|0)+P|0;N=((D>>>16)-(O>>>16)|0)+(M>>16)|0;e[y+R+S>>2]=D=N<<16|M&65535;P=N>>16;if(P){I=I-1|0,K=K-G|0;P=0;for(S=0;(S|0)<=(x|0);S=S+4|0){B=e[w+S>>2]|0;A=e[y+R+S>>2]|0;M=((A&65535)+(B&65535)|0)+P|0;N=((A>>>16)+(B>>>16)|0)+(M>>>16)|0;e[y+R+S>>2]=N<<16|M&65535;P=N>>>16}e[y+R+S>>2]=D=D+P|0}E=e[y+Q>>2]|0;A=D<<16|E>>>16;J=(A>>>0)/(G>>>0)|0,L=(A>>>0)%(G>>>0)|0,M=f(J,H)|0;while((J|0)==65536|M>>>0>(L<<16|E&65535)>>>0){J=J-1|0,L=L+G|0,M=M-H|0;if((L|0)>=65536)break}O=0,P=0;for(S=0;(S|0)<=(x|0);S=S+4|0){B=e[w+S>>2]|0;M=(f(J,B&65535)|0)+(O&65535)|0;N=((f(J,B>>>16)|0)+(M>>>16)|0)+(O>>>16)|0;B=M&65535|N<<16;O=N>>>16;A=e[y+R+S>>2]|0;M=((A&65535)-(B&65535)|0)+P|0;N=((A>>>16)-(B>>>16)|0)+(M>>16)|0;P=N>>16;e[y+R+S>>2]=N<<16|M&65535}M=((D&65535)-(O&65535)|0)+P|0;N=((D>>>16)-(O>>>16)|0)+(M>>16)|0;e[y+R+S>>2]=D=N<<16|M&65535;P=N>>16;if(P){J=J-1|0,L=L+G|0;P=0;for(S=0;(S|0)<=(x|0);S=S+4|0){B=e[w+S>>2]|0;A=e[y+R+S>>2]|0;M=((A&65535)+(B&65535)|0)+P|0;N=((A>>>16)+(B>>>16)|0)+(M>>>16)|0;P=N>>>16;e[y+R+S>>2]=M&65535|N<<16}e[y+R+S>>2]=D+P|0}e[z+R>>2]=I<<16|J;D=e[y+Q>>2]|0}if(C){E=e[y>>2]|0;for(Q=4;(Q|0)<=(x|0);Q=Q+4|0){A=e[y+Q>>2]|0;e[y+Q-4>>2]=A<<(32-C|0)|E>>>C;E=A}e[y+x>>2]=E>>>C}}function t(u,v,w,x,y,z){u=u|0;v=v|0;w=w|0;x=x|0;y=y|0;z=z|0;var A=0,B=0,C=0,D=0,E=0,F=0,G=0,H=0,I=0,J=0,K=0,L=0,M=0,N=0;A=h(x<<1)|0;k(x<<1,0,A);j(v,u,A);for(L=0;(L|0)<(x|0);L=L+4|0){C=e[A+L>>2]|0,D=C&65535,C=C>>>16;F=y>>>16,E=y&65535;G=f(D,E)|0,H=((f(D,F)|0)+(f(C,E)|0)|0)+(G>>>16)|0;D=G&65535,C=H&65535;K=0;for(M=0;(M|0)<(x|0);M=M+4|0){N=L+M|0;F=e[w+M>>2]|0,E=F&65535,F=F>>>16;J=e[A+N>>2]|0;G=((f(D,E)|0)+(K&65535)|0)+(J&65535)|0;H=((f(D,F)|0)+(K>>>16)|0)+(J>>>16)|0;I=((f(C,E)|0)+(H&65535)|0)+(G>>>16)|0;K=((f(C,F)|0)+(I>>>16)|0)+(H>>>16)|0;J=I<<16|G&65535;e[A+N>>2]=J}N=L+M|0;J=e[A+N>>2]|0;G=((J&65535)+(K&65535)|0)+B|0;H=((J>>>16)+(K>>>16)|0)+(G>>>16)|0;e[A+N>>2]=H<<16|G&65535;B=H>>>16}j(x,A+x|0,z);i(x<<1);if(B|(m(w,x,z,x)|0)<=0){p(z,x,w,x,z,x)|0}}return{sreset:g,salloc:h,sfree:i,z:k,tst:n,neg:l,cmp:m,add:o,sub:p,mul:q,sqr:r,div:s,mredc:t}}function ib(a){return a instanceof jb}function jb(a){var b=Ac,c=0,d=0;if(n(a)&&(a=f(a)),o(a)&&(a=new Uint8Array(a)),void 0===a);else if(m(a)){var e=Math.abs(a);e>4294967295?(b=new Uint32Array(2),b[0]=0|e,b[1]=e/4294967296|0,c=52):e>0?(b=new Uint32Array(1),b[0]=e,c=32):(b=Ac,c=0),d=0>a?-1:1}else if(p(a)){if(c=8*a.length,!c)return Cc;b=new Uint32Array(c+31>>5);for(var g=a.length-4;g>=0;g-=4)b[a.length-4-g>>2]=a[g]<<24|a[g+1]<<16|a[g+2]<<8|a[g+3];-3===g?b[b.length-1]=a[0]:-2===g?b[b.length-1]=a[0]<<8|a[1]:-1===g&&(b[b.length-1]=a[0]<<16|a[1]<<8|a[2]),d=1}else{if("object"!=typeof a||null===a)throw new TypeError("number is of unexpected type");b=new Uint32Array(a.limbs),c=a.bitLength,d=a.sign}this.limbs=b,this.bitLength=c,this.sign=d}function kb(a){a=a||16;var b=this.limbs,c=this.bitLength,e="";if(16!==a)throw new d("bad radix");for(var f=(c+31>>5)-1;f>=0;f--){var g=b[f].toString(16);e+="00000000".substr(g.length),e+=g}return e=e.replace(/^0+/,""),e.length||(e="0"),this.sign<0&&(e="-"+e),e}function lb(){var a=this.bitLength,b=this.limbs;if(0===a)return new Uint8Array(0);for(var c=a+7>>3,d=new Uint8Array(c),e=0;c>e;e++){var f=c-e-1;d[e]=b[f>>2]>>((3&f)<<3)}return d}function mb(){var a=this.limbs,b=this.bitLength,c=this.sign;if(!c)return 0;if(32>=b)return c*(a[0]>>>0);if(52>=b)return c*(4294967296*(a[1]>>>0)+(a[0]>>>0));var d,e,f=0;for(d=a.length-1;d>=0;d--)if(0!==(e=a[d])){for(;0===(e<<f&2147483648);)f++;break}return 0===d?c*(a[0]>>>0):c*(1048576*((a[d]<<f|(f?a[d-1]>>>32-f:0))>>>0)+((a[d-1]<<f|(f&&d>1?a[d-2]>>>32-f:0))>>>12))*Math.pow(2,32*d-f-52)}function nb(a){var b=this.limbs,c=this.bitLength;if(a>=c)return this;var d=new jb,e=a+31>>5,f=a%32;return d.limbs=new Uint32Array(b.subarray(0,e)),d.bitLength=a,d.sign=this.sign,f&&(d.limbs[e-1]&=-1>>>32-f),d}function ob(a,b){if(!m(a))throw new TypeError("TODO");if(void 0!==b&&!m(b))throw new TypeError("TODO");var c=this.limbs,d=this.bitLength;if(0>a)throw new RangeError("TODO");if(a>=d)return Cc;(void 0===b||b>d-a)&&(b=d-a);var e,f=new jb,g=a>>5,h=a+b+31>>5,i=b+31>>5,j=a%32,k=b%32;if(e=new Uint32Array(i),j){for(var l=0;h-g-1>l;l++)e[l]=c[g+l]>>>j|c[g+l+1]<<32-j;e[l]=c[g+l]>>>j}else e.set(c.subarray(g,h));return k&&(e[i-1]&=-1>>>32-k),f.limbs=e,f.bitLength=b,f.sign=this.sign,f}function pb(){var a=new jb;return a.limbs=this.limbs,a.bitLength=this.bitLength,a.sign=-1*this.sign,a}function qb(a){ib(a)||(a=new jb(a));var b=this.limbs,c=b.length,d=a.limbs,e=d.length,f=0;return this.sign<a.sign?-1:this.sign>a.sign?1:(zc.set(b,0),zc.set(d,c),f=hb.cmp(0,c<<2,c<<2,e<<2),f*this.sign)}function rb(a){if(ib(a)||(a=new jb(a)),!this.sign)return a;if(!a.sign)return this;var b,c,d,e,f=this.bitLength,g=this.limbs,h=g.length,i=this.sign,j=a.bitLength,k=a.limbs,l=k.length,m=a.sign,n=new jb;b=(f>j?f:j)+(i*m>0?1:0),c=b+31>>5,hb.sreset();var o=hb.salloc(h<<2),p=hb.salloc(l<<2),q=hb.salloc(c<<2);return hb.z(q-o+(c<<2),0,o),zc.set(g,o>>2),zc.set(k,p>>2),i*m>0?(hb.add(o,h<<2,p,l<<2,q,c<<2),d=i):i>m?(e=hb.sub(o,h<<2,p,l<<2,q,c<<2),d=e?m:i):(e=hb.sub(p,l<<2,o,h<<2,q,c<<2),d=e?i:m),e&&hb.neg(q,c<<2,q,c<<2),0===hb.tst(q,c<<2)?Cc:(n.limbs=new Uint32Array(zc.subarray(q>>2,(q>>2)+c)),n.bitLength=b,n.sign=d,n)}function sb(a){return ib(a)||(a=new jb(a)),this.add(a.negate())}function tb(a){if(ib(a)||(a=new jb(a)),!this.sign||!a.sign)return Cc;var b,c,d=this.bitLength,e=this.limbs,f=e.length,g=a.bitLength,h=a.limbs,i=h.length,j=new jb;b=d+g,c=b+31>>5,hb.sreset();var k=hb.salloc(f<<2),l=hb.salloc(i<<2),m=hb.salloc(c<<2);return hb.z(m-k+(c<<2),0,k),zc.set(e,k>>2),zc.set(h,l>>2),hb.mul(k,f<<2,l,i<<2,m,c<<2),j.limbs=new Uint32Array(zc.subarray(m>>2,(m>>2)+c)),j.sign=this.sign*a.sign,j.bitLength=b,j}function ub(){if(!this.sign)return Cc;var a,b,c=this.bitLength,d=this.limbs,e=d.length,f=new jb;a=c<<1,b=a+31>>5,hb.sreset();var g=hb.salloc(e<<2),h=hb.salloc(b<<2);return hb.z(h-g+(b<<2),0,g),zc.set(d,g>>2),hb.sqr(g,e<<2,h),f.limbs=new Uint32Array(zc.subarray(h>>2,(h>>2)+b)),f.bitLength=a,f.sign=1,f}function vb(a){ib(a)||(a=new jb(a));var b,c,d=this.bitLength,e=this.limbs,f=e.length,g=a.bitLength,h=a.limbs,i=h.length,j=Cc,k=Cc;hb.sreset();var l=hb.salloc(f<<2),m=hb.salloc(i<<2),n=hb.salloc(i<<2),o=hb.salloc(f<<2);return hb.z(o-l+(f<<2),0,l),zc.set(e,l>>2),zc.set(h,m>>2),hb.div(l,f<<2,m,i<<2,n,o),b=hb.tst(o,f<<2)>>2,b&&(j=new jb,j.limbs=new Uint32Array(zc.subarray(o>>2,(o>>2)+b)),j.bitLength=b<<5>d?d:b<<5,j.sign=this.sign*a.sign),c=hb.tst(n,i<<2)>>2,c&&(k=new jb,k.limbs=new Uint32Array(zc.subarray(n>>2,(n>>2)+c)),k.bitLength=c<<5>g?g:c<<5,k.sign=this.sign),{quotient:j,remainder:k}}function wb(a,b){var c,d,e,f,g=0>a?-1:1,h=0>b?-1:1,i=1,j=0,k=0,l=1;for(a*=g,b*=h,f=b>a,f&&(e=a,a=b,b=e,e=g,g=h,h=e),d=Math.floor(a/b),c=a-d*b;c;)e=i-d*j,i=j,j=e,e=k-d*l,k=l,l=e,a=b,b=c,d=Math.floor(a/b),c=a-d*b;return j*=g,l*=h,f&&(e=j,j=l,l=e),{gcd:b,x:j,y:l}}function xb(a,b){ib(a)||(a=new jb(a)),ib(b)||(b=new jb(b));var c=a.sign,d=b.sign;0>c&&(a=a.negate()),0>d&&(b=b.negate());var e=a.compare(b);if(0>e){var f=a;a=b,b=f,f=c,c=d,d=f}var g,h,i,j=Dc,k=Cc,l=b.bitLength,m=Cc,n=Dc,o=a.bitLength;for(g=a.divide(b);(h=g.remainder)!==Cc;)i=g.quotient,g=j.subtract(i.multiply(k).clamp(l)).clamp(l),j=k,k=g,g=m.subtract(i.multiply(n).clamp(o)).clamp(o),m=n,n=g,a=b,b=h,g=a.divide(b);if(0>c&&(k=k.negate()),0>d&&(n=n.negate()),0>e){var f=k;k=n,n=f}return{gcd:b,x:k,y:n}}function yb(){if(jb.apply(this,arguments),this.valueOf()<1)throw new RangeError;if(!(this.bitLength<=32)){var a;if(1&this.limbs[0]){var b=(this.bitLength+31&-32)+1,c=new Uint32Array(b+31>>5);c[c.length-1]=1,a=new jb,a.sign=1,a.bitLength=b,a.limbs=c;var d=wb(4294967296,this.limbs[0]).y;this.coefficient=0>d?-d:4294967296-d,this.comodulus=a,this.comodulusRemainder=a.divide(this).remainder,this.comodulusRemainderSquare=a.square().divide(this).remainder}}}function zb(a){return ib(a)||(a=new jb(a)),a.bitLength<=32&&this.bitLength<=32?new jb(a.valueOf()%this.valueOf()):a.compare(this)<0?a:a.divide(this).remainder}function Ab(a){a=this.reduce(a);var b=xb(this,a);return 1!==b.gcd.valueOf()?null:(b=b.y,b.sign<0&&(b=b.add(this).clamp(this.bitLength)),b)}function Bb(a,b){ib(a)||(a=new jb(a)),ib(b)||(b=new jb(b));for(var c=0,d=0;d<b.limbs.length;d++)for(var e=b.limbs[d];e;)1&e&&c++,e>>>=1;
-var f=8;b.bitLength<=4536&&(f=7),b.bitLength<=1736&&(f=6),b.bitLength<=630&&(f=5),b.bitLength<=210&&(f=4),b.bitLength<=60&&(f=3),b.bitLength<=12&&(f=2),1<<f-1>=c&&(f=1),a=Cb(this.reduce(a).multiply(this.comodulusRemainderSquare),this);var g=Cb(a.square(),this),h=new Array(1<<f-1);h[0]=a,h[1]=Cb(a.multiply(g),this);for(var d=2;1<<f-1>d;d++)h[d]=Cb(h[d-1].multiply(g),this);for(var i=this.comodulusRemainder,j=i,d=b.limbs.length-1;d>=0;d--)for(var e=b.limbs[d],k=32;k>0;)if(2147483648&e){for(var l=e>>>32-f,m=f;0===(1&l);)l>>>=1,m--;for(var n=h[l>>>1];l;)l>>>=1,j!==i&&(j=Cb(j.square(),this));j=j!==i?Cb(j.multiply(n),this):n,e<<=m,k-=m}else j!==i&&(j=Cb(j.square(),this)),e<<=1,k--;return j=Cb(j,this)}function Cb(a,b){var c=a.limbs,d=c.length,e=b.limbs,f=e.length,g=b.coefficient;hb.sreset();var h=hb.salloc(d<<2),i=hb.salloc(f<<2),j=hb.salloc(f<<2);hb.z(j-h+(f<<2),0,h),zc.set(c,h>>2),zc.set(e,i>>2),hb.mredc(h,d<<2,i,f<<2,g,j);var k=new jb;return k.limbs=new Uint32Array(zc.subarray(j>>2,(j>>2)+f)),k.bitLength=b.bitLength,k.sign=1,k}function Db(a){var b=new jb(this),c=0;for(b.limbs[0]-=1;0===b.limbs[c>>5];)c+=32;for(;0===(b.limbs[c>>5]>>(31&c)&1);)c++;b=b.slice(c);for(var d=new yb(this),e=this.subtract(Dc),f=new jb(this),g=this.limbs.length-1;0===f.limbs[g];)g--;for(;--a>=0;){for(fb(f.limbs),f.limbs[0]<2&&(f.limbs[0]+=2);f.compare(e)>=0;)f.limbs[g]>>>=1;var h=d.power(f,b);if(0!==h.compare(Dc)&&0!==h.compare(e)){for(var i=c;--i>0;){if(h=h.square().divide(d).remainder,0===h.compare(Dc))return!1;if(0===h.compare(e))break}if(0===i)return!1}}return!0}function Eb(a){a=a||80;var b=this.limbs,c=0;if(0===(1&b[0]))return!1;if(1>=a)return!0;var d=0,e=0,f=0;for(c=0;c<b.length;c++){for(var g=b[c];g;)d+=3&g,g>>>=2;for(var h=b[c];h;)e+=3&h,h>>>=2,e-=3&h,h>>>=2;for(var i=b[c];i;)f+=15&i,i>>>=4,f-=15&i,i>>>=4}return d%3&&e%5&&f%17?2>=a?!0:Db.call(this,a>>>1):!1}function Fb(a){if(Fc.length>=a)return Fc.slice(0,a);for(var b=Fc[Fc.length-1]+2;Fc.length<a;b+=2){for(var c=0,d=Fc[c];b>=d*d&&b%d!=0;d=Fc[++c]);d*d>b&&Fc.push(b)}return Fc}function Gb(a,c){var d=a+31>>5,e=new jb({sign:1,bitLength:a,limbs:d}),f=e.limbs,g=1e4;512>=a&&(g=2200),256>=a&&(g=600);var h=Fb(g),i=new Uint32Array(g),j=a*b.Math.LN2|0,k=27;for(a>=250&&(k=12),a>=450&&(k=6),a>=850&&(k=3),a>=1300&&(k=2);;){fb(f),f[0]|=1,f[d-1]|=1<<(a-1&31),31&a&&(f[d-1]&=l(a+1&31)-1),i[0]=1;for(var m=1;g>m;m++)i[m]=e.divide(h[m]).remainder.valueOf();a:for(var n=0;j>n;n+=2,f[0]+=2){for(var m=1;g>m;m++)if((i[m]+n)%h[m]===0)continue a;if(("function"!=typeof c||c(e))&&Db.call(e,k))return e}}}function Hb(a){a=a||{},this.key=null,this.result=null,this.reset(a)}function Ib(a){a=a||{},this.result=null;var b=a.key;if(void 0!==b){if(!(b instanceof Array))throw new TypeError("unexpected key type");var c=b.length;if(2!==c&&3!==c&&8!==c)throw new SyntaxError("unexpected key type");var d=[];d[0]=new yb(b[0]),d[1]=new jb(b[1]),c>2&&(d[2]=new jb(b[2])),c>3&&(d[3]=new yb(b[3]),d[4]=new yb(b[4]),d[5]=new jb(b[5]),d[6]=new jb(b[6]),d[7]=new jb(b[7])),this.key=d}return this}function Jb(a){if(!this.key)throw new c("no key is associated with the instance");n(a)&&(a=f(a)),o(a)&&(a=new Uint8Array(a));var b;if(p(a))b=new jb(a);else{if(!ib(a))throw new TypeError("unexpected data type");b=a}if(this.key[0].compare(b)<=0)throw new RangeError("data too large");var d=this.key[0],e=this.key[1],g=d.power(b,e).toBytes(),h=d.bitLength+7>>3;if(g.length<h){var i=new Uint8Array(h);i.set(g,h-g.length),g=i}return this.result=g,this}function Kb(a){if(!this.key)throw new c("no key is associated with the instance");if(this.key.length<3)throw new c("key isn't suitable for decription");n(a)&&(a=f(a)),o(a)&&(a=new Uint8Array(a));var b;if(p(a))b=new jb(a);else{if(!ib(a))throw new TypeError("unexpected data type");b=a}if(this.key[0].compare(b)<=0)throw new RangeError("data too large");var d;if(this.key.length>3){for(var e=this.key[0],g=this.key[3],h=this.key[4],i=this.key[5],j=this.key[6],k=this.key[7],l=g.power(b,i),m=h.power(b,j),q=l.subtract(m);q.sign<0;)q=q.add(g);var r=g.reduce(k.multiply(q));d=r.multiply(h).add(m).clamp(e.bitLength).toBytes()}else{var e=this.key[0],s=this.key[2];d=e.power(b,s).toBytes()}var t=e.bitLength+7>>3;if(d.length<t){var u=new Uint8Array(t);u.set(d,t-d.length),d=u}return this.result=d,this}function Lb(a,b){if(a=a||2048,b=b||65537,512>a)throw new d("bit length is too small");if(n(b)&&(b=f(b)),o(b)&&(b=new Uint8Array(b)),!(p(b)||m(b)||ib(b)))throw new TypeError("unexpected exponent type");if(b=new jb(b),0===(1&b.limbs[0]))throw new d("exponent must be an odd number");var c,b,e,g,h,i,j,k,l,q;g=Gb(a>>1,function(a){return i=new jb(a),i.limbs[0]-=1,1==xb(i,b).gcd.valueOf()}),h=Gb(a-(a>>1),function(d){return c=new yb(g.multiply(d)),c.limbs[(a+31>>5)-1]>>>(a-1&31)?(j=new jb(d),j.limbs[0]-=1,1==xb(j,b).gcd.valueOf()):!1}),e=new yb(i.multiply(j)).inverse(b),k=e.divide(i).remainder,l=e.divide(j).remainder,g=new yb(g),h=new yb(h);var q=g.inverse(h);return[c,b,e,g,h,k,l,q]}function Mb(a,b){if(void 0===a)throw new SyntaxError("bitlen required");if(void 0===b)throw new SyntaxError("e required");for(var c=Lb(a,b),d=0;d<c.length;d++)ib(c[d])&&(c[d]=c[d].toBytes());return c}function Nb(a,b){if(void 0===a)throw new SyntaxError("data required");if(void 0===b)throw new SyntaxError("key required");return new Hc({key:b}).encrypt(a).result}function Ob(a,b){if(void 0===a)throw new SyntaxError("data required");if(void 0===b)throw new SyntaxError("key required");return new Hc({key:b}).decrypt(a).result}b.asmCrypto=a,c.prototype=Object.create(Error.prototype,{name:{value:"IllegalStateError"}}),d.prototype=Object.create(Error.prototype,{name:{value:"IllegalArgumentError"}}),e.prototype=Object.create(Error.prototype,{name:{value:"SecurityError"}});var Pb=b.Float64Array||b.Float32Array;a.string_to_bytes=f,a.hex_to_bytes=g,a.base64_to_bytes=h,a.bytes_to_string=i,a.bytes_to_hex=j,a.bytes_to_base64=k,b.IllegalStateError=c,b.IllegalArgumentError=d,b.SecurityError=e;var Qb=[99,124,119,123,242,107,111,197,48,1,103,43,254,215,171,118,202,130,201,125,250,89,71,240,173,212,162,175,156,164,114,192,183,253,147,38,54,63,247,204,52,165,229,241,113,216,49,21,4,199,35,195,24,150,5,154,7,18,128,226,235,39,178,117,9,131,44,26,27,110,90,160,82,59,214,179,41,227,47,132,83,209,0,237,32,252,177,91,106,203,190,57,74,76,88,207,208,239,170,251,67,77,51,133,69,249,2,127,80,60,159,168,81,163,64,143,146,157,56,245,188,182,218,33,16,255,243,210,205,12,19,236,95,151,68,23,196,167,126,61,100,93,25,115,96,129,79,220,34,42,144,136,70,238,184,20,222,94,11,219,224,50,58,10,73,6,36,92,194,211,172,98,145,149,228,121,231,200,55,109,141,213,78,169,108,86,244,234,101,122,174,8,186,120,37,46,28,166,180,198,232,221,116,31,75,189,139,138,112,62,181,102,72,3,246,14,97,53,87,185,134,193,29,158,225,248,152,17,105,217,142,148,155,30,135,233,206,85,40,223,140,161,137,13,191,230,66,104,65,153,45,15,176,84,187,22,82,9,106,213,48,54,165,56,191,64,163,158,129,243,215,251,124,227,57,130,155,47,255,135,52,142,67,68,196,222,233,203,84,123,148,50,166,194,35,61,238,76,149,11,66,250,195,78,8,46,161,102,40,217,36,178,118,91,162,73,109,139,209,37,114,248,246,100,134,104,152,22,212,164,92,204,93,101,182,146,108,112,72,80,253,237,185,218,94,21,70,87,167,141,157,132,144,216,171,0,140,188,211,10,247,228,88,5,184,179,69,6,208,44,30,143,202,63,15,2,193,175,189,3,1,19,138,107,58,145,17,65,79,103,220,234,151,242,207,206,240,180,230,115,150,172,116,34,231,173,53,133,226,249,55,232,28,117,223,110,71,241,26,113,29,41,197,137,111,183,98,14,170,24,190,27,252,86,62,75,198,210,121,32,154,219,192,254,120,205,90,244,31,221,168,51,136,7,199,49,177,18,16,89,39,128,236,95,96,81,127,169,25,181,74,13,45,229,122,159,147,201,156,239,160,224,59,77,174,42,245,176,200,235,187,60,131,83,153,97,23,43,4,126,186,119,214,38,225,105,20,99,85,33,12,125,198,248,238,246,255,214,222,145,96,2,206,86,231,181,77,236,143,31,137,250,239,178,142,251,65,179,95,69,35,83,228,155,117,225,61,76,108,126,245,131,104,81,209,249,226,171,98,42,8,149,70,157,48,55,10,47,14,36,27,223,205,78,127,234,18,29,88,52,54,220,180,91,164,118,183,125,82,221,94,19,166,185,0,193,64,227,121,182,212,141,103,114,148,152,176,133,187,197,79,237,134,154,102,17,138,233,4,254,160,120,37,75,162,93,128,5,63,33,112,241,99,119,175,66,32,229,253,191,129,24,38,195,190,53,136,46,147,85,252,122,200,186,50,230,192,25,158,163,68,84,59,11,140,199,107,40,167,188,22,173,219,100,116,20,146,12,72,184,159,189,67,196,57,49,211,242,213,139,110,218,1,177,156,73,216,172,243,207,202,244,71,16,111,240,74,92,56,87,115,151,203,161,232,62,150,97,13,15,224,124,113,204,144,6,247,28,194,106,174,105,23,153,58,39,217,235,43,34,210,169,7,51,45,60,21,201,135,170,80,165,3,89,9,26,101,215,132,208,130,41,90,30,123,168,109,44,165,132,153,141,13,189,177,84,80,3,169,125,25,98,230,154,69,157,64,135,21,235,201,11,236,103,253,234,191,247,150,91,194,28,174,106,90,65,2,79,92,244,52,8,147,115,83,63,12,82,101,94,40,161,15,181,9,54,155,61,38,105,205,159,27,158,116,46,45,178,238,251,246,77,97,206,123,62,113,151,245,104,0,44,96,31,200,237,190,70,217,75,222,212,232,74,107,42,229,22,197,215,85,148,207,16,6,129,240,68,186,227,243,254,192,138,173,188,72,4,223,193,117,99,48,26,14,109,76,20,53,47,225,162,204,57,87,242,130,71,172,231,43,149,160,152,209,127,102,126,171,131,202,41,211,60,121,226,29,118,59,86,78,30,219,10,108,228,93,110,239,166,168,164,55,139,50,67,89,183,140,100,210,224,180,250,7,37,175,142,233,24,213,136,111,114,36,241,199,81,35,124,156,33,221,220,134,133,144,66,196,170,216,5,1,18,163,95,249,208,145,88,39,185,56,19,179,51,187,112,137,167,182,34,146,32,73,255,120,122,143,248,128,23,218,49,198,184,195,176,119,17,203,252,214,58,0,9,18,27,36,45,54,63,72,65,90,83,108,101,126,119,144,153,130,139,180,189,166,175,216,209,202,195,252,245,238,231,59,50,41,32,31,22,13,4,115,122,97,104,87,94,69,76,171,162,185,176,143,134,157,148,227,234,241,248,199,206,213,220,118,127,100,109,82,91,64,73,62,55,44,37,26,19,8,1,230,239,244,253,194,203,208,217,174,167,188,181,138,131,152,145,77,68,95,86,105,96,123,114,5,12,23,30,33,40,51,58,221,212,207,198,249,240,235,226,149,156,135,142,177,184,163,170,236,229,254,247,200,193,218,211,164,173,182,191,128,137,146,155,124,117,110,103,88,81,74,67,52,61,38,47,16,25,2,11,215,222,197,204,243,250,225,232,159,150,141,132,187,178,169,160,71,78,85,92,99,106,113,120,15,6,29,20,43,34,57,48,154,147,136,129,190,183,172,165,210,219,192,201,246,255,228,237,10,3,24,17,46,39,60,53,66,75,80,89,102,111,116,125,161,168,179,186,133,140,151,158,233,224,251,242,205,196,223,214,49,56,35,42,21,28,7,14,121,112,107,98,93,84,79,70,0,11,22,29,44,39,58,49,88,83,78,69,116,127,98,105,176,187,166,173,156,151,138,129,232,227,254,245,196,207,210,217,123,112,109,102,87,92,65,74,35,40,53,62,15,4,25,18,203,192,221,214,231,236,241,250,147,152,133,142,191,180,169,162,246,253,224,235,218,209,204,199,174,165,184,179,130,137,148,159,70,77,80,91,106,97,124,119,30,21,8,3,50,57,36,47,141,134,155,144,161,170,183,188,213,222,195,200,249,242,239,228,61,54,43,32,17,26,7,12,101,110,115,120,73,66,95,84,247,252,225,234,219,208,205,198,175,164,185,178,131,136,149,158,71,76,81,90,107,96,125,118,31,20,9,2,51,56,37,46,140,135,154,145,160,171,182,189,212,223,194,201,248,243,238,229,60,55,42,33,16,27,6,13,100,111,114,121,72,67,94,85,1,10,23,28,45,38,59,48,89,82,79,68,117,126,99,104,177,186,167,172,157,150,139,128,233,226,255,244,197,206,211,216,122,113,108,103,86,93,64,75,34,41,52,63,14,5,24,19,202,193,220,215,230,237,240,251,146,153,132,143,190,181,168,163,0,13,26,23,52,57,46,35,104,101,114,127,92,81,70,75,208,221,202,199,228,233,254,243,184,181,162,175,140,129,150,155,187,182,161,172,143,130,149,152,211,222,201,196,231,234,253,240,107,102,113,124,95,82,69,72,3,14,25,20,55,58,45,32,109,96,119,122,89,84,67,78,5,8,31,18,49,60,43,38,189,176,167,170,137,132,147,158,213,216,207,194,225,236,251,246,214,219,204,193,226,239,248,245,190,179,164,169,138,135,144,157,6,11,28,17,50,63,40,37,110,99,116,121,90,87,64,77,218,215,192,205,238,227,244,249,178,191,168,165,134,139,156,145,10,7,16,29,62,51,36,41,98,111,120,117,86,91,76,65,97,108,123,118,85,88,79,66,9,4,19,30,61,48,39,42,177,188,171,166,133,136,159,146,217,212,195,206,237,224,247,250,183,186,173,160,131,142,153,148,223,210,197,200,235,230,241,252,103,106,125,112,83,94,73,68,15,2,21,24,59,54,33,44,12,1,22,27,56,53,34,47,100,105,126,115,80,93,74,71,220,209,198,203,232,229,242,255,180,185,174,163,128,141,154,151,0,14,28,18,56,54,36,42,112,126,108,98,72,70,84,90,224,238,252,242,216,214,196,202,144,158,140,130,168,166,180,186,219,213,199,201,227,237,255,241,171,165,183,185,147,157,143,129,59,53,39,41,3,13,31,17,75,69,87,89,115,125,111,97,173,163,177,191,149,155,137,135,221,211,193,207,229,235,249,247,77,67,81,95,117,123,105,103,61,51,33,47,5,11,25,23,118,120,106,100,78,64,82,92,6,8,26,20,62,48,34,44,150,152,138,132,174,160,178,188,230,232,250,244,222,208,194,204,65,79,93,83,121,119,101,107,49,63,45,35,9,7,21,27,161,175,189,179,153,151,133,139,209,223,205,195,233,231,245,251,154,148,134,136,162,172,190,176,234,228,246,248,210,220,206,192,122,116,102,104,66,76,94,80,10,4,22,24,50,60,46,32,236,226,240,254,212,218,200,198,156,146,128,142,164,170,184,182,12,2,16,30,52,58,40,38,124,114,96,110,68,74,88,86,55,57,43,37,15,1,19,29,71,73,91,85,127,113,99,109,215,217,203,197,239,225,243,253,167,169,187,181,159,145,131,141],Rb=2048,Sb=16,Tb=z.prototype;Tb.reset=B,Tb.process=C,Tb.finish=D;var Ub=A.prototype;Ub.reset=B,Ub.process=F,Ub.finish=G;var Vb=y.prototype;Vb.reset=B,Vb.encrypt=E,Vb.decrypt=H;var Wb=new Uint8Array(1048576),Xb=u(b,null,Wb.buffer),Yb=new y({heap:Wb,asm:Xb});y.encrypt=I,y.decrypt=J,a.AES_CBC=y;var Zb=64,$b=32;O.BLOCK_SIZE=Zb,O.HASH_SIZE=$b;var _b=O.prototype;_b.reset=K,_b.process=L,_b.finish=M;var ac=null,bc=Q.prototype;bc.reset=T,bc.process=U,bc.finish=V,W.BLOCK_SIZE=O.BLOCK_SIZE,W.HMAC_SIZE=O.HASH_SIZE;var cc=W.prototype;cc.reset=X,cc.process=U,cc.finish=Y;var dc=null,ec=$.prototype;ec.reset=_,ec.generate=ab;var fc=bb.prototype;fc.reset=_,fc.generate=cb;var gc,hc=null,ic=function(){function a(){function a(){b^=d<<11,l=l+b|0,d=d+f|0,d^=f>>>2,m=m+d|0,f=f+l|0,f^=l<<8,n=n+f|0,l=l+m|0,l^=m>>>16,o=o+l|0,m=m+n|0,m^=n<<10,p=p+m|0,n=n+o|0,n^=o>>>4,b=b+n|0,o=o+p|0,o^=p<<8,d=d+o|0,p=p+b|0,p^=b>>>9,f=f+p|0,b=b+d|0}var b,d,f,l,m,n,o,p;h=i=j=0,b=d=f=l=m=n=o=p=2654435769;for(var q=0;4>q;q++)a();for(var q=0;256>q;q+=8)b=b+g[0|q]|0,d=d+g[1|q]|0,f=f+g[2|q]|0,l=l+g[3|q]|0,m=m+g[4|q]|0,n=n+g[5|q]|0,o=o+g[6|q]|0,p=p+g[7|q]|0,a(),e.set([b,d,f,l,m,n,o,p],q);for(var q=0;256>q;q+=8)b=b+e[0|q]|0,d=d+e[1|q]|0,f=f+e[2|q]|0,l=l+e[3|q]|0,m=m+e[4|q]|0,n=n+e[5|q]|0,o=o+e[6|q]|0,p=p+e[7|q]|0,a(),e.set([b,d,f,l,m,n,o,p],q);c(1),k=256}function b(b){var c,d,e,h,i;if(q(b))b=new Uint8Array(b.buffer);else if(m(b))h=new Pb(1),h[0]=b,b=new Uint8Array(h.buffer);else if(n(b))b=f(b);else{if(!o(b))throw new TypeError("bad seed type");b=new Uint8Array(b)}for(i=b.length,d=0;i>d;d+=1024){for(e=d,c=0;1024>c&&i>e;e=d|++c)g[c>>2]^=b[e]<<((3&c)<<3);a()}}function c(a){a=a||1;for(var b,c,d;a--;)for(j=j+1|0,i=i+j|0,b=0;256>b;b+=4)h^=h<<13,h=e[b+128&255]+h|0,c=e[0|b],e[0|b]=d=e[c>>>2&255]+(h+i|0)|0,g[0|b]=i=e[d>>>10&255]+c|0,h^=h>>>6,h=e[b+129&255]+h|0,c=e[1|b],e[1|b]=d=e[c>>>2&255]+(h+i|0)|0,g[1|b]=i=e[d>>>10&255]+c|0,h^=h<<2,h=e[b+130&255]+h|0,c=e[2|b],e[2|b]=d=e[c>>>2&255]+(h+i|0)|0,g[2|b]=i=e[d>>>10&255]+c|0,h^=h>>>16,h=e[b+131&255]+h|0,c=e[3|b],e[3|b]=d=e[c>>>2&255]+(h+i|0)|0,g[3|b]=i=e[d>>>10&255]+c|0}function d(){return k--||(c(1),k=255),g[k]}var e=new Uint32Array(256),g=new Uint32Array(256),h=0,i=0,j=0,k=0;return{seed:b,prng:c,rand:d}}(),jc=b.console,kc=b.Date.now,lc=b.Math.random,mc=b.performance,nc=b.crypto||b.msCrypto;void 0!==nc&&(gc=nc.getRandomValues);var oc,pc=ic.rand,qc=ic.seed,rc=0,sc=!1,tc=!1,uc=!1,vc=!1,wc={};if(void 0!==mc)oc=function(){return 1e3*mc.now()|0};else{var xc=1e3*kc()|0;oc=function(){return 1e3*kc()-xc|0}}var yc;yc=void 0===b.Math.imul?function(a,c,d){b.Math.imul=gb;var e=hb(a,c,d);return delete b.Math.imul,e}:hb;var zc=new Uint32Array(1048576),hb=yc(b,null,zc.buffer),Ac=new Uint32Array(0),Bc=jb.prototype=new Number;Bc.toString=kb,Bc.toBytes=lb,Bc.valueOf=mb,Bc.clamp=nb,Bc.slice=ob,Bc.negate=pb,Bc.compare=qb,Bc.add=rb,Bc.subtract=sb,Bc.multiply=tb,Bc.square=ub,Bc.divide=vb;var Cc=new jb(0),Dc=new jb(1);Object.freeze(Cc),Object.freeze(Dc);var Ec=yb.prototype=new jb;Ec.reduce=zb,Ec.inverse=Ab,Ec.power=Bb;var Fc=[2,3];Bc.isProbablePrime=Eb,jb.randomProbablePrime=Gb,jb.ZERO=Cc,jb.ONE=Dc,jb.extGCD=xb,a.BigNumber=jb,a.Modulus=yb;var Gc=Hb.prototype;Gc.reset=Ib,Gc.encrypt=Jb,Gc.decrypt=Kb,Hb.generateKey=Lb;var Hc=Hb;a.RSA={generateKey:Mb},Hc.encrypt=Nb,Hc.decrypt=Ob,Hc.sign=Ob,Hc.verify=Nb,a.RSA_RAW=Hc}({},function(){return this}());
-var sjcl={cipher:{}};sjcl.cipher.aes=function(a){this.a[0][0][0]||this.d();var d,c,g,b,e=this.a[0][4],f=this.a[1];d=a.length;var j=1;this.c=[g=a.slice(0),b=[]];for(a=d;a<4*d+28;a++){c=g[a-1];if(a%d===0||d===8&&a%d===4){c=e[c>>>24]<<24^e[c>>16&255]<<16^e[c>>8&255]<<8^e[c&255];if(a%d===0){c=c<<8^c>>>24^j<<24;j=j<<1^(j>>7)*283}}g[a]=g[a-d]^c}for(d=0;a;d++,a--){c=g[d&3?a:a-4];b[d]=a<=4||d<4?c:f[0][e[c>>>24]]^f[1][e[c>>16&255]]^f[2][e[c>>8&255]]^f[3][e[c&255]]}};sjcl.cipher.aes.prototype={encrypt:function(a){return this.b(a,0)},decrypt:function(a){return this.b(a,1)},a:[[[],[],[],[],[]],[[],[],[],[],[]]],d:function(){var a=this.a[0],d=this.a[1],c=a[4],g=d[4],b,e,f,j=[],l=[],m,i,h,k;for(b=0;b<0x100;b++)l[(j[b]=b<<1^(b>>7)*283)^b]=b;for(e=f=0;!c[e];e^=m||1,f=l[f]||1){h=f^f<<1^f<<2^f<<3^f<<4;h=h>>8^h&255^99;c[e]=h;g[h]=e;i=j[b=j[m=j[e]]];k=i*0x1010101^b*0x10001^m*0x101^e*0x1010100;i=j[h]*0x101^h*0x1010100;for(b=0;b<4;b++){a[b][e]=i=i<<24^i>>>8;d[b][h]=k=k<<24^k>>>8}}for(b=0;b<5;b++){a[b]=a[b].slice(0);d[b]=d[b].slice(0)}},b:function(a,d){var c=this.c[d],g=a[0]^c[0],b=a[d?3:1]^c[1],e=a[2]^c[2];a=a[d?1:3]^c[3];var f,j,l,m=c.length/4-2,i,h=4,k=[0,0,0,0];f=this.a[d];var n=f[0],o=f[1],p=f[2],q=f[3],r=f[4];for(i=0;i<m;i++){f=n[g>>>24]^o[b>>16&255]^p[e>>8&255]^q[a&255]^c[h];j=n[b>>>24]^o[e>>16&255]^p[a>>8&255]^q[g&255]^c[h+1];l=n[e>>>24]^o[a>>16&255]^p[g>>8&255]^q[b&255]^c[h+2];a=n[a>>>24]^o[g>>16&255]^p[b>>8&255]^q[e&255]^c[h+3];h+=4;g=f;b=j;e=l}for(i=0;i<4;i++){k[d?3&-i:i]=r[g>>>24]<<24^r[b>>16&255]<<16^r[e>>8&255]<<8^r[a&255]^c[h++];f=g;g=b;b=e;e=a;a=f}return k}};
-
+(function(exports, global) {
+    global["asmCrypto"] = exports;
+    function IllegalStateError() {
+        var err = Error.apply(this, arguments);
+        this.message = err.message, this.stack = err.stack;
+    }
+    IllegalStateError.prototype = Object.create(Error.prototype, {
+        name: {
+            value: "IllegalStateError"
+        }
+    });
+    function IllegalArgumentError() {
+        var err = Error.apply(this, arguments);
+        this.message = err.message, this.stack = err.stack;
+    }
+    IllegalArgumentError.prototype = Object.create(Error.prototype, {
+        name: {
+            value: "IllegalArgumentError"
+        }
+    });
+    function SecurityError() {
+        var err = Error.apply(this, arguments);
+        this.message = err.message, this.stack = err.stack;
+    }
+    SecurityError.prototype = Object.create(Error.prototype, {
+        name: {
+            value: "SecurityError"
+        }
+    });
+    "use strict";
+    var FloatArray = global.Float64Array || global.Float32Array;
+    function string_to_bytes(str) {
+        var len = str.length, arr = new Uint8Array(len);
+        for (var i = 0; i < len; i++) {
+            var c = str.charCodeAt(i);
+            if (c >>> 8) throw new Error("Wide characters are not allowed");
+            arr[i] = c;
+        }
+        return arr;
+    }
+    function hex_to_bytes(str) {
+        var arr = [], len = str.length, i;
+        if (len & 1) {
+            str = "0" + str;
+            len++;
+        }
+        for (i = 0; i < len; i += 2) {
+            arr.push(parseInt(str.substr(i, 2), 16));
+        }
+        return new Uint8Array(arr);
+    }
+    function base64_to_bytes(str) {
+        return string_to_bytes(atob(str));
+    }
+    function bytes_to_string(arr) {
+        var str = "";
+        for (var i = 0; i < arr.length; i++) str += String.fromCharCode(arr[i]);
+        return str;
+    }
+    function bytes_to_hex(arr) {
+        var str = "";
+        for (var i = 0; i < arr.length; i++) {
+            var h = (arr[i] & 255).toString(16);
+            if (h.length < 2) str += "0";
+            str += h;
+        }
+        return str;
+    }
+    function bytes_to_base64(arr) {
+        return btoa(bytes_to_string(arr));
+    }
+    function pow2_ceil(a) {
+        a -= 1;
+        a |= a >>> 1;
+        a |= a >>> 2;
+        a |= a >>> 4;
+        a |= a >>> 8;
+        a |= a >>> 16;
+        a += 1;
+        return a;
+    }
+    function is_number(a) {
+        return typeof a === "number";
+    }
+    function is_string(a) {
+        return typeof a === "string";
+    }
+    function is_buffer(a) {
+        return a instanceof ArrayBuffer;
+    }
+    function is_bytes(a) {
+        return a instanceof Uint8Array;
+    }
+    function is_typed_array(a) {
+        return a instanceof Int8Array || a instanceof Uint8Array || a instanceof Int16Array || a instanceof Uint16Array || a instanceof Int32Array || a instanceof Uint32Array || a instanceof Float32Array || a instanceof Float64Array;
+    }
+    function _heap_init(constructor, options) {
+        var heap = options.heap, size = heap ? heap.byteLength : options.heapSize || 4096;
+        if (size & 4095 || size <= 0) throw new Error("heap size must be a positive integer and a multiple of 4096");
+        heap = heap || new constructor(new ArrayBuffer(size));
+        return heap;
+    }
+    function _heap_write(heap, hpos, data, dpos, dlen) {
+        var hlen = heap.length - hpos, wlen = hlen < dlen ? hlen : dlen;
+        heap.set(data.subarray(dpos, dpos + wlen), hpos);
+        return wlen;
+    }
+    exports.string_to_bytes = string_to_bytes;
+    exports.hex_to_bytes = hex_to_bytes;
+    exports.base64_to_bytes = base64_to_bytes;
+    exports.bytes_to_string = bytes_to_string;
+    exports.bytes_to_hex = bytes_to_hex;
+    exports.bytes_to_base64 = bytes_to_base64;
+    global.IllegalStateError = IllegalStateError;
+    global.IllegalArgumentError = IllegalArgumentError;
+    global.SecurityError = SecurityError;
+    var _aes_tables = [ 99, 124, 119, 123, 242, 107, 111, 197, 48, 1, 103, 43, 254, 215, 171, 118, 202, 130, 201, 125, 250, 89, 71, 240, 173, 212, 162, 175, 156, 164, 114, 192, 183, 253, 147, 38, 54, 63, 247, 204, 52, 165, 229, 241, 113, 216, 49, 21, 4, 199, 35, 195, 24, 150, 5, 154, 7, 18, 128, 226, 235, 39, 178, 117, 9, 131, 44, 26, 27, 110, 90, 160, 82, 59, 214, 179, 41, 227, 47, 132, 83, 209, 0, 237, 32, 252, 177, 91, 106, 203, 190, 57, 74, 76, 88, 207, 208, 239, 170, 251, 67, 77, 51, 133, 69, 249, 2, 127, 80, 60, 159, 168, 81, 163, 64, 143, 146, 157, 56, 245, 188, 182, 218, 33, 16, 255, 243, 210, 205, 12, 19, 236, 95, 151, 68, 23, 196, 167, 126, 61, 100, 93, 25, 115, 96, 129, 79, 220, 34, 42, 144, 136, 70, 238, 184, 20, 222, 94, 11, 219, 224, 50, 58, 10, 73, 6, 36, 92, 194, 211, 172, 98, 145, 149, 228, 121, 231, 200, 55, 109, 141, 213, 78, 169, 108, 86, 244, 234, 101, 122, 174, 8, 186, 120, 37, 46, 28, 166, 180, 198, 232, 221, 116, 31, 75, 189, 139, 138, 112, 62, 181, 102, 72, 3, 246, 14, 97, 53, 87, 185, 134, 193, 29, 158, 225, 248, 152, 17, 105, 217, 142, 148, 155, 30, 135, 233, 206, 85, 40, 223, 140, 161, 137, 13, 191, 230, 66, 104, 65, 153, 45, 15, 176, 84, 187, 22, 82, 9, 106, 213, 48, 54, 165, 56, 191, 64, 163, 158, 129, 243, 215, 251, 124, 227, 57, 130, 155, 47, 255, 135, 52, 142, 67, 68, 196, 222, 233, 203, 84, 123, 148, 50, 166, 194, 35, 61, 238, 76, 149, 11, 66, 250, 195, 78, 8, 46, 161, 102, 40, 217, 36, 178, 118, 91, 162, 73, 109, 139, 209, 37, 114, 248, 246, 100, 134, 104, 152, 22, 212, 164, 92, 204, 93, 101, 182, 146, 108, 112, 72, 80, 253, 237, 185, 218, 94, 21, 70, 87, 167, 141, 157, 132, 144, 216, 171, 0, 140, 188, 211, 10, 247, 228, 88, 5, 184, 179, 69, 6, 208, 44, 30, 143, 202, 63, 15, 2, 193, 175, 189, 3, 1, 19, 138, 107, 58, 145, 17, 65, 79, 103, 220, 234, 151, 242, 207, 206, 240, 180, 230, 115, 150, 172, 116, 34, 231, 173, 53, 133, 226, 249, 55, 232, 28, 117, 223, 110, 71, 241, 26, 113, 29, 41, 197, 137, 111, 183, 98, 14, 170, 24, 190, 27, 252, 86, 62, 75, 198, 210, 121, 32, 154, 219, 192, 254, 120, 205, 90, 244, 31, 221, 168, 51, 136, 7, 199, 49, 177, 18, 16, 89, 39, 128, 236, 95, 96, 81, 127, 169, 25, 181, 74, 13, 45, 229, 122, 159, 147, 201, 156, 239, 160, 224, 59, 77, 174, 42, 245, 176, 200, 235, 187, 60, 131, 83, 153, 97, 23, 43, 4, 126, 186, 119, 214, 38, 225, 105, 20, 99, 85, 33, 12, 125, 198, 248, 238, 246, 255, 214, 222, 145, 96, 2, 206, 86, 231, 181, 77, 236, 143, 31, 137, 250, 239, 178, 142, 251, 65, 179, 95, 69, 35, 83, 228, 155, 117, 225, 61, 76, 108, 126, 245, 131, 104, 81, 209, 249, 226, 171, 98, 42, 8, 149, 70, 157, 48, 55, 10, 47, 14, 36, 27, 223, 205, 78, 127, 234, 18, 29, 88, 52, 54, 220, 180, 91, 164, 118, 183, 125, 82, 221, 94, 19, 166, 185, 0, 193, 64, 227, 121, 182, 212, 141, 103, 114, 148, 152, 176, 133, 187, 197, 79, 237, 134, 154, 102, 17, 138, 233, 4, 254, 160, 120, 37, 75, 162, 93, 128, 5, 63, 33, 112, 241, 99, 119, 175, 66, 32, 229, 253, 191, 129, 24, 38, 195, 190, 53, 136, 46, 147, 85, 252, 122, 200, 186, 50, 230, 192, 25, 158, 163, 68, 84, 59, 11, 140, 199, 107, 40, 167, 188, 22, 173, 219, 100, 116, 20, 146, 12, 72, 184, 159, 189, 67, 196, 57, 49, 211, 242, 213, 139, 110, 218, 1, 177, 156, 73, 216, 172, 243, 207, 202, 244, 71, 16, 111, 240, 74, 92, 56, 87, 115, 151, 203, 161, 232, 62, 150, 97, 13, 15, 224, 124, 113, 204, 144, 6, 247, 28, 194, 106, 174, 105, 23, 153, 58, 39, 217, 235, 43, 34, 210, 169, 7, 51, 45, 60, 21, 201, 135, 170, 80, 165, 3, 89, 9, 26, 101, 215, 132, 208, 130, 41, 90, 30, 123, 168, 109, 44, 165, 132, 153, 141, 13, 189, 177, 84, 80, 3, 169, 125, 25, 98, 230, 154, 69, 157, 64, 135, 21, 235, 201, 11, 236, 103, 253, 234, 191, 247, 150, 91, 194, 28, 174, 106, 90, 65, 2, 79, 92, 244, 52, 8, 147, 115, 83, 63, 12, 82, 101, 94, 40, 161, 15, 181, 9, 54, 155, 61, 38, 105, 205, 159, 27, 158, 116, 46, 45, 178, 238, 251, 246, 77, 97, 206, 123, 62, 113, 151, 245, 104, 0, 44, 96, 31, 200, 237, 190, 70, 217, 75, 222, 212, 232, 74, 107, 42, 229, 22, 197, 215, 85, 148, 207, 16, 6, 129, 240, 68, 186, 227, 243, 254, 192, 138, 173, 188, 72, 4, 223, 193, 117, 99, 48, 26, 14, 109, 76, 20, 53, 47, 225, 162, 204, 57, 87, 242, 130, 71, 172, 231, 43, 149, 160, 152, 209, 127, 102, 126, 171, 131, 202, 41, 211, 60, 121, 226, 29, 118, 59, 86, 78, 30, 219, 10, 108, 228, 93, 110, 239, 166, 168, 164, 55, 139, 50, 67, 89, 183, 140, 100, 210, 224, 180, 250, 7, 37, 175, 142, 233, 24, 213, 136, 111, 114, 36, 241, 199, 81, 35, 124, 156, 33, 221, 220, 134, 133, 144, 66, 196, 170, 216, 5, 1, 18, 163, 95, 249, 208, 145, 88, 39, 185, 56, 19, 179, 51, 187, 112, 137, 167, 182, 34, 146, 32, 73, 255, 120, 122, 143, 248, 128, 23, 218, 49, 198, 184, 195, 176, 119, 17, 203, 252, 214, 58, 0, 9, 18, 27, 36, 45, 54, 63, 72, 65, 90, 83, 108, 101, 126, 119, 144, 153, 130, 139, 180, 189, 166, 175, 216, 209, 202, 195, 252, 245, 238, 231, 59, 50, 41, 32, 31, 22, 13, 4, 115, 122, 97, 104, 87, 94, 69, 76, 171, 162, 185, 176, 143, 134, 157, 148, 227, 234, 241, 248, 199, 206, 213, 220, 118, 127, 100, 109, 82, 91, 64, 73, 62, 55, 44, 37, 26, 19, 8, 1, 230, 239, 244, 253, 194, 203, 208, 217, 174, 167, 188, 181, 138, 131, 152, 145, 77, 68, 95, 86, 105, 96, 123, 114, 5, 12, 23, 30, 33, 40, 51, 58, 221, 212, 207, 198, 249, 240, 235, 226, 149, 156, 135, 142, 177, 184, 163, 170, 236, 229, 254, 247, 200, 193, 218, 211, 164, 173, 182, 191, 128, 137, 146, 155, 124, 117, 110, 103, 88, 81, 74, 67, 52, 61, 38, 47, 16, 25, 2, 11, 215, 222, 197, 204, 243, 250, 225, 232, 159, 150, 141, 132, 187, 178, 169, 160, 71, 78, 85, 92, 99, 106, 113, 120, 15, 6, 29, 20, 43, 34, 57, 48, 154, 147, 136, 129, 190, 183, 172, 165, 210, 219, 192, 201, 246, 255, 228, 237, 10, 3, 24, 17, 46, 39, 60, 53, 66, 75, 80, 89, 102, 111, 116, 125, 161, 168, 179, 186, 133, 140, 151, 158, 233, 224, 251, 242, 205, 196, 223, 214, 49, 56, 35, 42, 21, 28, 7, 14, 121, 112, 107, 98, 93, 84, 79, 70, 0, 11, 22, 29, 44, 39, 58, 49, 88, 83, 78, 69, 116, 127, 98, 105, 176, 187, 166, 173, 156, 151, 138, 129, 232, 227, 254, 245, 196, 207, 210, 217, 123, 112, 109, 102, 87, 92, 65, 74, 35, 40, 53, 62, 15, 4, 25, 18, 203, 192, 221, 214, 231, 236, 241, 250, 147, 152, 133, 142, 191, 180, 169, 162, 246, 253, 224, 235, 218, 209, 204, 199, 174, 165, 184, 179, 130, 137, 148, 159, 70, 77, 80, 91, 106, 97, 124, 119, 30, 21, 8, 3, 50, 57, 36, 47, 141, 134, 155, 144, 161, 170, 183, 188, 213, 222, 195, 200, 249, 242, 239, 228, 61, 54, 43, 32, 17, 26, 7, 12, 101, 110, 115, 120, 73, 66, 95, 84, 247, 252, 225, 234, 219, 208, 205, 198, 175, 164, 185, 178, 131, 136, 149, 158, 71, 76, 81, 90, 107, 96, 125, 118, 31, 20, 9, 2, 51, 56, 37, 46, 140, 135, 154, 145, 160, 171, 182, 189, 212, 223, 194, 201, 248, 243, 238, 229, 60, 55, 42, 33, 16, 27, 6, 13, 100, 111, 114, 121, 72, 67, 94, 85, 1, 10, 23, 28, 45, 38, 59, 48, 89, 82, 79, 68, 117, 126, 99, 104, 177, 186, 167, 172, 157, 150, 139, 128, 233, 226, 255, 244, 197, 206, 211, 216, 122, 113, 108, 103, 86, 93, 64, 75, 34, 41, 52, 63, 14, 5, 24, 19, 202, 193, 220, 215, 230, 237, 240, 251, 146, 153, 132, 143, 190, 181, 168, 163, 0, 13, 26, 23, 52, 57, 46, 35, 104, 101, 114, 127, 92, 81, 70, 75, 208, 221, 202, 199, 228, 233, 254, 243, 184, 181, 162, 175, 140, 129, 150, 155, 187, 182, 161, 172, 143, 130, 149, 152, 211, 222, 201, 196, 231, 234, 253, 240, 107, 102, 113, 124, 95, 82, 69, 72, 3, 14, 25, 20, 55, 58, 45, 32, 109, 96, 119, 122, 89, 84, 67, 78, 5, 8, 31, 18, 49, 60, 43, 38, 189, 176, 167, 170, 137, 132, 147, 158, 213, 216, 207, 194, 225, 236, 251, 246, 214, 219, 204, 193, 226, 239, 248, 245, 190, 179, 164, 169, 138, 135, 144, 157, 6, 11, 28, 17, 50, 63, 40, 37, 110, 99, 116, 121, 90, 87, 64, 77, 218, 215, 192, 205, 238, 227, 244, 249, 178, 191, 168, 165, 134, 139, 156, 145, 10, 7, 16, 29, 62, 51, 36, 41, 98, 111, 120, 117, 86, 91, 76, 65, 97, 108, 123, 118, 85, 88, 79, 66, 9, 4, 19, 30, 61, 48, 39, 42, 177, 188, 171, 166, 133, 136, 159, 146, 217, 212, 195, 206, 237, 224, 247, 250, 183, 186, 173, 160, 131, 142, 153, 148, 223, 210, 197, 200, 235, 230, 241, 252, 103, 106, 125, 112, 83, 94, 73, 68, 15, 2, 21, 24, 59, 54, 33, 44, 12, 1, 22, 27, 56, 53, 34, 47, 100, 105, 126, 115, 80, 93, 74, 71, 220, 209, 198, 203, 232, 229, 242, 255, 180, 185, 174, 163, 128, 141, 154, 151, 0, 14, 28, 18, 56, 54, 36, 42, 112, 126, 108, 98, 72, 70, 84, 90, 224, 238, 252, 242, 216, 214, 196, 202, 144, 158, 140, 130, 168, 166, 180, 186, 219, 213, 199, 201, 227, 237, 255, 241, 171, 165, 183, 185, 147, 157, 143, 129, 59, 53, 39, 41, 3, 13, 31, 17, 75, 69, 87, 89, 115, 125, 111, 97, 173, 163, 177, 191, 149, 155, 137, 135, 221, 211, 193, 207, 229, 235, 249, 247, 77, 67, 81, 95, 117, 123, 105, 103, 61, 51, 33, 47, 5, 11, 25, 23, 118, 120, 106, 100, 78, 64, 82, 92, 6, 8, 26, 20, 62, 48, 34, 44, 150, 152, 138, 132, 174, 160, 178, 188, 230, 232, 250, 244, 222, 208, 194, 204, 65, 79, 93, 83, 121, 119, 101, 107, 49, 63, 45, 35, 9, 7, 21, 27, 161, 175, 189, 179, 153, 151, 133, 139, 209, 223, 205, 195, 233, 231, 245, 251, 154, 148, 134, 136, 162, 172, 190, 176, 234, 228, 246, 248, 210, 220, 206, 192, 122, 116, 102, 104, 66, 76, 94, 80, 10, 4, 22, 24, 50, 60, 46, 32, 236, 226, 240, 254, 212, 218, 200, 198, 156, 146, 128, 142, 164, 170, 184, 182, 12, 2, 16, 30, 52, 58, 40, 38, 124, 114, 96, 110, 68, 74, 88, 86, 55, 57, 43, 37, 15, 1, 19, 29, 71, 73, 91, 85, 127, 113, 99, 109, 215, 217, 203, 197, 239, 225, 243, 253, 167, 169, 187, 181, 159, 145, 131, 141 ];
+    var _aes_heap_start = 2048;
+    function _aes_asm(stdlib, foreign, buffer) {
+        "use asm";
+        var S0 = 0, S1 = 0, S2 = 0, S3 = 0, S4 = 0, S5 = 0, S6 = 0, S7 = 0, S8 = 0, S9 = 0, SA = 0, SB = 0, SC = 0, SD = 0, SE = 0, SF = 0;
+        var keySize = 0;
+        var H0 = 0, H1 = 0, H2 = 0, H3 = 0, Z0 = 0, Z1 = 0, Z2 = 0, Z3 = 0;
+        var R00 = 0, R01 = 0, R02 = 0, R03 = 0, R04 = 0, R05 = 0, R06 = 0, R07 = 0, R08 = 0, R09 = 0, R0A = 0, R0B = 0, R0C = 0, R0D = 0, R0E = 0, R0F = 0, R10 = 0, R11 = 0, R12 = 0, R13 = 0, R14 = 0, R15 = 0, R16 = 0, R17 = 0, R18 = 0, R19 = 0, R1A = 0, R1B = 0, R1C = 0, R1D = 0, R1E = 0, R1F = 0, R20 = 0, R21 = 0, R22 = 0, R23 = 0, R24 = 0, R25 = 0, R26 = 0, R27 = 0, R28 = 0, R29 = 0, R2A = 0, R2B = 0, R2C = 0, R2D = 0, R2E = 0, R2F = 0, R30 = 0, R31 = 0, R32 = 0, R33 = 0, R34 = 0, R35 = 0, R36 = 0, R37 = 0, R38 = 0, R39 = 0, R3A = 0, R3B = 0, R3C = 0, R3D = 0, R3E = 0, R3F = 0, R40 = 0, R41 = 0, R42 = 0, R43 = 0, R44 = 0, R45 = 0, R46 = 0, R47 = 0, R48 = 0, R49 = 0, R4A = 0, R4B = 0, R4C = 0, R4D = 0, R4E = 0, R4F = 0, R50 = 0, R51 = 0, R52 = 0, R53 = 0, R54 = 0, R55 = 0, R56 = 0, R57 = 0, R58 = 0, R59 = 0, R5A = 0, R5B = 0, R5C = 0, R5D = 0, R5E = 0, R5F = 0, R60 = 0, R61 = 0, R62 = 0, R63 = 0, R64 = 0, R65 = 0, R66 = 0, R67 = 0, R68 = 0, R69 = 0, R6A = 0, R6B = 0, R6C = 0, R6D = 0, R6E = 0, R6F = 0, R70 = 0, R71 = 0, R72 = 0, R73 = 0, R74 = 0, R75 = 0, R76 = 0, R77 = 0, R78 = 0, R79 = 0, R7A = 0, R7B = 0, R7C = 0, R7D = 0, R7E = 0, R7F = 0, R80 = 0, R81 = 0, R82 = 0, R83 = 0, R84 = 0, R85 = 0, R86 = 0, R87 = 0, R88 = 0, R89 = 0, R8A = 0, R8B = 0, R8C = 0, R8D = 0, R8E = 0, R8F = 0, R90 = 0, R91 = 0, R92 = 0, R93 = 0, R94 = 0, R95 = 0, R96 = 0, R97 = 0, R98 = 0, R99 = 0, R9A = 0, R9B = 0, R9C = 0, R9D = 0, R9E = 0, R9F = 0, RA0 = 0, RA1 = 0, RA2 = 0, RA3 = 0, RA4 = 0, RA5 = 0, RA6 = 0, RA7 = 0, RA8 = 0, RA9 = 0, RAA = 0, RAB = 0, RAC = 0, RAD = 0, RAE = 0, RAF = 0, RB0 = 0, RB1 = 0, RB2 = 0, RB3 = 0, RB4 = 0, RB5 = 0, RB6 = 0, RB7 = 0, RB8 = 0, RB9 = 0, RBA = 0, RBB = 0, RBC = 0, RBD = 0, RBE = 0, RBF = 0, RC0 = 0, RC1 = 0, RC2 = 0, RC3 = 0, RC4 = 0, RC5 = 0, RC6 = 0, RC7 = 0, RC8 = 0, RC9 = 0, RCA = 0, RCB = 0, RCC = 0, RCD = 0, RCE = 0, RCF = 0, RD0 = 0, RD1 = 0, RD2 = 0, RD3 = 0, RD4 = 0, RD5 = 0, RD6 = 0, RD7 = 0, RD8 = 0, RD9 = 0, RDA = 0, RDB = 0, RDC = 0, RDD = 0, RDE = 0, RDF = 0, RE0 = 0, RE1 = 0, RE2 = 0, RE3 = 0, RE4 = 0, RE5 = 0, RE6 = 0, RE7 = 0, RE8 = 0, RE9 = 0, REA = 0, REB = 0, REC = 0, RED = 0, REE = 0, REF = 0;
+        var HEAP = new stdlib.Uint8Array(buffer);
+        function _expand_key_128() {
+            var sbox = 0;
+            R10 = R00 ^ HEAP[sbox | R0D] ^ 1;
+            R11 = R01 ^ HEAP[sbox | R0E];
+            R12 = R02 ^ HEAP[sbox | R0F];
+            R13 = R03 ^ HEAP[sbox | R0C];
+            R14 = R04 ^ R10;
+            R15 = R05 ^ R11;
+            R16 = R06 ^ R12;
+            R17 = R07 ^ R13;
+            R18 = R08 ^ R14;
+            R19 = R09 ^ R15;
+            R1A = R0A ^ R16;
+            R1B = R0B ^ R17;
+            R1C = R0C ^ R18;
+            R1D = R0D ^ R19;
+            R1E = R0E ^ R1A;
+            R1F = R0F ^ R1B;
+            R20 = R10 ^ HEAP[sbox | R1D] ^ 2;
+            R21 = R11 ^ HEAP[sbox | R1E];
+            R22 = R12 ^ HEAP[sbox | R1F];
+            R23 = R13 ^ HEAP[sbox | R1C];
+            R24 = R14 ^ R20;
+            R25 = R15 ^ R21;
+            R26 = R16 ^ R22;
+            R27 = R17 ^ R23;
+            R28 = R18 ^ R24;
+            R29 = R19 ^ R25;
+            R2A = R1A ^ R26;
+            R2B = R1B ^ R27;
+            R2C = R1C ^ R28;
+            R2D = R1D ^ R29;
+            R2E = R1E ^ R2A;
+            R2F = R1F ^ R2B;
+            R30 = R20 ^ HEAP[sbox | R2D] ^ 4;
+            R31 = R21 ^ HEAP[sbox | R2E];
+            R32 = R22 ^ HEAP[sbox | R2F];
+            R33 = R23 ^ HEAP[sbox | R2C];
+            R34 = R24 ^ R30;
+            R35 = R25 ^ R31;
+            R36 = R26 ^ R32;
+            R37 = R27 ^ R33;
+            R38 = R28 ^ R34;
+            R39 = R29 ^ R35;
+            R3A = R2A ^ R36;
+            R3B = R2B ^ R37;
+            R3C = R2C ^ R38;
+            R3D = R2D ^ R39;
+            R3E = R2E ^ R3A;
+            R3F = R2F ^ R3B;
+            R40 = R30 ^ HEAP[sbox | R3D] ^ 8;
+            R41 = R31 ^ HEAP[sbox | R3E];
+            R42 = R32 ^ HEAP[sbox | R3F];
+            R43 = R33 ^ HEAP[sbox | R3C];
+            R44 = R34 ^ R40;
+            R45 = R35 ^ R41;
+            R46 = R36 ^ R42;
+            R47 = R37 ^ R43;
+            R48 = R38 ^ R44;
+            R49 = R39 ^ R45;
+            R4A = R3A ^ R46;
+            R4B = R3B ^ R47;
+            R4C = R3C ^ R48;
+            R4D = R3D ^ R49;
+            R4E = R3E ^ R4A;
+            R4F = R3F ^ R4B;
+            R50 = R40 ^ HEAP[sbox | R4D] ^ 16;
+            R51 = R41 ^ HEAP[sbox | R4E];
+            R52 = R42 ^ HEAP[sbox | R4F];
+            R53 = R43 ^ HEAP[sbox | R4C];
+            R54 = R44 ^ R50;
+            R55 = R45 ^ R51;
+            R56 = R46 ^ R52;
+            R57 = R47 ^ R53;
+            R58 = R48 ^ R54;
+            R59 = R49 ^ R55;
+            R5A = R4A ^ R56;
+            R5B = R4B ^ R57;
+            R5C = R4C ^ R58;
+            R5D = R4D ^ R59;
+            R5E = R4E ^ R5A;
+            R5F = R4F ^ R5B;
+            R60 = R50 ^ HEAP[sbox | R5D] ^ 32;
+            R61 = R51 ^ HEAP[sbox | R5E];
+            R62 = R52 ^ HEAP[sbox | R5F];
+            R63 = R53 ^ HEAP[sbox | R5C];
+            R64 = R54 ^ R60;
+            R65 = R55 ^ R61;
+            R66 = R56 ^ R62;
+            R67 = R57 ^ R63;
+            R68 = R58 ^ R64;
+            R69 = R59 ^ R65;
+            R6A = R5A ^ R66;
+            R6B = R5B ^ R67;
+            R6C = R5C ^ R68;
+            R6D = R5D ^ R69;
+            R6E = R5E ^ R6A;
+            R6F = R5F ^ R6B;
+            R70 = R60 ^ HEAP[sbox | R6D] ^ 64;
+            R71 = R61 ^ HEAP[sbox | R6E];
+            R72 = R62 ^ HEAP[sbox | R6F];
+            R73 = R63 ^ HEAP[sbox | R6C];
+            R74 = R64 ^ R70;
+            R75 = R65 ^ R71;
+            R76 = R66 ^ R72;
+            R77 = R67 ^ R73;
+            R78 = R68 ^ R74;
+            R79 = R69 ^ R75;
+            R7A = R6A ^ R76;
+            R7B = R6B ^ R77;
+            R7C = R6C ^ R78;
+            R7D = R6D ^ R79;
+            R7E = R6E ^ R7A;
+            R7F = R6F ^ R7B;
+            R80 = R70 ^ HEAP[sbox | R7D] ^ 128;
+            R81 = R71 ^ HEAP[sbox | R7E];
+            R82 = R72 ^ HEAP[sbox | R7F];
+            R83 = R73 ^ HEAP[sbox | R7C];
+            R84 = R74 ^ R80;
+            R85 = R75 ^ R81;
+            R86 = R76 ^ R82;
+            R87 = R77 ^ R83;
+            R88 = R78 ^ R84;
+            R89 = R79 ^ R85;
+            R8A = R7A ^ R86;
+            R8B = R7B ^ R87;
+            R8C = R7C ^ R88;
+            R8D = R7D ^ R89;
+            R8E = R7E ^ R8A;
+            R8F = R7F ^ R8B;
+            R90 = R80 ^ HEAP[sbox | R8D] ^ 27;
+            R91 = R81 ^ HEAP[sbox | R8E];
+            R92 = R82 ^ HEAP[sbox | R8F];
+            R93 = R83 ^ HEAP[sbox | R8C];
+            R94 = R84 ^ R90;
+            R95 = R85 ^ R91;
+            R96 = R86 ^ R92;
+            R97 = R87 ^ R93;
+            R98 = R88 ^ R94;
+            R99 = R89 ^ R95;
+            R9A = R8A ^ R96;
+            R9B = R8B ^ R97;
+            R9C = R8C ^ R98;
+            R9D = R8D ^ R99;
+            R9E = R8E ^ R9A;
+            R9F = R8F ^ R9B;
+            RA0 = R90 ^ HEAP[sbox | R9D] ^ 54;
+            RA1 = R91 ^ HEAP[sbox | R9E];
+            RA2 = R92 ^ HEAP[sbox | R9F];
+            RA3 = R93 ^ HEAP[sbox | R9C];
+            RA4 = R94 ^ RA0;
+            RA5 = R95 ^ RA1;
+            RA6 = R96 ^ RA2;
+            RA7 = R97 ^ RA3;
+            RA8 = R98 ^ RA4;
+            RA9 = R99 ^ RA5;
+            RAA = R9A ^ RA6;
+            RAB = R9B ^ RA7;
+            RAC = R9C ^ RA8;
+            RAD = R9D ^ RA9;
+            RAE = R9E ^ RAA;
+            RAF = R9F ^ RAB;
+        }
+        function _expand_key_256() {
+            var sbox = 0;
+            R20 = R00 ^ HEAP[sbox | R1D] ^ 1;
+            R21 = R01 ^ HEAP[sbox | R1E];
+            R22 = R02 ^ HEAP[sbox | R1F];
+            R23 = R03 ^ HEAP[sbox | R1C];
+            R24 = R04 ^ R20;
+            R25 = R05 ^ R21;
+            R26 = R06 ^ R22;
+            R27 = R07 ^ R23;
+            R28 = R08 ^ R24;
+            R29 = R09 ^ R25;
+            R2A = R0A ^ R26;
+            R2B = R0B ^ R27;
+            R2C = R0C ^ R28;
+            R2D = R0D ^ R29;
+            R2E = R0E ^ R2A;
+            R2F = R0F ^ R2B;
+            R30 = R10 ^ HEAP[sbox | R2C];
+            R31 = R11 ^ HEAP[sbox | R2D];
+            R32 = R12 ^ HEAP[sbox | R2E];
+            R33 = R13 ^ HEAP[sbox | R2F];
+            R34 = R14 ^ R30;
+            R35 = R15 ^ R31;
+            R36 = R16 ^ R32;
+            R37 = R17 ^ R33;
+            R38 = R18 ^ R34;
+            R39 = R19 ^ R35;
+            R3A = R1A ^ R36;
+            R3B = R1B ^ R37;
+            R3C = R1C ^ R38;
+            R3D = R1D ^ R39;
+            R3E = R1E ^ R3A;
+            R3F = R1F ^ R3B;
+            R40 = R20 ^ HEAP[sbox | R3D] ^ 2;
+            R41 = R21 ^ HEAP[sbox | R3E];
+            R42 = R22 ^ HEAP[sbox | R3F];
+            R43 = R23 ^ HEAP[sbox | R3C];
+            R44 = R24 ^ R40;
+            R45 = R25 ^ R41;
+            R46 = R26 ^ R42;
+            R47 = R27 ^ R43;
+            R48 = R28 ^ R44;
+            R49 = R29 ^ R45;
+            R4A = R2A ^ R46;
+            R4B = R2B ^ R47;
+            R4C = R2C ^ R48;
+            R4D = R2D ^ R49;
+            R4E = R2E ^ R4A;
+            R4F = R2F ^ R4B;
+            R50 = R30 ^ HEAP[sbox | R4C];
+            R51 = R31 ^ HEAP[sbox | R4D];
+            R52 = R32 ^ HEAP[sbox | R4E];
+            R53 = R33 ^ HEAP[sbox | R4F];
+            R54 = R34 ^ R50;
+            R55 = R35 ^ R51;
+            R56 = R36 ^ R52;
+            R57 = R37 ^ R53;
+            R58 = R38 ^ R54;
+            R59 = R39 ^ R55;
+            R5A = R3A ^ R56;
+            R5B = R3B ^ R57;
+            R5C = R3C ^ R58;
+            R5D = R3D ^ R59;
+            R5E = R3E ^ R5A;
+            R5F = R3F ^ R5B;
+            R60 = R40 ^ HEAP[sbox | R5D] ^ 4;
+            R61 = R41 ^ HEAP[sbox | R5E];
+            R62 = R42 ^ HEAP[sbox | R5F];
+            R63 = R43 ^ HEAP[sbox | R5C];
+            R64 = R44 ^ R60;
+            R65 = R45 ^ R61;
+            R66 = R46 ^ R62;
+            R67 = R47 ^ R63;
+            R68 = R48 ^ R64;
+            R69 = R49 ^ R65;
+            R6A = R4A ^ R66;
+            R6B = R4B ^ R67;
+            R6C = R4C ^ R68;
+            R6D = R4D ^ R69;
+            R6E = R4E ^ R6A;
+            R6F = R4F ^ R6B;
+            R70 = R50 ^ HEAP[sbox | R6C];
+            R71 = R51 ^ HEAP[sbox | R6D];
+            R72 = R52 ^ HEAP[sbox | R6E];
+            R73 = R53 ^ HEAP[sbox | R6F];
+            R74 = R54 ^ R70;
+            R75 = R55 ^ R71;
+            R76 = R56 ^ R72;
+            R77 = R57 ^ R73;
+            R78 = R58 ^ R74;
+            R79 = R59 ^ R75;
+            R7A = R5A ^ R76;
+            R7B = R5B ^ R77;
+            R7C = R5C ^ R78;
+            R7D = R5D ^ R79;
+            R7E = R5E ^ R7A;
+            R7F = R5F ^ R7B;
+            R80 = R60 ^ HEAP[sbox | R7D] ^ 8;
+            R81 = R61 ^ HEAP[sbox | R7E];
+            R82 = R62 ^ HEAP[sbox | R7F];
+            R83 = R63 ^ HEAP[sbox | R7C];
+            R84 = R64 ^ R80;
+            R85 = R65 ^ R81;
+            R86 = R66 ^ R82;
+            R87 = R67 ^ R83;
+            R88 = R68 ^ R84;
+            R89 = R69 ^ R85;
+            R8A = R6A ^ R86;
+            R8B = R6B ^ R87;
+            R8C = R6C ^ R88;
+            R8D = R6D ^ R89;
+            R8E = R6E ^ R8A;
+            R8F = R6F ^ R8B;
+            R90 = R70 ^ HEAP[sbox | R8C];
+            R91 = R71 ^ HEAP[sbox | R8D];
+            R92 = R72 ^ HEAP[sbox | R8E];
+            R93 = R73 ^ HEAP[sbox | R8F];
+            R94 = R74 ^ R90;
+            R95 = R75 ^ R91;
+            R96 = R76 ^ R92;
+            R97 = R77 ^ R93;
+            R98 = R78 ^ R94;
+            R99 = R79 ^ R95;
+            R9A = R7A ^ R96;
+            R9B = R7B ^ R97;
+            R9C = R7C ^ R98;
+            R9D = R7D ^ R99;
+            R9E = R7E ^ R9A;
+            R9F = R7F ^ R9B;
+            RA0 = R80 ^ HEAP[sbox | R9D] ^ 16;
+            RA1 = R81 ^ HEAP[sbox | R9E];
+            RA2 = R82 ^ HEAP[sbox | R9F];
+            RA3 = R83 ^ HEAP[sbox | R9C];
+            RA4 = R84 ^ RA0;
+            RA5 = R85 ^ RA1;
+            RA6 = R86 ^ RA2;
+            RA7 = R87 ^ RA3;
+            RA8 = R88 ^ RA4;
+            RA9 = R89 ^ RA5;
+            RAA = R8A ^ RA6;
+            RAB = R8B ^ RA7;
+            RAC = R8C ^ RA8;
+            RAD = R8D ^ RA9;
+            RAE = R8E ^ RAA;
+            RAF = R8F ^ RAB;
+            RB0 = R90 ^ HEAP[sbox | RAC];
+            RB1 = R91 ^ HEAP[sbox | RAD];
+            RB2 = R92 ^ HEAP[sbox | RAE];
+            RB3 = R93 ^ HEAP[sbox | RAF];
+            RB4 = R94 ^ RB0;
+            RB5 = R95 ^ RB1;
+            RB6 = R96 ^ RB2;
+            RB7 = R97 ^ RB3;
+            RB8 = R98 ^ RB4;
+            RB9 = R99 ^ RB5;
+            RBA = R9A ^ RB6;
+            RBB = R9B ^ RB7;
+            RBC = R9C ^ RB8;
+            RBD = R9D ^ RB9;
+            RBE = R9E ^ RBA;
+            RBF = R9F ^ RBB;
+            RC0 = RA0 ^ HEAP[sbox | RBD] ^ 32;
+            RC1 = RA1 ^ HEAP[sbox | RBE];
+            RC2 = RA2 ^ HEAP[sbox | RBF];
+            RC3 = RA3 ^ HEAP[sbox | RBC];
+            RC4 = RA4 ^ RC0;
+            RC5 = RA5 ^ RC1;
+            RC6 = RA6 ^ RC2;
+            RC7 = RA7 ^ RC3;
+            RC8 = RA8 ^ RC4;
+            RC9 = RA9 ^ RC5;
+            RCA = RAA ^ RC6;
+            RCB = RAB ^ RC7;
+            RCC = RAC ^ RC8;
+            RCD = RAD ^ RC9;
+            RCE = RAE ^ RCA;
+            RCF = RAF ^ RCB;
+            RD0 = RB0 ^ HEAP[sbox | RCC];
+            RD1 = RB1 ^ HEAP[sbox | RCD];
+            RD2 = RB2 ^ HEAP[sbox | RCE];
+            RD3 = RB3 ^ HEAP[sbox | RCF];
+            RD4 = RB4 ^ RD0;
+            RD5 = RB5 ^ RD1;
+            RD6 = RB6 ^ RD2;
+            RD7 = RB7 ^ RD3;
+            RD8 = RB8 ^ RD4;
+            RD9 = RB9 ^ RD5;
+            RDA = RBA ^ RD6;
+            RDB = RBB ^ RD7;
+            RDC = RBC ^ RD8;
+            RDD = RBD ^ RD9;
+            RDE = RBE ^ RDA;
+            RDF = RBF ^ RDB;
+            RE0 = RC0 ^ HEAP[sbox | RDD] ^ 64;
+            RE1 = RC1 ^ HEAP[sbox | RDE];
+            RE2 = RC2 ^ HEAP[sbox | RDF];
+            RE3 = RC3 ^ HEAP[sbox | RDC];
+            RE4 = RC4 ^ RE0;
+            RE5 = RC5 ^ RE1;
+            RE6 = RC6 ^ RE2;
+            RE7 = RC7 ^ RE3;
+            RE8 = RC8 ^ RE4;
+            RE9 = RC9 ^ RE5;
+            REA = RCA ^ RE6;
+            REB = RCB ^ RE7;
+            REC = RCC ^ RE8;
+            RED = RCD ^ RE9;
+            REE = RCE ^ REA;
+            REF = RCF ^ REB;
+        }
+        function _encrypt(s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, sA, sB, sC, sD, sE, sF) {
+            s0 = s0 | 0;
+            s1 = s1 | 0;
+            s2 = s2 | 0;
+            s3 = s3 | 0;
+            s4 = s4 | 0;
+            s5 = s5 | 0;
+            s6 = s6 | 0;
+            s7 = s7 | 0;
+            s8 = s8 | 0;
+            s9 = s9 | 0;
+            sA = sA | 0;
+            sB = sB | 0;
+            sC = sC | 0;
+            sD = sD | 0;
+            sE = sE | 0;
+            sF = sF | 0;
+            var t0 = 0, t1 = 0, t2 = 0, t3 = 0, t4 = 0, t5 = 0, t6 = 0, t7 = 0, t8 = 0, t9 = 0, tA = 0, tB = 0, tC = 0, tD = 0, tE = 0, tF = 0, sbox = 0, x2_sbox = 512, x3_sbox = 768;
+            s0 = s0 ^ R00;
+            s1 = s1 ^ R01;
+            s2 = s2 ^ R02;
+            s3 = s3 ^ R03;
+            s4 = s4 ^ R04;
+            s5 = s5 ^ R05;
+            s6 = s6 ^ R06;
+            s7 = s7 ^ R07;
+            s8 = s8 ^ R08;
+            s9 = s9 ^ R09;
+            sA = sA ^ R0A;
+            sB = sB ^ R0B;
+            sC = sC ^ R0C;
+            sD = sD ^ R0D;
+            sE = sE ^ R0E;
+            sF = sF ^ R0F;
+            t0 = HEAP[x2_sbox | s0] ^ HEAP[x3_sbox | s5] ^ HEAP[sbox | sA] ^ HEAP[sbox | sF] ^ R10;
+            t1 = HEAP[sbox | s0] ^ HEAP[x2_sbox | s5] ^ HEAP[x3_sbox | sA] ^ HEAP[sbox | sF] ^ R11;
+            t2 = HEAP[sbox | s0] ^ HEAP[sbox | s5] ^ HEAP[x2_sbox | sA] ^ HEAP[x3_sbox | sF] ^ R12;
+            t3 = HEAP[x3_sbox | s0] ^ HEAP[sbox | s5] ^ HEAP[sbox | sA] ^ HEAP[x2_sbox | sF] ^ R13;
+            t4 = HEAP[x2_sbox | s4] ^ HEAP[x3_sbox | s9] ^ HEAP[sbox | sE] ^ HEAP[sbox | s3] ^ R14;
+            t5 = HEAP[sbox | s4] ^ HEAP[x2_sbox | s9] ^ HEAP[x3_sbox | sE] ^ HEAP[sbox | s3] ^ R15;
+            t6 = HEAP[sbox | s4] ^ HEAP[sbox | s9] ^ HEAP[x2_sbox | sE] ^ HEAP[x3_sbox | s3] ^ R16;
+            t7 = HEAP[x3_sbox | s4] ^ HEAP[sbox | s9] ^ HEAP[sbox | sE] ^ HEAP[x2_sbox | s3] ^ R17;
+            t8 = HEAP[x2_sbox | s8] ^ HEAP[x3_sbox | sD] ^ HEAP[sbox | s2] ^ HEAP[sbox | s7] ^ R18;
+            t9 = HEAP[sbox | s8] ^ HEAP[x2_sbox | sD] ^ HEAP[x3_sbox | s2] ^ HEAP[sbox | s7] ^ R19;
+            tA = HEAP[sbox | s8] ^ HEAP[sbox | sD] ^ HEAP[x2_sbox | s2] ^ HEAP[x3_sbox | s7] ^ R1A;
+            tB = HEAP[x3_sbox | s8] ^ HEAP[sbox | sD] ^ HEAP[sbox | s2] ^ HEAP[x2_sbox | s7] ^ R1B;
+            tC = HEAP[x2_sbox | sC] ^ HEAP[x3_sbox | s1] ^ HEAP[sbox | s6] ^ HEAP[sbox | sB] ^ R1C;
+            tD = HEAP[sbox | sC] ^ HEAP[x2_sbox | s1] ^ HEAP[x3_sbox | s6] ^ HEAP[sbox | sB] ^ R1D;
+            tE = HEAP[sbox | sC] ^ HEAP[sbox | s1] ^ HEAP[x2_sbox | s6] ^ HEAP[x3_sbox | sB] ^ R1E;
+            tF = HEAP[x3_sbox | sC] ^ HEAP[sbox | s1] ^ HEAP[sbox | s6] ^ HEAP[x2_sbox | sB] ^ R1F;
+            s0 = HEAP[x2_sbox | t0] ^ HEAP[x3_sbox | t5] ^ HEAP[sbox | tA] ^ HEAP[sbox | tF] ^ R20;
+            s1 = HEAP[sbox | t0] ^ HEAP[x2_sbox | t5] ^ HEAP[x3_sbox | tA] ^ HEAP[sbox | tF] ^ R21;
+            s2 = HEAP[sbox | t0] ^ HEAP[sbox | t5] ^ HEAP[x2_sbox | tA] ^ HEAP[x3_sbox | tF] ^ R22;
+            s3 = HEAP[x3_sbox | t0] ^ HEAP[sbox | t5] ^ HEAP[sbox | tA] ^ HEAP[x2_sbox | tF] ^ R23;
+            s4 = HEAP[x2_sbox | t4] ^ HEAP[x3_sbox | t9] ^ HEAP[sbox | tE] ^ HEAP[sbox | t3] ^ R24;
+            s5 = HEAP[sbox | t4] ^ HEAP[x2_sbox | t9] ^ HEAP[x3_sbox | tE] ^ HEAP[sbox | t3] ^ R25;
+            s6 = HEAP[sbox | t4] ^ HEAP[sbox | t9] ^ HEAP[x2_sbox | tE] ^ HEAP[x3_sbox | t3] ^ R26;
+            s7 = HEAP[x3_sbox | t4] ^ HEAP[sbox | t9] ^ HEAP[sbox | tE] ^ HEAP[x2_sbox | t3] ^ R27;
+            s8 = HEAP[x2_sbox | t8] ^ HEAP[x3_sbox | tD] ^ HEAP[sbox | t2] ^ HEAP[sbox | t7] ^ R28;
+            s9 = HEAP[sbox | t8] ^ HEAP[x2_sbox | tD] ^ HEAP[x3_sbox | t2] ^ HEAP[sbox | t7] ^ R29;
+            sA = HEAP[sbox | t8] ^ HEAP[sbox | tD] ^ HEAP[x2_sbox | t2] ^ HEAP[x3_sbox | t7] ^ R2A;
+            sB = HEAP[x3_sbox | t8] ^ HEAP[sbox | tD] ^ HEAP[sbox | t2] ^ HEAP[x2_sbox | t7] ^ R2B;
+            sC = HEAP[x2_sbox | tC] ^ HEAP[x3_sbox | t1] ^ HEAP[sbox | t6] ^ HEAP[sbox | tB] ^ R2C;
+            sD = HEAP[sbox | tC] ^ HEAP[x2_sbox | t1] ^ HEAP[x3_sbox | t6] ^ HEAP[sbox | tB] ^ R2D;
+            sE = HEAP[sbox | tC] ^ HEAP[sbox | t1] ^ HEAP[x2_sbox | t6] ^ HEAP[x3_sbox | tB] ^ R2E;
+            sF = HEAP[x3_sbox | tC] ^ HEAP[sbox | t1] ^ HEAP[sbox | t6] ^ HEAP[x2_sbox | tB] ^ R2F;
+            t0 = HEAP[x2_sbox | s0] ^ HEAP[x3_sbox | s5] ^ HEAP[sbox | sA] ^ HEAP[sbox | sF] ^ R30;
+            t1 = HEAP[sbox | s0] ^ HEAP[x2_sbox | s5] ^ HEAP[x3_sbox | sA] ^ HEAP[sbox | sF] ^ R31;
+            t2 = HEAP[sbox | s0] ^ HEAP[sbox | s5] ^ HEAP[x2_sbox | sA] ^ HEAP[x3_sbox | sF] ^ R32;
+            t3 = HEAP[x3_sbox | s0] ^ HEAP[sbox | s5] ^ HEAP[sbox | sA] ^ HEAP[x2_sbox | sF] ^ R33;
+            t4 = HEAP[x2_sbox | s4] ^ HEAP[x3_sbox | s9] ^ HEAP[sbox | sE] ^ HEAP[sbox | s3] ^ R34;
+            t5 = HEAP[sbox | s4] ^ HEAP[x2_sbox | s9] ^ HEAP[x3_sbox | sE] ^ HEAP[sbox | s3] ^ R35;
+            t6 = HEAP[sbox | s4] ^ HEAP[sbox | s9] ^ HEAP[x2_sbox | sE] ^ HEAP[x3_sbox | s3] ^ R36;
+            t7 = HEAP[x3_sbox | s4] ^ HEAP[sbox | s9] ^ HEAP[sbox | sE] ^ HEAP[x2_sbox | s3] ^ R37;
+            t8 = HEAP[x2_sbox | s8] ^ HEAP[x3_sbox | sD] ^ HEAP[sbox | s2] ^ HEAP[sbox | s7] ^ R38;
+            t9 = HEAP[sbox | s8] ^ HEAP[x2_sbox | sD] ^ HEAP[x3_sbox | s2] ^ HEAP[sbox | s7] ^ R39;
+            tA = HEAP[sbox | s8] ^ HEAP[sbox | sD] ^ HEAP[x2_sbox | s2] ^ HEAP[x3_sbox | s7] ^ R3A;
+            tB = HEAP[x3_sbox | s8] ^ HEAP[sbox | sD] ^ HEAP[sbox | s2] ^ HEAP[x2_sbox | s7] ^ R3B;
+            tC = HEAP[x2_sbox | sC] ^ HEAP[x3_sbox | s1] ^ HEAP[sbox | s6] ^ HEAP[sbox | sB] ^ R3C;
+            tD = HEAP[sbox | sC] ^ HEAP[x2_sbox | s1] ^ HEAP[x3_sbox | s6] ^ HEAP[sbox | sB] ^ R3D;
+            tE = HEAP[sbox | sC] ^ HEAP[sbox | s1] ^ HEAP[x2_sbox | s6] ^ HEAP[x3_sbox | sB] ^ R3E;
+            tF = HEAP[x3_sbox | sC] ^ HEAP[sbox | s1] ^ HEAP[sbox | s6] ^ HEAP[x2_sbox | sB] ^ R3F;
+            s0 = HEAP[x2_sbox | t0] ^ HEAP[x3_sbox | t5] ^ HEAP[sbox | tA] ^ HEAP[sbox | tF] ^ R40;
+            s1 = HEAP[sbox | t0] ^ HEAP[x2_sbox | t5] ^ HEAP[x3_sbox | tA] ^ HEAP[sbox | tF] ^ R41;
+            s2 = HEAP[sbox | t0] ^ HEAP[sbox | t5] ^ HEAP[x2_sbox | tA] ^ HEAP[x3_sbox | tF] ^ R42;
+            s3 = HEAP[x3_sbox | t0] ^ HEAP[sbox | t5] ^ HEAP[sbox | tA] ^ HEAP[x2_sbox | tF] ^ R43;
+            s4 = HEAP[x2_sbox | t4] ^ HEAP[x3_sbox | t9] ^ HEAP[sbox | tE] ^ HEAP[sbox | t3] ^ R44;
+            s5 = HEAP[sbox | t4] ^ HEAP[x2_sbox | t9] ^ HEAP[x3_sbox | tE] ^ HEAP[sbox | t3] ^ R45;
+            s6 = HEAP[sbox | t4] ^ HEAP[sbox | t9] ^ HEAP[x2_sbox | tE] ^ HEAP[x3_sbox | t3] ^ R46;
+            s7 = HEAP[x3_sbox | t4] ^ HEAP[sbox | t9] ^ HEAP[sbox | tE] ^ HEAP[x2_sbox | t3] ^ R47;
+            s8 = HEAP[x2_sbox | t8] ^ HEAP[x3_sbox | tD] ^ HEAP[sbox | t2] ^ HEAP[sbox | t7] ^ R48;
+            s9 = HEAP[sbox | t8] ^ HEAP[x2_sbox | tD] ^ HEAP[x3_sbox | t2] ^ HEAP[sbox | t7] ^ R49;
+            sA = HEAP[sbox | t8] ^ HEAP[sbox | tD] ^ HEAP[x2_sbox | t2] ^ HEAP[x3_sbox | t7] ^ R4A;
+            sB = HEAP[x3_sbox | t8] ^ HEAP[sbox | tD] ^ HEAP[sbox | t2] ^ HEAP[x2_sbox | t7] ^ R4B;
+            sC = HEAP[x2_sbox | tC] ^ HEAP[x3_sbox | t1] ^ HEAP[sbox | t6] ^ HEAP[sbox | tB] ^ R4C;
+            sD = HEAP[sbox | tC] ^ HEAP[x2_sbox | t1] ^ HEAP[x3_sbox | t6] ^ HEAP[sbox | tB] ^ R4D;
+            sE = HEAP[sbox | tC] ^ HEAP[sbox | t1] ^ HEAP[x2_sbox | t6] ^ HEAP[x3_sbox | tB] ^ R4E;
+            sF = HEAP[x3_sbox | tC] ^ HEAP[sbox | t1] ^ HEAP[sbox | t6] ^ HEAP[x2_sbox | tB] ^ R4F;
+            t0 = HEAP[x2_sbox | s0] ^ HEAP[x3_sbox | s5] ^ HEAP[sbox | sA] ^ HEAP[sbox | sF] ^ R50;
+            t1 = HEAP[sbox | s0] ^ HEAP[x2_sbox | s5] ^ HEAP[x3_sbox | sA] ^ HEAP[sbox | sF] ^ R51;
+            t2 = HEAP[sbox | s0] ^ HEAP[sbox | s5] ^ HEAP[x2_sbox | sA] ^ HEAP[x3_sbox | sF] ^ R52;
+            t3 = HEAP[x3_sbox | s0] ^ HEAP[sbox | s5] ^ HEAP[sbox | sA] ^ HEAP[x2_sbox | sF] ^ R53;
+            t4 = HEAP[x2_sbox | s4] ^ HEAP[x3_sbox | s9] ^ HEAP[sbox | sE] ^ HEAP[sbox | s3] ^ R54;
+            t5 = HEAP[sbox | s4] ^ HEAP[x2_sbox | s9] ^ HEAP[x3_sbox | sE] ^ HEAP[sbox | s3] ^ R55;
+            t6 = HEAP[sbox | s4] ^ HEAP[sbox | s9] ^ HEAP[x2_sbox | sE] ^ HEAP[x3_sbox | s3] ^ R56;
+            t7 = HEAP[x3_sbox | s4] ^ HEAP[sbox | s9] ^ HEAP[sbox | sE] ^ HEAP[x2_sbox | s3] ^ R57;
+            t8 = HEAP[x2_sbox | s8] ^ HEAP[x3_sbox | sD] ^ HEAP[sbox | s2] ^ HEAP[sbox | s7] ^ R58;
+            t9 = HEAP[sbox | s8] ^ HEAP[x2_sbox | sD] ^ HEAP[x3_sbox | s2] ^ HEAP[sbox | s7] ^ R59;
+            tA = HEAP[sbox | s8] ^ HEAP[sbox | sD] ^ HEAP[x2_sbox | s2] ^ HEAP[x3_sbox | s7] ^ R5A;
+            tB = HEAP[x3_sbox | s8] ^ HEAP[sbox | sD] ^ HEAP[sbox | s2] ^ HEAP[x2_sbox | s7] ^ R5B;
+            tC = HEAP[x2_sbox | sC] ^ HEAP[x3_sbox | s1] ^ HEAP[sbox | s6] ^ HEAP[sbox | sB] ^ R5C;
+            tD = HEAP[sbox | sC] ^ HEAP[x2_sbox | s1] ^ HEAP[x3_sbox | s6] ^ HEAP[sbox | sB] ^ R5D;
+            tE = HEAP[sbox | sC] ^ HEAP[sbox | s1] ^ HEAP[x2_sbox | s6] ^ HEAP[x3_sbox | sB] ^ R5E;
+            tF = HEAP[x3_sbox | sC] ^ HEAP[sbox | s1] ^ HEAP[sbox | s6] ^ HEAP[x2_sbox | sB] ^ R5F;
+            s0 = HEAP[x2_sbox | t0] ^ HEAP[x3_sbox | t5] ^ HEAP[sbox | tA] ^ HEAP[sbox | tF] ^ R60;
+            s1 = HEAP[sbox | t0] ^ HEAP[x2_sbox | t5] ^ HEAP[x3_sbox | tA] ^ HEAP[sbox | tF] ^ R61;
+            s2 = HEAP[sbox | t0] ^ HEAP[sbox | t5] ^ HEAP[x2_sbox | tA] ^ HEAP[x3_sbox | tF] ^ R62;
+            s3 = HEAP[x3_sbox | t0] ^ HEAP[sbox | t5] ^ HEAP[sbox | tA] ^ HEAP[x2_sbox | tF] ^ R63;
+            s4 = HEAP[x2_sbox | t4] ^ HEAP[x3_sbox | t9] ^ HEAP[sbox | tE] ^ HEAP[sbox | t3] ^ R64;
+            s5 = HEAP[sbox | t4] ^ HEAP[x2_sbox | t9] ^ HEAP[x3_sbox | tE] ^ HEAP[sbox | t3] ^ R65;
+            s6 = HEAP[sbox | t4] ^ HEAP[sbox | t9] ^ HEAP[x2_sbox | tE] ^ HEAP[x3_sbox | t3] ^ R66;
+            s7 = HEAP[x3_sbox | t4] ^ HEAP[sbox | t9] ^ HEAP[sbox | tE] ^ HEAP[x2_sbox | t3] ^ R67;
+            s8 = HEAP[x2_sbox | t8] ^ HEAP[x3_sbox | tD] ^ HEAP[sbox | t2] ^ HEAP[sbox | t7] ^ R68;
+            s9 = HEAP[sbox | t8] ^ HEAP[x2_sbox | tD] ^ HEAP[x3_sbox | t2] ^ HEAP[sbox | t7] ^ R69;
+            sA = HEAP[sbox | t8] ^ HEAP[sbox | tD] ^ HEAP[x2_sbox | t2] ^ HEAP[x3_sbox | t7] ^ R6A;
+            sB = HEAP[x3_sbox | t8] ^ HEAP[sbox | tD] ^ HEAP[sbox | t2] ^ HEAP[x2_sbox | t7] ^ R6B;
+            sC = HEAP[x2_sbox | tC] ^ HEAP[x3_sbox | t1] ^ HEAP[sbox | t6] ^ HEAP[sbox | tB] ^ R6C;
+            sD = HEAP[sbox | tC] ^ HEAP[x2_sbox | t1] ^ HEAP[x3_sbox | t6] ^ HEAP[sbox | tB] ^ R6D;
+            sE = HEAP[sbox | tC] ^ HEAP[sbox | t1] ^ HEAP[x2_sbox | t6] ^ HEAP[x3_sbox | tB] ^ R6E;
+            sF = HEAP[x3_sbox | tC] ^ HEAP[sbox | t1] ^ HEAP[sbox | t6] ^ HEAP[x2_sbox | tB] ^ R6F;
+            t0 = HEAP[x2_sbox | s0] ^ HEAP[x3_sbox | s5] ^ HEAP[sbox | sA] ^ HEAP[sbox | sF] ^ R70;
+            t1 = HEAP[sbox | s0] ^ HEAP[x2_sbox | s5] ^ HEAP[x3_sbox | sA] ^ HEAP[sbox | sF] ^ R71;
+            t2 = HEAP[sbox | s0] ^ HEAP[sbox | s5] ^ HEAP[x2_sbox | sA] ^ HEAP[x3_sbox | sF] ^ R72;
+            t3 = HEAP[x3_sbox | s0] ^ HEAP[sbox | s5] ^ HEAP[sbox | sA] ^ HEAP[x2_sbox | sF] ^ R73;
+            t4 = HEAP[x2_sbox | s4] ^ HEAP[x3_sbox | s9] ^ HEAP[sbox | sE] ^ HEAP[sbox | s3] ^ R74;
+            t5 = HEAP[sbox | s4] ^ HEAP[x2_sbox | s9] ^ HEAP[x3_sbox | sE] ^ HEAP[sbox | s3] ^ R75;
+            t6 = HEAP[sbox | s4] ^ HEAP[sbox | s9] ^ HEAP[x2_sbox | sE] ^ HEAP[x3_sbox | s3] ^ R76;
+            t7 = HEAP[x3_sbox | s4] ^ HEAP[sbox | s9] ^ HEAP[sbox | sE] ^ HEAP[x2_sbox | s3] ^ R77;
+            t8 = HEAP[x2_sbox | s8] ^ HEAP[x3_sbox | sD] ^ HEAP[sbox | s2] ^ HEAP[sbox | s7] ^ R78;
+            t9 = HEAP[sbox | s8] ^ HEAP[x2_sbox | sD] ^ HEAP[x3_sbox | s2] ^ HEAP[sbox | s7] ^ R79;
+            tA = HEAP[sbox | s8] ^ HEAP[sbox | sD] ^ HEAP[x2_sbox | s2] ^ HEAP[x3_sbox | s7] ^ R7A;
+            tB = HEAP[x3_sbox | s8] ^ HEAP[sbox | sD] ^ HEAP[sbox | s2] ^ HEAP[x2_sbox | s7] ^ R7B;
+            tC = HEAP[x2_sbox | sC] ^ HEAP[x3_sbox | s1] ^ HEAP[sbox | s6] ^ HEAP[sbox | sB] ^ R7C;
+            tD = HEAP[sbox | sC] ^ HEAP[x2_sbox | s1] ^ HEAP[x3_sbox | s6] ^ HEAP[sbox | sB] ^ R7D;
+            tE = HEAP[sbox | sC] ^ HEAP[sbox | s1] ^ HEAP[x2_sbox | s6] ^ HEAP[x3_sbox | sB] ^ R7E;
+            tF = HEAP[x3_sbox | sC] ^ HEAP[sbox | s1] ^ HEAP[sbox | s6] ^ HEAP[x2_sbox | sB] ^ R7F;
+            s0 = HEAP[x2_sbox | t0] ^ HEAP[x3_sbox | t5] ^ HEAP[sbox | tA] ^ HEAP[sbox | tF] ^ R80;
+            s1 = HEAP[sbox | t0] ^ HEAP[x2_sbox | t5] ^ HEAP[x3_sbox | tA] ^ HEAP[sbox | tF] ^ R81;
+            s2 = HEAP[sbox | t0] ^ HEAP[sbox | t5] ^ HEAP[x2_sbox | tA] ^ HEAP[x3_sbox | tF] ^ R82;
+            s3 = HEAP[x3_sbox | t0] ^ HEAP[sbox | t5] ^ HEAP[sbox | tA] ^ HEAP[x2_sbox | tF] ^ R83;
+            s4 = HEAP[x2_sbox | t4] ^ HEAP[x3_sbox | t9] ^ HEAP[sbox | tE] ^ HEAP[sbox | t3] ^ R84;
+            s5 = HEAP[sbox | t4] ^ HEAP[x2_sbox | t9] ^ HEAP[x3_sbox | tE] ^ HEAP[sbox | t3] ^ R85;
+            s6 = HEAP[sbox | t4] ^ HEAP[sbox | t9] ^ HEAP[x2_sbox | tE] ^ HEAP[x3_sbox | t3] ^ R86;
+            s7 = HEAP[x3_sbox | t4] ^ HEAP[sbox | t9] ^ HEAP[sbox | tE] ^ HEAP[x2_sbox | t3] ^ R87;
+            s8 = HEAP[x2_sbox | t8] ^ HEAP[x3_sbox | tD] ^ HEAP[sbox | t2] ^ HEAP[sbox | t7] ^ R88;
+            s9 = HEAP[sbox | t8] ^ HEAP[x2_sbox | tD] ^ HEAP[x3_sbox | t2] ^ HEAP[sbox | t7] ^ R89;
+            sA = HEAP[sbox | t8] ^ HEAP[sbox | tD] ^ HEAP[x2_sbox | t2] ^ HEAP[x3_sbox | t7] ^ R8A;
+            sB = HEAP[x3_sbox | t8] ^ HEAP[sbox | tD] ^ HEAP[sbox | t2] ^ HEAP[x2_sbox | t7] ^ R8B;
+            sC = HEAP[x2_sbox | tC] ^ HEAP[x3_sbox | t1] ^ HEAP[sbox | t6] ^ HEAP[sbox | tB] ^ R8C;
+            sD = HEAP[sbox | tC] ^ HEAP[x2_sbox | t1] ^ HEAP[x3_sbox | t6] ^ HEAP[sbox | tB] ^ R8D;
+            sE = HEAP[sbox | tC] ^ HEAP[sbox | t1] ^ HEAP[x2_sbox | t6] ^ HEAP[x3_sbox | tB] ^ R8E;
+            sF = HEAP[x3_sbox | tC] ^ HEAP[sbox | t1] ^ HEAP[sbox | t6] ^ HEAP[x2_sbox | tB] ^ R8F;
+            t0 = HEAP[x2_sbox | s0] ^ HEAP[x3_sbox | s5] ^ HEAP[sbox | sA] ^ HEAP[sbox | sF] ^ R90;
+            t1 = HEAP[sbox | s0] ^ HEAP[x2_sbox | s5] ^ HEAP[x3_sbox | sA] ^ HEAP[sbox | sF] ^ R91;
+            t2 = HEAP[sbox | s0] ^ HEAP[sbox | s5] ^ HEAP[x2_sbox | sA] ^ HEAP[x3_sbox | sF] ^ R92;
+            t3 = HEAP[x3_sbox | s0] ^ HEAP[sbox | s5] ^ HEAP[sbox | sA] ^ HEAP[x2_sbox | sF] ^ R93;
+            t4 = HEAP[x2_sbox | s4] ^ HEAP[x3_sbox | s9] ^ HEAP[sbox | sE] ^ HEAP[sbox | s3] ^ R94;
+            t5 = HEAP[sbox | s4] ^ HEAP[x2_sbox | s9] ^ HEAP[x3_sbox | sE] ^ HEAP[sbox | s3] ^ R95;
+            t6 = HEAP[sbox | s4] ^ HEAP[sbox | s9] ^ HEAP[x2_sbox | sE] ^ HEAP[x3_sbox | s3] ^ R96;
+            t7 = HEAP[x3_sbox | s4] ^ HEAP[sbox | s9] ^ HEAP[sbox | sE] ^ HEAP[x2_sbox | s3] ^ R97;
+            t8 = HEAP[x2_sbox | s8] ^ HEAP[x3_sbox | sD] ^ HEAP[sbox | s2] ^ HEAP[sbox | s7] ^ R98;
+            t9 = HEAP[sbox | s8] ^ HEAP[x2_sbox | sD] ^ HEAP[x3_sbox | s2] ^ HEAP[sbox | s7] ^ R99;
+            tA = HEAP[sbox | s8] ^ HEAP[sbox | sD] ^ HEAP[x2_sbox | s2] ^ HEAP[x3_sbox | s7] ^ R9A;
+            tB = HEAP[x3_sbox | s8] ^ HEAP[sbox | sD] ^ HEAP[sbox | s2] ^ HEAP[x2_sbox | s7] ^ R9B;
+            tC = HEAP[x2_sbox | sC] ^ HEAP[x3_sbox | s1] ^ HEAP[sbox | s6] ^ HEAP[sbox | sB] ^ R9C;
+            tD = HEAP[sbox | sC] ^ HEAP[x2_sbox | s1] ^ HEAP[x3_sbox | s6] ^ HEAP[sbox | sB] ^ R9D;
+            tE = HEAP[sbox | sC] ^ HEAP[sbox | s1] ^ HEAP[x2_sbox | s6] ^ HEAP[x3_sbox | sB] ^ R9E;
+            tF = HEAP[x3_sbox | sC] ^ HEAP[sbox | s1] ^ HEAP[sbox | s6] ^ HEAP[x2_sbox | sB] ^ R9F;
+            if ((keySize | 0) == 16) {
+                S0 = HEAP[sbox | t0] ^ RA0;
+                S1 = HEAP[sbox | t5] ^ RA1;
+                S2 = HEAP[sbox | tA] ^ RA2;
+                S3 = HEAP[sbox | tF] ^ RA3;
+                S4 = HEAP[sbox | t4] ^ RA4;
+                S5 = HEAP[sbox | t9] ^ RA5;
+                S6 = HEAP[sbox | tE] ^ RA6;
+                S7 = HEAP[sbox | t3] ^ RA7;
+                S8 = HEAP[sbox | t8] ^ RA8;
+                S9 = HEAP[sbox | tD] ^ RA9;
+                SA = HEAP[sbox | t2] ^ RAA;
+                SB = HEAP[sbox | t7] ^ RAB;
+                SC = HEAP[sbox | tC] ^ RAC;
+                SD = HEAP[sbox | t1] ^ RAD;
+                SE = HEAP[sbox | t6] ^ RAE;
+                SF = HEAP[sbox | tB] ^ RAF;
+                return;
+            }
+            s0 = HEAP[x2_sbox | t0] ^ HEAP[x3_sbox | t5] ^ HEAP[sbox | tA] ^ HEAP[sbox | tF] ^ RA0;
+            s1 = HEAP[sbox | t0] ^ HEAP[x2_sbox | t5] ^ HEAP[x3_sbox | tA] ^ HEAP[sbox | tF] ^ RA1;
+            s2 = HEAP[sbox | t0] ^ HEAP[sbox | t5] ^ HEAP[x2_sbox | tA] ^ HEAP[x3_sbox | tF] ^ RA2;
+            s3 = HEAP[x3_sbox | t0] ^ HEAP[sbox | t5] ^ HEAP[sbox | tA] ^ HEAP[x2_sbox | tF] ^ RA3;
+            s4 = HEAP[x2_sbox | t4] ^ HEAP[x3_sbox | t9] ^ HEAP[sbox | tE] ^ HEAP[sbox | t3] ^ RA4;
+            s5 = HEAP[sbox | t4] ^ HEAP[x2_sbox | t9] ^ HEAP[x3_sbox | tE] ^ HEAP[sbox | t3] ^ RA5;
+            s6 = HEAP[sbox | t4] ^ HEAP[sbox | t9] ^ HEAP[x2_sbox | tE] ^ HEAP[x3_sbox | t3] ^ RA6;
+            s7 = HEAP[x3_sbox | t4] ^ HEAP[sbox | t9] ^ HEAP[sbox | tE] ^ HEAP[x2_sbox | t3] ^ RA7;
+            s8 = HEAP[x2_sbox | t8] ^ HEAP[x3_sbox | tD] ^ HEAP[sbox | t2] ^ HEAP[sbox | t7] ^ RA8;
+            s9 = HEAP[sbox | t8] ^ HEAP[x2_sbox | tD] ^ HEAP[x3_sbox | t2] ^ HEAP[sbox | t7] ^ RA9;
+            sA = HEAP[sbox | t8] ^ HEAP[sbox | tD] ^ HEAP[x2_sbox | t2] ^ HEAP[x3_sbox | t7] ^ RAA;
+            sB = HEAP[x3_sbox | t8] ^ HEAP[sbox | tD] ^ HEAP[sbox | t2] ^ HEAP[x2_sbox | t7] ^ RAB;
+            sC = HEAP[x2_sbox | tC] ^ HEAP[x3_sbox | t1] ^ HEAP[sbox | t6] ^ HEAP[sbox | tB] ^ RAC;
+            sD = HEAP[sbox | tC] ^ HEAP[x2_sbox | t1] ^ HEAP[x3_sbox | t6] ^ HEAP[sbox | tB] ^ RAD;
+            sE = HEAP[sbox | tC] ^ HEAP[sbox | t1] ^ HEAP[x2_sbox | t6] ^ HEAP[x3_sbox | tB] ^ RAE;
+            sF = HEAP[x3_sbox | tC] ^ HEAP[sbox | t1] ^ HEAP[sbox | t6] ^ HEAP[x2_sbox | tB] ^ RAF;
+            t0 = HEAP[x2_sbox | s0] ^ HEAP[x3_sbox | s5] ^ HEAP[sbox | sA] ^ HEAP[sbox | sF] ^ RB0;
+            t1 = HEAP[sbox | s0] ^ HEAP[x2_sbox | s5] ^ HEAP[x3_sbox | sA] ^ HEAP[sbox | sF] ^ RB1;
+            t2 = HEAP[sbox | s0] ^ HEAP[sbox | s5] ^ HEAP[x2_sbox | sA] ^ HEAP[x3_sbox | sF] ^ RB2;
+            t3 = HEAP[x3_sbox | s0] ^ HEAP[sbox | s5] ^ HEAP[sbox | sA] ^ HEAP[x2_sbox | sF] ^ RB3;
+            t4 = HEAP[x2_sbox | s4] ^ HEAP[x3_sbox | s9] ^ HEAP[sbox | sE] ^ HEAP[sbox | s3] ^ RB4;
+            t5 = HEAP[sbox | s4] ^ HEAP[x2_sbox | s9] ^ HEAP[x3_sbox | sE] ^ HEAP[sbox | s3] ^ RB5;
+            t6 = HEAP[sbox | s4] ^ HEAP[sbox | s9] ^ HEAP[x2_sbox | sE] ^ HEAP[x3_sbox | s3] ^ RB6;
+            t7 = HEAP[x3_sbox | s4] ^ HEAP[sbox | s9] ^ HEAP[sbox | sE] ^ HEAP[x2_sbox | s3] ^ RB7;
+            t8 = HEAP[x2_sbox | s8] ^ HEAP[x3_sbox | sD] ^ HEAP[sbox | s2] ^ HEAP[sbox | s7] ^ RB8;
+            t9 = HEAP[sbox | s8] ^ HEAP[x2_sbox | sD] ^ HEAP[x3_sbox | s2] ^ HEAP[sbox | s7] ^ RB9;
+            tA = HEAP[sbox | s8] ^ HEAP[sbox | sD] ^ HEAP[x2_sbox | s2] ^ HEAP[x3_sbox | s7] ^ RBA;
+            tB = HEAP[x3_sbox | s8] ^ HEAP[sbox | sD] ^ HEAP[sbox | s2] ^ HEAP[x2_sbox | s7] ^ RBB;
+            tC = HEAP[x2_sbox | sC] ^ HEAP[x3_sbox | s1] ^ HEAP[sbox | s6] ^ HEAP[sbox | sB] ^ RBC;
+            tD = HEAP[sbox | sC] ^ HEAP[x2_sbox | s1] ^ HEAP[x3_sbox | s6] ^ HEAP[sbox | sB] ^ RBD;
+            tE = HEAP[sbox | sC] ^ HEAP[sbox | s1] ^ HEAP[x2_sbox | s6] ^ HEAP[x3_sbox | sB] ^ RBE;
+            tF = HEAP[x3_sbox | sC] ^ HEAP[sbox | s1] ^ HEAP[sbox | s6] ^ HEAP[x2_sbox | sB] ^ RBF;
+            s0 = HEAP[x2_sbox | t0] ^ HEAP[x3_sbox | t5] ^ HEAP[sbox | tA] ^ HEAP[sbox | tF] ^ RC0;
+            s1 = HEAP[sbox | t0] ^ HEAP[x2_sbox | t5] ^ HEAP[x3_sbox | tA] ^ HEAP[sbox | tF] ^ RC1;
+            s2 = HEAP[sbox | t0] ^ HEAP[sbox | t5] ^ HEAP[x2_sbox | tA] ^ HEAP[x3_sbox | tF] ^ RC2;
+            s3 = HEAP[x3_sbox | t0] ^ HEAP[sbox | t5] ^ HEAP[sbox | tA] ^ HEAP[x2_sbox | tF] ^ RC3;
+            s4 = HEAP[x2_sbox | t4] ^ HEAP[x3_sbox | t9] ^ HEAP[sbox | tE] ^ HEAP[sbox | t3] ^ RC4;
+            s5 = HEAP[sbox | t4] ^ HEAP[x2_sbox | t9] ^ HEAP[x3_sbox | tE] ^ HEAP[sbox | t3] ^ RC5;
+            s6 = HEAP[sbox | t4] ^ HEAP[sbox | t9] ^ HEAP[x2_sbox | tE] ^ HEAP[x3_sbox | t3] ^ RC6;
+            s7 = HEAP[x3_sbox | t4] ^ HEAP[sbox | t9] ^ HEAP[sbox | tE] ^ HEAP[x2_sbox | t3] ^ RC7;
+            s8 = HEAP[x2_sbox | t8] ^ HEAP[x3_sbox | tD] ^ HEAP[sbox | t2] ^ HEAP[sbox | t7] ^ RC8;
+            s9 = HEAP[sbox | t8] ^ HEAP[x2_sbox | tD] ^ HEAP[x3_sbox | t2] ^ HEAP[sbox | t7] ^ RC9;
+            sA = HEAP[sbox | t8] ^ HEAP[sbox | tD] ^ HEAP[x2_sbox | t2] ^ HEAP[x3_sbox | t7] ^ RCA;
+            sB = HEAP[x3_sbox | t8] ^ HEAP[sbox | tD] ^ HEAP[sbox | t2] ^ HEAP[x2_sbox | t7] ^ RCB;
+            sC = HEAP[x2_sbox | tC] ^ HEAP[x3_sbox | t1] ^ HEAP[sbox | t6] ^ HEAP[sbox | tB] ^ RCC;
+            sD = HEAP[sbox | tC] ^ HEAP[x2_sbox | t1] ^ HEAP[x3_sbox | t6] ^ HEAP[sbox | tB] ^ RCD;
+            sE = HEAP[sbox | tC] ^ HEAP[sbox | t1] ^ HEAP[x2_sbox | t6] ^ HEAP[x3_sbox | tB] ^ RCE;
+            sF = HEAP[x3_sbox | tC] ^ HEAP[sbox | t1] ^ HEAP[sbox | t6] ^ HEAP[x2_sbox | tB] ^ RCF;
+            t0 = HEAP[x2_sbox | s0] ^ HEAP[x3_sbox | s5] ^ HEAP[sbox | sA] ^ HEAP[sbox | sF] ^ RD0;
+            t1 = HEAP[sbox | s0] ^ HEAP[x2_sbox | s5] ^ HEAP[x3_sbox | sA] ^ HEAP[sbox | sF] ^ RD1;
+            t2 = HEAP[sbox | s0] ^ HEAP[sbox | s5] ^ HEAP[x2_sbox | sA] ^ HEAP[x3_sbox | sF] ^ RD2;
+            t3 = HEAP[x3_sbox | s0] ^ HEAP[sbox | s5] ^ HEAP[sbox | sA] ^ HEAP[x2_sbox | sF] ^ RD3;
+            t4 = HEAP[x2_sbox | s4] ^ HEAP[x3_sbox | s9] ^ HEAP[sbox | sE] ^ HEAP[sbox | s3] ^ RD4;
+            t5 = HEAP[sbox | s4] ^ HEAP[x2_sbox | s9] ^ HEAP[x3_sbox | sE] ^ HEAP[sbox | s3] ^ RD5;
+            t6 = HEAP[sbox | s4] ^ HEAP[sbox | s9] ^ HEAP[x2_sbox | sE] ^ HEAP[x3_sbox | s3] ^ RD6;
+            t7 = HEAP[x3_sbox | s4] ^ HEAP[sbox | s9] ^ HEAP[sbox | sE] ^ HEAP[x2_sbox | s3] ^ RD7;
+            t8 = HEAP[x2_sbox | s8] ^ HEAP[x3_sbox | sD] ^ HEAP[sbox | s2] ^ HEAP[sbox | s7] ^ RD8;
+            t9 = HEAP[sbox | s8] ^ HEAP[x2_sbox | sD] ^ HEAP[x3_sbox | s2] ^ HEAP[sbox | s7] ^ RD9;
+            tA = HEAP[sbox | s8] ^ HEAP[sbox | sD] ^ HEAP[x2_sbox | s2] ^ HEAP[x3_sbox | s7] ^ RDA;
+            tB = HEAP[x3_sbox | s8] ^ HEAP[sbox | sD] ^ HEAP[sbox | s2] ^ HEAP[x2_sbox | s7] ^ RDB;
+            tC = HEAP[x2_sbox | sC] ^ HEAP[x3_sbox | s1] ^ HEAP[sbox | s6] ^ HEAP[sbox | sB] ^ RDC;
+            tD = HEAP[sbox | sC] ^ HEAP[x2_sbox | s1] ^ HEAP[x3_sbox | s6] ^ HEAP[sbox | sB] ^ RDD;
+            tE = HEAP[sbox | sC] ^ HEAP[sbox | s1] ^ HEAP[x2_sbox | s6] ^ HEAP[x3_sbox | sB] ^ RDE;
+            tF = HEAP[x3_sbox | sC] ^ HEAP[sbox | s1] ^ HEAP[sbox | s6] ^ HEAP[x2_sbox | sB] ^ RDF;
+            S0 = HEAP[sbox | t0] ^ RE0;
+            S1 = HEAP[sbox | t5] ^ RE1;
+            S2 = HEAP[sbox | tA] ^ RE2;
+            S3 = HEAP[sbox | tF] ^ RE3;
+            S4 = HEAP[sbox | t4] ^ RE4;
+            S5 = HEAP[sbox | t9] ^ RE5;
+            S6 = HEAP[sbox | tE] ^ RE6;
+            S7 = HEAP[sbox | t3] ^ RE7;
+            S8 = HEAP[sbox | t8] ^ RE8;
+            S9 = HEAP[sbox | tD] ^ RE9;
+            SA = HEAP[sbox | t2] ^ REA;
+            SB = HEAP[sbox | t7] ^ REB;
+            SC = HEAP[sbox | tC] ^ REC;
+            SD = HEAP[sbox | t1] ^ RED;
+            SE = HEAP[sbox | t6] ^ REE;
+            SF = HEAP[sbox | tB] ^ REF;
+        }
+        function _decrypt(s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, sA, sB, sC, sD, sE, sF) {
+            s0 = s0 | 0;
+            s1 = s1 | 0;
+            s2 = s2 | 0;
+            s3 = s3 | 0;
+            s4 = s4 | 0;
+            s5 = s5 | 0;
+            s6 = s6 | 0;
+            s7 = s7 | 0;
+            s8 = s8 | 0;
+            s9 = s9 | 0;
+            sA = sA | 0;
+            sB = sB | 0;
+            sC = sC | 0;
+            sD = sD | 0;
+            sE = sE | 0;
+            sF = sF | 0;
+            var t0 = 0, t1 = 0, t2 = 0, t3 = 0, t4 = 0, t5 = 0, t6 = 0, t7 = 0, t8 = 0, t9 = 0, tA = 0, tB = 0, tC = 0, tD = 0, tE = 0, tF = 0, inv_sbox = 256, x9 = 1024, xB = 1280, xD = 1536, xE = 1792;
+            if ((keySize | 0) == 32) {
+                t0 = HEAP[inv_sbox | s0 ^ RE0] ^ RD0;
+                t1 = HEAP[inv_sbox | sD ^ RED] ^ RD1;
+                t2 = HEAP[inv_sbox | sA ^ REA] ^ RD2;
+                t3 = HEAP[inv_sbox | s7 ^ RE7] ^ RD3;
+                t4 = HEAP[inv_sbox | s4 ^ RE4] ^ RD4;
+                t5 = HEAP[inv_sbox | s1 ^ RE1] ^ RD5;
+                t6 = HEAP[inv_sbox | sE ^ REE] ^ RD6;
+                t7 = HEAP[inv_sbox | sB ^ REB] ^ RD7;
+                t8 = HEAP[inv_sbox | s8 ^ RE8] ^ RD8;
+                t9 = HEAP[inv_sbox | s5 ^ RE5] ^ RD9;
+                tA = HEAP[inv_sbox | s2 ^ RE2] ^ RDA;
+                tB = HEAP[inv_sbox | sF ^ REF] ^ RDB;
+                tC = HEAP[inv_sbox | sC ^ REC] ^ RDC;
+                tD = HEAP[inv_sbox | s9 ^ RE9] ^ RDD;
+                tE = HEAP[inv_sbox | s6 ^ RE6] ^ RDE;
+                tF = HEAP[inv_sbox | s3 ^ RE3] ^ RDF;
+                s0 = HEAP[xE | t0] ^ HEAP[xB | t1] ^ HEAP[xD | t2] ^ HEAP[x9 | t3];
+                s1 = HEAP[x9 | tC] ^ HEAP[xE | tD] ^ HEAP[xB | tE] ^ HEAP[xD | tF];
+                s2 = HEAP[xD | t8] ^ HEAP[x9 | t9] ^ HEAP[xE | tA] ^ HEAP[xB | tB];
+                s3 = HEAP[xB | t4] ^ HEAP[xD | t5] ^ HEAP[x9 | t6] ^ HEAP[xE | t7];
+                s4 = HEAP[xE | t4] ^ HEAP[xB | t5] ^ HEAP[xD | t6] ^ HEAP[x9 | t7];
+                s5 = HEAP[x9 | t0] ^ HEAP[xE | t1] ^ HEAP[xB | t2] ^ HEAP[xD | t3];
+                s6 = HEAP[xD | tC] ^ HEAP[x9 | tD] ^ HEAP[xE | tE] ^ HEAP[xB | tF];
+                s7 = HEAP[xB | t8] ^ HEAP[xD | t9] ^ HEAP[x9 | tA] ^ HEAP[xE | tB];
+                s8 = HEAP[xE | t8] ^ HEAP[xB | t9] ^ HEAP[xD | tA] ^ HEAP[x9 | tB];
+                s9 = HEAP[x9 | t4] ^ HEAP[xE | t5] ^ HEAP[xB | t6] ^ HEAP[xD | t7];
+                sA = HEAP[xD | t0] ^ HEAP[x9 | t1] ^ HEAP[xE | t2] ^ HEAP[xB | t3];
+                sB = HEAP[xB | tC] ^ HEAP[xD | tD] ^ HEAP[x9 | tE] ^ HEAP[xE | tF];
+                sC = HEAP[xE | tC] ^ HEAP[xB | tD] ^ HEAP[xD | tE] ^ HEAP[x9 | tF];
+                sD = HEAP[x9 | t8] ^ HEAP[xE | t9] ^ HEAP[xB | tA] ^ HEAP[xD | tB];
+                sE = HEAP[xD | t4] ^ HEAP[x9 | t5] ^ HEAP[xE | t6] ^ HEAP[xB | t7];
+                sF = HEAP[xB | t0] ^ HEAP[xD | t1] ^ HEAP[x9 | t2] ^ HEAP[xE | t3];
+                t0 = HEAP[inv_sbox | s0] ^ RC0;
+                t1 = HEAP[inv_sbox | s1] ^ RC1;
+                t2 = HEAP[inv_sbox | s2] ^ RC2;
+                t3 = HEAP[inv_sbox | s3] ^ RC3;
+                t4 = HEAP[inv_sbox | s4] ^ RC4;
+                t5 = HEAP[inv_sbox | s5] ^ RC5;
+                t6 = HEAP[inv_sbox | s6] ^ RC6;
+                t7 = HEAP[inv_sbox | s7] ^ RC7;
+                t8 = HEAP[inv_sbox | s8] ^ RC8;
+                t9 = HEAP[inv_sbox | s9] ^ RC9;
+                tA = HEAP[inv_sbox | sA] ^ RCA;
+                tB = HEAP[inv_sbox | sB] ^ RCB;
+                tC = HEAP[inv_sbox | sC] ^ RCC;
+                tD = HEAP[inv_sbox | sD] ^ RCD;
+                tE = HEAP[inv_sbox | sE] ^ RCE;
+                tF = HEAP[inv_sbox | sF] ^ RCF;
+                s0 = HEAP[xE | t0] ^ HEAP[xB | t1] ^ HEAP[xD | t2] ^ HEAP[x9 | t3];
+                s1 = HEAP[x9 | tC] ^ HEAP[xE | tD] ^ HEAP[xB | tE] ^ HEAP[xD | tF];
+                s2 = HEAP[xD | t8] ^ HEAP[x9 | t9] ^ HEAP[xE | tA] ^ HEAP[xB | tB];
+                s3 = HEAP[xB | t4] ^ HEAP[xD | t5] ^ HEAP[x9 | t6] ^ HEAP[xE | t7];
+                s4 = HEAP[xE | t4] ^ HEAP[xB | t5] ^ HEAP[xD | t6] ^ HEAP[x9 | t7];
+                s5 = HEAP[x9 | t0] ^ HEAP[xE | t1] ^ HEAP[xB | t2] ^ HEAP[xD | t3];
+                s6 = HEAP[xD | tC] ^ HEAP[x9 | tD] ^ HEAP[xE | tE] ^ HEAP[xB | tF];
+                s7 = HEAP[xB | t8] ^ HEAP[xD | t9] ^ HEAP[x9 | tA] ^ HEAP[xE | tB];
+                s8 = HEAP[xE | t8] ^ HEAP[xB | t9] ^ HEAP[xD | tA] ^ HEAP[x9 | tB];
+                s9 = HEAP[x9 | t4] ^ HEAP[xE | t5] ^ HEAP[xB | t6] ^ HEAP[xD | t7];
+                sA = HEAP[xD | t0] ^ HEAP[x9 | t1] ^ HEAP[xE | t2] ^ HEAP[xB | t3];
+                sB = HEAP[xB | tC] ^ HEAP[xD | tD] ^ HEAP[x9 | tE] ^ HEAP[xE | tF];
+                sC = HEAP[xE | tC] ^ HEAP[xB | tD] ^ HEAP[xD | tE] ^ HEAP[x9 | tF];
+                sD = HEAP[x9 | t8] ^ HEAP[xE | t9] ^ HEAP[xB | tA] ^ HEAP[xD | tB];
+                sE = HEAP[xD | t4] ^ HEAP[x9 | t5] ^ HEAP[xE | t6] ^ HEAP[xB | t7];
+                sF = HEAP[xB | t0] ^ HEAP[xD | t1] ^ HEAP[x9 | t2] ^ HEAP[xE | t3];
+                t0 = HEAP[inv_sbox | s0] ^ RB0;
+                t1 = HEAP[inv_sbox | s1] ^ RB1;
+                t2 = HEAP[inv_sbox | s2] ^ RB2;
+                t3 = HEAP[inv_sbox | s3] ^ RB3;
+                t4 = HEAP[inv_sbox | s4] ^ RB4;
+                t5 = HEAP[inv_sbox | s5] ^ RB5;
+                t6 = HEAP[inv_sbox | s6] ^ RB6;
+                t7 = HEAP[inv_sbox | s7] ^ RB7;
+                t8 = HEAP[inv_sbox | s8] ^ RB8;
+                t9 = HEAP[inv_sbox | s9] ^ RB9;
+                tA = HEAP[inv_sbox | sA] ^ RBA;
+                tB = HEAP[inv_sbox | sB] ^ RBB;
+                tC = HEAP[inv_sbox | sC] ^ RBC;
+                tD = HEAP[inv_sbox | sD] ^ RBD;
+                tE = HEAP[inv_sbox | sE] ^ RBE;
+                tF = HEAP[inv_sbox | sF] ^ RBF;
+                s0 = HEAP[xE | t0] ^ HEAP[xB | t1] ^ HEAP[xD | t2] ^ HEAP[x9 | t3];
+                s1 = HEAP[x9 | tC] ^ HEAP[xE | tD] ^ HEAP[xB | tE] ^ HEAP[xD | tF];
+                s2 = HEAP[xD | t8] ^ HEAP[x9 | t9] ^ HEAP[xE | tA] ^ HEAP[xB | tB];
+                s3 = HEAP[xB | t4] ^ HEAP[xD | t5] ^ HEAP[x9 | t6] ^ HEAP[xE | t7];
+                s4 = HEAP[xE | t4] ^ HEAP[xB | t5] ^ HEAP[xD | t6] ^ HEAP[x9 | t7];
+                s5 = HEAP[x9 | t0] ^ HEAP[xE | t1] ^ HEAP[xB | t2] ^ HEAP[xD | t3];
+                s6 = HEAP[xD | tC] ^ HEAP[x9 | tD] ^ HEAP[xE | tE] ^ HEAP[xB | tF];
+                s7 = HEAP[xB | t8] ^ HEAP[xD | t9] ^ HEAP[x9 | tA] ^ HEAP[xE | tB];
+                s8 = HEAP[xE | t8] ^ HEAP[xB | t9] ^ HEAP[xD | tA] ^ HEAP[x9 | tB];
+                s9 = HEAP[x9 | t4] ^ HEAP[xE | t5] ^ HEAP[xB | t6] ^ HEAP[xD | t7];
+                sA = HEAP[xD | t0] ^ HEAP[x9 | t1] ^ HEAP[xE | t2] ^ HEAP[xB | t3];
+                sB = HEAP[xB | tC] ^ HEAP[xD | tD] ^ HEAP[x9 | tE] ^ HEAP[xE | tF];
+                sC = HEAP[xE | tC] ^ HEAP[xB | tD] ^ HEAP[xD | tE] ^ HEAP[x9 | tF];
+                sD = HEAP[x9 | t8] ^ HEAP[xE | t9] ^ HEAP[xB | tA] ^ HEAP[xD | tB];
+                sE = HEAP[xD | t4] ^ HEAP[x9 | t5] ^ HEAP[xE | t6] ^ HEAP[xB | t7];
+                sF = HEAP[xB | t0] ^ HEAP[xD | t1] ^ HEAP[x9 | t2] ^ HEAP[xE | t3];
+                t0 = HEAP[inv_sbox | s0] ^ RA0;
+                t1 = HEAP[inv_sbox | s1] ^ RA1;
+                t2 = HEAP[inv_sbox | s2] ^ RA2;
+                t3 = HEAP[inv_sbox | s3] ^ RA3;
+                t4 = HEAP[inv_sbox | s4] ^ RA4;
+                t5 = HEAP[inv_sbox | s5] ^ RA5;
+                t6 = HEAP[inv_sbox | s6] ^ RA6;
+                t7 = HEAP[inv_sbox | s7] ^ RA7;
+                t8 = HEAP[inv_sbox | s8] ^ RA8;
+                t9 = HEAP[inv_sbox | s9] ^ RA9;
+                tA = HEAP[inv_sbox | sA] ^ RAA;
+                tB = HEAP[inv_sbox | sB] ^ RAB;
+                tC = HEAP[inv_sbox | sC] ^ RAC;
+                tD = HEAP[inv_sbox | sD] ^ RAD;
+                tE = HEAP[inv_sbox | sE] ^ RAE;
+                tF = HEAP[inv_sbox | sF] ^ RAF;
+                s0 = HEAP[xE | t0] ^ HEAP[xB | t1] ^ HEAP[xD | t2] ^ HEAP[x9 | t3];
+                s1 = HEAP[x9 | tC] ^ HEAP[xE | tD] ^ HEAP[xB | tE] ^ HEAP[xD | tF];
+                s2 = HEAP[xD | t8] ^ HEAP[x9 | t9] ^ HEAP[xE | tA] ^ HEAP[xB | tB];
+                s3 = HEAP[xB | t4] ^ HEAP[xD | t5] ^ HEAP[x9 | t6] ^ HEAP[xE | t7];
+                s4 = HEAP[xE | t4] ^ HEAP[xB | t5] ^ HEAP[xD | t6] ^ HEAP[x9 | t7];
+                s5 = HEAP[x9 | t0] ^ HEAP[xE | t1] ^ HEAP[xB | t2] ^ HEAP[xD | t3];
+                s6 = HEAP[xD | tC] ^ HEAP[x9 | tD] ^ HEAP[xE | tE] ^ HEAP[xB | tF];
+                s7 = HEAP[xB | t8] ^ HEAP[xD | t9] ^ HEAP[x9 | tA] ^ HEAP[xE | tB];
+                s8 = HEAP[xE | t8] ^ HEAP[xB | t9] ^ HEAP[xD | tA] ^ HEAP[x9 | tB];
+                s9 = HEAP[x9 | t4] ^ HEAP[xE | t5] ^ HEAP[xB | t6] ^ HEAP[xD | t7];
+                sA = HEAP[xD | t0] ^ HEAP[x9 | t1] ^ HEAP[xE | t2] ^ HEAP[xB | t3];
+                sB = HEAP[xB | tC] ^ HEAP[xD | tD] ^ HEAP[x9 | tE] ^ HEAP[xE | tF];
+                sC = HEAP[xE | tC] ^ HEAP[xB | tD] ^ HEAP[xD | tE] ^ HEAP[x9 | tF];
+                sD = HEAP[x9 | t8] ^ HEAP[xE | t9] ^ HEAP[xB | tA] ^ HEAP[xD | tB];
+                sE = HEAP[xD | t4] ^ HEAP[x9 | t5] ^ HEAP[xE | t6] ^ HEAP[xB | t7];
+                sF = HEAP[xB | t0] ^ HEAP[xD | t1] ^ HEAP[x9 | t2] ^ HEAP[xE | t3];
+                t0 = HEAP[inv_sbox | s0] ^ R90;
+                t1 = HEAP[inv_sbox | s1] ^ R91;
+                t2 = HEAP[inv_sbox | s2] ^ R92;
+                t3 = HEAP[inv_sbox | s3] ^ R93;
+                t4 = HEAP[inv_sbox | s4] ^ R94;
+                t5 = HEAP[inv_sbox | s5] ^ R95;
+                t6 = HEAP[inv_sbox | s6] ^ R96;
+                t7 = HEAP[inv_sbox | s7] ^ R97;
+                t8 = HEAP[inv_sbox | s8] ^ R98;
+                t9 = HEAP[inv_sbox | s9] ^ R99;
+                tA = HEAP[inv_sbox | sA] ^ R9A;
+                tB = HEAP[inv_sbox | sB] ^ R9B;
+                tC = HEAP[inv_sbox | sC] ^ R9C;
+                tD = HEAP[inv_sbox | sD] ^ R9D;
+                tE = HEAP[inv_sbox | sE] ^ R9E;
+                tF = HEAP[inv_sbox | sF] ^ R9F;
+            } else {
+                t0 = HEAP[inv_sbox | s0 ^ RA0] ^ R90;
+                t1 = HEAP[inv_sbox | sD ^ RAD] ^ R91;
+                t2 = HEAP[inv_sbox | sA ^ RAA] ^ R92;
+                t3 = HEAP[inv_sbox | s7 ^ RA7] ^ R93;
+                t4 = HEAP[inv_sbox | s4 ^ RA4] ^ R94;
+                t5 = HEAP[inv_sbox | s1 ^ RA1] ^ R95;
+                t6 = HEAP[inv_sbox | sE ^ RAE] ^ R96;
+                t7 = HEAP[inv_sbox | sB ^ RAB] ^ R97;
+                t8 = HEAP[inv_sbox | s8 ^ RA8] ^ R98;
+                t9 = HEAP[inv_sbox | s5 ^ RA5] ^ R99;
+                tA = HEAP[inv_sbox | s2 ^ RA2] ^ R9A;
+                tB = HEAP[inv_sbox | sF ^ RAF] ^ R9B;
+                tC = HEAP[inv_sbox | sC ^ RAC] ^ R9C;
+                tD = HEAP[inv_sbox | s9 ^ RA9] ^ R9D;
+                tE = HEAP[inv_sbox | s6 ^ RA6] ^ R9E;
+                tF = HEAP[inv_sbox | s3 ^ RA3] ^ R9F;
+            }
+            s0 = HEAP[xE | t0] ^ HEAP[xB | t1] ^ HEAP[xD | t2] ^ HEAP[x9 | t3];
+            s1 = HEAP[x9 | tC] ^ HEAP[xE | tD] ^ HEAP[xB | tE] ^ HEAP[xD | tF];
+            s2 = HEAP[xD | t8] ^ HEAP[x9 | t9] ^ HEAP[xE | tA] ^ HEAP[xB | tB];
+            s3 = HEAP[xB | t4] ^ HEAP[xD | t5] ^ HEAP[x9 | t6] ^ HEAP[xE | t7];
+            s4 = HEAP[xE | t4] ^ HEAP[xB | t5] ^ HEAP[xD | t6] ^ HEAP[x9 | t7];
+            s5 = HEAP[x9 | t0] ^ HEAP[xE | t1] ^ HEAP[xB | t2] ^ HEAP[xD | t3];
+            s6 = HEAP[xD | tC] ^ HEAP[x9 | tD] ^ HEAP[xE | tE] ^ HEAP[xB | tF];
+            s7 = HEAP[xB | t8] ^ HEAP[xD | t9] ^ HEAP[x9 | tA] ^ HEAP[xE | tB];
+            s8 = HEAP[xE | t8] ^ HEAP[xB | t9] ^ HEAP[xD | tA] ^ HEAP[x9 | tB];
+            s9 = HEAP[x9 | t4] ^ HEAP[xE | t5] ^ HEAP[xB | t6] ^ HEAP[xD | t7];
+            sA = HEAP[xD | t0] ^ HEAP[x9 | t1] ^ HEAP[xE | t2] ^ HEAP[xB | t3];
+            sB = HEAP[xB | tC] ^ HEAP[xD | tD] ^ HEAP[x9 | tE] ^ HEAP[xE | tF];
+            sC = HEAP[xE | tC] ^ HEAP[xB | tD] ^ HEAP[xD | tE] ^ HEAP[x9 | tF];
+            sD = HEAP[x9 | t8] ^ HEAP[xE | t9] ^ HEAP[xB | tA] ^ HEAP[xD | tB];
+            sE = HEAP[xD | t4] ^ HEAP[x9 | t5] ^ HEAP[xE | t6] ^ HEAP[xB | t7];
+            sF = HEAP[xB | t0] ^ HEAP[xD | t1] ^ HEAP[x9 | t2] ^ HEAP[xE | t3];
+            t0 = HEAP[inv_sbox | s0] ^ R80;
+            t1 = HEAP[inv_sbox | s1] ^ R81;
+            t2 = HEAP[inv_sbox | s2] ^ R82;
+            t3 = HEAP[inv_sbox | s3] ^ R83;
+            t4 = HEAP[inv_sbox | s4] ^ R84;
+            t5 = HEAP[inv_sbox | s5] ^ R85;
+            t6 = HEAP[inv_sbox | s6] ^ R86;
+            t7 = HEAP[inv_sbox | s7] ^ R87;
+            t8 = HEAP[inv_sbox | s8] ^ R88;
+            t9 = HEAP[inv_sbox | s9] ^ R89;
+            tA = HEAP[inv_sbox | sA] ^ R8A;
+            tB = HEAP[inv_sbox | sB] ^ R8B;
+            tC = HEAP[inv_sbox | sC] ^ R8C;
+            tD = HEAP[inv_sbox | sD] ^ R8D;
+            tE = HEAP[inv_sbox | sE] ^ R8E;
+            tF = HEAP[inv_sbox | sF] ^ R8F;
+            s0 = HEAP[xE | t0] ^ HEAP[xB | t1] ^ HEAP[xD | t2] ^ HEAP[x9 | t3];
+            s1 = HEAP[x9 | tC] ^ HEAP[xE | tD] ^ HEAP[xB | tE] ^ HEAP[xD | tF];
+            s2 = HEAP[xD | t8] ^ HEAP[x9 | t9] ^ HEAP[xE | tA] ^ HEAP[xB | tB];
+            s3 = HEAP[xB | t4] ^ HEAP[xD | t5] ^ HEAP[x9 | t6] ^ HEAP[xE | t7];
+            s4 = HEAP[xE | t4] ^ HEAP[xB | t5] ^ HEAP[xD | t6] ^ HEAP[x9 | t7];
+            s5 = HEAP[x9 | t0] ^ HEAP[xE | t1] ^ HEAP[xB | t2] ^ HEAP[xD | t3];
+            s6 = HEAP[xD | tC] ^ HEAP[x9 | tD] ^ HEAP[xE | tE] ^ HEAP[xB | tF];
+            s7 = HEAP[xB | t8] ^ HEAP[xD | t9] ^ HEAP[x9 | tA] ^ HEAP[xE | tB];
+            s8 = HEAP[xE | t8] ^ HEAP[xB | t9] ^ HEAP[xD | tA] ^ HEAP[x9 | tB];
+            s9 = HEAP[x9 | t4] ^ HEAP[xE | t5] ^ HEAP[xB | t6] ^ HEAP[xD | t7];
+            sA = HEAP[xD | t0] ^ HEAP[x9 | t1] ^ HEAP[xE | t2] ^ HEAP[xB | t3];
+            sB = HEAP[xB | tC] ^ HEAP[xD | tD] ^ HEAP[x9 | tE] ^ HEAP[xE | tF];
+            sC = HEAP[xE | tC] ^ HEAP[xB | tD] ^ HEAP[xD | tE] ^ HEAP[x9 | tF];
+            sD = HEAP[x9 | t8] ^ HEAP[xE | t9] ^ HEAP[xB | tA] ^ HEAP[xD | tB];
+            sE = HEAP[xD | t4] ^ HEAP[x9 | t5] ^ HEAP[xE | t6] ^ HEAP[xB | t7];
+            sF = HEAP[xB | t0] ^ HEAP[xD | t1] ^ HEAP[x9 | t2] ^ HEAP[xE | t3];
+            t0 = HEAP[inv_sbox | s0] ^ R70;
+            t1 = HEAP[inv_sbox | s1] ^ R71;
+            t2 = HEAP[inv_sbox | s2] ^ R72;
+            t3 = HEAP[inv_sbox | s3] ^ R73;
+            t4 = HEAP[inv_sbox | s4] ^ R74;
+            t5 = HEAP[inv_sbox | s5] ^ R75;
+            t6 = HEAP[inv_sbox | s6] ^ R76;
+            t7 = HEAP[inv_sbox | s7] ^ R77;
+            t8 = HEAP[inv_sbox | s8] ^ R78;
+            t9 = HEAP[inv_sbox | s9] ^ R79;
+            tA = HEAP[inv_sbox | sA] ^ R7A;
+            tB = HEAP[inv_sbox | sB] ^ R7B;
+            tC = HEAP[inv_sbox | sC] ^ R7C;
+            tD = HEAP[inv_sbox | sD] ^ R7D;
+            tE = HEAP[inv_sbox | sE] ^ R7E;
+            tF = HEAP[inv_sbox | sF] ^ R7F;
+            s0 = HEAP[xE | t0] ^ HEAP[xB | t1] ^ HEAP[xD | t2] ^ HEAP[x9 | t3];
+            s1 = HEAP[x9 | tC] ^ HEAP[xE | tD] ^ HEAP[xB | tE] ^ HEAP[xD | tF];
+            s2 = HEAP[xD | t8] ^ HEAP[x9 | t9] ^ HEAP[xE | tA] ^ HEAP[xB | tB];
+            s3 = HEAP[xB | t4] ^ HEAP[xD | t5] ^ HEAP[x9 | t6] ^ HEAP[xE | t7];
+            s4 = HEAP[xE | t4] ^ HEAP[xB | t5] ^ HEAP[xD | t6] ^ HEAP[x9 | t7];
+            s5 = HEAP[x9 | t0] ^ HEAP[xE | t1] ^ HEAP[xB | t2] ^ HEAP[xD | t3];
+            s6 = HEAP[xD | tC] ^ HEAP[x9 | tD] ^ HEAP[xE | tE] ^ HEAP[xB | tF];
+            s7 = HEAP[xB | t8] ^ HEAP[xD | t9] ^ HEAP[x9 | tA] ^ HEAP[xE | tB];
+            s8 = HEAP[xE | t8] ^ HEAP[xB | t9] ^ HEAP[xD | tA] ^ HEAP[x9 | tB];
+            s9 = HEAP[x9 | t4] ^ HEAP[xE | t5] ^ HEAP[xB | t6] ^ HEAP[xD | t7];
+            sA = HEAP[xD | t0] ^ HEAP[x9 | t1] ^ HEAP[xE | t2] ^ HEAP[xB | t3];
+            sB = HEAP[xB | tC] ^ HEAP[xD | tD] ^ HEAP[x9 | tE] ^ HEAP[xE | tF];
+            sC = HEAP[xE | tC] ^ HEAP[xB | tD] ^ HEAP[xD | tE] ^ HEAP[x9 | tF];
+            sD = HEAP[x9 | t8] ^ HEAP[xE | t9] ^ HEAP[xB | tA] ^ HEAP[xD | tB];
+            sE = HEAP[xD | t4] ^ HEAP[x9 | t5] ^ HEAP[xE | t6] ^ HEAP[xB | t7];
+            sF = HEAP[xB | t0] ^ HEAP[xD | t1] ^ HEAP[x9 | t2] ^ HEAP[xE | t3];
+            t0 = HEAP[inv_sbox | s0] ^ R60;
+            t1 = HEAP[inv_sbox | s1] ^ R61;
+            t2 = HEAP[inv_sbox | s2] ^ R62;
+            t3 = HEAP[inv_sbox | s3] ^ R63;
+            t4 = HEAP[inv_sbox | s4] ^ R64;
+            t5 = HEAP[inv_sbox | s5] ^ R65;
+            t6 = HEAP[inv_sbox | s6] ^ R66;
+            t7 = HEAP[inv_sbox | s7] ^ R67;
+            t8 = HEAP[inv_sbox | s8] ^ R68;
+            t9 = HEAP[inv_sbox | s9] ^ R69;
+            tA = HEAP[inv_sbox | sA] ^ R6A;
+            tB = HEAP[inv_sbox | sB] ^ R6B;
+            tC = HEAP[inv_sbox | sC] ^ R6C;
+            tD = HEAP[inv_sbox | sD] ^ R6D;
+            tE = HEAP[inv_sbox | sE] ^ R6E;
+            tF = HEAP[inv_sbox | sF] ^ R6F;
+            s0 = HEAP[xE | t0] ^ HEAP[xB | t1] ^ HEAP[xD | t2] ^ HEAP[x9 | t3];
+            s1 = HEAP[x9 | tC] ^ HEAP[xE | tD] ^ HEAP[xB | tE] ^ HEAP[xD | tF];
+            s2 = HEAP[xD | t8] ^ HEAP[x9 | t9] ^ HEAP[xE | tA] ^ HEAP[xB | tB];
+            s3 = HEAP[xB | t4] ^ HEAP[xD | t5] ^ HEAP[x9 | t6] ^ HEAP[xE | t7];
+            s4 = HEAP[xE | t4] ^ HEAP[xB | t5] ^ HEAP[xD | t6] ^ HEAP[x9 | t7];
+            s5 = HEAP[x9 | t0] ^ HEAP[xE | t1] ^ HEAP[xB | t2] ^ HEAP[xD | t3];
+            s6 = HEAP[xD | tC] ^ HEAP[x9 | tD] ^ HEAP[xE | tE] ^ HEAP[xB | tF];
+            s7 = HEAP[xB | t8] ^ HEAP[xD | t9] ^ HEAP[x9 | tA] ^ HEAP[xE | tB];
+            s8 = HEAP[xE | t8] ^ HEAP[xB | t9] ^ HEAP[xD | tA] ^ HEAP[x9 | tB];
+            s9 = HEAP[x9 | t4] ^ HEAP[xE | t5] ^ HEAP[xB | t6] ^ HEAP[xD | t7];
+            sA = HEAP[xD | t0] ^ HEAP[x9 | t1] ^ HEAP[xE | t2] ^ HEAP[xB | t3];
+            sB = HEAP[xB | tC] ^ HEAP[xD | tD] ^ HEAP[x9 | tE] ^ HEAP[xE | tF];
+            sC = HEAP[xE | tC] ^ HEAP[xB | tD] ^ HEAP[xD | tE] ^ HEAP[x9 | tF];
+            sD = HEAP[x9 | t8] ^ HEAP[xE | t9] ^ HEAP[xB | tA] ^ HEAP[xD | tB];
+            sE = HEAP[xD | t4] ^ HEAP[x9 | t5] ^ HEAP[xE | t6] ^ HEAP[xB | t7];
+            sF = HEAP[xB | t0] ^ HEAP[xD | t1] ^ HEAP[x9 | t2] ^ HEAP[xE | t3];
+            t0 = HEAP[inv_sbox | s0] ^ R50;
+            t1 = HEAP[inv_sbox | s1] ^ R51;
+            t2 = HEAP[inv_sbox | s2] ^ R52;
+            t3 = HEAP[inv_sbox | s3] ^ R53;
+            t4 = HEAP[inv_sbox | s4] ^ R54;
+            t5 = HEAP[inv_sbox | s5] ^ R55;
+            t6 = HEAP[inv_sbox | s6] ^ R56;
+            t7 = HEAP[inv_sbox | s7] ^ R57;
+            t8 = HEAP[inv_sbox | s8] ^ R58;
+            t9 = HEAP[inv_sbox | s9] ^ R59;
+            tA = HEAP[inv_sbox | sA] ^ R5A;
+            tB = HEAP[inv_sbox | sB] ^ R5B;
+            tC = HEAP[inv_sbox | sC] ^ R5C;
+            tD = HEAP[inv_sbox | sD] ^ R5D;
+            tE = HEAP[inv_sbox | sE] ^ R5E;
+            tF = HEAP[inv_sbox | sF] ^ R5F;
+            s0 = HEAP[xE | t0] ^ HEAP[xB | t1] ^ HEAP[xD | t2] ^ HEAP[x9 | t3];
+            s1 = HEAP[x9 | tC] ^ HEAP[xE | tD] ^ HEAP[xB | tE] ^ HEAP[xD | tF];
+            s2 = HEAP[xD | t8] ^ HEAP[x9 | t9] ^ HEAP[xE | tA] ^ HEAP[xB | tB];
+            s3 = HEAP[xB | t4] ^ HEAP[xD | t5] ^ HEAP[x9 | t6] ^ HEAP[xE | t7];
+            s4 = HEAP[xE | t4] ^ HEAP[xB | t5] ^ HEAP[xD | t6] ^ HEAP[x9 | t7];
+            s5 = HEAP[x9 | t0] ^ HEAP[xE | t1] ^ HEAP[xB | t2] ^ HEAP[xD | t3];
+            s6 = HEAP[xD | tC] ^ HEAP[x9 | tD] ^ HEAP[xE | tE] ^ HEAP[xB | tF];
+            s7 = HEAP[xB | t8] ^ HEAP[xD | t9] ^ HEAP[x9 | tA] ^ HEAP[xE | tB];
+            s8 = HEAP[xE | t8] ^ HEAP[xB | t9] ^ HEAP[xD | tA] ^ HEAP[x9 | tB];
+            s9 = HEAP[x9 | t4] ^ HEAP[xE | t5] ^ HEAP[xB | t6] ^ HEAP[xD | t7];
+            sA = HEAP[xD | t0] ^ HEAP[x9 | t1] ^ HEAP[xE | t2] ^ HEAP[xB | t3];
+            sB = HEAP[xB | tC] ^ HEAP[xD | tD] ^ HEAP[x9 | tE] ^ HEAP[xE | tF];
+            sC = HEAP[xE | tC] ^ HEAP[xB | tD] ^ HEAP[xD | tE] ^ HEAP[x9 | tF];
+            sD = HEAP[x9 | t8] ^ HEAP[xE | t9] ^ HEAP[xB | tA] ^ HEAP[xD | tB];
+            sE = HEAP[xD | t4] ^ HEAP[x9 | t5] ^ HEAP[xE | t6] ^ HEAP[xB | t7];
+            sF = HEAP[xB | t0] ^ HEAP[xD | t1] ^ HEAP[x9 | t2] ^ HEAP[xE | t3];
+            t0 = HEAP[inv_sbox | s0] ^ R40;
+            t1 = HEAP[inv_sbox | s1] ^ R41;
+            t2 = HEAP[inv_sbox | s2] ^ R42;
+            t3 = HEAP[inv_sbox | s3] ^ R43;
+            t4 = HEAP[inv_sbox | s4] ^ R44;
+            t5 = HEAP[inv_sbox | s5] ^ R45;
+            t6 = HEAP[inv_sbox | s6] ^ R46;
+            t7 = HEAP[inv_sbox | s7] ^ R47;
+            t8 = HEAP[inv_sbox | s8] ^ R48;
+            t9 = HEAP[inv_sbox | s9] ^ R49;
+            tA = HEAP[inv_sbox | sA] ^ R4A;
+            tB = HEAP[inv_sbox | sB] ^ R4B;
+            tC = HEAP[inv_sbox | sC] ^ R4C;
+            tD = HEAP[inv_sbox | sD] ^ R4D;
+            tE = HEAP[inv_sbox | sE] ^ R4E;
+            tF = HEAP[inv_sbox | sF] ^ R4F;
+            s0 = HEAP[xE | t0] ^ HEAP[xB | t1] ^ HEAP[xD | t2] ^ HEAP[x9 | t3];
+            s1 = HEAP[x9 | tC] ^ HEAP[xE | tD] ^ HEAP[xB | tE] ^ HEAP[xD | tF];
+            s2 = HEAP[xD | t8] ^ HEAP[x9 | t9] ^ HEAP[xE | tA] ^ HEAP[xB | tB];
+            s3 = HEAP[xB | t4] ^ HEAP[xD | t5] ^ HEAP[x9 | t6] ^ HEAP[xE | t7];
+            s4 = HEAP[xE | t4] ^ HEAP[xB | t5] ^ HEAP[xD | t6] ^ HEAP[x9 | t7];
+            s5 = HEAP[x9 | t0] ^ HEAP[xE | t1] ^ HEAP[xB | t2] ^ HEAP[xD | t3];
+            s6 = HEAP[xD | tC] ^ HEAP[x9 | tD] ^ HEAP[xE | tE] ^ HEAP[xB | tF];
+            s7 = HEAP[xB | t8] ^ HEAP[xD | t9] ^ HEAP[x9 | tA] ^ HEAP[xE | tB];
+            s8 = HEAP[xE | t8] ^ HEAP[xB | t9] ^ HEAP[xD | tA] ^ HEAP[x9 | tB];
+            s9 = HEAP[x9 | t4] ^ HEAP[xE | t5] ^ HEAP[xB | t6] ^ HEAP[xD | t7];
+            sA = HEAP[xD | t0] ^ HEAP[x9 | t1] ^ HEAP[xE | t2] ^ HEAP[xB | t3];
+            sB = HEAP[xB | tC] ^ HEAP[xD | tD] ^ HEAP[x9 | tE] ^ HEAP[xE | tF];
+            sC = HEAP[xE | tC] ^ HEAP[xB | tD] ^ HEAP[xD | tE] ^ HEAP[x9 | tF];
+            sD = HEAP[x9 | t8] ^ HEAP[xE | t9] ^ HEAP[xB | tA] ^ HEAP[xD | tB];
+            sE = HEAP[xD | t4] ^ HEAP[x9 | t5] ^ HEAP[xE | t6] ^ HEAP[xB | t7];
+            sF = HEAP[xB | t0] ^ HEAP[xD | t1] ^ HEAP[x9 | t2] ^ HEAP[xE | t3];
+            t0 = HEAP[inv_sbox | s0] ^ R30;
+            t1 = HEAP[inv_sbox | s1] ^ R31;
+            t2 = HEAP[inv_sbox | s2] ^ R32;
+            t3 = HEAP[inv_sbox | s3] ^ R33;
+            t4 = HEAP[inv_sbox | s4] ^ R34;
+            t5 = HEAP[inv_sbox | s5] ^ R35;
+            t6 = HEAP[inv_sbox | s6] ^ R36;
+            t7 = HEAP[inv_sbox | s7] ^ R37;
+            t8 = HEAP[inv_sbox | s8] ^ R38;
+            t9 = HEAP[inv_sbox | s9] ^ R39;
+            tA = HEAP[inv_sbox | sA] ^ R3A;
+            tB = HEAP[inv_sbox | sB] ^ R3B;
+            tC = HEAP[inv_sbox | sC] ^ R3C;
+            tD = HEAP[inv_sbox | sD] ^ R3D;
+            tE = HEAP[inv_sbox | sE] ^ R3E;
+            tF = HEAP[inv_sbox | sF] ^ R3F;
+            s0 = HEAP[xE | t0] ^ HEAP[xB | t1] ^ HEAP[xD | t2] ^ HEAP[x9 | t3];
+            s1 = HEAP[x9 | tC] ^ HEAP[xE | tD] ^ HEAP[xB | tE] ^ HEAP[xD | tF];
+            s2 = HEAP[xD | t8] ^ HEAP[x9 | t9] ^ HEAP[xE | tA] ^ HEAP[xB | tB];
+            s3 = HEAP[xB | t4] ^ HEAP[xD | t5] ^ HEAP[x9 | t6] ^ HEAP[xE | t7];
+            s4 = HEAP[xE | t4] ^ HEAP[xB | t5] ^ HEAP[xD | t6] ^ HEAP[x9 | t7];
+            s5 = HEAP[x9 | t0] ^ HEAP[xE | t1] ^ HEAP[xB | t2] ^ HEAP[xD | t3];
+            s6 = HEAP[xD | tC] ^ HEAP[x9 | tD] ^ HEAP[xE | tE] ^ HEAP[xB | tF];
+            s7 = HEAP[xB | t8] ^ HEAP[xD | t9] ^ HEAP[x9 | tA] ^ HEAP[xE | tB];
+            s8 = HEAP[xE | t8] ^ HEAP[xB | t9] ^ HEAP[xD | tA] ^ HEAP[x9 | tB];
+            s9 = HEAP[x9 | t4] ^ HEAP[xE | t5] ^ HEAP[xB | t6] ^ HEAP[xD | t7];
+            sA = HEAP[xD | t0] ^ HEAP[x9 | t1] ^ HEAP[xE | t2] ^ HEAP[xB | t3];
+            sB = HEAP[xB | tC] ^ HEAP[xD | tD] ^ HEAP[x9 | tE] ^ HEAP[xE | tF];
+            sC = HEAP[xE | tC] ^ HEAP[xB | tD] ^ HEAP[xD | tE] ^ HEAP[x9 | tF];
+            sD = HEAP[x9 | t8] ^ HEAP[xE | t9] ^ HEAP[xB | tA] ^ HEAP[xD | tB];
+            sE = HEAP[xD | t4] ^ HEAP[x9 | t5] ^ HEAP[xE | t6] ^ HEAP[xB | t7];
+            sF = HEAP[xB | t0] ^ HEAP[xD | t1] ^ HEAP[x9 | t2] ^ HEAP[xE | t3];
+            t0 = HEAP[inv_sbox | s0] ^ R20;
+            t1 = HEAP[inv_sbox | s1] ^ R21;
+            t2 = HEAP[inv_sbox | s2] ^ R22;
+            t3 = HEAP[inv_sbox | s3] ^ R23;
+            t4 = HEAP[inv_sbox | s4] ^ R24;
+            t5 = HEAP[inv_sbox | s5] ^ R25;
+            t6 = HEAP[inv_sbox | s6] ^ R26;
+            t7 = HEAP[inv_sbox | s7] ^ R27;
+            t8 = HEAP[inv_sbox | s8] ^ R28;
+            t9 = HEAP[inv_sbox | s9] ^ R29;
+            tA = HEAP[inv_sbox | sA] ^ R2A;
+            tB = HEAP[inv_sbox | sB] ^ R2B;
+            tC = HEAP[inv_sbox | sC] ^ R2C;
+            tD = HEAP[inv_sbox | sD] ^ R2D;
+            tE = HEAP[inv_sbox | sE] ^ R2E;
+            tF = HEAP[inv_sbox | sF] ^ R2F;
+            s0 = HEAP[xE | t0] ^ HEAP[xB | t1] ^ HEAP[xD | t2] ^ HEAP[x9 | t3];
+            s1 = HEAP[x9 | tC] ^ HEAP[xE | tD] ^ HEAP[xB | tE] ^ HEAP[xD | tF];
+            s2 = HEAP[xD | t8] ^ HEAP[x9 | t9] ^ HEAP[xE | tA] ^ HEAP[xB | tB];
+            s3 = HEAP[xB | t4] ^ HEAP[xD | t5] ^ HEAP[x9 | t6] ^ HEAP[xE | t7];
+            s4 = HEAP[xE | t4] ^ HEAP[xB | t5] ^ HEAP[xD | t6] ^ HEAP[x9 | t7];
+            s5 = HEAP[x9 | t0] ^ HEAP[xE | t1] ^ HEAP[xB | t2] ^ HEAP[xD | t3];
+            s6 = HEAP[xD | tC] ^ HEAP[x9 | tD] ^ HEAP[xE | tE] ^ HEAP[xB | tF];
+            s7 = HEAP[xB | t8] ^ HEAP[xD | t9] ^ HEAP[x9 | tA] ^ HEAP[xE | tB];
+            s8 = HEAP[xE | t8] ^ HEAP[xB | t9] ^ HEAP[xD | tA] ^ HEAP[x9 | tB];
+            s9 = HEAP[x9 | t4] ^ HEAP[xE | t5] ^ HEAP[xB | t6] ^ HEAP[xD | t7];
+            sA = HEAP[xD | t0] ^ HEAP[x9 | t1] ^ HEAP[xE | t2] ^ HEAP[xB | t3];
+            sB = HEAP[xB | tC] ^ HEAP[xD | tD] ^ HEAP[x9 | tE] ^ HEAP[xE | tF];
+            sC = HEAP[xE | tC] ^ HEAP[xB | tD] ^ HEAP[xD | tE] ^ HEAP[x9 | tF];
+            sD = HEAP[x9 | t8] ^ HEAP[xE | t9] ^ HEAP[xB | tA] ^ HEAP[xD | tB];
+            sE = HEAP[xD | t4] ^ HEAP[x9 | t5] ^ HEAP[xE | t6] ^ HEAP[xB | t7];
+            sF = HEAP[xB | t0] ^ HEAP[xD | t1] ^ HEAP[x9 | t2] ^ HEAP[xE | t3];
+            t0 = HEAP[inv_sbox | s0] ^ R10;
+            t1 = HEAP[inv_sbox | s1] ^ R11;
+            t2 = HEAP[inv_sbox | s2] ^ R12;
+            t3 = HEAP[inv_sbox | s3] ^ R13;
+            t4 = HEAP[inv_sbox | s4] ^ R14;
+            t5 = HEAP[inv_sbox | s5] ^ R15;
+            t6 = HEAP[inv_sbox | s6] ^ R16;
+            t7 = HEAP[inv_sbox | s7] ^ R17;
+            t8 = HEAP[inv_sbox | s8] ^ R18;
+            t9 = HEAP[inv_sbox | s9] ^ R19;
+            tA = HEAP[inv_sbox | sA] ^ R1A;
+            tB = HEAP[inv_sbox | sB] ^ R1B;
+            tC = HEAP[inv_sbox | sC] ^ R1C;
+            tD = HEAP[inv_sbox | sD] ^ R1D;
+            tE = HEAP[inv_sbox | sE] ^ R1E;
+            tF = HEAP[inv_sbox | sF] ^ R1F;
+            s0 = HEAP[xE | t0] ^ HEAP[xB | t1] ^ HEAP[xD | t2] ^ HEAP[x9 | t3];
+            s1 = HEAP[x9 | tC] ^ HEAP[xE | tD] ^ HEAP[xB | tE] ^ HEAP[xD | tF];
+            s2 = HEAP[xD | t8] ^ HEAP[x9 | t9] ^ HEAP[xE | tA] ^ HEAP[xB | tB];
+            s3 = HEAP[xB | t4] ^ HEAP[xD | t5] ^ HEAP[x9 | t6] ^ HEAP[xE | t7];
+            s4 = HEAP[xE | t4] ^ HEAP[xB | t5] ^ HEAP[xD | t6] ^ HEAP[x9 | t7];
+            s5 = HEAP[x9 | t0] ^ HEAP[xE | t1] ^ HEAP[xB | t2] ^ HEAP[xD | t3];
+            s6 = HEAP[xD | tC] ^ HEAP[x9 | tD] ^ HEAP[xE | tE] ^ HEAP[xB | tF];
+            s7 = HEAP[xB | t8] ^ HEAP[xD | t9] ^ HEAP[x9 | tA] ^ HEAP[xE | tB];
+            s8 = HEAP[xE | t8] ^ HEAP[xB | t9] ^ HEAP[xD | tA] ^ HEAP[x9 | tB];
+            s9 = HEAP[x9 | t4] ^ HEAP[xE | t5] ^ HEAP[xB | t6] ^ HEAP[xD | t7];
+            sA = HEAP[xD | t0] ^ HEAP[x9 | t1] ^ HEAP[xE | t2] ^ HEAP[xB | t3];
+            sB = HEAP[xB | tC] ^ HEAP[xD | tD] ^ HEAP[x9 | tE] ^ HEAP[xE | tF];
+            sC = HEAP[xE | tC] ^ HEAP[xB | tD] ^ HEAP[xD | tE] ^ HEAP[x9 | tF];
+            sD = HEAP[x9 | t8] ^ HEAP[xE | t9] ^ HEAP[xB | tA] ^ HEAP[xD | tB];
+            sE = HEAP[xD | t4] ^ HEAP[x9 | t5] ^ HEAP[xE | t6] ^ HEAP[xB | t7];
+            sF = HEAP[xB | t0] ^ HEAP[xD | t1] ^ HEAP[x9 | t2] ^ HEAP[xE | t3];
+            S0 = HEAP[inv_sbox | s0] ^ R00;
+            S1 = HEAP[inv_sbox | s1] ^ R01;
+            S2 = HEAP[inv_sbox | s2] ^ R02;
+            S3 = HEAP[inv_sbox | s3] ^ R03;
+            S4 = HEAP[inv_sbox | s4] ^ R04;
+            S5 = HEAP[inv_sbox | s5] ^ R05;
+            S6 = HEAP[inv_sbox | s6] ^ R06;
+            S7 = HEAP[inv_sbox | s7] ^ R07;
+            S8 = HEAP[inv_sbox | s8] ^ R08;
+            S9 = HEAP[inv_sbox | s9] ^ R09;
+            SA = HEAP[inv_sbox | sA] ^ R0A;
+            SB = HEAP[inv_sbox | sB] ^ R0B;
+            SC = HEAP[inv_sbox | sC] ^ R0C;
+            SD = HEAP[inv_sbox | sD] ^ R0D;
+            SE = HEAP[inv_sbox | sE] ^ R0E;
+            SF = HEAP[inv_sbox | sF] ^ R0F;
+        }
+        function init_state(s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, sA, sB, sC, sD, sE, sF) {
+            s0 = s0 | 0;
+            s1 = s1 | 0;
+            s2 = s2 | 0;
+            s3 = s3 | 0;
+            s4 = s4 | 0;
+            s5 = s5 | 0;
+            s6 = s6 | 0;
+            s7 = s7 | 0;
+            s8 = s8 | 0;
+            s9 = s9 | 0;
+            sA = sA | 0;
+            sB = sB | 0;
+            sC = sC | 0;
+            sD = sD | 0;
+            sE = sE | 0;
+            sF = sF | 0;
+            S0 = s0;
+            S1 = s1;
+            S2 = s2;
+            S3 = s3;
+            S4 = s4;
+            S5 = s5;
+            S6 = s6;
+            S7 = s7;
+            S8 = s8;
+            S9 = s9;
+            SA = sA;
+            SB = sB;
+            SC = sC;
+            SD = sD;
+            SE = sE;
+            SF = sF;
+        }
+        function save_state(offset) {
+            offset = offset | 0;
+            HEAP[offset] = S0;
+            HEAP[offset | 1] = S1;
+            HEAP[offset | 2] = S2;
+            HEAP[offset | 3] = S3;
+            HEAP[offset | 4] = S4;
+            HEAP[offset | 5] = S5;
+            HEAP[offset | 6] = S6;
+            HEAP[offset | 7] = S7;
+            HEAP[offset | 8] = S8;
+            HEAP[offset | 9] = S9;
+            HEAP[offset | 10] = SA;
+            HEAP[offset | 11] = SB;
+            HEAP[offset | 12] = SC;
+            HEAP[offset | 13] = SD;
+            HEAP[offset | 14] = SE;
+            HEAP[offset | 15] = SF;
+        }
+        function init_key_128(k0, k1, k2, k3, k4, k5, k6, k7, k8, k9, kA, kB, kC, kD, kE, kF) {
+            k0 = k0 | 0;
+            k1 = k1 | 0;
+            k2 = k2 | 0;
+            k3 = k3 | 0;
+            k4 = k4 | 0;
+            k5 = k5 | 0;
+            k6 = k6 | 0;
+            k7 = k7 | 0;
+            k8 = k8 | 0;
+            k9 = k9 | 0;
+            kA = kA | 0;
+            kB = kB | 0;
+            kC = kC | 0;
+            kD = kD | 0;
+            kE = kE | 0;
+            kF = kF | 0;
+            R00 = k0;
+            R01 = k1;
+            R02 = k2;
+            R03 = k3;
+            R04 = k4;
+            R05 = k5;
+            R06 = k6;
+            R07 = k7;
+            R08 = k8;
+            R09 = k9;
+            R0A = kA;
+            R0B = kB;
+            R0C = kC;
+            R0D = kD;
+            R0E = kE;
+            R0F = kF;
+            keySize = 16;
+            _expand_key_128();
+        }
+        function init_key_256(k00, k01, k02, k03, k04, k05, k06, k07, k08, k09, k0A, k0B, k0C, k0D, k0E, k0F, k10, k11, k12, k13, k14, k15, k16, k17, k18, k19, k1A, k1B, k1C, k1D, k1E, k1F) {
+            k00 = k00 | 0;
+            k01 = k01 | 0;
+            k02 = k02 | 0;
+            k03 = k03 | 0;
+            k04 = k04 | 0;
+            k05 = k05 | 0;
+            k06 = k06 | 0;
+            k07 = k07 | 0;
+            k08 = k08 | 0;
+            k09 = k09 | 0;
+            k0A = k0A | 0;
+            k0B = k0B | 0;
+            k0C = k0C | 0;
+            k0D = k0D | 0;
+            k0E = k0E | 0;
+            k0F = k0F | 0;
+            k10 = k10 | 0;
+            k11 = k11 | 0;
+            k12 = k12 | 0;
+            k13 = k13 | 0;
+            k14 = k14 | 0;
+            k15 = k15 | 0;
+            k16 = k16 | 0;
+            k17 = k17 | 0;
+            k18 = k18 | 0;
+            k19 = k19 | 0;
+            k1A = k1A | 0;
+            k1B = k1B | 0;
+            k1C = k1C | 0;
+            k1D = k1D | 0;
+            k1E = k1E | 0;
+            k1F = k1F | 0;
+            R00 = k00;
+            R01 = k01;
+            R02 = k02;
+            R03 = k03;
+            R04 = k04;
+            R05 = k05;
+            R06 = k06;
+            R07 = k07;
+            R08 = k08;
+            R09 = k09;
+            R0A = k0A;
+            R0B = k0B;
+            R0C = k0C;
+            R0D = k0D;
+            R0E = k0E;
+            R0F = k0F;
+            R10 = k10;
+            R11 = k11;
+            R12 = k12;
+            R13 = k13;
+            R14 = k14;
+            R15 = k15;
+            R16 = k16;
+            R17 = k17;
+            R18 = k18;
+            R19 = k19;
+            R1A = k1A;
+            R1B = k1B;
+            R1C = k1C;
+            R1D = k1D;
+            R1E = k1E;
+            R1F = k1F;
+            keySize = 32;
+            _expand_key_256();
+        }
+        function ecb_encrypt(offset, length) {
+            offset = offset | 0;
+            length = length | 0;
+            var encrypted = 0;
+            if (offset & 15) return -1;
+            while ((length | 0) >= 16) {
+                _encrypt(HEAP[offset] | 0, HEAP[offset | 1] | 0, HEAP[offset | 2] | 0, HEAP[offset | 3] | 0, HEAP[offset | 4] | 0, HEAP[offset | 5] | 0, HEAP[offset | 6] | 0, HEAP[offset | 7] | 0, HEAP[offset | 8] | 0, HEAP[offset | 9] | 0, HEAP[offset | 10] | 0, HEAP[offset | 11] | 0, HEAP[offset | 12] | 0, HEAP[offset | 13] | 0, HEAP[offset | 14] | 0, HEAP[offset | 15] | 0);
+                HEAP[offset] = S0;
+                HEAP[offset | 1] = S1;
+                HEAP[offset | 2] = S2;
+                HEAP[offset | 3] = S3;
+                HEAP[offset | 4] = S4;
+                HEAP[offset | 5] = S5;
+                HEAP[offset | 6] = S6;
+                HEAP[offset | 7] = S7;
+                HEAP[offset | 8] = S8;
+                HEAP[offset | 9] = S9;
+                HEAP[offset | 10] = SA;
+                HEAP[offset | 11] = SB;
+                HEAP[offset | 12] = SC;
+                HEAP[offset | 13] = SD;
+                HEAP[offset | 14] = SE;
+                HEAP[offset | 15] = SF;
+                offset = offset + 16 | 0;
+                length = length - 16 | 0;
+                encrypted = encrypted + 16 | 0;
+            }
+            return encrypted | 0;
+        }
+        function ecb_decrypt(offset, length) {
+            offset = offset | 0;
+            length = length | 0;
+            var decrypted = 0;
+            if (offset & 15) return -1;
+            while ((length | 0) >= 16) {
+                _decrypt(HEAP[offset] | 0, HEAP[offset | 1] | 0, HEAP[offset | 2] | 0, HEAP[offset | 3] | 0, HEAP[offset | 4] | 0, HEAP[offset | 5] | 0, HEAP[offset | 6] | 0, HEAP[offset | 7] | 0, HEAP[offset | 8] | 0, HEAP[offset | 9] | 0, HEAP[offset | 10] | 0, HEAP[offset | 11] | 0, HEAP[offset | 12] | 0, HEAP[offset | 13] | 0, HEAP[offset | 14] | 0, HEAP[offset | 15] | 0);
+                HEAP[offset] = S0;
+                HEAP[offset | 1] = S1;
+                HEAP[offset | 2] = S2;
+                HEAP[offset | 3] = S3;
+                HEAP[offset | 4] = S4;
+                HEAP[offset | 5] = S5;
+                HEAP[offset | 6] = S6;
+                HEAP[offset | 7] = S7;
+                HEAP[offset | 8] = S8;
+                HEAP[offset | 9] = S9;
+                HEAP[offset | 10] = SA;
+                HEAP[offset | 11] = SB;
+                HEAP[offset | 12] = SC;
+                HEAP[offset | 13] = SD;
+                HEAP[offset | 14] = SE;
+                HEAP[offset | 15] = SF;
+                offset = offset + 16 | 0;
+                length = length - 16 | 0;
+                decrypted = decrypted + 16 | 0;
+            }
+            return decrypted | 0;
+        }
+        function cbc_encrypt(offset, length) {
+            offset = offset | 0;
+            length = length | 0;
+            var encrypted = 0;
+            if (offset & 15) return -1;
+            while ((length | 0) >= 16) {
+                _encrypt(S0 ^ HEAP[offset], S1 ^ HEAP[offset | 1], S2 ^ HEAP[offset | 2], S3 ^ HEAP[offset | 3], S4 ^ HEAP[offset | 4], S5 ^ HEAP[offset | 5], S6 ^ HEAP[offset | 6], S7 ^ HEAP[offset | 7], S8 ^ HEAP[offset | 8], S9 ^ HEAP[offset | 9], SA ^ HEAP[offset | 10], SB ^ HEAP[offset | 11], SC ^ HEAP[offset | 12], SD ^ HEAP[offset | 13], SE ^ HEAP[offset | 14], SF ^ HEAP[offset | 15]);
+                HEAP[offset] = S0;
+                HEAP[offset | 1] = S1;
+                HEAP[offset | 2] = S2;
+                HEAP[offset | 3] = S3;
+                HEAP[offset | 4] = S4;
+                HEAP[offset | 5] = S5;
+                HEAP[offset | 6] = S6;
+                HEAP[offset | 7] = S7;
+                HEAP[offset | 8] = S8;
+                HEAP[offset | 9] = S9;
+                HEAP[offset | 10] = SA;
+                HEAP[offset | 11] = SB;
+                HEAP[offset | 12] = SC;
+                HEAP[offset | 13] = SD;
+                HEAP[offset | 14] = SE;
+                HEAP[offset | 15] = SF;
+                offset = offset + 16 | 0;
+                length = length - 16 | 0;
+                encrypted = encrypted + 16 | 0;
+            }
+            return encrypted | 0;
+        }
+        function cbc_decrypt(offset, length) {
+            offset = offset | 0;
+            length = length | 0;
+            var iv0 = 0, iv1 = 0, iv2 = 0, iv3 = 0, iv4 = 0, iv5 = 0, iv6 = 0, iv7 = 0, iv8 = 0, iv9 = 0, ivA = 0, ivB = 0, ivC = 0, ivD = 0, ivE = 0, ivF = 0, decrypted = 0;
+            if (offset & 15) return -1;
+            iv0 = S0;
+            iv1 = S1;
+            iv2 = S2;
+            iv3 = S3;
+            iv4 = S4;
+            iv5 = S5;
+            iv6 = S6;
+            iv7 = S7;
+            iv8 = S8;
+            iv9 = S9;
+            ivA = SA;
+            ivB = SB;
+            ivC = SC;
+            ivD = SD;
+            ivE = SE;
+            ivF = SF;
+            while ((length | 0) >= 16) {
+                _decrypt(HEAP[offset] | 0, HEAP[offset | 1] | 0, HEAP[offset | 2] | 0, HEAP[offset | 3] | 0, HEAP[offset | 4] | 0, HEAP[offset | 5] | 0, HEAP[offset | 6] | 0, HEAP[offset | 7] | 0, HEAP[offset | 8] | 0, HEAP[offset | 9] | 0, HEAP[offset | 10] | 0, HEAP[offset | 11] | 0, HEAP[offset | 12] | 0, HEAP[offset | 13] | 0, HEAP[offset | 14] | 0, HEAP[offset | 15] | 0);
+                S0 = S0 ^ iv0;
+                iv0 = HEAP[offset] | 0;
+                S1 = S1 ^ iv1;
+                iv1 = HEAP[offset | 1] | 0;
+                S2 = S2 ^ iv2;
+                iv2 = HEAP[offset | 2] | 0;
+                S3 = S3 ^ iv3;
+                iv3 = HEAP[offset | 3] | 0;
+                S4 = S4 ^ iv4;
+                iv4 = HEAP[offset | 4] | 0;
+                S5 = S5 ^ iv5;
+                iv5 = HEAP[offset | 5] | 0;
+                S6 = S6 ^ iv6;
+                iv6 = HEAP[offset | 6] | 0;
+                S7 = S7 ^ iv7;
+                iv7 = HEAP[offset | 7] | 0;
+                S8 = S8 ^ iv8;
+                iv8 = HEAP[offset | 8] | 0;
+                S9 = S9 ^ iv9;
+                iv9 = HEAP[offset | 9] | 0;
+                SA = SA ^ ivA;
+                ivA = HEAP[offset | 10] | 0;
+                SB = SB ^ ivB;
+                ivB = HEAP[offset | 11] | 0;
+                SC = SC ^ ivC;
+                ivC = HEAP[offset | 12] | 0;
+                SD = SD ^ ivD;
+                ivD = HEAP[offset | 13] | 0;
+                SE = SE ^ ivE;
+                ivE = HEAP[offset | 14] | 0;
+                SF = SF ^ ivF;
+                ivF = HEAP[offset | 15] | 0;
+                HEAP[offset] = S0;
+                HEAP[offset | 1] = S1;
+                HEAP[offset | 2] = S2;
+                HEAP[offset | 3] = S3;
+                HEAP[offset | 4] = S4;
+                HEAP[offset | 5] = S5;
+                HEAP[offset | 6] = S6;
+                HEAP[offset | 7] = S7;
+                HEAP[offset | 8] = S8;
+                HEAP[offset | 9] = S9;
+                HEAP[offset | 10] = SA;
+                HEAP[offset | 11] = SB;
+                HEAP[offset | 12] = SC;
+                HEAP[offset | 13] = SD;
+                HEAP[offset | 14] = SE;
+                HEAP[offset | 15] = SF;
+                offset = offset + 16 | 0;
+                length = length - 16 | 0;
+                decrypted = decrypted + 16 | 0;
+            }
+            S0 = iv0;
+            S1 = iv1;
+            S2 = iv2;
+            S3 = iv3;
+            S4 = iv4;
+            S5 = iv5;
+            S6 = iv6;
+            S7 = iv7;
+            S8 = iv8;
+            S9 = iv9;
+            SA = ivA;
+            SB = ivB;
+            SC = ivC;
+            SD = ivD;
+            SE = ivE;
+            SF = ivF;
+            return decrypted | 0;
+        }
+        function cbc_mac(offset, length, output) {
+            offset = offset | 0;
+            length = length | 0;
+            output = output | 0;
+            if (offset & 15) return -1;
+            if (~output) if (output & 31) return -1;
+            while ((length | 0) >= 16) {
+                _encrypt(S0 ^ HEAP[offset], S1 ^ HEAP[offset | 1], S2 ^ HEAP[offset | 2], S3 ^ HEAP[offset | 3], S4 ^ HEAP[offset | 4], S5 ^ HEAP[offset | 5], S6 ^ HEAP[offset | 6], S7 ^ HEAP[offset | 7], S8 ^ HEAP[offset | 8], S9 ^ HEAP[offset | 9], SA ^ HEAP[offset | 10], SB ^ HEAP[offset | 11], SC ^ HEAP[offset | 12], SD ^ HEAP[offset | 13], SE ^ HEAP[offset | 14], SF ^ HEAP[offset | 15]);
+                offset = offset + 16 | 0;
+                length = length - 16 | 0;
+            }
+            if ((length | 0) > 0) {
+                S0 = S0 ^ HEAP[offset];
+                if ((length | 0) > 1) S1 = S1 ^ HEAP[offset | 1];
+                if ((length | 0) > 2) S2 = S2 ^ HEAP[offset | 2];
+                if ((length | 0) > 3) S3 = S3 ^ HEAP[offset | 3];
+                if ((length | 0) > 4) S4 = S4 ^ HEAP[offset | 4];
+                if ((length | 0) > 5) S5 = S5 ^ HEAP[offset | 5];
+                if ((length | 0) > 6) S6 = S6 ^ HEAP[offset | 6];
+                if ((length | 0) > 7) S7 = S7 ^ HEAP[offset | 7];
+                if ((length | 0) > 8) S8 = S8 ^ HEAP[offset | 8];
+                if ((length | 0) > 9) S9 = S9 ^ HEAP[offset | 9];
+                if ((length | 0) > 10) SA = SA ^ HEAP[offset | 10];
+                if ((length | 0) > 11) SB = SB ^ HEAP[offset | 11];
+                if ((length | 0) > 12) SC = SC ^ HEAP[offset | 12];
+                if ((length | 0) > 13) SD = SD ^ HEAP[offset | 13];
+                if ((length | 0) > 14) SE = SE ^ HEAP[offset | 14];
+                _encrypt(S0, S1, S2, S3, S4, S5, S6, S7, S8, S9, SA, SB, SC, SD, SE, SF);
+                offset = offset + length | 0;
+                length = 0;
+            }
+            if (~output) {
+                HEAP[output | 0] = S0;
+                HEAP[output | 1] = S1;
+                HEAP[output | 2] = S2;
+                HEAP[output | 3] = S3;
+                HEAP[output | 4] = S4;
+                HEAP[output | 5] = S5;
+                HEAP[output | 6] = S6;
+                HEAP[output | 7] = S7;
+                HEAP[output | 8] = S8;
+                HEAP[output | 9] = S9;
+                HEAP[output | 10] = SA;
+                HEAP[output | 11] = SB;
+                HEAP[output | 12] = SC;
+                HEAP[output | 13] = SD;
+                HEAP[output | 14] = SE;
+                HEAP[output | 15] = SF;
+            }
+            return 0;
+        }
+        function ctr_encrypt(offset, length, n0, n1, n2, n3, n4, n5, n6, n7, n8, n9, nA, nB, nCDEF) {
+            offset = offset | 0;
+            length = length | 0;
+            n0 = n0 | 0;
+            n1 = n1 | 0;
+            n2 = n2 | 0;
+            n3 = n3 | 0;
+            n4 = n4 | 0;
+            n5 = n5 | 0;
+            n6 = n6 | 0;
+            n7 = n7 | 0;
+            n8 = n8 | 0;
+            n9 = n9 | 0;
+            nA = nA | 0;
+            nB = nB | 0;
+            nCDEF = nCDEF | 0;
+            var encrypted = 0;
+            while ((length | 0) >= 16) {
+                _encrypt(n0, n1, n2, n3, n4, n5, n6, n7, n8, n9, nA, nB, nCDEF >>> 24, nCDEF >>> 16 & 255, nCDEF >>> 8 & 255, nCDEF & 255);
+                HEAP[offset | 0] = HEAP[offset | 0] ^ S0;
+                HEAP[offset | 1] = HEAP[offset | 1] ^ S1;
+                HEAP[offset | 2] = HEAP[offset | 2] ^ S2;
+                HEAP[offset | 3] = HEAP[offset | 3] ^ S3;
+                HEAP[offset | 4] = HEAP[offset | 4] ^ S4;
+                HEAP[offset | 5] = HEAP[offset | 5] ^ S5;
+                HEAP[offset | 6] = HEAP[offset | 6] ^ S6;
+                HEAP[offset | 7] = HEAP[offset | 7] ^ S7;
+                HEAP[offset | 8] = HEAP[offset | 8] ^ S8;
+                HEAP[offset | 9] = HEAP[offset | 9] ^ S9;
+                HEAP[offset | 10] = HEAP[offset | 10] ^ SA;
+                HEAP[offset | 11] = HEAP[offset | 11] ^ SB;
+                HEAP[offset | 12] = HEAP[offset | 12] ^ SC;
+                HEAP[offset | 13] = HEAP[offset | 13] ^ SD;
+                HEAP[offset | 14] = HEAP[offset | 14] ^ SE;
+                HEAP[offset | 15] = HEAP[offset | 15] ^ SF;
+                offset = offset + 16 | 0;
+                length = length - 16 | 0;
+                encrypted = encrypted + 16 | 0;
+                nCDEF = nCDEF + 1 | 0;
+            }
+            return encrypted | 0;
+        }
+        function ccm_encrypt(offset, length, nonce0, nonce1, nonce2, nonce3, nonce4, nonce5, nonce6, nonce7, nonce8, nonce9, nonceA, nonceB, nonceC, nonceD, counter0, counter1) {
+            offset = offset | 0;
+            length = length | 0;
+            nonce0 = nonce0 | 0;
+            nonce1 = nonce1 | 0;
+            nonce2 = nonce2 | 0;
+            nonce3 = nonce3 | 0;
+            nonce4 = nonce4 | 0;
+            nonce5 = nonce5 | 0;
+            nonce6 = nonce6 | 0;
+            nonce7 = nonce7 | 0;
+            nonce8 = nonce8 | 0;
+            nonce9 = nonce9 | 0;
+            nonceA = nonceA | 0;
+            nonceB = nonceB | 0;
+            nonceC = nonceC | 0;
+            nonceD = nonceD | 0;
+            counter0 = counter0 | 0;
+            counter1 = counter1 | 0;
+            var iv0 = 0, iv1 = 0, iv2 = 0, iv3 = 0, iv4 = 0, iv5 = 0, iv6 = 0, iv7 = 0, iv8 = 0, iv9 = 0, ivA = 0, ivB = 0, ivC = 0, ivD = 0, ivE = 0, ivF = 0, s0 = 0, s1 = 0, s2 = 0, s3 = 0, s4 = 0, s5 = 0, s6 = 0, s7 = 0, s8 = 0, s9 = 0, sA = 0, sB = 0, sC = 0, sD = 0, sE = 0, sF = 0, encrypted = 0;
+            if (offset & 15) return -1;
+            iv0 = S0, iv1 = S1, iv2 = S2, iv3 = S3, iv4 = S4, iv5 = S5, iv6 = S6, iv7 = S7, 
+            iv8 = S8, iv9 = S9, ivA = SA, ivB = SB, ivC = SC, ivD = SD, ivE = SE, ivF = SF;
+            while ((length | 0) >= 16) {
+                s0 = HEAP[offset] | 0;
+                s1 = HEAP[offset | 1] | 0;
+                s2 = HEAP[offset | 2] | 0;
+                s3 = HEAP[offset | 3] | 0;
+                s4 = HEAP[offset | 4] | 0;
+                s5 = HEAP[offset | 5] | 0;
+                s6 = HEAP[offset | 6] | 0;
+                s7 = HEAP[offset | 7] | 0;
+                s8 = HEAP[offset | 8] | 0;
+                s9 = HEAP[offset | 9] | 0;
+                sA = HEAP[offset | 10] | 0;
+                sB = HEAP[offset | 11] | 0;
+                sC = HEAP[offset | 12] | 0;
+                sD = HEAP[offset | 13] | 0;
+                sE = HEAP[offset | 14] | 0;
+                sF = HEAP[offset | 15] | 0;
+                _encrypt(nonce0, nonce1, nonce2, nonce3, nonce4, nonce5, nonce6, nonce7, nonce8 ^ counter0 >>> 24, nonce9 ^ counter0 >>> 16 & 255, nonceA ^ counter0 >>> 8 & 255, nonceB ^ counter0 & 255, nonceC ^ counter1 >>> 24, nonceD ^ counter1 >>> 16 & 255, counter1 >>> 8 & 255, counter1 & 255);
+                HEAP[offset] = s0 ^ S0;
+                HEAP[offset | 1] = s1 ^ S1;
+                HEAP[offset | 2] = s2 ^ S2;
+                HEAP[offset | 3] = s3 ^ S3;
+                HEAP[offset | 4] = s4 ^ S4;
+                HEAP[offset | 5] = s5 ^ S5;
+                HEAP[offset | 6] = s6 ^ S6;
+                HEAP[offset | 7] = s7 ^ S7;
+                HEAP[offset | 8] = s8 ^ S8;
+                HEAP[offset | 9] = s9 ^ S9;
+                HEAP[offset | 10] = sA ^ SA;
+                HEAP[offset | 11] = sB ^ SB;
+                HEAP[offset | 12] = sC ^ SC;
+                HEAP[offset | 13] = sD ^ SD;
+                HEAP[offset | 14] = sE ^ SE;
+                HEAP[offset | 15] = sF ^ SF;
+                _encrypt(s0 ^ iv0, s1 ^ iv1, s2 ^ iv2, s3 ^ iv3, s4 ^ iv4, s5 ^ iv5, s6 ^ iv6, s7 ^ iv7, s8 ^ iv8, s9 ^ iv9, sA ^ ivA, sB ^ ivB, sC ^ ivC, sD ^ ivD, sE ^ ivE, sF ^ ivF);
+                iv0 = S0, iv1 = S1, iv2 = S2, iv3 = S3, iv4 = S4, iv5 = S5, iv6 = S6, iv7 = S7, 
+                iv8 = S8, iv9 = S9, ivA = SA, ivB = SB, ivC = SC, ivD = SD, ivE = SE, ivF = SF;
+                encrypted = encrypted + 16 | 0;
+                offset = offset + 16 | 0;
+                length = length - 16 | 0;
+                counter1 = counter1 + 1 | 0;
+                if ((counter1 | 0) == 0) counter0 = counter0 + 1 | 0;
+            }
+            if ((length | 0) > 0) {
+                s0 = HEAP[offset] | 0;
+                s1 = (length | 0) > 1 ? HEAP[offset | 1] | 0 : 0;
+                s2 = (length | 0) > 2 ? HEAP[offset | 2] | 0 : 0;
+                s3 = (length | 0) > 3 ? HEAP[offset | 3] | 0 : 0;
+                s4 = (length | 0) > 4 ? HEAP[offset | 4] | 0 : 0;
+                s5 = (length | 0) > 5 ? HEAP[offset | 5] | 0 : 0;
+                s6 = (length | 0) > 6 ? HEAP[offset | 6] | 0 : 0;
+                s7 = (length | 0) > 7 ? HEAP[offset | 7] | 0 : 0;
+                s8 = (length | 0) > 8 ? HEAP[offset | 8] | 0 : 0;
+                s9 = (length | 0) > 9 ? HEAP[offset | 9] | 0 : 0;
+                sA = (length | 0) > 10 ? HEAP[offset | 10] | 0 : 0;
+                sB = (length | 0) > 11 ? HEAP[offset | 11] | 0 : 0;
+                sC = (length | 0) > 12 ? HEAP[offset | 12] | 0 : 0;
+                sD = (length | 0) > 13 ? HEAP[offset | 13] | 0 : 0;
+                sE = (length | 0) > 14 ? HEAP[offset | 14] | 0 : 0;
+                _encrypt(nonce0, nonce1, nonce2, nonce3, nonce4, nonce5, nonce6, nonce7, nonce8 ^ counter0 >>> 24, nonce9 ^ counter0 >>> 16 & 255, nonceA ^ counter0 >>> 8 & 255, nonceB ^ counter0 & 255, nonceC ^ counter1 >>> 24, nonceD ^ counter1 >>> 16 & 255, counter1 >>> 8 & 255, counter1 & 255);
+                HEAP[offset] = s0 ^ S0;
+                if ((length | 0) > 1) HEAP[offset | 1] = s1 ^ S1;
+                if ((length | 0) > 2) HEAP[offset | 2] = s2 ^ S2;
+                if ((length | 0) > 3) HEAP[offset | 3] = s3 ^ S3;
+                if ((length | 0) > 4) HEAP[offset | 4] = s4 ^ S4;
+                if ((length | 0) > 5) HEAP[offset | 5] = s5 ^ S5;
+                if ((length | 0) > 6) HEAP[offset | 6] = s6 ^ S6;
+                if ((length | 0) > 7) HEAP[offset | 7] = s7 ^ S7;
+                if ((length | 0) > 8) HEAP[offset | 8] = s8 ^ S8;
+                if ((length | 0) > 9) HEAP[offset | 9] = s9 ^ S9;
+                if ((length | 0) > 10) HEAP[offset | 10] = sA ^ SA;
+                if ((length | 0) > 11) HEAP[offset | 11] = sB ^ SB;
+                if ((length | 0) > 12) HEAP[offset | 12] = sC ^ SC;
+                if ((length | 0) > 13) HEAP[offset | 13] = sD ^ SD;
+                if ((length | 0) > 14) HEAP[offset | 14] = sE ^ SE;
+                _encrypt(s0 ^ iv0, s1 ^ iv1, s2 ^ iv2, s3 ^ iv3, s4 ^ iv4, s5 ^ iv5, s6 ^ iv6, s7 ^ iv7, s8 ^ iv8, s9 ^ iv9, sA ^ ivA, sB ^ ivB, sC ^ ivC, sD ^ ivD, sE ^ ivE, ivF);
+                iv0 = S0, iv1 = S1, iv2 = S2, iv3 = S3, iv4 = S4, iv5 = S5, iv6 = S6, iv7 = S7, 
+                iv8 = S8, iv9 = S9, ivA = SA, ivB = SB, ivC = SC, ivD = SD, ivE = SE, ivF = SF;
+                encrypted = encrypted + length | 0;
+                offset = offset + length | 0;
+                length = 0;
+                counter1 = counter1 + 1 | 0;
+                if ((counter1 | 0) == 0) counter0 = counter0 + 1 | 0;
+            }
+            return encrypted | 0;
+        }
+        function ccm_decrypt(offset, length, nonce0, nonce1, nonce2, nonce3, nonce4, nonce5, nonce6, nonce7, nonce8, nonce9, nonceA, nonceB, nonceC, nonceD, counter0, counter1) {
+            offset = offset | 0;
+            length = length | 0;
+            nonce0 = nonce0 | 0;
+            nonce1 = nonce1 | 0;
+            nonce2 = nonce2 | 0;
+            nonce3 = nonce3 | 0;
+            nonce4 = nonce4 | 0;
+            nonce5 = nonce5 | 0;
+            nonce6 = nonce6 | 0;
+            nonce7 = nonce7 | 0;
+            nonce8 = nonce8 | 0;
+            nonce9 = nonce9 | 0;
+            nonceA = nonceA | 0;
+            nonceB = nonceB | 0;
+            nonceC = nonceC | 0;
+            nonceD = nonceD | 0;
+            counter0 = counter0 | 0;
+            counter1 = counter1 | 0;
+            var iv0 = 0, iv1 = 0, iv2 = 0, iv3 = 0, iv4 = 0, iv5 = 0, iv6 = 0, iv7 = 0, iv8 = 0, iv9 = 0, ivA = 0, ivB = 0, ivC = 0, ivD = 0, ivE = 0, ivF = 0, s0 = 0, s1 = 0, s2 = 0, s3 = 0, s4 = 0, s5 = 0, s6 = 0, s7 = 0, s8 = 0, s9 = 0, sA = 0, sB = 0, sC = 0, sD = 0, sE = 0, sF = 0, decrypted = 0;
+            if (offset & 15) return -1;
+            iv0 = S0, iv1 = S1, iv2 = S2, iv3 = S3, iv4 = S4, iv5 = S5, iv6 = S6, iv7 = S7, 
+            iv8 = S8, iv9 = S9, ivA = SA, ivB = SB, ivC = SC, ivD = SD, ivE = SE, ivF = SF;
+            while ((length | 0) >= 16) {
+                _encrypt(nonce0, nonce1, nonce2, nonce3, nonce4, nonce5, nonce6, nonce7, nonce8 ^ counter0 >>> 24, nonce9 ^ counter0 >>> 16 & 255, nonceA ^ counter0 >>> 8 & 255, nonceB ^ counter0 & 255, nonceC ^ counter1 >>> 24, nonceD ^ counter1 >>> 16 & 255, counter1 >>> 8 & 255, counter1 & 255);
+                HEAP[offset] = s0 = HEAP[offset] ^ S0;
+                HEAP[offset | 1] = s1 = HEAP[offset | 1] ^ S1;
+                HEAP[offset | 2] = s2 = HEAP[offset | 2] ^ S2;
+                HEAP[offset | 3] = s3 = HEAP[offset | 3] ^ S3;
+                HEAP[offset | 4] = s4 = HEAP[offset | 4] ^ S4;
+                HEAP[offset | 5] = s5 = HEAP[offset | 5] ^ S5;
+                HEAP[offset | 6] = s6 = HEAP[offset | 6] ^ S6;
+                HEAP[offset | 7] = s7 = HEAP[offset | 7] ^ S7;
+                HEAP[offset | 8] = s8 = HEAP[offset | 8] ^ S8;
+                HEAP[offset | 9] = s9 = HEAP[offset | 9] ^ S9;
+                HEAP[offset | 10] = sA = HEAP[offset | 10] ^ SA;
+                HEAP[offset | 11] = sB = HEAP[offset | 11] ^ SB;
+                HEAP[offset | 12] = sC = HEAP[offset | 12] ^ SC;
+                HEAP[offset | 13] = sD = HEAP[offset | 13] ^ SD;
+                HEAP[offset | 14] = sE = HEAP[offset | 14] ^ SE;
+                HEAP[offset | 15] = sF = HEAP[offset | 15] ^ SF;
+                _encrypt(s0 ^ iv0, s1 ^ iv1, s2 ^ iv2, s3 ^ iv3, s4 ^ iv4, s5 ^ iv5, s6 ^ iv6, s7 ^ iv7, s8 ^ iv8, s9 ^ iv9, sA ^ ivA, sB ^ ivB, sC ^ ivC, sD ^ ivD, sE ^ ivE, sF ^ ivF);
+                iv0 = S0, iv1 = S1, iv2 = S2, iv3 = S3, iv4 = S4, iv5 = S5, iv6 = S6, iv7 = S7, 
+                iv8 = S8, iv9 = S9, ivA = SA, ivB = SB, ivC = SC, ivD = SD, ivE = SE, ivF = SF;
+                decrypted = decrypted + 16 | 0;
+                offset = offset + 16 | 0;
+                length = length - 16 | 0;
+                counter1 = counter1 + 1 | 0;
+                if ((counter1 | 0) == 0) counter0 = counter0 + 1 | 0;
+            }
+            if ((length | 0) > 0) {
+                _encrypt(nonce0, nonce1, nonce2, nonce3, nonce4, nonce5, nonce6, nonce7, nonce8 ^ counter0 >>> 24, nonce9 ^ counter0 >>> 16 & 255, nonceA ^ counter0 >>> 8 & 255, nonceB ^ counter0 & 255, nonceC ^ counter1 >>> 24, nonceD ^ counter1 >>> 16 & 255, counter1 >>> 8 & 255, counter1 & 255);
+                s0 = HEAP[offset] ^ S0;
+                s1 = (length | 0) > 1 ? HEAP[offset | 1] ^ S1 : 0;
+                s2 = (length | 0) > 2 ? HEAP[offset | 2] ^ S2 : 0;
+                s3 = (length | 0) > 3 ? HEAP[offset | 3] ^ S3 : 0;
+                s4 = (length | 0) > 4 ? HEAP[offset | 4] ^ S4 : 0;
+                s5 = (length | 0) > 5 ? HEAP[offset | 5] ^ S5 : 0;
+                s6 = (length | 0) > 6 ? HEAP[offset | 6] ^ S6 : 0;
+                s7 = (length | 0) > 7 ? HEAP[offset | 7] ^ S7 : 0;
+                s8 = (length | 0) > 8 ? HEAP[offset | 8] ^ S8 : 0;
+                s9 = (length | 0) > 9 ? HEAP[offset | 9] ^ S9 : 0;
+                sA = (length | 0) > 10 ? HEAP[offset | 10] ^ SA : 0;
+                sB = (length | 0) > 11 ? HEAP[offset | 11] ^ SB : 0;
+                sC = (length | 0) > 12 ? HEAP[offset | 12] ^ SC : 0;
+                sD = (length | 0) > 13 ? HEAP[offset | 13] ^ SD : 0;
+                sE = (length | 0) > 14 ? HEAP[offset | 14] ^ SE : 0;
+                sF = (length | 0) > 15 ? HEAP[offset | 15] ^ SF : 0;
+                HEAP[offset] = s0;
+                if ((length | 0) > 1) HEAP[offset | 1] = s1;
+                if ((length | 0) > 2) HEAP[offset | 2] = s2;
+                if ((length | 0) > 3) HEAP[offset | 3] = s3;
+                if ((length | 0) > 4) HEAP[offset | 4] = s4;
+                if ((length | 0) > 5) HEAP[offset | 5] = s5;
+                if ((length | 0) > 6) HEAP[offset | 6] = s6;
+                if ((length | 0) > 7) HEAP[offset | 7] = s7;
+                if ((length | 0) > 8) HEAP[offset | 8] = s8;
+                if ((length | 0) > 9) HEAP[offset | 9] = s9;
+                if ((length | 0) > 10) HEAP[offset | 10] = sA;
+                if ((length | 0) > 11) HEAP[offset | 11] = sB;
+                if ((length | 0) > 12) HEAP[offset | 12] = sC;
+                if ((length | 0) > 13) HEAP[offset | 13] = sD;
+                if ((length | 0) > 14) HEAP[offset | 14] = sE;
+                _encrypt(s0 ^ iv0, s1 ^ iv1, s2 ^ iv2, s3 ^ iv3, s4 ^ iv4, s5 ^ iv5, s6 ^ iv6, s7 ^ iv7, s8 ^ iv8, s9 ^ iv9, sA ^ ivA, sB ^ ivB, sC ^ ivC, sD ^ ivD, sE ^ ivE, sF ^ ivF);
+                iv0 = S0, iv1 = S1, iv2 = S2, iv3 = S3, iv4 = S4, iv5 = S5, iv6 = S6, iv7 = S7, 
+                iv8 = S8, iv9 = S9, ivA = SA, ivB = SB, ivC = SC, ivD = SD, ivE = SE, ivF = SF;
+                decrypted = decrypted + length | 0;
+                offset = offset + length | 0;
+                length = 0;
+                counter1 = counter1 + 1 | 0;
+                if ((counter1 | 0) == 0) counter0 = counter0 + 1 | 0;
+            }
+            return decrypted | 0;
+        }
+        function cfb_encrypt(offset, length) {
+            offset = offset | 0;
+            length = length | 0;
+            var encrypted = 0;
+            if (offset & 15) return -1;
+            while ((length | 0) >= 16) {
+                _encrypt(S0, S1, S2, S3, S4, S5, S6, S7, S8, S9, SA, SB, SC, SD, SE, SF);
+                S0 = S0 ^ HEAP[offset];
+                S1 = S1 ^ HEAP[offset | 1];
+                S2 = S2 ^ HEAP[offset | 2];
+                S3 = S3 ^ HEAP[offset | 3];
+                S4 = S4 ^ HEAP[offset | 4];
+                S5 = S5 ^ HEAP[offset | 5];
+                S6 = S6 ^ HEAP[offset | 6];
+                S7 = S7 ^ HEAP[offset | 7];
+                S8 = S8 ^ HEAP[offset | 8];
+                S9 = S9 ^ HEAP[offset | 9];
+                SA = SA ^ HEAP[offset | 10];
+                SB = SB ^ HEAP[offset | 11];
+                SC = SC ^ HEAP[offset | 12];
+                SD = SD ^ HEAP[offset | 13];
+                SE = SE ^ HEAP[offset | 14];
+                SF = SF ^ HEAP[offset | 15];
+                HEAP[offset] = S0;
+                HEAP[offset | 1] = S1;
+                HEAP[offset | 2] = S2;
+                HEAP[offset | 3] = S3;
+                HEAP[offset | 4] = S4;
+                HEAP[offset | 5] = S5;
+                HEAP[offset | 6] = S6;
+                HEAP[offset | 7] = S7;
+                HEAP[offset | 8] = S8;
+                HEAP[offset | 9] = S9;
+                HEAP[offset | 10] = SA;
+                HEAP[offset | 11] = SB;
+                HEAP[offset | 12] = SC;
+                HEAP[offset | 13] = SD;
+                HEAP[offset | 14] = SE;
+                HEAP[offset | 15] = SF;
+                offset = offset + 16 | 0;
+                length = length - 16 | 0;
+                encrypted = encrypted + 16 | 0;
+            }
+            if ((length | 0) > 0) {
+                _encrypt(S0, S1, S2, S3, S4, S5, S6, S7, S8, S9, SA, SB, SC, SD, SE, SF);
+                HEAP[offset] = HEAP[offset] ^ S0;
+                if ((length | 0) > 1) HEAP[offset | 1] = HEAP[offset | 1] ^ S1;
+                if ((length | 0) > 2) HEAP[offset | 2] = HEAP[offset | 2] ^ S2;
+                if ((length | 0) > 3) HEAP[offset | 3] = HEAP[offset | 3] ^ S3;
+                if ((length | 0) > 4) HEAP[offset | 4] = HEAP[offset | 4] ^ S4;
+                if ((length | 0) > 5) HEAP[offset | 5] = HEAP[offset | 5] ^ S5;
+                if ((length | 0) > 6) HEAP[offset | 6] = HEAP[offset | 6] ^ S6;
+                if ((length | 0) > 7) HEAP[offset | 7] = HEAP[offset | 7] ^ S7;
+                if ((length | 0) > 8) HEAP[offset | 8] = HEAP[offset | 8] ^ S8;
+                if ((length | 0) > 9) HEAP[offset | 9] = HEAP[offset | 9] ^ S9;
+                if ((length | 0) > 10) HEAP[offset | 10] = HEAP[offset | 10] ^ SA;
+                if ((length | 0) > 11) HEAP[offset | 11] = HEAP[offset | 11] ^ SB;
+                if ((length | 0) > 12) HEAP[offset | 12] = HEAP[offset | 12] ^ SC;
+                if ((length | 0) > 13) HEAP[offset | 13] = HEAP[offset | 13] ^ SD;
+                if ((length | 0) > 14) HEAP[offset | 14] = HEAP[offset | 14] ^ SE;
+                encrypted = encrypted + length | 0;
+                offset = offset + length | 0;
+                length = 0;
+            }
+            return encrypted | 0;
+        }
+        function cfb_decrypt(offset, length) {
+            offset = offset | 0;
+            length = length | 0;
+            var iv0 = 0, iv1 = 0, iv2 = 0, iv3 = 0, iv4 = 0, iv5 = 0, iv6 = 0, iv7 = 0, iv8 = 0, iv9 = 0, ivA = 0, ivB = 0, ivC = 0, ivD = 0, ivE = 0, ivF = 0, decrypted = 0;
+            if (offset & 15) return -1;
+            while ((length | 0) >= 16) {
+                _encrypt(S0, S1, S2, S3, S4, S5, S6, S7, S8, S9, SA, SB, SC, SD, SE, SF);
+                iv0 = HEAP[offset] | 0;
+                iv1 = HEAP[offset | 1] | 0;
+                iv2 = HEAP[offset | 2] | 0;
+                iv3 = HEAP[offset | 3] | 0;
+                iv4 = HEAP[offset | 4] | 0;
+                iv5 = HEAP[offset | 5] | 0;
+                iv6 = HEAP[offset | 6] | 0;
+                iv7 = HEAP[offset | 7] | 0;
+                iv8 = HEAP[offset | 8] | 0;
+                iv9 = HEAP[offset | 9] | 0;
+                ivA = HEAP[offset | 10] | 0;
+                ivB = HEAP[offset | 11] | 0;
+                ivC = HEAP[offset | 12] | 0;
+                ivD = HEAP[offset | 13] | 0;
+                ivE = HEAP[offset | 14] | 0;
+                ivF = HEAP[offset | 15] | 0;
+                HEAP[offset] = S0 ^ iv0;
+                HEAP[offset | 1] = S1 ^ iv1;
+                HEAP[offset | 2] = S2 ^ iv2;
+                HEAP[offset | 3] = S3 ^ iv3;
+                HEAP[offset | 4] = S4 ^ iv4;
+                HEAP[offset | 5] = S5 ^ iv5;
+                HEAP[offset | 6] = S6 ^ iv6;
+                HEAP[offset | 7] = S7 ^ iv7;
+                HEAP[offset | 8] = S8 ^ iv8;
+                HEAP[offset | 9] = S9 ^ iv9;
+                HEAP[offset | 10] = SA ^ ivA;
+                HEAP[offset | 11] = SB ^ ivB;
+                HEAP[offset | 12] = SC ^ ivC;
+                HEAP[offset | 13] = SD ^ ivD;
+                HEAP[offset | 14] = SE ^ ivE;
+                HEAP[offset | 15] = SF ^ ivF;
+                S0 = iv0;
+                S1 = iv1;
+                S2 = iv2;
+                S3 = iv3;
+                S4 = iv4;
+                S5 = iv5;
+                S6 = iv6;
+                S7 = iv7;
+                S8 = iv8;
+                S9 = iv9;
+                SA = ivA;
+                SB = ivB;
+                SC = ivC;
+                SD = ivD;
+                SE = ivE;
+                SF = ivF;
+                offset = offset + 16 | 0;
+                length = length - 16 | 0;
+                decrypted = decrypted + 16 | 0;
+            }
+            if ((length | 0) > 0) {
+                _encrypt(S0, S1, S2, S3, S4, S5, S6, S7, S8, S9, SA, SB, SC, SD, SE, SF);
+                HEAP[offset] = HEAP[offset] ^ S0;
+                if ((length | 0) > 1) HEAP[offset | 1] = HEAP[offset | 1] ^ S1;
+                if ((length | 0) > 2) HEAP[offset | 2] = HEAP[offset | 2] ^ S2;
+                if ((length | 0) > 3) HEAP[offset | 3] = HEAP[offset | 3] ^ S3;
+                if ((length | 0) > 4) HEAP[offset | 4] = HEAP[offset | 4] ^ S4;
+                if ((length | 0) > 5) HEAP[offset | 5] = HEAP[offset | 5] ^ S5;
+                if ((length | 0) > 6) HEAP[offset | 6] = HEAP[offset | 6] ^ S6;
+                if ((length | 0) > 7) HEAP[offset | 7] = HEAP[offset | 7] ^ S7;
+                if ((length | 0) > 8) HEAP[offset | 8] = HEAP[offset | 8] ^ S8;
+                if ((length | 0) > 9) HEAP[offset | 9] = HEAP[offset | 9] ^ S9;
+                if ((length | 0) > 10) HEAP[offset | 10] = HEAP[offset | 10] ^ SA;
+                if ((length | 0) > 11) HEAP[offset | 11] = HEAP[offset | 11] ^ SB;
+                if ((length | 0) > 12) HEAP[offset | 12] = HEAP[offset | 12] ^ SC;
+                if ((length | 0) > 13) HEAP[offset | 13] = HEAP[offset | 13] ^ SD;
+                if ((length | 0) > 14) HEAP[offset | 14] = HEAP[offset | 14] ^ SE;
+                decrypted = decrypted + length | 0;
+                offset = offset + length | 0;
+                length = 0;
+            }
+            return decrypted | 0;
+        }
+        function _gcm_mult(x0, x1, x2, x3) {
+            x0 = x0 | 0;
+            x1 = x1 | 0;
+            x2 = x2 | 0;
+            x3 = x3 | 0;
+            var y0 = 0, y1 = 0, y2 = 0, y3 = 0, z0 = 0, z1 = 0, z2 = 0, z3 = 0, i = 0, c = 0;
+            y0 = H0 | 0, y1 = H1 | 0, y2 = H2 | 0, y3 = H3 | 0;
+            for (;(i | 0) < 128; i = i + 1 | 0) {
+                if (y0 >>> 31) {
+                    z0 = z0 ^ x0, z1 = z1 ^ x1, z2 = z2 ^ x2, z3 = z3 ^ x3;
+                }
+                y0 = y0 << 1 | y1 >>> 31, y1 = y1 << 1 | y2 >>> 31, y2 = y2 << 1 | y3 >>> 31, y3 = y3 << 1;
+                c = x3 & 1;
+                x3 = x3 >>> 1 | x2 << 31, x2 = x2 >>> 1 | x1 << 31, x1 = x1 >>> 1 | x0 << 31, x0 = x0 >>> 1;
+                if (c) x0 = x0 ^ 3774873600;
+            }
+            Z0 = z0, Z1 = z1, Z2 = z2, Z3 = z3;
+        }
+        function gcm_init() {
+            _encrypt(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), H0 = S0 << 24 | S1 << 16 | S2 << 8 | S3, 
+            H1 = S4 << 24 | S5 << 16 | S6 << 8 | S7, H2 = S8 << 24 | S9 << 16 | SA << 8 | SB, 
+            H3 = SC << 24 | SD << 16 | SE << 8 | SF;
+            Z0 = Z1 = Z2 = Z3 = 0;
+        }
+        function gcm_ghash(offset, length) {
+            offset = offset | 0;
+            length = length | 0;
+            var processed = 0;
+            if (offset & 15) return -1;
+            Z0 = S0 << 24 | S1 << 16 | S2 << 8 | S3, Z1 = S4 << 24 | S5 << 16 | S6 << 8 | S7, 
+            Z2 = S8 << 24 | S9 << 16 | SA << 8 | SB, Z3 = SC << 24 | SD << 16 | SE << 8 | SF;
+            while ((length | 0) >= 16) {
+                _gcm_mult(Z0 ^ (HEAP[offset | 0] << 24 | HEAP[offset | 1] << 16 | HEAP[offset | 2] << 8 | HEAP[offset | 3]), Z1 ^ (HEAP[offset | 4] << 24 | HEAP[offset | 5] << 16 | HEAP[offset | 6] << 8 | HEAP[offset | 7]), Z2 ^ (HEAP[offset | 8] << 24 | HEAP[offset | 9] << 16 | HEAP[offset | 10] << 8 | HEAP[offset | 11]), Z3 ^ (HEAP[offset | 12] << 24 | HEAP[offset | 13] << 16 | HEAP[offset | 14] << 8 | HEAP[offset | 15]));
+                offset = offset + 16 | 0, length = length - 16 | 0, processed = processed + 16 | 0;
+            }
+            S0 = Z0 >>> 24, S1 = Z0 >>> 16 & 255, S2 = Z0 >>> 8 & 255, S3 = Z0 & 255, S4 = Z1 >>> 24, 
+            S5 = Z1 >>> 16 & 255, S6 = Z1 >>> 8 & 255, S7 = Z1 & 255, S8 = Z2 >>> 24, S9 = Z2 >>> 16 & 255, 
+            SA = Z2 >>> 8 & 255, SB = Z2 & 255, SC = Z3 >>> 24, SD = Z3 >>> 16 & 255, SE = Z3 >>> 8 & 255, 
+            SF = Z3 & 255;
+            return processed | 0;
+        }
+        function gcm_encrypt(offset, length, g0, g1, g2, g3, g4, g5, g6, g7, g8, g9, gA, gB, gCDEF) {
+            offset = offset | 0;
+            length = length | 0;
+            g0 = g0 | 0;
+            g1 = g1 | 0;
+            g2 = g2 | 0;
+            g3 = g3 | 0;
+            g4 = g4 | 0;
+            g5 = g5 | 0;
+            g6 = g6 | 0;
+            g7 = g7 | 0;
+            g8 = g8 | 0;
+            g9 = g9 | 0;
+            gA = gA | 0;
+            gB = gB | 0;
+            gCDEF = gCDEF | 0;
+            var s0 = 0, s1 = 0, s2 = 0, s3 = 0, s4 = 0, s5 = 0, s6 = 0, s7 = 0, s8 = 0, s9 = 0, sA = 0, sB = 0, sC = 0, sD = 0, sE = 0, sF = 0, processed = 0;
+            if (offset & 15) return -1;
+            while ((length | 0) >= 16) {
+                _encrypt(g0, g1, g2, g3, g4, g5, g6, g7, g8, g9, gA, gB, gCDEF >>> 24, gCDEF >>> 16 & 255, gCDEF >>> 8 & 255, gCDEF & 255);
+                HEAP[offset | 0] = s0 = HEAP[offset | 0] ^ S0, HEAP[offset | 1] = s1 = HEAP[offset | 1] ^ S1, 
+                HEAP[offset | 2] = s2 = HEAP[offset | 2] ^ S2, HEAP[offset | 3] = s3 = HEAP[offset | 3] ^ S3, 
+                HEAP[offset | 4] = s4 = HEAP[offset | 4] ^ S4, HEAP[offset | 5] = s5 = HEAP[offset | 5] ^ S5, 
+                HEAP[offset | 6] = s6 = HEAP[offset | 6] ^ S6, HEAP[offset | 7] = s7 = HEAP[offset | 7] ^ S7, 
+                HEAP[offset | 8] = s8 = HEAP[offset | 8] ^ S8, HEAP[offset | 9] = s9 = HEAP[offset | 9] ^ S9, 
+                HEAP[offset | 10] = sA = HEAP[offset | 10] ^ SA, HEAP[offset | 11] = sB = HEAP[offset | 11] ^ SB, 
+                HEAP[offset | 12] = sC = HEAP[offset | 12] ^ SC, HEAP[offset | 13] = sD = HEAP[offset | 13] ^ SD, 
+                HEAP[offset | 14] = sE = HEAP[offset | 14] ^ SE, HEAP[offset | 15] = sF = HEAP[offset | 15] ^ SF;
+                _gcm_mult(Z0 ^ (s0 << 24 | s1 << 16 | s2 << 8 | s3), Z1 ^ (s4 << 24 | s5 << 16 | s6 << 8 | s7), Z2 ^ (s8 << 24 | s9 << 16 | sA << 8 | sB), Z3 ^ (sC << 24 | sD << 16 | sE << 8 | sF));
+                gCDEF = gCDEF + 1 | 0;
+                offset = offset + 16 | 0, length = length - 16 | 0, processed = processed + 16 | 0;
+            }
+            if ((length | 0) > 0) {
+                _encrypt(g0, g1, g2, g3, g4, g5, g6, g7, g8, g9, gA, gB, gCDEF >>> 24, gCDEF >>> 16 & 255, gCDEF >>> 8 & 255, gCDEF & 255);
+                s0 = HEAP[offset | 0] ^ S0, s1 = (length | 0) > 1 ? HEAP[offset | 1] ^ S1 : 0, s2 = (length | 0) > 2 ? HEAP[offset | 2] ^ S2 : 0, 
+                s3 = (length | 0) > 3 ? HEAP[offset | 3] ^ S3 : 0, s4 = (length | 0) > 4 ? HEAP[offset | 4] ^ S4 : 0, 
+                s5 = (length | 0) > 5 ? HEAP[offset | 5] ^ S5 : 0, s6 = (length | 0) > 6 ? HEAP[offset | 6] ^ S6 : 0, 
+                s7 = (length | 0) > 7 ? HEAP[offset | 7] ^ S7 : 0, s8 = (length | 0) > 8 ? HEAP[offset | 8] ^ S8 : 0, 
+                s9 = (length | 0) > 9 ? HEAP[offset | 9] ^ S9 : 0, sA = (length | 0) > 10 ? HEAP[offset | 10] ^ SA : 0, 
+                sB = (length | 0) > 11 ? HEAP[offset | 11] ^ SB : 0, sC = (length | 0) > 12 ? HEAP[offset | 12] ^ SC : 0, 
+                sD = (length | 0) > 13 ? HEAP[offset | 13] ^ SD : 0, sE = (length | 0) > 14 ? HEAP[offset | 14] ^ SE : 0;
+                sF = 0;
+                HEAP[offset] = s0;
+                if ((length | 0) > 1) HEAP[offset | 1] = s1;
+                if ((length | 0) > 2) HEAP[offset | 2] = s2;
+                if ((length | 0) > 3) HEAP[offset | 3] = s3;
+                if ((length | 0) > 4) HEAP[offset | 4] = s4;
+                if ((length | 0) > 5) HEAP[offset | 5] = s5;
+                if ((length | 0) > 6) HEAP[offset | 6] = s6;
+                if ((length | 0) > 7) HEAP[offset | 7] = s7;
+                if ((length | 0) > 8) HEAP[offset | 8] = s8;
+                if ((length | 0) > 9) HEAP[offset | 9] = s9;
+                if ((length | 0) > 10) HEAP[offset | 10] = sA;
+                if ((length | 0) > 11) HEAP[offset | 11] = sB;
+                if ((length | 0) > 12) HEAP[offset | 12] = sC;
+                if ((length | 0) > 13) HEAP[offset | 13] = sD;
+                if ((length | 0) > 14) HEAP[offset | 14] = sE;
+                _gcm_mult(Z0 ^ (s0 << 24 | s1 << 16 | s2 << 8 | s3), Z1 ^ (s4 << 24 | s5 << 16 | s6 << 8 | s7), Z2 ^ (s8 << 24 | s9 << 16 | sA << 8 | sB), Z3 ^ (sC << 24 | sD << 16 | sE << 8 | sF));
+                gCDEF = gCDEF + 1 | 0;
+                processed = processed + length | 0;
+            }
+            S0 = Z0 >>> 24, S1 = Z0 >>> 16 & 255, S2 = Z0 >>> 8 & 255, S3 = Z0 & 255, S4 = Z1 >>> 24, 
+            S5 = Z1 >>> 16 & 255, S6 = Z1 >>> 8 & 255, S7 = Z1 & 255, S8 = Z2 >>> 24, S9 = Z2 >>> 16 & 255, 
+            SA = Z2 >>> 8 & 255, SB = Z2 & 255, SC = Z3 >>> 24, SD = Z3 >>> 16 & 255, SE = Z3 >>> 8 & 255, 
+            SF = Z3 & 255;
+            return processed | 0;
+        }
+        function gcm_decrypt(offset, length, g0, g1, g2, g3, g4, g5, g6, g7, g8, g9, gA, gB, gCDEF) {
+            offset = offset | 0;
+            length = length | 0;
+            g0 = g0 | 0;
+            g1 = g1 | 0;
+            g2 = g2 | 0;
+            g3 = g3 | 0;
+            g4 = g4 | 0;
+            g5 = g5 | 0;
+            g6 = g6 | 0;
+            g7 = g7 | 0;
+            g8 = g8 | 0;
+            g9 = g9 | 0;
+            gA = gA | 0;
+            gB = gB | 0;
+            gCDEF = gCDEF | 0;
+            var s0 = 0, s1 = 0, s2 = 0, s3 = 0, s4 = 0, s5 = 0, s6 = 0, s7 = 0, s8 = 0, s9 = 0, sA = 0, sB = 0, sC = 0, sD = 0, sE = 0, sF = 0, processed = 0;
+            if (offset & 15) return -1;
+            while ((length | 0) >= 16) {
+                s0 = HEAP[offset | 0] | 0, s1 = HEAP[offset | 1] | 0, s2 = HEAP[offset | 2] | 0, 
+                s3 = HEAP[offset | 3] | 0, s4 = HEAP[offset | 4] | 0, s5 = HEAP[offset | 5] | 0, 
+                s6 = HEAP[offset | 6] | 0, s7 = HEAP[offset | 7] | 0, s8 = HEAP[offset | 8] | 0, 
+                s9 = HEAP[offset | 9] | 0, sA = HEAP[offset | 10] | 0, sB = HEAP[offset | 11] | 0, 
+                sC = HEAP[offset | 12] | 0, sD = HEAP[offset | 13] | 0, sE = HEAP[offset | 14] | 0, 
+                sF = HEAP[offset | 15] | 0;
+                _gcm_mult(Z0 ^ (s0 << 24 | s1 << 16 | s2 << 8 | s3), Z1 ^ (s4 << 24 | s5 << 16 | s6 << 8 | s7), Z2 ^ (s8 << 24 | s9 << 16 | sA << 8 | sB), Z3 ^ (sC << 24 | sD << 16 | sE << 8 | sF));
+                _encrypt(g0, g1, g2, g3, g4, g5, g6, g7, g8, g9, gA, gB, gCDEF >>> 24, gCDEF >>> 16 & 255, gCDEF >>> 8 & 255, gCDEF & 255);
+                HEAP[offset | 0] = s0 ^ S0, HEAP[offset | 1] = s1 ^ S1, HEAP[offset | 2] = s2 ^ S2, 
+                HEAP[offset | 3] = s3 ^ S3, HEAP[offset | 4] = s4 ^ S4, HEAP[offset | 5] = s5 ^ S5, 
+                HEAP[offset | 6] = s6 ^ S6, HEAP[offset | 7] = s7 ^ S7, HEAP[offset | 8] = s8 ^ S8, 
+                HEAP[offset | 9] = s9 ^ S9, HEAP[offset | 10] = sA ^ SA, HEAP[offset | 11] = sB ^ SB, 
+                HEAP[offset | 12] = sC ^ SC, HEAP[offset | 13] = sD ^ SD, HEAP[offset | 14] = sE ^ SE, 
+                HEAP[offset | 15] = sF ^ SF;
+                gCDEF = gCDEF + 1 | 0;
+                offset = offset + 16 | 0, length = length - 16 | 0, processed = processed + 16 | 0;
+            }
+            if ((length | 0) > 0) {
+                s0 = HEAP[offset | 0] | 0, s1 = (length | 0) > 1 ? HEAP[offset | 1] | 0 : 0, s2 = (length | 0) > 2 ? HEAP[offset | 2] | 0 : 0, 
+                s3 = (length | 0) > 3 ? HEAP[offset | 3] | 0 : 0, s4 = (length | 0) > 4 ? HEAP[offset | 4] | 0 : 0, 
+                s5 = (length | 0) > 5 ? HEAP[offset | 5] | 0 : 0, s6 = (length | 0) > 6 ? HEAP[offset | 6] | 0 : 0, 
+                s7 = (length | 0) > 7 ? HEAP[offset | 7] | 0 : 0, s8 = (length | 0) > 8 ? HEAP[offset | 8] | 0 : 0, 
+                s9 = (length | 0) > 9 ? HEAP[offset | 9] | 0 : 0, sA = (length | 0) > 10 ? HEAP[offset | 10] | 0 : 0, 
+                sB = (length | 0) > 11 ? HEAP[offset | 11] | 0 : 0, sC = (length | 0) > 12 ? HEAP[offset | 12] | 0 : 0, 
+                sD = (length | 0) > 13 ? HEAP[offset | 13] | 0 : 0, sE = (length | 0) > 14 ? HEAP[offset | 14] | 0 : 0;
+                sF = 0;
+                _gcm_mult(Z0 ^ (s0 << 24 | s1 << 16 | s2 << 8 | s3), Z1 ^ (s4 << 24 | s5 << 16 | s6 << 8 | s7), Z2 ^ (s8 << 24 | s9 << 16 | sA << 8 | sB), Z3 ^ (sC << 24 | sD << 16 | sE << 8 | sF));
+                _encrypt(g0, g1, g2, g3, g4, g5, g6, g7, g8, g9, gA, gB, gCDEF >>> 24, gCDEF >>> 16 & 255, gCDEF >>> 8 & 255, gCDEF & 255);
+                HEAP[offset] = s0 ^ S0;
+                if ((length | 0) > 1) HEAP[offset | 1] = s1 ^ S1;
+                if ((length | 0) > 2) HEAP[offset | 2] = s2 ^ S2;
+                if ((length | 0) > 3) HEAP[offset | 3] = s3 ^ S3;
+                if ((length | 0) > 4) HEAP[offset | 4] = s4 ^ S4;
+                if ((length | 0) > 5) HEAP[offset | 5] = s5 ^ S5;
+                if ((length | 0) > 6) HEAP[offset | 6] = s6 ^ S6;
+                if ((length | 0) > 7) HEAP[offset | 7] = s7 ^ S7;
+                if ((length | 0) > 8) HEAP[offset | 8] = s8 ^ S8;
+                if ((length | 0) > 9) HEAP[offset | 9] = s9 ^ S9;
+                if ((length | 0) > 10) HEAP[offset | 10] = sA ^ SA;
+                if ((length | 0) > 11) HEAP[offset | 11] = sB ^ SB;
+                if ((length | 0) > 12) HEAP[offset | 12] = sC ^ SC;
+                if ((length | 0) > 13) HEAP[offset | 13] = sD ^ SD;
+                if ((length | 0) > 14) HEAP[offset | 14] = sE ^ SE;
+                gCDEF = gCDEF + 1 | 0;
+                processed = processed + length | 0;
+            }
+            S0 = Z0 >>> 24, S1 = Z0 >>> 16 & 255, S2 = Z0 >>> 8 & 255, S3 = Z0 & 255, S4 = Z1 >>> 24, 
+            S5 = Z1 >>> 16 & 255, S6 = Z1 >>> 8 & 255, S7 = Z1 & 255, S8 = Z2 >>> 24, S9 = Z2 >>> 16 & 255, 
+            SA = Z2 >>> 8 & 255, SB = Z2 & 255, SC = Z3 >>> 24, SD = Z3 >>> 16 & 255, SE = Z3 >>> 8 & 255, 
+            SF = Z3 & 255;
+            return processed | 0;
+        }
+        return {
+            init_state: init_state,
+            save_state: save_state,
+            init_key_128: init_key_128,
+            init_key_256: init_key_256,
+            ecb_encrypt: ecb_encrypt,
+            ecb_decrypt: ecb_decrypt,
+            cbc_encrypt: cbc_encrypt,
+            cbc_decrypt: cbc_decrypt,
+            cbc_mac: cbc_mac,
+            ctr_encrypt: ctr_encrypt,
+            ctr_decrypt: ctr_encrypt,
+            ccm_encrypt: ccm_encrypt,
+            ccm_decrypt: ccm_decrypt,
+            cfb_encrypt: cfb_encrypt,
+            cfb_decrypt: cfb_decrypt,
+            gcm_init: gcm_init,
+            gcm_ghash: gcm_ghash,
+            gcm_encrypt: gcm_encrypt,
+            gcm_decrypt: gcm_decrypt
+        };
+    }
+    function aes_asm(stdlib, foreign, buffer) {
+        var heap = new Uint8Array(buffer);
+        heap.set(_aes_tables);
+        return _aes_asm(stdlib, foreign, buffer);
+    }
+    var _aes_block_size = 16;
+    function _aes_constructor(options) {
+        options = options || {};
+        this.BLOCK_SIZE = _aes_block_size;
+        this.heap = _heap_init(Uint8Array, options);
+        this.asm = options.asm || aes_asm(global, null, this.heap.buffer);
+        this.pos = _aes_heap_start;
+        this.len = 0;
+        this.key = null;
+        this.result = null;
+        this.reset(options);
+    }
+    function _aes_reset(options) {
+        options = options || {};
+        this.result = null;
+        this.pos = _aes_heap_start;
+        this.len = 0;
+        var asm = this.asm;
+        var key = options.key;
+        if (key !== undefined) {
+            if (is_buffer(key) || is_bytes(key)) {
+                key = new Uint8Array(key);
+            } else if (is_string(key)) {
+                key = string_to_bytes(key);
+            } else {
+                throw new TypeError("unexpected key type");
+            }
+            if (key.length === 16) {
+                asm.init_key_128(key[0], key[1], key[2], key[3], key[4], key[5], key[6], key[7], key[8], key[9], key[10], key[11], key[12], key[13], key[14], key[15]);
+            } else if (key.length === 24) {
+                throw new IllegalArgumentError("illegal key size");
+            } else if (key.length === 32) {
+                asm.init_key_256(key[0], key[1], key[2], key[3], key[4], key[5], key[6], key[7], key[8], key[9], key[10], key[11], key[12], key[13], key[14], key[15], key[16], key[17], key[18], key[19], key[20], key[21], key[22], key[23], key[24], key[25], key[26], key[27], key[28], key[29], key[30], key[31]);
+            } else {
+                throw new IllegalArgumentError("illegal key size");
+            }
+            this.key = key;
+        }
+        return this;
+    }
+    function _aes_init_iv(iv) {
+        var asm = this.asm;
+        if (iv !== undefined) {
+            if (is_buffer(iv) || is_bytes(iv)) {
+                iv = new Uint8Array(iv);
+            } else if (is_string(iv)) {
+                iv = string_to_bytes(iv);
+            } else {
+                throw new TypeError("unexpected iv type");
+            }
+            if (iv.length !== _aes_block_size) throw new IllegalArgumentError("illegal iv size");
+            this.iv = iv;
+            asm.init_state(iv[0], iv[1], iv[2], iv[3], iv[4], iv[5], iv[6], iv[7], iv[8], iv[9], iv[10], iv[11], iv[12], iv[13], iv[14], iv[15]);
+        } else {
+            this.iv = null;
+            asm.init_state(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+        }
+    }
+    function cbc_aes_constructor(options) {
+        this.padding = true;
+        this.mode = "cbc";
+        this.iv = null;
+        _aes_constructor.call(this, options);
+    }
+    function cbc_aes_encrypt_constructor(options) {
+        cbc_aes_constructor.call(this, options);
+    }
+    function cbc_aes_decrypt_constructor(options) {
+        cbc_aes_constructor.call(this, options);
+    }
+    function cbc_aes_reset(options) {
+        options = options || {};
+        _aes_reset.call(this, options);
+        var padding = options.padding;
+        if (padding !== undefined) {
+            this.padding = !!padding;
+        } else {
+            this.padding = true;
+        }
+        _aes_init_iv.call(this, options.iv);
+        return this;
+    }
+    function cbc_aes_encrypt_process(data) {
+        if (!this.key) throw new IllegalStateError("no key is associated with the instance");
+        if (is_string(data)) data = string_to_bytes(data);
+        if (is_buffer(data)) data = new Uint8Array(data);
+        if (!is_bytes(data)) throw new TypeError("data isn't of expected type");
+        var dpos = 0, dlen = data.length || 0, asm = this.asm, heap = this.heap, pos = this.pos, len = this.len, rpos = 0, rlen = _aes_block_size * Math.floor((len + dlen) / _aes_block_size), wlen = 0;
+        var result = new Uint8Array(rlen);
+        while (dlen > 0) {
+            wlen = _heap_write(heap, pos + len, data, dpos, dlen);
+            len += wlen;
+            dpos += wlen;
+            dlen -= wlen;
+            wlen = asm.cbc_encrypt(pos, len);
+            result.set(heap.subarray(pos, pos + wlen), rpos);
+            rpos += wlen;
+            if (wlen < len) {
+                pos += wlen;
+                len -= wlen;
+            } else {
+                pos = _aes_heap_start;
+                len = 0;
+            }
+        }
+        this.result = result;
+        this.pos = pos;
+        this.len = len;
+        return this;
+    }
+    function cbc_aes_encrypt_finish() {
+        if (!this.key) throw new IllegalStateError("no key is associated with the instance");
+        var asm = this.asm, heap = this.heap, padding = this.padding, pos = this.pos, len = this.len, rlen = _aes_block_size * Math.ceil(len / _aes_block_size);
+        if (len % _aes_block_size === 0) {
+            if (padding) rlen += _aes_block_size;
+        } else if (!padding) {
+            throw new IllegalArgumentError("data length must be a multiple of " + _aes_block_size);
+        }
+        var result = new Uint8Array(rlen);
+        if (len < rlen) {
+            var plen = _aes_block_size - len % _aes_block_size;
+            for (var p = 0; p < plen; ++p) heap[pos + len + p] = plen;
+            len += plen;
+        }
+        if (len > 0) {
+            asm.cbc_encrypt(pos, len);
+            result.set(heap.subarray(pos, pos + len));
+        }
+        this.result = result;
+        this.pos = _aes_heap_start;
+        this.len = 0;
+        return this;
+    }
+    function cbc_aes_encrypt(data) {
+        var result1 = cbc_aes_encrypt_process.call(this, data).result, result2 = cbc_aes_encrypt_finish.call(this).result, result;
+        result = new Uint8Array(result1.length + result2.length);
+        result.set(result1);
+        if (result2.length > 0) result.set(result2, result1.length);
+        this.result = result;
+        return this;
+    }
+    function cbc_aes_decrypt_process(data) {
+        if (!this.key) throw new IllegalStateError("no key is associated with the instance");
+        if (is_string(data)) data = string_to_bytes(data);
+        if (is_buffer(data)) data = new Uint8Array(data);
+        if (!is_bytes(data)) throw new TypeError("data isn't of expected type");
+        var dpos = 0, dlen = data.length || 0, asm = this.asm, heap = this.heap, padding = this.padding, pos = this.pos, len = this.len, rpos = 0, rlen = _aes_block_size * Math.floor((len + dlen) / _aes_block_size), wlen = 0;
+        var result = new Uint8Array(rlen);
+        while (dlen > 0) {
+            wlen = _heap_write(heap, pos + len, data, dpos, dlen);
+            len += wlen;
+            dpos += wlen;
+            dlen -= wlen;
+            wlen = asm.cbc_decrypt(pos, len - (padding && dlen === 0 && len % _aes_block_size === 0 ? _aes_block_size : 0));
+            result.set(heap.subarray(pos, pos + wlen), rpos);
+            rpos += wlen;
+            if (wlen < len) {
+                pos += wlen;
+                len -= wlen;
+            } else {
+                pos = _aes_heap_start;
+                len = 0;
+            }
+        }
+        this.result = result.subarray(0, rpos);
+        this.pos = pos;
+        this.len = len;
+        return this;
+    }
+    function cbc_aes_decrypt_finish() {
+        if (!this.key) throw new IllegalStateError("no key is associated with the instance");
+        var asm = this.asm, heap = this.heap, padding = this.padding, pos = this.pos, len = this.len;
+        if (len === 0) {
+            if (!padding) {
+                this.result = new Uint8Array(0);
+                this.pos = _aes_heap_start;
+                this.len = 0;
+                return this;
+            } else {
+                throw new IllegalStateError("padding not found");
+            }
+        }
+        if (len % _aes_block_size !== 0) throw new IllegalArgumentError("data length must be a multiple of " + _aes_block_size);
+        var result = new Uint8Array(len);
+        if (len > 0) {
+            asm.cbc_decrypt(pos, len);
+            result.set(heap.subarray(pos, pos + len));
+        }
+        if (padding) {
+            var pad = result[len - 1];
+            result = result.subarray(0, len - pad);
+        }
+        this.result = result;
+        this.pos = _aes_heap_start;
+        this.len = 0;
+        return this;
+    }
+    function cbc_aes_decrypt(data) {
+        var result1 = cbc_aes_decrypt_process.call(this, data).result, result2 = cbc_aes_decrypt_finish.call(this).result, result;
+        result = new Uint8Array(result1.length + result2.length);
+        result.set(result1);
+        if (result2.length > 0) result.set(result2, result1.length);
+        this.result = result;
+        return this;
+    }
+    var cbc_aes_encrypt_prototype = cbc_aes_encrypt_constructor.prototype;
+    cbc_aes_encrypt_prototype.reset = cbc_aes_reset;
+    cbc_aes_encrypt_prototype.process = cbc_aes_encrypt_process;
+    cbc_aes_encrypt_prototype.finish = cbc_aes_encrypt_finish;
+    var cbc_aes_decrypt_prototype = cbc_aes_decrypt_constructor.prototype;
+    cbc_aes_decrypt_prototype.reset = cbc_aes_reset;
+    cbc_aes_decrypt_prototype.process = cbc_aes_decrypt_process;
+    cbc_aes_decrypt_prototype.finish = cbc_aes_decrypt_finish;
+    var cbc_aes_prototype = cbc_aes_constructor.prototype;
+    cbc_aes_prototype.reset = cbc_aes_reset;
+    cbc_aes_prototype.encrypt = cbc_aes_encrypt;
+    cbc_aes_prototype.decrypt = cbc_aes_decrypt;
+    var _aes_heap_instance = new Uint8Array(1048576), _aes_asm_instance = aes_asm(global, null, _aes_heap_instance.buffer);
+    var cbc_aes_instance = new cbc_aes_constructor({
+        heap: _aes_heap_instance,
+        asm: _aes_asm_instance
+    });
+    function cbc_aes_encrypt_bytes(data, key, padding, iv) {
+        if (data === undefined) throw new SyntaxError("data required");
+        if (key === undefined) throw new SyntaxError("key required");
+        return cbc_aes_instance.reset({
+            key: key,
+            padding: padding,
+            iv: iv
+        }).encrypt(data).result;
+    }
+    function cbc_aes_decrypt_bytes(data, key, padding, iv) {
+        if (data === undefined) throw new SyntaxError("data required");
+        if (key === undefined) throw new SyntaxError("key required");
+        return cbc_aes_instance.reset({
+            key: key,
+            padding: padding,
+            iv: iv
+        }).decrypt(data).result;
+    }
+    cbc_aes_constructor.encrypt = cbc_aes_encrypt_bytes;
+    cbc_aes_constructor.decrypt = cbc_aes_decrypt_bytes;
+    exports.AES_CBC = cbc_aes_constructor;
+    function hash_reset() {
+        this.result = null;
+        this.pos = 0;
+        this.len = 0;
+        this.asm.reset();
+        return this;
+    }
+    function hash_process(data) {
+        if (this.result !== null) throw new IllegalStateError("state must be reset before processing new data");
+        if (is_string(data)) data = string_to_bytes(data);
+        if (is_buffer(data)) data = new Uint8Array(data);
+        if (!is_bytes(data)) throw new TypeError("data isn't of expected type");
+        var asm = this.asm, heap = this.heap, hpos = this.pos, hlen = this.len, dpos = 0, dlen = data.length, wlen = 0;
+        while (dlen > 0) {
+            wlen = _heap_write(heap, hpos + hlen, data, dpos, dlen);
+            hlen += wlen;
+            dpos += wlen;
+            dlen -= wlen;
+            wlen = asm.process(hpos, hlen);
+            hpos += wlen;
+            hlen -= wlen;
+            if (!hlen) hpos = 0;
+        }
+        this.pos = hpos;
+        this.len = hlen;
+        return this;
+    }
+    function hash_finish() {
+        if (this.result !== null) throw new IllegalStateError("state must be reset before processing new data");
+        this.asm.finish(this.pos, this.len, 0);
+        this.result = new Uint8Array(this.HASH_SIZE);
+        this.result.set(this.heap.subarray(0, this.HASH_SIZE));
+        this.pos = 0;
+        this.len = 0;
+        return this;
+    }
+    function sha256_asm(stdlib, foreign, buffer) {
+        "use asm";
+        var H0 = 0, H1 = 0, H2 = 0, H3 = 0, H4 = 0, H5 = 0, H6 = 0, H7 = 0, TOTAL = 0;
+        var I0 = 0, I1 = 0, I2 = 0, I3 = 0, I4 = 0, I5 = 0, I6 = 0, I7 = 0, O0 = 0, O1 = 0, O2 = 0, O3 = 0, O4 = 0, O5 = 0, O6 = 0, O7 = 0;
+        var HEAP = new stdlib.Uint8Array(buffer);
+        function _core(w0, w1, w2, w3, w4, w5, w6, w7, w8, w9, w10, w11, w12, w13, w14, w15) {
+            w0 = w0 | 0;
+            w1 = w1 | 0;
+            w2 = w2 | 0;
+            w3 = w3 | 0;
+            w4 = w4 | 0;
+            w5 = w5 | 0;
+            w6 = w6 | 0;
+            w7 = w7 | 0;
+            w8 = w8 | 0;
+            w9 = w9 | 0;
+            w10 = w10 | 0;
+            w11 = w11 | 0;
+            w12 = w12 | 0;
+            w13 = w13 | 0;
+            w14 = w14 | 0;
+            w15 = w15 | 0;
+            var a = 0, b = 0, c = 0, d = 0, e = 0, f = 0, g = 0, h = 0, t = 0;
+            a = H0;
+            b = H1;
+            c = H2;
+            d = H3;
+            e = H4;
+            f = H5;
+            g = H6;
+            h = H7;
+            t = w0 + h + (e >>> 6 ^ e >>> 11 ^ e >>> 25 ^ e << 26 ^ e << 21 ^ e << 7) + (g ^ e & (f ^ g)) + 1116352408 | 0;
+            h = g;
+            g = f;
+            f = e;
+            e = d + t | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = t + (b & c ^ d & (b ^ c)) + (b >>> 2 ^ b >>> 13 ^ b >>> 22 ^ b << 30 ^ b << 19 ^ b << 10) | 0;
+            t = w1 + h + (e >>> 6 ^ e >>> 11 ^ e >>> 25 ^ e << 26 ^ e << 21 ^ e << 7) + (g ^ e & (f ^ g)) + 1899447441 | 0;
+            h = g;
+            g = f;
+            f = e;
+            e = d + t | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = t + (b & c ^ d & (b ^ c)) + (b >>> 2 ^ b >>> 13 ^ b >>> 22 ^ b << 30 ^ b << 19 ^ b << 10) | 0;
+            t = w2 + h + (e >>> 6 ^ e >>> 11 ^ e >>> 25 ^ e << 26 ^ e << 21 ^ e << 7) + (g ^ e & (f ^ g)) + 3049323471 | 0;
+            h = g;
+            g = f;
+            f = e;
+            e = d + t | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = t + (b & c ^ d & (b ^ c)) + (b >>> 2 ^ b >>> 13 ^ b >>> 22 ^ b << 30 ^ b << 19 ^ b << 10) | 0;
+            t = w3 + h + (e >>> 6 ^ e >>> 11 ^ e >>> 25 ^ e << 26 ^ e << 21 ^ e << 7) + (g ^ e & (f ^ g)) + 3921009573 | 0;
+            h = g;
+            g = f;
+            f = e;
+            e = d + t | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = t + (b & c ^ d & (b ^ c)) + (b >>> 2 ^ b >>> 13 ^ b >>> 22 ^ b << 30 ^ b << 19 ^ b << 10) | 0;
+            t = w4 + h + (e >>> 6 ^ e >>> 11 ^ e >>> 25 ^ e << 26 ^ e << 21 ^ e << 7) + (g ^ e & (f ^ g)) + 961987163 | 0;
+            h = g;
+            g = f;
+            f = e;
+            e = d + t | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = t + (b & c ^ d & (b ^ c)) + (b >>> 2 ^ b >>> 13 ^ b >>> 22 ^ b << 30 ^ b << 19 ^ b << 10) | 0;
+            t = w5 + h + (e >>> 6 ^ e >>> 11 ^ e >>> 25 ^ e << 26 ^ e << 21 ^ e << 7) + (g ^ e & (f ^ g)) + 1508970993 | 0;
+            h = g;
+            g = f;
+            f = e;
+            e = d + t | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = t + (b & c ^ d & (b ^ c)) + (b >>> 2 ^ b >>> 13 ^ b >>> 22 ^ b << 30 ^ b << 19 ^ b << 10) | 0;
+            t = w6 + h + (e >>> 6 ^ e >>> 11 ^ e >>> 25 ^ e << 26 ^ e << 21 ^ e << 7) + (g ^ e & (f ^ g)) + 2453635748 | 0;
+            h = g;
+            g = f;
+            f = e;
+            e = d + t | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = t + (b & c ^ d & (b ^ c)) + (b >>> 2 ^ b >>> 13 ^ b >>> 22 ^ b << 30 ^ b << 19 ^ b << 10) | 0;
+            t = w7 + h + (e >>> 6 ^ e >>> 11 ^ e >>> 25 ^ e << 26 ^ e << 21 ^ e << 7) + (g ^ e & (f ^ g)) + 2870763221 | 0;
+            h = g;
+            g = f;
+            f = e;
+            e = d + t | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = t + (b & c ^ d & (b ^ c)) + (b >>> 2 ^ b >>> 13 ^ b >>> 22 ^ b << 30 ^ b << 19 ^ b << 10) | 0;
+            t = w8 + h + (e >>> 6 ^ e >>> 11 ^ e >>> 25 ^ e << 26 ^ e << 21 ^ e << 7) + (g ^ e & (f ^ g)) + 3624381080 | 0;
+            h = g;
+            g = f;
+            f = e;
+            e = d + t | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = t + (b & c ^ d & (b ^ c)) + (b >>> 2 ^ b >>> 13 ^ b >>> 22 ^ b << 30 ^ b << 19 ^ b << 10) | 0;
+            t = w9 + h + (e >>> 6 ^ e >>> 11 ^ e >>> 25 ^ e << 26 ^ e << 21 ^ e << 7) + (g ^ e & (f ^ g)) + 310598401 | 0;
+            h = g;
+            g = f;
+            f = e;
+            e = d + t | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = t + (b & c ^ d & (b ^ c)) + (b >>> 2 ^ b >>> 13 ^ b >>> 22 ^ b << 30 ^ b << 19 ^ b << 10) | 0;
+            t = w10 + h + (e >>> 6 ^ e >>> 11 ^ e >>> 25 ^ e << 26 ^ e << 21 ^ e << 7) + (g ^ e & (f ^ g)) + 607225278 | 0;
+            h = g;
+            g = f;
+            f = e;
+            e = d + t | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = t + (b & c ^ d & (b ^ c)) + (b >>> 2 ^ b >>> 13 ^ b >>> 22 ^ b << 30 ^ b << 19 ^ b << 10) | 0;
+            t = w11 + h + (e >>> 6 ^ e >>> 11 ^ e >>> 25 ^ e << 26 ^ e << 21 ^ e << 7) + (g ^ e & (f ^ g)) + 1426881987 | 0;
+            h = g;
+            g = f;
+            f = e;
+            e = d + t | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = t + (b & c ^ d & (b ^ c)) + (b >>> 2 ^ b >>> 13 ^ b >>> 22 ^ b << 30 ^ b << 19 ^ b << 10) | 0;
+            t = w12 + h + (e >>> 6 ^ e >>> 11 ^ e >>> 25 ^ e << 26 ^ e << 21 ^ e << 7) + (g ^ e & (f ^ g)) + 1925078388 | 0;
+            h = g;
+            g = f;
+            f = e;
+            e = d + t | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = t + (b & c ^ d & (b ^ c)) + (b >>> 2 ^ b >>> 13 ^ b >>> 22 ^ b << 30 ^ b << 19 ^ b << 10) | 0;
+            t = w13 + h + (e >>> 6 ^ e >>> 11 ^ e >>> 25 ^ e << 26 ^ e << 21 ^ e << 7) + (g ^ e & (f ^ g)) + 2162078206 | 0;
+            h = g;
+            g = f;
+            f = e;
+            e = d + t | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = t + (b & c ^ d & (b ^ c)) + (b >>> 2 ^ b >>> 13 ^ b >>> 22 ^ b << 30 ^ b << 19 ^ b << 10) | 0;
+            t = w14 + h + (e >>> 6 ^ e >>> 11 ^ e >>> 25 ^ e << 26 ^ e << 21 ^ e << 7) + (g ^ e & (f ^ g)) + 2614888103 | 0;
+            h = g;
+            g = f;
+            f = e;
+            e = d + t | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = t + (b & c ^ d & (b ^ c)) + (b >>> 2 ^ b >>> 13 ^ b >>> 22 ^ b << 30 ^ b << 19 ^ b << 10) | 0;
+            t = w15 + h + (e >>> 6 ^ e >>> 11 ^ e >>> 25 ^ e << 26 ^ e << 21 ^ e << 7) + (g ^ e & (f ^ g)) + 3248222580 | 0;
+            h = g;
+            g = f;
+            f = e;
+            e = d + t | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = t + (b & c ^ d & (b ^ c)) + (b >>> 2 ^ b >>> 13 ^ b >>> 22 ^ b << 30 ^ b << 19 ^ b << 10) | 0;
+            w0 = t = (w1 >>> 7 ^ w1 >>> 18 ^ w1 >>> 3 ^ w1 << 25 ^ w1 << 14) + (w14 >>> 17 ^ w14 >>> 19 ^ w14 >>> 10 ^ w14 << 15 ^ w14 << 13) + w0 + w9 | 0;
+            t = t + h + (e >>> 6 ^ e >>> 11 ^ e >>> 25 ^ e << 26 ^ e << 21 ^ e << 7) + (g ^ e & (f ^ g)) + 3835390401 | 0;
+            h = g;
+            g = f;
+            f = e;
+            e = d + t | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = t + (b & c ^ d & (b ^ c)) + (b >>> 2 ^ b >>> 13 ^ b >>> 22 ^ b << 30 ^ b << 19 ^ b << 10) | 0;
+            w1 = t = (w2 >>> 7 ^ w2 >>> 18 ^ w2 >>> 3 ^ w2 << 25 ^ w2 << 14) + (w15 >>> 17 ^ w15 >>> 19 ^ w15 >>> 10 ^ w15 << 15 ^ w15 << 13) + w1 + w10 | 0;
+            t = t + h + (e >>> 6 ^ e >>> 11 ^ e >>> 25 ^ e << 26 ^ e << 21 ^ e << 7) + (g ^ e & (f ^ g)) + 4022224774 | 0;
+            h = g;
+            g = f;
+            f = e;
+            e = d + t | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = t + (b & c ^ d & (b ^ c)) + (b >>> 2 ^ b >>> 13 ^ b >>> 22 ^ b << 30 ^ b << 19 ^ b << 10) | 0;
+            w2 = t = (w3 >>> 7 ^ w3 >>> 18 ^ w3 >>> 3 ^ w3 << 25 ^ w3 << 14) + (w0 >>> 17 ^ w0 >>> 19 ^ w0 >>> 10 ^ w0 << 15 ^ w0 << 13) + w2 + w11 | 0;
+            t = t + h + (e >>> 6 ^ e >>> 11 ^ e >>> 25 ^ e << 26 ^ e << 21 ^ e << 7) + (g ^ e & (f ^ g)) + 264347078 | 0;
+            h = g;
+            g = f;
+            f = e;
+            e = d + t | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = t + (b & c ^ d & (b ^ c)) + (b >>> 2 ^ b >>> 13 ^ b >>> 22 ^ b << 30 ^ b << 19 ^ b << 10) | 0;
+            w3 = t = (w4 >>> 7 ^ w4 >>> 18 ^ w4 >>> 3 ^ w4 << 25 ^ w4 << 14) + (w1 >>> 17 ^ w1 >>> 19 ^ w1 >>> 10 ^ w1 << 15 ^ w1 << 13) + w3 + w12 | 0;
+            t = t + h + (e >>> 6 ^ e >>> 11 ^ e >>> 25 ^ e << 26 ^ e << 21 ^ e << 7) + (g ^ e & (f ^ g)) + 604807628 | 0;
+            h = g;
+            g = f;
+            f = e;
+            e = d + t | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = t + (b & c ^ d & (b ^ c)) + (b >>> 2 ^ b >>> 13 ^ b >>> 22 ^ b << 30 ^ b << 19 ^ b << 10) | 0;
+            w4 = t = (w5 >>> 7 ^ w5 >>> 18 ^ w5 >>> 3 ^ w5 << 25 ^ w5 << 14) + (w2 >>> 17 ^ w2 >>> 19 ^ w2 >>> 10 ^ w2 << 15 ^ w2 << 13) + w4 + w13 | 0;
+            t = t + h + (e >>> 6 ^ e >>> 11 ^ e >>> 25 ^ e << 26 ^ e << 21 ^ e << 7) + (g ^ e & (f ^ g)) + 770255983 | 0;
+            h = g;
+            g = f;
+            f = e;
+            e = d + t | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = t + (b & c ^ d & (b ^ c)) + (b >>> 2 ^ b >>> 13 ^ b >>> 22 ^ b << 30 ^ b << 19 ^ b << 10) | 0;
+            w5 = t = (w6 >>> 7 ^ w6 >>> 18 ^ w6 >>> 3 ^ w6 << 25 ^ w6 << 14) + (w3 >>> 17 ^ w3 >>> 19 ^ w3 >>> 10 ^ w3 << 15 ^ w3 << 13) + w5 + w14 | 0;
+            t = t + h + (e >>> 6 ^ e >>> 11 ^ e >>> 25 ^ e << 26 ^ e << 21 ^ e << 7) + (g ^ e & (f ^ g)) + 1249150122 | 0;
+            h = g;
+            g = f;
+            f = e;
+            e = d + t | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = t + (b & c ^ d & (b ^ c)) + (b >>> 2 ^ b >>> 13 ^ b >>> 22 ^ b << 30 ^ b << 19 ^ b << 10) | 0;
+            w6 = t = (w7 >>> 7 ^ w7 >>> 18 ^ w7 >>> 3 ^ w7 << 25 ^ w7 << 14) + (w4 >>> 17 ^ w4 >>> 19 ^ w4 >>> 10 ^ w4 << 15 ^ w4 << 13) + w6 + w15 | 0;
+            t = t + h + (e >>> 6 ^ e >>> 11 ^ e >>> 25 ^ e << 26 ^ e << 21 ^ e << 7) + (g ^ e & (f ^ g)) + 1555081692 | 0;
+            h = g;
+            g = f;
+            f = e;
+            e = d + t | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = t + (b & c ^ d & (b ^ c)) + (b >>> 2 ^ b >>> 13 ^ b >>> 22 ^ b << 30 ^ b << 19 ^ b << 10) | 0;
+            w7 = t = (w8 >>> 7 ^ w8 >>> 18 ^ w8 >>> 3 ^ w8 << 25 ^ w8 << 14) + (w5 >>> 17 ^ w5 >>> 19 ^ w5 >>> 10 ^ w5 << 15 ^ w5 << 13) + w7 + w0 | 0;
+            t = t + h + (e >>> 6 ^ e >>> 11 ^ e >>> 25 ^ e << 26 ^ e << 21 ^ e << 7) + (g ^ e & (f ^ g)) + 1996064986 | 0;
+            h = g;
+            g = f;
+            f = e;
+            e = d + t | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = t + (b & c ^ d & (b ^ c)) + (b >>> 2 ^ b >>> 13 ^ b >>> 22 ^ b << 30 ^ b << 19 ^ b << 10) | 0;
+            w8 = t = (w9 >>> 7 ^ w9 >>> 18 ^ w9 >>> 3 ^ w9 << 25 ^ w9 << 14) + (w6 >>> 17 ^ w6 >>> 19 ^ w6 >>> 10 ^ w6 << 15 ^ w6 << 13) + w8 + w1 | 0;
+            t = t + h + (e >>> 6 ^ e >>> 11 ^ e >>> 25 ^ e << 26 ^ e << 21 ^ e << 7) + (g ^ e & (f ^ g)) + 2554220882 | 0;
+            h = g;
+            g = f;
+            f = e;
+            e = d + t | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = t + (b & c ^ d & (b ^ c)) + (b >>> 2 ^ b >>> 13 ^ b >>> 22 ^ b << 30 ^ b << 19 ^ b << 10) | 0;
+            w9 = t = (w10 >>> 7 ^ w10 >>> 18 ^ w10 >>> 3 ^ w10 << 25 ^ w10 << 14) + (w7 >>> 17 ^ w7 >>> 19 ^ w7 >>> 10 ^ w7 << 15 ^ w7 << 13) + w9 + w2 | 0;
+            t = t + h + (e >>> 6 ^ e >>> 11 ^ e >>> 25 ^ e << 26 ^ e << 21 ^ e << 7) + (g ^ e & (f ^ g)) + 2821834349 | 0;
+            h = g;
+            g = f;
+            f = e;
+            e = d + t | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = t + (b & c ^ d & (b ^ c)) + (b >>> 2 ^ b >>> 13 ^ b >>> 22 ^ b << 30 ^ b << 19 ^ b << 10) | 0;
+            w10 = t = (w11 >>> 7 ^ w11 >>> 18 ^ w11 >>> 3 ^ w11 << 25 ^ w11 << 14) + (w8 >>> 17 ^ w8 >>> 19 ^ w8 >>> 10 ^ w8 << 15 ^ w8 << 13) + w10 + w3 | 0;
+            t = t + h + (e >>> 6 ^ e >>> 11 ^ e >>> 25 ^ e << 26 ^ e << 21 ^ e << 7) + (g ^ e & (f ^ g)) + 2952996808 | 0;
+            h = g;
+            g = f;
+            f = e;
+            e = d + t | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = t + (b & c ^ d & (b ^ c)) + (b >>> 2 ^ b >>> 13 ^ b >>> 22 ^ b << 30 ^ b << 19 ^ b << 10) | 0;
+            w11 = t = (w12 >>> 7 ^ w12 >>> 18 ^ w12 >>> 3 ^ w12 << 25 ^ w12 << 14) + (w9 >>> 17 ^ w9 >>> 19 ^ w9 >>> 10 ^ w9 << 15 ^ w9 << 13) + w11 + w4 | 0;
+            t = t + h + (e >>> 6 ^ e >>> 11 ^ e >>> 25 ^ e << 26 ^ e << 21 ^ e << 7) + (g ^ e & (f ^ g)) + 3210313671 | 0;
+            h = g;
+            g = f;
+            f = e;
+            e = d + t | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = t + (b & c ^ d & (b ^ c)) + (b >>> 2 ^ b >>> 13 ^ b >>> 22 ^ b << 30 ^ b << 19 ^ b << 10) | 0;
+            w12 = t = (w13 >>> 7 ^ w13 >>> 18 ^ w13 >>> 3 ^ w13 << 25 ^ w13 << 14) + (w10 >>> 17 ^ w10 >>> 19 ^ w10 >>> 10 ^ w10 << 15 ^ w10 << 13) + w12 + w5 | 0;
+            t = t + h + (e >>> 6 ^ e >>> 11 ^ e >>> 25 ^ e << 26 ^ e << 21 ^ e << 7) + (g ^ e & (f ^ g)) + 3336571891 | 0;
+            h = g;
+            g = f;
+            f = e;
+            e = d + t | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = t + (b & c ^ d & (b ^ c)) + (b >>> 2 ^ b >>> 13 ^ b >>> 22 ^ b << 30 ^ b << 19 ^ b << 10) | 0;
+            w13 = t = (w14 >>> 7 ^ w14 >>> 18 ^ w14 >>> 3 ^ w14 << 25 ^ w14 << 14) + (w11 >>> 17 ^ w11 >>> 19 ^ w11 >>> 10 ^ w11 << 15 ^ w11 << 13) + w13 + w6 | 0;
+            t = t + h + (e >>> 6 ^ e >>> 11 ^ e >>> 25 ^ e << 26 ^ e << 21 ^ e << 7) + (g ^ e & (f ^ g)) + 3584528711 | 0;
+            h = g;
+            g = f;
+            f = e;
+            e = d + t | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = t + (b & c ^ d & (b ^ c)) + (b >>> 2 ^ b >>> 13 ^ b >>> 22 ^ b << 30 ^ b << 19 ^ b << 10) | 0;
+            w14 = t = (w15 >>> 7 ^ w15 >>> 18 ^ w15 >>> 3 ^ w15 << 25 ^ w15 << 14) + (w12 >>> 17 ^ w12 >>> 19 ^ w12 >>> 10 ^ w12 << 15 ^ w12 << 13) + w14 + w7 | 0;
+            t = t + h + (e >>> 6 ^ e >>> 11 ^ e >>> 25 ^ e << 26 ^ e << 21 ^ e << 7) + (g ^ e & (f ^ g)) + 113926993 | 0;
+            h = g;
+            g = f;
+            f = e;
+            e = d + t | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = t + (b & c ^ d & (b ^ c)) + (b >>> 2 ^ b >>> 13 ^ b >>> 22 ^ b << 30 ^ b << 19 ^ b << 10) | 0;
+            w15 = t = (w0 >>> 7 ^ w0 >>> 18 ^ w0 >>> 3 ^ w0 << 25 ^ w0 << 14) + (w13 >>> 17 ^ w13 >>> 19 ^ w13 >>> 10 ^ w13 << 15 ^ w13 << 13) + w15 + w8 | 0;
+            t = t + h + (e >>> 6 ^ e >>> 11 ^ e >>> 25 ^ e << 26 ^ e << 21 ^ e << 7) + (g ^ e & (f ^ g)) + 338241895 | 0;
+            h = g;
+            g = f;
+            f = e;
+            e = d + t | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = t + (b & c ^ d & (b ^ c)) + (b >>> 2 ^ b >>> 13 ^ b >>> 22 ^ b << 30 ^ b << 19 ^ b << 10) | 0;
+            w0 = t = (w1 >>> 7 ^ w1 >>> 18 ^ w1 >>> 3 ^ w1 << 25 ^ w1 << 14) + (w14 >>> 17 ^ w14 >>> 19 ^ w14 >>> 10 ^ w14 << 15 ^ w14 << 13) + w0 + w9 | 0;
+            t = t + h + (e >>> 6 ^ e >>> 11 ^ e >>> 25 ^ e << 26 ^ e << 21 ^ e << 7) + (g ^ e & (f ^ g)) + 666307205 | 0;
+            h = g;
+            g = f;
+            f = e;
+            e = d + t | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = t + (b & c ^ d & (b ^ c)) + (b >>> 2 ^ b >>> 13 ^ b >>> 22 ^ b << 30 ^ b << 19 ^ b << 10) | 0;
+            w1 = t = (w2 >>> 7 ^ w2 >>> 18 ^ w2 >>> 3 ^ w2 << 25 ^ w2 << 14) + (w15 >>> 17 ^ w15 >>> 19 ^ w15 >>> 10 ^ w15 << 15 ^ w15 << 13) + w1 + w10 | 0;
+            t = t + h + (e >>> 6 ^ e >>> 11 ^ e >>> 25 ^ e << 26 ^ e << 21 ^ e << 7) + (g ^ e & (f ^ g)) + 773529912 | 0;
+            h = g;
+            g = f;
+            f = e;
+            e = d + t | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = t + (b & c ^ d & (b ^ c)) + (b >>> 2 ^ b >>> 13 ^ b >>> 22 ^ b << 30 ^ b << 19 ^ b << 10) | 0;
+            w2 = t = (w3 >>> 7 ^ w3 >>> 18 ^ w3 >>> 3 ^ w3 << 25 ^ w3 << 14) + (w0 >>> 17 ^ w0 >>> 19 ^ w0 >>> 10 ^ w0 << 15 ^ w0 << 13) + w2 + w11 | 0;
+            t = t + h + (e >>> 6 ^ e >>> 11 ^ e >>> 25 ^ e << 26 ^ e << 21 ^ e << 7) + (g ^ e & (f ^ g)) + 1294757372 | 0;
+            h = g;
+            g = f;
+            f = e;
+            e = d + t | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = t + (b & c ^ d & (b ^ c)) + (b >>> 2 ^ b >>> 13 ^ b >>> 22 ^ b << 30 ^ b << 19 ^ b << 10) | 0;
+            w3 = t = (w4 >>> 7 ^ w4 >>> 18 ^ w4 >>> 3 ^ w4 << 25 ^ w4 << 14) + (w1 >>> 17 ^ w1 >>> 19 ^ w1 >>> 10 ^ w1 << 15 ^ w1 << 13) + w3 + w12 | 0;
+            t = t + h + (e >>> 6 ^ e >>> 11 ^ e >>> 25 ^ e << 26 ^ e << 21 ^ e << 7) + (g ^ e & (f ^ g)) + 1396182291 | 0;
+            h = g;
+            g = f;
+            f = e;
+            e = d + t | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = t + (b & c ^ d & (b ^ c)) + (b >>> 2 ^ b >>> 13 ^ b >>> 22 ^ b << 30 ^ b << 19 ^ b << 10) | 0;
+            w4 = t = (w5 >>> 7 ^ w5 >>> 18 ^ w5 >>> 3 ^ w5 << 25 ^ w5 << 14) + (w2 >>> 17 ^ w2 >>> 19 ^ w2 >>> 10 ^ w2 << 15 ^ w2 << 13) + w4 + w13 | 0;
+            t = t + h + (e >>> 6 ^ e >>> 11 ^ e >>> 25 ^ e << 26 ^ e << 21 ^ e << 7) + (g ^ e & (f ^ g)) + 1695183700 | 0;
+            h = g;
+            g = f;
+            f = e;
+            e = d + t | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = t + (b & c ^ d & (b ^ c)) + (b >>> 2 ^ b >>> 13 ^ b >>> 22 ^ b << 30 ^ b << 19 ^ b << 10) | 0;
+            w5 = t = (w6 >>> 7 ^ w6 >>> 18 ^ w6 >>> 3 ^ w6 << 25 ^ w6 << 14) + (w3 >>> 17 ^ w3 >>> 19 ^ w3 >>> 10 ^ w3 << 15 ^ w3 << 13) + w5 + w14 | 0;
+            t = t + h + (e >>> 6 ^ e >>> 11 ^ e >>> 25 ^ e << 26 ^ e << 21 ^ e << 7) + (g ^ e & (f ^ g)) + 1986661051 | 0;
+            h = g;
+            g = f;
+            f = e;
+            e = d + t | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = t + (b & c ^ d & (b ^ c)) + (b >>> 2 ^ b >>> 13 ^ b >>> 22 ^ b << 30 ^ b << 19 ^ b << 10) | 0;
+            w6 = t = (w7 >>> 7 ^ w7 >>> 18 ^ w7 >>> 3 ^ w7 << 25 ^ w7 << 14) + (w4 >>> 17 ^ w4 >>> 19 ^ w4 >>> 10 ^ w4 << 15 ^ w4 << 13) + w6 + w15 | 0;
+            t = t + h + (e >>> 6 ^ e >>> 11 ^ e >>> 25 ^ e << 26 ^ e << 21 ^ e << 7) + (g ^ e & (f ^ g)) + 2177026350 | 0;
+            h = g;
+            g = f;
+            f = e;
+            e = d + t | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = t + (b & c ^ d & (b ^ c)) + (b >>> 2 ^ b >>> 13 ^ b >>> 22 ^ b << 30 ^ b << 19 ^ b << 10) | 0;
+            w7 = t = (w8 >>> 7 ^ w8 >>> 18 ^ w8 >>> 3 ^ w8 << 25 ^ w8 << 14) + (w5 >>> 17 ^ w5 >>> 19 ^ w5 >>> 10 ^ w5 << 15 ^ w5 << 13) + w7 + w0 | 0;
+            t = t + h + (e >>> 6 ^ e >>> 11 ^ e >>> 25 ^ e << 26 ^ e << 21 ^ e << 7) + (g ^ e & (f ^ g)) + 2456956037 | 0;
+            h = g;
+            g = f;
+            f = e;
+            e = d + t | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = t + (b & c ^ d & (b ^ c)) + (b >>> 2 ^ b >>> 13 ^ b >>> 22 ^ b << 30 ^ b << 19 ^ b << 10) | 0;
+            w8 = t = (w9 >>> 7 ^ w9 >>> 18 ^ w9 >>> 3 ^ w9 << 25 ^ w9 << 14) + (w6 >>> 17 ^ w6 >>> 19 ^ w6 >>> 10 ^ w6 << 15 ^ w6 << 13) + w8 + w1 | 0;
+            t = t + h + (e >>> 6 ^ e >>> 11 ^ e >>> 25 ^ e << 26 ^ e << 21 ^ e << 7) + (g ^ e & (f ^ g)) + 2730485921 | 0;
+            h = g;
+            g = f;
+            f = e;
+            e = d + t | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = t + (b & c ^ d & (b ^ c)) + (b >>> 2 ^ b >>> 13 ^ b >>> 22 ^ b << 30 ^ b << 19 ^ b << 10) | 0;
+            w9 = t = (w10 >>> 7 ^ w10 >>> 18 ^ w10 >>> 3 ^ w10 << 25 ^ w10 << 14) + (w7 >>> 17 ^ w7 >>> 19 ^ w7 >>> 10 ^ w7 << 15 ^ w7 << 13) + w9 + w2 | 0;
+            t = t + h + (e >>> 6 ^ e >>> 11 ^ e >>> 25 ^ e << 26 ^ e << 21 ^ e << 7) + (g ^ e & (f ^ g)) + 2820302411 | 0;
+            h = g;
+            g = f;
+            f = e;
+            e = d + t | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = t + (b & c ^ d & (b ^ c)) + (b >>> 2 ^ b >>> 13 ^ b >>> 22 ^ b << 30 ^ b << 19 ^ b << 10) | 0;
+            w10 = t = (w11 >>> 7 ^ w11 >>> 18 ^ w11 >>> 3 ^ w11 << 25 ^ w11 << 14) + (w8 >>> 17 ^ w8 >>> 19 ^ w8 >>> 10 ^ w8 << 15 ^ w8 << 13) + w10 + w3 | 0;
+            t = t + h + (e >>> 6 ^ e >>> 11 ^ e >>> 25 ^ e << 26 ^ e << 21 ^ e << 7) + (g ^ e & (f ^ g)) + 3259730800 | 0;
+            h = g;
+            g = f;
+            f = e;
+            e = d + t | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = t + (b & c ^ d & (b ^ c)) + (b >>> 2 ^ b >>> 13 ^ b >>> 22 ^ b << 30 ^ b << 19 ^ b << 10) | 0;
+            w11 = t = (w12 >>> 7 ^ w12 >>> 18 ^ w12 >>> 3 ^ w12 << 25 ^ w12 << 14) + (w9 >>> 17 ^ w9 >>> 19 ^ w9 >>> 10 ^ w9 << 15 ^ w9 << 13) + w11 + w4 | 0;
+            t = t + h + (e >>> 6 ^ e >>> 11 ^ e >>> 25 ^ e << 26 ^ e << 21 ^ e << 7) + (g ^ e & (f ^ g)) + 3345764771 | 0;
+            h = g;
+            g = f;
+            f = e;
+            e = d + t | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = t + (b & c ^ d & (b ^ c)) + (b >>> 2 ^ b >>> 13 ^ b >>> 22 ^ b << 30 ^ b << 19 ^ b << 10) | 0;
+            w12 = t = (w13 >>> 7 ^ w13 >>> 18 ^ w13 >>> 3 ^ w13 << 25 ^ w13 << 14) + (w10 >>> 17 ^ w10 >>> 19 ^ w10 >>> 10 ^ w10 << 15 ^ w10 << 13) + w12 + w5 | 0;
+            t = t + h + (e >>> 6 ^ e >>> 11 ^ e >>> 25 ^ e << 26 ^ e << 21 ^ e << 7) + (g ^ e & (f ^ g)) + 3516065817 | 0;
+            h = g;
+            g = f;
+            f = e;
+            e = d + t | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = t + (b & c ^ d & (b ^ c)) + (b >>> 2 ^ b >>> 13 ^ b >>> 22 ^ b << 30 ^ b << 19 ^ b << 10) | 0;
+            w13 = t = (w14 >>> 7 ^ w14 >>> 18 ^ w14 >>> 3 ^ w14 << 25 ^ w14 << 14) + (w11 >>> 17 ^ w11 >>> 19 ^ w11 >>> 10 ^ w11 << 15 ^ w11 << 13) + w13 + w6 | 0;
+            t = t + h + (e >>> 6 ^ e >>> 11 ^ e >>> 25 ^ e << 26 ^ e << 21 ^ e << 7) + (g ^ e & (f ^ g)) + 3600352804 | 0;
+            h = g;
+            g = f;
+            f = e;
+            e = d + t | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = t + (b & c ^ d & (b ^ c)) + (b >>> 2 ^ b >>> 13 ^ b >>> 22 ^ b << 30 ^ b << 19 ^ b << 10) | 0;
+            w14 = t = (w15 >>> 7 ^ w15 >>> 18 ^ w15 >>> 3 ^ w15 << 25 ^ w15 << 14) + (w12 >>> 17 ^ w12 >>> 19 ^ w12 >>> 10 ^ w12 << 15 ^ w12 << 13) + w14 + w7 | 0;
+            t = t + h + (e >>> 6 ^ e >>> 11 ^ e >>> 25 ^ e << 26 ^ e << 21 ^ e << 7) + (g ^ e & (f ^ g)) + 4094571909 | 0;
+            h = g;
+            g = f;
+            f = e;
+            e = d + t | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = t + (b & c ^ d & (b ^ c)) + (b >>> 2 ^ b >>> 13 ^ b >>> 22 ^ b << 30 ^ b << 19 ^ b << 10) | 0;
+            w15 = t = (w0 >>> 7 ^ w0 >>> 18 ^ w0 >>> 3 ^ w0 << 25 ^ w0 << 14) + (w13 >>> 17 ^ w13 >>> 19 ^ w13 >>> 10 ^ w13 << 15 ^ w13 << 13) + w15 + w8 | 0;
+            t = t + h + (e >>> 6 ^ e >>> 11 ^ e >>> 25 ^ e << 26 ^ e << 21 ^ e << 7) + (g ^ e & (f ^ g)) + 275423344 | 0;
+            h = g;
+            g = f;
+            f = e;
+            e = d + t | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = t + (b & c ^ d & (b ^ c)) + (b >>> 2 ^ b >>> 13 ^ b >>> 22 ^ b << 30 ^ b << 19 ^ b << 10) | 0;
+            w0 = t = (w1 >>> 7 ^ w1 >>> 18 ^ w1 >>> 3 ^ w1 << 25 ^ w1 << 14) + (w14 >>> 17 ^ w14 >>> 19 ^ w14 >>> 10 ^ w14 << 15 ^ w14 << 13) + w0 + w9 | 0;
+            t = t + h + (e >>> 6 ^ e >>> 11 ^ e >>> 25 ^ e << 26 ^ e << 21 ^ e << 7) + (g ^ e & (f ^ g)) + 430227734 | 0;
+            h = g;
+            g = f;
+            f = e;
+            e = d + t | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = t + (b & c ^ d & (b ^ c)) + (b >>> 2 ^ b >>> 13 ^ b >>> 22 ^ b << 30 ^ b << 19 ^ b << 10) | 0;
+            w1 = t = (w2 >>> 7 ^ w2 >>> 18 ^ w2 >>> 3 ^ w2 << 25 ^ w2 << 14) + (w15 >>> 17 ^ w15 >>> 19 ^ w15 >>> 10 ^ w15 << 15 ^ w15 << 13) + w1 + w10 | 0;
+            t = t + h + (e >>> 6 ^ e >>> 11 ^ e >>> 25 ^ e << 26 ^ e << 21 ^ e << 7) + (g ^ e & (f ^ g)) + 506948616 | 0;
+            h = g;
+            g = f;
+            f = e;
+            e = d + t | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = t + (b & c ^ d & (b ^ c)) + (b >>> 2 ^ b >>> 13 ^ b >>> 22 ^ b << 30 ^ b << 19 ^ b << 10) | 0;
+            w2 = t = (w3 >>> 7 ^ w3 >>> 18 ^ w3 >>> 3 ^ w3 << 25 ^ w3 << 14) + (w0 >>> 17 ^ w0 >>> 19 ^ w0 >>> 10 ^ w0 << 15 ^ w0 << 13) + w2 + w11 | 0;
+            t = t + h + (e >>> 6 ^ e >>> 11 ^ e >>> 25 ^ e << 26 ^ e << 21 ^ e << 7) + (g ^ e & (f ^ g)) + 659060556 | 0;
+            h = g;
+            g = f;
+            f = e;
+            e = d + t | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = t + (b & c ^ d & (b ^ c)) + (b >>> 2 ^ b >>> 13 ^ b >>> 22 ^ b << 30 ^ b << 19 ^ b << 10) | 0;
+            w3 = t = (w4 >>> 7 ^ w4 >>> 18 ^ w4 >>> 3 ^ w4 << 25 ^ w4 << 14) + (w1 >>> 17 ^ w1 >>> 19 ^ w1 >>> 10 ^ w1 << 15 ^ w1 << 13) + w3 + w12 | 0;
+            t = t + h + (e >>> 6 ^ e >>> 11 ^ e >>> 25 ^ e << 26 ^ e << 21 ^ e << 7) + (g ^ e & (f ^ g)) + 883997877 | 0;
+            h = g;
+            g = f;
+            f = e;
+            e = d + t | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = t + (b & c ^ d & (b ^ c)) + (b >>> 2 ^ b >>> 13 ^ b >>> 22 ^ b << 30 ^ b << 19 ^ b << 10) | 0;
+            w4 = t = (w5 >>> 7 ^ w5 >>> 18 ^ w5 >>> 3 ^ w5 << 25 ^ w5 << 14) + (w2 >>> 17 ^ w2 >>> 19 ^ w2 >>> 10 ^ w2 << 15 ^ w2 << 13) + w4 + w13 | 0;
+            t = t + h + (e >>> 6 ^ e >>> 11 ^ e >>> 25 ^ e << 26 ^ e << 21 ^ e << 7) + (g ^ e & (f ^ g)) + 958139571 | 0;
+            h = g;
+            g = f;
+            f = e;
+            e = d + t | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = t + (b & c ^ d & (b ^ c)) + (b >>> 2 ^ b >>> 13 ^ b >>> 22 ^ b << 30 ^ b << 19 ^ b << 10) | 0;
+            w5 = t = (w6 >>> 7 ^ w6 >>> 18 ^ w6 >>> 3 ^ w6 << 25 ^ w6 << 14) + (w3 >>> 17 ^ w3 >>> 19 ^ w3 >>> 10 ^ w3 << 15 ^ w3 << 13) + w5 + w14 | 0;
+            t = t + h + (e >>> 6 ^ e >>> 11 ^ e >>> 25 ^ e << 26 ^ e << 21 ^ e << 7) + (g ^ e & (f ^ g)) + 1322822218 | 0;
+            h = g;
+            g = f;
+            f = e;
+            e = d + t | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = t + (b & c ^ d & (b ^ c)) + (b >>> 2 ^ b >>> 13 ^ b >>> 22 ^ b << 30 ^ b << 19 ^ b << 10) | 0;
+            w6 = t = (w7 >>> 7 ^ w7 >>> 18 ^ w7 >>> 3 ^ w7 << 25 ^ w7 << 14) + (w4 >>> 17 ^ w4 >>> 19 ^ w4 >>> 10 ^ w4 << 15 ^ w4 << 13) + w6 + w15 | 0;
+            t = t + h + (e >>> 6 ^ e >>> 11 ^ e >>> 25 ^ e << 26 ^ e << 21 ^ e << 7) + (g ^ e & (f ^ g)) + 1537002063 | 0;
+            h = g;
+            g = f;
+            f = e;
+            e = d + t | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = t + (b & c ^ d & (b ^ c)) + (b >>> 2 ^ b >>> 13 ^ b >>> 22 ^ b << 30 ^ b << 19 ^ b << 10) | 0;
+            w7 = t = (w8 >>> 7 ^ w8 >>> 18 ^ w8 >>> 3 ^ w8 << 25 ^ w8 << 14) + (w5 >>> 17 ^ w5 >>> 19 ^ w5 >>> 10 ^ w5 << 15 ^ w5 << 13) + w7 + w0 | 0;
+            t = t + h + (e >>> 6 ^ e >>> 11 ^ e >>> 25 ^ e << 26 ^ e << 21 ^ e << 7) + (g ^ e & (f ^ g)) + 1747873779 | 0;
+            h = g;
+            g = f;
+            f = e;
+            e = d + t | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = t + (b & c ^ d & (b ^ c)) + (b >>> 2 ^ b >>> 13 ^ b >>> 22 ^ b << 30 ^ b << 19 ^ b << 10) | 0;
+            w8 = t = (w9 >>> 7 ^ w9 >>> 18 ^ w9 >>> 3 ^ w9 << 25 ^ w9 << 14) + (w6 >>> 17 ^ w6 >>> 19 ^ w6 >>> 10 ^ w6 << 15 ^ w6 << 13) + w8 + w1 | 0;
+            t = t + h + (e >>> 6 ^ e >>> 11 ^ e >>> 25 ^ e << 26 ^ e << 21 ^ e << 7) + (g ^ e & (f ^ g)) + 1955562222 | 0;
+            h = g;
+            g = f;
+            f = e;
+            e = d + t | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = t + (b & c ^ d & (b ^ c)) + (b >>> 2 ^ b >>> 13 ^ b >>> 22 ^ b << 30 ^ b << 19 ^ b << 10) | 0;
+            w9 = t = (w10 >>> 7 ^ w10 >>> 18 ^ w10 >>> 3 ^ w10 << 25 ^ w10 << 14) + (w7 >>> 17 ^ w7 >>> 19 ^ w7 >>> 10 ^ w7 << 15 ^ w7 << 13) + w9 + w2 | 0;
+            t = t + h + (e >>> 6 ^ e >>> 11 ^ e >>> 25 ^ e << 26 ^ e << 21 ^ e << 7) + (g ^ e & (f ^ g)) + 2024104815 | 0;
+            h = g;
+            g = f;
+            f = e;
+            e = d + t | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = t + (b & c ^ d & (b ^ c)) + (b >>> 2 ^ b >>> 13 ^ b >>> 22 ^ b << 30 ^ b << 19 ^ b << 10) | 0;
+            w10 = t = (w11 >>> 7 ^ w11 >>> 18 ^ w11 >>> 3 ^ w11 << 25 ^ w11 << 14) + (w8 >>> 17 ^ w8 >>> 19 ^ w8 >>> 10 ^ w8 << 15 ^ w8 << 13) + w10 + w3 | 0;
+            t = t + h + (e >>> 6 ^ e >>> 11 ^ e >>> 25 ^ e << 26 ^ e << 21 ^ e << 7) + (g ^ e & (f ^ g)) + 2227730452 | 0;
+            h = g;
+            g = f;
+            f = e;
+            e = d + t | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = t + (b & c ^ d & (b ^ c)) + (b >>> 2 ^ b >>> 13 ^ b >>> 22 ^ b << 30 ^ b << 19 ^ b << 10) | 0;
+            w11 = t = (w12 >>> 7 ^ w12 >>> 18 ^ w12 >>> 3 ^ w12 << 25 ^ w12 << 14) + (w9 >>> 17 ^ w9 >>> 19 ^ w9 >>> 10 ^ w9 << 15 ^ w9 << 13) + w11 + w4 | 0;
+            t = t + h + (e >>> 6 ^ e >>> 11 ^ e >>> 25 ^ e << 26 ^ e << 21 ^ e << 7) + (g ^ e & (f ^ g)) + 2361852424 | 0;
+            h = g;
+            g = f;
+            f = e;
+            e = d + t | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = t + (b & c ^ d & (b ^ c)) + (b >>> 2 ^ b >>> 13 ^ b >>> 22 ^ b << 30 ^ b << 19 ^ b << 10) | 0;
+            w12 = t = (w13 >>> 7 ^ w13 >>> 18 ^ w13 >>> 3 ^ w13 << 25 ^ w13 << 14) + (w10 >>> 17 ^ w10 >>> 19 ^ w10 >>> 10 ^ w10 << 15 ^ w10 << 13) + w12 + w5 | 0;
+            t = t + h + (e >>> 6 ^ e >>> 11 ^ e >>> 25 ^ e << 26 ^ e << 21 ^ e << 7) + (g ^ e & (f ^ g)) + 2428436474 | 0;
+            h = g;
+            g = f;
+            f = e;
+            e = d + t | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = t + (b & c ^ d & (b ^ c)) + (b >>> 2 ^ b >>> 13 ^ b >>> 22 ^ b << 30 ^ b << 19 ^ b << 10) | 0;
+            w13 = t = (w14 >>> 7 ^ w14 >>> 18 ^ w14 >>> 3 ^ w14 << 25 ^ w14 << 14) + (w11 >>> 17 ^ w11 >>> 19 ^ w11 >>> 10 ^ w11 << 15 ^ w11 << 13) + w13 + w6 | 0;
+            t = t + h + (e >>> 6 ^ e >>> 11 ^ e >>> 25 ^ e << 26 ^ e << 21 ^ e << 7) + (g ^ e & (f ^ g)) + 2756734187 | 0;
+            h = g;
+            g = f;
+            f = e;
+            e = d + t | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = t + (b & c ^ d & (b ^ c)) + (b >>> 2 ^ b >>> 13 ^ b >>> 22 ^ b << 30 ^ b << 19 ^ b << 10) | 0;
+            w14 = t = (w15 >>> 7 ^ w15 >>> 18 ^ w15 >>> 3 ^ w15 << 25 ^ w15 << 14) + (w12 >>> 17 ^ w12 >>> 19 ^ w12 >>> 10 ^ w12 << 15 ^ w12 << 13) + w14 + w7 | 0;
+            t = t + h + (e >>> 6 ^ e >>> 11 ^ e >>> 25 ^ e << 26 ^ e << 21 ^ e << 7) + (g ^ e & (f ^ g)) + 3204031479 | 0;
+            h = g;
+            g = f;
+            f = e;
+            e = d + t | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = t + (b & c ^ d & (b ^ c)) + (b >>> 2 ^ b >>> 13 ^ b >>> 22 ^ b << 30 ^ b << 19 ^ b << 10) | 0;
+            w15 = t = (w0 >>> 7 ^ w0 >>> 18 ^ w0 >>> 3 ^ w0 << 25 ^ w0 << 14) + (w13 >>> 17 ^ w13 >>> 19 ^ w13 >>> 10 ^ w13 << 15 ^ w13 << 13) + w15 + w8 | 0;
+            t = t + h + (e >>> 6 ^ e >>> 11 ^ e >>> 25 ^ e << 26 ^ e << 21 ^ e << 7) + (g ^ e & (f ^ g)) + 3329325298 | 0;
+            h = g;
+            g = f;
+            f = e;
+            e = d + t | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = t + (b & c ^ d & (b ^ c)) + (b >>> 2 ^ b >>> 13 ^ b >>> 22 ^ b << 30 ^ b << 19 ^ b << 10) | 0;
+            H0 = H0 + a | 0;
+            H1 = H1 + b | 0;
+            H2 = H2 + c | 0;
+            H3 = H3 + d | 0;
+            H4 = H4 + e | 0;
+            H5 = H5 + f | 0;
+            H6 = H6 + g | 0;
+            H7 = H7 + h | 0;
+        }
+        function _core_heap(offset) {
+            offset = offset | 0;
+            _core(HEAP[offset | 0] << 24 | HEAP[offset | 1] << 16 | HEAP[offset | 2] << 8 | HEAP[offset | 3], HEAP[offset | 4] << 24 | HEAP[offset | 5] << 16 | HEAP[offset | 6] << 8 | HEAP[offset | 7], HEAP[offset | 8] << 24 | HEAP[offset | 9] << 16 | HEAP[offset | 10] << 8 | HEAP[offset | 11], HEAP[offset | 12] << 24 | HEAP[offset | 13] << 16 | HEAP[offset | 14] << 8 | HEAP[offset | 15], HEAP[offset | 16] << 24 | HEAP[offset | 17] << 16 | HEAP[offset | 18] << 8 | HEAP[offset | 19], HEAP[offset | 20] << 24 | HEAP[offset | 21] << 16 | HEAP[offset | 22] << 8 | HEAP[offset | 23], HEAP[offset | 24] << 24 | HEAP[offset | 25] << 16 | HEAP[offset | 26] << 8 | HEAP[offset | 27], HEAP[offset | 28] << 24 | HEAP[offset | 29] << 16 | HEAP[offset | 30] << 8 | HEAP[offset | 31], HEAP[offset | 32] << 24 | HEAP[offset | 33] << 16 | HEAP[offset | 34] << 8 | HEAP[offset | 35], HEAP[offset | 36] << 24 | HEAP[offset | 37] << 16 | HEAP[offset | 38] << 8 | HEAP[offset | 39], HEAP[offset | 40] << 24 | HEAP[offset | 41] << 16 | HEAP[offset | 42] << 8 | HEAP[offset | 43], HEAP[offset | 44] << 24 | HEAP[offset | 45] << 16 | HEAP[offset | 46] << 8 | HEAP[offset | 47], HEAP[offset | 48] << 24 | HEAP[offset | 49] << 16 | HEAP[offset | 50] << 8 | HEAP[offset | 51], HEAP[offset | 52] << 24 | HEAP[offset | 53] << 16 | HEAP[offset | 54] << 8 | HEAP[offset | 55], HEAP[offset | 56] << 24 | HEAP[offset | 57] << 16 | HEAP[offset | 58] << 8 | HEAP[offset | 59], HEAP[offset | 60] << 24 | HEAP[offset | 61] << 16 | HEAP[offset | 62] << 8 | HEAP[offset | 63]);
+        }
+        function _state_to_heap(output) {
+            output = output | 0;
+            HEAP[output | 0] = H0 >>> 24;
+            HEAP[output | 1] = H0 >>> 16 & 255;
+            HEAP[output | 2] = H0 >>> 8 & 255;
+            HEAP[output | 3] = H0 & 255;
+            HEAP[output | 4] = H1 >>> 24;
+            HEAP[output | 5] = H1 >>> 16 & 255;
+            HEAP[output | 6] = H1 >>> 8 & 255;
+            HEAP[output | 7] = H1 & 255;
+            HEAP[output | 8] = H2 >>> 24;
+            HEAP[output | 9] = H2 >>> 16 & 255;
+            HEAP[output | 10] = H2 >>> 8 & 255;
+            HEAP[output | 11] = H2 & 255;
+            HEAP[output | 12] = H3 >>> 24;
+            HEAP[output | 13] = H3 >>> 16 & 255;
+            HEAP[output | 14] = H3 >>> 8 & 255;
+            HEAP[output | 15] = H3 & 255;
+            HEAP[output | 16] = H4 >>> 24;
+            HEAP[output | 17] = H4 >>> 16 & 255;
+            HEAP[output | 18] = H4 >>> 8 & 255;
+            HEAP[output | 19] = H4 & 255;
+            HEAP[output | 20] = H5 >>> 24;
+            HEAP[output | 21] = H5 >>> 16 & 255;
+            HEAP[output | 22] = H5 >>> 8 & 255;
+            HEAP[output | 23] = H5 & 255;
+            HEAP[output | 24] = H6 >>> 24;
+            HEAP[output | 25] = H6 >>> 16 & 255;
+            HEAP[output | 26] = H6 >>> 8 & 255;
+            HEAP[output | 27] = H6 & 255;
+            HEAP[output | 28] = H7 >>> 24;
+            HEAP[output | 29] = H7 >>> 16 & 255;
+            HEAP[output | 30] = H7 >>> 8 & 255;
+            HEAP[output | 31] = H7 & 255;
+        }
+        function reset() {
+            H0 = 1779033703;
+            H1 = 3144134277;
+            H2 = 1013904242;
+            H3 = 2773480762;
+            H4 = 1359893119;
+            H5 = 2600822924;
+            H6 = 528734635;
+            H7 = 1541459225;
+            TOTAL = 0;
+        }
+        function init(h0, h1, h2, h3, h4, h5, h6, h7, total) {
+            h0 = h0 | 0;
+            h1 = h1 | 0;
+            h2 = h2 | 0;
+            h3 = h3 | 0;
+            h4 = h4 | 0;
+            h5 = h5 | 0;
+            h6 = h6 | 0;
+            h7 = h7 | 0;
+            total = total | 0;
+            H0 = h0;
+            H1 = h1;
+            H2 = h2;
+            H3 = h3;
+            H4 = h4;
+            H5 = h5;
+            H6 = h6;
+            H7 = h7;
+            TOTAL = total;
+        }
+        function process(offset, length) {
+            offset = offset | 0;
+            length = length | 0;
+            var hashed = 0;
+            if (offset & 63) return -1;
+            while ((length | 0) >= 64) {
+                _core_heap(offset);
+                offset = offset + 64 | 0;
+                length = length - 64 | 0;
+                hashed = hashed + 64 | 0;
+            }
+            TOTAL = TOTAL + hashed | 0;
+            return hashed | 0;
+        }
+        function finish(offset, length, output) {
+            offset = offset | 0;
+            length = length | 0;
+            output = output | 0;
+            var hashed = 0, i = 0;
+            if (offset & 63) return -1;
+            if (~output) if (output & 31) return -1;
+            if ((length | 0) >= 64) {
+                hashed = process(offset, length) | 0;
+                if ((hashed | 0) == -1) return -1;
+                offset = offset + hashed | 0;
+                length = length - hashed | 0;
+            }
+            hashed = hashed + length | 0;
+            TOTAL = TOTAL + length | 0;
+            HEAP[offset | length] = 128;
+            if ((length | 0) >= 56) {
+                for (i = length + 1 | 0; (i | 0) < 64; i = i + 1 | 0) HEAP[offset | i] = 0;
+                _core_heap(offset);
+                length = 0;
+                HEAP[offset | 0] = 0;
+            }
+            for (i = length + 1 | 0; (i | 0) < 59; i = i + 1 | 0) HEAP[offset | i] = 0;
+            HEAP[offset | 59] = TOTAL >>> 29;
+            HEAP[offset | 60] = TOTAL >>> 21 & 255;
+            HEAP[offset | 61] = TOTAL >>> 13 & 255;
+            HEAP[offset | 62] = TOTAL >>> 5 & 255;
+            HEAP[offset | 63] = TOTAL << 3 & 255;
+            _core_heap(offset);
+            if (~output) _state_to_heap(output);
+            return hashed | 0;
+        }
+        function hmac_reset() {
+            H0 = I0;
+            H1 = I1;
+            H2 = I2;
+            H3 = I3;
+            H4 = I4;
+            H5 = I5;
+            H6 = I6;
+            H7 = I7;
+            TOTAL = 64;
+        }
+        function _hmac_opad() {
+            H0 = O0;
+            H1 = O1;
+            H2 = O2;
+            H3 = O3;
+            H4 = O4;
+            H5 = O5;
+            H6 = O6;
+            H7 = O7;
+            TOTAL = 64;
+        }
+        function hmac_init(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15) {
+            p0 = p0 | 0;
+            p1 = p1 | 0;
+            p2 = p2 | 0;
+            p3 = p3 | 0;
+            p4 = p4 | 0;
+            p5 = p5 | 0;
+            p6 = p6 | 0;
+            p7 = p7 | 0;
+            p8 = p8 | 0;
+            p9 = p9 | 0;
+            p10 = p10 | 0;
+            p11 = p11 | 0;
+            p12 = p12 | 0;
+            p13 = p13 | 0;
+            p14 = p14 | 0;
+            p15 = p15 | 0;
+            reset();
+            _core(p0 ^ 1549556828, p1 ^ 1549556828, p2 ^ 1549556828, p3 ^ 1549556828, p4 ^ 1549556828, p5 ^ 1549556828, p6 ^ 1549556828, p7 ^ 1549556828, p8 ^ 1549556828, p9 ^ 1549556828, p10 ^ 1549556828, p11 ^ 1549556828, p12 ^ 1549556828, p13 ^ 1549556828, p14 ^ 1549556828, p15 ^ 1549556828);
+            O0 = H0;
+            O1 = H1;
+            O2 = H2;
+            O3 = H3;
+            O4 = H4;
+            O5 = H5;
+            O6 = H6;
+            O7 = H7;
+            reset();
+            _core(p0 ^ 909522486, p1 ^ 909522486, p2 ^ 909522486, p3 ^ 909522486, p4 ^ 909522486, p5 ^ 909522486, p6 ^ 909522486, p7 ^ 909522486, p8 ^ 909522486, p9 ^ 909522486, p10 ^ 909522486, p11 ^ 909522486, p12 ^ 909522486, p13 ^ 909522486, p14 ^ 909522486, p15 ^ 909522486);
+            I0 = H0;
+            I1 = H1;
+            I2 = H2;
+            I3 = H3;
+            I4 = H4;
+            I5 = H5;
+            I6 = H6;
+            I7 = H7;
+            TOTAL = 64;
+        }
+        function hmac_finish(offset, length, output) {
+            offset = offset | 0;
+            length = length | 0;
+            output = output | 0;
+            var t0 = 0, t1 = 0, t2 = 0, t3 = 0, t4 = 0, t5 = 0, t6 = 0, t7 = 0, hashed = 0;
+            if (offset & 63) return -1;
+            if (~output) if (output & 31) return -1;
+            hashed = finish(offset, length, -1) | 0;
+            t0 = H0, t1 = H1, t2 = H2, t3 = H3, t4 = H4, t5 = H5, t6 = H6, t7 = H7;
+            _hmac_opad();
+            _core(t0, t1, t2, t3, t4, t5, t6, t7, 2147483648, 0, 0, 0, 0, 0, 0, 768);
+            if (~output) _state_to_heap(output);
+            return hashed | 0;
+        }
+        function pbkdf2_generate_block(offset, length, block, count, output) {
+            offset = offset | 0;
+            length = length | 0;
+            block = block | 0;
+            count = count | 0;
+            output = output | 0;
+            var h0 = 0, h1 = 0, h2 = 0, h3 = 0, h4 = 0, h5 = 0, h6 = 0, h7 = 0, t0 = 0, t1 = 0, t2 = 0, t3 = 0, t4 = 0, t5 = 0, t6 = 0, t7 = 0;
+            if (offset & 63) return -1;
+            if (~output) if (output & 31) return -1;
+            HEAP[offset + length | 0] = block >>> 24;
+            HEAP[offset + length + 1 | 0] = block >>> 16 & 255;
+            HEAP[offset + length + 2 | 0] = block >>> 8 & 255;
+            HEAP[offset + length + 3 | 0] = block & 255;
+            hmac_finish(offset, length + 4 | 0, -1) | 0;
+            h0 = t0 = H0, h1 = t1 = H1, h2 = t2 = H2, h3 = t3 = H3, h4 = t4 = H4, h5 = t5 = H5, 
+            h6 = t6 = H6, h7 = t7 = H7;
+            count = count - 1 | 0;
+            while ((count | 0) > 0) {
+                hmac_reset();
+                _core(t0, t1, t2, t3, t4, t5, t6, t7, 2147483648, 0, 0, 0, 0, 0, 0, 768);
+                t0 = H0, t1 = H1, t2 = H2, t3 = H3, t4 = H4, t5 = H5, t6 = H6, t7 = H7;
+                _hmac_opad();
+                _core(t0, t1, t2, t3, t4, t5, t6, t7, 2147483648, 0, 0, 0, 0, 0, 0, 768);
+                t0 = H0, t1 = H1, t2 = H2, t3 = H3, t4 = H4, t5 = H5, t6 = H6, t7 = H7;
+                h0 = h0 ^ H0;
+                h1 = h1 ^ H1;
+                h2 = h2 ^ H2;
+                h3 = h3 ^ H3;
+                h4 = h4 ^ H4;
+                h5 = h5 ^ H5;
+                h6 = h6 ^ H6;
+                h7 = h7 ^ H7;
+                count = count - 1 | 0;
+            }
+            H0 = h0;
+            H1 = h1;
+            H2 = h2;
+            H3 = h3;
+            H4 = h4;
+            H5 = h5;
+            H6 = h6;
+            H7 = h7;
+            if (~output) _state_to_heap(output);
+            return 0;
+        }
+        return {
+            reset: reset,
+            init: init,
+            process: process,
+            finish: finish,
+            hmac_reset: hmac_reset,
+            hmac_init: hmac_init,
+            hmac_finish: hmac_finish,
+            pbkdf2_generate_block: pbkdf2_generate_block
+        };
+    }
+    var _sha256_block_size = 64, _sha256_hash_size = 32;
+    function sha256_constructor(options) {
+        options = options || {};
+        this.heap = _heap_init(Uint8Array, options);
+        this.asm = options.asm || sha256_asm(global, null, this.heap.buffer);
+        this.BLOCK_SIZE = _sha256_block_size;
+        this.HASH_SIZE = _sha256_hash_size;
+        this.reset();
+    }
+    sha256_constructor.BLOCK_SIZE = _sha256_block_size;
+    sha256_constructor.HASH_SIZE = _sha256_hash_size;
+    var sha256_prototype = sha256_constructor.prototype;
+    sha256_prototype.reset = hash_reset;
+    sha256_prototype.process = hash_process;
+    sha256_prototype.finish = hash_finish;
+    var sha256_instance = null;
+    function get_sha256_instance() {
+        if (sha256_instance === null) sha256_instance = new sha256_constructor({
+            heapSize: 1048576
+        });
+        return sha256_instance;
+    }
+    function hmac_constructor(options) {
+        options = options || {};
+        if (!options.hash) throw new SyntaxError("option 'hash' is required");
+        if (!options.hash.HASH_SIZE) throw new SyntaxError("option 'hash' supplied doesn't seem to be a valid hash function");
+        this.hash = options.hash;
+        this.BLOCK_SIZE = this.hash.BLOCK_SIZE;
+        this.HMAC_SIZE = this.hash.HASH_SIZE;
+        this.key = null;
+        this.verify = null;
+        this.result = null;
+        if (options.password !== undefined || options.verify !== undefined) this.reset(options);
+        return this;
+    }
+    function _hmac_key(hash, password) {
+        if (is_buffer(password)) password = new Uint8Array(password);
+        if (is_string(password)) password = string_to_bytes(password);
+        if (!is_bytes(password)) throw new TypeError("password isn't of expected type");
+        var key = new Uint8Array(hash.BLOCK_SIZE);
+        if (password.length > hash.BLOCK_SIZE) {
+            key.set(hash.reset().process(password).finish().result);
+        } else {
+            key.set(password);
+        }
+        return key;
+    }
+    function _hmac_init_verify(verify) {
+        if (is_buffer(verify) || is_bytes(verify)) {
+            verify = new Uint8Array(verify);
+        } else if (is_string(verify)) {
+            verify = string_to_bytes(verify);
+        } else {
+            throw new TypeError("verify tag isn't of expected type");
+        }
+        if (verify.length !== this.HMAC_SIZE) throw new IllegalArgumentError("illegal verification tag size");
+        this.verify = verify;
+    }
+    function hmac_reset(options) {
+        options = options || {};
+        var password = options.password;
+        if (this.key === null && !is_string(password) && !password) throw new IllegalStateError("no key is associated with the instance");
+        this.result = null;
+        this.hash.reset();
+        if (password || is_string(password)) this.key = _hmac_key(this.hash, password);
+        var ipad = new Uint8Array(this.key);
+        for (var i = 0; i < ipad.length; ++i) ipad[i] ^= 54;
+        this.hash.process(ipad);
+        var verify = options.verify;
+        if (verify !== undefined) {
+            _hmac_init_verify.call(this, verify);
+        } else {
+            this.verify = null;
+        }
+        return this;
+    }
+    function hmac_process(data) {
+        if (this.key === null) throw new IllegalStateError("no key is associated with the instance");
+        if (this.result !== null) throw new IllegalStateError("state must be reset before processing new data");
+        this.hash.process(data);
+        return this;
+    }
+    function hmac_finish() {
+        if (this.key === null) throw new IllegalStateError("no key is associated with the instance");
+        if (this.result !== null) throw new IllegalStateError("state must be reset before processing new data");
+        var inner_result = this.hash.finish().result;
+        var opad = new Uint8Array(this.key);
+        for (var i = 0; i < opad.length; ++i) opad[i] ^= 92;
+        var verify = this.verify;
+        var result = this.hash.reset().process(opad).process(inner_result).finish().result;
+        if (verify) {
+            if (verify.length === result.length) {
+                var diff = 0;
+                for (var i = 0; i < verify.length; i++) {
+                    diff |= verify[i] ^ result[i];
+                }
+                this.result = !diff;
+            } else {
+                this.result = false;
+            }
+        } else {
+            this.result = result;
+        }
+        return this;
+    }
+    var hmac_prototype = hmac_constructor.prototype;
+    hmac_prototype.reset = hmac_reset;
+    hmac_prototype.process = hmac_process;
+    hmac_prototype.finish = hmac_finish;
+    function hmac_sha256_constructor(options) {
+        options = options || {};
+        if (!(options.hash instanceof sha256_constructor)) options.hash = get_sha256_instance();
+        hmac_constructor.call(this, options);
+        return this;
+    }
+    function hmac_sha256_reset(options) {
+        options = options || {};
+        this.result = null;
+        this.hash.reset();
+        var password = options.password;
+        if (password !== undefined) {
+            if (is_string(password)) password = string_to_bytes(password);
+            var key = this.key = _hmac_key(this.hash, password);
+            this.hash.reset().asm.hmac_init(key[0] << 24 | key[1] << 16 | key[2] << 8 | key[3], key[4] << 24 | key[5] << 16 | key[6] << 8 | key[7], key[8] << 24 | key[9] << 16 | key[10] << 8 | key[11], key[12] << 24 | key[13] << 16 | key[14] << 8 | key[15], key[16] << 24 | key[17] << 16 | key[18] << 8 | key[19], key[20] << 24 | key[21] << 16 | key[22] << 8 | key[23], key[24] << 24 | key[25] << 16 | key[26] << 8 | key[27], key[28] << 24 | key[29] << 16 | key[30] << 8 | key[31], key[32] << 24 | key[33] << 16 | key[34] << 8 | key[35], key[36] << 24 | key[37] << 16 | key[38] << 8 | key[39], key[40] << 24 | key[41] << 16 | key[42] << 8 | key[43], key[44] << 24 | key[45] << 16 | key[46] << 8 | key[47], key[48] << 24 | key[49] << 16 | key[50] << 8 | key[51], key[52] << 24 | key[53] << 16 | key[54] << 8 | key[55], key[56] << 24 | key[57] << 16 | key[58] << 8 | key[59], key[60] << 24 | key[61] << 16 | key[62] << 8 | key[63]);
+        } else {
+            this.hash.asm.hmac_reset();
+        }
+        var verify = options.verify;
+        if (verify !== undefined) {
+            _hmac_init_verify.call(this, verify);
+        } else {
+            this.verify = null;
+        }
+        return this;
+    }
+    function hmac_sha256_finish() {
+        if (this.key === null) throw new IllegalStateError("no key is associated with the instance");
+        if (this.result !== null) throw new IllegalStateError("state must be reset before processing new data");
+        var hash = this.hash, asm = this.hash.asm, heap = this.hash.heap;
+        asm.hmac_finish(hash.pos, hash.len, 0);
+        var verify = this.verify;
+        var result = new Uint8Array(_sha256_hash_size);
+        result.set(heap.subarray(0, _sha256_hash_size));
+        if (verify) {
+            if (verify.length === result.length) {
+                var diff = 0;
+                for (var i = 0; i < verify.length; i++) {
+                    diff |= verify[i] ^ result[i];
+                }
+                this.result = !diff;
+            } else {
+                this.result = false;
+            }
+        } else {
+            this.result = result;
+        }
+        return this;
+    }
+    hmac_sha256_constructor.BLOCK_SIZE = sha256_constructor.BLOCK_SIZE;
+    hmac_sha256_constructor.HMAC_SIZE = sha256_constructor.HASH_SIZE;
+    var hmac_sha256_prototype = hmac_sha256_constructor.prototype;
+    hmac_sha256_prototype.reset = hmac_sha256_reset;
+    hmac_sha256_prototype.process = hmac_process;
+    hmac_sha256_prototype.finish = hmac_sha256_finish;
+    var hmac_sha256_instance = null;
+    function get_hmac_sha256_instance() {
+        if (hmac_sha256_instance === null) hmac_sha256_instance = new hmac_sha256_constructor();
+        return hmac_sha256_instance;
+    }
+    function pbkdf2_constructor(options) {
+        options = options || {};
+        if (!options.hmac) throw new SyntaxError("option 'hmac' is required");
+        if (!options.hmac.HMAC_SIZE) throw new SyntaxError("option 'hmac' supplied doesn't seem to be a valid HMAC function");
+        this.hmac = options.hmac;
+        this.count = options.count || 4096;
+        this.length = options.length || this.hmac.HMAC_SIZE;
+        this.result = null;
+        var password = options.password;
+        if (password || is_string(password)) this.reset(options);
+        return this;
+    }
+    function pbkdf2_reset(options) {
+        this.result = null;
+        this.hmac.reset(options);
+        return this;
+    }
+    function pbkdf2_generate(salt, count, length) {
+        if (this.result !== null) throw new IllegalStateError("state must be reset before processing new data");
+        if (!salt && !is_string(salt)) throw new IllegalArgumentError("bad 'salt' value");
+        count = count || this.count;
+        length = length || this.length;
+        this.result = new Uint8Array(length);
+        var blocks = Math.ceil(length / this.hmac.HMAC_SIZE);
+        for (var i = 1; i <= blocks; ++i) {
+            var j = (i - 1) * this.hmac.HMAC_SIZE;
+            var l = (i < blocks ? 0 : length % this.hmac.HMAC_SIZE) || this.hmac.HMAC_SIZE;
+            var tmp = new Uint8Array(this.hmac.reset().process(salt).process(new Uint8Array([ i >>> 24 & 255, i >>> 16 & 255, i >>> 8 & 255, i & 255 ])).finish().result);
+            this.result.set(tmp.subarray(0, l), j);
+            for (var k = 1; k < count; ++k) {
+                tmp = new Uint8Array(this.hmac.reset().process(tmp).finish().result);
+                for (var r = 0; r < l; ++r) this.result[j + r] ^= tmp[r];
+            }
+        }
+        return this;
+    }
+    var pbkdf2_prototype = pbkdf2_constructor.prototype;
+    pbkdf2_prototype.reset = pbkdf2_reset;
+    pbkdf2_prototype.generate = pbkdf2_generate;
+    function pbkdf2_hmac_sha256_constructor(options) {
+        options = options || {};
+        if (!(options.hmac instanceof hmac_sha256_constructor)) options.hmac = get_hmac_sha256_instance();
+        pbkdf2_constructor.call(this, options);
+        return this;
+    }
+    function pbkdf2_hmac_sha256_generate(salt, count, length) {
+        if (this.result !== null) throw new IllegalStateError("state must be reset before processing new data");
+        if (!salt && !is_string(salt)) throw new IllegalArgumentError("bad 'salt' value");
+        count = count || this.count;
+        length = length || this.length;
+        this.result = new Uint8Array(length);
+        var blocks = Math.ceil(length / this.hmac.HMAC_SIZE);
+        for (var i = 1; i <= blocks; ++i) {
+            var j = (i - 1) * this.hmac.HMAC_SIZE;
+            var l = (i < blocks ? 0 : length % this.hmac.HMAC_SIZE) || this.hmac.HMAC_SIZE;
+            this.hmac.reset().process(salt);
+            this.hmac.hash.asm.pbkdf2_generate_block(this.hmac.hash.pos, this.hmac.hash.len, i, count, 0);
+            this.result.set(this.hmac.hash.heap.subarray(0, l), j);
+        }
+        return this;
+    }
+    var pbkdf2_hmac_sha256_prototype = pbkdf2_hmac_sha256_constructor.prototype;
+    pbkdf2_hmac_sha256_prototype.reset = pbkdf2_reset;
+    pbkdf2_hmac_sha256_prototype.generate = pbkdf2_hmac_sha256_generate;
+    var pbkdf2_hmac_sha256_instance = null;
+    function get_pbkdf2_hmac_sha256_instance() {
+        if (pbkdf2_hmac_sha256_instance === null) pbkdf2_hmac_sha256_instance = new pbkdf2_hmac_sha256_constructor();
+        return pbkdf2_hmac_sha256_instance;
+    }
+    var ISAAC = function() {
+        var m = new Uint32Array(256), r = new Uint32Array(256), acc = 0, brs = 0, cnt = 0, gnt = 0;
+        function randinit() {
+            var a, b, c, d, e, f, g, h;
+            function mix() {
+                a ^= b << 11;
+                d = d + a | 0;
+                b = b + c | 0;
+                b ^= c >>> 2;
+                e = e + b | 0;
+                c = c + d | 0;
+                c ^= d << 8;
+                f = f + c | 0;
+                d = d + e | 0;
+                d ^= e >>> 16;
+                g = g + d | 0;
+                e = e + f | 0;
+                e ^= f << 10;
+                h = h + e | 0;
+                f = f + g | 0;
+                f ^= g >>> 4;
+                a = a + f | 0;
+                g = g + h | 0;
+                g ^= h << 8;
+                b = b + g | 0;
+                h = h + a | 0;
+                h ^= a >>> 9;
+                c = c + h | 0;
+                a = a + b | 0;
+            }
+            acc = brs = cnt = 0;
+            a = b = c = d = e = f = g = h = 2654435769;
+            for (var i = 0; i < 4; i++) mix();
+            for (var i = 0; i < 256; i += 8) {
+                a = a + r[i | 0] | 0;
+                b = b + r[i | 1] | 0;
+                c = c + r[i | 2] | 0;
+                d = d + r[i | 3] | 0;
+                e = e + r[i | 4] | 0;
+                f = f + r[i | 5] | 0;
+                g = g + r[i | 6] | 0;
+                h = h + r[i | 7] | 0;
+                mix();
+                m.set([ a, b, c, d, e, f, g, h ], i);
+            }
+            for (var i = 0; i < 256; i += 8) {
+                a = a + m[i | 0] | 0;
+                b = b + m[i | 1] | 0;
+                c = c + m[i | 2] | 0;
+                d = d + m[i | 3] | 0;
+                e = e + m[i | 4] | 0;
+                f = f + m[i | 5] | 0;
+                g = g + m[i | 6] | 0;
+                h = h + m[i | 7] | 0;
+                mix();
+                m.set([ a, b, c, d, e, f, g, h ], i);
+            }
+            prng(1), gnt = 256;
+        }
+        function seed(s) {
+            var i, j, k, n, l;
+            if (!is_typed_array(s)) {
+                if (is_number(s)) {
+                    n = new FloatArray(1), n[0] = s;
+                    s = new Uint8Array(n.buffer);
+                } else if (is_string(s)) {
+                    s = string_to_bytes(s);
+                } else if (is_buffer(s)) {
+                    s = new Uint8Array(s);
+                } else {
+                    throw new TypeError("bad seed type");
+                }
+            } else {
+                s = new Uint8Array(s.buffer);
+            }
+            l = s.length;
+            for (j = 0; j < l; j += 1024) {
+                for (k = j, i = 0; i < 1024 && k < l; k = j | ++i) {
+                    r[i >> 2] ^= s[k] << ((i & 3) << 3);
+                }
+                randinit();
+            }
+        }
+        function prng(n) {
+            n = n || 1;
+            var i, x, y;
+            while (n--) {
+                cnt = cnt + 1 | 0;
+                brs = brs + cnt | 0;
+                for (i = 0; i < 256; i += 4) {
+                    acc ^= acc << 13;
+                    acc = m[i + 128 & 255] + acc | 0;
+                    x = m[i | 0];
+                    m[i | 0] = y = m[x >>> 2 & 255] + (acc + brs | 0) | 0;
+                    r[i | 0] = brs = m[y >>> 10 & 255] + x | 0;
+                    acc ^= acc >>> 6;
+                    acc = m[i + 129 & 255] + acc | 0;
+                    x = m[i | 1];
+                    m[i | 1] = y = m[x >>> 2 & 255] + (acc + brs | 0) | 0;
+                    r[i | 1] = brs = m[y >>> 10 & 255] + x | 0;
+                    acc ^= acc << 2;
+                    acc = m[i + 130 & 255] + acc | 0;
+                    x = m[i | 2];
+                    m[i | 2] = y = m[x >>> 2 & 255] + (acc + brs | 0) | 0;
+                    r[i | 2] = brs = m[y >>> 10 & 255] + x | 0;
+                    acc ^= acc >>> 16;
+                    acc = m[i + 131 & 255] + acc | 0;
+                    x = m[i | 3];
+                    m[i | 3] = y = m[x >>> 2 & 255] + (acc + brs | 0) | 0;
+                    r[i | 3] = brs = m[y >>> 10 & 255] + x | 0;
+                }
+            }
+        }
+        function rand() {
+            if (!gnt--) prng(1), gnt = 255;
+            return r[gnt];
+        }
+        return {
+            seed: seed,
+            prng: prng,
+            rand: rand
+        };
+    }();
+    var _global_console = global.console, _global_date_now = global.Date.now, _global_math_random = global.Math.random, _global_performance = global.performance, _global_crypto = global.crypto || global.msCrypto, _global_crypto_getRandomValues;
+    if (_global_crypto !== undefined) _global_crypto_getRandomValues = _global_crypto.getRandomValues;
+    var _isaac_rand = ISAAC.rand, _isaac_seed = ISAAC.seed, _isaac_counter = 0, _isaac_weak_seeded = false, _isaac_seeded = false;
+    var _random_estimated_entropy = 0, _random_required_entropy = 256, _random_allow_weak = false, _random_skip_system_rng_warning = false, _random_warn_callstacks = {};
+    var _hires_now;
+    if (_global_performance !== undefined) {
+        _hires_now = function() {
+            return 1e3 * _global_performance.now() | 0;
+        };
+    } else {
+        var _hires_epoch = 1e3 * _global_date_now() | 0;
+        _hires_now = function() {
+            return 1e3 * _global_date_now() - _hires_epoch | 0;
+        };
+    }
+    function Random_weak_seed() {
+        if (_global_crypto !== undefined) {
+            buffer = new Uint8Array(32);
+            _global_crypto_getRandomValues.call(_global_crypto, buffer);
+            _isaac_seed(buffer);
+        } else {
+            var buffer = new FloatArray(3), i, t;
+            buffer[0] = _global_math_random();
+            buffer[1] = _global_date_now();
+            buffer[2] = _hires_now();
+            buffer = new Uint8Array(buffer.buffer);
+            var pbkdf2 = get_pbkdf2_hmac_sha256_instance();
+            for (i = 0; i < 100; i++) {
+                buffer = pbkdf2.reset({
+                    password: buffer
+                }).generate(global.location.href, 1e3, 32).result;
+                t = _hires_now();
+                buffer[0] ^= t >>> 24, buffer[1] ^= t >>> 16, buffer[2] ^= t >>> 8, buffer[3] ^= t;
+            }
+            _isaac_seed(buffer);
+        }
+        _isaac_counter = 0;
+        _isaac_weak_seeded = true;
+    }
+    function Random_seed(seed) {
+        if (!is_buffer(seed) && !is_typed_array(seed)) throw new TypeError("bad seed type");
+        var bpos = seed.byteOffest || 0, blen = seed.byteLength || seed.length, buff = new Uint8Array(seed.buffer || seed, bpos, blen);
+        _isaac_seed(buff);
+        _isaac_counter = 0;
+        var nonzero = 0;
+        for (var i = 0; i < buff.length; i++) {
+            nonzero |= buff[i];
+            buff[i] = 0;
+        }
+        if (nonzero !== 0) {
+            _random_estimated_entropy += 4 * blen;
+        }
+        _isaac_seeded = _random_estimated_entropy >= _random_required_entropy;
+        return _isaac_seeded;
+    }
+    function Random_getValues(buffer) {
+        if (!_isaac_weak_seeded) Random_weak_seed();
+        if (!_isaac_seeded && _global_crypto === undefined) {
+            if (!_random_allow_weak) throw new SecurityError("No strong PRNGs available. Use asmCrypto.random.seed().");
+            if (_global_console !== undefined) _global_console.error("No strong PRNGs available; your security is greatly lowered. Use asmCrypto.random.seed().");
+        }
+        if (!_random_skip_system_rng_warning && !_isaac_seeded && _global_crypto !== undefined && _global_console !== undefined) {
+            var s = new Error().stack;
+            _random_warn_callstacks[s] |= 0;
+            if (!_random_warn_callstacks[s]++) _global_console.warn("asmCrypto PRNG not seeded; your security relies on your system PRNG. If this is not acceptable, use asmCrypto.random.seed().");
+        }
+        if (!is_buffer(buffer) && !is_typed_array(buffer)) throw new TypeError("unexpected buffer type");
+        var bpos = buffer.byteOffset || 0, blen = buffer.byteLength || buffer.length, bytes = new Uint8Array(buffer.buffer || buffer, bpos, blen), i, r;
+        if (_global_crypto !== undefined) _global_crypto_getRandomValues.call(_global_crypto, bytes);
+        for (i = 0; i < blen; i++) {
+            if ((i & 3) === 0) {
+                if (_isaac_counter >= 1099511627776) Random_weak_seed();
+                r = _isaac_rand();
+                _isaac_counter++;
+            }
+            bytes[i] ^= r;
+            r >>>= 8;
+        }
+    }
+    function Random_getNumber() {
+        if (!_isaac_weak_seeded || _isaac_counter >= 1099511627776) Random_weak_seed();
+        var n = (1048576 * _isaac_rand() + (_isaac_rand() >>> 12)) / 4503599627370496;
+        _isaac_counter += 2;
+        return n;
+    }
+    var bigint_asm;
+    if (global.Math.imul === undefined) {
+        function _half_imul(a, b) {
+            return a * b | 0;
+        }
+        bigint_asm = function(stdlib, foreign, buffer) {
+            global.Math.imul = _half_imul;
+            var m = _bigint_asm(stdlib, foreign, buffer);
+            delete global.Math.imul;
+            return m;
+        };
+    } else {
+        bigint_asm = _bigint_asm;
+    }
+    function _bigint_asm(stdlib, foreign, buffer) {
+        "use asm";
+        var SP = 0;
+        var HEAP32 = new stdlib.Uint32Array(buffer);
+        var imul = stdlib.Math.imul;
+        function sreset(p) {
+            p = p | 0;
+            SP = p = p + 31 & -32;
+            return p | 0;
+        }
+        function salloc(l) {
+            l = l | 0;
+            var p = 0;
+            p = SP;
+            SP = p + (l + 31 & -32) | 0;
+            return p | 0;
+        }
+        function sfree(l) {
+            l = l | 0;
+            SP = SP - (l + 31 & -32) | 0;
+        }
+        function cp(l, A, B) {
+            l = l | 0;
+            A = A | 0;
+            B = B | 0;
+            var i = 0;
+            if ((A | 0) > (B | 0)) {
+                for (;(i | 0) < (l | 0); i = i + 4 | 0) {
+                    HEAP32[B + i >> 2] = HEAP32[A + i >> 2];
+                }
+            } else {
+                for (i = l - 4 | 0; (i | 0) >= 0; i = i - 4 | 0) {
+                    HEAP32[B + i >> 2] = HEAP32[A + i >> 2];
+                }
+            }
+        }
+        function z(l, z, A) {
+            l = l | 0;
+            z = z | 0;
+            A = A | 0;
+            var i = 0;
+            for (;(i | 0) < (l | 0); i = i + 4 | 0) {
+                HEAP32[A + i >> 2] = z;
+            }
+        }
+        function neg(A, lA, R, lR) {
+            A = A | 0;
+            lA = lA | 0;
+            R = R | 0;
+            lR = lR | 0;
+            var a = 0, c = 0, t = 0, r = 0, i = 0;
+            if ((lR | 0) <= 0) lR = lA;
+            if ((lR | 0) < (lA | 0)) lA = lR;
+            c = 1;
+            for (;(i | 0) < (lA | 0); i = i + 4 | 0) {
+                a = ~HEAP32[A + i >> 2];
+                t = (a & 65535) + c | 0;
+                r = (a >>> 16) + (t >>> 16) | 0;
+                HEAP32[R + i >> 2] = r << 16 | t & 65535;
+                c = r >>> 16;
+            }
+            for (;(i | 0) < (lR | 0); i = i + 4 | 0) {
+                HEAP32[R + i >> 2] = c - 1 | 0;
+            }
+            return c | 0;
+        }
+        function cmp(A, lA, B, lB) {
+            A = A | 0;
+            lA = lA | 0;
+            B = B | 0;
+            lB = lB | 0;
+            var a = 0, b = 0, i = 0;
+            if ((lA | 0) > (lB | 0)) {
+                for (i = lA - 4 | 0; (i | 0) >= (lB | 0); i = i - 4 | 0) {
+                    if (HEAP32[A + i >> 2] | 0) return 1;
+                }
+            } else {
+                for (i = lB - 4 | 0; (i | 0) >= (lA | 0); i = i - 4 | 0) {
+                    if (HEAP32[B + i >> 2] | 0) return -1;
+                }
+            }
+            for (;(i | 0) >= 0; i = i - 4 | 0) {
+                a = HEAP32[A + i >> 2] | 0, b = HEAP32[B + i >> 2] | 0;
+                if (a >>> 0 < b >>> 0) return -1;
+                if (a >>> 0 > b >>> 0) return 1;
+            }
+            return 0;
+        }
+        function tst(A, lA) {
+            A = A | 0;
+            lA = lA | 0;
+            var i = 0;
+            for (i = lA - 4 | 0; (i | 0) >= 0; i = i - 4 | 0) {
+                if (HEAP32[A + i >> 2] | 0) return i + 4 | 0;
+            }
+            return 0;
+        }
+        function add(A, lA, B, lB, R, lR) {
+            A = A | 0;
+            lA = lA | 0;
+            B = B | 0;
+            lB = lB | 0;
+            R = R | 0;
+            lR = lR | 0;
+            var a = 0, b = 0, c = 0, t = 0, r = 0, i = 0;
+            if ((lA | 0) < (lB | 0)) {
+                t = A, A = B, B = t;
+                t = lA, lA = lB, lB = t;
+            }
+            if ((lR | 0) <= 0) lR = lA + 4 | 0;
+            if ((lR | 0) < (lB | 0)) lA = lB = lR;
+            for (;(i | 0) < (lB | 0); i = i + 4 | 0) {
+                a = HEAP32[A + i >> 2] | 0;
+                b = HEAP32[B + i >> 2] | 0;
+                t = ((a & 65535) + (b & 65535) | 0) + c | 0;
+                r = ((a >>> 16) + (b >>> 16) | 0) + (t >>> 16) | 0;
+                HEAP32[R + i >> 2] = t & 65535 | r << 16;
+                c = r >>> 16;
+            }
+            for (;(i | 0) < (lA | 0); i = i + 4 | 0) {
+                a = HEAP32[A + i >> 2] | 0;
+                t = (a & 65535) + c | 0;
+                r = (a >>> 16) + (t >>> 16) | 0;
+                HEAP32[R + i >> 2] = t & 65535 | r << 16;
+                c = r >>> 16;
+            }
+            for (;(i | 0) < (lR | 0); i = i + 4 | 0) {
+                HEAP32[R + i >> 2] = c | 0;
+                c = 0;
+            }
+            return c | 0;
+        }
+        function sub(A, lA, B, lB, R, lR) {
+            A = A | 0;
+            lA = lA | 0;
+            B = B | 0;
+            lB = lB | 0;
+            R = R | 0;
+            lR = lR | 0;
+            var a = 0, b = 0, c = 0, t = 0, r = 0, i = 0;
+            if ((lR | 0) <= 0) lR = (lA | 0) > (lB | 0) ? lA + 4 | 0 : lB + 4 | 0;
+            if ((lR | 0) < (lA | 0)) lA = lR;
+            if ((lR | 0) < (lB | 0)) lB = lR;
+            if ((lA | 0) < (lB | 0)) {
+                for (;(i | 0) < (lA | 0); i = i + 4 | 0) {
+                    a = HEAP32[A + i >> 2] | 0;
+                    b = HEAP32[B + i >> 2] | 0;
+                    t = ((a & 65535) - (b & 65535) | 0) + c | 0;
+                    r = ((a >>> 16) - (b >>> 16) | 0) + (t >> 16) | 0;
+                    HEAP32[R + i >> 2] = t & 65535 | r << 16;
+                    c = r >> 16;
+                }
+                for (;(i | 0) < (lB | 0); i = i + 4 | 0) {
+                    b = HEAP32[B + i >> 2] | 0;
+                    t = c - (b & 65535) | 0;
+                    r = (t >> 16) - (b >>> 16) | 0;
+                    HEAP32[R + i >> 2] = t & 65535 | r << 16;
+                    c = r >> 16;
+                }
+            } else {
+                for (;(i | 0) < (lB | 0); i = i + 4 | 0) {
+                    a = HEAP32[A + i >> 2] | 0;
+                    b = HEAP32[B + i >> 2] | 0;
+                    t = ((a & 65535) - (b & 65535) | 0) + c | 0;
+                    r = ((a >>> 16) - (b >>> 16) | 0) + (t >> 16) | 0;
+                    HEAP32[R + i >> 2] = t & 65535 | r << 16;
+                    c = r >> 16;
+                }
+                for (;(i | 0) < (lA | 0); i = i + 4 | 0) {
+                    a = HEAP32[A + i >> 2] | 0;
+                    t = (a & 65535) + c | 0;
+                    r = (a >>> 16) + (t >> 16) | 0;
+                    HEAP32[R + i >> 2] = t & 65535 | r << 16;
+                    c = r >> 16;
+                }
+            }
+            for (;(i | 0) < (lR | 0); i = i + 4 | 0) {
+                HEAP32[R + i >> 2] = c | 0;
+            }
+            return c | 0;
+        }
+        function mul(A, lA, B, lB, R, lR) {
+            A = A | 0;
+            lA = lA | 0;
+            B = B | 0;
+            lB = lB | 0;
+            R = R | 0;
+            lR = lR | 0;
+            var al0 = 0, al1 = 0, al2 = 0, al3 = 0, al4 = 0, al5 = 0, al6 = 0, al7 = 0, ah0 = 0, ah1 = 0, ah2 = 0, ah3 = 0, ah4 = 0, ah5 = 0, ah6 = 0, ah7 = 0, bl0 = 0, bl1 = 0, bl2 = 0, bl3 = 0, bl4 = 0, bl5 = 0, bl6 = 0, bl7 = 0, bh0 = 0, bh1 = 0, bh2 = 0, bh3 = 0, bh4 = 0, bh5 = 0, bh6 = 0, bh7 = 0, r0 = 0, r1 = 0, r2 = 0, r3 = 0, r4 = 0, r5 = 0, r6 = 0, r7 = 0, r8 = 0, r9 = 0, r10 = 0, r11 = 0, r12 = 0, r13 = 0, r14 = 0, r15 = 0, u = 0, v = 0, w = 0, m = 0, i = 0, Ai = 0, j = 0, Bj = 0, Rk = 0;
+            if ((lA | 0) > (lB | 0)) {
+                u = A, v = lA;
+                A = B, lA = lB;
+                B = u, lB = v;
+            }
+            m = lA + lB | 0;
+            if ((lR | 0) > (m | 0) | (lR | 0) <= 0) lR = m;
+            if ((lR | 0) < (lA | 0)) lA = lR;
+            if ((lR | 0) < (lB | 0)) lB = lR;
+            for (;(i | 0) < (lA | 0); i = i + 32 | 0) {
+                Ai = A + i | 0;
+                ah0 = HEAP32[(Ai | 0) >> 2] | 0, ah1 = HEAP32[(Ai | 4) >> 2] | 0, ah2 = HEAP32[(Ai | 8) >> 2] | 0, 
+                ah3 = HEAP32[(Ai | 12) >> 2] | 0, ah4 = HEAP32[(Ai | 16) >> 2] | 0, ah5 = HEAP32[(Ai | 20) >> 2] | 0, 
+                ah6 = HEAP32[(Ai | 24) >> 2] | 0, ah7 = HEAP32[(Ai | 28) >> 2] | 0, al0 = ah0 & 65535, 
+                al1 = ah1 & 65535, al2 = ah2 & 65535, al3 = ah3 & 65535, al4 = ah4 & 65535, al5 = ah5 & 65535, 
+                al6 = ah6 & 65535, al7 = ah7 & 65535, ah0 = ah0 >>> 16, ah1 = ah1 >>> 16, ah2 = ah2 >>> 16, 
+                ah3 = ah3 >>> 16, ah4 = ah4 >>> 16, ah5 = ah5 >>> 16, ah6 = ah6 >>> 16, ah7 = ah7 >>> 16;
+                r8 = r9 = r10 = r11 = r12 = r13 = r14 = r15 = 0;
+                for (j = 0; (j | 0) < (lB | 0); j = j + 32 | 0) {
+                    Bj = B + j | 0;
+                    Rk = R + (i + j | 0) | 0;
+                    bh0 = HEAP32[(Bj | 0) >> 2] | 0, bh1 = HEAP32[(Bj | 4) >> 2] | 0, bh2 = HEAP32[(Bj | 8) >> 2] | 0, 
+                    bh3 = HEAP32[(Bj | 12) >> 2] | 0, bh4 = HEAP32[(Bj | 16) >> 2] | 0, bh5 = HEAP32[(Bj | 20) >> 2] | 0, 
+                    bh6 = HEAP32[(Bj | 24) >> 2] | 0, bh7 = HEAP32[(Bj | 28) >> 2] | 0, bl0 = bh0 & 65535, 
+                    bl1 = bh1 & 65535, bl2 = bh2 & 65535, bl3 = bh3 & 65535, bl4 = bh4 & 65535, bl5 = bh5 & 65535, 
+                    bl6 = bh6 & 65535, bl7 = bh7 & 65535, bh0 = bh0 >>> 16, bh1 = bh1 >>> 16, bh2 = bh2 >>> 16, 
+                    bh3 = bh3 >>> 16, bh4 = bh4 >>> 16, bh5 = bh5 >>> 16, bh6 = bh6 >>> 16, bh7 = bh7 >>> 16;
+                    r0 = HEAP32[(Rk | 0) >> 2] | 0, r1 = HEAP32[(Rk | 4) >> 2] | 0, r2 = HEAP32[(Rk | 8) >> 2] | 0, 
+                    r3 = HEAP32[(Rk | 12) >> 2] | 0, r4 = HEAP32[(Rk | 16) >> 2] | 0, r5 = HEAP32[(Rk | 20) >> 2] | 0, 
+                    r6 = HEAP32[(Rk | 24) >> 2] | 0, r7 = HEAP32[(Rk | 28) >> 2] | 0;
+                    u = ((imul(al0, bl0) | 0) + (r8 & 65535) | 0) + (r0 & 65535) | 0;
+                    v = ((imul(ah0, bl0) | 0) + (r8 >>> 16) | 0) + (r0 >>> 16) | 0;
+                    w = ((imul(al0, bh0) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                    m = ((imul(ah0, bh0) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                    r0 = w << 16 | u & 65535;
+                    u = ((imul(al0, bl1) | 0) + (m & 65535) | 0) + (r1 & 65535) | 0;
+                    v = ((imul(ah0, bl1) | 0) + (m >>> 16) | 0) + (r1 >>> 16) | 0;
+                    w = ((imul(al0, bh1) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                    m = ((imul(ah0, bh1) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                    r1 = w << 16 | u & 65535;
+                    u = ((imul(al0, bl2) | 0) + (m & 65535) | 0) + (r2 & 65535) | 0;
+                    v = ((imul(ah0, bl2) | 0) + (m >>> 16) | 0) + (r2 >>> 16) | 0;
+                    w = ((imul(al0, bh2) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                    m = ((imul(ah0, bh2) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                    r2 = w << 16 | u & 65535;
+                    u = ((imul(al0, bl3) | 0) + (m & 65535) | 0) + (r3 & 65535) | 0;
+                    v = ((imul(ah0, bl3) | 0) + (m >>> 16) | 0) + (r3 >>> 16) | 0;
+                    w = ((imul(al0, bh3) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                    m = ((imul(ah0, bh3) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                    r3 = w << 16 | u & 65535;
+                    u = ((imul(al0, bl4) | 0) + (m & 65535) | 0) + (r4 & 65535) | 0;
+                    v = ((imul(ah0, bl4) | 0) + (m >>> 16) | 0) + (r4 >>> 16) | 0;
+                    w = ((imul(al0, bh4) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                    m = ((imul(ah0, bh4) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                    r4 = w << 16 | u & 65535;
+                    u = ((imul(al0, bl5) | 0) + (m & 65535) | 0) + (r5 & 65535) | 0;
+                    v = ((imul(ah0, bl5) | 0) + (m >>> 16) | 0) + (r5 >>> 16) | 0;
+                    w = ((imul(al0, bh5) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                    m = ((imul(ah0, bh5) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                    r5 = w << 16 | u & 65535;
+                    u = ((imul(al0, bl6) | 0) + (m & 65535) | 0) + (r6 & 65535) | 0;
+                    v = ((imul(ah0, bl6) | 0) + (m >>> 16) | 0) + (r6 >>> 16) | 0;
+                    w = ((imul(al0, bh6) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                    m = ((imul(ah0, bh6) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                    r6 = w << 16 | u & 65535;
+                    u = ((imul(al0, bl7) | 0) + (m & 65535) | 0) + (r7 & 65535) | 0;
+                    v = ((imul(ah0, bl7) | 0) + (m >>> 16) | 0) + (r7 >>> 16) | 0;
+                    w = ((imul(al0, bh7) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                    m = ((imul(ah0, bh7) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                    r7 = w << 16 | u & 65535;
+                    r8 = m;
+                    u = ((imul(al1, bl0) | 0) + (r9 & 65535) | 0) + (r1 & 65535) | 0;
+                    v = ((imul(ah1, bl0) | 0) + (r9 >>> 16) | 0) + (r1 >>> 16) | 0;
+                    w = ((imul(al1, bh0) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                    m = ((imul(ah1, bh0) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                    r1 = w << 16 | u & 65535;
+                    u = ((imul(al1, bl1) | 0) + (m & 65535) | 0) + (r2 & 65535) | 0;
+                    v = ((imul(ah1, bl1) | 0) + (m >>> 16) | 0) + (r2 >>> 16) | 0;
+                    w = ((imul(al1, bh1) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                    m = ((imul(ah1, bh1) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                    r2 = w << 16 | u & 65535;
+                    u = ((imul(al1, bl2) | 0) + (m & 65535) | 0) + (r3 & 65535) | 0;
+                    v = ((imul(ah1, bl2) | 0) + (m >>> 16) | 0) + (r3 >>> 16) | 0;
+                    w = ((imul(al1, bh2) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                    m = ((imul(ah1, bh2) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                    r3 = w << 16 | u & 65535;
+                    u = ((imul(al1, bl3) | 0) + (m & 65535) | 0) + (r4 & 65535) | 0;
+                    v = ((imul(ah1, bl3) | 0) + (m >>> 16) | 0) + (r4 >>> 16) | 0;
+                    w = ((imul(al1, bh3) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                    m = ((imul(ah1, bh3) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                    r4 = w << 16 | u & 65535;
+                    u = ((imul(al1, bl4) | 0) + (m & 65535) | 0) + (r5 & 65535) | 0;
+                    v = ((imul(ah1, bl4) | 0) + (m >>> 16) | 0) + (r5 >>> 16) | 0;
+                    w = ((imul(al1, bh4) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                    m = ((imul(ah1, bh4) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                    r5 = w << 16 | u & 65535;
+                    u = ((imul(al1, bl5) | 0) + (m & 65535) | 0) + (r6 & 65535) | 0;
+                    v = ((imul(ah1, bl5) | 0) + (m >>> 16) | 0) + (r6 >>> 16) | 0;
+                    w = ((imul(al1, bh5) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                    m = ((imul(ah1, bh5) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                    r6 = w << 16 | u & 65535;
+                    u = ((imul(al1, bl6) | 0) + (m & 65535) | 0) + (r7 & 65535) | 0;
+                    v = ((imul(ah1, bl6) | 0) + (m >>> 16) | 0) + (r7 >>> 16) | 0;
+                    w = ((imul(al1, bh6) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                    m = ((imul(ah1, bh6) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                    r7 = w << 16 | u & 65535;
+                    u = ((imul(al1, bl7) | 0) + (m & 65535) | 0) + (r8 & 65535) | 0;
+                    v = ((imul(ah1, bl7) | 0) + (m >>> 16) | 0) + (r8 >>> 16) | 0;
+                    w = ((imul(al1, bh7) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                    m = ((imul(ah1, bh7) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                    r8 = w << 16 | u & 65535;
+                    r9 = m;
+                    u = ((imul(al2, bl0) | 0) + (r10 & 65535) | 0) + (r2 & 65535) | 0;
+                    v = ((imul(ah2, bl0) | 0) + (r10 >>> 16) | 0) + (r2 >>> 16) | 0;
+                    w = ((imul(al2, bh0) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                    m = ((imul(ah2, bh0) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                    r2 = w << 16 | u & 65535;
+                    u = ((imul(al2, bl1) | 0) + (m & 65535) | 0) + (r3 & 65535) | 0;
+                    v = ((imul(ah2, bl1) | 0) + (m >>> 16) | 0) + (r3 >>> 16) | 0;
+                    w = ((imul(al2, bh1) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                    m = ((imul(ah2, bh1) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                    r3 = w << 16 | u & 65535;
+                    u = ((imul(al2, bl2) | 0) + (m & 65535) | 0) + (r4 & 65535) | 0;
+                    v = ((imul(ah2, bl2) | 0) + (m >>> 16) | 0) + (r4 >>> 16) | 0;
+                    w = ((imul(al2, bh2) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                    m = ((imul(ah2, bh2) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                    r4 = w << 16 | u & 65535;
+                    u = ((imul(al2, bl3) | 0) + (m & 65535) | 0) + (r5 & 65535) | 0;
+                    v = ((imul(ah2, bl3) | 0) + (m >>> 16) | 0) + (r5 >>> 16) | 0;
+                    w = ((imul(al2, bh3) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                    m = ((imul(ah2, bh3) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                    r5 = w << 16 | u & 65535;
+                    u = ((imul(al2, bl4) | 0) + (m & 65535) | 0) + (r6 & 65535) | 0;
+                    v = ((imul(ah2, bl4) | 0) + (m >>> 16) | 0) + (r6 >>> 16) | 0;
+                    w = ((imul(al2, bh4) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                    m = ((imul(ah2, bh4) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                    r6 = w << 16 | u & 65535;
+                    u = ((imul(al2, bl5) | 0) + (m & 65535) | 0) + (r7 & 65535) | 0;
+                    v = ((imul(ah2, bl5) | 0) + (m >>> 16) | 0) + (r7 >>> 16) | 0;
+                    w = ((imul(al2, bh5) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                    m = ((imul(ah2, bh5) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                    r7 = w << 16 | u & 65535;
+                    u = ((imul(al2, bl6) | 0) + (m & 65535) | 0) + (r8 & 65535) | 0;
+                    v = ((imul(ah2, bl6) | 0) + (m >>> 16) | 0) + (r8 >>> 16) | 0;
+                    w = ((imul(al2, bh6) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                    m = ((imul(ah2, bh6) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                    r8 = w << 16 | u & 65535;
+                    u = ((imul(al2, bl7) | 0) + (m & 65535) | 0) + (r9 & 65535) | 0;
+                    v = ((imul(ah2, bl7) | 0) + (m >>> 16) | 0) + (r9 >>> 16) | 0;
+                    w = ((imul(al2, bh7) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                    m = ((imul(ah2, bh7) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                    r9 = w << 16 | u & 65535;
+                    r10 = m;
+                    u = ((imul(al3, bl0) | 0) + (r11 & 65535) | 0) + (r3 & 65535) | 0;
+                    v = ((imul(ah3, bl0) | 0) + (r11 >>> 16) | 0) + (r3 >>> 16) | 0;
+                    w = ((imul(al3, bh0) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                    m = ((imul(ah3, bh0) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                    r3 = w << 16 | u & 65535;
+                    u = ((imul(al3, bl1) | 0) + (m & 65535) | 0) + (r4 & 65535) | 0;
+                    v = ((imul(ah3, bl1) | 0) + (m >>> 16) | 0) + (r4 >>> 16) | 0;
+                    w = ((imul(al3, bh1) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                    m = ((imul(ah3, bh1) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                    r4 = w << 16 | u & 65535;
+                    u = ((imul(al3, bl2) | 0) + (m & 65535) | 0) + (r5 & 65535) | 0;
+                    v = ((imul(ah3, bl2) | 0) + (m >>> 16) | 0) + (r5 >>> 16) | 0;
+                    w = ((imul(al3, bh2) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                    m = ((imul(ah3, bh2) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                    r5 = w << 16 | u & 65535;
+                    u = ((imul(al3, bl3) | 0) + (m & 65535) | 0) + (r6 & 65535) | 0;
+                    v = ((imul(ah3, bl3) | 0) + (m >>> 16) | 0) + (r6 >>> 16) | 0;
+                    w = ((imul(al3, bh3) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                    m = ((imul(ah3, bh3) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                    r6 = w << 16 | u & 65535;
+                    u = ((imul(al3, bl4) | 0) + (m & 65535) | 0) + (r7 & 65535) | 0;
+                    v = ((imul(ah3, bl4) | 0) + (m >>> 16) | 0) + (r7 >>> 16) | 0;
+                    w = ((imul(al3, bh4) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                    m = ((imul(ah3, bh4) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                    r7 = w << 16 | u & 65535;
+                    u = ((imul(al3, bl5) | 0) + (m & 65535) | 0) + (r8 & 65535) | 0;
+                    v = ((imul(ah3, bl5) | 0) + (m >>> 16) | 0) + (r8 >>> 16) | 0;
+                    w = ((imul(al3, bh5) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                    m = ((imul(ah3, bh5) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                    r8 = w << 16 | u & 65535;
+                    u = ((imul(al3, bl6) | 0) + (m & 65535) | 0) + (r9 & 65535) | 0;
+                    v = ((imul(ah3, bl6) | 0) + (m >>> 16) | 0) + (r9 >>> 16) | 0;
+                    w = ((imul(al3, bh6) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                    m = ((imul(ah3, bh6) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                    r9 = w << 16 | u & 65535;
+                    u = ((imul(al3, bl7) | 0) + (m & 65535) | 0) + (r10 & 65535) | 0;
+                    v = ((imul(ah3, bl7) | 0) + (m >>> 16) | 0) + (r10 >>> 16) | 0;
+                    w = ((imul(al3, bh7) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                    m = ((imul(ah3, bh7) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                    r10 = w << 16 | u & 65535;
+                    r11 = m;
+                    u = ((imul(al4, bl0) | 0) + (r12 & 65535) | 0) + (r4 & 65535) | 0;
+                    v = ((imul(ah4, bl0) | 0) + (r12 >>> 16) | 0) + (r4 >>> 16) | 0;
+                    w = ((imul(al4, bh0) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                    m = ((imul(ah4, bh0) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                    r4 = w << 16 | u & 65535;
+                    u = ((imul(al4, bl1) | 0) + (m & 65535) | 0) + (r5 & 65535) | 0;
+                    v = ((imul(ah4, bl1) | 0) + (m >>> 16) | 0) + (r5 >>> 16) | 0;
+                    w = ((imul(al4, bh1) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                    m = ((imul(ah4, bh1) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                    r5 = w << 16 | u & 65535;
+                    u = ((imul(al4, bl2) | 0) + (m & 65535) | 0) + (r6 & 65535) | 0;
+                    v = ((imul(ah4, bl2) | 0) + (m >>> 16) | 0) + (r6 >>> 16) | 0;
+                    w = ((imul(al4, bh2) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                    m = ((imul(ah4, bh2) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                    r6 = w << 16 | u & 65535;
+                    u = ((imul(al4, bl3) | 0) + (m & 65535) | 0) + (r7 & 65535) | 0;
+                    v = ((imul(ah4, bl3) | 0) + (m >>> 16) | 0) + (r7 >>> 16) | 0;
+                    w = ((imul(al4, bh3) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                    m = ((imul(ah4, bh3) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                    r7 = w << 16 | u & 65535;
+                    u = ((imul(al4, bl4) | 0) + (m & 65535) | 0) + (r8 & 65535) | 0;
+                    v = ((imul(ah4, bl4) | 0) + (m >>> 16) | 0) + (r8 >>> 16) | 0;
+                    w = ((imul(al4, bh4) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                    m = ((imul(ah4, bh4) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                    r8 = w << 16 | u & 65535;
+                    u = ((imul(al4, bl5) | 0) + (m & 65535) | 0) + (r9 & 65535) | 0;
+                    v = ((imul(ah4, bl5) | 0) + (m >>> 16) | 0) + (r9 >>> 16) | 0;
+                    w = ((imul(al4, bh5) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                    m = ((imul(ah4, bh5) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                    r9 = w << 16 | u & 65535;
+                    u = ((imul(al4, bl6) | 0) + (m & 65535) | 0) + (r10 & 65535) | 0;
+                    v = ((imul(ah4, bl6) | 0) + (m >>> 16) | 0) + (r10 >>> 16) | 0;
+                    w = ((imul(al4, bh6) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                    m = ((imul(ah4, bh6) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                    r10 = w << 16 | u & 65535;
+                    u = ((imul(al4, bl7) | 0) + (m & 65535) | 0) + (r11 & 65535) | 0;
+                    v = ((imul(ah4, bl7) | 0) + (m >>> 16) | 0) + (r11 >>> 16) | 0;
+                    w = ((imul(al4, bh7) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                    m = ((imul(ah4, bh7) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                    r11 = w << 16 | u & 65535;
+                    r12 = m;
+                    u = ((imul(al5, bl0) | 0) + (r13 & 65535) | 0) + (r5 & 65535) | 0;
+                    v = ((imul(ah5, bl0) | 0) + (r13 >>> 16) | 0) + (r5 >>> 16) | 0;
+                    w = ((imul(al5, bh0) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                    m = ((imul(ah5, bh0) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                    r5 = w << 16 | u & 65535;
+                    u = ((imul(al5, bl1) | 0) + (m & 65535) | 0) + (r6 & 65535) | 0;
+                    v = ((imul(ah5, bl1) | 0) + (m >>> 16) | 0) + (r6 >>> 16) | 0;
+                    w = ((imul(al5, bh1) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                    m = ((imul(ah5, bh1) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                    r6 = w << 16 | u & 65535;
+                    u = ((imul(al5, bl2) | 0) + (m & 65535) | 0) + (r7 & 65535) | 0;
+                    v = ((imul(ah5, bl2) | 0) + (m >>> 16) | 0) + (r7 >>> 16) | 0;
+                    w = ((imul(al5, bh2) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                    m = ((imul(ah5, bh2) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                    r7 = w << 16 | u & 65535;
+                    u = ((imul(al5, bl3) | 0) + (m & 65535) | 0) + (r8 & 65535) | 0;
+                    v = ((imul(ah5, bl3) | 0) + (m >>> 16) | 0) + (r8 >>> 16) | 0;
+                    w = ((imul(al5, bh3) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                    m = ((imul(ah5, bh3) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                    r8 = w << 16 | u & 65535;
+                    u = ((imul(al5, bl4) | 0) + (m & 65535) | 0) + (r9 & 65535) | 0;
+                    v = ((imul(ah5, bl4) | 0) + (m >>> 16) | 0) + (r9 >>> 16) | 0;
+                    w = ((imul(al5, bh4) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                    m = ((imul(ah5, bh4) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                    r9 = w << 16 | u & 65535;
+                    u = ((imul(al5, bl5) | 0) + (m & 65535) | 0) + (r10 & 65535) | 0;
+                    v = ((imul(ah5, bl5) | 0) + (m >>> 16) | 0) + (r10 >>> 16) | 0;
+                    w = ((imul(al5, bh5) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                    m = ((imul(ah5, bh5) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                    r10 = w << 16 | u & 65535;
+                    u = ((imul(al5, bl6) | 0) + (m & 65535) | 0) + (r11 & 65535) | 0;
+                    v = ((imul(ah5, bl6) | 0) + (m >>> 16) | 0) + (r11 >>> 16) | 0;
+                    w = ((imul(al5, bh6) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                    m = ((imul(ah5, bh6) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                    r11 = w << 16 | u & 65535;
+                    u = ((imul(al5, bl7) | 0) + (m & 65535) | 0) + (r12 & 65535) | 0;
+                    v = ((imul(ah5, bl7) | 0) + (m >>> 16) | 0) + (r12 >>> 16) | 0;
+                    w = ((imul(al5, bh7) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                    m = ((imul(ah5, bh7) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                    r12 = w << 16 | u & 65535;
+                    r13 = m;
+                    u = ((imul(al6, bl0) | 0) + (r14 & 65535) | 0) + (r6 & 65535) | 0;
+                    v = ((imul(ah6, bl0) | 0) + (r14 >>> 16) | 0) + (r6 >>> 16) | 0;
+                    w = ((imul(al6, bh0) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                    m = ((imul(ah6, bh0) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                    r6 = w << 16 | u & 65535;
+                    u = ((imul(al6, bl1) | 0) + (m & 65535) | 0) + (r7 & 65535) | 0;
+                    v = ((imul(ah6, bl1) | 0) + (m >>> 16) | 0) + (r7 >>> 16) | 0;
+                    w = ((imul(al6, bh1) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                    m = ((imul(ah6, bh1) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                    r7 = w << 16 | u & 65535;
+                    u = ((imul(al6, bl2) | 0) + (m & 65535) | 0) + (r8 & 65535) | 0;
+                    v = ((imul(ah6, bl2) | 0) + (m >>> 16) | 0) + (r8 >>> 16) | 0;
+                    w = ((imul(al6, bh2) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                    m = ((imul(ah6, bh2) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                    r8 = w << 16 | u & 65535;
+                    u = ((imul(al6, bl3) | 0) + (m & 65535) | 0) + (r9 & 65535) | 0;
+                    v = ((imul(ah6, bl3) | 0) + (m >>> 16) | 0) + (r9 >>> 16) | 0;
+                    w = ((imul(al6, bh3) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                    m = ((imul(ah6, bh3) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                    r9 = w << 16 | u & 65535;
+                    u = ((imul(al6, bl4) | 0) + (m & 65535) | 0) + (r10 & 65535) | 0;
+                    v = ((imul(ah6, bl4) | 0) + (m >>> 16) | 0) + (r10 >>> 16) | 0;
+                    w = ((imul(al6, bh4) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                    m = ((imul(ah6, bh4) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                    r10 = w << 16 | u & 65535;
+                    u = ((imul(al6, bl5) | 0) + (m & 65535) | 0) + (r11 & 65535) | 0;
+                    v = ((imul(ah6, bl5) | 0) + (m >>> 16) | 0) + (r11 >>> 16) | 0;
+                    w = ((imul(al6, bh5) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                    m = ((imul(ah6, bh5) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                    r11 = w << 16 | u & 65535;
+                    u = ((imul(al6, bl6) | 0) + (m & 65535) | 0) + (r12 & 65535) | 0;
+                    v = ((imul(ah6, bl6) | 0) + (m >>> 16) | 0) + (r12 >>> 16) | 0;
+                    w = ((imul(al6, bh6) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                    m = ((imul(ah6, bh6) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                    r12 = w << 16 | u & 65535;
+                    u = ((imul(al6, bl7) | 0) + (m & 65535) | 0) + (r13 & 65535) | 0;
+                    v = ((imul(ah6, bl7) | 0) + (m >>> 16) | 0) + (r13 >>> 16) | 0;
+                    w = ((imul(al6, bh7) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                    m = ((imul(ah6, bh7) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                    r13 = w << 16 | u & 65535;
+                    r14 = m;
+                    u = ((imul(al7, bl0) | 0) + (r15 & 65535) | 0) + (r7 & 65535) | 0;
+                    v = ((imul(ah7, bl0) | 0) + (r15 >>> 16) | 0) + (r7 >>> 16) | 0;
+                    w = ((imul(al7, bh0) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                    m = ((imul(ah7, bh0) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                    r7 = w << 16 | u & 65535;
+                    u = ((imul(al7, bl1) | 0) + (m & 65535) | 0) + (r8 & 65535) | 0;
+                    v = ((imul(ah7, bl1) | 0) + (m >>> 16) | 0) + (r8 >>> 16) | 0;
+                    w = ((imul(al7, bh1) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                    m = ((imul(ah7, bh1) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                    r8 = w << 16 | u & 65535;
+                    u = ((imul(al7, bl2) | 0) + (m & 65535) | 0) + (r9 & 65535) | 0;
+                    v = ((imul(ah7, bl2) | 0) + (m >>> 16) | 0) + (r9 >>> 16) | 0;
+                    w = ((imul(al7, bh2) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                    m = ((imul(ah7, bh2) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                    r9 = w << 16 | u & 65535;
+                    u = ((imul(al7, bl3) | 0) + (m & 65535) | 0) + (r10 & 65535) | 0;
+                    v = ((imul(ah7, bl3) | 0) + (m >>> 16) | 0) + (r10 >>> 16) | 0;
+                    w = ((imul(al7, bh3) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                    m = ((imul(ah7, bh3) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                    r10 = w << 16 | u & 65535;
+                    u = ((imul(al7, bl4) | 0) + (m & 65535) | 0) + (r11 & 65535) | 0;
+                    v = ((imul(ah7, bl4) | 0) + (m >>> 16) | 0) + (r11 >>> 16) | 0;
+                    w = ((imul(al7, bh4) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                    m = ((imul(ah7, bh4) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                    r11 = w << 16 | u & 65535;
+                    u = ((imul(al7, bl5) | 0) + (m & 65535) | 0) + (r12 & 65535) | 0;
+                    v = ((imul(ah7, bl5) | 0) + (m >>> 16) | 0) + (r12 >>> 16) | 0;
+                    w = ((imul(al7, bh5) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                    m = ((imul(ah7, bh5) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                    r12 = w << 16 | u & 65535;
+                    u = ((imul(al7, bl6) | 0) + (m & 65535) | 0) + (r13 & 65535) | 0;
+                    v = ((imul(ah7, bl6) | 0) + (m >>> 16) | 0) + (r13 >>> 16) | 0;
+                    w = ((imul(al7, bh6) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                    m = ((imul(ah7, bh6) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                    r13 = w << 16 | u & 65535;
+                    u = ((imul(al7, bl7) | 0) + (m & 65535) | 0) + (r14 & 65535) | 0;
+                    v = ((imul(ah7, bl7) | 0) + (m >>> 16) | 0) + (r14 >>> 16) | 0;
+                    w = ((imul(al7, bh7) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                    m = ((imul(ah7, bh7) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                    r14 = w << 16 | u & 65535;
+                    r15 = m;
+                    HEAP32[(Rk | 0) >> 2] = r0, HEAP32[(Rk | 4) >> 2] = r1, HEAP32[(Rk | 8) >> 2] = r2, 
+                    HEAP32[(Rk | 12) >> 2] = r3, HEAP32[(Rk | 16) >> 2] = r4, HEAP32[(Rk | 20) >> 2] = r5, 
+                    HEAP32[(Rk | 24) >> 2] = r6, HEAP32[(Rk | 28) >> 2] = r7;
+                }
+                Rk = R + (i + j | 0) | 0;
+                HEAP32[(Rk | 0) >> 2] = r8, HEAP32[(Rk | 4) >> 2] = r9, HEAP32[(Rk | 8) >> 2] = r10, 
+                HEAP32[(Rk | 12) >> 2] = r11, HEAP32[(Rk | 16) >> 2] = r12, HEAP32[(Rk | 20) >> 2] = r13, 
+                HEAP32[(Rk | 24) >> 2] = r14, HEAP32[(Rk | 28) >> 2] = r15;
+            }
+        }
+        function sqr(A, lA, R) {
+            A = A | 0;
+            lA = lA | 0;
+            R = R | 0;
+            var al0 = 0, al1 = 0, al2 = 0, al3 = 0, al4 = 0, al5 = 0, al6 = 0, al7 = 0, ah0 = 0, ah1 = 0, ah2 = 0, ah3 = 0, ah4 = 0, ah5 = 0, ah6 = 0, ah7 = 0, bl0 = 0, bl1 = 0, bl2 = 0, bl3 = 0, bl4 = 0, bl5 = 0, bl6 = 0, bl7 = 0, bh0 = 0, bh1 = 0, bh2 = 0, bh3 = 0, bh4 = 0, bh5 = 0, bh6 = 0, bh7 = 0, r0 = 0, r1 = 0, r2 = 0, r3 = 0, r4 = 0, r5 = 0, r6 = 0, r7 = 0, r8 = 0, r9 = 0, r10 = 0, r11 = 0, r12 = 0, r13 = 0, r14 = 0, r15 = 0, u = 0, v = 0, w = 0, c = 0, h = 0, m = 0, r = 0, d = 0, dd = 0, p = 0, i = 0, j = 0, k = 0, Ai = 0, Aj = 0, Rk = 0;
+            for (;(i | 0) < (lA | 0); i = i + 4 | 0) {
+                Rk = R + (i << 1) | 0;
+                ah0 = HEAP32[A + i >> 2] | 0, al0 = ah0 & 65535, ah0 = ah0 >>> 16;
+                u = imul(al0, al0) | 0;
+                v = (imul(al0, ah0) | 0) + (u >>> 17) | 0;
+                w = (imul(ah0, ah0) | 0) + (v >>> 15) | 0;
+                HEAP32[Rk >> 2] = v << 17 | u & 131071;
+                HEAP32[(Rk | 4) >> 2] = w;
+            }
+            for (p = 0; (p | 0) < (lA | 0); p = p + 8 | 0) {
+                Ai = A + p | 0, Rk = R + (p << 1) | 0;
+                ah0 = HEAP32[Ai >> 2] | 0, al0 = ah0 & 65535, ah0 = ah0 >>> 16;
+                bh0 = HEAP32[(Ai | 4) >> 2] | 0, bl0 = bh0 & 65535, bh0 = bh0 >>> 16;
+                u = imul(al0, bl0) | 0;
+                v = (imul(al0, bh0) | 0) + (u >>> 16) | 0;
+                w = (imul(ah0, bl0) | 0) + (v & 65535) | 0;
+                m = ((imul(ah0, bh0) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                r = HEAP32[(Rk | 4) >> 2] | 0;
+                u = (r & 65535) + ((u & 65535) << 1) | 0;
+                w = ((r >>> 16) + ((w & 65535) << 1) | 0) + (u >>> 16) | 0;
+                HEAP32[(Rk | 4) >> 2] = w << 16 | u & 65535;
+                c = w >>> 16;
+                r = HEAP32[(Rk | 8) >> 2] | 0;
+                u = ((r & 65535) + ((m & 65535) << 1) | 0) + c | 0;
+                w = ((r >>> 16) + (m >>> 16 << 1) | 0) + (u >>> 16) | 0;
+                HEAP32[(Rk | 8) >> 2] = w << 16 | u & 65535;
+                c = w >>> 16;
+                if (c) {
+                    r = HEAP32[(Rk | 12) >> 2] | 0;
+                    u = (r & 65535) + c | 0;
+                    w = (r >>> 16) + (u >>> 16) | 0;
+                    HEAP32[(Rk | 12) >> 2] = w << 16 | u & 65535;
+                }
+            }
+            for (p = 0; (p | 0) < (lA | 0); p = p + 16 | 0) {
+                Ai = A + p | 0, Rk = R + (p << 1) | 0;
+                ah0 = HEAP32[Ai >> 2] | 0, al0 = ah0 & 65535, ah0 = ah0 >>> 16, ah1 = HEAP32[(Ai | 4) >> 2] | 0, 
+                al1 = ah1 & 65535, ah1 = ah1 >>> 16;
+                bh0 = HEAP32[(Ai | 8) >> 2] | 0, bl0 = bh0 & 65535, bh0 = bh0 >>> 16, bh1 = HEAP32[(Ai | 12) >> 2] | 0, 
+                bl1 = bh1 & 65535, bh1 = bh1 >>> 16;
+                u = imul(al0, bl0) | 0;
+                v = imul(ah0, bl0) | 0;
+                w = ((imul(al0, bh0) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                m = ((imul(ah0, bh0) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                r0 = w << 16 | u & 65535;
+                u = (imul(al0, bl1) | 0) + (m & 65535) | 0;
+                v = (imul(ah0, bl1) | 0) + (m >>> 16) | 0;
+                w = ((imul(al0, bh1) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                m = ((imul(ah0, bh1) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                r1 = w << 16 | u & 65535;
+                r2 = m;
+                u = (imul(al1, bl0) | 0) + (r1 & 65535) | 0;
+                v = (imul(ah1, bl0) | 0) + (r1 >>> 16) | 0;
+                w = ((imul(al1, bh0) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                m = ((imul(ah1, bh0) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                r1 = w << 16 | u & 65535;
+                u = ((imul(al1, bl1) | 0) + (r2 & 65535) | 0) + (m & 65535) | 0;
+                v = ((imul(ah1, bl1) | 0) + (r2 >>> 16) | 0) + (m >>> 16) | 0;
+                w = ((imul(al1, bh1) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                m = ((imul(ah1, bh1) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                r2 = w << 16 | u & 65535;
+                r3 = m;
+                r = HEAP32[(Rk | 8) >> 2] | 0;
+                u = (r & 65535) + ((r0 & 65535) << 1) | 0;
+                w = ((r >>> 16) + (r0 >>> 16 << 1) | 0) + (u >>> 16) | 0;
+                HEAP32[(Rk | 8) >> 2] = w << 16 | u & 65535;
+                c = w >>> 16;
+                r = HEAP32[(Rk | 12) >> 2] | 0;
+                u = ((r & 65535) + ((r1 & 65535) << 1) | 0) + c | 0;
+                w = ((r >>> 16) + (r1 >>> 16 << 1) | 0) + (u >>> 16) | 0;
+                HEAP32[(Rk | 12) >> 2] = w << 16 | u & 65535;
+                c = w >>> 16;
+                r = HEAP32[(Rk | 16) >> 2] | 0;
+                u = ((r & 65535) + ((r2 & 65535) << 1) | 0) + c | 0;
+                w = ((r >>> 16) + (r2 >>> 16 << 1) | 0) + (u >>> 16) | 0;
+                HEAP32[(Rk | 16) >> 2] = w << 16 | u & 65535;
+                c = w >>> 16;
+                r = HEAP32[(Rk | 20) >> 2] | 0;
+                u = ((r & 65535) + ((r3 & 65535) << 1) | 0) + c | 0;
+                w = ((r >>> 16) + (r3 >>> 16 << 1) | 0) + (u >>> 16) | 0;
+                HEAP32[(Rk | 20) >> 2] = w << 16 | u & 65535;
+                c = w >>> 16;
+                for (k = 24; !!c & (k | 0) < 32; k = k + 4 | 0) {
+                    r = HEAP32[(Rk | k) >> 2] | 0;
+                    u = (r & 65535) + c | 0;
+                    w = (r >>> 16) + (u >>> 16) | 0;
+                    HEAP32[(Rk | k) >> 2] = w << 16 | u & 65535;
+                    c = w >>> 16;
+                }
+            }
+            for (p = 0; (p | 0) < (lA | 0); p = p + 32 | 0) {
+                Ai = A + p | 0, Rk = R + (p << 1) | 0;
+                ah0 = HEAP32[Ai >> 2] | 0, al0 = ah0 & 65535, ah0 = ah0 >>> 16, ah1 = HEAP32[(Ai | 4) >> 2] | 0, 
+                al1 = ah1 & 65535, ah1 = ah1 >>> 16, ah2 = HEAP32[(Ai | 8) >> 2] | 0, al2 = ah2 & 65535, 
+                ah2 = ah2 >>> 16, ah3 = HEAP32[(Ai | 12) >> 2] | 0, al3 = ah3 & 65535, ah3 = ah3 >>> 16;
+                bh0 = HEAP32[(Ai | 16) >> 2] | 0, bl0 = bh0 & 65535, bh0 = bh0 >>> 16, bh1 = HEAP32[(Ai | 20) >> 2] | 0, 
+                bl1 = bh1 & 65535, bh1 = bh1 >>> 16, bh2 = HEAP32[(Ai | 24) >> 2] | 0, bl2 = bh2 & 65535, 
+                bh2 = bh2 >>> 16, bh3 = HEAP32[(Ai | 28) >> 2] | 0, bl3 = bh3 & 65535, bh3 = bh3 >>> 16;
+                u = imul(al0, bl0) | 0;
+                v = imul(ah0, bl0) | 0;
+                w = ((imul(al0, bh0) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                m = ((imul(ah0, bh0) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                r0 = w << 16 | u & 65535;
+                u = (imul(al0, bl1) | 0) + (m & 65535) | 0;
+                v = (imul(ah0, bl1) | 0) + (m >>> 16) | 0;
+                w = ((imul(al0, bh1) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                m = ((imul(ah0, bh1) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                r1 = w << 16 | u & 65535;
+                u = (imul(al0, bl2) | 0) + (m & 65535) | 0;
+                v = (imul(ah0, bl2) | 0) + (m >>> 16) | 0;
+                w = ((imul(al0, bh2) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                m = ((imul(ah0, bh2) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                r2 = w << 16 | u & 65535;
+                u = (imul(al0, bl3) | 0) + (m & 65535) | 0;
+                v = (imul(ah0, bl3) | 0) + (m >>> 16) | 0;
+                w = ((imul(al0, bh3) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                m = ((imul(ah0, bh3) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                r3 = w << 16 | u & 65535;
+                r4 = m;
+                u = (imul(al1, bl0) | 0) + (r1 & 65535) | 0;
+                v = (imul(ah1, bl0) | 0) + (r1 >>> 16) | 0;
+                w = ((imul(al1, bh0) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                m = ((imul(ah1, bh0) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                r1 = w << 16 | u & 65535;
+                u = ((imul(al1, bl1) | 0) + (r2 & 65535) | 0) + (m & 65535) | 0;
+                v = ((imul(ah1, bl1) | 0) + (r2 >>> 16) | 0) + (m >>> 16) | 0;
+                w = ((imul(al1, bh1) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                m = ((imul(ah1, bh1) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                r2 = w << 16 | u & 65535;
+                u = ((imul(al1, bl2) | 0) + (r3 & 65535) | 0) + (m & 65535) | 0;
+                v = ((imul(ah1, bl2) | 0) + (r3 >>> 16) | 0) + (m >>> 16) | 0;
+                w = ((imul(al1, bh2) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                m = ((imul(ah1, bh2) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                r3 = w << 16 | u & 65535;
+                u = ((imul(al1, bl3) | 0) + (r4 & 65535) | 0) + (m & 65535) | 0;
+                v = ((imul(ah1, bl3) | 0) + (r4 >>> 16) | 0) + (m >>> 16) | 0;
+                w = ((imul(al1, bh3) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                m = ((imul(ah1, bh3) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                r4 = w << 16 | u & 65535;
+                r5 = m;
+                u = (imul(al2, bl0) | 0) + (r2 & 65535) | 0;
+                v = (imul(ah2, bl0) | 0) + (r2 >>> 16) | 0;
+                w = ((imul(al2, bh0) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                m = ((imul(ah2, bh0) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                r2 = w << 16 | u & 65535;
+                u = ((imul(al2, bl1) | 0) + (r3 & 65535) | 0) + (m & 65535) | 0;
+                v = ((imul(ah2, bl1) | 0) + (r3 >>> 16) | 0) + (m >>> 16) | 0;
+                w = ((imul(al2, bh1) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                m = ((imul(ah2, bh1) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                r3 = w << 16 | u & 65535;
+                u = ((imul(al2, bl2) | 0) + (r4 & 65535) | 0) + (m & 65535) | 0;
+                v = ((imul(ah2, bl2) | 0) + (r4 >>> 16) | 0) + (m >>> 16) | 0;
+                w = ((imul(al2, bh2) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                m = ((imul(ah2, bh2) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                r4 = w << 16 | u & 65535;
+                u = ((imul(al2, bl3) | 0) + (r5 & 65535) | 0) + (m & 65535) | 0;
+                v = ((imul(ah2, bl3) | 0) + (r5 >>> 16) | 0) + (m >>> 16) | 0;
+                w = ((imul(al2, bh3) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                m = ((imul(ah2, bh3) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                r5 = w << 16 | u & 65535;
+                r6 = m;
+                u = (imul(al3, bl0) | 0) + (r3 & 65535) | 0;
+                v = (imul(ah3, bl0) | 0) + (r3 >>> 16) | 0;
+                w = ((imul(al3, bh0) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                m = ((imul(ah3, bh0) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                r3 = w << 16 | u & 65535;
+                u = ((imul(al3, bl1) | 0) + (r4 & 65535) | 0) + (m & 65535) | 0;
+                v = ((imul(ah3, bl1) | 0) + (r4 >>> 16) | 0) + (m >>> 16) | 0;
+                w = ((imul(al3, bh1) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                m = ((imul(ah3, bh1) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                r4 = w << 16 | u & 65535;
+                u = ((imul(al3, bl2) | 0) + (r5 & 65535) | 0) + (m & 65535) | 0;
+                v = ((imul(ah3, bl2) | 0) + (r5 >>> 16) | 0) + (m >>> 16) | 0;
+                w = ((imul(al3, bh2) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                m = ((imul(ah3, bh2) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                r5 = w << 16 | u & 65535;
+                u = ((imul(al3, bl3) | 0) + (r6 & 65535) | 0) + (m & 65535) | 0;
+                v = ((imul(ah3, bl3) | 0) + (r6 >>> 16) | 0) + (m >>> 16) | 0;
+                w = ((imul(al3, bh3) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                m = ((imul(ah3, bh3) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                r6 = w << 16 | u & 65535;
+                r7 = m;
+                r = HEAP32[(Rk | 16) >> 2] | 0;
+                u = (r & 65535) + ((r0 & 65535) << 1) | 0;
+                w = ((r >>> 16) + (r0 >>> 16 << 1) | 0) + (u >>> 16) | 0;
+                HEAP32[(Rk | 16) >> 2] = w << 16 | u & 65535;
+                c = w >>> 16;
+                r = HEAP32[(Rk | 20) >> 2] | 0;
+                u = ((r & 65535) + ((r1 & 65535) << 1) | 0) + c | 0;
+                w = ((r >>> 16) + (r1 >>> 16 << 1) | 0) + (u >>> 16) | 0;
+                HEAP32[(Rk | 20) >> 2] = w << 16 | u & 65535;
+                c = w >>> 16;
+                r = HEAP32[(Rk | 24) >> 2] | 0;
+                u = ((r & 65535) + ((r2 & 65535) << 1) | 0) + c | 0;
+                w = ((r >>> 16) + (r2 >>> 16 << 1) | 0) + (u >>> 16) | 0;
+                HEAP32[(Rk | 24) >> 2] = w << 16 | u & 65535;
+                c = w >>> 16;
+                r = HEAP32[(Rk | 28) >> 2] | 0;
+                u = ((r & 65535) + ((r3 & 65535) << 1) | 0) + c | 0;
+                w = ((r >>> 16) + (r3 >>> 16 << 1) | 0) + (u >>> 16) | 0;
+                HEAP32[(Rk | 28) >> 2] = w << 16 | u & 65535;
+                c = w >>> 16;
+                r = HEAP32[Rk + 32 >> 2] | 0;
+                u = ((r & 65535) + ((r4 & 65535) << 1) | 0) + c | 0;
+                w = ((r >>> 16) + (r4 >>> 16 << 1) | 0) + (u >>> 16) | 0;
+                HEAP32[Rk + 32 >> 2] = w << 16 | u & 65535;
+                c = w >>> 16;
+                r = HEAP32[Rk + 36 >> 2] | 0;
+                u = ((r & 65535) + ((r5 & 65535) << 1) | 0) + c | 0;
+                w = ((r >>> 16) + (r5 >>> 16 << 1) | 0) + (u >>> 16) | 0;
+                HEAP32[Rk + 36 >> 2] = w << 16 | u & 65535;
+                c = w >>> 16;
+                r = HEAP32[Rk + 40 >> 2] | 0;
+                u = ((r & 65535) + ((r6 & 65535) << 1) | 0) + c | 0;
+                w = ((r >>> 16) + (r6 >>> 16 << 1) | 0) + (u >>> 16) | 0;
+                HEAP32[Rk + 40 >> 2] = w << 16 | u & 65535;
+                c = w >>> 16;
+                r = HEAP32[Rk + 44 >> 2] | 0;
+                u = ((r & 65535) + ((r7 & 65535) << 1) | 0) + c | 0;
+                w = ((r >>> 16) + (r7 >>> 16 << 1) | 0) + (u >>> 16) | 0;
+                HEAP32[Rk + 44 >> 2] = w << 16 | u & 65535;
+                c = w >>> 16;
+                for (k = 48; !!c & (k | 0) < 64; k = k + 4 | 0) {
+                    r = HEAP32[Rk + k >> 2] | 0;
+                    u = (r & 65535) + c | 0;
+                    w = (r >>> 16) + (u >>> 16) | 0;
+                    HEAP32[Rk + k >> 2] = w << 16 | u & 65535;
+                    c = w >>> 16;
+                }
+            }
+            for (d = 32; (d | 0) < (lA | 0); d = d << 1) {
+                dd = d << 1;
+                for (p = 0; (p | 0) < (lA | 0); p = p + dd | 0) {
+                    Rk = R + (p << 1) | 0;
+                    h = 0;
+                    for (i = 0; (i | 0) < (d | 0); i = i + 32 | 0) {
+                        Ai = (A + p | 0) + i | 0;
+                        ah0 = HEAP32[Ai >> 2] | 0, al0 = ah0 & 65535, ah0 = ah0 >>> 16, ah1 = HEAP32[(Ai | 4) >> 2] | 0, 
+                        al1 = ah1 & 65535, ah1 = ah1 >>> 16, ah2 = HEAP32[(Ai | 8) >> 2] | 0, al2 = ah2 & 65535, 
+                        ah2 = ah2 >>> 16, ah3 = HEAP32[(Ai | 12) >> 2] | 0, al3 = ah3 & 65535, ah3 = ah3 >>> 16, 
+                        ah4 = HEAP32[(Ai | 16) >> 2] | 0, al4 = ah4 & 65535, ah4 = ah4 >>> 16, ah5 = HEAP32[(Ai | 20) >> 2] | 0, 
+                        al5 = ah5 & 65535, ah5 = ah5 >>> 16, ah6 = HEAP32[(Ai | 24) >> 2] | 0, al6 = ah6 & 65535, 
+                        ah6 = ah6 >>> 16, ah7 = HEAP32[(Ai | 28) >> 2] | 0, al7 = ah7 & 65535, ah7 = ah7 >>> 16;
+                        r8 = r9 = r10 = r11 = r12 = r13 = r14 = r15 = c = 0;
+                        for (j = 0; (j | 0) < (d | 0); j = j + 32 | 0) {
+                            Aj = ((A + p | 0) + d | 0) + j | 0;
+                            bh0 = HEAP32[Aj >> 2] | 0, bl0 = bh0 & 65535, bh0 = bh0 >>> 16, bh1 = HEAP32[(Aj | 4) >> 2] | 0, 
+                            bl1 = bh1 & 65535, bh1 = bh1 >>> 16, bh2 = HEAP32[(Aj | 8) >> 2] | 0, bl2 = bh2 & 65535, 
+                            bh2 = bh2 >>> 16, bh3 = HEAP32[(Aj | 12) >> 2] | 0, bl3 = bh3 & 65535, bh3 = bh3 >>> 16, 
+                            bh4 = HEAP32[(Aj | 16) >> 2] | 0, bl4 = bh4 & 65535, bh4 = bh4 >>> 16, bh5 = HEAP32[(Aj | 20) >> 2] | 0, 
+                            bl5 = bh5 & 65535, bh5 = bh5 >>> 16, bh6 = HEAP32[(Aj | 24) >> 2] | 0, bl6 = bh6 & 65535, 
+                            bh6 = bh6 >>> 16, bh7 = HEAP32[(Aj | 28) >> 2] | 0, bl7 = bh7 & 65535, bh7 = bh7 >>> 16;
+                            r0 = r1 = r2 = r3 = r4 = r5 = r6 = r7 = 0;
+                            u = ((imul(al0, bl0) | 0) + (r0 & 65535) | 0) + (r8 & 65535) | 0;
+                            v = ((imul(ah0, bl0) | 0) + (r0 >>> 16) | 0) + (r8 >>> 16) | 0;
+                            w = ((imul(al0, bh0) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                            m = ((imul(ah0, bh0) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                            r0 = w << 16 | u & 65535;
+                            u = ((imul(al0, bl1) | 0) + (r1 & 65535) | 0) + (m & 65535) | 0;
+                            v = ((imul(ah0, bl1) | 0) + (r1 >>> 16) | 0) + (m >>> 16) | 0;
+                            w = ((imul(al0, bh1) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                            m = ((imul(ah0, bh1) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                            r1 = w << 16 | u & 65535;
+                            u = ((imul(al0, bl2) | 0) + (r2 & 65535) | 0) + (m & 65535) | 0;
+                            v = ((imul(ah0, bl2) | 0) + (r2 >>> 16) | 0) + (m >>> 16) | 0;
+                            w = ((imul(al0, bh2) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                            m = ((imul(ah0, bh2) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                            r2 = w << 16 | u & 65535;
+                            u = ((imul(al0, bl3) | 0) + (r3 & 65535) | 0) + (m & 65535) | 0;
+                            v = ((imul(ah0, bl3) | 0) + (r3 >>> 16) | 0) + (m >>> 16) | 0;
+                            w = ((imul(al0, bh3) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                            m = ((imul(ah0, bh3) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                            r3 = w << 16 | u & 65535;
+                            u = ((imul(al0, bl4) | 0) + (r4 & 65535) | 0) + (m & 65535) | 0;
+                            v = ((imul(ah0, bl4) | 0) + (r4 >>> 16) | 0) + (m >>> 16) | 0;
+                            w = ((imul(al0, bh4) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                            m = ((imul(ah0, bh4) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                            r4 = w << 16 | u & 65535;
+                            u = ((imul(al0, bl5) | 0) + (r5 & 65535) | 0) + (m & 65535) | 0;
+                            v = ((imul(ah0, bl5) | 0) + (r5 >>> 16) | 0) + (m >>> 16) | 0;
+                            w = ((imul(al0, bh5) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                            m = ((imul(ah0, bh5) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                            r5 = w << 16 | u & 65535;
+                            u = ((imul(al0, bl6) | 0) + (r6 & 65535) | 0) + (m & 65535) | 0;
+                            v = ((imul(ah0, bl6) | 0) + (r6 >>> 16) | 0) + (m >>> 16) | 0;
+                            w = ((imul(al0, bh6) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                            m = ((imul(ah0, bh6) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                            r6 = w << 16 | u & 65535;
+                            u = ((imul(al0, bl7) | 0) + (r7 & 65535) | 0) + (m & 65535) | 0;
+                            v = ((imul(ah0, bl7) | 0) + (r7 >>> 16) | 0) + (m >>> 16) | 0;
+                            w = ((imul(al0, bh7) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                            m = ((imul(ah0, bh7) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                            r7 = w << 16 | u & 65535;
+                            r8 = m;
+                            u = ((imul(al1, bl0) | 0) + (r1 & 65535) | 0) + (r9 & 65535) | 0;
+                            v = ((imul(ah1, bl0) | 0) + (r1 >>> 16) | 0) + (r9 >>> 16) | 0;
+                            w = ((imul(al1, bh0) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                            m = ((imul(ah1, bh0) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                            r1 = w << 16 | u & 65535;
+                            u = ((imul(al1, bl1) | 0) + (r2 & 65535) | 0) + (m & 65535) | 0;
+                            v = ((imul(ah1, bl1) | 0) + (r2 >>> 16) | 0) + (m >>> 16) | 0;
+                            w = ((imul(al1, bh1) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                            m = ((imul(ah1, bh1) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                            r2 = w << 16 | u & 65535;
+                            u = ((imul(al1, bl2) | 0) + (r3 & 65535) | 0) + (m & 65535) | 0;
+                            v = ((imul(ah1, bl2) | 0) + (r3 >>> 16) | 0) + (m >>> 16) | 0;
+                            w = ((imul(al1, bh2) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                            m = ((imul(ah1, bh2) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                            r3 = w << 16 | u & 65535;
+                            u = ((imul(al1, bl3) | 0) + (r4 & 65535) | 0) + (m & 65535) | 0;
+                            v = ((imul(ah1, bl3) | 0) + (r4 >>> 16) | 0) + (m >>> 16) | 0;
+                            w = ((imul(al1, bh3) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                            m = ((imul(ah1, bh3) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                            r4 = w << 16 | u & 65535;
+                            u = ((imul(al1, bl4) | 0) + (r5 & 65535) | 0) + (m & 65535) | 0;
+                            v = ((imul(ah1, bl4) | 0) + (r5 >>> 16) | 0) + (m >>> 16) | 0;
+                            w = ((imul(al1, bh4) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                            m = ((imul(ah1, bh4) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                            r5 = w << 16 | u & 65535;
+                            u = ((imul(al1, bl5) | 0) + (r6 & 65535) | 0) + (m & 65535) | 0;
+                            v = ((imul(ah1, bl5) | 0) + (r6 >>> 16) | 0) + (m >>> 16) | 0;
+                            w = ((imul(al1, bh5) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                            m = ((imul(ah1, bh5) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                            r6 = w << 16 | u & 65535;
+                            u = ((imul(al1, bl6) | 0) + (r7 & 65535) | 0) + (m & 65535) | 0;
+                            v = ((imul(ah1, bl6) | 0) + (r7 >>> 16) | 0) + (m >>> 16) | 0;
+                            w = ((imul(al1, bh6) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                            m = ((imul(ah1, bh6) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                            r7 = w << 16 | u & 65535;
+                            u = ((imul(al1, bl7) | 0) + (r8 & 65535) | 0) + (m & 65535) | 0;
+                            v = ((imul(ah1, bl7) | 0) + (r8 >>> 16) | 0) + (m >>> 16) | 0;
+                            w = ((imul(al1, bh7) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                            m = ((imul(ah1, bh7) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                            r8 = w << 16 | u & 65535;
+                            r9 = m;
+                            u = ((imul(al2, bl0) | 0) + (r2 & 65535) | 0) + (r10 & 65535) | 0;
+                            v = ((imul(ah2, bl0) | 0) + (r2 >>> 16) | 0) + (r10 >>> 16) | 0;
+                            w = ((imul(al2, bh0) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                            m = ((imul(ah2, bh0) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                            r2 = w << 16 | u & 65535;
+                            u = ((imul(al2, bl1) | 0) + (r3 & 65535) | 0) + (m & 65535) | 0;
+                            v = ((imul(ah2, bl1) | 0) + (r3 >>> 16) | 0) + (m >>> 16) | 0;
+                            w = ((imul(al2, bh1) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                            m = ((imul(ah2, bh1) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                            r3 = w << 16 | u & 65535;
+                            u = ((imul(al2, bl2) | 0) + (r4 & 65535) | 0) + (m & 65535) | 0;
+                            v = ((imul(ah2, bl2) | 0) + (r4 >>> 16) | 0) + (m >>> 16) | 0;
+                            w = ((imul(al2, bh2) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                            m = ((imul(ah2, bh2) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                            r4 = w << 16 | u & 65535;
+                            u = ((imul(al2, bl3) | 0) + (r5 & 65535) | 0) + (m & 65535) | 0;
+                            v = ((imul(ah2, bl3) | 0) + (r5 >>> 16) | 0) + (m >>> 16) | 0;
+                            w = ((imul(al2, bh3) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                            m = ((imul(ah2, bh3) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                            r5 = w << 16 | u & 65535;
+                            u = ((imul(al2, bl4) | 0) + (r6 & 65535) | 0) + (m & 65535) | 0;
+                            v = ((imul(ah2, bl4) | 0) + (r6 >>> 16) | 0) + (m >>> 16) | 0;
+                            w = ((imul(al2, bh4) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                            m = ((imul(ah2, bh4) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                            r6 = w << 16 | u & 65535;
+                            u = ((imul(al2, bl5) | 0) + (r7 & 65535) | 0) + (m & 65535) | 0;
+                            v = ((imul(ah2, bl5) | 0) + (r7 >>> 16) | 0) + (m >>> 16) | 0;
+                            w = ((imul(al2, bh5) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                            m = ((imul(ah2, bh5) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                            r7 = w << 16 | u & 65535;
+                            u = ((imul(al2, bl6) | 0) + (r8 & 65535) | 0) + (m & 65535) | 0;
+                            v = ((imul(ah2, bl6) | 0) + (r8 >>> 16) | 0) + (m >>> 16) | 0;
+                            w = ((imul(al2, bh6) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                            m = ((imul(ah2, bh6) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                            r8 = w << 16 | u & 65535;
+                            u = ((imul(al2, bl7) | 0) + (r9 & 65535) | 0) + (m & 65535) | 0;
+                            v = ((imul(ah2, bl7) | 0) + (r9 >>> 16) | 0) + (m >>> 16) | 0;
+                            w = ((imul(al2, bh7) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                            m = ((imul(ah2, bh7) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                            r9 = w << 16 | u & 65535;
+                            r10 = m;
+                            u = ((imul(al3, bl0) | 0) + (r3 & 65535) | 0) + (r11 & 65535) | 0;
+                            v = ((imul(ah3, bl0) | 0) + (r3 >>> 16) | 0) + (r11 >>> 16) | 0;
+                            w = ((imul(al3, bh0) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                            m = ((imul(ah3, bh0) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                            r3 = w << 16 | u & 65535;
+                            u = ((imul(al3, bl1) | 0) + (r4 & 65535) | 0) + (m & 65535) | 0;
+                            v = ((imul(ah3, bl1) | 0) + (r4 >>> 16) | 0) + (m >>> 16) | 0;
+                            w = ((imul(al3, bh1) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                            m = ((imul(ah3, bh1) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                            r4 = w << 16 | u & 65535;
+                            u = ((imul(al3, bl2) | 0) + (r5 & 65535) | 0) + (m & 65535) | 0;
+                            v = ((imul(ah3, bl2) | 0) + (r5 >>> 16) | 0) + (m >>> 16) | 0;
+                            w = ((imul(al3, bh2) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                            m = ((imul(ah3, bh2) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                            r5 = w << 16 | u & 65535;
+                            u = ((imul(al3, bl3) | 0) + (r6 & 65535) | 0) + (m & 65535) | 0;
+                            v = ((imul(ah3, bl3) | 0) + (r6 >>> 16) | 0) + (m >>> 16) | 0;
+                            w = ((imul(al3, bh3) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                            m = ((imul(ah3, bh3) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                            r6 = w << 16 | u & 65535;
+                            u = ((imul(al3, bl4) | 0) + (r7 & 65535) | 0) + (m & 65535) | 0;
+                            v = ((imul(ah3, bl4) | 0) + (r7 >>> 16) | 0) + (m >>> 16) | 0;
+                            w = ((imul(al3, bh4) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                            m = ((imul(ah3, bh4) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                            r7 = w << 16 | u & 65535;
+                            u = ((imul(al3, bl5) | 0) + (r8 & 65535) | 0) + (m & 65535) | 0;
+                            v = ((imul(ah3, bl5) | 0) + (r8 >>> 16) | 0) + (m >>> 16) | 0;
+                            w = ((imul(al3, bh5) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                            m = ((imul(ah3, bh5) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                            r8 = w << 16 | u & 65535;
+                            u = ((imul(al3, bl6) | 0) + (r9 & 65535) | 0) + (m & 65535) | 0;
+                            v = ((imul(ah3, bl6) | 0) + (r9 >>> 16) | 0) + (m >>> 16) | 0;
+                            w = ((imul(al3, bh6) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                            m = ((imul(ah3, bh6) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                            r9 = w << 16 | u & 65535;
+                            u = ((imul(al3, bl7) | 0) + (r10 & 65535) | 0) + (m & 65535) | 0;
+                            v = ((imul(ah3, bl7) | 0) + (r10 >>> 16) | 0) + (m >>> 16) | 0;
+                            w = ((imul(al3, bh7) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                            m = ((imul(ah3, bh7) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                            r10 = w << 16 | u & 65535;
+                            r11 = m;
+                            u = ((imul(al4, bl0) | 0) + (r4 & 65535) | 0) + (r12 & 65535) | 0;
+                            v = ((imul(ah4, bl0) | 0) + (r4 >>> 16) | 0) + (r12 >>> 16) | 0;
+                            w = ((imul(al4, bh0) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                            m = ((imul(ah4, bh0) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                            r4 = w << 16 | u & 65535;
+                            u = ((imul(al4, bl1) | 0) + (r5 & 65535) | 0) + (m & 65535) | 0;
+                            v = ((imul(ah4, bl1) | 0) + (r5 >>> 16) | 0) + (m >>> 16) | 0;
+                            w = ((imul(al4, bh1) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                            m = ((imul(ah4, bh1) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                            r5 = w << 16 | u & 65535;
+                            u = ((imul(al4, bl2) | 0) + (r6 & 65535) | 0) + (m & 65535) | 0;
+                            v = ((imul(ah4, bl2) | 0) + (r6 >>> 16) | 0) + (m >>> 16) | 0;
+                            w = ((imul(al4, bh2) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                            m = ((imul(ah4, bh2) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                            r6 = w << 16 | u & 65535;
+                            u = ((imul(al4, bl3) | 0) + (r7 & 65535) | 0) + (m & 65535) | 0;
+                            v = ((imul(ah4, bl3) | 0) + (r7 >>> 16) | 0) + (m >>> 16) | 0;
+                            w = ((imul(al4, bh3) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                            m = ((imul(ah4, bh3) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                            r7 = w << 16 | u & 65535;
+                            u = ((imul(al4, bl4) | 0) + (r8 & 65535) | 0) + (m & 65535) | 0;
+                            v = ((imul(ah4, bl4) | 0) + (r8 >>> 16) | 0) + (m >>> 16) | 0;
+                            w = ((imul(al4, bh4) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                            m = ((imul(ah4, bh4) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                            r8 = w << 16 | u & 65535;
+                            u = ((imul(al4, bl5) | 0) + (r9 & 65535) | 0) + (m & 65535) | 0;
+                            v = ((imul(ah4, bl5) | 0) + (r9 >>> 16) | 0) + (m >>> 16) | 0;
+                            w = ((imul(al4, bh5) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                            m = ((imul(ah4, bh5) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                            r9 = w << 16 | u & 65535;
+                            u = ((imul(al4, bl6) | 0) + (r10 & 65535) | 0) + (m & 65535) | 0;
+                            v = ((imul(ah4, bl6) | 0) + (r10 >>> 16) | 0) + (m >>> 16) | 0;
+                            w = ((imul(al4, bh6) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                            m = ((imul(ah4, bh6) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                            r10 = w << 16 | u & 65535;
+                            u = ((imul(al4, bl7) | 0) + (r11 & 65535) | 0) + (m & 65535) | 0;
+                            v = ((imul(ah4, bl7) | 0) + (r11 >>> 16) | 0) + (m >>> 16) | 0;
+                            w = ((imul(al4, bh7) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                            m = ((imul(ah4, bh7) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                            r11 = w << 16 | u & 65535;
+                            r12 = m;
+                            u = ((imul(al5, bl0) | 0) + (r5 & 65535) | 0) + (r13 & 65535) | 0;
+                            v = ((imul(ah5, bl0) | 0) + (r5 >>> 16) | 0) + (r13 >>> 16) | 0;
+                            w = ((imul(al5, bh0) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                            m = ((imul(ah5, bh0) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                            r5 = w << 16 | u & 65535;
+                            u = ((imul(al5, bl1) | 0) + (r6 & 65535) | 0) + (m & 65535) | 0;
+                            v = ((imul(ah5, bl1) | 0) + (r6 >>> 16) | 0) + (m >>> 16) | 0;
+                            w = ((imul(al5, bh1) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                            m = ((imul(ah5, bh1) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                            r6 = w << 16 | u & 65535;
+                            u = ((imul(al5, bl2) | 0) + (r7 & 65535) | 0) + (m & 65535) | 0;
+                            v = ((imul(ah5, bl2) | 0) + (r7 >>> 16) | 0) + (m >>> 16) | 0;
+                            w = ((imul(al5, bh2) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                            m = ((imul(ah5, bh2) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                            r7 = w << 16 | u & 65535;
+                            u = ((imul(al5, bl3) | 0) + (r8 & 65535) | 0) + (m & 65535) | 0;
+                            v = ((imul(ah5, bl3) | 0) + (r8 >>> 16) | 0) + (m >>> 16) | 0;
+                            w = ((imul(al5, bh3) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                            m = ((imul(ah5, bh3) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                            r8 = w << 16 | u & 65535;
+                            u = ((imul(al5, bl4) | 0) + (r9 & 65535) | 0) + (m & 65535) | 0;
+                            v = ((imul(ah5, bl4) | 0) + (r9 >>> 16) | 0) + (m >>> 16) | 0;
+                            w = ((imul(al5, bh4) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                            m = ((imul(ah5, bh4) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                            r9 = w << 16 | u & 65535;
+                            u = ((imul(al5, bl5) | 0) + (r10 & 65535) | 0) + (m & 65535) | 0;
+                            v = ((imul(ah5, bl5) | 0) + (r10 >>> 16) | 0) + (m >>> 16) | 0;
+                            w = ((imul(al5, bh5) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                            m = ((imul(ah5, bh5) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                            r10 = w << 16 | u & 65535;
+                            u = ((imul(al5, bl6) | 0) + (r11 & 65535) | 0) + (m & 65535) | 0;
+                            v = ((imul(ah5, bl6) | 0) + (r11 >>> 16) | 0) + (m >>> 16) | 0;
+                            w = ((imul(al5, bh6) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                            m = ((imul(ah5, bh6) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                            r11 = w << 16 | u & 65535;
+                            u = ((imul(al5, bl7) | 0) + (r12 & 65535) | 0) + (m & 65535) | 0;
+                            v = ((imul(ah5, bl7) | 0) + (r12 >>> 16) | 0) + (m >>> 16) | 0;
+                            w = ((imul(al5, bh7) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                            m = ((imul(ah5, bh7) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                            r12 = w << 16 | u & 65535;
+                            r13 = m;
+                            u = ((imul(al6, bl0) | 0) + (r6 & 65535) | 0) + (r14 & 65535) | 0;
+                            v = ((imul(ah6, bl0) | 0) + (r6 >>> 16) | 0) + (r14 >>> 16) | 0;
+                            w = ((imul(al6, bh0) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                            m = ((imul(ah6, bh0) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                            r6 = w << 16 | u & 65535;
+                            u = ((imul(al6, bl1) | 0) + (r7 & 65535) | 0) + (m & 65535) | 0;
+                            v = ((imul(ah6, bl1) | 0) + (r7 >>> 16) | 0) + (m >>> 16) | 0;
+                            w = ((imul(al6, bh1) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                            m = ((imul(ah6, bh1) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                            r7 = w << 16 | u & 65535;
+                            u = ((imul(al6, bl2) | 0) + (r8 & 65535) | 0) + (m & 65535) | 0;
+                            v = ((imul(ah6, bl2) | 0) + (r8 >>> 16) | 0) + (m >>> 16) | 0;
+                            w = ((imul(al6, bh2) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                            m = ((imul(ah6, bh2) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                            r8 = w << 16 | u & 65535;
+                            u = ((imul(al6, bl3) | 0) + (r9 & 65535) | 0) + (m & 65535) | 0;
+                            v = ((imul(ah6, bl3) | 0) + (r9 >>> 16) | 0) + (m >>> 16) | 0;
+                            w = ((imul(al6, bh3) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                            m = ((imul(ah6, bh3) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                            r9 = w << 16 | u & 65535;
+                            u = ((imul(al6, bl4) | 0) + (r10 & 65535) | 0) + (m & 65535) | 0;
+                            v = ((imul(ah6, bl4) | 0) + (r10 >>> 16) | 0) + (m >>> 16) | 0;
+                            w = ((imul(al6, bh4) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                            m = ((imul(ah6, bh4) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                            r10 = w << 16 | u & 65535;
+                            u = ((imul(al6, bl5) | 0) + (r11 & 65535) | 0) + (m & 65535) | 0;
+                            v = ((imul(ah6, bl5) | 0) + (r11 >>> 16) | 0) + (m >>> 16) | 0;
+                            w = ((imul(al6, bh5) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                            m = ((imul(ah6, bh5) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                            r11 = w << 16 | u & 65535;
+                            u = ((imul(al6, bl6) | 0) + (r12 & 65535) | 0) + (m & 65535) | 0;
+                            v = ((imul(ah6, bl6) | 0) + (r12 >>> 16) | 0) + (m >>> 16) | 0;
+                            w = ((imul(al6, bh6) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                            m = ((imul(ah6, bh6) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                            r12 = w << 16 | u & 65535;
+                            u = ((imul(al6, bl7) | 0) + (r13 & 65535) | 0) + (m & 65535) | 0;
+                            v = ((imul(ah6, bl7) | 0) + (r13 >>> 16) | 0) + (m >>> 16) | 0;
+                            w = ((imul(al6, bh7) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                            m = ((imul(ah6, bh7) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                            r13 = w << 16 | u & 65535;
+                            r14 = m;
+                            u = ((imul(al7, bl0) | 0) + (r7 & 65535) | 0) + (r15 & 65535) | 0;
+                            v = ((imul(ah7, bl0) | 0) + (r7 >>> 16) | 0) + (r15 >>> 16) | 0;
+                            w = ((imul(al7, bh0) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                            m = ((imul(ah7, bh0) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                            r7 = w << 16 | u & 65535;
+                            u = ((imul(al7, bl1) | 0) + (r8 & 65535) | 0) + (m & 65535) | 0;
+                            v = ((imul(ah7, bl1) | 0) + (r8 >>> 16) | 0) + (m >>> 16) | 0;
+                            w = ((imul(al7, bh1) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                            m = ((imul(ah7, bh1) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                            r8 = w << 16 | u & 65535;
+                            u = ((imul(al7, bl2) | 0) + (r9 & 65535) | 0) + (m & 65535) | 0;
+                            v = ((imul(ah7, bl2) | 0) + (r9 >>> 16) | 0) + (m >>> 16) | 0;
+                            w = ((imul(al7, bh2) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                            m = ((imul(ah7, bh2) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                            r9 = w << 16 | u & 65535;
+                            u = ((imul(al7, bl3) | 0) + (r10 & 65535) | 0) + (m & 65535) | 0;
+                            v = ((imul(ah7, bl3) | 0) + (r10 >>> 16) | 0) + (m >>> 16) | 0;
+                            w = ((imul(al7, bh3) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                            m = ((imul(ah7, bh3) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                            r10 = w << 16 | u & 65535;
+                            u = ((imul(al7, bl4) | 0) + (r11 & 65535) | 0) + (m & 65535) | 0;
+                            v = ((imul(ah7, bl4) | 0) + (r11 >>> 16) | 0) + (m >>> 16) | 0;
+                            w = ((imul(al7, bh4) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                            m = ((imul(ah7, bh4) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                            r11 = w << 16 | u & 65535;
+                            u = ((imul(al7, bl5) | 0) + (r12 & 65535) | 0) + (m & 65535) | 0;
+                            v = ((imul(ah7, bl5) | 0) + (r12 >>> 16) | 0) + (m >>> 16) | 0;
+                            w = ((imul(al7, bh5) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                            m = ((imul(ah7, bh5) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                            r12 = w << 16 | u & 65535;
+                            u = ((imul(al7, bl6) | 0) + (r13 & 65535) | 0) + (m & 65535) | 0;
+                            v = ((imul(ah7, bl6) | 0) + (r13 >>> 16) | 0) + (m >>> 16) | 0;
+                            w = ((imul(al7, bh6) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                            m = ((imul(ah7, bh6) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                            r13 = w << 16 | u & 65535;
+                            u = ((imul(al7, bl7) | 0) + (r14 & 65535) | 0) + (m & 65535) | 0;
+                            v = ((imul(ah7, bl7) | 0) + (r14 >>> 16) | 0) + (m >>> 16) | 0;
+                            w = ((imul(al7, bh7) | 0) + (v & 65535) | 0) + (u >>> 16) | 0;
+                            m = ((imul(ah7, bh7) | 0) + (v >>> 16) | 0) + (w >>> 16) | 0;
+                            r14 = w << 16 | u & 65535;
+                            r15 = m;
+                            k = d + (i + j | 0) | 0;
+                            r = HEAP32[Rk + k >> 2] | 0;
+                            u = ((r & 65535) + ((r0 & 65535) << 1) | 0) + c | 0;
+                            w = ((r >>> 16) + (r0 >>> 16 << 1) | 0) + (u >>> 16) | 0;
+                            HEAP32[Rk + k >> 2] = w << 16 | u & 65535;
+                            c = w >>> 16;
+                            k = k + 4 | 0;
+                            r = HEAP32[Rk + k >> 2] | 0;
+                            u = ((r & 65535) + ((r1 & 65535) << 1) | 0) + c | 0;
+                            w = ((r >>> 16) + (r1 >>> 16 << 1) | 0) + (u >>> 16) | 0;
+                            HEAP32[Rk + k >> 2] = w << 16 | u & 65535;
+                            c = w >>> 16;
+                            k = k + 4 | 0;
+                            r = HEAP32[Rk + k >> 2] | 0;
+                            u = ((r & 65535) + ((r2 & 65535) << 1) | 0) + c | 0;
+                            w = ((r >>> 16) + (r2 >>> 16 << 1) | 0) + (u >>> 16) | 0;
+                            HEAP32[Rk + k >> 2] = w << 16 | u & 65535;
+                            c = w >>> 16;
+                            k = k + 4 | 0;
+                            r = HEAP32[Rk + k >> 2] | 0;
+                            u = ((r & 65535) + ((r3 & 65535) << 1) | 0) + c | 0;
+                            w = ((r >>> 16) + (r3 >>> 16 << 1) | 0) + (u >>> 16) | 0;
+                            HEAP32[Rk + k >> 2] = w << 16 | u & 65535;
+                            c = w >>> 16;
+                            k = k + 4 | 0;
+                            r = HEAP32[Rk + k >> 2] | 0;
+                            u = ((r & 65535) + ((r4 & 65535) << 1) | 0) + c | 0;
+                            w = ((r >>> 16) + (r4 >>> 16 << 1) | 0) + (u >>> 16) | 0;
+                            HEAP32[Rk + k >> 2] = w << 16 | u & 65535;
+                            c = w >>> 16;
+                            k = k + 4 | 0;
+                            r = HEAP32[Rk + k >> 2] | 0;
+                            u = ((r & 65535) + ((r5 & 65535) << 1) | 0) + c | 0;
+                            w = ((r >>> 16) + (r5 >>> 16 << 1) | 0) + (u >>> 16) | 0;
+                            HEAP32[Rk + k >> 2] = w << 16 | u & 65535;
+                            c = w >>> 16;
+                            k = k + 4 | 0;
+                            r = HEAP32[Rk + k >> 2] | 0;
+                            u = ((r & 65535) + ((r6 & 65535) << 1) | 0) + c | 0;
+                            w = ((r >>> 16) + (r6 >>> 16 << 1) | 0) + (u >>> 16) | 0;
+                            HEAP32[Rk + k >> 2] = w << 16 | u & 65535;
+                            c = w >>> 16;
+                            k = k + 4 | 0;
+                            r = HEAP32[Rk + k >> 2] | 0;
+                            u = ((r & 65535) + ((r7 & 65535) << 1) | 0) + c | 0;
+                            w = ((r >>> 16) + (r7 >>> 16 << 1) | 0) + (u >>> 16) | 0;
+                            HEAP32[Rk + k >> 2] = w << 16 | u & 65535;
+                            c = w >>> 16;
+                        }
+                        k = d + (i + j | 0) | 0;
+                        r = HEAP32[Rk + k >> 2] | 0;
+                        u = (((r & 65535) + ((r8 & 65535) << 1) | 0) + c | 0) + h | 0;
+                        w = ((r >>> 16) + (r8 >>> 16 << 1) | 0) + (u >>> 16) | 0;
+                        HEAP32[Rk + k >> 2] = w << 16 | u & 65535;
+                        c = w >>> 16;
+                        k = k + 4 | 0;
+                        r = HEAP32[Rk + k >> 2] | 0;
+                        u = ((r & 65535) + ((r9 & 65535) << 1) | 0) + c | 0;
+                        w = ((r >>> 16) + (r9 >>> 16 << 1) | 0) + (u >>> 16) | 0;
+                        HEAP32[Rk + k >> 2] = w << 16 | u & 65535;
+                        c = w >>> 16;
+                        k = k + 4 | 0;
+                        r = HEAP32[Rk + k >> 2] | 0;
+                        u = ((r & 65535) + ((r10 & 65535) << 1) | 0) + c | 0;
+                        w = ((r >>> 16) + (r10 >>> 16 << 1) | 0) + (u >>> 16) | 0;
+                        HEAP32[Rk + k >> 2] = w << 16 | u & 65535;
+                        c = w >>> 16;
+                        k = k + 4 | 0;
+                        r = HEAP32[Rk + k >> 2] | 0;
+                        u = ((r & 65535) + ((r11 & 65535) << 1) | 0) + c | 0;
+                        w = ((r >>> 16) + (r11 >>> 16 << 1) | 0) + (u >>> 16) | 0;
+                        HEAP32[Rk + k >> 2] = w << 16 | u & 65535;
+                        c = w >>> 16;
+                        k = k + 4 | 0;
+                        r = HEAP32[Rk + k >> 2] | 0;
+                        u = ((r & 65535) + ((r12 & 65535) << 1) | 0) + c | 0;
+                        w = ((r >>> 16) + (r12 >>> 16 << 1) | 0) + (u >>> 16) | 0;
+                        HEAP32[Rk + k >> 2] = w << 16 | u & 65535;
+                        c = w >>> 16;
+                        k = k + 4 | 0;
+                        r = HEAP32[Rk + k >> 2] | 0;
+                        u = ((r & 65535) + ((r13 & 65535) << 1) | 0) + c | 0;
+                        w = ((r >>> 16) + (r13 >>> 16 << 1) | 0) + (u >>> 16) | 0;
+                        HEAP32[Rk + k >> 2] = w << 16 | u & 65535;
+                        c = w >>> 16;
+                        k = k + 4 | 0;
+                        r = HEAP32[Rk + k >> 2] | 0;
+                        u = ((r & 65535) + ((r14 & 65535) << 1) | 0) + c | 0;
+                        w = ((r >>> 16) + (r14 >>> 16 << 1) | 0) + (u >>> 16) | 0;
+                        HEAP32[Rk + k >> 2] = w << 16 | u & 65535;
+                        c = w >>> 16;
+                        k = k + 4 | 0;
+                        r = HEAP32[Rk + k >> 2] | 0;
+                        u = ((r & 65535) + ((r15 & 65535) << 1) | 0) + c | 0;
+                        w = ((r >>> 16) + (r15 >>> 16 << 1) | 0) + (u >>> 16) | 0;
+                        HEAP32[Rk + k >> 2] = w << 16 | u & 65535;
+                        h = w >>> 16;
+                    }
+                    for (k = k + 4 | 0; !!h & (k | 0) < dd << 1; k = k + 4 | 0) {
+                        r = HEAP32[Rk + k >> 2] | 0;
+                        u = (r & 65535) + h | 0;
+                        w = (r >>> 16) + (u >>> 16) | 0;
+                        HEAP32[Rk + k >> 2] = w << 16 | u & 65535;
+                        h = w >>> 16;
+                    }
+                }
+            }
+        }
+        function div(N, lN, D, lD, R, Q) {
+            N = N | 0;
+            lN = lN | 0;
+            D = D | 0;
+            lD = lD | 0;
+            R = R | 0;
+            Q = Q | 0;
+            var n = 0, d = 0, e = 0, u1 = 0, u0 = 0, v0 = 0, vh = 0, vl = 0, qh = 0, ql = 0, rh = 0, rl = 0, t1 = 0, t2 = 0, m = 0, c = 0, i = 0, j = 0, k = 0;
+            cp(lN, N, R);
+            for (i = lN - 1 & -4; (i | 0) >= 0; i = i - 4 | 0) {
+                n = HEAP32[N + i >> 2] | 0;
+                if (n) {
+                    lN = i;
+                    break;
+                }
+            }
+            for (i = lD - 1 & -4; (i | 0) >= 0; i = i - 4 | 0) {
+                d = HEAP32[D + i >> 2] | 0;
+                if (d) {
+                    lD = i;
+                    break;
+                }
+            }
+            while ((d & 2147483648) == 0) {
+                d = d << 1;
+                e = e + 1 | 0;
+            }
+            u0 = HEAP32[N + lN >> 2] | 0;
+            if (e) u1 = u0 >>> (32 - e | 0);
+            for (i = lN - 4 | 0; (i | 0) >= 0; i = i - 4 | 0) {
+                n = HEAP32[N + i >> 2] | 0;
+                HEAP32[R + i + 4 >> 2] = u0 << e | (e ? n >>> (32 - e | 0) : 0);
+                u0 = n;
+            }
+            HEAP32[R >> 2] = u0 << e;
+            if (e) {
+                v0 = HEAP32[D + lD >> 2] | 0;
+                for (i = lD - 4 | 0; (i | 0) >= 0; i = i - 4 | 0) {
+                    d = HEAP32[D + i >> 2] | 0;
+                    HEAP32[D + i + 4 >> 2] = v0 << e | d >>> (32 - e | 0);
+                    v0 = d;
+                }
+                HEAP32[D >> 2] = v0 << e;
+            }
+            v0 = HEAP32[D + lD >> 2] | 0;
+            vh = v0 >>> 16, vl = v0 & 65535;
+            for (i = lN; (i | 0) >= (lD | 0); i = i - 4 | 0) {
+                j = i - lD | 0;
+                u0 = HEAP32[R + i >> 2] | 0;
+                qh = (u1 >>> 0) / (vh >>> 0) | 0, rh = (u1 >>> 0) % (vh >>> 0) | 0, t1 = imul(qh, vl) | 0;
+                while ((qh | 0) == 65536 | t1 >>> 0 > (rh << 16 | u0 >>> 16) >>> 0) {
+                    qh = qh - 1 | 0, rh = rh + vh | 0, t1 = t1 - vl | 0;
+                    if ((rh | 0) >= 65536) break;
+                }
+                m = 0, c = 0;
+                for (k = 0; (k | 0) <= (lD | 0); k = k + 4 | 0) {
+                    d = HEAP32[D + k >> 2] | 0;
+                    t1 = (imul(qh, d & 65535) | 0) + (m >>> 16) | 0;
+                    t2 = (imul(qh, d >>> 16) | 0) + (t1 >>> 16) | 0;
+                    d = m & 65535 | t1 << 16;
+                    m = t2;
+                    n = HEAP32[R + j + k >> 2] | 0;
+                    t1 = ((n & 65535) - (d & 65535) | 0) + c | 0;
+                    t2 = ((n >>> 16) - (d >>> 16) | 0) + (t1 >> 16) | 0;
+                    HEAP32[R + j + k >> 2] = t2 << 16 | t1 & 65535;
+                    c = t2 >> 16;
+                }
+                t1 = ((u1 & 65535) - (m & 65535) | 0) + c | 0;
+                t2 = ((u1 >>> 16) - (m >>> 16) | 0) + (t1 >> 16) | 0;
+                HEAP32[R + j + k >> 2] = u1 = t2 << 16 | t1 & 65535;
+                c = t2 >> 16;
+                if (c) {
+                    qh = qh - 1 | 0, rh = rh - vh | 0;
+                    c = 0;
+                    for (k = 0; (k | 0) <= (lD | 0); k = k + 4 | 0) {
+                        d = HEAP32[D + k >> 2] | 0;
+                        n = HEAP32[R + j + k >> 2] | 0;
+                        t1 = ((n & 65535) + (d & 65535) | 0) + c | 0;
+                        t2 = ((n >>> 16) + (d >>> 16) | 0) + (t1 >>> 16) | 0;
+                        HEAP32[R + j + k >> 2] = t2 << 16 | t1 & 65535;
+                        c = t2 >>> 16;
+                    }
+                    HEAP32[R + j + k >> 2] = u1 = u1 + c | 0;
+                }
+                u0 = HEAP32[R + i >> 2] | 0;
+                n = u1 << 16 | u0 >>> 16;
+                ql = (n >>> 0) / (vh >>> 0) | 0, rl = (n >>> 0) % (vh >>> 0) | 0, t1 = imul(ql, vl) | 0;
+                while ((ql | 0) == 65536 | t1 >>> 0 > (rl << 16 | u0 & 65535) >>> 0) {
+                    ql = ql - 1 | 0, rl = rl + vh | 0, t1 = t1 - vl | 0;
+                    if ((rl | 0) >= 65536) break;
+                }
+                m = 0, c = 0;
+                for (k = 0; (k | 0) <= (lD | 0); k = k + 4 | 0) {
+                    d = HEAP32[D + k >> 2] | 0;
+                    t1 = (imul(ql, d & 65535) | 0) + (m & 65535) | 0;
+                    t2 = ((imul(ql, d >>> 16) | 0) + (t1 >>> 16) | 0) + (m >>> 16) | 0;
+                    d = t1 & 65535 | t2 << 16;
+                    m = t2 >>> 16;
+                    n = HEAP32[R + j + k >> 2] | 0;
+                    t1 = ((n & 65535) - (d & 65535) | 0) + c | 0;
+                    t2 = ((n >>> 16) - (d >>> 16) | 0) + (t1 >> 16) | 0;
+                    c = t2 >> 16;
+                    HEAP32[R + j + k >> 2] = t2 << 16 | t1 & 65535;
+                }
+                t1 = ((u1 & 65535) - (m & 65535) | 0) + c | 0;
+                t2 = ((u1 >>> 16) - (m >>> 16) | 0) + (t1 >> 16) | 0;
+                HEAP32[R + j + k >> 2] = u1 = t2 << 16 | t1 & 65535;
+                c = t2 >> 16;
+                if (c) {
+                    ql = ql - 1 | 0, rl = rl + vh | 0;
+                    c = 0;
+                    for (k = 0; (k | 0) <= (lD | 0); k = k + 4 | 0) {
+                        d = HEAP32[D + k >> 2] | 0;
+                        n = HEAP32[R + j + k >> 2] | 0;
+                        t1 = ((n & 65535) + (d & 65535) | 0) + c | 0;
+                        t2 = ((n >>> 16) + (d >>> 16) | 0) + (t1 >>> 16) | 0;
+                        c = t2 >>> 16;
+                        HEAP32[R + j + k >> 2] = t1 & 65535 | t2 << 16;
+                    }
+                    HEAP32[R + j + k >> 2] = u1 + c | 0;
+                }
+                HEAP32[Q + j >> 2] = qh << 16 | ql;
+                u1 = HEAP32[R + i >> 2] | 0;
+            }
+            if (e) {
+                u0 = HEAP32[R >> 2] | 0;
+                for (i = 4; (i | 0) <= (lD | 0); i = i + 4 | 0) {
+                    n = HEAP32[R + i >> 2] | 0;
+                    HEAP32[R + i - 4 >> 2] = n << (32 - e | 0) | u0 >>> e;
+                    u0 = n;
+                }
+                HEAP32[R + lD >> 2] = u0 >>> e;
+            }
+        }
+        function mredc(A, lA, N, lN, y, R) {
+            A = A | 0;
+            lA = lA | 0;
+            N = N | 0;
+            lN = lN | 0;
+            y = y | 0;
+            R = R | 0;
+            var T = 0, c = 0, uh = 0, ul = 0, vl = 0, vh = 0, w0 = 0, w1 = 0, w2 = 0, r0 = 0, r1 = 0, i = 0, j = 0, k = 0;
+            T = salloc(lN << 1) | 0;
+            z(lN << 1, 0, T);
+            cp(lA, A, T);
+            for (i = 0; (i | 0) < (lN | 0); i = i + 4 | 0) {
+                uh = HEAP32[T + i >> 2] | 0, ul = uh & 65535, uh = uh >>> 16;
+                vh = y >>> 16, vl = y & 65535;
+                w0 = imul(ul, vl) | 0, w1 = ((imul(ul, vh) | 0) + (imul(uh, vl) | 0) | 0) + (w0 >>> 16) | 0;
+                ul = w0 & 65535, uh = w1 & 65535;
+                r1 = 0;
+                for (j = 0; (j | 0) < (lN | 0); j = j + 4 | 0) {
+                    k = i + j | 0;
+                    vh = HEAP32[N + j >> 2] | 0, vl = vh & 65535, vh = vh >>> 16;
+                    r0 = HEAP32[T + k >> 2] | 0;
+                    w0 = ((imul(ul, vl) | 0) + (r1 & 65535) | 0) + (r0 & 65535) | 0;
+                    w1 = ((imul(ul, vh) | 0) + (r1 >>> 16) | 0) + (r0 >>> 16) | 0;
+                    w2 = ((imul(uh, vl) | 0) + (w1 & 65535) | 0) + (w0 >>> 16) | 0;
+                    r1 = ((imul(uh, vh) | 0) + (w2 >>> 16) | 0) + (w1 >>> 16) | 0;
+                    r0 = w2 << 16 | w0 & 65535;
+                    HEAP32[T + k >> 2] = r0;
+                }
+                k = i + j | 0;
+                r0 = HEAP32[T + k >> 2] | 0;
+                w0 = ((r0 & 65535) + (r1 & 65535) | 0) + c | 0;
+                w1 = ((r0 >>> 16) + (r1 >>> 16) | 0) + (w0 >>> 16) | 0;
+                HEAP32[T + k >> 2] = w1 << 16 | w0 & 65535;
+                c = w1 >>> 16;
+            }
+            cp(lN, T + lN | 0, R);
+            sfree(lN << 1);
+            if (c | (cmp(N, lN, R, lN) | 0) <= 0) {
+                sub(R, lN, N, lN, R, lN) | 0;
+            }
+        }
+        return {
+            sreset: sreset,
+            salloc: salloc,
+            sfree: sfree,
+            z: z,
+            tst: tst,
+            neg: neg,
+            cmp: cmp,
+            add: add,
+            sub: sub,
+            mul: mul,
+            sqr: sqr,
+            div: div,
+            mredc: mredc
+        };
+    }
+    function is_big_number(a) {
+        return a instanceof BigNumber;
+    }
+    var _bigint_heap = new Uint32Array(1048576), _bigint_asm = bigint_asm(global, null, _bigint_heap.buffer);
+    var _BigNumber_ZERO_limbs = new Uint32Array(0);
+    function BigNumber(num) {
+        var limbs = _BigNumber_ZERO_limbs, bitlen = 0, sign = 0;
+        if (is_string(num)) num = string_to_bytes(num);
+        if (is_buffer(num)) num = new Uint8Array(num);
+        if (num === undefined) {} else if (is_number(num)) {
+            var absnum = Math.abs(num);
+            if (absnum > 4294967295) {
+                limbs = new Uint32Array(2);
+                limbs[0] = absnum | 0;
+                limbs[1] = absnum / 4294967296 | 0;
+                bitlen = 52;
+            } else if (absnum > 0) {
+                limbs = new Uint32Array(1);
+                limbs[0] = absnum;
+                bitlen = 32;
+            } else {
+                limbs = _BigNumber_ZERO_limbs;
+                bitlen = 0;
+            }
+            sign = num < 0 ? -1 : 1;
+        } else if (is_bytes(num)) {
+            bitlen = num.length * 8;
+            if (!bitlen) return BigNumber_ZERO;
+            limbs = new Uint32Array(bitlen + 31 >> 5);
+            for (var i = num.length - 4; i >= 0; i -= 4) {
+                limbs[num.length - 4 - i >> 2] = num[i] << 24 | num[i + 1] << 16 | num[i + 2] << 8 | num[i + 3];
+            }
+            if (i === -3) {
+                limbs[limbs.length - 1] = num[0];
+            } else if (i === -2) {
+                limbs[limbs.length - 1] = num[0] << 8 | num[1];
+            } else if (i === -1) {
+                limbs[limbs.length - 1] = num[0] << 16 | num[1] << 8 | num[2];
+            }
+            sign = 1;
+        } else if (typeof num === "object" && num !== null) {
+            limbs = new Uint32Array(num.limbs);
+            bitlen = num.bitLength;
+            sign = num.sign;
+        } else {
+            throw new TypeError("number is of unexpected type");
+        }
+        this.limbs = limbs;
+        this.bitLength = bitlen;
+        this.sign = sign;
+    }
+    function BigNumber_toString(radix) {
+        radix = radix || 16;
+        var limbs = this.limbs, bitlen = this.bitLength, str = "";
+        if (radix === 16) {
+            for (var i = (bitlen + 31 >> 5) - 1; i >= 0; i--) {
+                var h = limbs[i].toString(16);
+                str += "00000000".substr(h.length);
+                str += h;
+            }
+            str = str.replace(/^0+/, "");
+            if (!str.length) str = "0";
+        } else {
+            throw new IllegalArgumentError("bad radix");
+        }
+        if (this.sign < 0) str = "-" + str;
+        return str;
+    }
+    function BigNumber_toBytes() {
+        var bitlen = this.bitLength, limbs = this.limbs;
+        if (bitlen === 0) return new Uint8Array(0);
+        var bytelen = bitlen + 7 >> 3, bytes = new Uint8Array(bytelen);
+        for (var i = 0; i < bytelen; i++) {
+            var j = bytelen - i - 1;
+            bytes[i] = limbs[j >> 2] >> ((j & 3) << 3);
+        }
+        return bytes;
+    }
+    function BigNumber_valueOf() {
+        var limbs = this.limbs, bits = this.bitLength, sign = this.sign;
+        if (!sign) return 0;
+        if (bits <= 32) return sign * (limbs[0] >>> 0);
+        if (bits <= 52) return sign * (4294967296 * (limbs[1] >>> 0) + (limbs[0] >>> 0));
+        var i, l, e = 0;
+        for (i = limbs.length - 1; i >= 0; i--) {
+            if ((l = limbs[i]) === 0) continue;
+            while ((l << e & 2147483648) === 0) e++;
+            break;
+        }
+        if (i === 0) return sign * (limbs[0] >>> 0);
+        return sign * (1048576 * ((limbs[i] << e | (e ? limbs[i - 1] >>> 32 - e : 0)) >>> 0) + ((limbs[i - 1] << e | (e && i > 1 ? limbs[i - 2] >>> 32 - e : 0)) >>> 12)) * Math.pow(2, 32 * i - e - 52);
+    }
+    function BigNumber_clamp(b) {
+        var limbs = this.limbs, bitlen = this.bitLength;
+        if (b >= bitlen) return this;
+        var clamped = new BigNumber(), n = b + 31 >> 5, k = b % 32;
+        clamped.limbs = new Uint32Array(limbs.subarray(0, n));
+        clamped.bitLength = b;
+        clamped.sign = this.sign;
+        if (k) clamped.limbs[n - 1] &= -1 >>> 32 - k;
+        return clamped;
+    }
+    function BigNumber_slice(f, b) {
+        if (!is_number(f)) throw new TypeError("TODO");
+        if (b !== undefined && !is_number(b)) throw new TypeError("TODO");
+        var limbs = this.limbs, bitlen = this.bitLength;
+        if (f < 0) throw new RangeError("TODO");
+        if (f >= bitlen) return BigNumber_ZERO;
+        if (b === undefined || b > bitlen - f) b = bitlen - f;
+        var sliced = new BigNumber(), slimbs, n = f >> 5, m = f + b + 31 >> 5, l = b + 31 >> 5, t = f % 32, k = b % 32;
+        slimbs = new Uint32Array(l);
+        if (t) {
+            for (var i = 0; i < m - n - 1; i++) {
+                slimbs[i] = limbs[n + i] >>> t | limbs[n + i + 1] << 32 - t;
+            }
+            slimbs[i] = limbs[n + i] >>> t;
+        } else {
+            slimbs.set(limbs.subarray(n, m));
+        }
+        if (k) {
+            slimbs[l - 1] &= -1 >>> 32 - k;
+        }
+        sliced.limbs = slimbs;
+        sliced.bitLength = b;
+        sliced.sign = this.sign;
+        return sliced;
+    }
+    function BigNumber_negate() {
+        var negative = new BigNumber();
+        negative.limbs = this.limbs;
+        negative.bitLength = this.bitLength;
+        negative.sign = -1 * this.sign;
+        return negative;
+    }
+    function BigNumber_compare(that) {
+        if (!is_big_number(that)) that = new BigNumber(that);
+        var alimbs = this.limbs, alimbcnt = alimbs.length, blimbs = that.limbs, blimbcnt = blimbs.length, z = 0;
+        if (this.sign < that.sign) return -1;
+        if (this.sign > that.sign) return 1;
+        _bigint_heap.set(alimbs, 0);
+        _bigint_heap.set(blimbs, alimbcnt);
+        z = _bigint_asm.cmp(0, alimbcnt << 2, alimbcnt << 2, blimbcnt << 2);
+        return z * this.sign;
+    }
+    function BigNumber_add(that) {
+        if (!is_big_number(that)) that = new BigNumber(that);
+        if (!this.sign) return that;
+        if (!that.sign) return this;
+        var abitlen = this.bitLength, alimbs = this.limbs, alimbcnt = alimbs.length, asign = this.sign, bbitlen = that.bitLength, blimbs = that.limbs, blimbcnt = blimbs.length, bsign = that.sign, rbitlen, rlimbcnt, rsign, rof, result = new BigNumber();
+        rbitlen = (abitlen > bbitlen ? abitlen : bbitlen) + (asign * bsign > 0 ? 1 : 0);
+        rlimbcnt = rbitlen + 31 >> 5;
+        _bigint_asm.sreset();
+        var pA = _bigint_asm.salloc(alimbcnt << 2), pB = _bigint_asm.salloc(blimbcnt << 2), pR = _bigint_asm.salloc(rlimbcnt << 2);
+        _bigint_asm.z(pR - pA + (rlimbcnt << 2), 0, pA);
+        _bigint_heap.set(alimbs, pA >> 2);
+        _bigint_heap.set(blimbs, pB >> 2);
+        if (asign * bsign > 0) {
+            _bigint_asm.add(pA, alimbcnt << 2, pB, blimbcnt << 2, pR, rlimbcnt << 2);
+            rsign = asign;
+        } else if (asign > bsign) {
+            rof = _bigint_asm.sub(pA, alimbcnt << 2, pB, blimbcnt << 2, pR, rlimbcnt << 2);
+            rsign = rof ? bsign : asign;
+        } else {
+            rof = _bigint_asm.sub(pB, blimbcnt << 2, pA, alimbcnt << 2, pR, rlimbcnt << 2);
+            rsign = rof ? asign : bsign;
+        }
+        if (rof) _bigint_asm.neg(pR, rlimbcnt << 2, pR, rlimbcnt << 2);
+        if (_bigint_asm.tst(pR, rlimbcnt << 2) === 0) return BigNumber_ZERO;
+        result.limbs = new Uint32Array(_bigint_heap.subarray(pR >> 2, (pR >> 2) + rlimbcnt));
+        result.bitLength = rbitlen;
+        result.sign = rsign;
+        return result;
+    }
+    function BigNumber_subtract(that) {
+        if (!is_big_number(that)) that = new BigNumber(that);
+        return this.add(that.negate());
+    }
+    function BigNumber_multiply(that) {
+        if (!is_big_number(that)) that = new BigNumber(that);
+        if (!this.sign || !that.sign) return BigNumber_ZERO;
+        var abitlen = this.bitLength, alimbs = this.limbs, alimbcnt = alimbs.length, bbitlen = that.bitLength, blimbs = that.limbs, blimbcnt = blimbs.length, rbitlen, rlimbcnt, result = new BigNumber();
+        rbitlen = abitlen + bbitlen;
+        rlimbcnt = rbitlen + 31 >> 5;
+        _bigint_asm.sreset();
+        var pA = _bigint_asm.salloc(alimbcnt << 2), pB = _bigint_asm.salloc(blimbcnt << 2), pR = _bigint_asm.salloc(rlimbcnt << 2);
+        _bigint_asm.z(pR - pA + (rlimbcnt << 2), 0, pA);
+        _bigint_heap.set(alimbs, pA >> 2);
+        _bigint_heap.set(blimbs, pB >> 2);
+        _bigint_asm.mul(pA, alimbcnt << 2, pB, blimbcnt << 2, pR, rlimbcnt << 2);
+        result.limbs = new Uint32Array(_bigint_heap.subarray(pR >> 2, (pR >> 2) + rlimbcnt));
+        result.sign = this.sign * that.sign;
+        result.bitLength = rbitlen;
+        return result;
+    }
+    function BigNumber_square() {
+        if (!this.sign) return BigNumber_ZERO;
+        var abitlen = this.bitLength, alimbs = this.limbs, alimbcnt = alimbs.length, rbitlen, rlimbcnt, result = new BigNumber();
+        rbitlen = abitlen << 1;
+        rlimbcnt = rbitlen + 31 >> 5;
+        _bigint_asm.sreset();
+        var pA = _bigint_asm.salloc(alimbcnt << 2), pR = _bigint_asm.salloc(rlimbcnt << 2);
+        _bigint_asm.z(pR - pA + (rlimbcnt << 2), 0, pA);
+        _bigint_heap.set(alimbs, pA >> 2);
+        _bigint_asm.sqr(pA, alimbcnt << 2, pR);
+        result.limbs = new Uint32Array(_bigint_heap.subarray(pR >> 2, (pR >> 2) + rlimbcnt));
+        result.bitLength = rbitlen;
+        result.sign = 1;
+        return result;
+    }
+    function BigNumber_divide(that) {
+        if (!is_big_number(that)) that = new BigNumber(that);
+        var abitlen = this.bitLength, alimbs = this.limbs, alimbcnt = alimbs.length, bbitlen = that.bitLength, blimbs = that.limbs, blimbcnt = blimbs.length, qlimbcnt, rlimbcnt, quotient = BigNumber_ZERO, remainder = BigNumber_ZERO;
+        _bigint_asm.sreset();
+        var pA = _bigint_asm.salloc(alimbcnt << 2), pB = _bigint_asm.salloc(blimbcnt << 2), pR = _bigint_asm.salloc(blimbcnt << 2), pQ = _bigint_asm.salloc(alimbcnt << 2);
+        _bigint_asm.z(pQ - pA + (alimbcnt << 2), 0, pA);
+        _bigint_heap.set(alimbs, pA >> 2);
+        _bigint_heap.set(blimbs, pB >> 2);
+        _bigint_asm.div(pA, alimbcnt << 2, pB, blimbcnt << 2, pR, pQ);
+        qlimbcnt = _bigint_asm.tst(pQ, alimbcnt << 2) >> 2;
+        if (qlimbcnt) {
+            quotient = new BigNumber();
+            quotient.limbs = new Uint32Array(_bigint_heap.subarray(pQ >> 2, (pQ >> 2) + qlimbcnt));
+            quotient.bitLength = abitlen < qlimbcnt << 5 ? abitlen : qlimbcnt << 5;
+            quotient.sign = this.sign * that.sign;
+        }
+        rlimbcnt = _bigint_asm.tst(pR, blimbcnt << 2) >> 2;
+        if (rlimbcnt) {
+            remainder = new BigNumber();
+            remainder.limbs = new Uint32Array(_bigint_heap.subarray(pR >> 2, (pR >> 2) + rlimbcnt));
+            remainder.bitLength = bbitlen < rlimbcnt << 5 ? bbitlen : rlimbcnt << 5;
+            remainder.sign = this.sign;
+        }
+        return {
+            quotient: quotient,
+            remainder: remainder
+        };
+    }
+    var BigNumberPrototype = BigNumber.prototype = new Number();
+    BigNumberPrototype.toString = BigNumber_toString;
+    BigNumberPrototype.toBytes = BigNumber_toBytes;
+    BigNumberPrototype.valueOf = BigNumber_valueOf;
+    BigNumberPrototype.clamp = BigNumber_clamp;
+    BigNumberPrototype.slice = BigNumber_slice;
+    BigNumberPrototype.negate = BigNumber_negate;
+    BigNumberPrototype.compare = BigNumber_compare;
+    BigNumberPrototype.add = BigNumber_add;
+    BigNumberPrototype.subtract = BigNumber_subtract;
+    BigNumberPrototype.multiply = BigNumber_multiply;
+    BigNumberPrototype.square = BigNumber_square;
+    BigNumberPrototype.divide = BigNumber_divide;
+    var BigNumber_ZERO = new BigNumber(0), BigNumber_ONE = new BigNumber(1);
+    Object.freeze(BigNumber_ZERO);
+    Object.freeze(BigNumber_ONE);
+    function Number_extGCD(a, b) {
+        var sa = a < 0 ? -1 : 1, sb = b < 0 ? -1 : 1, xi = 1, xj = 0, yi = 0, yj = 1, r, q, t, a_cmp_b;
+        a *= sa;
+        b *= sb;
+        a_cmp_b = a < b;
+        if (a_cmp_b) {
+            t = a;
+            a = b, b = t;
+            t = sa;
+            sa = sb;
+            sb = t;
+        }
+        q = Math.floor(a / b), r = a - q * b;
+        while (r) {
+            t = xi - q * xj, xi = xj, xj = t;
+            t = yi - q * yj, yi = yj, yj = t;
+            a = b, b = r;
+            q = Math.floor(a / b), r = a - q * b;
+        }
+        xj *= sa;
+        yj *= sb;
+        if (a_cmp_b) {
+            t = xj;
+            xj = yj, yj = t;
+        }
+        return {
+            gcd: b,
+            x: xj,
+            y: yj
+        };
+    }
+    function BigNumber_extGCD(a, b) {
+        if (!is_big_number(a)) a = new BigNumber(a);
+        if (!is_big_number(b)) b = new BigNumber(b);
+        var sa = a.sign, sb = b.sign;
+        if (sa < 0) a = a.negate();
+        if (sb < 0) b = b.negate();
+        var a_cmp_b = a.compare(b);
+        if (a_cmp_b < 0) {
+            var t = a;
+            a = b, b = t;
+            t = sa;
+            sa = sb;
+            sb = t;
+        }
+        var xi = BigNumber_ONE, xj = BigNumber_ZERO, lx = b.bitLength, yi = BigNumber_ZERO, yj = BigNumber_ONE, ly = a.bitLength, z, r, q;
+        z = a.divide(b);
+        while ((r = z.remainder) !== BigNumber_ZERO) {
+            q = z.quotient;
+            z = xi.subtract(q.multiply(xj).clamp(lx)).clamp(lx), xi = xj, xj = z;
+            z = yi.subtract(q.multiply(yj).clamp(ly)).clamp(ly), yi = yj, yj = z;
+            a = b, b = r;
+            z = a.divide(b);
+        }
+        if (sa < 0) xj = xj.negate();
+        if (sb < 0) yj = yj.negate();
+        if (a_cmp_b < 0) {
+            var t = xj;
+            xj = yj, yj = t;
+        }
+        return {
+            gcd: b,
+            x: xj,
+            y: yj
+        };
+    }
+    function Modulus() {
+        BigNumber.apply(this, arguments);
+        if (this.valueOf() < 1) throw new RangeError();
+        if (this.bitLength <= 32) return;
+        var comodulus;
+        if (this.limbs[0] & 1) {
+            var bitlen = (this.bitLength + 31 & -32) + 1, limbs = new Uint32Array(bitlen + 31 >> 5);
+            limbs[limbs.length - 1] = 1;
+            comodulus = new BigNumber();
+            comodulus.sign = 1;
+            comodulus.bitLength = bitlen;
+            comodulus.limbs = limbs;
+            var k = Number_extGCD(4294967296, this.limbs[0]).y;
+            this.coefficient = k < 0 ? -k : 4294967296 - k;
+        } else {
+            return;
+        }
+        this.comodulus = comodulus;
+        this.comodulusRemainder = comodulus.divide(this).remainder;
+        this.comodulusRemainderSquare = comodulus.square().divide(this).remainder;
+    }
+    function Modulus_reduce(a) {
+        if (!is_big_number(a)) a = new BigNumber(a);
+        if (a.bitLength <= 32 && this.bitLength <= 32) return new BigNumber(a.valueOf() % this.valueOf());
+        if (a.compare(this) < 0) return a;
+        return a.divide(this).remainder;
+    }
+    function Modulus_inverse(a) {
+        a = this.reduce(a);
+        var r = BigNumber_extGCD(this, a);
+        if (r.gcd.valueOf() !== 1) return null;
+        r = r.y;
+        if (r.sign < 0) r = r.add(this).clamp(this.bitLength);
+        return r;
+    }
+    function Modulus_power(g, e) {
+        if (!is_big_number(g)) g = new BigNumber(g);
+        if (!is_big_number(e)) e = new BigNumber(e);
+        var c = 0;
+        for (var i = 0; i < e.limbs.length; i++) {
+            var t = e.limbs[i];
+            while (t) {
+                if (t & 1) c++;
+                t >>>= 1;
+            }
+        }
+        var k = 8;
+        if (e.bitLength <= 4536) k = 7;
+        if (e.bitLength <= 1736) k = 6;
+        if (e.bitLength <= 630) k = 5;
+        if (e.bitLength <= 210) k = 4;
+        if (e.bitLength <= 60) k = 3;
+        if (e.bitLength <= 12) k = 2;
+        if (c <= 1 << k - 1) k = 1;
+        g = _Montgomery_reduce(this.reduce(g).multiply(this.comodulusRemainderSquare), this);
+        var g2 = _Montgomery_reduce(g.square(), this), gn = new Array(1 << k - 1);
+        gn[0] = g;
+        gn[1] = _Montgomery_reduce(g.multiply(g2), this);
+        for (var i = 2; i < 1 << k - 1; i++) {
+            gn[i] = _Montgomery_reduce(gn[i - 1].multiply(g2), this);
+        }
+        var u = this.comodulusRemainder, r = u;
+        for (var i = e.limbs.length - 1; i >= 0; i--) {
+            var t = e.limbs[i];
+            for (var j = 32; j > 0; ) {
+                if (t & 2147483648) {
+                    var n = t >>> 32 - k, l = k;
+                    while ((n & 1) === 0) {
+                        n >>>= 1;
+                        l--;
+                    }
+                    var m = gn[n >>> 1];
+                    while (n) {
+                        n >>>= 1;
+                        if (r !== u) r = _Montgomery_reduce(r.square(), this);
+                    }
+                    r = r !== u ? _Montgomery_reduce(r.multiply(m), this) : m;
+                    t <<= l, j -= l;
+                } else {
+                    if (r !== u) r = _Montgomery_reduce(r.square(), this);
+                    t <<= 1, j--;
+                }
+            }
+        }
+        r = _Montgomery_reduce(r, this);
+        return r;
+    }
+    function _Montgomery_reduce(a, n) {
+        var alimbs = a.limbs, alimbcnt = alimbs.length, nlimbs = n.limbs, nlimbcnt = nlimbs.length, y = n.coefficient;
+        _bigint_asm.sreset();
+        var pA = _bigint_asm.salloc(alimbcnt << 2), pN = _bigint_asm.salloc(nlimbcnt << 2), pR = _bigint_asm.salloc(nlimbcnt << 2);
+        _bigint_asm.z(pR - pA + (nlimbcnt << 2), 0, pA);
+        _bigint_heap.set(alimbs, pA >> 2);
+        _bigint_heap.set(nlimbs, pN >> 2);
+        _bigint_asm.mredc(pA, alimbcnt << 2, pN, nlimbcnt << 2, y, pR);
+        var result = new BigNumber();
+        result.limbs = new Uint32Array(_bigint_heap.subarray(pR >> 2, (pR >> 2) + nlimbcnt));
+        result.bitLength = n.bitLength;
+        result.sign = 1;
+        return result;
+    }
+    var ModulusPrototype = Modulus.prototype = new BigNumber();
+    ModulusPrototype.reduce = Modulus_reduce;
+    ModulusPrototype.inverse = Modulus_inverse;
+    ModulusPrototype.power = Modulus_power;
+    function _BigNumber_isMillerRabinProbablePrime(rounds) {
+        var t = new BigNumber(this), s = 0;
+        t.limbs[0] -= 1;
+        while (t.limbs[s >> 5] === 0) s += 32;
+        while ((t.limbs[s >> 5] >> (s & 31) & 1) === 0) s++;
+        t = t.slice(s);
+        var m = new Modulus(this), m1 = this.subtract(BigNumber_ONE), a = new BigNumber(this), l = this.limbs.length - 1;
+        while (a.limbs[l] === 0) l--;
+        while (--rounds >= 0) {
+            Random_getValues(a.limbs);
+            if (a.limbs[0] < 2) a.limbs[0] += 2;
+            while (a.compare(m1) >= 0) a.limbs[l] >>>= 1;
+            var x = m.power(a, t);
+            if (x.compare(BigNumber_ONE) === 0) continue;
+            if (x.compare(m1) === 0) continue;
+            var c = s;
+            while (--c > 0) {
+                x = x.square().divide(m).remainder;
+                if (x.compare(BigNumber_ONE) === 0) return false;
+                if (x.compare(m1) === 0) break;
+            }
+            if (c === 0) return false;
+        }
+        return true;
+    }
+    function BigNumber_isProbablePrime(paranoia) {
+        paranoia = paranoia || 80;
+        var limbs = this.limbs, i = 0;
+        if ((limbs[0] & 1) === 0) return false;
+        if (paranoia <= 1) return true;
+        var s3 = 0, s5 = 0, s17 = 0;
+        for (i = 0; i < limbs.length; i++) {
+            var l3 = limbs[i];
+            while (l3) {
+                s3 += l3 & 3;
+                l3 >>>= 2;
+            }
+            var l5 = limbs[i];
+            while (l5) {
+                s5 += l5 & 3;
+                l5 >>>= 2;
+                s5 -= l5 & 3;
+                l5 >>>= 2;
+            }
+            var l17 = limbs[i];
+            while (l17) {
+                s17 += l17 & 15;
+                l17 >>>= 4;
+                s17 -= l17 & 15;
+                l17 >>>= 4;
+            }
+        }
+        if (!(s3 % 3) || !(s5 % 5) || !(s17 % 17)) return false;
+        if (paranoia <= 2) return true;
+        return _BigNumber_isMillerRabinProbablePrime.call(this, paranoia >>> 1);
+    }
+    var _primes = [ 2, 3 ];
+    function _small_primes(n) {
+        if (_primes.length >= n) return _primes.slice(0, n);
+        for (var p = _primes[_primes.length - 1] + 2; _primes.length < n; p += 2) {
+            for (var i = 0, d = _primes[i]; d * d <= p; d = _primes[++i]) {
+                if (p % d == 0) break;
+            }
+            if (d * d > p) _primes.push(p);
+        }
+        return _primes;
+    }
+    function BigNumber_randomProbablePrime(bitlen, filter) {
+        var limbcnt = bitlen + 31 >> 5, prime = new BigNumber({
+            sign: 1,
+            bitLength: bitlen,
+            limbs: limbcnt
+        }), limbs = prime.limbs;
+        var k = 1e4;
+        if (bitlen <= 512) k = 2200;
+        if (bitlen <= 256) k = 600;
+        var divisors = _small_primes(k), remainders = new Uint32Array(k);
+        var s = bitlen * global.Math.LN2 | 0, r = 27;
+        if (bitlen >= 250) r = 12;
+        if (bitlen >= 450) r = 6;
+        if (bitlen >= 850) r = 3;
+        if (bitlen >= 1300) r = 2;
+        while (true) {
+            Random_getValues(limbs);
+            limbs[0] |= 1;
+            limbs[limbcnt - 1] |= 1 << (bitlen - 1 & 31);
+            if (bitlen & 31) limbs[limbcnt - 1] &= pow2_ceil(bitlen + 1 & 31) - 1;
+            remainders[0] = 1;
+            for (var i = 1; i < k; i++) {
+                remainders[i] = prime.divide(divisors[i]).remainder.valueOf();
+            }
+            seek: for (var j = 0; j < s; j += 2, limbs[0] += 2) {
+                for (var i = 1; i < k; i++) {
+                    if ((remainders[i] + j) % divisors[i] === 0) continue seek;
+                }
+                if (typeof filter === "function" && !filter(prime)) continue;
+                if (_BigNumber_isMillerRabinProbablePrime.call(prime, r)) return prime;
+            }
+        }
+    }
+    BigNumberPrototype.isProbablePrime = BigNumber_isProbablePrime;
+    BigNumber.randomProbablePrime = BigNumber_randomProbablePrime;
+    BigNumber.ZERO = BigNumber_ZERO;
+    BigNumber.ONE = BigNumber_ONE;
+    BigNumber.extGCD = BigNumber_extGCD;
+    exports.BigNumber = BigNumber;
+    exports.Modulus = Modulus;
+    function RSA(options) {
+        options = options || {};
+        this.key = null;
+        this.result = null;
+        this.reset(options);
+    }
+    function RSA_reset(options) {
+        options = options || {};
+        this.result = null;
+        var key = options.key;
+        if (key !== undefined) {
+            if (key instanceof Array) {
+                var l = key.length;
+                if (l !== 2 && l !== 3 && l !== 8) throw new SyntaxError("unexpected key type");
+                var k = [];
+                k[0] = new Modulus(key[0]);
+                k[1] = new BigNumber(key[1]);
+                if (l > 2) {
+                    k[2] = new BigNumber(key[2]);
+                }
+                if (l > 3) {
+                    k[3] = new Modulus(key[3]);
+                    k[4] = new Modulus(key[4]);
+                    k[5] = new BigNumber(key[5]);
+                    k[6] = new BigNumber(key[6]);
+                    k[7] = new BigNumber(key[7]);
+                }
+                this.key = k;
+            } else {
+                throw new TypeError("unexpected key type");
+            }
+        }
+        return this;
+    }
+    function RSA_encrypt(data) {
+        if (!this.key) throw new IllegalStateError("no key is associated with the instance");
+        if (is_string(data)) data = string_to_bytes(data);
+        if (is_buffer(data)) data = new Uint8Array(data);
+        var msg;
+        if (is_bytes(data)) {
+            msg = new BigNumber(data);
+        } else if (is_big_number(data)) {
+            msg = data;
+        } else {
+            throw new TypeError("unexpected data type");
+        }
+        if (this.key[0].compare(msg) <= 0) throw new RangeError("data too large");
+        var m = this.key[0], e = this.key[1];
+        var result = m.power(msg, e).toBytes();
+        var bytelen = m.bitLength + 7 >> 3;
+        if (result.length < bytelen) {
+            var r = new Uint8Array(bytelen);
+            r.set(result, bytelen - result.length);
+            result = r;
+        }
+        this.result = result;
+        return this;
+    }
+    function RSA_decrypt(data) {
+        if (!this.key) throw new IllegalStateError("no key is associated with the instance");
+        if (this.key.length < 3) throw new IllegalStateError("key isn't suitable for decription");
+        if (is_string(data)) data = string_to_bytes(data);
+        if (is_buffer(data)) data = new Uint8Array(data);
+        var msg;
+        if (is_bytes(data)) {
+            msg = new BigNumber(data);
+        } else if (is_big_number(data)) {
+            msg = data;
+        } else {
+            throw new TypeError("unexpected data type");
+        }
+        if (this.key[0].compare(msg) <= 0) throw new RangeError("data too large");
+        var result;
+        if (this.key.length > 3) {
+            var m = this.key[0], p = this.key[3], q = this.key[4], dp = this.key[5], dq = this.key[6], u = this.key[7];
+            var x = p.power(msg, dp), y = q.power(msg, dq);
+            var t = x.subtract(y);
+            while (t.sign < 0) t = t.add(p);
+            var h = p.reduce(u.multiply(t));
+            result = h.multiply(q).add(y).clamp(m.bitLength).toBytes();
+        } else {
+            var m = this.key[0], d = this.key[2];
+            result = m.power(msg, d).toBytes();
+        }
+        var bytelen = m.bitLength + 7 >> 3;
+        if (result.length < bytelen) {
+            var r = new Uint8Array(bytelen);
+            r.set(result, bytelen - result.length);
+            result = r;
+        }
+        this.result = result;
+        return this;
+    }
+    var RSA_prototype = RSA.prototype;
+    RSA_prototype.reset = RSA_reset;
+    RSA_prototype.encrypt = RSA_encrypt;
+    RSA_prototype.decrypt = RSA_decrypt;
+    function RSA_generateKey(bitlen, e) {
+        bitlen = bitlen || 2048;
+        e = e || 65537;
+        if (bitlen < 512) throw new IllegalArgumentError("bit length is too small");
+        if (is_string(e)) e = string_to_bytes(e);
+        if (is_buffer(e)) e = new Uint8Array(e);
+        if (is_bytes(e) || is_number(e) || is_big_number(e)) {
+            e = new BigNumber(e);
+        } else {
+            throw new TypeError("unexpected exponent type");
+        }
+        if ((e.limbs[0] & 1) === 0) throw new IllegalArgumentError("exponent must be an odd number");
+        var m, e, d, p, q, p1, q1, dp, dq, u;
+        p = BigNumber_randomProbablePrime(bitlen >> 1, function(p) {
+            p1 = new BigNumber(p);
+            p1.limbs[0] -= 1;
+            return BigNumber_extGCD(p1, e).gcd.valueOf() == 1;
+        });
+        q = BigNumber_randomProbablePrime(bitlen - (bitlen >> 1), function(q) {
+            m = new Modulus(p.multiply(q));
+            if (!(m.limbs[(bitlen + 31 >> 5) - 1] >>> (bitlen - 1 & 31))) return false;
+            q1 = new BigNumber(q);
+            q1.limbs[0] -= 1;
+            return BigNumber_extGCD(q1, e).gcd.valueOf() == 1;
+        });
+        d = new Modulus(p1.multiply(q1)).inverse(e);
+        dp = d.divide(p1).remainder, dq = d.divide(q1).remainder;
+        p = new Modulus(p), q = new Modulus(q);
+        var u = p.inverse(q);
+        return [ m, e, d, p, q, dp, dq, u ];
+    }
+    RSA.generateKey = RSA_generateKey;
+    var RSA_RAW = RSA;
+    function rsa_generate_key(bitlen, e) {
+        if (bitlen === undefined) throw new SyntaxError("bitlen required");
+        if (e === undefined) throw new SyntaxError("e required");
+        var key = RSA_generateKey(bitlen, e);
+        for (var i = 0; i < key.length; i++) {
+            if (is_big_number(key[i])) key[i] = key[i].toBytes();
+        }
+        return key;
+    }
+    exports.RSA = {
+        generateKey: rsa_generate_key
+    };
+    function rsa_raw_encrypt_bytes(data, key) {
+        if (data === undefined) throw new SyntaxError("data required");
+        if (key === undefined) throw new SyntaxError("key required");
+        return new RSA_RAW({
+            key: key
+        }).encrypt(data).result;
+    }
+    function rsa_raw_decrypt_bytes(data, key) {
+        if (data === undefined) throw new SyntaxError("data required");
+        if (key === undefined) throw new SyntaxError("key required");
+        return new RSA_RAW({
+            key: key
+        }).decrypt(data).result;
+    }
+    RSA_RAW.encrypt = rsa_raw_encrypt_bytes;
+    RSA_RAW.decrypt = rsa_raw_decrypt_bytes;
+    RSA_RAW.sign = rsa_raw_decrypt_bytes;
+    RSA_RAW.verify = rsa_raw_encrypt_bytes;
+    exports.RSA_RAW = RSA_RAW;
+})({}, function() {
+    return this;
+}());
+var sjcl = {
+	cipher : {}
+};
+sjcl.cipher.aes = function (a) {
+	this.a[0][0][0] || this.d();
+	var d,
+	c,
+	g,
+	b,
+	e = this.a[0][4],
+	f = this.a[1];
+	d = a.length;
+	var j = 1;
+	this.c = [g = a.slice(0), b = []];
+	for (a = d; a < 4 * d + 28; a++) {
+		c = g[a - 1];
+		if (a % d === 0 || d === 8 && a % d === 4) {
+			c = e[c >>> 24] << 24^e[c >> 16 & 255] << 16^e[c >> 8 & 255] << 8^e[c & 255];
+			if (a % d === 0) {
+				c = c << 8^c >>> 24^j << 24;
+				j = j << 1^(j >> 7) * 283
+			}
+		}
+		g[a] = g[a - d]^c
+	}
+	for (d = 0; a; d++, a--) {
+		c = g[d & 3 ? a : a - 4];
+		b[d] = a <= 4 || d < 4 ? c : f[0][e[c >>> 24]]^f[1][e[c >> 16 & 255]]^f[2][e[c >> 8 & 255]]^f[3][e[c & 255]]
+	}
+};
+sjcl.cipher.aes.prototype = {
+	encrypt : function (a) {
+		return this.b(a, 0)
+	},
+	decrypt : function (a) {
+		return this.b(a, 1)
+	},
+	a : [[[], [], [], [], []], [[], [], [], [], []]],
+	d : function () {
+		var a = this.a[0],
+		d = this.a[1],
+		c = a[4],
+		g = d[4],
+		b,
+		e,
+		f,
+		j = [],
+		l = [],
+		m,
+		i,
+		h,
+		k;
+		for (b = 0; b < 0x100; b++)
+			l[(j[b] = b << 1^(b >> 7) * 283)^b] = b;
+		for (e = f = 0; !c[e]; e ^= m || 1, f = l[f] || 1) {
+			h = f^f << 1^f << 2^f << 3^f << 4;
+			h = h >> 8^h & 255^99;
+			c[e] = h;
+			g[h] = e;
+			i = j[b = j[m = j[e]]];
+			k = i * 0x1010101^b * 0x10001^m * 0x101^e * 0x1010100;
+			i = j[h] * 0x101^h * 0x1010100;
+			for (b = 0; b < 4; b++) {
+				a[b][e] = i = i << 24^i >>> 8;
+				d[b][h] = k = k << 24^k >>> 8
+			}
+		}
+		for (b = 0; b < 5; b++) {
+			a[b] = a[b].slice(0);
+			d[b] = d[b].slice(0)
+		}
+	},
+	b : function (a, d) {
+		var c = this.c[d],
+		g = a[0]^c[0],
+		b = a[d ? 3 : 1]^c[1],
+		e = a[2]^c[2];
+		a = a[d ? 1 : 3]^c[3];
+		var f,
+		j,
+		l,
+		m = c.length / 4 - 2,
+		i,
+		h = 4,
+		k = [0, 0, 0, 0];
+		f = this.a[d];
+		var n = f[0],
+		o = f[1],
+		p = f[2],
+		q = f[3],
+		r = f[4];
+		for (i = 0; i < m; i++) {
+			f = n[g >>> 24]^o[b >> 16 & 255]^p[e >> 8 & 255]^q[a & 255]^c[h];
+			j = n[b >>> 24]^o[e >> 16 & 255]^p[a >> 8 & 255]^q[g & 255]^c[h + 1];
+			l = n[e >>> 24]^o[a >> 16 & 255]^p[g >> 8 & 255]^q[b & 255]^c[h + 2];
+			a = n[a >>> 24]^o[g >> 16 & 255]^p[b >> 8 & 255]^q[e & 255]^c[h + 3];
+			h += 4;
+			g = f;
+			b = j;
+			e = l
+		}
+		for (i = 0; i < 4; i++) {
+			k[d ? 3 & -i : i] = r[g >>> 24] << 24^r[b >> 16 & 255] << 16^r[e >> 8 & 255] << 8^r[a & 255]^c[h++];
+			f = g;
+			g = b;
+			b = e;
+			e = a;
+			a = f
+		}
+		return k
+	}
+};
 self.postMessage = self.webkitPostMessage || self.postMessage;
 
 self.onmessage = function ( e ) {

@@ -840,12 +840,9 @@ else if (!b_u)
 	jsl.push({f:'js/analytics.js', n: 'analytics_js', j:1});
 
 	// only used on beta
-	if(onBetaW) {
+	if (onBetaW) {
 		jsl.push({f: 'js/betacrashes.js', n: 'betacrashes_js', j: 1});
 	}
-
-//        jsl.push({f:'html/register.html', n: 'register', j:0});
-//        jsl.push({f:'html/js/register.js', n: 'register_js', j:1});
 
 	var jsl2 =
 	{

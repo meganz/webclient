@@ -46,18 +46,24 @@ var uiCheckboxes = function($scope) {
     $('.radio-txt', $scope).each(function() {
         var $label = $(this);
         var $cbxElement = $label.prev('.checkboxOn, .checkboxOff');
+        var $input = $('input[type="checkbox"]', $cbxElement);
 
         var _onToggle = function() {
             if ($cbxElement.attr('class').indexOf('checkboxOn') > -1)
             {
                 $cbxElement.addClass('checkboxOff');
                 $cbxElement.removeClass('checkboxOn');
+                $('input[type="checkbox"]', $cbxElement).removeAttr('checked');
+                $cbxElement.trigger('onFakeCheckboxChange', [false]);
             }
             else
             {
                 $cbxElement.addClass('checkboxOn');
                 $cbxElement.removeClass('checkboxOff');
+                $('input[type="checkbox"]', $cbxElement).attr('checked', true);
+                $cbxElement.trigger('onFakeCheckboxChange', [true]);
             }
+            return false;
         };
 
         $label
@@ -67,6 +73,19 @@ var uiCheckboxes = function($scope) {
         $cbxElement
             .unbind('click.uiCheckboxes')
             .bind('click.uiCheckboxes', _onToggle);
+
+        $input
+            .rebind('change.uiCheckboxes', function() {
+                if($(this).attr('checked')) {
+                    $cbxElement.removeClass('checkboxOff');
+                    $cbxElement.addClass('checkboxOn');
+                    $cbxElement.trigger('onFakeCheckboxChange', [true]);
+                } else {
+                    $cbxElement.removeClass('checkboxOn');
+                    $cbxElement.addClass('checkboxOff');
+                    $cbxElement.trigger('onFakeCheckboxChange', [false]);
+                }
+            });
 
     });
 };

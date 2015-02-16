@@ -20,6 +20,7 @@ function switch_pro(data)
 		$('.pro1 .reg-st3-bandwidth .reg-st3-big-txt').html('1 <span>TB</span>');
 		$('.pro2 .reg-st3-bandwidth .reg-st3-big-txt').html('4 <span>TB</span>');
 		$('.pro3 .reg-st3-bandwidth .reg-st3-big-txt').html('8 <span>TB</span>');
+         $('#reg-checkbox').attr('checked',true);
 	 } 
 	 else 
 	 {
@@ -33,7 +34,8 @@ function switch_pro(data)
 		$('.pro3 .reg-st3-bott-title.right').html('299<span>.99 &euro;</span>');			
 		$('.pro1 .reg-st3-bandwidth .reg-st3-big-txt').html('12 <span>TB</span>');
 		$('.pro2 .reg-st3-bandwidth .reg-st3-big-txt').html('48 <span>TB</span>');
-		$('.pro3 .reg-st3-bandwidth .reg-st3-big-txt').html('96 <span>TB</span>');			
+		$('.pro3 .reg-st3-bandwidth .reg-st3-big-txt').html('96 <span>TB</span>');
+         $('#reg-checkbox').attr('checked',false);
 	 }
 }
 
@@ -43,19 +45,17 @@ function init_pro()
 	
 	if (DEFAULT == 'monthly') 
 	{
-		$('#reg-checkbox').attr('checked',true);
 		switch_pro(true);
 	}
 	else
 	{
-		$('#reg-checkbox').attr('checked',false);
 		switch_pro(false);	
 	}
 
 	if (u_type == 3)
 	{
 		api_req(
-		{ a : 'uq',pro : 1,},
+		{ a : 'uq',pro : 1},
 		{ 
 			callback : function (res) 
 			{
@@ -83,7 +83,7 @@ function init_pro()
 		else if ((json[0][i][2] == '2048') && (json[0][i][5] == '199.99')) 	pro_packs['pro2_year'] 	= json[0][i];
 		else if ((json[0][i][2] == '4096') && (json[0][i][5] == '29.99')) 	pro_packs['pro3_month'] = json[0][i];
 		else if ((json[0][i][2] == '4096') && (json[0][i][5] == '299.99')) 	pro_packs['pro3_year'] 	= json[0][i];		
-	}	
+	}
 	if (!m)
 	{
 	   if (lang == 'fr') $('.reg-st3-big-txt').each(function(e,o){$(o).html($(o).html().replace('GB','Go').replace('TB','To'));});

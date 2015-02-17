@@ -1167,7 +1167,7 @@ function topmenuUI() {
             $('.top-menu-item.logout,.context-menu-divider.logout').show();
         }
 
-        $('.top-login-arrow').css('margin-right', $('.top-menu-icon').width() + $('.create-account-button').width() + ($('.top-login-button').width() / 2) + 82 + 'px');
+        $('.top-login-arrow').css('margin-right', $('.top-menu-icon').width() + $('.create-account-button').width() + ($('.top-login-button').width() / 2) + 78 + 'px');
     }
 
     $('.top-menu-arrow').css('margin-right', $('.top-menu-icon').width() / 2 + 'px');

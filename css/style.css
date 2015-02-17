@@ -329,6 +329,8 @@ input[type="checkbox"] {
 	-moz-opacity: 0;
 	-khtml-opacity: 0;
 	-moz-appearance: none;
+	width:21px;
+	height:21px;
 }
 .checkboxOn {
 	width: 30px;
@@ -22643,6 +22645,9 @@ a.top-login-forgot-pass {
 	width: 420px;
 	z-index: 1200;
 }
+.fm-dialog.feedback-dialog .checkboxOff, .fm-dialog .checkboxOn {
+	margin: 17px 16px 0 10px;
+}
 .feedback-dialog .content {
 	width: 100%;
 	overflow: auto;
@@ -22670,13 +22675,14 @@ a.top-login-forgot-pass {
 	box-sizing: border-box;
 	line-height: 18px;
 	color: #999999;
+	margin-bottom: 4px;
 }
 .feedback-dialog .reply label {
 	padding-right: 32px;
 }
 .feedback-dialog .rating {
 	text-align: center;
-	padding-bottom: 2px;
+	padding-bottom: 6px;
 }
 .feedback-dialog label {
 	display: block;

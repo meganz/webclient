@@ -22651,8 +22651,15 @@ a.top-login-forgot-pass {
 	padding-top: 10px;
 	padding-bottom: 10px;
 }
+.feedback-dialog .membership-notification {
+	width: 318px;
+	right:-42px;
+}
+.feedback-dialog .membership-notification {
+	width: 295px;
+}
 .feedback-dialog textarea {
-	width: 82%;
+	width: 86%;
 	height: 60px;
 	margin: 0 auto;
 	display: block;

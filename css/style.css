@@ -22580,10 +22580,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 	padding-bottom: 10px;
 }
 .feedback-dialog .membership-notification {
-	width: 318px;
-	right: -42px;
-}
-.feedback-dialog .membership-notification {
 	width: 295px;
 }
 .feedback-dialog textarea {

@@ -22645,9 +22645,6 @@ a.top-login-forgot-pass {
 	width: 420px;
 	z-index: 1200;
 }
-.fm-dialog.feedback-dialog .checkboxOff, .fm-dialog .checkboxOn {
-	margin: 17px 16px 0 10px;
-}
 .feedback-dialog .content {
 	width: 100%;
 	overflow: auto;

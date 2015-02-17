@@ -329,6 +329,8 @@ input[type="checkbox"] {
 	-moz-opacity: 0;
 	-khtml-opacity: 0;
 	-moz-appearance: none;
+	width:21px;
+	height:21px;
 }
 .checkboxOn {
 	width: 30px;
@@ -7013,7 +7015,7 @@ table {
 .fm-add-user:hover, .fm-add-user.active, .fm-chat-file-button.primary-button:hover, .fm-chat-file-button.primary-button.active, .fm-verify:hover, .fm-verify.active, .fm-share-copy:hover, .fm-share-copy.active, .fm-new-folder:hover, .fm-new-folder.active, .create-folder-button:hover, .create-folder-button.active, .add-user-popup-button.add:hover, .add-user-popup-button.add.active, .fm-dialog-new-folder-button:hover, .fm-dialog-new-folder-button.active, .rename-dialog-button.rename:hover, .rename-dialog-button.rename.active, .fm-dialog-button.notifications-button:hover, .fm-dialog-button.notifications-button.active, .fm-dialog-button.links-button:hover, .fm-dialog-button.links-button.active, .fm-dialog-button.dialog-move-button:hover, .fm-dialog-button.dialog-move-button.active, .fm-dialog-button.dialog-newfolder-button:hover, .fm-dialog-button.dialog-newfolder-button.active, .fm-dialog-button.dialog-copy-button:hover, .fm-dialog-button.dialog-copy-button.active, .fm-dialog-button.notification-button.confirm:hover, .fm-dialog-button.notification-button.confirm.active, .contact-request-button.accept:hover, .contact-request-button.accept.active, .fm-dialog-button.fm-dialog-button-green:hover, .fm-dialog-button.fm-dialog-button-green.active {
 	background-color: rgba(49,181,0,0.2);
 }
-.fm-add-user:hover span, .fm-add-user.active span, .fm-chat-file-button.primary-button:hover span, .fm-chat-file-button.primary-button.active span, .fm-verify:hover span, .fm-verify.active span, .fm-share-copy:hover span, .fm-share-copy.active span, .fm-new-folder:hover span, .fm-new-folder.active span, .create-folder-button:hover span, .create-folder-button.active span, .add-user-popup-button.add:hover span, .add-user-popup-button.add.active span, .fm-dialog-new-folder-button:hover span, .fm-dialog-new-folder-button.active span, .rename-dialog-button.rename:hover span, .rename-dialog-button.rename.active span, .fm-dialog-button.notifications-button:hover span, .fm-dialog-button.notifications-button.active span, .fm-dialog-button.links-button:hover span, .fm-dialog-button.links-button.active span, .fm-dialog-button.dialog-move-button:hover span, .fm-dialog-button.dialog-move-button.active span, .fm-dialog-button.dialog-newfolder-button:hover span, .fm-dialog-button.dialog-newfolder-button.active span, .fm-dialog-button.dialog-copy-button:hover span, .fm-dialog-button.dialog-copy-button.active span, .fm-dialog-button.notification-button.confirm:hover span, .fm-dialog-button.notification-button.confirm.active span, .contact-request-button.accept:hover span, .contact-request-button.accept.active span, .fm-dialog-button.fm-dialog-button-green:hover span, .fm-dialog-button.fm-dialog-button-green.active span  {
+.fm-add-user:hover span, .fm-add-user.active span, .fm-chat-file-button.primary-button:hover span, .fm-chat-file-button.primary-button.active span, .fm-verify:hover span, .fm-verify.active span, .fm-share-copy:hover span, .fm-share-copy.active span, .fm-new-folder:hover span, .fm-new-folder.active span, .create-folder-button:hover span, .create-folder-button.active span, .add-user-popup-button.add:hover span, .add-user-popup-button.add.active span, .fm-dialog-new-folder-button:hover span, .fm-dialog-new-folder-button.active span, .rename-dialog-button.rename:hover span, .rename-dialog-button.rename.active span, .fm-dialog-button.notifications-button:hover span, .fm-dialog-button.notifications-button.active span, .fm-dialog-button.links-button:hover span, .fm-dialog-button.links-button.active span, .fm-dialog-button.dialog-move-button:hover span, .fm-dialog-button.dialog-move-button.active span, .fm-dialog-button.dialog-newfolder-button:hover span, .fm-dialog-button.dialog-newfolder-button.active span, .fm-dialog-button.dialog-copy-button:hover span, .fm-dialog-button.dialog-copy-button.active span, .fm-dialog-button.notification-button.confirm:hover span, .fm-dialog-button.notification-button.confirm.active span, .contact-request-button.accept:hover span, .contact-request-button.accept.active span, .fm-dialog-button.fm-dialog-button-green:hover span, .fm-dialog-button.fm-dialog-button-green.active span {
 	color: rgba(49,181,0,1);
 }
 /* disabled */
@@ -11470,7 +11472,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
 	display: block;
 }
 .membership-notification {
-	font-size: 13px;
+	font-size: 12px;
 	line-height: 16px;
 	background-color: black;
 	-moz-border-radius: 4px;
@@ -22434,10 +22436,7 @@ background-color:#1DA2E9
 	-webkit-border-bottom-right-radius: 7px;
 	-moz-border-radius-bottomright: 7px;
 	border-bottom-right-radius: 7px;
-	padding-right: 6px;
-}
-.fm-mega-dialog-bottom > .fm-dialog-button {
-	margin-right: 2px;
+	padding-right: 12px;
 }
 /**
  * Start chat elements
@@ -22584,8 +22583,6 @@ a.top-login-forgot-pass {
 .tree-item-on-search-hidden {
 	display: none !important;
 }
-
-
 /** call feedback buttons in chat **/
 .fm-chat-messages-block .callfeedback-buttons {
 	display: inline-block;
@@ -22601,19 +22598,17 @@ a.top-login-forgot-pass {
 	-o-transition: opacity 200ms ease-in-out;
 	-ms-transition: opacity 200ms ease-in-out;
 	transition: opacity 200ms ease-in-out;
-
-	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
 	-moz-opacity: 0.7;
 	-khtml-opacity: 0.7;
 	opacity: 0.7;
 }
 .fm-chat-messages-block .callfeedback-buttons > a:hover {
-	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
 	-moz-opacity: 1;
 	-khtml-opacity: 1;
 	opacity: 1;
 }
-
 /** top header feedback button **/
 .feedback-button {
 	margin-left: 70px;
@@ -22630,73 +22625,89 @@ a.top-login-forgot-pass {
 	background-color: white;
 	padding-left: 24px;
 	background-repeat: no-repeat;
-
 	-webkit-transition: opacity 200ms ease-in-out;
 	-moz-transition: opacity 200ms ease-in-out;
 	-o-transition: opacity 200ms ease-in-out;
 	-ms-transition: opacity 200ms ease-in-out;
 	transition: opacity 200ms ease-in-out;
-
-	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 	-moz-opacity: 0.8;
 	-khtml-opacity: 0.8;
 	opacity: 0.8;
 }
 .feedback-button:hover {
-	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
 	-moz-opacity: 1;
 	-khtml-opacity: 1;
 	opacity: 1;
 }
-
 .feedback-dialog {
 	width: 420px;
 	z-index: 1200;
 }
-
 .feedback-dialog .content {
 	width: 100%;
 	overflow: auto;
 	padding-top: 10px;
 	padding-bottom: 10px;
 }
+.feedback-dialog .membership-notification {
+	width: 318px;
+	right:-42px;
+}
+.feedback-dialog .membership-notification {
+	width: 295px;
+}
 .feedback-dialog textarea {
-	width: 80%;
-	max-width: 80%;
+	width: 86%;
 	height: 60px;
 	margin: 0 auto;
 	display: block;
 	margin-top: 16px;
+	background-color: rgba(0,0,0,0.05);
+	height: 55px;
+	font-size: 12px;
+	line-height: 18px;
+	padding: 8px 12px;
+	-moz-border-radius: 6px;
+	-webkit-border-radius: 6px;
+	border-radius: 6px;
+	border: 0;
+	resize: none;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	line-height: 18px;
+	color: #999999;
+	margin-bottom: 4px;
 }
 .feedback-dialog .reply label {
-	width: 82%;
-	padding-top: 18px;
+	padding-right: 32px;
 }
 .feedback-dialog .rating {
-	width: 320px;
-	margin: 0 auto;
 	text-align: center;
+	padding-bottom: 6px;
 }
-
+.feedback-dialog label {
+	display: block;
+	float: none;
+	vertical-align: top;
+}
 .feedback-dialog .rating .rate.faded {
 	opacity: 0.3;
 }
 .feedback-dialog input[type="checkbox"] {
 	cursor: pointer;
 }
-
 .feedback-dialog .stats-button {
-	margin-top: 20px;
-	margin-left: -20px;
+	vertical-align: top;
 }
-
 .feedback-dialog .reply {
 	width: 390px;
 	min-height: 56px;
 	display: inline-block;
 	clear: both;
 }
-
 .feedback-dialog .reply .radio-txt {
 	margin-bottom: 4px;
 }
@@ -22705,50 +22716,36 @@ a.top-login-forgot-pass {
 	margin: 0 36px;
 	display: block;
 	border-radius: 4px;
-
-
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	background-color: white;
 	line-height: 18px;
-
 	font-size: 12px;
 	padding: 6px 10px 8px 10px;
-
 	border: 0;
-
 	background: rgba(0,0,0,0.3);
 	color: white;
 }
-
 .feedback-dialog .rating .rate {
 	display: inline-block;
 	width: 50px;
 	height: 50px;
 	border: 4px solid black;
 	background-color: white;
-	margin-right: 8px;
-	margin-left: 8px;
+	margin: 0 12px;
 	border-radius: 100%;
 	color: white;
-
-
 	background-repeat: no-repeat;
 	background-image: url(../images/mega/feedback/emotions.svg);
-
 	-webkit-transition: box-shadow 100ms ease-in-out, border-color 200ms ease-in-out, background-color 50ms ease-in-out, color 150ms ease-in-out, background-position 450ms ease, opacity 350ms ease-in-out;
 	-moz-transition: box-shadow 100ms ease-in-out, border-color 200ms ease-in-out, background-color 50ms ease-in-out, color 150ms ease-in-out, background-position 450ms ease, opacity 350ms ease-in-out;
 	-o-transition: box-shadow 100ms ease-in-out, border-color 200ms ease-in-out, background-color 50ms ease-in-out, color 150ms ease-in-out, background-position 450ms ease, opacity 350ms ease-in-out;
 	-ms-transition: box-shadow 100ms ease-in-out, border-color 200ms ease-in-out, background-color 50ms ease-in-out, color 150ms ease-in-out, background-position 450ms ease, opacity 350ms ease-in-out;
 	transition: box-shadow 100ms ease-in-out, border-color 200ms ease-in-out, background-color 50ms ease-in-out, color 150ms ease-in-out, background-position 450ms ease, opacity 350ms ease-in-out;
-
 	box-shadow: inset 0 0px 0px 0px rgba(0, 0, 0, 0.1), 0 1px 2px 1px rgba(0, 0, 0, 0.1);
 	opacity: 1;
 }
-
-
-
 .feedback-dialog .rating .rate.unhappy {
 	border-color: #FF1A53;
 	background-position: 10px 6px;
@@ -22765,15 +22762,12 @@ a.top-login-forgot-pass {
 	border-color: #13E03C;
 	background-position: -157px 6px;
 }
-
 .feedback-dialog .rating .rate.unhappy:hover, .feedback-dialog .rating .rate.unhappy.active {
 	box-shadow: inset -1px 0 1px 1px rgba(0, 0, 0, 0.1), 0 1px 2px 1px rgba(0, 0, 0, 0.1), 0 0 0 6px rgba(255, 26, 83, 0.1), 0 0 0 4px rgba(255, 26, 83, 0.4);
 	background-color: #FF1A53;
 	border-color: white;
 	color: white;
-
 	background-position: 10px -45px;
-
 	opacity: 1;
 }
 .feedback-dialog .rating .rate.neutral:hover, .feedback-dialog .rating .rate.neutral.active {
@@ -22782,7 +22776,6 @@ a.top-login-forgot-pass {
 	border-color: white;
 	color: white;
 	background-position: -44px -45px;
-
 	opacity: 1;
 }
 .feedback-dialog .rating .rate.happy:hover, .feedback-dialog .rating .rate.happy.active {
@@ -22791,7 +22784,6 @@ a.top-login-forgot-pass {
 	border-color: white;
 	color: white;
 	background-position: -101px -45px;
-
 	opacity: 1;
 }
 .feedback-dialog .rating .rate.awesome:hover, .feedback-dialog .rating .rate.awesome.active {
@@ -22800,20 +22792,18 @@ a.top-login-forgot-pass {
 	border-color: white;
 	color: white;
 	background-position: -157px -45px;
-
 	opacity: 1;
 }
-
 .collected-data-review-dialog {
-    z-index: 1250;
-    width: 70%;
+	z-index: 1250;
+	width: 70%;
 }
 .collected-data-review-dialog textarea {
-    display: block;
-    width: 99%;
-    min-height: 200px;
-    margin: 0 auto;
+	display: block;
+	width: 99%;
+	min-height: 200px;
+	margin: 0 auto;
 }
 .fm-chat-inline-dialog-button-sendFeedback {
-    margin-left: 4px;
+	margin-left: 4px;
 }

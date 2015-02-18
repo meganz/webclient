@@ -9054,7 +9054,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 }
 .fm-start-chat-dropdown {
 	left: auto;
-	right:-19px;
+	right: -14px;
 }
 .fm-add-contact-popup, .fm-send-files-popup, .fm-start-call-popup, .fm-chat-emotion-popup {
 	left: auto;

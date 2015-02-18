@@ -1424,7 +1424,7 @@ function MegaData()
 
                     var $userDiv = $this.parent().parent();
                     if($userDiv.is(".offline")) {
-                        $('.fm-chat-popup-button', m).addClass("disabled");
+                        $('.fm-chat-popup-button.start-audio, .fm-chat-popup-button.start-video', m).addClass("disabled");
                     }
 
                     $this.addClass('active');
@@ -1451,7 +1451,7 @@ function MegaData()
                 var $triggeredBy = $this.parent().data("triggeredBy");
                 var $userDiv = $triggeredBy.parent().parent();
 
-				if (!$this.is(".disabled") && !$userDiv.is(".offline")) {
+				if (!$this.is(".disabled")) {
                     var user_handle = $userDiv.attr('id').replace("contact_", "");
                     window.location = "#fm/chat/" + user_handle;
 				}

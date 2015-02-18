@@ -2391,7 +2391,7 @@ function MegaData()
             for (var i in $.selected)
                 selids[$.selected[i]] = 1;
 
-        for (var h in M.c[M.RubbishID])
+        for (var h in this.c[this.currentdirid])
         {
             if (!sel || selids[h])
             {
@@ -2406,7 +2406,7 @@ function MegaData()
         }
         var hasItems = false;
         if (sel)
-            for (var h in M.c[M.RubbishID]) {
+            for (var h in this.c[this.currentdirid]) {
                 hasItems = true;
                 break;
             }
@@ -2421,7 +2421,7 @@ function MegaData()
                 $('.fm-empty-trashbin').removeClass('hidden');
             }
         }
-        if (this.RubbishID == this.currentdirid)
+        if (this.RubbishID == this.currentrootid)
         {
             if (M.viewmode)
                 iconUI();

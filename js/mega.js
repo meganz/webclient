@@ -1389,7 +1389,6 @@ function MegaData()
             if (contacts[i].u === u_handle) { // don't show my own contact in the contact & conv. lists
                 continue;
             }
-
             var onlinestatus;
 
             if (!MegaChatDisabled) {
@@ -1402,21 +1401,41 @@ function MegaData()
                     + '"><div class="nw-contact-status"></div><div class="nw-contact-name">'
                     + htmlentities(contacts[i].name) + ' <a href="#" class="button start-chat-button"><span></span></a></div></div>';
             }
+			$('.fm-start-chat-dropdown').addClass('hidden');
         }
 
         $('.content-panel.contacts').html(html);
 
         if (!MegaChatDisabled) {
             megaChat.renderContactTree();
-
-            //TMP: temporary start chat button event handling
-            $('.fm-tree-panel').undelegate('.start-chat-button', 'click.megaChat');
+			
+			$('.fm-tree-panel').undelegate('.start-chat-button', 'click.megaChat');
             $('.fm-tree-panel').delegate('.start-chat-button', 'click.megaChat', function() {
-                var user_handle = $(this).parent().parent().attr('id').replace("contact_", "");
-                window.location = "#fm/chat/" + user_handle;
-
-                return false; // stop propagation!
+				var m = $('.fm-start-chat-dropdown'),
+					scrollPos = 0;
+				if ($(this).attr('class').indexOf('active') == -1) {
+				    if ($('.fm-tree-panel .jspPane')) scrollPos = $('.fm-tree-panel .jspPane').position().top;
+					$('.start-chat-button').removeClass('active');
+				    $(this).addClass('active');
+				    var y = $(this).closest('.nw-contact-item').position().top + 80 + scrollPos;
+				    m.css('top', y);
+				    m.removeClass('hidden').addClass('active');
+				} else {
+					$(this).removeClass('active');
+				    m.removeClass('active').addClass('hidden');	
+				}
+				
+				return false; // stop propagation!
             });
+			
+			$('.fm-chat-popup-button.start-chat').unbind('click');
+			$('.fm-chat-popup-button.start-chat').bind('click', function() {
+				if ($('.start-chat-button.active')) {
+                    var user_handle = $('.start-chat-button.active').closest('.nw-contact-item').attr('id').replace("contact_", "");
+                    window.location = "#fm/chat/" + user_handle;
+				} else $('.fm-start-chat-dropdown').removeClass('hidden').addClass('active');
+            });
+			
         }
 
         $('.fm-tree-panel').undelegate('.nw-contact-item', 'click');

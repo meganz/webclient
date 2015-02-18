@@ -873,8 +873,10 @@ function initUI() {
                 return false;
         }
 
-        $('.nw-sorting-menu').addClass('hidden')
-        $('.nw-tree-panel-arrows').removeClass('active')
+        $('.nw-sorting-menu').addClass('hidden');
+		$('.fm-start-chat-dropdown').addClass('hidden').removeClass('active');
+		$('.start-chat-button').removeClass('active');
+        $('.nw-tree-panel-arrows').removeClass('active');
         $('.context-menu-item.dropdown').removeClass('active');
         $('.fm-tree-header').removeClass('dragover');
         $('.nw-fm-tree-item').removeClass('dragover');

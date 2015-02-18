@@ -7,24 +7,36 @@
 }
 @font-face {
 	font-family: 'Open Sans Semibold';
-	src: url('../fonts/opensans-semibold-webfont.eot');
-	src: url('../fonts/opensans-semibold-webfont.eot?#iefix') format('embedded-opentype'), url('../fonts/opensans-semibold-webfont.woff') format('woff'), url('../fonts/opensans-semibold-webfont.ttf') format('truetype'), url('../fonts/opensans-semibold-webfont_v2.svg#open_sanssemibold') format('svg');
-	font-weight: normal;
-	font-style: normal;
+	src: url('../fonts/OpenSans-Semibold.eot');
+    src: url('../fonts/OpenSans-Semibold.eot?#iefix') format('embedded-opentype'),
+         url('../fonts/OpenSans-Semibold.woff2') format('woff2'),
+         url('../fonts/OpenSans-Semibold.woff') format('woff'),
+         url('../fonts/OpenSans-Semibold.ttf') format('truetype'),
+         url('../fonts/OpenSans-Semibold.svg#open_sanssemibold') format('svg');
+    font-weight: normal;
+    font-style: normal;
 }
 @font-face {
 	font-family: "Open Sans Semibold Italic";
-	src: url("../fonts/OpenSans-SemiboldItalic.eot");
-	src: url("../fonts/OpenSans-SemiboldItalic.eot?#iefix") format('embedded-opentype'), url("../fonts/OpenSans-SemiboldItalic.woff") format("woff"), url("../fonts/OpenSans-SemiboldItalic.ttf") format("truetype"), url("../fonts/OpenSans-SemiboldItalic_v2.svg#OpenSans-SemiboldItalic") format("svg");
-	font-weight: normal;
-	font-style: normal;
+	src: url('../fonts/OpenSans-SemiboldItalic.eot');
+    src: url('../fonts/OpenSans-SemiboldItalic.eot?#iefix') format('embedded-opentype'),
+         url('../fonts/OpenSans-SemiboldItalic.woff2') format('woff2'),
+         url('../fonts/OpenSans-SemiboldItalic.woff') format('woff'),
+         url('../fonts/OpenSans-SemiboldItalic.ttf') format('truetype'),
+         url('../fonts/OpenSans-SemiboldItalic.svg#open_sanssemibold_italic') format('svg');
+    font-weight: normal;
+    font-style: normal;
 }
 @font-face {
 	font-family: "Open Sans Light";
-	src: url("../fonts/OpenSans-Light.eot");
-	src: url("../fonts/OpenSans-Light.eot?#iefix") format('embedded-opentype'), url("../fonts/OpenSans-Light.woff") format("woff"), url("../fonts/OpenSans-Light.ttf") format("truetype"), url("../fonts/OpenSans-Light_v2.svg#OpenSans-Light") format("svg");
-	font-weight: normal;
-	font-style: normal;
+	src: url('../fonts/OpenSans-Light.eot');
+    src: url('../fonts/OpenSans-Light.eot?#iefix') format('embedded-opentype'),
+         url('../fonts/OpenSans-Light.woff2') format('woff2'),
+         url('../fonts/OpenSans-Light.woff') format('woff'),
+         url('../fonts/OpenSans-Light.ttf') format('truetype'),
+         url('../fonts/OpenSans-Light.svg#open_sanslight') format('svg');
+    font-weight: normal;
+    font-style: normal;
 }
 @font-face {
 	font-family: 'brandon_textbold_italic';
@@ -42,10 +54,14 @@
 }
 @font-face {
 	font-family: 'Open Sans Bold';
-	src: url('../fonts/opensans-bold-webfont.eot');
-	src: url('../fonts/opensans-bold-webfont.eot?#iefix') format('embedded-opentype'), url('../fonts/opensans-bold-webfont.woff') format('woff'), url('../fonts/opensans-bold-webfont.ttf') format('truetype'), url('../fonts/opensans-bold-webfont_v2.svg#open_sansbold') format('svg');
-	font-weight: normal;
-	font-style: normal;
+	src: url('../fonts/OpenSans-Bold.eot');
+    src: url('../fonts/OpenSans-Bold.eot?#iefix') format('embedded-opentype'),
+         url('../fonts/OpenSans-Bold.woff2') format('woff2'),
+         url('../fonts/OpenSans-Bold.woff') format('woff'),
+         url('../fonts/OpenSans-Bold.ttf') format('truetype'),
+         url('../fonts/OpenSans-Bold.svg#open_sansbold') format('svg');
+    font-weight: normal;
+    font-style: normal;
 }
 body, td, th {
 	font-family: 'Open Sans', Arial, Helvetica, sans-serif;
@@ -3460,6 +3476,10 @@ label.iPhoneCheckLabelOff span {
 	display: none;
 	position: relative;
 	cursor: pointer;
+	overflow: hidden;
+white-space: nowrap;
+-o-text-overflow: ellipsis;
+text-overflow: ellipsis;
 }
 .fm-contact-requests {
 	border-bottom: 1px solid #f6f6f6;
@@ -3932,7 +3952,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 	position: relative;
 	display: block;
 	font-size: 18px;
-	line-height: 32px;
+	line-height: 33px;
 	color: white;
 	text-align: center;
 	font-family: 'Open Sans Light';

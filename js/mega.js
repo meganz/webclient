@@ -2387,11 +2387,12 @@ function MegaData()
     {
         if (d) console.log('clearRubbish', sel);
         var selids = {};
+        var c = this.c[sel === false ? M.RubbishID : M.currentdirid];
         if (sel && $.selected)
             for (var i in $.selected)
                 selids[$.selected[i]] = 1;
 
-        for (var h in this.c[this.currentdirid])
+        for (var h in c)
         {
             if (!sel || selids[h])
             {
@@ -2406,7 +2407,7 @@ function MegaData()
         }
         var hasItems = false;
         if (sel)
-            for (var h in this.c[this.currentdirid]) {
+            for (var h in c) {
                 hasItems = true;
                 break;
             }

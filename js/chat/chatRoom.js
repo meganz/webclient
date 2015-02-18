@@ -256,16 +256,10 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
     $('.start-audio, .start-video', self.$header).unbind('click.megaChat');
 
     $('.start-audio', self.$header).bind('click.megaChat', function() {
-        self.options.mediaOptions.audio = true;
-        self.options.mediaOptions.video = false;
-
-        self._startCall();
+        self.startAudioCall();
     });
     $('.start-video', self.$header).bind('click.megaChat', function() {
-        self.options.mediaOptions.audio = true;
-        self.options.mediaOptions.video = true;
-
-        self._startCall();
+        self.startVideoCall();
     });
 
 
@@ -3329,4 +3323,21 @@ ChatRoom.prototype.cancelAttachment = function(messageId, nodeId) {
 
         $('.nw-chat-button', $container).remove();
     }
+};
+
+
+ChatRoom.prototype.startAudioCall = function() {
+    var self = this;
+    self.options.mediaOptions.audio = true;
+    self.options.mediaOptions.video = false;
+
+    self._startCall();
+};
+
+ChatRoom.prototype.startVideoCall = function() {
+    var self = this;
+    self.options.mediaOptions.audio = true;
+    self.options.mediaOptions.video = true;
+
+    self._startCall();
 };

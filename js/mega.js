@@ -1408,33 +1408,107 @@ function MegaData()
             if (contacts[i].u === u_handle) { // don't show my own contact in the contact & conv. lists
                 continue;
             }
-
             var onlinestatus;
 
             if (!MegaChatDisabled) {
                 onlinestatus = M.onlineStatusClass(megaChat.karere.getPresence(megaChat.getJidFromNodeId(contacts[i].u)));
             } else {
-                onlinestatus = "offline";
+                onlinestatus = ['Offline', 'offline'];
             }
             if (!treesearch || (treesearch && contacts[i].name && contacts[i].name.toLowerCase().indexOf(treesearch.toLowerCase()) > -1)) {
                 html += '<div class="nw-contact-item ' + onlinestatus[1] + '" id="contact_' + htmlentities(contacts[i].u)
                     + '"><div class="nw-contact-status"></div><div class="nw-contact-name">'
                     + htmlentities(contacts[i].name) + ' <a href="#" class="button start-chat-button"><span></span></a></div></div>';
             }
+			$('.fm-start-chat-dropdown').addClass('hidden');
         }
 
         $('.content-panel.contacts').html(html);
 
         if (!MegaChatDisabled) {
             megaChat.renderContactTree();
-
-            //TMP: temporary start chat button event handling
-            $('.fm-tree-panel').undelegate('.start-chat-button', 'click.megaChat');
+			
+			$('.fm-tree-panel').undelegate('.start-chat-button', 'click.megaChat');
             $('.fm-tree-panel').delegate('.start-chat-button', 'click.megaChat', function() {
-                var user_handle = $(this).parent().parent().attr('id').replace("contact_", "");
-                window.location = "#fm/chat/" + user_handle;
+				var m = $('.fm-start-chat-dropdown'),
+					scrollPos = 0;
 
-                return false; // stop propagation!
+                var $this = $(this);
+
+				if (!$this.is(".active")) {
+				    if ($('.fm-tree-panel .jspPane')) scrollPos = $('.fm-tree-panel .jspPane').position().top;
+					$('.start-chat-button').removeClass('active');
+
+                    $('.fm-chat-popup-button', m).removeClass("disabled");
+
+                    var $userDiv = $this.parent().parent();
+                    if($userDiv.is(".offline")) {
+                        $('.fm-chat-popup-button.start-audio, .fm-chat-popup-button.start-video', m).addClass("disabled");
+                    }
+
+                    $this.addClass('active');
+				    var y = $this.closest('.nw-contact-item').position().top + 80 + scrollPos;
+				    m
+                        .css('top', y)
+                        .removeClass('hidden')
+                        .addClass('active')
+                        .data("triggeredBy", $this);
+				} else {
+					$this.removeClass('active');
+				    m
+                        .removeClass('active')
+                        .addClass('hidden')
+                        .removeData("triggeredBy");
+				}
+				
+				return false; // stop propagation!
+            });
+			
+			$('.fm-chat-popup-button.start-chat').unbind('click.treePanel');
+			$('.fm-chat-popup-button.start-chat').bind('click.treePanel', function() {
+                var $this = $(this);
+                var $triggeredBy = $this.parent().data("triggeredBy");
+                var $userDiv = $triggeredBy.parent().parent();
+
+				if (!$this.is(".disabled")) {
+                    var user_handle = $userDiv.attr('id').replace("contact_", "");
+                    window.location = "#fm/chat/" + user_handle;
+				}
+            });
+
+            $('.fm-chat-popup-button.start-audio').unbind('click.treePanel');
+			$('.fm-chat-popup-button.start-audio').bind('click.treePanel', function() {
+                var $this = $(this);
+                var $triggeredBy = $this.parent().data("triggeredBy");
+                var $userDiv = $triggeredBy.parent().parent();
+
+                if (!$this.is(".disabled") && !$userDiv.is(".offline")) {
+                    var user_handle = $userDiv.attr('id').replace("contact_", "");
+
+                    window.location = "#fm/chat/" + user_handle;
+                    var room = megaChat.createAndShowPrivateRoomFor(user_handle);
+                    if(room) {
+                        room.startAudioCall();
+                    }
+				}
+            });
+
+
+            $('.fm-chat-popup-button.start-video').unbind('click.treePanel');
+			$('.fm-chat-popup-button.start-video').bind('click.treePanel', function() {
+                var $this = $(this);
+                var $triggeredBy = $this.parent().data("triggeredBy");
+                var $userDiv = $triggeredBy.parent().parent();
+
+                if (!$this.is(".disabled") && !$userDiv.is(".offline")) {
+                    var user_handle = $userDiv.attr('id').replace("contact_", "");
+
+                    window.location = "#fm/chat/" + user_handle;
+                    var room = megaChat.createAndShowPrivateRoomFor(user_handle);
+                    if(room) {
+                        room.startVideoCall();
+                    }
+				}
             });
         }
 
@@ -2402,11 +2476,12 @@ function MegaData()
     {
         if (d) console.log('clearRubbish', sel);
         var selids = {};
+        var c = this.c[sel === false ? M.RubbishID : M.currentdirid];
         if (sel && $.selected)
             for (var i in $.selected)
                 selids[$.selected[i]] = 1;
 
-        for (var h in M.c[M.RubbishID])
+        for (var h in c)
         {
             if (!sel || selids[h])
             {
@@ -2421,7 +2496,7 @@ function MegaData()
         }
         var hasItems = false;
         if (sel)
-            for (var h in M.c[M.RubbishID]) {
+            for (var h in c) {
                 hasItems = true;
                 break;
             }
@@ -2436,7 +2511,7 @@ function MegaData()
                 $('.fm-empty-trashbin').removeClass('hidden');
             }
         }
-        if (this.RubbishID == this.currentdirid)
+        if (this.RubbishID == this.currentrootid)
         {
             if (M.viewmode)
                 iconUI();

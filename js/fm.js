@@ -873,8 +873,10 @@ function initUI() {
                 return false;
         }
 
-        $('.nw-sorting-menu').addClass('hidden')
-        $('.nw-tree-panel-arrows').removeClass('active')
+        $('.nw-sorting-menu').addClass('hidden');
+		$('.fm-start-chat-dropdown').addClass('hidden').removeClass('active');
+		$('.start-chat-button').removeClass('active');
+        $('.nw-tree-panel-arrows').removeClass('active');
         $('.context-menu-item.dropdown').removeClass('active');
         $('.fm-tree-header').removeClass('dragover');
         $('.nw-fm-tree-item').removeClass('dragover');
@@ -2266,7 +2268,7 @@ function initContextUI()
     $(c + '.clearbin-item').unbind('click');
     $(c + '.clearbin-item').bind('click', function(event)
     {
-        doClearbin();
+        doClearbin(true);
     });
 
     $(c + '.move-up').unbind('click');
@@ -2568,16 +2570,17 @@ function fmtopUI() {
     }
     $('.fm-clearbin-button').unbind('click');
     $('.fm-clearbin-button').bind('click', function() {
-        doClearbin();
+        doClearbin(false);
     });
 }
 
-function doClearbin()
+function doClearbin(selected)
 {
     msgDialog('clear-bin', l[14], l[15], l[1007], function(e)
     {
-        if (e)
-            M.clearRubbish(!!($.selected || []).length);
+        if (e) {
+			M.clearRubbish(selected);
+		}
     });
 }
 

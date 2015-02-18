@@ -2357,7 +2357,7 @@ Chat.prototype.generatePrivateRoomName = function(jids) {
         roomName = roomName + jid.split("@")[0];
     });
 
-    roomName = base32.encode(asmCrypto.SHA256.hex(roomName).substr(0, 32))
+    roomName = base32.encode(asmCrypto.SHA256.hex(roomName).substr(0, 16));
     return roomName;
 };
 
@@ -2674,5 +2674,10 @@ Chat.prototype.getPrivateRoom = function(h) {
     return found;
 };
 
+
+Chat.prototype.createAndShowPrivateRoomFor = function(h) {
+    chatui(h);
+    return this.getPrivateRoom(h);
+};
 
 window.megaChat = new Chat();

@@ -1,7 +1,7 @@
 @font-face {
 	font-family: 'Open Sans';
 	src: url('../fonts/opensans-regular.eot');
-	src: url('../fonts/opensans-regular.eot?#iefix') format('embedded-opentype'),  url('../fonts/opensans-regular.woff2') format('woff2'),  url('../fonts/opensans-regular.woff') format('woff'),  url('../fonts/opensans-regular.ttf') format('truetype'),  url('../fonts/opensans-regular.svg#open_sansregular') format('svg');
+	src: url('../fonts/opensans-regular.eot?#iefix') format('embedded-opentype'), url('../fonts/opensans-regular.woff2') format('woff2'), url('../fonts/opensans-regular.woff') format('woff'), url('../fonts/opensans-regular.ttf') format('truetype'), url('../fonts/opensans-regular.svg#open_sansregular') format('svg');
 	font-weight: normal;
 	font-style: normal;
 }
@@ -7603,11 +7603,11 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	background-color: white;
-	line-height: 18px;
+	line-height: 31px;
 	margin-top: 0;
 	font-size: 12px;
 	color: #666666;
-	padding: 6px 10px 8px 42px;
+	padding: 0 10px 0 42px;
 	margin: 0;
 	background-image: url(../images/mega/dialogs-sprite_v2.svg);
 	background-position: 3px -1890px;
@@ -7722,7 +7722,7 @@ color: white;
 	margin: 10px 0 0 0;
 }
 .fm-account-input input {
-	padding: 6px 10px 8px 10px;
+	padding: 0 10px 0 10px;
 	background-image: none;
 }
 .fm-account-select, .fm-version-select {
@@ -8134,7 +8134,6 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	cursor: pointer;
-	
 }
 .current-user-video-container, .current-user-audio-container {
 	bottom: 12px;
@@ -12430,7 +12429,7 @@ table {
 }
 .fm-account-change-avatar, .fm-account-save, .fm-account-cancel {
 	height: 28px;
-	line-height: 26px;
+	line-height: 27px;
 	background-color: #D52600;
 	color: white;
 	float: left;
@@ -12486,6 +12485,7 @@ table {
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
+	padding-top: 2px;
 }
 .fm-accout-inputs-blocks {
 	float: left;
@@ -19917,16 +19917,16 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
 	position: relative;
 	cursor: pointer;
 	max-width: 140px;
-overflow: hidden;
-white-space: nowrap;
--o-text-overflow: ellipsis;
-text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
+	-o-text-overflow: ellipsis;
+	text-overflow: ellipsis;
 }
 .import-contacts-link:hover, .import-contacts-link.active {
 	color: rgb(102,102,102);
 }
 .import-contacts-dialog .import-contacts-link {
-	max-width:none;
+	max-width: none;
 }
 .import-contacts-link span {
 	position: absolute;
@@ -20479,7 +20479,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 	left: 0;
 	top: 0;
 }
-
 .video-full-container.full-mode {
 	overflow: hidden;
 }
@@ -20539,37 +20538,42 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 .video-call-border, .video-call-button span {
 	width: 32px;
 	height: 32px;
-	display:block;
-	position:absolute;
+	display: block;
+	position: absolute;
 	background-image: url(../images/mega/nw-fm-sprite_v3.svg);
 	background-repeat: no-repeat;
-	z-index:10;
+	z-index: 10;
 }
 .video-call-border {
-	height:32px;
-	width:32px;
-	left:50%;
-	top:50%;
-	margin:-16px 0 0 -16px;
+	height: 32px;
+	width: 32px;
 	-webkit-transition: all 200ms ease-in-out;
 	-moz-transition: all 200ms ease-in-out;
 	-o-transition: all 200ms ease-in-out;
 	-ms-transition: all 200ms ease-in-out;
-	transition: all 200ms ease-in-out, background-color 200ms ease-in-out;
+	transition: all 200ms ease-in-out;
 	background-image: none;
 	background-repeat: no-repeat;
-	-webkit-background-clip: padding-box;
-	-moz-background-clip: padding-box;
-	background-clip: padding-box;
 	-moz-border-radius: 100%;
 	-webkit-border-radius: 100%;
 	border-radius: 100%;
-	z-index:1;
+	z-index: 1;
+	position: static;
 	background-color: rgba(255,255,255,0.8);
+	-webkit-transform: scale( 1 );
+	-moz-transform: scale( 1 );
+	-o-transform: scale( 1 );
+	-ms-transform: scale( 1 );
+	transform: scale( 1 );
 }
-
 .video-call-button:hover .video-call-border {
 	background-color: rgba(255,255,255,1);
+	-webkit-transform: scale( 1.12 );
+	-moz-transform: scale( 1.12 );
+	-o-transform: scale( 1.12 );
+	-ms-transform: scale( 1.12 );
+	transform: scale( 1.12 );
+	vertical-align: middle;
 }
 .video-call-button.hang-up-icon .video-call-border {
 	background-color: rgba(217,0,7,0.8);
@@ -20666,7 +20670,6 @@ fm-right-header .video-controls {
 	position: relative;
 	border: 0;
 }
-
 .video-controls .video-size-button {
 	height: 48px;
 	width: 48px;

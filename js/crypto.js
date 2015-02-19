@@ -1169,8 +1169,7 @@ function getsc(fm)
                     if (ctx.fm)
                     {
                         mDBloaded=true;
-                        renderfm();
-                        notifyPopup.pollNotifications();
+                        loadfm_done();
                     }
                 }
                 if (res.w)

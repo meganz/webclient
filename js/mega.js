@@ -622,10 +622,10 @@ function MegaData()
                 </tr>';
 
                 $(t).append(html);
-                
+
                 drawn = true;
             }
-            
+
             if (drawn) {
 				$('.fm-empty-contacts').addClass('hidden');
                 // Hide received grids
@@ -1408,7 +1408,7 @@ function MegaData()
 
         if (!MegaChatDisabled) {
             megaChat.renderContactTree();
-			
+
 			$('.fm-tree-panel').undelegate('.start-chat-button', 'click.megaChat');
             $('.fm-tree-panel').delegate('.start-chat-button', 'click.megaChat', function() {
 				var m = $('.fm-start-chat-dropdown'),
@@ -1441,10 +1441,10 @@ function MegaData()
                         .addClass('hidden')
                         .removeData("triggeredBy");
 				}
-				
+
 				return false; // stop propagation!
             });
-			
+
 			$('.fm-chat-popup-button.start-chat').unbind('click.treePanel');
 			$('.fm-chat-popup-button.start-chat').bind('click.treePanel', function() {
                 var $this = $(this);
@@ -1473,7 +1473,6 @@ function MegaData()
                     }
 				}
             });
-
 
             $('.fm-chat-popup-button.start-video').unbind('click.treePanel');
 			$('.fm-chat-popup-button.start-video').bind('click.treePanel', function() {
@@ -4078,7 +4077,7 @@ function renderfm()
     }
 
     M.openFolder(M.currentdirid);
-    if (!MegaChatDisabled) {
+    if (!MegaChatDisabled && megaChat.is_initialized) {
         megaChat.renderContactTree();
         megaChat.renderMyStatus();
     }
@@ -4571,35 +4570,21 @@ function fm_commitkeyupdate()
 
 function loadfm()
 {
-    fminitialized = false;
-    loadingDialog.show();
-    loadfmdata();
-
-}
-function loadfmdata() {
-    if(loadfmdata.isLoading) {
-        //console.error("Already loading fmdata");
-        return;
+    if (loadfm.loaded) {
+        Soon(loadfm_done.bind(this, pfkey));
     } else {
-        //console.error("Will start loading fmdata");
-    }
-
-    loadfmdata.isLoading = true;
-    api_req({a: 'f', c: 1, r: 1}, {
-        callback: function() {
-            loadfmdata.isLoading = false;
-
-            M.reset(); // clear JUST before the new data is parsed.
-
-            loadfm_callback.apply(this, arguments);
+        if (is_fm()) {
+            loadingDialog.show();
         }
-    }, n_h ? 1 : 0);
-};
-loadfmdata.isLoading = false;
-
-
-function is_fm_data_loaded() {
-    return Object.keys(M.d).length > 0;
+        if (!loadfm.loading) {
+            M.reset();
+            fminitialized = false;
+            loadfm.loading = true;
+            api_req({a:'f',c:1,r:1},{
+                callback : loadfm_callback
+            },n_h ? 1 : 0);
+        }
+    }
 }
 
 function RightsbyID(id)
@@ -5265,6 +5250,12 @@ function init_chat() {
         if(u_type && !megaChat.is_initialized) {
             if (d) console.log('Initializing the chat...');
             megaChat.init();
+            if (fminitialized) {
+                Soon(function() {
+                    megaChat.renderContactTree();
+                    megaChat.renderMyStatus();
+                });
+            }
         }
     }
     if(!MegaChatDisabled) {
@@ -5325,11 +5316,7 @@ function loadfm_callback(res)
             localStorage[u_handle + '_maxaction'] = maxaction;
         }
 
-        loadfm_rendering_cb();
-
-        if (!pfkey) {
-            notifyPopup.pollNotifications();
-        }
+        loadfm_done(pfkey);
 
         if (res.cr) {
             crypto_procmcr(res.cr);
@@ -5342,11 +5329,20 @@ function loadfm_callback(res)
     });
 }
 
-function loadfm_rendering_cb() {
+function loadfm_done(pfkey) {
+    loadfm.loaded = Date.now();
+    loadfm.loading = false;
+
     init_chat();
 
-    if(is_fm() || $('.fm-main.default').is(":visible")) { // are we actually on an #fm/* page?
+    // are we actually on an #fm/* page?
+    if (is_fm() || $('.fm-main.default').is(":visible")) {
         renderfm();
+    }
+    loadingDialog.hide();
+
+    if (!pfkey) {
+        notifyPopup.pollNotifications();
     }
 }
 

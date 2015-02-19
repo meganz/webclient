@@ -14436,7 +14436,6 @@ h5.main-italic-header {
 }
 .new-download-gray-button {
 	background-color: rgba(0,0,0,0.70);
-	display: none;
 }
 .logged-in .new-download-gray-button {
 	display: block;

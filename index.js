@@ -174,7 +174,7 @@ function init_page()
 	if (!$.mcImport) closeDialog();
 
 	var fmwasinitialized = !!fminitialized;
-	if (u_handle) {
+	if (u_handle || pfid || folderlink) {
 
 		if (is_fm()) {
 			// switch between FM & folderlinks (completely reinitialize)

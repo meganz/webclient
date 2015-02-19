@@ -2617,6 +2617,9 @@ function MegaData()
                     }
                     rendernew();
                 }
+                if (typeof res === 'number' && res < 0) {
+                    return msgDialog('warninga', l[135], l[47], api_strerror(res));
+                }
                 if (ctx.del) {
                     var j = [];
                     for (var i in ctx.cn) {
@@ -4786,7 +4789,7 @@ function createfolder(toid, name, ulparams)
             ulparams: ulparams,
             callback: function(res, ctx)
             {
-                if (typeof res != 'number')
+                if (typeof res !== 'number')
                 {
                     $('.fm-new-folder').removeClass('active');
                     $('.create-new-folder').addClass('hidden');
@@ -4798,6 +4801,10 @@ function createfolder(toid, name, ulparams)
                     loadingDialog.hide();
                     if (ctx.ulparams)
                         ulparams.callback(ctx.ulparams, res.f[0].h);
+                }
+                else {
+                    loadingDialog.hide();
+                    msgDialog('warninga', l[135], l[47], api_strerror(res));
                 }
             }
         });

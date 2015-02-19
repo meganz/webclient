@@ -2,7 +2,7 @@ window.URL = window.URL || window.webkitURL;
 var have_ab = typeof ArrayBuffer != 'undefined' && typeof DataView != 'undefined';
 var use_workers = have_ab && typeof Worker != 'undefined';
 
-if (is_extension)
+if (is_extension || +localStorage.use_ssl === 0)
 {
     var use_ssl = 0;
 }
@@ -14,15 +14,6 @@ else
         have_ab=false;
     }
 
-    var ssl_off = [ 'Firefox/14', 'Firefox/15', 'Firefox/17', 'Safari', 'Firefox/16' ];
-    var ssl_opt = [ 'Chrome/' ];
-
-    function ssl_needed()
-    {
-        for (var i = ssl_opt.length; i--; ) if (navigator.userAgent.indexOf(ssl_opt[i]) >= 0) return 0;
-        for (var i = ssl_off.length; i--; ) if (navigator.userAgent.indexOf(ssl_off[i]) >= 0) return -1;
-        return 1;
-    }
     var use_ssl = ssl_needed();
     if (!use_ssl && localStorage.use_ssl) use_ssl = 1;
     else use_ssl++;
@@ -59,6 +50,15 @@ var ETOOMANYCONNECTIONS = -19;
 
 // custom errors
 var ETOOERR = -400;
+
+function ssl_needed()
+{
+    var ssl_opt = [ 'Chrome/' ];
+    var ssl_off = [ 'Firefox/14', 'Firefox/15', 'Firefox/17', 'Safari', 'Firefox/16' ];
+    for (var i = ssl_opt.length; i--; ) if (navigator.userAgent.indexOf(ssl_opt[i]) >= 0) return 0;
+    for (var i = ssl_off.length; i--; ) if (navigator.userAgent.indexOf(ssl_off[i]) >= 0) return -1;
+    return 1;
+}
 
 function benchmark()
 {

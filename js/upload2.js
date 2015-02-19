@@ -67,6 +67,7 @@ function ul_deduplicate(File, identical) {
 		return ul_start(File)
 	} else if (M.h[uq.hash]) {
 		n = M.d[M.h[uq.hash][0]];
+		identical = n;
 	}
 	if (!n) return ul_start(File);
 	DEBUG(File.file.name, "ul_deduplicate", n)
@@ -984,8 +985,6 @@ function resetUploadDownload() {
 
 	Later(percent_megatitle);
 }
-
-if (localStorage.ul_skipIdentical) ul_skipIdentical= parseInt(localStorage.ul_skipIdentical);
 
 ulQueue.poke = function(file, meth)
 {

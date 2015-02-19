@@ -1340,6 +1340,7 @@ function MegaData()
             window.location.hash = '#fm/' + M.currentdirid;
         }
         searchPath();
+        treesearchUI();
         $(document).trigger('MegaOpenFolder');
     };
 

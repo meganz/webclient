@@ -54,14 +54,6 @@ function startMega()
 	}
 	jsl=[];
 	init_page();
-
-	if(u_handle && loadfmdata.isLoading === false) {
-		if(!is_fm_data_loaded()) {
-			loadfmdata();
-		} else {
-			init_chat();
-		}
-	}
 }
 
 function mainScroll()
@@ -181,6 +173,34 @@ function init_page()
 
 	if (!$.mcImport) closeDialog();
 
+	var fmwasinitialized = !!fminitialized;
+	if (u_type === 3) {
+
+		if (is_fm()) {
+			// switch between FM & folderlinks (completely reinitialize)
+			if ((!pfid && folderlink) || (pfid && folderlink === 0))
+			{
+				M.reset();
+				folderlink=0;
+				fminitialized=false;
+				loadfm.loaded = false;
+				if (typeof mDBcls === 'function') {
+					mDBcls();
+				}
+				notifyPopup.notifications = null;
+			}
+		}
+
+		if (!fminitialized) {
+			if (typeof mDB !== 'undefined' && !pfid) {
+			throw 'fix me'; // TODO
+				mDBstart();
+			} else {
+				loadfm();
+			}
+		}
+	}
+
     if (page.substr(0, 7) == 'voucher')
 	{
 		loadingDialog.show();
@@ -218,10 +238,10 @@ function init_page()
 			}
 			else document.location.hash='fm/account';
 		}});
-    
+
 		return false;
 	}
-    
+
 	if (localStorage.voucher && u_type !== false)
 	{
 		api_req({ a: 'uavr', v: localStorage.voucher },
@@ -233,10 +253,10 @@ function init_page()
                 }
 			}
 		});
-        
+
 		delete localStorage.voucher;
 	}
-    
+
 	if (page.substr(0, 10) == 'blogsearch')
 	{
 		blogsearch = decodeURIComponent(page.substr(11,page.length-2));
@@ -277,7 +297,7 @@ function init_page()
 	else if (page.substr(0,5) == 'page_')
 	{
 		var cpage = decodeURIComponent(page.substr(5,page.length-2));
-		 
+
 		function doRenderCMSPage()
 		{
 			loadingDialog.show();
@@ -311,37 +331,37 @@ function init_page()
 		parsepage(pages['blog']);
 		init_blog();
 	}
-    
+
     // If user has been invited to join MEGA and they are not already registered
     else if (page.substr(0,9) == 'newsignup') {
-        
+
         // Get the email and hash checksum from after the #newsignup tag
         var emailAndHash = page.substr(9);
         var emailAndHashDecoded = base64urldecode(emailAndHash);
-                
+
         // Separate the email and checksum portions
         var endOfEmailPosition = emailAndHashDecoded.length - 8;
         var email = emailAndHashDecoded.substring(0, endOfEmailPosition);
         var hashChecksum = emailAndHashDecoded.substring(endOfEmailPosition);
-        
+
         // Hash the email address
         var hashBytes = asmCrypto.SHA512.bytes(email);
-        
+
         // Convert the first 8 bytes of the email to a Latin1 string for comparison
         var byteString = '';
         for (var i=0; i < 8; i++) {
             byteString += String.fromCharCode(parseInt(hashBytes[i]));
         }
-        
+
         // Unset registration email
         localStorage.removeItem('registeremail');
-        
+
         // If the checksum matches, redirect to #register page
         if (hashChecksum === byteString) {
-            
+
             // Store in the localstorage as this gets pre-populated into the register form
             localStorage.registeremail = email;
-            
+
             // Redirect to the register page
             removeHash();
             location.hash = '#register';
@@ -350,7 +370,7 @@ function init_page()
             // Redirect to the register page
             removeHash();
             location.hash = '#register';
-            
+
             // Show message
             alert('We can\'t decipher your invite link, please check you copied the link correctly, or sign up manually with the same email address.');
         }
@@ -586,24 +606,24 @@ function init_page()
 		$('.team-person-block').removeClass('first');
 		var html = '';
 		var a = 4;
-        
+
 		$('.team-person-block').sort(function() {
             return (Math.round(Math.random()) - 0.5);
         })
         .each(function(i, element)
-		{            
+		{
 			if (a == 4)
 			{
 				html += element.outerHTML.replace('team-person-block', 'team-person-block first');
 				a=0;
 			}
-			else 
-            {  
+			else
+            {
                 html += element.outerHTML;
             }
 			a++;
 		});
-                
+
 		$('#emailp').html($('#emailp').text().replace('jobs@mega.co.nz','<a href="mailto:jobs@mega.co.nz">jobs@mega.co.nz</a>'));
 		$('.new-bottom-pages.about').html(html + '<div class="clear"></div>');
 		mainScroll();
@@ -736,17 +756,8 @@ function init_page()
             }
 		}
 
-		if (!id && fminitialized) id = M.RootID;
+		if (!id && fmwasinitialized) id = M.RootID;
 
-		// switch between FM & folderlinks (completely reinitialize)
-		if ((!pfid && folderlink) || (pfid && folderlink === 0))
-		{
-			M.reset();
-			folderlink=0;
-			fminitialized=false;
-			mDBcls();
-			notifyPopup.notifications = null;
-		}
 		if (!fminitialized) {
 			if (id) {
                 M.currentdirid = id;
@@ -754,16 +765,6 @@ function init_page()
 			if (!m && $('#fmholder').html() == '') {
                 $('#fmholder').html( translate(pages['fm'].replace(/{staticpath}/g,staticpath)));
             }
-			if (typeof mDB !== 'undefined' && !pfid) {
-                mDBstart();
-            } else {
-				if(!is_fm_data_loaded()) {
-					loadfm();
-				} else {
-					loadfm_rendering_cb();
-				}
-            }
-			andreiScripts();
 			if (pfid) {
 				$('.fm-left-menu .folderlink').removeClass('hidden');
 				$('.fm-tree-header.cloud-drive-item span').text(l[808]);
@@ -1011,7 +1012,7 @@ function mLogout()
             {
                 // After the API call, clear other data and reload page
                 u_logout(true);
-                document.location.reload(); 
+                document.location.reload();
             }});
 		}
 	};
@@ -1125,7 +1126,7 @@ function topmenuUI() {
                 $('.top-warning-popup').removeClass('active');
                 document.location.hash = 'register';
             });
-	    
+
 	    	if(isNonActivatedAccount()) {
                 showNonActivatedAccountDialog();
 	    	}
@@ -1171,11 +1172,11 @@ function topmenuUI() {
     }
 
     $('.top-menu-arrow').css('margin-right', $('.top-menu-icon').width() / 2 + 'px');
-        
+
     $.hideTopMenu = function(e) {
-        
+
 		var c;
-        
+
 		if (e) c = $(e.target).attr('class');
 		if (!e || ($(e.target).parents('.membership-popup').length == 0 && ((c && c.indexOf('membership-status') == -1) || !c)) || (c && c.indexOf('membership-button') > -1))
 		{
@@ -1221,7 +1222,7 @@ function topmenuUI() {
 			$('.add-user-popup').removeAttr('style');
 		}
 	};
-    
+
 	$('#pageholder').unbind('click');
 	$('#pageholder').bind('click',function(e)
 	{
@@ -1520,7 +1521,7 @@ function topmenuUI() {
 	if (u_type) {
         $('.membership-popup-arrow').css('margin-right',$('.top-menu-icon').width()+$('.membership-status-block').width()/2+57+'px');
     }
-    
+
 	notifyPopup.initNotifications();
 }
 

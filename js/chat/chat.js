@@ -2553,7 +2553,8 @@ Chat.prototype.getBoshServiceUrl = function() {
         $.get("https://" + self.options.loadbalancerService + "/?service=xmpp")
             .done(function(r) {
                 if(r.xmpp && r.xmpp.length > 0) {
-                    $promise.resolve("https://" + r.xmpp[0].host + ":" + r.xmpp[0].port + "/bosh");
+                    var randomHost = array_random(r.xmpp);
+                    $promise.resolve("https://" + randomHost.host + ":" + randomHost.port + "/bosh");
                 } else {
                     var server = array_random(self.options.fallbackXmppServers);
                     self.logger.error("Got empty list from the load balancing service for xmpp, will fallback to: " + server + ".");

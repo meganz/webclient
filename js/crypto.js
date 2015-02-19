@@ -1169,8 +1169,7 @@ function getsc(fm)
                     if (ctx.fm)
                     {
                         mDBloaded=true;
-                        renderfm();
-                        notifyPopup.pollNotifications();
+                        loadfm_done();
                     }
                 }
                 if (res.w)
@@ -3091,6 +3090,55 @@ function crypto_share_rsa2aes()
         api_req({ a : 'k', sr : rsr });
         rsasharekeys = {};
     }
+}
+
+function api_strerror(errno)
+{
+    switch(errno)
+    {
+        case 0:
+            return "No error";
+        case EINTERNAL:
+            return "Internal error";
+        case EARGS:
+            return "Invalid argument";
+        case EAGAIN:
+            return "Request failed, retrying";
+        case ERATELIMIT:
+            return "Rate limit exceeded";
+        case EFAILED:
+            return "Failed permanently";
+        case ETOOMANY:
+            return "Too many concurrent connections or transfers";
+        case ERANGE:
+            return "Out of range";
+        case EEXPIRED:
+            return "Expired";
+        case ENOENT:
+            return "Not found";
+        case ECIRCULAR:
+            return "Circular linkage detected";
+        case EACCESS:
+            return "Access denied";
+        case EEXIST:
+            return "Already exists";
+        case EINCOMPLETE:
+            return "Incomplete";
+        case EKEY:
+            return "Invalid key/Decryption error";
+        case ESID:
+            return "Bad session ID";
+        case EBLOCKED:
+            return "Blocked";
+        case EOVERQUOTA:
+            return "Over quota";
+        case ETEMPUNAVAIL:
+            return "Temporarily not available";
+        case ETOOMANYCONNECTIONS:
+            return "Connection overflow";
+        default:break;
+    }
+    return "Unknown error (" + errno + ")";
 }
 
 (function __FileFingerprint(scope) {

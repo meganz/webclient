@@ -2360,8 +2360,8 @@ function generateAnonymousReport() {
         report.apireqbackoffs = apireqHaveBackOffs;
     }
 
-    report.hadLoadedRsaKeys = Object.keys(u_authring.RSA).length > 0;
-    report.hadLoadedEd25519Keys = Object.keys(u_authring.Ed25519).length > 0;
+    report.hadLoadedRsaKeys = u_authring.RSA && Object.keys(u_authring.RSA).length > 0;
+    report.hadLoadedEd25519Keys = u_authring.Ed25519 && Object.keys(u_authring.Ed25519).length > 0;
     report.totalDomElements = $("*").length;
     report.totalScriptElements = $("script").length;
 

@@ -974,6 +974,7 @@ function resetUploadDownload() {
 		panelDomQueue = {};
 		GlobalProgress = {};
 		delete $.transferprogress;
+		fmUpdateCount();
 		if ($.mTransferAnalysis)
 		{
 			clearInterval($.mTransferAnalysis);

@@ -40,10 +40,30 @@ var maxaction;
 var zipid = 1;
 
 function fmUpdateCount() {
-    var i = 0;
+    var i = 0, u = 0;
     $('.transfer-table span.row-number').each(function() {
-        $(this).text(++i);
+        var $this = $(this);
+        $this.text(++i);
+        if ($this.closest('tr').find('.transfer-type.upload').length) ++u;
     });
+    i -= u;
+    for (var k in panelDomQueue) {
+        if (k[0] === 'u') ++u;
+        else ++i;
+    }
+    var sep = "\u202F", $tpt = $('.transfer-panel-title');
+    var t, l = $.trim($tpt.text()).split(sep)[0];
+    if (i && u) {
+        t = '\u2191 ' + i + ' \u2193 ' + u;
+    } else if (i) {
+        t = i;
+    } else if (u) {
+        t = u;
+    } else {
+        t = '';
+    }
+    if (t) t = sep + ' ' + t;
+    $tpt.text(l + t);
 }
 
 function MegaData()

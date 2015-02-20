@@ -1478,8 +1478,8 @@ function MegaData()
 				}
             });
 
-            $('.fm-chat-popup-button.start-audio').unbind('click.treePanel');
-			$('.fm-chat-popup-button.start-audio').bind('click.treePanel', function() {
+            $('.fm-start-chat-dropdown .fm-chat-popup-button.start-audio').unbind('click.treePanel');
+			$('.fm-start-chat-dropdown .fm-chat-popup-button.start-audio').bind('click.treePanel', function() {
                 var $this = $(this);
                 var $triggeredBy = $this.parent().data("triggeredBy");
                 var $userDiv = $triggeredBy.parent().parent();
@@ -1495,8 +1495,8 @@ function MegaData()
 				}
             });
 
-            $('.fm-chat-popup-button.start-video').unbind('click.treePanel');
-			$('.fm-chat-popup-button.start-video').bind('click.treePanel', function() {
+            $('.fm-start-chat-dropdown .fm-chat-popup-button.start-video').unbind('click.treePanel');
+			$('.fm-start-chat-dropdown .fm-chat-popup-button.start-video').bind('click.treePanel', function() {
                 var $this = $(this);
                 var $triggeredBy = $this.parent().data("triggeredBy");
                 var $userDiv = $triggeredBy.parent().parent();

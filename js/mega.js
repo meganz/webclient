@@ -4592,8 +4592,11 @@ function fm_commitkeyupdate()
     // refresh render?
 }
 
-function loadfm()
+function loadfm(force)
 {
+    if (force) {
+        loadfm.loaded = false;
+    }
     if (loadfm.loaded) {
         Soon(loadfm_done.bind(this, pfkey));
     } else {

@@ -2328,7 +2328,7 @@ function initContextUI()
         if (typeof mDB !== 'undefined' && !pfid) {
             mDBreload();
         } else {
-            loadfm();
+            loadfm(true);
         }
     });
 

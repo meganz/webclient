@@ -314,7 +314,7 @@ var chatui;
 
                         assert(filesList.length > 0, 'no files selected.');
 
-                        getPubk(contact.h, function() {
+                        getPubRSA(contact.h, function() {
                             var resp = megaChat.rtc.startMediaCall(participants[0], {files: filesList});
 
 
@@ -631,7 +631,7 @@ var Chat = function() {
 
                 },
                 preloadCryptoKeyForJid: function (sendMsgFunc, bareJid) {
-                    getPubk(megaChat.getContactFromJid(bareJid).h, sendMsgFunc);
+                    getPubRSA(megaChat.getContactFromJid(bareJid).h, sendMsgFunc);
                 },
                 generateMac: function (msg, key) {
                     var rawkey = key;

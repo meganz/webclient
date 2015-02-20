@@ -1518,12 +1518,7 @@ function api_cachepubkeys2(res, ctx) {
             var fingerprint = authring.computeFingerprint(u_pubkeys[ctx.u], 'RSA', 'string');
             var observed = authring.getContactAuthenticated(ctx.u, 'RSA');
             if (observed && authring.equalFingerprints(observed.fingerprint, fingerprint) === false) {
-                if (window.d) {
-                    // TODO: Remove this once things are settled moving to SHA-256 fingerprinting.
-                    authring.scrubAuthRing();
-                } else {
-                    throw new Error('Fingerprint does not match previously seen one!');
-                }
+                throw new Error('RSA fingerprint does not match previously seen one!');
             }
             if (observed === false) {
                 authring.setContactAuthenticated(ctx.u, fingerprint, 'RSA',
@@ -3357,7 +3352,7 @@ function u_initAuthentication2(res, ctx) {
     var storeSigPubkCallback = function(res, ctx) {
         if (typeof res === 'number') {
             // No signed RSA pub key, store it.
-            var sigPubk = authring.signKey(crypto_decodepubkey(base64urldecode(u_attr.pubk)),'RSA');
+            var sigPubk = authring.signKey(crypto_decodepubkey(base64urldecode(u_attr.pubk)), 'RSA');
             setUserAttribute('sigPubk', base64urlencode(sigPubk), true, false);
         }
     };
@@ -3372,15 +3367,26 @@ function _checkFingerprintEd25519(userhandle) {
     var value = {pubkey: pubEd25519[userhandle],
                  authenticated: recorded};
     if (recorded && authring.equalFingerprints(recorded.fingerprint, fingerprint) === false) {
-        if (window.d) {
-            // TODO: Remove this once things are settled moving to SHA-256 fingerprinting.
-            authring.scrubAuthRing();
-        } else {
-            throw new Error('Fingerprint does not match previously authenticated one!');
-        }
+        throw new Error('Fingerprint does not match previously authenticated one!');
     }
     if (recorded === false) {
         authring.setContactAuthenticated(userhandle, fingerprint, 'Ed25519',
+                                         authring.AUTHENTICATION_METHOD.SEEN,
+                                         authring.KEY_CONFIDENCE.UNSURE);
+    }
+    return value;
+}
+
+function _checkFingerprintRSA(userhandle) {
+    var recorded = authring.getContactAuthenticated(userhandle, 'RSA');
+    var fingerprint = authring.computeFingerprint(u_pubkeys[userhandle], 'RSA', 'string');
+    var value = {pubkey: u_pubkeys[userhandle],
+                 authenticated: recorded};
+    if (recorded && authring.equalFingerprints(recorded.fingerprint, fingerprint) === false) {
+        throw new Error('RSA fingerprint does not match previously authenticated one!');
+    }
+    if (recorded === false) {
+        authring.setContactAuthenticated(userhandle, fingerprint, 'RSA',
                                          authring.AUTHENTICATION_METHOD.SEEN,
                                          authring.KEY_CONFIDENCE.UNSURE);
     }
@@ -3474,32 +3480,28 @@ function getFingerprintEd25519(userhandle, callback, format) {
     }
 }
 
-var pubkeysCache = null;
 /**
- * Cached/persistent way of accessing user public keys
+ * Cached RSA public key retrieval utility.
  *
  * @param userhandle {string}
- * @param callback {Function} with one argument - the actual pubkey
+ *     Mega user handle.
+ * @param callback {function}
+ *     Callback function to call upon completion of operation. The callback
+ *     requires one parameter: the actual public RSA key. The user handle is
+ *     passed as a second parameter, and may be obtained that way if the call
+ *     back supports it.
+ * @throws {Error}
+ *     In case the fingerprint of the public key differs from the one previously
+ *     authenticated by the user. This more severe condition warrants to throw
+ *     an exception.
  */
-function getPubk(userhandle, callback) {
-    if(!pubkeysCache) {
-        pubkeysCache = new MegaKVStorage("pubk", localStorage);
-    }
-
-    if (u_pubkeys[userhandle])
-    {
+function getPubRSA(userhandle, callback) {
+    if (u_pubkeys[userhandle]) {
         callback(u_pubkeys[userhandle], userhandle);
-    }
-    else if(pubkeysCache.hasItem(userhandle))
-    {
-        u_pubkeys[userhandle] = JSON.parse(pubkeysCache.getItem(userhandle));
-        callback(u_pubkeys[userhandle], userhandle);
-    }
-    else
-    {
+    } else {
         api_cachepubkeys({
             cachepubkeyscomplete : function() {
-                pubkeysCache.setItem(userhandle, JSON.stringify(u_pubkeys[userhandle]), 24*60*60);
+                _checkFingerprintRSA(userhandle);
                 callback(u_pubkeys[userhandle]);
             }
         }, [userhandle]);

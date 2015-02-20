@@ -75,8 +75,10 @@
     if (!(iw+ih)) return;
     var width = options.width, height = options.height;
     var ctx = canvas.getContext('2d');
-    ctx.save();
     transformCoordinate(canvas, ctx, width, height, options.orientation);
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.save();
     var subsampled = detectSubsampling(img);
     if (subsampled) {
       iw /= 2;

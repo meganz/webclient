@@ -1,0 +1,675 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>MEGA 2.0</title>
+<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+<link rel="stylesheet" type="text/css" href="../css/style.css" />
+<script type="text/javascript" src="../js/jquery-1.8.1.js"></script>
+<script type="text/javascript" src="../js/jquery.jscrollpane.js"></script>
+<script type="text/javascript" src="../js/jquery.mousewheel.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {  
+
+  function initTreePanelScroll()
+  {
+	  $('.fm-tree-panel').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5,animateScroll: true});
+  }
+  initTreePanelScroll();
+  $(window).bind('resize', function () 
+  {
+	  initTreePanelScroll();
+  });
+  
+   
+
+    //Demo of scripts.
+
+    function initChatScrolling() {
+	   var scrollBlockHeight = $('.fm-chat-block').outerHeight() - $('.fm-chat-input-scroll').outerHeight() - $('.fm-right-header').outerHeight();
+	   $('.fm-chat-message-scroll').height(scrollBlockHeight);
+	   $('.fm-chat-message-scroll').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5});
+    }
+	initChatScrolling();
+	
+	function messageAreaResizing(textfield) {
+	  var txt = $('.message-textarea'),
+	      txtHeight =  txt.outerHeight(), 
+	      hiddenDiv = $('.hiddendiv'),
+		  pane = $('.fm-chat-input-scroll'),
+		  content = txt.val(),
+		  api;
+		  
+      content = content.replace(/\n/g, '<br />');
+      hiddenDiv.html(content + '<br />');
+	  
+	  if (txtHeight != hiddenDiv.outerHeight() ) {
+		txt.height(hiddenDiv.outerHeight());
+	
+	    if( $('.fm-chat-input-block').outerHeight()>=200) {
+	        pane.jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5}); 
+	        api = pane.data('jsp');
+		    txt.blur();
+		    txt.focus();
+		    api.scrollByY(0);
+		}
+		else {
+			api = pane.data('jsp');
+			if (api) {
+			  api.destroy();
+			  txt.blur();
+			  txt.focus();
+			}
+		}
+		initChatScrolling();
+	  }
+	}
+	
+	$('.message-textarea').on('keyup', function () {
+	    messageAreaResizing();
+	});
+	
+	function initCallDialogScrolling() {
+	   $('.fm-call-dialog-scroll').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5});
+    }
+	
+	
+	
+	$('.fm-start-video-call, .fm-start-call').bind('click', function() {
+		if($(this).attr('class').indexOf('active') == -1) {
+			var rPos = $('.fm-chat-block').width() - $(this).position().left - $(this).outerWidth()/2 -12;
+			$('.chat-button').removeClass('active');
+			$(this).addClass('active');
+			$('.fm-call-dialog-arrow').css('right',rPos +'px');
+			$('.fm-call-dialog').fadeIn(200);
+			initCallDialogScrolling();
+		} else {
+			$(this).removeClass('active');
+			$('.fm-call-dialog').fadeOut(200);
+		}
+	});
+	
+	$(window).bind('resize', function () {
+		messageAreaResizing();
+		initChatScrolling();
+	});
+
+	
+
+});
+</script>
+</head>
+
+<body>
+<div class="loading-spinner" style="display:none;"></div>
+<div class="dark-overlay hidden"></div>
+<div class="loading-spinner hidden"></div>
+<div class="fm-dialog-overlay hidden"></div>
+
+
+<div class="fmholder" id="fmholder">
+  <div class="top-head"> 
+    <a class="logo"></a> 
+    <a class="top-menu-icon">Menu</a> 
+    <div class="membership-status-block">
+       <div class="membership-status free" style="display: block;">FREE</div>
+    </div>
+    <a class="user-name">Andrei.d</a>
+    <div class="activity-status-block">
+      <div class="activity-status online"></div>
+    </div>
+    <div class="cloud-popup-icon" style="display: block;"><span class="notification-num" style="display: none;">0</span></div>
+    <div class="top-chat-notification"></div>
+    <div class="top-search-bl">
+       <div class="top-search-clear">
+           <div class="top-clear-button"></div>
+           <input type="text" value="Search" class="top-search-input">
+       </div>
+    </div>   
+  </div>
+  
+  <div class="fm-main default">
+    <div class="nw-fm-left-icons-panel">
+          <div class="nw-fm-left-icon cloud-drive">
+             <div class="nw-fm-left-border"></div>
+             <div class="nw-fm-left-tooltip">Cloud Drive</div>
+          </div>
+          <div class="nw-fm-left-icon shared-with-me">
+             <div class="nw-fm-left-border"></div>
+             <div class="nw-fm-left-tooltip">Shared with me</div>
+          </div>
+          <div class="nw-fm-left-icon contacts">
+             <div class="nw-fm-left-border"></div>
+             <div class="nw-fm-left-tooltip">Contacts</div>
+          </div>
+          <div class="nw-fm-left-icon conversations active">
+             <div class="nw-fm-left-border"></div>
+             <div class="nw-fm-left-tooltip">Conversations</div>
+          </div>
+          <div class="file-transter-icon"></div>
+    </div>
+    <div class="fm-left-panel">
+                <div class="left-pane-drag-handle ui-resizable-handle ui-resizable-e"></div>
+                <!-- Please add one of necessary classname: "cloud-drive"/"shared-with-me"/"contacts"/"conversations" !-->
+                <div class="fm-left-menu conversations">
+                   <div class="nw-fm-tree-header cloud-drive"> 
+                      <input type="text" value="Cloud Drive" placeholder="Cloud Drive">
+                      <div class="nw-fm-settins-icon"></div>
+                   </div>
+                   <div class="nw-fm-tree-header shared-with-me"> 
+                      Shared with me
+                      <div class="nw-fm-settins-icon"></div>
+                   </div>
+                   <div class="nw-fm-tree-header contacts"> 
+                      Contacts
+                      <div class="nw-fm-settins-icon"></div>
+                   </div>
+                   <div class="nw-fm-tree-header conversations"> 
+                      
+                      <input type="text" value="Conversation" placeholder="Conversations">
+                      <div class="nw-fm-settins-icon"></div>
+                   </div>
+                </div>
+                <div class="fm-tree-panel">
+                  
+                  <!-- Please add "active" to necessary block to activate it !-->
+                  <div class="content-panel cloud-drive">
+                   
+                  </div> 
+                  <div class="content-panel shared-with-me">
+                   
+                  </div>
+                  <div class="content-panel contacts">
+                   
+                  
+                  </div> 
+                  <div class="content-panel conversations active">
+                     
+                     <div class="nw-tree-panel-header">
+                       <span>Current Conversations</span>
+                       <div class="nw-tree-panel-arrows"></div>
+                     </div>
+                     <!-- Please add "unread" classname to show unread counter !-->
+                     <div class="nw-conversations-item online unread">
+                        <div class="nw-contact-status"></div>
+                        <div class="nw-conversations-unread">3</div>
+                        <div class="nw-conversations-name">
+                          Andrei.d
+                        </div>
+                     </div>
+                     <div class="nw-conversations-item offline">
+                        <div class="nw-contact-status"></div>
+                        <div class="nw-conversations-unread">0</div>
+                        <div class="nw-conversations-name">
+                          Bram van der Kolk
+                        </div>
+                     </div>
+                     <div class="nw-tree-panel-header">
+                       <span>Mega contacts</span>
+                       <div class="nw-tree-panel-arrows"></div>
+                     </div>
+                     <div class="nw-conversations-item away">
+                        <div class="nw-contact-status"></div>
+                        <div class="nw-conversations-unread">0</div>
+                        <div class="nw-conversations-name">
+                          Eduardo
+                        </div>
+                     </div>
+                     <div class="nw-conversations-item busy">
+                        <div class="nw-contact-status"></div>
+                        <div class="nw-conversations-unread">0</div>
+                        <div class="nw-conversations-name">
+                          César Rodas
+                        </div>
+                     </div>
+                  </div>  
+                </div>
+              
+              </div>
+              
+    <div class="fm-right-files-block">
+      
+      
+      <!--Chat block !-->
+      <div class="fm-chat-block">
+      
+        <!--Chat header !-->
+        <div class="fm-right-header"> 
+        
+        <div class="fm-breadcrumbs-block">
+          <a class="fm-breadcrumbs conversations contains-directories">
+              <span class="right-arrow-bg">
+                  <span>Conversations</span>
+              </span>
+          </a>
+          <div class="clear"></div>
+        </div>
+        
+        <!-- New button !-->
+        <div class="chat-button fm-start-video-call"> <span class="fm-chatbutton-arrow">Start video call ...</span> </div>
+        <div class="chat-button fm-start-call"> <span class="fm-chatbutton-arrow">Start call ...</span> </div>
+        
+        <div class="fm-call-dialog hidden">
+            <div class="fm-call-dialog-arrow"></div>
+            <div class="fm-call-dialog-scroll">
+            
+              <div class="fm-call-dialog-item">
+                <div class="nw-contact-avatar color5 verified">
+                   <div class="nw-verified-icon"></div>
+                   B
+                </div>
+                <div class="fm-chat-user-info">
+                    <div class="fm-chat-user">al+2@mega.co.nz</div>
+                    <div class="contact-email">al+2@mega.co.nz</div>
+                </div>
+              </div>
+              
+              <div class="fm-call-dialog-item">
+                <div class="nw-contact-avatar color5 verified">
+                   <div class="nw-verified-icon"></div>
+                   B
+                </div>
+                <div class="fm-chat-user-info">
+                    <div class="fm-chat-user">al+2@mega.co.nz</div>
+                    <div class="contact-email">al+2@mega.co.nz</div>
+                </div>
+              </div>
+              
+              <div class="fm-call-dialog-item">
+                <div class="nw-contact-avatar color5 verified">
+                   <div class="nw-verified-icon"></div>
+                   B
+                </div>
+                <div class="fm-chat-user-info">
+                    <div class="fm-chat-user">al+2@mega.co.nz</div>
+                    <div class="contact-email">al+2@mega.co.nz</div>
+                </div>
+              </div>
+              
+              <div class="fm-call-dialog-item">
+                <div class="nw-contact-avatar color5 verified">
+                   <div class="nw-verified-icon"></div>
+                   B
+                </div>
+                <div class="fm-chat-user-info">
+                    <div class="fm-chat-user">al+2@mega.co.nz</div>
+                    <div class="contact-email">al+2@mega.co.nz</div>
+                </div>
+              </div>
+              
+              <div class="fm-call-dialog-item">
+                <div class="nw-contact-avatar color5 verified">
+                   <div class="nw-verified-icon"></div>
+                   B
+                </div>
+                <div class="fm-chat-user-info">
+                    <div class="fm-chat-user">al+2@mega.co.nz</div>
+                    <div class="contact-email">al+2@mega.co.nz</div>
+                </div>
+              </div>
+              
+              <div class="fm-call-dialog-item">
+                <div class="nw-contact-avatar color5 verified">
+                   <div class="nw-verified-icon"></div>
+                   B
+                </div>
+                <div class="fm-chat-user-info">
+                    <div class="fm-chat-user">al+2@mega.co.nz</div>
+                    <div class="contact-email">al+2@mega.co.nz</div>
+                </div>
+              </div>
+              
+              <div class="fm-call-dialog-item">
+                <div class="nw-contact-avatar color5 verified">
+                   <div class="nw-verified-icon"></div>
+                   B
+                </div>
+                <div class="fm-chat-user-info">
+                    <div class="fm-chat-user">al+2@mega.co.nz</div>
+                    <div class="contact-email">al+2@mega.co.nz</div>
+                </div>
+              </div>
+              
+              <div class="fm-call-dialog-item">
+                <div class="nw-contact-avatar color5 verified">
+                   <div class="nw-verified-icon"></div>
+                   B
+                </div>
+                <div class="fm-chat-user-info">
+                    <div class="fm-chat-user">al+2@mega.co.nz</div>
+                    <div class="contact-email">al+2@mega.co.nz</div>
+                </div>
+              </div>
+              
+              <div class="fm-call-dialog-item">
+                <div class="nw-contact-avatar color5 verified">
+                   <div class="nw-verified-icon"></div>
+                   B
+                </div>
+                <div class="fm-chat-user-info">
+                    <div class="fm-chat-user">al+2@mega.co.nz</div>
+                    <div class="contact-email">al+2@mega.co.nz</div>
+                </div>
+              </div>
+              
+              <div class="fm-call-dialog-item">
+                <div class="nw-contact-avatar color5 verified">
+                   <div class="nw-verified-icon"></div>
+                   B
+                </div>
+                <div class="fm-chat-user-info">
+                    <div class="fm-chat-user">al+2@mega.co.nz</div>
+                    <div class="contact-email">al+2@mega.co.nz</div>
+                </div>
+              </div>
+              
+            </div>
+        
+        </div>
+        
+        <div class="clear"></div>
+      </div>
+        <!-- End of Chat header !-->
+        
+        
+        <!-- Empty Conversations !-->
+        <div class="fm-empty-conversations hidden">
+                <div class="fm-empty-pad">
+                    <div class="fm-empty-conversations-bg"></div>
+                    <div class="fm-empty-cloud-txt">No Conversations</div>
+                    <div class="fm-not-logged-text">
+                        <div class="fm-not-logged-description">
+                            Login or create an account to <span class="red">get 50GB FREE</span> and speak with your friends and coworkers.
+                        </div>
+                        <div class="fm-not-logged-button login">
+                            Login
+                        </div>
+                        <div class="fm-not-logged-button create-account">
+                            Create account
+                        </div>
+                    </div>
+                </div>
+        </div>
+        <!-- end of Conversations list block !-->
+        
+        <!-- Please add "conversations" classname !-->
+        <div class="fm-chat-message-scroll conversations"> 
+         <div class="fm-chat-message-pad"> 
+             
+             
+             <div class="conversations-block">
+               <div class="conversations-border">
+                 <div class="conversations-pad">
+                    <div class="conversations-icon video"></div>
+                    <div class="conversations-icon audio"></div>
+                    
+                    <div class="nw-contact-avatar color5 green-tick">
+                       <div class="nw-verified-icon"></div>
+                       B
+                    </div>
+                    
+                    <!-- Add class "star" to show star icon !-->
+                    <div class="fm-chat-user-info online">
+                       <div class="fm-chat-user-star"></div>
+                       <div class="fm-chat-user">Bram Van Der Kolk</div>
+                       <div class="nw-contact-status"></div>
+                       <div class="fm-chat-user-status"> Online </div>
+                       <div class="clear"></div>
+                    </div>
+                    <div class="clear"></div>
+                    
+                    <!-- Please add "missed-call"/"call-from-different-device"/"call-timeout"/"call-dropped"/"rejected-call"/.. !-->
+                    <!-- Please add "hidden" if you haven’t communicated with user !-->
+                    <div class="conversations-call-info missed-call">
+                      <div class="nw-chat-notification-icon"></div>
+                      <div class="conversation-status">
+                        <span>
+                          Missed call
+                        </span>
+                      </div>
+                      <div class="conversations-time">about 2 hours ago</div>
+                    </div> 
+                    
+                    <!-- Please remove "hidden" if you haven’t communicated with user !-->
+                    <div class="not-communicated-txt hidden">
+                      You haven’t communicated with <strong>David Chaum</strong> recently.
+                    </div> 
+               
+                 </div>
+               </div>
+             </div>
+             
+             <div class="conversations-block">
+               <div class="conversations-border">
+                 <div class="conversations-pad">
+                    <div class="conversations-icon video"></div>
+                    <div class="conversations-icon audio hidden"></div>
+                    
+                    <div class="nw-contact-avatar color6">
+                       <div class="nw-verified-icon"></div>
+                       B
+                    </div>
+                    
+                    <!-- Add class "star" to show star icon !-->
+                    <div class="fm-chat-user-info away">
+                       <div class="fm-chat-user-star"></div>
+                       <div class="fm-chat-user">Andrei</div>
+                       <div class="nw-contact-status"></div>
+                       <div class="fm-chat-user-status"> Away </div>
+                       <div class="clear"></div>
+                    </div>
+                    <div class="clear"></div>
+                    
+                    <!-- Please add "missed-call"/"call-from-different-device"/"call-timeout"/"call-dropped"/"rejected-call"/.. !-->
+                    <!-- Please add "hidden" if you haven’t communicated with user !-->
+                    <div class="conversations-call-info missed-call hidden">
+                      <div class="nw-chat-notification-icon"></div>
+                      <div class="conversation-status">
+                        <span>
+                          Missed call
+                        </span>
+                      </div>
+                      <div class="conversations-time">about 2 hours ago</div>
+                    </div> 
+                    
+                    <!-- Please remove "hidden" if you haven’t communicated with user !-->
+                    <div class="not-communicated-txt">
+                      You haven’t communicated with <strong>David Chaum</strong> recently.
+                    </div> 
+               
+                 </div>
+               </div>
+             </div>
+             
+             <div class="conversations-block">
+               <div class="conversations-border">
+                 <div class="conversations-pad">
+                    <div class="conversations-icon video"></div>
+                    <div class="conversations-icon audio"></div>
+                    
+                    <div class="nw-contact-avatar color2 gray-tick">
+                       <div class="nw-verified-icon"></div>
+                       L
+                    </div>
+                    
+                    <!-- Add class "star" to show star icon !-->
+                    <div class="fm-chat-user-info online">
+                       <div class="fm-chat-user-star"></div>
+                       <div class="fm-chat-user">Lyubomir</div>
+                       <div class="nw-contact-status"></div>
+                       <div class="fm-chat-user-status"> Online </div>
+                       <div class="clear"></div>
+                    </div>
+                    <div class="clear"></div>
+                    
+                    <!-- Please add "missed-call"/"call-from-different-device"/"call-timeout"/"call-dropped"/"rejected-call"/.. !-->
+                    <!-- Please add "hidden" if you haven’t communicated with user !-->
+                    <div class="conversations-call-info call-dropped">
+                      <div class="nw-chat-notification-icon"></div>
+                      <div class="conversation-status">
+                        <span>
+                          Call dropped
+                        </span>
+                      </div>
+                      <div class="conversations-time">about 2 hours ago</div>
+                    </div> 
+                    
+                    <!-- Please remove "hidden" if you haven’t communicated with user !-->
+                    <div class="not-communicated-txt hidden">
+                      You haven’t communicated with <strong>David Chaum</strong> recently.
+                    </div> 
+               
+                 </div>
+               </div>
+             </div>
+             
+             <div class="conversations-block">
+               <div class="conversations-border">
+                 <div class="conversations-pad">
+                    <div class="conversations-icon video"></div>
+                    <div class="conversations-icon audio"></div>
+                    
+                    <div class="nw-contact-avatar color2 gray-tick">
+                       <div class="nw-verified-icon"></div>
+                       L
+                    </div>
+                    
+                    <!-- Add class "star" to show star icon !-->
+                    <div class="fm-chat-user-info offline">
+                       <div class="fm-chat-user-star"></div>
+                       <div class="fm-chat-user">Chris</div>
+                       <div class="nw-contact-status"></div>
+                       <div class="fm-chat-user-status"> Offline </div>
+                       <div class="clear"></div>
+                    </div>
+                    <div class="clear"></div>
+                    
+                    <!-- Please add "missed-call"/"call-from-different-device"/"call-timeout"/"call-dropped"/"rejected-call"/.. !-->
+                    <!-- Please add "hidden" if you haven’t communicated with user !-->
+                    <div class="conversations-call-info call-timeout">
+                      <div class="nw-chat-notification-icon"></div>
+                      <div class="conversation-status">
+                        <span>
+                          Call Timeout
+                        </span>
+                      </div>
+                      <div class="conversations-time">about 2 hours ago</div>
+                    </div> 
+                    
+                    <!-- Please remove "hidden" if you haven’t communicated with user !-->
+                    <div class="not-communicated-txt hidden">
+                      You haven’t communicated with <strong>David Chaum</strong> recently.
+                    </div> 
+               
+                 </div>
+               </div>
+             </div>
+             
+             <div class="conversations-block">
+               <div class="conversations-border">
+                 <div class="conversations-pad">
+                    <div class="conversations-icon video"></div>
+                    <div class="conversations-icon audio"></div>
+                    
+                    <div class="nw-contact-avatar color7 green-tick">
+                       <div class="nw-verified-icon"></div>
+                      E
+                    </div>
+                    
+                    <!-- Add class "star" to show star icon !-->
+                    <div class="fm-chat-user-info busy">
+                       <div class="fm-chat-user-star"></div>
+                       <div class="fm-chat-user">Eduardo</div>
+                       <div class="nw-contact-status"></div>
+                       <div class="fm-chat-user-status"> Busy </div>
+                       <div class="clear"></div>
+                    </div>
+                    <div class="clear"></div>
+                    
+                    <!-- Please add "missed-call"/"call-from-different-device"/"call-timeout"/"call-dropped"/"rejected-call"/.. !-->
+                    <!-- Please add "hidden" if you haven’t communicated with user !-->
+                    <div class="conversations-call-info call-ended">
+                      <div class="nw-chat-notification-icon"></div>
+                      <div class="conversation-status">
+                        <span>
+                          Call Ended
+                        </span>
+                      </div>
+                      <div class="conversations-time">about 2 hours ago</div>
+                    </div> 
+                    
+                    <!-- Please remove "hidden" if you haven’t communicated with user !-->
+                    <div class="not-communicated-txt hidden">
+                      You haven’t communicated with <strong>David Chaum</strong> recently.
+                    </div> 
+               
+                 </div>
+               </div>
+             </div>
+             
+             <div class="clear"></div>
+             
+         </div> 
+        </div>
+        
+        <div class="fm-chat-line-block hidden">
+          <div class="hiddendiv"></div>
+          <div class="fm-chat-emotions-icon"></div>
+          
+          <div class="fm-chat-emotion-popup">
+            <div class="fm-chat-arrow"></div>
+            <div class="fm-chat-smile smile"></div>
+            <div class="fm-chat-smile wink"></div>
+            <div class="fm-chat-smile tongue"></div>
+            <div class="fm-chat-smile grin"></div>
+            <div class="fm-chat-smile confuse"></div>
+            <div class="fm-chat-smile grasp"></div>
+            <div class="fm-chat-smile sad"></div>
+            <div class="fm-chat-smile cry"></div>
+            <div class="fm-chat-smile angry"></div>
+            <div class="fm-chat-smile smile"></div>
+            <div class="clear"></div>
+          </div>
+          
+          <div class="nw-chat-message-icon"></div>
+          <div class="fm-chat-input-scroll">
+            <div class="fm-chat-input-block">
+              <textarea class="message-textarea" placeholder="Write a message..."></textarea>
+            </div>
+          </div>
+          <div class="clear"></div>
+        </div>
+      </div>
+      
+      <!--end !--> 
+      
+    </div>
+  </div>
+  
+  <div class="transfer-panel ui-resizable ui-droppable">
+  <div class="transfer-drag-handle ui-resizable-handle ui-resizable-n"></div>
+  <div class="transfer-icons-block">
+    <!-- Please add "download-percents-0"-"download-percents-100" and "upload-percents-0"-"download-percents-100" !-->
+    <div class="file-transfer-icon download-percents-0 upload-percents-0">
+        <div class="file-transfer-download">
+            <div class="file-transfer-upload"></div>
+        </div>
+    </div>
+    <div class="transfer-panel-title">
+        File transfers
+    </div>
+    <a class="tranfer-view-icon"></a>
+    <!-- Please add/remove "active" class to sjow/hide upload and download indicators !-->
+    <div class="tranfer-upload-indicator">
+        640 Kb/s
+    </div>
+    <div class="tranfer-download-indicator">
+        1640 Kb/s
+    </div>
+    <div class="clear"></div>
+  </div>
+</div>
+  
+</div>
+</body>
+</html>

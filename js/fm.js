@@ -384,8 +384,18 @@ function treeredraw()
 function treesearchUI()
 {
     $('.nw-fm-tree-header').unbind('click');
-    $('.nw-fm-tree-header').bind('click', function(e)
-    {
+    $('.nw-fm-search-icon').unbind('click');
+    $('.nw-fm-tree-header input').unbind('keyup');
+    $('.nw-fm-tree-header input').unbind('blur');
+
+    if (!$('.fm-tree-panel .content-panel.active').find('ul li, .nw-contact-item').length) {
+      $('.nw-fm-tree-header input').prop('readonly', true);
+      $('.nw-fm-search-icon').hide();
+    } else {
+      $('.nw-fm-search-icon').show();
+      $('.nw-fm-tree-header input').prop('readonly', false);
+      $('.nw-fm-tree-header').bind('click', function(e)
+      {
         var c = $(e.target).attr('class');
         if (c && c.indexOf('nw-fm-search-icon') > -1)
         {
@@ -403,19 +413,17 @@ function treesearchUI()
             i.val('');
             i.focus();
         }
-    });
-    $('.nw-fm-search-icon').unbind('click');
-    $('.nw-fm-search-icon').bind('click', function()
-    {
+      });
+      $('.nw-fm-search-icon').bind('click', function()
+      {
         treesearch = false;
         treeredraw();
         $(this).prev().val('');
         $(this).parent().find('input').blur();
-    });
+      });
 
-    $('.nw-fm-tree-header input').unbind('keyup');
-    $('.nw-fm-tree-header input').bind('keyup', function(e)
-    {
+      $('.nw-fm-tree-header input').bind('keyup', function(e)
+      {
         var h = $(this).parent();
         if (e.keyCode == 27)
         {
@@ -432,11 +440,10 @@ function treesearchUI()
         if ($(this).val() == '')
             h.removeClass('filled-input');
         treeredraw()
-    });
+      });
 
-    $('.nw-fm-tree-header input').unbind('blur');
-    $('.nw-fm-tree-header input').bind('blur', function()
-    {
+      $('.nw-fm-tree-header input').bind('blur', function()
+      {
         if ($(this).val() == $(this).attr('placeholder') || $(this).val() == '')
         {
             $(this).parent('.nw-fm-tree-header').removeClass('focused-input filled-input');
@@ -444,7 +451,8 @@ function treesearchUI()
         }
         else
             $(this).parent('.nw-fm-tree-header').removeClass('focused-input');
-    });
+      });
+    }
 
     $('.nw-tree-panel-arrows').unbind('click');
     $('.nw-tree-panel-arrows').bind('click', function()
@@ -511,7 +519,6 @@ function treesearchUI()
             treeUI(); // reattach events
         }
     });
-    initializeTreePanelSorting()
 }
 
 function treePanelType()
@@ -588,6 +595,7 @@ function initUI() {
     }
 
     treesearchUI();
+    initializeTreePanelSorting()
 
     $.doDD = function(e, ui, a, type)
     {
@@ -1461,7 +1469,7 @@ function addContactUI()
 
     // Prevent double initialization of token input
     if (!$('.add-contact-multiple-input').tokenInput("getSettings")) {
-        
+
         // Plugin configuration
         var contacts = getContactsEMails();
 
@@ -1559,7 +1567,7 @@ function addContactUI()
             }
         });
     }
-    
+
     //TODO: Bind events if Contacts section is empty
     $('.fm-empty-contacts .fm-empty-button').unbind('mouseover');
     $('.fm-empty-contacts .fm-empty-button').bind('mouseover', function() {
@@ -2556,7 +2564,7 @@ function fmtopUI() {
 		    } else if (M.currentdirid === 'opc') {
 			    $('.fm-contact-requests').addClass('active');
 			    $('.fm-right-header').addClass('requests-panel');
-		    } 
+		    }
         } else if (M.currentdirid.length === 8 && RightsbyID(M.currentdirid) > 0) {
             $('.fm-new-folder').removeClass('hidden');
             $('.fm-file-upload').removeClass('hidden');
@@ -2566,7 +2574,7 @@ function fmtopUI() {
                 $('.fm-file-upload').addClass('last-button');
             }
         }
-		
+
     }
     $('.fm-clearbin-button').unbind('click');
     $('.fm-clearbin-button').bind('click', function() {
@@ -5760,7 +5768,7 @@ function sectionUIopen(id) {
         $('.files-grid-view.fm').addClass('hidden');
         $('.fm-blocks-view.fm').addClass('hidden');
     }
-	
+
 	if (id !== 'contacts' && id !== 'opc' && id !== 'ipc') {
 		$('.fm-left-panel').removeClass('contacts-panel');
 	    $('.fm-right-header').removeClass('requests-panel');
@@ -6347,15 +6355,14 @@ function addShareDialogContactToContent(type, id, av_color, av, name, permClass,
 function fillShareDialogWithContent() {
     var selectedNodeHandle = $.selected[0];
     $.sharedTokens = [];// Holds items currently visible in share folder content (above multi-input)
-    
     var shares = M.d[selectedNodeHandle].shares;
 
     // List users that are already use item
     for (var userHandle in shares) {
         if (shares.hasOwnProperty(userHandle)) {
-            
+
             // Don't add removed contacts from contact list
-            // Additional check of 'c' grants that only active 
+            // Additional check of 'c' grants that only active
             // contacts will be addded, this prevents contact
             //  duplication in share dialog contact list
             if (M.u[userHandle] && M.u[userHandle].c && M.u[userHandle].c === 1) {
@@ -6368,12 +6375,11 @@ function fillShareDialogWithContent() {
             }
         }
     }
-    
+
     for (var pendingShareHandle in M.ps) {
-        
         if (M.ps.hasOwnProperty(pendingShareHandle)) {
             var pendingShare = M.ps[pendingShareHandle];
-            
+
             // Is the pending share related to the selected node
             if (pendingShare.h === selectedNodeHandle) {
 
@@ -6381,7 +6387,7 @@ function fillShareDialogWithContent() {
                 if (M.opc[pendingShare.p]) {
 
                     var pendingContactRequest = M.opc[pendingShare.p];
-                    generateShareDialogRow(pendingContactRequest.m, pendingContactRequest.m, pendingShare.r);                
+                    generateShareDialogRow(pendingContactRequest.m, pendingContactRequest.m, pendingShare.r);
                 }
             }
         }
@@ -6416,7 +6422,7 @@ function generateShareDialogRow(displayNameOrEmail, email, shareRights, userHand
     
     // Add contact
     $.sharedTokens.push(email);
-    
+
     var rowId = (userHandle) ? userHandle : email;
     var html = addShareDialogContactToContent('', rowId, av_color, av, displayNameOrEmail, perm[0], perm[1]);
 
@@ -6616,7 +6622,7 @@ function initShareDialog() {
             }
         });
     }
-    
+
     menuPermissionState = function($this)
     {
         var mi = '.permissions-menu .permissions-menu-item';
@@ -6771,7 +6777,7 @@ function initShareDialog() {
         if (handleOrEmail !== '') {
             // Due to pending shares, the id could be an email instead of a handle
             var userEmail = handleOrEmail;
-            
+
             // If it was a user handle, the share must be a full share
             if (M.u[handleOrEmail]) {
                 userEmail = M.u[handleOrEmail].m;
@@ -7016,12 +7022,12 @@ function clearScrollPanel(from)
     }
     $(from + ' .multiple-input .jspPane').unwrap();
     $(from + ' .multiple-input .jspPane:first-child').unwrap();
-    
+
     // remove share dialog contacts, jScrollPane
     j = $(from + ' .share-dialog-contacts').jScrollPane().data();
     if (j && j.jsp) {
         j.jsp.destroy();
-    }    
+    }
 }
 
 function closeDialog() {

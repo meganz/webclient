@@ -1803,7 +1803,7 @@ function MegaData()
             }
             var sharedfolder = 'folder-item';
             if (typeof M.d[fid].shares !== 'undefined')
-                sharedfolder = 'shared-folder-item';
+                sharedfolder += ' shared-folder-item';
             var html = '<span class="context-menu-item ' + sharedfolder + cs + '" id="fi_' + fid + '">' + icon + htmlentities(this.d[fid].name) + '</span>' + sm;
             $('#csb_' + id).append(html);
             if (sub)

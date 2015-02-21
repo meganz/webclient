@@ -4566,7 +4566,7 @@ function execsc(actionPackets, callback) {
     function onExecSCDone() {
         if (newnodes.length > 0 && fminitialized) rendernew();
         if (loadavatars) M.avatars();
-        fm_thumbnails();
+        if (M.viewmode) fm_thumbnails();
         if ($.dialog === 'properties') propertiesDialog();
         getsc();
         if (callback) Soon(callback);

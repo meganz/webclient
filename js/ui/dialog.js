@@ -111,7 +111,7 @@
             })
             .bind('resize', function() {
                 self.reposition();
-            })
+            });
     };
 
 

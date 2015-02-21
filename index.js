@@ -784,7 +784,7 @@ function init_page()
 
 				return false;
 			});
-
+        
 		$('#pageholder').hide();
 		$('#startholder').hide();
 		if ($('#fmholder:visible').length == 0)

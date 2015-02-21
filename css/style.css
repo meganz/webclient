@@ -22894,6 +22894,107 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 	background-position: -157px -45px;
 	opacity: 1;
 }
+
+
+/* Credentials / Fingerprint warning dialog */
+.credential-warning-button {
+    left: 50%;
+    position: absolute;
+    top:15px;
+}
+.credentials-warning-dialog .fm-dialog-close {
+    visibility: hidden;
+}
+.credentials-warning-dialog .fm-mega-dialog-pad {
+    margin: 12px 0;
+}
+.credentials-warning-dialog .fm-mega-dialog-bottom {
+    margin: 12px 0 -12px;
+}
+.credentials-warning-dialog {
+    background-color: #fff;
+    width: 600px;
+}
+.credentials-warning-dialog .content {
+    color: #999999;
+    font-size: 12px;
+    line-height: 20px;
+    padding-bottom: 10px;
+}
+.credentials-warning-dialog .avatarAndWarningMessage {
+    margin: 0 20px;
+    overflow: hidden;
+}
+.credentials-warning-dialog .userAvatar {
+    float: left;
+}
+.credentials-warning-dialog .information {
+    float: left;
+    margin-left: 20px;
+    width: 442px;
+}
+.credentials-warning-dialog .information .firstLine {
+    color: #d90007;
+    font-weight: bold;
+}
+.credentials-warning-dialog .information .emailAddress {
+    color: #000;
+}
+.credentials-warning-dialog .userAvatar img {
+    height: 90px;
+    width: 90px;
+}
+.credentials-warning-dialog .previousCredentials {
+    background-color: #f2f2f2;
+    margin-top: 20px;
+    padding: 20px;
+}
+.credentials-warning-dialog .previousCredentials .title {
+    color: #000;
+    font-weight: bold;
+}
+.credentials-warning-dialog .previousCredentials .fingerprint,
+.credentials-warning-dialog .newCredentials .fingerprint {
+    font-family: monospace;
+    font-size: 13px;
+    margin-left: -6px;
+    margin-top: 10px;  
+}
+.credentials-warning-dialog .previousCredentials .fingerprint > span,
+.credentials-warning-dialog .newCredentials .fingerprint > span {
+    display: inline-block;
+    text-align: center;
+    width: 44px;
+	-webkit-touch-callout: text !important;
+	-webkit-user-select: text !important;
+	-khtml-user-select: text !important;
+	-moz-user-select: text !important;
+	-ms-user-select: text !important;
+	user-select: text !important;
+}
+.credentials-warning-dialog .newCredentials span.mismatch {
+    color: #D90007;
+}
+.credentials-warning-dialog .newCredentials {
+    padding: 20px 20px 35px 20px;
+}
+.credentials-warning-dialog .newCredentials .title {
+    color: #D90007;
+    font-weight: bold;
+}
+.credentials-warning-dialog .instruction {
+    padding: 3px 20px;
+}
+.credentials-warning-dialog .instruction .reject {
+    color: #D90007;
+    font-weight: bold;
+}
+.credentials-warning-dialog .instruction .accept {
+    color: #31B500;
+    font-weight: bold;
+}
+
+
 .collected-data-review-dialog {
 	z-index: 1250;
 	width: 70%;

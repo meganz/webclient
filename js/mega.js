@@ -2089,107 +2089,99 @@ function MegaData()
 
     this.rubNodes = {};
 
-    this.addNode = function(n, ignoreDB)
-    {
-        if (n.p == this.RubbishID)
-        {
+    this.addNode = function(n, ignoreDB) {
+        if (n.p === this.RubbishID) {
             this.rubNodes[n.h] = true;
             this.rubbishIco();
         }
-        if (n.t == 4)
-        {
-            for (var i in this.d)
-            {
-                if (this.d[i].p == n.h)
-                {
+        if (n.t === 4) {
+            for (var i in this.d) {
+                if (this.d[i].p == n.h) {
                     this.rubNodes[this.d[i].h] = true;
                 }
             }
             this.rubbishIco();
         }
 
-        if (!this.c['shares'])
+        if (!this.c['shares']) {
             this.c['shares'] = [];
-        if (!M.d[n.p] && n.p !== 'contacts')
-        {
-            if (n.sk)
-                n.p = n.u;
-            else if (n.su)
-                n.p = n.su;
         }
-        if (n.p && n.p.length == 11 && !M.d[n.p])
-        {
+        if (!M.d[n.p] && n.p !== 'contacts') {
+            if (n.sk) {
+                n.p = n.u;
+            } else if (n.su) {
+                n.p = n.su;
+            }
+        }
+        if (n.p && n.p.length === 11 && !M.d[n.p]) {
             var u = this.u[n.p];
-            if (u)
-            {
+            if (u) {
                 u.name = u.m;
                 u.h = u.u;
                 u.t = 1;
                 u.p = 'contacts';
                 M.addNode(u);
-            }
-            else
+            } else {
                 console.log('something went wrong!', n.p, this.u[n.p]);
+            }
         }
-        if (typeof mDB === 'object' && !ignoreDB && !pfkey)
+        if (typeof mDB === 'object' && !ignoreDB && !pfkey) {
             mDBadd('f', clone(n));
-        if (n.p)
-        {
-            if (typeof this.c[n.p] == 'undefined')
+        }
+        if (n.p) {
+            if (typeof this.c[n.p] == 'undefined') {
                 this.c[n.p] = [];
+            }
             this.c[n.p][n.h] = 1;
             // maintain special incoming shares index:
-            if (n.p.length == 11)
+            if (n.p.length === 11) {
                 this.c['shares'][n.h] = 1;
+            }
         }
 
-        if (n.t == 2)
+        if (n.t === 2) {
             this.RootID = n.h;
-        if (n.t == 3)
+        }
+        if (n.t === 3) {
             this.InboxID = n.h;
-        if (n.t == 4)
+        }
+        if (n.t === 4) {
             this.RubbishID = n.h;
-        if (!n.c)
-        {
+        }
+        if (!n.c) {
             if (n.sk && !u_sharekeys[n.h]) {
                 u_sharekeys[n.h] = crypto_process_sharekey(n.h, n.sk);
             }
 
-            if (n.t !== 2 && n.t !== 3 && n.t !== 4 && n.k)
-            {
-                if (u_kdnodecache[n.h])
-                {
+            if (n.t !== 2 && n.t !== 3 && n.t !== 4 && n.k) {
+                if (u_kdnodecache[n.h]) {
                     $.extend(n, u_kdnodecache[n.h]);
-                }
-                else
-                {
+                } else {
                     crypto_processkey(u_handle, u_k_aes, n);
                 }
                 u_nodekeys[n.h] = n.key;
-            }
-            else if (!n.k)
-            {
-                if (n.a)
-                {
-                    if (!missingkeys[n.h])
-                    {
+            } else if (!n.k) {
+                if (n.a) {
+                    if (!missingkeys[n.h]) {
                         missingkeys[n.h] = true;
                         newmissingkeys = true;
                     }
                 }
             }
-            if (n.hash)
-            {
-                if (!this.h[n.hash])
+            if (n.hash) {
+                if (!this.h[n.hash]) {
                     this.h[n.hash] = [];
+                }
                 this.h[n.hash].push(n.h);
             }
         }
-        if (this.d[n.h] && this.d[n.h].shares)
+        if (this.d[n.h] && this.d[n.h].shares) {
             n.shares = this.d[n.h].shares;
+        }
         this.d[n.h] = n;
-        if (typeof newnodes !== 'undefined')
+        if (typeof newnodes !== 'undefined') {
             newnodes.push(n);
+        }
     };
 
     this.delNode = function(h) {
@@ -2620,6 +2612,18 @@ function MegaData()
         }
     };
 
+    /**
+     * Delete ps record from localStorage using id, ps = pending share
+     *
+     * @param {string} id
+     * @returns {undefined}
+     */
+    this.delPS = function(id) {
+        if (typeof mDB === 'object' && !pfkey) {
+            mDBdel('ps', id);
+        }
+    };
+    
     this.copyNodes = function(cn, t, del, callback) {
         if ($.onImportCopyNodes && t.length === 11) {
             msgDialog('warninga', l[135], 'Operation not permitted.');
@@ -2993,7 +2997,7 @@ function MegaData()
                 }
             }
             sharedUInode(h, 1);
-            if ($.dialog == 'sharing' && $.selected && $.selected[0] == h) {
+            if ($.dialog === 'sharing' && $.selected && $.selected[0] === h) {
                 shareDialog();
             }
             if (typeof mDB === 'object' && !pfkey) {
@@ -4237,7 +4241,7 @@ function execsc(actionPackets, callback) {
             }
 
             // If contact notification
-            if (actionPacket.a === 'c') {
+                   if (actionPacket.a === 'c') {
                 process_u(actionPacket.u);
 
                 // Only show a notification if we did not trigger the action ourselves
@@ -4311,9 +4315,9 @@ function execsc(actionPackets, callback) {
             var prockey = false;
 
             if (actionPacket.o === u_handle) {
+                
+                // If access right are undefined then share is deleted
                 if (typeof actionPacket.r == "undefined") {
-                    
-                    // I deleted my share
                     M.delnodeShare(actionPacket.n, actionPacket.u);
                 } else if (M.d[actionPacket.n]
                     && typeof M.d[actionPacket.n].shares != 'undefined'
@@ -5165,7 +5169,7 @@ function processPS(pendingShares, fromGettree) {
 
             if (typeof shareRights === 'undefined') {
                 // This is a delete packet, we should remove the pending share if this was not triggered by our own client
-                if (pendingShares[i].i == requesti) continue;
+                if (pendingShares[i].i === requesti) continue;
 
                 // Delete the pending share
                 delete M.ps[pendingShares[i].p];
@@ -5212,18 +5216,22 @@ function processUPCI(ap) {
  */
 function processUPCO(ap) {
     DEBUG('processUPCO');
+    var psid = '';// pending id
     for (var i in ap) {
         if (ap[i].s) {
-            delete M.opc[ap[i].p];
-            delete M.ipc[ap[i].p];
-            M.delOPC(ap[i].p);
-            M.delIPC(ap[i].p);
+            psid = ap[i].p;
+            delete M.opc[psid];
+            delete M.ipc[psid];
+            delete M.ps[psid];
+            M.delOPC(psid);
+            M.delIPC(psid);
+            M.delPS(psid);
 
             // Update token.input plugin
             if ($('.add-contact-multiple-input')) {
                 $('.add-contact-multiple-input').tokenInput("removeContact", {id: ap[i].m}, '.add-contact-multiple-input');
             }
-            $('#opc_' + ap[i].p).remove();
+            $('#opc_' + psid).remove();
             if ((Object.keys(M.opc).length === 0) && (M.currentdirid === 'opc')) {
                 $('.sent-requests-grid').addClass('hidden');
                 $('.fm-empty-contacts').removeClass('hidden');

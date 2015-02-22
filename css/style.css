@@ -22958,7 +22958,8 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
     font-family: monospace;
     font-size: 13px;
     margin-left: -6px;
-    margin-top: 10px;  
+    margin-top: 10px;
+    text-transform: uppercase;
 }
 .credentials-warning-dialog .previousCredentials .fingerprint > span,
 .credentials-warning-dialog .newCredentials .fingerprint > span {

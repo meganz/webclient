@@ -766,6 +766,7 @@ else if (!b_u)
     jsl.push({f:'js/ui/filepicker.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/ui/dialog.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/ui/feedbackDialog.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/ui/credentialsWarningDialog.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/chat/ui/incomingCallDialog.js', n: 'mega_js', j:1,w:7});
 
     // notifications

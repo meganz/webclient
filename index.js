@@ -1299,7 +1299,7 @@ function topmenuUI() {
 					$('.membership-popup.pro-popup .membership-icon').addClass('pro' + u_attr.p);
 					var p = account.stype == 'S' ? '' : (l[987] + ' <span class="red">' + time2date(account.expiry) + '</span>');
 					$('.membership-popup.pro-popup .membership-icon-txt-bl .membershtip-medium-txt').html(p);
-					$('.membership-icon-pad .membership-big-txt.red').text('PRO ' + Array(+u_attr.p|0).join("I"));
+					$('.membership-icon-pad .membership-big-txt.red').text('PRO ' + Array(+u_attr.p+1|0).join("I"));
 				}
 				else
 				{

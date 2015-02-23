@@ -2591,7 +2591,7 @@ function MegaData()
     };
 
     /**
-     * Delete ipc record from localStorage using id
+     * Delete ipc record from indexedDb using id
      *
      * @param {string} id
      * @returns {undefined}
@@ -2602,7 +2602,7 @@ function MegaData()
         }
     };
 
-    // Update M.ps and related localStorage
+    // Update M.ps and related indexedDb
     this.addPS = function(pendingShare, ignoreDB)
     {
         this.ps[pendingShare.p] = pendingShare;
@@ -2613,7 +2613,7 @@ function MegaData()
     };
 
     /**
-     * Delete ps record from localStorage using id, ps = pending share
+     * Delete ps record from indexedDb using id, ps = pending share
      *
      * @param {string} id
      * @returns {undefined}
@@ -4255,7 +4255,9 @@ function execsc(actionPackets, callback) {
                     });
                 }
             }
-            else if (actionPacket.a === 'opc') {    // Outgoing pending contact
+            
+            // Outgoing pending contact
+            else if (actionPacket.a === 'opc') {
                 processOPC([actionPacket]);
 
                 // Don't append to sent grid on deletion
@@ -4263,19 +4265,26 @@ function execsc(actionPackets, callback) {
                     M.drawSentContactRequests([actionPacket]);
                 }
             }
-            else if (actionPacket.a === 'ipc') {    // Incoming pending contact
+            
+            // Incoming pending contact
+            else if (actionPacket.a === 'ipc') {
                 processIPC([actionPacket]);
                 M.drawReceivedContactRequests([actionPacket]);
                 addIpcOrContactNotification(actionPacket);
             }
-            else if (actionPacket.a === 's2') {     // Pending shares
-                var fromGettree = false;
-                processPS([actionPacket], fromGettree);
+            
+            // Pending shares, own action packet
+            else if (actionPacket.a === 's2') {
+                processPS([actionPacket]);
             }
-            else if (actionPacket.a === 'upci') {   // Incomming request updated
+            
+            // Incomming request updated
+            else if (actionPacket.a === 'upci') {
                 processUPCI([actionPacket]);
             }
-            else if (actionPacket.a === 'upco') {   // Outgoing request updated
+            
+            // Outgoing request updated
+            else if (actionPacket.a === 'upco') {
                 processUPCO([actionPacket]);
 
                 // If the status is accepted ('2') then this will be followed by a contact packet and we do not need to notify
@@ -4569,9 +4578,11 @@ function execsc(actionPackets, callback) {
         } else if (actionPacket.a === 'opc') {
             processOPC([actionPacket]);
             M.drawSentContactRequests([actionPacket]);
-        } else if (actionPacket.a === 's2') {
-            var fromGettree = false;
-            processPS([actionPacket], fromGettree);
+        }
+        
+        // Pending share, action packet generated on remote client
+        else if (actionPacket.a === 's2') {
+            processPS([actionPacket]);
         } else if (actionPacket.a === 'ipc') {
             processIPC([actionPacket]);
             M.drawReceivedContactRequests([actionPacket]);
@@ -5184,7 +5195,7 @@ function processPS(pendingShares, fromGettree) {
                 M.addPS({'h':nodeHandle, 'p':pendingContactId, 'r':shareRights, 'ts':timeStamp});
 
                 // Update the ui
-                sharedUInode(nodeHandle, 1);
+//                sharedUInode(nodeHandle, 1);
             }
         }
     }
@@ -5336,8 +5347,7 @@ function loadfm_callback(res)
         processIPC(res.ipc);
     }
     if (res.ps) {
-        var fromGettree = true;
-        processPS(res.ps, fromGettree);
+        processPS(res.ps);
     }
     process_f(res.f, function onLoadFMDone() {
 

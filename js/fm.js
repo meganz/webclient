@@ -1265,14 +1265,10 @@ function removeUInode(h)
     }
 }
 
-function sharedUInode(nodeHandle, numberOfFullShares)
-{
-    if (numberOfFullShares || M.d[nodeHandle].hasPendingShares)
-    {
+function sharedUInode(nodeHandle, numberOfFullShares) {
+    if (numberOfFullShares || M.d[nodeHandle].hasPendingShares) {
         $('#treea_' + nodeHandle + ' .nw-fm-tree-folder').addClass('shared-folder');
-    }
-    else
-    {
+    } else {
         $('#treea_' + nodeHandle + ' .nw-fm-tree-folder').removeClass('shared-folder');
         $('.grid-table.fm #' + nodeHandle + ' .transfer-filtype-icon').removeClass('folder-shared');
         $('.file-block#' + nodeHandle + ' .block-view-file-type').removeClass('folder-shared');
@@ -6355,9 +6351,9 @@ function addShareDialogContactToContent(type, id, av_color, av, name, permClass,
 }
 
 function fillShareDialogWithContent() {
-    var selectedNodeHandle = $.selected[0];
-    $.sharedTokens = [];// Holds items currently visible in share folder content (above multi-input)
-    var shares = M.d[selectedNodeHandle].shares;
+    $.sharedTokens = [];// GLOBAL VARIABLE, Holds items currently visible in share folder content (above multi-input)
+    var selectedNodeHandle = $.selected[0],
+        shares = M.d[selectedNodeHandle].shares;
 
     // List users that are already use item
     for (var userHandle in shares) {
@@ -6378,18 +6374,17 @@ function fillShareDialogWithContent() {
         }
     }
 
-    for (var pendingShareHandle in M.ps) {
-        if (M.ps.hasOwnProperty(pendingShareHandle)) {
-            var pendingShare = M.ps[pendingShareHandle];
-
-            // Is the pending share related to the selected node
-            if (pendingShare.h === selectedNodeHandle) {
-
+    var mps = M.ps[selectedNodeHandle];
+    if (mps) {
+        for (var pcrHandle in mps) {
+            if (mps.hasOwnProperty(pcrHandle)) {
+                
                 // Because it's pending, we don't have user information in M.u so we have to look in the pending contact request
-                if (M.opc[pendingShare.p]) {
-
-                    var pendingContactRequest = M.opc[pendingShare.p];
-                    generateShareDialogRow(pendingContactRequest.m, pendingContactRequest.m, pendingShare.r);
+                if (M.opc[mps[pcrHandle].p]) {
+                    var pendingContactRequest = M.opc[mps[pcrHandle].p];
+                    
+                    // ToDo: take care of name attribute once available
+                    generateShareDialogRow(pendingContactRequest.m, pendingContactRequest.m, mps[pcrHandle].r);
                 }
             }
         }

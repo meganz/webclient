@@ -2602,13 +2602,28 @@ function MegaData()
         }
     };
 
-    // Update M.ps and related indexedDb
-    this.addPS = function(pendingShare, ignoreDB)
-    {
-        this.ps[pendingShare.p] = pendingShare;
+    /**
+     * Update M.ps and indexedDb
+     * 
+     * Structure of M.ps
+     * <shared_item_id>:
+     * [
+     *  <pending_contact_request_id>:
+     *  {h, p, r, ts},
+     * ]
+     * @param {JSON} ps, pending share
+     * @param {boolean} ignoreDB
+     * 
+     * @returns {undefined}
+     */
+    this.addPS = function(ps, ignoreDB) {
+        if (!this.ps[ps.h]) {
+            this.ps[ps.h] = {};
+        }
+        this.ps[ps.h][ps.p] = ps;
 
         if (typeof mDB === 'object' && !ignoreDB && !pfkey) {
-            mDBadd('ps', clone(pendingShare));
+            mDBadd('ps', clone(ps));
         }
     };
 
@@ -3046,12 +3061,10 @@ function MegaData()
         }
     };
 
-    this.deletePendingShare = function(nodeHandle, pendingContactId)
-    {
+    this.deletePendingShare = function(nodeHandle, pendingContactId) {
         if (this.d[nodeHandle]) {
 
-            if (this.ps[pendingContactId])
-            {
+            if (this.ps[pendingContactId]) {
                 delete this.ps[pendingContactId];
 
                 // Todo: Delete from mDB once mDB gets re-instated
@@ -3059,45 +3072,35 @@ function MegaData()
 
             var pendingShareCount = 0;
 
-            for (var index in this.ps)
-            {
+            for (var index in this.ps) {
                 var pendingShare = this.ps[index];
-                if (pendingShare.h === nodeHandle)
-                {
+                if (pendingShare.h === nodeHandle) {
                     pendingShareCount++;
                 }
             }
 
-            if (pendingShareCount == 0)
-            {
+            if (pendingShareCount == 0) {
                 this.d[nodeHandle].hasPendingShares = false;
 
                 // node.Shares will be deleted if there are no full shares. If there ARE no shares left then we should
                 // remove the share icon
                 var removeIcon = false;
 
-                if (typeof this.d[nodeHandle].shares === 'undefined')
-                {
+                if (typeof this.d[nodeHandle].shares === 'undefined') {
                     removeIcon = true;
-                }
-                else
-                {
+                } else {
                     var count = 0;
-                    for (var i in this.d[nodeHandle].shares)
-                    {
-                        if (this.d[nodeHandle].shares.hasOwnProperty(i))
-                        {
+                    for (var i in this.d[nodeHandle].shares) {
+                        if (this.d[nodeHandle].shares.hasOwnProperty(i)) {
                             count++;
                         }
                     }
-                    if (count==0)
-                    {
+                    if (count==0) {
                         removeIcon = true;
                     }
                 }
 
-                if (removeIcon)
-                {
+                if (removeIcon) {
                     sharedUInode(nodeHandle, 0);
                 }
             }
@@ -4273,7 +4276,7 @@ function execsc(actionPackets, callback) {
                 addIpcOrContactNotification(actionPacket);
             }
             
-            // Pending shares, own action packet
+            // Pending shares
             else if (actionPacket.a === 's2') {
                 processPS([actionPacket]);
             }
@@ -4578,11 +4581,6 @@ function execsc(actionPackets, callback) {
         } else if (actionPacket.a === 'opc') {
             processOPC([actionPacket]);
             M.drawSentContactRequests([actionPacket]);
-        }
-        
-        // Pending share, action packet generated on remote client
-        else if (actionPacket.a === 's2') {
-            processPS([actionPacket]);
         } else if (actionPacket.a === 'ipc') {
             processIPC([actionPacket]);
             M.drawReceivedContactRequests([actionPacket]);
@@ -5167,13 +5165,12 @@ function processOPC(opc) {
  * @param {boolean} fromGettree
  * @returns {undefined}
  */
-function processPS(pendingShares, fromGettree) {
+function processPS(pendingShares) {
     DEBUG('processPS');
 
     for (var i in pendingShares) {
-        if (fromGettree) {
-            // As this is from gettree and the node tree may not have been processed yet, the 'hasPendingShares'
-            // flag will be set on the node after gettree is processed
+        
+        if (pendingShares[i].h) {// This's from gettree
             M.addPS(pendingShares[i]);
         } else {
             var nodeHandle = pendingShares[i].n;
@@ -5182,12 +5179,16 @@ function processPS(pendingShares, fromGettree) {
             var timeStamp = pendingShares[i].ts;
 
             if (typeof shareRights === 'undefined') {
+                
+                //??? Maybe this's not necessary, cause we should not handle remote pending shares,
+                //except removing conatct from pending contact list
                 // This is a delete packet, we should remove the pending share if this was not triggered by our own client
                 if (pendingShares[i].i === requesti) continue;
 
                 // Delete the pending share
                 delete M.ps[pendingShares[i].p];
             } else {
+                
                 // We need to record that this node has a pending share, as this is not gettree
                 M.d[nodeHandle].hasPendingShares = true;
 
@@ -5195,7 +5196,7 @@ function processPS(pendingShares, fromGettree) {
                 M.addPS({'h':nodeHandle, 'p':pendingContactId, 'r':shareRights, 'ts':timeStamp});
 
                 // Update the ui
-//                sharedUInode(nodeHandle, 1);
+                sharedUInode(nodeHandle, 1);
             }
         }
     }

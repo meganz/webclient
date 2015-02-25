@@ -41,6 +41,10 @@ function switch_pro(data)
 
 function init_pro()
 {
+    // Temporarily redirect to #resellers page because PayPal aren't taking payments anymore
+    window.location.replace("#resellers");
+    
+    
 	var DEFAULT = 'monthly'; 
 	
 	if (DEFAULT == 'monthly') 

@@ -1265,16 +1265,19 @@ function removeUInode(h)
     }
 }
 
-function sharedUInode(nodeHandle, numberOfFullShares) {
-    if (numberOfFullShares || M.d[nodeHandle].hasPendingShares) {
+function sharedUInode(nodeHandle) {
+    var availShares = false;
+    
+    if ((M.d[nodeHandle] && M.d[nodeHandle].shares) || M.ps[nodeHandle]) {
         $('#treea_' + nodeHandle + ' .nw-fm-tree-folder').addClass('shared-folder');
+        availShares = true;
     } else {
         $('#treea_' + nodeHandle + ' .nw-fm-tree-folder').removeClass('shared-folder');
         $('.grid-table.fm #' + nodeHandle + ' .transfer-filtype-icon').removeClass('folder-shared');
         $('.file-block#' + nodeHandle + ' .block-view-file-type').removeClass('folder-shared');
     }
-    $('.grid-table.fm #' + nodeHandle + ' .transfer-filtype-icon').addClass(fileicon({ t: 1, shares: numberOfFullShares }));
-    $('.file-block#' + nodeHandle + ' .block-view-file-type').addClass(fileicon({ t: 1, shares: numberOfFullShares }));
+    $('.grid-table.fm #' + nodeHandle + ' .transfer-filtype-icon').addClass(fileicon({ t: 1, shares: availShares }));
+    $('.file-block#' + nodeHandle + ' .block-view-file-type').addClass(fileicon({ t: 1, shares: availShares }));
 }
 
 function addnotification(notification) {
@@ -6775,7 +6778,7 @@ function initShareDialog() {
             // Due to pending shares, the id could be an email instead of a handle
             var userEmail = handleOrEmail;
 
-            // If it was a user handle, the share must be a full share
+            // If it was a user handle, the share is a full share
             if (M.u[handleOrEmail]) {
                 userEmail = M.u[handleOrEmail].m;
                 M.delnodeShare( selectedNodeHandle, handleOrEmail);
@@ -6787,16 +6790,7 @@ function initShareDialog() {
             }
 
             // The s2 api call can remove both shares and pending shares
-            api_req({
-                a: 's2',
-                n:  selectedNodeHandle,
-                s: [{
-                        u: userEmail,
-                        r: ''
-                    }],
-                ha: '',
-                i: requesti
-            });
+            api_req({a: 's2', n:  selectedNodeHandle, s: [{ u: userEmail, r: ''}], ha: '', i: requesti});
 
             $.sharedTokens.splice($.sharedTokens.indexOf(userEmail), 1);
         }

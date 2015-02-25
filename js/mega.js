@@ -2628,14 +2628,31 @@ function MegaData()
     };
 
     /**
-     * Delete ps record from indexedDb using id, ps = pending share
+     * Maintain .ps and related indexedDb
      *
-     * @param {string} id
+     * @param {string} pcrId, pending contact request id
+     * @param {string} nodeId, shared item id
+     * 
      * @returns {undefined}
      */
-    this.delPS = function(id) {
+    this.delPS = function(pcrId, nodeId) {
+        
+        // Delete the pending share
+        if (this.ps[nodeId]) {
+            if (this.ps[nodeId][pcrId]) {
+                delete this.ps[nodeId][pcrId];
+            }
+            
+            // If there's no pending shares for node left, clean M.ps
+            if (Object.keys(this.ps[nodeId]).length === 0) {
+                delete this.ps[nodeId];
+            }            
+        }
+
+        // Check how removing from indexedDb works and make
+        // sure that pending share is/only removed from it
         if (typeof mDB === 'object' && !pfkey) {
-            mDBdel('ps', id);
+            mDBdel('ps', pcrId);
         }
     };
     
@@ -3011,7 +3028,7 @@ function MegaData()
                     mDBadd('s', clone(s));
                 }
             }
-            sharedUInode(h, 1);
+            sharedUInode(h);
             if ($.dialog === 'sharing' && $.selected && $.selected[0] === h) {
                 shareDialog();
             }
@@ -3036,7 +3053,7 @@ function MegaData()
                 delete this.d[h].shares;
                 M.nodeAttr({h: h, shares: undefined});
                 delete u_sharekeys[h];
-                sharedUInode(h, 0);
+                sharedUInode(h);
                 if (typeof mDB === 'object')
                     mDBdel('ok', h);
             }
@@ -3048,62 +3065,39 @@ function MegaData()
     };
 
     // Searches M.opc for the pending contact
-    this.findOutgoingPendingContactIdByEmail = function(email)
-    {
-        for (var index in M.opc)
-        {
+    this.findOutgoingPendingContactIdByEmail = function(email) {
+        for (var index in M.opc) {
             var opc = M.opc[index];
 
-            if (opc.m === email)
-            {
+            if (opc.m === email) {
                 return opc.p;
             }
         }
     };
 
+    /**
+     * called when user try to remove pending contact from shared dialog
+     * should be changed case M.ps structure is changed, take a look at processPS()
+     * 
+     * @param {string} nodeHandle
+     * @param {string} pendingContactId
+     * 
+     * @returns {undefined}
+     */
     this.deletePendingShare = function(nodeHandle, pendingContactId) {
         if (this.d[nodeHandle]) {
 
-            if (this.ps[pendingContactId]) {
-                delete this.ps[pendingContactId];
-
-                // Todo: Delete from mDB once mDB gets re-instated
+            if (this.ps[nodeHandle] && this.ps[nodeHandle][pendingContactId]) {
+                M.delPS(pendingContactId, nodeHandle);
             }
 
-            var pendingShareCount = 0;
-
-            for (var index in this.ps) {
-                var pendingShare = this.ps[index];
-                if (pendingShare.h === nodeHandle) {
-                    pendingShareCount++;
-                }
-            }
-
-            if (pendingShareCount == 0) {
-                this.d[nodeHandle].hasPendingShares = false;
-
-                // node.Shares will be deleted if there are no full shares. If there ARE no shares left then we should
-                // remove the share icon
-                var removeIcon = false;
-
-                if (typeof this.d[nodeHandle].shares === 'undefined') {
-                    removeIcon = true;
-                } else {
-                    var count = 0;
-                    for (var i in this.d[nodeHandle].shares) {
-                        if (this.d[nodeHandle].shares.hasOwnProperty(i)) {
-                            count++;
-                        }
-                    }
-                    if (count==0) {
-                        removeIcon = true;
-                    }
-                }
-
-                if (removeIcon) {
-                    sharedUInode(nodeHandle, 0);
-                }
-            }
+            // If there ARE no shares left then we should remove the share icon
+//            if (!M.ps[nodeHandle]) {
+//
+//                if (!this.d[nodeHandle].shares) {
+//                    sharedUInode(nodeHandle);
+//                }
+//            }
         }
     };
 
@@ -4450,7 +4444,8 @@ function execsc(actionPackets, callback) {
                     a: 'k',
                     cr: crypto_makecr(actionPacket.n, [actionPacket.h], true)
                 });
-        } else if (actionPacket.a === 't') {
+        }
+        else if (actionPacket.a === 't') {
             if (tparentid) {
                 for (var b in actionPacket.t.f) {
                     if (rootsharenodes[actionPacket.t.f[b].h] && M.d[actionPacket.t.f[b].h]) {
@@ -4501,7 +4496,8 @@ function execsc(actionPackets, callback) {
             trights = false;
             //process_f(actionPacket.t.f);
             async_procnodes = async_procnodes.concat(actionPacket.t.f);
-        } else if (actionPacket.a === 'c') {
+        }
+        else if (actionPacket.a === 'c') {
             process_u(actionPacket.u);
 
             // Contact is deleted on remote computer, remove contact from contacts left panel
@@ -4520,9 +4516,11 @@ function execsc(actionPackets, callback) {
                     megaChat[v.c == 0 ? "processRemovedUser" : "processNewUser"](v.u);
                 });
             }
-        } else if (actionPacket.a === 'd') {
+        }
+        else if (actionPacket.a === 'd') {
             M.delNode(actionPacket.n);
-        } else if (actionPacket.a === 'ua' && fminitialized) {
+        }
+        else if (actionPacket.a === 'ua' && fminitialized) {
             for (var i in actionPacket.ua) {
                 if (actionPacket.ua[i] === '+a') {
                     avatars[actionPacket.u] = undefined;
@@ -4535,7 +4533,8 @@ function execsc(actionPackets, callback) {
                     getPubEd25519(actionPacket.u);
                 }
             }
-        } else if (actionPacket.a === 'u') {
+        }
+        else if (actionPacket.a === 'u') {
             var n = M.d[actionPacket.n];
             if (n) {
                 var f = {h: actionPacket.n, k: actionPacket.k, a: actionPacket.at}, newpath = 0;
@@ -4576,18 +4575,26 @@ function execsc(actionPackets, callback) {
                     crypto_proccr(actionPacket.cr);
                 }
             }
-        } else if (actionPacket.a === 'la') {
+        }
+        else if (actionPacket.a === 'la') {
             notifyPopup.doNotify();
-        } else if (actionPacket.a === 'opc') {
+        }
+        else if (actionPacket.a === 'opc') {
             processOPC([actionPacket]);
             M.drawSentContactRequests([actionPacket]);
-        } else if (actionPacket.a === 'ipc') {
+        }
+        else if (actionPacket.a === 'ipc') {
             processIPC([actionPacket]);
             M.drawReceivedContactRequests([actionPacket]);
             addIpcOrContactNotification(actionPacket);
-        } else if (actionPacket.a === 'upci') {
+        }
+        else if (actionPacket.a === 's2') {
+            processPS([actionPacket]);
+        }
+        else if (actionPacket.a === 'upci') {
             processUPCI([actionPacket]);
-        } else if (actionPacket.a === 'upco') {
+        }
+        else if (actionPacket.a === 'upco') {
             processUPCO([actionPacket]);
 
             // If the status is accepted ('2') then this will be followed by a contact packet and we do not need to notify
@@ -5162,41 +5169,44 @@ function processOPC(opc) {
  * Handle pending shares
  *
  * @param {array of JSON objects} pending shares
- * @param {boolean} fromGettree
+ * 
  * @returns {undefined}
  */
 function processPS(pendingShares) {
     DEBUG('processPS');
+    var ps;
 
     for (var i in pendingShares) {
-        
-        if (pendingShares[i].h) {// This's from gettree
-            M.addPS(pendingShares[i]);
-        } else {
-            var nodeHandle = pendingShares[i].n;
-            var pendingContactId = pendingShares[i].p;
-            var shareRights = pendingShares[i].r;
-            var timeStamp = pendingShares[i].ts;
+        if (pendingShares.hasOwnProperty(i)) {
+            ps = pendingShares[i];
+            if (ps.h) {// From gettree
+                M.addPS(ps);
+            }
+            else {// Situation different from gettree, s2 from API response, doesn't have .h attr instead have .n
+                var nodeHandle = ps.n;
+                var pendingContactId = ps.p;
+                var shareRights = ps.r;
+                var timeStamp = ps.ts;
 
-            if (typeof shareRights === 'undefined') {
-                
-                //??? Maybe this's not necessary, cause we should not handle remote pending shares,
-                //except removing conatct from pending contact list
-                // This is a delete packet, we should remove the pending share if this was not triggered by our own client
-                if (pendingShares[i].i === requesti) continue;
+                // ? Check how we are handling canceling/denying of pending contact request
 
-                // Delete the pending share
-                delete M.ps[pendingShares[i].p];
-            } else {
-                
-                // We need to record that this node has a pending share, as this is not gettree
-                M.d[nodeHandle].hasPendingShares = true;
+                // shareRights is undefined when user denies pending contact request
+                // .op is available when user accepts pending contact request and pending share
+                // should be updated to full share
+                if (typeof shareRights === 'undefined' || ps.op) {
 
-                // Add the pending share to state
-                M.addPS({'h':nodeHandle, 'p':pendingContactId, 'r':shareRights, 'ts':timeStamp});
+                    M.delPS(pendingContactId, nodeHandle);
 
-                // Update the ui
-                sharedUInode(nodeHandle, 1);
+                    if (ps.op) {// Upgrade pending share to full share
+                        M.nodeShare(nodeHandle, ps);
+                    }
+                } else {
+
+                    // Add the pending share to state
+                    M.addPS({'h':nodeHandle, 'p':pendingContactId, 'r':shareRights, 'ts':timeStamp});
+                    
+                    sharedUInode(nodeHandle);
+                }
             }
         }
     }
@@ -5237,10 +5247,14 @@ function processUPCO(ap) {
             psid = ap[i].p;
             delete M.opc[psid];
             delete M.ipc[psid];
-            delete M.ps[psid];
             M.delOPC(psid);
             M.delIPC(psid);
-            M.delPS(psid);
+            
+            for (var k in M.ps) {
+                if (M.ps.hasOwnProperty(k)) {
+                    M.delPS(psid, k);
+                }
+            }
 
             // Update token.input plugin
             if ($('.add-contact-multiple-input')) {
@@ -5357,16 +5371,6 @@ function loadfm_callback(res)
             for (var i in res.s) {
                 var nodeHandle = res.s[i].h;
                 M.nodeShare(nodeHandle, res.s[i]);
-            }
-        }
-
-        // If we have pending shares, and if any are for this node, set a flag
-        if (res.ps) {
-            for (var index in res.ps) {
-                var pendingShare = res.ps[index];
-                if (M.d[pendingShare.h]) {
-                    M.d[pendingShare.h].hasPendingShares = true;
-                }
             }
         }
 

@@ -235,7 +235,7 @@ function filetype(n)
 function fileicon(nodeInfo) {	
 	var icon;
     
-	if (nodeInfo.t && nodeInfo.shares || typeof nodeInfo.r == "number" || nodeInfo.hasPendingShares) {
+	if (nodeInfo.t && nodeInfo.shares || typeof nodeInfo.r == "number" || M.ps[nodeInfo.h]) {
         icon = 'folder-shared';
     }
 	else if (nodeInfo.t) {

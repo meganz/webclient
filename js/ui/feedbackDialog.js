@@ -57,7 +57,7 @@
 
                         this.hide();
 
-                        msgDialog('info', 'Feedback', 'Thank you for your feedback!')
+                        msgDialog('info', 'Feedback', 'Thank you for your feedback!');
                     }
                 },
                 {

@@ -1803,7 +1803,7 @@ function MegaData()
             }
             var sharedfolder = 'folder-item';
             if (typeof M.d[fid].shares !== 'undefined')
-                sharedfolder = 'shared-folder-item';
+                sharedfolder += ' shared-folder-item';
             var html = '<span class="context-menu-item ' + sharedfolder + cs + '" id="fi_' + fid + '">' + icon + htmlentities(this.d[fid].name) + '</span>' + sm;
             $('#csb_' + id).append(html);
             if (sub)
@@ -4566,7 +4566,7 @@ function execsc(actionPackets, callback) {
     function onExecSCDone() {
         if (newnodes.length > 0 && fminitialized) rendernew();
         if (loadavatars) M.avatars();
-        fm_thumbnails();
+        if (M.viewmode) fm_thumbnails();
         if ($.dialog === 'properties') propertiesDialog();
         getsc();
         if (callback) Soon(callback);
@@ -4592,8 +4592,11 @@ function fm_commitkeyupdate()
     // refresh render?
 }
 
-function loadfm()
+function loadfm(force)
 {
+    if (force) {
+        loadfm.loaded = false;
+    }
     if (loadfm.loaded) {
         Soon(loadfm_done.bind(this, pfkey));
     } else {

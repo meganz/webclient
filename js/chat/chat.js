@@ -2003,7 +2003,7 @@ Chat.prototype.renderContactTree = function() {
             var participantJid = room.getParticipantsExceptMe()[0];
             var presence = self.karere.getPresence(participantJid);
 
-            var targetClassName = "offline"
+            var targetClassName = "offline";
             if(!presence || presence == Karere.PRESENCE.OFFLINE) {
                 targetClassName = "offline";
             } else if(presence == Karere.PRESENCE.AWAY) {
@@ -2188,7 +2188,7 @@ Chat.prototype.reorderContactTree = function() {
             if($first.length > 0) {
                 $currentNode.insertBefore($first);
             } else {
-                $container.append($currentNode)
+                $container.append($currentNode);
             }
         } else {
             $currentNode.insertAfter($prevNode);

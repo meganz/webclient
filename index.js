@@ -784,7 +784,7 @@ function init_page()
 
 				return false;
 			});
-
+        
 		$('#pageholder').hide();
 		$('#startholder').hide();
 		if ($('#fmholder:visible').length == 0)
@@ -1077,8 +1077,8 @@ function topmenuUI() {
         if (u_attr.p) {
             $('.membership-icon-pad .membership-icon').attr('class', 'membership-icon pro' + u_attr.p);
             if (u_attr.p == 1) $('.membership-icon-pad .membership-big-txt.red').text('PRO I');
-            else if (u_attr.p == 1) $('.membership-icon-pad .membership-big-txt.red').text('PRO II');
-            else if (u_attr.p == 1) $('.membership-icon-pad .membership-big-txt.red').text('PRO III');
+            else if (u_attr.p == 2) $('.membership-icon-pad .membership-big-txt.red').text('PRO II');
+            else if (u_attr.p == 3) $('.membership-icon-pad .membership-big-txt.red').text('PRO III');
             $('.membership-status-block').html('<div class="membership-status pro">PRO</div>');
             $('.context-menu-divider.upgrade-your-account').addClass('pro');
             $('.membership-popup.pro-popup');
@@ -1299,6 +1299,7 @@ function topmenuUI() {
 					$('.membership-popup.pro-popup .membership-icon').addClass('pro' + u_attr.p);
 					var p = account.stype == 'S' ? '' : (l[987] + ' <span class="red">' + time2date(account.expiry) + '</span>');
 					$('.membership-popup.pro-popup .membership-icon-txt-bl .membershtip-medium-txt').html(p);
+					$('.membership-icon-pad .membership-big-txt.red').text('PRO ' + Array(+u_attr.p+1|0).join("I"));
 				}
 				else
 				{

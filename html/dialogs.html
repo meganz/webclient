@@ -1313,3 +1313,45 @@ These will not be added to you MEGA Contacts but will remain accessible to share
         </div>
     </div>
 </div>
+
+
+<!-- Dialog is shown when user is being MITM'd -->
+<div class="fm-dialog fm-mega-dialog credentials-warning-dialog filled-input hidden">
+    <div class="fm-dialog-close"></div>
+    <div class="nw-fm-dialog-title"></div>
+    <div class="fm-mega-dialog-pad">
+        <div class="fm-dialog-contents">
+            <div class="content">
+                <div class="avatarAndWarningMessage">
+                    <div class="userAvatar">
+                        <img alt="avatar" src="" />
+                    </div>
+                    <div class="information">
+                        <span class="firstLine">
+                            The previously <span class="seenOrVerified">seen</span> contact credentials 
+                            for <span class="emailAddress">email@domain.com</span> have changed.
+                        </span>
+                        There may be a man-in-the-middle attack in progress. Please verify these 
+                        credentials are correct with your contact through an existing secure channel or in-person.
+                    </div>
+                </div>
+                
+                <div class="previousCredentials">
+                    <div class="title">Previously <span class="seenOrVerified">seen</span> credentials:</div>
+                    <div class="fingerprint"></div>
+                </div>                
+                <div class="newCredentials">
+                    <div class="title">New unverified credentials:</div>
+                    <div class="fingerprint"></div>
+                </div>
+                
+                <div class="instruction">
+                    <span class="reject">Reject</span> if you are unsure and attempt to verify them as soon as possible.
+                </div>
+                <div class="instruction">
+                    <span class="accept">Accept</span> only if you have verified the new credentials with your contact.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

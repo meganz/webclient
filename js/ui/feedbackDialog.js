@@ -249,6 +249,9 @@
             FeedbackDialog._instance = new FeedbackDialog();
         }
 
+        if(typeOfFeedback) {
+            FeedbackDialog._instance._type = typeOfFeedback;
+        }
         FeedbackDialog._instance.show($toggleButton);
 
         return FeedbackDialog._instance;

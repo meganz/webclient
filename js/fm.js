@@ -1610,15 +1610,14 @@ function addContactUI()
     });
 
     $('.fm-add-user').unbind('click');
-    $('.fm-add-user').bind('click', function()
-    {
+    $('.fm-add-user').bind('click', function() {
         $.hideContextMenu();
         $.dialog = 'add-contact-popup';
         var $this = $(this);
         var $d = $('.add-user-popup');
         $.sharedTokens = [];// Holds items currently visible in share folder contet (above input)
-        if ($this.is('.active'))// Hide
-        {
+        
+        if ($this.is('.active')) {// Hide
             $this.removeClass('active');
             $d.addClass('hidden');
         } else {// Show
@@ -2170,7 +2169,8 @@ function initContextUI()
             var $shareDialog = $('.share-dialog');
             $shareDialog.removeClass('hidden');
 
-            // Hide the optional message by default. This gets enabled if they try share with a user who is not a contact
+            // Hide the optional message by default.
+            // This gets enabled if they try share with a user who is not a contact
             $shareDialog.find('.share-message').hide();
 
             fm_showoverlay();
@@ -6447,22 +6447,22 @@ function handleDialogScroll(num, dc)
 }
 
 function handleShareDialogContent() {
+    var dc = '.share-dialog';
 
     fillShareDialogWithContent();
 
     // Taking care about share dialog button 'Share' and scroll
     shareDialogContentCheck();
 
-    var dc = '.share-dialog';
     $('.share-dialog-icon.permissions-icon')
         .removeClass('active full-access read-and-write')
         .addClass('read-only');
+    
     // Update dialog title text
     $(dc + ' .fm-dialog-title').text(l[1344] + ' "' + M.d[$.selected].name + '"');
-
-    $('.share-dialog .multiple-input .token-input-token-mega').remove();
-
+    $(dc + ' .multiple-input .token-input-token-mega').remove();
     dialogPositioning('.fm-dialog.share-dialog');
+    $(dc + ' .token-input-input-token-mega input').focus();
 }
 
 function checkMultiInputPermission($this)
@@ -6524,7 +6524,7 @@ function initShareDialog() {
         }, 3000);
     }
 
-    // Prevent double initialization of token input
+    // Prevents double initialization of token input
     if (!$('.share-multiple-input').tokenInput("getSettings")) {
 
         // Plugin configuration
@@ -6552,11 +6552,7 @@ function initShareDialog() {
                 errorMsg("Looks like there's a malformed email!");
             },
             onDoublet: function(item) {
-
-                // If the email already exists in the state, show error
-    //            if (checkIfContactExists(item.id)) {
-                    errorMsg('You already have contact with that email!');
-    //            };
+                errorMsg('You already have contact with that email!');
             },
             onHolder: function() {
                 errorMsg('No need for that, you are THE owner!');

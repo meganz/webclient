@@ -5188,11 +5188,9 @@ function processPS(pendingShares) {
                 var shareRights = ps.r;
                 var timeStamp = ps.ts;
 
-                // ? Check how we are handling canceling/denying of pending contact request
-
                 // shareRights is undefined when user denies pending contact request
-                // .op is available when user accepts pending contact request and pending share
-                // should be updated to full share
+                // .op is available when user accepts pending contact request and 
+                // remaining pending share should be updated to full share
                 if (typeof shareRights === 'undefined' || ps.op) {
 
                     M.delPS(pendingContactId, nodeHandle);

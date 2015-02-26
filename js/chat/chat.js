@@ -2524,7 +2524,7 @@ Chat.prototype.closeChatPopups = function() {
     if (activePopup.attr('class')) {
         activeButton.removeClass('active');
         activePopup.removeClass('active');
-        if (activePopup.attr('class').indexOf('fm-add-contact-popup') == -1) activePopup.css('left', '-' + 10000 + 'px');
+        if (activePopup.attr('class').indexOf('fm-add-contact-popup') == -1 && activePopup.attr('class').indexOf('fm-start-call-popup') == -1) activePopup.css('left', '-' + 10000 + 'px');
         else activePopup.css('right', '-' + 10000 + 'px');
     }
 };

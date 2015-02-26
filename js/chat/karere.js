@@ -214,6 +214,22 @@ var Karere = function(user_options) {
         if(self._$connectingPromise && self._$connectingPromise.state() == 'pending') {
             self._$connectingPromise.reject();
         }
+
+        Object.keys(self._presenceBareCache).forEach(function(k) {
+            delete self._presenceBareCache[k];
+
+            self.trigger(
+                "onPresence",
+                new KarereEventObjects.Presence(
+                    self.getJid(),
+                    k,
+                    "unavailable",
+                    "unavailable",
+                    unixtime(),
+                    undefined
+                )
+            );
+        });
         self._presenceCache = {};
         self._presenceBareCache = {};
 

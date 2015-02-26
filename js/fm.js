@@ -6778,11 +6778,13 @@ function initShareDialog() {
             if (M.u[handleOrEmail]) {
                 userEmail = M.u[handleOrEmail].m;
                 M.delnodeShare( selectedNodeHandle, handleOrEmail);
-            } else {
-                // Pending share 
-                // Work out pendingContactId
+            }
+            
+            // Pending share
+            else {
                 var pendingContactId = M.findOutgoingPendingContactIdByEmail(userEmail);
                 M.deletePendingShare(selectedNodeHandle, pendingContactId);
+                M.sharedUInode(selectedNodeHandle);
             }
 
             // The s2 api call can remove both shares and pending shares

@@ -3090,14 +3090,6 @@ function MegaData()
             if (this.ps[nodeHandle] && this.ps[nodeHandle][pendingContactId]) {
                 M.delPS(pendingContactId, nodeHandle);
             }
-
-            // If there ARE no shares left then we should remove the share icon
-//            if (!M.ps[nodeHandle]) {
-//
-//                if (!this.d[nodeHandle].shares) {
-//                    sharedUInode(nodeHandle);
-//                }
-//            }
         }
     };
 

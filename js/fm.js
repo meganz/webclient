@@ -3894,7 +3894,7 @@ var FMShortcuts = function() {
             return false; // stop prop.
         } else if (charCode == 8) {
             var $items = selectionManager.get_selected();
-            if ($items.size() == 0) {
+            if ($items.size() == 0 || (RightsbyID(M.currentdirid || '') | 0) < 1) {
                 return; // dont do anything.
             }
 

@@ -1934,7 +1934,7 @@ describe("Chat.js - Karere UI integration", function() {
                         },
                         'reject': {
                             'type': 'secondary',
-                            'text': "Cancel",
+                            'text': l[1686],
                             'callback': function(){}
                         }
                     },

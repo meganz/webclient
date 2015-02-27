@@ -840,7 +840,7 @@ function MegaData()
         } else if (this.currentdirid === 'ipc') {
             DEBUG('RenderMain() ipc');
             this.drawReceivedContactRequests(this.v, 'clearGrid');
-        } else if (this.currentdirid === 'contacts') {
+        } else if (this.currentdirid === 'contacts') {// ToDo: This block must go in separate function, globals removed and documented 
             for (var i in this.v) {
                 var u_h = this.v[i].h;
                 var cs = this.contactstatus(u_h);
@@ -911,7 +911,7 @@ function MegaData()
                 }
                 mInsertNode(this.v[i], this.v[i-1], this.v[i+1], t, el, html, u);
             }
-        } else for (var i in this.v) {
+        } else for (var i in this.v) {// ToDo: This block must go in separate function, globals removed and documented 
             if (!this.v[i].name) {
                 if (d) console.log('Skipping M.v node with no name.', this.v[i]);
                 continue;
@@ -933,7 +933,7 @@ function MegaData()
 
             if (this.currentdirid === 'shares') {
                 var cs = this.contactstatus(this.v[i].h),
-                    contains = fm_contains(cs.files, cs.folders);
+                    contains = fm_contains(cs.files, cs.folders),
                     u_h = this.v[i].p,
                     user = this.d[u_h],
                     userName = (user.name && user.name.length > 1) ? user.name : user.email,

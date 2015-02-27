@@ -299,9 +299,8 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
             self.megaChat.karere.connection.rtc.muteUnmute(true, {video:true});
             $('.chat-header-indicator.muted-video', self.$header).removeClass('hidden');
         }
-
-
-
+        if ($('.my-av-screen').attr('class').indexOf('minimized')==-1)
+           $('.my-av-screen').removeAttr('style'); 
         self._resetCallStateInCall();
     });
 
@@ -1238,7 +1237,32 @@ ChatRoom.prototype._callStartedState = function(e, eventData) {
                 $fullscreenContainer.addClass("hidden");
                 self.megaChat.karere.connection.rtc.hangup(); /** pass eventData.peer? **/
             });
-
+        
+		$('.small-video-reziser')
+            .unbind('click')
+            .bind('click', function() {
+                if($(this).attr('class').indexOf('active') == -1) {
+                    $(this).parent().addClass('minimized');
+                    $(this).parent().animate({
+                        'min-height': '24px',
+                        width: 24,
+                        height: 24
+                    }, 200, function() {
+                        $('.small-video-reziser').addClass('active');
+                    });
+                } else {
+				    var w = 245;
+			        if ($(this).parent().attr('class').indexOf('current-user-audio-container') >=1 ) w = 184;
+                    $(this).parent().removeClass('minimized');
+                    $(this).parent().animate({
+                        width: w,
+                        height:184
+                      }, 200, function() {
+                        $('.small-video-reziser').removeClass('active');
+                        $(this).parent().css('min-height','184px');
+                    });
+                }
+	    	});
 
         $('.video-call-button.audio-icon', $fullscreenContainer)
             .unbind('click.megaChat')

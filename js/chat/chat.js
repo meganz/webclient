@@ -548,9 +548,9 @@ var chatui;
         if($(this).attr('class').indexOf('active') == -1) {
             $(this).parent().addClass('minimized');
             $(this).parent().animate({
-                'min-width': '32px',
-                width: 32,
-                height: 32
+                'min-width': '24px',
+                width: 24,
+                height: 24
             }, 200, function() {
                 $('.video-minimize-button').addClass('active');
             });

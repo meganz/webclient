@@ -935,7 +935,7 @@ function MegaData()
                 var cs = this.contactstatus(this.v[i].h),
                     contains = fm_contains(cs.files, cs.folders);
                     u_h = this.v[i].p,
-                    user = M.d[u_h],
+                    user = this.d[u_h],
                     userName = (user.name && user.name.length > 1) ? user.name : user.email,
                     av_meta = generateAvatarMeta(u_h),
                     avatar = av_meta.shortName,

@@ -54,7 +54,10 @@
             }
 
             avatar = "<span class='nw-contact-avatar color" + av_color + "'>" + av + "</span>";
-            return "<li class='share-search-result " + type + "'>" + (this.addAvatar ? avatar : '') + "<span class='fm-chat-user-info'><span class='fm-chat-user'>" + (this.enableHTML ? email : _escapeHTML(email)) + "</span><span class='fm-chat-user-email'>email</span></span><span class='clear'></span></li>";
+            return "<li class='share-search-result " + type + "'>" + (this.addAvatar ? avatar : '')
+                    + "<span class='fm-chat-user-info'><span class='fm-chat-user'>"
+                    + (this.enableHTML ? email : _escapeHTML(email))
+                    + "</span><span class='fm-chat-user-email'>email</span></span><span class='clear'></span></li>";
         },
         tokenFormatter: function (item) {
             var id, av_color, av, avatar;

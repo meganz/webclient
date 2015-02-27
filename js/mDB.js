@@ -147,8 +147,7 @@ if ( 0 && indexedDB)
 
     var mDBqueue = {};
 
-    function mDBadd(t,n)
-    {
+    function mDBadd(t,n) {
         var a = n;
         if (a.name && a.p !== 'contacts') delete a.name;
         if (a.ar && a.p !== 'contacts') delete a.ar;

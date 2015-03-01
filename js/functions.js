@@ -645,6 +645,7 @@ function showOverQuotaDialog()
     $('.warning-green-icon', $dialog).remove();
     $('.warning-popup-body', $dialog).unbind('click').html(
         '<div class="warning-header">' + l[1010] + '</div>' + l[5929]
+		+ "<p>" + l[5931].replace("[A]", "<a href='#fm/account' style='text-decoration: underline'>").replace("[/A]", "</a>") + "</p>"
     );
     
     // Set button text to 'Upgrade Account'

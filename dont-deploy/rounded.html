@@ -1,0 +1,88 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>MEGA 2.0</title>
+<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+<link rel="stylesheet" type="text/css" href="../css/style.css" />
+<script src="../js/jquery-1.8.1.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {  
+/* test */
+  $(function () {
+    var cloudPercent = 21, 
+		cloudDeg = 360 * cloudPercent / 100,
+		
+		rubbishPercent = 15, 
+		rubbishDeg = 360 * (cloudPercent + rubbishPercent) / 100;
+		
+		incomingPercent = 5, 
+		incomingDeg = 360 * (cloudPercent + rubbishPercent + incomingPercent) / 100;
+		
+		inboxPercent = 5, 
+		inboxDeg = 360 * (cloudPercent + rubbishPercent + incomingPercent + inboxPercent) / 100;
+		
+	if (cloudPercent + rubbishPercent + incomingPercent + inboxPercent <50) {
+        $('.nw-fm-chart5-right p').css('transform', 'rotate(' + cloudDeg + 'deg)');
+	    $('.nw-fm-chart4-right p').css('transform', 'rotate(' + rubbishDeg + 'deg)');
+	    $('.nw-fm-chart3-right p').css('transform', 'rotate(' + incomingDeg + 'deg)');
+	    $('.nw-fm-chart2-right p').css('transform', 'rotate(' + inboxDeg + 'deg)');
+	} else {
+		if (cloudPercent >=50) {
+		    
+			   $('.nw-fm-chart5-right p').css('transform', 'rotate(180deg)');
+			
+			   $('.nw-fm-chart5-left p').css('transform', 'rotate(' + (cloudDeg - 180) + 'deg)');
+			   $('.nw-fm-chart4-left p').css('transform', 'rotate(' + (cloudDeg + rubbishPercent - 180) +'deg)');
+			
+		} 
+	}
+	
+    $('.nw-fm-percents span.pecents-txt').html(inboxPercent + cloudPercent + rubbishPercent + incomingPercent); 
+  });
+});
+</script>
+</head>
+<body>
+<div class="nw-fm-progress-border">
+  <div class="nw-fm-percentage">
+    <ul>
+      <li class="nw-fm-chart1-right">
+        <p><span class="chart-left"></span></p>
+      </li>
+      <li class="nw-fm-chart1-left">
+        <p><span class="chart-right"></span></p>
+      </li>
+      <li class="nw-fm-chart2-right">
+        <p><span class="chart-left"></span></p>
+      </li>
+      <li class="nw-fm-chart2-left">
+        <p><span class="chart-right"></span></p>
+      </li>
+      <li class="nw-fm-chart3-right">
+        <p><span class="chart-left"></span></p>
+      </li>
+      <li class="nw-fm-chart3-left">
+        <p><span class="chart-right"></span></p>
+      </li>
+      <li class="nw-fm-chart4-right">
+        <p><span class="chart-left"></span></p>
+      </li>
+      <li class="nw-fm-chart4-left">
+        <p><span class="chart-right"></span></p>
+      </li>
+      <li class="nw-fm-chart5-right">
+        <p><span class="chart-left"></span></p>
+      </li>
+      <li class="nw-fm-chart5-left">
+        <p><span class="chart-right"></span></p>
+      </li>
+    </ul>
+  </div>
+  <div class="nw-fm-percents">
+    <div class="nw-fm-percents-wrapper"> <span class="pecents-txt">95</span><span class="gb-txt">GB</span> </div>
+  </div>
+</div>
+
+</body>
+</html>

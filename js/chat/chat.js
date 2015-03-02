@@ -2357,7 +2357,7 @@ Chat.prototype.generatePrivateRoomName = function(jids) {
         roomName = roomName + jid.split("@")[0];
     });
 
-    roomName = base32.encode(asmCrypto.SHA256.hex(roomName).substr(0, 16));
+    roomName = base32.encode(asmCrypto.SHA256.bytes(roomName).subarray(0, 16));
     return roomName;
 };
 

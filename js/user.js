@@ -176,10 +176,6 @@ function u_logout(logout)
                 localStorage.removeItem("megaChatPresenceMtime");
 
             }
-
-            if(pubkeysCache && pubkeysCache.clear()) {
-                pubkeysCache.clear();
-            }
         }
 
 		delete localStorage.signupcode;

@@ -205,20 +205,27 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
         if($(this).is(".disabled")) {
             return false;
         }
-        var positionX = $(this).position().left - ($(this).outerWidth() * 0.75);
-        var sendFilesPopup = $('.fm-start-call-popup', self.$header);
+		var sendFilesPopup = $('.fm-start-call-popup', self.$header);
+        var positionX = $('.fm-chat-block').outerWidth() - $(this).position().left - ($(this).outerWidth() * 0.5) - (sendFilesPopup.outerWidth() * 0.5);
+        
         if ($(this).attr('class').indexOf('active') == -1) {
             self.megaChat.closeChatPopups();
             sendFilesPopup.addClass('active');
             $(this).addClass('active');
 
             var $arrow = $('.fm-start-call-popup .fm-send-files-arrow', self.$header);
-
-            $arrow.css('left', $arrow.parent().outerWidth()*0.75  + 'px');
-            sendFilesPopup.css('left',  positionX + 'px');
+            
+			if(positionX < 8) {
+				sendFilesPopup.css('right',  '8px');
+				$arrow.css('left', sendFilesPopup.outerWidth() - ($(this).outerWidth() * 0.5)  + 'px');
+				
+			} else {
+				sendFilesPopup.css('right',  positionX + 'px');
+				$arrow.css('left', '50%');
+			}
+			
         } else {
             self.megaChat.closeChatPopups();
-
         }
     });
     // - send-files
@@ -292,9 +299,8 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
             self.megaChat.karere.connection.rtc.muteUnmute(true, {video:true});
             $('.chat-header-indicator.muted-video', self.$header).removeClass('hidden');
         }
-
-
-
+        if ($('.my-av-screen').attr('class').indexOf('minimized')==-1)
+           $('.my-av-screen').removeAttr('style'); 
         self._resetCallStateInCall();
     });
 
@@ -418,7 +424,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
                         },
                         'reject': {
                             'type': 'secondary',
-                            'text': "Cancel",
+                            'text': l[1686],
                             'callback': doCancel
                         }
                     }
@@ -1025,7 +1031,7 @@ ChatRoom.prototype._startCall = function() {
             [], {
                 'reject': {
                     'type': 'secondary',
-                    'text': "Cancel",
+                    'text': l[1686],
                     'callback': function() { self._cancelCallRequest(); }
                 }
             }
@@ -1035,7 +1041,8 @@ ChatRoom.prototype._startCall = function() {
 ChatRoom.prototype._callStartedState = function(e, eventData) {
     var self = this;
 
-    $('.btn-chat-call', self.$header).addClass('disabled');
+	$('.btn-chat-call',self.$header).addClass('hidden');
+	$('.fm-end-call', self.$header).removeClass('hidden');
 
     if(e.type == "call-init" || e.type == "call-answered") {
         // current-calling indicator
@@ -1224,13 +1231,38 @@ ChatRoom.prototype._callStartedState = function(e, eventData) {
                 }
             });
 
-        $('.video-call-button.hang-up-icon', $fullscreenContainer)
+        $('.video-call-button.hang-up-icon, .fm-end-call', $fullscreenContainer)
             .unbind('click.megaChat')
             .bind('click.megaChat', function() {
                 $fullscreenContainer.addClass("hidden");
                 self.megaChat.karere.connection.rtc.hangup(); /** pass eventData.peer? **/
             });
-
+        
+		$('.small-video-reziser')
+            .unbind('click')
+            .bind('click', function() {
+                if($(this).attr('class').indexOf('active') == -1) {
+                    $(this).parent().addClass('minimized');
+                    $(this).parent().animate({
+                        'min-height': '24px',
+                        width: 24,
+                        height: 24
+                    }, 200, function() {
+                        $('.small-video-reziser').addClass('active');
+                    });
+                } else {
+				    var w = 245;
+			        if ($(this).parent().attr('class').indexOf('current-user-audio-container') >=1 ) w = 184;
+                    $(this).parent().removeClass('minimized');
+                    $(this).parent().animate({
+                        width: w,
+                        height:184
+                      }, 200, function() {
+                        $('.small-video-reziser').removeClass('active');
+                        $(this).parent().css('min-height','184px');
+                    });
+                }
+	    	});
 
         $('.video-call-button.audio-icon', $fullscreenContainer)
             .unbind('click.megaChat')
@@ -1285,7 +1317,7 @@ ChatRoom.prototype._callStartedState = function(e, eventData) {
 
     // .chat-header-indicator.muted-video and .muted-audio should be synced when the .mute event is called
 
-    var $cancel = $('.hang-up-icon', self.$header);
+    var $cancel = $('.hang-up-icon, .fm-end-call', self.$header);
     $cancel.unbind('click.megaChat');
     $cancel.bind('click.megaChat', function() {
         self.megaChat.karere.connection.rtc.hangup(); /** pass eventData.peer? **/
@@ -1318,7 +1350,8 @@ ChatRoom.prototype._resetCallStateNoCall = function() {
     $('.chat-header-indicator.muted-video', self.$header).addClass("hidden");
     $('.chat-header-indicator.muted-audio', self.$header).addClass("hidden");
 
-    $('.btn-chat-call', self.$header).removeClass('disabled')
+	$('.btn-chat-call', self.$header).removeClass('hidden');
+	$('.fm-end-call', self.$header).addClass('hidden');
 
 
     if(callWasActive) {
@@ -2475,7 +2508,7 @@ ChatRoom.prototype.generateInlineDialog = function(type, user, iconCssClasses, m
     } else {
         $('.nw-contact-avatar', $inlineDialog).remove();
     }
-    $inlineDialog.addClass('fm-chat-inline-dialog-' + type);
+    $inlineDialog.addClass(type + ' ' + iconCssClasses);
 
     if($.isArray(iconCssClasses)) {
         $.each(iconCssClasses, function(k, v) {

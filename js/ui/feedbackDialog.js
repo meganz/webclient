@@ -57,7 +57,7 @@
 
                         this.hide();
 
-                        msgDialog('info', 'Feedback', 'Thank you for your feedback!')
+                        msgDialog('info', 'Feedback', 'Thank you for your feedback!');
                     }
                 },
                 {
@@ -249,6 +249,9 @@
             FeedbackDialog._instance = new FeedbackDialog();
         }
 
+        if(typeOfFeedback) {
+            FeedbackDialog._instance._type = typeOfFeedback;
+        }
         FeedbackDialog._instance.show($toggleButton);
 
         return FeedbackDialog._instance;

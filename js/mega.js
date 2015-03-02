@@ -40,10 +40,30 @@ var maxaction;
 var zipid = 1;
 
 function fmUpdateCount() {
-    var i = 0;
+    var i = 0, u = 0;
     $('.transfer-table span.row-number').each(function() {
-        $(this).text(++i);
+        var $this = $(this);
+        $this.text(++i);
+        if ($this.closest('tr').find('.transfer-type.upload').length) ++u;
     });
+    i -= u;
+    for (var k in panelDomQueue) {
+        if (k[0] === 'u') ++u;
+        else ++i;
+    }
+    var sep = "\u202F", $tpt = $('.transfer-panel-title');
+    var t, l = $.trim($tpt.text()).split(sep)[0];
+    if (i && u) {
+        t = '\u2191 ' + i + ' \u2193 ' + u;
+    } else if (i) {
+        t = i;
+    } else if (u) {
+        t = u;
+    } else {
+        t = '';
+    }
+    if (t) t = sep + ' ' + t;
+    $tpt.text(l + t);
 }
 
 function MegaData()
@@ -545,10 +565,9 @@ function MegaData()
             // If at least one new item is added then ajust grid
             if (drawn) {
 				$('.fm-empty-contacts').addClass('hidden');
-                // Hide sent grid
+                
+                // hide/show sent/received grid
                 $('.sent-requests-grid').addClass('hidden');
-
-                // Show received grid
                 $('.contact-requests-grid').removeClass('hidden');
 
                 initIpcGridScrolling();
@@ -622,16 +641,15 @@ function MegaData()
                 </tr>';
 
                 $(t).append(html);
-                
+
                 drawn = true;
             }
-            
+
             if (drawn) {
 				$('.fm-empty-contacts').addClass('hidden');
-                // Hide received grids
-                $('.contact-requests-grid').addClass('hidden');
 
-                // Show sent grids
+                // hide/show received/sent grids
+                $('.contact-requests-grid').addClass('hidden');
                 $('.sent-requests-grid').removeClass('hidden');
 
                 initOpcGridScrolling();
@@ -822,7 +840,7 @@ function MegaData()
         } else if (this.currentdirid === 'ipc') {
             DEBUG('RenderMain() ipc');
             this.drawReceivedContactRequests(this.v, 'clearGrid');
-        } else if (this.currentdirid === 'contacts') {
+        } else if (this.currentdirid === 'contacts') {// ToDo: This block must go in separate function, globals removed and documented 
             for (var i in this.v) {
                 var u_h = this.v[i].h;
                 var cs = this.contactstatus(u_h);
@@ -893,7 +911,7 @@ function MegaData()
                 }
                 mInsertNode(this.v[i], this.v[i-1], this.v[i+1], t, el, html, u);
             }
-        } else for (var i in this.v) {
+        } else for (var i in this.v) {// ToDo: This block must go in separate function, globals removed and documented 
             if (!this.v[i].name) {
                 if (d) console.log('Skipping M.v node with no name.', this.v[i]);
                 continue;
@@ -914,19 +932,23 @@ function MegaData()
             }
 
             if (this.currentdirid === 'shares') {
-                var cs = this.contactstatus(this.v[i].h);
-                var contains = fm_contains(cs.files, cs.folders);
+                var cs = this.contactstatus(this.v[i].h),
+                    contains = fm_contains(cs.files, cs.folders),
+                    u_h = this.v[i].p,
+                    user = this.d[u_h],
+                    userName = (user.name && user.name.length > 1) ? user.name : user.email,
+                    av_meta = generateAvatarMeta(u_h),
+                    avatar = av_meta.shortName,
+                    av_color = av_meta.color,
+                    rights = l[55],
+                    rightsclass = ' read-only',
+                    onlinestatus = this.onlineStatusClass(megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h)));
                 if (cs.files == 0 && cs.folders == 0) {
                     contains = l[1050];
                 }
-                var u_h = this.v[i].p;
-                var user = M.d[u_h];
-                var av_meta = generateAvatarMeta(u_h);
-                var avatar = av_meta.shortName, av_color = av_meta.color;
                 if (av_meta.avatarUrl) {
                     avatar = '<img src="' + av_meta.avatarUrl + '">';
                 }
-                var rights = l[55], rightsclass = ' read-only';
                 if (M.v[i].r === 1) {
                     rights = l[56];
                     rightsclass = ' read-and-write';
@@ -934,15 +956,32 @@ function MegaData()
                     rights = l[57];
                     rightsclass = ' full-access';
                 }
-                var onlinestatus = this.onlineStatusClass(megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h)));
+                
                 if (this.viewmode === 1) {
                     t = '.shared-blocks-scrolling';
                     el = 'a';
-                    html = '<a class="file-block folder" id="' + htmlentities(this.v[i].h) + '"><span class="file-status-icon ' + star + '"></span><span class="shared-folder-access ' + rightsclass + '"></span><span class="file-icon-area"><span class="block-view-file-type folder"></span></span><span class="nw-contact-avatar ' + htmlentities(u_h) + ' color' + av_color + '">' + avatar + '</span><span class="shared-folder-info-block"><span class="shared-folder-name">' + htmlentities(this.v[i].name) + '</span><span class="shared-folder-info">by ' + htmlentities(user.name) + '</span></span></a>';
+                    html = '<a class="file-block folder" id="'
+                        + htmlentities(this.v[i].h) + '"><span class="file-status-icon '
+                        + htmlentities(star) + '"></span><span class="shared-folder-access '
+                        + htmlentities(rightsclass) + '"></span><span class="file-icon-area">\n\
+                        <span class="block-view-file-type folder"></span></span><span class="nw-contact-avatar '
+                        + htmlentities(u_h) + ' color' + htmlentities(av_color) + '">' + htmlentities(avatar)
+                        + '</span><span class="shared-folder-info-block"><span class="shared-folder-name">'
+                        + htmlentities(this.v[i].name) + '</span><span class="shared-folder-info">by '
+                        + htmlentities(userName) + '</span></span></a>';
                 } else {
                     t = '.shared-grid-view .grid-table.shared-with-me';
                     el = 'tr';
-                    html = '<tr id="' + htmlentities(this.v[i].h) + '"><td width="30"><span class="grid-status-icon ' + star + '"></span></td><td><div class="shared-folder-icon"></div><div class="shared-folder-info-block"><div class="shared-folder-name">' + htmlentities(this.v[i].name) + '</div><div class="shared-folder-info">' + contains + '</div></div> </td><td width="240"><div class="nw-contact-avatar ' + htmlentities(u_h) + ' color' + av_color + '">' + avatar + '</div><div class="fm-chat-user-info todo-star ustatus ' + htmlentities(u_h) + ' ' + onlinestatus[1] + '"><div class="todo-fm-chat-user-star"></div><div class="fm-chat-user">' + htmlentities(user.name) + '</div><div class="nw-contact-status"></div><div class="fm-chat-user-status ' + htmlentities(u_h) + '">' + onlinestatus[0] + '</div><div class="clear"></div></div></td><td width="270"><div class="shared-folder-access' + rightsclass + '">' + rights + '</div></td></tr>';
+                    html = '<tr id="' + htmlentities(this.v[i].h) + '"><td width="30"><span class="grid-status-icon ' + htmlentities(star)
+                        + '"></span></td><td><div class="shared-folder-icon"></div><div class="shared-folder-info-block"><div class="shared-folder-name">'
+                        + htmlentities(this.v[i].name) + '</div><div class="shared-folder-info">' + htmlentities(contains)
+                        + '</div></div> </td><td width="240"><div class="nw-contact-avatar '
+                        + htmlentities(u_h) + ' color' + htmlentities(av_color) + '">' + htmlentities(avatar)
+                        + '</div><div class="fm-chat-user-info todo-star ustatus ' + htmlentities(u_h) + ' '
+                        + htmlentities(onlinestatus[1]) + '"><div class="todo-fm-chat-user-star"></div><div class="fm-chat-user">'
+                        + htmlentities(userName) + '</div><div class="nw-contact-status"></div><div class="fm-chat-user-status ' + htmlentities(htmlentities(u_h)) + '">' + htmlentities(onlinestatus[0])
+                        + '</div><div class="clear"></div></div></td><td width="270"><div class="shared-folder-access'
+                        + htmlentities(rightsclass) + '">' + htmlentities(rights) + '</div></td></tr>';
                 }
             } else if (this.currentdirid.length === 11 && this.currentrootid === 'contacts') {
                 var cs = this.contactstatus(this.v[i].h);
@@ -1128,7 +1167,7 @@ function MegaData()
                     var shareId = window.location.hash.replace('#fm/', '');
 
                     // Remove user from the share
-                    removeShare(shareId);
+                    removeShare (shareId);
 
                     // Open the shares folder
                     M.openFolder('shares', true);
@@ -1340,6 +1379,7 @@ function MegaData()
             window.location.hash = '#fm/' + M.currentdirid;
         }
         searchPath();
+        treesearchUI();
         $(document).trigger('MegaOpenFolder');
     };
 
@@ -1408,7 +1448,7 @@ function MegaData()
 
         if (!MegaChatDisabled) {
             megaChat.renderContactTree();
-			
+
 			$('.fm-tree-panel').undelegate('.start-chat-button', 'click.megaChat');
             $('.fm-tree-panel').delegate('.start-chat-button', 'click.megaChat', function() {
 				var m = $('.fm-start-chat-dropdown'),
@@ -1441,10 +1481,10 @@ function MegaData()
                         .addClass('hidden')
                         .removeData("triggeredBy");
 				}
-				
+
 				return false; // stop propagation!
             });
-			
+
 			$('.fm-chat-popup-button.start-chat').unbind('click.treePanel');
 			$('.fm-chat-popup-button.start-chat').bind('click.treePanel', function() {
                 var $this = $(this);
@@ -1457,8 +1497,8 @@ function MegaData()
 				}
             });
 
-            $('.fm-chat-popup-button.start-audio').unbind('click.treePanel');
-			$('.fm-chat-popup-button.start-audio').bind('click.treePanel', function() {
+            $('.fm-start-chat-dropdown .fm-chat-popup-button.start-audio').unbind('click.treePanel');
+			$('.fm-start-chat-dropdown .fm-chat-popup-button.start-audio').bind('click.treePanel', function() {
                 var $this = $(this);
                 var $triggeredBy = $this.parent().data("triggeredBy");
                 var $userDiv = $triggeredBy.parent().parent();
@@ -1474,9 +1514,8 @@ function MegaData()
 				}
             });
 
-
-            $('.fm-chat-popup-button.start-video').unbind('click.treePanel');
-			$('.fm-chat-popup-button.start-video').bind('click.treePanel', function() {
+            $('.fm-start-chat-dropdown .fm-chat-popup-button.start-video').unbind('click.treePanel');
+			$('.fm-start-chat-dropdown .fm-chat-popup-button.start-video').bind('click.treePanel', function() {
                 var $this = $(this);
                 var $triggeredBy = $this.parent().data("triggeredBy");
                 var $userDiv = $triggeredBy.parent().parent();
@@ -1783,7 +1822,7 @@ function MegaData()
             }
             var sharedfolder = 'folder-item';
             if (typeof M.d[fid].shares !== 'undefined')
-                sharedfolder = 'shared-folder-item';
+                sharedfolder += ' shared-folder-item';
             var html = '<span class="context-menu-item ' + sharedfolder + cs + '" id="fi_' + fid + '">' + icon + htmlentities(this.d[fid].name) + '</span>' + sm;
             $('#csb_' + id).append(html);
             if (sub)
@@ -1989,17 +2028,9 @@ function MegaData()
         } else if (this.currentdirid && this.currentdirid === 'opc') {
             DEBUG('Render Path OPC');
             $('.fm-breadcrumbs-block').html(contactBreadcrumb + html);
-//            $('.fm-breadcrumbs.received-requests').remove();
-//            $('.fm-breadcrumbs.contacts')
-//                .addClass('has-next-button')
-//                .after(sentBreadcrumb);
         } else if (this.currentdirid && this.currentdirid === 'ipc') {
             DEBUG('Render Path IPC');
             $('.fm-breadcrumbs-block').html(contactBreadcrumb + html);
-//            $('.fm-breadcrumbs.sent-requests').remove();
-//            $('.fm-breadcrumbs.contacts')
-//                .addClass('has-next-button')
-//                .after(receivedBreadcrumb);
         } else {
             $('.search-files-result').addClass('hidden');
             $('.fm-breadcrumbs-block').html(html);
@@ -2032,6 +2063,10 @@ function MegaData()
             } else if (M.currentdirid && M.currentdirid.substr(0, 7) === 'search/') {
                 return false;
             }
+            
+            // Remove focus from view ipc/opc buttons
+            $('.fm-received-requests').removeClass('active');
+            $('.fm-contact-requests').removeClass('active');
             M.openFolder($(this).attr('id').replace('path_', ''));
         });
 
@@ -2054,107 +2089,99 @@ function MegaData()
 
     this.rubNodes = {};
 
-    this.addNode = function(n, ignoreDB)
-    {
-        if (n.p == this.RubbishID)
-        {
+    this.addNode = function(n, ignoreDB) {
+        if (n.p === this.RubbishID) {
             this.rubNodes[n.h] = true;
             this.rubbishIco();
         }
-        if (n.t == 4)
-        {
-            for (var i in this.d)
-            {
-                if (this.d[i].p == n.h)
-                {
+        if (n.t === 4) {
+            for (var i in this.d) {
+                if (this.d[i].p == n.h) {
                     this.rubNodes[this.d[i].h] = true;
                 }
             }
             this.rubbishIco();
         }
 
-        if (!this.c['shares'])
+        if (!this.c['shares']) {
             this.c['shares'] = [];
-        if (!M.d[n.p] && n.p !== 'contacts')
-        {
-            if (n.sk)
-                n.p = n.u;
-            else if (n.su)
-                n.p = n.su;
         }
-        if (n.p && n.p.length == 11 && !M.d[n.p])
-        {
+        if (!M.d[n.p] && n.p !== 'contacts') {
+            if (n.sk) {
+                n.p = n.u;
+            } else if (n.su) {
+                n.p = n.su;
+            }
+        }
+        if (n.p && n.p.length === 11 && !M.d[n.p]) {
             var u = this.u[n.p];
-            if (u)
-            {
+            if (u) {
                 u.name = u.m;
                 u.h = u.u;
                 u.t = 1;
                 u.p = 'contacts';
                 M.addNode(u);
-            }
-            else
+            } else {
                 console.log('something went wrong!', n.p, this.u[n.p]);
+            }
         }
-        if (typeof mDB === 'object' && !ignoreDB && !pfkey)
+        if (typeof mDB === 'object' && !ignoreDB && !pfkey) {
             mDBadd('f', clone(n));
-        if (n.p)
-        {
-            if (typeof this.c[n.p] == 'undefined')
+        }
+        if (n.p) {
+            if (typeof this.c[n.p] == 'undefined') {
                 this.c[n.p] = [];
+            }
             this.c[n.p][n.h] = 1;
             // maintain special incoming shares index:
-            if (n.p.length == 11)
+            if (n.p.length === 11) {
                 this.c['shares'][n.h] = 1;
+            }
         }
 
-        if (n.t == 2)
+        if (n.t === 2) {
             this.RootID = n.h;
-        if (n.t == 3)
+        }
+        if (n.t === 3) {
             this.InboxID = n.h;
-        if (n.t == 4)
+        }
+        if (n.t === 4) {
             this.RubbishID = n.h;
-        if (!n.c)
-        {
+        }
+        if (!n.c) {
             if (n.sk && !u_sharekeys[n.h]) {
                 u_sharekeys[n.h] = crypto_process_sharekey(n.h, n.sk);
             }
 
-            if (n.t !== 2 && n.t !== 3 && n.t !== 4 && n.k)
-            {
-                if (u_kdnodecache[n.h])
-                {
+            if (n.t !== 2 && n.t !== 3 && n.t !== 4 && n.k) {
+                if (u_kdnodecache[n.h]) {
                     $.extend(n, u_kdnodecache[n.h]);
-                }
-                else
-                {
+                } else {
                     crypto_processkey(u_handle, u_k_aes, n);
                 }
                 u_nodekeys[n.h] = n.key;
-            }
-            else if (!n.k)
-            {
-                if (n.a)
-                {
-                    if (!missingkeys[n.h])
-                    {
+            } else if (!n.k) {
+                if (n.a) {
+                    if (!missingkeys[n.h]) {
                         missingkeys[n.h] = true;
                         newmissingkeys = true;
                     }
                 }
             }
-            if (n.hash)
-            {
-                if (!this.h[n.hash])
+            if (n.hash) {
+                if (!this.h[n.hash]) {
                     this.h[n.hash] = [];
+                }
                 this.h[n.hash].push(n.h);
             }
         }
-        if (this.d[n.h] && this.d[n.h].shares)
+        if (this.d[n.h] && this.d[n.h].shares) {
             n.shares = this.d[n.h].shares;
+        }
         this.d[n.h] = n;
-        if (typeof newnodes !== 'undefined')
+        if (typeof newnodes !== 'undefined') {
             newnodes.push(n);
+        }
     };
 
     this.delNode = function(h) {
@@ -2518,9 +2545,21 @@ function MegaData()
      * @returns {undefined}
      */
     this.addUser = function(u, ignoreDB) {
-        this.u[u.u] = u;
-        if (typeof mDB === 'object' && !ignoreDB && !pfkey)
-            mDBadd('u', clone(u));
+        var userId = '';
+        if (u && u.u) {
+            userId = u.u;
+            if (this.u[userId]) {
+                for (var key in u) {
+                    this.u[userId][key] = u[key];
+                }
+                u = this.u[userId];
+            } else {
+                this.u[userId] = u;
+            }
+            if (typeof mDB === 'object' && !ignoreDB && !pfkey) {
+                mDBadd('u', clone(u));
+            }
+        }
     };
 
     // Update M.opc and related localStorage
@@ -2544,8 +2583,7 @@ function MegaData()
     };
 
     // Update M.ipc and related localStorage
-    this.addIPC = function(u, ignoreDB)
-    {
+    this.addIPC = function(u, ignoreDB) {
         this.ipc[u.p] = u;
         if (typeof mDB === 'object' && !ignoreDB && !pfkey) {
             mDBadd('ipc', clone(u));
@@ -2553,7 +2591,7 @@ function MegaData()
     };
 
     /**
-     * Delete ipc record from localStorage using id
+     * Delete ipc record from indexedDb using id
      *
      * @param {string} id
      * @returns {undefined}
@@ -2564,16 +2602,60 @@ function MegaData()
         }
     };
 
-    // Update M.ps and related localStorage
-    this.addPS = function(pendingShare, ignoreDB)
-    {
-        this.ps[pendingShare.p] = pendingShare;
+    /**
+     * Update M.ps and indexedDb
+     * 
+     * Structure of M.ps
+     * <shared_item_id>:
+     * [
+     *  <pending_contact_request_id>:
+     *  {h, p, r, ts},
+     * ]
+     * @param {JSON} ps, pending share
+     * @param {boolean} ignoreDB
+     * 
+     * @returns {undefined}
+     */
+    this.addPS = function(ps, ignoreDB) {
+        if (!this.ps[ps.h]) {
+            this.ps[ps.h] = {};
+        }
+        this.ps[ps.h][ps.p] = ps;
 
         if (typeof mDB === 'object' && !ignoreDB && !pfkey) {
-            mDBadd('ps', clone(pendingShare));
+            mDBadd('ps', clone(ps));
         }
     };
 
+    /**
+     * Maintain .ps and related indexedDb
+     *
+     * @param {string} pcrId, pending contact request id
+     * @param {string} nodeId, shared item id
+     * 
+     * @returns {undefined}
+     */
+    this.delPS = function(pcrId, nodeId) {
+        
+        // Delete the pending share
+        if (this.ps[nodeId]) {
+            if (this.ps[nodeId][pcrId]) {
+                delete this.ps[nodeId][pcrId];
+            }
+            
+            // If there's no pending shares for node left, clean M.ps
+            if (Object.keys(this.ps[nodeId]).length === 0) {
+                delete this.ps[nodeId];
+            }            
+        }
+
+        // Check how removing from indexedDb works and make
+        // sure that pending share is/only removed from it
+        if (typeof mDB === 'object' && !pfkey) {
+            mDBdel('ps', pcrId);
+        }
+    };
+    
     this.copyNodes = function(cn, t, del, callback) {
         if ($.onImportCopyNodes && t.length === 11) {
             msgDialog('warninga', l[135], 'Operation not permitted.');
@@ -2617,6 +2699,9 @@ function MegaData()
                         callback(res);
                     }
                     rendernew();
+                }
+                if (typeof res === 'number' && res < 0) {
+                    return msgDialog('warninga', l[135], l[47], api_strerror(res));
                 }
                 if (ctx.del) {
                     var j = [];
@@ -2931,24 +3016,25 @@ function MegaData()
         }
     };
 
-    this.nodeShare = function(h, s, ignoreDB)
-    {
-        if (this.d[h])
-        {
-            if (typeof this.d[h].shares == 'undefined')
+    this.nodeShare = function(h, s, ignoreDB) {
+        if (this.d[h]) {
+            if (typeof this.d[h].shares == 'undefined') {
                 this.d[h].shares = [];
-            this.d[h].shares[s.u] = s;
-            if (typeof mDB === 'object')
-            {
-                s['h_u'] = h + '_' + s.u;
-                if (!ignoreDB && !pfkey)
-                    mDBadd('s', clone(s));
             }
-            sharedUInode(h, 1);
-            if ($.dialog == 'sharing' && $.selected && $.selected[0] == h)
+            this.d[h].shares[s.u] = s;
+            if (typeof mDB === 'object') {
+                s['h_u'] = h + '_' + s.u;
+                if (!ignoreDB && !pfkey) {
+                    mDBadd('s', clone(s));
+                }
+            }
+            sharedUInode(h);
+            if ($.dialog === 'sharing' && $.selected && $.selected[0] === h) {
                 shareDialog();
-            if (typeof mDB === 'object' && !pfkey)
+            }
+            if (typeof mDB === 'object' && !pfkey) {
                 mDBadd('ok', {h: h, k: a32_to_base64(encrypt_key(u_k_aes, u_sharekeys[h])), ha: crypto_handleauth(h)});
+            }
         }
     };
 
@@ -2967,7 +3053,7 @@ function MegaData()
                 delete this.d[h].shares;
                 M.nodeAttr({h: h, shares: undefined});
                 delete u_sharekeys[h];
-                sharedUInode(h, 0);
+                sharedUInode(h);
                 if (typeof mDB === 'object')
                     mDBdel('ok', h);
             }
@@ -2979,73 +3065,30 @@ function MegaData()
     };
 
     // Searches M.opc for the pending contact
-    this.findOutgoingPendingContactIdByEmail = function(email)
-    {
-        for (var index in M.opc)
-        {
+    this.findOutgoingPendingContactIdByEmail = function(email) {
+        for (var index in M.opc) {
             var opc = M.opc[index];
 
-            if (opc.m === email)
-            {
+            if (opc.m === email) {
                 return opc.p;
             }
         }
     };
 
-    this.deletePendingShare = function(nodeHandle, pendingContactId)
-    {
+    /**
+     * called when user try to remove pending contact from shared dialog
+     * should be changed case M.ps structure is changed, take a look at processPS()
+     * 
+     * @param {string} nodeHandle
+     * @param {string} pendingContactId
+     * 
+     * @returns {undefined}
+     */
+    this.deletePendingShare = function(nodeHandle, pendingContactId) {
         if (this.d[nodeHandle]) {
 
-            if (this.ps[pendingContactId])
-            {
-                delete this.ps[pendingContactId];
-
-                // Todo: Delete from mDB once mDB gets re-instated
-            }
-
-            var pendingShareCount = 0;
-
-            for (var index in this.ps)
-            {
-                var pendingShare = this.ps[index];
-                if (pendingShare.h === nodeHandle)
-                {
-                    pendingShareCount++;
-                }
-            }
-
-            if (pendingShareCount == 0)
-            {
-                this.d[nodeHandle].hasPendingShares = false;
-
-                // node.Shares will be deleted if there are no full shares. If there ARE no shares left then we should
-                // remove the share icon
-                var removeIcon = false;
-
-                if (typeof this.d[nodeHandle].shares === 'undefined')
-                {
-                    removeIcon = true;
-                }
-                else
-                {
-                    var count = 0;
-                    for (var i in this.d[nodeHandle].shares)
-                    {
-                        if (this.d[nodeHandle].shares.hasOwnProperty(i))
-                        {
-                            count++;
-                        }
-                    }
-                    if (count==0)
-                    {
-                        removeIcon = true;
-                    }
-                }
-
-                if (removeIcon)
-                {
-                    sharedUInode(nodeHandle, 0);
-                }
+            if (this.ps[nodeHandle] && this.ps[nodeHandle][pendingContactId]) {
+                M.delPS(pendingContactId, nodeHandle);
             }
         }
     };
@@ -4078,7 +4121,7 @@ function renderfm()
     }
 
     M.openFolder(M.currentdirid);
-    if (!MegaChatDisabled) {
+    if (!MegaChatDisabled && megaChat.is_initialized) {
         megaChat.renderContactTree();
         megaChat.renderMyStatus();
     }
@@ -4187,7 +4230,7 @@ function execsc(actionPackets, callback) {
             }
 
             // If contact notification
-            if (actionPacket.a === 'c') {
+                   if (actionPacket.a === 'c') {
                 process_u(actionPacket.u);
 
                 // Only show a notification if we did not trigger the action ourselves
@@ -4201,7 +4244,9 @@ function execsc(actionPackets, callback) {
                     });
                 }
             }
-            else if (actionPacket.a === 'opc') {    // Outgoing pending contact
+            
+            // Outgoing pending contact
+            else if (actionPacket.a === 'opc') {
                 processOPC([actionPacket]);
 
                 // Don't append to sent grid on deletion
@@ -4209,19 +4254,26 @@ function execsc(actionPackets, callback) {
                     M.drawSentContactRequests([actionPacket]);
                 }
             }
-            else if (actionPacket.a === 'ipc') {    // Incoming pending contact
+            
+            // Incoming pending contact
+            else if (actionPacket.a === 'ipc') {
                 processIPC([actionPacket]);
                 M.drawReceivedContactRequests([actionPacket]);
                 addIpcOrContactNotification(actionPacket);
             }
-            else if (actionPacket.a === 's2') {     // Pending shares
-                var fromGettree = false;
-                processPS([actionPacket], fromGettree);
+            
+            // Pending shares
+            else if (actionPacket.a === 's2') {
+                processPS([actionPacket]);
             }
-            else if (actionPacket.a === 'upci') {   // Incomming request updated
+            
+            // Incomming request updated
+            else if (actionPacket.a === 'upci') {
                 processUPCI([actionPacket]);
             }
-            else if (actionPacket.a === 'upco') {   // Outgoing request updated
+            
+            // Outgoing request updated
+            else if (actionPacket.a === 'upco') {
                 processUPCO([actionPacket]);
 
                 // If the status is accepted ('2') then this will be followed by a contact packet and we do not need to notify
@@ -4261,13 +4313,15 @@ function execsc(actionPackets, callback) {
             var prockey = false;
 
             if (actionPacket.o === u_handle) {
+                
+                // If access right are undefined then share is deleted
                 if (typeof actionPacket.r == "undefined") {
-                    // I deleted my share
                     M.delnodeShare(actionPacket.n, actionPacket.u);
                 } else if (M.d[actionPacket.n]
                     && typeof M.d[actionPacket.n].shares != 'undefined'
                     && M.d[actionPacket.n].shares[actionPacket.u]
                     || actionPacket.ha == crypto_handleauth(actionPacket.n)) {
+                    
                     // I updated or created my share
                     u_sharekeys[actionPacket.n] = decrypt_key(u_k_aes, base64_to_a32(actionPacket.ok));
                     M.nodeShare(actionPacket.n, {
@@ -4368,7 +4422,7 @@ function execsc(actionPackets, callback) {
                         });
                         newnodes.push(M.d[n.h]);
                     }
-                }
+                }r
             }
 
             crypto_share_rsa2aes();
@@ -4382,7 +4436,8 @@ function execsc(actionPackets, callback) {
                     a: 'k',
                     cr: crypto_makecr(actionPacket.n, [actionPacket.h], true)
                 });
-        } else if (actionPacket.a === 't') {
+        }
+        else if (actionPacket.a === 't') {
             if (tparentid) {
                 for (var b in actionPacket.t.f) {
                     if (rootsharenodes[actionPacket.t.f[b].h] && M.d[actionPacket.t.f[b].h]) {
@@ -4410,6 +4465,7 @@ function execsc(actionPackets, callback) {
             if (fminitialized && !folderlink && actionPacket.ou && actionPacket.ou != u_handle
                 && actionPacket.t && actionPacket.t.f && actionPacket.t.f[0]
                 && actionPacket.t.f[0].p.length < 11 && !tmoveid && !tparentid) {
+                
                 var targetid = actionPacket.t.f[0].p;
                 var pnodes = [];
                 for (var i in actionPacket.t.f) {
@@ -4432,7 +4488,8 @@ function execsc(actionPackets, callback) {
             trights = false;
             //process_f(actionPacket.t.f);
             async_procnodes = async_procnodes.concat(actionPacket.t.f);
-        } else if (actionPacket.a === 'c') {
+        }
+        else if (actionPacket.a === 'c') {
             process_u(actionPacket.u);
 
             // Contact is deleted on remote computer, remove contact from contacts left panel
@@ -4451,9 +4508,11 @@ function execsc(actionPackets, callback) {
                     megaChat[v.c == 0 ? "processRemovedUser" : "processNewUser"](v.u);
                 });
             }
-        } else if (actionPacket.a === 'd') {
+        }
+        else if (actionPacket.a === 'd') {
             M.delNode(actionPacket.n);
-        } else if (actionPacket.a === 'ua' && fminitialized) {
+        }
+        else if (actionPacket.a === 'ua' && fminitialized) {
             for (var i in actionPacket.ua) {
                 if (actionPacket.ua[i] === '+a') {
                     avatars[actionPacket.u] = undefined;
@@ -4466,7 +4525,8 @@ function execsc(actionPackets, callback) {
                     getPubEd25519(actionPacket.u);
                 }
             }
-        } else if (actionPacket.a === 'u') {
+        }
+        else if (actionPacket.a === 'u') {
             var n = M.d[actionPacket.n];
             if (n) {
                 var f = {h: actionPacket.n, k: actionPacket.k, a: actionPacket.at}, newpath = 0;
@@ -4507,21 +4567,26 @@ function execsc(actionPackets, callback) {
                     crypto_proccr(actionPacket.cr);
                 }
             }
-        } else if (actionPacket.a === 'la') {
+        }
+        else if (actionPacket.a === 'la') {
             notifyPopup.doNotify();
-        } else if (actionPacket.a === 'opc') {
+        }
+        else if (actionPacket.a === 'opc') {
             processOPC([actionPacket]);
             M.drawSentContactRequests([actionPacket]);
-        } else if (actionPacket.a === 's2') {
-            var fromGettree = false;
-            processPS([actionPacket], fromGettree);
-        } else if (actionPacket.a === 'ipc') {
+        }
+        else if (actionPacket.a === 'ipc') {
             processIPC([actionPacket]);
             M.drawReceivedContactRequests([actionPacket]);
             addIpcOrContactNotification(actionPacket);
-        } else if (actionPacket.a === 'upci') {
+        }
+        else if (actionPacket.a === 's2') {
+            processPS([actionPacket]);
+        }
+        else if (actionPacket.a === 'upci') {
             processUPCI([actionPacket]);
-        } else if (actionPacket.a === 'upco') {
+        }
+        else if (actionPacket.a === 'upco') {
             processUPCO([actionPacket]);
 
             // If the status is accepted ('2') then this will be followed by a contact packet and we do not need to notify
@@ -4543,7 +4608,7 @@ function execsc(actionPackets, callback) {
     function onExecSCDone() {
         if (newnodes.length > 0 && fminitialized) rendernew();
         if (loadavatars) M.avatars();
-        fm_thumbnails();
+        if (M.viewmode) fm_thumbnails();
         if ($.dialog === 'properties') propertiesDialog();
         getsc();
         if (callback) Soon(callback);
@@ -4569,37 +4634,26 @@ function fm_commitkeyupdate()
     // refresh render?
 }
 
-function loadfm()
+function loadfm(force)
 {
-    fminitialized = false;
-    loadingDialog.show();
-    loadfmdata();
-
-}
-function loadfmdata() {
-    if(loadfmdata.isLoading) {
-        //console.error("Already loading fmdata");
-        return;
-    } else {
-        //console.error("Will start loading fmdata");
+    if (force) {
+        loadfm.loaded = false;
     }
-
-    loadfmdata.isLoading = true;
-    api_req({a: 'f', c: 1, r: 1}, {
-        callback: function() {
-            loadfmdata.isLoading = false;
-
-            M.reset(); // clear JUST before the new data is parsed.
-
-            loadfm_callback.apply(this, arguments);
+    if (loadfm.loaded) {
+        Soon(loadfm_done.bind(this, pfkey));
+    } else {
+        if (is_fm()) {
+            loadingDialog.show();
         }
-    }, n_h ? 1 : 0);
-};
-loadfmdata.isLoading = false;
-
-
-function is_fm_data_loaded() {
-    return Object.keys(M.d).length > 0;
+        if (!loadfm.loading) {
+            M.reset();
+            fminitialized = false;
+            loadfm.loading = true;
+            api_req({a:'f',c:1,r:1},{
+                callback : loadfm_callback
+            },n_h ? 1 : 0);
+        }
+    }
 }
 
 function RightsbyID(id)
@@ -4801,7 +4855,7 @@ function createfolder(toid, name, ulparams)
             ulparams: ulparams,
             callback: function(res, ctx)
             {
-                if (typeof res != 'number')
+                if (typeof res !== 'number')
                 {
                     $('.fm-new-folder').removeClass('active');
                     $('.create-new-folder').addClass('hidden');
@@ -4813,6 +4867,10 @@ function createfolder(toid, name, ulparams)
                     loadingDialog.hide();
                     if (ctx.ulparams)
                         ulparams.callback(ctx.ulparams, res.f[0].h);
+                }
+                else {
+                    loadingDialog.hide();
+                    msgDialog('warninga', l[135], l[47], api_strerror(res));
                 }
             }
         });
@@ -4826,8 +4884,7 @@ function getuid(email)
     return false;
 }
 
-function doshare(h, targets, dontShowShareDialog)
-{
+function doshare(h, targets, dontShowShareDialog) {
     var $promise = new $.Deferred();
 
     nodeids = fm_getnodes(h);
@@ -4837,32 +4894,27 @@ function doshare(h, targets, dontShowShareDialog)
         {
             t: targets,
             h: h,
-            done: function(res, ctx)
-            {
+            done: function(res, ctx) {
                 var i;
 
-                if (res.r && res.r[0] == '0')
-                {
-                    for (i in res.u)
+                if (res.r && res.r[0] == '0') {
+                    for (i in res.u) {
                         M.addUser(res.u[i]);
+                    }
 
-                    for (i in res.r)
-                    {
-                        if (res.r[i] == 0)
-                        {
+                    for (i in res.r) {
+                        if (res.r[i] == 0) {
                             var rights = ctx.t[i].r;
                             var user = ctx.t[i].u;
 
-                            if (user.indexOf('@') >= 0)
-                            {
+                            if (user.indexOf('@') >= 0) {
                                 user = getuid(ctx.t[i].u);
                             }
 
                             // A pending share may not have a corresponding user and should not be added
                             // A pending share can also be identified by a user who is only a '0' contact
                             // level (passive)
-                            if (user != false && M.u[user].c != 0)
-                            {
+                            if (user != false && M.u[user].c != 0) {
                                 M.nodeShare(ctx.h, {h: h, r: rights, u: user, ts: Math.floor(new Date().getTime() / 1000)});
                             }
                         }
@@ -4877,9 +4929,7 @@ function doshare(h, targets, dontShowShareDialog)
                         shareDialog();
                     }
                     $promise.resolve();
-                }
-                else
-                {
+                } else {
                     $('.fm-dialog.share-dialog').removeClass('hidden');
                     loadingDialog.hide();
                     $promise.reject(res);
@@ -5061,7 +5111,7 @@ function processIPC(ipc) {
             delete M.ipc[ipc[i].p];
             if ((Object.keys(M.ipc).length === 0) && (M.currentdirid === 'ipc')) {
                 $('.contact-requests-grid').addClass('hidden');
-                $('.empty-contact-requests').removeClass('hidden');
+                $('.fm-empty-contacts').removeClass('hidden');
             }
         }
     }
@@ -5111,44 +5161,42 @@ function processOPC(opc) {
  * Handle pending shares
  *
  * @param {array of JSON objects} pending shares
- * @param {boolean} fromGettree
+ * 
  * @returns {undefined}
  */
-function processPS(pendingShares, fromGettree) {
+function processPS(pendingShares) {
     DEBUG('processPS');
+    var ps;
 
     for (var i in pendingShares) {
-        if (fromGettree)
-        {
-            // As this is from gettree and the node tree may not have been processed yet, the 'hasPendingShares'
-            // flag will be set on the node after gettree is processed
-            M.addPS(pendingShares[i]);
-        }
-        else
-        {
-            var nodeHandle = pendingShares[i].n;
-            var pendingContactId = pendingShares[i].p;
-            var shareRights = pendingShares[i].r;
-            var timeStamp = pendingShares[i].ts;
-
-            if (typeof shareRights === 'undefined')
-            {
-                // This is a delete packet, we should remove the pending share if this was not triggered by our own client
-                if (pendingShares[i].i == requesti) continue;
-
-                // Delete the pending share
-                delete M.ps[pendingShares[i].p];
+        if (pendingShares.hasOwnProperty(i)) {
+            ps = pendingShares[i];
+            if (ps.h) {// From gettree
+                M.addPS(ps);
             }
-            else
-            {
-                // We need to record that this node has a pending share, as this is not gettree
-                M.d[nodeHandle].hasPendingShares = true;
+            else {// Situation different from gettree, s2 from API response, doesn't have .h attr instead have .n
+                var nodeHandle = ps.n;
+                var pendingContactId = ps.p;
+                var shareRights = ps.r;
+                var timeStamp = ps.ts;
 
-                // Add the pending share to state
-                M.addPS({'h':nodeHandle, 'p':pendingContactId, 'r':shareRights, 'ts':timeStamp});
+                // shareRights is undefined when user denies pending contact request
+                // .op is available when user accepts pending contact request and 
+                // remaining pending share should be updated to full share
+                if (typeof shareRights === 'undefined' || ps.op) {
 
-                // Update the ui
-                sharedUInode(nodeHandle, 1);
+                    M.delPS(pendingContactId, nodeHandle);
+
+                    if (ps.op) {// Upgrade pending share to full share
+                        M.nodeShare(nodeHandle, ps);
+                    }
+                } else {
+
+                    // Add the pending share to state
+                    M.addPS({'h':nodeHandle, 'p':pendingContactId, 'r':shareRights, 'ts':timeStamp});
+                    
+                    sharedUInode(nodeHandle);
+                }
             }
         }
     }
@@ -5164,19 +5212,12 @@ function processUPCI(ap) {
     DEBUG('processUPCI');
     for (var i in ap) {
         if (ap[i].s) {
-//            if (ap[i].s === 1) { // Ignore received pending request
-//                M.addIPC(ap[i], 'ignoreDB');
-//            } else if (ap[i].s === 2) { // Accept received pending request
-//                delete M.ipc[ap[i].p];
-//            } else if (ap[i].s === 3) { // Deny received pending request
-//                M.addIPC(ap[i], 'ignoreDB');
-//            }
             delete M.ipc[ap[i].p];
             M.delIPC(ap[i].p);// Remove from localStorage
             $('#ipc_' + ap[i].p).remove();
             if ((Object.keys(M.ipc).length === 0) && (M.currentdirid === 'ipc')) {
                 $('.contact-requests-grid').addClass('hidden');
-                $('.empty-contact-requests').removeClass('hidden');
+                $('.fm-empty-contacts').removeClass('hidden');
             }
         }
     }
@@ -5190,18 +5231,26 @@ function processUPCI(ap) {
  */
 function processUPCO(ap) {
     DEBUG('processUPCO');
+    var psid = '';// pending id
     for (var i in ap) {
         if (ap[i].s) {
-            delete M.opc[ap[i].p];
-            delete M.ipc[ap[i].p];
-            M.delOPC(ap[i].p);
-            M.delIPC(ap[i].p);
+            psid = ap[i].p;
+            delete M.opc[psid];
+            delete M.ipc[psid];
+            M.delOPC(psid);
+            M.delIPC(psid);
+            
+            for (var k in M.ps) {
+                if (M.ps.hasOwnProperty(k)) {
+                    M.delPS(psid, k);
+                }
+            }
 
             // Update token.input plugin
             if ($('.add-contact-multiple-input')) {
                 $('.add-contact-multiple-input').tokenInput("removeContact", {id: ap[i].m}, '.add-contact-multiple-input');
             }
-            $('#opc_' + ap[i].p).remove();
+            $('#opc_' + psid).remove();
             if ((Object.keys(M.opc).length === 0) && (M.currentdirid === 'opc')) {
                 $('.sent-requests-grid').addClass('hidden');
                 $('.fm-empty-contacts').removeClass('hidden');
@@ -5265,6 +5314,12 @@ function init_chat() {
         if(u_type && !megaChat.is_initialized) {
             if (d) console.log('Initializing the chat...');
             megaChat.init();
+            if (fminitialized) {
+                Soon(function() {
+                    megaChat.renderContactTree();
+                    megaChat.renderMyStatus();
+                });
+            }
         }
     }
     if(!MegaChatDisabled) {
@@ -5297,8 +5352,7 @@ function loadfm_callback(res)
         processIPC(res.ipc);
     }
     if (res.ps) {
-        var fromGettree = true;
-        processPS(res.ps, fromGettree);
+        processPS(res.ps);
     }
     process_f(res.f, function onLoadFMDone() {
 
@@ -5310,26 +5364,12 @@ function loadfm_callback(res)
             }
         }
 
-        // If we have pending shares, and if any are for this node, set a flag
-        if (res.ps) {
-            for (var index in res.ps) {
-                var pendingShare = res.ps[index];
-                if (M.d[pendingShare.h]) {
-                    M.d[pendingShare.h].hasPendingShares = true;
-                }
-            }
-        }
-
         maxaction = res.sn;
         if (typeof mDB === 'object') {
             localStorage[u_handle + '_maxaction'] = maxaction;
         }
 
-        loadfm_rendering_cb();
-
-        if (!pfkey) {
-            notifyPopup.pollNotifications();
-        }
+        loadfm_done(pfkey);
 
         if (res.cr) {
             crypto_procmcr(res.cr);
@@ -5342,11 +5382,20 @@ function loadfm_callback(res)
     });
 }
 
-function loadfm_rendering_cb() {
+function loadfm_done(pfkey) {
+    loadfm.loaded = Date.now();
+    loadfm.loading = false;
+
     init_chat();
 
-    if(is_fm() || $('.fm-main.default').is(":visible")) { // are we actually on an #fm/* page?
+    // are we actually on an #fm/* page?
+    if (is_fm() || $('.fm-main.default').is(":visible")) {
         renderfm();
+    }
+    loadingDialog.hide();
+
+    if (!pfkey) {
+        notifyPopup.pollNotifications();
     }
 }
 

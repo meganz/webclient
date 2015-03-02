@@ -645,6 +645,7 @@ function showOverQuotaDialog()
     $('.warning-green-icon', $dialog).remove();
     $('.warning-popup-body', $dialog).unbind('click').html(
         '<div class="warning-header">' + l[1010] + '</div>' + l[5929]
+		+ "<p>" + l[5931].replace("[A]", "<a href='#fm/account' style='text-decoration: underline'>").replace("[/A]", "</a>") + "</p>"
     );
     
     // Set button text to 'Upgrade Account'
@@ -2360,8 +2361,8 @@ function generateAnonymousReport() {
         report.apireqbackoffs = apireqHaveBackOffs;
     }
 
-    report.hadLoadedRsaKeys = Object.keys(u_authring.RSA).length > 0;
-    report.hadLoadedEd25519Keys = Object.keys(u_authring.Ed25519).length > 0;
+    report.hadLoadedRsaKeys = u_authring.RSA && Object.keys(u_authring.RSA).length > 0;
+    report.hadLoadedEd25519Keys = u_authring.Ed25519 && Object.keys(u_authring.Ed25519).length > 0;
     report.totalDomElements = $("*").length;
     report.totalScriptElements = $("script").length;
 

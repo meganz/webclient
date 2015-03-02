@@ -22,7 +22,7 @@ html {
 }
 @font-face {
 	font-family: "Open Sans Semibold Italic";
-	src: url("https://eu.static.mega.co.nz/fonts/OpenSans-SemiboldItalic.eot?") format("eot"), url("https://eu.static.mega.co.nz/fonts/OpenSans-SemiboldItalic.woff") format("woff"), url("https://eu.static.mega.co.nz/fonts/OpenSans-SemiboldItalic.ttf") format("truetype"), url("https://eu.static.mega.co.nz/fonts/OpenSans-SemiboldItalic_v2.svg#OpenSans-SemiboldItalic") format("svg");
+	src: url("https://eu.static.mega.co.nz/fonts/OpenSans-SemiboldItalic_v3.eot?") format("eot"), url("https://eu.static.mega.co.nz/fonts/OpenSans-SemiboldItalic_v3.woff") format("woff"), url("https://eu.static.mega.co.nz/fonts/OpenSans-SemiboldItalic_v3.ttf") format("truetype"), url("https://eu.static.mega.co.nz/fonts/OpenSans-SemiboldItalic_v2.svg#OpenSans-SemiboldItalic") format("svg");
 	font-weight: normal;
 	font-style: normal;
 }

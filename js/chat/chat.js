@@ -314,7 +314,7 @@ var chatui;
 
                         assert(filesList.length > 0, 'no files selected.');
 
-                        getPubk(contact.h, function() {
+                        getPubRSA(contact.h, function() {
                             var resp = megaChat.rtc.startMediaCall(participants[0], {files: filesList});
 
 
@@ -548,9 +548,9 @@ var chatui;
         if($(this).attr('class').indexOf('active') == -1) {
             $(this).parent().addClass('minimized');
             $(this).parent().animate({
-                'min-width': '32px',
-                width: 32,
-                height: 32
+                'min-width': '24px',
+                width: 24,
+                height: 24
             }, 200, function() {
                 $('.video-minimize-button').addClass('active');
             });
@@ -631,7 +631,7 @@ var Chat = function() {
 
                 },
                 preloadCryptoKeyForJid: function (sendMsgFunc, bareJid) {
-                    getPubk(megaChat.getContactFromJid(bareJid).h, sendMsgFunc);
+                    getPubRSA(megaChat.getContactFromJid(bareJid).h, sendMsgFunc);
                 },
                 generateMac: function (msg, key) {
                     var rawkey = key;
@@ -2003,7 +2003,7 @@ Chat.prototype.renderContactTree = function() {
             var participantJid = room.getParticipantsExceptMe()[0];
             var presence = self.karere.getPresence(participantJid);
 
-            var targetClassName = "offline"
+            var targetClassName = "offline";
             if(!presence || presence == Karere.PRESENCE.OFFLINE) {
                 targetClassName = "offline";
             } else if(presence == Karere.PRESENCE.AWAY) {
@@ -2188,7 +2188,7 @@ Chat.prototype.reorderContactTree = function() {
             if($first.length > 0) {
                 $currentNode.insertBefore($first);
             } else {
-                $container.append($currentNode)
+                $container.append($currentNode);
             }
         } else {
             $currentNode.insertAfter($prevNode);
@@ -2524,7 +2524,7 @@ Chat.prototype.closeChatPopups = function() {
     if (activePopup.attr('class')) {
         activeButton.removeClass('active');
         activePopup.removeClass('active');
-        if (activePopup.attr('class').indexOf('fm-add-contact-popup') == -1) activePopup.css('left', '-' + 10000 + 'px');
+        if (activePopup.attr('class').indexOf('fm-add-contact-popup') == -1 && activePopup.attr('class').indexOf('fm-start-call-popup') == -1) activePopup.css('left', '-' + 10000 + 'px');
         else activePopup.css('right', '-' + 10000 + 'px');
     }
 };
@@ -2553,7 +2553,8 @@ Chat.prototype.getBoshServiceUrl = function() {
         $.get("https://" + self.options.loadbalancerService + "/?service=xmpp")
             .done(function(r) {
                 if(r.xmpp && r.xmpp.length > 0) {
-                    $promise.resolve("https://" + r.xmpp[0].host + ":" + r.xmpp[0].port + "/bosh");
+                    var randomHost = array_random(r.xmpp);
+                    $promise.resolve("https://" + randomHost.host + ":" + randomHost.port + "/bosh");
                 } else {
                     var server = array_random(self.options.fallbackXmppServers);
                     self.logger.error("Got empty list from the load balancing service for xmpp, will fallback to: " + server + ".");

@@ -41,7 +41,7 @@ function switch_pro(data)
 
 function init_pro()
 {
-	var DEFAULT = 'monthly'; 
+    var DEFAULT = 'monthly'; 
 	
 	if (DEFAULT == 'monthly') 
 	{
@@ -112,7 +112,7 @@ function init_pro()
 		$('.pro-gray-block .register-st2-button-arrow').unbind('click');
 		$('.pro-gray-block .register-st2-button-arrow').bind('click',function(e)
 		{
-			pro_proceed(e);
+            pro_proceed(e);
             return false;
 		});		
 		
@@ -709,6 +709,11 @@ var doProRegister = function($dialog) {
 
 var paypalTimeout = null;
 function redirectToPaypal(url) {
+    
+    // Temporarily redirect to #resellers page because PayPal aren't taking payments anymore
+    window.location.replace("#resellers");
+    return false;
+    
     clearTimeout(paypalTimeout);
 
     $('.pro-register-dialog')

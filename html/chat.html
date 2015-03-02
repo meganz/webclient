@@ -67,6 +67,7 @@
         <!-- end of Chat audio/video indicators !-->
 
         <!-- Remove hidden class when Chat is ready -->
+        <div class="chat-button fm-end-call hidden"> <span class="fm-chatbutton">[$5884]</span> </div>
         <div class="chat-button fm-chat-end end-chat hidden"> <span class="fm-chatbutton">End chat</span> </div>
         <div class="chat-button fm-send-files hidden"> <span class="fm-chatbutton-arrow">Send files ...</span> </div>
 
@@ -84,8 +85,8 @@
             <div class="fm-chat-popup-button from-computer">From your computer</div>
         </div>
 
-        <div class="chat-popup fm-start-call-popup" style="left: -10000px;">
-            <div class="fm-send-files-arrow" style="left: 62px;"></div>
+        <div class="chat-popup fm-start-call-popup">
+            <div class="fm-send-files-arrow"></div>
             <div class="fm-chat-popup-button start-audio">[$5896]</div>
             <div class="fm-chat-popup-button start-video">[$5897]</div>
         </div>
@@ -113,7 +114,7 @@
             <!-- Current user audio container !-->
             <div class="my-av-screen current-user-audio-container current-user-video-container hidden">
                 <div class="current-user-resizer video-only"><div></div></div>
-
+                <div class="video-minimize-button small-video-reziser"></div>
                 <img style="height:100%;" src="" class="my-avatar"/>
                 <div style="height:100%;" class="my-avatar-text"/>
                 <div class="localVideoWrapper"></div>

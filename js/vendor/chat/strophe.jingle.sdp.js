@@ -185,6 +185,9 @@ SDP.prototype.toJingle = function (elem, thecreator) {
                 lines = SDPUtil.find_lines(this.media[i], 'a=extmap:');
                 for (j = 0; j < lines.length; j++) {
                     tmp = SDPUtil.parse_extmap(lines[j]);
+                    //Skip leaking of audio level info
+                    if (tmp.uri === 'urn:ietf:params:rtp-hdrext:ssrc-audio-level')
+                        continue;
                     elem.c('rtp-hdrext', { xmlns: 'urn:xmpp:jingle:apps:rtp:rtp-hdrext:0',
                                     uri: tmp.uri,
                                     id: tmp.value });

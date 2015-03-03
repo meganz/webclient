@@ -2696,18 +2696,18 @@ function accountUI()
 				// if (u.stime == 'W') $('.membership-big-txt.type').text(l[747]);
 				// else if (u.stime == 'M') $('.membership-big-txt.type').text(l[748]);
 				// else if (u.stime == 'Y') $('.membership-big-txt.type').text(l[749]);
-				// $('.membershtip-medium-txt.expiry').html(htmlentities(l[750]) + ' <span class="red">' + time2date(account.scycle) + '</span>');
+				// $('.membership-medium-txt.expiry').html(htmlentities(l[750]) + ' <span class="red">' + time2date(account.scycle) + '</span>');
 				if (account.scycle == '1 M') $('.membership-big-txt.type').text(l[748]);
 				else if (account.scycle == '1 Y') $('.membership-big-txt.type').text(l[749]);
 				else $('.membership-big-txt.type').text('');
-				$('.membershtip-medium-txt.expiry').html(htmlentities('(' + account.sgw.join(",") + ')'));
+				$('.membership-medium-txt.expiry').html(htmlentities('(' + account.sgw.join(",") + ')'));
 			}
 			else if (account.stype == 'O')
 			{
 				// one-time
 				$('.fm-account-header.typetitle').text(l[746]+':');
 				$('.membership-big-txt.type').text(l[751]);
-				$('.membershtip-medium-txt.expiry').html(l[987] + ' <span class="red">' + time2date(account.expiry) + '</span>');
+				$('.membership-medium-txt.expiry').html(l[987] + ' <span class="red">' + time2date(account.expiry) + '</span>');
 			}
 		}
 		else
@@ -2716,7 +2716,7 @@ function accountUI()
 			$('.fm-account-blocks .membership-icon.type').addClass('free');
 			$('.membership-big-txt.type').text(l[435]);
 			$('.membership-big-txt.accounttype').text(l[435]);
-			$('.membershtip-medium-txt.expiry').text(l[436]);
+			$('.membership-medium-txt.expiry').text(l[436]);
 		}
 		perc = Math.round((account.servbw_used+account.downbw_used)/account.bw*100);
 		perc_c=perc;
@@ -2743,7 +2743,7 @@ function accountUI()
         if (perc > 100)
             $('.fm-account-main .membership-circle-bg.green-circle').text(':-(');
         else
-            $('.fm-account-main .membership-circle-bg.green-circle').html(perc + '<span class="membershtip-small-txt">%</span>');
+            $('.fm-account-main .membership-circle-bg.green-circle').html(perc + '<span class="membership-small-txt">%</span>');
         $('.fm-account-bar.green').width(perc_c + '%');
         var b1 = bytesToSize(account.servbw_used + account.downbw_used);
         b1 = b1.split(' ');
@@ -2751,7 +2751,7 @@ function accountUI()
         var b2 = bytesToSize(account.bw);
         b2 = b2.split(' ');
         b2[0] = Math.round(b2[0]) + ' ';
-        $('.pro-bandwidth .membership-big-txt.floating').html('<span class="membershtip-small-txt">' + l['439a'].replace('[X1]', '<span class="green lpxf">' + htmlentities(b1[0]) + '<span class="membershtip-small-txt">' + htmlentities(b1[1]) + '</span></span>').replace('[X2]', '<span class="lpxf">' + htmlentities(b2[0]) + '</span>' + ' <span class="membershtip-small-txt">' + htmlentities(b2[1]) + '</span>') + '</span>' + warning);
+        $('.pro-bandwidth .membership-big-txt.floating').html('<span class="membership-small-txt">' + l['439a'].replace('[X1]', '<span class="green lpxf">' + htmlentities(b1[0]) + '<span class="membership-small-txt">' + htmlentities(b1[1]) + '</span></span>').replace('[X2]', '<span class="lpxf">' + htmlentities(b2[0]) + '</span>' + ' <span class="membership-small-txt">' + htmlentities(b2[1]) + '</span>') + '</span>' + warning);
         $('.fm-account-main .pro-bandwidth').removeClass('hidden');
         $('.fm-account-main .free-bandwidth').addClass('hidden');
 
@@ -2775,7 +2775,7 @@ function accountUI()
         if (perc > 100)
             $('.fm-account-main .membership-circle-bg.blue-circle').text(':-(');
         else
-            $('.fm-account-main .membership-circle-bg.blue-circle').html(perc + '<span class="membershtip-small-txt">%</span>');
+            $('.fm-account-main .membership-circle-bg.blue-circle').html(perc + '<span class="membership-small-txt">%</span>');
         $('.fm-account-bar.blue').width(perc_c + '%');
         var b1 = bytesToSize(account.space_used);
         b1 = b1.split(' ');
@@ -2783,7 +2783,7 @@ function accountUI()
         var b2 = bytesToSize(account.space);
         b2 = b2.split(' ');
         b2[0] = Math.round(b2[0]) + ' ';
-        $('.membership-big-txt.space').html('<span class="membershtip-small-txt">' + l['439a'].replace('[X1]', '<span class="blue lpxf">' + htmlentities(b1[0]) + '<span class="membershtip-small-txt">' + htmlentities(b1[1]) + '</span></span>').replace('[X2]', '<span class="lpxf">' + htmlentities(b2[0]) + '</span>' + ' <span class="membershtip-small-txt">' + htmlentities(b2[1]) + '</span>') + '</span>' + warning);
+        $('.membership-big-txt.space').html('<span class="membership-small-txt">' + l['439a'].replace('[X1]', '<span class="blue lpxf">' + htmlentities(b1[0]) + '<span class="membership-small-txt">' + htmlentities(b1[1]) + '</span></span>').replace('[X2]', '<span class="lpxf">' + htmlentities(b2[0]) + '</span>' + ' <span class="membership-small-txt">' + htmlentities(b2[1]) + '</span>') + '</span>' + warning);
         $('.fm-account-main .pro-upgrade').unbind('click');
         $('.fm-account-main .pro-upgrade').bind('click', function(e)
         {
@@ -2799,8 +2799,8 @@ function accountUI()
             $('.membership-big-txt.contacts').text(l[990]);
         else
             $('.membership-big-txt.contacts').text(l[989].replace('[X]', a));
-        $('.membershtip-medium-txt.contacts').unbind('click');
-        $('.membershtip-medium-txt.contacts').bind('click', function(e)
+        $('.membership-medium-txt.contacts').unbind('click');
+        $('.membership-medium-txt.contacts').bind('click', function(e)
         {
             M.openFolder('contacts');
             return false;
@@ -3403,8 +3403,8 @@ function accountUI()
             $('.fm-account-select.vouchertype select').html(voucheroptions);
         }
 
-        $('.fm-purchase-voucher,.membershtip-medium-txt.topup').unbind('click');
-        $('.fm-purchase-voucher,.membershtip-medium-txt.topup').bind('click', function(e)
+        $('.fm-purchase-voucher,.membership-medium-txt.topup').unbind('click');
+        $('.fm-purchase-voucher,.membership-medium-txt.topup').bind('click', function(e)
         {
             document.location.hash = 'resellers';
         });
@@ -3452,10 +3452,21 @@ function accountUI()
         initAccountScroll();
     }, 1);
 
-    if (u_attr.firstname)
+    // Show first name or last name
+    if (u_attr.firstname) {
         $('.membership-big-txt.name').text(u_attr.firstname + ' ' + u_attr.lastname);
-    else
+    }
+    else {
         $('.membership-big-txt.name').text(u_attr.name);
+    }
+    
+    // Show email address
+    if (u_attr.email) {
+        $('.membership-big-txt.email').text(u_attr.email);
+    }
+    else {
+        $('.membership-big-txt.email').hide();
+    }
 
     $('.editprofile').unbind('click');
     $('.editprofile').bind('click', function(event)

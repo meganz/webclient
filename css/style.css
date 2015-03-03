@@ -11506,19 +11506,28 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
 .space.membership-big-txt, .free-bandwidth .membership-big-txt {
 	font-size: 18px;
 }
+.membership-big-txt.name {
+    padding-bottom: 0;
+}
+.membership-big-txt.email {
+    padding-bottom: 0;
+}
 .membership-big-txt.red {
 	color: #BF1900;
 }
 .membership-big-txt.floating {
 	display: inline-block;
 }
-.membershtip-medium-txt {
+.membership-medium-txt {
 	font-size: 12px;
 	line-height: 19px;
 	min-height: 20px;
 	color: #333333;
 }
-.membershtip-small-txt {
+.membership-medium-txt.red-bg.editprofile {
+    margin-top: 7px;
+}
+.membership-small-txt {
 	font-size: 12px;
 }
 .membership-price-txt {
@@ -11587,7 +11596,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
 .membership-usage-txt span.green, .membership-usage-txt.green, .membership-big-txt span.green {
 	color: #71AD32;
 }
-.membershtip-medium-txt.green-bg, .membershtip-medium-txt.red-bg, .membershtip-medium-txt.gray-bg, .membershtip-medium-txt.blue-bg {
+.membership-medium-txt.green-bg, .membership-medium-txt.red-bg, .membership-medium-txt.gray-bg, .membership-medium-txt.blue-bg {
 	background-color: #71AD32;
 	color: white;
 	padding: 0 5px 1px 5px;
@@ -11599,18 +11608,18 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
 	float: left;
 	position: relative;
 }
-.membershtip-medium-txt.red-bg {
+.membership-medium-txt.red-bg {
 	background-color: #D32200;
 }
-.membershtip-medium-txt.blue-bg {
+.membership-medium-txt.blue-bg {
 	background-color: #1FA4E5;
 }
-.membershtip-medium-txt.gray-bg {
+.membership-medium-txt.gray-bg {
 	background-color: #4c4c4c;
 	margin-left: 10px;
 	position: relative;
 }
-.membershtip-medium-txt.gray-bg:hover, .membershtip-medium-txt.gray-bg.active {
+.membership-medium-txt.gray-bg:hover, .membership-medium-txt.gray-bg.active {
 	background-color: black;
 }
 .membership-question {
@@ -12530,7 +12539,7 @@ table {
 .exceeded .membership-circle-bg.blue-circle, .exceeded .membership-circle-bg.green-circle {
 	background-position: 0 -3280px;
 }
-.membershtip-medium-txt.floating {
+.membership-medium-txt.floating {
 	display: inline-block;
 	float: none;
 	margin: 0 0 0 15px;

@@ -87,7 +87,7 @@ function start_arkanoid()
 		if (perc <= 100)
 		{
 			$('.membership-circle-bg.game-circle').attr('class','membership-circle-bg game-circle percents-'+perc);
-			$('.membership-circle-bg.game-circle').html(perc + '<span class="membershtip-small-txt">%</span>');
+			$('.membership-circle-bg.game-circle').html(perc + '<span class="membership-small-txt">%</span>');
 		}				
 		if (perc >= 100)
 		{		

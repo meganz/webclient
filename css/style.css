@@ -740,7 +740,6 @@ a.account-manage-button:hover {
 	padding-right: 21px;
 	position: relative;
 }
-
 .upload-settings .account-set-bg1, .download-settings .account-set-bg1 {
 	width: 490px;
 	background-position: left -65px;
@@ -895,45 +894,17 @@ a.account-manage-button:hover {
 	border-top-right-radius: 74px;
 	border-bottom-right-radius: 74px;
 }
-.nw-fm-chart1-left span {
-	background: white;
-}
-.nw-fm-chart1-right span {
-	background: white;
-}
-.nw-fm-chart2-left span {
+.nw-fm-chart3-left span, .nw-fm-chart3-right span, .nw-fm-bar3 {
 	background: #F07800;
 }
-.nw-fm-chart2-right span {
-	background: #F07800;
-}
-.nw-fm-chart3-left span {
+.nw-fm-chart2-left span, .nw-fm-chart2-right span, .nw-fm-bar2 {
 	background: #FFD300;
 }
-.nw-fm-chart3-right span {
-	background: #FFD300;
-}
-.nw-fm-chart4-left span {
+.nw-fm-chart1-left span, .nw-fm-chart1-right span, .nw-fm-bar1 {
 	background: #13E03C;
 }
-.nw-fm-chart4-right span {
-	background: #13E03C;
-}
-.nw-fm-chart5-left span {
+.nw-fm-chart0-left span, .nw-fm-chart0-right span, .nw-fm-bar0 {
 	background: #2BA6DE;
-}
-.nw-fm-chart5-right span {
-	background: #2BA6DE;
-}
-.nw-fm-percentage ul :nth-child(1) p {
-	-moz-transform: rotate(180deg);
-	-webkit-transform: rotate(180deg);
-	-o-transform: rotate(180deg);
-}
-.nw-fm-percentage ul :nth-child(2) p {
-	-moz-transform: rotate(180deg);
-	-webkit-transform: rotate(180deg);
-	-o-transform: rotate(180deg);
 }
 .nw-fm-percents {
 	content: "";
@@ -983,6 +954,33 @@ a.account-manage-button:hover {
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	position: relative;
+	float:left;
+}
+.nw-fm-line-progress {
+	height: 24px;
+	margin-top: 20px;
+	-moz-border-radius: 12px;
+	-webkit-border-radius: 12px;
+	border-radius: 12px;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	border: 2px solid rgba(0,0,0,0.1);
+	background-color: white;
+	padding: 2px;
+	overflow: hidden;
+}
+.nw-fm-line-progress-pad {
+	height: 16px;
+	-moz-border-radius: 12px;
+	-webkit-border-radius: 12px;
+	border-radius: 12px;
+	overflow: hidden;
+}
+.nw-fm-line-progress-bar {
+	height: 16px;
+	width: 0%;
+	float: left;
 }
 .transfer-numbers {
 	float: left;
@@ -12438,10 +12436,10 @@ table {
 	border: 0;
 }
 .fm-account-header {
-	font-size: 13px;
+	font-size: 15px;
 	line-height: 21px;
 	color: #666666;
-	padding: 0 0 10px 0;
+	padding: 0 0 15px 0;
 }
 .fm-account-avatar {
 	width: 64px;

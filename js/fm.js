@@ -2718,72 +2718,102 @@ function accountUI()
 			$('.membership-big-txt.accounttype').text(l[435]);
 			$('.membership-medium-txt.expiry').text(l[436]);
 		}
+		
+		
 		perc = Math.round((account.servbw_used+account.downbw_used)/account.bw*100);
 		perc_c=perc;
-		if (perc_c > 100) perc_c=100;
-		warning = '';
-		if (perc > 99 && u_attr.p)
-		{
-			warning = '<div class="account-warning-icon"><span class="membership-notification"><span><span class="yellow">'+ l[34] + ':</span> ' + l[1008] + ' ' + l[1009] + ' <a href="#pro" class="upgradelink">' + l[920] + '.</a></span><span class="membership-arrow"></span></span>&nbsp;</div>';
-		}
-		else if (perc > 99 && !u_attr.p)
-		{
-			// @@@ TODO: add dynamic bandwidth available in X minutes:
-			warning = '<div class="account-warning-icon"><span class="membership-notification"><span><span class="yellow">' + l[34] + '</span> ' + l[1008] + ' ' + l[1009] + ' <a href="#pro" class="upgradelink">' + l[920] + '</a></span><span class="membership-arrow"></span></span>&nbsp;</div>';
-		}
-		else if (!u_attr.p)
-		{
-			// @@@ TODO: add dynamic bandwidth available in X minutes:
 
-            var waittime = '30 minutes';
-
-            warning = '<span class="membership-question">?<span class="membership-notification"><span>' + l[1056] + ' ' + l[1054].replace('[X]', waittime) + '</span><span class="membership-arrow"></span></span></span>';
-        }
-        $('.fm-account-main .membership-circle-bg.green-circle').attr('class', 'membership-circle-bg green-circle percents-' + perc_c);
-        if (perc > 100)
-            $('.fm-account-main .membership-circle-bg.green-circle').text(':-(');
-        else
-            $('.fm-account-main .membership-circle-bg.green-circle').html(perc + '<span class="membership-small-txt">%</span>');
-        $('.fm-account-bar.green').width(perc_c + '%');
+		
+		/* New Used Bandwidth bar */
+			
         var b1 = bytesToSize(account.servbw_used + account.downbw_used);
         b1 = b1.split(' ');
         b1[0] = Math.round(b1[0]) + ' ';
         var b2 = bytesToSize(account.bw);
         b2 = b2.split(' ');
         b2[0] = Math.round(b2[0]) + ' ';
-        $('.pro-bandwidth .membership-big-txt.floating').html('<span class="membership-small-txt">' + l['439a'].replace('[X1]', '<span class="green lpxf">' + htmlentities(b1[0]) + '<span class="membership-small-txt">' + htmlentities(b1[1]) + '</span></span>').replace('[X2]', '<span class="lpxf">' + htmlentities(b2[0]) + '</span>' + ' <span class="membership-small-txt">' + htmlentities(b2[1]) + '</span>') + '</span>' + warning);
-        $('.fm-account-main .pro-bandwidth').removeClass('hidden');
-        $('.fm-account-main .free-bandwidth').addClass('hidden');
+		var b3 = bytesToSize(account.bw - (account.servbw_used + account.downbw_used));
+		
+        var bandwidthDeg = 360 * perc_c / 100; 
+		if (bandwidthDeg <= 180) {
+				$('.bandwidth .nw-fm-chart0-right p').css('transform', 'rotate(' + bandwidthDeg + 'deg)');
+		} else {
+				$('.bandwidth .nw-fm-chart0-right p').css('transform', 'rotate(180deg)');
+				$('.bandwidth .nw-fm-chart0-left p').css('transform', 'rotate(' + (bandwidthDeg - 180) + 'deg)');
+		}
+		if (bandwidthDeg > 0) $('.bandwidth .nw-fm-percentage').removeClass('empty');
+		$('.bandwidth .nw-fm-bar0').css('width', perc_c + '%');
+		
+		// Maximum bandwidth
+		$('.bandwidth .nw-fm-percents span.pecents-txt').html(htmlentities(b2[0])); 
+		$('.bandwidth .nw-fm-percents span.gb-txt').html(htmlentities(b2[1]));
+		
+		// Used bandwidth
+		$('.bandwidth .fm-bar-size.used').html(b1); 
+		// Available bandwidth
+		$('.bandwidth .fm-bar-size.available').html(b3); 
+		
+		if (perc > 99) $('.fm-account-blocks.storage').addClass('exceeded');
+		
+		/* End of Used Bandwidth bar */ 
 
-        if (perc > 99)
-            $('.fm-account-mutliple-bl.bandwidth').addClass('exceeded');
 
         perc = Math.round(account.space_used / account.space * 100);
         perc_c = perc;
         if (perc_c > 100)
             perc_c = 100;
         if (perc > 99)
-            $('.fm-account-mutliple-bl.storage').addClass('exceeded');
+            $('.fm-account-blocks.storage').addClass('exceeded');
 
-        warning = '';
-        if (perc > 99)
-            warning = '<div class="account-warning-icon"><span class="membership-notification"><span><span class="yellow">' + l[34] + ':</span> ' + l[1010] + ' ' + l[1011] + ' <a href="#pro"  class="upgradelink">' + l[920] + '.</a></span><span class="membership-arrow"></span></span>&nbsp;</div>';
-        else if (perc > 79)
-            warning = '<div class="account-warning-icon"><span class="membership-notification"><span><span class="yellow">' + l[34] + ':</span> ' + l[1012] + ' ' + l[1013] + ' <a href="#pro"  class="upgradelink">' + l[920] + '.</a></span><span class="membership-arrow"></span></span>&nbsp;</div>';
 
-        $('.fm-account-main .membership-circle-bg.blue-circle').attr('class', 'membership-circle-bg blue-circle percents-' + perc_c);
-        if (perc > 100)
-            $('.fm-account-main .membership-circle-bg.blue-circle').text(':-(');
-        else
-            $('.fm-account-main .membership-circle-bg.blue-circle').html(perc + '<span class="membership-small-txt">%</span>');
-        $('.fm-account-bar.blue').width(perc_c + '%');
+		
+		/* New Used space bar */
+		
         var b1 = bytesToSize(account.space_used);
         b1 = b1.split(' ');
         b1[0] = Math.round(b1[0]) + ' ';
         var b2 = bytesToSize(account.space);
         b2 = b2.split(' ');
         b2[0] = Math.round(b2[0]) + ' ';
-        $('.membership-big-txt.space').html('<span class="membership-small-txt">' + l['439a'].replace('[X1]', '<span class="blue lpxf">' + htmlentities(b1[0]) + '<span class="membership-small-txt">' + htmlentities(b1[1]) + '</span></span>').replace('[X2]', '<span class="lpxf">' + htmlentities(b2[0]) + '</span>' + ' <span class="membership-small-txt">' + htmlentities(b2[1]) + '</span>') + '</span>' + warning);
+		var b3 = bytesToSize(account.space - account.space_used);
+		
+		// Array contains Cloud drive , Rubbish bin, Incoming sares, Inbox (percents)
+        var percents = [ perc_c , 0, 0 , 0 ],
+		    deg = 0; 
+		for (i = 0; i < 4; i++) {
+			// Rounded chart
+			deg = deg + (360 * percents[i] / 100);
+			if (deg <= 180) {
+				$('.storage .nw-fm-chart' + i + '-right p').css('transform', 'rotate(' + deg + 'deg)');
+			} else {
+				$('.storage .nw-fm-chart' + i + '-right p').css('transform', 'rotate(180deg)');
+				$('.storage .nw-fm-chart' + i + '-left p').css('transform', 'rotate(' + (deg - 180) + 'deg)');
+			}
+			if (deg > 0) $('.storage .nw-fm-percentage').removeClass('empty');
+			// Line progress bar
+			$('.storage .nw-fm-bar' + i).css('width', percents[i] + '%');
+		} 
+		
+		// Maximum disk space
+		$('.storage .nw-fm-percents span.pecents-txt').html(htmlentities(b2[0])); 
+		$('.storage .nw-fm-percents span.gb-txt').html(htmlentities(b2[1]));
+		
+		// Used space
+		$('.storage .fm-bar-size.used').html(b1); 
+		// Available space
+		$('.storage .fm-bar-size.available').html(b3); 
+		// Cloud drive
+		$('.storage .fm-bar-size.cloud-drive').html(b1); 
+		// Rubbish bin
+		$('.storage .fm-bar-size.rubbish-bin').html('0 MB'); 
+		// Incoming shares
+		$('.storage .fm-bar-size.incoming-shares').html('0 MB'); 
+		// Inbox
+		$('.storage .fm-bar-size.inbox').html('0 MB'); 
+		
+		/* End of New Used space */ 
+		
+		
         $('.fm-account-main .pro-upgrade').unbind('click');
         $('.fm-account-main .pro-upgrade').bind('click', function(e)
         {

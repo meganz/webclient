@@ -1081,7 +1081,7 @@ border-radius: 100%;
 	float:left;
 }
 .fm-account-blocks.bandwidth {
-	padding:24px 24px 24px 0;
+	padding:24px 0 24px 0;
 	float:right;
 	width: 184px;
 }
@@ -12554,9 +12554,9 @@ table {
 }
 .fm-account-header {
 	font-size: 15px;
-	line-height: 21px;
+	line-height: 18px;
 	color: #666666;
-	padding: 0 0 20px 0;
+	height:41px;
 }
 .fm-account-avatar {
 	width: 100px;

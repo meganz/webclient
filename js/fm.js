@@ -1267,7 +1267,7 @@ function removeUInode(h)
 
 function sharedUInode(nodeHandle) {
     var availShares = false;
-    
+
     if ((M.d[nodeHandle] && M.d[nodeHandle].shares) || M.ps[nodeHandle]) {
         $('#treea_' + nodeHandle + ' .nw-fm-tree-folder').addClass('shared-folder');
         availShares = true;
@@ -1616,7 +1616,7 @@ function addContactUI()
         var $this = $(this);
         var $d = $('.add-user-popup');
         $.sharedTokens = [];// Holds items currently visible in share folder contet (above input)
-        
+
         if ($this.is('.active')) {// Hide
             $this.removeClass('active');
             $d.addClass('hidden');
@@ -2718,14 +2718,12 @@ function accountUI()
 			$('.membership-big-txt.accounttype').text(l[435]);
 			$('.membership-medium-txt.expiry').text(l[436]);
 		}
-		
-		
+
 		perc = Math.round((account.servbw_used+account.downbw_used)/account.bw*100);
 		perc_c=perc;
 
-		
 		/* New Used Bandwidth bar */
-			
+
         var b1 = bytesToSize(account.servbw_used + account.downbw_used);
         b1 = b1.split(' ');
         b1[0] = Math.round(b1[0]) + ' ';
@@ -2733,8 +2731,8 @@ function accountUI()
         b2 = b2.split(' ');
         b2[0] = Math.round(b2[0]) + ' ';
 		var b3 = bytesToSize(account.bw - (account.servbw_used + account.downbw_used));
-		
-        var bandwidthDeg = 360 * perc_c / 100; 
+
+        var bandwidthDeg = 360 * perc_c / 100;
 		if (bandwidthDeg <= 180) {
 				$('.bandwidth .nw-fm-chart0-right p').css('transform', 'rotate(' + bandwidthDeg + 'deg)');
 		} else {
@@ -2743,19 +2741,19 @@ function accountUI()
 		}
 		if (bandwidthDeg > 0) $('.bandwidth .nw-fm-percentage').removeClass('empty');
 		$('.bandwidth .nw-fm-bar0').css('width', perc_c + '%');
-		
+
 		// Maximum bandwidth
-		$('.bandwidth .nw-fm-percents span.pecents-txt').html(htmlentities(b2[0])); 
+		$('.bandwidth .nw-fm-percents span.pecents-txt').html(htmlentities(b2[0]));
 		$('.bandwidth .nw-fm-percents span.gb-txt').html(htmlentities(b2[1]));
-		
+
 		// Used bandwidth
-		$('.bandwidth .fm-bar-size.used').html(b1); 
+		$('.bandwidth .fm-bar-size.used').html(b1);
 		// Available bandwidth
-		$('.bandwidth .fm-bar-size.available').html(b3); 
-		
+		$('.bandwidth .fm-bar-size.available').html(b3);
+
 		if (perc > 99) $('.fm-account-blocks.storage').addClass('exceeded');
-		
-		/* End of Used Bandwidth bar */ 
+
+		/* End of Used Bandwidth bar */
 
 
         perc = Math.round(account.space_used / account.space * 100);
@@ -2765,21 +2763,20 @@ function accountUI()
         if (perc > 99)
             $('.fm-account-blocks.storage').addClass('exceeded');
 
-
-		
 		/* New Used space bar */
-		
-        var b1 = bytesToSize(account.space_used);
-        b1 = b1.split(' ');
-        b1[0] = Math.round(b1[0]) + ' ';
-        var b2 = bytesToSize(account.space);
-        b2 = b2.split(' ');
-        b2[0] = Math.round(b2[0]) + ' ';
-		var b3 = bytesToSize(account.space - account.space_used);
-		
-		// Array contains Cloud drive , Rubbish bin, Incoming sares, Inbox (percents)
-        var percents = [ perc_c , 0, 0 , 0 ],
-		    deg = 0; 
+
+        var c = account.cstrgn, k = Object.keys(c), deg = 0, iSharesBytes = 0;
+		// Array contains Cloud drive , Rubbish bin, Incoming shares, Inbox (percents)
+        var percents = [
+            100 * c[k[0]][0] / account.space,
+            100 * c[k[2]][0] / account.space,
+            0,
+            100 * c[k[1]][0] / account.space
+        ];
+        for (var i = 3 ; i < k.length ; ++i ) {
+            iSharesBytes += c[k[i]][0];
+            percents[2] += (100 * c[k[i]][0] / account.space);
+        }
 		for (i = 0; i < 4; i++) {
 			// Rounded chart
 			deg = deg + (360 * percents[i] / 100);
@@ -2792,28 +2789,28 @@ function accountUI()
 			if (deg > 0) $('.storage .nw-fm-percentage').removeClass('empty');
 			// Line progress bar
 			$('.storage .nw-fm-bar' + i).css('width', percents[i] + '%');
-		} 
-		
+		}
+
 		// Maximum disk space
-		$('.storage .nw-fm-percents span.pecents-txt').html(htmlentities(b2[0])); 
+		$('.storage .nw-fm-percents span.pecents-txt').html(htmlentities(b2[0]));
 		$('.storage .nw-fm-percents span.gb-txt').html(htmlentities(b2[1]));
-		
+
 		// Used space
-		$('.storage .fm-bar-size.used').html(b1); 
+		$('.storage .fm-bar-size.used').html(bytesToSize(account.space_used));
 		// Available space
-		$('.storage .fm-bar-size.available').html(b3); 
+		$('.storage .fm-bar-size.available').html(bytesToSize(account.space - account.space_used));
 		// Cloud drive
-		$('.storage .fm-bar-size.cloud-drive').html(b1); 
+		$('.storage .fm-bar-size.cloud-drive').html(bytesToSize(c[k[0]][0]));
 		// Rubbish bin
-		$('.storage .fm-bar-size.rubbish-bin').html('0 MB'); 
+		$('.storage .fm-bar-size.rubbish-bin').html(bytesToSize(c[k[2]][0]));
 		// Incoming shares
-		$('.storage .fm-bar-size.incoming-shares').html('0 MB'); 
+		$('.storage .fm-bar-size.incoming-shares').html(bytesToSize(iSharesBytes));
 		// Inbox
-		$('.storage .fm-bar-size.inbox').html('0 MB'); 
-		
-		/* End of New Used space */ 
-		
-		
+		$('.storage .fm-bar-size.inbox').html(bytesToSize(c[k[1]][0]));
+
+		/* End of New Used space */
+
+
         $('.fm-account-main .pro-upgrade').unbind('click');
         $('.fm-account-main .pro-upgrade').bind('click', function(e)
         {
@@ -3489,7 +3486,7 @@ function accountUI()
     else {
         $('.membership-big-txt.name').text(u_attr.name);
     }
-    
+
     // Show email address
     if (u_attr.email) {
         $('.membership-big-txt.email').text(u_attr.email);
@@ -5826,14 +5823,14 @@ function sectionUIopen(id) {
 
     if (id !== 'opc') {
         $('.sent-requests-grid').addClass('hidden');
-        
+
         // this's button in left panel of contacts tab
         $('.fm-recived-requests').removeClass('active');
     }
 
     if (id !== 'ipc') {
         $('.contact-requests-grid').addClass('hidden');
-        
+
         // this's button in left panel of contacts tab
         $('.fm-contact-requests').removeClass('active');
     }
@@ -6364,7 +6361,7 @@ function handleDialogContent(s, m, c, n, t, i)
  */
 function shareDialogContentCheck() {
     var dc = '.share-dialog';
-    
+
     // Disable/enable button
     var $btn = $('.fm-dialog-button .dialog-share-button');
 
@@ -6422,11 +6419,11 @@ function fillShareDialogWithContent() {
     if (mps) {
         for (var pcrHandle in mps) {
             if (mps.hasOwnProperty(pcrHandle)) {
-                
+
                 // Because it's pending, we don't have user information in M.u so we have to look in the pending contact request
                 if (M.opc[mps[pcrHandle].p]) {
                     var pendingContactRequest = M.opc[mps[pcrHandle].p];
-                    
+
                     // ToDo: take care of name attribute once available
                     generateShareDialogRow(pendingContactRequest.m, pendingContactRequest.m, mps[pcrHandle].r);
                 }
@@ -6447,7 +6444,7 @@ function generateShareDialogRow(displayNameOrEmail, email, shareRights, userHand
     var av = (avatars[userHandle] && avatars[userHandle].url) ? '<img src="' + avatars[userHandle].url + '">' : (displayNameOrEmail.charAt(0) + displayNameOrEmail.charAt(1));
     var perm = '';
     var permissionLevel = 0;
-    
+
     if (typeof shareRights != 'undefined') {
         permissionLevel = shareRights;
     }
@@ -6460,7 +6457,7 @@ function generateShareDialogRow(displayNameOrEmail, email, shareRights, userHand
     } else {
         perm = ['read-only', l[55]];
     }
-    
+
     // Add contact
     $.sharedTokens.push(email);
 
@@ -6498,7 +6495,7 @@ function handleShareDialogContent() {
     $('.share-dialog-icon.permissions-icon')
         .removeClass('active full-access read-and-write')
         .addClass('read-only');
-    
+
     // Update dialog title text
     $(dc + ' .fm-dialog-title').text(l[1344] + ' "' + M.d[$.selected].name + '"');
     $(dc + ' .multiple-input .token-input-token-mega').remove();
@@ -6784,7 +6781,7 @@ function initShareDialog() {
                 } else {
                     perm = 0;
                 }
-                
+
                 if (!s || !s[id] || s[id].r !== perm) {
                     targets.push({u: id, r: perm});
                 }
@@ -6792,7 +6789,7 @@ function initShareDialog() {
 
             closeDialog();
             if (targets.length > 0) {
-                
+
                 // ToDo: Update Message with appropriate field once UI html is available
                 doshare($.selected[0], targets, true, 'Message');
             }
@@ -6820,7 +6817,7 @@ function initShareDialog() {
                 userEmail = M.u[handleOrEmail].m;
                 M.delnodeShare( selectedNodeHandle, handleOrEmail);
             }
-            
+
             // Pending share
             else {
                 var pendingContactId = M.findOutgoingPendingContactIdByEmail(userEmail);

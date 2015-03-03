@@ -2734,10 +2734,10 @@ function accountUI()
 
         var bandwidthDeg = 360 * perc_c / 100;
         if (bandwidthDeg <= 180) {
-                $('.bandwidth .nw-fm-chart0-right p').css('transform', 'rotate(' + bandwidthDeg + 'deg)');
+                $('.bandwidth .nw-fm-chart0.right-c p').css('transform', 'rotate(' + bandwidthDeg + 'deg)');
         } else {
-                $('.bandwidth .nw-fm-chart0-right p').css('transform', 'rotate(180deg)');
-                $('.bandwidth .nw-fm-chart0-left p').css('transform', 'rotate(' + (bandwidthDeg - 180) + 'deg)');
+                $('.bandwidth .nw-fm-chart0.right-c p').css('transform', 'rotate(180deg)');
+                $('.bandwidth .nw-fm-chart0.left-c p').css('transform', 'rotate(' + (bandwidthDeg - 180) + 'deg)');
         }
         if (bandwidthDeg > 0) $('.bandwidth .nw-fm-percentage').removeClass('empty');
         $('.bandwidth .nw-fm-bar0').css('width', perc_c + '%');
@@ -2778,16 +2778,14 @@ function accountUI()
             percents[2] += (100 * c[k[i]][0] / account.space);
         }
         for (i = 0; i < 4; i++) {
-            // Rounded chart
             deg = deg + (360 * percents[i] / 100);
             if (deg <= 180) {
-                $('.storage .nw-fm-chart' + i + '-right p').css('transform', 'rotate(' + deg + 'deg)');
+                $('.storage .nw-fm-chart' + i + '.right-c p').css('transform', 'rotate(' + deg + 'deg)');
             } else {
-                $('.storage .nw-fm-chart' + i + '-right p').css('transform', 'rotate(180deg)');
-                $('.storage .nw-fm-chart' + i + '-left p').css('transform', 'rotate(' + (deg - 180) + 'deg)');
+                $('.storage .nw-fm-chart' + i + '.right-c p').css('transform', 'rotate(180deg)');
+                $('.storage .nw-fm-chart' + i + '.left-c p').css('transform', 'rotate(' + (deg - 180) + 'deg)');
             }
             if (deg > 0) $('.storage .nw-fm-percentage').removeClass('empty');
-            // Line progress bar
             $('.storage .nw-fm-bar' + i).css('width', percents[i] + '%');
         }
 

@@ -877,7 +877,7 @@ a.account-manage-button:hover {
 .nw-fm-percentage ul :nth-child(even) {
 	clip: rect(0px, 74px, 148px, 0px);
 }
-.chart-left {
+.right-c span {
 	-moz-border-radius-topleft: 74px;
 	-moz-border-radius-bottomleft: 74px;
 	-webkit-border-top-left-radius: 74px;
@@ -885,7 +885,7 @@ a.account-manage-button:hover {
 	border-top-left-radius: 74px;
 	border-bottom-left-radius: 74px;
 }
-.chart-right {
+.left-c span {
 	margin-left: 74px;
 	-moz-border-radius-topright: 74px;
 	-moz-border-radius-bottomright: 74px;
@@ -901,22 +901,22 @@ a.account-manage-button:hover {
 .bar-color4 {
 	background-color: #666666;
 }
-.nw-fm-chart3-left span, .nw-fm-chart3-right span, .nw-fm-bar3, .bar-color3 {
+.nw-fm-chart3.left-c span, .nw-fm-chart3.right-c span, .nw-fm-bar3, .bar-color3 {
 	background: #F07800;
 }
-.nw-fm-chart2-left span, .nw-fm-chart2-right span, .nw-fm-bar2, .bar-color2 {
+.nw-fm-chart2.left-c span, .nw-fm-chart2.right-c span, .nw-fm-bar2, .bar-color2 {
 	background: #FFD300;
 }
-.nw-fm-chart1-left span, .nw-fm-chart1-right span, .nw-fm-bar1, .bar-color1 {
+.nw-fm-chart1.left-c span, .nw-fm-chart1.right-c span, .nw-fm-bar1, .bar-color1 {
 	background: #13E03C;
 }
-.nw-fm-chart0-left span, .nw-fm-chart0-right span, .nw-fm-bar0, .bar-color0 {
+.nw-fm-chart0.left-c span, .nw-fm-chart0.right-c span, .nw-fm-bar0, .bar-color0 {
 	background: #2BA6DE;
 }
-.bandwidth .nw-fm-chart0-left span, .bandwidth .nw-fm-chart0-right span, .bandwidth .nw-fm-bar0, .bandwidth .bar-color4 {
+.bandwidth .nw-fm-chart0.left-c span, .bandwidth .nw-fm-chart0.right-c span, .bandwidth .nw-fm-bar0, .bandwidth .bar-color4 {
 	background-color: #6BB219;
 }
-.exceeded .fm-bar-color.bar-color4, .exceeded .bandwidth .nw-fm-chart0-left span, .exceeded .bandwidth .nw-fm-chart0-right span {
+.exceeded .fm-bar-color.bar-color4, .exceeded .bandwidth .nw-fm-chart0.left-c span, .exceeded .bandwidth .nw-fm-chart0.right-c span {
 	background-color: rgba(217,0,7,1);
 }
 .exceeded .fm-bar-title.used-info, .exceeded .fm-bar-size.used {

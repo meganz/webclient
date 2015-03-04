@@ -1,0 +1,109 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>MEGA 2.0</title>
+<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+<link rel="stylesheet" type="text/css" href="../css/style.css" />
+<script src="../js/jquery-1.8.1.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {  
+/* test */
+  $(function () {
+	  
+    var percents = [ 45 , 15, 10 , 15 ]
+		deg = 0; 
+		
+		for (i = 0; i < 4; i++) {
+			// Rounded chart
+			deg = deg + (360 * percents[i] / 100);
+			if (deg <= 180) {
+				$('.nw-fm-chart' + i + '.right-c p').css('transform', 'rotate(' + deg + 'deg)');
+			} else {
+				$('.nw-fm-chart' + i + '.right-c p').css('transform', 'rotate(180deg)');
+				$('.nw-fm-chart' + i + '.left-c p').css('transform', 'rotate(' + (deg - 180) + 'deg)');
+			}
+			// Line progress bar
+			$('.nw-fm-bar' + i).css('width', percents[i] + '%');
+		} 
+		
+        $('.nw-fm-percents span.pecents-txt').html(deg); 
+		
+  });
+});
+</script>
+</head>
+<body style=" width:386px; padding:40px;">
+<div class="nw-fm-progress-border">
+  <div class="nw-fm-percentage">
+    <ul>
+      <li class="nw-fm-chart3 right-c"><p><span></span></p></li>
+      <li class="nw-fm-chart3 left-c"><p><span></span></p></li>
+      <li class="nw-fm-chart2 right-c"><p><span></span></p></li>
+      <li class="nw-fm-chart2 left-c"><p><span></span></p></li>
+      <li class="nw-fm-chart1 right-c"><p><span></span></p></li>
+      <li class="nw-fm-chart1 left-c"><p><span></span></p></li>
+      <li class="nw-fm-chart0 right-c"><p><span></span></p></li>
+      <li class="nw-fm-chart0 left-c"><p><span></span></p></li>
+    </ul>
+  </div>
+  <div class="nw-fm-percents">
+    <div class="nw-fm-percents-wrapper"> <span class="pecents-txt">95</span><span class="gb-txt">GB</span> </div>
+  </div>
+</div>
+
+<div class="nw-fm-bar-info">
+  <div class="fm-half-sized-block">
+  
+     <div class="fm-bar-info-txt">
+       <div class="fm-bar-color bar-color0"></div>
+       <span class="fm-bar-title">Cloud Drive</span>
+       <span class="fm-bar-size">180 GB</span>
+     </div>
+     <div class="fm-bar-info-txt">
+       <div class="fm-bar-color bar-color1"></div>
+       <span class="fm-bar-title">Rubbish Bin</span>
+       <span class="fm-bar-size">19.5 GB</span>
+     </div>
+     <div class="fm-bar-info-txt">
+       <div class="fm-bar-color bar-color2"></div>
+       <span class="fm-bar-title">Incoming Shares</span>
+       <span class="fm-bar-size">500 MB</span>
+     </div>
+     <div class="fm-bar-info-txt">
+       <div class="fm-bar-color bar-color3"></div>
+       <span class="fm-bar-title">Inbox</span>
+       <span class="fm-bar-size">0 GB</span>
+     </div>
+  
+  </div>
+  
+  <div class="fm-half-sized-block">
+     
+     <div class="fm-bar-info-txt">
+       <div class="fm-bar-color bar-color4"></div>
+       <span class="fm-bar-title">Used</span>
+       <span class="fm-bar-size">200 GB</span>
+     </div>
+     <div class="fm-bar-info-txt">
+       <div class="fm-bar-color bar-color5"></div>
+       <span class="fm-bar-title">Available</span>
+       <span class="fm-bar-size">300 GB</span>
+     </div>
+     
+  </div>
+</div>
+
+<div class="clear"></div>
+
+<div class="nw-fm-line-progress">
+  <div class="nw-fm-line-progress-pad">
+       <div class="nw-fm-line-progress-bar nw-fm-bar0"></div>
+       <div class="nw-fm-line-progress-bar nw-fm-bar1"></div>
+       <div class="nw-fm-line-progress-bar nw-fm-bar2"></div>
+       <div class="nw-fm-line-progress-bar nw-fm-bar3"></div>
+  </div>
+</div>
+
+</body>
+</html>

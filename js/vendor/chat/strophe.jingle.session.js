@@ -328,6 +328,7 @@ sendOffer: function (cb) {
 
 createdOffer: function (sdp, cb) {
     var self = this;
+    sdp.sdp = sdp.sdp.replace(/\r\na=extmap:\d+ urn:ietf:params:rtp-hdrext:ssrc-audio-level\r\n/mg, '\r\n');
     self.localSDP = new SDP(sdp.sdp);
     //this.localSDP.mangle();
     sdp.sdp = this.localSDP.raw;
@@ -536,12 +537,12 @@ sendAnswer: function (cb, provisional) {
 },
 
 createdAnswer: function (sdp, cb, provisional) {
-    if (this.state === 'ended')
-    {
+    if (this.state === 'ended') {
         console.warn('Session ', this.sid, 'to', this.peerjid, ':createdAnswer: Session already closed, aborting');
 //        return;
     }
     var self = this;
+    sdp.sdp = sdp.sdp.replace(/\r\na=extmap:\d+ urn:ietf:params:rtp-hdrext:ssrc-audio-level\r\n/mg, '\r\n');
     self.localSDP = new SDP(sdp.sdp);
     //this.localSDP.mangle();
     self.usepranswer = provisional === true;

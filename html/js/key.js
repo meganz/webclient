@@ -51,7 +51,11 @@ function init_key()
 		crypto_rsagenkey()
             .done(function() {
                 authring.scrubAuthRing();
-                authring.scrubEd25519KeyPair();
+                authring.scrubEd25519KeyPair()
+                    .done(function() {
+                        pubEd25519[u_handle] = u_pubEd25519;
+                        init_chat();
+                    });
             });
 	}
 	else ui_keycomplete();	
@@ -68,7 +72,11 @@ function key_step2()
 		crypto_rsagenkey()
             .done(function() {
                 authring.scrubAuthRing();
-                authring.scrubEd25519KeyPair();
+                authring.scrubEd25519KeyPair()
+                    .done(function() {
+                        pubEd25519[u_handle] = u_pubEd25519;
+                        init_chat();
+                    });
             });
 	}
 	else ui_keycomplete();
@@ -107,6 +115,7 @@ function ui_keycomplete()
 	} else {
 		init_pro();
 		mainScroll();
+        init_chat();
 	}
 }
 

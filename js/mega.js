@@ -873,14 +873,13 @@ function MegaData()
          * 
          * @returns {int}
          */
-        function renderLayout(u, n_cache, files) {
+        function renderLayout(u, n_cache) {
             var html, el, cs, contains, u_h, av_meta, t, el, time,
                 avatar, av_color, rights, rightsclass, onlinestatus, html,
                 s = '',
                 ftype = '',
                 c = '',
                 cc = null,
-                files = files,
                 star = '';
             
             for (var i in M.v) {
@@ -1038,15 +1037,12 @@ function MegaData()
                                 </tr>';
                     }
                     
-                    // ToDo: Is files++ what we realy want?
                     if (!(M.v[i].seen = n_cache > files++)) {
                         cc = [i, html, M.v[i].h, M.v[i].t];
                     }
                 }
                 mInsertNode(M.v[i], M.v[i-1], M.v[i+1], t, el, html, u, cc); 
             }
-            
-            return files;
         }// renderLayout END
         
         var n_cache, lSel,
@@ -1143,7 +1139,7 @@ function MegaData()
         } else if (this.currentdirid === 'contacts') {
             renderContactsLayout(u);
         } else {
-            files = renderLayout(u, n_cache, files);
+            renderLayout(u, n_cache);
         }
 
         contactUI();// ToDo: Document this function,
@@ -1154,7 +1150,7 @@ function MegaData()
                 flush_cached_nodes();
         });
 
-        DEBUG('cache %d/%d (%d)', cache.length, files, n_cache);
+        if (d) console.log('cache %d/%d (%d)', cache.length, files, n_cache);
         if (cache.length) {
             $(lSel).bind('jsp-scroll-y.dynlist', function(ev, pos, top, bot) {
                 if (bot) {

@@ -485,17 +485,36 @@ var authring = (function () {
      * Purges/regenerated Ed25519 key pair and RSA pub key signature.
      *
      * @return
-     *     void
+     *     {MegaPromise}
      */
     ns.scrubEd25519KeyPair = function() {
         u_privEd25519 = jodid25519.eddsa.generateKeySeed();
         u_keyring = {prEd255 : u_privEd25519};
         u_pubEd25519 = jodid25519.eddsa.publicKey(u_privEd25519);
-        setUserAttribute('keyring', u_keyring, false, false);
-        setUserAttribute('puEd255', base64urlencode(u_pubEd25519), true, false);
+
+        // after generating the keys, the authring is empty, e.g. it does not have our own key, which is pretty weird...
+        // this is why, we will wait for ALL setUserAttribute API calls to finish and then fill the key in the cache
+
+
+
+        var successfulSetUserAttributeCalls = 0;
+
+        setUserAttribute('keyring', u_keyring, false, false, function() {
+            successfulSetUserAttributeCalls++;
+        });
+        setUserAttribute('puEd255', base64urlencode(u_pubEd25519), true, false, function() {
+            successfulSetUserAttributeCalls++;
+        });
         var sigPubk = authring.signKey(crypto_decodepubkey(base64urldecode(u_attr.pubk)),
                                        'RSA');
-        setUserAttribute('sigPubk', base64urlencode(sigPubk), true, false);
+        setUserAttribute('sigPubk', base64urlencode(sigPubk), true, false, function() {
+            successfulSetUserAttributeCalls++;
+        });
+
+        return createTimeoutPromise(function() {
+            return successfulSetUserAttributeCalls == 3
+        }, 200, 5000);
+
     };
 
 

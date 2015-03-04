@@ -5439,6 +5439,8 @@ function init_chat() {
                     megaChat.renderContactTree();
                     megaChat.renderMyStatus();
                 });
+            } else {
+                if (d) console.log('Will not initializing chat [branch:1]');
             }
         }
     }
@@ -5447,7 +5449,10 @@ function init_chat() {
             __init_chat();
         } else {
             mBroadcaster.once('pubEd25519', __init_chat);
+            if (d) console.log('Will not initializing chat [branch:2]');
         }
+    } else {
+        if (d) console.log('Will not initializing chat [branch:3]');
     }
 }
 

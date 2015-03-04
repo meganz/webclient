@@ -782,20 +782,20 @@ function MegaData()
          */
         function renderContactsLayout(u) {
             var u_h, contact, node, av_meta, avatar, av_color, el, t, html, onlinestatus,
-            cs = this.contactstatus(u_h),
+            cs = M.contactstatus(u_h),
             time = time2last(cs.ts),
             timems = cs.ts,
             interactionclass = 'cloud-drive';
 
             // Render all items given in glob M.v
-            for (var i in this.v) {
-                u_h = this.v[i].h;
+            for (var i in M.v) {
+                u_h = M.v[i].h;
                 if (cs.files === 0 && cs.folders === 0) {
                     time = l[1051];
                     interactionclass = 'never';
                 }
 
-                contact = this.u[u_h];
+                contact = M.u[u_h];
                 
                 // chat is enabled?
                 if (megaChat && megaChat.is_initialized && !MegaChatDisabled) {
@@ -822,12 +822,12 @@ function MegaData()
                     avatar = '<img src="' + av_meta.avatarUrl + '">';
                 }
 
-                onlinestatus = this.onlineStatusClass(megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h)));
+                onlinestatus = M.onlineStatusClass(megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h)));
 
-                if (this.viewmode === 1) {
+                if (M.viewmode === 1) {
                     el = 'div';
                     t = '.contacts-blocks-scrolling';
-                    html = '<a class="file-block ustatus ' + htmlentities(u_h) + ' ' + onlinestatus[1] + '" id="' + htmlentities(this.v[i].h) + '">\n\
+                    html = '<a class="file-block ustatus ' + htmlentities(u_h) + ' ' + onlinestatus[1] + '" id="' + htmlentities(M.v[i].h) + '">\n\
                                 <span class="nw-contact-status"></span>\n\
                                 <span class="nw-contact-block-avatar two-letters ' + htmlentities(u_h) + ' color' + av_color + '">' + avatar + '</span>\n\
                                 <span class="shared-folder-info-block">\n\
@@ -838,7 +838,7 @@ function MegaData()
                 } else {
                     el = 'tr';
                     t = '.grid-table.contacts';
-                    html = '<tr id="' + htmlentities(this.v[i].h) + '">\n\
+                    html = '<tr id="' + htmlentities(M.v[i].h) + '">\n\
                                 <td>\n\
                                     <div class="nw-contact-avatar ' + htmlentities(u_h) + ' color' + av_color + '">' + avatar + '</div>\n\
                                     <div class="fm-chat-user-info todo-star">\n\
@@ -858,7 +858,7 @@ function MegaData()
                                 </td>\n\
                             </tr>';
                 }
-                mInsertNode(this.v[i], this.v[i-1], this.v[i+1], t, el, html, u);
+                mInsertNode(M.v[i], M.v[i-1], M.v[i+1], t, el, html, u);
             }            
         }// renderContactsLayout END
         
@@ -874,102 +874,103 @@ function MegaData()
          * @returns {int}
          */
         function renderLayout(u, n_cache, files) {
-                var html, el, cs, contains, u_h, av_meta, t, el, time,
-                    avatar, av_color, rights, rightsclass, onlinestatus, html,
-                    s = '',
-                    ftype = '',
-                    c = '',
-                    cc = null,
-                    files = files,
-                    star = '';
-            for (var i in this.v) {
-                if (!this.v[i].name) {
-                    DEBUG('Skipping M.v node with no name.', this.v[i]);
+            var html, el, cs, contains, u_h, av_meta, t, el, time,
+                avatar, av_color, rights, rightsclass, onlinestatus, html,
+                s = '',
+                ftype = '',
+                c = '',
+                cc = null,
+                files = files,
+                star = '';
+            
+            for (var i in M.v) {
+                if (!M.v[i].name) {
+                    DEBUG('Skipping M.v node with no name.', M.v[i]);
                     continue;
                 }
-                if (this.v[i].t) {
+                if (M.v[i].t) {
                     ftype = l[1049];
                     c = ' folder';
                 } else {
-                    ftype = filetype(this.v[i].name);
-                    s = htmlentities(bytesToSize(this.v[i].s));
+                    ftype = filetype(M.v[i].name);
+                    s = htmlentities(bytesToSize(M.v[i].s));
                 }
-                if (this.v[i].fav) {
+                if (M.v[i].fav) {
                     star = ' star';
                 }
 
-                if (this.currentdirid === 'shares') {// render shares tab
-                    cs = this.contactstatus(this.v[i].h),
+                if (M.currentdirid === 'shares') {// render shares tab
+                    cs = M.contactstatus(M.v[i].h),
                     contains = fm_contains(cs.files, cs.folders),
-                    u_h = this.v[i].p,
+                    u_h = M.v[i].p,
                     av_meta = generateAvatarMeta(u_h),
                     avatar = av_meta.shortName,
                     av_color = av_meta.color,
                     rights = l[55],
                     rightsclass = ' read-only',
-                    onlinestatus = this.onlineStatusClass(megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h)));
+                    onlinestatus = M.onlineStatusClass(megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h)));
                     if (cs.files === 0 && cs.folders === 0) {
                         contains = l[1050];
                     }
                     if (av_meta.avatarUrl) {
                         avatar = '<img src="' + av_meta.avatarUrl + '">';
                     }
-                    if (this.v[i].r === 1) {
+                    if (M.v[i].r === 1) {
                         rights = l[56];
                         rightsclass = ' read-and-write';
-                    } else if (this.v[i].r === 2) {
+                    } else if (M.v[i].r === 2) {
                         rights = l[57];
                         rightsclass = ' full-access';
                     }
 
-                    if (this.viewmode === 1) {
+                    if (M.viewmode === 1) {
                         t = '.shared-blocks-scrolling';
                         el = 'a';
                         html = '<a class="file-block folder" id="'
-                            + htmlentities(this.v[i].h) + '"><span class="file-status-icon '
+                            + htmlentities(M.v[i].h) + '"><span class="file-status-icon '
                             + htmlentities(star) + '"></span><span class="shared-folder-access '
                             + htmlentities(rightsclass) + '"></span><span class="file-icon-area">\n\
                             <span class="block-view-file-type folder"></span></span><span class="nw-contact-avatar '
                             + htmlentities(u_h) + ' color' + htmlentities(av_color) + '">' + htmlentities(avatar)
                             + '</span><span class="shared-folder-info-block"><span class="shared-folder-name">'
-                            + htmlentities(this.v[i].name) + '</span><span class="shared-folder-info">by '
-                            + htmlentities(this.d[u_h].name) + '</span></span></a>';
+                            + htmlentities(M.v[i].name) + '</span><span class="shared-folder-info">by '
+                            + htmlentities(M.d[u_h].name) + '</span></span></a>';
                     } else {
                         t = '.shared-grid-view .grid-table.shared-with-me';
                         el = 'tr';
-                        html = '<tr id="' + htmlentities(this.v[i].h) + '"><td width="30"><span class="grid-status-icon ' + htmlentities(star)
+                        html = '<tr id="' + htmlentities(M.v[i].h) + '"><td width="30"><span class="grid-status-icon ' + htmlentities(star)
                             + '"></span></td><td><div class="shared-folder-icon"></div><div class="shared-folder-info-block"><div class="shared-folder-name">'
-                            + htmlentities(this.v[i].name) + '</div><div class="shared-folder-info">' + htmlentities(contains)
+                            + htmlentities(M.v[i].name) + '</div><div class="shared-folder-info">' + htmlentities(contains)
                             + '</div></div> </td><td width="240"><div class="nw-contact-avatar '
                             + htmlentities(u_h) + ' color' + htmlentities(av_color) + '">' + htmlentities(avatar)
                             + '</div><div class="fm-chat-user-info todo-star ustatus ' + htmlentities(u_h) + ' '
                             + htmlentities(onlinestatus[1]) + '"><div class="todo-fm-chat-user-star"></div><div class="fm-chat-user">'
-                            + htmlentities(this.d[u_h].name) + '</div><div class="nw-contact-status"></div><div class="fm-chat-user-status ' + htmlentities(htmlentities(u_h)) + '">' + htmlentities(onlinestatus[0])
+                            + htmlentities(M.d[u_h].name) + '</div><div class="nw-contact-status"></div><div class="fm-chat-user-status ' + htmlentities(htmlentities(u_h)) + '">' + htmlentities(onlinestatus[0])
                             + '</div><div class="clear"></div></div></td><td width="270"><div class="shared-folder-access'
                             + htmlentities(rightsclass) + '">' + htmlentities(rights) + '</div></td></tr>';
                     }
                 }
                 
                 // switching from contacts tab
-                else if (this.currentdirid.length === 11 && this.currentrootid === 'contacts') {
-                    cs = this.contactstatus(this.v[i].h);
+                else if (M.currentdirid.length === 11 && M.currentrootid === 'contacts') {
+                    cs = M.contactstatus(M.v[i].h);
                     contains = fm_contains(cs.files, cs.folders);
                     if (cs.files === 0 && cs.folders === 0) {
                         contains = l[1050];
                     }
                     var rights = l[55], rightsclass = ' read-only';
-                    if (this.v[i].r === 1) {
+                    if (M.v[i].r === 1) {
                         rights = l[56];
                         rightsclass = ' read-and-write';
-                    } else if (this.v[i].r === 2) {
+                    } else if (M.v[i].r === 2) {
                         rights = l[57];
                         rightsclass = ' full-access';
                     }
 
-                    if (this.viewmode === 1) {
+                    if (M.viewmode === 1) {
                         t = '.fm-blocks-view.contact-details-view .file-block-scrolling';
                         el = 'a';
-                        html = '<a id="' + htmlentities(this.v[i].h) + '" class="file-block folder">\n\
+                        html = '<a id="' + htmlentities(M.v[i].h) + '" class="file-block folder">\n\
                                     <span class="file-status-icon"></span>\n\
                                     <span class="file-settings-icon">\n\
                                         <span></span>\n\
@@ -978,19 +979,19 @@ function MegaData()
                                     <span class="file-icon-area">\n\
                                         <span class="block-view-file-type folder-shared"><img alt=""></span>\n\
                                     </span>\n\
-                                    <span class="file-block-title">' + htmlentities(this.v[i].name) + '</span>\n\
+                                    <span class="file-block-title">' + htmlentities(M.v[i].name) + '</span>\n\
                                 </a>';
                     } else {
                         t = '.contacts-details-block .grid-table.shared-with-me';
                         el = 'tr';
-                        html = '<tr id="' + htmlentities(this.v[i].h) + '">\n\
+                        html = '<tr id="' + htmlentities(M.v[i].h) + '">\n\
                                     <td width="30">\n\
                                         <span class="grid-status-icon"></span>\n\
                                     </td>\n\
                                     <td>\n\
                                         <div class="shared-folder-icon"></div>\n\
                                         <div class="shared-folder-info-block">\n\
-                                            <div class="shared-folder-name">' + htmlentities(this.v[i].name) + '</div>\n\
+                                            <div class="shared-folder-name">' + htmlentities(M.v[i].name) + '</div>\n\
                                             <div class="shared-folder-info">' + contains + '</div>\n\
                                         </div>\n\
                                     </td>\n\
@@ -1000,31 +1001,31 @@ function MegaData()
                                 </tr>';
                     }
                 } else {
-                    if (this.viewmode === 1) {
+                    if (M.viewmode === 1) {
                         t = '.fm-blocks-view.fm .file-block-scrolling';
                         el = 'a';
-                        html = '<a class="file-block' + c + '" id="' + htmlentities(this.v[i].h) + '">\n\
+                        html = '<a class="file-block' + c + '" id="' + htmlentities(M.v[i].h) + '">\n\
                                     <span class="file-status-icon' + star + '"></span>\n\
                                     <span class="file-settings-icon">\n\
                                         <span></span>\n\
                                     </span>\n\
                                     <span class="file-icon-area">\n\
-                                        <span class="block-view-file-type ' + fileicon(this.v[i]) + '"><img alt="" /></span>\n\
+                                        <span class="block-view-file-type ' + fileicon(M.v[i]) + '"><img alt="" /></span>\n\
                                     </span>\n\
-                                    <span class="file-block-title">' + htmlentities(this.v[i].name) + '</span>\n\
+                                    <span class="file-block-title">' + htmlentities(M.v[i].name) + '</span>\n\
                                 </a>';
                     }
                     else {
-                        time = time2date(this.v[i].ts || (this.v[i].p === 'contacts' && this.contactstatus(this.v[i].h).ts));
+                        time = time2date(M.v[i].ts || (M.v[i].p === 'contacts' && M.contactstatus(M.v[i].h).ts));
                         t = '.grid-table.fm';
                         el = 'tr';
-                        html = '<tr id="' + htmlentities(this.v[i].h) + '" class="' + c + '">\n\
+                        html = '<tr id="' + htmlentities(M.v[i].h) + '" class="' + c + '">\n\
                                     <td width="30">\n\
                                         <span class="grid-status-icon' + star + '"></span>\n\
                                     </td>\n\
                                     <td>\n\
-                                        <span class="transfer-filtype-icon ' + fileicon(this.v[i]) + '"> </span>\n\
-                                        <span class="tranfer-filetype-txt">' + htmlentities(this.v[i].name) + '</span>\n\
+                                        <span class="transfer-filtype-icon ' + fileicon(M.v[i]) + '"> </span>\n\
+                                        <span class="tranfer-filetype-txt">' + htmlentities(M.v[i].name) + '</span>\n\
                                     </td>\n\
                                     <td width="100">' + s + '</td>\n\
                                     <td width="130">' + ftype + '</td>\n\
@@ -1038,11 +1039,11 @@ function MegaData()
                     }
                     
                     // ToDo: Is files++ what we realy want?
-                    if (!(this.v[i].seen = n_cache > files++)) {
-                        cc = [i, html, this.v[i].h, this.v[i].t];
+                    if (!(M.v[i].seen = n_cache > files++)) {
+                        cc = [i, html, M.v[i].h, M.v[i].t];
                     }
                 }
-                mInsertNode(this.v[i], this.v[i-1], this.v[i+1], t, el, html, u, cc); 
+                mInsertNode(M.v[i], M.v[i-1], M.v[i+1], t, el, html, u, cc); 
             }
             
             return files;
@@ -1066,7 +1067,7 @@ function MegaData()
             deleteScrollPanel('.file-block-scrolling', 'jsp');
         }
         deleteScrollPanel('.contacts-blocks-scrolling', 'jsp');
-        deleteSCrollPanel('.contacts-details-block .file-block-scrolling', 'jsp');
+        deleteScrollPanel('.contacts-details-block .file-block-scrolling', 'jsp');
         
         initOpcGridScrolling();
         initIpcGridScrolling();
@@ -1142,7 +1143,7 @@ function MegaData()
         } else if (this.currentdirid === 'contacts') {
             renderContactsLayout(u);
         } else {
-            renderLayout(u, n_cache, files);
+            files = renderLayout(u, n_cache, files);
         }
 
         contactUI();// ToDo: Document this function,
@@ -1153,12 +1154,12 @@ function MegaData()
                 flush_cached_nodes();
         });
 
-        if (d)
-            console.log('cache %d/%d (%d)', cache.length, files, n_cache);
+        DEBUG('cache %d/%d (%d)', cache.length, files, n_cache);
         if (cache.length) {
             $(lSel).bind('jsp-scroll-y.dynlist', function(ev, pos, top, bot) {
-                if (bot)
+                if (bot) {
                     flush_cached_nodes(n_cache);
+                }
             });
 
             $(window).bind("resize.dynlist", SoonFc(function() {
@@ -1173,8 +1174,9 @@ function MegaData()
                             n = 2 + Math.ceil($('.files-grid-view.fm').height() / 24 - $('.files-grid-view.fm tr').length);
                         }
 
-                        if (n > 0)
+                        if (n > 0) {
                             flush_cached_nodes(n);
+                        }
                     }
                 }
                 else

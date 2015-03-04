@@ -1269,6 +1269,7 @@ function sharedUInode(nodeHandle) {
 
     if ((M.d[nodeHandle] && M.d[nodeHandle].shares) || M.ps[nodeHandle]) {
         $('#treea_' + nodeHandle + ' .nw-fm-tree-folder').addClass('shared-folder');
+        $('.grid-table.fm #' + nodeHandle + ' .transfer-filtype-icon').addClass('folder-shared');
         availShares = true;
     } else {
         $('#treea_' + nodeHandle + ' .nw-fm-tree-folder').removeClass('shared-folder');
@@ -5244,8 +5245,7 @@ function menuItems()
     return items;
 }
 
-function contextmenuUI(e, ll, topmenu)
-{
+function contextmenuUI(e, ll, topmenu) {
     // is contextmenu disabled
     if (localStorage.contextmenu)
         return true;
@@ -5254,89 +5254,96 @@ function contextmenuUI(e, ll, topmenu)
 
     var m = $('.context-menu.files-menu');// container/wrapper around menu
     var t = '.context-menu.files-menu .context-menu-item';
+    
     // it seems that ll == 2 is used when right click is occured outside item, on empty canvas
-    if (ll == 2)
-    {
+    if (ll === 2) {
         // Enable upload item menu for clould-drive, don't show it for rubbish and rest of crew
-        if (RightsbyID(M.currentdirid) && RootbyId(M.currentdirid) !== M.RubbishID)
-        {
+        if (RightsbyID(M.currentdirid) && RootbyId(M.currentdirid) !== M.RubbishID) {
             $(t).filter('.context-menu-item').hide();
             $(t).filter('.fileupload-item,.newfolder-item,.refresh-item').show();
-            if ((is_chrome_firefox & 2) || 'webkitdirectory' in document.createElement('input'))
+            if ((is_chrome_firefox & 2) || 'webkitdirectory' in document.createElement('input')) {
                 $(t).filter('.folderupload-item').show();
-        }
-        else
+            }
+        } else {
             return false;
-    }
-    else if (ll == 3) // we want just the download menu
-    {
+        }
+    } else if (ll === 3) {// we want just the download menu
         $(t).hide();
         // m.hide();
-        var m = $('.context-menu.download');
+        m = $('.context-menu.download');
         t = '.context-menu.download .context-menu-item';
-    }
-    else if (ll === 4 || ll === 5) // contactUI
-    {
+    } else if (ll === 4 || ll === 5) {// contactUI
         $(t).hide();
         var items = menuItems();
         delete items['download'];
         delete items['zipdownload'];
         delete items['copy'];
         delete items['open'];
-        if (ll == 5) {
+        
+        if (ll === 5) {
             delete items['properties'];
         }
+        
         for (var item in items) {
             $(t).filter('.' + item + '-item').show();
         }
-    }
-    else if (ll)// click on item
-    {
+    } else if (ll) {// click on item
         $(t).hide();// Hide all menu-items
         var c = $(e.currentTarget).attr('class');
         var id = $(e.currentTarget).attr('id');
-        if (id)
+        if (id) {
             id = id.replace('treea_', '');// if right clicked on left panel
-        if (id && !M.d[id])
+        }
+        if (id && !M.d[id]) {
             id = undefined;// exist in node list
+        }
 
         // detect and show right menu
-        if (id && id.length === 11) $(t).filter('.refresh-item,.remove-item').show();// transfer panel
-        else if (c && c.indexOf('cloud-drive-item') > -1)
-        {
+        if (id && id.length === 11) {
+            $(t).filter('.refresh-item,.remove-item').show();// transfer panel
+        } else if (c && c.indexOf('cloud-drive-item') > -1) {
             var flt = '.refresh-item,.properties-item';
             if (folderlink) {
-                if (u_type) flt += ',.import-item';
-                if (M.v.length) flt += ',.zipdownload-item';
+                if (u_type) {
+                    flt += ',.import-item';
+                }
+                if (M.v.length) {
+                    flt += ',.zipdownload-item';
+                }
             }
             $.selected = [M.RootID];
             $(t).filter(flt).show();
-        }
-        else if (c && c.indexOf('recycle-item') > -1) $(t).filter('.refresh-item,.clearbin-item').show();
-        else if (c && c.indexOf('contacts-item') > -1) $(t).filter('.refresh-item,.addcontact-item').show();
-        else if (c && c.indexOf('messages-item') > -1)
-        {
+        } else if (c && c.indexOf('recycle-item') > -1) {
+            $(t).filter('.refresh-item,.clearbin-item').show();
+        } else if (c && c.indexOf('contacts-item') > -1) {
+            $(t).filter('.refresh-item,.addcontact-item').show();
+        } else if (c && c.indexOf('messages-item') > -1) {
             e.preventDefault();
             return false;
-        }
-        else if (c && (c.indexOf('file-block') > -1 || c.indexOf('folder') > -1 || c.indexOf('fm-tree-folder') > -1) || id)
-        {
+        } else if (c && (c.indexOf('file-block') > -1 || c.indexOf('folder') > -1 || c.indexOf('fm-tree-folder') > -1) || id) {
             var items = menuItems();
-            for (var item in items) $(t).filter('.' + item + '-item').show();
+            for (var item in items) {
+                $(t).filter('.' + item + '-item').show();
+            }
+        } else {
+            return false;
         }
-        else return false;
     }
     // This part of code is also executed when ll == 'undefined'
     var v = m.children($('.context-menu-section'));
+    
     // count all items inside section, and hide dividers if necessary
     v.each(function() {// hide dividers in hidden sections
-        var a = $(this).find('a.context-menu-item');
-        var b = $(this).find('.context-menu-divider');
-        var c = a.filter(function() {
-            return $(this).css('display') === 'none';
-        });
-        if (c.length === a.length || a.length === 0) b.hide();
-        else b.show();
+        var a = $(this).find('a.context-menu-item'),
+            b = $(this).find('.context-menu-divider'),
+            c = a.filter(function() {
+                return $(this).css('display') === 'none';
+            });
+        if (c.length === a.length || a.length === 0) {
+            b.hide();
+        } else {
+            b.show();
+        }
     });
 
     adjustContextMenuPosition(e, m);
@@ -5671,23 +5678,18 @@ function treeUI()
     });
 
     $('.fm-tree-panel .nw-fm-tree-item').unbind('click contextmenu');
-    $('.fm-tree-panel .nw-fm-tree-item').bind('click contextmenu', function(e)
-    {
+    $('.fm-tree-panel .nw-fm-tree-item').bind('click contextmenu', function(e) {
         var id = $(this).attr('id').replace('treea_', '');
-        if (e.type == 'contextmenu')
-        {
+        if (e.type === 'contextmenu') {
             $('.nw-fm-tree-item').removeClass('dragover');
             $(this).addClass('dragover');
             $.selected = [id];
             return !!contextmenuUI(e, 1);
         }
         var c = $(e.target).attr('class');
-        if (c && c.indexOf('nw-fm-arrow-icon') > -1)
-        {
+        if (c && c.indexOf('nw-fm-arrow-icon') > -1) {
             treeUIexpand(id);
-        }
-        else
-        {
+        } else {
             var c = $(this).attr('class');
             if (c && c.indexOf('opened') > -1)
                 treeUIexpand(id);
@@ -5697,8 +5699,7 @@ function treeUI()
     });
 
     $(window).unbind('resize.tree');
-    $(window).bind('resize.tree', function()
-    {
+    $(window).bind('resize.tree', function() {
         initTreeScroll();
     });
     // setTimeout(initTreeScroll,10);
@@ -5710,8 +5711,10 @@ function treeUI()
         */
         $(window).trigger('resize');
     });
-    if (d)
+    
+    if (d) {
         console.timeEnd('treeUI');
+    }
 }
 
 function treeUIexpand(id, force, moveDialog)

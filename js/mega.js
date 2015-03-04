@@ -1701,12 +1701,9 @@ function MegaData()
         return found;
     };
 
-    this.buildtree = function(n, dialog, stype)
-    {
-        if (!n)
-        {
-            if (d)
-                console.error('Invalid node passed to M.buildtree');
+    this.buildtree = function(n, dialog, stype) {
+        if (!n) {
+            DEBUG('Invalid node passed to M.buildtree');
             return;
         }
 
@@ -1724,8 +1721,7 @@ function MegaData()
             dialog = undefined;
         }
         var stype = stype || "cloud-drive";
-        if (n.h == M.RootID)
-        {
+        if (n.h === M.RootID) {
             if (typeof dialog === 'undefined') {
                 if (rebuild || $('.content-panel.cloud-drive ul').length == 0) {
                     $('.content-panel.cloud-drive').html('<ul id="treesub_' + htmlentities(M.RootID) + '"></ul>');
@@ -1737,8 +1733,7 @@ function MegaData()
                 // }
             }
         }
-        else if (n.h == 'shares')
-        {
+        else if (n.h === 'shares') {
             if (typeof dialog === 'undefined') {
                 // if ($('.content-panel.shared-with-me ul').length == 0) {
                     $('.content-panel.shared-with-me').html('<ul id="treesub_shares"></ul>');
@@ -1751,8 +1746,7 @@ function MegaData()
             }
             stype = "shared-with-me";
         }
-        else if (n.h == M.RubbishID)
-        {
+        else if (n.h === M.RubbishID) {
             if (typeof dialog === 'undefined') {
                 // if ($('.content-panel.rubbish-bin ul').length == 0) {
                     $('.content-panel.rubbish-bin').html('<ul id="treesub_' + htmlentities(M.RubbishID) + '"></ul>');
@@ -1765,18 +1759,17 @@ function MegaData()
             }
             stype = "rubbish-bin";
         } else if (folderlink) {
-            stype = "folder-link"
+            stype = "folder-link";
         }
-        // if (d) console.log('buildtree', stype, n.h, n, dialog);
 
-        if (this.c[n.h])
-        {
+        if (this.c[n.h]) {
             var folders = [];
             for (var i in this.c[n.h]) {
-                if (this.d[i] && this.d[i].t == 1 && this.d[i].name) {
+                if (this.d[i] && this.d[i].t === 1 && this.d[i].name) {
                     folders.push(this.d[i]);
                 }
             }
+            
             // sort by name is default in the tree
             treePanelSortElements(stype, folders, {
                 name: function(a, b) {
@@ -1793,78 +1786,87 @@ function MegaData()
                  _sub = 'mctreesub_';
             }
 
-            for (var i in folders)
-            {
-                var ulc = '';
-                var expandedc = '';
-                var buildnode = false;
-                if (fmconfig && fmconfig.treenodes && fmconfig.treenodes[folders[i].h] && typeof M.c[folders[i].h] !== 'undefined')
-                {
-                    for (var h in M.c[folders[i].h])
-                    {
-                        var n2 = M.d[h];
-                        if (n2 && n2.t) {
-                            buildnode = true;
-                            break;
+            for (var ii in folders) {
+                if (folders.hasOwnProperty(ii)) {
+                    var ulc = '';
+                    var expandedc = '';
+                    var buildnode = false;
+                    if (fmconfig && fmconfig.treenodes && fmconfig.treenodes[folders[ii].h] && M.c[folders[ii].h]) {
+                        for (var h in M.c[folders[ii].h]) {
+                            var n2 = M.d[h];
+                            if (n2 && n2.t) {
+                                buildnode = true;
+                                break;
+                            }
                         }
                     }
-                }
-                if (buildnode)
-                {
-                    ulc = 'class="opened"';
-                    expandedc = 'expanded';
-                }
-                else if (fmconfig && fmconfig.treenodes && fmconfig.treenodes[folders[i].h]) {
-                    fmtreenode(folders[i].h, false);
-                }
-                var containsc = '';
-                var cns = M.c[folders[i].h];
-                if (cns) {
-                    for (var cn in cns) {
-                        if (M.d[cn] && M.d[cn].t) {
-                            containsc = 'contains-folders';
-                            break;
+                    if (buildnode) {
+                        ulc = 'class="opened"';
+                        expandedc = 'expanded';
+                    }
+                    else if (fmconfig && fmconfig.treenodes && fmconfig.treenodes[folders[ii].h]) {
+                        fmtreenode(folders[ii].h, false);
+                    }
+                    var containsc = '';
+                    var cns = M.c[folders[ii].h];
+                    if (cns) {
+                        for (var cn in cns) {
+                            if (M.d[cn] && M.d[cn].t) {
+                                containsc = 'contains-folders';
+                                break;
+                            }
                         }
                     }
-                }
-                var sharedfolder = '';
-                if (typeof M.d[folders[i].h].shares !== 'undefined')
-                    sharedfolder = ' shared-folder';
-
-                var openedc = '';
-                if (M.currentdirid == folders[i].h)
-                    openedc = 'opened';
-
-                var k = $('#' + _li + folders[i].h).length;
-
-                if (k) {
-                    if (containsc) {
-                        $('#' + _li + folders[i].h + ' .nw-fm-tree-item').addClass(containsc);
-                    } else {
-                        $('#' + _li + folders[i].h + ' .nw-fm-tree-item').removeClass('contains-folders');
+                    var sharedfolder = '';
+                    if (M.d[folders[ii].h].shares) {
+                        sharedfolder = ' shared-folder';
                     }
-                }
-                else {
-                    var html = '<li id="' + _li + folders[i].h + '"><span class="nw-fm-tree-item ' + containsc + ' ' + expandedc + ' ' + openedc + '" id="' + _a + htmlentities(folders[i].h) + '"><span class="nw-fm-arrow-icon"></span><span class="nw-fm-tree-folder' + sharedfolder + '">' + htmlentities(folders[i].name) + '</span></span><ul id="' + _sub + folders[i].h + '" ' + ulc + '></ul></li>';
 
-                    if (folders[i - 1] && $('#' + _li + folders[i - 1].h).length > 0)
-                        $('#' + _li + folders[i - 1].h).after(html);
-                    else if (i == 0 && $('#' + _sub + n.h + ' li').length > 0)
-                        $($('#' + _sub + n.h + ' li')[0]).before(html);
-                    else
-                        $('#' + _sub + n.h).append(html);
-                }
-
-                if (_ts_l && folders[i].name) {
-                    if (folders[i].name.toLowerCase().indexOf(_ts_l) == -1) {
-                        $('#' + _li + folders[i].h).addClass('tree-item-on-search-hidden');
-                    } else {
-                        $('#' + _li + folders[i].h).parents('li').removeClass('tree-item-on-search-hidden');
+                    
+                    var openedc = '';
+                    if (M.currentdirid === folders[ii].h) {
+                        openedc = 'opened';
                     }
+
+                    var k = $('#' + _li + folders[ii].h).length;
+
+                    if (k) {
+                        if (containsc) {
+                            $('#' + _li + folders[ii].h + ' .nw-fm-tree-item').addClass(containsc);
+                        } else {
+                            $('#' + _li + folders[ii].h + ' .nw-fm-tree-item').removeClass('contains-folders');
+                        }
+                    }
+                    else {
+                        var html = '<li id="' + _li + folders[ii].h + '">\n\
+                                        <span class="nw-fm-tree-item ' + containsc + ' ' + expandedc + ' ' + openedc + '" id="' + _a + htmlentities(folders[ii].h) + '">\n\
+                                            <span class="nw-fm-arrow-icon"></span>\n\
+                                            <span class="nw-fm-tree-folder' + sharedfolder + '">' + htmlentities(folders[ii].name) + '</span>\n\
+                                        </span>\n\
+                                        <ul id="' + _sub + folders[ii].h + '" ' + ulc + '></ul>\n\
+                                    </li>';
+
+                        if (folders[ii - 1] && $('#' + _li + folders[ii - 1].h).length > 0)
+                            $('#' + _li + folders[ii - 1].h).after(html);
+                        else if (ii == 0 && $('#' + _sub + n.h + ' li').length > 0)
+                            $($('#' + _sub + n.h + ' li')[0]).before(html);
+                        else
+                            $('#' + _sub + n.h).append(html);
+                    }
+
+                    if (_ts_l && folders[ii].name) {
+                        if (folders[ii].name.toLowerCase().indexOf(_ts_l) == -1) {
+                            $('#' + _li + folders[ii].h).addClass('tree-item-on-search-hidden');
+                        } else {
+                            $('#' + _li + folders[ii].h).parents('li').removeClass('tree-item-on-search-hidden');
+                        }
+                    }
+                    if (buildnode)
+                        this.buildtree(folders[ii], dialog, stype);
+                    
+                    sharedUInode(folders[ii].h);
                 }
-                if (buildnode)
-                    this.buildtree(folders[i], dialog, stype);
-            }
+            }// END of for folders loop
         }
     };
 

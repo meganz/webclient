@@ -178,8 +178,7 @@ function startpageMain()
 	if (page == 'download') el = '.download-mid-white-block';	
 	$(el).show();
 	$('.top-head').show();
-	var jsp = $('.st-main-block').data('jsp');
-	if (jsp) jsp.destroy();
+    deleteScrollPanel('.st-main-block', 'jsp');
 	$('.st-main-block').scrollTop($('.st-main-block').height());	
 	$('.st-main-bottom.scroll.floating').hide();
 	$.startscrolling=true;

@@ -165,6 +165,13 @@ function andreiScripts()
      */
 }
 
+function deleteScrollPanel(from, data) {
+    var jsp = $(from).data(data);
+    if (jsp) {
+        jsp.destroy();
+    }    
+}
+
 function initAccountScroll()
 {
     $('.fm-account-main').jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5, animateScroll: true});
@@ -189,12 +196,10 @@ function initFileblocksScrolling2()
 }
 
 function initContactsGridScrolling() {
-    var jsp = $('.grid-scrolling-table.contacts').data('jsp');
-    if (jsp) {
-        jsp.destroy();
-    }
-    $('.grid-scrolling-table.contacts').jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
-    jScrollFade('.grid-scrolling-table.contacts');
+    var scroll = '.grid-scrolling-table.contacts';
+    deleteScrollPanel(scroll, 'jsp');
+    $(scroll).jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
+    jScrollFade(scroll);
 }
 
 /**
@@ -203,12 +208,10 @@ function initContactsGridScrolling() {
  * @returns {undefined}
  */
 function initOpcGridScrolling() {
-    var jsp = $('.grid-scrolling-table.opc').data('jsp');
-    if (jsp) {
-        jsp.destroy();
-    }
-    $('.grid-scrolling-table.opc').jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
-    jScrollFade('.grid-scrolling-table.opc');
+    var scroll = '.grid-scrolling-table.opc';
+    deleteScrollPanel(scroll, 'jsp');
+    $(scroll).jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
+    jScrollFade(scroll);
 }
 
 /**
@@ -217,35 +220,30 @@ function initOpcGridScrolling() {
  * @returns {undefined}
  */
 function initIpcGridScrolling() {
-    var jsp = $('.grid-scrolling-table.ipc').data('jsp');
-    if (jsp) {
-        jsp.destroy();
-    }
-    $('.grid-scrolling-table.ipc').jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
-    jScrollFade('.grid-scrolling-table.ipc');
+    var scroll = '.grid-scrolling-table.ipc';
+    deleteScrollPanel(scroll, 'jsp');
+    $(scroll).jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
+    jScrollFade(scroll);
 }
 
 function initContactsBlocksScrolling() {
+    var scroll = '.contacts-blocks-scrolling';
     if ($('.contacts-blocks-scrolling:visible').length === 0) {
         return;
     }
-    var jsp = $('.contacts-blocks-scrolling').data('jsp');
-    if (jsp) {
-        jsp.destroy();
-    }
-    $('.contacts-blocks-scrolling').jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
-    jScrollFade('.contacts-blocks-scrolling');
+    deleteScrollPanel(scroll, 'jsp');
+    $(scroll).jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
+    jScrollFade(scroll);
 }
 
-function initShareBlocksScrolling()
-{
-    if ($('.shared-blocks-scrolling:visible').length == 0)
+function initShareBlocksScrolling() {
+    var scroll = '.shared-blocks-scrolling';
+    if ($('.shared-blocks-scrolling:visible').length === 0) {
         return;
-    var jsp = $('.shared-blocks-scrolling').data('jsp');
-    if (jsp)
-        jsp.destroy();
-    $('.shared-blocks-scrolling').jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
-    jScrollFade('.shared-blocks-scrolling');
+    }
+    deleteScrollPanel(scroll, 'jsp');
+    $(scroll).jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
+    jScrollFade(scroll);
 }
 
 function initTransferScroll()
@@ -1266,6 +1264,7 @@ function removeUInode(h)
 }
 
 function sharedUInode(nodeHandle) {
+    DEBUG('sharedUInode');
     var availShares = false;
     
     if ((M.d[nodeHandle] && M.d[nodeHandle].shares) || M.ps[nodeHandle]) {
@@ -7003,8 +7002,7 @@ function closeImportContactNotification(c) {
     $(c + ' input#token-input-').blur();
 }
 
-function clearScrollPanel(from)
-{
+function clearScrollPanel(from) {
     var j = $(from + ' .multiple-input').jScrollPane().data();
     if (j && j.jsp) {
         j.jsp.destroy();
@@ -7564,13 +7562,10 @@ function getclipboardkeys()
     return l;
 }
 
-function linksDialog(close)
-{
-    var jsp = $('.export-link-body').data('jsp');
-    if (jsp)
-        jsp.destroy();
-    if (close)
-    {
+function linksDialog(close) {
+    var scroll = '.export-link-body';
+    deleteScrollPanel(scroll, 'jsp');
+    if (close) {
         $.dialog = false;
         fm_hideoverlay();
         $('.fm-dialog.export-links-dialog').addClass('hidden');
@@ -7580,25 +7575,20 @@ function linksDialog(close)
 
     $.dialog = 'links';
     var html = '';
-    for (var i in M.links)
-    {
+    for (var i in M.links) {
         var n = M.d[M.links[i]];
         var key, fileSize, F;
-        if (n.t)
-        {
+        if (n.t) {
             F = 'F';
             key = u_sharekeys[n.h];
             fileSize = '';
-        }
-        else
-        {
+        } else {
             F = '';
             key = n.key;
             fileSize = htmlentities(bytesToSize(n.s));
         }
 
-        if (n && n.ph)
-        {
+        if (n && n.ph) {
             var fileUrlWithoutKey = getBaseUrl() + '/#' + F + '!' + htmlentities(n.ph);
             var fileUrlWithKey = fileUrlWithoutKey + (key ? '!' + a32_to_base64(key) : '');
             var fileUrl = window.getLinkState === false ? fileUrlWithoutKey : fileUrlWithKey;
@@ -7618,45 +7608,40 @@ function linksDialog(close)
                  +  '</div>';
         }
     }
+    
     $('.export-links-warning-close').unbind('click');
-    $('.export-links-warning-close').bind('click', function()
-    {
+    $('.export-links-warning-close').bind('click', function() {
         $('.export-links-warning').addClass('hidden');
     });
+    
     $('.export-links-dialog .fm-dialog-close').unbind('click');
-    $('.export-links-dialog .fm-dialog-close').bind('click', function()
-    {
+    $('.export-links-dialog .fm-dialog-close').bind('click', function() {
         linksDialog(1);
     });
 
     // Setup the copy to clipboard buttons
-    if (is_extension)
-    {
-        if (!is_chrome_firefox)
-        {
+    if (is_extension) {
+        if (!is_chrome_firefox) {
             $('.fm-dialog-chrome-clipboard').removeClass('hidden');
             $("#chromeclipboard").fadeTo(1, 0.01);
         }
         // chrome & firefox extension:
         $("#clipboardbtn1").unbind('click');
-        $("#clipboardbtn1").bind('click', function()
-        {
-            if (is_chrome_firefox)
+        $("#clipboardbtn1").bind('click', function() {
+            if (is_chrome_firefox) {
                 mozSetClipboard(getclipboardlinks());
-            else
-            {
+            } else {
                 $('#chromeclipboard')[0].value = getclipboardlinks();
                 $('#chromeclipboard').select();
                 document.execCommand('copy');
             }
         });
+        
         $('#clipboardbtn2').unbind('click');
-        $('#clipboardbtn2').bind('click', function()
-        {
-            if (is_chrome_firefox)
+        $('#clipboardbtn2').bind('click', function() {
+            if (is_chrome_firefox) {
                 mozSetClipboard(getclipboardkeys());
-            else
-            {
+            } else {
                 $('#chromeclipboard')[0].value = getclipboardkeys();
                 $('#chromeclipboard').select();
                 document.execCommand('copy');
@@ -7664,28 +7649,26 @@ function linksDialog(close)
         });
         $('#clipboardbtn1').text(l[370]);
         $('#clipboardbtn2').text(l[1033]);
-    }
-    else if (flashIsEnabled())
-    {
+    } else if (flashIsEnabled()) {
         $('#clipboardbtn1 span').html(htmlentities(l[370]) + '<object data="OneClipboard.swf" id="clipboardswf1" type="application/x-shockwave-flash"  width="100%" height="32" allowscriptaccess="always"><param name="wmode" value="transparent"><param value="always" name="allowscriptaccess"><param value="all" name="allowNetworkin"><param name=FlashVars value="buttonclick=1" /></object>');
         $('#clipboardbtn2 span').html(htmlentities(l[1033]) + '<object data="OneClipboard.swf" id="clipboardswf2" type="application/x-shockwave-flash"  width="100%" height="32" allowscriptaccess="always"><param name="wmode" value="transparent"><param value="always" name="allowscriptaccess"><param value="all" name="allowNetworkin"><param name=FlashVars value="buttonclick=1" /></object>');
 
         $('#clipboardbtn1').unbind('mouseover');
-        $('#clipboardbtn1').bind('mouseover', function()
-        {
+        $('#clipboardbtn1').bind('mouseover', function() {
             var e = $('#clipboardswf1')[0];
-            if (e && e.setclipboardtext)
+            if (e && e.setclipboardtext) {
                 e.setclipboardtext(getclipboardlinks());
+            }
         });
+        
         $('#clipboardbtn2').unbind('mouseover');
-        $('#clipboardbtn2').bind('mouseover', function()
-        {
+        $('#clipboardbtn2').bind('mouseover', function() {
             var e = $('#clipboardswf2')[0];
-            if (e && e.setclipboardtext)
+            if (e && e.setclipboardtext) {
                 e.setclipboardtext(getclipboardkeys());
+            }
         });
-    }
-    else {
+    } else {
         // Hide the clipboard buttons if not using the extension and Flash is disabled
         $('#clipboardbtn1').addClass('hidden');
         $('#clipboardbtn2').addClass('hidden');
@@ -7695,16 +7678,14 @@ function linksDialog(close)
     $('.export-checkbox :checkbox').iphoneStyle({
         resizeContainer: false,
         resizeHandle: false,
-        onChange: function(elem, data)
-        {
+        onChange: function(elem, data) {
             if (data) {
                 $(elem).closest('.on_off').removeClass('off').addClass('on');
 
                 // Show link with key
                 var fileLinkWithKey = $('.file-link-with-key').text();
                 $('.export-link-url').val(fileLinkWithKey);
-            }
-            else {
+            } else {
                 $(elem).closest('.on_off').removeClass('on').addClass('off');
 
                 // Show link without key
@@ -7714,6 +7695,7 @@ function linksDialog(close)
             window.getLinkState = !!data;
         }
     });
+    
     if (typeof window.getLinkState === 'undefined') {
         $('.export-checkbox').removeClass('off').addClass('on');
     }
@@ -7723,11 +7705,11 @@ function linksDialog(close)
     $('.export-links-warning').removeClass('hidden');
     $('.fm-dialog.export-links-dialog').removeClass('hidden');
     $('.export-link-body').removeAttr('style');
-    if ($('.export-link-body').outerHeight() == 384) {
+    if ($('.export-link-body').outerHeight() === 384) {// ToDo: How did I find this integer?
         $('.export-link-body').jScrollPane({showArrows: true, arrowSize: 5});
         jScrollFade('.export-link-body');
     }
-    $('.fm-dialog.export-links-dialog').css('margin-top', $('.fm-dialog.export-links-dialog').outerHeight() / 2 * -1);
+    $('.fm-dialog.export-links-dialog').css('margin-top', $('.fm-dialog.export-links-dialog').outerHeight() / 2 * - 1);
 }
 
 function refreshDialogContent()
@@ -8777,25 +8759,25 @@ function fm_thumbnail_render(n)
     }
 }
 
-function fm_contains(filecnt, foldercnt)
-{
+function fm_contains(filecnt, foldercnt) {
     var containstxt = l[782];
-    if ((foldercnt > 1) && (filecnt > 1))
+    if ((foldercnt > 1) && (filecnt > 1)) {
         containstxt = l[828].replace('[X1]', foldercnt).replace('[X2]', filecnt);
-    else if ((foldercnt > 1) && (filecnt == 1))
+    } else if ((foldercnt > 1) && (filecnt === 1)) {
         containstxt = l[829].replace('[X]', foldercnt);
-    else if ((foldercnt == 1) && (filecnt > 1))
+    } else if ((foldercnt === 1) && (filecnt > 1)) {
         containstxt = l[830].replace('[X]', filecnt);
-    else if ((foldercnt == 1) && (filecnt == 1))
+    } else if ((foldercnt === 1) && (filecnt === 1)) {
         containstxt = l[831];
-    else if (foldercnt > 1)
+    } else if (foldercnt > 1) {
         containstxt = l[832].replace('[X]', foldercnt);
-    else if (filecnt > 1)
+    } else if (filecnt > 1) {
         containstxt = l[833].replace('[X]', filecnt);
-    else if (foldercnt == 1)
+    } else if (foldercnt === 1) {
         containstxt = l[834];
-    else if (filecnt == 1)
+    } else if (filecnt === 1) {
         containstxt = l[835];
+    }
     return containstxt;
 }
 

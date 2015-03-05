@@ -564,8 +564,8 @@ function MegaData()
 
             // If at least one new item is added then ajust grid
             if (drawn) {
-				$('.fm-empty-contacts').addClass('hidden');
-                
+                $('.fm-empty-contacts').addClass('hidden');
+
                 // hide/show sent/received grid
                 $('.sent-requests-grid').addClass('hidden');
                 $('.contact-requests-grid').removeClass('hidden');
@@ -646,7 +646,7 @@ function MegaData()
             }
 
             if (drawn) {
-				$('.fm-empty-contacts').addClass('hidden');
+                $('.fm-empty-contacts').addClass('hidden');
 
                 // hide/show received/sent grids
                 $('.contact-requests-grid').addClass('hidden');
@@ -660,15 +660,15 @@ function MegaData()
 
     /**
      * renderMain
-     * 
+     *
      * @param {type} u
      * @returns {unresolved}
      */
     this.renderMain = function(u) {
-        
+
         /**
          * flush_cached_nodes
-         * 
+         *
          * @param {integer} n
          * @returns {undefined}
          */
@@ -709,10 +709,10 @@ function MegaData()
                 $(lSel).unbind('jsp-scroll-y.dynlist');
             }
         }// flush_cached_nodes END
-        
+
         /**
          * mInsertNode
-         * 
+         *
          * @param {string} aNode
          * @param {string} aPrevNode
          * @param {string} aNextNode
@@ -773,10 +773,10 @@ function MegaData()
                 }
             }
         }// mInsertNode END
-        
+
         /*
          * renerContactsLayout
-         * 
+         *
          * @param {} u
          * @returns {undefined}
          */
@@ -796,7 +796,7 @@ function MegaData()
                 }
 
                 contact = M.u[u_h];
-                
+
                 // chat is enabled?
                 if (megaChat && megaChat.is_initialized && !MegaChatDisabled) {
                     if (contact && contact.lastChatActivity > timems) {
@@ -817,7 +817,7 @@ function MegaData()
                 av_meta = generateAvatarMeta(u_h);
                 avatar = av_meta.shortName;
                 av_color = av_meta.color;
-                
+
                 if (av_meta.avatarUrl) {
                     avatar = '<img src="' + av_meta.avatarUrl + '">';
                 }
@@ -859,18 +859,18 @@ function MegaData()
                             </tr>';
                 }
                 mInsertNode(M.v[i], M.v[i-1], M.v[i+1], t, el, html, u);
-            }            
+            }
         }// renderContactsLayout END
-        
+
         /*
          * renderLayout
-         * 
+         *
          * render layouts different from contacts, opc and ipc
-         * 
+         *
          * @param {} u
          * @param {int} n_cache
          * @param {int} files
-         * 
+         *
          * @returns {int}
          */
         function renderLayout(u, n_cache) {
@@ -881,7 +881,7 @@ function MegaData()
                 c = '',
                 cc = null,
                 star = '';
-            
+
             for (var i in M.v) {
                 if (!M.v[i].name) {
                     DEBUG('Skipping M.v node with no name.', M.v[i]);
@@ -949,7 +949,7 @@ function MegaData()
                             + htmlentities(rightsclass) + '">' + htmlentities(rights) + '</div></td></tr>';
                     }
                 }
-                
+
                 // switching from contacts tab
                 else if (M.currentdirid.length === 11 && M.currentrootid === 'contacts') {
                     cs = M.contactstatus(M.v[i].h);
@@ -1036,15 +1036,15 @@ function MegaData()
                                     </td>\n\
                                 </tr>';
                     }
-                    
+
                     if (!(M.v[i].seen = n_cache > files++)) {
                         cc = [i, html, M.v[i].h, M.v[i].t];
                     }
                 }
-                mInsertNode(M.v[i], M.v[i-1], M.v[i+1], t, el, html, u, cc); 
+                mInsertNode(M.v[i], M.v[i-1], M.v[i+1], t, el, html, u, cc);
             }
         }// renderLayout END
-        
+
         var n_cache, lSel,
             cache = [],
             files = 0;
@@ -1064,7 +1064,7 @@ function MegaData()
         }
         deleteScrollPanel('.contacts-blocks-scrolling', 'jsp');
         deleteScrollPanel('.contacts-details-block .file-block-scrolling', 'jsp');
-        
+
         initOpcGridScrolling();
         initIpcGridScrolling();
 
@@ -1557,7 +1557,7 @@ function MegaData()
                     + '"><div class="nw-contact-status"></div><div class="nw-contact-name">'
                     + htmlentities(contacts[i].name) + ' <a href="#" class="button start-chat-button"><span></span></a></div></div>';
             }
-			$('.fm-start-chat-dropdown').addClass('hidden');
+            $('.fm-start-chat-dropdown').addClass('hidden');
         }
 
         $('.content-panel.contacts').html(html);
@@ -1565,16 +1565,16 @@ function MegaData()
         if (!MegaChatDisabled) {
             megaChat.renderContactTree();
 
-			$('.fm-tree-panel').undelegate('.start-chat-button', 'click.megaChat');
+            $('.fm-tree-panel').undelegate('.start-chat-button', 'click.megaChat');
             $('.fm-tree-panel').delegate('.start-chat-button', 'click.megaChat', function() {
-				var m = $('.fm-start-chat-dropdown'),
-					scrollPos = 0;
+                var m = $('.fm-start-chat-dropdown'),
+                    scrollPos = 0;
 
                 var $this = $(this);
 
-				if (!$this.is(".active")) {
-				    if ($('.fm-tree-panel .jspPane')) scrollPos = $('.fm-tree-panel .jspPane').position().top;
-					$('.start-chat-button').removeClass('active');
+                if (!$this.is(".active")) {
+                    if ($('.fm-tree-panel .jspPane')) scrollPos = $('.fm-tree-panel .jspPane').position().top;
+                    $('.start-chat-button').removeClass('active');
 
                     $('.fm-chat-popup-button', m).removeClass("disabled");
 
@@ -1584,37 +1584,37 @@ function MegaData()
                     }
 
                     $this.addClass('active');
-				    var y = $this.closest('.nw-contact-item').position().top + 80 + scrollPos;
-				    m
+                    var y = $this.closest('.nw-contact-item').position().top + 80 + scrollPos;
+                    m
                         .css('top', y)
                         .removeClass('hidden')
                         .addClass('active')
                         .data("triggeredBy", $this);
-				} else {
-					$this.removeClass('active');
-				    m
+                } else {
+                    $this.removeClass('active');
+                    m
                         .removeClass('active')
                         .addClass('hidden')
                         .removeData("triggeredBy");
-				}
+                }
 
-				return false; // stop propagation!
+                return false; // stop propagation!
             });
 
-			$('.fm-chat-popup-button.start-chat').unbind('click.treePanel');
-			$('.fm-chat-popup-button.start-chat').bind('click.treePanel', function() {
+            $('.fm-chat-popup-button.start-chat').unbind('click.treePanel');
+            $('.fm-chat-popup-button.start-chat').bind('click.treePanel', function() {
                 var $this = $(this);
                 var $triggeredBy = $this.parent().data("triggeredBy");
                 var $userDiv = $triggeredBy.parent().parent();
 
-				if (!$this.is(".disabled")) {
+                if (!$this.is(".disabled")) {
                     var user_handle = $userDiv.attr('id').replace("contact_", "");
                     window.location = "#fm/chat/" + user_handle;
-				}
+                }
             });
 
             $('.fm-start-chat-dropdown .fm-chat-popup-button.start-audio').unbind('click.treePanel');
-			$('.fm-start-chat-dropdown .fm-chat-popup-button.start-audio').bind('click.treePanel', function() {
+            $('.fm-start-chat-dropdown .fm-chat-popup-button.start-audio').bind('click.treePanel', function() {
                 var $this = $(this);
                 var $triggeredBy = $this.parent().data("triggeredBy");
                 var $userDiv = $triggeredBy.parent().parent();
@@ -1627,11 +1627,11 @@ function MegaData()
                     if(room) {
                         room.startAudioCall();
                     }
-				}
+                }
             });
 
             $('.fm-start-chat-dropdown .fm-chat-popup-button.start-video').unbind('click.treePanel');
-			$('.fm-start-chat-dropdown .fm-chat-popup-button.start-video').bind('click.treePanel', function() {
+            $('.fm-start-chat-dropdown .fm-chat-popup-button.start-video').bind('click.treePanel', function() {
                 var $this = $(this);
                 var $triggeredBy = $this.parent().data("triggeredBy");
                 var $userDiv = $triggeredBy.parent().parent();
@@ -1644,7 +1644,7 @@ function MegaData()
                     if(room) {
                         room.startVideoCall();
                     }
-				}
+                }
             });
         }
 
@@ -1765,7 +1765,7 @@ function MegaData()
                     folders.push(this.d[i]);
                 }
             }
-            
+
             // sort by name is default in the tree
             treePanelSortElements(stype, folders, {
                 name: function(a, b) {
@@ -1818,7 +1818,6 @@ function MegaData()
                         sharedfolder = ' shared-folder';
                     }
 
-                    
                     var openedc = '';
                     if (M.currentdirid === folders[ii].h) {
                         openedc = 'opened';
@@ -1859,7 +1858,7 @@ function MegaData()
                     }
                     if (buildnode)
                         this.buildtree(folders[ii], dialog, stype);
-                    
+
                     sharedUInode(folders[ii].h);
                 }
             }// END of for folders loop
@@ -2032,7 +2031,7 @@ function MegaData()
                 if (this.d[id]) {
                     id = this.d[id].p;
                 }
-				else break;
+                else break;
             }
         }
         return a;
@@ -2181,7 +2180,7 @@ function MegaData()
             } else if (M.currentdirid && M.currentdirid.substr(0, 7) === 'search/') {
                 return false;
             }
-            
+
             // Remove focus from view ipc/opc buttons
             $('.fm-received-requests').removeClass('active');
             $('.fm-contact-requests').removeClass('active');
@@ -2722,7 +2721,7 @@ function MegaData()
 
     /**
      * Update M.ps and indexedDb
-     * 
+     *
      * Structure of M.ps
      * <shared_item_id>:
      * [
@@ -2731,7 +2730,7 @@ function MegaData()
      * ]
      * @param {JSON} ps, pending share
      * @param {boolean} ignoreDB
-     * 
+     *
      * @returns {undefined}
      */
     this.addPS = function(ps, ignoreDB) {
@@ -2750,21 +2749,21 @@ function MegaData()
      *
      * @param {string} pcrId, pending contact request id
      * @param {string} nodeId, shared item id
-     * 
+     *
      * @returns {undefined}
      */
     this.delPS = function(pcrId, nodeId) {
-        
+
         // Delete the pending share
         if (this.ps[nodeId]) {
             if (this.ps[nodeId][pcrId]) {
                 delete this.ps[nodeId][pcrId];
             }
-            
+
             // If there's no pending shares for node left, clean M.ps
             if (Object.keys(this.ps[nodeId]).length === 0) {
                 delete this.ps[nodeId];
-            }            
+            }
         }
 
         // Check how removing from indexedDb works and make
@@ -2773,7 +2772,7 @@ function MegaData()
             mDBdel('ps', pcrId);
         }
     };
-    
+
     this.copyNodes = function(cn, t, del, callback) {
         if ($.onImportCopyNodes && t.length === 11) {
             msgDialog('warninga', l[135], 'Operation not permitted.');
@@ -3196,10 +3195,10 @@ function MegaData()
     /**
      * called when user try to remove pending contact from shared dialog
      * should be changed case M.ps structure is changed, take a look at processPS()
-     * 
+     *
      * @param {string} nodeHandle
      * @param {string} pendingContactId
-     * 
+     *
      * @returns {undefined}
      */
     this.deletePendingShare = function(nodeHandle, pendingContactId) {
@@ -4327,6 +4326,7 @@ function execsc(actionPackets, callback) {
     var tmoveid = false;
     var rootsharenodes = [];
     var async_procnodes = [];
+    var async_treestate = [];
 
     var loadavatars = false;
 
@@ -4362,7 +4362,7 @@ function execsc(actionPackets, callback) {
                     });
                 }
             }
-            
+
             // Outgoing pending contact
             else if (actionPacket.a === 'opc') {
                 processOPC([actionPacket]);
@@ -4372,24 +4372,24 @@ function execsc(actionPackets, callback) {
                     M.drawSentContactRequests([actionPacket]);
                 }
             }
-            
+
             // Incoming pending contact
             else if (actionPacket.a === 'ipc') {
                 processIPC([actionPacket]);
                 M.drawReceivedContactRequests([actionPacket]);
                 addIpcOrContactNotification(actionPacket);
             }
-            
+
             // Pending shares
             else if (actionPacket.a === 's2') {
                 processPS([actionPacket]);
             }
-            
+
             // Incomming request updated
             else if (actionPacket.a === 'upci') {
                 processUPCI([actionPacket]);
             }
-            
+
             // Outgoing request updated
             else if (actionPacket.a === 'upco') {
                 processUPCO([actionPacket]);
@@ -4431,7 +4431,7 @@ function execsc(actionPackets, callback) {
             var prockey = false;
 
             if (actionPacket.o === u_handle) {
-                
+
                 // If access right are undefined then share is deleted
                 if (typeof actionPacket.r == "undefined") {
                     M.delnodeShare(actionPacket.n, actionPacket.u);
@@ -4439,7 +4439,7 @@ function execsc(actionPackets, callback) {
                     && typeof M.d[actionPacket.n].shares != 'undefined'
                     && M.d[actionPacket.n].shares[actionPacket.u]
                     || actionPacket.ha == crypto_handleauth(actionPacket.n)) {
-                    
+
                     // I updated or created my share
                     u_sharekeys[actionPacket.n] = decrypt_key(u_k_aes, base64_to_a32(actionPacket.ok));
                     M.nodeShare(actionPacket.n, {
@@ -4583,7 +4583,7 @@ function execsc(actionPackets, callback) {
             if (fminitialized && !folderlink && actionPacket.ou && actionPacket.ou != u_handle
                 && actionPacket.t && actionPacket.t.f && actionPacket.t.f[0]
                 && actionPacket.t.f[0].p.length < 11 && !tmoveid && !tparentid) {
-                
+
                 var targetid = actionPacket.t.f[0].p;
                 var pnodes = [];
                 for (var i in actionPacket.t.f) {
@@ -4606,6 +4606,9 @@ function execsc(actionPackets, callback) {
             trights = false;
             //process_f(actionPacket.t.f);
             async_procnodes = async_procnodes.concat(actionPacket.t.f);
+        }
+        else if (actionPacket.a === 'u') {
+            async_treestate.push(actionPacket);
         }
         else if (actionPacket.a === 'c') {
             process_u(actionPacket.u);
@@ -4641,48 +4644,6 @@ function execsc(actionPackets, callback) {
                     // force finger regen.
                     delete pubEd25519[actionPacket.u];
                     getPubEd25519(actionPacket.u);
-                }
-            }
-        }
-        else if (actionPacket.a === 'u') {
-            var n = M.d[actionPacket.n];
-            if (n) {
-                var f = {h: actionPacket.n, k: actionPacket.k, a: actionPacket.at}, newpath = 0;
-                crypto_processkey(u_handle, u_k_aes, f);
-                if (f.key) {
-                    u_nodekeys[a.n] = f.key;
-                    if (f.name !== n.name) {
-                        $('.grid-table.fm #' + n.h + ' .tranfer-filetype-txt').text(f.name);
-                        $('.file-block#' + n.h + ' .file-block-title').text(f.name);
-                        $('#treea_' + n.h + ' .nw-fm-tree-folder').text(f.name);
-
-                        //@@@Todo: reposition elements according to sorting (if sorted by name)
-                        if ($('#path_' + n.h).length > 0) {
-                            newpath = 1;
-                        }
-                    }
-                    if (f.fav !== n.fav) {
-                        if (f.fav) {
-                            $('.grid-table.fm #' + n.h + ' .grid-status-icon').addClass('star');
-                            $('.file-block#' + n.h + ' .file-status-icon').addClass('star');
-                        } else {
-                            $('.grid-table.fm #' + n.h + ' .grid-status-icon').removeClass('star');
-                            $('.file-block#' + n.h + ' .file-status-icon').removeClass('star');
-                        }
-                    }
-                    M.nodeAttr({
-                        h: actionPacket.n,
-                        fav: f.fav,
-                        name: f.name,
-                        key: f.key,
-                        a: actionPacket.at
-                    });
-                    if (newpath) {
-                        M.renderPath();
-                    }
-                }
-                if (actionPacket.cr) {
-                    crypto_proccr(actionPacket.cr);
                 }
             }
         }
@@ -4724,6 +4685,54 @@ function execsc(actionPackets, callback) {
     }
 
     function onExecSCDone() {
+        if (async_treestate.length) {
+            async_treestate.forEach(function(actionPacket) {
+                var n = M.d[actionPacket.n];
+                if (d) console.log('updateTreeState', n, actionPacket);
+                if (n) {
+                    var f = {
+                        h : actionPacket.n,
+                        k : actionPacket.k,
+                        a : actionPacket.at
+                    }, newpath = 0;
+                    crypto_processkey(u_handle, u_k_aes, f);
+                    if (f.key) {
+                        if (f.name !== n.name) {
+                            $('.grid-table.fm #' + n.h + ' .tranfer-filetype-txt').text(f.name);
+                            $('.file-block#' + n.h + ' .file-block-title').text(f.name);
+                            $('#treea_' + n.h + ' .nw-fm-tree-folder').text(f.name);
+
+                            //@@@Todo: reposition elements according to sorting (if sorted by name)
+                            if ($('#path_' + n.h).length > 0) {
+                                newpath = 1;
+                            }
+                        }
+                        if (f.fav !== n.fav) {
+                            if (f.fav) {
+                                $('.grid-table.fm #' + n.h + ' .grid-status-icon').addClass('star');
+                                $('.file-block#' + n.h + ' .file-status-icon').addClass('star');
+                            } else {
+                                $('.grid-table.fm #' + n.h + ' .grid-status-icon').removeClass('star');
+                                $('.file-block#' + n.h + ' .file-status-icon').removeClass('star');
+                            }
+                        }
+                        M.nodeAttr({
+                            h : actionPacket.n,
+                            fav : f.fav,
+                            name : f.name,
+                            key : f.key,
+                            a : actionPacket.at
+                        });
+                        if (newpath) {
+                            M.renderPath();
+                        }
+                    }
+                    if (actionPacket.cr) {
+                        crypto_proccr(actionPacket.cr);
+                    }
+                }
+            });
+        }
         if (newnodes.length > 0 && fminitialized) rendernew();
         if (loadavatars) M.avatars();
         if (M.viewmode) fm_thumbnails();
@@ -5279,7 +5288,7 @@ function processOPC(opc) {
  * Handle pending shares
  *
  * @param {array of JSON objects} pending shares
- * 
+ *
  * @returns {undefined}
  */
 function processPS(pendingShares) {
@@ -5299,7 +5308,7 @@ function processPS(pendingShares) {
                 var timeStamp = ps.ts;
 
                 // shareRights is undefined when user denies pending contact request
-                // .op is available when user accepts pending contact request and 
+                // .op is available when user accepts pending contact request and
                 // remaining pending share should be updated to full share
                 if (typeof shareRights === 'undefined' || ps.op) {
 
@@ -5312,7 +5321,7 @@ function processPS(pendingShares) {
 
                     // Add the pending share to state
                     M.addPS({'h':nodeHandle, 'p':pendingContactId, 'r':shareRights, 'ts':timeStamp});
-                    
+
                     sharedUInode(nodeHandle);
                 }
             }
@@ -5357,7 +5366,7 @@ function processUPCO(ap) {
             delete M.ipc[psid];
             M.delOPC(psid);
             M.delIPC(psid);
-            
+
             for (var k in M.ps) {
                 if (M.ps.hasOwnProperty(k)) {
                     M.delPS(psid, k);

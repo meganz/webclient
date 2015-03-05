@@ -2172,19 +2172,30 @@ function MegaData()
             $(el[i]).text('');
             i++;
         }
+        
+        if ($('.fm-breadcrumbs-block .fm-breadcrumbs').length > 1) {
+            $('.fm-breadcrumbs-block').removeClass('deactivated');
+        } else {
+            $('.fm-breadcrumbs-block').addClass('deactivated');
+        }
+        
         $('.fm-breadcrumbs-block a').unbind('click');
         $('.fm-breadcrumbs-block a').bind('click', function() {
             var crumbId = $(this).attr('id');
-            if (crumbId === 'chatcrumb' || crumbId === 'path_opc' || crumbId === 'path_ipc') {
-                return false;
-            } else if (M.currentdirid && M.currentdirid.substr(0, 7) === 'search/') {
-                return false;
+            
+            // When NOT deactivated
+            if (!$('.fm-breadcrumbs-block').hasClass('deactivated')) {
+                if (crumbId === 'path_opc' || crumbId === 'path_ipc') {
+                    return false;
+                } else if ((crumbId === 'chatcrumb') || (M.currentdirid && M.currentdirid.substr(0, 7) === 'search/')) {
+                    return false;
+                }
+                
+                // Remove focus from 'view ipc/opc' buttons
+                $('.fm-received-requests').removeClass('active');
+                $('.fm-contact-requests').removeClass('active');
+                M.openFolder($(this).attr('id').replace('path_', ''));
             }
-
-            // Remove focus from view ipc/opc buttons
-            $('.fm-received-requests').removeClass('active');
-            $('.fm-contact-requests').removeClass('active');
-            M.openFolder($(this).attr('id').replace('path_', ''));
         });
 
         if (folderlink) {

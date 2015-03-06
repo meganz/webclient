@@ -11641,6 +11641,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
 .membership-medium-txt.red-bg.editprofile {
 	margin-top: 7px;
 }
+.membership-medium-txt.gray-bg.deleteprofile {
+	margin-top: 7px;
+}
 .membership-small-txt {
 	font-size: 12px;
 }
@@ -19129,7 +19132,7 @@ a.blog-article-button {
 	width: 100%;
 	text-align: center;
 }
-.animations-left-container. currentLink, .animations-right-container .currentLink {
+.animations-left-container.currentLink, .animations-right-container .currentLink {
  display:block;
 }
 .products-bottom-block {

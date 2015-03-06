@@ -3497,18 +3497,19 @@ function accountUI()
     }
 
     $('.editprofile').unbind('click');
-    $('.editprofile').bind('click', function(event)
-    {
+    $('.editprofile').bind('click', function() {
         document.location.hash = 'fm/account/profile';
     });
 
+    $('.deleteprofile').unbind('click');
+    $('.deleteprofile').bind('click', function() {
+        DEBUG('clicked Delete your account');
+    });
+    
     $('.fm-account-button').unbind('click');
-    $('.fm-account-button').bind('click', function(event)
-    {
-        if ($(this).attr('class').indexOf('active') == -1)
-        {
-            switch (true)
-            {
+    $('.fm-account-button').bind('click', function() {
+        if ($(this).attr('class').indexOf('active') == -1) {
+            switch (true) {
                 case ($(this).attr('class').indexOf('fm-account-overview-button') >= 0):
                     document.location.hash = 'fm/account';
                     break;

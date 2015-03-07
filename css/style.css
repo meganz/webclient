@@ -19019,10 +19019,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 .ads-right-block {
 	right: 0;
 }
-.new-ads .ads-right-block, .new-ads .products-bottom-block {
-	background-color: rgba(0,0,0,0.05);
-}
-.new-ads .ads-left-block .products-bottom-block {
+.new-ads .products-bottom-block {
 	background-color: rgba(255,255,255,0.5);
 }
 .new-ads .ads-left-block {
@@ -19060,9 +19057,6 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 	background-position: center 0;
 	background-repeat: no-repeat;
 	top: 64px;
-}
-.new-ads .products-top-txt, .new-ads .animations-right-container, .new-ads .animations-left-container {
-	display: none;
 }
 .blog-new-full, .blog-new-full td {
 	font-size: 13px;
@@ -19165,7 +19159,7 @@ a.blog-article-button {
 	width: 20px;
 	height: 9px;
 	left: 137px;
-	top: 2px;
+	top: 0;
 	background-image: url(../images/mega/mobile-sprite-v6.png?v=1);
 	background-position: right -1449px;
 	background-repeat: no-repeat;
@@ -19247,9 +19241,9 @@ a.blog-article-button {
 	border-color: rgba(0,0,0,0.3);
 	position: absolute;
 }
-.products-bottom-block .sync-button {
+/*.products-bottom-block .sync-button {
 	position: static;
-}
+}*/
 .products-bottom-block .win-phone-button {
 	width: 234px;
 }

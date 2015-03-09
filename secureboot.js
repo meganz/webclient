@@ -688,8 +688,10 @@ else if (!b_u)
     var jsl = [];
     
     // If they've already selected a language, use that
-    if (typeof localStorage.lang !== 'undefined' && languages[localStorage.lang]) {
-        lang = localStorage.lang;
+    if ((typeof localStorage != 'undefined') && (localStorage.lang)) {
+        if (languages[localStorage.lang]) {
+            lang = localStorage.lang;
+        }
     }
     
     // Get the language file path e.g. lang/en.json or 'lang/en_7a8e15911490...f1878e1eb3.json'

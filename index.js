@@ -82,7 +82,11 @@ function init_page()
 {
 	if (!u_type) $('body').attr('class','not-logged');
 		else $('body').attr('class',''); // Todo: check if cleaning the whole class is ok..
-	if ('-fa-ar-he-'.indexOf('-'+lang+'-') > -1) $('body').addClass('rtl');
+	
+    // Add language class to body for CSS fixes for specific language strings
+    $('body').addClass(lang);
+    
+    if ('-fa-ar-he-'.indexOf('-'+lang+'-') > -1) $('body').addClass('rtl');
 
 	if ($.startscroll) delete $.startscroll;
 	if ($.dlscroll) delete $.dlscroll;

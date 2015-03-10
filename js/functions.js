@@ -237,6 +237,7 @@ function megatitle(nperc) {
 
 function populate_l()
 {
+	// for (var i = 7000 ; i-- ; l[i] = l[i] || '(null)');
 	l[0] = 'Mega Limited ' + new Date().getFullYear();
 	if ((lang == 'es') || (lang == 'pt') || (lang == 'sk')) l[0] = 'Mega Ltd.';
 	l[1] = l[398];
@@ -417,6 +418,8 @@ function browserdetails(useragent)
 	browserdetails.name = name;
 	browserdetails.icon = icon;
 	browserdetails.browser = browser;
+	// Determine if the OS is 64bit
+	browserdetails.is64bit = /\b(WOW64|x86_64|Win64|intel mac os x 10.(9|\d{2,}))/i.test(useragent);
 	return browserdetails;
 }
 

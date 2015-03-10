@@ -214,9 +214,12 @@ ClassChunk.prototype.on_error = function(args, xhr) {
 
 // XHR::on_ready {{{
 ClassChunk.prototype.on_ready = function(args, xhr) {
+	var r;
 	if (this.isCancelled()) return;
-	var r = xhr.response || {};
-	if (r.byteLength == this.size) {
+	try {
+		r = xhr.response || {};
+	} catch(e) {}
+	if (r && r.byteLength == this.size) {
 		this.Progress.done += r.byteLength;
 		delete this.Progress.data[this.xid];
 		this.updateProgress(true);
@@ -235,7 +238,7 @@ ClassChunk.prototype.on_ready = function(args, xhr) {
 		this.finish_download();
 		this.destroy();
 	} else if (!this.dl.cancelled) {
-		if (d) console.error("HTTP FAILED", this.dl.n, xhr.status, "am i done? "+this.done, r.bytesLength, this.size);
+		if (d) console.error("HTTP FAILED", this.dl.n, xhr.status, "am i done? "+this.done, r && r.bytesLength, this.size);
 		if (dlMethod === MemoryIO) try {
 			new Uint8Array(0x1000000);
 		} catch(e) {

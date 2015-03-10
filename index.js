@@ -584,10 +584,10 @@ function init_page()
 		parsepage(pages['backup']);
 		init_backup();
 	}
-	else if (page == 'recovery')
-	{
+	else if (page === 'recovery') {
 		parsepage(pages['recovery']);
-		init_recovery();
+		var accountRecovery = new mega.AccountRecovery();
+        accountRecovery.initRecovery();
 	}
 	else if (page.substr(0,7) == 'recover' && page.length > 25)
 	{

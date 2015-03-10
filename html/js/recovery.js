@@ -68,11 +68,15 @@
             }
         });
         
+        // Inform that can't recover with temporary sesstion
         if (u_type === 0) {
             msgDialog('info', l[135], l[1944], false, function() {
                 document.location.hash = 'start';
             });
-        } else if (u_type) {
+        }
+        
+        // Inform that current session can be used to backup master key
+        else if (u_type) {
             msgDialog('warninga', l[135], l[1945].replace('[X]', u_attr.email), false, function() {
                 document.location.hash = 'backup';
             });
@@ -134,7 +138,7 @@
             });
         }
     };
-
+    
     //export
     scope.mega = scope.mega || {};
     scope.mega.AccountRecovery = AccountRecovery;

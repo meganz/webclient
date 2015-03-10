@@ -19,6 +19,7 @@ function MemoryIO(dl_id, dl) {
 
 	this.download = function(name, path) {
 		var blob = this.getBlob();
+		this.completed = true;
 
 		if(is_chrome_firefox) {
 			requestFileSystem(0,blob.size,function(fs) {
@@ -50,7 +51,7 @@ function MemoryIO(dl_id, dl) {
 
 	this.setCredentials = function (url, size, filename, chunks, sizes) {
 		if (d) DEBUG('MemoryIO Begin', dl_id, Array.prototype.slice.call(arguments));
-		if (size > 950*0x100000) {
+		if (size > MemoryIO.fileSizeLimit) {
 			dlFatalError(dl, Error('File too big to be reliably handled in memory.'));
 			if (!this.is_zip) ASSERT(!this.begin, "This should have been destroyed 'while initializing'");
 		} else {
@@ -60,7 +61,15 @@ function MemoryIO(dl_id, dl) {
 	};
 
 	this.abort = function() {
-		dblob = undefined;
+		if (dblob) {
+			if (msie && !this.completed) {
+				try {
+				// XXX: how to force freeing up the blob memory?
+					dblob=dblob.getBlob();
+				} catch(e) {}
+			}
+			dblob = undefined;
+		}
 	};
 
 	this.getBlob = function() {
@@ -70,5 +79,6 @@ function MemoryIO(dl_id, dl) {
 
 MemoryIO.usable = function()
 {
+	MemoryIO.fileSizeLimit = localStorage.dlFileSizeLimit || (1024*1024*1024*(1+browserdetails(ua).is64bit));
 	return navigator.msSaveOrOpenBlob || "download" in document.createElementNS("http://www.w3.org/1999/xhtml", "a");
 };

@@ -56,7 +56,7 @@ module.exports = function(config) {
 
     // Test results reporter to use.
     // Possible values: 'dots', 'progress', 'junit', 'growl', 'coverage'.
-    reporters: ['progress', 'coverage'],
+    reporters: ['progress', 'coverage', 'junit'],
 
     // Source files to generate a coverage report for.
     // (Do not include tests or libraries.
@@ -69,6 +69,11 @@ module.exports = function(config) {
     coverageReporter: {
         type: 'html',
         dir: 'coverage/'
+    },
+    
+    // JUnit reporter configuration.
+    junitReporter: {
+        outputFile: 'test-results.xml'
     },
 
     // Web server port.

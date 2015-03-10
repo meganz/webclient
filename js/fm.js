@@ -3501,9 +3501,13 @@ function accountUI()
         document.location.hash = 'fm/account/profile';
     });
 
-    $('.deleteprofile').unbind('click');
-    $('.deleteprofile').bind('click', function() {
-        DEBUG('clicked Delete your account');
+    $('.delete-account').unbind('click');
+    $('.delete-account').bind('click', function() {
+        DEBUG('Delete your account');
+        
+        // Show are you sure dialog
+        
+//        Show email notification dialog
     });
     
     $('.fm-account-button').unbind('click');

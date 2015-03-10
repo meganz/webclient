@@ -22,7 +22,7 @@ api-doc: $(JSDOC)
                  --recurse
 
 clean:
-	rm -rf doc/api/ coverage/ build/
+	rm -rf doc/api/ coverage/ build/ test-results.xml
 
 clean-all: clean
 	rm -f $(BUILD_DEP_ALL)

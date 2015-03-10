@@ -3505,9 +3505,35 @@ function accountUI()
     $('.delete-account').bind('click', function() {
         DEBUG('Delete your account');
         
-        // Show are you sure dialog
-        
-//        Show email notification dialog
+        // Ask for confirmation
+        msgDialog('warninga', l[5933], l[1974], false, function() {
+            loadingDialog.show();
+            api_req({a: 'erm', m: M.u[u_handle].m, t: 21}, {
+                callback: function(res) {
+                    loadingDialog.hide();
+                    if (res === ENOENT) {
+                        msgDialog('warningb', l[1513], l[1946]);
+                    } else if (res === 0) {
+                        $('.fm-dialog.reset-success .reg-success-txt').text(l[735]);
+
+                        $('.fm-dialog.reset-success .fm-dialog-button').unbind('click');
+                        $('.fm-dialog.reset-success .fm-dialog-button').bind('click', function() {
+                            $('.fm-dialog-overlay').addClass('hidden');
+                            $('body').removeClass('overlayed');
+                            $('.fm-dialog.reset-success').addClass('hidden');
+                            delete $.dialog;
+                        });
+
+                        $('.fm-dialog-overlay').removeClass('hidden');
+                        $('body').addClass('overlayed');
+                        $('.fm-dialog.reset-success').removeClass('hidden');
+                        $.dialog = 'deleteaccount';
+                    } else {
+                        msgDialog('warningb', l[135], l[200]);
+                    }
+                }
+            });
+        });
     });
     
     $('.fm-account-button').unbind('click');
@@ -6064,58 +6090,49 @@ function dorename()
     }
 }
 
-function msgDialog(type, title, msg, submsg, callback, checkbox)
-{
+function msgDialog(type, title, msg, submsg, callback, checkbox) {
     $.msgDialog = type;
     $('#msgDialog').removeClass('clear-bin-dialog confirmation-dialog warning-dialog-b warning-dialog-a notification-dialog remove-dialog delete-contact loginrequired-dialog multiple');
     $('#msgDialog .icon').removeClass('fm-bin-clear-icon .fm-notification-icon');
     $('#msgDialog .confirmation-checkbox').addClass('hidden');
     $.warningCallback = callback;
-    if (type == 'clear-bin')
-    {
+    if (type === 'clear-bin') {
         $('#msgDialog').addClass('clear-bin-dialog');
         $('#msgDialog .icon').addClass('fm-bin-clear-icon');
         $('#msgDialog .fm-notifications-bottom').html('<div class="fm-dialog-button notification-button confirm"><span>' + l[1018] + '</span></div><div class="fm-dialog-button notification-button cancel"><span>' + l[82] + '</span></div><div class="clear"></div>');
-        $('#msgDialog .fm-dialog-button').eq(0).bind('click',function()
-        {
+        $('#msgDialog .fm-dialog-button').eq(0).bind('click',function() {
             closeMsg();
             if ($.warningCallback) $.warningCallback(true);
         });
-        $('#msgDialog .fm-dialog-button').eq(1).bind('click',function()
-        {
+        $('#msgDialog .fm-dialog-button').eq(1).bind('click',function() {
             closeMsg();
             if ($.warningCallback) $.warningCallback(false);
         });
     }
-    if (type == 'delete-contact')
-    {
+    if (type === 'delete-contact') {
         $('#msgDialog').addClass('delete-contact');
         $('#msgDialog .fm-notifications-bottom').html('<div class="fm-dialog-button notification-button confirm"><span>' + l[78] + '</span></div><div class="fm-dialog-button notification-button cancel"><span>' + l[79] + '</span></div><div class="clear"></div>');
-        $('#msgDialog .fm-dialog-button').eq(0).bind('click',function()
-        {
+        $('#msgDialog .fm-dialog-button').eq(0).bind('click',function() {
             closeMsg();
             if ($.warningCallback) $.warningCallback(true);
         });
-        $('#msgDialog .fm-dialog-button').eq(1).bind('click',function()
-        {
+        $('#msgDialog .fm-dialog-button').eq(1).bind('click',function() {
             closeMsg();
             if ($.warningCallback) $.warningCallback(false);
         });
     }
-    else if (type == 'warninga' || type == 'warningb' || type == 'info')
-    {
+    else if (type === 'warninga' || type === 'warningb' || type === 'info') {
         $('#msgDialog .fm-notifications-bottom').html('<div class="fm-dialog-button notification-button"><span>' + l[81] + '</span></div><div class="clear"></div>');
-        $('#msgDialog .fm-dialog-button').bind('click',function()
-        {
+        $('#msgDialog .fm-dialog-button').bind('click',function() {
             closeMsg();
             if ($.warningCallback) $.warningCallback(true);
         });
         $('#msgDialog .icon').addClass('fm-notification-icon');
-        if (type == 'warninga') $('#msgDialog').addClass('warning-dialog-a');
-        else if (type == 'warningb') $('#msgDialog').addClass('warning-dialog-b');
-        else if (type == 'info') $('#msgDialog').addClass('notification-dialog');
+        if (type === 'warninga') $('#msgDialog').addClass('warning-dialog-a');
+        else if (type === 'warningb') $('#msgDialog').addClass('warning-dialog-b');
+        else if (type === 'info') $('#msgDialog').addClass('notification-dialog');
     }
-    else if (type == 'confirmation' || type == 'remove') {
+    else if (type === 'confirmation' || type === 'remove') {
         $('#msgDialog .fm-notifications-bottom').html('<div class="left checkbox-block hidden"><div class="checkdiv checkboxOff"> <input type="checkbox" name="confirmation-checkbox" id="confirmation-checkbox" class="checkboxOff"> </div> <label for="export-checkbox" class="radio-txt">' + l[229] + '</label></div><div class="fm-dialog-button notification-button confirm"><span>' + l[78] + '</span></div><div class="fm-dialog-button notification-button cancel"><span>' + l[79] + '</span></div><div class="clear"></div>');
 
         $('#msgDialog .fm-dialog-button').eq(0).bind('click', function () {
@@ -6130,7 +6147,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox)
         });
         $('#msgDialog .icon').addClass('fm-notification-icon');
         $('#msgDialog').addClass('confirmation-dialog');
-        if (type == 'remove')
+        if (type === 'remove')
             $('#msgDialog').addClass('remove-dialog');
 
         if (checkbox) {
@@ -6150,7 +6167,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox)
                 }
             });
         }
-    } else if (type == 'loginrequired') {
+    } else if (type === 'loginrequired') {
 
         $('#msgDialog').addClass('loginrequired-dialog');
 
@@ -6158,8 +6175,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox)
             .addClass('hidden')
             .html('');
 
-        $('#msgDialog .fm-dialog-button').bind('click',function()
-        {
+        $('#msgDialog .fm-dialog-button').bind('click',function() {
             closeMsg();
             if ($.warningCallback) $.warningCallback(true);
         });
@@ -6183,17 +6199,18 @@ function msgDialog(type, title, msg, submsg, callback, checkbox)
     }
 
     $('#msgDialog .fm-dialog-title span').text(title);
+    
     $('#msgDialog .fm-notification-info p').html(msg);
-    if (submsg)
-    {
+    if (submsg) {
         $('#msgDialog .fm-notification-warning').text(submsg);
         $('#msgDialog .fm-notification-warning').show();
     }
-    else
+    else {
         $('#msgDialog .fm-notification-warning').hide();
+    }
+    
     $('#msgDialog .fm-dialog-close').unbind('click');
-    $('#msgDialog .fm-dialog-close').bind('click', function()
-    {
+    $('#msgDialog .fm-dialog-close').bind('click', function() {
         closeMsg();
         if ($.warningCallback)
             $.warningCallback(false);
@@ -6202,8 +6219,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox)
     fm_showoverlay();
 }
 
-function closeMsg()
-{
+function closeMsg() {
     $('#msgDialog').addClass('hidden');
 
     if(!$('.pro-register-dialog').is(':visible')) {
@@ -6213,19 +6229,15 @@ function closeMsg()
     delete $.msgDialog;
 }
 
-function dialogScroll(s)
-{
-    s+=':visible';
-    $(s).jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true});
-    jScrollFade(s);
-    // var jsp = $(s).data('jsp');
-    // if (jsp) {
-        // jsp.reinitialise();
-    // }
+function dialogScroll(s) {
+    var cls = s;
+    
+    cls += ':visible';
+    $(cls).jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true});
+    jScrollFade(cls);
 }
 
-function dialogPositioning(s)
-{
+function dialogPositioning(s) {
     $(s).css('margin-top', '-' + $(s).height() / 2 + 'px');
 }
 

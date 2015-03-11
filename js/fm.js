@@ -3506,33 +3506,35 @@ function accountUI()
         DEBUG('Cancel your account');
         
         // Ask for confirmation
-        msgDialog('confirmation', 'Cancel your account', l[1974], false, function() {
-            loadingDialog.show();
-            api_req({a: 'erm', m: M.u[u_handle].m, t: 21}, {
-                callback: function(res) {
-                    loadingDialog.hide();
-                    if (res === ENOENT) {
-                        msgDialog('warningb', l[1513], l[1946]);
-                    } else if (res === 0) {
-                        $('.fm-dialog.reset-success .reg-success-txt').text(l[735]);
+        msgDialog('confirmation', 'Cancel your account', l[1974], false, function(e) {
+            if (e) {
+                loadingDialog.show();
+                api_req({a: 'erm', m: M.u[u_handle].m, t: 21}, {
+                    callback: function(res) {
+                        loadingDialog.hide();
+                        if (res === ENOENT) {
+                            msgDialog('warningb', l[1513], l[1946]);
+                        } else if (res === 0) {
+                            $('.fm-dialog.reset-success .reg-success-txt').text(l[735]);
 
-                        $('.fm-dialog.reset-success .fm-dialog-button').unbind('click');
-                        $('.fm-dialog.reset-success .fm-dialog-button').bind('click', function() {
-                            $('.fm-dialog-overlay').addClass('hidden');
-                            $('body').removeClass('overlayed');
-                            $('.fm-dialog.reset-success').addClass('hidden');
-                            delete $.dialog;
-                        });
+                            $('.fm-dialog.reset-success .fm-dialog-button').unbind('click');
+                            $('.fm-dialog.reset-success .fm-dialog-button').bind('click', function() {
+                                $('.fm-dialog-overlay').addClass('hidden');
+                                $('body').removeClass('overlayed');
+                                $('.fm-dialog.reset-success').addClass('hidden');
+                                delete $.dialog;
+                            });
 
-                        $('.fm-dialog-overlay').removeClass('hidden');
-                        $('body').addClass('overlayed');
-                        $('.fm-dialog.reset-success').removeClass('hidden');
-                        $.dialog = 'deleteaccount';
-                    } else {
-                        msgDialog('warningb', l[135], l[200]);
+                            $('.fm-dialog-overlay').removeClass('hidden');
+                            $('body').addClass('overlayed');
+                            $('.fm-dialog.reset-success').removeClass('hidden');
+                            $.dialog = 'deleteaccount';
+                        } else {
+                            msgDialog('warningb', l[135], l[200]);
+                        }
                     }
-                }
-            });
+                });
+            }
         });
     });
     

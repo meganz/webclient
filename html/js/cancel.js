@@ -5,28 +5,43 @@
      * @param opts {Object}
      * @constructor
      */
-    var AccountClosure = function() {
+    var AccountClosure = function(opts) {
         var self = this;
 
         var defaultOptions = {
+            'prefix': 'cancel',
+            'code': '',
+            'email': '',
+            'secret': Math.random()
         };
 
-        //self.options = $.extend(true, {}, defaultOptions, opts);
+        self.opt = $.extend(true, {}, defaultOptions, opts);
     };
+
     AccountClosure.prototype.initAccountClosure = function() {
+        var self = this;
         $('.cancel-account-button').unbind('click');
         $('.cancel-account-button').bind('click', function() {
-            accountClosure();
+            
+            self.opt.code = page.replace(self.opt.prefix, '');
+
+            loadingDialog.show();
+            self.opt.email = self._getEmail(self._accountClosure);
+
+            // Make sure that user is logged out
+            if (u_type) {
+                // Logout user
+            }            
         });
     };
 
-    AccountClosure.prototype._initAccountClosure = function() {
-        loadingDialog.show();
-
-        // Check is user logged in and owner
-        if (u_type !== 3) {
-            document.location.hash = 'login';
-        }
+    /**
+     * _accountClosure, closes account
+     * 
+     * @returns {undefined}
+     */
+    AccountClosure.prototype._accountClosure = function(code, email, hash) {
+        var self = this;
 
         api_resetuser({callback: function(code) {
                 loadingDialog.hide();
@@ -49,7 +64,40 @@
                         document.location.hash = 'recovery';
                     });
                 }
-            }}, page.replace('cancel', ''), '', '');
+            }}, code, email, hash);
+    };
+
+    /**
+     * _getEmail, query server for email using given url code
+     * 
+     * @param {callback} on success call this function
+     * @returns {undefined}
+     */
+    AccountClosure.prototype._getEmail = function(callback) {
+        var self = this;
+
+        api_req({a: 'erv', c: self.opt.code}, {
+            callback: function(res) {
+                if (typeof res === 'number') {
+                    if (res === EEXPIRED) {
+                        msgDialog('warninga', l[1966], l[1967], '', function() {
+                            document.location.hash = 'recovery';
+                        });
+                    }
+                    else {
+                        msgDialog('warninga', l[1968], l[1969], '', function() {
+                            document.location.hash = 'recovery';
+                        });
+                    }
+                }
+                else {
+                    if (res[0] === 21) {
+                        self.opt.email = res[1];
+                        callback(self.opt.code, self.opt.email, self.opt.secret.toString());
+                    }
+                }
+            }
+        });
     };
 
     //export

@@ -91,7 +91,7 @@ function blog_load()
 				blogcontent +='<div class="blog-new-small">' + acc_time2date(blogposts[i].t) + '</div>';
 				blogcontent +='<div class="blog-new-date-div"></div>';
 				blogcontent +='<div class="blog-new-small"><span>By:</span> ' + by + '</div>';
-				blogcontent +='<div class="clear"></div><img alt="" data-img="loading_' + blogposts[i].attaches.simg  + '" src="' + CMS.img(blogposts[i].attaches.simg) + '" />';
+				blogcontent +='<div class="clear"></div><img alt="" data-img="loading_' + blogposts[i].attaches.simg  + '" src="' + CMS.img(blogposts[i].attaches.simg) + '" integrity="ni:///sha-256;' +blogposts[i].attaches.bimg + '" />';
 				blogcontent +='<p><span class="blog-new-description">' + introtxt + '</span>';
 				blogcontent +='<a href="#blog_' + blogposts[i].id + '" class="blog-new-read-more">Read more</a>';
 				blogcontent +='<span class="clear"></span></p> </div>';				

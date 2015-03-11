@@ -27,41 +27,33 @@
 
             loadingDialog.show();
             self.opt.email = self._getEmail(self._accountClosure);
-
-            // Make sure that user is logged out
-            if (u_type) {
-                // Logout user
-            }            
         });
     };
 
     /**
      * _accountClosure, closes account
      * 
+     * @param {string} url code
+     * @param {string} email
+     * @param {string} hash
      * @returns {undefined}
      */
     AccountClosure.prototype._accountClosure = function(code, email, hash) {
-        var self = this;
-
         api_resetuser({callback: function(code) {
                 loadingDialog.hide();
                 if (code === 0) {
-                    msgDialog('info', l[1975], l[1976], '', function() {
-                        login_email = recoveryemail;
-                        document.location.hash = 'login';
+                    msgDialog('info', 'Account canceled', 'Your account has been canceled successfully.', '', function() {
+                        if (u_type) {
+                            mLogout();
+                        }
+                        else {
+                            document.location.hash = 'login';
+                        }
                     });
                 }
-                else if (code === EKEY) {
-                    msgDialog('warningb', l[1977], l[1978]);
-                    $('.recover-block.error').removeClass('hidden');
-                }
-                else if (code === EBLOCKED)
-                {
-                    msgDialog('warningb', l[1979], l[1980]);
-                }
                 else if (code === EEXPIRED || code === ENOENT) {
-                    msgDialog('warninga', l[1966], l[1967], '', function() {
-                        document.location.hash = 'recovery';
+                    msgDialog('warninga', 'Cancellation link has expired.', 'Cancellation link has expired, please try again.', '', function() {
+                        document.location.hash = 'fm/account';
                     });
                 }
             }}, code, email, hash);
@@ -80,13 +72,15 @@
             callback: function(res) {
                 if (typeof res === 'number') {
                     if (res === EEXPIRED) {
-                        msgDialog('warninga', l[1966], l[1967], '', function() {
-                            document.location.hash = 'recovery';
+                        loadingDialog.hide();
+                        msgDialog('warninga', 'Cancellation link has expired.', 'Cancellation link has expired, please try again.', '', function() {
+                            document.location.hash = 'fm/account';
                         });
                     }
                     else {
-                        msgDialog('warninga', l[1968], l[1969], '', function() {
-                            document.location.hash = 'recovery';
+                        loadingDialog.hide();
+                        msgDialog('warninga', 'Invalid cancelation link.', 'Invalid cancellation link, please try again.', '', function() {
+                            document.location.hash = 'fm/account';
                         });
                     }
                 }

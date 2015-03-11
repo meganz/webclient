@@ -584,6 +584,11 @@ function init_page()
 		parsepage(pages['backup']);
 		init_backup();
 	}
+	else if (page.substr(0,6) === 'cancel' && page.length > 24) {
+		parsepage(pages['cancel']);
+        
+        init_reset();
+	}
 	else if (page === 'recovery') {
 		parsepage(pages['recovery']);
 		var accountRecovery = new mega.AccountRecovery();

@@ -3501,12 +3501,12 @@ function accountUI()
         document.location.hash = 'fm/account/profile';
     });
 
-    $('.delete-account').unbind('click');
-    $('.delete-account').bind('click', function() {
-        DEBUG('Delete your account');
+    $('.cancel-account').unbind('click');
+    $('.cancel-account').bind('click', function() {
+        DEBUG('Cancel your account');
         
         // Ask for confirmation
-        msgDialog('warninga', l[5933], l[1974], false, function() {
+        msgDialog('confirmation', 'Cancel your account', l[1974], false, function() {
             loadingDialog.show();
             api_req({a: 'erm', m: M.u[u_handle].m, t: 21}, {
                 callback: function(res) {

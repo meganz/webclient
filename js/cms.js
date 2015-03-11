@@ -71,10 +71,8 @@ function process_cms_response(bytes, next, as, id)
 	}
 }
 
-var assets = {}, cmsToId = null
+var assets = {}
 var booting = false;
-
-var is_img
 
 /**
  *	Rewrite links. Basically this links 
@@ -91,33 +89,7 @@ function dl_placeholder(str, sep, rid, id) {
  *  the BLOB server
  */
 function img_placeholder(str, sep, rid, id) {
-	is_img = true;
-	return "'" + IMAGE_PLACEHOLDER + "' data-img='loading_" +  id + "'" 
-}
-
-function cmsObjectToId(name)
-{
-	var q = getxhr();
-	if (d) console.error("CMS: loading " + name)
-	q.onload = function() {
-		if (name == '_all') {
-			cmsToId = JSON.parse(ab_to_str(q.response));
-		} else {
-			cmsToId[name] = ab_to_str(q.response).split(".")
-		}
-		q = null;
-		if (name != '_all') doRequest(name);
-	}
-	q.onerror = function() {
-		Later(function() {
-			cmsObjectToId(name);
-		})
-		q = null;
-	};
-	var srv = apipath.replace(/https?:\/\//, '').replace(/\//g, '')
-	q.open("GET", (localStorage.cms || "//cms.mega.nz/") + srv + '/' + name);
-	q.responseType = 'arraybuffer';
-	q.send();
+	return "'" + (localStorage.cms || "//cms.mega.nz") + "/unsigned/" + id + "' data-img='loading_" +  id + "'" 
 }
 
 /**
@@ -131,24 +103,23 @@ var fetching = {};
 function doRequest(id) {
 	if (!id) throw new Error
 	if (d) console.error("CMS fetch element", id)
-	if (cmsToId === null) {
-		if (!booting) {
-			booting = true;
-			cmsObjectToId('_all');
-		}
-		return Later(function() {
-			doRequest(id);
-		});
-	}
-	if (!cmsToId[id]) {
-		return cmsObjectToId(id)
-	}
-	_cms_request(cmsToId[id], function(blob) {
+	var q = getxhr();
+	q.onerror = function() {
+		Later(function() {
+			cmsObjectToId(name);
+		})
+		q = null;
+	};
+	q.onload = function() {
 		for (var i in fetching[id]) {
-			process_cms_response(blob, fetching[id][i][0], fetching[id][i][1], id);
+			process_cms_response(q.response, fetching[id][i][0], fetching[id][i][1], id);
 		}
 		delete fetching[id];
-	});
+	};
+
+	q.open("GET", (localStorage.cms || "//cms.mega.nz") + '/content/' + id);
+	q.responseType = 'arraybuffer';
+	q.send()
 }
 
 var _listeners = {};
@@ -177,29 +148,6 @@ function _concat_arraybuf(arr)
 	return buffer.buffer
 }
 
-function _cms_request(ids, next)
-{
-	if (d) console.error("CMS: request", ids)
-	var args = []
-		, q  = []
-		, done = 0
-	for (var i in ids) {
-		args.push({fa:i+":1*" + ids[i], k:i, plaintext: true})
-		q[i] = null
-	}
-
-	api_getfileattr(args, 1, function(ctx, id, bytes)
-	{
-		if (d) console.error("Got response", id, bytes.byteLength, ctx)
-		
-		q[id] = bytes
-		if (++done == q.length) {
-			next(_concat_arraybuf(q))
-			q = undefined
-		}
-	});
-}
-
 var curType;
 var curCallback;
 
@@ -212,14 +160,6 @@ var CMS = {
 
 	reRender: function(type, nodeId)
 	{
-		//ERRDEBUG(type, nodeId)
-		// If cmsToId is NULL it means we didn't open
-		// *any* CMS content so we should ignore this
-		// update, we will get the newest version always
-		// when we need it (the first time)
-		if (!(cmsToId instanceof Object)) return;
-
-		cmsToId[type] = nodeId;
 		if (type == curType) {
 			curCallback(nodeId);
 		}
@@ -245,13 +185,7 @@ var CMS = {
 	loaded: loaded,
 
 	img : function(id) {
-		if (!assets[id]) {
-			this.get(id, function(err, obj) {
-				$('*[data-img=loading_' + id + ']').attr({'id': '', 'src': obj.url})
-				assets[id] = obj.url;
-			});
-		}
-		return assets[id] ? assets[id] : IMAGE_PLACEHOLDER;
+		return (localStorage.cms || "//cms.mega.nz") + "/unsigned/" + id
 	},
 	get: function(id, next, as) {
 		if (typeof fetching[id] == "undefined") {
@@ -271,15 +205,10 @@ var CMS = {
 
 	imgLoader: function(html, id) {
 		if (!assets[id]) {
-			is_img = false;
 			// replace images
 			html = html.replace(new RegExp('([\'"])(i:(' + id + '))([\'"])', 'g'), img_placeholder);
 			// replace download links
 			html = html.replace(new RegExp('([\'"])(d:(' + id + '))([\'"])', 'g'), dl_placeholder);
-		
-			if (is_img) {
-				this.get(id);
-			}
 		} else {
 			html = html.replace(IMAGE_PLACEHOLDER + "' data-img='loading_" + id, assets[id], 'g');
 		}

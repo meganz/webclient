@@ -109,7 +109,12 @@ function init_reset()
 		$('.login-register-input.password').removeClass('loading');
 		reset_pwcheck();
 	}
-	
+
+    $('.cancel-account-button').unbind('click');
+    $('.cancel-account-button').bind('click', function() {
+        accountClosure();
+    });
+
 	$('.restore-verify-button').unbind('click');
 	$('.restore-verify-button').bind('click',function(e)
 	{

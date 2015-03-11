@@ -922,6 +922,9 @@ a.account-manage-button:hover {
 .exceeded .fm-bar-title.used-info, .exceeded .fm-bar-size.used {
 	color: rgba(217,0,7,1)
 }
+.exceeded .nw-fm-percentage li span, .exceeded .nw-fm-line-progress-bar {
+	background-color: rgba(217,0,7,1);
+}
 .nw-fm-percents {
 	content: "";
 	position: absolute;
@@ -12646,7 +12649,7 @@ table {
 .fm-account-progress .fm-account-bar.green {
 	background-color: #6BB219;
 }
-.exceeded .fm-account-progress .fm-account-bar.blue, .exceeded .fm-account-progress .fm-account-bar.green {
+.exceeded .fm-account-progress .fm-account-bar.blue, .exceeded .fm-account-progress .fm-account-bar.green, .exceeded.storage .nw-fm-bar0 {
 	background-color: #D52400;
 	width: 100% !important;
 }

@@ -2799,7 +2799,7 @@ function accountUI()
         // Used space
         $('.storage .fm-bar-size.used').html(bytesToSize(account.space_used));
         // Available space
-        $('.storage .fm-bar-size.available').html(bytesToSize(account.space - account.space_used));
+        $('.storage .fm-bar-size.available').html(bytesToSize(Math.max(0,account.space - account.space_used)));
         // Cloud drive
         $('.storage .fm-bar-size.cloud-drive').html(bytesToSize(c[k[0]][0]));
         // Rubbish bin

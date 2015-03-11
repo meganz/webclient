@@ -586,8 +586,8 @@ function init_page()
 	}
 	else if (page.substr(0,6) === 'cancel' && page.length > 24) {
 		parsepage(pages['cancel']);
-        
-        init_reset();
+        var ac = new mega.AccountClosure();
+        ac.initAccountClosure();
 	}
 	else if (page === 'recovery') {
 		parsepage(pages['recovery']);

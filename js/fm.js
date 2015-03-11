@@ -2799,7 +2799,13 @@ function accountUI()
         // Used space
         $('.storage .fm-bar-size.used').html(bytesToSize(account.space_used));
         // Available space
-        $('.storage .fm-bar-size.available').html(bytesToSize(Math.max(0,account.space - account.space_used)));
+        b2 = account.space - account.space_used;
+        if (b2 < 0) {
+            b2 = bytesToSize(-b2) + ' over quota';
+        } else {
+            b2 = bytesToSize(b2);
+        }
+        $('.storage .fm-bar-size.available').html(b2);
         // Cloud drive
         $('.storage .fm-bar-size.cloud-drive').html(bytesToSize(c[k[0]][0]));
         // Rubbish bin

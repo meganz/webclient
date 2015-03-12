@@ -205,7 +205,7 @@ function initContactsGridScrolling() {
 /**
  * Sent Contact Requests
  *
- * @returns {undefined}
+ * 
  */
 function initOpcGridScrolling() {
     var scroll = '.grid-scrolling-table.opc';
@@ -217,7 +217,7 @@ function initOpcGridScrolling() {
 /**
  * Received Contact Requests
  *
- * @returns {undefined}
+ * 
  */
 function initIpcGridScrolling() {
     var scroll = '.grid-scrolling-table.ipc';
@@ -1814,7 +1814,7 @@ function addContactUI()
 
 /**
  * Bind actions to Received Pending Conctact Request buttons
- * @returns {undefined}
+ * 
  */
 function initBindIPC() {
     DEBUG('initBindIPC()');
@@ -1842,7 +1842,7 @@ function initBindIPC() {
 
 /**
  * Bind actions to Received pending contacts requests buttons
- * @returns {undefined}
+ * 
  */
 function initBindOPC() {
     DEBUG('initBindOPC()');
@@ -2538,7 +2538,7 @@ function docreatefolderUI(e)
 /**
  * fmtopUI
  *
- * @returns {undefined}
+ * 
  */
 function fmtopUI() {
     $('.fm-clearbin-button,.fm-add-user,.fm-new-folder,.fm-file-upload,.fm-folder-upload').addClass('hidden');
@@ -3507,8 +3507,7 @@ function accountUI()
         document.location.hash = 'fm/account/profile';
     });
 
-    $('.cancel-account').unbind('click');
-    $('.cancel-account').bind('click', function() {
+    $('.cancel-account').rebind('click', function() {
         DEBUG('Cancel your account');
         
         // Ask for confirmation
@@ -3520,7 +3519,8 @@ function accountUI()
                         loadingDialog.hide();
                         if (res === ENOENT) {
                             msgDialog('warningb', l[1513], l[1946]);
-                        } else if (res === 0) {
+                        }
+                        else if (res === 0) {
                             $('.fm-dialog.reset-success .reg-success-txt').text(l[735]);
 
                             $('.fm-dialog.reset-success .fm-dialog-button').unbind('click');
@@ -3535,7 +3535,8 @@ function accountUI()
                             $('body').addClass('overlayed');
                             $('.fm-dialog.reset-success').removeClass('hidden');
                             $.dialog = 'deleteaccount';
-                        } else {
+                        }
+                        else {
                             msgDialog('warningb', l[135], l[200]);
                         }
                     }
@@ -6256,7 +6257,7 @@ function dialogPositioning(s) {
  * @param {string} n - dialog prefix (copy|move)
  * @param {string} x - html, content
  *
- * @returns {undefined}
+ * 
  */
 function handleDialogTabContent(s, m, n, x)
 {
@@ -6302,7 +6303,7 @@ function disableReadOnlySharedFolders(m)
  * @param {string} n - dialog prefix (copy|move)
  * @param {string} t - action button label
  * @param {string} i - in case of conversations tab
- * @returns {undefined}
+ * 
  */
 function handleDialogContent(s, m, c, n, t, i)
 {
@@ -6384,7 +6385,7 @@ function handleDialogContent(s, m, c, n, t, i)
 
 /**
  * Taking care about share dialog button 'Share' enabled/disabled and scroll
- * @returns {undefined}
+ * 
  *
  */
 function shareDialogContentCheck() {
@@ -6713,7 +6714,7 @@ function initShareDialog() {
      *
      * @param {email} item
      * @param {array} perm, permission class and text
-     * @returns {undefined}
+     * 
      */
     determineContactParams = function(item, perm) {
         var email = item;// email address

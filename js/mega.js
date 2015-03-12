@@ -505,7 +505,7 @@ function MegaData()
      *
      * @param {array of JSON objects} ipc - received requests
      * @param {bool} clearGrid
-     * @returns {undefined}
+     * 
      */
     this.drawReceivedContactRequests = function(ipc, clearGrid) {
         DEBUG('Draw received contacts grid.');
@@ -599,7 +599,7 @@ function MegaData()
      *
      * @param {array of JSON objects} opc - sent requests
      * @param {bool} clearGrid
-     * @returns {undefined}
+     * 
      */
     this.drawSentContactRequests = function(opc, clearGrid) {
         DEBUG('Draw sent invites.');
@@ -670,7 +670,7 @@ function MegaData()
          * flush_cached_nodes
          *
          * @param {integer} n
-         * @returns {undefined}
+         * 
          */
         function flush_cached_nodes(n) {
             var canvas,
@@ -721,7 +721,7 @@ function MegaData()
          * @param {} aHTMLContent
          * @param {} aUpdate
          * @param {} aDynCache
-         * @returns {undefined}
+         * 
          */
         function mInsertNode(aNode, aPrevNode, aNextNode, aTag, aElement, aHTMLContent, aUpdate, aDynCache) {
             if (!aUpdate || $(aTag + ' ' + aElement).length === 0) {
@@ -778,7 +778,7 @@ function MegaData()
          * renerContactsLayout
          *
          * @param {} u
-         * @returns {undefined}
+         * 
          */
         function renderContactsLayout(u) {
             var u_h, contact, node, av_meta, avatar, av_color, el, t, html, onlinestatus,
@@ -2426,7 +2426,7 @@ function MegaData()
      * @param {email} target
      * @param {string} msg
      *
-     * @returns {undefined}
+     * 
      */
     this.inviteContact = function(owner, target, msg) {
         DEBUG('inviteContact');
@@ -2455,7 +2455,7 @@ function MegaData()
      * @param {int} errorCode
      * @param {string} msg Can be undefined
      * @param {email} email  Can be undefined
-     * @returns {undefined}
+     * 
      */
     this.inviteContactMessageHandler = function(errorCode) {
         if (errorCode === -12) {
@@ -2670,7 +2670,7 @@ function MegaData()
      * @param {object} u, user object data
      * @param {boolean} ignoreDB, don't write to indexedDB
      *
-     * @returns {undefined}
+     * 
      */
     this.addUser = function(u, ignoreDB) {
         var userId = '';
@@ -2702,7 +2702,7 @@ function MegaData()
      * Delete opc record from localStorage using id
      *
      * @param {string} id
-     * @returns {undefined}
+     * 
      */
     this.delOPC = function(id) {
         if (typeof mDB === 'object' && !pfkey) {
@@ -2722,7 +2722,7 @@ function MegaData()
      * Delete ipc record from indexedDb using id
      *
      * @param {string} id
-     * @returns {undefined}
+     * 
      */
     this.delIPC = function(id) {
         if (typeof mDB === 'object' && !pfkey) {
@@ -2742,7 +2742,7 @@ function MegaData()
      * @param {JSON} ps, pending share
      * @param {boolean} ignoreDB
      *
-     * @returns {undefined}
+     * 
      */
     this.addPS = function(ps, ignoreDB) {
         if (!this.ps[ps.h]) {
@@ -2761,7 +2761,7 @@ function MegaData()
      * @param {string} pcrId, pending contact request id
      * @param {string} nodeId, shared item id
      *
-     * @returns {undefined}
+     * 
      */
     this.delPS = function(pcrId, nodeId) {
 
@@ -3210,7 +3210,7 @@ function MegaData()
      * @param {string} nodeHandle
      * @param {string} pendingContactId
      *
-     * @returns {undefined}
+     * 
      */
     this.deletePendingShare = function(nodeHandle, pendingContactId) {
         if (this.d[nodeHandle]) {
@@ -5237,7 +5237,7 @@ function __process_f2(f, cb, tick)
  * Handle incoming pending contacts
  *
  * @param {array of JSON objects} pending contacts
- * @returns {undefined}
+ * 
  */
 function processIPC(ipc) {
     DEBUG('processIPC');
@@ -5259,7 +5259,7 @@ function processIPC(ipc) {
  * Handle outgoing pending contacts
  *
  * @param {array of JSON objects} pending contacts
- * @returns {undefined}
+ * 
  */
 function processOPC(opc) {
     DEBUG('processOPC');
@@ -5300,7 +5300,7 @@ function processOPC(opc) {
  *
  * @param {array of JSON objects} pending shares
  *
- * @returns {undefined}
+ * 
  */
 function processPS(pendingShares) {
     DEBUG('processPS');
@@ -5344,7 +5344,7 @@ function processPS(pendingShares) {
  * Handle upca response, upci, pending contact request updated (for whom it's incomming)
  *
  * @param {array of JSON objects} ap (actionpackets)
- * @returns {undefined}
+ * 
  */
 function processUPCI(ap) {
     DEBUG('processUPCI');
@@ -5365,7 +5365,7 @@ function processUPCI(ap) {
  * Handle upco response, upco, pending contact request updated (for whom it's outgoing)
  *
  * @param {array of JSON objects} ap (actionpackets)
- * @returns {undefined}
+ * 
  */
 function processUPCO(ap) {
     DEBUG('processUPCO');

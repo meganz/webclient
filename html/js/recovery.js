@@ -29,8 +29,7 @@
         });
 
         // We have Yes and No button
-        $('.recover-button').unbind('click');
-        $('.recover-button').bind('click', function() {
+        $('.recover-button').rebind('click', function() {
             if ($(this).attr('class').indexOf('active') === -1) {
                 $('.recover-button').removeClass('active');
                 $('.recover-block').addClass('hidden');
@@ -49,8 +48,7 @@
         });
 
         // Send recovery email to address
-        $('.backup-input-button').unbind('click');
-        $('.backup-input-button').bind('click', function() {
+        $('.backup-input-button').rebind('click', function() {
             self._startRecovery();
         });
 
@@ -86,7 +84,7 @@
     /**
      * 
      * @param {integer} actions: recover, park
-     * @returns {undefined}
+     * 
      */
     AccountRecovery.prototype._startRecovery = function() {
         var self = this;

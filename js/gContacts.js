@@ -49,7 +49,7 @@
 
     /**
      * Calculate parameters used for google contact importing
-     * @returns {undefined}
+     * 
      */
     GContacts.prototype._calcParams = function() {
         var self = this;
@@ -171,7 +171,7 @@
      * Failure to verify tokens acquired this way makes your application
      * more vulnerable to the confused deputy problem.
      * @param {type} accessToken
-     * @returns {undefined}
+     * 
      */
     GContacts.prototype._validateToken = function(accessToken) {
         var self = this;

@@ -4892,7 +4892,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	color: rgba(255,255,255,0.7);
 	font-family: 'Open Sans', Arial, Helvetica, sans-serif;
 	font-size: 12px;
-	cursor: default;
+	cursor: pointer;
 }
 .download-page .user-name, .download-page a.user-name {
 	color: #666666;

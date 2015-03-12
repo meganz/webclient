@@ -400,7 +400,7 @@ if ( 0 && indexedDB)
         if (mDB && mDB.close) {
             mDB.close();
         }
-        var dbreq= indexedDB.deleteDatabase("MEGA_" + u_handle);
+        var dbreq = indexedDB.deleteDatabase("MEGA_" + u_handle);
         dbreq.callback = callback;
         dbreq.onsuccess = function() {
             DEBUG('dB deleted');

@@ -42,7 +42,7 @@
         api_resetuser({callback: function(code) {
                 loadingDialog.hide();
                 if (code === 0) {
-                    msgDialog('info', 'Account canceled', 'Your account has been canceled successfully.', '', function() {
+                    msgDialog('info', 'Account is canceled', 'Your account has been canceled successfully.', '', function() {
                         if (u_type) {
                             mLogout();
                         }

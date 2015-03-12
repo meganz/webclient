@@ -36,19 +36,25 @@
      * @param {string} url code
      * @param {string} email
      * @param {string} hash
-     * @returns {undefined}
+     * 
      */
     AccountClosure.prototype._accountClosure = function(code, email, hash) {
         api_resetuser({callback: function(code) {
                 loadingDialog.hide();
                 if (code === 0) {
                     msgDialog('info', 'Account is canceled', 'Your account has been canceled successfully.', '', function() {
+                        
+                        // If user canceling account from active session
                         if (u_type) {
-                            mLogout();
+                            mDBclear();
+                            for (var i in localStorage) {
+                                if (localStorage.hasOwnProperty(i)) {
+                                    delete localStorage[i];
+                                }
+                            }
+                            delete localStorage;
                         }
-                        else {
-                            document.location.hash = 'login';
-                        }
+                        document.location.hash = 'login';
                     });
                 }
                 else if (code === EEXPIRED || code === ENOENT) {
@@ -63,7 +69,7 @@
      * _getEmail, query server for email using given url code
      * 
      * @param {callback} on success call this function
-     * @returns {undefined}
+     * 
      */
     AccountClosure.prototype._getEmail = function(callback) {
         var self = this;

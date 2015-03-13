@@ -882,27 +882,19 @@ a.account-manage-button:hover {
 .nw-fm-percentage {
 	position: relative;
 	float: left;
-	width: 148px;
-	height: 148px;
-	margin: 0;
-	padding: 0;
+	-moz-border-radius: 100%;
+	-webkit-border-radius: 100%;
+	border-radius: 100%;
+	overflow:hidden;
 }
 .nw-fm-percentage ul {
 	list-style-type: none;
-	width: 148px;
-	height: 148px;
-	padding: 0;
-	margin: 0;
 }
 .nw-fm-percentage li {
 	position: absolute;
 	top: 0px;
-	width: 148px;
-	height: 148px;
-	padding: 0;
-	margin: 0;
 }
-.nw-fm-percentage p {
+.nw-fm-percentage p, .nw-fm-percentage li, .nw-fm-percentage ul, .nw-fm-percentage {
 	width: 148px;
 	height: 148px;
 	padding: 0;
@@ -958,14 +950,11 @@ a.account-manage-button:hover {
 .bandwidth .nw-fm-chart0.left-c span, .bandwidth .nw-fm-chart0.right-c span, .bandwidth .nw-fm-bar0, .bandwidth .bar-color4 {
 	background-color: #6BB219;
 }
-.exceeded .fm-bar-color.bar-color4, .exceeded .bandwidth .nw-fm-chart0.left-c span, .exceeded .bandwidth .nw-fm-chart0.right-c span {
+.exceeded .nw-fm-percentage li span, .exceeded .nw-fm-line-progress-bar, .exceeded .nw-fm-percentage {
 	background-color: rgba(217,0,7,1);
 }
 .exceeded .fm-bar-title.used-info, .exceeded .fm-bar-size.used, .exceeded .fm-bar-size.available {
 	color: rgba(217,0,7,1)
-}
-.exceeded .nw-fm-percentage li span, .exceeded .nw-fm-line-progress-bar {
-	background-color: rgba(217,0,7,1);
 }
 .nw-fm-percents {
 	content: "";

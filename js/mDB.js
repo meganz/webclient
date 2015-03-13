@@ -396,15 +396,17 @@ if ( 0 && indexedDB)
         };
     }
 
-    function mDBclear(callback)
-    {
-        mDB.close();
-        var dbreq= indexedDB.deleteDatabase("MEGA_" + u_handle);
+    function mDBclear(callback) {
+        if (mDB && mDB.close) {
+            mDB.close();
+        }
+        var dbreq = indexedDB.deleteDatabase("MEGA_" + u_handle);
         dbreq.callback = callback;
-        dbreq.onsuccess = function(event)
-        {
-            if (d) console.log('db deleted');
-            if (dbreq.callback) dbreq.callback();
+        dbreq.onsuccess = function() {
+            DEBUG('dB deleted');
+            if (dbreq.callback) {
+                dbreq.callback();
+            }
         };
     }
 

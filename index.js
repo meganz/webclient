@@ -584,10 +584,15 @@ function init_page()
 		parsepage(pages['backup']);
 		init_backup();
 	}
-	else if (page == 'recovery')
-	{
+	else if (page.substr(0,6) === 'cancel' && page.length > 24) {
+		parsepage(pages['cancel']);
+        var ac = new mega.AccountClosure();
+        ac.initAccountClosure();
+	}
+	else if (page === 'recovery') {
 		parsepage(pages['recovery']);
-		init_recovery();
+		var accountRecovery = new mega.AccountRecovery();
+        accountRecovery.initRecovery();
 	}
 	else if (page.substr(0,7) == 'recover' && page.length > 25)
 	{
@@ -1484,17 +1489,22 @@ function topmenuUI() {
 		}
 	});
 
-	if (avatars[u_handle]) $('.fm-avatar img').attr('src',avatars[u_handle].url);
-	$('.fm-avatar img').unbind('click');
-	$('.fm-avatar img').bind('click',function(e)
-	{
-		if ($(this).attr('src').indexOf('blob:') > -1) document.location.hash = 'fm/account';
-		else avatarDialog();
+	if (avatars[u_handle]) {
+        $('.fm-avatar img').attr('src', avatars[u_handle].url);
+    }
+    
+	$('.fm-avatar img, .user-name').rebind('click',function() {
+		if ($('.fm-avatar img').attr('src').indexOf('blob:') > -1) {
+            document.location.hash = 'fm/account';
+        }
+		else {
+            avatarDialog();
+        }
 	});
 
+    
 	$('.top-head .logo').unbind('click');
-	$('.top-head .logo').bind('click',function(e)
-	{
+	$('.top-head .logo').bind('click',function() {
 		document.location.hash = typeof u_type !== 'undefined' && +u_type > 2 ? '#fm' : '#index';
 	});
 

@@ -3071,15 +3071,17 @@ function MegaData()
             $('.nw-fm-left-icon.rubbish-bin').addClass('filled')
     };
 
-    this.nodeAttr = function(a)
-    {
+    this.nodeAttr = function(a) {
+        
         var n = M.d[a.h];
-        if (n)
-        {
-            for (var i in a)
+        
+        if (n) {
+            for (var i in a) {
                 n[i] = a[i];
-            if (typeof mDB === 'object' && !pfkey)
+            }
+            if (typeof mDB === 'object' && !pfkey) {
                 mDBadd('f', clone(n));
+            }
         }
     };
 
@@ -3221,89 +3223,89 @@ function MegaData()
         }
     };
 
-    this.getlinks = function(h)
-    {
+    this.getlinks = function(h) {
         this.$getLinkPromise = new $.Deferred();
 
         loadingDialog.show();
         this.links = [];
         this.folderlinks = [];
-        for (var i in h)
-        {
+        for (var i in h) {
             var n = M.d[h[i]];
-            if (n)
-            {
-                if (n.t)
+            if (n) {
+                if (n.t) {
                     this.folderlinks.push(n.h);
+                }
                 this.links.push(n.h);
             }
         }
-        if (d)
+        if (d) {
             console.log('getlinks', this.links);
-        if (this.folderlinks.length > 0)
+        }
+        if (this.folderlinks.length > 0) {
             this.getFolderlinks();
-        else
-            this.getlinksDone();
+        }
+        else {
+            this.getLinksDone();
+        }
 
         return this.$getLinkPromise;
-    }
+    };
 
-    this.getlinksDone = function()
-    {
+    this.getLinksDone = function() {
         var self = this;
 
-        for (var i in this.links)
+        for (var i in this.links) {
             api_req({a: 'l', n: this.links[i]}, {
                 node: this.links[i],
-                last: i == this.links.length - 1,
-                callback: function(res, ctx)
-                {
-                    if (typeof res != 'number')
+                last: i === this.links.length - 1,
+                callback: function(res, ctx) {
+                    
+                    if (typeof res !== 'number') {
                         M.nodeAttr({h: M.d[ctx.node].h, ph: res});
+                    }
 
-                    if (ctx.last)
-                    {
+                    if (ctx.last) {
                         self.$getLinkPromise.resolve();
                         loadingDialog.hide();
                     }
                 }
             });
-    }
+        }
+    };
 
-    this.getFolderlinks = function()
-    {
-        if (this.folderlinks.length > 0)
-        {
+    this.getFolderlinks = function() {
+        
+        if (this.folderlinks.length > 0) {
             var n = M.d[this.folderlinks[0]];
             this.folderlinks.splice(0, 1);
 
-            if (n)
-            {
+            if (n) {
                 this.fln = n;
-                if (n.shares && n.shares['EXP'])
+                if (n.shares && n.shares['EXP']) {
                     this.getFolderlinks();
-                else
-                {
+                }
+                else {
                     var h = fm_getnodes(n.h);
                     h.push(n.h);
 
-                    api_setshare(n.h, [{u: 'EXP', r: 0}], h,
-                        {
-                            done: function(res)
-                            {
-                                if (res.r && res.r[0] == 0)
-                                    M.nodeShare(M.fln.h, {h: M.fln.h, r: 0, u: 'EXP', ts: Math.floor(new Date().getTime() / 1000)});
-                                M.getFolderlinks();
+                    api_setshare(n.h, [{u: 'EXP', r: 0}], h, {
+                        done: function(res) {
+                            if (res.r && res.r[0] === 0) {
+                                M.nodeShare(M.fln.h, {h: M.fln.h, r: 0, u: 'EXP', ts: Math.floor(new Date().getTime() / 1000)});
                             }
-                        });
+                            M.getFolderlinks();
+                        }
+                    });
                 }
             }
-            else
+            else {
                 this.getFolderlinks();
+            }
         }
-        else
-            this.getlinksDone();
-    }
+        else {
+            this.getLinksDone();
+        }
+    };
 
     this.makeDir = function(n)
     {
@@ -5474,10 +5476,9 @@ function init_chat() {
     }
 }
 
-function loadfm_callback(res)
-{
-    if (pfkey && res.f && res.f[0])
-    {
+function loadfm_callback(res) {
+    
+    if (pfkey && res.f && res.f[0]) {
         M.RootID = res.f[0].h;
         u_sharekeys[res.f[0].h] = base64_to_a32(pfkey);
         folderlink = pfid;
@@ -5497,6 +5498,7 @@ function loadfm_callback(res)
     if (res.ps) {
         processPS(res.ps);
     }
+    
     process_f(res.f, function onLoadFMDone() {
 
         // If we have shares, and if a share is for this node, record it on the nodes share list

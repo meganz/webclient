@@ -482,23 +482,26 @@ function treesearchUI()
             $('.nw-sorting-menu').addClass('hidden');
         }
     });
-    $('.sorting-menu-item').unbind('click');
-    $('.sorting-menu-item').bind('click', function()
-    {
-        var $this = $(this);
-        if ($this.attr('class').indexOf('active') == -1)
-        {
+    
+    $('.sorting-menu-item').rebind('click', function() {
+        
+        var $this = $(this),
+            data = $this.data(),
+            type = treePanelType();
+
+        if ($this.attr('class').indexOf('active') === -1) {
             $this.parent().find('.sorting-menu-item').removeClass('active');
             $this.addClass('active');
             $('.nw-sorting-menu').addClass('hidden');
             $('.nw-tree-panel-arrows').removeClass('active');
-            var data = $this.data()
-                , type = treePanelType()
+                
             if (data.dir) {
                 localStorage['sort' + type + 'Dir'] = $.sortTreePanel[type].dir = data.dir;
-            } else {
+            }
+            else {
                 localStorage['sort' + type + 'By'] = $.sortTreePanel[type].by = data.by;
             }
+            
             switch (type) {
                 case 'contacts':
                     M.contacts();
@@ -2129,14 +2132,13 @@ function initContextUI()
         M.addDownload($.selected, true);
     });
 
-    $(c + '.getlink-item').unbind('click');
-    $(c + '.getlink-item').bind('click', function(event)
-    {
+    $(c + '.getlink-item').rebind('click', function(event) {
         if ($.propertiesDialog) {
             propertiesDialog(1);
         }
-        if (u_type === 0)
+        if (u_type === 0) {
             ephemeralDialog(l[1005]);
+        }
         else {
             M.getlinks($.selected).done(function() {
                 linksDialog();
@@ -6423,9 +6425,11 @@ function addShareDialogContactToContent(type, id, av_color, av, name, permClass,
 }
 
 function fillShareDialogWithContent() {
-    $.sharedTokens = [];// GLOBAL VARIABLE, Holds items currently visible in share folder content (above multi-input)
+    
+    $.sharedTokens = [];// GLOBAL VARIABLE, Hold items currently visible in share folder content (above multi-input)
     var selectedNodeHandle = $.selected[0],
-        shares = M.d[selectedNodeHandle].shares;
+        shares = M.d[selectedNodeHandle].shares,
+        mps = M.ps[selectedNodeHandle];
 
     // List users that are already use item
     for (var userHandle in shares) {
@@ -6446,7 +6450,7 @@ function fillShareDialogWithContent() {
         }
     }
 
-    var mps = M.ps[selectedNodeHandle];
+    // Pending contact requests (pcr)
     if (mps) {
         for (var pcrHandle in mps) {
             if (mps.hasOwnProperty(pcrHandle)) {
@@ -6471,10 +6475,13 @@ function fillShareDialogWithContent() {
  * @param {String} userHandle Optional
  */
 function generateShareDialogRow(displayNameOrEmail, email, shareRights, userHandle) {
-    var av_color = displayNameOrEmail.charCodeAt(0) % 6 + displayNameOrEmail.charCodeAt(1) % 6;
-    var av = (avatars[userHandle] && avatars[userHandle].url) ? '<img src="' + avatars[userHandle].url + '">' : (displayNameOrEmail.charAt(0) + displayNameOrEmail.charAt(1));
-    var perm = '';
-    var permissionLevel = 0;
+    
+    var rowId = '',
+        html = '',
+        av_color = displayNameOrEmail.charCodeAt(0) % 6 + displayNameOrEmail.charCodeAt(1) % 6,
+        av = (avatars[userHandle] && avatars[userHandle].url) ? '<img src="' + avatars[userHandle].url + '">' : (displayNameOrEmail.charAt(0) + displayNameOrEmail.charAt(1)),
+        perm = '',
+        permissionLevel = 0;
 
     if (typeof shareRights != 'undefined') {
         permissionLevel = shareRights;
@@ -6492,8 +6499,8 @@ function generateShareDialogRow(displayNameOrEmail, email, shareRights, userHand
     // Add contact
     $.sharedTokens.push(email);
 
-    var rowId = (userHandle) ? userHandle : email;
-    var html = addShareDialogContactToContent('', rowId, av_color, av, displayNameOrEmail, perm[0], perm[1]);
+    rowId = (userHandle) ? userHandle : email;
+    html = addShareDialogContactToContent('', rowId, av_color, av, displayNameOrEmail, perm[0], perm[1]);
 
     $('.share-dialog .share-dialog-contacts').append(html);
 }
@@ -7632,8 +7639,47 @@ function getclipboardkeys()
     return l;
 }
 
+/**
+ * generates file url for shared item
+ * 
+ * @param {string} handle, M.d.ph (specific for shared links)
+ * @param {string} key
+ * @param {string{ type, represents type of itme, file or folder
+ * 
+ * @returns {array}
+ */
+function itemExportLink(handle, key, type, fileSize) {
+    
+    var fileUrlWithoutKey, fileUrlWithKey, fileUrl,
+        html = '';
+    
+    fileUrlWithoutKey = getBaseUrl() + '/#' + type + '!' + htmlentities(handle);
+    fileUrlWithKey = fileUrlWithoutKey + (key ? '!' + a32_to_base64(key) : '');
+    fileUrl = window.getLinkState === false ? fileUrlWithoutKey : fileUrlWithKey;
+    
+    html += '<div class="export-link-item">'
+         +      '<div class="export-icon ' + fileicon(n) + '" ></div>'
+         +      '<div class="export-link-text-pad">'
+         +          '<div class="export-link-txt">'
+         +               htmlentities(n.name) + ' <span class="export-link-gray-txt">' + fileSize + '</span>'
+         +          '</div>'
+         +          '<div>'
+         +              '<input class="export-link-url" type="text" readonly="readonly" value="' + fileUrl + '">'
+         +          '</div>'
+         +          '<span class="file-link-without-key hidden">' + fileUrlWithoutKey + '</span>'
+         +          '<span class="file-link-with-key hidden">' + fileUrlWithKey + '</span>'
+         +      '</div>'
+         +  '</div>';
+    
+    return html;
+}
+
 function linksDialog(close) {
-    var scroll = '.export-link-body';
+    
+    var n, key, fileSize, f,
+        html = '',
+        scroll = '.export-link-body';
+    
     deleteScrollPanel(scroll, 'jsp');
     if (close) {
         $.dialog = false;
@@ -7644,38 +7690,25 @@ function linksDialog(close) {
     }
 
     $.dialog = 'links';
-    var html = '';
     for (var i in M.links) {
-        var n = M.d[M.links[i]];
-        var key, fileSize, F;
+        n = M.d[M.links[i]];
+        
+        // Shared item type is folder
         if (n.t) {
-            F = 'F';
+            f = 'F';
             key = u_sharekeys[n.h];
             fileSize = '';
-        } else {
-            F = '';
+        }
+        
+        // Shared item type is file
+        else {
+            f = '';
             key = n.key;
             fileSize = htmlentities(bytesToSize(n.s));
         }
 
         if (n && n.ph) {
-            var fileUrlWithoutKey = getBaseUrl() + '/#' + F + '!' + htmlentities(n.ph);
-            var fileUrlWithKey = fileUrlWithoutKey + (key ? '!' + a32_to_base64(key) : '');
-            var fileUrl = window.getLinkState === false ? fileUrlWithoutKey : fileUrlWithKey;
-
-            html += '<div class="export-link-item">'
-                 +      '<div class="export-icon ' + fileicon(n) + '" ></div>'
-                 +      '<div class="export-link-text-pad">'
-                 +          '<div class="export-link-txt">'
-                 +               htmlentities(n.name) + ' <span class="export-link-gray-txt">' + fileSize + '</span>'
-                 +          '</div>'
-                 +          '<div>'
-                 +              '<input class="export-link-url" type="text" readonly="readonly" value="' + fileUrl + '">'
-                 +          '</div>'
-                 +          '<span class="file-link-without-key hidden">' + fileUrlWithoutKey + '</span>'
-                 +          '<span class="file-link-with-key hidden">' + fileUrlWithKey + '</span>'
-                 +      '</div>'
-                 +  '</div>';
+            html = itemExportLink(n.ph, key, f, fileSize);
         }
     }
     
@@ -7684,8 +7717,7 @@ function linksDialog(close) {
         $('.export-links-warning').addClass('hidden');
     });
     
-    $('.export-links-dialog .fm-dialog-close').unbind('click');
-    $('.export-links-dialog .fm-dialog-close').bind('click', function() {
+    $('.export-links-dialog .fm-dialog-close').rebind('click', function() {
         linksDialog(1);
     });
 
@@ -7698,9 +7730,11 @@ function linksDialog(close) {
         // chrome & firefox extension:
         $("#clipboardbtn1").unbind('click');
         $("#clipboardbtn1").bind('click', function() {
+            
             if (is_chrome_firefox) {
                 mozSetClipboard(getclipboardlinks());
-            } else {
+            }
+            else {
                 $('#chromeclipboard')[0].value = getclipboardlinks();
                 $('#chromeclipboard').select();
                 document.execCommand('copy');
@@ -7709,9 +7743,11 @@ function linksDialog(close) {
         
         $('#clipboardbtn2').unbind('click');
         $('#clipboardbtn2').bind('click', function() {
+            
             if (is_chrome_firefox) {
                 mozSetClipboard(getclipboardkeys());
-            } else {
+            }
+            else {
                 $('#chromeclipboard')[0].value = getclipboardkeys();
                 $('#chromeclipboard').select();
                 document.execCommand('copy');
@@ -7719,12 +7755,14 @@ function linksDialog(close) {
         });
         $('#clipboardbtn1').text(l[370]);
         $('#clipboardbtn2').text(l[1033]);
-    } else if (flashIsEnabled()) {
+    }
+    else if (flashIsEnabled()) {
         $('#clipboardbtn1 span').html(htmlentities(l[370]) + '<object data="OneClipboard.swf" id="clipboardswf1" type="application/x-shockwave-flash"  width="100%" height="32" allowscriptaccess="always"><param name="wmode" value="transparent"><param value="always" name="allowscriptaccess"><param value="all" name="allowNetworkin"><param name=FlashVars value="buttonclick=1" /></object>');
         $('#clipboardbtn2 span').html(htmlentities(l[1033]) + '<object data="OneClipboard.swf" id="clipboardswf2" type="application/x-shockwave-flash"  width="100%" height="32" allowscriptaccess="always"><param name="wmode" value="transparent"><param value="always" name="allowscriptaccess"><param value="all" name="allowNetworkin"><param name=FlashVars value="buttonclick=1" /></object>');
 
         $('#clipboardbtn1').unbind('mouseover');
         $('#clipboardbtn1').bind('mouseover', function() {
+            
             var e = $('#clipboardswf1')[0];
             if (e && e.setclipboardtext) {
                 e.setclipboardtext(getclipboardlinks());
@@ -7733,12 +7771,14 @@ function linksDialog(close) {
         
         $('#clipboardbtn2').unbind('mouseover');
         $('#clipboardbtn2').bind('mouseover', function() {
+            
             var e = $('#clipboardswf2')[0];
             if (e && e.setclipboardtext) {
                 e.setclipboardtext(getclipboardkeys());
             }
         });
-    } else {
+    }
+    else {
         // Hide the clipboard buttons if not using the extension and Flash is disabled
         $('#clipboardbtn1').addClass('hidden');
         $('#clipboardbtn2').addClass('hidden');
@@ -7755,7 +7795,8 @@ function linksDialog(close) {
                 // Show link with key
                 var fileLinkWithKey = $('.file-link-with-key').text();
                 $('.export-link-url').val(fileLinkWithKey);
-            } else {
+            }
+            else {
                 $(elem).closest('.on_off').removeClass('on').addClass('off');
 
                 // Show link without key
@@ -7769,12 +7810,16 @@ function linksDialog(close) {
     if (typeof window.getLinkState === 'undefined') {
         $('.export-checkbox').removeClass('off').addClass('on');
     }
+    
     $('.export-links-dialog').addClass('file-keys-view');
     $('.export-links-dialog .export-link-body').html(html);
+    
     fm_showoverlay();
+    
     $('.export-links-warning').removeClass('hidden');
     $('.fm-dialog.export-links-dialog').removeClass('hidden');
     $('.export-link-body').removeAttr('style');
+    
     if ($('.export-link-body').outerHeight() === 384) {// ToDo: How did I find this integer?
         $('.export-link-body').jScrollPane({showArrows: true, arrowSize: 5});
         jScrollFade('.export-link-body');
@@ -7782,16 +7827,13 @@ function linksDialog(close) {
     $('.fm-dialog.export-links-dialog').css('margin-top', $('.fm-dialog.export-links-dialog').outerHeight() / 2 * - 1);
 }
 
-function refreshDialogContent()
-{
+function refreshDialogContent() {
     // Refresh dialog content with newly created directory
     var b = $('.content-panel.cloud-drive').html();
-    if ($.copyDialog)
-    {
+    if ($.copyDialog) {
         handleDialogTabContent('cloud-drive', 'ul', 'copy', b);
     }
-    else if ($.moveDialog)
-    {
+    else if ($.moveDialog) {
         handleDialogTabContent('cloud-drive', 'ul', 'move', b);
     }
 }
@@ -7835,17 +7877,17 @@ function createfolderDialog(close)
             $('.create-folder-dialog').addClass('active');
     });
     $('.create-folder-dialog input').unbind('keypress');
-    $('.create-folder-dialog input').bind('keypress', function(e)
-    {
-        if (e.which == 13 && $(this).val() !== '')
-        {
-            if (!$.cftarget)
+    $('.create-folder-dialog input').bind('keypress', function(e) {
+        
+        if (e.which === 13 && $(this).val() !== '') {
+            if (!$.cftarget) {
                 $.cftarget = M.currentdirid;
+            }
             createfolder($.cftarget, $(this).val());
-//            refreshDialogContent();
             createfolderDialog(1);
         }
     });
+    
     $('.create-folder-dialog .fm-dialog-close, .create-folder-button-cancel.dialog').unbind('click');
     $('.create-folder-dialog .fm-dialog-close, .create-folder-button-cancel.dialog').bind('click', function()
     {
@@ -7861,21 +7903,24 @@ function createfolderDialog(close)
     });
 
     $('.fm-dialog-new-folder-button').unbind('click');
-    $('.fm-dialog-new-folder-button').bind('click', function()
-    {
+    $('.fm-dialog-new-folder-button').bind('click', function() {
+        
         var v = $('.create-folder-dialog input').val();
-        if (v == '' || v == l[157])
+        
+        if (v == '' || v == l[157]) {
             alert(l[1024]);
-        else
-        {
-            if (!$.cftarget)
+        }
+        else {
+            if (!$.cftarget) {
                 $.cftarget = M.currentdirid;
+            }
             createfolder($.cftarget, v);
-//            refreshDialogContent();
             createfolderDialog(1);
         }
     });
+    
     fm_showoverlay();
+    
     $('.fm-dialog.create-folder-dialog').removeClass('hidden');
     $('.create-folder-input-bl input').focus();
     $('.create-folder-dialog').removeClass('active');
@@ -8993,7 +9038,10 @@ function fm_resize_handler() {
 }
 
 function sharedfolderUI() {
-    var r = false;
+    
+    var c,
+        n = M.d[M.currentdirid],
+        r = false;
 
     if ($('.shared-details-block').length > 0) {
         $('.shared-details-block .shared-folder-content').unwrap();
@@ -9002,7 +9050,6 @@ function sharedfolderUI() {
         r = true;
     }
 
-    var c, n = M.d[M.currentdirid];
     if (!n || n.p.length !== 11) {
         n = null;
 
@@ -9011,8 +9058,9 @@ function sharedfolderUI() {
             c = M.d[p[0]];
             n = M.d[p[p.length - 3]];
 
-            if (!n || n.p.length !== 11)
+            if (!n || n.p.length !== 11) {
                 n = 0;
+            }
         }
     }
 
@@ -9025,16 +9073,16 @@ function sharedfolderUI() {
             avatar = '<img src="' + av_meta.avatarUrl + '">';
 
         var rights = l[55], rightsclass = ' read-only';
-        if (n.r == 1) {
+        if (n.r === 1) {
             rights = l[56];
             rightsclass = ' read-and-write';
-        } else if (n.r == 2) {
+        } else if (n.r === 2) {
             rights = l[57];
             rightsclass = ' full-access';
         }
 
         var e = '.files-grid-view.fm';
-        if (M.viewmode == 1)
+        if (M.viewmode === 1)
             e = '.fm-blocks-view.fm';
 
         $(e).wrap('<div class="shared-details-block"></div>');
@@ -9062,11 +9110,6 @@ function sharedfolderUI() {
                 +'</div>'
             +'</div>');
         $(e).addClass('shared-folder-content');
-
-        // fm_resize_handler();
-
-        // if (M.viewmode == 1) initFileblocksScrolling();
-        // else initGridScrolling();
 
         Soon(function() {
             $(window).trigger('resize');

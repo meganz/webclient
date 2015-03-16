@@ -1,13 +1,15 @@
-var pro_package;
-var pro_packs = [];
-var pro_balance = 0;
-var pro_paymentmethod;
-var pro_m;
-var pro_usebalance=false;
+var pro_package,
+    pro_packs = [],
+	pro_balance = 0,
+	pro_paymentmethod,
+	pro_m,
+	memberships = [],
+	pro_usebalance=false;
 
 
-function init_pro()
+function init_pro(key)
 {
+	if (key) $('.main-pad-block').addClass('key');
     
 	if (u_type == 3)
 	{
@@ -30,23 +32,32 @@ function init_pro()
 	
 	
 	$('body').addClass('pro');
-	if (lang != 'en') $('body').addClass(lang);	
-	json = JSON.parse(pro_json);				
-	for (var i in json[0])
-	{
-		if      ((json[0][i][2] == '500') && (json[0][i][5] == '9.99')) 	pro_packs['pro1_month'] = json[0][i];
-		else if ((json[0][i][2] == '500') && (json[0][i][5] == '99.99')) 	pro_packs['pro1_year'] 	= json[0][i];
-		else if ((json[0][i][2] == '2048') && (json[0][i][5] == '19.99')) 	pro_packs['pro2_month'] = json[0][i];
-		else if ((json[0][i][2] == '2048') && (json[0][i][5] == '199.99')) 	pro_packs['pro2_year'] 	= json[0][i];
-		else if ((json[0][i][2] == '4096') && (json[0][i][5] == '29.99')) 	pro_packs['pro3_month'] = json[0][i];
-		else if ((json[0][i][2] == '4096') && (json[0][i][5] == '299.99')) 	pro_packs['pro3_year'] 	= json[0][i];		
-	}
+	if (lang !== 'en') $('.reg-st3-save-txt').addClass(lang);
+    if (lang == 'fr') $('.reg-st3-big-txt').each(function(e,o){$(o).html($(o).html().replace('GB','Go').replace('TB','To'));});
+	
+	
 	if (!m)
 	{
-	   if (lang !== 'en') $('.reg-st3-save-txt').addClass(lang);
-	   if (lang == 'fr') $('.reg-st3-big-txt').each(function(e,o){$(o).html($(o).html().replace('GB','Go').replace('TB','To'));});
-	
 	   
+	    api_req(
+        { a : 'utqa'},
+		    { 
+			  callback : function (res) 
+			  {
+				  memberships = res;
+				 
+				  for ( var i = 0, l = memberships.length; i < l; i++ ) {
+					  if (memberships[i][4] == 1) {
+                        $('.reg-st3-membership-bl.pro' + memberships[i][1] + ' .price .num').html(memberships[i][5].split('.')[0]+'<span class="small">.'+memberships[i][5].split('.')[1]+' &euro;</span>');
+					  }
+				  }
+			  }
+	        }
+	    );	
+		
+		if (lang !== 'en') $('.reg-st3-save-txt').addClass(lang);
+	    if (lang == 'fr') $('.reg-st3-big-txt').each(function(e,o){$(o).html($(o).html().replace('GB','Go').replace('TB','To'));});
+	     
 	    $('.membership-step1 .reg-st3-membership-bl').unbind('click');
 		$('.membership-step1 .reg-st3-membership-bl').bind('click',function(e)
 		{		
@@ -67,18 +78,22 @@ function init_pro()
 			if (page == 'fm') document.location.hash = '#start';
 		    else document.location.hash = '#fm';
 		    return false;
-			
 		});
 		
 		$('.membership-button').unbind('click');
 		$('.membership-button').bind('click',function(e)
 		{
-			var membership,
+			var m,
 			    $membershipBlock = $(this).closest('.reg-st3-membership-bl');
+				
 			$('.reg-st3-membership-bl').removeClass('selected');
 			$membershipBlock.addClass('selected');
-			membership = $membershipBlock.attr('class').split(' ')[1];
-			pro_next_step(membership);
+			
+			m = $membershipBlock.attr('data-payment');
+			$membershipBlock.clone().appendTo( '.membership-selected-block');
+				
+			pro_next_step(m);
+			
 		});		
 		
 		$('.pro-bottom-button').unbind('click');
@@ -94,13 +109,28 @@ function pro_next_step(m) {
 	var currentDate = new Date(),
 	    monthName=new Array("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"),
 	    mon = monthName[currentDate.getMonth()],
-		day = currentDate.getDate();
-	$('.membership-step1 ').addClass('hidden');
-	$('.membership-step2 ').removeClass('hidden');
-	$('.membership-step2 .reg-st3-membership-bl').removeClass('lite pro1 pro2 pro3').addClass(m);
-	$('.main-scroll-block').jScrollPane({showArrows:true,arrowSize:5,animateScroll:true,verticalDragMinHeight:150,enableKeyboardNavigation:true});
+		day = currentDate.getDate(),
+		pricePerMonth, pricePerYear;
+		
+	for (var i in memberships) {
+		  if (memberships[i][1] == m ) {
+			  if (memberships[i][4] == 1 ) pricePerMonth = memberships[i][5];
+			  else pricePerYear = memberships[i][5];
+		  }
+	}
+		
+	$('.membership-step1').addClass('hidden');
+	$('.membership-step2').removeClass('hidden');
+	mainScroll();
+	
 	$('.membership-date .month').text(mon);
 	$('.membership-date .day').text(day);
+	
+	$('.membership-dropdown-item').each(function() {
+	   if($(this).attr('data-months')<12)
+       $(this).find('strong').html(pricePerMonth * $(this).attr('data-months'));
+	   else $(this).find('strong').html(pricePerYear);
+    });
 	
 	$('.membership-st2-select span').unbind('click');
 	$('.membership-st2-select span').bind('click',function()
@@ -112,15 +142,21 @@ function pro_next_step(m) {
 	$('.membership-dropdown-item').unbind('click');
 	$('.membership-dropdown-item').bind('click',function()
 	{		
+	    var price = $(this).find('strong').html();
+	    $('.membership-dropdown-item').removeClass('selected');
+		$(this).addClass('selected');
 		$('.membership-st2-select').removeClass('active');
 		$('.membership-st2-select span').html($(this).html());
-		$('.membership-center.inactive').removeClass('inactive');
+		if (price) {
+		   $('.membership-center.inactive').removeClass('inactive');
+		   $('.membership-bott-price strong').html(price.split('.')[0]+'<span>.' + price.split('.')[1] + ' &euro;</span>');
+		}
 	});
 	
 	$('.membership-bott-button').unbind('click');
 	$('.membership-bott-button').bind('click',function(e)
 	{		
-		if ($('.membership-center').attr('class').indexOf('inactive')) {
+		if ($('.membership-center').attr('class').indexOf('inactive')==-1) {
 			pro_proceed(e);
             return false;
 		}
@@ -131,13 +167,10 @@ function pro_next_step(m) {
 function pro_proceed(e)
 {
 	if (page == 'key') sessionStorage.proref = 'accountcompletion';
-
-	var c = $('.reg-st3-membership-bl.selected').attr('class');
 	
-	if(c.indexOf('lite') > -1) pro_package = 'lite_month';
-	else if(c.indexOf('pro1') > -1) pro_package = 'pro1_month';
-	else if(c.indexOf('pro2') > -1) pro_package = 'pro2_month';	
-	else if(c.indexOf('pro3') > -1) pro_package = 'pro3_month';
+	if ($('.membership-dropdown-item.selected').attr('data-months')<12)
+         pro_package = 'pro' + m + '_month';
+	else pro_package = 'pro' + m + '_year';
 	
 
     megaAnalytics.log("pro", "proc");
@@ -187,8 +220,6 @@ function pro_pay()
     if(!ul_uploading && !downloading) {
         redirectToPaypal();
     }
-	
-	
 
     api_req({ a : 'uts', it: 0, si: pro_packs[pro_package][0], p: pro_packs[pro_package][5], c: pro_packs[pro_package][6], aff: aff, 'm':m},
 	{

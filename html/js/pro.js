@@ -9,7 +9,10 @@ var pro_package,
 
 function init_pro(key)
 {
-	if (key) $('.main-pad-block').addClass('key');
+	if (key) {
+		$('.main-pad-block').addClass('key');
+	    sessionStorage.proref = 'accountcompletion';
+	}
     
 	if (u_type == 3)
 	{
@@ -106,6 +109,19 @@ function init_pro(key)
 
 //Step2
 function pro_next_step(m) {
+	
+	if(!u_handle) {
+        megaAnalytics.log("pro", "loginreq");
+        //msgDialog('loginrequired', 'title', 'msg');
+        showSignupPromptDialog();
+        return;
+    } else if(isEphemeral()) {
+        showRegisterDialog();
+        return;
+    }
+	
+	megaAnalytics.log("pro", "proc");
+	
 	var currentDate = new Date(),
 	    monthName=new Array("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"),
 	    mon = monthName[currentDate.getMonth()],
@@ -155,42 +171,21 @@ function pro_next_step(m) {
 	
 	$('.membership-bott-button').unbind('click');
 	$('.membership-bott-button').bind('click',function(e)
-	{		
+	{	
 		if ($('.membership-center').attr('class').indexOf('inactive')==-1) {
-			pro_proceed(e);
+			if ($('.membership-dropdown-item.selected').attr('data-months')<12)
+                 pro_package = 'pro' + m + '_month';
+	        else pro_package = 'pro' + m + '_year';
+			
+			pro_continue(e);
             return false;
 		}
 	});
 	
 }
 
-function pro_proceed(e)
+function pro_continue(e)
 {
-	if ($('.main-pad-block').attr('class').indexOf('key')>-1) sessionStorage.proref = 'accountcompletion';
-	
-	if ($('.membership-dropdown-item.selected').attr('data-months')<12)
-         pro_package = 'pro' + m + '_month';
-	else pro_package = 'pro' + m + '_year';
-	
-
-    megaAnalytics.log("pro", "proc");
-
-	if (pro_package) pro_continue();
-}
-
-function pro_continue()
-{
-
-    if(!u_handle) {
-        megaAnalytics.log("pro", "loginreq");
-        //msgDialog('loginrequired', 'title', 'msg');
-        showSignupPromptDialog();
-        return;
-    } else if(isEphemeral()) {
-        showRegisterDialog();
-        return;
-    }
-
 	pro_paymentmethod='';
 	if (u_type === false)
 	{

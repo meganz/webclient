@@ -91,7 +91,7 @@ function init_pro(key)
 			
 			m = $membershipBlock.attr('data-payment');
 			$membershipBlock.clone().appendTo( '.membership-selected-block');
-				
+			$('.membership-step2 .pro span').html($membershipBlock.find('.reg-st3-bott-title.title').html())	;
 			pro_next_step(m);
 			
 		});		

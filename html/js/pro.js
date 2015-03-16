@@ -166,7 +166,7 @@ function pro_next_step(m) {
 
 function pro_proceed(e)
 {
-	if (page == 'key') sessionStorage.proref = 'accountcompletion';
+	if ($('.main-pad-block').attr('class').indexOf('key')>-1) sessionStorage.proref = 'accountcompletion';
 	
 	if ($('.membership-dropdown-item.selected').attr('data-months')<12)
          pro_package = 'pro' + m + '_month';

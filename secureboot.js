@@ -284,7 +284,7 @@ function compareHashes(hashFromWorker, fileName) {
     var startOfHash = fileName.lastIndexOf('_') + 1;
     var endOfHash = fileName.lastIndexOf('.');
     var hashFromDeployment = fileName.substring(startOfHash, endOfHash);
-    
+
     if (hashFromWorker === hashFromDeployment) {
         //console.log('Hash match on file: ' + fileName + '. Hash from worker thread: ' + hashFromWorker + ' Hash from deployment script: ' + hashFromDeployment);
         return true;
@@ -644,7 +644,7 @@ else if (!b_u)
             return false;
         };
     }
-    
+
     function detectlang()
     {
         if (!navigator.language) return 'en';
@@ -654,7 +654,7 @@ else if (!b_u)
         for (var l in l2) for (b in l2[l]) if (l2[l][b].substring(0,3)==bl.substring(0,3)) return l;
         return 'en';
     }
-    
+
     /**
      * Gets the file path for a language file
      * @param {String} language
@@ -664,13 +664,13 @@ else if (!b_u)
     {
         // If the sh1 (filename with hashes) array has been created from deploy script
         if (typeof sh1 !== 'undefined') {
-            
+
             // Search the array
             for (var i = 0, length = sh1.length; i < length; i++)
             {
                 var filePath = sh1[i];
 
-                // If the language e.g. 'en' matches part of the filename from the deploy script e.g. 
+                // If the language e.g. 'en' matches part of the filename from the deploy script e.g.
                 // 'lang/en_0a8e1591149050ef1884b0c4abfbbeb759bbe9eaf062fa54e5b856fdb78e1eb3.json'
                 if (filePath.indexOf('lang/' + language) > -1)
                 {
@@ -683,17 +683,17 @@ else if (!b_u)
             return 'lang/' + language + '.json';
         }
     }
-    
+
     var lang = detectlang();
     var jsl = [];
-    
+
     // If they've already selected a language, use that
     if ((typeof localStorage != 'undefined') && (localStorage.lang)) {
         if (languages[localStorage.lang]) {
             lang = localStorage.lang;
         }
     }
-    
+
     // Get the language file path e.g. lang/en.json or 'lang/en_7a8e15911490...f1878e1eb3.json'
     var langFilepath = getLanguageFilePath(lang);
 
@@ -705,7 +705,6 @@ else if (!b_u)
     jsl.push({f:'js/jsbn.js', n: 'jsbn_js', j:1,w:2});
     jsl.push({f:'js/jsbn2.js', n: 'jsbn2_js', j:1,w:2});
     jsl.push({f:'js/jodid25519.js', n: 'jodid25519_js', j:1,w:7});
-    jsl.push({f:'js/stringcrypt.js', n: 'stringcrypt_js', j:1});
     jsl.push({f:'js/user.js', n: 'user_js', j:1});
     jsl.push({f:'js/authring.js', n: 'authring_js', j:1});
     jsl.push({f:'js/mouse.js', n: 'mouse_js', j:1});
@@ -713,7 +712,6 @@ else if (!b_u)
     jsl.push({f:'js/functions.js', n: 'functions_js', j:1});
     jsl.push({f:'js/megaLogger.js', n: 'megaLogger_js', j:1});
     jsl.push({f:'js/jquery-ui-1.11.2.js', n: 'jqueryui_js', j:1,w:10});
-    jsl.push({f:'js/base64.js', n: 'base64_js', j:1});
     jsl.push({f:'js/filedrag.js', n: 'filedrag_js', j:1});
     jsl.push({f:'js/jquery.mousewheel.js', n: 'jquerymouse_js', j:1});
     jsl.push({f:'js/jquery.jscrollpane.js', n: 'jscrollpane_js', j:1});
@@ -787,118 +785,115 @@ else if (!b_u)
 
     jsl.push({f:'js/chat/karereEventObjects.js', n: 'keo_js', j:1,w:7});
     jsl.push({f:'js/chat/karere.js', n: 'karere_js', j:1,w:7});
-	jsl.push({f:'html/chat.html', n: 'chat', j:0});
+    jsl.push({f:'html/chat.html', n: 'chat', j:0});
     jsl.push({f:'js/chat/chat.js', n: 'chat_js', j:1,w:7});
     jsl.push({f:'js/chat/chatRoom.js', n: 'chat_js', j:1,w:7});
 
     // END OF MEGA CHAT
 
-	jsl.push({f:'js/fm.js', n: 'fm_js', j:1,w:12});
-	jsl.push({f:'js/filetypes.js', n: 'filetypes_js', j:1});
-	jsl.push({f:'js/miniui.js', n: 'miniui_js', j:1});
-	if (is_extension)
-	{
-		jsl.push({f:'js/dcraw.js', n: 'dcraw_js', j:1});
-	}
-	/* better download */
-	jsl.push({f:'js/xhr.js', n: 'xhr_js', j:1});
-	jsl.push({f:'js/events.js', n: 'events', j:1,w:4});
-	jsl.push({f:'js/queue.js', n: 'queue', j:1,w:4});
-	jsl.push({f:'js/downloadChrome.js', n: 'dl_chrome', j:1,w:3});
-	if (is_chrome_firefox && parseInt(Services.appinfo.version) > 27)
-	{
-		is_chrome_firefox |= 4;
-		jsl.push({f:'js/downloadFirefox.js', n: 'dl_firefox', j:1,w:3});
-	}
-	else
-	{
-		jsl.push({f:'js/downloadMemory.js', n: 'dl_memory', j:1,w:3});
-		jsl.push({f:'js/downloadFlash.js', n: 'dl_flash', j:1,w:3});
-	}
-	jsl.push({f:'js/downloader.js', n: 'dl_downloader', j:1,w:3});
-	jsl.push({f:'js/download2.js', n: 'dl_js', j:1,w:3});
-	jsl.push({f:'js/upload2.js', n: 'upload_js', j:1,w:2});
-	/* end better download */
-	jsl.push({f:'index.js', n: 'index', j:1,w:4});
-	jsl.push({f:'html/start.html', n: 'start', j:0});
-	jsl.push({f:'html/megainfo.html', n: 'megainfo', j:0});
-	jsl.push({f:'html/js/start.js', n: 'start_js', j:1});
-	jsl.push({f:'html/bottom2.html', n: 'bottom2',j:0});
-	jsl.push({f:'html/key.html', n: 'key', j:0});
-	jsl.push({f:'html/js/key.js', n: 'key_js', j:1});
-	jsl.push({f:'html/pro.html', n: 'pro', j:0});
-	jsl.push({f:'html/js/pro.js', n: 'pro_js', j:1});
-	jsl.push({f:'html/login.html', n: 'login', j:0});
-	jsl.push({f:'html/js/login.js', n: 'login_js', j:1});
-	jsl.push({f:'html/fm.html', n: 'fm', j:0,w:3});
-	jsl.push({f:'html/top.html', n: 'top', j:0});
-	jsl.push({f:'js/notifications.js', n: 'notifications_js', j:1});
-	jsl.push({f:'css/style.css', n: 'style_css', j:2,w:30,c:1,d:1,cache:1});
-	jsl.push({f:'js/avatar.js', n: 'avatar_js', j:1,w:3});
-	jsl.push({f:'js/countries.js', n: 'countries_js', j:1});
-	jsl.push({f:'html/dialogs.html', n: 'dialogs', j:0,w:2});
-	jsl.push({f:'html/transferwidget.html', n: 'transferwidget', j:0});
-	jsl.push({f:'js/checkboxes.js', n: 'checkboxes_js', j:1});
-	jsl.push({f:'js/Int64.js', n: 'int64_js', j:1});
-	jsl.push({f:'js/zip64.js', n: 'zip_js', j:1});
-	jsl.push({f:'js/cms.js', n: 'cms_js', j:1});
-	jsl.push({f:'js/analytics.js', n: 'analytics_js', j:1});
+    jsl.push({f:'js/fm.js', n: 'fm_js', j:1,w:12});
+    jsl.push({f:'js/filetypes.js', n: 'filetypes_js', j:1});
+    jsl.push({f:'js/miniui.js', n: 'miniui_js', j:1});
+    if (is_extension)
+    {
+        jsl.push({f:'js/dcraw.js', n: 'dcraw_js', j:1});
+    }
+    /* better download */
+    jsl.push({f:'js/xhr.js', n: 'xhr_js', j:1});
+    jsl.push({f:'js/queue.js', n: 'queue', j:1,w:4});
+    jsl.push({f:'js/downloadChrome.js', n: 'dl_chrome', j:1,w:3});
+    if (is_chrome_firefox && parseInt(Services.appinfo.version) > 27)
+    {
+        is_chrome_firefox |= 4;
+        jsl.push({f:'js/downloadFirefox.js', n: 'dl_firefox', j:1,w:3});
+    }
+    else
+    {
+        jsl.push({f:'js/downloadMemory.js', n: 'dl_memory', j:1,w:3});
+        jsl.push({f:'js/downloadFlash.js', n: 'dl_flash', j:1,w:3});
+    }
+    jsl.push({f:'js/downloader.js', n: 'dl_downloader', j:1,w:3});
+    jsl.push({f:'js/download2.js', n: 'dl_js', j:1,w:3});
+    jsl.push({f:'js/upload2.js', n: 'upload_js', j:1,w:2});
+    /* end better download */
+    jsl.push({f:'index.js', n: 'index', j:1,w:4});
+    jsl.push({f:'html/start.html', n: 'start', j:0});
+    jsl.push({f:'html/megainfo.html', n: 'megainfo', j:0});
+    jsl.push({f:'html/js/start.js', n: 'start_js', j:1});
+    jsl.push({f:'html/bottom2.html', n: 'bottom2',j:0});
+    jsl.push({f:'html/key.html', n: 'key', j:0});
+    jsl.push({f:'html/js/key.js', n: 'key_js', j:1});
+    jsl.push({f:'html/pro.html', n: 'pro', j:0});
+    jsl.push({f:'html/js/pro.js', n: 'pro_js', j:1});
+    jsl.push({f:'html/login.html', n: 'login', j:0});
+    jsl.push({f:'html/js/login.js', n: 'login_js', j:1});
+    jsl.push({f:'html/fm.html', n: 'fm', j:0,w:3});
+    jsl.push({f:'html/top.html', n: 'top', j:0});
+    jsl.push({f:'js/notifications.js', n: 'notifications_js', j:1});
+    jsl.push({f:'css/style.css', n: 'style_css', j:2,w:30,c:1,d:1,cache:1});
+    jsl.push({f:'js/avatar.js', n: 'avatar_js', j:1,w:3});
+    jsl.push({f:'js/countries.js', n: 'countries_js', j:1});
+    jsl.push({f:'html/dialogs.html', n: 'dialogs', j:0,w:2});
+    jsl.push({f:'html/transferwidget.html', n: 'transferwidget', j:0});
+    jsl.push({f:'js/jquery.checkboxes.js', n: 'checkboxes_js', j:1});
+    jsl.push({f:'js/Int64.js', n: 'int64_js', j:1});
+    jsl.push({f:'js/zip64.js', n: 'zip_js', j:1});
+    jsl.push({f:'js/cms.js', n: 'cms_js', j:1});
 
-	// only used on beta
-	if (onBetaW) {
-		jsl.push({f: 'js/betacrashes.js', n: 'betacrashes_js', j: 1});
-	}
+    // only used on beta
+    if (onBetaW) {
+        jsl.push({f: 'js/betacrashes.js', n: 'betacrashes_js', j: 1});
+    }
 
-	var jsl2 =
-	{
-		'about': {f:'html/about.html', n: 'about', j:0},
-		'blog': {f:'html/blog.html', n: 'blog', j:0},
-		'blog_js': {f:'html/js/blog.js', n: 'blog_js', j:1},
-		'blogarticle': {f:'html/blogarticle.html', n: 'blogarticle', j:0},
-		'blogarticle_js': {f:'html/js/blogarticle.js', n: 'blogarticle_js', j:1},
-		'register': {f:'html/register.html', n: 'register', j:0},
-		'register_js': {f:'html/js/register.js', n: 'register_js', j:1},
-		'resellers': {f:'html/resellers.html', n: 'resellers', j:0},
-		'download': {f:'html/download.html', n: 'download', j:0},
-		'download_js': {f:'html/js/download.js', n: 'download_js', j:1},
-		'copyright': {f:'html/copyright.html', n: 'copyright', j:0},
-		'copyrightnotice': {f:'html/copyrightnotice.html', n: 'copyrightnotice', j:0},
-		'copyrightnotice_js': {f:'html/js/copyrightnotice.js', n: 'copyrightnotice_js', j:1},
-		'privacy': {f:'html/privacy.html', n: 'privacy', j:0},
-		'terms': {f:'html/terms.html', n: 'terms', j:0},
-		'backup': {f:'html/backup.html', n: 'backup', j:0},
-		'backup_js': {f:'html/js/backup.js', n: 'backup_js', j:1},
-		'cancel': {f:'html/cancel.html', n: 'cancel', j:0},
-		'cancel_js': {f:'html/js/cancel.js', n: 'cancel_js', j:1},
-		'reset': {f:'html/reset.html', n: 'reset', j:0},
-		'reset_js': {f:'html/js/reset.js', n: 'reset_js', j:1},
-		'filesaver': {f:'js/filesaver.js', n: 'filesaver', j:1},
-		'recovery': {f:'html/recovery.html', n: 'recovery', j:0},
-		'recovery_js': {f:'html/js/recovery.js', n: 'recovery_js', j:1},
-		'credits': {f:'html/credits.html', n: 'credits', j:0},
-		'takedown': {f:'html/takedown.html', n: 'takedown', j:0},
-		'dev': {f:'html/dev.html', n: 'dev', j:0},
-		'arkanoid_js': {f:'js/arkanoid.js', n: 'arkanoid_js', j:1},
-		'dev_js': {f:'html/js/dev.js', n: 'dev_js', j:1},
-		'sdkterms': {f:'html/sdkterms.html', n: 'sdkterms', j:0},
-		'help_js': {f:'html/js/help.js', n: 'help_js', j:1},
-		'firefox': {f:'html/firefox.html', n: 'firefox', j:0},
-		'sync': {f:'html/sync.html', n: 'sync', j:0},
-		'sync_js': {f:'html/js/sync.js', n: 'sync_js', j:1},
-		'mobile': {f:'html/mobile.html', n: 'mobile', j:0},
-		'affiliates': {f:'html/affiliates.html', n: 'affiliates', j:0},
-		'affiliate_js': {f:'html/js/affiliate.js', n: 'affiliate_js', j:0},
-		'affiliateterms': {f:'html/affiliateterms.html', n: 'affiliateterms', j:0},
-		'affiliatesignup': {f:'html/affiliatesignup.html', n: 'affiliatesignup', j:0},
-		'affiliatesignup_js': {f:'html/js/affiliatesignup.js', n: 'affiliatesignup_js', j:1},
-		'affiliatemember': {f:'html/affiliatemember.html', n: 'affiliatemember', j:0},
-		'affiliatemember_js': {f:'html/js/affiliatemember.js', n: 'affiliatemember_js', j:1},
-		'contact': {f:'html/contact.html', n: 'contact', j:0},
-		'privacycompany': {f:'html/privacycompany.html', n: 'privacycompany', j:0},
-		'chrome': {f:'html/chrome.html', n: 'chrome', j:0},
-		'zxcvbn_js': {f:'js/zxcvbn.js', n: 'zxcvbn_js', j:1}
-	};
-	
+    var jsl2 =
+    {
+        'about': {f:'html/about.html', n: 'about', j:0},
+        'blog': {f:'html/blog.html', n: 'blog', j:0},
+        'blog_js': {f:'html/js/blog.js', n: 'blog_js', j:1},
+        'blogarticle': {f:'html/blogarticle.html', n: 'blogarticle', j:0},
+        'blogarticle_js': {f:'html/js/blogarticle.js', n: 'blogarticle_js', j:1},
+        'register': {f:'html/register.html', n: 'register', j:0},
+        'register_js': {f:'html/js/register.js', n: 'register_js', j:1},
+        'resellers': {f:'html/resellers.html', n: 'resellers', j:0},
+        'download': {f:'html/download.html', n: 'download', j:0},
+        'download_js': {f:'html/js/download.js', n: 'download_js', j:1},
+        'copyright': {f:'html/copyright.html', n: 'copyright', j:0},
+        'copyrightnotice': {f:'html/copyrightnotice.html', n: 'copyrightnotice', j:0},
+        'copyrightnotice_js': {f:'html/js/copyrightnotice.js', n: 'copyrightnotice_js', j:1},
+        'privacy': {f:'html/privacy.html', n: 'privacy', j:0},
+        'terms': {f:'html/terms.html', n: 'terms', j:0},
+        'backup': {f:'html/backup.html', n: 'backup', j:0},
+        'backup_js': {f:'html/js/backup.js', n: 'backup_js', j:1},
+        'cancel': {f:'html/cancel.html', n: 'cancel', j:0},
+        'cancel_js': {f:'html/js/cancel.js', n: 'cancel_js', j:1},
+        'reset': {f:'html/reset.html', n: 'reset', j:0},
+        'reset_js': {f:'html/js/reset.js', n: 'reset_js', j:1},
+        'filesaver': {f:'js/filesaver.js', n: 'filesaver', j:1},
+        'recovery': {f:'html/recovery.html', n: 'recovery', j:0},
+        'recovery_js': {f:'html/js/recovery.js', n: 'recovery_js', j:1},
+        'credits': {f:'html/credits.html', n: 'credits', j:0},
+        'takedown': {f:'html/takedown.html', n: 'takedown', j:0},
+        'dev': {f:'html/dev.html', n: 'dev', j:0},
+        'dev_js': {f:'html/js/dev.js', n: 'dev_js', j:1},
+        'sdkterms': {f:'html/sdkterms.html', n: 'sdkterms', j:0},
+        'help_js': {f:'html/js/help.js', n: 'help_js', j:1},
+        'firefox': {f:'html/firefox.html', n: 'firefox', j:0},
+        'sync': {f:'html/sync.html', n: 'sync', j:0},
+        'sync_js': {f:'html/js/sync.js', n: 'sync_js', j:1},
+        'mobile': {f:'html/mobile.html', n: 'mobile', j:0},
+        'affiliates': {f:'html/affiliates.html', n: 'affiliates', j:0},
+        'affiliate_js': {f:'html/js/affiliate.js', n: 'affiliate_js', j:0},
+        'affiliateterms': {f:'html/affiliateterms.html', n: 'affiliateterms', j:0},
+        'affiliatesignup': {f:'html/affiliatesignup.html', n: 'affiliatesignup', j:0},
+        'affiliatesignup_js': {f:'html/js/affiliatesignup.js', n: 'affiliatesignup_js', j:1},
+        'affiliatemember': {f:'html/affiliatemember.html', n: 'affiliatemember', j:0},
+        'affiliatemember_js': {f:'html/js/affiliatemember.js', n: 'affiliatemember_js', j:1},
+        'contact': {f:'html/contact.html', n: 'contact', j:0},
+        'privacycompany': {f:'html/privacycompany.html', n: 'privacycompany', j:0},
+        'chrome': {f:'html/chrome.html', n: 'chrome', j:0},
+        'zxcvbn_js': {f:'js/zxcvbn.js', n: 'zxcvbn_js', j:1}
+    };
+
     var subpages =
     {
         'about': ['about'],
@@ -914,7 +909,6 @@ else if (!b_u)
         'resellers': ['resellers'],
         '!': ['download','download_js'],
         'copyright': ['copyright'],
-        'key':['arkanoid_js'],
         'copyrightnotice': ['copyrightnotice','copyrightnotice_js'],
         'privacy': ['privacy','privacycompany'],
         'takedown': ['takedown'],
@@ -1195,11 +1189,11 @@ else if (!b_u)
             else
             {
                 if (!nocontentcheck) {
-                    
+
                     // Hash the file content and convert to hex
                     var hash = sjcl_sha256.hash.sha256.hash(jsl[this.jsi].text);
                     var hashHex = sjcl_sha256.codec.hex.fromBits(hash);
-                    
+
                     // Compare the hash from the file and the correct hash determined at deployment time
                     if (!compareHashes(hashHex, jsl[e.data.jsi].f))
                     {
@@ -1207,7 +1201,7 @@ else if (!b_u)
                         contenterror = 1;
                     }
                 }
-                
+
                 if (!contenterror)
                 {
                     jsl_current += jsl[this.jsi].w || 1;

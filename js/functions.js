@@ -13,22 +13,22 @@ var inherits = (function() {
 })();
 
 /**
- *	Check if value is contained in a array. If it is return value
- *	otherwise false
+ *  Check if value is contained in a array. If it is return value
+ *  otherwise false
  */
 function anyOf(arr, value) {
     return $.inArray(value, arr) == -1 ? false : value;
 }
 
 /**
- *	Cascade:
+ *  Cascade:
  *
- *	Tiny helper to queue related tasks, in which the output of one function
- *	is the input of the next task. It is asynchronous
+ *  Tiny helper to queue related tasks, in which the output of one function
+ *  is the input of the next task. It is asynchronous
  *
- *		function([prevarg, arg], next)
+ *      function([prevarg, arg], next)
  *
- *	Author: @crodas
+ *  Author: @crodas
  */
 function Cascade(tasks, fnc, done, value)
 {
@@ -44,10 +44,10 @@ function Cascade(tasks, fnc, done, value)
 }
 
 /**
- *	Simple interface to run things in parallel (safely) once, and
- *	get a safe callback
+ *  Simple interface to run things in parallel (safely) once, and
+ *  get a safe callback
  *
- *	Author: @crodas
+ *  Author: @crodas
  */
 function Parallel(task) {
     var callbacks = {};
@@ -102,8 +102,7 @@ function SoonFc(func, ms)
 function jScrollFade(id)
 {
 
-    $(id + ' .jspTrack').unbind('mouseover');
-    $(id + ' .jspTrack').bind('mouseover', function(e)
+    $(id + ' .jspTrack').rebind('mouseover', function(e)
     {
         $(this).find('.jspDrag').addClass('jspActive');
         $(this).closest('.jspContainer').uniqueId();
@@ -115,8 +114,7 @@ function jScrollFade(id)
     for (var i in $.jScroll)
         if ($.jScroll[i] == 0)
             delete $.jScroll[i];
-    $(id).unbind('jsp-scroll-y.fade');
-    $(id).bind('jsp-scroll-y.fade', function(event, scrollPositionY, isAtTop, isAtBottom)
+    $(id).rebind('jsp-scroll-y.fade', function(event, scrollPositionY, isAtTop, isAtBottom)
     {
         $(this).find('.jspDrag').addClass('jspActive');
         $(this).find('.jspContainer').uniqueId();
@@ -237,78 +235,78 @@ function megatitle(nperc) {
 
 function populate_l()
 {
-	// for (var i = 7000 ; i-- ; l[i] = l[i] || '(null)');
-	l[0] = 'Mega Limited ' + new Date().getFullYear();
-	if ((lang == 'es') || (lang == 'pt') || (lang == 'sk')) l[0] = 'Mega Ltd.';
-	l[1] = l[398];
-	if (lang == 'en') l[1] = 'Go Pro';
-	l[438] = l[438].replace('[X]','');
-	l['439a'] = l[439];
-	l[439] = l[439].replace('[X1]','').replace('[X2]','');
-	l['466a'] = l[466];
-	l[466] = l[466].replace('[X]','');
-	l[543] = l[543].replace('[X]','');
-	l[456] = l[456].replace(':','');
-	l['471a'] = l[471].replace('[X]',10);
-	l['471b'] = l[471].replace('[X]',100);
-	l['471c'] = l[471].replace('[X]',250);
-	l['471d'] = l[471].replace('[X]',500);
-	l['471e'] = l[471].replace('[X]',1000);
-	l['469a'] = l[469].replace('[X]',10);
-	l['469b'] = l[469].replace('[X]',100);
-	l['469c'] = l[469].replace('[X]',250);
-	l['472a'] = l[472].replace('[X]',10);
-	l['472b'] = l[472].replace('[X]',100);
-	l['472c'] = l[472].replace('[X]',250);
-	l['208a'] = l[208].replace('[A]','<a href="#terms" class="red">');
-	l['208a'] = l['208a'].replace('[/A]','</a>');
-	l[208] = l[208].replace('[A]','<a href="#terms">');
-	l[208] = l[208].replace('[/A]','</a>');
-	l[517] = l[517].replace('[A]','<a href="#help">').replace('[/A]','</a>');
-	l[521] = l[521].replace('[A]','<a href="#copyright">').replace('[/A]','</a>');
-	l[553] = l[553].replace('[A]','<a href="mailto:resellers@mega.co.nz">').replace('[/A]','</a>');
-	l[555] = l[555].replace('[A]','<a href="#terms">').replace('[/A]','</a>');
-	l[754] = l[754].replace('[A]','<a href="http://www.google.com/chrome" target="_blank" style="color:#D9290B;">');
-	l[754] = l[754].replace('[/A]','</a>');
-	l[871] = l[871].replace('[B]','<strong>').replace('[/B]','</strong>').replace('[A]','<a href="#pro">').replace('[/A]','</a>');
-	l[924] = l[924].replace('[A]','<span class="red">').replace('[/A]','</span>');
-	l[501] = l[501].replace('17','').replace('%','');
-	l[1066] = l[1066].replace('[A]','<a class="red">').replace('[/A]','</a>');
-	l[1067] = l[1067].replace('[A]','<span class="red">').replace('[/A]','</span>');
-	l[1094] = l[1094].replace('[A]','<a href="#plugin">').replace('[/A]','</a>');
-	l[1095] = l[1095].replace('[A]','<span class="red">').replace('[/A]','</span>');
-	l[1133] = l[1133].replace('[A]','<a href="http://en.wikipedia.org/wiki/Entropy" target="_blank">').replace('[/A]','</a>');
-	l[1134] = l[1134].replace('[A]','<a href="http://en.wikipedia.org/wiki/Public-key_cryptography" target="_blank">').replace('[/A]','</a>');
-	l[1148] = l[1148].replace('[A]','<span class="red">').replace('[/A]','</span>');
-	l[1151] = l[1151].replace('[A]','<span class="red">').replace('[/A]','</span>');
-	l[731] = l[731].replace('[A]','<a href="#terms">').replace('[/A]','</a>');
-	if (lang == 'en') l[965] = 'Legal & policies';
-	l[1159] = l[1159].replace('[A]','<span class="red">').replace('[/A]','</span>');
-	l[1171] = l[1171].replace('[A]','<span class="red">').replace('[/A]','</span>');
-	l[1185] = l[1185].replace('[X]','<strong>MEGA.crx</strong>');
-	l[1242] = l[1242].replace('[A]','<a href="#affiliateterms" target="_blank">').replace('[/A]','</a>');
-	l[1218] = l[1218].replace('[A]','<a href="#affiliateterms" class="red">').replace('[/A]','</a>');
-	l[1212] = l[1212].replace('[A]','<a href="#sdk" class="red">').replace('[/A]','</a>');
-	l[1274] = l[1274].replace('[A]','<a href="#takedown">').replace('[/A]','</a>');
-	l[1275] = l[1275].replace('[A]','<a href="#copyright">').replace('[/A]','</a>');
-	l[1244] = l[1244].replace('[A]','<a href="#affiliateterms" class="red">').replace('[/A]','</a>');
-	l[1201] = l[1201].replace('[A]','<span class="red">').replace('[/A]','</span>');
-	l[1208] = l[1208].replace('[B]','<strong>').replace('[/B]','</strong>');
-	l[1915] = l[1915].replace('[A]','<a class="red" href="https://chrome.google.com/webstore/detail/mega/bigefpfhnfcobdlfbedofhhaibnlghod" target="_blank">').replace('[/A]','</a>');
-	l[1936] = l[1936].replace('[A]','<a href="#backup">').replace('[/A]','</a>');
-	l[1942] = l[1942].replace('[A]','<a href="#backup">').replace('[/A]','</a>');
-	l[1943] = l[1943].replace('[A]','<a href="mailto:support@mega.co.nz">').replace('[/A]','</a>');
-	l[1948] = l[1948].replace('[A]','<a href="mailto:support@mega.co.nz">').replace('[/A]','</a>');
-	l[1957] = l[1957].replace('[A]','<a href="#recovery">').replace('[/A]','</a>');
-	l[1965] = l[1965].replace('[A]','<a href="#recovery">').replace('[/A]','</a>');
-	l[1982] = l[1982].replace('[A]','<font style="color:#D21F00;">').replace('[/A]','</font>');
-	l[1993] = l[1993].replace('[A]','<span class="red">').replace('[/A]','</span>');
-	l[1371] = l[1371].replace('2014','2015');
-	l[122] = l[122].replace('five or six hours','<span class="red">five or six hours</span>');
-	l[231] = l[231].replace('No thanks, I\'ll wait','I\'ll wait');
+    // for (var i = 7000 ; i-- ; l[i] = l[i] || '(null)');
+    l[0] = 'Mega Limited ' + new Date().getFullYear();
+    if ((lang == 'es') || (lang == 'pt') || (lang == 'sk')) l[0] = 'Mega Ltd.';
+    l[1] = l[398];
+    if (lang == 'en') l[1] = 'Go Pro';
+    l[438] = l[438].replace('[X]','');
+    l['439a'] = l[439];
+    l[439] = l[439].replace('[X1]','').replace('[X2]','');
+    l['466a'] = l[466];
+    l[466] = l[466].replace('[X]','');
+    l[543] = l[543].replace('[X]','');
+    l[456] = l[456].replace(':','');
+    l['471a'] = l[471].replace('[X]',10);
+    l['471b'] = l[471].replace('[X]',100);
+    l['471c'] = l[471].replace('[X]',250);
+    l['471d'] = l[471].replace('[X]',500);
+    l['471e'] = l[471].replace('[X]',1000);
+    l['469a'] = l[469].replace('[X]',10);
+    l['469b'] = l[469].replace('[X]',100);
+    l['469c'] = l[469].replace('[X]',250);
+    l['472a'] = l[472].replace('[X]',10);
+    l['472b'] = l[472].replace('[X]',100);
+    l['472c'] = l[472].replace('[X]',250);
+    l['208a'] = l[208].replace('[A]','<a href="#terms" class="red">');
+    l['208a'] = l['208a'].replace('[/A]','</a>');
+    l[208] = l[208].replace('[A]','<a href="#terms">');
+    l[208] = l[208].replace('[/A]','</a>');
+    l[517] = l[517].replace('[A]','<a href="#help">').replace('[/A]','</a>');
+    l[521] = l[521].replace('[A]','<a href="#copyright">').replace('[/A]','</a>');
+    l[553] = l[553].replace('[A]','<a href="mailto:resellers@mega.co.nz">').replace('[/A]','</a>');
+    l[555] = l[555].replace('[A]','<a href="#terms">').replace('[/A]','</a>');
+    l[754] = l[754].replace('[A]','<a href="http://www.google.com/chrome" target="_blank" style="color:#D9290B;">');
+    l[754] = l[754].replace('[/A]','</a>');
+    l[871] = l[871].replace('[B]','<strong>').replace('[/B]','</strong>').replace('[A]','<a href="#pro">').replace('[/A]','</a>');
+    l[924] = l[924].replace('[A]','<span class="red">').replace('[/A]','</span>');
+    l[501] = l[501].replace('17','').replace('%','');
+    l[1066] = l[1066].replace('[A]','<a class="red">').replace('[/A]','</a>');
+    l[1067] = l[1067].replace('[A]','<span class="red">').replace('[/A]','</span>');
+    l[1094] = l[1094].replace('[A]','<a href="#plugin">').replace('[/A]','</a>');
+    l[1095] = l[1095].replace('[A]','<span class="red">').replace('[/A]','</span>');
+    l[1133] = l[1133].replace('[A]','<a href="http://en.wikipedia.org/wiki/Entropy" target="_blank">').replace('[/A]','</a>');
+    l[1134] = l[1134].replace('[A]','<a href="http://en.wikipedia.org/wiki/Public-key_cryptography" target="_blank">').replace('[/A]','</a>');
+    l[1148] = l[1148].replace('[A]','<span class="red">').replace('[/A]','</span>');
+    l[1151] = l[1151].replace('[A]','<span class="red">').replace('[/A]','</span>');
+    l[731] = l[731].replace('[A]','<a href="#terms">').replace('[/A]','</a>');
+    if (lang == 'en') l[965] = 'Legal & policies';
+    l[1159] = l[1159].replace('[A]','<span class="red">').replace('[/A]','</span>');
+    l[1171] = l[1171].replace('[A]','<span class="red">').replace('[/A]','</span>');
+    l[1185] = l[1185].replace('[X]','<strong>MEGA.crx</strong>');
+    l[1242] = l[1242].replace('[A]','<a href="#affiliateterms" target="_blank">').replace('[/A]','</a>');
+    l[1218] = l[1218].replace('[A]','<a href="#affiliateterms" class="red">').replace('[/A]','</a>');
+    l[1212] = l[1212].replace('[A]','<a href="#sdk" class="red">').replace('[/A]','</a>');
+    l[1274] = l[1274].replace('[A]','<a href="#takedown">').replace('[/A]','</a>');
+    l[1275] = l[1275].replace('[A]','<a href="#copyright">').replace('[/A]','</a>');
+    l[1244] = l[1244].replace('[A]','<a href="#affiliateterms" class="red">').replace('[/A]','</a>');
+    l[1201] = l[1201].replace('[A]','<span class="red">').replace('[/A]','</span>');
+    l[1208] = l[1208].replace('[B]','<strong>').replace('[/B]','</strong>');
+    l[1915] = l[1915].replace('[A]','<a class="red" href="https://chrome.google.com/webstore/detail/mega/bigefpfhnfcobdlfbedofhhaibnlghod" target="_blank">').replace('[/A]','</a>');
+    l[1936] = l[1936].replace('[A]','<a href="#backup">').replace('[/A]','</a>');
+    l[1942] = l[1942].replace('[A]','<a href="#backup">').replace('[/A]','</a>');
+    l[1943] = l[1943].replace('[A]','<a href="mailto:support@mega.co.nz">').replace('[/A]','</a>');
+    l[1948] = l[1948].replace('[A]','<a href="mailto:support@mega.co.nz">').replace('[/A]','</a>');
+    l[1957] = l[1957].replace('[A]','<a href="#recovery">').replace('[/A]','</a>');
+    l[1965] = l[1965].replace('[A]','<a href="#recovery">').replace('[/A]','</a>');
+    l[1982] = l[1982].replace('[A]','<font style="color:#D21F00;">').replace('[/A]','</font>');
+    l[1993] = l[1993].replace('[A]','<span class="red">').replace('[/A]','</span>');
+    l[1371] = l[1371].replace('2014','2015');
+    l[122] = l[122].replace('five or six hours','<span class="red">five or six hours</span>');
+    l[231] = l[231].replace('No thanks, I\'ll wait','I\'ll wait');
 
-	l['year'] = new Date().getFullYear();
-	date_months = [l[408], l[409], l[410], l[411], l[412], l[413], l[414], l[415], l[416], l[417], l[418], l[419]];
+    l['year'] = new Date().getFullYear();
+    date_months = [l[408], l[409], l[410], l[411], l[412], l[413], l[414], l[415], l[416], l[417], l[418], l[419]];
 }
 
 function GetNextNode(labelid)
@@ -368,59 +366,59 @@ function removeHash() {
 
 function browserdetails(useragent)
 {
-	useragent = (' ' + useragent).toLowerCase();
-	var os = false;
-	var browser = false;
-	var icon = '';
-	var name = '';
-	if (useragent.indexOf('android') > 0) os = 'Android';
-	else if (useragent.indexOf('windows') > 0) os = 'Windows';
-	else if (useragent.indexOf('iphone') > 0) os = 'iPhone';
-	else if (useragent.indexOf('imega') > 0) os = 'iPhone';
-	else if (useragent.indexOf('ipad') > 0) os = 'iPad';
-	else if (useragent.indexOf('mac') > 0) os = 'Apple';
-	else if (useragent.indexOf('linux') > 0) os = 'Linux';
-	else if (useragent.indexOf('linux') > 0) os = 'MEGAsync';
-	else if (useragent.indexOf('blackberry') > 0) os = 'Blackberry';
-	if (useragent.indexOf('windows nt 1') > 0 && useragent.indexOf('edge/') > 0) browser = 'Spartan';
-	else if (useragent.indexOf('opera') > 0 || useragent.indexOf(' opr/') > 0) browser = 'Opera';
-	else if (useragent.indexOf('chrome') > 0) browser = 'Chrome';
-	else if (useragent.indexOf('safari') > 0) browser = 'Safari';
-	else if (useragent.indexOf('firefox') > 0) browser = 'Firefox';
-	else if (useragent.indexOf('thunderbird') > 0) browser = 'Thunderbird';
-	else if (useragent.indexOf('megasync') > 0) browser = 'MEGAsync';
-	else if (useragent.indexOf('msie') > 0
-		|| "ActiveXObject" in window) browser = 'Internet Explorer';
-	if ((os) && (browser))
-	{
-		name = browser + ' on ' + os;
-	}
-	else if (os)
-	{
-		name = os;
-		icon = os.toLowerCase() + '.png';
-	}
-	else if (browser)
-	{
-		name = browser;
-	}
-	else
-	{
-		name = 'Unknown';
-		icon = 'unknown.png';
-	}
-	if (!icon && browser)
-	{
-		if (browser == 'Internet Explorer' || browser == 'Spartan') icon = 'ie.png';
-		else icon = browser.toLowerCase() + '.png';
-	}
-	var browserdetails = {};
-	browserdetails.name = name;
-	browserdetails.icon = icon;
-	browserdetails.browser = browser;
-	// Determine if the OS is 64bit
-	browserdetails.is64bit = /\b(WOW64|x86_64|Win64|intel mac os x 10.(9|\d{2,}))/i.test(useragent);
-	return browserdetails;
+    useragent = (' ' + useragent).toLowerCase();
+    var os = false;
+    var browser = false;
+    var icon = '';
+    var name = '';
+    if (useragent.indexOf('android') > 0) os = 'Android';
+    else if (useragent.indexOf('windows') > 0) os = 'Windows';
+    else if (useragent.indexOf('iphone') > 0) os = 'iPhone';
+    else if (useragent.indexOf('imega') > 0) os = 'iPhone';
+    else if (useragent.indexOf('ipad') > 0) os = 'iPad';
+    else if (useragent.indexOf('mac') > 0) os = 'Apple';
+    else if (useragent.indexOf('linux') > 0) os = 'Linux';
+    else if (useragent.indexOf('linux') > 0) os = 'MEGAsync';
+    else if (useragent.indexOf('blackberry') > 0) os = 'Blackberry';
+    if (useragent.indexOf('windows nt 1') > 0 && useragent.indexOf('edge/') > 0) browser = 'Spartan';
+    else if (useragent.indexOf('opera') > 0 || useragent.indexOf(' opr/') > 0) browser = 'Opera';
+    else if (useragent.indexOf('chrome') > 0) browser = 'Chrome';
+    else if (useragent.indexOf('safari') > 0) browser = 'Safari';
+    else if (useragent.indexOf('firefox') > 0) browser = 'Firefox';
+    else if (useragent.indexOf('thunderbird') > 0) browser = 'Thunderbird';
+    else if (useragent.indexOf('megasync') > 0) browser = 'MEGAsync';
+    else if (useragent.indexOf('msie') > 0
+        || "ActiveXObject" in window) browser = 'Internet Explorer';
+    if ((os) && (browser))
+    {
+        name = browser + ' on ' + os;
+    }
+    else if (os)
+    {
+        name = os;
+        icon = os.toLowerCase() + '.png';
+    }
+    else if (browser)
+    {
+        name = browser;
+    }
+    else
+    {
+        name = 'Unknown';
+        icon = 'unknown.png';
+    }
+    if (!icon && browser)
+    {
+        if (browser == 'Internet Explorer' || browser == 'Spartan') icon = 'ie.png';
+        else icon = browser.toLowerCase() + '.png';
+    }
+    var browserdetails = {};
+    browserdetails.name = name;
+    browserdetails.icon = icon;
+    browserdetails.browser = browser;
+    // Determine if the OS is 64bit
+    browserdetails.is64bit = /\b(WOW64|x86_64|Win64|intel mac os x 10.(9|\d{2,}))/i.test(useragent);
+    return browserdetails;
 }
 
 function countrydetails(isocode)
@@ -456,14 +454,14 @@ if (typeof (l) == 'undefined') {
 var date_months = []
 function acc_time2date(unixtime)
 {
-	var MyDate = new Date(unixtime*1000);
-	var th = 'th';
-	if ((parseInt(MyDate.getDate()) == 11) || (parseInt(MyDate.getDate()) == 12)) {}
-	else if (('' + MyDate.getDate()).slice(-1) == '1') th = 'st';
-	else if (('' + MyDate.getDate()).slice(-1) == '2') th = 'nd';
-	else if (('' + MyDate.getDate()).slice(-1) == '3') th = 'rd';
-	if (lang !== 'en') th = ',';
-	return date_months[MyDate.getMonth()] + ' ' + MyDate.getDate() + th + ' ' + MyDate.getFullYear();
+    var MyDate = new Date(unixtime*1000);
+    var th = 'th';
+    if ((parseInt(MyDate.getDate()) == 11) || (parseInt(MyDate.getDate()) == 12)) {}
+    else if (('' + MyDate.getDate()).slice(-1) == '1') th = 'st';
+    else if (('' + MyDate.getDate()).slice(-1) == '2') th = 'nd';
+    else if (('' + MyDate.getDate()).slice(-1) == '3') th = 'rd';
+    if (lang !== 'en') th = ',';
+    return date_months[MyDate.getMonth()] + ' ' + MyDate.getDate() + th + ' ' + MyDate.getFullYear();
 }
 
 function time2last(timestamp)
@@ -627,11 +625,11 @@ function showOverQuotaDialog()
     // Show the dialog
     var $dialog = $('.top-warning-popup');
     $dialog.addClass('active');
-    
+
     // Unhide the warning icon and show the button
     $('.warning-popup-icon').removeClass('hidden');
     $('.fm-notifications-bottom', $dialog).show();
-    
+
     // Add a click event on the warning icon to hide and show the dialog
     $('.warning-icon-area').unbind('click');
     $('.warning-icon-area').click(function()
@@ -643,17 +641,17 @@ function showOverQuotaDialog()
             $dialog.addClass('active');
         }
     });
-    
+
     // Change contents of dialog text
     $('.warning-green-icon', $dialog).remove();
     $('.warning-popup-body', $dialog).unbind('click').html(
         '<div class="warning-header">' + l[1010] + '</div>' + l[5929]
-		+ "<p>" + l[5931].replace("[A]", "<a href='#fm/account' style='text-decoration: underline'>").replace("[/A]", "</a>") + "</p>"
+        + "<p>" + l[5931].replace("[A]", "<a href='#fm/account' style='text-decoration: underline'>").replace("[/A]", "</a>") + "</p>"
     );
-    
+
     // Set button text to 'Upgrade Account'
     $('.warning-button span').text(l[5549]);
-   
+
     // Redirect to Pro signup page on button click
     $('.warning-button').click(function() {
        document.location.hash = 'pro';
@@ -1079,7 +1077,7 @@ function NOW() {
 }
 
 /**
- *	Global function to help debugging
+ *  Global function to help debugging
  */
 function DEBUG2() {
     if (typeof (d) !== "undefined" && d) {
@@ -1118,29 +1116,29 @@ function ASSERT(what, msg, udata) {
 
 function srvlog(msg, data, silent)
 {
-	if (data && !(data instanceof Error)) data = { udata : data };
-	if (!silent && d) console.error(msg);
-	if (!d || onBetaW) window.onerror(msg, '', data ? 1:-1, 0, data || null);
+    if (data && !(data instanceof Error)) data = { udata : data };
+    if (!silent && d) console.error(msg);
+    if (!d || onBetaW) window.onerror(msg, '', data ? 1:-1, 0, data || null);
 }
 
 function oDestroy(obj) {
-	if (window.d) ASSERT(Object.isFrozen(obj) === false, 'Object already frozen...');
+    if (window.d) ASSERT(Object.isFrozen(obj) === false, 'Object already frozen...');
 
-	Object.keys(obj).forEach(function(memb) {
-		if (obj.hasOwnProperty(memb)) delete obj[memb];
-	});
-	Object.defineProperty(obj, ":$:frozen:", { value : String(new Date()), writable : false });
+    Object.keys(obj).forEach(function(memb) {
+        if (obj.hasOwnProperty(memb)) delete obj[memb];
+    });
+    Object.defineProperty(obj, ":$:frozen:", { value : String(new Date()), writable : false });
 
-	if (window.d) Object.freeze(obj);
+    if (window.d) Object.freeze(obj);
 }
 
 function oIsFrozen(obj)
 {
-	return obj && typeof obj === 'object' && obj.hasOwnProperty(":$:frozen:");
+    return obj && typeof obj === 'object' && obj.hasOwnProperty(":$:frozen:");
 }
 
 /**
- *	Return a default callback for error handlign
+ *  Return a default callback for error handlign
  */
 function dlError(text) {
     return function(e) {
@@ -1150,7 +1148,7 @@ function dlError(text) {
 }
 
 /**
- *	Remove an element from an *array*
+ *  Remove an element from an *array*
  */
 function removeValue(array, value, can_fail) {
     var idx = array.indexOf(value);
@@ -1337,6 +1335,67 @@ function megaJidToUserId(jid) {
 }
 
 /**
+ * Implementation of a string encryption/decryption.
+ */
+var stringcrypt = (function () {
+    /**
+     * @description
+     * Implementation of a string encryption/decryption.</p>
+     */
+    var ns = {};
+
+    "use strict";
+
+    /**
+     * Encrypts clear text data to an authenticated ciphertext, armoured with
+     * encryption mode indicator and IV.
+     *
+     * @param plain {string}
+     *     Plain data block as (unicode) string.
+     * @param key {string}
+     *     Encryption key as byte string.
+     * @returns {string}
+     *     Encrypted data block as byte string, incorporating mode, nonce and MAC.
+     */
+    ns.stringEncrypter = function(plain, key) {
+        var mode = tlvstore.BLOCK_ENCRYPTION_SCHEME.AES_GCM_12_16;
+        var plainBytes = unescape(encodeURIComponent(plain));
+        var cipher = tlvstore.blockEncrypt(plainBytes, key, mode);
+        return cipher;
+    };
+
+    /**
+     * Decrypts an authenticated cipher text armoured with a mode indicator and IV
+     * to clear text data.
+     *
+     * @param cipher {string}
+     *     Encrypted data block as byte string, incorporating mode, nonce and MAC.
+     * @param key {string}
+     *     Encryption key as byte string.
+     * @returns {string}
+     *     Clear text as (unicode) string.
+     */
+    ns.stringDecrypter = function(cipher, key) {
+        var plain = tlvstore.blockDecrypt(cipher, key);
+        return decodeURIComponent(escape(plain));
+    };
+
+    /**
+     * Generates a new AES-128 key.
+     *
+     * @returns {string}
+     *     Symmetric key as byte string.
+     */
+    ns.newKey = function() {
+        var keyBytes = new Uint8Array(16);
+        asmCrypto.getRandomValues(keyBytes);
+        return asmCrypto.bytes_to_string(keyBytes);
+    };
+
+    return ns;
+})();
+
+/**
  * JS Implementation of MurmurHash3 (r136) (as of May 20, 2011)
  *
  * @author <a href="mailto:gary.court.gmail.com">Gary Court</a>
@@ -1404,9 +1463,9 @@ function MurmurHash3(key, seed) {
 }
 
 /**
- *	Create a pool of workers, it returns a Queue object
- *	so it can be called many times and it'd be throttled
- *	by the queue
+ *  Create a pool of workers, it returns a Queue object
+ *  so it can be called many times and it'd be throttled
+ *  by the queue
  */
 function CreateWorkers(url, message, size) {
     size = size || 4
@@ -1425,41 +1484,41 @@ function CreateWorkers(url, message, size) {
     function create(i) {
         var w;
 
-		try {
-			w  = new Worker(url);
-		} catch(e) {
-			msgDialog('warninga', '' + url, '' + e, location.hostname);
-			throw e;
-		}
+        try {
+            w  = new Worker(url);
+        } catch(e) {
+            msgDialog('warninga', '' + url, '' + e, location.hostname);
+            throw e;
+        }
 
-		w.id   = i;
-		w.busy = false;
-		w.postMessage = w.webkitPostMessage || w.postMessage;
-		w.onmessage   = handler(i);
-		return w;
-	}
+        w.id   = i;
+        w.busy = false;
+        w.postMessage = w.webkitPostMessage || w.postMessage;
+        w.onmessage   = handler(i);
+        return w;
+    }
 
     for (var i = 0; i < size; i++) {
         worker.push(null);
     }
 
-	return new MegaQueue(function(task, done) {
-		for (var i = 0; i < size; i++) {
-			if (worker[i] === null) worker[i] = create(i);
-			if (!worker[i].busy) break;
-		}
-		worker[i].busy = true;
-		instances[i]   = done;
-		$.each(task, function(e, t) {
-			if (e == 0) {
-				worker[i].context = t;
-			} else if (t.constructor === Uint8Array && typeof MSBlobBuilder !== "function") {
-				worker[i].postMessage(t.buffer,[t.buffer]);
-			} else {
-				worker[i].postMessage(t);
-			}
-		});
-	}, size, 'worker-' + url);
+    return new MegaQueue(function(task, done) {
+        for (var i = 0; i < size; i++) {
+            if (worker[i] === null) worker[i] = create(i);
+            if (!worker[i].busy) break;
+        }
+        worker[i].busy = true;
+        instances[i]   = done;
+        $.each(task, function(e, t) {
+            if (e == 0) {
+                worker[i].context = t;
+            } else if (t.constructor === Uint8Array && typeof MSBlobBuilder !== "function") {
+                worker[i].postMessage(t.buffer,[t.buffer]);
+            } else {
+                worker[i].postMessage(t);
+            }
+        });
+    }, size, 'worker-' + url);
 }
 
 function mKeyDialog(ph, fl)
@@ -1470,27 +1529,23 @@ function mKeyDialog(ph, fl)
     $('.fm-dialog.dlkey-dialog').removeClass('hidden');
     $('.fm-dialog-overlay').removeClass('hidden');
     $('body').addClass('overlayed');
-    $('.fm-dialog.dlkey-dialog input').unbind('focus');
-    $('.fm-dialog.dlkey-dialog input').bind('focus', function(e)
+    $('.fm-dialog.dlkey-dialog input').rebind('focus', function(e)
     {
         if ($(this).val() == l[1028])
             $(this).val('');
     });
-    $('.fm-dialog.dlkey-dialog input').unbind('blur');
-    $('.fm-dialog.dlkey-dialog input').bind('blur', function(e)
+    $('.fm-dialog.dlkey-dialog input').rebind('blur', function(e)
     {
         if ($(this).val() == '')
             $(this).val(l[1028]);
     });
-    $('.fm-dialog.dlkey-dialog input').unbind('keydown');
-    $('.fm-dialog.dlkey-dialog input').bind('keydown', function(e)
+    $('.fm-dialog.dlkey-dialog input').rebind('keydown', function(e)
     {
         $('.fm-dialog.dlkey-dialog .fm-dialog-new-folder-button').addClass('active');
         if (e.keyCode == 13)
             $('.fm-dialog.dlkey-dialog .fm-dialog-new-folder-button').click();
     });
-    $('.fm-dialog.dlkey-dialog .fm-dialog-new-folder-button').unbind('click');
-    $('.fm-dialog.dlkey-dialog .fm-dialog-new-folder-button').bind('click', function(e)
+    $('.fm-dialog.dlkey-dialog .fm-dialog-new-folder-button').rebind('click', function(e)
     {
         var key = $('.fm-dialog.dlkey-dialog input').val();
 
@@ -1501,8 +1556,7 @@ function mKeyDialog(ph, fl)
             document.location.hash = (fl ? '#F!' : '#!') + ph + '!' + key;
         }
     });
-    $('.fm-dialog.dlkey-dialog .fm-dialog-close').unbind('click');
-    $('.fm-dialog.dlkey-dialog .fm-dialog-close').bind('click', function(e)
+    $('.fm-dialog.dlkey-dialog .fm-dialog-close').rebind('click', function(e)
     {
         $('.fm-dialog.dlkey-dialog').addClass('hidden');
         $('.fm-dialog-overlay').addClass('hidden');
@@ -1510,207 +1564,207 @@ function mKeyDialog(ph, fl)
 }
 
 function dcTracer(ctr) {
-	var name = ctr.name, proto = ctr.prototype;
-	for(var fn in proto) {
-		if(proto.hasOwnProperty(fn) && typeof proto[fn] === 'function') {
-			console.log('Tracing ' + name + '.' + fn);
-			proto[fn] = (function(fn, fc) {
-				fc.dbg = function() {
-					try {
-						console.log('Entering ' + name + '.' + fn,
-							this, '~####~', Array.prototype.slice.call(arguments));
-						var r = fc.apply(this, arguments);
-						console.log('Leaving ' + name + '.' + fn, r);
-						return r;
-					} catch(e) {
-						console.error(e);
-					}
-				};
-				return fc.dbg;
-			})(fn, proto[fn]);
-		}
-	}
+    var name = ctr.name, proto = ctr.prototype;
+    for(var fn in proto) {
+        if(proto.hasOwnProperty(fn) && typeof proto[fn] === 'function') {
+            console.log('Tracing ' + name + '.' + fn);
+            proto[fn] = (function(fn, fc) {
+                fc.dbg = function() {
+                    try {
+                        console.log('Entering ' + name + '.' + fn,
+                            this, '~####~', Array.prototype.slice.call(arguments));
+                        var r = fc.apply(this, arguments);
+                        console.log('Leaving ' + name + '.' + fn, r);
+                        return r;
+                    } catch(e) {
+                        console.error(e);
+                    }
+                };
+                return fc.dbg;
+            })(fn, proto[fn]);
+        }
+    }
 }
 
 function mSpawnWorker(url, nw)
 {
-	if (!(this instanceof mSpawnWorker))
-		return new mSpawnWorker(url, nw);
+    if (!(this instanceof mSpawnWorker))
+        return new mSpawnWorker(url, nw);
 
-	this.jid = 1;
-	this.jobs = {};
-	this.nworkers=nw=nw||4;
-	this.wrk = new Array(nw);
-	this.token = mRandomToken('mSpawnWorker.'+url.split(".")[0]);
+    this.jid = 1;
+    this.jobs = {};
+    this.nworkers=nw=nw||4;
+    this.wrk = new Array(nw);
+    this.token = mRandomToken('mSpawnWorker.'+url.split(".")[0]);
 
-	while (nw--) {
-		if (!(this.wrk[nw] = this.add(url))) {
-			throw new Error(this.token.split("$")[0]+' Setup Error');
-		}
-	}
+    while (nw--) {
+        if (!(this.wrk[nw] = this.add(url))) {
+            throw new Error(this.token.split("$")[0]+' Setup Error');
+        }
+    }
 }
 mSpawnWorker.prototype = {
-	process: function mSW_Process(data, callback, onerror)
-	{
-		if (!Array.isArray(data)) {
-			var err = new Error("'data' must be an array");
-			if (onerror) return onerror(err);
-			throw err;
-		}
-		if (this.unreliably) {
-			return onerror(0xBADF);
-		}
-		var nw  = this.nworkers, l = Math.ceil(data.length/nw);
-		var id  = mRandomToken("mSWJobID"+this.jid++), idx = 0;
-		var job = { done: 0, data: [], callback: callback};
+    process: function mSW_Process(data, callback, onerror)
+    {
+        if (!Array.isArray(data)) {
+            var err = new Error("'data' must be an array");
+            if (onerror) return onerror(err);
+            throw err;
+        }
+        if (this.unreliably) {
+            return onerror(0xBADF);
+        }
+        var nw  = this.nworkers, l = Math.ceil(data.length/nw);
+        var id  = mRandomToken("mSWJobID"+this.jid++), idx = 0;
+        var job = { done: 0, data: [], callback: callback};
 
-		while (nw--) {
-			job.data.push(data.slice(idx, idx+=l));
-		}
-		if (onerror) job.onerror = onerror;
-		this.jobs[id] = job;
-		this.postNext();
-	},
-	postNext: function mSW_PostNext()
-	{
-		if (this.busy())
-			return;
-		for (var id in this.jobs)
-		{
-			var nw = this.nworkers;
-			var job = this.jobs[id], data;
+        while (nw--) {
+            job.data.push(data.slice(idx, idx+=l));
+        }
+        if (onerror) job.onerror = onerror;
+        this.jobs[id] = job;
+        this.postNext();
+    },
+    postNext: function mSW_PostNext()
+    {
+        if (this.busy())
+            return;
+        for (var id in this.jobs)
+        {
+            var nw = this.nworkers;
+            var job = this.jobs[id], data;
 
-			while (nw--)
-			{
-				if (!this.wrk[nw].working)
-				{
-					data = job.data.shift();
-					if (data)
-					{
-						this.wrk[nw].working = !0;
-						this.wrk[nw].postMessage({
-							data        : data,
-							debug       : !!window.d,
-							u_sharekeys : u_sharekeys,
-							u_privk     : u_privk,
-							u_handle    : u_handle,
-							u_k         : u_k,
-							jid         : id
-						});
+            while (nw--)
+            {
+                if (!this.wrk[nw].working)
+                {
+                    data = job.data.shift();
+                    if (data)
+                    {
+                        this.wrk[nw].working = !0;
+                        this.wrk[nw].postMessage({
+                            data        : data,
+                            debug       : !!window.d,
+                            u_sharekeys : u_sharekeys,
+                            u_privk     : u_privk,
+                            u_handle    : u_handle,
+                            u_k         : u_k,
+                            jid         : id
+                        });
 
-						if (d && job.data.length == this.nworkers-1) console.time(id);
-					}
-				}
-			}
-		}
-	},
-	busy: function()
-	{
-		var nw = this.nworkers;
-		while (nw-- && this.wrk[nw].working);
-		return nw == -1;
-	},
-	add: function mSW_Add(url)
-	{
-		var self = this, wrk;
+                        if (d && job.data.length == this.nworkers-1) console.time(id);
+                    }
+                }
+            }
+        }
+    },
+    busy: function()
+    {
+        var nw = this.nworkers;
+        while (nw-- && this.wrk[nw].working);
+        return nw == -1;
+    },
+    add: function mSW_Add(url)
+    {
+        var self = this, wrk;
 
-		try {
-			wrk = new Worker(url);
-		} catch(e) {
-			console.error(e);
-			if (!window[this.token]) {
-				window[this.token] = true;
-				msgDialog('warninga', l[16], "Unable to launch " + url + " worker.", e);
-			}
-			return false;
-		}
+        try {
+            wrk = new Worker(url);
+        } catch(e) {
+            console.error(e);
+            if (!window[this.token]) {
+                window[this.token] = true;
+                msgDialog('warninga', l[16], "Unable to launch " + url + " worker.", e);
+            }
+            return false;
+        }
 
-		wrk.onerror = function mSW_OnError(err)
-		{
-			console.error(err);
-			if (!(self && self.wrk)) return;
-			Soon(function() {
-				throw err;
-			});
-			self.unreliably = true;
-			var nw = self.nworkers;
-			while (nw--) {
-				if (self.wrk[nw]) {
-					self.wrk[nw].terminate();
-				}
-			}
-			for (var id in self.jobs) {
-				var job = self.jobs[id];
-				if (job.onerror) job.onerror(err);
-			}
-			if (!window[self.token]) {
-				window[self.token] = true;
-				if (err.filename) {
-					msgDialog('warninga', "Worker Exception: " + url, err.message, err.filename + ":" + err.lineno);
-				}
-			}
-			delete self.wrk;
-			delete self.jobs;
-			self = undefined;
-		};
+        wrk.onerror = function mSW_OnError(err)
+        {
+            console.error(err);
+            if (!(self && self.wrk)) return;
+            Soon(function() {
+                throw err;
+            });
+            self.unreliably = true;
+            var nw = self.nworkers;
+            while (nw--) {
+                if (self.wrk[nw]) {
+                    self.wrk[nw].terminate();
+                }
+            }
+            for (var id in self.jobs) {
+                var job = self.jobs[id];
+                if (job.onerror) job.onerror(err);
+            }
+            if (!window[self.token]) {
+                window[self.token] = true;
+                if (err.filename) {
+                    msgDialog('warninga', "Worker Exception: " + url, err.message, err.filename + ":" + err.lineno);
+                }
+            }
+            delete self.wrk;
+            delete self.jobs;
+            self = undefined;
+        };
 
-		wrk.onmessage = function mSW_OnMessage(ev)
-		{
-			if (ev.data[0] == 'console')
-			{
-				if (d) {
-					var args = ev.data[1];
-					args.unshift(self.token);
-					console.log.apply(console,args);
-				}
-				return;
-			}
-			if (d) console.log(self.token, ev.data);
+        wrk.onmessage = function mSW_OnMessage(ev)
+        {
+            if (ev.data[0] == 'console')
+            {
+                if (d) {
+                    var args = ev.data[1];
+                    args.unshift(self.token);
+                    console.log.apply(console,args);
+                }
+                return;
+            }
+            if (d) console.log(self.token, ev.data);
 
-			wrk.working = false;
-			if (!self.done(ev.data)) this.onerror(0xBADF);
-		};
+            wrk.working = false;
+            if (!self.done(ev.data)) this.onerror(0xBADF);
+        };
 
-		if (d) console.log(this.token, 'Starting...');
+        if (d) console.log(this.token, 'Starting...');
 
-		wrk.postMessage = wrk.postMessage || wrk.webkitPostMessage;
+        wrk.postMessage = wrk.postMessage || wrk.webkitPostMessage;
 
-		return wrk;
-	},
-	done: function mSW_Done(reply)
-	{
-		var job = this.jobs[reply.jid];
-		if (!ASSERT(job,'Invalid worker reply.'))
-			return false;
+        return wrk;
+    },
+    done: function mSW_Done(reply)
+    {
+        var job = this.jobs[reply.jid];
+        if (!ASSERT(job,'Invalid worker reply.'))
+            return false;
 
-		if (!job.result) job.result = reply.result;
-		else $.extend(job.result, reply.result);
+        if (!job.result) job.result = reply.result;
+        else $.extend(job.result, reply.result);
 
-		if (reply.newmissingkeys)
-		{
-			job.newmissingkeys=newmissingkeys = true;
-			$.extend(missingkeys, reply.missingkeys);
-		}
-		if (reply.rsa2aes)      $.extend(rsa2aes,      reply.rsa2aes);
-		if (reply.u_sharekeys)  $.extend(u_sharekeys,  reply.u_sharekeys);
-		if (reply.rsasharekeys) $.extend(rsasharekeys, reply.rsasharekeys);
+        if (reply.newmissingkeys)
+        {
+            job.newmissingkeys=newmissingkeys = true;
+            $.extend(missingkeys, reply.missingkeys);
+        }
+        if (reply.rsa2aes)      $.extend(rsa2aes,      reply.rsa2aes);
+        if (reply.u_sharekeys)  $.extend(u_sharekeys,  reply.u_sharekeys);
+        if (reply.rsasharekeys) $.extend(rsasharekeys, reply.rsasharekeys);
 
-		Soon(this.postNext.bind(this));
-		if (++job.done == this.nworkers)
-		{
-			if (d) console.timeEnd(reply.jid);
+        Soon(this.postNext.bind(this));
+        if (++job.done == this.nworkers)
+        {
+            if (d) console.timeEnd(reply.jid);
 
-			delete this.jobs[reply.jid];
-			job.callback(job.result, job);
-		}
+            delete this.jobs[reply.jid];
+            job.callback(job.result, job);
+        }
 
-		return true;
-	}
+        return true;
+    }
 };
 
 function mRandomToken(pfx)
 {
-	return (pfx || '!') + '$' + (Math.random()*Date.now()).toString(36);
+    return (pfx || '!') + '$' + (Math.random()*Date.now()).toString(36);
 }
 
 function str_mtrunc(str, len)
@@ -2187,13 +2241,13 @@ function _wrapFnWithBeforeAndAfterEvents(fn, eventSuffix, dontReturnPromises) {
 
 function hex2bin(hex)
 {
-	var bytes = [];
+    var bytes = [];
 
-	for(var i=0; i< hex.length-1; i+=2){
-		bytes.push(parseInt(hex.substr(i, 2), 16));
-	}
+    for(var i=0; i< hex.length-1; i+=2){
+        bytes.push(parseInt(hex.substr(i, 2), 16));
+    }
 
-	return String.fromCharCode.apply(String, bytes);
+    return String.fromCharCode.apply(String, bytes);
 }
 
 /**
@@ -2202,9 +2256,9 @@ function hex2bin(hex)
  * @returns {Boolean}
  */
 function flashIsEnabled() {
-    
+
     var flashEnabled = false;
-    
+
     try {
         var flashObject = new ActiveXObject('ShockwaveFlash.ShockwaveFlash');
         if (flashObject) {
@@ -2216,7 +2270,7 @@ function flashIsEnabled() {
             flashEnabled = true;
         }
     }
-    
+
     return flashEnabled;
 }
 
@@ -2286,7 +2340,6 @@ function secToDuration(s, sep) {
     return durStr.replace(secToDuration.regExp[sep], "");
 }
 
-
 function generateAnonymousReport() {
     var $promise = new MegaPromise();
     var report = {};
@@ -2325,7 +2378,6 @@ function generateAnonymousReport() {
             participants[k] = cc && cc.u ? userAnonMap[cc.u] : v;
         });
 
-
         var r = {
             'roomUniqueId': k,
             'roomState': v.getStateAsText(),
@@ -2346,7 +2398,6 @@ function generateAnonymousReport() {
     });
 
     report.chatRoomState = chatStates;
-
 
     if (is_chrome_firefox)
     {
@@ -2394,8 +2445,6 @@ function generateAnonymousReport() {
     report.scripts = {};
     report.host = window.location.host;
 
-
-
     var promises = [];
 
     $('script').each(function() {
@@ -2430,3 +2479,68 @@ function generateAnonymousReport() {
 
     return $promise;
 }
+
+function MegaEvents() {}
+MegaEvents.prototype.trigger = function(name, args) {
+    if (!(this._events && this._events.hasOwnProperty(name))) return false;
+
+    if (d > 1) console.log(' >>> Triggering ' + name, this._events[name].length, args );
+
+    args = args || []
+    var done = 0, evs = this._events[name];
+    for (var i in evs) {
+        try {
+            evs[i].apply(null, args);
+        } catch(ex) {
+            console.error(ex);
+        }
+        ++done;
+    }
+    return done;
+};
+MegaEvents.prototype.on = function(name, callback) {
+    if (!this._events) this._events = {};
+    if (!this._events.hasOwnProperty(name)) {
+        this._events[name] = [];
+    }
+    this._events[name].push(callback);
+    return this;
+};
+
+(function(scope) {
+    var MegaAnalytics = function(id) {
+        this.loggerId = id;
+        this.sessionId = makeid(16);
+    };
+    MegaAnalytics.prototype.log = function(c, e, data) {
+
+        data = data || {};
+        data = $.extend(
+            true,
+            {}, {
+                'aid': this.sessionId,
+                'lang': typeof(lang) !== 'undefined' ? lang : null,
+                'browserlang': navigator.language,
+                'u_type': typeof(u_type) !== 'undefined' ? u_type : null
+            },
+            data
+        );
+
+        if (c == 'pro' && sessionStorage.proref) data['ref'] = sessionStorage.proref;
+
+        var msg = JSON.stringify({
+            'c': c,
+            'e': e,
+            'data': data
+        });
+
+        if(d) {
+            console.log("megaAnalytics: ", c, e, data);
+        }
+        if(window.location.toString().indexOf("mega.dev") !== -1) {
+            return;
+        }
+        api_req({ a: 'log',e: this.loggerId, m: msg},  {});
+    };
+    scope.megaAnalytics = new MegaAnalytics(99999);
+})(this);

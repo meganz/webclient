@@ -14326,7 +14326,7 @@ h5.main-italic-header {
 	background-color: #D90007;
 	color: #D90007;
 }
-.lite .membership-button:hover {
+.pro4 .membership-button:hover {
 	background-color: #FFA500;
 	color: #FFA500;
 }
@@ -14358,7 +14358,7 @@ h5.main-italic-header {
 .free .reg-st3-membership-icon, .loginrequired-dialog .fm-notification-icon.plan0 {
 	background-position: center -210px;
 }
-.lite .reg-st3-membership-icon, .loginrequired-dialog .fm-notification-icon.plan1 {
+.pro4 .reg-st3-membership-icon, .loginrequired-dialog .fm-notification-icon.plan1 {
 	background-position: center -339px;
 }
 .pro1 .reg-st3-membership-icon, .loginrequired-dialog .fm-notification-icon.plan2 {
@@ -14369,6 +14369,12 @@ h5.main-italic-header {
 }
 .pro3 .reg-st3-membership-icon, .loginrequired-dialog .fm-notification-icon.plan4 {
 	background-position: center -729px;
+}
+.key3-top, .key .pro-top {
+	display:none;
+}
+.key .key3-top {
+	display:block;
 }
 .membership-question-mark {
 	margin: 14px auto 0 auto;
@@ -14506,7 +14512,10 @@ h5.main-italic-header {
 	-ms-transition: all 200ms ease-in-out;
 	transition: all 200ms ease-in-out;
 }
-.membership-dropdown-item:hover {
+.membership-dropdown-item strong, .membership-bott-price strong {
+	font-family: 'Open Sans', Arial;
+}
+.membership-dropdown-item:hover, .membership-dropdown-item.selected {
 	background-color: rgba(0,0,0,0.05);
 }
 .membership-radio input {
@@ -14665,7 +14674,7 @@ div.membership-bott-button {
 	line-height: 28px;
 	font-family: 'source_sans_prosemibold';
 }
-.lite .reg-st3-big-txt {
+.pro4 .reg-st3-big-txt {
 	color: #FFA500;
 }
 .reg-st3-big-txt span {
@@ -14712,11 +14721,14 @@ font-size:14px;
 .membership-step2 .membership-new-offer {
 	display: none;
 }
-.membership-step2 .lite .membership-new-offer {
+.membership-step2 .pro4 .membership-new-offer {
 	display: block;
 }
 .membership-step2 .membership-pad-bl {
 	height: 258px;
+}
+.membership-step2 .membership-button {
+	display:none;
 }
 .reg-st3-bott-title {
 	font-size: 32px;
@@ -14726,7 +14738,7 @@ font-size:14px;
 	padding: 56px 10px 0 10px;
 	font-family: 'source_sans_proregular';
 }
-.lite .reg-st3-bott-title.title {
+.pro4 .reg-st3-bott-title.title {
 	font-family: 'source_sans_proextralight';
 }
 .pro1 .reg-st3-bott-title.title {
@@ -14750,7 +14762,7 @@ font-size:14px;
 	color: #FF0008;
 	padding-left: 8px;
 }
-.lite .reg-st3-bott-title span.period {
+.pro4 .reg-st3-bott-title span.period {
 	color: #FFA500;
 }
 .free .right.reg-st3-bott-title {

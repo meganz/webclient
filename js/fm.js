@@ -6196,10 +6196,10 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
 
         var $selectedPlan = $('.reg-st3-membership-bl.selected');
         var plan = 1;
-        if($selectedPlan.is(".lite")) { plan = 1; }
-		else if($selectedPlan.is(".pro1")) { plan = 2; }
-        else if($selectedPlan.is(".pro2")) { plan = 3; }
-        else if($selectedPlan.is(".pro3")) { plan = 4; }
+        if($selectedPlan.is(".pro4")) { plan = 4; }
+		else if($selectedPlan.is(".pro1")) { plan = 1; }
+        else if($selectedPlan.is(".pro2")) { plan = 2; }
+        else if($selectedPlan.is(".pro3")) { plan = 3; }
 
         $('.loginrequired-dialog .fm-notification-icon')
 		    .removeClass('plan1')

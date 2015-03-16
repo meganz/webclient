@@ -3,6 +3,7 @@ var pro_package,
 	pro_balance = 0,
 	pro_paymentmethod,
 	pro_m,
+	account_type_num,
 	memberships = [],
 	pro_usebalance=false;
 
@@ -86,16 +87,15 @@ function init_pro(key)
 		$('.membership-button').unbind('click');
 		$('.membership-button').bind('click',function(e)
 		{
-			var m,
-			    $membershipBlock = $(this).closest('.reg-st3-membership-bl');
+			var $membershipBlock = $(this).closest('.reg-st3-membership-bl');
 				
 			$('.reg-st3-membership-bl').removeClass('selected');
 			$membershipBlock.addClass('selected');
 			
-			m = $membershipBlock.attr('data-payment');
+			account_type_num = $membershipBlock.attr('data-payment');
 			$membershipBlock.clone().appendTo( '.membership-selected-block');
 			$('.membership-step2 .pro span').html($membershipBlock.find('.reg-st3-bott-title.title').html())	;
-			pro_next_step(m);
+			pro_next_step();
 			
 		});		
 		
@@ -108,7 +108,7 @@ function init_pro(key)
 }
 
 //Step2
-function pro_next_step(m) {
+function pro_next_step() {
 	
 	if(!u_handle) {
         megaAnalytics.log("pro", "loginreq");
@@ -129,7 +129,7 @@ function pro_next_step(m) {
 		pricePerMonth, pricePerYear;
 		
 	for (var i in memberships) {
-		  if (memberships[i][1] == m ) {
+		  if (memberships[i][1] == account_type_num ) {
 			  if (memberships[i][4] == 1 ) pricePerMonth = memberships[i][5];
 			  else pricePerYear = memberships[i][5];
 		  }
@@ -173,10 +173,6 @@ function pro_next_step(m) {
 	$('.membership-bott-button').bind('click',function(e)
 	{	
 		if ($('.membership-center').attr('class').indexOf('inactive')==-1) {
-			if ($('.membership-dropdown-item.selected').attr('data-months')<12)
-                 pro_package = 'pro' + m + '_month';
-	        else pro_package = 'pro' + m + '_year';
-			
 			pro_continue(e);
             return false;
 		}
@@ -186,6 +182,11 @@ function pro_next_step(m) {
 
 function pro_continue(e)
 {
+	if ($('.membership-dropdown-item.selected').attr('data-months')<12)
+         pro_package = 'pro' + account_type_num + '_month';
+		 //$('.membership-dropdown-item').attr('data-months') - how much months is selected
+	else pro_package = 'pro' + account_type_num + '_year';
+	
 	pro_paymentmethod='';
 	if (u_type === false)
 	{

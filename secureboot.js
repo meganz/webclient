@@ -97,18 +97,19 @@ if (!b_u) try
         apipath = localStorage.apipath || 'https://eu.api.mega.co.nz/';
     }
 }
-catch(e)
-{
-    alert(
-        "Sorry, we were unable to initialize the browser's local storage, "+
-        "either you're using an outdated browser or it's something from our side.\n"+
-        "\n"+
-        "If you think it's our fault, please report the issue back to us.\n"+
-        "\n"+
-        "Reason: " + (e.message || e)+
-        "\nBrowser: " + (typeof mozBrowserID !== 'undefined' ? mozBrowserID : ua)
-    );
-    b_u = 1;
+catch(e) {
+    if (!isMobile() || e.message !== 'SecurityError: DOM Exception 18') {
+        alert(
+            "Sorry, we were unable to initialize the browser's local storage, "+
+            "either you're using an outdated browser or it's something from our side.\n"+
+            "\n"+
+            "If you think it's our fault, please report the issue back to us.\n"+
+            "\n"+
+            "Reason: " + (e.message || e)+
+            "\nBrowser: " + (typeof mozBrowserID !== 'undefined' ? mozBrowserID : ua)
+        );
+        b_u = 1;
+    }
 }
 
 var bootstaticpath = staticpath;
@@ -435,6 +436,8 @@ if (m)
     }
     else if (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1 || ua.indexOf('ipod') > -1)
     {
+        // http://whatsmyuseragent.com/Devices/iPhone-User-Agent-Strings
+        // http://www.enterpriseios.com/wiki/Complete_List_of_iOS_User_Agent_Strings
         app='https://itunes.apple.com/app/mega/id706857885';
         document.body.className = 'ios full-mode supported';
         document.getElementById('m_desc').innerHTML = 'Free 50 GB - End-to-end encryption';
@@ -454,7 +457,7 @@ if (m)
     if (window.location.hash.substr(1,1) == '!' || window.location.hash.substr(1,2) == 'F!')
     {
         var i=0;
-        if (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1 || ua.indexOf('ipod') > -1 || ua.indexOf('windows phone') > -1) i=1;
+        if (ua.indexOf('windows phone') > -1) i=1;
 
         if (app) {
             document.getElementById('m_title').innerHTML = 'Install the free MEGA app to access this file from your mobile';
@@ -472,7 +475,7 @@ if (m)
     else if (window.location.hash.substr(1,7) == 'confirm' || window.location.hash.substr(1,7) == 'account')
     {
         var i=0;
-        if (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1 || ua.indexOf('ipod') > -1 || ua.indexOf('windows phone') > -1) i=1;
+        if (ua.indexOf('windows phone') > -1) i=1;
         if (ua.indexOf('chrome') > -1) window.location ='mega://' + window.location.hash.substr(i);
         else document.getElementById('m_iframe').src = 'mega://' + window.location.hash.substr(i);
     }

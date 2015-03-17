@@ -1161,20 +1161,17 @@ function isValidShareLink()
     return valid;
 }
 
-function removeUInode(h)
-{
-    var n = M.d[h];
-    var i = 0;
+function removeUInode(h) {
+    
+    var n = M.d[h],
+        i = 0;
+    
     // check subfolders
-    if (n && n.t)
-    {
+    if (n && n.t) {
         var cns = M.c[n.p];
-        if (cns)
-        {
-            for (var cn in cns)
-            {
-                if (M.d[cn] && M.d[cn].t && cn !== h)
-                {
+        if (cns) {
+            for (var cn in cns) {
+                if (M.d[cn] && M.d[cn].t && cn !== h) {
                     i++;
                     break;
                 }
@@ -1183,77 +1180,82 @@ function removeUInode(h)
     }
 
     var hasItems = !!M.v.length;
-    switch (M.currentdirid)
-    {
+    switch (M.currentdirid) {
         case "shares":
             $('#treeli_' + h).remove();// remove folder and subfolders
-            if (!hasItems)
-            {
+            if (!hasItems) {
                 $('.files-grid-view .grid-table-header tr').remove();
-                // ToDo: Missing empty picture for shares
                 $('.fm-empty-cloud').removeClass('hidden');
             }
             break;
         case "contacts":
+            
             //Clear left panel:
             $('#contact_' + h).fadeOut('slow', function() {
                 $(this).remove();
             });
+            
             //Clear right panel:
             $('.grid-table.contacts tr#' + h).fadeOut('slow', function() {
                 $(this).remove();
             });
+            
             // clear the contacts grid:
             $('.contacts-grid-view #' + h).remove();
-            // TODO: remove from conversations?
-            if (!hasItems)
-            {
+            if (!hasItems) {
                 $('.contacts-grid-view .contacts-grid-header tr').remove();
+                $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[784]);
                 $('.fm-empty-contacts').removeClass('hidden');
             }
             break;
         case "chat":
-            if (!hasItems)
-            {
-                // ToDo: Missing grid header for conversation
+            if (!hasItems) {
                 $('.contacts-grid-view .contacts-grid-header tr').remove();
                 $('.fm-empty-chat').removeClass('hidden');
             }
             break;
         case M.RubbishID:
-            if (i == 0 && n)
+            if (i == 0 && n) {
                 $('#treea_' + n.p).removeClass('contains-folders expanded');
-            $('#' + h).remove();// remove item
-            $('#treeli_' + h).remove();// remove folder and subfolders
-            if (!hasItems)
-            {
+            }
+            
+            // Remove item
+            $('#' + h).remove();
+            
+            // Remove folder and subfolders
+            $('#treeli_' + h).remove();
+            if (!hasItems) {
                 $('.contacts-grid-view .contacts-grid-header tr').remove();
                 $('.fm-empty-trashbin').removeClass('hidden');
             }
             break;
         case M.RootID:
-            if (i == 0 && n)
+            if (i == 0 && n) {
                 $('#treea_' + n.p).removeClass('contains-folders expanded');
-            $('#' + h).remove();// remove item
-            $('#treeli_' + h).remove();// remove folder and subfolders
-            if (!hasItems)
-            {
+            }
+            
+            // Remove item
+            $('#' + h).remove();
+            
+            // Remove folder and subfolders
+            $('#treeli_' + h).remove();
+            if (!hasItems) {
                 $('.files-grid-view').addClass('hidden');
                 $('.grid-table.fm tr').remove();
                 $('.fm-empty-cloud').removeClass('hidden');
             }
             break;
         default:
-            if (i == 0 && n)
+            if (i == 0 && n) {
                 $('#treea_' + n.p).removeClass('contains-folders expanded');
+            }
             $('#' + h).remove();// remove item
             $('#treeli_' + h).remove();// remove folder and subfolders
-            if (!hasItems)
-            {
-                if (sharedfolderUI())
+            if (!hasItems) {
+                if (sharedfolderUI()) {
                     M.emptySharefolderUI();
-                else
-                {
+                }
+                else {
                     $('.files-grid-view').addClass('hidden');
                     $('.fm-empty-folder').removeClass('hidden');
                 }
@@ -1568,18 +1570,15 @@ function addContactUI()
     }
 
     //TODO: Bind events if Contacts section is empty
-    $('.fm-empty-contacts .fm-empty-button').unbind('mouseover');
-    $('.fm-empty-contacts .fm-empty-button').bind('mouseover', function() {
+    $('.fm-empty-contacts .fm-empty-button').rebind('mouseover', function() {
         $('.fm-empty-contacts').addClass('hovered');
     });
 
-    $('.fm-empty-contacts .fm-empty-button').unbind('mouseout');
-    $('.fm-empty-contacts .fm-empty-button').bind('mouseout', function() {
+    $('.fm-empty-contacts .fm-empty-button').rebind('mouseout', function() {
         $('.fm-empty-contacts').removeClass('hovered');
     });
 
-    $('.fm-empty-contacts .fm-empty-button').unbind('click');
-    $('.fm-empty-contacts .fm-empty-button').bind('click', function(event) {
+    $('.fm-empty-contacts .fm-empty-button').rebind('click', function(event) {
 
         $.hideContextMenu();
         $.dialog = 'add-contact-popup';
@@ -1609,8 +1608,7 @@ function addContactUI()
         focusOnInput();
     });
 
-    $('.fm-add-user').unbind('click');
-    $('.fm-add-user').bind('click', function() {
+    $('.fm-add-user').rebind('click', function() {
         $.hideContextMenu();
         $.dialog = 'add-contact-popup';
         var $this = $(this);

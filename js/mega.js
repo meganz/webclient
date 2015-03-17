@@ -590,6 +590,7 @@ function MegaData()
             // We do NOT have active contacts, set empty contacts grid
             if (!haveActiveContact) {
                 $('.files-grid-view.contacts-view').addClass('hidden');
+                $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[784]);
                 $('.fm-empty-contacts').removeClass('hidden');
             }
         }
@@ -1086,7 +1087,11 @@ function MegaData()
         if (this.v.length === 0) {
             if (M.currentdirid === M.RubbishID) {
                 $('.fm-empty-trashbin').removeClass('hidden');
-            } else if (M.currentdirid === 'contacts' || M.currentdirid === 'opc' || M.currentdirid === 'ipc') {
+            } else if (M.currentdirid === 'contacts') {
+                $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[784]);
+                $('.fm-empty-contacts').removeClass('hidden');
+            } else if (M.currentdirid === 'opc' || M.currentdirid === 'ipc') {
+                $('.fm-empty-contacts .fm-empty-cloud-txt').text('No requests pending at this time');
                 $('.fm-empty-contacts').removeClass('hidden');
             } else if (M.currentdirid.substr(0, 7) === 'search/') {
                 $('.fm-empty-search').removeClass('hidden');
@@ -5249,6 +5254,7 @@ function processIPC(ipc) {
             delete M.ipc[ipc[i].p];
             if ((Object.keys(M.ipc).length === 0) && (M.currentdirid === 'ipc')) {
                 $('.contact-requests-grid').addClass('hidden');
+                $('.fm-empty-contacts .fm-empty-cloud-txt').text('No requests pending at this time');
                 $('.fm-empty-contacts').removeClass('hidden');
             }
         }
@@ -5282,6 +5288,7 @@ function processOPC(opc) {
                     delete M.opc[k];
                     if ((Object.keys(M.opc).length === 0) && (M.currentdirid === 'opc')) {
                         $('.sent-requests-grid').addClass('hidden');
+                        $('.fm-empty-contacts .fm-empty-cloud-txt').text('No requests pending at this time');
                         $('.fm-empty-contacts').removeClass('hidden');
                     }
                     break;
@@ -5355,6 +5362,7 @@ function processUPCI(ap) {
             $('#ipc_' + ap[i].p).remove();
             if ((Object.keys(M.ipc).length === 0) && (M.currentdirid === 'ipc')) {
                 $('.contact-requests-grid').addClass('hidden');
+                $('.fm-empty-contacts .fm-empty-cloud-txt').text('No requests pending at this time');
                 $('.fm-empty-contacts').removeClass('hidden');
             }
         }
@@ -5391,6 +5399,7 @@ function processUPCO(ap) {
             $('#opc_' + psid).remove();
             if ((Object.keys(M.opc).length === 0) && (M.currentdirid === 'opc')) {
                 $('.sent-requests-grid').addClass('hidden');
+                $('.fm-empty-contacts .fm-empty-cloud-txt').text('No requests pending at this time');
                 $('.fm-empty-contacts').removeClass('hidden');
             }
         }

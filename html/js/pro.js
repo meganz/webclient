@@ -8,12 +8,14 @@ var pro_package,
 	pro_usebalance=false;
 
 
-function init_pro(key)
+function init_pro()
 {
-	if (key) {
-		$('.main-pad-block').addClass('key');
+	if (localStorage.keycomplete) {
+		$('body').addClass('key');
 	    sessionStorage.proref = 'accountcompletion';
-	}
+		localStorage.removeItem('keycomplete');
+	} else $('body').addClass('pro');
+	
     
 	if (u_type == 3)
 	{
@@ -34,8 +36,6 @@ function init_pro(key)
 	
 	if (document.location.hash.indexOf('#pro#') > -1) sessionStorage.proref = document.location.hash.replace('#pro#','');
 	
-	
-	$('body').addClass('pro');
 	if (lang !== 'en') $('.reg-st3-save-txt').addClass(lang);
     if (lang == 'fr') $('.reg-st3-big-txt').each(function(e,o){$(o).html($(o).html().replace('GB','Go').replace('TB','To'));});
 	

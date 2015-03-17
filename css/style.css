@@ -11664,7 +11664,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
 	min-height: 20px;
 	color: #333333;
 }
-.membership-medium-txt.red-bg.editprofile {
+.membership-medium-txt.red-bg.editprofile, .membership-medium-txt.gray-bg.cancel-account {
 	margin-top: 7px;
 }
 .membership-small-txt {
@@ -13542,6 +13542,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	padding: 0 20px;
+	overflow:hidden;
 }
 .nw-bottom-pad {
 	height: 208px;

@@ -16241,8 +16241,8 @@ strong, b {
 	padding: 20px 0 17px 0;
 }
 /* Make the wire transfer details mouse selectable */
-.nw-contact-avatar, .nw-contact-avatar img, div.nw-chat-sharing-body, div.fm-chat-messages-pad, .block-view-file-type, .nw-chat-expand-arrow, .fm-chat-message, .nw-chat-sharing-body, .nw-chat-sharing-body div, .nw-contact-avatar img, .create-folder-button, a.create-folder-button, .add-user-popup-button, a.add-user-popup-button, .create-folder-button-cancel, .fm-dialog-new-folder-button, .fm-dialog, .fmholder div, .fmholder a, .fmholder span, .fmholder td, div.new-bottom-pages div.new-left-menu-link, div.new-bottom-pages a.dev-new-button, .fm-subfolders, .add-contact-item, .share-folder-info, .fm-dialog-header, .fm-share-body, .share-dialog div, .fm-chat-file-button, .reg-st3-membership-bl .resellers-top-txt .wire-transfer-details {
-    -webkit-touch-callout: text !important;
+.wire-transfer-details * {
+	-webkit-touch-callout: text !important;
 	-webkit-user-select: text !important;
 	-khtml-user-select: text !important;
 	-moz-user-select: text !important;
@@ -16250,11 +16250,11 @@ strong, b {
 	user-select: text !important;
 }
 .resellers-top-txt .wire-transfer-details th {
-    padding-right: 15px;
-    text-align: left;
+	padding-right: 15px;
+	text-align: left;
 }
 .resellers-top-txt .wire-transfer-details .bank-address {
-    padding-bottom: 15px;
+	padding-bottom: 15px;
 }
 /* Avatar Picket */
 .top-login-input-tooltip.active {

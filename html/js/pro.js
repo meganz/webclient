@@ -1,20 +1,57 @@
-var pro_package,
-    pro_packs = [],
-	pro_balance = 0,
-	pro_paymentmethod,
-	pro_m,
-	account_type_num,
-	memberships = [],
-	pro_usebalance=false;
+var pro_package;
+var pro_packs = [];
+var pro_balance = 0;
+var pro_paymentmethod;
+var pro_m;
+var pro_usebalance=false;
 
-
-function init_pro(key)
+function switch_pro(data)
 {
-	if (key) {
-		$('.main-pad-block').addClass('key');
-	    sessionStorage.proref = 'accountcompletion';
+	 if(data)
+	 {
+		$('#month').addClass('red');
+		$('#year').removeClass('red');
+		$('.reg-st3-save-icon').addClass('hidden');
+		$('.pro-new-year').addClass('hidden');
+		$('.pro-new-month').removeClass('hidden');			
+		$('.pro1 .reg-st3-bott-title.right').html('9<span>.99 &euro;</span>');
+		$('.pro2 .reg-st3-bott-title.right').html('19<span>.99 &euro;</span>');
+		$('.pro3 .reg-st3-bott-title.right').html('29<span>.99 &euro;</span>');
+		$('.pro1 .reg-st3-bandwidth .reg-st3-big-txt').html('1 <span>TB</span>');
+		$('.pro2 .reg-st3-bandwidth .reg-st3-big-txt').html('4 <span>TB</span>');
+		$('.pro3 .reg-st3-bandwidth .reg-st3-big-txt').html('8 <span>TB</span>');
+         $('#reg-checkbox').attr('checked',true);
+	 } 
+	 else 
+	 {
+		$('#month').removeClass('red');
+		$('#year').addClass('red');
+		$('.reg-st3-save-icon').removeClass('hidden');
+		$('.pro-new-year').removeClass('hidden');
+		$('.pro-new-month').addClass('hidden');			
+		$('.pro1 .reg-st3-bott-title.right').html('99<span>.99 &euro;</span>');
+		$('.pro2 .reg-st3-bott-title.right').html('199<span>.99 &euro;</span>');
+		$('.pro3 .reg-st3-bott-title.right').html('299<span>.99 &euro;</span>');			
+		$('.pro1 .reg-st3-bandwidth .reg-st3-big-txt').html('12 <span>TB</span>');
+		$('.pro2 .reg-st3-bandwidth .reg-st3-big-txt').html('48 <span>TB</span>');
+		$('.pro3 .reg-st3-bandwidth .reg-st3-big-txt').html('96 <span>TB</span>');
+         $('#reg-checkbox').attr('checked',false);
+	 }
+}
+
+function init_pro()
+{
+    var DEFAULT = 'monthly'; 
+	
+	if (DEFAULT == 'monthly') 
+	{
+		switch_pro(true);
 	}
-    
+	else
+	{
+		switch_pro(false);	
+	}
+
 	if (u_type == 3)
 	{
 		api_req(
@@ -36,67 +73,53 @@ function init_pro(key)
 	
 	
 	$('body').addClass('pro');
-	if (lang !== 'en') $('.reg-st3-save-txt').addClass(lang);
-    if (lang == 'fr') $('.reg-st3-big-txt').each(function(e,o){$(o).html($(o).html().replace('GB','Go').replace('TB','To'));});
-	
-	
+	if (lang != 'en') $('body').addClass(lang);	
+	json = JSON.parse(pro_json);				
+	for (var i in json[0])
+	{
+		if      ((json[0][i][2] == '500') && (json[0][i][5] == '9.99')) 	pro_packs['pro1_month'] = json[0][i];
+		else if ((json[0][i][2] == '500') && (json[0][i][5] == '99.99')) 	pro_packs['pro1_year'] 	= json[0][i];
+		else if ((json[0][i][2] == '2048') && (json[0][i][5] == '19.99')) 	pro_packs['pro2_month'] = json[0][i];
+		else if ((json[0][i][2] == '2048') && (json[0][i][5] == '199.99')) 	pro_packs['pro2_year'] 	= json[0][i];
+		else if ((json[0][i][2] == '4096') && (json[0][i][5] == '29.99')) 	pro_packs['pro3_month'] = json[0][i];
+		else if ((json[0][i][2] == '4096') && (json[0][i][5] == '299.99')) 	pro_packs['pro3_year'] 	= json[0][i];		
+	}
 	if (!m)
 	{
+	   if (lang == 'fr') $('.reg-st3-big-txt').each(function(e,o){$(o).html($(o).html().replace('GB','Go').replace('TB','To'));});
+	   if (lang !== 'en') $('.reg-st3-save-txt').addClass(lang);	   
+	   $('.reg-checkbox :checkbox').iphoneStyle({resizeContainer:false,resizeHandle:false,onChange:function(elem, data)
+	   {
+		 switch_pro(data);	     
+		 if (lang == 'fr') $('.reg-st3-big-txt').each(function(e,o){$(o).html($(o).html().replace('GB','Go').replace('TB','To'));});
+		}
+	   });
 	   
-	    api_req(
-        { a : 'utqa'},
-		    { 
-			  callback : function (res) 
-			  {
-				  memberships = res;
-				 
-				  for ( var i = 0, l = memberships.length; i < l; i++ ) {
-					  if (memberships[i][4] == 1) {
-                        $('.reg-st3-membership-bl.pro' + memberships[i][1] + ' .price .num').html(memberships[i][5].split('.')[0]+'<span class="small">.'+memberships[i][5].split('.')[1]+' &euro;</span>');
-					  }
-				  }
-			  }
-	        }
-	    );	
-		
-		if (lang !== 'en') $('.reg-st3-save-txt').addClass(lang);
-	    if (lang == 'fr') $('.reg-st3-big-txt').each(function(e,o){$(o).html($(o).html().replace('GB','Go').replace('TB','To'));});
-	     
-	    $('.membership-step1 .reg-st3-membership-bl').unbind('click');
-		$('.membership-step1 .reg-st3-membership-bl').bind('click',function(e)
+	    $('.reg-st3-membership-bl').unbind('click');
+		$('.reg-st3-membership-bl').bind('click',function(e)
 		{		
 			$('.reg-st3-membership-bl').removeClass('selected');
-			$(this).addClass('selected');	
+			$(this).addClass('selected');		
 		});
 		
-		$('.membership-step1 .reg-st3-membership-bl').unbind('dblclick');
-		$('.membership-step1 .reg-st3-membership-bl').bind('dblclick',function(e)
+		 $('.reg-st3-membership-bl').unbind('dblclick');
+		$('.reg-st3-membership-bl').bind('dblclick',function(e)
 		{		
 			$('.reg-st3-membership-bl').removeClass('selected');
 			$(this).addClass('selected');
-			pro_next_step($(this).attr('class').split(' ')[1]);	
+			pro_proceed(e);
 		});
-		
-		$('.membership-free-button').unbind('click');
-		$('.membership-free-button').bind('click',function(e) {
-			if (page == 'fm') document.location.hash = '#start';
-		    else document.location.hash = '#fm';
-		    return false;
-		});
-		
-		$('.membership-button').unbind('click');
-		$('.membership-button').bind('click',function(e)
+		$('.pro-gray-block .register-st2-button-arrow').unbind('click');
+		$('.pro-gray-block .register-st2-button-arrow').bind('click',function(e)
 		{
-			var $membershipBlock = $(this).closest('.reg-st3-membership-bl');
-				
-			$('.reg-st3-membership-bl').removeClass('selected');
-			$membershipBlock.addClass('selected');
-			
-			account_type_num = $membershipBlock.attr('data-payment');
-			$membershipBlock.clone().appendTo( '.membership-selected-block');
-			$('.membership-step2 .pro span').html($membershipBlock.find('.reg-st3-bott-title.title').html())	;
-			pro_next_step();
-			
+            pro_proceed(e);
+            return false;
+		});		
+		
+		$('.key3 .register-st2-button-arrow').unbind('click');
+		$('.key3 .register-st2-button-arrow').bind('click',function(e)
+		{
+			pro_proceed(e);
 		});		
 		
 		$('.pro-bottom-button').unbind('click');
@@ -107,10 +130,34 @@ function init_pro(key)
 	}
 }
 
-//Step2
-function pro_next_step() {
-	
-	if(!u_handle) {
+function pro_proceed(e)
+{
+	if (page == 'key') sessionStorage.proref = 'accountcompletion';
+
+	var c = $('.reg-st3-membership-bl.selected').attr('class');
+	if (c.indexOf('free') > -1)
+	{
+		if (page == 'fm') document.location.hash = '#start';
+		else document.location.hash = '#fm';
+
+		return false;
+	}
+	else if(c.indexOf('pro1') > -1 && $('#reg-checkbox').attr('checked')) pro_package = 'pro1_month';
+	else if(c.indexOf('pro1') > -1) pro_package = 'pro1_year';
+	else if(c.indexOf('pro2') > -1 && $('#reg-checkbox').attr('checked')) pro_package = 'pro2_month';		
+	else if(c.indexOf('pro2') > -1) pro_package = 'pro2_year';
+	else if(c.indexOf('pro3') > -1 && $('#reg-checkbox').attr('checked')) pro_package = 'pro3_month';
+	else if(c.indexOf('pro3') > -1) pro_package = 'pro3_year';
+
+    megaAnalytics.log("pro", "proc");
+
+	if (pro_package) pro_continue();
+}
+
+function pro_continue()
+{
+
+    if(!u_handle) {
         megaAnalytics.log("pro", "loginreq");
         //msgDialog('loginrequired', 'title', 'msg');
         showSignupPromptDialog();
@@ -119,74 +166,7 @@ function pro_next_step() {
         showRegisterDialog();
         return;
     }
-	
-	megaAnalytics.log("pro", "proc");
-	
-	var currentDate = new Date(),
-	    monthName=new Array("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"),
-	    mon = monthName[currentDate.getMonth()],
-		day = currentDate.getDate(),
-		pricePerMonth, pricePerYear;
-		
-	for (var i in memberships) {
-		  if (memberships[i][1] == account_type_num ) {
-			  if (memberships[i][4] == 1 ) pricePerMonth = memberships[i][5];
-			  else pricePerYear = memberships[i][5];
-		  }
-	}
-		
-	$('.membership-step1').addClass('hidden');
-	$('.membership-step2').removeClass('hidden');
-	mainScroll();
-	
-	$('.membership-date .month').text(mon);
-	$('.membership-date .day').text(day);
-	
-	$('.membership-dropdown-item').each(function() {
-	   if($(this).attr('data-months')<12)
-       $(this).find('strong').html(pricePerMonth * $(this).attr('data-months'));
-	   else $(this).find('strong').html(pricePerYear);
-    });
-	
-	$('.membership-st2-select span').unbind('click');
-	$('.membership-st2-select span').bind('click',function()
-	{		
-		if ($('.membership-st2-select').attr('class').indexOf('active') == -1 ) $('.membership-st2-select').addClass('active');
-		else $('.membership-st2-select').removeClass('active');
-	});
-	
-	$('.membership-dropdown-item').unbind('click');
-	$('.membership-dropdown-item').bind('click',function()
-	{		
-	    var price = $(this).find('strong').html();
-	    $('.membership-dropdown-item').removeClass('selected');
-		$(this).addClass('selected');
-		$('.membership-st2-select').removeClass('active');
-		$('.membership-st2-select span').html($(this).html());
-		if (price) {
-		   $('.membership-center.inactive').removeClass('inactive');
-		   $('.membership-bott-price strong').html(price.split('.')[0]+'<span>.' + price.split('.')[1] + ' &euro;</span>');
-		}
-	});
-	
-	$('.membership-bott-button').unbind('click');
-	$('.membership-bott-button').bind('click',function(e)
-	{	
-		if ($('.membership-center').attr('class').indexOf('inactive')==-1) {
-			pro_continue(e);
-            return false;
-		}
-	});
-	
-}
 
-function pro_continue(e)
-{
-	if ($('.membership-dropdown-item.selected').attr('data-months')<12)
-         pro_package = 'pro' + account_type_num + '_month';
-		 //$('.membership-dropdown-item').attr('data-months') - how much months is selected
-	else pro_package = 'pro' + account_type_num + '_year';
-	
 	pro_paymentmethod='';
 	if (u_type === false)
 	{
@@ -216,6 +196,8 @@ function pro_pay()
     if(!ul_uploading && !downloading) {
         redirectToPaypal();
     }
+	
+	
 
     api_req({ a : 'uts', it: 0, si: pro_packs[pro_package][0], p: pro_packs[pro_package][5], c: pro_packs[pro_package][6], aff: aff, 'm':m},
 	{
@@ -823,10 +805,18 @@ var showSignupPromptDialog = function() {
                 );
 
             // custom buttons, because of the styling
-            $('.fm-notification-info',this.$dialog)
-                .html('<p>' + l[5842] + '</p>');
+            $('.fm-notification-info p',this.$dialog)
+                .html(
+                    '<p>' + l[5842] + '</p>\n' +
+                    '<a class="top-login-button" href="#login">' + l[171] + '</a>\n' +
+                    '<a class="create-account-button" href="#register">' + l[1076] + '</a><br/>'
+                );
 
-            $('.fm-dialog-button.pro-login', this.$dialog)
+            $('.fm-notifications-bottom', this.$dialog)
+                .addClass('hidden')
+                .html('');
+
+            $('.top-login-button', this.$dialog)
                 .unbind('click.loginrequired')
                 .bind('click.loginrequired', function() {
                     signupPromptDialog.hide();
@@ -834,7 +824,7 @@ var showSignupPromptDialog = function() {
                     return false;
                 });
 
-            $('.fm-dialog-button.pro-register', this.$dialog)
+            $('.create-account-button', this.$dialog)
                 .unbind('click.loginrequired')
                 .bind('click.loginrequired', function() {
                     signupPromptDialog.hide();
@@ -848,15 +838,13 @@ var showSignupPromptDialog = function() {
 
     var $selectedPlan = $('.reg-st3-membership-bl.selected');
     var plan = 1;
-    if($selectedPlan.is(".lite")) { plan = 1; }
-	else if($selectedPlan.is(".pro1")) { plan = 2; }
-    else if($selectedPlan.is(".pro2")) { plan = 3; }
-    else if($selectedPlan.is(".pro3")) { plan = 4; }
+    if($selectedPlan.is(".pro1")) { plan = 1; }
+    else if($selectedPlan.is(".pro2")) { plan = 2; }
+    else if($selectedPlan.is(".pro3")) { plan = 3; }
 
     $('.loginrequired-dialog .fm-notification-icon')
         .removeClass('plan1')
         .removeClass('plan2')
         .removeClass('plan3')
-		.removeClass('plan4')
         .addClass('plan' + plan);
 }

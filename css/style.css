@@ -14485,10 +14485,10 @@ h5.main-italic-header {
 	font-size: 16px;
 	line-height: 18px;
 }
-.cz .reg-st3-bandwidth, .cz .reg-st3-storage, .ru .reg-st3-bandwidth, .ru .reg-st3-storage, .uk .reg-st3-bandwidth, .uk .reg-st3-storage {
+.cz .pro-gray-block .reg-st3-bandwidth, .cz .pro-gray-block .reg-st3-storage, .ru .pro-gray-block .reg-st3-bandwidth, .ru .pro-gray-block .reg-st3-storage, .uk .pro-gray-block .reg-st3-bandwidth, .uk .pro-gray-block .reg-st3-storage {
 	width: 130px;
 }
-.sl .reg-st3-bandwidth, .sl .reg-st3-storage, .ca .reg-st3-bandwidth, .ca .reg-st3-storage {
+.sl .pro-gray-block .reg-st3-bandwidth, .sl .pro-gray-block .reg-st3-storage, .ca .pro-gray-block .reg-st3-bandwidth, .pro-gray-block .ca .reg-st3-storage {
 	width: 113px;
 }
 .ar .diagonal, .ar .reg-st3-checkbox-label {

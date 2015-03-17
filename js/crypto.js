@@ -630,8 +630,8 @@ function crypto_rsagenkey() {
         var endTime = new Date();
         if (window.d) {
             console.log("Key generation took "
-                + (endTime.getTime() - startTime.getTime()) / 1000.0)
-                + " seconds!";
+                + (endTime.getTime() - startTime.getTime()) / 1000.0
+                + " seconds!");
         }
 
         u_setrsa(k)

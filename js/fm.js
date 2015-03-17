@@ -6685,24 +6685,22 @@ function initShareDialog() {
         });
     }
 
-    menuPermissionState = function($this)
-    {
+    function menuPermissionState($this) {
         var mi = '.permissions-menu .permissions-menu-item';
         $(mi).removeClass('active');
 
         var cls = checkMultiInputPermission($this);
 
         $(mi + '.' + cls[0]).addClass('active');
-    };
+    }
 
-    handlePermissionMenu = function($this, m, x, y)
-    {
+    function handlePermissionMenu($this, m, x, y) {
         m.css('left', x + 'px');
         m.css('top', y + 'px');
         menuPermissionState($this);
         $this.addClass('active');
         m.fadeIn(200);
-    };
+    }
 
     /**
      * Called when multi-input is not empty
@@ -6715,7 +6713,7 @@ function initShareDialog() {
      * @param {array} perm, permission class and text
      * 
      */
-    determineContactParams = function(item, perm) {
+    function determineContactParams(item, perm) {
         var email = item;// email address
         var id = '';
         /*for (var i in M.u)
@@ -6739,12 +6737,9 @@ function initShareDialog() {
         var html = addShareDialogContactToContent('', id, av_color, av, email, perm[0], perm[1]);
 
         $('.share-dialog .share-dialog-contacts').append(html);
+    }
 
-    };
-
-    $('.share-dialog').unbind('click');
-    $('.share-dialog').bind('click', function(e)
-    {
+    $('.share-dialog').rebind('click', function(e) {
         // Fix bug in console
         if (typeof e.originalEvent.path != 'undefined') {
 
@@ -6768,15 +6763,12 @@ function initShareDialog() {
         }
     });
 
-    $('.share-dialog .fm-dialog-close, .share-dialog .dialog-cancel-button').unbind('click');
-    $('.share-dialog .fm-dialog-close, .share-dialog .dialog-cancel-button').bind('click', function()
-    {
+    $('.share-dialog .fm-dialog-close, .share-dialog .dialog-cancel-button').rebind('click', function() {
         $('.export-links-warning').addClass('hidden');
         closeDialog();
     });
 
-    $('.share-dialog .dialog-share-button').unbind('click');
-    $('.share-dialog .dialog-share-button').bind('click', function() {
+    $('.share-dialog .dialog-share-button').rebind('click', function() {
         // If share button is NOT disabled
         if (!$(this).is('.disabled')) {
             // If there's a contacts in multi-input add them to top
@@ -6828,8 +6820,7 @@ function initShareDialog() {
         }
     });
 
-    $(document).off('click', '.share-dialog-remove-button');
-    $(document).on('click', '.share-dialog-remove-button', function() {
+    $('.share-dialog-remove-button').rebind('click', function() {
         var $this = $(this);
 
         var handleOrEmail = $this.parent().attr('id').replace('sdcbl_', '');
@@ -6870,9 +6861,7 @@ function initShareDialog() {
     });
 
     // related to specific contact
-    $(document).off('click', '.share-dialog-permissions');
-    $(document).on('click', '.share-dialog-permissions', function (e)
-    {
+    $('.share-dialog-permissions').rebind('click', function(e) {
         var $this = $(this),
             $m = $('.permissions-menu'),
             scrollBlock = $('.share-dialog-contacts .jspPane');
@@ -6899,9 +6888,7 @@ function initShareDialog() {
     });
 
     // related to multi-input contacts
-    $('.share-dialog .permissions-icon').unbind('click');
-    $('.share-dialog .permissions-icon').bind('click', function (e)
-    {
+    $('.share-dialog .permissions-icon').rebind('click', function(e) {
         var $this = $(this),
             $m = $('.permissions-menu');
         if ($this.is('.active'))// fadeOut permission menu for this icon
@@ -6923,9 +6910,7 @@ function initShareDialog() {
         e.stopPropagation();
     });
 
-    $('.permissions-menu-item').unbind('click');
-    $('.permissions-menu-item').bind('click', function(e)
-    {
+    $('.permissions-menu-item').rebind('click', function(e) {
         var $this = $(this);
 
         $('.permissions-menu').fadeOut(200);
@@ -6963,7 +6948,7 @@ function initShareDialog() {
     });
 
     //Pending info block
-    $('.pending-indicator').bind('mouseover', function() {
+    $('.pending-indicator').rebind('mouseover', function() {
         var x = $(this).position().left,
             y = $(this).position().top,
             infoBlock = $('.share-pending-info'),
@@ -6977,12 +6962,12 @@ function initShareDialog() {
         });
         infoBlock.fadeIn(200);
     });
-    $('.pending-indicator').bind('mouseout', function() {
+    $('.pending-indicator').rebind('mouseout', function() {
         $('.share-pending-info').fadeOut(200);
     });
 
     // Personal message
-    $('.share-message textarea').bind('focus', function() {
+    $('.share-message textarea').rebind('focus', function() {
 
         var $this = $(this);
         $('.share-message').addClass('active');
@@ -7004,7 +6989,7 @@ function initShareDialog() {
         }
     });
 
-    $('.share-message textarea').bind('blur', function() {
+    $('.share-message textarea').rebind('blur', function() {
         var $this = $(this);
         $('.share-message').removeClass('active');
     });
@@ -7040,7 +7025,7 @@ function initShareDialog() {
       }
     }
 
-    $('.share-message textarea').on('keyup', function () {
+    $('.share-message textarea').rebind('keyup', function() {
         shareMessageResizing();
     });
 }

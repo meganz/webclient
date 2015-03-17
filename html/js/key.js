@@ -109,7 +109,7 @@ function ui_keycomplete()
 {
 	$('.key1').addClass('hidden');
 	$('.key2').addClass('hidden');
-	$document.location.hash = 'pro';
+	document.location.hash = 'pro';
 	if(typeof(u_attr.p) !== 'undefined' && (u_attr.p == 1 || u_attr.p == 2 || u_attr.p == 3)) {
 		document.location.hash = 'fm';
 	} else {

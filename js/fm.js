@@ -2166,6 +2166,7 @@ function initContextUI()
             // Show the share dialog
             var $shareDialog = $('.share-dialog');
             $shareDialog.removeClass('hidden');
+            $('.export-links-warning').removeClass('hidden');
 
             // Hide the optional message by default.
             // This gets enabled if they try share with a user who is not a contact
@@ -6770,6 +6771,7 @@ function initShareDialog() {
     $('.share-dialog .fm-dialog-close, .share-dialog .dialog-cancel-button').unbind('click');
     $('.share-dialog .fm-dialog-close, .share-dialog .dialog-cancel-button').bind('click', function()
     {
+        $('.export-links-warning').addClass('hidden');
         closeDialog();
     });
 
@@ -6815,6 +6817,7 @@ function initShareDialog() {
             });
 
             closeDialog();
+            $('.export-links-warning').addClass('hidden');
             if (targets.length > 0) {
 
                 // ToDo: Update Message with appropriate field once UI html is available

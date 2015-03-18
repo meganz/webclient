@@ -2140,7 +2140,7 @@ function initContextUI()
             ephemeralDialog(l[1005]);
         }
         else {
-            M.getlinks($.selected).done(function() {
+            M.getLinks($.selected).done(function() {
                 linksDialog();
             });
         }
@@ -2159,8 +2159,7 @@ function initContextUI()
         mcDialog();
     });
 
-    $(c + '.sh4r1ng-item').unbind('click');
-    $(c + '.sh4r1ng-item').bind('click', function() {
+    $(c + '.sh4r1ng-item').rebind('click', function() {
         if (u_type === 0) {
             ephemeralDialog(l[1006]);
         } else {
@@ -6427,7 +6426,8 @@ function addShareDialogContactToContent(type, id, av_color, av, name, permClass,
 function fillShareDialogWithContent() {
     
     $.sharedTokens = [];// GLOBAL VARIABLE, Hold items currently visible in share folder content (above multi-input)
-    var selectedNodeHandle = $.selected[0],
+    var user, email, name, shareRights, html,
+        selectedNodeHandle = $.selected[0],
         shares = M.d[selectedNodeHandle].shares,
         mps = M.ps[selectedNodeHandle];
 
@@ -6440,12 +6440,26 @@ function fillShareDialogWithContent() {
             // contacts will be addded, this prevents contact
             //  duplication in share dialog contact list
             if (M.u[userHandle] && M.u[userHandle].c && M.u[userHandle].c === 1) {
-                var user = M.u[userHandle];
-                var email = user.m;
-                var name = (user.name && user.name.length > 1) ? user.name : user.m;
-                var shareRights = M.d[selectedNodeHandle].shares[userHandle].r;
+                    user = M.u[userHandle];
+                    email = user.m;
+                    name = (user.name && user.name.length > 1) ? user.name : user.m;
+                    shareRights = M.d[selectedNodeHandle].shares[userHandle].r;
 
-                generateShareDialogRow(name, email, shareRights, userHandle);
+                    generateShareDialogRow(name, email, shareRights, userHandle);
+            }
+            // Item export link
+            if (userHandle === 'EXP' && M.d[selectedNodeHandle].ph) {
+//                html = generateExportLinkShareDialogRow();
+                window.getLinkState = false;
+                html = itemExportLinkHtml(M.d[selectedNodeHandle]);
+                var tmp =
+                '<div class="share-dialog-contact-bl" id="sdcbl_EXP">\n\
+                    <div class="share-dialog-permissions read-only">\n\
+                        <span></span>Read-only\n\
+                    </div>\n\
+                </div>';
+                $('.share-dialog .share-dialog-contacts').append(tmp);
+                $('.share-dialog .share-dialog-contacts .share-dialog-contact-bl').append(html);
             }
         }
     }
@@ -7623,45 +7637,62 @@ function getclipboardlinks()
     return link;
 }
 
-function getclipboardkeys()
-{
-    var l = '';
-    for (var i in M.links)
-    {
-        var n = M.d[M.links[i]];
-        var key;
-        if (n.t)
+function getclipboardkeys() {
+    
+    var n, key,
+        l = '';
+    
+    for (var i in M.links) {
+        n = M.d[M.links[i]];
+        
+        if (n.t) {
             key = u_sharekeys[n.h];
-        else
+        }
+        else {
             key = n.key;
+        }
+        
         l += a32_to_base64(key) + '\n';
     }
+    
     return l;
 }
 
 /**
- * generates file url for shared item
+ * itemExportLinkHtml
  * 
- * @param {string} handle, M.d.ph (specific for shared links)
- * @param {string} key
- * @param {string{ type, represents type of itme, file or folder
+ * @param {object} item
  * 
- * @returns {array}
+ * @returns {string}
  */
-function itemExportLink(handle, key, type, fileSize) {
+function itemExportLinkHtml(item) {
     
-    var fileUrlWithoutKey, fileUrlWithKey, fileUrl,
+    var fileUrlWithoutKey, fileUrlWithKey, fileUrl, key, type, fileSize,
         html = '';
-    
-    fileUrlWithoutKey = getBaseUrl() + '/#' + type + '!' + htmlentities(handle);
+
+    // Shared item type is folder
+    if (item.t) {
+        type = 'F';
+        key = u_sharekeys[item.h];
+        fileSize = '';
+    }
+
+    // Shared item type is file
+    else {
+        type = '';
+        key = item.key;
+        fileSize = htmlentities(bytesToSize(item.s));
+    }
+
+    fileUrlWithoutKey = getBaseUrl() + '/#' + type + '!' + htmlentities(item.ph);
     fileUrlWithKey = fileUrlWithoutKey + (key ? '!' + a32_to_base64(key) : '');
     fileUrl = window.getLinkState === false ? fileUrlWithoutKey : fileUrlWithKey;
     
-    html += '<div class="export-link-item">'
-         +      '<div class="export-icon ' + fileicon(n) + '" ></div>'
+    html = '<div class="export-link-item">'
+         +      '<div class="export-icon ' + fileicon(item.ph) + '" ></div>'
          +      '<div class="export-link-text-pad">'
          +          '<div class="export-link-txt">'
-         +               htmlentities(n.name) + ' <span class="export-link-gray-txt">' + fileSize + '</span>'
+         +               htmlentities(item.name) + ' <span class="export-link-gray-txt">' + fileSize + '</span>'
          +          '</div>'
          +          '<div>'
          +              '<input class="export-link-url" type="text" readonly="readonly" value="' + fileUrl + '">'
@@ -7671,13 +7702,33 @@ function itemExportLink(handle, key, type, fileSize) {
          +      '</div>'
          +  '</div>';
     
+    return html;    
+}
+
+/**
+ * generates file url for shared item
+ * 
+ * @returns {string}
+ */
+function itemExportLink() {
+    
+    var n,
+        html = '';
+    
+        for (var i in M.links) {
+            n = M.d[M.links[i]];
+
+            if (n && n.ph) {
+                html += itemExportLinkHtml(n);
+            }
+        }
+    
     return html;
 }
 
 function linksDialog(close) {
     
-    var n, key, fileSize, f,
-        html = '',
+    var html = '',
         scroll = '.export-link-body';
     
     deleteScrollPanel(scroll, 'jsp');
@@ -7690,30 +7741,10 @@ function linksDialog(close) {
     }
 
     $.dialog = 'links';
-    for (var i in M.links) {
-        n = M.d[M.links[i]];
-        
-        // Shared item type is folder
-        if (n.t) {
-            f = 'F';
-            key = u_sharekeys[n.h];
-            fileSize = '';
-        }
-        
-        // Shared item type is file
-        else {
-            f = '';
-            key = n.key;
-            fileSize = htmlentities(bytesToSize(n.s));
-        }
-
-        if (n && n.ph) {
-            html = itemExportLink(n.ph, key, f, fileSize);
-        }
-    }
     
-    $('.export-links-warning-close').unbind('click');
-    $('.export-links-warning-close').bind('click', function() {
+    html = itemExportLink();
+    
+    $('.export-links-warning-close').rebind('click', function() {
         $('.export-links-warning').addClass('hidden');
     });
     
@@ -8608,13 +8639,10 @@ function slideshow(id, close)
         }
     });
 
-    $('.slideshow-download').unbind('click');
-    $('.slideshow-download').bind('click', function(e)
-    {
-        for (var i in dl_queue)
-        {
-            if (dl_queue[i] && dl_queue[i].id == slideshowid)
-            {
+    $('.slideshow-download').rebind('click', function() {
+        
+        for (var i in dl_queue) {
+            if (dl_queue[i] && dl_queue[i].id === slideshowid) {
                 dl_queue[i].preview = false;
                 openTransferpanel();
                 return;
@@ -8623,25 +8651,25 @@ function slideshow(id, close)
         M.addDownload([slideshowid]);
     });
 
-    $('.slideshow-getlink').unbind('click');
-    $('.slideshow-getlink').bind('click', function(e)
-    {
-        if (u_type === 0)
+    $('.slideshow-getlink').rebind('click', function() {
+        
+        if (u_type === 0) {
             ephemeralDialog(l[1005]);
+        }
         else {
-            M.getlinks([slideshowid]).done(function() {
+            M.getLinks([slideshowid]).done(function() {
                 linksDialog();
             });
         }
     });
 
-    if (previews[id])
-    {
+    if (previews[id]) {
         previewsrc(previews[id].src);
         fetchnext();
     }
-    else if (!preqs[id])
+    else if (!preqs[id]) {
         fetchsrc(id);
+    }
 
     $('.slideshow-overlay').removeClass('hidden');
     $('.slideshow-dialog').removeClass('hidden');

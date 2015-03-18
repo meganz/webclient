@@ -3223,25 +3223,25 @@ function MegaData()
         }
     };
 
-    this.getlinks = function(h) {
+    this.getLinks = function(h) {
         this.$getLinkPromise = new $.Deferred();
 
         loadingDialog.show();
         this.links = [];
-        this.folderlinks = [];
+        this.folderLinks = [];
         for (var i in h) {
             var n = M.d[h[i]];
             if (n) {
                 if (n.t) {
-                    this.folderlinks.push(n.h);
+                    this.folderLinks.push(n.h);
                 }
                 this.links.push(n.h);
             }
         }
         if (d) {
-            console.log('getlinks', this.links);
+            console.log('getLinks', this.links);
         }
-        if (this.folderlinks.length > 0) {
+        if (this.folderLinks.length > 0) {
             this.getFolderlinks();
         }
         else {
@@ -3257,7 +3257,7 @@ function MegaData()
         for (var i in this.links) {
             api_req({a: 'l', n: this.links[i]}, {
                 node: this.links[i],
-                last: i === this.links.length - 1,
+                last: i == this.links.length - 1,
                 callback: function(res, ctx) {
                     
                     if (typeof res !== 'number') {
@@ -3275,9 +3275,9 @@ function MegaData()
 
     this.getFolderlinks = function() {
         
-        if (this.folderlinks.length > 0) {
-            var n = M.d[this.folderlinks[0]];
-            this.folderlinks.splice(0, 1);
+        if (this.folderLinks.length > 0) {
+            var n = M.d[this.folderLinks[0]];
+            this.folderLinks.splice(0, 1);
 
             if (n) {
                 this.fln = n;
@@ -3291,6 +3291,8 @@ function MegaData()
                     api_setshare(n.h, [{u: 'EXP', r: 0}], h, {
                         done: function(res) {
                             if (res.r && res.r[0] === 0) {
+                                
+                                // ToDo: timestamp ts can be different here and on server side, check how this influence execution
                                 M.nodeShare(M.fln.h, {h: M.fln.h, r: 0, u: 'EXP', ts: Math.floor(new Date().getTime() / 1000)});
                             }
                             M.getFolderlinks();

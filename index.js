@@ -181,7 +181,7 @@ function init_page()
 	if (u_handle || pfid || folderlink) {
 
 		if (is_fm()) {
-			// switch between FM & folderlinks (completely reinitialize)
+			// switch between FM & folderLinks (completely reinitialize)
 			if ((!pfid && folderlink) || (pfid && folderlink === 0))
 			{
 				M.reset();

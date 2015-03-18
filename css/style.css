@@ -14549,7 +14549,10 @@ h5.main-italic-header {
 	padding: 0 12px;
 }
 .membership-payment-pad {
-	padding: 56px 0 0 0;
+	padding: 0;
+}
+.payment-period {
+    margin-top: 56px;
 }
 .membership-payment-icon {
 	width: 110px;

@@ -1618,7 +1618,7 @@ a.blog-button:hover {
 	line-height: 46px;
 	margin: 8px 0;
 	display: block;
-	text-transform:uppercase;
+	text-transform: uppercase;
 }
 .notification-request-buttons {
 	float: right;
@@ -9625,20 +9625,15 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
 	min-height: 100px;
 	margin: -187px 0 0 -310px;
 }
-.fm-dialog.registration-success {
-	width: 364px;
+.fm-dialog.registration-success, .fm-dialog.reset-success {
+	width: 393px;
 	min-height: 254px;
-	margin: -127px 0 0 -182px
+	margin: -178px 0 0 -196px
 }
 .fm-dialog.restore-success {
 	width: 364px;
 	min-height: 274px;
 	margin: -137px 0 0 -182px
-}
-.fm-dialog.reset-success {
-	width: 364px;
-	min-height: 243px;
-	margin: -121px 0 0 -182px
 }
 .fm-dialog.password-dialog {
 	width: 604px;
@@ -13523,6 +13518,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	padding: 0 20px;
+	overflow: hidden;
 }
 .nw-bottom-pad {
 	height: 208px;
@@ -14174,12 +14170,12 @@ h5.main-italic-header {
 	color: #FFBA00;
 }
 .reg-success-icon {
-	width: 100px;
-	height: 100px;
-	background-image: url(../images/mega/register-big-sprite.png);
+	width: 200px;
+	height: 200px;
+	background-image: url(../images/mega/email-confirmation.png);
 	background-position: left top;
 	background-repeat: no-repeat;
-	margin: 30px auto 20px auto;
+	margin: 30px auto 0 auto;
 }
 .reg-success-header {
 	font-size: 20px;
@@ -14193,7 +14189,22 @@ h5.main-italic-header {
 	color: #333333;
 	text-align: center;
 	padding: 4px 30px 25px 30px;
-	line-height: 20px;
+	line-height: 18px;
+}
+.reset-success .reg-success-txt {
+	padding-bottom: 18px;
+}
+.reset-description-txt {
+	font-size: 11px;
+	color: #999999;
+	text-align: center;
+	padding: 0 30px 26px 30px;
+	line-height: 15px;
+}
+.reset-description-txt a {
+	color: #999999;
+	font-family: 'Open Sans Semibold', Arial;
+	text-decoration: none;
 }
 .register-loading-icon {
 	position: absolute;
@@ -16224,13 +16235,13 @@ strong, b {
 	width: 32px;
 	display: inline-block;
 	margin: 0 4px 0 4px;
-    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 	-moz-opacity: 0.5;
 	-khtml-opacity: 0.5;
 	opacity: 0.5;
 }
 .resellers-link:hover .resellers-payment {
-    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
 	-moz-opacity: 1;
 	-khtml-opacity: 1;
 	opacity: 1;
@@ -19021,6 +19032,9 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 	float: none;
 	margin: 0;
 }
+.restore-success .reg-success-icon {
+	margin-top: 2px;
+}
 .reset-account-lock-image {
 	height: 375px;
 	background-image: url(../images/mega/encr-sprite_v1.png);
@@ -19094,8 +19108,8 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 }
 .blog-new-full, .blog-new-full td {
 	font-size: 13px;
-    line-height: 26px;
-    color: #3F4646;
+	line-height: 26px;
+	color: #3F4646;
 }
 a.blog-article-button {
 	display: table-cell;
@@ -19161,7 +19175,7 @@ a.blog-article-button {
 	text-align: center;
 }
 .animations-left-container.currentLink, .animations-right-container .currentLink {
- display:block;
+	display: block;
 }
 .products-bottom-block {
 	height: 130px;
@@ -21399,6 +21413,584 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .not-communicated-txt.hidden {
 	display: none;
 }
+.loading-animation {
+	height: 16px;
+	position: relative;
+	width: 16px;
+	border-radius: 100%;
+	border: 2px solid transparent;
+	border-color: transparent gray transparent gray;
+	-moz-animation: rotate-loading 1.5s linear 0s infinite normal;
+	-moz-transform-origin: 50% 50%;
+	-o-animation: rotate-loading 1.5s linear 0s infinite normal;
+	-o-transform-origin: 50% 50%;
+	-webkit-animation: rotate-loading 1.5s linear 0s infinite normal;
+	-webkit-transform-origin: 50% 50%;
+	animation: rotate-loading 1.5s linear 0s infinite normal;
+	transform-origin: 50% 50%;
+	position: absolute;
+	margin: -2px 0 0 -2px;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	-webkit-transition: opacity 200ms ease-in-out;
+	-moz-transition: opacity 200ms ease-in-out;
+	-o-transition: opacity 200ms ease-in-out;
+	-ms-transition: opacity 200ms ease-in-out;
+	transition: opacity 2100ms ease-in-out;
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+	-moz-opacity: 0;
+	-khtml-opacity: 0;
+	opacity: 0;
+	display: none;
+}
+.connecting .loading-animation {
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
+	-moz-opacity: 0.6;
+	-khtml-opacity: 0.6;
+	opacity: 0.6;
+	display: block;
+}
+/**
+ * Hide UI elements when the chat is disabled
+ */
+.megaChatDisabled .fm-start-conversation, .megaChatDisabled .nw-contact-status, .megaChatDisabled .nw-fm-left-icon.conversations, .megaChatDisabled .fm-send-files {
+	display: none;
+}
+/**
+ * MegaDialog.js
+ */
+
+.fm-mega-dialog {
+	position: absolute;
+	border: 2px solid rgba(0, 0, 0, 0.1);
+	-webkit-background-clip: padding-box;
+	background-clip: padding-box;
+	width: 360px;
+	background-color: white;
+	margin: 46px 0 0 0;
+	z-index: 900;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	border-radius: 8px;
+	display: block;
+}
+.fm-mega-dialog.expanded {
+	z-index: 1200;
+}
+.fm-mega-dialog .fm-mega-dialog-pad {
+	margin: 12px 12px 12px 12px
+}
+.fm-mega-dialog-size-icon {
+	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-position: center -5509px;
+	background-repeat: no-repeat;
+	width: 20px;
+	height: 20px;
+	position: absolute;
+	top: 6px;
+	right: 10px;
+	-webkit-transition: opacity 200ms ease-in-out;
+	-moz-transition: opacity 200ms ease-in-out;
+	-o-transition: opacity 200ms ease-in-out;
+	-ms-transition: opacity 200ms ease-in-out;
+	transition: opacity 200ms ease-in-out;
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
+	-moz-opacity: 0.3;
+	-khtml-opacity: 0.3;
+	opacity: 0.3;
+	cursor: pointer;
+}
+.fm-mega-dialog-size-icon:hover {
+	-moz-opacity: 0.6;
+	-khtml-opacity: 0.6;
+	opacity: 0.6;
+}
+.fm-mega-dialog-size-icon.short-size {
+	background-position: center -5559px;
+	top: 16px;
+	right: 40px;
+}
+.fm-mega-dialog.dialog .fm-dialog-close, .fm-mega-dialog.dialog .nw-fm-dialog-title {
+	display: block;
+}
+.fm-mega-dialog-bottom {
+	height: 56px;
+	background-color: #F6F6F6;
+	margin: 12px -12px -12px -12px;
+	display: block;
+	-webkit-border-bottom-left-radius: 7px;
+	-moz-border-radius-bottomleft: 7px;
+	border-bottom-left-radius: 7px;
+	-webkit-border-bottom-right-radius: 7px;
+	-moz-border-radius-bottomright: 7px;
+	border-bottom-right-radius: 7px;
+	padding-right: 12px;
+}
+/**
+ * Start chat elements
+ */
+
+.fm-create-chat-button.active .add-user-popup-arrow {
+	margin-top: -4px;
+	z-index: 1210;
+}
+/**
+  * PRO upgrade, new flow styling for the login/register popups and buttons
+  */
+
+
+.fm-dialog.loginrequired-dialog {
+	min-height: 166px;
+	width: 445px;
+}
+.loginrequired-dialog .fm-notification-body {
+	padding: 0 20px;
+}
+.fm-notification-info .top-login-button {
+	color: white;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+	float: none;
+	display: inline-block;
+	clear: left;
+	background-color: rgb(127, 127, 127);
+	margin-right: 5px;
+}
+.fm-notification-info .create-account-button {
+	color: white;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+	float: none;
+	display: inline-block;
+	background-color: rgb(217, 046, 000);
+}
+.loginrequired-dialog .fm-notification-info > p {
+	margin-top: 26px;
+}
+.loginrequired-dialog .fm-notification-info > p > p {
+	margin-bottom: 6px;
+	margin-top: -14px;
+	padding-top: 2px;
+	margin-left: 4px;
+}
+.loginrequired-dialog .fm-notification-icon {
+	width: 90px;
+	height: 90px;
+	background-image: url(../images/mega/register-big-sprite@2x.png);
+	background-size: 100px auto;
+	background-position: center -199px;
+	background-repeat: no-repeat;
+	margin: 0 26px 0 0;
+}
+.loginrequired-dialog .fm-notification-icon.plan1 {
+	background-position: center -329px;
+}
+.loginrequired-dialog .fm-notification-icon.plan2 {
+	background-position: center -459px;
+}
+.loginrequired-dialog .fm-notification-icon.plan3 {
+	background-position: center -589px;
+}
+/* login dialog */
+.pro-login-dialog {
+	z-index: 1200;
+	top: 50%;
+	left: 50%;
+	-webkit-border-radius: 7px;
+	-moz-border-radius: 7px;
+	border-radius: 7px;
+	border-right: 2px solid rgba(0, 0, 0, .3);
+	border-top: 2px solid rgba(0, 0, 0, .3);
+}
+.pro-login-dialog.hidden {
+	display: none;
+}
+.pro-login-dialog .fm-dialog-header {
+	margin-bottom: 10px;
+}
+a.top-login-forgot-pass {
+	font-size: 11px;
+	color: #999999;
+	line-height: 21px;
+	background-image: url(../images/mega/top-login-sprite_v4.png);
+	background-position: 0 -1582px;
+	background-repeat: no-repeat;
+	float: right;
+	padding: 0 0 0 23px;
+	cursor: pointer;
+}
+/* register */
+.pro-register-dialog {
+	z-index: 1180;
+	top: 50%;
+	left: 50%;
+	-webkit-border-radius: 7px;
+	-moz-border-radius: 7px;
+	border-radius: 7px;
+	border-right: 2px solid rgba(0, 0, 0, .3);
+	border-top: 2px solid rgba(0, 0, 0, .3);
+	min-width: 460px;
+}
+.pro-register-dialog.hidden {
+	display: none;
+}
+.pro-register-dialog .fm-dialog-header {
+	margin-bottom: 10px;
+}
+.pro-register-dialog .register-st2-button {
+	float: right;
+	cursor: pointer;
+}
+.pro-register-paypal-dialog .reg-success-icon {
+	background: url(../images/mega/paypalgame_2-1.png) 0 0 no-repeat;
+	background-size: 200px 200px;
+	width: 200px;
+	height: 200px;
+}
+/* logged in PRO account, but not activated */
+.top-warning-popup.not-activated {
+	cursor: default;
+}
+.top-warning-popup.not-activated .mailbox-icon {
+	background: url(../images/mega/email-confirmation.png) 0 0 no-repeat;
+	background-size: 100px 100px;
+	width: 100px;
+	height: 100px;
+	float: left;
+	margin: 0 15px 10px 0;
+}
+.top-warning-popup.not-activated p {
+	display: table-cell;
+	height: 100px;
+	vertical-align: middle;
+}
+.top-warning-popup.not-activated .warning-popup-body {
+	padding-bottom: 8px;
+}
+.tree-item-on-search-hidden {
+	display: none !important;
+}
+/** call feedback buttons in chat **/
+.fm-chat-messages-block .callfeedback-buttons {
+	display: inline-block;
+	height: 18px;
+	margin-left: 8px;
+}
+.fm-chat-messages-block .callfeedback-buttons .blog-new-recomend {
+	margin-right: 2px;
+}
+.fm-chat-messages-block .callfeedback-buttons > a {
+	-webkit-transition: opacity 200ms ease-in-out;
+	-moz-transition: opacity 200ms ease-in-out;
+	-o-transition: opacity 200ms ease-in-out;
+	-ms-transition: opacity 200ms ease-in-out;
+	transition: opacity 200ms ease-in-out;
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
+	-moz-opacity: 0.7;
+	-khtml-opacity: 0.7;
+	opacity: 0.7;
+}
+.fm-chat-messages-block .callfeedback-buttons > a:hover {
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+	-moz-opacity: 1;
+	-khtml-opacity: 1;
+	opacity: 1;
+}
+/** top header feedback button **/
+.feedback-button {
+	margin-left: 70px;
+	color: #888;
+	padding: 2px 6px;
+	margin-top: 14px;
+	display: inline-block;
+	border-radius: 12px;
+	text-transform: uppercase;
+	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-repeat: no-repeat;
+	background-position: 4px -630px;
+	color: rgba(255,255,255,0.7) !important;
+	padding-left: 24px;
+	background-repeat: no-repeat;
+	-webkit-transition: opacity 200ms ease-in-out;
+	-moz-transition: opacity 200ms ease-in-out;
+	-o-transition: opacity 200ms ease-in-out;
+	-ms-transition: opacity 200ms ease-in-out;
+	transition: opacity 200ms ease-in-out;
+filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
+	-moz-opacity: 0.8;
+	-khtml-opacity: 0.8;
+	opacity: 0.8;
+}
+.feedback-button:hover {
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+	-moz-opacity: 1;
+	-khtml-opacity: 1;
+	opacity: 1;
+}
+.feedback-dialog {
+	width: 420px;
+	z-index: 1200;
+}
+.feedback-dialog .content {
+	width: 100%;
+	overflow: auto;
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+.feedback-dialog .membership-notification {
+	width: 295px;
+}
+.feedback-dialog textarea {
+	width: 86%;
+	height: 60px;
+	margin: 0 auto;
+	display: block;
+	margin-top: 16px;
+	background-color: rgba(0,0,0,0.05);
+	height: 55px;
+	font-size: 12px;
+	line-height: 18px;
+	padding: 8px 12px;
+	-moz-border-radius: 6px;
+	-webkit-border-radius: 6px;
+	border-radius: 6px;
+	border: 0;
+	resize: none;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	line-height: 18px;
+	color: #999999;
+	margin-bottom: 4px;
+}
+.feedback-dialog .reply label {
+	padding-right: 32px;
+}
+.feedback-dialog .rating {
+	text-align: center;
+	padding-bottom: 6px;
+}
+.feedback-dialog label {
+	display: block;
+	float: none;
+	vertical-align: top;
+}
+.feedback-dialog .rating .rate.faded {
+	opacity: 0.3;
+}
+.feedback-dialog input[type="checkbox"] {
+	cursor: pointer;
+}
+.feedback-dialog .stats-button {
+	vertical-align: top;
+}
+.feedback-dialog .reply {
+	width: 390px;
+	min-height: 56px;
+	display: inline-block;
+	clear: both;
+}
+.feedback-dialog .reply .radio-txt {
+	margin-bottom: 4px;
+}
+.feedback-dialog input[name="email"] {
+	width: 50%;
+	margin: 0 36px;
+	display: block;
+	border-radius: 4px;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	background-color: white;
+	line-height: 18px;
+	font-size: 12px;
+	padding: 6px 10px 8px 10px;
+	border: 0;
+	background: rgba(0,0,0,0.3);
+	color: white;
+}
+.feedback-dialog .rating .rate {
+	display: inline-block;
+	width: 50px;
+	height: 50px;
+	border: 4px solid black;
+	background-color: white;
+	margin: 0 12px;
+	border-radius: 100%;
+	color: white;
+	background-repeat: no-repeat;
+	background-image: url(../images/mega/feedback/emotions.svg);
+	-webkit-transition: box-shadow 100ms ease-in-out, border-color 200ms ease-in-out, background-color 50ms ease-in-out, color 150ms ease-in-out, background-position 450ms ease, opacity 350ms ease-in-out;
+	-moz-transition: box-shadow 100ms ease-in-out, border-color 200ms ease-in-out, background-color 50ms ease-in-out, color 150ms ease-in-out, background-position 450ms ease, opacity 350ms ease-in-out;
+	-o-transition: box-shadow 100ms ease-in-out, border-color 200ms ease-in-out, background-color 50ms ease-in-out, color 150ms ease-in-out, background-position 450ms ease, opacity 350ms ease-in-out;
+	-ms-transition: box-shadow 100ms ease-in-out, border-color 200ms ease-in-out, background-color 50ms ease-in-out, color 150ms ease-in-out, background-position 450ms ease, opacity 350ms ease-in-out;
+	transition: box-shadow 100ms ease-in-out, border-color 200ms ease-in-out, background-color 50ms ease-in-out, color 150ms ease-in-out, background-position 450ms ease, opacity 350ms ease-in-out;
+	box-shadow: inset 0 0px 0px 0px rgba(0, 0, 0, 0.1), 0 1px 2px 1px rgba(0, 0, 0, 0.1);
+	opacity: 1;
+}
+.feedback-dialog .rating .rate.unhappy {
+	border-color: #FF1A53;
+	background-position: 10px 6px;
+}
+.feedback-dialog .rating .rate.neutral {
+	border-color: #B0DAEB;
+	background-position: -44px 6px;
+}
+.feedback-dialog .rating .rate.happy {
+	border-color: #61D2FF;
+	background-position: -101px 6px;
+}
+.feedback-dialog .rating .rate.awesome {
+	border-color: #13E03C;
+	background-position: -157px 6px;
+}
+.feedback-dialog .rating .rate.unhappy:hover, .feedback-dialog .rating .rate.unhappy.active {
+	box-shadow: inset -1px 0 1px 1px rgba(0, 0, 0, 0.1), 0 1px 2px 1px rgba(0, 0, 0, 0.1), 0 0 0 6px rgba(255, 26, 83, 0.1), 0 0 0 4px rgba(255, 26, 83, 0.4);
+	background-color: #FF1A53;
+	border-color: white;
+	color: white;
+	background-position: 10px -45px;
+	opacity: 1;
+}
+.feedback-dialog .rating .rate.neutral:hover, .feedback-dialog .rating .rate.neutral.active {
+	box-shadow: inset -1px 0 1px 1px rgba(0, 0, 0, 0.1), 0 1px 2px 1px rgba(0, 0, 0, 0.1), 0 0 0 6px rgba(176, 218, 235, 0.1), 0 0 0 4px rgba(176, 218, 235, 0.4);
+	background-color: #B0DAEB;
+	border-color: white;
+	color: white;
+	background-position: -44px -45px;
+	opacity: 1;
+}
+.feedback-dialog .rating .rate.happy:hover, .feedback-dialog .rating .rate.happy.active {
+	box-shadow: inset -1px 0 1px 1px rgba(0, 0, 0, 0.1), 0 1px 2px 1px rgba(0, 0, 0, 0.1), 0 0 0 6px rgba(97, 210, 255, 0.1), 0 0 0 4px rgba(97, 210, 255, 0.4);
+	background-color: #61D2FF;
+	border-color: white;
+	color: white;
+	background-position: -101px -45px;
+	opacity: 1;
+}
+.feedback-dialog .rating .rate.awesome:hover, .feedback-dialog .rating .rate.awesome.active {
+	box-shadow: inset -1px 0 1px 1px rgba(0, 0, 0, 0.1), 0 1px 2px 1px rgba(0, 0, 0, 0.1), 0 0 0 6px rgba(19, 224, 60, 0.1), 0 0 0 4px rgba(19, 224, 60, 0.4);
+	background-color: #13E03C;
+	border-color: white;
+	color: white;
+	background-position: -157px -45px;
+	opacity: 1;
+}
+/* Credentials / Fingerprint warning dialog */
+.credential-warning-button {
+	left: 50%;
+	position: absolute;
+	top: 15px;
+}
+.credentials-warning-dialog .fm-dialog-close {
+	visibility: hidden;
+}
+.credentials-warning-dialog .fm-mega-dialog-pad {
+	margin: 12px 0;
+}
+.credentials-warning-dialog .fm-mega-dialog-bottom {
+	margin: 12px 0 -12px;
+}
+.credentials-warning-dialog {
+	background-color: #fff;
+	width: 600px;
+}
+.credentials-warning-dialog .content {
+	color: #999999;
+	font-size: 12px;
+	line-height: 20px;
+	padding-bottom: 10px;
+}
+.credentials-warning-dialog .avatarAndWarningMessage {
+	margin: 0 20px;
+	overflow: hidden;
+}
+.credentials-warning-dialog .userAvatar {
+	float: left;
+}
+.credentials-warning-dialog .information {
+	float: left;
+	margin-left: 20px;
+	width: 442px;
+}
+.credentials-warning-dialog .information .firstLine {
+	color: #d90007;
+	font-weight: bold;
+}
+.credentials-warning-dialog .information .emailAddress {
+	color: #000;
+}
+.credentials-warning-dialog .userAvatar img {
+	height: 90px;
+	width: 90px;
+}
+.credentials-warning-dialog .previousCredentials {
+	background-color: #f2f2f2;
+	margin-top: 20px;
+	padding: 20px;
+}
+.credentials-warning-dialog .previousCredentials .title {
+	color: #000;
+	font-weight: bold;
+}
+.credentials-warning-dialog .previousCredentials .fingerprint, .credentials-warning-dialog .newCredentials .fingerprint {
+	font-family: monospace;
+	font-size: 13px;
+	margin-left: -6px;
+	margin-top: 10px;
+	text-transform: uppercase;
+}
+.credentials-warning-dialog .previousCredentials .fingerprint > span, .credentials-warning-dialog .newCredentials .fingerprint > span {
+	display: inline-block;
+	text-align: center;
+	width: 44px;
+	-webkit-touch-callout: text !important;
+	-webkit-user-select: text !important;
+	-khtml-user-select: text !important;
+	-moz-user-select: text !important;
+	-ms-user-select: text !important;
+	user-select: text !important;
+}
+.credentials-warning-dialog .newCredentials span.mismatch {
+	color: #D90007;
+}
+.credentials-warning-dialog .newCredentials {
+	padding: 20px 20px 35px 20px;
+}
+.credentials-warning-dialog .newCredentials .title {
+	color: #D90007;
+	font-weight: bold;
+}
+.credentials-warning-dialog .instruction {
+	padding: 3px 20px;
+}
+.credentials-warning-dialog .instruction .reject {
+	color: #D90007;
+	font-weight: bold;
+}
+.credentials-warning-dialog .instruction .accept {
+	color: #31B500;
+	font-weight: bold;
+}
+.collected-data-review-dialog {
+	z-index: 1250;
+	width: 70%;
+}
+.collected-data-review-dialog textarea {
+	display: block;
+	width: 99%;
+	min-height: 200px;
+	margin: 0 auto;
+}
+.fm-chat-inline-dialog-button-sendFeedback {
+	margin-left: 4px;
+}
  @media only screen and (max-width: 1593px) {
 .download-mid-centered-block {
 	min-width: 648px;
@@ -21489,29 +22081,29 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 @media only screen and (max-height: 776px) {
 .download-adv-bl {
 	background-position: center -161px;
-    background-size: 170px auto;
+	background-size: 170px auto;
 	padding-top: 147px;
 }
 }
 @media only screen and (max-height: 752px) {
 .download-adv-bl {
-    background-size: 150px auto;
+	background-size: 150px auto;
 	padding-top: 111px;
 }
 }
 @media only screen and (max-height: 726px) {
 .download-adv-bl {
-    background-position: center -109px;
-    background-repeat: no-repeat;
-    background-size: 110px auto;
-    padding-top: 90px;
+	background-position: center -109px;
+	background-repeat: no-repeat;
+	background-size: 110px auto;
+	padding-top: 90px;
 }
 }
 @media only screen and (max-height: 703px) {
 .download-adv-bl {
-    background-position: center -79px;
-    background-size: 80px auto;
-    padding-top: 66px;
+	background-position: center -79px;
+	background-size: 80px auto;
+	padding-top: 66px;
 }
 }
 @media only screen and (max-height: 730px) {
@@ -21858,9 +22450,13 @@ top-login-spr .nlanguage-tooltip-bg, .nlanguage-bottom {
  background-image: url(../images/mega/top-login-sprite@2x_v4.png);
  background-size:48px auto;
 }
- .reg-success-icon, .reg-st3-membership-icon, .reg-st3-storage, .reg-st3-bandwidth, .reg-st3-save-icon, .reg-st3-save-icon {
+.reg-st3-membership-icon, .reg-st3-storage, .reg-st3-bandwidth, .reg-st3-save-icon, .reg-st3-save-icon {
  background-image: url(../images/mega/register-big-sprite@2x.png);
  background-size: 100px auto;
+}
+.reg-success-icon {
+ background-image: url(../images/mega/email-confirmation@2x.png);
+ background-size: 200px 200px;
 }
 .reg-st5-key-gen, .reg-st5-info-icon {
  background-image: url(../images/mega/reg-st5-rounded@2x.png);
@@ -22899,581 +23495,4 @@ background-color:#1DA2E9
 }
  100% {
 }
-}
-.loading-animation {
-	height: 16px;
-	position: relative;
-	width: 16px;
-	border-radius: 100%;
-	border: 2px solid transparent;
-	border-color: transparent gray transparent gray;
-	-moz-animation: rotate-loading 1.5s linear 0s infinite normal;
-	-moz-transform-origin: 50% 50%;
-	-o-animation: rotate-loading 1.5s linear 0s infinite normal;
-	-o-transform-origin: 50% 50%;
-	-webkit-animation: rotate-loading 1.5s linear 0s infinite normal;
-	-webkit-transform-origin: 50% 50%;
-	animation: rotate-loading 1.5s linear 0s infinite normal;
-	transform-origin: 50% 50%;
-	position: absolute;
-	margin: -2px 0 0 -2px;
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	box-sizing: border-box;
-	-webkit-transition: opacity 200ms ease-in-out;
-	-moz-transition: opacity 200ms ease-in-out;
-	-o-transition: opacity 200ms ease-in-out;
-	-ms-transition: opacity 200ms ease-in-out;
-	transition: opacity 2100ms ease-in-out;
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
-	-moz-opacity: 0;
-	-khtml-opacity: 0;
-	opacity: 0;
-	display: none;
-}
-.connecting .loading-animation {
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
-	-moz-opacity: 0.6;
-	-khtml-opacity: 0.6;
-	opacity: 0.6;
-	display: block;
-}
-/**
- * Hide UI elements when the chat is disabled
- */
-.megaChatDisabled .fm-start-conversation, .megaChatDisabled .nw-contact-status, .megaChatDisabled .nw-fm-left-icon.conversations, .megaChatDisabled .fm-send-files {
-	display: none;
-}
-/**
- * MegaDialog.js
- */
-
-.fm-mega-dialog {
-	position: absolute;
-	border: 2px solid rgba(0, 0, 0, 0.1);
-	-webkit-background-clip: padding-box;
-	background-clip: padding-box;
-	width: 360px;
-	background-color: white;
-	margin: 46px 0 0 0;
-	z-index: 900;
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	box-sizing: border-box;
-	-moz-border-radius: 8px;
-	-webkit-border-radius: 8px;
-	border-radius: 8px;
-	display: block;
-}
-.fm-mega-dialog.expanded {
-	z-index: 1200;
-}
-.fm-mega-dialog .fm-mega-dialog-pad {
-	margin: 12px 12px 12px 12px
-}
-.fm-mega-dialog-size-icon {
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
-	background-position: center -5509px;
-	background-repeat: no-repeat;
-	width: 20px;
-	height: 20px;
-	position: absolute;
-	top: 6px;
-	right: 10px;
-	-webkit-transition: opacity 200ms ease-in-out;
-	-moz-transition: opacity 200ms ease-in-out;
-	-o-transition: opacity 200ms ease-in-out;
-	-ms-transition: opacity 200ms ease-in-out;
-	transition: opacity 200ms ease-in-out;
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
-	-moz-opacity: 0.3;
-	-khtml-opacity: 0.3;
-	opacity: 0.3;
-	cursor: pointer;
-}
-.fm-mega-dialog-size-icon:hover {
-	-moz-opacity: 0.6;
-	-khtml-opacity: 0.6;
-	opacity: 0.6;
-}
-.fm-mega-dialog-size-icon.short-size {
-	background-position: center -5559px;
-	top: 16px;
-	right: 40px;
-}
-.fm-mega-dialog.dialog .fm-dialog-close, .fm-mega-dialog.dialog .nw-fm-dialog-title {
-	display: block;
-}
-.fm-mega-dialog-bottom {
-	height: 56px;
-	background-color: #F6F6F6;
-	margin: 12px -12px -12px -12px;
-	display: block;
-	-webkit-border-bottom-left-radius: 7px;
-	-moz-border-radius-bottomleft: 7px;
-	border-bottom-left-radius: 7px;
-	-webkit-border-bottom-right-radius: 7px;
-	-moz-border-radius-bottomright: 7px;
-	border-bottom-right-radius: 7px;
-	padding-right: 12px;
-}
-/**
- * Start chat elements
- */
-
-.fm-create-chat-button.active .add-user-popup-arrow {
-	margin-top: -4px;
-	z-index: 1210;
-}
-/**
-  * PRO upgrade, new flow styling for the login/register popups and buttons
-  */
-
-
-.fm-dialog.loginrequired-dialog {
-	min-height: 166px;
-	width: 445px;
-}
-.loginrequired-dialog .fm-notification-body {
-	padding: 0 20px;
-}
-.fm-notification-info .top-login-button {
-	color: white;
-	-webkit-border-radius: 4px;
-	-moz-border-radius: 4px;
-	border-radius: 4px;
-	float: none;
-	display: inline-block;
-	clear: left;
-	background-color: rgb(127, 127, 127);
-	margin-right: 5px;
-}
-.fm-notification-info .create-account-button {
-	color: white;
-	-webkit-border-radius: 4px;
-	-moz-border-radius: 4px;
-	border-radius: 4px;
-	float: none;
-	display: inline-block;
-	background-color: rgb(217, 046, 000);
-}
-.loginrequired-dialog .fm-notification-info > p {
-	margin-top: 26px;
-}
-.loginrequired-dialog .fm-notification-info > p > p {
-	margin-bottom: 6px;
-	margin-top: -14px;
-	padding-top: 2px;
-	margin-left: 4px;
-}
-.loginrequired-dialog .fm-notification-icon {
-	width: 90px;
-	height: 90px;
-	background-image: url(../images/mega/register-big-sprite@2x.png);
-	background-size: 100px auto;
-	background-position: center -199px;
-	background-repeat: no-repeat;
-	margin: 0 26px 0 0;
-}
-.loginrequired-dialog .fm-notification-icon.plan1 {
-	background-position: center -329px;
-}
-.loginrequired-dialog .fm-notification-icon.plan2 {
-	background-position: center -459px;
-}
-.loginrequired-dialog .fm-notification-icon.plan3 {
-	background-position: center -589px;
-}
-/* login dialog */
-.pro-login-dialog {
-	z-index: 1200;
-	top: 50%;
-	left: 50%;
-	-webkit-border-radius: 7px;
-	-moz-border-radius: 7px;
-	border-radius: 7px;
-	border-right: 2px solid rgba(0, 0, 0, .3);
-	border-top: 2px solid rgba(0, 0, 0, .3);
-}
-.pro-login-dialog.hidden {
-	display: none;
-}
-.pro-login-dialog .fm-dialog-header {
-	margin-bottom: 10px;
-}
-a.top-login-forgot-pass {
-	font-size: 11px;
-	color: #999999;
-	line-height: 21px;
-	background-image: url(../images/mega/top-login-sprite_v4.png);
-	background-position: 0 -1582px;
-	background-repeat: no-repeat;
-	float: right;
-	padding: 0 0 0 23px;
-	cursor: pointer;
-}
-/* register */
-.pro-register-dialog {
-	z-index: 1180;
-	top: 50%;
-	left: 50%;
-	-webkit-border-radius: 7px;
-	-moz-border-radius: 7px;
-	border-radius: 7px;
-	border-right: 2px solid rgba(0, 0, 0, .3);
-	border-top: 2px solid rgba(0, 0, 0, .3);
-	min-width: 460px;
-}
-.pro-register-dialog.hidden {
-	display: none;
-}
-.pro-register-dialog .fm-dialog-header {
-	margin-bottom: 10px;
-}
-.pro-register-dialog .register-st2-button {
-	float: right;
-	cursor: pointer;
-}
-.pro-register-paypal-dialog .reg-success-icon {
-	background: url(../images/mega/paypalgame_2-1.png) 0 0 no-repeat;
-	background-size: 200px 200px;
-	width: 200px;
-	height: 200px;
-}
-/* logged in PRO account, but not activated */
-.top-warning-popup.not-activated {
-	cursor: default;
-}
-.top-warning-popup.not-activated .mailbox-icon {
-	background: url(../images/mega/email_confirmation_warning.png) 0 0 no-repeat;
-	background-size: 100px 100px;
-	width: 100px;
-	height: 100px;
-	float: left;
-	margin-right: 10px;
-}
-.top-warning-popup.not-activated p {
-	margin-top: 10px;
-	padding-top: 9px;
-}
-.top-warning-popup.not-activated .warning-popup-body {
-	padding-bottom: 8px;
-}
-.tree-item-on-search-hidden {
-	display: none !important;
-}
-/** call feedback buttons in chat **/
-.fm-chat-messages-block .callfeedback-buttons {
-	display: inline-block;
-	height: 18px;
-	margin-left: 8px;
-}
-.fm-chat-messages-block .callfeedback-buttons .blog-new-recomend {
-	margin-right: 2px;
-}
-.fm-chat-messages-block .callfeedback-buttons > a {
-	-webkit-transition: opacity 200ms ease-in-out;
-	-moz-transition: opacity 200ms ease-in-out;
-	-o-transition: opacity 200ms ease-in-out;
-	-ms-transition: opacity 200ms ease-in-out;
-	transition: opacity 200ms ease-in-out;
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
-	-moz-opacity: 0.7;
-	-khtml-opacity: 0.7;
-	opacity: 0.7;
-}
-.fm-chat-messages-block .callfeedback-buttons > a:hover {
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
-	-moz-opacity: 1;
-	-khtml-opacity: 1;
-	opacity: 1;
-}
-/** top header feedback button **/
-.feedback-button {
-	margin-left: 70px;
-	color: #888;
-	padding: 2px 6px;
-	margin-top: 14px;
-	display: inline-block;
-	border-radius: 12px;
-	text-transform: uppercase;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
-	background-repeat: no-repeat;
-	background-position: 4px -630px;
-	color: rgba(255,255,255,0.7) !important;
-	padding-left: 24px;
-	background-repeat: no-repeat;
-	-webkit-transition: opacity 200ms ease-in-out;
-	-moz-transition: opacity 200ms ease-in-out;
-	-o-transition: opacity 200ms ease-in-out;
-	-ms-transition: opacity 200ms ease-in-out;
-	transition: opacity 200ms ease-in-out;
-filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
-	-moz-opacity: 0.8;
-	-khtml-opacity: 0.8;
-	opacity: 0.8;
-}
-.feedback-button:hover {
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
-	-moz-opacity: 1;
-	-khtml-opacity: 1;
-	opacity: 1;
-}
-.feedback-dialog {
-	width: 420px;
-	z-index: 1200;
-}
-.feedback-dialog .content {
-	width: 100%;
-	overflow: auto;
-	padding-top: 10px;
-	padding-bottom: 10px;
-}
-.feedback-dialog .membership-notification {
-	width: 295px;
-}
-.feedback-dialog textarea {
-	width: 86%;
-	height: 60px;
-	margin: 0 auto;
-	display: block;
-	margin-top: 16px;
-	background-color: rgba(0,0,0,0.05);
-	height: 55px;
-	font-size: 12px;
-	line-height: 18px;
-	padding: 8px 12px;
-	-moz-border-radius: 6px;
-	-webkit-border-radius: 6px;
-	border-radius: 6px;
-	border: 0;
-	resize: none;
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	box-sizing: border-box;
-	line-height: 18px;
-	color: #999999;
-	margin-bottom: 4px;
-}
-.feedback-dialog .reply label {
-	padding-right: 32px;
-}
-.feedback-dialog .rating {
-	text-align: center;
-	padding-bottom: 6px;
-}
-.feedback-dialog label {
-	display: block;
-	float: none;
-	vertical-align: top;
-}
-.feedback-dialog .rating .rate.faded {
-	opacity: 0.3;
-}
-.feedback-dialog input[type="checkbox"] {
-	cursor: pointer;
-}
-.feedback-dialog .stats-button {
-	vertical-align: top;
-}
-.feedback-dialog .reply {
-	width: 390px;
-	min-height: 56px;
-	display: inline-block;
-	clear: both;
-}
-.feedback-dialog .reply .radio-txt {
-	margin-bottom: 4px;
-}
-.feedback-dialog input[name="email"] {
-	width: 50%;
-	margin: 0 36px;
-	display: block;
-	border-radius: 4px;
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	box-sizing: border-box;
-	background-color: white;
-	line-height: 18px;
-	font-size: 12px;
-	padding: 6px 10px 8px 10px;
-	border: 0;
-	background: rgba(0,0,0,0.3);
-	color: white;
-}
-.feedback-dialog .rating .rate {
-	display: inline-block;
-	width: 50px;
-	height: 50px;
-	border: 4px solid black;
-	background-color: white;
-	margin: 0 12px;
-	border-radius: 100%;
-	color: white;
-	background-repeat: no-repeat;
-	background-image: url(../images/mega/feedback/emotions.svg);
-	-webkit-transition: box-shadow 100ms ease-in-out, border-color 200ms ease-in-out, background-color 50ms ease-in-out, color 150ms ease-in-out, background-position 450ms ease, opacity 350ms ease-in-out;
-	-moz-transition: box-shadow 100ms ease-in-out, border-color 200ms ease-in-out, background-color 50ms ease-in-out, color 150ms ease-in-out, background-position 450ms ease, opacity 350ms ease-in-out;
-	-o-transition: box-shadow 100ms ease-in-out, border-color 200ms ease-in-out, background-color 50ms ease-in-out, color 150ms ease-in-out, background-position 450ms ease, opacity 350ms ease-in-out;
-	-ms-transition: box-shadow 100ms ease-in-out, border-color 200ms ease-in-out, background-color 50ms ease-in-out, color 150ms ease-in-out, background-position 450ms ease, opacity 350ms ease-in-out;
-	transition: box-shadow 100ms ease-in-out, border-color 200ms ease-in-out, background-color 50ms ease-in-out, color 150ms ease-in-out, background-position 450ms ease, opacity 350ms ease-in-out;
-	box-shadow: inset 0 0px 0px 0px rgba(0, 0, 0, 0.1), 0 1px 2px 1px rgba(0, 0, 0, 0.1);
-	opacity: 1;
-}
-.feedback-dialog .rating .rate.unhappy {
-	border-color: #FF1A53;
-	background-position: 10px 6px;
-}
-.feedback-dialog .rating .rate.neutral {
-	border-color: #B0DAEB;
-	background-position: -44px 6px;
-}
-.feedback-dialog .rating .rate.happy {
-	border-color: #61D2FF;
-	background-position: -101px 6px;
-}
-.feedback-dialog .rating .rate.awesome {
-	border-color: #13E03C;
-	background-position: -157px 6px;
-}
-.feedback-dialog .rating .rate.unhappy:hover, .feedback-dialog .rating .rate.unhappy.active {
-	box-shadow: inset -1px 0 1px 1px rgba(0, 0, 0, 0.1), 0 1px 2px 1px rgba(0, 0, 0, 0.1), 0 0 0 6px rgba(255, 26, 83, 0.1), 0 0 0 4px rgba(255, 26, 83, 0.4);
-	background-color: #FF1A53;
-	border-color: white;
-	color: white;
-	background-position: 10px -45px;
-	opacity: 1;
-}
-.feedback-dialog .rating .rate.neutral:hover, .feedback-dialog .rating .rate.neutral.active {
-	box-shadow: inset -1px 0 1px 1px rgba(0, 0, 0, 0.1), 0 1px 2px 1px rgba(0, 0, 0, 0.1), 0 0 0 6px rgba(176, 218, 235, 0.1), 0 0 0 4px rgba(176, 218, 235, 0.4);
-	background-color: #B0DAEB;
-	border-color: white;
-	color: white;
-	background-position: -44px -45px;
-	opacity: 1;
-}
-.feedback-dialog .rating .rate.happy:hover, .feedback-dialog .rating .rate.happy.active {
-	box-shadow: inset -1px 0 1px 1px rgba(0, 0, 0, 0.1), 0 1px 2px 1px rgba(0, 0, 0, 0.1), 0 0 0 6px rgba(97, 210, 255, 0.1), 0 0 0 4px rgba(97, 210, 255, 0.4);
-	background-color: #61D2FF;
-	border-color: white;
-	color: white;
-	background-position: -101px -45px;
-	opacity: 1;
-}
-.feedback-dialog .rating .rate.awesome:hover, .feedback-dialog .rating .rate.awesome.active {
-	box-shadow: inset -1px 0 1px 1px rgba(0, 0, 0, 0.1), 0 1px 2px 1px rgba(0, 0, 0, 0.1), 0 0 0 6px rgba(19, 224, 60, 0.1), 0 0 0 4px rgba(19, 224, 60, 0.4);
-	background-color: #13E03C;
-	border-color: white;
-	color: white;
-	background-position: -157px -45px;
-	opacity: 1;
-}
-/* Credentials / Fingerprint warning dialog */
-.credential-warning-button {
-	left: 50%;
-	position: absolute;
-	top: 15px;
-}
-.credentials-warning-dialog .fm-dialog-close {
-	visibility: hidden;
-}
-.credentials-warning-dialog .fm-mega-dialog-pad {
-	margin: 12px 0;
-}
-.credentials-warning-dialog .fm-mega-dialog-bottom {
-	margin: 12px 0 -12px;
-}
-.credentials-warning-dialog {
-	background-color: #fff;
-	width: 600px;
-}
-.credentials-warning-dialog .content {
-	color: #999999;
-	font-size: 12px;
-	line-height: 20px;
-	padding-bottom: 10px;
-}
-.credentials-warning-dialog .avatarAndWarningMessage {
-	margin: 0 20px;
-	overflow: hidden;
-}
-.credentials-warning-dialog .userAvatar {
-	float: left;
-}
-.credentials-warning-dialog .information {
-	float: left;
-	margin-left: 20px;
-	width: 442px;
-}
-.credentials-warning-dialog .information .firstLine {
-	color: #d90007;
-	font-weight: bold;
-}
-.credentials-warning-dialog .information .emailAddress {
-	color: #000;
-}
-.credentials-warning-dialog .userAvatar img {
-	height: 90px;
-	width: 90px;
-}
-.credentials-warning-dialog .previousCredentials {
-	background-color: #f2f2f2;
-	margin-top: 20px;
-	padding: 20px;
-}
-.credentials-warning-dialog .previousCredentials .title {
-	color: #000;
-	font-weight: bold;
-}
-.credentials-warning-dialog .previousCredentials .fingerprint, .credentials-warning-dialog .newCredentials .fingerprint {
-	font-family: monospace;
-	font-size: 13px;
-	margin-left: -6px;
-	margin-top: 10px;
-	text-transform: uppercase;
-}
-.credentials-warning-dialog .previousCredentials .fingerprint > span, .credentials-warning-dialog .newCredentials .fingerprint > span {
-	display: inline-block;
-	text-align: center;
-	width: 44px;
-	-webkit-touch-callout: text !important;
-	-webkit-user-select: text !important;
-	-khtml-user-select: text !important;
-	-moz-user-select: text !important;
-	-ms-user-select: text !important;
-	user-select: text !important;
-}
-.credentials-warning-dialog .newCredentials span.mismatch {
-	color: #D90007;
-}
-.credentials-warning-dialog .newCredentials {
-	padding: 20px 20px 35px 20px;
-}
-.credentials-warning-dialog .newCredentials .title {
-	color: #D90007;
-	font-weight: bold;
-}
-.credentials-warning-dialog .instruction {
-	padding: 3px 20px;
-}
-.credentials-warning-dialog .instruction .reject {
-	color: #D90007;
-	font-weight: bold;
-}
-.credentials-warning-dialog .instruction .accept {
-	color: #31B500;
-	font-weight: bold;
-}
-.collected-data-review-dialog {
-	z-index: 1250;
-	width: 70%;
-}
-.collected-data-review-dialog textarea {
-	display: block;
-	width: 99%;
-	min-height: 200px;
-	margin: 0 auto;
-}
-.fm-chat-inline-dialog-button-sendFeedback {
-	margin-left: 4px;
 }

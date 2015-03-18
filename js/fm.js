@@ -1637,6 +1637,7 @@ function addContactUI()
             }
 
             focusOnInput();
+			addContactAreaResizing();
         }
 
         iconSize(true);

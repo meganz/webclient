@@ -41,7 +41,7 @@
         <div class="fm-dialog-top-text">
           To confirm the <strong>closing of your account</strong>,  please re-enter your password.
         </div>
-        <div class="reset-input-label">Enter password:</div>
+        <div class="reset-small-txt">Enter password:</div>
         
         <div class="fm-account-input">
             <div class="reset-pass-error"> 
@@ -59,6 +59,59 @@
             <div class="clear"></div>
         </div>  
 
+    </div>
+</div>
+
+<div class="fm-dialog reset-success-st3 hidden">
+    <div class="fm-dialog-header">
+        <div class="fm-dialog-title">We’re sorry to see you go</div>
+    </div>
+    <div class="fm-dialog-body">
+        <div class="fm-dialog-top-text">
+          <strong>Your account has now been closed</strong>, but before you leave we would love to know why you are leaving us.
+        </div>
+        <div class="reset-small-txt">Please select one:</div>
+        
+        <form>
+           <div class="radioOn" id="res1_div"><input type="radio" name="feedback-radio" id="res1" class="radioOn" value="1"></div>
+           <label for="res1" class="radio-txt">I don’t use my account anymore</label>
+           
+           <div class="radioOff" id="res2_div"><input type="radio" name="feedback-radio" id="res2" class="radioOff" value="2"></div>
+           <label for="res2" class="radio-txt">I have another MEGA account</label>
+           
+           <div class="radioOff" id="res3_div"><input type="radio" name="feedback-radio" id="res3" class="radioOff" value="3"></div>
+           <label for="res3" class="radio-txt">I have experienced too many problems</label>
+           
+           <div class="radioOff" id="res4_div"><input type="radio" name="feedback-radio" id="res4" class="radioOff" value="4"></div>
+           <label for="res4" class="radio-txt">My favourite browser is not technologically compatible and I don't want to change</label>
+           
+           <div class="radioOff" id="res1_div"><input type="radio" name="feedback-radio" id="res5" class="radioOff" value="5"></div>
+           <label for="res5" class="radio-txt">I find the interface too confusing to use</label>
+           
+           <div class="radioOff" id="res6_div"><input type="radio" name="feedback-radio" id="res6" class="radioOff" value="6"></div>
+           <label for="res6" class="radio-txt">MEGA has under-delivered on its promise</label>
+           
+           <div class="radioOff" id="res7_div"><input type="radio" name="feedback-radio" id="res7" class="radioOff" value="7"></div>
+           <label for="res7" class="radio-txt">Other:</label>
+           
+           <div class="feedback-textarea-bl">
+             <div class="feedback-textarea-scroll">
+               <div class="feedback-textarea">
+                 <textarea></textarea>
+                 <div class="feedback-hidden"></div>
+               </div>
+             </div>
+           </div>
+           
+        </form>
+        
+    
+        <div class="default-dialog-bottom">
+            <div class="fm-dialog-button feedback-submit"><span>[$1694]</span></div>
+            <div class="fm-dialog-button cancel"><span>[$82]</span></div>
+            <div class="clear"></div>
+        </div>
+    
     </div>
 </div>
 
@@ -820,7 +873,7 @@
           <div class="add-user-nt-scrolling">
             <div class="add-user-textarea">
                 <textarea>[$5878]</textarea>
-                <div class="add-contact-hidden"></div>
+                <div class="add-contact-hidden">[$5878]</div>
             </div>
           </div>
           

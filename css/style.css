@@ -7886,6 +7886,15 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	background-color: transparent;
 	border: 0;
 }
+.active .fm-account-input {
+	background-color: rgba(0,0,0,0.2);
+}
+.error .fm-account-input {
+	background-color: rgba(217,0,7,0.5);
+}
+.active .fm-account-input input, .error .fm-account-input input {
+	color: white;
+}
 .add-user-notification, .share-message {
 	-moz-border-radius: 5px;
 	-webkit-border-radius: 5px;
@@ -9625,10 +9634,14 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
 	min-height: 100px;
 	margin: -187px 0 0 -310px;
 }
-.fm-dialog.registration-success, .fm-dialog.reset-success {
+.fm-dialog.registration-success, .fm-dialog.reset-success, .fm-dialog.reset-success-st2 {
 	width: 393px;
 	min-height: 254px;
 	margin: -178px 0 0 -196px
+}
+.fm-dialog.reset-success-st2 {
+	min-height: 200px;
+	margin: -120px 0 0 -196px
 }
 .fm-dialog.restore-success {
 	width: 364px;
@@ -14193,6 +14206,26 @@ h5.main-italic-header {
 }
 .reset-success .reg-success-txt {
 	padding-bottom: 18px;
+}
+.fm-dialog-top-text {
+	padding: 0 8px;
+	font-size: 13px;
+	line-height: 17px;
+}
+.reset-input-label {
+	font-family: 'Open Sans Semibold';
+	font-size: 11px;
+	color: #999999;
+	padding: 20px 8px 8px 8px;
+}
+.reset-success-st2 .fm-account-input {
+	margin: 0 8px 20px 8px;
+	width: auto;
+	float: none;
+}
+.reset-pass-error {
+	position: absolute;
+	width: 24px;
 }
 .reset-description-txt {
 	font-size: 11px;
@@ -20048,8 +20081,8 @@ ul.token-input-list-mega {
 	position: absolute;
 	right: 42px;
 	background-color: #444444;
-	padding: 0 2px 0 12px;
-	line-height: 31px;
+	padding: 0 8px 0 12px;
+	line-height: 30px;
 	color: #CCCCCC;
 	font-size: 11px;
 	-moz-border-radius: 8px;

@@ -1164,20 +1164,17 @@ function isValidShareLink()
     return valid;
 }
 
-function removeUInode(h)
-{
-    var n = M.d[h];
-    var i = 0;
+function removeUInode(h) {
+    
+    var n = M.d[h],
+        i = 0;
+    
     // check subfolders
-    if (n && n.t)
-    {
+    if (n && n.t) {
         var cns = M.c[n.p];
-        if (cns)
-        {
-            for (var cn in cns)
-            {
-                if (M.d[cn] && M.d[cn].t && cn !== h)
-                {
+        if (cns) {
+            for (var cn in cns) {
+                if (M.d[cn] && M.d[cn].t && cn !== h) {
                     i++;
                     break;
                 }
@@ -1186,77 +1183,82 @@ function removeUInode(h)
     }
 
     var hasItems = !!M.v.length;
-    switch (M.currentdirid)
-    {
+    switch (M.currentdirid) {
         case "shares":
             $('#treeli_' + h).remove();// remove folder and subfolders
-            if (!hasItems)
-            {
+            if (!hasItems) {
                 $('.files-grid-view .grid-table-header tr').remove();
-                // ToDo: Missing empty picture for shares
                 $('.fm-empty-cloud').removeClass('hidden');
             }
             break;
         case "contacts":
+            
             //Clear left panel:
             $('#contact_' + h).fadeOut('slow', function() {
                 $(this).remove();
             });
+            
             //Clear right panel:
             $('.grid-table.contacts tr#' + h).fadeOut('slow', function() {
                 $(this).remove();
             });
+            
             // clear the contacts grid:
             $('.contacts-grid-view #' + h).remove();
-            // TODO: remove from conversations?
-            if (!hasItems)
-            {
+            if (!hasItems) {
                 $('.contacts-grid-view .contacts-grid-header tr').remove();
+                $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[784]);
                 $('.fm-empty-contacts').removeClass('hidden');
             }
             break;
         case "chat":
-            if (!hasItems)
-            {
-                // ToDo: Missing grid header for conversation
+            if (!hasItems) {
                 $('.contacts-grid-view .contacts-grid-header tr').remove();
                 $('.fm-empty-chat').removeClass('hidden');
             }
             break;
         case M.RubbishID:
-            if (i == 0 && n)
+            if (i == 0 && n) {
                 $('#treea_' + n.p).removeClass('contains-folders expanded');
-            $('#' + h).remove();// remove item
-            $('#treeli_' + h).remove();// remove folder and subfolders
-            if (!hasItems)
-            {
+            }
+            
+            // Remove item
+            $('#' + h).remove();
+            
+            // Remove folder and subfolders
+            $('#treeli_' + h).remove();
+            if (!hasItems) {
                 $('.contacts-grid-view .contacts-grid-header tr').remove();
                 $('.fm-empty-trashbin').removeClass('hidden');
             }
             break;
         case M.RootID:
-            if (i == 0 && n)
+            if (i == 0 && n) {
                 $('#treea_' + n.p).removeClass('contains-folders expanded');
-            $('#' + h).remove();// remove item
-            $('#treeli_' + h).remove();// remove folder and subfolders
-            if (!hasItems)
-            {
+            }
+            
+            // Remove item
+            $('#' + h).remove();
+            
+            // Remove folder and subfolders
+            $('#treeli_' + h).remove();
+            if (!hasItems) {
                 $('.files-grid-view').addClass('hidden');
                 $('.grid-table.fm tr').remove();
                 $('.fm-empty-cloud').removeClass('hidden');
             }
             break;
         default:
-            if (i == 0 && n)
+            if (i == 0 && n) {
                 $('#treea_' + n.p).removeClass('contains-folders expanded');
+            }
             $('#' + h).remove();// remove item
             $('#treeli_' + h).remove();// remove folder and subfolders
-            if (!hasItems)
-            {
-                if (sharedfolderUI())
+            if (!hasItems) {
+                if (sharedfolderUI()) {
                     M.emptySharefolderUI();
-                else
-                {
+                }
+                else {
                     $('.files-grid-view').addClass('hidden');
                     $('.fm-empty-folder').removeClass('hidden');
                 }
@@ -1571,18 +1573,15 @@ function addContactUI()
     }
 
     //TODO: Bind events if Contacts section is empty
-    $('.fm-empty-contacts .fm-empty-button').unbind('mouseover');
-    $('.fm-empty-contacts .fm-empty-button').bind('mouseover', function() {
+    $('.fm-empty-contacts .fm-empty-button').rebind('mouseover', function() {
         $('.fm-empty-contacts').addClass('hovered');
     });
 
-    $('.fm-empty-contacts .fm-empty-button').unbind('mouseout');
-    $('.fm-empty-contacts .fm-empty-button').bind('mouseout', function() {
+    $('.fm-empty-contacts .fm-empty-button').rebind('mouseout', function() {
         $('.fm-empty-contacts').removeClass('hovered');
     });
 
-    $('.fm-empty-contacts .fm-empty-button').unbind('click');
-    $('.fm-empty-contacts .fm-empty-button').bind('click', function(event) {
+    $('.fm-empty-contacts .fm-empty-button').rebind('click', function(event) {
 
         $.hideContextMenu();
         $.dialog = 'add-contact-popup';
@@ -1612,8 +1611,7 @@ function addContactUI()
         focusOnInput();
     });
 
-    $('.fm-add-user').unbind('click');
-    $('.fm-add-user').bind('click', function() {
+    $('.fm-add-user').rebind('click', function() {
         $.hideContextMenu();
         $.dialog = 'add-contact-popup';
         var $this = $(this);
@@ -2169,6 +2167,7 @@ function initContextUI()
             // Show the share dialog
             var $shareDialog = $('.share-dialog');
             $shareDialog.removeClass('hidden');
+            $('.export-links-warning').removeClass('hidden');
 
             // Hide the optional message by default.
             // This gets enabled if they try share with a user who is not a contact
@@ -6197,16 +6196,14 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
 
         var $selectedPlan = $('.reg-st3-membership-bl.selected');
         var plan = 1;
-        if($selectedPlan.is(".lite")) { plan = 1; }
-		else if($selectedPlan.is(".pro1")) { plan = 2; }
-        else if($selectedPlan.is(".pro2")) { plan = 3; }
-        else if($selectedPlan.is(".pro3")) { plan = 4; }
+        if($selectedPlan.is(".pro1")) { plan = 1; }
+        else if($selectedPlan.is(".pro2")) { plan = 2; }
+        else if($selectedPlan.is(".pro3")) { plan = 3; }
 
         $('.loginrequired-dialog .fm-notification-icon')
-		    .removeClass('plan1')
+            .removeClass('plan1')
             .removeClass('plan2')
             .removeClass('plan3')
-            .removeClass('plan4')
             .addClass('plan' + plan);
     }
 
@@ -6709,24 +6706,22 @@ function initShareDialog() {
         });
     }
 
-    menuPermissionState = function($this)
-    {
+    function menuPermissionState($this) {
         var mi = '.permissions-menu .permissions-menu-item';
         $(mi).removeClass('active');
 
         var cls = checkMultiInputPermission($this);
 
         $(mi + '.' + cls[0]).addClass('active');
-    };
+    }
 
-    handlePermissionMenu = function($this, m, x, y)
-    {
+    function handlePermissionMenu($this, m, x, y) {
         m.css('left', x + 'px');
         m.css('top', y + 'px');
         menuPermissionState($this);
         $this.addClass('active');
         m.fadeIn(200);
-    };
+    }
 
     /**
      * Called when multi-input is not empty
@@ -6739,7 +6734,7 @@ function initShareDialog() {
      * @param {array} perm, permission class and text
      * 
      */
-    determineContactParams = function(item, perm) {
+    function determineContactParams(item, perm) {
         var email = item;// email address
         var id = '';
         /*for (var i in M.u)
@@ -6763,12 +6758,9 @@ function initShareDialog() {
         var html = addShareDialogContactToContent('', id, av_color, av, email, perm[0], perm[1]);
 
         $('.share-dialog .share-dialog-contacts').append(html);
+    }
 
-    };
-
-    $('.share-dialog').unbind('click');
-    $('.share-dialog').bind('click', function(e)
-    {
+    $('.share-dialog').rebind('click', function(e) {
         // Fix bug in console
         if (typeof e.originalEvent.path != 'undefined') {
 
@@ -6792,14 +6784,12 @@ function initShareDialog() {
         }
     });
 
-    $('.share-dialog .fm-dialog-close, .share-dialog .dialog-cancel-button').unbind('click');
-    $('.share-dialog .fm-dialog-close, .share-dialog .dialog-cancel-button').bind('click', function()
-    {
+    $('.share-dialog .fm-dialog-close, .share-dialog .dialog-cancel-button').rebind('click', function() {
+        $('.export-links-warning').addClass('hidden');
         closeDialog();
     });
 
-    $('.share-dialog .dialog-share-button').unbind('click');
-    $('.share-dialog .dialog-share-button').bind('click', function() {
+    $('.share-dialog .dialog-share-button').rebind('click', function() {
         // If share button is NOT disabled
         if (!$(this).is('.disabled')) {
             // If there's a contacts in multi-input add them to top
@@ -6840,6 +6830,7 @@ function initShareDialog() {
             });
 
             closeDialog();
+            $('.export-links-warning').addClass('hidden');
             if (targets.length > 0) {
 
                 // ToDo: Update Message with appropriate field once UI html is available
@@ -6850,8 +6841,7 @@ function initShareDialog() {
         }
     });
 
-    $(document).off('click', '.share-dialog-remove-button');
-    $(document).on('click', '.share-dialog-remove-button', function() {
+    $('.share-dialog-remove-button').rebind('click', function() {
         var $this = $(this);
 
         var handleOrEmail = $this.parent().attr('id').replace('sdcbl_', '');
@@ -6892,9 +6882,7 @@ function initShareDialog() {
     });
 
     // related to specific contact
-    $(document).off('click', '.share-dialog-permissions');
-    $(document).on('click', '.share-dialog-permissions', function (e)
-    {
+    $('.share-dialog-permissions').rebind('click', function(e) {
         var $this = $(this),
             $m = $('.permissions-menu'),
             scrollBlock = $('.share-dialog-contacts .jspPane');
@@ -6921,9 +6909,7 @@ function initShareDialog() {
     });
 
     // related to multi-input contacts
-    $('.share-dialog .permissions-icon').unbind('click');
-    $('.share-dialog .permissions-icon').bind('click', function (e)
-    {
+    $('.share-dialog .permissions-icon').rebind('click', function(e) {
         var $this = $(this),
             $m = $('.permissions-menu');
         if ($this.is('.active'))// fadeOut permission menu for this icon
@@ -6945,9 +6931,7 @@ function initShareDialog() {
         e.stopPropagation();
     });
 
-    $('.permissions-menu-item').unbind('click');
-    $('.permissions-menu-item').bind('click', function(e)
-    {
+    $('.permissions-menu-item').rebind('click', function(e) {
         var $this = $(this);
 
         $('.permissions-menu').fadeOut(200);
@@ -6985,7 +6969,7 @@ function initShareDialog() {
     });
 
     //Pending info block
-    $('.pending-indicator').bind('mouseover', function() {
+    $('.pending-indicator').rebind('mouseover', function() {
         var x = $(this).position().left,
             y = $(this).position().top,
             infoBlock = $('.share-pending-info'),
@@ -6999,12 +6983,12 @@ function initShareDialog() {
         });
         infoBlock.fadeIn(200);
     });
-    $('.pending-indicator').bind('mouseout', function() {
+    $('.pending-indicator').rebind('mouseout', function() {
         $('.share-pending-info').fadeOut(200);
     });
 
     // Personal message
-    $('.share-message textarea').bind('focus', function() {
+    $('.share-message textarea').rebind('focus', function() {
 
         var $this = $(this);
         $('.share-message').addClass('active');
@@ -7026,7 +7010,7 @@ function initShareDialog() {
         }
     });
 
-    $('.share-message textarea').bind('blur', function() {
+    $('.share-message textarea').rebind('blur', function() {
         var $this = $(this);
         $('.share-message').removeClass('active');
     });
@@ -7062,7 +7046,7 @@ function initShareDialog() {
       }
     }
 
-    $('.share-message textarea').on('keyup', function () {
+    $('.share-message textarea').rebind('keyup', function() {
         shareMessageResizing();
     });
 }

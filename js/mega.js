@@ -590,6 +590,7 @@ function MegaData()
             // We do NOT have active contacts, set empty contacts grid
             if (!haveActiveContact) {
                 $('.files-grid-view.contacts-view').addClass('hidden');
+                $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[784]);
                 $('.fm-empty-contacts').removeClass('hidden');
             }
         }
@@ -782,10 +783,10 @@ function MegaData()
          */
         function renderContactsLayout(u) {
             var u_h, contact, node, av_meta, avatar, av_color, el, t, html, onlinestatus,
-            cs = M.contactstatus(u_h),
-            time = time2last(cs.ts),
-            timems = cs.ts,
-            interactionclass = 'cloud-drive';
+                cs = M.contactstatus(u_h),
+                time = time2last(cs.ts),
+                timems = cs.ts,
+                interactionclass = 'cloud-drive';
 
             // Render all items given in glob M.v
             for (var i in M.v) {
@@ -903,7 +904,7 @@ function MegaData()
                     contains = fm_contains(cs.files, cs.folders),
                     u_h = M.v[i].p,
                     av_meta = generateAvatarMeta(u_h),
-                    avatar = av_meta.shortName,
+                    avatar = htmlentities(av_meta.shortName),
                     av_color = av_meta.color,
                     rights = l[55],
                     rightsclass = ' read-only',
@@ -930,7 +931,7 @@ function MegaData()
                             + htmlentities(star) + '"></span><span class="shared-folder-access '
                             + htmlentities(rightsclass) + '"></span><span class="file-icon-area">\n\
                             <span class="block-view-file-type folder"></span></span><span class="nw-contact-avatar '
-                            + htmlentities(u_h) + ' color' + htmlentities(av_color) + '">' + htmlentities(avatar)
+                            + htmlentities(u_h) + ' color' + htmlentities(av_color) + '">' + avatar
                             + '</span><span class="shared-folder-info-block"><span class="shared-folder-name">'
                             + htmlentities(M.v[i].name) + '</span><span class="shared-folder-info">by '
                             + htmlentities(M.d[u_h].name) + '</span></span></a>';
@@ -941,7 +942,7 @@ function MegaData()
                             + '"></span></td><td><div class="shared-folder-icon"></div><div class="shared-folder-info-block"><div class="shared-folder-name">'
                             + htmlentities(M.v[i].name) + '</div><div class="shared-folder-info">' + htmlentities(contains)
                             + '</div></div> </td><td width="240"><div class="nw-contact-avatar '
-                            + htmlentities(u_h) + ' color' + htmlentities(av_color) + '">' + htmlentities(avatar)
+                            + htmlentities(u_h) + ' color' + htmlentities(av_color) + '">' + avatar
                             + '</div><div class="fm-chat-user-info todo-star ustatus ' + htmlentities(u_h) + ' '
                             + htmlentities(onlinestatus[1]) + '"><div class="todo-fm-chat-user-star"></div><div class="fm-chat-user">'
                             + htmlentities(M.d[u_h].name) + '</div><div class="nw-contact-status"></div><div class="fm-chat-user-status ' + htmlentities(htmlentities(u_h)) + '">' + htmlentities(onlinestatus[0])
@@ -1086,7 +1087,11 @@ function MegaData()
         if (this.v.length === 0) {
             if (M.currentdirid === M.RubbishID) {
                 $('.fm-empty-trashbin').removeClass('hidden');
-            } else if (M.currentdirid === 'contacts' || M.currentdirid === 'opc' || M.currentdirid === 'ipc') {
+            } else if (M.currentdirid === 'contacts') {
+                $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[784]);
+                $('.fm-empty-contacts').removeClass('hidden');
+            } else if (M.currentdirid === 'opc' || M.currentdirid === 'ipc') {
+                $('.fm-empty-contacts .fm-empty-cloud-txt').text('No requests pending at this time');
                 $('.fm-empty-contacts').removeClass('hidden');
             } else if (M.currentdirid.substr(0, 7) === 'search/') {
                 $('.fm-empty-search').removeClass('hidden');
@@ -5253,6 +5258,7 @@ function processIPC(ipc) {
             delete M.ipc[ipc[i].p];
             if ((Object.keys(M.ipc).length === 0) && (M.currentdirid === 'ipc')) {
                 $('.contact-requests-grid').addClass('hidden');
+                $('.fm-empty-contacts .fm-empty-cloud-txt').text('No requests pending at this time');
                 $('.fm-empty-contacts').removeClass('hidden');
             }
         }
@@ -5286,6 +5292,7 @@ function processOPC(opc) {
                     delete M.opc[k];
                     if ((Object.keys(M.opc).length === 0) && (M.currentdirid === 'opc')) {
                         $('.sent-requests-grid').addClass('hidden');
+                        $('.fm-empty-contacts .fm-empty-cloud-txt').text('No requests pending at this time');
                         $('.fm-empty-contacts').removeClass('hidden');
                     }
                     break;
@@ -5359,6 +5366,7 @@ function processUPCI(ap) {
             $('#ipc_' + ap[i].p).remove();
             if ((Object.keys(M.ipc).length === 0) && (M.currentdirid === 'ipc')) {
                 $('.contact-requests-grid').addClass('hidden');
+                $('.fm-empty-contacts .fm-empty-cloud-txt').text('No requests pending at this time');
                 $('.fm-empty-contacts').removeClass('hidden');
             }
         }
@@ -5395,6 +5403,7 @@ function processUPCO(ap) {
             $('#opc_' + psid).remove();
             if ((Object.keys(M.opc).length === 0) && (M.currentdirid === 'opc')) {
                 $('.sent-requests-grid').addClass('hidden');
+                $('.fm-empty-contacts .fm-empty-cloud-txt').text('No requests pending at this time');
                 $('.fm-empty-contacts').removeClass('hidden');
             }
         }

@@ -6407,15 +6407,33 @@ function shareDialogContentCheck() {
     }
 }
 
-function addShareDialogContactToContent(type, id, av_color, av, name, permClass, permText) {
-    var html = '<div class="share-dialog-contact-bl ' + htmlentities(type) + '" id="sdcbl_' + htmlentities(id) + '">\n\
-                    <div class="nw-contact-avatar color' + htmlentities(av_color) + '">' + htmlentities(av) + '</div>\n\
-                    <div class="fm-chat-user-info"><div class="fm-chat-user">' + htmlentities(name) + '</div></div>\n\
-                    <div class="share-dialog-permissions ' + htmlentities(permClass) + '">\n\
-                        <span></span>' + htmlentities(permText) + '\n\
-                    </div>';
+function addShareDialogContactToContent(type, id, av_color, av, name, permClass, permText, exportLink) {
+    
+    var html = '',
+        htmlEnd = '',
+        item = '';
 
-    var htmlEnd = '<div class="share-dialog-remove-button"></div><div class="clear"></div></div>';
+    
+    if (exportLink) {
+        item = itemExportLinkHtml(M.d[exportLink]);
+    }
+    else {
+        item = '<div class="nw-contact-avatar color' + av_color + '">' + av + '</div>'
+               +   '<div class="fm-chat-user-info">'
+               +       '<div class="fm-chat-user">' + name + '</div>'
+               +   '</div>';
+    }
+    
+    html = '<div class="share-dialog-contact-bl ' + type + '" id="sdcbl_' + id + '">'
+           +   item
+           +   '<div class="share-dialog-permissions ' + permClass + '">'
+           +       '<span></span>' + permText
+           +   '</div>';
+
+    
+    htmlEnd = '     <div class="share-dialog-remove-button"></div>'
+              + '   <div class="clear"></div>'
+              + '</div>';
 
     return html + htmlEnd;
 }
@@ -6444,19 +6462,13 @@ function fillShareDialogWithContent() {
 
                     generateShareDialogRow(name, email, shareRights, userHandle);
             }
+            
             // Item export link
             if (userHandle === 'EXP' && M.d[selectedNodeHandle].ph) {
 //                html = generateExportLinkShareDialogRow();
                 window.getLinkState = false;
-                html = itemExportLinkHtml(M.d[selectedNodeHandle]);
-                var tmp =
-                '<div class="share-dialog-contact-bl" id="sdcbl_EXP">\n\
-                    <div class="share-dialog-permissions read-only">\n\
-                        <span></span>Read-only\n\
-                    </div>\n\
-                </div>';
-                $('.share-dialog .share-dialog-contacts').append(tmp);
-                $('.share-dialog .share-dialog-contacts .share-dialog-contact-bl').append(html);
+                html = addShareDialogContactToContent('', 'EXP', '', '', '', 'read-only', l[55], selectedNodeHandle);
+                $('.share-dialog .share-dialog-contacts').append(html);
             }
         }
     }
@@ -6841,36 +6853,50 @@ function initShareDialog() {
         }
     });
 
-    $('.share-dialog-remove-button').rebind('click', function() {
+    $('.share-dialog').off('click', '.share-dialog-remove-button');
+    $('.share-dialog').on('click', '.share-dialog-remove-button', function() {
         var $this = $(this);
 
-        var handleOrEmail = $this.parent().attr('id').replace('sdcbl_', '');
+        var userEmail, pendingContactId,
+            handleOrEmail = $this.parent().attr('id').replace('sdcbl_', '');
+        
         $this.parent()
             .fadeOut(200)
             .remove();
 
         var selectedNodeHandle = $.selected[0];
         if (handleOrEmail !== '') {
-            // Due to pending shares, the id could be an email instead of a handle
-            var userEmail = handleOrEmail;
-
-            // If it was a user handle, the share is a full share
-            if (M.u[handleOrEmail]) {
-                userEmail = M.u[handleOrEmail].m;
-                M.delnodeShare( selectedNodeHandle, handleOrEmail);
+            
+            // Export link
+            if (handleOrEmail === 'EXP') {
+                // The s2 api call can remove both shares and pending shares
+                api_req({a: 's2', n:  selectedNodeHandle, s: [{ u: handleOrEmail, r: ''}], ha: '', i: requesti});
+                
+                M.delNodeShare(selectedNodeHandle, 'EXP');
+                M.deleteExportLinkShare(selectedNodeHandle);
             }
-
-            // Pending share
             else {
-                var pendingContactId = M.findOutgoingPendingContactIdByEmail(userEmail);
-                M.deletePendingShare(selectedNodeHandle, pendingContactId);
-                sharedUInode(selectedNodeHandle);
+                // Due to pending shares, the id could be an email instead of a handle
+                userEmail = handleOrEmail;
+
+                // If it was a user handle, the share is a full share
+                if (M.u[handleOrEmail]) {
+                    userEmail = M.u[handleOrEmail].m;
+                    M.delNodeShare(selectedNodeHandle, handleOrEmail);
+                }
+
+                // Pending share
+                else {
+                    pendingContactId = M.findOutgoingPendingContactIdByEmail(userEmail);
+                    M.deletePendingShare(selectedNodeHandle, pendingContactId);
+                    sharedUInode(selectedNodeHandle);
+                }
+
+                // The s2 api call can remove both shares and pending shares
+                api_req({a: 's2', n:  selectedNodeHandle, s: [{ u: userEmail, r: ''}], ha: '', i: requesti});
+
+                $.sharedTokens.splice($.sharedTokens.indexOf(userEmail), 1);
             }
-
-            // The s2 api call can remove both shares and pending shares
-            api_req({a: 's2', n:  selectedNodeHandle, s: [{ u: userEmail, r: ''}], ha: '', i: requesti});
-
-            $.sharedTokens.splice($.sharedTokens.indexOf(userEmail), 1);
         }
 
         shareDialogContentCheck();
@@ -6882,7 +6908,8 @@ function initShareDialog() {
     });
 
     // related to specific contact
-    $('.share-dialog-permissions').rebind('click', function(e) {
+    $('.share-dialog').off('click', '.share-dialog-permissions');
+    $('.share-dialog').on('click', '.share-dialog-permissions', function() {
         var $this = $(this),
             $m = $('.permissions-menu'),
             scrollBlock = $('.share-dialog-contacts .jspPane');

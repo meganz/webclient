@@ -3173,29 +3173,31 @@ function MegaData()
         }
     };
 
-    this.delnodeShare = function(h, u)
-    {
-        if (this.d[h] && typeof this.d[h].shares !== 'undefined')
-        {
+    this.delNodeShare = function(h, u) {
+        var a = 0;
+        if (this.d[h] && typeof this.d[h].shares !== 'undefined') {
             api_updfkey(h);
             delete this.d[h].shares[u];
-            var a = 0;
-            for (var i in this.d[h].shares)
-                if (this.d[h].shares[i])
+            for (var i in this.d[h].shares) {
+                if (this.d[h].shares[i]) {
                     a++;
-            if (a == 0)
-            {
+                }
+            }
+            if (a === 0) {
                 delete this.d[h].shares;
                 M.nodeAttr({h: h, shares: undefined});
                 delete u_sharekeys[h];
                 sharedUInode(h);
-                if (typeof mDB === 'object')
+                if (typeof mDB === 'object') {
                     mDBdel('ok', h);
+                }
             }
-            if (typeof mDB === 'object')
+            if (typeof mDB === 'object') {
                 mDBdel('s', h + '_' + u);
-            if ($.dialog == 'sharing' && $.selected && $.selected[0] == h)
+            }
+            if ($.dialog === 'sharing' && $.selected && $.selected[0] === h) {
                 shareDialog();
+            }
         }
     };
 
@@ -3228,6 +3230,32 @@ function MegaData()
         }
     };
 
+    /**
+     * Removes traces of export link share
+     * Remove M.fln, M.links, M.d[handle].ph
+     * 
+     * @param {string} handle of selected node/item
+     * 
+     */
+    this.deleteExportLinkShare = function(handle) {
+        
+        var index;
+        
+//  ToDo: Find out what's .fln stand for        
+//        if (M.fln.h === handle) {
+//            delete M.fln;
+//        }
+        
+        index = $.inArray(handle, M.links);
+        if (index !== -1) {
+            M.links.splice(index, 1);
+        }
+        
+        if (M.d[handle] && M.d[handle].ph) {
+            delete M.d[handle].ph;
+        }
+    };
+    
     this.getLinks = function(h) {
         this.$getLinkPromise = new $.Deferred();
 
@@ -4454,7 +4482,7 @@ function execsc(actionPackets, callback) {
 
                 // If access right are undefined then share is deleted
                 if (typeof actionPacket.r == "undefined") {
-                    M.delnodeShare(actionPacket.n, actionPacket.u);
+                    M.delNodeShare(actionPacket.n, actionPacket.u);
                 } else if (M.d[actionPacket.n]
                     && typeof M.d[actionPacket.n].shares != 'undefined'
                     && M.d[actionPacket.n].shares[actionPacket.u]
@@ -4476,6 +4504,10 @@ function execsc(actionPackets, callback) {
                     prockey = true;
                 }
 
+                if (actionPacket && actionPacket.u === 'EXP') {
+                    M.getLinks([actionPacket.h]);
+                }
+                
                 if (typeof actionPacket.o != 'undefined') {
                     if (typeof actionPacket.r == "undefined") {
                         if (d) {
@@ -5515,8 +5547,15 @@ function loadfm_callback(res) {
         // If we have shares, and if a share is for this node, record it on the nodes share list
         if (res.s) {
             for (var i in res.s) {
-                var nodeHandle = res.s[i].h;
-                M.nodeShare(nodeHandle, res.s[i]);
+                if (res.s.hasOwnProperty(i)) {
+                    
+                    var nodeHandle = res.s[i].h;
+                    M.nodeShare(nodeHandle, res.s[i]);
+                
+                    if (res.s[i].u === 'EXP') {
+                        M.getLinks([nodeHandle]);
+                    }
+                }
             }
         }
 

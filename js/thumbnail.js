@@ -242,9 +242,9 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                                 ThumbFR.readAsArrayBuffer(file);
                             });
                         }
+                        catch (e) {}
                     }
-                    catch (e) {}
-
+                    
                     file = file.blob();
                 }
 

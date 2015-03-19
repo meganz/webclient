@@ -325,7 +325,7 @@ function pro_continue(e)
             
 		}},true);
 	}
-	else if (parseFloat(pro_balance) >= parseFloat(membershipPlans[pro_package][5]))
+	else if (parseFloat(pro_balance) >= parseFloat(pro_packs[pro_package][5]))
 	{
 		msgDialog('confirmation',l[504],l[5844],false,function(e)
 		{

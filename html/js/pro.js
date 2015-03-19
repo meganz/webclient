@@ -4,9 +4,19 @@ var pro_package,
 	pro_paymentmethod,
 	pro_m,
 	account_type_num,
-	memberships = [],
-	pro_usebalance=false;
+	membershipPlans = [],
+	pro_usebalance = false;
 
+// Payment gateways, hardcoded for now, will call API in future to get list
+var gatewayOptions = [
+    {   
+        apiGatewayId: 4,
+        displayName: 'Bitcoin',
+        supportsRecurring: false,
+        cssClass: 'bitcoin',
+        providerName: 'Coinify'
+    }
+];
 
 function init_pro()
 {
@@ -14,17 +24,20 @@ function init_pro()
 		$('body').addClass('key');
 	    sessionStorage.proref = 'accountcompletion';
 		localStorage.removeItem('keycomplete');
-	} else $('body').addClass('pro');
-	
+	}
+    else {
+        $('body').addClass('pro');
+    }	
     
 	if (u_type == 3)
 	{
-		api_req(
-		{ a : 'uq',pro : 1},
-		{ 
+        // Flag pro:1 includes pro balance in the response
+		api_req({ a : 'uq', pro : 1 }, { 
 			callback : function (res) 
 			{
-				if (typeof res == 'object' && res.balance && res.balance[0]) pro_balance = res.balance[0][0];
+				if (typeof res == 'object' && res.balance && res.balance[0]) {
+                    pro_balance = res.balance[0][0];
+                }
 			}
 		});	
 	}
@@ -38,26 +51,21 @@ function init_pro()
 	
 	if (lang !== 'en') $('.reg-st3-save-txt').addClass(lang);
     if (lang == 'fr') $('.reg-st3-big-txt').each(function(e,o){$(o).html($(o).html().replace('GB','Go').replace('TB','To'));});
-	
-	
+		
 	if (!m)
 	{
-	   
-	    api_req(
-        { a : 'utqa'},
-		    { 
-			  callback : function (res) 
-			  {
-				  memberships = res;
-				 
-				  for ( var i = 0, l = memberships.length; i < l; i++ ) {
-					  if (memberships[i][4] == 1) {
-                        $('.reg-st3-membership-bl.pro' + memberships[i][1] + ' .price .num').html(memberships[i][5].split('.')[0]+'<span class="small">.'+memberships[i][5].split('.')[1]+' &euro;</span>');
-					  }
-				  }
-			  }
-	        }
-	    );	
+        // Get the membership plans. This call will return an array of arrays. Each array contains this data:
+        // [api_id, account_level, storage, transfer, months, price, currency, description, ios_id, google_id]                
+	    api_req({ a : 'utqa'}, { 
+            callback: function (result)
+            {
+                // Store globally
+                membershipPlans = result;
+                
+                // Render the plan details
+                populateMembershipPlans();
+            }
+        });
 		
 		if (lang !== 'en') $('.reg-st3-save-txt').addClass(lang);
 	    if (lang == 'fr') $('.reg-st3-big-txt').each(function(e,o){$(o).html($(o).html().replace('GB','Go').replace('TB','To'));});
@@ -107,34 +115,82 @@ function init_pro()
 	}
 }
 
-//Step2
+/**
+ * Populate the monthly plans across the main #pro page
+ */
+function populateMembershipPlans() {
+    
+    for (var i = 0, length = membershipPlans.length; i < length; i++) {
+
+        var accountLevel = membershipPlans[i][1];
+        var months = membershipPlans[i][4];
+        var price = membershipPlans[i][5].split('.');
+        var dollars = price[0];
+        var cents = price[1];
+
+        if (months === 1) {
+            $('.reg-st3-membership-bl.pro' + accountLevel + ' .price .num').html(
+                dollars + '<span class="small">.' + cents + ' &euro;</span>'
+            );
+        }
+    }
+}
+
+/**
+ * Loads the payment gateway options into Payment options section
+ */
+function loadPaymentGatewayOptions() {
+    
+    var html = '';
+    
+    // Loop through gateway providers (change to use list from API soon)
+    for (var i = 0, length = gatewayOptions.length; i < length; i++) {
+        
+        // Pre-select the first option in the list
+        var gatewayOption = gatewayOptions[i];
+        var optionChecked = (i === 0) ? 'checked="checked" ' : '';
+        
+        // Update name of the provider
+        if (i === 0) {
+            $('.payment-provider-name').text(gatewayOption.displayName);
+        }
+        
+        // Create a radio button with icon for each payment gateway
+        html += '<div class="membership-radio">'
+             +      '<input type="radio" name="' + gatewayOption.cssClass + '" id="' + gatewayOption.cssClass + '" ' + optionChecked + 'disabled="disabled" />'
+             +      '<div></div>'
+             +  '</div>'
+             +  '<div class="membership-radio-label ' + gatewayOption.cssClass + '">'
+             +      
+             +  '</div>';
+    }
+    
+    $('.payment-options-list').html(html);
+}
+
+// Step2
 function pro_next_step() {
 	
-	if(!u_handle) {
+	if (!u_handle) {
         megaAnalytics.log("pro", "loginreq");
-        //msgDialog('loginrequired', 'title', 'msg');
         showSignupPromptDialog();
         return;
-    } else if(isEphemeral()) {
+    }
+    else if(isEphemeral()) {
         showRegisterDialog();
         return;
     }
 	
-	megaAnalytics.log("pro", "proc");
+	megaAnalytics.log('pro', 'proc');
 	
 	var currentDate = new Date(),
-	    monthName=new Array("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"),
+        monthName = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
 	    mon = monthName[currentDate.getMonth()],
 		day = currentDate.getDate(),
-		pricePerMonth, pricePerYear;
-		
-	for (var i in memberships) {
-		  if (memberships[i][1] == account_type_num ) {
-			  if (memberships[i][4] == 1 ) pricePerMonth = memberships[i][5];
-			  else pricePerYear = memberships[i][5];
-		  }
-	}
-		
+		price = [];
+    
+    renderPlanDurationDropDown();
+    
 	$('.membership-step1').addClass('hidden');
 	$('.membership-step2').removeClass('hidden');
 	mainScroll();
@@ -143,31 +199,34 @@ function pro_next_step() {
 	$('.membership-date .day').text(day);
 	
 	$('.membership-dropdown-item').each(function() {
-	   if($(this).attr('data-months')<12)
-       $(this).find('strong').html(pricePerMonth * $(this).attr('data-months'));
-	   else $(this).find('strong').html(pricePerYear);
+        $(this).find('strong').html(price[$(this).attr('data-months')]);
     });
 	
 	$('.membership-st2-select span').unbind('click');
-	$('.membership-st2-select span').bind('click',function()
-	{		
-		if ($('.membership-st2-select').attr('class').indexOf('active') == -1 ) $('.membership-st2-select').addClass('active');
-		else $('.membership-st2-select').removeClass('active');
-	});
+	$('.membership-st2-select span').bind('click', function ()
+    {
+        if ($('.membership-st2-select').attr('class').indexOf('active') == -1) {
+            $('.membership-st2-select').addClass('active');
+        }
+        else {
+            $('.membership-st2-select').removeClass('active');
+        }
+    });
 	
 	$('.membership-dropdown-item').unbind('click');
-	$('.membership-dropdown-item').bind('click',function()
-	{		
-	    var price = $(this).find('strong').html();
-	    $('.membership-dropdown-item').removeClass('selected');
-		$(this).addClass('selected');
-		$('.membership-st2-select').removeClass('active');
-		$('.membership-st2-select span').html($(this).html());
-		if (price) {
-		   $('.membership-center.inactive').removeClass('inactive');
-		   $('.membership-bott-price strong').html(price.split('.')[0]+'<span>.' + price.split('.')[1] + ' &euro;</span>');
-		}
-	});
+    $('.membership-dropdown-item').bind('click', function ()
+    {
+        var price = $(this).find('strong').html();
+        $('.membership-dropdown-item').removeClass('selected');
+        $(this).addClass('selected');
+        $('.membership-st2-select').removeClass('active');
+        $('.membership-st2-select span').html($(this).html());
+        
+        if (price) {
+            $('.membership-center.inactive').removeClass('inactive');
+            $('.membership-bott-price strong').html(price.split('.')[0] + '<span>.' + price.split('.')[1] + ' &euro;</span>');
+        }
+    });
 	
 	$('.membership-bott-button').unbind('click');
 	$('.membership-bott-button').bind('click',function(e)
@@ -178,16 +237,84 @@ function pro_next_step() {
 		}
 	});
 	
+    loadPaymentGatewayOptions();
+}
+
+/**
+ * Renders the pro plan prices into the Plan Duration dropdown
+ */
+function renderPlanDurationDropDown() {
+    
+    // Filter the list of pricing options
+    var currentPlanDurations = membershipPlans.filter(function(element, index, array) {
+        
+        // If match on the membership plan, keep that pricing option
+        if (element[1] == account_type_num) {
+            return true;
+        }
+        
+        return false;
+    });
+    
+    /**
+     * Sort plan durations by lowest number of months first
+     * @param {Array} planA
+     * @param {Array} planB
+     */
+    currentPlanDurations.sort(function (planA, planB) {
+        
+        var numOfMonthsPlanA = planA[4];
+        var numOfMonthsPlanB = planB[4];
+        
+        if (numOfMonthsPlanA < numOfMonthsPlanB) {
+            return -1;
+        }
+        if (numOfMonthsPlanA > numOfMonthsPlanB) {
+            return 1;
+        }
+        
+        return 0;
+    });
+    
+    var html = '';
+    
+    // Loop through the available plan durations for the current membership plan
+	for (var i = 0, length = currentPlanDurations.length; i < length; i++) {
+            
+        // Get the price and number of months duration
+        var price = currentPlanDurations[i][5];
+        var numOfMonths = currentPlanDurations[i][4];
+        var monthsWording = '1 month';            
+
+        // Change wording depending on number of months
+        if (numOfMonths === 12) {
+            monthsWording = '1 year';
+        }
+        else if (numOfMonths > 1) {
+            monthsWording = numOfMonths + ' months';
+        }
+
+        // Build select option
+        html += '<div class="membership-dropdown-item" data-months="' + numOfMonths + '" data-price="' + price + '">'
+             +       monthsWording + ' (<strong>' + price + '</strong> €)'
+             +  '</div>';
+    }
+    
+    // Update drop down HTML
+    $('.membership-st2-dropdown').html(html);    
 }
 
 function pro_continue(e)
 {
-	if ($('.membership-dropdown-item.selected').attr('data-months')<12)
-         pro_package = 'pro' + account_type_num + '_month';
-		 //$('.membership-dropdown-item').attr('data-months') - how much months is selected
-	else pro_package = 'pro' + account_type_num + '_year';
+	if ($('.membership-dropdown-item.selected').attr('data-months') < 12) {
+        pro_package = 'pro' + account_type_num + '_month';
+    }
+	else {
+        pro_package = 'pro' + account_type_num + '_year';
+    }
 	
-	pro_paymentmethod='';
+	pro_paymentmethod = '';
+    
 	if (u_type === false)
 	{
 		u_storage = init_storage(localStorage);
@@ -195,9 +322,10 @@ function pro_continue(e)
 		u_checklogin({ checkloginresult: function(u_ctx,r) 
 		{ 
 			pro_pay();
+            
 		}},true);
 	}
-	else if (parseFloat(pro_balance) >= parseFloat(pro_packs[pro_package][5]))
+	else if (parseFloat(pro_balance) >= parseFloat(membershipPlans[pro_package][5]))
 	{
 		msgDialog('confirmation',l[504],l[5844],false,function(e)
 		{

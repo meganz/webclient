@@ -19045,7 +19045,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 	background-position: 4px -653px;
 	background-repeat: no-repeat;
 }
-.restore-close-button {
+.restore-close-button, .reset-close-button {
 	text-align: center;
 	margin-top: -10px;
 	padding-bottom: 20px;

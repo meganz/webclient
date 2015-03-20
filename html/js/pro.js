@@ -161,7 +161,7 @@ function loadPaymentGatewayOptions() {
              +      '<div></div>'
              +  '</div>'
              +  '<div class="membership-radio-label ' + gatewayOption.cssClass + '">'
-             +      
+             +      gatewayOption.displayName
              +  '</div>';
     }
     

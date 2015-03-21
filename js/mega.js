@@ -3903,8 +3903,13 @@ function MegaData()
     };
 
     var __ul_id = 8000;
-    this.addUpload = function(u)
+    this.addUpload = function(u, ignoreWarning)
     {
+        /*if (u.length > 99 && !ignoreWarning) {
+            if (UploadManager.warning(M.addUpload.bind(M, u, true))) {
+                return;
+            }
+        }*/
         var target = $.onDroppedTreeFolder || M.currentdirid, onChat;
         delete $.onDroppedTreeFolder;
 

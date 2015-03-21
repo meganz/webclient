@@ -115,20 +115,7 @@
                     if (res === ENOENT) {
                         msgDialog('warningb', l[1513], l[1946]);
                     } else if (res === 0) {
-                        $('.fm-dialog.reset-success .reg-success-txt').text(l[735]);
-                        
-                        $('.fm-dialog.reset-success .fm-dialog-button').unbind('click');
-                        $('.fm-dialog.reset-success .fm-dialog-button').bind('click', function() {
-                            $('.fm-dialog-overlay').addClass('hidden');
-                            $('body').removeClass('overlayed');
-                            $('.fm-dialog.reset-success').addClass('hidden');
-                            delete $.dialog;
-                        });
-                        
-                        $('.fm-dialog-overlay').removeClass('hidden');
-                        $('body').addClass('overlayed');
-                        $('.fm-dialog.reset-success').removeClass('hidden');
-                        $.dialog = 'resetsuccess';
+                        handleResetSuccessDialogs('.reset-success', l[735], 'resetsuccess');
                     } else {
                         msgDialog('warningb', l[135], l[200]);
                     }

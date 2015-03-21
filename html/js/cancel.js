@@ -12,7 +12,12 @@
             'prefix': 'cancel',
             'code': '',
             'email': '',
-            'secret': Math.random()
+            'secret': Math.random(),
+            'dialogClass': '.reset-success-st2',
+            'dlgName': 'resetsuccessst2',
+            'passwordInputId': '#reset_success_st2_pass',
+            'inputWrapperClass': '.fm-account-input',
+            'tOut' : 1000
         };
 
         self.opt = $.extend(true, {}, defaultOptions, opts);
@@ -20,13 +25,58 @@
 
     AccountClosure.prototype.initAccountClosure = function() {
         var self = this;
-        $('.cancel-account-button').unbind('click');
-        $('.cancel-account-button').bind('click', function() {
-            
-            self.opt.code = page.replace(self.opt.prefix, '');
+        
+        $(self.opt.passwordInputId).val('');
+        $('.fm-dialog').removeClass('error active');
+        $('.fm-dialog-overlay').removeClass('hidden');
+        $('body').addClass('overlayed');
+        $('.fm-dialog' + self.opt.dialogClass).removeClass('hidden');    
 
-            loadingDialog.show();
-            self.opt.email = self._getEmail(self._accountClosure);
+        $.dialog = self.opt.dlgName;
+
+        $(self.opt.passwordInputId).focus(function() {
+            $('.fm-dialog').addClass('active');
+        });
+        
+        $(self.opt.dialogClass + ' .fm-dialog-button.close-account').rebind('click', function(e) {
+        
+            if ($(this).hasClass('close-account')) {
+                loadingDialog.show();
+
+                self.opt.code = page.replace(self.opt.prefix, '');
+                postLogin(u_attr.email, $(self.opt.passwordInputId).val(), false, function(r) {
+                    loadingDialog.hide();
+
+                    // Password is matched
+                    if (r) {
+                        self._getEmail(self._accountClosure);
+                    }
+
+                    // Password is wrong
+                    else {
+                        $(self.opt.passwordInputId).val('');
+                        $('.fm-dialog').addClass('error');
+                        setTimeout(function() {
+                            $('.fm-dialog').removeClass('error');
+                        }, self.opt.tOut);
+                        $(self.opt.passwordInputId).focus();
+                    }
+                });
+            }
+        });
+
+        $(self.opt.dialogClass + ' .fm-dialog-button.cancel').rebind('click', function() {
+                loadingDialog.hide();
+                document.location.hash = 'fm/account';
+        });
+        
+        $(self.opt.passwordInputId).rebind('keypress', function(e) {
+            
+            var key = e.wich || e.keyCode;
+            
+            if (key === 13) {
+                $(self.opt.dialogClass + ' .fm-dialog-button.close-account').click();
+            }
         });
     };
 
@@ -54,6 +104,7 @@
                             }
                             delete localStorage;
                         }
+                        closeDialog();
                         document.location.hash = 'login';
                     });
                 }
@@ -93,7 +144,9 @@
                 else {
                     if (res[0] === 21) {
                         self.opt.email = res[1];
-                        callback(self.opt.code, self.opt.email, self.opt.secret.toString());
+                        if (callback) {
+                            callback(self.opt.code, self.opt.email, self.opt.secret.toString());
+                        }
                     }
                 }
             }

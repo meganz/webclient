@@ -3521,20 +3521,7 @@ function accountUI()
                             msgDialog('warningb', l[1513], l[1946]);
                         }
                         else if (res === 0) {
-                            $('.fm-dialog.reset-success .reg-success-txt').text(l[735]);
-
-                            $('.fm-dialog.reset-success .fm-dialog-button').unbind('click');
-                            $('.fm-dialog.reset-success .fm-dialog-button').bind('click', function() {
-                                $('.fm-dialog-overlay').addClass('hidden');
-                                $('body').removeClass('overlayed');
-                                $('.fm-dialog.reset-success').addClass('hidden');
-                                delete $.dialog;
-                            });
-
-                            $('.fm-dialog-overlay').removeClass('hidden');
-                            $('body').addClass('overlayed');
-                            $('.fm-dialog.reset-success').removeClass('hidden');
-                            $.dialog = 'deleteaccount';
+                            handleResetSuccessDialogs('.reset-success', l[735], 'deleteaccount');
                         }
                         else {
                             msgDialog('warningb', l[135], l[200]);
@@ -3593,6 +3580,24 @@ function accountUI()
         if ($(this).val() == $('#account-new-password').val())
             $('.fm-account-save-block').removeClass('hidden');
     });
+}
+
+function handleResetSuccessDialogs(dialog, txt, dlgString) {
+    
+    $('.fm-dialog' + dialog + ' .reg-success-txt').text(txt);
+
+    $('.fm-dialog' + dialog + ' .fm-dialog-button').rebind('click', function() {
+        $('.fm-dialog-overlay').addClass('hidden');
+        $('body').removeClass('overlayed');
+        $('.fm-dialog' + dialog).addClass('hidden');
+        delete $.dialog;
+    });
+
+    $('.fm-dialog-overlay').removeClass('hidden');
+    $('body').addClass('overlayed');
+    $('.fm-dialog' + dialog).removeClass('hidden');    
+    
+    $.dialog = dlgString;
 }
 
 function acc_checkpassword(pass)
@@ -7946,10 +7951,8 @@ function firefoxDialog(close)
     });
 }
 
-function browserDialog(close)
-{
-    if (close)
-    {
+function browserDialog(close) {
+    if (close) {
         $.dialog = false;
         fm_hideoverlay();
         $('.fm-dialog.browsers-dialog').addClass('hidden');
@@ -7959,29 +7962,27 @@ function browserDialog(close)
     $.dialog = 'browser';
     fm_showoverlay();
     $('.fm-dialog.browsers-dialog').removeClass('hidden');
-    $('.browsers-dialog .browsers-button,.browsers-dialog .fm-dialog-close').unbind('click')
-    $('.browsers-dialog .browsers-button,.browsers-dialog .fm-dialog-close').bind('click', function()
-    {
+    
+    $('.browsers-dialog .browsers-button,.browsers-dialog .fm-dialog-close').rebind('click', function() {
         browserDialog(1);
     });
+    
     $('#browsers-checkbox').unbind('click');
-    $('#browsers-checkbox').bind('click', function()
-    {
-        if ($(this).attr('class').indexOf('checkboxOn') == -1)
-        {
+    $('#browsers-checkbox').bind('click', function() {
+        if ($(this).attr('class').indexOf('checkboxOn') == -1) {
             localStorage.browserDialog = 1;
             $(this).attr('class', 'checkboxOn');
             $(this).parent().attr('class', 'checkboxOn');
             $(this).attr('checked', true);
         }
-        else
-        {
+        else {
             delete localStorage.chromeDialog;
             $(this).attr('class', 'checkboxOff');
             $(this).parent().attr('class', 'checkboxOff');
             $(this).attr('checked', false);
         }
     });
+    
     $('.browsers-top-icon').removeClass('ie9 ie10 safari');
     var bc, bh, bt;
     if ('-ms-scroll-limit' in document.documentElement.style && '-ms-ime-align' in document.documentElement.style)

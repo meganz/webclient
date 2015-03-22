@@ -876,13 +876,13 @@
                 <li>A 64 bit meta-MAC m of all chunk MACs</li>
               </ul>
               <p> A chunk MAC is computed as follows (this is essentially CBC-MAC, which was chosen instead of the more efficient OCB over intellectual property concerns):<br>
-                h := (n << 64) + n<br>
+                h := (n &lt;&lt; 64) + n<br>
                 For each AES block d: h := AES(k,h XOR d)<br>
                 A chunk is encrypted using standard counter mode:<br>
-                For each AES block d at block position p: d' := d XOR AES(k,(n << 64)+p)<br>
+                For each AES block d at block position p: d' := d XOR AES(k,(n &lt;&lt; 64)+p)<br>
                 MAC computation and encryption can be performed in the same loop.<br>
                 Decryption is analogous.<br>
-                To obtain the meta-MAC m, apply the same CBC-MAC to the resulting block MACs with a start value of 0. The 64 bit meta-MAC m is computed as ((bits 0-31 XOR bits 32-63) << 64) + (bits 64-95 XOR bits 96-127). </p>
+                To obtain the meta-MAC m, apply the same CBC-MAC to the resulting block MACs with a start value of 0. The 64 bit meta-MAC m is computed as ((bits 0-31 XOR bits 32-63) &lt;&lt; 64) + (bits 64-95 XOR bits 96-127). </p>
               <h2>11.11 Uploads</h2>
               <p>Uploads are performed by POSTing raw data to the target URL returned by the API u command. If so desired, an upload can be performed in chunks. Chunks can be sent in any order and can be of any size, but they must begin and end on a chunk boundary. The byte offset x of a chunk within the file is indicated by appending /x to the URL. Multiple chunks can be sent in parallel. After a chunk completes, the server responds with a status message, which can be:</p>
               <ul>

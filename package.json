@@ -32,6 +32,7 @@
   "devDependencies": {
     "dateformat": "~1.0.7-1.2.3",
     "fb-flo": "^0.3.1",
+    "grunt-contrib-concat": "^0.5.1",
     "grunt-contrib-htmlmin": "^0.4.0",
     "grunt-htmljson": "^0.1.1",
     "ibrik": "~1.1.1",

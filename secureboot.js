@@ -712,23 +712,27 @@ else if (!b_u)
     jsl.push({f:'js/user.js', n: 'user_js', j:1});
     jsl.push({f:'js/authring.js', n: 'authring_js', j:1});
     jsl.push({f:'js/mouse.js', n: 'mouse_js', j:1});
-    jsl.push({f:'js/jquery-2.1.1.js', n: 'jquery', j:1,w:10});
+	if (htmljson) {
+		jsl.push({f:'js/mega-jquery.js', n: 'jquery', j:1,w:10});
+	} else {
+		jsl.push({f:'js/jquery-2.1.1.js', n: 'jquery', j:1,w:10});
+		jsl.push({f:'js/jquery-ui-1.11.2.js', n: 'jqueryui_js', j:1,w:10});
+		jsl.push({f:'js/jquery.mousewheel.js', n: 'jquerymouse_js', j:1});
+		jsl.push({f:'js/jquery.jscrollpane.js', n: 'jscrollpane_js', j:1});
+		jsl.push({f:'js/jquery.tokeninput.js', n: 'jquerytokeninput_js', j:1});
+		jsl.push({f:'js/jquery.misc.js', n: 'jquerymisc_js', j:1});
+		jsl.push({f:'js/jquery.fullscreen.js', n: 'jquery_fullscreen', j:1,w:10});
+		jsl.push({f:'js/vendor/jquery.window-active.js', n: 'jquery_windowactive', j:1,w:2});
+	}
     jsl.push({f:'js/functions.js', n: 'functions_js', j:1});
     jsl.push({f:'js/megaLogger.js', n: 'megaLogger_js', j:1});
-    jsl.push({f:'js/jquery-ui-1.11.2.js', n: 'jqueryui_js', j:1,w:10});
     jsl.push({f:'js/filedrag.js', n: 'filedrag_js', j:1});
-    jsl.push({f:'js/jquery.mousewheel.js', n: 'jquerymouse_js', j:1});
-    jsl.push({f:'js/jquery.jscrollpane.js', n: 'jscrollpane_js', j:1});
-    jsl.push({f:'js/jquery.tokeninput.js', n: 'jquerytokeninput_js', j:1});
-    jsl.push({f:'js/jquery.misc.js', n: 'jquerymisc_js', j:1});
     jsl.push({f:'js/mDB.js', n: 'mDB_js', j:1});
     jsl.push({f:'js/thumbnail.js', n: 'thumbnail_js', j:1});
     jsl.push({f:'js/exif.js', n: 'exif_js', j:1,w:3});
     jsl.push({f:'js/megapix.js', n: 'megapix_js', j:1});
     jsl.push({f:'js/smartcrop.js', n: 'smartcrop_js', j:1,w:7});
     jsl.push({f:'js/mega.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/jquery.fullscreen.js', n: 'jquery_fullscreen', j:1,w:10});
-    jsl.push({f:'js/vendor/jquery.window-active.js', n: 'jquery_windowactive', j:1,w:2});
     jsl.push({f:'js/megaPromise.js', n: 'megapromise_js', j:1,w:5});
     jsl.push({f:'js/vendor/db.js', n: 'db_js', j:1,w:5});
     jsl.push({f:'js/megaDbEncryptionPlugin.js', n: 'megadbenc_js', j:1,w:5});

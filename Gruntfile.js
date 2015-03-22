@@ -19,12 +19,9 @@ module.exports = function(grunt) {
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
         uglify: {
-            options: {
-                banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
-            },
-            build: {
-                src: 'src/<%= pkg.name %>.js',
-                dest: 'build/<%= pkg.name %>.min.js'
+			jquery: {
+				src: 'js/mega-jquery.js',
+				dest: 'js/mega-jquery.js',
             }
         },
 		htmlmin: {
@@ -37,6 +34,12 @@ module.exports = function(grunt) {
 					 {expand: true, src: ['html/*.html', 'html/**/*.html'], dest: 'build/'},
 				],
 			},
+		},
+		concat: {
+			jquery: {
+				src: ["js/jquery*", "js/vendor/jquery*"],
+				dest: "js/mega-jquery.js",
+			}
 		},
         htmljson: {
 			required: {
@@ -54,8 +57,9 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-htmljson');
 	grunt.loadNpmTasks('grunt-contrib-htmlmin');
+	grunt.loadNpmTasks('grunt-contrib-concat');
 
 
     // Default task(s).
-    grunt.registerTask('default', ['htmlmin', 'htmljson', 'uglify']);
+    grunt.registerTask('default', ['htmlmin', 'concat', 'htmljson', 'uglify']);
 };

@@ -1353,6 +1353,7 @@ else if (!b_u)
 					var x = JSON.parse(jsl[i].text)
 					for (var i in x) {
 						pages[i] = x[i]
+						jsl_loaded[i] = 1
 					}
 				} catch (ex) {
 					throw new Error("Error parsing template");

@@ -5,7 +5,7 @@ var is_chrome_firefox = document.location.protocol === 'chrome:' && document.loc
 var is_extension = is_chrome_firefox || document.location.href.substr(0,19) == 'chrome-extension://';
 var storage_version = '1'; // clear localStorage when version doesn't match
 var page = document.location.hash;
-var htmljson = false || localStorage.htmljson
+var htmljson = false || localStorage.htmljson == "1"
 
 function isMobile()
 {
@@ -722,6 +722,7 @@ else if (!b_u)
 		jsl.push({f:'js/jquery.tokeninput.js', n: 'jquerytokeninput_js', j:1});
 		jsl.push({f:'js/jquery.misc.js', n: 'jquerymisc_js', j:1});
 		jsl.push({f:'js/jquery.fullscreen.js', n: 'jquery_fullscreen', j:1,w:10});
+		jsl.push({f:'js/jquery.checkboxes.js', n: 'checkboxes_js', j:1});
 		jsl.push({f:'js/vendor/jquery.window-active.js', n: 'jquery_windowactive', j:1,w:2});
 	}
     jsl.push({f:'js/functions.js', n: 'functions_js', j:1});
@@ -734,7 +735,9 @@ else if (!b_u)
     jsl.push({f:'js/smartcrop.js', n: 'smartcrop_js', j:1,w:7});
     jsl.push({f:'js/mega.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/megaPromise.js', n: 'megapromise_js', j:1,w:5});
-    jsl.push({f:'js/vendor/db.js', n: 'db_js', j:1,w:5});
+	if (!htmljson) {
+		jsl.push({f:'js/vendor/db.js', n: 'db_js', j:1,w:5});
+	}
     jsl.push({f:'js/megaDbEncryptionPlugin.js', n: 'megadbenc_js', j:1,w:5});
     jsl.push({f:'js/megaDb.js', n: 'megadb_js', j:1,w:5});
     jsl.push({f:'js/megaKvStorage.js', n: 'megakvstorage_js', j:1,w:5});
@@ -742,26 +745,30 @@ else if (!b_u)
     jsl.push({f:'js/chat/mpenc.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/chat/opQueue.js', n: 'mega_js', j:1,w:7});
 
-    jsl.push({f:'js/vendor/chat/strophe.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/vendor/chat/strophe.disco.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/vendor/chat/strophe.jingle.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/vendor/chat/strophe.jingle.session.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/vendor/chat/strophe.jingle.sdp.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/vendor/chat/strophe.jingle.adapter.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/vendor/chat/strophe.muc.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/vendor/chat/strophe.roster.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/vendor/chat/wildemitter.patched.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/vendor/chat/hark.patched.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/vendor/chat/base32.js', n: 'mega_js', j:1,w:7});
-
-    // direct transfer deps.
-    jsl.push({f:'js/vendor/chat/cryptojs-core.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/vendor/chat/cryptojs-sha1.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/vendor/chat/cryptojs-hmac.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/vendor/chat/cryptojs-lib-typedarrays.js', n: 'mega_js', j:1,w:7});
-
-    // Other
-    jsl.push({f:'js/vendor/Autolinker.js', n: 'mega_js', j:1,w:7});
+	if (!htmljson) {
+	    jsl.push({f:'js/vendor/chat/strophe.js', n: 'mega_js', j:1,w:7});
+	    jsl.push({f:'js/vendor/chat/strophe.disco.js', n: 'mega_js', j:1,w:7});
+	    jsl.push({f:'js/vendor/chat/strophe.jingle.js', n: 'mega_js', j:1,w:7});
+	    jsl.push({f:'js/vendor/chat/strophe.jingle.session.js', n: 'mega_js', j:1,w:7});
+	    jsl.push({f:'js/vendor/chat/strophe.jingle.sdp.js', n: 'mega_js', j:1,w:7});
+	    jsl.push({f:'js/vendor/chat/strophe.jingle.adapter.js', n: 'mega_js', j:1,w:7});
+	    jsl.push({f:'js/vendor/chat/strophe.muc.js', n: 'mega_js', j:1,w:7});
+	    jsl.push({f:'js/vendor/chat/strophe.roster.js', n: 'mega_js', j:1,w:7});
+	    jsl.push({f:'js/vendor/chat/wildemitter.patched.js', n: 'mega_js', j:1,w:7});
+	    jsl.push({f:'js/vendor/chat/hark.patched.js', n: 'mega_js', j:1,w:7});
+	    jsl.push({f:'js/vendor/chat/base32.js', n: 'mega_js', j:1,w:7});
+	
+	    // direct transfer deps.
+	    jsl.push({f:'js/vendor/chat/cryptojs-core.js', n: 'mega_js', j:1,w:7});
+	    jsl.push({f:'js/vendor/chat/cryptojs-sha1.js', n: 'mega_js', j:1,w:7});
+	    jsl.push({f:'js/vendor/chat/cryptojs-hmac.js', n: 'mega_js', j:1,w:7});
+	    jsl.push({f:'js/vendor/chat/cryptojs-lib-typedarrays.js', n: 'mega_js', j:1,w:7});
+	
+	    // Other
+	    jsl.push({f:'js/vendor/Autolinker.js', n: 'mega_js', j:1,w:7});
+	} else {
+		jsl.push({f:'js/mega-vendor.js', n: 'mega_js', j:1,w:7});
+	}
 
     // Google Import Contacts
     jsl.push({f:'js/gContacts.js', n: 'gcontacts_js', j:1,w:3});
@@ -779,9 +786,11 @@ else if (!b_u)
 
     // notifications
     jsl.push({f:'js/megaNotifications.js', n: 'meganotifications_js', j:1,w:7});
-    jsl.push({f:'js/vendor/ion.sound.js', n: 'ionsound_js', j:1,w:7});
-    jsl.push({f:'js/vendor/favico.js', n: 'favico_js', j:1,w:7});
-    jsl.push({f:'js/vendor/notification.js', n: 'notification_js', j:1,w:7});
+	if (!htmljson) {
+		jsl.push({f:'js/vendor/ion.sound.js', n: 'ionsound_js', j:1,w:7});
+		jsl.push({f:'js/vendor/favico.js', n: 'favico_js', j:1,w:7});
+		jsl.push({f:'js/vendor/notification.js', n: 'notification_js', j:1,w:7});
+	}
 
     jsl.push({f:'js/chat/plugins/urlFilter.js', n: 'urlFilter_js', j:1,w:7});
     jsl.push({f:'js/chat/plugins/emoticonsFilter.js', n: 'emoticonsFilter_js', j:1,w:7});
@@ -843,7 +852,6 @@ else if (!b_u)
     jsl.push({f:'js/countries.js', n: 'countries_js', j:1});
     jsl.push({f:'html/dialogs.html', n: 'dialogs', j:0,w:2});
     jsl.push({f:'html/transferwidget.html', n: 'transferwidget', j:0});
-    jsl.push({f:'js/jquery.checkboxes.js', n: 'checkboxes_js', j:1});
     jsl.push({f:'js/Int64.js', n: 'int64_js', j:1});
     jsl.push({f:'js/zip64.js', n: 'zip_js', j:1});
     jsl.push({f:'js/cms.js', n: 'cms_js', j:1});

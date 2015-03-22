@@ -22,6 +22,10 @@ module.exports = function(grunt) {
 			jquery: {
 				src: 'js/mega-jquery.js',
 				dest: 'js/mega-jquery.js',
+            },
+			vendor: {
+				src: 'js/mega-vendor.js',
+				dest: 'js/mega-vendor.js',
             }
         },
 		htmlmin: {
@@ -37,9 +41,13 @@ module.exports = function(grunt) {
 		},
 		concat: {
 			jquery: {
-				src: ["js/jquery*", "js/vendor/jquery*"],
+				src: ["js/jquery-2.1.1.js", "js/jquery*", "js/vendor/jquery*"],
 				dest: "js/mega-jquery.js",
-			}
+			},
+			vendor: {
+				src: ["js/vendor/chat/strophe.js", "js/vendor/*.js", "js/vendor/**/*.js"],
+				dest: "js/mega-vendor.js",
+			},
 		},
         htmljson: {
 			required: {

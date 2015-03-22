@@ -26,7 +26,11 @@ module.exports = function(grunt) {
 			vendor: {
 				src: 'js/mega-vendor.js',
 				dest: 'js/mega-vendor.js',
-            }
+            },
+			plugins: {
+				src: 'js/mega-chat-plugins.js',
+				dest: 'js/mega-chat-plugins.js',
+            },
         },
 		htmlmin: {
 			default_options: {
@@ -47,6 +51,10 @@ module.exports = function(grunt) {
 			vendor: {
 				src: ["js/vendor/chat/strophe.js", "js/vendor/*.js", "js/vendor/**/*.js"],
 				dest: "js/mega-vendor.js",
+			},
+			plugins: {
+				src: ["js/chat/plugins/*.js"],
+				dest: "js/mega-chat-plugins.js",
 			},
 		},
         htmljson: {

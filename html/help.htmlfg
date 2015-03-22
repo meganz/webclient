@@ -1,0 +1,156 @@
+
+  <div class="main-scroll-block">
+   <div class="main-pad-block">
+      ((TOP))
+
+      <div class="dev-nw-gray-bg">
+        <div class="dev-nw-gray"></div>
+      </div>
+      
+      <div class="main-mid-pad new-bottom-pages help-nw">
+         <div class="new-left-menu-block">
+            <div class="new-left-menu-link home active">
+              <div class="new-left-menu-icon help-icon help-home">Inicio</div>
+            </div> 
+            <div class="new-left-menu-link basics">
+              <div class="new-left-menu-icon help-icon help-basics">B&aacute;sico</div>
+            </div> 
+            <div class="new-left-menu-link sharing">
+              <div class="new-left-menu-icon help-icon help-sharing">Compartir</div>
+            </div> 
+            <div class="new-left-menu-link security">
+              <div class="new-left-menu-icon help-icon help-security">Seguridad y Privacidad</div>
+            </div> 
+            <div class="new-left-menu-link account">
+              <div class="new-left-menu-icon help-icon help-account">Cuenta</div>
+            </div> 
+            <div class="new-left-menu-link sync">
+              <div class="new-left-menu-icon help-icon help-sync">Cliente de Sincronizaci&oacute;n</div>
+            </div> 
+            <div class="new-left-menu-link ios">
+              <div class="new-left-menu-icon help-icon help-ios">Aplicaci&oacute;n para iOS</div>
+            </div> 
+            <div class="new-left-menu-link android">
+              <div class="new-left-menu-icon help-icon help-android">Aplicaci&oacute;n para Android</div>
+            </div> 
+         </div>
+         
+         <div class="new-right-content-block home">
+           <h1 class="help-home-header">Bienvenido al Centro de Ayuda</h1>
+           <div class="blog-new-search">
+                <input value="Buscar" class="help_ search"/>
+           </div>
+           <div class="blog-new-div">
+              <div></div>
+           </div>
+           <div class="help-short-block">
+            <div class="dev-short-block left"> 
+             <div class="new-affiliate-mid-header new-affiliate-bot-pad"> 
+                <span class="red">Obt&eacute;n soporte</span> 
+             </div> 
+             <div class="help-text-block"> 
+                Si tu pregunta no esta respondida aqu&iacute;, no dudes en contactar con nosotros.
+             </div> 
+             <a href="mailto:support@mega.co.nz" class="dev-new-button"> Contactar con Soporte </a> 
+             <div class="clear"></div> 
+            </div>
+            <div class="dev-short-block right"> 
+             <div class="new-affiliate-mid-header new-affiliate-bot-pad"> 
+               <span class="red">Temas Populares:</span> 
+             </div>  
+             <a href="#help/basics" class="basics-listing"> 
+                &iquest;De qu&eacute; se trata MEGA?
+             </a><br>
+             <a href="#help/sharing" class="sharing-listing"> 
+                &iquest;C&oacute;mo funcionan las carpetas compartidas?
+             </a><br>
+             <a href="#help/security" class="security-listing"> 
+                &iquest;C&oacute;mo funciona el cifrado?
+             </a><br>
+             <a href="#help/account" class="account-listing"> 
+                He olvidado mi contrase&ntilde;a. &iquest;Puedo restaurarla?
+             </a><br>
+            </div>
+            <div class="clear"></div>
+           </div>
+           <div class="blog-new-div">
+              <div></div>
+           </div>
+           <div class="new-affiliate-mid-header new-affiliate-bot-pad"> 
+               <span class="red">Categor&iacute;as</span> 
+           </div> 
+           <div class="dev-short-block left help-nw-short-blocks"> 
+               <div class="help-block basics">
+                   <div class="help-short-icon basics">
+                    B&aacute;sico
+                   </div>
+                   <div class="help-short-txt">
+                   Encuentra respuestas a todas las preguntas b&aacute;sicas acerca de nuestro servicio.
+                   </div>
+               </div>
+               <div class="help-block security">
+                   <div class="help-short-icon security">
+                    Seguridad y Privacidad
+                   </div>
+                   <div class="help-short-txt">
+                   M&aacute;s informaci&oacute;n sobre el modelo de seguridad y criptograf&iacute;a de MEGA.
+                   </div>
+               </div>
+               <div class="help-block sync">
+                   <div class="help-short-icon sync">
+                    Cliente de Sincronizaci&oacute;n
+                   </div>
+                   <div class="help-short-txt">
+                   Obt&eacute;n toda la informaci&oacute;n acerca de la sincronizaci&oacute;n entre tus ordenadores y MEGA.
+                   </div>
+               </div>
+               <div class="help-block android">
+                   <div class="help-short-icon android">
+                    Aplicaci&oacute;n para Android
+                   </div>
+                   <div class="help-short-txt">
+                   Aprende m&aacute;s sobre nuestra aplicaci&oacute;n para Android, la nube en el bolsillo.
+                   </div>
+               </div>
+           </div>
+           <div class="dev-short-block right help-nw-short-blocks"> 
+               <div class="help-block sharing">
+                   <div class="help-short-icon sharing">
+                    Compartir
+                   </div>
+                   <div class="help-short-txt">
+                   Aprende m&aacute;s acerca las funciones de las poderosas colaboraciones de MEGA.
+                   </div>
+               </div>
+               <div class="help-block account">
+                   <div class="help-short-icon account">
+                    Cuenta
+                   </div>
+                   <div class="help-short-txt">
+                   Todo lo que necesitas saber acerca de tu cuenta de MEGA.
+                   </div>
+               </div>
+               <div class="help-block ios">
+                   <div class="help-short-icon ios">
+                    Aplicaci&oacute;n para iOS
+                   </div>
+                   <div class="help-short-txt">
+                   Aprende m&aacute;s sobre nuestra aplicaci&oacute;n para iOS, la nube en el bolsillo.
+                   </div>
+               </div>
+           </div>
+           <div class="clear"></div>
+         </div>
+         
+         <div class="new-right-content-block help-info-pages hidden">
+		 
+         </div>
+         
+         <div class="clear"></div>
+      </div>
+      
+    
+      ((BOTTOM))
+    
+  </div>
+  </div>

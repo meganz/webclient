@@ -929,6 +929,42 @@ else if (!b_u)
         'recover': ['reset','reset_js']
     };
 
+	if (localStorage.htmljson) {
+		// Fix jsl
+		var _jsl = []
+		for (var i in jsl) {
+			if (jsl[i].j != 0) {
+				_jsl.push(jsl[i])
+			}
+		}
+		_jsl.push({f: "html/boot.json", n:"htmljson_boot", j:9})
+		jsl = _jsl;
+
+		// fix jsl2
+		for (var i in jsl2) {
+			if (jsl2[i].j == 0) {
+				jsl2[i].j = 9;
+				jsl2[i].f = 'html/extra.json';
+			}
+		}
+
+		// TODO: research if Array.filter is portable enough
+		// to use it instead
+		for (var x in subpages) {
+			var has = false
+			var tmp = []
+			for (var y in subpages[x]) {
+				if ((jsl2[subpages[x][y]]||{}).j == 9) {
+					if (!has) tmp.push(subpages[x][y])
+					has = true
+				} else {
+					tmp.push(subpages[x][y])
+				}
+			}
+			subpages[x] = tmp;
+		}
+	}
+
     if (page)
     {
         if (page.indexOf('%25') !== -1)
@@ -1124,7 +1160,7 @@ else if (!b_u)
                 else
                 {
                     var ch = NetUtil.newChannel(file);
-                    ch.contentType = jsl[jsi].j == 3
+                    ch.contentType = jsl[jsi].j == 3 || jsl[jsi].j == 9
                         ? "application/json":"text/plain";
 
                     NetUtil.asyncFetch(ch, function(is, s)
@@ -1137,7 +1173,7 @@ else if (!b_u)
                         else
                         {
                             jsl[jsi].text = NetUtil.readInputStreamToString(is, is.available());
-                            if (jsl[jsi].j == 3) l = JSON.parse(jsl[jsi].text);
+                            if (jsl[jsi].j == 3 || jsl[jsi].j == 9) l = JSON.parse(jsl[jsi].text);
                             step(jsi);
                         }
                     });
@@ -1312,6 +1348,16 @@ else if (!b_u)
                     throw new Error('Error parsing language file '+lang+'.json');
                 }
             }
+			else if (jsl[i].j == 9) {
+                try {
+					var x = JSON.parse(jsl[i].text)
+					for (var i in x) {
+						pages[i] = x[i]
+					}
+				} catch (ex) {
+					throw new Error("Error parsing template");
+				}
+			}
             else if (jsl[i].j == 0) pages[jsl[i].n] = jsl[i].text;
         }
         if (window.URL)

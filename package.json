@@ -32,6 +32,8 @@
   "devDependencies": {
     "dateformat": "~1.0.7-1.2.3",
     "fb-flo": "^0.3.1",
+    "grunt-contrib-htmlmin": "^0.4.0",
+    "grunt-htmljson": "^0.1.1",
     "ibrik": "~1.1.1",
     "istanbul": "~0.2.10",
     "jsdoc": "~3.3.0",
@@ -43,12 +45,15 @@
     "karma-firefox-launcher": "~0.1.3",
     "karma-html2js-preprocessor": "~0.1.0",
     "karma-jasmine": "~0.1.5",
+    "karma-junit-reporter": "~0.2",
     "karma-mocha": "~0.1.1",
     "karma-phantomjs-launcher": "~0.1.1",
     "karma-script-launcher": "~0.1.0",
     "karma-sinon": "~1.0.3",
-    "karma-junit-reporter": "~0.2",
     "mocha": "~1.17.1",
     "sinon": "~1.9.0"
+  },
+  "dependencies": {
+    "grunt-contrib-uglify": "^0.8.0"
   }
 }

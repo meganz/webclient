@@ -5,6 +5,7 @@ var is_chrome_firefox = document.location.protocol === 'chrome:' && document.loc
 var is_extension = is_chrome_firefox || document.location.href.substr(0,19) == 'chrome-extension://';
 var storage_version = '1'; // clear localStorage when version doesn't match
 var page = document.location.hash;
+var htmljson = false || localStorage.htmljson
 
 function isMobile()
 {
@@ -929,7 +930,7 @@ else if (!b_u)
         'recover': ['reset','reset_js']
     };
 
-	if (localStorage.htmljson) {
+	if (htmljson) {
 		// Fix jsl
 		var _jsl = []
 		for (var i in jsl) {

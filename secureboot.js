@@ -804,9 +804,9 @@ else if (!b_u)
         jsl.push({f:'js/dcraw.js', n: 'dcraw_js', j:1});
     }
     /* better download */
-    jsl.push({f:'js/xhr.js', n: 'xhr_js', j:1});
-    jsl.push({f:'js/queue.js', n: 'queue', j:1,w:4});
-    jsl.push({f:'js/downloadChrome.js', n: 'dl_chrome', j:1,w:3});
+    jsl.push({f:'js/xhr.js', n: 'xhr_js', j:1, g: 'download'});
+    jsl.push({f:'js/queue.js', n: 'queue', j:1,w:4, g: 'download'});
+    jsl.push({f:'js/downloadChrome.js', n: 'dl_chrome', j:1,w:3, g: 'download'});
     if (is_chrome_firefox && parseInt(Services.appinfo.version) > 27)
     {
         is_chrome_firefox |= 4;
@@ -814,8 +814,8 @@ else if (!b_u)
     }
     else
     {
-        jsl.push({f:'js/downloadMemory.js', n: 'dl_memory', j:1,w:3});
-        jsl.push({f:'js/downloadFlash.js', n: 'dl_flash', j:1,w:3});
+        jsl.push({f:'js/downloadMemory.js', n: 'dl_memory', j:1,w:3, g: 'download'});
+        jsl.push({f:'js/downloadFlash.js', n: 'dl_flash', j:1,w:3, g: 'download'});
     }
     jsl.push({f:'js/downloader.js', n: 'dl_downloader', j:1,w:3, g: 'download'});
     jsl.push({f:'js/download2.js', n: 'dl_js', j:1,w:3, g: 'download'});

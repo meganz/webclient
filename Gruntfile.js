@@ -31,13 +31,17 @@ module.exports = function(grunt) {
 				src: 'js/mega-chat-plugins.js',
 				dest: 'js/mega-chat-plugins.js',
             },
-			crypto: {
-				src: 'js/mega-crypto.js',
-				dest: 'js/mega-crypto.js',
+			mega_chat: {
+				src: 'js/mega-chat.js',
+				dest: 'js/mega-chat.js',
             },
 			ui: {
 				src: 'js/mega-ui.js',
 				dest: 'js/mega-ui.js',
+            },
+			crypto: {
+				src: 'js/mega-crypto.js',
+				dest: 'js/mega-crypto.js',
             },
         },
 		htmlmin: {
@@ -72,6 +76,19 @@ module.exports = function(grunt) {
 				src: ["js/ui/filepicker.js", "js/ui/dialog.js", "js/ui/*.js", "js/chat/ui/*"],
 				dest: "js/mega-ui.js",
 			},
+			mega_chat: {
+				src : [
+					'js/chat/mpenc.js', 
+					'js/chat/opQueue.js', 
+					'js/chat/rtc*.js',
+					'js/chat/karereEventObjects.js',
+					'js/chat/karere.js',
+					'js/chat/chat.js', 
+					'js/chat/chatRoom.js',
+					'js/chat/*.js',
+				],
+				dest : 'js/mega-chat.js',
+			}
 		},
         htmljson: {
 			required: {
@@ -93,5 +110,6 @@ module.exports = function(grunt) {
 
 
     // Default task(s).
-    grunt.registerTask('default', ['htmlmin', 'concat', 'htmljson', 'uglify']);
+    grunt.registerTask('default', ['htmlmin', 'concat', 'htmljson']);
+    grunt.registerTask('prod', ['default', 'uglify']);
 };

@@ -151,7 +151,7 @@ function loadPaymentGatewayOptions() {
         
         // Update name of the provider
         if (i === 0) {
-            $('.payment-provider-name').text(gatewayOption.displayName);
+            $('.payment-provider-name').text(gatewayOption.providerName);
         }
         
         // Create a radio button with icon for each payment gateway

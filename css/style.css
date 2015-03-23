@@ -22006,8 +22006,7 @@ a.top-login-forgot-pass {
 	cursor: pointer;
 }
 .pro-register-paypal-dialog .reg-success-icon {
-	background: url(../images/mega/paypalgame_2-1.png) 0 0 no-repeat;
-	background-size: 200px 200px;
+	background: url(../images/mega/bitcoin.png) 0 0 no-repeat;
 	width: 200px;
 	height: 200px;
 }
@@ -22473,6 +22472,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 }
 }
  @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
+.pro-register-paypal-dialog .reg-success-icon {
+ background-image: url(../images/mega/bitcoin@2x.png);
+ background-size: 200px 200px;
+}
 .fm-chat-smile {
  background-image:url(../images/mega/chat-smiles@2x.png);
  background-size:180px auto;

@@ -29,6 +29,9 @@ module.exports = function(grunt) {
 			dest: "js/xmega-" + i + ".js"
 		}
 		uglify[i] = {
+			options: {
+				sourceMap: true,
+			},
 			src: "js/xmega-" + i + ".js",
 			dest: "js/xmega-" + i + ".js",
 		}

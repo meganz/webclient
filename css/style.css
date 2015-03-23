@@ -16288,6 +16288,9 @@ strong, b {
 	color: #333333;
 	padding: 20px 0 17px 0;
 }
+.wire-transfer-details {
+    margin-bottom: 20px;
+}
 /* Make the wire transfer details mouse selectable */
 .wire-transfer-details * {
 	-webkit-touch-callout: text !important;

@@ -716,12 +716,11 @@ else if (!b_u)
     jsl.push({f:'js/functions.js', n: 'functions_js', j:1});
     jsl.push({f:'js/megaLogger.js', n: 'megaLogger_js', j:1});
     jsl.push({f:'js/jquery-ui-1.11.2.js', n: 'jqueryui_js', j:1,w:10, g: 'jquery'});
-    jsl.push({f:'js/filedrag.js', n: 'filedrag_js', j:1});
+    jsl.push({f:'js/filedrag.js', n: 'filedrag_js', j:1, g: 'common'});
     jsl.push({f:'js/jquery.mousewheel.js', n: 'jquerymouse_js', j:1, g: 'jquery'});
     jsl.push({f:'js/jquery.jscrollpane.js', n: 'jscrollpane_js', j:1, g: 'jquery'});
     jsl.push({f:'js/jquery.tokeninput.js', n: 'jquerytokeninput_js', j:1, g: 'jquery'});
     jsl.push({f:'js/jquery.misc.js', n: 'jquerymisc_js', j:1, g: 'jquery'});
-    jsl.push({f:'js/mDB.js', n: 'mDB_js', j:1});
     jsl.push({f:'js/thumbnail.js', n: 'thumbnail_js', j:1, g: 'images'});
     jsl.push({f:'js/exif.js', n: 'exif_js', j:1,w:3, j:1, g: 'images'});
     jsl.push({f:'js/megapix.js', n: 'megapix_js', j:1, j:1, g: 'images'});
@@ -731,6 +730,7 @@ else if (!b_u)
     jsl.push({f:'js/vendor/jquery.window-active.js', n: 'jquery_windowactive', j:1,w:2, g: 'jquery'});
     jsl.push({f:'js/megaPromise.js', n: 'megapromise_js', j:1,w:5});
     jsl.push({f:'js/vendor/db.js', n: 'db_js', j:1,w:5, g: 'vendor'});
+    jsl.push({f:'js/mDB.js', n: 'mDB_js', j:1, g: 'db'});
     jsl.push({f:'js/megaDbEncryptionPlugin.js', n: 'megadbenc_js', j:1,w:5, j:1, g: 'db'});
     jsl.push({f:'js/megaDb.js', n: 'megadb_js', j:1,w:5, j:1, g: 'db'});
     jsl.push({f:'js/megaKvStorage.js', n: 'megakvstorage_js', j:1,w:5, g: 'db'});
@@ -757,7 +757,7 @@ else if (!b_u)
     jsl.push({f:'js/vendor/Autolinker.js', n: 'mega_js', j:1,w:7, g: 'vendor'});
 
     // Google Import Contacts
-    jsl.push({f:'js/gContacts.js', n: 'gcontacts_js', j:1,w:3});
+    jsl.push({f:'js/gContacts.js', n: 'gcontacts_js', j:1,w:3, g: 'plugins'});
 
     jsl.push({f:'js/ui/filepicker.js', n: 'mega_js', j:1,w:7, g: 'ui'});
     jsl.push({f:'js/ui/dialog.js', n: 'mega_js', j:1,w:7, g: 'ui'});
@@ -797,7 +797,7 @@ else if (!b_u)
     // END OF MEGA CHAT
 
     jsl.push({f:'js/fm.js', n: 'fm_js', j:1,w:12});
-    jsl.push({f:'js/filetypes.js', n: 'filetypes_js', j:1});
+    jsl.push({f:'js/filetypes.js', n: 'filetypes_js', j:1, g: 'common'});
     jsl.push({f:'js/miniui.js', n: 'miniui_js', j:1, g: 'ui'});
     if (is_extension)
     {
@@ -825,20 +825,20 @@ else if (!b_u)
     jsl.push({f:'index.js', n: 'index', j:1,w:4});
     jsl.push({f:'html/start.html', n: 'start', j:0});
     jsl.push({f:'html/megainfo.html', n: 'megainfo', j:0});
-    jsl.push({f:'html/js/start.js', n: 'start_js', j:1});
+    jsl.push({f:'html/js/start.js', n: 'start_js', j:1, g: 'common'});
     jsl.push({f:'html/bottom2.html', n: 'bottom2',j:0});
     jsl.push({f:'html/key.html', n: 'key', j:0});
-    jsl.push({f:'html/js/key.js', n: 'key_js', j:1});
+    jsl.push({f:'html/js/key.js', n: 'key_js', j:1, g: 'common'});
     jsl.push({f:'html/pro.html', n: 'pro', j:0});
-    jsl.push({f:'html/js/pro.js', n: 'pro_js', j:1});
+    jsl.push({f:'html/js/pro.js', n: 'pro_js', j:1, g: 'common'});
     jsl.push({f:'html/login.html', n: 'login', j:0});
-    jsl.push({f:'html/js/login.js', n: 'login_js', j:1});
+    jsl.push({f:'html/js/login.js', n: 'login_js', j:1, g: 'common'});
     jsl.push({f:'html/fm.html', n: 'fm', j:0,w:3});
     jsl.push({f:'html/top.html', n: 'top', j:0});
     jsl.push({f:'js/notifications.js', n: 'notifications_js', j:1});
     jsl.push({f:'css/style.css', n: 'style_css', j:2,w:30,c:1,d:1,cache:1});
-    jsl.push({f:'js/avatar.js', n: 'avatar_js', j:1,w:3});
-    jsl.push({f:'js/countries.js', n: 'countries_js', j:1});
+    jsl.push({f:'js/avatar.js', n: 'avatar_js', j:1,w:3, g: 'common'});
+    jsl.push({f:'js/countries.js', n: 'countries_js', j:1, g: 'common'});
     jsl.push({f:'html/dialogs.html', n: 'dialogs', j:0,w:2});
     jsl.push({f:'html/transferwidget.html', n: 'transferwidget', j:0});
     jsl.push({f:'js/jquery.checkboxes.js', n: 'checkboxes_js', j:1, g: 'jquery'});
@@ -947,7 +947,7 @@ else if (!b_u)
 		}
 		_jsl.push({f: "html/boot.json", n:"prod_assets_boot", j:9})
 
-		console.error("Production boot", jsl.length - _jsl.length, "assets less")
+		console.error("Production boot. Loading ", _jsl.length, " assets instead of ", jsl.length);
 		jsl = _jsl;
 
 		// fix jsl2

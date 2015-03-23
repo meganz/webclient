@@ -35,6 +35,10 @@ module.exports = function(grunt) {
 				src: 'js/mega-crypto.js',
 				dest: 'js/mega-crypto.js',
             },
+			ui: {
+				src: 'js/mega-ui.js',
+				dest: 'js/mega-ui.js',
+            },
         },
 		htmlmin: {
 			default_options: {
@@ -63,6 +67,10 @@ module.exports = function(grunt) {
 			plugins: {
 				src: ["js/chat/plugins/*.js"],
 				dest: "js/mega-chat-plugins.js",
+			},
+			ui : {
+				src: ["js/ui/filepicker.js", "js/ui/dialog.js", "js/ui/*.js", "js/chat/ui/*"],
+				dest: "js/mega-ui.js",
 			},
 		},
         htmljson: {

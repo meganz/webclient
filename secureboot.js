@@ -704,6 +704,7 @@ else if (!b_u)
     jsl.push({f: langFilepath, n: 'lang', j:3});
 	if (prod_assets) {
 		jsl.push({f:'js/mega-crypto.js', n: 'sjcl_js', j:1}); // Will be replaced with asmCrypto soon
+		jsl.push({f:'js/mega-jquery.js', n: 'jquery', j:1,w:10});
 	} else {
 	    jsl.push({f:'sjcl.js', n: 'sjcl_js', j:1}); // Will be replaced with asmCrypto soon
 	    jsl.push({f:'js/asmcrypto.js',n:'asmcrypto_js',j:1,w:1});
@@ -715,10 +716,6 @@ else if (!b_u)
 	    jsl.push({f:'js/user.js', n: 'user_js', j:1});
 	    jsl.push({f:'js/authring.js', n: 'authring_js', j:1});
 	    jsl.push({f:'js/mouse.js', n: 'mouse_js', j:1});
-	}
-	if (prod_assets) {
-		jsl.push({f:'js/mega-jquery.js', n: 'jquery', j:1,w:10});
-	} else {
 		jsl.push({f:'js/jquery-2.1.1.js', n: 'jquery', j:1,w:10});
 		jsl.push({f:'js/jquery-ui-1.11.2.js', n: 'jqueryui_js', j:1,w:10});
 		jsl.push({f:'js/jquery.mousewheel.js', n: 'jquerymouse_js', j:1});
@@ -782,11 +779,15 @@ else if (!b_u)
     jsl.push({f:'js/chat/rtcSession.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/chat/fileTransfer.js', n: 'mega_js', j:1,w:7});
 
-    jsl.push({f:'js/ui/filepicker.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/ui/dialog.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/ui/feedbackDialog.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/ui/credentialsWarningDialog.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/chat/ui/incomingCallDialog.js', n: 'mega_js', j:1,w:7});
+	if (!prod_assets) {
+		jsl.push({f:'js/ui/filepicker.js', n: 'mega_js', j:1,w:7});
+		jsl.push({f:'js/ui/dialog.js', n: 'mega_js', j:1,w:7});
+		jsl.push({f:'js/ui/feedbackDialog.js', n: 'mega_js', j:1,w:7});
+		jsl.push({f:'js/ui/credentialsWarningDialog.js', n: 'mega_js', j:1,w:7});
+		jsl.push({f:'js/chat/ui/incomingCallDialog.js', n: 'mega_js', j:1,w:7});
+	} else {
+		jsl.push({f:'js/mega-ui.js', n: 'mega_ui_js', j:1});
+	}
 
     // notifications
     jsl.push({f:'js/megaNotifications.js', n: 'meganotifications_js', j:1,w:7});

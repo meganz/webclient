@@ -4228,7 +4228,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 	position: relative;
 	display: block;
 	font-size: 18px;
-	line-height: 32px;
+	line-height: 31px;
 	color: white;
 	text-align: center;
 	font-family: 'Open Sans Light';
@@ -6976,6 +6976,9 @@ table {
 	background-position: 5px -1003px;
 	cursor: pointer;
 	padding: 0 8px 0 46px;
+}
+.deactivated .fm-breadcrumbs .right-arrow-bg  {
+    cursor:default;
 }
 .fm-breadcrumbs.cloud-drive .right-arrow-bg {
 	padding: 0 8px 0 31px;

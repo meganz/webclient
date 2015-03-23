@@ -31,6 +31,10 @@ module.exports = function(grunt) {
 				src: 'js/mega-chat-plugins.js',
 				dest: 'js/mega-chat-plugins.js',
             },
+			crypto: {
+				src: 'js/mega-crypto.js',
+				dest: 'js/mega-crypto.js',
+            },
         },
 		htmlmin: {
 			default_options: {
@@ -44,6 +48,10 @@ module.exports = function(grunt) {
 			},
 		},
 		concat: {
+			crypto:  {
+				src: ["sjcl.js", "js/asmcrypto.js", "js/tlvstore.js", "js/crypto.js", "js/jsbn.js", "js/jsbn2.js", "js/jodid25519.js", "js/user.js", "js/authring.js", "js/mouse.js"],
+				dest: "js/mega-crypto.js",
+				},
 			jquery: {
 				src: ["js/jquery-2.1.1.js", "js/jquery*", "js/vendor/jquery*"],
 				dest: "js/mega-jquery.js",

@@ -5,7 +5,7 @@ var is_chrome_firefox = document.location.protocol === 'chrome:' && document.loc
 var is_extension = is_chrome_firefox || document.location.href.substr(0,19) == 'chrome-extension://';
 var storage_version = '1'; // clear localStorage when version doesn't match
 var page = document.location.hash;
-var htmljson = false || localStorage.htmljson == "1"
+var prod_assets = false || localStorage.prod_assets == "1"
 
 function isMobile()
 {
@@ -702,17 +702,21 @@ else if (!b_u)
     var langFilepath = getLanguageFilePath(lang);
 
     jsl.push({f: langFilepath, n: 'lang', j:3});
-    jsl.push({f:'sjcl.js', n: 'sjcl_js', j:1}); // Will be replaced with asmCrypto soon
-    jsl.push({f:'js/asmcrypto.js',n:'asmcrypto_js',j:1,w:1});
-    jsl.push({f:'js/tlvstore.js', n: 'tlvstore_js', j:1});
-    jsl.push({f:'js/crypto.js', n: 'crypto_js', j:1,w:5});
-    jsl.push({f:'js/jsbn.js', n: 'jsbn_js', j:1,w:2});
-    jsl.push({f:'js/jsbn2.js', n: 'jsbn2_js', j:1,w:2});
-    jsl.push({f:'js/jodid25519.js', n: 'jodid25519_js', j:1,w:7});
-    jsl.push({f:'js/user.js', n: 'user_js', j:1});
-    jsl.push({f:'js/authring.js', n: 'authring_js', j:1});
-    jsl.push({f:'js/mouse.js', n: 'mouse_js', j:1});
-	if (htmljson) {
+	if (prod_assets) {
+		jsl.push({f:'js/mega-crypto.js', n: 'sjcl_js', j:1}); // Will be replaced with asmCrypto soon
+	} else {
+	    jsl.push({f:'sjcl.js', n: 'sjcl_js', j:1}); // Will be replaced with asmCrypto soon
+	    jsl.push({f:'js/asmcrypto.js',n:'asmcrypto_js',j:1,w:1});
+	    jsl.push({f:'js/tlvstore.js', n: 'tlvstore_js', j:1});
+	    jsl.push({f:'js/crypto.js', n: 'crypto_js', j:1,w:5});
+	    jsl.push({f:'js/jsbn.js', n: 'jsbn_js', j:1,w:2});
+	    jsl.push({f:'js/jsbn2.js', n: 'jsbn2_js', j:1,w:2});
+	    jsl.push({f:'js/jodid25519.js', n: 'jodid25519_js', j:1,w:7});
+	    jsl.push({f:'js/user.js', n: 'user_js', j:1});
+	    jsl.push({f:'js/authring.js', n: 'authring_js', j:1});
+	    jsl.push({f:'js/mouse.js', n: 'mouse_js', j:1});
+	}
+	if (prod_assets) {
 		jsl.push({f:'js/mega-jquery.js', n: 'jquery', j:1,w:10});
 	} else {
 		jsl.push({f:'js/jquery-2.1.1.js', n: 'jquery', j:1,w:10});
@@ -735,7 +739,7 @@ else if (!b_u)
     jsl.push({f:'js/smartcrop.js', n: 'smartcrop_js', j:1,w:7});
     jsl.push({f:'js/mega.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/megaPromise.js', n: 'megapromise_js', j:1,w:5});
-	if (!htmljson) {
+	if (!prod_assets) {
 		jsl.push({f:'js/vendor/db.js', n: 'db_js', j:1,w:5});
 	}
     jsl.push({f:'js/megaDbEncryptionPlugin.js', n: 'megadbenc_js', j:1,w:5});
@@ -745,7 +749,7 @@ else if (!b_u)
     jsl.push({f:'js/chat/mpenc.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/chat/opQueue.js', n: 'mega_js', j:1,w:7});
 
-	if (!htmljson) {
+	if (!prod_assets) {
 	    jsl.push({f:'js/vendor/chat/strophe.js', n: 'mega_js', j:1,w:7});
 	    jsl.push({f:'js/vendor/chat/strophe.disco.js', n: 'mega_js', j:1,w:7});
 	    jsl.push({f:'js/vendor/chat/strophe.jingle.js', n: 'mega_js', j:1,w:7});
@@ -786,7 +790,7 @@ else if (!b_u)
 
     // notifications
     jsl.push({f:'js/megaNotifications.js', n: 'meganotifications_js', j:1,w:7});
-	if (!htmljson) {
+	if (!prod_assets) {
 		jsl.push({f:'js/vendor/ion.sound.js', n: 'ionsound_js', j:1,w:7});
 		jsl.push({f:'js/vendor/favico.js', n: 'favico_js', j:1,w:7});
 		jsl.push({f:'js/vendor/notification.js', n: 'notification_js', j:1,w:7});
@@ -944,7 +948,7 @@ else if (!b_u)
         'recover': ['reset','reset_js']
     };
 
-	if (htmljson) {
+	if (prod_assets) {
 		// Fix jsl
 		var _jsl = []
 		for (var i in jsl) {
@@ -952,7 +956,7 @@ else if (!b_u)
 				_jsl.push(jsl[i])
 			}
 		}
-		_jsl.push({f: "html/boot.json", n:"htmljson_boot", j:9})
+		_jsl.push({f: "html/boot.json", n:"prod_assets_boot", j:9})
 		jsl = _jsl;
 
 		// fix jsl2

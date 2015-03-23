@@ -1,11 +1,11 @@
 var pro_package,
-    pro_packs = [],
 	pro_balance = 0,
 	pro_paymentmethod,
 	pro_m,
 	account_type_num,
-	membershipPlans = [],
-	pro_usebalance = false;
+	pro_usebalance = false,
+    membershipPlans = [],
+    selectedProPackage = [];
 
 // Payment gateways, hardcoded for now, will call API in future to get list
 var gatewayOptions = [
@@ -31,7 +31,7 @@ function init_pro()
     
 	if (u_type == 3)
 	{
-        // Flag pro:1 includes pro balance in the response
+        // Flag 'pro : 1' includes pro balance in the response
 		api_req({ a : 'uq', pro : 1 }, { 
 			callback : function (res) 
 			{
@@ -103,8 +103,7 @@ function init_pro()
 			account_type_num = $membershipBlock.attr('data-payment');
 			$membershipBlock.clone().appendTo( '.membership-selected-block');
 			$('.membership-step2 .pro span').html($membershipBlock.find('.reg-st3-bott-title.title').html())	;
-			pro_next_step();
-			
+			pro_next_step();			
 		});		
 		
 		$('.pro-bottom-button').unbind('click');
@@ -245,23 +244,12 @@ function pro_next_step() {
  */
 function renderPlanDurationDropDown() {
     
-    // Filter the list of pricing options
-    var currentPlanDurations = membershipPlans.filter(function(element, index, array) {
-        
-        // If match on the membership plan, keep that pricing option
-        if (element[1] == account_type_num) {
-            return true;
-        }
-        
-        return false;
-    });
-    
     /**
      * Sort plan durations by lowest number of months first
      * @param {Array} planA
      * @param {Array} planB
      */
-    currentPlanDurations.sort(function (planA, planB) {
+    membershipPlans.sort(function (planA, planB) {
         
         var numOfMonthsPlanA = planA[4];
         var numOfMonthsPlanB = planB[4];
@@ -279,25 +267,31 @@ function renderPlanDurationDropDown() {
     var html = '';
     
     // Loop through the available plan durations for the current membership plan
-	for (var i = 0, length = currentPlanDurations.length; i < length; i++) {
-            
-        // Get the price and number of months duration
-        var price = currentPlanDurations[i][5];
-        var numOfMonths = currentPlanDurations[i][4];
-        var monthsWording = '1 month';            
+	for (var i = 0, length = membershipPlans.length; i < length; i++) {
+        
+        var currentPlan = membershipPlans[i];
+        
+        // If match on the membership plan, display that pricing option in the dropdown
+        if (currentPlan[1] == account_type_num) {
 
-        // Change wording depending on number of months
-        if (numOfMonths === 12) {
-            monthsWording = '1 year';
-        }
-        else if (numOfMonths > 1) {
-            monthsWording = numOfMonths + ' months';
-        }
+            // Get the price and number of months duration
+            var price = currentPlan[5];
+            var numOfMonths = currentPlan[4];
+            var monthsWording = '1 month';            
 
-        // Build select option
-        html += '<div class="membership-dropdown-item" data-months="' + numOfMonths + '" data-price="' + price + '">'
-             +       monthsWording + ' (<strong>' + price + '</strong> €)'
-             +  '</div>';
+            // Change wording depending on number of months
+            if (numOfMonths === 12) {
+                monthsWording = '1 year';
+            }
+            else if (numOfMonths > 1) {
+                monthsWording = numOfMonths + ' months';
+            }
+
+            // Build select option
+            html += '<div class="membership-dropdown-item" data-plan-index="' + i + '">'
+                 +       monthsWording + ' (<strong>' + price + '</strong> €)'
+                 +  '</div>';
+        }
     }
     
     // Update drop down HTML
@@ -306,7 +300,16 @@ function renderPlanDurationDropDown() {
 
 function pro_continue(e)
 {
-	if ($('.membership-dropdown-item.selected').attr('data-months') < 12) {
+    var selectedProPackageIndex = $('.membership-dropdown-item.selected').attr('data-plan-index');
+    
+    // Set the pro package (used in pro_pay function)
+    selectedProPackage = membershipPlans[selectedProPackageIndex];
+    
+    // Get the months and price
+    var selectedPlanMonths = selectedProPackage[4];
+    var selectedPlanPrice = selectedProPackage[5];
+    
+	if (selectedPlanMonths < 12) {
         pro_package = 'pro' + account_type_num + '_month';
     }
 	else {
@@ -319,13 +322,14 @@ function pro_continue(e)
 	{
 		u_storage = init_storage(localStorage);
 		loadingDialog.show();
+        
 		u_checklogin({ checkloginresult: function(u_ctx,r) 
 		{ 
 			pro_pay();
             
-		}},true);
+		}}, true);
 	}
-	else if (parseFloat(pro_balance) >= parseFloat(pro_packs[pro_package][5]))
+	else if (parseFloat(pro_balance) >= parseFloat(selectedPlanPrice))
 	{
 		msgDialog('confirmation',l[504],l[5844],false,function(e)
 		{
@@ -333,19 +337,26 @@ function pro_continue(e)
 			pro_pay();		
 		});
 	}
-	else  pro_pay();	
+	else {
+        pro_pay();
+    }
 }
 
 function pro_pay()
-{
-	var aff=0;	
+{   
+	var aff = 0;	
 	if (localStorage.affid && localStorage.affts > new Date().getTime()-86400000) aff = localStorage.affid;
 
-    if(!ul_uploading && !downloading) {
+    if (!ul_uploading && !downloading) {
         redirectToPaypal();
     }
 
-    api_req({ a : 'uts', it: 0, si: pro_packs[pro_package][0], p: pro_packs[pro_package][5], c: pro_packs[pro_package][6], aff: aff, 'm':m},
+    // Data for API request
+    var apiId = selectedProPackage[0];
+    var price = selectedProPackage[5];
+    var currency = selectedProPackage[6];
+    
+    api_req({ a : 'uts', it: 0, si: apiId, p: price, c: currency, aff: aff, 'm': m },
 	{
 		callback : function (res)
 		{ 
@@ -356,11 +367,17 @@ function pro_pay()
 			}
 			else
 			{
-				if (pro_paymentmethod == 'pro_voucher' || pro_paymentmethod == 'pro_prepaid') pro_m = 0;
-				else pro_m = 1;
+				if (pro_paymentmethod == 'pro_voucher' || pro_paymentmethod == 'pro_prepaid') {
+                    pro_m = 0;
+                }
+				else {
+                    pro_m = 1;
+                }
 				
 				var proref = '';
-				if (sessionStorage.proref) proref = sessionStorage.proref;
+				if (sessionStorage.proref) {
+                    proref = sessionStorage.proref;
+                }
 
 				api_req({ a : 'utc', s : [res], m : pro_m, r: proref },
 				{ 

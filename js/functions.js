@@ -30,8 +30,7 @@ function anyOf(arr, value) {
  *
  *  Author: @crodas
  */
-function Cascade(tasks, fnc, done, value)
-{
+function Cascade(tasks, fnc, done, value) {
     function scheduler(value) {
         if (tasks.length == 0) {
             return done(value);
@@ -67,31 +66,31 @@ function Parallel(task) {
     };
 }
 
-function asciionly(text)
-{
+function asciionly(text) {
     var rforeign = /[^\u0000-\u007f]/;
-    if (rforeign.test(text))
+    if (rforeign.test(text)) {
         return false;
-    else
+    }
+    else {
         return true;
+    }
 }
 
 function Later(callback) {
     return setTimeout(callback, 1000);
 }
 
-var Soon = is_chrome_firefox ? mozRunAsync : function(callback)
-{
+var Soon = is_chrome_firefox ? mozRunAsync : function(callback) {
     setTimeout(callback, 17);
 };
 
-function SoonFc(func, ms)
-{
-    return function __soonfc()
-    {
-        var self = this, args = arguments;
-        if (func.__sfc)
+function SoonFc(func, ms) {
+    return function __soonfc() {
+        var self = this,
+            args = arguments;
+        if (func.__sfc) {
             clearTimeout(func.__sfc);
+        }
         func.__sfc = setTimeout(function() {
             delete func.__sfc;
             func.apply(self, args);
@@ -99,72 +98,71 @@ function SoonFc(func, ms)
     };
 }
 
-function jScrollFade(id)
-{
+function jScrollFade(id) {
 
-    $(id + ' .jspTrack').rebind('mouseover', function(e)
-    {
+    $(id + ' .jspTrack').rebind('mouseover', function(e) {
         $(this).find('.jspDrag').addClass('jspActive');
         $(this).closest('.jspContainer').uniqueId();
         jScrollFadeOut($(this).closest('.jspContainer').attr('id'));
     });
 
-    if (!$.jScroll)
+    if (!$.jScroll) {
         $.jScroll = {};
-    for (var i in $.jScroll)
-        if ($.jScroll[i] == 0)
+    }
+    for (var i in $.jScroll) {
+        if ($.jScroll[i] == 0) {
             delete $.jScroll[i];
-    $(id).rebind('jsp-scroll-y.fade', function(event, scrollPositionY, isAtTop, isAtBottom)
-    {
-        $(this).find('.jspDrag').addClass('jspActive');
-        $(this).find('.jspContainer').uniqueId();
-        var id = $(this).find('.jspContainer').attr('id');
-        jScrollFadeOut(id);
-    });
+        }
+    }
+    $(id).rebind('jsp-scroll-y.fade', function(event, scrollPositionY, isAtTop, isAtBottom) {
+            $(this).find('.jspDrag').addClass('jspActive');
+            $(this).find('.jspContainer').uniqueId();
+            var id = $(this).find('.jspContainer').attr('id');
+            jScrollFadeOut(id);
+        });
 }
 
-function jScrollFadeOut(id)
-{
-    if (!$.jScroll[id])
+function jScrollFadeOut(id) {
+    if (!$.jScroll[id]) {
         $.jScroll[id] = 0;
+    }
     $.jScroll[id]++;
-    setTimeout(function(id)
-    {
+    setTimeout(function(id) {
         $.jScroll[id]--;
-        if ($.jScroll[id] == 0)
+        if ($.jScroll[id] == 0) {
             $('#' + id + ' .jspDrag').removeClass('jspActive');
+        }
     }, 500, id);
 }
 
-function inputfocus(id, defaultvalue, pw)
-{
-    if (pw)
+function inputfocus(id, defaultvalue, pw) {
+    if (pw) {
         $('#' + id)[0].type = 'password';
-    if ($('#' + id)[0].value == defaultvalue)
+    }
+    if ($('#' + id)[0].value == defaultvalue) {
         $('#' + id)[0].value = '';
+    }
 }
 
-function inputblur(id, defaultvalue, pw)
-{
-    if ($('#' + id)[0].value == '')
+function inputblur(id, defaultvalue, pw) {
+    if ($('#' + id)[0].value == '') {
         $('#' + id)[0].value = defaultvalue;
-    if (($('#' + id)[0].value == defaultvalue) && (pw))
+    }
+    if (($('#' + id)[0].value == defaultvalue) && (pw)) {
         $('#' + id)[0].type = 'text';
+    }
 }
 
-function easeOutCubic(t, b, c, d)
-{
+function easeOutCubic(t, b, c, d) {
     return c * ((t = t / d - 1) * t * t + 1) + b;
 }
 
-function ellipsis(text, location, maxCharacters)
-{
-    if (text.length > 0 && text.length > maxCharacters)
-    {
-        if (typeof (location) == 'undefined')
+function ellipsis(text, location, maxCharacters) {
+    if (text.length > 0 && text.length > maxCharacters) {
+        if (typeof(location) == 'undefined') {
             location = 'end';
-        switch (location)
-        {
+        }
+        switch (location) {
             case 'center':
                 var center = (maxCharacters / 2);
                 text = text.slice(0, center) + '...' + text.slice(-center);
@@ -177,34 +175,26 @@ function ellipsis(text, location, maxCharacters)
     return text;
 }
 
-function translate(html)
-{
+function translate(html) {
     var arr = html.split("[$");
     var items = [];
-    for (var i in arr)
-    {
+    for (var i in arr) {
         var tmp = arr[i].split(']');
-        if (tmp.length > 1)
-        {
+        if (tmp.length > 1) {
             var t = tmp[0];
             items.push(t);
         }
     }
-    for (var i in items)
-    {
+    for (var i in items) {
         var tmp = items[i].split('.');
-        if (tmp.length > 1)
-        {
-            if (tmp[1] == 'dq')
-            {
+        if (tmp.length > 1) {
+            if (tmp[1] == 'dq') {
                 l[items[i]] = l[tmp[0]].replace('"', '&quot;');
             }
-            else if (tmp[1] == 'q')
-            {
+            else if (tmp[1] == 'q') {
                 l[items[i]] = l[tmp[0]].replace("'", "\\'");
             }
-            else if (tmp[1] == 'dqq')
-            {
+            else if (tmp[1] == 'dqq') {
                 l[items[i]] = l[tmp[0]].replace("'", "\\'");
                 l[items[i]] = l[items[i]].replace('"', '&quot;');
             }
@@ -225,7 +215,8 @@ function megatitle(nperc) {
     var a = parseInt($('.notification-num:first').text());
     if (a > 0) {
         a = '(' + a + ') ';
-    } else {
+    }
+    else {
         a = '';
     }
     if (document.title !== a + 'MEGA' + nperc) {
@@ -233,92 +224,102 @@ function megatitle(nperc) {
     }
 }
 
-function populate_l()
-{
+function populate_l() {
     // for (var i = 7000 ; i-- ; l[i] = l[i] || '(null)');
     l[0] = 'Mega Limited ' + new Date().getFullYear();
-    if ((lang == 'es') || (lang == 'pt') || (lang == 'sk')) l[0] = 'Mega Ltd.';
+    if ((lang == 'es') || (lang == 'pt') || (lang == 'sk')) {
+        l[0] = 'Mega Ltd.';
+    }
     l[1] = l[398];
-    if (lang == 'en') l[1] = 'Go Pro';
-    l[438] = l[438].replace('[X]','');
+    if (lang == 'en') {
+        l[1] = 'Go Pro';
+    }
+    l[438] = l[438].replace('[X]', '');
     l['439a'] = l[439];
-    l[439] = l[439].replace('[X1]','').replace('[X2]','');
+    l[439] = l[439].replace('[X1]', '').replace('[X2]', '');
     l['466a'] = l[466];
-    l[466] = l[466].replace('[X]','');
-    l[543] = l[543].replace('[X]','');
-    l[456] = l[456].replace(':','');
-    l['471a'] = l[471].replace('[X]',10);
-    l['471b'] = l[471].replace('[X]',100);
-    l['471c'] = l[471].replace('[X]',250);
-    l['471d'] = l[471].replace('[X]',500);
-    l['471e'] = l[471].replace('[X]',1000);
-    l['469a'] = l[469].replace('[X]',10);
-    l['469b'] = l[469].replace('[X]',100);
-    l['469c'] = l[469].replace('[X]',250);
-    l['472a'] = l[472].replace('[X]',10);
-    l['472b'] = l[472].replace('[X]',100);
-    l['472c'] = l[472].replace('[X]',250);
-    l['208a'] = l[208].replace('[A]','<a href="#terms" class="red">');
-    l['208a'] = l['208a'].replace('[/A]','</a>');
-    l[208] = l[208].replace('[A]','<a href="#terms">');
-    l[208] = l[208].replace('[/A]','</a>');
-    l[517] = l[517].replace('[A]','<a href="#help">').replace('[/A]','</a>');
-    l[521] = l[521].replace('[A]','<a href="#copyright">').replace('[/A]','</a>');
-    l[553] = l[553].replace('[A]','<a href="mailto:resellers@mega.co.nz">').replace('[/A]','</a>');
-    l[555] = l[555].replace('[A]','<a href="#terms">').replace('[/A]','</a>');
-    l[754] = l[754].replace('[A]','<a href="http://www.google.com/chrome" target="_blank" style="color:#D9290B;">');
-    l[754] = l[754].replace('[/A]','</a>');
-    l[871] = l[871].replace('[B]','<strong>').replace('[/B]','</strong>').replace('[A]','<a href="#pro">').replace('[/A]','</a>');
-    l[924] = l[924].replace('[A]','<span class="red">').replace('[/A]','</span>');
-    l[501] = l[501].replace('17','').replace('%','');
-    l[1066] = l[1066].replace('[A]','<a class="red">').replace('[/A]','</a>');
-    l[1067] = l[1067].replace('[A]','<span class="red">').replace('[/A]','</span>');
-    l[1094] = l[1094].replace('[A]','<a href="#plugin">').replace('[/A]','</a>');
-    l[1095] = l[1095].replace('[A]','<span class="red">').replace('[/A]','</span>');
-    l[1133] = l[1133].replace('[A]','<a href="http://en.wikipedia.org/wiki/Entropy" target="_blank">').replace('[/A]','</a>');
-    l[1134] = l[1134].replace('[A]','<a href="http://en.wikipedia.org/wiki/Public-key_cryptography" target="_blank">').replace('[/A]','</a>');
-    l[1148] = l[1148].replace('[A]','<span class="red">').replace('[/A]','</span>');
-    l[1151] = l[1151].replace('[A]','<span class="red">').replace('[/A]','</span>');
-    l[731] = l[731].replace('[A]','<a href="#terms">').replace('[/A]','</a>');
-    if (lang == 'en') l[965] = 'Legal & policies';
-    l[1159] = l[1159].replace('[A]','<span class="red">').replace('[/A]','</span>');
-    l[1171] = l[1171].replace('[A]','<span class="red">').replace('[/A]','</span>');
-    l[1185] = l[1185].replace('[X]','<strong>MEGA.crx</strong>');
-    l[1242] = l[1242].replace('[A]','<a href="#affiliateterms" target="_blank">').replace('[/A]','</a>');
-    l[1218] = l[1218].replace('[A]','<a href="#affiliateterms" class="red">').replace('[/A]','</a>');
-    l[1212] = l[1212].replace('[A]','<a href="#sdk" class="red">').replace('[/A]','</a>');
-    l[1274] = l[1274].replace('[A]','<a href="#takedown">').replace('[/A]','</a>');
-    l[1275] = l[1275].replace('[A]','<a href="#copyright">').replace('[/A]','</a>');
-    l[1244] = l[1244].replace('[A]','<a href="#affiliateterms" class="red">').replace('[/A]','</a>');
-    l[1201] = l[1201].replace('[A]','<span class="red">').replace('[/A]','</span>');
-    l[1208] = l[1208].replace('[B]','<strong>').replace('[/B]','</strong>');
-    l[1915] = l[1915].replace('[A]','<a class="red" href="https://chrome.google.com/webstore/detail/mega/bigefpfhnfcobdlfbedofhhaibnlghod" target="_blank">').replace('[/A]','</a>');
-    l[1936] = l[1936].replace('[A]','<a href="#backup">').replace('[/A]','</a>');
-    l[1942] = l[1942].replace('[A]','<a href="#backup">').replace('[/A]','</a>');
-    l[1943] = l[1943].replace('[A]','<a href="mailto:support@mega.co.nz">').replace('[/A]','</a>');
-    l[1948] = l[1948].replace('[A]','<a href="mailto:support@mega.co.nz">').replace('[/A]','</a>');
-    l[1957] = l[1957].replace('[A]','<a href="#recovery">').replace('[/A]','</a>');
-    l[1965] = l[1965].replace('[A]','<a href="#recovery">').replace('[/A]','</a>');
-    l[1982] = l[1982].replace('[A]','<font style="color:#D21F00;">').replace('[/A]','</font>');
-    l[1993] = l[1993].replace('[A]','<span class="red">').replace('[/A]','</span>');
-    l[1371] = l[1371].replace('2014','2015');
-    l[122] = l[122].replace('five or six hours','<span class="red">five or six hours</span>');
-    l[231] = l[231].replace('No thanks, I\'ll wait','I\'ll wait');
+    l[466] = l[466].replace('[X]', '');
+    l[543] = l[543].replace('[X]', '');
+    l[456] = l[456].replace(':', '');
+    l['471a'] = l[471].replace('[X]', 10);
+    l['471b'] = l[471].replace('[X]', 100);
+    l['471c'] = l[471].replace('[X]', 250);
+    l['471d'] = l[471].replace('[X]', 500);
+    l['471e'] = l[471].replace('[X]', 1000);
+    l['469a'] = l[469].replace('[X]', 10);
+    l['469b'] = l[469].replace('[X]', 100);
+    l['469c'] = l[469].replace('[X]', 250);
+    l['472a'] = l[472].replace('[X]', 10);
+    l['472b'] = l[472].replace('[X]', 100);
+    l['472c'] = l[472].replace('[X]', 250);
+    l['208a'] = l[208].replace('[A]', '<a href="#terms" class="red">');
+    l['208a'] = l['208a'].replace('[/A]', '</a>');
+    l[208] = l[208].replace('[A]', '<a href="#terms">');
+    l[208] = l[208].replace('[/A]', '</a>');
+    l[517] = l[517].replace('[A]', '<a href="#help">').replace('[/A]', '</a>');
+    l[521] = l[521].replace('[A]', '<a href="#copyright">').replace('[/A]', '</a>');
+    l[553] = l[553].replace('[A]', '<a href="mailto:resellers@mega.co.nz">').replace('[/A]', '</a>');
+    l[555] = l[555].replace('[A]', '<a href="#terms">').replace('[/A]', '</a>');
+    l[754] = l[754].replace('[A]',
+        '<a href="http://www.google.com/chrome" target="_blank" style="color:#D9290B;">');
+    l[754] = l[754].replace('[/A]', '</a>');
+    l[871] = l[871].replace('[B]',
+        '<strong>').replace('[/B]', '</strong>').replace('[A]', '<a href="#pro">').replace('[/A]', '</a>');
+    l[924] = l[924].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
+    l[501] = l[501].replace('17', '').replace('%', '');
+    l[1066] = l[1066].replace('[A]', '<a class="red">').replace('[/A]', '</a>');
+    l[1067] = l[1067].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
+    l[1094] = l[1094].replace('[A]', '<a href="#plugin">').replace('[/A]', '</a>');
+    l[1095] = l[1095].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
+    l[1133] = l[1133].replace('[A]',
+        '<a href="http://en.wikipedia.org/wiki/Entropy" target="_blank">').replace('[/A]', '</a>');
+    l[1134] = l[1134].replace('[A]',
+        '<a href="http://en.wikipedia.org/wiki/Public-key_cryptography" target="_blank">').replace('[/A]',
+        '</a>');
+    l[1148] = l[1148].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
+    l[1151] = l[1151].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
+    l[731] = l[731].replace('[A]', '<a href="#terms">').replace('[/A]', '</a>');
+    if (lang == 'en') {
+        l[965] = 'Legal & policies';
+    }
+    l[1159] = l[1159].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
+    l[1171] = l[1171].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
+    l[1185] = l[1185].replace('[X]', '<strong>MEGA.crx</strong>');
+    l[1242] = l[1242].replace('[A]', '<a href="#affiliateterms" target="_blank">').replace('[/A]', '</a>');
+    l[1218] = l[1218].replace('[A]', '<a href="#affiliateterms" class="red">').replace('[/A]', '</a>');
+    l[1212] = l[1212].replace('[A]', '<a href="#sdk" class="red">').replace('[/A]', '</a>');
+    l[1274] = l[1274].replace('[A]', '<a href="#takedown">').replace('[/A]', '</a>');
+    l[1275] = l[1275].replace('[A]', '<a href="#copyright">').replace('[/A]', '</a>');
+    l[1244] = l[1244].replace('[A]', '<a href="#affiliateterms" class="red">').replace('[/A]', '</a>');
+    l[1201] = l[1201].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
+    l[1208] = l[1208].replace('[B]', '<strong>').replace('[/B]', '</strong>');
+    l[1915] = l[1915].replace('[A]',
+        '<a class="red" href="https://chrome.google.com/webstore/detail/mega/bigefpfhnfcobdlfbedofhhaibnlghod" target="_blank">')
+            .replace('[/A]', '</a>');
+    l[1936] = l[1936].replace('[A]', '<a href="#backup">').replace('[/A]', '</a>');
+    l[1942] = l[1942].replace('[A]', '<a href="#backup">').replace('[/A]', '</a>');
+    l[1943] = l[1943].replace('[A]', '<a href="mailto:support@mega.co.nz">').replace('[/A]', '</a>');
+    l[1948] = l[1948].replace('[A]', '<a href="mailto:support@mega.co.nz">').replace('[/A]', '</a>');
+    l[1957] = l[1957].replace('[A]', '<a href="#recovery">').replace('[/A]', '</a>');
+    l[1965] = l[1965].replace('[A]', '<a href="#recovery">').replace('[/A]', '</a>');
+    l[1982] = l[1982].replace('[A]', '<font style="color:#D21F00;">').replace('[/A]', '</font>');
+    l[1993] = l[1993].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
+    l[1371] = l[1371].replace('2014', '2015');
+    l[122] = l[122].replace('five or six hours', '<span class="red">five or six hours</span>');
+    l[231] = l[231].replace('No thanks, I\'ll wait', 'I\'ll wait');
 
     l['year'] = new Date().getFullYear();
     date_months = [l[408], l[409], l[410], l[411], l[412], l[413], l[414], l[415], l[416], l[417], l[418], l[419]];
 }
 
-function GetNextNode(labelid)
-{
+function GetNextNode(labelid) {
     var label = document.getElementById(labelid);
     var select_id = document.getElementById(labelid + "_option");
     label.innerHTML = select_id.options[select_id.selectedIndex].text;
     return select_id.options[select_id.selectedIndex].value;
 }
 
-function showmoney(number)
-{
+function showmoney(number) {
     number = number.toString();
     var dollars = number.split('.')[0],
         cents = (number.split('.')[1] || '') + '00';
@@ -328,31 +329,35 @@ function showmoney(number)
     return dollars + '.' + cents.slice(0, 2);
 }
 
-function getHeight()
-{
+function getHeight() {
     var myHeight = 0;
-    if (typeof (window.innerWidth) == 'number')
+    if (typeof(window.innerWidth) == 'number') {
         myHeight = window.innerHeight;
-    else if (document.documentElement && (document.documentElement.clientWidth || document.documentElement.clientHeight))
+    }
+    else if (document.documentElement
+            && (document.documentElement.clientWidth || document.documentElement.clientHeight)) {
         myHeight = document.documentElement.clientHeight;
-    else if (document.body && (document.body.clientWidth || document.body.clientHeight))
+    }
+    else if (document.body && (document.body.clientWidth || document.body.clientHeight)) {
         myHeight = document.body.clientHeight;
+    }
     return myHeight;
 }
 
-function divscroll(el)
-{
+function divscroll(el) {
     document.getElementById(el).scrollIntoView();
     $('body').scrollLeft(0);
     $('html').scrollTop(0);
-    if (page == 'start')
+    if (page == 'start') {
         start_menu(el);
+    }
 }
 
 function removeHash() {
     var scrollV, scrollH, loc = window.location;
-    if ("pushState" in history)
+    if ("pushState" in history) {
         history.pushState("", document.title, loc.pathname + loc.search);
+    }
     else {
         // Prevent scrolling by storing the page's current scroll offset
         scrollV = document.body.scrollTop;
@@ -364,53 +369,85 @@ function removeHash() {
     }
 }
 
-function browserdetails(useragent)
-{
+function browserdetails(useragent) {
     useragent = (' ' + useragent).toLowerCase();
     var os = false;
     var browser = false;
     var icon = '';
     var name = '';
-    if (useragent.indexOf('android') > 0) os = 'Android';
-    else if (useragent.indexOf('windows') > 0) os = 'Windows';
-    else if (useragent.indexOf('iphone') > 0) os = 'iPhone';
-    else if (useragent.indexOf('imega') > 0) os = 'iPhone';
-    else if (useragent.indexOf('ipad') > 0) os = 'iPad';
-    else if (useragent.indexOf('mac') > 0) os = 'Apple';
-    else if (useragent.indexOf('linux') > 0) os = 'Linux';
-    else if (useragent.indexOf('linux') > 0) os = 'MEGAsync';
-    else if (useragent.indexOf('blackberry') > 0) os = 'Blackberry';
-    if (useragent.indexOf('windows nt 1') > 0 && useragent.indexOf('edge/') > 0) browser = 'Spartan';
-    else if (useragent.indexOf('opera') > 0 || useragent.indexOf(' opr/') > 0) browser = 'Opera';
-    else if (useragent.indexOf('chrome') > 0) browser = 'Chrome';
-    else if (useragent.indexOf('safari') > 0) browser = 'Safari';
-    else if (useragent.indexOf('firefox') > 0) browser = 'Firefox';
-    else if (useragent.indexOf('thunderbird') > 0) browser = 'Thunderbird';
-    else if (useragent.indexOf('megasync') > 0) browser = 'MEGAsync';
+    if (useragent.indexOf('android') > 0) {
+        os = 'Android';
+    }
+    else if (useragent.indexOf('windows') > 0) {
+        os = 'Windows';
+    }
+    else if (useragent.indexOf('iphone') > 0) {
+        os = 'iPhone';
+    }
+    else if (useragent.indexOf('imega') > 0) {
+        os = 'iPhone';
+    }
+    else if (useragent.indexOf('ipad') > 0) {
+        os = 'iPad';
+    }
+    else if (useragent.indexOf('mac') > 0) {
+        os = 'Apple';
+    }
+    else if (useragent.indexOf('linux') > 0) {
+        os = 'Linux';
+    }
+    else if (useragent.indexOf('linux') > 0) {
+        os = 'MEGAsync';
+    }
+    else if (useragent.indexOf('blackberry') > 0) {
+        os = 'Blackberry';
+    }
+    if (useragent.indexOf('windows nt 1') > 0 && useragent.indexOf('edge/') > 0) {
+        browser = 'Spartan';
+    }
+    else if (useragent.indexOf('opera') > 0 || useragent.indexOf(' opr/') > 0) {
+        browser = 'Opera';
+    }
+    else if (useragent.indexOf('chrome') > 0) {
+        browser = 'Chrome';
+    }
+    else if (useragent.indexOf('safari') > 0) {
+        browser = 'Safari';
+    }
+    else if (useragent.indexOf('firefox') > 0) {
+        browser = 'Firefox';
+    }
+    else if (useragent.indexOf('thunderbird') > 0) {
+        browser = 'Thunderbird';
+    }
+    else if (useragent.indexOf('megasync') > 0) {
+        browser = 'MEGAsync';
+    }
     else if (useragent.indexOf('msie') > 0
-        || "ActiveXObject" in window) browser = 'Internet Explorer';
-    if ((os) && (browser))
-    {
+            || "ActiveXObject" in window) {
+        browser = 'Internet Explorer';
+    }
+    if ((os) && (browser)) {
         name = browser + ' on ' + os;
     }
-    else if (os)
-    {
+    else if (os) {
         name = os;
         icon = os.toLowerCase() + '.png';
     }
-    else if (browser)
-    {
+    else if (browser) {
         name = browser;
     }
-    else
-    {
+    else {
         name = 'Unknown';
         icon = 'unknown.png';
     }
-    if (!icon && browser)
-    {
-        if (browser == 'Internet Explorer' || browser == 'Spartan') icon = 'ie.png';
-        else icon = browser.toLowerCase() + '.png';
+    if (!icon && browser) {
+        if (browser == 'Internet Explorer' || browser == 'Spartan') {
+            icon = 'ie.png';
+        }
+        else {
+            icon = browser.toLowerCase() + '.png';
+        }
     }
     var browserdetails = {};
     browserdetails.name = name;
@@ -421,25 +458,21 @@ function browserdetails(useragent)
     return browserdetails;
 }
 
-function countrydetails(isocode)
-{
-    var cdetails =
-        {
-            name: isocountries[isocode],
-            icon: isocode.toLowerCase() + '.gif'
-        };
+function countrydetails(isocode) {
+    var cdetails = {
+        name: isocountries[isocode],
+        icon: isocode.toLowerCase() + '.gif'
+    };
     return cdetails;
 }
 
-function time2date(unixtime, ignoretime)
-{
+function time2date(unixtime, ignoretime) {
     var MyDate = new Date(unixtime * 1000 || 0);
     var MyDateString =
         MyDate.getFullYear() + '-'
         + ('0' + (MyDate.getMonth() + 1)).slice(-2) + '-'
         + ('0' + MyDate.getDate()).slice(-2);
-    if (!ignoretime)
-    {
+    if (!ignoretime) {
         MyDateString += ' ' + ('0' + MyDate.getHours()).slice(-2) + ':'
             + ('0' + MyDate.getMinutes()).slice(-2);
     }
@@ -447,64 +480,78 @@ function time2date(unixtime, ignoretime)
 }
 
 // in case we need to run functions.js in a standalone (non secureboot.js) environment, we need to handle this case:
-if (typeof (l) == 'undefined') {
+if (typeof(l) == 'undefined') {
     l = [];
 }
 
 var date_months = []
-function acc_time2date(unixtime)
-{
-    var MyDate = new Date(unixtime*1000);
+
+function acc_time2date(unixtime) {
+    var MyDate = new Date(unixtime * 1000);
     var th = 'th';
     if ((parseInt(MyDate.getDate()) == 11) || (parseInt(MyDate.getDate()) == 12)) {}
-    else if (('' + MyDate.getDate()).slice(-1) == '1') th = 'st';
-    else if (('' + MyDate.getDate()).slice(-1) == '2') th = 'nd';
-    else if (('' + MyDate.getDate()).slice(-1) == '3') th = 'rd';
-    if (lang !== 'en') th = ',';
+    else if (('' + MyDate.getDate()).slice(-1) == '1') {
+        th = 'st';
+    }
+    else if (('' + MyDate.getDate()).slice(-1) == '2') {
+        th = 'nd';
+    }
+    else if (('' + MyDate.getDate()).slice(-1) == '3') {
+        th = 'rd';
+    }
+    if (lang !== 'en') {
+        th = ',';
+    }
     return date_months[MyDate.getMonth()] + ' ' + MyDate.getDate() + th + ' ' + MyDate.getFullYear();
 }
 
-function time2last(timestamp)
-{
+function time2last(timestamp) {
     var sec = (new Date().getTime() / 1000) - timestamp;
-    if (sec < 4)
+    if (sec < 4) {
         return l[880];
-    else if (sec < 59)
+    }
+    else if (sec < 59) {
         return l[873].replace('[X]', Math.ceil(sec));
-    else if (sec < 90)
+    }
+    else if (sec < 90) {
         return l[874];
-    else if (sec < 3540)
+    }
+    else if (sec < 3540) {
         return l[875].replace('[X]', Math.ceil(sec / 60));
-    else if (sec < 4500)
+    }
+    else if (sec < 4500) {
         return l[876];
-    else if (sec < 82000)
+    }
+    else if (sec < 82000) {
         return l[877].replace('[X]', Math.ceil(sec / 3600));
-    else if (sec < 110000)
+    }
+    else if (sec < 110000) {
         return l[878];
-    else
+    }
+    else {
         return l[879].replace('[X]', Math.ceil(sec / 86400));
+    }
 }
 
 function unixtime() {
     return (new Date().getTime() / 1000);
 }
 
-function uplpad(number, length)
-{
+function uplpad(number, length) {
     var str = '' + number;
-    while (str.length < length)
-    {
+    while (str.length < length) {
         str = '0' + str;
     }
     return str;
 }
 
-function secondsToTime(secs)
-{
-    if (isNaN(secs))
+function secondsToTime(secs) {
+    if (isNaN(secs)) {
         return '--:--:--';
-    if (secs < 0)
+    }
+    if (secs < 0) {
         return '';
+    }
 
     var hours = uplpad(Math.floor(secs / (60 * 60)), 2);
     var divisor_for_minutes = secs % (60 * 60);
@@ -515,17 +562,17 @@ function secondsToTime(secs)
     return returnvar;
 }
 
-function htmlentities(value)
-{
-    if (!value)
+function htmlentities(value) {
+    if (!value) {
         return '';
+    }
     return $('<div/>').text(value).html();
 }
 
-function bytesToSize(bytes, precision)
-{
-    if (!bytes)
+function bytesToSize(bytes, precision) {
+    if (!bytes) {
         return '0';
+    }
 
     var s_b = 'B';
     var s_kb = 'KB';
@@ -533,8 +580,7 @@ function bytesToSize(bytes, precision)
     var s_gb = 'GB';
     var s_tb = 'TB';
 
-    if (lang == 'fr')
-    {
+    if (lang == 'fr') {
         s_b = 'O';
         s_kb = 'Ko';
         s_mb = 'Mo';
@@ -546,26 +592,33 @@ function bytesToSize(bytes, precision)
     var megabyte = kilobyte * 1024;
     var gigabyte = megabyte * 1024;
     var terabyte = gigabyte * 1024;
-    if (bytes > 1024 * 1024 * 1024)
+    if (bytes > 1024 * 1024 * 1024) {
         precision = 2;
-    else if (bytes > 1024 * 1024)
+    }
+    else if (bytes > 1024 * 1024) {
         precision = 1;
-    if ((bytes >= 0) && (bytes < kilobyte))
+    }
+    if ((bytes >= 0) && (bytes < kilobyte)) {
         return parseInt(bytes) + ' ' + s_b;
-    else if ((bytes >= kilobyte) && (bytes < megabyte))
+    }
+    else if ((bytes >= kilobyte) && (bytes < megabyte)) {
         return (bytes / kilobyte).toFixed(precision) + ' ' + s_kb;
-    else if ((bytes >= megabyte) && (bytes < gigabyte))
+    }
+    else if ((bytes >= megabyte) && (bytes < gigabyte)) {
         return (bytes / megabyte).toFixed(precision) + ' ' + s_mb;
-    else if ((bytes >= gigabyte) && (bytes < terabyte))
+    }
+    else if ((bytes >= gigabyte) && (bytes < terabyte)) {
         return (bytes / gigabyte).toFixed(precision) + ' ' + s_gb;
-    else if (bytes >= terabyte)
+    }
+    else if (bytes >= terabyte) {
         return (bytes / terabyte).toFixed(precision) + ' ' + s_tb;
-    else
+    }
+    else {
         return parseInt(bytes) + ' ' + s_b;
+    }
 }
 
-function checkPassword(strPassword)
-{
+function checkPassword(strPassword) {
     var m_strUpperCase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     var m_strLowerCase = "abcdefghijklmnopqrstuvwxyz";
     var m_strNumber = "0123456789";
@@ -573,38 +626,49 @@ function checkPassword(strPassword)
     var nScore = 0;
     nScore += countDif(strPassword) * 2;
     var extra = countDif(strPassword) * strPassword.length / 3;
-    if (extra > 25)
+    if (extra > 25) {
         extra = 25;
+    }
     nScore += extra;
     var nUpperCount = countContain(strPassword, m_strUpperCase);
     var nLowerCount = countContain(strPassword, m_strLowerCase);
     var nLowerUpperCount = nUpperCount + nLowerCount;
-    if (nUpperCount == 0 && nLowerCount != 0)
+    if (nUpperCount == 0 && nLowerCount != 0) {
         nScore += 10;
-    else if (nUpperCount != 0 && nLowerCount != 0)
+    }
+    else if (nUpperCount != 0 && nLowerCount != 0) {
         nScore += 10;
+    }
     var nNumberCount = countContain(strPassword, m_strNumber);
-    if (nNumberCount == 1)
+    if (nNumberCount == 1) {
         nScore += 10;
-    if (nNumberCount >= 3)
+    }
+    if (nNumberCount >= 3) {
         nScore += 15;
+    }
     var nCharacterCount = countContain(strPassword, m_strCharacters);
-    if (nCharacterCount == 1)
+    if (nCharacterCount == 1) {
         nScore += 10;
-    if (nCharacterCount > 1)
+    }
+    if (nCharacterCount > 1) {
         nScore += 10;
-    if (nNumberCount != 0 && nLowerUpperCount != 0)
+    }
+    if (nNumberCount != 0 && nLowerUpperCount != 0) {
         nScore += 2;
-    if (nNumberCount != 0 && nLowerUpperCount != 0 && nCharacterCount != 0)
+    }
+    if (nNumberCount != 0 && nLowerUpperCount != 0 && nCharacterCount != 0) {
         nScore += 3;
-    if (nNumberCount != 0 && nUpperCount != 0 && nLowerCount != 0 && nCharacterCount != 0)
+    }
+    if (nNumberCount != 0 && nUpperCount != 0 && nLowerCount != 0 && nCharacterCount != 0) {
         nScore += 5;
+    }
     return nScore;
 }
 
-function showNonActivatedAccountDialog(log)
-{
-    if (log) megaAnalytics.log("pro", "showNonActivatedAccountDialog");
+function showNonActivatedAccountDialog(log) {
+    if (log) {
+        megaAnalytics.log("pro", "showNonActivatedAccountDialog");
+    }
 
     var $dialog = $('.top-warning-popup');
     $dialog.addClass('not-activated');
@@ -620,8 +684,7 @@ function showNonActivatedAccountDialog(log)
 /**
  * Shows a dialog with a message that the user is over quota
  */
-function showOverQuotaDialog()
-{
+function showOverQuotaDialog() {
     // Show the dialog
     var $dialog = $('.top-warning-popup');
     $dialog.addClass('active');
@@ -632,8 +695,7 @@ function showOverQuotaDialog()
 
     // Add a click event on the warning icon to hide and show the dialog
     $('.warning-icon-area').unbind('click');
-    $('.warning-icon-area').click(function()
-    {
+    $('.warning-icon-area').click(function() {
         if ($dialog.hasClass('active')) {
             $dialog.removeClass('active');
         }
@@ -654,18 +716,15 @@ function showOverQuotaDialog()
 
     // Redirect to Pro signup page on button click
     $('.warning-button').click(function() {
-       document.location.hash = 'pro';
+        document.location.hash = 'pro';
     });
 }
 
-function countDif(strPassword)
-{
+function countDif(strPassword) {
     var chararr = [];
     var nCount = 0;
-    for (i = 0; i < strPassword.length; i++)
-    {
-        if (!chararr[strPassword.charAt(i)])
-        {
+    for (i = 0; i < strPassword.length; i++) {
+        if (!chararr[strPassword.charAt(i)]) {
             chararr[strPassword.charAt(i)] = true;
             nCount++;
         }
@@ -673,43 +732,44 @@ function countDif(strPassword)
     return nCount;
 }
 
-function countContain(strPassword, strCheck)
-{
+function countContain(strPassword, strCheck) {
     var nCount = 0;
-    for (i = 0; i < strPassword.length; i++)
-    {
-        if (strCheck.indexOf(strPassword.charAt(i)) > -1)
+    for (i = 0; i < strPassword.length; i++) {
+        if (strCheck.indexOf(strPassword.charAt(i)) > -1) {
             nCount++;
+        }
     }
     return nCount;
 }
 
-function logincheckboxCheck(ch_id)
-{
+function logincheckboxCheck(ch_id) {
     var ch_div = ch_id + "_div";
-    if (document.getElementById(ch_id).checked)
+    if (document.getElementById(ch_id).checked) {
         document.getElementById(ch_div).className = "checkboxOn";
-    else
+    }
+    else {
         document.getElementById(ch_div).className = "checkboxOff";
+    }
 }
 
-function makeid(len)
-{
+function makeid(len) {
     var text = "";
     var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    for (var i = 0; i < len; i++)
+    for (var i = 0; i < len; i++) {
         text += possible.charAt(Math.floor(Math.random() * possible.length));
+    }
     return text;
 }
 
-function checkMail(email)
-{
+function checkMail(email) {
     email = email.replace('+', '', 'g');
     var filter = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
-    if (filter.test(email))
+    if (filter.test(email)) {
         return false;
-    else
+    }
+    else {
         return true;
+    }
 }
 
 /**
@@ -738,7 +798,8 @@ function makeObservable(kls) {
             kls.prototype[v] = function() {
                 return $(this)[v].apply($(this), toArray(arguments));
             }
-        } else {
+        }
+        else {
             kls[v] = function() {
                 return $(this)[v].apply($(this), toArray(arguments));
             }
@@ -789,9 +850,11 @@ function makeMetaAware(kls) {
 
         if (prefix && !namespace && !k) {
             delete self["_" + prefix];
-        } else if (prefix && namespace && !k) {
+        }
+        else if (prefix && namespace && !k) {
             delete self["_" + prefix][namespace];
-        } else if (prefix && namespace && k) {
+        }
+        else if (prefix && namespace && k) {
             delete self["_" + prefix][namespace][k];
         }
 
@@ -820,17 +883,21 @@ function makeMetaAware(kls) {
         if (k == undefined) {
             if (self["_" + prefix] == undefined) {
                 return default_value;
-            } else {
+            }
+            else {
                 return self["_" + prefix][namespace] || default_value;
             }
-        } else {
+        }
+        else {
             // all args
 
             if (self["_" + prefix] == undefined) {
                 return default_value;
-            } else if (self["_" + prefix][namespace] == undefined) {
+            }
+            else if (self["_" + prefix][namespace] == undefined) {
                 return default_value;
-            } else {
+            }
+            else {
                 return self["_" + prefix][namespace][k] || default_value;
             }
         }
@@ -879,8 +946,9 @@ function simpleStringHashCode(str) {
         }, 0);
     }
     var hash = 0;
-    if (str.length === 0)
+    if (str.length === 0) {
         return hash;
+    }
     for (var i = 0; i < str.length; i++) {
         var character = str.charCodeAt(i);
         hash = ((hash << 5) - hash) + character;
@@ -909,7 +977,8 @@ function createTimeoutPromise(validateFunction, tick, timeout, resolveRejectArgs
     $promise.verify = function() {
         if (validateFunction()) {
             if (window.d) {
-                console.debug("Resolving timeout promise", timeout, "ms", "at", (new Date()), validateFunction, resolveRejectArgs);
+                console.debug("Resolving timeout promise",
+                    timeout, "ms", "at", (new Date()), validateFunction, resolveRejectArgs);
             }
             $promise.resolve.apply($promise, resolveRejectArgs);
         }
@@ -923,11 +992,14 @@ function createTimeoutPromise(validateFunction, tick, timeout, resolveRejectArgs
         var timeoutTimer = setTimeout(function() {
             if (validateFunction()) {
                 if (window.d) {
-                    console.debug("Resolving timeout promise", timeout, "ms", "at", (new Date()), validateFunction, resolveRejectArgs);
+                    console.debug("Resolving timeout promise",
+                        timeout, "ms", "at", (new Date()), validateFunction, resolveRejectArgs);
                 }
                 $promise.resolve.apply($promise, resolveRejectArgs);
-            } else {
-                console.error("Timed out after waiting", timeout, "ms", "at", (new Date()), validateFunction, resolveRejectArgs);
+            }
+            else {
+                console.error("Timed out after waiting",
+                    timeout, "ms", "at", (new Date()), validateFunction, resolveRejectArgs);
                 $promise.reject.apply($promise, resolveRejectArgs);
             }
         }, timeout);
@@ -943,7 +1015,8 @@ function createTimeoutPromise(validateFunction, tick, timeout, resolveRejectArgs
 
     if (!waitForPromise || !waitForPromise.done) {
         startTimerChecks();
-    } else {
+    }
+    else {
         waitForPromise.always(function() {
             startTimerChecks();
         });
@@ -968,7 +1041,8 @@ function toArray(val) {
  * Released under MIT license.
  */
 (function(Date, undefined) {
-    var origParse = Date.parse, numericKeys = [1, 4, 5, 6, 7, 10, 11];
+    var origParse = Date.parse,
+        numericKeys = [1, 4, 5, 6, 7, 10, 11];
     Date.parse = function(date) {
         var timestamp, struct, minutesOffset = 0;
 
@@ -994,7 +1068,8 @@ function toArray(val) {
                 }
             }
 
-            timestamp = Date.UTC(struct[1], struct[2], struct[3], struct[4], struct[5] + minutesOffset, struct[6], struct[7]);
+            timestamp = Date.UTC(struct[1],
+                    struct[2], struct[3], struct[4], struct[5] + minutesOffset, struct[6], struct[7]);
         }
         else {
             timestamp = origParse ? origParse(date) : NaN;
@@ -1044,7 +1119,8 @@ function assert(test, message) {
     if (!test) {
         if (MegaLogger && MegaLogger.rootLogger) {
             MegaLogger.rootLogger.error("assertion failed: ", message);
-        } else if (window.d) {
+        }
+        else if (window.d) {
             console.error(message);
         }
 
@@ -1080,60 +1156,77 @@ function NOW() {
  *  Global function to help debugging
  */
 function DEBUG2() {
-    if (typeof (d) !== "undefined" && d) {
+    if (typeof(d) !== "undefined" && d) {
         console.warn.apply(console, arguments)
     }
 }
 
 function ERRDEBUG() {
-    if (typeof (d) !== "undefined" && d) {
+    if (typeof(d) !== "undefined" && d) {
         console.error.apply(console, arguments)
     }
 }
 
 function DEBUG() {
-    if (typeof (d) !== "undefined" && d) {
+    if (typeof(d) !== "undefined" && d) {
         (console.debug || console.log).apply(console, arguments)
     }
 }
 
 function ASSERT(what, msg, udata) {
-    if (!what)
-    {
+    if (!what) {
         var af = new Error('failed assertion; ' + msg);
-        if (udata)
+        if (udata) {
             af.udata = udata;
+        }
         Soon(function() {
             throw af;
         });
-        if (console.assert)
+        if (console.assert) {
             console.assert(what, msg);
-        else
+        }
+        else {
             console.error('FAILED ASSERTION', msg);
+        }
     }
     return !!what;
 }
 
-function srvlog(msg, data, silent)
-{
-    if (data && !(data instanceof Error)) data = { udata : data };
-    if (!silent && d) console.error(msg);
-    if (!d || onBetaW) window.onerror(msg, '', data ? 1:-1, 0, data || null);
+function srvlog(msg, data, silent) {
+    if (data && !(data instanceof Error)) {
+        data = {
+            udata: data
+        };
+    }
+    if (!silent && d) {
+        console.error(msg);
+    }
+    if (!d || onBetaW) {
+        window.onerror(msg, '', data ? 1 : -1, 0, data || null);
+    }
 }
 
 function oDestroy(obj) {
-    if (window.d) ASSERT(Object.isFrozen(obj) === false, 'Object already frozen...');
+    if (window.d) {
+        ASSERT(Object.isFrozen(obj) === false, 'Object already frozen...');
+    }
 
     Object.keys(obj).forEach(function(memb) {
-        if (obj.hasOwnProperty(memb)) delete obj[memb];
+        if (obj.hasOwnProperty(memb)) {
+            delete obj[memb];
+        }
     });
-    Object.defineProperty(obj, ":$:frozen:", { value : String(new Date()), writable : false });
+    Object.defineProperty(obj, ":$:frozen:", {
+        value: String(new Date()),
+        writable: false
+    });
 
-    if (window.d) Object.freeze(obj);
+    if (window.d) {
+        Object.freeze(obj);
+    }
 }
 
-function oIsFrozen(obj)
-{
+function oIsFrozen(obj) {
     return obj && typeof obj === 'object' && obj.hasOwnProperty(":$:frozen:");
 }
 
@@ -1153,43 +1246,44 @@ function dlError(text) {
 function removeValue(array, value, can_fail) {
     var idx = array.indexOf(value);
     ASSERT(can_fail || idx != -1, 'Unable to Remove Value ' + value);
-    if (idx != -1)
+    if (idx != -1) {
         array.splice(idx, 1);
+    }
     return idx != -1;
 }
 
 function setTransferStatus(dl, status, ethrow, lock) {
     var id = dl && DownloadManager.GetGID(dl);
     var text = '' + status;
-    if (text.length > 44)
+    if (text.length > 44) {
         text = text.substr(0, 42) + '...';
+    }
     $('.transfer-table #' + id + ' td:eq(6)').text(text);
-    if (lock)
+    if (lock) {
         $('.transfer-table #' + id).attr('id', 'LOCKed_' + id);
-    if (d)
+    }
+    if (d) {
         console.error(status);
-    if (ethrow)
+    }
+    if (ethrow) {
         throw status;
+    }
 }
 
 function dlFatalError(dl, error, ethrow) {
     var m = 'This issue should be resolved ';
-    if (navigator.webkitGetUserMedia)
-    {
+    if (navigator.webkitGetUserMedia) {
         m += 'exiting from Incognito mode.';
     }
-    else if (navigator.msSaveOrOpenBlob)
-    {
+    else if (navigator.msSaveOrOpenBlob) {
         Later(browserDialog);
         m = l[1933];
     }
-    else if (dlMethod === FlashIO)
-    {
+    else if (dlMethod === FlashIO) {
         Later(browserDialog);
         m = l[1308];
     }
-    else
-    {
+    else {
         Later(firefoxDialog);
         // m += 'installing our extension.'
         m = l[1932];
@@ -1212,7 +1306,9 @@ function RegExpEscape(text) {
 
 function unixtimeToTimeString(timestamp) {
     var date = new Date(timestamp * 1000);
-    return addZeroIfLenLessThen(date.getHours(), 2) + ":" + addZeroIfLenLessThen(date.getMinutes(), 2) + "." + addZeroIfLenLessThen(date.getSeconds(), 2)
+    return addZeroIfLenLessThen(date.getHours(), 2)
+        + ":" + addZeroIfLenLessThen(date.getMinutes(), 2)
+        + "." + addZeroIfLenLessThen(date.getSeconds(), 2)
 }
 
 /**
@@ -1286,7 +1382,7 @@ function logAllCallsOnObject(ctx, loggerFn, recursive, textPrefix, parentLogger)
     }
     loggerFn = loggerFn || console.debug;
 
-    if (typeof (parentLogger) == "undefined") {
+    if (typeof(parentLogger) == "undefined") {
         var logger = new MegaLogger(textPrefix);
     }
     if (!window.callLoggerObjects) {
@@ -1294,9 +1390,11 @@ function logAllCallsOnObject(ctx, loggerFn, recursive, textPrefix, parentLogger)
     }
 
     $.each(ctx, function(k, v) {
-        if (typeof (v) == "function") {
+        if (typeof(v) == "function") {
             callLoggerWrapper(ctx, k, loggerFn, textPrefix, parentLogger);
-        } else if (typeof (v) == "object" && !$.isArray(v) && v !== null && recursive && !$.inArray(window.callLoggerObjects)) {
+        }
+        else if (typeof(v) == "object"
+                && !$.isArray(v) && v !== null && recursive && !$.inArray(window.callLoggerObjects)) {
             window.callLoggerObjects.push(v);
             logAllCallsOnObject(v, loggerFn, recursive, textPrefix + ":" + k, parentLogger);
         }
@@ -1312,6 +1410,7 @@ function array_unique(arr) {
 function array_random(arr) {
     return arr[rand(arr.length)];
 }
+
 /**
  * Simple method that will convert Mega user ids to base32 strings (that should be used when doing XMPP auth)
  *
@@ -1337,7 +1436,7 @@ function megaJidToUserId(jid) {
 /**
  * Implementation of a string encryption/decryption.
  */
-var stringcrypt = (function () {
+var stringcrypt = (function() {
     /**
      * @description
      * Implementation of a string encryption/decryption.</p>
@@ -1469,8 +1568,8 @@ function MurmurHash3(key, seed) {
  */
 function CreateWorkers(url, message, size) {
     size = size || 4
-    var worker = []
-        , instances = [];
+    var worker = [],
+        instances = [];
 
     function handler(id) {
         return function(e) {
@@ -1485,16 +1584,17 @@ function CreateWorkers(url, message, size) {
         var w;
 
         try {
-            w  = new Worker(url);
-        } catch(e) {
+            w = new Worker(url);
+        }
+        catch (e) {
             msgDialog('warninga', '' + url, '' + e, location.hostname);
             throw e;
         }
 
-        w.id   = i;
+        w.id = i;
         w.busy = false;
         w.postMessage = w.webkitPostMessage || w.postMessage;
-        w.onmessage   = handler(i);
+        w.onmessage = handler(i);
         return w;
     }
 
@@ -1503,70 +1603,75 @@ function CreateWorkers(url, message, size) {
     }
 
     return new MegaQueue(function(task, done) {
-        for (var i = 0; i < size; i++) {
-            if (worker[i] === null) worker[i] = create(i);
-            if (!worker[i].busy) break;
-        }
-        worker[i].busy = true;
-        instances[i]   = done;
-        $.each(task, function(e, t) {
-            if (e == 0) {
-                worker[i].context = t;
-            } else if (t.constructor === Uint8Array && typeof MSBlobBuilder !== "function") {
-                worker[i].postMessage(t.buffer,[t.buffer]);
-            } else {
-                worker[i].postMessage(t);
+            for (var i = 0; i < size; i++) {
+                if (worker[i] === null) {
+                    worker[i] = create(i);
+                }
+                if (!worker[i].busy) {
+                    break;
+                }
             }
-        });
-    }, size, 'worker-' + url);
+            worker[i].busy = true;
+            instances[i] = done;
+            $.each(task, function(e, t) {
+                    if (e == 0) {
+                        worker[i].context = t;
+                    }
+                    else if (t.constructor === Uint8Array && typeof MSBlobBuilder !== "function") {
+                        worker[i].postMessage(t.buffer, [t.buffer]);
+                    }
+                    else {
+                        worker[i].postMessage(t);
+                    }
+                });
+        }, size, 'worker-' + url);
 }
 
-function mKeyDialog(ph, fl)
-{
+function mKeyDialog(ph, fl) {
     $('.new-download-buttons').addClass('hidden');
     $('.new-download-file-title').text(l[1199]);
-    $('.new-download-file-icon').addClass(fileicon({name: 'unknown.unknown'}));
+    $('.new-download-file-icon').addClass(fileicon({
+        name: 'unknown.unknown'
+    }));
     $('.fm-dialog.dlkey-dialog').removeClass('hidden');
     $('.fm-dialog-overlay').removeClass('hidden');
     $('body').addClass('overlayed');
-    $('.fm-dialog.dlkey-dialog input').rebind('focus', function(e)
-    {
-        if ($(this).val() == l[1028])
+    $('.fm-dialog.dlkey-dialog input').rebind('focus', function(e) {
+        if ($(this).val() == l[1028]) {
             $(this).val('');
+        }
     });
-    $('.fm-dialog.dlkey-dialog input').rebind('blur', function(e)
-    {
-        if ($(this).val() == '')
+    $('.fm-dialog.dlkey-dialog input').rebind('blur', function(e) {
+        if ($(this).val() == '') {
             $(this).val(l[1028]);
+        }
     });
-    $('.fm-dialog.dlkey-dialog input').rebind('keydown', function(e)
-    {
+    $('.fm-dialog.dlkey-dialog input').rebind('keydown', function(e) {
         $('.fm-dialog.dlkey-dialog .fm-dialog-new-folder-button').addClass('active');
-        if (e.keyCode == 13)
+        if (e.keyCode == 13) {
             $('.fm-dialog.dlkey-dialog .fm-dialog-new-folder-button').click();
+        }
     });
-    $('.fm-dialog.dlkey-dialog .fm-dialog-new-folder-button').rebind('click', function(e)
-    {
+    $('.fm-dialog.dlkey-dialog .fm-dialog-new-folder-button').rebind('click', function(e) {
         var key = $('.fm-dialog.dlkey-dialog input').val();
 
-        if (key && key !== l[1028])
-        {
+        if (key && key !== l[1028]) {
             $('.fm-dialog.dlkey-dialog').addClass('hidden');
             $('.fm-dialog-overlay').addClass('hidden');
             document.location.hash = (fl ? '#F!' : '#!') + ph + '!' + key;
         }
     });
-    $('.fm-dialog.dlkey-dialog .fm-dialog-close').rebind('click', function(e)
-    {
+    $('.fm-dialog.dlkey-dialog .fm-dialog-close').rebind('click', function(e) {
         $('.fm-dialog.dlkey-dialog').addClass('hidden');
         $('.fm-dialog-overlay').addClass('hidden');
     });
 }
 
 function dcTracer(ctr) {
-    var name = ctr.name, proto = ctr.prototype;
-    for(var fn in proto) {
-        if(proto.hasOwnProperty(fn) && typeof proto[fn] === 'function') {
+    var name = ctr.name,
+        proto = ctr.prototype;
+    for (var fn in proto) {
+        if (proto.hasOwnProperty(fn) && typeof proto[fn] === 'function') {
             console.log('Tracing ' + name + '.' + fn);
             proto[fn] = (function(fn, fc) {
                 fc.dbg = function() {
@@ -1576,7 +1681,8 @@ function dcTracer(ctr) {
                         var r = fc.apply(this, arguments);
                         console.log('Leaving ' + name + '.' + fn, r);
                         return r;
-                    } catch(e) {
+                    }
+                    catch (e) {
                         console.error(e);
                     }
                 };
@@ -1586,91 +1692,99 @@ function dcTracer(ctr) {
     }
 }
 
-function mSpawnWorker(url, nw)
-{
-    if (!(this instanceof mSpawnWorker))
+function mSpawnWorker(url, nw) {
+    if (!(this instanceof mSpawnWorker)) {
         return new mSpawnWorker(url, nw);
+    }
 
     this.jid = 1;
     this.jobs = {};
-    this.nworkers=nw=nw||4;
+    this.nworkers = nw = nw || 4;
     this.wrk = new Array(nw);
-    this.token = mRandomToken('mSpawnWorker.'+url.split(".")[0]);
+    this.token = mRandomToken('mSpawnWorker.' + url.split(".")[0]);
 
     while (nw--) {
         if (!(this.wrk[nw] = this.add(url))) {
-            throw new Error(this.token.split("$")[0]+' Setup Error');
+            throw new Error(this.token.split("$")[0] + ' Setup Error');
         }
     }
 }
 mSpawnWorker.prototype = {
-    process: function mSW_Process(data, callback, onerror)
-    {
+    process: function mSW_Process(data, callback, onerror) {
         if (!Array.isArray(data)) {
             var err = new Error("'data' must be an array");
-            if (onerror) return onerror(err);
+            if (onerror) {
+                return onerror(err);
+            }
             throw err;
         }
         if (this.unreliably) {
             return onerror(0xBADF);
         }
-        var nw  = this.nworkers, l = Math.ceil(data.length/nw);
-        var id  = mRandomToken("mSWJobID"+this.jid++), idx = 0;
-        var job = { done: 0, data: [], callback: callback};
+        var nw = this.nworkers,
+            l = Math.ceil(data.length / nw);
+        var id = mRandomToken("mSWJobID" + this.jid++),
+            idx = 0;
+        var job = {
+            done: 0,
+            data: [],
+            callback: callback
+        };
 
         while (nw--) {
-            job.data.push(data.slice(idx, idx+=l));
+            job.data.push(data.slice(idx, idx += l));
         }
-        if (onerror) job.onerror = onerror;
+        if (onerror) {
+            job.onerror = onerror;
+        }
         this.jobs[id] = job;
         this.postNext();
     },
-    postNext: function mSW_PostNext()
-    {
-        if (this.busy())
+    postNext: function mSW_PostNext() {
+        if (this.busy()) {
             return;
-        for (var id in this.jobs)
-        {
+        }
+        for (var id in this.jobs) {
             var nw = this.nworkers;
-            var job = this.jobs[id], data;
+            var job = this.jobs[id],
+                data;
 
-            while (nw--)
-            {
-                if (!this.wrk[nw].working)
-                {
+            while (nw--) {
+                if (!this.wrk[nw].working) {
                     data = job.data.shift();
-                    if (data)
-                    {
+                    if (data) {
                         this.wrk[nw].working = !0;
                         this.wrk[nw].postMessage({
-                            data        : data,
-                            debug       : !!window.d,
-                            u_sharekeys : u_sharekeys,
-                            u_privk     : u_privk,
-                            u_handle    : u_handle,
-                            u_k         : u_k,
-                            jid         : id
+                            data: data,
+                            debug: !!window.d,
+                            u_sharekeys: u_sharekeys,
+                            u_privk: u_privk,
+                            u_handle: u_handle,
+                            u_k: u_k,
+                            jid: id
                         });
 
-                        if (d && job.data.length == this.nworkers-1) console.time(id);
+                        if (d && job.data.length == this.nworkers - 1) {
+                            console.time(id);
+                        }
                     }
                 }
             }
         }
     },
-    busy: function()
-    {
+    busy: function() {
         var nw = this.nworkers;
         while (nw-- && this.wrk[nw].working);
         return nw == -1;
     },
-    add: function mSW_Add(url)
-    {
-        var self = this, wrk;
+    add: function mSW_Add(url) {
+        var self = this,
+            wrk;
 
         try {
             wrk = new Worker(url);
-        } catch(e) {
+        }
+        catch (e) {
             console.error(e);
             if (!window[this.token]) {
                 window[this.token] = true;
@@ -1679,10 +1793,11 @@ mSpawnWorker.prototype = {
             return false;
         }
 
-        wrk.onerror = function mSW_OnError(err)
-        {
+        wrk.onerror = function mSW_OnError(err) {
             console.error(err);
-            if (!(self && self.wrk)) return;
+            if (!(self && self.wrk)) {
+                return;
+            }
             Soon(function() {
                 throw err;
             });
@@ -1695,12 +1810,15 @@ mSpawnWorker.prototype = {
             }
             for (var id in self.jobs) {
                 var job = self.jobs[id];
-                if (job.onerror) job.onerror(err);
+                if (job.onerror) {
+                    job.onerror(err);
+                }
             }
             if (!window[self.token]) {
                 window[self.token] = true;
                 if (err.filename) {
-                    msgDialog('warninga', "Worker Exception: " + url, err.message, err.filename + ":" + err.lineno);
+                    msgDialog('warninga',
+                        "Worker Exception: " + url, err.message, err.filename + ":" + err.lineno);
                 }
             }
             delete self.wrk;
@@ -1708,51 +1826,65 @@ mSpawnWorker.prototype = {
             self = undefined;
         };
 
-        wrk.onmessage = function mSW_OnMessage(ev)
-        {
-            if (ev.data[0] == 'console')
-            {
+        wrk.onmessage = function mSW_OnMessage(ev) {
+            if (ev.data[0] == 'console') {
                 if (d) {
                     var args = ev.data[1];
                     args.unshift(self.token);
-                    console.log.apply(console,args);
+                    console.log.apply(console, args);
                 }
                 return;
             }
-            if (d) console.log(self.token, ev.data);
+            if (d) {
+                console.log(self.token, ev.data);
+            }
 
             wrk.working = false;
-            if (!self.done(ev.data)) this.onerror(0xBADF);
+            if (!self.done(ev.data)) {
+                this.onerror(0xBADF);
+            }
         };
 
-        if (d) console.log(this.token, 'Starting...');
+        if (d) {
+            console.log(this.token, 'Starting...');
+        }
 
         wrk.postMessage = wrk.postMessage || wrk.webkitPostMessage;
 
         return wrk;
     },
-    done: function mSW_Done(reply)
-    {
+    done: function mSW_Done(reply) {
         var job = this.jobs[reply.jid];
-        if (!ASSERT(job,'Invalid worker reply.'))
+        if (!ASSERT(job, 'Invalid worker reply.')) {
             return false;
+        }
 
-        if (!job.result) job.result = reply.result;
-        else $.extend(job.result, reply.result);
+        if (!job.result) {
+            job.result = reply.result;
+        }
+        else {
+            $.extend(job.result, reply.result);
+        }
 
-        if (reply.newmissingkeys)
-        {
-            job.newmissingkeys=newmissingkeys = true;
+        if (reply.newmissingkeys) {
+            job.newmissingkeys = newmissingkeys = true;
             $.extend(missingkeys, reply.missingkeys);
         }
-        if (reply.rsa2aes)      $.extend(rsa2aes,      reply.rsa2aes);
-        if (reply.u_sharekeys)  $.extend(u_sharekeys,  reply.u_sharekeys);
-        if (reply.rsasharekeys) $.extend(rsasharekeys, reply.rsasharekeys);
+        if (reply.rsa2aes) {
+            $.extend(rsa2aes, reply.rsa2aes);
+        }
+        if (reply.u_sharekeys) {
+            $.extend(u_sharekeys, reply.u_sharekeys);
+        }
+        if (reply.rsasharekeys) {
+            $.extend(rsasharekeys, reply.rsasharekeys);
+        }
 
         Soon(this.postNext.bind(this));
-        if (++job.done == this.nworkers)
-        {
-            if (d) console.timeEnd(reply.jid);
+        if (++job.done == this.nworkers) {
+            if (d) {
+                console.timeEnd(reply.jid);
+            }
 
             delete this.jobs[reply.jid];
             job.callback(job.result, job);
@@ -1762,115 +1894,123 @@ mSpawnWorker.prototype = {
     }
 };
 
-function mRandomToken(pfx)
-{
-    return (pfx || '!') + '$' + (Math.random()*Date.now()).toString(36);
+function mRandomToken(pfx) {
+    return (pfx || '!') + '$' + (Math.random() * Date.now()).toString(36);
 }
 
-function str_mtrunc(str, len)
-{
-    if (!len)
+function str_mtrunc(str, len) {
+    if (!len) {
         len = 35;
-    if (len > (str || '').length)
+    }
+    if (len > (str || '').length) {
         return str;
+    }
     var p1 = Math.ceil(0.60 * len),
         p2 = Math.ceil(0.30 * len);
     return str.substr(0, p1) + '\u2026' + str.substr(-p2);
 }
 
-function setupTransferAnalysis()
-{
-    if ($.mTransferAnalysis)
+function setupTransferAnalysis() {
+    if ($.mTransferAnalysis) {
         return;
+    }
 
-    var prev = {}, tlen = {}, time = {}, chunks = {};
-    $.mTransferAnalysis = setInterval(function()
-    {
-        if (uldl_hold)
+    var prev = {},
+        tlen = {},
+        time = {},
+        chunks = {};
+    $.mTransferAnalysis = setInterval(function() {
+        if (uldl_hold) {
             prev = {};
-        else if ($.transferprogress)
-        {
+        }
+        else if ($.transferprogress) {
             var tp = $.transferprogress;
 
-            for (var i in tp)
-            {
+            for (var i in tp) {
                 if (!GlobalProgress[i] || GlobalProgress[i].paused || tp[i][0] == tp[i][1]
-                    || (i[0] === 'u' ? ulQueue : dlQueue).isPaused())
-                {
+                        || (i[0] === 'u' ? ulQueue : dlQueue).isPaused()) {
                     delete prev[i];
                 }
-                else if (prev[i] && prev[i] == tp[i][0])
-                {
-                    var p = tp[i], t = i[0] === 'u' ? 'Upload' : 'Download', r = '', data = [];
-                    var s = GlobalProgress[i].speed, w = GlobalProgress[i].working || [];
+                else if (prev[i] && prev[i] == tp[i][0]) {
+                    var p = tp[i],
+                        t = i[0] === 'u' ? 'Upload' : 'Download',
+                        r = '',
+                        data = [];
+                    var s = GlobalProgress[i].speed,
+                        w = GlobalProgress[i].working || [];
                     var c = p[0] + '/' + p[1] + '-' + Math.floor(p[0] / p[1] * 100) + '%';
-                    var u = w.map(function(c)
-                    {
+                    var u = w.map(function(c) {
                         var x = c.xhr || {};
-                        return ['' + c, x.__failed, x.__timeout, !!x.listener, x.__id, x.readyState > 1 && x.status];
+                        return ['' + c, x.__failed, x.__timeout,
+                            !!x.listener, x.__id, x.readyState > 1 && x.status];
                     });
 
-                    if (d)
+                    if (d) {
                         console.warn(i + ' might be stuck, checking...', c, w.length, u);
+                    }
 
-                    if (w.length)
-                    {
+                    if (w.length) {
                         var j = w.length;
-                        while (j--)
-                        {
+                        while (j--) {
                             /**
                              * if there's a timer, no need to call on_error ourselves
                              * since the chunk will get restarted there by the xhr
                              */
                             var stuck = w[j].xhr && !w[j].xhr.__timeout;
-                            if (stuck)
-                            {
-                                var chunk_id = '' + w[j], n = u[j];
+                            if (stuck) {
+                                var chunk_id = '' + w[j],
+                                    n = u[j];
 
-                                if (w[j].dl && w[j].dl.lasterror)
+                                if (w[j].dl && w[j].dl.lasterror) {
                                     r = '[DLERR' + w[j].dl.lasterror + ']';
-                                else if (w[j].srverr)
+                                }
+                                else if (w[j].srverr) {
                                     r = '[SRVERR' + (w[j].srverr - 1) + ']';
+                                }
 
                                 try {
                                     w[j].on_error(0, {}, 'Stuck');
-                                } catch (e) {
+                                }
+                                catch (e) {
                                     n.push(e.message);
                                 }
 
-                                if (!chunks[chunk_id])
-                                {
+                                if (!chunks[chunk_id]) {
                                     chunks[chunk_id] = 1;
                                     data.push(n);
                                 }
                             }
                         }
 
-                        if (!data.length && (Date.now() - time[i]) > (mXHRTimeoutMS * 3.1))
-                        {
+                        if (!data.length && (Date.now() - time[i]) > (mXHRTimeoutMS * 3.1)) {
                             r = s ? '[TIMEOUT]' : '[ETHERR]';
                             data = ['Chunks are taking too long to complete... ', u];
                         }
                     }
-                    else
-                    {
+                    else {
                         r = '[!]';
                         data = 'GlobalProgress.' + i + ' exists with no working chunks.';
                     }
 
-                    if (data.length)
-                    {
-                        var udata = {i: i, p: c, d: data, j: [prev, tlen], s: s};
-                        if (i[0] == 'z')
+                    if (data.length) {
+                        var udata = {
+                            i: i,
+                            p: c,
+                            d: data,
+                            j: [prev, tlen],
+                            s: s
+                        };
+                        if (i[0] == 'z') {
                             t = 'zip' + t;
+                        }
                         console.error(t + ' stuck. ' + r, i, udata);
-                        if (!d)
+                        if (!d) {
                             srvlog(t + ' Stuck. ' + r, udata);
+                        }
                     }
                     delete prev[i];
                 }
-                else
-                {
+                else {
                     time[i] = Date.now();
                     tlen[i] = Math.max(tlen[i] || 0, tp[i][0]);
                     prev[i] = tp[i][0];
@@ -1880,43 +2020,44 @@ function setupTransferAnalysis()
     }, mXHRTimeoutMS * 1.2);
 }
 
-function percent_megatitle()
-{
-    var dl_r = 0, dl_t = 0, ul_r = 0, ul_t = 0, tp = $.transferprogress || {}
-    , dl_s = 0, ul_s = 0, zips = {}
+function percent_megatitle() {
+    var dl_r = 0,
+        dl_t = 0,
+        ul_r = 0,
+        ul_t = 0,
+        tp = $.transferprogress || {},
+        dl_s = 0,
+        ul_s = 0,
+        zips = {}
 
-    for (var i in dl_queue)
-    {
-        var q = dl_queue[i], t = tp[q.zipid ? 'zip_' + q.zipid : 'dl_' + q.id];
+    for (var i in dl_queue) {
+        var q = dl_queue[i],
+            t = tp[q.zipid ? 'zip_' + q.zipid : 'dl_' + q.id];
 
-        if (t)
-        {
+        if (t) {
             dl_r += t[0];
             dl_t += t[1];
             if (!q.zipid || !zips[q.zipid]) {
-                if (q.zipid)
+                if (q.zipid) {
                     zips[q.zipid] = 1;
+                }
                 dl_s += t[2];
             }
         }
-        else
-        {
+        else {
             dl_t += q.size || 0;
         }
     }
 
-    for (var i in ul_queue)
-    {
+    for (var i in ul_queue) {
         var t = tp['ul_' + ul_queue[i].id]
 
-        if (t)
-        {
+        if (t) {
             ul_r += t[0];
             ul_t += t[1];
             ul_s += t[2];
         }
-        else
-        {
+        else {
             ul_t += ul_queue[i].size || 0;
         }
     }
@@ -1932,20 +2073,16 @@ function percent_megatitle()
     var x_ul = Math.floor(ul_r / ul_t * 100) || 0,
         x_dl = Math.floor(dl_r / dl_t * 100) || 0
 
-    if (dl_t && ul_t)
-    {
+    if (dl_t && ul_t) {
         t = ' \u2191 ' + x_dl + '% \u2193 ' + x_ul + '%';
     }
-    else if (dl_t)
-    {
+    else if (dl_t) {
         t = ' ' + x_dl + '%';
     }
-    else if (ul_t)
-    {
+    else if (ul_t) {
         t = ' ' + x_ul + '%';
     }
-    else
-    {
+    else {
         t = '';
         $.transferprogress = {};
     }
@@ -1955,7 +2092,8 @@ function percent_megatitle()
             .text(bytesToSize(dl_s, 1) + "/s")
             .addClass('active');
         $('.transfer-panel-title').addClass('active');
-    } else {
+    }
+    else {
         $('.tranfer-download-indicator').removeClass('active');
         $('.transfer-panel-title').removeClass('active');
     }
@@ -1965,23 +2103,24 @@ function percent_megatitle()
             .text(bytesToSize(ul_s, 1) + "/s")
             .addClass('active');
         $('.transfer-panel-title').addClass('active');
-    } else {
+    }
+    else {
         $('.tranfer-upload-indicator').removeClass('active');
         $('.transfer-panel-title').removeClass('active');
     }
 
     $('.file-transfer-icon')
-        .attr(
-            'class',
+        .attr('class',
             'file-transfer-icon download-percents-' + x_dl + ' upload-percents-' + x_ul
-            );
+        );
 
     megatitle(t);
 }
 
 function hostname(url) {
-    if (d)
+    if (d) {
         ASSERT(url && /^http/.test(url), 'Invalid URL passed to hostname() -> ' + url);
+    }
     url = ('' + url).match(/https?:\/\/([^.]+)/);
     return url && url[1];
 }
@@ -1996,15 +2135,13 @@ String.prototype.minutes = function() {
 }
 
 // Quick hack for sane average speed readings
-function bucketspeedometer(initialp)
-{
+function bucketspeedometer(initialp) {
     return {
         interval: 200,
         num: 300,
         prevp: initialp,
         h: {},
-        progress: function(p)
-        {
+        progress: function(p) {
             var now, min, oldest;
             var total;
             var t;
@@ -2020,20 +2157,21 @@ function bucketspeedometer(initialp)
             oldest = now;
             total = 0;
 
-            for (t in this.h)
-            {
-                if (t < min)
+            for (t in this.h) {
+                if (t < min) {
                     delete this.h.bt;
-                else
-                {
-                    if (t < oldest)
+                }
+                else {
+                    if (t < oldest) {
                         oldest = t;
+                    }
                     total += this.h[t];
                 }
             }
 
-            if (now - oldest < 1000)
+            if (now - oldest < 1000) {
                 return 0;
+            }
 
             p = 1000 * total / (now - oldest);
 
@@ -2043,14 +2181,11 @@ function bucketspeedometer(initialp)
     }
 }
 
-function moveCursortoToEnd(el)
-{
-    if (typeof el.selectionStart == "number")
-    {
+function moveCursortoToEnd(el) {
+    if (typeof el.selectionStart == "number") {
         el.selectionStart = el.selectionEnd = el.value.length;
     }
-    else if (typeof el.createTextRange != "undefined")
-    {
+    else if (typeof el.createTextRange != "undefined") {
         el.focus();
         var range = el.createTextRange();
         range.collapse(false);
@@ -2058,8 +2193,7 @@ function moveCursortoToEnd(el)
     }
 }
 
-String.prototype.replaceAll = function(_f, _r, _c)
-{
+String.prototype.replaceAll = function(_f, _r, _c) {
     var o = this.toString();
     var r = '';
     var s = o;
@@ -2070,8 +2204,7 @@ String.prototype.replaceAll = function(_f, _r, _c)
         s = o.toLowerCase();
     }
 
-    while ((e = s.indexOf(_f)) > -1)
-    {
+    while ((e = s.indexOf(_f)) > -1) {
         r += o.substring(b, b + e) + _r;
         s = s.substring(e + _f.length, s.length);
         b += e + _f.length;
@@ -2087,22 +2220,19 @@ String.prototype.replaceAll = function(_f, _r, _c)
 };
 
 // Returns pixels position of element relative to document (top left corner)
-function getHtmlElemPos(elem, n)
-{
+function getHtmlElemPos(elem, n) {
     var xPos = 0;
     var yPos = 0;
     var sl, st, cl, ct;
     var pNode;
-    while (elem)
-    {
+    while (elem) {
         pNode = elem.parentNode;
         sl = 0;
         st = 0;
         cl = 0;
         ct = 0;
-        if (pNode && pNode.tagName && !/html|body/i.test(pNode.tagName))
-        {
-            if (typeof n === 'undefined')// count this in, except for overflow huge menu
+        if (pNode && pNode.tagName && !/html|body/i.test(pNode.tagName)) {
+            if (typeof n === 'undefined') // count this in, except for overflow huge menu
             {
                 sl = elem.scrollLeft;
                 st = elem.scrollTop;
@@ -2114,32 +2244,33 @@ function getHtmlElemPos(elem, n)
         }
         elem = elem.offsetParent;
     }
-    return {x: xPos, y: yPos};
+    return {
+        x: xPos,
+        y: yPos
+    };
 }
 
-function disableDescendantFolders(id, pref)
-{
+function disableDescendantFolders(id, pref) {
     var folders = [];
-    for (var i in M.c[id])
-        if (M.d[i] && M.d[i].t === 1 && M.d[i].name)
+    for (var i in M.c[id]) {
+        if (M.d[i] && M.d[i].t === 1 && M.d[i].name) {
             folders.push(M.d[i]);
-
-    for (var i in folders)
-    {
+        }
+    }
+    for (var i in folders) {
         var sub = false;
         var fid = folders[i].h;
 
-        for (var h in M.c[fid])
-        {
-            if (M.d[h].t)
-            {
+        for (var h in M.c[fid]) {
+            if (M.d[h].t) {
                 sub = true;
                 break;
             }
         }
         $(pref + fid).addClass('disabled');
-        if (sub)
+        if (sub) {
             this.disableDescendantFolders(fid, pref);
+        }
     }
 
     return true;
@@ -2159,19 +2290,19 @@ function ucfirst(str) {
     return f + str.substr(1);
 }
 
-function readLocalStorage(name, type, val)
-{
+function readLocalStorage(name, type, val) {
     var v;
-    if (localStorage[name])
-    {
+    if (localStorage[name]) {
         var f = 'parse' + ucfirst(type);
         v = localStorage[name];
 
-        if (typeof window[f] === "function")
+        if (typeof window[f] === "function") {
             v = window[f](v);
+        }
 
-        if (val && ((val.min && val.min > v) || (val.max && val.max < v)))
+        if (val && ((val.min && val.min > v) || (val.max && val.max < v))) {
             v = null;
+        }
     }
     return v || (val && val.def);
 }
@@ -2202,12 +2333,13 @@ function _wrapFnWithBeforeAndAfterEvents(fn, eventSuffix, dontReturnPromises) {
             logger.debug("Propagation stopped for event: ", event);
             if (dontReturnPromises) {
                 return false;
-            } else {
+            }
+            else {
                 return Promise.reject("Propagation stopped by onBefore" + eventSuffix);
             }
 
         }
-        if (typeof (event.returnedValue) != "undefined") {
+        if (typeof(event.returnedValue) != "undefined") {
             args = event.returnedValue;
         }
 
@@ -2221,7 +2353,8 @@ function _wrapFnWithBeforeAndAfterEvents(fn, eventSuffix, dontReturnPromises) {
                 logger.debug("Propagation stopped for event: ", event);
                 if (dontReturnPromises) {
                     return false;
-                } else {
+                }
+                else {
                     return Promise.reject("Propagation stopped by onAfter" + eventSuffix);
                 }
             }
@@ -2231,7 +2364,8 @@ function _wrapFnWithBeforeAndAfterEvents(fn, eventSuffix, dontReturnPromises) {
             returnedValue.then(function() {
                 done();
             });
-        } else {
+        }
+        else {
             done();
         }
 
@@ -2239,11 +2373,10 @@ function _wrapFnWithBeforeAndAfterEvents(fn, eventSuffix, dontReturnPromises) {
     }
 }
 
-function hex2bin(hex)
-{
+function hex2bin(hex) {
     var bytes = [];
 
-    for(var i=0; i< hex.length-1; i+=2){
+    for (var i = 0; i < hex.length - 1; i += 2) {
         bytes.push(parseInt(hex.substr(i, 2), 16));
     }
 
@@ -2266,7 +2399,9 @@ function flashIsEnabled() {
         }
     }
     catch (e) {
-        if (navigator.mimeTypes && (navigator.mimeTypes['application/x-shockwave-flash'] != undefined) && (navigator.mimeTypes['application/x-shockwave-flash'].enabledPlugin)) {
+        if (navigator.mimeTypes
+                && (navigator.mimeTypes['application/x-shockwave-flash'] != undefined)
+                && (navigator.mimeTypes['application/x-shockwave-flash'].enabledPlugin)) {
             flashEnabled = true;
         }
     }
@@ -2305,32 +2440,36 @@ function secToDuration(s, sep) {
     var dur = ms2Time(s * 1000).split(":");
     var durStr = "";
     sep = sep || ", ";
-    if(!secToDuration.regExp) { //regexp compile cache
+    if (!secToDuration.regExp) { //regexp compile cache
         secToDuration.regExp = {};
     }
 
-    if(!secToDuration.regExp[sep]) {
+    if (!secToDuration.regExp[sep]) {
         secToDuration.regExp[sep] = new RegExp("" + sep + "$");
     }
 
-    for(var i = 0; i < dur.length; i++) {
+    for (var i = 0; i < dur.length; i++) {
         var unit;
         var v = dur[i];
-        if(v === "0") {
-            if(durStr.length !== 0 && i !== 0) {
+        if (v === "0") {
+            if (durStr.length !== 0 && i !== 0) {
                 continue;
-            } else if(i < 2) {
+            }
+            else if (i < 2) {
                 continue;
             }
         }
 
-        if(i === 0) {
+        if (i === 0) {
             unit = v != 1 ? "hours" : "hour";
-        } else if(i === 1) {
+        }
+        else if (i === 1) {
             unit = v != 1 ? "minutes" : "minute";
-        } else if(i === 2) {
+        }
+        else if (i === 2) {
             unit = v != 1 ? "seconds" : "second";
-        } else {
+        }
+        else {
             throw new Error("this should never happen.");
         }
 
@@ -2346,7 +2485,7 @@ function generateAnonymousReport() {
     report.ua = navigator.userAgent;
     report.ut = u_type;
     report.io = window.dlMethod && dlMethod.name;
-    report.sb = +(''+$('script[src*="secureboot"]').attr('src')).split('=').pop();
+    report.sb = +('' + $('script[src*="secureboot"]').attr('src')).split('=').pop();
     report.tp = $.transferprogress;
     report.karereState = megaChat.karere.getConnectionState();
     report.karereCurrentConnRetries = megaChat.karere._connectionRetries;
@@ -2354,7 +2493,7 @@ function generateAnonymousReport() {
     report.karereServer = megaChat.karere.connection.service;
     report.numOpenedChats = Object.keys(megaChat.chats).length;
     report.haveRtc = megaChat.rtc ? true : false;
-    if(report.haveRtc) {
+    if (report.haveRtc) {
         report.rtcStatsAnonymousId = megaChat.rtc.ownAnonId;
     }
 
@@ -2369,7 +2508,7 @@ function generateAnonymousReport() {
 
         participants.forEach(function(v, k) {
             var cc = megaChat.getContactFromJid(v);
-            if(cc && cc.u && !userAnonMap[cc.u]) {
+            if (cc && cc.u && !userAnonMap[cc.u]) {
                 userAnonMap[cc.u] = {
                     anonId: userAnonIdx++ + rand(1000),
                     pres: megaChat.karere.getPresence(v)
@@ -2383,13 +2522,17 @@ function generateAnonymousReport() {
             'roomState': v.getStateAsText(),
             'roomParticipants': participants,
             'encState': v.encryptionHandler ? v.encryptionHandler.state : "not defined",
-            'opQueueQueueCount': v.encryptionOpQueue ? v.encryptionOpQueue._queue.length : "not defined",
-            'opQueueErrRetries': v.encryptionOpQueue ? v.encryptionOpQueue._error_retries : "not defined",
-            'opQueueCurrentOp': v.encryptionOpQueue && v.encryptionOpQueue._queue.length > 0 ? v.encryptionOpQueue._queue[0][0] : "not defined"
+            'opQueueQueueCount': v.encryptionOpQueue
+                ? v.encryptionOpQueue._queue.length : "not defined",
+            'opQueueErrRetries': v.encryptionOpQueue
+                ? v.encryptionOpQueue._error_retries : "not defined",
+            'opQueueCurrentOp': v.encryptionOpQueue
+                && v.encryptionOpQueue._queue.length > 0
+                    ? v.encryptionOpQueue._queue[0][0] : "not defined"
         };
 
-        if(report.haveRtc) {
-            if(v.callStats) {
+        if (report.haveRtc) {
+            if (v.callStats) {
                 r.rtcCallStats = v.callStats;
             }
         }
@@ -2399,19 +2542,18 @@ function generateAnonymousReport() {
 
     report.chatRoomState = chatStates;
 
-    if (is_chrome_firefox)
-    {
+    if (is_chrome_firefox) {
         report.mo = mozBrowserID + '::' + is_chrome_firefox + '::' + mozMEGAExtensionVersion;
     }
 
     var apireqHaveBackOffs = {};
     apixs.forEach(function(v, k) {
-        if(v.backoff > 0) {
+        if (v.backoff > 0) {
             apireqHaveBackOffs[k] = v.backoff;
         }
     });
 
-    if(Object.keys(apireqHaveBackOffs).length > 0) {
+    if (Object.keys(apireqHaveBackOffs).length > 0) {
         report.apireqbackoffs = apireqHaveBackOffs;
     }
 
@@ -2429,7 +2571,7 @@ function generateAnonymousReport() {
     report.l = lang;
     report.scrnSize = window.screen.availWidth + "x" + window.screen.availHeight;
 
-    if(typeof(window.devicePixelRatio) != 'undefined') {
+    if (typeof(window.devicePixelRatio) != 'undefined') {
         report.pixRatio = window.devicePixelRatio;
     }
 
@@ -2438,7 +2580,8 @@ function generateAnonymousReport() {
         report.memUsed = window.performance.memory.usedJSHeapSize;
         report.memTotal = window.performance.memory.totalJSHeapSize;
         report.memLim = window.performance.memory.jsHeapSizeLimit;
-    } catch(e) {}
+    }
+    catch (e) {}
 
     report.jslC = jslcomplete;
     report.jslI = jsli;
@@ -2462,7 +2605,7 @@ function generateAnonymousReport() {
                     ];
             })
             .fail(function(r) {
-                    report.scripts[src] = false;
+                report.scripts[src] = false;
             })
         );
     });
@@ -2482,16 +2625,22 @@ function generateAnonymousReport() {
 
 function MegaEvents() {}
 MegaEvents.prototype.trigger = function(name, args) {
-    if (!(this._events && this._events.hasOwnProperty(name))) return false;
+    if (!(this._events && this._events.hasOwnProperty(name))) {
+        return false;
+    }
 
-    if (d > 1) console.log(' >>> Triggering ' + name, this._events[name].length, args );
+    if (d > 1) {
+        console.log(' >>> Triggering ' + name, this._events[name].length, args);
+    }
 
     args = args || []
-    var done = 0, evs = this._events[name];
+    var done = 0,
+        evs = this._events[name];
     for (var i in evs) {
         try {
             evs[i].apply(null, args);
-        } catch(ex) {
+        }
+        catch (ex) {
             console.error(ex);
         }
         ++done;
@@ -2499,7 +2648,9 @@ MegaEvents.prototype.trigger = function(name, args) {
     return done;
 };
 MegaEvents.prototype.on = function(name, callback) {
-    if (!this._events) this._events = {};
+    if (!this._events) {
+        this._events = {};
+    }
     if (!this._events.hasOwnProperty(name)) {
         this._events[name] = [];
     }
@@ -2516,8 +2667,7 @@ MegaEvents.prototype.on = function(name, callback) {
 
         data = data || {};
         data = $.extend(
-            true,
-            {}, {
+            true, {}, {
                 'aid': this.sessionId,
                 'lang': typeof(lang) !== 'undefined' ? lang : null,
                 'browserlang': navigator.language,
@@ -2526,7 +2676,9 @@ MegaEvents.prototype.on = function(name, callback) {
             data
         );
 
-        if (c == 'pro' && sessionStorage.proref) data['ref'] = sessionStorage.proref;
+        if (c == 'pro' && sessionStorage.proref) {
+            data['ref'] = sessionStorage.proref;
+        }
 
         var msg = JSON.stringify({
             'c': c,
@@ -2534,13 +2686,17 @@ MegaEvents.prototype.on = function(name, callback) {
             'data': data
         });
 
-        if(d) {
+        if (d) {
             console.log("megaAnalytics: ", c, e, data);
         }
-        if(window.location.toString().indexOf("mega.dev") !== -1) {
+        if (window.location.toString().indexOf("mega.dev") !== -1) {
             return;
         }
-        api_req({ a: 'log',e: this.loggerId, m: msg},  {});
+        api_req({
+            a: 'log',
+            e: this.loggerId,
+            m: msg
+        }, {});
     };
     scope.megaAnalytics = new MegaAnalytics(99999);
 })(this);

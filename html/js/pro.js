@@ -348,7 +348,7 @@ function pro_pay()
 	if (localStorage.affid && localStorage.affts > new Date().getTime()-86400000) aff = localStorage.affid;
 
     if (!ul_uploading && !downloading) {
-        redirectToPaypal();
+        redirectToPaymentProvider();
     }
 
     // Data for API request
@@ -371,7 +371,8 @@ function pro_pay()
                     pro_m = 0;
                 }
 				else {
-                    pro_m = 1;
+                    // Coinify
+                    pro_m = 4;
                 }
 				
 				var proref = '';
@@ -397,22 +398,16 @@ function pro_pay()
 								document.location.hash = 'account';								
 							}
 						}
-						else
-						{					
-							var ppurl = 'https://www.paypal.com/cgi-bin/webscr';
-							if (res && res.EUR)
-							{	
-								var j = 0;
-								for (var i in res.EUR)
-								{
-									if (j == 0) ppurl += '?';
-									else ppurl += '&';
-									ppurl += i + '=' + encodeURIComponent(res.EUR[i]);
-									j++;
-								}								
-								loadingDialog.hide();
-								redirectToPaypal(ppurl);                                
-							}			
+                        else {
+                            // If Coinify
+                            if ((pro_m >= 4) && res && res.EUR)
+                            {
+                                loadingDialog.hide();
+                                
+                                console.log('Redirect URL: ' + res.EUR['url']);
+                                
+                                redirectToPaymentProvider(res.EUR['url'], pro_m);
+                            }
 							else
 							{
 								loadingDialog.hide();
@@ -871,11 +866,7 @@ var doProRegister = function($dialog) {
 };
 
 var paypalTimeout = null;
-function redirectToPaypal(url) {
-    
-    // Temporarily redirect to #resellers page because PayPal aren't taking payments anymore
-    window.location.replace("#resellers");
-    return false;
+function redirectToPaymentProvider(url) {
     
     clearTimeout(paypalTimeout);
 

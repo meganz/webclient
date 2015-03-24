@@ -685,6 +685,7 @@ function showNonActivatedAccountDialog(log) {
  * Shows a dialog with a message that the user is over quota
  */
 function showOverQuotaDialog() {
+    
     // Show the dialog
     var $dialog = $('.top-warning-popup');
     $dialog.addClass('active');

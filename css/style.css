@@ -956,6 +956,9 @@ a.account-manage-button:hover {
 .exceeded .fm-bar-title.used-info, .exceeded .fm-bar-size.used, .exceeded .fm-bar-size.available {
 	color: rgba(217,0,7,1)
 }
+.exceeded .nw-fm-percentage li span, .exceeded .nw-fm-line-progress-bar {
+	background-color: rgba(217,0,7,1);
+}
 .nw-fm-percents {
 	content: "";
 	position: absolute;
@@ -1649,10 +1652,11 @@ a.blog-button:hover {
 	line-height: 46px;
 	margin: 8px 0;
 	display: block;
+	text-transform:uppercase;
 }
 .notification-request-buttons {
 	float: right;
-	padding: 9px 20px 0 8px;
+	padding: 4px 20px 0 8px;
 	display: none;
 }
 .nt-contact-request .notification-request-buttons {
@@ -4881,7 +4885,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	color: rgba(255,255,255,0.7);
 	font-family: 'Open Sans', Arial, Helvetica, sans-serif;
 	font-size: 12px;
-	cursor: default;
+	cursor: pointer;
 }
 .download-page .user-name, .download-page a.user-name {
 	color: #666666;
@@ -11670,6 +11674,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
 .membership-medium-txt.red-bg.editprofile, .membership-medium-txt.gray-bg.cancel-account {
 	margin-top: 7px;
 }
+.membership-medium-txt.gray-bg.cancel-account {
+	margin-top: 7px;
+}
 .membership-small-txt {
 	font-size: 12px;
 }
@@ -16642,13 +16649,13 @@ strong, b {
 	width: 32px;
 	display: inline-block;
 	margin: 0 4px 0 4px;
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 	-moz-opacity: 0.5;
 	-khtml-opacity: 0.5;
 	opacity: 0.5;
 }
 .resellers-link:hover .resellers-payment {
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
 	-moz-opacity: 1;
 	-khtml-opacity: 1;
 	opacity: 1;
@@ -16658,6 +16665,25 @@ strong, b {
 	line-height: 25px;
 	color: #333333;
 	padding: 20px 0 17px 0;
+}
+.wire-transfer-details {
+    margin-bottom: 20px;
+}
+/* Make the wire transfer details mouse selectable */
+.wire-transfer-details * {
+	-webkit-touch-callout: text !important;
+	-webkit-user-select: text !important;
+	-khtml-user-select: text !important;
+	-moz-user-select: text !important;
+	-ms-user-select: text !important;
+	user-select: text !important;
+}
+.resellers-top-txt .wire-transfer-details th {
+	padding-right: 15px;
+	text-align: left;
+}
+.resellers-top-txt .wire-transfer-details .bank-address {
+	padding-bottom: 15px;
 }
 /* Avatar Picket */
 .top-login-input-tooltip.active {
@@ -19231,6 +19257,20 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 	border-radius: 4px;
 	cursor: pointer;
 }
+.cancel-account-button {
+	height: 24px;
+	background-color: #D32200;
+	padding: 0 15px;
+	float: left;
+	line-height: 23px;
+	font-size: 12px;
+	color: white;
+	margin-top: 4px;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+	cursor: pointer;
+}
 .backup-recover .login-register-input {
 	padding-right: 70px;
 	margin-top: 6px;
@@ -19548,7 +19588,7 @@ a.blog-article-button {
 	width: 100%;
 	text-align: center;
 }
-.animations-left-container. currentLink, .animations-right-container .currentLink {
+.animations-left-container.currentLink, .animations-right-container .currentLink {
  display:block;
 }
 .products-bottom-block {

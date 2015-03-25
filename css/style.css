@@ -1653,6 +1653,7 @@ a.blog-button:hover {
 	margin: 8px 0;
 	display: block;
 	text-transform:uppercase;
+	font-family:'Open Sans Light';
 }
 .notification-request-buttons {
 	float: right;
@@ -11616,7 +11617,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
 	box-sizing: border-box;
 	border-right: 2px solid #f6f6f6;
 }
-.membership-icon {
+.membership-icon-old {
 	width: 65px;
 	height: 65px;
 	margin: 20px 0 20px 24px;
@@ -11625,23 +11626,11 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
 	background-position: center top;
 	background-repeat: no-repeat;
 }
-.membership-icon.pro1 {
-	background-position: center top;
-}
-.membership-icon.pro2 {
-	background-position: center -115px;
-}
-.membership-icon.pro3 {
-	background-position: center -230px;
-}
-.membership-icon.free {
-	background-position: center -340px;
-}
-.membership-icon.contacts {
+.membership-icon-old.contacts {
 	background-position: center -604px;
 	margin: 0;
 }
-.dates .membership-icon {
+.dates .membership-icon-old {
 	background-position: -16px -467px;
 }
 .membership-icon-txt-bl {
@@ -12706,7 +12695,7 @@ table {
 	float: none;
 	margin: 0 0 0 15px;
 }
-.fm-account-mutliple-bl .membership-icon {
+.fm-account-mutliple-bl .membership-icon-old {
 	margin: 0;
 }
 .fm-account-mutliple-bl.dates .fm-account-info-block {
@@ -14367,7 +14356,7 @@ h5.main-italic-header {
 	width: 98px;
 	height: 98px;
 }
-.reg-st3-membership-icon {
+.reg-st3-membership-icon, .membership-icon {
 	width: 70px;
 	height: 70px;
 	background-image: url(../images/mega/register-big-sprite-v1.png);
@@ -14378,19 +14367,27 @@ h5.main-italic-header {
 	left: 50%;
 	top: -28px;
 }
-.free .reg-st3-membership-icon, .loginrequired-dialog .fm-notification-icon.plan0 {
+.membership-popup .membership-icon, .fm-account-mutliple-bl .membership-icon {
+	position:static;
+	float:left;
+	margin:20px 0 0 20px;
+}
+.fm-account-mutliple-bl .membership-icon {
+	margin:0;
+}
+.free .reg-st3-membership-icon, .loginrequired-dialog .fm-notification-icon.plan0, .free.membership-icon {
 	background-position: center -210px;
 }
-.pro4 .reg-st3-membership-icon, .loginrequired-dialog .fm-notification-icon.plan1 {
+.pro4 .reg-st3-membership-icon, .loginrequired-dialog .fm-notification-icon.plan1, .pro4.membership-icon {
 	background-position: center -339px;
 }
-.pro1 .reg-st3-membership-icon, .loginrequired-dialog .fm-notification-icon.plan2 {
+.pro1 .reg-st3-membership-icon, .loginrequired-dialog .fm-notification-icon.plan2, .pro1.membership-icon {
 	background-position: center -470px;
 }
-.pro2 .reg-st3-membership-icon, .loginrequired-dialog .fm-notification-icon.plan3 {
+.pro2 .reg-st3-membership-icon, .loginrequired-dialog .fm-notification-icon.plan3, .pro2.membership-icon {
 	background-position: center -600px;
 }
-.pro3 .reg-st3-membership-icon, .loginrequired-dialog .fm-notification-icon.plan4 {
+.pro3 .reg-st3-membership-icon, .loginrequired-dialog .fm-notification-icon.plan4, .pro3.membership-icon {
 	background-position: center -729px;
 }
 .key3-top, .key .pro-top {
@@ -22865,7 +22862,7 @@ top-login-spr .nlanguage-tooltip-bg, .nlanguage-bottom {
  background-image: url(../images/mega/top-login-sprite@2x_v4.png);
  background-size:48px auto;
 }
- .reg-success-icon, .reg-st3-save-icon, .reg-st3-membership-icon, .loginrequired-dialog .fm-notification-icon {
+ .reg-success-icon, .reg-st3-save-icon, .reg-st3-membership-icon, .membership-icon, .loginrequired-dialog .fm-notification-icon {
  background-image: url(../images/mega/register-big-sprite-v1@2x.png);
  background-size: 100px auto;
 }
@@ -22953,7 +22950,7 @@ background-size: 36px auto;
 background-image: url(../images/mega/empty@2x.png);
  background-size: 300px auto;
 }
-.membership-icon {
+.membership-icon-old {
  background-image: url(../images/mega/membership-spite@2x.png);
  background-size: 83px auto;
 }

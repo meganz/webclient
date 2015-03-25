@@ -115,8 +115,7 @@ function ui_keycomplete()
         document.location.hash = 'fm';
     }
     else {
-        init_pro();
-        mainScroll();
-        init_chat();
+        localStorage.keycomplete = true;
+        document.location.hash = 'pro';
     }
 }

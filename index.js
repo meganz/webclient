@@ -1226,7 +1226,7 @@ function topmenuUI() {
         }
         if (!e || ($(e.target).parents('.membership-popup').length == 0
                 && ((c && c.indexOf('membership-status') == -1) || !c))
-                || (c && c.indexOf('membership-button') > -1)) {
+                || (c && c.indexOf('mem-button') > -1)) {
             $('.membership-popup').removeClass('active');
             $('.membership-status-block').removeClass('active');
         }
@@ -1465,7 +1465,7 @@ function topmenuUI() {
                     $('.membership-usage-txt.bandwidth').addClass('exceeded');
                 }
 
-                $('.membership-popup .membership-button').rebind('click', function (e) {
+                $('.membership-popup .mem-button').rebind('click', function (e) {
                     document.location.hash = 'fm/account';
                     $.hideTopMenu(e);
                 });

@@ -1,65 +1,43 @@
-var pro_package;
-var pro_packs = [];
-var pro_balance = 0;
-var pro_paymentmethod;
-var pro_m;
-var pro_usebalance=false;
+var pro_package,
+	pro_balance = 0,
+	pro_paymentmethod,
+	pro_m,
+	account_type_num,
+	pro_usebalance = false,
+    membershipPlans = [],
+    selectedProPackage = [];
 
-function switch_pro(data)
-{
-	 if(data)
-	 {
-		$('#month').addClass('red');
-		$('#year').removeClass('red');
-		$('.reg-st3-save-icon').addClass('hidden');
-		$('.pro-new-year').addClass('hidden');
-		$('.pro-new-month').removeClass('hidden');			
-		$('.pro1 .reg-st3-bott-title.right').html('9<span>.99 &euro;</span>');
-		$('.pro2 .reg-st3-bott-title.right').html('19<span>.99 &euro;</span>');
-		$('.pro3 .reg-st3-bott-title.right').html('29<span>.99 &euro;</span>');
-		$('.pro1 .reg-st3-bandwidth .reg-st3-big-txt').html('1 <span>TB</span>');
-		$('.pro2 .reg-st3-bandwidth .reg-st3-big-txt').html('4 <span>TB</span>');
-		$('.pro3 .reg-st3-bandwidth .reg-st3-big-txt').html('8 <span>TB</span>');
-         $('#reg-checkbox').attr('checked',true);
-	 } 
-	 else 
-	 {
-		$('#month').removeClass('red');
-		$('#year').addClass('red');
-		$('.reg-st3-save-icon').removeClass('hidden');
-		$('.pro-new-year').removeClass('hidden');
-		$('.pro-new-month').addClass('hidden');			
-		$('.pro1 .reg-st3-bott-title.right').html('99<span>.99 &euro;</span>');
-		$('.pro2 .reg-st3-bott-title.right').html('199<span>.99 &euro;</span>');
-		$('.pro3 .reg-st3-bott-title.right').html('299<span>.99 &euro;</span>');			
-		$('.pro1 .reg-st3-bandwidth .reg-st3-big-txt').html('12 <span>TB</span>');
-		$('.pro2 .reg-st3-bandwidth .reg-st3-big-txt').html('48 <span>TB</span>');
-		$('.pro3 .reg-st3-bandwidth .reg-st3-big-txt').html('96 <span>TB</span>');
-         $('#reg-checkbox').attr('checked',false);
-	 }
-}
+// Payment gateways, hardcoded for now, will call API in future to get list
+var gatewayOptions = [
+    {   
+        apiGatewayId: 4,
+        displayName: 'Bitcoin',
+        supportsRecurring: false,
+        cssClass: 'bitcoin',
+        providerName: 'Coinify'
+    }
+];
 
 function init_pro()
 {
-    var DEFAULT = 'monthly'; 
-	
-	if (DEFAULT == 'monthly') 
-	{
-		switch_pro(true);
+	if (localStorage.keycomplete) {
+		$('body').addClass('key');
+	    sessionStorage.proref = 'accountcompletion';
+		localStorage.removeItem('keycomplete');
 	}
-	else
-	{
-		switch_pro(false);	
-	}
-
+    else {
+        $('body').addClass('pro');
+    }	
+    
 	if (u_type == 3)
 	{
-		api_req(
-		{ a : 'uq',pro : 1},
-		{ 
+        // Flag 'pro : 1' includes pro balance in the response
+		api_req({ a : 'uq', pro : 1 }, { 
 			callback : function (res) 
 			{
-				if (typeof res == 'object' && res.balance && res.balance[0]) pro_balance = res.balance[0][0];
+				if (typeof res == 'object' && res.balance && res.balance[0]) {
+                    pro_balance = res.balance[0][0];
+                }
 			}
 		});	
 	}
@@ -71,55 +49,62 @@ function init_pro()
 	
 	if (document.location.hash.indexOf('#pro#') > -1) sessionStorage.proref = document.location.hash.replace('#pro#','');
 	
-	
-	$('body').addClass('pro');
-	if (lang != 'en') $('body').addClass(lang);	
-	json = JSON.parse(pro_json);				
-	for (var i in json[0])
-	{
-		if      ((json[0][i][2] == '500') && (json[0][i][5] == '9.99')) 	pro_packs['pro1_month'] = json[0][i];
-		else if ((json[0][i][2] == '500') && (json[0][i][5] == '99.99')) 	pro_packs['pro1_year'] 	= json[0][i];
-		else if ((json[0][i][2] == '2048') && (json[0][i][5] == '19.99')) 	pro_packs['pro2_month'] = json[0][i];
-		else if ((json[0][i][2] == '2048') && (json[0][i][5] == '199.99')) 	pro_packs['pro2_year'] 	= json[0][i];
-		else if ((json[0][i][2] == '4096') && (json[0][i][5] == '29.99')) 	pro_packs['pro3_month'] = json[0][i];
-		else if ((json[0][i][2] == '4096') && (json[0][i][5] == '299.99')) 	pro_packs['pro3_year'] 	= json[0][i];		
-	}
+	if (lang !== 'en') $('.reg-st3-save-txt').addClass(lang);
+    if (lang == 'fr') $('.reg-st3-big-txt').each(function(e,o){$(o).html($(o).html().replace('GB','Go').replace('TB','To'));});
+		
 	if (!m)
 	{
-	   if (lang == 'fr') $('.reg-st3-big-txt').each(function(e,o){$(o).html($(o).html().replace('GB','Go').replace('TB','To'));});
-	   if (lang !== 'en') $('.reg-st3-save-txt').addClass(lang);	   
-	   $('.reg-checkbox :checkbox').iphoneStyle({resizeContainer:false,resizeHandle:false,onChange:function(elem, data)
-	   {
-		 switch_pro(data);	     
-		 if (lang == 'fr') $('.reg-st3-big-txt').each(function(e,o){$(o).html($(o).html().replace('GB','Go').replace('TB','To'));});
-		}
-	   });
-	   
-	    $('.reg-st3-membership-bl').unbind('click');
-		$('.reg-st3-membership-bl').bind('click',function(e)
+        // Get the membership plans. This call will return an array of arrays. Each array contains this data:
+        // [api_id, account_level, storage, transfer, months, price, currency, description, ios_id, google_id]
+        // More data can be retrieved with 'f : 1'
+	    api_req({ a : 'utqa' }, {
+            callback: function (result)
+            {
+                // Store globally
+                membershipPlans = result;
+                
+                // Render the plan details
+                populateMembershipPlans();
+            }
+        });
+		
+		if (lang !== 'en') $('.reg-st3-save-txt').addClass(lang);
+	    if (lang == 'fr') $('.reg-st3-big-txt').each(function(e,o){$(o).html($(o).html().replace('GB','Go').replace('TB','To'));});
+	     
+	    $('.membership-step1 .reg-st3-membership-bl').unbind('click');
+		$('.membership-step1 .reg-st3-membership-bl').bind('click',function(e)
 		{		
 			$('.reg-st3-membership-bl').removeClass('selected');
-			$(this).addClass('selected');		
+			$(this).addClass('selected');	
 		});
 		
-		 $('.reg-st3-membership-bl').unbind('dblclick');
-		$('.reg-st3-membership-bl').bind('dblclick',function(e)
+		$('.membership-step1 .reg-st3-membership-bl').unbind('dblclick');
+		$('.membership-step1 .reg-st3-membership-bl').bind('dblclick',function(e)
 		{		
 			$('.reg-st3-membership-bl').removeClass('selected');
 			$(this).addClass('selected');
-			pro_proceed(e);
+			pro_next_step($(this).attr('class').split(' ')[1]);	
 		});
-		$('.pro-gray-block .register-st2-button-arrow').unbind('click');
-		$('.pro-gray-block .register-st2-button-arrow').bind('click',function(e)
-		{
-            pro_proceed(e);
-            return false;
-		});		
 		
-		$('.key3 .register-st2-button-arrow').unbind('click');
-		$('.key3 .register-st2-button-arrow').bind('click',function(e)
+		$('.membership-free-button').unbind('click');
+		$('.membership-free-button').bind('click',function(e) {
+			if (page == 'fm') document.location.hash = '#start';
+		    else document.location.hash = '#fm';
+		    return false;
+		});
+		
+		$('.membership-button').unbind('click');
+		$('.membership-button').bind('click',function(e)
 		{
-			pro_proceed(e);
+			var $membershipBlock = $(this).closest('.reg-st3-membership-bl');
+				
+			$('.reg-st3-membership-bl').removeClass('selected');
+			$membershipBlock.addClass('selected');
+			
+			account_type_num = $membershipBlock.attr('data-payment');
+			$membershipBlock.clone().appendTo( '.membership-selected-block');
+			$('.membership-step2 .pro span').html($membershipBlock.find('.reg-st3-bott-title.title').html())	;
+			pro_next_step();			
 		});		
 		
 		$('.pro-bottom-button').unbind('click');
@@ -130,54 +115,218 @@ function init_pro()
 	}
 }
 
-function pro_proceed(e)
-{
-	if (page == 'key') sessionStorage.proref = 'accountcompletion';
+/**
+ * Populate the monthly plans across the main #pro page
+ */
+function populateMembershipPlans() {
+    
+    for (var i = 0, length = membershipPlans.length; i < length; i++) {
 
-	var c = $('.reg-st3-membership-bl.selected').attr('class');
-	if (c.indexOf('free') > -1)
-	{
-		if (page == 'fm') document.location.hash = '#start';
-		else document.location.hash = '#fm';
+        var accountLevel = membershipPlans[i][1];
+        var months = membershipPlans[i][4];
+        var price = membershipPlans[i][5].split('.');
+        var dollars = price[0];
+        var cents = price[1];
 
-		return false;
-	}
-	else if(c.indexOf('pro1') > -1 && $('#reg-checkbox').attr('checked')) pro_package = 'pro1_month';
-	else if(c.indexOf('pro1') > -1) pro_package = 'pro1_year';
-	else if(c.indexOf('pro2') > -1 && $('#reg-checkbox').attr('checked')) pro_package = 'pro2_month';		
-	else if(c.indexOf('pro2') > -1) pro_package = 'pro2_year';
-	else if(c.indexOf('pro3') > -1 && $('#reg-checkbox').attr('checked')) pro_package = 'pro3_month';
-	else if(c.indexOf('pro3') > -1) pro_package = 'pro3_year';
-
-    megaAnalytics.log("pro", "proc");
-
-	if (pro_package) pro_continue();
+        if (months === 1) {
+            $('.reg-st3-membership-bl.pro' + accountLevel + ' .price .num').html(
+                dollars + '<span class="small">.' + cents + ' &euro;</span>'
+            );
+        }
+    }
 }
 
-function pro_continue()
-{
+/**
+ * Loads the payment gateway options into Payment options section
+ */
+function loadPaymentGatewayOptions() {
+    
+    var html = '';
+    
+    // Loop through gateway providers (change to use list from API soon)
+    for (var i = 0, length = gatewayOptions.length; i < length; i++) {
+        
+        // Pre-select the first option in the list
+        var gatewayOption = gatewayOptions[i];
+        var optionChecked = (i === 0) ? 'checked="checked" ' : '';
+        
+        // Update name of the provider
+        if (i === 0) {
+            $('.payment-provider-name').text(gatewayOption.providerName);
+        }
+        
+        // Create a radio button with icon for each payment gateway
+        html += '<div class="membership-radio">'
+             +      '<input type="radio" name="' + gatewayOption.cssClass + '" id="' + gatewayOption.cssClass + '" ' + optionChecked + 'disabled="disabled" />'
+             +      '<div></div>'
+             +  '</div>'
+             +  '<div class="membership-radio-label ' + gatewayOption.cssClass + '">'
+             +      gatewayOption.displayName
+             +  '</div>';
+    }
+    
+    $('.payment-options-list').html(html);
+}
 
-    if(!u_handle) {
+// Step2
+function pro_next_step() {
+	
+	if (!u_handle) {
         megaAnalytics.log("pro", "loginreq");
-        //msgDialog('loginrequired', 'title', 'msg');
         showSignupPromptDialog();
         return;
-    } else if(isEphemeral()) {
+    }
+    else if(isEphemeral()) {
         showRegisterDialog();
         return;
     }
+	
+	megaAnalytics.log('pro', 'proc');
+	
+	var currentDate = new Date(),
+        monthName = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+	    mon = monthName[currentDate.getMonth()],
+		day = currentDate.getDate(),
+		price = [];
+    
+    renderPlanDurationDropDown();
+    
+	$('.membership-step1').addClass('hidden');
+	$('.membership-step2').removeClass('hidden');
+	mainScroll();
+	
+	$('.membership-date .month').text(mon);
+	$('.membership-date .day').text(day);
+	
+	$('.membership-dropdown-item').each(function() {
+        $(this).find('strong').html(price[$(this).attr('data-months')]);
+    });
+	
+	$('.membership-st2-select span').unbind('click');
+	$('.membership-st2-select span').bind('click', function ()
+    {
+        if ($('.membership-st2-select').attr('class').indexOf('active') == -1) {
+            $('.membership-st2-select').addClass('active');
+        }
+        else {
+            $('.membership-st2-select').removeClass('active');
+        }
+    });
+	
+	$('.membership-dropdown-item').unbind('click');
+    $('.membership-dropdown-item').bind('click', function ()
+    {
+        var price = $(this).find('strong').html();
+        $('.membership-dropdown-item').removeClass('selected');
+        $(this).addClass('selected');
+        $('.membership-st2-select').removeClass('active');
+        $('.membership-st2-select span').html($(this).html());
+        
+        if (price) {
+            $('.membership-center.inactive').removeClass('inactive');
+            $('.membership-bott-price strong').html(price.split('.')[0] + '<span>.' + price.split('.')[1] + ' &euro;</span>');
+        }
+    });
+	
+	$('.membership-bott-button').unbind('click');
+	$('.membership-bott-button').bind('click',function(e)
+	{	
+		if ($('.membership-center').attr('class').indexOf('inactive')==-1) {
+			pro_continue(e);
+            return false;
+		}
+	});
+	
+    loadPaymentGatewayOptions();
+}
 
-	pro_paymentmethod='';
+/**
+ * Renders the pro plan prices into the Plan Duration dropdown
+ */
+function renderPlanDurationDropDown() {
+    
+    // Sort plan durations by lowest number of months first
+    membershipPlans.sort(function (planA, planB) {
+        
+        var numOfMonthsPlanA = planA[4];
+        var numOfMonthsPlanB = planB[4];
+        
+        if (numOfMonthsPlanA < numOfMonthsPlanB) {
+            return -1;
+        }
+        if (numOfMonthsPlanA > numOfMonthsPlanB) {
+            return 1;
+        }
+        
+        return 0;
+    });
+    
+    var html = '';
+    
+    // Loop through the available plan durations for the current membership plan
+	for (var i = 0, length = membershipPlans.length; i < length; i++) {
+        
+        var currentPlan = membershipPlans[i];
+        
+        // If match on the membership plan, display that pricing option in the dropdown
+        if (currentPlan[1] == account_type_num) {
+
+            // Get the price and number of months duration
+            var price = currentPlan[5];
+            var numOfMonths = currentPlan[4];
+            var monthsWording = '1 month';            
+
+            // Change wording depending on number of months
+            if (numOfMonths === 12) {
+                monthsWording = '1 year';
+            }
+            else if (numOfMonths > 1) {
+                monthsWording = numOfMonths + ' months';
+            }
+
+            // Build select option
+            html += '<div class="membership-dropdown-item" data-plan-index="' + i + '">'
+                 +       monthsWording + ' (<strong>' + price + '</strong> €)'
+                 +  '</div>';
+        }
+    }
+    
+    // Update drop down HTML
+    $('.membership-st2-dropdown').html(html);    
+}
+
+function pro_continue(e)
+{
+    var selectedProPackageIndex = $('.membership-dropdown-item.selected').attr('data-plan-index');
+    
+    // Set the pro package (used in pro_pay function)
+    selectedProPackage = membershipPlans[selectedProPackageIndex];
+    
+    // Get the months and price
+    var selectedPlanMonths = selectedProPackage[4];
+    var selectedPlanPrice = selectedProPackage[5];
+    
+	if (selectedPlanMonths < 12) {
+        pro_package = 'pro' + account_type_num + '_month';
+    }
+	else {
+        pro_package = 'pro' + account_type_num + '_year';
+    }
+	
+	pro_paymentmethod = '';
+    
 	if (u_type === false)
 	{
 		u_storage = init_storage(localStorage);
 		loadingDialog.show();
+        
 		u_checklogin({ checkloginresult: function(u_ctx,r) 
 		{ 
 			pro_pay();
-		}},true);
+            
+		}}, true);
 	}
-	else if (parseFloat(pro_balance) >= parseFloat(pro_packs[pro_package][5]))
+	else if (parseFloat(pro_balance) >= parseFloat(selectedPlanPrice))
 	{
 		msgDialog('confirmation',l[504],l[5844],false,function(e)
 		{
@@ -185,21 +334,26 @@ function pro_continue()
 			pro_pay();		
 		});
 	}
-	else  pro_pay();	
+	else {
+        pro_pay();
+    }
 }
 
 function pro_pay()
-{
-	var aff=0;	
+{   
+	var aff = 0;	
 	if (localStorage.affid && localStorage.affts > new Date().getTime()-86400000) aff = localStorage.affid;
 
-    if(!ul_uploading && !downloading) {
-        redirectToPaypal();
+    if (!ul_uploading && !downloading) {
+        redirectToPaymentProvider();
     }
-	
-	
 
-    api_req({ a : 'uts', it: 0, si: pro_packs[pro_package][0], p: pro_packs[pro_package][5], c: pro_packs[pro_package][6], aff: aff, 'm':m},
+    // Data for API request
+    var apiId = selectedProPackage[0];
+    var price = selectedProPackage[5];
+    var currency = selectedProPackage[6];
+    
+    api_req({ a : 'uts', it: 0, si: apiId, p: price, c: currency, aff: aff, 'm': m },
 	{
 		callback : function (res)
 		{ 
@@ -210,11 +364,18 @@ function pro_pay()
 			}
 			else
 			{
-				if (pro_paymentmethod == 'pro_voucher' || pro_paymentmethod == 'pro_prepaid') pro_m = 0;
-				else pro_m = 1;
+				if (pro_paymentmethod == 'pro_voucher' || pro_paymentmethod == 'pro_prepaid') {
+                    pro_m = 0;
+                }
+				else {
+                    // Coinify
+                    pro_m = 4;
+                }
 				
 				var proref = '';
-				if (sessionStorage.proref) proref = sessionStorage.proref;
+				if (sessionStorage.proref) {
+                    proref = sessionStorage.proref;
+                }
 
 				api_req({ a : 'utc', s : [res], m : pro_m, r: proref },
 				{ 
@@ -234,22 +395,14 @@ function pro_pay()
 								document.location.hash = 'account';								
 							}
 						}
-						else
-						{					
-							var ppurl = 'https://www.paypal.com/cgi-bin/webscr';
-							if (res && res.EUR)
-							{	
-								var j = 0;
-								for (var i in res.EUR)
-								{
-									if (j == 0) ppurl += '?';
-									else ppurl += '&';
-									ppurl += i + '=' + encodeURIComponent(res.EUR[i]);
-									j++;
-								}								
-								loadingDialog.hide();
-								redirectToPaypal(ppurl);                                
-							}			
+                        else {
+                            // If Coinify
+                            if ((pro_m >= 4) && res && res.EUR)
+                            {
+                                // Redirect to payment provider
+                                loadingDialog.hide();                                
+                                redirectToPaymentProvider(res.EUR['url'], pro_m);
+                            }
 							else
 							{
 								loadingDialog.hide();
@@ -708,11 +861,7 @@ var doProRegister = function($dialog) {
 };
 
 var paypalTimeout = null;
-function redirectToPaypal(url) {
-    
-    // Temporarily redirect to #resellers page because PayPal aren't taking payments anymore
-    window.location.replace("#resellers");
-    return false;
+function redirectToPaymentProvider(url) {
     
     clearTimeout(paypalTimeout);
 
@@ -805,18 +954,10 @@ var showSignupPromptDialog = function() {
                 );
 
             // custom buttons, because of the styling
-            $('.fm-notification-info p',this.$dialog)
-                .html(
-                    '<p>' + l[5842] + '</p>\n' +
-                    '<a class="top-login-button" href="#login">' + l[171] + '</a>\n' +
-                    '<a class="create-account-button" href="#register">' + l[1076] + '</a><br/>'
-                );
+            $('.fm-notification-info',this.$dialog)
+                .html('<p>' + l[5842] + '</p>');
 
-            $('.fm-notifications-bottom', this.$dialog)
-                .addClass('hidden')
-                .html('');
-
-            $('.top-login-button', this.$dialog)
+            $('.fm-dialog-button.pro-login', this.$dialog)
                 .unbind('click.loginrequired')
                 .bind('click.loginrequired', function() {
                     signupPromptDialog.hide();
@@ -824,7 +965,7 @@ var showSignupPromptDialog = function() {
                     return false;
                 });
 
-            $('.create-account-button', this.$dialog)
+            $('.fm-dialog-button.pro-register', this.$dialog)
                 .unbind('click.loginrequired')
                 .bind('click.loginrequired', function() {
                     signupPromptDialog.hide();
@@ -838,13 +979,15 @@ var showSignupPromptDialog = function() {
 
     var $selectedPlan = $('.reg-st3-membership-bl.selected');
     var plan = 1;
-    if($selectedPlan.is(".pro1")) { plan = 1; }
-    else if($selectedPlan.is(".pro2")) { plan = 2; }
-    else if($selectedPlan.is(".pro3")) { plan = 3; }
+    if($selectedPlan.is(".lite")) { plan = 1; }
+	else if($selectedPlan.is(".pro1")) { plan = 2; }
+    else if($selectedPlan.is(".pro2")) { plan = 3; }
+    else if($selectedPlan.is(".pro3")) { plan = 4; }
 
     $('.loginrequired-dialog .fm-notification-icon')
         .removeClass('plan1')
         .removeClass('plan2')
         .removeClass('plan3')
+		.removeClass('plan4')
         .addClass('plan' + plan);
 }

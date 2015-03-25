@@ -2886,20 +2886,66 @@ function accountUI()
             else
                 return -1;
         });
+        
         $('.grid-table.purchases tr').remove();
         var html = '<tr><th>' + l[475] + '</th><th>' + l[476] + '</th><th>' + l[477] + '</th><th>' + l[478] + '</th></tr>';
-        $(account.purchases).each(function(i, el)
+        
+        // The purchase history rendering below needs to be refactored and not hard coded. 
+        // Or in the future as soon as the prices change it will break the account page.
+        var pro = {
+            
+            // Monthly
+            '9.99': ['PRO I (' + l[918] + ')', '1'],
+            '19.99': ['PRO II (' + l[918] + ')', '2'],
+            '29.99': ['PRO III (' + l[918] + ')', '3'],
+            '4.99': ['Lite (' + l[918] + ')', '4'],
+            
+            // Yearly
+            '99.99': ['PRO I (' + l[919] + ')', '1'],
+            '199.99': ['PRO II (' + l[919] + ')', '2'],
+            '299.99': ['PRO III (' + l[919] + ')', '3'],
+            '49.99': ['Lite (' + l[919] + ')', '4']
+        };
+        
+        // Render every purchase made into Purchase History on Account page
+        $(account.purchases).each(function(index, purchaseTransaction)
         {
-            var paymentmethod = 'Voucher';
-            if (el[4] == 1)
-                paymentmethod = 'PayPal';
-            else if (el[4] == 2)
-                paymentmethod = 'iTunes';
-            var pro = {'9.99': ['PRO I (' + l[918] + ')', '1'], '19.99': ['PRO II (' + l[918] + ')', '2'], '29.99': ['PRO III (' + l[918] + ')', '3'], '99.99': ['PRO I (' + l[919] + ')', '1'], '199.99': ['PRO II (' + l[919] + ')', '2'], '299.99': ['PRO III (' + l[919] + ')', '3']};
-            html += '<tr><td>' + time2date(el[1]) + '</td><td><span class="fm-member-icon"><img alt="" src="' + staticpath + 'images/mega/icons/retina/pro' + pro[el[2]][1] + '@2x.png" /></span><span class="fm-member-icon-txt"> ' + pro[el[2]][0] + '</span></td><td>&euro;' + htmlentities(el[2]) + '</td><td>' + paymentmethod + '</td></tr>';
-        });
-        $('.grid-table.purchases').html(html);
+            // Set payment method
+            var paymentMethodIndex = purchaseTransaction[4];
+            var paymentMethod = 'Voucher';           
+            
+            if (paymentMethodIndex == 1) {
+                paymentMethod = 'PayPal';
+            }
+            else if (paymentMethodIndex == 2) {
+                paymentMethod = 'iTunes';
+            }
+            else if (paymentMethodIndex == 4) {
+                paymentMethod = 'Bitcoin';
+            }
 
+            // Set Date/Time, Item (plan purchased), Amount, Payment Method
+            var dateTime = time2date(purchaseTransaction[1]);
+            var price = purchaseTransaction[2];
+            var proNum = pro[price][1];
+            var item = pro[price][0];
+            var priceEscaped = htmlentities(price);
+
+            // Render table row
+            html += '<tr>'
+                 +      '<td>' + dateTime + '</td>'
+                 +      '<td>'
+                 +           '<span class="fm-member-icon">'
+                 +                '<img alt="" src="' + staticpath + 'images/mega/icons/retina/pro' + proNum + '@2x.png" />'
+                 +           '</span>'
+                 +           '<span class="fm-member-icon-txt"> ' + item + '</span>'
+                 +      '</td>'
+                 +      '<td>&euro;' + priceEscaped + '</td>'
+                 +      '<td>' + paymentMethod + '</td>'
+                 +  '</tr>';
+        });
+
+        $('.grid-table.purchases').html(html);
         $('.account-history-dropdown-button.transactions').text(l[471].replace('[X]', $.transactionlimit));
         $('.account-history-drop-items.transaction10-').text(l[471].replace('[X]', 10));
         $('.account-history-drop-items.transaction100-').text(l[471].replace('[X]', 100));

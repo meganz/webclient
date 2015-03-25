@@ -9709,6 +9709,18 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
 	margin: -100px 0 0 -240px;
 	overflow: hidden;
 }
+.fm-dialog.generic-dialog {
+	width: auto;
+	height: auto;
+	min-width: 320px;
+	min-height: 240px;
+	margin: -160px 0 0 -150px;
+	overflow: hidden;
+	z-index: 1200;
+}
+.fm-dialog.generic-dialog .fm-dialog-contents {
+	min-height: 120px;
+}
 .fm-dialog.incoming-call-dialog {
 	width: 300px;
 	min-height: 320px;

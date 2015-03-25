@@ -452,6 +452,7 @@ function browserdetails(useragent) {
     var browserdetails = {};
     browserdetails.name = name;
     browserdetails.icon = icon;
+    browserdetails.os = os || '';
     browserdetails.browser = browser;
     // Determine if the OS is 64bit
     browserdetails.is64bit = /\b(WOW64|x86_64|Win64|intel mac os x 10.(9|\d{2,}))/i.test(useragent);

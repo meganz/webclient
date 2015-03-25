@@ -3511,7 +3511,7 @@ function accountUI()
         DEBUG('Cancel your account');
         
         // Ask for confirmation
-        msgDialog('confirmation', 'Cancel your account', l[1974], false, function(e) {
+        msgDialog('confirmation', l[6181], l[1974], false, function(e) {
             if (e) {
                 loadingDialog.show();
                 api_req({a: 'erm', m: M.u[u_handle].m, t: 21}, {

@@ -104,12 +104,12 @@
 
             if (code === 0) {
                 // Account successfully canceled/deleted
-                msgDialog('warninga', 'Account cancellation', 'Your account is canceled successfully.', '', function() {
+                msgDialog('warninga', l[6188], l[6189], '', function() {
                     document.location.hash = 'login';
                 });
             }
             else if (code === EEXPIRED || code === ENOENT) {
-                msgDialog('warninga', 'Cancellation link has expired.', 'Cancellation link has expired, please try again.', '', function() {
+                msgDialog('warninga', l[6184], l[6185], '', function() {
                     document.location.hash = 'fm/account';
                 });
             }
@@ -130,13 +130,13 @@
                 if (typeof res === 'number') {
                     if (res === EEXPIRED) {
                         loadingDialog.hide();
-                        msgDialog('warninga', 'Cancellation link has expired.', 'Cancellation link has expired, please try again.', '', function() {
+                        msgDialog('warninga', l[6184], l[6185], '', function() {
                             document.location.hash = 'fm/account';
                         });
                     }
                     else {
                         loadingDialog.hide();
-                        msgDialog('warninga', 'Invalid cancelation link.', 'Invalid cancellation link, please try again.', '', function() {
+                        msgDialog('warninga', l[6186], l[6187], '', function() {
                             document.location.hash = 'fm/account';
                         });
                     }

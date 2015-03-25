@@ -55,8 +55,9 @@ function init_pro()
 	if (!m)
 	{
         // Get the membership plans. This call will return an array of arrays. Each array contains this data:
-        // [api_id, account_level, storage, transfer, months, price, currency, description, ios_id, google_id]                
-	    api_req({ a : 'utqa'}, { 
+        // [api_id, account_level, storage, transfer, months, price, currency, description, ios_id, google_id]
+        // More data can be retrieved with 'f : 1'
+	    api_req({ a : 'utqa' }, {
             callback: function (result)
             {
                 // Store globally
@@ -244,11 +245,7 @@ function pro_next_step() {
  */
 function renderPlanDurationDropDown() {
     
-    /**
-     * Sort plan durations by lowest number of months first
-     * @param {Array} planA
-     * @param {Array} planB
-     */
+    // Sort plan durations by lowest number of months first
     membershipPlans.sort(function (planA, planB) {
         
         var numOfMonthsPlanA = planA[4];
@@ -402,10 +399,8 @@ function pro_pay()
                             // If Coinify
                             if ((pro_m >= 4) && res && res.EUR)
                             {
-                                loadingDialog.hide();
-                                
-                                console.log('Redirect URL: ' + res.EUR['url']);
-                                
+                                // Redirect to payment provider
+                                loadingDialog.hide();                                
                                 redirectToPaymentProvider(res.EUR['url'], pro_m);
                             }
 							else

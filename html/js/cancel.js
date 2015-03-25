@@ -45,7 +45,6 @@
         // Button cloase account listener
         $(self.opt.dialogClass + ' .fm-dialog-button.close-account').rebind('click', function(e) {
 
-//            if ($(this).hasClass('close-account')) {
             loadingDialog.show();
 
             self.opt.code = page.replace(self.opt.prefix, '');
@@ -55,7 +54,7 @@
 
                 // Password is matched
                 if (r) {
-                    self._getEmail(self._accountClosure);
+                    self._handleFeedback(self._accountClosure, self);
                 }
 
                 // Password is wrong
@@ -68,7 +67,6 @@
                     $(self.opt.passwordInputId).focus();
                 }
             });
-//            }
         });
 
         // Cancel button listener
@@ -100,19 +98,22 @@
         var self = this;
 
         api_resetuser({callback: function(code) {
-                closeDialog();
-                loadingDialog.hide();
+            closeDialog();
+            $('.reset-success-st2').removeClass('active');
+            loadingDialog.hide();
 
-                if (code === 0) {
-                    self._handleFeedback();
-
-                }
-                else if (code === EEXPIRED || code === ENOENT) {
-                    msgDialog('warninga', 'Cancellation link has expired.', 'Cancellation link has expired, please try again.', '', function() {
-                        document.location.hash = 'fm/account';
-                    });
-                }
-            }}, code, email, hash);
+            if (code === 0) {
+                // Account successfully canceled/deleted
+                msgDialog('warninga', 'Account cancellation', 'Your account is canceled successfully.', '', function() {
+                    document.location.hash = 'login';
+                });
+            }
+            else if (code === EEXPIRED || code === ENOENT) {
+                msgDialog('warninga', 'Cancellation link has expired.', 'Cancellation link has expired, please try again.', '', function() {
+                    document.location.hash = 'fm/account';
+                });
+            }
+        }}, code, email, hash);
     };
 
     /**
@@ -121,7 +122,7 @@
      * @param {callback} on success call this function
      * 
      */
-    AccountClosure.prototype._getEmail = function(callback) {
+    AccountClosure.prototype._getEmail = function(_handleFeedbackCallback, callback_obj) {
         var self = this;
 
         api_req({a: 'erv', c: self.opt.code}, {
@@ -143,8 +144,8 @@
                 else {
                     if (res[0] === 21) {
                         self.opt.email = res[1];
-                        if (callback) {
-                            callback(self.opt.code, self.opt.email, self.opt.secret.toString());
+                        if (_handleFeedbackCallback) {
+                            _handleFeedbackCallback(callback_obj);
                         }
                     }
                 }
@@ -153,88 +154,154 @@
     };
 
     AccountClosure.prototype._deleteLeftovers = function() {
-        mDBclear();
+//        mDBclear();
         for (var i in localStorage) {
             if (localStorage.hasOwnProperty(i)) {
 //                delete localStorage[i];
             }
         }
-        delete localStorage;
+//        delete localStorage;
         closeDialog();
+        $('.reset-success-st3').removeClass('active');
         document.location.hash = 'login';
     };
 
     AccountClosure.prototype._gatherFeedback = function() {
-        var text = '';
+        var text = '',
+            btnId = $('.reset-success-st3 .radioOn').attr('id');
 
         // Other: Textarea, $('.feedback-textarea textarea').val()
-        if ($('.radioOn').attr('id') === 'res1_div') {
+        if (btnId === 'res1_div') {
             text = "I don’t use my account anymore";
         }
-        else if ($('.radioOn').attr('id') === 'res2_div') {
+        else if (btnId === 'res2_div') {
             text = 'I have another MEGA account';
         }
-        else if ($('.radioOn').attr('id') === 'res3_div') {
+        else if (btnId === 'res3_div') {
             text = 'I have experienced too many problems';
         }
-        else if ($('.radioOn').attr('id') === 'res4_div') {
+        else if (btnId === 'res4_div') {
             text = "My favourite browser is not technologically compatible and I don't want to change";
         }
-        else if ($('.radioOn').attr('id') === 'res5_div') {
+        else if (btnId === 'res5_div') {
             text = "I find the interface too confusing to use";
         }
-        else if ($('.radioOn').attr('id') === 'res6_div') {
+        else if (btnId === 'res6_div') {
             text = "MEGA has under-delivered on its promise";
         }
         else {
-            text = $('.radio-txt.active').text();
+            text = $('.feedback-textarea-bl textarea').val();
         }
 
         return text;
     };
 
     AccountClosure.prototype._prepareJsonString = function(text) {
-        var result;
 
-        result = '{"lang": "' + lang + '", "feedbackText": "' + text + '"}';
+        var result = '{"lang": "' + lang + '", "feedbackText": "' + text + '"}';
 
         return result;
     };
 
-    AccountClosure.prototype._handleFeedback = function() {
-        var self = this;
-//                $('.fm-dialog-overlay').removeClass('hidden');
-//                $('body').addClass('overlayed');
-        $('.fm-dialog' + self.opt.fbDlgClass).removeClass('hidden');
+    AccountClosure.prototype._handleFeedback = function(_accountClosureCallback, obj) {
+        
+        // Reset feedback dialog to default state
+        $(obj.opt.fbDlgClass + ' .radioOn').attr('class', 'radioOff');
+        $(obj.opt.fbDlgClass + ' .radio-txt').removeClass('active');
+        $(obj.opt.fbDlgClass + ' #res1_div')
+            .attr('class', 'radioOn')
+            .next().addClass('active');
+        $(obj.opt.fbDlgClass + ' .feedback-textarea-bl textarea').val('');
+        $('.fm-dialog' + obj.opt.fbDlgClass).removeClass('hidden');
 
-        $.dialog = self.opt.fbDlgName;
+        $.dialog = obj.opt.fbDlgName;
 
         // Send feedback button listener
-        $(self.opt.fbDlgClass + ' .fm-dialog-button.feedback-submit').rebind('click', function() {
+        $(obj.opt.fbDlgClass + ' .fm-dialog-button.feedback-submit').rebind('click', function() {
 
-            self.opt.feedbackText = self._prepareJsonString(self._gatherFeedback());
-            api_req({'a': 'clog', 't': self.opt.fbType, 'd': self.opt.feedbackText});
-            self._deleteLeftovers();
+            obj.opt.feedbackText = obj._prepareJsonString(obj._gatherFeedback());
+            api_req({'a': 'clog', 't': obj.opt.fbType, 'd': obj.opt.feedbackText});
+
+            if (_accountClosureCallback) {
+                _accountClosureCallback(obj.opt.code, obj.opt.email, obj.opt.secret.toString());
+            }
+            
+            obj._deleteLeftovers();
         });
 
         // Cancel button listener
-        $(self.opt.fbDlgClass + ' .fm-dialog-button.cancel').rebind('click', function() {
+        $(obj.opt.fbDlgClass + ' .fm-dialog-button.cancel').rebind('click', function() {
 
-            self.opt.feedbackText = self._prepareJsonString("User did NOT provide feedback.");
-            api_req({'a': 'clog', 't': self.opt.fbType, 'd': self.opt.feedbackText});
-            self._deleteLeftovers();
+            obj.opt.feedbackText = obj._prepareJsonString("User did NOT provide feedback.");
+            api_req({'a': 'clog', 't': obj.opt.fbType, 'd': obj.opt.feedbackText});
+            
+            if (_accountClosureCallback) {
+                _accountClosureCallback(obj.opt.code, obj.opt.email, obj.opt.secret.toString());
+            }
+            
+            obj._deleteLeftovers();
         });
 
+        // On focus
+        $(obj.opt.fbDlgClass).off('focus', '.feedback-textarea-bl');
+        $(obj.opt.fbDlgClass).on('focus', '.feedback-textarea-bl', function() {
+            $(obj.opt.fbDlgClass + ' .radio-txt').removeClass('active');
+            $(obj.opt.fbDlgClass + ' .radioOn').attr('class', 'radioOff');
+            $(obj.opt.fbDlgClass + ' #res7_div')
+                .attr('class', 'radioOn')
+                .next().addClass('active');
+        });
         // Keyboard button listener <Enter key>
-        $(self.opt.fbDlgClass).rebind('keypress', function(e) {
+        $(obj.opt.fbDlgClass).rebind('keypress', function(e) {
 
             var key = e.wich || e.keyCode;
 
             if (key === 13) {
-                $(self.opt.fbDlgClass + ' .fm-dialog-button.feedback-button').click();
+                $(obj.opt.fbDlgClass + ' .fm-dialog-button.feedback-button').click();
             }
         });
 
+        $('.feedback-textarea-bl textarea').on('keyup', function() {
+            obj._feedbackAreaResizing();
+        });
+
+        $('.reset-success-st3 input[type=radio]').rebind('change', function() {
+            $('.reset-success-st3 .radioOn').removeClass('radioOn').addClass('radioOff');
+            $('.reset-success-st3 .radio-txt').removeClass('active');
+            $(this).removeClass('radioOff').addClass('radioOn').parent().removeClass('radioOff').addClass('radioOn').next().addClass('active');
+        });
+
+    };
+
+    AccountClosure.prototype._feedbackAreaResizing = function() {
+        var txt = $('.feedback-textarea-bl textarea'),
+            txtHeight = txt.outerHeight(),
+            hiddenDiv = $('.feedback-hidden'),
+            pane = $('.feedback-textarea-scroll'),
+            content = txt.val(),
+            api;
+        content = content.replace(/\n/g, '<br />');
+        hiddenDiv.html(content + '<br/>');
+
+        if (txtHeight !== hiddenDiv.outerHeight()) {
+            txt.height(hiddenDiv.outerHeight());
+
+            if ($('.feedback-textarea').outerHeight() >= 96) {
+                pane.jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
+                api = pane.data('jsp');
+                txt.blur();
+                txt.focus();
+                api.scrollByY(0);
+            }
+            else {
+                api = pane.data('jsp');
+                if (api) {
+                    api.destroy();
+                    txt.blur();
+                    txt.focus();
+                }
+            }
+        }
     };
 
     //export

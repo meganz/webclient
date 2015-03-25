@@ -5435,11 +5435,11 @@ function process_u(u) {
     //}
 }
 
-function process_ok(ok)
+function process_ok(ok, ignoreDB)
 {
-    for (i in ok)
+    for (var i in ok)
     {
-        if (typeof mDB === 'object' && !pfkey)
+        if (typeof mDB === 'object' && !pfkey && !ignoreDB)
             mDBadd('ok', ok[i]);
         if (ok[i].ha == crypto_handleauth(ok[i].h))
             u_sharekeys[ok[i].h] = decrypt_key(u_k_aes, base64_to_a32(ok[i].k));

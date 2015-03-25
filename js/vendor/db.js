@@ -107,7 +107,9 @@
                 transaction.oncomplete = function () {
                     resolve( records , that );
                 };
+                //https://bugzilla.mozilla.org/show_bug.cgi?id=872873
                 transaction.onerror = function ( e ) {
+                    e.preventDefault();
                     reject({ 'records': records , 'reason': e });
                 };
                 transaction.onabort = function ( e ) {
@@ -122,10 +124,9 @@
                 throw 'Database has been closed';
             }
 
-            var records = [];
-            for ( var i = 0 ; i < arguments.length - 1 ; i++ ) {
-                records[ i ] = arguments[ i + 1 ];
-            }
+            var records = Array.isArray(arguments[1])
+                ? arguments[1]
+                : [].slice.call(arguments, 1);
 
             var transaction = db.transaction( table , transactionModes.readwrite ),
                 store = transaction.objectStore( table ),
@@ -515,7 +516,7 @@
     var dbCache = {};
 
     var db = {
-        version: '0.9.2',
+        version: '0.9.2-modified',
         open: function ( options ) {
             var request;
 

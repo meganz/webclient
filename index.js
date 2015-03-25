@@ -234,7 +234,6 @@ function init_page() {
 
         if (!fminitialized) {
             if (typeof mDB !== 'undefined' && !pfid) {
-                throw 'fix me'; // TODO
                 mDBstart();
             }
             else {
@@ -735,7 +734,7 @@ function init_page() {
     }
     else if (page == 'resellers') {
         parsepage(pages['resellers']);
-        
+
         // If logged in, pre-populate email address into wire transfer details
         if (typeof u_attr !== 'undefined') {
             $('#email-address').html(u_attr.email);
@@ -1035,18 +1034,22 @@ function mLogout() {
             });
         }
         else {
-            // Use the 'Session Management Logout' API call to kill the current session
-            loadingDialog.show();
-            api_req({
-                'a': 'sml'
-            }, {
-                callback: function (result) {
-                    // After the API call, clear other data and reload page
-                    loadingDialog.hide();
+            var finishLogout = function() {
+                if (--step === 0) {
                     u_logout(true);
                     document.location.reload();
                 }
-            });
+            }, step = 1;
+            loadingDialog.show();
+            if (typeof mDB === 'object' && mDB.drop) {
+                step++;
+                mDB.drop().then(finishLogout,function() {
+                    localStorage['fmdblock_' + u_handle] = 0xDEAD;
+                    finishLogout();
+                });
+            }
+            // Use the 'Session Management Logout' API call to kill the current session
+            api_req({ 'a': 'sml' }, { callback: finishLogout });
         }
     };
     var cnt = 0;

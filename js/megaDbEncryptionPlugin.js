@@ -55,7 +55,7 @@ var MegaDBEncryption = function(mdbInstance) {
             if(k == "__origObj") { return; }
             else if(k == "id") { return; }
 
-            if(mdbInstance.schema[table]['indexes'][k]) {
+            if(mdbInstance.schema[table]['indexes'] && mdbInstance.schema[table]['indexes'][k]) {
                 obj[k + "$v"] = stringcrypt.stringEncrypter(JSON.stringify(v), getEncDecKey());
                 obj[k] = hasherFunc(JSON.stringify(v));
             } else {

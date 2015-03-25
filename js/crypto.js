@@ -1216,14 +1216,14 @@ function getsc(fm) {
             if (typeof res === 'object') {
                 function getSCDone(sma) {
                     if (sma !== -0x7ff
-                            && typeof mDBloaded !== 'undefined'
+                            // && typeof mDBloaded !== 'undefined'
                             && !folderlink && !pfid
                             && typeof mDB !== 'undefined') {
                         localStorage[u_handle + '_maxaction'] = maxaction;
                     }
 
                     if (ctx.fm) {
-                        mDBloaded = true;
+                        // mDBloaded = true;
                         loadfm_done();
                     }
                 }

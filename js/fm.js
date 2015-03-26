@@ -1077,7 +1077,7 @@ function transferPanelContextMenu(target)
     if (!file) {
         /* no file, it is a finished operation */
         menuitems.hide()
-            .filter('.tranfer-clear,.refresh-item')
+            .filter('.tranfer-clear')
             .show()
 
     } else {
@@ -2314,18 +2314,6 @@ function initContextUI()
             $('span.transfer-type', this).addClass('paused');
         });
         $('.tranfer-download-indicator,.transfer-upload-indicator').removeClass('active');
-    });
-
-    $(c + '.refresh-item').unbind('click');
-    $(c + '.refresh-item').bind('click', function(event)
-    {
-        stopsc();
-        stopapi();
-        if (typeof mDB !== 'undefined' && !pfid) {
-            mDBreload();
-        } else {
-            loadfm(true);
-        }
     });
 
     $(c + '.select-all').unbind('click');
@@ -5345,7 +5333,7 @@ function contextmenuUI(e, ll, topmenu) {
         // Enable upload item menu for clould-drive, don't show it for rubbish and rest of crew
         if (RightsbyID(M.currentdirid) && RootbyId(M.currentdirid) !== M.RubbishID) {
             $(t).filter('.context-menu-item').hide();
-            $(t).filter('.fileupload-item,.newfolder-item,.refresh-item').show();
+            $(t).filter('.fileupload-item,.newfolder-item').show();
             if ((is_chrome_firefox & 2) || 'webkitdirectory' in document.createElement('input')) {
                 $(t).filter('.folderupload-item').show();
             }
@@ -5385,9 +5373,9 @@ function contextmenuUI(e, ll, topmenu) {
 
         // detect and show right menu
         if (id && id.length === 11) {
-            $(t).filter('.refresh-item,.remove-item').show();// transfer panel
+            $(t).filter('.remove-item').show();// transfer panel
         } else if (c && c.indexOf('cloud-drive-item') > -1) {
-            var flt = '.refresh-item,.properties-item';
+            var flt = '.properties-item';
             if (folderlink) {
                 if (u_type) {
                     flt += ',.import-item';
@@ -5399,9 +5387,9 @@ function contextmenuUI(e, ll, topmenu) {
             $.selected = [M.RootID];
             $(t).filter(flt).show();
         } else if (c && c.indexOf('recycle-item') > -1) {
-            $(t).filter('.refresh-item,.clearbin-item').show();
+            $(t).filter('.clearbin-item').show();
         } else if (c && c.indexOf('contacts-item') > -1) {
-            $(t).filter('.refresh-item,.addcontact-item').show();
+            $(t).filter('.addcontact-item').show();
         } else if (c && c.indexOf('messages-item') > -1) {
             e.preventDefault();
             return false;

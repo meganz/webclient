@@ -1563,6 +1563,15 @@ function topmenuUI() {
         else if (c.indexOf('account') > -1) {
             document.location.hash = 'fm/account';
         }
+		else if (c.indexOf('refresh') > -1) {
+           stopsc();
+           stopapi();
+           if (typeof mDB !== 'undefined' && !pfid) {
+              mDBreload();
+           } else {
+              loadfm(true);
+           }
+        }
         else if (c.indexOf('languages') > -1) {
             languageDialog();
         }

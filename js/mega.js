@@ -4790,9 +4790,7 @@ function loadfm(force)
     if (loadfm.loaded) {
         Soon(loadfm_done.bind(this, pfkey));
     } else {
-        if (is_fm()) {
-            loadingDialog.show();
-        }
+        loadingDialog.show();
         if (!loadfm.loading) {
             M.reset();
             fminitialized = false;

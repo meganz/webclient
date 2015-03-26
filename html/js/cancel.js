@@ -154,13 +154,13 @@
     };
 
     AccountClosure.prototype._deleteLeftovers = function() {
-//        mDBclear();
+        mDBclear();
         for (var i in localStorage) {
             if (localStorage.hasOwnProperty(i)) {
-//                delete localStorage[i];
+                delete localStorage[i];
             }
         }
-//        delete localStorage;
+        delete localStorage;
         closeDialog();
         $('.reset-success-st3').removeClass('active');
         document.location.hash = 'login';

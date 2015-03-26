@@ -4864,18 +4864,25 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	-ms-transition: all 200ms ease-in-out;
 	transition: all 200ms ease-in-out;
 }
-.membership-status.pro {
-	background-color: #721908;
-}
 .membership-status.free {
 	background-color: #12a22f;
 }
-.membership-status-block:hover .membership-status.pro, .membership-status-block.active .membership-status.pro {
-	background-color: #bf1f02;
-	color: rgba(255,255,255,0.9);
+.membership-status.lite {
+	background-color: #ffa500;
+}
+.membership-status.pro {
+	background-color: #721908;
 }
 .membership-status-block:hover .membership-status.free, .membership-status-block.active .membership-status.free {
 	background-color: #13E03C;
+	color: rgba(255,255,255,0.9);
+}
+.membership-status-block:hover .membership-status.lite, .membership-status-block.active .membership-status.lite {
+	background-color: #ffa500;
+	color: rgba(255,255,255,0.9);
+}
+.membership-status-block:hover .membership-status.pro, .membership-status-block.active .membership-status.pro {
+	background-color: #bf1f02;
 	color: rgba(255,255,255,0.9);
 }
 .user-name, a.user-name {

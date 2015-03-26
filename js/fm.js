@@ -2670,32 +2670,38 @@ function accountUI()
         else
         {
             // this is the main entry point for users who just had upgraded their accounts
-
-            if(isNonActivatedAccount()) {
+            if (isNonActivatedAccount()) {
                 showNonActivatedAccountDialog(true);
             }
 
             $('.fm-account-overview-button').addClass('active');
             $('.fm-account-overview').removeClass('hidden');
         }
-        $('.fm-account-blocks .membership-icon.type').removeClass('free pro1 pro2 pro3');
+        $('.fm-account-blocks .membership-icon.type').removeClass('free pro1 pro2 pro3 pro4');
         if (u_attr.p)
         {
-            // pro account:
-            var protext;
-            if (u_attr.p == 1) protext = 'PRO I';
-            else if (u_attr.p == 2) protext = 'PRO II';
-            else if (u_attr.p == 3) protext = 'PRO III';
-            $('.membership-big-txt.accounttype').text(protext);
+            // LITE/PRO account
+            var planText;
+            if (u_attr.p == 1) {
+                planText = l[5819];      // PRO I
+            }
+            else if (u_attr.p == 2) {
+                planText = l[6125];      // PRO II
+            }
+            else if (u_attr.p == 3) {
+                planText = l[6127];      // PRO III
+            }
+            else if (u_attr.p == 4) {
+                planText = 'LITE';
+            }
+            
+            $('.membership-big-txt.accounttype').text(planText);
             $('.fm-account-blocks .membership-icon.type').addClass('pro' + u_attr.p);
+            
             if (account.stype == 'S')
             {
                 // subscription
                 $('.fm-account-header.typetitle').text(l[434]);
-                // if (u.stime == 'W') $('.membership-big-txt.type').text(l[747]);
-                // else if (u.stime == 'M') $('.membership-big-txt.type').text(l[748]);
-                // else if (u.stime == 'Y') $('.membership-big-txt.type').text(l[749]);
-                // $('.membership-medium-txt.expiry').html(htmlentities(l[750]) + ' <span class="red">' + time2date(account.scycle) + '</span>');
                 if (account.scycle == '1 M') $('.membership-big-txt.type').text(l[748]);
                 else if (account.scycle == '1 Y') $('.membership-big-txt.type').text(l[749]);
                 else $('.membership-big-txt.type').text('');

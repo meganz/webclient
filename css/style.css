@@ -11989,13 +11989,15 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 	color: rgba(204,204,204,1);
 	background-position: right -4593px;
 }
-.top-menu-popup .top-menu-item:nth-child(2) .top-submenu-popup {
+.not-logged .top-menu-popup .top-menu-item:nth-child(3) .top-submenu-popup {
 	-webkit-border-top-left-radius: 0px;
 	-moz-border-radius-topleft: 0px;
 	border-top-left-radius: 0px;
 	-webkit-border-top-right-radius: 0px;
 	-moz-border-radius-topright: 0px;
 	border-top-right-radius: 0px;
+	margin: -4px 0 0 0;
+    padding-top: 4px;
 }
 .top-menu-arrow, .top-login-arrow, .notification-arrow, .top-user-status-arrow, .membership-popup-arrow, .warning-popup-arrow {
 	height: 8px;
@@ -12343,14 +12345,6 @@ table {
 }
 .top-user-status-txt {
 	margin: 0 0 0 26px;
-}
-.top-menu-item.upgrade-your-account {
-	color: rgba(255,255,255,0.7);
-	background-color: rgba(29,172,57,1);
-}
-.top-menu-item.upgrade-your-account:hover {
-	color: rgba(255,255,255,1);
-	background-color: rgba(19,224,60,1);
 }
 .top-menu-item:hover, .top-menu-item.active, .top-user-status-item:hover {
 	background-color: rgba(255,255,255,0.1);

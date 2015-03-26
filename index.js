@@ -1074,7 +1074,6 @@ function topmenuUI() {
 
     $('.warning-popup-icon').addClass('hidden');
     $('.top-menu-item.upgrade-your-account').hide();
-    $('.context-menu-divider.upgrade-your-account').addClass('pro');
     $('.top-menu-item.register,.top-menu-item.login').hide();
     $('.top-menu-item.logout,.context-menu-divider.logout').hide();
     $('.top-menu-item.clouddrive,.top-menu-item.account').hide();
@@ -1126,12 +1125,9 @@ function topmenuUI() {
                 $('.membership-icon-pad .membership-big-txt.red').text('PRO III');
             }
             $('.membership-status-block').html('<div class="membership-status pro">PRO</div>');
-            $('.context-menu-divider.upgrade-your-account').addClass('pro');
-            $('.membership-popup.pro-popup');
         }
         else {
-            $('.top-menu-item.upgrade-your-account,.context-menu-divider.upgrade-your-account').show();
-            $('.context-menu-divider.upgrade-your-account').removeClass('pro');
+            $('.top-menu-item.upgrade-your-account').show();
             $('.membership-status').addClass('free');
             $('.membership-status').html(l[435]);
         }
@@ -1181,7 +1177,7 @@ function topmenuUI() {
         }
 
         $('.top-menu-item.upgrade-your-account').show();
-        $('.top-menu-item.upgrade-your-account').text(l[129]);
+        $('.top-menu-item.pro-item span').text(l[129]);
         $('.membership-status-block').hide();
         $('.create-account-button').show();
         $('.create-account-button').rebind('click', function () {

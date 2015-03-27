@@ -244,7 +244,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                         }
                         catch (e) {}
                     }
-                    
+
                     file = file.blob();
                 }
 

@@ -1080,7 +1080,7 @@ function transferPanelContextMenu(target)
     if (!file) {
         /* no file, it is a finished operation */
         menuitems.hide()
-            .filter('.tranfer-clear,.refresh-item')
+            .filter('.tranfer-clear')
             .show()
 
     } else {
@@ -2317,18 +2317,6 @@ function initContextUI()
         $('.tranfer-download-indicator,.transfer-upload-indicator').removeClass('active');
     });
 
-    $(c + '.refresh-item').unbind('click');
-    $(c + '.refresh-item').bind('click', function(event)
-    {
-        stopsc();
-        stopapi();
-        if (typeof mDB !== 'undefined' && !pfid) {
-            mDBreload();
-        } else {
-            loadfm(true);
-        }
-    });
-
     $(c + '.select-all').unbind('click');
     $(c + '.select-all').bind('click', function(event)
     {
@@ -2887,20 +2875,66 @@ function accountUI()
             else
                 return -1;
         });
+        
         $('.grid-table.purchases tr').remove();
         var html = '<tr><th>' + l[475] + '</th><th>' + l[476] + '</th><th>' + l[477] + '</th><th>' + l[478] + '</th></tr>';
-        $(account.purchases).each(function(i, el)
+        
+        // The purchase history rendering below needs to be refactored and not hard coded. 
+        // Or in the future as soon as the prices change it will break the account page.
+        var pro = {
+            
+            // Monthly
+            '9.99': ['PRO I (' + l[918] + ')', '1'],
+            '19.99': ['PRO II (' + l[918] + ')', '2'],
+            '29.99': ['PRO III (' + l[918] + ')', '3'],
+            '4.99': ['Lite (' + l[918] + ')', '4'],
+            
+            // Yearly
+            '99.99': ['PRO I (' + l[919] + ')', '1'],
+            '199.99': ['PRO II (' + l[919] + ')', '2'],
+            '299.99': ['PRO III (' + l[919] + ')', '3'],
+            '49.99': ['Lite (' + l[919] + ')', '4']
+        };
+        
+        // Render every purchase made into Purchase History on Account page
+        $(account.purchases).each(function(index, purchaseTransaction)
         {
-            var paymentmethod = 'Voucher';
-            if (el[4] == 1)
-                paymentmethod = 'PayPal';
-            else if (el[4] == 2)
-                paymentmethod = 'iTunes';
-            var pro = {'9.99': ['PRO I (' + l[918] + ')', '1'], '19.99': ['PRO II (' + l[918] + ')', '2'], '29.99': ['PRO III (' + l[918] + ')', '3'], '99.99': ['PRO I (' + l[919] + ')', '1'], '199.99': ['PRO II (' + l[919] + ')', '2'], '299.99': ['PRO III (' + l[919] + ')', '3']};
-            html += '<tr><td>' + time2date(el[1]) + '</td><td><span class="fm-member-icon"><img alt="" src="' + staticpath + 'images/mega/icons/retina/pro' + pro[el[2]][1] + '@2x.png" /></span><span class="fm-member-icon-txt"> ' + pro[el[2]][0] + '</span></td><td>&euro;' + htmlentities(el[2]) + '</td><td>' + paymentmethod + '</td></tr>';
-        });
-        $('.grid-table.purchases').html(html);
+            // Set payment method
+            var paymentMethodIndex = purchaseTransaction[4];
+            var paymentMethod = 'Voucher';           
+            
+            if (paymentMethodIndex == 1) {
+                paymentMethod = 'PayPal';
+            }
+            else if (paymentMethodIndex == 2) {
+                paymentMethod = 'iTunes';
+            }
+            else if (paymentMethodIndex == 4) {
+                paymentMethod = 'Bitcoin';
+            }
 
+            // Set Date/Time, Item (plan purchased), Amount, Payment Method
+            var dateTime = time2date(purchaseTransaction[1]);
+            var price = purchaseTransaction[2];
+            var proNum = pro[price][1];
+            var item = pro[price][0];
+            var priceEscaped = htmlentities(price);
+
+            // Render table row
+            html += '<tr>'
+                 +      '<td>' + dateTime + '</td>'
+                 +      '<td>'
+                 +           '<span class="fm-member-icon">'
+                 +                '<img alt="" src="' + staticpath + 'images/mega/icons/retina/pro' + proNum + '@2x.png" />'
+                 +           '</span>'
+                 +           '<span class="fm-member-icon-txt"> ' + item + '</span>'
+                 +      '</td>'
+                 +      '<td>&euro;' + priceEscaped + '</td>'
+                 +      '<td>' + paymentMethod + '</td>'
+                 +  '</tr>';
+        });
+
+        $('.grid-table.purchases').html(html);
         $('.account-history-dropdown-button.transactions').text(l[471].replace('[X]', $.transactionlimit));
         $('.account-history-drop-items.transaction10-').text(l[471].replace('[X]', 10));
         $('.account-history-drop-items.transaction100-').text(l[471].replace('[X]', 100));
@@ -5300,7 +5334,7 @@ function contextmenuUI(e, ll, topmenu) {
         // Enable upload item menu for clould-drive, don't show it for rubbish and rest of crew
         if (RightsbyID(M.currentdirid) && RootbyId(M.currentdirid) !== M.RubbishID) {
             $(t).filter('.context-menu-item').hide();
-            $(t).filter('.fileupload-item,.newfolder-item,.refresh-item').show();
+            $(t).filter('.fileupload-item,.newfolder-item').show();
             if ((is_chrome_firefox & 2) || 'webkitdirectory' in document.createElement('input')) {
                 $(t).filter('.folderupload-item').show();
             }
@@ -5340,9 +5374,9 @@ function contextmenuUI(e, ll, topmenu) {
 
         // detect and show right menu
         if (id && id.length === 11) {
-            $(t).filter('.refresh-item,.remove-item').show();// transfer panel
+            $(t).filter('.remove-item').show();// transfer panel
         } else if (c && c.indexOf('cloud-drive-item') > -1) {
-            var flt = '.refresh-item,.properties-item';
+            var flt = '.properties-item';
             if (folderlink) {
                 if (u_type) {
                     flt += ',.import-item';
@@ -5354,9 +5388,9 @@ function contextmenuUI(e, ll, topmenu) {
             $.selected = [M.RootID];
             $(t).filter(flt).show();
         } else if (c && c.indexOf('recycle-item') > -1) {
-            $(t).filter('.refresh-item,.clearbin-item').show();
+            $(t).filter('.clearbin-item').show();
         } else if (c && c.indexOf('contacts-item') > -1) {
-            $(t).filter('.refresh-item,.addcontact-item').show();
+            $(t).filter('.addcontact-item').show();
         } else if (c && c.indexOf('messages-item') > -1) {
             e.preventDefault();
             return false;
@@ -6196,14 +6230,16 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
 
         var $selectedPlan = $('.reg-st3-membership-bl.selected');
         var plan = 1;
-        if($selectedPlan.is(".pro1")) { plan = 1; }
+        if($selectedPlan.is(".pro4")) { plan = 4; }
+		else if($selectedPlan.is(".pro1")) { plan = 1; }
         else if($selectedPlan.is(".pro2")) { plan = 2; }
         else if($selectedPlan.is(".pro3")) { plan = 3; }
 
         $('.loginrequired-dialog .fm-notification-icon')
-            .removeClass('plan1')
+		    .removeClass('plan1')
             .removeClass('plan2')
             .removeClass('plan3')
+            .removeClass('plan4')
             .addClass('plan' + plan);
     }
 

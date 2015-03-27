@@ -1074,7 +1074,6 @@ function topmenuUI() {
 
     $('.warning-popup-icon').addClass('hidden');
     $('.top-menu-item.upgrade-your-account').hide();
-    $('.context-menu-divider.upgrade-your-account').addClass('pro');
     $('.top-menu-item.register,.top-menu-item.login').hide();
     $('.top-menu-item.logout,.context-menu-divider.logout').hide();
     $('.top-menu-item.clouddrive,.top-menu-item.account').hide();
@@ -1126,12 +1125,9 @@ function topmenuUI() {
                 $('.membership-icon-pad .membership-big-txt.red').text('PRO III');
             }
             $('.membership-status-block').html('<div class="membership-status pro">PRO</div>');
-            $('.context-menu-divider.upgrade-your-account').addClass('pro');
-            $('.membership-popup.pro-popup');
         }
         else {
-            $('.top-menu-item.upgrade-your-account,.context-menu-divider.upgrade-your-account').show();
-            $('.context-menu-divider.upgrade-your-account').removeClass('pro');
+            $('.top-menu-item.upgrade-your-account').show();
             $('.membership-status').addClass('free');
             $('.membership-status').html(l[435]);
         }
@@ -1181,7 +1177,7 @@ function topmenuUI() {
         }
 
         $('.top-menu-item.upgrade-your-account').show();
-        $('.top-menu-item.upgrade-your-account').text(l[129]);
+        $('.top-menu-item.pro-item span').text(l[129]);
         $('.membership-status-block').hide();
         $('.create-account-button').show();
         $('.create-account-button').rebind('click', function () {
@@ -1226,7 +1222,7 @@ function topmenuUI() {
         }
         if (!e || ($(e.target).parents('.membership-popup').length == 0
                 && ((c && c.indexOf('membership-status') == -1) || !c))
-                || (c && c.indexOf('membership-button') > -1)) {
+                || (c && c.indexOf('mem-button') > -1)) {
             $('.membership-popup').removeClass('active');
             $('.membership-status-block').removeClass('active');
         }
@@ -1465,7 +1461,7 @@ function topmenuUI() {
                     $('.membership-usage-txt.bandwidth').addClass('exceeded');
                 }
 
-                $('.membership-popup .membership-button').rebind('click', function (e) {
+                $('.membership-popup .mem-button').rebind('click', function (e) {
                     document.location.hash = 'fm/account';
                     $.hideTopMenu(e);
                 });
@@ -1562,6 +1558,15 @@ function topmenuUI() {
         }
         else if (c.indexOf('account') > -1) {
             document.location.hash = 'fm/account';
+        }
+		else if (c.indexOf('refresh') > -1) {
+           stopsc();
+           stopapi();
+           if (typeof mDB !== 'undefined' && !pfid) {
+              mDBreload();
+           } else {
+              loadfm(true);
+           }
         }
         else if (c.indexOf('languages') > -1) {
             languageDialog();

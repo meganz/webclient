@@ -3935,8 +3935,13 @@ function MegaData()
     };
 
     var __ul_id = 8000;
-    this.addUpload = function(u)
+    this.addUpload = function(u, ignoreWarning)
     {
+        /*if (u.length > 99 && !ignoreWarning) {
+            if (UploadManager.warning(M.addUpload.bind(M, u, true))) {
+                return;
+            }
+        }*/
         var target = $.onDroppedTreeFolder || M.currentdirid, onChat;
         delete $.onDroppedTreeFolder;
 
@@ -4821,9 +4826,7 @@ function loadfm(force)
     if (loadfm.loaded) {
         Soon(loadfm_done.bind(this, pfkey));
     } else {
-        if (is_fm()) {
-            loadingDialog.show();
-        }
+        loadingDialog.show();
         if (!loadfm.loading) {
             M.reset();
             fminitialized = false;

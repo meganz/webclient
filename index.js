@@ -1077,6 +1077,7 @@ function topmenuUI() {
     $('.top-menu-item.register,.top-menu-item.login').hide();
     $('.top-menu-item.logout,.context-menu-divider.logout').hide();
     $('.top-menu-item.clouddrive,.top-menu-item.account').hide();
+    $('.top-menu-item.refresh-item').hide();
     $('.activity-status,.activity-status-block').hide();
     $('.membership-status-block').html('<div class="membership-status free">' + l[435] + '</div>');
     $('.membership-status').hide();
@@ -1111,6 +1112,7 @@ function topmenuUI() {
 
         $('.top-menu-item.logout,.context-menu-divider.logout').show();
         $('.top-menu-item.clouddrive,.top-menu-item.account').show();
+        $('.top-menu-item.refresh-item').show();
         $('.fm-avatar').show();
 
         if (u_attr.p) {
@@ -1145,6 +1147,7 @@ function topmenuUI() {
 
             $('.top-menu-item.register').text(l[968]);
             $('.top-menu-item.clouddrive').show();
+            $('.top-menu-item.refresh-item').show();
             $('.warning-popup-icon').removeClass('hidden');
             $('.warning-icon-area').rebind('click', function (e) {
 
@@ -1573,6 +1576,15 @@ function topmenuUI() {
         }
         else if (c.indexOf('clouddrive') > -1) {
             document.location.hash = 'fm';
+        }
+        else if (c.indexOf('refresh-item') > -1) {
+            stopsc();
+            stopapi();
+            if (typeof mDB !== 'undefined' && !pfid) {
+                mDBreload();
+            } else {
+                loadfm(true);
+            }            
         }
         else if (c.indexOf('logout') > -1) {
             mLogout();

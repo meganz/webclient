@@ -1,4 +1,22 @@
-
+/**
+ * Get a string for the payment plan number
+ * @param {Number} planNum The plan number e.g. 1: PRO I, 2: PRO II, 3: PRO III, 4: LITE
+ */
+function getProPlan(planNum) {
+    
+    switch (planNum) {
+        case 1:
+            return l[5819];     // PRO I
+        case 2:
+            return l[6125];     // PRO II
+        case 3:
+            return l[6126];     // PRO III
+        case 4:
+            return 'LITE';      // l[6234] (when strings generated)
+        default:
+            return l[435];      // FREE
+    }
+}
 
 function voucherCentering(button)
 {
@@ -1077,7 +1095,7 @@ function transferPanelContextMenu(target)
     if (!file) {
         /* no file, it is a finished operation */
         menuitems.hide()
-            .filter('.tranfer-clear,.refresh-item')
+            .filter('.tranfer-clear')
             .show()
 
     } else {
@@ -1282,7 +1300,7 @@ function sharedUInode(nodeHandle) {
     $('.file-block#' + nodeHandle + ' .block-view-file-type').addClass(fileicon({ t: 1, shares: availShares }));
 }
 
-function addnotification(notification) {
+function addShareNotification(notification) {
 
     if (notifyPopup.notifications == null) {
         return false;
@@ -1330,7 +1348,7 @@ function addnotification(notification) {
     notifyPopup.doNotify();
 }
 
-function addIpcOrContactNotification(actionPacket) {
+function addNotification(actionPacket) {
 
     if (notifyPopup.notifications === null) {
         return false;
@@ -2316,18 +2334,6 @@ function initContextUI()
         $('.tranfer-download-indicator,.transfer-upload-indicator').removeClass('active');
     });
 
-    $(c + '.refresh-item').unbind('click');
-    $(c + '.refresh-item').bind('click', function(event)
-    {
-        stopsc();
-        stopapi();
-        if (typeof mDB !== 'undefined' && !pfid) {
-            mDBreload();
-        } else {
-            loadfm(true);
-        }
-    });
-
     $(c + '.select-all').unbind('click');
     $(c + '.select-all').bind('click', function(event)
     {
@@ -2670,32 +2676,27 @@ function accountUI()
         else
         {
             // this is the main entry point for users who just had upgraded their accounts
-
-            if(isNonActivatedAccount()) {
+            if (isNonActivatedAccount()) {
                 showNonActivatedAccountDialog(true);
             }
 
             $('.fm-account-overview-button').addClass('active');
             $('.fm-account-overview').removeClass('hidden');
         }
-        $('.fm-account-blocks .membership-icon.type').removeClass('free pro1 pro2 pro3');
+        $('.fm-account-blocks .membership-icon.type').removeClass('free pro1 pro2 pro3 pro4');
         if (u_attr.p)
         {
-            // pro account:
-            var protext;
-            if (u_attr.p == 1) protext = 'PRO I';
-            else if (u_attr.p == 2) protext = 'PRO II';
-            else if (u_attr.p == 3) protext = 'PRO III';
-            $('.membership-big-txt.accounttype').text(protext);
-            $('.fm-account-blocks .membership-icon.type').addClass('pro' + u_attr.p);
+            // LITE/PRO account
+            var planNum = u_attr.p;
+            var planText = getProPlan(planNum);
+            
+            $('.membership-big-txt.accounttype').text(planText);
+            $('.fm-account-blocks .membership-icon.type').addClass('pro' + planNum);
+            
             if (account.stype == 'S')
             {
                 // subscription
                 $('.fm-account-header.typetitle').text(l[434]);
-                // if (u.stime == 'W') $('.membership-big-txt.type').text(l[747]);
-                // else if (u.stime == 'M') $('.membership-big-txt.type').text(l[748]);
-                // else if (u.stime == 'Y') $('.membership-big-txt.type').text(l[749]);
-                // $('.membership-medium-txt.expiry').html(htmlentities(l[750]) + ' <span class="red">' + time2date(account.scycle) + '</span>');
                 if (account.scycle == '1 M') $('.membership-big-txt.type').text(l[748]);
                 else if (account.scycle == '1 Y') $('.membership-big-txt.type').text(l[749]);
                 else $('.membership-big-txt.type').text('');
@@ -2886,20 +2887,52 @@ function accountUI()
             else
                 return -1;
         });
+        
         $('.grid-table.purchases tr').remove();
         var html = '<tr><th>' + l[475] + '</th><th>' + l[476] + '</th><th>' + l[477] + '</th><th>' + l[478] + '</th></tr>';
-        $(account.purchases).each(function(i, el)
+        
+        // Render every purchase made into Purchase History on Account page
+        $(account.purchases).each(function(index, purchaseTransaction)
         {
-            var paymentmethod = 'Voucher';
-            if (el[4] == 1)
-                paymentmethod = 'PayPal';
-            else if (el[4] == 2)
-                paymentmethod = 'iTunes';
-            var pro = {'9.99': ['PRO I (' + l[918] + ')', '1'], '19.99': ['PRO II (' + l[918] + ')', '2'], '29.99': ['PRO III (' + l[918] + ')', '3'], '99.99': ['PRO I (' + l[919] + ')', '1'], '199.99': ['PRO II (' + l[919] + ')', '2'], '299.99': ['PRO III (' + l[919] + ')', '3']};
-            html += '<tr><td>' + time2date(el[1]) + '</td><td><span class="fm-member-icon"><img alt="" src="' + staticpath + 'images/mega/icons/retina/pro' + pro[el[2]][1] + '@2x.png" /></span><span class="fm-member-icon-txt"> ' + pro[el[2]][0] + '</span></td><td>&euro;' + htmlentities(el[2]) + '</td><td>' + paymentmethod + '</td></tr>';
-        });
-        $('.grid-table.purchases').html(html);
+            // Set payment method
+            var paymentMethodIndex = purchaseTransaction[4];
+            var paymentMethod = 'Voucher';           
+            
+            if (paymentMethodIndex == 1) {
+                paymentMethod = 'PayPal';
+            }
+            else if (paymentMethodIndex == 2) {
+                paymentMethod = 'iTunes';
+            }
+            else if (paymentMethodIndex == 4) {
+                paymentMethod = 'Bitcoin';
+            }
 
+            // Set Date/Time, Item (plan purchased), Amount, Payment Method
+            var dateTime = time2date(purchaseTransaction[1]);
+            var price = purchaseTransaction[2];
+            var proNum = purchaseTransaction[4];
+            
+            // Because the information for whether the purchase was monthly or yearly is currently unavailable, 
+            // we apply a temporary hack to check if the price is greater than 30 EUR then it must be yearly plan 
+            var monthlyOrYearlyWording = (price > 30) ? l[919] : l[918];            
+            var item = getProPlan(proNum) + ' (' + monthlyOrYearlyWording + ')';
+
+            // Render table row
+            html += '<tr>'
+                 +      '<td>' + dateTime + '</td>'
+                 +      '<td>'
+                 +           '<span class="fm-member-icon">'
+                 +                '<img alt="" src="' + staticpath + 'images/mega/icons/retina/pro' + proNum + '@2x.png" />'
+                 +           '</span>'
+                 +           '<span class="fm-member-icon-txt"> ' + item + '</span>'
+                 +      '</td>'
+                 +      '<td>&euro;' + htmlentities(price) + '</td>'
+                 +      '<td>' + paymentMethod + '</td>'
+                 +  '</tr>';
+        });
+
+        $('.grid-table.purchases').html(html);
         $('.account-history-dropdown-button.transactions').text(l[471].replace('[X]', $.transactionlimit));
         $('.account-history-drop-items.transaction10-').text(l[471].replace('[X]', 10));
         $('.account-history-drop-items.transaction100-').text(l[471].replace('[X]', 100));
@@ -5299,7 +5332,7 @@ function contextmenuUI(e, ll, topmenu) {
         // Enable upload item menu for clould-drive, don't show it for rubbish and rest of crew
         if (RightsbyID(M.currentdirid) && RootbyId(M.currentdirid) !== M.RubbishID) {
             $(t).filter('.context-menu-item').hide();
-            $(t).filter('.fileupload-item,.newfolder-item,.refresh-item').show();
+            $(t).filter('.fileupload-item,.newfolder-item').show();
             if ((is_chrome_firefox & 2) || 'webkitdirectory' in document.createElement('input')) {
                 $(t).filter('.folderupload-item').show();
             }
@@ -5339,9 +5372,9 @@ function contextmenuUI(e, ll, topmenu) {
 
         // detect and show right menu
         if (id && id.length === 11) {
-            $(t).filter('.refresh-item,.remove-item').show();// transfer panel
+            $(t).filter('.remove-item').show();// transfer panel
         } else if (c && c.indexOf('cloud-drive-item') > -1) {
-            var flt = '.refresh-item,.properties-item';
+            var flt = '.properties-item';
             if (folderlink) {
                 if (u_type) {
                     flt += ',.import-item';
@@ -5353,9 +5386,9 @@ function contextmenuUI(e, ll, topmenu) {
             $.selected = [M.RootID];
             $(t).filter(flt).show();
         } else if (c && c.indexOf('recycle-item') > -1) {
-            $(t).filter('.refresh-item,.clearbin-item').show();
+            $(t).filter('.clearbin-item').show();
         } else if (c && c.indexOf('contacts-item') > -1) {
-            $(t).filter('.refresh-item,.addcontact-item').show();
+            $(t).filter('.addcontact-item').show();
         } else if (c && c.indexOf('messages-item') > -1) {
             e.preventDefault();
             return false;
@@ -5890,13 +5923,13 @@ function sectionUIopen(id) {
             headertxt = l[5903];
             break;
         case 'conversations':
-            headertxt = 'My conversations';
+            headertxt = l[5914];
             break;
         case 'shared-with-me':
-            headertxt = 'My incoming shares';
+            headertxt = l[5915];
             break;
         case 'cloud-drive':
-            headertxt = 'My folders';
+            headertxt = l[5916];
             break;
         case 'rubbish-bin':
             headertxt = 'Deleted folders';
@@ -6195,14 +6228,16 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
 
         var $selectedPlan = $('.reg-st3-membership-bl.selected');
         var plan = 1;
-        if($selectedPlan.is(".pro1")) { plan = 1; }
+        if($selectedPlan.is(".pro4")) { plan = 4; }
+		else if($selectedPlan.is(".pro1")) { plan = 1; }
         else if($selectedPlan.is(".pro2")) { plan = 2; }
         else if($selectedPlan.is(".pro3")) { plan = 3; }
 
         $('.loginrequired-dialog .fm-notification-icon')
-            .removeClass('plan1')
+		    .removeClass('plan1')
             .removeClass('plan2')
             .removeClass('plan3')
+            .removeClass('plan4')
             .addClass('plan' + plan);
     }
 
@@ -9220,7 +9255,7 @@ function contactUI() {
         if (isContactVerified(user)) {
             $('.fm-verify').find('span').text('Verified');
         } else {
-            $('.fm-verify').find('span').text('Verify...');
+            $('.fm-verify').find('span').text(l[1960]+'...');
             $('.fm-verify').rebind('click', function() {
                 fingerprintDialog(user);
             });

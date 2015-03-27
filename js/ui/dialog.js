@@ -45,6 +45,7 @@
              * optional:
              */
             'title': '',
+            'notAgainTag': null,
             'buttons': []
         };
 
@@ -120,10 +121,32 @@
      */
     Dialog.prototype._renderButtons = function() {
         var self = this;
+        var $container = self.options.notAgainTag || self.options.buttons.length
+            ? $('<div class="' + self.options.buttonContainerClassName + '"/>')
+            : null;
+
+        if (self.options.notAgainTag) {
+            $container.append('<div class="left checkbox-block fm-chat-inline-dialog-button-sendFeedback">'+
+                '<div class="checkdiv checkboxOff">'+
+                    '<input type="checkbox" name="confirmation-checkbox" class="checkboxOff">'+
+                '</div>'+
+                '<label for="confirmation-checkbox" class="radio-txt">' + l[229] + '</label>'+
+            '</div>');
+
+            $('.left.checkbox-block', $container).rebind('click.dialog', function(e) {
+                var c = $('.left.checkbox-block .checkdiv', $container);
+                if (c.hasClass('checkboxOff')) {
+                    c.removeClass('checkboxOff').addClass('checkboxOn');
+                    localStorage[self.options.notAgainTag] = 1;
+                }
+                else {
+                    c.removeClass('checkboxOn').addClass('checkboxOff');
+                    delete localStorage[self.options.notAgainTag];
+                }
+            });
+        }
 
         if(self.options.buttons.length > 0) {
-            var $container = $('<div class="' + self.options.buttonContainerClassName + '"/>');
-
             self.options.buttons.forEach(function(buttonMeta, k) {
                 var $button = $('<div class="fm-dialog-button"><span></span></div>');
                 $button
@@ -139,7 +162,10 @@
                         );
                 $container.append($button);
             });
+        }
 
+        if ($container) {
+            $container.append('<div class="clear"></div>');
             $('.' + self.options.buttonPlaceholderClassName, self.$dialog).append($container);
         }
     };
@@ -386,4 +412,47 @@
     scope.mega = scope.mega || {};
     scope.mega.ui = scope.mega.ui || {};
     scope.mega.ui.Dialog = Dialog;
+    scope.mega.ui.Dialog.generic = function mGenericDialog(aOptions, aRenderCB) {
+        var defaultOptions = {
+            'className': 'generic-dialog',
+            'closable': true,
+            'focusable': false,
+            'expandable': false,
+            'requiresOverlay': true,
+        };
+        if (!aOptions.buttons) {
+            aOptions.buttons = [
+                {
+                    'label': aOptions.okLabel || l[78],
+                    'className': "fm-dialog-button-green",
+                    'callback': function() {
+                        aOptions.success.apply(this, arguments);
+                    }
+                },
+                {
+                    'label': aOptions.cancelLabel || l[79],
+                    'className': "fm-dialog-button-red",
+                    'callback': function() {
+                        this.hide();
+                    }
+                }
+            ];
+        }
+        var options = $.extend(true, {}, defaultOptions, aOptions);
+        var gd = new Dialog(options);
+        gd.bind('onHide', function gdHide() {
+            $('.' + gd.options.buttonContainerClassName, gd.$dialog).remove();
+            $('.content', gd.$dialog).empty();
+        });
+        gd.bind('onShow', function gdShow() {
+            var self = this;
+            setTimeout(function() {
+                self.reposition();
+            }, 50);
+        });
+        gd.bind('onBeforeShow', function gdShow() {
+            aRenderCB($('.content', gd.$dialog), $('.fm-dialog-title', gd.$dialog), this);
+        });
+        gd.show();
+    };
 })(jQuery, window);

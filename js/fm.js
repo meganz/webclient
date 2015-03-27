@@ -5923,13 +5923,13 @@ function sectionUIopen(id) {
             headertxt = l[5903];
             break;
         case 'conversations':
-            headertxt = 'My conversations';
+            headertxt = l[5914];
             break;
         case 'shared-with-me':
-            headertxt = 'My incoming shares';
+            headertxt = l[5915];
             break;
         case 'cloud-drive':
-            headertxt = 'My folders';
+            headertxt = l[5916];
             break;
         case 'rubbish-bin':
             headertxt = 'Deleted folders';
@@ -9255,7 +9255,7 @@ function contactUI() {
         if (isContactVerified(user)) {
             $('.fm-verify').find('span').text('Verified');
         } else {
-            $('.fm-verify').find('span').text('Verify...');
+            $('.fm-verify').find('span').text(l[1960]+'...');
             $('.fm-verify').rebind('click', function() {
                 fingerprintDialog(user);
             });

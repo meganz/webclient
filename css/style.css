@@ -4362,9 +4362,13 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 	font-size: 12px;
 	line-height: 23px;
 	color: #999999;
-	padding: 0 0 0 10px;
+	padding: 0 25px 0 10px;
 	position: relative;
 	background-color: white;
+	-o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space:nowrap;
 }
 .nw-tree-panel-arrows, .copy-dialog-panel-arrows, .move-dialog-panel-arrows, .share-dialog-panel-arrows {
 	height: 24px;
@@ -12083,6 +12087,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 }
+.top-menu-item {
+	padding-right:26px;
+}
 .sorting-menu-item {
 	height: 24px;
 	line-height: 23px;
@@ -14756,6 +14763,10 @@ div.membership-bott-button {
 }
 .membership-step2 .membership-new-offer {
 	display: none;
+}
+.membership-new-offer text {
+	font-family: 'source_sans_proregular';
+	font-weight:normal;
 }
 .membership-step2 .pro4 .membership-new-offer {
 	display: block;
@@ -20336,7 +20347,7 @@ span.incoming-call-name {
 	color: white;
 	overflow: hidden;
 	font-size: 100px;
-	line-height: 156px;
+	line-height: 154px;
 	margin: 4px 0 0 4px;
 	text-align: center;
 	font-family: 'Open Sans Light', Arial;

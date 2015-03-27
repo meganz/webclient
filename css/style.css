@@ -885,7 +885,7 @@ a.account-manage-button:hover {
 	-moz-border-radius: 100%;
 	-webkit-border-radius: 100%;
 	border-radius: 100%;
-	overflow:hidden;
+	overflow: hidden;
 }
 .nw-fm-percentage ul {
 	list-style-type: none;
@@ -1652,8 +1652,8 @@ a.blog-button:hover {
 	line-height: 46px;
 	margin: 8px 0;
 	display: block;
-	text-transform:uppercase;
-	font-family:'Open Sans Light';
+	text-transform: uppercase;
+	font-family: 'Open Sans Light';
 }
 .notification-request-buttons {
 	float: right;
@@ -6998,8 +6998,12 @@ table {
 	cursor: pointer;
 	padding: 0 8px 0 46px;
 }
-.deactivated .fm-breadcrumbs .right-arrow-bg  {
-    cursor:default;
+.deactivated .fm-breadcrumbs .right-arrow-bg {
+	cursor: default;
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
+	-moz-opacity: 0.5;
+	-khtml-opacity: 0.5;
+	opacity: 0.5;
 }
 .fm-breadcrumbs.cloud-drive .right-arrow-bg {
 	padding: 0 8px 0 31px;
@@ -12001,13 +12005,15 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 	color: rgba(204,204,204,1);
 	background-position: right -4593px;
 }
-.top-menu-popup .top-menu-item:nth-child(2) .top-submenu-popup {
+.not-logged .top-menu-popup .top-menu-item:nth-child(3) .top-submenu-popup {
 	-webkit-border-top-left-radius: 0px;
 	-moz-border-radius-topleft: 0px;
 	border-top-left-radius: 0px;
 	-webkit-border-top-right-radius: 0px;
 	-moz-border-radius-topright: 0px;
 	border-top-right-radius: 0px;
+	margin: -4px 0 0 0;
+    padding-top: 4px;
 }
 .top-menu-arrow, .top-login-arrow, .notification-arrow, .top-user-status-arrow, .membership-popup-arrow, .warning-popup-arrow {
 	height: 8px;
@@ -12355,14 +12361,6 @@ table {
 }
 .top-user-status-txt {
 	margin: 0 0 0 26px;
-}
-.top-menu-item.upgrade-your-account {
-	color: rgba(255,255,255,0.7);
-	background-color: rgba(29,172,57,1);
-}
-.top-menu-item.upgrade-your-account:hover {
-	color: rgba(255,255,255,1);
-	background-color: rgba(19,224,60,1);
 }
 .top-menu-item:hover, .top-menu-item.active, .top-user-status-item:hover {
 	background-color: rgba(255,255,255,0.1);
@@ -13569,7 +13567,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	padding: 0 20px;
-	overflow:hidden;
+	overflow: hidden;
 }
 .nw-bottom-pad {
 	height: 208px;
@@ -14384,12 +14382,12 @@ h5.main-italic-header {
 	top: -28px;
 }
 .membership-popup .membership-icon, .fm-account-mutliple-bl .membership-icon {
-	position:static;
-	float:left;
-	margin:20px 0 0 20px;
+	position: static;
+	float: left;
+	margin: 20px 0 0 20px;
 }
 .fm-account-mutliple-bl .membership-icon {
-	margin:0;
+	margin: 0;
 }
 .free .reg-st3-membership-icon, .loginrequired-dialog .fm-notification-icon.plan0, .free.membership-icon {
 	background-position: center -210px;
@@ -14407,10 +14405,10 @@ h5.main-italic-header {
 	background-position: center -729px;
 }
 .key3-top, .key .pro-top {
-	display:none;
+	display: none;
 }
 .key .key3-top {
-	display:block;
+	display: block;
 }
 .membership-question-mark {
 	margin: 14px auto 0 auto;
@@ -14587,7 +14585,7 @@ h5.main-italic-header {
 	padding: 0;
 }
 .payment-period {
-    margin-top: 56px;
+	margin-top: 56px;
 }
 .membership-payment-icon {
 	width: 110px;
@@ -14740,22 +14738,21 @@ div.membership-bott-button {
 	border: 2px solid #d9d9d9;
 	margin: 8px;
 }
-
-.bg .reg-st3-big-txt span, .uk .reg-st3-big-txt span, .ru .reg-st3-big-txt span, .ca .reg-st3-mid-txt, .ca .reg-st3-big-txt span, .gl .reg-st3-mid-txt, .gl .reg-st3-big-txt span, .it .reg-st3-mid-txt, .it .reg-st3-big-txt span, .lv .reg-st3-mid-txt, .lv .reg-st3-big-txt span, .nl .reg-st3-mid-txt, .nl .reg-st3-big-txt span, .pt .reg-st3-mid-txt, .pt .reg-st3-big-txt span, .br .reg-st3-mid-txt, .br .reg-st3-big-txt span, .sk .reg-st3-mid-txt, .sk .reg-st3-big-txt span, .ka .reg-st3-big-txt span  {
-font-size:14px;
+.bg .reg-st3-big-txt span, .uk .reg-st3-big-txt span, .ru .reg-st3-big-txt span, .ca .reg-st3-mid-txt, .ca .reg-st3-big-txt span, .gl .reg-st3-mid-txt, .gl .reg-st3-big-txt span, .it .reg-st3-mid-txt, .it .reg-st3-big-txt span, .lv .reg-st3-mid-txt, .lv .reg-st3-big-txt span, .nl .reg-st3-mid-txt, .nl .reg-st3-big-txt span, .pt .reg-st3-mid-txt, .pt .reg-st3-big-txt span, .br .reg-st3-mid-txt, .br .reg-st3-big-txt span, .sk .reg-st3-mid-txt, .sk .reg-st3-big-txt span, .ka .reg-st3-big-txt span {
+	font-size: 14px;
 }
 .bg .reg-st3-big-txt, .uk .reg-st3-big-txt, .ru .reg-st3-big-txt, .ka .reg-st3-big-txt {
 	font-size: 18px;
 }
 .bg .reg-st3-mid-txt, .uk .reg-st3-mid-txt, .ru .reg-st3-mid-txt, .ka .reg-st3-mid-txt {
-	font-size:13px;
+	font-size: 13px;
 }
 .bg .reg-st3-storage, .bg .reg-st3-bandwidth, .uk .reg-st3-storage, .uk .reg-st3-bandwidth, .ru .reg-st3-storage, .ru .reg-st3-bandwidth, .gl .reg-st3-storage, .gl .reg-st3-bandwidth, .it .reg-st3-storage, .it .reg-st3-bandwidth, .lv .reg-st3-storage, .lv .reg-st3-bandwidth, .pt .reg-st3-storage, .pt .reg-st3-bandwidth, .br .reg-st3-storage, .br .reg-st3-bandwidth, .sk .reg-st3-storage, .sk .reg-st3-bandwidth, .ka .reg-st3-storage, .ka .reg-st3-bandwidth {
-  	padding-left: 20px;
-	padding-right:20px;
+	padding-left: 20px;
+	padding-right: 20px;
 }
 .ca .reg-st3-mid-txt, .gl .reg-st3-mid-txt, .it .reg-st3-mid-txt, .nl .reg-st3-mid-txt, .pt .reg-st3-mid-txt, .br .reg-st3-mid-txt, .sk .reg-st3-mid-txt {
-	  line-height: 34px;
+	line-height: 34px;
 }
 .membership-step2 .membership-new-offer {
 	display: none;
@@ -14767,7 +14764,7 @@ font-size:14px;
 	height: 258px;
 }
 .membership-step2 .membership-button {
-	display:none;
+	display: none;
 }
 .reg-st3-bott-title {
 	font-size: 32px;
@@ -16674,13 +16671,13 @@ strong, b {
 	width: 32px;
 	display: inline-block;
 	margin: 0 4px 0 4px;
-    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 	-moz-opacity: 0.5;
 	-khtml-opacity: 0.5;
 	opacity: 0.5;
 }
 .resellers-link:hover .resellers-payment {
-    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
 	-moz-opacity: 1;
 	-khtml-opacity: 1;
 	opacity: 1;
@@ -16692,7 +16689,7 @@ strong, b {
 	padding: 20px 0 17px 0;
 }
 .wire-transfer-details {
-    margin-bottom: 20px;
+	margin-bottom: 20px;
 }
 /* Make the wire transfer details mouse selectable */
 .wire-transfer-details * {
@@ -19614,7 +19611,7 @@ a.blog-article-button {
 	text-align: center;
 }
 .animations-left-container.currentLink, .animations-right-container .currentLink {
- display:block;
+	display: block;
 }
 .products-bottom-block {
 	height: 130px;
@@ -20289,7 +20286,7 @@ span.incoming-call-name {
 .shared-details-pad .fm-chat-user {
 	color: #666666;
 	font-size: 11px;
-	padding: 9px 0 0 0;
+	padding: 12px 0 0 0;
 	font-family: 'Open Sans', Helvetica, Arial;
 }
 .shared-details-buttons {

@@ -1074,7 +1074,6 @@ function topmenuUI() {
 
     $('.warning-popup-icon').addClass('hidden');
     $('.top-menu-item.upgrade-your-account').hide();
-    $('.context-menu-divider.upgrade-your-account').addClass('pro');
     $('.top-menu-item.register,.top-menu-item.login').hide();
     $('.top-menu-item.logout,.context-menu-divider.logout').hide();
     $('.top-menu-item.clouddrive,.top-menu-item.account').hide();
@@ -1189,7 +1188,7 @@ function topmenuUI() {
         }
 
         $('.top-menu-item.upgrade-your-account').show();
-        $('.top-menu-item.upgrade-your-account').text(l[129]);
+        $('.top-menu-item.pro-item span').text(l[129]);
         $('.membership-status-block').hide();
         $('.create-account-button').show();
         $('.create-account-button').rebind('click', function () {
@@ -1582,6 +1581,15 @@ function topmenuUI() {
         }
         else if (c.indexOf('account') > -1) {
             document.location.hash = 'fm/account';
+        }
+		else if (c.indexOf('refresh') > -1) {
+           stopsc();
+           stopapi();
+           if (typeof mDB !== 'undefined' && !pfid) {
+              mDBreload();
+           } else {
+              loadfm(true);
+           }
         }
         else if (c.indexOf('languages') > -1) {
             languageDialog();

@@ -1694,6 +1694,7 @@ a.blog-button:hover {
 .black {
 	color: black;
 }
+/* Notification icons */
 .nt-revocation-of-incoming .notification-avatar-icon {
 	background-position: -10px -153px;
 }
@@ -1714,6 +1715,14 @@ a.blog-button:hover {
 }
 .nt-contact-request-denied .notification-avatar-icon, .nt-contact-request-blocked .notification-avatar-icon, .nt-contact-request-ignored .notification-avatar-icon {
 	background-position: -10px -153px;
+}
+.nt-payment-notification .notification-avatar-icon {
+    background-image: url("../images/mega/icons/retina/money_coin@2x.png");
+    background-position: 0 0;
+    background-repeat: no-repeat;
+    background-size: 100% auto;
+    height: 48px;
+    width: 48px;
 }
 .notification-popup .jspDrag {
 	width: 4px;

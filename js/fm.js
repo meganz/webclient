@@ -1,4 +1,22 @@
-
+/**
+ * Get a string for the payment plan number
+ * @param {Number} planNum The plan number e.g. 1: PRO I, 2: PRO II, 3: PRO III, 4: LITE
+ */
+function getProPlan(planNum) {
+    
+    switch (planNum) {
+        case 1:
+            return l[5819];     // PRO I
+        case 2:
+            return l[6125];     // PRO II
+        case 3:
+            return l[6126];     // PRO III
+        case 4:
+            return 'LITE';      // l[6234] (when strings generated)
+        default:
+            return l[435];      // FREE
+    }
+}
 
 function voucherCentering(button)
 {
@@ -1282,7 +1300,7 @@ function sharedUInode(nodeHandle) {
     $('.file-block#' + nodeHandle + ' .block-view-file-type').addClass(fileicon({ t: 1, shares: availShares }));
 }
 
-function addnotification(notification) {
+function addShareNotification(notification) {
 
     if (notifyPopup.notifications == null) {
         return false;
@@ -1330,7 +1348,7 @@ function addnotification(notification) {
     notifyPopup.doNotify();
 }
 
-function addIpcOrContactNotification(actionPacket) {
+function addNotification(actionPacket) {
 
     if (notifyPopup.notifications === null) {
         return false;
@@ -2681,22 +2699,11 @@ function accountUI()
         if (u_attr.p)
         {
             // LITE/PRO account
-            var planText;
-            if (u_attr.p == 1) {
-                planText = l[5819];      // PRO I
-            }
-            else if (u_attr.p == 2) {
-                planText = l[6125];      // PRO II
-            }
-            else if (u_attr.p == 3) {
-                planText = l[6127];      // PRO III
-            }
-            else if (u_attr.p == 4) {
-                planText = 'LITE';
-            }
+            var planNum = u_attr.p;
+            var planText = getProPlan(planNum);
             
             $('.membership-big-txt.accounttype').text(planText);
-            $('.fm-account-blocks .membership-icon.type').addClass('pro' + u_attr.p);
+            $('.fm-account-blocks .membership-icon.type').addClass('pro' + planNum);
             
             if (account.stype == 'S')
             {
@@ -2896,23 +2903,6 @@ function accountUI()
         $('.grid-table.purchases tr').remove();
         var html = '<tr><th>' + l[475] + '</th><th>' + l[476] + '</th><th>' + l[477] + '</th><th>' + l[478] + '</th></tr>';
         
-        // The purchase history rendering below needs to be refactored and not hard coded. 
-        // Or in the future as soon as the prices change it will break the account page.
-        var pro = {
-            
-            // Monthly
-            '9.99': ['PRO I (' + l[918] + ')', '1'],
-            '19.99': ['PRO II (' + l[918] + ')', '2'],
-            '29.99': ['PRO III (' + l[918] + ')', '3'],
-            '4.99': ['Lite (' + l[918] + ')', '4'],
-            
-            // Yearly
-            '99.99': ['PRO I (' + l[919] + ')', '1'],
-            '199.99': ['PRO II (' + l[919] + ')', '2'],
-            '299.99': ['PRO III (' + l[919] + ')', '3'],
-            '49.99': ['Lite (' + l[919] + ')', '4']
-        };
-        
         // Render every purchase made into Purchase History on Account page
         $(account.purchases).each(function(index, purchaseTransaction)
         {
@@ -2933,9 +2923,12 @@ function accountUI()
             // Set Date/Time, Item (plan purchased), Amount, Payment Method
             var dateTime = time2date(purchaseTransaction[1]);
             var price = purchaseTransaction[2];
-            var proNum = pro[price][1];
-            var item = pro[price][0];
-            var priceEscaped = htmlentities(price);
+            var proNum = purchaseTransaction[4];
+            
+            // Because the information for whether the purchase was monthly or yearly is currently unavailable, 
+            // we apply a temporary hack to check if the price is greater than 30 EUR then it must be yearly plan 
+            var monthlyOrYearlyWording = (price > 30) ? l[919] : l[918];            
+            var item = getProPlan(proNum) + ' (' + monthlyOrYearlyWording + ')';
 
             // Render table row
             html += '<tr>'
@@ -2946,7 +2939,7 @@ function accountUI()
                  +           '</span>'
                  +           '<span class="fm-member-icon-txt"> ' + item + '</span>'
                  +      '</td>'
-                 +      '<td>&euro;' + priceEscaped + '</td>'
+                 +      '<td>&euro;' + htmlentities(price) + '</td>'
                  +      '<td>' + paymentMethod + '</td>'
                  +  '</tr>';
         });

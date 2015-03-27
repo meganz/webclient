@@ -107,7 +107,7 @@ function MegaData()
         this.RubbishID = undefined;
         this.InboxID = undefined;
         this.viewmode = 0;
-    }
+    };
 
     this.sortBy = function(fn, d)
     {
@@ -4369,16 +4369,16 @@ function execsc(actionPackets, callback) {
             }
 
             // If contact notification
-                   if (actionPacket.a === 'c') {
+            if (actionPacket.a === 'c') {
                 process_u(actionPacket.u);
 
                 // Only show a notification if we did not trigger the action ourselves
                 if (actionPacket.ou !== u_attr.u) {
-                    addIpcOrContactNotification(actionPacket);
+                    addNotification(actionPacket);
                 }
 
                 if (megaChat && megaChat.is_initialized) {
-                    $.each(actionPacket.u, function(k, v) {
+                    $.each(actionPacket.u, function (k, v) {
                         megaChat[v.c == 0 ? "processRemovedUser" : "processNewUser"](v.u);
                     });
                 }
@@ -4398,7 +4398,7 @@ function execsc(actionPackets, callback) {
             else if (actionPacket.a === 'ipc') {
                 processIPC([actionPacket]);
                 M.drawReceivedContactRequests([actionPacket]);
-                addIpcOrContactNotification(actionPacket);
+                addNotification(actionPacket);
             }
 
             // Pending shares
@@ -4417,7 +4417,7 @@ function execsc(actionPackets, callback) {
 
                 // If the status is accepted ('2') then this will be followed by a contact packet and we do not need to notify
                 if (actionPacket.s !== 2) {
-                    addIpcOrContactNotification(actionPacket);
+                    addNotification(actionPacket);
                 }
             }
             else if (actionPacket.a === 'ua') {
@@ -4494,7 +4494,7 @@ function execsc(actionPackets, callback) {
                             M.delNode(actionPacket.n);
                         }
                         if (!folderlink && actionPacket.u !== 'EXP' && fminitialized) {
-                            addnotification({
+                            addShareNotification({
                                 t: 'dshare',
                                 n: actionPacket.n,
                                 u: actionPacket.o
@@ -4529,7 +4529,7 @@ function execsc(actionPackets, callback) {
                             }
 
                             if (!folderlink && fminitialized) {
-                                addnotification({
+                                addShareNotification({
                                     t: 'share',
                                     n: actionPacket.n,
                                     u: actionPacket.o
@@ -4615,7 +4615,7 @@ function execsc(actionPackets, callback) {
                         });
                     }
                 }
-                addnotification({
+                addShareNotification({
                     t: 'put',
                     n: targetid,
                     u: actionPacket.ou,
@@ -4642,7 +4642,7 @@ function execsc(actionPackets, callback) {
 
             // Only show a notification if we did not trigger the action ourselves
             if (actionPacket.ou !== u_attr.u) {
-                addIpcOrContactNotification(actionPacket);
+                addNotification(actionPacket);
             }
 
             if (megaChat && megaChat.is_initialized) {
@@ -4678,7 +4678,7 @@ function execsc(actionPackets, callback) {
         else if (actionPacket.a === 'ipc') {
             processIPC([actionPacket]);
             M.drawReceivedContactRequests([actionPacket]);
-            addIpcOrContactNotification(actionPacket);
+            addNotification(actionPacket);
         }
         else if (actionPacket.a === 's2') {
             processPS([actionPacket]);
@@ -4691,9 +4691,14 @@ function execsc(actionPackets, callback) {
 
             // If the status is accepted ('2') then this will be followed by a contact packet and we do not need to notify
             if (actionPacket.s !== 2) {
-                addIpcOrContactNotification(actionPacket);
+                addNotification(actionPacket);
             }
-        } else {
+        }        
+        // Action packet to notify about payment (Payment Service Transaction Status)
+        else if (actionPacket.a === 'psts') {            
+            addNotification(actionPacket);
+        }
+        else {
             if (d) {
                 console.log('not processing this action packet', actionPacket);
             }

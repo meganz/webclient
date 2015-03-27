@@ -1116,23 +1116,13 @@ function topmenuUI() {
 
         // If a Lite/Pro plan has been purchased
         if (u_attr.p) {
-            var purchasedPlan = '';
-            var cssClass = 'pro';
             
-            // Set the text
-            if (u_attr.p == 1) {
-                purchasedPlan = l[5819];    // PRO I
-            }
-            else if (u_attr.p == 2) {
-                purchasedPlan = l[6125];    // PRO II
-            }
-            else if (u_attr.p == 3) {
-                purchasedPlan = l[6126];    // PRO III
-            }
-            else if (u_attr.p == 4) {
-                purchasedPlan = 'LITE';
-                cssClass = 'lite';
-            }
+            // Set the plan text
+            var proNum = u_attr.p;
+            var purchasedPlan = getProPlan(proNum);
+            
+            // Set colour of plan
+            var cssClass = (proNum == 4) ? 'lite' : 'pro';
             
             // Show the 'Upgrade your account' button in the main menu for all 
             // accounts except for the biggest plan i.e. PRO III

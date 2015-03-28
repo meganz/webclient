@@ -23931,6 +23931,7 @@ background-color:#1DA2E9
         visibility: hidden;
         height: auto !important;
         overflow: visible !important;
+        max-width: 100% !important;
     }
     .main-mid-pad * {
         visibility: visible;

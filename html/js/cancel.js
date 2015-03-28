@@ -34,15 +34,14 @@
         $('.fm-dialog').removeClass('error active');
         $('.fm-dialog-overlay').removeClass('hidden');
         $('body').addClass('overlayed');
-        $('.fm-dialog' + self.opt.dialogClass).removeClass('hidden');
+        $('.fm-dialog' + self.opt.dialogClass)
+            .removeClass('hidden')
+            .addClass('active');
+        $(self.opt.passwordInputId).focus();
 
         $.dialog = self.opt.dlgName;
 
-        $(self.opt.passwordInputId).focus(function() {
-            $('.fm-dialog').addClass('active');
-        });
-
-        // Button cloase account listener
+        // Button close account listener
         $(self.opt.dialogClass + ' .fm-dialog-button.close-account').rebind('click', function(e) {
 
             loadingDialog.show();
@@ -154,16 +153,11 @@
     };
 
     AccountClosure.prototype._deleteLeftovers = function() {
-        mDBclear();
-        for (var i in localStorage) {
-            if (localStorage.hasOwnProperty(i)) {
-                delete localStorage[i];
-            }
-        }
-        delete localStorage;
+        u_logout(true);
         closeDialog();
         $('.reset-success-st3').removeClass('active');
         document.location.hash = 'login';
+        document.location.reload();
     };
 
     AccountClosure.prototype._gatherFeedback = function() {

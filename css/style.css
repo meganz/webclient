@@ -23922,3 +23922,30 @@ background-color:#1DA2E9
  100% {
 }
 }
+
+
+/* frienldy printing */
+@media print {
+    /* remove all single page styles */
+    body, body * {
+        visibility: hidden;
+        height: auto !important;
+        overflow: visible !important;
+    }
+    .main-mid-pad * {
+        visibility: visible;
+        display: block;
+    }
+    .main-mid-pad {
+        visibility: visible;
+        float: none !important;
+        left: 0px;
+        top: 0px;
+        width: 100% !important;
+        position: absolute !important;
+        overflow: visible !important;
+    }
+    p {
+        page-break-before: always;
+    }
+}

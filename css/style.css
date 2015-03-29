@@ -23945,7 +23945,4 @@ background-color:#1DA2E9
         position: absolute !important;
         overflow: visible !important;
     }
-    p {
-        page-break-before: always;
-    }
 }

@@ -6445,10 +6445,12 @@ function addShareDialogContactToContent(type, id, av_color, av, name, permClass,
     var html = '',
         htmlEnd = '',
         item = '';
+		exportClass = '';
 
     
     if (exportLink) {
         item = itemExportLinkHtml(M.d[exportLink]);
+		exportClass = 'share-item-bl';
     }
     else {
         item = '<div class="nw-contact-avatar color' + av_color + '">' + av + '</div>'
@@ -6457,7 +6459,7 @@ function addShareDialogContactToContent(type, id, av_color, av, name, permClass,
                +   '</div>';
     }
     
-    html = '<div class="share-dialog-contact-bl ' + type + '" id="sdcbl_' + id + '">'
+    html = '<div class="share-dialog-contact-bl ' + exportClass + ' ' + type + '" id="sdcbl_' + id + '">'
            +   item
            +   '<div class="share-dialog-permissions ' + permClass + '">'
            +       '<span></span>' + permText
@@ -6983,7 +6985,7 @@ function initShareDialog() {
             $('.permissions-icon').removeClass('active');
             $m.addClass('search-permissions');
             closeImportContactNotification('.share-dialog');
-            var x = $this.position().left + 12;
+            var x = $this.position().left;
             var y = $this.position().top + 8;
             handlePermissionMenu($this, $m, x, y);
         }

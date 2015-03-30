@@ -12311,9 +12311,6 @@ table {
 .canceltransfer-item .context-menu-icon {
 	background-position: 4px -3716px;
 }
-.refresh-item .context-menu-icon {
-	background-position: -3px -4519px;
-}
 .select-all .context-menu-icon {
 	background-position: -3px -5290px;
 }
@@ -23921,4 +23918,28 @@ background-color:#1DA2E9
 }
  100% {
 }
+}
+
+
+/* frienldy printing */
+@media print {
+    /* remove all single page styles */
+    body, body * {
+        visibility: hidden;
+        height: auto !important;
+        overflow: visible !important;
+        max-width: 100% !important;
+    }
+    .main-mid-pad * {
+        visibility: visible;
+    }
+    .main-mid-pad {
+        visibility: visible;
+        float: none !important;
+        left: 0px;
+        top: 0px;
+        width: 100% !important;
+        position: absolute !important;
+        overflow: visible !important;
+    }
 }

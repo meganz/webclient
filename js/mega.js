@@ -2988,12 +2988,15 @@ function MegaData()
                 }
             });
 
-            api_req({a: 'utp'}, {
+            // Get (f)ull payment history
+            // [[payment id, timestamp, price paid, currency, payment gateway id, payment plan id, num of months purchased]]
+            api_req({ a: 'utp', f : 1 }, {
                 account: account,
                 callback: function(res, ctx)
                 {
-                    if (typeof res != 'object')
+                    if (typeof res != 'object') {
                         res = [];
+                    }
                     ctx.account.purchases = res;
                 }
             });

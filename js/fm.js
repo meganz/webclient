@@ -2911,12 +2911,10 @@ function accountUI()
             // Set Date/Time, Item (plan purchased), Amount, Payment Method
             var dateTime = time2date(purchaseTransaction[1]);
             var price = purchaseTransaction[2];
-            var proNum = purchaseTransaction[4];
-            
-            // Because the information for whether the purchase was monthly or yearly is currently unavailable, 
-            // we apply a temporary hack to check if the price is greater than 30 EUR then it must be yearly plan 
-            var monthlyOrYearlyWording = (price > 30) ? l[919] : l[918];            
-            var item = getProPlan(proNum) + ' (' + monthlyOrYearlyWording + ')';
+            var proNum = purchaseTransaction[5];
+            var numOfMonths = purchaseTransaction[6];
+            var monthWording = (numOfMonths == 1) ? l[931] : 'months';  // Todo: l[6788] when generated
+            var item = getProPlan(proNum) + ' (' + numOfMonths + ' ' + monthWording + ')';
 
             // Render table row
             html += '<tr>'

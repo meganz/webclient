@@ -1660,6 +1660,7 @@ a.blog-button:hover {
 .black {
 	color: black;
 }
+/* Notification icons */
 .nt-revocation-of-incoming .notification-avatar-icon {
 	background-position: -10px -153px;
 }
@@ -1680,6 +1681,14 @@ a.blog-button:hover {
 }
 .nt-contact-request-denied .notification-avatar-icon, .nt-contact-request-blocked .notification-avatar-icon, .nt-contact-request-ignored .notification-avatar-icon {
 	background-position: -10px -153px;
+}
+.nt-payment-notification .notification-avatar-icon {
+    background-image: url("../images/mega/icons/retina/money_coin@2x.png");
+    background-position: 0 0;
+    background-repeat: no-repeat;
+    background-size: 100% auto;
+    height: 48px;
+    width: 48px;
 }
 .notification-popup .jspDrag {
 	width: 4px;
@@ -4319,9 +4328,13 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 	font-size: 12px;
 	line-height: 23px;
 	color: #999999;
-	padding: 0 0 0 10px;
+	padding: 0 25px 0 10px;
 	position: relative;
 	background-color: white;
+	-o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space:nowrap;
 }
 .nw-tree-panel-arrows, .copy-dialog-panel-arrows, .move-dialog-panel-arrows, .share-dialog-panel-arrows {
 	height: 24px;
@@ -4830,18 +4843,25 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	-ms-transition: all 200ms ease-in-out;
 	transition: all 200ms ease-in-out;
 }
-.membership-status.pro {
-	background-color: #721908;
-}
 .membership-status.free {
 	background-color: #12a22f;
 }
-.membership-status-block:hover .membership-status.pro, .membership-status-block.active .membership-status.pro {
-	background-color: #bf1f02;
-	color: rgba(255,255,255,0.9);
+.membership-status.lite {
+	background-color: #ffa500;
+}
+.membership-status.pro {
+	background-color: #721908;
 }
 .membership-status-block:hover .membership-status.free, .membership-status-block.active .membership-status.free {
 	background-color: #13E03C;
+	color: rgba(255,255,255,0.9);
+}
+.membership-status-block:hover .membership-status.lite, .membership-status-block.active .membership-status.lite {
+	background-color: #ffa500;
+	color: rgba(255,255,255,0.9);
+}
+.membership-status-block:hover .membership-status.pro, .membership-status-block.active .membership-status.pro {
+	background-color: #bf1f02;
 	color: rgba(255,255,255,0.9);
 }
 .user-name, a.user-name {
@@ -6950,6 +6970,10 @@ table {
 }
 .deactivated .fm-breadcrumbs .right-arrow-bg {
 	cursor: default;
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
+	-moz-opacity: 0.5;
+	-khtml-opacity: 0.5;
+	opacity: 0.5;
 }
 .fm-breadcrumbs.cloud-drive .right-arrow-bg {
 	padding: 0 8px 0 31px;
@@ -7642,11 +7666,11 @@ table {
 	-o-transition: all 200ms ease-in-out;
 	-ms-transition: all 200ms ease-in-out;
 	transition: all 200ms ease-in-out;
-	margin: 0 4px;
 }
 .fm-empty-button:hover, .fm-not-logged-button:hover {
 	background-color: rgba(49,181,0,0.7);
 	color: white;
+	margin: 0 4px;
 }
 .fm-empty-cloud-txt {
 	color: #CCCCCC;
@@ -10738,6 +10762,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	font-size: 11px;
 	line-height: 19px;
 	width: 100%;
+	background-color: transparent;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 .export-link-gray-txt {
 	color: #999999;
@@ -11982,13 +12010,15 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 	color: rgba(204,204,204,1);
 	background-position: right -4593px;
 }
-.top-menu-popup .top-menu-item:nth-child(2) .top-submenu-popup {
+.not-logged .top-menu-popup .top-menu-item:nth-child(3) .top-submenu-popup {
 	-webkit-border-top-left-radius: 0px;
 	-moz-border-radius-topleft: 0px;
 	border-top-left-radius: 0px;
 	-webkit-border-top-right-radius: 0px;
 	-moz-border-radius-topright: 0px;
 	border-top-right-radius: 0px;
+	margin: -4px 0 0 0;
+	padding-top: 4px;
 }
 .top-menu-arrow, .top-login-arrow, .notification-arrow, .top-user-status-arrow, .membership-popup-arrow, .warning-popup-arrow {
 	height: 8px;
@@ -12058,6 +12088,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 }
+.top-menu-item {
+	padding-right:26px;
+}
 .sorting-menu-item {
 	height: 24px;
 	line-height: 23px;
@@ -12093,7 +12126,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 	top: 14px;
 }
 .context-menu-item, .permissions-menu-item {
-	padding: 0 15px 0 42px;
+	padding: 0 30px 0 42px;
 	color: rgba(204,204,204,1);
 }
 .permissions-menu-item {
@@ -12279,9 +12312,6 @@ table {
 .canceltransfer-item .context-menu-icon {
 	background-position: 4px -3716px;
 }
-.refresh-item .context-menu-icon {
-	background-position: -3px -4519px;
-}
 .select-all .context-menu-icon {
 	background-position: -3px -5290px;
 }
@@ -12336,14 +12366,6 @@ table {
 }
 .top-user-status-txt {
 	margin: 0 0 0 26px;
-}
-.top-menu-item.upgrade-your-account {
-	color: rgba(255,255,255,0.7);
-	background-color: rgba(29,172,57,1);
-}
-.top-menu-item.upgrade-your-account:hover {
-	color: rgba(255,255,255,1);
-	background-color: rgba(19,224,60,1);
 }
 .top-menu-item:hover, .top-menu-item.active, .top-user-status-item:hover {
 	background-color: rgba(255,255,255,0.1);
@@ -14791,10 +14813,14 @@ div.membership-bott-button {
 	padding-right: 20px;
 }
 .ca .reg-st3-mid-txt, .gl .reg-st3-mid-txt, .it .reg-st3-mid-txt, .nl .reg-st3-mid-txt, .pt .reg-st3-mid-txt, .br .reg-st3-mid-txt, .sk .reg-st3-mid-txt {
-	line-height: 34px;
+	  line-height: 34px;
 }
 .membership-step2 .membership-new-offer {
 	display: none;
+}
+.membership-new-offer text {
+	font-family: 'source_sans_proregular';
+	font-weight:normal;
 }
 .membership-step2 .pro4 .membership-new-offer {
 	display: block;
@@ -20314,7 +20340,7 @@ span.incoming-call-name {
 .shared-details-pad .fm-chat-user {
 	color: #666666;
 	font-size: 11px;
-	padding: 9px 0 0 0;
+	padding: 12px 0 0 0;
 	font-family: 'Open Sans', Helvetica, Arial;
 }
 .shared-details-buttons {
@@ -20364,7 +20390,7 @@ span.incoming-call-name {
 	color: white;
 	overflow: hidden;
 	font-size: 100px;
-	line-height: 156px;
+	line-height: 154px;
 	margin: 4px 0 0 4px;
 	text-align: center;
 	font-family: 'Open Sans Light', Arial;
@@ -20689,6 +20715,23 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
 	box-sizing: border-box;
 	white-space: nowrap;
 }
+.share-item-bl .export-link-item {
+	float: left;
+	display: block;
+	width: 259px;
+}
+.share-item-bl .export-icon {
+	margin: 0 14px 0 8px;
+}
+.share-item-bl .export-link-text-pad {
+	width: 170px;
+}
+.share-item-bl .share-dialog-permissions {
+	top: 13px;
+}
+.share-item-bl .share-dialog-remove-button {
+	margin-top: 26px;
+}
 .share-dialog-contact-bl.pending .fm-chat-user span {
 	max-width: -webkit-calc(100% - 26px);
 	max-width: -moz-calc(100% - 26px);
@@ -20905,7 +20948,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	max-height: 192px;
 }
 .share-dialog-contact-bl {
-	height: 48px;
 	-webkit-transition: background-color 200ms ease-in-out;
 	-moz-transition: background-color 200ms ease-in-out;
 	-o-transition: background-color 200ms ease-in-out;
@@ -23007,12 +23049,13 @@ background-image: url(../images/mega/empty@2x.png);
  background-image: url(../images/mega/dev-point-gray-new.png);
  background-size: 39px auto;
 }
-.radioOn, .radioOff {
- background-position: left 2px;
- background-size: 16px auto;
+.radioOn {
+ background-position: -174px -274px;
+ background-size: 353px auto;
 }
 .radioOff {
- background-position: left -28px;
+ background-position: -219px -274px;
+ background-size: 353px auto;
 }
 .fm-bandwidth-icon, .fm-bandwidth-dashed {
 background-image: url(../images/mega/quota-sprite@2x.png);
@@ -23937,4 +23980,28 @@ background-color:#1DA2E9
 }
  100% {
 }
+}
+
+
+/* frienldy printing */
+@media print {
+    /* remove all single page styles */
+    body, body * {
+        visibility: hidden;
+        height: auto !important;
+        overflow: visible !important;
+        max-width: 100% !important;
+    }
+    .main-mid-pad * {
+        visibility: visible;
+    }
+    .main-mid-pad {
+        visibility: visible;
+        float: none !important;
+        left: 0px;
+        top: 0px;
+        width: 100% !important;
+        position: absolute !important;
+        overflow: visible !important;
+    }
 }

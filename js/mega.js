@@ -107,7 +107,7 @@ function MegaData()
         this.RubbishID = undefined;
         this.InboxID = undefined;
         this.viewmode = 0;
-    }
+    };
 
     this.sortBy = function(fn, d)
     {
@@ -452,13 +452,13 @@ function MegaData()
     this.onlineStatusClass = function(os)
     {
         if (os == 'dnd')
-            return ['Busy', 'busy'];
+            return [l[5925], 'busy'];
         else if (os == 'away')
-            return ['Away', 'away'];
+            return [l[5924], 'away'];
         else if (os == 'chat' || os == 'available')
-            return ['Online', 'online'];
+            return [l[5923], 'online'];
         else
-            return ['Offline', 'offline'];
+            return [l[5926], 'offline'];
     };
 
     this.onlineStatusEvent = function(u, status)
@@ -1555,7 +1555,7 @@ function MegaData()
             if (!MegaChatDisabled) {
                 onlinestatus = M.onlineStatusClass(megaChat.karere.getPresence(megaChat.getJidFromNodeId(contacts[i].u)));
             } else {
-                onlinestatus = ['Offline', 'offline'];
+                onlinestatus = [l[5926], 'offline'];
             }
             if (!treesearch || (treesearch && contacts[i].name && contacts[i].name.toLowerCase().indexOf(treesearch.toLowerCase()) > -1)) {
                 html += '<div class="nw-contact-item ' + onlinestatus[1] + '" id="contact_' + htmlentities(contacts[i].u)
@@ -2988,12 +2988,15 @@ function MegaData()
                 }
             });
 
-            api_req({a: 'utp'}, {
+            // Get (f)ull payment history
+            // [[payment id, timestamp, price paid, currency, payment gateway id, payment plan id, num of months purchased]]
+            api_req({ a: 'utp', f : 1 }, {
                 account: account,
                 callback: function(res, ctx)
                 {
-                    if (typeof res != 'object')
+                    if (typeof res != 'object') {
                         res = [];
+                    }
                     ctx.account.purchases = res;
                 }
             });
@@ -3076,15 +3079,17 @@ function MegaData()
             $('.nw-fm-left-icon.rubbish-bin').addClass('filled')
     };
 
-    this.nodeAttr = function(a)
-    {
+    this.nodeAttr = function(a) {
+        
         var n = M.d[a.h];
-        if (n)
-        {
-            for (var i in a)
+        
+        if (n) {
+            for (var i in a) {
                 n[i] = a[i];
-            if (typeof mDB === 'object' && !pfkey)
+            }
+            if (typeof mDB === 'object' && !pfkey) {
                 mDBadd('f', clone(n));
+            }
         }
     };
 
@@ -3171,29 +3176,31 @@ function MegaData()
         }
     };
 
-    this.delnodeShare = function(h, u)
-    {
-        if (this.d[h] && typeof this.d[h].shares !== 'undefined')
-        {
+    this.delNodeShare = function(h, u) {
+        var a = 0;
+        if (this.d[h] && typeof this.d[h].shares !== 'undefined') {
             api_updfkey(h);
             delete this.d[h].shares[u];
-            var a = 0;
-            for (var i in this.d[h].shares)
-                if (this.d[h].shares[i])
+            for (var i in this.d[h].shares) {
+                if (this.d[h].shares[i]) {
                     a++;
-            if (a == 0)
-            {
+                }
+            }
+            if (a === 0) {
                 delete this.d[h].shares;
                 M.nodeAttr({h: h, shares: undefined});
                 delete u_sharekeys[h];
                 sharedUInode(h);
-                if (typeof mDB === 'object')
+                if (typeof mDB === 'object') {
                     mDBdel('ok', h);
+                }
             }
-            if (typeof mDB === 'object')
+            if (typeof mDB === 'object') {
                 mDBdel('s', h + '_' + u);
-            if ($.dialog == 'sharing' && $.selected && $.selected[0] == h)
+            }
+            if ($.dialog === 'sharing' && $.selected && $.selected[0] === h) {
                 shareDialog();
+            }
         }
     };
 
@@ -3226,89 +3233,117 @@ function MegaData()
         }
     };
 
-    this.getlinks = function(h)
-    {
+    /**
+     * Removes traces of export link share
+     * Remove M.fln, M.links, M.d[handle].ph
+     * 
+     * @param {string} handle of selected node/item
+     * 
+     */
+    this.deleteExportLinkShare = function(handle) {
+        
+        var index;
+        
+//  ToDo: Find out what's .fln stand for        
+//        if (M.fln.h === handle) {
+//            delete M.fln;
+//        }
+        
+        index = $.inArray(handle, M.links);
+        if (index !== -1) {
+            M.links.splice(index, 1);
+        }
+        
+        if (M.d[handle] && M.d[handle].ph) {
+            delete M.d[handle].ph;
+        }
+    };
+    
+    this.getLinks = function(h) {
         this.$getLinkPromise = new $.Deferred();
 
         loadingDialog.show();
         this.links = [];
-        this.folderlinks = [];
-        for (var i in h)
-        {
+        this.folderLinks = [];
+        for (var i in h) {
             var n = M.d[h[i]];
-            if (n)
-            {
-                if (n.t)
-                    this.folderlinks.push(n.h);
+            if (n) {
+                if (n.t) {
+                    this.folderLinks.push(n.h);
+                }
                 this.links.push(n.h);
             }
         }
-        if (d)
-            console.log('getlinks', this.links);
-        if (this.folderlinks.length > 0)
+        if (d) {
+            console.log('getLinks', this.links);
+        }
+        if (this.folderLinks.length > 0) {
             this.getFolderlinks();
-        else
-            this.getlinksDone();
+        }
+        else {
+            this.getLinksDone();
+        }
 
         return this.$getLinkPromise;
-    }
+    };
 
-    this.getlinksDone = function()
-    {
+    this.getLinksDone = function() {
         var self = this;
 
-        for (var i in this.links)
+        for (var i in this.links) {
             api_req({a: 'l', n: this.links[i]}, {
                 node: this.links[i],
                 last: i == this.links.length - 1,
-                callback: function(res, ctx)
-                {
-                    if (typeof res != 'number')
+                callback: function(res, ctx) {
+                    
+                    if (typeof res !== 'number') {
                         M.nodeAttr({h: M.d[ctx.node].h, ph: res});
+                    }
 
-                    if (ctx.last)
-                    {
+                    if (ctx.last) {
                         self.$getLinkPromise.resolve();
                         loadingDialog.hide();
                     }
                 }
             });
-    }
+        }
+    };
 
-    this.getFolderlinks = function()
-    {
-        if (this.folderlinks.length > 0)
-        {
-            var n = M.d[this.folderlinks[0]];
-            this.folderlinks.splice(0, 1);
+    this.getFolderlinks = function() {
+        
+        if (this.folderLinks.length > 0) {
+            var n = M.d[this.folderLinks[0]];
+            this.folderLinks.splice(0, 1);
 
-            if (n)
-            {
+            if (n) {
                 this.fln = n;
-                if (n.shares && n.shares['EXP'])
+                if (n.shares && n.shares['EXP']) {
                     this.getFolderlinks();
-                else
-                {
+                }
+                else {
                     var h = fm_getnodes(n.h);
                     h.push(n.h);
 
-                    api_setshare(n.h, [{u: 'EXP', r: 0}], h,
-                        {
-                            done: function(res)
-                            {
-                                if (res.r && res.r[0] == 0)
-                                    M.nodeShare(M.fln.h, {h: M.fln.h, r: 0, u: 'EXP', ts: Math.floor(new Date().getTime() / 1000)});
-                                M.getFolderlinks();
+                    api_setshare(n.h, [{u: 'EXP', r: 0}], h, {
+                        done: function(res) {
+                            if (res.r && res.r[0] === 0) {
+                                
+                                // ToDo: timestamp ts can be different here and on server side, check how this influence execution
+                                M.nodeShare(M.fln.h, {h: M.fln.h, r: 0, u: 'EXP', ts: Math.floor(new Date().getTime() / 1000)});
                             }
-                        });
+                            M.getFolderlinks();
+                        }
+                    });
                 }
             }
-            else
+            else {
                 this.getFolderlinks();
+            }
         }
-        else
-            this.getlinksDone();
-    }
+        else {
+            this.getLinksDone();
+        }
+    };
 
     this.makeDir = function(n)
     {
@@ -4369,16 +4404,16 @@ function execsc(actionPackets, callback) {
             }
 
             // If contact notification
-                   if (actionPacket.a === 'c') {
+            if (actionPacket.a === 'c') {
                 process_u(actionPacket.u);
 
                 // Only show a notification if we did not trigger the action ourselves
                 if (actionPacket.ou !== u_attr.u) {
-                    addIpcOrContactNotification(actionPacket);
+                    addNotification(actionPacket);
                 }
 
                 if (megaChat && megaChat.is_initialized) {
-                    $.each(actionPacket.u, function(k, v) {
+                    $.each(actionPacket.u, function (k, v) {
                         megaChat[v.c == 0 ? "processRemovedUser" : "processNewUser"](v.u);
                     });
                 }
@@ -4398,7 +4433,7 @@ function execsc(actionPackets, callback) {
             else if (actionPacket.a === 'ipc') {
                 processIPC([actionPacket]);
                 M.drawReceivedContactRequests([actionPacket]);
-                addIpcOrContactNotification(actionPacket);
+                addNotification(actionPacket);
             }
 
             // Pending shares
@@ -4417,7 +4452,7 @@ function execsc(actionPackets, callback) {
 
                 // If the status is accepted ('2') then this will be followed by a contact packet and we do not need to notify
                 if (actionPacket.s !== 2) {
-                    addIpcOrContactNotification(actionPacket);
+                    addNotification(actionPacket);
                 }
             }
             else if (actionPacket.a === 'ua') {
@@ -4455,7 +4490,7 @@ function execsc(actionPackets, callback) {
 
                 // If access right are undefined then share is deleted
                 if (typeof actionPacket.r == "undefined") {
-                    M.delnodeShare(actionPacket.n, actionPacket.u);
+                    M.delNodeShare(actionPacket.n, actionPacket.u);
                 } else if (M.d[actionPacket.n]
                     && typeof M.d[actionPacket.n].shares != 'undefined'
                     && M.d[actionPacket.n].shares[actionPacket.u]
@@ -4477,6 +4512,10 @@ function execsc(actionPackets, callback) {
                     prockey = true;
                 }
 
+                if (actionPacket && actionPacket.u === 'EXP') {
+                    M.getLinks([actionPacket.h]);
+                }
+                
                 if (typeof actionPacket.o != 'undefined') {
                     if (typeof actionPacket.r == "undefined") {
                         if (d) {
@@ -4494,7 +4533,7 @@ function execsc(actionPackets, callback) {
                             M.delNode(actionPacket.n);
                         }
                         if (!folderlink && actionPacket.u !== 'EXP' && fminitialized) {
-                            addnotification({
+                            addShareNotification({
                                 t: 'dshare',
                                 n: actionPacket.n,
                                 u: actionPacket.o
@@ -4529,7 +4568,7 @@ function execsc(actionPackets, callback) {
                             }
 
                             if (!folderlink && fminitialized) {
-                                addnotification({
+                                addShareNotification({
                                     t: 'share',
                                     n: actionPacket.n,
                                     u: actionPacket.o
@@ -4615,7 +4654,7 @@ function execsc(actionPackets, callback) {
                         });
                     }
                 }
-                addnotification({
+                addShareNotification({
                     t: 'put',
                     n: targetid,
                     u: actionPacket.ou,
@@ -4642,7 +4681,7 @@ function execsc(actionPackets, callback) {
 
             // Only show a notification if we did not trigger the action ourselves
             if (actionPacket.ou !== u_attr.u) {
-                addIpcOrContactNotification(actionPacket);
+                addNotification(actionPacket);
             }
 
             if (megaChat && megaChat.is_initialized) {
@@ -4678,7 +4717,7 @@ function execsc(actionPackets, callback) {
         else if (actionPacket.a === 'ipc') {
             processIPC([actionPacket]);
             M.drawReceivedContactRequests([actionPacket]);
-            addIpcOrContactNotification(actionPacket);
+            addNotification(actionPacket);
         }
         else if (actionPacket.a === 's2') {
             processPS([actionPacket]);
@@ -4691,9 +4730,14 @@ function execsc(actionPackets, callback) {
 
             // If the status is accepted ('2') then this will be followed by a contact packet and we do not need to notify
             if (actionPacket.s !== 2) {
-                addIpcOrContactNotification(actionPacket);
+                addNotification(actionPacket);
             }
-        } else {
+        }        
+        // Action packet to notify about payment (Payment Service Transaction Status)
+        else if (actionPacket.a === 'psts') {            
+            addNotification(actionPacket);
+        }
+        else {
             if (d) {
                 console.log('not processing this action packet', actionPacket);
             }
@@ -5488,10 +5532,9 @@ function init_chat() {
     }
 }
 
-function loadfm_callback(res)
-{
-    if (pfkey && res.f && res.f[0])
-    {
+function loadfm_callback(res) {
+    
+    if (pfkey && res.f && res.f[0]) {
         M.RootID = res.f[0].h;
         u_sharekeys[res.f[0].h] = base64_to_a32(pfkey);
         folderlink = pfid;
@@ -5511,13 +5554,21 @@ function loadfm_callback(res)
     if (res.ps) {
         processPS(res.ps);
     }
+    
     process_f(res.f, function onLoadFMDone() {
 
         // If we have shares, and if a share is for this node, record it on the nodes share list
         if (res.s) {
             for (var i in res.s) {
-                var nodeHandle = res.s[i].h;
-                M.nodeShare(nodeHandle, res.s[i]);
+                if (res.s.hasOwnProperty(i)) {
+                    
+                    var nodeHandle = res.s[i].h;
+                    M.nodeShare(nodeHandle, res.s[i]);
+                
+                    if (res.s[i].u === 'EXP') {
+                        M.getLinks([nodeHandle]);
+                    }
+                }
             }
         }
 

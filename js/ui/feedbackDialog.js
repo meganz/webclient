@@ -34,7 +34,7 @@
             /**
              * optional:
              */
-            'title': 'Feedback',
+            'title': l[1356],
             'buttons': [
                 {
                     'label': "Send",

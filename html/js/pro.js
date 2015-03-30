@@ -83,7 +83,11 @@ function init_pro()
 		{		
 			$('.reg-st3-membership-bl').removeClass('selected');
 			$(this).addClass('selected');
-			pro_next_step($(this).attr('class').split(' ')[1]);	
+			
+			account_type_num = $(this).attr('data-payment');
+			$(this).clone().appendTo( '.membership-selected-block');
+			$('.membership-step2 .pro span').html($(this).find('.reg-st3-bott-title.title').html())	;
+			pro_next_step();
 		});
 		
 		$('.membership-free-button').unbind('click');

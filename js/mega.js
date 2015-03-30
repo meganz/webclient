@@ -107,7 +107,7 @@ function MegaData()
         this.RubbishID = undefined;
         this.InboxID = undefined;
         this.viewmode = 0;
-    }
+    };
 
     this.sortBy = function(fn, d)
     {
@@ -452,13 +452,13 @@ function MegaData()
     this.onlineStatusClass = function(os)
     {
         if (os == 'dnd')
-            return ['Busy', 'busy'];
+            return [l[5925], 'busy'];
         else if (os == 'away')
-            return ['Away', 'away'];
+            return [l[5924], 'away'];
         else if (os == 'chat' || os == 'available')
-            return ['Online', 'online'];
+            return [l[5923], 'online'];
         else
-            return ['Offline', 'offline'];
+            return [l[5926], 'offline'];
     };
 
     this.onlineStatusEvent = function(u, status)
@@ -1091,7 +1091,7 @@ function MegaData()
                 $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[784]);
                 $('.fm-empty-contacts').removeClass('hidden');
             } else if (M.currentdirid === 'opc' || M.currentdirid === 'ipc') {
-                $('.fm-empty-contacts .fm-empty-cloud-txt').text('No requests pending at this time');
+                $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[6196]);
                 $('.fm-empty-contacts').removeClass('hidden');
             } else if (M.currentdirid.substr(0, 7) === 'search/') {
                 $('.fm-empty-search').removeClass('hidden');
@@ -1555,7 +1555,7 @@ function MegaData()
             if (!MegaChatDisabled) {
                 onlinestatus = M.onlineStatusClass(megaChat.karere.getPresence(megaChat.getJidFromNodeId(contacts[i].u)));
             } else {
-                onlinestatus = ['Offline', 'offline'];
+                onlinestatus = [l[5926], 'offline'];
             }
             if (!treesearch || (treesearch && contacts[i].name && contacts[i].name.toLowerCase().indexOf(treesearch.toLowerCase()) > -1)) {
                 html += '<div class="nw-contact-item ' + onlinestatus[1] + '" id="contact_' + htmlentities(contacts[i].u)
@@ -2988,12 +2988,15 @@ function MegaData()
                 }
             });
 
-            api_req({a: 'utp'}, {
+            // Get (f)ull payment history
+            // [[payment id, timestamp, price paid, currency, payment gateway id, payment plan id, num of months purchased]]
+            api_req({ a: 'utp', f : 1 }, {
                 account: account,
                 callback: function(res, ctx)
                 {
-                    if (typeof res != 'object')
+                    if (typeof res != 'object') {
                         res = [];
+                    }
                     ctx.account.purchases = res;
                 }
             });
@@ -4401,16 +4404,16 @@ function execsc(actionPackets, callback) {
             }
 
             // If contact notification
-                   if (actionPacket.a === 'c') {
+            if (actionPacket.a === 'c') {
                 process_u(actionPacket.u);
 
                 // Only show a notification if we did not trigger the action ourselves
                 if (actionPacket.ou !== u_attr.u) {
-                    addIpcOrContactNotification(actionPacket);
+                    addNotification(actionPacket);
                 }
 
                 if (megaChat && megaChat.is_initialized) {
-                    $.each(actionPacket.u, function(k, v) {
+                    $.each(actionPacket.u, function (k, v) {
                         megaChat[v.c == 0 ? "processRemovedUser" : "processNewUser"](v.u);
                     });
                 }
@@ -4430,7 +4433,7 @@ function execsc(actionPackets, callback) {
             else if (actionPacket.a === 'ipc') {
                 processIPC([actionPacket]);
                 M.drawReceivedContactRequests([actionPacket]);
-                addIpcOrContactNotification(actionPacket);
+                addNotification(actionPacket);
             }
 
             // Pending shares
@@ -4449,7 +4452,7 @@ function execsc(actionPackets, callback) {
 
                 // If the status is accepted ('2') then this will be followed by a contact packet and we do not need to notify
                 if (actionPacket.s !== 2) {
-                    addIpcOrContactNotification(actionPacket);
+                    addNotification(actionPacket);
                 }
             }
             else if (actionPacket.a === 'ua') {
@@ -4530,7 +4533,7 @@ function execsc(actionPackets, callback) {
                             M.delNode(actionPacket.n);
                         }
                         if (!folderlink && actionPacket.u !== 'EXP' && fminitialized) {
-                            addnotification({
+                            addShareNotification({
                                 t: 'dshare',
                                 n: actionPacket.n,
                                 u: actionPacket.o
@@ -4565,7 +4568,7 @@ function execsc(actionPackets, callback) {
                             }
 
                             if (!folderlink && fminitialized) {
-                                addnotification({
+                                addShareNotification({
                                     t: 'share',
                                     n: actionPacket.n,
                                     u: actionPacket.o
@@ -4651,7 +4654,7 @@ function execsc(actionPackets, callback) {
                         });
                     }
                 }
-                addnotification({
+                addShareNotification({
                     t: 'put',
                     n: targetid,
                     u: actionPacket.ou,
@@ -4678,7 +4681,7 @@ function execsc(actionPackets, callback) {
 
             // Only show a notification if we did not trigger the action ourselves
             if (actionPacket.ou !== u_attr.u) {
-                addIpcOrContactNotification(actionPacket);
+                addNotification(actionPacket);
             }
 
             if (megaChat && megaChat.is_initialized) {
@@ -4714,7 +4717,7 @@ function execsc(actionPackets, callback) {
         else if (actionPacket.a === 'ipc') {
             processIPC([actionPacket]);
             M.drawReceivedContactRequests([actionPacket]);
-            addIpcOrContactNotification(actionPacket);
+            addNotification(actionPacket);
         }
         else if (actionPacket.a === 's2') {
             processPS([actionPacket]);
@@ -4727,9 +4730,14 @@ function execsc(actionPackets, callback) {
 
             // If the status is accepted ('2') then this will be followed by a contact packet and we do not need to notify
             if (actionPacket.s !== 2) {
-                addIpcOrContactNotification(actionPacket);
+                addNotification(actionPacket);
             }
-        } else {
+        }        
+        // Action packet to notify about payment (Payment Service Transaction Status)
+        else if (actionPacket.a === 'psts') {            
+            addNotification(actionPacket);
+        }
+        else {
             if (d) {
                 console.log('not processing this action packet', actionPacket);
             }
@@ -4826,7 +4834,9 @@ function loadfm(force)
     if (loadfm.loaded) {
         Soon(loadfm_done.bind(this, pfkey));
     } else {
-        loadingDialog.show();
+        if (is_fm()) {
+            loadingDialog.show();
+        }
         if (!loadfm.loading) {
             M.reset();
             fminitialized = false;
@@ -5293,7 +5303,7 @@ function processIPC(ipc) {
             delete M.ipc[ipc[i].p];
             if ((Object.keys(M.ipc).length === 0) && (M.currentdirid === 'ipc')) {
                 $('.contact-requests-grid').addClass('hidden');
-                $('.fm-empty-contacts .fm-empty-cloud-txt').text('No requests pending at this time');
+                $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[6196]);
                 $('.fm-empty-contacts').removeClass('hidden');
             }
         }
@@ -5327,7 +5337,7 @@ function processOPC(opc) {
                     delete M.opc[k];
                     if ((Object.keys(M.opc).length === 0) && (M.currentdirid === 'opc')) {
                         $('.sent-requests-grid').addClass('hidden');
-                        $('.fm-empty-contacts .fm-empty-cloud-txt').text('No requests pending at this time');
+                        $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[6196]);
                         $('.fm-empty-contacts').removeClass('hidden');
                     }
                     break;
@@ -5401,7 +5411,7 @@ function processUPCI(ap) {
             $('#ipc_' + ap[i].p).remove();
             if ((Object.keys(M.ipc).length === 0) && (M.currentdirid === 'ipc')) {
                 $('.contact-requests-grid').addClass('hidden');
-                $('.fm-empty-contacts .fm-empty-cloud-txt').text('No requests pending at this time');
+                $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[6196]);
                 $('.fm-empty-contacts').removeClass('hidden');
             }
         }
@@ -5438,7 +5448,7 @@ function processUPCO(ap) {
             $('#opc_' + psid).remove();
             if ((Object.keys(M.opc).length === 0) && (M.currentdirid === 'opc')) {
                 $('.sent-requests-grid').addClass('hidden');
-                $('.fm-empty-contacts .fm-empty-cloud-txt').text('No requests pending at this time');
+                $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[6196]);
                 $('.fm-empty-contacts').removeClass('hidden');
             }
         }

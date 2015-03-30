@@ -1113,21 +1113,32 @@ function topmenuUI() {
         $('.top-menu-item.clouddrive,.top-menu-item.account').show();
         $('.fm-avatar').show();
 
+        // If a Lite/Pro plan has been purchased
         if (u_attr.p) {
+            
+            // Set the plan text
+            var proNum = u_attr.p;
+            var purchasedPlan = getProPlan(proNum);
+            
+            // Set colour of plan
+            var cssClass = (proNum == 4) ? 'lite' : 'pro';
+            
+            // Show the 'Upgrade your account' button in the main menu for all 
+            // accounts except for the biggest plan i.e. PRO III
+            if (u_attr.p !== 3) {
+                $('.top-menu-item.upgrade-your-account,.context-menu-divider.upgrade-your-account').show();
+            }
+            
+            $('.membership-icon-pad .membership-big-txt.red').text(purchasedPlan);
             $('.membership-icon-pad .membership-icon').attr('class', 'membership-icon pro' + u_attr.p);
-            if (u_attr.p == 1) {
-                $('.membership-icon-pad .membership-big-txt.red').text('PRO I');
-            }
-            else if (u_attr.p == 2) {
-                $('.membership-icon-pad .membership-big-txt.red').text('PRO II');
-            }
-            else if (u_attr.p == 3) {
-                $('.membership-icon-pad .membership-big-txt.red').text('PRO III');
-            }
-            $('.membership-status-block').html('<div class="membership-status pro">PRO</div>');
+            $('.membership-status-block').html('<div class="membership-status ' + cssClass + '">' + purchasedPlan + '</div>');
+            $('.context-menu-divider.upgrade-your-account').addClass('pro');
+            $('.membership-popup.pro-popup');
         }
         else {
-            $('.top-menu-item.upgrade-your-account').show();
+            // Show the free badge
+            $('.top-menu-item.upgrade-your-account,.context-menu-divider.upgrade-your-account').show();
+            $('.context-menu-divider.upgrade-your-account').removeClass('pro lite');
             $('.membership-status').addClass('free');
             $('.membership-status').html(l[435]);
         }
@@ -1323,15 +1334,27 @@ function topmenuUI() {
             }
 
             M.accountData(function (account) {
+                
                 var perc, warning, perc_c;
                 $('.membership-popup .membership-loading').hide();
                 $('.membership-popup .membership-main-block').show();
+                
                 if (u_attr.p) {
                     $('.membership-popup.pro-popup .membership-icon').addClass('pro' + u_attr.p);
                     var p = account.stype == 'S' ? '' :
                         (l[987] + ' <span class="red">' + time2date(account.expiry) + '</span>');
                     $('.membership-popup.pro-popup .membership-icon-txt-bl .membership-medium-txt').html(p);
-                    $('.membership-icon-pad .membership-big-txt.red').text('PRO ' + Array(+u_attr.p + 1 | 0).join("I"));
+                    
+                    var planName = '';
+                    
+                    // Update current plan to PRO I, PRO II, PRO III or LITE in popup
+                    if (u_attr.p <= 3) {
+                        planName = 'PRO ' + Array(+u_attr.p + 1 | 0).join("I");
+                    }
+                    else if (u_attr.p === 4) {
+                        planName = 'LITE';
+                    }
+                    $('.membership-icon-pad .membership-big-txt.red').text(planName);
                 }
                 else {
                     $('.membership-popup .upgrade-account').rebind('click', function () {
@@ -1573,6 +1596,15 @@ function topmenuUI() {
         }
         else if (c.indexOf('clouddrive') > -1) {
             document.location.hash = 'fm';
+        }
+        else if (c.indexOf('refresh-item') > -1) {
+            stopsc();
+            stopapi();
+            if (typeof mDB !== 'undefined' && !pfid) {
+                mDBreload();
+            } else {
+                loadfm(true);
+            }            
         }
         else if (c.indexOf('logout') > -1) {
             mLogout();

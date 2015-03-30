@@ -665,7 +665,7 @@ function setUserAttribute(attribute, value, pub, nonHistoric, callback,
 }
 
 function isNonActivatedAccount() {
-    return (!u_privk && typeof (u_attr.p) !== 'undefined' && (u_attr.p == 1 || u_attr.p == 2 || u_attr.p == 3));
+    return (!u_privk && typeof (u_attr.p) !== 'undefined' && (u_attr.p >= 1 || u_attr.p <= 4));
 }
 
 function isEphemeral() {

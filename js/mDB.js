@@ -21,7 +21,7 @@ var mFileManagerDB = {
     version: 1,
 
     init: function mFileManagerDB_init() {
-        var db = new MegaDB("fm", u_handle, this.version, this.schema, {plugins:{}});
+        var db = new MegaDB("fm", u_handle, this.version, this.schema, {plugins: {}});
 
         db.bind('onDbStateReady', function _onDbStateReady() {
             if (d) console.log('onDbStateReady', arguments);
@@ -128,9 +128,9 @@ var mFileManagerDB = {
 
             var promise;
             if (aCommand === 'add') {
-                promise = this.db.server.update(aTable, aData);
+                promise = this.db.addOrUpdate(aTable, aData);
             } else {
-                promise = this.db.server.remove(aTable, aData);
+                promise = this.db.remove(aTable, aData);
             }
 
             promise.then(function() {

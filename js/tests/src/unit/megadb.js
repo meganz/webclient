@@ -169,4 +169,109 @@ describe("MegaDB - Unit Test", function() {
                     });
             });
     });
+
+    it(".remove(table, obj), .addOrUpdate(table, obj)", function(done) {
+        var obj1 = {
+            'id': "johnDoe1",
+            'firstName': "John",
+            'lastName': "Doe",
+            'answer': 12
+        };
+        var obj2 = {
+            'id': 'johnDoe2',
+            'firstName': "John2",
+            'lastName': "Doe2",
+            'answer': 12
+        };
+
+        mdb.add("people", obj1)
+            .then(function() {
+                mdb.add("people", obj2)
+                    .then(function() {
+                        obj1.firstName = "John1";
+                        mdb.addOrUpdate("people", obj1)
+                            .then(function(r) {
+                                expect(r.length).to.eql(1);
+
+                                mdb.query("people")
+                                    .filter("answer", 12)
+                                    .execute()
+                                    .then(function(rr) {
+                                        expect(rr.length).to.eql(2);
+                                        expect(rr[0].firstName).to.eql("John1");
+                                        expect(rr[1].firstName).to.eql("John2");
+
+                                        mdb.remove("people", obj1)
+                                            .then(function() {
+                                                mdb.query("people")
+                                                    .filter("answer", 12)
+                                                    .execute()
+                                                    .then(function(rrr) {
+                                                        expect(rrr.length).to.eql(1);
+                                                        expect(rrr[0].firstName).to.eql("John2");
+
+                                                        done();
+                                                    }).fail(function() {
+                                                        fail("obj1 was not properly removed.");
+                                                    });
+                                            })
+                                            .fail(function() {
+                                                fail("failed to remove obj1");
+                                            });
+
+                                    }).fail(function() {
+                                        fail("could not get obj with answer=12");
+                                    });
+                            })
+                            .fail(function() {
+                                fail("could not get obj with id 1");
+                            });
+                    });
+            });
+    });
+
+    it(".remove(table, array[Obj]), .addOrUpdate(table, array[Obj])", function(done) {
+        var obj1 = {
+            'id': "johnDoe1",
+            'firstName': "John",
+            'lastName': "Doe",
+            'answer': 12
+        };
+        var obj2 = {
+            'id': 'johnDoe2',
+            'firstName': "John2",
+            'lastName': "Doe2",
+            'answer': 12
+        };
+
+        mdb.addOrUpdate("people", [obj1, obj2])
+            .then(function() {
+                mdb.query("people")
+                    .filter("answer", 12)
+                    .execute()
+                    .then(function(rr) {
+                        expect(rr.length).to.eql(2);
+                        expect(rr[0].firstName).to.eql("John");
+                        expect(rr[1].firstName).to.eql("John2");
+
+                        mdb.remove("people", [obj1, obj2])
+                            .then(function() {
+                                mdb.query("people")
+                                    .execute()
+                                    .then(function(rrr) {
+                                        expect(rrr.length).to.eql(0);
+                                        done();
+                                    }).fail(function() {
+                                        fail("obj1 was not properly removed.");
+                                    });
+                            })
+                            .fail(function() {
+                                fail("failed to remove obj1");
+                            });
+
+                    }).fail(function() {
+                        fail("could not get obj with answer=12");
+                    })
+            });
+    });
 });

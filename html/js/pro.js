@@ -154,11 +154,6 @@ function loadPaymentGatewayOptions() {
         var gatewayOption = gatewayOptions[i];
         var optionChecked = (i === 0) ? 'checked="checked" ' : '';
         
-        // Update name of the provider
-        if (i === 0) {
-            $('.payment-provider-name').text(gatewayOption.providerName);
-        }
-        
         // Create a radio button with icon for each payment gateway
         html += '<div class="membership-radio">'
              +      '<input type="radio" name="' + gatewayOption.cssClass + '" id="' + gatewayOption.cssClass + '" ' + optionChecked + 'disabled="disabled" />'
@@ -234,8 +229,8 @@ function pro_next_step() {
 	
 	$('.membership-bott-button').unbind('click');
 	$('.membership-bott-button').bind('click',function(e)
-	{	
-		if ($('.membership-center').attr('class').indexOf('inactive')==-1) {
+	{
+        if ($('.membership-center').attr('class').indexOf('inactive') == -1) {
 			pro_continue(e);
             return false;
 		}
@@ -390,22 +385,26 @@ function pro_pay()
 							loadingDialog.hide();
 							if (typeof res == 'number' && res < 0)
 							{
-								if (res == EOVERQUOTA) alert(l[514]);
-								else alert(l[200]);
+								if (res == EOVERQUOTA) {
+                                    alert(l[514]);
+                                }
+								else {
+                                    alert(l[200]);
+                                }
 							}
 							else
 							{
-								if (M.account) M.account.lastupdate=0;
+								if (M.account) {
+                                    M.account.lastupdate = 0;
+                                }
 								document.location.hash = 'account';								
 							}
 						}
                         else {
-                            // If Coinify
+                            // If Coinify, show Bitcoin invoice dialog
                             if ((pro_m >= 4) && res && res.EUR)
                             {
-                                // Redirect to payment provider
-                                loadingDialog.hide();                                
-                                redirectToPaymentProvider(res.EUR['url'], pro_m);
+                                showBitcoinInvoice(res.EUR);
                             }
 							else
 							{
@@ -418,6 +417,109 @@ function pro_pay()
 			}
 		}
 	});	
+}
+
+/**
+ * Step 3 in plan purchase with Bitcoin
+ * @param {Object} apiResponse API result
+ */
+function showBitcoinInvoice(apiResponse) {
+
+    // Testing data
+    /*apiResponse = {
+        "invoice_id": 'sIk',
+        "address": '12ouE2tWLuR3q5ZyQzQL6DR25iBLVjhwXd',
+        "amount": 1.35715354,
+        "created": Math.round(Date.now() / 1000),
+        "expiry": Math.round(Date.now() / 1000) + 5//900
+    };*/
+    
+    // Set details
+    var bitcoinAddress = apiResponse.address;
+    var bitcoinUrl = 'bitcoin:' + apiResponse.address + '?amount=' + apiResponse.amount;
+    var invoiceDateTime = Date(apiResponse.created);    
+    var proPlanNum = selectedProPackage[1];
+    var planName = getProPlan(proPlanNum);
+    var planMonths = selectedProPackage[4] + ' month purchase';
+    var priceEuros = selectedProPackage[5] + '<span>&euro;</span>';
+    var priceBitcoins = apiResponse.amount + '<span>BTC</span>';
+    var expiryTime = new Date(apiResponse.expiry);
+
+    // Adjust overlay transparency to darken out most of the page
+    $('.fm-dialog-overlay').addClass('bitcoin-invoice-dialog');
+    $('.fm-dialog.registration-success').addClass('bitcoin-invoice-dialog');
+    
+    // Clone template
+    var bitcoinInvoiceHtml = $('.bitcoin-invoice').html();
+    
+    // Show Bitcoin invoice
+    var dialog = $('.fm-dialog.bitcoin-invoice-dialog');
+	dialog.html(bitcoinInvoiceHtml);
+    
+    // Generate QR Code with highest error correction so that MEGA logo can be overlayed
+    // http://www.qrstuff.com/blog/2011/12/14/qr-code-error-correction
+    var options	= {
+        width: 256,
+		height: 256,
+        correctLevel: QRErrorCorrectLevel.H,
+        background: "#ffffff",
+        foreground: "#000",
+        text: bitcoinUrl
+	};
+    dialog.find('.bitcoin-qr-code').qrcode(options);
+    
+    // Update details inside dialog
+    dialog.find('.btn-open-wallet').attr('href', bitcoinUrl);    
+    dialog.find('.bitcoin-address').html(bitcoinAddress);
+    dialog.find('.invoice-date-time').html(invoiceDateTime);
+    dialog.find('.plan-icon').addClass('pro' + proPlanNum);
+    dialog.find('.plan-name').html(planName);
+    dialog.find('.plan-duration').html(planMonths);
+    dialog.find('.plan-price-euros').html(priceEuros);
+    dialog.find('.plan-price-bitcoins').html(priceBitcoins);
+    
+    // Count down the time to price expiration
+    var countdownIntervalId = setInterval(function() {
+        
+        // Show number of minutes and seconds counting down
+        var currentTimestamp = Math.round(Date.now() / 1000);
+        var difference = expiryTime - currentTimestamp;
+        var minutes = Math.floor(difference / 60);
+        var minutesPadded = (minutes < 10) ? '0' + minutes : minutes;
+        var seconds = difference - (minutes * 60);
+        var secondsPadded = (seconds < 10) ? '0' + seconds : seconds;
+        
+        // If there is still time remaining
+        if (difference > 0) {
+            
+            // Show full opacity when 1 minute countdown mark hit
+            if (difference <= 60) {
+                dialog.find('.clock-icon').css('opacity', 1);
+                dialog.find('.expiry-instruction').css('opacity', 1);
+                dialog.find('.time-to-expire').css('opacity', 1);
+            }
+            
+            // Show time remaining
+            dialog.find('.time-to-expire').html(minutesPadded + ':' + secondsPadded);
+        }
+        else {
+            // Grey out and hide details as the price has expired            
+            dialog.find('.scan-code-instruction').css('opacity', '0.25');
+            dialog.find('.btn-open-wallet').css('visibility', 'hidden');
+            dialog.find('.bitcoin-address').css('visibility', 'hidden');
+            dialog.find('.bitcoin-qr-code').css('opacity', '0.25');
+            dialog.find('.plan-icon').css('opacity', '0.25');
+            dialog.find('.plan-name').css('opacity', '0.25');
+            dialog.find('.plan-duration').css('opacity', '0.25');
+            dialog.find('.plan-price-euros').css('opacity', '0.25');
+            dialog.find('.plan-price-bitcoins').css('opacity', '0.25');
+            dialog.find('.expiry-instruction').html('This purchase has expired.').css('opacity', '1');
+            dialog.find('.time-to-expire').html('00:00').css('opacity', '1');
+            dialog.find('.price-expired-instruction').show();
+            
+            clearInterval(countdownIntervalId);
+        }        
+    }, 1000);
 }
 
 function showLoginDialog() {

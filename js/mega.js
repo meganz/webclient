@@ -4734,7 +4734,7 @@ function execsc(actionPackets, callback) {
             }
         }        
         // Action packet to notify about payment (Payment Service Transaction Status)
-        else if (actionPacket.a === 'psts') {            
+        else if (actionPacket.a === 'psts') {
             addNotification(actionPacket);
         }
         else {

@@ -10,10 +10,6 @@
 
     var hasOwn = Object.prototype.hasOwnProperty;
 
-    if ( !indexedDB ) {
-        throw 'IndexedDB required';
-    }
-
     var defaultMapper = function (value) {
         return value;
     };
@@ -529,7 +525,18 @@
                     } , options.server , options.version , options.schema )
                         .then(resolve, reject)
                 } else {
-                    request = indexedDB.open( options.server , options.version );
+                    try {
+                        request = indexedDB.open( options.server , options.version );
+                    } catch (e) {
+                        reject({ 'reason': e });
+                        return;
+                    }
+
+                    request.onblocked = function ( e ) {
+                        // If some other tab is loaded with the database,
+                        // then it needs to be closed before we can proceed.
+                        reject({ 'reason': e });
+                    };
 
                     request.onsuccess = function ( e ) {
                         open( e , options.server , options.version , options.schema )

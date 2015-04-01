@@ -1924,8 +1924,5 @@ window.onbeforeunload = function () {
         return l[377];
     }
 
-    if (typeof mDB !== 'undefined' && mDB
-            && mDBact && localStorage[u_handle + '_mDBactive']) {
-        delete localStorage[u_handle + '_mDBactive'];
-    }
+    mBroadcaster.crossTab.leave();
 }

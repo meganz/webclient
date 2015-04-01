@@ -265,6 +265,156 @@ var mBroadcaster = {
             once : true,
             callback : callback
         });
+    },
+
+    crossTab: {
+        eTag: '$CTE$!_',
+
+        initialize: function crossTab_init(cb) {
+            var setup = function(ev) {
+                var msg = String(ev && ev.key).substr(this.eTag.length);
+                if (d) console.log('crossTab setup-event', msg, ev);
+                if (cb && (!ev || msg === 'pong')) {
+                    this.unlisten(setup);
+                    if (msg !== 'pong') {
+                        this.setMaster();
+                    } else {
+                        delete localStorage[ev.key];
+                    }
+                    this.listen();
+                    if (d) {
+                        console.log('CROSSTAB COMMUNICATION INITIALIZED AS '
+                            + (this.master ? 'MASTER':'SLAVE'));
+                    }
+                    cb(this.master);
+                    cb = null;
+                }
+            }.bind(this);
+
+            if (this.handle) {
+                this.eTag = this.eTag.split(this.handle).shift();
+            }
+            this.handle = u_handle;
+            this.eTag += u_handle + '!';
+
+            this.ctID = ~~(Math.random() * Date.now());
+            this.listen(setup);
+            this.notify('ping');
+            setTimeout(setup, 2000);
+
+            // if (typeof u_handle !== 'undefined') {
+                // if (+localStorage['mCrossTabRef_' + u_handle] + 14e3 > Date.now()) {
+                     // if (window.addEventListener) {
+                        // window.addEventListener('storage', this, false);
+                    // }
+                    // else if (window.attachEvent) {
+                        // window.attachEvent('onstorage', this.handleEvent.bind(this));
+                    // }
+                // }
+                // else {
+                    // this.setMaster();
+                // }
+                // if (d) {
+                    // console.log('CROSSTAB COMMUNICATION INITIALIZED AS '
+                        // + (this.master ? 'MASTER':'SLAVE'));
+                // }
+            // }
+        },
+
+        listen: function crossTab_listen(aListener) {
+            if (window.addEventListener) {
+                window.addEventListener('storage', aListener || this, false);
+            }
+            else if (window.attachEvent) {
+                if (!aListener) {
+                    aListener = this.__msie_listener = this.handleEvent.bind(this);
+                }
+                window.attachEvent('onstorage', aListener);
+            }
+        },
+
+        unlisten: function crossTab_unlisten(aListener) {
+            if (window.addEventListener) {
+                window.removeEventListener('storage', aListener || this, false);
+            }
+            else if (window.attachEvent) {
+                if (!aListener) {
+                    aListener = this.__msie_listener;
+                    delete this.__msie_listener;
+                }
+                window.detachEvent('onstorage', aListener);
+            }
+        },
+
+        leave: function crossTab_leave() {
+            if (this.master) {
+                localStorage['mCrossTabRef_' + u_handle] = this.master;
+                this.notify('leaving', this.master);
+                delete this.master;
+            } else {
+                if (d) console.log('crossTab leaving');
+            }
+            this.unlisten();
+        },
+
+        notify: function crossTab_notify(msg, data) {
+            data = { origin: this.ctID, data: data || Math.random()};
+            localStorage.setItem(this.eTag + msg, JSON.stringify(data));
+            if (d) console.log('crossTab Notifying', this.eTag + msg, localStorage[this.eTag + msg]);
+        },
+
+        setMaster: function crossTab_setMaster() {
+            this.master = (Math.random() * Date.now()).toString(36);
+
+            // (function liveLoop(tag) {
+                // if (tag === mBroadcaster.crossTab.master) {
+                    // localStorage['mCrossTabRef_' + u_handle] = Date.now();
+                    // setTimeout(liveLoop, 6e3, tag);
+                // }
+            // })(this.master);
+        },
+
+        clear: function crossTab_clear() {
+            Object.keys(localStorage).forEach(function(key) {
+                if (key.substr(0,this.eTag.length) === this.eTag) {
+                    if (d) console.log('crossTab Removing ' + key);
+                    delete localStorage[key];
+                }
+            }.bind(this));
+        },
+
+        handleEvent: function crossTab_handleEvent(ev) {
+            if (d) console.log('crossTab ' + ev.type + '-event', ev.key, ev.newValue, ev);
+
+            if (String(ev.key).indexOf(this.eTag) !== 0) {
+                return;
+            }
+            var msg = ev.key.substr(this.eTag.length),
+                strg = JSON.parse(ev.newValue ||'""');
+
+            if (!strg || strg.origin === this.ctID) {
+                if (d) console.log('Ignoring crossTab event', msg, strg);
+                return;
+            }
+
+            switch (msg) {
+                case 'ping':
+                    this.notify('pong');
+                    break;
+                case 'leaving':
+                    if (localStorage['mCrossTabRef_' + u_handle] === strg.data) {
+                        if (d) console.log('Taking crossTab-master ownership');
+                        delete localStorage['mCrossTabRef_' + u_handle];
+                        this.setMaster();
+                        if (u_handle && window.indexedDB) {
+                            mDBstart(true);
+                        }
+                    }
+                    break;
+            }
+
+            delete localStorage[ev.key];
+        }
     }
 };
 if (typeof Object.freeze === 'function') {
@@ -1020,7 +1170,7 @@ else if (!b_u)
         var _queueWaitToBeLoaded = function(id, elem) {
             waitingToBeLoaded++;
             elem.onload = function() {
-                if (d) console.log('jj.progress...', waitingToBeLoaded);
+                // if (d) console.log('jj.progress...', waitingToBeLoaded);
                 if (--waitingToBeLoaded == 0) {
                     jj_done = true;
                     boot_done();
@@ -1372,7 +1522,7 @@ else if (!b_u)
 
         document.write('<style type="text/css">.div, span, input {outline: none;}.hidden {display: none;}.clear {clear: both;margin: 0px;padding: 0px;display: block;}.loading-main-block {width: 100%;height: 100%;overflow: auto;font-family:Arial, Helvetica, sans-serif;}.loading-mid-white-block {height: 100%;width:100%;}.mid-centered-block {position: absolute;width: 494px;min-height: 158px;top: 50%;left: 50%;margin: -95px 0 0 -247px;}.loading-main-bottom {max-width: 940px;width: 100%;position: absolute;bottom: 20px;left: 50%;margin: 0 0 0 -470px;text-align: center;}.loading-bottom-button {height: 29px;width: 29px;float: left;background-image: url(' + istaticpath + 'images/mega/loading-sprite1.png);background-repeat: no-repeat;cursor: pointer;}.st-social-block-load {position: absolute;bottom: 20px;left: 0;width: 100%;height: 43px;text-align: center;}.st-bottom-button {height: 29px;width: 29px;display: inline-block;background-image: url(' + istaticpath + 'images/mega/new-startpage-spite1.png?v=1);background-repeat: no-repeat;cursor: pointer;}.st-bottom-button.st-google-button {background-position: -93px -1233px;position: relative;margin: 0 5px;}.st-bottom-button.st-google-button:hover {background-position: -93px -1173px;}.st-bottom-button.st-facebook-button {background-position: -49px -1233px;margin: 0 5px;}.st-bottom-button.st-facebook-button:hover {background-position: -49px -1173px;}.st-bottom-button.st-twitter-button {background-position: left -1233px;margin: 0 5px;}.st-bottom-button.st-twitter-button:hover {background-position: left -1173px;}.loading-cloud {width: 222px;height: 158px;background-image: url(' + istaticpath + 'images/mega/loading-sprite1.png);background-repeat: no-repeat;background-position: 0 -2128px;margin: 0 auto;-webkit-box-sizing: border-box;-moz-box-sizing: border-box;-ms-box-sizing: border-box;box-sizing: border-box;padding-top: 55px;}.loading-progress-bar, .loading-progress-bar div {width: 80px;height: 80px;margin: 0 0 0 71px;background-image: url(' + istaticpath + 'images/mega/loading-sprite1.png);background-repeat: no-repeat;background-position: 0 top;}.loading-progress-bar div {background-position: -71px -2183px;margin: 0;}.maintance-block {position: absolute;width: 484px;min-height: 94px;border: 2px solid #d9d9d9;-moz-border-radius: 7px;-webkit-border-radius: 7px;border-radius: 7px;padding: 10px;color: #333333;font-size: 13px;line-height: 30px;padding: 15px 15px 15px 102px;-webkit-box-sizing: border-box;-moz-box-sizing: border-box;-ms-box-sizing: border-box;box-sizing: border-box;background-image: url(' + istaticpath + 'images/mega/loading-sprite1.png);background-repeat: no-repeat;background-position: -60px -2428px;margin-top: 45px;}.loading-progress-bar.percents-0 {background-position: 0 0;}.loading-progress-bar.percents-1, .loading-progress-bar.percents-2, .loading-progress-bar.percents-3 {background-position: -130px 0;}.loading-progress-bar.percents-4, .loading-progress-bar.percents-5, .loading-progress-bar.percents-6 {background-position: 0 -100px;}.loading-progress-bar.percents-7, .loading-progress-bar.percents-8, .loading-progress-bar.percents-9 {background-position: -130px -100px;}.loading-progress-bar.percents-10, .loading-progress-bar.percents-11, .loading-progress-bar.percents-12 {background-position: 0 -200px;}.loading-progress-bar.percents-13, .loading-progress-bar.percents-14, .loading-progress-bar.percents-15 {background-position: -130px -200px;}.loading-progress-bar.percents-16, .loading-progress-bar.percents-17, .loading-progress-bar.percents-18 {background-position: 0 -300px;}.loading-progress-bar.percents-19, .loading-progress-bar.percents-20, .loading-progress-bar.percents-21 {background-position: -130px -300px;}.loading-progress-bar.percents-22, .loading-progress-bar.percents-23, .loading-progress-bar.percents-24 {background-position: 0 -400px;}.loading-progress-bar.percents-25, .loading-progress-bar.percents-26, .loading-progress-bar.percents-27 {background-position: -130px -400px;}.loading-progress-bar.percents-28, .loading-progress-bar.percents-29, .loading-progress-bar.percents-30 {background-position: 0 -500px;}.loading-progress-bar.percents-31, .loading-progress-bar.percents-32, .loading-progress-bar.percents-33 {background-position: -130px -500px;}.loading-progress-bar.percents-34, .loading-progress-bar.percents-35 {background-position: 0 -600px;}.loading-progress-bar.percents-36, .loading-progress-bar.percents-37 {background-position: -130px -600px;}.loading-progress-bar.percents-38, .loading-progress-bar.percents-39 {background-position: 0 -700px;}.loading-progress-bar.percents-40, .loading-progress-bar.percents-41 {background-position: -130px -700px;}.loading-progress-bar.percents-42, .loading-progress-bar.percents-43 {background-position: 0 -800px;}.loading-progress-bar.percents-44, .loading-progress-bar.percents-45 {background-position: -130px -800px;}.loading-progress-bar.percents-46, .loading-progress-bar.percents-47 {background-position: 0 -900px;}.loading-progress-bar.percents-48, .loading-progress-bar.percents-49 {background-position: -130px -900px;}.loading-progress-bar.percents-50 {background-position: 0 -1000px;}.loading-progress-bar.percents-51, .loading-progress-bar.percents-52, .loading-progress-bar.percents-53 {background-position: -130px -1000px;}.loading-progress-bar.percents-54, .loading-progress-bar.percents-55, .loading-progress-bar.percents-56 {background-position: 0 -1100px;}.loading-progress-bar.percents-57, .loading-progress-bar.percents-58, .loading-progress-bar.percents-59 {background-position: -130px -1100px;}.loading-progress-bar.percents-60, .loading-progress-bar.percents-61, .loading-progress-bar.percents-62 {background-position: 0 -1200px;}.loading-progress-bar.percents-63, .loading-progress-bar.percents-64, .loading-progress-bar.percents-65 {background-position: -130px -1200px;}.loading-progress-bar.percents-66, .loading-progress-bar.percents-67, .loading-progress-bar.percents-68 {background-position: 0 -1300px;}.loading-progress-bar.percents-69, .loading-progress-bar.percents-70, .loading-progress-bar.percents-71 {background-position: -130px -1300px;}.loading-progress-bar.percents-72, .loading-progress-bar.percents-73, .loading-progress-bar.percents-74 {background-position: 0 -1400px;}.loading-progress-bar.percents-75, .loading-progress-bar.percents-76, .loading-progress-bar.percents-77 {background-position: -130px -1400px;}.loading-progress-bar.percents-78, .loading-progress-bar.percents-79, .loading-progress-bar.percents-80 {background-position: 0 -1500px;}.loading-progress-bar.percents-81, .loading-progress-bar.percents-82, .loading-progress-bar.percents-83 {background-position: -130px -1500px;}.loading-progress-bar.percents-84, .loading-progress-bar.percents-85, .loading-progress-bar.percents-86 {background-position: 0 -1600px;}.loading-progress-bar.percents-87, .loading-progress-bar.percents-88, .loading-progress-bar.percents-89 {background-position: -130px -1600px;}.loading-progress-bar.percents-90, .loading-progress-bar.percents-91, .loading-progress-bar.percents-92 {background-position: 0 -1800px;}.loading-progress-bar.percents-93, .loading-progress-bar.percents-94, .loading-progress-bar.percents-95 {background-position: -130px -1800px;}.loading-progress-bar.percents-96, .loading-progress-bar.percents-97 {background-position: 0 -1900px;}.loading-progress-bar.percents-98, .loading-progress-bar.percents-99 {background-position: -130px -1900px;}.loading-progress-bar.percents-100 {background-position: 0 -2000px;}.follow-txt {text-decoration:none; line-height: 28px; float:right; color:#666666; font-size:12px;}@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {.maintance-block, .loading-progress-bar, .loading-progress-bar div, .loading-cloud, .loading-bottom-button {background-image: url(' + istaticpath + 'images/mega/loading-sprite1@2x.png);    background-size: 222px auto;}.st-bottom-button, .st-bottom-scroll-button {background-image: url(' + istaticpath + 'images/mega/new-startpage-spite1@2x.png?v=1);background-size: 356px auto;}}</style><div class="loading-main-block" id="loading"><div class="loading-mid-white-block"><div class="mid-centered-block"><div class="loading-cloud"><div class="loading-progress-bar percents-1" id="loadinganim"><div></div></div></div><div class="maintance-block hidden">Scheduled System Maintenance - Expect Disruptions<br/>Sunday 04:00 - 10:00 UTC </div></div><div class="st-social-block-load" id="bootbottom"><a href="https://www.facebook.com/MEGAprivacy" target="_blank" class="st-bottom-button st-facebook-button"></a><a href="https://www.twitter.com/MEGAprivacy" target="_blank" class="st-bottom-button st-twitter-button"></a><a href="https://plus.google.com/b/108055545377490138410/" target="_blank" class="st-bottom-button st-google-button"></a></div></div></div>');
     }
-    var u_storage,loginresponse,u_sid,dl_res;
+    var u_storage, loginresponse, u_sid, dl_res;
     u_storage = init_storage( localStorage.sid ? localStorage : sessionStorage );
     if ((u_sid = u_storage.sid))
     {

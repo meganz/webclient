@@ -108,6 +108,7 @@ MegaDB._delayFnCallUntilDbReady = function(fn) {
                         var resultPromise = fn.apply(self, args);
                     } catch(e) {
                         $promise.reject.apply($promise, arguments);
+                        self.logger.error("Could not open db: ", e);
                     }
 
                     if(resultPromise.then) {
@@ -134,6 +135,18 @@ MegaDB._delayFnCallUntilDbReady = function(fn) {
     }
 };
 
+/**
+ * Try to find the table's keyPath (primary index) from the schema definition, if not found will return 'id'
+ */
+MegaDB.prototype._getTablePk = function(tableName) {
+    assert(this.schema[tableName], 'table not found: ' + tableName);
+    var tableSchema = this.schema[tableName];
+    var k = 'id';
+    if(tableSchema['key'] && tableSchema['key']['keyPath']) {
+        k = tableSchema['key']['keyPath'];
+    }
+    return k;
+};
 
 /**
  * Place holder for code, which should be executed to initialize the db (executed when the db is ready)
@@ -156,6 +169,8 @@ MegaDB.prototype.initialize = function() {
  * @returns {MegaPromise}
  */
 MegaDB.prototype.add = function(tableName, val) {
+    var self = this;
+
     assert(this.server[tableName], 'table not found:' + tableName);
 
     var tempObj = clone(val);
@@ -170,8 +185,8 @@ MegaDB.prototype.add = function(tableName, val) {
     return this.server[tableName].add(tempObj)
         .then(function() {
             // get back the .id after .add is done
-            if(tempObj.id && tempObj.id != val.id) {
-                val.id = tempObj.id;
+            if(tempObj[self._getTablePk(tableName)] && tempObj[self._getTablePk(tableName)] != val[self._getTablePk(tableName)]) {
+                val[self._getTablePk(tableName)] = tempObj[self._getTablePk(tableName)];
             }
         });
 };
@@ -184,12 +199,35 @@ MegaDB.prototype.add = _wrapFnWithBeforeAndAfterEvents(
 );
 
 
+MegaDB.prototype.addOrUpdate = function(tableName, val) {
+    var self = this;
+
+    var $promise;
+    if(Array.isArray(val)) {
+        var promises = val.map(function(v) {
+            return self.addOrUpdate(tableName, v);
+        });
+
+        $promise = MegaPromise.allDone(promises);
+    } else {
+        $promise = this.update(tableName, val[this._getTablePk(tableName)], val);
+    }
+    return $promise;
+};
+
+MegaDB.prototype.addOrUpdate = _wrapFnWithBeforeAndAfterEvents(
+    MegaDB._delayFnCallUntilDbReady(
+        MegaDB.prototype.addOrUpdate
+    ),
+    'AddOrUpdate'
+);
+
 /**
- * Update an object/row, where `k` should be the ID of the object which should be updated
+ * Update an object/row, where `k` should be the ID of the object which should be updated (will insert if not found)
  *
  * @param tableName {String}
- * @param k {Integer} id of the object to be updated
- * @param val {Object} actual object, which will be used to replace the values in the current db
+ * @param k {Integer|Object} id of the object to be updated
+ * @param [val] {Object|undefined} actual object, which will be used to replace the values in the current db
  * @returns {MegaPromise}
  */
 MegaDB.prototype.update = function(tableName, k, val) {
@@ -197,6 +235,10 @@ MegaDB.prototype.update = function(tableName, k, val) {
 
     assert(this.server[tableName], 'table not found:' + tableName);
 
+    if(!val && Array.isArray(k)) {
+        val = k;
+        k = val[this._getTablePk(tableName)];
+    }
     // ignore any __privateProperties and get back the .id after .add is done
     var tempObj = clone(val);
 
@@ -206,10 +248,11 @@ MegaDB.prototype.update = function(tableName, k, val) {
         }
     });
 
-    return self.query(tableName)
-        .filter('id', k)
-        .modify(tempObj)
-        .execute();
+
+    val = clone(val);
+    self.trigger("onModifyQuery", [tableName, val]);
+    self.trigger("onBeforeUpdate", [tableName, val[self._getTablePk(tableName)], val, true]);
+    return self.server.update(tableName, val);
 };
 
 MegaDB.prototype.update = _wrapFnWithBeforeAndAfterEvents(
@@ -224,22 +267,25 @@ MegaDB.prototype.update = _wrapFnWithBeforeAndAfterEvents(
  * Remove a row/object from `tableName` which pk/id equals to `id`
  *
  * @param tableName
- * @param id
+ * @param id {Integer|String|Object}
  * @returns {MegaPromise}
  */
 MegaDB.prototype.remove = function(tableName, id) {
+    if($.isPlainObject(id)) {
+        id = id[this._getTablePk(tableName)];
+    } else if(Array.isArray(id)) {
+        var self = this;
+        return MegaPromise.allDone(id.map(function(v) {
+            return self.remove(tableName, v);
+        }))
+    }
+
     return this.removeBy(
         tableName,
-        "id",
+        this._getTablePk(tableName),
         id
     );
 };
-MegaDB.prototype.remove = _wrapFnWithBeforeAndAfterEvents(
-    MegaDB._delayFnCallUntilDbReady(
-        MegaDB.prototype.remove
-    ),
-    'Remove'
-);
 
 
 /**
@@ -273,7 +319,7 @@ MegaDB.prototype.removeBy = function(tableName, keyName, value) {
             if(r.length && r.length > 0) { // found
                 r.forEach(function(v) {
                     promises.push(
-                        self.server.remove(tableName, v["id"])
+                        self.server.remove(tableName, v[self._getTablePk(tableName)])
                     );
                 });
             }
@@ -289,6 +335,12 @@ MegaDB.prototype.removeBy = function(tableName, keyName, value) {
 
     return promise;
 };
+MegaDB.prototype.removeBy = _wrapFnWithBeforeAndAfterEvents(
+    MegaDB._delayFnCallUntilDbReady(
+        MegaDB.prototype.removeBy
+    ),
+    'RemoveBy'
+);
 
 
 /**
@@ -339,7 +391,7 @@ MegaDB.prototype.get = function(tableName, val) {
     var promise = new Promise(function(resolve, reject) {
 
         self.query(tableName)
-            .filter("id", val)
+            .filter(self._getTablePk(tableName), val)
             .execute()
             .then(
             function(result) {
@@ -484,7 +536,7 @@ MegaDB.QuerySet.prototype._dequeueOps = function(q, opName) {
         // if this was a modify() call, then trigger onBeforeUpdate
         if(opName == "modify") {
             q = q.map(function(r) {
-                //self.megaDb.trigger("onBeforeUpdate", [self.tableName, r.id, r, true]);
+                self.megaDb.trigger("onBeforeUpdate", [self.tableName, r[self.megaDb._getTablePk(self.tableName)], r, true]);
                 return r;
             });
         }

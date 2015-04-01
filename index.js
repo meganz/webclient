@@ -1600,6 +1600,15 @@ function topmenuUI() {
         else if (c.indexOf('clouddrive') > -1) {
             document.location.hash = 'fm';
         }
+        else if (c.indexOf('refresh-item') > -1) {
+            stopsc();
+            stopapi();
+            if (typeof mDB !== 'undefined' && !pfid) {
+                mDBreload();
+            } else {
+                loadfm(true);
+            }            
+        }
         else if (c.indexOf('logout') > -1) {
             mLogout();
         }

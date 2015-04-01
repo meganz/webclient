@@ -10765,6 +10765,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	font-size: 11px;
 	line-height: 19px;
 	width: 100%;
+	background-color: transparent;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 .export-link-gray-txt {
 	color: #999999;
@@ -12017,7 +12021,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 	-moz-border-radius-topright: 0px;
 	border-top-right-radius: 0px;
 	margin: -4px 0 0 0;
-    padding-top: 4px;
+	padding-top: 4px;
 }
 .top-menu-arrow, .top-login-arrow, .notification-arrow, .top-user-status-arrow, .membership-popup-arrow, .warning-popup-arrow {
 	height: 8px;
@@ -12125,7 +12129,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 	top: 14px;
 }
 .context-menu-item, .permissions-menu-item {
-	padding: 0 15px 0 42px;
+	padding: 0 30px 0 42px;
 	color: rgba(204,204,204,1);
 }
 .permissions-menu-item {
@@ -12310,9 +12314,6 @@ table {
 }
 .canceltransfer-item .context-menu-icon {
 	background-position: 4px -3716px;
-}
-.refresh-item .context-menu-icon {
-	background-position: -3px -4519px;
 }
 .select-all .context-menu-icon {
 	background-position: -3px -5290px;
@@ -20672,6 +20673,23 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
 	box-sizing: border-box;
 	white-space: nowrap;
 }
+.share-item-bl .export-link-item {
+	float: left;
+	display: block;
+	width: 259px;
+}
+.share-item-bl .export-icon {
+	margin: 0 14px 0 8px;
+}
+.share-item-bl .export-link-text-pad {
+	width: 170px;
+}
+.share-item-bl .share-dialog-permissions {
+	top: 13px;
+}
+.share-item-bl .share-dialog-remove-button {
+	margin-top: 26px;
+}
 .share-dialog-contact-bl.pending .fm-chat-user span {
 	max-width: -webkit-calc(100% - 26px);
 	max-width: -moz-calc(100% - 26px);
@@ -20888,7 +20906,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	max-height: 192px;
 }
 .share-dialog-contact-bl {
-	height: 48px;
 	-webkit-transition: background-color 200ms ease-in-out;
 	-moz-transition: background-color 200ms ease-in-out;
 	-o-transition: background-color 200ms ease-in-out;
@@ -23921,4 +23938,28 @@ background-color:#1DA2E9
 }
  100% {
 }
+}
+
+
+/* frienldy printing */
+@media print {
+    /* remove all single page styles */
+    body, body * {
+        visibility: hidden;
+        height: auto !important;
+        overflow: visible !important;
+        max-width: 100% !important;
+    }
+    .main-mid-pad * {
+        visibility: visible;
+    }
+    .main-mid-pad {
+        visibility: visible;
+        float: none !important;
+        left: 0px;
+        top: 0px;
+        width: 100% !important;
+        position: absolute !important;
+        overflow: visible !important;
+    }
 }

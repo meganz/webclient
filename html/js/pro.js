@@ -425,8 +425,9 @@ function pro_pay()
  */
 function showBitcoinInvoice(apiResponse) {
 
+    /*
     // Testing data
-    /*apiResponse = {
+    apiResponse = {
         "invoice_id": 'sIk',
         "address": '12ouE2tWLuR3q5ZyQzQL6DR25iBLVjhwXd',
         "amount": 1.35715354,
@@ -445,15 +446,17 @@ function showBitcoinInvoice(apiResponse) {
     var priceBitcoins = apiResponse.amount + '<span>BTC</span>';
     var expiryTime = new Date(apiResponse.expiry);
 
-    // Adjust overlay transparency to darken out most of the page
-    $('.fm-dialog-overlay').addClass('bitcoin-invoice-dialog');
-    $('.fm-dialog.registration-success').addClass('bitcoin-invoice-dialog');
+    // Cache original HTML of dialog to reset after close
+    var dialogOverlay = $('.fm-dialog-overlay');        
+    var dialog = $('.fm-dialog.pro-register-paypal-dialog');
+    var dialogOriginalHtml = dialog.html();
     
-    // Clone template
+    // Add styles for the dialog
+    dialogOverlay.addClass('bitcoin-invoice-dialog');
+    dialog.addClass('bitcoin-invoice-dialog');
+    
+    // Clone template and show Bitcoin invoice
     var bitcoinInvoiceHtml = $('.bitcoin-invoice').html();
-    
-    // Show Bitcoin invoice
-    var dialog = $('.fm-dialog.bitcoin-invoice-dialog');
 	dialog.html(bitcoinInvoiceHtml);
     
     // Generate QR Code with highest error correction so that MEGA logo can be overlayed
@@ -477,6 +480,12 @@ function showBitcoinInvoice(apiResponse) {
     dialog.find('.plan-duration').html(planMonths);
     dialog.find('.plan-price-euros').html(priceEuros);
     dialog.find('.plan-price-bitcoins').html(priceBitcoins);
+    
+    // Close dialog
+    dialog.find('.btn-close-dialog').click(function() {
+        dialogOverlay.removeClass('bitcoin-invoice-dialog').addClass('hidden');
+        dialog.removeClass('bitcoin-invoice-dialog').addClass('hidden').html(dialogOriginalHtml);
+    });
     
     // Count down the time to price expiration
     var countdownIntervalId = setInterval(function() {

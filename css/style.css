@@ -9744,6 +9744,22 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     font-weight: bold;
     text-transform: uppercase;
 }
+.fm-dialog.bitcoin-invoice-dialog .btn-close-dialog {
+    cursor: pointer;
+    padding: 15px;
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+.fm-dialog.bitcoin-invoice-dialog .btn-close-dialog .close-icon {
+    background-image: url('../images/mega/icons/retina/close@2x.png');
+    background-position: 0 0;
+    background-repeat: no-repeat;
+    background-size: 100% auto;
+    display: block;
+    height: 7px;
+    width: 7px;
+}
 .fm-dialog.bitcoin-invoice-dialog .right-side {
     background-color: #47abdc;
     border-bottom-right-radius: 12px;

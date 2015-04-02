@@ -1,6 +1,3 @@
-
-
-
 // global variables holding the user's identity
 var u_handle;   // user handle
 var u_k;        // master key
@@ -482,7 +479,7 @@ function generateAvatarMeta(user_hash) {
         shortName = contact.shortName;
         color = contact.displayColor;
     } else {
-        $.each(Object.keys(M.u), function(k, v) {
+        M.u.forEach(function(k, v) {
             var c = M.u[v];
             var n = generateContactName(v);
 

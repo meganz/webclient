@@ -1093,7 +1093,7 @@ function topmenuUI() {
         $('.membership-status').show();
 
         // If the chat is disabled don't show the green status icon in the header
-        if (!MegaChatDisabled) {
+        if(typeof(MegaChatDisabled) == "undefined" || !MegaChatDisabled) {
             $('.activity-status-block, .activity-status').show();
             megaChat.renderMyStatus();
         }

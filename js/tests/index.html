@@ -36,6 +36,7 @@
 
 
 
+    <script type="text/javascript" src="../datastructs.js"></script>
     <script type="text/javascript" src="../functions.js"></script>
     <script type="text/javascript" src="../megaLogger.js"></script>
 
@@ -105,12 +106,16 @@
     <script type="text/javascript" src="../chat/plugins/encryptionFilter.js"></script>
     <script type="text/javascript" src="../chat/plugins/chatStore.js"></script>
     <script type="text/javascript" src="../chat/plugins/chatNotifications.js"></script>
+    <script type="text/javascript" src="../chat/plugins/callFeedback.js"></script>
     <script type="text/javascript" src="../megaNotifications.js"></script>
 
     <script type="text/javascript" src="../chat/karereEventObjects.js"></script>
     <script type="text/javascript" src="../chat/karere.js"></script>
-    <script type="text/javascript" src="../chat/chat.js"></script>
-    <script type="text/javascript" src="../chat/chatRoom.js"></script>
+
+    <script type="text/javascript" src="src/helpers/utils.js"></script> <!-- provides a dummy window.module -->
+
+    <script type="text/javascript" src="../../bundle.js"></script>
+    <script type="text/javascript" src="../stores/mixins.js"></script>
 
 
 
@@ -122,7 +127,7 @@
     <script type="text/javascript" src="src/helpers/stropheMocker.js"></script>
     <script type="text/javascript" src="src/helpers/fixtures.js"></script>
     <script type="text/javascript" src="src/helpers/karereMocker.js"></script>
-    <script type="text/javascript" src="src/helpers/utils.js"></script>
+
 
     <!-- include spec files here... -->
     <!--<script type="text/javascript" src="spec/SpecHelper.js"></script>-->
@@ -145,6 +150,8 @@
     <script type="text/javascript" src="src/unit/megaNotifications.js"></script>
     <script type="text/javascript" src="src/unit/chatStore.js"></script>
     <script type="text/javascript" src="src/unit/mpencTestCases.js"></script>
+    <script type="text/javascript" src="src/unit/datastructs.js"></script>
+    <script type="text/javascript" src="src/unit/megaRenderMixin.js"></script>
 
     <!--<script type="text/javascript" src="src/integration/chatIntegration.js"></script>-->
 

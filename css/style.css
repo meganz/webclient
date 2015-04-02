@@ -8643,6 +8643,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .fm-call-dialog-item {
 	height: 48px;
 	clear: both;
+    cursor: pointer;
 }
 .fm-call-dialog-item:nth-child(odd) {
 	background-color: rgba(0,0,0,0.02)
@@ -21235,9 +21236,11 @@ video.localViewport {
 	-webkit-transform: rotateY(180deg); /* Safari and Chrome */
 	-moz-transform: rotateY(180deg); /* Firefox */
 }
-.fm-chat-message-scroll.conversations {
+.fm-chat-message-scroll.conversations, .conversations-main-listing > .jScrollPaneContainer {
 	background-color: #fafafa;
+    height: 100%;
 }
+
 .conversations .fm-chat-message-pad {
 	padding: 2px 6px 6px 2px;
 }
@@ -23445,4 +23448,16 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 }
 .fm-chat-inline-dialog-button-sendFeedback {
 	margin-left: 4px;
+}
+
+/**
+ * New sections UI structure
+ */
+
+.section {
+    width: 100%;
+}
+.section.conversations .nw-conversations-item {
+    transition: all 500ms ease;
+    box-sizing: border-box;
 }

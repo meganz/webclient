@@ -1,5 +1,3 @@
-
-
 function voucherCentering(button)
 {
     var popupBlock = $('.fm-voucher-popup');
@@ -903,8 +901,14 @@ function initUI() {
         if ($.hideTopMenu)
             $.hideTopMenu(e);
         var c = $(e.target).attr('class');
-        if ($(e.target).attr('type') !== 'file' && (c && c.indexOf('upgradelink') == -1) && (c && c.indexOf('campaign-logo') == -1) && (c && c.indexOf('resellerbuy') == -1) && (c && c.indexOf('linkified') == -1))
+
+
+        if($(e.target).attr('data-reactid')) {
+            return; // never return false, if this is an event triggered by a React element....
+        }
+        if ($(e.target).attr('type') !== 'file' && (c && c.indexOf('upgradelink') == -1) && (c && c.indexOf('campaign-logo') == -1) && (c && c.indexOf('resellerbuy') == -1) && (c && c.indexOf('linkified') == -1)) {
             return false;
+        }
 
     });
 
@@ -5801,9 +5805,7 @@ function sectionUIopen(id) {
 
     if (id !== 'conversations') {
         $('.fm-right-header').removeClass('hidden');
-        $('.fm-chat-block').hide();
-    } else {
-        $('.fm-chat-block').show();
+        $('.fm-chat-block').addClass('hidden');
     }
 
     if ((id !== 'cloud-drive') && (id !== 'rubbish-bin') && ((id !== 'shared-with-me') && (M.currentdirid !== 'shares'))) {
@@ -5864,8 +5866,39 @@ function sectionUIopen(id) {
             break;
     }
 
-    if (!folderlink)
-        $('.nw-tree-panel-header span').text(headertxt);
+    if (!folderlink) {
+        $('.fm-tree-panel > .jspContainer > .jspPane > .nw-tree-panel-header span').text(headertxt);
+    }
+
+    {
+        // required tricks to make the conversations work with the old UI HTML/css structure
+        if(id == "conversations") { // moving the control of the headers in the tree panel to chat.js + ui/conversations.jsx
+            $('.fm-tree-panel > .jspContainer > .jspPane > .nw-tree-panel-header').hide();
+            $('.fm-main.default > .fm-left-panel').hide();
+        } else {
+            $('.fm-tree-panel > .jspContainer > .jspPane > .nw-tree-panel-header').show();
+            $('.fm-main.default > .fm-left-panel').show();
+        }
+
+        // new sections UI
+        $('.section').addClass('hidden');
+        var repos = function() {
+            $('.section.' + id)
+                .height(
+                $(window).outerHeight() - $('#topmenu').outerHeight() - $('.transfer-panel').outerHeight()
+            )
+        };
+
+        $(window)
+            .unbind('resize.section')
+            .bind('resize.section', function() {
+                repos();
+            });
+
+        repos();
+        $('.section.' + id).removeClass('hidden');
+    }
+
 
     if ($.fah_abort_timer) {
         clearTimeout($.fah_abort_timer);
@@ -9214,7 +9247,7 @@ function contactUI() {
             });
         }
 
-        if (!MegaChatDisabled) {
+        if (typeof(MegaChatDisabled) !== 'undefined' || !MegaChatDisabled) {
             if (onlinestatus[1] !== "offline" && u_h !== u_handle) {
                 // user is online, lets display the "Start chat" button
 

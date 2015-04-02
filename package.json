@@ -49,5 +49,26 @@
     "karma-sinon": "~1.0.3",
     "mocha": "~1.17.1",
     "sinon": "~1.9.0"
+  },
+  "dependencies": {
+    "babel-core": "^4.6.6",
+    "babel-loader": "^4.0.0",
+    "babel-runtime": "^4.6.6",
+    "coffee-script": "^1.9.1",
+    "constant-enum": "^1.0.1",
+    "css-loader": "^0.9.1",
+    "es6-promise": "^2.0.1",
+    "immutable": "^3.6.2",
+    "jsx-loader": "^0.12.2",
+    "less": "^2.4.0",
+    "less-loader": "^2.0.0",
+    "object-assign": "^2.0.0",
+    "react": "^0.12.2",
+    "react-hot-loader": "^1.2.3",
+    "react-immutable-render-mixin": "^0.8.0",
+    "react-magic-move": "^0.1.0",
+    "uglify-loader": "^1.1.0",
+    "webpack": "^1.7.2",
+    "webpack-dev-server": "^1.7.0"
   }
 }

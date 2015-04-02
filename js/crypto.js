@@ -995,24 +995,26 @@ function api_proc(q)
 
                     if (typeof ctx.callback === 'function')
                     {
-                        try {
+                        //try {
                             ctx.callback( t[i], ctx, this );
-                        } catch (ex) {
-                            // if there is *any* issue on the callback
-                            // we don't want to HALT, instead we let the channel
-                            // a chance to clean itself and continue
-                            // Otherwise if we load #blog *or* #page_<something>
-                            // the whole site is buggy
-
-                            if (chromehack) {
-                                console.error(ex, ex.stack);
-                            } else {
-                                console.error(ex);
-                            }
-                            Soon(function sapith() {
-                                throw ex;
-                            });
-                        }
+                        //} catch (ex) {
+                        //    // if there is *any* issue on the callback
+                        //    // we don't want to HALT, instead we let the channel
+                        //    // a chance to clean itself and continue
+                        //    // Otherwise if we load #blog *or* #page_<something>
+                        //    // the whole site is buggy
+                        //
+                        //    if (chromehack) {
+                        //        console.error(ex, ex.stack);
+                        //    } else {
+                        //        console.error(ex);
+                        //    }
+                        //
+                        //
+                        //    Soon(function sapith() {
+                        //        throw ex;
+                        //    });
+                        //}
                     }
                 }
 

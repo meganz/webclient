@@ -1,3 +1,5 @@
+var utils = require("../utils.jsx");
+
 /**
  * Class used to represent a MUC Room in which the current user is present
  *
@@ -11,11 +13,34 @@
  * @constructor
  */
 var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
+    var self = this;
+
+
     this.logger = MegaLogger.getLogger("room[" + roomJid + "]", {}, megaChat.logger);
 
     this.megaChat = megaChat;
+
+    MegaDataObject.attachToExistingJSObject(
+        this,
+        {
+            'state': null,
+            'users': [],
+            'roomJid': null,
+            'type': null,
+            'messages': [],
+            'messagesIndex': [],
+            'ctime': 0,
+            'lastActivity': 0,
+            'callRequest': null,
+            'callIsActive': false,
+            'isCurrentlyActive': false,
+            '_syncRequests': {},
+            '_messagesQueue': []
+        },
+        true
+    );
+
     this.users = users ? users : [];
-    this.hash = null;
     this.roomJid = roomJid;
     this.type = type;
     this.messages = [];
@@ -64,8 +89,6 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
             video: true
         }
     };
-    this._syncRequests = {};
-    this._messagesQueue = [];
 
     this.setState(ChatRoom.STATE.INITIALIZED);
 
@@ -94,7 +117,6 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
     this.$header.droppable(droppableConfig);
 
     // Events
-    var self = this;
     this.bind('onStateChange', function(e, oldState, newState) {
         self.logger.warn("Will change state from: ", ChatRoom.stateToText(oldState), " to ", ChatRoom.stateToText(newState));
 
@@ -179,10 +201,10 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
         }
     });
 
-    this.$header.hide();
+    this.$header.addClass('hidden');
     this.$header.addClass('conv-ended');
 
-    this.$messages.hide();
+    this.$messages.addClass('hidden');
 
     this.$header.insertBefore(
         $('.fm-chat-line-block', this.megaChat.$container)
@@ -1554,8 +1576,6 @@ ChatRoom.prototype._resetCallStateInCall = function() {
         self.megaChat._currentCallCounter++;
     }, 1000);
 
-    self.megaChat.renderContactTree();
-
 
 
     self._renderAudioVideoScreens();
@@ -1846,6 +1866,54 @@ ChatRoom.prototype.getParticipantsExceptMe = function(jids) {
 };
 
 /**
+ * Get room title
+ *
+ * @returns {string}
+ */
+ChatRoom.prototype.getRoomTitle = function() {
+    var self = this;
+    if(this.type == "private") {
+        var participants = self.getParticipantsExceptMe();
+        return self.megaChat.getContactNameFromJid(participants[0]);
+    } else {
+        assert(false, "invalid room type");
+        return "[invalid room type]";
+    }
+};
+
+
+/**
+ * Get room css icon
+ *
+ * @returns {string}
+ */
+ChatRoom.prototype.getRoomIcon = function() {
+    var self = this;
+    if(this.type == "private") {
+        var participants = self.getParticipantsExceptMe();
+        var presence = self.megaChat.karere.getPresence(participants[0]);
+
+        var targetClassName = "offline";
+        if(!presence || presence == Karere.PRESENCE.OFFLINE) {
+            targetClassName = "offline";
+        } else if(presence == Karere.PRESENCE.AWAY) {
+            targetClassName = "away";
+        } else if(presence == Karere.PRESENCE.BUSY) {
+            targetClassName = "busy";
+        } else if(presence === true || presence == Karere.PRESENCE.ONLINE || presence == Karere.PRESENCE.AVAILABLE) {
+            targetClassName = "online";
+        } else {
+            targetClassName = "offline";
+        }
+
+        return targetClassName;
+    } else {
+        assert(false, "invalid room type");
+        return "[invalid room type]";
+    }
+};
+
+/**
  * Refreshes the UI of the chat room.
  *
  * @param [scrollToBottom] {boolean|jQuery} set to true if you want to automatically scroll the messages pane to the
@@ -1862,8 +1930,8 @@ ChatRoom.prototype.refreshUI = function(scrollToBottom) {
 
     if(this.$header.is(":visible")) {
         this.$header.removeClass("hidden");
-        $('.nw-conversations-item').removeClass("selected");
-        $('.nw-conversations-item[data-room-jid="' + self.roomJid.split("@")[0] + '"]').addClass("selected");
+        //$('.nw-conversations-item').removeClass("selected");
+        //$('.nw-conversations-item[data-room-jid="' + self.roomJid.split("@")[0] + '"]').addClass("selected");
 
 
         // active call?
@@ -2016,7 +2084,11 @@ ChatRoom.prototype.leave = function(notifyOtherDevices) {
         });
     } else {
         self.setState(ChatRoom.STATE.LEFT);
+
+        self.destroyStructure();
     }
+
+    self.megaChat.refreshConversations();
 };
 
 /**
@@ -2034,7 +2106,7 @@ ChatRoom.prototype.destroy = function(notifyOtherDevices) {
 
             clearTimeout(req.timer);
         });
-        delete self._syncRequests;
+        self._syncRequests = {};
     };
 
     self.leave(notifyOtherDevices);
@@ -2055,9 +2127,11 @@ ChatRoom.prototype.destroy = function(notifyOtherDevices) {
         setTimeout(function() {
             self.megaChat.renderListing();
         }, 300);
+    } else {
+        self.megaChat.refreshConversations();
     }
     setTimeout(function() {
-        delete mc.chats[roomJid];
+        mc.chats.remove(roomJid);
     }, 1);
 };
 
@@ -2068,6 +2142,8 @@ ChatRoom.prototype.destroy = function(notifyOtherDevices) {
 ChatRoom.prototype.show = function() {
     var self = this;
 
+    self.megaChat.hideAllChats();
+    self.isCurrentlyActive = true;
 
     $('.files-grid-view').addClass('hidden');
     $('.fm-blocks-view').addClass('hidden');
@@ -2076,19 +2152,8 @@ ChatRoom.prototype.show = function() {
 
     $('.fm-right-files-block').removeClass('hidden');
 
-    $('.nw-conversations-item').removeClass('selected');
+    //$('.nw-conversations-item').removeClass('selected');
 
-
-
-
-    sectionUIopen('conversations');
-
-
-    $('.nw-conversations-item[data-room-jid="' + self.roomJid.split("@")[0] + '"]').addClass("selected");
-
-    self.$header.show();
-    self.$messages.show();
-    self.$messages.parent().removeClass('hidden'); // show .fm-chat-block if hidden
 
     if(self.megaChat.currentlyOpenedChat && self.megaChat.currentlyOpenedChat != self.roomJid) {
         var oldRoom = self.megaChat.getCurrentRoom();
@@ -2096,6 +2161,17 @@ ChatRoom.prototype.show = function() {
             oldRoom.hide();
         }
     }
+
+    sectionUIopen('conversations');
+
+
+    //$('.nw-conversations-item[data-room-jid="' + self.roomJid.split("@")[0] + '"]').addClass("selected");
+
+    self.$header.removeClass('hidden');
+    self.$messages.removeClass('hidden');
+    self.$messages.parent().removeClass('hidden'); // show .fm-chat-block if hidden
+    self.$messages.attr('data-roomJid', self.roomJid); // TODO: debug, remove this.
+
 
     if(self.callIsActive) {
         self.$header.parent('.fm-chat-block').addClass('video-call');
@@ -2137,7 +2213,8 @@ ChatRoom.prototype.getRoomUrl = function() {
     } else {
         throw new Error("Not implemented");
     }
-}
+};
+
 /**
  * If this is not the currently active room, then this method will navigate the user to this room (using window.location)
  */
@@ -2153,9 +2230,10 @@ ChatRoom.prototype.activateWindow = function() {
 ChatRoom.prototype.hide = function() {
     var self = this;
 
+    self.isCurrentlyActive = false;
 
-    self.$header.hide();
-    self.$messages.hide();
+    self.$header.addClass('hidden');
+    self.$messages.addClass('hidden');
 
     if(self.megaChat.currentlyOpenedChat == self.roomJid) {
         self.megaChat.currentlyOpenedChat = null;
@@ -2383,8 +2461,6 @@ ChatRoom.prototype.appendDomMessage = function($message, messageObject) {
     if($message.is('.unread')) {
         self.trigger('activity');
     }
-
-    self.megaChat.renderContactTree();
 
 };
 
@@ -2647,7 +2723,8 @@ ChatRoom.prototype.requestMessageSync = function(exceptFromUsers) {
         'timeoutHandler': function() {
             self.logger.warn(new Date(), "Sync request timed out from user: ", userJid, " for room: ", self.roomJid);
 
-            delete self._syncRequests[messageId];
+            self._syncRequests[messageId] = {};
+
             exceptFromUsers.push(userJid);
             self.requestMessageSync(exceptFromUsers);
         },
@@ -2760,7 +2837,7 @@ ChatRoom.prototype.handleSyncResponse = function(response) {
         clearTimeout(self._syncRequests.cleanupTimeout);
     }
     self._syncRequests.cleanupTimeout = setTimeout(function() {
-        delete self._syncRequests;
+        self._syncRequests = {};
     }, self.options.syncRequestCleanupTimeout);
 
     $.each(meta.messages, function(k, msg) {
@@ -3146,6 +3223,18 @@ ChatRoom.prototype.renderContactTree = function() {
 };
 
 /**
+ * Returns the # of messages which are currently marked as unread (uses the chatNotifications plugin)
+ *
+ * @returns {Integer|undefined}
+ */
+ChatRoom.prototype.getUnreadCount = function() {
+    var self = this;
+    var count = self.megaChat.plugins.chatNotifications.notifications.getCounterGroup(self.roomJid);
+    return count;
+};
+
+
+/**
  * Re-join - safely join a room after connection error/interruption
  */
 ChatRoom.prototype.recover = function() {
@@ -3153,7 +3242,7 @@ ChatRoom.prototype.recover = function() {
 
     self.logger.warn('recovering room: ', self.roomJid, self);
 
-    self._syncRequests = [];
+    self._syncRequests = {};
     self.callIsActive = false;
     self.callRequest = null;
     self.setState(ChatRoom.STATE.JOINING, true);
@@ -3364,6 +3453,9 @@ ChatRoom.prototype.startAudioCall = function() {
     self.options.mediaOptions.audio = true;
     self.options.mediaOptions.video = false;
 
+    self.activateWindow();
+    self.show();
+
     self._startCall();
 };
 
@@ -3372,5 +3464,10 @@ ChatRoom.prototype.startVideoCall = function() {
     self.options.mediaOptions.audio = true;
     self.options.mediaOptions.video = true;
 
+    self.activateWindow();
+    self.show();
+
     self._startCall();
 };
+
+module.exports = ChatRoom;

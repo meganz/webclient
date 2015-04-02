@@ -39,6 +39,22 @@ if (localStorage.fmconfig)
 var maxaction;
 var zipid = 1;
 
+// data struct definitions
+var MEGA_USER_STRUCT = {
+    "u": undefined,
+    "c": undefined,
+    "m": undefined,
+    "m2": undefined,
+    "name": undefined,
+    "h": undefined,
+    "t": undefined,
+    "p": undefined,
+    "presence": undefined,
+    "presenceMtime": undefined,
+    "displayColor": undefined,
+    "shortName": undefined
+};
+
 function fmUpdateCount() {
     var i = 0, u = 0;
     $('.transfer-table span.row-number').each(function() {
@@ -71,7 +87,7 @@ function MegaData()
     this.d = {};
     this.v = [];
     this.c = {};
-    this.u = {};
+    this.u = new MegaDataMap();
     this.t = {};
     this.h = {};
     this.opc = {};
@@ -93,7 +109,8 @@ function MegaData()
         this.d = {};
         this.v = [];
         this.c = {};
-        this.u = {};
+        this.u = new MegaDataMap();
+
         this.t = {};
         this.opc = {};
         this.ipc = {};
@@ -107,6 +124,8 @@ function MegaData()
         this.RubbishID = undefined;
         this.InboxID = undefined;
         this.viewmode = 0;
+
+        mBroadcaster.sendMessage("MegaDataReset");
     }
 
     this.sortBy = function(fn, d)
@@ -580,12 +599,12 @@ function MegaData()
         // If focus is on contacts tab
         if (M.currentdirid === 'contacts') {
             var haveActiveContact = false;
-            for (var i in M.u) {
-                if (M.u[i].c !== 0 && M.u[i].c !== 2) {
+            M.u.forEach(function(v, k) {
+                if (v.c !== 0 && v.c !== 2) {
                     haveActiveContact = true;
-                    break;
+                    return false; // break
                 }
-            }
+            });
 
             // We do NOT have active contacts, set empty contacts grid
             if (!haveActiveContact) {
@@ -798,7 +817,7 @@ function MegaData()
                 contact = M.u[u_h];
 
                 // chat is enabled?
-                if (megaChat && megaChat.is_initialized && !MegaChatDisabled) {
+                if (megaChat && megaChat.is_initialized && (typeof(MegaChatDisabled) == "undefined" || !MegaChatDisabled)) {
                     if (contact && contact.lastChatActivity > timems) {
                         interactionclass = 'conversations';
                         time = time2last(contact.lastChatActivity);
@@ -1344,8 +1363,8 @@ function MegaData()
         this.buildtree({h: M.RubbishID});
         this.contacts();
         treeUI();
-        if (!MegaChatDisabled) {
-            megaChat.renderContactTree();
+        if (typeof(MegaChatDisabled) == "undefined" || !MegaChatDisabled) {
+            //megaChat.renderContactTree();
         }
     };
 
@@ -1385,12 +1404,9 @@ function MegaData()
             this.chat = true;
             id = 'chat';
 
-            if (megaChat.renderListing() === true) {
-                window.location = megaChat.getCurrentRoom().getRoomUrl();
-                return;
-            }
             megaChat.refreshConversations();
             treeUI();
+            megaChat.renderListing();
         } else if (id && id.substr(0, 7) === 'account')
             accountUI();
         else if (id && id.substr(0, 13) === 'notifications')
@@ -1401,13 +1417,13 @@ function MegaData()
             this.chat = true;
             treeUI();
 
-            if (!MegaChatDisabled) {
+            if (typeof(MegaChatDisabled) == "undefined" || !MegaChatDisabled) {
                 chatui(id); // XX: using the old code...for now
             }
         } else if (!id || !M.d[id])
             id = this.RootID;
 
-        if (!MegaChatDisabled) {
+        if (typeof(MegaChatDisabled) == "undefined" || !MegaChatDisabled) {
             if (!this.chat) {
                 if (megaChat.getCurrentRoom()) {
                     megaChat.getCurrentRoom().hide();
@@ -1547,7 +1563,7 @@ function MegaData()
             }
             var onlinestatus;
 
-            if (!MegaChatDisabled) {
+            if (typeof(MegaChatDisabled) == "undefined" || !MegaChatDisabled) {
                 onlinestatus = M.onlineStatusClass(megaChat.karere.getPresence(megaChat.getJidFromNodeId(contacts[i].u)));
             } else {
                 onlinestatus = ['Offline', 'offline'];
@@ -1562,8 +1578,7 @@ function MegaData()
 
         $('.content-panel.contacts').html(html);
 
-        if (!MegaChatDisabled) {
-            megaChat.renderContactTree();
+        if (typeof(MegaChatDisabled) == "undefined" || !MegaChatDisabled) {
 
             $('.fm-tree-panel').undelegate('.start-chat-button', 'click.megaChat');
             $('.fm-tree-panel').delegate('.start-chat-button', 'click.megaChat', function() {
@@ -2299,12 +2314,13 @@ function MegaData()
         if (typeof newnodes !== 'undefined') {
             newnodes.push(n);
         }
+        $(window).trigger("megaNodeAdded", [n]);
     };
 
     this.delNode = function(h) {
 
         function ds(h) {
-
+            $(window).trigger("megaNodeRemoved", [h]);
             removeUInode(h);
             if (M.c[h] && h.length < 11) {
                 for (var h2 in M.c[h]) {
@@ -2398,13 +2414,15 @@ function MegaData()
 //        }
 
         // Check active contacts
-        var u = M.u;
-        for (var i in u) {
-            if ((M.u[i].m === email) && (M.u[i].c !== 0)) {
-                return -2;
+        var result = 0;
+        M.u.forEach(function(v, k) {
+            if (v.m === email && v.c !== 0) {
+                result = -2;
+                return false; // break;
             }
-        }
-        return 0;
+        });
+
+        return result;
     };
 
     /**
@@ -2671,7 +2689,7 @@ function MegaData()
                 }
                 u = this.u[userId];
             } else {
-                this.u[userId] = u;
+                this.u.set(userId, new MegaDataObject(MEGA_USER_STRUCT, true, u));
             }
             if (typeof mDB === 'object' && !ignoreDB && !pfkey) {
                 mDBadd('u', clone(u));
@@ -4238,8 +4256,7 @@ function renderfm()
     }
 
     M.openFolder(M.currentdirid);
-    if (!MegaChatDisabled && megaChat.is_initialized) {
-        megaChat.renderContactTree();
+    if ((typeof(MegaChatDisabled) == "undefined" || !MegaChatDisabled) && megaChat.is_initialized) {
         megaChat.renderMyStatus();
     }
 
@@ -4302,8 +4319,7 @@ function rendernew()
         M.contacts();
         treeUI();
 
-        if (!MegaChatDisabled) {
-            megaChat.renderContactTree();
+        if (typeof(MegaChatDisabled) == "undefined" || !MegaChatDisabled) {
             megaChat.renderMyStatus();
         }
     }
@@ -4358,7 +4374,11 @@ function execsc(actionPackets, callback) {
 
                 if (megaChat && megaChat.is_initialized) {
                     $.each(actionPacket.u, function(k, v) {
-                        megaChat[v.c == 0 ? "processRemovedUser" : "processNewUser"](v.u);
+                        if(v.c === 0) {
+                            megaChat.processRemovedUser(v.u);
+                        } else {
+                            megaChat.processNewUser(v.u);
+                        }
                     });
                 }
             }
@@ -5005,10 +5025,16 @@ function createfolder(toid, name, ulparams)
 
 function getuid(email)
 {
-    for (var j in M.u)
-        if (M.u[j].m == email)
-            return j;
-    return false;
+    var result = false;
+
+    M.u.forEach(function(v, k) {
+        if (v.m == email) {
+            result = k;
+            return false; // break;
+        }
+    });
+
+    return result;
 }
 
 function doshare(h, targets, dontShowShareDialog) {
@@ -5443,7 +5469,6 @@ function init_chat() {
             megaChat.init();
             if (fminitialized) {
                 Soon(function() {
-                    megaChat.renderContactTree();
                     megaChat.renderMyStatus();
                 });
             } else {
@@ -5451,7 +5476,7 @@ function init_chat() {
             }
         }
     }
-    if(!MegaChatDisabled) {
+    if(typeof(MegaChatDisabled) == "undefined" || !MegaChatDisabled) {
         if (pubEd25519[u_handle]) {
             __init_chat();
         } else {

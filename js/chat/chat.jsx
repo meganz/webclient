@@ -5,6 +5,10 @@
  */
 var MegaChatDisabled = localStorage.chatDisabled == true ? true : false;
 
+var React = require("react");
+var ConversationsUI = require("./ui/conversations.jsx");
+var ChatRoom = require('./chatRoom.jsx');
+
 var disableMpEnc = true;
 
 if(MegaChatDisabled) {
@@ -590,7 +594,7 @@ var Chat = function() {
     this.is_initialized = false;
     this.logger = MegaLogger.getLogger("chat");
 
-    this.chats = {};
+    this.chats = new MegaDataMap();
     this.currentlyOpenedChat = null;
     this.lastOpenedChat = null;
     this._myPresence = localStorage.megaChatPresence;
@@ -767,6 +771,10 @@ var Chat = function() {
 
 makeObservable(Chat);
 
+Chat.prototype.renderConversationsApp = function () {
+    this.$conversationsAppInstance.forceUpdate();
+};
+
 /**
  * Initialize the MegaChat (also will connect to the XMPP)
  */
@@ -818,7 +826,7 @@ Chat.prototype.init = function() {
 
         // should we trigger refreshUI ?
         if(eventObject.isMyOwn(self.karere) === false) {
-            $.each(self.chats, function(roomJid, room) {
+            self.chats.forEach(function(room, roomJid) {
 
                 if(room.participantExistsInRoom(bareJid)) {
                     // if this user is part of the currently visible room, then refresh the UI
@@ -841,7 +849,7 @@ Chat.prototype.init = function() {
                     }
                 }
 
-                $.each(self.chats, function(roomJid, room) {
+                self.chats.forEach(function(room, roomJid) {
                     if(room._leaving === true || room._conv_ended === true) {
                         return; // continue
                     }
@@ -879,7 +887,6 @@ Chat.prototype.init = function() {
         }
 
         self.renderMyStatus();
-        self.renderContactTree();
     });
 
     // Disco capabilities updated
@@ -917,8 +924,7 @@ Chat.prototype.init = function() {
         if(meta && meta.type == "private") {
 
             var bareFromJid = eventObject.getFromJid().split("/")[0];
-            Object.keys(self.chats).forEach(function(roomJid) {
-                var room = self.chats[roomJid];
+            self.chats.forEach(function(room, roomJid) {
 
                 if(roomJid == eventObject.getRoomJid()) {
                     return; // continue
@@ -957,12 +963,16 @@ Chat.prototype.init = function() {
         // if we are here..then join the room
         self.logger.debug("Initializing UI for new room: ", eventObject.getRoomJid(), "");
 
-        self.chats[eventObject.getRoomJid()] = new ChatRoom(self, eventObject.getRoomJid(), meta.type, meta.participants, meta.ctime);
-        self.chats[eventObject.getRoomJid()].setState(ChatRoom.STATE.JOINING);
-        self.karere.joinChat(eventObject.getRoomJid(), eventObject.getPassword());
+        var roomJid = eventObject.getRoomJid();
+        var room = new ChatRoom(self, eventObject.getRoomJid(), meta.type, meta.participants, meta.ctime);
+        self.chats.set(
+            roomJid,
+            room
+        );
+        room.setState(ChatRoom.STATE.JOINING);
+        self.karere.joinChat(roomJid, eventObject.getPassword());
 
-
-        self.chats[eventObject.getRoomJid()].refreshUI();
+        room.refreshUI();
 
 
         e.stopPropagation();
@@ -972,7 +982,6 @@ Chat.prototype.init = function() {
 
     var updateMyConnectionStatus = function() {
         self.renderMyStatus();
-        self.renderContactTree();
     };
 
 
@@ -981,7 +990,7 @@ Chat.prototype.init = function() {
      * in case of his connection was interuptted
      */
     var recoverChats = function() {
-        $.each(self.chats, function(k, v) {
+        self.chats.forEach(function(v, k) {
             if(v.state == ChatRoom.STATE.INITIALIZED) {
                 v.recover();
             }
@@ -1011,7 +1020,7 @@ Chat.prototype.init = function() {
 
         updateMyConnectionStatus();
 
-        $.each(self.chats, function(k, v) {
+        self.chats.forEach(function(v, k) {
             v.setState(ChatRoom.STATE.INITIALIZED, true);
         })
     });
@@ -1020,7 +1029,7 @@ Chat.prototype.init = function() {
         if(eventData.newUsers[self.karere.getJid()]) {
             // i'm the first of my devices to join the room..notify all my other devices please
             var iAmFirstToJoin = true;
-            Object.keys(eventData.currentUsers).forEach(function(k, v) {
+            Object.keys(eventData.currentUsers).forEach(function(v, k) {
                 if(k.indexOf(self.karere.getBareJid()) !== -1) {
                     iAmFirstToJoin = false;
                     return false;
@@ -1041,13 +1050,14 @@ Chat.prototype.init = function() {
         return self._onUsersUpdate("left", e, eventData);
     });
     this.karere.bind("onUsersUpdatedDone", function(e, eventObject) {
-        if(self.chats[eventObject.getRoomJid()] && (self.chats[eventObject.getRoomJid()].state == ChatRoom.STATE.JOINING || self.chats[eventObject.getRoomJid()].state == ChatRoom.STATE.WAITING_FOR_PARTICIPANTS)) {
-            if(self.chats[eventObject.getRoomJid()]._waitingForOtherParticipants() === false) {
-                self.chats[eventObject.getRoomJid()].setState(
+        var room = self.chats[eventObject.getRoomJid()];
+        if(room && (room.state == ChatRoom.STATE.JOINING || room.state == ChatRoom.STATE.WAITING_FOR_PARTICIPANTS)) {
+            if(room._waitingForOtherParticipants() === false) {
+                room.setState(
                     ChatRoom.STATE.PARTICIPANTS_HAD_JOINED
                 );
             } else {
-                self.chats[eventObject.getRoomJid()].setState(
+                room.setState(
                     ChatRoom.STATE.WAITING_FOR_PARTICIPANTS
                 );
             }
@@ -1105,7 +1115,7 @@ Chat.prototype.init = function() {
             } else {
                 room = self.chats[meta.roomJid];
                 if(!room) {
-                    [room.$header, room.$messages].forEach(function(k, v) {
+                    [room.$header, room.$messages].forEach(function(v, k) {
                         $(k).addClass("conv-start")
                             .removeClass("conv-end");
                     });
@@ -1143,7 +1153,7 @@ Chat.prototype.init = function() {
 
                 removeValue(room.messagesIndex, msgIdx);
                 removeValue(room.messages, msgObject);
-                delete msgObject;
+                Object.freeze(msgObject);
             }
         } else {
             self.logger.error("Not sure how to handle action message: ", eventObject.getAction(), eventObject, e);
@@ -1262,6 +1272,31 @@ Chat.prototype.init = function() {
     });
 
     self.$container = $('.fm-chat-block');
+    if(self.$container.parent('.section.conversations .fm-right-files-block').size() == 0) {
+        $('.section.conversations .fm-right-files-block').append(self.$container);
+    }
+
+    self.$container = $('.fm-chat-block');
+
+
+    self.$conversationsApp = <ConversationsUI.ConversationsApp megaChat={this} contacts={M.u} />;
+
+    self.$conversationsAppInstance = React.render(
+        self.$conversationsApp,
+        document.querySelector('.section.conversations')
+    );
+
+    self.renderConversationsApp();
+
+    $(window)
+        .unbind('hashchange.chat')
+        .bind('hashchange.chat', function() {
+            if(window.location.hash.indexOf("/chat") !== -1) {
+                self.renderConversationsApp();
+            }
+        });
+
+
 
 
     self.$header_tpl = $('.fm-right-header', self.$container).clone().removeClass("template");
@@ -1450,6 +1485,10 @@ Chat.prototype.init = function() {
             $('#contact_' + c.u + ' .start-chat-button')
                 .addClass("active");
         }
+
+        room.bind("onChatShown", function() {
+            $('.conversations-main-listing').addClass("hidden");
+        });
     });
     self.on('onRoomDestroy', function(e, room) {
         if(room.type == "private") {
@@ -1527,6 +1566,7 @@ Chat.prototype.init = function() {
             })
         }
     });
+
 
     self.trigger("onInit");
 };
@@ -1786,11 +1826,11 @@ Chat.prototype.destroy = function(isLogout) {
 
 
 
-    $.each(self.chats, function(roomJid, room) {
+    self.chats.forEach( function(room, roomJid) {
         if(!isLogout) {
             room.destroy();
         }
-        delete self.chats[roomJid];
+        self.chats.remove(roomJid);
     });
 
     self.karere.resetConnectionRetries();
@@ -1813,7 +1853,7 @@ Chat.prototype.destroy = function(isLogout) {
  */
 Chat.prototype.getContacts = function() {
     var results = [];
-    $.each(M.u, function(k, v) {
+    M.u.forEach( function(k, v) {
         if(v.c == 1 || v.c == 2) {
             results.push(v);
         }
@@ -1904,6 +1944,26 @@ Chat.prototype.xmppPresenceToCssClass = function(presence) {
 };
 
 /**
+ * Helper to convert XMPP presence from string (e.g. 'chat'), to a translated text
+ *
+ * @param presence {String}
+ * @returns {String}
+ */
+Chat.prototype.xmppPresenceToText = function(presence) {
+    if(presence == Karere.PRESENCE.ONLINE || presence == Karere.PRESENCE.AVAILABLE || presence === true) {
+        return __('Online');
+    } else if(presence == Karere.PRESENCE.AWAY || presence == "xa") {
+        return __('Away');
+    } else if(presence == Karere.PRESENCE.BUSY) {
+        return __('Busy');
+    } else if(!presence || presence == Karere.PRESENCE.OFFLINE) {
+        return __('Offline');
+    } else {
+        return __('Unknown');
+    }
+};
+
+/**
  * Used to re-render my own presence/status
  */
 Chat.prototype.renderMyStatus = function() {
@@ -1972,196 +2032,6 @@ Chat.prototype.renderMyStatus = function() {
 
 };
 
-
-/**
- * Used to pre/render my contacts statuses + unread counts (in the Tree panel)
- */
-Chat.prototype.renderContactTree = function() {
-    var self = this;
-
-
-
-    // update currently active call (if there is such)
-
-    var $currentCallIndicator = $('.nw-conversations-item.current-calling');
-
-    if(!$currentCallIndicator.is(".hidden")) { // if not hidden (e.g. there is active call)
-        var roomJid = $currentCallIndicator.attr('data-jid');
-        if(roomJid) {
-            $currentCallIndicator
-                .removeClass("online")
-                .removeClass("offline")
-                .removeClass("busy")
-                .removeClass("away")
-                .removeClass("no");
-
-
-            var room = self.chats[roomJid];
-
-            assert(room, 'room not found');
-
-            var participantJid = room.getParticipantsExceptMe()[0];
-            var presence = self.karere.getPresence(participantJid);
-
-            var targetClassName = "offline";
-            if(!presence || presence == Karere.PRESENCE.OFFLINE) {
-                targetClassName = "offline";
-            } else if(presence == Karere.PRESENCE.AWAY) {
-                targetClassName = "away";
-            } else if(presence == Karere.PRESENCE.BUSY) {
-                targetClassName = "busy";
-            } else if(presence === true || presence == Karere.PRESENCE.ONLINE || presence == Karere.PRESENCE.AVAILABLE) {
-                targetClassName = "online";
-            } else {
-                targetClassName = "offline";
-            }
-
-            $currentCallIndicator.addClass(targetClassName);
-        }
-    }
-
-    // update conversation list
-    // -> add new convs to the ui
-    Object.keys(self.chats).forEach(function(k) {
-        var megaRoom = self.chats[k];
-
-        if(megaRoom._leaving) {
-            return; // continue;
-        }
-
-        if($('.nw-conversations-item[data-room-jid="' + k.split("@")[0] + '"]').length != 0) {
-            return; // continue;
-        }
-
-        if(megaRoom.type == "private") {
-            var chatWithJid = megaRoom.getParticipantsExceptMe()[0];
-            var contact = self.getContactFromJid(chatWithJid);
-            var name = self.getContactNameFromJid(chatWithJid);
-
-            if(contact) {
-                var html2 = '<div class="nw-conversations-item offline" id="contact2_' + htmlentities(contact.u) + '" data-room-jid="' + k.split("@")[0] + '" data-jid="' + chatWithJid + '"><div class="nw-contact-status"></div><div class="nw-conversations-unread">0</div><div class="nw-conversations-name">' + htmlentities(name) + '</div></div>';
-                $('.content-panel.conversations .conversations-container').prepend(html2);
-            } else {
-                //self.logger.error("Contacts are still not loaded. Will not show user: ", chatWithJid, " until data for that contact is loaded.");
-            }
-
-        } else {
-            throw new Error("TBD");
-        }
-    });
-
-    // -> remove left chats from the ui
-    $('.nw-conversations-item[data-room-jid]').each(function() {
-        var megaRoom = self.chats[$(this).attr("data-room-jid") + "@" + self.karere.options.mucDomain];
-        if(!megaRoom || megaRoom._leaving === true) {
-            $(this).remove();
-        }
-    });
-
-
-
-    // update conversation list presence
-    $.each(self.getContacts(), function(k, contact) {
-        var $element = $('.content-panel.conversations #contact2_' + contact.u);
-
-        var presence = self.karere.getPresence(self.getJidFromNodeId(contact.u));
-
-        var targetClassName = "offline";
-        if(!presence || presence == Karere.PRESENCE.OFFLINE) {
-            targetClassName = "offline";
-        } else if(presence == Karere.PRESENCE.AWAY) {
-            targetClassName = "away";
-        } else if(presence == Karere.PRESENCE.BUSY) {
-            targetClassName = "busy";
-        } else if(presence === true || presence == Karere.PRESENCE.ONLINE || presence == Karere.PRESENCE.AVAILABLE) {
-            targetClassName = "online";
-        } else {
-            targetClassName = "offline";
-        }
-
-
-
-        $('#contact_' + contact.u, '.fm-tree-panel')
-            .removeClass("online")
-            .removeClass("offline")
-            .removeClass("busy")
-            .removeClass("away")
-            .removeClass("no")
-            .addClass(targetClassName);
-
-
-        // skip if element does not exists
-        if($element.length == 0) {
-            return;
-        }
-
-        $element.removeClass("online");
-        $element.removeClass("offline");
-        $element.removeClass("busy");
-        $element.removeClass("away");
-        $element.removeClass("no");
-
-
-
-        $element.addClass(targetClassName);
-
-        assert(
-            $element.length == 1,
-            'nav elements not found (expected 1, got: ' + $element.length + ')'
-        );
-
-        $element.attr("data-jid", self.getJidFromNodeId(contact.u));
-
-        if(contact.u != u_handle) {
-            $element.unbind("click.megaChat");
-            $element.bind("click.megaChat", function(e) {
-                window.location = "#fm/chat/" + contact.u;
-                e.stopPropagation();
-                return false;
-            });
-
-            var room = self.chats[
-                $element.attr('data-room-jid') + "@" + self.karere.options.mucDomain
-                ];
-            if(room) {
-                room.renderContactTree();
-            }
-        }
-    });
-    // update contacts tree
-    $('.content-panel.contacts .nw-contact-item').each(function() {
-        var $node = $(this);
-        var node_id = $node.attr("id");
-        if(!node_id) {
-            return; // continue;
-        }
-
-        var u_h = node_id.replace("contact_", "");
-
-        $('.start-chat-button', $node)
-            .show();
-    });
-
-
-    // update the "global" conversation tab unread counter
-    var unreadCount = 0;
-    for(var k in self.chats) {
-        var megaRoom = self.chats[k];
-        var c = parseInt($('.nw-conversations-unread', megaRoom.getNavElement()).text());
-        unreadCount += c;
-
-        if (unreadCount > 0) {
-            $('.new-messages-indicator')
-                .text(
-                unreadCount
-            )
-                .removeClass('hidden');
-        } else {
-            $('.new-messages-indicator')
-                .addClass('hidden');
-        }
-    }
-};
 
 /**
  * Reorders the contact tree by last activity (THIS is going to just move DOM nodes, it will NOT recreate them from
@@ -2275,11 +2145,16 @@ Chat.prototype.openChat = function(jids, type) {
 
     var room = new ChatRoom(self, roomJid + "@" + self.karere.options.mucDomain, type, jids, unixtime());
 
+
+    self.chats.set(
+        room.roomJid,
+        room
+    );
+
     if(!self.currentlyOpenedChat) {
         room.show();
     }
 
-    self.chats[room.roomJid] = room;
 
     var tmpJid = room.roomJid;
 
@@ -2287,7 +2162,7 @@ Chat.prototype.openChat = function(jids, type) {
 //        assert(roomJid, "missing room jid");
 
         if(self.currentlyOpenedChat === tmpJid) {
-            self.currentlyOpenedChat = roomJid;
+            self.currentlyOpenedChat = room.roomJid;
             if(room) {
                 room.show();
             }
@@ -2331,17 +2206,25 @@ Chat.prototype.openChat = function(jids, type) {
 
             if(self.chats[$startChatPromise.roomJid]) {
                 self.chats[$startChatPromise.roomJid].destroy(false);
-                self.renderContactTree();
             }
         });
-
-
 
 
     return [roomJid, room, $promise];
 };
 
 
+/**
+ * Utility func to hide all visible chats
+ */
+Chat.prototype.hideAllChats = function() {
+    var self = this;
+    self.chats.forEach((chatRoom, k) => {
+        if(!chatRoom.$header.is(".hidden") || !chatRoom.$messages.is(".hidden") || chatRoom.isCurrentlyActive) {
+            chatRoom.hide();
+        }
+    });
+};
 /**
  * Used to generate unique room JID for private (1on1) chats.
  *
@@ -2461,7 +2344,6 @@ Chat.prototype.processNewUser = function(u) {
 
     this.karere.subscribe(megaChat.getJidFromNodeId(u), self.getMyXMPPPassword());
 
-    self.renderContactTree();
     self.renderMyStatus();
 };
 
@@ -2482,7 +2364,6 @@ Chat.prototype.processRemovedUser = function(u) {
     }
     this.karere.unsubscribe(megaChat.getJidFromNodeId(u), self.getMyXMPPPassword());
 
-    self.renderContactTree();
     self.renderMyStatus();
 };
 
@@ -2493,26 +2374,24 @@ Chat.prototype.processRemovedUser = function(u) {
 Chat.prototype.refreshConversations = function() {
     var self = this;
 
+
+    $('.fm-tree-panel > .jspContainer > .jspPane > .nw-tree-panel-header').hide();
+    $('.fm-tree-panel > .nw-tree-panel-header').hide();
+
+
     if(!self.$container && !megaChat.is_initialized && u_type == 0) {
         $('.fm-chat-block').hide();
         return false;
     }
     // move to the proper place if loaded before the FM
-    if(self.$container.parent('.fm-right-files-block').size() == 0) {
-        $('.fm-right-files-block').append(self.$container);
+    if(self.$container.parent('.section.conversations .fm-right-files-block').size() == 0) {
+        $('.section.conversations .fm-right-files-block').append(self.$container);
         $('video', self.$container).each(function() {
             this.play();
         });
     }
 
-    // remove any dom elements for rooms which were destroyed
-    $('.content-panel .conversations .nw-conversations-item').each(function() {
-        if($(this).data('chatRoomId') && !self.chats[$(this).data('chatRoomId')]) {
-            $(this).remove();
-        }
-    });
-
-    self.renderContactTree();
+    self.renderConversationsApp();
 };
 
 Chat.prototype.closeChatPopups = function() {
@@ -2535,7 +2414,7 @@ Chat.prototype.closeChatPopups = function() {
  */
 
 Chat.prototype.getChatNum = function(idx) {
-    return this.chats[Object.keys(this.chats)[idx]];
+    return this.chats[this.chats.keys()[idx]];
 };
 
 /**
@@ -2581,7 +2460,13 @@ Chat.prototype.getBoshServiceUrl = function() {
 Chat.prototype.renderListing = function() {
     var self = this;
 
+
+    self.hideAllChats();
+
     hideEmptyGrids();
+
+    $('.fm-tree-panel > .jspContainer > .jspPane > .nw-tree-panel-header').hide();
+    $('.fm-tree-panel > .nw-tree-panel-header').hide();
 
     $('.files-grid-view').addClass('hidden');
     $('.fm-blocks-view').addClass('hidden');
@@ -2590,40 +2475,24 @@ Chat.prototype.renderListing = function() {
     $('.fm-contacts-blocks-view').addClass('hidden');
 
     $('.fm-right-files-block').removeClass('hidden');
-
-    //$('.nw-conversations-item').removeClass('selected');
+    $('.nw-conversations-item').removeClass('selected');
 
 
     sectionUIopen('conversations');
 
-    if(Object.keys(self.chats).length == 0) {
+    $('.section.conversations .fm-right-header').removeClass('hidden');
+
+
+    if(self.chats.size === 0) {
         $('.fm-empty-conversations').removeClass('hidden');
     } else {
         $('.fm-empty-conversations').addClass('hidden');
-
-        if($('.fm-right-header:visible').length === 0) {
-            // show something, instead of a blank/white screen if there are currently opened chats
-            if(self.lastOpenedChat && self.chats[self.lastOpenedChat] && self.chats[self.lastOpenedChat]._leaving !== true) {
-                // have last opened chat, which is active
-                self.chats[self.lastOpenedChat].show();
-                return true;
-            } else {
-                // show first chat from the conv. list
-                var $firstConversation = $('.nw-conversations-item:visible[data-room-jid]:first');
-                if($firstConversation.length === 1) {
-                    self.chats[$firstConversation.attr("data-room-jid") + "@conference." + self.options.xmppDomain].show();
-                    return true;
-                } else {
-                    $('.fm-empty-conversations').removeClass('hidden');
-                }
-            }
-        }
+        $('.conversations-main-listing').removeClass("hidden");
     }
     $('.fm-create-chat-button').show();
 
-    return false;
 
-    //TODO: show something? some kind of list of conversations summary/overview screen or something?
+    self.renderConversationsApp();
 };
 
 /**
@@ -2663,9 +2532,7 @@ Chat.prototype.getPrivateRoom = function(h) {
     var jid = self.getJidFromNodeId(h);
 
     var found = false;
-    Object.keys(self.chats).forEach(function(k) {
-        var v = self.chats[k];
-
+    self.chats.forEach(function(v, k) {
         if(v.getParticipantsExceptMe()[0] == jid) {
             found = v;
             return false; // break;
@@ -2682,3 +2549,11 @@ Chat.prototype.createAndShowPrivateRoomFor = function(h) {
 };
 
 window.megaChat = new Chat();
+window.chatui = chatui;
+window.MegaChatDisabled = MegaChatDisabled;
+
+module.exports = {
+    Chat,
+    chatui,
+    MegaChatDisabled
+};

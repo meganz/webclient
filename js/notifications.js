@@ -252,9 +252,9 @@ var notifyPopup = {
         notifyPopup.userEmails = {};
         
         if (M && M.u) {
-            for (var i in M.u) {
-                notifyPopup.userEmails[i] = M.u[i].m;
-            }
+            M.u.forEach(function(v, k) {
+                notifyPopup.userEmails[k] = v.m;
+            });
         }
 
         // Sort the notifications

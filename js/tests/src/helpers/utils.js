@@ -176,3 +176,51 @@ function getMegaRoom(data) {
 
     return obj;
 }
+
+var generateDummyReactInstance = function(name, props, state) {
+    var obj = {
+        simulateDidMount: function() {
+            this.componentDidMount();
+        },
+        simulateWillUnmount: function() {
+            this.componentWillUnmount();
+        },
+        simulateWillMount: function() {
+            this.componentWillMount();
+        },
+        _currentElement: {
+            type: {
+                displayName: name
+            }
+        },
+        isMounted: function() {
+            return true;
+        },
+        forceUpdate: function() {
+            //debugger;
+        },
+        _pendingForceUpdate: false,
+        props: props,
+        state: state
+    };
+
+    sinon.spy(obj, 'forceUpdate');
+
+    return obj;
+};
+
+var applyMixinToReactElement = function(obj, mxin) {
+    Object.keys(mxin).forEach(function(k) {
+        var v = mxin[k];
+
+        if(typeof(v) == 'function') {
+            if(obj[k]) {
+                console.error("Fn: ", k, "already defined in the main object. Can't apply mixin.");
+            } else {
+                obj[k] = v;
+            }
+        }
+    })
+};
+
+window.module = {};

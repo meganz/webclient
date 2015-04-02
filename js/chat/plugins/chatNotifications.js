@@ -21,11 +21,11 @@ var ChatNotifications = function(megaChat, options) {
     });
 
 
-    self.notifications
-        .unbind('onCounterUpdated.chat')
-        .bind('onCounterUpdated.chat', function(megaNotifications, group, notifObj) {
-            megaChat.renderContactTree();
-        });
+    //self.notifications
+    //    .unbind('onCounterUpdated.chat')
+    //    .bind('onCounterUpdated.chat', function(megaNotifications, group, notifObj) {
+    //        megaChat.renderContactTree();
+    //    });
 
     return this;
 };

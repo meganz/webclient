@@ -2306,9 +2306,7 @@ function generateAnonymousReport() {
     var userAnonMap = {};
     var userAnonIdx = 0;
 
-    Object.keys(megaChat.chats).forEach(function(k) {
-        var v = megaChat.chats[k];
-
+    megaChat.chats.forEach(function(v, k) {
         var participants = v.getParticipants();
 
         participants.forEach(function(v, k) {
@@ -2367,7 +2365,7 @@ function generateAnonymousReport() {
     report.totalScriptElements = $("script").length;
 
     report.totalD = Object.keys(M.d).length;
-    report.totalU = Object.keys(M.u).length;
+    report.totalU = M.u.size();
     report.totalC = Object.keys(M.c).length;
     report.totalIpc = Object.keys(M.ipc).length;
     report.totalOpc = Object.keys(M.opc).length;
@@ -2426,4 +2424,8 @@ function generateAnonymousReport() {
         });
 
     return $promise;
+}
+
+function __(s) { //TODO: waiting for @crodas to commit the real __ code.
+    return s;
 }

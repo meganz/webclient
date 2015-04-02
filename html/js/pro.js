@@ -425,25 +425,25 @@ function pro_pay()
  */
 function showBitcoinInvoice(apiResponse) {
 
-    /*
     // Testing data
-    apiResponse = {
+    /*apiResponse = {
         "invoice_id": 'sIk',
         "address": '12ouE2tWLuR3q5ZyQzQL6DR25iBLVjhwXd',
         "amount": 1.35715354,
         "created": Math.round(Date.now() / 1000),
-        "expiry": Math.round(Date.now() / 1000) + 5//900
+        "expiry": Math.round(Date.now() / 1000) + 5
     };*/
     
     // Set details
     var bitcoinAddress = apiResponse.address;
     var bitcoinUrl = 'bitcoin:' + apiResponse.address + '?amount=' + apiResponse.amount;
-    var invoiceDateTime = Date(apiResponse.created);    
+    var invoiceDateTime = new Date(apiResponse.created);    
     var proPlanNum = selectedProPackage[1];
     var planName = getProPlan(proPlanNum);
     var planMonths = selectedProPackage[4] + ' month purchase';
     var priceEuros = selectedProPackage[5] + '<span>&euro;</span>';
-    var priceBitcoins = apiResponse.amount + '<span>BTC</span>';
+    var priceBitcoins = apiResponse.amount;
+    var priceSatoshis = toSatoshi(apiResponse.amount);
     var expiryTime = new Date(apiResponse.expiry);
 
     // Cache original HTML of dialog to reset after close
@@ -516,7 +516,8 @@ function showBitcoinInvoice(apiResponse) {
             dialog.find('.scan-code-instruction').css('opacity', '0.25');
             dialog.find('.btn-open-wallet').css('visibility', 'hidden');
             dialog.find('.bitcoin-address').css('visibility', 'hidden');
-            dialog.find('.bitcoin-qr-code').css('opacity', '0.25');
+            dialog.find('.bitcoin-qr-code').css('opacity', '0.15');
+            dialog.find('.qr-code-mega-icon').hide();
             dialog.find('.plan-icon').css('opacity', '0.25');
             dialog.find('.plan-name').css('opacity', '0.25');
             dialog.find('.plan-duration').css('opacity', '0.25');
@@ -529,6 +530,70 @@ function showBitcoinInvoice(apiResponse) {
             clearInterval(countdownIntervalId);
         }        
     }, 1000);
+    
+    // Open WebSocket to chain.com API to monitor block chain for transactions on that receive address.
+    // This will receive a faster confirmation than the action packet which waits for an IPN from the provider.
+    var conn = new WebSocket("wss://ws.chain.com/v2/notifications");    
+    
+    conn.onopen = function (event) {
+        var req = { type: "address", address: bitcoinAddress, block_chain: "bitcoin" };
+        conn.send(JSON.stringify(req));
+    };
+    
+    conn.onmessage = function (event) {
+        
+        // Get data from WebSocket response
+        var notification = JSON.parse(event.data);
+        var type = notification.payload.type;
+        var address = notification.payload.address;
+        var satoshisReceived = notification.payload.received;
+        
+        // If correct amount was received, show success
+        if ((type === 'address') && (address === bitcoinAddress) && (satoshisReceived == priceSatoshis)) {
+            
+            console.log('zzzz price exact', satoshisReceived, priceSatoshis, notification);
+            
+            // Show success
+            dialog.find('.left-side').css('visibility', 'hidden');
+            dialog.find('.payment-confirmation').show();
+            dialog.find('.payment-confirmation .icon').addClass('success');
+            dialog.find('.payment-confirmation .description').html('Paid!');
+            dialog.find('.payment-confirmation .instruction').html('This may take up to a minute to be confirmed by the MEGA system.');
+            dialog.find('.expiry-instruction').html('Paid!');
+            clearInterval(countdownIntervalId);            
+        }
+        
+        // If partial payment was made
+        else if ((type === 'address') && (address === bitcoinAddress) && (satoshisReceived < priceSatoshis)) {
+            
+            console.log('zzzz price partial', satoshisReceived, priceSatoshis, notification);
+            
+            // Update price left to pay
+            var currentPriceBitcoins = parseFloat(dialog.find('.plan-price-bitcoins').html());
+            var currentPriceSatoshis = toSatoshi(currentPriceBitcoins);
+            var priceRemainingSatoshis = currentPriceSatoshis - satoshisReceived;
+            var priceRemainingBitcoins = toBitcoin(priceRemainingSatoshis);
+            var bitcoinUrl = 'bitcoin:' + bitcoinAddress + '?amount=' + priceRemainingBitcoins;
+            
+            console.log('zzzz currentPriceBitcoins', currentPriceBitcoins);
+            console.log('zzzz priceRemainingSatoshis', priceRemainingSatoshis);
+            console.log('zzzz priceRemainingBitcoins', priceRemainingBitcoins);
+            
+            // Update price
+            dialog.find('.plan-price-bitcoins').html(priceRemainingBitcoins);
+            
+            // Re-render QR code
+            var options = {
+                width: 256,
+                height: 256,
+                correctLevel: QRErrorCorrectLevel.H,
+                background: "#ffffff",
+                foreground: "#000",
+                text: bitcoinUrl
+            };
+            dialog.find('.bitcoin-qr-code').html('').qrcode(options);
+        }
+    };
 }
 
 function showLoginDialog() {

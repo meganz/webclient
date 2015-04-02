@@ -9695,13 +9695,52 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 
 /* Bitcoin invoice dialog */
 .fm-dialog.bitcoin-invoice-dialog {
+    border: 0 none;
     border-radius: 14px;
-    min-height: 440px;
     margin: -220px 0 0 -330px !important;
+    min-height: 440px;
     width: 660px;
 }
 .fm-dialog.bitcoin-invoice-dialog .invoice-container {
     position: relative;
+}
+.fm-dialog.bitcoin-invoice-dialog .payment-confirmation {
+    display: none;
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+.fm-dialog.bitcoin-invoice-dialog .payment-confirmation .icon {
+    background-position: 0 0;
+    background-repeat: no-repeat;
+    background-size: 100% auto;
+    display: block;
+    height: 167px;
+    margin-left: 80px;
+    margin-top: 70px;
+    width: 167px;
+}
+.fm-dialog.bitcoin-invoice-dialog .payment-confirmation .icon.success {
+    background-image: url("../images/mega/icons/retina/blue_tick@2x.png");
+}
+.fm-dialog.bitcoin-invoice-dialog .payment-confirmation .icon.failure {
+    background-image: url("../images/mega/icons/retina/red_cross@2x.png");
+}
+.fm-dialog.bitcoin-invoice-dialog .payment-confirmation .description {
+    color: grey;
+    font-size: 20px;
+    margin-left: 34px;
+    margin-top: 40px;
+    text-align: center;
+    width: 260px;
+}
+.fm-dialog.bitcoin-invoice-dialog .payment-confirmation .instruction {
+    color: grey;
+    font-size: 19px;
+    line-height: 1.3;
+    margin-left: 34px;
+    margin-top: 32px;
+    width: 270px;
 }
 .fm-dialog.bitcoin-invoice-dialog .scan-code-instruction {
     color: #ccc;
@@ -9712,6 +9751,19 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 .fm-dialog.bitcoin-invoice-dialog .bitcoin-qr-code {
     margin: 25px 36px 20px;
     width: 256px;
+}
+.fm-dialog.bitcoin-invoice-dialog .qr-code-mega-icon {
+    background-image: url("../images/mega/icons/retina/qrcode_mega@2x.png");
+    background-position: 0 0;
+    background-repeat: no-repeat;
+    background-size: 100% auto;
+    display: block;
+    height: 42px;
+    left: 144px;
+    opacity: 1;
+    position: absolute;
+    top: 182px;
+    width: 42px;
 }
 .fm-dialog.bitcoin-invoice-dialog a.btn-open-wallet {
     border: 2px solid #47abdc;
@@ -9728,8 +9780,9 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 .fm-dialog.bitcoin-invoice-dialog .bitcoin-address {
     color: #ccc;
     font-size: 10px;
-    margin-left: 59px;
     margin-top: 21px;
+    text-align: center;
+    width: 330px;
 }
 .fm-dialog.bitcoin-invoice-dialog .price-expired-instruction {
     display: none;
@@ -9766,7 +9819,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     border-top-right-radius: 12px;
     bottom: 0;
     color: #fff;
-    height: 436px;
+    height: 440px;
     left: 330px;
     padding-left: 35px;
     position: absolute;
@@ -9816,11 +9869,13 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     font-size: 0.8em;
 }
 .fm-dialog.bitcoin-invoice-dialog .plan-price-bitcoins {
+    display: inline-block;
     font-size: 38px;
     margin-top: 64px;
 }
-.fm-dialog.bitcoin-invoice-dialog .plan-price-bitcoins > span {
-    font-size: 0.35em;
+.fm-dialog.bitcoin-invoice-dialog .plan-price-bitcoins-btc {
+    display: inline-block;
+    font-size: 13px;
     padding-left: 4px;
 }
 .fm-dialog.bitcoin-invoice-dialog .separator {
@@ -9845,7 +9900,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     opacity: 0.3;
 }
 .fm-dialog.bitcoin-invoice-dialog .time-to-expire {
-    bottom: 45px;
+    bottom: 49px;
     font-size: 38px;
     opacity: 0.3;
     position: absolute;

@@ -729,6 +729,7 @@ else if (!b_u)
     jsl.push({f:'js/jquery.fullscreen.js', n: 'jquery_fullscreen', j:1,w:10});
     jsl.push({f:'js/jquery.qrcode.js', n: 'jqueryqrcode', j:1});
     jsl.push({f:'js/vendor/qrcode.js', n: 'qrcode', j:1,w:2, g: 'vendor'});
+    jsl.push({f:'js/bitcoin-math.js', n: 'bitcoinmath', j:1 });
     jsl.push({f:'js/vendor/jquery.window-active.js', n: 'jquery_windowactive', j:1,w:2});
     jsl.push({f:'js/megaPromise.js', n: 'megapromise_js', j:1,w:5});
     jsl.push({f:'js/vendor/db.js', n: 'db_js', j:1,w:5});

@@ -4,7 +4,7 @@ var ua = window.navigator.userAgent.toLowerCase();
 var is_chrome_firefox = document.location.protocol === 'chrome:' && document.location.host === 'mega' || document.location.protocol === 'mega:';
 var is_extension = is_chrome_firefox || document.location.href.substr(0,19) == 'chrome-extension://';
 var storage_version = '1'; // clear localStorage when version doesn't match
-var page = document.location.hash;
+var page = document.location.hash, l, d = false;
 
 function isMobile()
 {
@@ -48,6 +48,7 @@ if (!b_u) try
         Cu['import']("resource://gre/modules/Services.jsm");
         XPCOMUtils.defineLazyModuleGetter(this, "NetUtil", "resource://gre/modules/NetUtil.jsm");
 
+        // d = true;
         (function(global) {
             global.loadSubScript = function(file,scope) {
                 if (global.d) {
@@ -63,7 +64,7 @@ if (!b_u) try
 
         try {
             var mozBrowserID =
-            [    Services.appinfo.name,
+            [   Services.appinfo.name,
                 Services.appinfo.platformVersion,
                 Services.appinfo.platformBuildID,
                 Services.appinfo.OS,
@@ -72,12 +73,12 @@ if (!b_u) try
             var mozBrowserID = ua;
         }
 
-        loadSubScript('chrome://mega/content/strg2.js');
+        loadSubScript('chrome://mega/content/strg4.js');
 
         if(!(localStorage instanceof Ci.nsIDOMStorage)) {
             throw new Error('Invalid DOM Storage instance.');
         }
-        var d = !!localStorage.d;
+        d = !!localStorage.d;
     }
     if (typeof localStorage == 'undefined') b_u = 1;
     else
@@ -645,7 +646,7 @@ else if (page == '#android')
 }
 else if (!b_u)
 {
-    var d = localStorage.d || 0,l;
+    d = localStorage.d || 0;
     var jj = localStorage.jj || 0;
     var onBetaW = location.hostname === 'beta.mega.nz' || location.hostname.indexOf("developers.") === 0;
     var languages = {'en':['en','en-'],'es':['es','es-'],'fr':['fr','fr-'],'de':['de','de-'],'it':['it','it-'],'nl':['nl','nl-'],'pt':['pt'],'br':['pt-br'],'dk':['da'],'se':['sv'],'fi':['fi'],'no':['no'],'pl':['pl'],'cz':['cz','cz-'],'sk':['sk','sk-'],'sl':['sl','sl-'],'hu':['hu','hu-'],'jp':['ja'],'cn':['zh','zh-cn'],'ct':['zh-hk','zh-sg','zh-tw'],'kr':['ko'],'ru':['ru','ru-mo'],'ar':['ar','ar-'],'he':['he'],'id':['id'],'ca':['ca','ca-'],'eu':['eu','eu-'],'af':['af','af-'],'bs':['bs','bs-'],'sg':[],'tr':['tr','tr-'],'mk':[],'hi':[],'hr':['hr'],'ro':['ro','ro-'],'uk':['||'],'gl':['||'],'sr':['||'],'lt':['||'],'th':['||'],'lv':['||'],'fa':['||'],'ee':['et'],'ms':['ms'],'cy':['cy'],'bg':['bg'],'be':['br'],'tl':['en-ph'],'ka':['||']};

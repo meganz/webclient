@@ -51,14 +51,14 @@ var MegaRenderMixin = {
         window.removeEventListener('hashchange', this.onHashChangeDoUpdate);
     },
     onResizeDoUpdate: function() {
-        if(!this.isMounted() && this._pendingForceUpdate === false) {
+        if(!this.isMounted() || this._pendingForceUpdate === true) {
             return;
         }
 
         this.forceUpdate();
     },
     onHashChangeDoUpdate: function() {
-        if(!this.isMounted() && this._pendingForceUpdate === false) {
+        if(!this.isMounted() || this._pendingForceUpdate === true) {
             return;
         }
 
@@ -135,7 +135,7 @@ var MegaRenderMixin = {
         var self = this;
         depth = depth || 0;
 
-        if(!this.isMounted() && this._pendingForceUpdate === false) {
+        if(!this.isMounted() || this._pendingForceUpdate === true) {
             return;
         }
 
@@ -171,8 +171,8 @@ var MegaRenderMixin = {
     },
     shouldComponentUpdate: function(nextProps, nextState) {
         var shouldRerender = false;
-        if(!this.isMounted() && this._pendingForceUpdate === false) {
-            return;
+        if(!this.isMounted() || this._pendingForceUpdate === true) {
+            return false;
         }
 
         if(this.props !== null) {
@@ -201,7 +201,7 @@ var MegaRenderMixin = {
         return shouldRerender;
     },
     forceUpdateIfChanged: function() {
-        if(!this.isMounted() && this._pendingForceUpdate === false) {
+        if(!this.isMounted() || this._pendingForceUpdate === true) {
             return;
         }
 

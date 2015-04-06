@@ -2137,6 +2137,12 @@ Chat.prototype.openChat = function(jids, type) {
         roomJid = self._generateNewRoomIdx();
     }
 
+    var roomFullJid = roomJid + "@" + self.karere.options.mucDomain;
+    if(self.chats[roomFullJid]) {
+        var room = self.chats[roomFullJid];
+        room.show();
+        return [roomFullJid, room, (new $.Deferred()).resolve(roomFullJid, room)];
+    }
     if(self.currentlyOpenedChat && self.currentlyOpenedChat != roomJid) {
         self.hideChat(self.currentlyOpenedChat);
         self.currentlyOpenedChat = null;

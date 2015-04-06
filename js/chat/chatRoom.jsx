@@ -780,6 +780,18 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
             $('.others-av-screen .video-only', self.$header).show();
         }
 
+        self.megaChat._currentCallCounter = 0;
+        if(self.megaChat._currentCallTimer) {
+            clearInterval(self.megaChat._currentCallTimer);
+        }
+        self.megaChat._currentCallTimer = setInterval(function() {
+            $('.nw-conversations-item.current-calling .chat-time-txt').text(
+                secondsToTime(self.megaChat._currentCallCounter)
+            );
+
+            self.megaChat._currentCallCounter++;
+        }, 1000);
+
 
         self._resetCallStateInCall();
     });
@@ -1568,13 +1580,6 @@ ChatRoom.prototype._resetCallStateInCall = function() {
     if(self.megaChat._currentCallTimer) {
         clearInterval(self.megaChat._currentCallTimer);
     }
-    self.megaChat._currentCallTimer = setInterval(function() {
-        $('.nw-conversations-item.current-calling .chat-time-txt').text(
-            secondsToTime(self.megaChat._currentCallCounter)
-        );
-
-        self.megaChat._currentCallCounter++;
-    }, 1000);
 
 
 

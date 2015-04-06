@@ -93,9 +93,30 @@ var ButtonPopup = React.createClass({
             classes += " hidden";
         }
 
+        var styles;
+        // calculate and move the popup arrow to the correct position.
+        if(this.isMounted() && this._owner) {
+            var parentDomNode = this._owner.getDOMNode();
+            var $button = $(parentDomNode).children(1);
+            var $buttonContainer = $(parentDomNode).children(0);
+            var parentWidth = $buttonContainer.outerWidth();
+            var parentPos = $button.offset().left;
+
+            var bottomOffset = 4;
+            var rightPos = ($(window).outerWidth() - parentPos - (parentWidth*0.5));
+            var topPos = $button.offset().top + $button.outerHeight() - bottomOffset;
+
+            styles = {
+                'right': rightPos,
+                'zIndex': 110,
+                'position': 'fixed',
+                'top': topPos
+            };
+        }
+
         return (
             <div className={classes}>
-                <div className="fm-call-dialog-arrow"></div>
+                <div className="fm-call-dialog-arrow"  style={styles}></div>
                 <div className="fm-call-dialog-scroll">
                     <utils.JScrollPane {...this.props}>
                         {this.props.children}

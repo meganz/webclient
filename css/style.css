@@ -8210,14 +8210,10 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 }
 .nw-conversations-item.current-calling {
 	height: 48px;
-	cursor: pointer;
-	background-color: rgba(149,211,239,1);
-	color: white;
-	cursor: default;
+    color: #333333;
 }
-.nw-conversations-item.current-calling .nw-conversations-name {
-	color: white;
-}
+
+
 .nw-conversations-item.current-calling.selected {
 	cursor: default;
 }

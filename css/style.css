@@ -19724,9 +19724,9 @@ a.blog-article-button {
 	border-color: rgba(0,0,0,0.3);
 	position: absolute;
 }
-/*.products-bottom-block .sync-button {
+.products-bottom-block .sync-button {
 	position: static;
-}*/
+}
 .products-bottom-block .win-phone-button {
 	width: 234px;
 }

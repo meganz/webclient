@@ -2381,8 +2381,8 @@ Chat.prototype.refreshConversations = function() {
     var self = this;
 
 
-    $('.fm-tree-panel > .jspContainer > .jspPane > .nw-tree-panel-header').hide();
-    $('.fm-tree-panel > .nw-tree-panel-header').hide();
+    //$('.fm-tree-panel > .jspContainer > .jspPane > .nw-tree-panel-header').hide();
+    //$('.fm-tree-panel > .nw-tree-panel-header').hide();
 
 
     if(!self.$container && !megaChat.is_initialized && u_type == 0) {
@@ -2471,8 +2471,8 @@ Chat.prototype.renderListing = function() {
 
     hideEmptyGrids();
 
-    $('.fm-tree-panel > .jspContainer > .jspPane > .nw-tree-panel-header').hide();
-    $('.fm-tree-panel > .nw-tree-panel-header').hide();
+    //$('.fm-tree-panel > .jspContainer > .jspPane > .nw-tree-panel-header').hide();
+    //$('.fm-tree-panel > .nw-tree-panel-header').hide();
 
     $('.files-grid-view').addClass('hidden');
     $('.fm-blocks-view').addClass('hidden');

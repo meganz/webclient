@@ -2623,6 +2623,7 @@ function accountUI()
     $('.fm-account-button').removeClass('active');
     $('.fm-account-sections').addClass('hidden');
     $('.fm-right-files-block').addClass('hidden');
+    $('.section.conversations').addClass('hidden');
     $('.fm-right-account-block').removeClass('hidden');
     $('.nw-fm-left-icon.settings').addClass('active');
     M.accountData(function(account)
@@ -5806,6 +5807,9 @@ function sectionUIopen(id) {
     if (id !== 'conversations') {
         $('.fm-right-header').removeClass('hidden');
         $('.fm-chat-block').addClass('hidden');
+        $('.section.conversations').addClass('hidden');
+    } else {
+        $('.section.conversations').removeClass('hidden');
     }
 
     if ((id !== 'cloud-drive') && (id !== 'rubbish-bin') && ((id !== 'shared-with-me') && (M.currentdirid !== 'shares'))) {

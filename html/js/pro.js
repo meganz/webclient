@@ -551,14 +551,12 @@ function showBitcoinInvoice(apiResponse) {
         // If correct amount was received, show success
         if ((type === 'address') && (address === bitcoinAddress) && (satoshisReceived == priceSatoshis)) {
             
-            console.log('zzzz price exact', satoshisReceived, priceSatoshis, notification);
-            
             // Show success
             dialog.find('.left-side').css('visibility', 'hidden');
             dialog.find('.payment-confirmation').show();
             dialog.find('.payment-confirmation .icon').addClass('success');
-            dialog.find('.payment-confirmation .description').html('Paid!');
-            dialog.find('.payment-confirmation .instruction').html('This may take up to a minute to be confirmed by the MEGA system.');
+            dialog.find('.payment-confirmation .description').html(planName + ' plan has been paid!');
+            dialog.find('.payment-confirmation .instruction').html('Please await account upgrade by MEGA...');
             dialog.find('.expiry-instruction').html('Paid!');
             clearInterval(countdownIntervalId);            
         }
@@ -566,18 +564,12 @@ function showBitcoinInvoice(apiResponse) {
         // If partial payment was made
         else if ((type === 'address') && (address === bitcoinAddress) && (satoshisReceived < priceSatoshis)) {
             
-            console.log('zzzz price partial', satoshisReceived, priceSatoshis, notification);
-            
             // Update price left to pay
             var currentPriceBitcoins = parseFloat(dialog.find('.plan-price-bitcoins').html());
             var currentPriceSatoshis = toSatoshi(currentPriceBitcoins);
             var priceRemainingSatoshis = currentPriceSatoshis - satoshisReceived;
             var priceRemainingBitcoins = toBitcoin(priceRemainingSatoshis);
             var bitcoinUrl = 'bitcoin:' + bitcoinAddress + '?amount=' + priceRemainingBitcoins;
-            
-            console.log('zzzz currentPriceBitcoins', currentPriceBitcoins);
-            console.log('zzzz priceRemainingSatoshis', priceRemainingSatoshis);
-            console.log('zzzz priceRemainingBitcoins', priceRemainingBitcoins);
             
             // Update price
             dialog.find('.plan-price-bitcoins').html(priceRemainingBitcoins);

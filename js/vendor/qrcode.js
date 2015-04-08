@@ -397,7 +397,6 @@ var QRCode;
 					_oContext.fillStyle = bIsDark ? _htOption.colorDark : _htOption.colorLight;					
 					_oContext.fillRect(nLeft, nTop, nWidth, nHeight);
 					
-					// 안티 앨리어싱 방지 처리
 					_oContext.strokeRect(
 						Math.floor(nLeft) + 0.5,
 						Math.floor(nTop) + 0.5,

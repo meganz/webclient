@@ -66,7 +66,7 @@ var mIDBPlaceHolder = false;
 		}
 	}
 	Services.obs.addObserver(domStorageBridge, "dom-storage2-changed", false);
-	window.addEventListener('unload', e => Services.obs.removeObserver(domStorageBridge, "dom-storage2-changed"));
+	scope.addEventListener('unload', e => Services.obs.removeObserver(domStorageBridge, "dom-storage2-changed"));
 	
 	if (inPrivateBrowsing) {
 		scope.Incognito = true;

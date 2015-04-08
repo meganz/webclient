@@ -2698,8 +2698,8 @@ function MegaData()
     // Update M.opc and related localStorage
     this.addOPC = function(u, ignoreDB) {
         this.opc[u.p] = u;
-        if (typeof mDB === 'object' && !ignoreDB && !pfkey) {
-            mDBadd('opc', clone(u));
+        if (typeof mSDB === 'object' && !ignoreDB && !pfkey) {
+            mSDB.add('opc', clone(u));
         }
     };
 
@@ -2710,16 +2710,16 @@ function MegaData()
      * 
      */
     this.delOPC = function(id) {
-        if (typeof mDB === 'object' && !pfkey) {
-            mDBdel('opc', id);
+        if (typeof mSDB === 'object' && !pfkey) {
+            mSDB.del('opc', id);
         }
     };
 
     // Update M.ipc and related localStorage
     this.addIPC = function(u, ignoreDB) {
         this.ipc[u.p] = u;
-        if (typeof mDB === 'object' && !ignoreDB && !pfkey) {
-            mDBadd('ipc', clone(u));
+        if (typeof mSDB === 'object' && !ignoreDB && !pfkey) {
+            mSDB.add('ipc', clone(u));
         }
     };
 
@@ -2730,8 +2730,8 @@ function MegaData()
      * 
      */
     this.delIPC = function(id) {
-        if (typeof mDB === 'object' && !pfkey) {
-            mDBdel('ipc', id);
+        if (typeof mSDB === 'object' && !pfkey) {
+            mSDB.del('ipc', id);
         }
     };
 
@@ -2755,8 +2755,8 @@ function MegaData()
         }
         this.ps[ps.h][ps.p] = ps;
 
-        if (typeof mDB === 'object' && !ignoreDB && !pfkey) {
-            mDBadd('ps', clone(ps));
+        if (typeof mSDB === 'object' && !ignoreDB && !pfkey) {
+            mSDB.add('ps', clone(ps));
         }
     };
 
@@ -2784,8 +2784,8 @@ function MegaData()
 
         // Check how removing from indexedDb works and make
         // sure that pending share is/only removed from it
-        if (typeof mDB === 'object' && !pfkey) {
-            mDBdel('ps', pcrId);
+        if (typeof mSDB === 'object' && !pfkey) {
+            mSDB.del('ps', pcrId);
         }
     };
 
@@ -5293,10 +5293,10 @@ function __process_f2(f, cb, tick)
  * @param {array of JSON objects} pending contacts
  * 
  */
-function processIPC(ipc) {
+function processIPC(ipc, ignoreDB) {
     DEBUG('processIPC');
     for (var i in ipc) {
-        M.addIPC(ipc[i]);
+        M.addIPC(ipc[i], ignoreDB);
         if (ipc[i].dts) {
             M.delIPC(ipc[i].p);
             $('#ipc_' + ipc[i].p).remove();
@@ -5316,10 +5316,10 @@ function processIPC(ipc) {
  * @param {array of JSON objects} pending contacts
  * 
  */
-function processOPC(opc) {
+function processOPC(opc, ignoreDB) {
     DEBUG('processOPC');
     for (var i in opc) {
-        M.addOPC(opc[i]);
+        M.addOPC(opc[i], ignoreDB);
         if (opc[i].dts) {
             M.delOPC(opc[i].p);
 
@@ -5358,7 +5358,7 @@ function processOPC(opc) {
  *
  * 
  */
-function processPS(pendingShares) {
+function processPS(pendingShares, ignoreDB) {
     DEBUG('processPS');
     var ps;
 
@@ -5366,7 +5366,7 @@ function processPS(pendingShares) {
         if (pendingShares.hasOwnProperty(i)) {
             ps = pendingShares[i];
             if (ps.h) {// From gettree
-                M.addPS(ps);
+                M.addPS(ps, ignoreDB);
             }
             else {// Situation different from gettree, s2 from API response, doesn't have .h attr instead have .n
                 var nodeHandle = ps.n;
@@ -5387,7 +5387,7 @@ function processPS(pendingShares) {
                 } else {
 
                     // Add the pending share to state
-                    M.addPS({'h':nodeHandle, 'p':pendingContactId, 'r':shareRights, 'ts':timeStamp});
+                    M.addPS({'h':nodeHandle, 'p':pendingContactId, 'r':shareRights, 'ts':timeStamp}, ignoreDB);
 
                     sharedUInode(nodeHandle);
                 }

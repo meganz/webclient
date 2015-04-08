@@ -10,6 +10,220 @@ if (!window.IDBTransaction) {
 
 var mDBact, mDBv = 7;
 var mDB = indexedDB ? 0x7f : undefined;
+var mSDB, mSDBPromises = [];
+
+/**
+ *  @brief Dynamic wrapper around MegaDB which eases handling
+ *         indexedDBs whose purpose is storing plain objects
+ *         with no indexes and loaded in bulk at startup.
+ *
+ *  @param [string]   aName      Database name.
+ *  @param [mixed]    aOptions   MegaDB Options (optional)
+ *  @param [function] aCallback  Callback to invoke when the db
+ *                               is ready to use (optional)
+ *
+ *  @details The schema is created at runtime by calling the function
+ *           addSchemaHandler. If there is no callback provided on the
+ *           constructor a mBroadcaster event will be dispatched with
+ *           the DB name, ie mStorageDB:dbname, when it's ready to use.
+ *           The version is automatically handled by computing a
+ *           MurmurHash3 for the schema, and increased as it changes.
+ *
+ *  @example
+ *       mStorageDB('myDataBase', function(aError) {
+ *           if (aError) throw new Error('Database error');
+ *
+ *           this.add('myTable', {
+ *               name: 'John Doe', age: 49, car: 'Volvo'
+ *           }).then(function() {
+ *               console.log('Item inserted successfully');
+ *           });
+ *       }).addSchemaHandler('myTable', 'name', function(results) {
+ *           results.forEach(function(who) {
+ *               console.debug('Meet ' + who.name);
+ *           })
+ *       });
+ */
+function mStorageDB(aName, aOptions, aCallback) {
+    if (!(this instanceof mStorageDB)) {
+        return new mStorageDB(aName, aOptions, aCallback);
+    }
+    if (typeof aOptions === 'function') {
+        aCallback = aOptions;
+        aOptions = undefined;
+    }
+    this.name     = aName;
+    this.options  = aOptions;
+    this.handlers = {};
+    this.schema   = {};
+    mSDBPromises.push(this);
+    this.onReadyState = aCallback;
+}
+mStorageDB.prototype = {
+    addSchemaHandler: function mStorageDB_addSchemaHandler(aTable, aKeyPath, aHandler) {
+        this.schema[aTable] = {
+            key: {
+                keyPath: aKeyPath
+            }
+        };
+        this.handlers[aTable] = aHandler;
+        return this;
+    },
+
+    query: function mStorageDB_query(aCommand, aTable, aData) {
+        var promise;
+
+        if (this.schema[aTable]) {
+            if (d) console.log('msdb query', this.name, aCommand, aTable, aData);
+
+            if (aCommand === 'add') {
+                promise = this.db.addOrUpdate(aTable, aData);
+            } else {
+                promise = this.db.remove(aTable, aData);
+            }
+        }
+        else {
+            promise = new MegaPromise();
+            Soon(function __msdb_queryError() {
+                promise.reject(Error("Unknown table '"+aTable+"' for db " + this.name));
+            });
+        }
+        return promise;
+    },
+
+    setup: function mStorageDB_setup() {
+        this.dbtag  = 'msdb_' + this.name + '_' + u_handle + '_';
+        var version = +localStorage[this.dbtag + 'v'] || 0;
+        var oldHash = +localStorage[this.dbtag + 'hash'];
+        var newHash = MurmurHash3(JSON.stringify(this.schema), 0x9e450134);
+        var promise = new MegaPromise(), self = this, db;
+
+        if (oldHash !== newHash) {
+            localStorage[this.dbtag + 'v'] = ++version;
+            localStorage[this.dbtag + 'hash'] = newHash;
+        }
+
+        db = new MegaDB(this.name, u_handle, version, this.schema, this.options);
+
+        db.bind('onDbStateReady', function _onDbStateReady() {
+            self.fetch(Object.keys(self.schema))
+                .then(function() {
+                    __dbNotifyCompletion();
+                }, function() {
+                    __dbNotifyCompletion(true);
+                });
+        });
+
+        db.bind('onDbStateFailed', function _onDbStateFailed() {
+            if (d) console.error('onDbStateFailed', arguments);
+            __dbNotifyCompletion(true);
+        });
+
+        function __dbNotifyCompletion(aError) {
+            if (aError) {
+                self.db = null;
+                promise.reject(aError);
+            } else {
+                promise.resolve();
+            }
+            if (self.onReadyState) {
+                Soon(self.onReadyState.bind(self, aError));
+                delete self.onReadyState;
+            }
+            db.unbind('onDbStateReady').unbind('onDbStateFailed');
+            mBroadcaster.sendMessage('mStorageDB:' + self.name, aError);
+            promise = newHash = oldHash = version = db = self = undefined;
+        }
+
+        this.db = db;
+        this.add = this.query.bind(this, 'add');
+        this.del = this.query.bind(this, 'del');
+
+        return promise;
+    },
+
+    fetch: function mStorageDB_fetch(aTables, aPromise) {
+        var t = aTables.shift(), self = this;
+        if (d) console.log('msdb fetch', t);
+
+        if (!aPromise) {
+            aPromise = new MegaPromise();
+        }
+
+        if (t) {
+            this.db.query(t)
+                .execute()
+                .done(function _fetchDone(results) {
+                    if (d) console.log('msdb fetch done', t, results);
+
+                    if (results.length) {
+                        if (self.handlers[t]) {
+                            try {
+                                self.handlers[t](results, true);
+                            }
+                            catch(ex) {
+                                if (d) console.error(ex);
+                            }
+                        }
+                        else {
+                            console.error('No handler for table', t);
+                        }
+                    }
+                    self.fetch(aTables, aPromise);
+                }).fail(function _fetchFail() {
+                    if (d) console.log('msdb fetch failed', t);
+                    aPromise.reject.apply(aPromise, arguments);
+                });
+        } else {
+            aPromise.resolve();
+        }
+
+        return aPromise;
+    }
+};
+
+mBroadcaster.once('startMega', function __msdb_init() {
+    var db = new mStorageDB('gps');
+
+    db.addSchemaHandler( 'ipc',  'p',  processIPC );
+    db.addSchemaHandler( 'opc',  'p',  processOPC );
+    db.addSchemaHandler( 'ps',   'p',  processPS  );
+
+    mBroadcaster.once('mStorageDB:' + db.name,
+        function __msdb_ready(aError) {
+            if (d) console.log('mStorageDB.ready', !aError);
+            if (aError) {
+                mSDB = db = undefined;
+            }
+        });
+
+    mBroadcaster.once('mFileManagerDB.done',
+        function __msdb_setup(aCallback) {
+            var promises = mSDBPromises
+                    .map(function(aDBInstance) {
+                        return aDBInstance.setup();
+                    });
+            MegaPromise.allDone(promises).always(
+                function __msdb_done() {
+                    if (aCallback === getsc) {
+                        getsc(1);
+                    } else {
+                        aCallback();
+                    }
+                    mBroadcaster.sendMessage('mStorageDB!ready');
+                });
+            mSDBPromises = undefined;
+        });
+
+    mBroadcaster.addListener('mFileManagerDB.state',
+        function __msdb_state(aState) {
+            if (aState === mFileManagerDB.STATE_READONLY) {
+                mSDB = undefined;
+            } else {
+                mSDB = db;
+            }
+        });
+});
 
 var mFileManagerDB = {
     schema: {
@@ -151,7 +365,7 @@ var mFileManagerDB = {
             }
             else {
                 this._setstate(this.db);
-                getsc(1);
+                mBroadcaster.sendMessage('mFileManagerDB.done', getsc);
             }
         }
     },
@@ -202,7 +416,7 @@ var mFileManagerDB = {
 
     _loadfm: function mFileManagerDB__loadfm(aDBInstance) {
         this._setstate(aDBInstance);
-        loadfm();
+        mBroadcaster.sendMessage('mFileManagerDB.done', loadfm);
     },
 
     _setstate: function mFileManagerDB__setstate(aDBInstance) {
@@ -219,7 +433,7 @@ var mFileManagerDB = {
             this.state = this.STATE_READY;
             mDB = aDBInstance;
         }
-        if (d) console.log('mFileManagerDB.state', this.state);
+        mBroadcaster.sendMessage('mFileManagerDB.state', this.state);
     },
 
     state: 0,

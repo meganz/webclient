@@ -174,6 +174,10 @@ function loadPaymentGatewayOptions() {
 
 // Step2
 function pro_next_step() {
+    
+    // Temporarily redirect to #resellers page until Bitcoin is ready
+    window.location.replace("#resellers");
+    return false;
 	
 	if (!u_handle) {
         megaAnalytics.log("pro", "loginreq");
@@ -290,7 +294,7 @@ function renderPlanDurationDropDown() {
 
             // Build select option
             html += '<div class="membership-dropdown-item" data-plan-index="' + i + '">'
-                 +       monthsWording + ' (<strong>' + price + '</strong> €)'
+                 +       monthsWording + ' (<strong>' + price + '</strong> &euro;)'
                  +  '</div>';
         }
     }

@@ -14266,6 +14266,16 @@ h5.main-italic-header {
 	color: #999999;
 	padding: 20px 8px 8px 8px;
 }
+.reset-success-st3 .reset-txt {
+	font-family: 'Open Sans Semibold';
+	float: none;
+	display: block;
+	color: #3F3F3F;
+	margin-bottom: 17px;
+}
+.reset-success-st3  .fm-dialog-header {
+	margin-bottom: 10px;
+}
 .reset-success-st2 .fm-account-input {
 	margin: 0 8px 20px 8px;
 	width: auto;

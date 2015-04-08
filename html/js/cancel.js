@@ -98,7 +98,9 @@
 
         api_resetuser({callback: function(code) {
             closeDialog();
-            $('.reset-success-st2').removeClass('active');
+            $('.reset-success-st2')
+                .removeClass('active')
+                .addClass('hidden');
             loadingDialog.hide();
 
             if (code === 0) {
@@ -162,6 +164,7 @@
 
     AccountClosure.prototype._gatherFeedback = function() {
         var text = '',
+            comment = '',
             btnId = $('.reset-success-st3 .radioOn').attr('id');
 
         // Other: Textarea, $('.feedback-textarea textarea').val()
@@ -183,11 +186,10 @@
         else if (btnId === 'res6_div') {
             text = "MEGA has under-delivered on its promise";
         }
-        else {
-            text = $('.feedback-textarea-bl textarea').val();
-        }
-
-        return text;
+        
+        comment = $('.feedback-textarea-bl textarea').val();
+        
+        return text + ' | ' + comment;
     };
 
     AccountClosure.prototype._prepareJsonString = function(text) {
@@ -236,15 +238,6 @@
             obj._deleteLeftovers();
         });
 
-        // On focus
-        $(obj.opt.fbDlgClass).off('focus', '.feedback-textarea-bl');
-        $(obj.opt.fbDlgClass).on('focus', '.feedback-textarea-bl', function() {
-            $(obj.opt.fbDlgClass + ' .radio-txt').removeClass('active');
-            $(obj.opt.fbDlgClass + ' .radioOn').attr('class', 'radioOff');
-            $(obj.opt.fbDlgClass + ' #res7_div')
-                .attr('class', 'radioOn')
-                .next().addClass('active');
-        });
         // Keyboard button listener <Enter key>
         $(obj.opt.fbDlgClass).rebind('keypress', function(e) {
 

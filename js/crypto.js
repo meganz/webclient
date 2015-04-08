@@ -1154,15 +1154,21 @@ function api_reqfailed(c, e) {
             loadfm();
         }
     }
+    
+    // If suspended account
     else if (e === EBLOCKED) {
+        
+        // On clicking OK, log the user out and redirect to contact page
         msgDialog('warninga', 'Suspended account',
-                'You have been suspended due to excess data usage.\n\
-                Please contact support@mega.co.nz to get your account reinstated.',
-                false, function() {
-            u_logout(true);
-            document.location.reload();
-            document.location.hash = 'contact';
-        });
+            'You have been suspended due to excess data usage.\n\
+            Please contact support@mega.co.nz to get your account reinstated.',
+            false,
+            function() {
+                var redirectUrl = window.location.origin + window.location.pathname + '#contact';
+                u_logout(true);                
+                window.location.replace(redirectUrl);
+            }
+        );
     }
 }
 

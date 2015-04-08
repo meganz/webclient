@@ -1,4 +1,22 @@
-
+/**
+ * Get a string for the payment plan number
+ * @param {Number} planNum The plan number e.g. 1: PRO I, 2: PRO II, 3: PRO III, 4: LITE
+ */
+function getProPlan(planNum) {
+    
+    switch (planNum) {
+        case 1:
+            return l[5819];     // PRO I
+        case 2:
+            return l[6125];     // PRO II
+        case 3:
+            return l[6126];     // PRO III
+        case 4:
+            return 'LITE';      // l[6234] (when strings generated)
+        default:
+            return l[435];      // FREE
+    }
+}
 
 function voucherCentering(button)
 {
@@ -482,23 +500,26 @@ function treesearchUI()
             $('.nw-sorting-menu').addClass('hidden');
         }
     });
-    $('.sorting-menu-item').unbind('click');
-    $('.sorting-menu-item').bind('click', function()
-    {
-        var $this = $(this);
-        if ($this.attr('class').indexOf('active') == -1)
-        {
+    
+    $('.sorting-menu-item').rebind('click', function() {
+        
+        var $this = $(this),
+            data = $this.data(),
+            type = treePanelType();
+
+        if ($this.attr('class').indexOf('active') === -1) {
             $this.parent().find('.sorting-menu-item').removeClass('active');
             $this.addClass('active');
             $('.nw-sorting-menu').addClass('hidden');
             $('.nw-tree-panel-arrows').removeClass('active');
-            var data = $this.data()
-                , type = treePanelType()
+                
             if (data.dir) {
                 localStorage['sort' + type + 'Dir'] = $.sortTreePanel[type].dir = data.dir;
-            } else {
+            }
+            else {
                 localStorage['sort' + type + 'By'] = $.sortTreePanel[type].by = data.by;
             }
+            
             switch (type) {
                 case 'contacts':
                     M.contacts();
@@ -1077,7 +1098,7 @@ function transferPanelContextMenu(target)
     if (!file) {
         /* no file, it is a finished operation */
         menuitems.hide()
-            .filter('.tranfer-clear,.refresh-item')
+            .filter('.tranfer-clear')
             .show()
 
     } else {
@@ -1282,7 +1303,7 @@ function sharedUInode(nodeHandle) {
     $('.file-block#' + nodeHandle + ' .block-view-file-type').addClass(fileicon({ t: 1, shares: availShares }));
 }
 
-function addnotification(notification) {
+function addShareNotification(notification) {
 
     if (notifyPopup.notifications == null) {
         return false;
@@ -1330,7 +1351,7 @@ function addnotification(notification) {
     notifyPopup.doNotify();
 }
 
-function addIpcOrContactNotification(actionPacket) {
+function addNotification(actionPacket) {
 
     if (notifyPopup.notifications === null) {
         return false;
@@ -2127,16 +2148,15 @@ function initContextUI()
         M.addDownload($.selected, true);
     });
 
-    $(c + '.getlink-item').unbind('click');
-    $(c + '.getlink-item').bind('click', function(event)
-    {
+    $(c + '.getlink-item').rebind('click', function(event) {
         if ($.propertiesDialog) {
             propertiesDialog(1);
         }
-        if (u_type === 0)
+        if (u_type === 0) {
             ephemeralDialog(l[1005]);
+        }
         else {
-            M.getlinks($.selected).done(function() {
+            M.getLinks($.selected).done(function() {
                 linksDialog();
             });
         }
@@ -2155,8 +2175,7 @@ function initContextUI()
         mcDialog();
     });
 
-    $(c + '.sh4r1ng-item').unbind('click');
-    $(c + '.sh4r1ng-item').bind('click', function() {
+    $(c + '.sh4r1ng-item').rebind('click', function() {
         if (u_type === 0) {
             ephemeralDialog(l[1006]);
         } else {
@@ -2314,18 +2333,6 @@ function initContextUI()
             $('span.transfer-type', this).addClass('paused');
         });
         $('.tranfer-download-indicator,.transfer-upload-indicator').removeClass('active');
-    });
-
-    $(c + '.refresh-item').unbind('click');
-    $(c + '.refresh-item').bind('click', function(event)
-    {
-        stopsc();
-        stopapi();
-        if (typeof mDB !== 'undefined' && !pfid) {
-            mDBreload();
-        } else {
-            loadfm(true);
-        }
     });
 
     $(c + '.select-all').unbind('click');
@@ -2670,32 +2677,27 @@ function accountUI()
         else
         {
             // this is the main entry point for users who just had upgraded their accounts
-
-            if(isNonActivatedAccount()) {
+            if (isNonActivatedAccount()) {
                 showNonActivatedAccountDialog(true);
             }
 
             $('.fm-account-overview-button').addClass('active');
             $('.fm-account-overview').removeClass('hidden');
         }
-        $('.fm-account-blocks .membership-icon.type').removeClass('free pro1 pro2 pro3');
+        $('.fm-account-blocks .membership-icon.type').removeClass('free pro1 pro2 pro3 pro4');
         if (u_attr.p)
         {
-            // pro account:
-            var protext;
-            if (u_attr.p == 1) protext = 'PRO I';
-            else if (u_attr.p == 2) protext = 'PRO II';
-            else if (u_attr.p == 3) protext = 'PRO III';
-            $('.membership-big-txt.accounttype').text(protext);
-            $('.fm-account-blocks .membership-icon.type').addClass('pro' + u_attr.p);
+            // LITE/PRO account
+            var planNum = u_attr.p;
+            var planText = getProPlan(planNum);
+            
+            $('.membership-big-txt.accounttype').text(planText);
+            $('.fm-account-blocks .membership-icon.type').addClass('pro' + planNum);
+            
             if (account.stype == 'S')
             {
                 // subscription
                 $('.fm-account-header.typetitle').text(l[434]);
-                // if (u.stime == 'W') $('.membership-big-txt.type').text(l[747]);
-                // else if (u.stime == 'M') $('.membership-big-txt.type').text(l[748]);
-                // else if (u.stime == 'Y') $('.membership-big-txt.type').text(l[749]);
-                // $('.membership-medium-txt.expiry').html(htmlentities(l[750]) + ' <span class="red">' + time2date(account.scycle) + '</span>');
                 if (account.scycle == '1 M') $('.membership-big-txt.type').text(l[748]);
                 else if (account.scycle == '1 Y') $('.membership-big-txt.type').text(l[749]);
                 else $('.membership-big-txt.type').text('');
@@ -2886,20 +2888,50 @@ function accountUI()
             else
                 return -1;
         });
+        
         $('.grid-table.purchases tr').remove();
         var html = '<tr><th>' + l[475] + '</th><th>' + l[476] + '</th><th>' + l[477] + '</th><th>' + l[478] + '</th></tr>';
-        $(account.purchases).each(function(i, el)
+        
+        // Render every purchase made into Purchase History on Account page
+        $(account.purchases).each(function(index, purchaseTransaction)
         {
-            var paymentmethod = 'Voucher';
-            if (el[4] == 1)
-                paymentmethod = 'PayPal';
-            else if (el[4] == 2)
-                paymentmethod = 'iTunes';
-            var pro = {'9.99': ['PRO I (' + l[918] + ')', '1'], '19.99': ['PRO II (' + l[918] + ')', '2'], '29.99': ['PRO III (' + l[918] + ')', '3'], '99.99': ['PRO I (' + l[919] + ')', '1'], '199.99': ['PRO II (' + l[919] + ')', '2'], '299.99': ['PRO III (' + l[919] + ')', '3']};
-            html += '<tr><td>' + time2date(el[1]) + '</td><td><span class="fm-member-icon"><img alt="" src="' + staticpath + 'images/mega/icons/retina/pro' + pro[el[2]][1] + '@2x.png" /></span><span class="fm-member-icon-txt"> ' + pro[el[2]][0] + '</span></td><td>&euro;' + htmlentities(el[2]) + '</td><td>' + paymentmethod + '</td></tr>';
-        });
-        $('.grid-table.purchases').html(html);
+            // Set payment method
+            var paymentMethodIndex = purchaseTransaction[4];
+            var paymentMethod = 'Voucher';           
+            
+            if (paymentMethodIndex == 1) {
+                paymentMethod = 'PayPal';
+            }
+            else if (paymentMethodIndex == 2) {
+                paymentMethod = 'iTunes';
+            }
+            else if (paymentMethodIndex == 4) {
+                paymentMethod = 'Bitcoin';
+            }
 
+            // Set Date/Time, Item (plan purchased), Amount, Payment Method
+            var dateTime = time2date(purchaseTransaction[1]);
+            var price = purchaseTransaction[2];
+            var proNum = purchaseTransaction[5];
+            var numOfMonths = purchaseTransaction[6];
+            var monthWording = (numOfMonths == 1) ? l[931] : 'months';  // Todo: l[6788] when generated
+            var item = getProPlan(proNum) + ' (' + numOfMonths + ' ' + monthWording + ')';
+
+            // Render table row
+            html += '<tr>'
+                 +      '<td>' + dateTime + '</td>'
+                 +      '<td>'
+                 +           '<span class="fm-member-icon">'
+                 +                '<img alt="" src="' + staticpath + 'images/mega/icons/retina/pro' + proNum + '@2x.png" />'
+                 +           '</span>'
+                 +           '<span class="fm-member-icon-txt"> ' + item + '</span>'
+                 +      '</td>'
+                 +      '<td>&euro;' + htmlentities(price) + '</td>'
+                 +      '<td>' + paymentMethod + '</td>'
+                 +  '</tr>';
+        });
+
+        $('.grid-table.purchases').html(html);
         $('.account-history-dropdown-button.transactions').text(l[471].replace('[X]', $.transactionlimit));
         $('.account-history-drop-items.transaction10-').text(l[471].replace('[X]', 10));
         $('.account-history-drop-items.transaction100-').text(l[471].replace('[X]', 100));
@@ -5299,7 +5331,7 @@ function contextmenuUI(e, ll, topmenu) {
         // Enable upload item menu for clould-drive, don't show it for rubbish and rest of crew
         if (RightsbyID(M.currentdirid) && RootbyId(M.currentdirid) !== M.RubbishID) {
             $(t).filter('.context-menu-item').hide();
-            $(t).filter('.fileupload-item,.newfolder-item,.refresh-item').show();
+            $(t).filter('.fileupload-item,.newfolder-item').show();
             if ((is_chrome_firefox & 2) || 'webkitdirectory' in document.createElement('input')) {
                 $(t).filter('.folderupload-item').show();
             }
@@ -5339,9 +5371,9 @@ function contextmenuUI(e, ll, topmenu) {
 
         // detect and show right menu
         if (id && id.length === 11) {
-            $(t).filter('.refresh-item,.remove-item').show();// transfer panel
+            $(t).filter('.remove-item').show();// transfer panel
         } else if (c && c.indexOf('cloud-drive-item') > -1) {
-            var flt = '.refresh-item,.properties-item';
+            var flt = '.properties-item';
             if (folderlink) {
                 if (u_type) {
                     flt += ',.import-item';
@@ -5353,9 +5385,9 @@ function contextmenuUI(e, ll, topmenu) {
             $.selected = [M.RootID];
             $(t).filter(flt).show();
         } else if (c && c.indexOf('recycle-item') > -1) {
-            $(t).filter('.refresh-item,.clearbin-item').show();
+            $(t).filter('.clearbin-item').show();
         } else if (c && c.indexOf('contacts-item') > -1) {
-            $(t).filter('.refresh-item,.addcontact-item').show();
+            $(t).filter('.addcontact-item').show();
         } else if (c && c.indexOf('messages-item') > -1) {
             e.preventDefault();
             return false;
@@ -5890,13 +5922,13 @@ function sectionUIopen(id) {
             headertxt = l[5903];
             break;
         case 'conversations':
-            headertxt = 'My conversations';
+            headertxt = l[5914];
             break;
         case 'shared-with-me':
-            headertxt = 'My incoming shares';
+            headertxt = l[5915];
             break;
         case 'cloud-drive':
-            headertxt = 'My folders';
+            headertxt = l[5916];
             break;
         case 'rubbish-bin':
             headertxt = 'Deleted folders';
@@ -6195,14 +6227,16 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
 
         var $selectedPlan = $('.reg-st3-membership-bl.selected');
         var plan = 1;
-        if($selectedPlan.is(".pro1")) { plan = 1; }
+        if($selectedPlan.is(".pro4")) { plan = 4; }
+		else if($selectedPlan.is(".pro1")) { plan = 1; }
         else if($selectedPlan.is(".pro2")) { plan = 2; }
         else if($selectedPlan.is(".pro3")) { plan = 3; }
 
         $('.loginrequired-dialog .fm-notification-icon')
-            .removeClass('plan1')
+		    .removeClass('plan1')
             .removeClass('plan2')
             .removeClass('plan3')
+            .removeClass('plan4')
             .addClass('plan' + plan);
     }
 
@@ -6406,23 +6440,46 @@ function shareDialogContentCheck() {
     }
 }
 
-function addShareDialogContactToContent(type, id, av_color, av, name, permClass, permText) {
-    var html = '<div class="share-dialog-contact-bl ' + htmlentities(type) + '" id="sdcbl_' + htmlentities(id) + '">\n\
-                    <div class="nw-contact-avatar color' + htmlentities(av_color) + '">' + htmlentities(av) + '</div>\n\
-                    <div class="fm-chat-user-info"><div class="fm-chat-user">' + htmlentities(name) + '</div></div>\n\
-                    <div class="share-dialog-permissions ' + htmlentities(permClass) + '">\n\
-                        <span></span>' + htmlentities(permText) + '\n\
-                    </div>';
+function addShareDialogContactToContent(type, id, av_color, av, name, permClass, permText, exportLink) {
+    
+    var html = '',
+        htmlEnd = '',
+        item = '';
+		exportClass = '';
 
-    var htmlEnd = '<div class="share-dialog-remove-button"></div><div class="clear"></div></div>';
+    
+    if (exportLink) {
+        item = itemExportLinkHtml(M.d[exportLink]);
+		exportClass = 'share-item-bl';
+    }
+    else {
+        item = '<div class="nw-contact-avatar color' + av_color + '">' + av + '</div>'
+               +   '<div class="fm-chat-user-info">'
+               +       '<div class="fm-chat-user">' + name + '</div>'
+               +   '</div>';
+    }
+    
+    html = '<div class="share-dialog-contact-bl ' + exportClass + ' ' + type + '" id="sdcbl_' + id + '">'
+           +   item
+           +   '<div class="share-dialog-permissions ' + permClass + '">'
+           +       '<span></span>' + permText
+           +   '</div>';
+
+    
+    htmlEnd = '     <div class="share-dialog-remove-button"></div>'
+              + '   <div class="clear"></div>'
+              + '</div>';
 
     return html + htmlEnd;
 }
 
 function fillShareDialogWithContent() {
-    $.sharedTokens = [];// GLOBAL VARIABLE, Holds items currently visible in share folder content (above multi-input)
-    var selectedNodeHandle = $.selected[0],
-        shares = M.d[selectedNodeHandle].shares;
+    
+    $.sharedTokens = [];// GLOBAL VARIABLE, Hold items currently visible in share folder content (above multi-input)
+    var user, email, name, shareRights, html,
+        selectedNodeHandle = $.selected[0],
+        shares = M.d[selectedNodeHandle].shares,
+        mps = M.ps[selectedNodeHandle];
 
     // List users that are already use item
     for (var userHandle in shares) {
@@ -6433,17 +6490,25 @@ function fillShareDialogWithContent() {
             // contacts will be addded, this prevents contact
             //  duplication in share dialog contact list
             if (M.u[userHandle] && M.u[userHandle].c && M.u[userHandle].c === 1) {
-                var user = M.u[userHandle];
-                var email = user.m;
-                var name = (user.name && user.name.length > 1) ? user.name : user.m;
-                var shareRights = M.d[selectedNodeHandle].shares[userHandle].r;
+                    user = M.u[userHandle];
+                    email = user.m;
+                    name = (user.name && user.name.length > 1) ? user.name : user.m;
+                    shareRights = M.d[selectedNodeHandle].shares[userHandle].r;
 
-                generateShareDialogRow(name, email, shareRights, userHandle);
+                    generateShareDialogRow(name, email, shareRights, userHandle);
+            }
+            
+            // Item export link
+            if (userHandle === 'EXP' && M.d[selectedNodeHandle].ph) {
+//                html = generateExportLinkShareDialogRow();
+                window.getLinkState = false;
+                html = addShareDialogContactToContent('', 'EXP', '', '', '', 'read-only', l[55], selectedNodeHandle);
+                $('.share-dialog .share-dialog-contacts').append(html);
             }
         }
     }
 
-    var mps = M.ps[selectedNodeHandle];
+    // Pending contact requests (pcr)
     if (mps) {
         for (var pcrHandle in mps) {
             if (mps.hasOwnProperty(pcrHandle)) {
@@ -6468,10 +6533,13 @@ function fillShareDialogWithContent() {
  * @param {String} userHandle Optional
  */
 function generateShareDialogRow(displayNameOrEmail, email, shareRights, userHandle) {
-    var av_color = displayNameOrEmail.charCodeAt(0) % 6 + displayNameOrEmail.charCodeAt(1) % 6;
-    var av = (avatars[userHandle] && avatars[userHandle].url) ? '<img src="' + avatars[userHandle].url + '">' : (displayNameOrEmail.charAt(0) + displayNameOrEmail.charAt(1));
-    var perm = '';
-    var permissionLevel = 0;
+    
+    var rowId = '',
+        html = '',
+        av_color = displayNameOrEmail.charCodeAt(0) % 6 + displayNameOrEmail.charCodeAt(1) % 6,
+        av = (avatars[userHandle] && avatars[userHandle].url) ? '<img src="' + avatars[userHandle].url + '">' : (displayNameOrEmail.charAt(0) + displayNameOrEmail.charAt(1)),
+        perm = '',
+        permissionLevel = 0;
 
     if (typeof shareRights != 'undefined') {
         permissionLevel = shareRights;
@@ -6489,8 +6557,8 @@ function generateShareDialogRow(displayNameOrEmail, email, shareRights, userHand
     // Add contact
     $.sharedTokens.push(email);
 
-    var rowId = (userHandle) ? userHandle : email;
-    var html = addShareDialogContactToContent('', rowId, av_color, av, displayNameOrEmail, perm[0], perm[1]);
+    rowId = (userHandle) ? userHandle : email;
+    html = addShareDialogContactToContent('', rowId, av_color, av, displayNameOrEmail, perm[0], perm[1]);
 
     $('.share-dialog .share-dialog-contacts').append(html);
 }
@@ -6820,36 +6888,50 @@ function initShareDialog() {
         }
     });
 
-    $('.share-dialog-remove-button').rebind('click', function() {
+    $('.share-dialog').off('click', '.share-dialog-remove-button');
+    $('.share-dialog').on('click', '.share-dialog-remove-button', function() {
         var $this = $(this);
 
-        var handleOrEmail = $this.parent().attr('id').replace('sdcbl_', '');
+        var userEmail, pendingContactId,
+            handleOrEmail = $this.parent().attr('id').replace('sdcbl_', '');
+        
         $this.parent()
             .fadeOut(200)
             .remove();
 
         var selectedNodeHandle = $.selected[0];
         if (handleOrEmail !== '') {
-            // Due to pending shares, the id could be an email instead of a handle
-            var userEmail = handleOrEmail;
-
-            // If it was a user handle, the share is a full share
-            if (M.u[handleOrEmail]) {
-                userEmail = M.u[handleOrEmail].m;
-                M.delnodeShare( selectedNodeHandle, handleOrEmail);
+            
+            // Export link
+            if (handleOrEmail === 'EXP') {
+                // The s2 api call can remove both shares and pending shares
+                api_req({a: 's2', n:  selectedNodeHandle, s: [{ u: handleOrEmail, r: ''}], ha: '', i: requesti});
+                
+                M.delNodeShare(selectedNodeHandle, 'EXP');
+                M.deleteExportLinkShare(selectedNodeHandle);
             }
-
-            // Pending share
             else {
-                var pendingContactId = M.findOutgoingPendingContactIdByEmail(userEmail);
-                M.deletePendingShare(selectedNodeHandle, pendingContactId);
-                sharedUInode(selectedNodeHandle);
+                // Due to pending shares, the id could be an email instead of a handle
+                userEmail = handleOrEmail;
+
+                // If it was a user handle, the share is a full share
+                if (M.u[handleOrEmail]) {
+                    userEmail = M.u[handleOrEmail].m;
+                    M.delNodeShare(selectedNodeHandle, handleOrEmail);
+                }
+
+                // Pending share
+                else {
+                    pendingContactId = M.findOutgoingPendingContactIdByEmail(userEmail);
+                    M.deletePendingShare(selectedNodeHandle, pendingContactId);
+                    sharedUInode(selectedNodeHandle);
+                }
+
+                // The s2 api call can remove both shares and pending shares
+                api_req({a: 's2', n:  selectedNodeHandle, s: [{ u: userEmail, r: ''}], ha: '', i: requesti});
+
+                $.sharedTokens.splice($.sharedTokens.indexOf(userEmail), 1);
             }
-
-            // The s2 api call can remove both shares and pending shares
-            api_req({a: 's2', n:  selectedNodeHandle, s: [{ u: userEmail, r: ''}], ha: '', i: requesti});
-
-            $.sharedTokens.splice($.sharedTokens.indexOf(userEmail), 1);
         }
 
         shareDialogContentCheck();
@@ -6861,7 +6943,8 @@ function initShareDialog() {
     });
 
     // related to specific contact
-    $('.share-dialog-permissions').rebind('click', function(e) {
+    $('.share-dialog').off('click', '.share-dialog-permissions');
+    $('.share-dialog').on('click', '.share-dialog-permissions', function() {
         var $this = $(this),
             $m = $('.permissions-menu'),
             scrollBlock = $('.share-dialog-contacts .jspPane');
@@ -6902,7 +6985,7 @@ function initShareDialog() {
             $('.permissions-icon').removeClass('active');
             $m.addClass('search-permissions');
             closeImportContactNotification('.share-dialog');
-            var x = $this.position().left + 12;
+            var x = $this.position().left;
             var y = $this.position().top + 8;
             handlePermissionMenu($this, $m, x, y);
         }
@@ -7600,24 +7683,100 @@ function getclipboardlinks()
     return link;
 }
 
-function getclipboardkeys()
-{
-    var l = '';
-    for (var i in M.links)
-    {
-        var n = M.d[M.links[i]];
-        var key;
-        if (n.t)
+function getclipboardkeys() {
+    
+    var n, key,
+        l = '';
+    
+    for (var i in M.links) {
+        n = M.d[M.links[i]];
+        
+        if (n.t) {
             key = u_sharekeys[n.h];
-        else
+        }
+        else {
             key = n.key;
+        }
+        
         l += a32_to_base64(key) + '\n';
     }
+    
     return l;
 }
 
+/**
+ * itemExportLinkHtml
+ * 
+ * @param {object} item
+ * 
+ * @returns {string}
+ */
+function itemExportLinkHtml(item) {
+    
+    var fileUrlWithoutKey, fileUrlWithKey, fileUrl, key, type, fileSize,
+        html = '';
+
+    // Shared item type is folder
+    if (item.t) {
+        type = 'F';
+        key = u_sharekeys[item.h];
+        fileSize = '';
+    }
+
+    // Shared item type is file
+    else {
+        type = '';
+        key = item.key;
+        fileSize = htmlentities(bytesToSize(item.s));
+    }
+
+    fileUrlWithoutKey = getBaseUrl() + '/#' + type + '!' + htmlentities(item.ph);
+    fileUrlWithKey = fileUrlWithoutKey + (key ? '!' + a32_to_base64(key) : '');
+    fileUrl = window.getLinkState === false ? fileUrlWithoutKey : fileUrlWithKey;
+    
+    html = '<div class="export-link-item">'
+         +      '<div class="export-icon ' + fileicon(item.ph) + '" ></div>'
+         +      '<div class="export-link-text-pad">'
+         +          '<div class="export-link-txt">'
+         +               htmlentities(item.name) + ' <span class="export-link-gray-txt">' + fileSize + '</span>'
+         +          '</div>'
+         +          '<div>'
+         +              '<input class="export-link-url" type="text" readonly="readonly" value="' + fileUrl + '">'
+         +          '</div>'
+         +          '<span class="file-link-without-key hidden">' + fileUrlWithoutKey + '</span>'
+         +          '<span class="file-link-with-key hidden">' + fileUrlWithKey + '</span>'
+         +      '</div>'
+         +  '</div>';
+    
+    return html;    
+}
+
+/**
+ * generates file url for shared item
+ * 
+ * @returns {string}
+ */
+function itemExportLink() {
+    
+    var n,
+        html = '';
+    
+        for (var i in M.links) {
+            n = M.d[M.links[i]];
+
+            if (n && n.ph) {
+                html += itemExportLinkHtml(n);
+            }
+        }
+    
+    return html;
+}
+
 function linksDialog(close) {
-    var scroll = '.export-link-body';
+    
+    var html = '',
+        scroll = '.export-link-body';
+    
     deleteScrollPanel(scroll, 'jsp');
     if (close) {
         $.dialog = false;
@@ -7628,48 +7787,14 @@ function linksDialog(close) {
     }
 
     $.dialog = 'links';
-    var html = '';
-    for (var i in M.links) {
-        var n = M.d[M.links[i]];
-        var key, fileSize, F;
-        if (n.t) {
-            F = 'F';
-            key = u_sharekeys[n.h];
-            fileSize = '';
-        } else {
-            F = '';
-            key = n.key;
-            fileSize = htmlentities(bytesToSize(n.s));
-        }
-
-        if (n && n.ph) {
-            var fileUrlWithoutKey = getBaseUrl() + '/#' + F + '!' + htmlentities(n.ph);
-            var fileUrlWithKey = fileUrlWithoutKey + (key ? '!' + a32_to_base64(key) : '');
-            var fileUrl = window.getLinkState === false ? fileUrlWithoutKey : fileUrlWithKey;
-
-            html += '<div class="export-link-item">'
-                 +      '<div class="export-icon ' + fileicon(n) + '" ></div>'
-                 +      '<div class="export-link-text-pad">'
-                 +          '<div class="export-link-txt">'
-                 +               htmlentities(n.name) + ' <span class="export-link-gray-txt">' + fileSize + '</span>'
-                 +          '</div>'
-                 +          '<div>'
-                 +              '<input class="export-link-url" type="text" readonly="readonly" value="' + fileUrl + '">'
-                 +          '</div>'
-                 +          '<span class="file-link-without-key hidden">' + fileUrlWithoutKey + '</span>'
-                 +          '<span class="file-link-with-key hidden">' + fileUrlWithKey + '</span>'
-                 +      '</div>'
-                 +  '</div>';
-        }
-    }
     
-    $('.export-links-warning-close').unbind('click');
-    $('.export-links-warning-close').bind('click', function() {
+    html = itemExportLink();
+    
+    $('.export-links-warning-close').rebind('click', function() {
         $('.export-links-warning').addClass('hidden');
     });
     
-    $('.export-links-dialog .fm-dialog-close').unbind('click');
-    $('.export-links-dialog .fm-dialog-close').bind('click', function() {
+    $('.export-links-dialog .fm-dialog-close').rebind('click', function() {
         linksDialog(1);
     });
 
@@ -7682,9 +7807,11 @@ function linksDialog(close) {
         // chrome & firefox extension:
         $("#clipboardbtn1").unbind('click');
         $("#clipboardbtn1").bind('click', function() {
+            
             if (is_chrome_firefox) {
                 mozSetClipboard(getclipboardlinks());
-            } else {
+            }
+            else {
                 $('#chromeclipboard')[0].value = getclipboardlinks();
                 $('#chromeclipboard').select();
                 document.execCommand('copy');
@@ -7693,9 +7820,11 @@ function linksDialog(close) {
         
         $('#clipboardbtn2').unbind('click');
         $('#clipboardbtn2').bind('click', function() {
+            
             if (is_chrome_firefox) {
                 mozSetClipboard(getclipboardkeys());
-            } else {
+            }
+            else {
                 $('#chromeclipboard')[0].value = getclipboardkeys();
                 $('#chromeclipboard').select();
                 document.execCommand('copy');
@@ -7703,12 +7832,14 @@ function linksDialog(close) {
         });
         $('#clipboardbtn1').text(l[370]);
         $('#clipboardbtn2').text(l[1033]);
-    } else if (flashIsEnabled()) {
+    }
+    else if (flashIsEnabled()) {
         $('#clipboardbtn1 span').html(htmlentities(l[370]) + '<object data="OneClipboard.swf" id="clipboardswf1" type="application/x-shockwave-flash"  width="100%" height="32" allowscriptaccess="always"><param name="wmode" value="transparent"><param value="always" name="allowscriptaccess"><param value="all" name="allowNetworkin"><param name=FlashVars value="buttonclick=1" /></object>');
         $('#clipboardbtn2 span').html(htmlentities(l[1033]) + '<object data="OneClipboard.swf" id="clipboardswf2" type="application/x-shockwave-flash"  width="100%" height="32" allowscriptaccess="always"><param name="wmode" value="transparent"><param value="always" name="allowscriptaccess"><param value="all" name="allowNetworkin"><param name=FlashVars value="buttonclick=1" /></object>');
 
         $('#clipboardbtn1').unbind('mouseover');
         $('#clipboardbtn1').bind('mouseover', function() {
+            
             var e = $('#clipboardswf1')[0];
             if (e && e.setclipboardtext) {
                 e.setclipboardtext(getclipboardlinks());
@@ -7717,12 +7848,14 @@ function linksDialog(close) {
         
         $('#clipboardbtn2').unbind('mouseover');
         $('#clipboardbtn2').bind('mouseover', function() {
+            
             var e = $('#clipboardswf2')[0];
             if (e && e.setclipboardtext) {
                 e.setclipboardtext(getclipboardkeys());
             }
         });
-    } else {
+    }
+    else {
         // Hide the clipboard buttons if not using the extension and Flash is disabled
         $('#clipboardbtn1').addClass('hidden');
         $('#clipboardbtn2').addClass('hidden');
@@ -7739,7 +7872,8 @@ function linksDialog(close) {
                 // Show link with key
                 var fileLinkWithKey = $('.file-link-with-key').text();
                 $('.export-link-url').val(fileLinkWithKey);
-            } else {
+            }
+            else {
                 $(elem).closest('.on_off').removeClass('on').addClass('off');
 
                 // Show link without key
@@ -7753,12 +7887,16 @@ function linksDialog(close) {
     if (typeof window.getLinkState === 'undefined') {
         $('.export-checkbox').removeClass('off').addClass('on');
     }
+    
     $('.export-links-dialog').addClass('file-keys-view');
     $('.export-links-dialog .export-link-body').html(html);
+    
     fm_showoverlay();
+    
     $('.export-links-warning').removeClass('hidden');
     $('.fm-dialog.export-links-dialog').removeClass('hidden');
     $('.export-link-body').removeAttr('style');
+    
     if ($('.export-link-body').outerHeight() === 384) {// ToDo: How did I find this integer?
         $('.export-link-body').jScrollPane({showArrows: true, arrowSize: 5});
         jScrollFade('.export-link-body');
@@ -7766,16 +7904,13 @@ function linksDialog(close) {
     $('.fm-dialog.export-links-dialog').css('margin-top', $('.fm-dialog.export-links-dialog').outerHeight() / 2 * - 1);
 }
 
-function refreshDialogContent()
-{
+function refreshDialogContent() {
     // Refresh dialog content with newly created directory
     var b = $('.content-panel.cloud-drive').html();
-    if ($.copyDialog)
-    {
+    if ($.copyDialog) {
         handleDialogTabContent('cloud-drive', 'ul', 'copy', b);
     }
-    else if ($.moveDialog)
-    {
+    else if ($.moveDialog) {
         handleDialogTabContent('cloud-drive', 'ul', 'move', b);
     }
 }
@@ -7819,17 +7954,17 @@ function createfolderDialog(close)
             $('.create-folder-dialog').addClass('active');
     });
     $('.create-folder-dialog input').unbind('keypress');
-    $('.create-folder-dialog input').bind('keypress', function(e)
-    {
-        if (e.which == 13 && $(this).val() !== '')
-        {
-            if (!$.cftarget)
+    $('.create-folder-dialog input').bind('keypress', function(e) {
+        
+        if (e.which === 13 && $(this).val() !== '') {
+            if (!$.cftarget) {
                 $.cftarget = M.currentdirid;
+            }
             createfolder($.cftarget, $(this).val());
-//            refreshDialogContent();
             createfolderDialog(1);
         }
     });
+    
     $('.create-folder-dialog .fm-dialog-close, .create-folder-button-cancel.dialog').unbind('click');
     $('.create-folder-dialog .fm-dialog-close, .create-folder-button-cancel.dialog').bind('click', function()
     {
@@ -7845,21 +7980,24 @@ function createfolderDialog(close)
     });
 
     $('.fm-dialog-new-folder-button').unbind('click');
-    $('.fm-dialog-new-folder-button').bind('click', function()
-    {
+    $('.fm-dialog-new-folder-button').bind('click', function() {
+        
         var v = $('.create-folder-dialog input').val();
-        if (v == '' || v == l[157])
+        
+        if (v == '' || v == l[157]) {
             alert(l[1024]);
-        else
-        {
-            if (!$.cftarget)
+        }
+        else {
+            if (!$.cftarget) {
                 $.cftarget = M.currentdirid;
+            }
             createfolder($.cftarget, v);
-//            refreshDialogContent();
             createfolderDialog(1);
         }
     });
+    
     fm_showoverlay();
+    
     $('.fm-dialog.create-folder-dialog').removeClass('hidden');
     $('.create-folder-input-bl input').focus();
     $('.create-folder-dialog').removeClass('active');
@@ -8547,13 +8685,10 @@ function slideshow(id, close)
         }
     });
 
-    $('.slideshow-download').unbind('click');
-    $('.slideshow-download').bind('click', function(e)
-    {
-        for (var i in dl_queue)
-        {
-            if (dl_queue[i] && dl_queue[i].id == slideshowid)
-            {
+    $('.slideshow-download').rebind('click', function() {
+        
+        for (var i in dl_queue) {
+            if (dl_queue[i] && dl_queue[i].id === slideshowid) {
                 dl_queue[i].preview = false;
                 openTransferpanel();
                 return;
@@ -8562,25 +8697,25 @@ function slideshow(id, close)
         M.addDownload([slideshowid]);
     });
 
-    $('.slideshow-getlink').unbind('click');
-    $('.slideshow-getlink').bind('click', function(e)
-    {
-        if (u_type === 0)
+    $('.slideshow-getlink').rebind('click', function() {
+        
+        if (u_type === 0) {
             ephemeralDialog(l[1005]);
+        }
         else {
-            M.getlinks([slideshowid]).done(function() {
+            M.getLinks([slideshowid]).done(function() {
                 linksDialog();
             });
         }
     });
 
-    if (previews[id])
-    {
+    if (previews[id]) {
         previewsrc(previews[id].src);
         fetchnext();
     }
-    else if (!preqs[id])
+    else if (!preqs[id]) {
         fetchsrc(id);
+    }
 
     $('.slideshow-overlay').removeClass('hidden');
     $('.slideshow-dialog').removeClass('hidden');
@@ -8977,7 +9112,10 @@ function fm_resize_handler() {
 }
 
 function sharedfolderUI() {
-    var r = false;
+    
+    var c,
+        n = M.d[M.currentdirid],
+        r = false;
 
     if ($('.shared-details-block').length > 0) {
         $('.shared-details-block .shared-folder-content').unwrap();
@@ -8986,7 +9124,6 @@ function sharedfolderUI() {
         r = true;
     }
 
-    var c, n = M.d[M.currentdirid];
     if (!n || n.p.length !== 11) {
         n = null;
 
@@ -8995,8 +9132,9 @@ function sharedfolderUI() {
             c = M.d[p[0]];
             n = M.d[p[p.length - 3]];
 
-            if (!n || n.p.length !== 11)
+            if (!n || n.p.length !== 11) {
                 n = 0;
+            }
         }
     }
 
@@ -9009,16 +9147,16 @@ function sharedfolderUI() {
             avatar = '<img src="' + av_meta.avatarUrl + '">';
 
         var rights = l[55], rightsclass = ' read-only';
-        if (n.r == 1) {
+        if (n.r === 1) {
             rights = l[56];
             rightsclass = ' read-and-write';
-        } else if (n.r == 2) {
+        } else if (n.r === 2) {
             rights = l[57];
             rightsclass = ' full-access';
         }
 
         var e = '.files-grid-view.fm';
-        if (M.viewmode == 1)
+        if (M.viewmode === 1)
             e = '.fm-blocks-view.fm';
 
         $(e).wrap('<div class="shared-details-block"></div>');
@@ -9046,11 +9184,6 @@ function sharedfolderUI() {
                 +'</div>'
             +'</div>');
         $(e).addClass('shared-folder-content');
-
-        // fm_resize_handler();
-
-        // if (M.viewmode == 1) initFileblocksScrolling();
-        // else initGridScrolling();
 
         Soon(function() {
             $(window).trigger('resize');
@@ -9220,7 +9353,7 @@ function contactUI() {
         if (isContactVerified(user)) {
             $('.fm-verify').find('span').text('Verified');
         } else {
-            $('.fm-verify').find('span').text('Verify...');
+            $('.fm-verify').find('span').text(l[1960]+'...');
             $('.fm-verify').rebind('click', function() {
                 fingerprintDialog(user);
             });

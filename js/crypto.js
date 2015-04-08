@@ -1142,17 +1142,27 @@ function api_retry() {
 }
 
 function api_reqfailed(c, e) {
-    if (e == ESID) {
+    if (e === ESID) {
         u_logout(true);
         document.location.hash = 'login';
     }
-    else if (c == 2 && e == ETOOMANY) {
+    else if (c === 2 && e === ETOOMANY) {
         if (typeof mDB !== 'undefined' && mDB) {
             mDBreload();
         }
         else {
             loadfm();
         }
+    }
+    else if (e === EBLOCKED) {
+        msgDialog('warninga', 'Suspended account',
+                'You have been suspended due to excess data usage.\n\
+                Please contact support@mega.co.nz to get your account reinstated.',
+                false, function() {
+            u_logout(true);
+            document.location.reload();
+            document.location.hash = 'contact';
+        });
     }
 }
 

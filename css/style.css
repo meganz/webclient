@@ -20903,7 +20903,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	border-radius: 5px;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
-	box-sizing: padding-box;
+	box-sizing: border-box;
 	background-color: white;
 	white-space: nowrap;
 	overflow: hidden;

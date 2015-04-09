@@ -123,7 +123,7 @@
         api_req({ a: 'prox', url: url }, {
             callback: function(res) {
                 if (typeof res == 'number') {
-                    console.log("Contacts importing failed.");
+                    DEBUG("Contacts importing failed.");
                     return false;
                 } else {            
                     var gData = self._readAllEmails(res);
@@ -140,6 +140,11 @@
                     }
                     else {
                         loadingDialog.hide();
+                        DEBUG("Contacts importing canceled.");
+                        
+                        $('.import-contacts-dialog').fadeOut(200);
+
+                        self.isImported = false;
                     }
                 }
             }

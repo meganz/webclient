@@ -26,11 +26,89 @@
 
 
 
-<div class="fm-dialog reset-success hidden">
+<div class="fm-dialog reset-success">
+    <div class="nw-fm-dialog-title">[$1585]</div>
     <div class="reg-success-icon"></div>
-    <div class="reg-success-txt"> You successfully reset your account. You successfully reset your account. You successfully reset your account.</div>
-    <div class="restore-close-button">
-        <div class="fm-dialog-button browsers-button"><span>Close</span></div>
+    <div class="reg-success-txt"> [$6214]  <strong>[$6215]</strong>. </div>
+    <div class="reset-description-txt">[$6216] <a href="mailto:support@mega.co.nz">support@mega.co.nz</a></div>
+</div>
+
+<div class="fm-dialog reset-success-st2">
+    <div class="fm-dialog-header">
+        <div class="fm-dialog-title">[$1585]</div>
+    </div>
+    <div class="fm-dialog-body">
+        <div class="fm-dialog-top-text">
+          [$6217] <strong>[$6218]</strong>,  [$6219]
+        </div>
+        <div class="reset-small-txt">[$6220]</div>
+        
+        <div class="fm-account-input">
+            <div class="reset-pass-error"> 
+              <div class="multiple-input-warning">
+                <div class="arrow"></div>
+                <span>[$6001]</span>
+              </div>
+            </div>
+            <input id="reset_success_st2_pass" type="password" type="text" value="" />
+        </div>
+        
+        <div class="default-dialog-bottom">
+            <div class="fm-dialog-button red close-account"><span>[$6221]</span></div>
+            <div class="fm-dialog-button cancel"><span>[$82]</span></div>
+            <div class="clear"></div>
+        </div>  
+
+    </div>
+</div>
+
+<div class="fm-dialog reset-success-st3 hidden">
+    <div class="fm-dialog-header">
+        <div class="fm-dialog-title">We’re sorry to see you go</div>
+    </div>
+    <div class="fm-dialog-body">
+        <div class="fm-dialog-top-text">
+          <strong>Your account has now been closed</strong>, but before you leave we would love to know why you are leaving us.
+        </div>
+        <div class="reset-small-txt">Please select one:</div>
+        
+        <form>
+           <div class="radioOn" id="res1_div"><input type="radio" name="feedback-radio" id="res1" value="1"></div>
+           <label for="res1" class="radio-txt">I don’t use my account anymore</label>
+           
+           <div class="radioOff" id="res2_div"><input type="radio" name="feedback-radio" id="res2" value="2"></div>
+           <label for="res2" class="radio-txt">I have another MEGA account</label>
+           
+           <div class="radioOff" id="res3_div"><input type="radio" name="feedback-radio" id="res3" value="3"></div>
+           <label for="res3" class="radio-txt">I have experienced too many problems</label>
+           
+           <div class="radioOff" id="res4_div"><input type="radio" name="feedback-radio" id="res4" value="4"></div>
+           <label for="res4" class="radio-txt">My favourite browser is not technologically compatible and I don't want to change</label>
+           
+           <div class="radioOff" id="res5_div"><input type="radio" name="feedback-radio" id="res5" value="5"></div>
+           <label for="res5" class="radio-txt">I find the interface too confusing to use</label>
+           
+           <div class="radioOff" id="res6_div"><input type="radio" name="feedback-radio" id="res6" value="6"></div>
+           <label for="res6" class="radio-txt">MEGA has under-delivered on its promise</label>
+           
+           <div class="reset-txt">Leave a comment:</div>
+           
+           <div class="feedback-textarea-bl">
+             <div class="feedback-textarea-scroll">
+               <div class="feedback-textarea">
+                 <textarea></textarea>
+                 <div class="feedback-hidden"></div>
+               </div>
+             </div>
+           </div>
+        </form>
+
+        <div class="default-dialog-bottom">
+            <div class="fm-dialog-button feedback-submit"><span>[$1694]</span></div>
+            <div class="fm-dialog-button cancel"><span>[$148]</span></div>
+            <div class="clear"></div>
+        </div>
+    
     </div>
 </div>
 
@@ -792,7 +870,7 @@
           <div class="add-user-nt-scrolling">
             <div class="add-user-textarea">
                 <textarea>[$5878]</textarea>
-                <div class="add-contact-hidden"></div>
+                <div class="add-contact-hidden">[$5878]</div>
             </div>
           </div>
           

@@ -1160,53 +1160,19 @@ a.account-manage-button:hover {
 	width: auto;
 	padding: 0 7px;
 }
-.radioOn {
+.radioOn, .radioOff {
 	float: left;
-	background-image: url(../images/mega/progressbars2.png);
-	background-position: -347px -439px;
+	background-image: url(../images/mega/selects.png);
+	background-position: left -133px;
 	background-repeat: no-repeat;
-	width: 19px;
+	width: 18px;
 	height: 19px;
 	margin-right: 7px;
 	margin-top: 6px;
 	cursor: pointer;
 }
 .radioOff {
-	float: left;
-	background-image: url(../images/mega/progressbars2.png);
-	background-position: -415px -439px;
-	background-repeat: no-repeat;
-	width: 19px;
-	height: 19px;
-	margin-right: 7px;
-	margin-top: 6px;
-	cursor: pointer;
-}
-.download-radio-block .radioOn, .download-radio-block .radioOff {
-	margin-right: 12px;
-}
-.download-checkbox {
-	background-color: #F2F2F3;
-	padding: 5px 20px 12px 20px;
-}
-.download-checkbox.nt-settings {
-	background-color: transparent;
-}
-.nt-settings-txt {
-	font-size: 13px;
-	line-height: 16px;
-	color: #6c6d6f;
-	font-family: 'Open Sans', Arial, Helvetica, sans-serif;
-	padding-right: 25px;
-	padding-top: 7px;
-	padding-bottom: 8px;
-}
-.nt-settings .nt-settings-txt {
-	padding-top: 2px;
-	padding-bottom: 12px;
-}
-.download-radio-block {
-	padding: 20px 20px 25px 20px;
+	background-position: left -163px;
 }
 input.radioOn, input.radioOff {
 	margin: 0;
@@ -7948,7 +7914,16 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	background-color: transparent;
 	border: 0;
 }
-.add-user-notification, .share-message {
+.active .fm-account-input {
+	background-color: rgba(0,0,0,0.2);
+}
+.error .fm-account-input {
+	background-color: rgba(217,0,7,0.5);
+}
+.active .fm-account-input input, .error .fm-account-input input {
+	color: white;
+}
+.add-user-notification, .share-message, .feedback-textarea-bl {
 	-moz-border-radius: 5px;
 	-webkit-border-radius: 5px;
 	border-radius: 5px;
@@ -7963,13 +7938,22 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	box-sizing: border-box;
 	margin-top: 12px;
 }
-.add-user-nt-scrolling, .share-message-scrolling {
+.feedback-textarea-bl {
+	height: 96px;
+	background-image: none;
+	padding: 0;
+	margin: -4px 0 0 0;
+}
+.feedback-textarea-scroll {
+	height: 96px;
+}
+.add-user-nt-scrolling, .share-message-scroll {
 	height: 50px;
 }
-.add-user-nt-scrolling .jspDrag, .share-message-scrolling .jspDrag {
+.add-user-nt-scrolling .jspDrag, .share-message-scrolling .jspDrag, .feedback-textarea-scroll .jspDrag {
 	width: 4px;
 }
-.add-user-nt-scrolling textarea, .add-contact-hidden, .share-message-scrolling textarea, .share-message-hidden {
+.add-user-nt-scrolling textarea, .add-contact-hidden, .share-message-scrolling textarea, .share-message-hidden, .feedback-textarea-scroll textarea, .feedback-hidden {
 	border: 0;
 	padding: 0;
 	background-color: transparent;
@@ -7989,13 +7973,20 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	overflow: hidden;
 	min-height: 36px;
 }
-.add-contact-hidden, .share-message-hidden {
+.feedback-textarea-scroll textarea, .feedback-hidden {
+	height: 96px;
+	font-size: 12px;
+}
+.add-contact-hidden, .share-message-hidden, .feedback-hidden {
 	display: none;
 	height: auto;
 	overflow: visible;
 }
 .add-user-textarea, .share-message-textarea {
 	padding: 7px 10px 7px 3px;
+}
+.feedback-textarea {
+	padding: 7px 10px;
 }
 .add-user-nt-scrolling textarea::selection, .share-message-scrolling textarea::selection {
 	background-color: #333333;
@@ -9679,20 +9670,26 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
 	min-height: 100px;
 	margin: -187px 0 0 -310px;
 }
-.fm-dialog.registration-success {
-	width: 364px;
+.fm-dialog.registration-success, .fm-dialog.reset-success, .fm-dialog.reset-success-st2 {
+	width: 393px;
 	min-height: 254px;
-	margin: -127px 0 0 -182px
+	margin: -178px 0 0 -196px
+}
+.fm-dialog.registration-success {
+	margin-top: -163px;
+}
+.fm-dialog.reset-success-st2 {
+	min-height: 200px;
+	margin: -120px 0 0 -196px
+}
+.fm-dialog.reset-success-st3 {
+	width: 456px;
+	margin: -285px 0 0 -228px;
 }
 .fm-dialog.restore-success {
 	width: 364px;
 	min-height: 274px;
 	margin: -137px 0 0 -182px
-}
-.fm-dialog.reset-success {
-	width: 364px;
-	min-height: 243px;
-	margin: -121px 0 0 -182px
 }
 .fm-dialog.password-dialog {
 	width: 604px;
@@ -14231,12 +14228,15 @@ h5.main-italic-header {
 	color: #FFBA00;
 }
 .reg-success-icon {
-	width: 100px;
-	height: 100px;
-	background-image: url(../images/mega/register-big-sprite-v1.png);
+	width: 200px;
+	height: 192px;
+	background-image: url(../images/mega/register-big-sprite-v2.png);
 	background-position: left top;
 	background-repeat: no-repeat;
-	margin: 30px auto 20px auto;
+	margin: 30px auto 4px auto;
+}
+.reset-success .reg-success-icon {
+	margin: 14px auto 0 auto;
 }
 .reg-success-header {
 	font-size: 20px;
@@ -14250,7 +14250,70 @@ h5.main-italic-header {
 	color: #333333;
 	text-align: center;
 	padding: 4px 30px 25px 30px;
-	line-height: 20px;
+	line-height: 18px;
+}
+.reset-success .reg-success-txt {
+	padding: 0 30px 18px 30px;
+}
+.fm-dialog-top-text {
+	padding: 0 8px;
+	font-size: 13px;
+	line-height: 18px;
+}
+.reset-small-txt {
+	font-family: 'Open Sans Semibold';
+	font-size: 11px;
+	color: #999999;
+	padding: 20px 8px 8px 8px;
+}
+.reset-success-st3 .reset-txt {
+	font-family: 'Open Sans Semibold';
+	float: none;
+	display: block;
+	color: #3F3F3F;
+	margin-bottom: 17px;
+}
+.reset-success-st3  .fm-dialog-header {
+	margin-bottom: 10px;
+}
+.reset-success-st2 .fm-account-input {
+	margin: 0 8px 20px 8px;
+	width: auto;
+	float: none;
+}
+.reset-pass-error {
+	position: absolute;
+	width: 24px;
+}
+.reset-description-txt {
+	font-size: 11px;
+	color: #999999;
+	text-align: center;
+	padding: 0 30px 26px 30px;
+	line-height: 15px;
+}
+.reset-description-txt a {
+	color: #999999;
+	font-family: 'Open Sans Semibold', Arial;
+	text-decoration: none;
+}
+.reset-success-st3 form {
+	padding: 0 8px 8px 8px;
+	display: block;
+}
+.reset-success-st3 .radioOn, .reset-success-st3 .radioOff {
+	margin: 0;
+}
+.reset-success-st3 .radio-txt {
+	float: none;
+	margin: 0 0 0 25px;
+	display: block;
+	padding: 1px 0;
+	color: #3F3F3F;
+	margin-bottom: 17px;
+}
+.reset-success-st3 .radio-txt.active {
+	font-family: 'Open Sans Semibold';
 }
 .register-loading-icon {
 	position: absolute;
@@ -14381,7 +14444,7 @@ h5.main-italic-header {
 .reg-st3-membership-icon, .membership-icon {
 	width: 70px;
 	height: 70px;
-	background-image: url(../images/mega/register-big-sprite-v1.png);
+	background-image: url(../images/mega/register-big-sprite-v2.png);
 	background-position: center -210px;
 	background-repeat: no-repeat;
 	margin: 0 0 0 -35px;
@@ -14760,7 +14823,7 @@ div.membership-bott-button {
 	padding-right: 20px;
 }
 .ca .reg-st3-mid-txt, .gl .reg-st3-mid-txt, .it .reg-st3-mid-txt, .nl .reg-st3-mid-txt, .pt .reg-st3-mid-txt, .br .reg-st3-mid-txt, .sk .reg-st3-mid-txt {
-	line-height: 34px;
+	  line-height: 34px;
 }
 .membership-step2 .membership-new-offer {
 	display: none;
@@ -14891,7 +14954,7 @@ div.membership-bott-button {
 	height: 82px;
 	width: 82px;
 	float: left;
-	background-image: url(../images/mega/register-big-sprite-v1.png);
+	background-image: url(../images/mega/register-big-sprite-v2.png);
 	background-position: center -960px;
 	background-repeat: no-repeat;
 	margin-top: 28px;
@@ -17163,14 +17226,6 @@ ul.cannt-ul li span {
 .forms-page {
 	padding: 10px 20px 50px 20px;
 }
-.affiliate .radioOn, .affiliate .radioOff {
-	background-image: url(../images/mega/new-affiliate-sprite.png);
-	background-position: -745px -1248px;
-	background-repeat: no-repeat;
-}
-.affiliate .radioOn {
-	background-position: -840px -1248px;
-}
 .affiliate-input-block.textarea-block {
 	height: auto;
 	padding: 2px 10px;
@@ -17598,13 +17653,7 @@ a.contact-new-button:hover {
 	margin-bottom: 20px;
 }
 .dev-new-app-right-block .radioOff, .dev-new-app-right-block .radioOn {
-	background-image: url(../images/mega/sdk-sprite.png);
-	background-position: -159px -856px;
-	background-repeat: no-repeat;
 	margin-top: 5px;
-}
-.dev-new-app-right-block .radioOn {
-	background-position: 0 -856px;
 }
 .dev-new-app-right-block .radio-txt {
 	padding-top: 6px;
@@ -19473,7 +19522,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 	background-position: 4px -653px;
 	background-repeat: no-repeat;
 }
-.restore-close-button {
+.restore-close-button, .reset-close-button {
 	text-align: center;
 	margin-top: -10px;
 	padding-bottom: 20px;
@@ -19482,6 +19531,9 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 	display: inline-block;
 	float: none;
 	margin: 0;
+}
+.restore-success .reg-success-icon {
+	margin-top: 2px;
 }
 .reset-account-lock-image {
 	height: 375px;
@@ -20496,8 +20548,8 @@ ul.token-input-list-mega {
 	position: absolute;
 	right: 42px;
 	background-color: #444444;
-	padding: 0 2px 0 12px;
-	line-height: 31px;
+	padding: 0 8px 0 12px;
+	line-height: 30px;
 	color: #CCCCCC;
 	font-size: 11px;
 	-moz-border-radius: 8px;
@@ -22037,7 +22089,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .loginrequired-dialog .fm-notification-icon {
 	width: 70px;
 	height: 70px;
-	background-image: url(../images/mega/register-big-sprite-v1.png);
+	background-image: url(../images/mega/register-big-sprite-v2.png);
 	background-position: center -199px;
 	background-repeat: no-repeat;
 	margin: 4px 16px 0 0px;
@@ -22904,8 +22956,8 @@ top-login-spr .nlanguage-tooltip-bg, .nlanguage-bottom {
  background-size:48px auto;
 }
  .reg-success-icon, .reg-st3-save-icon, .reg-st3-membership-icon, .membership-icon, .loginrequired-dialog .fm-notification-icon {
- background-image: url(../images/mega/register-big-sprite-v1@2x.png);
- background-size: 100px auto;
+ background-image: url(../images/mega/register-big-sprite-v2@2x.png);
+ background-size: 200px auto;
 }
 .reg-st5-key-gen, .reg-st5-info-icon {
  background-image: url(../images/mega/reg-st5-rounded@2x.png);
@@ -22947,7 +22999,7 @@ top-login-spr .nlanguage-tooltip-bg, .nlanguage-bottom {
  background-image: url(../images/mega/avatar-zoom@2x.png);
  background-size: 367px auto;
 }
- .new-affiliate-bg1, .new-affiliate-right-bg, .new-affialite-mid-bg, ul.top-ul li span, ul.mid-ul li span, ul.bot-ul li span, ul.can-ul li span, ul.cannt-ul li span, .new-affiliate-icon, .new-affiliate-star, .affiliate-input-block.select, .affiliate .radioOn, .affiliate .radioOff {
+ .new-affiliate-bg1, .new-affiliate-right-bg, .new-affialite-mid-bg, ul.top-ul li span, ul.mid-ul li span, ul.bot-ul li span, ul.can-ul li span, ul.cannt-ul li span, .new-affiliate-icon, .new-affiliate-star, .affiliate-input-block.select {
 background-image: url(../images/mega/new-affiliate-sprite@2x.png);
 background-size: 1500px auto;
 }
@@ -22955,7 +23007,7 @@ background-size: 1500px auto;
 background-image: url(../images/mega/contact-new-sprite@2x.png);
 background-size: 541px auto;
 }
-.new-left-menu-icon, .dev-short-bl-icon, .dev-new-button, .dev-new-table-icon, .dev-new-app-settings, .dev-no-apps-txt, .dev-new-app-big-icon, .dev-new-app-right-block .radioOff, .dev-new-app-right-block .radioOn, .new-left-submenu-item, .new-bottom-pages .new-right-content-block li {
+.new-left-menu-icon, .dev-short-bl-icon, .dev-new-button, .dev-new-table-icon, .dev-new-app-settings, .dev-no-apps-txt, .dev-new-app-big-icon, .new-left-submenu-item, .new-bottom-pages .new-right-content-block li {
 background-image: url(../images/mega/sdk-sprite@2x.png);
 background-size: 904px auto;
 }

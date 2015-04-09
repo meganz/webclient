@@ -115,6 +115,7 @@
      * @param {boolean} false = addContacts, true=share dialog
      */
     GContacts.prototype.getContactList = function(where) {
+        
         var self = this;
 
         var url = self.options.retreiveAllUrl + "?access_token=" + self.accessToken + "&v=3.0&alt=json&max-results=999";
@@ -129,12 +130,16 @@
                     if (gData.length > 0) {
                         if (where === 'shared') {
                             addImportedDataToSharedDialog(gData, 'gmail');
-                        } else if (where === 'contacts') {
+                        }
+                        else if (where === 'contacts') {
                             addImportedDataToAddContactsDialog(gData, 'gmail');
                         }
                         $('.import-contacts-dialog').fadeOut(200);
 
                         self.isImported = true;
+                    }
+                    else {
+                        loadingDialog.hide();
                     }
                 }
             }

@@ -169,7 +169,7 @@
 
         // Other: Textarea, $('.feedback-textarea textarea').val()
         if (btnId === 'res1_div') {
-            text = "I don’t use my account anymore";
+            text = "I don't use my account anymore";
         }
         else if (btnId === 'res2_div') {
             text = 'I have another MEGA account';

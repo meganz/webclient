@@ -523,6 +523,7 @@ function showBitcoinInvoice(apiResponse) {
             dialog.find('.plan-duration').css('opacity', '0.25');
             dialog.find('.plan-price-euros').css('opacity', '0.25');
             dialog.find('.plan-price-bitcoins').css('opacity', '0.25');
+            dialog.find('.plan-price-bitcoins-btc').css('opacity', '0.25');
             dialog.find('.expiry-instruction').html('This purchase has expired.').css('opacity', '1');
             dialog.find('.time-to-expire').html('00:00').css('opacity', '1');
             dialog.find('.price-expired-instruction').show();
@@ -548,8 +549,14 @@ function showBitcoinInvoice(apiResponse) {
         var address = notification.payload.address;
         var satoshisReceived = notification.payload.received;
         
+        // Update price left to pay
+        var currentPriceBitcoins = parseFloat(dialog.find('.plan-price-bitcoins').html());
+        var currentPriceSatoshis = toSatoshi(currentPriceBitcoins);
+        var priceRemainingSatoshis = currentPriceSatoshis - satoshisReceived;
+        var priceRemainingBitcoins = toBitcoin(priceRemainingSatoshis);
+        
         // If correct amount was received, show success
-        if ((type === 'address') && (address === bitcoinAddress) && (satoshisReceived == priceSatoshis)) {
+        if ((type === 'address') && (address === bitcoinAddress) && (satoshisReceived == currentPriceSatoshis)) {
             
             // Show success
             dialog.find('.left-side').css('visibility', 'hidden');
@@ -558,23 +565,19 @@ function showBitcoinInvoice(apiResponse) {
             dialog.find('.payment-confirmation .description').html(planName + ' plan has been paid!');
             dialog.find('.payment-confirmation .instruction').html('Please await account upgrade by MEGA...');
             dialog.find('.expiry-instruction').html('Paid!');
+            
+            // End countdown timer
             clearInterval(countdownIntervalId);            
         }
         
         // If partial payment was made
-        else if ((type === 'address') && (address === bitcoinAddress) && (satoshisReceived < priceSatoshis)) {
-            
-            // Update price left to pay
-            var currentPriceBitcoins = parseFloat(dialog.find('.plan-price-bitcoins').html());
-            var currentPriceSatoshis = toSatoshi(currentPriceBitcoins);
-            var priceRemainingSatoshis = currentPriceSatoshis - satoshisReceived;
-            var priceRemainingBitcoins = toBitcoin(priceRemainingSatoshis);
-            var bitcoinUrl = 'bitcoin:' + bitcoinAddress + '?amount=' + priceRemainingBitcoins;
+        else if ((type === 'address') && (address === bitcoinAddress) && (satoshisReceived < currentPriceSatoshis)) {
             
             // Update price
             dialog.find('.plan-price-bitcoins').html(priceRemainingBitcoins);
             
             // Re-render QR code
+            var bitcoinUrl = 'bitcoin:' + bitcoinAddress + '?amount=' + priceRemainingBitcoins;            
             var options = {
                 width: 256,
                 height: 256,

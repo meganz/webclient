@@ -4600,7 +4600,7 @@ function execsc(actionPackets, callback) {
                         });
                         newnodes.push(M.d[n.h]);
                     }
-                }r
+                }
             }
 
             crypto_share_rsa2aes();

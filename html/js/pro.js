@@ -443,7 +443,6 @@ function showBitcoinInvoice(apiResponse) {
     var planMonths = selectedProPackage[4] + ' month purchase';
     var priceEuros = selectedProPackage[5] + '<span>&euro;</span>';
     var priceBitcoins = apiResponse.amount;
-    var priceSatoshis = toSatoshi(apiResponse.amount);
     var expiryTime = new Date(apiResponse.expiry);
 
     // Cache original HTML of dialog to reset after close
@@ -523,53 +522,74 @@ function showBitcoinInvoice(apiResponse) {
         }        
     }, 1000);
     
-    // Open WebSocket to chain.com API to monitor block chain for transactions on that receive address.
-    // This will receive a faster confirmation than the action packet which waits for an IPN from the provider.
+    // Update the dialog if a transaction is seen in the blockchain
+    checkTransactionInBlockchain(dialog, bitcoinAddress, planName, countdownIntervalId);
+}
+
+/**
+ * Open WebSocket to chain.com API to monitor block chain for transactions on that receive address.
+ * This will receive a faster confirmation than the action packet which waits for an IPN from the provider.
+ * @param {Object} dialog The jQuery object for the dialog
+ * @param {String} bitcoinAddress The bitcoin address
+ * @param {String} planName The Pro plan name
+ * @param {Number} countdownIntervalId The countdown timer id so it can be terminated
+ */
+function checkTransactionInBlockchain(dialog, bitcoinAddress, planName, countdownIntervalId) {
+    
+    // Open socket
     var conn = new WebSocket('wss://ws.chain.com/v2/notifications');    
     
+    // Listen for events on this bitcoin address
     conn.onopen = function (event) {
         var req = { type: 'address', address: bitcoinAddress, block_chain: 'bitcoin' };
         conn.send(JSON.stringify(req));
-    };    
+    };
+    
+    // On event received
     conn.onmessage = function (event) {
         
         // Get data from WebSocket response
         var notification = JSON.parse(event.data);
         var type = notification.payload.type;
         var address = notification.payload.address;
-        var satoshisReceived = notification.payload.received;
         
-        // Update price left to pay
-        var currentPriceBitcoins = parseFloat(dialog.find('.plan-price-bitcoins').html());
-        var currentPriceSatoshis = toSatoshi(currentPriceBitcoins);
-        var priceRemainingSatoshis = currentPriceSatoshis - satoshisReceived;
-        var priceRemainingBitcoins = toBitcoin(priceRemainingSatoshis);
+        // Check only 'address' packets as the system also sends heartbeat packets
+        if ((type === 'address') && (address === bitcoinAddress)) {
         
-        // If correct amount was received, show success
-        if ((type === 'address') && (address === bitcoinAddress) && (satoshisReceived == currentPriceSatoshis)) {
-            
-            // Show success
-            dialog.find('.left-side').css('visibility', 'hidden');
-            dialog.find('.payment-confirmation').show();
-            dialog.find('.payment-confirmation .icon').addClass('success');
-            dialog.find('.payment-confirmation .description').html(planName + ' plan has been paid!');
-            dialog.find('.payment-confirmation .instruction').html('Please await account upgrade by MEGA...');
-            dialog.find('.expiry-instruction').html('Paid!');
-            
-            // End countdown timer
-            clearInterval(countdownIntervalId);            
+            // Update price left to pay
+            var currentPriceBitcoins = parseFloat(dialog.find('.plan-price-bitcoins').html());
+            var currentPriceSatoshis = toSatoshi(currentPriceBitcoins);
+            var satoshisReceived = notification.payload.received;
+            var priceRemainingSatoshis = currentPriceSatoshis - satoshisReceived;
+            var priceRemainingBitcoins = toBitcoin(priceRemainingSatoshis);
+
+            // If correct amount was received
+            if (satoshisReceived === currentPriceSatoshis) {
+
+                // Show success
+                dialog.find('.left-side').css('visibility', 'hidden');
+                dialog.find('.payment-confirmation').show();
+                dialog.find('.payment-confirmation .icon').addClass('success');
+                dialog.find('.payment-confirmation .description').html(planName + ' plan has been paid!');
+                dialog.find('.payment-confirmation .instruction').html('Please await account upgrade by MEGA...');
+                dialog.find('.expiry-instruction').html('Paid!');
+
+                // End countdown timer
+                clearInterval(countdownIntervalId);            
+            }
+
+            // If partial payment was made
+            else if (satoshisReceived < currentPriceSatoshis) {
+
+                // Update price to pay
+                dialog.find('.plan-price-bitcoins').html(priceRemainingBitcoins);
+                dialog.find('.btn-open-wallet').attr('href', 'bitcoin:' + bitcoinAddress + '?amount=' + priceRemainingBitcoins);
+                
+                // Re-render QR code with updated price          
+                generateBitcoinQrCode(dialog, bitcoinAddress, priceRemainingBitcoins);
+            }
         }
-        
-        // If partial payment was made
-        else if ((type === 'address') && (address === bitcoinAddress) && (satoshisReceived < currentPriceSatoshis)) {
-            
-            // Update price
-            dialog.find('.plan-price-bitcoins').html(priceRemainingBitcoins);
-            
-            // Re-render QR code with updated price          
-            generateBitcoinQrCode(dialog, bitcoinAddress, priceRemainingBitcoins);
-        }
-    };
+    };    
 }
 
 /**

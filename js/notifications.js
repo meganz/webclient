@@ -770,7 +770,7 @@ var notifyPopup = {
     },
     
     /**
-     * Process payment notification sent from payment provider e.g. Coinify
+     * Process payment notification sent from payment provider e.g. Bitcoin
      * To test run: addNotification({'a':'psts', 'p':4, 'r':'f'})
      * @param {Object} notification The action packet {'a':'psts', 'p':<prolevel>, 'r':<s for success or f for failure>}
      */

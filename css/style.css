@@ -9759,12 +9759,12 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     background-repeat: no-repeat;
     background-size: 100% auto;
     display: block;
-    height: 41px;
-    left: 144px;
+    height: 40.5px;
+    left: 143.5px;
     opacity: 1;
     position: absolute;
     top: 183px;
-    width: 41px;
+    width: 40.5px;
 }
 .fm-dialog.bitcoin-invoice-dialog a.btn-open-wallet {
     border: 2px solid #47abdc;
@@ -9892,21 +9892,74 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     display: block;
     height: 15px;
     margin-top: 22px;
-    opacity: 0.3;
+    opacity: 0.5;
     width: 15px;
 }
 .fm-dialog.bitcoin-invoice-dialog .expiry-instruction {
     font-size: 11px;
     margin-top: 5px;
-    opacity: 0.3;
+    opacity: 0.5;
 }
 .fm-dialog.bitcoin-invoice-dialog .time-to-expire {
     bottom: 49px;
     font-size: 38px;
-    opacity: 0.3;
+    opacity: 0.5;
     position: absolute;
     right: 35px;
 }
+
+/* Failure to connect to provider */
+.fm-dialog.bitcoin-provider-failure-dialog .container {
+    position: relative;
+}
+.fm-dialog.bitcoin-provider-failure-dialog .icon {
+    background-image: url("../images/mega/icons/retina/red_cross@2x.png");
+    background-position: 0 0;
+    background-repeat: no-repeat;
+    background-size: 100% auto;
+    display: block;
+    height: 167px;
+    margin: 40px auto 0;
+    width: 167px;
+}
+.fm-dialog.bitcoin-provider-failure-dialog .description {
+    color: grey;
+    font-size: 18px;
+    line-height: 1.3;
+    margin: 25px 70px;
+    text-align: center;
+}
+.fm-dialog.bitcoin-provider-failure-dialog .instruction {
+    color: grey;
+    font-size: 18px;
+    line-height: 1.3;
+    margin: 25px 50px 35px;
+    text-align: center;
+}
+.fm-dialog.bitcoin-provider-failure-dialog .instruction a {
+    color: #696969;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+.fm-dialog.bitcoin-provider-failure-dialog .btn-close-dialog {
+    background-color: #dc4747;
+    border-radius: 20px;
+    cursor: pointer;
+    padding: 10px;
+    position: absolute;
+    right: 15px;
+    top: -25px;
+}
+.fm-dialog.bitcoin-provider-failure-dialog .btn-close-dialog .close-icon {
+    background-image: url('../images/mega/icons/retina/close@2x.png');
+    background-position: 0 0;
+    background-repeat: no-repeat;
+    background-size: 100% auto;
+    display: block;
+    height: 7px;
+    width: 7px;
+}
+
 
 .fm-dialog.restore-success {
     width: 364px;

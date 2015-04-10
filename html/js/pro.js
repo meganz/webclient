@@ -14,7 +14,7 @@ var gatewayOptions = [
         displayName: 'Bitcoin',
         supportsRecurring: false,
         cssClass: 'bitcoin',
-        providerName: 'Coinify'
+        providerName: 'Bitcoin'
     }
 ];
 
@@ -367,7 +367,7 @@ function pro_pay()
                     pro_m = 0;
                 }
 				else {
-                    // Coinify
+                    // Bitcoin provider
                     pro_m = 4;
                 }
 				
@@ -401,15 +401,12 @@ function pro_pay()
 							}
 						}
                         else {
-                            // If Coinify, show Bitcoin invoice dialog
-                            if ((pro_m >= 4) && res && res.EUR)
-                            {
+                            // If Bitcoin provider then show the Bitcoin invoice dialog
+                            if ((pro_m >= 4) && res && res.EUR) {
                                 showBitcoinInvoice(res.EUR);
                             }
-							else
-							{
-								loadingDialog.hide();
-								alert(l[200]);
+							else {
+                                showBitcoinProviderFailure();
 							}
 						}
 					}
@@ -620,6 +617,31 @@ function generateBitcoinQrCode(dialog, bitcoinAddress, priceInBitcoins) {
     
     // Render the QR code
     dialog.find('.bitcoin-qr-code').html('').qrcode(options);
+}
+
+/**
+ * Show a failure dialog if the provider can't be contacted
+ */
+function showBitcoinProviderFailure() {
+    
+    // Add styles for the dialog
+    var dialogOverlay = $('.fm-dialog-overlay');
+    var dialog = $('.fm-dialog.pro-register-paypal-dialog');
+    var dialogOriginalHtml = dialog.html();
+    
+    // Add styles for the dialog
+    dialogOverlay.addClass('bitcoin-provider-failure-dialog');
+    dialog.addClass('bitcoin-provider-failure-dialog');
+    
+    // Clone template and show failure
+    var bitcoinProviderFailureHtml = $('.bitcoin-provider-failure').html();
+	dialog.html(bitcoinProviderFailureHtml);
+    
+    // Close dialog and reset to original dialog
+    dialog.find('.btn-close-dialog').click(function() {
+        dialogOverlay.removeClass('bitcoin-provider-failure-dialog').addClass('hidden');
+        dialog.removeClass('bitcoin-provider-failure-dialog').addClass('hidden').html(dialogOriginalHtml);
+    });
 }
 
 

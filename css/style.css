@@ -9759,12 +9759,12 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     background-repeat: no-repeat;
     background-size: 100% auto;
     display: block;
-    height: 42px;
+    height: 41px;
     left: 144px;
     opacity: 1;
     position: absolute;
-    top: 182px;
-    width: 42px;
+    top: 183px;
+    width: 41px;
 }
 .fm-dialog.bitcoin-invoice-dialog a.btn-open-wallet {
     border: 2px solid #47abdc;

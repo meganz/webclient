@@ -419,6 +419,9 @@ function pro_pay()
 	});	
 }
 
+// Web socket for chain.com connection to monitor bitcoin payment
+var chainWebSocketConn = null;
+
 /**
  * Step 3 in plan purchase with Bitcoin
  * @param {Object} apiResponse API result
@@ -471,10 +474,15 @@ function showBitcoinInvoice(apiResponse) {
     dialog.find('.plan-price-euros').html(priceEuros);
     dialog.find('.plan-price-bitcoins').html(priceBitcoins);
     
-    // Close dialog
+    // Close dialog and reset to original dialog
     dialog.find('.btn-close-dialog').click(function() {
         dialogOverlay.removeClass('bitcoin-invoice-dialog').addClass('hidden');
         dialog.removeClass('bitcoin-invoice-dialog').addClass('hidden').html(dialogOriginalHtml);
+        
+        // Close Web Socket if open
+        if (chainWebSocketConn !== null) {
+            chainWebSocketConn.close();
+        }
     });
     
     // Count down the time to price expiration
@@ -518,6 +526,7 @@ function showBitcoinInvoice(apiResponse) {
             dialog.find('.time-to-expire').html('00:00').css('opacity', '1');
             dialog.find('.price-expired-instruction').show();
             
+            // End countdown timer
             clearInterval(countdownIntervalId);
         }        
     }, 1000);
@@ -537,16 +546,14 @@ function showBitcoinInvoice(apiResponse) {
 function checkTransactionInBlockchain(dialog, bitcoinAddress, planName, countdownIntervalId) {
     
     // Open socket
-    var conn = new WebSocket('wss://ws.chain.com/v2/notifications');    
+    chainWebSocketConn = new WebSocket('wss://ws.chain.com/v2/notifications');    
     
     // Listen for events on this bitcoin address
-    conn.onopen = function (event) {
+    chainWebSocketConn.onopen = function (event) {
         var req = { type: 'address', address: bitcoinAddress, block_chain: 'bitcoin' };
-        conn.send(JSON.stringify(req));
+        chainWebSocketConn.send(JSON.stringify(req));
     };
-    
-    // On event received
-    conn.onmessage = function (event) {
+    chainWebSocketConn.onmessage = function (event) {
         
         // Get data from WebSocket response
         var notification = JSON.parse(event.data);
@@ -574,8 +581,9 @@ function checkTransactionInBlockchain(dialog, bitcoinAddress, planName, countdow
                 dialog.find('.payment-confirmation .instruction').html('Please await account upgrade by MEGA...');
                 dialog.find('.expiry-instruction').html('Paid!');
 
-                // End countdown timer
-                clearInterval(countdownIntervalId);            
+                // End countdown timer and close connection
+                clearInterval(countdownIntervalId);
+                chainWebSocketConn.close();
             }
 
             // If partial payment was made
@@ -593,15 +601,14 @@ function checkTransactionInBlockchain(dialog, bitcoinAddress, planName, countdow
 }
 
 /**
- * Renders the bitcoin QR code
+ * Renders the bitcoin QR code with highest error correction so that MEGA logo can be overlayed
+ * http://www.qrstuff.com/blog/2011/12/14/qr-code-error-correction
  * @param {Object} dialog jQuery object of the dialog
  * @param {String} bitcoinAddress The bitcoin address
  * @param {String|Number} priceInBitcoins The price in bitcoins
  */
 function generateBitcoinQrCode(dialog, bitcoinAddress, priceInBitcoins) {
-    
-    // Generate QR Code with highest error correction so that MEGA logo can be overlayed
-    // http://www.qrstuff.com/blog/2011/12/14/qr-code-error-correction
+
     var options = {
         width: 256,
         height: 256,
@@ -614,6 +621,7 @@ function generateBitcoinQrCode(dialog, bitcoinAddress, priceInBitcoins) {
     // Render the QR code
     dialog.find('.bitcoin-qr-code').html('').qrcode(options);
 }
+
 
 function showLoginDialog() {
     megaAnalytics.log("pro", "loginDialog");

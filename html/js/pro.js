@@ -459,17 +459,8 @@ function showBitcoinInvoice(apiResponse) {
     var bitcoinInvoiceHtml = $('.bitcoin-invoice').html();
 	dialog.html(bitcoinInvoiceHtml);
     
-    // Generate QR Code with highest error correction so that MEGA logo can be overlayed
-    // http://www.qrstuff.com/blog/2011/12/14/qr-code-error-correction
-    var options	= {
-        width: 256,
-		height: 256,
-        correctLevel: QRErrorCorrectLevel.H,
-        background: "#ffffff",
-        foreground: "#000",
-        text: bitcoinUrl
-	};
-    dialog.find('.bitcoin-qr-code').qrcode(options);
+    // Render QR code            
+    generateBitcoinQrCode(dialog, bitcoinAddress, priceBitcoins);
     
     // Update details inside dialog
     dialog.find('.btn-open-wallet').attr('href', bitcoinUrl);    
@@ -534,13 +525,12 @@ function showBitcoinInvoice(apiResponse) {
     
     // Open WebSocket to chain.com API to monitor block chain for transactions on that receive address.
     // This will receive a faster confirmation than the action packet which waits for an IPN from the provider.
-    var conn = new WebSocket("wss://ws.chain.com/v2/notifications");    
+    var conn = new WebSocket('wss://ws.chain.com/v2/notifications');    
     
     conn.onopen = function (event) {
-        var req = { type: "address", address: bitcoinAddress, block_chain: "bitcoin" };
+        var req = { type: 'address', address: bitcoinAddress, block_chain: 'bitcoin' };
         conn.send(JSON.stringify(req));
-    };
-    
+    };    
     conn.onmessage = function (event) {
         
         // Get data from WebSocket response
@@ -576,19 +566,33 @@ function showBitcoinInvoice(apiResponse) {
             // Update price
             dialog.find('.plan-price-bitcoins').html(priceRemainingBitcoins);
             
-            // Re-render QR code
-            var bitcoinUrl = 'bitcoin:' + bitcoinAddress + '?amount=' + priceRemainingBitcoins;            
-            var options = {
-                width: 256,
-                height: 256,
-                correctLevel: QRErrorCorrectLevel.H,
-                background: "#ffffff",
-                foreground: "#000",
-                text: bitcoinUrl
-            };
-            dialog.find('.bitcoin-qr-code').html('').qrcode(options);
+            // Re-render QR code with updated price          
+            generateBitcoinQrCode(dialog, bitcoinAddress, priceRemainingBitcoins);
         }
     };
+}
+
+/**
+ * Renders the bitcoin QR code
+ * @param {Object} dialog jQuery object of the dialog
+ * @param {String} bitcoinAddress The bitcoin address
+ * @param {String|Number} priceInBitcoins The price in bitcoins
+ */
+function generateBitcoinQrCode(dialog, bitcoinAddress, priceInBitcoins) {
+    
+    // Generate QR Code with highest error correction so that MEGA logo can be overlayed
+    // http://www.qrstuff.com/blog/2011/12/14/qr-code-error-correction
+    var options = {
+        width: 256,
+        height: 256,
+        correctLevel: QRErrorCorrectLevel.H,
+        background: "#ffffff",
+        foreground: "#000",
+        text: 'bitcoin:' + bitcoinAddress + '?amount=' + priceInBitcoins
+    };
+    
+    // Render the QR code
+    dialog.find('.bitcoin-qr-code').html('').qrcode(options);
 }
 
 function showLoginDialog() {

@@ -259,7 +259,11 @@ var mBroadcaster = {
             }
             if (idr.length)
                 idr.forEach(this.removeListener.bind(this));
+
+            return true;
         }
+
+        return false;
     },
 
     once: function mBroadcaster_once(topic, callback) {

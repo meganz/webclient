@@ -71,21 +71,29 @@ mStorageDB.prototype = {
     },
 
     query: function mStorageDB_query(aCommand, aTable, aData) {
-        var promise;
+        var promise, error;
 
         if (this.schema[aTable]) {
             if (d) console.log('msdb query', this.name, aCommand, aTable, aData);
 
             if (aCommand === 'add') {
                 promise = this.db.addOrUpdate(aTable, aData);
-            } else {
+            }
+            else if (aCommand === 'del') {
                 promise = this.db.remove(aTable, aData);
+            }
+            else {
+                error = Error("Unknown command '"+aCommand+"'");
             }
         }
         else {
+            error = Error("Unknown table '"+aTable+"' for db " + this.name);
+        }
+
+        if (error) {
             promise = new MegaPromise();
             Soon(function __msdb_queryError() {
-                promise.reject(Error("Unknown table '"+aTable+"' for db " + this.name));
+                promise.reject(error);
             });
         }
         return promise;
@@ -183,7 +191,7 @@ mStorageDB.prototype = {
 };
 
 mBroadcaster.once('startMega', function __msdb_init() {
-    var db = new mStorageDB('gps');
+    var db = new mStorageDB('msmain');
 
     db.addSchemaHandler( 'ipc',  'p',  processIPC );
     db.addSchemaHandler( 'opc',  'p',  processOPC );
@@ -245,11 +253,11 @@ var mFileManagerDB = {
                 localStorage['fmdbv_' + u_handle] = this.currentVersion;
 
                 if (oldVersion < this.currentVersion) {
-                    if (d) console.log('db version change');
+                    if (d) console.log('fmdb version change');
                     mFileManagerDB.reload();
                 }
                 else if (+localStorage['fmdblock_' + u_handle]) {
-                    if (d) console.log('db is locked');
+                    if (d) console.log('fmdb is locked');
                     mFileManagerDB.reload();
                 }
                 else {
@@ -285,13 +293,13 @@ var mFileManagerDB = {
 
     fetch: function mFileManagerDB_fetch(aTables) {
         var t = aTables.shift();
-        if (d) console.log('db fetch', t);
+        if (d) console.log('fmdb fetch', t);
 
         if (t) {
             this.db.query(t)
                 .execute()
                 .done(function _fetchDone(results) {
-                    if (d) console.log('db fetch done', t, results);
+                    if (d) console.log('fmdb fetch done', t, results);
 
                     if (!results.length) {
                         mFileManagerDB.fetch(aTables);
@@ -333,7 +341,7 @@ var mFileManagerDB = {
                         mFileManagerDB.fetch(aTables);
                     }
                 }).fail(function _fetchFail() {
-                    if (d) console.log('db fetch failed', t);
+                    if (d) console.log('fmdb fetch failed', t);
 
                     if (mFileManagerDB.slave) {
                         mFileManagerDB._loadfm();
@@ -353,7 +361,7 @@ var mFileManagerDB = {
 
             if (d) {
                 console.timeEnd('fmdb');
-                console.log('db fetch completed', maxaction, hasEntries);
+                console.log('fmdb fetch completed', maxaction, hasEntries);
             }
 
             if (!maxaction || !hasEntries) {
@@ -375,7 +383,7 @@ var mFileManagerDB = {
             var l = (+localStorage['fmdblock_' + u_handle] | 0) + 1;
             localStorage['fmdblock_' + u_handle] = l;
 
-            if (d) console.log('db query', aCommand, aTable, aData, l);
+            if (d) console.log('fmdb query', aCommand, aTable, aData, l);
 
             var promise;
             if (aCommand === 'add') {
@@ -387,8 +395,10 @@ var mFileManagerDB = {
             promise.then(function() {
                 var l = (+localStorage['fmdblock_' + u_handle] | 0) - 1;
                 localStorage['fmdblock_' + u_handle] = l;
-                if (d) console.log('db lock', l);
+                if (d) console.log('fmdb lock', l);
             });
+        } else {
+            throw new Error('Unknown fmdb table: ' + aTable);
         }
     },
 
@@ -396,10 +406,10 @@ var mFileManagerDB = {
         if (this.db) {
             this.db.drop()
                 .done(function _dropDone() {
-                    if (d) console.log('db dropped');
+                    if (d) console.log('fmdb dropped');
                     mFileManagerDB._restart();
                 }).fail(function _dropFail() {
-                    if (d) console.log('db drop failed');
+                    if (d) console.log('fmdb drop failed');
                     mFileManagerDB._loadfm();
                 });
             delete this.db;
@@ -416,7 +426,7 @@ var mFileManagerDB = {
 
     _loadfm: function mFileManagerDB__loadfm(aDBInstance) {
         this._setstate(aDBInstance);
-        mBroadcaster.sendMessage('mFileManagerDB.done', loadfm);
+        mBroadcaster.sendMessage('mFileManagerDB.done', loadfm) || loadfm();
     },
 
     _setstate: function mFileManagerDB__setstate(aDBInstance) {
@@ -464,7 +474,7 @@ function mDBstart(aSlave) {
                 loadfm();
             }
         default:
-            if (d) console.log('db state', mFileManagerDB.state);
+            if (d) console.log('fmdb state', mFileManagerDB.state);
     }
 }
 

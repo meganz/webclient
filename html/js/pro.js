@@ -319,7 +319,7 @@ function renderPlanDurationDropDown() {
 
             // Build select option
             html += '<div class="membership-dropdown-item" data-plan-index="' + i + '">'
-                 +       monthsWording + ' (<strong>' + price + '</strong> €)'
+                 +       monthsWording + ' (<strong>' + price + '</strong> &euro;)'
                  +  '</div>';
         }
     }

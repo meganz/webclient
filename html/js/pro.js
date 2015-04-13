@@ -516,6 +516,9 @@ function showBitcoinInvoice(apiResponse) {
     dialog.find('.plan-price-euros').html(priceEuros);
     dialog.find('.plan-price-bitcoins').html(priceBitcoins);
     
+    // Set countdown to price expiry
+    var countdownIntervalId = setCoundownTimer(dialog, expiryTime);
+    
     // Close dialog and reset to original dialog
     dialog.find('.btn-close-dialog').click(function() {
         dialogOverlay.removeClass('bitcoin-invoice-dialog').addClass('hidden');
@@ -525,10 +528,10 @@ function showBitcoinInvoice(apiResponse) {
         if (chainWebSocketConn !== null) {
             chainWebSocketConn.close();
         }
+        
+        // End countdown timer
+        clearInterval(countdownIntervalId);
     });
-    
-    // Set countdown to price expiry
-    var countdownIntervalId = setCoundownTimer(dialog, expiryTime);
     
     // Update the dialog if a transaction is seen in the blockchain
     checkTransactionInBlockchain(dialog, bitcoinAddress, planName, countdownIntervalId);

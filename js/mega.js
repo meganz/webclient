@@ -5462,15 +5462,18 @@ function processPaymentReceived(actionPacket) {
     // Check success or failure
     var success = (actionPacket.r === 's') ? true : false;
     
-    // If their payment was successful
-    if (success) {
-        
-        // Update state for new Pro Plan
-        M.accountData(function() { }, false);
-    }
-    
     // Add a notification in the top bar
     addNotification(actionPacket);
+    
+    // If their payment was successful, redirect to account page to show new Pro Plan
+    if (success) {
+        
+        // Make sure it fetches new account data on reload
+        if (M.account) {
+            M.account.lastupdate = 0;
+        }
+        document.location.hash = 'account';
+    }
 }
 
 function process_u(u) {

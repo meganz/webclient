@@ -8,15 +8,13 @@ var pro_package,
     selectedProPackage = [];
 
 // Payment gateways, hardcoded for now, will call API in future to get list
-var gatewayOptions = [
-    {   
-        apiGatewayId: 4,
-        displayName: 'Bitcoin',
-        supportsRecurring: false,
-        cssClass: 'bitcoin',
-        providerName: 'Bitcoin'
-    }
-];
+var gatewayOptions = [{   
+    apiGatewayId: 4,
+    displayName: 'Bitcoin',
+    supportsRecurring: false,
+    cssClass: 'bitcoin',
+    providerName: 'Bitcoin'
+}];
 
 function init_pro()
 {
@@ -27,7 +25,7 @@ function init_pro()
 	}
     else {
         $('body').addClass('pro');
-    }	
+    }
     
 	if (u_type == 3)
 	{

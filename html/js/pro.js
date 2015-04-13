@@ -14,6 +14,13 @@ var gatewayOptions = [{
     supportsRecurring: false,
     cssClass: 'bitcoin',
     providerName: 'Bitcoin'
+},
+{
+    apiGatewayId: null,
+    displayName: 'Prepaid balance',
+    supportsRecurring: false,
+    cssClass: 'prepaid-balance',
+    providerName: 'Prepaid balance'
 }];
 
 function init_pro()
@@ -151,18 +158,42 @@ function loadPaymentGatewayOptions() {
         // Pre-select the first option in the list
         var gatewayOption = gatewayOptions[i];
         var optionChecked = (i === 0) ? 'checked="checked" ' : '';
+        var classChecked = (i === 0) ? ' checked' : '';
         
         // Create a radio button with icon for each payment gateway
-        html += '<div class="membership-radio">'
-             +      '<input type="radio" name="' + gatewayOption.cssClass + '" id="' + gatewayOption.cssClass + '" ' + optionChecked + 'disabled="disabled" />'
-             +      '<div></div>'
-             +  '</div>'
-             +  '<div class="membership-radio-label ' + gatewayOption.cssClass + '">'
-             +      gatewayOption.displayName
+        html += '<div class="payment-method">'
+             +      '<div class="membership-radio' + classChecked + '">'
+             +          '<input type="radio" name="' + gatewayOption.cssClass + '" id="' + gatewayOption.cssClass + '" ' + optionChecked + 'disabled="disabled" />'
+             +          '<div></div>'
+             +      '</div>'
+             +      '<div class="membership-radio-label ' + gatewayOption.cssClass + '">'
+             +          gatewayOption.displayName
+             +      '</div>'
              +  '</div>';
     }
     
-    $('.payment-options-list').html(html);
+    // Change checkbox states when clicked
+    var paymentOptionsList = $('.payment-options-list');
+    paymentOptionsList.html(html);
+    paymentOptionsList.find('.payment-method').click(function() {
+        
+        // Remove checked state from all radio inputs
+        paymentOptionsList.find('.membership-radio').removeClass('checked');
+        paymentOptionsList.find('input').removeAttr('checked');
+        
+        // Add checked state for this radio button
+        var $this = $(this);
+        $this.find('input').attr('checked', 'checked');
+        $this.find('.membership-radio').addClass('checked');
+        
+        // Hide instructions below the purchase button if other option is selected
+        if ($this.find('.membership-radio-label').hasClass('bitcoin')) {
+            $('.membership-center p').removeClass('hidden');
+        }
+        else {
+            $('.membership-center p').addClass('hidden');
+        }
+    });
 }
 
 // Step2
@@ -312,6 +343,10 @@ function pro_continue(e)
 	
 	pro_paymentmethod = '';
     
+    // Check if prepaid balance method is selected
+    var prepaidmethodSelected = $('#prepaid-balance').attr('checked');
+        prepaidmethodSelected = (prepaidmethodSelected === 'checked') ? true : false;
+    
 	if (u_type === false)
 	{
 		u_storage = init_storage(localStorage);
@@ -322,13 +357,18 @@ function pro_continue(e)
 			pro_pay();
             
 		}}, true);
-	}
-	else if (parseFloat(pro_balance) >= parseFloat(selectedPlanPrice))
-	{
-		msgDialog('confirmation',l[504],l[5844],false,function(e)
-		{
-			if(e) pro_paymentmethod = 'pro_prepaid';
-			pro_pay();		
+	}    
+    else if (prepaidmethodSelected && (parseFloat(pro_balance) < parseFloat(selectedPlanPrice))) {
+        msgDialog('warninga', 'Insufficient balance', 'You have insufficient funds to make this purchase. Please top up with a voucher or choose another payment method.', false, false);
+    }
+	else if (prepaidmethodSelected && (parseFloat(pro_balance) >= parseFloat(selectedPlanPrice))) {
+		
+        // Ask for confirmation to use the prepaid funds
+        msgDialog('confirmation', l[504], l[5844], false, function(event) {
+			if (event) {
+                pro_paymentmethod = 'pro_prepaid';
+                pro_pay();
+            }	
 		});
 	}
 	else {
@@ -337,12 +377,13 @@ function pro_continue(e)
 }
 
 function pro_pay()
-{   
+{
 	var aff = 0;	
 	if (localStorage.affid && localStorage.affts > new Date().getTime()-86400000) aff = localStorage.affid;
 
-    if (!ul_uploading && !downloading) {
-        redirectToPaymentProvider();
+    // Only show loading dialog if needing to redirect or setup bitcoin invoice
+    if (!ul_uploading && !downloading && (pro_paymentmethod !== 'pro_prepaid')) {
+        showLoadingDialog();
     }
 
     // Data for API request
@@ -392,6 +433,7 @@ function pro_pay()
 							}
 							else
 							{
+                                // Redirect to account page to show purchase
 								if (M.account) {
                                     M.account.lastupdate = 0;
                                 }
@@ -404,7 +446,7 @@ function pro_pay()
                                 showBitcoinInvoice(res.EUR);
                             }
 							else {
-                                showBitcoinProviderFailure();
+                                showBitcoinProviderFailureDialog();
 							}
 						}
 					}
@@ -620,7 +662,7 @@ function generateBitcoinQrCode(dialog, bitcoinAddress, priceInBitcoins) {
 /**
  * Show a failure dialog if the provider can't be contacted
  */
-function showBitcoinProviderFailure() {
+function showBitcoinProviderFailureDialog() {
     
     // Add styles for the dialog
     var dialogOverlay = $('.fm-dialog-overlay');
@@ -641,7 +683,6 @@ function showBitcoinProviderFailure() {
         dialog.removeClass('bitcoin-provider-failure-dialog').addClass('hidden').html(dialogOriginalHtml);
     });
 }
-
 
 function showLoginDialog() {
     megaAnalytics.log("pro", "loginDialog");
@@ -1088,7 +1129,7 @@ var doProRegister = function($dialog) {
 };
 
 var paypalTimeout = null;
-function redirectToPaymentProvider(url) {
+function showLoadingDialog(url) {
     
     clearTimeout(paypalTimeout);
 
@@ -1124,9 +1165,6 @@ function redirectToPaymentProvider(url) {
     $dialog
         .addClass('active')
         .removeClass('hidden');
-
-
-
 
     if(url) {
         megaAnalytics.log("pro", "proceedingToPaypal");

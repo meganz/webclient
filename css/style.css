@@ -9918,9 +9918,9 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     background-repeat: no-repeat;
     background-size: 100% auto;
     display: block;
-    height: 167px;
+    height: 142px;
     margin: 40px auto 0;
-    width: 167px;
+    width: 142px;
 }
 .fm-dialog.bitcoin-provider-failure-dialog .description {
     color: grey;
@@ -9942,8 +9942,6 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     text-transform: uppercase;
 }
 .fm-dialog.bitcoin-provider-failure-dialog .btn-close-dialog {
-    background-color: #dc4747;
-    border-radius: 20px;
     cursor: pointer;
     padding: 10px;
     position: absolute;
@@ -9951,13 +9949,13 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     top: -25px;
 }
 .fm-dialog.bitcoin-provider-failure-dialog .btn-close-dialog .close-icon {
-    background-image: url('../images/mega/icons/retina/close@2x.png');
+    background-image: url('../images/mega/icons/retina/close-black@2x.png');
     background-position: 0 0;
     background-repeat: no-repeat;
     background-size: 100% auto;
     display: block;
-    height: 7px;
-    width: 7px;
+    height: 10px;
+    width: 10px;
 }
 
 
@@ -14885,16 +14883,27 @@ h5.main-italic-header {
 .membership-payment-pad .membership-st2-head {
     padding: 26px 0 11px 0;
 }
+.membership-radio.checked {
+    background-color: #3B99FC;
+}
 .membership-radio {
     float: left;
     width: 16px;
     height: 16px;
-    background-color: #3B99FC;
+    background-color: #a7a5a5;
     -moz-border-radius: 100%;
     -webkit-border-radius: 100%;
     border-radius: 100%;
     position: relative;
     margin: 5px 12px 0 0;
+}
+.payment-options-list .payment-method {
+    cursor: pointer;
+    display: inline-block;
+    margin-left: 20px
+}
+.payment-options-list .payment-method:first-of-type {
+    margin-left: 0;
 }
 .membership-radio div {
     width: 6px;
@@ -14922,6 +14931,11 @@ h5.main-italic-header {
 }
 .membership-radio-label.bitcoin {
     background-position: -444px -614px;
+}
+.membership-radio-label.prepaid-balance {
+    background-image: url("../images/mega/icons/retina/prepaid-balance@2x.png");
+    background-position: 0 2px;
+    background-size: 20px 20px;
 }
 .membership-bott-price {
     font-size: 72px;

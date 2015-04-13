@@ -155,10 +155,14 @@ function loadPaymentGatewayOptions() {
     // Loop through gateway providers (change to use list from API soon)
     for (var i = 0, length = gatewayOptions.length; i < length; i++) {
         
-        // Pre-select the first option in the list
         var gatewayOption = gatewayOptions[i];
-        var optionChecked = (i === 0) ? 'checked="checked" ' : '';
-        var classChecked = (i === 0) ? ' checked' : '';
+        var optionChecked = '', classChecked = '';
+        
+        // Pre-select the first option in the list
+        if (i === 0) {
+            optionChecked = 'checked="checked" ';
+            classChecked = ' checked';
+        }
         
         // Create a radio button with icon for each payment gateway
         html += '<div class="payment-method">'
@@ -183,15 +187,16 @@ function loadPaymentGatewayOptions() {
         
         // Add checked state for this radio button
         var $this = $(this);
+        var $bitcoinInstructions = $('.membership-center p');        
         $this.find('input').attr('checked', 'checked');
         $this.find('.membership-radio').addClass('checked');
         
         // Hide instructions below the purchase button if other option is selected
         if ($this.find('.membership-radio-label').hasClass('bitcoin')) {
-            $('.membership-center p').removeClass('hidden');
+            $bitcoinInstructions.removeClass('hidden');
         }
         else {
-            $('.membership-center p').addClass('hidden');
+            $bitcoinInstructions.addClass('hidden');
         }
     });
 }
@@ -465,14 +470,14 @@ var chainWebSocketConn = null;
  */
 function showBitcoinInvoice(apiResponse) {
 
-    // Testing data
-    /*apiResponse = {
+    /* Testing data to watch the invoice expire in 5 secs
+    apiResponse = {
         "invoice_id": 'sIk',
         "address": '12ouE2tWLuR3q5ZyQzQL6DR25iBLVjhwXd',
         "amount": 1.35715354,
         "created": Math.round(Date.now() / 1000),
         "expiry": Math.round(Date.now() / 1000) + 5
-    };*/
+    };//*/
     
     // Set details
     var bitcoinAddress = apiResponse.address;
@@ -522,6 +527,22 @@ function showBitcoinInvoice(apiResponse) {
         }
     });
     
+    // Set countdown to price expiry
+    var countdownIntervalId = setCoundownTimer(dialog, expiryTime);
+    
+    // Update the dialog if a transaction is seen in the blockchain
+    checkTransactionInBlockchain(dialog, bitcoinAddress, planName, countdownIntervalId);
+}
+
+/**
+ * Sets a countdown timer on the bitcoin invoice dialog to count down from 15~ minutes 
+ * until the bitcoin price expires and they need to restart the process
+ * @param {Object} dialog The bitcoin invoice dialog
+ * @param {Date} expiryTime The date/time the invoice will expire
+ * @returns {Number} Returns the interval id
+ */
+function setCoundownTimer(dialog, expiryTime)
+{
     // Count down the time to price expiration
     var countdownIntervalId = setInterval(function() {
         
@@ -568,8 +589,7 @@ function showBitcoinInvoice(apiResponse) {
         }        
     }, 1000);
     
-    // Update the dialog if a transaction is seen in the blockchain
-    checkTransactionInBlockchain(dialog, bitcoinAddress, planName, countdownIntervalId);
+    return countdownIntervalId;
 }
 
 /**
@@ -590,6 +610,8 @@ function checkTransactionInBlockchain(dialog, bitcoinAddress, planName, countdow
         var req = { type: 'address', address: bitcoinAddress, block_chain: 'bitcoin' };
         chainWebSocketConn.send(JSON.stringify(req));
     };
+    
+    // After receiving a response from the chain.com server
     chainWebSocketConn.onmessage = function (event) {
         
         // Get data from WebSocket response

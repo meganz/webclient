@@ -4600,7 +4600,7 @@ function execsc(actionPackets, callback) {
                         });
                         newnodes.push(M.d[n.h]);
                     }
-                }r
+                }
             }
 
             crypto_share_rsa2aes();
@@ -4734,8 +4734,8 @@ function execsc(actionPackets, callback) {
             }
         }        
         // Action packet to notify about payment (Payment Service Transaction Status)
-        else if (actionPacket.a === 'psts') {            
-            addNotification(actionPacket);
+        else if (actionPacket.a === 'psts') {
+            processPaymentReceived(actionPacket);
         }
         else {
             if (d) {
@@ -5420,9 +5420,7 @@ function processUPCI(ap) {
 
 /**
  * Handle upco response, upco, pending contact request updated (for whom it's outgoing)
- *
  * @param {array of JSON objects} ap (actionpackets)
- * 
  */
 function processUPCO(ap) {
     DEBUG('processUPCO');
@@ -5452,6 +5450,29 @@ function processUPCO(ap) {
                 $('.fm-empty-contacts').removeClass('hidden');
             }
         }
+    }
+}
+
+/**
+ * Update the state when a payment has been received to show their new Pro Level
+ * @param {Object} actionPacket The action packet {'a':'psts', 'p':<prolevel>, 'r':<s for success or f for failure>}
+ */
+function processPaymentReceived(actionPacket) {
+    
+    // Check success or failure
+    var success = (actionPacket.r === 's') ? true : false;
+    
+    // Add a notification in the top bar
+    addNotification(actionPacket);
+    
+    // If their payment was successful, redirect to account page to show new Pro Plan
+    if (success) {
+        
+        // Make sure it fetches new account data on reload
+        if (M.account) {
+            M.account.lastupdate = 0;
+        }
+        document.location.hash = 'account';
     }
 }
 

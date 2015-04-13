@@ -241,14 +241,58 @@
                         PURCHASE
                     </div>
                     <p>
-                        When you click "PURCHASE" you will be forwarded to the <span class="payment-provider-name">Provider</span> site to set up your billing information.
+                        When you click "PURCHASE" you will be shown the price in Bitcoins and an address to send the Bitcoins.
                     </p>
                     <p class="last">
                         Due to the nature of exchanging Bitcoin, all Bitcoin transactions will be final and non recurring.
                     </p>
                 </div>
             </div>
-
+        </div>
+        <div class="bitcoin-invoice hidden">
+            <div class="invoice-container">
+                <div class="left-side">
+                    <div class="scan-code-instruction">Scan code to pay</div>
+                    <div class="bitcoin-qr-code"></div>
+                    <div class="qr-code-mega-icon"></div>
+                    <a class="btn-open-wallet" href="">Open with Bitcoin Wallet</a>
+                    <div class="bitcoin-address selectable"></div>
+                    <div class="price-expired-instruction">
+                        Please close this dialog box and click <a href="#pro">purchase</a> again.
+                    </div>                    
+                </div>
+                <div class="right-side">
+                    <div class="invoice-date-time"></div>
+                    <img class="plan-icon" />
+                    <div class="plan-name"></div>
+                    <div class="plan-duration"></div>
+                    <div class="plan-price-euros"></div>
+                    <div class="plan-price-bitcoins selectable"></div>
+                    <div class="plan-price-bitcoins-btc">BTC</div>
+                    <div class="separator"></div>
+                    <img class="clock-icon" />
+                    <div class="expiry-instruction">This purchase expires in:</div>
+                    <div class="time-to-expire"></div>
+                </div>
+                <div class="btn-close-dialog">
+                    <span class="close-icon"></span>
+                </div>
+                <div class="payment-confirmation">
+                    <div class="icon"></div>
+                    <div class="description"></div>
+                    <div class="instruction"></div>
+                </div>
+            </div>
+        </div>
+        <div class="bitcoin-provider-failure hidden">
+            <div class="container">
+                <div class="btn-close-dialog">
+                    <span class="close-icon"></span>
+                </div>
+                <div class="icon"></div>
+                <div class="description">Connection to payment provider failed.</div>
+                <div class="instruction">Please close this dialog box and click <a href="#pro">purchase</a> again.</div>
+            </div>
         </div>
 
         ((BOTTOM))

@@ -950,13 +950,13 @@ a.account-manage-button:hover {
 .bandwidth .nw-fm-chart0.left-c span, .bandwidth .nw-fm-chart0.right-c span, .bandwidth .nw-fm-bar0, .bandwidth .bar-color4 {
 	background-color: #6BB219;
 }
-.exceeded .nw-fm-percentage li span, .exceeded .nw-fm-line-progress-bar, .exceeded .nw-fm-percentage {
+.exceeded .nw-fm-percentage li span, .exceeded .nw-fm-percentage {
 	background-color: rgba(217,0,7,1);
 }
 .exceeded .fm-bar-title.used-info, .exceeded .fm-bar-size.used, .exceeded .fm-bar-size.available {
 	color: rgba(217,0,7,1)
 }
-.exceeded .nw-fm-percentage li span, .exceeded .nw-fm-line-progress-bar {
+.exceeded .nw-fm-percentage li span {
 	background-color: rgba(217,0,7,1);
 }
 .nw-fm-percents {
@@ -12699,9 +12699,8 @@ table {
 .fm-account-progress .fm-account-bar.green {
 	background-color: #6BB219;
 }
-.exceeded .fm-account-progress .fm-account-bar.blue, .exceeded .fm-account-progress .fm-account-bar.green, .exceeded.storage .nw-fm-bar0 {
+.exceeded .fm-account-progress .fm-account-bar.blue, .exceeded .fm-account-progress .fm-account-bar.green {
 	background-color: #D52400;
-	width: 100% !important;
 }
 .exceeded .membership-usage-txt span.blue, .exceeded .membership-usage-txt.blue, .exceeded .membership-big-txt span.blue, .exceeded .membership-usage-txt span.green, .exceeded .membership-usage-txt.green, .exceeded .membership-big-txt span.green {
 	color: #D52400;

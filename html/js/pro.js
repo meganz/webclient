@@ -164,6 +164,11 @@ function loadPaymentGatewayOptions() {
             classChecked = ' checked';
         }
         
+        // If their prepay balance is less than 0 don't show that option
+        if ((gatewayOption.cssClass === 'prepaid-balance') && (parseFloat(pro_balance) <= 0)) {
+            continue;
+        }
+        
         // Create a radio button with icon for each payment gateway
         html += '<div class="payment-method">'
              +      '<div class="membership-radio' + classChecked + '">'
@@ -176,7 +181,16 @@ function loadPaymentGatewayOptions() {
              +  '</div>';
     }
     
-    // Change checkbox states when clicked
+    // Change radio button states when clicked
+    initPaymentMethodRadioOptions(html);
+}
+
+/**
+ * Change payment method radio button states when clicked
+ * @param {String} html The radio button html
+ */
+function initPaymentMethodRadioOptions(html) {
+    
     var paymentOptionsList = $('.payment-options-list');
     paymentOptionsList.html(html);
     paymentOptionsList.find('.payment-method').click(function() {
@@ -185,9 +199,10 @@ function loadPaymentGatewayOptions() {
         paymentOptionsList.find('.membership-radio').removeClass('checked');
         paymentOptionsList.find('input').removeAttr('checked');
         
-        // Add checked state for this radio button
         var $this = $(this);
-        var $bitcoinInstructions = $('.membership-center p');        
+        var $bitcoinInstructions = $('.membership-center p');
+        
+        // Add checked state for this radio button
         $this.find('input').attr('checked', 'checked');
         $this.find('.membership-radio').addClass('checked');
         

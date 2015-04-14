@@ -1006,6 +1006,7 @@ function MegaData()
                         el = 'a';
                         html = '<a class="file-block' + c + '" id="' + htmlentities(M.v[i].h) + '">\n\
                                     <span class="file-status-icon' + star + '"></span>\n\
+									<span class="link-icon"></span>\n\
                                     <span class="file-settings-icon">\n\
                                         <span></span>\n\
                                     </span>\n\
@@ -1030,10 +1031,11 @@ function MegaData()
                                     <td width="100">' + s + '</td>\n\
                                     <td width="130">' + ftype + '</td>\n\
                                     <td width="120">' + time + '</td>\n\
-                                    <td width="42" class="grid-url-field">\n\
+                                    <td width="62" class="grid-url-field own-data">\n\
                                         <a class="grid-url-arrow">\n\
                                             <span></span>\n\
                                         </a>\n\
+										<span class="link-icon"></span>\n\
                                     </td>\n\
                                 </tr>';
                     }

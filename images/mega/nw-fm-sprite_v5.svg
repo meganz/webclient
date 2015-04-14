@@ -103,9 +103,9 @@
 	c0,1.93,1.57,3.5,3.5,3.5s3.5-1.57,3.5-3.5s-1.57-3.5-3.5-3.5S18,1044.57,18,1046.5L18,1046.5z M21,1044h1v2h2v1h-2v2h-1v-2h-2v-1h2
 	V1044L21,1044z"/>
 <g id="Group_15_" transform="translate(28.000000, 1235.000000)" sketch:type="MSShapeGroup">
-	<path id="Shape_25_" fill="#0D0D0D" d="M4,6L0,1h8L4,6z"/>
+	<path id="Shape_25_" opacity="0.3" fill="#0D0D0D" d="M4,6L0,1h8L4,6z"/>
 </g>
-<g id="Group_16_" transform="translate(28.000000, 1295.000000)" sketch:type="MSShapeGroup">
+<g id="Group_16_" transform="translate(28.000000, 1295.000000)" sketch:type="MSShapeGroup" opacity="0.3">
 	<path id="Shape_26_" fill="#0D0D0D" d="M4,0L0,5h8L4,0z"/>
 </g>
 <g id="Group_17_" transform="translate(7.000000, 1587.000000)" sketch:type="MSShapeGroup">
@@ -468,8 +468,6 @@
 	<path id="Shape_136_" fill="#FFFFFF" d="M9,5c0,2.21,1.79,4,4,4s4-1.79,4-4s-1.79-4-4-4S9,2.79,9,5L9,5z M11,4h2V2l3,3l-3,3V6h-2V4
 		L11,4z"/>
 </g>
-<path id="Shape_137_" sketch:type="MSShapeGroup" fill="#FFFFFF" d="M23.5,4290.061l4.33,2.939l-1.53-4.92l4.2-3.109l-5.27-0.104
-	L23.5,4280l-1.73,4.859l-5.27,0.104l4.2,3.104l-1.53,4.92L23.5,4290.061z"/>
 <g id="Group_54_" transform="translate(17.000000, 4565.000000)" sketch:type="MSShapeGroup">
 	<rect id="Rectangle-path_59_" y="3" fill="#FFFFFF" width="16" height="9"/>
 	<rect id="Rectangle-path_60_" y="1" fill="#FFFFFF" width="15" height="1"/>
@@ -484,8 +482,6 @@
 	c-0.3,0.312-0.57,0.66-0.79,1.04c-0.29-0.13-0.601-0.21-0.931-0.21c-1.299,0-2.359,1.13-2.359,2.528c0,0.142,0.01,0.271,0.03,0.42
 	C14.75,4740.221,13,4742.159,13,4744.55L13,4744.55z M23,4735.148c-0.35,0.104-0.689,0.25-1,0.438v0.396h1v1h-1v1h1v1h-1v1v1h-1v5h4
 	v-5h-1v-1h-1v-1h1v-1h-1v-1h1v-1h-1V4735.148L23,4735.148z M24,4744.971h-2v-3h2V4744.971L24,4744.971z"/>
-<path id="Shape_140_" sketch:type="MSShapeGroup" fill="#FFFFFF" d="M19,4646l-4,9h15l4-9H19L19,4646z M15,4653l3-8h12v-1h-8v-1h-7
-	V4653L15,4653z"/>
 <g>
 	<polygon fill="#FFFFFF" points="24.5,4891.5 21.5,4891.5 21.5,4893.5 19.5,4893.5 23,4897.5 26.5,4893.5 24.5,4893.5 	"/>
 	<polygon fill="#FFFFFF" points="21.5,4886.5 24.5,4886.5 24.5,4884.5 26.5,4884.5 23,4880.5 19.5,4884.5 21.5,4884.5 	"/>
@@ -780,7 +776,7 @@
 </g>
 <path id="Shape_245_" sketch:type="MSShapeGroup" fill="#FFFFFF" d="M15,4256c0,4.42,3.58,8,8,8s8-3.58,8-8s-3.58-8-8-8
 	S15,4251.58,15,4256L15,4256z M22,4255h2v5h-2V4255L22,4255z M22,4252h2v2h-2V4252L22,4252z"/>
-<g id="Group_86_" transform="translate(30.000000, 4604.000000)" sketch:type="MSShapeGroup">
+<g id="Group_86_" transform="translate(30.000000, 4604.000000)" sketch:type="MSShapeGroup" opacity="0.5">
 	<path id="Shape_246_" fill="#FFFFFF" d="M1,10V0l5,5L1,10z"/>
 </g>
 <path id="Shape_247_" sketch:type="MSShapeGroup" fill="#FFFFFF" d="M31,4784v-10l5,5L31,4784z"/>
@@ -1069,11 +1065,11 @@
 	c-0.43-0.2-0.9-0.319-1.39-0.319c-1.949,0-3.54,1.709-3.54,3.789c0,0.23,0.02,0.44,0.05,0.65C11.63,388.88,9,391.79,9,395.37"/>
 <g id="Fill-3-_x2B_-Fill-5" transform="translate(9.000000, 427.000000)" sketch:type="MSShapeGroup">
 	
-		<linearGradient id="Fill-3_8_" gradientUnits="userSpaceOnUse" x1="-710.7832" y1="13942.9121" x2="-710.7832" y2="13941.75" gradientTransform="matrix(30 0 0 -20 21338.5 278859)">
+		<linearGradient id="Fill-3_9_" gradientUnits="userSpaceOnUse" x1="-710.7832" y1="13942.9121" x2="-710.7832" y2="13941.75" gradientTransform="matrix(30 0 0 -20 21338.5 278859)">
 		<stop  offset="0" style="stop-color:#FFFFFF"/>
 		<stop  offset="1" style="stop-color:#FFFFFF;stop-opacity:0.8"/>
 	</linearGradient>
-	<path id="Fill-3" fill="url(#Fill-3_8_)" d="M27,19.48c0,0.271-0.24,0.52-0.52,0.52H23c-0.02-1.859-0.37-2.23-0.54-2.41
+	<path id="Fill-3" fill="url(#Fill-3_9_)" d="M27,19.48c0,0.271-0.24,0.52-0.52,0.52H23c-0.02-1.859-0.37-2.23-0.54-2.41
 		c-0.36-0.354-1.771-1.07-2.94-1.604c0.03-0.104,0.08-0.221,0.146-0.239c0.13-0.052,0.54-0.25,0.54-0.25
 		c0-0.03,0.05-0.12,0.062-0.211c0-0.104-0.062-0.209-0.062-0.209c-0.056-0.11-0.25-0.37-0.312-0.57
 		c-0.062-0.2-0.121-0.722-0.121-0.722c0-0.109-0.16-0.159-0.271-0.209c-0.182-0.09-0.488-1.2-0.488-1.2c0-0.36-0.012-0.2-0.012-0.46
@@ -1123,21 +1119,21 @@
 </g>
 <g id="ic_conversations" transform="translate(7.000000, 523.000000)" sketch:type="MSShapeGroup">
 	
-		<linearGradient id="Fill-1_27_" gradientUnits="userSpaceOnUse" x1="-602.1094" y1="14730.4434" x2="-602.1094" y2="14729.4453" gradientTransform="matrix(16.5198 0 0 -14.8583 9971.4658 218878.5938)">
+		<linearGradient id="Fill-1_34_" gradientUnits="userSpaceOnUse" x1="-602.1094" y1="14730.4434" x2="-602.1094" y2="14729.4453" gradientTransform="matrix(16.5198 0 0 -14.8583 9971.4658 218878.5938)">
 		<stop  offset="0" style="stop-color:#FFFFFF"/>
 		<stop  offset="1" style="stop-color:#FFFFFF;stop-opacity:0.8"/>
 	</linearGradient>
-	<path id="Fill-1" opacity="0.7" fill="url(#Fill-1_27_)" enable-background="new    " d="M30.01,21.15
+	<path id="Fill-1" opacity="0.7" fill="url(#Fill-1_34_)" enable-background="new    " d="M30.01,21.15
 		c1.711-0.979,2.93-2.45,2.99-4.371c0.1-4.188-3.91-7.239-7.91-8.109l-0.16-0.029c0.26,2.67-0.39,5.17-1.9,7.159
 		c-1.521,2.021-3.812,3.38-6.542,3.96c1.323,1.631,3.429,2.67,5.979,2.84c1.227,0.1,2.46,0,3.71-0.17
 		c1.347,1.08,3.271,1.146,4.91,1.03c0.513-0.04,0.41-0.26,0.021-0.36c-0.772-0.189-1.394-0.75-1.354-1.55
 		C29.76,21.37,29.9,21.23,30.01,21.15"/>
 	
-		<linearGradient id="Fill-2_26_" gradientUnits="userSpaceOnUse" x1="-656.4678" y1="13880.623" x2="-656.4678" y2="13879.625" gradientTransform="matrix(23.0021 0 0 -19.7383 15112.6338 273980.0312)">
+		<linearGradient id="Fill-2_32_" gradientUnits="userSpaceOnUse" x1="-656.4678" y1="13880.623" x2="-656.4678" y2="13879.625" gradientTransform="matrix(23.0021 0 0 -19.7383 15112.6338 273980.0312)">
 		<stop  offset="0" style="stop-color:#FFFFFF"/>
 		<stop  offset="1" style="stop-color:#FFFFFF;stop-opacity:0.8"/>
 	</linearGradient>
-	<path id="Fill-2" fill="url(#Fill-2_26_)" d="M11.109,0.859C5.991,2,0.871,5.99,1,11.46c0.07,2.511,1.63,4.45,3.82,5.71
+	<path id="Fill-2" fill="url(#Fill-2_32_)" d="M11.109,0.859C5.991,2,0.871,5.99,1,11.46c0.07,2.511,1.63,4.45,3.82,5.71
 		c0.151,0.1,0.321,0.28,0.33,0.521c0.05,1.051-0.73,1.771-1.72,2.021c-0.51,0.129-0.62,0.408,0.03,0.479
 		c2.08,0.141,4.55,0.061,6.271-1.35c1.589,0.229,3.169,0.35,4.729,0.229c6.41-0.461,10.681-5.24,9.271-11.67
 		C22.471,1.55,16.71-0.38,11.109,0.859L11.109,0.859z"/>
@@ -1254,22 +1250,22 @@
 </g>
 <g id="Imported-Layers-4_1_" transform="translate(9.000000, 9858.000000)" sketch:type="MSShapeGroup">
 	
-		<linearGradient id="Fill-1_32_" gradientUnits="userSpaceOnUse" x1="-710.7832" y1="3922.2695" x2="-710.7832" y2="3921.2695" gradientTransform="matrix(30 0 0 -26 21338.5 101983)">
+		<linearGradient id="Fill-1_35_" gradientUnits="userSpaceOnUse" x1="-710.7832" y1="3922.2695" x2="-710.7832" y2="3921.2695" gradientTransform="matrix(30 0 0 -26 21338.5 101983)">
 		<stop  offset="0" style="stop-color:#FFFFFF"/>
 		<stop  offset="1" style="stop-color:#FFFFFF;stop-opacity:0.8"/>
 	</linearGradient>
-	<path id="Fill-1_4_" fill="url(#Fill-1_32_)" d="M29.816,20.602l-5.28-11.438C24.209,8.455,23.5,8,22.721,8H20v2h3l4,10h-6l-3,3h-6
+	<path id="Fill-1_4_" fill="url(#Fill-1_35_)" d="M29.816,20.602l-5.28-11.438C24.209,8.455,23.5,8,22.721,8H20v2h3l4,10h-6l-3,3h-6
 		l-3-3H3l4-10h3V8H7.28C6.5,8,5.791,8.455,5.464,9.164l-5.28,11.438C0.063,20.863,0,21.15,0,21.439V28c0,1.104,0.895,2,2,2h26
 		c1.105,0,2-0.896,2-2v-6.561C30,21.15,29.938,20.863,29.816,20.602L29.816,20.602z M18,6v6h4l-7,8l-7-8h4V6c0-1.105,0.895-2,2-2h2
 		C17.105,4,18,4.895,18,6L18,6z"/>
 </g>
 <g id="Fill-1-_x2B_-Fill-3_1_" transform="translate(9.000000, 9912.000000)" sketch:type="MSShapeGroup">
 	
-		<linearGradient id="Fill-1_33_" gradientUnits="userSpaceOnUse" x1="-710.7842" y1="4457.6289" x2="-710.7842" y2="4456.6289" gradientTransform="matrix(30 0 0 -19.999 21338.5 89157.0938)">
+		<linearGradient id="Fill-1_36_" gradientUnits="userSpaceOnUse" x1="-710.7842" y1="4457.6289" x2="-710.7842" y2="4456.6289" gradientTransform="matrix(30 0 0 -19.999 21338.5 89157.0938)">
 		<stop  offset="0" style="stop-color:#FFFFFF"/>
 		<stop  offset="1" style="stop-color:#FFFFFF;stop-opacity:0.8"/>
 	</linearGradient>
-	<path id="Fill-1_5_" fill="url(#Fill-1_33_)" d="M0,28c0,0.549,0.45,1,1,1h28c0.55,0,1-0.451,1-1V9H0V28L0,28z M23,18.5L15.8,25
+	<path id="Fill-1_5_" fill="url(#Fill-1_36_)" d="M0,28c0,0.549,0.45,1,1,1h28c0.55,0,1-0.451,1-1V9H0V28L0,28z M23,18.5L15.8,25
 		v-4.061c-3.43,0-7.66,1.107-8.8,4.061c0-2.801,3.09-8.311,8.8-8.939V12L23,18.5L23,18.5z"/>
 	<path id="Fill-2_3_" opacity="0.7" fill="#FFFFFF" enable-background="new    " d="M29,7H17l-2-2H1C0.45,5,0,5.451,0,6v3h30V8
 		C30,7.451,29.55,7,29,7L29,7z"/>
@@ -1868,13 +1864,42 @@
 		c1.088,0.146,2.166,0.227,3.234,0.146C16.577-2028.42,19.493-2031.746,18.536-2036.201L18.536-2036.201z"/>
 </g>
 <g id="Imported-Layers-5" transform="translate(0.000000, 131.000000)" sketch:type="MSLayerGroup">
-	<path id="Fill-1_31_" sketch:type="MSShapeGroup" fill="#FFFFFF" d="M22.078,4230.922c1.395,1.393,4.439,1.542,5.874,0.107
+	<path id="Fill-1_31_" sketch:type="MSShapeGroup" fill="#FFFFFF" d="M21.078,4230.922c1.395,1.393,4.439,1.542,5.874,0.107
 		l2.886-2.885c1.592-1.584,1.542-4.23-0.109-5.873c-1.643-1.651-4.289-1.701-5.873-0.109l-2.279,2.279
 		c0.848-0.039,1.721,0.109,2.527,0.461l1.246-1.246c0.793-0.793,2.118-0.768,2.94,0.054c0.821,0.822,0.847,2.147,0.054,2.94
-		l-2.886,2.886c-0.792,0.792-2.373,0.495-3.424,0.455L22.078,4230.922"/>
-	<path id="Fill-2_31_" sketch:type="MSShapeGroup" fill="#FFFFFF" d="M25.922,4227.078c-1.443-1.443-4.479-1.504-5.874-0.107
+		l-2.886,2.886c-0.792,0.792-2.373,0.495-3.424,0.455L21.078,4230.922"/>
+	<path id="Fill-2_31_" sketch:type="MSShapeGroup" fill="#FFFFFF" d="M24.922,4227.078c-1.443-1.443-4.479-1.504-5.874-0.107
 		l-2.886,2.885c-1.592,1.584-1.542,4.23,0.109,5.873c1.643,1.651,4.289,1.701,5.873,0.109l2.272-2.273
 		c-0.849,0.041-1.714-0.115-2.521-0.467l-1.246,1.246c-0.793,0.793-2.118,0.768-2.94-0.054c-0.821-0.822-0.847-2.147-0.054-2.94
-		l2.886-2.886c0.575-0.575,1.476-0.491,3.433-0.454c0.02,0,0.027-0.012,0.027-0.012L25.922,4227.078"/>
+		l2.886-2.886c0.575-0.575,1.476-0.491,3.433-0.454c0.02,0,0.027-0.012,0.027-0.012L24.922,4227.078"/>
+</g>
+<g id="Page-1_7_" sketch:type="MSPage">
+	<g id="Fill-1-_x2B_-Fill-2_5_" sketch:type="MSLayerGroup">
+		<path id="Fill-1_27_" sketch:type="MSShapeGroup" fill="#FFFFFF" fill-opacity="0.7" d="M20.592,4642.018
+			c0.262,0,0.512,0.104,0.699,0.287l0.917,0.904c0.636,0.666,1.028,0.791,1.292,0.791h6c0.55,0,1,0.45,1,1v6l-15,3v-11.001
+			c0-0.554,0.447-1,1-0.999L20.592,4642.018z"/>
+		<path id="Fill-2_26_" sketch:type="MSShapeGroup" fill="#FFFFFF" d="M32.5,4646l-2.771,7.316
+			c-0.137,0.408-0.519,0.684-0.949,0.684H15.5l3-8H32.5z"/>
+	</g>
+</g>
+<g id="Page-1_8_" sketch:type="MSPage">
+	<g id="Fill-31" sketch:type="MSLayerGroup">
+		<path id="Fill-16" sketch:type="MSShapeGroup" fill="#FFFFFF" d="M23,4290.52l-5,2.98l1.4-5.561L15,4284.5l5.779-0.73L23,4278.5
+			l2.23,5.27l5.77,0.73l-4.4,3.439l1.4,5.561L23,4290.52"/>
+	</g>
+</g>
+<g id="Imported-Layers-6" transform="translate(0.000000, 163.000000)" sketch:type="MSLayerGroup">
+	<path id="Fill-1_32_" sketch:type="MSShapeGroup" fill="#FFFFFF" d="M26.294,5031.037c-0.897,0.087-1.765,0.449-2.438,1.125
+		l-2.279,2.279c0.826-0.039,1.673,0.105,2.461,0.438C24.215,5033.297,25.064,5031.922,26.294,5031.037"/>
+	<path id="Fill-2_30_" sketch:type="MSShapeGroup" fill="#FFFFFF" d="M25.607,5039.387l-0.149,0.149
+		c-0.792,0.792-2.373,0.495-3.424,0.455l-0.956,0.931c1.393,1.393,4.439,1.542,5.874,0.107l0.446-0.447
+		C26.725,5040.303,26.116,5039.895,25.607,5039.387"/>
+	<path id="Fill-3_8_" sketch:type="MSShapeGroup" fill="#FFFFFF" d="M20.65,5044.344c-0.793,0.793-2.118,0.768-2.94-0.054
+		c-0.821-0.822-0.847-2.147-0.054-2.94l2.886-2.886c0.575-0.575,1.476-0.491,3.433-0.454c0.02,0,0.027-0.012,0.027-0.012
+		l0.411-0.411c-0.144-0.346-0.249-0.711-0.317-1.089c-1.572-0.83-3.879-0.697-5.048,0.473l-2.886,2.885
+		c-1.592,1.584-1.542,4.23,0.109,5.873c1.643,1.651,4.289,1.701,5.873,0.109l2.272-2.273c-0.849,0.041-1.714-0.115-2.521-0.467
+		L20.65,5044.344"/>
+	<path id="Fill-4_3_" sketch:type="MSShapeGroup" fill="#FFFFFF" d="M29.5,5031c-2.484,0-4.5,2.016-4.5,4.5s2.016,4.5,4.5,4.5
+		s4.5-2.016,4.5-4.5S31.984,5031,29.5,5031L29.5,5031z M27,5035h5v1h-5V5035z"/>
 </g>
 </svg>

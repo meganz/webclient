@@ -5653,52 +5653,39 @@ th.grid-first-th {
 	display: block;
 	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
 	background-repeat: no-repeat;
-	background-position: -7px -1469px;
-}
-.grid-status-icon {
 	background-position: -7px -1494px;
 }
 .file-status-icon {
 	background-image: none;
 }
-.file-status-icon.star, .contact-status-icon.star {
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+.file-status-icon.star, .contact-status-icon.star, .grid-status-icon.star, .link-icon {
+	background-image: url(../images/mega/register-big-sprite-v2.png);
 	background-repeat: no-repeat;
-	background-position: -7px -1469px;
+	background-position: -69px -963px;
 }
-.file-status-icon.star, .contact-status-icon.star {
-	background-position: -7px -1469px;
+table .grid-status-icon.star {
+	background-position: -64px -961px;
 }
-.grid-status-icon.star {
-	background-position: -9px -7736px;
-}
-.grid-status-icon.new, .file-status-icon.new, .contact-status-icon.new {
-	background-position: -34px -1624px;
-}
-.grid-status-icon.star.new, .file-status-icon.star.new, .contact-status-icon.star.new {
-	background-position: -29px -1574px;
-}
-.file-block .file-status-icon.new, .contact-status-icon.new, .file-block.ui-selected .file-status-icon.new, .file-block.dragover .file-status-icon.new, .ui-selected .contact-status-icon.new, .dragover .contact-status-icon.new {
-	background-position: -7px -1469px;
-}
-.file-block .file-status-icon.star.new, .contact-status-icon.star.new, .file-block.ui-selected .file-status-icon.star.new, .file-block.dragover .file-status-icon.star.new, .ui-selected .contact-status-icon.star.new, .dragover .contact-status-icon.star.new {
-	background-position: -7px -1469px;
-}
-.file-block .file-status-icon, .contact-status-icon, .properties-body .file-status-icon {
+.file-block .file-status-icon, .contact-status-icon, .properties-body .file-status-icon, .link-icon {
 	position: absolute;
-	left: 4px;
-	top: 4px;
-	height: 20px;
-	z-index: 10;
-	width: 20px;
-	background-position: 1px -3679px;
+    left: 6px;
+    top: 6px;
+    height: 20px;
+    z-index: 10;
+    width: 20px;
 }
-.properties-body .file-status-icon {
-	left: 14px;
-	top: 14px;
+.link-icon {
+	left:auto;
+	right:6px;
+	background-position: -106px -963px;
+	display:none;
 }
-.file-block .file-status-icon.star, .contact-status-icon.star, .properties-body .file-status-icon.star {
-	background-position: -14px -7738px;
+.own-data .link-icon {
+	left: 3px;
+    top: 2px;
+}
+.link-exists .link-icon {
+	display:block;
 }
 .fm-blocks-view, .fm-contacts-blocks-view, .fm-blocks-view.shared-view, .shared-details-block, .shared-blocks-view, .fm-blocks-view.contacts-view, .contacts-details-block, .contacts-blocks-view {
 	-webkit-box-sizing: border-box;
@@ -5864,8 +5851,8 @@ th.grid-first-th {
 	box-sizing: border-box;
 }
 .grid-url-arrow, .file-settings-icon {
-	height: 18px;
-	width: 18px;
+	height: 20px;
+	width: 20px;
 	display: block;
 	cursor: pointer;
 	-webkit-transition: all 200ms ease-in-out;
@@ -5875,18 +5862,21 @@ th.grid-first-th {
 	transition: all 200ms ease-in-out;
 	position: absolute;
 	background-color: rbga(255, 255, 255, 0);
-	top: 3px;
+	top: 2px;
 	left: 12px;
 	border: 2px solid rgba(0,0,0,0);
-	-moz-border-radius: 4px;
-	-webkit-border-radius: 4px;
-	border-radius: 4px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	-webkit-background-clip: padding-box;
 	-moz-background-clip: padding-box;
 	background-clip: padding-box;
+}
+.own-data .grid-url-arrow {
+	left:32px;
 }
 .file-settings-icon {
 	left: auto;
@@ -5898,7 +5888,7 @@ th.grid-first-th {
 .grid-url-arrow span, .file-settings-icon span {
 	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
 	background-repeat: no-repeat;
-	background-position: -18px -7788px;
+	background-position: -17px -7787px;
 	-webkit-transition: opacity 200ms ease-in-out;
 	-moz-transition: opacity 200ms ease-in-out;
 	-o-transition: opacity 200ms ease-in-out;
@@ -5909,8 +5899,8 @@ th.grid-first-th {
 	-khtml-opacity: 0;
 	opacity: 0;
 	display: block;
-	width: 14px;
-	height: 14px;
+	width: 16px;
+	height: 16px;
 }
 .file-block:hover .file-settings-icon, .file-block.ui-selected .file-settings-icon, tr:hover .grid-url-arrow, tr.ui-selected .grid-url-arrow, .properties-name-block:hover .file-settings-icon {
 	border: 2px solid rgba(0,0,0,0.1);
@@ -7765,7 +7755,7 @@ table {
 }
 .context-menu-divider, .pause-item-divider, .sorting-item-divider {
 	height: 2px;
-	background-color: rgba(255,255,255,0.05);
+	background-color: rgba(255,255,255,0.1);
 	margin: 3px 0;
 	display: block;
 }
@@ -12522,6 +12512,9 @@ table {
 }
 .getlink-item .context-menu-icon {
 	background-position: -3px -4344px;
+}
+.removelink-item .context-menu-icon {
+	background-position: -3px -5186px;
 }
 .sh4r1ng-item .context-menu-icon {
 	background-position: -3px -4800px;
@@ -23250,7 +23243,7 @@ top-login-spr .nlanguage-tooltip-bg, .nlanguage-bottom {
  background-image: url(../images/mega/top-login-sprite@2x_v4.png);
  background-size:48px auto;
 }
- .reg-success-icon, .reg-st3-save-icon, .reg-st3-membership-icon, .membership-icon, .loginrequired-dialog .fm-notification-icon {
+ .reg-success-icon, .reg-st3-save-icon, .reg-st3-membership-icon, .membership-icon, .loginrequired-dialog .fm-notification-icon, .file-status-icon.star, .contact-status-icon.star, .grid-status-icon.star, .link-icon {
  background-image: url(../images/mega/register-big-sprite-v2@2x.png);
  background-size: 200px auto;
 }

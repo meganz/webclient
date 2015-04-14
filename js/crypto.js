@@ -2,8 +2,17 @@ window.URL = window.URL || window.webkitURL;
 var have_ab = typeof ArrayBuffer != 'undefined' && typeof DataView != 'undefined';
 var use_workers = have_ab && typeof Worker != 'undefined';
 
-if (is_extension || +localStorage.use_ssl === 0) {
+if (is_extension && typeof localStorage.use_ssl === 'undefined') {
+	localStorage.use_ssl = 0;
+}
+
+// if (is_extension || +localStorage.use_ssl === 0) {
+if (is_chrome_firefox) {
     var use_ssl = 0;
+}
+else if (+localStorage.use_ssl === 0) {
+    var use_ssl = (navigator.userAgent.indexOf('Chrome/') !== -1
+		&& parseInt(navigator.userAgent.split('Chrome/').pop()) > 40) ? 1:0;
 }
 else {
     if ((navigator.appVersion.indexOf('Safari') > 0) && (navigator.appVersion.indexOf('Version/5') > 0)) {
@@ -57,7 +66,7 @@ function ssl_needed() {
     var ssl_off = ['Firefox/14', 'Firefox/15', 'Firefox/17', 'Safari', 'Firefox/16'];
     for (var i = ssl_opt.length; i--;) {
         if (navigator.userAgent.indexOf(ssl_opt[i]) >= 0) {
-            return 0;
+            return parseInt(navigator.userAgent.split(ssl_opt[i]).pop()) > 40;
         }
     }
     for (var i = ssl_off.length; i--;) {
@@ -1142,17 +1151,33 @@ function api_retry() {
 }
 
 function api_reqfailed(c, e) {
-    if (e == ESID) {
+    if (e === ESID) {
         u_logout(true);
         document.location.hash = 'login';
     }
-    else if (c == 2 && e == ETOOMANY) {
+    else if (c === 2 && e === ETOOMANY) {
         if (typeof mDB !== 'undefined' && mDB) {
             mDBreload();
         }
         else {
             loadfm();
         }
+    }
+    
+    // If suspended account
+    else if (e === EBLOCKED) {
+        
+        // On clicking OK, log the user out and redirect to contact page
+        msgDialog('warninga', 'Suspended account',
+            'You have been suspended due to excess data usage.\n\
+            Please contact support@mega.co.nz to get your account reinstated.',
+            false,
+            function() {
+                var redirectUrl = window.location.origin + window.location.pathname + '#contact';
+                u_logout(true);                
+                window.location.replace(redirectUrl);
+            }
+        );
     }
 }
 

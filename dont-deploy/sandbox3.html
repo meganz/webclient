@@ -34,15 +34,26 @@
         
         localStorage.clear();
         
-        localStorage.apipath = 'https://api-sandbox3.developers.mega.co.nz/';
-        //localStorage.apipath = 'https://staging.api.mega.co.nz/';
-        
+        // Add ?apipath=staging to the end of the URL if you want to use the staging API,
+        // apipath=prod for the live API servers, or leave blank for Sandbox 3.
+        if (window.location.search.indexOf('apipath=staging') > -1) {
+            localStorage.apipath = 'https://staging.api.mega.co.nz/';
+        }
+        else if (window.location.search.indexOf('apipath=prod') > -1) {
+            localStorage.apipath = 'https://eu.api.mega.co.nz/';
+        }
+        else {
+            localStorage.apipath = 'https://api-sandbox3.developers.mega.co.nz/';
+        }        
 
         localStorage.staticpath = window.location.protocol + "//" + devhost + pathSuffix + "/";
 
+        // Disables hash checking of files and loads them separately
         localStorage.dd = 1;
 
         localStorage.jj = 1;
+        
+        // Shows debug logging to console
         localStorage.d = 1;
 
         //localStorage.chatDisabled = 1;

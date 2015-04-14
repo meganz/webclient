@@ -3,7 +3,7 @@
  * @param {Number} planNum The plan number e.g. 1: PRO I, 2: PRO II, 3: PRO III, 4: LITE
  */
 function getProPlan(planNum) {
-    
+
     switch (planNum) {
         case 1:
             return l[5819];     // PRO I
@@ -12,7 +12,7 @@ function getProPlan(planNum) {
         case 3:
             return l[6126];     // PRO III
         case 4:
-            return 'LITE';      // l[6234] (when strings generated)
+            return l[6234];     // LITE
         default:
             return l[435];      // FREE
     }
@@ -187,7 +187,7 @@ function deleteScrollPanel(from, data) {
     var jsp = $(from).data(data);
     if (jsp) {
         jsp.destroy();
-    }    
+    }
 }
 
 function initAccountScroll()
@@ -223,7 +223,7 @@ function initContactsGridScrolling() {
 /**
  * Sent Contact Requests
  *
- * 
+ *
  */
 function initOpcGridScrolling() {
     var scroll = '.grid-scrolling-table.opc';
@@ -235,7 +235,7 @@ function initOpcGridScrolling() {
 /**
  * Received Contact Requests
  *
- * 
+ *
  */
 function initIpcGridScrolling() {
     var scroll = '.grid-scrolling-table.ipc';
@@ -500,9 +500,9 @@ function treesearchUI()
             $('.nw-sorting-menu').addClass('hidden');
         }
     });
-    
+
     $('.sorting-menu-item').rebind('click', function() {
-        
+
         var $this = $(this),
             data = $this.data(),
             type = treePanelType();
@@ -512,14 +512,14 @@ function treesearchUI()
             $this.addClass('active');
             $('.nw-sorting-menu').addClass('hidden');
             $('.nw-tree-panel-arrows').removeClass('active');
-                
+
             if (data.dir) {
                 localStorage['sort' + type + 'Dir'] = $.sortTreePanel[type].dir = data.dir;
             }
             else {
                 localStorage['sort' + type + 'By'] = $.sortTreePanel[type].by = data.by;
             }
-            
+
             switch (type) {
                 case 'contacts':
                     M.contacts();
@@ -1183,10 +1183,10 @@ function isValidShareLink()
 }
 
 function removeUInode(h) {
-    
+
     var n = M.d[h],
         i = 0;
-    
+
     // check subfolders
     if (n && n.t) {
         var cns = M.c[n.p];
@@ -1210,17 +1210,17 @@ function removeUInode(h) {
             }
             break;
         case "contacts":
-            
+
             //Clear left panel:
             $('#contact_' + h).fadeOut('slow', function() {
                 $(this).remove();
             });
-            
+
             //Clear right panel:
             $('.grid-table.contacts tr#' + h).fadeOut('slow', function() {
                 $(this).remove();
             });
-            
+
             // clear the contacts grid:
             $('.contacts-grid-view #' + h).remove();
             if (!hasItems) {
@@ -1239,10 +1239,10 @@ function removeUInode(h) {
             if (i == 0 && n) {
                 $('#treea_' + n.p).removeClass('contains-folders expanded');
             }
-            
+
             // Remove item
             $('#' + h).remove();
-            
+
             // Remove folder and subfolders
             $('#treeli_' + h).remove();
             if (!hasItems) {
@@ -1254,10 +1254,10 @@ function removeUInode(h) {
             if (i == 0 && n) {
                 $('#treea_' + n.p).removeClass('contains-folders expanded');
             }
-            
+
             // Remove item
             $('#' + h).remove();
-            
+
             // Remove folder and subfolders
             $('#treeli_' + h).remove();
             if (!hasItems) {
@@ -1658,6 +1658,7 @@ function addContactUI()
             }
 
             focusOnInput();
+            addContactAreaResizing();
         }
 
         iconSize(true);
@@ -1833,7 +1834,7 @@ function addContactUI()
 
 /**
  * Bind actions to Received Pending Conctact Request buttons
- * 
+ *
  */
 function initBindIPC() {
     DEBUG('initBindIPC()');
@@ -1861,7 +1862,7 @@ function initBindIPC() {
 
 /**
  * Bind actions to Received pending contacts requests buttons
- * 
+ *
  */
 function initBindOPC() {
     DEBUG('initBindOPC()');
@@ -2544,7 +2545,7 @@ function docreatefolderUI(e)
 /**
  * fmtopUI
  *
- * 
+ *
  */
 function fmtopUI() {
     $('.fm-clearbin-button,.fm-add-user,.fm-new-folder,.fm-file-upload,.fm-folder-upload').addClass('hidden');
@@ -2690,10 +2691,10 @@ function accountUI()
             // LITE/PRO account
             var planNum = u_attr.p;
             var planText = getProPlan(planNum);
-            
+
             $('.membership-big-txt.accounttype').text(planText);
             $('.fm-account-blocks .membership-icon.type').addClass('pro' + planNum);
-            
+
             if (account.stype == 'S')
             {
                 // subscription
@@ -2888,17 +2889,17 @@ function accountUI()
             else
                 return -1;
         });
-        
+
         $('.grid-table.purchases tr').remove();
         var html = '<tr><th>' + l[475] + '</th><th>' + l[476] + '</th><th>' + l[477] + '</th><th>' + l[478] + '</th></tr>';
-        
+
         // Render every purchase made into Purchase History on Account page
         $(account.purchases).each(function(index, purchaseTransaction)
         {
             // Set payment method
             var paymentMethodIndex = purchaseTransaction[4];
-            var paymentMethod = 'Voucher';           
-            
+            var paymentMethod = 'Voucher';
+
             if (paymentMethodIndex == 1) {
                 paymentMethod = 'PayPal';
             }
@@ -3540,9 +3541,9 @@ function accountUI()
 
     $('.cancel-account').rebind('click', function() {
         DEBUG('Cancel your account');
-        
+
         // Ask for confirmation
-        msgDialog('confirmation', 'Cancel your account', l[1974], false, function(e) {
+        msgDialog('confirmation', l[6181], l[1974], false, function(e) {
             if (e) {
                 loadingDialog.show();
                 api_req({a: 'erm', m: M.u[u_handle].m, t: 21}, {
@@ -3552,20 +3553,7 @@ function accountUI()
                             msgDialog('warningb', l[1513], l[1946]);
                         }
                         else if (res === 0) {
-                            $('.fm-dialog.reset-success .reg-success-txt').text(l[735]);
-
-                            $('.fm-dialog.reset-success .fm-dialog-button').unbind('click');
-                            $('.fm-dialog.reset-success .fm-dialog-button').bind('click', function() {
-                                $('.fm-dialog-overlay').addClass('hidden');
-                                $('body').removeClass('overlayed');
-                                $('.fm-dialog.reset-success').addClass('hidden');
-                                delete $.dialog;
-                            });
-
-                            $('.fm-dialog-overlay').removeClass('hidden');
-                            $('body').addClass('overlayed');
-                            $('.fm-dialog.reset-success').removeClass('hidden');
-                            $.dialog = 'deleteaccount';
+                            handleResetSuccessDialogs('.reset-success', l[735], 'deleteaccount');
                         }
                         else {
                             msgDialog('warningb', l[135], l[200]);
@@ -3575,7 +3563,7 @@ function accountUI()
             }
         });
     });
-    
+
     $('.fm-account-button').unbind('click');
     $('.fm-account-button').bind('click', function() {
         if ($(this).attr('class').indexOf('active') == -1) {
@@ -3624,6 +3612,24 @@ function accountUI()
         if ($(this).val() == $('#account-new-password').val())
             $('.fm-account-save-block').removeClass('hidden');
     });
+}
+
+function handleResetSuccessDialogs(dialog, txt, dlgString) {
+
+    $('.fm-dialog' + dialog + ' .reg-success-txt').text(txt);
+
+    $('.fm-dialog' + dialog + ' .fm-dialog-button').rebind('click', function() {
+        $('.fm-dialog-overlay').addClass('hidden');
+        $('body').removeClass('overlayed');
+        $('.fm-dialog' + dialog).addClass('hidden');
+        delete $.dialog;
+    });
+
+    $('.fm-dialog-overlay').removeClass('hidden');
+    $('body').addClass('overlayed');
+    $('.fm-dialog' + dialog).removeClass('hidden');
+
+    $.dialog = dlgString;
 }
 
 function acc_checkpassword(pass)
@@ -5325,7 +5331,7 @@ function contextmenuUI(e, ll, topmenu) {
 
     var m = $('.context-menu.files-menu');// container/wrapper around menu
     var t = '.context-menu.files-menu .context-menu-item';
-    
+
     // it seems that ll == 2 is used when right click is occured outside item, on empty canvas
     if (ll === 2) {
         // Enable upload item menu for clould-drive, don't show it for rubbish and rest of crew
@@ -5350,11 +5356,11 @@ function contextmenuUI(e, ll, topmenu) {
         delete items['zipdownload'];
         delete items['copy'];
         delete items['open'];
-        
+
         if (ll === 5) {
             delete items['properties'];
         }
-        
+
         for (var item in items) {
             $(t).filter('.' + item + '-item').show();
         }
@@ -5402,7 +5408,7 @@ function contextmenuUI(e, ll, topmenu) {
     }
     // This part of code is also executed when ll == 'undefined'
     var v = m.children($('.context-menu-section'));
-    
+
     // count all items inside section, and hide dividers if necessary
     v.each(function() {// hide dividers in hidden sections
         var a = $(this).find('a.context-menu-item'),
@@ -5782,7 +5788,7 @@ function treeUI()
         */
         $(window).trigger('resize');
     });
-    
+
     if (d) {
         console.timeEnd('treeUI');
     }
@@ -6228,12 +6234,12 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
         var $selectedPlan = $('.reg-st3-membership-bl.selected');
         var plan = 1;
         if($selectedPlan.is(".pro4")) { plan = 4; }
-		else if($selectedPlan.is(".pro1")) { plan = 1; }
+        else if($selectedPlan.is(".pro1")) { plan = 1; }
         else if($selectedPlan.is(".pro2")) { plan = 2; }
         else if($selectedPlan.is(".pro3")) { plan = 3; }
 
         $('.loginrequired-dialog .fm-notification-icon')
-		    .removeClass('plan1')
+            .removeClass('plan1')
             .removeClass('plan2')
             .removeClass('plan3')
             .removeClass('plan4')
@@ -6241,7 +6247,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
     }
 
     $('#msgDialog .fm-dialog-title span').text(title);
-    
+
     $('#msgDialog .fm-notification-info p').html(msg);
     if (submsg) {
         $('#msgDialog .fm-notification-warning').text(submsg);
@@ -6250,7 +6256,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
     else {
         $('#msgDialog .fm-notification-warning').hide();
     }
-    
+
     $('#msgDialog .fm-dialog-close').unbind('click');
     $('#msgDialog .fm-dialog-close').bind('click', function() {
         closeMsg();
@@ -6273,7 +6279,7 @@ function closeMsg() {
 
 function dialogScroll(s) {
     var cls = s;
-    
+
     cls += ':visible';
     $(cls).jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true});
     jScrollFade(cls);
@@ -6290,7 +6296,7 @@ function dialogPositioning(s) {
  * @param {string} n - dialog prefix (copy|move)
  * @param {string} x - html, content
  *
- * 
+ *
  */
 function handleDialogTabContent(s, m, n, x)
 {
@@ -6336,7 +6342,7 @@ function disableReadOnlySharedFolders(m)
  * @param {string} n - dialog prefix (copy|move)
  * @param {string} t - action button label
  * @param {string} i - in case of conversations tab
- * 
+ *
  */
 function handleDialogContent(s, m, c, n, t, i)
 {
@@ -6418,7 +6424,7 @@ function handleDialogContent(s, m, c, n, t, i)
 
 /**
  * Taking care about share dialog button 'Share' enabled/disabled and scroll
- * 
+ *
  *
  */
 function shareDialogContentCheck() {
@@ -6441,16 +6447,16 @@ function shareDialogContentCheck() {
 }
 
 function addShareDialogContactToContent(type, id, av_color, av, name, permClass, permText, exportLink) {
-    
+
     var html = '',
         htmlEnd = '',
         item = '';
-		exportClass = '';
+        exportClass = '';
 
-    
+
     if (exportLink) {
         item = itemExportLinkHtml(M.d[exportLink]);
-		exportClass = 'share-item-bl';
+        exportClass = 'share-item-bl';
     }
     else {
         item = '<div class="nw-contact-avatar color' + av_color + '">' + av + '</div>'
@@ -6458,14 +6464,14 @@ function addShareDialogContactToContent(type, id, av_color, av, name, permClass,
                +       '<div class="fm-chat-user">' + name + '</div>'
                +   '</div>';
     }
-    
+
     html = '<div class="share-dialog-contact-bl ' + exportClass + ' ' + type + '" id="sdcbl_' + id + '">'
            +   item
            +   '<div class="share-dialog-permissions ' + permClass + '">'
            +       '<span></span>' + permText
            +   '</div>';
 
-    
+
     htmlEnd = '     <div class="share-dialog-remove-button"></div>'
               + '   <div class="clear"></div>'
               + '</div>';
@@ -6474,7 +6480,7 @@ function addShareDialogContactToContent(type, id, av_color, av, name, permClass,
 }
 
 function fillShareDialogWithContent() {
-    
+
     $.sharedTokens = [];// GLOBAL VARIABLE, Hold items currently visible in share folder content (above multi-input)
     var user, email, name, shareRights, html,
         selectedNodeHandle = $.selected[0],
@@ -6497,7 +6503,7 @@ function fillShareDialogWithContent() {
 
                     generateShareDialogRow(name, email, shareRights, userHandle);
             }
-            
+
             // Item export link
             if (userHandle === 'EXP' && M.d[selectedNodeHandle].ph) {
 //                html = generateExportLinkShareDialogRow();
@@ -6533,7 +6539,7 @@ function fillShareDialogWithContent() {
  * @param {String} userHandle Optional
  */
 function generateShareDialogRow(displayNameOrEmail, email, shareRights, userHandle) {
-    
+
     var rowId = '',
         html = '',
         av_color = displayNameOrEmail.charCodeAt(0) % 6 + displayNameOrEmail.charCodeAt(1) % 6,
@@ -6779,7 +6785,7 @@ function initShareDialog() {
      *
      * @param {email} item
      * @param {array} perm, permission class and text
-     * 
+     *
      */
     function determineContactParams(item, perm) {
         var email = item;// email address
@@ -6894,19 +6900,19 @@ function initShareDialog() {
 
         var userEmail, pendingContactId,
             handleOrEmail = $this.parent().attr('id').replace('sdcbl_', '');
-        
+
         $this.parent()
             .fadeOut(200)
             .remove();
 
         var selectedNodeHandle = $.selected[0];
         if (handleOrEmail !== '') {
-            
+
             // Export link
             if (handleOrEmail === 'EXP') {
                 // The s2 api call can remove both shares and pending shares
                 api_req({a: 's2', n:  selectedNodeHandle, s: [{ u: handleOrEmail, r: ''}], ha: '', i: requesti});
-                
+
                 M.delNodeShare(selectedNodeHandle, 'EXP');
                 M.deleteExportLinkShare(selectedNodeHandle);
             }
@@ -7684,35 +7690,35 @@ function getclipboardlinks()
 }
 
 function getclipboardkeys() {
-    
+
     var n, key,
         l = '';
-    
+
     for (var i in M.links) {
         n = M.d[M.links[i]];
-        
+
         if (n.t) {
             key = u_sharekeys[n.h];
         }
         else {
             key = n.key;
         }
-        
+
         l += a32_to_base64(key) + '\n';
     }
-    
+
     return l;
 }
 
 /**
  * itemExportLinkHtml
- * 
+ *
  * @param {object} item
- * 
+ *
  * @returns {string}
  */
 function itemExportLinkHtml(item) {
-    
+
     var fileUrlWithoutKey, fileUrlWithKey, fileUrl, key, type, fileSize,
         html = '';
 
@@ -7733,7 +7739,7 @@ function itemExportLinkHtml(item) {
     fileUrlWithoutKey = getBaseUrl() + '/#' + type + '!' + htmlentities(item.ph);
     fileUrlWithKey = fileUrlWithoutKey + (key ? '!' + a32_to_base64(key) : '');
     fileUrl = window.getLinkState === false ? fileUrlWithoutKey : fileUrlWithKey;
-    
+
     html = '<div class="export-link-item">'
          +      '<div class="export-icon ' + fileicon(item.ph) + '" ></div>'
          +      '<div class="export-link-text-pad">'
@@ -7747,53 +7753,61 @@ function itemExportLinkHtml(item) {
          +          '<span class="file-link-with-key hidden">' + fileUrlWithKey + '</span>'
          +      '</div>'
          +  '</div>';
-    
-    return html;    
+
+    return html;
 }
 
 /**
  * generates file url for shared item
- * 
+ *
  * @returns {string}
  */
-function itemExportLink() {
-    
-    var n,
-        html = '';
-    
-        for (var i in M.links) {
-            n = M.d[M.links[i]];
+function itemExportLink(out) {
 
-            if (n && n.ph) {
-                html += itemExportLinkHtml(n);
-            }
+    var n, html = '', phf = {};
+
+    for (var i in M.links) {
+        n = M.d[M.links[i]];
+
+        if (n && n.ph) {
+            html += itemExportLinkHtml(n);
+            phf[n.ph] = n.name;
         }
-    
+    }
+
+    if (out) {
+        out.value = phf;
+    }
+
     return html;
 }
 
 function linksDialog(close) {
-    
-    var html = '',
+
+    var html = '', phf = {},
         scroll = '.export-link-body';
-    
+
     deleteScrollPanel(scroll, 'jsp');
     if (close) {
         $.dialog = false;
         fm_hideoverlay();
         $('.fm-dialog.export-links-dialog').addClass('hidden');
         $('.export-links-warning').addClass('hidden');
+        if (window.onCopyEventHandler) {
+            document.removeEventListener('copy', window.onCopyEventHandler, false);
+            delete window.onCopyEventHandler;
+        }
         return true;
     }
 
     $.dialog = 'links';
-    
-    html = itemExportLink();
-    
+
+    html = itemExportLink(phf);
+
     $('.export-links-warning-close').rebind('click', function() {
         $('.export-links-warning').addClass('hidden');
     });
-    
+
     $('.export-links-dialog .fm-dialog-close').rebind('click', function() {
         linksDialog(1);
     });
@@ -7807,7 +7821,7 @@ function linksDialog(close) {
         // chrome & firefox extension:
         $("#clipboardbtn1").unbind('click');
         $("#clipboardbtn1").bind('click', function() {
-            
+
             if (is_chrome_firefox) {
                 mozSetClipboard(getclipboardlinks());
             }
@@ -7817,10 +7831,10 @@ function linksDialog(close) {
                 document.execCommand('copy');
             }
         });
-        
+
         $('#clipboardbtn2').unbind('click');
         $('#clipboardbtn2').bind('click', function() {
-            
+
             if (is_chrome_firefox) {
                 mozSetClipboard(getclipboardkeys());
             }
@@ -7830,8 +7844,8 @@ function linksDialog(close) {
                 document.execCommand('copy');
             }
         });
-        $('#clipboardbtn1').text(l[370]);
-        $('#clipboardbtn2').text(l[1033]);
+        $('#clipboardbtn1 span').text(l[370]);
+        $('#clipboardbtn2 span').text(l[1033]);
     }
     else if (flashIsEnabled()) {
         $('#clipboardbtn1 span').html(htmlentities(l[370]) + '<object data="OneClipboard.swf" id="clipboardswf1" type="application/x-shockwave-flash"  width="100%" height="32" allowscriptaccess="always"><param name="wmode" value="transparent"><param value="always" name="allowscriptaccess"><param value="all" name="allowNetworkin"><param name=FlashVars value="buttonclick=1" /></object>');
@@ -7839,16 +7853,16 @@ function linksDialog(close) {
 
         $('#clipboardbtn1').unbind('mouseover');
         $('#clipboardbtn1').bind('mouseover', function() {
-            
+
             var e = $('#clipboardswf1')[0];
             if (e && e.setclipboardtext) {
                 e.setclipboardtext(getclipboardlinks());
             }
         });
-        
+
         $('#clipboardbtn2').unbind('mouseover');
         $('#clipboardbtn2').bind('mouseover', function() {
-            
+
             var e = $('#clipboardswf2')[0];
             if (e && e.setclipboardtext) {
                 e.setclipboardtext(getclipboardkeys());
@@ -7856,9 +7870,60 @@ function linksDialog(close) {
         });
     }
     else {
-        // Hide the clipboard buttons if not using the extension and Flash is disabled
-        $('#clipboardbtn1').addClass('hidden');
-        $('#clipboardbtn2').addClass('hidden');
+        var uad = browserdetails(ua);
+
+        if (uad.icon === 'ie.png' && window.clipboardData) {
+            $('#clipboardbtn1').rebind('click', function() {
+                var links = $.trim(getclipboardlinks());
+                var mode = links.indexOf("\n") !== -1 ? 'Text' : 'URL';
+                window.clipboardData.setData(mode, links);
+            });
+            $('#clipboardbtn2').rebind('click', function() {
+                window.clipboardData.setData('Text', getclipboardkeys());
+            });
+        }
+        else {
+            Later(function() {
+                $('input.export-link-url').focus().click();
+            });
+
+            if (window.ClipboardEvent) {
+                $('#clipboardbtn1, #clipboardbtn2').rebind('click', function() {
+                    var doLinks = ($(this).attr('id') === 'clipboardbtn1');
+                    var links = $.trim(doLinks ? getclipboardlinks() : getclipboardkeys());
+                    var $span = $(this).find('span');
+
+                    window.onCopyEventHandler = function onCopyEvent(ev) {
+                        if (d) console.log('onCopyEvent', arguments);
+                        ev.clipboardData.setData('text/plain', links);
+                        if (doLinks) {
+                            ev.clipboardData.setData('text/html', links.split("\n").map(function(link) {
+                                return '<a href="' + link + '">'
+                                    + phf.value[link.match(/#F?!([\w-]{8})/).pop()]
+                                    + '</a>';
+                            }).join("<br/>\n"));
+                        }
+                        ev.preventDefault();
+                        $span.text(l[726]); // Done
+                    };
+                    document.addEventListener('copy', window.onCopyEventHandler, false);
+                    Soon(function() {
+                        $('input.export-link-url').focus().click();
+                        // var ev = new ClipboardEvent('copy', { dataType: 'text/plain', data: links });
+                        // document.dispatchEvent(ev);
+                        $span.text('Hit ' + (uad.os === 'Apple' ? 'cmd':'ctrl') + '-c');
+                    });
+                });
+            }
+            else {
+                // Hide the clipboard buttons if not using the extension and Flash is disabled
+                $('#clipboardbtn1').addClass('hidden');
+                $('#clipboardbtn2').addClass('hidden');
+            }
+        }
+
+        $('#clipboardbtn1 span').text(l[370]);
+        $('#clipboardbtn2 span').text(l[1033]);
     }
 
     // On Export File Links and Decryption Keys dialog
@@ -7883,25 +7948,31 @@ function linksDialog(close) {
             window.getLinkState = !!data;
         }
     });
-    
+
     if (typeof window.getLinkState === 'undefined') {
         $('.export-checkbox').removeClass('off').addClass('on');
     }
-    
+
     $('.export-links-dialog').addClass('file-keys-view');
     $('.export-links-dialog .export-link-body').html(html);
-    
+
     fm_showoverlay();
-    
+
     $('.export-links-warning').removeClass('hidden');
     $('.fm-dialog.export-links-dialog').removeClass('hidden');
     $('.export-link-body').removeAttr('style');
-    
+
     if ($('.export-link-body').outerHeight() === 384) {// ToDo: How did I find this integer?
         $('.export-link-body').jScrollPane({showArrows: true, arrowSize: 5});
         jScrollFade('.export-link-body');
     }
     $('.fm-dialog.export-links-dialog').css('margin-top', $('.fm-dialog.export-links-dialog').outerHeight() / 2 * - 1);
+
+    setTimeout(function() {
+        $('input.export-link-url').rebind('click', function() {
+            $(this).select();
+        });
+    }, 30);
 }
 
 function refreshDialogContent() {
@@ -7955,7 +8026,7 @@ function createfolderDialog(close)
     });
     $('.create-folder-dialog input').unbind('keypress');
     $('.create-folder-dialog input').bind('keypress', function(e) {
-        
+
         if (e.which === 13 && $(this).val() !== '') {
             if (!$.cftarget) {
                 $.cftarget = M.currentdirid;
@@ -7964,7 +8035,7 @@ function createfolderDialog(close)
             createfolderDialog(1);
         }
     });
-    
+
     $('.create-folder-dialog .fm-dialog-close, .create-folder-button-cancel.dialog').unbind('click');
     $('.create-folder-dialog .fm-dialog-close, .create-folder-button-cancel.dialog').bind('click', function()
     {
@@ -7981,9 +8052,9 @@ function createfolderDialog(close)
 
     $('.fm-dialog-new-folder-button').unbind('click');
     $('.fm-dialog-new-folder-button').bind('click', function() {
-        
+
         var v = $('.create-folder-dialog input').val();
-        
+
         if (v == '' || v == l[157]) {
             alert(l[1024]);
         }
@@ -7995,9 +8066,9 @@ function createfolderDialog(close)
             createfolderDialog(1);
         }
     });
-    
+
     fm_showoverlay();
-    
+
     $('.fm-dialog.create-folder-dialog').removeClass('hidden');
     $('.create-folder-input-bl input').focus();
     $('.create-folder-dialog').removeClass('active');
@@ -8083,10 +8154,8 @@ function firefoxDialog(close)
     });
 }
 
-function browserDialog(close)
-{
-    if (close)
-    {
+function browserDialog(close) {
+    if (close) {
         $.dialog = false;
         fm_hideoverlay();
         $('.fm-dialog.browsers-dialog').addClass('hidden');
@@ -8096,29 +8165,27 @@ function browserDialog(close)
     $.dialog = 'browser';
     fm_showoverlay();
     $('.fm-dialog.browsers-dialog').removeClass('hidden');
-    $('.browsers-dialog .browsers-button,.browsers-dialog .fm-dialog-close').unbind('click')
-    $('.browsers-dialog .browsers-button,.browsers-dialog .fm-dialog-close').bind('click', function()
-    {
+
+    $('.browsers-dialog .browsers-button,.browsers-dialog .fm-dialog-close').rebind('click', function() {
         browserDialog(1);
     });
+
     $('#browsers-checkbox').unbind('click');
-    $('#browsers-checkbox').bind('click', function()
-    {
-        if ($(this).attr('class').indexOf('checkboxOn') == -1)
-        {
+    $('#browsers-checkbox').bind('click', function() {
+        if ($(this).attr('class').indexOf('checkboxOn') == -1) {
             localStorage.browserDialog = 1;
             $(this).attr('class', 'checkboxOn');
             $(this).parent().attr('class', 'checkboxOn');
             $(this).attr('checked', true);
         }
-        else
-        {
+        else {
             delete localStorage.chromeDialog;
             $(this).attr('class', 'checkboxOff');
             $(this).parent().attr('class', 'checkboxOff');
             $(this).attr('checked', false);
         }
     });
+
     $('.browsers-top-icon').removeClass('ie9 ie10 safari');
     var bc, bh, bt;
     if ('-ms-scroll-limit' in document.documentElement.style && '-ms-ime-align' in document.documentElement.style)
@@ -8686,7 +8753,7 @@ function slideshow(id, close)
     });
 
     $('.slideshow-download').rebind('click', function() {
-        
+
         for (var i in dl_queue) {
             if (dl_queue[i] && dl_queue[i].id === slideshowid) {
                 dl_queue[i].preview = false;
@@ -8698,7 +8765,7 @@ function slideshow(id, close)
     });
 
     $('.slideshow-getlink').rebind('click', function() {
-        
+
         if (u_type === 0) {
             ephemeralDialog(l[1005]);
         }
@@ -9112,7 +9179,7 @@ function fm_resize_handler() {
 }
 
 function sharedfolderUI() {
-    
+
     var c,
         n = M.d[M.currentdirid],
         r = false;

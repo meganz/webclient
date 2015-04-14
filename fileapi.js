@@ -192,10 +192,33 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 				return this.blob(aStart,aEnd-aStart);
 			}
 		};
-		mozRunAsync(function() {
+		var __done = function() {
 			aCallback(file);
-			file = undefined;
-		});
+			__done = file = undefined;
+		};
+		var nop = true;
+		if (aFile.fileSize === 0) {
+			// If this is a junction, try to get the real size
+			try {
+				OS.File.stat(aFile.path)
+					.then(function statSucceed(aInfo) {
+						if (ASSERT(!aInfo.isDir, 'Stat operation performed over directory')) {
+							file.size = +aInfo.size | 0;
+						}
+						if (d) console.log('Stat.fileSize', file.size, aInfo);
+						__done();
+					}, function statFailed() {
+						mozError(arguments);
+						__done();
+					});
+				nop = false;
+			} catch(e) {
+				mozError(e);
+			}
+		}
+		if (nop) {
+			mozRunAsync(__done);
+		}
 	};
 
 	this.readEntries = function(aCallback)

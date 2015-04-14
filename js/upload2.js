@@ -41,7 +41,7 @@ function ul_completepending2(res,ctx)
 		newnodes = [];
 		process_f(res.f);
 		rendernew();
-		fm_thumbnails();
+		if (M.viewmode) fm_thumbnails();
 		if (ctx.faid) api_attachfileattr(n.h,ctx.faid);
 		onUploadSuccess(ul_queue[ctx.ul_queue_num],n.h,ctx.faid);
 		ctx.file.ul_failed = false;

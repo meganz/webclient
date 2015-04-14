@@ -12,7 +12,7 @@ function getProPlan(planNum) {
         case 3:
             return l[6126];     // PRO III
         case 4:
-            return 'LITE';      // l[6234] (when strings generated)
+            return l[6234];     // LITE
         default:
             return l[435];      // FREE
     }

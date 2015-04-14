@@ -7,22 +7,6 @@ var pro_package,
     membershipPlans = [],
     selectedProPackage = [];
 
-// Payment gateways, hardcoded for now, will call API in future to get list
-var gatewayOptions = [{   
-    apiGatewayId: 4,
-    displayName: 'Bitcoin',
-    supportsRecurring: false,
-    cssClass: 'bitcoin',
-    providerName: 'Bitcoin'
-},
-{
-    apiGatewayId: null,
-    displayName: 'Prepaid balance',
-    supportsRecurring: false,
-    cssClass: 'prepaid-balance',
-    providerName: 'Prepaid balance'
-}];
-
 function init_pro()
 {
 	if (localStorage.keycomplete) {
@@ -150,6 +134,21 @@ function populateMembershipPlans() {
  */
 function loadPaymentGatewayOptions() {
     
+    // Payment gateways, hardcoded for now, will call API in future to get list
+    var gatewayOptions = [{   
+        apiGatewayId: 4,
+        displayName: l[6802],           // Bitcoin
+        supportsRecurring: false,
+        cssClass: 'bitcoin',
+        providerName: l[6802]
+    },
+    {
+        apiGatewayId: null,
+        displayName: l[504],            // Prepaid balance
+        supportsRecurring: false,
+        cssClass: 'prepaid-balance',
+        providerName: l[504]
+    }];
     var html = '';
     
     // Loop through gateway providers (change to use list from API soon)
@@ -322,14 +321,14 @@ function renderPlanDurationDropDown() {
             // Get the price and number of months duration
             var price = currentPlan[5];
             var numOfMonths = currentPlan[4];
-            var monthsWording = '1 month';            
+            var monthsWording = l[922];     // 1 month        
 
             // Change wording depending on number of months
             if (numOfMonths === 12) {
-                monthsWording = '1 year';
+                monthsWording = l[923];     // 1 year
             }
             else if (numOfMonths > 1) {
-                monthsWording = numOfMonths + ' months';
+                monthsWording = l[6803].replace('%1', numOfMonths);     // x months
             }
 
             // Build select option
@@ -364,8 +363,8 @@ function pro_continue(e)
 	pro_paymentmethod = '';
     
     // Check if prepaid balance method is selected
-    var prepaidmethodSelected = $('#prepaid-balance').attr('checked');
-        prepaidmethodSelected = (prepaidmethodSelected === 'checked') ? true : false;
+    var prepaidMethodSelected = $('#prepaid-balance').attr('checked');
+        prepaidMethodSelected = (prepaidMethodSelected === 'checked') ? true : false;
     
 	if (u_type === false)
 	{
@@ -377,18 +376,21 @@ function pro_continue(e)
 			pro_pay();
             
 		}}, true);
-	}    
-    else if (prepaidmethodSelected && (parseFloat(pro_balance) < parseFloat(selectedPlanPrice))) {
-        msgDialog('warninga', 'Insufficient balance', 'You have insufficient funds to make this purchase. Please top up with a voucher or choose another payment method.', false, false);
+	}
+    
+    // Warn them about insufficient funds
+    else if (prepaidMethodSelected && (parseFloat(pro_balance) < parseFloat(selectedPlanPrice))) {
+        msgDialog('warninga', l[6804], l[6805], false, false);
     }
-	else if (prepaidmethodSelected && (parseFloat(pro_balance) >= parseFloat(selectedPlanPrice))) {
-		
-        // Ask for confirmation to use the prepaid funds
+    
+    // Ask for confirmation to use their prepaid funds
+	else if (prepaidMethodSelected && (parseFloat(pro_balance) >= parseFloat(selectedPlanPrice))) {
+        
         msgDialog('confirmation', l[504], l[5844], false, function(event) {
 			if (event) {
                 pro_paymentmethod = 'pro_prepaid';
                 pro_pay();
-            }	
+            }
 		});
 	}
 	else {
@@ -500,7 +502,7 @@ function showBitcoinInvoice(apiResponse) {
     var invoiceDateTime = new Date(apiResponse.created);    
     var proPlanNum = selectedProPackage[1];
     var planName = getProPlan(proPlanNum);
-    var planMonths = selectedProPackage[4] + ' month purchase';
+    var planMonths = l[6806].replace('%1', selectedProPackage[4]);  // x month purchase
     var priceEuros = selectedProPackage[5] + '<span>&euro;</span>';
     var priceBitcoins = apiResponse.amount;
     var expiryTime = new Date(apiResponse.expiry);
@@ -1284,10 +1286,11 @@ var showSignupPromptDialog = function() {
 
     var $selectedPlan = $('.reg-st3-membership-bl.selected');
     var plan = 1;
-    if($selectedPlan.is(".lite")) { plan = 1; }
-	else if($selectedPlan.is(".pro1")) { plan = 2; }
-    else if($selectedPlan.is(".pro2")) { plan = 3; }
-    else if($selectedPlan.is(".pro3")) { plan = 4; }
+    
+    if ($selectedPlan.is(".lite")) { plan = 1; }
+	else if ($selectedPlan.is(".pro1")) { plan = 2; }
+    else if ($selectedPlan.is(".pro2")) { plan = 3; }
+    else if ($selectedPlan.is(".pro3")) { plan = 4; }
 
     $('.loginrequired-dialog .fm-notification-icon')
         .removeClass('plan1')

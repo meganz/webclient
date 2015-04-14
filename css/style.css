@@ -5684,7 +5684,7 @@ table .grid-status-icon.star {
 	left: 3px;
     top: 2px;
 }
-.link-exists .link-icon {
+.linked .link-icon {
 	display:block;
 }
 .fm-blocks-view, .fm-contacts-blocks-view, .fm-blocks-view.shared-view, .shared-details-block, .shared-blocks-view, .fm-blocks-view.contacts-view, .contacts-details-block, .contacts-blocks-view {

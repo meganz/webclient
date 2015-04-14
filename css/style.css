@@ -9788,7 +9788,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
     top: 358px;
     width: 223px;
 }
-.fm-dialog.bitcoin-invoice-dialog .price-expired-instruction a {
+.fm-dialog.bitcoin-invoice-dialog .price-expired-instruction span {
     font-weight: bold;
     text-transform: uppercase;
 }
@@ -9930,7 +9930,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
     margin: 25px 50px 35px;
     text-align: center;
 }
-.fm-dialog.bitcoin-provider-failure-dialog .instruction a {
+.fm-dialog.bitcoin-provider-failure-dialog .instruction span {
     color: #696969;
     font-weight: bold;
     text-transform: uppercase;

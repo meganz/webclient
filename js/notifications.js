@@ -770,7 +770,7 @@ var notifyPopup = {
     },
     
     /**
-     * Process payment notification sent from payment provider e.g. Coinify
+     * Process payment notification sent from payment provider e.g. Bitcoin
      * To test run: addNotification({'a':'psts', 'p':4, 'r':'f'})
      * @param {Object} notification The action packet {'a':'psts', 'p':<prolevel>, 'r':<s for success or f for failure>}
      */
@@ -785,7 +785,7 @@ var notifyPopup = {
         var type = 'proPayment';
         
         if (success) {
-            message = 'Your payment was received and your account is now on the ' + proPlan + ' plan.';
+            message = 'Your payment for the ' + proPlan + ' plan was received.';
         }
 
         return notifyPopup.getNotificationHtml(notification.id, type, message, timestamp, notification.read, null);

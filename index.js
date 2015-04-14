@@ -1340,20 +1340,15 @@ function topmenuUI() {
                 $('.membership-popup .membership-main-block').show();
                 
                 if (u_attr.p) {
-                    $('.membership-popup.pro-popup .membership-icon').addClass('pro' + u_attr.p);
+                    var planNum = u_attr.p;
+                    var planName = getProPlan(planNum);
+                    
+                    $('.membership-popup.pro-popup .membership-icon').addClass('pro' + planNum);
                     var p = account.stype == 'S' ? '' :
                         (l[987] + ' <span class="red">' + time2date(account.expiry) + '</span>');
                     $('.membership-popup.pro-popup .membership-icon-txt-bl .membership-medium-txt').html(p);
                     
-                    var planName = '';
-                    
                     // Update current plan to PRO I, PRO II, PRO III or LITE in popup
-                    if (u_attr.p <= 3) {
-                        planName = 'PRO ' + Array(+u_attr.p + 1 | 0).join("I");
-                    }
-                    else if (u_attr.p === 4) {
-                        planName = 'LITE';
-                    }
                     $('.membership-icon-pad .membership-big-txt.red').text(planName);
                 }
                 else {

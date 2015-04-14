@@ -2,8 +2,17 @@ window.URL = window.URL || window.webkitURL;
 var have_ab = typeof ArrayBuffer != 'undefined' && typeof DataView != 'undefined';
 var use_workers = have_ab && typeof Worker != 'undefined';
 
-if (is_extension || +localStorage.use_ssl === 0) {
+if (is_extension && typeof localStorage.use_ssl === 'undefined') {
+	localStorage.use_ssl = 0;
+}
+
+// if (is_extension || +localStorage.use_ssl === 0) {
+if (is_chrome_firefox) {
     var use_ssl = 0;
+}
+else if (+localStorage.use_ssl === 0) {
+    var use_ssl = (navigator.userAgent.indexOf('Chrome/') !== -1
+		&& parseInt(navigator.userAgent.split('Chrome/').pop()) > 40) ? 1:0;
 }
 else {
     if ((navigator.appVersion.indexOf('Safari') > 0) && (navigator.appVersion.indexOf('Version/5') > 0)) {
@@ -57,7 +66,7 @@ function ssl_needed() {
     var ssl_off = ['Firefox/14', 'Firefox/15', 'Firefox/17', 'Safari', 'Firefox/16'];
     for (var i = ssl_opt.length; i--;) {
         if (navigator.userAgent.indexOf(ssl_opt[i]) >= 0) {
-            return 0;
+            return parseInt(navigator.userAgent.split(ssl_opt[i]).pop()) > 40;
         }
     }
     for (var i = ssl_off.length; i--;) {

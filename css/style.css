@@ -6436,9 +6436,13 @@ table {
 .dragger-icon.folder-shared, .new-download-file-icon.folder-shared, .share-folder-icon div.folder-shared {
 	background-position: center -4614px;
 }
-.export-icon.folder-shared, .export-icon.folder {
-	background-image: url(../images/mega/dialogs-sprite_v2.svg);
-	background-position: -10px -2680px;
+.export-icon.folder-shared {
+	background-position: center -4613px;
+	margin: 5px 15px;
+}
+.export-icon.folder {
+	background-position: center -4533px;
+	margin: 5px 15px;
 }
 .dragger-icon.flash, .export-icon.flash, .new-download-file-icon.flash, .share-folder-icon div.flash {
 	background-position: center -4694px;
@@ -10998,14 +11002,13 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	-khtml-user-select: none;
 	-moz-user-select: none;
 	-ms-user-select: none;
-	padding: 8px 0 0 0;
-	height: 74px;
+	padding: 3px 0 0 0;
 }
 .export-icon {
-	height: 62px;
-	width: 54px;
+	height: 60px;
+	width: 60px;
 	float: left;
-	margin: 0 15px;
+	margin: 5px 12px;
 	background-repeat: no-repeat;
 	background-image: url(../images/mega/files-icons_v2.svg);
 	background-position: 0 0;
@@ -21019,9 +21022,11 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
 	float: left;
 	display: block;
 	width: 259px;
+	height: 74px;
+	padding-top:8px;
 }
 .share-item-bl .export-icon {
-	margin: 0 14px 0 8px;
+	margin: 0 10px 0 4px;
 }
 .share-item-bl .export-link-text-pad {
 	width: 170px;

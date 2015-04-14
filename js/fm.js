@@ -7728,7 +7728,6 @@ function itemExportLinkHtml(item) {
         key = u_sharekeys[item.h];
         fileSize = '';
     }
-
     // Shared item type is file
     else {
         type = '';
@@ -7739,9 +7738,8 @@ function itemExportLinkHtml(item) {
     fileUrlWithoutKey = getBaseUrl() + '/#' + type + '!' + htmlentities(item.ph);
     fileUrlWithKey = fileUrlWithoutKey + (key ? '!' + a32_to_base64(key) : '');
     fileUrl = window.getLinkState === false ? fileUrlWithoutKey : fileUrlWithKey;
-
     html = '<div class="export-link-item">'
-         +      '<div class="export-icon ' + fileicon(item.ph) + '" ></div>'
+         +      '<div class="export-icon ' + fileicon(item) + '" ></div>'
          +      '<div class="export-link-text-pad">'
          +          '<div class="export-link-txt">'
          +               htmlentities(item.name) + ' <span class="export-link-gray-txt">' + fileSize + '</span>'
@@ -7811,7 +7809,7 @@ function linksDialog(close) {
     $('.export-links-dialog .fm-dialog-close').rebind('click', function() {
         linksDialog(1);
     });
-
+	
     // Setup the copy to clipboard buttons
     if (is_extension) {
         if (!is_chrome_firefox) {

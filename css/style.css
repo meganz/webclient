@@ -3765,7 +3765,7 @@ label.iPhoneCheckLabelOff span {
 	height: 24px;
 	left: 10px;
 	top: 10px;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-position: -1px -3035px;
 	background-repeat: no-repeat;
 }
@@ -3968,7 +3968,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 	cursor: default;
 }
 .nw-fm-tree-item.contains-folders .nw-fm-arrow-icon {
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	background-position: center -845px;
 	cursor: pointer;
@@ -3992,7 +3992,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 	line-height: 23px;
 	color: #666666;
 	height: 24px;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-position: -15px -7465px;
 	background-repeat: no-repeat;
 	-o-text-overflow: ellipsis;
@@ -4086,7 +4086,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 }
 .fm-add-user-scrolling .nw-contact-item {
 	padding-right: 32px;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-position: right -2907px;
 	background-repeat: no-repeat;
 }
@@ -4111,7 +4111,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 	margin: 12px;
 	border: 2px solid #d9d9d9;
 	padding: 0 10px 0 32px;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-position: -10px -2969px;
 	background-repeat: no-repeat;
 	-moz-border-radius: 5px;
@@ -4128,7 +4128,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 	color: #868686;
 }
 .verified .nw-contact-verified-icon {
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-position: -19px -2827px;
 	background-repeat: no-repeat;
 	position: absolute;
@@ -4263,7 +4263,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 	position: absolute;
 	width: 16px;
 	height: 16px;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	z-index: 10;
 	background-position: -11px -2244px;
 	-webkit-box-sizing: border-box;
@@ -4342,7 +4342,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 	position: absolute;
 	right: 2px;
 	top: 0;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	background-position: -12px -752px;
 	cursor: pointer;
@@ -4456,7 +4456,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	width: 48px;
 	position: absolute;
 	left: 1px;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	background-position: center -581px;
 	cursor: pointer;
@@ -5183,7 +5183,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	display: block;
 }
 .nw-fm-search-icon {
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	background-position: -11px -7881px;
 	position: absolute;
@@ -5218,7 +5218,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 .nw-fm-left-icon {
 	width: 48px;
 	height: 48px;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	cursor: pointer;
 	-webkit-box-sizing: border-box;
@@ -5317,7 +5317,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	position: absolute;
 	top: 48px;
 	width: 36px;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	background-position: center -10008px;
 }
@@ -5407,7 +5407,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 .rubbish-bin-icon, .settings-icon {
 	height: 48px;
 	width: 48px;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	background-position: 0 -188px;
 	cursor: pointer;
@@ -5484,7 +5484,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	-webkit-border-radius: 20px;
 	border-radius: 20px;
 	font-size: 11px;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	background-position: 1px -3916px;
 	cursor: default;
@@ -5501,7 +5501,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	float: right;
 	height: 25px;
 	width: 22px;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	background-position: -8px -4002px;
 	margin: 11px 12px 0 0;
@@ -5590,7 +5590,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	height: calc(100% - 303px);
 }
 .files-grid-view th, .contacts-grid-view th, .grid-table-header th, .transfer-table-header th, .grid-table th, .files-grid-view.shared-view th, .files-grid-view.contacts-view th, .shared-grid-view th {
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	background-position: right -1529px;
 }
@@ -5604,7 +5604,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	height: 24px;
 	width: 30px;
 	display: block;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	background-position: -7px -1469px;
 }
@@ -5651,7 +5651,7 @@ th.grid-first-th {
 	height: 24px;
 	width: 25px;
 	display: block;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	background-position: -7px -1494px;
 }
@@ -5659,7 +5659,7 @@ th.grid-first-th {
 	background-image: none;
 }
 .file-status-icon.star, .contact-status-icon.star, .grid-status-icon.star, .link-icon {
-	background-image: url(../images/mega/register-big-sprite-v2.png);
+	background-image: url(../images/mega/register-big-sprite-v3.png);
 	background-repeat: no-repeat;
 	background-position: -69px -963px;
 }
@@ -5886,7 +5886,7 @@ table .grid-status-icon.star {
 	z-index: 10;
 }
 .grid-url-arrow span, .file-settings-icon span {
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	background-position: -17px -7787px;
 	-webkit-transition: opacity 200ms ease-in-out;
@@ -6087,7 +6087,7 @@ table {
 	background-position: -61px -1196px;
 }
 .transfer-filtype-icon.folder, .search-path-icon-span.folder, .transfer-filtype-icon.folder-shared, .search-path-icon-span.folder-shared {
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-position: -14px -7465px;
 	background-repeat: no-repeat;
 }
@@ -6818,7 +6818,7 @@ table {
 	line-height: 23px;
 	padding: 0 0 0 24px;
 	white-space: nowrap;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	display: block;
 }
@@ -6907,7 +6907,7 @@ table {
 	-moz-opacity: 0.5;
 	-khtml-opacity: 0.5;
 	opacity: 0.5;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	background-position: 5px -1003px;
 	cursor: pointer;
@@ -6948,7 +6948,7 @@ table {
 	opacity: 0.7;
 }
 .fm-breadcrumbs.has-next-button, a.fm-breadcrumbs.has-next-button, .fm-share-breadcrumbs.has-next-button, a.fm-share-breadcrumbs.has-next-button {
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	background-position: right -1433px;
 }
@@ -6956,7 +6956,7 @@ table {
 	line-height: 23px;
 	color: #777777;
 	font-size: 12px;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	background-position: 5px -1003px;
 	cursor: pointer;
@@ -6999,7 +6999,7 @@ table {
 	font-size: 12px;
 	color: #333333;
 	padding: 0 20px 0 22px;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	background-position: -2px -3304px;
 	float: right;
@@ -7137,7 +7137,7 @@ table {
 	line-height: 23px;
 	color: #777777;
 	padding: 0 10px 0 30px;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	background-position: -1px -8510px;
 	text-align: center;
@@ -7453,7 +7453,7 @@ table {
 	display: block;
 	float: right;
 	margin: 15px 10px 0 23px;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	-webkit-transition: opacity 200ms ease-in-out;
 	-moz-transition: opacity 200ms ease-in-out;
@@ -7703,7 +7703,7 @@ table {
 	cursor: pointer;
 }
 .context-menu-item.contains-submenu {
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-position: right -4593px;
 	background-repeat: no-repeat;
 }
@@ -7801,7 +7801,7 @@ table {
 	width: 25px;
 	height: 13px;
 	position: absolute;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-position: center -5891px;
 	background-repeat: no-repeat;
 	margin: 25px 0 0 -12px;
@@ -7838,7 +7838,7 @@ table {
 	display: block !important;
 }
 .create-folder-size-icon, .add-user-size-icon {
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-position: center -5509px;
 	background-repeat: no-repeat;
 	width: 20px;
@@ -8114,7 +8114,7 @@ color: white;
 	width: 18px;
 	height: 18px;
 	position: absolute;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	margin: 20px 0 0 -22px;
 }
@@ -8281,7 +8281,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 	width: 16px;
 	height: 16px;
 	float: right;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	background-position: -13px -6439px;
 	margin: 16px -3px 0 0;
@@ -8437,7 +8437,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
 	height: 16px;
 	width: 16px;
 	margin: 0 auto;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	background-position: center -6763px;
 	-webkit-transition: all 200ms ease-in-out;
@@ -8559,7 +8559,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	height: 25px;
 	float: left;
 	margin: 12px 0 0 9px;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	background-position: -13px -6484px;
 }
@@ -8578,7 +8578,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	width: 16px;
 	height: 8px;
 	position: absolute;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	background-position: center -7239px;
 	left: -8px;
@@ -8674,7 +8674,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	right: 50%;
 	top: -12px;
 	margin-right: -13px;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-position: center -5890px;
 	background-repeat: no-repeat;
 }
@@ -8711,7 +8711,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	float: right;
 }
 .star .fm-chat-user-star {
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-position: -7px -2205px;
 	background-repeat: no-repeat;
 }
@@ -9031,7 +9031,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	height: 27px;
 	margin: 10px 12px 0 10px;
 	background-position: 1px -2417px;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	cursor: pointer;
 	-webkit-transition: all 200ms ease-in-out;
@@ -9060,7 +9060,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	position: relative;
 }
 .nw-chat-message-icon {
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-position: 0 -2460px;
 	background-repeat: no-repeat;
 	width: 26px;
@@ -9233,7 +9233,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	position: absolute;
 	right: 12px;
 	top: 14px;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	background-position: 6px -2771px;
 	cursor: pointer;
@@ -9256,7 +9256,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
 .fm-chat-arrow {
 	width: 8px;
 	height: 20px;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	background-position: left -2719px;
 	position: absolute;
@@ -9429,7 +9429,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	width: 44px;
 	height: 8px;
 	position: absolute;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-position: center -2516px;
 	background-repeat: no-repeat;
 	margin: 0 0 0 -22px;
@@ -9478,7 +9478,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	-o-transition: background-color 200ms ease-in-out;
 	-ms-transition: background-color 200ms ease-in-out;
 	transition: background-color 200ms ease-in-out;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-position: 0 -2516px;
 	background-repeat: no-repeat;
 }
@@ -10149,7 +10149,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
 	height: 30px;
 	width: 30px;
 	background-position: 9px -5961px;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	position: absolute;
 	right: 10px;
@@ -10399,7 +10399,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.1);
 	background-position: -6px -9302px;
 	background-repeat: no-repeat;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	display: none;
 	display: none;
 }
@@ -10524,7 +10524,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	line-height: 21px;
 	color: #333333;
 	padding-left: 32px;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-position: 0 -2317px;
 	background-repeat: no-repeat;
 	float: left;
@@ -10535,7 +10535,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	line-height: 21px;
 	color: #999999;
 	padding-left: 20px;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-position: -5px -2368px;
 	background-repeat: no-repeat;
 	float: left;
@@ -10554,7 +10554,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	cursor: pointer;
 	width: 24px;
 	line-height: 21px;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-position: -22px -2586px;
 	background-repeat: no-repeat;
 }
@@ -10621,7 +10621,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	width: 22px;
 	height: 12px;
 	background-position: center -6062px;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	margin: -12px 0 0 5px;
 }
@@ -10745,7 +10745,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 }
 .fm-share-contacts-body .ui-selected .add-contact-pad {
 	background-position: right -2860px;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 }
 .fm-share-dropdown, .account-history-dropdown-button {
@@ -12209,7 +12209,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
 	width: 100%;
 	position: absolute;
 	top: 6px;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-position: center -8343px;
 	background-repeat: no-repeat;
 	display: none;
@@ -12376,11 +12376,11 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 	background-color: rgba(255,255,255,0.1);
 }
 .sorting-menu-item.active, .sorting-menu-item.selected {
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	color: rgba(255,255,255,1);
 }
 .sorting-menu-arrow, .permissions-menu-arrow {
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	background-position: left -7998px;
 	position: absolute;
@@ -12408,7 +12408,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 }
 .permissions-menu-item.active {
 	color: rgba(255,255,255,1);
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	background-position: right -7963px;
 }
@@ -12422,7 +12422,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 	background-color: rgba(49,181,0,1);
 }
 .context-menu-icon, .context-menu-points {
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-position: left top;
 	background-repeat: no-repeat;
 	height: 32px;
@@ -13028,7 +13028,7 @@ table {
 	width: 25px;
 	height: 13px;
 	position: absolute;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-position: center -5890px;
 	background-repeat: no-repeat;
 	margin: 16px 0 0 -12px;
@@ -14500,7 +14500,7 @@ h5.main-italic-header {
 .reg-success-icon {
 	width: 200px;
 	height: 192px;
-	background-image: url(../images/mega/register-big-sprite-v2.png);
+	background-image: url(../images/mega/register-big-sprite-v3.png);
 	background-position: left top;
 	background-repeat: no-repeat;
 	margin: 30px auto 4px auto;
@@ -14714,7 +14714,7 @@ h5.main-italic-header {
 .reg-st3-membership-icon, .membership-icon {
 	width: 70px;
 	height: 70px;
-	background-image: url(../images/mega/register-big-sprite-v2.png);
+	background-image: url(../images/mega/register-big-sprite-v3.png);
 	background-position: center -210px;
 	background-repeat: no-repeat;
 	margin: 0 0 0 -35px;
@@ -15240,7 +15240,7 @@ div.membership-bott-button {
 	height: 82px;
 	width: 82px;
 	float: left;
-	background-image: url(../images/mega/register-big-sprite-v2.png);
+	background-image: url(../images/mega/register-big-sprite-v3.png);
 	background-position: center -960px;
 	background-repeat: no-repeat;
 	margin-top: 28px;
@@ -18907,7 +18907,7 @@ h1.help-home-header {
 .arrow {
 	cursor: pointer;
 	background-position: right top;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	padding: 0 35px 0 0;
 }
@@ -20129,7 +20129,7 @@ span.incoming-call-name {
 	display: inline-block;
 }
 .star .incoming-contact-info span.incoming-call-name {
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-position: right -6265px;
 	background-repeat: no-repeat;
 	padding-right: 25px;
@@ -21539,7 +21539,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 	width: 159px;
 	float: left;
 	background-color: rgba(0,0,0,0.15);
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	cursor: pointer;
 }
@@ -21818,7 +21818,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 	height: 32px;
 	display: block;
 	position: absolute;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	z-index: 10;
 }
@@ -21974,7 +21974,7 @@ fm-right-header .video-controls {
 	right: 4px;
 	background-color: rgba(255,255,255,0.9);
 	z-index: 10;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	background-position: -1px -9474px;
 	cursor: pointer;
@@ -22130,7 +22130,7 @@ video.localViewport {
 	height: 25px;
 	float: right;
 	margin: 18px 17px 0 0;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-position: -12px -8137px;
 	background-repeat: no-repeat;
 	-webkit-transition: opacity 200ms ease-in-out;
@@ -22289,7 +22289,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	margin: 12px 12px 12px 12px
 }
 .fm-mega-dialog-size-icon {
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-position: center -5509px;
 	background-repeat: no-repeat;
 	width: 20px;
@@ -22377,7 +22377,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .loginrequired-dialog .fm-notification-icon {
 	width: 70px;
 	height: 70px;
-	background-image: url(../images/mega/register-big-sprite-v2.png);
+	background-image: url(../images/mega/register-big-sprite-v3.png);
 	background-position: center -199px;
 	background-repeat: no-repeat;
 	margin: 4px 16px 0 0px;
@@ -22500,7 +22500,7 @@ a.top-login-forgot-pass {
 	display: inline-block;
 	border-radius: 12px;
 	text-transform: uppercase;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	background-position: 4px -630px;
 	color: rgba(255,255,255,0.7) !important;
@@ -23244,7 +23244,7 @@ top-login-spr .nlanguage-tooltip-bg, .nlanguage-bottom {
  background-size:48px auto;
 }
  .reg-success-icon, .reg-st3-save-icon, .reg-st3-membership-icon, .membership-icon, .loginrequired-dialog .fm-notification-icon, .file-status-icon.star, .contact-status-icon.star, .grid-status-icon.star, .link-icon {
- background-image: url(../images/mega/register-big-sprite-v2@2x.png);
+ background-image: url(../images/mega/register-big-sprite-v3@2x.png);
  background-size: 200px auto;
 }
 .reg-st5-key-gen, .reg-st5-info-icon {

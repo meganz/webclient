@@ -9860,6 +9860,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
 .bitcoin-invoice-dialog .clock-icon {
 	vertical-align: top;
 	display: inline-block;
+	padding-right: 5px;
 	width: 15px;
 	height: 15px;
 	background: url(../images/mega/bitcoin-v1.png) 0 -786px no-repeat;

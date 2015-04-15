@@ -9699,7 +9699,8 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
 .bitcoin-invoice-dialog .payment-confirmation {
 	display: none;
 	position: absolute;
-	left: 0;
+	left: 30px;
+	width: 270px;
 	top: 0;
 }
 .payment-confirmation .icon {
@@ -9710,23 +9711,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
 }
 .payment-confirmation .reg-success-icon.failure {
 	background-position: center -200px;
-}
-.bitcoin-invoice-dialog .payment-confirmation .description {
-	color: grey;
-	font-size: 20px;
-	margin-left: 34px;
-	margin-top: 25px;
-	text-align: center;
-	width: 260px;
-}
-.bitcoin-invoice-dialog .payment-confirmation .instruction {
-	color: grey;
-	font-size: 19px;
-	line-height: 1.3;
-	margin-left: 34px;
-	margin-top: 23px;
-	text-align: center;
-	width: 259px;
 }
 .bitcoin-invoice-dialog .scan-code-instruction {
 	color: #ccc;
@@ -9874,10 +9858,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
 	box-sizing: border-box;
 }
 .bitcoin-invoice-dialog .clock-icon {
-	vertical-align:top;
-	display:inline-block;
-	width:15px;
-	height:15px;
+	vertical-align: top;
+	display: inline-block;
+	width: 15px;
+	height: 15px;
 	background: url(../images/mega/bitcoin-v1.png) 0 -786px no-repeat;
 }
 .bitcoin-invoice-dialog .clock-icon::before {
@@ -9898,14 +9882,14 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
 	background-position: center -200px;
 	margin-top: 0;
 }
-.fm-dialog.bitcoin-provider-failure-dialog .txt {
+.fm-dialog.bitcoin-provider-failure-dialog .txt, .bitcoin-invoice-dialog .payment-confirmation .txt {
 	color: #333333;
 	font-size: 16px;
 	line-height: 18px;
 	text-align: center;
 	padding: 4px 30px 0 30px;
 }
-.fm-dialog.bitcoin-provider-failure-dialog .instruction {
+.fm-dialog.bitcoin-provider-failure-dialog .instruction, .bitcoin-invoice-dialog .payment-confirmation .instruction {
 	color: grey;
 	font-size: 13px;
 	padding: 10px 30px 30px 30px;
@@ -14087,7 +14071,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	border-bottom-right-radius: 8px;
 }
 .pro-login-dialog .login-notification-icon {
-	display:none;
+	display: none;
 }
 .top-login-forgot-pass {
 	font-size: 11px;

@@ -22376,9 +22376,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 }
 .loginrequired-dialog .fm-notification-icon {
 	width: 70px;
-	height: 78px;
-	background-image: url(../images/mega/register-big-sprite-v2.png);
-	background-position: center -199px;
+	height: 70px;
+	background-image: url(../images/mega/register-big-sprite-v3.png);
+	background-position: center -210px;
 	background-repeat: no-repeat;
 	margin: 4px 16px 0 0px;
 }

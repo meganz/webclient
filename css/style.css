@@ -14081,6 +14081,14 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 }
+.pro-login-dialog .top-login-bott-gray-block {
+	-webkit-border-bottom-right-radius: 8px;
+	-moz-border-radius-bottomright: 8px;
+	border-bottom-right-radius: 8px;
+}
+.pro-login-dialog .login-notification-icon {
+	display:none;
+}
 .top-login-forgot-pass {
 	font-size: 11px;
 	color: rgb(153,153,153);

@@ -1361,7 +1361,7 @@ function MegaData()
         if (d) {
             console.log('openFolder()', M.currentdirid, id, force);
         }
-        if (id !== 'notifications' && $('.fm-main.notifications').attr('class').indexOf('hidden') < 0) {
+        if ((id !== 'notifications') && ($('.fm-main.notifications').hasClass('hidden') === false)) {
             notificationsUI(1);
         }
         this.search = false;
@@ -5472,7 +5472,7 @@ function processPaymentReceived(actionPacket) {
         if (M.account) {
             M.account.lastupdate = 0;
         }
-        document.location.hash = 'account';
+        window.location.hash = 'account';
     }
 }
 

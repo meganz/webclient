@@ -651,7 +651,7 @@ function checkTransactionInBlockchain(dialog, bitcoinAddress, planName, countdow
             var currentPriceSatoshis = toSatoshi(currentPriceBitcoins);
             var satoshisReceived = notification.payload.received;
             var priceRemainingSatoshis = currentPriceSatoshis - satoshisReceived;
-            var priceRemainingBitcoins = toBitcoin(priceRemainingSatoshis);
+            var priceRemainingBitcoins = toBitcoinString(priceRemainingSatoshis);
 
             // If correct amount was received
             if (satoshisReceived === currentPriceSatoshis) {

@@ -659,7 +659,7 @@ function checkTransactionInBlockchain(dialog, bitcoinAddress, planName, countdow
                 // Show success
                 dialog.find('.left-side').css('visibility', 'hidden');
                 dialog.find('.payment-confirmation').show();
-                dialog.find('.payment-confirmation .icon').addClass('success');
+                dialog.find('.payment-confirmation .reg-success-icon').addClass('success');
                 dialog.find('.payment-confirmation .description').html(planName + ' plan has been paid!');
                 dialog.find('.payment-confirmation .instruction').html('Please await account upgrade by MEGA...');
                 dialog.find('.expiry-instruction').html('Paid!');

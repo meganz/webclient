@@ -1683,12 +1683,12 @@ a.blog-button:hover {
 	background-position: -10px -153px;
 }
 .nt-payment-notification .notification-avatar-icon {
-    background-image: url("../images/mega/icons/retina/money_coin@2x.png");
-    background-position: 0 0;
-    background-repeat: no-repeat;
-    background-size: 100% auto;
-    height: 48px;
-    width: 48px;
+	background-image: url("../images/mega/icons/retina/money_coin@2x.png");
+	background-position: 0 0;
+	background-repeat: no-repeat;
+	background-size: 100% auto;
+	height: 48px;
+	width: 48px;
 }
 .notification-popup .jspDrag {
 	width: 4px;
@@ -4332,9 +4332,9 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 	position: relative;
 	background-color: white;
 	-o-text-overflow: ellipsis;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space:nowrap;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
 }
 .nw-tree-panel-arrows, .copy-dialog-panel-arrows, .move-dialog-panel-arrows, .share-dialog-panel-arrows {
 	height: 24px;
@@ -9617,12 +9617,12 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
 	left: 0;
 }
 .fm-dialog-overlay.bitcoin-invoice-dialog {
-    background: -moz-radial-gradient(center, ellipse cover, rgba(0,0,0,0.1) 0%, rgba(20,20,20,0.9) 100%);
-    background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%, rgba(0,0,0,0.1)), color-stop(100%, rgba(20,20,20,0.9)));
-    background: -webkit-radial-gradient(center, ellipse cover, rgba(0,0,0,0.1) 0%, rgba(20,20,20,0.9) 100%);
-    background: -o-radial-gradient(center, ellipse cover, rgba(0,0,0,0.1) 0%, rgba(20,20,20,0.9) 100%);
-    background: -ms-radial-gradient(center, ellipse cover, rgba(0,0,0,0.1) 0%, rgba(20,20,20,0.9) 100%);
-    background: radial-gradient(ellipse at center, rgba(0,0,0,0.1) 0%, rgba(20,20,20,0.9) 100%);
+	background: -moz-radial-gradient(center, ellipse cover, rgba(0,0,0,0.1) 0%, rgba(20,20,20,0.9) 100%);
+	background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%, rgba(0,0,0,0.1)), color-stop(100%, rgba(20,20,20,0.9)));
+	background: -webkit-radial-gradient(center, ellipse cover, rgba(0,0,0,0.1) 0%, rgba(20,20,20,0.9) 100%);
+	background: -o-radial-gradient(center, ellipse cover, rgba(0,0,0,0.1) 0%, rgba(20,20,20,0.9) 100%);
+	background: -ms-radial-gradient(center, ellipse cover, rgba(0,0,0,0.1) 0%, rgba(20,20,20,0.9) 100%);
+	background: radial-gradient(ellipse at center, rgba(0,0,0,0.1) 0%, rgba(20,20,20,0.9) 100%);
 }
 .fm-dialog {
 	position: absolute;
@@ -9686,208 +9686,212 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
 .fm-dialog.registration-success {
 	margin-top: -163px;
 }
-
 /* Bitcoin invoice dialog */
 .fm-dialog.bitcoin-invoice-dialog {
-    border: 0 none;
-    border-radius: 14px;
-    margin: -220px 0 0 -330px !important;
-    width: 660px;
+	border: 0 none;
+	border-radius: 14px;
+	margin: -220px 0 0 -330px !important;
+	width: 660px;
 }
 .invoice-container {
-    position: relative;
+	position: relative;
 }
 .bitcoin-invoice-dialog .payment-confirmation {
-    display: none;
-    position: absolute;
-    left: 0;
-    top: 0;
+	display: none;
+	position: absolute;
+	left: 0;
+	top: 0;
 }
-.bitcoin-invoice-dialog .payment-confirmation .icon {
-    background-position: 0 0;
-    background-repeat: no-repeat;
-    background-size: 100% auto;
-    display: block;
-    height: 167px;
-    margin-left: 80px;
-    margin-top: 70px;
-    width: 167px;
+.payment-confirmation .icon {
+	margin-top: 0;
 }
-.bitcoin-invoice-dialog .payment-confirmation .icon.success {
-    background-image: url("../images/mega/icons/retina/blue_tick@2x.png");
+.payment-confirmation .reg-success-icon.success {
+	background-position: center -400px;
 }
-.bitcoin-invoice-dialog .payment-confirmation .icon.failure {
-    background-image: url("../images/mega/icons/retina/red_cross@2x.png");
+.payment-confirmation .reg-success-icon.failure {
+	background-position: center -200px;
 }
 .bitcoin-invoice-dialog .payment-confirmation .description {
-    color: grey;
-    font-size: 20px;
-    margin-left: 34px;
-    margin-top: 25px;
-    text-align: center;
-    width: 260px;
+	color: grey;
+	font-size: 20px;
+	margin-left: 34px;
+	margin-top: 25px;
+	text-align: center;
+	width: 260px;
 }
 .bitcoin-invoice-dialog .payment-confirmation .instruction {
-    color: grey;
-    font-size: 19px;
-    line-height: 1.3;
-    margin-left: 34px;
-    margin-top: 23px;
-    text-align: center;
-    width: 259px;
+	color: grey;
+	font-size: 19px;
+	line-height: 1.3;
+	margin-left: 34px;
+	margin-top: 23px;
+	text-align: center;
+	width: 259px;
 }
 .bitcoin-invoice-dialog .scan-code-instruction {
-    color: #ccc;
-    font-size: 12px;
-    margin-left: 35px;
-    padding-top: 35px;
+	color: #ccc;
+	font-size: 12px;
+	margin-left: 35px;
+	padding-top: 35px;
 }
 .bitcoin-invoice-dialog .bitcoin-qr-code {
-    margin: 25px 36px 20px;
-    width: 256px;
+	margin: 25px 0 20px 36px;
+	width: 256px;
 }
 .bitcoin-invoice-dialog .qr-code-mega-icon {
-    background-image: url("../images/mega/icons/retina/qrcode_mega@2x.png");
-    background-position: 0 0;
-    background-repeat: no-repeat;
-    background-size: 100% auto;
-    display: block;
-    height: 40.5px;
-    left: 143.5px;
-    opacity: 1;
-    position: absolute;
-    top: 183px;
-    width: 40.5px;
+	background: url(../images/mega/bitcoin-v1.png) 0 -650px no-repeat;
+	display: block;
+	height: 40.5px;
+	left: 143.5px;
+	opacity: 1;
+	position: absolute;
+	top: 183px;
+	width: 40.5px;
 }
 .bitcoin-invoice-dialog a.btn-open-wallet {
-    border: 2px solid #47abdc;
-  -moz-border-radius: 5px;
-  -webkit-border-radius: 5px;
-  border-radius: 5px;
-  color: #47abdc;
-  font-size: 13px;
-  line-height: 27px;
-  margin: 0 36px;
-  display: block;
-  text-align: center;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-  height: 32px;
+	border: 2px solid #47abdc;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+	color: #47abdc;
+	font-size: 13px;
+	line-height: 27px;
+	margin: 0 36px;
+	display: block;
+	text-align: center;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	height: 32px;
+	-webkit-transition: all 200ms ease-in-out;
+	-moz-transition: all 200ms ease-in-out;
+	-o-transition: all 200ms ease-in-out;
+	-ms-transition: all 200ms ease-in-out;
+	transition: all 200ms ease-in-out;
 }
 .bitcoin-invoice-dialog a.btn-open-wallet:hover {
-    background-color: #47abdc;
-    color: #fff;
+	background-color: #47abdc;
+	color: #fff;
 }
 .bitcoin-invoice-dialog .bitcoin-address {
-    color: #ccc;
-  font-size: 10px;
-  padding: 21px 30px;
-  text-align: center;
+	color: #ccc;
+	font-size: 10px;
+	padding: 21px 30px;
+	text-align: center;
 }
 .bitcoin-invoice-dialog .price-expired-instruction {
-    display: none;
-    font-size: 16px;
-    line-height: 18px;
+	display: none;
+	font-size: 15px;
+	line-height: 18px;
+	left: 0;
+	line-height: 21px;
+	position: absolute;
+	top: 356px;
+	width: 100%;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	padding: 0 36px;
 }
 .bitcoin-invoice-dialog .price-expired-instruction span {
-    font-weight: bold;
-    text-transform: uppercase;
+	font-family: 'Open Sans Semibold', Arial;
+	text-transform: uppercase;
 }
 .bitcoin-invoice-dialog .left-side {
-	float:left; width:50%;
+	float: left;
+	width: 50%;
+	position: relative;
 }
 .invoice-right-bg {
 	background-color: #47abdc;
-	  -webkit-border-bottom-right-radius: 12px;
-  -moz-border-radius-bottomright: 12px;
-  border-bottom-right-radius: 12px;
-  -webkit-border-top-right-radius: 12px;
-  -moz-border-radius-topright: 12px;
-  border-top-right-radius: 12px;
-  right:0;
-  width:50%;
-	position:absolute;
-	height:100%;
+	-webkit-border-bottom-right-radius: 12px;
+	-moz-border-radius-bottomright: 12px;
+	border-bottom-right-radius: 12px;
+	-webkit-border-top-right-radius: 12px;
+	-moz-border-radius-topright: 12px;
+	border-top-right-radius: 12px;
+	right: 0;
+	width: 50%;
+	position: absolute;
+	height: 100%;
 }
 .bitcoin-invoice-dialog .right-side {
-	margin-left:50%;
-    color: #fff;
-      padding: 35px 35px 16px;
-    position: relative;
+	margin-left: 50%;
+	color: #fff;
+	padding: 35px 35px 26px;
+	position: relative;
 }
 .invoice-date-time {
-    font-size: 11px;
-    text-align: center;
+	font-size: 11px;
+	text-align: center;
 }
 .plan-icon .reg-st3-membership-icon {
-    margin: 30px 0 0 0;
-	position:static;
+	margin: 30px 0 0 -3px;
+	position: static;
 }
-
 .bitcoin-invoice-dialog .plan-name {
-    font-size: 30px;
-	line-height:32px;
-    padding-top: 15px;
+	font-size: 30px;
+	line-height: 32px;
+	padding-top: 5px;
 }
 .bitcoin-invoice-dialog .plan-duration {
-    font-size: 21px;
-	line-height:24px;
-    padding-top: 20px;
+	font-size: 21px;
+	line-height: 24px;
+	padding-top: 6px;
 }
 .bitcoin-invoice-dialog .plan-price-euros {
-    font-size: 20px;
-	line-height:24px;
-    padding-top: 14px;
+	font-size: 20px;
+	line-height: 24px;
+	padding-top: 6px;
 }
 .bitcoin-invoice-dialog .plan-price-euros > span {
-    font-size: 0.8em;
+	font-size: 0.8em;
 }
 .bitcoin-invoice-dialog .plan-price-bitcoins {
-    display: inline-block;
-  font-size: 38px;
-  line-height: 42px;
-  padding-top: 40px;
+	display: inline-block;
+	font-size: 38px;
+	line-height: 42px;
+	padding-top: 45px;
 }
 .bitcoin-invoice-dialog .plan-price-bitcoins-btc {
-    display: inline-block;
-    font-size: 13px;
-    padding-left: 4px;
+	display: inline-block;
+	font-size: 13px;
+	padding-left: 4px;
 }
 .bitcoin-invoice-dialog .separator {
-    border-bottom: 1px solid #fff;
-    padding-top: 10px;
-	margin-bottom:20px
+	border-bottom: 1px solid #fff;
+	padding-top: 10px;
+	margin-bottom: 24px
 }
 .bitcoin-invoice-dialog .expiry-instruction {
-        font-size: 11px;
-  /* line-height: 16px; */
-  /* padding-top: 25px; */
-  opacity: 0.5;
-  background-image: url("../images/mega/icons/retina/timer@2x.png");
-  background-position: left center;
-  background-repeat: no-repeat;
-  background-size: 15px auto;
-  padding-left: 20px;
-  vertical-align: middle;
-  display: table-cell;
-  height: 45px;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-  /* margin-right: 148px; */
+	font-size: 11px;
+	opacity: 0.5;
+	vertical-align: middle;
+	display: table-cell;
+	height: 45px;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+.bitcoin-invoice-dialog .clock-icon {
+	vertical-align:top;
+	display:inline-block;
+	width:15px;
+	height:15px;
+	background: url(../images/mega/bitcoin-v1.png) 0 -786px no-repeat;
+}
+.bitcoin-invoice-dialog .clock-icon::before {
+	content: '\00a0';
 }
 .bitcoin-invoice-dialog .time-to-expire {
-     font-size: 38px;
-  line-height: 42px;
-  opacity: 0.5;
-  /* margin-top: 20px; */
-  float: right;
+	font-size: 38px;
+	line-height: 42px;
+	opacity: 0.5;
+	float: right;
 }
-
 /* Failure to connect to provider */
 .fm-dialog.bitcoin-provider-failure-dialog .container {
-    position: relative;
+	position: relative;
 	padding-top: 30px;
 }
 .bitcoin-provider-failure-dialog.pro-register-paypal-dialog .reg-success-icon {
@@ -9896,19 +9900,19 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
 }
 .fm-dialog.bitcoin-provider-failure-dialog .txt {
 	color: #333333;
-    font-size: 16px;
-    line-height: 18px;
-	text-align:center;
+	font-size: 16px;
+	line-height: 18px;
+	text-align: center;
 	padding: 4px 30px 0 30px;
 }
 .fm-dialog.bitcoin-provider-failure-dialog .instruction {
-    color: grey;
-    font-size: 13px;
+	color: grey;
+	font-size: 13px;
 	padding: 10px 30px 30px 30px;
 }
 .fm-dialog.bitcoin-provider-failure-dialog .instruction span {
-    font-weight: bold;
-    text-transform: uppercase;
+	font-weight: bold;
+	text-transform: uppercase;
 }
 .fm-dialog.reset-success-st2 {
 	min-height: 200px;
@@ -10127,7 +10131,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	-moz-opacity: 0.3;
 	-khtml-opacity: 0.3;
 	opacity: 0.3;
-	z-index:10;
+	z-index: 10;
 }
 .fm-dialog-close:hover, .btn-close-dialog:hover {
 	-moz-opacity: 0.6;
@@ -12322,7 +12326,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 	box-sizing: border-box;
 }
 .top-menu-item {
-	padding-right:26px;
+	padding-right: 26px;
 }
 .sorting-menu-item {
 	height: 24px;
@@ -14460,7 +14464,7 @@ h5.main-italic-header {
 .password-warning-txt {
 	color: #FFBA00;
 }
-.reg-success-icon {
+.reg-success-icon, .payment-confirmation .icon {
 	width: 200px;
 	height: 192px;
 	background-image: url(../images/mega/register-big-sprite-v2.png);
@@ -14506,7 +14510,7 @@ h5.main-italic-header {
 	color: #3F3F3F;
 	margin-bottom: 17px;
 }
-.reset-success-st3  .fm-dialog-header {
+.reset-success-st3 .fm-dialog-header {
 	margin-bottom: 10px;
 }
 .reset-success-st2 .fm-account-input {
@@ -14905,26 +14909,26 @@ h5.main-italic-header {
 	padding: 26px 0 11px 0;
 }
 .membership-radio.checked {
-    background-color: #3B99FC;
+	background-color: #3B99FC;
 }
 .membership-radio {
-    float: left;
-    width: 16px;
-    height: 16px;
-    background-color: #a7a5a5;
-    -moz-border-radius: 100%;
-    -webkit-border-radius: 100%;
-    border-radius: 100%;
-    position: relative;
-    margin: 5px 12px 0 0;
+	float: left;
+	width: 16px;
+	height: 16px;
+	background-color: #a7a5a5;
+	-moz-border-radius: 100%;
+	-webkit-border-radius: 100%;
+	border-radius: 100%;
+	position: relative;
+	margin: 5px 12px 0 0;
 }
 .payment-options-list .payment-method {
-    cursor: pointer;
-    display: inline-block;
-    margin-left: 20px
+	cursor: pointer;
+	display: inline-block;
+	margin-left: 20px
 }
 .payment-options-list .payment-method:first-of-type {
-    margin-left: 0;
+	margin-left: 0;
 }
 .membership-radio div {
 	width: 6px;
@@ -14954,9 +14958,9 @@ h5.main-italic-header {
 	background-position: -444px -614px;
 }
 .membership-radio-label.prepaid-balance {
-    background-image: url("../images/mega/icons/retina/prepaid-balance@2x.png");
-    background-position: 0 2px;
-    background-size: 20px 20px;
+	background-image: url("../images/mega/icons/retina/prepaid-balance@2x.png");
+	background-position: 0 2px;
+	background-size: 20px 20px;
 }
 .membership-bott-price {
 	font-size: 72px;
@@ -15072,14 +15076,14 @@ div.membership-bott-button {
 	padding-right: 20px;
 }
 .ca .reg-st3-mid-txt, .gl .reg-st3-mid-txt, .it .reg-st3-mid-txt, .nl .reg-st3-mid-txt, .pt .reg-st3-mid-txt, .br .reg-st3-mid-txt, .sk .reg-st3-mid-txt {
-	  line-height: 34px;
+	line-height: 34px;
 }
 .membership-step2 .membership-new-offer {
 	display: none;
 }
 .membership-new-offer text {
 	font-family: 'source_sans_proregular';
-	font-weight:normal;
+	font-weight: normal;
 }
 .membership-step2 .pro4 .membership-new-offer {
 	display: block;
@@ -22399,7 +22403,7 @@ a.top-login-forgot-pass {
 	float: right;
 	cursor: pointer;
 }
-.pro-register-paypal-dialog .reg-success-icon {
+.pro-register-paypal-dialog .reg-success-icon, .payment-confirmation .icon {
 	background: url(../images/mega/bitcoin-v1.png) 0 0 no-repeat;
 	width: 200px;
 	height: 200px;
@@ -22866,7 +22870,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 }
 }
  @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
-.pro-register-paypal-dialog .reg-success-icon {
+.pro-register-paypal-dialog .reg-success-icon, .payment-confirmation .icon, .bitcoin-invoice-dialog .qr-code-mega-icon, .bitcoin-invoice-dialog .clock-icon {
  background-image: url(../images/mega/bitcoin-v1@2x.png);
  background-size: 200px auto;
 }
@@ -24244,23 +24248,23 @@ background-color:#1DA2E9
 
 /* frienldy printing */
 @media print {
-    /* remove all single page styles */
-    body, body * {
-        visibility: hidden;
-        height: auto !important;
-        overflow: visible !important;
-        max-width: 100% !important;
-    }
-    .main-mid-pad * {
-        visibility: visible;
-    }
-    .main-mid-pad {
-        visibility: visible;
-        float: none !important;
-        left: 0px;
-        top: 0px;
-        width: 100% !important;
-        position: absolute !important;
-        overflow: visible !important;
-    }
+/* remove all single page styles */
+body, body * {
+	visibility: hidden;
+	height: auto !important;
+	overflow: visible !important;
+	max-width: 100% !important;
+}
+.main-mid-pad * {
+	visibility: visible;
+}
+.main-mid-pad {
+	visibility: visible;
+	float: none !important;
+	left: 0px;
+	top: 0px;
+	width: 100% !important;
+	position: absolute !important;
+	overflow: visible !important;
+}
 }

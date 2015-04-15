@@ -5,7 +5,8 @@ var pro_package,
     account_type_num,
     pro_usebalance = false,
     membershipPlans = [],
-    selectedProPackage = [];
+    selectedProPackage = [],
+    saleId = null;
 
 function init_pro()
 {
@@ -136,7 +137,7 @@ function loadPaymentGatewayOptions() {
 
     // Payment gateways, hardcoded for now, will call API in future to get list
     var gatewayOptions = [{
-        apiGatewayId: 4,
+        apiGatewayId: 4,                // Bitcoin provider
         displayName: l[6802],           // Bitcoin
         supportsRecurring: false,
         cssClass: 'bitcoin',
@@ -415,9 +416,12 @@ function pro_pay()
 
     api_req({ a : 'uts', it: 0, si: apiId, p: price, c: currency, aff: aff, 'm': m },
     {
-        callback : function (res)
+        callback : function (result)
         {
-            if (typeof res == 'number' && res < 0)
+            // Store the sale ID to check with API later
+            saleId = result;
+            
+            if (typeof saleId == 'number' && saleId < 0)
             {
                 loadingDialog.hide();
                 alert(l[200]);
@@ -437,7 +441,7 @@ function pro_pay()
                     proref = sessionStorage.proref;
                 }
 
-                api_req({ a : 'utc', s : [res], m : pro_m, r: proref },
+                api_req({ a : 'utc', s : [saleId], m : pro_m, r: proref },
                 {
                     callback : function (res)
                     {
@@ -663,6 +667,12 @@ function checkTransactionInBlockchain(dialog, bitcoinAddress, planName, countdow
                 // End countdown timer and close connection
                 clearInterval(countdownIntervalId);
                 chainWebSocketConn.close();
+                
+                // Inform API that we have full payment and await action packet confirmation.
+                // a = action, vpay = verify payment, saleId = the id from the 'uts' call - this is 
+                // an array because one day we may support multiple sales e.g. buy Pro 1 and 2 at the 
+                // same time, add = the bitcoin address, t = payment gateway id for bitcoin provider (4)
+                api_req({ a: 'vpay', saleid: [saleId], add: bitcoinAddress, t: 4 });
             }
 
             // If partial payment was made

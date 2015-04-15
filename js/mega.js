@@ -1344,9 +1344,9 @@ function MegaData()
 
     this.renderTree = function()
     {
-        this.buildtree({h: 'shares'});
-        this.buildtree(this.d[this.RootID]);
-        this.buildtree({h: M.RubbishID});
+        this.buildtree({h: 'shares'},       0x4fe);
+        this.buildtree(this.d[this.RootID], 0x4fe);
+        this.buildtree({h: M.RubbishID},    0x4fe);
         this.contacts();
         treeUI();
         if (!MegaChatDisabled) {

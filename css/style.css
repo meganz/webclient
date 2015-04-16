@@ -14742,7 +14742,7 @@ h5.main-italic-header {
 	-moz-border-radius: 100%;
 	-webkit-border-radius: 100%;
 	border-radius: 100%;
-	background-image: url(../images/mega/pro-new-sprite-v1.png);
+	background-image: url(../images/mega/pro-new-sprite-v2.png);
 	background-position: center -252px;
 	background-repeat: no-repeat;
 	display: block;
@@ -14760,8 +14760,7 @@ h5.main-italic-header {
 	-moz-border-radius: 8px;
 	-webkit-border-radius: 8px;
 	border-radius: 8px;
-	background-image: url(../images/mega/pro-new-sprite-v1@2x.png);
-	background-size: 755px auto;
+	background-image: url(../images/mega/pro-new-sprite-v2.png);
 	background-position: -292px -401px;
 	background-repeat: no-repeat;
 	-webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
@@ -14878,8 +14877,7 @@ h5.main-italic-header {
 	-webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
 	-moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
 	box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
-	background-image: url(../images/mega/pro-new-sprite-v1@2x.png);
-	background-size: 755px auto;
+	background-image: url(../images/mega/pro-new-sprite-v2.png);
 	background-position: right -643px;
 	background-repeat: no-repeat;
 	font-size: 13px;
@@ -14897,8 +14895,7 @@ h5.main-italic-header {
 	width: 110px;
 	height: 110px;
 	float: left;
-	background-image: url(../images/mega/pro-new-sprite-v1@2x.png);
-	background-size: 755px auto;
+	background-image: url(../images/mega/pro-new-sprite-v2.png);
 	background-position: -287px -553px;
 	background-repeat: no-repeat;
 	margin: 0 0 0 -7px;
@@ -14945,8 +14942,7 @@ h5.main-italic-header {
 	height: 26px;
 	line-height: 26px;
 	padding-left: 28px;
-	background-image: url(../images/mega/pro-new-sprite-v1@2x.png);
-	background-size: 755px auto;
+	background-image: url(../images/mega/pro-new-sprite-v2.png);
 	background-repeat: no-repeat;
 	font-size: 13px;
 	color: #333333;
@@ -16117,7 +16113,7 @@ span.browsers-update {
 	height: 181px;
 	float: left;
 	text-align: center;
-	background-image: url(../images/mega/pro-new-sprite-v1.png);
+	background-image: url(../images/mega/pro-new-sprite-v2.png);
 	background-position: -7px -359px;
 	background-repeat: no-repeat;
 	-moz-box-sizing: border-box;
@@ -23180,8 +23176,8 @@ top-login-spr .nlanguage-tooltip-bg, .nlanguage-bottom {
  background-image: url(../images/mega/browsers-page@2x.png);
  background-size: 892px auto;
 }
-.pro-icons-block, .membership-question-mark span {
- background-image: url(../images/mega/pro-new-sprite-v1@2x.png);
+.pro-icons-block, .membership-question-mark span, .membership-date, .membership-st2-select span, .membership-payment-icon, .membership-radio-label {
+ background-image: url(../images/mega/pro-new-sprite-v2@2x.png);
  background-size: 755px auto;
 }
 .sync-list-txt, .sync-icon, .mobile-icon, .ios-button, .ff-icon, .blackberry-button, .chrome-icon, .sync-button, .google-play-button, .ff-bott-button, .mobile-small-icon, .chrome-bott-icons, .chrome-download-button, a.chrome-download-button, .ads-top-arrow, .win-phone-button {

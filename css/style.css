@@ -9744,7 +9744,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
     padding-top: 35px;
 }
 .fm-dialog.bitcoin-invoice-dialog .bitcoin-qr-code {
-    margin: 25px 36px 20px;
+    margin: 25px 36px 14px;
     width: 256px;
 }
 .fm-dialog.bitcoin-invoice-dialog .qr-code-mega-icon {
@@ -9764,9 +9764,12 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
     border: 2px solid #47abdc;
     border-radius: 5px;
     color: #47abdc;
+    display: block;
     font-size: 13px;
-    margin-left: 36px;
-    padding: 5px 52px;
+    margin-left: 35px;
+    padding: 5px 0;
+    text-align: center;
+    width: 253px;
 }
 .fm-dialog.bitcoin-invoice-dialog a.btn-open-wallet:hover {
     background-color: #47abdc;
@@ -9775,7 +9778,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
 .fm-dialog.bitcoin-invoice-dialog .bitcoin-address {
     color: #ccc;
     font-size: 10px;
-    margin-top: 21px;
+    margin-top: 14px;
     text-align: center;
     width: 330px;
 }

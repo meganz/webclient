@@ -1683,12 +1683,17 @@ a.blog-button:hover {
 	background-position: -10px -153px;
 }
 .nt-payment-notification .notification-avatar-icon {
-	background-image: url("../images/mega/icons/retina/money_coin@2x.png");
-	background-position: 0 0;
-	background-repeat: no-repeat;
-	background-size: 100% auto;
+	background: url(../images/mega/bitcoin-v1.png) -152px -650px no-repeat;
 	height: 48px;
 	width: 48px;
+	left: 0;
+	top: 0;
+}
+.nt-payment-notification .notification-avatar {
+	background-color: transparent;
+}
+.nt-payment-notification .notification-avatar img {
+	display:none;
 }
 .notification-popup .jspDrag {
 	width: 4px;
@@ -22863,7 +22868,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 }
 }
  @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
-.pro-register-paypal-dialog .reg-success-icon, .payment-confirmation .icon, .bitcoin-invoice-dialog .qr-code-mega-icon, .bitcoin-invoice-dialog .clock-icon {
+.pro-register-paypal-dialog .reg-success-icon, .payment-confirmation .icon, .bitcoin-invoice-dialog .qr-code-mega-icon, .bitcoin-invoice-dialog .clock-icon, .nt-payment-notification .notification-avatar-icon {
  background-image: url(../images/mega/bitcoin-v1@2x.png);
  background-size: 200px auto;
 }

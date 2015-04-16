@@ -984,20 +984,43 @@ function initUI() {
             e.preventDefault();
     });
 
+    var fmTabState;
     $('.nw-fm-left-icon').unbind('click');
     $('.nw-fm-left-icon').bind('click', function() {
         treesearch = false;
         var c = $(this).attr('class');
-        if (c && c.indexOf('cloud-drive') > -1) {
-            M.openFolder(M.RootID);
-        } else if (c && c.indexOf('shared-with-me') > -1) {
-            M.openFolder('shares');
-        } else if (c && c.indexOf('conversations') > -1) {
-            M.openFolder('chat');
-        } else if (c && c.indexOf('contacts') > -1) {
-            M.openFolder('contacts');
-        } else if (c && c.indexOf('rubbish-bin') > -1) {
-            M.openFolder(M.RubbishID);
+        if (!c) {
+            return;
+        }
+        if (!fmTabState || fmTabState['cloud-drive'].root !== M.RootID) {
+            fmTabState = {
+                'cloud-drive':    { root: M.RootID,    prev: null },
+                'shared-with-me': { root: 'shares',    prev: null },
+                'conversations':  { root: 'chat',      prev: null },
+                'contacts':       { root: 'contacts',  prev: null },
+                'rubbish-bin':    { root: M.RubbishID, prev: null }
+            };
+        }
+        var active = $('.nw-fm-left-icon.active:visible')
+            .attr('class').split(" ").filter(function(c) {
+                return !!fmTabState[c];
+            });
+
+        if ((active = fmTabState[active])) {
+            if (active.root === M.currentrootid) {
+                active.prev = M.currentdirid;
+            }
+            else if (d) {
+                console.warn('Root mismatch', M.currentrootid, M.currentdirid, active);
+            }
+        }
+
+        for (var tab in fmTabState) {
+            if (~c.indexOf(tab)) {
+                tab = fmTabState[tab];
+                M.openFolder(tab.prev || tab.root);
+                break;
+            }
         }
     });
 

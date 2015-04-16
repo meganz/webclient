@@ -366,8 +366,8 @@ function ImgError(source){
  * Changes the animated product images on the download page
  */
 	
-//var gifSlider = {
-    /*
+var gifSlider = {
+    
     // Speed to fade in/out the images and text
     fadeInSpeed: 3000,
     fadeOutSpeed: 500,
@@ -424,10 +424,9 @@ function ImgError(source){
             }
         ]
     },
-    */
+    
     
     // Initialise the slide show
-    /* 
     init: function() {
         
         // Preload the images into memory so they will display straight away
@@ -442,12 +441,12 @@ function ImgError(source){
         gifSlider.continueSlideShow('left', 0);
         gifSlider.continueSlideShow('right', 0);
     },
-    */
+    
     /**
      * Preloads the images into memory
      * @param {String} side The side of the page (left or right)
      */
-	/*
+	
     preLoadImages: function(side) {
         
         // Get the current URL without the location hash (#xycabc), also add on the path to the images dir
@@ -467,14 +466,14 @@ function ImgError(source){
             gifSlider.images[side][i].image = image;            
         }
     },
-    */
+    
     /**
      * Iterates to the next image in the slideshow
      * @param {String} side The side of the page (left or right)
      * @param {Number} currentSlideIndex The current slide's index number (matches array above)
      * @param {Number} oldIntervalId The interval ID to be cleared
      */
-	/*
+	
     continueSlideShow: function(side, currentSlideIndex, oldIntervalId) {
         
         // Find when to start the next image
@@ -509,13 +508,13 @@ function ImgError(source){
         
         }, animationLengthForCurrentSlide);
     },
-    */
+    
     /**
      * Shows the animated image
      * @param {String} side The side of the page (left or right)
      * @param {Number} slideIndex The slide's index number to be shown
      */
-	/*
+	
     showImage: function(side, slideIndex) {
         
         // Set the details for the next slide
@@ -553,5 +552,5 @@ function ImgError(source){
 		  
 		} 
     }
-	*/
-//};
+	
+};

@@ -1693,7 +1693,7 @@ a.blog-button:hover {
 	background-color: transparent;
 }
 .nt-payment-notification .notification-avatar img {
-	display:none;
+	display: none;
 }
 .notification-popup .jspDrag {
 	width: 4px;
@@ -14956,9 +14956,7 @@ h5.main-italic-header {
 	background-position: -444px -614px;
 }
 .membership-radio-label.prepaid-balance {
-	background-image: url("../images/mega/icons/retina/prepaid-balance@2x.png");
-	background-position: 0 2px;
-	background-size: 20px 20px;
+	background-position: -444px -569px;
 }
 .membership-bott-price {
 	font-size: 72px;

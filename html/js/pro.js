@@ -1212,7 +1212,7 @@ function showLoadingDialog(url) {
             });
     };
 
-    fadeOutInLoop($('.pro-register-paypal-dialog .reg-success-icon'));
+    //fadeOutInLoop($('.pro-register-paypal-dialog .reg-success-icon'));
 
     $dialog
         .addClass('active')

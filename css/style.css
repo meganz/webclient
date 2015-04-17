@@ -22349,7 +22349,7 @@ a.top-login-forgot-pass {
 	cursor: pointer;
 }
 .pro-register-paypal-dialog .reg-success-icon, .payment-confirmation .icon {
-	background: url(../images/mega/bitcoin-v1.png) 0 0 no-repeat;
+	background: url(../images/mega/bitcoin-icon@2x.png) 0 0 no-repeat;
 	width: 200px;
 	height: 200px;
 }

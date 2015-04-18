@@ -6834,8 +6834,18 @@ function initShareDialog() {
     }
 
     $('.share-dialog').rebind('click', function(e) {
-        // Fix bug in console
-        if (typeof e.originalEvent.path != 'undefined') {
+        var hideMenus = function() {
+            // share dialog permission menu
+            $('.permissions-menu', $this).fadeOut(200);
+            $('.import-contacts-dialog').fadeOut(200);
+            $('.permissions-icon', $this).removeClass('active');
+            $('.share-dialog-permissions', $this).removeClass('active');
+            closeImportContactNotification('.share-dialog');
+            $('.import-contacts-service', $this).removeClass('imported');
+        };
+        var $this = $(this);
+
+        if (typeof e.originalEvent.path !== 'undefined') {
 
             // This's sensitive to dialog DOM element positioning
             var trg = e.originalEvent.path[0];
@@ -6846,14 +6856,11 @@ function initShareDialog() {
                 && !$(trg1).is('.permissions-icon,.import-contacts-link,.share-dialog-permissions')
                 && !$(trg2).is('.permissions-icon,.import-contacts-link,.share-dialog-permissions'))
             {
-                // share dialog permission menu
-                $('.permissions-menu').fadeOut(200);
-                $('.import-contacts-dialog').fadeOut(200);
-                $('.permissions-icon').removeClass('active');
-                $('.share-dialog-permissions').removeClass('active');
-                closeImportContactNotification('.share-dialog');
-                $('.import-contacts-service').removeClass('imported');
+                hideMenus();
             }
+        }
+        else if ($this.get(0) === e.currentTarget) {
+            hideMenus();
         }
     });
 
@@ -6970,7 +6977,7 @@ function initShareDialog() {
 
     // related to specific contact
     $('.share-dialog').off('click', '.share-dialog-permissions');
-    $('.share-dialog').on('click', '.share-dialog-permissions', function() {
+    $('.share-dialog').on('click', '.share-dialog-permissions', function(e) {
         var $this = $(this),
             $m = $('.permissions-menu'),
             scrollBlock = $('.share-dialog-contacts .jspPane');

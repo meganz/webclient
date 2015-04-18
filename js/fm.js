@@ -1011,7 +1011,8 @@ function initUI() {
                 return !!fmTabState[c];
             });
 
-        if ((active = fmTabState[active])) {
+        active = fmTabState[active];
+        if (active) {
             if (active.root === M.currentrootid) {
                 active.prev = M.currentdirid;
             }

@@ -487,11 +487,16 @@ function treesearchUI()
                     // hide everything
                     menu.find('.sorting-item-divider,*[data-by=name],*[data-by=status],*[data-by=last-interaction]').addClass('hidden');
             }
+            var sortTreePanel = $.sortTreePanel[type];
+            if (d && !sortTreePanel) {
+                console.error('No sortTreePanel', type);
+            }
 
-            $('.sorting-menu-item')
-                .removeClass('active')
-                .filter('*[data-by=' + $.sortTreePanel[type].by + '],*[data-dir=' + $.sortTreePanel[type].dir + ']')
-                .addClass('active');
+            var $o = $('.sorting-menu-item')
+                .removeClass('active');
+            if (sortTreePanel) {
+                $o.filter('*[data-by=' + sortTreePanel.by + '],*[data-dir=' + sortTreePanel.dir + ']').addClass('active');
+            }
             return false;
         }
         else
@@ -1001,8 +1006,8 @@ function initUI() {
                 'rubbish-bin':    { root: M.RubbishID, prev: null }
             };
         }
-        var active = $('.nw-fm-left-icon.active:visible')
-            .attr('class').split(" ").filter(function(c) {
+        var active = (''+$('.nw-fm-left-icon.active:visible')
+            .attr('class')).split(" ").filter(function(c) {
                 return !!fmTabState[c];
             });
 
@@ -2627,11 +2632,6 @@ function notificationsUI(close)
     {
         $('.fm-main.notifications').addClass('hidden');
         $('.fm-main.default').removeClass('hidden');
-        treeUI();
-        if (M.viewmode)
-            iconUI();
-        else
-            gridUI();
         return false;
     }
     notifyPopup.notifyMarkCount(true);
@@ -5458,8 +5458,15 @@ function disableCircularTargets(pref)
     {
         var x = $.selected[s];
         $(pref + x).addClass('disabled');
-        $(pref + M.d[x].p).addClass('disabled');// Disable parent dir
-        disableDescendantFolders(x, pref);// Disable all children folders
+        if (M.d[x]) {
+            // Disable parent dir
+            $(pref + M.d[x].p).addClass('disabled');
+        }
+        else if (d) {
+            console.error('disableCircularTargets: Invalid node', x, pref);
+        }
+        // Disable all children folders
+        disableDescendantFolders(x, pref);
     }
     return true;
 }

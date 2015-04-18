@@ -1240,9 +1240,10 @@ function removeUInode(h) {
             });
 
             //Clear right panel:
-            $('.grid-table.contacts tr#' + h).fadeOut('slow', function() {
-                $(this).remove();
-            });
+            $('.grid-table.contacts tr#' + h + ', .contacts-blocks-scrolling a#' + h)
+                .fadeOut('slow', function() {
+                    $(this).remove();
+                });
 
             // clear the contacts grid:
             $('.contacts-grid-view #' + h).remove();

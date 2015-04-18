@@ -1363,7 +1363,7 @@ function MegaData()
         if (d) {
             console.log('openFolder()', M.currentdirid, id, force);
         }
-        if ((id !== 'notifications') && ($('.fm-main.notifications').hasClass('hidden') === false)) {
+        if ((id !== 'notifications') && ($('.fm-main.notifications').hasClass('hidden'))) {
             notificationsUI(1);
         }
         this.search = false;

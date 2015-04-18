@@ -5673,11 +5673,11 @@ table .grid-status-icon.star {
 }
 .file-block .file-status-icon, .contact-status-icon, .properties-body .file-status-icon, .link-icon {
 	position: absolute;
-    left: 6px;
-    top: 6px;
-    height: 20px;
-    z-index: 10;
-    width: 20px;
+        left: 6px;
+        top: 6px;
+        height: 20px;
+        z-index: 10;
+        width: 20px;
 }
 .link-icon {
 	left:auto;
@@ -5687,7 +5687,7 @@ table .grid-status-icon.star {
 }
 .own-data .link-icon {
 	left: 3px;
-    top: 2px;
+        top: 2px;
 }
 .linked .link-icon {
 	display:block;

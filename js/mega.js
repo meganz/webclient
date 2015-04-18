@@ -875,8 +875,10 @@ function MegaData()
          * @returns {int}
          */
         function renderLayout(u, n_cache) {
-            var html, el, cs, contains, u_h, av_meta, t, el, time,
+            var html, el, cs, contains, u_h, av_meta, t, el, time, bShare,
                 avatar, av_color, rights, rightsclass, onlinestatus, html,
+                sExportLink,
+                iShareNum = 0,
                 s = '',
                 ftype = '',
                 c = '',
@@ -1001,21 +1003,38 @@ function MegaData()
                                 </tr>';
                     }
                 } else {
+                    
+                    if (M.v[i].shares) {
+                        iShareNum = Object.keys(M.v[i].shares).length;
+                    }
+                    else {
+                        iShareNum = 0;
+                    }
+                    bShare = (
+                        (M.v[i].shares && M.v[i].shares.EXP && iShareNum > 1)
+                        || (M.v[i].shares && !M.v[i].shares.EXP && iShareNum)
+                        || M.ps[M.v[i].h])
+                        ? true : false;
+                    sExportLink = (M.v[i].shares && M.v[i].shares.EXP) ? 'linked' : '';
+                    
+                    // Block view
                     if (M.viewmode === 1) {
                         t = '.fm-blocks-view.fm .file-block-scrolling';
                         el = 'a';
-                        html = '<a class="file-block' + c + '" id="' + htmlentities(M.v[i].h) + '">\n\
+                        html = '<a class="file-block' + c + ' ' + sExportLink + '" id="' + htmlentities(M.v[i].h) + '">\n\
                                     <span class="file-status-icon' + star + '"></span>\n\
 									<span class="link-icon"></span>\n\
                                     <span class="file-settings-icon">\n\
                                         <span></span>\n\
                                     </span>\n\
                                     <span class="file-icon-area">\n\
-                                        <span class="block-view-file-type ' + fileicon(M.v[i]) + '"><img alt="" /></span>\n\
+                                        <span class="block-view-file-type ' + fileicon({t: 1, shares: bShare}) + '"><img alt="" /></span>\n\
                                     </span>\n\
                                     <span class="file-block-title">' + htmlentities(M.v[i].name) + '</span>\n\
                                 </a>';
                     }
+                    
+                    // List view
                     else {
                         time = time2date(M.v[i].ts || (M.v[i].p === 'contacts' && M.contactstatus(M.v[i].h).ts));
                         t = '.grid-table.fm';
@@ -1025,13 +1044,13 @@ function MegaData()
                                         <span class="grid-status-icon' + star + '"></span>\n\
                                     </td>\n\
                                     <td>\n\
-                                        <span class="transfer-filtype-icon ' + fileicon(M.v[i]) + '"> </span>\n\
+                                        <span class="transfer-filtype-icon ' + fileicon({t: 1, shares: bShare}) + '"> </span>\n\
                                         <span class="tranfer-filetype-txt">' + htmlentities(M.v[i].name) + '</span>\n\
                                     </td>\n\
                                     <td width="100">' + s + '</td>\n\
                                     <td width="130">' + ftype + '</td>\n\
                                     <td width="120">' + time + '</td>\n\
-                                    <td width="62" class="grid-url-field own-data">\n\
+                                    <td width="62" class="grid-url-field own-data ' + sExportLink + '">\n\
                                         <a class="grid-url-arrow">\n\
                                             <span></span>\n\
                                         </a>\n\
@@ -1226,7 +1245,7 @@ function MegaData()
             e.currentTarget = target;
             cacheselect();
             searchPath();
-            contextmenuUI(e, 1);
+            contextMenuUI(e, 1);
         });
 
         $('.file-block .file-settings-icon').bind('click', function(e) {
@@ -1240,7 +1259,7 @@ function MegaData()
             e.currentTarget = target;
             cacheselect();
             searchPath();
-            contextmenuUI(e, 1);
+            contextMenuUI(e, 1);
         });
 
         if (!u) {
@@ -1258,7 +1277,7 @@ function MegaData()
                 $('.shared-details-info-block .grid-url-arrow').unbind('click');
                 $('.shared-details-info-block .grid-url-arrow').bind('click', function (e) {
                     prepareShareMenuHandler(e);
-                    contextmenuUI(e, 1);
+                    contextMenuUI(e, 1);
                 });
 
                 $('.shared-details-info-block .fm-share-download').unbind('click');
@@ -1268,7 +1287,7 @@ function MegaData()
                     e.clientX = $this.offset().left;
                     e.clientY = $this.offset().top + $this.height()
 
-                    contextmenuUI(e, 3);
+                    contextMenuUI(e, 3);
                 });
 
                 $('.shared-details-info-block .fm-share-copy').unbind('click');
@@ -3261,6 +3280,36 @@ function MegaData()
         }
     };
     
+    /**
+     * hasExportLink, check if at least one selected
+     * item have export link already generated
+     * 
+     * @param {array} selected
+     * @returns {boolean}
+     */
+    this.hasExportLink = function(selected) {
+        
+        var i, shares, selectedNodeHandle;
+        
+        // Loop through all selected items
+        for (i = selected.length; i--;) {
+            
+            selectedNodeHandle = selected[i];
+            shares = M.d[selectedNodeHandle].shares;
+            
+            // Loop through selected items and search for export link share
+            for (var userHandle in shares) {
+                if (shares.hasOwnProperty(userHandle)) {
+                    if (userHandle === 'EXP' && M.d[selectedNodeHandle].ph) {
+                        return true;
+                    }
+                }
+            }
+        }
+        
+        return false;
+    };
+    
     this.getLinks = function(h) {
         this.$getLinkPromise = new $.Deferred();
 
@@ -3276,7 +3325,7 @@ function MegaData()
                 this.links.push(n.h);
             }
         }
-        if (d) {
+         if (d) {
             console.log('getLinks', this.links);
         }
         if (this.folderLinks.length > 0) {

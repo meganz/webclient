@@ -929,32 +929,41 @@ function initUI() {
 
     });
 
-    $('.fm-back-button').unbind('click');
-    $('.fm-back-button').bind('click', function(e)
-    {
-        if (!M.currentdirid)
+    $('.fm-back-button').rebind('click', function(e) {
+        
+        if (!M.currentdirid) {
             return;
-        if (M.currentdirid == 'notifications' || M.currentdirid.substr(0, 7) == 'search/' || M.currentdirid.substr(0, 5) == 'chat/')
+        }
+        
+        if (M.currentdirid == 'notifications' 
+            || M.currentdirid.substr(0, 7) == 'search/' 
+            || M.currentdirid.substr(0, 5) == 'chat/') {
             window.history.back();
-        else
-        {
+        }
+        else {
             var n = M.d[M.currentdirid];
-            if ((n && n.p && M.d[n.p]) || (n && n.p == 'contacts'))
+            if ((n && n.p && M.d[n.p]) || (n && n.p === 'contacts')) {
                 M.openFolder(n.p);
+            }
         }
     });
+    
     $('.fm-right-header.fm').removeClass('hidden');
+    
     if (folderlink) {
         $('.fm-tree-header.cloud-drive-item span').text('');
     }
-    else
+    else {
         folderlink = 0;
-    if (ul_queue.length > 0)
+    }
+    
+    if (ul_queue.length > 0) {
         openTransferpanel();
-    if (u_type === 0 && !u_attr.terms)
-    {
-        $.termsAgree = function()
-        {
+    }
+    
+    if (u_type === 0 && !u_attr.terms) {
+        $.termsAgree = function() {
+            
             u_attr.terms = 1;
             api_req({a: 'up', terms: 'Mq'});
             // queued work is continued when user accept terms of service
@@ -963,31 +972,31 @@ function initUI() {
             ulQueue.resume();
             ui_paused = false;
         };
-        $.termsDeny = function()
-        {
+        
+        $.termsDeny = function() {
             u_logout();
             document.location.reload();
         };
         termsDialog();
     }
-    if (ul_queue.length > 0)
+    
+    if (ul_queue.length > 0) {
         openTransferpanel();
+    }
     M.avatars();
 
-    if (typeof dl_import !== 'undefined' && dl_import)
+    if (typeof dl_import !== 'undefined' && dl_import) {
         dl_fm_import();
+    }
 
-    $('.context-menu').unbind('contextmenu');
-    $('.context-menu').bind('contextmenu', function(e)
-    {
+    $('.context-menu').rebind('contextmenu', function(e) {
         if (!localStorage.contextmenu)
             e.preventDefault();
     });
 
     var fmTabState;
-    $('.nw-fm-left-icon').unbind('click');
-    $('.nw-fm-left-icon').bind('click', function() {
-        treesearch = false;
+    $('.nw-fm-left-icon').rebind('click', function() {
+        
         var c = $(this).attr('class');
         if (!c) {
             return;
@@ -1186,7 +1195,7 @@ function openTransferpanel()
         transferPanelContextMenu(target);
         target.parent().find('tr').removeClass('ui-selected');
         target.addClass('ui-selected');
-        contextmenuUI(e);
+        contextMenuUI(e);
     });
 
 }
@@ -1310,20 +1319,48 @@ function removeUInode(h) {
 }
 
 function sharedUInode(nodeHandle) {
+
     DEBUG('sharedUInode');
-    var availShares = false;
+    var userHandle, oShares,
+        shareNum = 0,
+        exportLink = false,
+        availShares = false;
 
     if ((M.d[nodeHandle] && M.d[nodeHandle].shares) || M.ps[nodeHandle]) {
-        $('#treea_' + nodeHandle + ' .nw-fm-tree-folder').addClass('shared-folder');
-        $('.grid-table.fm #' + nodeHandle + ' .transfer-filtype-icon').addClass('folder-shared');
-        availShares = true;
-    } else {
+        
+        oShares = M.d[nodeHandle].shares;
+
+        if (oShares) {
+            shareNum = Object.keys(oShares).length;
+        }
+        
+        if (oShares && oShares.EXP) {
+            $('.grid-table.fm #' + nodeHandle + ' .grid-url-field').addClass('linked');
+            $('.file-block#' + nodeHandle).addClass('linked');
+            
+            exportLink = true;
+        }
+        
+        if ((oShares && oShares.EXP && shareNum > 1) || (oShares && !oShares.EXP && shareNum) || M.ps[nodeHandle]) {
+            $('#treea_' + nodeHandle + ' .nw-fm-tree-folder').addClass('shared-folder');
+            
+            availShares = true;
+        }
+    }
+    
+    if (!availShares) {
         $('#treea_' + nodeHandle + ' .nw-fm-tree-folder').removeClass('shared-folder');
         $('.grid-table.fm #' + nodeHandle + ' .transfer-filtype-icon').removeClass('folder-shared');
         $('.file-block#' + nodeHandle + ' .block-view-file-type').removeClass('folder-shared');
     }
-    $('.grid-table.fm #' + nodeHandle + ' .transfer-filtype-icon').addClass(fileicon({ t: 1, shares: availShares }));
-    $('.file-block#' + nodeHandle + ' .block-view-file-type').addClass(fileicon({ t: 1, shares: availShares }));
+    
+    if (!exportLink) {
+        $('.grid-table.fm #' + nodeHandle + ' .grid-url-field').removeClass('linked');
+        $('.file-block#' + nodeHandle).removeClass('linked');        
+    }
+    
+    $('.grid-table.fm #' + nodeHandle + ' .transfer-filtype-icon').addClass(fileicon({t: 1, shares: availShares}));
+    $('.file-block#' + nodeHandle + ' .block-view-file-type').addClass(fileicon({t: 1, shares: availShares}));
 }
 
 function addShareNotification(notification) {
@@ -2172,7 +2209,8 @@ function initContextUI()
         M.addDownload($.selected, true);
     });
 
-    $(c + '.getlink-item').rebind('click', function(event) {
+    $(c + '.getlink-item').rebind('click', function() {
+        
         if ($.propertiesDialog) {
             propertiesDialog(1);
         }
@@ -2186,6 +2224,31 @@ function initContextUI()
         }
     });
 
+    $(c + '.removelink-item').rebind('click', function() {
+        
+        var index, selectedNodeHandle,
+            selected = $.selected;
+        
+        if ($.propertiesDialog) {
+            propertiesDialog(1);
+        }
+        if (u_type === 0) {
+            ephemeralDialog(l[1005]);
+        }
+        else {
+            // ToDo delete icons only if api reqeust was successful
+            for (index = selected.length; index--;) {
+                if (selected.hasOwnProperty(index)) {
+                    selectedNodeHandle = selected[index];
+                    api_req({a: 's2', n:  selectedNodeHandle, s: [{ u: 'EXP', r: ''}], ha: '', i: requesti});
+
+                    M.delNodeShare(selectedNodeHandle, 'EXP');
+                    M.deleteExportLinkShare(selectedNodeHandle);
+                }
+            }
+        }
+    });
+    
     $(c + '.rename-item').unbind('click');
     $(c + '.rename-item').bind('click', function(event)
     {
@@ -3910,7 +3973,7 @@ function gridUI() {
         $('.file-block').removeClass('ui-selected');
         $.selected = [];
         $.hideTopMenu();
-        return !!contextmenuUI(e, 2);
+        return !!contextMenuUI(e, 2);
     });
 
     // enable add star on first column click (make favorite)
@@ -4858,7 +4921,7 @@ function selectddUI() {
         cacheselect();
         searchPath();
         $.hideTopMenu();
-        return !!contextmenuUI(e, 1);
+        return !!contextMenuUI(e, 1);
     });
 
     $($.selectddUIgrid + ' ' + $.selectddUIitem).unbind('click');
@@ -4992,7 +5055,7 @@ function iconUI(aQuiet)
         selectionManager.clear(); // is this required? don't we have a support for a multi-selection context menu?
         $.selected = [];
         $.hideTopMenu();
-        return !!contextmenuUI(e, 2);
+        return !!contextMenuUI(e, 2);
     });
 
     if (M.currentdirid == 'contacts')
@@ -5072,7 +5135,7 @@ function transferPanelUI()
                     $('.transfer-table tr').removeClass('ui-selected');
                 $(this).addClass('ui-selected');
                 $(this).addClass('dragover');
-                return !!contextmenuUI(e);
+                return !!contextMenuUI(e);
             }
             else
             {
@@ -5287,45 +5350,66 @@ function getDDhelper()
     return $('.dragger-block')[0];
 }
 
-function menuItems()
-{
-    var items = [];
-    var sourceRoot = RootbyId($.selected[0]);
-    if ($.selected.length == 1 && RightsbyID($.selected[0]) > 1)
+function menuItems() {
+    
+    var selItem,
+        items = [],
+        sourceRoot = RootbyId($.selected[0]);
+    
+    if ($.selected.length === 1 && RightsbyID($.selected[0]) > 1) {
         items['rename'] = 1;
-    if (RightsbyID($.selected[0]) > 0)
-    {
+    }
+    
+    if (RightsbyID($.selected[0]) > 0) {
         items['add-star'] = 1;
         $.delfav = 1;
-        for (var i in $.selected)
-        {
-            var n = M.d[$.selected[i]];
+        
+        for (var i in $.selected) {
+            n = M.d[$.selected[i]];
             if (n && !n.fav)
                 $.delfav = 0;
         }
-        if ($.delfav)
+        
+        if ($.delfav) {
             $('.add-star-item').html('<span class="context-menu-icon"></span>' + l[5872]);
-        else
+        }
+        else {
             $('.add-star-item').html('<span class="context-menu-icon"/></span>' + l[5871]);
+        }
     }
-    var n = M.d[$.selected[0]];
-    if (n && n.p.length == 11)
+    
+    selItem = M.d[$.selected[0]];
+    
+    if (selItem && selItem.p.length === 11) {
         items['removeshare'] = 1;
-    else if (RightsbyID($.selected[0]) > 1)
+    }
+    else if (RightsbyID($.selected[0]) > 1) {
         items['remove'] = 1;
-    if (n && $.selected.length == 1 && n.t)
+    }
+
+    if (selItem && $.selected.length === 1 && selItem.t) {
         items['open'] = 1;
-    if (n && $.selected.length == 1 && is_image(n))
+    }
+
+    if (selItem && $.selected.length === 1 && is_image(selItem)) {
         items['preview'] = 1;
-    if (n && sourceRoot == M.RootID && $.selected.length == 1 && n.t && !folderlink)
+    }
+
+    if (selItem && sourceRoot === M.RootID && $.selected.length === 1 && selItem.t && !folderlink) {
         items['sh4r1ng'] = 1;
-    if (sourceRoot == M.RootID && !folderlink)
-    {
+    }
+
+    if (sourceRoot === M.RootID && !folderlink) {
         items['move'] = 1;
         items['getlink'] = 1;
+        if (M.hasExportLink($.selected)) {
+            items['removelink'] = true;
+        }
     }
-    else if (sourceRoot == M.RubbishID && !folderlink)
+
+    else if (sourceRoot === M.RubbishID && !folderlink) {
         items['move'] = 1;
+    }
 
     items['download'] = 1;
     items['zipdownload'] = 1;
@@ -5333,48 +5417,58 @@ function menuItems()
     items['properties'] = 1;
     items['refresh'] = 1;
 
-    if (folderlink)
-    {
+    if (folderlink) {
         delete items['properties'];
         delete items['copy'];
         delete items['add-star'];
-        if (u_type)
+        if (u_type) {
             items['import'] = 1;
+        }
     }
 
     return items;
 }
 
-function contextmenuUI(e, ll, topmenu) {
+function contextMenuUI(e, ll) {
+    
+    var items, v, flt,
+        m = $('.context-menu.files-menu'),
+        t = '.context-menu.files-menu .context-menu-item',
+        c = $(e.currentTarget).attr('class'),
+        id = $(e.currentTarget).attr('id');
+    
     // is contextmenu disabled
-    if (localStorage.contextmenu)
+    if (localStorage.contextmenu) {
         return true;
+    }
 
     $.hideContextMenu();
 
-    var m = $('.context-menu.files-menu');// container/wrapper around menu
-    var t = '.context-menu.files-menu .context-menu-item';
-
-    // it seems that ll == 2 is used when right click is occured outside item, on empty canvas
+    // Used when right click is occured outside item, on empty canvas
     if (ll === 2) {
+        
         // Enable upload item menu for clould-drive, don't show it for rubbish and rest of crew
         if (RightsbyID(M.currentdirid) && RootbyId(M.currentdirid) !== M.RubbishID) {
             $(t).filter('.context-menu-item').hide();
             $(t).filter('.fileupload-item,.newfolder-item').show();
+            
             if ((is_chrome_firefox & 2) || 'webkitdirectory' in document.createElement('input')) {
                 $(t).filter('.folderupload-item').show();
             }
-        } else {
+        }
+        else {
             return false;
         }
-    } else if (ll === 3) {// we want just the download menu
+    }
+    else if (ll === 3) {// we want just the download menu
         $(t).hide();
         // m.hide();
         m = $('.context-menu.download');
         t = '.context-menu.download .context-menu-item';
-    } else if (ll === 4 || ll === 5) {// contactUI
+    }
+    else if (ll === 4 || ll === 5) {// contactUI
         $(t).hide();
-        var items = menuItems();
+        items = menuItems();
         delete items['download'];
         delete items['zipdownload'];
         delete items['copy'];
@@ -5387,13 +5481,18 @@ function contextmenuUI(e, ll, topmenu) {
         for (var item in items) {
             $(t).filter('.' + item + '-item').show();
         }
-    } else if (ll) {// click on item
-        $(t).hide();// Hide all menu-items
-        var c = $(e.currentTarget).attr('class');
-        var id = $(e.currentTarget).attr('id');
+    }
+    else if (ll) {// Click on item
+
+        // Hide all menu-items
+        $(t).hide();
+        c = $(e.currentTarget).attr('class');
+        id = $(e.currentTarget).attr('id');
+        
         if (id) {
             id = id.replace('treea_', '');// if right clicked on left panel
         }
+        
         if (id && !M.d[id]) {
             id = undefined;// exist in node list
         }
@@ -5401,8 +5500,9 @@ function contextmenuUI(e, ll, topmenu) {
         // detect and show right menu
         if (id && id.length === 11) {
             $(t).filter('.remove-item').show();// transfer panel
-        } else if (c && c.indexOf('cloud-drive-item') > -1) {
-            var flt = '.properties-item';
+        }
+        else if (c && c.indexOf('cloud-drive-item') > -1) {
+            flt = '.properties-item';
             if (folderlink) {
                 flt += ',.import-item';
                 if (M.v.length) {
@@ -5411,35 +5511,41 @@ function contextmenuUI(e, ll, topmenu) {
             }
             $.selected = [M.RootID];
             $(t).filter(flt).show();
-        } else if (c && c.indexOf('recycle-item') > -1) {
+        }
+        else if (c && c.indexOf('recycle-item') > -1) {
             $(t).filter('.clearbin-item').show();
-        } else if (c && c.indexOf('contacts-item') > -1) {
+        }
+        else if (c && c.indexOf('contacts-item') > -1) {
             $(t).filter('.addcontact-item').show();
-        } else if (c && c.indexOf('messages-item') > -1) {
+        }
+        else if (c && c.indexOf('messages-item') > -1) {
             e.preventDefault();
             return false;
-        } else if (c && (c.indexOf('file-block') > -1 || c.indexOf('folder') > -1 || c.indexOf('fm-tree-folder') > -1) || id) {
-            var items = menuItems();
+        }
+        else if (c && (c.indexOf('file-block') > -1 || c.indexOf('folder') > -1 || c.indexOf('fm-tree-folder') > -1) || id) {
+            items = menuItems();
             for (var item in items) {
                 $(t).filter('.' + item + '-item').show();
             }
-        } else {
+        }
+        else {
             return false;
         }
     }
     // This part of code is also executed when ll == 'undefined'
-    var v = m.children($('.context-menu-section'));
+    v = m.children($('.context-menu-section'));
 
     // count all items inside section, and hide dividers if necessary
-    v.each(function() {// hide dividers in hidden sections
+    v.each(function() {
         var a = $(this).find('a.context-menu-item'),
             b = $(this).find('.context-menu-divider'),
-            c = a.filter(function() {
+            x = a.filter(function() {
                 return $(this).css('display') === 'none';
             });
-        if (c.length === a.length || a.length === 0) {
+        if (x.length === a.length || a.length === 0) {
             b.hide();
-        } else {
+        }
+        else {
             b.show();
         }
     });
@@ -5782,7 +5888,7 @@ function treeUI()
             $('.nw-fm-tree-item').removeClass('dragover');
             $(this).addClass('dragover');
             $.selected = [id];
-            return !!contextmenuUI(e, 1);
+            return !!contextMenuUI(e, 1);
         }
         var c = $(e.target).attr('class');
         if (c && c.indexOf('nw-fm-arrow-icon') > -1) {
@@ -6523,14 +6629,6 @@ function fillShareDialogWithContent() {
 
                     generateShareDialogRow(name, email, shareRights, userHandle);
             }
-
-            // Item export link
-            if (userHandle === 'EXP' && M.d[selectedNodeHandle].ph) {
-//                html = generateExportLinkShareDialogRow();
-                window.getLinkState = false;
-                html = addShareDialogContactToContent('', 'EXP', '', '', '', 'read-only', l[55], selectedNodeHandle);
-                $('.share-dialog .share-dialog-contacts').append(html);
-            }
         }
     }
 
@@ -6916,53 +7014,44 @@ function initShareDialog() {
 
     $('.share-dialog').off('click', '.share-dialog-remove-button');
     $('.share-dialog').on('click', '.share-dialog-remove-button', function() {
+        
         var $this = $(this);
 
-        var userEmail, pendingContactId,
+        var userEmail, pendingContactId, selectedNodeHandle, num,
             handleOrEmail = $this.parent().attr('id').replace('sdcbl_', '');
 
         $this.parent()
             .fadeOut(200)
             .remove();
 
-        var selectedNodeHandle = $.selected[0];
+        selectedNodeHandle = $.selected[0];
         if (handleOrEmail !== '') {
 
-            // Export link
-            if (handleOrEmail === 'EXP') {
-                // The s2 api call can remove both shares and pending shares
-                api_req({a: 's2', n:  selectedNodeHandle, s: [{ u: handleOrEmail, r: ''}], ha: '', i: requesti});
+            // Due to pending shares, the id could be an email instead of a handle
+            userEmail = handleOrEmail;
 
-                M.delNodeShare(selectedNodeHandle, 'EXP');
-                M.deleteExportLinkShare(selectedNodeHandle);
+            // If it was a user handle, the share is a full share
+            if (M.u[handleOrEmail]) {
+                userEmail = M.u[handleOrEmail].m;
+                M.delNodeShare(selectedNodeHandle, handleOrEmail);
             }
+
+            // Pending share
             else {
-                // Due to pending shares, the id could be an email instead of a handle
-                userEmail = handleOrEmail;
-
-                // If it was a user handle, the share is a full share
-                if (M.u[handleOrEmail]) {
-                    userEmail = M.u[handleOrEmail].m;
-                    M.delNodeShare(selectedNodeHandle, handleOrEmail);
-                }
-
-                // Pending share
-                else {
-                    pendingContactId = M.findOutgoingPendingContactIdByEmail(userEmail);
-                    M.deletePendingShare(selectedNodeHandle, pendingContactId);
-                    sharedUInode(selectedNodeHandle);
-                }
-
-                // The s2 api call can remove both shares and pending shares
-                api_req({a: 's2', n:  selectedNodeHandle, s: [{ u: userEmail, r: ''}], ha: '', i: requesti});
-
-                $.sharedTokens.splice($.sharedTokens.indexOf(userEmail), 1);
+                pendingContactId = M.findOutgoingPendingContactIdByEmail(userEmail);
+                M.deletePendingShare(selectedNodeHandle, pendingContactId);
+                sharedUInode(selectedNodeHandle);
             }
+
+            // The s2 api call can remove both shares and pending shares
+            api_req({a: 's2', n:  selectedNodeHandle, s: [{ u: userEmail, r: ''}], ha: '', i: requesti});
+
+            $.sharedTokens.splice($.sharedTokens.indexOf(userEmail), 1);
         }
 
         shareDialogContentCheck();
 
-        var num = $('.share-dialog .share-dialog-contacts .share-dialog-contact-bl').length + $('.share-dialog .token-input-list-mega .token-input-token-mega').length;
+        num = $('.share-dialog .share-dialog-contacts .share-dialog-contact-bl').length + $('.share-dialog .token-input-list-mega .token-input-token-mega').length;
         if (!num) {
             $('.dialog-share-button').addClass('disabled');
         }
@@ -7757,7 +7846,14 @@ function itemExportLinkHtml(item) {
 
     fileUrlWithoutKey = getBaseUrl() + '/#' + type + '!' + htmlentities(item.ph);
     fileUrlWithKey = fileUrlWithoutKey + (key ? '!' + a32_to_base64(key) : '');
-    fileUrl = window.getLinkState === false ? fileUrlWithoutKey : fileUrlWithKey;
+    
+    if (window.getLinkState !== false) {
+        fileUrl = fileUrlWithKey;
+    }
+    else {
+        fileUrl = fileUrlWithoutKey;
+    }
+    
     html = '<div class="export-link-item">'
          +      '<div class="export-icon ' + fileicon(item) + '" ></div>'
          +      '<div class="export-link-text-pad">'
@@ -8450,7 +8546,7 @@ function propertiesDialog(close)
             e.currentTarget = $('#' + n.h)
             e.calculatePosition = true;
             $.selected = [n.h];
-            contextmenuUI(e, n.h.length === 11 ? 5 : 1);
+            contextMenuUI(e, n.h.length === 11 ? 5 : 1);
         } else {
             __fsi_close();
         }
@@ -9427,7 +9523,7 @@ function contactUI() {
             e.calculatePosition = true;
             $.selected = [location.hash.replace('#fm/', '')];
             searchPath();
-            contextmenuUI(e, 4);
+            contextMenuUI(e, 4);
         });
 
         var fprint = $('.contact-fingerprint-txt').empty();

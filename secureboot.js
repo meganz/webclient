@@ -935,48 +935,48 @@ else if (!b_u)
         'recover': ['reset','reset_js']
     };
 
-	if (prod_assets) {
-		// Fix jsl
-		var _jsl = []
-		var assets = {}
-		for (var i in jsl) {
-			if (jsl[i].j != 0 && !jsl[i].g) {
-				_jsl.push(jsl[i])
-			} else if (jsl[i].g && !assets[ jsl[i].g ]) {
-				jsl[i]['f'] = "js/xmega-" + jsl[i].g + ".js";
-				_jsl.push(jsl[i])
-				assets[jsl[i].g] = true
-			}
-		}
-		_jsl.push({f: "html/boot.json", n:"prod_assets_boot", j:9})
+    if (prod_assets) {
+        // Fix jsl
+        var _jsl = []
+        var assets = {}
+        for (var i in jsl) {
+            if (jsl[i].j != 0 && !jsl[i].g) {
+                _jsl.push(jsl[i])
+            } else if (jsl[i].g && !assets[ jsl[i].g ]) {
+                jsl[i]['f'] = "js/xmega-" + jsl[i].g + ".js";
+                _jsl.push(jsl[i])
+                assets[jsl[i].g] = true
+            }
+        }
+        _jsl.push({f: "html/boot.json", n:"prod_assets_boot", j:9})
 
-		console.error("Production boot. Loading ", _jsl.length, " assets instead of ", jsl.length);
-		jsl = _jsl;
+        console.error("Production boot. Loading ", _jsl.length, " assets instead of ", jsl.length);
+        jsl = _jsl;
 
-		// fix jsl2
-		for (var i in jsl2) {
-			if (jsl2[i].j == 0) {
-				jsl2[i].j = 9;
-				jsl2[i].f = 'html/extra.json';
-			}
-		}
+        // fix jsl2
+        for (var i in jsl2) {
+            if (jsl2[i].j == 0) {
+                jsl2[i].j = 9;
+                jsl2[i].f = 'html/extra.json';
+            }
+        }
 
-		// TODO: research if Array.filter is portable enough
-		// to use it instead
-		for (var x in subpages) {
-			var has = false
-			var tmp = []
-			for (var y in subpages[x]) {
-				if ((jsl2[subpages[x][y]]||{}).j == 9) {
-					if (!has) tmp.push(subpages[x][y])
-					has = true
-				} else {
-					tmp.push(subpages[x][y])
-				}
-			}
-			subpages[x] = tmp;
-		}
-	}
+        // TODO: research if Array.filter is portable enough
+        // to use it instead
+        for (var x in subpages) {
+            var has = false
+            var tmp = []
+            for (var y in subpages[x]) {
+                if ((jsl2[subpages[x][y]]||{}).j == 9) {
+                    if (!has) tmp.push(subpages[x][y])
+                    has = true
+                } else {
+                    tmp.push(subpages[x][y])
+                }
+            }
+            subpages[x] = tmp;
+        }
+    }
 
 
     if (page)
@@ -1174,7 +1174,7 @@ else if (!b_u)
                 else
                 {
                     var ch = NetUtil.newChannel(file);
-                    ch.contentType = jsl[jsi].j == 3 || jsl[jsi].j == 9
+                    ch.contentType = jsl[jsi].j == 3
                         ? "application/json":"text/plain";
 
                     NetUtil.asyncFetch(ch, function(is, s)
@@ -1187,7 +1187,7 @@ else if (!b_u)
                         else
                         {
                             jsl[jsi].text = NetUtil.readInputStreamToString(is, is.available());
-                            if (jsl[jsi].j == 3 || jsl[jsi].j == 9) l = JSON.parse(jsl[jsi].text);
+                            if (jsl[jsi].j == 3) l = JSON.parse(jsl[jsi].text);
                             step(jsi);
                         }
                     });
@@ -1362,17 +1362,17 @@ else if (!b_u)
                     throw new Error('Error parsing language file '+lang+'.json');
                 }
             }
-			else if (jsl[i].j == 9) {
+            else if (jsl[i].j == 9) {
                 try {
-					var x = JSON.parse(jsl[i].text)
-					for (var i in x) {
-						pages[i] = x[i]
-						jsl_loaded[i] = 1
-					}
-				} catch (ex) {
-					throw new Error("Error parsing template");
-				}
-			}
+                    var x = JSON.parse(jsl[i].text)
+                    for (var i in x) {
+                        pages[i] = x[i]
+                        jsl_loaded[i] = 1
+                    }
+                } catch (ex) {
+                    throw new Error("Error parsing template");
+                }
+            }
             else if (jsl[i].j == 0) pages[jsl[i].n] = jsl[i].text;
         }
         if (window.URL)

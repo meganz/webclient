@@ -984,20 +984,43 @@ function initUI() {
             e.preventDefault();
     });
 
+    var fmTabState;
     $('.nw-fm-left-icon').unbind('click');
     $('.nw-fm-left-icon').bind('click', function() {
         treesearch = false;
         var c = $(this).attr('class');
-        if (c && c.indexOf('cloud-drive') > -1) {
-            M.openFolder(M.RootID);
-        } else if (c && c.indexOf('shared-with-me') > -1) {
-            M.openFolder('shares');
-        } else if (c && c.indexOf('conversations') > -1) {
-            M.openFolder('chat');
-        } else if (c && c.indexOf('contacts') > -1) {
-            M.openFolder('contacts');
-        } else if (c && c.indexOf('rubbish-bin') > -1) {
-            M.openFolder(M.RubbishID);
+        if (!c) {
+            return;
+        }
+        if (!fmTabState || fmTabState['cloud-drive'].root !== M.RootID) {
+            fmTabState = {
+                'cloud-drive':    { root: M.RootID,    prev: null },
+                'shared-with-me': { root: 'shares',    prev: null },
+                'conversations':  { root: 'chat',      prev: null },
+                'contacts':       { root: 'contacts',  prev: null },
+                'rubbish-bin':    { root: M.RubbishID, prev: null }
+            };
+        }
+        var active = $('.nw-fm-left-icon.active:visible')
+            .attr('class').split(" ").filter(function(c) {
+                return !!fmTabState[c];
+            });
+
+        if ((active = fmTabState[active])) {
+            if (active.root === M.currentrootid) {
+                active.prev = M.currentdirid;
+            }
+            else if (d) {
+                console.warn('Root mismatch', M.currentrootid, M.currentdirid, active);
+            }
+        }
+
+        for (var tab in fmTabState) {
+            if (~c.indexOf(tab)) {
+                tab = fmTabState[tab];
+                M.openFolder(tab.prev || tab.root);
+                break;
+            }
         }
     });
 
@@ -5381,9 +5404,7 @@ function contextmenuUI(e, ll, topmenu) {
         } else if (c && c.indexOf('cloud-drive-item') > -1) {
             var flt = '.properties-item';
             if (folderlink) {
-                if (u_type) {
-                    flt += ',.import-item';
-                }
+                flt += ',.import-item';
                 if (M.v.length) {
                     flt += ',.zipdownload-item';
                 }
@@ -5842,9 +5863,13 @@ function sectionUIopen(id) {
     }
     $('.nw-fm-left-icon.' + tmpId).addClass('active');
     $('.content-panel.' + tmpId).addClass('active');
-    $('.fm-left-menu').removeClass('cloud-drive shared-with-me rubbish-bin contacts conversations opc ipc').addClass(tmpId);
+    $('.fm-left-menu').removeClass('cloud-drive folder-link shared-with-me rubbish-bin contacts conversations opc ipc').addClass(tmpId);
     $('.fm-right-header, .fm-import-to-cloudrive, .fm-download-as-zip').addClass('hidden');
     $('.fm-import-to-cloudrive, .fm-download-as-zip').unbind('click');
+
+    $('.fm-main').removeClass('active-folder-link');
+    $('.nw-fm-tree-header.folder-link').hide();
+    $('.nw-fm-left-icon.folder-link').removeClass('active');
 
     if (folderlink) {
         if (!isValidShareLink()) {
@@ -5865,14 +5890,9 @@ function sectionUIopen(id) {
                     M.addDownload([M.currentdirid], true);
                 }
             });
-            if (!u_type) {
-                $('.fm-import-to-cloudrive').addClass('hidden');
-            }
-        } else {
-            $('.fm-main').removeClass('active-folder-link');
-            $('.fm-left-menu').removeClass('folder-link');
-            $('.nw-fm-tree-header.folder-link').hide();
-            $('.nw-fm-left-icon.folder-link').removeClass('active');
+            // if (!u_type) {
+                // $('.fm-import-to-cloudrive').addClass('hidden');
+            // }
         }
     }
 
@@ -9040,27 +9060,31 @@ function fm_contains(filecnt, foldercnt) {
 function fm_importflnodes(nodes)
 {
     var sel = [].concat(nodes || []);
-    if (sel.length)
-    {
+    if (sel.length) {
         var FLRootID = M.RootID;
 
-        $.onImportCopyNodes = fm_getcopynodes(sel);
-        document.location.hash = 'fm';
+        mega.ui.showLoginRequiredDialog().done(function() {
 
-        $(document).one('onInitContextUI', SoonFc(function(e)
-        {
-            if (ASSERT(M.RootID != FLRootID, 'Unexpected openFolder on Import'))
-            {
-                if (d)
-                    console.log('Importing Nodes...', sel, $.onImportCopyNodes);
+            $.onImportCopyNodes = fm_getcopynodes(sel);
+            document.location.hash = 'fm';
 
-                $.selected = sel;
-                $.mcImport = true;
+            $(document).one('onInitContextUI', SoonFc(function(e) {
+                if (ASSERT(M.RootID != FLRootID, 'Unexpected openFolder on Import')) {
+                    if (d) console.log('Importing Nodes...', sel, $.onImportCopyNodes);
 
-                // XXX: ...
-                $('.context-menu-item.copy-item').click();
+                    $.selected = sel;
+                    $.mcImport = true;
+
+                    // XXX: ...
+                    $('.context-menu-item.copy-item').click();
+                }
+            }));
+        }).fail(function(aError) {
+            // If no aError, it was canceled
+            if (aError) {
+                alert(aError);
             }
-        }));
+        });
     }
 }
 

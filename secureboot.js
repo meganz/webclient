@@ -113,6 +113,7 @@ catch(e) {
     }
 }
 
+var mega = {ui: {}};
 var bootstaticpath = staticpath;
 var urlrootfile = '';
 
@@ -727,7 +728,7 @@ else if (!b_u)
     jsl.push({f:'js/smartcrop.js', n: 'smartcrop_js', j:1,w:7, j:1, g: 'images'});
     jsl.push({f:'js/mega.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/jquery.fullscreen.js', n: 'jquery_fullscreen', j:1,w:10, g: 'jquery'});
-    jsl.push({f:'js/jquery.qrcode.js', n: 'jqueryqrcode', j:1, 'vendor'});
+    jsl.push({f:'js/jquery.qrcode.js', n: 'jqueryqrcode', j:1, g:'vendor'});
     jsl.push({f:'js/vendor/qrcode.js', n: 'qrcode', j:1,w:2, g: 'vendor'});
     jsl.push({f:'js/bitcoin-math.js', n: 'bitcoinmath', j:1, g: 'vendor' });
     jsl.push({f:'js/vendor/jquery.window-active.js', n: 'jquery_windowactive', j:1,w:2, g: 'jquery'});
@@ -766,6 +767,7 @@ else if (!b_u)
     jsl.push({f:'js/ui/dialog.js', n: 'mega_js', j:1,w:7, g: 'ui'});
     jsl.push({f:'js/ui/feedbackDialog.js', n: 'mega_js', j:1,w:7, g: 'ui'});
     jsl.push({f:'js/ui/credentialsWarningDialog.js', n: 'mega_js', j:1,w:7, g: 'ui'});
+    jsl.push({f:'js/ui/loginRequiredDialog.js', n: 'mega_js', j:1,w:7, g:'ui'});
     jsl.push({f:'js/chat/ui/incomingCallDialog.js', n: 'mega_js', j:1,w:7, g: 'ui'});
 
     // notifications

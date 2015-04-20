@@ -17,7 +17,7 @@ var inherits = (function() {
  *  otherwise false
  */
 function anyOf(arr, value) {
-    return $.inArray(value, arr) == -1 ? false : value;
+    return $.inArray(value, arr) === -1 ? false : value;
 }
 
 /**
@@ -32,7 +32,7 @@ function anyOf(arr, value) {
  */
 function Cascade(tasks, fnc, done, value) {
     function scheduler(value) {
-        if (tasks.length == 0) {
+        if (tasks.length === 0) {
             return done(value);
         }
 
@@ -110,7 +110,7 @@ function jScrollFade(id) {
         $.jScroll = {};
     }
     for (var i in $.jScroll) {
-        if ($.jScroll[i] == 0) {
+        if ($.jScroll[i] === 0) {
             delete $.jScroll[i];
         }
     }
@@ -129,7 +129,7 @@ function jScrollFadeOut(id) {
     $.jScroll[id]++;
     setTimeout(function(id) {
         $.jScroll[id]--;
-        if ($.jScroll[id] == 0) {
+        if ($.jScroll[id] === 0) {
             $('#' + id + ' .jspDrag').removeClass('jspActive');
         }
     }, 500, id);
@@ -139,16 +139,16 @@ function inputfocus(id, defaultvalue, pw) {
     if (pw) {
         $('#' + id)[0].type = 'password';
     }
-    if ($('#' + id)[0].value == defaultvalue) {
+    if ($('#' + id)[0].value === defaultvalue) {
         $('#' + id)[0].value = '';
     }
 }
 
 function inputblur(id, defaultvalue, pw) {
-    if ($('#' + id)[0].value == '') {
+    if ($('#' + id)[0].value === '') {
         $('#' + id)[0].value = defaultvalue;
     }
-    if (($('#' + id)[0].value == defaultvalue) && (pw)) {
+    if (($('#' + id)[0].value === defaultvalue) && (pw)) {
         $('#' + id)[0].type = 'text';
     }
 }
@@ -159,7 +159,7 @@ function easeOutCubic(t, b, c, d) {
 
 function ellipsis(text, location, maxCharacters) {
     if (text.length > 0 && text.length > maxCharacters) {
-        if (typeof(location) == 'undefined') {
+        if (typeof(location) === 'undefined') {
             location = 'end';
         }
         switch (location) {
@@ -188,13 +188,13 @@ function translate(html) {
     for (var i in items) {
         var tmp = items[i].split('.');
         if (tmp.length > 1) {
-            if (tmp[1] == 'dq') {
+            if (tmp[1] === 'dq') {
                 l[items[i]] = l[tmp[0]].replace('"', '&quot;');
             }
-            else if (tmp[1] == 'q') {
+            else if (tmp[1] === 'q') {
                 l[items[i]] = l[tmp[0]].replace("'", "\\'");
             }
-            else if (tmp[1] == 'dqq') {
+            else if (tmp[1] === 'dqq') {
                 l[items[i]] = l[tmp[0]].replace("'", "\\'");
                 l[items[i]] = l[items[i]].replace('"', '&quot;');
             }
@@ -227,11 +227,11 @@ function megatitle(nperc) {
 function populate_l() {
     // for (var i = 7000 ; i-- ; l[i] = l[i] || '(null)');
     l[0] = 'Mega Limited ' + new Date().getFullYear();
-    if ((lang == 'es') || (lang == 'pt') || (lang == 'sk')) {
+    if ((lang === 'es') || (lang === 'pt') || (lang === 'sk')) {
         l[0] = 'Mega Ltd.';
     }
     l[1] = l[398];
-    if (lang == 'en') {
+    if (lang === 'en') {
         l[1] = 'Go Pro';
     }
     l[438] = l[438].replace('[X]', '');
@@ -279,7 +279,7 @@ function populate_l() {
     l[1148] = l[1148].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
     l[1151] = l[1151].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
     l[731] = l[731].replace('[A]', '<a href="#terms">').replace('[/A]', '</a>');
-    if (lang == 'en') {
+    if (lang === 'en') {
         l[965] = 'Legal & policies';
     }
     l[1159] = l[1159].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
@@ -331,7 +331,7 @@ function showmoney(number) {
 
 function getHeight() {
     var myHeight = 0;
-    if (typeof(window.innerWidth) == 'number') {
+    if (typeof(window.innerWidth) === 'number') {
         myHeight = window.innerHeight;
     }
     else if (document.documentElement
@@ -348,7 +348,7 @@ function divscroll(el) {
     document.getElementById(el).scrollIntoView();
     $('body').scrollLeft(0);
     $('html').scrollTop(0);
-    if (page == 'start') {
+    if (page === 'start') {
         start_menu(el);
     }
 }
@@ -442,7 +442,7 @@ function browserdetails(useragent) {
         icon = 'unknown.png';
     }
     if (!icon && browser) {
-        if (browser == 'Internet Explorer' || browser == 'Spartan') {
+        if (browser === 'Internet Explorer' || browser === 'Spartan') {
             icon = 'ie.png';
         }
         else {
@@ -481,7 +481,7 @@ function time2date(unixtime, ignoretime) {
 }
 
 // in case we need to run functions.js in a standalone (non secureboot.js) environment, we need to handle this case:
-if (typeof(l) == 'undefined') {
+if (typeof(l) === 'undefined') {
     l = [];
 }
 
@@ -490,14 +490,14 @@ var date_months = []
 function acc_time2date(unixtime) {
     var MyDate = new Date(unixtime * 1000);
     var th = 'th';
-    if ((parseInt(MyDate.getDate()) == 11) || (parseInt(MyDate.getDate()) == 12)) {}
-    else if (('' + MyDate.getDate()).slice(-1) == '1') {
+    if ((parseInt(MyDate.getDate()) === 11) || (parseInt(MyDate.getDate()) === 12)) {}
+    else if (('' + MyDate.getDate()).slice(-1) === '1') {
         th = 'st';
     }
-    else if (('' + MyDate.getDate()).slice(-1) == '2') {
+    else if (('' + MyDate.getDate()).slice(-1) === '2') {
         th = 'nd';
     }
-    else if (('' + MyDate.getDate()).slice(-1) == '3') {
+    else if (('' + MyDate.getDate()).slice(-1) === '3') {
         th = 'rd';
     }
     if (lang !== 'en') {
@@ -581,7 +581,7 @@ function bytesToSize(bytes, precision) {
     var s_gb = 'GB';
     var s_tb = 'TB';
 
-    if (lang == 'fr') {
+    if (lang === 'fr') {
         s_b = 'O';
         s_kb = 'Ko';
         s_mb = 'Mo';
@@ -634,33 +634,33 @@ function checkPassword(strPassword) {
     var nUpperCount = countContain(strPassword, m_strUpperCase);
     var nLowerCount = countContain(strPassword, m_strLowerCase);
     var nLowerUpperCount = nUpperCount + nLowerCount;
-    if (nUpperCount == 0 && nLowerCount != 0) {
+    if (nUpperCount === 0 && nLowerCount !== 0) {
         nScore += 10;
     }
-    else if (nUpperCount != 0 && nLowerCount != 0) {
+    else if (nUpperCount !== 0 && nLowerCount !== 0) {
         nScore += 10;
     }
     var nNumberCount = countContain(strPassword, m_strNumber);
-    if (nNumberCount == 1) {
+    if (nNumberCount === 1) {
         nScore += 10;
     }
     if (nNumberCount >= 3) {
         nScore += 15;
     }
     var nCharacterCount = countContain(strPassword, m_strCharacters);
-    if (nCharacterCount == 1) {
+    if (nCharacterCount === 1) {
         nScore += 10;
     }
     if (nCharacterCount > 1) {
         nScore += 10;
     }
-    if (nNumberCount != 0 && nLowerUpperCount != 0) {
+    if (nNumberCount !== 0 && nLowerUpperCount !== 0) {
         nScore += 2;
     }
-    if (nNumberCount != 0 && nLowerUpperCount != 0 && nCharacterCount != 0) {
+    if (nNumberCount !== 0 && nLowerUpperCount !== 0 && nCharacterCount !== 0) {
         nScore += 3;
     }
-    if (nNumberCount != 0 && nUpperCount != 0 && nLowerCount != 0 && nCharacterCount != 0) {
+    if (nNumberCount !== 0 && nUpperCount !== 0 && nLowerCount !== 0 && nCharacterCount !== 0) {
         nScore += 5;
     }
     return nScore;
@@ -686,7 +686,7 @@ function showNonActivatedAccountDialog(log) {
  * Shows a dialog with a message that the user is over quota
  */
 function showOverQuotaDialog() {
-    
+
     // Show the dialog
     var $dialog = $('.top-warning-popup');
     $dialog.addClass('active');
@@ -827,10 +827,10 @@ function makeMetaAware(kls) {
     kls.prototype.setMeta = function(prefix, namespace, k, val) {
         var self = this;
 
-        if (self["_" + prefix] == undefined) {
+        if (self["_" + prefix] === undefined) {
             self["_" + prefix] = {};
         }
-        if (self["_" + prefix][namespace] == undefined) {
+        if (self["_" + prefix][namespace] === undefined) {
             self["_" + prefix][namespace] = {};
         }
         self["_" + prefix][namespace][k] = val;
@@ -882,8 +882,8 @@ function makeMetaAware(kls) {
         default_value = default_value || undefined; /* optional */
 
         // support for calling only with 2 args.
-        if (k == undefined) {
-            if (self["_" + prefix] == undefined) {
+        if (k === undefined) {
+            if (self["_" + prefix] === undefined) {
                 return default_value;
             }
             else {
@@ -893,10 +893,10 @@ function makeMetaAware(kls) {
         else {
             // all args
 
-            if (self["_" + prefix] == undefined) {
+            if (self["_" + prefix] === undefined) {
                 return default_value;
             }
-            else if (self["_" + prefix][namespace] == undefined) {
+            else if (self["_" + prefix][namespace] === undefined) {
                 return default_value;
             }
             else {
@@ -969,7 +969,8 @@ function simpleStringHashCode(str) {
  * @param [waitForPromise] {(MegaPromise|$.Deferred)} Before starting the timer, we will wait for this promise to be rej/res first.
  * @returns {Deferred}
  */
-function createTimeoutPromise(validateFunction, tick, timeout, resolveRejectArgs, waitForPromise) {
+function createTimeoutPromise(validateFunction, tick, timeout,
+                              resolveRejectArgs, waitForPromise) {
     var $promise = new MegaPromise();
     resolveRejectArgs = resolveRejectArgs || [];
     if (!$.isArray(resolveRejectArgs)) {
@@ -980,7 +981,8 @@ function createTimeoutPromise(validateFunction, tick, timeout, resolveRejectArgs
         if (validateFunction()) {
             if (window.d) {
                 console.debug("Resolving timeout promise",
-                    timeout, "ms", "at", (new Date()), validateFunction, resolveRejectArgs);
+                    timeout, "ms", "at", (new Date()),
+                    validateFunction, resolveRejectArgs);
             }
             $promise.resolve.apply($promise, resolveRejectArgs);
         }
@@ -995,13 +997,15 @@ function createTimeoutPromise(validateFunction, tick, timeout, resolveRejectArgs
             if (validateFunction()) {
                 if (window.d) {
                     console.debug("Resolving timeout promise",
-                        timeout, "ms", "at", (new Date()), validateFunction, resolveRejectArgs);
+                        timeout, "ms", "at", (new Date()),
+                        validateFunction, resolveRejectArgs);
                 }
                 $promise.resolve.apply($promise, resolveRejectArgs);
             }
             else {
                 console.error("Timed out after waiting",
-                    timeout, "ms", "at", (new Date()), validateFunction, resolveRejectArgs);
+                    timeout, "ms", "at", (new Date()),
+                    validateFunction, resolveRejectArgs);
                 $promise.reject.apply($promise, resolveRejectArgs);
             }
         }, timeout);
@@ -1009,7 +1013,7 @@ function createTimeoutPromise(validateFunction, tick, timeout, resolveRejectArgs
         // stop any running timers and timeouts
         $promise.always(function() {
             clearInterval(tickInterval);
-            clearTimeout(timeoutTimer)
+            clearTimeout(timeoutTimer);
         });
 
         $promise.verify();
@@ -1135,7 +1139,7 @@ function assert(test, message) {
 }
 
 /**
- * Pad/prepend `val` with "0" (zeros) until the length is == `length`
+ * Pad/prepend `val` with "0" (zeros) until the length is === `length`
  *
  * @param val {String} value to add "0" to
  * @param len {Number} expected length
@@ -1247,11 +1251,11 @@ function dlError(text) {
  */
 function removeValue(array, value, can_fail) {
     var idx = array.indexOf(value);
-    ASSERT(can_fail || idx != -1, 'Unable to Remove Value ' + value);
-    if (idx != -1) {
+    ASSERT(can_fail || idx !== -1, 'Unable to Remove Value ' + value);
+    if (idx !== -1) {
         array.splice(idx, 1);
     }
-    return idx != -1;
+    return idx !== -1;
 }
 
 function setTransferStatus(dl, status, ethrow, lock) {
@@ -1349,7 +1353,7 @@ function callLoggerWrapper(ctx, fnName, loggerFn, textPrefix, parentLogger) {
     var textPrefix = textPrefix || "missing-prefix";
 
     var logger = MegaLogger.getLogger(textPrefix + "[" + fnName + "]", {}, parentLogger);
-    var logFnName = loggerFn == console.error ? "error" : "debug";
+    var logFnName = loggerFn === console.error ? "error" : "debug";
 
     if (ctx[fnName].haveCallLogger) { // recursion
         return;
@@ -1384,7 +1388,7 @@ function logAllCallsOnObject(ctx, loggerFn, recursive, textPrefix, parentLogger)
     }
     loggerFn = loggerFn || console.debug;
 
-    if (typeof(parentLogger) == "undefined") {
+    if (typeof(parentLogger) === "undefined") {
         var logger = new MegaLogger(textPrefix);
     }
     if (!window.callLoggerObjects) {
@@ -1392,10 +1396,10 @@ function logAllCallsOnObject(ctx, loggerFn, recursive, textPrefix, parentLogger)
     }
 
     $.each(ctx, function(k, v) {
-        if (typeof(v) == "function") {
+        if (typeof(v) === "function") {
             callLoggerWrapper(ctx, k, loggerFn, textPrefix, parentLogger);
         }
-        else if (typeof(v) == "object"
+        else if (typeof(v) === "object"
                 && !$.isArray(v) && v !== null && recursive && !$.inArray(window.callLoggerObjects)) {
             window.callLoggerObjects.push(v);
             logAllCallsOnObject(v, loggerFn, recursive, textPrefix + ":" + k, parentLogger);
@@ -1616,7 +1620,7 @@ function CreateWorkers(url, message, size) {
             worker[i].busy = true;
             instances[i] = done;
             $.each(task, function(e, t) {
-                    if (e == 0) {
+                    if (e === 0) {
                         worker[i].context = t;
                     }
                     else if (t.constructor === Uint8Array && typeof MSBlobBuilder !== "function") {
@@ -1639,18 +1643,18 @@ function mKeyDialog(ph, fl) {
     $('.fm-dialog-overlay').removeClass('hidden');
     $('body').addClass('overlayed');
     $('.fm-dialog.dlkey-dialog input').rebind('focus', function(e) {
-        if ($(this).val() == l[1028]) {
+        if ($(this).val() === l[1028]) {
             $(this).val('');
         }
     });
     $('.fm-dialog.dlkey-dialog input').rebind('blur', function(e) {
-        if ($(this).val() == '') {
+        if ($(this).val() === '') {
             $(this).val(l[1028]);
         }
     });
     $('.fm-dialog.dlkey-dialog input').rebind('keydown', function(e) {
         $('.fm-dialog.dlkey-dialog .fm-dialog-new-folder-button').addClass('active');
-        if (e.keyCode == 13) {
+        if (e.keyCode === 13) {
             $('.fm-dialog.dlkey-dialog .fm-dialog-new-folder-button').click();
         }
     });
@@ -1766,7 +1770,7 @@ mSpawnWorker.prototype = {
                             jid: id
                         });
 
-                        if (d && job.data.length == this.nworkers - 1) {
+                        if (d && job.data.length === this.nworkers - 1) {
                             console.time(id);
                         }
                     }
@@ -1777,7 +1781,7 @@ mSpawnWorker.prototype = {
     busy: function() {
         var nw = this.nworkers;
         while (nw-- && this.wrk[nw].working);
-        return nw == -1;
+        return nw === -1;
     },
     add: function mSW_Add(url) {
         var self = this,
@@ -1829,7 +1833,7 @@ mSpawnWorker.prototype = {
         };
 
         wrk.onmessage = function mSW_OnMessage(ev) {
-            if (ev.data[0] == 'console') {
+            if (ev.data[0] === 'console') {
                 if (d) {
                     var args = ev.data[1];
                     args.unshift(self.token);
@@ -1883,7 +1887,7 @@ mSpawnWorker.prototype = {
         }
 
         Soon(this.postNext.bind(this));
-        if (++job.done == this.nworkers) {
+        if (++job.done === this.nworkers) {
             if (d) {
                 console.timeEnd(reply.jid);
             }
@@ -1929,11 +1933,11 @@ function setupTransferAnalysis() {
             var tp = $.transferprogress;
 
             for (var i in tp) {
-                if (!GlobalProgress[i] || GlobalProgress[i].paused || tp[i][0] == tp[i][1]
+                if (!GlobalProgress[i] || GlobalProgress[i].paused || tp[i][0] === tp[i][1]
                         || (i[0] === 'u' ? ulQueue : dlQueue).isPaused()) {
                     delete prev[i];
                 }
-                else if (prev[i] && prev[i] == tp[i][0]) {
+                else if (prev[i] && prev[i] === tp[i][0]) {
                     var p = tp[i],
                         t = i[0] === 'u' ? 'Upload' : 'Download',
                         r = '',
@@ -2002,7 +2006,7 @@ function setupTransferAnalysis() {
                             j: [prev, tlen],
                             s: s
                         };
-                        if (i[0] == 'z') {
+                        if (i[0] === 'z') {
                             t = 'zip' + t;
                         }
                         console.error(t + ' stuck. ' + r, i, udata);
@@ -2184,10 +2188,10 @@ function bucketspeedometer(initialp) {
 }
 
 function moveCursortoToEnd(el) {
-    if (typeof el.selectionStart == "number") {
+    if (typeof el.selectionStart === "number") {
         el.selectionStart = el.selectionEnd = el.value.length;
     }
-    else if (typeof el.createTextRange != "undefined") {
+    else if (typeof el.createTextRange !== "undefined") {
         el.focus();
         var range = el.createTextRange();
         range.collapse(false);
@@ -2341,7 +2345,7 @@ function _wrapFnWithBeforeAndAfterEvents(fn, eventSuffix, dontReturnPromises) {
             }
 
         }
-        if (typeof(event.returnedValue) != "undefined") {
+        if (typeof(event.returnedValue) !== "undefined") {
             args = event.returnedValue;
         }
 
@@ -2402,7 +2406,7 @@ function flashIsEnabled() {
     }
     catch (e) {
         if (navigator.mimeTypes
-                && (navigator.mimeTypes['application/x-shockwave-flash'] != undefined)
+                && (navigator.mimeTypes['application/x-shockwave-flash'] !== undefined)
                 && (navigator.mimeTypes['application/x-shockwave-flash'].enabledPlugin)) {
             flashEnabled = true;
         }
@@ -2463,13 +2467,13 @@ function secToDuration(s, sep) {
         }
 
         if (i === 0) {
-            unit = v != 1 ? "hours" : "hour";
+            unit = v !== 1 ? "hours" : "hour";
         }
         else if (i === 1) {
-            unit = v != 1 ? "minutes" : "minute";
+            unit = v !== 1 ? "minutes" : "minute";
         }
         else if (i === 2) {
-            unit = v != 1 ? "seconds" : "second";
+            unit = v !== 1 ? "seconds" : "second";
         }
         else {
             throw new Error("this should never happen.");
@@ -2573,7 +2577,7 @@ function generateAnonymousReport() {
     report.l = lang;
     report.scrnSize = window.screen.availWidth + "x" + window.screen.availHeight;
 
-    if (typeof(window.devicePixelRatio) != 'undefined') {
+    if (typeof(window.devicePixelRatio) !== 'undefined') {
         report.pixRatio = window.devicePixelRatio;
     }
 
@@ -2678,7 +2682,7 @@ MegaEvents.prototype.on = function(name, callback) {
             data
         );
 
-        if (c == 'pro' && sessionStorage.proref) {
+        if (c === 'pro' && sessionStorage.proref) {
             data['ref'] = sessionStorage.proref;
         }
 

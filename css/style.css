@@ -3922,6 +3922,13 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 	-ms-transition: all 150ms ease-in-out;
 	transition: all 150ms ease-in-out;
 }
+.nw-fm-tree-item.linked {
+	padding-right: 22px;
+}
+.nw-fm-tree-item.linked .link-icon {
+	top: 1px;
+    right: 7px;
+}
 .nw-fm-tree-item:hover {
 	background-color: rgba(217,0,7,0.2);
 	color: white;

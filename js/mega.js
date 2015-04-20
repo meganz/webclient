@@ -1863,6 +1863,7 @@ function MegaData()
                                         <span class="nw-fm-tree-item ' + containsc + ' ' + expandedc + ' ' + openedc + '" id="' + _a + htmlentities(folders[ii].h) + '">\n\
                                             <span class="nw-fm-arrow-icon"></span>\n\
                                             <span class="nw-fm-tree-folder' + sharedfolder + '">' + htmlentities(folders[ii].name) + '</span>\n\
+											<span class="link-icon"></span>\n\
                                         </span>\n\
                                         <ul id="' + _sub + folders[ii].h + '" ' + ulc + '></ul>\n\
                                     </li>';

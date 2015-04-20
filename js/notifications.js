@@ -287,29 +287,26 @@ var notifyPopup = {
             if (notification.type === 'ipc') {            
                 obj = notifyPopup.renderIncomingPendingContactNotification(notification);
             }
-
             else if (notification.type === 'c') {
                 obj = notifyPopup.renderContactChangeNotification(notification);
-            }
-            
+            }            
             else if (notification.type == 'upci') {
                 obj = notifyPopup.renderUpdatedPendingContactNotificationIncoming(notification);
             }
-
             else if (notification.type == 'upco') {
                 obj = notifyPopup.renderUpdatedPendingContactNotificationOutgoing(notification);
             }
-
             else if (notification.type == 'share') {
                 obj = notifyPopup.renderNewShareNotification(notification);                
             }
-
             else if (notification.type == 'dshare') {
                 obj = notifyPopup.renderRevokedShareNotifications(notification);
             }
-
             else if (notification.type == 'put') {
                 obj = notifyPopup.renderPutNodeNotifications(notification);
+            }            
+            else if (notification.type == 'psts') {
+                obj = notifyPopup.renderPaymentNotification(notification);
             }
 
             if (obj) {                        
@@ -773,6 +770,28 @@ var notifyPopup = {
     },
     
     /**
+     * Process payment notification sent from payment provider e.g. Bitcoin
+     * To test run: addNotification({'a':'psts', 'p':4, 'r':'f'})
+     * @param {Object} notification The action packet {'a':'psts', 'p':<prolevel>, 'r':<s for success or f for failure>}
+     */
+    renderPaymentNotification: function(notification) {
+    
+        var actionPacket = notification.notificationObj;
+        var timestamp = notification.timestamp;
+        var proLevel = actionPacket.p;
+        var proPlan = getProPlan(proLevel);
+        var success = (actionPacket.r === 's') ? true : false;        
+        var message = 'Your payment for the ' + proPlan + ' plan was unsuccessful.';
+        var type = 'proPayment';
+        
+        if (success) {
+            message = 'Your payment for the ' + proPlan + ' plan was received.';
+        }
+
+        return notifyPopup.getNotificationHtml(notification.id, type, message, timestamp, notification.read, null);
+    },
+    
+    /**
      * Refresh the notifications every second if the popup is open
      */
     notifyClock: function() {
@@ -936,6 +955,10 @@ var notifyPopup = {
         else if (type === 'contactRequestIgnored') {
             className = 'nt-contact-request-ignored';
             nstyle2 = 'style="cursor:pointer;"';
+        }
+        else if (type === 'proPayment') {
+            className = 'nt-payment-notification';
+            nstyle = 'style="cursor:default;"';
         }
 
         var email = '';

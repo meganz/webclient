@@ -538,15 +538,19 @@ function dl_writer(dl, is_ready) {
 			if (d) console.error(dl.cancelled ? "download cancelled":"writing empty chunk");
 			return finish_write(task, done);
 		}
+		
+		// As of Firefox 37, this method will neuter the array buffer.
+		var abLen = task.data.byteLength;
+		var abDup = dl.data && (is_chrome_firefox & 4) && new Uint8Array(task.data);
 
 		dl.io.write(task.data, task.offset, function() {
-			dl.writer.pos += task.data.length;
+			dl.writer.pos += abLen;
 			if (dl.data) {
 				new Uint8Array(
 					dl.data,
 					task.offset,
-					task.data.length
-				).set(task.data);
+					abLen
+				).set(abDup||task.data);
 			}
 
 			return finish_write(task, done);

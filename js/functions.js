@@ -1090,14 +1090,11 @@ function toArray(val) {
  *
  * Assertion helper module.
  *
- * Example usage:
- *
- * <pre>
+ * @example
  * function lastElement(array) {
  *     assert(array.length > 0, "empty array in lastElement");
  *     return array[array.length - 1];
  * }
- * </pre>
  */
 /**
  * Assertion exception.

@@ -539,9 +539,14 @@ function generateAvatarMeta(user_hash) {
  * @param ctx {object}
  *     Context, in case higher hierarchies need to inject a context
  *     (default: none).
+ * @return {MegaPromise}
+ *     A promise that is resolved when the original asynch code is settled.
+ *     Can be used to use promises instead of callbacks for asynchronous
+ *     dependencies.
  */
 function getUserAttribute(userhandle, attribute, pub, nonHistoric,
-    callback, ctx) {
+                          callback, ctx) {
+    // Assemble property name on Mega API.
     var attributePrefix = '';
     if (pub === true || pub === undefined) {
         attributePrefix = '+';
@@ -554,45 +559,48 @@ function getUserAttribute(userhandle, attribute, pub, nonHistoric,
     }
     attribute = attributePrefix + attribute;
 
+    // Make the promise to execute the API code.
+    var thePromise = new MegaPromise();
+
+    function settleFunction(res, ctx) {
+        if (typeof res !== 'number') {
+            // Decrypt if it's a private attribute container.
+            if (ctx.ua.charAt(0) === '*') {
+                var clearContainer = tlvstore.blockDecrypt(base64urldecode(res),
+                                                           u_k);
+                res = tlvstore.tlvRecordsToContainer(clearContainer);
+            }
+            if (window.d) {
+                console.log('Attribute "' + ctx.ua + '" for user "' + ctx.u
+                            + '" is "' + res + '".');
+            }
+            thePromise.resolve(res, ctx);
+        } else {
+            // Got back an error (a number).
+            if (window.d) {
+                console.log('Warning, attribute "' + ctx.ua
+                            + '" for user "' + ctx.u
+                            + '" could not be retrieved: ' + res + '!');
+            }
+            thePromise.reject(res, ctx);
+        }
+
+        // Finish off if we have a callback.
+        if (callback) {
+            callback(res, ctx);
+        }
+    }
+
     // Assemble context for this async API request.
     var myCtx = ctx || {};
     myCtx.u = userhandle;
     myCtx.ua = attribute;
-    myCtx.callback = function (res, ctx) {
-        if (typeof res !== 'number') {
-            // Decrypt if it's a private attribute container.
-            var value = res;
-            if (ctx.ua.charAt(0) === '*') {
-                var clearContainer = tlvstore.blockDecrypt(base64urldecode(res),
-                    u_k);
-                value = tlvstore.tlvRecordsToContainer(clearContainer);
-            }
-            if (window.d) {
-                console.log('Attribute "' + ctx.ua + '" for user "' + ctx.u
-                            + '" is "' + value + '".');
-            }
-            if (ctx.callback2) {
-                ctx.callback2(value, ctx);
-            }
-        }
-        else {
-            if (window.d) {
-                console.log('Error retrieving attribute "' + ctx.ua
-                            + '" for user "' + ctx.u + '": ' + res + '!');
-            }
-            if (ctx.callback2) {
-                ctx.callback2(res, ctx);
-            }
-        }
-    };
-    myCtx.callback2 = callback;
+    myCtx.callback = settleFunction;
 
     // Fire it off.
-    api_req({
-        'a': 'uga',
-        'u': userhandle,
-        'ua': attribute
-    }, myCtx);
+    api_req({'a': 'uga', 'u': userhandle, 'ua': attribute}, myCtx);
+
+    return thePromise;
 }
 
 /**
@@ -613,13 +621,21 @@ function getUserAttribute(userhandle, attribute, pub, nonHistoric,
  *     Callback function to call upon completion (default: none). This callback
  *     function expects two parameters: the attribute `name`, and its `value`.
  *     In case of an error, the `value` will be undefined.
+ * @param ctx {object}
+ *     Context, in case higher hierarchies need to inject a context
+ *     (default: none).
  * @param mode {integer}
  *     Encryption mode. One of BLOCK_ENCRYPTION_SCHEME (default: AES_CCM_12_16).
+ * @return {MegaPromise}
+ *     A promise that is resolved when the original asynch code is settled.
+ *     Can be used to use promises instead of callbacks for asynchronous
+ *     dependencies.
  */
-function setUserAttribute(attribute, value, pub, nonHistoric, callback,
-    mode) {
+function setUserAttribute(attribute, value, pub, nonHistoric, callback, ctx,
+                          mode) {
+    // Prepare all data needed for the call on the Mega API.
     if (mode === undefined) {
-        mode = tlvstore.BLOCK_ENCRYPTION_SCHEME.AES_CCM_12_16;
+        mode = tlvstore.BLOCK_ENCRYPTION_SCHEME.AES_GCM_12_16;
     }
     if (nonHistoric === true || nonHistoric === 1) {
         attribute = '!' + attribute;
@@ -635,37 +651,41 @@ function setUserAttribute(attribute, value, pub, nonHistoric, callback,
             tlvstore.containerToTlvRecords(value), u_k, mode));
     }
 
-    // Assemble context for this async API request.
-    var myCtx = {
-        callback: function (res, ctx) {
-            if (window.d) {
-                if (typeof res !== 'number') {
-                    console.log('Setting user attribute "'
-                                + ctx.ua + '", result: ' + res);
-                }
-                else {
-                    console.log('Error setting user attribute "'
-                                + ctx.ua + '", result: ' + res + '!');
-                }
-            }
-            if (ctx.callback2) {
-                ctx.callback2(res, ctx);
-            }
-        },
-        ua: attribute,
-        callback2: callback,
-    };
+    // Make the promise to execute the API code.
+    var thePromise = new MegaPromise();
+
+    function settleFunction(res, ctx) {
+        if (typeof res !== 'number') {
+            console.log('Setting user attribute "'
+                        + ctx.ua + '", result: ' + res);
+            thePromise.resolve(res, ctx);
+        } else {
+            console.log('Error setting user attribute "'
+                        + ctx.ua + '", result: ' + res + '!');
+            thePromise.reject(res, ctx);
+        }
+
+        // Finish off if we have a callback.
+        if (callback) {
+            callback(res, ctx);
+        }
+    }
+
+    var myCtx = ctx || {};
+    myCtx.ua = attribute;
+    myCtx.callback = settleFunction;
 
     // Fire it off.
-    var apiCall = {
-        'a': 'up'
-    };
+    var apiCall = {'a': 'up'};
     apiCall[attribute] = value;
     api_req(apiCall, myCtx);
+
+    return thePromise;
 }
 
 function isNonActivatedAccount() {
-    return (!u_privk && typeof (u_attr.p) !== 'undefined' && (u_attr.p >= 1 || u_attr.p <= 4));
+    return (!u_privk && typeof (u_attr.p) !== 'undefined'
+            && (u_attr.p >= 1 || u_attr.p <= 4));
 }
 
 function isEphemeral() {

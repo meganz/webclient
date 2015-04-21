@@ -172,13 +172,13 @@ describe("OpQueue Unit Test", function() {
         expect(opQueue.$waitPreprocessing.state()).to.eql("resolved");
 
         expect(opQueue.ctx.processMessage.callCount).to.eql(1);
-        expect(getPubEd25519.callCount).to.eql(2);
+        expect(crypt.getPubEd25519.callCount).to.eql(2);
 
         // -> lets try failing, this should remove the 'processMessage' from the queue.
 
-        getPubEd25519.restore();
+        crypt.getPubEd25519.restore();
         // lets make getPubEd return error
-        sinon.stub(window, 'getPubEd25519', function(u_h, cb) {
+        sinon.stub(crypt, 'getPubEd25519', function(u_h, cb) {
             cb(false)
         });
 
@@ -192,18 +192,18 @@ describe("OpQueue Unit Test", function() {
         opQueue.queue('sampleOp1', 'args1');
         // 'sampleOp1' should NOT be executed, because 'processMessage' had blocked the queue from processing next ops
         expect(opQueue.ctx.sampleOp1.callCount).to.eql(0);
-        expect(getPubEd25519.callCount).to.eql(4);
+        expect(crypt.getPubEd25519.callCount).to.eql(4);
 
-        getPubEd25519.restore();
+        crypt.getPubEd25519.restore();
         // make getPubEd work again
-        sinon.stub(window, 'getPubEd25519', function(u_h, cb) {
+        sinon.stub(crypt, 'getPubEd25519', function(u_h, cb) {
             cb('key')
         });
         opQueue.pop();
 
         expect(opQueue.$waitPreprocessing).to.eql(true);
 
-        expect(getPubEd25519.callCount).to.eql(2);
+        expect(crypt.getPubEd25519.callCount).to.eql(2);
         expect(opQueue.ctx.sampleOp1.callCount).to.eql(1);
 
         mdMocker.restore();

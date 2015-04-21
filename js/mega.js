@@ -505,7 +505,7 @@ function MegaData()
      *
      * @param {array.<JSON_objects>} ipc - received requests
      * @param {bool} clearGrid
-     * 
+     *
      */
     this.drawReceivedContactRequests = function(ipc, clearGrid) {
         DEBUG('Draw received contacts grid.');
@@ -600,7 +600,7 @@ function MegaData()
      *
      * @param {array.<JSON_objects>} opc - sent requests
      * @param {bool} clearGrid
-     * 
+     *
      */
     this.drawSentContactRequests = function(opc, clearGrid) {
         DEBUG('Draw sent invites.');
@@ -4276,10 +4276,11 @@ function fm_matchname(p, name)
 
 var t;
 
-function renderfm()
+function renderfm(stackPointer)
 {
-    if (d)
+    if (d) {
         console.time('renderfm');
+    }
 
     initUI();
     loadingDialog.hide();
@@ -4841,9 +4842,13 @@ function loadfm(force)
             M.reset();
             fminitialized = false;
             loadfm.loading = true;
-            api_req({a:'f',c:1,r:1},{
-                callback : loadfm_callback
-            },n_h ? 1 : 0);
+            var sp = new Error('loadfm-stack-pointer');
+            setTimeout(function __lazyLoadFM() {
+                api_req({a:'f',c:1,r:1},{
+                    callback: loadfm_callback,
+                    stackPointer: sp
+                },n_h ? 1 : 0);
+            }, 350);
         }
     }
 }
@@ -5294,7 +5299,7 @@ function __process_f2(f, cb, tick)
  * Handle incoming pending contacts
  *
  * @param {array.<JSON_objects>} pending contacts
- * 
+ *
  */
 function processIPC(ipc) {
     DEBUG('processIPC');
@@ -5317,7 +5322,7 @@ function processIPC(ipc) {
  * Handle outgoing pending contacts
  *
  * @param {array.<JSON_objects>} pending contacts
- * 
+ *
  */
 function processOPC(opc) {
     DEBUG('processOPC');
@@ -5359,7 +5364,7 @@ function processOPC(opc) {
  *
  * @param {array.<JSON_objects>} pending shares
  *
- * 
+ *
  */
 function processPS(pendingShares) {
     DEBUG('processPS');
@@ -5403,7 +5408,7 @@ function processPS(pendingShares) {
  * Handle upca response, upci, pending contact request updated (for whom it's incomming)
  *
  * @param {array.<JSON_objects>} ap (actionpackets)
- * 
+ *
  */
 function processUPCI(ap) {
     DEBUG('processUPCI');
@@ -5556,7 +5561,7 @@ function init_chat() {
     }
 }
 
-function loadfm_callback(res) {
+function loadfm_callback(res, ctx) {
 
     if (pfkey && res.f && res.f[0]) {
         M.RootID = res.f[0].h;
@@ -5583,6 +5588,7 @@ function loadfm_callback(res) {
 
         // If we have shares, and if a share is for this node, record it on the nodes share list
         if (res.s) {
+            var sharedNodes = [];
             for (var i in res.s) {
                 if (res.s.hasOwnProperty(i)) {
 
@@ -5590,9 +5596,12 @@ function loadfm_callback(res) {
                     M.nodeShare(nodeHandle, res.s[i]);
 
                     if (res.s[i].u === 'EXP') {
-                        M.getLinks([nodeHandle]);
+                        sharedNodes.push(nodeHandle);
                     }
                 }
+            }
+            if (sharedNodes.length) {
+                M.getLinks(sharedNodes);
             }
         }
 
@@ -5601,7 +5610,7 @@ function loadfm_callback(res) {
             localStorage[u_handle + '_maxaction'] = maxaction;
         }
 
-        loadfm_done(pfkey);
+        loadfm_done(pfkey, ctx.stackPointer);
 
         if (res.cr) {
             crypto_procmcr(res.cr);
@@ -5614,9 +5623,11 @@ function loadfm_callback(res) {
     });
 }
 
-function loadfm_done(pfkey) {
+function loadfm_done(pfkey, stackPointer) {
     loadfm.loaded = Date.now();
     loadfm.loading = false;
+
+    if (d > 1) console.error('loadfm_done', stackPointer, is_fm());
 
     init_chat();
 

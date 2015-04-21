@@ -77,11 +77,16 @@ function RtcSession(stropheConn, options) {
         throw new Error('This browser does not support webRTC');
 
     var self = this;
-    this.connection = stropheConn;
-    var jingle = this.jingle = stropheConn.jingle;
+    self.connection = stropheConn;
+    self.gLocalStream = null;
+    self.gLocalStreamRefcount = 0;
+    self.gLocalVid = null;
+    self.gLocalVidRefcount = 0;
+
+    var jingle = self.jingle = stropheConn.jingle;
     if (jingle.rtcSession)
         throw new Error("This Strophe connection already has an associated RtcSession instance");
-    this.ftManager = jingle.ftManager;
+    self.ftManager = jingle.ftManager;
 // Init crypto functions
     if (options.dummyCryptoFunctions) {
         jingle.encryptMessageForJid = function(msg, bareJid) {
@@ -246,11 +251,6 @@ function RtcSession(stropheConn, options) {
         this.jingle.media_constraints.mandatory.MozDontOfferDataChannel = true;
 }
 //global variables
-//RtcSession.gLocalAudioOnlyStream = {stream: null, refcount:0};
-//RtcSession.gLocalAudioVideoStream = {stream: null, refcount:0};
-
-RtcSession.gLocalStream = null;
-RtcSession.gLocalVid = null;
 RtcSession.gVolMon = null;
 RtcSession.gVolMonCallback = null;
 
@@ -259,22 +259,37 @@ RtcSession.prototype = {
   _myGetUserMedia: function(options, successCallback, errCallback, allowContinueOnFail)
   {
     var self = this;
-    if (RtcSession.gLocalStream)
+    if (self.gLocalStream)
     {
-        var sessStream = RTC.cloneMediaStream(RtcSession.gLocalStream, {audio:true, video:true});
+        var sessStream = RTC.cloneMediaStream(self.gLocalStream, {audio:true, video:true});
         self._refLocalStream(options.video);
         successCallback.call(self, sessStream);
         return;
     }
+//self.gLocalStream is null
+    if (self.gLocalStreamRefcount !== 0) {
+        console.error("_myGetUserMedia: gLocalStream is null, but gLocalStreamRefcount is", this.gLocalStreamRefcount,"(!= 0)");
+        self.gLocalStreamRefcount = 0;
+    }
+
+    if (self.gLocalVid !== null) {
+        console.error("_myGetUserMedia: gLocalStream is null, but gLocalVid is != null");
+        self.gLocalVid = null;
+    }
+
+    if (self.gLocalVidRefcount !== 0) {
+        console.error("_myGetUserMedia: gLocalStream is null, but gLocalVidRefcount is",self.gLocalVidRefcount,"(!= 0)");
+        self.gLocalVidRefcount = 0;
+    }
 
     RTC.getUserMediaWithConstraintsAndCallback({audio: true, video: true}, this,
       function(stream) {
-        RtcSession.gLocalStream = stream;
-        RtcSession.gLocalStreamRefcount = 0;
-        var sessStream = RTC.cloneMediaStream(RtcSession.gLocalStream, {audio:true, video:true});
-        self._onMediaReady(RtcSession.gLocalStream);
-        self._refLocalStream(options.video);
-        successCallback.call(self, sessStream);
+          self.gLocalStream = stream;
+          var sessStream = RTC.cloneMediaStream(this.gLocalStream,
+                                                {audio:true, video:true});
+          self._onMediaReady(this.gLocalStream);
+          self._refLocalStream(options.video); //we must call this after onMediaReady because it will enable the local video display, and that is created in onMediaReady
+          successCallback.call(self, sessStream);
       },
       function(error, e) {
         var msg;
@@ -312,9 +327,9 @@ RtcSession.prototype = {
                     if (errCallback)
                         errCallback(msg);
                 } else {
-                    RtcSession.gLocalStream = null;
-                    RtcSession.gLocalStreamRefcount = 0;
-                    if (RtcSession.gLocalVid)
+                    self.gLocalStream = null;
+                    self.gLocalStreamRefcount = 0;
+                    if (self.gLocalVid)
                         console.warn("Assertion failed: Could not get local stream, but local video element is not null");
                     successCallback.call(self, null);
                 }
@@ -405,8 +420,7 @@ RtcSession.prototype = {
           options.video = actualAv.video;
       }
 
-      if (state === 4) {//call was canceled before we got user media
-          self._freeLocalStreamIfUnused();
+      if (state === 4) {//call was canceled
           return;
       }
       state = 1;
@@ -473,7 +487,7 @@ RtcSession.prototype = {
               isDataCall:!!options.files
           });
         } catch(e) {
-          self._freeLocalStreamIfUnused();
+          self._unrefLocalStream(options.video);
           console.error("Exception in call answer handler:\n"+e.stack+'\nIgnoring call');
         }
       }, null, 'message', 'megaCallAnswer', null, targetJid, {matchBare: true});
@@ -490,7 +504,7 @@ RtcSession.prototype = {
           ansHandler = null;
           declineHandler = null;
           sessStream = null;
-          self._freeLocalStreamIfUnused();
+          self._unrefLocalStream(options.video);
 
           var body = stanza.getElementsByTagName('body');
           var fullPeerJid = $(stanza).attr('from');
@@ -550,7 +564,7 @@ RtcSession.prototype = {
                   infos[file.name] = info;
               }
               msgattrs.files = JSON.stringify(infos);
-          } else {
+          } else { //!options.files
               msgattrs.media = (options.audio?'a':'')+(options.video?'v':'');
               if (!msgattrs.media)
                   msgattrs.media = '_';
@@ -559,7 +573,7 @@ RtcSession.prototype = {
           self.connection.send($msg(msgattrs));
       }, targetJid);
 
-      if (!options.files)
+      if (!options.files) { //set answer timeout
           setTimeout(function() {
               if (state !== 1)
                   return;
@@ -570,7 +584,7 @@ RtcSession.prototype = {
               self.connection.deleteHandler(declineHandler);
               declineHandler = null;
               sessStream = null;
-              self._freeLocalStreamIfUnused();
+              self._unrefLocalStream(options.video);
 
               self.connection.send($msg({
                   to:Strophe.getBareJidFromJid(targetJid),
@@ -587,6 +601,7 @@ RtcSession.prototype = {
        */
               self.trigger('call-answer-timeout', {peer: targetJid, info: { sid: sid }});
           }, self.jingle.callAnswerTimeout);
+      } //end set answer timeout
   } //end initiateCallback()
   if (options.audio || options.video)
       self._myGetUserMedia(options, initiateCallback, null, true);
@@ -606,7 +621,7 @@ RtcSession.prototype = {
             self.connection.deleteHandler(declineHandler);
             declineHandler = null;
 
-            self._freeLocalStreamIfUnused();
+            self._unrefLocalStream(options.video);
             self.connection.send($msg({
                 to:Strophe.getBareJidFromJid(targetJid),
                 sid: sid,
@@ -693,14 +708,25 @@ RtcSession.prototype = {
 // mutes all and the local video playback.
 // In Chrome all local streams are independent, so the local video stream has to be
 // muted explicitly as well
-    if (what.video && RtcSession.gLocalVid && (!jid || (sessions.length >= RtcSession.gLocalStreamRefcount))) {
-        if (state)
-            RtcSession._disableLocalVid(this);
-        else
-            RtcSession._enableLocalVid(this);
+    for (var i=0; i<sessions.length; i++) {
+        var sess = sessions[i];
+        if (what.video && this.gLocalVid) {
+            if (state) {//mute
+                if (!sess.mutedState.videoMuted)
+                    this.gLocalVidRefcount--;
+            } else { //unmute
+                if (sess.mutedState.videoMuted)
+                    this.gLocalVidRefcount++;
+            }
+        }
+        sess.muteUnmute(state, what);
     }
-    for (var i=0; i<sessions.length; i++)
-        sessions[i].muteUnmute(state, what);
+    if (this.gLocalVid) {
+        if (this.gLocalVidRefcount <= 0)
+            this._disableLocalVid(); //does nothing if already disabled
+        else
+            this._enableLocalVid(); //does nothing if already enabled
+    }
     return true;
  },
  _getSessionsForJid: function(jid) {
@@ -751,7 +777,7 @@ RtcSession.prototype = {
     if (localStream.getVideoTracks().length < 1)
         elemClass +=" localNoVideo";
 
-    if (RtcSession.gLocalVid)
+    if (this.gLocalVid)
         throw new Error("Local stream just obtained, but localVid was not null");
 
     var vid = $('<video class="'+elemClass+'" autoplay="autoplay" />');
@@ -760,7 +786,7 @@ RtcSession.prototype = {
     vid = vid[0];
     vid.muted = true;
     vid.volume = 0;
-    RtcSession.gLocalVid = vid;
+    this.gLocalVid = vid;
     /**
         Local media stream has just been opened and a video element was
         created (the player param), but not yet added to the DOM. The stream object
@@ -986,23 +1012,20 @@ RtcSession.prototype = {
     });
     this.trigger('call-ended', obj);
     if (!sess.fake) { //non-fake session
+        var videoUsed;
+        if (sess.localStream) {
+            var vt = sess.localStream.getVideoTracks();
+            videoUsed = ((vt.length > 0) && vt[0].enabled);
+        } else {
+            videoUsed = false;
+        }
         delete sess.localStream;
-        this.removeVideo(sess);
+        this.removeVideo(sess); //remove remote video
+        this._unrefLocalStream(videoUsed);
     }
-    this._freeLocalStreamIfUnused();
  } catch(e) {
     console.error("onTerminate() handler threw an exception:\n", e.stack?e.stack:e);
  }
- },
-
- _freeLocalStreamIfUnused: function() {
-     var sessions = this.jingle.sessions;
-    for (var sess in sessions)
-        if (sessions[sess].localStream) //in use
-            return;
-
-//last call ended
-    this._unrefLocalStream();
  },
 
  waitForRemoteMedia: function(playerElem, sess) {
@@ -1191,9 +1214,11 @@ RtcSession.prototype = {
         };
  },
  _refLocalStream: function(sendsVideo) {
-    RtcSession.gLocalStreamRefcount++;
-    if (sendsVideo)
-        RtcSession._enableLocalVid(this);
+    this.gLocalStreamRefcount++;
+    if (sendsVideo) {
+        this.gLocalVidRefcount++;
+        this._enableLocalVid(this);
+    }
     /**
       @event "local-stream-connect"
       @type {object}
@@ -1202,35 +1227,76 @@ RtcSession.prototype = {
       of whether the local stream has been just obtained or not, i.e. this
       event is always fired during a call setup
     */
-    this.trigger('local-stream-connect', {player: RtcSession.gLocalVid});
+    this.trigger('local-stream-connect', {player: this.gLocalVid});
  },
- _unrefLocalStream: function() {
-    var cnt = --RtcSession.gLocalStreamRefcount;
-    if (cnt > 0)
+ _unrefLocalStream: function(video) {
+    if (video) {
+        if (--this.gLocalVidRefcount <= 0)
+            this._disableLocalVid();
+    }
+    if (--this.gLocalStreamRefcount > 0)
         return;
 
-    if (!RtcSession.gLocalStream) {
-        console.warn('RtcSession.unrefLocalStream: gLocalStream is null. refcount = ', cnt);
+    if (!this.gLocalStream) {
+        console.error('_unrefLocalStream: gLocalStream is null. refcount = ', this.gLocalStreamRefcount);
         return;
     }
     this._freeLocalStream();
  },
  _freeLocalStream: function() {
-    RtcSession.gLocalStreamRefcount = 0;
-    if (!RtcSession.gLocalStream)
+    if (this.gLocalStreamRefcount > 0) {
+        console.error("_freeLocalStream: gLocalStreamRefcount is > 0, wont free it, aborting");
         return;
-    RtcSession._disableLocalVid(this);
+    }
+    if (this.gLocalVidRefcount > 0) {
+        console.error("_freeLocalStream: gLocalVidRefcount is > 0, but gLocalStreamRefcount is <=0 , aborting");
+        return;
+    }
+
+    if (!this.gLocalStream) {
+        console.error("_freeLocalStream: gLocalStream is already null");
+        return;
+    }
 /**
     Local stream is about to be closed and local video player to be destroyed
     @event local-video-destroy
     @type {object}
     @property {DOM} player The local video player, which is about to be destroyed
 */
-    this.trigger('local-player-remove', {player: RtcSession.gLocalVid});
-    RtcSession.gLocalVid = null;
-    RtcSession.gLocalStream.stop();
-    RtcSession.gLocalStream = null;
+    this.trigger('local-player-remove', {player: this.gLocalVid});
+    this.gLocalVid = null;
+    this.gLocalStream.stop();
+    this.gLocalStream = null;
  },
+ _disableLocalVid: function() {
+    if (!this._localVidEnabled)
+        return;
+    // All references to local video are muted, disable local video display
+    // We need sess only to have where an object to trigger the event on
+        RTC.attachMediaStream($(this.gLocalVid), null);
+    /**
+        Local camera playback has been disabled because all calls have muted their video
+        @event local-video-disabled
+        @type {object}
+        @property {DOM} player - the local camera video HTML element
+    */
+        this._localVidEnabled = false;
+        this.trigger('local-video-disabled', {player: this.gLocalVid});
+  },
+ _enableLocalVid: function() {
+     if(this._localVidEnabled)
+         return;
+     RTC.attachMediaStream($(this.gLocalVid), this.gLocalStream);
+    /**
+        Local video playback has been re-enabled because at least one call started sending video
+        @event local-video-enabled
+        @type {object}
+        @property {DOM} player The local video player HTML element
+    */
+     this.trigger('local-video-enabled', {player: this.gLocalVid});
+     this.gLocalVid.play();
+     this._localVidEnabled = true;
+  },
 
  trigger: function(name, obj) {
     if (this.logEvent)
@@ -1263,13 +1329,6 @@ RtcSession.prototype = {
          return undefined;
      return sess.statsRecorder.isRelay();
  },
-
- _requiredLocalStream: function(channels) {
-    if (channels.video)
-        return RtcSession.gLocalAudioVideoStream;
-      else
-        return RtcSession.gLocalAudioOnlyStream;
-  }
 }
 
 
@@ -1312,38 +1371,6 @@ RtcSession.xmlUnescape = function(text) {
                .replace(/\&gt;/g, '>')
                .replace(/\&apos;/g, "'")
                .replace(/\&quot;/g, '"');
-}
-
-RtcSession._disableLocalVid = function(rtc) {
-    if (!this._localVidEnabled)
-        return;
-// All references to local video are muted, disable local video display
-// We need sess only to have where an object to trigger the event on
-    RTC.attachMediaStream($(this.gLocalVid), null);
-/**
-    Local camera playback has been disabled because all calls have muted their video
-    @event local-video-disabled
-    @type {object}
-    @property {DOM} player - the local camera video HTML element
-*/
-    this._localVidEnabled = false;
-    rtc.trigger('local-video-disabled', {player: this.gLocalVid});
-
-}
-
-RtcSession._enableLocalVid = function(rtc) {
-    if(this._localVidEnabled)
-        return;
-    RTC.attachMediaStream($(this.gLocalVid), this.gLocalStream);
-/**
-    Local video playback has been re-enabled because at least one call started sending video
-    @event local-video-enabled
-    @type {object}
-    @property {DOM} player The local video player HTML element
-*/
-    rtc.trigger('local-video-enabled', {player: this.gLocalVid});
-    this.gLocalVid.play();
-    this._localVidEnabled = true;
 }
 
 /**

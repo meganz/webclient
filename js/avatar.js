@@ -226,7 +226,7 @@ window.ClientFileHandler = (function() {
     /**
      * Takes in an array of files, processes them, and fires the onSuccess handler if any are valid, or the onError handler
      * otherwise. These handlers can be specified on the options object passed to the constructor.
-     * @param fileList array of objects like { size:Number, type:String }
+     * @param fileList array of objects like {{size: Number, type: String}}
      * @param fileSourceElem - Unused. Matches IframeUploader interface
      */
     ClientFileHandler.prototype.handleFiles = function(fileList, fileSourceElem) {

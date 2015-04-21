@@ -425,7 +425,7 @@ if (m)
     }
     else if (ua.indexOf('android') > -1)
     {
-        app='https://play.google.com/store/apps/details?id=nz.mega.android';
+        app='https://play.google.com/store/apps/details?id=nz.mega.android&referrer=meganzsb';
         document.body.className = 'android full-mode supported';
         android=1;
     }
@@ -492,7 +492,7 @@ if (m)
 }
 else if (page == '#android')
 {
-    document.location = 'https://play.google.com/store/apps/details?id=nz.mega.android';
+    document.location = 'https://play.google.com/store/apps/details?id=nz.mega.android&referrer=meganzmobileapps';
 }
 else if (!b_u)
 {
@@ -704,6 +704,10 @@ else if (!b_u)
     jsl.push({f: langFilepath, n: 'lang', j:3});
     jsl.push({f:'sjcl.js', n: 'sjcl_js', j:1}); // Will be replaced with asmCrypto soon
     jsl.push({f:'js/asmcrypto.js',n:'asmcrypto_js',j:1,w:1});
+    jsl.push({f:'js/jquery-2.1.1.js', n: 'jquery', j:1,w:10});
+    jsl.push({f:'js/functions.js', n: 'functions_js', j:1});
+    jsl.push({f:'js/mega.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/megaLogger.js', n: 'megaLogger_js', j:1});
     jsl.push({f:'js/tlvstore.js', n: 'tlvstore_js', j:1});
     jsl.push({f:'js/crypto.js', n: 'crypto_js', j:1,w:5});
     jsl.push({f:'js/jsbn.js', n: 'jsbn_js', j:1,w:2});
@@ -712,9 +716,6 @@ else if (!b_u)
     jsl.push({f:'js/user.js', n: 'user_js', j:1});
     jsl.push({f:'js/authring.js', n: 'authring_js', j:1});
     jsl.push({f:'js/mouse.js', n: 'mouse_js', j:1});
-    jsl.push({f:'js/jquery-2.1.1.js', n: 'jquery', j:1,w:10});
-    jsl.push({f:'js/functions.js', n: 'functions_js', j:1});
-    jsl.push({f:'js/megaLogger.js', n: 'megaLogger_js', j:1});
     jsl.push({f:'js/jquery-ui-1.11.2.js', n: 'jqueryui_js', j:1,w:10});
     jsl.push({f:'js/filedrag.js', n: 'filedrag_js', j:1});
     jsl.push({f:'js/jquery.mousewheel.js', n: 'jquerymouse_js', j:1});
@@ -726,7 +727,6 @@ else if (!b_u)
     jsl.push({f:'js/exif.js', n: 'exif_js', j:1,w:3});
     jsl.push({f:'js/megapix.js', n: 'megapix_js', j:1});
     jsl.push({f:'js/smartcrop.js', n: 'smartcrop_js', j:1,w:7});
-    jsl.push({f:'js/mega.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/jquery.fullscreen.js', n: 'jquery_fullscreen', j:1,w:10});
     jsl.push({f:'js/jquery.qrcode.js', n: 'jqueryqrcode', j:1});
     jsl.push({f:'js/vendor/qrcode.js', n: 'qrcode', j:1,w:2, g: 'vendor'});
@@ -1351,14 +1351,14 @@ else if (!b_u)
     {
         if (document.location.hash == '#android')
         {
-            document.location = 'https://play.google.com/store/apps/details?id=nz.mega.android';
+            document.location = 'https://play.google.com/store/apps/details?id=nz.mega.android&referrer=meganzindexandroid';
         }
         else
         {
             document.write('<link rel="stylesheet" type="text/css" href="' + staticpath + 'css/mobile-android.css" /><div class="overlay"></div><div class="new-folder-popup" id="message"><div class="new-folder-popup-bg"><div class="new-folder-header">MEGA for Android</div><div class="new-folder-main-bg"><div class="new-folder-descr">Do you want to install the latest<br/> version of the MEGA app for Android?</div><a class="new-folder-input left-button" id="trashbinYes"> <span class="new-folder-bg1"> <span class="new-folder-bg2" id="android_yes"> Yes </span> </span></a><a class="new-folder-input right-button" id="trashbinNo"> <span class="new-folder-bg1"> <span class="new-folder-bg2" id="android_no">No </span> </span></a><div class="clear"></div></div></div></div></div>');
             document.getElementById('android_yes').addEventListener("click", function ()
             {
-                document.location = 'https://play.google.com/store/apps/details?id=nz.mega.android';
+                document.location = 'https://play.google.com/store/apps/details?id=nz.mega.android&referrer=meganzandroid';
             }, false);
             document.getElementById('android_no').addEventListener("click", function ()
             {

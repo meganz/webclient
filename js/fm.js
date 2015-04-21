@@ -3058,6 +3058,8 @@ function accountUI()
                 if ($(this).attr('name') == 'account-country')
                     val = isocountries[val];
                 $('.fm-account-save-block').removeClass('hidden');
+				$('.fm-account-main').addClass('save');
+				initAccountScroll();
             }
             $(this).parent().find('.account-select-txt').text(val);
         });
@@ -3065,11 +3067,15 @@ function accountUI()
         $('#account-firstname,#account-lastname').bind('keyup', function(e)
         {
             $('.fm-account-save-block').removeClass('hidden');
+			$('.fm-account-main').addClass('save');
+			initAccountScroll();
         });
         $('.fm-account-cancel').unbind('click');
         $('.fm-account-cancel').bind('click', function(e)
         {
             $('.fm-account-save-block').addClass('hidden');
+			$('.fm-account-main').removeClass('save');
+			initAccountScroll();
             accountUI();
         });
         $('.fm-account-save').unbind('click');
@@ -3098,6 +3104,8 @@ function accountUI()
                 }
             });
             $('.fm-account-save-block').addClass('hidden');
+			$('.fm-account-main').removeClass('save');
+			initAccountScroll();
 
             if (M.account.dl_maxSlots)
             {
@@ -3139,6 +3147,8 @@ function accountUI()
                     $('#account-password').focus();
                     $('#account-password').bind('keyup.accpwd', function() {
                         $('.fm-account-save-block').removeClass('hidden');
+						$('.fm-account-main').addClass('save');
+						initAccountScroll();
                         $('#account-password').unbind('keyup.accpwd');
                     });
                 });
@@ -3167,6 +3177,8 @@ function accountUI()
                                 $('#account-password').focus();
                                 $('#account-password').bind('keyup.accpwd', function() {
                                     $('.fm-account-save-block').removeClass('hidden');
+									$('.fm-account-main').addClass('save');
+									initAccountScroll();
                                     $('#account-password').unbind('keyup.accpwd');
                                 });
                             });
@@ -3241,6 +3253,8 @@ function accountUI()
             {
                 M.account.dl_maxSlots = ui.value;
                 $('.fm-account-save-block').removeClass('hidden');
+				$('.fm-account-main').addClass('save');
+				initAccountScroll();
             }
         });
         $("#slider-range-max2").slider({
@@ -3248,6 +3262,8 @@ function accountUI()
             {
                 M.account.ul_maxSlots = ui.value;
                 $('.fm-account-save-block').removeClass('hidden');
+				$('.fm-account-main').addClass('save');
+				initAccountScroll();
             }
         });
         $('.ulspeedradio').removeClass('radioOn').addClass('radioOff');
@@ -3279,6 +3295,8 @@ function accountUI()
             $(this).addClass('radioOn').removeClass('radioOff');
             $(this).parent().addClass('radioOn').removeClass('radioOff');
             $('.fm-account-save-block').removeClass('hidden');
+			$('.fm-account-main').addClass('save');
+			initAccountScroll();
         });
         $('#ulspeedvalue').unbind('click keyup');
         $('#ulspeedvalue').bind('click keyup', function(e)
@@ -3290,6 +3308,8 @@ function accountUI()
             else
                 M.account.ul_maxSpeed = 100 * 1024;
             $('.fm-account-save-block').removeClass('hidden');
+			$('.fm-account-main').addClass('save');
+			initAccountScroll();
         });
 
         $('.ulskip').removeClass('radioOn').addClass('radioOff');
@@ -3310,6 +3330,8 @@ function accountUI()
             $(this).addClass('radioOn').removeClass('radioOff');
             $(this).parent().addClass('radioOn').removeClass('radioOff');
             $('.fm-account-save-block').removeClass('hidden');
+			$('.fm-account-main').addClass('save');
+			initAccountScroll();
         });
 
         $('.uisorting').removeClass('radioOn').addClass('radioOff');
@@ -3330,6 +3352,8 @@ function accountUI()
             $(this).addClass('radioOn').removeClass('radioOff');
             $(this).parent().addClass('radioOn').removeClass('radioOff');
             $('.fm-account-save-block').removeClass('hidden');
+			$('.fm-account-main').addClass('save');
+			initAccountScroll();
         });
 
         $('.uiviewmode').removeClass('radioOn').addClass('radioOff');
@@ -3350,6 +3374,8 @@ function accountUI()
             $(this).addClass('radioOn').removeClass('radioOff');
             $(this).parent().addClass('radioOn').removeClass('radioOff');
             $('.fm-account-save-block').removeClass('hidden');
+			$('.fm-account-main').addClass('save');
+			initAccountScroll();
         });
 
         $('.redeem-voucher').unbind('click');
@@ -3521,6 +3547,8 @@ function accountUI()
             $(this).addClass('radioOn').removeClass('radioOff');
             $(this).parent().addClass('radioOn').removeClass('radioOff');
             $('.fm-account-save-block').removeClass('hidden');
+			$('.fm-account-main').addClass('save');
+			initAccountScroll();
         });
 
         $('.fm-account-change-avatar,.fm-account-avatar').unbind('click');
@@ -3636,6 +3664,8 @@ function accountUI()
     {
         if ($(this).val() == $('#account-new-password').val())
             $('.fm-account-save-block').removeClass('hidden');
+			$('.fm-account-main').addClass('save');
+			initAccountScroll();
     });
 }
 

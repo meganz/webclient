@@ -23306,12 +23306,12 @@ background-image: url(../images/mega/empty@2x.png);
  background-size: 39px auto;
 }
 .radioOn {
- background-position: -174px -274px;
- background-size: 353px auto;
+ background-position: 0 2px;
+ background-size: 16px auto;
 }
 .radioOff {
- background-position: -219px -274px;
- background-size: 353px auto;
+ background-position: 0 -28px;
+ background-size: 16px auto;
 }
 .fm-bandwidth-icon, .fm-bandwidth-dashed {
 background-image: url(../images/mega/quota-sprite@2x.png);

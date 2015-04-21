@@ -503,7 +503,7 @@ function MegaData()
 
     /**
      *
-     * @param {array of JSON objects} ipc - received requests
+     * @param {array.<JSON_objects>} ipc - received requests
      * @param {bool} clearGrid
      * 
      */
@@ -598,7 +598,7 @@ function MegaData()
 
     /**
      *
-     * @param {array of JSON objects} opc - sent requests
+     * @param {array.<JSON_objects>} opc - sent requests
      * @param {bool} clearGrid
      * 
      */
@@ -5290,7 +5290,7 @@ function __process_f2(f, cb, tick)
 /**
  * Handle incoming pending contacts
  *
- * @param {array of JSON objects} pending contacts
+ * @param {array.<JSON_objects>} pending contacts
  * 
  */
 function processIPC(ipc) {
@@ -5313,7 +5313,7 @@ function processIPC(ipc) {
 /**
  * Handle outgoing pending contacts
  *
- * @param {array of JSON objects} pending contacts
+ * @param {array.<JSON_objects>} pending contacts
  * 
  */
 function processOPC(opc) {
@@ -5354,7 +5354,7 @@ function processOPC(opc) {
 /**
  * Handle pending shares
  *
- * @param {array of JSON objects} pending shares
+ * @param {array.<JSON_objects>} pending shares
  *
  * 
  */
@@ -5399,7 +5399,7 @@ function processPS(pendingShares) {
 /**
  * Handle upca response, upci, pending contact request updated (for whom it's incomming)
  *
- * @param {array of JSON objects} ap (actionpackets)
+ * @param {array.<JSON_objects>} ap (actionpackets)
  * 
  */
 function processUPCI(ap) {
@@ -5420,7 +5420,7 @@ function processUPCI(ap) {
 
 /**
  * Handle upco response, upco, pending contact request updated (for whom it's outgoing)
- * @param {array of JSON objects} ap (actionpackets)
+ * @param {array.<JSON_objects>} ap (actionpackets)
  */
 function processUPCO(ap) {
     DEBUG('processUPCO');

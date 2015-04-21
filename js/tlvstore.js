@@ -4,6 +4,8 @@
  */
 
 var tlvstore = (function () {
+    "use strict";
+
     /**
      * @description
      * <p>Storage of key/value pairs in a "container".</p>

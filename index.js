@@ -622,7 +622,7 @@ function init_page() {
         init_backup();
     }
     else if (page.substr(0, 6) === 'cancel' && page.length > 24 && u_type) {
-        
+
         var ac = new mega.AccountClosure();
         ac.initAccountClosure();
     }
@@ -735,7 +735,7 @@ function init_page() {
     }
     else if (page == 'resellers') {
         parsepage(pages['resellers']);
-        
+
         // If logged in, pre-populate email address into wire transfer details
         if (typeof u_attr !== 'undefined') {
             $('#email-address').html(u_attr.email);
@@ -1077,6 +1077,7 @@ function topmenuUI() {
     $('.top-menu-item.register,.top-menu-item.login').hide();
     $('.top-menu-item.logout,.context-menu-divider.logout').hide();
     $('.top-menu-item.clouddrive,.top-menu-item.account').hide();
+    $('.top-menu-item.refresh-item').addClass('hidden');
     $('.activity-status,.activity-status-block').hide();
     $('.membership-status-block').html('<div class="membership-status free">' + l[435] + '</div>');
     $('.membership-status').hide();
@@ -1115,20 +1116,20 @@ function topmenuUI() {
 
         // If a Lite/Pro plan has been purchased
         if (u_attr.p) {
-            
+
             // Set the plan text
             var proNum = u_attr.p;
             var purchasedPlan = getProPlan(proNum);
-            
+
             // Set colour of plan
             var cssClass = (proNum == 4) ? 'lite' : 'pro';
-            
-            // Show the 'Upgrade your account' button in the main menu for all 
+
+            // Show the 'Upgrade your account' button in the main menu for all
             // accounts except for the biggest plan i.e. PRO III
             if (u_attr.p !== 3) {
                 $('.top-menu-item.upgrade-your-account,.context-menu-divider.upgrade-your-account').show();
             }
-            
+
             $('.membership-icon-pad .membership-big-txt.red').text(purchasedPlan);
             $('.membership-icon-pad .membership-icon').attr('class', 'membership-icon pro' + u_attr.p);
             $('.membership-status-block').html('<div class="membership-status ' + cssClass + '">' + purchasedPlan + '</div>');
@@ -1144,6 +1145,10 @@ function topmenuUI() {
         }
 
         $('.membership-status').show();
+
+        if (is_fm()) {
+            $('.top-menu-item.refresh-item').removeClass('hidden');
+        }
 
         // If the chat is disabled don't show the green status icon in the header
         if (!MegaChatDisabled) {
@@ -1334,26 +1339,21 @@ function topmenuUI() {
             }
 
             M.accountData(function (account) {
-                
+
                 var perc, warning, perc_c;
                 $('.membership-popup .membership-loading').hide();
                 $('.membership-popup .membership-main-block').show();
-                
+
                 if (u_attr.p) {
-                    $('.membership-popup.pro-popup .membership-icon').addClass('pro' + u_attr.p);
+                    var planNum = u_attr.p;
+                    var planName = getProPlan(planNum);
+
+                    $('.membership-popup.pro-popup .membership-icon').addClass('pro' + planNum);
                     var p = account.stype == 'S' ? '' :
                         (l[987] + ' <span class="red">' + time2date(account.expiry) + '</span>');
                     $('.membership-popup.pro-popup .membership-icon-txt-bl .membership-medium-txt').html(p);
-                    
-                    var planName = '';
-                    
+
                     // Update current plan to PRO I, PRO II, PRO III or LITE in popup
-                    if (u_attr.p <= 3) {
-                        planName = 'PRO ' + Array(+u_attr.p + 1 | 0).join("I");
-                    }
-                    else if (u_attr.p === 4) {
-                        planName = 'LITE';
-                    }
                     $('.membership-icon-pad .membership-big-txt.red').text(planName);
                 }
                 else {
@@ -1582,7 +1582,7 @@ function topmenuUI() {
         else if (c.indexOf('account') > -1) {
             document.location.hash = 'fm/account';
         }
-		else if (c.indexOf('refresh') > -1) {
+        else if (c.indexOf('refresh') > -1) {
            stopsc();
            stopapi();
            if (typeof mDB !== 'undefined' && !pfid) {
@@ -1604,7 +1604,7 @@ function topmenuUI() {
                 mDBreload();
             } else {
                 loadfm(true);
-            }            
+            }
         }
         else if (c.indexOf('logout') > -1) {
             mLogout();

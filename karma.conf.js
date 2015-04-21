@@ -18,8 +18,8 @@ module.exports = function(config) {
         'node_modules/sinon/pkg/sinon.js',
 
         // Basics.
-        'js/jquery-1.8.1.js',
-        'js/jquery-ui-1.10.4.js',
+        'js/jquery-2.1.1.js',
+        'js/jquery-ui-1.11.2.js',
         'js/jquery.jscrollpane.js',
 
         // Libraries.
@@ -36,14 +36,15 @@ module.exports = function(config) {
 
         // Our code.
         'secureboot.js',
+        'js/megaPromise.js',
         'js/functions.js',
         'js/mega.js',
         'js/fm.js',
+        'js/authring.js',
         'js/crypto.js',
         'js/user.js',
         'js/ui/filepicker.js',
         'js/tlvstore.js',
-        'js/authring.js',
         
         // Tests.
         {pattern: 'test/fixtures/**/*.html', included: false, served: true},

@@ -168,8 +168,9 @@ UpgradeLog*.htm
 App_Data/*.mdf
 App_Data/*.ldf
 
+
 #############
-## Windows detritus
+## Operating System detritus
 #############
 
 # Windows image file caches
@@ -207,19 +208,19 @@ develop-eggs/
 # Installer logs
 pip-log.txt
 
-# Unit test / coverage reports
-.coverage
-.tox
-js/tests/coverage
-
 
 #############
 ## JavaScript machinery
 #############
 
 node_modules/
+js/tests/node_modules/
 coverage/
 doc/
+test-results.xml
+.coverage
+.tox
+js/tests/coverage
 
 
 #############
@@ -232,19 +233,9 @@ doc/
 # Mr Developer
 .mr.developer.cfg
 
-<<<<<<< HEAD
 # JS Docs
 js/docs/
 
-
-#############
-## Node modules
-#############
-
-js/tests/node_modules/
-=======
->>>>>>> master
-dont-deploy/sandbox.html
 
 #############
 ## Netbeans project metadata

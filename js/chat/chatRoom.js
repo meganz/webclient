@@ -1592,7 +1592,7 @@ ChatRoom.stateToText = function(state) {
 /**
  * Change the state of this room
  *
- * @param newState {ChatRoom.STATE.*} the new state
+ * @param newState {ChatRoom.STATE} the new state
  * @param [isRecover] {Boolean}
  */
 ChatRoom.prototype.setState = function(newState, isRecover) {

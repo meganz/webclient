@@ -1321,46 +1321,52 @@ function removeUInode(h) {
 function sharedUInode(nodeHandle) {
 
     DEBUG('sharedUInode');
-    var userHandle, oShares,
-        shareNum = 0,
-        exportLink = false,
-        availShares = false;
+    var oShares,
+        iShareNum = 0,
+        bExportLink = false,
+        bAvailShares = false;
 
     if ((M.d[nodeHandle] && M.d[nodeHandle].shares) || M.ps[nodeHandle]) {
         
         oShares = M.d[nodeHandle].shares;
 
         if (oShares) {
-            shareNum = Object.keys(oShares).length;
+            iShareNum = Object.keys(oShares).length;
         }
         
         if (oShares && oShares.EXP) {
             $('.grid-table.fm #' + nodeHandle + ' .grid-url-field').addClass('linked');
             $('.file-block#' + nodeHandle).addClass('linked');
             
-            exportLink = true;
+            bExportLink = true;
         }
         
-        if ((oShares && oShares.EXP && shareNum > 1) || (oShares && !oShares.EXP && shareNum) || M.ps[nodeHandle]) {
-            $('#treea_' + nodeHandle + ' .nw-fm-tree-folder').addClass('shared-folder');
+        if ((oShares && oShares.EXP && iShareNum > 1)
+            || (oShares && !oShares.EXP && iShareNum)
+            || M.ps[nodeHandle]) {
             
-            availShares = true;
+            $('#treea_' + nodeHandle + ' .nw-fm-tree-folder').addClass('shared-folder');
+            $('#treea_' + nodeHandle).addClass('linked');
+            
+            
+            bAvailShares = true;
         }
     }
     
-    if (!availShares) {
+    if (!bAvailShares) {
         $('#treea_' + nodeHandle + ' .nw-fm-tree-folder').removeClass('shared-folder');
         $('.grid-table.fm #' + nodeHandle + ' .transfer-filtype-icon').removeClass('folder-shared');
         $('.file-block#' + nodeHandle + ' .block-view-file-type').removeClass('folder-shared');
     }
     
-    if (!exportLink) {
+    if (!bExportLink) {
         $('.grid-table.fm #' + nodeHandle + ' .grid-url-field').removeClass('linked');
-        $('.file-block#' + nodeHandle).removeClass('linked');        
+        $('.file-block#' + nodeHandle).removeClass('linked');
+        $('#treea_' + nodeHandle).removeClass('linked');
     }
     
-    $('.grid-table.fm #' + nodeHandle + ' .transfer-filtype-icon').addClass(fileicon({t: 1, shares: availShares}));
-    $('.file-block#' + nodeHandle + ' .block-view-file-type').addClass(fileicon({t: 1, shares: availShares}));
+    $('.grid-table.fm #' + nodeHandle + ' .transfer-filtype-icon').addClass(fileicon({t: 1, shares: bAvailShares}));
+    $('.file-block#' + nodeHandle + ' .block-view-file-type').addClass(fileicon({t: 1, shares: bAvailShares}));
 }
 
 function addShareNotification(notification) {

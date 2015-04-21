@@ -1859,8 +1859,9 @@ function MegaData()
                         }
                     }
                     else {
+                        var sExportLink = (M.d[folders[ii].h].shares && M.d[folders[ii].h].shares.EXP) ? 'linked' : '';
                         var html = '<li id="' + _li + folders[ii].h + '">\n\
-                                        <span class="nw-fm-tree-item ' + containsc + ' ' + expandedc + ' ' + openedc + '" id="' + _a + htmlentities(folders[ii].h) + '">\n\
+                                        <span class="nw-fm-tree-item ' + containsc + ' ' + expandedc + ' ' + openedc + ' ' + sExportLink +  '" id="' + _a + htmlentities(folders[ii].h) + '">\n\
                                             <span class="nw-fm-arrow-icon"></span>\n\
                                             <span class="nw-fm-tree-folder' + sharedfolder + '">' + htmlentities(folders[ii].name) + '</span>\n\
 											<span class="link-icon"></span>\n\

@@ -5,7 +5,7 @@ var is_chrome_firefox = document.location.protocol === 'chrome:' && document.loc
 var is_extension = is_chrome_firefox || document.location.href.substr(0,19) == 'chrome-extension://';
 var storage_version = '1'; // clear localStorage when version doesn't match
 var page = document.location.hash;
-var prod_assets = false || localStorage.prod_assets == "1"
+var prod_assets = false
 
 function isMobile()
 {
@@ -96,6 +96,7 @@ if (!b_u) try
         }
         staticpath = localStorage.staticpath || geoStaticpath();
         apipath = localStorage.apipath || 'https://eu.api.mega.co.nz/';
+        prod_assets = prod_assets || localStorage.prod_assets == "1"
     }
 }
 catch(e) {

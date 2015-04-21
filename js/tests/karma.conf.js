@@ -8,8 +8,8 @@ module.exports = function(config) {
             "vendor/mocha/sinon-chai.js",
             "vendor/sinon-1.7.3.js",
 
-            "../jquery-1.8.1.js",
-            "../jquery-ui-1.10.4.js",
+            "../jquery-2.1.1.js",
+            "../jquery-ui-1.11.2.js",
 
             "src/helpers/fromMega.js",
 

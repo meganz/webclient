@@ -503,9 +503,9 @@ function MegaData()
 
     /**
      *
-     * @param {array of JSON objects} ipc - received requests
+     * @param {array.<JSON_objects>} ipc - received requests
      * @param {bool} clearGrid
-     *
+     * 
      */
     this.drawReceivedContactRequests = function(ipc, clearGrid) {
         DEBUG('Draw received contacts grid.');
@@ -598,9 +598,9 @@ function MegaData()
 
     /**
      *
-     * @param {array of JSON objects} opc - sent requests
+     * @param {array.<JSON_objects>} opc - sent requests
      * @param {bool} clearGrid
-     *
+     * 
      */
     this.drawSentContactRequests = function(opc, clearGrid) {
         DEBUG('Draw sent invites.');
@@ -5293,8 +5293,8 @@ function __process_f2(f, cb, tick)
 /**
  * Handle incoming pending contacts
  *
- * @param {array of JSON objects} pending contacts
- *
+ * @param {array.<JSON_objects>} pending contacts
+ * 
  */
 function processIPC(ipc) {
     DEBUG('processIPC');
@@ -5316,8 +5316,8 @@ function processIPC(ipc) {
 /**
  * Handle outgoing pending contacts
  *
- * @param {array of JSON objects} pending contacts
- *
+ * @param {array.<JSON_objects>} pending contacts
+ * 
  */
 function processOPC(opc) {
     DEBUG('processOPC');
@@ -5357,9 +5357,9 @@ function processOPC(opc) {
 /**
  * Handle pending shares
  *
- * @param {array of JSON objects} pending shares
+ * @param {array.<JSON_objects>} pending shares
  *
- *
+ * 
  */
 function processPS(pendingShares) {
     DEBUG('processPS');
@@ -5402,8 +5402,8 @@ function processPS(pendingShares) {
 /**
  * Handle upca response, upci, pending contact request updated (for whom it's incomming)
  *
- * @param {array of JSON objects} ap (actionpackets)
- *
+ * @param {array.<JSON_objects>} ap (actionpackets)
+ * 
  */
 function processUPCI(ap) {
     DEBUG('processUPCI');
@@ -5423,7 +5423,7 @@ function processUPCI(ap) {
 
 /**
  * Handle upco response, upco, pending contact request updated (for whom it's outgoing)
- * @param {array of JSON objects} ap (actionpackets)
+ * @param {array.<JSON_objects>} ap (actionpackets)
  */
 function processUPCO(ap) {
     DEBUG('processUPCO');

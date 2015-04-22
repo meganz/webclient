@@ -1,3 +1,15 @@
+/** Key ring holding own private keys. */
+var u_keyring;
+
+/** Own private Ed25519 key. */
+var u_privEd25519;
+
+/** Own public Ed25519 key. */
+var u_pubEd25519;
+
+/** Cache for contacts' public Ed25519 keys. */
+var pubEd25519 = {};
+
 var crypt = (function () {
     "use strict";
 
@@ -21,8 +33,9 @@ var crypt = (function () {
             authring.setContactAuthenticated(userhandle, fingerprint, 'Ed25519',
                                              authring.AUTHENTICATION_METHOD.SEEN,
                                              authring.KEY_CONFIDENCE.UNSURE);
-        } else if (recorded && authring.equalFingerprints(recorded.fingerprint, fingerprint) === false) {
-            throw new Error('Fingerprint does not match previously authenticated one!');
+        }
+        else if (recorded && authring.equalFingerprints(recorded.fingerprint, fingerprint) === false) {
+            throw new Error('Ed25519 fingerprint does not match previously authenticated one!');
         }
         return value;
     };
@@ -40,7 +53,8 @@ var crypt = (function () {
                                              authring.AUTHENTICATION_METHOD.SEEN,
                                              authring.KEY_CONFIDENCE.UNSURE);
             return value;
-        } else if (recorded && authring.equalFingerprints(recorded.fingerprint, fingerprint) === false) {
+        }
+        else if (recorded && authring.equalFingerprints(recorded.fingerprint, fingerprint) === false) {
             throw new Error('RSA fingerprint does not match previously authenticated one!');
         }
         return value;
@@ -97,9 +111,10 @@ var crypt = (function () {
             // Non-cached value, make a promise.
             var thePromise = getUserAttribute(userhandle, 'puEd255',
                                               true, false);
-            thePromise.then(
+            return thePromise.then(
                 // Function on fulfilment.
-                function(result, userhandle) {
+                function(result, ctx) {
+                    var userhandle = ctx.u;
                     result = base64urldecode(result);
                     pubEd25519[userhandle] = result;
                     try {
@@ -118,6 +133,7 @@ var crypt = (function () {
                     if (callback) {
                         callback(pubEd25519[userhandle], userhandle);
                     }
+                    console.log('----------', pubEd25519[userhandle].length);
                     thePromise.resolve(pubEd25519[userhandle], userhandle);
                 },
                 // Function on rejection.
@@ -130,35 +146,64 @@ var crypt = (function () {
                     thePromise.reject(result, ctx);
                 }
             );
+        }
+    };
+
+    /**
+     * Computes a user's Ed25519 key finger print. This function uses the
+     * `pubEd25519` object for caching.
+     *
+     * @param userhandle {string}
+     *     Mega user handle.
+     * @param format {string}
+     *     Format in which to return the fingerprint. Valid values: "hex" and
+     *     "string" (default: "hex").
+     * @return {MegaPromise}
+     *     A promise that is resolved when the original asynch code is
+     *     settled.
+     */
+    ns.getFingerprintEd25519 = function(userhandle, format) {
+        var makeFingerprint = function(pubKey) {
+            console.log('*************', pubKey.length, typeof pubKey);
+            var value = authring.computeFingerprint(pubKey, 'Ed25519', format);
+            var message = 'Got Ed25519 fingerprint for user "' + userhandle + '": ';
+            if (format === 'string') {
+                message += base64urlencode(value);
+            }
+            else {
+                message += value;
+            }
+            logger.debug(message);
+            return value;
+        };
+
+        if (pubEd25519[userhandle]) {
+            // It's cached: Only compute fingerprint of it.
+            // Make the promise for a cached value.
+            var thePromise = new MegaPromise();
+            console.log('************* cached');
+            thePromise.resolve(makeFingerprint(pubEd25519[userhandle]),
+                               userhandle);
             return thePromise;
         }
-
-
-
-//        if (pubEd25519[userhandle]) {
-//            var value = crypt._checkAuthenticationEd25519(userhandle);
-//            if (callback) {
-//                callback(value, userhandle);
-//            }
-//        } else {
-//            var myCallback = function(res, ctx) {
-//                if (typeof res !== 'number') {
-//                    res = base64urldecode(res);
-//                    pubEd25519[ctx.u] = res;
-//                    var value = _checkAuthenticationEd25519(userhandle);
-//                    if (ctx.callback3) {
-//                        ctx.callback3(value, ctx.u);
-//                    }
-//                } else if (ctx.callback3) {
-//                    ctx.callback3(false, ctx.u);
-//                }
-//            };
-//            var myCtx = {
-//                u: userhandle,
-//                callback3: callback,
-//            };
-//            getUserAttribute(userhandle, 'puEd255', true, false, myCallback, myCtx);
-//        }
+        else {
+            // Non-cached value, make a promise.
+            var thePromise = crypt.getPubEd25519(userhandle);
+            thePromise.then(
+                // Function on fulfilment.
+                function(result, userhandle) {
+                    console.log('************* not cached', result.length, typeof result);
+                    thePromise.resolve(makeFingerprint(result), userhandle);
+                },
+                // Function on rejection.
+                function(result, ctx) {
+                    logger.error('Error getting Ed25519 fingerprint for user "'
+                                 + userhandle + '": ' + result);
+                    thePromise.reject(result, ctx);
+                }
+            );
+            return thePromise;
+        }
     };
 
 
@@ -3763,10 +3808,6 @@ function api_strerror(errno) {
     };
 })(this);
 
-var u_keyring;
-var u_privEd25519;
-var u_pubEd25519;
-var pubEd25519 = {};
 
 /**
  * Initialises the authentication system.
@@ -3829,50 +3870,6 @@ function u_initAuthentication2(res, ctx) {
 
 
 
-
-/**
- * Computes a user's Ed25519 key finger print. This function uses the
- * `pubEd25519` object for caching.
- *
- * @param userhandle {string}
- *     Mega user handle.
- * @param callback {function}
- *     Callback function to call upon completion of operation. The callback
- *     requires two parameters: `value` (the computed fingerprint as a hex
- *     string) and `user` (the user handle for the returned key). `value` will
- *     be `false` upon a failed request.
- * @param format {string}
- *     Format in which to return the fingerprint. Valid values: "bytes", "hex",
- *     "string" and "base64" (default: "hex").
- */
-function getFingerprintEd25519(userhandle, callback, format) {
-    if (pubEd25519[userhandle]) {
-        if (callback) {
-            callback(authring.computeFingerprint(pubEd25519[userhandle],
-                    'Ed25519', format),
-                userhandle);
-        }
-    }
-    else {
-        var myCallback = function (res, ctx) {
-            if (typeof res !== 'number') {
-                res = base64urldecode(res);
-                pubEd25519[ctx.u] = res;
-                if (ctx.callback3) {
-                    ctx.callback3(authring.computeFingerprint(res, 'Ed25519', format), ctx.u);
-                }
-            }
-            else if (ctx.callback3) {
-                ctx.callback3(false, ctx.u);
-            }
-        };
-        var myCtx = {
-            u: userhandle,
-            callback3: callback,
-        };
-        getUserAttribute(userhandle, 'puEd255', true, false, myCallback, myCtx);
-    }
-}
 
 /**
  * Cached RSA public key retrieval utility.

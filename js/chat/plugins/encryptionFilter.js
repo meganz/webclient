@@ -309,7 +309,7 @@ var EncryptionFilter = function(megaChat) {
 
 
     logAllCallsOnObject(this, console.debug, true, "encFilter", self.logger);
-    callLoggerWrapper(crypt, "getPubEd25519", console.debug, "getPubEd25519", self.logger);
+    callLoggerWrapper(window, "crypt.getPubEd25519", console.debug, "crypt.getPubEd25519", self.logger);
 
 
     /**

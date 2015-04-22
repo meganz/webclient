@@ -9306,19 +9306,21 @@ function userAvatar(userid)
     return {img: avatar, color: av_color};
 }
 
-function userFingerprint(userid, next)
-{
-    userid = userid.u || userid
+function userFingerprint(userid, next) {
+    userid = userid.u || userid;
     var user = M.u[userid];
-    if (!user || !user.u)
-        return next([])
-    if (userid == u_handle) {
-        var fprint = authring.computeFingerprint(u_pubEd25519, 'Ed25519', 'hex')
-        return next(fprint.toUpperCase().match(/.{4}/g), fprint)
+    if (!user || !user.u) {
+        return next([]);
     }
-    getFingerprintEd25519(user.h || userid, function(response) {
-        next(response.toUpperCase().match(/.{4}/g), response)
-    });
+    if (userid === u_handle) {
+        var fprint = authring.computeFingerprint(u_pubEd25519, 'Ed25519', 'hex');
+        return next(fprint.toUpperCase().match(/.{4}/g), fprint);
+    }
+    crypt.getFingerprintEd25519(user.h || userid).then(
+        function(response) {
+            next(response.toUpperCase().match(/.{4}/g), response);
+        }
+    );
 }
 
 function isContactVerified(userid)

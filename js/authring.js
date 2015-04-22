@@ -318,10 +318,19 @@ var authring = (function () {
         if (ns._properties[keyType] === undefined) {
             throw new Error('Unsupporte key type: ' + keyType);
         }
-        format = format || "hex";
+        format = format || 'hex';
+        keyType = keyType || 'Ed25519';
         var value = key;
-        if (keyType === 'RSA') {
+        if (keyType === 'Ed25519') {
+            if (key.length !== 32) {
+                throw new Error('Unexpected Ed25519 key length: ' + key.length);
+            }
+        }
+        else if (keyType === 'RSA') {
             value = key[0] + key[1];
+        }
+        else {
+            throw new Error('Unexpected key type for fingerprinting: ' + keyType);
         }
         if (format === "string") {
             return asmCrypto.bytes_to_string(asmCrypto.SHA256.bytes(value)).substring(0, 20);

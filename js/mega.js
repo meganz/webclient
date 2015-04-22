@@ -5130,7 +5130,7 @@ function getuid(email)
     return false;
 }
 
-function doshare(h, targets, dontShowShareDialog) {
+function doShare(h, targets, dontShowShareDialog) {
     var $promise = new $.Deferred();
 
     nodeids = fm_getnodes(h);

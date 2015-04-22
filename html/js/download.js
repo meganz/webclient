@@ -367,6 +367,7 @@ function ImgError(source){
  */
 	
 var gifSlider = {
+    
     // Speed to fade in/out the images and text
     fadeInSpeed: 3000,
     fadeOutSpeed: 500,
@@ -374,9 +375,11 @@ var gifSlider = {
     // There can be more or less images on either side e.g. 2 gifs on left and 
     // 3 on right and it will still work because they are run independently.
     images: {
-        // Slide show on left side of the page
-        left: [
-            {
+        
+        
+        // Slide show on right side of the page
+        right: [
+		    {
                 name: 'video-chat',         // Name & CSS class of the GIF
                 animationLength: 12120,     // Length of the GIF animation in milliseconds
                 href: '#register',          // Page link you go to when clicked
@@ -391,11 +394,7 @@ var gifSlider = {
                 title: 1626,
                 description: 1086,
                 image: null
-            }
-        ],
-        
-        // Slide show on right side of the page
-        right: [
+            },
             {
                 name: 'browser-extension-firefox',
                 animationLength: 12080,
@@ -422,29 +421,26 @@ var gifSlider = {
             }
         ]
     },
-	
+    
     
     // Initialise the slide show
     init: function() {
         
         // Preload the images into memory so they will display straight away
-        gifSlider.preLoadImages('left');
         gifSlider.preLoadImages('right');
         
         // Show first two slides using order defined above
-        gifSlider.showImage('left', 0);
         gifSlider.showImage('right', 0);
         
         // Setup loops to continually change after every slide has finished
-        gifSlider.continueSlideShow('left', 0);
         gifSlider.continueSlideShow('right', 0);
     },
-	
+
     /**
      * Preloads the images into memory
      * @param {String} side The side of the page (left or right)
      */
-	 
+
     preLoadImages: function(side) {
         
         // Get the current URL without the location hash (#xycabc), also add on the path to the images dir
@@ -464,14 +460,14 @@ var gifSlider = {
             gifSlider.images[side][i].image = image;            
         }
     },
-	
+
     /**
      * Iterates to the next image in the slideshow
      * @param {String} side The side of the page (left or right)
      * @param {Number} currentSlideIndex The current slide's index number (matches array above)
      * @param {Number} oldIntervalId The interval ID to be cleared
      */
-	 
+
     continueSlideShow: function(side, currentSlideIndex, oldIntervalId) {
         
         // Find when to start the next image
@@ -506,13 +502,15 @@ var gifSlider = {
         
         }, animationLengthForCurrentSlide);
     },
+
     /**
      * Shows the animated image
      * @param {String} side The side of the page (left or right)
      * @param {Number} slideIndex The slide's index number to be shown
      */
+
     showImage: function(side, slideIndex) {
-		
+        
         // Set the details for the next slide
         var slideTitle = l[gifSlider.images[side][slideIndex].title] + ':';
         var slideDescription = l[gifSlider.images[side][slideIndex].description];
@@ -532,21 +530,23 @@ var gifSlider = {
 		
 		// Applications buttons
 		if(side==='right') {
-		  $('.button0,.button1,.button2,.button3, .button4').fadeOut(gifSlider.fadeInSpeed);
+		  if (slideIndex!=1) {
+		  $('.button0,.button2,.button3,.button4, .button5, .button6').fadeOut(gifSlider.fadeInSpeed);
 		  $('.button'+slideIndex).fadeIn(gifSlider.fadeInSpeed).css('display', 'block');
+		  }
 		  
-		  if (slideIndex==2) {
+		  if (slideIndex==4) {
 			  setTimeout(function() {
-                $('.button2').fadeOut(gifSlider.fadeInSpeed);
-		        $('.button3').fadeIn(gifSlider.fadeInSpeed).css('display', 'block');
+                $('.button4').fadeOut(gifSlider.fadeInSpeed);
+		        $('.button5').fadeIn(gifSlider.fadeInSpeed).css('display', 'block');
                 setTimeout(function() {
-                   $('.button3').fadeOut(gifSlider.fadeInSpeed);
-		           $('.button4').fadeIn(gifSlider.fadeInSpeed).css('display', 'block');
+                   $('.button5').fadeOut(gifSlider.fadeInSpeed);
+		           $('.button6').fadeIn(gifSlider.fadeInSpeed).css('display', 'block');
                 }, 5000);
               }, 5000);
           }
 		  
 		} 
     }
-	
+
 };

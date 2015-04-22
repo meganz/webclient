@@ -1361,7 +1361,7 @@ function MegaData()
         if (d) {
             console.log('openFolder()', M.currentdirid, id, force);
         }
-        if ((id !== 'notifications') && ($('.fm-main.notifications').hasClass('hidden'))) {
+        if ((id !== 'notifications') && !$('.fm-main.notifications').hasClass('hidden')) {
             notificationsUI(1);
         }
         this.search = false;
@@ -5106,8 +5106,11 @@ function doshare(h, targets, dontShowShareDialog) {
                             // A pending share may not have a corresponding user and should not be added
                             // A pending share can also be identified by a user who is only a '0' contact
                             // level (passive)
-                            if (user != false && M.u[user].c != 0) {
+                            if (M.u[user] && M.u[user].c != 0) {
                                 M.nodeShare(ctx.h, {h: h, r: rights, u: user, ts: Math.floor(new Date().getTime() / 1000)});
+                            }
+                            else if (d) {
+                                console.log('doshare: invalid user', user, M.u[user], ctx.t[i]);
                             }
                         }
                     }

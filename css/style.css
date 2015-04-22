@@ -12829,6 +12829,11 @@ table {
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 }
+.fm-account-main.save {
+	height: -webkit-calc(100% - 96px);
+	height: -moz-calc(100% -96px);
+	height: calc(100% - 96px);
+}
 .fm-account-blocks {
 	padding: 24px;
 }

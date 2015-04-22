@@ -431,7 +431,12 @@
             } else {
                 $newNode.addClass("folder");
 
-                if(typeof n.shares !== "undefined") {
+                if (n.shares) {
+                    var iShareNum = Object.keys(n.shares).length;
+                }
+                if((n.shares && n.shares.EXP && iShareNum > 1)
+                    || (n.shares && !n.shares.EXP && iShareNum)
+                    || M.ps[n.h]) {
                     $('.transfer-filtype-icon', $newNode).addClass(
                         "folder-shared"
                     );

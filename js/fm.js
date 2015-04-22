@@ -1319,6 +1319,12 @@ function removeUInode(h) {
     }
 }
 
+/**
+ * sharedUInode(nodeHandle)
+ * Handle shared/export link icons in Cloud Drive
+ * 
+ * @param {string} nodeHandle
+ */
 function sharedUInode(nodeHandle) {
 
     DEBUG('sharedUInode');
@@ -1348,11 +1354,13 @@ function sharedUInode(nodeHandle) {
             
             $('#treea_' + nodeHandle + ' .nw-fm-tree-folder').addClass('shared-folder');
             $('#treea_' + nodeHandle).addClass('linked');
-            
-            
+
             bAvailShares = true;
         }
     }
+    
+    $('.grid-table.fm #' + nodeHandle + ' .transfer-filtype-icon').addClass(fileicon({t: 1, share: bAvailShares}));
+    $('.file-block#' + nodeHandle + ' .block-view-file-type').addClass(fileicon({t: 1, share: bAvailShares}));
     
     if (!bAvailShares) {
         $('#treea_' + nodeHandle + ' .nw-fm-tree-folder').removeClass('shared-folder');
@@ -1365,9 +1373,6 @@ function sharedUInode(nodeHandle) {
         $('.file-block#' + nodeHandle).removeClass('linked');
         $('#treea_' + nodeHandle).removeClass('linked');
     }
-    
-    $('.grid-table.fm #' + nodeHandle + ' .transfer-filtype-icon').addClass(fileicon({t: 1, shares: bAvailShares}));
-    $('.file-block#' + nodeHandle + ' .block-view-file-type').addClass(fileicon({t: 1, shares: bAvailShares}));
 }
 
 function addShareNotification(notification) {
@@ -1495,14 +1500,12 @@ function addContactUI()
         var $s = $('.add-user-popup .multiple-input-warning span');
         $s.text(msg);
         $d.addClass('error');
-        setTimeout(function()
-        {
+        setTimeout(function() {
             $d.removeClass('error');
         }, 3000);
     }
 
-    function focusOnInput()
-    {
+    function focusOnInput() {
         var $tokenInput = $('#token-input-');
 
         $tokenInput
@@ -1521,16 +1524,18 @@ function addContactUI()
     });
 
     function addContactAreaResizing() {
+        
         var txt = $('.add-user-notification textarea'),
             txtHeight = txt.outerHeight(),
             hiddenDiv = $('.add-contact-hidden'),
             pane = $('.add-user-nt-scrolling'),
             content = txt.val(),
             api;
+        
         content = content.replace(/\n/g, '<br />');
         hiddenDiv.html(content + '<br/>');
 
-        if (txtHeight != hiddenDiv.outerHeight()) {
+        if (txtHeight !== hiddenDiv.outerHeight()) {
             txt.height(hiddenDiv.outerHeight());
 
             if ($('.add-user-textarea').outerHeight() >= 50) {
@@ -1724,8 +1729,8 @@ function addContactUI()
                 $d.css('right', 8 + 'px');
             }
 
-            focusOnInput();
             addContactAreaResizing();
+            focusOnInput();
         }
 
         iconSize(true);
@@ -1766,30 +1771,38 @@ function addContactUI()
         $(this).addClass('active');
     });
 
-    $('.add-user-size-icon').off('click');
-    $('.add-user-size-icon').on('click', function()
-    {
+    $('.add-user-size-icon').rebind('click', function() {
+        
+        var iPos = 0;
+        
         $('.add-user-popup .import-contacts-dialog').fadeOut(0);
         $('.import-contacts-link').removeClass('active');
-        if ($(this).is('.full-size'))
-        {
+        
+        if ($(this).is('.full-size')) {
+            
             $('.add-user-popup').addClass('dialog');
             fm_showoverlay();
             iconSize(false);
             $('.fm-add-user').removeClass('active');
             focusOnInput();
         }
-        else// .short-size
-        {
+        
+        // .short-size
+        else {
+            
             fm_hideoverlay();
             $('.add-user-popup').removeClass('dialog');
             iconSize(true);
             $('.fm-add-user').addClass('active');
-            var pos = $(window).width() - $('.fm-add-user').offset().left - $('.add-user-popup').outerWidth() + 2;
-            if (pos > 8)
-                $('.add-user-popup').css('right', pos + 'px');
-            else
+            
+            iPos = $(window).width() - $('.fm-add-user').offset().left - $('.add-user-popup').outerWidth() + 2;
+            
+            if (iPos > 8) {
+                $('.add-user-popup').css('right', iPos + 'px');
+            }
+            else {
                 $('.add-user-popup').css('right', 8 + 'px');
+            }
             focusOnInput();
         }
     });
@@ -2563,12 +2576,14 @@ function createfolderUI() {
         $('.create-new-folder input').val(l[157]);
     });
 
-    $('.create-folder-size-icon.full-size').unbind('click');
-    $('.create-folder-size-icon.full-size').bind('click', function() {
+    $('.create-folder-size-icon.full-size').rebind('click', function() {
+        
         var v = $('.create-new-folder input').val();
-        if (v != l[157] && v != '') {
+        
+        if (v !== l[157] && v !== '') {
             $('.create-folder-dialog input').val(v);
         }
+        
         $('.create-new-folder input').focus();
         $('.create-new-folder').removeClass('filled-input');
         $('.create-new-folder').addClass('hidden');
@@ -2577,13 +2592,15 @@ function createfolderUI() {
         $('.create-new-folder input').val(l[157]);
     });
 
-    $('.create-folder-size-icon.short-size').unbind('click');
-    $('.create-folder-size-icon.short-size').bind('click', function() {
+    $('.create-folder-size-icon.short-size').rebind('click', function() {
+        
         var v = $('.create-folder-dialog input').val();
-        if (v != l[157] && v != '') {
+        
+        if (v !== l[157] && v !== '') {
             $('.create-new-folder input').val(v);
             $('.create-new-folder').addClass('filled-input');
         }
+        
         $('.fm-new-folder').addClass('active');
         $('.create-new-folder').removeClass('hidden');
         createfolderDialog(1);

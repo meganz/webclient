@@ -1028,7 +1028,7 @@ function MegaData()
                                         <span></span>\n\
                                     </span>\n\
                                     <span class="file-icon-area">\n\
-                                        <span class="block-view-file-type ' + fileicon({t: 1, shares: bShare}) + '"><img alt="" /></span>\n\
+                                        <span class="block-view-file-type ' + fileicon(M.v[i]) + '"><img alt="" /></span>\n\
                                     </span>\n\
                                     <span class="file-block-title">' + htmlentities(M.v[i].name) + '</span>\n\
                                 </a>';
@@ -1044,7 +1044,7 @@ function MegaData()
                                         <span class="grid-status-icon' + star + '"></span>\n\
                                     </td>\n\
                                     <td>\n\
-                                        <span class="transfer-filtype-icon ' + fileicon({t: 1, shares: bShare}) + '"> </span>\n\
+                                        <span class="transfer-filtype-icon ' + fileicon(M.v[i]) + '"> </span>\n\
                                         <span class="tranfer-filetype-txt">' + htmlentities(M.v[i].name) + '</span>\n\
                                     </td>\n\
                                     <td width="100">' + s + '</td>\n\
@@ -1840,6 +1840,7 @@ function MegaData()
                         }
                     }
                     var sharedfolder = '';
+                    
                     if (M.d[folders[ii].h].shares) {
                         sharedfolder = ' shared-folder';
                     }

@@ -2295,7 +2295,7 @@ function initContextUI()
             $('.export-links-warning').removeClass('hidden');
 
             // Hide the optional message by default.
-            // This gets enabled if they try share with a user who is not a contact
+            // This gets enabled if user want to share
             $shareDialog.find('.share-message').hide();
 
             fm_showoverlay();
@@ -6581,7 +6581,7 @@ function shareDialogContentCheck() {
     var dc = '.share-dialog';
 
     // Disable/enable button
-    var $btn = $('.fm-dialog-button .dialog-share-button');
+    var $btn = $('.fm-dialog-button.dialog-share-button');
 
     var num = $(dc + ' .share-dialog-contacts .share-dialog-contact-bl').length;
     if (num) {
@@ -6738,6 +6738,7 @@ function handleShareDialogContent() {
 
     $('.share-dialog-icon.permissions-icon')
         .removeClass('active full-access read-and-write')
+        .html('<span></span>' + l[55])
         .addClass('read-only');
 
     // Update dialog title text
@@ -6970,6 +6971,10 @@ function initShareDialog() {
         closeDialog();
     });
 
+    /*
+     * On share dialog Share button
+     * Adding new contacts to shared item
+     */
     $('.share-dialog .dialog-share-button').rebind('click', function() {
         
         // If share button is NOT disabled
@@ -6980,8 +6985,7 @@ function initShareDialog() {
             
             var $newContacts = $('.share-dialog .token-input-list-mega .token-input-token-mega'),
                 targets = [],
-                s = M.d[$.selected[0]].shares,
-                id = '', sMsg,
+                sMsg,
                 $txtArea = $('.share-dialog .share-message-textarea textarea'),
                 iPerm;
   
@@ -7112,53 +7116,77 @@ function initShareDialog() {
 
     $('.permissions-menu-item').rebind('click', function(e) {
         
-        var $this = $(this),
-            cls = checkMultiInputPermission($this),
-            $i = $('.share-dialog .share-dialog-permissions.active'),// Specific contact
-            $g = $('.share-dialog .permissions-icon.active'),// Group permissions
-            acls = [];// active permission
+        var $this = $(this);
+        
+        var sId, iPerm, $existingContacts,
+            oShares = M.d[$.selected[0]].shares,
+            aItems = [],
+            aNewPermLevel = checkMultiInputPermission($this),
+            $itemPermLevel = $('.share-dialog .share-dialog-permissions.active'),
+            $groupPermLevel = $('.share-dialog .permissions-icon.active'),
+            aCurrPermLevel = [];
 
         $('.permissions-menu').fadeOut(200);
 
-        var targets = [];// u: id, r:perm
-        
-        var $existingContacts = $('.share-dialog-contact-bl');// Get all items available in dialog content block (avatar, name/email, permission)
-        
-            $.each($existingContacts, function(index, value) {
-                
-                // extract id of contact
-                id = $(value).attr('id').replace('sdcbl_', '');
-                
-                // ToDo: This should not be happening, expand this to make sure all contacts are with id and exist in M.u
-                if (id === '') {
-                    id = $(value).find('.fm-chat-user').text();
-                }
+        if ($itemPermLevel.length) {
 
-                iPerm = sharedPermissionLevel(checkMultiInputPermission($(value).find('.share-dialog-permissions'))[0]);
-                
-                if (!s || !s[id] || s[id].r !== iPerm) {
-                    targets.push({u: id, r: iPerm});
+            aCurrPermLevel = checkMultiInputPermission($itemPermLevel);
+            sId = $itemPermLevel.parent().attr('id');
+            
+            if (sId !== '') {
+                iPerm = sharedPermissionLevel(aNewPermLevel[0]);
+
+                if (!oShares || !oShares[sId] || oShares[sId].r !== iPerm) {
+                    aItems.push({u: sId, r: iPerm});
+                }
+            }
+        
+            $itemPermLevel
+                .removeClass(aCurrPermLevel[0])
+                .removeClass('active')
+                .html('<span></span>' + aNewPermLevel[1])
+                .addClass(aNewPermLevel[0]);
+        }
+        
+        // Group permission, permissions-icon
+        else if ($groupPermLevel.length) {
+            
+            aCurrPermLevel = checkMultiInputPermission($groupPermLevel);
+            
+            // Get all items from dialog content block (avatar, name/email, permission)
+            $existingContacts = $('.share-dialog-contact-bl');
+            $.each($existingContacts, function(index, value) {
+
+                // extract id of contact
+                sId = $(value).attr('id').replace('sdcbl_', '');
+
+                if (sId !== '') {
+                    iPerm = sharedPermissionLevel(aNewPermLevel[0]);
+
+                    if (!oShares || !oShares[sId] || oShares[sId].r !== iPerm) {
+                        aItems.push({u: sId, r: iPerm});
+                    }
                 }
             });
-//        doShare($.selected[0], targets, true);
 
-        if ($i.length) {
-            acls = checkMultiInputPermission($i);
-            $i
-                .removeClass(acls[0])
+            $groupPermLevel
+                .removeClass(aCurrPermLevel[0])
                 .removeClass('active')
-                .html('<span></span>' + cls[1])
-                .addClass(cls[0]);
-        }
-        else if ($g.length) {// Group permission, permissions-icon
-            acls = checkMultiInputPermission($g);
-            $g
-                .removeClass(acls[0])
-                .removeClass('active')
-                .html('<span></span>' + cls[1])
-                .addClass(cls[0]);
+                .html('<span></span>' + aNewPermLevel[1])
+                .addClass(aNewPermLevel[0]);
+            
+            $('.share-dialog-contact-bl .share-dialog-permissions')
+                .removeClass('read-only')
+                .removeClass('read-and-write')
+                .removeClass('full-access')
+                .html('<span></span>' + aNewPermLevel[1])
+                .addClass(aNewPermLevel[0]);
         }
 
+        if (aItems.length > 0) {
+            doShare($.selected[0], aItems, true);
+        }
+        
         $('.permissions-icon.active').removeClass('active');
         $('.share-dialog-permissions.active').removeClass('active');
 

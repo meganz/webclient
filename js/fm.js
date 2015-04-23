@@ -1590,11 +1590,7 @@ function addContactUI()
                 errorMsg("Looks like there's a malformed email!");
             },
             onDoublet: function(u) {
-
-                // If the email already exists in the state, show error
-    //            if (checkIfContactExists(u.id)) {
-                    errorMsg('You already have contact with that email!');
-    //            };
+                errorMsg('You already have contact with that email!');
             },
             onHolder: function() {
                 errorMsg('No need for that, you are THE owner!');
@@ -1608,10 +1604,10 @@ function addContactUI()
                     $('.add-user-popup-button.add').removeClass('disabled');
                     $('.add-user-popup .nw-fm-dialog-title').text('Add Contacts');
 
-                    var $a = $('.add-user-popup .share-added-contact.token-input-token-mega');
-                    var $b = $('.add-user-popup .multiple-input');
-                    var h1 = $a.outerHeight(true);// margin included
-                    var h2 = $b.height();
+                    var $a = $('.add-user-popup .share-added-contact.token-input-token-mega'),
+                    $b = $('.add-user-popup .multiple-input'),
+                    h1 = $a.outerHeight(true),// margin included
+                    h2 = $b.height();
 
                     if (5 <= h2 / h1 && h2 / h1 < 6) {
                         $b.jScrollPane({
@@ -1631,26 +1627,31 @@ function addContactUI()
                     $('.add-user-popup .token-input-input-token-mega input').blur();
                 }, 0);
                 var itemNum = $('.token-input-list-mega .token-input-token-mega').length;
+                
                 if (itemNum === 0) {
                     $('.add-user-popup-button.add').addClass('disabled');
                     $('.add-user-popup .nw-fm-dialog-title').text(l[71]);
 
-                } else if (itemNum === 1) {
+                }
+                else if (itemNum === 1) {
                     $('.add-user-popup-button.add').removeClass('disabled');
                     $('.add-user-popup .nw-fm-dialog-title').text(l[71]);
 
-                } else {
+                }
+                else {
                     $('.add-user-popup-button.add').removeClass('disabled');
                     $('.add-user-popup .nw-fm-dialog-title').text('Add Contacts');
 
-                    var $a = $('.add-user-popup .share-added-contact.token-input-token-mega');
-                    var $b = $('.add-user-popup .multiple-input');
-                    var $c = $('.add-user-popup .multiple-input .jspPane')[0];
-                    var h1 = $a.outerHeight(true);// margin included
-                    var h2;
+                    var $a = $('.add-user-popup .share-added-contact.token-input-token-mega'),
+                        $b = $('.add-user-popup .multiple-input'),
+                        $c = $('.add-user-popup .multiple-input .jspPane')[0],
+                        h1 = $a.outerHeight(true),// margin included
+                        h2;
+                        
                     if ($c) {
                         h2 = $c.scrollHeight;
-                    } else {
+                    }
+                    else {
                         h2 = $b.height();
                     }
 
@@ -6578,21 +6579,31 @@ function handleDialogContent(s, m, c, n, t, i)
  *
  */
 function shareDialogContentCheck() {
-    var dc = '.share-dialog';
+    
+    var dc = '.share-dialog',
+        iItemsNum = 0,
+        iNewItemsNum = 0,
+        $btn = $('.fm-dialog-button.dialog-share-button');
 
-    // Disable/enable button
-    var $btn = $('.fm-dialog-button.dialog-share-button');
-
-    var num = $(dc + ' .share-dialog-contacts .share-dialog-contact-bl').length;
-    if (num) {
-        $btn.removeClass('disabled');
+    iNewItemsNum = $(dc + ' .token-input-token-mega').length;
+    iItemsNum = $(dc + ' .share-dialog-contacts .share-dialog-contact-bl').length;
+    
+    if (iItemsNum) {
+        
         $(dc + ' .share-dialog-img').addClass('hidden');
         $(dc + ' .share-dialog-contacts').removeClass('hidden');
-        handleDialogScroll(num, dc);
-    } else {
-        $btn.addClass('disabled');
+        handleDialogScroll(iItemsNum, dc);
+    }
+    else {
         $(dc + ' .share-dialog-img').removeClass('hidden');
         $(dc + ' .share-dialog-contacts').addClass('hidden');
+    }
+    
+    if (iNewItemsNum) {
+        $btn.removeClass('disabled');        
+    }
+    else {
+        $btn.addClass('disabled');
     }
 }
 
@@ -6632,6 +6643,7 @@ function addShareDialogContactToContent(type, id, av_color, av, name, permClass,
 function fillShareDialogWithContent() {
 
     $.sharedTokens = [];// GLOBAL VARIABLE, Hold items currently visible in share folder content (above multi-input)
+    
     var user, email, name, shareRights, html,
         selectedNodeHandle = $.selected[0],
         shares = M.d[selectedNodeHandle].shares,
@@ -6848,13 +6860,12 @@ function initShareDialog() {
 
                 $('.dialog-share-button').removeClass('disabled');
 
-                var $a = $('.share-dialog .share-added-contact.token-input-token-mega');
-                var $b = $('.share-dialog .multiple-input');
-                var h1 = $a.outerHeight(true);// margin
-                var h2 = $b.height();
+                var $a = $('.share-dialog .share-added-contact.token-input-token-mega'),
+                    $b = $('.share-dialog .multiple-input'),
+                    h1 = $a.outerHeight(true),// margin
+                    h2 = $b.height();
 
-                if (5 <= h2 / h1 && h2 / h1 < 6)
-                {
+                if (5 <= h2 / h1 && h2 / h1 < 6) {
                     $b.jScrollPane({
                         enableKeyboardNavigation: false,
                         showArrows: true,
@@ -6866,33 +6877,37 @@ function initShareDialog() {
                     }, 0);
                 }
             },
-            onDelete: function()
-            {
+            onDelete: function() {
                 var $btn = $('.dialog-share-button');
                 setTimeout(function() {
                     $('.share-dialog .token-input-input-token-mega input').blur();
                 }, 0);
-                var itemNum = $('.share-dialog .token-input-list-mega .token-input-token-mega').length + $('.share-dialog .share-dialog-contacts .share-dialog-contact-bl').length;
-                if (itemNum === 0)
-                {
+                
+                var iNewItemsNum = $('.share-dialog .token-input-list-mega .token-input-token-mega').length,
+                    iItemsNum = $('.share-dialog .share-dialog-contacts .share-dialog-contact-bl').length;
+
+                if (iNewItemsNum) {
+                    $btn.removeClass('disabled');
+                }
+                else {
                     $btn.addClass('disabled');
                 }
-                else
-                {
-                    $btn.removeClass('disabled');
-
-                    var $a = $('.share-dialog .share-added-contact.token-input-token-mega');
-                    var $b = $('.share-dialog .multiple-input');
-                    var $c = $('.share-dialog .multiple-input .jspPane')[0];
-                    var h1 = $a.outerHeight();// margin excluded
-                    var h2;
-                    if ($c)
+                    
+                if (iItemsNum) {
+                    var $a = $('.share-dialog .share-added-contact.token-input-token-mega'),
+                        $b = $('.share-dialog .multiple-input'),
+                        $c = $('.share-dialog .multiple-input .jspPane')[0],
+                        h1 = $a.outerHeight(),// margin excluded
+                        h2;
+                        
+                    if ($c) {
                         h2 = $c.scrollHeight;
-                    else
+                    }
+                    else {
                         h2 = $b.height();
+                    }
 
-                    if (h2 / h1 < 6)
-                    {
+                    if (h2 / h1 < 6) {
                         clearScrollPanel('.share-dialog');
                     }
                 }
@@ -7053,7 +7068,7 @@ function initShareDialog() {
 
         shareDialogContentCheck();
 
-        num = $('.share-dialog .share-dialog-contacts .share-dialog-contact-bl').length + $('.share-dialog .token-input-list-mega .token-input-token-mega').length;
+        num = $('.share-dialog .token-input-list-mega .token-input-token-mega').length;
         if (!num) {
             $('.dialog-share-button').addClass('disabled');
         }

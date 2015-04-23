@@ -671,7 +671,7 @@ function MegaData()
          * flush_cached_nodes
          *
          * @param {integer} n
-         * 
+         *
          */
         function flush_cached_nodes(n) {
             var canvas,
@@ -722,7 +722,7 @@ function MegaData()
          * @param {} aHTMLContent
          * @param {} aUpdate
          * @param {} aDynCache
-         * 
+         *
          */
         function mInsertNode(aNode, aPrevNode, aNextNode, aTag, aElement, aHTMLContent, aUpdate, aDynCache) {
             if (!aUpdate || $(aTag + ' ' + aElement).length === 0) {
@@ -779,7 +779,7 @@ function MegaData()
          * renerContactsLayout
          *
          * @param {} u
-         * 
+         *
          */
         function renderContactsLayout(u) {
             var u_h, contact, node, av_meta, avatar, av_color, el, t, html, onlinestatus,
@@ -1382,7 +1382,7 @@ function MegaData()
         if (d) {
             console.log('openFolder()', M.currentdirid, id, force);
         }
-        if ((id !== 'notifications') && ($('.fm-main.notifications').hasClass('hidden'))) {
+        if ((id !== 'notifications') && !$('.fm-main.notifications').hasClass('hidden')) {
             notificationsUI(1);
         }
         this.search = false;
@@ -2201,17 +2201,17 @@ function MegaData()
             $(el[i]).text('');
             i++;
         }
-        
+
         if ($('.fm-breadcrumbs-block .fm-breadcrumbs').length > 1) {
             $('.fm-breadcrumbs-block').removeClass('deactivated');
         } else {
             $('.fm-breadcrumbs-block').addClass('deactivated');
         }
-        
+
         $('.fm-breadcrumbs-block a').unbind('click');
         $('.fm-breadcrumbs-block a').bind('click', function() {
             var crumbId = $(this).attr('id');
-            
+
             // When NOT deactivated
             if (!$('.fm-breadcrumbs-block').hasClass('deactivated')) {
                 if (crumbId === 'path_opc' || crumbId === 'path_ipc') {
@@ -2219,7 +2219,7 @@ function MegaData()
                 } else if ((crumbId === 'chatcrumb') || (M.currentdirid && M.currentdirid.substr(0, 7) === 'search/')) {
                     return false;
                 }
-                
+
                 // Remove focus from 'view ipc/opc' buttons
                 $('.fm-received-requests').removeClass('active');
                 $('.fm-contact-requests').removeClass('active');
@@ -2455,7 +2455,7 @@ function MegaData()
      * @param {email} target
      * @param {string} msg
      *
-     * 
+     *
      */
     this.inviteContact = function(owner, target, msg) {
         DEBUG('inviteContact');
@@ -2484,7 +2484,7 @@ function MegaData()
      * @param {int} errorCode
      * @param {string} msg Can be undefined
      * @param {email} email  Can be undefined
-     * 
+     *
      */
     this.inviteContactMessageHandler = function(errorCode) {
         if (errorCode === -12) {
@@ -2699,7 +2699,7 @@ function MegaData()
      * @param {object} u, user object data
      * @param {boolean} ignoreDB, don't write to indexedDB
      *
-     * 
+     *
      */
     this.addUser = function(u, ignoreDB) {
         var userId = '';
@@ -2731,7 +2731,7 @@ function MegaData()
      * Delete opc record from localStorage using id
      *
      * @param {string} id
-     * 
+     *
      */
     this.delOPC = function(id) {
         if (typeof mDB === 'object' && !pfkey) {
@@ -2751,7 +2751,7 @@ function MegaData()
      * Delete ipc record from indexedDb using id
      *
      * @param {string} id
-     * 
+     *
      */
     this.delIPC = function(id) {
         if (typeof mDB === 'object' && !pfkey) {
@@ -2771,7 +2771,7 @@ function MegaData()
      * @param {JSON} ps, pending share
      * @param {boolean} ignoreDB
      *
-     * 
+     *
      */
     this.addPS = function(ps, ignoreDB) {
         if (!this.ps[ps.h]) {
@@ -2790,7 +2790,7 @@ function MegaData()
      * @param {string} pcrId, pending contact request id
      * @param {string} nodeId, shared item id
      *
-     * 
+     *
      */
     this.delPS = function(pcrId, nodeId) {
 
@@ -3104,9 +3104,9 @@ function MegaData()
     };
 
     this.nodeAttr = function(a) {
-        
+
         var n = M.d[a.h];
-        
+
         if (n) {
             for (var i in a) {
                 n[i] = a[i];
@@ -3246,7 +3246,7 @@ function MegaData()
      * @param {string} nodeHandle
      * @param {string} pendingContactId
      *
-     * 
+     *
      */
     this.deletePendingShare = function(nodeHandle, pendingContactId) {
         if (this.d[nodeHandle]) {
@@ -3260,29 +3260,29 @@ function MegaData()
     /**
      * Removes traces of export link share
      * Remove M.fln, M.links, M.d[handle].ph
-     * 
+     *
      * @param {string} handle of selected node/item
-     * 
+     *
      */
     this.deleteExportLinkShare = function(handle) {
-        
+
         var index;
-        
-//  ToDo: Find out what's .fln stand for        
+
+//  ToDo: Find out what's .fln stand for
 //        if (M.fln.h === handle) {
 //            delete M.fln;
 //        }
-        
+
         index = $.inArray(handle, M.links);
         if (index !== -1) {
             M.links.splice(index, 1);
         }
-        
+
         if (M.d[handle] && M.d[handle].ph) {
             delete M.d[handle].ph;
         }
     };
-    
+
     /**
      * hasExportLink, check if at least one selected
      * item have export link already generated
@@ -3291,15 +3291,15 @@ function MegaData()
      * @returns {boolean}
      */
     this.hasExportLink = function(selected) {
-        
+
         var i, shares, selectedNodeHandle;
-        
+
         // Loop through all selected items
         for (i = selected.length; i--;) {
-            
+
             selectedNodeHandle = selected[i];
             shares = M.d[selectedNodeHandle].shares;
-            
+
             // Loop through selected items and search for export link share
             for (var userHandle in shares) {
                 if (shares.hasOwnProperty(userHandle)) {
@@ -3309,10 +3309,10 @@ function MegaData()
                 }
             }
         }
-        
+
         return false;
     };
-    
+
     this.getLinks = function(h) {
         this.$getLinkPromise = new $.Deferred();
 
@@ -3328,7 +3328,7 @@ function MegaData()
                 this.links.push(n.h);
             }
         }
-         if (d) {
+        if (d) {
             console.log('getLinks', this.links);
         }
         if (this.folderLinks.length > 0) {
@@ -3349,7 +3349,7 @@ function MegaData()
                 node: this.links[i],
                 last: i == this.links.length - 1,
                 callback: function(res, ctx) {
-                    
+
                     if (typeof res !== 'number') {
                         M.nodeAttr({h: M.d[ctx.node].h, ph: res});
                     }
@@ -3364,7 +3364,7 @@ function MegaData()
     };
 
     this.getFolderlinks = function() {
-        
+
         if (this.folderLinks.length > 0) {
             var n = M.d[this.folderLinks[0]];
             this.folderLinks.splice(0, 1);
@@ -3381,7 +3381,7 @@ function MegaData()
                     api_setshare(n.h, [{u: 'EXP', r: 0}], h, {
                         done: function(res) {
                             if (res.r && res.r[0] === 0) {
-                                
+
                                 // ToDo: timestamp ts can be different here and on server side, check how this influence execution
                                 M.nodeShare(M.fln.h, {h: M.fln.h, r: 0, u: 'EXP', ts: Math.floor(new Date().getTime() / 1000)});
                             }
@@ -4569,7 +4569,7 @@ function execsc(actionPackets, callback) {
                 if (actionPacket && actionPacket.u === 'EXP') {
                     M.getLinks([actionPacket.h]);
                 }
-                
+
                 if (typeof actionPacket.o != 'undefined') {
                     if (typeof actionPacket.r == "undefined") {
                         if (d) {
@@ -4786,7 +4786,7 @@ function execsc(actionPackets, callback) {
             if (actionPacket.s !== 2) {
                 addNotification(actionPacket);
             }
-        }        
+        }
         // Action packet to notify about payment (Payment Service Transaction Status)
         else if (actionPacket.a === 'psts') {
             processPaymentReceived(actionPacket);
@@ -5160,8 +5160,11 @@ function doShare(h, targets, dontShowShareDialog) {
                             // A pending share may not have a corresponding user and should not be added
                             // A pending share can also be identified by a user who is only a '0' contact
                             // level (passive)
-                            if (user != false && M.u[user].c != 0) {
+                            if (M.u[user] && M.u[user].c != 0) {
                                 M.nodeShare(ctx.h, {h: h, r: rights, u: user, ts: Math.floor(new Date().getTime() / 1000)});
+                            }
+                            else if (d) {
+                                console.log('doshare: invalid user', user, M.u[user], ctx.t[i]);
                             }
                         }
                     }
@@ -5512,16 +5515,16 @@ function processUPCO(ap) {
  * @param {Object} actionPacket The action packet {'a':'psts', 'p':<prolevel>, 'r':<s for success or f for failure>}
  */
 function processPaymentReceived(actionPacket) {
-    
+
     // Check success or failure
     var success = (actionPacket.r === 's') ? true : false;
-    
+
     // Add a notification in the top bar
     addNotification(actionPacket);
-    
+
     // If their payment was successful, redirect to account page to show new Pro Plan
     if (success) {
-        
+
         // Make sure it fetches new account data on reload
         if (M.account) {
             M.account.lastupdate = 0;
@@ -5608,7 +5611,7 @@ function init_chat() {
 }
 
 function loadfm_callback(res) {
-    
+
     if (pfkey && res.f && res.f[0]) {
         M.RootID = res.f[0].h;
         u_sharekeys[res.f[0].h] = base64_to_a32(pfkey);
@@ -5629,17 +5632,17 @@ function loadfm_callback(res) {
     if (res.ps) {
         processPS(res.ps);
     }
-    
+
     process_f(res.f, function onLoadFMDone() {
 
         // If we have shares, and if a share is for this node, record it on the nodes share list
         if (res.s) {
             for (var i in res.s) {
                 if (res.s.hasOwnProperty(i)) {
-                    
+
                     var nodeHandle = res.s[i].h;
                     M.nodeShare(nodeHandle, res.s[i]);
-                
+
                     if (res.s[i].u === 'EXP') {
                         M.getLinks([nodeHandle]);
                     }

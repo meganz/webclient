@@ -793,7 +793,7 @@ function funcAlias(context, fn) {
  * @param kls class on which prototype this method should add the on, bind, unbind, etc methods
  */
 function makeObservable(kls) {
-    var aliases = ['on', 'bind', 'unbind', 'one', 'trigger'];
+    var aliases = ['on', 'bind', 'unbind', 'one', 'trigger', 'rebind'];
 
     $.each(aliases, function(k, v) {
         if (kls.prototype) {
@@ -2702,3 +2702,46 @@ MegaEvents.prototype.on = function(name, callback) {
     };
     scope.megaAnalytics = new MegaAnalytics(99999);
 })(this);
+
+
+function constStateToText(enumMap, state) {
+    var txt = null;
+    $.each(enumMap, function(k, v) {
+        if(state == v) {
+            txt = k;
+
+            return false; // break
+        }
+    });
+
+    return txt;
+};
+
+/**
+ * Helper function that will do some assert()s to guarantee that the new state is correct/allowed
+ *
+ * @param currentState
+ * @param newState
+ * @param allowedStatesMap
+ * @param enumMap
+ * @throws AssertionError
+ */
+function assertStateChange(currentState, newState, allowedStatesMap, enumMap) {
+    var checksAvailable = allowedStatesMap[currentState];
+    var allowed = false;
+    if(checksAvailable) {
+        checksAvailable.forEach(function(allowedState) {
+            if(allowedState === newState) {
+                allowed = true;
+                return false; // break;
+            }
+        });
+    }
+    if(!allowed) {
+        assert(
+            false,
+            'State change from: ' + constStateToText(enumMap, currentState) + ' to ' +
+            constStateToText(enumMap, newState) + ' is not in the allowed state transitions map.'
+        );
+    }
+}

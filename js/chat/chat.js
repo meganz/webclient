@@ -697,6 +697,7 @@ var Chat = function() {
          * Really simple plugin architecture
          */
         'plugins': {
+            'callManager': CallManager,
             'urlFilter': UrlFilter,
             'emoticonsFilter': EmoticonsFilter,
             'attachmentsFilter': AttachmentsFilter,
@@ -757,8 +758,6 @@ var Chat = function() {
     });
 
     self.filePicker = null; // initialized on a later stage when the DOM is fully available.
-
-    self.incomingCallDialog = new mega.ui.chat.IncomingCallDialog();
 
     //logAllCallsOnObject(jodid25519.eddsa, console.error, true, 'jodid25519.eddsa');
 
@@ -1316,119 +1315,7 @@ Chat.prototype.init = function() {
         self.renderMyStatus();
     }
 
-    try {
-        self.rtc = self.karere.connection.rtc = new RtcSession(self.karere.connection, self.options.rtcSession);
-        self.rtc.ftManager.updateGui = function() {
-            var uploadAndDownloadSessions = obj_values(this.downloads).concat(obj_values(this.uploads));
 
-            $.each(uploadAndDownloadSessions, function(k, v) {
-                if (!v.currentFile()) {
-                    return; // continue
-                }
-
-                var progress = v.progress()|0;
-                var $elem = $('.webrtc-transfer[data-transfer-sid="' + v._sid + '"] .nw-chat-sharing-body[data-file-uniqueid="' + v.currentFile().uniqueId + '"]');
-
-                var title = v.state().text;
-                title = (title ? title + ", " : title) + (progress ? progress + "%" : ""); // XX: ah this looks ugly
-
-                $elem.attr("title", title);
-                $('.direct-progressbar', $elem).removeClass("hidden");
-                $('.progressbarfill', $elem).css('width', progress + "%");
-
-                if(progress == 100) {
-                    $('.direct-progressbar', $elem).addClass("hidden");
-                }
-            });
-
-        };
-
-        self.rtc.statsUrl = "https://stats.karere.mega.nz/stats";
-
-        // bind rtc events
-        var rtcEventProxyToRoom = function(e, eventData) {
-            self.logger.debug("RTC: ", e, eventData);
-
-            var peer = eventData.peer;
-
-            if(peer) {
-                var fromBareJid = Karere.getNormalizedBareJid(peer);
-                if(fromBareJid == self.karere.getBareJid()) {
-                    self.logger.warn("Ignoring my own incoming request.");
-
-                    return;
-                }
-                var chatJids = [fromBareJid]
-                chatJids.push(self.karere.getBareJid());
-
-                var resp = self.openChat(chatJids, "private");
-
-                resp[2].done(function(roomJid, room) {
-                    room.trigger(e, eventData);
-                });
-            } else {
-                var room = self.getCurrentRoom();
-
-                self.logger.warn("Routing RTC event to current room: ", room, e, eventData);
-
-                // local-stream-obtained = most likely this is the currently active window/room
-                if(room) {
-                    room.trigger(e, eventData);
-                }
-            }
-
-
-            // TODO: Multi group calls?
-        };
-
-        $(self.rtc).on('call-incoming-request', rtcEventProxyToRoom);
-        $(self.rtc).on('call-answered', rtcEventProxyToRoom);
-        $(self.rtc).on('call-declined', rtcEventProxyToRoom);
-        $(self.rtc).on('call-answer-timeout', rtcEventProxyToRoom);
-        $(self.rtc).on('call-canceled', rtcEventProxyToRoom);
-        $(self.rtc).on('call-canceled-caller', rtcEventProxyToRoom);
-        $(self.rtc).on('media-recv', rtcEventProxyToRoom);
-        $(self.rtc).on('local-stream-connect', rtcEventProxyToRoom);
-        $(self.rtc).on('remote-player-remove', rtcEventProxyToRoom);
-        $(self.rtc).on('local-player-remove', rtcEventProxyToRoom);
-        $(self.rtc).on('local-media-fail', rtcEventProxyToRoom);
-        $(self.rtc).on('call-init', rtcEventProxyToRoom);
-        $(self.rtc).on('call-ended', rtcEventProxyToRoom);
-        $(self.rtc).on('muted', rtcEventProxyToRoom);
-        $(self.rtc).on('unmuted', rtcEventProxyToRoom);
-
-        //ftManager proxies
-
-        var _ftSessEndHandler = function(e, eventData) {
-            self.logger.debug("RTC ftSessHandler: ", e, eventData);
-
-            var sess = eventData.ftSess;
-
-            var $elem = $('.webrtc-transfer[data-transfer-sid="' + sess._sid + '"]');
-
-            $('.primary-button', $elem).replaceWith(
-                $("<em>" + (e.type == "ftsess-remove" ? "Done" : "Canceled") + "</em>")
-            );
-
-            if(e.type == "ftsess-remove") { // completed
-                $('.nw-chat-sharing-body', $elem).removeAttr('title');
-                $('.progressbarfill', $elem).css('width', '100%');
-                $('.direct-progressbar', $elem).addClass("hidden");
-            }
-
-            var roomJid = $('.webrtc-transfer').parents('.fm-chat-message-scroll').prev().attr("data-room-jid");
-            var room = megaChat.chats[roomJid + "@conference." + megaChat.options.xmppDomain];
-            if(room) {
-                room.refreshUI();
-            }
-        };
-        $(self.rtc.ftManager).on('ftsess-remove', _ftSessEndHandler);
-        $(self.rtc.ftManager).on('ftsess-canceled', _ftSessEndHandler);
-
-    } catch(e) {
-        // no RTC support.
-        self.logger.error("No rtc support: ", e);
-    }
 
     if(self.karere.getConnectionState() == Karere.CONNECTION_STATE.DISCONNECTED || self.karere.getConnectionState() == Karere.CONNECTION_STATE.AUTHFAIL) {
         self.karere.authSetup(
@@ -1436,7 +1323,6 @@ Chat.prototype.init = function() {
             self.getMyXMPPPassword()
         );
     }
-
 
     // contacts tab update
 
@@ -1461,8 +1347,9 @@ Chat.prototype.init = function() {
             $('#contact_' + c.u + ' .start-chat-button')
                 .removeClass("active");
         }
-        room._cancelCallRequest();
-        room._resetCallStateNoCall();
+        if(room.callSession) {
+            room.callSession.endCall();
+        }
     });
     $(document)
         .unbind('megaulcomplete.megaChat')

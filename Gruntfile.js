@@ -25,6 +25,7 @@ module.exports = function(grunt) {
             } else if (l.indexOf(":") > 1) {
                 htmlExtra.push( "build/html/" + l.match(/\/(.+.html)/)[1] )    
                 l = l.replace(/html\/[^\.]+\.html/, "html/extra.json")
+                l = l.replace(/j:[ \t\r]*\d/, "j:9")
             }
         }
         if (include) code.push(l)

@@ -5,7 +5,6 @@ var is_chrome_firefox = document.location.protocol === 'chrome:' && document.loc
 var is_extension = is_chrome_firefox || document.location.href.substr(0,19) == 'chrome-extension://';
 var storage_version = '1'; // clear localStorage when version doesn't match
 var page = document.location.hash;
-var prod_assets = false
 
 function isMobile()
 {
@@ -38,7 +37,6 @@ else if (ua.indexOf('opera') > -1 && typeof window.webkitRequestFileSystem == 'u
 var apipath, staticpath = 'https://eu.static.mega.co.nz/3/';
 var myURL, URL = window.URL || window.webkitURL;
 if (!(myURL=URL)) b_u=1;
-
 if (!b_u) try
 {
     if (is_chrome_firefox)
@@ -96,7 +94,6 @@ if (!b_u) try
         }
         staticpath = localStorage.staticpath || geoStaticpath();
         apipath = localStorage.apipath || 'https://eu.api.mega.co.nz/';
-        prod_assets = prod_assets || localStorage.prod_assets == "1"
     }
 }
 catch(e) {
@@ -944,50 +941,6 @@ else if (!b_u)
         'affiliate': ['affiliates','affiliateterms','affiliatesignup','affiliatesignup_js','affiliatemember','affiliatemember_js','affiliate_js'],
         'recover': ['reset','reset_js']
     };
-
-    if (prod_assets) {
-        // Fix jsl
-        var _jsl = []
-        var assets = {}
-        for (var i in jsl) {
-            if (jsl[i].j != 0 && !jsl[i].g) {
-                _jsl.push(jsl[i])
-            } else if (jsl[i].g && !assets[ jsl[i].g ]) {
-                jsl[i]['f'] = "js/xmega-" + jsl[i].g + ".js";
-                _jsl.push(jsl[i])
-                assets[jsl[i].g] = true
-            }
-        }
-        _jsl.push({f: "html/boot.json", n:"prod_assets_boot", j:9})
-
-        console.error("Production boot. Loading ", _jsl.length, " assets instead of ", jsl.length);
-        jsl = _jsl;
-
-        // fix jsl2
-        for (var i in jsl2) {
-            if (jsl2[i].j == 0) {
-                jsl2[i].j = 9;
-                jsl2[i].f = 'html/extra.json';
-            }
-        }
-
-        // TODO: research if Array.filter is portable enough
-        // to use it instead
-        for (var x in subpages) {
-            var has = false
-            var tmp = []
-            for (var y in subpages[x]) {
-                if ((jsl2[subpages[x][y]]||{}).j == 9) {
-                    if (!has) tmp.push(subpages[x][y])
-                    has = true
-                } else {
-                    tmp.push(subpages[x][y])
-                }
-            }
-            subpages[x] = tmp;
-        }
-    }
-
 
     if (page)
     {

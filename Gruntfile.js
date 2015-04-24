@@ -4,22 +4,32 @@ module.exports = function(grunt) {
 
 	var secure = fs.readFileSync("secureboot.js").toString().split("\n")
 
-	var htmls = [], htmlExtra = [], js = {}
+    /* move to a plugin {{{ */
+	var htmls = [], htmlExtra = [], js = {}, code = [], has = {}
 	secure.forEach(function(l) {
+        var include = true
 		if (l.match(/f:.+\.js.+g:/)) {
 			eval("var y = " + l.match(/{[^}]+}/)[0])
 			if (y.g && y.f) {
 				if (!js[y.g]) js[y.g] = []
+                else include = false
 				js[y.g].push(y.f)
 			}
+            l = "/*placeholder-" + y.g + "*/"
 		} else if (l.indexOf(".html") > 1) {
 			if (l.indexOf("jsl.push") > 1) {
 				htmls.push( "build/html/" + l.match(/\/(.+.html)/)[1] )	
+                l = 'jsl.push({f: "html/boot.json", n:"prod_assets_boot", j:9})'
+                include = !has['html']
+                has['html'] = true
 			} else if (l.indexOf(":") > 1) {
 				htmlExtra.push( "build/html/" + l.match(/\/(.+.html)/)[1] )	
+                l = l.replace(/html\/[^\.]+\.html/, "html/extra.json")
 			}
 		}
+        if (include) code.push(l)
 	});
+    code = code.join("\n")
 
 	var concat = {}, uglify = {}
 
@@ -35,7 +45,13 @@ module.exports = function(grunt) {
 			src: "js/xmega-" + i + ".js",
 			dest: "js/xmega-" + i + ".js",
 		}
+        code = code.replace(
+            "/*placeholder-" + i+"*/", 
+            "jsl.push({f:'js/xmega-"+i+ ".js', n: 'pack_"+i+"', j:1});"
+        )
 	}
+    fs.writeFileSync("secureboot.prod.js", code)
+    /* }}} */
 
     // Project configuration.
     grunt.initConfig({

@@ -536,7 +536,8 @@ RtcSession.prototype = {
               reason: $(stanza).attr('reason'),
               sid: sid,
               isDataCall: !!options.files,
-              text : body.length ? RtcSession.xmlUnescape(body[0].textContent) : undefined
+              text : body.length ? RtcSession.xmlUnescape(body[0].textContent) : undefined,
+              peerMedia: options
           });
       },
       null, 'message', 'megaCallDecline', null, targetJid, {matchBare: true});
@@ -612,6 +613,7 @@ RtcSession.prototype = {
   //return an object with a cancel() method
   return {
       sid: sid,
+      peerMedia: options,
       cancel: function() {
         if (state === 2)
             return false;
@@ -629,7 +631,7 @@ RtcSession.prototype = {
                 reason: 'caller',
                 type: 'megaCallCancel'
             }));
-            self.trigger('call-canceled-caller', {peer: targetJid, info: { sid: sid, reason: 'caller' }});
+            self.trigger('call-canceled-caller', {peer: targetJid, info: { sid: sid, reason: 'caller' }, peerMedia: options});
             return true;
         } else if (state === 0) {
             state = 4;
@@ -773,12 +775,12 @@ hangupAll: function()
     if (this.gLocalVid) {
         throw new Error("Local stream just obtained, but localVid was not null");
     }
-    var vid = $('<video class="'+elemClass+'" autoplay="autoplay" />');
+    var vid = $('<video class="'+elemClass+'" autoplay="autoplay" defaultMuted="true" muted="true" volume="0"/>');
     if (vid.length < 1) {
         throw new Error("Failed to create local video element");
     }
     vid = vid[0];
-    vid.muted = true;
+    vid.muted = vid.defaultMuted = true;
     vid.volume = 0;
     this.gLocalVid = vid;
     /**

@@ -1,16 +1,4 @@
-if (!window.indexedDB) {
-    window.indexedDB = window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
-}
-if (!window.IDBKeyRange) {
-    window.IDBKeyRange = window.webkitIDBKeyRange || window.msIDBKeyRange;
-}
-if (!window.IDBTransaction) {
-    window.IDBTransaction = window.webkitIDBTransaction || window.OIDBTransaction || window.msIDBTransaction;
-}
-
-var mDBact, mDBv = 7;
-var mDB = indexedDB ? 0x7f : undefined;
-var mSDB, mSDBPromises = [];
+var mDBact, mDBv = 7, mDB, mSDB, mSDBPromises = [];
 
 /**
  *  @brief Dynamic wrapper around MegaDB which eases handling
@@ -190,6 +178,21 @@ mStorageDB.prototype = {
         return aPromise;
     }
 };
+
+mBroadcaster.once('startMega', function __idb_setup() {
+    if (!window.indexedDB) {
+        window.indexedDB = window.webkitIndexedDB || window.msIndexedDB || window.mozIndexedDB;
+    }
+    if (!window.IDBKeyRange) {
+        window.IDBKeyRange = window.webkitIDBKeyRange || window.msIDBKeyRange;
+    }
+    if (!window.IDBTransaction) {
+        window.IDBTransaction = window.webkitIDBTransaction || window.OIDBTransaction || window.msIDBTransaction;
+    }
+    if (indexedDB) {
+        mDB = 0x7f;
+    }
+});
 
 mBroadcaster.once('startMega', function __msdb_init() {
     var db = new mStorageDB('msmain');

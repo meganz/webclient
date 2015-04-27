@@ -54,7 +54,6 @@ mStorageDB.prototype = {
                 keyPath: aKeyPath
             }
         };
-
         this.handlers[aTable] = aHandler;
         return this;
     },
@@ -391,9 +390,9 @@ var mFileManagerDB = {
 
             var promise;
             if (aCommand === 'add') {
-                promise = this.db.addOrUpdate(aTable, aData);
+                promise = this.db.server.update(aTable, aData);
             } else {
-                promise = this.db.remove(aTable, aData);
+                promise = this.db.server.remove(aTable, aData);
             }
 
             promise.then(function() {

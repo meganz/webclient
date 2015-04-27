@@ -254,6 +254,7 @@ describe("MegaDB - Unit Test", function() {
                         expect(rr[0].firstName).to.eql("John");
                         expect(rr[1].firstName).to.eql("John2");
 
+
                         mdb.remove("people", [obj1, obj2])
                             .then(function() {
                                 mdb.query("people")

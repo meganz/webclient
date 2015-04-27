@@ -75,7 +75,6 @@ MegaDB.DEFAULT_OPTIONS = {
     }
 };
 
-
 /**
  * Wrap `fn` with a function which will create a "proxy" promise, which will wait for the DB state to be ready and then
  * actually execute the code in `fn`

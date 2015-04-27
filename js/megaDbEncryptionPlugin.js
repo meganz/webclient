@@ -52,8 +52,7 @@ var MegaDBEncryption = function(mdbInstance) {
     var simpleEncryptObjFunction = function(table, obj) {
         Object.keys(obj).forEach(function(k) {
             var v = obj[k];
-            if(k == "__origObj") { return; }
-            else if(k == "id") { return; }
+            if(k == "__origObj" || k == "id" ||  k === mdbInstance._getTablePk(table)) { return; }
 
             if(mdbInstance.schema[table]['indexes'] && mdbInstance.schema[table]['indexes'][k]) {
                 obj[k + "$v"] = stringcrypt.stringEncrypter(JSON.stringify(v), getEncDecKey());
@@ -83,7 +82,7 @@ var MegaDBEncryption = function(mdbInstance) {
             var decryptedKeys = [];
             Object.keys(obj).forEach(function (k) {
                 var v = obj[k];
-                if (k == "__origObj" || k == "id" || k.substr(-2) == "$v") {
+                if (k == "__origObj" || k == "id" || k.substr(-2) == "$v" || k === mdbInstance._getTablePk(table)) {
                     return;
                 }
 
@@ -134,6 +133,17 @@ var MegaDBEncryption = function(mdbInstance) {
             simpleDecryptObjFunction(table, e.returnedValue[2]);
         }
     });
+    mdbInstance.bind("onBeforeUpdate", function(e, table, k, obj, isQuerysetUpdate) {
+        logger.debug("onBeforeUpdate: ", table, k, obj);
+
+        e.returnedValue = [table, k, clone(obj), isQuerysetUpdate];
+
+        if (!isQuerysetUpdate) {
+            simpleEncryptObjFunction(table, e.returnedValue[2]);
+        } else {
+            simpleDecryptObjFunction(table, e.returnedValue[2]);
+        }
+    });
 
     mdbInstance.bind("onDbRead", function(e, table, obj) {
         //logger.debug("onDbRead: ", table, obj);
@@ -160,16 +170,17 @@ var MegaDBEncryption = function(mdbInstance) {
             var k = filters[i];
             var v = filters[i+1];
 
-            if(k == mdbInstance._getTablePk(table)) { return; }
+            if(k == mdbInstance._getTablePk(table)) { break; }
 
             assert(
                 (mdbInstance.schema[table]['indexes'] && typeof(mdbInstance.schema[table]['indexes'][k]) != 'undefined') ||
                 mdbInstance._getTablePk(table) != k,
                 'tried to execute a search on a field which is not marked as index'
-        );
+            );
 
             filters[i+1] = hasherFunc(JSON.stringify(v));
         };
+
         logger.debug("filters:", filters);
     });
 

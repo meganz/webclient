@@ -247,7 +247,7 @@ var mFileManagerDB = {
     version: 1,
 
     init: function mFileManagerDB_init() {
-        var db = new MegaDB("fm", u_handle, this.version, this.schema);
+        var db = new MegaDB("fm", u_handle, this.version, this.schema, {plugins: {}});
 
         if (mBroadcaster.crossTab.master) {
             db.bind('onDbStateReady', function _onDbStateReady() {

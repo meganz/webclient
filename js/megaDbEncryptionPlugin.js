@@ -123,18 +123,7 @@ var MegaDBEncryption = function(mdbInstance) {
     });
 
     mdbInstance.bind("onBeforeUpdate", function(e, table, k, obj, isQuerysetUpdate) {
-        logger.debug("onBeforeUpdate: ", table, k, obj);
-
-        e.returnedValue = [table, k, clone(obj), isQuerysetUpdate];
-
-        if (!isQuerysetUpdate) {
-            simpleEncryptObjFunction(table, e.returnedValue[2]);
-        } else {
-            simpleDecryptObjFunction(table, e.returnedValue[2]);
-        }
-    });
-    mdbInstance.bind("onBeforeUpdate", function(e, table, k, obj, isQuerysetUpdate) {
-        logger.debug("onBeforeUpdate: ", table, k, obj);
+        //logger.debug("onBeforeUpdate: ", table, k, obj);
 
         e.returnedValue = [table, k, clone(obj), isQuerysetUpdate];
 

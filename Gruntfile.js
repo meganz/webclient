@@ -37,18 +37,18 @@ module.exports = function(grunt) {
     for (var i in js) {
         concat[i] = {
             src: js[i],
-            dest: "js/xmega-" + i + ".js"
+            dest: "js/pack-" + i + ".js"
         }
         uglify[i] = {
             options: {
                 sourceMap: true,
             },
-            src: "js/xmega-" + i + ".js",
-            dest: "js/xmega-" + i + ".js",
+            src: "js/pack-" + i + ".js",
+            dest: "js/pack-" + i + ".js",
         }
         code = code.replace(
             "/*placeholder-" + i+"*/", 
-            "jsl.push({f:'js/xmega-"+i+ ".js', n: 'pack_"+i+"', j:1});"
+            "jsl.push({f:'js/pack-"+i+ ".js', n: 'pack_"+i+"', g:'" + i +"', j:1});"
         )
     }
     fs.writeFileSync("secureboot.prod.js", code)

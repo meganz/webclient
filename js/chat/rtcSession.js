@@ -537,7 +537,7 @@ RtcSession.prototype = {
               sid: sid,
               isDataCall: !!options.files,
               text : body.length ? RtcSession.xmlUnescape(body[0].textContent) : undefined,
-              peerMedia: options
+              callOptions: options
           });
       },
       null, 'message', 'megaCallDecline', null, targetJid, {matchBare: true});
@@ -613,7 +613,7 @@ RtcSession.prototype = {
   //return an object with a cancel() method
   return {
       sid: sid,
-      peerMedia: options,
+      callOptions: options,
       cancel: function() {
         if (state === 2)
             return false;
@@ -631,7 +631,7 @@ RtcSession.prototype = {
                 reason: 'caller',
                 type: 'megaCallCancel'
             }));
-            self.trigger('call-canceled-caller', {peer: targetJid, info: { sid: sid, reason: 'caller' }, peerMedia: options});
+            self.trigger('call-canceled-caller', {peer: targetJid, info: { sid: sid, reason: 'caller' }, callOptions: options});
             return true;
         } else if (state === 0) {
             state = 4;

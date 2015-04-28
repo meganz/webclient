@@ -128,8 +128,18 @@ CallSession.prototype.onRemoteStreamRemoved = function(e, eventData) {
     $(self.remotelayer).remove();
 };
 
+CallSession._extractMediaOptionsFromEventData = function(eventData) {
+    var opts = eventData.peerMedia;
+    if(!opts) {
+        opts = eventData.callOptions;
+    }
+    return opts;
+};
+
 CallSession.prototype.onWaitingResponseOutgoing = function(e, eventData) {
     var self = this;
+    var callOptions = CallSession._extractMediaOptionsFromEventData(eventData);
+
     if(eventData) {
         if(eventData.cancel) {
             self.cancel = eventData.cancel;
@@ -140,22 +150,23 @@ CallSession.prototype.onWaitingResponseOutgoing = function(e, eventData) {
             sid: eventData.sid,
             sentMediaTypes: function() {
                 return {
-                    'audio': eventData.peerMedia.audio,
-                    'video': eventData.peerMedia.video
+                    'audio': callOptions.audio,
+                    'video': callOptions.video
                 };
             },
             receivedMediaTypes: function() {
                 return {
-                    'audio': eventData.peerMedia.audio,
-                    'video': eventData.peerMedia.video
+                    'audio': callOptions.audio,
+                    'video': callOptions.video
                 }
             }
-        };//new SessWrapper(callRequest);
+        };
     }
 };
 CallSession.prototype.onWaitingResponseIncoming = function(e, eventData) {
     var self = this;
 
+    var callOptions = CallSession._extractMediaOptionsFromEventData(eventData);
 
     $('.btn-chat-call', self.room.$header).addClass("disabled");
 
@@ -169,14 +180,14 @@ CallSession.prototype.onWaitingResponseIncoming = function(e, eventData) {
             peerJid: function() { return eventData.peer; },
             sentMediaTypes: function() {
                 return {
-                    'audio': eventData.peerMedia.audio,
-                    'video': eventData.peerMedia.video
+                    'audio': callOptions.audio,
+                    'video': callOptions.video
                 };
             },
             receivedMediaTypes: function() {
                 return {
-                    'audio': eventData.peerMedia.audio,
-                    'video': eventData.peerMedia.video
+                    'audio': callOptions.audio,
+                    'video': callOptions.video
                 };
             }
         };
@@ -250,7 +261,7 @@ CallSession.prototype.onWaitingResponseIncoming = function(e, eventData) {
                 self
             ]);
 
-            // peerMedia, can be == {} in the cases then the user does not have/have not provided access to the cam & mic
+            // callOptions, can be == {} in the cases then the user does not have/have not provided access to the cam & mic
             var showVideoButton = self.getRemoteMediaOptions().video ? true : false;
 
             self.getCallManager().incomingCallDialog.show(

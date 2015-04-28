@@ -603,10 +603,15 @@ function MegaData()
      * 
      */
     this.drawSentContactRequests = function(opc, clearGrid) {
+        
         DEBUG('Draw sent invites.');
+        
         var html, hideCancel, hideReinvite, hideOPC,
             drawn = false,
+            TIME_FRAME = 60 * 60 * 24 * 14,// 14 days in seconds
+            iServerTime = getServerTime(),
             t = '.grid-table.sent-requests';
+        
         if (M.currentdirid === 'opc') {
 
             if (clearGrid) {
@@ -614,16 +619,19 @@ function MegaData()
             }
 
             for (var i in opc) {
-                var hideCancel = '',
-                    hideReinvite = '',
+                if (opc.hasOwnProperty(i)) {
+                    hideCancel = '';
+                    hideReinvite = '';
                     hideOPC = '';
-                if (opc[i].dts) {
-                    hideOPC = 'deleted';
-                    hideReinvite = 'hidden';
-                    hideCancel = 'hidden';
-                } else {
-                    if (M.checkInviteContactPrerequisites(opc[i].m) !== 0) {
+                    if (opc[i].dts) {
+                        hideOPC = 'deleted';
                         hideReinvite = 'hidden';
+                        hideCancel = 'hidden';
+                    }
+                    else {
+                        if (iServerTime < (opc[i].rts + TIME_FRAME)) {
+                            hideReinvite = 'hidden';
+                        }
                     }
                 }
 
@@ -2546,40 +2554,9 @@ function MegaData()
     };
 
     this.reinvitePendingContactRequest = function(target) {
+        
         DEBUG('reinvitePendingContactRequest');
-        var proceed = this.checkReinviteContactPrerequisites(target);
-
-        if (proceed === 0) {
-            api_req({'a': 'upc', 'u': target, 'aa': 'r', i: requesti}, {
-                callback: function(resp) {
-                    proceed = resp;
-                }
-            });
-        }
-
-        this.reinviteContactMessageHandler(proceed);
-
-        return proceed;
-    };
-
-    this.reinviteContactMessageHandler = function(errorCode) {
-        if (errorCode === -5) {
-            msgDialog('info', '', 'You are not allowed to reinvite yet');
-        }
-    };
-
-    this.checkReinviteContactPrerequisites = function(email) {
-        var TIME_FRAME = 60 * 60 * 24 * 14;// 14 days in seconds
-        var opc = M.opc;
-        for (var i in opc) {
-            if (M.opc[i].m === email) {
-//                if (opc[i].rts + TIME_FRAME <= Math.floor(new Date().getTime() / 1000)) {
-                return 0;
-//                }
-                return -5;
-            }
-        }
-        return 0;
+        api_req({'a': 'upc', 'u': target, 'aa': 'r', i: requesti});
     };
 
     // Answer on 'aa':'a', {"a":"upc","p":"0uUure4TCJw","s":2,"uts":1416434431,"ou":"fRSlXWOeSfo","i":"UAouV6Kori"}

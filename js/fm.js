@@ -1955,15 +1955,16 @@ function initBindOPC() {
     DEBUG('initBindOPC()');
     $('.sent-requests-grid .contact-request-button').off('click');
     $('.sent-requests-grid .contact-request-button').on('click', function() {
+        
         var $self = $(this),
             $reqRow = $self.closest('tr'),
             opcId = $reqRow.attr('id').replace('opc_', '');
 
         if ($self.is('.reinvite')) {
-            if (M.reinvitePendingContactRequest(M.opc[opcId].m) === 0) {
-                $reqRow.children().children('.contact-request-button.reinvite').addClass('hidden');
-            }
-        } else if ($self.is('.cancel')) {
+            M.reinvitePendingContactRequest(M.opc[opcId].m);
+            $reqRow.children().children('.contact-request-button.reinvite').addClass('hidden');
+        }
+        else if ($self.is('.cancel')) {
 
             // If successfully deleted, grey column and hide buttons
             if (M.cancelPendingContactRequest(M.opc[opcId].m) === 0) {

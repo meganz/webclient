@@ -2486,6 +2486,7 @@ function generateAnonymousReport() {
     var report = {};
     report.ua = navigator.userAgent;
     report.ut = u_type;
+    report.pbm = !!window.Incognito;
     report.io = window.dlMethod && dlMethod.name;
     report.sb = +('' + $('script[src*="secureboot"]').attr('src')).split('=').pop();
     report.tp = $.transferprogress;

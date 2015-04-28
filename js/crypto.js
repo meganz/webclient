@@ -1056,13 +1056,13 @@ function api_proc(q) {
                     if (typeof ctx.callback === 'function') {
                         try {
                             ctx.callback(t[i], ctx, this);
-                        } catch (ex) {
+                        }
+                        catch (ex) {
                             // if there is *any* issue on the callback
                             // we don't want to HALT, instead we let the channel
                             // a chance to clean itself and continue
                             // Otherwise if we load #blog *or* #page_<something>
                             // the whole site is buggy
-
                             if (chromehack) {
                                 console.error(ex, ex.stack);
                             }
@@ -1635,13 +1635,15 @@ function api_cachepubkeys2(res, ctx) {
         var spubkey, keylen, pubkey;
 
         if (res.pubk) {
-            u_pubkeys[ctx.u] = u_pubkeys[res.u] = crypto_decodepubkey(base64urldecode(res.pubk));
+            var userHandle = res.u;
+            u_pubkeys[ctx.u] = u_pubkeys[userHandle] = crypto_decodepubkey(base64urldecode(res.pubk));
             var fingerprint = authring.computeFingerprint(u_pubkeys[ctx.u], 'RSA', 'string');
             var observed = authring.getContactAuthenticated(ctx.u, 'RSA');
+            
             if (observed && authring.equalFingerprints(observed.fingerprint, fingerprint) === false) {
-                throw new Error('RSA fingerprint does not match previously seen one!');
+                showFingerprintMismatchException('RSA', userHandle, observed.method, observed.fingerprint, fingerprint);
             }
-            if (observed === false) {
+            else if (observed === false) {
                 authring.setContactAuthenticated(ctx.u, fingerprint, 'RSA',
                     authring.AUTHENTICATION_METHOD.SEEN,
                     authring.KEY_CONFIDENCE.UNSURE);
@@ -3664,7 +3666,7 @@ function _checkFingerprintEd25519(userhandle) {
         pubkey: pubEd25519[userhandle],
         authenticated: recorded
     };
-    if (recorded && authring.equalFingerprints(recorded.fingerprint, fingerprint) === false) {
+    if (recorded && (authring.equalFingerprints(recorded.fingerprint, fingerprint) === false)) {
         throw new Error('Fingerprint does not match previously authenticated one!');
     }
     if (recorded === false) {
@@ -3675,21 +3677,52 @@ function _checkFingerprintEd25519(userhandle) {
     return value;
 }
 
-function _checkFingerprintRSA(userhandle) {
-    var recorded = authring.getContactAuthenticated(userhandle, 'RSA');
-    var fingerprint = authring.computeFingerprint(u_pubkeys[userhandle], 'RSA', 'string');
+/**
+ * Shows the fingerprint warning dialog
+ * @param {String} fingerprintType either Ed25519 or RSA
+ * @param {String} userHandle The user handle e.g. 3nnYu_071I3
+ * @param {Number} method Whether seen or verified (authring.AUTHENTICATION_METHOD.SEEN or .FINGERPRINT_COMPARISON)
+ * @param {String} previousFingerprint The previously seen or verified fingerprint
+ * @param {String} newFingerprint The new fingerprint
+ */
+function showFingerprintMismatchException(fingerprintType, userHandle, method, previousFingerprint, newFingerprint) {
+    
+    // Normalise fingerprints to display in hexadecimal for the dialog
+    if (previousFingerprint.length === 20) {
+        previousFingerprint = asmCrypto.bytes_to_hex(asmCrypto.string_to_bytes(previousFingerprint));
+    }
+    if (newFingerprint.length === 20) {
+        newFingerprint = asmCrypto.bytes_to_hex(asmCrypto.string_to_bytes(newFingerprint));
+    }
+    
+    // Show warning dialog
+    mega.ui.CredentialsWarningDialog.singleton(userHandle, method, previousFingerprint, newFingerprint);
+
+    // Throw exception to stop whatever they were doing from progressing e.g. initiating/accepting call
+    throw fingerprintType + ' fingerprint does not match the previously authenticated one! ' +
+          'Previous fingerprint: ' + previousFingerprint + '. ' +
+          'New fingerprint: ' + newFingerprint + '. ';
+}
+
+function _checkFingerprintRSA(userHandle) {
+    
+    var recorded = authring.getContactAuthenticated(userHandle, 'RSA');
+    var fingerprint = authring.computeFingerprint(u_pubkeys[userHandle], 'RSA', 'string');
     var value = {
-        pubkey: u_pubkeys[userhandle],
+        pubkey: u_pubkeys[userHandle],
         authenticated: recorded
     };
-    if (recorded && authring.equalFingerprints(recorded.fingerprint, fingerprint) === false) {
-        throw new Error('RSA fingerprint does not match previously authenticated one!');
+    
+    // If fingerprint mismatch, show warning and throw exception
+    if (recorded && (authring.equalFingerprints(recorded.fingerprint, fingerprint) === false)) {
+        showFingerprintMismatchException('RSA', userHandle, recorded.method, recorded.fingerprint, fingerprint);
     }
-    if (recorded === false) {
-        authring.setContactAuthenticated(userhandle, fingerprint, 'RSA',
+    else if (recorded === false) {
+        authring.setContactAuthenticated(userHandle, fingerprint, 'RSA',
             authring.AUTHENTICATION_METHOD.SEEN,
             authring.KEY_CONFIDENCE.UNSURE);
     }
+    
     return value;
 }
 
@@ -3734,7 +3767,7 @@ function getPubEd25519(userhandle, callback) {
         };
         var myCtx = {
             u: userhandle,
-            callback3: callback,
+            callback3: callback
         };
         getUserAttribute(userhandle, 'puEd255', true, false, myCallback, myCtx);
     }
@@ -3778,7 +3811,7 @@ function getFingerprintEd25519(userhandle, callback, format) {
         };
         var myCtx = {
             u: userhandle,
-            callback3: callback,
+            callback3: callback
         };
         getUserAttribute(userhandle, 'puEd255', true, false, myCallback, myCtx);
     }
@@ -3807,7 +3840,7 @@ function getPubRSA(userhandle, callback) {
         api_cachepubkeys({
             cachepubkeyscomplete: function () {
                 _checkFingerprintRSA(userhandle);
-                callback(u_pubkeys[userhandle]);
+                callback(u_pubkeys[userhandle]);              
             }
         }, [userhandle]);
     }

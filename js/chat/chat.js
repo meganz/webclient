@@ -311,12 +311,10 @@ var chatui;
 
                         ERRDEBUG("Direct transfer: ", filesList);
 
-
                         assert(filesList.length > 0, 'no files selected.');
 
                         getPubRSA(contact.h, function() {
-                            var resp = megaChat.rtc.startMediaCall(participants[0], {files: filesList});
-
+                            var resp = megaChat.rtc.startMediaCall(participants[0], { files: filesList });
 
                             var $message = megaChat._generateIncomingRtcFileMessage(room, filesList, resp.sid, function() {
 
@@ -331,7 +329,6 @@ var chatui;
                         });
 
                         Soon(function() { $fileUploadField.remove(); });
-
                     });
 
                     $fileUploadField.trigger("click");

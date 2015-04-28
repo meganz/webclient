@@ -1611,9 +1611,9 @@ function addContactUI()
                     $('.add-user-popup .nw-fm-dialog-title').text('Add Contacts');
 
                     var $a = $('.add-user-popup .share-added-contact.token-input-token-mega'),
-                    $b = $('.add-user-popup .multiple-input'),
-                    h1 = $a.outerHeight(true),// margin included
-                    h2 = $b.height();
+                    	$b = $('.add-user-popup .multiple-input'),
+                    	h1 = $a.outerHeight(true),// margin included
+                    	h2 = $b.height();
 
                     if (5 <= h2 / h1 && h2 / h1 < 6) {
                         $b.jScrollPane({
@@ -1653,7 +1653,7 @@ function addContactUI()
                         $c = $('.add-user-popup .multiple-input .jspPane')[0],
                         h1 = $a.outerHeight(true),// margin included
                         h2;
-                        
+
                     if ($c) {
                         h2 = $c.scrollHeight;
                     }
@@ -6997,8 +6997,18 @@ function initShareDialog() {
     }
 
     $('.share-dialog').rebind('click', function(e) {
-        // Fix bug in console
-        if (typeof e.originalEvent.path != 'undefined') {
+        var hideMenus = function() {
+            // share dialog permission menu
+            $('.permissions-menu', $this).fadeOut(200);
+            $('.import-contacts-dialog').fadeOut(200);
+            $('.permissions-icon', $this).removeClass('active');
+            $('.share-dialog-permissions', $this).removeClass('active');
+            closeImportContactNotification('.share-dialog');
+            $('.import-contacts-service', $this).removeClass('imported');
+        };
+        var $this = $(this);
+
+        if (typeof e.originalEvent.path !== 'undefined') {
 
             // This's sensitive to dialog DOM element positioning
             var trg = e.originalEvent.path[0];
@@ -7009,14 +7019,11 @@ function initShareDialog() {
                 && !$(trg1).is('.permissions-icon,.import-contacts-link,.share-dialog-permissions')
                 && !$(trg2).is('.permissions-icon,.import-contacts-link,.share-dialog-permissions'))
             {
-                // share dialog permission menu
-                $('.permissions-menu').fadeOut(200);
-                $('.import-contacts-dialog').fadeOut(200);
-                $('.permissions-icon').removeClass('active');
-                $('.share-dialog-permissions').removeClass('active');
-                closeImportContactNotification('.share-dialog');
-                $('.import-contacts-service').removeClass('imported');
+                hideMenus();
             }
+        }
+        else if ($this.get(0) === e.currentTarget) {
+            hideMenus();
         }
     });
 
@@ -7181,6 +7188,7 @@ function initShareDialog() {
             aCurrPermLevel = [];
 
         $('.permissions-menu').fadeOut(200);
+        // Find where we are permissions-icon or share-dialog-permissions
 
         if ($itemPermLevel.length) {
 
@@ -7939,6 +7947,7 @@ function itemExportLinkHtml(item) {
         key = u_sharekeys[item.h];
         fileSize = '';
     }
+
     // Shared item type is file
     else {
         type = '';
@@ -8027,7 +8036,7 @@ function linksDialog(close) {
     $('.export-links-dialog .fm-dialog-close').rebind('click', function() {
         linksDialog(1);
     });
-	
+
     // Setup the copy to clipboard buttons
     if (is_extension) {
         if (!is_chrome_firefox) {

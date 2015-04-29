@@ -2500,7 +2500,7 @@ function generateAnonymousReport() {
         report.rtcStatsAnonymousId = megaChat.rtc.ownAnonId;
     }
 
-    var chatStates = [];
+    var chatStates = {};
     var userAnonMap = {};
     var userAnonIdx = 0;
 
@@ -2534,14 +2534,27 @@ function generateAnonymousReport() {
                     ? v.encryptionOpQueue._queue[0][0] : "not defined"
         };
 
-        if (report.haveRtc) {
-            if (v.callStats) {
-                r.rtcCallStats = v.callStats;
-            }
-        }
-
-        chatStates.push(r);
+        chatStates[k] = r;
     });
+
+    if (report.haveRtc) {
+        Object.keys(megaChat.plugins.callManager.callSessions).forEach(function(k) {
+            var v = megaChat.plugins.callManager.callSessions[k];
+
+            var r = {
+                'callStats': v.callStats,
+                'state': v.state
+            };
+
+            if(!chatStates[v.room.roomJid]) {
+                chatStates[v.room.roomJid] = {};
+            }
+            if(!chatStates[v.room.roomJid].callSessions) {
+                chatStates[v.room.roomJid].callSessions = [];
+            }
+            chatStates[v.room.roomJid].callSessions.push(r);
+        });
+    };
 
     report.chatRoomState = chatStates;
 

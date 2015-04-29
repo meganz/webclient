@@ -522,7 +522,7 @@ function mDBreload() {
 }
 
 function mDBcls() {
-    if (typeof mDB === 'object' && mDB.close) {
+    if (typeof mDB === 'object' && mDB.close && mDB.dbState !== MegaDB.DB_STATE.CLOSED) {
         mDB.close();
     }
     mDB = indexedDB ? 0x9e : undefined;

@@ -56,7 +56,7 @@
         });
 
         self.bind("onHide", function() {
-            
+            $('.credentials-warning-dialog .fm-mega-dialog-bottom').remove();
         });
     };
 
@@ -99,6 +99,14 @@
         var newFingerprint = CredentialsWarningDialog.newFingerprint;
         var previousFingerprintHtml = '';
         var newFingerprintHtml = '';
+                
+        // Normalise fingerprints to display in hexadecimal for the dialog
+        if (previousFingerprint.length === 20) {
+            previousFingerprint = asmCrypto.bytes_to_hex(asmCrypto.string_to_bytes(previousFingerprint));
+        }
+        if (newFingerprint.length === 20) {
+            newFingerprint = asmCrypto.bytes_to_hex(asmCrypto.string_to_bytes(newFingerprint));
+        }
         
         // Build up the fingerprint HTML
         for (var i = 0, groupCount = 0, length = previousFingerprint.length;  i < length;  i++) {

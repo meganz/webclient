@@ -3604,6 +3604,7 @@ var pubEd25519 = {};
  * Initialises the authentication system.
  */
 function u_initAuthentication() {
+    
     // Load contacts' tracked authentication fingerprints.
     authring.getContacts('Ed25519');
     authring.getContacts('RSA');
@@ -3620,7 +3621,7 @@ function u_initAuthentication() {
 function u_initAuthentication2(res, ctx) {
     if (typeof res !== 'number') {
         // Keyring is a private attribute, so it's been wrapped by a TLV store,
-        // no furthe processing here.
+        // no further processing here.
         u_keyring = res;
     }
     else {
@@ -3659,49 +3660,25 @@ function u_initAuthentication2(res, ctx) {
     mBroadcaster.sendMessage('pubEd25519');
 }
 
-function _checkFingerprintEd25519(userhandle) {
-    var recorded = authring.getContactAuthenticated(userhandle, 'Ed25519');
-    var fingerprint = authring.computeFingerprint(pubEd25519[userhandle], 'Ed25519', 'string');
+function _checkFingerprintEd25519(userHandle) {
+    var recorded = authring.getContactAuthenticated(userHandle, 'Ed25519');
+    var fingerprint = authring.computeFingerprint(pubEd25519[userHandle], 'Ed25519', 'string');
     var value = {
-        pubkey: pubEd25519[userhandle],
+        pubkey: pubEd25519[userHandle],
         authenticated: recorded
     };
+    
+    // If fingerprint mismatch, show warning and throw exception
     if (recorded && (authring.equalFingerprints(recorded.fingerprint, fingerprint) === false)) {
-        throw new Error('Fingerprint does not match previously authenticated one!');
+        showFingerprintMismatchException('Ed25519', userHandle, recorded.method, recorded.fingerprint, fingerprint);
     }
-    if (recorded === false) {
-        authring.setContactAuthenticated(userhandle, fingerprint, 'Ed25519',
+    else if (recorded === false) {
+        authring.setContactAuthenticated(userHandle, fingerprint, 'Ed25519',
             authring.AUTHENTICATION_METHOD.SEEN,
             authring.KEY_CONFIDENCE.UNSURE);
     }
+    
     return value;
-}
-
-/**
- * Shows the fingerprint warning dialog
- * @param {String} fingerprintType either Ed25519 or RSA
- * @param {String} userHandle The user handle e.g. 3nnYu_071I3
- * @param {Number} method Whether seen or verified (authring.AUTHENTICATION_METHOD.SEEN or .FINGERPRINT_COMPARISON)
- * @param {String} previousFingerprint The previously seen or verified fingerprint
- * @param {String} newFingerprint The new fingerprint
- */
-function showFingerprintMismatchException(fingerprintType, userHandle, method, previousFingerprint, newFingerprint) {
-    
-    // Normalise fingerprints to display in hexadecimal for the dialog
-    if (previousFingerprint.length === 20) {
-        previousFingerprint = asmCrypto.bytes_to_hex(asmCrypto.string_to_bytes(previousFingerprint));
-    }
-    if (newFingerprint.length === 20) {
-        newFingerprint = asmCrypto.bytes_to_hex(asmCrypto.string_to_bytes(newFingerprint));
-    }
-    
-    // Show warning dialog
-    mega.ui.CredentialsWarningDialog.singleton(userHandle, method, previousFingerprint, newFingerprint);
-
-    // Throw exception to stop whatever they were doing from progressing e.g. initiating/accepting call
-    throw fingerprintType + ' fingerprint does not match the previously authenticated one! ' +
-          'Previous fingerprint: ' + previousFingerprint + '. ' +
-          'New fingerprint: ' + newFingerprint + '. ';
 }
 
 function _checkFingerprintRSA(userHandle) {
@@ -3727,6 +3704,37 @@ function _checkFingerprintRSA(userHandle) {
 }
 
 /**
+ * Shows the fingerprint warning dialog
+ * @param {String} fingerprintType either Ed25519 or RSA
+ * @param {String} userHandle The user handle e.g. 3nnYu_071I3
+ * @param {Number} method Whether seen or verified (authring.AUTHENTICATION_METHOD.SEEN or .FINGERPRINT_COMPARISON)
+ * @param {String} previousFingerprint The previously seen or verified fingerprint
+ * @param {String} newFingerprint The new fingerprint
+ * @throws {Error}
+ *     In case the fingerprint of the public key differs from the one previously
+ *     authenticated by the user. This more severe condition warrants to throw
+ *     an exception.
+ */
+function showFingerprintMismatchException(fingerprintType, userHandle, method, previousFingerprint, newFingerprint) {
+    
+    // Show warning dialog
+    mega.ui.CredentialsWarningDialog.singleton(userHandle, method, previousFingerprint, newFingerprint);
+
+    // Remove the cached key, so the key will be fetched and checked against the stored fingerprint again next time
+    if (fingerprintType === 'RSA') {
+        delete u_pubkeys[userHandle];
+    }
+    else if (fingerprintType === 'Ed25519') {
+        delete pubEd25519[userHandle];
+    }
+
+    // Throw exception to stop whatever they were doing from progressing e.g. initiating/accepting call
+    throw fingerprintType + ' fingerprint does not match the previously authenticated one! ' +
+          'Previous fingerprint: ' + previousFingerprint + '. ' +
+          'New fingerprint: ' + newFingerprint + '. ';
+}
+
+/**
  * Cached Ed25519 public key retrieval utility.
  *
  * @param userhandle {string}
@@ -3742,7 +3750,8 @@ function _checkFingerprintRSA(userHandle) {
  *     an exception.
  */
 function getPubEd25519(userhandle, callback) {
-    if (u_authring.Ed25519 === undefined) {
+
+    if (typeof u_authring.Ed25519 === 'undefined') {
         throw new Error('First initialise u_authring by calling authring.getContacts()');
     }
     if (pubEd25519[userhandle]) {

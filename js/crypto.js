@@ -3810,6 +3810,7 @@ function getFingerprintEd25519(userhandle, callback, format) {
             if (typeof res !== 'number') {
                 res = base64urldecode(res);
                 pubEd25519[ctx.u] = res;
+                var value = _checkFingerprintEd25519(userhandle);
                 if (ctx.callback3) {
                     ctx.callback3(authring.computeFingerprint(res, 'Ed25519', format), ctx.u);
                 }

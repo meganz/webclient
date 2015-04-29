@@ -3,7 +3,7 @@
     /**
      * Warning dialog when there is a fingerprint mismatch e.g. a MITM attack in progress.
      * Triggerable with the following test code:
-     * mega.ui.CredentialsWarningDialog.singleton('DKLLwlj_THc', authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON, 'ABCDEF0123456789ABCDEF0123456789ABCDEF01', 'ABCDFF0123456789ABCDEE0123456788ABCDEF00', function(){ alert('rejected') }, function(){ alert('accepted') });
+     * mega.ui.CredentialsWarningDialog.singleton('DKLLwlj_THc', authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON, 'ABCDEF0123456789ABCDEF0123456789ABCDEF01', 'ABCDFF0123456789ABCDEE0123456788ABCDEF00' });
      *
      * @param opts {Object}
      * @constructor

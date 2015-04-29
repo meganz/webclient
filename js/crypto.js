@@ -3737,7 +3737,7 @@ function showFingerprintMismatchException(fingerprintType, userHandle, method, p
 /**
  * Cached Ed25519 public key retrieval utility.
  *
- * @param userhandle {string}
+ * @param userHandle {string}
  *     Mega user handle.
  * @param callback {function}
  *     Callback function to call upon completion of operation. The callback
@@ -3749,15 +3749,15 @@ function showFingerprintMismatchException(fingerprintType, userHandle, method, p
  *     authenticated by the user. This more severe condition warrants to throw
  *     an exception.
  */
-function getPubEd25519(userhandle, callback) {
+function getPubEd25519(userHandle, callback) {
 
     if (typeof u_authring.Ed25519 === 'undefined') {
         throw new Error('First initialise u_authring by calling authring.getContacts()');
     }
-    if (pubEd25519[userhandle]) {
-        var value = _checkFingerprintEd25519(userhandle);
+    if (pubEd25519[userHandle]) {
+        var value = _checkFingerprintEd25519(userHandle);
         if (callback) {
-            callback(value, userhandle);
+            callback(value, userHandle);
         }
     }
     else {
@@ -3765,7 +3765,7 @@ function getPubEd25519(userhandle, callback) {
             if (typeof res !== 'number') {
                 res = base64urldecode(res);
                 pubEd25519[ctx.u] = res;
-                var value = _checkFingerprintEd25519(userhandle);
+                var value = _checkFingerprintEd25519(userHandle);
                 if (ctx.callback3) {
                     ctx.callback3(value, ctx.u);
                 }
@@ -3775,10 +3775,10 @@ function getPubEd25519(userhandle, callback) {
             }
         };
         var myCtx = {
-            u: userhandle,
+            u: userHandle,
             callback3: callback
         };
-        getUserAttribute(userhandle, 'puEd255', true, false, myCallback, myCtx);
+        getUserAttribute(userHandle, 'puEd255', true, false, myCallback, myCtx);
     }
 }
 

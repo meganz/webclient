@@ -793,7 +793,7 @@ function funcAlias(context, fn) {
  * @param kls class on which prototype this method should add the on, bind, unbind, etc methods
  */
 function makeObservable(kls) {
-    var aliases = ['on', 'bind', 'unbind', 'one', 'trigger'];
+    var aliases = ['on', 'bind', 'unbind', 'one', 'trigger', 'rebind'];
 
     $.each(aliases, function(k, v) {
         if (kls.prototype) {
@@ -2500,7 +2500,7 @@ function generateAnonymousReport() {
         report.rtcStatsAnonymousId = megaChat.rtc.ownAnonId;
     }
 
-    var chatStates = [];
+    var chatStates = {};
     var userAnonMap = {};
     var userAnonIdx = 0;
 
@@ -2534,14 +2534,27 @@ function generateAnonymousReport() {
                     ? v.encryptionOpQueue._queue[0][0] : "not defined"
         };
 
-        if (report.haveRtc) {
-            if (v.callStats) {
-                r.rtcCallStats = v.callStats;
-            }
-        }
-
-        chatStates.push(r);
+        chatStates[k] = r;
     });
+
+    if (report.haveRtc) {
+        Object.keys(megaChat.plugins.callManager.callSessions).forEach(function(k) {
+            var v = megaChat.plugins.callManager.callSessions[k];
+
+            var r = {
+                'callStats': v.callStats,
+                'state': v.state
+            };
+
+            if(!chatStates[v.room.roomJid]) {
+                chatStates[v.room.roomJid] = {};
+            }
+            if(!chatStates[v.room.roomJid].callSessions) {
+                chatStates[v.room.roomJid].callSessions = [];
+            }
+            chatStates[v.room.roomJid].callSessions.push(r);
+        });
+    };
 
     report.chatRoomState = chatStates;
 
@@ -2703,3 +2716,46 @@ MegaEvents.prototype.on = function(name, callback) {
     };
     scope.megaAnalytics = new MegaAnalytics(99999);
 })(this);
+
+
+function constStateToText(enumMap, state) {
+    var txt = null;
+    $.each(enumMap, function(k, v) {
+        if(state == v) {
+            txt = k;
+
+            return false; // break
+        }
+    });
+
+    return txt;
+};
+
+/**
+ * Helper function that will do some assert()s to guarantee that the new state is correct/allowed
+ *
+ * @param currentState
+ * @param newState
+ * @param allowedStatesMap
+ * @param enumMap
+ * @throws AssertionError
+ */
+function assertStateChange(currentState, newState, allowedStatesMap, enumMap) {
+    var checksAvailable = allowedStatesMap[currentState];
+    var allowed = false;
+    if(checksAvailable) {
+        checksAvailable.forEach(function(allowedState) {
+            if(allowedState === newState) {
+                allowed = true;
+                return false; // break;
+            }
+        });
+    }
+    if(!allowed) {
+        assert(
+            false,
+            'State change from: ' + constStateToText(enumMap, currentState) + ' to ' +
+            constStateToText(enumMap, newState) + ' is not in the allowed state transitions map.'
+        );
+    }
+}

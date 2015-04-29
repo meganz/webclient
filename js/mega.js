@@ -1061,15 +1061,13 @@ function MegaData()
         hideEmptyGrids();
 
         if (!u) {
+            deleteScrollPanel('.contacts-blocks-scrolling', 'jsp');
+            deleteScrollPanel('.contacts-details-block .file-block-scrolling', 'jsp');
             deleteScrollPanel('.file-block-scrolling', 'jsp');
-        }
-        deleteScrollPanel('.contacts-blocks-scrolling', 'jsp');
-        deleteScrollPanel('.contacts-details-block .file-block-scrolling', 'jsp');
 
-        initOpcGridScrolling();
-        initIpcGridScrolling();
+            initOpcGridScrolling();
+            initIpcGridScrolling();
 
-        if (!u) {
             $('.grid-table tr').remove();
             $('.file-block-scrolling a').remove();
             $('.contacts-blocks-scrolling a').remove();
@@ -1087,35 +1085,46 @@ function MegaData()
         if (this.v.length === 0) {
             if (M.currentdirid === M.RubbishID) {
                 $('.fm-empty-trashbin').removeClass('hidden');
-            } else if (M.currentdirid === 'contacts') {
+            }
+            else if (M.currentdirid === 'contacts') {
                 $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[784]);
                 $('.fm-empty-contacts').removeClass('hidden');
-            } else if (M.currentdirid === 'opc' || M.currentdirid === 'ipc') {
+            }
+            else if (M.currentdirid === 'opc' || M.currentdirid === 'ipc') {
                 $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[6196]);
                 $('.fm-empty-contacts').removeClass('hidden');
-            } else if (M.currentdirid.substr(0, 7) === 'search/') {
+            }
+            else if (M.currentdirid.substr(0, 7) === 'search/') {
                 $('.fm-empty-search').removeClass('hidden');
-            } else if (M.currentdirid === M.RootID && folderlink) {
+            }
+            else if (M.currentdirid === M.RootID && folderlink) {
                 if (!isValidShareLink()) {
                     $('.fm-invalid-folder').removeClass('hidden');
                 } else {
                     $('.fm-empty-folder-link').removeClass('hidden');
                 }
-            } else if (M.currentdirid === M.RootID) {
+            }
+            else if (M.currentdirid === M.RootID) {
                 $('.fm-empty-cloud').removeClass('hidden');
-            } else if (M.currentdirid === M.InboxID) {
+            }
+            else if (M.currentdirid === M.InboxID) {
                 $('.fm-empty-messages').removeClass('hidden');
-            } else if (M.currentdirid === 'shares') {
+            }
+            else if (M.currentdirid === 'shares') {
                 $('.fm-empty-incoming').removeClass('hidden');
-            } else if (RootbyId(M.currentdirid) === M.RootID) {
+            }
+            else if (RootbyId(M.currentdirid) === M.RootID) {
                 $('.fm-empty-folder').removeClass('hidden');
-            } else if (RootbyId(M.currentdirid) === 'shares') {
+            }
+            else if (RootbyId(M.currentdirid) === 'shares') {
                 this.emptySharefolderUI(lSel);
-            } else if (RootbyId(M.currentdirid) === 'contacts') {
+            }
+            else if (RootbyId(M.currentdirid) === 'contacts') {
                 $('.fm-empty-incoming.contact-details-view').removeClass('hidden');
                 $('.contact-share-notification').addClass('hidden');
             }
-        } else if (this.currentdirid.length !== 11 && !~['contacts', 'shares', 'ipc', 'opc'].indexOf(this.currentdirid)) {
+        }
+        else if (this.currentdirid.length !== 11 && !~['contacts', 'shares', 'ipc', 'opc'].indexOf(this.currentdirid)) {
             if (this.viewmode === 1) {
                 var r = Math.floor($('.fm-blocks-view.fm').width() / 140);
                 n_cache = r * Math.ceil($('.fm-blocks-view.fm').height() / 164) + r;
@@ -1138,12 +1147,15 @@ function MegaData()
         if (this.currentdirid === 'opc') {
             DEBUG('RenderMain() opc');
             this.drawSentContactRequests(this.v, 'clearGrid');
-        } else if (this.currentdirid === 'ipc') {
+        }
+        else if (this.currentdirid === 'ipc') {
             DEBUG('RenderMain() ipc');
             this.drawReceivedContactRequests(this.v, 'clearGrid');
-        } else if (this.currentdirid === 'contacts') {
+        }
+        else if (this.currentdirid === 'contacts') {
             renderContactsLayout(u);
-        } else {
+        }
+        else {
             renderLayout(u, n_cache);
         }
 
@@ -4278,8 +4290,9 @@ var t;
 
 function renderfm()
 {
-    if (d)
+    if (d) {
         console.time('renderfm');
+    }
 
     initUI();
     loadingDialog.hide();
@@ -4841,9 +4854,13 @@ function loadfm(force)
             M.reset();
             fminitialized = false;
             loadfm.loading = true;
-            api_req({a:'f',c:1,r:1},{
-                callback : loadfm_callback
-            },n_h ? 1 : 0);
+            var sp = new Error('loadfm-stack-pointer');
+            setTimeout(function __lazyLoadFM() {
+                api_req({a:'f',c:1,r:1},{
+                    callback: loadfm_callback,
+                    stackPointer: sp
+                },n_h ? 1 : 0);
+            }, 350);
         }
     }
 }
@@ -5358,8 +5375,6 @@ function processOPC(opc) {
  * Handle pending shares
  *
  * @param {array.<JSON_objects>} pending shares
- *
- *
  */
 function processPS(pendingShares) {
     DEBUG('processPS');
@@ -5556,7 +5571,7 @@ function init_chat() {
     }
 }
 
-function loadfm_callback(res) {
+function loadfm_callback(res, ctx) {
 
     if (pfkey && res.f && res.f[0]) {
         M.RootID = res.f[0].h;
@@ -5583,6 +5598,7 @@ function loadfm_callback(res) {
 
         // If we have shares, and if a share is for this node, record it on the nodes share list
         if (res.s) {
+            var sharedNodes = [];
             for (var i in res.s) {
                 if (res.s.hasOwnProperty(i)) {
 
@@ -5590,9 +5606,12 @@ function loadfm_callback(res) {
                     M.nodeShare(nodeHandle, res.s[i]);
 
                     if (res.s[i].u === 'EXP') {
-                        M.getLinks([nodeHandle]);
+                        sharedNodes.push(nodeHandle);
                     }
                 }
+            }
+            if (sharedNodes.length) {
+                M.getLinks(sharedNodes);
             }
         }
 
@@ -5601,7 +5620,7 @@ function loadfm_callback(res) {
             localStorage[u_handle + '_maxaction'] = maxaction;
         }
 
-        loadfm_done(pfkey);
+        loadfm_done(pfkey, ctx.stackPointer);
 
         if (res.cr) {
             crypto_procmcr(res.cr);
@@ -5614,9 +5633,11 @@ function loadfm_callback(res) {
     });
 }
 
-function loadfm_done(pfkey) {
+function loadfm_done(pfkey, stackPointer) {
     loadfm.loaded = Date.now();
     loadfm.loading = false;
+
+    if (d > 1) console.error('loadfm_done', stackPointer, is_fm());
 
     init_chat();
 

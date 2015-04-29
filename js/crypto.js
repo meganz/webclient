@@ -1271,13 +1271,13 @@ function api_proc(q) {
                     if (typeof ctx.callback === 'function') {
                         try {
                             ctx.callback(t[i], ctx, this);
-                        } catch (ex) {
+                        }
+                        catch (ex) {
                             // if there is *any* issue on the callback
                             // we don't want to HALT, instead we let the channel
                             // a chance to clean itself and continue
                             // Otherwise if we load #blog *or* #page_<something>
                             // the whole site is buggy
-
                             if (chromehack) {
                                 console.error(ex, ex.stack);
                             }
@@ -1850,13 +1850,15 @@ function api_cachepubkeys2(res, ctx) {
         var spubkey, keylen, pubkey;
 
         if (res.pubk) {
-            u_pubkeys[ctx.u] = u_pubkeys[res.u] = crypto_decodepubkey(base64urldecode(res.pubk));
+            var userHandle = res.u;
+            u_pubkeys[ctx.u] = u_pubkeys[userHandle] = crypto_decodepubkey(base64urldecode(res.pubk));
             var fingerprint = authring.computeFingerprint(u_pubkeys[ctx.u], 'RSA', 'string');
             var observed = authring.getContactAuthenticated(ctx.u, 'RSA');
+
             if (observed && authring.equalFingerprints(observed.fingerprint, fingerprint) === false) {
-                throw new Error('RSA fingerprint does not match previously seen one!');
+                showFingerprintMismatchException('RSA', userHandle, observed.method, observed.fingerprint, fingerprint);
             }
-            if (observed === false) {
+            else if (observed === false) {
                 authring.setContactAuthenticated(ctx.u, fingerprint, 'RSA',
                     authring.AUTHENTICATION_METHOD.SEEN,
                     authring.KEY_CONFIDENCE.UNSURE);
@@ -3813,6 +3815,7 @@ function api_strerror(errno) {
  * Initialises the authentication system.
  */
 function u_initAuthentication() {
+
     // Load contacts' tracked authentication fingerprints.
     authring.getContacts('Ed25519');
     authring.getContacts('RSA');
@@ -3829,7 +3832,7 @@ function u_initAuthentication() {
 function u_initAuthentication2(res, ctx) {
     if (typeof res !== 'number') {
         // Keyring is a private attribute, so it's been wrapped by a TLV store,
-        // no furthe processing here.
+        // no further processing here.
         u_keyring = res;
     }
     else {
@@ -3867,8 +3870,6 @@ function u_initAuthentication2(res, ctx) {
 
     mBroadcaster.sendMessage('pubEd25519');
 }
-
-
 
 
 /**

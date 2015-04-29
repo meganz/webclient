@@ -49,7 +49,7 @@ var authring = (function () {
     ns.AUTHENTICATION_METHOD = {
         SEEN: 0x00,
         FINGERPRINT_COMPARISON: 0x01,
-        SIGNATURE_VERIFIED: 0x02,
+        SIGNATURE_VERIFIED: 0x02
     };
 
 
@@ -61,7 +61,7 @@ var authring = (function () {
      *     Direct fingerprint comparison.
      */
     ns.KEY_CONFIDENCE = {
-        UNSURE: 0x00,
+        UNSURE: 0x00
     };
 
     // User property names used for different key types.

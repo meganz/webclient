@@ -779,6 +779,8 @@ function init_page() {
             }
         }
 
+        if (d) console.log('Setting up fm...', id, pfid, fmwasinitialized, fminitialized, M.currentdirid);
+
         if (!id && fmwasinitialized) {
             id = M.RootID;
         }
@@ -1724,15 +1726,16 @@ function topmenuUI() {
 }
 
 function is_fm() {
-    if ((u_type !== false && page === '')
-            || (u_type !== false && page.substr(0, 2) === 'fm')
-            || (u_type !== false && page === 'start')
-            || (u_type !== false && page.substr(0, 7) === 'account') || pfid) {
-        return true;
+    var r = !!pfid;
+
+    if (!r && (u_type !== false)) {
+        r = page === '' || page === 'start' || page === 'index'
+            || page.substr(0, 2) === 'fm' || page.substr(0, 7) === 'account';
     }
-    else {
-        return false;
-    }
+
+    if (d > 1) console.error('is_fm', r, page, hash);
+
+    return r;
 }
 
 function parsepage(pagehtml, pp) {
@@ -1741,10 +1744,7 @@ function parsepage(pagehtml, pp) {
     $('#pageholder').hide();
     $('#startholder').hide();
     megatitle();
-    try {
-        pagehtml = translate(pagehtml);
-    } catch (e) {}
-    pagehtml = pagehtml.replace(/{staticpath}/g, staticpath);
+    pagehtml = translate(''+pagehtml).replace(/{staticpath}/g, staticpath);
     if (document.location.href.substr(0, 19) == 'chrome-extension://') {
         pagehtml = pagehtml.replace(/\/#/g, '/' + urlrootfile + '#');
     }

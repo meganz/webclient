@@ -10369,7 +10369,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .verified .nw-chat-notification-icon {
 	background-position: -4px -9046px;
 }
-.establishing-connection .nw-chat-notification-icon, .outgoing-call .nw-chat-notification-icon, .incoming-call .nw-chat-notification-icon {
+.establishing-connection .nw-chat-notification-icon, .outgoing-call .nw-chat-notification-icon, .incoming-call .nw-chat-notification-icon, .call-starting .nw-chat-notification-icon {
 	background-position: -5px -9189px;
 }
 /*yellow*/

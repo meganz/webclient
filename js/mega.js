@@ -1061,15 +1061,13 @@ function MegaData()
         hideEmptyGrids();
 
         if (!u) {
+            deleteScrollPanel('.contacts-blocks-scrolling', 'jsp');
+            deleteScrollPanel('.contacts-details-block .file-block-scrolling', 'jsp');
             deleteScrollPanel('.file-block-scrolling', 'jsp');
-        }
-        deleteScrollPanel('.contacts-blocks-scrolling', 'jsp');
-        deleteScrollPanel('.contacts-details-block .file-block-scrolling', 'jsp');
 
-        initOpcGridScrolling();
-        initIpcGridScrolling();
+            initOpcGridScrolling();
+            initIpcGridScrolling();
 
-        if (!u) {
             $('.grid-table tr').remove();
             $('.file-block-scrolling a').remove();
             $('.contacts-blocks-scrolling a').remove();
@@ -1087,35 +1085,46 @@ function MegaData()
         if (this.v.length === 0) {
             if (M.currentdirid === M.RubbishID) {
                 $('.fm-empty-trashbin').removeClass('hidden');
-            } else if (M.currentdirid === 'contacts') {
+            }
+            else if (M.currentdirid === 'contacts') {
                 $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[784]);
                 $('.fm-empty-contacts').removeClass('hidden');
-            } else if (M.currentdirid === 'opc' || M.currentdirid === 'ipc') {
+            }
+            else if (M.currentdirid === 'opc' || M.currentdirid === 'ipc') {
                 $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[6196]);
                 $('.fm-empty-contacts').removeClass('hidden');
-            } else if (M.currentdirid.substr(0, 7) === 'search/') {
+            }
+            else if (M.currentdirid.substr(0, 7) === 'search/') {
                 $('.fm-empty-search').removeClass('hidden');
-            } else if (M.currentdirid === M.RootID && folderlink) {
+            }
+            else if (M.currentdirid === M.RootID && folderlink) {
                 if (!isValidShareLink()) {
                     $('.fm-invalid-folder').removeClass('hidden');
                 } else {
                     $('.fm-empty-folder-link').removeClass('hidden');
                 }
-            } else if (M.currentdirid === M.RootID) {
+            }
+            else if (M.currentdirid === M.RootID) {
                 $('.fm-empty-cloud').removeClass('hidden');
-            } else if (M.currentdirid === M.InboxID) {
+            }
+            else if (M.currentdirid === M.InboxID) {
                 $('.fm-empty-messages').removeClass('hidden');
-            } else if (M.currentdirid === 'shares') {
+            }
+            else if (M.currentdirid === 'shares') {
                 $('.fm-empty-incoming').removeClass('hidden');
-            } else if (RootbyId(M.currentdirid) === M.RootID) {
+            }
+            else if (RootbyId(M.currentdirid) === M.RootID) {
                 $('.fm-empty-folder').removeClass('hidden');
-            } else if (RootbyId(M.currentdirid) === 'shares') {
+            }
+            else if (RootbyId(M.currentdirid) === 'shares') {
                 this.emptySharefolderUI(lSel);
-            } else if (RootbyId(M.currentdirid) === 'contacts') {
+            }
+            else if (RootbyId(M.currentdirid) === 'contacts') {
                 $('.fm-empty-incoming.contact-details-view').removeClass('hidden');
                 $('.contact-share-notification').addClass('hidden');
             }
-        } else if (this.currentdirid.length !== 11 && !~['contacts', 'shares', 'ipc', 'opc'].indexOf(this.currentdirid)) {
+        }
+        else if (this.currentdirid.length !== 11 && !~['contacts', 'shares', 'ipc', 'opc'].indexOf(this.currentdirid)) {
             if (this.viewmode === 1) {
                 var r = Math.floor($('.fm-blocks-view.fm').width() / 140);
                 n_cache = r * Math.ceil($('.fm-blocks-view.fm').height() / 164) + r;
@@ -1138,12 +1147,15 @@ function MegaData()
         if (this.currentdirid === 'opc') {
             DEBUG('RenderMain() opc');
             this.drawSentContactRequests(this.v, 'clearGrid');
-        } else if (this.currentdirid === 'ipc') {
+        }
+        else if (this.currentdirid === 'ipc') {
             DEBUG('RenderMain() ipc');
             this.drawReceivedContactRequests(this.v, 'clearGrid');
-        } else if (this.currentdirid === 'contacts') {
+        }
+        else if (this.currentdirid === 'contacts') {
             renderContactsLayout(u);
-        } else {
+        }
+        else {
             renderLayout(u, n_cache);
         }
 
@@ -4276,7 +4288,7 @@ function fm_matchname(p, name)
 
 var t;
 
-function renderfm(stackPointer)
+function renderfm()
 {
     if (d) {
         console.time('renderfm');
@@ -5363,8 +5375,6 @@ function processOPC(opc) {
  * Handle pending shares
  *
  * @param {array.<JSON_objects>} pending shares
- *
- *
  */
 function processPS(pendingShares) {
     DEBUG('processPS');

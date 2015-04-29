@@ -10370,7 +10370,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .verified .nw-chat-notification-icon {
 	background-position: -4px -9046px;
 }
-.establishing-connection .nw-chat-notification-icon, .outgoing-call .nw-chat-notification-icon, .incoming-call .nw-chat-notification-icon {
+.establishing-connection .nw-chat-notification-icon, .outgoing-call .nw-chat-notification-icon, .incoming-call .nw-chat-notification-icon, .call-starting .nw-chat-notification-icon {
 	background-position: -5px -9189px;
 }
 /*yellow*/
@@ -22675,6 +22675,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 	float: left;
 	margin-left: 20px;
 	width: 442px;
+}
+.credentials-warning-dialog .information.noAvatar {
+    margin-left: 0;
+    width: auto;
 }
 .credentials-warning-dialog .information .firstLine {
 	color: #d90007;

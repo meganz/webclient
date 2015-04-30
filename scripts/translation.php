@@ -9,10 +9,11 @@ $new = array();
 foreach (glob(__DIR__ . "/../html/*.html") as $file) {
     $html = file_get_contents($file);
     $html = preg_replace_callback("/{{([^}]+)}}/smU", function($match) use ($eng, &$new, $file, &$html) {
-        $text = preg_replace("/\W+/",  " ", $match[1]);
+        $text = preg_replace("/[ \n\r\t]+/",  " ", $match[1]);
         $text = trim($text);
         $ltext = strtolower($text);
         if ($text != strip_tags($text)) {
+            var_dump($text);exit;
             return $match[0];
         }
         if (!empty($eng[$text])) {

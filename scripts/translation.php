@@ -1,8 +1,8 @@
 <?php
 
 $eng = json_decode(file_get_contents(__DIR__ . "/../lang/en.json"), true);
-$eng = array_merge($eng, array_map('strtolower', $eng));
-$eng = array_flip($eng);
+$leng = array_map('strtolower', $eng);
+$eng = array_merge(array_flip($eng), array_flip($eng));
 $new = array();
 
 foreach (glob(__DIR__ . "/../html/*.html") as $file) {

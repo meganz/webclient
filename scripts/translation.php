@@ -2,12 +2,12 @@
 
 $eng = json_decode(file_get_contents(__DIR__ . "/../lang/en.json"), true);
 $leng = array_map('strtolower', $eng);
-$eng = array_merge(array_flip($eng), array_flip($eng));
+$eng = array_merge(array_flip($eng), array_flip($leng));
 $new = array();
 
 foreach (glob(__DIR__ . "/../html/*.html") as $file) {
     $html = file_get_contents($file);
-    $html = preg_replace_callback("/{{([^}]+)}}/smU", function($match) use ($eng, &$new) {
+    $html = preg_replace_callback("/{{([^}]+)}}/smU", function($match) use ($eng, &$new, $file) {
         $text = preg_replace("/\W+/",  " ", $match[1]);
         $text = trim($text);
         $ltext = strtolower($text);
@@ -19,6 +19,8 @@ foreach (glob(__DIR__ . "/../html/*.html") as $file) {
         }
 
         $new[] = $text;
+        print_r($eng);
+        var_dump($ltext, $text, $file);exit;
 
         return $match[0];
     }, $html);

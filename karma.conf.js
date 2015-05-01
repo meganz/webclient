@@ -75,6 +75,7 @@ module.exports = function(config) {
         'js/tlvstore.js',
         'js/crypto.js',
         'js/megaPromise.js',
+        'js/paycrypt.js',
         'js/user.js',
         'js/authring.js',
         'js/fm.js',

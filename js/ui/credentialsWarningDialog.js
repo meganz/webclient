@@ -75,10 +75,15 @@
      */
     CredentialsWarningDialog.prototype._renderDetails = function() {
         
-        $dialog = $('.credentials-warning-dialog');        
-        $dialog.find('.emailAddress').text(CredentialsWarningDialog.contactEmail);
-        $dialog.find('.seenOrVerified').text(CredentialsWarningDialog.seenOrVerifiedWording);
+        // Change wording to seen or verified
+        var infoFirstLine = (CredentialsWarningDialog.seenOrVerified === 'seen') ? l[6881] : l[6882];
+            infoFirstLine = infoFirstLine.replace('%1', '<span class="emailAddress">' + CredentialsWarningDialog.contactEmail + '</span>');
+        var title = (CredentialsWarningDialog.seenOrVerified === 'seen') ? l[6883] : l[6884];
         
+        $dialog = $('.credentials-warning-dialog');
+        $dialog.find('.information .firstLine').html(infoFirstLine);
+        $dialog.find('.previousCredentials .title').html(title);
+                
         // If the avatar exists, show it
         if (typeof avatars[CredentialsWarningDialog.contactHandle] !== 'undefined') {
             $dialog.find('.userAvatar img').attr('src', avatars[CredentialsWarningDialog.contactHandle].url);
@@ -164,7 +169,7 @@
         // Set to object so can be used later
         CredentialsWarningDialog.contactHandle = contactHandle;
         CredentialsWarningDialog.contactEmail = M.u[contactHandle].m;
-        CredentialsWarningDialog.seenOrVerifiedWording = (authMethod === authring.AUTHENTICATION_METHOD.SEEN) ? 'seen' : 'verified';
+        CredentialsWarningDialog.seenOrVerified = (authMethod === authring.AUTHENTICATION_METHOD.SEEN) ? 'seen' : 'verified';
         CredentialsWarningDialog.previousFingerprint = prevFingerprint;
         CredentialsWarningDialog.newFingerprint = newFingerprint;
         

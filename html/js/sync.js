@@ -14,6 +14,22 @@ var linuxsync =
 	'c':'sudo gdebi'
 },
 {
+	'name':'Debian 8.0',
+	'32':'Debian_8.0/i386/megasync-Debian_8.0_i386.deb',
+	'32n':'Debian_8.0/i386/nautilus-megasync-Debian_8.0_i386.deb',
+	'64':'Debian_8.0/amd64/megasync-Debian_8.0_amd64.deb',
+	'64n':'Debian_8.0/amd64/nautilus-megasync-Debian_8.0_amd64.deb',
+	'c':'sudo gdebi'
+},
+{
+	'name':'elementary OS Freya',
+	'32':'xUbuntu_14.04/i386/megasync-xUbuntu_14.04_i386.deb',
+	'32n':'xUbuntu_14.04/i386/nautilus-megasync-xUbuntu_14.04_i386.deb',
+	'64':'xUbuntu_14.04/amd64/megasync-xUbuntu_14.04_amd64.deb',
+	'64n':'xUbuntu_14.04/amd64/nautilus-megasync-xUbuntu_14.04_amd64.deb',
+	'c':'sudo gdebi'
+},
+{
 	'name':'Fedora 19',
 	'32':'Fedora_19/i686/megasync-Fedora_19.i686.rpm',
 	'32n':'Fedora_19/i686/nautilus-megasync-Fedora_19.i686.rpm',
@@ -121,6 +137,14 @@ var linuxsync =
 	'32n':'xUbuntu_14.10/i386/nautilus-megasync-xUbuntu_14.10_i386.deb',
 	'64':'xUbuntu_14.10/amd64/megasync-xUbuntu_14.10_amd64.deb',
 	'64n':'xUbuntu_14.10/amd64/nautilus-megasync-xUbuntu_14.10_amd64.deb',
+	'c':'sudo gdebi'
+},
+{
+	'name':'Ubuntu 15.04',
+	'32':'xUbuntu_15.04/i386/megasync-xUbuntu_14.05_i386.deb',
+	'32n':'xUbuntu_15.04/i386/nautilus-megasync-xUbuntu_14.05_i386.deb',
+	'64':'xUbuntu_15.04/amd64/megasync-xUbuntu_15.04_amd64.deb',
+	'64n':'xUbuntu_15.04/amd64/nautilus-megasync-xUbuntu_15.04_amd64.deb',
 	'c':'sudo gdebi'
 }];
 

@@ -349,5 +349,23 @@ describe("crypto unit test", function() {
                                    'Got Ed25519 fingerprint for user "you456789xw": If4x36FUomFia_hUBG_SJxt77Us');
             });
         });
+
+        describe('FOO TEST', function() {
+            it("test some chained FOO", function() {
+                dump('=== FOO CASE ===');
+                var result = ns.fooStep3('GUY');
+                result.done(function(result) {
+                    console.log('final result', result);
+                });
+            });
+
+            it("test some chained BAR", function() {
+                dump('=== BAR CASE ===');
+                var result = ns.bar('GUY');
+                result.then(function(result) {
+                    console.log('final result', result);
+                });
+            });
+        });
     });
 });

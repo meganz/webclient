@@ -61,6 +61,68 @@ var crypt = (function () {
     };
 
 
+    ns.fooStep1 = function(param) {
+        console.log('starting fooStep1 for', param);
+        var thePromise = new MegaPromise(function(resolve, reject) {
+            console.log('fooStep1 for', param, 'is boing');
+            resolve('step1_boing');
+        });
+        return thePromise;
+    };
+
+
+    ns.fooStep2 = function(param) {
+        console.log('starting fooStep2 for', param);
+        var thePromise = ns.fooStep1('get_step1_' + param);
+        var nextStep = thePromise.then(
+            function(result) {
+                console.log('fooStep2 for', param, 'is', result);
+                return 'step2_' + result;
+            }
+        );
+        return nextStep;
+    };
+
+    ns.fooStep3 = function(param) {
+        console.log('starting fooStep3 for', param);
+        var thePromise = ns.fooStep2('get_step2_' + param);
+        var nextStep = thePromise.then(
+            function(result) {
+                console.log('fooStep3 for', param, 'is', result);
+                return 'step3_' + result ;
+            }
+        );
+        return nextStep;
+    };
+
+
+    ns.bar = function(param) {
+        console.log('starting bar chain', param);
+        var step1 = new MegaPromise();
+        var step2 = step1.then(
+            function(result) {
+                console.log('barStep1 for', param, 'is', result);
+                return 'step1_'+ result;
+            }
+        );
+        var step3 = step2.then(
+            function(result) {
+                console.log('barStep2 for', param, 'is', result);
+                return 'step2_' + result;
+            }
+        );
+        var step4 = step3.then(
+            function(result) {
+                console.log('barStep3 for', param, 'is', result);
+                return 'step3_' + result;
+            }
+        );
+        step1.resolve('boing');
+        return step4;
+    };
+
+
+
     /**
      * Cached Ed25519 public key retrieval utility.
      *

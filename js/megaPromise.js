@@ -90,12 +90,11 @@ MegaPromise.prototype.promise = function() {
  * Alias of .then
  *
  * @param res
- * @param rej
+ * @param [rej]
  * @returns {MegaPromise}
  */
 MegaPromise.prototype.then = function(res, rej) {
-    this._internalPromise.then(res, rej);
-    return this;
+    return MegaPromise.asMegaPromiseProxy(this._internalPromise.then(res, rej));
 };
 
 /**

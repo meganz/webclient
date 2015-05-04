@@ -113,7 +113,81 @@ function is_fm() { return false; };
 
 function rand(n) { return Math.floor(Math.random() * n) + 1; };
 
+
+var mBroadcaster = {
+    _topics : {},
+
+    addListener: function mBroadcaster_addListener(topic, options) {
+        if (typeof options === 'function') {
+            options = {
+                callback : options
+            };
+        }
+        if (typeof options.callback !== 'function') {
+            return false;
+        }
+
+        if (!this._topics.hasOwnProperty(topic)) {
+            this._topics[topic] = {};
+        }
+
+        var id = Math.random().toString(26);
+        this._topics[topic][id] = options;
+
+        if (d) console.log('Adding broadcast listener', topic, id, options);
+
+        return id;
+    },
+
+    removeListener: function mBroadcaster_removeListenr(token) {
+        if (d) console.log('Removing broadcast listener', token);
+        for (var topic in this._topics) {
+            if (this._topics[topic][token]) {
+                delete this._topics[topic][token];
+                if (!Object.keys(this._topics[topic]).length) {
+                    delete this._topics[topic];
+                }
+                return true;
+            }
+        }
+        return false;
+    },
+
+    sendMessage: function mBroadcaster_sendMessage(topic) {
+        if (d) console.log('Broadcasting ' + topic);
+        if (this._topics.hasOwnProperty(topic)) {
+            var args = Array.prototype.slice.call(arguments, 1);
+            var idr = [];
+
+            for (var id in this._topics[topic]) {
+                var ev = this._topics[topic][id];
+                try {
+                    ev.callback.apply(ev.scope, args);
+                } catch (ex) {
+                    if (d) console.error(ex);
+                }
+                if (ev.once)
+                    idr.push(id);
+            }
+            if (idr.length)
+                idr.forEach(this.removeListener.bind(this));
+        }
+    },
+
+    once: function mBroadcaster_once(topic, callback) {
+        this.addListener(topic, {
+            once : true,
+            callback : callback
+        });
+    }
+};
+if (typeof Object.freeze === 'function') {
+    mBroadcaster = Object.freeze(mBroadcaster);
+}
+
+
 window.d = 1;
 is_extension = false;
 
 apipath = "http://localhost/"; // some invalid api path
+staticpath = "/js/";

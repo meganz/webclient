@@ -90,7 +90,7 @@ function u_checklogin3a(res, ctx) {
 
     if (typeof res !== 'object') {
         u_logout();
-        r = res;
+        ctx.checkloginresult(ctx, res);
     }
     else {
         u_attr = res;
@@ -136,9 +136,11 @@ function u_checklogin3a(res, ctx) {
             // Load/initialise the authentication system.
             u_initAuthentication();
         }
+        mBroadcaster.crossTab.initialize(function() {
+            ctx.checkloginresult(ctx, r);
+        });
     }
 
-    ctx.checkloginresult(ctx, r);
 }
 
 // erase all local user/session information
@@ -180,6 +182,7 @@ function u_logout(logout) {
             delete localStorage[u_handle + '_mDBactive'];
         }
         fminitialized = false;
+        mBroadcaster.crossTab.leave();
         u_sid = u_handle = u_k = u_attr = u_privk = u_k_aes = undefined;
         notifyPopup.notifications = null;
         api_setsid(false);

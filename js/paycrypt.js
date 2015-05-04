@@ -37,8 +37,11 @@ var paycrypt = (function () {
         var iv = new Uint8Array(_IV_BYTES);
         asmCrypto.getRandomValues(iv);
 
-        return { length: keysLength, keys: keys,
-                 encryption: encKey, hmac: hmacKey, iv: iv };
+        return { length: keysLength,
+                 keys: asmCrypto.bytes_to_string(keys),
+                 encryption: asmCrypto.bytes_to_string(encKey),
+                 hmac: asmCrypto.bytes_to_string(hmacKey),
+                 iv: asmCrypto.bytes_to_string(iv) };
     };
 
 

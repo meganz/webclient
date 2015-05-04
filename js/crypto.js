@@ -2,8 +2,17 @@ window.URL = window.URL || window.webkitURL;
 var have_ab = typeof ArrayBuffer != 'undefined' && typeof DataView != 'undefined';
 var use_workers = have_ab && typeof Worker != 'undefined';
 
-if (is_extension || +localStorage.use_ssl === 0) {
+if (is_extension && typeof localStorage.use_ssl === 'undefined') {
+	localStorage.use_ssl = 0;
+}
+
+// if (is_extension || +localStorage.use_ssl === 0) {
+if (is_chrome_firefox) {
     var use_ssl = 0;
+}
+else if (+localStorage.use_ssl === 0) {
+    var use_ssl = (navigator.userAgent.indexOf('Chrome/') !== -1
+		&& parseInt(navigator.userAgent.split('Chrome/').pop()) > 40) ? 1:0;
 }
 else {
     if ((navigator.appVersion.indexOf('Safari') > 0) && (navigator.appVersion.indexOf('Version/5') > 0)) {
@@ -57,7 +66,7 @@ function ssl_needed() {
     var ssl_off = ['Firefox/14', 'Firefox/15', 'Firefox/17', 'Safari', 'Firefox/16'];
     for (var i = ssl_opt.length; i--;) {
         if (navigator.userAgent.indexOf(ssl_opt[i]) >= 0) {
-            return 0;
+            return parseInt(navigator.userAgent.split(ssl_opt[i]).pop()) > 40;
         }
     }
     for (var i = ssl_off.length; i--;) {
@@ -1047,13 +1056,13 @@ function api_proc(q) {
                     if (typeof ctx.callback === 'function') {
                         try {
                             ctx.callback(t[i], ctx, this);
-                        } catch (ex) {
+                        }
+                        catch (ex) {
                             // if there is *any* issue on the callback
                             // we don't want to HALT, instead we let the channel
                             // a chance to clean itself and continue
                             // Otherwise if we load #blog *or* #page_<something>
                             // the whole site is buggy
-
                             if (chromehack) {
                                 console.error(ex, ex.stack);
                             }
@@ -1142,17 +1151,33 @@ function api_retry() {
 }
 
 function api_reqfailed(c, e) {
-    if (e == ESID) {
+    if (e === ESID) {
         u_logout(true);
         document.location.hash = 'login';
     }
-    else if (c == 2 && e == ETOOMANY) {
+    else if (c === 2 && e === ETOOMANY) {
         if (typeof mDB !== 'undefined' && mDB) {
             mDBreload();
         }
         else {
             loadfm();
         }
+    }
+    
+    // If suspended account
+    else if (e === EBLOCKED) {
+        
+        // On clicking OK, log the user out and redirect to contact page
+        msgDialog('warninga', 'Suspended account',
+            'You have been suspended due to excess data usage.\n\
+            Please contact support@mega.co.nz to get your account reinstated.',
+            false,
+            function() {
+                var redirectUrl = window.location.origin + window.location.pathname + '#contact';
+                u_logout(true);                
+                window.location.replace(redirectUrl);
+            }
+        );
     }
 }
 
@@ -1610,13 +1635,15 @@ function api_cachepubkeys2(res, ctx) {
         var spubkey, keylen, pubkey;
 
         if (res.pubk) {
-            u_pubkeys[ctx.u] = u_pubkeys[res.u] = crypto_decodepubkey(base64urldecode(res.pubk));
+            var userHandle = res.u;
+            u_pubkeys[ctx.u] = u_pubkeys[userHandle] = crypto_decodepubkey(base64urldecode(res.pubk));
             var fingerprint = authring.computeFingerprint(u_pubkeys[ctx.u], 'RSA', 'string');
             var observed = authring.getContactAuthenticated(ctx.u, 'RSA');
+            
             if (observed && authring.equalFingerprints(observed.fingerprint, fingerprint) === false) {
-                throw new Error('RSA fingerprint does not match previously seen one!');
+                showFingerprintMismatchException('RSA', userHandle, observed.method, observed.fingerprint, fingerprint);
             }
-            if (observed === false) {
+            else if (observed === false) {
                 authring.setContactAuthenticated(ctx.u, fingerprint, 'RSA',
                     authring.AUTHENTICATION_METHOD.SEEN,
                     authring.KEY_CONFIDENCE.UNSURE);
@@ -3577,6 +3604,7 @@ var pubEd25519 = {};
  * Initialises the authentication system.
  */
 function u_initAuthentication() {
+    
     // Load contacts' tracked authentication fingerprints.
     authring.getContacts('Ed25519');
     authring.getContacts('RSA');
@@ -3593,7 +3621,7 @@ function u_initAuthentication() {
 function u_initAuthentication2(res, ctx) {
     if (typeof res !== 'number') {
         // Keyring is a private attribute, so it's been wrapped by a TLV store,
-        // no furthe processing here.
+        // no further processing here.
         u_keyring = res;
     }
     else {
@@ -3632,46 +3660,84 @@ function u_initAuthentication2(res, ctx) {
     mBroadcaster.sendMessage('pubEd25519');
 }
 
-function _checkFingerprintEd25519(userhandle) {
-    var recorded = authring.getContactAuthenticated(userhandle, 'Ed25519');
-    var fingerprint = authring.computeFingerprint(pubEd25519[userhandle], 'Ed25519', 'string');
+function _checkFingerprintEd25519(userHandle) {
+    var recorded = authring.getContactAuthenticated(userHandle, 'Ed25519');
+    var fingerprint = authring.computeFingerprint(pubEd25519[userHandle], 'Ed25519', 'string');
     var value = {
-        pubkey: pubEd25519[userhandle],
+        pubkey: pubEd25519[userHandle],
         authenticated: recorded
     };
-    if (recorded && authring.equalFingerprints(recorded.fingerprint, fingerprint) === false) {
-        throw new Error('Fingerprint does not match previously authenticated one!');
+    
+    // If fingerprint mismatch, show warning and throw exception
+    if (recorded && (authring.equalFingerprints(recorded.fingerprint, fingerprint) === false)) {
+        showFingerprintMismatchException('Ed25519', userHandle, recorded.method, recorded.fingerprint, fingerprint);
     }
-    if (recorded === false) {
-        authring.setContactAuthenticated(userhandle, fingerprint, 'Ed25519',
+    else if (recorded === false) {
+        authring.setContactAuthenticated(userHandle, fingerprint, 'Ed25519',
             authring.AUTHENTICATION_METHOD.SEEN,
             authring.KEY_CONFIDENCE.UNSURE);
     }
+    
     return value;
 }
 
-function _checkFingerprintRSA(userhandle) {
-    var recorded = authring.getContactAuthenticated(userhandle, 'RSA');
-    var fingerprint = authring.computeFingerprint(u_pubkeys[userhandle], 'RSA', 'string');
+function _checkFingerprintRSA(userHandle) {
+    
+    var recorded = authring.getContactAuthenticated(userHandle, 'RSA');
+    var fingerprint = authring.computeFingerprint(u_pubkeys[userHandle], 'RSA', 'string');
     var value = {
-        pubkey: u_pubkeys[userhandle],
+        pubkey: u_pubkeys[userHandle],
         authenticated: recorded
     };
-    if (recorded && authring.equalFingerprints(recorded.fingerprint, fingerprint) === false) {
-        throw new Error('RSA fingerprint does not match previously authenticated one!');
+    
+    // If fingerprint mismatch, show warning and throw exception
+    if (recorded && (authring.equalFingerprints(recorded.fingerprint, fingerprint) === false)) {
+        showFingerprintMismatchException('RSA', userHandle, recorded.method, recorded.fingerprint, fingerprint);
     }
-    if (recorded === false) {
-        authring.setContactAuthenticated(userhandle, fingerprint, 'RSA',
+    else if (recorded === false) {
+        authring.setContactAuthenticated(userHandle, fingerprint, 'RSA',
             authring.AUTHENTICATION_METHOD.SEEN,
             authring.KEY_CONFIDENCE.UNSURE);
     }
+    
     return value;
+}
+
+/**
+ * Shows the fingerprint warning dialog
+ * @param {String} fingerprintType either Ed25519 or RSA
+ * @param {String} userHandle The user handle e.g. 3nnYu_071I3
+ * @param {Number} method Whether seen or verified (authring.AUTHENTICATION_METHOD.SEEN or .FINGERPRINT_COMPARISON)
+ * @param {String} previousFingerprint The previously seen or verified fingerprint
+ * @param {String} newFingerprint The new fingerprint
+ * @throws {Error}
+ *     In case the fingerprint of the public key differs from the one previously
+ *     authenticated by the user. This more severe condition warrants to throw
+ *     an exception.
+ */
+function showFingerprintMismatchException(fingerprintType, userHandle, method, previousFingerprint, newFingerprint) {
+    
+    // Show warning dialog
+    mega.ui.CredentialsWarningDialog.singleton(userHandle, method, previousFingerprint, newFingerprint);
+
+    // Remove the cached key, so the key will be fetched and checked against the stored fingerprint again next time
+    if (fingerprintType === 'RSA') {
+        delete u_pubkeys[userHandle];
+    }
+    else if (fingerprintType === 'Ed25519') {
+        delete pubEd25519[userHandle];
+    }
+
+    // Throw exception to stop whatever they were doing from progressing e.g. initiating/accepting call
+    throw fingerprintType + ' fingerprint does not match the previously authenticated one! ' +
+          'Previous fingerprint: ' + previousFingerprint + '. ' +
+          'New fingerprint: ' + newFingerprint + '. ';
 }
 
 /**
  * Cached Ed25519 public key retrieval utility.
  *
- * @param userhandle {string}
+ * @param userHandle {string}
  *     Mega user handle.
  * @param callback {function}
  *     Callback function to call upon completion of operation. The callback
@@ -3683,14 +3749,15 @@ function _checkFingerprintRSA(userhandle) {
  *     authenticated by the user. This more severe condition warrants to throw
  *     an exception.
  */
-function getPubEd25519(userhandle, callback) {
-    if (u_authring.Ed25519 === undefined) {
+function getPubEd25519(userHandle, callback) {
+
+    if (typeof u_authring.Ed25519 === 'undefined') {
         throw new Error('First initialise u_authring by calling authring.getContacts()');
     }
-    if (pubEd25519[userhandle]) {
-        var value = _checkFingerprintEd25519(userhandle);
+    if (pubEd25519[userHandle]) {
+        var value = _checkFingerprintEd25519(userHandle);
         if (callback) {
-            callback(value, userhandle);
+            callback(value, userHandle);
         }
     }
     else {
@@ -3698,7 +3765,7 @@ function getPubEd25519(userhandle, callback) {
             if (typeof res !== 'number') {
                 res = base64urldecode(res);
                 pubEd25519[ctx.u] = res;
-                var value = _checkFingerprintEd25519(userhandle);
+                var value = _checkFingerprintEd25519(userHandle);
                 if (ctx.callback3) {
                     ctx.callback3(value, ctx.u);
                 }
@@ -3708,10 +3775,10 @@ function getPubEd25519(userhandle, callback) {
             }
         };
         var myCtx = {
-            u: userhandle,
-            callback3: callback,
+            u: userHandle,
+            callback3: callback
         };
-        getUserAttribute(userhandle, 'puEd255', true, false, myCallback, myCtx);
+        getUserAttribute(userHandle, 'puEd255', true, false, myCallback, myCtx);
     }
 }
 
@@ -3743,6 +3810,7 @@ function getFingerprintEd25519(userhandle, callback, format) {
             if (typeof res !== 'number') {
                 res = base64urldecode(res);
                 pubEd25519[ctx.u] = res;
+                var value = _checkFingerprintEd25519(userhandle);
                 if (ctx.callback3) {
                     ctx.callback3(authring.computeFingerprint(res, 'Ed25519', format), ctx.u);
                 }
@@ -3753,7 +3821,7 @@ function getFingerprintEd25519(userhandle, callback, format) {
         };
         var myCtx = {
             u: userhandle,
-            callback3: callback,
+            callback3: callback
         };
         getUserAttribute(userhandle, 'puEd255', true, false, myCallback, myCtx);
     }
@@ -3782,7 +3850,7 @@ function getPubRSA(userhandle, callback) {
         api_cachepubkeys({
             cachepubkeyscomplete: function () {
                 _checkFingerprintRSA(userhandle);
-                callback(u_pubkeys[userhandle]);
+                callback(u_pubkeys[userhandle]);              
             }
         }, [userhandle]);
     }

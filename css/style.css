@@ -4337,9 +4337,9 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 	position: relative;
 	background-color: white;
 	-o-text-overflow: ellipsis;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space:nowrap;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
 }
 .nw-tree-panel-arrows, .copy-dialog-panel-arrows, .move-dialog-panel-arrows, .share-dialog-panel-arrows {
 	height: 24px;
@@ -7207,6 +7207,7 @@ table {
 }
 .fm-new-folder, .search-files-result, .search-messages-result, .fm-file-upload, .search-messages-result, .fm-folder-upload, .fm-notification-settings {
 	position: relative;
+	overflow: hidden;
 }
 .search-files-result span, .search-files-result.disabled span, .search-messages-result span, .search-messages-result.disabled span {
 	background-position: -4px -4559px;
@@ -8055,7 +8056,7 @@ color: white;
 	background-image: none;
 }
 .fm-account-select, .fm-version-select {
-	background-position: right -6595px;
+	background-position: right -6593px;
 	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-repeat: no-repeat;
 	padding: 0;
@@ -9621,13 +9622,8 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
 	top: 0;
 	left: 0;
 }
-.fm-dialog-overlay.bitcoin-invoice-dialog {
-	background: -moz-radial-gradient(center, ellipse cover, rgba(0,0,0,0.1) 0%, rgba(20,20,20,0.9) 100%);
-	background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%, rgba(0,0,0,0.1)), color-stop(100%, rgba(20,20,20,0.9)));
-	background: -webkit-radial-gradient(center, ellipse cover, rgba(0,0,0,0.1) 0%, rgba(20,20,20,0.9) 100%);
-	background: -o-radial-gradient(center, ellipse cover, rgba(0,0,0,0.1) 0%, rgba(20,20,20,0.9) 100%);
-	background: -ms-radial-gradient(center, ellipse cover, rgba(0,0,0,0.1) 0%, rgba(20,20,20,0.9) 100%);
-	background: radial-gradient(ellipse at center, rgba(0,0,0,0.1) 0%, rgba(20,20,20,0.9) 100%);
+.fm-dialog-overlay.bitcoin-invoice-dialog, .fm-dialog-overlay.payment-dialog-overlay {
+	background: rgba(34,34,34,0.95);
 }
 .fm-dialog {
 	position: absolute;
@@ -9757,16 +9753,18 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
 	-o-transition: all 200ms ease-in-out;
 	-ms-transition: all 200ms ease-in-out;
 	transition: all 200ms ease-in-out;
+	overflow: hidden;
+	padding: 0 10px;
 }
 .bitcoin-invoice-dialog a.btn-open-wallet:hover {
 	background-color: #47abdc;
 	color: #fff;
 }
 .bitcoin-invoice-dialog .bitcoin-address {
-    color: #ccc;
-    font-size: 10px;
-    padding: 10px 30px 21px;
-    text-align: center;
+	color: #ccc;
+	font-size: 10px;
+	padding: 10px 30px 21px;
+	text-align: center;
 }
 .bitcoin-invoice-dialog .price-expired-instruction {
 	display: none;
@@ -9822,11 +9820,13 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
 	font-size: 30px;
 	line-height: 32px;
 	padding-top: 5px;
+	font-family: 'source_sans_prolight';
 }
 .bitcoin-invoice-dialog .plan-duration {
 	font-size: 21px;
 	line-height: 24px;
 	padding-top: 6px;
+	font-family: 'source_sans_prolight';
 }
 .bitcoin-invoice-dialog .plan-price-euros {
 	font-size: 20px;
@@ -9848,17 +9848,17 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
 	padding-left: 4px;
 }
 .bitcoin-invoice-dialog .separator {
-    border-bottom: 1px solid #fff;
-    margin-bottom: 25px;
-    padding-top: 10px;
+	border-bottom: 1px solid #fff;
+	margin-bottom: 25px;
+	padding-top: 10px;
 }
 .bitcoin-invoice-dialog .expiry-instruction {
 	box-sizing: border-box;
-    display: table-cell;
-    font-size: 11px;
-    height: 45px;
-    opacity: 0.5;
-    vertical-align: middle;
+	display: table-cell;
+	font-size: 11px;
+	height: 45px;
+	opacity: 0.5;
+	vertical-align: middle;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
@@ -12317,7 +12317,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 	box-sizing: border-box;
 }
 .top-menu-item {
-	padding-right:26px;
+	padding-right: 26px;
 }
 .sorting-menu-item {
 	height: 24px;
@@ -14872,6 +14872,9 @@ h5.main-italic-header {
 	-moz-opacity: 0;
 	-khtml-opacity: 0;
 	opacity: 0;
+	cursor: pointer;
+	padding: 0;
+	margin: 0;
 }
 .membership-st2-select span {
 	background-color: white;
@@ -15081,7 +15084,7 @@ div.membership-bott-button {
 }
 .membership-new-offer text {
 	font-family: 'source_sans_proregular';
-	font-weight:normal;
+	font-weight: normal;
 }
 .membership-step2 .pro4 .membership-new-offer {
 	display: block;
@@ -22672,8 +22675,8 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 	width: 442px;
 }
 .credentials-warning-dialog .information.noAvatar {
-    margin-left: 0;
-    width: auto;
+	margin-left: 0;
+	width: auto;
 }
 .credentials-warning-dialog .information .firstLine {
 	color: #d90007;
@@ -22747,6 +22750,172 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 .fm-chat-inline-dialog-button-sendFeedback {
 	margin-left: 4px;
 }
+/* CC payment dialog */
+.fm-dialog.payment-dialog {
+	border: 0 none;
+	border-radius: 14px;
+	margin: -219px 0 0 -330px;
+	width: 660px;
+	min-height: 254px;
+}
+.payment-dialog-body {
+	padding: 30px;
+}
+.payment-dialog .plan-icon {
+	float: left;
+}
+.payment-dialog .reg-st3-membership-icon {
+	margin-top: 0;
+}
+.payment-plan-info {
+	float: left;
+	padding: 6px 0 0 15px;
+}
+.payment-plan-title, .payment-plan-price {
+	font-size: 36px;
+	line-height: 38px;
+	font-family: 'source_sans_prolight', 'Open Sans Light', Arial;
+}
+.payment-plan-txt {
+	color: #9d9d9d;
+	line-height: 21px;
+}
+.payment-plan-txt span {
+	font-size: 11px;
+}
+.payment-plan-price {
+	float: right;
+	padding: 6px 10px 0 0;
+}
+.payment-half-block {
+	float: left;
+	width: 50%;
+	border-right: 2px solid #f7f7f7;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	padding: 0 24px 12px 0;
+	margin: 26px 0 0 0;
+}
+.payment-half-block.second {
+	border: 0;
+	border-left: 2px solid #f7f7f7;
+	padding: 0 0 12px 24px;
+	margin: 26px -2px 0 -2px;
+}
+.payment-form-title {
+	font-family: 'Open Sans Semibold', Arial;
+}
+.payment-dialog .fm-account-input {
+	margin: 19px 0 0 0;
+	width: auto;
+}
+.payment-dialog .fm-account-select {
+	width: 161px;
+	float: left;
+	margin: 19px 0 0 0;
+}
+.payment-dialog .fm-account-input.code {
+	margin-left: 175px;
+}
+.payment-cc {
+	margin: 19px 0 0 0;
+	height: 32px;
+}
+.payment-cc-icon {
+	float: left;
+	border: 2px solid #ececec;
+	width: 40px;
+	height: 25px;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	margin: 4px 5px 0 0px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+	background-image: url(../images/mega/payment-icons@2x.png);
+	background-position: center 6px;
+	background-repeat: no-repeat;
+	background-size: 27px auto;
+}
+.payment-cc-icon.mastercard {
+	background-position: center -34px;
+}
+.payment-short-bl {
+	float: left;
+	width: 50%;
+	padding-right: 7px;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+}
+.payment-short-bl.second {
+	padding: 0 0 0 7px;
+}
+.payment-short-bl.triplex {
+	width: 33.333333%;
+	padding-right: 7px;
+}
+.payment-short-bl.triplex.second {
+	padding: 0 7px;
+}
+.payment-short-bl.triplex.third {
+	padding: 0 0 0 7px;
+}
+.payment-short-bl .fm-account-select {
+	width: 100%;
+	float: none;
+	margin: 19px 0 0 0;
+}
+.payment-dialog .account-select-txt:first-letter {
+    text-transform: uppercase;
+}
+.payment-buy-now {
+	margin: 19px 0 0 0;
+	height: 32px;
+	border: 2px solid #D90007;
+	-moz-border-radius: 6px;
+	-webkit-border-radius: 6px;
+	border-radius: 6px;
+	cursor: pointer;
+	background-color: white;
+	color: #D90007;
+	font-size: 13px;
+	line-height: 26px;
+	text-align: center;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	-webkit-transition: all 200ms ease-in-out;
+	-moz-transition: all 200ms ease-in-out;
+	-o-transition: all 200ms ease-in-out;
+	-ms-transition: all 200ms ease-in-out;
+	transition: all 200ms ease-in-out;
+}
+.payment-buy-now:hover {
+	color: white;
+	background-color: #D90007;
+}
+.payment-half-block .fm-account-input input {
+	color: #888787;
+}
+.payment-half-block .fm-account-input input::-webkit-input-placeholder {
+ color: #888787;
+}
+.payment-half-block .fm-account-input input:-moz-placeholder {
+ color: #888787;
+ opacity: 1;
+}
+.payment-half-block .fm-account-input input::-moz-placeholder {
+ color: #888787;
+ opacity: 1;
+}
+.payment-half-block .fm-account-input input:-ms-input-placeholder {
+ color: #888787;
+}
+/* end of CC payment dialog */
+
  @media only screen and (max-width: 1593px) {
 .download-mid-centered-block {
 	min-width: 648px;
@@ -24250,23 +24419,23 @@ background-color:#1DA2E9
 
 /* frienldy printing */
 @media print {
-    /* remove all single page styles */
-    body, body * {
-        visibility: hidden;
-        height: auto !important;
-        overflow: visible !important;
-        max-width: 100% !important;
-    }
-    .main-mid-pad * {
-        visibility: visible;
-    }
-    .main-mid-pad {
-        visibility: visible;
-        float: none !important;
-        left: 0px;
-        top: 0px;
-        width: 100% !important;
-        position: absolute !important;
-        overflow: visible !important;
-    }
+/* remove all single page styles */
+body, body * {
+	visibility: hidden;
+	height: auto !important;
+	overflow: visible !important;
+	max-width: 100% !important;
+}
+.main-mid-pad * {
+	visibility: visible;
+}
+.main-mid-pad {
+	visibility: visible;
+	float: none !important;
+	left: 0px;
+	top: 0px;
+	width: 100% !important;
+	position: absolute !important;
+	overflow: visible !important;
+}
 }

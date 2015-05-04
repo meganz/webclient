@@ -141,8 +141,8 @@ var linuxsync =
 },
 {
 	'name':'Ubuntu 15.04',
-	'32':'xUbuntu_15.04/i386/megasync-xUbuntu_14.05_i386.deb',
-	'32n':'xUbuntu_15.04/i386/nautilus-megasync-xUbuntu_14.05_i386.deb',
+	'32':'xUbuntu_15.04/i386/megasync-xUbuntu_15.04_i386.deb',
+	'32n':'xUbuntu_15.04/i386/nautilus-megasync-xUbuntu_15.04_i386.deb',
 	'64':'xUbuntu_15.04/amd64/megasync-xUbuntu_15.04_amd64.deb',
 	'64n':'xUbuntu_15.04/amd64/nautilus-megasync-xUbuntu_15.04_amd64.deb',
 	'c':'sudo gdebi'

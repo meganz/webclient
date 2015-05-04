@@ -57,6 +57,21 @@
                             id: reportId,
                             d: dump
                         });
+
+                        if(self._report.chatRoomState) {
+                            self._report.chatRoomState.forEach(function(v) {
+                                if(v.rtcCallStats && v.rtcCallStats.length > 0) {
+                                    v.rtcCallStats.forEach(function(cs) {
+                                        api_req({
+                                            a: 'clog',
+                                            t: "callStats",
+                                            id: cs.cid,
+                                            d: reportId
+                                        });
+                                    })
+                                }
+                            })
+                        }
                         this.hide();
 
                         msgDialog('info', 'Feedback', 'Thank you for your feedback!');

@@ -681,6 +681,11 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
             );
         }
 
+        if(eventData.stats) {
+            self.callStats.push(
+                eventData.stats
+            );
+        }
 
         self._resetCallStateNoCall();
     });
@@ -711,14 +716,15 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
             self._othersAvElement = obj.player;
         }
 
-        self.callStats = {};
+        self.callStats = [];
+        self.liveCallStats = [];
         obj.stats = {
             scanPeriod: 1, maxSamplePeriod: 5,
             onSample: function(stats, type) {
                 if (type == 1) {
-                    self.callStats.stats = stats;
+                    self.liveCallStats.stats = stats;
                 } else if (type == 0) {
-                    self.callStats.commonStats = stats;
+                    self.liveCallStats.commonStats = stats;
                 }
             }
         };

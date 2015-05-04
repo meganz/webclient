@@ -59,16 +59,21 @@
                         });
 
                         if(self._report.chatRoomState) {
-                            self._report.chatRoomState.forEach(function(v) {
-                                if(v.rtcCallStats && v.rtcCallStats.length > 0) {
-                                    v.rtcCallStats.forEach(function(cs) {
-                                        api_req({
-                                            a: 'clog',
-                                            t: "callStats",
-                                            id: cs.cid + "_" + cs.isCaller,
-                                            d: reportId
-                                        });
-                                    })
+                            Object.keys(self._report.chatRoomState).forEach(function(k) {
+                                var v = self._report.chatRoomState[k];
+                                if(v.callSessions && v.callSessions.length > 0) {
+                                    v.callSessions.forEach(function(callSession) {
+                                        if(callSession.callStats) {
+                                            callSession.callStats.forEach(function (cs) {
+                                                api_req({
+                                                    a: 'clog',
+                                                    t: "callStats",
+                                                    id: cs.cid + "_" + cs.isCaller,
+                                                    d: reportId
+                                                });
+                                            })
+                                        }
+                                    });
                                 }
                             })
                         }

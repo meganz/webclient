@@ -65,7 +65,7 @@
                                         api_req({
                                             a: 'clog',
                                             t: "callStats",
-                                            id: cs.cid,
+                                            id: cs.cid + "_" + cs.isCaller,
                                             d: reportId
                                         });
                                     })

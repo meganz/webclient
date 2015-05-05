@@ -132,6 +132,11 @@ function u_checklogin3a(res, ctx) {
             r = 3;
         }
 
+        if(M.u[u_handle]) {
+            M.u[u_handle].m = u_attr.email;
+            M.u[u_handle].c = u_attr.c;
+        }
+
         if (r == 3) {
             // Load/initialise the authentication system.
             u_initAuthentication();

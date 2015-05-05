@@ -167,7 +167,7 @@ function loadPaymentGatewayOptions() {
         var optionChecked = '', classChecked = '';
 
         // Pre-select the first option in the list
-        if (i === 0) {
+        if (!html) {
             optionChecked = 'checked="checked" ';
             classChecked = ' checked';
         }
@@ -180,7 +180,7 @@ function loadPaymentGatewayOptions() {
         // Create a radio button with icon for each payment gateway
         html += '<div class="payment-method">'
              +      '<div class="membership-radio' + classChecked + '">'
-             +          '<input type="radio" name="' + gatewayOption.cssClass + '" id="' + gatewayOption.cssClass + '" ' + optionChecked + 'disabled="disabled" value="' + gatewayOption.cssClass + '" />'
+             +          '<input type="radio" name="' + gatewayOption.cssClass + '" id="' + gatewayOption.cssClass + '" ' + optionChecked + ' value="' + gatewayOption.cssClass + '" />'
              +          '<div></div>'
              +      '</div>'
              +      '<div class="membership-radio-label ' + gatewayOption.cssClass + '">'

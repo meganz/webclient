@@ -486,13 +486,13 @@ function pro_pay()
                         else {
                             // If Bitcoin provider then show the Bitcoin invoice dialog
                             if ((pro_m === 4) && res && res.EUR) {
-                                showBitcoinInvoice(res.EUR);
+                                bitcoinDialog.showInvoice(res.EUR);
                             }
                             else if ((pro_m === 4) && (!res || !res.EUR)) {
-                                showBitcoinProviderFailureDialog();
+                                bitcoinDialog.showBitcoinProviderFailureDialog();
                             }
                             else if ((pro_m === 8) && res && res.EUR) {
-                                alert('show cc dialog');
+                                // Pay for credit card
                             }
                         }
                     }
@@ -502,6 +502,9 @@ function pro_pay()
     });
 }
 
+/**
+ * Credit card payment dialog
+ */
 var cardDialog = {
     
     $dialog: null,
@@ -538,265 +541,266 @@ var cardDialog = {
     }
 };
 
+/**
+ * Bitcoin invoice dialog
+ */
 var bitcoinDialog = {
     
+    // Web socket for chain.com connection to monitor bitcoin payment
+    chainWebSocketConn: null,
     
-    
-};
+    /**
+     * Step 3 in plan purchase with Bitcoin
+     * @param {Object} apiResponse API result
+     */
+    showInvoice: function(apiResponse) {
 
-// Web socket for chain.com connection to monitor bitcoin payment
-var chainWebSocketConn = null;
+        //* Testing data to watch the invoice expire in 5 secs
+        apiResponse = {
+            "invoice_id": 'sIk',
+            "address": '12ouE2tWLuR3q5ZyQzQL6DR25iBLVjhwXd',
+            "amount": 1.35715354,
+            "created": Math.round(Date.now() / 1000),
+            "expiry": Math.round(Date.now() / 1000) + 5
+        };//*/
 
-/**
- * Step 3 in plan purchase with Bitcoin
- * @param {Object} apiResponse API result
- */
-function showBitcoinInvoice(apiResponse) {
+        // Set details
+        var bitcoinAddress = apiResponse.address;
+        var bitcoinUrl = 'bitcoin:' + apiResponse.address + '?amount=' + apiResponse.amount;
+        var invoiceDateTime = new Date(apiResponse.created);
+        var proPlanNum = selectedProPackage[1];
+        var planName = getProPlan(proPlanNum);
+        var planMonths = l[6806].replace('%1', selectedProPackage[4]);  // x month purchase
+        var priceEuros = selectedProPackage[5] + '<span>&euro;</span>';
+        var priceBitcoins = apiResponse.amount;
+        var expiryTime = new Date(apiResponse.expiry);
 
-    /* Testing data to watch the invoice expire in 5 secs
-    apiResponse = {
-        "invoice_id": 'sIk',
-        "address": '12ouE2tWLuR3q5ZyQzQL6DR25iBLVjhwXd',
-        "amount": 1.35715354,
-        "created": Math.round(Date.now() / 1000),
-        "expiry": Math.round(Date.now() / 1000) + 5
-    };//*/
+        // Cache original HTML of dialog to reset after close
+        var dialogOverlay = $('.fm-dialog-overlay');
+        var dialog = $('.fm-dialog.pro-register-paypal-dialog');
+        var dialogOriginalHtml = dialog.html();
 
-    // Set details
-    var bitcoinAddress = apiResponse.address;
-    var bitcoinUrl = 'bitcoin:' + apiResponse.address + '?amount=' + apiResponse.amount;
-    var invoiceDateTime = new Date(apiResponse.created);
-    var proPlanNum = selectedProPackage[1];
-    var planName = getProPlan(proPlanNum);
-    var planMonths = l[6806].replace('%1', selectedProPackage[4]);  // x month purchase
-    var priceEuros = selectedProPackage[5] + '<span>&euro;</span>';
-    var priceBitcoins = apiResponse.amount;
-    var expiryTime = new Date(apiResponse.expiry);
+        // Add styles for the dialog
+        dialogOverlay.addClass('bitcoin-invoice-dialog');
+        dialog.addClass('bitcoin-invoice-dialog');
 
-    // Cache original HTML of dialog to reset after close
-    var dialogOverlay = $('.fm-dialog-overlay');
-    var dialog = $('.fm-dialog.pro-register-paypal-dialog');
-    var dialogOriginalHtml = dialog.html();
+        // Clone template and show Bitcoin invoice
+        var bitcoinInvoiceHtml = $('.bitcoin-invoice').html();
+        dialog.html(bitcoinInvoiceHtml);
 
-    // Add styles for the dialog
-    dialogOverlay.addClass('bitcoin-invoice-dialog');
-    dialog.addClass('bitcoin-invoice-dialog');
+        // Render QR code
+        bitcoinDialog.generateBitcoinQrCode(dialog, bitcoinAddress, priceBitcoins);
 
-    // Clone template and show Bitcoin invoice
-    var bitcoinInvoiceHtml = $('.bitcoin-invoice').html();
-    dialog.html(bitcoinInvoiceHtml);
+        // Update details inside dialog
+        dialog.find('.btn-open-wallet').attr('href', bitcoinUrl);
+        dialog.find('.bitcoin-address').html(bitcoinAddress);
+        dialog.find('.invoice-date-time').html(invoiceDateTime);
+        dialog.find('.plan-icon').addClass('pro' + proPlanNum);
+        dialog.find('.plan-name').html(planName);
+        dialog.find('.plan-duration').html(planMonths);
+        dialog.find('.plan-price-euros').html(priceEuros);
+        dialog.find('.plan-price-bitcoins').html(priceBitcoins);
 
-    // Render QR code
-    generateBitcoinQrCode(dialog, bitcoinAddress, priceBitcoins);
+        // Set countdown to price expiry
+        var countdownIntervalId = bitcoinDialog.setCoundownTimer(dialog, expiryTime);
 
-    // Update details inside dialog
-    dialog.find('.btn-open-wallet').attr('href', bitcoinUrl);
-    dialog.find('.bitcoin-address').html(bitcoinAddress);
-    dialog.find('.invoice-date-time').html(invoiceDateTime);
-    dialog.find('.plan-icon').addClass('pro' + proPlanNum);
-    dialog.find('.plan-name').html(planName);
-    dialog.find('.plan-duration').html(planMonths);
-    dialog.find('.plan-price-euros').html(priceEuros);
-    dialog.find('.plan-price-bitcoins').html(priceBitcoins);
+        // Close dialog and reset to original dialog
+        dialog.find('.btn-close-dialog').click(function() {
+            dialogOverlay.removeClass('bitcoin-invoice-dialog').addClass('hidden');
+            dialog.removeClass('bitcoin-invoice-dialog').addClass('hidden').html(dialogOriginalHtml);
 
-    // Set countdown to price expiry
-    var countdownIntervalId = setCoundownTimer(dialog, expiryTime);
-
-    // Close dialog and reset to original dialog
-    dialog.find('.btn-close-dialog').click(function() {
-        dialogOverlay.removeClass('bitcoin-invoice-dialog').addClass('hidden');
-        dialog.removeClass('bitcoin-invoice-dialog').addClass('hidden').html(dialogOriginalHtml);
-
-        // Close Web Socket if open
-        if (chainWebSocketConn !== null) {
-            chainWebSocketConn.close();
-        }
-
-        // End countdown timer
-        clearInterval(countdownIntervalId);
-    });
-
-    // Update the dialog if a transaction is seen in the blockchain
-    checkTransactionInBlockchain(dialog, bitcoinAddress, planName, countdownIntervalId);
-}
-
-/**
- * Sets a countdown timer on the bitcoin invoice dialog to count down from 15~ minutes
- * until the bitcoin price expires and they need to restart the process
- * @param {Object} dialog The bitcoin invoice dialog
- * @param {Date} expiryTime The date/time the invoice will expire
- * @returns {Number} Returns the interval id
- */
-function setCoundownTimer(dialog, expiryTime)
-{
-    // Count down the time to price expiration
-    var countdownIntervalId = setInterval(function() {
-
-        // Show number of minutes and seconds counting down
-        var currentTimestamp = Math.round(Date.now() / 1000);
-        var difference = expiryTime - currentTimestamp;
-        var minutes = Math.floor(difference / 60);
-        var minutesPadded = (minutes < 10) ? '0' + minutes : minutes;
-        var seconds = difference - (minutes * 60);
-        var secondsPadded = (seconds < 10) ? '0' + seconds : seconds;
-
-        // If there is still time remaining
-        if (difference > 0) {
-
-            // Show full opacity when 1 minute countdown mark hit
-            if (difference <= 60) {
-                dialog.find('.clock-icon').css('opacity', 1);
-                dialog.find('.expiry-instruction').css('opacity', 1);
-                dialog.find('.time-to-expire').css('opacity', 1);
+            // Close Web Socket if open
+            if (bitcoinDialog.chainWebSocketConn !== null) {
+                bitcoinDialog.chainWebSocketConn.close();
             }
-
-            // Show time remaining
-            dialog.find('.time-to-expire').html(minutesPadded + ':' + secondsPadded);
-        }
-        else {
-            // Grey out and hide details as the price has expired
-            dialog.find('.scan-code-instruction').css('opacity', '0.25');
-            dialog.find('.btn-open-wallet').css('visibility', 'hidden');
-            dialog.find('.bitcoin-address').css('visibility', 'hidden');
-            dialog.find('.bitcoin-qr-code').css('opacity', '0.15');
-            dialog.find('.qr-code-mega-icon').hide();
-            dialog.find('.plan-icon').css('opacity', '0.25');
-            dialog.find('.plan-name').css('opacity', '0.25');
-            dialog.find('.plan-duration').css('opacity', '0.25');
-            dialog.find('.plan-price-euros').css('opacity', '0.25');
-            dialog.find('.plan-price-bitcoins').css('opacity', '0.25');
-            dialog.find('.plan-price-bitcoins-btc').css('opacity', '0.25');
-            dialog.find('.expiry-instruction').html('This purchase has expired.').css('opacity', '1');
-            dialog.find('.time-to-expire').html('00:00').css('opacity', '1');
-            dialog.find('.price-expired-instruction').show();
 
             // End countdown timer
             clearInterval(countdownIntervalId);
-        }
-    }, 1000);
+        });
 
-    return countdownIntervalId;
-}
+        // Update the dialog if a transaction is seen in the blockchain
+        bitcoinDialog.checkTransactionInBlockchain(dialog, bitcoinAddress, planName, countdownIntervalId);
+    },
+    
+    /**
+     * Renders the bitcoin QR code with highest error correction so that MEGA logo can be overlayed
+     * http://www.qrstuff.com/blog/2011/12/14/qr-code-error-correction
+     * @param {Object} dialog jQuery object of the dialog
+     * @param {String} bitcoinAddress The bitcoin address
+     * @param {String|Number} priceInBitcoins The price in bitcoins
+     */
+    generateBitcoinQrCode: function(dialog, bitcoinAddress, priceInBitcoins) {
 
-/**
- * Open WebSocket to chain.com API to monitor block chain for transactions on that receive address.
- * This will receive a faster confirmation than the action packet which waits for an IPN from the provider.
- * @param {Object} dialog The jQuery object for the dialog
- * @param {String} bitcoinAddress The bitcoin address
- * @param {String} planName The Pro plan name
- * @param {Number} countdownIntervalId The countdown timer id so it can be terminated
- */
-function checkTransactionInBlockchain(dialog, bitcoinAddress, planName, countdownIntervalId) {
+        var options = {
+            width: 256,
+            height: 256,
+            correctLevel: QRErrorCorrectLevel.H,
+            background: '#ffffff',
+            foreground: '#000',
+            text: 'bitcoin:' + bitcoinAddress + '?amount=' + priceInBitcoins
+        };
 
-    // Open socket
-    chainWebSocketConn = new WebSocket('wss://ws.chain.com/v2/notifications');
+        // Render the QR code
+        dialog.find('.bitcoin-qr-code').html('').qrcode(options);
+    },
+    
+    /**
+     * Open WebSocket to chain.com API to monitor block chain for transactions on that receive address.
+     * This will receive a faster confirmation than the action packet which waits for an IPN from the provider.
+     * @param {Object} dialog The jQuery object for the dialog
+     * @param {String} bitcoinAddress The bitcoin address
+     * @param {String} planName The Pro plan name
+     * @param {Number} countdownIntervalId The countdown timer id so it can be terminated
+     */
+    checkTransactionInBlockchain: function(dialog, bitcoinAddress, planName, countdownIntervalId) {
 
-    // Listen for events on this bitcoin address
-    chainWebSocketConn.onopen = function (event) {
-        var req = { type: 'address', address: bitcoinAddress, block_chain: 'bitcoin' };
-        chainWebSocketConn.send(JSON.stringify(req));
-    };
+        // Open socket
+        bitcoinDialog.chainWebSocketConn = new WebSocket('wss://ws.chain.com/v2/notifications');
 
-    // After receiving a response from the chain.com server
-    chainWebSocketConn.onmessage = function (event) {
+        // Listen for events on this bitcoin address
+        bitcoinDialog.chainWebSocketConn.onopen = function (event) {
+            var req = { type: 'address', address: bitcoinAddress, block_chain: 'bitcoin' };
+            bitcoinDialog.chainWebSocketConn.send(JSON.stringify(req));
+        };
 
-        // Get data from WebSocket response
-        var notification = JSON.parse(event.data);
-        var type = notification.payload.type;
-        var address = notification.payload.address;
+        // After receiving a response from the chain.com server
+        bitcoinDialog.chainWebSocketConn.onmessage = function (event) {
 
-        // Check only 'address' packets as the system also sends heartbeat packets
-        if ((type === 'address') && (address === bitcoinAddress)) {
+            // Get data from WebSocket response
+            var notification = JSON.parse(event.data);
+            var type = notification.payload.type;
+            var address = notification.payload.address;
 
-            // Update price left to pay
-            var currentPriceBitcoins = parseFloat(dialog.find('.plan-price-bitcoins').html());
-            var currentPriceSatoshis = toSatoshi(currentPriceBitcoins);
-            var satoshisReceived = notification.payload.received;
-            var priceRemainingSatoshis = currentPriceSatoshis - satoshisReceived;
-            var priceRemainingBitcoins = toBitcoinString(priceRemainingSatoshis);
+            // Check only 'address' packets as the system also sends heartbeat packets
+            if ((type === 'address') && (address === bitcoinAddress)) {
 
-            // If correct amount was received
-            if (satoshisReceived === currentPriceSatoshis) {
+                // Update price left to pay
+                var currentPriceBitcoins = parseFloat(dialog.find('.plan-price-bitcoins').html());
+                var currentPriceSatoshis = toSatoshi(currentPriceBitcoins);
+                var satoshisReceived = notification.payload.received;
+                var priceRemainingSatoshis = currentPriceSatoshis - satoshisReceived;
+                var priceRemainingBitcoins = toBitcoinString(priceRemainingSatoshis);
 
-                // Show success
-                dialog.find('.left-side').css('visibility', 'hidden');
-                dialog.find('.payment-confirmation').show();
-                dialog.find('.payment-confirmation .reg-success-icon').addClass('success');
-                dialog.find('.payment-confirmation .description').html(planName + ' plan has been paid!');
-                dialog.find('.payment-confirmation .instruction').html('Please await account upgrade by MEGA...');
-                dialog.find('.expiry-instruction').html('Paid!');
+                // If correct amount was received
+                if (satoshisReceived === currentPriceSatoshis) {
 
-                // End countdown timer and close connection
+                    // Show success
+                    dialog.find('.left-side').css('visibility', 'hidden');
+                    dialog.find('.payment-confirmation').show();
+                    dialog.find('.payment-confirmation .reg-success-icon').addClass('success');
+                    dialog.find('.payment-confirmation .description').html(planName + ' plan has been paid!');
+                    dialog.find('.payment-confirmation .instruction').html('Please await account upgrade by MEGA...');
+                    dialog.find('.expiry-instruction').html('Paid!');
+
+                    // End countdown timer and close connection
+                    clearInterval(countdownIntervalId);
+                    bitcoinDialog.chainWebSocketConn.close();
+
+                    // Inform API that we have full payment and await action packet confirmation.
+                    // a = action, vpay = verify payment, saleId = the id from the 'uts' call - this is 
+                    // an array because one day we may support multiple sales e.g. buy Pro 1 and 2 at the 
+                    // same time, add = the bitcoin address, t = payment gateway id for bitcoin provider (4)
+                    api_req({ a: 'vpay', saleid: [saleId], add: bitcoinAddress, t: 4 });
+                }
+
+                // If partial payment was made
+                else if (satoshisReceived < currentPriceSatoshis) {
+
+                    // Update price to pay
+                    dialog.find('.plan-price-bitcoins').html(priceRemainingBitcoins);
+                    dialog.find('.btn-open-wallet').attr('href', 'bitcoin:' + bitcoinAddress + '?amount=' + priceRemainingBitcoins);
+
+                    // Re-render QR code with updated price
+                    bitcoinDialog.generateBitcoinQrCode(dialog, bitcoinAddress, priceRemainingBitcoins);
+                }
+            }
+        };
+    },
+    
+    /**
+     * Sets a countdown timer on the bitcoin invoice dialog to count down from 15~ minutes
+     * until the bitcoin price expires and they need to restart the process
+     * @param {Object} dialog The bitcoin invoice dialog
+     * @param {Date} expiryTime The date/time the invoice will expire
+     * @returns {Number} Returns the interval id
+     */
+    setCoundownTimer: function(dialog, expiryTime)
+    {
+        // Count down the time to price expiration
+        var countdownIntervalId = setInterval(function() {
+
+            // Show number of minutes and seconds counting down
+            var currentTimestamp = Math.round(Date.now() / 1000);
+            var difference = expiryTime - currentTimestamp;
+            var minutes = Math.floor(difference / 60);
+            var minutesPadded = (minutes < 10) ? '0' + minutes : minutes;
+            var seconds = difference - (minutes * 60);
+            var secondsPadded = (seconds < 10) ? '0' + seconds : seconds;
+
+            // If there is still time remaining
+            if (difference > 0) {
+
+                // Show full opacity when 1 minute countdown mark hit
+                if (difference <= 60) {
+                    dialog.find('.clock-icon').css('opacity', 1);
+                    dialog.find('.expiry-instruction').css('opacity', 1);
+                    dialog.find('.time-to-expire').css('opacity', 1);
+                }
+
+                // Show time remaining
+                dialog.find('.time-to-expire').html(minutesPadded + ':' + secondsPadded);
+            }
+            else {
+                // Grey out and hide details as the price has expired
+                dialog.find('.scan-code-instruction').css('opacity', '0.25');
+                dialog.find('.btn-open-wallet').css('visibility', 'hidden');
+                dialog.find('.bitcoin-address').css('visibility', 'hidden');
+                dialog.find('.bitcoin-qr-code').css('opacity', '0.15');
+                dialog.find('.qr-code-mega-icon').hide();
+                dialog.find('.plan-icon').css('opacity', '0.25');
+                dialog.find('.plan-name').css('opacity', '0.25');
+                dialog.find('.plan-duration').css('opacity', '0.25');
+                dialog.find('.plan-price-euros').css('opacity', '0.25');
+                dialog.find('.plan-price-bitcoins').css('opacity', '0.25');
+                dialog.find('.plan-price-bitcoins-btc').css('opacity', '0.25');
+                dialog.find('.expiry-instruction').html('This purchase has expired.').css('opacity', '1');
+                dialog.find('.time-to-expire').html('00:00').css('opacity', '1');
+                dialog.find('.price-expired-instruction').show();
+
+                // End countdown timer
                 clearInterval(countdownIntervalId);
-                chainWebSocketConn.close();
-                
-                // Inform API that we have full payment and await action packet confirmation.
-                // a = action, vpay = verify payment, saleId = the id from the 'uts' call - this is 
-                // an array because one day we may support multiple sales e.g. buy Pro 1 and 2 at the 
-                // same time, add = the bitcoin address, t = payment gateway id for bitcoin provider (4)
-                api_req({ a: 'vpay', saleid: [saleId], add: bitcoinAddress, t: 4 });
             }
+        }, 1000);
 
-            // If partial payment was made
-            else if (satoshisReceived < currentPriceSatoshis) {
+        return countdownIntervalId;
+    },
+    
+    /**
+     * Show a failure dialog if the provider can't be contacted
+     */
+    showBitcoinProviderFailureDialog: function() {
 
-                // Update price to pay
-                dialog.find('.plan-price-bitcoins').html(priceRemainingBitcoins);
-                dialog.find('.btn-open-wallet').attr('href', 'bitcoin:' + bitcoinAddress + '?amount=' + priceRemainingBitcoins);
+        // Add styles for the dialog
+        var dialogOverlay = $('.fm-dialog-overlay');
+        var dialog = $('.fm-dialog.pro-register-paypal-dialog');
+        var dialogOriginalHtml = dialog.html();
 
-                // Re-render QR code with updated price
-                generateBitcoinQrCode(dialog, bitcoinAddress, priceRemainingBitcoins);
-            }
-        }
-    };
-}
+        // Add styles for the dialog
+        dialogOverlay.addClass('bitcoin-provider-failure-dialog');
+        dialog.addClass('bitcoin-provider-failure-dialog');
 
-/**
- * Renders the bitcoin QR code with highest error correction so that MEGA logo can be overlayed
- * http://www.qrstuff.com/blog/2011/12/14/qr-code-error-correction
- * @param {Object} dialog jQuery object of the dialog
- * @param {String} bitcoinAddress The bitcoin address
- * @param {String|Number} priceInBitcoins The price in bitcoins
- */
-function generateBitcoinQrCode(dialog, bitcoinAddress, priceInBitcoins) {
+        // Clone template and show failure
+        var bitcoinProviderFailureHtml = $('.bitcoin-provider-failure').html();
+        dialog.html(bitcoinProviderFailureHtml);
 
-    var options = {
-        width: 256,
-        height: 256,
-        correctLevel: QRErrorCorrectLevel.H,
-        background: "#ffffff",
-        foreground: "#000",
-        text: 'bitcoin:' + bitcoinAddress + '?amount=' + priceInBitcoins
-    };
+        // Close dialog and reset to original dialog
+        dialog.find('.btn-close-dialog').click(function() {
+            dialogOverlay.removeClass('bitcoin-provider-failure-dialog').addClass('hidden');
+            dialog.removeClass('bitcoin-provider-failure-dialog').addClass('hidden').html(dialogOriginalHtml);
+        });
+    }
+};
 
-    // Render the QR code
-    dialog.find('.bitcoin-qr-code').html('').qrcode(options);
-}
-
-/**
- * Show a failure dialog if the provider can't be contacted
- */
-function showBitcoinProviderFailureDialog() {
-
-    // Add styles for the dialog
-    var dialogOverlay = $('.fm-dialog-overlay');
-    var dialog = $('.fm-dialog.pro-register-paypal-dialog');
-    var dialogOriginalHtml = dialog.html();
-
-    // Add styles for the dialog
-    dialogOverlay.addClass('bitcoin-provider-failure-dialog');
-    dialog.addClass('bitcoin-provider-failure-dialog');
-
-    // Clone template and show failure
-    var bitcoinProviderFailureHtml = $('.bitcoin-provider-failure').html();
-    dialog.html(bitcoinProviderFailureHtml);
-
-    // Close dialog and reset to original dialog
-    dialog.find('.btn-close-dialog').click(function() {
-        dialogOverlay.removeClass('bitcoin-provider-failure-dialog').addClass('hidden');
-        dialog.removeClass('bitcoin-provider-failure-dialog').addClass('hidden').html(dialogOriginalHtml);
-    });
-}
 
 function showLoginDialog() {
     megaAnalytics.log("pro", "loginDialog");

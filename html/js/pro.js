@@ -515,6 +515,10 @@ var cardDialog = {
      */
     init: function() {
         this.showCreditCardDialog();
+        this.initCountryDropDown();
+        this.initExpiryMonthDropDown();
+        this.initExpiryYearDropDown();
+        this.initPurchaseButton();
     },
     
     /**
@@ -538,6 +542,183 @@ var cardDialog = {
             'margin-top': -1 * (this.$dialog.outerHeight() / 2)
         });
         this.$dialog.addClass('active').removeClass('hidden');
+    },
+    
+    /**
+     * Initialise functionality for the purchase button
+     */
+    initPurchaseButton: function() {
+        
+        this.$dialog.find('.payment-buy-now').click(function() {
+            
+            // Validate the form
+            if (cardDialog.billingDetailsValid()) {                
+                cardDialog.encryptBillingData();
+            }            
+        });
+    },
+    
+    /**
+     * Creates a list of country names with the ISO 3166-1-alpha-2 code as the option value
+     */
+    initCountryDropDown: function() {
+      
+        var countryOptions = '';
+        var $countriesDropDown = this.$dialog.find('.countries');
+        
+        // Build options
+        $.each(isocountries, function(isoCode, countryName) {            
+            countryOptions += '<option value="' + isoCode + '">' + countryName + '</option>';
+        });
+        
+        // Render the countries and update the text when a country is selected
+        $countriesDropDown.html(countryOptions);
+		$countriesDropDown.rebind('change', function(event)
+        {
+            var $this = $(this);
+            var countryName = $this.find(':selected').text();
+            
+            $this.parent().find('.account-select-txt').text(countryName);
+        });
+    },
+    
+    /**
+     * Creates the expiry month dropdown
+     */
+    initExpiryMonthDropDown: function() {
+        
+        var monthOptions = '';
+        var twoDigitMonth = '';
+        var $expiryMonthDropDown = this.$dialog.find('.expiry-date-month');
+        
+        // Build options
+        for (var month = 1; month <= 12; month++) {            
+            twoDigitMonth = (month < 10) ? '0' + month : month;
+            monthOptions += '<option value="' + twoDigitMonth + '">' + twoDigitMonth + '</option>';
+        }
+        
+        // Render the months and update the text when a country is selected
+        $expiryMonthDropDown.html(monthOptions);
+        $expiryMonthDropDown.rebind('change', function(event)
+        {
+            var $this = $(this);
+            var monthNum = $this.find(':selected').text();
+            
+            $this.parent().find('.account-select-txt').text(monthNum);
+        });
+    },
+    
+    /**
+     * Creates the expiry year dropdown
+     */
+    initExpiryYearDropDown: function() {
+        
+        var yearOptions = '';
+        var currentYear = new Date().getFullYear();
+        var endYear = currentYear + 7;
+        var $expiryYearDropDown = this.$dialog.find('.expiry-date-year');
+        
+        // Build options
+        for (var year = currentYear; year < endYear; year++) {
+            yearOptions += '<option value="' + year + '">' + year + '</option>';
+        }
+        
+        // Render the months and update the text when a country is selected
+        $expiryYearDropDown.html(yearOptions);
+        $expiryYearDropDown.rebind('change', function(event)
+        {
+            var $this = $(this);
+            var yearText = $this.find(':selected').text();
+            
+            $this.parent().find('.account-select-txt').text(yearText);
+        });
+    },
+    
+    /**
+     * Checks if the billing details are valid before proceeding
+     * @returns {Boolean}
+     */
+    billingDetailsValid: function() {
+        
+        // normalise data and send object to encryptBillingData function
+        
+        return true;
+    },
+    
+    /**
+     * Encrypts the billing data before sending to the API server
+     */
+    encryptBillingData: function() {
+        
+        // All payment data
+        var billingData =	{
+            'first_name': this.$dialog.find('.first-name').val(),
+            'last_name': this.$dialog.find('.last-name').val(),
+            'card_number': this.$dialog.find('.credit-card-number').val(),
+            'expiry_date_month': this.$dialog.find('.expiry-date-month').val(),
+            'expiry_date_year': this.$dialog.find('.expiry-date-year').val(),
+            'cv2': this.$dialog.find('.cvv-code').val(),
+            'address1': this.$dialog.find('.address1').val(),
+            'address2': this.$dialog.find('.address2').val(),
+            'city': this.$dialog.find('.city').val(),
+            'province': this.$dialog.find('.state-province').val(),
+            'postal_code': this.$dialog.find('.post-code').val(),
+            'country_code': this.$dialog.find('.countries').val()
+        };
+
+        // Data to be hashed
+        var cardData = {
+            'card_number': billingData.card_number,
+            'expiry_date_month': billingData.expiry_date_month,
+            'expiry_date_year': billingData.expiry_date_year,
+            'cv2': billingData.cv2       
+        };
+        
+        // Get last 4 digits of card number
+        var cardNumberLength = cardData.card_number.length;
+        var lastFourCardDigits = cardData.card_number.substr(cardNumberLength - 4);
+        
+        // Hash the card data so users can identify their cards later in our system if they 
+        // get locked out or something. It must be unique and able to be derived again.
+        var cardDataHash = sjcl.hash.sha256.hash(cardData);
+        var cardDataHashHex = sjcl.codec.hex.fromBits(cardDataHash);
+        
+        // Load a public key up somehow. This is the current test one.
+        // Guy STRONGLY recommends loading this from somewhere external e.g. a json file.
+        var PUBKEY = [
+            base64urldecode('plp2MuzOXah-7Iaq4-IxEX4YQn86FObg8nAKH9aPCch7vxeO29GgA'
+                            + 'fSoSrCFSr_dJ27nmu8BrlrHNKcZa0eZCjp6jBHCEKy8rBbqUpXq'
+                            + 'sIpSIKeTFAb5D03bJ9tkHPUJXcJqf3GwTVX061FRUon79EIw525'
+                            + 'e7fbCxeRoBTH2IVqjMQK9w99O9nEBfXk2wywmzw-0awr1Ik3aiN'
+                            + 'W0-_Xv9fO2EswnY3lav7WW-WJ4Szx5YDUH35hSY-NYrUsKaqxGD'
+                            + 'fHuZCL7BCDaR4i7VyCAQZ5XejWbueVN-7B3mJJ-TwenDIt2RJvd'
+                            + 'LiAezE-Qsh2C2hGyfUZMyTUXMSQAtsOApw'),
+            "\u0000\u0001\u0000\u0001", 2048
+        ];
+
+        // Comes back as byte string, so encode first.
+        var jsonEncodedBillingData = JSON.stringify(billingData);
+        var encryptedBillingData = btoa(paycrypt.hybridEncrypt(jsonEncodedBillingData, PUBKEY));
+
+        console.log('zzzz billingData', billingData);
+        console.log('zzzz cardData', cardData);
+
+        // Add credit card, the most recently added card is used by default
+        api_req({ 
+                'a': 'ccs',                          // Credit Card Store
+                'cc': encryptedBillingData,
+                'last4': lastFourCardDigits,
+                'expm': cardData.expiry_date_month,
+                'expy': cardData.expiry_date_year, 
+                'hash': cardDataHashHex
+            },
+            {
+                callback : function (res) { 
+                    console.log('zzzz', res);
+                    // pro_pay()
+                }
+            }
+        );
     }
 };
 
@@ -606,6 +787,7 @@ var bitcoinDialog = {
 
         // Close dialog and reset to original dialog
         dialog.find('.btn-close-dialog').click(function() {
+            
             dialogOverlay.removeClass('bitcoin-invoice-dialog').addClass('hidden');
             dialog.removeClass('bitcoin-invoice-dialog').addClass('hidden').html(dialogOriginalHtml);
 

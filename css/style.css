@@ -1683,7 +1683,7 @@ a.blog-button:hover {
 	background-position: -10px -153px;
 }
 .nt-payment-notification .notification-avatar-icon {
-	background: url(../images/mega/bitcoin-v1.png) -152px -650px no-repeat;
+	background: url(../images/mega/bitcoin-v4.png) -152px -650px no-repeat;
 	height: 48px;
 	width: 48px;
 	left: 0;
@@ -9724,7 +9724,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
 	width: 256px;
 }
 .bitcoin-invoice-dialog .qr-code-mega-icon {
-	background: url(../images/mega/bitcoin-v1.png) 0 -650px no-repeat;
+	background: url(../images/mega/bitcoin-v4.png) 0 -650px no-repeat;
 	display: none;
 	height: 40.5px;
 	left: 143.5px;
@@ -9869,7 +9869,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
 	padding-right: 5px;
 	width: 15px;
 	height: 15px;
-	background: url(../images/mega/bitcoin-v1.png) 0 -786px no-repeat;
+	background: url(../images/mega/bitcoin-v4.png) 0 -786px no-repeat;
 }
 .bitcoin-invoice-dialog .clock-icon::before {
 	content: '\00a0';
@@ -22410,9 +22410,12 @@ a.top-login-forgot-pass {
 	cursor: pointer;
 }
 .pro-register-paypal-dialog .reg-success-icon, .payment-confirmation .icon {
-	background: url(../images/mega/bitcoin-icon@2x.png) 0 0 no-repeat;
+	background: url(../images/mega/bitcoin-icon@2x.png) 0 5px no-repeat;
 	width: 200px;
 	height: 200px;
+}
+.pro-register-paypal-dialog .reg-success-icon.unionpay, .payment-confirmation .icon.unionpay {
+	background-position: center -846px;
 }
 /* logged in PRO account, but not activated */
 .top-warning-popup.not-activated {
@@ -23050,7 +23053,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 }
  @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
 .pro-register-paypal-dialog .reg-success-icon, .payment-confirmation .icon, .bitcoin-invoice-dialog .qr-code-mega-icon, .bitcoin-invoice-dialog .clock-icon, .nt-payment-notification .notification-avatar-icon {
- background-image: url(../images/mega/bitcoin-v1@2x.png);
+ background-image: url(../images/mega/bitcoin-v4@2x.png);
  background-size: 200px auto;
 }
 .fm-chat-smile {

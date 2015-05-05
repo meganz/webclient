@@ -534,7 +534,7 @@ var cardDialog = {
         this.$dialogOverlay = $('.fm-dialog-overlay');
         
         // Add the styling for the overlay
-        this.$dialogOverlay.removeClass('hidden').addClass('.payment-dialog-overlay');
+        this.$dialogOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
         
         // Position the dialog and open it
         this.$dialog.css({

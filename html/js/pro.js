@@ -1,6 +1,6 @@
 var pro_package,
     pro_balance = 0,
-    pro_paymentmethod,
+    pro_paymentmethod = '',
     pro_m,
     account_type_num,
     pro_usebalance = false,
@@ -136,19 +136,27 @@ function populateMembershipPlans() {
 function loadPaymentGatewayOptions() {
 
     // Payment gateways, hardcoded for now, will call API in future to get list
-    var gatewayOptions = [{
-        apiGatewayId: 4,                // Bitcoin provider
-        displayName: l[6802],           // Bitcoin
-        supportsRecurring: false,
-        cssClass: 'bitcoin',
-        providerName: l[6802]
-    },
+    var gatewayOptions = [  
     {
         apiGatewayId: null,
         displayName: l[504],            // Prepaid balance
         supportsRecurring: false,
         cssClass: 'prepaid-balance',
         providerName: l[504]
+    },
+    {
+        apiGatewayId: 8,                // Perfunctio
+        displayName: 'Credit card',     // Credit card
+        supportsRecurring: false,
+        cssClass: 'credit-card',
+        providerName: l[6802]
+    },
+    {
+        apiGatewayId: 4,                // Bitcoin provider
+        displayName: l[6802],           // Bitcoin
+        supportsRecurring: false,
+        cssClass: 'bitcoin',
+        providerName: l[6802]
     }];
     var html = '';
 
@@ -172,7 +180,7 @@ function loadPaymentGatewayOptions() {
         // Create a radio button with icon for each payment gateway
         html += '<div class="payment-method">'
              +      '<div class="membership-radio' + classChecked + '">'
-             +          '<input type="radio" name="' + gatewayOption.cssClass + '" id="' + gatewayOption.cssClass + '" ' + optionChecked + 'disabled="disabled" />'
+             +          '<input type="radio" name="' + gatewayOption.cssClass + '" id="' + gatewayOption.cssClass + '" ' + optionChecked + 'disabled="disabled" value="' + gatewayOption.cssClass + '" />'
              +          '<div></div>'
              +      '</div>'
              +      '<div class="membership-radio-label ' + gatewayOption.cssClass + '">'
@@ -197,13 +205,13 @@ function initPaymentMethodRadioOptions(html) {
 
         // Remove checked state from all radio inputs
         paymentOptionsList.find('.membership-radio').removeClass('checked');
-        paymentOptionsList.find('input').removeAttr('checked');
+        paymentOptionsList.find('input').prop('checked', false);
 
         var $this = $(this);
         var $bitcoinInstructions = $('.membership-center p');
 
         // Add checked state for this radio button
-        $this.find('input').attr('checked', 'checked');
+        $this.find('input').prop('checked', true);
         $this.find('.membership-radio').addClass('checked');
 
         // Hide instructions below the purchase button if other option is selected
@@ -345,7 +353,10 @@ function renderPlanDurationDropDown() {
 
 function pro_continue(e)
 {
+    // Selected payment method and package
+    var selectedPaymentMethod = $('.membership-radio input:checked').val();
     var selectedProPackageIndex = $('.membership-dropdown-item.selected').attr('data-plan-index');
+    var prepaidMethodSelected = (selectedPaymentMethod === 'prepaid-balance') ? true : false;
 
     // Set the pro package (used in pro_pay function)
     selectedProPackage = membershipPlans[selectedProPackageIndex];
@@ -360,12 +371,6 @@ function pro_continue(e)
     else {
         pro_package = 'pro' + account_type_num + '_year';
     }
-
-    pro_paymentmethod = '';
-
-    // Check if prepaid balance method is selected
-    var prepaidMethodSelected = $('#prepaid-balance').attr('checked');
-        prepaidMethodSelected = (prepaidMethodSelected === 'checked') ? true : false;
 
     if (u_type === false)
     {
@@ -395,7 +400,16 @@ function pro_continue(e)
         });
     }
     else {
-        pro_pay();
+        pro_paymentmethod = selectedPaymentMethod;
+        
+        // For credit card we show the dialog first, then do the uts/utc calls
+        if (pro_paymentmethod === 'credit-card') {
+            cardDialog.init();
+        }
+        else {
+            // For other methods we do a uts and utc call to get the provider details first
+            pro_pay();
+        }
     }
 }
 
@@ -404,11 +418,11 @@ function pro_pay()
     var aff = 0;
     if (localStorage.affid && localStorage.affts > new Date().getTime()-86400000) aff = localStorage.affid;
 
-    // Only show loading dialog if needing to redirect or setup bitcoin invoice
-    if (!ul_uploading && !downloading && (pro_paymentmethod !== 'pro_prepaid')) {
+    // Only show loading dialog if needing to setup bitcoin invoice
+    if (!ul_uploading && !downloading && (pro_paymentmethod === 'bitcoin')) {
         showLoadingDialog();
     }
-
+    
     // Data for API request
     var apiId = selectedProPackage[0];
     var price = selectedProPackage[5];
@@ -428,13 +442,16 @@ function pro_pay()
             }
             else
             {
-                if (pro_paymentmethod == 'pro_voucher' || pro_paymentmethod == 'pro_prepaid') {
+                if (pro_paymentmethod === 'pro_voucher' || pro_paymentmethod === 'pro_prepaid') {
                     pro_m = 0;
                 }
-                else {
-                    // Bitcoin provider
+                else if (pro_paymentmethod === 'bitcoin') {
                     pro_m = 4;
                 }
+                else if (pro_paymentmethod === 'credit-card') {
+                    pro_m = 8;
+                }
+                
 
                 var proref = '';
                 if (sessionStorage.proref) {
@@ -468,11 +485,14 @@ function pro_pay()
                         }
                         else {
                             // If Bitcoin provider then show the Bitcoin invoice dialog
-                            if ((pro_m >= 4) && res && res.EUR) {
+                            if ((pro_m === 4) && res && res.EUR) {
                                 showBitcoinInvoice(res.EUR);
                             }
-                            else {
+                            else if ((pro_m === 4) && (!res || !res.EUR)) {
                                 showBitcoinProviderFailureDialog();
+                            }
+                            else if ((pro_m === 8) && res && res.EUR) {
+                                alert('show cc dialog');
                             }
                         }
                     }
@@ -481,6 +501,48 @@ function pro_pay()
         }
     });
 }
+
+var cardDialog = {
+    
+    $dialog: null,
+    $dialogOverlay: null,
+    
+    /**
+     * Open and setup the dialog
+     */
+    init: function() {
+        this.showCreditCardDialog();
+    },
+    
+    /**
+     * Display the dialog
+     */
+    showCreditCardDialog: function() {
+    
+        // Close the pro register dialog if it's already open
+        $('.pro-register-dialog').removeClass('active').addClass('hidden');
+        
+        // Cache DOM reference for lookup in other functions
+        this.$dialog = $('.fm-dialog.payment-dialog');
+        this.$dialogOverlay = $('.fm-dialog-overlay');
+        
+        // Add the styling for the overlay
+        this.$dialogOverlay.removeClass('hidden').addClass('.payment-dialog-overlay');
+        
+        // Position the dialog and open it
+        this.$dialog.css({
+            'margin-left': -1 * (this.$dialog.outerWidth() / 2),
+            'margin-top': -1 * (this.$dialog.outerHeight() / 2)
+        });
+        this.$dialog.addClass('active').removeClass('hidden');
+    }
+};
+
+var bitcoinDialog = {
+    
+    
+    
+};
 
 // Web socket for chain.com connection to monitor bitcoin payment
 var chainWebSocketConn = null;

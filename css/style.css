@@ -22926,7 +22926,138 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 	background-color: rgba(0,0,0,0.05);
 }
 /* end of CC payment dialog */
-
+.payment-animation-pad {
+	width: 100%;
+	position: absolute;
+	top: 50%;
+	margin: -82px 0 0 0;
+	text-align: center;
+	z-index: 1100;
+}
+.payment-animation {
+	width: 146px;
+	height: 164px;
+	display: inline-block;
+	background-image: url(../images/mega/payment-animation.gif);
+	background-position: 0 0;
+	background-repeat: no-repeat;
+}
+.payment-animation-txt {
+	padding: 45px 0 0 0;
+	color: white;
+	font-size: 20px;
+	line-height: 24px;
+	font-family: 'source_sans_proregular', Arial
+}
+.payment-result-pad {
+	position: absolute;
+	width: 100%;
+	text-align: center;
+	top: 50%;
+	margin: -172px 0 0 0;
+	z-index: 2200;
+}
+.payment-rusult-header, .payment-result-txt {
+	font-size: 32px;
+	font-family: 'source_sans_prolight';
+	line-height: 34px;
+	color: white;
+	padding-bottom: 17px;
+}
+.payment-result-txt {
+	font-size: 14px;
+	padding-bottom: 35px;
+}
+.failed .payment-result-txt {
+	padding-bottom: 39px;
+}
+.payment-result-icon {
+	width: 130px;
+	height: 130px;
+	margin: 0 auto;
+	background: url(../images/mega/bitcoin-v4.png) -33px -1048px no-repeat;
+	margin-bottom: 47px;
+}
+.failed .payment-result-icon {
+	background-position: -24px -1222px;
+	width: 150px;
+	margin-bottom: 43px;
+}
+.payment-result-button {
+	display: inline-block;
+	min-width: 240px;
+	font-size: 16px;
+	padding: 0 15px;
+	height: 48px;
+	border: 2px solid rgba(19,224,60,0.7);
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	border-radius: 8px;
+	color: rgba(19,224,60,1);
+	line-height: 44px;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	font-family: 'source_sans_proregular';
+	-webkit-transition: all 200ms ease-in-out;
+	-moz-transition: all 200ms ease-in-out;
+	-o-transition: all 200ms ease-in-out;
+	-ms-transition: all 200ms ease-in-out;
+	transition: all 200ms ease-in-out;
+	cursor: pointer;
+	text-transform: uppercase;
+}
+.payment-result-button:hover {
+	color: #2e2e2e;
+	background-color: rgba(19,224,60,1);
+	border-color: rgba(19,224,60,1);
+}
+.failed .payment-result-button {
+	color: rgba(255,211,0,1);
+	border: 2px solid rgba(255,211,0,0.7);
+}
+.failed .payment-result-button:hover {
+	color: #2e2e2e;
+	background-color: rgba(255,211,0,1);
+	border-color: rgba(255,211,0,1);
+}
+.payment-close {
+	width: 50px;
+	position: absolute;
+	z-index: 2300;
+	top: 14px;
+	right: 0;
+}
+.payment-close-icon {
+	background: url(../images/mega/bitcoin-v4.png) -183px -791px no-repeat;
+	width: 20px;
+	height: 20px;
+	margin: 0 auto;
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
+	-moz-opacity: 0.7;
+	-khtml-opacity: 0.7;
+	opacity: 0.7;
+	-webkit-transition: all 200ms ease-in-out;
+	-moz-transition: all 200ms ease-in-out;
+	-o-transition: all 200ms ease-in-out;
+	-ms-transition: all 200ms ease-in-out;
+	transition: all 200ms ease-in-out;
+	cursor: pointer;
+}
+.payment-close-icon:hover {
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+	-moz-opacity: 1;
+	-khtml-opacity: 1;
+	opacity: 1;
+}
+.payment-close span {
+	display: block;
+	text-align: center;
+	font-size: 12px;
+	color: rgba(255,255,255,0.3);
+	padding-top: 2px;
+	font-family: 'source_sans_proregular';
+}
  @media only screen and (max-width: 1593px) {
 .download-mid-centered-block {
 	min-width: 648px;
@@ -23052,7 +23183,11 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 }
 }
  @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
-.pro-register-paypal-dialog .reg-success-icon, .payment-confirmation .icon, .bitcoin-invoice-dialog .qr-code-mega-icon, .bitcoin-invoice-dialog .clock-icon, .nt-payment-notification .notification-avatar-icon {
+ .payment-animation {
+ background-image:url(../images/mega/payment-animation@2x.gif);
+background-size:146px auto;
+}
+.pro-register-paypal-dialog .reg-success-icon, .payment-confirmation .icon, .bitcoin-invoice-dialog .qr-code-mega-icon, .bitcoin-invoice-dialog .clock-icon, .nt-payment-notification .notification-avatar-icon, .payment-result-icon, .payment-close-icon {
  background-image: url(../images/mega/bitcoin-v4@2x.png);
  background-size: 200px auto;
 }

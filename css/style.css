@@ -23058,6 +23058,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 	padding-top: 2px;
 	font-family: 'source_sans_proregular';
 }
+body.pro:after {
+	display: none;
+	content: url(../images/mega/payment-animation.gif);
+}
  @media only screen and (max-width: 1593px) {
 .download-mid-centered-block {
 	min-width: 648px;
@@ -23183,6 +23187,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 }
 }
  @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
+body.pro:after {
+ content: url(../images/mega/payment-animation@2x.gif);
+}
  .payment-animation {
  background-image:url(../images/mega/payment-animation@2x.gif);
 background-size:146px auto;

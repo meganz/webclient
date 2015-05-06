@@ -34,6 +34,7 @@ var authring = (function () {
      */
     var ns = {};
     var logger = MegaLogger.getLogger('authring');
+    ns._logger = logger;
 
     /**
      * "Enumeration" of authentication methods. The values in here must fit
@@ -189,24 +190,23 @@ var authring = (function () {
                                           false, true);
         return thePromise.then(
             // Function on fulfilment.
-            function(result, ctx) {
+            function(result) {
                 if (typeof result !== 'number') {
                     // Authring is in the empty-name record.
                     u_authring[keyType] = ns.deserialise(result['']);
                     logger.debug('Got authentication ring for key type '
                                  + keyType + '.');
-                    thePromise.resolve(u_authring[keyType], ctx);
+                    return u_authring[keyType];
                 } else {
                     logger.error('Error retrieving authentication ring for key type '
                                  + keyType + ': ' + result);
-                    thePromise.reject(result, ctx);
+                    thePromise.reject(result);
                 }
             },
             // Function on rejection.
-            function(result, ctx) {
+            function(result) {
                 logger.error('Error retrieving authentication ring for key type '
                              + keyType + ': ' + result);
-                thePromise.reject(result, ctx);
             }
         );
     };

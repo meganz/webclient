@@ -106,30 +106,36 @@ describe("authring unit test", function() {
     describe('getting/setting u_authring.Ed25519', function() {
         describe('getContacts()', function() {
             it("API error", function() {
-                sandbox.stub(window.console, 'error');
+                sandbox.stub(ns._logger, '_log');
                 sandbox.stub(u_authring, 'Ed25519', undefined);
-                sandbox.stub(window, 'getUserAttribute').returns(new MegaPromise());
+                var attributePromise = { then: sinon.stub(),
+                                         reject: sinon.stub() };
+                sandbox.stub(window, 'getUserAttribute').returns(attributePromise);
                 var aPromise = ns.getContacts('Ed25519');
                 assert.strictEqual(getUserAttribute.callCount, 1);
                 assert.lengthOf(getUserAttribute.args[0], 4);
                 assert.strictEqual(getUserAttribute.args[0][1], 'authring');
-                aPromise.resolve(-3);
+                var callback = attributePromise.then.args[0][0];
+                callback(-3);
                 assert.strictEqual(u_authring.Ed25519, undefined);
-                assert.strictEqual(console.error.args[0][2],
+                assert.strictEqual(ns._logger._log.args[0][1][0],
                     'Error retrieving authentication ring for key type Ed25519: -3');
             });
 
             it("through API", function() {
-                sandbox.stub(window.console, 'debug');
+                sandbox.stub(ns._logger, '_log');
                 sandbox.stub(u_authring, 'Ed25519', undefined);
-                sandbox.stub(window, 'getUserAttribute').returns(new MegaPromise());
+                var attributePromise = { then: sinon.stub(),
+                                         resolve: sinon.stub() };
+                sandbox.stub(window, 'getUserAttribute').returns(attributePromise);
                 var aPromise = ns.getContacts('Ed25519');
                 assert.strictEqual(getUserAttribute.callCount, 1);
                 assert.lengthOf(getUserAttribute.args[0], 4);
                 assert.strictEqual(getUserAttribute.args[0][1], 'authring');
-                aPromise.resolve({'': SERIALISED_RING_ED25519});
+                var callback = attributePromise.then.args[0][0];
+                callback({ '': SERIALISED_RING_ED25519 });
                 assert.deepEqual(u_authring.Ed25519, RING_ED25519);
-                assert.strictEqual(console.debug.args[0][2],
+                assert.strictEqual(ns._logger._log.args[0][1][0],
                     'Got authentication ring for key type Ed25519.');
             });
 
@@ -139,16 +145,19 @@ describe("authring unit test", function() {
             });
 
             it("authring for RSA", function() {
-                sandbox.stub(window.console, 'debug');
+                sandbox.stub(ns._logger, '_log');
                 sandbox.stub(u_authring, 'RSA', undefined);
-                sandbox.stub(window, 'getUserAttribute').returns(new MegaPromise());
+                var attributePromise = { then: sinon.stub(),
+                                         resolve: sinon.stub() };
+                sandbox.stub(window, 'getUserAttribute').returns(attributePromise);
                 var aPromise = ns.getContacts('RSA');
                 assert.strictEqual(getUserAttribute.callCount, 1);
                 assert.lengthOf(getUserAttribute.args[0], 4);
                 assert.strictEqual(getUserAttribute.args[0][1], 'authRSA');
-                aPromise.resolve({'': SERIALISED_RING_RSA});
+                var callback = attributePromise.then.args[0][0];
+                callback({ '': SERIALISED_RING_RSA });
                 assert.deepEqual(u_authring.RSA, RING_RSA);
-                assert.strictEqual(console.debug.args[0][2],
+                assert.strictEqual(ns._logger._log.args[0][1][0],
                     'Got authentication ring for key type RSA.');
             });
         });
@@ -461,7 +470,7 @@ describe("authring unit test", function() {
     describe('authentication system start', function() {
         describe('setUpAuthenticationSystem()', function() {
             it('all from scratch', function() {
-                sandbox.stub(console, 'debug');
+                sandbox.stub(ns._logger, '_log');
                 sandbox.stub(jodid25519.eddsa, 'generateKeySeed').returns('foo');
                 sandbox.stub(jodid25519.eddsa, 'publicKey').returns('bar');
                 sandbox.stub(window, 'u_attr', {});
@@ -489,7 +498,7 @@ describe("authring unit test", function() {
                 assert.lengthOf(MegaPromise.allDone.args[0], 1);
                 assert.lengthOf(MegaPromise.allDone.args[0][0], 5);
                 assert.strictEqual(result, 'blah');
-                assert.strictEqual(console.debug.args[0][2],
+                assert.strictEqual(ns._logger._log.args[0][1][0],
                                    'Setting up authentication system (Ed25519 keys, RSA pub key signature).');
             });
         });
@@ -508,8 +517,7 @@ describe("authring unit test", function() {
             });
 
             it('outdated key', function() {
-                sandbox.stub(console, 'info');
-                sandbox.stub(console, 'debug');
+                sandbox.stub(ns._logger, '_log');
                 var getAttributePromise = { then: sinon.stub(),
                                             resolve: sinon.stub() };
                 sandbox.stub(window, 'getUserAttribute').returns(getAttributePromise);
@@ -524,15 +532,14 @@ describe("authring unit test", function() {
                 var setCallback = setAttributePromise.then.args[0][0];
                 setCallback('foo', 'you456789xw');
                 assert.strictEqual(getAttributePromise.resolve.callCount, 1);
-                assert.strictEqual(console.info.args[0][2],
+                assert.strictEqual(ns._logger._log.args[0][1][0],
                                    'Need to update Ed25519 pub key.');
-                assert.strictEqual(console.debug.args[0][2],
+                assert.strictEqual(ns._logger._log.args[1][1][0],
                                    'Ed25519 pub key updated.');
             });
 
             it('getting key fails', function() {
-                sandbox.stub(console, 'warn');
-                sandbox.stub(console, 'debug');
+                sandbox.stub(ns._logger, '_log');
                 var getAttributePromise = { then: sinon.stub(),
                                             resolve: sinon.stub() };
                 sandbox.stub(window, 'getUserAttribute').returns(getAttributePromise);
@@ -545,15 +552,14 @@ describe("authring unit test", function() {
                 var setCallback = setAttributePromise.then.args[0][0];
                 setCallback('foo', 'you456789xw');
                 assert.strictEqual(getAttributePromise.resolve.callCount, 1);
-                assert.strictEqual(console.warn.args[0][2],
+                assert.strictEqual(ns._logger._log.args[0][1][0],
                                    'Could not get my Ed25519 pub key, setting it now.');
-                assert.strictEqual(console.debug.args[0][2],
+                assert.strictEqual(ns._logger._log.args[1][1][0],
                                    'Ed25519 pub key updated.');
             });
 
             it('key update fails', function() {
-                sandbox.stub(console, 'info');
-                sandbox.stub(console, 'error');
+                sandbox.stub(ns._logger, '_log');
                 var getAttributePromise = { then: sinon.stub(),
                                             reject: sinon.stub() };
                 sandbox.stub(window, 'getUserAttribute').returns(getAttributePromise);
@@ -568,9 +574,9 @@ describe("authring unit test", function() {
                 var setCallback = setAttributePromise.then.args[0][1];
                 setCallback('foo', 'you456789xw');
                 assert.strictEqual(getAttributePromise.reject.callCount, 1);
-                assert.strictEqual(console.info.args[0][2],
+                assert.strictEqual(ns._logger._log.args[0][1][0],
                                    'Need to update Ed25519 pub key.');
-                assert.strictEqual(console.error.args[0][2],
+                assert.strictEqual(ns._logger._log.args[1][1][0],
                                    'Error updating Ed25519 pub key.');
             });
         });
@@ -609,7 +615,7 @@ describe("authring unit test", function() {
             it('missing keyring, auth system setup succeeds', function() {
                 sandbox.stub(authring, 'getContacts');
                 sandbox.stub(MegaPromise, 'allDone');
-                sandbox.stub(console, 'warn');
+                sandbox.stub(ns._logger, '_log');
                 var getAttributePromise = { then: sinon.stub(),
                                             resolve: sinon.stub() };
                 sandbox.stub(window, 'getUserAttribute').returns(getAttributePromise);
@@ -621,7 +627,7 @@ describe("authring unit test", function() {
                 getCallback(-9, 'foo');
                 var setupAuthCallback = setupAuthPromise.then.args[0][0];
                 setupAuthCallback(true, 'foo');
-                assert.strictEqual(console.warn.args[0][2],
+                assert.strictEqual(ns._logger._log.args[0][1][0],
                                    'Authentication system seems unavailable.');
                 assert.strictEqual(ns.setUpAuthenticationSystem.callCount, 1);
                 assert.strictEqual(getAttributePromise.resolve.callCount, 1);
@@ -630,7 +636,7 @@ describe("authring unit test", function() {
             it('missing keyring, auth system setup fails', function() {
                 sandbox.stub(authring, 'getContacts');
                 sandbox.stub(MegaPromise, 'allDone');
-                sandbox.stub(console, 'warn');
+                sandbox.stub(ns._logger, '_log');
                 var getAttributePromise = { then: sinon.stub(),
                                             reject: sinon.stub() };
                 sandbox.stub(window, 'getUserAttribute').returns(getAttributePromise);
@@ -642,7 +648,7 @@ describe("authring unit test", function() {
                 getCallback(-9, 'foo');
                 var setupAuthCallback = setupAuthPromise.then.args[0][1];
                 setupAuthCallback(false, 'foo');
-                assert.strictEqual(console.warn.args[0][2],
+                assert.strictEqual(ns._logger._log.args[0][1][0],
                                    'Authentication system seems unavailable.');
                 assert.strictEqual(ns.setUpAuthenticationSystem.callCount, 1);
                 assert.strictEqual(getAttributePromise.reject.callCount, 1);
@@ -651,14 +657,14 @@ describe("authring unit test", function() {
             it('keyring get rejected', function() {
                 sandbox.stub(authring, 'getContacts');
                 sandbox.stub(MegaPromise, 'allDone');
-                sandbox.stub(console, 'error');
+                sandbox.stub(ns._logger, '_log');
                 var getAttributePromise = { then: sinon.stub(),
                                             reject: sinon.stub() };
                 sandbox.stub(window, 'getUserAttribute').returns(getAttributePromise);
                 var collectivePromise = ns.initAuthenticationSystem();
                 var getCallback = getAttributePromise.then.args[0][1];
                 getCallback('foo', 'bar');
-                assert.strictEqual(console.error.args[0][2],
+                assert.strictEqual(ns._logger._log.args[0][1][0],
                                    'Error retrieving Ed25519 authentication ring: foo');
                 assert.strictEqual(getAttributePromise.reject.callCount, 1);
             });

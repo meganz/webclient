@@ -451,7 +451,6 @@ function pro_pay()
                 else if (pro_paymentmethod === 'credit-card') {
                     pro_m = 8;
                 }
-                
 
                 var proref = '';
                 if (sessionStorage.proref) {
@@ -493,6 +492,7 @@ function pro_pay()
                             }
                             else if ((pro_m === 8) && res && res.EUR) {
                                 // Pay for credit card
+                                console.log('zzzz credit card res', res);
                             }
                         }
                     }
@@ -509,6 +509,17 @@ var cardDialog = {
     
     $dialog: null,
     $dialogOverlay: null,
+    
+    // The public key for the Secure Processing Machine (SPM)
+    publicKey: [atob(
+        "wfvbeFkjArOsHvAjXAJqve/2z/nl2vaZ+0sBj8V6U7knIow6y3/6KJ"
+      + "3gkJ50QQ7xDDakyt1C49UN27e+e0kCg2dLJ428JVNvw/q5AQW41"
+      + "grPkutUdFZYPACOauqIsx9KY6Q3joabL9g1JbwmuB44Mv20aV/L"
+      + "/Xyb2yiNm09xlyVhO7bvJ5Sh4M/EOzRN2HI+V7lHwlhoDrzxgQv"
+      + "vKjzsoPfFZaMud742tpgY8OMnKHcfmRQrfIvG/WfCqJ4ETETpr6"
+      + "AeI2PIHsptZgOYkkrDK6Bi8qb/T7njk32ZRt1E6Q/N7+hd8PLhh"
+      + "2PaYRWfpNiWwnf/rPu4MnwRE6T77s/qGQ=="),
+        "\u0001\u0000\u0001", 2048],
     
     /**
      * Open and setup the dialog
@@ -542,6 +553,33 @@ var cardDialog = {
             'margin-top': -1 * (this.$dialog.outerHeight() / 2)
         });
         this.$dialog.addClass('active').removeClass('hidden');
+        
+        // Get the selected Pro plan details
+        var proNum = selectedProPackage[1];
+        var proPlan = getProPlan(proNum);
+        var proPrice = selectedProPackage[5];
+        var numOfMonths = selectedProPackage[4];
+        var monthsWording = l[922];     // 1 month
+
+        // Change wording depending on number of months
+        if (numOfMonths === 12) {
+            monthsWording = l[923];     // 1 year
+        }
+        else if (numOfMonths > 1) {
+            monthsWording = l[6803].replace('%1', numOfMonths);     // x months
+        }
+        
+        // Update the Pro plan details
+        this.$dialog.find('.plan-icon').removeClass('pro1 pro2 pro3 pro4').addClass('pro' + proNum);
+        this.$dialog.find('.payment-plan-title').html(proPlan);
+        this.$dialog.find('.payment-plan-price').html(proPrice + '&euro;');
+        this.$dialog.find('.payment-plan-txt').html(monthsWording + ' (recurring)');
+        
+        // Initialise the close button
+        this.$dialog.find('.btn-close-dialog').click(function() {
+            cardDialog.$dialogOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+            cardDialog.$dialog.removeClass('active').addClass('hidden');
+        });
     },
     
     /**
@@ -551,9 +589,11 @@ var cardDialog = {
         
         this.$dialog.find('.payment-buy-now').click(function() {
             
-            // Validate the form
-            if (cardDialog.billingDetailsValid()) {                
-                cardDialog.encryptBillingData();
+            // Validate the form and normalise the billing details
+            var billingDetails = cardDialog.getBillingDetails();
+            
+            if (billingDetails !== false) {                
+                cardDialog.encryptBillingData(billingDetails);
             }            
         });
     },
@@ -563,7 +603,7 @@ var cardDialog = {
      */
     initCountryDropDown: function() {
       
-        var countryOptions = '';
+        var countryOptions = '<option value=""></option>';
         var $countriesDropDown = this.$dialog.find('.countries');
         
         // Build options
@@ -576,8 +616,7 @@ var cardDialog = {
 		$countriesDropDown.rebind('change', function(event)
         {
             var $this = $(this);
-            var countryName = $this.find(':selected').text();
-            
+            var countryName = $this.find(':selected').text();            
             $this.parent().find('.account-select-txt').text(countryName);
         });
     },
@@ -587,8 +626,8 @@ var cardDialog = {
      */
     initExpiryMonthDropDown: function() {
         
-        var monthOptions = '';
         var twoDigitMonth = '';
+        var monthOptions = '<option value=""></option>';
         var $expiryMonthDropDown = this.$dialog.find('.expiry-date-month');
         
         // Build options
@@ -602,8 +641,7 @@ var cardDialog = {
         $expiryMonthDropDown.rebind('change', function(event)
         {
             var $this = $(this);
-            var monthNum = $this.find(':selected').text();
-            
+            var monthNum = $this.find(':selected').text();            
             $this.parent().find('.account-select-txt').text(monthNum);
         });
     },
@@ -613,7 +651,7 @@ var cardDialog = {
      */
     initExpiryYearDropDown: function() {
         
-        var yearOptions = '';
+        var yearOptions = '<option value=""></option>';
         var currentYear = new Date().getFullYear();
         var endYear = currentYear + 7;
         var $expiryYearDropDown = this.$dialog.find('.expiry-date-year');
@@ -628,44 +666,63 @@ var cardDialog = {
         $expiryYearDropDown.rebind('change', function(event)
         {
             var $this = $(this);
-            var yearText = $this.find(':selected').text();
-            
+            var yearText = $this.find(':selected').text();            
             $this.parent().find('.account-select-txt').text(yearText);
         });
     },
     
     /**
      * Checks if the billing details are valid before proceeding
+     * Also normalise the data to remove inconsistencies
      * @returns {Boolean}
      */
-    billingDetailsValid: function() {
+    getBillingDetails: function() {
         
-        // normalise data and send object to encryptBillingData function
+        // All payment data
+        var billingData =	{
+            first_name: this.$dialog.find('.first-name').val(),
+            last_name: this.$dialog.find('.last-name').val(),
+            card_number: this.$dialog.find('.credit-card-number').val(),
+            expiry_date_month: this.$dialog.find('.expiry-date-month').val(),
+            expiry_date_year: this.$dialog.find('.expiry-date-year').val(),
+            cv2: this.$dialog.find('.cvv-code').val(),
+            address1: this.$dialog.find('.address1').val(),
+            address2: this.$dialog.find('.address2').val(),
+            city: this.$dialog.find('.city').val(),
+            province: this.$dialog.find('.state-province').val(),
+            postal_code: this.$dialog.find('.post-code').val(),
+            country_code: this.$dialog.find('.countries').val()
+        };
         
-        return true;
+        // Trim whitespace from beginning and end of all form fields
+        $.each(billingData, function(key, value) {
+            billingData[key] = $.trim(value);
+        });
+        
+        // Remove all spaces and hyphens from credit card number
+        billingData.card_number = billingData.card_number.replace(/-|\s/g, '');
+        
+        if (!billingData.address1 || !billingData.city || !billingData.province || !billingData.country_code || !billingData.postal_code) {
+            msgDialog('warninga', 'Missing billing details', 'Please complete the billing details correctly.', '', function() {
+                cardDialog.$dialogOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+            });
+            return false;
+        }
+        else if (!billingData.first_name || !billingData.last_name || !billingData.card_number || !billingData.expiry_date_month || !billingData.expiry_date_year || !billingData.cv2) {
+            msgDialog('warninga', 'Missing payment details', 'Please complete the payment details correctly.', '', function() {
+                cardDialog.$dialogOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+            });
+            return false;
+        }
+        
+        return billingData;
     },
     
     /**
      * Encrypts the billing data before sending to the API server
      */
-    encryptBillingData: function() {
+    encryptBillingData: function(billingData) {
         
-        // All payment data
-        var billingData =	{
-            'first_name': this.$dialog.find('.first-name').val(),
-            'last_name': this.$dialog.find('.last-name').val(),
-            'card_number': this.$dialog.find('.credit-card-number').val(),
-            'expiry_date_month': this.$dialog.find('.expiry-date-month').val(),
-            'expiry_date_year': this.$dialog.find('.expiry-date-year').val(),
-            'cv2': this.$dialog.find('.cvv-code').val(),
-            'address1': this.$dialog.find('.address1').val(),
-            'address2': this.$dialog.find('.address2').val(),
-            'city': this.$dialog.find('.city').val(),
-            'province': this.$dialog.find('.state-province').val(),
-            'postal_code': this.$dialog.find('.post-code').val(),
-            'country_code': this.$dialog.find('.countries').val()
-        };
-
         // Data to be hashed
         var cardData = {
             'card_number': billingData.card_number,
@@ -682,23 +739,10 @@ var cardDialog = {
         // get locked out or something. It must be unique and able to be derived again.
         var cardDataHash = sjcl.hash.sha256.hash(cardData);
         var cardDataHashHex = sjcl.codec.hex.fromBits(cardDataHash);
-        
-        // Load a public key up somehow. This is the current test one.
-        // Guy STRONGLY recommends loading this from somewhere external e.g. a json file.
-        var PUBKEY = [
-            base64urldecode('plp2MuzOXah-7Iaq4-IxEX4YQn86FObg8nAKH9aPCch7vxeO29GgA'
-                            + 'fSoSrCFSr_dJ27nmu8BrlrHNKcZa0eZCjp6jBHCEKy8rBbqUpXq'
-                            + 'sIpSIKeTFAb5D03bJ9tkHPUJXcJqf3GwTVX061FRUon79EIw525'
-                            + 'e7fbCxeRoBTH2IVqjMQK9w99O9nEBfXk2wywmzw-0awr1Ik3aiN'
-                            + 'W0-_Xv9fO2EswnY3lav7WW-WJ4Szx5YDUH35hSY-NYrUsKaqxGD'
-                            + 'fHuZCL7BCDaR4i7VyCAQZ5XejWbueVN-7B3mJJ-TwenDIt2RJvd'
-                            + 'LiAezE-Qsh2C2hGyfUZMyTUXMSQAtsOApw'),
-            "\u0000\u0001\u0000\u0001", 2048
-        ];
 
         // Comes back as byte string, so encode first.
         var jsonEncodedBillingData = JSON.stringify(billingData);
-        var encryptedBillingData = btoa(paycrypt.hybridEncrypt(jsonEncodedBillingData, PUBKEY));
+        var encryptedBillingData = btoa(paycrypt.hybridEncrypt(jsonEncodedBillingData, this.publicKey));
 
         console.log('zzzz billingData', billingData);
         console.log('zzzz cardData', cardData);
@@ -715,7 +759,7 @@ var cardDialog = {
             {
                 callback : function (res) { 
                     console.log('zzzz', res);
-                    // pro_pay()
+                    pro_pay();
                 }
             }
         );
@@ -1460,7 +1504,7 @@ function showLoadingDialog(url) {
             });
     };
 
-    //fadeOutInLoop($('.pro-register-paypal-dialog .reg-success-icon'));
+    fadeOutInLoop($('.pro-register-paypal-dialog .reg-success-icon'));
 
     $dialog
         .addClass('active')

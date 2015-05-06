@@ -42,6 +42,7 @@ module.exports = function(config) {
         'js/fm.js',
         'js/authring.js',
         'js/crypto.js',
+        'js/paycrypt.js',
         'js/user.js',
         'js/ui/filepicker.js',
         'js/tlvstore.js',

@@ -355,6 +355,11 @@ function sync_switchOS(os)
 	});
 }
 
+/**
+ * If an animation image fails to load it will show this transparent placeholder 1x1 pixel image
+ * @param {String} source
+ * @returns {Boolean}
+ */
 function ImgError(source){
     var empty1x1png = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQI12NgYAAAAAMAASDVlMcAAAAASUVORK5CYII=";
     source.src = "data:image/png;base64," + empty1x1png;
@@ -365,8 +370,8 @@ function ImgError(source){
 /**
  * Changes the animated product images on the download page
  */
-	
 var gifSlider = {
+    
     // Speed to fade in/out the images and text
     fadeInSpeed: 3000,
     fadeOutSpeed: 500,
@@ -374,9 +379,10 @@ var gifSlider = {
     // There can be more or less images on either side e.g. 2 gifs on left and 
     // 3 on right and it will still work because they are run independently.
     images: {
-        // Slide show on left side of the page
-        left: [
-            {
+        
+        // Slide show on right side of the page
+        right: [
+		    {
                 name: 'video-chat',         // Name & CSS class of the GIF
                 animationLength: 12120,     // Length of the GIF animation in milliseconds
                 href: '#register',          // Page link you go to when clicked
@@ -391,11 +397,7 @@ var gifSlider = {
                 title: 1626,
                 description: 1086,
                 image: null
-            }
-        ],
-        
-        // Slide show on right side of the page
-        right: [
+            },
             {
                 name: 'browser-extension-firefox',
                 animationLength: 12080,
@@ -422,29 +424,27 @@ var gifSlider = {
             }
         ]
     },
-	
     
     // Initialise the slide show
     init: function() {
         
         // Preload the images into memory so they will display straight away
-        gifSlider.preLoadImages('left');
         gifSlider.preLoadImages('right');
         
         // Show first two slides using order defined above
-        gifSlider.showImage('left', 0);
         gifSlider.showImage('right', 0);
         
         // Setup loops to continually change after every slide has finished
-        gifSlider.continueSlideShow('left', 0);
         gifSlider.continueSlideShow('right', 0);
+        
+        // Show ads in bottom right corner
+        gifSlider.alternateBottomRightProducts();
     },
-	
+
     /**
      * Preloads the images into memory
      * @param {String} side The side of the page (left or right)
      */
-	 
     preLoadImages: function(side) {
         
         // Get the current URL without the location hash (#xycabc), also add on the path to the images dir
@@ -464,14 +464,13 @@ var gifSlider = {
             gifSlider.images[side][i].image = image;            
         }
     },
-	
+
     /**
      * Iterates to the next image in the slideshow
      * @param {String} side The side of the page (left or right)
      * @param {Number} currentSlideIndex The current slide's index number (matches array above)
      * @param {Number} oldIntervalId The interval ID to be cleared
      */
-	 
     continueSlideShow: function(side, currentSlideIndex, oldIntervalId) {
         
         // Find when to start the next image
@@ -506,47 +505,62 @@ var gifSlider = {
         
         }, animationLengthForCurrentSlide);
     },
+
     /**
      * Shows the animated image
      * @param {String} side The side of the page (left or right)
      * @param {Number} slideIndex The slide's index number to be shown
      */
     showImage: function(side, slideIndex) {
-		
+        
         // Set the details for the next slide
         var slideTitle = l[gifSlider.images[side][slideIndex].title] + ':';
         var slideDescription = l[gifSlider.images[side][slideIndex].description];
         var slideImgSrc = gifSlider.images[side][slideIndex].image.src;
         var slideLink = gifSlider.images[side][slideIndex].href;
 
-
         // Change the link and fade in the new image
         $('.ads-' + side + '-block .currentLink').attr('href', slideLink);
         $('.animations-' + side + '-container .currentLink').attr('href', slideLink);
         $('.animations-' + side + '-container .currentImage').attr('src', slideImgSrc).css({ width: '260px', height: '300px'}).fadeIn(gifSlider.fadeInSpeed);
 		
-		
         // Set title and description
         $('.ads-' + side + '-block .products-top-txt .red').html(slideTitle).fadeIn(gifSlider.fadeInSpeed);
         $('.ads-' + side + '-block .products-top-txt .description').text(slideDescription).fadeIn(gifSlider.fadeInSpeed);
-		
-		// Applications buttons
-		if(side==='right') {
-		  $('.button0,.button1,.button2,.button3, .button4').fadeOut(gifSlider.fadeInSpeed);
-		  $('.button'+slideIndex).fadeIn(gifSlider.fadeInSpeed).css('display', 'block');
-		  
-		  if (slideIndex==2) {
-			  setTimeout(function() {
-                $('.button2').fadeOut(gifSlider.fadeInSpeed);
-		        $('.button3').fadeIn(gifSlider.fadeInSpeed).css('display', 'block');
-                setTimeout(function() {
-                   $('.button3').fadeOut(gifSlider.fadeInSpeed);
-		           $('.button4').fadeIn(gifSlider.fadeInSpeed).css('display', 'block');
-                }, 5000);
-              }, 5000);
-          }
-		  
-		} 
+    },
+
+    /**
+     * Alternates the images in the bottom right corner
+     */
+    alternateBottomRightProducts: function () {
+        
+        var adIndex = 0;
+        
+        // Show the first ad
+        var $productsBottomBlock = $('.products-bottom-block');
+        $productsBottomBlock.find('.button' + adIndex).fadeIn(gifSlider.fadeInSpeed);
+        
+        // Show new ad every 10 seconds
+        setInterval(function() {
+            
+            var previousAdIndex = adIndex;
+            adIndex += 1;
+            
+            // Reset back to start if exceeded available ads
+            if (adIndex === 7) {
+                adIndex = 0;
+            }
+            
+            // Ad index 1 is missing so skip it
+            else if (adIndex === 1) {
+                adIndex++;
+            }
+            
+            // Fade out the old ad and fade in the new ad
+            $productsBottomBlock.find('.button' + previousAdIndex).fadeOut(gifSlider.fadeOutSpeed, function() {
+                $productsBottomBlock.find('.button' + adIndex).fadeIn(gifSlider.fadeInSpeed);
+            });
+            
+        }, 10000);
     }
-	
 };

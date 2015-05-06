@@ -416,11 +416,18 @@ function pro_continue(e)
 function pro_pay()
 {
     var aff = 0;
-    if (localStorage.affid && localStorage.affts > new Date().getTime()-86400000) aff = localStorage.affid;
+    if (localStorage.affid && localStorage.affts > new Date().getTime() - 86400000) {
+        aff = localStorage.affid;
+    }
 
     // Only show loading dialog if needing to setup bitcoin invoice
     if (!ul_uploading && !downloading && (pro_paymentmethod === 'bitcoin')) {
         showLoadingDialog();
+    }
+    
+    // Otherwise if credit card payment, show bouncing coin while loading
+    else if (!ul_uploading && !downloading && (pro_paymentmethod === 'credit-card')) {
+        cardDialog.showLoadingOverlay();
     }
     
     // Data for API request
@@ -518,17 +525,22 @@ var cardDialog = {
     $dialog: null,
     $dialogOverlay: null,
     $successOverlay: null,
+    $loadingOverlay: null,
     
     // The RSA public key to encrypt data to be stored on the Secure Processing Machine (SPM)
-    publicKey: [atob(
-        "wfvbeFkjArOsHvAjXAJqve/2z/nl2vaZ+0sBj8V6U7knIow6y3/6KJ"
-      + "3gkJ50QQ7xDDakyt1C49UN27e+e0kCg2dLJ428JVNvw/q5AQW41"
-      + "grPkutUdFZYPACOauqIsx9KY6Q3joabL9g1JbwmuB44Mv20aV/L"
-      + "/Xyb2yiNm09xlyVhO7bvJ5Sh4M/EOzRN2HI+V7lHwlhoDrzxgQv"
-      + "vKjzsoPfFZaMud742tpgY8OMnKHcfmRQrfIvG/WfCqJ4ETETpr6"
-      + "AeI2PIHsptZgOYkkrDK6Bi8qb/T7njk32ZRt1E6Q/N7+hd8PLhh"
-      + "2PaYRWfpNiWwnf/rPu4MnwRE6T77s/qGQ=="),
-        "\u0001\u0000\u0001", 2048],
+    publicKey: [
+        atob(
+            "wfvbeFkjArOsHvAjXAJqve/2z/nl2vaZ+0sBj8V6U7knIow6y3/6KJ" +
+            "3gkJ50QQ7xDDakyt1C49UN27e+e0kCg2dLJ428JVNvw/q5AQW41" +
+            "grPkutUdFZYPACOauqIsx9KY6Q3joabL9g1JbwmuB44Mv20aV/L" +
+            "/Xyb2yiNm09xlyVhO7bvJ5Sh4M/EOzRN2HI+V7lHwlhoDrzxgQv" +
+            "vKjzsoPfFZaMud742tpgY8OMnKHcfmRQrfIvG/WfCqJ4ETETpr6" +
+            "AeI2PIHsptZgOYkkrDK6Bi8qb/T7njk32ZRt1E6Q/N7+hd8PLhh" +
+            "2PaYRWfpNiWwnf/rPu4MnwRE6T77s/qGQ=="
+        ),
+        "\u0001\u0000\u0001",   // Exponent 65537
+        2048                    // Key size in bits
+    ],
     
     /**
      * Open and setup the dialog
@@ -553,6 +565,7 @@ var cardDialog = {
         this.$dialog = $('.fm-dialog.payment-dialog');
         this.$dialogOverlay = $('.fm-dialog-overlay');
         this.$successOverlay = $('.payment-result.success');
+        this.$loadingOverlay = $('.payment-processing');
         
         // Add the styling for the overlay
         this.$dialogOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
@@ -760,7 +773,7 @@ var cardDialog = {
         var encryptedBillingData = btoa(paycrypt.hybridEncrypt(jsonEncodedBillingData, this.publicKey));
 
         // Add credit card, the most recently added card is used by default
-        api_req({ 
+        api_req({
                 'a': 'ccs',                          // Credit Card Store
                 'cc': encryptedBillingData,
                 'last4': lastFourCardDigits,
@@ -769,8 +782,8 @@ var cardDialog = {
                 'hash': cardDataHashHex
             },
             {
-                // Proceed with payment - ToDo: handle failures here
-                callback : function (res) {
+                // Proceed with payment - ToDo: handle save failures here
+                callback: function (res) {
                     pro_pay();
                 }
             }
@@ -778,13 +791,28 @@ var cardDialog = {
     },
     
     /**
-     * Shows a successful payment modal dialog
+     * Show the bouncing megacoin icon while loading
      */
-    showSuccessfulPayment: function() {
+    showLoadingOverlay: function() {
         
         // Close the card dialog
         cardDialog.$dialogOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
         cardDialog.$dialog.removeClass('active').addClass('hidden');
+        
+        // Show the success
+        cardDialog.$dialogOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+        cardDialog.$loadingOverlay.removeClass('hidden');
+    },
+    
+    /**
+     * Shows a successful payment modal dialog
+     */
+    showSuccessfulPayment: function() {
+        
+        // Close the card dialog and loading overlay
+        cardDialog.$dialogOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+        cardDialog.$dialog.removeClass('active').addClass('hidden');
+        cardDialog.$loadingOverlay.addClass('hidden');
         
         // Get the selected Pro plan details
         var proNum = selectedProPackage[1];
@@ -810,7 +838,7 @@ var cardDialog = {
         });
         
         // Go to their account on close as well
-        $('.payment-result.success .payment-close').rebind('click', function() {
+        cardDialog.$successOverlay.find('.payment-close').rebind('click', function() {
             
             // Hide the overlay
             cardDialog.$dialogOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
@@ -822,6 +850,10 @@ var cardDialog = {
             }
             window.location.hash = 'fm/account';
         });
+    },
+    
+    showFailedPayment: function() {
+        
     }
 };
 

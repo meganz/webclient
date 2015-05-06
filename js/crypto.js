@@ -19,10 +19,12 @@ var crypt = (function () {
      */
     var ns = {};
     var logger = MegaLogger.getLogger('crypt');
+    ns._logger = logger;
 
     // TODO: Eventually migrate all functionality into this name space.
 
 
+    // Synchronous helper function comparing an Ed25519 pub key's authentication state.
     ns._checkAuthenticationEd25519 = function(userhandle) {
         var recorded = authring.getContactAuthenticated(userhandle, 'Ed25519');
         var fingerprint = authring.computeFingerprint(pubEd25519[userhandle],
@@ -40,6 +42,7 @@ var crypt = (function () {
         return value;
     };
 
+    // Synchronous helper function comparing an RSA pub key's authentication state.
     ns._checkAuthenticationRSA = function(userhandle) {
         var recorded = authring.getContactAuthenticated(userhandle, 'RSA');
         var fingerprint = authring.computeFingerprint(u_pubkeys[userhandle],
@@ -60,6 +63,8 @@ var crypt = (function () {
         return value;
     };
 
+
+    // XXX: Remove the following test code.
 
     ns.fooStep1 = function(param) {
         console.log('starting fooStep1 for', param);
@@ -96,32 +101,6 @@ var crypt = (function () {
     };
 
 
-    ns.bar = function(param) {
-        console.log('starting bar chain', param);
-        var step1 = new MegaPromise();
-        var step2 = step1.then(
-            function(result) {
-                console.log('barStep1 for', param, 'is', result);
-                return 'step1_'+ result;
-            }
-        );
-        var step3 = step2.then(
-            function(result) {
-                console.log('barStep2 for', param, 'is', result);
-                return 'step2_' + result;
-            }
-        );
-        var step4 = step3.then(
-            function(result) {
-                console.log('barStep3 for', param, 'is', result);
-                return 'step3_' + result;
-            }
-        );
-        step1.resolve('boing');
-        return step4;
-    };
-
-
 
     /**
      * Cached Ed25519 public key retrieval utility.
@@ -151,13 +130,13 @@ var crypt = (function () {
         if (pubEd25519[userhandle]) {
             // It's cached: Only check the authenticity of the key.
             // Make the promise for a cached value.
-            var thePromise = new MegaPromise();
+            var keyPromise = new MegaPromise();
             try {
                 var value = crypt._checkAuthenticationEd25519(userhandle);
                 if (callback) {
                     callback(value, userhandle);
                 }
-                thePromise.resolve(pubEd25519[userhandle], userhandle);
+                keyPromise.resolve(pubEd25519[userhandle]);
             }
             catch (ex) {
                 var message = 'Error verifying authenticity of Ed25519 pub key: '
@@ -167,16 +146,15 @@ var crypt = (function () {
                 throw(ex);
                 // Not rejecting it. The exception beats a reject!
             }
-            return thePromise;
+            return keyPromise;
         }
         else {
             // Non-cached value, make a promise.
-            var thePromise = getUserAttribute(userhandle, 'puEd255',
-                                              true, false);
-            return thePromise.then(
+            var attributePromise = getUserAttribute(userhandle, 'puEd255',
+                                                    true, false);
+            var keyPromise = attributePromise.then(
                 // Function on fulfilment.
-                function(result, ctx) {
-                    var userhandle = ctx.u;
+                function(result) {
                     result = base64urldecode(result);
                     pubEd25519[userhandle] = result;
                     try {
@@ -195,19 +173,19 @@ var crypt = (function () {
                     if (callback) {
                         callback(pubEd25519[userhandle], userhandle);
                     }
-                    console.log('----------', pubEd25519[userhandle].length);
-                    thePromise.resolve(pubEd25519[userhandle], userhandle);
+                    console.log('XXX ----------', pubEd25519[userhandle].length);
+                    return pubEd25519[userhandle];
                 },
                 // Function on rejection.
-                function(result, ctx) {
+                function(error) {
                     logger.error('Error getting Ed25519 pub key of user "'
-                                 + userhandle + '": ' + result);
+                                 + userhandle + '": ' + error);
                     if (callback) {
-                        callback(result, ctx);
+                        callback(error);
                     }
-                    thePromise.reject(result, ctx);
                 }
             );
+            return keyPromise;
         }
     };
 
@@ -226,7 +204,7 @@ var crypt = (function () {
      */
     ns.getFingerprintEd25519 = function(userhandle, format) {
         var makeFingerprint = function(pubKey) {
-            console.log('*************', pubKey.length, typeof pubKey);
+            console.log('XXX *************', pubKey.length, typeof pubKey);
             var value = authring.computeFingerprint(pubKey, 'Ed25519', format);
             var message = 'Got Ed25519 fingerprint for user "' + userhandle + '": ';
             if (format === 'string') {
@@ -242,29 +220,27 @@ var crypt = (function () {
         if (pubEd25519[userhandle]) {
             // It's cached: Only compute fingerprint of it.
             // Make the promise for a cached value.
-            var thePromise = new MegaPromise();
-            console.log('************* cached');
-            thePromise.resolve(makeFingerprint(pubEd25519[userhandle]),
-                               userhandle);
-            return thePromise;
+            var fingerprintPromise = new MegaPromise();
+            console.log('XXX ************* cached');
+            fingerprintPromise.resolve(makeFingerprint(pubEd25519[userhandle]));
+            return fingerprintPromise;
         }
         else {
             // Non-cached value, make a promise.
-            var thePromise = crypt.getPubEd25519(userhandle);
-            thePromise.then(
+            var keyPromise = crypt.getPubEd25519(userhandle);
+            var fingerprintPromise = keyPromise.then(
                 // Function on fulfilment.
-                function(result, userhandle) {
-                    console.log('************* not cached', result.length, typeof result);
-                    thePromise.resolve(makeFingerprint(result), userhandle);
+                function(result) {
+                    console.log('XXX ************* not cached', result.length, typeof result);
+                    return makeFingerprint(result);
                 },
                 // Function on rejection.
-                function(result, ctx) {
+                function(result) {
                     logger.error('Error getting Ed25519 fingerprint for user "'
                                  + userhandle + '": ' + result);
-                    thePromise.reject(result, ctx);
                 }
             );
-            return thePromise;
+            return fingerprintPromise;
         }
     };
 

@@ -117,7 +117,7 @@ describe("crypto unit test", function() {
 
         describe('getPubEd25519', function() {
             it("API error, no custom callback", function() {
-                sandbox.stub(console, 'error');
+                sandbox.stub(ns._logger, '_log');
                 sandbox.stub(window, 'pubEd25519', {});
                 sandbox.stub(window, 'u_authring', { Ed25519: {} });
                 sandbox.stub(ns, '_checkAuthenticationEd25519').returns('foo');
@@ -129,14 +129,14 @@ describe("crypto unit test", function() {
                 assert.strictEqual(ns._checkAuthenticationEd25519.callCount, 0);
                 assert.lengthOf(getUserAttribute.args[0], 4);
                 var callback = attributePromise.then.args[0][1];
-                callback(-3, 'you456789xw');
+                callback(-3);
                 assert.deepEqual(pubEd25519, {});
-                assert.strictEqual(console.error.args[0][2],
+                assert.strictEqual(ns._logger._log.args[0][1][0],
                                    'Error getting Ed25519 pub key of user "you456789xw": -3');
             });
 
             it("trough API, no custom callback", function() {
-                sandbox.stub(console, 'debug');
+                sandbox.stub(ns._logger, '_log');
                 sandbox.stub(window, 'pubEd25519', {});
                 sandbox.stub(window, 'u_authring', { Ed25519: {} });
                 sandbox.stub(ns, '_checkAuthenticationEd25519').returns(
@@ -151,10 +151,10 @@ describe("crypto unit test", function() {
                 assert.strictEqual(ns._checkAuthenticationEd25519.callCount, 0);
                 assert.lengthOf(getUserAttribute.args[0], 4);
                 var callback = attributePromise.then.args[0][0];
-                callback(base64urlencode(ED25519_PUB_KEY), { u: 'you456789xw' });
+                callback(base64urlencode(ED25519_PUB_KEY));
                 assert.strictEqual(ns._checkAuthenticationEd25519.callCount, 1);
                 assert.deepEqual(pubEd25519, { 'you456789xw': ED25519_PUB_KEY });
-                assert.strictEqual(console.debug.args[0][2],
+                assert.strictEqual(ns._logger._log.args[0][1][0],
                                    'Got Ed25519 pub key of user "you456789xw".');
             });
 
@@ -163,7 +163,7 @@ describe("crypto unit test", function() {
                 sandbox.stub(ns, '_checkAuthenticationEd25519').throws(
                     'Fingerprint does not match previously authenticated one!');
                 sandbox.stub(window, 'getUserAttribute');
-                sandbox.stub(console, 'error');
+                sandbox.stub(ns._logger, '_log');
                 var authenticated = { fingerprint: ED25519_FINGERPRINT,
                                       method: authring.AUTHENTICATION_METHOD.SEEN,
                                       confidence: authring.KEY_CONFIDENCE.UNSURE };
@@ -173,15 +173,14 @@ describe("crypto unit test", function() {
                 assert.strictEqual(ns._checkAuthenticationEd25519.callCount, 1);
                 assert.strictEqual(getUserAttribute.callCount, 0);
                 assert.strictEqual(ns._checkAuthenticationEd25519.callCount, 1);
-                var log = console.error.args[0];
-                assert.strictEqual(log[2],
+                assert.strictEqual(ns._logger._log.args[0][1][0],
                                    'Error verifying authenticity of Ed25519 pub key:'
                                    + ' Fingerprint does not match previously authenticated one!');
                 assert.deepEqual(u_authring.Ed25519['you456789xw'], authenticated);
             });
 
             it("API error, custom callback", function() {
-                sandbox.stub(console, 'error');
+                sandbox.stub(ns._logger, '_log');
                 sandbox.stub(u_authring, 'Ed25519', {});
                 sandbox.stub(window, 'pubEd25519', {});
                 var attributePromise = { then: sinon.stub(),
@@ -192,16 +191,16 @@ describe("crypto unit test", function() {
                 sinon.assert.calledOnce(getUserAttribute);
                 assert.lengthOf(getUserAttribute.args[0], 4);
                 var callback = attributePromise.then.args[0][1];
-                callback(-3, 'foo');
+                callback(-3);
                 assert.deepEqual(pubEd25519, {});
                 assert.strictEqual(myCallback.callCount, 1);
                 assert.deepEqual(u_authring.Ed25519, {});
-                assert.strictEqual(console.error.args[0][2],
+                assert.strictEqual(ns._logger._log.args[0][1][0],
                                    'Error getting Ed25519 pub key of user "you456789xw": -3');
             });
 
             it("through API, custom callback", function() {
-                sandbox.stub(console, 'debug');
+                sandbox.stub(ns._logger, '_log');
                 sandbox.stub(window, 'pubEd25519', {});
                 sandbox.stub(window, 'u_authring', { Ed25519: {} });
                 sandbox.stub(ns, '_checkAuthenticationEd25519').returns(
@@ -217,16 +216,16 @@ describe("crypto unit test", function() {
                 assert.strictEqual(ns._checkAuthenticationEd25519.callCount, 0);
                 assert.lengthOf(getUserAttribute.args[0], 4);
                 var callback = attributePromise.then.args[0][0];
-                callback(base64urlencode(ED25519_PUB_KEY), { u: 'you456789xw' });
+                callback(base64urlencode(ED25519_PUB_KEY));
                 assert.strictEqual(ns._checkAuthenticationEd25519.callCount, 1);
                 assert.deepEqual(pubEd25519, { 'you456789xw': ED25519_PUB_KEY });
                 assert.strictEqual(myCallback.callCount, 1);
-                assert.strictEqual(console.debug.args[0][2],
+                assert.strictEqual(ns._logger._log.args[0][1][0],
                                    'Got Ed25519 pub key of user "you456789xw".');
             });
 
             it("through API, no custom callback, authentication error", function() {
-                sandbox.stub(console, 'error');
+                sandbox.stub(ns._logger, '_log');
                 sandbox.stub(window, 'pubEd25519', {});
                 sandbox.stub(u_authring, 'Ed25519', {});
                 sandbox.stub(ns, '_checkAuthenticationEd25519').throws(
@@ -238,10 +237,9 @@ describe("crypto unit test", function() {
                 assert.strictEqual(ns._checkAuthenticationEd25519.callCount, 0);
                 assert.lengthOf(getUserAttribute.args[0], 4);
                 var callback = attributePromise.then.args[0][0];
-                assert.throws(function() { callback(base64urlencode(ED25519_PUB_KEY), { u: 'you456789xw' }); });
+                assert.throws(function() { callback(base64urlencode(ED25519_PUB_KEY)); });
                 assert.strictEqual(ns._checkAuthenticationEd25519.callCount, 1);
-                var log = console.error.args[0];
-                assert.strictEqual(log[2],
+                assert.strictEqual(ns._logger._log.args[0][1][0],
                                    'Error verifying authenticity of Ed25519 pub key:'
                                    + ' Fingerprint does not match previously authenticated one!');
                 assert.deepEqual(u_authring.Ed25519, {});
@@ -289,80 +287,73 @@ describe("crypto unit test", function() {
 
         describe('getFingerprintEd25519', function() {
             it("key promise reject, no custom callback", function() {
-                sandbox.stub(console, 'error');
+                sandbox.stub(ns._logger, '_log');
                 sandbox.stub(window, 'pubEd25519', {});
-                var keyPromise = { then: sinon.stub(),
+                var keyPromise = { then: sinon.stub().returns('foo'),
                                    reject: sinon.stub() };
                 sandbox.stub(ns, 'getPubEd25519').returns(keyPromise);
                 var response = ns.getFingerprintEd25519('you456789xw');
-                assert.strictEqual(typeof response.then, 'function');
+                assert.strictEqual(response, 'foo');
                 assert.strictEqual(ns.getPubEd25519.callCount, 1);
                 assert.lengthOf(ns.getPubEd25519.args[0], 1);
                 var callback = keyPromise.then.args[0][1];
-                callback(-3, 'foo');
+                callback(-3);
                 assert.deepEqual(pubEd25519, {});
-                assert.strictEqual(console.error.args[0][2],
+                assert.strictEqual(ns._logger._log.args[0][1][0],
                                    'Error getting Ed25519 fingerprint for user "you456789xw": -3');
             });
 
             it("non-cached, no custom callback", function() {
-                sandbox.stub(console, 'debug');
+                sandbox.stub(ns._logger, '_log');
                 sandbox.stub(window, 'pubEd25519', {});
-                var keyPromise = { then: sinon.stub(),
+                var keyPromise = { then: sinon.stub().returns('foo'),
                                    resolve: sinon.stub() };
                 sandbox.stub(ns, 'getPubEd25519', function() {
                     pubEd25519['you456789xw'] = ED25519_PUB_KEY;
                     return keyPromise;
                 });
                 var response = ns.getFingerprintEd25519('you456789xw');
-                assert.strictEqual(typeof response.then, 'function');
+                assert.strictEqual(response, 'foo');
                 assert.strictEqual(ns.getPubEd25519.callCount, 1);
                 assert.lengthOf(ns.getPubEd25519.args[0], 1);
                 var callback = keyPromise.then.args[0][0];
-                callback(ED25519_PUB_KEY, 'you456789xw');
+                callback(ED25519_PUB_KEY);
                 assert.deepEqual(pubEd25519, { 'you456789xw': ED25519_PUB_KEY });
-                assert.strictEqual(console.debug.args[0][2],
+                assert.strictEqual(ns._logger._log.args[0][1][0],
                                    'Got Ed25519 fingerprint for user "you456789xw": 21fe31dfa154a261626bf854046fd2271b7bed4b');
             });
 
             it("cached, hex", function() {
-                sandbox.stub(console, 'debug');
+                sandbox.stub(ns._logger, '_log');
                 sandbox.stub(window, 'pubEd25519', { 'you456789xw': ED25519_PUB_KEY });
                 sandbox.stub(authring, 'computeFingerprint').returns('21fe31dfa154a261626bf854046fd2271b7bed4b');
                 ns.getFingerprintEd25519('you456789xw', 'hex');
                 assert.strictEqual(authring.computeFingerprint.callCount, 1);
                 assert.strictEqual(authring.computeFingerprint.args[0][2], 'hex');
                 assert.deepEqual(pubEd25519, { 'you456789xw': ED25519_PUB_KEY });
-                assert.strictEqual(console.debug.args[0][2],
+                assert.strictEqual(ns._logger._log.args[0][1][0],
                                    'Got Ed25519 fingerprint for user "you456789xw": 21fe31dfa154a261626bf854046fd2271b7bed4b');
             });
 
             it("cached, string", function() {
-                sandbox.stub(console, 'debug');
+                sandbox.stub(ns._logger, '_log');
                 sandbox.stub(window, 'pubEd25519', { 'you456789xw': ED25519_PUB_KEY });
                 sandbox.stub(authring, 'computeFingerprint').returns(ED25519_FINGERPRINT);
                 ns.getFingerprintEd25519('you456789xw', 'string');
                 assert.strictEqual(authring.computeFingerprint.callCount, 1);
                 assert.strictEqual(authring.computeFingerprint.args[0][2], 'string');
                 assert.deepEqual(pubEd25519, { 'you456789xw': ED25519_PUB_KEY });
-                assert.strictEqual(console.debug.args[0][2],
+                assert.strictEqual(ns._logger._log.args[0][1][0],
                                    'Got Ed25519 fingerprint for user "you456789xw": If4x36FUomFia_hUBG_SJxt77Us');
             });
         });
 
+        // XXX: Remove the following test code.
         describe('FOO TEST', function() {
             it("test some chained FOO", function() {
                 dump('=== FOO CASE ===');
                 var result = ns.fooStep3('GUY');
                 result.done(function(result) {
-                    console.log('final result', result);
-                });
-            });
-
-            it("test some chained BAR", function() {
-                dump('=== BAR CASE ===');
-                var result = ns.bar('GUY');
-                result.then(function(result) {
                     console.log('final result', result);
                 });
             });

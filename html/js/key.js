@@ -111,6 +111,9 @@ function ui_keycomplete()
     $('.key2').addClass('hidden');
     $('.key3').removeClass('hidden');
 
+    if(M.u[u_handle].c != u_attr.c) {
+        loadfm(true);
+    }
 
     if (typeof (u_attr.p) !== 'undefined' && (u_attr.p >= 1 && u_attr.p <= 4)) {
         document.location.hash = 'fm';

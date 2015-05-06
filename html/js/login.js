@@ -181,13 +181,6 @@ function pagelogin()
 					}
 					else if (r)
 					{
-
-                        // refresh the M.u[u_handle] and u_attr data, since it is outdated
-                        api_getuser({
-                            'callback': u_checklogin3a,
-                            'checkloginresult': function(){}
-                        });
-
 						u_type = r;
 						document.location.hash = 'key';
 					}

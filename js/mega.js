@@ -5490,7 +5490,7 @@ function processPaymentReceived(actionPacket) {
         if (M.account) {
             M.account.lastupdate = 0;
         }
-        window.location.hash = 'account';
+        window.location.hash = 'fm/account';
     }
 }
 

@@ -430,10 +430,10 @@ function pro_pay()
 
     api_req({ a : 'uts', it: 0, si: apiId, p: price, c: currency, aff: aff, 'm': m },
     {
-        callback : function (result)
+        callback : function (utsResult)
         {
             // Store the sale ID to check with API later
-            saleId = result;
+            saleId = utsResult;
             
             if (typeof saleId == 'number' && saleId < 0)
             {
@@ -459,14 +459,14 @@ function pro_pay()
 
                 api_req({ a : 'utc', s : [saleId], m : pro_m, r: proref },
                 {
-                    callback : function (res)
+                    callback : function (utcResult)
                     {
                         if (pro_paymentmethod == 'pro_prepaid')
                         {
                             loadingDialog.hide();
-                            if (typeof res == 'number' && res < 0)
+                            if (typeof utcResult == 'number' && utcResult < 0)
                             {
-                                if (res == EOVERQUOTA) {
+                                if (utcResult == EOVERQUOTA) {
                                     alert(l[514]);
                                 }
                                 else {
@@ -484,15 +484,23 @@ function pro_pay()
                         }
                         else {
                             // If Bitcoin provider then show the Bitcoin invoice dialog
-                            if ((pro_m === 4) && res && res.EUR) {
-                                bitcoinDialog.showInvoice(res.EUR);
+                            if ((pro_m === 4) && utcResult && utcResult.EUR) {
+                                bitcoinDialog.showInvoice(utcResult.EUR);
                             }
-                            else if ((pro_m === 4) && (!res || !res.EUR)) {
+                            
+                            // If bitcoin failure
+                            else if ((pro_m === 4) && (!utcResult || !utcResult.EUR)) {
                                 bitcoinDialog.showBitcoinProviderFailureDialog();
                             }
-                            else if ((pro_m === 8) && res && res.EUR) {
-                                // Pay for credit card
-                                console.log('zzzz credit card res', res);
+                            
+                            // Pay for credit card
+                            else if ((pro_m === 8) && utcResult && utcResult.EUR.res === 'S') {
+                                cardDialog.showSuccessfulPayment(utcResult);
+                            }
+                            
+                            // ToDo: Show credit card failure
+                            else if ((pro_m === 8) && (!utcResult || utcResult.EUR.res === 'FP' || utcResult.EUR.res === 'FI')) {
+                                
                             }
                         }
                     }
@@ -509,8 +517,9 @@ var cardDialog = {
     
     $dialog: null,
     $dialogOverlay: null,
+    $successOverlay: null,
     
-    // The public key for the Secure Processing Machine (SPM)
+    // The RSA public key to encrypt data to be stored on the Secure Processing Machine (SPM)
     publicKey: [atob(
         "wfvbeFkjArOsHvAjXAJqve/2z/nl2vaZ+0sBj8V6U7knIow6y3/6KJ"
       + "3gkJ50QQ7xDDakyt1C49UN27e+e0kCg2dLJ428JVNvw/q5AQW41"
@@ -543,6 +552,7 @@ var cardDialog = {
         // Cache DOM reference for lookup in other functions
         this.$dialog = $('.fm-dialog.payment-dialog');
         this.$dialogOverlay = $('.fm-dialog-overlay');
+        this.$successOverlay = $('.payment-result.success');
         
         // Add the styling for the overlay
         this.$dialogOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
@@ -702,13 +712,19 @@ var cardDialog = {
         // Remove all spaces and hyphens from credit card number
         billingData.card_number = billingData.card_number.replace(/-|\s/g, '');
         
+        // Check the required billing details are completed
         if (!billingData.address1 || !billingData.city || !billingData.province || !billingData.country_code || !billingData.postal_code) {
+            
+            // Show error popup and on close re-add the overlay
             msgDialog('warninga', 'Missing billing details', 'Please complete the billing details correctly.', '', function() {
                 cardDialog.$dialogOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
             });
             return false;
         }
+        
+        // Check all the card details are completed
         else if (!billingData.first_name || !billingData.last_name || !billingData.card_number || !billingData.expiry_date_month || !billingData.expiry_date_year || !billingData.cv2) {
+            
             msgDialog('warninga', 'Missing payment details', 'Please complete the payment details correctly.', '', function() {
                 cardDialog.$dialogOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
             });
@@ -720,23 +736,22 @@ var cardDialog = {
     
     /**
      * Encrypts the billing data before sending to the API server
+     * @param {Object} billingData The data to be encrypted and sent
      */
     encryptBillingData: function(billingData) {
         
-        // Data to be hashed
-        var cardData = {
-            'card_number': billingData.card_number,
-            'expiry_date_month': billingData.expiry_date_month,
-            'expiry_date_year': billingData.expiry_date_year,
-            'cv2': billingData.cv2       
-        };
-        
         // Get last 4 digits of card number
-        var cardNumberLength = cardData.card_number.length;
-        var lastFourCardDigits = cardData.card_number.substr(cardNumberLength - 4);
+        var cardNumberLength = billingData.card_number.length;
+        var lastFourCardDigits = billingData.card_number.substr(cardNumberLength - 4);
         
         // Hash the card data so users can identify their cards later in our system if they 
         // get locked out or something. It must be unique and able to be derived again.
+        var cardData = JSON.stringify({
+            'card_number': billingData.card_number,
+            'expiry_date_month': billingData.expiry_date_month,
+            'expiry_date_year': billingData.expiry_date_year,
+            'cv2': billingData.cv2
+        });
         var cardDataHash = sjcl.hash.sha256.hash(cardData);
         var cardDataHashHex = sjcl.codec.hex.fromBits(cardDataHash);
 
@@ -744,25 +759,69 @@ var cardDialog = {
         var jsonEncodedBillingData = JSON.stringify(billingData);
         var encryptedBillingData = btoa(paycrypt.hybridEncrypt(jsonEncodedBillingData, this.publicKey));
 
-        console.log('zzzz billingData', billingData);
-        console.log('zzzz cardData', cardData);
-
         // Add credit card, the most recently added card is used by default
         api_req({ 
                 'a': 'ccs',                          // Credit Card Store
                 'cc': encryptedBillingData,
                 'last4': lastFourCardDigits,
-                'expm': cardData.expiry_date_month,
-                'expy': cardData.expiry_date_year, 
+                'expm': billingData.expiry_date_month,
+                'expy': billingData.expiry_date_year, 
                 'hash': cardDataHashHex
             },
             {
-                callback : function (res) { 
-                    console.log('zzzz', res);
+                // Proceed with payment - ToDo: handle failures here
+                callback : function (res) {
                     pro_pay();
                 }
             }
         );
+    },
+    
+    /**
+     * Shows a successful payment modal dialog
+     */
+    showSuccessfulPayment: function() {
+        
+        // Close the card dialog
+        cardDialog.$dialogOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+        cardDialog.$dialog.removeClass('active').addClass('hidden');
+        
+        // Get the selected Pro plan details
+        var proNum = selectedProPackage[1];
+        var proPlan = getProPlan(proNum);
+        
+        // Show the success
+        cardDialog.$dialogOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+        cardDialog.$successOverlay.removeClass('hidden');
+        cardDialog.$successOverlay.find('.payment-result-txt span').text(proPlan);
+        
+        // Add click handler for 'Go to my account' button
+        cardDialog.$successOverlay.find('.payment-result-button').rebind('click', function() {
+            
+            // Hide the overlay
+            cardDialog.$dialogOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+            cardDialog.$successOverlay.addClass('hidden');
+            
+            // Make sure it fetches new account data on reload
+            if (M.account) {
+                M.account.lastupdate = 0;
+            }
+            window.location.hash = 'fm/account';            
+        });
+        
+        // Go to their account on close as well
+        $('.payment-result.success .payment-close').rebind('click', function() {
+            
+            // Hide the overlay
+            cardDialog.$dialogOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+            cardDialog.$successOverlay.addClass('hidden');
+            
+            // Make sure it fetches new account data on reload
+            if (M.account) {
+                M.account.lastupdate = 0;
+            }
+            window.location.hash = 'fm/account';
+        });
     }
 };
 

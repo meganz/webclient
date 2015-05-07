@@ -3,7 +3,7 @@ var have_ab = typeof ArrayBuffer != 'undefined' && typeof DataView != 'undefined
 var use_workers = have_ab && typeof Worker != 'undefined';
 
 if (is_extension && typeof localStorage.use_ssl === 'undefined') {
-	localStorage.use_ssl = 0;
+    localStorage.use_ssl = 0;
 }
 
 // if (is_extension || +localStorage.use_ssl === 0) {
@@ -12,7 +12,7 @@ if (is_chrome_firefox) {
 }
 else if (+localStorage.use_ssl === 0) {
     var use_ssl = (navigator.userAgent.indexOf('Chrome/') !== -1
-		&& parseInt(navigator.userAgent.split('Chrome/').pop()) > 40) ? 1:0;
+        && parseInt(navigator.userAgent.split('Chrome/').pop()) > 40) ? 1:0;
 }
 else {
     if ((navigator.appVersion.indexOf('Safari') > 0) && (navigator.appVersion.indexOf('Version/5') > 0)) {
@@ -1163,10 +1163,10 @@ function api_reqfailed(c, e) {
             loadfm();
         }
     }
-    
+
     // If suspended account
     else if (e === EBLOCKED) {
-        
+
         // On clicking OK, log the user out and redirect to contact page
         msgDialog('warninga', 'Suspended account',
             'You have been suspended due to excess data usage.\n\
@@ -1174,7 +1174,7 @@ function api_reqfailed(c, e) {
             false,
             function() {
                 var redirectUrl = window.location.origin + window.location.pathname + '#contact';
-                u_logout(true);                
+                u_logout(true);
                 window.location.replace(redirectUrl);
             }
         );
@@ -1639,7 +1639,7 @@ function api_cachepubkeys2(res, ctx) {
             u_pubkeys[ctx.u] = u_pubkeys[userHandle] = crypto_decodepubkey(base64urldecode(res.pubk));
             var fingerprint = authring.computeFingerprint(u_pubkeys[ctx.u], 'RSA', 'string');
             var observed = authring.getContactAuthenticated(ctx.u, 'RSA');
-            
+
             if (observed && authring.equalFingerprints(observed.fingerprint, fingerprint) === false) {
                 showFingerprintMismatchException('RSA', userHandle, observed.method, observed.fingerprint, fingerprint);
             }
@@ -3604,7 +3604,7 @@ var pubEd25519 = {};
  * Initialises the authentication system.
  */
 function u_initAuthentication() {
-    
+
     // Load contacts' tracked authentication fingerprints.
     authring.getContacts('Ed25519');
     authring.getContacts('RSA');
@@ -3639,7 +3639,7 @@ function u_initAuthentication2(res, ctx) {
     u_privEd25519 = u_keyring.prEd255;
     u_pubEd25519 = u_pubEd25519 || jodid25519.eddsa.publicKey(u_privEd25519);
     u_attr.puEd255 = u_pubEd25519;
-    pubEd25519[u_handle] = u_pubEd25519;
+    u_setPubEd25519(u_pubEd25519);
 
     getUserAttribute(u_handle, "puEd255", true, false, function (res) {
         if (res !== base64urlencode(u_pubEd25519)) {
@@ -3656,8 +3656,18 @@ function u_initAuthentication2(res, ctx) {
         }
     };
     getUserAttribute(u_handle, 'sigPubk', true, false, storeSigPubkCallback);
+}
 
-    mBroadcaster.sendMessage('pubEd25519');
+/**
+ * Store pubEd25519 and notify listeners
+ */
+function u_setPubEd25519(u_pubEd25519) {
+    if (d) console.log('u_setPubEd25519', u_handle, u_pubEd25519);
+
+    pubEd25519[u_handle] = u_pubEd25519;
+    Soon(function __u_setPubEd25519() {
+        mBroadcaster.sendMessage('pubEd25519');
+    });
 }
 
 function _checkFingerprintEd25519(userHandle) {
@@ -3667,7 +3677,7 @@ function _checkFingerprintEd25519(userHandle) {
         pubkey: pubEd25519[userHandle],
         authenticated: recorded
     };
-    
+
     // If fingerprint mismatch, show warning and throw exception
     if (recorded && (authring.equalFingerprints(recorded.fingerprint, fingerprint) === false)) {
         showFingerprintMismatchException('Ed25519', userHandle, recorded.method, recorded.fingerprint, fingerprint);
@@ -3677,19 +3687,19 @@ function _checkFingerprintEd25519(userHandle) {
             authring.AUTHENTICATION_METHOD.SEEN,
             authring.KEY_CONFIDENCE.UNSURE);
     }
-    
+
     return value;
 }
 
 function _checkFingerprintRSA(userHandle) {
-    
+
     var recorded = authring.getContactAuthenticated(userHandle, 'RSA');
     var fingerprint = authring.computeFingerprint(u_pubkeys[userHandle], 'RSA', 'string');
     var value = {
         pubkey: u_pubkeys[userHandle],
         authenticated: recorded
     };
-    
+
     // If fingerprint mismatch, show warning and throw exception
     if (recorded && (authring.equalFingerprints(recorded.fingerprint, fingerprint) === false)) {
         showFingerprintMismatchException('RSA', userHandle, recorded.method, recorded.fingerprint, fingerprint);
@@ -3699,7 +3709,7 @@ function _checkFingerprintRSA(userHandle) {
             authring.AUTHENTICATION_METHOD.SEEN,
             authring.KEY_CONFIDENCE.UNSURE);
     }
-    
+
     return value;
 }
 
@@ -3716,7 +3726,7 @@ function _checkFingerprintRSA(userHandle) {
  *     an exception.
  */
 function showFingerprintMismatchException(fingerprintType, userHandle, method, previousFingerprint, newFingerprint) {
-    
+
     // Show warning dialog
     mega.ui.CredentialsWarningDialog.singleton(userHandle, method, previousFingerprint, newFingerprint);
 
@@ -3850,7 +3860,7 @@ function getPubRSA(userhandle, callback) {
         api_cachepubkeys({
             cachepubkeyscomplete: function () {
                 _checkFingerprintRSA(userhandle);
-                callback(u_pubkeys[userhandle]);              
+                callback(u_pubkeys[userhandle]);
             }
         }, [userhandle]);
     }

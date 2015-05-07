@@ -2975,19 +2975,19 @@ function accountUI()
         {
             // Set payment method
             var paymentMethodIndex = purchaseTransaction[4];
-            var paymentMethod = 'Voucher';
+            var paymentMethod = l[428];
 
             if (paymentMethodIndex == 1) {
                 paymentMethod = 'PayPal';
             }
             else if (paymentMethodIndex == 2) {
-                paymentMethod = 'iTunes';
+                paymentMethod = l[6953];
             }
             else if (paymentMethodIndex == 4) {
-                paymentMethod = 'Bitcoin';
+                paymentMethod = l[6802];
             }
             else if (paymentMethodIndex == 8) {
-                paymentMethod = 'Credit card';
+                paymentMethod = l[6952];
             }
 
             // Set Date/Time, Item (plan purchased), Amount, Payment Method

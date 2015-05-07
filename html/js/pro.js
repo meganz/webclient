@@ -145,9 +145,9 @@ function loadPaymentGatewayOptions() {
         providerName: l[504]
     },
     {
-        apiGatewayId: 8,                // Perfunctio
-        displayName: 'Credit card',     // Credit card
-        supportsRecurring: false,
+        apiGatewayId: 8,                // Credit card provider
+        displayName: l[6952],           // Credit card
+        supportsRecurring: true,
         cssClass: 'credit-card',
         providerName: l[6802]
     },
@@ -598,7 +598,7 @@ var cardDialog = {
         this.$dialog.find('.plan-icon').removeClass('pro1 pro2 pro3 pro4').addClass('pro' + proNum);
         this.$dialog.find('.payment-plan-title').html(proPlan);
         this.$dialog.find('.payment-plan-price').html(proPrice + '&euro;');
-        this.$dialog.find('.payment-plan-txt').html(monthsWording + ' (recurring)');
+        this.$dialog.find('.payment-plan-txt').html(monthsWording + ' (' + l[6965] + ')');
         
         // Initialise the close button
         this.$dialog.find('.btn-close-dialog').click(function() {
@@ -732,7 +732,7 @@ var cardDialog = {
         if (!cardDialog.isValidCreditCard(billingData.card_number)) {
             
             // Show error popup and on close re-add the overlay
-            msgDialog('warninga', 'Incorrect card number', 'Please enter a valid credit card number.', '', function() {
+            msgDialog('warninga', l[6954], l[6955], '', function() {
                 cardDialog.$dialogOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
             });
             return false;
@@ -742,7 +742,7 @@ var cardDialog = {
         if (!billingData.address1 || !billingData.city || !billingData.province || !billingData.country_code || !billingData.postal_code) {
             
             // Show error popup and on close re-add the overlay
-            msgDialog('warninga', 'Missing billing details', 'Please complete the billing details correctly.', '', function() {
+            msgDialog('warninga', l[6956], l[6957], '', function() {
                 cardDialog.$dialogOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
             });
             return false;
@@ -751,7 +751,7 @@ var cardDialog = {
         // Check all the card details are completed
         else if (!billingData.first_name || !billingData.last_name || !billingData.card_number || !billingData.expiry_date_month || !billingData.expiry_date_year || !billingData.cv2) {
             
-            msgDialog('warninga', 'Missing payment details', 'Please complete the payment details correctly.', '', function() {
+            msgDialog('warninga', l[6958], l[6959], '', function() {
                 cardDialog.$dialogOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
             });
             return false;
@@ -802,7 +802,7 @@ var cardDialog = {
         
         api_req(requestData, {
             callback: function (res) {    
-                // Proceed with payment - ToDo: handle save failures here
+                // Proceed with payment
                 pro_pay();
             }
         });
@@ -835,11 +835,12 @@ var cardDialog = {
         // Get the selected Pro plan details
         var proNum = selectedProPackage[1];
         var proPlan = getProPlan(proNum);
+        var successMessage = l[6962].replace('%1', '<span>' + proPlan + '</span>');
         
         // Show the success
         cardDialog.$dialogOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
         cardDialog.$successOverlay.removeClass('hidden');
-        cardDialog.$successOverlay.find('.payment-result-txt span').text(proPlan);
+        cardDialog.$successOverlay.find('.payment-result-txt').html(successMessage);
         
         // Add click handlers for 'Go to my account' and Close buttons
         cardDialog.$successOverlay.find('.payment-result-button, .payment-close').rebind('click', function() {
@@ -883,7 +884,7 @@ var cardDialog = {
      * From http://jqueryvalidation.org/creditcard-method/ (MIT Licence)
      * Based on http://en.wikipedia.org/wiki/Luhn_algorithm
      * @param {String} cardNum The credit card number
-     * @returns {String|Boolean}
+     * @returns {Boolean}
      */
     isValidCreditCard: function (cardNum) {
 
@@ -1019,7 +1020,7 @@ var bitcoinDialog = {
         var options = {
             width: 256,
             height: 256,
-            correctLevel: QRErrorCorrectLevel.H,
+            correctLevel: QRErrorCorrectLevel.H,    // High
             background: '#ffffff',
             foreground: '#000',
             text: 'bitcoin:' + bitcoinAddress + '?amount=' + priceInBitcoins

@@ -2733,7 +2733,7 @@ function accountUI()
 				else {
                     $('.membership-big-txt.type').text('');
                 }
-				$('.membershtip-medium-txt.expiry').html(htmlentities('(' + account.sgw.join(",") + ')'));
+				$('.membership-medium-txt.expiry').html(htmlentities('(' + account.sgw.join(",") + ')'));
 				
 				// Check if there are any active subscriptions
                 // ccqns = Credit Card Query Number of Subscriptions

@@ -12023,6 +12023,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
 	margin-left: 10px;
 	position: relative;
 }
+.membershtip-medium-txt .btn-cancel {
+    display: none;
+}
 .membership-medium-txt.gray-bg:hover, .membership-medium-txt.gray-bg.active {
 	background-color: black;
 }

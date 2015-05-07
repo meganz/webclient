@@ -528,7 +528,7 @@ var cardDialog = {
     $failureOverlay: null,
     $loadingOverlay: null,
     
-    // The RSA public key to encrypt data to be stored on the Secure Processing Machine (SPM)
+    // The RSA public key to encrypt data to be stored on the Secure Processing Unit (SPU)
     publicKey: [
         atob(
             "wfvbeFkjArOsHvAjXAJqve/2z/nl2vaZ+0sBj8V6U7knIow6y3/6KJ" +
@@ -617,6 +617,7 @@ var cardDialog = {
             // Validate the form and normalise the billing details
             var billingDetails = cardDialog.getBillingDetails();
             
+            // If no errors, proceed with payment
             if (billingDetails !== false) {                
                 cardDialog.encryptBillingData(billingDetails);
             }            
@@ -727,6 +728,16 @@ var cardDialog = {
         // Remove all spaces and hyphens from credit card number
         billingData.card_number = billingData.card_number.replace(/-|\s/g, '');
         
+        // Check the credit card number
+        if (!cardDialog.isValidCreditCard(billingData.card_number)) {
+            
+            // Show error popup and on close re-add the overlay
+            msgDialog('warninga', 'Incorrect card number', 'Please enter a valid credit card number.', '', function() {
+                cardDialog.$dialogOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+            });
+            return false;
+        }
+        
         // Check the required billing details are completed
         if (!billingData.address1 || !billingData.city || !billingData.province || !billingData.country_code || !billingData.postal_code) {
             
@@ -783,6 +794,12 @@ var cardDialog = {
             'expy': billingData.expiry_date_year, 
             'hash': cardDataHashHex
         };
+        
+        if (d) {
+            console.log('requestData', requestData);
+            console.log('billingData', billingData);
+        }
+        
         api_req(requestData, {
             callback: function (res) {    
                 // Proceed with payment - ToDo: handle save failures here
@@ -858,6 +875,50 @@ var cardDialog = {
             cardDialog.$dialogOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
             cardDialog.$dialog.addClass('active').removeClass('hidden');
         });
+    },
+    
+    /**
+     * Validates the credit card number is the correct format
+     * Written by Jorn Zaefferer
+     * From http://jqueryvalidation.org/creditcard-method/ (MIT Licence)
+     * Based on http://en.wikipedia.org/wiki/Luhn_algorithm
+     * @param {String} cardNum The credit card number
+     * @returns {String|Boolean}
+     */
+    isValidCreditCard: function (cardNum) {
+
+        // Accept only spaces, digits and dashes
+        if (/[^0-9 \-]+/.test(cardNum)) {
+            return false;
+        }
+        var numCheck = 0,
+            numDigit = 0,
+            boolEven = false,
+            num,
+            charDigit;
+
+        cardNum = cardNum.replace(/\D/g, '');
+
+        // Basing min and max length on
+        // http://developer.ean.com/general_info/Valid_Credit_Card_Types
+        if (cardNum.length < 13 || cardNum.length > 19) {
+            return false;
+        }
+
+        for (num = cardNum.length - 1; num >= 0; num--) {
+            charDigit = cardNum.charAt(num);
+            numDigit = parseInt(charDigit, 10);
+            
+            if (boolEven) {
+                if ((numDigit *= 2) > 9) {
+                    numDigit -= 9;
+                }
+            }
+            numCheck += numDigit;
+            boolEven = !boolEven;
+        }
+
+        return (numCheck % 10) === 0;
     }
 };
 

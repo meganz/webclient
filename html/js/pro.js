@@ -930,13 +930,16 @@ var bitcoinDialog = {
     // Web socket for chain.com connection to monitor bitcoin payment
     chainWebSocketConn: null,
     
+    // Timer for counting down the time till when the price expires
+    countdownIntervalId: 0,
+    
     /**
      * Step 3 in plan purchase with Bitcoin
      * @param {Object} apiResponse API result
      */
     showInvoice: function(apiResponse) {
 
-        //* Testing data to watch the invoice expire in 5 secs
+        /* Testing data to watch the invoice expire in 5 secs
         apiResponse = {
             "invoice_id": 'sIk',
             "address": '12ouE2tWLuR3q5ZyQzQL6DR25iBLVjhwXd',
@@ -983,7 +986,7 @@ var bitcoinDialog = {
         dialog.find('.plan-price-bitcoins').html(priceBitcoins);
 
         // Set countdown to price expiry
-        var countdownIntervalId = bitcoinDialog.setCoundownTimer(dialog, expiryTime);
+        bitcoinDialog.setCoundownTimer(dialog, expiryTime);
 
         // Close dialog and reset to original dialog
         dialog.find('.btn-close-dialog').click(function() {
@@ -997,11 +1000,11 @@ var bitcoinDialog = {
             }
 
             // End countdown timer
-            clearInterval(countdownIntervalId);
+            clearInterval(bitcoinDialog.countdownIntervalId);
         });
 
         // Update the dialog if a transaction is seen in the blockchain
-        bitcoinDialog.checkTransactionInBlockchain(dialog, bitcoinAddress, planName, countdownIntervalId);
+        bitcoinDialog.checkTransactionInBlockchain(dialog, bitcoinAddress, planName);
     },
     
     /**
@@ -1032,9 +1035,8 @@ var bitcoinDialog = {
      * @param {Object} dialog The jQuery object for the dialog
      * @param {String} bitcoinAddress The bitcoin address
      * @param {String} planName The Pro plan name
-     * @param {Number} countdownIntervalId The countdown timer id so it can be terminated
      */
-    checkTransactionInBlockchain: function(dialog, bitcoinAddress, planName, countdownIntervalId) {
+    checkTransactionInBlockchain: function(dialog, bitcoinAddress, planName) {
 
         // Open socket
         bitcoinDialog.chainWebSocketConn = new WebSocket('wss://ws.chain.com/v2/notifications');
@@ -1075,7 +1077,7 @@ var bitcoinDialog = {
                     dialog.find('.expiry-instruction').html('Paid!');
 
                     // End countdown timer and close connection
-                    clearInterval(countdownIntervalId);
+                    clearInterval(bitcoinDialog.countdownIntervalId);
                     bitcoinDialog.chainWebSocketConn.close();
 
                     // Inform API that we have full payment and await action packet confirmation.
@@ -1109,7 +1111,7 @@ var bitcoinDialog = {
     setCoundownTimer: function(dialog, expiryTime)
     {
         // Count down the time to price expiration
-        var countdownIntervalId = setInterval(function() {
+        bitcoinDialog.countdownIntervalId = setInterval(function() {
 
             // Show number of minutes and seconds counting down
             var currentTimestamp = Math.round(Date.now() / 1000);
@@ -1150,11 +1152,9 @@ var bitcoinDialog = {
                 dialog.find('.price-expired-instruction').show();
 
                 // End countdown timer
-                clearInterval(countdownIntervalId);
+                clearInterval(bitcoinDialog.countdownIntervalId);
             }
         }, 1000);
-
-        return countdownIntervalId;
     },
     
     /**
@@ -1171,10 +1171,13 @@ var bitcoinDialog = {
         dialogOverlay.addClass('bitcoin-provider-failure-dialog');
         dialog.addClass('bitcoin-provider-failure-dialog');
 
+        // End countdown timer
+        clearInterval(bitcoinDialog.countdownIntervalId);
+
         // Clone template and show failure
         var bitcoinProviderFailureHtml = $('.bitcoin-provider-failure').html();
         dialog.html(bitcoinProviderFailureHtml);
-
+        
         // Close dialog and reset to original dialog
         dialog.find('.btn-close-dialog').click(function() {
             dialogOverlay.removeClass('bitcoin-provider-failure-dialog').addClass('hidden');

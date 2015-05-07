@@ -11743,7 +11743,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
 	opacity: 1;
 	margin-left: 0;
 	margin-right: 0;
-    display: block !important;
+    display: block;
 }
 .top-warning-popup.active, .notification-popup.active, .warning-popup.active, .notification-popup.active.hidden, .warning-popup.active.hidden {
 	margin-left: -188px;

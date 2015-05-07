@@ -893,7 +893,7 @@ var cardDialog = {
         }
         var numCheck = 0,
             numDigit = 0,
-            boolEven = false,
+            even = false,
             num,
             charDigit;
 
@@ -909,13 +909,13 @@ var cardDialog = {
             charDigit = cardNum.charAt(num);
             numDigit = parseInt(charDigit, 10);
             
-            if (boolEven) {
+            if (even) {
                 if ((numDigit *= 2) > 9) {
                     numDigit -= 9;
                 }
             }
             numCheck += numDigit;
-            boolEven = !boolEven;
+            even = !even;
         }
 
         return (numCheck % 10) === 0;

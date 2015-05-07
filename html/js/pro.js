@@ -505,9 +505,9 @@ function pro_pay()
                                 cardDialog.showSuccessfulPayment(utcResult);
                             }
                             
-                            // ToDo: Show credit card failure
+                            // Show credit card failure
                             else if ((pro_m === 8) && (!utcResult || utcResult.EUR.res === 'FP' || utcResult.EUR.res === 'FI')) {
-                                
+                                cardDialog.showFailureOverlay();
                             }
                         }
                     }
@@ -525,6 +525,7 @@ var cardDialog = {
     $dialog: null,
     $dialogOverlay: null,
     $successOverlay: null,
+    $failureOverlay: null,
     $loadingOverlay: null,
     
     // The RSA public key to encrypt data to be stored on the Secure Processing Machine (SPM)
@@ -565,6 +566,7 @@ var cardDialog = {
         this.$dialog = $('.fm-dialog.payment-dialog');
         this.$dialogOverlay = $('.fm-dialog-overlay');
         this.$successOverlay = $('.payment-result.success');
+        this.$failureOverlay = $('.payment-result.failed');
         this.$loadingOverlay = $('.payment-processing');
         
         // Add the styling for the overlay
@@ -773,21 +775,20 @@ var cardDialog = {
         var encryptedBillingData = btoa(paycrypt.hybridEncrypt(jsonEncodedBillingData, this.publicKey));
 
         // Add credit card, the most recently added card is used by default
-        api_req({
-                'a': 'ccs',                          // Credit Card Store
-                'cc': encryptedBillingData,
-                'last4': lastFourCardDigits,
-                'expm': billingData.expiry_date_month,
-                'expy': billingData.expiry_date_year, 
-                'hash': cardDataHashHex
-            },
-            {
+        var requestData = {
+            'a': 'ccs',                          // Credit Card Store
+            'cc': encryptedBillingData,
+            'last4': lastFourCardDigits,
+            'expm': billingData.expiry_date_month,
+            'expy': billingData.expiry_date_year, 
+            'hash': cardDataHashHex
+        };
+        api_req(requestData, {
+            callback: function (res) {    
                 // Proceed with payment - ToDo: handle save failures here
-                callback: function (res) {
-                    pro_pay();
-                }
+                pro_pay();
             }
-        );
+        });
     },
     
     /**
@@ -823,8 +824,8 @@ var cardDialog = {
         cardDialog.$successOverlay.removeClass('hidden');
         cardDialog.$successOverlay.find('.payment-result-txt span').text(proPlan);
         
-        // Add click handler for 'Go to my account' button
-        cardDialog.$successOverlay.find('.payment-result-button').rebind('click', function() {
+        // Add click handlers for 'Go to my account' and Close buttons
+        cardDialog.$successOverlay.find('.payment-result-button, .payment-close').rebind('click', function() {
             
             // Hide the overlay
             cardDialog.$dialogOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
@@ -836,24 +837,27 @@ var cardDialog = {
             }
             window.location.hash = 'fm/account';            
         });
-        
-        // Go to their account on close as well
-        cardDialog.$successOverlay.find('.payment-close').rebind('click', function() {
-            
-            // Hide the overlay
-            cardDialog.$dialogOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
-            cardDialog.$successOverlay.addClass('hidden');
-            
-            // Make sure it fetches new account data on reload
-            if (M.account) {
-                M.account.lastupdate = 0;
-            }
-            window.location.hash = 'fm/account';
-        });
     },
     
-    showFailedPayment: function() {
+    /**
+     * Shows the failure overlay
+     */
+    showFailureOverlay: function() {
         
+        // Show the failure overlay
+        cardDialog.$failureOverlay.removeClass('hidden');
+        cardDialog.$loadingOverlay.addClass('hidden');
+        
+        // On click of the 'Try again' or Close buttons, hide the overlay and the user can fix their payment details
+        cardDialog.$failureOverlay.find('.payment-result-button, .payment-close').rebind('click', function() {
+            
+            // Hide failure and re-open the dialog
+            cardDialog.$failureOverlay.addClass('hidden');
+            
+            // Re-open the card dialog
+            cardDialog.$dialogOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+            cardDialog.$dialog.addClass('active').removeClass('hidden');
+        });
     }
 };
 

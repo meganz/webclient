@@ -2934,6 +2934,9 @@ function accountUI()
             else if (paymentMethodIndex == 4) {
                 paymentMethod = 'Bitcoin';
             }
+            else if (paymentMethodIndex == 8) {
+                paymentMethod = 'Credit card';
+            }
 
             // Set Date/Time, Item (plan purchased), Amount, Payment Method
             var dateTime = time2date(purchaseTransaction[1]);

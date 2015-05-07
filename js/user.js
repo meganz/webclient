@@ -578,7 +578,8 @@ function getUserAttribute(userhandle, attribute, pub, nonHistoric,
                             + '" is "' + res + '".');
             }
             thePromise.resolve(res, ctx);
-        } else {
+        }
+        else {
             // Got back an error (a number).
             if (window.d) {
                 console.log('Warning, attribute "' + ctx.ua
@@ -662,7 +663,8 @@ function setUserAttribute(attribute, value, pub, nonHistoric, callback, ctx,
             console.log('Setting user attribute "'
                         + ctx.ua + '", result: ' + res);
             thePromise.resolve(res, ctx);
-        } else {
+        }
+        else {
             console.log('Error setting user attribute "'
                         + ctx.ua + '", result: ' + res + '!');
             thePromise.reject(res, ctx);

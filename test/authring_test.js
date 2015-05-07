@@ -505,77 +505,75 @@ describe("authring unit test", function() {
 
         describe('_checkEd25519PubKey()', function() {
             it('passed check', function() {
-                var getAttributePromise = { then: sinon.stub(),
-                                            resolve: sinon.stub() };
+                var getAttributePromise = { then: sinon.stub().returns('foo') };
                 sandbox.stub(window, 'getUserAttribute').returns(getAttributePromise);
                 sandbox.stub(window, 'base64urldecode').returns(ED25519_PUB_KEY);
                 sandbox.stub(window, 'u_pubEd25519', ED25519_PUB_KEY);
-                ns._checkEd25519PubKey();
+                var result = ns._checkEd25519PubKey();
+                assert.strictEqual(result, 'foo');
                 var callback = getAttributePromise.then.args[0][0];
-                callback('foo');
-                assert.strictEqual(getAttributePromise.resolve.callCount, 1);
+                var callbackResult = callback('bar');
+                assert.strictEqual(callbackResult, true);
             });
 
             it('outdated key', function() {
                 sandbox.stub(ns._logger, '_log');
-                var getAttributePromise = { then: sinon.stub(),
-                                            resolve: sinon.stub() };
+                var getAttributePromise = { then: sinon.stub().returns('foo') };
                 sandbox.stub(window, 'getUserAttribute').returns(getAttributePromise);
-                var setAttributePromise = { then: sinon.stub(),
-                                            resolve: sinon.stub() };
+                var setAttributePromise = { then: sinon.stub().returns('bar') };
                 sandbox.stub(window, 'setUserAttribute').returns(setAttributePromise);
                 sandbox.stub(window, 'base64urldecode').returns(ED25519_PUB_KEY);
                 sandbox.stub(window, 'u_pubEd25519', 'foo');
-                ns._checkEd25519PubKey();
+                var result = ns._checkEd25519PubKey();
+                assert.strictEqual(result, 'foo');
                 var getCallback = getAttributePromise.then.args[0][0];
-                getCallback('foo');
-                var setCallback = setAttributePromise.then.args[0][0];
-                setCallback('foo');
-                assert.strictEqual(getAttributePromise.resolve.callCount, 1);
+                var getCallbackResult = getCallback('foo');
+                assert.strictEqual(getCallbackResult, 'bar');
                 assert.strictEqual(ns._logger._log.args[0][1][0],
                                    'Need to update Ed25519 pub key.');
+                var setCallback = setAttributePromise.then.args[0][0];
+                var setCallbackResult = setCallback('foo');
+                assert.strictEqual(setCallbackResult, true);
                 assert.strictEqual(ns._logger._log.args[1][1][0],
                                    'Ed25519 pub key updated.');
             });
 
             it('getting key fails', function() {
                 sandbox.stub(ns._logger, '_log');
-                var getAttributePromise = { then: sinon.stub(),
-                                            resolve: sinon.stub() };
+                var getAttributePromise = { then: sinon.stub().returns('foo') };
                 sandbox.stub(window, 'getUserAttribute').returns(getAttributePromise);
-                var setAttributePromise = { then: sinon.stub(),
-                                            resolve: sinon.stub() };
+                var setAttributePromise = { then: sinon.stub().returns('bar') };
                 sandbox.stub(window, 'setUserAttribute').returns(setAttributePromise);
-                ns._checkEd25519PubKey();
+                var result = ns._checkEd25519PubKey();
+                assert.strictEqual(result, 'foo');
                 var getCallback = getAttributePromise.then.args[0][1];
-                getCallback('foo');
-                var setCallback = setAttributePromise.then.args[0][0];
-                setCallback('foo');
-                assert.strictEqual(getAttributePromise.resolve.callCount, 1);
+                var getCallbackResult = getCallback('foo');
+                assert.strictEqual(getCallbackResult, 'bar');
                 assert.strictEqual(ns._logger._log.args[0][1][0],
                                    'Could not get my Ed25519 pub key, setting it now.');
+                var setCallback = setAttributePromise.then.args[0][0];
+                var setCallbackResult = setCallback('foo');
+                assert.strictEqual(setCallbackResult, true);
                 assert.strictEqual(ns._logger._log.args[1][1][0],
                                    'Ed25519 pub key updated.');
             });
 
             it('key update fails', function() {
                 sandbox.stub(ns._logger, '_log');
-                var getAttributePromise = { then: sinon.stub(),
-                                            reject: sinon.stub() };
+                var getAttributePromise = { then: sinon.stub().returns('foo') };
                 sandbox.stub(window, 'getUserAttribute').returns(getAttributePromise);
-                var setAttributePromise = { then: sinon.stub(),
-                                            resolve: sinon.stub() };
+                var setAttributePromise = { then: sinon.stub().returns('bar') };
                 sandbox.stub(window, 'setUserAttribute').returns(setAttributePromise);
-                sandbox.stub(window, 'base64urldecode').returns(ED25519_PUB_KEY);
-                sandbox.stub(window, 'u_pubEd25519', 'foo');
-                ns._checkEd25519PubKey();
-                var getCallback = getAttributePromise.then.args[0][0];
-                getCallback('foo');
-                var setCallback = setAttributePromise.then.args[0][1];
-                setCallback('foo');
-                assert.strictEqual(getAttributePromise.reject.callCount, 1);
+                var result = ns._checkEd25519PubKey();
+                assert.strictEqual(result, 'foo');
+                var getCallback = getAttributePromise.then.args[0][1];
+                var getCallbackResult = getCallback('foo');
+                assert.strictEqual(getCallbackResult, 'bar');
                 assert.strictEqual(ns._logger._log.args[0][1][0],
-                                   'Need to update Ed25519 pub key.');
+                                   'Could not get my Ed25519 pub key, setting it now.');
+                var setCallback = setAttributePromise.then.args[0][1];
+                var setCallbackResult = setCallback('foo');
+                assert.strictEqual(setCallbackResult, false);
                 assert.strictEqual(ns._logger._log.args[1][1][0],
                                    'Error updating Ed25519 pub key.');
             });
@@ -583,8 +581,8 @@ describe("authring unit test", function() {
 
         describe('initAuthenticationSystem()', function() {
             it('works normally', function() {
-                sandbox.stub(authring, 'getContacts');
-                sandbox.stub(MegaPromise, 'allDone');
+                sandbox.stub(authring, 'getContacts').returns('bar');
+                sandbox.stub(MegaPromise, 'allDone', function(input) { return input; });
                 sandbox.stub(window, 'u_keyring', null);
                 sandbox.stub(window, 'u_handle', 'me3456789xw');
                 sandbox.stub(window, 'u_attr', {});
@@ -593,80 +591,80 @@ describe("authring unit test", function() {
                 sandbox.stub(window, 'pubEd25519', {});
                 sandbox.stub(ns, '_checkEd25519PubKey');
                 sandbox.stub(jodid25519.eddsa, 'publicKey').returns(ED25519_PUB_KEY);
-                var getAttributePromise = { then: sinon.stub(),
-                                            resolve: sinon.stub() };
+                var getAttributePromise = { then: sinon.stub().returns('foo') };
                 sandbox.stub(window, 'getUserAttribute').returns(getAttributePromise);
                 var collectivePromise = ns.initAuthenticationSystem();
+                assert.deepEqual(collectivePromise, ['foo', 'bar', 'bar']);
+                assert.strictEqual(authring.getContacts.callCount, 2);
+                assert.strictEqual(MegaPromise.allDone.callCount, 1);
                 var getCallback = getAttributePromise.then.args[0][0];
-                getCallback({ prEd255: ED25519_PRIV_KEY });
+                var getCallbackResult = getCallback({ prEd255: ED25519_PRIV_KEY });
+                assert.strictEqual(getCallbackResult, true);
+                assert.strictEqual(jodid25519.eddsa.publicKey.callCount, 1);
+                assert.strictEqual(ns._checkEd25519PubKey.callCount, 1);
                 assert.deepEqual(u_keyring, { prEd255: ED25519_PRIV_KEY });
                 assert.deepEqual(u_attr.keyring, { prEd255: ED25519_PRIV_KEY });
                 assert.strictEqual(u_privEd25519, ED25519_PRIV_KEY);
                 assert.strictEqual(u_pubEd25519, ED25519_PUB_KEY);
                 assert.strictEqual(u_attr.puEd255, ED25519_PUB_KEY);
                 assert.strictEqual(pubEd25519[u_handle], ED25519_PUB_KEY);
-                assert.strictEqual(jodid25519.eddsa.publicKey.callCount, 1);
-                assert.strictEqual(ns._checkEd25519PubKey.callCount, 1);
-                assert.strictEqual(getAttributePromise.resolve.callCount, 1);
-                assert.strictEqual(authring.getContacts.callCount, 2);
-                assert.strictEqual(MegaPromise.allDone.callCount, 1);
             });
 
             it('missing keyring, auth system setup succeeds', function() {
-                sandbox.stub(authring, 'getContacts');
-                sandbox.stub(MegaPromise, 'allDone');
                 sandbox.stub(ns._logger, '_log');
-                var getAttributePromise = { then: sinon.stub(),
-                                            resolve: sinon.stub() };
-                sandbox.stub(window, 'getUserAttribute').returns(getAttributePromise);
-                var setupAuthPromise = { then: sinon.stub(),
-                                         resolve: sinon.stub() };
+                sandbox.stub(authring, 'getContacts').returns('bar');
+                sandbox.stub(MegaPromise, 'allDone', function(input) { return input; });
+                sandbox.stub(window, 'u_keyring', null);
+                sandbox.stub(window, 'u_handle', 'me3456789xw');
+                sandbox.stub(window, 'u_attr', {});
+                sandbox.stub(window, 'u_privEd25519', null);
+                sandbox.stub(window, 'u_pubEd25519', null);
+                sandbox.stub(window, 'pubEd25519', {});
+                sandbox.stub(ns, '_checkEd25519PubKey');
+                sandbox.stub(jodid25519.eddsa, 'publicKey').returns(ED25519_PUB_KEY);
+                var setupAuthPromise = { then: sinon.stub().returns('bar') };
                 sandbox.stub(ns, 'setUpAuthenticationSystem').returns(setupAuthPromise);
+                var getAttributePromise = { then: sinon.stub().returns('foo') };
+                sandbox.stub(window, 'getUserAttribute').returns(getAttributePromise);
                 var collectivePromise = ns.initAuthenticationSystem();
+                assert.deepEqual(collectivePromise, ['foo', 'bar', 'bar']);
+                assert.strictEqual(authring.getContacts.callCount, 2);
+                assert.strictEqual(MegaPromise.allDone.callCount, 1);
                 var getCallback = getAttributePromise.then.args[0][1];
-                getCallback(-9);
-                var setupAuthCallback = setupAuthPromise.then.args[0][0];
-                setupAuthCallback(true);
+                var getCallbackResult = getCallback(-9);
                 assert.strictEqual(ns._logger._log.args[0][1][0],
                                    'Authentication system seems unavailable.');
+                assert.strictEqual(typeof getCallbackResult.then, 'function');
                 assert.strictEqual(ns.setUpAuthenticationSystem.callCount, 1);
-                assert.strictEqual(getAttributePromise.resolve.callCount, 1);
-            });
-
-            it('missing keyring, auth system setup fails', function() {
-                sandbox.stub(authring, 'getContacts');
-                sandbox.stub(MegaPromise, 'allDone');
-                sandbox.stub(ns._logger, '_log');
-                var getAttributePromise = { then: sinon.stub(),
-                                            reject: sinon.stub() };
-                sandbox.stub(window, 'getUserAttribute').returns(getAttributePromise);
-                var setupAuthPromise = { then: sinon.stub(),
-                                         resolve: sinon.stub() };
-                sandbox.stub(ns, 'setUpAuthenticationSystem').returns(setupAuthPromise);
-                var collectivePromise = ns.initAuthenticationSystem();
-                var getCallback = getAttributePromise.then.args[0][1];
-                getCallback(-9);
-                var setupAuthCallback = setupAuthPromise.then.args[0][1];
-                setupAuthCallback(false);
-                assert.strictEqual(ns._logger._log.args[0][1][0],
-                                   'Authentication system seems unavailable.');
-                assert.strictEqual(ns.setUpAuthenticationSystem.callCount, 1);
-                assert.strictEqual(getAttributePromise.reject.callCount, 1);
             });
 
             it('keyring get rejected', function() {
-                sandbox.stub(authring, 'getContacts');
-                sandbox.stub(MegaPromise, 'allDone');
                 sandbox.stub(ns._logger, '_log');
-                var getAttributePromise = { then: sinon.stub(),
-                                            reject: sinon.stub() };
+                sandbox.stub(authring, 'getContacts').returns('bar');
+                sandbox.stub(MegaPromise, 'allDone', function(input) { return input; });
+                sandbox.stub(window, 'u_keyring', null);
+                sandbox.stub(window, 'u_handle', 'me3456789xw');
+                sandbox.stub(window, 'u_attr', {});
+                sandbox.stub(window, 'u_privEd25519', null);
+                sandbox.stub(window, 'u_pubEd25519', null);
+                sandbox.stub(window, 'pubEd25519', {});
+                sandbox.stub(ns, '_checkEd25519PubKey');
+                sandbox.stub(jodid25519.eddsa, 'publicKey').returns(ED25519_PUB_KEY);
+                var setupAuthPromise = { then: sinon.stub().returns('bar') };
+                sandbox.stub(ns, 'setUpAuthenticationSystem').returns(setupAuthPromise);
+                var getAttributePromise = { then: sinon.stub().returns('foo') };
                 sandbox.stub(window, 'getUserAttribute').returns(getAttributePromise);
                 var collectivePromise = ns.initAuthenticationSystem();
+                assert.deepEqual(collectivePromise, ['foo', 'bar', 'bar']);
+                assert.strictEqual(authring.getContacts.callCount, 2);
+                assert.strictEqual(MegaPromise.allDone.callCount, 1);
                 var getCallback = getAttributePromise.then.args[0][1];
-                getCallback('foo');
+                var getCallbackResult = getCallback('oh noooo!');
                 assert.strictEqual(ns._logger._log.args[0][1][0],
-                                   'Error retrieving Ed25519 authentication ring: foo');
-                assert.strictEqual(getAttributePromise.reject.callCount, 1);
+                                   'Error retrieving Ed25519 authentication ring: oh noooo!');
+                assert.strictEqual(typeof getCallbackResult.then, 'function');
+                assert.strictEqual(ns.setUpAuthenticationSystem.callCount, 0);
+                assert.strictEqual(getCallbackResult.state(), 'rejected');
             });
         });
     });

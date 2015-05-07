@@ -186,9 +186,9 @@ var authring = (function () {
             throw new Error('Unsupporte authentication key type: ' + keyType);
         }
 
-        var thePromise = getUserAttribute(u_handle, ns._properties[keyType],
-                                          false, true);
-        return thePromise.then(
+        var attributePromise = getUserAttribute(u_handle, ns._properties[keyType],
+                                                false, true);
+        var contactPromise = attributePromise.then(
             // Function on fulfilment.
             function(result) {
                 if (typeof result !== 'number') {
@@ -200,15 +200,17 @@ var authring = (function () {
                 } else {
                     logger.error('Error retrieving authentication ring for key type '
                                  + keyType + ': ' + result);
-                    thePromise.reject(result);
+                    attributePromise.reject(result);
                 }
             },
             // Function on rejection.
             function(result) {
                 logger.error('Error retrieving authentication ring for key type '
                              + keyType + ': ' + result);
+                return result;
             }
         );
+        return contactPromise;
     };
 
 
@@ -510,10 +512,10 @@ var authring = (function () {
      */
     ns.initAuthenticationSystem = function() {
         // Load private key.
-        var keyringApiPromise = getUserAttribute(u_handle, 'keyring', false, false);
-        keyringApiPromise.then(
+        var attributePromise = getUserAttribute(u_handle, 'keyring', false, false);
+        var keyringPromise = attributePromise.then(
             // Function on resolution.
-            function(result, ctx) {
+            function(result) {
                 // Set local values.
                 u_keyring = result;
                 u_attr.keyring = u_keyring;
@@ -523,30 +525,26 @@ var authring = (function () {
                 pubEd25519[u_handle] = u_pubEd25519;
                 // Run on the side a sanity check on the stored pub key.
                 ns._checkEd25519PubKey();
-                // Resolve the promise.
-                keyringApiPromise.resolve(true, ctx);
+
+                return true;
             },
             // Function on rejection.
-            function(result, ctx) {
+            function(result) {
                 if (result === -9) {
                     // We don't have it set up, yet. Let's do so now.
                     logger.warn('Authentication system seems unavailable.');
-                    var setUpPromise = ns.setUpAuthenticationSystem();
-                    setUpPromise.then(
-                        // Function on resolution.
-                        function(result, ctx) {
-                            keyringApiPromise.resolve();
-                        },
-                        // Function on rejection.
-                        function(result, ctx) {
-                            keyringApiPromise.reject();
-                        }
-                    );
+
+                    return ns.setUpAuthenticationSystem();
                 }
                 else {
-                    logger.error('Error retrieving Ed25519 authentication ring: '
-                                 + result);
-                    keyringApiPromise.reject(result, ctx);
+                    var message = 'Error retrieving Ed25519 authentication ring: '
+                                + result;
+                    logger.error(message);
+                    // Let's pass a rejection upstream.
+                    var rejectedPromise = new MegaPromise();
+                    rejectedPromise.reject(result);
+
+                    return rejectedPromise;
                 }
             }
         );
@@ -555,50 +553,66 @@ var authring = (function () {
         var authringPromise = authring.getContacts('Ed25519');
         var authRsaPromise = authring.getContacts('RSA');
 
-        return MegaPromise.allDone([keyringApiPromise, authringPromise,
+        return MegaPromise.allDone([keyringPromise, authringPromise,
                                     authRsaPromise]);
     };
 
 
+    /**
+     * This is a check to run on one's *own* pub key against the private key.
+     *
+     * @return {MegaPromise}
+     *     A promise that is resolved when the original asynch code is settled.
+     */
     ns._checkEd25519PubKey = function() {
-        var thePromise = getUserAttribute(u_handle, "puEd255", true, false);
+        var attributePromise = getUserAttribute(u_handle, "puEd255", true, false);
 
+        // To set the pub key, in case it's not there or doesn't pair up with
+        // our private key.
         function setKey() {
             var setPromise = setUserAttribute('puEd255',
                                               base64urlencode(u_pubEd25519),
                                               true, false);
-            setPromise.then(
+            var setDonePromise = setPromise.then(
                 // Function on resolution for set.
-                function(result, ctx) {
+                function(result) {
                     logger.debug('Ed25519 pub key updated.');
-                    thePromise.resolve(true, ctx);
+
+                    return true;
                 },
                 // Function on rejection for set.
-                function(result, ctx) {
+                function(result) {
                     logger.error('Error updating Ed25519 pub key.');
-                    thePromise.reject(false, ctx);
+
+                    return false;
                 }
             );
+
+            return setDonePromise;
         }
 
-        thePromise.then(
+        var checkPromise = attributePromise.then(
             // Function on resolution for get.
-            function(result, ctx) {
-                var storedPubKey = base64urldecode(result)
+            function(result) {
+                var storedPubKey = base64urldecode(result);
                 if (storedPubKey === u_pubEd25519) {
-                    thePromise.resolve(true, ctx);
+                    return true;
                 }
                 else {
                     logger.info('Need to update Ed25519 pub key.');
-                    setKey();
+
+                    return setKey();
                 }
             },
             // Function on rejection for get.
-            function(result, ctx) {
+            function(result) {
                 logger.warn('Could not get my Ed25519 pub key, setting it now.');
-                setKey();
+
+                return setKey();
             }
         );
+
+        return checkPromise;
     };
 
 

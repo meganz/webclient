@@ -347,16 +347,5 @@ describe("crypto unit test", function() {
                                    'Got Ed25519 fingerprint for user "you456789xw": If4x36FUomFia_hUBG_SJxt77Us');
             });
         });
-
-        // XXX: Remove the following test code.
-        describe('FOO TEST', function() {
-            it("test some chained FOO", function() {
-                dump('=== FOO CASE ===');
-                var result = ns.fooStep3('GUY');
-                result.done(function(result) {
-                    console.log('final result', result);
-                });
-            });
-        });
     });
 });

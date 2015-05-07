@@ -39,6 +39,7 @@ var crypt = (function () {
         else if (recorded && authring.equalFingerprints(recorded.fingerprint, fingerprint) === false) {
             throw new Error('Ed25519 fingerprint does not match previously authenticated one!');
         }
+
         return value;
     };
 
@@ -55,51 +56,15 @@ var crypt = (function () {
             authring.setContactAuthenticated(userhandle, fingerprint, 'RSA',
                                              authring.AUTHENTICATION_METHOD.SEEN,
                                              authring.KEY_CONFIDENCE.UNSURE);
+
             return value;
         }
         else if (recorded && authring.equalFingerprints(recorded.fingerprint, fingerprint) === false) {
             throw new Error('RSA fingerprint does not match previously authenticated one!');
         }
+
         return value;
     };
-
-
-    // XXX: Remove the following test code.
-
-    ns.fooStep1 = function(param) {
-        console.log('starting fooStep1 for', param);
-        var thePromise = new MegaPromise(function(resolve, reject) {
-            console.log('fooStep1 for', param, 'is boing');
-            resolve('step1_boing');
-        });
-        return thePromise;
-    };
-
-
-    ns.fooStep2 = function(param) {
-        console.log('starting fooStep2 for', param);
-        var thePromise = ns.fooStep1('get_step1_' + param);
-        var nextStep = thePromise.then(
-            function(result) {
-                console.log('fooStep2 for', param, 'is', result);
-                return 'step2_' + result;
-            }
-        );
-        return nextStep;
-    };
-
-    ns.fooStep3 = function(param) {
-        console.log('starting fooStep3 for', param);
-        var thePromise = ns.fooStep2('get_step2_' + param);
-        var nextStep = thePromise.then(
-            function(result) {
-                console.log('fooStep3 for', param, 'is', result);
-                return 'step3_' + result ;
-            }
-        );
-        return nextStep;
-    };
-
 
 
     /**
@@ -146,6 +111,7 @@ var crypt = (function () {
                 throw(ex);
                 // Not rejecting it. The exception beats a reject!
             }
+
             return keyPromise;
         }
         else {
@@ -173,7 +139,7 @@ var crypt = (function () {
                     if (callback) {
                         callback(pubEd25519[userhandle], userhandle);
                     }
-                    console.log('XXX ----------', pubEd25519[userhandle].length);
+
                     return pubEd25519[userhandle];
                 },
                 // Function on rejection.
@@ -185,6 +151,7 @@ var crypt = (function () {
                     }
                 }
             );
+
             return keyPromise;
         }
     };
@@ -204,7 +171,6 @@ var crypt = (function () {
      */
     ns.getFingerprintEd25519 = function(userhandle, format) {
         var makeFingerprint = function(pubKey) {
-            console.log('XXX *************', pubKey.length, typeof pubKey);
             var value = authring.computeFingerprint(pubKey, 'Ed25519', format);
             var message = 'Got Ed25519 fingerprint for user "' + userhandle + '": ';
             if (format === 'string') {
@@ -214,6 +180,7 @@ var crypt = (function () {
                 message += value;
             }
             logger.debug(message);
+
             return value;
         };
 
@@ -221,8 +188,8 @@ var crypt = (function () {
             // It's cached: Only compute fingerprint of it.
             // Make the promise for a cached value.
             var fingerprintPromise = new MegaPromise();
-            console.log('XXX ************* cached');
             fingerprintPromise.resolve(makeFingerprint(pubEd25519[userhandle]));
+
             return fingerprintPromise;
         }
         else {
@@ -231,7 +198,6 @@ var crypt = (function () {
             var fingerprintPromise = keyPromise.then(
                 // Function on fulfilment.
                 function(result) {
-                    console.log('XXX ************* not cached', result.length, typeof result);
                     return makeFingerprint(result);
                 },
                 // Function on rejection.
@@ -240,6 +206,7 @@ var crypt = (function () {
                                  + userhandle + '": ' + result);
                 }
             );
+
             return fingerprintPromise;
         }
     };

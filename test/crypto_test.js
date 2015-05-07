@@ -29,7 +29,7 @@ describe("crypto unit test", function() {
     describe('user attributes', function() {
         describe('_checkAuthenticationEd25519()', function() {
             it("unseen fingerprint", function() {
-                sandbox.stub(window, 'pubEd25519', {'you456789xw': ED25519_PUB_KEY});
+                sandbox.stub(window, 'pubEd25519', { 'you456789xw': ED25519_PUB_KEY });
                 sandbox.stub(authring, 'getContactAuthenticated').returns(false);
                 sandbox.stub(authring, 'equalFingerprints').returns(undefined);
                 sandbox.stub(authring, 'setContactAuthenticated');
@@ -39,7 +39,7 @@ describe("crypto unit test", function() {
             });
 
             it("seen fingerprint", function() {
-                sandbox.stub(window, 'pubEd25519', {'you456789xw': ED25519_PUB_KEY});
+                sandbox.stub(window, 'pubEd25519', { 'you456789xw': ED25519_PUB_KEY });
                 var authenticated = { fingerprint: ED25519_FINGERPRINT,
                                       method: authring.AUTHENTICATION_METHOD.SEEN,
                                       confidence: authring.KEY_CONFIDENCE.UNSURE };
@@ -52,7 +52,7 @@ describe("crypto unit test", function() {
             });
 
             it("fingerprint mismatch", function() {
-                sandbox.stub(window, 'pubEd25519', {'you456789xw': ED25519_PUB_KEY});
+                sandbox.stub(window, 'pubEd25519', { 'you456789xw': ED25519_PUB_KEY });
                 var authenticated = { fingerprint: base64urldecode('XyeqVYkXl3DkdXWxYqHe2XuL_G0'),
                                       method: authring.AUTHENTICATION_METHOD.SEEN,
                                       confidence: authring.KEY_CONFIDENCE.UNSURE };
@@ -67,7 +67,7 @@ describe("crypto unit test", function() {
 
         describe('_checkAuthenticationRSA()', function() {
             it("unseen fingerprint", function() {
-                sandbox.stub(window, 'u_pubkeys', {'you456789xw': 'foo'});
+                sandbox.stub(window, 'u_pubkeys', { 'you456789xw': 'foo' });
                 sandbox.stub(authring, 'getContactAuthenticated').returns(false);
                 sandbox.stub(authring, 'computeFingerprint').returns(ED25519_FINGERPRINT);
                 sandbox.stub(authring, 'equalFingerprints').returns(undefined);
@@ -81,7 +81,7 @@ describe("crypto unit test", function() {
             });
 
             it("seen fingerprint", function() {
-                sandbox.stub(window, 'u_pubkeys', {'you456789xw': 'foo'});
+                sandbox.stub(window, 'u_pubkeys', { 'you456789xw': 'foo' });
                 var authenticated = { fingerprint: ED25519_FINGERPRINT,
                                       method: authring.AUTHENTICATION_METHOD.SEEN,
                                       confidence: authring.KEY_CONFIDENCE.UNSURE };
@@ -98,7 +98,7 @@ describe("crypto unit test", function() {
             });
 
             it("fingerprint mismatch", function() {
-                sandbox.stub(window, 'u_pubkeys', {'you456789xw': 'foo'});
+                sandbox.stub(window, 'u_pubkeys', { 'you456789xw': 'foo' });
                 var authenticated = { fingerprint: ED25519_FINGERPRINT,
                                       method: authring.AUTHENTICATION_METHOD.SEEN,
                                       confidence: authring.KEY_CONFIDENCE.UNSURE };
@@ -121,9 +121,11 @@ describe("crypto unit test", function() {
                 sandbox.stub(window, 'pubEd25519', {});
                 sandbox.stub(window, 'u_authring', { Ed25519: {} });
                 sandbox.stub(ns, '_checkAuthenticationEd25519').returns('foo');
-                var attributePromise = { then: sinon.stub(),
-                                         reject: sinon.stub() };
-                sandbox.stub(window, 'getUserAttribute').returns(attributePromise);
+                var attributePromise = { then: sinon.stub() };
+                var rootPromise = { then: sinon.stub().returns(attributePromise),
+                                    resolve: sinon.stub() };
+                sandbox.stub(window, 'MegaPromise').returns(rootPromise);
+                sandbox.stub(window, 'getUserAttribute');
                 ns.getPubEd25519('you456789xw');
                 assert.strictEqual(getUserAttribute.callCount, 1);
                 assert.strictEqual(ns._checkAuthenticationEd25519.callCount, 0);
@@ -143,9 +145,11 @@ describe("crypto unit test", function() {
                     { pubkey: ED25519_PUB_KEY,
                       authenticated: { fingerprint: ED25519_FINGERPRINT,
                                        method: 0, confidence: 0} } );
-                var attributePromise = { then: sinon.stub(),
-                                         resolve: sinon.stub() };
-                sandbox.stub(window, 'getUserAttribute').returns(attributePromise);
+                var attributePromise = { then: sinon.stub() };
+                var rootPromise = { then: sinon.stub().returns(attributePromise),
+                                    resolve: sinon.stub() };
+                sandbox.stub(window, 'MegaPromise').returns(rootPromise);
+                sandbox.stub(window, 'getUserAttribute');
                 ns.getPubEd25519('you456789xw');
                 assert.strictEqual(getUserAttribute.callCount, 1);
                 assert.strictEqual(ns._checkAuthenticationEd25519.callCount, 0);
@@ -183,9 +187,11 @@ describe("crypto unit test", function() {
                 sandbox.stub(ns._logger, '_log');
                 sandbox.stub(u_authring, 'Ed25519', {});
                 sandbox.stub(window, 'pubEd25519', {});
-                var attributePromise = { then: sinon.stub(),
-                                         reject: sinon.stub() };
-                sandbox.stub(window, 'getUserAttribute').returns(attributePromise);
+                var attributePromise = { then: sinon.stub() };
+                var rootPromise = { then: sinon.stub().returns(attributePromise),
+                                    resolve: sinon.stub() };
+                sandbox.stub(window, 'MegaPromise').returns(rootPromise);
+                sandbox.stub(window, 'getUserAttribute');
                 var myCallback = sinon.spy();
                 ns.getPubEd25519('you456789xw', myCallback);
                 sinon.assert.calledOnce(getUserAttribute);
@@ -207,10 +213,12 @@ describe("crypto unit test", function() {
                     { pubkey: ED25519_PUB_KEY,
                       authenticated: { fingerprint: ED25519_FINGERPRINT,
                                        method: 0, confidence: 0} } );
-                var attributePromise = { then: sinon.stub(),
-                                         resolve: sinon.stub() };
-                sandbox.stub(window, 'getUserAttribute').returns(attributePromise);
-                var myCallback = sinon.spy();
+                var attributePromise = { then: sinon.stub() };
+                var rootPromise = { then: sinon.stub().returns(attributePromise),
+                                    resolve: sinon.stub() };
+                sandbox.stub(window, 'MegaPromise').returns(rootPromise);
+                sandbox.stub(window, 'getUserAttribute');
+                                var myCallback = sinon.spy();
                 ns.getPubEd25519('you456789xw', myCallback);
                 assert.strictEqual(getUserAttribute.callCount, 1);
                 assert.strictEqual(ns._checkAuthenticationEd25519.callCount, 0);
@@ -231,7 +239,10 @@ describe("crypto unit test", function() {
                 sandbox.stub(ns, '_checkAuthenticationEd25519').throws(
                     'Fingerprint does not match previously authenticated one!');
                 var attributePromise = { then: sinon.stub() };
-                sandbox.stub(window, 'getUserAttribute').returns(attributePromise);
+                var rootPromise = { then: sinon.stub().returns(attributePromise),
+                                    resolve: sinon.stub() };
+                sandbox.stub(window, 'MegaPromise').returns(rootPromise);
+                sandbox.stub(window, 'getUserAttribute');
                 ns.getPubEd25519('you456789xw');
                 assert.strictEqual(getUserAttribute.callCount, 1);
                 assert.strictEqual(ns._checkAuthenticationEd25519.callCount, 0);
@@ -282,6 +293,12 @@ describe("crypto unit test", function() {
                 assert.deepEqual(pubEd25519, { 'you456789xw': ED25519_PUB_KEY });
                 assert.deepEqual(u_authring.Ed25519, {'you456789xw': { fingerprint: ED25519_FINGERPRINT,
                                                                        method: 0, confidence: 0 } });
+            });
+
+            it("uninitialised authring", function() {
+                sandbox.stub(window, 'u_authring', {});
+                ns.getPubEd25519('you456789xw');
+                assert.fail('boo, complete this');
             });
         });
 

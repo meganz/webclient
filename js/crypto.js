@@ -88,36 +88,46 @@ var crypt = (function () {
      *     condition warrants to throw an exception.
      */
     ns.getPubEd25519 = function(userhandle, callback) {
-        if (u_authring.Ed25519 === undefined) {
-            throw new Error('First initialise u_authring by calling authring.getContacts()');
+        var rootPromise = undefined;
+        if (typeof u_authring.Ed25519 === 'undefined') {
+            // First initialise the Ed25519 authring.
+            rootPromise = authring.getContacts('Ed25519');
+        }
+        else {
+            // Move on directly with a resolved promise.
+            rootPromise = new MegaPromise();
+            rootPromise.resolve();
         }
 
         if (pubEd25519[userhandle]) {
             // It's cached: Only check the authenticity of the key.
             // Make the promise for a cached value.
-            var keyPromise = new MegaPromise();
-            try {
-                var value = crypt._checkAuthenticationEd25519(userhandle);
-                if (callback) {
-                    callback(value, userhandle);
+            var keyPromise = rootPromise.then(
+                function() {
+                    try {
+                        var value = crypt._checkAuthenticationEd25519(userhandle);
+                        if (callback) {
+                            callback(value, userhandle);
+                        }
+                        return pubEd25519[userhandle];
+                    }
+                    catch (ex) {
+                        var message = 'Error verifying authenticity of Ed25519 pub key: '
+                                    + ex.name;
+                        logger.error(message);
+                        ex.name = message;
+                        throw(ex);
+                        // Not rejecting it. The exception beats a reject!
+                    }
                 }
-                keyPromise.resolve(pubEd25519[userhandle]);
-            }
-            catch (ex) {
-                var message = 'Error verifying authenticity of Ed25519 pub key: '
-                            + ex.name;
-                logger.error(message);
-                ex.name = message;
-                throw(ex);
-                // Not rejecting it. The exception beats a reject!
-            }
+            ); // end rootPromise.then()
 
             return keyPromise;
         }
         else {
             // Non-cached value, make a promise.
-            var attributePromise = getUserAttribute(userhandle, 'puEd255',
-                                                    true, false);
+            var attributePromise = rootPromise.then(
+                getUserAttribute(userhandle, 'puEd255', true, false));
             var keyPromise = attributePromise.then(
                 // Function on fulfilment.
                 function(result) {
@@ -150,7 +160,7 @@ var crypt = (function () {
                         callback(error);
                     }
                 }
-            );
+            ); // end keyPromise.then()
 
             return keyPromise;
         }

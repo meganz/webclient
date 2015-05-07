@@ -87,6 +87,11 @@ function scrollMenu() {
 }
 
 function init_page() {
+    if (page.substr(0, 13) == 'sitetransfer!') {
+        M.transferFromMegaCoNz();
+        return false;
+    }
+
     if (!u_type) {
         $('body').attr('class', 'not-logged');
     }

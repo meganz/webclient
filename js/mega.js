@@ -4147,6 +4147,49 @@ function MegaData()
             delete n2.p;
         return n2;
     };
+
+    this.transferFromMegaCoNz = function()
+    {       
+        var parts = /#sitetransfer!(.*)/.exec(window.location);
+        if (parts) {
+            parts = JSON.parse(atob(parts[1]));
+            if (parts) {                
+                u_k = parts[0];
+                u_sid = parts[1];
+                topage = parts[2];
+                api_setsid(u_sid);
+                u_storage.k = JSON.stringify(u_k);
+                u_storage.sid = u_sid;
+
+                var ctx = 
+                {
+                    checkloginresult: function(ctx,r)
+                    {
+                        if (m) loadingDialog.hide();
+                        else document.getElementById('overlay').style.display='none';       
+                        
+                        if (r == EBLOCKED)
+                        {
+                            alert(l[730]);
+                        }
+                        else if (r)
+                        {
+                            document.location.hash = topage;
+                            //page=topage;
+                            //init_page();                                  
+                        }                   
+                        else
+                        {
+                            document.getElementById('login_password').value='';
+                            alert(l[201]);
+                        }
+                    }   
+                }
+
+                u_checklogin3(ctx);
+            }
+        }
+    };
 }
 
 function voucherData(arr)

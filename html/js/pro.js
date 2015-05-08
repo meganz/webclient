@@ -435,6 +435,7 @@ function pro_pay()
     var price = selectedProPackage[5];
     var currency = selectedProPackage[6];
 
+    // uts = User Transaction Sale
     api_req({ a : 'uts', it: 0, si: apiId, p: price, c: currency, aff: aff, 'm': m },
     {
         callback : function (utsResult)
@@ -464,6 +465,7 @@ function pro_pay()
                     proref = sessionStorage.proref;
                 }
 
+                // utc = User Transaction Complete
                 api_req({ a : 'utc', s : [saleId], m : pro_m, r: proref },
                 {
                     callback : function (utcResult)
@@ -501,13 +503,13 @@ function pro_pay()
                             }
                             
                             // Pay for credit card
-                            else if ((pro_m === 8) && utcResult && utcResult.EUR.res === 'S') {
+                            else if ((pro_m === 8) && utcResult && (utcResult.EUR.res === 'S')) {
                                 cardDialog.showSuccessfulPayment(utcResult);
                             }
                             
                             // Show credit card failure
-                            else if ((pro_m === 8) && (!utcResult || utcResult.EUR.res === 'FP' || utcResult.EUR.res === 'FI')) {
-                                cardDialog.showFailureOverlay();
+                            else if ((pro_m === 8) && (!utcResult || (utcResult.EUR.res === 'FP') || (utcResult.EUR.res === 'FI'))) {
+                                cardDialog.showFailureOverlay(utcResult);
                             }
                         }
                     }
@@ -859,12 +861,17 @@ var cardDialog = {
     
     /**
      * Shows the failure overlay
+     * @param {Object} utcResult 
      */
-    showFailureOverlay: function() {
+    showFailureOverlay: function(utcResult) {
         
         // Show the failure overlay
         cardDialog.$failureOverlay.removeClass('hidden');
         cardDialog.$loadingOverlay.addClass('hidden');
+        
+        // If error is 'Fail Provider', get the exact error or show a default 'Something went wrong' type message
+        var errorMessage = (utcResult.EUR.res === 'FP') ? this.getProviderError(utcResult.EUR.code) : l[6950];
+        cardDialog.$failureOverlay.find('.payment-result-txt').html(errorMessage);
         
         // On click of the 'Try again' or Close buttons, hide the overlay and the user can fix their payment details
         cardDialog.$failureOverlay.find('.payment-result-button, .payment-close').rebind('click', function() {
@@ -876,6 +883,35 @@ var cardDialog = {
             cardDialog.$dialogOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
             cardDialog.$dialog.addClass('active').removeClass('hidden');
         });
+    },
+    
+    /**
+     * Gets an error message based on the error code from the payment provider
+     * @param {Number} errorCode The error code
+     * @returns {String} The error message
+     */
+    getProviderError: function(errorCode) {
+        
+        switch (errorCode) {
+            case -1:
+                // There is an error with your credit card details
+                return l[6966];
+            case -2:
+                // There is an error with your billing details
+                return l[6967];
+            case -3:
+                // Your transaction was detected as being fraudulent
+                return l[6968];
+            case -4:
+                // You have tried to pay too many times with this credit card recently
+                return l[6969];
+            case -5:
+                // You have insufficient funds to make this payment
+                return l[6970];
+            default:
+                // Please verify your payment information and try again
+                return l[6950];
+        }
     },
     
     /**

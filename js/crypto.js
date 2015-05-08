@@ -89,8 +89,9 @@ var crypt = (function () {
      */
     ns.getPubEd25519 = function(userhandle, callback) {
         var rootPromise = undefined;
-        if (typeof u_authring.Ed25519 === 'undefined') {
-            // First initialise the Ed25519 authring.
+        if (typeof u_authring === 'undefined'
+                || typeof u_authring.Ed25519 === 'undefined') {
+            logger.debug('First initialising the Ed25519 authring.');
             rootPromise = authring.getContacts('Ed25519');
         }
         else {
@@ -126,41 +127,45 @@ var crypt = (function () {
         }
         else {
             // Non-cached value, make a promise.
-            var attributePromise = rootPromise.then(
-                getUserAttribute(userhandle, 'puEd255', true, false));
-            var keyPromise = attributePromise.then(
-                // Function on fulfilment.
-                function(result) {
-                    result = base64urldecode(result);
-                    pubEd25519[userhandle] = result;
-                    try {
-                        var value = crypt._checkAuthenticationEd25519(userhandle);
-                        logger.debug('Got Ed25519 pub key of user "'
-                                     + userhandle + '".');
-                    }
-                    catch (ex) {
-                        var message = 'Error verifying authenticity of Ed25519 pub key: '
-                                    + ex.name;
-                        logger.error(message);
-                        ex.name = message;
-                        throw(ex);
-                        // Not rejecting it. The exception beats a reject!
-                    }
-                    if (callback) {
-                        callback(pubEd25519[userhandle], userhandle);
-                    }
+            var attributePromise = rootPromise.then(function() {
+                return getUserAttribute(userhandle, 'puEd255', true, false);
+            });
 
-                    return pubEd25519[userhandle];
-                },
-                // Function on rejection.
-                function(error) {
-                    logger.error('Error getting Ed25519 pub key of user "'
-                                 + userhandle + '": ' + error);
-                    if (callback) {
-                        callback(error);
-                    }
+            function resolveAttributePromiseFunc(result) {
+                result = base64urldecode(result);
+                pubEd25519[userhandle] = result;
+                try {
+                    var value = crypt._checkAuthenticationEd25519(userhandle);
+                    logger.debug('Got Ed25519 pub key of user "'
+                                 + userhandle + '".');
                 }
-            ); // end keyPromise.then()
+                catch (ex) {
+                    var message = 'Error verifying authenticity of Ed25519 pub key: '
+                                + ex.name;
+                    logger.error(message);
+                    ex.name = message;
+                    throw(ex);
+                    // Not rejecting it. The exception beats a reject!
+                }
+                if (callback) {
+                    callback(pubEd25519[userhandle], userhandle);
+                }
+
+                return pubEd25519[userhandle];
+            }
+
+            function rejectAttributePromiseFunc(error) {
+                logger.error('Error getting Ed25519 pub key of user "'
+                             + userhandle + '": ' + error);
+                if (callback) {
+                    callback(error);
+                }
+            }
+
+            var keyPromise = attributePromise.then(
+                resolveAttributePromiseFunc,
+                rejectAttributePromiseFunc
+            );
 
             return keyPromise;
         }

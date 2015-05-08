@@ -87,6 +87,8 @@ function scrollMenu() {
 }
 
 function init_page() {
+    
+    // If they are transferring from mega.co.nz
     if (page.substr(0, 13) == 'sitetransfer!') {
         M.transferFromMegaCoNz();
         return false;

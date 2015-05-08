@@ -2733,8 +2733,22 @@ function accountUI()
 				else {
                     $('.membership-big-txt.type').text('');
                 }
-				$('.membership-medium-txt.expiry').html(htmlentities('(' + account.sgw.join(",") + ')'));
-				
+                
+                // Get the date their subscription will renew
+                var timestamp = account.srenew[0];
+                var paymentType = htmlentities('(' + account.sgw.join(',') + ')');      // Credit card etc
+                
+                // Display the date their subscription will renew in format '14 March 2015 (credit card)'
+                if (timestamp > 0) {
+                    var date = new Date(timestamp * 1000);
+                    var dateString = l[6971] + ' ' + date.getDate() + ' ' + date_months[date.getMonth()] + ' ' + date.getFullYear();
+                    $('.membership-medium-txt.expiry').html(dateString + ' ' + paymentType);
+                }
+                else {
+                    // Otherwise just show payment type
+                    $('.membership-medium-txt.expiry').html(paymentType);
+                }
+                
 				// Check if there are any active subscriptions
                 // ccqns = Credit Card Query Number of Subscriptions
 				api_req({ a: 'ccqns' },

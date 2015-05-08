@@ -2957,6 +2957,11 @@ function MegaData()
                         ctx.account.balance = res.balance;
                         ctx.account.reseller = res.reseller;
                         ctx.account.prices = res.prices;
+                        
+                        // If a subscription, get the timestamp it will be renewed
+                        if (res.stype === 'S') {
+                            ctx.account.srenew = res.srenew;
+                        }
 
                         if (res.balance.length == 0)
                             ctx.account.balance = [['0.00', 'EUR']];

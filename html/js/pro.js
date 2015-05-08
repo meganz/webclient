@@ -553,6 +553,7 @@ var cardDialog = {
         this.initCountryDropDown();
         this.initExpiryMonthDropDown();
         this.initExpiryYearDropDown();
+		this.initInputsFocus();
         this.initPurchaseButton();
     },
     
@@ -697,6 +698,21 @@ var cardDialog = {
             var yearText = $this.find(':selected').text();            
             $this.parent().find('.account-select-txt').text(yearText);
         });
+    },
+	
+	/**
+     * Inputs focused states
+     */
+	initInputsFocus: function() {
+      
+        this.$dialog.find('.fm-account-input input').bind('focus', function() {
+            $(this).parent().addClass('focused');
+        });
+		
+		this.$dialog.find('.fm-account-input input').bind('blur', function() {
+            $(this).parent().removeClass('focused');
+        });
+		
     },
     
     /**

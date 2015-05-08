@@ -12024,7 +12024,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
 	position: relative;
 }
 .membershtip-medium-txt .btn-cancel {
-    display: none;
+	display: none;
 }
 .membership-medium-txt.gray-bg:hover, .membership-medium-txt.gray-bg.active {
 	background-color: black;
@@ -12269,14 +12269,14 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 .top-user-status-arrow {
 	background-position: 2px -420px;
 }
-.membership-popup-arrow, .warning-popup-arrow {
+.membership-popup-arrow, .warning-popup-arrow, .top-login-arrow {
 	background-position: 2px -440px;
 }
 .top-user-status-arrow {
 	float: none;
 	margin-left: 20px;
 }
-.notification-arrow, .top-login-arrow {
+.notification-arrow {
 	background-position: 2px -450px;
 }
 .notification-arrow, .warning-popup-arrow, .top-login-arrow {
@@ -22927,6 +22927,26 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 }
 .payment-dialog.active .fm-account-input {
 	background-color: rgba(0,0,0,0.05);
+}
+.payment-dialog.active .fm-account-input.focused {
+	background-color: rgba(0,0,0,0.2);
+}
+.payment-dialog.active .fm-account-input.focused input {
+	color: white;
+}
+.payment-half-block .fm-account-input.focused input::-webkit-input-placeholder {
+ color: white;
+}
+.payment-half-block .fm-account-input.focused input:-moz-placeholder {
+ color: white;
+ opacity: 1;
+}
+.payment-half-block .fm-account-input.focused input::-moz-placeholder {
+ color: white;
+ opacity: 1;
+}
+.payment-half-block .fm-account-input.focused input:-ms-input-placeholder {
+color: white;
 }
 /* end of CC payment dialog */
 .payment-animation-pad {

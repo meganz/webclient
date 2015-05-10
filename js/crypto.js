@@ -1316,7 +1316,7 @@ function api_proc(q) {
                 this.q.cmds[this.q.i] = [];
                 this.q.ctxs[this.q.i] = [];
 
-                api_proc(q);
+                api_proc(this.q);
             }
             else {
                 api_reqerror(this.q, t);
@@ -1364,6 +1364,9 @@ function api_reqerror(q, e) {
         // request failed - retry with exponential backoff
         if (q.backoff) {
             q.backoff *= 2;
+            if (q.backoff > 1024000) {
+                q.backoff = 1024000;
+            }
         }
         else {
             q.backoff = 125;
@@ -1378,8 +1381,9 @@ function api_reqerror(q, e) {
 
 function api_retry() {
     for (var i = 4; i--;) {
-        if (apixs[i].timer) {
+        if (apixs[i].timer && apixs[i].backoff > 5000) {
             clearTimeout(apixs[i].timer);
+            apixs[i].backoff = 4000;
             api_send(apixs[i]);
         }
     }
@@ -1503,28 +1507,6 @@ function getsc(fm) {
     }, 2);
 }
 
-function completewait(recheck) {
-    if (this.waitid !== waitid) {
-        return;
-    }
-
-    stopsc();
-
-    var t = new Date().getTime() - waitbegin;
-
-    if (t < 1000) {
-        waitbackoff += waitbackoff;
-        if (waitbackoff > 256000) {
-            waitbackoff = 256000;
-        }
-    }
-    else {
-        waitbackoff = 250;
-    }
-
-    getsc();
-}
-
 function waitsc() {
     var newid = ++waitid;
 
@@ -1544,25 +1526,49 @@ function waitsc() {
     waittimeout = setTimeout(waitsc, 300000);
 
     waitxhr.onerror = function () {
-        clearTimeout(waittimeout);
-        waittimeout = false;
+        if (d) console.error('waitsc.onerror');
 
-        waitbackoff += waitbackoff;
-        if (waitbackoff > 1024000) {
-            waitbackoff = 1024000;
+        if (this.waitid === waitid) {
+            clearTimeout(waittimeout);
+            waittimeout = false;
+
+            waitbackoff *= 2;
+            if (waitbackoff > 1024000) {
+                waitbackoff = 1024000;
+            }
+            waittimeout = setTimeout(waitsc, waitbackoff);
         }
-        waittimeout = setTimeout(waitsc, waitbackoff);
-    }
+    };
 
-    waitxhr.onload = function () {
-        if (this.status === 200) {
+    waitxhr.onload = function() {
+        if (this.status !== 200) {
+            this.onerror();
+        } else {
             waitbackoff = 250;
-        }
 
-        clearTimeout(waittimeout);
-        waittimeout = false;
-        completewait();
-    }
+            clearTimeout(waittimeout);
+            waittimeout = false;
+
+            if (this.waitid === waitid) {
+
+                stopsc();
+
+                var t = new Date().getTime() - waitbegin;
+
+                if (t < 1000) {
+                    waitbackoff += waitbackoff;
+                    if (waitbackoff > 256000) {
+                        waitbackoff = 256000;
+                    }
+                }
+                else {
+                    waitbackoff = 250;
+                }
+
+                getsc();
+            }
+        }
+    };
 
     waitbegin = new Date().getTime();
     waitxhr.open('POST', waiturl, true);
@@ -3889,6 +3895,38 @@ function u_initAuthentication2(res, ctx) {
     getUserAttribute(u_handle, 'sigPubk', true, false, storeSigPubkCallback);
 
     mBroadcaster.sendMessage('pubEd25519');
+}
+
+
+/**
+ * Shows the fingerprint warning dialog
+ * @param {String} fingerprintType either Ed25519 or RSA
+ * @param {String} userHandle The user handle e.g. 3nnYu_071I3
+ * @param {Number} method Whether seen or verified (authring.AUTHENTICATION_METHOD.SEEN or .FINGERPRINT_COMPARISON)
+ * @param {String} previousFingerprint The previously seen or verified fingerprint
+ * @param {String} newFingerprint The new fingerprint
+ * @throws {Error}
+ *     In case the fingerprint of the public key differs from the one previously
+ *     authenticated by the user. This more severe condition warrants to throw
+ *     an exception.
+ */
+function showFingerprintMismatchException(fingerprintType, userHandle, method, previousFingerprint, newFingerprint) {
+
+    // Show warning dialog
+    mega.ui.CredentialsWarningDialog.singleton(userHandle, method, previousFingerprint, newFingerprint);
+
+    // Remove the cached key, so the key will be fetched and checked against the stored fingerprint again next time
+    if (fingerprintType === 'RSA') {
+        delete u_pubkeys[userHandle];
+    }
+    else if (fingerprintType === 'Ed25519') {
+        delete pubEd25519[userHandle];
+    }
+
+    // Throw exception to stop whatever they were doing from progressing e.g. initiating/accepting call
+    throw fingerprintType + ' fingerprint does not match the previously authenticated one! ' +
+          'Previous fingerprint: ' + previousFingerprint + '. ' +
+          'New fingerprint: ' + newFingerprint + '. ';
 }
 
 

@@ -549,6 +549,8 @@ function generateAvatarMeta(user_hash) {
  */
 function getUserAttribute(userhandle, attribute, pub, nonHistoric,
                           callback, ctx) {
+    var myCtx = ctx || {};
+
     // Assemble property name on Mega API.
     var attributePrefix = '';
     if (pub === true || pub === undefined) {
@@ -565,38 +567,37 @@ function getUserAttribute(userhandle, attribute, pub, nonHistoric,
     // Make the promise to execute the API code.
     var thePromise = new MegaPromise();
 
-    function settleFunction(res, ctx) {
+    function settleFunction(res) {
         if (typeof res !== 'number') {
             // Decrypt if it's a private attribute container.
-            if (ctx.ua.charAt(0) === '*') {
+            if (attribute.charAt(0) === '*') {
                 var clearContainer = tlvstore.blockDecrypt(base64urldecode(res),
                                                            u_k);
                 res = tlvstore.tlvRecordsToContainer(clearContainer);
             }
             if (window.d) {
-                console.log('Attribute "' + ctx.ua + '" for user "' + ctx.u
-                            + '" is "' + res + '".');
+                console.log('Attribute "' + attribute + '" for user "'
+                            + userhandle + '" is "' + res + '".');
             }
-            thePromise.resolve(res, ctx);
+            thePromise.resolve(res);
         }
         else {
             // Got back an error (a number).
             if (window.d) {
-                console.log('Warning, attribute "' + ctx.ua
-                            + '" for user "' + ctx.u
+                console.log('Warning, attribute "' + attribute
+                            + '" for user "' + userhandle
                             + '" could not be retrieved: ' + res + '!');
             }
-            thePromise.reject(res, ctx);
+            thePromise.reject(res);
         }
 
         // Finish off if we have a callback.
         if (callback) {
-            callback(res, ctx);
+            callback(res, myCtx);
         }
     }
 
     // Assemble context for this async API request.
-    var myCtx = ctx || {};
     myCtx.u = userhandle;
     myCtx.ua = attribute;
     myCtx.callback = settleFunction;

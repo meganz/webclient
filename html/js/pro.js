@@ -601,7 +601,11 @@ var cardDialog = {
         this.$dialog.find('.plan-icon').removeClass('pro1 pro2 pro3 pro4').addClass('pro' + proNum);
         this.$dialog.find('.payment-plan-title').html(proPlan);
         this.$dialog.find('.payment-plan-price').html(proPrice + '&euro;');
-        this.$dialog.find('.payment-plan-txt').html(monthsWording + ' (' + l[6965] + ')');
+        this.$dialog.find('.payment-plan-txt').html(monthsWording + ' ' + l[6965] + ' ');
+        
+        // Remove rogue colon in translation text
+        var statePlaceholder = this.$dialog.find('.state-province').attr('placeholder').replace(':', '');
+        this.$dialog.find('.state-province').attr('placeholder', statePlaceholder);
         
         // Initialise the close button
         this.$dialog.find('.btn-close-dialog').click(function() {

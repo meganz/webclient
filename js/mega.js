@@ -4147,6 +4147,61 @@ function MegaData()
             delete n2.p;
         return n2;
     };
+
+    /**
+     * Handle a redirect from the mega.co.nz/#pro page to mega.nz/#pro page
+     * and keep the user logged in at the same time
+     */
+    this.transferFromMegaCoNz = function()
+    {
+        var parts = /#sitetransfer!(.*)/.exec(window.location);
+        if (parts) {
+            
+            // Decode from Base64
+            parts = JSON.parse(atob(parts[1]));
+            
+            if (parts) {
+                
+                // Aquire the keys and the session
+                u_k = parts[0];
+                u_sid = parts[1];
+                var toPage = parts[2];
+                api_setsid(u_sid);
+                u_storage.k = JSON.stringify(u_k);
+                u_storage.sid = u_sid;
+
+                var ctx = 
+                {
+                    checkloginresult: function(ctx, result)
+                    {
+                        if (m) {
+                            loadingDialog.hide();
+                        }
+                        else {
+                            document.getElementById('overlay').style.display = 'none';
+                        }
+                        
+                        // Check for suspended account
+                        if (result == EBLOCKED) {
+                            alert(l[730]);
+                        }
+                        else if (result) {    
+                            // Redirect to page
+                            window.location.hash = toPage;                           
+                        }                   
+                        else {
+                            // Incorrect email or password
+                            document.getElementById('login_password').value = '';
+                            alert(l[201]);
+                        }
+                    }   
+                };
+
+                // Continue log in
+                u_checklogin3(ctx);
+            }
+        }
+    };
 }
 
 function voucherData(arr)

@@ -1791,7 +1791,7 @@ function parsetopmenu() {
     return top;
 }
 
-window.onhashchange = function () {
+$(window).on('hashchange', null, function() {
     var tpage = document.location.hash;
     if (silent_loading) {
         document.location.hash = hash;
@@ -1845,7 +1845,7 @@ window.onhashchange = function () {
     else {
         init_page();
     }
-}
+});
 
 function languageDialog(close) {
     if (close) {

@@ -376,6 +376,13 @@ var gifSlider = {
     fadeInSpeed: 3000,
     fadeOutSpeed: 500,
     
+    // Interval timers
+    leftAnimationIntervalId: 0,
+    rightAnimationIntervalId: 0,
+    bottomRightAnimationIntervalId: 0,
+    
+    onDownloadPage: false,
+    
     // There can be more or less images on either side e.g. 2 gifs on left and 
     // 3 on right and it will still work because they are run independently.
     images: {
@@ -388,7 +395,7 @@ var gifSlider = {
                 href: '#register',          // Page link you go to when clicked
                 title: 5875,                // Title for above the GIF shown in red
                 description: 5876,          // Description next to the title
-                image: null                 // The image itself, preloaded and cached in memory
+                imageSrc: null              // The image itself, preloaded and cached in memory
             },
             {
                 name: 'sync-client',
@@ -396,7 +403,7 @@ var gifSlider = {
                 href: '#sync',
                 title: 1626,
                 description: 1086,
-                image: null
+                imageSrc: null
             },
             {
                 name: 'browser-extension-firefox',
@@ -404,7 +411,7 @@ var gifSlider = {
                 href: '#firefox',
                 title: 1088,
                 description: 1929,
-                image: null
+                imageSrc: null
             },
             {
                 name: 'browser-extension-chrome',
@@ -412,7 +419,7 @@ var gifSlider = {
                 href: '#chrome',
                 title: 1088,
                 description: 1929,
-                image: null
+                imageSrc: null
             },
             {
                 name: 'mobile-app',
@@ -420,13 +427,15 @@ var gifSlider = {
                 href: '#mobile',
                 title: 955,
                 description: 1930,
-                image: null
+                imageSrc: null
             }
         ]
     },
     
     // Initialise the slide show
     init: function() {
+        
+        gifSlider.onDownloadPage = true;
         
         // Preload the images into memory so they will display straight away
         gifSlider.preLoadImages('right');
@@ -439,6 +448,9 @@ var gifSlider = {
         
         // Show ads in bottom right corner
         gifSlider.alternateBottomRightProducts();
+        
+        // If the page changes, clear the timers
+        $(window).on('hashchange', null, gifSlider.clearIntervals);
     },
 
     /**
@@ -458,10 +470,11 @@ var gifSlider = {
             
             // Preload the image
             var image = new Image();
-            image.src = baseImagePath + gifSlider.images[side][i].name + retina + '.gif';
+            var imageSrc = baseImagePath + gifSlider.images[side][i].name + retina + '.gif';
+            image.src = imageSrc;
             
-            // Store for display later
-            gifSlider.images[side][i].image = image;            
+            // Store source to swap out later
+            gifSlider.images[side][i].imageSrc = imageSrc;
         }
     },
 
@@ -469,40 +482,44 @@ var gifSlider = {
      * Iterates to the next image in the slideshow
      * @param {String} side The side of the page (left or right)
      * @param {Number} currentSlideIndex The current slide's index number (matches array above)
-     * @param {Number} oldIntervalId The interval ID to be cleared
      */
-    continueSlideShow: function(side, currentSlideIndex, oldIntervalId) {
+    continueSlideShow: function(side, currentSlideIndex) {
         
         // Find when to start the next image
         var animationLengthForCurrentSlide = gifSlider.images[side][currentSlideIndex].animationLength;
-        var currentSlideImgSrc = gifSlider.images[side][currentSlideIndex].image.src;
-        
-        // Clear old interval ID
-        if (oldIntervalId) {
-            clearInterval(oldIntervalId);
-        }
+        var currentSlideImgSrc = gifSlider.images[side][currentSlideIndex].imageSrc;
         
         // Set timer to load the next slide after the current one has finished
-        var intervalId = setInterval(function() {
+        gifSlider[side + 'AnimationIntervalId'] = setInterval(function() {
             
-            // Fade out existing image            
-            $('.animations-' + side + '-container .currentImage').attr('src', currentSlideImgSrc).fadeOut(gifSlider.fadeOutSpeed, function() {
+            // Clear the previous interval
+            clearInterval(gifSlider[side + 'AnimationIntervalId']);
+            
+            // If on the download page, start a new interval
+            if (gifSlider.onDownloadPage) {
                 
-                // Increment to next image
-                var nextSlideIndex = currentSlideIndex + 1;
+                // Fade out existing image            
+                $('.animations-' + side + '-container .currentImage').attr('src', currentSlideImgSrc);
+                $('.animations-' + side + '-container .currentImage').fadeOut(gifSlider.fadeOutSpeed, function() {
 
-                // If it has incremented past the last slide available, go back to start
-                if (nextSlideIndex === gifSlider.images[side].length) {
-                    nextSlideIndex = 0;
-                }
+                    // Increment to next image
+                    var nextSlideIndex = currentSlideIndex + 1;
 
-                // Show the image now
-                gifSlider.showImage(side, nextSlideIndex);
+                    // If it has incremented past the last slide available, go back to start
+                    if (nextSlideIndex === gifSlider.images[side].length) {
+                        nextSlideIndex = 0;
+                    }
 
-                // Setup the timer for the slide above, so after that finishes it will run the next one
-                gifSlider.continueSlideShow(side, nextSlideIndex, intervalId);
-            });
-        
+                    // Show the image now
+                    gifSlider.showImage(side, nextSlideIndex);
+
+                    // Setup the timer for the slide above, so after that finishes it will run the next one
+                    gifSlider.continueSlideShow(side, nextSlideIndex);
+                });
+            }
+
+            console.log('zzzz still animating ' + side + ' side ' + gifSlider[side + 'AnimationIntervalId']);
+
         }, animationLengthForCurrentSlide);
     },
 
@@ -516,7 +533,7 @@ var gifSlider = {
         // Set the details for the next slide
         var slideTitle = l[gifSlider.images[side][slideIndex].title] + ':';
         var slideDescription = l[gifSlider.images[side][slideIndex].description];
-        var slideImgSrc = gifSlider.images[side][slideIndex].image.src;
+        var slideImgSrc = gifSlider.images[side][slideIndex].imageSrc;
         var slideLink = gifSlider.images[side][slideIndex].href;
 
         // Change the link and fade in the new image
@@ -541,7 +558,7 @@ var gifSlider = {
         $productsBottomBlock.find('.button' + adIndex).fadeIn(gifSlider.fadeInSpeed);
         
         // Show new ad every 10 seconds
-        setInterval(function() {
+        gifSlider.bottomRightAnimationIntervalId = setInterval(function() {
             
             var previousAdIndex = adIndex;
             adIndex += 1;
@@ -562,5 +579,19 @@ var gifSlider = {
             });
             
         }, 10000);
+    },
+    
+    /**
+     * Clears the timers and removes the hashchange handler
+     */
+    clearIntervals: function() {
+
+        clearInterval(gifSlider.leftAnimationIntervalId);
+        clearInterval(gifSlider.rightAnimationIntervalId);
+        clearInterval(gifSlider.bottomRightAnimationIntervalId);
+        
+        gifSlider.onDownloadPage = false;
+
+        $(window).off('hashchange', null, gifSlider.clearIntervals);
     }
 };

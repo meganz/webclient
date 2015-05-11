@@ -309,6 +309,11 @@ var notifyPopup = {
                 obj = notifyPopup.renderPaymentNotification(notification);
             }
 
+
+            if(M.d[notification.user]) {
+                setLastInteractionWith(notification.user, "0:" + notification.timestamp);
+            }
+
             if (obj) {                        
                 nhtml += obj.nhtml;
                 var max = Math.floor(($('body').height() - 50) / 70);
@@ -571,7 +576,7 @@ var notifyPopup = {
         else {
             title = l[827];
         }
-        
+
         return notifyPopup.getNotificationHtml(notification.id, 'dshare', title, notification.timestamp, notification.read, notification.user);
     },
     
@@ -590,7 +595,7 @@ var notifyPopup = {
         else {
             title = l[825];
         }
-        
+
         return notifyPopup.getNotificationHtml(notification.id, 'share', title, notification.timestamp, notification.read, notification.user);  
     },
     

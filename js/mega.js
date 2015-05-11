@@ -431,21 +431,25 @@ function MegaData()
         var ts = 0;
         if (M.d[h])
         {
-            var a = fm_getnodes(h);
-            for (var i in a)
-            {
-                var n = M.d[a[i]];
-                if (n)
-                {
-                    if (ts < n.ts)
-                        ts = n.ts;
-                    if (n.t)
-                        folders++;
-                    else
-                        files++;
+            if(!M.d[h].ts) {
+                var a = fm_getnodes(h);
+                for (var i in a) {
+                    var n = M.d[a[i]];
+                    if (n) {
+                        if (ts < n.ts)
+                            ts = n.ts;
+                        if (n.t)
+                            folders++;
+                        else
+                            files++;
+                    }
                 }
+                M.d[h].ts = ts;
+            } else {
+                ts = M.d[h].ts;
             }
         }
+
         return {files: files, folders: folders, ts: ts};
     };
 
@@ -855,11 +859,13 @@ function MegaData()
                                     </div>\n\
                                 </td>\n\
                                 <td width="270">\n\
-                                    <div class="contacts-interation ' + interactionclass + '">' + time + '</div>\n\
+                                    <div class="contacts-interation li_' + u_h + '"></div>\n\
                                 </td>\n\
                             </tr>';
                 }
                 mInsertNode(M.v[i], M.v[i-1], M.v[i+1], t, el, html, u);
+
+                getLastInteractionWith(u_h);
             }
         }// renderContactsLayout END
 
@@ -1520,20 +1526,18 @@ function MegaData()
 
         treePanelSortElements('contacts', contacts, {
             'last-interaction': function(a, b) {
-                if (!M.i_cache[a.u]) {
-                    var cs = M.contactstatus(a.u);
-                    if (cs.ts === 0) {
-                        cs.ts = -1;
-                    }
-                    M.i_cache[a.u] = cs.ts;
+                var cs = M.contactstatus(a.u);
+                if (cs.ts === 0) {
+                    cs.ts = -1;
                 }
-                if (!M.i_cache[b.u]) {
-                    var cs = M.contactstatus(b.u);
-                    if (cs.ts === 0) {
-                        cs.ts = -1;
-                    }
-                    M.i_cache[b.u] = cs.ts;
+                M.i_cache[a.u] = cs.ts;
+
+
+                var cs = M.contactstatus(b.u);
+                if (cs.ts === 0) {
+                    cs.ts = -1;
                 }
+                M.i_cache[b.u] = cs.ts;
 
                 return M.i_cache[a.u] - M.i_cache[b.u]
             },
@@ -5108,6 +5112,7 @@ function doshare(h, targets, dontShowShareDialog) {
                             // level (passive)
                             if (M.u[user] && M.u[user].c != 0) {
                                 M.nodeShare(ctx.h, {h: h, r: rights, u: user, ts: Math.floor(new Date().getTime() / 1000)});
+                                setLastInteractionWith(user, "0:" + unixtime());
                             }
                             else if (d) {
                                 console.log('doshare: invalid user', user, M.u[user], ctx.t[i]);

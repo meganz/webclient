@@ -344,6 +344,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
 
             if(targetUserNode) {
                 M.u[targetUserNode.u].lastChatActivity = self.lastActivity;
+                setLastInteractionWith(targetUserNode.u, "1:" + self.lastActivity);
             }
         } else {
             throw new Error("Not implemented");

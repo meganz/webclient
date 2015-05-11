@@ -4153,14 +4153,24 @@ function MegaData()
         var parts = /#sitetransfer!(.*)/.exec(window.location);
         if (parts) {
             parts = JSON.parse(atob(parts[1]));
-            if (parts) {                
+            if (parts) { 
+                if (JSON.stringify(u_k) === JSON.stringify(parts[0]))
+                {
+                    document.location.hash = parts[2];
+                    return;
+                }
+
+                localStorage.wasloggedin = true;
+                u_logout();
+
+                u_storage = init_storage(sessionStorage);
                 u_k = parts[0];
                 u_sid = parts[1];
                 topage = parts[2];
-                api_setsid(u_sid);
                 u_storage.k = JSON.stringify(u_k);
                 u_storage.sid = u_sid;
 
+                api_setsid(u_sid);
                 var ctx = 
                 {
                     checkloginresult: function(ctx,r)
@@ -4173,10 +4183,11 @@ function MegaData()
                             alert(l[730]);
                         }
                         else if (r)
-                        {
-                            document.location.hash = topage;
+                        {    
+                            u_type = r;
                             //page=topage;
-                            //init_page();                                  
+                            //init_page(); 
+                             document.location.hash = topage;
                         }                   
                         else
                         {

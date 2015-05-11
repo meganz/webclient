@@ -114,7 +114,7 @@ function u_checklogin3a(res, ctx) {
         try {
             u_k = JSON.parse(u_storage.k);
             if (u_attr.privk) {
-                u_privk = crypto_decodeprivkey(base64urldecode(u_storage.privk));
+                u_privk = crypto_decodeprivkey(base64urldecode(u_attr.privk));
             }
         } catch (e) {}
 

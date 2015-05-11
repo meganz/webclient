@@ -817,11 +817,6 @@ var cardDialog = {
             'hash': cardDataHashHex
         };
         
-        if (d) {
-            console.log('requestData', requestData);
-            console.log('billingData', billingData);
-        }
-        
         api_req(requestData, {
             callback: function (res) {    
                 // Proceed with payment

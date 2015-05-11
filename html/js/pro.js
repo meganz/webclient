@@ -1540,8 +1540,12 @@ var doProRegister = function($dialog) {
                     u_attr.terms=1;
 
                     api_req(ops);
-
-                    proceedToPaypal();
+                    //proceedToPaypal();
+                    $('.pro-register-dialog').addClass('hidden');
+                    $('.fm-dialog.registration-page-success').removeClass('hidden');
+                    $('.fm-dialog-overlay').removeClass('hidden');
+                    $('body').addClass('overlayed');
+                    $('.fm-dialog.registration-page-success').unbind('click');
                 }
                 else
                 {

@@ -4159,17 +4159,28 @@ function MegaData()
             
             // Decode from Base64
             parts = JSON.parse(atob(parts[1]));
-            
-            if (parts) {
-                
-                // Aquire the keys and the session
+            if (parts) { 
+                // If the user is already logged in here we can avoid a lot and just take them to the correct page
+                if (JSON.stringify(u_k) === JSON.stringify(parts[0]))
+                {
+                    document.location.hash = parts[2];
+                    return;
+                }
+
+                // Likely that they have never logged in here before, we must set this.
+                localStorage.wasloggedin = true;
+                u_logout();
+
+                u_storage = init_storage(sessionStorage);
                 u_k = parts[0];
                 u_sid = parts[1];
-                var toPage = parts[2];
-                api_setsid(u_sid);
+                var topage = parts[2];
+                u_privk = parts[3];
                 u_storage.k = JSON.stringify(u_k);
                 u_storage.sid = u_sid;
+                u_storage.privk = base64urlencode(crypto_encodeprivkey(u_privk));
 
+                api_setsid(u_sid);
                 var ctx = 
                 {
                     checkloginresult: function(ctx, result)
@@ -4185,11 +4196,15 @@ function MegaData()
                         if (result == EBLOCKED) {
                             alert(l[730]);
                         }
-                        else if (result) {    
-                            // Redirect to page
-                            window.location.hash = toPage;                           
+                        else if (result)
+                        {    
+                            // Set account type and redirect to the requested location (via the hash mechanism)
+                            u_type = result;
+                            document.location.hash = topage;
+
                         }                   
-                        else {
+                        else 
+                        {
                             // Incorrect email or password
                             document.getElementById('login_password').value = '';
                             alert(l[201]);
@@ -4197,7 +4212,7 @@ function MegaData()
                     }   
                 };
 
-                // Continue log in
+                // Continue through the log in flow from approximately the correct place given that we have the master key, SID and privk.
                 u_checklogin3(ctx);
             }
         }

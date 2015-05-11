@@ -638,6 +638,8 @@ function getUserAttribute(userhandle, attribute, pub, nonHistoric,
  */
 function setUserAttribute(attribute, value, pub, nonHistoric, callback, ctx,
                           mode) {
+    var myCtx = ctx || {};
+
     // Prepare all data needed for the call on the Mega API.
     if (mode === undefined) {
         mode = tlvstore.BLOCK_ENCRYPTION_SCHEME.AES_GCM_12_16;
@@ -659,25 +661,25 @@ function setUserAttribute(attribute, value, pub, nonHistoric, callback, ctx,
     // Make the promise to execute the API code.
     var thePromise = new MegaPromise();
 
-    function settleFunction(res, ctx) {
+    function settleFunction(res) {
         if (typeof res !== 'number') {
             console.log('Setting user attribute "'
-                        + ctx.ua + '", result: ' + res);
-            thePromise.resolve(res, ctx);
+                        + attribute + '", result: ' + res);
+            thePromise.resolve(res);
         }
         else {
             console.log('Error setting user attribute "'
-                        + ctx.ua + '", result: ' + res + '!');
-            thePromise.reject(res, ctx);
+                        + attribute + '", result: ' + res + '!');
+            thePromise.reject(res);
         }
 
         // Finish off if we have a callback.
         if (callback) {
-            callback(res, ctx);
+            callback(res, myCtx);
         }
     }
 
-    var myCtx = ctx || {};
+    // Assemble context for this async API request.
     myCtx.ua = attribute;
     myCtx.callback = settleFunction;
 

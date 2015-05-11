@@ -6,7 +6,8 @@ var pro_package,
     pro_usebalance = false,
     membershipPlans = [],
     selectedProPackage = [],
-    saleId = null;
+    saleId = null,
+    pro_do_next = null
 
 function init_pro()
 {
@@ -55,6 +56,9 @@ function init_pro()
 
                 // Render the plan details
                 populateMembershipPlans();
+
+                // 
+                if (pro_do_next) pro_do_next();
             }
         });
 
@@ -92,7 +96,7 @@ function init_pro()
         {
             var $membershipBlock = $(this).closest('.reg-st3-membership-bl');
 
-            $('.reg-st3-membership-bl').removeClass('selected');
+            $('-reg-st3-membership-bl').removeClass('selected');
             $membershipBlock.addClass('selected');
 
             account_type_num = $membershipBlock.attr('data-payment');
@@ -1303,6 +1307,13 @@ var doProLogin = function($dialog) {
     megaAnalytics.log("pro", "doLogin");
 
     loadingDialog.show();
+    
+    var button = $('.selected .membership-button').parents('.reg-st3-membership-bl').attr('class').match(/pro\d/)[0]
+    pro_do_next = function() {
+        $('.' + button + ' .membership-button').trigger('click')
+        pro_do_next = null
+    };
+
     var ctx =
     {
         checkloginresult: function(ctx,r)
@@ -1327,7 +1338,6 @@ var doProLogin = function($dialog) {
                     $('.reg-st3-membership-bl').removeClass('selected')
                     $('.reg-st3-membership-bl.' + cls).addClass('selected');
                 }
-                pro_continue();
             }
             else
             {

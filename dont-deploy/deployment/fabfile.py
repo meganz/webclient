@@ -24,7 +24,7 @@ def deploy():
     with cd(env.target_dir):
         run("touch current_ver")
         run("cat current_ver>>~/deployer/last_ver")
-        run("git pull -u origin develop")
+        run("git pull -u origin CC-payment-dialog")
         run("git rev-parse HEAD>current_ver.txt")
         with cd("logger"):
             run("git pull -u")

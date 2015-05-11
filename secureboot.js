@@ -4,7 +4,7 @@ var ua = window.navigator.userAgent.toLowerCase();
 var is_chrome_firefox = document.location.protocol === 'chrome:' && document.location.host === 'mega' || document.location.protocol === 'mega:';
 var is_extension = is_chrome_firefox || document.location.href.substr(0,19) == 'chrome-extension://';
 var storage_version = '1'; // clear localStorage when version doesn't match
-var page = document.location.hash;
+var page = document.location.hash, l, d = false;
 
 function isMobile()
 {
@@ -48,6 +48,7 @@ if (!b_u) try
         Cu['import']("resource://gre/modules/Services.jsm");
         XPCOMUtils.defineLazyModuleGetter(this, "NetUtil", "resource://gre/modules/NetUtil.jsm");
 
+        // d = true;
         (function(global) {
             global.loadSubScript = function(file,scope) {
                 if (global.d) {
@@ -63,7 +64,7 @@ if (!b_u) try
 
         try {
             var mozBrowserID =
-            [    Services.appinfo.name,
+            [   Services.appinfo.name,
                 Services.appinfo.platformVersion,
                 Services.appinfo.platformBuildID,
                 Services.appinfo.OS,
@@ -72,12 +73,12 @@ if (!b_u) try
             var mozBrowserID = ua;
         }
 
-        loadSubScript('chrome://mega/content/strg2.js');
+        loadSubScript('chrome://mega/content/strg5.js');
 
         if(!(localStorage instanceof Ci.nsIDOMStorage)) {
             throw new Error('Invalid DOM Storage instance.');
         }
-        var d = !!localStorage.d;
+        d = !!localStorage.d;
     }
     if (typeof localStorage == 'undefined') b_u = 1;
     else
@@ -275,10 +276,11 @@ var mBroadcaster = {
     },
 
     sendMessage: function mBroadcaster_sendMessage(topic) {
-        if (d) console.log('Broadcasting ' + topic);
         if (this._topics.hasOwnProperty(topic)) {
             var args = Array.prototype.slice.call(arguments, 1);
             var idr = [];
+
+            if (d) console.log('Broadcasting ' + topic, args);
 
             for (var id in this._topics[topic]) {
                 var ev = this._topics[topic][id];
@@ -292,7 +294,11 @@ var mBroadcaster = {
             }
             if (idr.length)
                 idr.forEach(this.removeListener.bind(this));
+
+            return true;
         }
+
+        return false;
     },
 
     once: function mBroadcaster_once(topic, callback) {
@@ -300,6 +306,156 @@ var mBroadcaster = {
             once : true,
             callback : callback
         });
+    },
+
+    crossTab: {
+        eTag: '$CTE$!_',
+
+        initialize: function crossTab_init(cb) {
+            var setup = function(ev) {
+                var msg = String(ev && ev.key).substr(this.eTag.length);
+                if (d) console.log('crossTab setup-event', msg, ev);
+                if (cb && (!ev || msg === 'pong')) {
+                    this.unlisten(setup);
+                    if (msg !== 'pong') {
+                        this.setMaster();
+                    } else {
+                        delete localStorage[ev.key];
+                    }
+                    this.listen();
+                    if (d) {
+                        console.log('CROSSTAB COMMUNICATION INITIALIZED AS '
+                            + (this.master ? 'MASTER':'SLAVE'));
+                    }
+                    cb(this.master);
+                    cb = null;
+                }
+            }.bind(this);
+
+            if (this.handle) {
+                this.eTag = this.eTag.split(this.handle).shift();
+            }
+            this.handle = u_handle;
+            this.eTag += u_handle + '!';
+
+            this.ctID = ~~(Math.random() * Date.now());
+            this.listen(setup);
+            this.notify('ping');
+            setTimeout(setup, 2000);
+
+            // if (typeof u_handle !== 'undefined') {
+                // if (+localStorage['mCrossTabRef_' + u_handle] + 14e3 > Date.now()) {
+                     // if (window.addEventListener) {
+                        // window.addEventListener('storage', this, false);
+                    // }
+                    // else if (window.attachEvent) {
+                        // window.attachEvent('onstorage', this.handleEvent.bind(this));
+                    // }
+                // }
+                // else {
+                    // this.setMaster();
+                // }
+                // if (d) {
+                    // console.log('CROSSTAB COMMUNICATION INITIALIZED AS '
+                        // + (this.master ? 'MASTER':'SLAVE'));
+                // }
+            // }
+        },
+
+        listen: function crossTab_listen(aListener) {
+            if (window.addEventListener) {
+                window.addEventListener('storage', aListener || this, false);
+            }
+            else if (window.attachEvent) {
+                if (!aListener) {
+                    aListener = this.__msie_listener = this.handleEvent.bind(this);
+                }
+                window.attachEvent('onstorage', aListener);
+            }
+        },
+
+        unlisten: function crossTab_unlisten(aListener) {
+            if (window.addEventListener) {
+                window.removeEventListener('storage', aListener || this, false);
+            }
+            else if (window.attachEvent) {
+                if (!aListener) {
+                    aListener = this.__msie_listener;
+                    delete this.__msie_listener;
+                }
+                window.detachEvent('onstorage', aListener);
+            }
+        },
+
+        leave: function crossTab_leave() {
+            if (this.master) {
+                localStorage['mCrossTabRef_' + u_handle] = this.master;
+                this.notify('leaving', this.master);
+                delete this.master;
+            } else {
+                if (d) console.log('crossTab leaving');
+            }
+            this.unlisten();
+        },
+
+        notify: function crossTab_notify(msg, data) {
+            data = { origin: this.ctID, data: data || Math.random()};
+            localStorage.setItem(this.eTag + msg, JSON.stringify(data));
+            if (d) console.log('crossTab Notifying', this.eTag + msg, localStorage[this.eTag + msg]);
+        },
+
+        setMaster: function crossTab_setMaster() {
+            this.master = (Math.random() * Date.now()).toString(36);
+
+            // (function liveLoop(tag) {
+                // if (tag === mBroadcaster.crossTab.master) {
+                    // localStorage['mCrossTabRef_' + u_handle] = Date.now();
+                    // setTimeout(liveLoop, 6e3, tag);
+                // }
+            // })(this.master);
+        },
+
+        clear: function crossTab_clear() {
+            Object.keys(localStorage).forEach(function(key) {
+                if (key.substr(0,this.eTag.length) === this.eTag) {
+                    if (d) console.log('crossTab Removing ' + key);
+                    delete localStorage[key];
+                }
+            }.bind(this));
+        },
+
+        handleEvent: function crossTab_handleEvent(ev) {
+            if (d) console.log('crossTab ' + ev.type + '-event', ev.key, ev.newValue, ev);
+
+            if (String(ev.key).indexOf(this.eTag) !== 0) {
+                return;
+            }
+            var msg = ev.key.substr(this.eTag.length),
+                strg = JSON.parse(ev.newValue ||'""');
+
+            if (!strg || strg.origin === this.ctID) {
+                if (d) console.log('Ignoring crossTab event', msg, strg);
+                return;
+            }
+
+            switch (msg) {
+                case 'ping':
+                    this.notify('pong');
+                    break;
+                case 'leaving':
+                    if (localStorage['mCrossTabRef_' + u_handle] === strg.data) {
+                        if (d) console.log('Taking crossTab-master ownership');
+                        delete localStorage['mCrossTabRef_' + u_handle];
+                        this.setMaster();
+                        if (u_handle && window.indexedDB) {
+                            mDBstart(true);
+                        }
+                    }
+                    break;
+            }
+
+            delete localStorage[ev.key];
+        }
     }
 };
 if (typeof Object.freeze === 'function') {
@@ -530,7 +686,7 @@ else if (page == '#android')
 }
 else if (!b_u)
 {
-    var d = localStorage.d || 0,l;
+    d = localStorage.d || 0;
     var jj = localStorage.jj || 0;
     var onBetaW = location.hostname === 'beta.mega.nz' || location.hostname.indexOf("developers.") === 0;
     var languages = {'en':['en','en-'],'es':['es','es-'],'fr':['fr','fr-'],'de':['de','de-'],'it':['it','it-'],'nl':['nl','nl-'],'pt':['pt'],'br':['pt-br'],'dk':['da'],'se':['sv'],'fi':['fi'],'no':['no'],'pl':['pl'],'cz':['cz','cz-'],'sk':['sk','sk-'],'sl':['sl','sl-'],'hu':['hu','hu-'],'jp':['ja'],'cn':['zh','zh-cn'],'ct':['zh-hk','zh-sg','zh-tw'],'kr':['ko'],'ru':['ru','ru-mo'],'ar':['ar','ar-'],'he':['he'],'id':['id'],'ca':['ca','ca-'],'eu':['eu','eu-'],'af':['af','af-'],'bs':['bs','bs-'],'sg':[],'tr':['tr','tr-'],'mk':[],'hi':[],'hr':['hr'],'ro':['ro','ro-'],'uk':['||'],'gl':['||'],'sr':['||'],'lt':['||'],'th':['||'],'lv':['||'],'fa':['||'],'ee':['et'],'ms':['ms'],'cy':['cy'],'bg':['bg'],'be':['br'],'tl':['en-ph'],'ka':['||']};
@@ -1059,7 +1215,7 @@ else if (!b_u)
         var _queueWaitToBeLoaded = function(id, elem) {
             waitingToBeLoaded++;
             elem.onload = function() {
-                if (d) console.log('jj.progress...', waitingToBeLoaded);
+                // if (d) console.log('jj.progress...', waitingToBeLoaded);
                 if (--waitingToBeLoaded == 0) {
                     jj_done = true;
                     boot_done();
@@ -1422,7 +1578,7 @@ else if (!b_u)
                 '   </div>'+
                 '</div>';
     }
-    var u_storage,loginresponse,u_sid,dl_res;
+    var u_storage, loginresponse, u_sid, dl_res;
     u_storage = init_storage( localStorage.sid ? localStorage : sessionStorage );
     if ((u_sid = u_storage.sid))
     {

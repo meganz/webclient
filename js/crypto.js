@@ -3,7 +3,7 @@ var have_ab = typeof ArrayBuffer != 'undefined' && typeof DataView != 'undefined
 var use_workers = have_ab && typeof Worker != 'undefined';
 
 if (is_extension && typeof localStorage.use_ssl === 'undefined') {
-	localStorage.use_ssl = 0;
+    localStorage.use_ssl = 0;
 }
 
 // if (is_extension || +localStorage.use_ssl === 0) {
@@ -12,7 +12,7 @@ if (is_chrome_firefox) {
 }
 else if (+localStorage.use_ssl === 0) {
     var use_ssl = (navigator.userAgent.indexOf('Chrome/') !== -1
-		&& parseInt(navigator.userAgent.split('Chrome/').pop()) > 40) ? 1:0;
+        && parseInt(navigator.userAgent.split('Chrome/').pop()) > 40) ? 1:0;
 }
 else {
     if ((navigator.appVersion.indexOf('Safari') > 0) && (navigator.appVersion.indexOf('Version/5') > 0)) {
@@ -1081,7 +1081,7 @@ function api_proc(q) {
                 this.q.cmds[this.q.i] = [];
                 this.q.ctxs[this.q.i] = [];
 
-                api_proc(q);
+                api_proc(this.q);
             }
             else {
                 api_reqerror(this.q, t);
@@ -1129,6 +1129,9 @@ function api_reqerror(q, e) {
         // request failed - retry with exponential backoff
         if (q.backoff) {
             q.backoff *= 2;
+            if (q.backoff > 1024000) {
+                q.backoff = 1024000;
+            }
         }
         else {
             q.backoff = 125;
@@ -1143,8 +1146,9 @@ function api_reqerror(q, e) {
 
 function api_retry() {
     for (var i = 4; i--;) {
-        if (apixs[i].timer) {
+        if (apixs[i].timer && apixs[i].backoff > 5000) {
             clearTimeout(apixs[i].timer);
+            apixs[i].backoff = 4000;
             api_send(apixs[i]);
         }
     }
@@ -1163,10 +1167,10 @@ function api_reqfailed(c, e) {
             loadfm();
         }
     }
-    
+
     // If suspended account
     else if (e === EBLOCKED) {
-        
+
         // On clicking OK, log the user out and redirect to contact page
         msgDialog('warninga', 'Suspended account',
             'You have been suspended due to excess data usage.\n\
@@ -1174,7 +1178,7 @@ function api_reqfailed(c, e) {
             false,
             function() {
                 var redirectUrl = window.location.origin + window.location.pathname + '#contact';
-                u_logout(true);                
+                u_logout(true);
                 window.location.replace(redirectUrl);
             }
         );
@@ -1241,14 +1245,14 @@ function getsc(fm) {
             if (typeof res === 'object') {
                 function getSCDone(sma) {
                     if (sma !== -0x7ff
-                            && typeof mDBloaded !== 'undefined'
+                            // && typeof mDBloaded !== 'undefined'
                             && !folderlink && !pfid
                             && typeof mDB !== 'undefined') {
                         localStorage[u_handle + '_maxaction'] = maxaction;
                     }
 
                     if (ctx.fm) {
-                        mDBloaded = true;
+                        // mDBloaded = true;
                         loadfm_done();
                     }
                 }
@@ -1266,28 +1270,6 @@ function getsc(fm) {
             }
         }
     }, 2);
-}
-
-function completewait(recheck) {
-    if (this.waitid != waitid) {
-        return;
-    }
-
-    stopsc();
-
-    var t = new Date().getTime() - waitbegin;
-
-    if (t < 1000) {
-        waitbackoff += waitbackoff;
-        if (waitbackoff > 256000) {
-            waitbackoff = 256000;
-        }
-    }
-    else {
-        waitbackoff = 250;
-    }
-
-    getsc();
 }
 
 function waitsc() {
@@ -1309,25 +1291,49 @@ function waitsc() {
     waittimeout = setTimeout(waitsc, 300000);
 
     waitxhr.onerror = function () {
-        clearTimeout(waittimeout);
-        waittimeout = false;
+        if (d) console.error('waitsc.onerror');
 
-        waitbackoff += waitbackoff;
-        if (waitbackoff > 1024000) {
-            waitbackoff = 1024000;
+        if (this.waitid === waitid) {
+            clearTimeout(waittimeout);
+            waittimeout = false;
+
+            waitbackoff *= 2;
+            if (waitbackoff > 1024000) {
+                waitbackoff = 1024000;
+            }
+            waittimeout = setTimeout(waitsc, waitbackoff);
         }
-        waittimeout = setTimeout(waitsc, waitbackoff);
-    }
+    };
 
-    waitxhr.onload = function () {
-        if (this.status == 200) {
+    waitxhr.onload = function() {
+        if (this.status !== 200) {
+            this.onerror();
+        } else {
             waitbackoff = 250;
-        }
 
-        clearTimeout(waittimeout);
-        waittimeout = false;
-        completewait();
-    }
+            clearTimeout(waittimeout);
+            waittimeout = false;
+
+            if (this.waitid === waitid) {
+
+                stopsc();
+
+                var t = new Date().getTime() - waitbegin;
+
+                if (t < 1000) {
+                    waitbackoff += waitbackoff;
+                    if (waitbackoff > 256000) {
+                        waitbackoff = 256000;
+                    }
+                }
+                else {
+                    waitbackoff = 250;
+                }
+
+                getsc();
+            }
+        }
+    };
 
     waitbegin = new Date().getTime();
     waitxhr.open('POST', waiturl, true);
@@ -1639,7 +1645,7 @@ function api_cachepubkeys2(res, ctx) {
             u_pubkeys[ctx.u] = u_pubkeys[userHandle] = crypto_decodepubkey(base64urldecode(res.pubk));
             var fingerprint = authring.computeFingerprint(u_pubkeys[ctx.u], 'RSA', 'string');
             var observed = authring.getContactAuthenticated(ctx.u, 'RSA');
-            
+
             if (observed && authring.equalFingerprints(observed.fingerprint, fingerprint) === false) {
                 showFingerprintMismatchException('RSA', userHandle, observed.method, observed.fingerprint, fingerprint);
             }
@@ -3604,7 +3610,7 @@ var pubEd25519 = {};
  * Initialises the authentication system.
  */
 function u_initAuthentication() {
-    
+
     // Load contacts' tracked authentication fingerprints.
     authring.getContacts('Ed25519');
     authring.getContacts('RSA');
@@ -3667,7 +3673,7 @@ function _checkFingerprintEd25519(userHandle) {
         pubkey: pubEd25519[userHandle],
         authenticated: recorded
     };
-    
+
     // If fingerprint mismatch, show warning and throw exception
     if (recorded && (authring.equalFingerprints(recorded.fingerprint, fingerprint) === false)) {
         showFingerprintMismatchException('Ed25519', userHandle, recorded.method, recorded.fingerprint, fingerprint);
@@ -3677,19 +3683,19 @@ function _checkFingerprintEd25519(userHandle) {
             authring.AUTHENTICATION_METHOD.SEEN,
             authring.KEY_CONFIDENCE.UNSURE);
     }
-    
+
     return value;
 }
 
 function _checkFingerprintRSA(userHandle) {
-    
+
     var recorded = authring.getContactAuthenticated(userHandle, 'RSA');
     var fingerprint = authring.computeFingerprint(u_pubkeys[userHandle], 'RSA', 'string');
     var value = {
         pubkey: u_pubkeys[userHandle],
         authenticated: recorded
     };
-    
+
     // If fingerprint mismatch, show warning and throw exception
     if (recorded && (authring.equalFingerprints(recorded.fingerprint, fingerprint) === false)) {
         showFingerprintMismatchException('RSA', userHandle, recorded.method, recorded.fingerprint, fingerprint);
@@ -3699,7 +3705,7 @@ function _checkFingerprintRSA(userHandle) {
             authring.AUTHENTICATION_METHOD.SEEN,
             authring.KEY_CONFIDENCE.UNSURE);
     }
-    
+
     return value;
 }
 
@@ -3716,7 +3722,7 @@ function _checkFingerprintRSA(userHandle) {
  *     an exception.
  */
 function showFingerprintMismatchException(fingerprintType, userHandle, method, previousFingerprint, newFingerprint) {
-    
+
     // Show warning dialog
     mega.ui.CredentialsWarningDialog.singleton(userHandle, method, previousFingerprint, newFingerprint);
 
@@ -3850,7 +3856,7 @@ function getPubRSA(userhandle, callback) {
         api_cachepubkeys({
             cachepubkeyscomplete: function () {
                 _checkFingerprintRSA(userhandle);
-                callback(u_pubkeys[userhandle]);              
+                callback(u_pubkeys[userhandle]);
             }
         }, [userhandle]);
     }

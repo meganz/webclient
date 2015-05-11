@@ -87,6 +87,8 @@ function scrollMenu() {
 }
 
 function init_page() {
+    
+    // If they are transferring from mega.co.nz
     if (page.substr(0, 13) == 'sitetransfer!') {
         M.transferFromMegaCoNz();
         //return false;
@@ -239,7 +241,6 @@ function init_page() {
 
         if (!fminitialized) {
             if (typeof mDB !== 'undefined' && !pfid) {
-                throw 'fix me'; // TODO
                 mDBstart();
             }
             else {
@@ -1042,18 +1043,22 @@ function mLogout() {
             });
         }
         else {
-            // Use the 'Session Management Logout' API call to kill the current session
-            loadingDialog.show();
-            api_req({
-                'a': 'sml'
-            }, {
-                callback: function (result) {
-                    // After the API call, clear other data and reload page
-                    loadingDialog.hide();
+            var finishLogout = function() {
+                if (--step === 0) {
                     u_logout(true);
                     document.location.reload();
                 }
-            });
+            }, step = 1;
+            loadingDialog.show();
+            if (typeof mDB === 'object' && mDB.drop) {
+                step++;
+                mDB.drop().then(finishLogout,function() {
+                    localStorage['fmdblock_' + u_handle] = 0xDEAD;
+                    finishLogout();
+                });
+            }
+            // Use the 'Session Management Logout' API call to kill the current session
+            api_req({ 'a': 'sml' }, { callback: finishLogout });
         }
     };
     var cnt = 0;
@@ -1926,8 +1931,5 @@ window.onbeforeunload = function () {
         return l[377];
     }
 
-    if (typeof mDB !== 'undefined' && mDB
-            && mDBact && localStorage[u_handle + '_mDBactive']) {
-        delete localStorage[u_handle + '_mDBactive'];
-    }
+    mBroadcaster.crossTab.leave();
 }

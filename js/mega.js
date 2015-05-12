@@ -4159,11 +4159,23 @@ function MegaData()
             
             // Decode from Base64
             parts = JSON.parse(atob(parts[1]));
-            if (parts) { 
-                // If the user is already logged in here we can avoid a lot and just take them to the correct page
+            if (parts) {
+                
+                // If the user is already logged in here with the same account 
+                // we can avoid a lot and just take them to the correct page
                 if (JSON.stringify(u_k) === JSON.stringify(parts[0]))
                 {
                     document.location.hash = parts[2];
+                    return;
+                }
+                
+                // If the user is already logged in but with a different account 
+                // throw a warning and ask them to log out of the other account first
+                else if (u_k && (JSON.stringify(u_k) !== JSON.stringify(parts[0]))) {
+                    
+                    msgDialog('warninga', 'Logged in under different account', 'You are already logged into mega.nz with a different account. Please log out of that account first and log in again.', false, null);
+                    
+                    alert('You are already logged into mega.nz with a different account. Please log out of that account first and log in again.');
                     return;
                 }
 

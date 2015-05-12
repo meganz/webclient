@@ -101,6 +101,7 @@ MegaPromise.prototype.then = function(res, rej) {
     }
     res = res || _passthrough;
     rer = rej || _passthrough;
+
     return MegaPromise.asMegaPromiseProxy(this._internalPromise.then(res, rej));
 };
 

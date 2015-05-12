@@ -4172,7 +4172,7 @@ function MegaData()
                 // If the user is already logged in but with a different account 
                 // throw a warning and ask them to log out of the other account first
                 else if (u_k && (JSON.stringify(u_k) !== JSON.stringify(parts[0]))) {
-                    msgDialog('warninga', 'Logged in under different account', 'You are already logged into mega.nz with a different account. Please log out of that account first and log in again.', false, null);
+                    alert('You are already logged into mega.nz with a different account. Please log out of that account first and log in again.');
                     return;
                 }
 

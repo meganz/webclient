@@ -90,10 +90,17 @@ MegaPromise.prototype.promise = function() {
  * Alias of .then
  *
  * @param res
+ *     Function to be called on resolution of the promise.
  * @param [rej]
+ *     Function to be called on rejection of the promise.
  * @returns {MegaPromise}
  */
 MegaPromise.prototype.then = function(res, rej) {
+    function _passthrough(value) {
+        return value;
+    }
+    res = res || _passthrough;
+    rer = rej || _passthrough;
     return MegaPromise.asMegaPromiseProxy(this._internalPromise.then(res, rej));
 };
 

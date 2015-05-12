@@ -87,6 +87,12 @@ function scrollMenu() {
 }
 
 function init_page() {
+    
+    // If they are transferring from mega.co.nz
+    if (page.substr(0, 13) == 'sitetransfer!') {
+        M.transferFromMegaCoNz();
+    }
+
     if (!u_type) {
         $('body').attr('class', 'not-logged');
     }
@@ -216,7 +222,7 @@ function init_page() {
     }
 
     var fmwasinitialized = !!fminitialized;
-    if (u_handle || pfid || folderlink) {
+    if ((u_type === 0 || u_type === 3) || pfid || folderlink) {
 
         if (is_fm()) {
             // switch between FM & folderlinks (completely reinitialize)
@@ -1686,7 +1692,7 @@ function topmenuUI() {
 
 
     $('.top-head .logo').rebind('click', function () {
-        document.location.hash = typeof u_type !== 'undefined' && +u_type > 2 ? '#fm' : '#index';
+        document.location.hash = typeof u_type !== 'undefined' && +u_type > 2 ? '#fm' : '#start';
     });
 
     var c = $('.fm-dialog.registration-page-success').attr('class');

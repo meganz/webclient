@@ -519,10 +519,16 @@ DownloadQueue.prototype.push = function() {
 		, dlIO
 
 	if (dl.zipid) {
-		if (!Zips[dl.zipid]) Zips[dl.zipid] = new ZipWriter(dl.zipid, dl);
+		if (!Zips[dl.zipid]) {
+			Zips[dl.zipid] = new ZipWriter(dl.zipid, dl);
+		}
 		dlIO = Zips[dl.zipid].addEntryFile(dl);
 	} else {
-		dlIO = dl.preview ? new MemoryIO(dl_id, dl) : new dlMethod(dl_id, dl);
+		if (dl.preview || (window.Incognito === 0xC120E && dl.size < 400*1024*1024)) {
+			dlIO = new MemoryIO(dl_id, dl);
+		} else {
+			dlIO = new dlMethod(dl_id, dl);
+		}
 	}
 
 	if (!use_workers) {

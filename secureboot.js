@@ -703,7 +703,7 @@ else if (!b_u)
         };
     })(console);
 
-    Object.defineProperty(window, "__cd_v", { value : 9, writable : false });
+    Object.defineProperty(window, "__cd_v", { value : 11, writable : false });
     if (!d || onBetaW)
     {
         var __cdumps = [], __cd_t;
@@ -893,6 +893,7 @@ else if (!b_u)
 
     jsl.push({f: langFilepath, n: 'lang', j:3});
     jsl.push({f:'sjcl.js', n: 'sjcl_js', j:1}); // Will be replaced with asmCrypto soon
+    jsl.push({f:'js/mDB.js', n: 'mDB_js', j:1});
     jsl.push({f:'js/asmcrypto.js',n:'asmcrypto_js',j:1,w:1});
     jsl.push({f:'js/jquery-2.1.1.js', n: 'jquery', j:1,w:10});
     jsl.push({f:'js/functions.js', n: 'functions_js', j:1});
@@ -912,7 +913,6 @@ else if (!b_u)
     jsl.push({f:'js/jquery.jscrollpane.js', n: 'jscrollpane_js', j:1});
     jsl.push({f:'js/jquery.tokeninput.js', n: 'jquerytokeninput_js', j:1});
     jsl.push({f:'js/jquery.misc.js', n: 'jquerymisc_js', j:1});
-    jsl.push({f:'js/mDB.js', n: 'mDB_js', j:1});
     jsl.push({f:'js/thumbnail.js', n: 'thumbnail_js', j:1});
     jsl.push({f:'js/exif.js', n: 'exif_js', j:1,w:3});
     jsl.push({f:'js/megapix.js', n: 'megapix_js', j:1});

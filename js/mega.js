@@ -4165,12 +4165,13 @@ function MegaData()
                 // we can avoid a lot and just take them to the correct page
                 if (JSON.stringify(u_k) === JSON.stringify(parts[0]))
                 {
-                    document.location.hash = parts[2];
+                    window.location.hash = parts[2];
                     return;
                 }
                 
                 // If the user is already logged in but with a different account just load that account instead
                 else if (u_k && (JSON.stringify(u_k) !== JSON.stringify(parts[0]))) {
+                    window.location.hash = 'fm';
                     return;
                 }
 
@@ -4207,7 +4208,7 @@ function MegaData()
                         {    
                             // Set account type and redirect to the requested location (via the hash mechanism)
                             u_type = result;
-                            document.location.hash = topage;
+                            window.location.hash = topage;
 
                         }                   
                         else 

@@ -22937,24 +22937,24 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 	background-color: rgba(0,0,0,0.05);
 }
 .payment-dialog.active .fm-account-input.focused {
-	background-color: rgba(0,0,0,0.2);
+	background-color: rgba(0,0,0,0.1);
 }
 .payment-dialog.active .fm-account-input.focused input {
-	color: white;
+	color: #000;
 }
 .payment-half-block .fm-account-input.focused input::-webkit-input-placeholder {
- color: white;
+    color: #E5E5E5;
 }
 .payment-half-block .fm-account-input.focused input:-moz-placeholder {
- color: white;
- opacity: 1;
+    color: #E5E5E5;
+    opacity: 1;
 }
 .payment-half-block .fm-account-input.focused input::-moz-placeholder {
- color: white;
- opacity: 1;
+    color: #E5E5E5;
+    opacity: 1;
 }
 .payment-half-block .fm-account-input.focused input:-ms-input-placeholder {
-color: white;
+    color: #E5E5E5;
 }
 /* end of CC payment dialog */
 .payment-animation-pad {

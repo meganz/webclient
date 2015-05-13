@@ -379,7 +379,6 @@ var gifSlider = {
     // Interval timers
     leftAnimationIntervalId: 0,
     rightAnimationIntervalId: 0,
-    bottomRightAnimationIntervalId: 0,
     
     // There can be more or less images on either side e.g. 2 gifs on left and 
     // 3 on right and it will still work because they are run independently.
@@ -393,7 +392,8 @@ var gifSlider = {
                 href: '#register',          // Page link you go to when clicked
                 title: 5875,                // Title for above the GIF shown in red
                 description: 5876,          // Description next to the title
-                imageSrc: null              // The image itself, preloaded and cached in memory
+                imageSrc: null,             // The image path
+                bottomImage: null           // The corresponding ad image to be shown in the bottom right corner      
             },
             {
                 name: 'sync-client',
@@ -401,7 +401,8 @@ var gifSlider = {
                 href: '#sync',
                 title: 1626,
                 description: 1086,
-                imageSrc: null
+                imageSrc: null,
+                bottomImage: 'button0'      // Swaps between Windows/MacOS/Linux using code above
             },
             {
                 name: 'browser-extension-firefox',
@@ -409,7 +410,8 @@ var gifSlider = {
                 href: '#firefox',
                 title: 1088,
                 description: 1929,
-                imageSrc: null
+                imageSrc: null,
+                bottomImage: 'button2'
             },
             {
                 name: 'browser-extension-chrome',
@@ -417,7 +419,8 @@ var gifSlider = {
                 href: '#chrome',
                 title: 1088,
                 description: 1929,
-                imageSrc: null
+                imageSrc: null,
+                bottomImage: 'button3'
             },
             {
                 name: 'mobile-app',
@@ -425,7 +428,8 @@ var gifSlider = {
                 href: '#mobile',
                 title: 955,
                 description: 1930,
-                imageSrc: null
+                imageSrc: null,
+                bottomImage: ['button4', 'button5', 'button6']
             }
         ]
     },
@@ -434,16 +438,16 @@ var gifSlider = {
     init: function() {
         
         // Preload the images into memory so they will display straight away
+        //gifSlider.preLoadImages('left');
         gifSlider.preLoadImages('right');
         
         // Show first two slides using order defined above
+        //gifSlider.showImage('left', 0);
         gifSlider.showImage('right', 0);
         
         // Setup loops to continually change after every slide has finished
+        //gifSlider.continueSlideShow('left', 0);
         gifSlider.continueSlideShow('right', 0);
-        
-        // Show ads in bottom right corner
-        gifSlider.alternateBottomRightProducts();
         
         // If the page changes, clear the timers
         $(window).on('hashchange', null, gifSlider.clearIntervals);
@@ -493,6 +497,7 @@ var gifSlider = {
             
             // Fade out existing image            
             $('.animations-' + side + '-container .currentImage').attr('src', currentSlideImgSrc);
+            $('.products-bottom-block a').fadeOut(gifSlider.fadeOutSpeed);
             $('.animations-' + side + '-container .currentImage').fadeOut(gifSlider.fadeOutSpeed, function() {
 
                 // Increment to next image
@@ -525,6 +530,7 @@ var gifSlider = {
         var slideDescription = l[gifSlider.images[side][slideIndex].description];
         var slideImgSrc = gifSlider.images[side][slideIndex].imageSrc;
         var slideLink = gifSlider.images[side][slideIndex].href;
+        var bottomImage = gifSlider.images[side][slideIndex].bottomImage;
 
         // Change the link and fade in the new image
         $('.ads-' + side + '-block .currentLink').attr('href', slideLink);
@@ -534,41 +540,21 @@ var gifSlider = {
         // Set title and description
         $('.ads-' + side + '-block .products-top-txt .red').html(slideTitle).fadeIn(gifSlider.fadeInSpeed);
         $('.ads-' + side + '-block .products-top-txt .description').text(slideDescription).fadeIn(gifSlider.fadeInSpeed);
-    },
-
-    /**
-     * Alternates the images in the bottom right corner
-     */
-    alternateBottomRightProducts: function () {
         
-        var adIndex = 0;
+        // Display corresponding image in bottom right corner
+        if (typeof bottomImage === 'string') {
+            $('.products-bottom-block .' + bottomImage).fadeIn(gifSlider.fadeInSpeed);
+        }
         
-        // Show the first ad
-        var $productsBottomBlock = $('.products-bottom-block');
-        $productsBottomBlock.find('.button' + adIndex).fadeIn(gifSlider.fadeInSpeed);
-        
-        // Show new ad every 10 seconds
-        gifSlider.bottomRightAnimationIntervalId = setInterval(function() {
+        // If the mobile ad, pick a random store to show in bottom right corner e.g. Google, Apple, Windows
+        else if (bottomImage !== null) {
             
-            var previousAdIndex = adIndex;
-            adIndex += 1;
+            var min = 0;
+            var max = bottomImage.length - 1;
+            var randomIndex = Math.floor(Math.random() * (max - min + 1) + min);
             
-            // Reset back to start if exceeded available ads
-            if (adIndex === 7) {
-                adIndex = 0;
-            }
-            
-            // Ad index 1 is missing so skip it
-            else if (adIndex === 1) {
-                adIndex++;
-            }
-            
-            // Fade out the old ad and fade in the new ad
-            $productsBottomBlock.find('.button' + previousAdIndex).fadeOut(gifSlider.fadeOutSpeed, function() {
-                $productsBottomBlock.find('.button' + adIndex).fadeIn(gifSlider.fadeInSpeed);
-            });
-            
-        }, 10000);
+            $('.products-bottom-block .' + bottomImage[randomIndex]).fadeIn(gifSlider.fadeInSpeed);
+        }
     },
     
     /**
@@ -578,7 +564,6 @@ var gifSlider = {
 
         clearInterval(gifSlider.leftAnimationIntervalId);
         clearInterval(gifSlider.rightAnimationIntervalId);
-        clearInterval(gifSlider.bottomRightAnimationIntervalId);
         
         // Remove on hashchange handler as it's not needed on other pages
         $(window).off('hashchange', null, gifSlider.clearIntervals);

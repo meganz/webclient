@@ -468,13 +468,13 @@ var gifSlider = {
         // Loop through the available images
         for (var i = 0, length = gifSlider.images[side].length; i < length; i++) {
             
-            // Preload the image
-            var image = new Image();
-            var imageSrc = baseImagePath + gifSlider.images[side][i].name + retina + '.gif';
-            image.src = imageSrc;
-            
             // Store source path to swap out later
+            var imageSrc = baseImagePath + gifSlider.images[side][i].name + retina + '.gif';
             gifSlider.images[side][i].imageSrc = imageSrc;
+            
+            // Download and cache the image in a hidden image tag. The currently playing animation will have the 
+            // src attribute swapped and the next image will start from frame 0 and load it from browser cache.
+            $('.animation-image.' + gifSlider.images[side][i].name).attr('src', imageSrc);
         }
     },
 
@@ -487,7 +487,6 @@ var gifSlider = {
         
         // Find when to start the next image
         var animationLengthForCurrentSlide = gifSlider.images[side][currentSlideIndex].animationLength;
-        var currentSlideImgSrc = gifSlider.images[side][currentSlideIndex].imageSrc;
         
         // Set timer to load the next slide after the current one has finished
         gifSlider[side + 'AnimationIntervalId'] = setInterval(function() {
@@ -496,7 +495,6 @@ var gifSlider = {
             clearInterval(gifSlider[side + 'AnimationIntervalId']);
             
             // Fade out existing image            
-            $('.animations-' + side + '-container .currentImage').attr('src', currentSlideImgSrc);
             $('.products-bottom-block a').fadeOut(gifSlider.fadeOutSpeed);
             $('.animations-' + side + '-container .currentImage').fadeOut(gifSlider.fadeOutSpeed, function() {
 

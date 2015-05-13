@@ -1164,7 +1164,7 @@ function api_reqfailed(c, e) {
             mDBreload();
         }
         else {
-            loadfm();
+            loadfm(true);
         }
     }
 

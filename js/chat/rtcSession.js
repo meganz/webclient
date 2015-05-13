@@ -256,7 +256,7 @@ RtcSession.gVolMonCallback = null;
 
 RtcSession.prototype = {
   NO_DTLS: false, //compat with android
-  _myGetUserMedia: function(options, successCallback, errCallback, allowContinueOnFail)
+  _myGetUserMedia: function(options, successCallback, errCallback, allowContinueOnFail, sid)
   {
     var self = this;
     if (self.gLocalStream)
@@ -314,12 +314,13 @@ RtcSession.prototype = {
         }
         if (!allowContinueOnFail) {
             fail();
-            self.trigger('local-media-fail', {error: msg});
+            self.trigger('local-media-fail', {error: msg, sid: sid});
             return;
         }
 
         var obj = {
             error: msg,
+            sid: sid,
             continue: function(cont) {
                 if (failed)
                     throw new Error("Already handled by failure handler");
@@ -535,7 +536,8 @@ RtcSession.prototype = {
               reason: $(stanza).attr('reason'),
               sid: sid,
               isDataCall: !!options.files,
-              text : body.length ? RtcSession.xmlUnescape(body[0].textContent) : undefined
+              text : body.length ? RtcSession.xmlUnescape(body[0].textContent) : undefined,
+              callOptions: options
           });
       },
       null, 'message', 'megaCallDecline', null, targetJid, {matchBare: true});
@@ -604,13 +606,14 @@ RtcSession.prototype = {
       } //end set answer timeout
   } //end initiateCallback()
   if (options.audio || options.video)
-      self._myGetUserMedia(options, initiateCallback, null, true);
+      self._myGetUserMedia(options, initiateCallback, null, true, sid);
   else
       initiateCallback(null);
 
   //return an object with a cancel() method
   return {
       sid: sid,
+      callOptions: options,
       cancel: function() {
         if (state === 2)
             return false;
@@ -628,7 +631,7 @@ RtcSession.prototype = {
                 reason: 'caller',
                 type: 'megaCallCancel'
             }));
-            self.trigger('call-canceled-caller', {peer: targetJid, info: { sid: sid, reason: 'caller' }});
+            self.trigger('call-canceled-caller', {peer: targetJid, info: { sid: sid, reason: 'caller' }, callOptions: options});
             return true;
         } else if (state === 0) {
             state = 4;
@@ -639,49 +642,33 @@ RtcSession.prototype = {
   }};
  },
 
+/** Terminates all current calls and file transfers */
+hangupAll: function()
+{
+    this.jingle.terminateAll('hangup', '');
+    for (var asid in this.jingle.acceptCallsFrom) {
+        this.jingle.cancelAutoAnswerEntry(asid, 'hangup', '');
+    }
+},
  /**
-    Terminates an ongoing (media) call
-    @param {string} [jid]
-        The JID of the peer, serves to identify the call. If no jid is specified,
-        all current calls are terminated. If JID is a bare JID, all calls to this bare JID
-        will be terminated. If it is a full JID, only the call to that full JID is terminated
-        Note that this function does not terminate file transfer calls
-        @param {boolean} [all] If set to true, does not filter only media calls, and can terminate
-                               data calls as well
+    Terminates an ongoing call or file transfer
+    @param {string} sid The sid of the session to hangup.
+    @returns {bool} true if the sid matched a call, false otherwsise
  */
- hangup: function(jid, all)
+ hangup: function(sid)
  {
-    var isBareJid = jid && (jid.indexOf('/') < 0);
-    var sessions = this.jingle.sessions;
-    for (var sid in sessions) {
-        var sess = sessions[sid];
-        if (sess.fileTransferHandler && !all)
-            continue;
-        if (jid) {
-            if (isBareJid) {
-                 if (Strophe.getBareJidFromJid(sess.peerjid) != jid)
-                    continue;
-            } else {
-                if (sess.peerjid != jid)
-                    continue;
-            }
-        }
+    var sess = this.jingle.sessions[sid];
+    if (sess) {
         this.jingle.terminateBySid(sid, 'hangup');
+        return true;
     }
-    var autoAnswers = this.jingle.acceptCallsFrom;
-    for (var aid in autoAnswers) {
-        var item = autoAnswers[aid];
-        if (jid) {
-            if (isBareJid) {
-                if (Strophe.getBareJidFromJid(item.from) != jid)
-                    continue;
-            } else {
-                if (item.from != jid)
-                    continue;
-            }
-        }
-        this.jingle.cancelAutoAnswerEntry(aid, 'hangup', '', all?undefined:'m');
+
+    var item = this.jingle.acceptCallsFrom[sid];
+    if (item) {
+        this.jingle.cancelAutoAnswerEntry(sid, 'hangup', '');
+        return true;
     }
+    return false;
  },
 
  /**
@@ -701,8 +688,9 @@ RtcSession.prototype = {
  muteUnmute: function(state, what, jid)
  {
     var sessions = this._getSessionsForJid(jid);
-    if (!sessions)
+    if (!sessions) {
         return false;
+    }
 // If we are muting all calls, disable also local video playback as well
 // In Firefox, all local streams are only references to gLocalStream, so muting any of them
 // mutes all and the local video playback.
@@ -712,53 +700,60 @@ RtcSession.prototype = {
         var sess = sessions[i];
         if (what.video && this.gLocalVid) {
             if (state) {//mute
-                if (!sess.mutedState.videoMuted)
+                if (!sess.mutedState.videoMuted) {
                     this.gLocalVidRefcount--;
+                }
             } else { //unmute
-                if (sess.mutedState.videoMuted)
+                if (sess.mutedState.videoMuted) {
                     this.gLocalVidRefcount++;
+                }
             }
         }
         sess.muteUnmute(state, what);
     }
     if (this.gLocalVid) {
-        if (this.gLocalVidRefcount <= 0)
+        if (this.gLocalVidRefcount <= 0) {
             this._disableLocalVid(); //does nothing if already disabled
-        else
+        } else {
             this._enableLocalVid(); //does nothing if already enabled
+        }
     }
     return true;
  },
  _getSessionsForJid: function(jid) {
     var sessions = [];
     if (!jid) {
-        for (var k in this.jingle.sessions)
+        for (var k in this.jingle.sessions) {
             sessions.push(this.jingle.sessions[k]);
-        if (sessions.length < 1)
+        }
+        if (sessions.length < 1) {
             return null;
+        }
     } else {
         var isFullJid = (jid.indexOf('/') >= 0);
         for(var sid in this.jingle.sessions) {
             var sess = this.jingle.sessions[sid];
             if (isFullJid) {
-                if (sess.peerjid === jid)
+                if (sess.peerjid === jid) {
                     sessions.push(sess);
+                }
             } else {
-            if (Strophe.getBareJidFromJid(sess.peerjid) === jid)
-                sessions.push(sess);
+                if (Strophe.getBareJidFromJid(sess.peerjid) === jid) {
+                    sessions.push(sess);
+                }
             }
         }
     }
     return sessions;
  },
- _onPresenceUnavailable: function(pres)
- {
+ _onPresenceUnavailable: function(pres) {
     var from = $(pres).attr('from');
     var sessions = this.jingle.sessions;
     for (var sid in sessions) {
         var sess = sessions[sid];
-        if (sess.peerjid === from)
+        if (sess.peerjid === from) {
             this.jingle.terminate(sess, 'peer-disconnected');
+        }
     }
     return true; //We dont want this handler to be deleted
  },
@@ -766,25 +761,26 @@ RtcSession.prototype = {
  _onMediaReady: function(localStream) {
 // localStream is actually RtcSession.gLocalStream
 
-    for (var i = 0; i < localStream.getAudioTracks().length; i++)
+    for (var i = 0; i < localStream.getAudioTracks().length; i++) {
         console.log('using audio device "' +localStream.getAudioTracks()[i].label + '"');
-
-    for (i = 0; i < localStream.getVideoTracks().length; i++)
+    }
+    for (i = 0; i < localStream.getVideoTracks().length; i++) {
         console.log('using video device "' + localStream.getVideoTracks()[i].label + '"');
-
+    }
     // mute video on firefox and recent canary
     var elemClass = "localViewport";
-    if (localStream.getVideoTracks().length < 1)
+    if (localStream.getVideoTracks().length < 1) {
         elemClass +=" localNoVideo";
-
-    if (this.gLocalVid)
+    }
+    if (this.gLocalVid) {
         throw new Error("Local stream just obtained, but localVid was not null");
-
-    var vid = $('<video class="'+elemClass+'" autoplay="autoplay" />');
-    if (vid.length < 1)
+    }
+    var vid = $('<video class="'+elemClass+'" autoplay="autoplay" defaultMuted="true" muted="true" volume="0"/>');
+    if (vid.length < 1) {
         throw new Error("Failed to create local video element");
+    }
     vid = vid[0];
-    vid.muted = true;
+    vid.muted = vid.defaultMuted = true;
     vid.volume = 0;
     this.gLocalVid = vid;
     /**
@@ -810,8 +806,7 @@ RtcSession.prototype = {
     RtcSession._maybeCreateVolMon();
  },
 
- onIncomingCallRequest: function(params, ansFunc)
- {
+ onIncomingCallRequest: function(params, ansFunc) {
     var self = this;
     /**
     Incoming call request received
@@ -833,11 +828,15 @@ RtcSession.prototype = {
     */
     params.answer = 
     function(accept, obj) {
-        if (!params.reqStillValid()) //expired
+        if (!params.reqStillValid()) {//expired
             return false;
-
-        if (!accept)
-            return ansFunc(false, {reason: obj.reason?obj.reason:'busy', text: obj.text});
+        }
+        if (!accept) {
+            return ansFunc(false, {
+                reason: obj.reason?obj.reason:'busy',
+                text: obj.text
+            });
+        }
         if (!params.files) {
             var media = obj.mediaOptions;
             self._myGetUserMedia(media,
@@ -856,13 +855,14 @@ RtcSession.prototype = {
                     });
                 },
                 //allow to answer with no media only if peer is sending something
-                (params.peerMedia.audio || params.peerMedia.video)
+                (params.peerMedia.audio || params.peerMedia.video),
+                params.sid
             );
-    } else {//file transfer
-         ansFunc(true, {});
-     }
-          return true;
+        } else {//file transfer
+            ansFunc(true, {});
     }
+    return true;
+    };
     this.trigger('call-incoming-request', params);
     /**
     Function parameter to <i>call-incoming-request</i> to check if the call request is still valid
@@ -1118,52 +1118,14 @@ RtcSession.prototype = {
  },
 
  /**
-    Get info whether local audio and video are being sent at the moment in a call to the specified JID
-    @param {string} fullJid The <b>full</b> JID of the peer to whom there is an ongoing call
-    @returns {{audio: Boolean, video: Boolean}} If there is no call to the specified JID, null is returned
+     Get a SessWrapper object for a session, identified by the specified sid
+     @param {string} sid The sid of the session
  */
- getSentMediaTypes: function(fullJid)
- {
-     var sess = this.getMediaSessionToJid(fullJid);
+ getSessionBySid: function(sid) {
+     var sess = this.jingle.sessions[sid];
      if (!sess)
-        return null;
-//we don't use sess.mutedState because in Forefox we don't have a separate
-//local streams for each session, so (un)muting one session's local stream applies to all
-//other sessions, making mutedState out of sync
-    var audTracks = sess.localStream.getAudioTracks();
-    var vidTracks = sess.localStream.getVideoTracks();
-    return {
-        audio: (audTracks.length > 0) && audTracks[0].enabled,
-        video: (vidTracks.length > 0) && vidTracks[0].enabled
-    }
- },
-
- /**
-    Get info whether remote audio and video are being received at the moment in a call to the specified JID
-    @param {string} fullJid The full peer JID to identify the call
-    @returns {{audio: Boolean, video: Boolean}} If there is no call to the specified JID, null is returned
- */
- getReceivedMediaTypes: function(fullJid) {
-    var sess = this.getMediaSessionToJid(fullJid);
-    if (!sess)
-        return null;
-    var m = sess.remoteMutedState;
-    return {
-        audio: (sess.remoteStream.getAudioTracks().length > 0) && !m.audioMuted,
-        video: (sess.remoteStream.getVideoTracks().length > 0) && !m.videoMuted
-    }
- },
-
- getMediaSessionToJid: function(fullJid) {
- //TODO: We get only the first media session to fullJid, but there may be more
-    var sessions = this.jingle.sessions;
-    for (var sid in sessions) {
-        var s = sessions[sid];
-        if (s.peerjid === fullJid) {
-            return s;
-        }
-    }
-    return null;
+         return null;
+     return new SessWrapper(sess);
  },
 
 /**
@@ -1254,7 +1216,6 @@ RtcSession.prototype = {
     }
 
     if (!this.gLocalStream) {
-        console.error("_freeLocalStream: gLocalStream is already null");
         return;
     }
 /**
@@ -1314,7 +1275,6 @@ RtcSession.prototype = {
  */
  destroy: function() {
     this.hangup();
-    this._freeLocalStream();
  },
 
 /** Returns whether the call or file transfer with the given
@@ -1415,7 +1375,7 @@ peerJid: function(){
     @returns {string}
 */
 jid:function() {
-return this._sess.jid;
+    return this._sess.jid;
 },
 
 /**
@@ -1467,12 +1427,50 @@ isRelay: function() {
         return undefined;
     else
         return statsRec.isRelay();
-}
+},
+/**
+    Get info whether local audio and video are being sent at the moment in that session
+    @returns {{audio: Boolean, video: Boolean}} If the session is fake, null is returned
+*/
+sentMediaTypes: function()
+{
+    var sess = this._sess;
+    if (sess.isFake) {
+        return null;
+    }
+   //we don't use sess.mutedState because in Forefox we don't have a separate
+   //local streams for each session, so (un)muting one session's local stream applies to all
+   //other sessions, making mutedState out of sync
+    var audTracks = sess.localStream.getAudioTracks();
+    var vidTracks = sess.localStream.getVideoTracks();
+    return {
+        audio: (audTracks.length > 0) && audTracks[0].enabled,
+        video: (vidTracks.length > 0) && vidTracks[0].enabled
+    }
+},
+
+/**
+    Get info whether remote audio and video are being received at the moment in that session
+    @returns {{audio: Boolean, video: Boolean}} If the session is fake, null is returned
+*/
+receivedMediaTypes: function() {
+    var sess = this._sess;
+    if (sess.isFake) {
+        return null;
+    }
+
+    var m = sess.remoteMutedState;
+    return {
+        audio: (sess.remoteStream.getAudioTracks().length > 0) && !m.audioMuted,
+        video: (sess.remoteStream.getVideoTracks().length > 0) && !m.videoMuted
+    }
+},
+
 }
 function getStreamAv(stream) {
-    if (!stream)
+    if (!stream) {
         return {audio:false, video: false};
-
+    }
     var result = {};
     result.audio = (stream.getAudioTracks().length > 0);
     result.video = (stream.getVideoTracks().length > 0);

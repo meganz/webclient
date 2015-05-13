@@ -13075,7 +13075,7 @@ table {
 .fm-account-profile .fm-account-info-block {
 	margin-left: 120px;
 }
-.fm-account-change-avatar, .fm-account-save, .fm-account-cancel {
+.fm-account-remove-avatar, .fm-account-change-avatar, .fm-account-save, .fm-account-cancel {
 	height: 28px;
 	line-height: 27px;
 	background-color: #D52600;

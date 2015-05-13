@@ -3551,6 +3551,14 @@ function accountUI()
 			initAccountScroll();
         });
 
+        $('.fm-account-remove-avatar,.fm-account-avatar').rebind('click', function() {
+            msgDialog('confirmation', "Are you sure?", "Are you sure to remove your avatar", false, function(e) {
+                if (!e) return;
+                api_req({'a': 'up', '+a':base64urlencode('')});
+                delete avatars[u_handle];
+            });
+        });
+
         $('.fm-account-change-avatar,.fm-account-avatar').unbind('click');
         $('.fm-account-change-avatar,.fm-account-avatar').bind('click', function(e)
         {

@@ -381,8 +381,6 @@ var gifSlider = {
     rightAnimationIntervalId: 0,
     bottomRightAnimationIntervalId: 0,
     
-    onDownloadPage: false,
-    
     // There can be more or less images on either side e.g. 2 gifs on left and 
     // 3 on right and it will still work because they are run independently.
     images: {
@@ -435,8 +433,6 @@ var gifSlider = {
     // Initialise the slide show
     init: function() {
         
-        gifSlider.onDownloadPage = true;
-        
         // Preload the images into memory so they will display straight away
         gifSlider.preLoadImages('right');
         
@@ -473,7 +469,7 @@ var gifSlider = {
             var imageSrc = baseImagePath + gifSlider.images[side][i].name + retina + '.gif';
             image.src = imageSrc;
             
-            // Store source to swap out later
+            // Store source path to swap out later
             gifSlider.images[side][i].imageSrc = imageSrc;
         }
     },
@@ -495,30 +491,24 @@ var gifSlider = {
             // Clear the previous interval
             clearInterval(gifSlider[side + 'AnimationIntervalId']);
             
-            // If on the download page, start a new interval
-            if (gifSlider.onDownloadPage) {
-                
-                // Fade out existing image            
-                $('.animations-' + side + '-container .currentImage').attr('src', currentSlideImgSrc);
-                $('.animations-' + side + '-container .currentImage').fadeOut(gifSlider.fadeOutSpeed, function() {
+            // Fade out existing image            
+            $('.animations-' + side + '-container .currentImage').attr('src', currentSlideImgSrc);
+            $('.animations-' + side + '-container .currentImage').fadeOut(gifSlider.fadeOutSpeed, function() {
 
-                    // Increment to next image
-                    var nextSlideIndex = currentSlideIndex + 1;
+                // Increment to next image
+                var nextSlideIndex = currentSlideIndex + 1;
 
-                    // If it has incremented past the last slide available, go back to start
-                    if (nextSlideIndex === gifSlider.images[side].length) {
-                        nextSlideIndex = 0;
-                    }
+                // If it has incremented past the last slide available, go back to start
+                if (nextSlideIndex === gifSlider.images[side].length) {
+                    nextSlideIndex = 0;
+                }
 
-                    // Show the image now
-                    gifSlider.showImage(side, nextSlideIndex);
+                // Show the image now
+                gifSlider.showImage(side, nextSlideIndex);
 
-                    // Setup the timer for the slide above, so after that finishes it will run the next one
-                    gifSlider.continueSlideShow(side, nextSlideIndex);
-                });
-            }
-
-            console.log('zzzz still animating ' + side + ' side ' + gifSlider[side + 'AnimationIntervalId']);
+                // Setup the timer for the slide above, so after that finishes it will run the next one
+                gifSlider.continueSlideShow(side, nextSlideIndex);
+            });
 
         }, animationLengthForCurrentSlide);
     },
@@ -590,8 +580,7 @@ var gifSlider = {
         clearInterval(gifSlider.rightAnimationIntervalId);
         clearInterval(gifSlider.bottomRightAnimationIntervalId);
         
-        gifSlider.onDownloadPage = false;
-
+        // Remove on hashchange handler as it's not needed on other pages
         $(window).off('hashchange', null, gifSlider.clearIntervals);
     }
 };

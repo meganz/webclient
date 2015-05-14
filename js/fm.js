@@ -3186,7 +3186,7 @@ function accountUI()
                         else if (typeof res == 'number' && res < 0)
                         { // something went wrong
                             $('#account-confirm-password,#account-password,#account-new-password').val('');
-                            msgDialog('warninga', 'Error', l[200]);
+                            msgDialog('warninga', 'Error', l[6972]);
                         }
                         else
                         { // success

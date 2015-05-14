@@ -55,6 +55,7 @@
                             a: 'clog',
                             t: "feedbackDialog." + self._type,
                             id: reportId,
+                            uh: self._report.u_handle ? self._report.u_handle : "",
                             d: dump
                         });
 

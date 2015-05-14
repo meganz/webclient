@@ -14,7 +14,8 @@ var CallSession = function(chatRoom, sid) {
     this.answer = null;
     this.cancel = null;
 
-    this.callStats = {};
+    this.callStats = [];
+    this.liveCallStats = {};
 
     if(this.room.callSession) {
         if(this.room.callSession.isStarting() === true) {
@@ -377,15 +378,15 @@ CallSession.prototype.onCallAnswered = function(e) {
 CallSession.prototype.onCallStarted = function(e, eventData) {
     var self = this;
 
-    self.callStats = {};
+    self.liveCallStats = {};
 
     eventData.stats = {
         scanPeriod: 1, maxSamplePeriod: 5,
         onSample: function(stats, type) {
             if (type == 1) {
-                self.callStats.stats = stats;
+                self.liveCallStats.stats = stats;
             } else if (type == 0) {
-                self.callStats.commonStats = stats;
+                self.liveCallStats.commonStats = stats;
             }
         }
     };
@@ -1566,6 +1567,12 @@ CallManager.prototype._attachToChatRoom = function(megaChat, chatRoom) {
 
             delete self.outgoingRequestJingleSessions[session.sid];
             delete self.incomingRequestJingleSessions[session.sid];
+        }
+
+        if(eventData.stats) {
+            session.callStats.push(
+                eventData.stats
+            );
         }
 
         var reason = eventData.reason ? eventData.reason : (eventData.info && eventData.info.reason ? eventData.info.reason : undefined);

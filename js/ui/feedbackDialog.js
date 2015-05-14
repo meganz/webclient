@@ -117,29 +117,8 @@
                 .val('')
                 .hide();
 
-            $('input[name="email"]', self.$dialog)
-                .hide();
-
             $('.stats-button', self.$dialog)
                 .hide();
-
-            $('.reply .checkdiv').rebind('onFakeCheckboxChange.feedbackDialog', function(e, val) {
-                var fnName = val ? "slideDown" : "slideUp";
-
-                $('input[name="email"]', self.$dialog)[fnName]({
-                    duration: 250,
-                    progress: function(anim, progress, remainingMs) {
-                        if(Math.ceil(progress * 100) % 2 === 0) {
-                            self.reposition();
-                        }
-                    },
-                    complete: function() {
-                        $(this)
-                            .select()
-                            .focus();
-                    }
-                });
-            });
 
             $('.stats .checkdiv').rebind('onFakeCheckboxChange.feedbackDialog', function(e, val) {
                 var fnName = val ? "fadeIn" : "fadeOut";
@@ -169,10 +148,6 @@
 
 
 
-
-            $('input[name="email"]', self.$dialog)
-                .val(M.u[u_handle].m)
-                .trigger('change');
 
             $('input[name="send_stats"]', self.$dialog)
                 .attr('checked', true)

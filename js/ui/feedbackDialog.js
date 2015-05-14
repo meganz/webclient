@@ -41,8 +41,8 @@
                     'className': "fm-dialog-button-green feedback-button-send disabled",
                     'callback': function() {
                         self._report.message = self.$textarea.val();
-                        if($('input[name="my_email"]', self.$dialog).attr('checked')) {
-                            self._report.replyEmail = $('input[name="email"]', self.$dialog).val();
+                        if($('input[name="share_uh"]', self.$dialog).attr('checked')) {
+                            self._report.u_handle = u_handle;
                         }
 
                         var rated = $('.rate.active', self.$dialog)[0].className;
@@ -177,8 +177,8 @@
                 .attr('checked', true)
                 .trigger('change');
 
-            $('input[name="my_email"]', self.$dialog)
-                .attr('checked', false)
+            $('input[name="share_uh"]', self.$dialog)
+                .attr('checked', true)
                 .trigger('change');
         });
 

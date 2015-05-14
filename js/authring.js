@@ -200,7 +200,9 @@ var authring = (function () {
                 } else {
                     logger.error('Error retrieving authentication ring for key type '
                                  + keyType + ': ' + result);
-                    attributePromise.reject(result);
+                    var rejectedPromise = new MegaPromise();
+                    rejectedPromise.reject(result);
+                    return rejectedPromise;
                 }
             },
             // Function on rejection.
@@ -530,7 +532,7 @@ var authring = (function () {
             },
             // Function on rejection.
             function(result) {
-                if (result === -9) {
+                if (result === ENOENT) {
                     // We don't have it set up, yet. Let's do so now.
                     logger.warn('Authentication system seems unavailable.');
 

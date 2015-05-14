@@ -116,10 +116,10 @@ describe("authring unit test", function() {
                 assert.lengthOf(getUserAttribute.args[0], 4);
                 assert.strictEqual(getUserAttribute.args[0][1], 'authring');
                 var callback = attributePromise.then.args[0][0];
-                callback(-3);
+                callback(EFAILED);
                 assert.strictEqual(u_authring.Ed25519, undefined);
                 assert.strictEqual(ns._logger._log.args[0][1][0],
-                    'Error retrieving authentication ring for key type Ed25519: -3');
+                    'Error retrieving authentication ring for key type Ed25519: -5');
             });
 
             it("through API", function() {
@@ -631,7 +631,7 @@ describe("authring unit test", function() {
                 assert.strictEqual(authring.getContacts.callCount, 2);
                 assert.strictEqual(MegaPromise.allDone.callCount, 1);
                 var getCallback = getAttributePromise.then.args[0][1];
-                var getCallbackResult = getCallback(-9);
+                var getCallbackResult = getCallback(ENOENT);
                 assert.strictEqual(ns._logger._log.args[0][1][0],
                                    'Authentication system seems unavailable.');
                 assert.strictEqual(typeof getCallbackResult.then, 'function');

@@ -36,9 +36,9 @@ describe("user unit test", function() {
                 var theCtx = api_req.args[0][1];
                 sandbox.stub(window.console, 'log');
                 sandbox.stub(window, 'd', true);
-                callback(-3, theCtx);
+                callback(EFAILED, theCtx);
                 assert.strictEqual(console.log.args[0][0],
-                                   'Warning, attribute "+puEd255" for user "me" could not be retrieved: -3!');
+                                   'Warning, attribute "+puEd255" for user "me" could not be retrieved: -5!');
             });
 
             it("internal callback error, custom callback", function() {
@@ -48,8 +48,8 @@ describe("user unit test", function() {
                 assert.strictEqual(api_req.callCount, 1);
                 var callback = api_req.args[0][1].callback;
                 var theCtx = api_req.args[0][1];
-                callback(-3, theCtx);
-                assert.strictEqual(myCallback.args[0][0], -3);
+                callback(EFAILED, theCtx);
+                assert.strictEqual(myCallback.args[0][0], EFAILED);
             });
 
             it("internal callback OK, no custom callback", function() {
@@ -152,9 +152,9 @@ describe("user unit test", function() {
                 var callback = api_req.args[0][1].callback;
                 var theCtx = api_req.args[0][1];
                 sandbox.stub(window, 'd', true);
-                callback(-3, theCtx);
+                callback(EFAILED, theCtx);
                 assert.strictEqual(console.log.args[0][0],
-                                   'Error setting user attribute "+puEd255", result: -3!');
+                                   'Error setting user attribute "+puEd255", result: -5!');
             });
 
             it("internal callback error, custom callback", function() {
@@ -165,10 +165,10 @@ describe("user unit test", function() {
                 assert.strictEqual(api_req.callCount, 1);
                 var callback = api_req.args[0][1].callback;
                 var theCtx = api_req.args[0][1];
-                callback(-3, theCtx);
-                assert.strictEqual(myCallback.args[0][0], -3);
+                callback(EFAILED, theCtx);
+                assert.strictEqual(myCallback.args[0][0], EFAILED);
                 assert.strictEqual(console.log.args[0][0],
-                                   'Error setting user attribute "+puEd255", result: -3!');
+                                   'Error setting user attribute "+puEd255", result: -5!');
                 });
 
             it("internal callback OK, no custom callback", function() {

@@ -313,7 +313,7 @@ var chatui;
 
                         assert(filesList.length > 0, 'no files selected.');
 
-                        getPubRSA(contact.h, function() {
+                        crypt.getPubRSA(contact.h, function() {
                             var resp = megaChat.rtc.startMediaCall(participants[0], { files: filesList });
 
                             var $message = megaChat._generateIncomingRtcFileMessage(room, filesList, resp.sid, function() {
@@ -628,7 +628,7 @@ var Chat = function() {
 
                 },
                 preloadCryptoKeyForJid: function (sendMsgFunc, bareJid) {
-                    getPubRSA(megaChat.getContactFromJid(bareJid).h, sendMsgFunc);
+                    crypt.getPubRSA(megaChat.getContactFromJid(bareJid).h, sendMsgFunc);
                 },
                 generateMac: function (msg, key) {
                     var rawkey = key;

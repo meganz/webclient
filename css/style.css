@@ -12019,9 +12019,17 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
 	display: block;
 	float: left;
 	position: relative;
+	-webkit-transition: background-color 200ms ease-in-out;
+	-moz-transition: background-color 200ms ease-in-out;
+	-o-transition: background-color 200ms ease-in-out;
+	-ms-transition: background-color 200ms ease-in-out;
+	transition: background-color 200ms 
 }
 .membership-medium-txt.red-bg {
-	background-color: #D32200;
+	background-color: rgba(213,38,0,0.9);
+}
+.membership-medium-txt.red-bg:hover {
+	background-color: rgba(213,38,0,1);
 }
 .membership-medium-txt.blue-bg {
 	background-color: #1FA4E5;
@@ -13078,7 +13086,7 @@ table {
 .fm-account-remove-avatar, .fm-account-change-avatar, .fm-account-save, .fm-account-cancel {
 	height: 28px;
 	line-height: 27px;
-	background-color: #D52600;
+	background-color: rgba(213,38,0,0.9);
 	color: white;
 	float: left;
 	-webkit-box-sizing: border-box;
@@ -13090,10 +13098,26 @@ table {
 	padding: 0 15px;
 	margin: 14px 0;
 	cursor: pointer;
+	-webkit-transition: background-color 200ms ease-in-out;
+	-moz-transition: background-color 200ms ease-in-out;
+	-o-transition: background-color 200ms ease-in-out;
+	-ms-transition: background-color 200ms ease-in-out;
+	transition: background-color 200ms 
+}
+.fm-account-change-avatar:hover, .fm-account-save:hover, .fm-account-cancel:hover {
+	background-color: rgba(213,38,0,1);
 }
 .fm-account-change-avatar {
 	padding: 0 10px;
 	margin: 37px 0 15px 0;
+}
+.fm-account-remove-avatar {
+	padding: 0 10px;
+	margin: 37px 0 15px 15px;
+	background-color: #4c4c4c;
+}
+.fm-account-remove-avatar:hover {
+	background-color: black;
 }
 .fm-account-save, .fm-account-cancel {
 	float: right;

@@ -437,6 +437,11 @@ function pro_pay()
         cardDialog.showLoadingOverlay();
     }
     
+    // Otherwise if Union Pay payment, show bouncing coin while loading
+    else if (!ul_uploading && !downloading && (pro_paymentmethod === 'union-pay')) {
+        unionPay.showLoadingOverlay();
+    }
+    
     // Data for API request
     var apiId = selectedProPackage[0];
     var price = selectedProPackage[5];
@@ -465,6 +470,9 @@ function pro_pay()
                 }
                 else if (pro_paymentmethod === 'credit-card') {
                     pro_m = 8;
+                }
+                else if (pro_paymentmethod === 'union-pay') {
+                    pro_m = 5;
                 }
 
                 var proref = '';
@@ -499,8 +507,13 @@ function pro_pay()
                             }
                         }
                         else {
+                            // If Dynamic/Union Pay provider then redirect to their site
+                            if ((pro_m === 5) && utcResult && utcResult.EUR) {
+                                unionPay.redirectToSite(utcResult);
+                            }
+                            
                             // If Bitcoin provider then show the Bitcoin invoice dialog
-                            if ((pro_m === 4) && utcResult && utcResult.EUR) {
+                            else if ((pro_m === 4) && utcResult && utcResult.EUR) {
                                 bitcoinDialog.showInvoice(utcResult.EUR);
                             }
                             
@@ -525,6 +538,42 @@ function pro_pay()
         }
     });
 }
+
+/**
+ * Code for Dynamic/Union Pay
+ */
+var unionPay = {
+    
+    /**
+     * Show the bouncing megacoin icon while loading
+     */
+    showLoadingOverlay: function() {
+        
+        console.log('zzzz got here');
+        
+        $('.fm-dialog-overlay').removeClass('hidden').addClass('payment-dialog-overlay');
+        $('.payment-processing').removeClass('hidden');
+    },
+    
+    /**
+     * Redirect to the site
+     * @param {Object} utcResult
+     */
+    redirectToSite: function(utcResult) {
+        
+        // DynamicPay
+        // We need to redirect to their site via a post, so we are building a form :\
+        var form = $("<form id='pay_form' name='pay_form' action='" + utcResult.EUR['url'] + "' method='post'></form>");
+        
+        for (var key in utcResult.EUR['postdata'])
+        {
+            var input = $("<input type='hidden' name='" + key + "' value='" + utcResult.EUR['postdata'][key] + "' />");
+            form.append(input);
+            $("body").append(form);
+            form.submit();
+        }
+    }
+};
 
 /**
  * Credit card payment dialog
@@ -840,7 +889,7 @@ var cardDialog = {
         cardDialog.$dialogOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
         cardDialog.$dialog.removeClass('active').addClass('hidden');
         
-        // Show the success
+        // Show the loading gif
         cardDialog.$dialogOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
         cardDialog.$loadingOverlay.removeClass('hidden');
     },

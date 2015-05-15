@@ -730,6 +730,14 @@ else if (!b_u)
                 return false;
             }
 
+            if (~dump.m.indexOf("\n")) {
+                var lns = dump.m.split(/\r?\n/).map(String.trim).filter(String);
+
+                if (lns.length > 6) {
+                    dump.m = [].concat(lns.slice(0,2), "[..!]", lns.slice(-2)).join(" ");
+                }
+            }
+
             if (~dump.m.indexOf('took +10s'))
             {
                 var lrc = +localStorage.ttfbReportCount || 0;
@@ -748,7 +756,9 @@ else if (!b_u)
                 if (errobj.udata) dump.d = errobj.udata;
                 if (errobj.stack)
                 {
-                    dump.s = ('' + errobj.stack).split("\n").splice(0,9).map(mTrim).join("\n");
+                    dump.s = ('' + errobj.stack).replace(''+msg,'')
+                        .split("\n").map(String.trim).filter(String)
+                        .splice(0,15).map(mTrim).join("\n");
                 }
             }
             if (cn) dump.c = cn;

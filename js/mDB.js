@@ -99,21 +99,28 @@ mStorageDB.prototype = {
             localStorage[this.dbtag + 'hash'] = newHash;
         }
 
-        db = new MegaDB(this.name, u_handle, version, this.schema, this.options);
+        // MegaDB's encryption plugin depends on u_privk
+        if (u_privk) {
 
-        db.bind('onDbStateReady', function _onDbStateReady() {
-            self.fetch(Object.keys(self.schema))
-                .then(function() {
-                    __dbNotifyCompletion();
-                }, function() {
-                    __dbNotifyCompletion(true);
-                });
-        });
+            db = new MegaDB(this.name, u_handle, version, this.schema, this.options);
 
-        db.bind('onDbStateFailed', function _onDbStateFailed() {
-            if (d) console.error('onDbStateFailed', arguments);
-            __dbNotifyCompletion(true);
-        });
+            db.bind('onDbStateReady', function _onDbStateReady() {
+                self.fetch(Object.keys(self.schema))
+                    .then(function() {
+                        __dbNotifyCompletion();
+                    }, function() {
+                        __dbNotifyCompletion(true);
+                    });
+            });
+
+            db.bind('onDbStateFailed', function _onDbStateFailed() {
+                if (d) console.error('onDbStateFailed', arguments);
+                __dbNotifyCompletion(true);
+            });
+        }
+        else {
+            Soon(__dbNotifyCompletion.bind(null, true));
+        }
 
         function __dbNotifyCompletion(aError) {
             if (aError) {
@@ -126,7 +133,9 @@ mStorageDB.prototype = {
                 Soon(self.onReadyState.bind(self, aError));
                 delete self.onReadyState;
             }
-            db.unbind('onDbStateReady').unbind('onDbStateFailed');
+            if (db) {
+                db.unbind('onDbStateReady').unbind('onDbStateFailed');
+            }
             mBroadcaster.sendMessage('mStorageDB:' + self.name, aError);
             promise = newHash = oldHash = version = db = self = undefined;
         }

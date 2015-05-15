@@ -1216,7 +1216,6 @@ hangupAll: function()
     }
 
     if (!this.gLocalStream) {
-        console.error("_freeLocalStream: gLocalStream is already null");
         return;
     }
 /**
@@ -1376,7 +1375,7 @@ peerJid: function(){
     @returns {string}
 */
 jid:function() {
-return this._sess.jid;
+    return this._sess.jid;
 },
 
 /**
@@ -1469,9 +1468,9 @@ receivedMediaTypes: function() {
 
 }
 function getStreamAv(stream) {
-    if (!stream)
+    if (!stream) {
         return {audio:false, video: false};
-
+    }
     var result = {};
     result.audio = (stream.getAudioTracks().length > 0);
     result.video = (stream.getVideoTracks().length > 0);

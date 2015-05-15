@@ -1164,7 +1164,7 @@ function api_reqfailed(c, e) {
             mDBreload();
         }
         else {
-            loadfm();
+            loadfm(true);
         }
     }
 
@@ -3645,7 +3645,7 @@ function u_initAuthentication2(res, ctx) {
     u_privEd25519 = u_keyring.prEd255;
     u_pubEd25519 = u_pubEd25519 || jodid25519.eddsa.publicKey(u_privEd25519);
     u_attr.puEd255 = u_pubEd25519;
-    pubEd25519[u_handle] = u_pubEd25519;
+    u_setPubEd25519(u_pubEd25519);
 
     getUserAttribute(u_handle, "puEd255", true, false, function (res) {
         if (res !== base64urlencode(u_pubEd25519)) {
@@ -3662,8 +3662,18 @@ function u_initAuthentication2(res, ctx) {
         }
     };
     getUserAttribute(u_handle, 'sigPubk', true, false, storeSigPubkCallback);
+}
 
-    mBroadcaster.sendMessage('pubEd25519');
+/**
+ * Store pubEd25519 and notify listeners
+ */
+function u_setPubEd25519(u_pubEd25519) {
+    if (d) console.log('u_setPubEd25519', u_handle, u_pubEd25519);
+
+    pubEd25519[u_handle] = u_pubEd25519;
+    Soon(function __u_setPubEd25519() {
+        mBroadcaster.sendMessage('pubEd25519');
+    });
 }
 
 function _checkFingerprintEd25519(userHandle) {

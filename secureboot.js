@@ -726,6 +726,10 @@ else if (!b_u)
                 f : mTrim('' + url), l : ln
             }, cc, sbid = +(''+(document.querySelector('script[src*="secureboot"]')||{}).src).split('=').pop()|0;
 
+            if (~dump.m.indexOf('[[:i]]')) {
+                return false;
+            }
+
             if (~dump.m.indexOf('took +10s'))
             {
                 var lrc = +localStorage.ttfbReportCount || 0;

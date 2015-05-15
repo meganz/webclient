@@ -81,61 +81,80 @@ var crypt = (function () {
      *     condition warrants to throw an exception.
      */
     ns.getPubEd25519 = function(userhandle, callback) {
-        var rootPromise = undefined;
+        var masterPromise = new MegaPromise(); // this promise will be the one which is going to be returned
+
+        // if a callback is passed to the fn, ALWAYS call it when the master promise is resolved.
+        var _callbackAttachAfterDone = function() {
+            // if a callback is passed to the fn, ALWAYS call it when the master promise is resolved.
+            if(callback) {
+                masterPromise.done(function(r) {
+                    callback(r);
+                });
+            }
+        };
+
         if (typeof u_authring === 'undefined'
                 || typeof u_authring.Ed25519 === 'undefined') {
             logger.debug('First initialising the Ed25519 authring.');
-            rootPromise = authring.getContacts('Ed25519');
+            var ed25519LoadingPromise = authring.getContacts('Ed25519');
+
+            masterPromise.linkFailTo(ed25519LoadingPromise);
+
+            ed25519LoadingPromise.done(function() {
+                masterPromise.linkDoneAndFailTo(
+                    ns.getPubEd25519(userhandle)
+                );
+            });
+            _callbackAttachAfterDone(masterPromise);
+
+            return masterPromise;
         }
-        else {
-            // Move on directly with a resolved promise.
-            rootPromise = new MegaPromise();
-            rootPromise.resolve();
-        }
+
 
         if (pubEd25519[userhandle]) {
             // It's cached: Only check the authenticity of the key.
             // Make the promise for a cached value.
-            var keyPromise = rootPromise.then(
-                function() {
-                    crypt._checkAuthenticationEd25519(userhandle, callback);
-                    return pubEd25519[userhandle];
-                }
-            );
 
-            return keyPromise;
+            crypt._checkAuthenticationEd25519(userhandle, callback);
+            masterPromise.resolve(pubEd25519[userhandle]);
+
+            _callbackAttachAfterDone(masterPromise);
+
+            return masterPromise;
         }
         else {
             // Non-cached value.
-            var attributePromise = rootPromise.then(function() {
-                return getUserAttribute(userhandle, 'puEd255', true, false);
-            });
 
-            function resolveAttributePromiseFunc(result) {
+            var getUserAttribPromise = getUserAttribute(userhandle, 'puEd255', true, false);
+
+            getUserAttribPromise.done(function(result) {
                 result = base64urldecode(result);
+
                 pubEd25519[userhandle] = result;
-                crypt._checkAuthenticationEd25519(userhandle, callback);
+
+                crypt._checkAuthenticationEd25519(userhandle);
+
+
                 logger.debug('Got Ed25519 pub key of user "' + userhandle + '".');
 
-                return pubEd25519[userhandle];
-            }
+                masterPromise.resolve(pubEd25519[userhandle]);
+            });
 
-            function rejectAttributePromiseFunc(error) {
+            // show error and call the 'callback', masterPromise will get rejected by the next .linkFailTo call...
+            getUserAttribPromise.fail(function() {
                 logger.error('Error getting Ed25519 pub key of user "'
-                             + userhandle + '": ' + error);
+                + userhandle + '": ' + error);
                 if (callback) {
                     callback(error);
                 }
+            });
 
-                return error;
-            }
+            masterPromise.linkFailTo(getUserAttribPromise);
 
-            var keyPromise = attributePromise.then(
-                resolveAttributePromiseFunc,
-                rejectAttributePromiseFunc
-            );
 
-            return keyPromise;
+            _callbackAttachAfterDone(masterPromise);
+
+            return masterPromise;
         }
     };
 
@@ -324,8 +343,8 @@ var crypt = (function () {
      *
      * @param userhandle {string}
      *     Mega user handle.
-     * @param callback {function}
-     *     Callback function to call upon completion of operation. The callback
+     * @param [callback] {function}
+     *     (Optional) Callback function to call upon completion of operation. The callback
      *     requires one parameter: the actual public RSA key. The user handle is
      *     passed as a second parameter, and may be obtained that way if the call
      *     back supports it.
@@ -338,37 +357,71 @@ var crypt = (function () {
      *     an exception.
      */
     ns.getPubRSA = function(userhandle, callback) {
-        var rootPromise = undefined;
+        // 1. check the authring, if empty, initialise
+        // 2. if cached - _asynchCheckAuthenticationRSA
+        // 3. if not cached - _getPubRSAattribute + _asynchCheckAuthenticationRSA
+
+        var masterPromise = new MegaPromise(); // this promise will be the one which is going to be returned
+
+        var _callbackAttachAfterDone = function() {
+            // if a callback is passed to the fn, ALWAYS call it when the master promise is resolved.
+            if(callback) {
+                masterPromise.done(function(r) {
+                    console.error('calling cb');
+                    callback(r);
+                });
+            }
+        };
+
         if (typeof u_authring === 'undefined'
                 || typeof u_authring.RSA === 'undefined') {
             logger.debug('First initialising the RSA authring.');
-            rootPromise = authring.getContacts('RSA');
-        }
-        else {
-            // Move on directly with a resolved promise.
-            rootPromise = new MegaPromise();
-            rootPromise.resolve();
+            var authringPromise = authring.getContacts('RSA');
+            masterPromise.linkFailTo(authringPromise); // fail the masterPromise IF the authring.getContacts fail.
+
+            authringPromise
+                .done(function() {
+                    // loading finished, do a recursion and link the newly called .getPubRSA's state to the returned master promise
+                    masterPromise.linkDoneAndFailTo( // masterPromise will get resolved when ns.getPubRSA get resolved too
+                        ns.getPubRSA(userhandle) /* no need to pass the callback, since the master promise will call it */
+                    );
+                });
+
+            _callbackAttachAfterDone(masterPromise); // attach the callback ONLY AFTER the previous handlers are attached
+            return masterPromise; // stop the code execution!
         }
 
         if (u_pubkeys[userhandle]) {
             // It's cached: Only check the authenticity of the key.
-            var checkPromise = rootPromise.then(function() {
-                return crypt._asynchCheckAuthenticationRSA(userhandle);
-            });
+            var checkAuthPromise = crypt._asynchCheckAuthenticationRSA(userhandle);
 
-            return checkPromise;
+            masterPromise // resolve/reject the master promise depending on the state of the checkAuthPromise
+                .linkDoneAndFailTo(checkAuthPromise);
+
+            _callbackAttachAfterDone(masterPromise); // attach the callback ONLY AFTER the previous handlers are attached
+
+            return masterPromise;
+
         }
         else {
             // Non-cached value.
-            var keyPromise = rootPromise.then(function() {
-                return crypt._getPubRSAattribute(userhandle);
-            });
-            var checkPromise = keyPromise.then(function(result) {
+            var keyLoadingPromise = crypt._getPubRSAattribute(userhandle);
+
+            masterPromise.linkFailTo(keyLoadingPromise);
+
+            keyLoadingPromise.done(function(result) {
+                // cache it
                 u_pubkeys[userhandle] = result;
-                return crypt._asynchCheckAuthenticationRSA(userhandle);
+
+                // no need to duplicate code ... just do a recursion here and link the state of both promises
+                var recursionPromise = ns.getPubRSA(userhandle);  /* no need to pass the callback, since the master promise will call it */
+                masterPromise
+                    .linkDoneAndFailTo(recursionPromise);
             });
 
-            return checkPromise;
+            _callbackAttachAfterDone(masterPromise); // attach the callback ONLY AFTER the previous handlers are attached
+
+            return masterPromise;
         }
     };
 

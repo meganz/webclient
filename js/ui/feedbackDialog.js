@@ -48,13 +48,35 @@
                         var rated = $('.rate.active', self.$dialog)[0].className;
                         rated = rated.replace("rate", "").replace("active", "").replace(/\s+/g, "");
                         self._report.rated = rated;
+                        var dump = JSON.stringify(self._report);
 
-                        megaAnalytics.log(
-                            "feedback",
-                            self._type,
-                            self._report
-                        );
+                        var reportId = MurmurHash3(JSON.stringify(dump), 0x4ef5391a);
+                        api_req({
+                            a: 'clog',
+                            t: "feedbackDialog." + self._type,
+                            id: reportId,
+                            d: dump
+                        });
 
+                        if(self._report.chatRoomState) {
+                            Object.keys(self._report.chatRoomState).forEach(function(k) {
+                                var v = self._report.chatRoomState[k];
+                                if(v.callSessions && v.callSessions.length > 0) {
+                                    v.callSessions.forEach(function(callSession) {
+                                        if(callSession.callStats) {
+                                            callSession.callStats.forEach(function (cs) {
+                                                api_req({
+                                                    a: 'clog',
+                                                    t: "callStats",
+                                                    id: cs.cid + "_" + cs.isCaller,
+                                                    d: reportId
+                                                });
+                                            })
+                                        }
+                                    });
+                                }
+                            })
+                        }
                         this.hide();
 
                         msgDialog('info', 'Feedback', 'Thank you for your feedback!');

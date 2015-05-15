@@ -87,6 +87,12 @@ function scrollMenu() {
 }
 
 function init_page() {
+    
+    // If they are transferring from mega.co.nz
+    if (page.substr(0, 13) == 'sitetransfer!') {
+        M.transferFromMegaCoNz();
+    }
+
     if (!u_type) {
         $('body').attr('class', 'not-logged');
     }
@@ -216,7 +222,7 @@ function init_page() {
     }
 
     var fmwasinitialized = !!fminitialized;
-    if (u_handle || pfid || folderlink) {
+    if ((u_type === 0 || u_type === 3) || pfid || folderlink) {
 
         if (is_fm()) {
             // switch between FM & folderlinks (completely reinitialize)
@@ -234,7 +240,6 @@ function init_page() {
 
         if (!fminitialized) {
             if (typeof mDB !== 'undefined' && !pfid) {
-                throw 'fix me'; // TODO
                 mDBstart();
             }
             else {
@@ -1037,18 +1042,22 @@ function mLogout() {
             });
         }
         else {
-            // Use the 'Session Management Logout' API call to kill the current session
-            loadingDialog.show();
-            api_req({
-                'a': 'sml'
-            }, {
-                callback: function (result) {
-                    // After the API call, clear other data and reload page
-                    loadingDialog.hide();
+            var finishLogout = function() {
+                if (--step === 0) {
                     u_logout(true);
                     document.location.reload();
                 }
-            });
+            }, step = 1;
+            loadingDialog.show();
+            if (typeof mDB === 'object' && mDB.drop) {
+                step++;
+                mDB.drop().then(finishLogout,function() {
+                    localStorage['fmdblock_' + u_handle] = 0xDEAD;
+                    finishLogout();
+                });
+            }
+            // Use the 'Session Management Logout' API call to kill the current session
+            api_req({ 'a': 'sml' }, { callback: finishLogout });
         }
     };
     var cnt = 0;
@@ -1683,7 +1692,7 @@ function topmenuUI() {
 
 
     $('.top-head .logo').rebind('click', function () {
-        document.location.hash = typeof u_type !== 'undefined' && +u_type > 2 ? '#fm' : '#index';
+        document.location.hash = typeof u_type !== 'undefined' && +u_type > 2 ? '#fm' : '#start';
     });
 
     var c = $('.fm-dialog.registration-page-success').attr('class');
@@ -1921,8 +1930,5 @@ window.onbeforeunload = function () {
         return l[377];
     }
 
-    if (typeof mDB !== 'undefined' && mDB
-            && mDBact && localStorage[u_handle + '_mDBactive']) {
-        delete localStorage[u_handle + '_mDBactive'];
-    }
+    mBroadcaster.crossTab.leave();
 }

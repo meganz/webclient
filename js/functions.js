@@ -2522,6 +2522,7 @@ function generateAnonymousReport() {
     var report = {};
     report.ua = navigator.userAgent;
     report.ut = u_type;
+    report.pbm = !!window.Incognito;
     report.io = window.dlMethod && dlMethod.name;
     report.sb = +('' + $('script[src*="secureboot"]').attr('src')).split('=').pop();
     report.tp = $.transferprogress;
@@ -2538,6 +2539,8 @@ function generateAnonymousReport() {
     var chatStates = {};
     var userAnonMap = {};
     var userAnonIdx = 0;
+    var roomUniqueId = 0;
+    var roomUniqueIdMap = {};
 
     Object.keys(megaChat.chats).forEach(function(k) {
         var v = megaChat.chats[k];
@@ -2556,7 +2559,7 @@ function generateAnonymousReport() {
         });
 
         var r = {
-            'roomUniqueId': k,
+            'roomUniqueId': roomUniqueId,
             'roomState': v.getStateAsText(),
             'roomParticipants': participants,
             'encState': v.encryptionHandler ? v.encryptionHandler.state : "not defined",
@@ -2569,7 +2572,9 @@ function generateAnonymousReport() {
                     ? v.encryptionOpQueue._queue[0][0] : "not defined"
         };
 
-        chatStates[k] = r;
+        chatStates[roomUniqueId] = r;
+        roomUniqueIdMap[k] = roomUniqueId;
+        roomUniqueId++;
     });
 
     if (report.haveRtc) {
@@ -2581,13 +2586,18 @@ function generateAnonymousReport() {
                 'state': v.state
             };
 
-            if(!chatStates[v.room.roomJid]) {
-                chatStates[v.room.roomJid] = {};
+            var roomIdx = roomUniqueIdMap[v.room.roomJid];
+            if(!roomIdx) {
+                roomUniqueId += 1; // room which was closed, create new tmp id;
+                roomIdx = roomUniqueId;
             }
-            if(!chatStates[v.room.roomJid].callSessions) {
-                chatStates[v.room.roomJid].callSessions = [];
+            if(!chatStates[roomIdx]) {
+                chatStates[roomIdx] = {};
             }
-            chatStates[v.room.roomJid].callSessions.push(r);
+            if(!chatStates[roomIdx].callSessions) {
+                chatStates[roomIdx].callSessions = [];
+            }
+            chatStates[roomIdx].callSessions.push(r);
         });
     };
 

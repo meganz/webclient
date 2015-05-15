@@ -5771,6 +5771,10 @@ mocha.run = function(fn){
   mocha.globals('location');
 
   var query = Mocha.utils.parseQuery(global.location.search || '');
+  if(query.grep) {
+      query.grep = query.grep.replace("/", ""); // fix for the Python's SimpleHTTPServer
+      console.error(query.grep);
+  }
   if (query.grep) mocha.grep(query.grep);
   if (query.invert) mocha.invert();
 

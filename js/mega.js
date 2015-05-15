@@ -2711,8 +2711,8 @@ function MegaData()
     // Update M.opc and related localStorage
     this.addOPC = function(u, ignoreDB) {
         this.opc[u.p] = u;
-        if (typeof mDB === 'object' && !ignoreDB && !pfkey) {
-            mDBadd('opc', clone(u));
+        if (typeof mSDB === 'object' && !ignoreDB && !pfkey) {
+            mSDB.add('opc', clone(u));
         }
     };
 
@@ -2723,16 +2723,16 @@ function MegaData()
      *
      */
     this.delOPC = function(id) {
-        if (typeof mDB === 'object' && !pfkey) {
-            mDBdel('opc', id);
+        if (typeof mSDB === 'object' && !pfkey) {
+            mSDB.del('opc', id);
         }
     };
 
     // Update M.ipc and related localStorage
     this.addIPC = function(u, ignoreDB) {
         this.ipc[u.p] = u;
-        if (typeof mDB === 'object' && !ignoreDB && !pfkey) {
-            mDBadd('ipc', clone(u));
+        if (typeof mSDB === 'object' && !ignoreDB && !pfkey) {
+            mSDB.add('ipc', clone(u));
         }
     };
 
@@ -2743,8 +2743,8 @@ function MegaData()
      *
      */
     this.delIPC = function(id) {
-        if (typeof mDB === 'object' && !pfkey) {
-            mDBdel('ipc', id);
+        if (typeof mSDB === 'object' && !pfkey) {
+            mSDB.del('ipc', id);
         }
     };
 
@@ -2768,8 +2768,8 @@ function MegaData()
         }
         this.ps[ps.h][ps.p] = ps;
 
-        if (typeof mDB === 'object' && !ignoreDB && !pfkey) {
-            mDBadd('ps', clone(ps));
+        if (typeof mSDB === 'object' && !ignoreDB && !pfkey) {
+            mSDB.add('ps', clone(ps));
         }
     };
 
@@ -2797,8 +2797,8 @@ function MegaData()
 
         // Check how removing from indexedDb works and make
         // sure that pending share is/only removed from it
-        if (typeof mDB === 'object' && !pfkey) {
-            mDBdel('ps', pcrId);
+        if (typeof mSDB === 'object' && !pfkey) {
+            mSDB.del('ps', pcrId);
         }
     };
 
@@ -4178,6 +4178,84 @@ function MegaData()
             delete n2.p;
         return n2;
     };
+
+    /**
+     * Handle a redirect from the mega.co.nz/#pro page to mega.nz/#pro page
+     * and keep the user logged in at the same time
+     */
+    this.transferFromMegaCoNz = function()
+    {
+        var parts = /#sitetransfer!(.*)/.exec(window.location);
+        if (parts) {
+            
+            // Decode from Base64
+            parts = JSON.parse(atob(parts[1]));
+            if (parts) {
+                
+                // If the user is already logged in here with the same account 
+                // we can avoid a lot and just take them to the correct page
+                if (JSON.stringify(u_k) === JSON.stringify(parts[0]))
+                {
+                    window.location.hash = parts[2];
+                    return;
+                }
+                
+                // If the user is already logged in but with a different account just load that account instead
+                else if (u_k && (JSON.stringify(u_k) !== JSON.stringify(parts[0]))) {
+                    window.location.hash = 'fm';
+                    return;
+                }
+
+                // Likely that they have never logged in here before, we must set this.
+                localStorage.wasloggedin = true;
+                u_logout();
+
+                u_storage = init_storage(sessionStorage);
+                u_k = parts[0];
+                u_sid = parts[1];
+                var topage = parts[2];
+                u_privk = parts[3];
+                u_storage.k = JSON.stringify(u_k);
+                u_storage.sid = u_sid;
+                u_storage.privk = base64urlencode(crypto_encodeprivkey(u_privk));
+
+                api_setsid(u_sid);
+                var ctx = 
+                {
+                    checkloginresult: function(ctx, result)
+                    {
+                        if (m) {
+                            loadingDialog.hide();
+                        }
+                        else {
+                            document.getElementById('overlay').style.display = 'none';
+                        }
+                        
+                        // Check for suspended account
+                        if (result == EBLOCKED) {
+                            alert(l[730]);
+                        }
+                        else if (result)
+                        {    
+                            // Set account type and redirect to the requested location (via the hash mechanism)
+                            u_type = result;
+                            window.location.hash = topage;
+
+                        }                   
+                        else 
+                        {
+                            // Incorrect email or password
+                            document.getElementById('login_password').value = '';
+                            alert(l[201]);
+                        }
+                    }   
+                };
+
+                // Continue through the log in flow from approximately the correct place given that we have the master key, SID and privk.
+                u_checklogin3(ctx);
+            }
+        }
+    };
 }
 
 function voucherData(arr)
@@ -5344,10 +5422,10 @@ function __process_f2(f, cb, tick)
  * @param {array.<JSON_objects>} pending contacts
  *
  */
-function processIPC(ipc) {
+function processIPC(ipc, ignoreDB) {
     DEBUG('processIPC');
     for (var i in ipc) {
-        M.addIPC(ipc[i]);
+        M.addIPC(ipc[i], ignoreDB);
         if (ipc[i].dts) {
             M.delIPC(ipc[i].p);
             $('#ipc_' + ipc[i].p).remove();
@@ -5367,10 +5445,10 @@ function processIPC(ipc) {
  * @param {array.<JSON_objects>} pending contacts
  *
  */
-function processOPC(opc) {
+function processOPC(opc, ignoreDB) {
     DEBUG('processOPC');
     for (var i in opc) {
-        M.addOPC(opc[i]);
+        M.addOPC(opc[i], ignoreDB);
         if (opc[i].dts) {
             M.delOPC(opc[i].p);
 
@@ -5407,7 +5485,7 @@ function processOPC(opc) {
  *
  * @param {array.<JSON_objects>} pending shares
  */
-function processPS(pendingShares) {
+function processPS(pendingShares, ignoreDB) {
     DEBUG('processPS');
     var ps;
 
@@ -5415,7 +5493,7 @@ function processPS(pendingShares) {
         if (pendingShares.hasOwnProperty(i)) {
             ps = pendingShares[i];
             if (ps.h) {// From gettree
-                M.addPS(ps);
+                M.addPS(ps, ignoreDB);
             }
             else {// Situation different from gettree, s2 from API response, doesn't have .h attr instead have .n
                 var nodeHandle = ps.n;
@@ -5436,7 +5514,7 @@ function processPS(pendingShares) {
                 } else {
 
                     // Add the pending share to state
-                    M.addPS({'h':nodeHandle, 'p':pendingContactId, 'r':shareRights, 'ts':timeStamp});
+                    M.addPS({'h':nodeHandle, 'p':pendingContactId, 'r':shareRights, 'ts':timeStamp}, ignoreDB);
 
                     sharedUInode(nodeHandle);
                 }
@@ -5554,11 +5632,11 @@ function process_u(u) {
     //}
 }
 
-function process_ok(ok)
+function process_ok(ok, ignoreDB)
 {
-    for (i in ok)
+    for (var i in ok)
     {
-        if (typeof mDB === 'object' && !pfkey)
+        if (typeof mDB === 'object' && !pfkey && !ignoreDB)
             mDBadd('ok', ok[i]);
         if (ok[i].ha == crypto_handleauth(ok[i].h))
             u_sharekeys[ok[i].h] = decrypt_key(u_k_aes, base64_to_a32(ok[i].k));

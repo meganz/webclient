@@ -14581,8 +14581,9 @@ h5.main-italic-header {
 	width: 16px;
 }
 .register-st3-main-bl, .register-st5-main-bl {
-	padding: 40px 0 32px 0;
-	margin: 0 -8px;
+    margin: 0 -8px;
+    padding: 40px 0 32px;
+    position: relative;
 }
 .register-st4-main-bl {
 	margin: 0;
@@ -14908,8 +14909,11 @@ h5.main-italic-header {
 .membership-payment-pad {
 	padding: 0;
 }
+/* Positioned absolute because payment options can be dynamic e.g. they may or may not have account 
+   balance and we want the bottom of the date box to line up with the bottom of the plan box on the left */
 .payment-period {
-	margin-top: 56px;
+    position: absolute;
+    top: 203px;
 }
 .membership-payment-icon {
 	width: 110px;
@@ -14921,7 +14925,7 @@ h5.main-italic-header {
 	margin: 0 0 0 -7px;
 }
 .membership-payment-pad .membership-st2-head {
-	padding: 26px 0 11px 0;
+    padding: 12px 0;
 }
 .membership-radio.checked {
 	background-color: #3B99FC;
@@ -14938,12 +14942,8 @@ h5.main-italic-header {
 	margin: 5px 12px 0 0;
 }
 .payment-options-list .payment-method {
-	cursor: pointer;
-	display: inline-block;
-	margin-left: 20px
-}
-.payment-options-list .payment-method:first-of-type {
-	margin-left: 0;
+    cursor: pointer;
+    overflow: auto;
 }
 .membership-radio div {
 	width: 6px;
@@ -14970,14 +14970,17 @@ h5.main-italic-header {
 	color: #333333;
 	font-family: 'Open Sans Semibold', Arial;
 }
-.membership-radio-label.bitcoin {
-	background-position: -444px -614px;
-}
 .membership-radio-label.prepaid-balance {
 	background-position: -444px -569px;
 }
 .membership-radio-label.credit-card {
 	background-position: -444px -524px;
+}
+.membership-radio-label.union-pay {
+	background-position: -444px -524px; /* Todo: replace with correct Union Pay position */
+}
+.membership-radio-label.bitcoin {
+	background-position: -444px -614px;
 }
 .membership-bott-price {
 	font-size: 72px;

@@ -145,22 +145,25 @@ function loadPaymentGatewayOptions() {
         apiGatewayId: null,
         displayName: l[504],            // Prepaid balance
         supportsRecurring: false,
-        cssClass: 'prepaid-balance',
-        providerName: l[504]
+        cssClass: 'prepaid-balance'
     },
     {
         apiGatewayId: 8,                // Credit card provider
         displayName: l[6952],           // Credit card
         supportsRecurring: true,
-        cssClass: 'credit-card',
-        providerName: l[6802]
+        cssClass: 'credit-card'
+    },
+    {
+        apiGatewayId: 5,                // Union Pay
+        displayName: 'Union Pay',       // Union Pay
+        supportsRecurring: true,
+        cssClass: 'union-pay'
     },
     {
         apiGatewayId: 4,                // Bitcoin provider
         displayName: l[6802],           // Bitcoin
         supportsRecurring: false,
-        cssClass: 'bitcoin',
-        providerName: l[6802]
+        cssClass: 'bitcoin'
     }];
     var html = '';
 

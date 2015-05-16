@@ -391,13 +391,16 @@ var mFileManagerDB = {
     },
 
     query: function mFileManagerDB_query(aCommand, aTable, aData) {
-        if (this.schema[aTable]) {
+        if (!this.db) {
+            throw new Error("No database connection.");
+        }
+        else if (this.schema[aTable]) {
+            var u_handle = this.db.suffix, promise;
             var l = (+localStorage['fmdblock_' + u_handle] | 0) + 1;
             localStorage['fmdblock_' + u_handle] = l;
 
             if (d) console.log('fmdb query', aCommand, aTable, aData, l);
 
-            var promise;
             if (aCommand === 'add') {
                 promise = this.db.server.update(aTable, aData);
             } else {

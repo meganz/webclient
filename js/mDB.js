@@ -527,9 +527,15 @@ function mDBstart(aSlave) {
             break;
         case mFileManagerDB.STATE_WAITING:
             mFileManagerDB.init();
+        case mFileManagerDB.STATE_READY:
         case mFileManagerDB.STATE_WORKING:
-            if (!aSlave && is_fm()) {
-                loadingDialog.show();
+            if (!aSlave) {
+                if (loadfm.loaded) {
+                    loadfm();
+                }
+                else if (is_fm()) {
+                    loadingDialog.show();
+                }
             }
             break;
         case mFileManagerDB.STATE_FAILED:

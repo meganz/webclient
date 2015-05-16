@@ -552,6 +552,10 @@ function init_storage ( storage ) {
     return storage;
 }
 
+function getxhr() {
+    return (typeof XDomainRequest !== 'undefined' && typeof ArrayBuffer === 'undefined') ? new XDomainRequest() : new XMLHttpRequest();
+}
+
 var androidsplash = false;
 var m = false;
 var seqno = Math.ceil(Math.random()*1000000000);
@@ -1276,13 +1280,7 @@ else if (!b_u)
         if (d) console.log('jj.total...', waitingToBeLoaded);
     }
 
-    var pages = [];
-    function getxhr()
-    {
-        return (typeof XDomainRequest != 'undefined' && typeof ArrayBuffer == 'undefined') ? new XDomainRequest() : new XMLHttpRequest();
-    }
-
-    var xhr_progress,xhr_stack,jsl_fm_current,jsl_current,jsl_total,jsl_perc,jsli,jslcomplete;
+    var pages = [],xhr_progress,xhr_stack,jsl_fm_current,jsl_current,jsl_total,jsl_perc,jsli,jslcomplete;
 
     function jsl_start()
     {

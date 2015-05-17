@@ -124,8 +124,8 @@ l[1212] = l[1212].replace('[A]','<a href="#sdk" class="red">').replace('[/A]','<
 l[1218] = l[1218].replace('[A]','<a href="#affiliateterms" class="red">').replace('[/A]','</a>');
 l[1863] = l[1863].replace('[A]','<a href="#mobile">').replace('[/A]','</a>');
 l[1863] = l[1863].replace('[B]','<a href="https://itunes.apple.com/app/mega/id706857885" target="_blank">').replace('[/B]','</a>');
-l[1863] = l[1863].replace('[C]','<a href="https://play.google.com/store/apps/details?id=nz.mega.android&referrer=meganzhelp" target="_blank">').replace('[/C]','</a>');
-l[1862] = l[1862].replace('[A]','<a href="https://play.google.com/store/apps/details?id=nz.mega.android&referrer=meganzhelp" target="_blank">').replace('[/A]','</a>');
+l[1863] = l[1863].replace('[C]','<a href="https://play.google.com/store/apps/details?id=nz.mega.android&amp;referrer=meganzhelp" target="_blank">').replace('[/C]','</a>');
+l[1862] = l[1862].replace('[A]','<a href="https://play.google.com/store/apps/details?id=nz.mega.android&amp;referrer=meganzhelp" target="_blank">').replace('[/A]','</a>');
 l[1860] = l[1860].replace('[A]','<a href="https://itunes.apple.com/app/mega/id706857885" target="_blank">').replace('[/A]','</a>');
 l[1828] = l[1828].replace('[A]','<a href="#sync">').replace('[/A]','</a>');
 l[1996] = l[1996].replace('[A]','<a href="mailto:support@mega.co.nz">').replace('[/A]','</a>');

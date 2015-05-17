@@ -2045,10 +2045,10 @@ function MegaData()
                 g = 0;
             }
             if (g) {
-                if (this.d[id]) {
-                    id = this.d[id].p;
+                if (!(this.d[id] && this.d[id].p)) {
+                    break;
                 }
-                else break;
+                id = this.d[id].p;
             }
         }
         return a;
@@ -4156,19 +4156,19 @@ function MegaData()
     {
         var parts = /#sitetransfer!(.*)/.exec(window.location);
         if (parts) {
-            
+
             // Decode from Base64
             parts = JSON.parse(atob(parts[1]));
             if (parts) {
-                
-                // If the user is already logged in here with the same account 
+
+                // If the user is already logged in here with the same account
                 // we can avoid a lot and just take them to the correct page
                 if (JSON.stringify(u_k) === JSON.stringify(parts[0]))
                 {
                     window.location.hash = parts[2];
                     return;
                 }
-                
+
                 // If the user is already logged in but with a different account just load that account instead
                 else if (u_k && (JSON.stringify(u_k) !== JSON.stringify(parts[0]))) {
                     window.location.hash = 'fm';
@@ -4189,7 +4189,7 @@ function MegaData()
                 u_storage.privk = base64urlencode(crypto_encodeprivkey(u_privk));
 
                 api_setsid(u_sid);
-                var ctx = 
+                var ctx =
                 {
                     checkloginresult: function(ctx, result)
                     {
@@ -4199,25 +4199,25 @@ function MegaData()
                         else {
                             document.getElementById('overlay').style.display = 'none';
                         }
-                        
+
                         // Check for suspended account
                         if (result == EBLOCKED) {
                             alert(l[730]);
                         }
                         else if (result)
-                        {    
+                        {
                             // Set account type and redirect to the requested location (via the hash mechanism)
                             u_type = result;
                             window.location.hash = topage;
 
-                        }                   
-                        else 
+                        }
+                        else
                         {
                             // Incorrect email or password
                             document.getElementById('login_password').value = '';
                             alert(l[201]);
                         }
-                    }   
+                    }
                 };
 
                 // Continue through the log in flow from approximately the correct place given that we have the master key, SID and privk.

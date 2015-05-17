@@ -676,8 +676,7 @@ if (m)
         var script = document.createElement('script');
         script.type = "text/javascript";
         document.head.appendChild(script);
-        //script.src = 'https://mega.nz/blog.js'
-        script.src = '/html/js/blog.js'
+        script.src = '/blog.js';
     }
 }
 else if (page == '#android')

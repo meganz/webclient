@@ -1791,8 +1791,13 @@ function parsetopmenu() {
     return top;
 }
 
-$(window).on('hashchange', null, function() {
+window.onhashchange = function() {
     var tpage = document.location.hash;
+
+    if (typeof gifSlider !== 'undefined') {
+        gifSlider.clear();
+    }
+
     if (silent_loading) {
         document.location.hash = hash;
         return false;
@@ -1845,7 +1850,7 @@ $(window).on('hashchange', null, function() {
     else {
         init_page();
     }
-});
+};
 
 function languageDialog(close) {
     if (close) {

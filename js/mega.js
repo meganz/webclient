@@ -1056,7 +1056,7 @@ function MegaData()
             cache = [],
             files = 0;
 
-        if(d) console.log('renderMain', u);
+        if (d) console.log('renderMain', u);
 
         lSel = this.fsViewSel;
         $(lSel).unbind('jsp-scroll-y.dynlist');
@@ -1588,7 +1588,7 @@ function MegaData()
                     $('.fm-chat-popup-button', m).removeClass("disabled");
 
                     var $userDiv = $this.parent().parent();
-                    if($userDiv.is(".offline")) {
+                    if ($userDiv.is(".offline")) {
                         $('.fm-chat-popup-button.start-audio, .fm-chat-popup-button.start-video', m).addClass("disabled");
                     }
 
@@ -1633,7 +1633,7 @@ function MegaData()
 
                     window.location = "#fm/chat/" + user_handle;
                     var room = megaChat.createAndShowPrivateRoomFor(user_handle);
-                    if(room) {
+                    if (room) {
                         room.startAudioCall();
                     }
                 }
@@ -1650,7 +1650,7 @@ function MegaData()
 
                     window.location = "#fm/chat/" + user_handle;
                     var room = megaChat.createAndShowPrivateRoomFor(user_handle);
-                    if(room) {
+                    if (room) {
                         room.startVideoCall();
                     }
                 }
@@ -5508,7 +5508,7 @@ function process_u(u) {
         M.addUser(u[i]);
     }
 
-    //if(megaChat && megaChat.karere && megaChat.karere.getConnectionState() === Karere.CONNECTION_STATE.CONNECTED) {
+    //if (megaChat && megaChat.karere && megaChat.karere.getConnectionState() === Karere.CONNECTION_STATE.CONNECTED) {
     //    megaChat.karere.forceReconnect();
     //}
 }
@@ -5536,7 +5536,7 @@ function folderreqerr(c, e)
 
 function init_chat() {
     function __init_chat() {
-        if(u_type && !megaChat.is_initialized) {
+        if (u_type && !megaChat.is_initialized) {
             if (d) console.log('Initializing the chat...');
             megaChat.init();
             if (fminitialized) {
@@ -5549,7 +5549,7 @@ function init_chat() {
             }
         }
     }
-    if(!MegaChatDisabled) {
+    if (!MegaChatDisabled) {
         if (pubEd25519[u_handle]) {
             __init_chat();
         } else {
@@ -5742,13 +5742,13 @@ function clone(obj)
         for (var attr in obj)
         {
             if (obj.hasOwnProperty(attr)) {
-                if(!(obj[attr] instanceof Object)) {
+                if (!(obj[attr] instanceof Object)) {
                     copy[attr] = obj[attr];
                 } else if (obj[attr] instanceof Array) {
                     copy[attr] = clone(obj[attr]);
-                } else if(!isNativeObject(obj[attr])) {
+                } else if (!isNativeObject(obj[attr])) {
                     copy[attr] = clone(obj[attr]);
-                } else if($.isFunction(obj[attr])) {
+                } else if ($.isFunction(obj[attr])) {
                     copy[attr] = obj[attr];
                 } else {
                     copy[attr] = {};

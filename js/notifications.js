@@ -310,7 +310,7 @@ var notifyPopup = {
             }
 
 
-            if(M.d[notification.user]) {
+            if (M.d[notification.user]) {
                 setLastInteractionWith(notification.user, "0:" + notification.timestamp);
             }
 

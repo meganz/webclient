@@ -699,11 +699,11 @@ var setLastInteractionWith = function(u_h, v) {
 
     var tsNew = parseInt(v.split(":")[1], 10);
 
-    if(!_lastUserInteractionCache[u_h]) {
+    if (!_lastUserInteractionCache[u_h]) {
         getLastInteractionWith(u_h)
             .done(function(r) {
                 var tsOld = parseInt(r.split(":")[1], 10);
-                if(tsOld >= tsNew)  {
+                if (tsOld >= tsNew)  {
                     //console.error("tsOld > tsNew, can't set li to dates in the past.");
                     // ^^ mainly triggered by notifications.
 
@@ -721,7 +721,7 @@ var setLastInteractionWith = function(u_h, v) {
         return $promise;
     } else {
         var tsOld = parseInt(_lastUserInteractionCache[u_h].split(":")[1], 10);
-        if(tsOld > tsNew)  {
+        if (tsOld > tsNew)  {
             //console.error("tsOld > tsNew, can't set li to dates in the past.");
             // ^^ mainly triggered by notifications.
 
@@ -765,13 +765,13 @@ var getLastInteractionWith = function(u_h) {
 
         var ts = parseInt(r[1], 10);
 
-        if(M.u[u_h]) {
+        if (M.u[u_h]) {
             M.u[u_h].ts = ts;
         }
 
-        if(r[0] == "0") {
+        if (r[0] == "0") {
             $elem.addClass('cloud-drive');
-        } else if(r[0] == "1" && megaChat) {
+        } else if (r[0] == "1" && megaChat) {
             M.u[u_h].lastChatActivity = ts;
             var room = megaChat.getPrivateRoom(u_h);
             if (room && megaChat && megaChat.plugins && megaChat.plugins.chatNotifications) {
@@ -809,7 +809,7 @@ var getLastInteractionWith = function(u_h) {
     };
 
 
-    if(_lastUserInteractionCache[u_h]) {
+    if (_lastUserInteractionCache[u_h]) {
         var $promise = Promise.resolve(_lastUserInteractionCache[u_h]);
 
         $promise
@@ -818,7 +818,7 @@ var getLastInteractionWith = function(u_h) {
 
         return $promise;
     }
-    if(_lastUserInteractionGetRequests[u_h] && _lastUserInteractionGetRequests[u_h].state() == 'pending') {
+    if (_lastUserInteractionGetRequests[u_h] && _lastUserInteractionGetRequests[u_h].state() == 'pending') {
         return _lastUserInteractionGetRequests[u_h];
     }
     var isDone = false;
@@ -837,7 +837,7 @@ var getLastInteractionWith = function(u_h) {
         true,
         function(res, ctx) {
             if (typeof res !== 'number') {
-                if(res && typeof(res['']) !== 'undefined') {
+                if (res && typeof(res['']) !== 'undefined') {
                     _lastUserInteractionCache[u_h] = res[''];
                     $promise.resolve(_lastUserInteractionCache[u_h]);
                     isDone = true;
@@ -857,7 +857,7 @@ var getLastInteractionWith = function(u_h) {
         .done(_renderLastInteractionDone)
         .fail(_renderLastInteractionFail)
         .always(function() {
-            if(_lastUserInteractionGetRequests[u_h] === $promise) {
+            if (_lastUserInteractionGetRequests[u_h] === $promise) {
                 delete _lastUserInteractionGetRequests[u_h];
             }
         });

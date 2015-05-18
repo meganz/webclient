@@ -47,7 +47,7 @@
 
 
                         var $selectedRating = $('.rate.active', self.$dialog);
-                        if($selectedRating.length == 0) {
+                        if($selectedRating.length === 0) {
                             return false;
                         }
 

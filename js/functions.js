@@ -2338,7 +2338,7 @@ function _wrapFnWithBeforeAndAfterEvents(fn, eventSuffix, dontReturnPromises) {
                 return false;
             }
             else {
-                return Promise.reject("Propagation stopped by onBefore" + eventSuffix);
+                return MegaPromise.reject("Propagation stopped by onBefore" + eventSuffix);
             }
 
         }
@@ -2358,7 +2358,7 @@ function _wrapFnWithBeforeAndAfterEvents(fn, eventSuffix, dontReturnPromises) {
                     return false;
                 }
                 else {
-                    return Promise.reject("Propagation stopped by onAfter" + eventSuffix);
+                    return MegaPromise.reject("Propagation stopped by onAfter" + eventSuffix);
                 }
             }
         };

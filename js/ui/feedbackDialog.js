@@ -45,6 +45,12 @@
                             self._report.u_handle = u_handle;
                         }
 
+
+                        var $selectedRating = $('.rate.active', self.$dialog);
+                        if($selectedRating.length == 0) {
+                            return false;
+                        }
+
                         var rated = $('.rate.active', self.$dialog)[0].className;
                         rated = rated.replace("rate", "").replace("active", "").replace(/\s+/g, "");
                         self._report.rated = rated;

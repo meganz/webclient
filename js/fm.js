@@ -1023,11 +1023,12 @@ function initUI() {
 
         for (var tab in fmTabState) {
             if (~clickedClass.indexOf(tab)) {
-                2261                // clicked on the currently active tab, should open the root (e.g. go back)
+                tab = fmTabState[tab];
+
+                // clicked on the currently active tab, should open the root (e.g. go back)
                 if(activeClass === 'cloud-drive' && ~clickedClass.indexOf(activeClass)) {
                     M.openFolder(tab.root);
                 } else {
-                    tab = fmTabState[tab];
                     M.openFolder(tab.prev || tab.root);
                 }
                 break;

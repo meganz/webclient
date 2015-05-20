@@ -7,7 +7,7 @@ var pro_package,
     membershipPlans = [],
     selectedProPackage = [],
     saleId = null,
-    pro_do_next = null
+    pro_do_next = null;
 
 function init_pro()
 {
@@ -140,13 +140,7 @@ function populateMembershipPlans() {
 function loadPaymentGatewayOptions() {
 
     // Payment gateways, hardcoded for now, will call API in future to get list
-    var gatewayOptions = [  
-    {
-        apiGatewayId: null,
-        displayName: l[504],            // Prepaid balance
-        supportsRecurring: false,
-        cssClass: 'prepaid-balance'
-    },
+    var gatewayOptions = [
     {
         apiGatewayId: 8,                // Credit card provider
         displayName: l[6952],           // Credit card
@@ -154,17 +148,24 @@ function loadPaymentGatewayOptions() {
         cssClass: 'credit-card'
     },
     {
-        apiGatewayId: 5,                // Union Pay
-        displayName: 'Union Pay',       // Union Pay
-        supportsRecurring: true,
-        cssClass: 'union-pay'
-    },
-    {
         apiGatewayId: 4,                // Bitcoin provider
         displayName: l[6802],           // Bitcoin
         supportsRecurring: false,
         cssClass: 'bitcoin'
-    }];
+    },
+    {
+        apiGatewayId: null,
+        displayName: l[504],            // Prepaid balance
+        supportsRecurring: false,
+        cssClass: 'prepaid-balance'
+    }
+    /*{
+        apiGatewayId: 5,                // Union Pay
+        displayName: 'Union Pay',       // Union Pay
+        supportsRecurring: true,
+        cssClass: 'union-pay'
+    },*/
+    ];
     var html = '';
 
     // Loop through gateway providers (change to use list from API soon)
@@ -187,7 +188,7 @@ function loadPaymentGatewayOptions() {
         // Create a radio button with icon for each payment gateway
         html += '<div class="payment-method">'
              +      '<div class="membership-radio' + classChecked + '">'
-             +          '<input type="radio" name="' + gatewayOption.cssClass + '" id="' + gatewayOption.cssClass + '" ' + optionChecked + ' value="' + gatewayOption.cssClass + '" />'
+             +          '<input type="radio" name="' + gatewayOption.cssClass + '" id="' + gatewayOption.cssClass + '" ' + optionChecked + ' value="' + gatewayOption.cssClass + '" data-recurring="' + gatewayOption.supportsRecurring + '" />'
              +          '<div></div>'
              +      '</div>'
              +      '<div class="membership-radio-label ' + gatewayOption.cssClass + '">'
@@ -216,11 +217,12 @@ function initPaymentMethodRadioOptions(html) {
 
         var $this = $(this);
         var $bitcoinInstructions = $('.membership-center p');
+        var recurring = ($this.find('input').attr('data-recurring') === 'true') ? true : false;
 
         // Add checked state for this radio button
-        $this.find('input').prop('checked', true);
+        $this.find('input').prop('checked', true);        
         $this.find('.membership-radio').addClass('checked');
-
+        
         // Hide instructions below the purchase button if other option is selected
         if ($this.find('.membership-radio-label').hasClass('bitcoin')) {
             $bitcoinInstructions.removeClass('hidden');
@@ -228,6 +230,8 @@ function initPaymentMethodRadioOptions(html) {
         else {
             $bitcoinInstructions.addClass('hidden');
         }
+        
+        updateTextDependingOnRecurring();
     });
 }
 
@@ -252,6 +256,7 @@ function pro_next_step() {
         day = currentDate.getDate(),
         price = [];
 
+    loadPaymentGatewayOptions();
     renderPlanDurationDropDown();
 
     $('.membership-step1').addClass('hidden');
@@ -286,21 +291,18 @@ function pro_next_step() {
         $('.membership-st2-select span').html($(this).html());
 
         if (price) {
-            $('.membership-center.inactive').removeClass('inactive');
             $('.membership-bott-price strong').html(price.split('.')[0] + '<span>.' + price.split('.')[1] + ' &euro;</span>');
         }
+        
+        updateTextDependingOnRecurring();
     });
-
+    
     $('.membership-bott-button').unbind('click');
     $('.membership-bott-button').bind('click',function(e)
     {
-        if ($('.membership-center').attr('class').indexOf('inactive') == -1) {
-            pro_continue(e);
-            return false;
-        }
+        pro_continue(e);
+        return false;
     });
-
-    loadPaymentGatewayOptions();
 }
 
 /**
@@ -356,7 +358,57 @@ function renderPlanDurationDropDown() {
 
     // Update drop down HTML
     $('.membership-st2-dropdown').html(html);
+    
+    // Select first option
+    var $durationSelect = $('.membership-st2-select');
+    var $firstOption = $durationSelect.find('.membership-dropdown-item:first-child');
+    $durationSelect.find('span').html($firstOption.html());
+    $firstOption.addClass('selected');
+    
+    // Get current plan price
+    var price = $durationSelect.find('span > strong').html().split('.');
+    var dollars = price[0];
+    var cents = price[1];
+    
+    // Update main price at the bottom
+    var $mainPrice = $('.membership-bott-price');
+    $mainPrice.find('strong').html(dollars + '<span>.' + cents + ' &euro;</span>');
+    
+    updateTextDependingOnRecurring();
 }
+
+function updateTextDependingOnRecurring() {
+    
+    // Update whether this selected option is recurring or one-time
+    var $durationSelect = $('.membership-st2-select');
+    var $durationOption = $durationSelect.find('.membership-dropdown-item.selected');
+    var recurring = ($('.payment-options-list input:checked').attr('data-recurring') === 'true') ? true : false;
+    var planIndex = $durationOption.attr('data-plan-index');
+    var currentPlan = membershipPlans[planIndex];
+    var numOfMonths = currentPlan[4];
+    var subscribeOrPurchase = (recurring) ? 'subscribe' : 'purchase';
+    var durationOrRenewal = (recurring) ? 'Choose renewal period' : l[6817];
+    var $mainPrice = $('.membership-bott-price');
+    
+    console.log('planIndex', planIndex);
+    console.log('numOfMonths', numOfMonths);
+    console.log('currentPlan', currentPlan);
+    
+    // Set to /month, /year or /one time next to the price
+    if (recurring && (numOfMonths === 1)) {
+        $mainPrice.find('.period').text('/month');
+    }
+    else if (recurring && (numOfMonths > 1)) {
+        $mainPrice.find('.period').text('/year');
+    }
+    else {
+        $mainPrice.find('.period').text('/' + l[6809]);
+    }
+    
+    // Update depending on recurring or one off payment
+    $('.membership-st2-head.choose-duration').html(durationOrRenewal);
+    $('.membership-bott-button').html(subscribeOrPurchase);
+}   
 
 function pro_continue(e)
 {
@@ -794,7 +846,8 @@ var cardDialog = {
             city: this.$dialog.find('.city').val(),
             province: this.$dialog.find('.state-province').val(),
             postal_code: this.$dialog.find('.post-code').val(),
-            country_code: this.$dialog.find('.countries').val()
+            country_code: this.$dialog.find('.countries').val(),
+            email_address: u_attr.email
         };
         
         // Trim whitespace from beginning and end of all form fields

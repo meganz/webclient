@@ -14943,6 +14943,7 @@ h5.main-italic-header {
 }
 .payment-options-list .payment-method {
     cursor: pointer;
+    margin-bottom: 3px;
     overflow: auto;
 }
 .membership-radio div {
@@ -15014,6 +15015,7 @@ div.membership-bott-button {
 	line-height: 55px;
 	margin: 17px 0 32px 0;
 	min-width: 240px;
+    text-transform: uppercase;
 }
 .inactive .membership-bott-button:hover, .inactive .membership-bott-button {
 	cursor: default;

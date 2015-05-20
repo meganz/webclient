@@ -1511,6 +1511,8 @@ function topmenuUI() {
             }
         }
     });
+    
+    $('.top-menu-popup .top-menu-item').unbind('click');
     $('.top-menu-popup .top-menu-item').rebind('click', function () {
         
         $('.top-menu-popup').removeClass('active');
@@ -1523,11 +1525,9 @@ function topmenuUI() {
         if (className.indexOf('privacycompany') > -1) {
             document.location.hash = 'privacycompany';
         }
-        else if (className.indexOf('pro-item') > -1) {
-            document.location.hash = 'pro';
-        }
         else if (className.indexOf('upgrade-your-account') > -1) {
             document.location.hash = 'pro';
+            return false;
         }
         else if (className.indexOf('register') > -1) {
             document.location.hash = 'register';
@@ -1552,6 +1552,7 @@ function topmenuUI() {
         }
         else if (className.indexOf('resellers') > -1) {
             document.location.hash = 'resellers';
+            return false;
         }
         else if (className.indexOf('firefox') > -1) {
             document.location.hash = 'firefox';

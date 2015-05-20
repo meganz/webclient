@@ -2998,10 +2998,13 @@ function accountUI()
                 paymentMethod = l[6953];
             }
             else if (paymentMethodIndex == 4) {
-                paymentMethod = l[6802];
+                paymentMethod = l[6802];            // Bitcoin
+            }
+            else if (paymentMethodIndex == 5) {
+                paymentMethod = l[6952];            // Union Pay
             }
             else if (paymentMethodIndex == 8) {
-                paymentMethod = l[6952];
+                paymentMethod = l[6952];            // Credit card
             }
 
             // Set Date/Time, Item (plan purchased), Amount, Payment Method

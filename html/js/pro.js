@@ -376,18 +376,23 @@ function renderPlanDurationDropDown() {
     updateTextDependingOnRecurring();
 }
 
+/**
+ * Updates the text on the page depending on the payment option they've selected and 
+ * the duration/period so it is accurate for a recurring subscription or one off payment.
+ */
 function updateTextDependingOnRecurring() {
     
     // Update whether this selected option is recurring or one-time
     var $durationSelect = $('.membership-st2-select');
     var $durationOption = $durationSelect.find('.membership-dropdown-item.selected');
+    var $mainPrice = $('.membership-bott-price');
     var recurring = ($('.payment-options-list input:checked').attr('data-recurring') === 'true') ? true : false;
     var planIndex = $durationOption.attr('data-plan-index');
     var currentPlan = membershipPlans[planIndex];
     var numOfMonths = currentPlan[4];
     var subscribeOrPurchase = (recurring) ? 'subscribe' : 'purchase';
     var durationOrRenewal = (recurring) ? 'Choose renewal period' : l[6817];
-    var $mainPrice = $('.membership-bott-price');
+    var getTwoMonthsFree = (recurring) ? 'Get 2 months free if you subscribe to a one-year pro plan.' : l[1148];
     
     // Set to /month, /year or /one time next to the price
     if (recurring && (numOfMonths === 1)) {
@@ -403,13 +408,8 @@ function updateTextDependingOnRecurring() {
     // Update depending on recurring or one off payment
     $('.membership-st2-head.choose-duration').html(durationOrRenewal);
     $('.membership-bott-button').html(subscribeOrPurchase);
-    
-    if (recurring) {
-        $('.membership-bott-descr').html('Get 2 months free if you subscribe to a one-year pro plan.');
-    }
-    else {
-        $('.membership-bott-descr').html(l[1148].replace('[A]', '').replace('[/A]', ''));
-    }
+    $('.membership-bott-descr').html(getTwoMonthsFree);
+    $('.payment-dialog .payment-buy-now').html(subscribeOrPurchase);
 }
 
 function pro_continue(e)
@@ -956,8 +956,9 @@ var cardDialog = {
         
         // Close the card dialog and loading overlay
         cardDialog.$dialogOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
-        cardDialog.$dialog.removeClass('active').addClass('hidden');
+        cardDialog.$failureOverlay.addClass('hidden');
         cardDialog.$loadingOverlay.addClass('hidden');
+        cardDialog.$dialog.removeClass('active').addClass('hidden');
         
         // Get the selected Pro plan details
         var proNum = selectedProPackage[1];
@@ -1113,7 +1114,7 @@ var bitcoinDialog = {
         // Set details
         var bitcoinAddress = apiResponse.address;
         var bitcoinUrl = 'bitcoin:' + apiResponse.address + '?amount=' + apiResponse.amount;
-        var invoiceDateTime = new Date(apiResponse.created);
+        var invoiceDateTime = new Date(apiResponse.created * 1000);
         var proPlanNum = selectedProPackage[1];
         var planName = getProPlan(proPlanNum);
         var planMonths = l[6806].replace('%1', selectedProPackage[4]);  // x month purchase

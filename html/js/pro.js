@@ -261,6 +261,12 @@ function pro_next_step() {
     $('.membership-step1').addClass('hidden');
     $('.membership-step2').removeClass('hidden');
     mainScroll();
+    
+    // Update header text with plan
+    var proPlan = getProPlan(pro_m);
+    var $selectedPlanHeader = $('.membership-step2 .main-italic-header.pro');
+    var selectedPlanText = $selectedPlanHeader.html().replace('%1', proPlan);
+    $selectedPlanHeader.html(selectedPlanText);
 
     $('.membership-date .month').text(mon);
     $('.membership-date .day').text(day);
@@ -390,16 +396,16 @@ function updateTextDependingOnRecurring() {
     var planIndex = $durationOption.attr('data-plan-index');
     var currentPlan = membershipPlans[planIndex];
     var numOfMonths = currentPlan[4];
-    var subscribeOrPurchase = (recurring) ? 'subscribe' : 'purchase';
-    var durationOrRenewal = (recurring) ? 'Choose renewal period' : l[6817];
-    var getTwoMonthsFree = (recurring) ? 'Get 2 months free if you subscribe to a one-year pro plan.' : l[1148];
+    var subscribeOrPurchase = (recurring) ? l[6172] : l[6190].toLowerCase();
+    var durationOrRenewal = (recurring) ? l[6977] : l[6817];
+    var getTwoMonthsFree = (recurring) ? l[6978] : l[1148];
     
     // Set to /month, /year or /one time next to the price
     if (recurring && (numOfMonths === 1)) {
-        $mainPrice.find('.period').text('/month');
+        $mainPrice.find('.period').text('/' + l[913]);
     }
     else if (recurring && (numOfMonths > 1)) {
-        $mainPrice.find('.period').text('/year');
+        $mainPrice.find('.period').text('/' + l[932]);
     }
     else {
         $mainPrice.find('.period').text('/' + l[6809]);

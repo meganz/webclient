@@ -2720,15 +2720,81 @@ function accountUI()
             $('.membership-big-txt.accounttype').text(planText);
             $('.fm-account-blocks .membership-icon.type').addClass('pro' + planNum);
 
+            // Subscription
             if (account.stype == 'S')
             {
-                // subscription
-                $('.fm-account-header.typetitle').text(l[434]);
-                if (account.scycle == '1 M') $('.membership-big-txt.type').text(l[748]);
-                else if (account.scycle == '1 Y') $('.membership-big-txt.type').text(l[749]);
-                else $('.membership-big-txt.type').text('');
-                $('.membership-medium-txt.expiry').html(htmlentities('(' + account.sgw.join(",") + ')'));
-            }
+				$('.fm-account-header.typetitle').text(l[434]);
+				if (account.scycle == '1 M') {
+                    $('.membership-big-txt.type').text(l[748]);
+                }
+				else if (account.scycle == '1 Y') {
+                    $('.membership-big-txt.type').text(l[749]);
+                }
+				else {
+                    $('.membership-big-txt.type').text('');
+                }
+                
+                // Get the date their subscription will renew
+                var timestamp = account.srenew[0];
+                var paymentType = htmlentities('(' + account.sgw.join(',') + ')');      // Credit card etc
+                
+                // Display the date their subscription will renew in format '14 March 2015 (credit card)'
+                if (timestamp > 0) {
+                    var date = new Date(timestamp * 1000);
+                    var dateString = l[6971] + ' ' + date.getDate() + ' ' + date_months[date.getMonth()] + ' ' + date.getFullYear();
+                    $('.membership-medium-txt.expiry').html(dateString + ' ' + paymentType);
+                }
+                else {
+                    // Otherwise just show payment type
+                    $('.membership-medium-txt.expiry').html(paymentType);
+                }
+                
+				// Check if there are any active subscriptions
+                // ccqns = Credit Card Query Number of Subscriptions
+				api_req({ a: 'ccqns' },
+				{
+					callback : function(numOfSubscriptions, ctx)
+					{
+						// If > 0 then show cancel button and bind cancellation API call to the button
+						if (numOfSubscriptions > 0)
+						{
+                            var $cancelButton = $('.btn-cancel');
+							$cancelButton.show();
+							$cancelButton.rebind('click', function()
+							{
+                                // Make sure they really want to do it
+								msgDialog('confirmation', l[6822], l[6823], false, function(event)
+								{
+									if (event) 
+									{
+										$cancelButton.hide();
+										loadingDialog.show();
+                                        
+                                        // Cancel the subscriptions
+                                        // cccs = Credit Card Cancel Subscriptions
+										api_req({ a: 'cccs' },
+										{
+											callback: function()
+											{
+												// Reset account cache and refetch all account data to display UI 
+                                                // (note potential race condition if cancellation callback wasn't received in 7500ms)
+												M.account.lastupdate = 0;
+                                                
+												setTimeout(function()
+												{
+													loadingDialog.hide();												
+													accountUI();
+                                                    
+												}, 7500);
+											}											
+										});
+									}
+								});							
+							});
+						}
+					}
+				});
+			}
             else if (account.stype == 'O')
             {
                 // one-time
@@ -2923,16 +2989,19 @@ function accountUI()
         {
             // Set payment method
             var paymentMethodIndex = purchaseTransaction[4];
-            var paymentMethod = 'Voucher';
+            var paymentMethod = l[428];
 
             if (paymentMethodIndex == 1) {
                 paymentMethod = 'PayPal';
             }
             else if (paymentMethodIndex == 2) {
-                paymentMethod = 'iTunes';
+                paymentMethod = l[6953];
             }
             else if (paymentMethodIndex == 4) {
-                paymentMethod = 'Bitcoin';
+                paymentMethod = l[6802];
+            }
+            else if (paymentMethodIndex == 8) {
+                paymentMethod = l[6952];
             }
 
             // Set Date/Time, Item (plan purchased), Amount, Payment Method

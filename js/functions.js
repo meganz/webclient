@@ -277,6 +277,7 @@ function populate_l() {
         '<a href="http://en.wikipedia.org/wiki/Public-key_cryptography" target="_blank" rel="noreferrer">').replace('[/A]',
         '</a>');
     l[1148] = l[1148].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
+    l[6978] = l[6978].replace('[A]', '<span class="red">').replace('[/A]', '</span>');    
     l[1151] = l[1151].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
     l[731] = l[731].replace('[A]', '<a href="#terms">').replace('[/A]', '</a>');
     if (lang === 'en') {

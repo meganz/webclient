@@ -42,6 +42,9 @@
         else if (window.location.search.indexOf('apipath=prod') > -1) {
             localStorage.apipath = 'https://eu.api.mega.co.nz/';
         }
+        else if (window.location.search.indexOf('apipath=sandbox2') > -1) {
+            localStorage.apipath = 'https://api-sandbox2.developers.mega.co.nz/';
+        }
         else {
             localStorage.apipath = 'https://api-sandbox3.developers.mega.co.nz/';
         }        

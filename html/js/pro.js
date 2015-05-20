@@ -79,7 +79,15 @@ function init_pro()
 
             account_type_num = $(this).attr('data-payment');
             $(this).clone().appendTo( '.membership-selected-block');
-            $('.membership-step2 .pro span').html($(this).find('.reg-st3-bott-title.title').html()) ;
+            
+            var proPlanName = $(this).find('.reg-st3-bott-title.title').html();
+            $('.membership-step2 .pro span').html(proPlanName);
+            
+            // Update header text with plan
+            var $selectedPlanHeader = $('.membership-step2 .main-italic-header.pro');
+            var selectedPlanText = $selectedPlanHeader.html().replace('%1', proPlanName);
+            $selectedPlanHeader.html(selectedPlanText);
+
             pro_next_step();
         });
 
@@ -100,7 +108,14 @@ function init_pro()
 
             account_type_num = $membershipBlock.attr('data-payment');
             $membershipBlock.clone().appendTo( '.membership-selected-block');
-            $('.membership-step2 .pro span').html($membershipBlock.find('.reg-st3-bott-title.title').html())    ;
+            var proPlanName = $membershipBlock.find('.reg-st3-bott-title.title').html();
+            $('.membership-step2 .pro span').html(proPlanName);
+            
+            // Update header text with plan
+            var $selectedPlanHeader = $('.membership-step2 .main-italic-header.pro');
+            var selectedPlanText = $selectedPlanHeader.html().replace('%1', proPlanName);
+            $selectedPlanHeader.html(selectedPlanText);
+            
             pro_next_step();
         });
 
@@ -216,8 +231,7 @@ function initPaymentMethodRadioOptions(html) {
 
         var $this = $(this);
         var $bitcoinInstructions = $('.membership-center p');
-        var recurring = ($this.find('input').attr('data-recurring') === 'true') ? true : false;
-
+        
         // Add checked state for this radio button
         $this.find('input').prop('checked', true);        
         $this.find('.membership-radio').addClass('checked');
@@ -262,12 +276,6 @@ function pro_next_step() {
     $('.membership-step2').removeClass('hidden');
     mainScroll();
     
-    // Update header text with plan
-    var proPlan = getProPlan(pro_m);
-    var $selectedPlanHeader = $('.membership-step2 .main-italic-header.pro');
-    var selectedPlanText = $selectedPlanHeader.html().replace('%1', proPlan);
-    $selectedPlanHeader.html(selectedPlanText);
-
     $('.membership-date .month').text(mon);
     $('.membership-date .day').text(day);
 

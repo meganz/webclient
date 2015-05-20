@@ -57,7 +57,6 @@ function init_pro()
                 // Render the plan details
                 populateMembershipPlans();
 
-                // 
                 if (pro_do_next) pro_do_next();
             }
         });
@@ -390,10 +389,6 @@ function updateTextDependingOnRecurring() {
     var durationOrRenewal = (recurring) ? 'Choose renewal period' : l[6817];
     var $mainPrice = $('.membership-bott-price');
     
-    console.log('planIndex', planIndex);
-    console.log('numOfMonths', numOfMonths);
-    console.log('currentPlan', currentPlan);
-    
     // Set to /month, /year or /one time next to the price
     if (recurring && (numOfMonths === 1)) {
         $mainPrice.find('.period').text('/month');
@@ -408,7 +403,14 @@ function updateTextDependingOnRecurring() {
     // Update depending on recurring or one off payment
     $('.membership-st2-head.choose-duration').html(durationOrRenewal);
     $('.membership-bott-button').html(subscribeOrPurchase);
-}   
+    
+    if (recurring) {
+        $('.membership-bott-descr').html('Get 2 months free if you subscribe to a one-year pro plan.');
+    }
+    else {
+        $('.membership-bott-descr').html(l[1148].replace('[A]', '').replace('[/A]', ''));
+    }
+}
 
 function pro_continue(e)
 {

@@ -762,8 +762,8 @@ function initUI() {
                     $.draggingClass = ('dndc-to-shared');
                 else if (~c.indexOf('contacts'))
                     $.draggingClass = ('dndc-to-contacts');
-                else if (~c.indexOf('conversations'))
-                    $.draggingClass = ('dndc-to-conversations');
+                /*else if (~c.indexOf('conversations'))
+                    $.draggingClass = ('dndc-to-conversations');*/
                 else if (~c.indexOf('cloud-drive'))
                     $.draggingClass = ('dndc-to-conversations'); // TODO: cursor, please?
                 else
@@ -800,7 +800,7 @@ function initUI() {
             {
                 // do nothing
             }
-            else if ($(e.target).hasClass('nw-conversations-item'))
+            /*else if ($(e.target).hasClass('nw-conversations-item'))
             {
                 nRevert();
 
@@ -811,7 +811,7 @@ function initUI() {
 
                 if (d)
                     console.error('TODO: dragging to the chat', currentRoom);
-            }
+            }*/
             else if (dd == 'move')
             {
                 nRevert(t !== M.RubbishID);

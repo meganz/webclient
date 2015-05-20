@@ -158,7 +158,7 @@ mStorageDB.prototype = {
         if (t) {
             this.db.query(t)
                 .execute()
-                .done(function _fetchDone(results) {
+                .then(function _fetchDone(results) {
                     if (d) console.log('msdb fetch done', t, results);
 
                     if (results.length) {
@@ -175,7 +175,7 @@ mStorageDB.prototype = {
                         }
                     }
                     self.fetch(aTables, aPromise);
-                }).fail(function _fetchFail() {
+                }, function _fetchFail() {
                     if (d) console.log('msdb fetch failed', t);
                     aPromise.reject.apply(aPromise, arguments);
                 });
@@ -310,7 +310,7 @@ var mFileManagerDB = {
         if (t) {
             this.db.query(t)
                 .execute()
-                .done(function _fetchDone(results) {
+                .then(function _fetchDone(results) {
                     if (d) console.log('fmdb fetch done', t, results);
 
                     if (!results.length) {
@@ -352,7 +352,7 @@ var mFileManagerDB = {
                         }
                         mFileManagerDB.fetch(aTables);
                     }
-                }).fail(function _fetchFail() {
+                }, function _fetchFail() {
                     if (d) console.log('fmdb fetch failed', t);
 
                     if (mFileManagerDB.slave) {
@@ -417,10 +417,10 @@ var mFileManagerDB = {
     reload: function mFileManagerDB_reload() {
         if (this.db) {
             this.db.drop()
-                .done(function _dropDone() {
+                .then(function _dropDone() {
                     if (d) console.log('fmdb dropped');
                     mFileManagerDB._restart();
-                }).fail(function _dropFail() {
+                }, function _dropFail() {
                     if (d) console.log('fmdb drop failed');
                     mFileManagerDB._loadfm();
                 });

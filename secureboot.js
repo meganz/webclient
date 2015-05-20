@@ -676,8 +676,7 @@ if (m)
         var script = document.createElement('script');
         script.type = "text/javascript";
         document.head.appendChild(script);
-        //script.src = 'https://mega.nz/blog.js'
-        script.src = '/html/js/blog.js'
+        script.src = '/blog.js';
     }
 }
 else if (page == '#android')
@@ -1039,6 +1038,8 @@ else if (!b_u)
     jsl.push({f:'js/Int64.js', n: 'int64_js', j:1});
     jsl.push({f:'js/zip64.js', n: 'zip_js', j:1});
     jsl.push({f:'js/cms.js', n: 'cms_js', j:1});
+
+    jsl.push({f:'js/windowOpenerProtection.js', n: 'windowOpenerProtection', j:1,w:1});
 
     // only used on beta
     if (onBetaW) {

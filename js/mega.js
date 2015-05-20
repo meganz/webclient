@@ -4767,6 +4767,15 @@ function execsc(actionPackets, callback) {
             // Contact is deleted on remote computer, remove contact from contacts left panel
             if (actionPacket.u[0].c === 0) {
                 $('#contact_' + actionPacket.ou).remove();
+
+                // hide the context menu if it is currently visible and this contact was removed.
+                if($.selected && $.selected[0] === actionPacket.ou) {
+                    // was selected
+                    $.selected = [];
+                    if($('.context-menu.files-menu').is(":visible")) {
+                        $.hideContextMenu();
+                    }
+                }
                 M.handleEmptyContactGrid();
             }
 

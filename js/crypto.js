@@ -1148,7 +1148,7 @@ function api_retry() {
     for (var i = 4; i--;) {
         if (apixs[i].timer && apixs[i].backoff > 5000) {
             clearTimeout(apixs[i].timer);
-            apixs[i].backoff = 4000;
+            apixs[i].backoff = 2000;
             api_send(apixs[i]);
         }
     }

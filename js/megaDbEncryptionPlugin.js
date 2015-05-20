@@ -142,7 +142,7 @@ var MegaDBEncryption = function(mdbInstance) {
         } catch(exc) {
             if(exc.message == "data integrity check failed") {
                 logger.error("data integrity check failed for (will be removed): ", table, obj.id, obj);
-                mdbInstance.server.remove(table, obj.id);
+                mdbInstance.server.remove(table, obj[mdbInstance._getTablePk(table)]);
                 e.stopPropagation();
             } else {
                 logger.error("onDbRead failed: ", exc, exc.stack ? exc.stack : undefined);

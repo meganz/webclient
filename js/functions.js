@@ -1803,7 +1803,7 @@ mSpawnWorker.prototype = {
                 return;
             }
             Soon(function() {
-                throw err;
+                throw err.message || err;
             });
             self.unreliably = true;
             var nw = self.nworkers;

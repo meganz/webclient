@@ -1051,10 +1051,7 @@ function mLogout() {
             loadingDialog.show();
             if (typeof mDB === 'object' && mDB.drop) {
                 step++;
-                mDB.drop().then(finishLogout,function() {
-                    localStorage['fmdblock_' + u_handle] = 0xDEAD;
-                    finishLogout();
-                });
+                mFileManagerDB.exec('drop').always(finishLogout);
             }
             // Use the 'Session Management Logout' API call to kill the current session
             api_req({ 'a': 'sml' }, { callback: finishLogout });

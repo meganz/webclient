@@ -773,16 +773,7 @@ Chat.prototype.init = function() {
     self.plugins = {};
 
 
-    // since this plugin act as filter, it should be added first. (only if in the real app!)
-    if (typeof(mocha) === "undefined" && !disableMpEnc) {
-        self.plugins['encryptionFilter'] = new EncryptionFilter(self);
-    }
-    //if (typeof(mocha) === "undefined") {
-    //    self.plugins['chatStore'] = new ChatStore(self);
-    //}
-    if (typeof(mocha) === "undefined") {
-        self.plugins['chatNotifications'] = new ChatNotifications(self, self.options.chatNotificationOptions);
-    }
+    self.plugins['chatNotifications'] = new ChatNotifications(self, self.options.chatNotificationOptions);
 
     $.each(self.options.plugins, function(k, v) {
         self.plugins[k] = new v(self);

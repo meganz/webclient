@@ -436,9 +436,8 @@ var gifSlider = {
         ]
     },
 
-    // Initialise the slide show
+    // Initialise the slide show and preload the images into memory so they will display straight away
     init: function() {
-        // Preload the images into memory so they will display straight away
         gifSlider.preLoadImages('right');
     },
 
@@ -478,14 +477,10 @@ var gifSlider = {
                 }, 400);
 
                 gifSlider.state = gifSlider.STATE_DONE;
-
-                if (side === 'right') {
-                    // gifSlider.preLoadImages('left');
-                }
             }
         }
+        
         var imageLoadStep = 0, imageSrc, image;
-
         this.state = this.STATE_INIT;
 
         // Get the current URL without the location hash (#xycabc), also add on the path to the images dir
@@ -496,6 +491,7 @@ var gifSlider = {
 
         // Loop through the available images
         for (var i = 0, length = gifSlider.images[side].length; i < length; i++) {
+            
             // Store source path to swap out later
             imageSrc = baseImagePath + gifSlider.images[side][i].name + retina + '.gif';
             gifSlider.images[side][i].imageSrc = imageSrc;
@@ -578,7 +574,6 @@ var gifSlider = {
         else if (bottomImage !== null) {
 
             var randomIndex = rand(bottomImage.length);
-
             $('.products-bottom-block .' + bottomImage[randomIndex]).fadeIn(gifSlider.fadeInSpeed);
         }
     },
@@ -598,7 +593,6 @@ var gifSlider = {
         }
 
         $('img.animation-image, a.currentLink img.currentImage').attr('src', this.empty1x1png);
-
         this.state = this.STATE_GONE;
     },
 
@@ -607,5 +601,5 @@ var gifSlider = {
     STATE_INIT: 1,
     STATE_SHOW: 2,
     STATE_DONE: 4,
-    STATE_GONE: 8,
+    STATE_GONE: 8
 };

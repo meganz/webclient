@@ -1025,16 +1025,18 @@ function initUI() {
             if (~clickedClass.indexOf(tab)) {
                 tab = fmTabState[tab];
 
-
                 var targetFolder = null;
-                if(~clickedClass.indexOf(activeClass)) { // clicked on the currently active tab, should open the root (e.g. go back)
+
+                // Clicked on the currently active tab, should open the root (e.g. go back)
+                if (~clickedClass.indexOf(activeClass)) {
                     targetFolder = tab.root;
-                } else if(tab.prev) {
+                }
+                else if (tab.prev) {
                     targetFolder = tab.prev;
-                } else {
+                }
+                else {
                     targetFolder = tab.root
                 }
-
 
                 M.openFolder(targetFolder);
 

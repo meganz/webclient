@@ -26,14 +26,14 @@
 
 
 
-<div class="fm-dialog reset-success">
+<div class="fm-dialog reset-success hidden">
     <div class="nw-fm-dialog-title">[$1585]</div>
     <div class="reg-success-icon"></div>
     <div class="reg-success-txt"> [$6214]  <strong>[$6215]</strong>. </div>
     <div class="reset-description-txt">[$6216] <a href="mailto:support@mega.co.nz">support@mega.co.nz</a></div>
 </div>
 
-<div class="fm-dialog reset-success-st2">
+<div class="fm-dialog reset-success-st2 hidden">
     <div class="fm-dialog-header">
         <div class="fm-dialog-title">[$1585]</div>
     </div>
@@ -494,7 +494,7 @@
         </div>
         <div class="browsers-logos-block">
             <div class="browsers-logo opera-next hidden">
-                <a href="http://www.opera.com" class="browsers-logo-lnk" target="_blank">
+                <a href="http://www.opera.com" class="browsers-logo-lnk" target="_blank" rel="noreferrer">
                     <span class="browsers-compatibility">
                         <span class="fm-pause-notification hidden"><span class="fm-pause-info"></span></span>
                     </span>
@@ -504,7 +504,7 @@
                 </a>
             </div>
             <div class="browsers-logo firefox">
-                <a href="http://www.mozilla.org/firefox/" class="browsers-logo-lnk" target="_blank">
+                <a href="http://www.mozilla.org/firefox/" class="browsers-logo-lnk" target="_blank" rel="noreferrer">
                     <span class="browsers-compatibility">
                         <span class="fm-pause-notification hidden"><span class="fm-pause-info">[$888]</span></span>
                     </span>
@@ -514,7 +514,7 @@
                 </a>
             </div>
             <div class="browsers-logo chrome">
-                <a href="http://www.google.com/chrome" class="browsers-logo-lnk" target="_blank">
+                <a href="http://www.google.com/chrome" class="browsers-logo-lnk" target="_blank" rel="noreferrer">
                     <span class="browsers-compatibility">
                         <span class="fm-pause-notification hidden"><span class="fm-pause-info">[$888]</span></span>
                     </span>
@@ -524,7 +524,7 @@
                 </a>
             </div>
             <div class="browsers-logo opera">
-                <a href="http://www.opera.com/" target="_blank" class="browsers-logo-lnk">
+                <a href="http://www.opera.com/" target="_blank" rel="noreferrer" class="browsers-logo-lnk">
                     <span class="browsers-compatibility">
                         <span class="fm-pause-notification hidden"><span class="fm-pause-info">[$889]</span></span>
                     </span>
@@ -740,8 +740,8 @@
         <div class="clear"></div>
     </div>
     <div class="paypal-body">
-        <a href="" target="_blank"><img src="{staticpath}images/mega/paypal-checkout.png"></a><br>
-        <a href="" target="_blank"><img src="{staticpath}images/mega/paypal-cards.png"></a>
+        <a href="" target="_blank" rel="noreferrer"><img src="{staticpath}images/mega/paypal-checkout.png"></a><br>
+        <a href="" target="_blank" rel="noreferrer"><img src="{staticpath}images/mega/paypal-cards.png"></a>
     </div>
 </div>
 
@@ -754,7 +754,7 @@
     <div class="fm-dialog-body">
         <div class="download-dialog-icon">
             [$240]
-            <a href="https://www.google.com/chrome" class="download-chrome-lnk" target="_blank">
+            <a href="https://www.google.com/chrome" class="download-chrome-lnk" target="_blank" rel="noreferrer">
                 [$242]
             </a>
         </div>
@@ -780,7 +780,7 @@
         <div class="ff-extension-content">
             <div class="ff-extension-head">[$752]</div>
             <div class="ff-extension-txt">
-                Please install our extension for improved download performance and added security. Unfortunately, there is a <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=939510" class="red" target="_blank">bug</a> in the current version of Firefox that will cause excessive memory consumption during and after large downloads.
+                Please install our extension for improved download performance and added security. Unfortunately, there is a <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=939510" class="red" target="_blank" rel="noreferrer">bug</a> in the current version of Firefox that will cause excessive memory consumption during and after large downloads.
             </div>
             <a href="https://mega.co.nz/mega.xpi" class="ff-extension-button">
                 [$1178]
@@ -1354,11 +1354,9 @@
 
                 <div class="reply">
                     <div class="checkdiv checkboxOff">
-                        <input type="checkbox" name="my_email" id="my_email" />
+                        <input type="checkbox" name="share_uh" id="share_uh" />
                     </div>
-                    <label for="my_email" class="radio-txt">[$6856]</label>
-                    <input type="text" name="email" value="" placeholder="your@email.com"/>
-
+                    <label for="share_uh" class="radio-txt">I'm ok to share my user ID</label>
                 </div>
 
                 <div class="stats">
@@ -1438,5 +1436,125 @@
                 </div>
             </div>
         </div>
+    </div>
+</div>
+
+<div class="fm-dialog payment-dialog hidden">
+    <div class="btn-close-dialog"></div>
+    <div class="payment-dialog-body">
+
+        <div class="plan-icon pro1" >
+            <div class="reg-st3-membership-icon"></div>
+        </div>
+        <div class="payment-plan-info">
+            <div class="payment-plan-title">PRO I</div>
+            <div class="payment-plan-txt">1 month <span>([$6965])</span></div>
+        </div>
+
+        <div class="payment-plan-price">9.99&euro</div>
+        <div class="clear"></div>
+
+        <div class="payment-half-block first">
+            <div class="payment-form-title"> [$6964]: </div>
+            <div class="fm-account-input">
+                <input class="address1" type="text" value="" placeholder="[$561] 1">
+            </div>
+            <div class="fm-account-input">
+                <input class="address2" type="text" value="" placeholder="[$561] 2 ([$2028])">
+            </div>
+            <div class="fm-account-input">
+                <input class="city" type="text" value="" placeholder="[$565]">
+            </div>
+            <div class="fm-account-input">
+                <input class="state-province" type="text" value="" placeholder="[$653]">
+            </div>
+            <div class="fm-account-select"> <span class="account-select-txt">[$481]</span>
+                <select class="countries">
+                </select>
+            </div>
+            <div class="fm-account-input code">
+                <input class="post-code" type="text" value="" placeholder="Postal Code">
+            </div>
+            <div class="clear"></div>
+        </div>
+
+        <div class="payment-half-block second">
+            <div class="payment-form-title"> [$6963]: </div>
+            <div class="payment-cc">
+                <div class="radioOn hidden" id="rad1_div">
+                    <input type="radio" id="rad1" class="radioOn" value="1" checked="checked">
+                </div>
+                <div class="payment-cc-icon visa"></div>
+                <div class="payment-cc-icon mastercard"></div>
+            </div>
+            <div class="payment-short-bl first">
+                <div class="fm-account-input">
+                    <input class="first-name" type="text" value="" placeholder="[$1096]" >
+                </div>
+            </div>
+            <div class="payment-short-bl second">
+                <div class="fm-account-input">
+                    <input class="last-name" type="text" value="" placeholder="[$1097]" >
+                </div>
+            </div>
+            <div class="clear"></div>
+            <div class="fm-account-input">
+                <input class="credit-card-number" type="text" value="" placeholder="Credit Card Number" >
+            </div>
+            <div class="payment-short-bl triplex first">
+                <div class="fm-account-select"> <span class="account-select-txt">[$913]</span>
+                    <select class="expiry-date-month">
+                    </select>
+                </div>
+            </div>
+            <div class="payment-short-bl triplex second">
+                <div class="fm-account-select"> <span class="account-select-txt">[$932]</span>
+                    <select class="expiry-date-year">
+                    </select>
+                </div>
+            </div>
+            <div class="payment-short-bl triplex third">
+                <div class="fm-account-input">
+                    <input class="cvv-code" type="text" value="" placeholder="CVV" >
+                </div>
+            </div>
+            <div class="clear"></div>
+            <div class="payment-buy-now"> [$6190] </div>
+        </div>
+
+        <div class="clear"></div>
+    </div>
+</div>
+
+<div class="payment-processing hidden">
+    <div class="payment-animation-pad">
+        <div class="payment-animation"></div>
+        <div class="payment-animation-txt">[$6960]</div>
+    </div>
+</div>
+
+<div class="payment-result success hidden">
+    <div class="payment-close">
+        <div class="payment-close-icon"></div>
+        <span></span>
+    </div>
+    <div class="payment-result-pad">
+        <div class="payment-rusult-header">[$6961]!</div>
+        <div class="payment-result-txt">[$6962]</div>
+        <div class="payment-result-icon"></div>
+        <div class="payment-result-button">[$6690]</div>
+    </div>
+</div>
+
+<div class="payment-result failed hidden">
+    <div class="payment-close">
+        <div class="payment-close-icon"></div>
+        <span></span>
+    </div>
+    <div class="payment-result-pad">
+        <div class="payment-rusult-header">[$6949]</div>
+        <div class="payment-result-txt">[$6950]</div>
+        <div class="payment-result-icon"></div>
+        <div class="payment-result-button">[$1472]</div>
     </div>
 </div>

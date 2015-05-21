@@ -53,6 +53,12 @@
         var that = this,
             closed = false;
 
+        Object.defineProperty(this, 'idbRequestInstance', {
+            get: function() {
+                return db;
+            }
+        });
+
         this.add = function( table ) {
             if ( closed ) {
                 throw 'Database has been closed';
@@ -306,6 +312,7 @@
                     } else {
                         var matchFilter = true;
                         var result = 'value' in cursor ? cursor.value : cursor.key;
+                        // debugger;
 
                         filters.forEach( function ( filter ) {
                             if ( !filter || !filter.length ) {

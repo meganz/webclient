@@ -99,21 +99,28 @@ mStorageDB.prototype = {
             localStorage[this.dbtag + 'hash'] = newHash;
         }
 
-        db = new MegaDB(this.name, u_handle, version, this.schema, this.options);
+        // MegaDB's encryption plugin depends on u_privk
+        if (u_privk) {
 
-        db.bind('onDbStateReady', function _onDbStateReady() {
-            self.fetch(Object.keys(self.schema))
-                .then(function() {
-                    __dbNotifyCompletion();
-                }, function() {
-                    __dbNotifyCompletion(true);
-                });
-        });
+            db = new MegaDB(this.name, u_handle, version, this.schema, this.options);
 
-        db.bind('onDbStateFailed', function _onDbStateFailed() {
-            if (d) console.error('onDbStateFailed', arguments);
-            __dbNotifyCompletion(true);
-        });
+            db.bind('onDbStateReady', function _onDbStateReady() {
+                self.fetch(Object.keys(self.schema))
+                    .then(function() {
+                        __dbNotifyCompletion();
+                    }, function() {
+                        __dbNotifyCompletion(true);
+                    });
+            });
+
+            db.bind('onDbStateFailed', function _onDbStateFailed() {
+                if (d) console.error('onDbStateFailed', arguments);
+                __dbNotifyCompletion(true);
+            });
+        }
+        else {
+            Soon(__dbNotifyCompletion.bind(null, true));
+        }
 
         function __dbNotifyCompletion(aError) {
             if (aError) {
@@ -126,7 +133,9 @@ mStorageDB.prototype = {
                 Soon(self.onReadyState.bind(self, aError));
                 delete self.onReadyState;
             }
-            db.unbind('onDbStateReady').unbind('onDbStateFailed');
+            if (db) {
+                db.unbind('onDbStateReady').unbind('onDbStateFailed');
+            }
             mBroadcaster.sendMessage('mStorageDB:' + self.name, aError);
             promise = newHash = oldHash = version = db = self = undefined;
         }
@@ -149,7 +158,7 @@ mStorageDB.prototype = {
         if (t) {
             this.db.query(t)
                 .execute()
-                .done(function _fetchDone(results) {
+                .then(function _fetchDone(results) {
                     if (d) console.log('msdb fetch done', t, results);
 
                     if (results.length) {
@@ -166,7 +175,7 @@ mStorageDB.prototype = {
                         }
                     }
                     self.fetch(aTables, aPromise);
-                }).fail(function _fetchFail() {
+                }, function _fetchFail() {
                     if (d) console.log('msdb fetch failed', t);
                     aPromise.reject.apply(aPromise, arguments);
                 });
@@ -301,7 +310,7 @@ var mFileManagerDB = {
         if (t) {
             this.db.query(t)
                 .execute()
-                .done(function _fetchDone(results) {
+                .then(function _fetchDone(results) {
                     if (d) console.log('fmdb fetch done', t, results);
 
                     if (!results.length) {
@@ -343,7 +352,7 @@ var mFileManagerDB = {
                         }
                         mFileManagerDB.fetch(aTables);
                     }
-                }).fail(function _fetchFail() {
+                }, function _fetchFail() {
                     if (d) console.log('fmdb fetch failed', t);
 
                     if (mFileManagerDB.slave) {
@@ -408,10 +417,10 @@ var mFileManagerDB = {
     reload: function mFileManagerDB_reload() {
         if (this.db) {
             this.db.drop()
-                .done(function _dropDone() {
+                .then(function _dropDone() {
                     if (d) console.log('fmdb dropped');
                     mFileManagerDB._restart();
-                }).fail(function _dropFail() {
+                }, function _dropFail() {
                     if (d) console.log('fmdb drop failed');
                     mFileManagerDB._loadfm();
                 });

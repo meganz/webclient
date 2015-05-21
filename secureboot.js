@@ -675,8 +675,7 @@ if (m)
         var script = document.createElement('script');
         script.type = "text/javascript";
         document.head.appendChild(script);
-        //script.src = 'https://mega.nz/blog.js'
-        script.src = '/html/js/blog.js'
+        script.src = '/blog.js';
     }
 }
 else if (page == '#android')
@@ -702,7 +701,7 @@ else if (!b_u)
         };
     })(console);
 
-    Object.defineProperty(window, "__cd_v", { value : 9, writable : false });
+    Object.defineProperty(window, "__cd_v", { value : 11, writable : false });
     if (!d || onBetaW)
     {
         var __cdumps = [], __cd_t;
@@ -827,7 +826,7 @@ else if (!b_u)
 
                 for (var i in __cdumps)
                 {
-                    api_req({ a : 'cd', c : JSON.stringify(__cdumps[i]), v : report, t : +__cd_v }, ctx(ids[i]));
+                    api_req({ a : 'cd', c : JSON.stringify(__cdumps[i]), v : report, t : +__cd_v, s : window.location.host }, ctx(ids[i]));
                 }
                 __cd_t = 0;
                 __cdumps = [];
@@ -911,23 +910,25 @@ else if (!b_u)
     jsl.push({f:'js/jquery.jscrollpane.js', n: 'jscrollpane_js', j:1, g: 'jquery'});
     jsl.push({f:'js/jquery.tokeninput.js', n: 'jquerytokeninput_js', j:1, g: 'jquery'});
     jsl.push({f:'js/jquery.misc.js', n: 'jquerymisc_js', j:1, g: 'jquery'});
+    jsl.push({f:'js/thumbnail.js', n: 'thumbnail_js', j:1});
+    jsl.push({f:'js/exif.js', n: 'exif_js', j:1,w:3});
+    jsl.push({f:'js/megapix.js', n: 'megapix_js', j:1});
+    jsl.push({f:'js/smartcrop.js', n: 'smartcrop_js', j:1,w:7});
+    jsl.push({f:'js/jquery.fullscreen.js', n: 'jquery_fullscreen', j:1,w:10});
+    jsl.push({f:'js/jquery.qrcode.js', n: 'jqueryqrcode', j:1});
+    jsl.push({f:'js/thumbnail.js', n: 'thumbnail_js', j:1});
+    jsl.push({f:'js/exif.js', n: 'exif_js', j:1,w:3});
+    jsl.push({f:'js/megapix.js', n: 'megapix_js', j:1});
+    jsl.push({f:'js/smartcrop.js', n: 'smartcrop_js', j:1,w:7});
+    jsl.push({f:'js/jquery.fullscreen.js', n: 'jquery_fullscreen', j:1,w:10});
+    jsl.push({f:'js/jquery.qrcode.js', n: 'jqueryqrcode', j:1});
     jsl.push({f:'js/mDB.js', n: 'mDB_js', j:1, g: 'db'});
-    jsl.push({f:'js/thumbnail.js', n: 'thumbnail_js', j:1});
-    jsl.push({f:'js/exif.js', n: 'exif_js', j:1,w:3});
-    jsl.push({f:'js/megapix.js', n: 'megapix_js', j:1});
-    jsl.push({f:'js/smartcrop.js', n: 'smartcrop_js', j:1,w:7});
-    jsl.push({f:'js/jquery.fullscreen.js', n: 'jquery_fullscreen', j:1,w:10});
-    jsl.push({f:'js/jquery.qrcode.js', n: 'jqueryqrcode', j:1});
-    jsl.push({f:'js/thumbnail.js', n: 'thumbnail_js', j:1});
-    jsl.push({f:'js/exif.js', n: 'exif_js', j:1,w:3});
-    jsl.push({f:'js/megapix.js', n: 'megapix_js', j:1});
-    jsl.push({f:'js/smartcrop.js', n: 'smartcrop_js', j:1,w:7});
-    jsl.push({f:'js/jquery.fullscreen.js', n: 'jquery_fullscreen', j:1,w:10});
-    jsl.push({f:'js/jquery.qrcode.js', n: 'jqueryqrcode', j:1});
 
     jsl.push({f:'js/vendor/qrcode.js', n: 'qrcode', j:1,w:2, g: 'vendor'});
     jsl.push({f:'js/bitcoin-math.js', n: 'bitcoinmath', j:1, g: 'vendor' });
+    jsl.push({f:'js/paycrypt.js', n: 'paycrypt_js', j:1 });
     jsl.push({f:'js/vendor/jquery.window-active.js', n: 'jquery_windowactive', j:1,w:2, g: 'jquery'});
+
     jsl.push({f:'js/megaPromise.js', n: 'megapromise_js', j:1,w:5});
     jsl.push({f:'js/vendor/db.js', n: 'db_js', j:1,w:5, g: 'vendor'});
     jsl.push({f:'js/megaDbEncryptionPlugin.js', n: 'megadbenc_js', j:1,w:5, j:1, g: 'db'});
@@ -1046,6 +1047,8 @@ else if (!b_u)
     jsl.push({f:'js/Int64.js', n: 'int64_js', j:1, g: 'download'});
     jsl.push({f:'js/zip64.js', n: 'zip_js', j:1, g: 'download'});
     jsl.push({f:'js/cms.js', n: 'cms_js', j:1});
+
+    jsl.push({f:'js/windowOpenerProtection.js', n: 'windowOpenerProtection', j:1,w:1});
 
     // only used on beta
     if (onBetaW) {

@@ -331,7 +331,3 @@ MegaPromise.reject = function() {
 
     return p;
 };
-
-
-// replace the original Promise
-window.Promise = MegaPromise;

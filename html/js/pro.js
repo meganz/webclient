@@ -379,7 +379,9 @@ function renderPlanDurationDropDown() {
     $firstOption.addClass('selected');
     
     // Get current plan price
-    var price = $durationSelect.find('span > strong').html().split('.');
+    var planIndex = $firstOption.attr('data-plan-index');
+    var currentPlan = membershipPlans[planIndex];
+    var price = currentPlan[5].split('.');
     var dollars = price[0];
     var cents = price[1];
     

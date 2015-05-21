@@ -12256,7 +12256,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 	-webkit-border-top-right-radius: 0px;
 	-moz-border-radius-topright: 0px;
 	border-top-right-radius: 0px;
-	margin: -4px 0 0 0;
+	margin-top: -4px;
 	padding-top: 4px;
 }
 .top-menu-arrow, .top-login-arrow, .notification-arrow, .top-user-status-arrow, .membership-popup-arrow, .warning-popup-arrow {

@@ -181,6 +181,9 @@ function u_logout(logout) {
             mDBact = false;
             delete localStorage[u_handle + '_mDBactive'];
         }
+        if (typeof mDBcls === 'function') {
+            mDBcls(); // resets mDBloaded
+        }
         fminitialized = false;
         mBroadcaster.crossTab.leave();
         u_sid = u_handle = u_k = u_attr = u_privk = u_k_aes = undefined;
@@ -198,9 +201,6 @@ function u_logout(logout) {
         if (waitxhr) {
             waitxhr.abort();
             waitxhr = undefined;
-        }
-        if (typeof mDBcls === 'function') {
-            mDBcls(); // resets mDBloaded
         }
     }
 }

@@ -762,8 +762,8 @@ function initUI() {
                     $.draggingClass = ('dndc-to-shared');
                 else if (~c.indexOf('contacts'))
                     $.draggingClass = ('dndc-to-contacts');
-                else if (~c.indexOf('conversations'))
-                    $.draggingClass = ('dndc-to-conversations');
+                /*else if (~c.indexOf('conversations'))
+                    $.draggingClass = ('dndc-to-conversations');*/
                 else if (~c.indexOf('cloud-drive'))
                     $.draggingClass = ('dndc-to-conversations'); // TODO: cursor, please?
                 else
@@ -800,7 +800,7 @@ function initUI() {
             {
                 // do nothing
             }
-            else if ($(e.target).hasClass('nw-conversations-item'))
+            /*else if ($(e.target).hasClass('nw-conversations-item'))
             {
                 nRevert();
 
@@ -811,7 +811,7 @@ function initUI() {
 
                 if (d)
                     console.error('TODO: dragging to the chat', currentRoom);
-            }
+            }*/
             else if (dd == 'move')
             {
                 nRevert(t !== M.RubbishID);
@@ -2797,10 +2797,11 @@ function accountUI()
 			}
             else if (account.stype == 'O')
             {
-                // one-time
+                // one-time or cancelled subscription
                 $('.fm-account-header.typetitle').text(l[746]+':');
                 $('.membership-big-txt.type').text(l[751]);
                 $('.membership-medium-txt.expiry').html(l[987] + ' <span class="red">' + time2date(account.expiry) + '</span>');
+                $('.btn-cancel').hide();
             }
         }
         else
@@ -9114,7 +9115,7 @@ function fm_thumbnails()
                     blob = new Blob([uint8arr.buffer]);
                 // thumbnailblobs[node] = blob;
                 thumbnails[node] = myURL.createObjectURL(blob);
-                if (M.d[node].seen)
+                if (M.d[node] && M.d[node].seen)
                     fm_thumbnail_render(M.d[node]);
 
                 // deduplicate in view when there is a duplicate fa:

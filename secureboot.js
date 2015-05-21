@@ -551,6 +551,10 @@ function init_storage ( storage ) {
     return storage;
 }
 
+function getxhr() {
+    return (typeof XDomainRequest !== 'undefined' && typeof ArrayBuffer === 'undefined') ? new XDomainRequest() : new XMLHttpRequest();
+}
+
 var androidsplash = false;
 var m = false;
 var seqno = Math.ceil(Math.random()*1000000000);
@@ -724,6 +728,18 @@ else if (!b_u)
                 f : mTrim('' + url), l : ln
             }, cc, sbid = +(''+(document.querySelector('script[src*="secureboot"]')||{}).src).split('=').pop()|0;
 
+            if (~dump.m.indexOf('[[:i]]')) {
+                return false;
+            }
+
+            if (~dump.m.indexOf("\n")) {
+                var lns = dump.m.split(/\r?\n/).map(String.trim).filter(String);
+
+                if (lns.length > 6) {
+                    dump.m = [].concat(lns.slice(0,2), "[..!]", lns.slice(-2)).join(" ");
+                }
+            }
+
             if (~dump.m.indexOf('took +10s'))
             {
                 var lrc = +localStorage.ttfbReportCount || 0;
@@ -742,7 +758,9 @@ else if (!b_u)
                 if (errobj.udata) dump.d = errobj.udata;
                 if (errobj.stack)
                 {
-                    dump.s = ('' + errobj.stack).split("\n").splice(0,9).map(mTrim).join("\n");
+                    dump.s = ('' + errobj.stack).replace(''+msg,'')
+                        .split("\n").map(String.trim).filter(String)
+                        .splice(0,15).map(mTrim).join("\n");
                 }
             }
             if (cn) dump.c = cn;
@@ -1273,13 +1291,7 @@ else if (!b_u)
         if (d) console.log('jj.total...', waitingToBeLoaded);
     }
 
-    var pages = [];
-    function getxhr()
-    {
-        return (typeof XDomainRequest != 'undefined' && typeof ArrayBuffer == 'undefined') ? new XDomainRequest() : new XMLHttpRequest();
-    }
-
-    var xhr_progress,xhr_stack,jsl_fm_current,jsl_current,jsl_total,jsl_perc,jsli,jslcomplete;
+    var pages = [],xhr_progress,xhr_stack,jsl_fm_current,jsl_current,jsl_total,jsl_perc,jsli,jslcomplete;
 
     function jsl_start()
     {

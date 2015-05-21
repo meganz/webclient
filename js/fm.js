@@ -2720,8 +2720,6 @@ function accountUI()
             $('.membership-big-txt.accounttype').text(planText);
             $('.fm-account-blocks .membership-icon.type').addClass('pro' + planNum);
 
-            console.log('zzzz account.stype', account.stype);
-
             // Subscription
             if (account.stype == 'S')
             {

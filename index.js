@@ -1800,8 +1800,13 @@ function parsetopmenu() {
     return top;
 }
 
-window.onhashchange = function () {
+window.onhashchange = function() {
     var tpage = document.location.hash;
+
+    if (typeof gifSlider !== 'undefined') {
+        gifSlider.clear();
+    }
+
     if (silent_loading) {
         document.location.hash = hash;
         return false;
@@ -1854,7 +1859,7 @@ window.onhashchange = function () {
     else {
         init_page();
     }
-}
+};
 
 function languageDialog(close) {
     if (close) {

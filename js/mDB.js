@@ -48,7 +48,7 @@ function mStorageDB(aName, aOptions, aCallback) {
     this.onReadyState = aCallback;
 
     if (!("plugins" in this.options)) {
-        this.options.plugins = MegaDB.DB_PLUGIN.ENCRYIPTION;
+        this.options.plugins = MegaDB.DB_PLUGIN.ENCRYPTION;
     }
 }
 mStorageDB.prototype = {

@@ -14,7 +14,7 @@ var ChatStore = function(megaChat) {
     self.megaChat = megaChat;
     self.db = new MegaDB("megaChat", u_handle, ChatStore.DBSchema, {
         'parentLogger': self.logger,
-        'plugins': MegaDB.DB_PLUGIN.ENCRYIPTION
+        'plugins': MegaDB.DB_PLUGIN.ENCRYPTION
     });
 
     self.db.bind("onDbStateFailed", function() {

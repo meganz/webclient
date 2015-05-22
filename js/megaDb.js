@@ -26,7 +26,7 @@ function MegaDB(name, suffix, schema, options) {
     this.logger = new MegaLogger("megaDB[" + name + "]", {}, options.parentLogger);
 
     // init code goes here
-    if (this.options.plugins & MegaDB.DB_PLUGIN.ENCRYIPTION) {
+    if (this.options.plugins & MegaDB.DB_PLUGIN.ENCRYPTION) {
         this.plugins.megaDbEncryptionPlugin = new MegaDBEncryption(this);
     }
 
@@ -96,7 +96,7 @@ makeObservable(MegaDB);
  * Static, DB state/flags
  */
 MegaDB.DB_STATE = makeEnum(['OPENING','INITIALIZED','FAILED_TO_INITIALIZE','CLOSED']);
-MegaDB.DB_PLUGIN = makeEnum(['ENCRYIPTION']);
+MegaDB.DB_PLUGIN = makeEnum(['ENCRYPTION']);
 
 /**
  * Static, default options

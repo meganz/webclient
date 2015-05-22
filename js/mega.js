@@ -4234,7 +4234,14 @@ function MegaData()
                 }
                 else {
                     // Otherwise this is an ephemeral account so reload to log them in properly
-                    window.location = 'https://beta.mega.nz/#' + toPage;
+                    if (toPage) {
+                        window.location.hash = toPage;
+                    }
+                    else {
+                        window.location.hash = '';
+                    }
+                    
+                    document.location.reload(false);
                 }
             }
         }

@@ -35,6 +35,7 @@
     "ibrik": "~1.1.1",
     "istanbul": "~0.2.10",
     "jsdoc": "~3.3.0",
+    "jshint": "~2.7.0",
     "karma": "~0.12.8",
     "karma-chai": "0.1.0",
     "karma-chai-plugins": "0.2.1",

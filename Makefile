@@ -6,6 +6,7 @@ NODE = node
 # Build-depends - make sure you keep BUILD_DEP_ALL and BUILD_DEP_ALL_NAMES up-to-date
 KARMA  = $(NODE_PATH)/karma/bin/karma
 JSDOC  = $(NODE_PATH)/.bin/jsdoc
+JSHINT = $(NODE_PATH)/.bin/jshint
 BUILD_DEP_ALL = $(KARMA) $(JSDOC)
 BUILD_DEP_ALL_NAMES = karma jsdoc
 
@@ -21,6 +22,9 @@ api-doc: $(JSDOC)
                  --configure jsdoc.json \
                  --recurse
 
+jshint: $(JSHINT)
+	@-$(NODE) $(JSHINT) --verbose .
+
 clean:
 	rm -rf doc/api/ coverage/ build/ test-results.xml
 
@@ -28,4 +32,4 @@ clean-all: clean
 	rm -f $(BUILD_DEP_ALL)
 	rm -rf $(BUILD_DEP_ALL_NAMES:%=$(NODE_PATH)/%) $(DEP_ALL_NAMES:%=$(NODE_PATH)/%)
 
-.PHONY: all test api-doc clean clean-all
+.PHONY: all test api-doc jshint clean clean-all

@@ -386,8 +386,7 @@ var gifSlider = {
     // 3 on right and it will still work because they are run independently.
     images: {
 
-        // Slide show on right side of the page
-        right: [
+        left: [
             {
                 name: 'video-chat',         // Name & CSS class of the GIF
                 animationLength: 12120,     // Length of the GIF animation in milliseconds
@@ -405,7 +404,11 @@ var gifSlider = {
                 description: 1086,
                 imageSrc: null,
                 bottomImage: 'button0'      // Swaps between Windows/MacOS/Linux using code above
-            },
+            }
+        ],  
+
+        // Slide show on right side of the page
+        right: [
             {
                 name: 'browser-extension-firefox',
                 animationLength: 12080,
@@ -477,6 +480,10 @@ var gifSlider = {
                 }, 400);
 
                 gifSlider.state = gifSlider.STATE_DONE;
+                
+                if (side === 'right') {
+                    gifSlider.preLoadImages('left');
+                }
             }
         }
         
@@ -519,7 +526,7 @@ var gifSlider = {
             gifSlider[side + 'AnimationIntervalId'] = 0;
 
             // Fade out existing image
-            $('.products-bottom-block a').fadeOut(gifSlider.fadeOutSpeed);
+            $('.ads-' + side + '-block .products-bottom-block a').fadeOut(gifSlider.fadeOutSpeed);
             $('.animations-' + side + '-container .currentImage').fadeOut(gifSlider.fadeOutSpeed, function() {
 
                 // Increment to next image
@@ -567,14 +574,13 @@ var gifSlider = {
 
         // Display corresponding image in bottom right corner
         if (typeof bottomImage === 'string') {
-            $('.products-bottom-block .' + bottomImage).fadeIn(gifSlider.fadeInSpeed);
+            $('.ads-' + side + '-block .products-bottom-block .' + bottomImage).fadeIn(gifSlider.fadeInSpeed);
         }
 
         // If the mobile ad, pick a random store to show in bottom right corner e.g. Google, Apple, Windows
         else if (bottomImage !== null) {
-
             var randomIndex = rand(bottomImage.length);
-            $('.products-bottom-block .' + bottomImage[randomIndex]).fadeIn(gifSlider.fadeInSpeed);
+            $('.ads-' + side + '-block .products-bottom-block .' + bottomImage[randomIndex]).fadeIn(gifSlider.fadeInSpeed);
         }
     },
 

@@ -4233,12 +4233,8 @@ function MegaData()
                     u_checklogin3(ctx);
                 }
                 else {
-                    // Otherwise this is an ephemeral account to reload to log them in properly
-                    document.location.reload(false);
-                    
-                    if (toPage) {
-                        window.location.hash = toPage;
-                    }
+                    // Otherwise this is an ephemeral account so reload to log them in properly
+                    window.location = 'https://mega.nz/#' + toPage;
                 }
             }
         }

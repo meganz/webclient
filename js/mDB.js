@@ -92,16 +92,7 @@ mStorageDB.prototype = {
     },
 
     setup: function mStorageDB_setup() {
-        this.dbtag  = 'msdb_' + this.name + '_' + u_handle + '_';
-        var version = +localStorage[this.dbtag + 'v'] || 0;
-        var oldHash = +localStorage[this.dbtag + 'hash'];
-        var newHash = MurmurHash3(JSON.stringify(this.schema), 0x9e450134);
         var promise = new MegaPromise(), self = this, db;
-
-        if (oldHash !== newHash) {
-            localStorage[this.dbtag + 'v'] = ++version;
-            localStorage[this.dbtag + 'hash'] = newHash;
-        }
 
         // MegaDB's encryption plugin depends on u_privk
         if (u_privk) {

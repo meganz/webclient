@@ -749,7 +749,7 @@ makeMetaAware(Karere);
         } else if(self.getConnectionState() == Karere.CONNECTION_STATE.CONNECTING && self._$connectingPromise) {
             return self._$connectingPromise;
         } else if(self.getConnectionState() != Karere.CONNECTION_STATE.DISCONNECTED && self.getConnectionState() != Karere.CONNECTION_STATE.AUTHFAIL) {
-            throw new Error("Invalid connection state. Karere should be DISCONNECTED, before calling .reconnect.");
+            throw new Error("Invalid connection state. Karere should be DISCONNECTED, before calling .reconnect. [[:i]]");
         }
 
 

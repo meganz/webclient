@@ -323,7 +323,7 @@ MegaDB.prototype.removeBy = function(tableName, keyName, value) {
                 });
             }
 
-            Promise.all(promises).then(function(ar) {
+            MegaPromise.all(promises).then(function(ar) {
                 promise.resolve(ar);
             }, function(ar) {
                 promise.reject(ar)
@@ -387,7 +387,7 @@ MegaDB.prototype.get = function(tableName, val) {
 
     assert(this.server[tableName], 'table not found:' + tableName);
 
-    var promise = new Promise(function(resolve, reject) {
+    var promise = new MegaPromise(function(resolve, reject) {
 
         self.query(tableName)
             .filter(self._getTablePk(tableName), val)
@@ -610,7 +610,7 @@ MegaDB.QuerySet.prototype.execute = MegaDB._delayFnCallUntilDbReady(
         var $proxyPromise = new MegaPromise();
 
         q.execute()
-            .done(function(r) {
+            .then(function(r) {
                 if(r.length > 0) {
                     var results = [];
                     r.forEach(function(v, k) {
@@ -623,8 +623,7 @@ MegaDB.QuerySet.prototype.execute = MegaDB._delayFnCallUntilDbReady(
                     $proxyPromise.resolve.apply($proxyPromise, arguments);
                 }
 
-            })
-            .fail(function() {
+            }, function() {
                 $proxyPromise.reject.apply($proxyPromise, arguments);
             });
 

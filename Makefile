@@ -7,6 +7,7 @@ NODE = node
 KARMA  = $(NODE_PATH)/karma/bin/karma
 JSDOC  = $(NODE_PATH)/.bin/jsdoc
 JSHINT = $(NODE_PATH)/.bin/jshint
+JSCS = $(NODE_PATH)/.bin/jscs
 BUILD_DEP_ALL = $(KARMA) $(JSDOC)
 BUILD_DEP_ALL_NAMES = karma jsdoc
 
@@ -25,6 +26,11 @@ api-doc: $(JSDOC)
 jshint: $(JSHINT)
 	@-$(NODE) $(JSHINT) --verbose .
 
+jscs: $(JSCS)
+	@-$(NODE) $(JSCS) --verbose .
+
+checks: jshint jscs
+
 clean:
 	rm -rf doc/api/ coverage/ build/ test-results.xml
 
@@ -32,4 +38,4 @@ clean-all: clean
 	rm -f $(BUILD_DEP_ALL)
 	rm -rf $(BUILD_DEP_ALL_NAMES:%=$(NODE_PATH)/%) $(DEP_ALL_NAMES:%=$(NODE_PATH)/%)
 
-.PHONY: all test api-doc jshint clean clean-all
+.PHONY: all test api-doc jshint jscs checks clean clean-all

@@ -7,7 +7,9 @@ doc/*
 sjcl.js
 fileapi.js
 aesasm.js
-karma.conf.js.js
+megapix.js
+keygen.js
+karma.conf.js
 js/jodid25519.js
 js/jquery*.js
 js/asmcrypto.js

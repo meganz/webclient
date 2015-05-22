@@ -81,14 +81,15 @@ var crypt = (function () {
      *     condition warrants to throw an exception.
      */
     ns.getPubEd25519 = function(userhandle, callback) {
-        var masterPromise = new MegaPromise(); // this promise will be the one which is going to be returned
+        // This promise will be the one which is going to be returned.
+        var masterPromise = new MegaPromise();
 
-        // if a callback is passed to the fn, ALWAYS call it when the master promise is resolved.
+        // If a callback is passed to the fn, ALWAYS call it
+        // when the master promise is resolved.
         var _callbackAttachAfterDone = function() {
-            // if a callback is passed to the fn, ALWAYS call it when the master promise is resolved.
             if(callback) {
-                masterPromise.done(function(r) {
-                    callback(r);
+                masterPromise.done(function(result) {
+                    callback(result);
                 });
             }
         };
@@ -97,9 +98,7 @@ var crypt = (function () {
                 || typeof u_authring.Ed25519 === 'undefined') {
             logger.debug('First initialising the Ed25519 authring.');
             var ed25519LoadingPromise = authring.getContacts('Ed25519');
-
             masterPromise.linkFailTo(ed25519LoadingPromise);
-
             ed25519LoadingPromise.done(function() {
                 masterPromise.linkDoneAndFailTo(
                     ns.getPubEd25519(userhandle)
@@ -113,45 +112,35 @@ var crypt = (function () {
 
         if (pubEd25519[userhandle]) {
             // It's cached: Only check the authenticity of the key.
-            // Make the promise for a cached value.
-
             crypt._checkAuthenticationEd25519(userhandle, callback);
             masterPromise.resolve(pubEd25519[userhandle]);
-
             _callbackAttachAfterDone(masterPromise);
 
             return masterPromise;
         }
         else {
             // Non-cached value.
-
-            var getUserAttribPromise = getUserAttribute(userhandle, 'puEd255', true, false);
-
+            var getUserAttribPromise = getUserAttribute(userhandle, 'puEd255',
+                                                        true, false);
             getUserAttribPromise.done(function(result) {
                 result = base64urldecode(result);
-
                 pubEd25519[userhandle] = result;
-
                 crypt._checkAuthenticationEd25519(userhandle);
-
-
                 logger.debug('Got Ed25519 pub key of user "' + userhandle + '".');
-
                 masterPromise.resolve(pubEd25519[userhandle]);
             });
 
-            // show error and call the 'callback', masterPromise will get rejected by the next .linkFailTo call...
+            // Show error and call the 'callback', masterPromise will get
+            // rejected by the next .linkFailTo call...
             getUserAttribPromise.fail(function() {
                 logger.error('Error getting Ed25519 pub key of user "'
-                + userhandle + '": ' + error);
+                             + userhandle + '": ' + error);
                 if (callback) {
                     callback(error);
                 }
             });
 
             masterPromise.linkFailTo(getUserAttribPromise);
-
-
             _callbackAttachAfterDone(masterPromise);
 
             return masterPromise;

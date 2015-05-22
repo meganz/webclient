@@ -645,7 +645,7 @@ function idbDownloadIO(dl_id, dl) {
                 }
             }.bind(this);
 
-            db = new MegaDB('dl', dl_id, 1, schema, {plugins: {}});
+            db = new MegaDB('dl', dl_id, schema);
 
             db.bind('onDbStateReady', __onDbStateChange)
                 .bind('onDbStateFailed', __onDbStateChange);

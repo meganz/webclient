@@ -7,72 +7,133 @@
  *
  * @param suffix {string} used for suffixing the db name
  * @param name {string} name of the database (a-zA-Z0-9_-)
- * @param version {Integer} version
  * @param schema {Object} db schema (IndexedDB format)
+ * @param options {Object}
  * @returns {MegaDB}
  * @constructor
  */
-function MegaDB(name, suffix, version, schema, options) {
+function MegaDB(name, suffix, schema, options) {
     this.name = name;
     this.suffix = suffix;
-
-
-    this.logger = new MegaLogger("megaDB[" + name + "]", {}, options && options.parentLogger ? options.parentLogger : undefined);
-
-
     this.server = null;
-
-    this.currentVersion = version;
     this.schema = schema;
     this.dbState = MegaDB.DB_STATE.OPENING;
     this.plugins = {};
+
+    options = options || {};
     this.options = $.extend({}, clone(MegaDB.DEFAULT_OPTIONS), options);
 
-    var self = this;
+    this.logger = new MegaLogger("megaDB[" + name + "]", {}, options.parentLogger);
 
     // init code goes here
-    $.each(self.options.plugins, function(k, v) {
-        self.plugins[k] = new v(self);
-    });
+    if (this.options.plugins & MegaDB.DB_PLUGIN.ENCRYIPTION) {
+        this.plugins.megaDbEncryptionPlugin = new MegaDBEncryption(this);
+    }
 
+    var self = this;
+    var dbName = 'mdb_' + name + '_' + suffix;
+    var murSeed = options.murSeed || 0x80017700;
+    var murData =
+        JSON.stringify(this.schema) +
+        JSON.stringify(this.options);
 
-    self._dbOpenPromise = db.open({
-        server: 'mdb_' + name + '_' + suffix,
-        version: version,
-        schema: schema
-    }).then( function ( s ) {
-        self.server = s;
-        self.dbState = MegaDB.DB_STATE.INITIALIZED;
-        self.trigger('onDbStateReady');
-        self.initialize();
-    }, function() {
-        self.dbState = MegaDB.DB_STATE.FAILED_TO_INITIALIZE;
-        self.logger.error("Could not initialise MegaDB: ", arguments, name, version, schema);
-        self.trigger('onDbStateFailed');
-    });
+    var version = +localStorage[dbName + '_v'] || 0;
+    var oldHash = +localStorage[dbName + '_hash'];
+    var newHash = MurmurHash3( murData, murSeed );
+
+    if (oldHash !== newHash) {
+        localStorage[dbName + '_v'] = ++version;
+        localStorage[dbName + '_hash'] = newHash;
+    }
+
+    __dbOpen();
+
+    function __dbOpen() {
+        self._dbOpenPromise = db.open({
+            server: dbName,
+            version: version,
+            schema: schema
+        }).then( function( s ) {
+            self.server = s;
+            self.currentVersion = version;
+            self.dbState = MegaDB.DB_STATE.INITIALIZED;
+            self.trigger('onDbStateReady');
+            self.initialize();
+        }, function( e ) {
+            // nb: "reason" comes from our modified db.js
+            var dbError = e.reason.target.error;
+
+            if (dbError.name === 'VersionError') {
+                if (d) console.log('DB VersionError');
+
+                MegaDB.getDatabaseVersion(dbName)
+                    .then(function(dbProp) {
+                        localStorage[dbName + '_v'] = version = dbProp.version + 1;
+                        __dbOpen();
+                    }, function(error) {
+                        console.error('MegaDB.getDatabaseVersion', error);
+                        __dbOpenFailed();
+                    });
+            }
+            else {
+                __dbOpenFailed();
+            }
+
+            function __dbOpenFailed() {
+                self.dbState = MegaDB.DB_STATE.FAILED_TO_INITIALIZE;
+                self.logger.error("Could not initialise MegaDB: ", arguments, name, version, schema);
+                self.trigger('onDbStateFailed', dbError);
+            }
+        });
+    }
 
     return this;
-};
+}
 
 makeObservable(MegaDB);
 
 /**
- * Static, DB state
+ * Static, DB state/flags
  */
-MegaDB.DB_STATE = {
-    'OPENING': 0,
-    'INITIALIZED': 10,
-    'FAILED_TO_INITIALIZE': 20,
-    'CLOSED': 30
-};
+MegaDB.DB_STATE = makeEnum(['OPENING','INITIALIZED','FAILED_TO_INITIALIZE','CLOSED']);
+MegaDB.DB_PLUGIN = makeEnum(['ENCRYIPTION']);
 
 /**
  * Static, default options
  */
 MegaDB.DEFAULT_OPTIONS = {
-    'plugins': {
-        'megaDbEncryptionPlugin': MegaDBEncryption
+    'murSeed': 0,
+    'version': false,
+    'plugins': 0
+};
+
+/**
+ * Get Database version
+ */
+MegaDB.getDatabaseVersion = function(dbName) {
+    var promise = new MegaPromise();
+
+    try {
+        var request = indexedDB.open(dbName);
+        request.onsuccess = function(e) {
+            var idb = e.target.result;
+
+            promise.resolve({
+                name: dbName,
+                version: idb.version,
+                gdbvSucceed: true
+            });
+            idb.close();
+        };
+        request.onblocked = request.onerror = function(e) {
+            promise.reject(e);
+        };
     }
+    catch(e) {
+        promise.reject(e);
+    }
+
+    return promise;
 };
 
 /**

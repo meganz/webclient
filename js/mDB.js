@@ -41,11 +41,15 @@ function mStorageDB(aName, aOptions, aCallback) {
         aOptions = undefined;
     }
     this.name     = aName;
-    this.options  = aOptions;
+    this.options  = aOptions || {};
     this.handlers = {};
     this.schema   = {};
     mSDBPromises.push(this);
     this.onReadyState = aCallback;
+
+    if (!("plugins" in this.options)) {
+        this.options.plugins = MegaDB.DB_PLUGIN.ENCRYIPTION;
+    }
 }
 mStorageDB.prototype = {
     addSchemaHandler: function mStorageDB_addSchemaHandler(aTable, aKeyPath, aHandler) {
@@ -102,7 +106,7 @@ mStorageDB.prototype = {
         // MegaDB's encryption plugin depends on u_privk
         if (u_privk) {
 
-            db = new MegaDB(this.name, u_handle, version, this.schema, this.options);
+            db = new MegaDB(this.name, u_handle, this.schema, this.options);
 
             db.bind('onDbStateReady', function _onDbStateReady() {
                 self.fetch(Object.keys(self.schema))
@@ -113,8 +117,8 @@ mStorageDB.prototype = {
                     });
             });
 
-            db.bind('onDbStateFailed', function _onDbStateFailed() {
-                if (d) console.error('onDbStateFailed', arguments);
+            db.bind('onDbStateFailed', function _onDbStateFailed(ev, error) {
+                if (d) console.error('onDbStateFailed', error.message || error);
                 __dbNotifyCompletion(true);
             });
         }
@@ -252,10 +256,9 @@ var mFileManagerDB = {
         u:  { key: { keyPath: "u"   }},
         f:  { key: { keyPath: "h"   }}
     },
-    version: 1,
 
     init: function mFileManagerDB_init() {
-        var db = new MegaDB("fm", u_handle, this.version, this.schema, {plugins: {}});
+        var db = new MegaDB("fm", u_handle, this.schema);
 
         if (mBroadcaster.crossTab.master) {
             db.bind('onDbStateReady', function _onDbStateReady() {

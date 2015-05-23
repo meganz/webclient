@@ -733,6 +733,9 @@ var cardDialog = {
         var statePlaceholder = this.$dialog.find('.state-province').attr('placeholder').replace(':', '');
         this.$dialog.find('.state-province').attr('placeholder', statePlaceholder);
         
+        // Reset form if they made a previous payment
+        this.clearPreviouslyEnteredCardData();
+        
         // Initialise the close button
         this.$dialog.find('.btn-close-dialog').rebind('click', function() {
             cardDialog.$dialogOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
@@ -741,6 +744,31 @@ var cardDialog = {
             // Reset flag so they can try paying again
             cardDialog.paymentInProcess = false;
         });
+    },
+    
+    /**
+     * Clears card data and billing details previously entered
+     */
+    clearPreviouslyEnteredCardData: function() {
+        
+        this.$dialog.find('.first-name').val('');
+        this.$dialog.find('.last-name').val('');
+        this.$dialog.find('.credit-card-number').val('');
+        this.$dialog.find('.cvv-code').val('');
+        this.$dialog.find('.address1').val('');
+        this.$dialog.find('.address2').val('');
+        this.$dialog.find('.city').val('');
+        this.$dialog.find('.state-province').val('');
+        this.$dialog.find('.post-code').val('');
+        
+        this.$dialog.find('.expiry-date-month')[0].selectedIndex = 0;
+        this.$dialog.find('.expiry-date-month').parent().find('.account-select-txt').text(l[913]);
+        
+        this.$dialog.find('.expiry-date-year')[0].selectedIndex = 0;
+        this.$dialog.find('.expiry-date-year').parent().find('.account-select-txt').text(l[932]);
+        
+        this.$dialog.find('.countries')[0].selectedIndex = 0;
+        this.$dialog.find('.countries').parent().find('.account-select-txt').text(l[481]);
     },
     
     /**
@@ -1006,6 +1034,9 @@ var cardDialog = {
             // Hide the overlay
             cardDialog.$dialogOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
             cardDialog.$successOverlay.addClass('hidden');
+            
+            // Remove credit card details from the form
+            cardDialog.clearPreviouslyEnteredCardData();
             
             // Reset flag so they can try paying again
             cardDialog.paymentInProcess = false;

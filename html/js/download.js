@@ -563,7 +563,7 @@ var gifSlider = {
         var bottomImage      = sliderObj.bottomImage;
 
         // Change the link and fade in the new image
-        $('.ads-' + side + '-block .currentLink, .products-top-txt a.titleLink').attr('href', slideLink);
+        $('.ads-' + side + '-block .currentLink, .ads-' + side + '-block .products-top-txt a.titleLink').attr('href', slideLink);
         $('.animations-' + side + '-container .currentLink').attr('href', slideLink);
         $('.animations-' + side + '-container .currentImage').attr('src', slideImgSrc)
             .css({ width: '260px', height: '300px'}).fadeIn(gifSlider.fadeInSpeed);

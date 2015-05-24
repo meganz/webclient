@@ -4,6 +4,9 @@ js/vendor/*
 coverage/*
 dont-deploy/*
 doc/*
+test/node_modules/*
+contrib/*
+scripts/*
 sjcl.js
 fileapi.js
 aesasm.js

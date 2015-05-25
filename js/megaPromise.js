@@ -229,7 +229,7 @@ MegaPromise.prototype.linkDoneAndFailTo = function(targetPromise) {
 MegaPromise.prototype.dumpToConsole = function(msg) {
     var self = this;
 
-    if(d) {
+    if (d) {
         self.done(function () {
             console.log("success: ", msg ? msg : arguments, !msg ? null : arguments);
         });

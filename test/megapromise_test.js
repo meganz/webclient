@@ -242,7 +242,7 @@ describe("MegaPromise Unit Test", function() {
         try {
             p1.resove(123);
             fail("p1.resolve should have triggered an exception!");
-        } catch(e) {
+        } catch (e) {
             expect(e instanceof TypeError).to.eql(true);
             done();
         }

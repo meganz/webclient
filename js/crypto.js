@@ -87,7 +87,7 @@ var crypt = (function () {
         // If a callback is passed to the fn, ALWAYS call it
         // when the master promise is resolved.
         var _callbackAttachAfterDone = function() {
-            if(callback) {
+            if (callback) {
                 masterPromise.done(function(result) {
                     callback(result);
                 });
@@ -198,7 +198,7 @@ var crypt = (function () {
      *     Ed25519 signature of the RSA public key.
      * @param fingerprint {string}
      *     Fingerprint of the RSA public key.
-     * @return {object}
+     * @return {Object}
      *     The checked RSA public key.
      * @throws {Error}
      *     In case the fingerprint of the public key differs from the one previously
@@ -274,11 +274,11 @@ var crypt = (function () {
                                                     true, false);
 
             // Get the signature and public signing key.
-            function attributePromiseResolve(result) {
+            var attributePromiseResolve = function(result) {
                 signature = base64urldecode(result);
                 return signature;
-            }
-            function attributePromiseReject(result) {
+            };
+            var attributePromiseReject = function(result) {
                 if (result === ENOENT) {
                     signature = '';
                     var resolvePromise = new MegaPromise();
@@ -289,7 +289,7 @@ var crypt = (function () {
                 else {
                     return result;
                 }
-            }
+            };
             var signaturePromise = attributePromise.then(attributePromiseResolve,
                                                          attributePromiseReject);
 
@@ -354,7 +354,7 @@ var crypt = (function () {
 
         var _callbackAttachAfterDone = function() {
             // if a callback is passed to the fn, ALWAYS call it when the master promise is resolved.
-            if(callback) {
+            if (callback) {
                 masterPromise.done(function(r) {
                     console.error('calling cb');
                     callback(r);
@@ -371,8 +371,9 @@ var crypt = (function () {
             authringPromise
                 .done(function() {
                     // loading finished, do a recursion and link the newly called .getPubRSA's state to the returned master promise
-                    masterPromise.linkDoneAndFailTo( // masterPromise will get resolved when ns.getPubRSA get resolved too
-                        ns.getPubRSA(userhandle) /* no need to pass the callback, since the master promise will call it */
+                    masterPromise.linkDoneAndFailTo(
+                        // masterPromise will get resolved when ns.getPubRSA get resolved too
+                        ns.getPubRSA(userhandle) // no need to pass the callback, since the master promise will call it
                     );
                 });
 

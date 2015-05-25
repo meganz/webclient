@@ -1572,7 +1572,7 @@ describe("EncryptionFilter", function() {
             room.encryptionHandler.processMessage = function(){};
 
             sinon.stub(encryptionFilter, 'syncRoomUsersWithEncMembers', function(){});
-            if(!crypt.getPubEd25519.restore) {
+            if (!crypt.getPubEd25519.restore) {
                 sinon.spy(crypt, 'getPubEd25519');
             }
 

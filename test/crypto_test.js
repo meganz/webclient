@@ -484,7 +484,7 @@ describe("crypto unit test", function() {
                                     resolve: sinon.stub() };
                 sandbox.stub(window, 'MegaPromise').returns(rootPromise);
                 sandbox.stub(window, 'getUserAttribute');
-                                var myCallback = sinon.spy();
+                var myCallback = sinon.spy();
 
                 ns.getPubEd25519('you456789xw', myCallback);
                 var rootCallback = rootPromise.then.args[0][0];

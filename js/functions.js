@@ -261,7 +261,7 @@ function populate_l() {
     l[553] = l[553].replace('[A]', '<a href="mailto:resellers@mega.co.nz">').replace('[/A]', '</a>');
     l[555] = l[555].replace('[A]', '<a href="#terms">').replace('[/A]', '</a>');
     l[754] = l[754].replace('[A]',
-        '<a href="http://www.google.com/chrome" target="_blank" style="color:#D9290B;">');
+        '<a href="http://www.google.com/chrome" target="_blank" rel="noreferrer" style="color:#D9290B;">');
     l[754] = l[754].replace('[/A]', '</a>');
     l[871] = l[871].replace('[B]',
         '<strong>').replace('[/B]', '</strong>').replace('[A]', '<a href="#pro">').replace('[/A]', '</a>');
@@ -272,11 +272,12 @@ function populate_l() {
     l[1094] = l[1094].replace('[A]', '<a href="#plugin">').replace('[/A]', '</a>');
     l[1095] = l[1095].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
     l[1133] = l[1133].replace('[A]',
-        '<a href="http://en.wikipedia.org/wiki/Entropy" target="_blank">').replace('[/A]', '</a>');
+        '<a href="http://en.wikipedia.org/wiki/Entropy" target="_blank" rel="noreferrer">').replace('[/A]', '</a>');
     l[1134] = l[1134].replace('[A]',
-        '<a href="http://en.wikipedia.org/wiki/Public-key_cryptography" target="_blank">').replace('[/A]',
+        '<a href="http://en.wikipedia.org/wiki/Public-key_cryptography" target="_blank" rel="noreferrer">').replace('[/A]',
         '</a>');
     l[1148] = l[1148].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
+    l[6978] = l[6978].replace('[A]', '<span class="red">').replace('[/A]', '</span>');    
     l[1151] = l[1151].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
     l[731] = l[731].replace('[A]', '<a href="#terms">').replace('[/A]', '</a>');
     if (lang === 'en') {
@@ -285,7 +286,7 @@ function populate_l() {
     l[1159] = l[1159].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
     l[1171] = l[1171].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
     l[1185] = l[1185].replace('[X]', '<strong>MEGA.crx</strong>');
-    l[1242] = l[1242].replace('[A]', '<a href="#affiliateterms" target="_blank">').replace('[/A]', '</a>');
+    l[1242] = l[1242].replace('[A]', '<a href="#affiliateterms" target="_blank" rel="noreferrer">').replace('[/A]', '</a>');
     l[1218] = l[1218].replace('[A]', '<a href="#affiliateterms" class="red">').replace('[/A]', '</a>');
     l[1212] = l[1212].replace('[A]', '<a href="#sdk" class="red">').replace('[/A]', '</a>');
     l[1274] = l[1274].replace('[A]', '<a href="#takedown">').replace('[/A]', '</a>');
@@ -294,7 +295,7 @@ function populate_l() {
     l[1201] = l[1201].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
     l[1208] = l[1208].replace('[B]', '<strong>').replace('[/B]', '</strong>');
     l[1915] = l[1915].replace('[A]',
-        '<a class="red" href="https://chrome.google.com/webstore/detail/mega/bigefpfhnfcobdlfbedofhhaibnlghod" target="_blank">')
+        '<a class="red" href="https://chrome.google.com/webstore/detail/mega/bigefpfhnfcobdlfbedofhhaibnlghod" target="_blank" rel="noreferrer">')
             .replace('[/A]', '</a>');
     l[1936] = l[1936].replace('[A]', '<a href="#backup">').replace('[/A]', '</a>');
     l[1942] = l[1942].replace('[A]', '<a href="#backup">').replace('[/A]', '</a>');
@@ -1802,7 +1803,7 @@ mSpawnWorker.prototype = {
                 return;
             }
             Soon(function() {
-                throw err;
+                throw err.message || err;
             });
             self.unreliably = true;
             var nw = self.nworkers;
@@ -2338,7 +2339,7 @@ function _wrapFnWithBeforeAndAfterEvents(fn, eventSuffix, dontReturnPromises) {
                 return false;
             }
             else {
-                return Promise.reject("Propagation stopped by onBefore" + eventSuffix);
+                return MegaPromise.reject("Propagation stopped by onBefore" + eventSuffix);
             }
 
         }
@@ -2358,7 +2359,7 @@ function _wrapFnWithBeforeAndAfterEvents(fn, eventSuffix, dontReturnPromises) {
                     return false;
                 }
                 else {
-                    return Promise.reject("Propagation stopped by onAfter" + eventSuffix);
+                    return MegaPromise.reject("Propagation stopped by onAfter" + eventSuffix);
                 }
             }
         };
@@ -2487,6 +2488,7 @@ function generateAnonymousReport() {
     var report = {};
     report.ua = navigator.userAgent;
     report.ut = u_type;
+    report.pbm = !!window.Incognito;
     report.io = window.dlMethod && dlMethod.name;
     report.sb = +('' + $('script[src*="secureboot"]').attr('src')).split('=').pop();
     report.tp = $.transferprogress;
@@ -2503,6 +2505,8 @@ function generateAnonymousReport() {
     var chatStates = {};
     var userAnonMap = {};
     var userAnonIdx = 0;
+    var roomUniqueId = 0;
+    var roomUniqueIdMap = {};
 
     Object.keys(megaChat.chats).forEach(function(k) {
         var v = megaChat.chats[k];
@@ -2521,7 +2525,7 @@ function generateAnonymousReport() {
         });
 
         var r = {
-            'roomUniqueId': k,
+            'roomUniqueId': roomUniqueId,
             'roomState': v.getStateAsText(),
             'roomParticipants': participants,
             'encState': v.encryptionHandler ? v.encryptionHandler.state : "not defined",
@@ -2534,7 +2538,9 @@ function generateAnonymousReport() {
                     ? v.encryptionOpQueue._queue[0][0] : "not defined"
         };
 
-        chatStates[k] = r;
+        chatStates[roomUniqueId] = r;
+        roomUniqueIdMap[k] = roomUniqueId;
+        roomUniqueId++;
     });
 
     if (report.haveRtc) {
@@ -2546,13 +2552,18 @@ function generateAnonymousReport() {
                 'state': v.state
             };
 
-            if(!chatStates[v.room.roomJid]) {
-                chatStates[v.room.roomJid] = {};
+            var roomIdx = roomUniqueIdMap[v.room.roomJid];
+            if(!roomIdx) {
+                roomUniqueId += 1; // room which was closed, create new tmp id;
+                roomIdx = roomUniqueId;
             }
-            if(!chatStates[v.room.roomJid].callSessions) {
-                chatStates[v.room.roomJid].callSessions = [];
+            if(!chatStates[roomIdx]) {
+                chatStates[roomIdx] = {};
             }
-            chatStates[v.room.roomJid].callSessions.push(r);
+            if(!chatStates[roomIdx].callSessions) {
+                chatStates[roomIdx].callSessions = [];
+            }
+            chatStates[roomIdx].callSessions.push(r);
         });
     };
 

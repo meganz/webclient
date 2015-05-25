@@ -14,7 +14,8 @@ var CallSession = function(chatRoom, sid) {
     this.answer = null;
     this.cancel = null;
 
-    this.callStats = {};
+    this.callStats = [];
+    this.liveCallStats = {};
 
     if(this.room.callSession) {
         if(this.room.callSession.isStarting() === true) {
@@ -377,15 +378,15 @@ CallSession.prototype.onCallAnswered = function(e) {
 CallSession.prototype.onCallStarted = function(e, eventData) {
     var self = this;
 
-    self.callStats = {};
+    self.liveCallStats = {};
 
     eventData.stats = {
         scanPeriod: 1, maxSamplePeriod: 5,
         onSample: function(stats, type) {
             if (type == 1) {
-                self.callStats.stats = stats;
+                self.liveCallStats.stats = stats;
             } else if (type == 0) {
-                self.callStats.commonStats = stats;
+                self.liveCallStats.commonStats = stats;
             }
         }
     };
@@ -1482,41 +1483,41 @@ CallManager.prototype._attachToChatRoom = function(megaChat, chatRoom) {
      */
 
     chatRoom.rebind('media-recv.callManager', function(e, eventData) {
-        var session = self.getOrCreateSessionFromEventData(eventData, chatRoom);
+        var session = self.getOrCreateSessionFromEventData(e.type, eventData, chatRoom);
         session.setState(CallSession.STATE.STARTED);
         self.trigger('RemoteStreamReceived', [session, eventData]);
         self.trigger('CallStarted', [session, eventData]);
     });
 
     chatRoom.rebind('local-stream-connect.callManager', function(e, eventData) {
-        var session = self.getOrCreateSessionFromEventData(eventData, chatRoom);
+        var session = self.getOrCreateSessionFromEventData(e.type, eventData, chatRoom);
         self.trigger('LocalStreamReceived', [session, eventData]);
     });
     chatRoom.rebind('local-player-remove.callManager', function(e, eventData) {
-        var session = self.getOrCreateSessionFromEventData(eventData, chatRoom);
+        var session = self.getOrCreateSessionFromEventData(e.type, eventData, chatRoom);
         self.trigger('LocalStreamRemoved', [session, eventData]);
     });
     chatRoom.rebind('remote-player-remove.callManager', function(e, eventData) {
-        var session = self.getOrCreateSessionFromEventData(eventData, chatRoom);
+        var session = self.getOrCreateSessionFromEventData(e.type, eventData, chatRoom);
         self.trigger('RemoteStreamRemoved', [session, eventData]);
     });
 
     chatRoom.rebind('call-init.callManager call-answered.callManager', function(e, eventData) {
-        var session = self.getOrCreateSessionFromEventData(eventData, chatRoom);
+        var session = self.getOrCreateSessionFromEventData(e.type, eventData, chatRoom);
         session.setState(CallSession.STATE.STARTING);
         self.trigger('CallStarting', [session]);
     });
 
 
     chatRoom.rebind('call-incoming-request.callManager', function(e, eventData) {
-        var session = self.getOrCreateSessionFromEventData(eventData, chatRoom);
+        var session = self.getOrCreateSessionFromEventData(e.type, eventData, chatRoom);
         session.setState(CallSession.STATE.WAITING_RESPONSE_INCOMING);
         self.trigger('WaitingResponseIncoming', [session, eventData]);
     });
 
     // local user will receive this event in case of timeout
     chatRoom.rebind('call-answer-timeout.callManager', function(e, eventData) {
-        var session = self.getOrCreateSessionFromEventData(eventData, chatRoom);
+        var session = self.getOrCreateSessionFromEventData(e.type, eventData, chatRoom);
         session.setState(CallSession.STATE.TIMEOUT);
 
         var jingSession = session.getJingleSession();
@@ -1534,7 +1535,7 @@ CallManager.prototype._attachToChatRoom = function(megaChat, chatRoom) {
 
     // remote user will receive this event in case of timeout
     chatRoom.rebind('call-canceled.callManager', function(e, eventData) {
-        var session = self.getOrCreateSessionFromEventData(eventData, chatRoom);
+        var session = self.getOrCreateSessionFromEventData(e.type, eventData, chatRoom);
         self.callEndedJingleSessions[session.sid] = session.getJingleSession();
 
         delete self.incomingRequestJingleSessions[session.sid];
@@ -1556,7 +1557,7 @@ CallManager.prototype._attachToChatRoom = function(megaChat, chatRoom) {
     });
 
     chatRoom.rebind('call-ended.callManager call-declined.callManager', function(e, eventData) {
-        var session = self.getOrCreateSessionFromEventData(eventData, chatRoom);
+        var session = self.getOrCreateSessionFromEventData(e.type, eventData, chatRoom);
 
         if(self.outgoingRequestJingleSessions[session.sid] || self.incomingRequestJingleSessions[session.sid]) {
             self.callEndedJingleSessions[session.sid] = session.getJingleSession(session.sid);
@@ -1568,8 +1569,14 @@ CallManager.prototype._attachToChatRoom = function(megaChat, chatRoom) {
             delete self.incomingRequestJingleSessions[session.sid];
         }
 
+        if(eventData.stats) {
+            session.callStats.push(
+                eventData.stats
+            );
+        }
+
         var reason = eventData.reason ? eventData.reason : (eventData.info && eventData.info.reason ? eventData.info.reason : undefined);
-        if((session.isStarted() || session.isNotStarted()) && (reason == 'peer-hangup' || reason == 'hangup' || reason == 'caller')) {
+        if((session.isStarted() || session.isNotStarted()) && (reason == 'peer-hangup' || reason == 'hangup' || reason == 'caller' || reason == 'disconnected')) {
             if(session.state == CallSession.STATE.STARTED) {
                 session.setState(CallSession.STATE.ENDED);
                 self.trigger('CallEnded', [session, reason]);
@@ -1580,7 +1587,7 @@ CallManager.prototype._attachToChatRoom = function(megaChat, chatRoom) {
         } else if(reason == 'busy') {
             session.setState(CallSession.STATE.REJECTED);
             self.trigger('CallRejected', [session, reason]);
-        } else if(reason == 'peer-disconnected') {
+        } else if(reason == 'peer-disconnected' || reason == 'ice-disconnect') {
             session.setState(CallSession.STATE.FAILED);
             self.trigger('CallFailed', [session, reason, eventData.text]);
         } else if(reason == 'security') {
@@ -1593,12 +1600,12 @@ CallManager.prototype._attachToChatRoom = function(megaChat, chatRoom) {
             session.setState(CallSession.STATE.FAILED);
             self.trigger('CallFailed', [session, reason, eventData.text]);
         } else {
-            session.logger.warn('Unknown call ended reason: ', reason, 'in session with current state: ', constStateToText(CallSession.STATE, session.state));
+            session.logger.error('Unknown call ended reason: ', reason, 'in session with current state: ', constStateToText(CallSession.STATE, session.state));
         }
     });
 
     chatRoom.rebind('muted.callManager', function(e, eventData) {
-        var session = self.getOrCreateSessionFromEventData(eventData, chatRoom);
+        var session = self.getOrCreateSessionFromEventData(e.type, eventData, chatRoom);
         if(eventData.info.video) {
             self.trigger('RemoteVideoMuted', [session]);
         } else if(eventData.info.audio) {
@@ -1609,7 +1616,7 @@ CallManager.prototype._attachToChatRoom = function(megaChat, chatRoom) {
     });
 
     chatRoom.rebind('unmuted.callManager', function(e, eventData) {
-        var session = self.getOrCreateSessionFromEventData(eventData, chatRoom);
+        var session = self.getOrCreateSessionFromEventData(e.type, eventData, chatRoom);
         if(eventData.info.video) {
             self.trigger('RemoteVideoUnmuted', [session]);
         } else if(eventData.info.audio) {
@@ -1620,7 +1627,7 @@ CallManager.prototype._attachToChatRoom = function(megaChat, chatRoom) {
     });
 
     chatRoom.rebind('local-media-fail.callManager', function(e, eventData) {
-        var session = self.getOrCreateSessionFromEventData(eventData, chatRoom);
+        var session = self.getOrCreateSessionFromEventData(e.type, eventData, chatRoom);
 
         if (eventData.continue) {
             eventData.wait = true;
@@ -1674,7 +1681,7 @@ CallManager.prototype._detachFromChatRoom = function(megaChat, chatRoom) {
 };
 
 
-CallManager.prototype.getOrCreateSessionFromEventData = function(eventData, chatRoom) {
+CallManager.prototype.getOrCreateSessionFromEventData = function(eventName, eventData, chatRoom) {
     var self = this;
     var sid;
     var callSession;
@@ -1703,11 +1710,15 @@ CallManager.prototype.getOrCreateSessionFromEventData = function(eventData, chat
             return;
         }
 
-        assert(
-            chatRoom.callSession.isNotStarted() || chatRoom.callSession.isTerminated() || chatRoom.callSession.isStarting(),
-            'expected that when the local-stream-connect is triggered, the currently stored session in the room ' +
-            'would be in starting state'
-        );
+        if(eventName === "local-stream-connect") {
+            assert(
+                chatRoom.callSession.isNotStarted() ||
+                chatRoom.callSession.isTerminated() ||
+                chatRoom.callSession.isStarting(),
+                'expected that when the local-stream-connect is triggered, the currently stored session in the room ' +
+                'would be in starting state'
+            );
+        }
 
         sid = chatRoom.callSession.sid;
         callSession = chatRoom.callSession

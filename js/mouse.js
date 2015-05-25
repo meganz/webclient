@@ -81,8 +81,8 @@ function mouseMoveEntropy(e) {
         }
     }
 
-    if (!mouseApiRetryT || mouseApiRetryT < new Date().getTime()) {
-        mouseApiRetryT = new Date().getTime() + 2000;
+    if (!mouseApiRetryT || mouseApiRetryT < lastactive) {
+        mouseApiRetryT = lastactive + 2000;
         api_retry();
     }
 }

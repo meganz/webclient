@@ -1,527 +1,595 @@
-if (!window.indexedDB) {
-    window.indexedDB = window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
+var mDBact, mDBv = 7, mDB, mSDB, mSDBPromises = [];
+
+/**
+ *  @brief Dynamic wrapper around MegaDB which eases handling
+ *         indexedDBs whose purpose is storing plain objects
+ *         with no indexes and loaded in bulk at startup.
+ *
+ *  @param [string]   aName      Database name.
+ *  @param [mixed]    aOptions   MegaDB Options (optional)
+ *  @param [function] aCallback  Callback to invoke when the db
+ *                               is ready to use (optional)
+ *
+ *  @details The schema is created at runtime by calling the function
+ *           addSchemaHandler. If there is no callback provided on the
+ *           constructor a mBroadcaster event will be dispatched with
+ *           the DB name, ie mStorageDB:dbname, when it's ready to use.
+ *           The version is automatically handled by computing a
+ *           MurmurHash3 for the schema, and increased as it changes.
+ *
+ *  @example
+ *       mStorageDB('myDataBase', function(aError) {
+ *           if (aError) throw new Error('Database error');
+ *
+ *           this.add('myTable', {
+ *               name: 'John Doe', age: 49, car: 'Volvo'
+ *           }).then(function() {
+ *               console.log('Item inserted successfully');
+ *           });
+ *       }).addSchemaHandler('myTable', 'name', function(results) {
+ *           results.forEach(function(who) {
+ *               console.debug('Meet ' + who.name);
+ *           })
+ *       });
+ */
+function mStorageDB(aName, aOptions, aCallback) {
+    if (!(this instanceof mStorageDB)) {
+        return new mStorageDB(aName, aOptions, aCallback);
+    }
+    if (typeof aOptions === 'function') {
+        aCallback = aOptions;
+        aOptions = undefined;
+    }
+    this.name     = aName;
+    this.options  = aOptions;
+    this.handlers = {};
+    this.schema   = {};
+    mSDBPromises.push(this);
+    this.onReadyState = aCallback;
 }
-if (!window.IDBKeyRange) {
-    window.IDBKeyRange = window.webkitIDBKeyRange || window.msIDBKeyRange;
-}
-if (!window.IDBTransaction) {
-    window.IDBTransaction = window.webkitIDBTransaction || window.OIDBTransaction || window.msIDBTransaction;
-}
+mStorageDB.prototype = {
+    addSchemaHandler: function mStorageDB_addSchemaHandler(aTable, aKeyPath, aHandler) {
+        this.schema[aTable] = {
+            key: {
+                keyPath: aKeyPath
+            }
+        };
+        this.handlers[aTable] = aHandler;
+        return this;
+    },
 
-var mDBact, mDBv = 7;
+    query: function mStorageDB_query(aCommand, aTable, aData) {
+        var promise, error;
 
-// Turn off IndexedDB on mega.nz for now (need to investigate inconsistencies)
-if (0 && indexedDB) {
-    var mDB = 1;
-    var request;
-    var mDBloaded;
-    var mDBStartError;
+        if (this.schema[aTable]) {
+            if (d) console.log('msdb query', this.name, aCommand, aTable, aData);
 
-    function mDBfetch() {
-        if (d) {
-            console.log('mDBfetch()');
-        }
-        mDBcount('f', function(c) {
-            if (c == 0) {
-                delete localStorage[u_handle + '_mDBcount'];
-                mDBt = {};
-                mDBqueue = {};
-                loadfm();
+            if (aCommand === 'add') {
+                promise = this.db.addOrUpdate(aTable, aData);
+            }
+            else if (aCommand === 'del') {
+                promise = this.db.remove(aTable, aData);
             }
             else {
-                mDBreload();
-            }
-        });
-    }
-
-    function mDBactive(act) {
-        if (act !== mDBact) {
-            return;
-        }
-        localStorage[u_handle + '_mDBactive'] = Date.now();
-        setTimeout(mDBactive, 2000, act);
-    }
-
-    function mDBstart() {
-        function rOnError(event) {
-            if (d) {
-                console.log('mDB error', event);
-            }
-            if (mDB) {
-                mDB = undefined;
-                loadfm();
+                error = Error("Unknown command '"+aCommand+"'");
             }
         }
-
-        if (localStorage[u_handle + '_mDBactive']
-                && parseInt(localStorage[u_handle + '_mDBactive']) + 4000 > Date.now()) {
-            if (d) {
-                console.log('existing mDB session, fetch live data');
-            }
-            mDB = undefined;
-            loadfm();
-            return;
-        }
-        mDBact = Math.random();
-        mDBactive(mDBact);
-        loadingDialog.show();
-
-        if (d) {
-            console.log('mDBstart()');
+        else {
+            error = Error("Unknown table '"+aTable+"' for db " + this.name);
         }
 
-        setTimeout(function() {
-            if (mDB === 1) {
-                if (d) {
-                    console.log('mDBstart timeout (2000ms), fetching live data');
-                }
-                mDB = undefined;
-                loadfm();
-            }
-        }, 2000);
-
-        try {
-            request = indexedDB.open("MEGA_" + u_handle, 2);
+        if (error) {
+            promise = new MegaPromise();
+            Soon(function __msdb_queryError() {
+                promise.reject(error);
+            });
         }
-        catch (e) {
-            if (!mDBStartError) {
-                console.error('mDB.open error', e);
-                mDBreload();
-            }
-            else {
-                rOnError(e);
-            }
-            mDBStartError = 1;
-            return;
+        return promise;
+    },
+
+    setup: function mStorageDB_setup() {
+        this.dbtag  = 'msdb_' + this.name + '_' + u_handle + '_';
+        var version = +localStorage[this.dbtag + 'v'] || 0;
+        var oldHash = +localStorage[this.dbtag + 'hash'];
+        var newHash = MurmurHash3(JSON.stringify(this.schema), 0x9e450134);
+        var promise = new MegaPromise(), self = this, db;
+
+        if (oldHash !== newHash) {
+            localStorage[this.dbtag + 'v'] = ++version;
+            localStorage[this.dbtag + 'hash'] = newHash;
         }
-        mDBStartError = 0;
-        request.onerror = rOnError;
-        request.onblocked = function(event) {
-            if (d) {
-                console.log('mDB blocked', event);
-            }
-            if (mDB) {
-                mDB = undefined;
-                loadfm();
-            }
+
+        // MegaDB's encryption plugin depends on u_privk
+        if (u_privk) {
+
+            db = new MegaDB(this.name, u_handle, version, this.schema, this.options);
+
+            db.bind('onDbStateReady', function _onDbStateReady() {
+                self.fetch(Object.keys(self.schema))
+                    .then(function() {
+                        __dbNotifyCompletion();
+                    }, function() {
+                        __dbNotifyCompletion(true);
+                    });
+            });
+
+            db.bind('onDbStateFailed', function _onDbStateFailed() {
+                if (d) console.error('onDbStateFailed', arguments);
+                __dbNotifyCompletion(true);
+            });
         }
-        request.onsuccess = function(event) {
-            if (!mDB) {
-                return false;
-            }
-            mDB = request.result;
-            if (localStorage[u_handle + '_mDBcount']
-                    && (!localStorage[u_handle + '_mDBv'] || parseInt(localStorage[u_handle + '_mDBv']) < mDBv)) {
-                if (d) {
-                    console.log('mDB version change, fetch live site for new mDB');
-                }
-                localStorage[u_handle + '_mDBv'] = mDBv;
-                mDBact = false;
-                mDBreload();
-                return false;
-            }
-            if (d) {
-                console.log('mDB success');
-            }
-            if (localStorage[u_handle + '_mDBcount']
-                    && localStorage[u_handle + '_mDBcount'] == 0 && localStorage[u_handle + '_maxaction']) {
-                mDBcount('f', function(c) {
-                    if (c == 0) {
-                        mDBfetch();
-                    }
-                    else {
-                        loadingDialog.show();
-                        mDBquery('ok');
-                    }
-                });
-            }
-            else {
-                if (d) {
-                    console.log('fetching live data');
-                }
-                mDBfetch();
-            }
-
-        };
-        request.onupgradeneeded = function(event) {
-            if (d) {
-                console.log('onupgradeend');
-            }
-            var db = event.target.result;
-            db.createObjectStore("f",   { keyPath: "h"});
-            db.createObjectStore("ok",  { keyPath: "h"});
-            db.createObjectStore("s",   { keyPath: "h_u"});
-            db.createObjectStore("u",   { keyPath: "u"});
-            db.createObjectStore("opc", { keyPath: "p"});
-            db.createObjectStore("ipc", { keyPath: "p"});
-            db.createObjectStore("ps",  { keyPath: "p"});
-        };
-    }
-
-    var mDBqueue = {};
-
-    function mDBadd(t, n) {
-        var a = n;
-        if (a.name && a.p !== 'contacts') {
-            delete a.name;
+        else {
+            Soon(__dbNotifyCompletion.bind(null, true));
         }
-        if (a.ar && a.p !== 'contacts') {
-            delete a.ar;
+
+        function __dbNotifyCompletion(aError) {
+            if (aError) {
+                self.db = null;
+                promise.reject(aError);
+            } else {
+                promise.resolve();
+            }
+            if (self.onReadyState) {
+                Soon(self.onReadyState.bind(self, aError));
+                delete self.onReadyState;
+            }
+            if (db) {
+                db.unbind('onDbStateReady').unbind('onDbStateFailed');
+            }
+            mBroadcaster.sendMessage('mStorageDB:' + self.name, aError);
+            promise = newHash = oldHash = version = db = self = undefined;
         }
-        if (a.key) {
-            delete a.key;
+
+        this.db = db;
+        this.add = this.query.bind(this, 'add');
+        this.del = this.query.bind(this, 'del');
+
+        return promise;
+    },
+
+    fetch: function mStorageDB_fetch(aTables, aPromise) {
+        var t = aTables.shift(), self = this;
+        if (d) console.log('msdb fetch', t);
+
+        if (!aPromise) {
+            aPromise = new MegaPromise();
         }
-        mDBaddQueue(t, {
-            a: a
-        });
-    }
 
-    var Qt;
-    var mDBt = {};
-    var mDBi = {};
+        if (t) {
+            this.db.query(t)
+                .execute()
+                .then(function _fetchDone(results) {
+                    if (d) console.log('msdb fetch done', t, results);
 
-    function mDBprocess() {
-        if (!Qt) {
-            Qt = new Date().getTime();
-        }
-        for (var t in mDBqueue) {
-            if (!mDBi[t]) {
-                mDBi[t] = 0;
-            }
-            while (mDBi[t] < mDBqueue[t].length) {
-                if (mDBt.t !== t) {
-                    mDBt.t = t;
-                    mDBt.transation = mDB.transaction([t], "readwrite");
-                    mDBt.objectStore = mDBt.transation.objectStore(t);
-                }
-                var q = mDBqueue[t][mDBi[t]++];
-
-                if (mDBi[t] == mDBqueue[t].length) {
-                    delete mDBqueue[t];
-                    delete mDBi[t];
-                }
-
-                if (q) {
-                    var cmd = q.a ? 'put' : 'delete';
-                    var request = mDBt.objectStore[cmd](q.d || q.a);
-                    request.onsuccess = function(event) {
-                        if (parseInt(localStorage[u_handle + '_mDBcount']) > 0) {
-                            localStorage[u_handle + '_mDBcount']--;
-                        }
-                        mDBprocess();
-                    };
-                    request.onerror = function(event) {
-                        if (d) {
-                            console.log('error', event);
-                        }
-                        mDBprocess();
-                    };
-                    return;
-                }
-            }
-        }
-        if (d) {
-            console.log('Qt', Qt - new Date().getTime());
-        }
-        mDBt = {};
-        mDBqueue = {};
-    }
-
-    function mDBaddQueue(t, obj) {
-        if (!localStorage[u_handle + '_mDBcount']) {
-            localStorage[u_handle + '_mDBcount'] = 0;
-        }
-        localStorage[u_handle + '_mDBcount']++;
-        if (!mDBqueue[t]) {
-            mDBqueue[t] = [];
-        }
-        mDBqueue[t].push(obj);
-        if (!mDBt.t) {
-            mDBprocess();
-        }
-    }
-
-    if (typeof safari !== 'undefined') {
-        var mDBprocess = function _Safari_mDBprocess() {
-            function __mDBIterate(t, act, queue) {
-                function __mDBNext() {
-                    var e = queue.shift();
-                    if (e) {
-                        try {
-                            var r = objectStore[act](e);
-                        }
-                        catch (ex) {
-                            // if (d) console.error('objectStore', ex);
-                            delete mDBt.t;
-                            queue.unshift(e);
-                            return __mDBIterate(t, act, queue);
-                        }
-                        if (r) {
-                            r.onsuccess = function() {
-                                if (parseInt(localStorage[u_handle + '_mDBcount']) > 0) {
-                                    localStorage[u_handle + '_mDBcount']--;
-                                }
-                                // if (d) console.log('__mDBNext.success');
-                                if ((queue.length % 80) == 0) {
-                                    Soon(__mDBNext);
-                                }
-                                else {
-                                    __mDBNext();
-                                }
-                            };
-                            r.onerror = function(err) {
-                                if (d) {
-                                    console.log('__mDBNext.error', err);
-                                }
-                                Later(__mDBNext);
-                            };
-                            return;
-                        }
-                    }
-
-                    Soon(mDBprocess);
-                }
-                // if (d) console.log('__mDBIterate', arguments);
-
-                if (mDBt.t !== t) {
-                    mDBt.t = t;
-                    mDBt.transation = mDB.transaction([t], "readwrite");
-                }
-                var objectStore = mDBt.transation.objectStore(t);
-                __mDBNext();
-            }
-
-            for (var t in mDBqueue) {
-                var q = mDBqueue[t];
-
-                for (var a in q) {
-                    __mDBIterate(t, a, q[a]);
-                    delete mDBqueue[t][a];
-                    return;
-                }
-            }
-
-            if (d) {
-                console.timeEnd('mDBprocess');
-            }
-            mDBt = {};
-            mDBqueue = {};
-        };
-        var mDBaddQueue = function _Safari_mDBaddQueue(t, obj) {
-            if (!localStorage[u_handle + '_mDBcount']) {
-                localStorage[u_handle + '_mDBcount'] = 0;
-            }
-            localStorage[u_handle + '_mDBcount']++;
-
-            var act = obj.d ? 'delete' : 'put';
-            if (!mDBqueue[t]) {
-                mDBqueue[t] = {};
-            }
-            if (!mDBqueue[t][act]) {
-                mDBqueue[t][act] = [];
-            }
-            mDBqueue[t][act].push(obj.d || obj.a);
-
-            if (mDBt.stc) {
-                clearTimeout(mDBt.stc);
-            }
-            mDBt.stc = setTimeout(function() {
-                if (!mDBt.t) {
-                    if (d) {
-                        console.time('mDBprocess');
-                    }
-                    mDBprocess();
-                }
-                delete mDBt.stc;
-            }, 3100);
-        };
-    }
-
-    function mDBdel(t, id) {
-        mDBaddQueue(t, {
-            d: id
-        });
-    }
-
-    function mDBcount(t, callback) {
-        var request = mDB.transaction([t], "readwrite").objectStore(t).count();
-        request.onsuccess = function(event) {
-            if (d) {
-                console.log('mDBcount', event.target.result);
-            }
-            if (callback) {
-                callback(event.target.result);
-            }
-        };
-        request.onerror = function() {
-            mDBfetch();
-        };
-    }
-
-    function mDBquery(t) {
-        if (d) {
-            console.log('mDBquery()');
-        }
-        var fr, apn = [];
-        var objectStore = mDB.transaction(t, 'readonly').objectStore(t);
-        objectStore.openCursor().onsuccess = function(event) {
-            var rec = event.target.result;
-            if (rec) {
-                var n;
-
-                try {
-                    n = rec.value;
-                }
-                catch (e) {
-                    if (d) {
-                        console.error('mDBquery', t, e);
-                    }
-                }
-
-                if (typeof n === 'undefined') {
-                    fr = true;
-                }
-                else if (t === 'f') {
-                    if (n.sk) {
-                        u_sharekeys[n.h] = crypto_process_sharekey(n.h, n.sk);
-                    }
-                    apn.push(n);
-                }
-                else if (t === 'ok') {
-                    process_ok([n]);
-                }
-                else if (t === 'u') {
-                    M.addUser(n, 1);
-                }
-                else if (t === 's') {
-                    M.nodeShare(n.h, n, 1);
-                }
-                else if (t === 'opc') {
-                    M.addOPC(n, 1);
-                }
-                else if (t === 'ipc') {
-                    M.addIPC(n, 1);
-                }
-                else if (t === 'ps') {
-                    M.addPS(n, 1);
-                }
-                rec.continue();
-            }
-            else if (fr) {
-                if (d) {
-                    console.log('mDBquery: forcing reload');
-                }
-                mDBreload();
-            }
-            else {
-                if (d) {
-                    console.log('mDBloaded', t);
-                }
-                mDBloaded[t] = 1;
-
-                function __mDB_Next() {
-                    for (var dbt in mDBloaded) {
-                        if (mDBloaded[dbt] == 0) {
-                            mDBquery(dbt);
-                            return false;
-                        }
-                    }
-                    maxaction = localStorage[u_handle + '_maxaction'];
-                    for (var i in M.d) {
-                        var entries = true;
-                        break;
-                    }
-                    if (!maxaction || typeof entries == 'undefined') {
-                        mDBreload();
-                    }
-                    else {
-                        getsc(1);
-                    }
-                }
-                if (apn.length) {
-                    $.mDBIgnoreDB = true;
-                    process_f(apn, function(hasMissingKeys) {
-                        delete $.mDBIgnoreDB;
-                        if (hasMissingKeys) {
-                            mDBreload();
+                    if (results.length) {
+                        if (self.handlers[t]) {
+                            try {
+                                self.handlers[t](results, true);
+                            }
+                            catch(ex) {
+                                if (d) console.error(ex);
+                            }
                         }
                         else {
-                            __mDB_Next();
+                            console.error('No handler for table', t);
                         }
-                    }, 1);
+                    }
+                    self.fetch(aTables, aPromise);
+                }, function _fetchFail() {
+                    if (d) console.log('msdb fetch failed', t);
+                    aPromise.reject.apply(aPromise, arguments);
+                });
+        } else {
+            aPromise.resolve();
+        }
+
+        return aPromise;
+    }
+};
+
+mBroadcaster.once('startMega', function __idb_setup() {
+    if (!window.indexedDB) {
+        window.indexedDB = window.webkitIndexedDB || window.msIndexedDB || window.mozIndexedDB;
+    }
+    if (!window.IDBKeyRange) {
+        window.IDBKeyRange = window.webkitIDBKeyRange || window.msIDBKeyRange;
+    }
+    if (!window.IDBTransaction) {
+        window.IDBTransaction = window.webkitIDBTransaction || window.OIDBTransaction || window.msIDBTransaction;
+    }
+    if (indexedDB) {
+        mDB = 0x7f;
+    }
+});
+
+mBroadcaster.once('startMega', function __msdb_init() {
+    var db = new mStorageDB('msmain');
+
+    db.addSchemaHandler( 'ipc',  'p',  processIPC );
+    db.addSchemaHandler( 'opc',  'p',  processOPC );
+    db.addSchemaHandler( 'ps',   'p',  processPS  );
+
+    mBroadcaster.once('mStorageDB:' + db.name,
+        function __msdb_ready(aError) {
+            if (d) console.log('mStorageDB.ready', !aError);
+            if (aError) {
+                mSDB = db = undefined;
+            }
+        });
+
+    mBroadcaster.once('mFileManagerDB.done',
+        function __msdb_setup(aCallback) {
+            var promises = mSDBPromises
+                    .map(function(aDBInstance) {
+                        return aDBInstance.setup();
+                    });
+            MegaPromise.allDone(promises).always(
+                function __msdb_done() {
+                    if (aCallback === getsc) {
+                        getsc(1);
+                    } else {
+                        aCallback();
+                    }
+                    mBroadcaster.sendMessage('mStorageDB!ready');
+                });
+            mSDBPromises = undefined;
+        });
+
+    mBroadcaster.addListener('mFileManagerDB.state',
+        function __msdb_state(aState) {
+            if (aState === mFileManagerDB.STATE_READONLY) {
+                mSDB = undefined;
+            } else {
+                mSDB = db;
+            }
+        });
+});
+
+var mFileManagerDB = {
+    schema: {
+        ok: { key: { keyPath: "h"   }},
+        s:  { key: { keyPath: "h_u" }},
+        u:  { key: { keyPath: "u"   }},
+        f:  { key: { keyPath: "h"   }}
+    },
+    version: 1,
+
+    init: function mFileManagerDB_init() {
+        var db = new MegaDB("fm", u_handle, this.version, this.schema, {plugins: {}});
+
+        if (mBroadcaster.crossTab.master) {
+            db.bind('onDbStateReady', function _onDbStateReady() {
+                if (d) console.log('onDbStateReady', arguments);
+
+                var oldVersion = +localStorage['fmdbv_' + u_handle] || this.currentVersion;
+                localStorage['fmdbv_' + u_handle] = this.currentVersion;
+
+                if (oldVersion < this.currentVersion) {
+                    if (d) console.log('fmdb version change');
+                    mFileManagerDB.reload();
+                }
+                else if (+localStorage['fmdblock_' + u_handle]) {
+                    if (d) console.log('fmdb is locked');
+                    mFileManagerDB.reload();
                 }
                 else {
-                    __mDB_Next();
+                    mDB = this;
+                    if (localStorage[u_handle + '_maxaction']) {
+                        if (d) console.time('fmdb');
+                        mFileManagerDB.fetch(Object.keys(mFileManagerDB.schema));
+                    } else {
+                        mFileManagerDB._loadfm(this);
+                    }
                 }
-            }
-        };
-    }
-
-    function mDBclear(callback) {
-        if (mDB && mDB.close) {
-            mDB.close();
+            });
         }
-        var dbreq = indexedDB.deleteDatabase("MEGA_" + u_handle);
-        dbreq.callback = callback;
-        dbreq.onsuccess = function() {
-            DEBUG('dB deleted');
-            if (dbreq.callback) {
-                dbreq.callback();
-            }
-        };
-    }
-
-    function mDBreload() {
-        if (mDB && mDB.close) {
-            mDB.close();
-        }
-        mDB = 2;
-        setTimeout(function() {
-            if (mDB === 2) {
+        else {
+            db.bind('onDbStateReady', function _onDbStateReady() {
                 if (d) {
-                    console.log('mDBreload timeout (2000ms), fetching live data');
+                    console.log('onDbStateReady.slave', arguments);
+                    console.time('fmdb');
                 }
-                mDB = undefined;
+                mFileManagerDB.fetch(Object.keys(mFileManagerDB.schema));
+            });
+            this.slave = true;
+        }
+
+        db.bind('onDbStateFailed', function _onDbStateFailed() {
+            if (d) console.error('onDbStateFailed', arguments);
+            mFileManagerDB._loadfm();
+        });
+
+        this.db = db;
+        this.state = this.STATE_WORKING;
+    },
+
+    fetch: function mFileManagerDB_fetch(aTables) {
+        var t = aTables.shift();
+        if (d) console.log('fmdb fetch', t);
+
+        if (t) {
+            this.db.query(t)
+                .execute()
+                .then(function _fetchDone(results) {
+                    if (d) console.log('fmdb fetch done', t, results);
+
+                    if (!results.length) {
+                        mFileManagerDB.fetch(aTables);
+                    }
+                    else if (t === 'f') {
+                        for (var i in results) {
+                            if (results[i].sk) {
+                                var n = results[i];
+                                u_sharekeys[n.h] = crypto_process_sharekey(n.h, n.sk);
+                            }
+                        }
+                        $.mDBIgnoreDB = true;
+                        process_f(results, function(hasMissingKeys) {
+                            delete $.mDBIgnoreDB;
+                            if (hasMissingKeys) {
+                                mFileManagerDB.reload();
+                            } else {
+                                mFileManagerDB.fetch(aTables);
+                            }
+                        }, 1);
+                    }
+                    else {
+                        if (t === 'ok') {
+                            process_ok(results, 1);
+                        }
+                        else if (t === 'u') {
+                            for (var i in results) {
+                                M.addUser(results[i], 1);
+                            }
+                        }
+                        else if (t === 's') {
+                            for (var i in results) {
+                                M.nodeShare(results[i].h, results[i], 1);
+                            }
+                        }
+                        else {
+                            console.error('Unknown table', t);
+                        }
+                        mFileManagerDB.fetch(aTables);
+                    }
+                }, function _fetchFail() {
+                    if (d) console.log('fmdb fetch failed', t);
+
+                    if (mFileManagerDB.slave) {
+                        mFileManagerDB._loadfm();
+                    } else {
+                        mFileManagerDB._restart();
+                    }
+                });
+        }
+        else {
+            var hasEntries = false;
+            maxaction = localStorage[u_handle + '_maxaction'];
+
+            for (var i in M.d) {
+                hasEntries = true;
+                break;
+            }
+
+            if (d) {
+                console.timeEnd('fmdb');
+                console.log('fmdb fetch completed', maxaction, hasEntries);
+            }
+
+            if (!maxaction || !hasEntries) {
+                if (this.slave) {
+                    this._loadfm();
+                } else {
+                    this.reload();
+                }
+            }
+            else {
+                this._setstate(this.db);
+                mBroadcaster.sendMessage('mFileManagerDB.done', getsc);
+            }
+        }
+    },
+
+    query: function mFileManagerDB_query(aCommand, aTable, aData) {
+        if (!this.db) {
+            throw new Error("No database connection.");
+        }
+        else if (this.schema[aTable]) {
+            var u_handle = this.db.suffix, promise;
+            var l = (+localStorage['fmdblock_' + u_handle] | 0) + 1;
+            localStorage['fmdblock_' + u_handle] = l;
+
+            if (d) console.log('fmdb query', aCommand, aTable, aData, l);
+
+            if (aCommand === 'add') {
+                promise = this.db.server.update(aTable, aData);
+            } else {
+                promise = this.db.server.remove(aTable, aData);
+            }
+
+            promise.then(function() {
+                var l = (+localStorage['fmdblock_' + u_handle] | 0) - 1;
+                localStorage['fmdblock_' + u_handle] = l;
+                if (d) console.log('fmdb lock', l);
+            });
+        } else {
+            throw new Error('Unknown fmdb table: ' + aTable);
+        }
+    },
+
+    exec: function mFileManagerDB_exec(aFunc) {
+        var db = this.db, promise = new MegaPromise();
+
+        if (d) console.log('mFileManagerDB.exec', aFunc, db);
+
+        if (db && db.dbState !== MegaDB.DB_STATE.CLOSED) {
+            var u_handle = db.suffix;
+
+            if (typeof db[aFunc] === 'function') {
+                var expunge = aFunc === 'drop' || aFunc === 'close';
+
+                try {
+                    db[aFunc]()
+                        .done(function() {
+                            promise.resolve();
+                        }).fail(function(e) {
+                            if (expunge) {
+                                localStorage['fmdblock_' + u_handle] = 0xDEAD;
+                            }
+                            promise.reject(e);
+                        });
+                } catch(e) {
+                    promise.reject(e);
+                }
+
+                if (expunge) {
+                    this.state = this.STATE_WAITING;
+                    delete this.db;
+
+                    if (mFileManagerDB.addQueueTimer) {
+                        clearTimeout(mFileManagerDB.addQueueTimer);
+                        delete mFileManagerDB.addQueue;
+                        delete mFileManagerDB.addQueueTimer;
+                        localStorage['fmdblock_' + u_handle] = 0xBADF;
+                    }
+                }
+            }
+            else {
+                promise.reject('INVALID');
+            }
+        }
+        else {
+            promise.reject('CLOSED');
+        }
+
+        return promise;
+    },
+
+    reload: function mFileManagerDB_reload() {
+        if (this.db) {
+            this.db.drop()
+                .then(function _dropDone() {
+                    if (d) console.log('fmdb dropped');
+                    mFileManagerDB._restart();
+                }, function _dropFail() {
+                    if (d) console.log('fmdb drop failed');
+                    mFileManagerDB._loadfm();
+                });
+            delete this.db;
+        } else {
+            mFileManagerDB._restart();
+        }
+    },
+
+    _restart: function mFileManagerDB__restart() {
+        delete localStorage['fmdblock_' + u_handle];
+        delete localStorage[u_handle + '_maxaction'];
+        this.init();
+    },
+
+    _loadfm: function mFileManagerDB__loadfm(aDBInstance) {
+        this._setstate(aDBInstance);
+        mBroadcaster.sendMessage('mFileManagerDB.done', loadfm) || loadfm();
+    },
+
+    _setstate: function mFileManagerDB__setstate(aDBInstance) {
+        if (!aDBInstance) {
+            this.state = this.STATE_FAILED;
+            mDB = undefined;
+        }
+        else if (!mBroadcaster.crossTab.master) {
+            if (d) console.log('existing mDB session, read-only mode.');
+            this.state = this.STATE_READONLY;
+            mDB = undefined;
+        }
+        else {
+            this.state = this.STATE_READY;
+            mDB = aDBInstance;
+        }
+        mBroadcaster.sendMessage('mFileManagerDB.state', this.state);
+    },
+
+    state: 0,
+    STATE_WAITING:  0,
+    STATE_WORKING:  1,
+    STATE_READONLY: 2,
+    STATE_READY:    4,
+    STATE_FAILED:   8
+};
+
+function mDBstart(aSlave) {
+    switch(mFileManagerDB.state) {
+        case mFileManagerDB.STATE_READONLY:
+            if (aSlave) {
+                mFileManagerDB.
+                    _setstate(mFileManagerDB.db);
+            }
+            break;
+        case mFileManagerDB.STATE_WAITING:
+            mFileManagerDB.init();
+        case mFileManagerDB.STATE_READY:
+        case mFileManagerDB.STATE_WORKING:
+            if (!aSlave) {
+                if (loadfm.loaded) {
+                    loadfm();
+                }
+                else if (is_fm()) {
+                    loadingDialog.show();
+                }
+            }
+            break;
+        case mFileManagerDB.STATE_FAILED:
+            if (!aSlave) {
                 loadfm();
             }
-        }, 2000);
-        var dbreq = indexedDB.deleteDatabase("MEGA_" + u_handle);
-        dbreq.onsuccess = function(event) {
-            if (d) {
-                console.log('db deleted');
-            }
-            mDBrestart();
-        };
-        dbreq.onerror = function(event) {
-            mDBrestart();
-        };
+        default:
+            if (d) console.log('fmdb state', mFileManagerDB.state);
     }
+}
 
-    function mDBrestart() {
-        if (mDB) {
-            delete localStorage[u_handle + '_mDBcount'];
-            delete localStorage[u_handle + '_maxaction'];
-            delete localStorage[u_handle + '_mDBactive'];
-            mDBact = Math.random();
-            mDBcls();
-            Qt = undefined;
-            request = undefined;
-            mDB = 1;
-            mDBstart();
+function mDBadd(t, n) {
+    var a = n;
+    if (a.name && a.p !== 'contacts') {
+        delete a.name;
+    }
+    if (a.ar && a.p !== 'contacts') {
+        delete a.ar;
+    }
+    delete a.key;
+    delete a.seen;
+    // mFileManagerDB.query('add', t, a);
+    if (!mFileManagerDB.addQueue) {
+        mFileManagerDB.addQueue = {};
+    }
+    if (!mFileManagerDB.addQueue[t]) {
+        mFileManagerDB.addQueue[t] = [];
+    }
+    mFileManagerDB.addQueue[t].push(a);
+    if (mFileManagerDB.addQueueTimer) {
+        clearTimeout(mFileManagerDB.addQueueTimer);
+    }
+    mFileManagerDB.addQueueTimer = setTimeout(function() {
+        for (var t in mFileManagerDB.addQueue) {
+            var q = mFileManagerDB.addQueue[t];
+            mFileManagerDB.query('add', t, q);
         }
-    }
+        delete mFileManagerDB.addQueue;
+        delete mFileManagerDB.addQueueTimer;
+    }, 300);
+}
 
-    function mDBcls() {
-        mDBloaded = {
-            'ok' : 0,
-            'u'  : 0,
-            /*'f_sk':0,*/
-            'f'  : 0,
-            's'  : 0,
-            'opc': 0,
-            'ipc': 0,
-            'ps' : 0
-        };
+function mDBdel(t, id) {
+    mFileManagerDB.query('remove', t, id);
+}
+
+function mDBreload() {
+    loadfm.loaded = false;
+    mFileManagerDB.reload();
+}
+
+function mDBcls() {
+    if (typeof mDB === 'object' && mDB.close) {
+        mFileManagerDB.exec('close');
     }
-    mDBcls();
+    mDB = indexedDB ? 0x9e : undefined;
 }

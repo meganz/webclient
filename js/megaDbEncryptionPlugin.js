@@ -52,10 +52,9 @@ var MegaDBEncryption = function(mdbInstance) {
     var simpleEncryptObjFunction = function(table, obj) {
         Object.keys(obj).forEach(function(k) {
             var v = obj[k];
-            if(k == "__origObj") { return; }
-            else if(k == "id") { return; }
+            if(k == "__origObj" || k == "id" ||  k === mdbInstance._getTablePk(table)) { return; }
 
-            if(mdbInstance.schema[table]['indexes'][k]) {
+            if(mdbInstance.schema[table]['indexes'] && mdbInstance.schema[table]['indexes'][k]) {
                 obj[k + "$v"] = stringcrypt.stringEncrypter(JSON.stringify(v), getEncDecKey());
                 obj[k] = hasherFunc(JSON.stringify(v));
             } else {
@@ -83,11 +82,11 @@ var MegaDBEncryption = function(mdbInstance) {
             var decryptedKeys = [];
             Object.keys(obj).forEach(function (k) {
                 var v = obj[k];
-                if (k == "__origObj" || k == "id" || k.substr(-2) == "$v") {
+                if (k == "__origObj" || k == "id" || k.substr(-2) == "$v" || k === mdbInstance._getTablePk(table)) {
                     return;
                 }
 
-                if(mdbInstance.schema[table]['indexes'][k] && obj[k + "$v"] && decryptedKeys.indexOf(k) === -1) {
+                if(mdbInstance.schema[table]['indexes'] && mdbInstance.schema[table]['indexes'][k] && obj[k + "$v"] && decryptedKeys.indexOf(k) === -1) {
                     obj[k] = JSON.parse(stringcrypt.stringDecrypter(obj[k + "$v"], getEncDecKey()));
                     delete obj[k + "$v"];
                     decryptedKeys.push(k);
@@ -100,7 +99,7 @@ var MegaDBEncryption = function(mdbInstance) {
                             obj[k] = JSON.parse(obj[k]);
                         }
                     } catch(e) {
-                        if(e instanceof TypeError) {
+                        if(e instanceof TypeError) { // TypeError is caused when the data stored in the db is NOT encrypted.
                             obj[k] = v;
                         } else {
                             throw e;
@@ -117,14 +116,14 @@ var MegaDBEncryption = function(mdbInstance) {
      * attach those functions to the specific event handlers
      */
     mdbInstance.bind("onBeforeAdd", function(e, table, obj) {
-        //logger.debug("onBeforeAdd: ", table, obj);
+        logger.debug("onBeforeAdd: ", table, obj);
 
         e.returnedValue = [table, clone(obj)];
         simpleEncryptObjFunction(table, e.returnedValue[1]);
     });
 
     mdbInstance.bind("onBeforeUpdate", function(e, table, k, obj, isQuerysetUpdate) {
-        //logger.debug("onBeforeUpdate: ", table, obj);
+        //logger.debug("onBeforeUpdate: ", table, k, obj);
 
         e.returnedValue = [table, k, clone(obj), isQuerysetUpdate];
 
@@ -133,9 +132,8 @@ var MegaDBEncryption = function(mdbInstance) {
         } else {
             simpleDecryptObjFunction(table, e.returnedValue[2]);
         }
-
-
     });
+
     mdbInstance.bind("onDbRead", function(e, table, obj) {
         //logger.debug("onDbRead: ", table, obj);
 
@@ -143,9 +141,11 @@ var MegaDBEncryption = function(mdbInstance) {
             simpleDecryptObjFunction(table, obj);
         } catch(exc) {
             if(exc.message == "data integrity check failed") {
-                logger.warn("data integrity check failed for (will be removed): ", table, obj.id, obj);
-                mdbInstance.server.remove(table, obj.id);
+                logger.error("data integrity check failed for (will be removed): ", table, obj.id, obj);
+                mdbInstance.server.remove(table, obj[mdbInstance._getTablePk(table)]);
                 e.stopPropagation();
+            } else {
+                logger.error("onDbRead failed: ", exc, exc.stack ? exc.stack : undefined);
             }
         }
 
@@ -153,20 +153,24 @@ var MegaDBEncryption = function(mdbInstance) {
     });
 
     mdbInstance.bind("onFilterQuery", function(e, table, filters) {
-        //logger.debug("onFilterQuery: ", table, filters);
+        logger.debug("onFilterQuery: ", table, filters);
         // since filters is an array containing key, value pairs, lets parse them
         for(var i = 0; i<filters.length; i+=2) {
             var k = filters[i];
             var v = filters[i+1];
 
-            if(k == "id") { return; }
+            if(k == mdbInstance._getTablePk(table)) { break; }
 
-            assert(typeof(mdbInstance.schema[table]['indexes'][k]) != 'undefined', 'tried to execute a search ' +
-            'on a field which is not marked as index');
+            assert(
+                (mdbInstance.schema[table]['indexes'] && typeof(mdbInstance.schema[table]['indexes'][k]) != 'undefined') ||
+                mdbInstance._getTablePk(table) != k,
+                'tried to execute a search on a field which is not marked as index'
+            );
 
             filters[i+1] = hasherFunc(JSON.stringify(v));
         };
-        //logger.debug("filters:", filters);
+
+        logger.debug("filters:", filters);
     });
 
     //mdbInstance.bind("onModifyQuery", function(e, table, args) {

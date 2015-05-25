@@ -41,20 +41,49 @@
                     'className': "fm-dialog-button-green feedback-button-send disabled",
                     'callback': function() {
                         self._report.message = self.$textarea.val();
-                        if($('input[name="my_email"]', self.$dialog).attr('checked')) {
-                            self._report.replyEmail = $('input[name="email"]', self.$dialog).val();
+                        if($('input[name="share_uh"]', self.$dialog).attr('checked')) {
+                            self._report.u_handle = u_handle;
+                        }
+
+
+                        var $selectedRating = $('.rate.active', self.$dialog);
+                        if($selectedRating.length === 0) {
+                            return false;
                         }
 
                         var rated = $('.rate.active', self.$dialog)[0].className;
                         rated = rated.replace("rate", "").replace("active", "").replace(/\s+/g, "");
                         self._report.rated = rated;
+                        var dump = JSON.stringify(self._report);
 
-                        megaAnalytics.log(
-                            "feedback",
-                            self._type,
-                            self._report
-                        );
+                        var reportId = MurmurHash3(JSON.stringify(dump), 0x4ef5391a);
+                        api_req({
+                            a: 'clog',
+                            t: "feedbackDialog." + self._type,
+                            id: reportId,
+                            uh: self._report.u_handle ? self._report.u_handle : "",
+                            d: dump
+                        });
 
+                        if(self._report.chatRoomState) {
+                            Object.keys(self._report.chatRoomState).forEach(function(k) {
+                                var v = self._report.chatRoomState[k];
+                                if(v.callSessions && v.callSessions.length > 0) {
+                                    v.callSessions.forEach(function(callSession) {
+                                        if(callSession.callStats) {
+                                            callSession.callStats.forEach(function (cs) {
+                                                api_req({
+                                                    a: 'clog',
+                                                    t: "callStats",
+                                                    id: cs.cid + "_" + cs.isCaller,
+                                                    d: reportId
+                                                });
+                                            })
+                                        }
+                                    });
+                                }
+                            })
+                        }
                         this.hide();
 
                         msgDialog('info', 'Feedback', 'Thank you for your feedback!');
@@ -94,29 +123,8 @@
                 .val('')
                 .hide();
 
-            $('input[name="email"]', self.$dialog)
-                .hide();
-
             $('.stats-button', self.$dialog)
                 .hide();
-
-            $('.reply .checkdiv').rebind('onFakeCheckboxChange.feedbackDialog', function(e, val) {
-                var fnName = val ? "slideDown" : "slideUp";
-
-                $('input[name="email"]', self.$dialog)[fnName]({
-                    duration: 250,
-                    progress: function(anim, progress, remainingMs) {
-                        if(Math.ceil(progress * 100) % 2 === 0) {
-                            self.reposition();
-                        }
-                    },
-                    complete: function() {
-                        $(this)
-                            .select()
-                            .focus();
-                    }
-                });
-            });
 
             $('.stats .checkdiv').rebind('onFakeCheckboxChange.feedbackDialog', function(e, val) {
                 var fnName = val ? "fadeIn" : "fadeOut";
@@ -147,16 +155,12 @@
 
 
 
-            $('input[name="email"]', self.$dialog)
-                .val(M.u[u_handle].m)
-                .trigger('change');
-
             $('input[name="send_stats"]', self.$dialog)
                 .attr('checked', true)
                 .trigger('change');
 
-            $('input[name="my_email"]', self.$dialog)
-                .attr('checked', false)
+            $('input[name="share_uh"]', self.$dialog)
+                .attr('checked', true)
                 .trigger('change');
         });
 

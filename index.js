@@ -87,6 +87,12 @@ function scrollMenu() {
 }
 
 function init_page() {
+    
+    // If they are transferring from mega.co.nz
+    if (page.substr(0, 13) == 'sitetransfer!') {
+        M.transferFromMegaCoNz();
+    }
+
     if (!u_type) {
         $('body').attr('class', 'not-logged');
     }
@@ -216,7 +222,7 @@ function init_page() {
     }
 
     var fmwasinitialized = !!fminitialized;
-    if (u_handle || pfid || folderlink) {
+    if ((u_type === 0 || u_type === 3) || pfid || folderlink) {
 
         if (is_fm()) {
             // switch between FM & folderlinks (completely reinitialize)
@@ -234,7 +240,6 @@ function init_page() {
 
         if (!fminitialized) {
             if (typeof mDB !== 'undefined' && !pfid) {
-                throw 'fix me'; // TODO
                 mDBstart();
             }
             else {
@@ -779,6 +784,8 @@ function init_page() {
             }
         }
 
+        if (d) console.log('Setting up fm...', id, pfid, fmwasinitialized, fminitialized, M.currentdirid);
+
         if (!id && fmwasinitialized) {
             id = M.RootID;
         }
@@ -1035,18 +1042,19 @@ function mLogout() {
             });
         }
         else {
-            // Use the 'Session Management Logout' API call to kill the current session
-            loadingDialog.show();
-            api_req({
-                'a': 'sml'
-            }, {
-                callback: function (result) {
-                    // After the API call, clear other data and reload page
-                    loadingDialog.hide();
+            var finishLogout = function() {
+                if (--step === 0) {
                     u_logout(true);
                     document.location.reload();
                 }
-            });
+            }, step = 1;
+            loadingDialog.show();
+            if (typeof mDB === 'object' && mDB.drop) {
+                step++;
+                mFileManagerDB.exec('drop').always(finishLogout);
+            }
+            // Use the 'Session Management Logout' API call to kill the current session
+            api_req({ 'a': 'sml' }, { callback: finishLogout });
         }
     };
     var cnt = 0;
@@ -1500,89 +1508,95 @@ function topmenuUI() {
             }
         }
     });
+    
+    $('.top-menu-popup .top-menu-item').unbind('click');
     $('.top-menu-popup .top-menu-item').rebind('click', function () {
+        
         $('.top-menu-popup').removeClass('active');
         $('.top-menu-icon').removeClass('active');
-        var c = $(this).attr('class');
-        if (!c) {
-            c = '';
+        
+        var className = $(this).attr('class');
+        if (!className) {
+            className = '';
         }
-        if (c.indexOf('privacycompany') > -1) {
+        if (className.indexOf('privacycompany') > -1) {
             document.location.hash = 'privacycompany';
         }
-        else if (c.indexOf('upgrade-your-account') > -1) {
+        else if (className.indexOf('upgrade-your-account') > -1) {
             document.location.hash = 'pro';
+            return false;
         }
-        else if (c.indexOf('register') > -1) {
+        else if (className.indexOf('register') > -1) {
             document.location.hash = 'register';
         }
-        else if (c.indexOf('login') > -1) {
+        else if (className.indexOf('login') > -1) {
             document.location.hash = 'login';
         }
-        else if (c.indexOf('aboutus') > -1) {
+        else if (className.indexOf('aboutus') > -1) {
             document.location.hash = 'about';
         }
-        else if (c.indexOf('corporate') > -1) {
+        else if (className.indexOf('corporate') > -1) {
             document.location.hash = 'corporate';
         }
-        else if (c.indexOf('megablog') > -1) {
+        else if (className.indexOf('megablog') > -1) {
             document.location.hash = 'blog';
         }
-        else if (c.indexOf('credits') > -1) {
+        else if (className.indexOf('credits') > -1) {
             document.location.hash = 'credits';
         }
-        else if (c.indexOf('chrome') > -1) {
+        else if (className.indexOf('chrome') > -1) {
             document.location.hash = 'chrome';
         }
-        else if (c.indexOf('resellers') > -1) {
+        else if (className.indexOf('resellers') > -1) {
             document.location.hash = 'resellers';
+            return false;
         }
-        else if (c.indexOf('firefox') > -1) {
+        else if (className.indexOf('firefox') > -1) {
             document.location.hash = 'firefox';
         }
-        else if (c.indexOf('mobile') > -1) {
+        else if (className.indexOf('mobile') > -1) {
             document.location.hash = 'mobile';
         }
-        else if (c.indexOf('sync') > -1) {
+        else if (className.indexOf('sync') > -1) {
             document.location.hash = 'sync';
         }
-        else if (c.indexOf('help') > -1) {
+        else if (className.indexOf('help') > -1) {
             document.location.hash = 'help';
         }
-        else if (c.indexOf('contact') > -1) {
+        else if (className.indexOf('contact') > -1) {
             document.location.hash = 'contact';
         }
-        else if (c.indexOf('sitemap') > -1) {
+        else if (className.indexOf('sitemap') > -1) {
             document.location.hash = 'sitemap';
         }
-        else if (c.indexOf('sdk') > -1) {
+        else if (className.indexOf('sdk') > -1) {
             document.location.hash = 'sdk';
         }
-        else if (c.indexOf('doc') > -1) {
+        else if (className.indexOf('doc') > -1) {
             document.location.hash = 'doc';
         }
-        else if (c.indexOf('affiliateterms') > -1) {
+        else if (className.indexOf('affiliateterms') > -1) {
             document.location.hash = 'affiliateterms';
         }
-        else if (c.indexOf('aff') > -1) {
+        else if (className.indexOf('aff') > -1) {
             document.location.hash = 'affiliates';
         }
-        else if (c.indexOf('terms') > -1) {
+        else if (className.indexOf('terms') > -1) {
             document.location.hash = 'terms';
         }
-        else if (c.indexOf('privacypolicy') > -1) {
+        else if (className.indexOf('privacypolicy') > -1) {
             document.location.hash = 'privacy';
         }
-        else if (c.indexOf('copyright') > -1) {
+        else if (className.indexOf('copyright') > -1) {
             document.location.hash = 'copyright';
         }
-        else if (c.indexOf('takedown') > -1) {
+        else if (className.indexOf('takedown') > -1) {
             document.location.hash = 'takedown';
         }
-        else if (c.indexOf('account') > -1) {
+        else if (className.indexOf('account') > -1) {
             document.location.hash = 'fm/account';
         }
-        else if (c.indexOf('refresh') > -1) {
+        else if (className.indexOf('refresh') > -1) {
            stopsc();
            stopapi();
            if (typeof mDB !== 'undefined' && !pfid) {
@@ -1591,13 +1605,13 @@ function topmenuUI() {
               loadfm(true);
            }
         }
-        else if (c.indexOf('languages') > -1) {
+        else if (className.indexOf('languages') > -1) {
             languageDialog();
         }
-        else if (c.indexOf('clouddrive') > -1) {
+        else if (className.indexOf('clouddrive') > -1) {
             document.location.hash = 'fm';
         }
-        else if (c.indexOf('refresh-item') > -1) {
+        else if (className.indexOf('refresh-item') > -1) {
             stopsc();
             stopapi();
             if (typeof mDB !== 'undefined' && !pfid) {
@@ -1606,7 +1620,7 @@ function topmenuUI() {
                 loadfm(true);
             }
         }
-        else if (c.indexOf('logout') > -1) {
+        else if (className.indexOf('logout') > -1) {
             mLogout();
         }
     });
@@ -1681,7 +1695,7 @@ function topmenuUI() {
 
 
     $('.top-head .logo').rebind('click', function () {
-        document.location.hash = typeof u_type !== 'undefined' && +u_type > 2 ? '#fm' : '#index';
+        document.location.hash = typeof u_type !== 'undefined' && +u_type > 2 ? '#fm' : '#start';
     });
 
     var c = $('.fm-dialog.registration-page-success').attr('class');
@@ -1724,15 +1738,16 @@ function topmenuUI() {
 }
 
 function is_fm() {
-    if ((u_type !== false && page === '')
-            || (u_type !== false && page.substr(0, 2) === 'fm')
-            || (u_type !== false && page === 'start')
-            || (u_type !== false && page.substr(0, 7) === 'account') || pfid) {
-        return true;
+    var r = !!pfid;
+
+    if (!r && (u_type !== false)) {
+        r = page === '' || page === 'start' || page === 'index'
+            || page.substr(0, 2) === 'fm' || page.substr(0, 7) === 'account';
     }
-    else {
-        return false;
-    }
+
+    if (d > 1) console.error('is_fm', r, page, hash);
+
+    return r;
 }
 
 function parsepage(pagehtml, pp) {
@@ -1741,10 +1756,7 @@ function parsepage(pagehtml, pp) {
     $('#pageholder').hide();
     $('#startholder').hide();
     megatitle();
-    try {
-        pagehtml = translate(pagehtml);
-    } catch (e) {}
-    pagehtml = pagehtml.replace(/{staticpath}/g, staticpath);
+    pagehtml = translate(''+pagehtml).replace(/{staticpath}/g, staticpath);
     if (document.location.href.substr(0, 19) == 'chrome-extension://') {
         pagehtml = pagehtml.replace(/\/#/g, '/' + urlrootfile + '#');
     }
@@ -1788,8 +1800,13 @@ function parsetopmenu() {
     return top;
 }
 
-window.onhashchange = function () {
+window.onhashchange = function() {
     var tpage = document.location.hash;
+
+    if (typeof gifSlider !== 'undefined') {
+        gifSlider.clear();
+    }
+
     if (silent_loading) {
         document.location.hash = hash;
         return false;
@@ -1842,7 +1859,7 @@ window.onhashchange = function () {
     else {
         init_page();
     }
-}
+};
 
 function languageDialog(close) {
     if (close) {
@@ -1921,8 +1938,5 @@ window.onbeforeunload = function () {
         return l[377];
     }
 
-    if (typeof mDB !== 'undefined' && mDB
-            && mDBact && localStorage[u_handle + '_mDBactive']) {
-        delete localStorage[u_handle + '_mDBactive'];
-    }
+    mBroadcaster.crossTab.leave();
 }

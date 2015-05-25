@@ -1955,6 +1955,8 @@ ChatRoom.prototype.attachNodes = function(ids, message) {
     var self = this;
     message = message || "";
 
+    return MegaPromise.reject(false); // TODO: This is temp disabled, until we get the API to support it.
+
     if (!ids || ids.length === 0) {
         return;
     }

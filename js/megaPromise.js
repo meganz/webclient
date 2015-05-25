@@ -39,10 +39,11 @@ function MegaPromise(fn) {
     return this;
 };
 
-if(typeof(Promise) != "undefined") {
+if(typeof(Promise) !== "undefined") {
     MegaPromise._origPromise = Promise;
 } else {
     MegaPromise._origPromise = undefined;
+    window.Promise = MegaPromise;
 }
 
 /**
@@ -251,7 +252,3 @@ MegaPromise.reject = function() {
 
     return p;
 };
-
-
-// replace the original Promise
-window.Promise = MegaPromise;

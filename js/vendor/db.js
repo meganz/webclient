@@ -10,10 +10,6 @@
 
     var hasOwn = Object.prototype.hasOwnProperty;
 
-    if ( !indexedDB ) {
-        throw 'IndexedDB required';
-    }
-
     var defaultMapper = function (value) {
         return value;
     };
@@ -56,6 +52,12 @@
     var Server = function ( db , name ) {
         var that = this,
             closed = false;
+
+        Object.defineProperty(this, 'idbRequestInstance', {
+            get: function() {
+                return db;
+            }
+        });
 
         this.add = function( table ) {
             if ( closed ) {
@@ -107,7 +109,9 @@
                 transaction.oncomplete = function () {
                     resolve( records , that );
                 };
+                //https://bugzilla.mozilla.org/show_bug.cgi?id=872873
                 transaction.onerror = function ( e ) {
+                    e.preventDefault();
                     reject({ 'records': records , 'reason': e });
                 };
                 transaction.onabort = function ( e ) {
@@ -122,10 +126,9 @@
                 throw 'Database has been closed';
             }
 
-            var records = [];
-            for ( var i = 0 ; i < arguments.length - 1 ; i++ ) {
-                records[ i ] = arguments[ i + 1 ];
-            }
+            var records = Array.isArray(arguments[1])
+                ? arguments[1]
+                : [].slice.call(arguments, 1);
 
             var transaction = db.transaction( table , transactionModes.readwrite ),
                 store = transaction.objectStore( table ),
@@ -309,6 +312,7 @@
                     } else {
                         var matchFilter = true;
                         var result = 'value' in cursor ? cursor.value : cursor.key;
+                        // debugger;
 
                         filters.forEach( function ( filter ) {
                             if ( !filter || !filter.length ) {
@@ -515,7 +519,7 @@
     var dbCache = {};
 
     var db = {
-        version: '0.9.2',
+        version: '0.9.2-modified',
         open: function ( options ) {
             var request;
 
@@ -528,7 +532,18 @@
                     } , options.server , options.version , options.schema )
                         .then(resolve, reject)
                 } else {
-                    request = indexedDB.open( options.server , options.version );
+                    try {
+                        request = indexedDB.open( options.server , options.version );
+                    } catch (e) {
+                        reject({ 'reason': e });
+                        return;
+                    }
+
+                    request.onblocked = function ( e ) {
+                        // If some other tab is loaded with the database,
+                        // then it needs to be closed before we can proceed.
+                        reject({ 'reason': e });
+                    };
 
                     request.onsuccess = function ( e ) {
                         open( e , options.server , options.version , options.schema )

@@ -35,6 +35,9 @@
     "ibrik": "~1.1.1",
     "istanbul": "~0.2.10",
     "jsdoc": "~3.3.0",
+    "jshint": "~2.7.0",
+    "jscs": "~1.13.1",
+    "jscs-jsdoc": "~1.0.1",
     "karma": "~0.12.8",
     "karma-chai": "0.1.0",
     "karma-chai-plugins": "0.2.1",
@@ -43,11 +46,11 @@
     "karma-firefox-launcher": "~0.1.3",
     "karma-html2js-preprocessor": "~0.1.0",
     "karma-jasmine": "~0.1.5",
+    "karma-junit-reporter": "~0.2",
     "karma-mocha": "~0.1.1",
     "karma-phantomjs-launcher": "~0.1.1",
     "karma-script-launcher": "~0.1.0",
     "karma-sinon": "~1.0.3",
-    "karma-junit-reporter": "~0.2",
     "mocha": "~1.17.1",
     "sinon": "~1.9.0"
   }

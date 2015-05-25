@@ -1,38 +1,55 @@
 var fs = require('fs');
 
-module.exports = function(grunt) {
+/* GetFilesFromSecureBoot {{{
+ *
+ *  Read secureboot.js, get information about the Javascripts, how to group them and
+ *  templates info. 
+ *
+ *  Return a hash with rules to build 
+ *
+ *  @return hash
+ */
+function getRulesFromSecureBoot()
+{
+    var content = fs.readFileSync("secureboot.js").toString().split("\n")
 
-    var secure = fs.readFileSync("secureboot.js").toString().split("\n")
+    var htmls = []  /* list of HTML templates */
+        , htmlExtra = []  /* list of HTML templates which are loaded on demand */
+        , js = {}  /* list of JS files */
+        , nlines = []  /* lines of JS, to rebuild secureboot.js */
 
-    /* move to a plugin {{{ */
-    var htmls = [], htmlExtra = [], js = {}, code = [], has = {}
-    secure.forEach(function(l) {
+    content.forEach(function(line) {
         var include = true
-        if (l.match(/f:.+\.js.+g:/)) {
-            eval("var y = " + l.match(/{[^}]+}/)[0])
+        if (line.match(/f:.+\.js.+g:/)) {
+            eval("var y = " + line.match(/{[^}]+}/)[0]);
             if (y.g && y.f) {
-                if (!js[y.g]) js[y.g] = []
-                else include = false
-                js[y.g].push(y.f)
+                if (!js[y.g]) {
+                    js[y.g] = [];
+                } else {
+                    include = false;
+                }
+                js[y.g].push(y.f);
             }
-            l = "/*placeholder-" + y.g + "*/"
-        } else if (l.indexOf(".html") > 1) {
-            if (l.indexOf("jsl.push") > 1) {
-                htmls.push( "build/html/" + l.match(/\/(.+.html)/)[1] )    
-                l = 'jsl.push({f: "html/boot.json", n:"prod_assets_boot", j:9})'
-                include = !has['html']
-                has['html'] = true
-            } else if (l.indexOf(":") > 1) {
-                htmlExtra.push( "build/html/" + l.match(/\/(.+.html)/)[1] )    
-                l = l.replace(/html\/[^\.]+\.html/, "html/extra.json")
-                l = l.replace(/j:[ \t\r]*\d/, "j:9")
+            line = "/*placeholder-" + y.g + "*/"
+        } else if (line.indexOf(".html") > 1) {
+            if (line.indexOf("jsl.push") > 1) {
+                htmls.push( "build/html/" + line.match(/\/(.+.html)/)[1] );
+                line = 'jsl.push({f: "html/boot.json", n:"prod_assets_boot", j:9})';
+                include = !js['html'];
+                js['html'] = true;
+            } else if (line.indexOf(":") > 1) {
+                htmlExtra.push( "build/html/" + line.match(/\/(.+.html)/)[1] ) ;
+                line = line
+                    .replace(/html\/[^\.]+\.html/, "html/extra.json")
+                    .replace(/j:[ \t\r]*\d/, "j:9");
             }
         }
-        if (include) code.push(l)
+        if (include) nlines.push(line)
     });
-    code = code.join("\n")
+    nlines = nlines.join("\n")
 
     var concat = {}, uglify = {}
+    delete js['html']
 
     for (var i in js) {
         concat[i] = {
@@ -46,19 +63,27 @@ module.exports = function(grunt) {
             src: "js/pack-" + i + ".js",
             dest: "js/pack-" + i + ".js",
         }
-        code = code.replace(
+        nlines = nlines.replace(
             "/*placeholder-" + i+"*/", 
             "jsl.push({f:'js/pack-"+i+ ".js', n: 'pack_"+i+"', g:'" + i +"', j:1});"
         )
     }
-    fs.writeFileSync("secureboot.prod.js", code)
-    /* }}} */
+    fs.writeFileSync("secureboot.prod.js", nlines)
+
+    return {concat: concat, uglify: uglify, htmls: htmls, htmlExtra: htmlExtra}
+}
+/* }}} */
+
+module.exports = function(grunt) {
+
+    var rules = getRulesFromSecureBoot()
+
 
     // Project configuration.
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
-        uglify: uglify,
-        concat: concat, 
+        uglify: rules.glify,
+        concat: rules.concat, 
         htmlmin: {
             default_options: {
                 options: {
@@ -72,11 +97,11 @@ module.exports = function(grunt) {
         },
         htmljson: {
             required: {
-                src: htmls,
+                src: rules.htmls,
                 dest: "html/boot.json",
             },
             extra: {
-                src: htmlExtra,
+                src: rules.htmlExtra,
                 dest: "html/extra.json",
             },
         },

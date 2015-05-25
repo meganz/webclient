@@ -858,7 +858,7 @@ var cardDialog = {
         var $expiryYearDropDown = this.$dialog.find('.expiry-date-year');
         
         // Build options
-        for (var year = currentYear; year < endYear; year++) {
+        for (var year = currentYear; year <= endYear; year++) {
             yearOptions += '<option value="' + year + '">' + year + '</option>';
         }
         

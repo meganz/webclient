@@ -993,8 +993,8 @@ function initUI() {
     $('.nw-fm-left-icon').unbind('click');
     $('.nw-fm-left-icon').bind('click', function() {
         treesearch = false;
-        var c = $(this).attr('class');
-        if (!c) {
+        var clickedClass = $(this).attr('class');
+        if (!clickedClass) {
             return;
         }
         if (!fmTabState || fmTabState['cloud-drive'].root !== M.RootID) {
@@ -1006,25 +1006,40 @@ function initUI() {
                 'rubbish-bin':    { root: M.RubbishID, prev: null }
             };
         }
-        var active = (''+$('.nw-fm-left-icon.active:visible')
+        var activeClass = (''+$('.nw-fm-left-icon.active:visible')
             .attr('class')).split(" ").filter(function(c) {
                 return !!fmTabState[c];
-            });
+            })[0];
 
-        active = fmTabState[active];
-        if (active) {
-            if (active.root === M.currentrootid) {
-                active.prev = M.currentdirid;
+        var activeTab = fmTabState[activeClass];
+        if (activeTab) {
+            if (activeTab.root === M.currentrootid) {
+                activeTab.prev = M.currentdirid;
             }
             else if (d) {
-                console.warn('Root mismatch', M.currentrootid, M.currentdirid, active);
+                console.warn('Root mismatch', M.currentrootid, M.currentdirid, activeTab);
             }
         }
 
         for (var tab in fmTabState) {
-            if (~c.indexOf(tab)) {
+            if (~clickedClass.indexOf(tab)) {
                 tab = fmTabState[tab];
-                M.openFolder(tab.prev || tab.root);
+
+                var targetFolder = null;
+
+                // Clicked on the currently active tab, should open the root (e.g. go back)
+                if (~clickedClass.indexOf(activeClass)) {
+                    targetFolder = tab.root;
+                }
+                else if (tab.prev) {
+                    targetFolder = tab.prev;
+                }
+                else {
+                    targetFolder = tab.root
+                }
+
+                M.openFolder(targetFolder);
+
                 break;
             }
         }
@@ -2797,10 +2812,11 @@ function accountUI()
 			}
             else if (account.stype == 'O')
             {
-                // one-time
+                // one-time or cancelled subscription
                 $('.fm-account-header.typetitle').text(l[746]+':');
                 $('.membership-big-txt.type').text(l[751]);
                 $('.membership-medium-txt.expiry').html(l[987] + ' <span class="red">' + time2date(account.expiry) + '</span>');
+                $('.btn-cancel').hide();
             }
         }
         else

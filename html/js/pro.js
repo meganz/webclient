@@ -223,7 +223,7 @@ function initPaymentMethodRadioOptions(html) {
 
     var paymentOptionsList = $('.payment-options-list');
     paymentOptionsList.html(html);
-    paymentOptionsList.find('.payment-method').click(function() {
+    paymentOptionsList.find('.payment-method').rebind('click', function() {
 
         // Remove checked state from all radio inputs
         paymentOptionsList.find('.membership-radio').removeClass('checked');
@@ -283,8 +283,7 @@ function pro_next_step() {
         $(this).find('strong').html(price[$(this).attr('data-months')]);
     });
 
-    $('.membership-st2-select span').unbind('click');
-    $('.membership-st2-select span').bind('click', function ()
+    $('.membership-st2-select span').rebind('click', function ()
     {
         if ($('.membership-st2-select').attr('class').indexOf('active') == -1) {
             $('.membership-st2-select').addClass('active');
@@ -294,8 +293,7 @@ function pro_next_step() {
         }
     });
 
-    $('.membership-dropdown-item').unbind('click');
-    $('.membership-dropdown-item').bind('click', function ()
+    $('.membership-dropdown-item').rebind('click', function ()
     {
         var price = $(this).find('strong').html();
         $('.membership-dropdown-item').removeClass('selected');
@@ -310,8 +308,7 @@ function pro_next_step() {
         updateTextDependingOnRecurring();
     });
     
-    $('.membership-bott-button').unbind('click');
-    $('.membership-bott-button').bind('click',function(e)
+    $('.membership-bott-button').rebind('click',function(e)
     {
         pro_continue(e);
         return false;
@@ -379,7 +376,9 @@ function renderPlanDurationDropDown() {
     $firstOption.addClass('selected');
     
     // Get current plan price
-    var price = $durationSelect.find('span > strong').html().split('.');
+    var planIndex = $firstOption.attr('data-plan-index');
+    var currentPlan = membershipPlans[planIndex];
+    var price = currentPlan[5].split('.');
     var dollars = price[0];
     var cents = price[1];
     
@@ -654,6 +653,9 @@ var cardDialog = {
     $failureOverlay: null,
     $loadingOverlay: null,
     
+    // Flag to prevent accidental double payments
+    paymentInProcess: false,
+    
     // The RSA public key to encrypt data to be stored on the Secure Processing Unit (SPU)
     publicKey: [
         atob(
@@ -731,11 +733,42 @@ var cardDialog = {
         var statePlaceholder = this.$dialog.find('.state-province').attr('placeholder').replace(':', '');
         this.$dialog.find('.state-province').attr('placeholder', statePlaceholder);
         
+        // Reset form if they made a previous payment
+        this.clearPreviouslyEnteredCardData();
+        
         // Initialise the close button
-        this.$dialog.find('.btn-close-dialog').click(function() {
+        this.$dialog.find('.btn-close-dialog').rebind('click', function() {
             cardDialog.$dialogOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
-            cardDialog.$dialog.removeClass('active').addClass('hidden');
+            cardDialog.$dialog.removeClass('active').addClass('hidden');            
+            
+            // Reset flag so they can try paying again
+            cardDialog.paymentInProcess = false;
         });
+    },
+    
+    /**
+     * Clears card data and billing details previously entered
+     */
+    clearPreviouslyEnteredCardData: function() {
+        
+        this.$dialog.find('.first-name').val('');
+        this.$dialog.find('.last-name').val('');
+        this.$dialog.find('.credit-card-number').val('');
+        this.$dialog.find('.cvv-code').val('');
+        this.$dialog.find('.address1').val('');
+        this.$dialog.find('.address2').val('');
+        this.$dialog.find('.city').val('');
+        this.$dialog.find('.state-province').val('');
+        this.$dialog.find('.post-code').val('');
+        
+        this.$dialog.find('.expiry-date-month')[0].selectedIndex = 0;
+        this.$dialog.find('.expiry-date-month').parent().find('.account-select-txt').text(l[913]);
+        
+        this.$dialog.find('.expiry-date-year')[0].selectedIndex = 0;
+        this.$dialog.find('.expiry-date-year').parent().find('.account-select-txt').text(l[932]);
+        
+        this.$dialog.find('.countries')[0].selectedIndex = 0;
+        this.$dialog.find('.countries').parent().find('.account-select-txt').text(l[481]);
     },
     
     /**
@@ -743,15 +776,26 @@ var cardDialog = {
      */
     initPurchaseButton: function() {
         
-        this.$dialog.find('.payment-buy-now').click(function() {
+        this.$dialog.find('.payment-buy-now').rebind('click', function() {
             
-            // Validate the form and normalise the billing details
-            var billingDetails = cardDialog.getBillingDetails();
-            
-            // If no errors, proceed with payment
-            if (billingDetails !== false) {                
-                cardDialog.encryptBillingData(billingDetails);
-            }            
+            // Prevent accidental double click if they've already initiated a payment
+            if (cardDialog.paymentInProcess === false) {
+
+                // Set flag to prevent double click getting here too
+                cardDialog.paymentInProcess = true;
+
+                // Validate the form and normalise the billing details
+                var billingDetails = cardDialog.getBillingDetails();
+
+                // If no errors, proceed with payment
+                if (billingDetails !== false) {                
+                    cardDialog.encryptBillingData(billingDetails);
+                }
+                else {
+                    // Reset flag so they can try paying again
+                    cardDialog.paymentInProcess = false;
+                }
+            }
         });
     },
     
@@ -810,11 +854,11 @@ var cardDialog = {
         
         var yearOptions = '<option value=""></option>';
         var currentYear = new Date().getFullYear();
-        var endYear = currentYear + 7;
+        var endYear = currentYear + 20;                                     // http://stackoverflow.com/q/2500588
         var $expiryYearDropDown = this.$dialog.find('.expiry-date-year');
         
         // Build options
-        for (var year = currentYear; year < endYear; year++) {
+        for (var year = currentYear; year <= endYear; year++) {
             yearOptions += '<option value="' + year + '">' + year + '</option>';
         }
         
@@ -924,12 +968,14 @@ var cardDialog = {
             'expiry_date_year': billingData.expiry_date_year,
             'cv2': billingData.cv2
         });
-        var cardDataHash = sjcl.hash.sha256.hash(cardData);
+        var htmlEncodedCardData = cardDialog.htmlEncodeString(cardData);
+        var cardDataHash = sjcl.hash.sha256.hash(htmlEncodedCardData);
         var cardDataHashHex = sjcl.codec.hex.fromBits(cardDataHash);
 
         // Comes back as byte string, so encode first.
         var jsonEncodedBillingData = JSON.stringify(billingData);
-        var encryptedBillingData = btoa(paycrypt.hybridEncrypt(jsonEncodedBillingData, this.publicKey));
+        var htmlAndJsonEncodedBillingData = cardDialog.htmlEncodeString(jsonEncodedBillingData);
+        var encryptedBillingData = btoa(paycrypt.hybridEncrypt(htmlAndJsonEncodedBillingData, this.publicKey));
 
         // Add credit card, the most recently added card is used by default
         var requestData = {
@@ -941,11 +987,23 @@ var cardDialog = {
             'hash': cardDataHashHex
         };
         
+        // Proceed with payment
         api_req(requestData, {
-            callback: function (res) {    
-                // Proceed with payment
+            callback: function (res) {
                 pro_pay();
             }
+        });
+    },
+    
+    /**
+     * Encode Unicode characters in the string so people with strange addresses can still pay
+     * @param {String} input The string to encode
+     * @returns {String} Returns the encoded string
+     */
+    htmlEncodeString: function(input) {
+        
+        return input.replace(/[\u00A0-\uFFFF<>\&]/gim, function(i) {
+            return '&#' + i.charCodeAt(0) + ';';
         });
     },
     
@@ -991,11 +1049,17 @@ var cardDialog = {
             cardDialog.$dialogOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
             cardDialog.$successOverlay.addClass('hidden');
             
+            // Remove credit card details from the form
+            cardDialog.clearPreviouslyEnteredCardData();
+            
+            // Reset flag so they can try paying again
+            cardDialog.paymentInProcess = false;
+            
             // Make sure it fetches new account data on reload
             if (M.account) {
                 M.account.lastupdate = 0;
             }
-            window.location.hash = 'fm/account';            
+            window.location.hash = 'fm/account';
         });
     },
     
@@ -1015,6 +1079,9 @@ var cardDialog = {
         
         // On click of the 'Try again' or Close buttons, hide the overlay and the user can fix their payment details
         cardDialog.$failureOverlay.find('.payment-result-button, .payment-close').rebind('click', function() {
+            
+            // Reset flag so they can try paying again
+            cardDialog.paymentInProcess = false;
             
             // Hide failure and re-open the dialog
             cardDialog.$failureOverlay.addClass('hidden');
@@ -1166,7 +1233,7 @@ var bitcoinDialog = {
         bitcoinDialog.setCoundownTimer(dialog, expiryTime);
 
         // Close dialog and reset to original dialog
-        dialog.find('.btn-close-dialog').click(function() {
+        dialog.find('.btn-close-dialog').rebind('click', function() {
             
             dialogOverlay.removeClass('bitcoin-invoice-dialog').addClass('hidden');
             dialog.removeClass('bitcoin-invoice-dialog').addClass('hidden').html(dialogOriginalHtml);
@@ -1356,7 +1423,7 @@ var bitcoinDialog = {
         dialog.html(bitcoinProviderFailureHtml);
         
         // Close dialog and reset to original dialog
-        dialog.find('.btn-close-dialog').click(function() {
+        dialog.find('.btn-close-dialog').rebind('click', function() {
             dialogOverlay.removeClass('bitcoin-provider-failure-dialog').addClass('hidden');
             dialog.removeClass('bitcoin-provider-failure-dialog').addClass('hidden').html(dialogOriginalHtml);
         });

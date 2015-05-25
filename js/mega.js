@@ -4160,16 +4160,16 @@ function MegaData()
     this.transferFromMegaCoNz = function()
     {
         var parts = /#sitetransfer!(.*)/.exec(window.location);
+        
         if (parts) {
 
             // Decode from Base64
             parts = JSON.parse(atob(parts[1]));
+            
             if (parts) {
-
                 // If the user is already logged in here with the same account
                 // we can avoid a lot and just take them to the correct page
-                if (JSON.stringify(u_k) === JSON.stringify(parts[0]))
-                {
+                if (JSON.stringify(u_k) === JSON.stringify(parts[0])){
                     window.location.hash = parts[2];
                     return;
                 }
@@ -4180,53 +4180,69 @@ function MegaData()
                     return;
                 }
 
-                // Likely that they have never logged in here before, we must set this.
+                // Likely that they have never logged in here before so we must set this
                 localStorage.wasloggedin = true;
                 u_logout();
 
+                // Set master key, session key and RSA private key
                 u_storage = init_storage(sessionStorage);
                 u_k = parts[0];
                 u_sid = parts[1];
-                var topage = parts[2];
                 u_privk = parts[3];
                 u_storage.k = JSON.stringify(u_k);
                 u_storage.sid = u_sid;
-                u_storage.privk = base64urlencode(crypto_encodeprivkey(u_privk));
-
+                
+                // Set session ID
                 api_setsid(u_sid);
-                var ctx =
-                {
-                    checkloginresult: function(ctx, result)
-                    {
-                        if (m) {
-                            loadingDialog.hide();
-                        }
-                        else {
-                            document.getElementById('overlay').style.display = 'none';
-                        }
+                
+                // Get the page to redirect to
+                var toPage = parts[2];
 
-                        // Check for suspended account
-                        if (result == EBLOCKED) {
-                            alert(l[730]);
-                        }
-                        else if (result)
+                // This won't exist if ephemeral redirect
+                if (u_privk) {
+                    u_storage.privk = base64urlencode(crypto_encodeprivkey(u_privk));
+                
+                    var ctx = {
+                        checkloginresult: function(ctx, result)
                         {
-                            // Set account type and redirect to the requested location (via the hash mechanism)
-                            u_type = result;
-                            window.location.hash = topage;
+                            if (m) {
+                                loadingDialog.hide();
+                            }
+                            else {
+                                document.getElementById('overlay').style.display = 'none';
+                            }
 
+                            // Check for suspended account
+                            if (result == EBLOCKED) {
+                                alert(l[730]);
+                            }
+                            else if (result) {
+                                // Set account type and redirect to the requested location
+                                u_type = result;
+                                window.location.hash = toPage;
+                            }
+                            else {
+                                // Incorrect email or password
+                                alert(l[201]);
+                            }
                         }
-                        else
-                        {
-                            // Incorrect email or password
-                            document.getElementById('login_password').value = '';
-                            alert(l[201]);
-                        }
+                    };
+
+                    // Continue through the log in flow from approximately the correct 
+                    // place given that we have the master key, session ID and private RSA key
+                    u_checklogin3(ctx);
+                }
+                else {
+                    // Otherwise this is an ephemeral account so reload to log them in properly
+                    if (toPage) {
+                        window.location.hash = toPage;
                     }
-                };
-
-                // Continue through the log in flow from approximately the correct place given that we have the master key, SID and privk.
-                u_checklogin3(ctx);
+                    else {
+                        window.location.hash = '';
+                    }
+                    
+                    document.location.reload(false);
+                }
             }
         }
     };

@@ -3,7 +3,6 @@
     "eqeqeq": true,
     "forin": true,
     "freeze": true,
-    "funcscope": true,
     "futurehostile": true,
     "latedef": "nofunc",
     "maxcomplexity": 10,

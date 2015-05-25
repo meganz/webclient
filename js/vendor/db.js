@@ -59,6 +59,23 @@
             }
         });
 
+        this.setUData = function( data, key ) {
+            return this.update('__udata__', {
+                k: key || '__gbl',
+                v: data
+            });
+        };
+
+        this.getUData = function( key ) {
+            var promise = this.query('__udata__').filter('k', key || '__gbl').execute();
+
+            return new Promise(function(resolve, reject) {
+                promise.then(function(results) {
+                    resolve(results && results.length === 1 && results[0].v);
+                }, reject);
+            });
+        };
+
         this.add = function( table ) {
             if ( closed ) {
                 throw 'Database has been closed';
@@ -482,9 +499,6 @@
     };
 
     var createSchema = function ( e , schema , db ) {
-        if ( typeof schema === 'function' ) {
-            schema = schema();
-        }
 
         for ( var tableName in schema ) {
             var table = schema[ tableName ];
@@ -539,6 +553,20 @@
                         return;
                     }
 
+                    var schema = options.schema || {};
+                    if ( typeof schema === 'function' ) {
+                        schema = schema();
+                    }
+                    if (options.UDataSlave) {
+                        schema = clone(schema);
+                        schema['__udata__'] = {
+                            key: { keyPath: 'k' },
+                            indexes: {
+                                k: { unique: true }
+                            }
+                        };
+                    }
+
                     request.onblocked = function ( e ) {
                         // If some other tab is loaded with the database,
                         // then it needs to be closed before we can proceed.
@@ -546,12 +574,12 @@
                     };
 
                     request.onsuccess = function ( e ) {
-                        open( e , options.server , options.version , options.schema )
+                        open( e , options.server , options.version , schema )
                             .then(resolve, reject)
                     };
 
                     request.onupgradeneeded = function ( e ) {
-                        createSchema( e , options.schema , e.target.result );
+                        createSchema( e , schema , e.target.result );
                     };
                     request.onerror = function ( e ) {
                         reject({ 'reason': e });

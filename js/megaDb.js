@@ -25,17 +25,13 @@ function MegaDB(name, suffix, schema, options) {
 
     this.logger = new MegaLogger("megaDB[" + name + "]", {}, options.parentLogger);
 
-    // init code goes here
-    if (this.options.plugins & MegaDB.DB_PLUGIN.ENCRYPTION) {
-        this.plugins.megaDbEncryptionPlugin = new MegaDBEncryption(this);
-    }
-
     var self = this;
     var dbName = 'mdb_' + name + '_' + suffix;
-    var murSeed = options.murSeed || 0x80017700;
+    // var murSeed = options.murSeed || 0x4d444201;
+    var murSeed = options.murSeed || 0xffff0001;            // <-- NEEDS TO BE CHANGED BEFORE MERGING
     var murData =
         JSON.stringify(this.schema) +
-        JSON.stringify(this.options);
+        JSON.stringify(clone(this.options));
 
     var version = +localStorage[dbName + '_v'] || 0;
     var oldHash = +localStorage[dbName + '_hash'];
@@ -46,14 +42,21 @@ function MegaDB(name, suffix, schema, options) {
         localStorage[dbName + '_hash'] = newHash;
     }
 
+    var dbOpenOptions = {
+        server: dbName,
+        schema: schema
+    };
+    if (this.options.plugins & MegaDB.DB_PLUGIN.ENCRYPTION) {
+        this.plugins.megaDbEncryptionPlugin = new MegaDBEncryption(this);
+        dbOpenOptions.UDataSlave = true;
+    }
+
     __dbOpen();
 
     function __dbOpen() {
-        self._dbOpenPromise = db.open({
-            server: dbName,
-            version: version,
-            schema: schema
-        }).then( function( s ) {
+        dbOpenOptions.version = version;
+
+        self._dbOpenPromise = db.open(dbOpenOptions).then( function( s ) {
             self.server = s;
             self.currentVersion = version;
             self.dbState = MegaDB.DB_STATE.INITIALIZED;

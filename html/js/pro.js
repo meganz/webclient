@@ -854,7 +854,7 @@ var cardDialog = {
         
         var yearOptions = '<option value=""></option>';
         var currentYear = new Date().getFullYear();
-        var endYear = currentYear + 7;
+        var endYear = currentYear + 20;                                     // http://stackoverflow.com/q/2500588
         var $expiryYearDropDown = this.$dialog.find('.expiry-date-year');
         
         // Build options
@@ -968,12 +968,14 @@ var cardDialog = {
             'expiry_date_year': billingData.expiry_date_year,
             'cv2': billingData.cv2
         });
-        var cardDataHash = sjcl.hash.sha256.hash(cardData);
+        var htmlEncodedCardData = cardDialog.htmlEncodeString(cardData);
+        var cardDataHash = sjcl.hash.sha256.hash(htmlEncodedCardData);
         var cardDataHashHex = sjcl.codec.hex.fromBits(cardDataHash);
 
         // Comes back as byte string, so encode first.
         var jsonEncodedBillingData = JSON.stringify(billingData);
-        var encryptedBillingData = btoa(paycrypt.hybridEncrypt(jsonEncodedBillingData, this.publicKey));
+        var htmlAndJsonEncodedBillingData = cardDialog.htmlEncodeString(jsonEncodedBillingData);
+        var encryptedBillingData = btoa(paycrypt.hybridEncrypt(htmlAndJsonEncodedBillingData, this.publicKey));
 
         // Add credit card, the most recently added card is used by default
         var requestData = {
@@ -985,11 +987,23 @@ var cardDialog = {
             'hash': cardDataHashHex
         };
         
+        // Proceed with payment
         api_req(requestData, {
-            callback: function (res) {    
-                // Proceed with payment
+            callback: function (res) {
                 pro_pay();
             }
+        });
+    },
+    
+    /**
+     * Encode Unicode characters in the string so people with strange addresses can still pay
+     * @param {String} input The string to encode
+     * @returns {String} Returns the encoded string
+     */
+    htmlEncodeString: function(input) {
+        
+        return input.replace(/[\u00A0-\uFFFF<>\&]/gim, function(i) {
+            return '&#' + i.charCodeAt(0) + ';';
         });
     },
     

@@ -653,6 +653,7 @@ MegaDB.QuerySet.prototype.execute = MegaDB._delayFnCallUntilDbReady(
                 q = self._dequeueOps(q, opName);
             });
 
+        var $proxyPromise = new MegaPromise();
 
         // by using .map trigger an event when an object is loaded, so that the encryption can kick in and decrypt it
         q = q.map(function(r) {
@@ -661,6 +662,9 @@ MegaDB.QuerySet.prototype.execute = MegaDB._delayFnCallUntilDbReady(
             if(!$event.isPropagationStopped()) {
                 return r;
             } else {
+                if($event.data && $event.data.errors && $event.data.errors.length > 0) {
+                    $proxyPromise.reject($event.data.errors);
+                }
                 return undefined;
             }
         });
@@ -670,8 +674,6 @@ MegaDB.QuerySet.prototype.execute = MegaDB._delayFnCallUntilDbReady(
         q = self._dequeueOps(q, "map");
         q = self._dequeueOps(q, "modify");
 
-
-        var $proxyPromise = new MegaPromise();
 
         q.execute()
             .then(function(r) {

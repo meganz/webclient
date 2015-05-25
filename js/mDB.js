@@ -103,8 +103,8 @@ mStorageDB.prototype = {
                 self.fetch(Object.keys(self.schema))
                     .then(function() {
                         __dbNotifyCompletion();
-                    }, function() {
-                        __dbNotifyCompletion(true);
+                    }, function(err) {
+                        __dbNotifyCompletion(true, err);
                     });
             });
 
@@ -117,9 +117,12 @@ mStorageDB.prototype = {
             Soon(__dbNotifyCompletion.bind(null, true));
         }
 
-        function __dbNotifyCompletion(aError) {
+        function __dbNotifyCompletion(aError, theError) {
             if (aError) {
                 self.db = null;
+                if(d) {
+                    console.error("msdb failed setup db, error flag: ", aError, ", passed error:", theError);
+                }
                 promise.reject(aError);
             } else {
                 promise.resolve();
@@ -131,7 +134,7 @@ mStorageDB.prototype = {
             if (db) {
                 db.unbind('onDbStateReady').unbind('onDbStateFailed');
             }
-            mBroadcaster.sendMessage('mStorageDB:' + self.name, aError);
+            mBroadcaster.sendMessage('mStorageDB:' + self.name, aError, theError);
             promise = newHash = oldHash = version = db = self = undefined;
         }
 
@@ -205,19 +208,24 @@ mBroadcaster.once('startMega', function __msdb_init() {
     db.addSchemaHandler( 'ps',   'p',  processPS  );
 
     mBroadcaster.once('mStorageDB:' + db.name,
-        function __msdb_ready(aError) {
+        function __msdb_ready(aError, theError) {
             if (d) console.log('mStorageDB.ready', !aError);
+
             if (aError) {
                 mSDB = db = undefined;
+                if(theError && theError.length > 0 && theError[0] instanceof SecurityError) {
+                    // decrypt failed. reset the db!
+                    //TODO: @diego please add the force ipc/opc/etc reload data code here
+                }
             }
         });
 
     mBroadcaster.once('mFileManagerDB.done',
         function __msdb_setup(aCallback) {
             var promises = mSDBPromises
-                    .map(function(aDBInstance) {
-                        return aDBInstance.setup();
-                    });
+                .map(function(aDBInstance) {
+                    return aDBInstance.setup();
+                });
             MegaPromise.allDone(promises).always(
                 function __msdb_done() {
                     if (aCallback === getsc) {

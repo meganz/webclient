@@ -16,7 +16,7 @@
             window.MegaLogger = root.MegaLogger;
         }
     }
-}(this, function () {
+}(this, /** @lends MegaLogger */ function () {
     var extend = require("extend");
     var isfunction = require("isfunction");
     var clone = require("clone");
@@ -26,6 +26,7 @@
     /**
      * Simple .toArray method to be used to convert `arguments` to a normal JavaScript Array
      *
+     * @private
      * @param val {Arguments}
      * @returns {Array}
      */
@@ -66,6 +67,10 @@
 
     /**
      * Static, log levels
+     *
+     * @public
+     * @enum {number}
+     * @static
      */
     MegaLogger.LEVELS = {
         'ERROR': 40,
@@ -77,13 +82,20 @@
 
     /**
      * Static, global log registry
+     *
+     * @private
+     * @static
      */
     MegaLogger._logRegistry = {};
 
     /**
      * Static, default options
+     *
+     * @public
+     * @static
      */
     MegaLogger.DEFAULT_OPTIONS = {
+        'colorsEnabled': isBrowser, /* use this only in browsers */
         'levelColors': {
             'ERROR': '#ff0000',
             'DEBUG': '#0000ff',
@@ -142,15 +154,16 @@
     };
 
     /**
-     * Factory function to return a {MegaLogger} instance.
+     * Factory function to return a {@link MegaLogger} instance.
      *
      * @param name {string}
      *     Name of the database (a-zA-Z0-9_-).
      * @param options {Object}
-     *     See {MegaLogger.DEFAULT_OPTIONS}.
+     *     See {@link MegaLogger.DEFAULT_OPTIONS}.
      * @param parentLogger {string|object}
      *     Name of or reference to a parent logger.
      * @returns {MegaLogger}
+     * @static
      */
     MegaLogger.getLogger = function(name, options, parentLogger) {
         if(typeof(parentLogger) === 'object') {
@@ -164,6 +177,14 @@
     };
 
 
+    /**
+     * Converts enum to text/label
+     *
+     * @param intVal {number} enum to text converter helper
+     * @returns {string} the text representation of the `intVal`
+     * @private
+     * @static
+     */
     MegaLogger._intToLevel = function(intVal) {
         var levelName = "unknown";
 
@@ -178,6 +199,11 @@
         return levelName;
     };
 
+    /**
+     * Formats a breadcrumb/path for a logger (e.g. pkg:subpkg:subsubpkg)
+     * @returns {string}
+     * @private
+     */
     MegaLogger.prototype._getLoggerPath = function() {
         var path = this.name;
 
@@ -191,6 +217,13 @@
         return path;
     };
 
+    /**
+     * Send the passed `arguments` to the specific `level` logger
+     *
+     * @param level {number}
+     * @param arguments {*}
+     * @private
+     */
     MegaLogger.prototype._log = function(level, arguments) {
         var self = this;
 
@@ -200,8 +233,8 @@
 
 
         var args = [
-            (isBrowser ? "%c" : "") + self.options.dateFormatter(new Date()) + " - " + self._getLoggerPath() + " - " + levelName,
-            (isBrowser ? logStyle : "")
+            (self.options.colorsEnabled ? "%c" : "") + self.options.dateFormatter(new Date()) + " - " + self._getLoggerPath() + " - " + levelName,
+            (self.options.colorsEnabled ? logStyle : "")
         ];
 
         args = args.concat(arguments);
@@ -277,6 +310,12 @@
 
     };
 
+    /**
+     * Returns `.options.isEnabled` and converts it to a boolean (if it is a dynamic function)
+     *
+     * @public
+     * @returns {boolean}
+     */
     MegaLogger.prototype.isEnabled = function() {
         var isEnabled = this.options.isEnabled;
         if(isfunction(isEnabled)) {
@@ -287,13 +326,64 @@
     };
 
 
-    Object.keys(MegaLogger.LEVELS).forEach(function(k) {
-        var v = MegaLogger.LEVELS[k];
+    /**
+     * Logs a message with a log level ERROR
+     *
+     * @param {...*}
+     * @public
+     */
+    MegaLogger.prototype.error = function() {
+        this._log(MegaLogger.LEVELS.ERROR, toArray(arguments));
+    };
 
-        MegaLogger.prototype[k.toLowerCase()] = function() {
-            this._log(v, toArray(arguments));
-        };
-    });
+    /**
+     * Logs a message with a log level WARN
+     *
+     * @param {...*}
+     * @public
+     */
+    MegaLogger.prototype.warn = function() {
+        this._log(MegaLogger.LEVELS.WARN, toArray(arguments));
+    };
+
+    /**
+     * Logs a message with a log level INFO
+     *
+     * @param {...*}
+     * @public
+     */
+    MegaLogger.prototype.info = function() {
+        this._log(MegaLogger.LEVELS.INFO, toArray(arguments));
+    };
+
+    /**
+     * Logs a message with a log level LOG
+     *
+     * @param {...*}
+     * @public
+     */
+    MegaLogger.prototype.log = function() {
+        this._log(MegaLogger.LEVELS.LOG, toArray(arguments));
+    };
+
+    /**
+     * Logs a message with a log level DEBUG
+     *
+     * @param {...*}
+     * @public
+     */
+    MegaLogger.prototype.debug = function() {
+        this._log(MegaLogger.LEVELS.DEBUG, toArray(arguments));
+    };
+
+
+    /**
+     * @function MegaLogger#error
+     * @param {*} the message parts to be logged (any number of arguments are allowed, as in the native console.log)
+     * @public
+     */
+
+
 
     return MegaLogger;
 }));

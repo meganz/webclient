@@ -18,5 +18,6 @@
     "browser": true,
     "devel": true,
     "typed": true,
-    "worker": true
+    "worker": true,
+    "maxerr": 9999
 }

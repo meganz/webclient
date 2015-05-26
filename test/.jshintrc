@@ -20,5 +20,6 @@
     "jasmine": true,
     "jquery": true,
     "mocha": true,
-    "typed": true
+    "typed": true,
+    "maxerr": 9999
 }

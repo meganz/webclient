@@ -57,7 +57,7 @@ function MegaDBEncryption(mdbInstance) {
                         });
                 }
                 else {
-                    _encDecKeyCache = stringcrypt.stringDecrypter(data.k, u_k);
+                    _encDecKeyCache = stringcrypt.stringDecrypter(data, u_k);
                     promise.resolve();
                 }
             }, function(err) {

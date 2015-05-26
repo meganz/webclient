@@ -15521,9 +15521,12 @@ div.membership-bott-button {
 .new-download-right-block {
 	margin-left: 299px;
 	height: 210px;
-	overflow: hidden;
 }
 .new-download-pad {
+	display: table;
+	table-layout:fixed;
+}
+.new-download-centered-bl {
 	height: 210px;
 	display: table-cell;
 	vertical-align: middle;
@@ -15547,6 +15550,9 @@ div.membership-bott-button {
 	color: #333333;
 	padding-top: 10px;
 	white-space: nowrap;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .new-download-file-size {
 	font-size: 11px;
@@ -15593,7 +15599,6 @@ div.membership-bott-button {
 	display: block;
 }
 .downloading-progress {
-	width: 360px;
 	height: 20px;
 	background-color: rgba(0,0,0,0.15);
 	padding: 5px;
@@ -15603,9 +15608,6 @@ div.membership-bott-button {
 	-webkit-border-radius: 10px;
 	-moz-border-radius: 10px;
 	border-radius: 10px;
-}
-.adv .downloading-progress {
-	width: 344px;
 }
 .downslideshow-progress, .downloading-progress-bar {
 	width: 0%;
@@ -15669,7 +15671,7 @@ div.membership-bott-button {
 	width: 20px;
 	height: 20px;
 	position: absolute;
-	left: 25px;
+	left: 38px;
 	z-index: 10;
 	margin-top: -2px;
 	background-image: url(../images/mega/download-sprite.png);
@@ -19866,19 +19868,6 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 .ads-right-block {
 	right: 0;
 }
-.new-ads .products-bottom-block {
-	background-color: rgba(255,255,255,0.5);
-}
-.new-ads .ads-left-block {
-	background: rgba(0,0,0,0.05);
-	background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2VlZWVlZSIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNiYmJiYmIiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
-	background: -moz-linear-gradient(top, #eeeeee 0%, #bbbbbb 100%);
-	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #eeeeee), color-stop(100%, #bbbbbb));
-	background: -webkit-linear-gradient(top, #eeeeee 0%, #bbbbbb 100%);
-	background: -o-linear-gradient(top, #eeeeee 0%, #bbbbbb 100%);
-	background: -ms-linear-gradient(top, #eeeeee 0%, #bbbbbb 100%);
-	background: linear-gradient(to bottom, #eeeeee 0%, #bbbbbb 100%);
-}
 .download-adv-bl {
 	position: absolute;
 	width: 100%;
@@ -20088,9 +20077,33 @@ a.blog-article-button {
 	border-color: rgba(0,0,0,0.3);
 	position: absolute;
 }
-/*.products-bottom-block .sync-button {
-	position: static;
-}*/
+.ru .sync-button-txt.big, .bg .sync-button-txt.big, .mk .sync-button-txt.big, .sr .sync-button-txt.big, .ms .sync-button-txt.big, .bs .sync-button-txt.big, .bs .sync-button-txt.big, .cy .sync-button-txt.big, .de .sync-button-txt.big, .ee .sync-button-txt.big, .eu .sync-button-txt.big, .fr .sync-button-txt.big, .hr .sync-button-txt.big, .lv .sync-button-txt.big, .ka .sync-button-txt.big, .sl .sync-button-txt.big {
+	font-size: 13px;
+}
+.uk .sync-button-txt.big, .lt .sync-button-txt.big {
+	font-size: 11px;
+}
+.lt .chrome-descr {
+	font-size: 9.1px;
+}
+.cz .chrome-descr, .hu .chrome-descr, .sk .chrome-descr {
+	font-size: 10px;
+}
+.ru .chrome-descr, .ct .chrome-descr {
+	font-size: 10.8px;
+}
+.bg .chrome-descr, .af .chrome-descr, .mk .chrome-descr, .sr .chrome-descr, .ms .chrome-descr, .bs .chrome-descr, .bs .chrome-descr, .cy .chrome-descr, .ee .chrome-descr, .hr .chrome-descr, .lv .chrome-descr, .uk .chrome-descr, .no .chrome-descr, .pt .chrome-descr, .ro .chrome-descr, .sl .chrome-descr, .tr .chrome-descr, .he .chrome-descr, .jp .chrome-descr {
+	font-size: 11.5px;
+}
+.uk .products-top-white-txt1 {
+	font-size: 17px;
+}
+.mk .products-top-white-txt1, .sr .products-top-white-txt1, .ms .products-top-white-txt1, .bs .products-top-white-txt1, .be .products-top-white-txt1, .ca .products-top-white-txt1, .cz .products-top-white-txt1, .cy .products-top-white-txt1, .eu .products-top-white-txt1, .fr .products-top-white-txt1, .hr .products-top-white-txt1, .lv .products-top-white-txt1, .lt .products-top-white-txt1, .hu .products-top-white-txt1, .ru .products-top-white-txt1, .pl .products-top-white-txt1, .ro .products-top-white-txt1, .sl .products-top-white-txt1, .sk .products-top-white-txt1, .tr .products-top-white-txt1 {
+	font-size: 19px;
+}
+.ee .products-top-white-txt2, .jp .products-top-white-txt2 {
+	font-size: 12px;
+}
 .products-bottom-block .win-phone-button {
 	width: 234px;
 }
@@ -23126,7 +23139,7 @@ body.pro:after {
  @media only screen and (max-width: 1593px) {
 .download-mid-centered-block {
 	min-width: 648px;
-	margin-left: -334px;
+	margin-left: -353px;
 }
 .download-mid-centered-block.not-available-some-reason {
 	min-width: 728px;
@@ -23136,11 +23149,6 @@ body.pro:after {
 @media only screen and (max-width: 1570px) {
 .conversations-block {
 	width: 33.333333%;
-}
-}
-@media only screen and (max-width: 1362px) {
-.downloading-progress {
-	width: 300px;
 }
 }
 @media only screen and (max-height: 292px) {

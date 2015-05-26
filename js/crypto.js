@@ -109,7 +109,6 @@ var crypt = (function () {
             return masterPromise;
         }
 
-
         if (pubEd25519[userhandle]) {
             // It's cached: Only check the authenticity of the key.
             crypt._checkAuthenticationEd25519(userhandle, callback);
@@ -346,14 +345,18 @@ var crypt = (function () {
      *     an exception.
      */
     ns.getPubRSA = function(userhandle, callback) {
-        // 1. check the authring, if empty, initialise
-        // 2. if cached - _asynchCheckAuthenticationRSA
-        // 3. if not cached - _getPubRSAattribute + _asynchCheckAuthenticationRSA
+        /* This function does the following:
+         * 1. Check the authring, if empty: initialise.
+         * 2. If the key is cached: _asynchCheckAuthenticationRSA.
+         * 3. If not cached: _getPubRSAattribute + _asynchCheckAuthenticationRSA.
+         */
 
-        var masterPromise = new MegaPromise(); // this promise will be the one which is going to be returned
+         // This promise will be the one which is going to be returned.
+        var masterPromise = new MegaPromise();
 
+        /** If a callback is passed in, ALWAYS call it when the master promise
+         * is resolved. */
         var _callbackAttachAfterDone = function() {
-            // if a callback is passed to the fn, ALWAYS call it when the master promise is resolved.
             if (callback) {
                 masterPromise.done(function(r) {
                     console.error('calling cb');
@@ -366,32 +369,38 @@ var crypt = (function () {
                 || typeof u_authring.RSA === 'undefined') {
             logger.debug('First initialising the RSA authring.');
             var authringPromise = authring.getContacts('RSA');
-            masterPromise.linkFailTo(authringPromise); // fail the masterPromise IF the authring.getContacts fail.
+            // Fail the masterPromise if authring.getContacts() fails.
+            masterPromise.linkFailTo(authringPromise);
 
             authringPromise
                 .done(function() {
-                    // loading finished, do a recursion and link the newly called .getPubRSA's state to the returned master promise
+                    // Loading finished. Do a recursion and link the newly
+                    // called .getPubRSA's state to the returned master promise.
                     masterPromise.linkDoneAndFailTo(
-                        // masterPromise will get resolved when ns.getPubRSA get resolved too
-                        ns.getPubRSA(userhandle) // no need to pass the callback, since the master promise will call it
+                        // masterPromise will be resolved when ns.getPubRSA
+                        // is resolved.
+                        // Callback will be called by masterPromise directly.
+                        ns.getPubRSA(userhandle)
                     );
                 });
 
-            _callbackAttachAfterDone(masterPromise); // attach the callback ONLY AFTER the previous handlers are attached
-            return masterPromise; // stop the code execution!
+             // Attach the callback ONLY AFTER previous handlers are attached.
+             _callbackAttachAfterDone(masterPromise);
+
+            return masterPromise;
         }
 
         if (u_pubkeys[userhandle]) {
             // It's cached: Only check the authenticity of the key.
             var checkAuthPromise = crypt._asynchCheckAuthenticationRSA(userhandle);
 
-            masterPromise // resolve/reject the master promise depending on the state of the checkAuthPromise
-                .linkDoneAndFailTo(checkAuthPromise);
+            // Resolve/reject master promise depending on state of checkAuthPromise.
+            masterPromise.linkDoneAndFailTo(checkAuthPromise);
 
-            _callbackAttachAfterDone(masterPromise); // attach the callback ONLY AFTER the previous handlers are attached
+            // Attach the callback ONLY AFTER previous handlers are attached.
+            _callbackAttachAfterDone(masterPromise);
 
             return masterPromise;
-
         }
         else {
             // Non-cached value.

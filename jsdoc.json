@@ -1,6 +1,7 @@
 {
     "source": {
         "include": ["."],
+
         "exclude": ["test/", "node_modules/",
                     "js/tests/", "js/vendor/",
                     "coverage/", "dont-deploy/", "doc/",

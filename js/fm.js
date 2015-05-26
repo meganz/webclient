@@ -9421,10 +9421,11 @@ function sharedfolderUI() {
 
 function userAvatar(userid)
 {
-    userid = userid.u || userid
-    var user = M.u[userid]
-    if (!user || !user.u)
+    userid = userid.u || userid;
+    var user = M.u[userid];
+    if (!user || !user.u) {
         return;
+    }
 
     var name = user.name || user.m;
 
@@ -9449,25 +9450,24 @@ function userFingerprint(userid, next) {
         var fprint = authring.computeFingerprint(u_pubEd25519, 'Ed25519', 'hex');
         return next(fprint.toUpperCase().match(/.{4}/g), fprint);
     }
-    crypt.getFingerprintEd25519(user.h || userid).then(
-        function(response) {
-            next(response.toUpperCase().match(/.{4}/g), response);
-        }
-    );
+    crypt.getFingerprintEd25519(user.h || userid, function (response) {
+        next(response.toUpperCase().match(/.{4}/g), response);
+    });
 }
 
 function isContactVerified(userid)
 {
-    userid = userid.u || userid
+    userid = userid.u || userid;
     return (u_authring.Ed25519[userid] || {}).method >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON;
 }
 
 function fingerprintDialog(userid)
 {
-    userid = userid.u || userid
-    var user = M.u[userid]
-    if (!user || !user.u)
+    userid = userid.u || userid;
+    var user = M.u[userid];
+    if (!user || !user.u) {
         return;
+    }
 
     function closeFngrPrntDialog() {
         fm_hideoverlay();
@@ -9568,23 +9568,52 @@ function contactUI() {
             contextmenuUI(e, 4);
         });
 
-        var fprint = $('.contact-fingerprint-txt').empty();
-        userFingerprint(user, function(fprints) {
-            $.each(fprints, function(k, value) {
-                $('<span>').text(value).appendTo(
-                    fprint.filter(k <= 4 ? ':first' : ':last')
-                )
+        /**
+         * Get and display the fingerprint
+         */
+        var showAuthenticityCredentials = function() {
+            var fprint = $('.contact-fingerprint-txt').empty();
+            userFingerprint(user, function (fprints) {
+                $.each(fprints, function (k, value) {
+                    $('<span>').text(value).appendTo(
+                        fprint.filter(k <= 4 ? ':first' : ':last')
+                    );
+                });
             });
-        });
-
-        if (isContactVerified(user)) {
-            $('.fm-verify').find('span').text('Verified');
-        } else {
-            $('.fm-verify').find('span').text(l[1960]+'...');
+        };
+        
+        /**
+         * Enables the Verify button
+         */
+        var enableVerifyFingerprintsButton = function() {
+            $('.fm-verify').removeClass('disabled');
+            $('.fm-verify').find('span').text(l[1960] + '...');
             $('.fm-verify').rebind('click', function() {
                 fingerprintDialog(user);
             });
+        };
+        
+        // Display the current fingerpring
+        showAuthenticityCredentials();
+
+        // If the fingerprints have already been verified for the contact, show 'Verified' 
+        if (isContactVerified(user)) {
+            $('.fm-verify').addClass('disabled');
+            $('.fm-verify').find('span').text(l[6776]);
         }
+        else {
+            // Otherwise show the Verify button
+            enableVerifyFingerprintsButton();
+        }
+
+        // Reset seen or verified fingerprints and re-enable the Verify button
+        $('.fm-reset-stored-fingerprint').rebind('click', function() {
+            authring.resetFingerprintsForUser(user.u);
+            enableVerifyFingerprintsButton();
+            
+            // Refetch the key
+            showAuthenticityCredentials();
+        });
 
         if (!MegaChatDisabled) {
             if (onlinestatus[1] !== "offline" && u_h !== u_handle) {

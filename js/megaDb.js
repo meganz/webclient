@@ -315,7 +315,7 @@ MegaDB.prototype.update = function(tableName, k, val) {
     val = clone(val);
     self.trigger("onModifyQuery", [tableName, val]);
     self.trigger("onBeforeUpdate", [tableName, val[self._getTablePk(tableName)], val, true]);
-    return self.server.update(tableName, val);
+    return MegaPromise.asMegaPromiseProxy(self.server.update(tableName, val));
 };
 
 MegaDB.prototype.update = _wrapFnWithBeforeAndAfterEvents(
@@ -374,7 +374,7 @@ MegaDB.prototype.removeBy = function(tableName, keyName, value) {
     }
 
 
-    var promise = new $.Deferred();
+    var promise = new MegaPromise();
 
     q.execute()
         .then(function(r) {
@@ -382,7 +382,9 @@ MegaDB.prototype.removeBy = function(tableName, keyName, value) {
             if(r.length && r.length > 0) { // found
                 r.forEach(function(v) {
                     promises.push(
-                        self.server.remove(tableName, v[self._getTablePk(tableName)])
+                        MegaPromise.asMegaPromiseProxy(
+                            self.server.remove(tableName, v[self._getTablePk(tableName)])
+                        )
                     );
                 });
             }
@@ -429,7 +431,7 @@ MegaDB.prototype.clear = _wrapFnWithBeforeAndAfterEvents(
 MegaDB.prototype.drop = function() {
     var self = this;
     self.close();
-    return self.server.destroy();
+    return MegaPromise.asMegaPromiseProxy(self.server.destroy());
 };
 
 MegaDB.prototype.drop = _wrapFnWithBeforeAndAfterEvents(

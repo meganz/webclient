@@ -11,6 +11,7 @@
     "nocomma": true,
     "nonbsp": true,
     "nonew": true,
+    "nomen": true,
 
     "laxbreak": true,
     "sub": true,
@@ -18,5 +19,6 @@
     "browser": true,
     "devel": true,
     "typed": true,
-    "worker": true
+    "worker": true,
+    "maxerr": 9999
 }

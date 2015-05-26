@@ -4,6 +4,7 @@
         "exclude": ["test/",
                     "js/tests/vendor/", "js/vendor/",
                     "node_modules/",
+                    "js/tests/node_modules",
                     "sjcl.js",
                     "fileapi.js",
                     "karma.conf.js.js",

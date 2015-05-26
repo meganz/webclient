@@ -909,7 +909,7 @@ else if (!b_u)
 
     jsl.push({f: langFilepath, n: 'lang', j:3});
     jsl.push({f:'sjcl.js', n: 'sjcl_js', j: 1, g: 'crypto'}); // Will be replaced with asmCrypto soon
-    jsl.push({f:'js/asmcrypto.js',n:'asmcrypto_js',j: 1, w:1, g: 'crypto'});
+    jsl.push({f:'js/asmcrypto.js', n:'asmcrypto_js', j: 1, w:1, g: 'crypto'});
     jsl.push({f:'js/jquery-2.1.1.js', n: 'jquery', j: 1, w:10, g: 'jquery'});
     jsl.push({f:'js/functions.js', n: 'functions_js', j: 1});
     jsl.push({f:'js/mega.js', n: 'mega_js', j: 1, w: 7});
@@ -1046,7 +1046,7 @@ else if (!b_u)
     jsl.push({f:'html/start.html', n: 'start', j: 0});
     jsl.push({f:'html/megainfo.html', n: 'megainfo', j: 0});
     jsl.push({f:'html/js/start.js', n: 'start_js', j: 1, g: 'common'});
-    jsl.push({f:'html/bottom2.html', n: 'bottom2',j: 0});
+    jsl.push({f:'html/bottom2.html', n: 'bottom2', j: 0});
     jsl.push({f:'html/key.html', n: 'key', j: 0});
     jsl.push({f:'html/js/key.js', n: 'key_js', j: 1, g: 'common'});
     jsl.push({f:'html/pro.html', n: 'pro', j: 0});
@@ -1056,7 +1056,7 @@ else if (!b_u)
     jsl.push({f:'html/fm.html', n: 'fm', j: 0, w:3});
     jsl.push({f:'html/top.html', n: 'top', j: 0});
     jsl.push({f:'js/notifications.js', n: 'notifications_js', j: 1});
-    jsl.push({f:'css/style.css', n: 'style_css', j:2, w:30,c:1,d:1,cache:1});
+    jsl.push({f:'css/style.css', n: 'style_css', j:2, w:30, c:1, d:1, cache:1});
     jsl.push({f:'js/avatar.js', n: 'avatar_js', j: 1, w:3, g: 'common'});
     jsl.push({f:'js/countries.js', n: 'countries_js', j: 1, g: 'common'});
     jsl.push({f:'html/dialogs.html', n: 'dialogs', j: 0, w:2});

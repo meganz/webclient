@@ -70,7 +70,7 @@ function getRulesFromSecureBoot()
         };
         nlines = nlines.replace(
             "/*placeholder-" + i + "*/",
-            "jsl.push({f:'js/pack-" + i+ ".js', n: 'pack_" + i + "', g:'" + i + "', j:1});"
+            "jsl.push({f:'js/pack-" + i + ".js', n: 'pack_" + i + "', g:'" + i + "', j:1});"
         );
     }
 

@@ -41,8 +41,14 @@
                     'className': "fm-dialog-button-green feedback-button-send disabled",
                     'callback': function() {
                         self._report.message = self.$textarea.val();
-                        if($('input[name="my_email"]', self.$dialog).attr('checked')) {
-                            self._report.replyEmail = $('input[name="email"]', self.$dialog).val();
+                        if($('input[name="share_uh"]', self.$dialog).attr('checked')) {
+                            self._report.u_handle = u_handle;
+                        }
+
+
+                        var $selectedRating = $('.rate.active', self.$dialog);
+                        if($selectedRating.length === 0) {
+                            return false;
                         }
 
                         var rated = $('.rate.active', self.$dialog)[0].className;
@@ -55,6 +61,7 @@
                             a: 'clog',
                             t: "feedbackDialog." + self._type,
                             id: reportId,
+                            uh: self._report.u_handle ? self._report.u_handle : "",
                             d: dump
                         });
 
@@ -116,29 +123,8 @@
                 .val('')
                 .hide();
 
-            $('input[name="email"]', self.$dialog)
-                .hide();
-
             $('.stats-button', self.$dialog)
                 .hide();
-
-            $('.reply .checkdiv').rebind('onFakeCheckboxChange.feedbackDialog', function(e, val) {
-                var fnName = val ? "slideDown" : "slideUp";
-
-                $('input[name="email"]', self.$dialog)[fnName]({
-                    duration: 250,
-                    progress: function(anim, progress, remainingMs) {
-                        if(Math.ceil(progress * 100) % 2 === 0) {
-                            self.reposition();
-                        }
-                    },
-                    complete: function() {
-                        $(this)
-                            .select()
-                            .focus();
-                    }
-                });
-            });
 
             $('.stats .checkdiv').rebind('onFakeCheckboxChange.feedbackDialog', function(e, val) {
                 var fnName = val ? "fadeIn" : "fadeOut";
@@ -169,16 +155,12 @@
 
 
 
-            $('input[name="email"]', self.$dialog)
-                .val(M.u[u_handle].m)
-                .trigger('change');
-
             $('input[name="send_stats"]', self.$dialog)
                 .attr('checked', true)
                 .trigger('change');
 
-            $('input[name="my_email"]', self.$dialog)
-                .attr('checked', false)
+            $('input[name="share_uh"]', self.$dialog)
+                .attr('checked', true)
                 .trigger('change');
         });
 

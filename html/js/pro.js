@@ -1,12 +1,13 @@
 var pro_package,
     pro_balance = 0,
-    pro_paymentmethod,
+    pro_paymentmethod = '',
     pro_m,
     account_type_num,
     pro_usebalance = false,
     membershipPlans = [],
     selectedProPackage = [],
-    saleId = null;
+    saleId = null,
+    pro_do_next = null;
 
 function init_pro()
 {
@@ -55,6 +56,8 @@ function init_pro()
 
                 // Render the plan details
                 populateMembershipPlans();
+
+                if (pro_do_next) pro_do_next();
             }
         });
 
@@ -76,7 +79,15 @@ function init_pro()
 
             account_type_num = $(this).attr('data-payment');
             $(this).clone().appendTo( '.membership-selected-block');
-            $('.membership-step2 .pro span').html($(this).find('.reg-st3-bott-title.title').html()) ;
+            
+            var proPlanName = $(this).find('.reg-st3-bott-title.title').html();
+            $('.membership-step2 .pro span').html(proPlanName);
+            
+            // Update header text with plan
+            var $selectedPlanHeader = $('.membership-step2 .main-italic-header.pro');
+            var selectedPlanText = $selectedPlanHeader.html().replace('%1', proPlanName);
+            $selectedPlanHeader.html(selectedPlanText);
+
             pro_next_step();
         });
 
@@ -92,12 +103,19 @@ function init_pro()
         {
             var $membershipBlock = $(this).closest('.reg-st3-membership-bl');
 
-            $('.reg-st3-membership-bl').removeClass('selected');
+            $('-reg-st3-membership-bl').removeClass('selected');
             $membershipBlock.addClass('selected');
 
             account_type_num = $membershipBlock.attr('data-payment');
             $membershipBlock.clone().appendTo( '.membership-selected-block');
-            $('.membership-step2 .pro span').html($membershipBlock.find('.reg-st3-bott-title.title').html())    ;
+            var proPlanName = $membershipBlock.find('.reg-st3-bott-title.title').html();
+            $('.membership-step2 .pro span').html(proPlanName);
+            
+            // Update header text with plan
+            var $selectedPlanHeader = $('.membership-step2 .main-italic-header.pro');
+            var selectedPlanText = $selectedPlanHeader.html().replace('%1', proPlanName);
+            $selectedPlanHeader.html(selectedPlanText);
+            
             pro_next_step();
         });
 
@@ -136,20 +154,32 @@ function populateMembershipPlans() {
 function loadPaymentGatewayOptions() {
 
     // Payment gateways, hardcoded for now, will call API in future to get list
-    var gatewayOptions = [{
+    var gatewayOptions = [
+    {
+        apiGatewayId: 8,                // Credit card provider
+        displayName: l[6952],           // Credit card
+        supportsRecurring: true,
+        cssClass: 'credit-card'
+    },
+    {
         apiGatewayId: 4,                // Bitcoin provider
         displayName: l[6802],           // Bitcoin
         supportsRecurring: false,
-        cssClass: 'bitcoin',
-        providerName: l[6802]
+        cssClass: 'bitcoin'
     },
     {
         apiGatewayId: null,
         displayName: l[504],            // Prepaid balance
         supportsRecurring: false,
-        cssClass: 'prepaid-balance',
-        providerName: l[504]
-    }];
+        cssClass: 'prepaid-balance'
+    }
+    /*{
+        apiGatewayId: 5,                // Union Pay
+        displayName: 'Union Pay',       // Union Pay
+        supportsRecurring: true,
+        cssClass: 'union-pay'
+    },*/
+    ];
     var html = '';
 
     // Loop through gateway providers (change to use list from API soon)
@@ -159,7 +189,7 @@ function loadPaymentGatewayOptions() {
         var optionChecked = '', classChecked = '';
 
         // Pre-select the first option in the list
-        if (i === 0) {
+        if (!html) {
             optionChecked = 'checked="checked" ';
             classChecked = ' checked';
         }
@@ -172,7 +202,7 @@ function loadPaymentGatewayOptions() {
         // Create a radio button with icon for each payment gateway
         html += '<div class="payment-method">'
              +      '<div class="membership-radio' + classChecked + '">'
-             +          '<input type="radio" name="' + gatewayOption.cssClass + '" id="' + gatewayOption.cssClass + '" ' + optionChecked + 'disabled="disabled" />'
+             +          '<input type="radio" name="' + gatewayOption.cssClass + '" id="' + gatewayOption.cssClass + '" ' + optionChecked + ' value="' + gatewayOption.cssClass + '" data-recurring="' + gatewayOption.supportsRecurring + '" />'
              +          '<div></div>'
              +      '</div>'
              +      '<div class="membership-radio-label ' + gatewayOption.cssClass + '">'
@@ -197,15 +227,15 @@ function initPaymentMethodRadioOptions(html) {
 
         // Remove checked state from all radio inputs
         paymentOptionsList.find('.membership-radio').removeClass('checked');
-        paymentOptionsList.find('input').removeAttr('checked');
+        paymentOptionsList.find('input').prop('checked', false);
 
         var $this = $(this);
         var $bitcoinInstructions = $('.membership-center p');
-
+        
         // Add checked state for this radio button
-        $this.find('input').attr('checked', 'checked');
+        $this.find('input').prop('checked', true);        
         $this.find('.membership-radio').addClass('checked');
-
+        
         // Hide instructions below the purchase button if other option is selected
         if ($this.find('.membership-radio-label').hasClass('bitcoin')) {
             $bitcoinInstructions.removeClass('hidden');
@@ -213,6 +243,8 @@ function initPaymentMethodRadioOptions(html) {
         else {
             $bitcoinInstructions.addClass('hidden');
         }
+        
+        updateTextDependingOnRecurring();
     });
 }
 
@@ -237,12 +269,13 @@ function pro_next_step() {
         day = currentDate.getDate(),
         price = [];
 
+    loadPaymentGatewayOptions();
     renderPlanDurationDropDown();
 
     $('.membership-step1').addClass('hidden');
     $('.membership-step2').removeClass('hidden');
     mainScroll();
-
+    
     $('.membership-date .month').text(mon);
     $('.membership-date .day').text(day);
 
@@ -271,21 +304,18 @@ function pro_next_step() {
         $('.membership-st2-select span').html($(this).html());
 
         if (price) {
-            $('.membership-center.inactive').removeClass('inactive');
             $('.membership-bott-price strong').html(price.split('.')[0] + '<span>.' + price.split('.')[1] + ' &euro;</span>');
         }
+        
+        updateTextDependingOnRecurring();
     });
-
+    
     $('.membership-bott-button').unbind('click');
     $('.membership-bott-button').bind('click',function(e)
     {
-        if ($('.membership-center').attr('class').indexOf('inactive') == -1) {
-            pro_continue(e);
-            return false;
-        }
+        pro_continue(e);
+        return false;
     });
-
-    loadPaymentGatewayOptions();
 }
 
 /**
@@ -341,11 +371,69 @@ function renderPlanDurationDropDown() {
 
     // Update drop down HTML
     $('.membership-st2-dropdown').html(html);
+    
+    // Select first option
+    var $durationSelect = $('.membership-st2-select');
+    var $firstOption = $durationSelect.find('.membership-dropdown-item:first-child');
+    $durationSelect.find('span').html($firstOption.html());
+    $firstOption.addClass('selected');
+    
+    // Get current plan price
+    var planIndex = $firstOption.attr('data-plan-index');
+    var currentPlan = membershipPlans[planIndex];
+    var price = currentPlan[5].split('.');
+    var dollars = price[0];
+    var cents = price[1];
+    
+    // Update main price at the bottom
+    var $mainPrice = $('.membership-bott-price');
+    $mainPrice.find('strong').html(dollars + '<span>.' + cents + ' &euro;</span>');
+    
+    updateTextDependingOnRecurring();
+}
+
+/**
+ * Updates the text on the page depending on the payment option they've selected and 
+ * the duration/period so it is accurate for a recurring subscription or one off payment.
+ */
+function updateTextDependingOnRecurring() {
+    
+    // Update whether this selected option is recurring or one-time
+    var $durationSelect = $('.membership-st2-select');
+    var $durationOption = $durationSelect.find('.membership-dropdown-item.selected');
+    var $mainPrice = $('.membership-bott-price');
+    var recurring = ($('.payment-options-list input:checked').attr('data-recurring') === 'true') ? true : false;
+    var planIndex = $durationOption.attr('data-plan-index');
+    var currentPlan = membershipPlans[planIndex];
+    var numOfMonths = currentPlan[4];
+    var subscribeOrPurchase = (recurring) ? l[6172] : l[6190].toLowerCase();
+    var durationOrRenewal = (recurring) ? l[6977] : l[6817];
+    var getTwoMonthsFree = (recurring) ? l[6978] : l[1148];
+    
+    // Set to /month, /year or /one time next to the price
+    if (recurring && (numOfMonths === 1)) {
+        $mainPrice.find('.period').text('/' + l[913]);
+    }
+    else if (recurring && (numOfMonths > 1)) {
+        $mainPrice.find('.period').text('/' + l[932]);
+    }
+    else {
+        $mainPrice.find('.period').text('/' + l[6809]);
+    }
+    
+    // Update depending on recurring or one off payment
+    $('.membership-st2-head.choose-duration').html(durationOrRenewal);
+    $('.membership-bott-button').html(subscribeOrPurchase);
+    $('.membership-bott-descr').html(getTwoMonthsFree);
+    $('.payment-dialog .payment-buy-now').html(subscribeOrPurchase);
 }
 
 function pro_continue(e)
 {
+    // Selected payment method and package
+    var selectedPaymentMethod = $('.membership-radio input:checked').val();
     var selectedProPackageIndex = $('.membership-dropdown-item.selected').attr('data-plan-index');
+    var prepaidMethodSelected = (selectedPaymentMethod === 'prepaid-balance') ? true : false;
 
     // Set the pro package (used in pro_pay function)
     selectedProPackage = membershipPlans[selectedProPackageIndex];
@@ -360,12 +448,6 @@ function pro_continue(e)
     else {
         pro_package = 'pro' + account_type_num + '_year';
     }
-
-    pro_paymentmethod = '';
-
-    // Check if prepaid balance method is selected
-    var prepaidMethodSelected = $('#prepaid-balance').attr('checked');
-        prepaidMethodSelected = (prepaidMethodSelected === 'checked') ? true : false;
 
     if (u_type === false)
     {
@@ -395,31 +477,53 @@ function pro_continue(e)
         });
     }
     else {
-        pro_pay();
+        pro_paymentmethod = selectedPaymentMethod;
+        
+        // For credit card we show the dialog first, then do the uts/utc calls
+        if (pro_paymentmethod === 'credit-card') {
+            cardDialog.init();
+        }
+        else {
+            // For other methods we do a uts and utc call to get the provider details first
+            pro_pay();
+        }
     }
 }
 
 function pro_pay()
 {
     var aff = 0;
-    if (localStorage.affid && localStorage.affts > new Date().getTime()-86400000) aff = localStorage.affid;
-
-    // Only show loading dialog if needing to redirect or setup bitcoin invoice
-    if (!ul_uploading && !downloading && (pro_paymentmethod !== 'pro_prepaid')) {
-        showLoadingDialog();
+    if (localStorage.affid && localStorage.affts > new Date().getTime() - 86400000) {
+        aff = localStorage.affid;
     }
 
+    // Only show loading dialog if needing to setup bitcoin invoice
+    if (!ul_uploading && !downloading && (pro_paymentmethod === 'bitcoin')) {
+        showLoadingDialog();
+    }
+    
+    // Otherwise if credit card payment, show bouncing coin while loading
+    else if (!ul_uploading && !downloading && (pro_paymentmethod === 'credit-card')) {
+        cardDialog.showLoadingOverlay();
+    }
+    
+    // Otherwise if Union Pay payment, show bouncing coin while loading
+    else if (!ul_uploading && !downloading && (pro_paymentmethod === 'union-pay')) {
+        unionPay.showLoadingOverlay();
+    }
+    
     // Data for API request
     var apiId = selectedProPackage[0];
     var price = selectedProPackage[5];
     var currency = selectedProPackage[6];
 
+    // uts = User Transaction Sale
     api_req({ a : 'uts', it: 0, si: apiId, p: price, c: currency, aff: aff, 'm': m },
     {
-        callback : function (result)
+        callback : function (utsResult)
         {
             // Store the sale ID to check with API later
-            saleId = result;
+            saleId = utsResult;
             
             if (typeof saleId == 'number' && saleId < 0)
             {
@@ -428,12 +532,17 @@ function pro_pay()
             }
             else
             {
-                if (pro_paymentmethod == 'pro_voucher' || pro_paymentmethod == 'pro_prepaid') {
+                if (pro_paymentmethod === 'pro_voucher' || pro_paymentmethod === 'pro_prepaid') {
                     pro_m = 0;
                 }
-                else {
-                    // Bitcoin provider
+                else if (pro_paymentmethod === 'bitcoin') {
                     pro_m = 4;
+                }
+                else if (pro_paymentmethod === 'credit-card') {
+                    pro_m = 8;
+                }
+                else if (pro_paymentmethod === 'union-pay') {
+                    pro_m = 5;
                 }
 
                 var proref = '';
@@ -441,16 +550,17 @@ function pro_pay()
                     proref = sessionStorage.proref;
                 }
 
+                // utc = User Transaction Complete
                 api_req({ a : 'utc', s : [saleId], m : pro_m, r: proref },
                 {
-                    callback : function (res)
+                    callback : function (utcResult)
                     {
                         if (pro_paymentmethod == 'pro_prepaid')
                         {
                             loadingDialog.hide();
-                            if (typeof res == 'number' && res < 0)
+                            if (typeof utcResult == 'number' && utcResult < 0)
                             {
-                                if (res == EOVERQUOTA) {
+                                if (utcResult == EOVERQUOTA) {
                                     alert(l[514]);
                                 }
                                 else {
@@ -467,12 +577,29 @@ function pro_pay()
                             }
                         }
                         else {
-                            // If Bitcoin provider then show the Bitcoin invoice dialog
-                            if ((pro_m >= 4) && res && res.EUR) {
-                                showBitcoinInvoice(res.EUR);
+                            // If Dynamic/Union Pay provider then redirect to their site
+                            if ((pro_m === 5) && utcResult && utcResult.EUR) {
+                                unionPay.redirectToSite(utcResult);
                             }
-                            else {
-                                showBitcoinProviderFailureDialog();
+                            
+                            // If Bitcoin provider then show the Bitcoin invoice dialog
+                            else if ((pro_m === 4) && utcResult && utcResult.EUR) {
+                                bitcoinDialog.showInvoice(utcResult.EUR);
+                            }
+                            
+                            // If bitcoin failure
+                            else if ((pro_m === 4) && (!utcResult || !utcResult.EUR)) {
+                                bitcoinDialog.showBitcoinProviderFailureDialog();
+                            }
+                            
+                            // Pay for credit card
+                            else if ((pro_m === 8) && utcResult && (utcResult.EUR.res === 'S')) {
+                                cardDialog.showSuccessfulPayment(utcResult);
+                            }
+                            
+                            // Show credit card failure
+                            else if ((pro_m === 8) && (!utcResult || (utcResult.EUR.res === 'FP') || (utcResult.EUR.res === 'FI'))) {
+                                cardDialog.showFailureOverlay(utcResult);
                             }
                         }
                     }
@@ -482,259 +609,762 @@ function pro_pay()
     });
 }
 
-// Web socket for chain.com connection to monitor bitcoin payment
-var chainWebSocketConn = null;
-
 /**
- * Step 3 in plan purchase with Bitcoin
- * @param {Object} apiResponse API result
+ * Code for Dynamic/Union Pay
  */
-function showBitcoinInvoice(apiResponse) {
-
-    /* Testing data to watch the invoice expire in 5 secs
-    apiResponse = {
-        "invoice_id": 'sIk',
-        "address": '12ouE2tWLuR3q5ZyQzQL6DR25iBLVjhwXd',
-        "amount": 1.35715354,
-        "created": Math.round(Date.now() / 1000),
-        "expiry": Math.round(Date.now() / 1000) + 5
-    };//*/
-
-    // Set details
-    var bitcoinAddress = apiResponse.address;
-    var bitcoinUrl = 'bitcoin:' + apiResponse.address + '?amount=' + apiResponse.amount;
-    var invoiceDateTime = new Date(apiResponse.created);
-    var proPlanNum = selectedProPackage[1];
-    var planName = getProPlan(proPlanNum);
-    var planMonths = l[6806].replace('%1', selectedProPackage[4]);  // x month purchase
-    var priceEuros = selectedProPackage[5] + '<span>&euro;</span>';
-    var priceBitcoins = apiResponse.amount;
-    var expiryTime = new Date(apiResponse.expiry);
-
-    // Cache original HTML of dialog to reset after close
-    var dialogOverlay = $('.fm-dialog-overlay');
-    var dialog = $('.fm-dialog.pro-register-paypal-dialog');
-    var dialogOriginalHtml = dialog.html();
-
-    // Add styles for the dialog
-    dialogOverlay.addClass('bitcoin-invoice-dialog');
-    dialog.addClass('bitcoin-invoice-dialog');
-
-    // Clone template and show Bitcoin invoice
-    var bitcoinInvoiceHtml = $('.bitcoin-invoice').html();
-    dialog.html(bitcoinInvoiceHtml);
-
-    // Render QR code
-    generateBitcoinQrCode(dialog, bitcoinAddress, priceBitcoins);
-
-    // Update details inside dialog
-    dialog.find('.btn-open-wallet').attr('href', bitcoinUrl);
-    dialog.find('.bitcoin-address').html(bitcoinAddress);
-    dialog.find('.invoice-date-time').html(invoiceDateTime);
-    dialog.find('.plan-icon').addClass('pro' + proPlanNum);
-    dialog.find('.plan-name').html(planName);
-    dialog.find('.plan-duration').html(planMonths);
-    dialog.find('.plan-price-euros').html(priceEuros);
-    dialog.find('.plan-price-bitcoins').html(priceBitcoins);
-
-    // Set countdown to price expiry
-    var countdownIntervalId = setCoundownTimer(dialog, expiryTime);
-
-    // Close dialog and reset to original dialog
-    dialog.find('.btn-close-dialog').click(function() {
-        dialogOverlay.removeClass('bitcoin-invoice-dialog').addClass('hidden');
-        dialog.removeClass('bitcoin-invoice-dialog').addClass('hidden').html(dialogOriginalHtml);
-
-        // Close Web Socket if open
-        if (chainWebSocketConn !== null) {
-            chainWebSocketConn.close();
+var unionPay = {
+    
+    /**
+     * Show the bouncing megacoin icon while loading
+     */
+    showLoadingOverlay: function() {
+        
+        console.log('zzzz got here');
+        
+        $('.fm-dialog-overlay').removeClass('hidden').addClass('payment-dialog-overlay');
+        $('.payment-processing').removeClass('hidden');
+    },
+    
+    /**
+     * Redirect to the site
+     * @param {Object} utcResult
+     */
+    redirectToSite: function(utcResult) {
+        
+        // DynamicPay
+        // We need to redirect to their site via a post, so we are building a form :\
+        var form = $("<form id='pay_form' name='pay_form' action='" + utcResult.EUR['url'] + "' method='post'></form>");
+        
+        for (var key in utcResult.EUR['postdata'])
+        {
+            var input = $("<input type='hidden' name='" + key + "' value='" + utcResult.EUR['postdata'][key] + "' />");
+            form.append(input);
+            $("body").append(form);
+            form.submit();
         }
-
-        // End countdown timer
-        clearInterval(countdownIntervalId);
-    });
-
-    // Update the dialog if a transaction is seen in the blockchain
-    checkTransactionInBlockchain(dialog, bitcoinAddress, planName, countdownIntervalId);
-}
+    }
+};
 
 /**
- * Sets a countdown timer on the bitcoin invoice dialog to count down from 15~ minutes
- * until the bitcoin price expires and they need to restart the process
- * @param {Object} dialog The bitcoin invoice dialog
- * @param {Date} expiryTime The date/time the invoice will expire
- * @returns {Number} Returns the interval id
+ * Credit card payment dialog
  */
-function setCoundownTimer(dialog, expiryTime)
-{
-    // Count down the time to price expiration
-    var countdownIntervalId = setInterval(function() {
+var cardDialog = {
+    
+    $dialog: null,
+    $dialogOverlay: null,
+    $successOverlay: null,
+    $failureOverlay: null,
+    $loadingOverlay: null,
+    
+    // The RSA public key to encrypt data to be stored on the Secure Processing Unit (SPU)
+    publicKey: [
+        atob(
+            "wfvbeFkjArOsHvAjXAJqve/2z/nl2vaZ+0sBj8V6U7knIow6y3/6KJ" +
+            "3gkJ50QQ7xDDakyt1C49UN27e+e0kCg2dLJ428JVNvw/q5AQW41" +
+            "grPkutUdFZYPACOauqIsx9KY6Q3joabL9g1JbwmuB44Mv20aV/L" +
+            "/Xyb2yiNm09xlyVhO7bvJ5Sh4M/EOzRN2HI+V7lHwlhoDrzxgQv" +
+            "vKjzsoPfFZaMud742tpgY8OMnKHcfmRQrfIvG/WfCqJ4ETETpr6" +
+            "AeI2PIHsptZgOYkkrDK6Bi8qb/T7njk32ZRt1E6Q/N7+hd8PLhh" +
+            "2PaYRWfpNiWwnf/rPu4MnwRE6T77s/qGQ=="
+        ),
+        "\u0001\u0000\u0001",   // Exponent 65537
+        2048                    // Key size in bits
+    ],
+    
+    /**
+     * Open and setup the dialog
+     */
+    init: function() {
+        this.showCreditCardDialog();
+        this.initCountryDropDown();
+        this.initExpiryMonthDropDown();
+        this.initExpiryYearDropDown();
+        this.initInputsFocus();
+        this.initPurchaseButton();
+    },
+    
+    /**
+     * Display the dialog
+     */
+    showCreditCardDialog: function() {
+    
+        // Close the pro register dialog if it's already open
+        $('.pro-register-dialog').removeClass('active').addClass('hidden');
+        
+        // Cache DOM reference for lookup in other functions
+        this.$dialog = $('.fm-dialog.payment-dialog');
+        this.$dialogOverlay = $('.fm-dialog-overlay');
+        this.$successOverlay = $('.payment-result.success');
+        this.$failureOverlay = $('.payment-result.failed');
+        this.$loadingOverlay = $('.payment-processing');
+        
+        // Add the styling for the overlay
+        this.$dialogOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+        
+        // Position the dialog and open it
+        this.$dialog.css({
+            'margin-left': -1 * (this.$dialog.outerWidth() / 2),
+            'margin-top': -1 * (this.$dialog.outerHeight() / 2)
+        });
+        this.$dialog.addClass('active').removeClass('hidden');
+        
+        // Get the selected Pro plan details
+        var proNum = selectedProPackage[1];
+        var proPlan = getProPlan(proNum);
+        var proPrice = selectedProPackage[5];
+        var numOfMonths = selectedProPackage[4];
+        var monthsWording = l[922];     // 1 month
 
-        // Show number of minutes and seconds counting down
-        var currentTimestamp = Math.round(Date.now() / 1000);
-        var difference = expiryTime - currentTimestamp;
-        var minutes = Math.floor(difference / 60);
-        var minutesPadded = (minutes < 10) ? '0' + minutes : minutes;
-        var seconds = difference - (minutes * 60);
-        var secondsPadded = (seconds < 10) ? '0' + seconds : seconds;
+        // Change wording depending on number of months
+        if (numOfMonths === 12) {
+            monthsWording = l[923];     // 1 year
+        }
+        else if (numOfMonths > 1) {
+            monthsWording = l[6803].replace('%1', numOfMonths);     // x months
+        }
+        
+        // Update the Pro plan details
+        this.$dialog.find('.plan-icon').removeClass('pro1 pro2 pro3 pro4').addClass('pro' + proNum);
+        this.$dialog.find('.payment-plan-title').html(proPlan);
+        this.$dialog.find('.payment-plan-price').html(proPrice + '&euro;');
+        this.$dialog.find('.payment-plan-txt').html(monthsWording + ' ' + l[6965] + ' ');
+        
+        // Remove rogue colon in translation text
+        var statePlaceholder = this.$dialog.find('.state-province').attr('placeholder').replace(':', '');
+        this.$dialog.find('.state-province').attr('placeholder', statePlaceholder);
+        
+        // Initialise the close button
+        this.$dialog.find('.btn-close-dialog').click(function() {
+            cardDialog.$dialogOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+            cardDialog.$dialog.removeClass('active').addClass('hidden');
+        });
+    },
+    
+    /**
+     * Initialise functionality for the purchase button
+     */
+    initPurchaseButton: function() {
+        
+        this.$dialog.find('.payment-buy-now').click(function() {
+            
+            // Validate the form and normalise the billing details
+            var billingDetails = cardDialog.getBillingDetails();
+            
+            // If no errors, proceed with payment
+            if (billingDetails !== false) {                
+                cardDialog.encryptBillingData(billingDetails);
+            }            
+        });
+    },
+    
+    /**
+     * Creates a list of country names with the ISO 3166-1-alpha-2 code as the option value
+     */
+    initCountryDropDown: function() {
+      
+        var countryOptions = '<option value=""></option>';
+        var $countriesDropDown = this.$dialog.find('.countries');
+        
+        // Build options
+        $.each(isocountries, function(isoCode, countryName) {            
+            countryOptions += '<option value="' + isoCode + '">' + countryName + '</option>';
+        });
+        
+        // Render the countries and update the text when a country is selected
+        $countriesDropDown.html(countryOptions);
+		$countriesDropDown.rebind('change', function(event)
+        {
+            var $this = $(this);
+            var countryName = $this.find(':selected').text();            
+            $this.parent().find('.account-select-txt').text(countryName);
+        });
+    },
+    
+    /**
+     * Creates the expiry month dropdown
+     */
+    initExpiryMonthDropDown: function() {
+        
+        var twoDigitMonth = '';
+        var monthOptions = '<option value=""></option>';
+        var $expiryMonthDropDown = this.$dialog.find('.expiry-date-month');
+        
+        // Build options
+        for (var month = 1; month <= 12; month++) {            
+            twoDigitMonth = (month < 10) ? '0' + month : month;
+            monthOptions += '<option value="' + twoDigitMonth + '">' + twoDigitMonth + '</option>';
+        }
+        
+        // Render the months and update the text when a country is selected
+        $expiryMonthDropDown.html(monthOptions);
+        $expiryMonthDropDown.rebind('change', function(event)
+        {
+            var $this = $(this);
+            var monthNum = $this.find(':selected').text();            
+            $this.parent().find('.account-select-txt').text(monthNum);
+        });
+    },
+    
+    /**
+     * Creates the expiry year dropdown
+     */
+    initExpiryYearDropDown: function() {
+        
+        var yearOptions = '<option value=""></option>';
+        var currentYear = new Date().getFullYear();
+        var endYear = currentYear + 7;
+        var $expiryYearDropDown = this.$dialog.find('.expiry-date-year');
+        
+        // Build options
+        for (var year = currentYear; year < endYear; year++) {
+            yearOptions += '<option value="' + year + '">' + year + '</option>';
+        }
+        
+        // Render the months and update the text when a country is selected
+        $expiryYearDropDown.html(yearOptions);
+        $expiryYearDropDown.rebind('change', function(event)
+        {
+            var $this = $(this);
+            var yearText = $this.find(':selected').text();            
+            $this.parent().find('.account-select-txt').text(yearText);
+        });
+    },
+	
+	/**
+     * Inputs focused states
+     */
+    initInputsFocus: function() {
 
-        // If there is still time remaining
-        if (difference > 0) {
+        this.$dialog.find('.fm-account-input input').bind('focus', function() {
+            $(this).parent().addClass('focused');
+        });
 
-            // Show full opacity when 1 minute countdown mark hit
-            if (difference <= 60) {
-                dialog.find('.clock-icon').css('opacity', 1);
-                dialog.find('.expiry-instruction').css('opacity', 1);
-                dialog.find('.time-to-expire').css('opacity', 1);
+        this.$dialog.find('.fm-account-input input').bind('blur', function() {
+            $(this).parent().removeClass('focused');
+        });
+    },
+    
+    /**
+     * Checks if the billing details are valid before proceeding
+     * Also normalise the data to remove inconsistencies
+     * @returns {Boolean}
+     */
+    getBillingDetails: function() {
+        
+        // All payment data
+        var billingData =	{
+            first_name: this.$dialog.find('.first-name').val(),
+            last_name: this.$dialog.find('.last-name').val(),
+            card_number: this.$dialog.find('.credit-card-number').val(),
+            expiry_date_month: this.$dialog.find('.expiry-date-month').val(),
+            expiry_date_year: this.$dialog.find('.expiry-date-year').val(),
+            cv2: this.$dialog.find('.cvv-code').val(),
+            address1: this.$dialog.find('.address1').val(),
+            address2: this.$dialog.find('.address2').val(),
+            city: this.$dialog.find('.city').val(),
+            province: this.$dialog.find('.state-province').val(),
+            postal_code: this.$dialog.find('.post-code').val(),
+            country_code: this.$dialog.find('.countries').val(),
+            email_address: u_attr.email
+        };
+        
+        // Trim whitespace from beginning and end of all form fields
+        $.each(billingData, function(key, value) {
+            billingData[key] = $.trim(value);
+        });
+        
+        // Remove all spaces and hyphens from credit card number
+        billingData.card_number = billingData.card_number.replace(/-|\s/g, '');
+        
+        // Check the credit card number
+        if (!cardDialog.isValidCreditCard(billingData.card_number)) {
+            
+            // Show error popup and on close re-add the overlay
+            msgDialog('warninga', l[6954], l[6955], '', function() {
+                cardDialog.$dialogOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+            });
+            return false;
+        }
+        
+        // Check the required billing details are completed
+        if (!billingData.address1 || !billingData.city || !billingData.province || !billingData.country_code || !billingData.postal_code) {
+            
+            // Show error popup and on close re-add the overlay
+            msgDialog('warninga', l[6956], l[6957], '', function() {
+                cardDialog.$dialogOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+            });
+            return false;
+        }
+        
+        // Check all the card details are completed
+        else if (!billingData.first_name || !billingData.last_name || !billingData.card_number || !billingData.expiry_date_month || !billingData.expiry_date_year || !billingData.cv2) {
+            
+            msgDialog('warninga', l[6958], l[6959], '', function() {
+                cardDialog.$dialogOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+            });
+            return false;
+        }
+        
+        return billingData;
+    },
+    
+    /**
+     * Encrypts the billing data before sending to the API server
+     * @param {Object} billingData The data to be encrypted and sent
+     */
+    encryptBillingData: function(billingData) {
+        
+        // Get last 4 digits of card number
+        var cardNumberLength = billingData.card_number.length;
+        var lastFourCardDigits = billingData.card_number.substr(cardNumberLength - 4);
+        
+        // Hash the card data so users can identify their cards later in our system if they 
+        // get locked out or something. It must be unique and able to be derived again.
+        var cardData = JSON.stringify({
+            'card_number': billingData.card_number,
+            'expiry_date_month': billingData.expiry_date_month,
+            'expiry_date_year': billingData.expiry_date_year,
+            'cv2': billingData.cv2
+        });
+        var cardDataHash = sjcl.hash.sha256.hash(cardData);
+        var cardDataHashHex = sjcl.codec.hex.fromBits(cardDataHash);
+
+        // Comes back as byte string, so encode first.
+        var jsonEncodedBillingData = JSON.stringify(billingData);
+        var encryptedBillingData = btoa(paycrypt.hybridEncrypt(jsonEncodedBillingData, this.publicKey));
+
+        // Add credit card, the most recently added card is used by default
+        var requestData = {
+            'a': 'ccs',                          // Credit Card Store
+            'cc': encryptedBillingData,
+            'last4': lastFourCardDigits,
+            'expm': billingData.expiry_date_month,
+            'expy': billingData.expiry_date_year, 
+            'hash': cardDataHashHex
+        };
+        
+        api_req(requestData, {
+            callback: function (res) {    
+                // Proceed with payment
+                pro_pay();
             }
-
-            // Show time remaining
-            dialog.find('.time-to-expire').html(minutesPadded + ':' + secondsPadded);
+        });
+    },
+    
+    /**
+     * Show the bouncing megacoin icon while loading
+     */
+    showLoadingOverlay: function() {
+        
+        // Close the card dialog
+        cardDialog.$dialogOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+        cardDialog.$dialog.removeClass('active').addClass('hidden');
+        
+        // Show the loading gif
+        cardDialog.$dialogOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+        cardDialog.$loadingOverlay.removeClass('hidden');
+    },
+    
+    /**
+     * Shows a successful payment modal dialog
+     */
+    showSuccessfulPayment: function() {
+        
+        // Close the card dialog and loading overlay
+        cardDialog.$dialogOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+        cardDialog.$failureOverlay.addClass('hidden');
+        cardDialog.$loadingOverlay.addClass('hidden');
+        cardDialog.$dialog.removeClass('active').addClass('hidden');
+        
+        // Get the selected Pro plan details
+        var proNum = selectedProPackage[1];
+        var proPlan = getProPlan(proNum);
+        var successMessage = l[6962].replace('%1', '<span>' + proPlan + '</span>');
+        
+        // Show the success
+        cardDialog.$dialogOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+        cardDialog.$successOverlay.removeClass('hidden');
+        cardDialog.$successOverlay.find('.payment-result-txt').html(successMessage);
+        
+        // Add click handlers for 'Go to my account' and Close buttons
+        cardDialog.$successOverlay.find('.payment-result-button, .payment-close').rebind('click', function() {
+            
+            // Hide the overlay
+            cardDialog.$dialogOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+            cardDialog.$successOverlay.addClass('hidden');
+            
+            // Make sure it fetches new account data on reload
+            if (M.account) {
+                M.account.lastupdate = 0;
+            }
+            window.location.hash = 'fm/account';            
+        });
+    },
+    
+    /**
+     * Shows the failure overlay
+     * @param {Object} utcResult 
+     */
+    showFailureOverlay: function(utcResult) {
+        
+        // Show the failure overlay
+        cardDialog.$failureOverlay.removeClass('hidden');
+        cardDialog.$loadingOverlay.addClass('hidden');
+        
+        // If error is 'Fail Provider', get the exact error or show a default 'Something went wrong' type message
+        var errorMessage = (utcResult.EUR.res === 'FP') ? this.getProviderError(utcResult.EUR.code) : l[6950];
+        cardDialog.$failureOverlay.find('.payment-result-txt').html(errorMessage);
+        
+        // On click of the 'Try again' or Close buttons, hide the overlay and the user can fix their payment details
+        cardDialog.$failureOverlay.find('.payment-result-button, .payment-close').rebind('click', function() {
+            
+            // Hide failure and re-open the dialog
+            cardDialog.$failureOverlay.addClass('hidden');
+            
+            // Re-open the card dialog
+            cardDialog.$dialogOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+            cardDialog.$dialog.addClass('active').removeClass('hidden');
+        });
+    },
+    
+    /**
+     * Gets an error message based on the error code from the payment provider
+     * @param {Number} errorCode The error code
+     * @returns {String} The error message
+     */
+    getProviderError: function(errorCode) {
+        
+        switch (errorCode) {
+            case -1:
+                // There is an error with your credit card details
+                return l[6966];
+            case -2:
+                // There is an error with your billing details
+                return l[6967];
+            case -3:
+                // Your transaction was detected as being fraudulent
+                return l[6968];
+            case -4:
+                // You have tried to pay too many times with this credit card recently
+                return l[6969];
+            case -5:
+                // You have insufficient funds to make this payment
+                return l[6970];
+            default:
+                // Please verify your payment information and try again
+                return l[6950];
         }
-        else {
-            // Grey out and hide details as the price has expired
-            dialog.find('.scan-code-instruction').css('opacity', '0.25');
-            dialog.find('.btn-open-wallet').css('visibility', 'hidden');
-            dialog.find('.bitcoin-address').css('visibility', 'hidden');
-            dialog.find('.bitcoin-qr-code').css('opacity', '0.15');
-            dialog.find('.qr-code-mega-icon').hide();
-            dialog.find('.plan-icon').css('opacity', '0.25');
-            dialog.find('.plan-name').css('opacity', '0.25');
-            dialog.find('.plan-duration').css('opacity', '0.25');
-            dialog.find('.plan-price-euros').css('opacity', '0.25');
-            dialog.find('.plan-price-bitcoins').css('opacity', '0.25');
-            dialog.find('.plan-price-bitcoins-btc').css('opacity', '0.25');
-            dialog.find('.expiry-instruction').html('This purchase has expired.').css('opacity', '1');
-            dialog.find('.time-to-expire').html('00:00').css('opacity', '1');
-            dialog.find('.price-expired-instruction').show();
+    },
+    
+    /**
+     * Validates the credit card number is the correct format
+     * Written by Jorn Zaefferer
+     * From http://jqueryvalidation.org/creditcard-method/ (MIT Licence)
+     * Based on http://en.wikipedia.org/wiki/Luhn_algorithm
+     * @param {String} cardNum The credit card number
+     * @returns {Boolean}
+     */
+    isValidCreditCard: function (cardNum) {
+
+        // Accept only spaces, digits and dashes
+        if (/[^0-9 \-]+/.test(cardNum)) {
+            return false;
+        }
+        var numCheck = 0,
+            numDigit = 0,
+            even = false,
+            num,
+            charDigit;
+
+        cardNum = cardNum.replace(/\D/g, '');
+
+        // Basing min and max length on
+        // http://developer.ean.com/general_info/Valid_Credit_Card_Types
+        if (cardNum.length < 13 || cardNum.length > 19) {
+            return false;
+        }
+
+        for (num = cardNum.length - 1; num >= 0; num--) {
+            charDigit = cardNum.charAt(num);
+            numDigit = parseInt(charDigit, 10);
+            
+            if (even) {
+                if ((numDigit *= 2) > 9) {
+                    numDigit -= 9;
+                }
+            }
+            numCheck += numDigit;
+            even = !even;
+        }
+
+        return (numCheck % 10) === 0;
+    }
+};
+
+/**
+ * Bitcoin invoice dialog
+ */
+var bitcoinDialog = {
+    
+    // Web socket for chain.com connection to monitor bitcoin payment
+    chainWebSocketConn: null,
+    
+    // Timer for counting down the time till when the price expires
+    countdownIntervalId: 0,
+    
+    /**
+     * Step 3 in plan purchase with Bitcoin
+     * @param {Object} apiResponse API result
+     */
+    showInvoice: function(apiResponse) {
+
+        /* Testing data to watch the invoice expire in 5 secs
+        apiResponse = {
+            "invoice_id": 'sIk',
+            "address": '12ouE2tWLuR3q5ZyQzQL6DR25iBLVjhwXd',
+            "amount": 1.35715354,
+            "created": Math.round(Date.now() / 1000),
+            "expiry": Math.round(Date.now() / 1000) + 5
+        };//*/
+
+        // Set details
+        var bitcoinAddress = apiResponse.address;
+        var bitcoinUrl = 'bitcoin:' + apiResponse.address + '?amount=' + apiResponse.amount;
+        var invoiceDateTime = new Date(apiResponse.created * 1000);
+        var proPlanNum = selectedProPackage[1];
+        var planName = getProPlan(proPlanNum);
+        var planMonths = l[6806].replace('%1', selectedProPackage[4]);  // x month purchase
+        var priceEuros = selectedProPackage[5] + '<span>&euro;</span>';
+        var priceBitcoins = apiResponse.amount;
+        var expiryTime = new Date(apiResponse.expiry);
+
+        // Cache original HTML of dialog to reset after close
+        var dialogOverlay = $('.fm-dialog-overlay');
+        var dialog = $('.fm-dialog.pro-register-paypal-dialog');
+        var dialogOriginalHtml = dialog.html();
+
+        // Add styles for the dialog
+        dialogOverlay.addClass('bitcoin-invoice-dialog');
+        dialog.addClass('bitcoin-invoice-dialog');
+
+        // Clone template and show Bitcoin invoice
+        var bitcoinInvoiceHtml = $('.bitcoin-invoice').html();
+        dialog.html(bitcoinInvoiceHtml);
+
+        // Render QR code
+        bitcoinDialog.generateBitcoinQrCode(dialog, bitcoinAddress, priceBitcoins);
+
+        // Update details inside dialog
+        dialog.find('.btn-open-wallet').attr('href', bitcoinUrl);
+        dialog.find('.bitcoin-address').html(bitcoinAddress);
+        dialog.find('.invoice-date-time').html(invoiceDateTime);
+        dialog.find('.plan-icon').addClass('pro' + proPlanNum);
+        dialog.find('.plan-name').html(planName);
+        dialog.find('.plan-duration').html(planMonths);
+        dialog.find('.plan-price-euros').html(priceEuros);
+        dialog.find('.plan-price-bitcoins').html(priceBitcoins);
+
+        // Set countdown to price expiry
+        bitcoinDialog.setCoundownTimer(dialog, expiryTime);
+
+        // Close dialog and reset to original dialog
+        dialog.find('.btn-close-dialog').click(function() {
+            
+            dialogOverlay.removeClass('bitcoin-invoice-dialog').addClass('hidden');
+            dialog.removeClass('bitcoin-invoice-dialog').addClass('hidden').html(dialogOriginalHtml);
+
+            // Close Web Socket if open
+            if (bitcoinDialog.chainWebSocketConn !== null) {
+                bitcoinDialog.chainWebSocketConn.close();
+            }
 
             // End countdown timer
-            clearInterval(countdownIntervalId);
-        }
-    }, 1000);
+            clearInterval(bitcoinDialog.countdownIntervalId);
+        });
 
-    return countdownIntervalId;
-}
+        // Update the dialog if a transaction is seen in the blockchain
+        bitcoinDialog.checkTransactionInBlockchain(dialog, bitcoinAddress, planName);
+    },
+    
+    /**
+     * Renders the bitcoin QR code with highest error correction so that MEGA logo can be overlayed
+     * http://www.qrstuff.com/blog/2011/12/14/qr-code-error-correction
+     * @param {Object} dialog jQuery object of the dialog
+     * @param {String} bitcoinAddress The bitcoin address
+     * @param {String|Number} priceInBitcoins The price in bitcoins
+     */
+    generateBitcoinQrCode: function(dialog, bitcoinAddress, priceInBitcoins) {
 
-/**
- * Open WebSocket to chain.com API to monitor block chain for transactions on that receive address.
- * This will receive a faster confirmation than the action packet which waits for an IPN from the provider.
- * @param {Object} dialog The jQuery object for the dialog
- * @param {String} bitcoinAddress The bitcoin address
- * @param {String} planName The Pro plan name
- * @param {Number} countdownIntervalId The countdown timer id so it can be terminated
- */
-function checkTransactionInBlockchain(dialog, bitcoinAddress, planName, countdownIntervalId) {
+        var options = {
+            width: 256,
+            height: 256,
+            correctLevel: QRErrorCorrectLevel.H,    // High
+            background: '#ffffff',
+            foreground: '#000',
+            text: 'bitcoin:' + bitcoinAddress + '?amount=' + priceInBitcoins
+        };
 
-    // Open socket
-    chainWebSocketConn = new WebSocket('wss://ws.chain.com/v2/notifications');
+        // Render the QR code
+        dialog.find('.bitcoin-qr-code').html('').qrcode(options);
+    },
+    
+    /**
+     * Open WebSocket to chain.com API to monitor block chain for transactions on that receive address.
+     * This will receive a faster confirmation than the action packet which waits for an IPN from the provider.
+     * @param {Object} dialog The jQuery object for the dialog
+     * @param {String} bitcoinAddress The bitcoin address
+     * @param {String} planName The Pro plan name
+     */
+    checkTransactionInBlockchain: function(dialog, bitcoinAddress, planName) {
 
-    // Listen for events on this bitcoin address
-    chainWebSocketConn.onopen = function (event) {
-        var req = { type: 'address', address: bitcoinAddress, block_chain: 'bitcoin' };
-        chainWebSocketConn.send(JSON.stringify(req));
-    };
+        // Open socket
+        bitcoinDialog.chainWebSocketConn = new WebSocket('wss://ws.chain.com/v2/notifications');
 
-    // After receiving a response from the chain.com server
-    chainWebSocketConn.onmessage = function (event) {
+        // Listen for events on this bitcoin address
+        bitcoinDialog.chainWebSocketConn.onopen = function (event) {
+            var req = { type: 'address', address: bitcoinAddress, block_chain: 'bitcoin' };
+            bitcoinDialog.chainWebSocketConn.send(JSON.stringify(req));
+        };
 
-        // Get data from WebSocket response
-        var notification = JSON.parse(event.data);
-        var type = notification.payload.type;
-        var address = notification.payload.address;
+        // After receiving a response from the chain.com server
+        bitcoinDialog.chainWebSocketConn.onmessage = function (event) {
 
-        // Check only 'address' packets as the system also sends heartbeat packets
-        if ((type === 'address') && (address === bitcoinAddress)) {
+            // Get data from WebSocket response
+            var notification = JSON.parse(event.data);
+            var type = notification.payload.type;
+            var address = notification.payload.address;
 
-            // Update price left to pay
-            var currentPriceBitcoins = parseFloat(dialog.find('.plan-price-bitcoins').html());
-            var currentPriceSatoshis = toSatoshi(currentPriceBitcoins);
-            var satoshisReceived = notification.payload.received;
-            var priceRemainingSatoshis = currentPriceSatoshis - satoshisReceived;
-            var priceRemainingBitcoins = toBitcoinString(priceRemainingSatoshis);
+            // Check only 'address' packets as the system also sends heartbeat packets
+            if ((type === 'address') && (address === bitcoinAddress)) {
 
-            // If correct amount was received
-            if (satoshisReceived === currentPriceSatoshis) {
+                // Update price left to pay
+                var currentPriceBitcoins = parseFloat(dialog.find('.plan-price-bitcoins').html());
+                var currentPriceSatoshis = toSatoshi(currentPriceBitcoins);
+                var satoshisReceived = notification.payload.received;
+                var priceRemainingSatoshis = currentPriceSatoshis - satoshisReceived;
+                var priceRemainingBitcoins = toBitcoinString(priceRemainingSatoshis);
 
-                // Show success
-                dialog.find('.left-side').css('visibility', 'hidden');
-                dialog.find('.payment-confirmation').show();
-                dialog.find('.payment-confirmation .reg-success-icon').addClass('success');
-                dialog.find('.payment-confirmation .description').html(planName + ' plan has been paid!');
-                dialog.find('.payment-confirmation .instruction').html('Please await account upgrade by MEGA...');
-                dialog.find('.expiry-instruction').html('Paid!');
+                // If correct amount was received
+                if (satoshisReceived === currentPriceSatoshis) {
 
-                // End countdown timer and close connection
-                clearInterval(countdownIntervalId);
-                chainWebSocketConn.close();
-                
-                // Inform API that we have full payment and await action packet confirmation.
-                // a = action, vpay = verify payment, saleId = the id from the 'uts' call - this is 
-                // an array because one day we may support multiple sales e.g. buy Pro 1 and 2 at the 
-                // same time, add = the bitcoin address, t = payment gateway id for bitcoin provider (4)
-                api_req({ a: 'vpay', saleid: [saleId], add: bitcoinAddress, t: 4 });
+                    // Show success
+                    dialog.find('.left-side').css('visibility', 'hidden');
+                    dialog.find('.payment-confirmation').show();
+                    dialog.find('.payment-confirmation .reg-success-icon').addClass('success');
+                    dialog.find('.payment-confirmation .description').html(planName + ' plan has been paid!');
+                    dialog.find('.payment-confirmation .instruction').html('Please await account upgrade by MEGA...');
+                    dialog.find('.expiry-instruction').html('Paid!');
+
+                    // End countdown timer and close connection
+                    clearInterval(bitcoinDialog.countdownIntervalId);
+                    bitcoinDialog.chainWebSocketConn.close();
+
+                    // Inform API that we have full payment and await action packet confirmation.
+                    // a = action, vpay = verify payment, saleId = the id from the 'uts' call - this is 
+                    // an array because one day we may support multiple sales e.g. buy Pro 1 and 2 at the 
+                    // same time, add = the bitcoin address, t = payment gateway id for bitcoin provider (4)
+                    api_req({ a: 'vpay', saleid: [saleId], add: bitcoinAddress, t: 4 });
+                }
+
+                // If partial payment was made
+                else if (satoshisReceived < currentPriceSatoshis) {
+
+                    // Update price to pay
+                    dialog.find('.plan-price-bitcoins').html(priceRemainingBitcoins);
+                    dialog.find('.btn-open-wallet').attr('href', 'bitcoin:' + bitcoinAddress + '?amount=' + priceRemainingBitcoins);
+
+                    // Re-render QR code with updated price
+                    bitcoinDialog.generateBitcoinQrCode(dialog, bitcoinAddress, priceRemainingBitcoins);
+                }
             }
+        };
+    },
+    
+    /**
+     * Sets a countdown timer on the bitcoin invoice dialog to count down from 15~ minutes
+     * until the bitcoin price expires and they need to restart the process
+     * @param {Object} dialog The bitcoin invoice dialog
+     * @param {Date} expiryTime The date/time the invoice will expire
+     * @returns {Number} Returns the interval id
+     */
+    setCoundownTimer: function(dialog, expiryTime)
+    {
+        // Count down the time to price expiration
+        bitcoinDialog.countdownIntervalId = setInterval(function() {
 
-            // If partial payment was made
-            else if (satoshisReceived < currentPriceSatoshis) {
+            // Show number of minutes and seconds counting down
+            var currentTimestamp = Math.round(Date.now() / 1000);
+            var difference = expiryTime - currentTimestamp;
+            var minutes = Math.floor(difference / 60);
+            var minutesPadded = (minutes < 10) ? '0' + minutes : minutes;
+            var seconds = difference - (minutes * 60);
+            var secondsPadded = (seconds < 10) ? '0' + seconds : seconds;
 
-                // Update price to pay
-                dialog.find('.plan-price-bitcoins').html(priceRemainingBitcoins);
-                dialog.find('.btn-open-wallet').attr('href', 'bitcoin:' + bitcoinAddress + '?amount=' + priceRemainingBitcoins);
+            // If there is still time remaining
+            if (difference > 0) {
 
-                // Re-render QR code with updated price
-                generateBitcoinQrCode(dialog, bitcoinAddress, priceRemainingBitcoins);
+                // Show full opacity when 1 minute countdown mark hit
+                if (difference <= 60) {
+                    dialog.find('.clock-icon').css('opacity', 1);
+                    dialog.find('.expiry-instruction').css('opacity', 1);
+                    dialog.find('.time-to-expire').css('opacity', 1);
+                }
+
+                // Show time remaining
+                dialog.find('.time-to-expire').html(minutesPadded + ':' + secondsPadded);
             }
-        }
-    };
-}
+            else {
+                // Grey out and hide details as the price has expired
+                dialog.find('.scan-code-instruction').css('opacity', '0.25');
+                dialog.find('.btn-open-wallet').css('visibility', 'hidden');
+                dialog.find('.bitcoin-address').css('visibility', 'hidden');
+                dialog.find('.bitcoin-qr-code').css('opacity', '0.15');
+                dialog.find('.qr-code-mega-icon').hide();
+                dialog.find('.plan-icon').css('opacity', '0.25');
+                dialog.find('.plan-name').css('opacity', '0.25');
+                dialog.find('.plan-duration').css('opacity', '0.25');
+                dialog.find('.plan-price-euros').css('opacity', '0.25');
+                dialog.find('.plan-price-bitcoins').css('opacity', '0.25');
+                dialog.find('.plan-price-bitcoins-btc').css('opacity', '0.25');
+                dialog.find('.expiry-instruction').html('This purchase has expired.').css('opacity', '1');
+                dialog.find('.time-to-expire').html('00:00').css('opacity', '1');
+                dialog.find('.price-expired-instruction').show();
 
-/**
- * Renders the bitcoin QR code with highest error correction so that MEGA logo can be overlayed
- * http://www.qrstuff.com/blog/2011/12/14/qr-code-error-correction
- * @param {Object} dialog jQuery object of the dialog
- * @param {String} bitcoinAddress The bitcoin address
- * @param {String|Number} priceInBitcoins The price in bitcoins
- */
-function generateBitcoinQrCode(dialog, bitcoinAddress, priceInBitcoins) {
+                // End countdown timer
+                clearInterval(bitcoinDialog.countdownIntervalId);
+            }
+        }, 1000);
+    },
+    
+    /**
+     * Show a failure dialog if the provider can't be contacted
+     */
+    showBitcoinProviderFailureDialog: function() {
 
-    var options = {
-        width: 256,
-        height: 256,
-        correctLevel: QRErrorCorrectLevel.H,
-        background: "#ffffff",
-        foreground: "#000",
-        text: 'bitcoin:' + bitcoinAddress + '?amount=' + priceInBitcoins
-    };
+        // Add styles for the dialog
+        var dialogOverlay = $('.fm-dialog-overlay');
+        var dialog = $('.fm-dialog.pro-register-paypal-dialog');
+        var dialogOriginalHtml = dialog.html();
 
-    // Render the QR code
-    dialog.find('.bitcoin-qr-code').html('').qrcode(options);
-}
+        // Add styles for the dialog
+        dialogOverlay.addClass('bitcoin-provider-failure-dialog');
+        dialog.addClass('bitcoin-provider-failure-dialog');
 
-/**
- * Show a failure dialog if the provider can't be contacted
- */
-function showBitcoinProviderFailureDialog() {
+        // End countdown timer
+        clearInterval(bitcoinDialog.countdownIntervalId);
 
-    // Add styles for the dialog
-    var dialogOverlay = $('.fm-dialog-overlay');
-    var dialog = $('.fm-dialog.pro-register-paypal-dialog');
-    var dialogOriginalHtml = dialog.html();
+        // Clone template and show failure
+        var bitcoinProviderFailureHtml = $('.bitcoin-provider-failure').html();
+        dialog.html(bitcoinProviderFailureHtml);
+        
+        // Close dialog and reset to original dialog
+        dialog.find('.btn-close-dialog').click(function() {
+            dialogOverlay.removeClass('bitcoin-provider-failure-dialog').addClass('hidden');
+            dialog.removeClass('bitcoin-provider-failure-dialog').addClass('hidden').html(dialogOriginalHtml);
+        });
+    }
+};
 
-    // Add styles for the dialog
-    dialogOverlay.addClass('bitcoin-provider-failure-dialog');
-    dialog.addClass('bitcoin-provider-failure-dialog');
-
-    // Clone template and show failure
-    var bitcoinProviderFailureHtml = $('.bitcoin-provider-failure').html();
-    dialog.html(bitcoinProviderFailureHtml);
-
-    // Close dialog and reset to original dialog
-    dialog.find('.btn-close-dialog').click(function() {
-        dialogOverlay.removeClass('bitcoin-provider-failure-dialog').addClass('hidden');
-        dialog.removeClass('bitcoin-provider-failure-dialog').addClass('hidden').html(dialogOriginalHtml);
-    });
-}
 
 function showLoginDialog() {
     megaAnalytics.log("pro", "loginDialog");
@@ -801,6 +1431,13 @@ var doProLogin = function($dialog) {
     megaAnalytics.log("pro", "doLogin");
 
     loadingDialog.show();
+    
+    var button = $('.selected .membership-button').parents('.reg-st3-membership-bl').attr('class').match(/pro\d/)[0]
+    pro_do_next = function() {
+        $('.' + button + ' .membership-button').trigger('click')
+        pro_do_next = null
+    };
+
     var ctx =
     {
         checkloginresult: function(ctx,r)
@@ -825,7 +1462,6 @@ var doProLogin = function($dialog) {
                     $('.reg-st3-membership-bl').removeClass('selected')
                     $('.reg-st3-membership-bl.' + cls).addClass('selected');
                 }
-                pro_continue();
             }
             else
             {
@@ -1038,8 +1674,12 @@ var doProRegister = function($dialog) {
                     u_attr.terms=1;
 
                     api_req(ops);
-
-                    proceedToPaypal();
+                    //proceedToPaypal();
+                    $('.pro-register-dialog').addClass('hidden');
+                    $('.fm-dialog.registration-page-success').removeClass('hidden');
+                    $('.fm-dialog-overlay').removeClass('hidden');
+                    $('body').addClass('overlayed');
+                    $('.fm-dialog.registration-page-success').unbind('click');
                 }
                 else
                 {
@@ -1212,7 +1852,7 @@ function showLoadingDialog(url) {
             });
     };
 
-    //fadeOutInLoop($('.pro-register-paypal-dialog .reg-success-icon'));
+    fadeOutInLoop($('.pro-register-paypal-dialog .reg-success-icon'));
 
     $dialog
         .addClass('active')

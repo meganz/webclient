@@ -22998,9 +22998,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 	width: 146px;
 	height: 164px;
 	display: inline-block;
-	background-image: url(../images/mega/payment-animation.gif);
-	background-position: 0 0;
-	background-repeat: no-repeat;
 }
 .payment-animation-txt {
 	padding: 45px 0 0 0;
@@ -23244,10 +23241,6 @@ body.pro:after {
  @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
 body.pro:after {
  content: url(../images/mega/payment-animation@2x.gif);
-}
- .payment-animation {
- background-image:url(../images/mega/payment-animation@2x.gif);
-background-size:146px auto;
 }
 .pro-register-paypal-dialog .reg-success-icon, .payment-confirmation .icon, .bitcoin-invoice-dialog .qr-code-mega-icon, .bitcoin-invoice-dialog .clock-icon, .nt-payment-notification .notification-avatar-icon, .payment-result-icon, .payment-close-icon {
  background-image: url(../images/mega/bitcoin-v4@2x.png);

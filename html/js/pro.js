@@ -615,9 +615,6 @@ var unionPay = {
      * Show the bouncing megacoin icon while loading
      */
     showLoadingOverlay: function() {
-        
-        console.log('zzzz got here');
-        
         $('.fm-dialog-overlay').removeClass('hidden').addClass('payment-dialog-overlay');
         $('.payment-processing').removeClass('hidden');
     },
@@ -648,7 +645,7 @@ var unionPay = {
 var cardDialog = {
     
     $dialog: null,
-    $dialogOverlay: null,
+    $backgroundOverlay: null,
     $successOverlay: null,
     $failureOverlay: null,
     $loadingOverlay: null,
@@ -693,13 +690,13 @@ var cardDialog = {
         
         // Cache DOM reference for lookup in other functions
         this.$dialog = $('.fm-dialog.payment-dialog');
-        this.$dialogOverlay = $('.fm-dialog-overlay');
+        this.$backgroundOverlay = $('.fm-dialog-overlay');
         this.$successOverlay = $('.payment-result.success');
         this.$failureOverlay = $('.payment-result.failed');
         this.$loadingOverlay = $('.payment-processing');
         
         // Add the styling for the overlay
-        this.$dialogOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+        this.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
         
         // Position the dialog and open it
         this.$dialog.css({
@@ -738,12 +735,16 @@ var cardDialog = {
         
         // Initialise the close button
         this.$dialog.find('.btn-close-dialog').rebind('click', function() {
-            cardDialog.$dialogOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+            cardDialog.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
             cardDialog.$dialog.removeClass('active').addClass('hidden');            
             
             // Reset flag so they can try paying again
             cardDialog.paymentInProcess = false;
         });
+        
+        // Check if using retina display and preload loading animation
+        var retina = (window.devicePixelRatio > 1) ? '@2x' : '';
+        $('.payment-animation').attr('src', staticpath + '/images/mega/payment-animation' + retina + '.gif');
     },
     
     /**
@@ -923,7 +924,7 @@ var cardDialog = {
             
             // Show error popup and on close re-add the overlay
             msgDialog('warninga', l[6954], l[6955], '', function() {
-                cardDialog.$dialogOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+                cardDialog.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
             });
             return false;
         }
@@ -933,7 +934,7 @@ var cardDialog = {
             
             // Show error popup and on close re-add the overlay
             msgDialog('warninga', l[6956], l[6957], '', function() {
-                cardDialog.$dialogOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+                cardDialog.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
             });
             return false;
         }
@@ -942,7 +943,7 @@ var cardDialog = {
         else if (!billingData.first_name || !billingData.last_name || !billingData.card_number || !billingData.expiry_date_month || !billingData.expiry_date_year || !billingData.cv2) {
             
             msgDialog('warninga', l[6958], l[6959], '', function() {
-                cardDialog.$dialogOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+                cardDialog.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
             });
             return false;
         }
@@ -989,8 +990,16 @@ var cardDialog = {
         
         // Proceed with payment
         api_req(requestData, {
-            callback: function (res) {
-                pro_pay();
+            callback: function (result) {
+                
+                // If negative API number
+                if ((typeof result === 'number') && (result < 0)) {
+                    cardDialog.showFailureOverlay();
+                }
+                else {
+                    // Otherwise continue to charge card
+                    pro_pay();
+                }
             }
         });
     },
@@ -1013,11 +1022,16 @@ var cardDialog = {
     showLoadingOverlay: function() {
         
         // Close the card dialog
-        cardDialog.$dialogOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
         cardDialog.$dialog.removeClass('active').addClass('hidden');
         
+        // Prevent clicking on the background overlay while it's loading, which makes 
+        // the background disappear and error triangle appear on white background
+        cardDialog.$backgroundOverlay.rebind('click', function(event) {
+            event.stopPropagation();
+        });
+        
         // Show the loading gif
-        cardDialog.$dialogOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+        cardDialog.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
         cardDialog.$loadingOverlay.removeClass('hidden');
     },
     
@@ -1027,7 +1041,6 @@ var cardDialog = {
     showSuccessfulPayment: function() {
         
         // Close the card dialog and loading overlay
-        cardDialog.$dialogOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
         cardDialog.$failureOverlay.addClass('hidden');
         cardDialog.$loadingOverlay.addClass('hidden');
         cardDialog.$dialog.removeClass('active').addClass('hidden');
@@ -1038,7 +1051,7 @@ var cardDialog = {
         var successMessage = l[6962].replace('%1', '<span>' + proPlan + '</span>');
         
         // Show the success
-        cardDialog.$dialogOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+        cardDialog.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
         cardDialog.$successOverlay.removeClass('hidden');
         cardDialog.$successOverlay.find('.payment-result-txt').html(successMessage);
         
@@ -1046,7 +1059,7 @@ var cardDialog = {
         cardDialog.$successOverlay.find('.payment-result-button, .payment-close').rebind('click', function() {
             
             // Hide the overlay
-            cardDialog.$dialogOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+            cardDialog.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
             cardDialog.$successOverlay.addClass('hidden');
             
             // Remove credit card details from the form
@@ -1070,11 +1083,13 @@ var cardDialog = {
     showFailureOverlay: function(utcResult) {
         
         // Show the failure overlay
+        cardDialog.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
         cardDialog.$failureOverlay.removeClass('hidden');
         cardDialog.$loadingOverlay.addClass('hidden');
+        cardDialog.$successOverlay.addClass('hidden');
         
         // If error is 'Fail Provider', get the exact error or show a default 'Something went wrong' type message
-        var errorMessage = (utcResult.EUR.res === 'FP') ? this.getProviderError(utcResult.EUR.code) : l[6950];
+        var errorMessage = ((typeof utcResult !== 'undefined') && (utcResult.EUR.res === 'FP')) ? this.getProviderError(utcResult.EUR.code) : l[6950];
         cardDialog.$failureOverlay.find('.payment-result-txt').html(errorMessage);
         
         // On click of the 'Try again' or Close buttons, hide the overlay and the user can fix their payment details
@@ -1087,7 +1102,6 @@ var cardDialog = {
             cardDialog.$failureOverlay.addClass('hidden');
             
             // Re-open the card dialog
-            cardDialog.$dialogOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
             cardDialog.$dialog.addClass('active').removeClass('hidden');
         });
     },
@@ -1129,7 +1143,7 @@ var cardDialog = {
      * @param {String} cardNum The credit card number
      * @returns {Boolean}
      */
-    isValidCreditCard: function (cardNum) {
+    isValidCreditCard: function(cardNum) {
 
         // Accept only spaces, digits and dashes
         if (/[^0-9 \-]+/.test(cardNum)) {

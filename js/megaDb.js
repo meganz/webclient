@@ -65,7 +65,7 @@ function MegaDB(name, suffix, schema, options) {
         self.trigger('onDbStateReady');
         self.initialize();
     }
-    function __dbOpen() {
+    function __dbOpen(aRetry) {
         dbOpenOptions.version = version;
 
         self._dbOpenPromise = db.open(dbOpenOptions).then( function( s ) {
@@ -101,15 +101,25 @@ function MegaDB(name, suffix, schema, options) {
 
         }, function( e ) {
             // nb: "reason" comes from our modified db.js
-            var dbError = e.reason.target.error;
+            var dbError = e.reason;
 
-            if (dbError.name === 'VersionError') {
-                self.logger.error(dbError.name);
+            // MSIE throws DOMException.InvalidAccessError
+            if (!(dbError instanceof DOMException)) {
+                if (dbError.target && dbError.target.error instanceof DOMError) {
+                    dbError = dbError.target.error;
+                }
+                else {
+                    self.logger.error('Unexpected error', dbError);
+                }
+            }
+
+            if (!aRetry && (dbError.name === 'VersionError' || dbError.name === 'InvalidAccessError')) {
+                self.logger.info(dbError.name + ' (retrying)');
 
                 MegaDB.getDatabaseVersion(dbName)
                     .then(function(dbProp) {
                         localStorage[dbName + '_v'] = version = dbProp.version + 1;
-                        __dbOpen();
+                        __dbOpen(true);
                     }, function(error) {
                         self.logger.error('MegaDB.getDatabaseVersion', error);
                         __dbOpenFailed(dbError);

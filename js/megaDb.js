@@ -28,7 +28,7 @@ function MegaDB(name, suffix, schema, options) {
     var self = this;
     var dbName = 'mdb_' + name + '_' + suffix;
     // var murSeed = options.murSeed || 0x4d444201;
-    var murSeed = options.murSeed || 0xffff0001;            // <-- NEEDS TO BE CHANGED BEFORE MERGING
+    var murSeed = options.murSeed || 0xffff0002;            // <-- NEEDS TO BE CHANGED BEFORE MERGING
     var murData =
         JSON.stringify(this.schema) +
         JSON.stringify(clone(this.options));
@@ -78,10 +78,20 @@ function MegaDB(name, suffix, schema, options) {
             if (pluginSetupPromises.length) {
                 MegaPromise.all(pluginSetupPromises)
                     .then(function() {
-                        if (d) console.log('MegaDB PlugIn(s) intialization succeed.', arguments);
+                        self.logger.debug('MegaDB PlugIn(s) intialization succeed.', arguments);
                         __dbOpenSucceed(s);
                     }, function(err) {
-                        if (d) console.error('Failed to initialize MegaDB PlugIn(s)', err);
+                        if (!err) {
+                            err = new Error('Failed to initialize MegaDB PlugIn(s)');
+                        }
+                        else if (typeof err === 'object') {
+                            if ("reason" in err) {
+                                err = err.reason;
+                            }
+                            if ("target" in err && err.target.error) {
+                                err = err.target.error;
+                            }
+                        }
                         __dbOpenFailed(err);
                     });
             }
@@ -94,14 +104,14 @@ function MegaDB(name, suffix, schema, options) {
             var dbError = e.reason.target.error;
 
             if (dbError.name === 'VersionError') {
-                if (d) console.log('DB VersionError');
+                self.logger.error(dbError.name);
 
                 MegaDB.getDatabaseVersion(dbName)
                     .then(function(dbProp) {
                         localStorage[dbName + '_v'] = version = dbProp.version + 1;
                         __dbOpen();
                     }, function(error) {
-                        console.error('MegaDB.getDatabaseVersion', error);
+                        self.logger.error('MegaDB.getDatabaseVersion', error);
                         __dbOpenFailed(dbError);
                     });
             }

@@ -39,7 +39,7 @@ function MegaDBEncryption(mdbInstance) {
 
         mdbServerInstance.getUData('enckey')
             .then(function(data) {
-                if (d) console.log('getUData.enckey', data);
+                logger.debug('getUData.enckey', data);
 
                 if (!data) {
                     // Generate new encryption key
@@ -49,10 +49,10 @@ function MegaDBEncryption(mdbInstance) {
 
                     mdbServerInstance.setUData(data, 'enckey')
                         .then(function() {
-                            if (d) console.log('setUData.enckey', arguments);
+                            logger.info('setUData.enckey', arguments);
                             promise.resolve();
                         }, function(err) {
-                            if (d) console.error('Error storing enckey', err);
+                            logger.error('Error storing enckey', err);
                             promise.reject(err);
                         });
                 }

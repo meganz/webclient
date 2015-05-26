@@ -400,7 +400,7 @@ var mFileManagerDB = {
     },
 
     query: function mFileManagerDB_query(aCommand, aTable, aData) {
-        if (!this.db) {
+        if (!(this.db && this.db.server)) {
             throw new Error("No database connection.");
         }
         else if (this.schema[aTable]) {

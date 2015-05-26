@@ -3641,9 +3641,10 @@ function accountUI()
 
         $('.fm-account-remove-avatar,.fm-account-avatar').rebind('click', function() {
             msgDialog('confirmation', l[1756], l[6973], false, function(e) {
-                if (!e) return;
-                api_req({'a': 'up', '+a':'none'});
-                delete avatars[u_handle];
+                if (e) {
+                    api_req({'a': 'up', '+a':'none'});
+                    delete avatars[u_handle];
+                }
             });
         });
 

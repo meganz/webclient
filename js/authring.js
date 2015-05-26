@@ -479,6 +479,20 @@ var authring = (function () {
         u_authring.RSA = {};
         ns.setContacts('RSA');
     };
+    
+    
+    /**
+     * Resets the seen or verified fingerprints for a particular user
+     * @param {String} userHandle The user handle e.g. EWh7LzU3Zf0
+     */
+    ns.resetFingerprintsForUser = function(userHandle) {
+    
+        delete u_authring.Ed25519[userHandle];
+        delete u_authring.RSA[userHandle];
+        
+        ns.setContacts('Ed25519');
+        ns.setContacts('RSA');
+    };
 
 
     /**

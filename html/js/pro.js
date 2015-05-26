@@ -741,6 +741,10 @@ var cardDialog = {
             // Reset flag so they can try paying again
             cardDialog.paymentInProcess = false;
         });
+        
+        // Check if using retina display and preload loading animation
+        var retina = (window.devicePixelRatio > 1) ? '@2x' : '';
+        $('.payment-animation').attr('src', staticpath + '/images/mega/payment-animation' + retina + '.gif');
     },
     
     /**
@@ -1022,8 +1026,7 @@ var cardDialog = {
         
         // Prevent clicking on the background overlay while it's loading, which makes 
         // the background disappear and error triangle appear on white background
-        cardDialog.$backgroundOverlay.rebind('click', function(event)
-        {
+        cardDialog.$backgroundOverlay.rebind('click', function(event) {
             event.stopPropagation();
         });
         

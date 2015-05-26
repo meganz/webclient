@@ -986,8 +986,16 @@ var cardDialog = {
         
         // Proceed with payment
         api_req(requestData, {
-            callback: function (res) {
-                pro_pay();
+            callback: function (result) {
+                
+                // If negative API number
+                if ((typeof result === 'number') && (result < 0)) {
+                    cardDialog.showFailureOverlay();
+                }
+                else {
+                    // Otherwise continue to charge card
+                    pro_pay();
+                }
             }
         });
     },
@@ -1071,7 +1079,7 @@ var cardDialog = {
         cardDialog.$successOverlay.addClass('hidden');
         
         // If error is 'Fail Provider', get the exact error or show a default 'Something went wrong' type message
-        var errorMessage = (utcResult.EUR.res === 'FP') ? this.getProviderError(utcResult.EUR.code) : l[6950];
+        var errorMessage = ((typeof utcResult !== 'undefined') && (utcResult.EUR.res === 'FP')) ? this.getProviderError(utcResult.EUR.code) : l[6950];
         cardDialog.$failureOverlay.find('.payment-result-txt').html(errorMessage);
         
         // On click of the 'Try again' or Close buttons, hide the overlay and the user can fix their payment details

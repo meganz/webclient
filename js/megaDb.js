@@ -53,15 +53,42 @@ function MegaDB(name, suffix, schema, options) {
 
     __dbOpen();
 
+    function __dbOpenFailed(dbError) {
+        self.dbState = MegaDB.DB_STATE.FAILED_TO_INITIALIZE;
+        self.logger.error("Could not initialise MegaDB: ", arguments, name, version, schema);
+        self.trigger('onDbStateFailed', dbError);
+    }
+    function __dbOpenSucceed(dbServer) {
+        self.server = dbServer;
+        self.currentVersion = version;
+        self.dbState = MegaDB.DB_STATE.INITIALIZED;
+        self.trigger('onDbStateReady');
+        self.initialize();
+    }
     function __dbOpen() {
         dbOpenOptions.version = version;
 
         self._dbOpenPromise = db.open(dbOpenOptions).then( function( s ) {
-            self.server = s;
-            self.currentVersion = version;
-            self.dbState = MegaDB.DB_STATE.INITIALIZED;
-            self.trigger('onDbStateReady');
-            self.initialize();
+
+            var pluginSetupPromises = obj_values(self.plugins)
+                .map(function(pl) {
+                    return typeof pl.setup === 'function' && pl.setup(s) || true;
+                });
+
+            if (pluginSetupPromises.length) {
+                MegaPromise.all(pluginSetupPromises)
+                    .then(function() {
+                        if (d) console.log('MegaDB PlugIn(s) intialization succeed.', arguments);
+                        __dbOpenSucceed(s);
+                    }, function(err) {
+                        if (d) console.error('Failed to initialize MegaDB PlugIn(s)', err);
+                        __dbOpenFailed(err);
+                    });
+            }
+            else {
+                __dbOpenSucceed(s);
+            }
+
         }, function( e ) {
             // nb: "reason" comes from our modified db.js
             var dbError = e.reason.target.error;
@@ -75,17 +102,11 @@ function MegaDB(name, suffix, schema, options) {
                         __dbOpen();
                     }, function(error) {
                         console.error('MegaDB.getDatabaseVersion', error);
-                        __dbOpenFailed();
+                        __dbOpenFailed(dbError);
                     });
             }
             else {
-                __dbOpenFailed();
-            }
-
-            function __dbOpenFailed() {
-                self.dbState = MegaDB.DB_STATE.FAILED_TO_INITIALIZE;
-                self.logger.error("Could not initialise MegaDB: ", arguments, name, version, schema);
-                self.trigger('onDbStateFailed', dbError);
+                __dbOpenFailed(dbError);
             }
         });
     }

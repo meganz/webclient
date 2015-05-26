@@ -4,9 +4,8 @@
  * @param mdbInstance {MegaDB}
  * @constructor
  */
-var MegaDBEncryption = function(mdbInstance) {
+function MegaDBEncryption(mdbInstance) {
     assert(u_k, 'missing master key');
-    assert(u_handle, 'missing u_handle');
 
     var self = this;
 
@@ -19,23 +18,56 @@ var MegaDBEncryption = function(mdbInstance) {
     var _encDecKeyCache = null;
     var getEncDecKey = function() {
 
-        // user's already loaded, static key (e.g. u_privk)
-        if(_encDecKeyCache) {
-            return _encDecKeyCache;
-        } else if (typeof(localStorage["mdbk_" + u_handle]) != "undefined") {
-            _encDecKeyCache = stringcrypt.stringDecrypter(localStorage["mdbk_" + u_handle], u_privk);
-            return _encDecKeyCache;
-        } else {
-            _encDecKeyCache = stringcrypt.newKey();
-            localStorage["mdbk_" + u_handle] = stringcrypt.stringEncrypter(_encDecKeyCache, u_privk);
-            return _encDecKeyCache;
+        if(_encDecKeyCache === null) {
+            throw new Error('_encDecKeyCache is not yet initialised');
         }
+
+        return _encDecKeyCache;
     };
 
     var hasherFunc = function(v) {
+        assert(u_pubEd25519, "FATAL: u_pubEd25519 is not set!");
+
         var hashFunc = asmCrypto.SHA256.base64;
         var hCache = hashFunc(u_pubEd25519 + getEncDecKey());
         return hashFunc(v + hCache);
+    };
+
+    // PlugIn Initialization
+    this.setup = function MegaDBEncryptionSetup(mdbServerInstance) {
+        var promise = new MegaPromise();
+
+        mdbServerInstance.getUData('enckey')
+            .then(function(data) {
+                if (d) console.log('getUData.enckey', data);
+
+                if (!data) {
+                    // Generate new encryption key
+
+                    _encDecKeyCache = stringcrypt.newKey();
+                    data = stringcrypt.stringEncrypter(_encDecKeyCache, u_k);
+
+                    mdbServerInstance.setUData(data, 'enckey')
+                        .then(function() {
+                            if (d) console.log('setUData.enckey', arguments);
+                            promise.resolve();
+                        }, function(err) {
+                            if (d) console.error('Error storing enckey', err);
+                            promise.reject(err);
+                        });
+                }
+                else {
+                    _encDecKeyCache = stringcrypt.stringDecrypter(data.k, u_k);
+                    promise.resolve();
+                }
+            }, function(err) {
+                promise.reject(err);
+            });
+
+        // We no longer need this
+        delete this.setup;
+
+        return promise;
     };
 
     // funcs which encrypt or decrypt the whole object
@@ -193,4 +225,4 @@ var MegaDBEncryption = function(mdbInstance) {
     //    });
     //    logger.debug("modify:", table, args);
     //});
-};
+}

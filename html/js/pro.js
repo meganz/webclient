@@ -615,9 +615,6 @@ var unionPay = {
      * Show the bouncing megacoin icon while loading
      */
     showLoadingOverlay: function() {
-        
-        console.log('zzzz got here');
-        
         $('.fm-dialog-overlay').removeClass('hidden').addClass('payment-dialog-overlay');
         $('.payment-processing').removeClass('hidden');
     },

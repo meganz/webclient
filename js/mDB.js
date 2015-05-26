@@ -95,7 +95,7 @@ mStorageDB.prototype = {
         var promise = new MegaPromise(), self = this, db;
 
         // MegaDB's encryption plugin depends on u_privk
-        if (u_privk) {
+        if (typeof u_k !== 'undefined' && u_k) {
 
             db = new MegaDB(this.name, u_handle, this.schema, this.options);
 
@@ -104,25 +104,21 @@ mStorageDB.prototype = {
                     .then(function() {
                         __dbNotifyCompletion();
                     }, function(err) {
-                        __dbNotifyCompletion(true, err);
+                        __dbNotifyCompletion(err || true);
                     });
             });
 
             db.bind('onDbStateFailed', function _onDbStateFailed(ev, error) {
                 if (d) console.error('onDbStateFailed', error.message || error);
-                __dbNotifyCompletion(true);
+                __dbNotifyCompletion(0xBADF);
             });
         }
         else {
-            Soon(__dbNotifyCompletion.bind(null, true));
+            Soon(__dbNotifyCompletion.bind(null, 0xBADF));
         }
 
-        function __dbNotifyCompletion(aError, theError) {
+        function __dbNotifyCompletion(aError) {
             if (aError) {
-                self.db = null;
-                if(d) {
-                    console.error("msdb failed setup db, error flag: ", aError, ", passed error:", theError);
-                }
                 promise.reject(aError);
             } else {
                 promise.resolve();
@@ -134,8 +130,8 @@ mStorageDB.prototype = {
             if (db) {
                 db.unbind('onDbStateReady').unbind('onDbStateFailed');
             }
-            mBroadcaster.sendMessage('mStorageDB:' + self.name, aError, theError);
-            promise = newHash = oldHash = version = db = self = undefined;
+            mBroadcaster.sendMessage('mStorageDB:' + self.name, aError);
+            promise = db = self = undefined;
         }
 
         this.db = db;
@@ -208,31 +204,42 @@ mBroadcaster.once('startMega', function __msdb_init() {
     db.addSchemaHandler( 'ps',   'p',  processPS  );
 
     mBroadcaster.once('mStorageDB:' + db.name,
-        function __msdb_ready(aError, theError) {
-            if (d) console.log('mStorageDB.ready', !aError);
+        function __msdb_ready(aError) {
+            if (d) console.log('mStorageDB.ready', aError);
 
-            if (aError) {
+            if (aError === 0xBADF) {
                 mSDB = db = undefined;
-                if(theError && theError.length > 0 && theError[0] instanceof SecurityError) {
-                    // decrypt failed. reset the db!
-                    //TODO: @diego please add the force ipc/opc/etc reload data code here
-                }
             }
         });
 
     mBroadcaster.once('mFileManagerDB.done',
         function __msdb_setup(aCallback) {
+            function __msdb_done() {
+                if (d) console.log('__msdb_done', arguments);
+
+                if (aCallback === getsc) {
+                    getsc(1);
+                } else {
+                    aCallback();
+                }
+            }
             var promises = mSDBPromises
                 .map(function(aDBInstance) {
                     return aDBInstance.setup();
                 });
-            MegaPromise.allDone(promises).always(
-                function __msdb_done() {
-                    if (aCallback === getsc) {
-                        getsc(1);
+            MegaPromise.all(promises)
+                .done(__msdb_done)
+                .fail(function __msdb_failed(err) {
+                    if (d) console.error('__msdb_setup error', err);
+
+                    if (err === 0xBADF) {
+                        // error accessing the db, continue with no mSDB support
+                        __msdb_done();
                     } else {
-                        aCallback();
+                        // error reading db data on disk, force reload
+                        loadfm(true);
                     }
+                }).always(function() {
                     mBroadcaster.sendMessage('mStorageDB!ready');
                 });
             mSDBPromises = undefined;

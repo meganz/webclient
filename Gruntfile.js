@@ -1,9 +1,14 @@
 var fs = require('fs');
+var RJSON = require('relaxed-json');
 
 /* GetFilesFromSecureBoot {{{
  *
  *  Read secureboot.js, get information about the Javascripts, how to group them and
  *  templates info.
+ *
+ *  Secureboot.js follows some patterns, this function will extract Javascripts and HTML
+ *  files that are loaded. It also writes a `secureboot.prod.js` which loads the
+ *  concat'ed files
  *
  *  Return a hash with rules to build
  *
@@ -16,40 +21,59 @@ function getRulesFromSecureBoot()
     var htmls = [];  /* list of HTML templates */
     var htmlExtra = [];  /* list of HTML templates which are loaded on demand */
     var js = {};  /* list of JS files */
-    var nlines = [];  /* lines of JS, to rebuild secureboot.js */
+    var newSecureboot = [];  /* lines of JS, to rebuild secureboot.js */
 
     content.forEach(function(line) {
         var include = true;
-        if (line.match(/f:.+\.js.+g:/)) {
-            eval("var y = " + line.match(/{[^}]+}/)[0]);
-            if (y.g && y.f) {
-                if (!js[y.g]) {
-                    js[y.g] = [];
-                } else {
-                    include = false;
-                }
-                js[y.g].push(y.f);
+        var isObject = line.match(/{[^}]+}/);
+        var obj;
+        if (isObject && isObject[0]) {
+            try {
+                obj = RJSON.parse(isObject[0]);
+            } catch (e) {
+                /* It's an invalid JSON */
+                return;
             }
-            line = "/*placeholder-" + y.g + "*/";
-        } else if (line.indexOf(".html") > 1) {
-            if (line.indexOf("jsl.push") > 1) {
-                htmls.push("build/html/" + line.match(/\/(.+.html)/)[1]);
-                line = 'jsl.push({f: "html/boot.json", n:"prod_assets_boot", j:9})';
-                include = !js['html'];
-                js['html'] = true;
-            } else if (line.indexOf(":") > 1) {
-                htmlExtra.push("build/html/" + line.match(/\/(.+.html)/)[1]) ;
-                line = line
-                    .replace(/html\/[^\.]+\.html/, "html/extra.json")
-                    .replace(/j:[ \t\r]*\d/, "j:9");
+            if (obj.g && (obj.f || "").match(/js$/)) {
+                /*
+                 * It's a Javascript definition and it belongs to a group
+                 */
+                if (!js[obj.g]) {
+                    /* We never saw this group before, therefore
+                     * we replace this entry with the group javascript
+                     */
+                    js[obj.g] = [ obj.f ];
+                    obj.f = "js/pack-" + obj.g + ".js";
+                    line = "jsl.push(" + JSON.stringify(obj) + ")";
+                } else {
+                    /**
+                     * This JS belongs to a group that was loaded already
+                     * so we ignore this line
+                     */
+                    include = false;
+                    js[obj.g].push(obj.f);
+                }
+            } else if ((obj.f || "").match(/\.html$/)) {
+                if (line.indexOf("jsl.push") > 1) {
+                    /* It's an HTML template that needs to be loaded at boot time */
+                    htmls.push("build/" + obj.f);
+                    /* We load html/boot.json instead, *the first time* */
+                    obj.f = "html/boot.json";
+                    line = 'jsl.push(' + RJSON.stringify(obj) + ")";
+                    include = !js['html'];
+                    js['html'] = true;
+                } else {
+                    /* It's a template laoded on demand. We group it as html/extra.json */
+                    htmlExtra.push("build/" + obj.f);
+                    /* Replace the files to load */
+                    line = line.replace(obj.f, "html/extra.json");
+                }
             }
         }
         if (include) {
-            nlines.push(line);
+            newSecureboot.push(line);
         }
     });
-
-    nlines = nlines.join("\n");
 
     var concat = {}; /* concat rules */
     var uglify = {}; /* uglify rules */
@@ -68,13 +92,9 @@ function getRulesFromSecureBoot()
             src: "js/pack-" + i + ".js",
             dest: "js/pack-" + i + ".js",
         };
-        nlines = nlines.replace(
-            "/*placeholder-" + i + "*/",
-            "jsl.push({f:'js/pack-" + i + ".js', n: 'pack_" + i + "', g:'" + i + "', j:1});"
-        );
     }
 
-    fs.writeFileSync("secureboot.prod.js", nlines);
+    fs.writeFileSync("secureboot.prod.js", newSecureboot.join("\n"));
 
     return {concat: concat, uglify: uglify, htmls: htmls, htmlExtra: htmlExtra};
 }

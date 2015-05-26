@@ -58,6 +58,7 @@
     "sinon": "~1.9.0"
   },
   "dependencies": {
-    "grunt-contrib-uglify": "^0.8.0"
+    "grunt-contrib-uglify": "^0.8.0",
+    "relaxed-json": "^0.2.9"
   }
 }

@@ -1528,7 +1528,7 @@ else if (!b_u)
                     throw new Error('Error parsing language file '+lang+'.json');
                 }
             }
-            else if (jsl[i].j == 9) {
+            else if (jsl[i].j == 0 && jsl[i].f.match(/\.json$/)) {
                 try {
                     var x = JSON.parse(jsl[i].text);
                     for (var i in x) {

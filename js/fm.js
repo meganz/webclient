@@ -9571,7 +9571,7 @@ function contactUI() {
         /**
          * Get and display the fingerprint
          */
-        function showAuthenticityCredentials() {
+        var showAuthenticityCredentials = function() {
             var fprint = $('.contact-fingerprint-txt').empty();
             userFingerprint(user, function (fprints) {
                 $.each(fprints, function (k, value) {
@@ -9580,18 +9580,18 @@ function contactUI() {
                     );
                 });
             });
-        }
+        };
         
         /**
          * Enables the Verify button
          */
-        function enableVerifyFingerprintsButton() {
+        var enableVerifyFingerprintsButton = function() {
             $('.fm-verify').removeClass('disabled');
             $('.fm-verify').find('span').text(l[1960] + '...');
             $('.fm-verify').rebind('click', function() {
                 fingerprintDialog(user);
             });
-        }
+        };
         
         // Display the current fingerpring
         showAuthenticityCredentials();

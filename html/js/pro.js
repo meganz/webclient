@@ -1020,6 +1020,13 @@ var cardDialog = {
         // Close the card dialog
         cardDialog.$dialog.removeClass('active').addClass('hidden');
         
+        // Prevent clicking on the background overlay while it's loading, which makes 
+        // the background disappear and error triangle appear on white background
+        cardDialog.$backgroundOverlay.rebind('click', function(event)
+        {
+            event.stopPropagation();
+        });
+        
         // Show the loading gif
         cardDialog.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
         cardDialog.$loadingOverlay.removeClass('hidden');

@@ -43,7 +43,7 @@ var authring = (function () {
      */
     ns.AUTHENTICATION_METHOD = {
         SEEN: 0x00,
-        FINGERPRINT_COMPARISON: 0x01,
+        FINGERPRINT_COMPARISON: 0x01
     };
 
 
@@ -55,7 +55,7 @@ var authring = (function () {
      *     Direct fingerprint comparison.
      */
     ns.KEY_CONFIDENCE = {
-        UNSURE: 0x00,
+        UNSURE: 0x00
     };
 
     // User property names used for different key types.
@@ -477,6 +477,20 @@ var authring = (function () {
         u_authring.Ed25519 = {};
         ns.setContacts('Ed25519');
         u_authring.RSA = {};
+        ns.setContacts('RSA');
+    };
+    
+    
+    /**
+     * Resets the seen or verified fingerprints for a particular user
+     * @param {String} userHandle The user handle e.g. EWh7LzU3Zf0
+     */
+    ns.resetFingerprintsForUser = function(userHandle) {
+    
+        delete u_authring.Ed25519[userHandle];
+        delete u_authring.RSA[userHandle];
+        
+        ns.setContacts('Ed25519');
         ns.setContacts('RSA');
     };
 

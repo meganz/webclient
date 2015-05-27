@@ -135,9 +135,11 @@ function u_checklogin3a(res, ctx) {
         if (r == 3) {
             // Load/initialise the authentication system.
             u_initAuthentication();
+            return mBroadcaster.crossTab.initialize(function() {
+                ctx.checkloginresult(ctx, r);
+            });
         }
     }
-
     ctx.checkloginresult(ctx, r);
 }
 
@@ -179,7 +181,11 @@ function u_logout(logout) {
             mDBact = false;
             delete localStorage[u_handle + '_mDBactive'];
         }
+        if (typeof mDBcls === 'function') {
+            mDBcls(); // resets mDBloaded
+        }
         fminitialized = false;
+        mBroadcaster.crossTab.leave();
         u_sid = u_handle = u_k = u_attr = u_privk = u_k_aes = undefined;
         notifyPopup.notifications = null;
         api_setsid(false);
@@ -195,9 +201,6 @@ function u_logout(logout) {
         if (waitxhr) {
             waitxhr.abort();
             waitxhr = undefined;
-        }
-        if (typeof mDBcls === 'function') {
-            mDBcls(); // resets mDBloaded
         }
     }
 }
@@ -220,11 +223,25 @@ function u_setrsa(rsakey) {
             u_privk = rsakey;
             u_attr.privk = u_storage.privk = base64urlencode(crypto_encodeprivkey(rsakey));
             u_attr.pubk = u_storage.pubk = base64urlencode(crypto_encodepubkey(rsakey));
-            u_type = 3;
 
-            $promise.resolve(rsakey);
+            // Update u_attr and store user data on account activation
+            u_checklogin({
+                checkloginresult: function(ctx, r) {
+                    u_type = r;
+                    if (ASSERT(u_type === 3, 'Invalid activation procedure.')) {
+                        var user = {
+                            u: u_attr.u,
+                            c: u_attr.c,
+                            m: u_attr.email,
+                        };
+                        process_u([user]);
 
-            ui_keycomplete();
+                        if (d) console.log('Account activation succeeded', user);
+                    }
+                    $promise.resolve(rsakey);
+                    ui_keycomplete();
+                }
+            });
         }
     };
 

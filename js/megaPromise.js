@@ -39,10 +39,11 @@ function MegaPromise(fn) {
     return this;
 };
 
-if(typeof(Promise) != "undefined") {
+if(typeof(Promise) !== "undefined") {
     MegaPromise._origPromise = Promise;
 } else {
     MegaPromise._origPromise = undefined;
+    window.Promise = MegaPromise;
 }
 
 /**
@@ -58,8 +59,21 @@ MegaPromise.asMegaPromiseProxy  = function(p) {
 
     p.then(function() {
         $promise.resolve.apply($promise, toArray(arguments))
-    }, function(argument) {
-        if(window.d) {
+    }, MegaPromise.getTraceableReject($promise));
+
+    return $promise;
+};
+
+/**
+ * Common function to be used as reject callback to promises.
+ *
+ * @param promise {MegaPromise}
+ * @returns {function}
+ * @private
+ */
+MegaPromise.getTraceableReject = function($promise) {
+    return function(argument) {
+        if (window.d) {
             var stack;
             // try to get the stack trace
             try {
@@ -70,9 +84,7 @@ MegaPromise.asMegaPromiseProxy  = function(p) {
             console.error("Promise rejected: ", argument, p, stack);
         }
         $promise.reject.apply($promise, toArray(arguments))
-    });
-
-    return $promise;
+    };
 };
 
 /**
@@ -176,9 +188,18 @@ MegaPromise.all = function(promisesList) {
         _jQueryPromisesList.push(v);
     });
 
-    return MegaPromise.asMegaPromiseProxy(
-        $.when.apply($, _jQueryPromisesList)
-    );
+    // return MegaPromise.asMegaPromiseProxy(
+        // $.when.apply($, _jQueryPromisesList)
+    // );
+
+    var promise = new MegaPromise();
+
+    $.when.apply($, _jQueryPromisesList)
+        .then(function() {
+            promise.resolve(toArray(arguments));
+        }, MegaPromise.getTraceableReject(promise));
+
+    return promise;
 };
 
 /**
@@ -251,7 +272,3 @@ MegaPromise.reject = function() {
 
     return p;
 };
-
-
-// replace the original Promise
-window.Promise = MegaPromise;

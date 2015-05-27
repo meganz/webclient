@@ -4,7 +4,7 @@ var ua = window.navigator.userAgent.toLowerCase();
 var is_chrome_firefox = document.location.protocol === 'chrome:' && document.location.host === 'mega' || document.location.protocol === 'mega:';
 var is_extension = is_chrome_firefox || document.location.href.substr(0,19) == 'chrome-extension://';
 var storage_version = '1'; // clear localStorage when version doesn't match
-var page = document.location.hash;
+var page = document.location.hash, l, d = false;
 
 function isMobile()
 {
@@ -48,6 +48,7 @@ if (!b_u) try
         Cu['import']("resource://gre/modules/Services.jsm");
         XPCOMUtils.defineLazyModuleGetter(this, "NetUtil", "resource://gre/modules/NetUtil.jsm");
 
+        // d = true;
         (function(global) {
             global.loadSubScript = function(file,scope) {
                 if (global.d) {
@@ -63,7 +64,7 @@ if (!b_u) try
 
         try {
             var mozBrowserID =
-            [    Services.appinfo.name,
+            [   Services.appinfo.name,
                 Services.appinfo.platformVersion,
                 Services.appinfo.platformBuildID,
                 Services.appinfo.OS,
@@ -72,12 +73,12 @@ if (!b_u) try
             var mozBrowserID = ua;
         }
 
-        loadSubScript('chrome://mega/content/strg2.js');
+        loadSubScript('chrome://mega/content/strg5.js');
 
         if(!(localStorage instanceof Ci.nsIDOMStorage)) {
             throw new Error('Invalid DOM Storage instance.');
         }
-        var d = !!localStorage.d;
+        d = !!localStorage.d;
     }
     if (typeof localStorage == 'undefined') b_u = 1;
     else
@@ -112,6 +113,7 @@ catch(e) {
     }
 }
 
+var mega = {ui: {}};
 var bootstaticpath = staticpath;
 var urlrootfile = '';
 
@@ -164,21 +166,55 @@ var sjcl_sha256_js = 'var sjcl_sha256={cipher:{},hash:{},keyexchange:{},mode:{},
 
 function evalscript(text)
 {
-    var script = document.createElement('script');
-    script.type = "text/javascript";
-    document.getElementsByTagName('head')[0].appendChild(script);
-    script.text = text;
+    mCreateElement('script', {type: 'text/javascript'}, 'head').text = text;
 }
 
 function evalscript_url(jarray)
 {
-    var head = document.head || document.getElementsByTagName('head')[0];
-    var script = document.createElement('script');
-    script.type = "text/javascript";
-    head.appendChild(script);
-    var url = mObjectURL(jarray, script.type);
-    script.src = url;
+    var url = mObjectURL(jarray, 'text/javascript');
+    mCreateElement('script', {type: 'text/javascript'}, 'head').src = url;
     return url;
+}
+
+function mCreateElement(aNode, aAttrs, aChildNodes, aTarget)
+{
+    aNode = document.createElement(aNode);
+    if (!aNode) {
+        return null;
+    }
+
+    if (aAttrs) {
+        for (var attr in aAttrs) {
+            aNode.setAttribute( attr, '' + aAttrs[attr]);
+        }
+    }
+
+    if (!Array.isArray(aChildNodes)) {
+        aTarget = aChildNodes;
+        aChildNodes = null;
+    }
+
+    if (aChildNodes) {
+        for (var cn in aChildNodes) {
+            if (aChildNodes[cn]) {
+                aNode.appendChild(aChildNodes[cn]);
+            }
+        }
+    }
+
+    if (aTarget) {
+        if (typeof aTarget === 'string') {
+            aTarget = document[aTarget] || document.getElementsByTagName(aTarget)[0];
+        }
+        if (aTarget) {
+            aTarget.appendChild(aNode);
+        }
+        else if (d) {
+            console.error('Invalid target', aNode, aAttrs, aTarget);
+        }
+    }
+
+    return aNode;
 }
 
 function mObjectURL(data, type)
@@ -240,10 +276,11 @@ var mBroadcaster = {
     },
 
     sendMessage: function mBroadcaster_sendMessage(topic) {
-        if (d) console.log('Broadcasting ' + topic);
         if (this._topics.hasOwnProperty(topic)) {
             var args = Array.prototype.slice.call(arguments, 1);
             var idr = [];
+
+            if (d) console.log('Broadcasting ' + topic, args);
 
             for (var id in this._topics[topic]) {
                 var ev = this._topics[topic][id];
@@ -257,7 +294,11 @@ var mBroadcaster = {
             }
             if (idr.length)
                 idr.forEach(this.removeListener.bind(this));
+
+            return true;
         }
+
+        return false;
     },
 
     once: function mBroadcaster_once(topic, callback) {
@@ -265,6 +306,156 @@ var mBroadcaster = {
             once : true,
             callback : callback
         });
+    },
+
+    crossTab: {
+        eTag: '$CTE$!_',
+
+        initialize: function crossTab_init(cb) {
+            var setup = function(ev) {
+                var msg = String(ev && ev.key).substr(this.eTag.length);
+                if (d) console.log('crossTab setup-event', msg, ev);
+                if (cb && (!ev || msg === 'pong')) {
+                    this.unlisten(setup);
+                    if (msg !== 'pong') {
+                        this.setMaster();
+                    } else {
+                        delete localStorage[ev.key];
+                    }
+                    this.listen();
+                    if (d) {
+                        console.log('CROSSTAB COMMUNICATION INITIALIZED AS '
+                            + (this.master ? 'MASTER':'SLAVE'));
+                    }
+                    cb(this.master);
+                    cb = null;
+                }
+            }.bind(this);
+
+            if (this.handle) {
+                this.eTag = this.eTag.split(this.handle).shift();
+            }
+            this.handle = u_handle;
+            this.eTag += u_handle + '!';
+
+            this.ctID = ~~(Math.random() * Date.now());
+            this.listen(setup);
+            this.notify('ping');
+            setTimeout(setup, 2000);
+
+            // if (typeof u_handle !== 'undefined') {
+                // if (+localStorage['mCrossTabRef_' + u_handle] + 14e3 > Date.now()) {
+                     // if (window.addEventListener) {
+                        // window.addEventListener('storage', this, false);
+                    // }
+                    // else if (window.attachEvent) {
+                        // window.attachEvent('onstorage', this.handleEvent.bind(this));
+                    // }
+                // }
+                // else {
+                    // this.setMaster();
+                // }
+                // if (d) {
+                    // console.log('CROSSTAB COMMUNICATION INITIALIZED AS '
+                        // + (this.master ? 'MASTER':'SLAVE'));
+                // }
+            // }
+        },
+
+        listen: function crossTab_listen(aListener) {
+            if (window.addEventListener) {
+                window.addEventListener('storage', aListener || this, false);
+            }
+            else if (window.attachEvent) {
+                if (!aListener) {
+                    aListener = this.__msie_listener = this.handleEvent.bind(this);
+                }
+                window.attachEvent('onstorage', aListener);
+            }
+        },
+
+        unlisten: function crossTab_unlisten(aListener) {
+            if (window.addEventListener) {
+                window.removeEventListener('storage', aListener || this, false);
+            }
+            else if (window.attachEvent) {
+                if (!aListener) {
+                    aListener = this.__msie_listener;
+                    delete this.__msie_listener;
+                }
+                window.detachEvent('onstorage', aListener);
+            }
+        },
+
+        leave: function crossTab_leave() {
+            if (this.master) {
+                localStorage['mCrossTabRef_' + u_handle] = this.master;
+                this.notify('leaving', this.master);
+                delete this.master;
+            } else {
+                if (d) console.log('crossTab leaving');
+            }
+            this.unlisten();
+        },
+
+        notify: function crossTab_notify(msg, data) {
+            data = { origin: this.ctID, data: data || Math.random()};
+            localStorage.setItem(this.eTag + msg, JSON.stringify(data));
+            if (d) console.log('crossTab Notifying', this.eTag + msg, localStorage[this.eTag + msg]);
+        },
+
+        setMaster: function crossTab_setMaster() {
+            this.master = (Math.random() * Date.now()).toString(36);
+
+            // (function liveLoop(tag) {
+                // if (tag === mBroadcaster.crossTab.master) {
+                    // localStorage['mCrossTabRef_' + u_handle] = Date.now();
+                    // setTimeout(liveLoop, 6e3, tag);
+                // }
+            // })(this.master);
+        },
+
+        clear: function crossTab_clear() {
+            Object.keys(localStorage).forEach(function(key) {
+                if (key.substr(0,this.eTag.length) === this.eTag) {
+                    if (d) console.log('crossTab Removing ' + key);
+                    delete localStorage[key];
+                }
+            }.bind(this));
+        },
+
+        handleEvent: function crossTab_handleEvent(ev) {
+            if (d) console.log('crossTab ' + ev.type + '-event', ev.key, ev.newValue, ev);
+
+            if (String(ev.key).indexOf(this.eTag) !== 0) {
+                return;
+            }
+            var msg = ev.key.substr(this.eTag.length),
+                strg = JSON.parse(ev.newValue ||'""');
+
+            if (!strg || strg.origin === this.ctID) {
+                if (d) console.log('Ignoring crossTab event', msg, strg);
+                return;
+            }
+
+            switch (msg) {
+                case 'ping':
+                    this.notify('pong');
+                    break;
+                case 'leaving':
+                    if (localStorage['mCrossTabRef_' + u_handle] === strg.data) {
+                        if (d) console.log('Taking crossTab-master ownership');
+                        delete localStorage['mCrossTabRef_' + u_handle];
+                        this.setMaster();
+                        if (u_handle && window.indexedDB) {
+                            mDBstart(true);
+                        }
+                    }
+                    break;
+            }
+
+            delete localStorage[ev.key];
+        }
     }
 };
 if (typeof Object.freeze === 'function') {
@@ -361,6 +552,10 @@ function init_storage ( storage ) {
     return storage;
 }
 
+function getxhr() {
+    return (typeof XDomainRequest !== 'undefined' && typeof ArrayBuffer === 'undefined') ? new XDomainRequest() : new XMLHttpRequest();
+}
+
 var androidsplash = false;
 var m = false;
 var seqno = Math.ceil(Math.random()*1000000000);
@@ -424,7 +619,7 @@ if (m)
     }
     else if (ua.indexOf('android') > -1)
     {
-        app='https://play.google.com/store/apps/details?id=nz.mega.android';
+        app='https://play.google.com/store/apps/details?id=nz.mega.android&referrer=meganzsb';
         document.body.className = 'android full-mode supported';
         android=1;
     }
@@ -485,17 +680,16 @@ if (m)
         var script = document.createElement('script');
         script.type = "text/javascript";
         document.head.appendChild(script);
-        //script.src = 'https://mega.nz/blog.js'
-        script.src = '/html/js/blog.js'
+        script.src = '/blog.js';
     }
 }
 else if (page == '#android')
 {
-    document.location = 'https://play.google.com/store/apps/details?id=nz.mega.android';
+    document.location = 'https://play.google.com/store/apps/details?id=nz.mega.android&referrer=meganzmobileapps';
 }
 else if (!b_u)
 {
-    var d = localStorage.d || 0,l;
+    d = localStorage.d || 0;
     var jj = localStorage.jj || 0;
     var onBetaW = location.hostname === 'beta.mega.nz' || location.hostname.indexOf("developers.") === 0;
     var languages = {'en':['en','en-'],'es':['es','es-'],'fr':['fr','fr-'],'de':['de','de-'],'it':['it','it-'],'nl':['nl','nl-'],'pt':['pt'],'br':['pt-br'],'dk':['da'],'se':['sv'],'fi':['fi'],'no':['no'],'pl':['pl'],'cz':['cz','cz-'],'sk':['sk','sk-'],'sl':['sl','sl-'],'hu':['hu','hu-'],'jp':['ja'],'cn':['zh','zh-cn'],'ct':['zh-hk','zh-sg','zh-tw'],'kr':['ko'],'ru':['ru','ru-mo'],'ar':['ar','ar-'],'he':['he'],'id':['id'],'ca':['ca','ca-'],'eu':['eu','eu-'],'af':['af','af-'],'bs':['bs','bs-'],'sg':[],'tr':['tr','tr-'],'mk':[],'hi':[],'hr':['hr'],'ro':['ro','ro-'],'uk':['||'],'gl':['||'],'sr':['||'],'lt':['||'],'th':['||'],'lv':['||'],'fa':['||'],'ee':['et'],'ms':['ms'],'cy':['cy'],'bg':['bg'],'be':['br'],'tl':['en-ph'],'ka':['||']};
@@ -512,7 +706,7 @@ else if (!b_u)
         };
     })(console);
 
-    Object.defineProperty(window, "__cd_v", { value : 9, writable : false });
+    Object.defineProperty(window, "__cd_v", { value : 11, writable : false });
     if (!d || onBetaW)
     {
         var __cdumps = [], __cd_t;
@@ -535,6 +729,18 @@ else if (!b_u)
                 f : mTrim('' + url), l : ln
             }, cc, sbid = +(''+(document.querySelector('script[src*="secureboot"]')||{}).src).split('=').pop()|0;
 
+            if (~dump.m.indexOf('[[:i]]')) {
+                return false;
+            }
+
+            if (~dump.m.indexOf("\n")) {
+                var lns = dump.m.split(/\r?\n/).map(String.trim).filter(String);
+
+                if (lns.length > 6) {
+                    dump.m = [].concat(lns.slice(0,2), "[..!]", lns.slice(-2)).join(" ");
+                }
+            }
+
             if (~dump.m.indexOf('took +10s'))
             {
                 var lrc = +localStorage.ttfbReportCount || 0;
@@ -553,7 +759,9 @@ else if (!b_u)
                 if (errobj.udata) dump.d = errobj.udata;
                 if (errobj.stack)
                 {
-                    dump.s = ('' + errobj.stack).split("\n").splice(0,9).map(mTrim).join("\n");
+                    dump.s = ('' + errobj.stack).replace(''+msg,'')
+                        .split("\n").map(String.trim).filter(String)
+                        .splice(0,15).map(mTrim).join("\n");
                 }
             }
             if (cn) dump.c = cn;
@@ -637,7 +845,7 @@ else if (!b_u)
 
                 for (var i in __cdumps)
                 {
-                    api_req({ a : 'cd', c : JSON.stringify(__cdumps[i]), v : report, t : +__cd_v }, ctx(ids[i]));
+                    api_req({ a : 'cd', c : JSON.stringify(__cdumps[i]), v : report, t : +__cd_v, s : window.location.host }, ctx(ids[i]));
                 }
                 __cd_t = 0;
                 __cdumps = [];
@@ -702,7 +910,12 @@ else if (!b_u)
 
     jsl.push({f: langFilepath, n: 'lang', j:3});
     jsl.push({f:'sjcl.js', n: 'sjcl_js', j:1}); // Will be replaced with asmCrypto soon
+    jsl.push({f:'js/mDB.js', n: 'mDB_js', j:1});
     jsl.push({f:'js/asmcrypto.js',n:'asmcrypto_js',j:1,w:1});
+    jsl.push({f:'js/jquery-2.1.1.js', n: 'jquery', j:1,w:10});
+    jsl.push({f:'js/functions.js', n: 'functions_js', j:1});
+    jsl.push({f:'js/mega.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/megaLogger.js', n: 'megaLogger_js', j:1});
     jsl.push({f:'js/tlvstore.js', n: 'tlvstore_js', j:1});
     jsl.push({f:'js/crypto.js', n: 'crypto_js', j:1,w:5});
     jsl.push({f:'js/jsbn.js', n: 'jsbn_js', j:1,w:2});
@@ -711,25 +924,21 @@ else if (!b_u)
     jsl.push({f:'js/user.js', n: 'user_js', j:1});
     jsl.push({f:'js/authring.js', n: 'authring_js', j:1});
     jsl.push({f:'js/mouse.js', n: 'mouse_js', j:1});
-    jsl.push({f:'js/jquery-2.1.1.js', n: 'jquery', j:1,w:10});
-    jsl.push({f:'js/functions.js', n: 'functions_js', j:1});
-    jsl.push({f:'js/megaLogger.js', n: 'megaLogger_js', j:1});
     jsl.push({f:'js/jquery-ui-1.11.2.js', n: 'jqueryui_js', j:1,w:10});
     jsl.push({f:'js/filedrag.js', n: 'filedrag_js', j:1});
     jsl.push({f:'js/jquery.mousewheel.js', n: 'jquerymouse_js', j:1});
     jsl.push({f:'js/jquery.jscrollpane.js', n: 'jscrollpane_js', j:1});
     jsl.push({f:'js/jquery.tokeninput.js', n: 'jquerytokeninput_js', j:1});
     jsl.push({f:'js/jquery.misc.js', n: 'jquerymisc_js', j:1});
-    jsl.push({f:'js/mDB.js', n: 'mDB_js', j:1});
     jsl.push({f:'js/thumbnail.js', n: 'thumbnail_js', j:1});
     jsl.push({f:'js/exif.js', n: 'exif_js', j:1,w:3});
     jsl.push({f:'js/megapix.js', n: 'megapix_js', j:1});
     jsl.push({f:'js/smartcrop.js', n: 'smartcrop_js', j:1,w:7});
-    jsl.push({f:'js/mega.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/jquery.fullscreen.js', n: 'jquery_fullscreen', j:1,w:10});
     jsl.push({f:'js/jquery.qrcode.js', n: 'jqueryqrcode', j:1});
     jsl.push({f:'js/vendor/qrcode.js', n: 'qrcode', j:1,w:2, g: 'vendor'});
     jsl.push({f:'js/bitcoin-math.js', n: 'bitcoinmath', j:1 });
+    jsl.push({f:'js/paycrypt.js', n: 'paycrypt_js', j:1 });
     jsl.push({f:'js/vendor/jquery.window-active.js', n: 'jquery_windowactive', j:1,w:2});
     jsl.push({f:'js/megaPromise.js', n: 'megapromise_js', j:1,w:5});
     jsl.push({f:'js/vendor/db.js', n: 'db_js', j:1,w:5});
@@ -773,6 +982,7 @@ else if (!b_u)
     jsl.push({f:'js/ui/dialog.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/ui/feedbackDialog.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/ui/credentialsWarningDialog.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/ui/loginRequiredDialog.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/chat/ui/incomingCallDialog.js', n: 'mega_js', j:1,w:7});
 
     // notifications
@@ -781,6 +991,7 @@ else if (!b_u)
     jsl.push({f:'js/vendor/favico.js', n: 'favico_js', j:1,w:7});
     jsl.push({f:'js/vendor/notification.js', n: 'notification_js', j:1,w:7});
 
+    jsl.push({f:'js/chat/plugins/callManager.js', n: 'callManager_js', j:1,w:7});
     jsl.push({f:'js/chat/plugins/urlFilter.js', n: 'urlFilter_js', j:1,w:7});
     jsl.push({f:'js/chat/plugins/emoticonsFilter.js', n: 'emoticonsFilter_js', j:1,w:7});
     jsl.push({f:'js/chat/plugins/attachmentsFilter.js', n: 'attachmentsFilter_js', j:1,w:7});
@@ -845,6 +1056,8 @@ else if (!b_u)
     jsl.push({f:'js/Int64.js', n: 'int64_js', j:1});
     jsl.push({f:'js/zip64.js', n: 'zip_js', j:1});
     jsl.push({f:'js/cms.js', n: 'cms_js', j:1});
+
+    jsl.push({f:'js/windowOpenerProtection.js', n: 'windowOpenerProtection', j:1,w:1});
 
     // only used on beta
     if (onBetaW) {
@@ -1022,7 +1235,7 @@ else if (!b_u)
         var _queueWaitToBeLoaded = function(id, elem) {
             waitingToBeLoaded++;
             elem.onload = function() {
-                if (d) console.log('jj.progress...', waitingToBeLoaded);
+                // if (d) console.log('jj.progress...', waitingToBeLoaded);
                 if (--waitingToBeLoaded == 0) {
                     jj_done = true;
                     boot_done();
@@ -1069,13 +1282,7 @@ else if (!b_u)
         if (d) console.log('jj.total...', waitingToBeLoaded);
     }
 
-    var pages = [];
-    function getxhr()
-    {
-        return (typeof XDomainRequest != 'undefined' && typeof ArrayBuffer == 'undefined') ? new XDomainRequest() : new XMLHttpRequest();
-    }
-
-    var xhr_progress,xhr_stack,jsl_fm_current,jsl_current,jsl_total,jsl_perc,jsli,jslcomplete;
+    var pages = [],xhr_progress,xhr_stack,jsl_fm_current,jsl_current,jsl_total,jsl_perc,jsli,jslcomplete;
 
     function jsl_start()
     {
@@ -1294,11 +1501,8 @@ else if (!b_u)
                 }
                 else
                 {
-                    var css = document.createElement('style');
-                    css.type = "text/css";
-                    css.rel = 'stylesheet';
-                    document.getElementsByTagName('head')[0].appendChild(css);
-                    css.textContent = jsl[i].text.replace(/\.\.\//g,staticpath).replace(new RegExp( "\\/en\\/", "g"),'/' + lang + '/');
+                    mCreateElement('style', {type: 'text/css', rel: 'stylesheet'}, 'head')
+                        .textContent = jsl[i].text.replace(/\.\.\//g,staticpath).replace(new RegExp( "\\/en\\/", "g"),'/' + lang + '/');
                 }
             }
             else if (jsl[i].j == 3) {
@@ -1322,11 +1526,7 @@ else if (!b_u)
             cssar = cssar.length && mObjectURL(cssar, "text/css");
             if (cssar)
             {
-                var link = document.createElement('link');
-                link.setAttribute('rel', 'stylesheet');
-                link.type = 'text/css';
-                link.href = cssar;
-                document.head.appendChild(link);
+                mCreateElement('link', {type: 'text/css', rel: 'stylesheet'}, 'head').href = cssar;
             }
             if (!jsl_done || jsar.length) {
                 jsar.push('jsl_done=true; boot_done();');
@@ -1349,14 +1549,14 @@ else if (!b_u)
     {
         if (document.location.hash == '#android')
         {
-            document.location = 'https://play.google.com/store/apps/details?id=nz.mega.android';
+            document.location = 'https://play.google.com/store/apps/details?id=nz.mega.android&referrer=meganzindexandroid';
         }
         else
         {
             document.write('<link rel="stylesheet" type="text/css" href="' + staticpath + 'css/mobile-android.css" /><div class="overlay"></div><div class="new-folder-popup" id="message"><div class="new-folder-popup-bg"><div class="new-folder-header">MEGA for Android</div><div class="new-folder-main-bg"><div class="new-folder-descr">Do you want to install the latest<br/> version of the MEGA app for Android?</div><a class="new-folder-input left-button" id="trashbinYes"> <span class="new-folder-bg1"> <span class="new-folder-bg2" id="android_yes"> Yes </span> </span></a><a class="new-folder-input right-button" id="trashbinNo"> <span class="new-folder-bg1"> <span class="new-folder-bg2" id="android_no">No </span> </span></a><div class="clear"></div></div></div></div></div>');
             document.getElementById('android_yes').addEventListener("click", function ()
             {
-                document.location = 'https://play.google.com/store/apps/details?id=nz.mega.android';
+                document.location = 'https://play.google.com/store/apps/details?id=nz.mega.android&referrer=meganzandroid';
             }, false);
             document.getElementById('android_no').addEventListener("click", function ()
             {
@@ -1372,9 +1572,27 @@ else if (!b_u)
         if (document.location.href.substr(0,19) == 'chrome-extension://')  istaticpath = '../';
         else if (is_chrome_firefox) istaticpath = 'chrome://mega/content/';
 
-        document.write('<style type="text/css">.div, span, input {outline: none;}.hidden {display: none;}.clear {clear: both;margin: 0px;padding: 0px;display: block;}.loading-main-block {width: 100%;height: 100%;overflow: auto;font-family:Arial, Helvetica, sans-serif;}.loading-mid-white-block {height: 100%;width:100%;}.mid-centered-block {position: absolute;width: 494px;min-height: 158px;top: 50%;left: 50%;margin: -95px 0 0 -247px;}.loading-main-bottom {max-width: 940px;width: 100%;position: absolute;bottom: 20px;left: 50%;margin: 0 0 0 -470px;text-align: center;}.loading-bottom-button {height: 29px;width: 29px;float: left;background-image: url(' + istaticpath + 'images/mega/loading-sprite1.png);background-repeat: no-repeat;cursor: pointer;}.st-social-block-load {position: absolute;bottom: 20px;left: 0;width: 100%;height: 43px;text-align: center;}.st-bottom-button {height: 29px;width: 29px;display: inline-block;background-image: url(' + istaticpath + 'images/mega/new-startpage-spite1.png?v=1);background-repeat: no-repeat;cursor: pointer;}.st-bottom-button.st-google-button {background-position: -93px -1233px;position: relative;margin: 0 5px;}.st-bottom-button.st-google-button:hover {background-position: -93px -1173px;}.st-bottom-button.st-facebook-button {background-position: -49px -1233px;margin: 0 5px;}.st-bottom-button.st-facebook-button:hover {background-position: -49px -1173px;}.st-bottom-button.st-twitter-button {background-position: left -1233px;margin: 0 5px;}.st-bottom-button.st-twitter-button:hover {background-position: left -1173px;}.loading-cloud {width: 222px;height: 158px;background-image: url(' + istaticpath + 'images/mega/loading-sprite1.png);background-repeat: no-repeat;background-position: 0 -2128px;margin: 0 auto;-webkit-box-sizing: border-box;-moz-box-sizing: border-box;-ms-box-sizing: border-box;box-sizing: border-box;padding-top: 55px;}.loading-progress-bar, .loading-progress-bar div {width: 80px;height: 80px;margin: 0 0 0 71px;background-image: url(' + istaticpath + 'images/mega/loading-sprite1.png);background-repeat: no-repeat;background-position: 0 top;}.loading-progress-bar div {background-position: -71px -2183px;margin: 0;}.maintance-block {position: absolute;width: 484px;min-height: 94px;border: 2px solid #d9d9d9;-moz-border-radius: 7px;-webkit-border-radius: 7px;border-radius: 7px;padding: 10px;color: #333333;font-size: 13px;line-height: 30px;padding: 15px 15px 15px 102px;-webkit-box-sizing: border-box;-moz-box-sizing: border-box;-ms-box-sizing: border-box;box-sizing: border-box;background-image: url(' + istaticpath + 'images/mega/loading-sprite1.png);background-repeat: no-repeat;background-position: -60px -2428px;margin-top: 45px;}.loading-progress-bar.percents-0 {background-position: 0 0;}.loading-progress-bar.percents-1, .loading-progress-bar.percents-2, .loading-progress-bar.percents-3 {background-position: -130px 0;}.loading-progress-bar.percents-4, .loading-progress-bar.percents-5, .loading-progress-bar.percents-6 {background-position: 0 -100px;}.loading-progress-bar.percents-7, .loading-progress-bar.percents-8, .loading-progress-bar.percents-9 {background-position: -130px -100px;}.loading-progress-bar.percents-10, .loading-progress-bar.percents-11, .loading-progress-bar.percents-12 {background-position: 0 -200px;}.loading-progress-bar.percents-13, .loading-progress-bar.percents-14, .loading-progress-bar.percents-15 {background-position: -130px -200px;}.loading-progress-bar.percents-16, .loading-progress-bar.percents-17, .loading-progress-bar.percents-18 {background-position: 0 -300px;}.loading-progress-bar.percents-19, .loading-progress-bar.percents-20, .loading-progress-bar.percents-21 {background-position: -130px -300px;}.loading-progress-bar.percents-22, .loading-progress-bar.percents-23, .loading-progress-bar.percents-24 {background-position: 0 -400px;}.loading-progress-bar.percents-25, .loading-progress-bar.percents-26, .loading-progress-bar.percents-27 {background-position: -130px -400px;}.loading-progress-bar.percents-28, .loading-progress-bar.percents-29, .loading-progress-bar.percents-30 {background-position: 0 -500px;}.loading-progress-bar.percents-31, .loading-progress-bar.percents-32, .loading-progress-bar.percents-33 {background-position: -130px -500px;}.loading-progress-bar.percents-34, .loading-progress-bar.percents-35 {background-position: 0 -600px;}.loading-progress-bar.percents-36, .loading-progress-bar.percents-37 {background-position: -130px -600px;}.loading-progress-bar.percents-38, .loading-progress-bar.percents-39 {background-position: 0 -700px;}.loading-progress-bar.percents-40, .loading-progress-bar.percents-41 {background-position: -130px -700px;}.loading-progress-bar.percents-42, .loading-progress-bar.percents-43 {background-position: 0 -800px;}.loading-progress-bar.percents-44, .loading-progress-bar.percents-45 {background-position: -130px -800px;}.loading-progress-bar.percents-46, .loading-progress-bar.percents-47 {background-position: 0 -900px;}.loading-progress-bar.percents-48, .loading-progress-bar.percents-49 {background-position: -130px -900px;}.loading-progress-bar.percents-50 {background-position: 0 -1000px;}.loading-progress-bar.percents-51, .loading-progress-bar.percents-52, .loading-progress-bar.percents-53 {background-position: -130px -1000px;}.loading-progress-bar.percents-54, .loading-progress-bar.percents-55, .loading-progress-bar.percents-56 {background-position: 0 -1100px;}.loading-progress-bar.percents-57, .loading-progress-bar.percents-58, .loading-progress-bar.percents-59 {background-position: -130px -1100px;}.loading-progress-bar.percents-60, .loading-progress-bar.percents-61, .loading-progress-bar.percents-62 {background-position: 0 -1200px;}.loading-progress-bar.percents-63, .loading-progress-bar.percents-64, .loading-progress-bar.percents-65 {background-position: -130px -1200px;}.loading-progress-bar.percents-66, .loading-progress-bar.percents-67, .loading-progress-bar.percents-68 {background-position: 0 -1300px;}.loading-progress-bar.percents-69, .loading-progress-bar.percents-70, .loading-progress-bar.percents-71 {background-position: -130px -1300px;}.loading-progress-bar.percents-72, .loading-progress-bar.percents-73, .loading-progress-bar.percents-74 {background-position: 0 -1400px;}.loading-progress-bar.percents-75, .loading-progress-bar.percents-76, .loading-progress-bar.percents-77 {background-position: -130px -1400px;}.loading-progress-bar.percents-78, .loading-progress-bar.percents-79, .loading-progress-bar.percents-80 {background-position: 0 -1500px;}.loading-progress-bar.percents-81, .loading-progress-bar.percents-82, .loading-progress-bar.percents-83 {background-position: -130px -1500px;}.loading-progress-bar.percents-84, .loading-progress-bar.percents-85, .loading-progress-bar.percents-86 {background-position: 0 -1600px;}.loading-progress-bar.percents-87, .loading-progress-bar.percents-88, .loading-progress-bar.percents-89 {background-position: -130px -1600px;}.loading-progress-bar.percents-90, .loading-progress-bar.percents-91, .loading-progress-bar.percents-92 {background-position: 0 -1800px;}.loading-progress-bar.percents-93, .loading-progress-bar.percents-94, .loading-progress-bar.percents-95 {background-position: -130px -1800px;}.loading-progress-bar.percents-96, .loading-progress-bar.percents-97 {background-position: 0 -1900px;}.loading-progress-bar.percents-98, .loading-progress-bar.percents-99 {background-position: -130px -1900px;}.loading-progress-bar.percents-100 {background-position: 0 -2000px;}.follow-txt {text-decoration:none; line-height: 28px; float:right; color:#666666; font-size:12px;}@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {.maintance-block, .loading-progress-bar, .loading-progress-bar div, .loading-cloud, .loading-bottom-button {background-image: url(' + istaticpath + 'images/mega/loading-sprite1@2x.png);    background-size: 222px auto;}.st-bottom-button, .st-bottom-scroll-button {background-image: url(' + istaticpath + 'images/mega/new-startpage-spite1@2x.png?v=1);background-size: 356px auto;}}</style><div class="loading-main-block" id="loading"><div class="loading-mid-white-block"><div class="mid-centered-block"><div class="loading-cloud"><div class="loading-progress-bar percents-1" id="loadinganim"><div></div></div></div><div class="maintance-block hidden">Scheduled System Maintenance - Expect Disruptions<br/>Sunday 04:00 - 10:00 UTC </div></div><div class="st-social-block-load" id="bootbottom"><a href="https://www.facebook.com/MEGAprivacy" target="_blank" class="st-bottom-button st-facebook-button"></a><a href="https://www.twitter.com/MEGAprivacy" target="_blank" class="st-bottom-button st-twitter-button"></a><a href="https://plus.google.com/b/108055545377490138410/" target="_blank" class="st-bottom-button st-google-button"></a></div></div></div>');
+        mCreateElement('style', {type: 'text/css'}, 'body').textContent = '.div, span, input {outline: none;}.hidden {display: none;}.clear {clear: both;margin: 0px;padding: 0px;display: block;}.loading-main-block {width: 100%;height: 100%;overflow: auto;font-family:Arial, Helvetica, sans-serif;}.loading-mid-white-block {height: 100%;width:100%;}.mid-centered-block {position: absolute;width: 494px;min-height: 158px;top: 50%;left: 50%;margin: -95px 0 0 -247px;}.loading-main-bottom {max-width: 940px;width: 100%;position: absolute;bottom: 20px;left: 50%;margin: 0 0 0 -470px;text-align: center;}.loading-bottom-button {height: 29px;width: 29px;float: left;background-image: url(' + istaticpath + 'images/mega/loading-sprite1.png);background-repeat: no-repeat;cursor: pointer;}.st-social-block-load {position: absolute;bottom: 20px;left: 0;width: 100%;height: 43px;text-align: center;}.st-bottom-button {height: 29px;width: 29px;display: inline-block;background-image: url(' + istaticpath + 'images/mega/new-startpage-spite1.png?v=1);background-repeat: no-repeat;cursor: pointer;}.st-bottom-button.st-google-button {background-position: -93px -1233px;position: relative;margin: 0 5px;}.st-bottom-button.st-google-button:hover {background-position: -93px -1173px;}.st-bottom-button.st-facebook-button {background-position: -49px -1233px;margin: 0 5px;}.st-bottom-button.st-facebook-button:hover {background-position: -49px -1173px;}.st-bottom-button.st-twitter-button {background-position: left -1233px;margin: 0 5px;}.st-bottom-button.st-twitter-button:hover {background-position: left -1173px;}.loading-cloud {width: 222px;height: 158px;background-image: url(' + istaticpath + 'images/mega/loading-sprite1.png);background-repeat: no-repeat;background-position: 0 -2128px;margin: 0 auto;-webkit-box-sizing: border-box;-moz-box-sizing: border-box;-ms-box-sizing: border-box;box-sizing: border-box;padding-top: 55px;}.loading-progress-bar, .loading-progress-bar div {width: 80px;height: 80px;margin: 0 0 0 71px;background-image: url(' + istaticpath + 'images/mega/loading-sprite1.png);background-repeat: no-repeat;background-position: 0 top;}.loading-progress-bar div {background-position: -71px -2183px;margin: 0;}.maintance-block {position: absolute;width: 484px;min-height: 94px;border: 2px solid #d9d9d9;-moz-border-radius: 7px;-webkit-border-radius: 7px;border-radius: 7px;padding: 10px;color: #333333;font-size: 13px;line-height: 30px;padding: 15px 15px 15px 102px;-webkit-box-sizing: border-box;-moz-box-sizing: border-box;-ms-box-sizing: border-box;box-sizing: border-box;background-image: url(' + istaticpath + 'images/mega/loading-sprite1.png);background-repeat: no-repeat;background-position: -60px -2428px;margin-top: 45px;}.loading-progress-bar.percents-0 {background-position: 0 0;}.loading-progress-bar.percents-1, .loading-progress-bar.percents-2, .loading-progress-bar.percents-3 {background-position: -130px 0;}.loading-progress-bar.percents-4, .loading-progress-bar.percents-5, .loading-progress-bar.percents-6 {background-position: 0 -100px;}.loading-progress-bar.percents-7, .loading-progress-bar.percents-8, .loading-progress-bar.percents-9 {background-position: -130px -100px;}.loading-progress-bar.percents-10, .loading-progress-bar.percents-11, .loading-progress-bar.percents-12 {background-position: 0 -200px;}.loading-progress-bar.percents-13, .loading-progress-bar.percents-14, .loading-progress-bar.percents-15 {background-position: -130px -200px;}.loading-progress-bar.percents-16, .loading-progress-bar.percents-17, .loading-progress-bar.percents-18 {background-position: 0 -300px;}.loading-progress-bar.percents-19, .loading-progress-bar.percents-20, .loading-progress-bar.percents-21 {background-position: -130px -300px;}.loading-progress-bar.percents-22, .loading-progress-bar.percents-23, .loading-progress-bar.percents-24 {background-position: 0 -400px;}.loading-progress-bar.percents-25, .loading-progress-bar.percents-26, .loading-progress-bar.percents-27 {background-position: -130px -400px;}.loading-progress-bar.percents-28, .loading-progress-bar.percents-29, .loading-progress-bar.percents-30 {background-position: 0 -500px;}.loading-progress-bar.percents-31, .loading-progress-bar.percents-32, .loading-progress-bar.percents-33 {background-position: -130px -500px;}.loading-progress-bar.percents-34, .loading-progress-bar.percents-35 {background-position: 0 -600px;}.loading-progress-bar.percents-36, .loading-progress-bar.percents-37 {background-position: -130px -600px;}.loading-progress-bar.percents-38, .loading-progress-bar.percents-39 {background-position: 0 -700px;}.loading-progress-bar.percents-40, .loading-progress-bar.percents-41 {background-position: -130px -700px;}.loading-progress-bar.percents-42, .loading-progress-bar.percents-43 {background-position: 0 -800px;}.loading-progress-bar.percents-44, .loading-progress-bar.percents-45 {background-position: -130px -800px;}.loading-progress-bar.percents-46, .loading-progress-bar.percents-47 {background-position: 0 -900px;}.loading-progress-bar.percents-48, .loading-progress-bar.percents-49 {background-position: -130px -900px;}.loading-progress-bar.percents-50 {background-position: 0 -1000px;}.loading-progress-bar.percents-51, .loading-progress-bar.percents-52, .loading-progress-bar.percents-53 {background-position: -130px -1000px;}.loading-progress-bar.percents-54, .loading-progress-bar.percents-55, .loading-progress-bar.percents-56 {background-position: 0 -1100px;}.loading-progress-bar.percents-57, .loading-progress-bar.percents-58, .loading-progress-bar.percents-59 {background-position: -130px -1100px;}.loading-progress-bar.percents-60, .loading-progress-bar.percents-61, .loading-progress-bar.percents-62 {background-position: 0 -1200px;}.loading-progress-bar.percents-63, .loading-progress-bar.percents-64, .loading-progress-bar.percents-65 {background-position: -130px -1200px;}.loading-progress-bar.percents-66, .loading-progress-bar.percents-67, .loading-progress-bar.percents-68 {background-position: 0 -1300px;}.loading-progress-bar.percents-69, .loading-progress-bar.percents-70, .loading-progress-bar.percents-71 {background-position: -130px -1300px;}.loading-progress-bar.percents-72, .loading-progress-bar.percents-73, .loading-progress-bar.percents-74 {background-position: 0 -1400px;}.loading-progress-bar.percents-75, .loading-progress-bar.percents-76, .loading-progress-bar.percents-77 {background-position: -130px -1400px;}.loading-progress-bar.percents-78, .loading-progress-bar.percents-79, .loading-progress-bar.percents-80 {background-position: 0 -1500px;}.loading-progress-bar.percents-81, .loading-progress-bar.percents-82, .loading-progress-bar.percents-83 {background-position: -130px -1500px;}.loading-progress-bar.percents-84, .loading-progress-bar.percents-85, .loading-progress-bar.percents-86 {background-position: 0 -1600px;}.loading-progress-bar.percents-87, .loading-progress-bar.percents-88, .loading-progress-bar.percents-89 {background-position: -130px -1600px;}.loading-progress-bar.percents-90, .loading-progress-bar.percents-91, .loading-progress-bar.percents-92 {background-position: 0 -1800px;}.loading-progress-bar.percents-93, .loading-progress-bar.percents-94, .loading-progress-bar.percents-95 {background-position: -130px -1800px;}.loading-progress-bar.percents-96, .loading-progress-bar.percents-97 {background-position: 0 -1900px;}.loading-progress-bar.percents-98, .loading-progress-bar.percents-99 {background-position: -130px -1900px;}.loading-progress-bar.percents-100 {background-position: 0 -2000px;}.follow-txt {text-decoration:none; line-height: 28px; float:right; color:#666666; font-size:12px;}@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {.maintance-block, .loading-progress-bar, .loading-progress-bar div, .loading-cloud, .loading-bottom-button {background-image: url(' + istaticpath + 'images/mega/loading-sprite1@2x.png);    background-size: 222px auto;}.st-bottom-button, .st-bottom-scroll-button {background-image: url(' + istaticpath + 'images/mega/new-startpage-spite1@2x.png?v=1);background-size: 356px auto;}}';
+
+        mCreateElement('div', { "class": "loading-main-block", id: "loading"}, 'body')
+            .innerHTML =
+                '<div class="loading-mid-white-block">'+
+                '   <div class="mid-centered-block">'+
+                '       <div class="loading-cloud">'+
+                '           <div class="loading-progress-bar percents-1" id="loadinganim">'+
+                '               <div></div>'+
+                '           </div>'+
+                '       </div>'+
+                // '       <div class="maintance-block hidden">Scheduled System Maintenance - Expect Disruptions<br/>Sunday 04:00 - 10:00 UTC </div>'+
+                '   </div>'+
+                '   <div class="st-social-block-load" id="bootbottom">'+
+                '       <a href="https://www.facebook.com/MEGAprivacy" target="_blank" class="st-bottom-button st-facebook-button"></a>'+
+                '       <a href="https://www.twitter.com/MEGAprivacy" target="_blank" class="st-bottom-button st-twitter-button"></a>'+
+                '       <a href="https://plus.google.com/b/108055545377490138410/" target="_blank" class="st-bottom-button st-google-button"></a>'+
+                '   </div>'+
+                '</div>';
     }
-    var u_storage,loginresponse,u_sid,dl_res;
+    var u_storage, loginresponse, u_sid, dl_res;
     u_storage = init_storage( localStorage.sid ? localStorage : sessionStorage );
     if ((u_sid = u_storage.sid))
     {

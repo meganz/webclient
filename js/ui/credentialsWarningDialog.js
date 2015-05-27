@@ -1,7 +1,9 @@
 (function($, scope) {
     
     /**
-     * Simple/reusable feedback dialog
+     * Warning dialog when there is a fingerprint mismatch e.g. a MITM attack in progress.
+     * Triggerable with the following test code:
+     * mega.ui.CredentialsWarningDialog.singleton('DKLLwlj_THc', authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON, 'ABCDEF0123456789ABCDEF0123456789ABCDEF01', 'ABCDFF0123456789ABCDEE0123456788ABCDEF00' });
      *
      * @param opts {Object}
      * @constructor
@@ -36,18 +38,9 @@
             'title': 'Warning',
             'buttons': [
                 {
-                    'label': "Accept",
-                    'className': "fm-dialog-button-green feedback-button-send",
-                    'callback': function() {
-                        CredentialsWarningDialog.acceptButtonCallback();
-                        this.hide();
-                    }
-                },
-                {
-                    'label': "Reject",
+                    'label': "Close",
                     'className': "fm-dialog-button-red feedback-button-cancel",
-                    'callback': function() {                        
-                        CredentialsWarningDialog.rejectButtonCallback();
+                    'callback': function() {
                         this.hide();
                     }
                 }
@@ -60,10 +53,6 @@
 
         self.bind("onBeforeShow", function() {
             $('.fm-dialog-overlay').addClass('hidden');
-        });
-
-        self.bind("onHide", function() {
-            
         });
     };
 
@@ -82,12 +71,23 @@
      */
     CredentialsWarningDialog.prototype._renderDetails = function() {
         
-        $dialog = $('.credentials-warning-dialog');        
-        $dialog.find('.emailAddress').text(CredentialsWarningDialog.contactEmail);
-        $dialog.find('.seenOrVerified').text(CredentialsWarningDialog.seenOrVerifiedWording);
+        // Change wording to seen or verified
+        var infoFirstLine = (CredentialsWarningDialog.seenOrVerified === 'seen') ? l[6881] : l[6882];
+            infoFirstLine = infoFirstLine.replace('%1', '<span class="emailAddress">' + CredentialsWarningDialog.contactEmail + '</span>');
+        var title = (CredentialsWarningDialog.seenOrVerified === 'seen') ? l[6883] : l[6884];
         
+        $dialog = $('.credentials-warning-dialog');
+        $dialog.find('.information .firstLine').html(infoFirstLine);
+        $dialog.find('.previousCredentials .title').html(title);
+                
+        // If the avatar exists, show it
         if (typeof avatars[CredentialsWarningDialog.contactHandle] !== 'undefined') {
             $dialog.find('.userAvatar img').attr('src', avatars[CredentialsWarningDialog.contactHandle].url);
+        }
+        else {
+            // Otherwise hide the avatar 
+            $dialog.find('.userAvatar').hide();
+            $dialog.find('.information').addClass('noAvatar');
         }
     };
     
@@ -100,6 +100,14 @@
         var newFingerprint = CredentialsWarningDialog.newFingerprint;
         var previousFingerprintHtml = '';
         var newFingerprintHtml = '';
+                
+        // Normalise fingerprints to display in hexadecimal for the dialog
+        if (previousFingerprint.length === 20) {
+            previousFingerprint = asmCrypto.bytes_to_hex(asmCrypto.string_to_bytes(previousFingerprint));
+        }
+        if (newFingerprint.length === 20) {
+            newFingerprint = asmCrypto.bytes_to_hex(asmCrypto.string_to_bytes(newFingerprint));
+        }
         
         // Build up the fingerprint HTML
         for (var i = 0, groupCount = 0, length = previousFingerprint.length;  i < length;  i++) {
@@ -150,28 +158,27 @@
      * @param {Number} authMethod Whether the fingerprint is seen or verified, use authring.AUTHENTICATION_METHOD.SEEN or .FINGERPRINT_COMPARISON
      * @param {String} prevFingerprint The previous fingerprint as a hexadecimal string
      * @param {String} newFingerprint The current fingerprint as a hexadecimal string
-     * @param {Function} rejectBtnCallback What happens when the Reject fingerprint change button is clicked, e.g. disconnect the call/chat
-     * @param {Function} acceptBtnCallback What happens when the Accept fingerprint change button is clicked, e.g. proceed with the call/chat
      * @returns {CredentialsWarningDialog._instance}
      */
-    CredentialsWarningDialog.singleton = function(contactHandle, authMethod, prevFingerprint, newFingerprint, rejectBtnCallback, acceptBtnCallback) {
+    CredentialsWarningDialog.singleton = function(contactHandle, authMethod, prevFingerprint, newFingerprint) {
         
         // Set to object so can be used later
         CredentialsWarningDialog.contactHandle = contactHandle;
         CredentialsWarningDialog.contactEmail = M.u[contactHandle].m;
-        CredentialsWarningDialog.seenOrVerifiedWording = (authMethod === authring.AUTHENTICATION_METHOD.SEEN) ? 'seen' : 'verified';
+        CredentialsWarningDialog.seenOrVerified = (authMethod === authring.AUTHENTICATION_METHOD.SEEN) ? 'seen' : 'verified';
         CredentialsWarningDialog.previousFingerprint = prevFingerprint;
         CredentialsWarningDialog.newFingerprint = newFingerprint;
-        CredentialsWarningDialog.rejectButtonCallback = rejectBtnCallback;
-        CredentialsWarningDialog.acceptButtonCallback = acceptBtnCallback;
         
-        CredentialsWarningDialog._instance = new CredentialsWarningDialog();
+        if (!CredentialsWarningDialog._instance) {
+            CredentialsWarningDialog._instance = new CredentialsWarningDialog();
+        }
+        
         CredentialsWarningDialog._instance.show();
 
         return CredentialsWarningDialog._instance;
     };
 
-    // export
+    // Export
     scope.mega = scope.mega || {};
     scope.mega.ui = scope.mega.ui || {};
     scope.mega.ui.CredentialsWarningDialog = CredentialsWarningDialog;

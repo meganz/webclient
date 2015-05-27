@@ -487,11 +487,16 @@ function treesearchUI()
                     // hide everything
                     menu.find('.sorting-item-divider,*[data-by=name],*[data-by=status],*[data-by=last-interaction]').addClass('hidden');
             }
+            var sortTreePanel = $.sortTreePanel[type];
+            if (d && !sortTreePanel) {
+                console.error('No sortTreePanel', type);
+            }
 
-            $('.sorting-menu-item')
-                .removeClass('active')
-                .filter('*[data-by=' + $.sortTreePanel[type].by + '],*[data-dir=' + $.sortTreePanel[type].dir + ']')
-                .addClass('active');
+            var $o = $('.sorting-menu-item')
+                .removeClass('active');
+            if (sortTreePanel) {
+                $o.filter('*[data-by=' + sortTreePanel.by + '],*[data-dir=' + sortTreePanel.dir + ']').addClass('active');
+            }
             return false;
         }
         else
@@ -757,8 +762,8 @@ function initUI() {
                     $.draggingClass = ('dndc-to-shared');
                 else if (~c.indexOf('contacts'))
                     $.draggingClass = ('dndc-to-contacts');
-                else if (~c.indexOf('conversations'))
-                    $.draggingClass = ('dndc-to-conversations');
+                /*else if (~c.indexOf('conversations'))
+                    $.draggingClass = ('dndc-to-conversations');*/
                 else if (~c.indexOf('cloud-drive'))
                     $.draggingClass = ('dndc-to-conversations'); // TODO: cursor, please?
                 else
@@ -795,7 +800,7 @@ function initUI() {
             {
                 // do nothing
             }
-            else if ($(e.target).hasClass('nw-conversations-item'))
+            /*else if ($(e.target).hasClass('nw-conversations-item'))
             {
                 nRevert();
 
@@ -806,7 +811,7 @@ function initUI() {
 
                 if (d)
                     console.error('TODO: dragging to the chat', currentRoom);
-            }
+            }*/
             else if (dd == 'move')
             {
                 nRevert(t !== M.RubbishID);
@@ -984,20 +989,59 @@ function initUI() {
             e.preventDefault();
     });
 
+    var fmTabState;
     $('.nw-fm-left-icon').unbind('click');
     $('.nw-fm-left-icon').bind('click', function() {
         treesearch = false;
-        var c = $(this).attr('class');
-        if (c && c.indexOf('cloud-drive') > -1) {
-            M.openFolder(M.RootID);
-        } else if (c && c.indexOf('shared-with-me') > -1) {
-            M.openFolder('shares');
-        } else if (c && c.indexOf('conversations') > -1) {
-            M.openFolder('chat');
-        } else if (c && c.indexOf('contacts') > -1) {
-            M.openFolder('contacts');
-        } else if (c && c.indexOf('rubbish-bin') > -1) {
-            M.openFolder(M.RubbishID);
+        var clickedClass = $(this).attr('class');
+        if (!clickedClass) {
+            return;
+        }
+        if (!fmTabState || fmTabState['cloud-drive'].root !== M.RootID) {
+            fmTabState = {
+                'cloud-drive':    { root: M.RootID,    prev: null },
+                'shared-with-me': { root: 'shares',    prev: null },
+                'conversations':  { root: 'chat',      prev: null },
+                'contacts':       { root: 'contacts',  prev: null },
+                'rubbish-bin':    { root: M.RubbishID, prev: null }
+            };
+        }
+        var activeClass = (''+$('.nw-fm-left-icon.active:visible')
+            .attr('class')).split(" ").filter(function(c) {
+                return !!fmTabState[c];
+            })[0];
+
+        var activeTab = fmTabState[activeClass];
+        if (activeTab) {
+            if (activeTab.root === M.currentrootid) {
+                activeTab.prev = M.currentdirid;
+            }
+            else if (d) {
+                console.warn('Root mismatch', M.currentrootid, M.currentdirid, activeTab);
+            }
+        }
+
+        for (var tab in fmTabState) {
+            if (~clickedClass.indexOf(tab)) {
+                tab = fmTabState[tab];
+
+                var targetFolder = null;
+
+                // Clicked on the currently active tab, should open the root (e.g. go back)
+                if (~clickedClass.indexOf(activeClass)) {
+                    targetFolder = tab.root;
+                }
+                else if (tab.prev) {
+                    targetFolder = tab.prev;
+                }
+                else {
+                    targetFolder = tab.root
+                }
+
+                M.openFolder(targetFolder);
+
+                break;
+            }
         }
     });
 
@@ -1217,9 +1261,10 @@ function removeUInode(h) {
             });
 
             //Clear right panel:
-            $('.grid-table.contacts tr#' + h).fadeOut('slow', function() {
-                $(this).remove();
-            });
+            $('.grid-table.contacts tr#' + h + ', .contacts-blocks-scrolling a#' + h)
+                .fadeOut('slow', function() {
+                    $(this).remove();
+                });
 
             // clear the contacts grid:
             $('.contacts-grid-view #' + h).remove();
@@ -2604,11 +2649,6 @@ function notificationsUI(close)
     {
         $('.fm-main.notifications').addClass('hidden');
         $('.fm-main.default').removeClass('hidden');
-        treeUI();
-        if (M.viewmode)
-            iconUI();
-        else
-            gridUI();
         return false;
     }
     notifyPopup.notifyMarkCount(true);
@@ -2695,21 +2735,88 @@ function accountUI()
             $('.membership-big-txt.accounttype').text(planText);
             $('.fm-account-blocks .membership-icon.type').addClass('pro' + planNum);
 
+            // Subscription
             if (account.stype == 'S')
             {
-                // subscription
-                $('.fm-account-header.typetitle').text(l[434]);
-                if (account.scycle == '1 M') $('.membership-big-txt.type').text(l[748]);
-                else if (account.scycle == '1 Y') $('.membership-big-txt.type').text(l[749]);
-                else $('.membership-big-txt.type').text('');
-                $('.membership-medium-txt.expiry').html(htmlentities('(' + account.sgw.join(",") + ')'));
-            }
+				$('.fm-account-header.typetitle').text(l[434]);
+				if (account.scycle == '1 M') {
+                    $('.membership-big-txt.type').text(l[748]);
+                }
+				else if (account.scycle == '1 Y') {
+                    $('.membership-big-txt.type').text(l[749]);
+                }
+				else {
+                    $('.membership-big-txt.type').text('');
+                }
+                
+                // Get the date their subscription will renew
+                var timestamp = account.srenew[0];
+                var paymentType = htmlentities('(' + account.sgw.join(',') + ')');      // Credit card etc
+                
+                // Display the date their subscription will renew in format '14 March 2015 (credit card)'
+                if (timestamp > 0) {
+                    var date = new Date(timestamp * 1000);
+                    var dateString = l[6971] + ' ' + date.getDate() + ' ' + date_months[date.getMonth()] + ' ' + date.getFullYear();
+                    $('.membership-medium-txt.expiry').html(dateString + ' ' + paymentType);
+                }
+                else {
+                    // Otherwise just show payment type
+                    $('.membership-medium-txt.expiry').html(paymentType);
+                }
+                
+				// Check if there are any active subscriptions
+                // ccqns = Credit Card Query Number of Subscriptions
+				api_req({ a: 'ccqns' },
+				{
+					callback : function(numOfSubscriptions, ctx)
+					{
+						// If > 0 then show cancel button and bind cancellation API call to the button
+						if (numOfSubscriptions > 0)
+						{
+                            var $cancelButton = $('.btn-cancel');
+							$cancelButton.show();
+							$cancelButton.rebind('click', function()
+							{
+                                // Make sure they really want to do it
+								msgDialog('confirmation', l[6822], l[6823], false, function(event)
+								{
+									if (event) 
+									{
+										$cancelButton.hide();
+										loadingDialog.show();
+                                        
+                                        // Cancel the subscriptions
+                                        // cccs = Credit Card Cancel Subscriptions
+										api_req({ a: 'cccs' },
+										{
+											callback: function()
+											{
+												// Reset account cache and refetch all account data to display UI 
+                                                // (note potential race condition if cancellation callback wasn't received in 7500ms)
+												M.account.lastupdate = 0;
+                                                
+												setTimeout(function()
+												{
+													loadingDialog.hide();												
+													accountUI();
+                                                    
+												}, 7500);
+											}											
+										});
+									}
+								});							
+							});
+						}
+					}
+				});
+			}
             else if (account.stype == 'O')
             {
-                // one-time
+                // one-time or cancelled subscription
                 $('.fm-account-header.typetitle').text(l[746]+':');
                 $('.membership-big-txt.type').text(l[751]);
                 $('.membership-medium-txt.expiry').html(l[987] + ' <span class="red">' + time2date(account.expiry) + '</span>');
+                $('.btn-cancel').hide();
             }
         }
         else
@@ -2719,6 +2826,7 @@ function accountUI()
             $('.membership-big-txt.type').text(l[435]);
             $('.membership-big-txt.accounttype').text(l[435]);
             $('.membership-medium-txt.expiry').text(l[436]);
+            $('.btn-cancel').hide();
         }
 
         perc = Math.round((account.servbw_used+account.downbw_used)/account.bw*100);
@@ -2898,16 +3006,22 @@ function accountUI()
         {
             // Set payment method
             var paymentMethodIndex = purchaseTransaction[4];
-            var paymentMethod = 'Voucher';
+            var paymentMethod = l[428];
 
             if (paymentMethodIndex == 1) {
                 paymentMethod = 'PayPal';
             }
             else if (paymentMethodIndex == 2) {
-                paymentMethod = 'iTunes';
+                paymentMethod = l[6953];
             }
             else if (paymentMethodIndex == 4) {
-                paymentMethod = 'Bitcoin';
+                paymentMethod = l[6802];            // Bitcoin
+            }
+            else if (paymentMethodIndex == 5) {
+                paymentMethod = l[6952];            // Union Pay
+            }
+            else if (paymentMethodIndex == 8) {
+                paymentMethod = l[6952];            // Credit card
             }
 
             // Set Date/Time, Item (plan purchased), Amount, Payment Method
@@ -3033,6 +3147,8 @@ function accountUI()
                 if ($(this).attr('name') == 'account-country')
                     val = isocountries[val];
                 $('.fm-account-save-block').removeClass('hidden');
+				$('.fm-account-main').addClass('save');
+				initAccountScroll();
             }
             $(this).parent().find('.account-select-txt').text(val);
         });
@@ -3040,11 +3156,15 @@ function accountUI()
         $('#account-firstname,#account-lastname').bind('keyup', function(e)
         {
             $('.fm-account-save-block').removeClass('hidden');
+			$('.fm-account-main').addClass('save');
+			initAccountScroll();
         });
         $('.fm-account-cancel').unbind('click');
         $('.fm-account-cancel').bind('click', function(e)
         {
             $('.fm-account-save-block').addClass('hidden');
+			$('.fm-account-main').removeClass('save');
+			initAccountScroll();
             accountUI();
         });
         $('.fm-account-save').unbind('click');
@@ -3073,6 +3193,8 @@ function accountUI()
                 }
             });
             $('.fm-account-save-block').addClass('hidden');
+			$('.fm-account-main').removeClass('save');
+			initAccountScroll();
 
             if (M.account.dl_maxSlots)
             {
@@ -3114,6 +3236,8 @@ function accountUI()
                     $('#account-password').focus();
                     $('#account-password').bind('keyup.accpwd', function() {
                         $('.fm-account-save-block').removeClass('hidden');
+						$('.fm-account-main').addClass('save');
+						initAccountScroll();
                         $('#account-password').unbind('keyup.accpwd');
                     });
                 });
@@ -3142,6 +3266,8 @@ function accountUI()
                                 $('#account-password').focus();
                                 $('#account-password').bind('keyup.accpwd', function() {
                                     $('.fm-account-save-block').removeClass('hidden');
+									$('.fm-account-main').addClass('save');
+									initAccountScroll();
                                     $('#account-password').unbind('keyup.accpwd');
                                 });
                             });
@@ -3149,7 +3275,7 @@ function accountUI()
                         else if (typeof res == 'number' && res < 0)
                         { // something went wrong
                             $('#account-confirm-password,#account-password,#account-new-password').val('');
-                            msgDialog('warninga', 'Error', l[200]);
+                            msgDialog('warninga', 'Error', l[6972]);
                         }
                         else
                         { // success
@@ -3216,6 +3342,8 @@ function accountUI()
             {
                 M.account.dl_maxSlots = ui.value;
                 $('.fm-account-save-block').removeClass('hidden');
+				$('.fm-account-main').addClass('save');
+				initAccountScroll();
             }
         });
         $("#slider-range-max2").slider({
@@ -3223,6 +3351,8 @@ function accountUI()
             {
                 M.account.ul_maxSlots = ui.value;
                 $('.fm-account-save-block').removeClass('hidden');
+				$('.fm-account-main').addClass('save');
+				initAccountScroll();
             }
         });
         $('.ulspeedradio').removeClass('radioOn').addClass('radioOff');
@@ -3254,6 +3384,8 @@ function accountUI()
             $(this).addClass('radioOn').removeClass('radioOff');
             $(this).parent().addClass('radioOn').removeClass('radioOff');
             $('.fm-account-save-block').removeClass('hidden');
+			$('.fm-account-main').addClass('save');
+			initAccountScroll();
         });
         $('#ulspeedvalue').unbind('click keyup');
         $('#ulspeedvalue').bind('click keyup', function(e)
@@ -3265,6 +3397,8 @@ function accountUI()
             else
                 M.account.ul_maxSpeed = 100 * 1024;
             $('.fm-account-save-block').removeClass('hidden');
+			$('.fm-account-main').addClass('save');
+			initAccountScroll();
         });
 
         $('.ulskip').removeClass('radioOn').addClass('radioOff');
@@ -3285,6 +3419,8 @@ function accountUI()
             $(this).addClass('radioOn').removeClass('radioOff');
             $(this).parent().addClass('radioOn').removeClass('radioOff');
             $('.fm-account-save-block').removeClass('hidden');
+			$('.fm-account-main').addClass('save');
+			initAccountScroll();
         });
 
         $('.uisorting').removeClass('radioOn').addClass('radioOff');
@@ -3305,6 +3441,8 @@ function accountUI()
             $(this).addClass('radioOn').removeClass('radioOff');
             $(this).parent().addClass('radioOn').removeClass('radioOff');
             $('.fm-account-save-block').removeClass('hidden');
+			$('.fm-account-main').addClass('save');
+			initAccountScroll();
         });
 
         $('.uiviewmode').removeClass('radioOn').addClass('radioOff');
@@ -3325,6 +3463,8 @@ function accountUI()
             $(this).addClass('radioOn').removeClass('radioOff');
             $(this).parent().addClass('radioOn').removeClass('radioOff');
             $('.fm-account-save-block').removeClass('hidden');
+			$('.fm-account-main').addClass('save');
+			initAccountScroll();
         });
 
         $('.redeem-voucher').unbind('click');
@@ -3496,6 +3636,8 @@ function accountUI()
             $(this).addClass('radioOn').removeClass('radioOff');
             $(this).parent().addClass('radioOn').removeClass('radioOff');
             $('.fm-account-save-block').removeClass('hidden');
+			$('.fm-account-main').addClass('save');
+			initAccountScroll();
         });
 
         $('.fm-account-change-avatar,.fm-account-avatar').unbind('click');
@@ -3611,6 +3753,8 @@ function accountUI()
     {
         if ($(this).val() == $('#account-new-password').val())
             $('.fm-account-save-block').removeClass('hidden');
+			$('.fm-account-main').addClass('save');
+			initAccountScroll();
     });
 }
 
@@ -5381,9 +5525,7 @@ function contextmenuUI(e, ll, topmenu) {
         } else if (c && c.indexOf('cloud-drive-item') > -1) {
             var flt = '.properties-item';
             if (folderlink) {
-                if (u_type) {
-                    flt += ',.import-item';
-                }
+                flt += ',.import-item';
                 if (M.v.length) {
                     flt += ',.zipdownload-item';
                 }
@@ -5437,8 +5579,15 @@ function disableCircularTargets(pref)
     {
         var x = $.selected[s];
         $(pref + x).addClass('disabled');
-        $(pref + M.d[x].p).addClass('disabled');// Disable parent dir
-        disableDescendantFolders(x, pref);// Disable all children folders
+        if (M.d[x]) {
+            // Disable parent dir
+            $(pref + M.d[x].p).addClass('disabled');
+        }
+        else if (d) {
+            console.error('disableCircularTargets: Invalid node', x, pref);
+        }
+        // Disable all children folders
+        disableDescendantFolders(x, pref);
     }
     return true;
 }
@@ -5842,9 +5991,13 @@ function sectionUIopen(id) {
     }
     $('.nw-fm-left-icon.' + tmpId).addClass('active');
     $('.content-panel.' + tmpId).addClass('active');
-    $('.fm-left-menu').removeClass('cloud-drive shared-with-me rubbish-bin contacts conversations opc ipc').addClass(tmpId);
+    $('.fm-left-menu').removeClass('cloud-drive folder-link shared-with-me rubbish-bin contacts conversations opc ipc').addClass(tmpId);
     $('.fm-right-header, .fm-import-to-cloudrive, .fm-download-as-zip').addClass('hidden');
     $('.fm-import-to-cloudrive, .fm-download-as-zip').unbind('click');
+
+    $('.fm-main').removeClass('active-folder-link');
+    $('.nw-fm-tree-header.folder-link').hide();
+    $('.nw-fm-left-icon.folder-link').removeClass('active');
 
     if (folderlink) {
         if (!isValidShareLink()) {
@@ -5865,14 +6018,9 @@ function sectionUIopen(id) {
                     M.addDownload([M.currentdirid], true);
                 }
             });
-            if (!u_type) {
-                $('.fm-import-to-cloudrive').addClass('hidden');
-            }
-        } else {
-            $('.fm-main').removeClass('active-folder-link');
-            $('.fm-left-menu').removeClass('folder-link');
-            $('.nw-fm-tree-header.folder-link').hide();
-            $('.nw-fm-left-icon.folder-link').removeClass('active');
+            // if (!u_type) {
+                // $('.fm-import-to-cloudrive').addClass('hidden');
+            // }
         }
     }
 
@@ -6814,8 +6962,18 @@ function initShareDialog() {
     }
 
     $('.share-dialog').rebind('click', function(e) {
-        // Fix bug in console
-        if (typeof e.originalEvent.path != 'undefined') {
+        var hideMenus = function() {
+            // share dialog permission menu
+            $('.permissions-menu', $this).fadeOut(200);
+            $('.import-contacts-dialog').fadeOut(200);
+            $('.permissions-icon', $this).removeClass('active');
+            $('.share-dialog-permissions', $this).removeClass('active');
+            closeImportContactNotification('.share-dialog');
+            $('.import-contacts-service', $this).removeClass('imported');
+        };
+        var $this = $(this);
+
+        if (typeof e.originalEvent.path !== 'undefined') {
 
             // This's sensitive to dialog DOM element positioning
             var trg = e.originalEvent.path[0];
@@ -6826,14 +6984,11 @@ function initShareDialog() {
                 && !$(trg1).is('.permissions-icon,.import-contacts-link,.share-dialog-permissions')
                 && !$(trg2).is('.permissions-icon,.import-contacts-link,.share-dialog-permissions'))
             {
-                // share dialog permission menu
-                $('.permissions-menu').fadeOut(200);
-                $('.import-contacts-dialog').fadeOut(200);
-                $('.permissions-icon').removeClass('active');
-                $('.share-dialog-permissions').removeClass('active');
-                closeImportContactNotification('.share-dialog');
-                $('.import-contacts-service').removeClass('imported');
+                hideMenus();
             }
+        }
+        else if ($this.get(0) === e.currentTarget) {
+            hideMenus();
         }
     });
 
@@ -6950,7 +7105,7 @@ function initShareDialog() {
 
     // related to specific contact
     $('.share-dialog').off('click', '.share-dialog-permissions');
-    $('.share-dialog').on('click', '.share-dialog-permissions', function() {
+    $('.share-dialog').on('click', '.share-dialog-permissions', function(e) {
         var $this = $(this),
             $m = $('.permissions-menu'),
             scrollBlock = $('.share-dialog-contacts .jspPane');
@@ -8976,7 +9131,7 @@ function fm_thumbnails()
                     blob = new Blob([uint8arr.buffer]);
                 // thumbnailblobs[node] = blob;
                 thumbnails[node] = myURL.createObjectURL(blob);
-                if (M.d[node].seen)
+                if (M.d[node] && M.d[node].seen)
                     fm_thumbnail_render(M.d[node]);
 
                 // deduplicate in view when there is a duplicate fa:
@@ -9040,27 +9195,31 @@ function fm_contains(filecnt, foldercnt) {
 function fm_importflnodes(nodes)
 {
     var sel = [].concat(nodes || []);
-    if (sel.length)
-    {
+    if (sel.length) {
         var FLRootID = M.RootID;
 
-        $.onImportCopyNodes = fm_getcopynodes(sel);
-        document.location.hash = 'fm';
+        mega.ui.showLoginRequiredDialog().done(function() {
 
-        $(document).one('onInitContextUI', SoonFc(function(e)
-        {
-            if (ASSERT(M.RootID != FLRootID, 'Unexpected openFolder on Import'))
-            {
-                if (d)
-                    console.log('Importing Nodes...', sel, $.onImportCopyNodes);
+            $.onImportCopyNodes = fm_getcopynodes(sel);
+            document.location.hash = 'fm';
 
-                $.selected = sel;
-                $.mcImport = true;
+            $(document).one('onInitContextUI', SoonFc(function(e) {
+                if (ASSERT(M.RootID != FLRootID, 'Unexpected openFolder on Import')) {
+                    if (d) console.log('Importing Nodes...', sel, $.onImportCopyNodes);
 
-                // XXX: ...
-                $('.context-menu-item.copy-item').click();
+                    $.selected = sel;
+                    $.mcImport = true;
+
+                    // XXX: ...
+                    $('.context-menu-item.copy-item').click();
+                }
+            }));
+        }).fail(function(aError) {
+            // If no aError, it was canceled
+            if (aError) {
+                alert(aError);
             }
-        }));
+        });
     }
 }
 
@@ -9263,10 +9422,11 @@ function sharedfolderUI() {
 
 function userAvatar(userid)
 {
-    userid = userid.u || userid
-    var user = M.u[userid]
-    if (!user || !user.u)
+    userid = userid.u || userid;
+    var user = M.u[userid];
+    if (!user || !user.u) {
         return;
+    }
 
     var name = user.name || user.m;
 
@@ -9281,33 +9441,34 @@ function userAvatar(userid)
     return {img: avatar, color: av_color};
 }
 
-function userFingerprint(userid, next)
-{
-    userid = userid.u || userid
+function userFingerprint(userid, next) {
+    userid = userid.u || userid;
     var user = M.u[userid];
-    if (!user || !user.u)
-        return next([])
-    if (userid == u_handle) {
-        var fprint = authring.computeFingerprint(u_pubEd25519, 'Ed25519', 'hex')
-        return next(fprint.toUpperCase().match(/.{4}/g), fprint)
+    if (!user || !user.u) {
+        return next([]);
     }
-    getFingerprintEd25519(user.h || userid, function(response) {
-        next(response.toUpperCase().match(/.{4}/g), response)
+    if (userid == u_handle) {
+        var fprint = authring.computeFingerprint(u_pubEd25519, 'Ed25519', 'hex');
+        return next(fprint.toUpperCase().match(/.{4}/g), fprint);
+    }
+    getFingerprintEd25519(user.h || userid, function (response) {
+        next(response.toUpperCase().match(/.{4}/g), response);
     });
 }
 
 function isContactVerified(userid)
 {
-    userid = userid.u || userid
+    userid = userid.u || userid;
     return (u_authring.Ed25519[userid] || {}).method >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON;
 }
 
 function fingerprintDialog(userid)
 {
-    userid = userid.u || userid
-    var user = M.u[userid]
-    if (!user || !user.u)
+    userid = userid.u || userid;
+    var user = M.u[userid];
+    if (!user || !user.u) {
         return;
+    }
 
     function closeFngrPrntDialog() {
         fm_hideoverlay();
@@ -9408,23 +9569,52 @@ function contactUI() {
             contextmenuUI(e, 4);
         });
 
-        var fprint = $('.contact-fingerprint-txt').empty();
-        userFingerprint(user, function(fprints) {
-            $.each(fprints, function(k, value) {
-                $('<span>').text(value).appendTo(
-                    fprint.filter(k <= 4 ? ':first' : ':last')
-                )
+        /**
+         * Get and display the fingerprint
+         */
+        var showAuthenticityCredentials = function() {
+            var fprint = $('.contact-fingerprint-txt').empty();
+            userFingerprint(user, function (fprints) {
+                $.each(fprints, function (k, value) {
+                    $('<span>').text(value).appendTo(
+                        fprint.filter(k <= 4 ? ':first' : ':last')
+                    );
+                });
             });
-        });
-
-        if (isContactVerified(user)) {
-            $('.fm-verify').find('span').text('Verified');
-        } else {
-            $('.fm-verify').find('span').text(l[1960]+'...');
+        };
+        
+        /**
+         * Enables the Verify button
+         */
+        var enableVerifyFingerprintsButton = function() {
+            $('.fm-verify').removeClass('disabled');
+            $('.fm-verify').find('span').text(l[1960] + '...');
             $('.fm-verify').rebind('click', function() {
                 fingerprintDialog(user);
             });
+        };
+        
+        // Display the current fingerpring
+        showAuthenticityCredentials();
+
+        // If the fingerprints have already been verified for the contact, show 'Verified' 
+        if (isContactVerified(user)) {
+            $('.fm-verify').addClass('disabled');
+            $('.fm-verify').find('span').text(l[6776]);
         }
+        else {
+            // Otherwise show the Verify button
+            enableVerifyFingerprintsButton();
+        }
+
+        // Reset seen or verified fingerprints and re-enable the Verify button
+        $('.fm-reset-stored-fingerprint').rebind('click', function() {
+            authring.resetFingerprintsForUser(user.u);
+            enableVerifyFingerprintsButton();
+            
+            // Refetch the key
+            showAuthenticityCredentials();
+        });
 
         if (!MegaChatDisabled) {
             if (onlinestatus[1] !== "offline" && u_h !== u_handle) {

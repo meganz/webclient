@@ -235,7 +235,7 @@ mBroadcaster.once('startMega', function __msdb_init() {
                         });
 
                     if (requiresReload) {
-                        loadfm(true);
+                        mDBreload();
                     }
                     else {
                         __msdb_done();
@@ -248,7 +248,7 @@ mBroadcaster.once('startMega', function __msdb_init() {
                         __msdb_done();
                     } else {
                         // error reading db data on disk, force reload
-                        loadfm(true);
+                        mDBreload();
                     }
                 }).always(function() {
                     mBroadcaster.sendMessage('mStorageDB!ready');

@@ -270,7 +270,7 @@
             (function ( storeName ) {
                 that[ storeName ] = { };
                 for ( var i in that ) {
-                    if ( !hasOwn.call( that , i ) || i === 'close' ) {
+                    if ( !hasOwn.call( that , i ) || i === 'close' || i === 'getUData' || i === 'setUData' ) {
                         continue;
                     }
                     that[ storeName ][ i ] = (function ( i ) {
@@ -549,6 +549,7 @@
                     try {
                         request = indexedDB.open( options.server , options.version );
                     } catch (e) {
+                        console.error("indexedDB.open('"+ options.server +"', "+ options.version +"); FAILED", e);
                         reject({ 'reason': e });
                         return;
                     }

@@ -61,12 +61,15 @@ function MegaDB(name, suffix, schema, options) {
     function __dbOpenSucceed(dbServer) {
         self.server = dbServer;
         self.currentVersion = version;
+        self.dbName = dbName;
         self.dbState = MegaDB.DB_STATE.INITIALIZED;
         self.trigger('onDbStateReady');
         self.initialize();
     }
-    function __dbOpen(aRetry) {
+    function __dbOpen() {
         dbOpenOptions.version = version;
+
+        self.logger.debug('Opening DB', version, dbOpenOptions);
 
         self._dbOpenPromise = db.open(dbOpenOptions).then( function( s ) {
 
@@ -100,26 +103,44 @@ function MegaDB(name, suffix, schema, options) {
             }
 
         }, function( e ) {
-            // nb: "reason" comes from our modified db.js
-            var dbError = e.reason;
+            var dbError;
 
-            // MSIE throws DOMException.InvalidAccessError
-            if (!(dbError instanceof DOMException)) {
-                if (dbError.target && dbError.target.error instanceof DOMError) {
-                    dbError = dbError.target.error;
-                }
-                else {
-                    self.logger.error('Unexpected error', dbError);
-                }
+            // nb: "reason" comes from our modified db.js
+            if (typeof e === 'object' && "reason" in e) {
+                e = e.reason;
             }
 
-            if (!aRetry && (dbError.name === 'VersionError' || dbError.name === 'InvalidAccessError')) {
+            if (e instanceof Event) {
+
+                if (e.type === 'blocked') {
+                    dbError = new Error('Database is blocked');
+                }
+                else {
+                    var target = e.target;
+                    var error = target && target.error;
+
+                    if (error instanceof DOMError) {
+                        dbError = error;
+                    }
+                }
+            }
+            else if (e instanceof DOMException) {
+                dbError = e;
+            }
+
+            if (!dbError) {
+                dbError = e;
+                self.logger.error('Unexpected error', dbError);
+            }
+
+            if (dbError.name === 'VersionError' || dbError.name === 'InvalidAccessError') {
                 self.logger.info(dbError.name + ' (retrying)');
 
                 MegaDB.getDatabaseVersion(dbName)
                     .then(function(dbProp) {
+                        self.logger.info('Current DB Version', dbProp.version);
                         localStorage[dbName + '_v'] = version = dbProp.version + 1;
-                        __dbOpen(true);
+                        __dbOpen();
                     }, function(error) {
                         self.logger.error('MegaDB.getDatabaseVersion', error);
                         __dbOpenFailed(dbError);
@@ -161,13 +182,14 @@ MegaDB.getDatabaseVersion = function(dbName) {
         var request = indexedDB.open(dbName);
         request.onsuccess = function(e) {
             var idb = e.target.result;
+            var ver = idb.version;
 
+            idb.close();
             promise.resolve({
                 name: dbName,
-                version: idb.version,
+                version: ver,
                 gdbvSucceed: true
             });
-            idb.close();
         };
         request.onblocked = request.onerror = function(e) {
             promise.reject(e);
@@ -470,9 +492,10 @@ MegaDB.prototype.clear = _wrapFnWithBeforeAndAfterEvents(
  * @returns {MegaPromise}
  */
 MegaDB.prototype.drop = function() {
-    var self = this;
-    self.close();
-    return MegaPromise.asMegaPromiseProxy(self.server.destroy());
+    this.close();
+    delete localStorage[this.dbName + '_v'];
+    delete localStorage[this.dbName + '_hash'];
+    return MegaPromise.asMegaPromiseProxy(this.server.destroy());
 };
 
 MegaDB.prototype.drop = _wrapFnWithBeforeAndAfterEvents(

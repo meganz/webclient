@@ -303,8 +303,8 @@ var mFileManagerDB = {
             this.slave = true;
         }
 
-        db.bind('onDbStateFailed', function _onDbStateFailed() {
-            if (d) console.error('onDbStateFailed', arguments);
+        db.bind('onDbStateFailed', function _onDbStateFailed(ev, error) {
+            if (d) console.error('onDbStateFailed', error && error.message || error);
             mFileManagerDB._loadfm();
         });
 

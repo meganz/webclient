@@ -121,7 +121,7 @@ mStorageDB.prototype = {
             if (aError) {
                 promise.reject(aError);
             } else {
-                promise.resolve();
+                promise.resolve(db);
             }
             if (self.onReadyState) {
                 Soon(self.onReadyState.bind(self, aError));
@@ -228,8 +228,19 @@ mBroadcaster.once('startMega', function __msdb_init() {
                     return aDBInstance.setup();
                 });
             MegaPromise.all(promises)
-                .done(__msdb_done)
-                .fail(function __msdb_failed(err) {
+                .done(function __msdb_ready(resultPromises) {
+                    var requiresReload = resultPromises
+                        .some(function(db) {
+                            return db.flags & MegaDB.DB_FLAGS.HASNEWENCKEY;
+                        });
+
+                    if (requiresReload) {
+                        loadfm(true);
+                    }
+                    else {
+                        __msdb_done();
+                    }
+                }).fail(function __msdb_failed(err) {
                     if (d) console.error('__msdb_setup error', err);
 
                     if (err === 0xBADF) {

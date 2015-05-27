@@ -1356,9 +1356,9 @@ function MegaData()
 
     this.renderTree = function()
     {
-        this.buildtree({h: 'shares'},       0x4fe);
-        this.buildtree(this.d[this.RootID], 0x4fe);
-        this.buildtree({h: M.RubbishID},    0x4fe);
+        this.buildtree({h: 'shares'},       this.buildtree.FORCE_REBUILD);
+        this.buildtree(this.d[this.RootID], this.buildtree.FORCE_REBUILD);
+        this.buildtree({h: M.RubbishID},    this.buildtree.FORCE_REBUILD);
         this.contacts();
         treeUI();
         if (!MegaChatDisabled) {
@@ -1729,7 +1729,7 @@ function MegaData()
          */
 
         var rebuild = false;
-        if (dialog === 0x4fe) {
+        if (dialog === this.buildtree.FORCE_REBUILD) {
             rebuild = true;
             dialog = undefined;
         }
@@ -1881,6 +1881,7 @@ function MegaData()
             }// END of for folders loop
         }
     };
+    this.buildtree.FORCE_REBUILD = 34675890009;
 
     var icon = '<span class="context-menu-icon"></span>';
     var arrow = '<span class="context-top-arrow"></span><span class="context-bottom-arrow"></span>';

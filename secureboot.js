@@ -75,7 +75,7 @@ if (!b_u) try
 
         loadSubScript('chrome://mega/content/strg5.js');
 
-        if(!(localStorage instanceof Ci.nsIDOMStorage)) {
+        if (!(localStorage instanceof Ci.nsIDOMStorage)) {
             throw new Error('Invalid DOM Storage instance.');
         }
         d = !!localStorage.d;
@@ -699,7 +699,7 @@ else if (!b_u)
         var timers = {};
         c.time = function(n) { timers[n] = new Date().getTime()};
         c.timeEnd = function(n) {
-            if(timers[n]) {
+            if (timers[n]) {
                 c.log(n + ': ' + (new Date().getTime() - timers[n]) + 'ms');
                 delete timers[n];
             }
@@ -1287,7 +1287,7 @@ else if (!b_u)
     function jsl_start()
     {
         jslcomplete = 0;
-        if(d && jj) {
+        if (d && jj) {
             xhr_progress = [0, 0, 0, 0, 0];
         } else {
             xhr_progress = [0, 0];
@@ -1378,8 +1378,8 @@ else if (!b_u)
 
     function xhr_load(url,jsi,xhri)
     {
-        if(d && jj) {
-            if(jsl[jsi].j == 1 || jsl[jsi].j == 2) {
+        if (d && jj) {
+            if (jsl[jsi].j == 1 || jsl[jsi].j == 2) {
                 // DON'T load via XHR any js or css files...since when jj == 1, secureboot will append them in the doc.
 
                 jsl_current += jsl[jsi].w || 1;

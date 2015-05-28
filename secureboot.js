@@ -1530,9 +1530,9 @@ else if (!b_u)
             }
             else if (jsl[i].j == 0 && jsl[i].f.match(/\.json$/)) {
                 try {
-                    var x = JSON.parse(jsl[i].text);
-                    for (var i in x) {
-                        pages[i] = x[i];
+                    var templates = JSON.parse(jsl[i].text);
+                    for (var i in templates) {
+                        pages[i] = templates[i];
                         jsl_loaded[i] = 1;
                     }
                 } catch (ex) {

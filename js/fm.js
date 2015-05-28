@@ -2826,6 +2826,7 @@ function accountUI()
             $('.membership-big-txt.type').text(l[435]);
             $('.membership-big-txt.accounttype').text(l[435]);
             $('.membership-medium-txt.expiry').text(l[436]);
+            $('.btn-cancel').hide();
         }
 
         perc = Math.round((account.servbw_used+account.downbw_used)/account.bw*100);

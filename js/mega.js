@@ -5360,7 +5360,7 @@ function process_f(f, cb, retry)
             if (skn.length) {
                 process_f(f, cb, 1);
             } else {
-                if (cb) cb();
+                if (cb) cb(!!newmissingkeys);
             }
             if (d) console.timeEnd('process_f');
         }
@@ -5717,7 +5717,7 @@ function loadfm_callback(res, ctx) {
         processPS(res.ps);
     }
 
-    process_f(res.f, function onLoadFMDone() {
+    process_f(res.f, function onLoadFMDone(hasMissingKeys) {
 
         // If we have shares, and if a share is for this node, record it on the nodes share list
         if (res.s) {
@@ -5753,6 +5753,10 @@ function loadfm_callback(res, ctx) {
         }
 
         getsc();
+
+        if (hasMissingKeys) {
+            srvlog('Got missing keys processing gettree...', null, true);
+        }
     });
 }
 

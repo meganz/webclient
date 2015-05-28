@@ -347,6 +347,7 @@ var mFileManagerDB = {
                         process_f(results, function(hasMissingKeys) {
                             delete $.mDBIgnoreDB;
                             if (hasMissingKeys) {
+                                srvlog('Got missing keys on DB, forcing fm reload...', null, true);
                                 mFileManagerDB.reload();
                             } else {
                                 mFileManagerDB.fetch(aTables);

@@ -2544,15 +2544,7 @@ function generateAnonymousReport() {
         var r = {
             'roomUniqueId': roomUniqueId,
             'roomState': v.getStateAsText(),
-            'roomParticipants': participants,
-            'encState': v.encryptionHandler ? v.encryptionHandler.state : "not defined",
-            'opQueueQueueCount': v.encryptionOpQueue
-                ? v.encryptionOpQueue._queue.length : "not defined",
-            'opQueueErrRetries': v.encryptionOpQueue
-                ? v.encryptionOpQueue._error_retries : "not defined",
-            'opQueueCurrentOp': v.encryptionOpQueue
-                && v.encryptionOpQueue._queue.length > 0
-                    ? v.encryptionOpQueue._queue[0][0] : "not defined"
+            'roomParticipants': participants
         };
 
         chatStates[roomUniqueId] = r;

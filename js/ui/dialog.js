@@ -221,7 +221,7 @@
 
     /**
      * Show the picker (and if $toggleButton is passed, position it top/bottom)
-     * @param [$toggleButton] {{jQuery|DomElement}} optional element to which to attach/render the dialog
+     * @param [$toggleButton] {jQuery|DomElement} optional element to which to attach/render the dialog
      */
     Dialog.prototype.show = function($toggleButton) {
         var self = this;

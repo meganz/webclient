@@ -54,10 +54,6 @@
         self.bind("onBeforeShow", function() {
             $('.fm-dialog-overlay').addClass('hidden');
         });
-
-        self.bind("onHide", function() {
-            $('.credentials-warning-dialog .fm-mega-dialog-bottom').remove();
-        });
     };
 
     CredentialsWarningDialog.prototype._initGenericEvents = function() {
@@ -173,7 +169,10 @@
         CredentialsWarningDialog.previousFingerprint = prevFingerprint;
         CredentialsWarningDialog.newFingerprint = newFingerprint;
         
-        CredentialsWarningDialog._instance = new CredentialsWarningDialog();
+        if (!CredentialsWarningDialog._instance) {
+            CredentialsWarningDialog._instance = new CredentialsWarningDialog();
+        }
+        
         CredentialsWarningDialog._instance.show();
 
         return CredentialsWarningDialog._instance;

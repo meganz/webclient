@@ -949,8 +949,8 @@ else if (!b_u)
 
     jsl.push({f:'js/megaPromise.js', n: 'megapromise_js', j: 1, w:5});
     jsl.push({f:'js/vendor/db.js', n: 'db_js', j: 1, w:5, g: 'vendor'});
-    jsl.push({f:'js/megaDbEncryptionPlugin.js', n: 'megadbenc_js', j: 1, w:5, j: 1, g: 'db'});
-    jsl.push({f:'js/megaDb.js', n: 'megadb_js', j: 1, w:5, j: 1, g: 'db'});
+    jsl.push({f:'js/megaDbEncryptionPlugin.js', n: 'megadbenc_js', j: 1, w:5,  g: 'db'});
+    jsl.push({f:'js/megaDb.js', n: 'megadb_js', j: 1, w:5, g: 'db'});
     jsl.push({f:'js/megaKvStorage.js', n: 'megakvstorage_js', j: 1, w:5, g: 'db'});
 
     jsl.push({f:'js/vendor/chat/strophe.js', n: 'mega_js', j: 1, w: 7, g: 'vendor'});
@@ -1528,12 +1528,12 @@ else if (!b_u)
                     throw new Error('Error parsing language file '+lang+'.json');
                 }
             }
-            else if (jsl[i].j == 0 && jsl[i].f.match(/\.json$/)) {
+            else if (jsl[i].j === 0 && jsl[i].f.match(/\.json$/)) {
                 try {
                     var templates = JSON.parse(jsl[i].text);
-                    for (var i in templates) {
-                        pages[i] = templates[i];
-                        jsl_loaded[i] = 1;
+                    for (var e in templates) {
+                        pages[e] = templates[e];
+                        jsl_loaded[e] = 1;
                     }
                 } catch (ex) {
                     throw new Error("Error parsing template");

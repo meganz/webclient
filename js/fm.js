@@ -2748,11 +2748,11 @@ function accountUI()
 				else {
                     $('.membership-big-txt.type').text('');
                 }
-                
+
                 // Get the date their subscription will renew
                 var timestamp = account.srenew[0];
                 var paymentType = htmlentities('(' + account.sgw.join(',') + ')');      // Credit card etc
-                
+
                 // Display the date their subscription will renew in format '14 March 2015 (credit card)'
                 if (timestamp > 0) {
                     var date = new Date(timestamp * 1000);
@@ -2763,7 +2763,7 @@ function accountUI()
                     // Otherwise just show payment type
                     $('.membership-medium-txt.expiry').html(paymentType);
                 }
-                
+
 				// Check if there are any active subscriptions
                 // ccqns = Credit Card Query Number of Subscriptions
 				api_req({ a: 'ccqns' },
@@ -2780,31 +2780,31 @@ function accountUI()
                                 // Make sure they really want to do it
 								msgDialog('confirmation', l[6822], l[6823], false, function(event)
 								{
-									if (event) 
+									if (event)
 									{
 										$cancelButton.hide();
 										loadingDialog.show();
-                                        
+
                                         // Cancel the subscriptions
                                         // cccs = Credit Card Cancel Subscriptions
 										api_req({ a: 'cccs' },
 										{
 											callback: function()
 											{
-												// Reset account cache and refetch all account data to display UI 
+												// Reset account cache and refetch all account data to display UI
                                                 // (note potential race condition if cancellation callback wasn't received in 7500ms)
 												M.account.lastupdate = 0;
-                                                
+
 												setTimeout(function()
 												{
-													loadingDialog.hide();												
+													loadingDialog.hide();
 													accountUI();
-                                                    
+
 												}, 7500);
-											}											
+											}
 										});
 									}
-								});							
+								});
 							});
 						}
 					}
@@ -9451,7 +9451,8 @@ function userFingerprint(userid, next) {
         var fprint = authring.computeFingerprint(u_pubEd25519, 'Ed25519', 'hex');
         return next(fprint.toUpperCase().match(/.{4}/g), fprint);
     }
-    crypt.getFingerprintEd25519(user.h || userid, function (response) {
+    var fingerprintPromise = crypt.getFingerprintEd25519(user.h || userid);
+    fingerprintPromise.done(function (response) {
         next(response.toUpperCase().match(/.{4}/g), response);
     });
 }
@@ -9582,7 +9583,7 @@ function contactUI() {
                 });
             });
         };
-        
+
         /**
          * Enables the Verify button
          */
@@ -9593,11 +9594,11 @@ function contactUI() {
                 fingerprintDialog(user);
             });
         };
-        
+
         // Display the current fingerpring
         showAuthenticityCredentials();
 
-        // If the fingerprints have already been verified for the contact, show 'Verified' 
+        // If the fingerprints have already been verified for the contact, show 'Verified'
         if (isContactVerified(user)) {
             $('.fm-verify').addClass('disabled');
             $('.fm-verify').find('span').text(l[6776]);
@@ -9611,7 +9612,7 @@ function contactUI() {
         $('.fm-reset-stored-fingerprint').rebind('click', function() {
             authring.resetFingerprintsForUser(user.u);
             enableVerifyFingerprintsButton();
-            
+
             // Refetch the key
             showAuthenticityCredentials();
         });

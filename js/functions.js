@@ -187,6 +187,9 @@ function translate(html) {
     }
     for (var i in items) {
         var tmp = items[i].split('.');
+        if (isNaN(parseInt(items[i]))) {
+            continue;
+        }
         if (tmp.length > 1) {
             if (tmp[1] === 'dq') {
                 l[items[i]] = l[tmp[0]].replace('"', '&quot;');

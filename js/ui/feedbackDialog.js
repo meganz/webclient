@@ -153,10 +153,6 @@
                 });
             });
 
-            $('input[name="share_uh"]', self.$dialog)
-                .attr('checked', true)
-                .trigger('change');
-
             $('input[name="send_stats"]', self.$dialog)
                 .attr('checked', true)
                 .trigger('change');

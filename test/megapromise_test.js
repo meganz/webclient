@@ -1,6 +1,4 @@
 describe("MegaPromise Unit Test", function() {
-    var _NativePromise = MegaPromise._origPromise;
-
     beforeEach(function(done) {
         done();
     });
@@ -149,7 +147,7 @@ describe("MegaPromise Unit Test", function() {
     });
 
     it("native Promise to MegaPromise", function(done) {
-        var n = new _NativePromise(function(res, rej) {
+        var n = new Promise(function(res, rej) {
             res(123);
         });
 
@@ -190,7 +188,7 @@ describe("MegaPromise Unit Test", function() {
         var p1 = new MegaPromise();
         p1.resolve(123);
 
-        var p2 = new _NativePromise(function(res, rej) {
+        var p2 = new Promise(function(res, rej) {
             res(456);
         });
 
@@ -213,11 +211,11 @@ describe("MegaPromise Unit Test", function() {
     });
 
     it("MegaPromise.all with 1 resolved and 1 rejected promises", function(done) {
-        var p1 = new _NativePromise(function(res, rej) {
+        var p1 = new Promise(function(res, rej) {
             rej(123);
         });
 
-        var p2 = new _NativePromise(function(res, rej) {
+        var p2 = new Promise(function(res, rej) {
             res(456);
         });
 

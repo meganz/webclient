@@ -688,3 +688,198 @@ function isNonActivatedAccount() {
 function isEphemeral() {
     return (u_type === 0);
 }
+
+
+var _lastUserInteractionCache = {};
+var _lastUserInteractionGetRequests = {};
+
+var _getLastInteractionAttribKey = function(u_h) {
+    assert(u_h, "missing argument u_h, can't proceed");
+
+    return "li_" + u_h;
+};
+
+var setLastInteractionWith = function(u_h, v) {
+    assert(u_handle, "missing u_handle, can't proceed");
+    assert(u_h, "missing argument u_h, can't proceed");
+
+    var k = _getLastInteractionAttribKey(u_h);
+
+    var isDone = false;
+    var $promise = createTimeoutPromise(
+        function() {
+            return isDone === true
+        },
+        500,
+        10000
+    );
+
+    var tsNew = parseInt(v.split(":")[1], 10);
+
+    if (!_lastUserInteractionCache[u_h]) {
+        getLastInteractionWith(u_h)
+            .done(function(r) {
+                var tsOld = parseInt(r.split(":")[1], 10);
+                if (tsOld >= tsNew)  {
+                    //console.error("tsOld > tsNew, can't set li to dates in the past.");
+                    // ^^ mainly triggered by notifications.
+
+                    $promise.resolve(r);
+                } else {
+                    setLastInteractionWith(u_h, v)
+                        .done(function() { $promise.resolve.apply($promise, arguments); })
+                        .fail(function() { $promise.reject.apply($promise, arguments); })
+                }
+            })
+            .fail(function(e) {
+                $promise.reject(e);
+            });
+
+        return $promise;
+    } else {
+        var tsOld = parseInt(_lastUserInteractionCache[u_h].split(":")[1], 10);
+        if (tsOld > tsNew)  {
+            //console.error("tsOld > tsNew, can't set li to dates in the past.");
+            // ^^ mainly triggered by notifications.
+
+            $promise.resolve(_lastUserInteractionCache[u_h]);
+            return $promise;
+        }
+    }
+
+    _lastUserInteractionCache[u_h] = v;
+
+    setUserAttribute(
+        k,
+        {'': v}, // as advised by Guy, this is the format that we should use when we want to store strings in attributes
+        false,
+        true,
+        function() {
+            isDone = true;
+            $promise.resolve(_lastUserInteractionCache[u_h]);
+            $promise.verify();
+        }
+    );
+
+    return $promise;
+};
+var getLastInteractionWith = function(u_h) {
+    assert(u_handle, "missing u_handle, can't proceed");
+    assert(u_h, "missing argument u_h, can't proceed");
+
+    var k = _getLastInteractionAttribKey(u_h);
+
+    var _renderLastInteractionDone = function(r) {
+        r = r.split(":");
+
+        var $elem = $('.li_' + u_h);
+
+        $elem
+            .removeClass('never')
+            .removeClass('cloud-drive')
+            .removeClass('conversations')
+            .removeClass('unread-conversations');
+
+        var ts = parseInt(r[1], 10);
+
+        if (M.u[u_h]) {
+            M.u[u_h].ts = ts;
+        }
+
+        if (r[0] == "0") {
+            $elem.addClass('cloud-drive');
+        } else if (r[0] == "1" && megaChat) {
+            M.u[u_h].lastChatActivity = ts;
+            var room = megaChat.getPrivateRoom(u_h);
+            if (room && megaChat && megaChat.plugins && megaChat.plugins.chatNotifications) {
+                if (megaChat.plugins.chatNotifications.notifications.getCounterGroup(room.roomJid) > 0) {
+                    $elem.addClass('unread-conversations');
+                } else {
+                    $elem.addClass('conversations');
+                }
+            } else {
+                $elem.addClass('conversations');
+            }
+        } else {
+            $elem.addClass('never');
+        }
+        $elem.text(
+            time2last(ts)
+        );
+
+        if ($.sortTreePanel.contacts.by == 'last-interaction') {
+            M.contacts(); // we need to resort
+        }
+    };
+
+    var _renderLastInteractionFail = function(r) {
+        var $elem = $('.li_' + u_h);
+
+        $elem
+            .removeClass('never')
+            .removeClass('cloud-drive')
+            .removeClass('conversations')
+            .removeClass('unread-conversations');
+
+
+        $elem.addClass('never');
+    };
+
+
+    if (_lastUserInteractionCache[u_h]) {
+        var $promise = Promise.resolve(_lastUserInteractionCache[u_h]);
+
+        $promise
+            .done(_renderLastInteractionDone)
+            .fail(_renderLastInteractionFail);
+
+        return $promise;
+    }
+    if (_lastUserInteractionGetRequests[u_h] && _lastUserInteractionGetRequests[u_h].state() == 'pending') {
+        return _lastUserInteractionGetRequests[u_h];
+    }
+    var isDone = false;
+    var $promise = createTimeoutPromise(
+        function() {
+            return isDone === true
+        },
+        500,
+        10000
+    );
+
+    getUserAttribute(
+        u_handle,
+        k,
+        false,
+        true,
+        function(res, ctx) {
+            if (typeof res !== 'number') {
+                if (res && typeof(res['']) !== 'undefined') {
+                    _lastUserInteractionCache[u_h] = res[''];
+                    $promise.resolve(_lastUserInteractionCache[u_h]);
+                    isDone = true;
+                } else {
+                    $promise.reject(res);
+                    isDone = true;
+                }
+            } else {
+                $promise.reject(res);
+                isDone = true;
+            }
+
+        }
+    );
+
+    $promise
+        .done(_renderLastInteractionDone)
+        .fail(_renderLastInteractionFail)
+        .always(function() {
+            if (_lastUserInteractionGetRequests[u_h] === $promise) {
+                delete _lastUserInteractionGetRequests[u_h];
+            }
+        });
+
+    _lastUserInteractionGetRequests[u_h] = $promise;
+
+    return $promise;
+};

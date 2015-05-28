@@ -554,8 +554,10 @@ function treePanelType()
 function treePanelSortElements(type, elements, handlers, ifEq) {
     var settings = $.sortTreePanel[type]
         , sort = handlers[settings.by]
+
     if (!sort)
         return;
+
     elements.sort(function(a, b) {
         var d = sort(a, b)
         if (d == 0 && ifEq)
@@ -7079,6 +7081,7 @@ function initShareDialog() {
                 if (M.u[handleOrEmail]) {
                     userEmail = M.u[handleOrEmail].m;
                     M.delNodeShare(selectedNodeHandle, handleOrEmail);
+                    setLastInteractionWith(handleOrEmail, "0:" + unixtime());
                 }
 
                 // Pending share

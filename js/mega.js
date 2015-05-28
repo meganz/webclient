@@ -431,21 +431,25 @@ function MegaData()
         var ts = 0;
         if (M.d[h])
         {
-            var a = fm_getnodes(h);
-            for (var i in a)
-            {
-                var n = M.d[a[i]];
-                if (n)
-                {
-                    if (ts < n.ts)
-                        ts = n.ts;
-                    if (n.t)
-                        folders++;
-                    else
-                        files++;
+            if(!M.d[h].ts) {
+                var a = fm_getnodes(h);
+                for (var i in a) {
+                    var n = M.d[a[i]];
+                    if (n) {
+                        if (ts < n.ts)
+                            ts = n.ts;
+                        if (n.t)
+                            folders++;
+                        else
+                            files++;
+                    }
                 }
+                M.d[h].ts = ts;
+            } else {
+                ts = M.d[h].ts;
             }
         }
+
         return {files: files, folders: folders, ts: ts};
     };
 
@@ -855,11 +859,13 @@ function MegaData()
                                     </div>\n\
                                 </td>\n\
                                 <td width="270">\n\
-                                    <div class="contacts-interation ' + interactionclass + '">' + time + '</div>\n\
+                                    <div class="contacts-interation li_' + u_h + '"></div>\n\
                                 </td>\n\
                             </tr>';
                 }
                 mInsertNode(M.v[i], M.v[i-1], M.v[i+1], t, el, html, u);
+
+                getLastInteractionWith(u_h);
             }
         }// renderContactsLayout END
 
@@ -1050,7 +1056,7 @@ function MegaData()
             cache = [],
             files = 0;
 
-        if(d) console.log('renderMain', u);
+        if (d) console.log('renderMain', u);
 
         lSel = this.fsViewSel;
         $(lSel).unbind('jsp-scroll-y.dynlist');
@@ -1532,20 +1538,18 @@ function MegaData()
 
         treePanelSortElements('contacts', contacts, {
             'last-interaction': function(a, b) {
-                if (!M.i_cache[a.u]) {
-                    var cs = M.contactstatus(a.u);
-                    if (cs.ts === 0) {
-                        cs.ts = -1;
-                    }
-                    M.i_cache[a.u] = cs.ts;
+                var cs = M.contactstatus(a.u);
+                if (cs.ts === 0) {
+                    cs.ts = -1;
                 }
-                if (!M.i_cache[b.u]) {
-                    var cs = M.contactstatus(b.u);
-                    if (cs.ts === 0) {
-                        cs.ts = -1;
-                    }
-                    M.i_cache[b.u] = cs.ts;
+                M.i_cache[a.u] = cs.ts;
+
+
+                var cs = M.contactstatus(b.u);
+                if (cs.ts === 0) {
+                    cs.ts = -1;
                 }
+                M.i_cache[b.u] = cs.ts;
 
                 return M.i_cache[a.u] - M.i_cache[b.u]
             },
@@ -1596,7 +1600,7 @@ function MegaData()
                     $('.fm-chat-popup-button', m).removeClass("disabled");
 
                     var $userDiv = $this.parent().parent();
-                    if($userDiv.is(".offline")) {
+                    if ($userDiv.is(".offline")) {
                         $('.fm-chat-popup-button.start-audio, .fm-chat-popup-button.start-video', m).addClass("disabled");
                     }
 
@@ -1641,7 +1645,7 @@ function MegaData()
 
                     window.location = "#fm/chat/" + user_handle;
                     var room = megaChat.createAndShowPrivateRoomFor(user_handle);
-                    if(room) {
+                    if (room) {
                         room.startAudioCall();
                     }
                 }
@@ -1658,7 +1662,7 @@ function MegaData()
 
                     window.location = "#fm/chat/" + user_handle;
                     var room = megaChat.createAndShowPrivateRoomFor(user_handle);
-                    if(room) {
+                    if (room) {
                         room.startVideoCall();
                     }
                 }
@@ -5242,6 +5246,7 @@ function doshare(h, targets, dontShowShareDialog) {
                             // level (passive)
                             if (M.u[user] && M.u[user].c != 0) {
                                 M.nodeShare(ctx.h, {h: h, r: rights, u: user, ts: Math.floor(new Date().getTime() / 1000)});
+                                setLastInteractionWith(user, "0:" + unixtime());
                             }
                             else if (d) {
                                 console.log('doshare: invalid user', user, M.u[user], ctx.t[i]);
@@ -5635,7 +5640,7 @@ function process_u(u) {
         M.addUser(u[i]);
     }
 
-    //if(megaChat && megaChat.karere && megaChat.karere.getConnectionState() === Karere.CONNECTION_STATE.CONNECTED) {
+    //if (megaChat && megaChat.karere && megaChat.karere.getConnectionState() === Karere.CONNECTION_STATE.CONNECTED) {
     //    megaChat.karere.forceReconnect();
     //}
 }
@@ -5663,7 +5668,7 @@ function folderreqerr(c, e)
 
 function init_chat() {
     function __init_chat() {
-        if(u_type && !megaChat.is_initialized) {
+        if (u_type && !megaChat.is_initialized) {
             if (d) console.log('Initializing the chat...');
             megaChat.init();
             if (fminitialized) {
@@ -5676,7 +5681,7 @@ function init_chat() {
             }
         }
     }
-    if(!MegaChatDisabled) {
+    if (!MegaChatDisabled) {
         if (pubEd25519[u_handle]) {
             __init_chat();
         } else {
@@ -5875,13 +5880,13 @@ function clone(obj)
         for (var attr in obj)
         {
             if (obj.hasOwnProperty(attr)) {
-                if(!(obj[attr] instanceof Object)) {
+                if (!(obj[attr] instanceof Object)) {
                     copy[attr] = obj[attr];
                 } else if (obj[attr] instanceof Array) {
                     copy[attr] = clone(obj[attr]);
-                } else if(!isNativeObject(obj[attr])) {
+                } else if (!isNativeObject(obj[attr])) {
                     copy[attr] = clone(obj[attr]);
-                } else if($.isFunction(obj[attr])) {
+                } else if ($.isFunction(obj[attr])) {
                     copy[attr] = obj[attr];
                 } else {
                     copy[attr] = {};

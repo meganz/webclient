@@ -4200,9 +4200,6 @@ function MegaData()
                 // The isEphemeralAccount flag may not be set (e.g. if from SDK), but if it is then set it
                 var isEphemeralAccount = (typeof urlParts[3] === 'undefined') ? false : urlParts[3];
                 
-                console.log('zzzz isEphemeralAccount', isEphemeralAccount);
-                console.log('zzzz toPage', toPage);
-                
                 // If a regular account, log them in
                 if (!isEphemeralAccount) {
                     this.performRegularLogin(toPage);

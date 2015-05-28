@@ -4159,23 +4159,25 @@ function MegaData()
      */
     this.transferFromMegaCoNz = function()
     {
-        var parts = /#sitetransfer!(.*)/.exec(window.location);
+        // Get site transfer data from after the hash in the URL
+        var urlParts = /#sitetransfer!(.*)/.exec(window.location);
         
-        if (parts) {
+        if (urlParts) {
 
-            // Decode from Base64
-            parts = JSON.parse(atob(parts[1]));
+            // Decode from Base64 and JSON
+            urlParts = JSON.parse(atob(urlParts[1]));
             
-            if (parts) {
+            if (urlParts) {
                 // If the user is already logged in here with the same account
                 // we can avoid a lot and just take them to the correct page
-                if (JSON.stringify(u_k) === JSON.stringify(parts[0])){
-                    window.location.hash = parts[2];
+                if (JSON.stringify(u_k) === JSON.stringify(urlParts[0])){
+                    window.location.hash = urlParts[2];
                     return;
                 }
 
-                // If the user is already logged in but with a different account just load that account instead
-                else if (u_k && (JSON.stringify(u_k) !== JSON.stringify(parts[0]))) {
+                // If the user is already logged in but with a different account just load that account instead. The 
+                // hash they came from e.g. a folder link may not be valid for this account so just load the file manager.
+                else if (u_k && (JSON.stringify(u_k) !== JSON.stringify(urlParts[0]))) {
                     window.location.hash = 'fm';
                     return;
                 }
@@ -4184,56 +4186,26 @@ function MegaData()
                 localStorage.wasloggedin = true;
                 u_logout();
 
-                // Set master key, session key and RSA private key
+                // Set master key, session ID and RSA private key
                 u_storage = init_storage(sessionStorage);
-                u_k = parts[0];
-                u_sid = parts[1];
-                u_privk = parts[3];
+                u_k = urlParts[0];
+                u_sid = urlParts[1];
                 u_storage.k = JSON.stringify(u_k);
                 u_storage.sid = u_sid;
-                
-                // Set session ID
                 api_setsid(u_sid);
                 
-                // Get the page to redirect to
-                var toPage = parts[2];
-
-                // This won't exist if ephemeral redirect
-                if (u_privk) {
-                    u_storage.privk = base64urlencode(crypto_encodeprivkey(u_privk));
+                // Get the page to load
+                var toPage = urlParts[2];
                 
-                    var ctx = {
-                        checkloginresult: function(ctx, result)
-                        {
-                            if (m) {
-                                loadingDialog.hide();
-                            }
-                            else {
-                                document.getElementById('overlay').style.display = 'none';
-                            }
-
-                            // Check for suspended account
-                            if (result == EBLOCKED) {
-                                alert(l[730]);
-                            }
-                            else if (result) {
-                                // Set account type and redirect to the requested location
-                                u_type = result;
-                                window.location.hash = toPage;
-                            }
-                            else {
-                                // Incorrect email or password
-                                alert(l[201]);
-                            }
-                        }
-                    };
-
-                    // Continue through the log in flow from approximately the correct 
-                    // place given that we have the master key, session ID and private RSA key
-                    u_checklogin3(ctx);
+                // The isEphemeralAccount flag may not be set (e.g. if from SDK), but if it is then set it
+                var isEphemeralAccount = (typeof urlParts[3] === 'undefined') ? false : urlParts[3];
+                
+                // If a regular account, log them in
+                if (!isEphemeralAccount) {
+                    this.performRegularLogin(toPage);
                 }
                 else {
-                    // Otherwise this is an ephemeral account so reload to log them in properly
+                    // Otherwise this is an ephemeral account, so reset the page hash
                     if (toPage) {
                         window.location.hash = toPage;
                     }
@@ -4241,10 +4213,47 @@ function MegaData()
                         window.location.hash = '';
                     }
                     
+                    // Do a full reload to log them in properly
                     document.location.reload(false);
                 }
             }
         }
+    };
+    
+    /**
+     * Performs a regular login as part of the transfer from mega.co.nz
+     * @param {String} toPage The page to load e.g. 'fm', 'pro' etc
+     */
+    this.performRegularLogin = function(toPage) {
+        
+        var ctx = {
+            checkloginresult: function(ctx, result) {
+                if (m) {
+                    loadingDialog.hide();
+                }
+                else {
+                    document.getElementById('overlay').style.display = 'none';
+                }
+
+                // Check for suspended account
+                if (result == EBLOCKED) {
+                    alert(l[730]);
+                }
+                else if (result) {
+                    // Set account type and redirect to the requested location
+                    u_type = result;
+                    window.location.hash = toPage;
+                }
+                else {
+                    // Incorrect email or password
+                    alert(l[201]);
+                }
+            }
+        };
+
+        // Continue through the log in flow from approximately the correct 
+        // place given that we have the master key, session ID and private RSA key
+        u_checklogin3(ctx);
     };
 }
 

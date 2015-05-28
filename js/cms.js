@@ -1,4 +1,5 @@
 var IMAGE_PLACEHOLDER = staticpath + "/images/img_loader@2x.png";
+var CMS_HOST = "http://46.101.165.59";
 
 (function(window, asmCrypto) {
 
@@ -89,7 +90,7 @@ function dl_placeholder(str, sep, rid, id) {
  *  the BLOB server
  */
 function img_placeholder(str, sep, rid, id) {
-	return "'" + (localStorage.cms || "//cms.mega.nz") + "/unsigned/" + id + "' data-img='loading_" +  id + "'" 
+	return "'" + (localStorage.cms || CMS_HOST) + "/unsigned/" + id + "' data-img='loading_" +  id + "'" 
 }
 
 /**
@@ -117,7 +118,7 @@ function doRequest(id) {
 		delete fetching[id];
 	};
 
-	q.open("GET", (localStorage.cms || "//cms.mega.nz") + '/content/' + id);
+	q.open("GET", (localStorage.cms || CMS_HOST) + '/content/' + id);
 	q.responseType = 'arraybuffer';
 	q.send()
 }
@@ -185,7 +186,7 @@ var CMS = {
 	loaded: loaded,
 
 	img : function(id) {
-		return (localStorage.cms || "//cms.mega.nz") + "/unsigned/" + id
+		return (localStorage.cms || CMS_HOST) + "/unsigned/" + id
 	},
 	get: function(id, next, as) {
 		if (typeof fetching[id] == "undefined") {

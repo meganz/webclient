@@ -827,7 +827,7 @@ var getLastInteractionWith = function(u_h) {
 
 
     if (_lastUserInteractionCache[u_h]) {
-        var $promise = Promise.resolve(_lastUserInteractionCache[u_h]);
+        var $promise = MegaPromise.resolve(_lastUserInteractionCache[u_h]);
 
         $promise
             .done(_renderLastInteractionDone)

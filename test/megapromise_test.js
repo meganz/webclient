@@ -198,12 +198,10 @@ describe("MegaPromise Unit Test", function() {
         var p123 = MegaPromise.all([p1, p2, p3]);
 
         p123.then(function() {
-            expect(arguments.length).to.eql(3);
+            expect(arguments.length).to.eql(1);
             expect(p1._internalPromise.state()).to.eql("resolved");
-            expect(p3.state()).to.eql("resolved");
-            expect(arguments[0]).to.eql(123);
-            expect(arguments[1]).to.eql(456);
-            expect(arguments[2]).to.eql(789);
+            expect(p3.state()).to.equal("resolved");
+            expect(arguments[0]).to.deep.equal([123, 456, 789]);
             done();
         }, function() {
             fail('.all was rejected, while it should have been resolved');

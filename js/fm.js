@@ -552,6 +552,13 @@ function treePanelType()
 }
 
 function treePanelSortElements(type, elements, handlers, ifEq) {
+    if (!$.sortTreePanel) {
+       // XX: not yet initialised, initUI was not called yet, which means that most likely rendering/sorting should not be
+       // triggered at the moment. Caused receiving action packets, BEFORE the ui was initialised, so this call can simply
+       // do nothing at this moment.
+
+       return;
+    }
     var settings = $.sortTreePanel[type]
         , sort = handlers[settings.by]
     if (!sort)
@@ -990,6 +997,7 @@ function initUI() {
     });
 
     var fmTabState;
+
     $('.nw-fm-left-icon').unbind('click');
     $('.nw-fm-left-icon').bind('click', function() {
         treesearch = false;
@@ -1031,7 +1039,7 @@ function initUI() {
                 if (~clickedClass.indexOf(activeClass)) {
                     targetFolder = tab.root;
                 }
-                else if (tab.prev) {
+                else if (tab.prev && M.d[tab.prev]) {
                     targetFolder = tab.prev;
                 }
                 else {
@@ -1328,6 +1336,10 @@ function removeUInode(h) {
                 $('.grid-table.fm tr').remove();
             }
             break;
+    }
+
+    if (M.currentdirid === h || isCircular(h, M.currentdirid) === true) {
+        M.openFolder(RootbyId(h));
     }
 }
 
@@ -1953,6 +1965,13 @@ function removeShare(shareId, nfk) {
     if (!nfk) api_updfkey(shareId);
     M.delNode(shareId);
     api_req({ a: 'd', n: shareId, i: requesti });
+
+    M.buildtree({h: 'shares'}, 0x4fe);
+
+    if (M.currentdirid === shareId || isCircular(shareId, M.currentdirid) === true) {
+        M.openFolder(RootbyId(shareId));
+    }
+
     delete u_sharekeys[shareId];
 }
 
@@ -6137,7 +6156,13 @@ function treeUIopen(id, event, ignoreScroll, dragOver, DragOpen) {
         if (ids[0] === 'contacts' && M.currentdirid && M.currentdirid.length === 11 && RootbyId(M.currentdirid) == 'contacts') {
             sectionUIopen('contacts');
         } else if (ids[0] === 'contacts') {
-            sectionUIopen('shared-with-me');
+            // XX: whats the goal of this? everytime when i'm in the contacts and I receive a share, it changes ONLY the
+            // UI tree -> Shared with me... its a bug from what i can see and i also don't see any points of automatic
+            // redirect in the UI when another user had sent me a shared folder.... its very bad UX. Plus, as a bonus
+            // sectionUIopen is already called with sectionUIopen('contacts') few lines before this (when this func
+            // is called by the rendernew()
+
+            // sectionUIopen('shared-with-me');
         } else if (ids[0] === M.RootID) {
             sectionUIopen('cloud-drive');
         }
@@ -9385,6 +9410,8 @@ function sharedfolderUI() {
         if (M.viewmode === 1)
             e = '.fm-blocks-view.fm';
 
+        var nameStr = user && user.name ? htmlentities(user.name) : "N/a";
+
         $(e).wrap('<div class="shared-details-block"></div>');
         $('.shared-details-block').prepend(
             '<div class="shared-top-details">'
@@ -9392,12 +9419,12 @@ function sharedfolderUI() {
                 +'<div class="shared-details-info-block">'
                     +'<div class="shared-details-pad">'
                         +'<div class="shared-details-folder-name">'+ htmlentities((c||n).name) +'</div>'
-                        +'<a href="" class="grid-url-arrow"><span></span></a>'
+                        +'<a href="javascript:;" class="grid-url-arrow"><span></span></a>'
                         +'<div class="shared-folder-access'+ rightsclass + '">' + rights + '</div>'
                         +'<div class="clear"></div>'
                         +'<div class="nw-contact-avatar color10">' + avatar + '</div>'
                         +'<div class="fm-chat-user-info">'
-                            +'<div class="fm-chat-user">' + htmlentities(user.name) + '</div>'
+                            +'<div class="fm-chat-user">' + nameStr + '</div>'
                         +'</div>'
                     +'</div>'
                     +'<div class="shared-details-buttons">'

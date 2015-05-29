@@ -434,14 +434,19 @@ function MegaData()
             if(!M.d[h].ts) {
                 var a = fm_getnodes(h);
                 for (var i in a) {
-                    var n = M.d[a[i]];
-                    if (n) {
-                        if (ts < n.ts)
-                            ts = n.ts;
-                        if (n.t)
-                            folders++;
-                        else
-                            files++;
+                    if (a.hasOwnProperty(i)) {
+                        var n = M.d[a[i]];
+                        if (n) {
+                            if (ts < n.ts) {
+                                ts = n.ts;
+                            }
+                            if (n.t) {
+                                folders++;
+                            }
+                            else {
+                                files++;
+                            }
+                        }
                     }
                 }
                 M.d[h].ts = ts;
@@ -2962,7 +2967,7 @@ function MegaData()
                         ctx.account.balance = res.balance;
                         ctx.account.reseller = res.reseller;
                         ctx.account.prices = res.prices;
-                        
+
                         // If a subscription, get the timestamp it will be renewed
                         if (res.stype === 'S') {
                             ctx.account.srenew = res.srenew;
@@ -4166,12 +4171,12 @@ function MegaData()
     {
         // Get site transfer data from after the hash in the URL
         var urlParts = /#sitetransfer!(.*)/.exec(window.location);
-        
+
         if (urlParts) {
 
             // Decode from Base64 and JSON
             urlParts = JSON.parse(atob(urlParts[1]));
-            
+
             if (urlParts) {
                 // If the user is already logged in here with the same account
                 // we can avoid a lot and just take them to the correct page
@@ -4180,7 +4185,7 @@ function MegaData()
                     return;
                 }
 
-                // If the user is already logged in but with a different account just load that account instead. The 
+                // If the user is already logged in but with a different account just load that account instead. The
                 // hash they came from e.g. a folder link may not be valid for this account so just load the file manager.
                 else if (u_k && (JSON.stringify(u_k) !== JSON.stringify(urlParts[0]))) {
                     window.location.hash = 'fm';
@@ -4198,13 +4203,13 @@ function MegaData()
                 u_storage.k = JSON.stringify(u_k);
                 u_storage.sid = u_sid;
                 api_setsid(u_sid);
-                
+
                 // Get the page to load
                 var toPage = urlParts[2];
-                
+
                 // The isEphemeralAccount flag may not be set (e.g. if from SDK), but if it is then set it
                 var isEphemeralAccount = (typeof urlParts[3] === 'undefined') ? false : urlParts[3];
-                
+
                 // If a regular account, log them in
                 if (!isEphemeralAccount) {
                     this.performRegularLogin(toPage);
@@ -4217,20 +4222,20 @@ function MegaData()
                     else {
                         window.location.hash = '';
                     }
-                    
+
                     // Do a full reload to log them in properly
                     document.location.reload(false);
                 }
             }
         }
     };
-    
+
     /**
      * Performs a regular login as part of the transfer from mega.co.nz
      * @param {String} toPage The page to load e.g. 'fm', 'pro' etc
      */
     this.performRegularLogin = function(toPage) {
-        
+
         var ctx = {
             checkloginresult: function(ctx, result) {
                 if (m) {
@@ -4256,7 +4261,7 @@ function MegaData()
             }
         };
 
-        // Continue through the log in flow from approximately the correct 
+        // Continue through the log in flow from approximately the correct
         // place given that we have the master key, session ID and private RSA key
         u_checklogin3(ctx);
     };

@@ -13,6 +13,9 @@ var pubEd25519 = {};
 var crypt = (function () {
     "use strict";
 
+    // Disables warnings for explicit initialisation with `undefined`.
+    /* jshint -W080 */
+
     /**
      * @description
      * Cryptography related functionality.

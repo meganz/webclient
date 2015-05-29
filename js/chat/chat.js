@@ -47,7 +47,7 @@ var chatui;
         var $promise;
 
 
-        if (localStorage.megaChatPresence != "unavailable") {
+        if (localStorage.megaChatPresence !== "unavailable") {
             if (megaChat.karere.getConnectionState() != Karere.CONNECTION_STATE.CONNECTED) {
                 megaChat.connect()
                     .done(function() {
@@ -816,7 +816,7 @@ Chat.prototype.init = function() {
             });
         }
 
-        if (eventObject.getShow() != "unavailable") {
+        if (eventObject.getShow() !== "unavailable") {
             if (eventObject.isMyOwn(self.karere) === false) {
 
                 // update M.u
@@ -1570,7 +1570,7 @@ Chat.prototype._onUsersUpdate = function(type, e, eventObject) {
 
 
     // i had joined OR left
-    if ($.inArray(self.karere.getJid(), diffUsers) != -1) {
+    if ($.inArray(self.karere.getJid(), diffUsers) !== -1) {
         if (type != "joined") { // i'd left
             // i'd left, remove the room and the UI stuff
             if (self.chats[eventObject.getRoomJid()]) {
@@ -1590,7 +1590,7 @@ Chat.prototype._onUsersUpdate = function(type, e, eventObject) {
             }
         }
     } else { //some one else had joined/left the room
-        if (type != "joined") { // they left the room
+        if (type !== "joined") { // they left the room
             //XX: If this is a private room and the only user left count === 1, then destroy the room (an UI elements)
 
             // this code should trigger timeout immediately if there is a request pending for a user who had left the

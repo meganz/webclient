@@ -280,8 +280,8 @@ var mFileManagerDB = {
                         mFileManagerDB.fetch([
                             'f', /* <- f should ALWAYS be first! */
                             'u',
-                            'ok',
-                            's'
+                            's',
+                            'ok'
                         ]);
 
                     } else {

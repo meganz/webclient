@@ -530,14 +530,14 @@ function treesearchUI()
                     M.contacts();
                     break;
                 case 'shared-with-me':
-                    M.buildtree({h: 'shares'}, 0x4fe);
+                    M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
                     break;
                 case 'cloud-drive':
                 case 'folder-link':
-                    M.buildtree(M.d[M.RootID], 0x4fe);
+                    M.buildtree(M.d[M.RootID], M.buildtree.FORCE_REBUILD);
                     break;
                 case 'rubbish-bin':
-                    M.buildtree({h: M.RubbishID}, 0x4fe);
+                    M.buildtree({h: M.RubbishID}, M.buildtree.FORCE_REBUILD);
                     break;
             }
             treeUI(); // reattach events
@@ -554,8 +554,10 @@ function treePanelType()
 function treePanelSortElements(type, elements, handlers, ifEq) {
     var settings = $.sortTreePanel[type]
         , sort = handlers[settings.by]
+
     if (!sort)
         return;
+
     elements.sort(function(a, b) {
         var d = sort(a, b)
         if (d == 0 && ifEq)
@@ -7079,6 +7081,7 @@ function initShareDialog() {
                 if (M.u[handleOrEmail]) {
                     userEmail = M.u[handleOrEmail].m;
                     M.delNodeShare(selectedNodeHandle, handleOrEmail);
+                    setLastInteractionWith(handleOrEmail, "0:" + unixtime());
                 }
 
                 // Pending share

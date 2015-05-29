@@ -4476,7 +4476,7 @@ function rendernew()
         var n = M.d[h];
         if (n)
         {
-            M.buildtree(n, 0x4fe);
+            M.buildtree(n, M.buildtree.FORCE_REBUILD);
             UItree = true;
         }
     }
@@ -4513,8 +4513,8 @@ function rendernew()
         }
     }
 
-    if(newshare) {
-        M.buildtree({h: 'shares'}, 0x4fe);
+    if (newshare) {
+        M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
     }
     M.buildSubmenu();
     initContextUI();
@@ -4758,7 +4758,7 @@ function execsc(actionPackets, callback) {
 
             crypto_share_rsa2aes();
 
-            M.buildtree({h: 'shares'}, 0x4fe);
+            M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
         } else if (actionPacket.a === 'k' && !folderlink) {
             if (actionPacket.sr)
                 crypto_procsr(actionPacket.sr);
@@ -4770,7 +4770,7 @@ function execsc(actionPackets, callback) {
                     cr: crypto_makecr(actionPacket.n, [actionPacket.h], true)
                 });
 
-            M.buildtree({h: 'shares'}, 0x4fe);
+            M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
         }
         else if (actionPacket.a === 't') {
             if (tparentid) {

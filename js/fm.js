@@ -1968,7 +1968,7 @@ function removeShare(shareId, nfk) {
     M.delNode(shareId);
     api_req({ a: 'd', n: shareId, i: requesti });
 
-    M.buildtree({h: 'shares'}, 0x4fe);
+    M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
 
     if (M.currentdirid === shareId || isCircular(shareId, M.currentdirid) === true) {
         M.openFolder(RootbyId(shareId));

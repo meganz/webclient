@@ -132,11 +132,10 @@ describe("MegaPromise Unit Test", function() {
         var p12 = MegaPromise.all([p1, p2]);
 
         p12.then(function() {
-            expect(arguments.length).to.eql(2);
+            expect(arguments.length).to.eql(1);
             expect(p1._internalPromise.state()).to.eql("resolved");
             expect(p2._internalPromise.state()).to.eql("resolved");
-            expect(arguments[0]).to.eql(123);
-            expect(arguments[1]).to.eql(456);
+            expect(arguments[0]).to.deep.equal([123, 456]);
             done();
         }, function() {
             fail('.all was rejected, while it should have been resolved');
@@ -151,7 +150,6 @@ describe("MegaPromise Unit Test", function() {
             res(123);
         });
 
-
         var mp = MegaPromise.asMegaPromiseProxy(n);
 
         mp.then(function() {
@@ -160,7 +158,7 @@ describe("MegaPromise Unit Test", function() {
             expect(arguments[0]).to.eql(123);
             done();
         }, function() {
-            fail('.all was rejected, while it should have been resolved');
+            fail('MegaPromise was rejected, while it should have been resolved');
         });
 
         mp.resolve(123);
@@ -169,7 +167,6 @@ describe("MegaPromise Unit Test", function() {
     it("jQuery Deferred to MegaPromise", function(done) {
         var n = new $.Deferred();
 
-
         var mp = MegaPromise.asMegaPromiseProxy(n);
 
         mp.then(function() {
@@ -178,7 +175,7 @@ describe("MegaPromise Unit Test", function() {
             expect(arguments[0]).to.eql(123);
             done();
         }, function() {
-            fail('.all was rejected, while it should have been resolved');
+            fail('MegaPromise was rejected, while it should have been resolved');
         });
 
         n.resolve(123);
@@ -293,8 +290,8 @@ describe("MegaPromise Unit Test", function() {
             _trackPromise(dummyTimedPromise(5, 'resolve')),
             _trackPromise(dummyTimedPromise(6, 'reject'))
         ]).always(function() {
-            expect(resolved).to.eql([1, 2, 5]);
-            expect(rejected).to.eql([3, 4, 6]);
+            expect(resolved).to.deep.eql([1, 2, 5]);
+            expect(rejected).to.deep.eql([3, 4, 6]);
             done();
         });
     });

@@ -431,21 +431,25 @@ function MegaData()
         var ts = 0;
         if (M.d[h])
         {
-            var a = fm_getnodes(h);
-            for (var i in a)
-            {
-                var n = M.d[a[i]];
-                if (n)
-                {
-                    if (ts < n.ts)
-                        ts = n.ts;
-                    if (n.t)
-                        folders++;
-                    else
-                        files++;
+            if(!M.d[h].ts) {
+                var a = fm_getnodes(h);
+                for (var i in a) {
+                    var n = M.d[a[i]];
+                    if (n) {
+                        if (ts < n.ts)
+                            ts = n.ts;
+                        if (n.t)
+                            folders++;
+                        else
+                            files++;
+                    }
                 }
+                M.d[h].ts = ts;
+            } else {
+                ts = M.d[h].ts;
             }
         }
+
         return {files: files, folders: folders, ts: ts};
     };
 
@@ -858,11 +862,13 @@ function MegaData()
                                     </div>\n\
                                 </td>\n\
                                 <td width="270">\n\
-                                    <div class="contacts-interation ' + interactionclass + '">' + time + '</div>\n\
+                                    <div class="contacts-interation li_' + u_h + '"></div>\n\
                                 </td>\n\
                             </tr>';
                 }
                 mInsertNode(M.v[i], M.v[i-1], M.v[i+1], t, el, html, u);
+
+                getLastInteractionWith(u_h);
             }
         }// renderContactsLayout END
 
@@ -1055,7 +1061,7 @@ function MegaData()
             cache = [],
             files = 0;
 
-        if(d) console.log('renderMain', u);
+        if (d) console.log('renderMain', u);
 
         lSel = this.fsViewSel;
         $(lSel).unbind('jsp-scroll-y.dynlist');
@@ -1361,9 +1367,9 @@ function MegaData()
 
     this.renderTree = function()
     {
-        this.buildtree({h: 'shares'},       0x4fe);
-        this.buildtree(this.d[this.RootID], 0x4fe);
-        this.buildtree({h: M.RubbishID},    0x4fe);
+        this.buildtree({h: 'shares'},       this.buildtree.FORCE_REBUILD);
+        this.buildtree(this.d[this.RootID], this.buildtree.FORCE_REBUILD);
+        this.buildtree({h: M.RubbishID},    this.buildtree.FORCE_REBUILD);
         this.contacts();
         treeUI();
         if (!MegaChatDisabled) {
@@ -1537,20 +1543,18 @@ function MegaData()
 
         treePanelSortElements('contacts', contacts, {
             'last-interaction': function(a, b) {
-                if (!M.i_cache[a.u]) {
-                    var cs = M.contactstatus(a.u);
-                    if (cs.ts === 0) {
-                        cs.ts = -1;
-                    }
-                    M.i_cache[a.u] = cs.ts;
+                var cs = M.contactstatus(a.u);
+                if (cs.ts === 0) {
+                    cs.ts = -1;
                 }
-                if (!M.i_cache[b.u]) {
-                    var cs = M.contactstatus(b.u);
-                    if (cs.ts === 0) {
-                        cs.ts = -1;
-                    }
-                    M.i_cache[b.u] = cs.ts;
+                M.i_cache[a.u] = cs.ts;
+
+
+                var cs = M.contactstatus(b.u);
+                if (cs.ts === 0) {
+                    cs.ts = -1;
                 }
+                M.i_cache[b.u] = cs.ts;
 
                 return M.i_cache[a.u] - M.i_cache[b.u]
             },
@@ -1601,7 +1605,7 @@ function MegaData()
                     $('.fm-chat-popup-button', m).removeClass("disabled");
 
                     var $userDiv = $this.parent().parent();
-                    if($userDiv.is(".offline")) {
+                    if ($userDiv.is(".offline")) {
                         $('.fm-chat-popup-button.start-audio, .fm-chat-popup-button.start-video', m).addClass("disabled");
                     }
 
@@ -1646,7 +1650,7 @@ function MegaData()
 
                     window.location = "#fm/chat/" + user_handle;
                     var room = megaChat.createAndShowPrivateRoomFor(user_handle);
-                    if(room) {
+                    if (room) {
                         room.startAudioCall();
                     }
                 }
@@ -1663,7 +1667,7 @@ function MegaData()
 
                     window.location = "#fm/chat/" + user_handle;
                     var room = megaChat.createAndShowPrivateRoomFor(user_handle);
-                    if(room) {
+                    if (room) {
                         room.startVideoCall();
                     }
                 }
@@ -1734,7 +1738,7 @@ function MegaData()
          */
 
         var rebuild = false;
-        if (dialog === 0x4fe) {
+        if (dialog === this.buildtree.FORCE_REBUILD) {
             rebuild = true;
             dialog = undefined;
         }
@@ -1886,6 +1890,7 @@ function MegaData()
             }// END of for folders loop
         }
     };
+    this.buildtree.FORCE_REBUILD = 34675890009;
 
     var icon = '<span class="context-menu-icon"></span>';
     var arrow = '<span class="context-top-arrow"></span><span class="context-bottom-arrow"></span>';
@@ -4167,23 +4172,25 @@ function MegaData()
      */
     this.transferFromMegaCoNz = function()
     {
-        var parts = /#sitetransfer!(.*)/.exec(window.location);
+        // Get site transfer data from after the hash in the URL
+        var urlParts = /#sitetransfer!(.*)/.exec(window.location);
         
-        if (parts) {
+        if (urlParts) {
 
-            // Decode from Base64
-            parts = JSON.parse(atob(parts[1]));
+            // Decode from Base64 and JSON
+            urlParts = JSON.parse(atob(urlParts[1]));
             
-            if (parts) {
+            if (urlParts) {
                 // If the user is already logged in here with the same account
                 // we can avoid a lot and just take them to the correct page
-                if (JSON.stringify(u_k) === JSON.stringify(parts[0])){
-                    window.location.hash = parts[2];
+                if (JSON.stringify(u_k) === JSON.stringify(urlParts[0])){
+                    window.location.hash = urlParts[2];
                     return;
                 }
 
-                // If the user is already logged in but with a different account just load that account instead
-                else if (u_k && (JSON.stringify(u_k) !== JSON.stringify(parts[0]))) {
+                // If the user is already logged in but with a different account just load that account instead. The 
+                // hash they came from e.g. a folder link may not be valid for this account so just load the file manager.
+                else if (u_k && (JSON.stringify(u_k) !== JSON.stringify(urlParts[0]))) {
                     window.location.hash = 'fm';
                     return;
                 }
@@ -4192,56 +4199,26 @@ function MegaData()
                 localStorage.wasloggedin = true;
                 u_logout();
 
-                // Set master key, session key and RSA private key
+                // Set master key, session ID and RSA private key
                 u_storage = init_storage(sessionStorage);
-                u_k = parts[0];
-                u_sid = parts[1];
-                u_privk = parts[3];
+                u_k = urlParts[0];
+                u_sid = urlParts[1];
                 u_storage.k = JSON.stringify(u_k);
                 u_storage.sid = u_sid;
-                
-                // Set session ID
                 api_setsid(u_sid);
                 
-                // Get the page to redirect to
-                var toPage = parts[2];
-
-                // This won't exist if ephemeral redirect
-                if (u_privk) {
-                    u_storage.privk = base64urlencode(crypto_encodeprivkey(u_privk));
+                // Get the page to load
+                var toPage = urlParts[2];
                 
-                    var ctx = {
-                        checkloginresult: function(ctx, result)
-                        {
-                            if (m) {
-                                loadingDialog.hide();
-                            }
-                            else {
-                                document.getElementById('overlay').style.display = 'none';
-                            }
-
-                            // Check for suspended account
-                            if (result == EBLOCKED) {
-                                alert(l[730]);
-                            }
-                            else if (result) {
-                                // Set account type and redirect to the requested location
-                                u_type = result;
-                                window.location.hash = toPage;
-                            }
-                            else {
-                                // Incorrect email or password
-                                alert(l[201]);
-                            }
-                        }
-                    };
-
-                    // Continue through the log in flow from approximately the correct 
-                    // place given that we have the master key, session ID and private RSA key
-                    u_checklogin3(ctx);
+                // The isEphemeralAccount flag may not be set (e.g. if from SDK), but if it is then set it
+                var isEphemeralAccount = (typeof urlParts[3] === 'undefined') ? false : urlParts[3];
+                
+                // If a regular account, log them in
+                if (!isEphemeralAccount) {
+                    this.performRegularLogin(toPage);
                 }
                 else {
-                    // Otherwise this is an ephemeral account so reload to log them in properly
+                    // Otherwise this is an ephemeral account, so reset the page hash
                     if (toPage) {
                         window.location.hash = toPage;
                     }
@@ -4249,10 +4226,47 @@ function MegaData()
                         window.location.hash = '';
                     }
                     
+                    // Do a full reload to log them in properly
                     document.location.reload(false);
                 }
             }
         }
+    };
+    
+    /**
+     * Performs a regular login as part of the transfer from mega.co.nz
+     * @param {String} toPage The page to load e.g. 'fm', 'pro' etc
+     */
+    this.performRegularLogin = function(toPage) {
+        
+        var ctx = {
+            checkloginresult: function(ctx, result) {
+                if (m) {
+                    loadingDialog.hide();
+                }
+                else {
+                    document.getElementById('overlay').style.display = 'none';
+                }
+
+                // Check for suspended account
+                if (result == EBLOCKED) {
+                    alert(l[730]);
+                }
+                else if (result) {
+                    // Set account type and redirect to the requested location
+                    u_type = result;
+                    window.location.hash = toPage;
+                }
+                else {
+                    // Incorrect email or password
+                    alert(l[201]);
+                }
+            }
+        };
+
+        // Continue through the log in flow from approximately the correct 
+        // place given that we have the master key, session ID and private RSA key
+        u_checklogin3(ctx);
     };
 }
 
@@ -5274,6 +5288,7 @@ function doshare(h, targets, dontShowShareDialog) {
                             // level (passive)
                             if (M.u[user] && M.u[user].c != 0) {
                                 M.nodeShare(ctx.h, {h: h, r: rights, u: user, ts: Math.floor(new Date().getTime() / 1000)});
+                                setLastInteractionWith(user, "0:" + unixtime());
                             }
                             else if (d) {
                                 console.log('doshare: invalid user', user, M.u[user], ctx.t[i]);
@@ -5667,7 +5682,7 @@ function process_u(u) {
         M.addUser(u[i]);
     }
 
-    //if(megaChat && megaChat.karere && megaChat.karere.getConnectionState() === Karere.CONNECTION_STATE.CONNECTED) {
+    //if (megaChat && megaChat.karere && megaChat.karere.getConnectionState() === Karere.CONNECTION_STATE.CONNECTED) {
     //    megaChat.karere.forceReconnect();
     //}
 }
@@ -5695,7 +5710,7 @@ function folderreqerr(c, e)
 
 function init_chat() {
     function __init_chat() {
-        if(u_type && !megaChat.is_initialized) {
+        if (u_type && !megaChat.is_initialized) {
             if (d) console.log('Initializing the chat...');
             megaChat.init();
             if (fminitialized) {
@@ -5708,7 +5723,7 @@ function init_chat() {
             }
         }
     }
-    if(!MegaChatDisabled) {
+    if (!MegaChatDisabled) {
         if (pubEd25519[u_handle]) {
             __init_chat();
         } else {
@@ -5907,13 +5922,13 @@ function clone(obj)
         for (var attr in obj)
         {
             if (obj.hasOwnProperty(attr)) {
-                if(!(obj[attr] instanceof Object)) {
+                if (!(obj[attr] instanceof Object)) {
                     copy[attr] = obj[attr];
                 } else if (obj[attr] instanceof Array) {
                     copy[attr] = clone(obj[attr]);
-                } else if(!isNativeObject(obj[attr])) {
+                } else if (!isNativeObject(obj[attr])) {
                     copy[attr] = clone(obj[attr]);
-                } else if($.isFunction(obj[attr])) {
+                } else if ($.isFunction(obj[attr])) {
                     copy[attr] = obj[attr];
                 } else {
                     copy[attr] = {};

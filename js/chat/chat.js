@@ -517,9 +517,9 @@ var chatui;
             }
         });
 
-    }
+    };
 
-    //Hidding Control panel if cursor is idle
+    // Hidding Control panel if cursor is idle
     var idleMouseTimer;
     var forceMouseHide = false;
     $(document.body).undelegate('.video-full-container.full-mode', 'mousemove.megaChatVideo');
@@ -1028,7 +1028,9 @@ Chat.prototype.init = function() {
         return self._onUsersUpdate("left", e, eventData);
     });
     this.karere.bind("onUsersUpdatedDone", function(e, eventObject) {
-        if (self.chats[eventObject.getRoomJid()] && (self.chats[eventObject.getRoomJid()].state === ChatRoom.STATE.JOINING || self.chats[eventObject.getRoomJid()].state === ChatRoom.STATE.WAITING_FOR_PARTICIPANTS)) {
+        if (self.chats[eventObject.getRoomJid()]
+                && (self.chats[eventObject.getRoomJid()].state === ChatRoom.STATE.JOINING
+                    || self.chats[eventObject.getRoomJid()].state === ChatRoom.STATE.WAITING_FOR_PARTICIPANTS)) {
             if (self.chats[eventObject.getRoomJid()]._waitingForOtherParticipants() === false) {
                 self.chats[eventObject.getRoomJid()].setState(
                     ChatRoom.STATE.PARTICIPANTS_HAD_JOINED
@@ -1112,13 +1114,15 @@ Chat.prototype.init = function() {
 
 
             // policy required for deleting messages:
-            // 1. the delete-message action can only be allowed if the sender of both the action message and target message to be the same
-            // 2. the sender === me (applied by using the helper flag: fromMyDevice === true, in the previous if)
+            // 1. the delete-message action can only be allowed if the sender of
+            //    both the action message and target message to be the same
+            // 2. the sender === me (applied by using the helper flag:
+            //    fromMyDevice === true, in the previous if)
             // 3. the message state is NOT_SENT
-            if (
-                Karere.getNormalizedBareJid(eventObject.getFromJid()) === Karere.getNormalizedBareJid(msgObject.getFromJid()) &&
-                msgObject.getState && msgObject.getState() === KarereEventObjects.OutgoingMessage.STATE.NOT_SENT
-            ) {
+            if (Karere.getNormalizedBareJid(eventObject.getFromJid())
+                        === Karere.getNormalizedBareJid(msgObject.getFromJid())
+                    && msgObject.getState && msgObject.getState()
+                        === KarereEventObjects.OutgoingMessage.STATE.NOT_SENT) {
                 var meta = clone(msgObject.getMeta());
                 meta['isDeleted'] = true;
                 msgObject.setMeta(meta); // trigger change event
@@ -1570,6 +1574,7 @@ Chat.prototype._onUsersUpdate = function(type, e, eventObject) {
 
 
     // i had joined OR left
+    var room;
     if ($.inArray(self.karere.getJid(), diffUsers) !== -1) {
         if (type != "joined") { // i'd left
             // i'd left, remove the room and the UI stuff
@@ -1577,7 +1582,7 @@ Chat.prototype._onUsersUpdate = function(type, e, eventObject) {
                 self.chats[eventObject.getRoomJid()].destroy(true);
             }
         } else { // i'd joined
-            var room = self.chats[eventObject.getRoomJid()];
+            room = self.chats[eventObject.getRoomJid()];
             if (room) {
                 if (room._waitingForOtherParticipants() === false && (
                         room.state === ChatRoom.STATE.WAITING_FOR_PARTICIPANTS || room.state === ChatRoom.STATE.JOINING
@@ -1607,7 +1612,7 @@ Chat.prototype._onUsersUpdate = function(type, e, eventObject) {
                 })
             }
 
-            var room = room = self.chats[eventObject.getRoomJid()];
+            room = self.chats[eventObject.getRoomJid()];
             if (room && room.state === ChatRoom.STATE.READY && room._waitingForOtherParticipants()) {
                 // other party/ies had left the room
                 room.setState(ChatRoom.STATE.WAITING_FOR_PARTICIPANTS);
@@ -1615,7 +1620,7 @@ Chat.prototype._onUsersUpdate = function(type, e, eventObject) {
 
         } else {
             // they had joined
-            var room = self.chats[eventObject.getRoomJid()];
+            room = self.chats[eventObject.getRoomJid()];
             if (room) {
                 if (room._waitingForOtherParticipants() === false && room.state === ChatRoom.STATE.WAITING_FOR_PARTICIPANTS) {
                     if (room._conv_ended === true || typeof(room._conv_ended) === 'undefined') {
@@ -1628,7 +1633,7 @@ Chat.prototype._onUsersUpdate = function(type, e, eventObject) {
                 }
             }
         }
-        var room = self.chats[eventObject.getRoomJid()];
+        room = self.chats[eventObject.getRoomJid()];
 
         if (!room) {
             return;

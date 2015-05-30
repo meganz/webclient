@@ -380,8 +380,8 @@ var crypt = (function () {
                 masterPromise.linkDoneAndFailTo(ns.getPubRSA(userhandle));
             });
 
-             // Attach the callback ONLY AFTER previous handlers are attached.
-             _callbackAttachAfterDone(masterPromise);
+            // Attach the callback ONLY AFTER previous handlers are attached.
+            _callbackAttachAfterDone(masterPromise);
 
             return masterPromise;
         }

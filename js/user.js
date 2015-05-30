@@ -733,7 +733,7 @@ var setLastInteractionWith = function(u_h, v) {
     var isDone = false;
     var $promise = createTimeoutPromise(
         function() {
-            return isDone === true
+            return isDone === true;
         },
         500,
         10000
@@ -753,7 +753,7 @@ var setLastInteractionWith = function(u_h, v) {
                 } else {
                     setLastInteractionWith(u_h, v)
                         .done(function() { $promise.resolve.apply($promise, arguments); })
-                        .fail(function() { $promise.reject.apply($promise, arguments); })
+                        .fail(function() { $promise.reject.apply($promise, arguments); });
                 }
             })
             .fail(function(e) {
@@ -811,9 +811,9 @@ var getLastInteractionWith = function(u_h) {
             M.u[u_h].ts = ts;
         }
 
-        if (r[0] == "0") {
+        if (r[0] === "0") {
             $elem.addClass('cloud-drive');
-        } else if (r[0] == "1" && megaChat) {
+        } else if (r[0] === "1" && megaChat) {
             M.u[u_h].lastChatActivity = ts;
             var room = megaChat.getPrivateRoom(u_h);
             if (room && megaChat && megaChat.plugins && megaChat.plugins.chatNotifications) {
@@ -832,7 +832,7 @@ var getLastInteractionWith = function(u_h) {
             time2last(ts)
         );
 
-        if ($.sortTreePanel.contacts.by == 'last-interaction') {
+        if ($.sortTreePanel.contacts.by === 'last-interaction') {
             M.contacts(); // we need to resort
         }
     };
@@ -850,9 +850,9 @@ var getLastInteractionWith = function(u_h) {
         $elem.addClass('never');
     };
 
-
+    var $promise;
     if (_lastUserInteractionCache[u_h]) {
-        var $promise = MegaPromise.resolve(_lastUserInteractionCache[u_h]);
+        $promise = MegaPromise.resolve(_lastUserInteractionCache[u_h]);
 
         $promise
             .done(_renderLastInteractionDone)
@@ -860,13 +860,13 @@ var getLastInteractionWith = function(u_h) {
 
         return $promise;
     }
-    if (_lastUserInteractionGetRequests[u_h] && _lastUserInteractionGetRequests[u_h].state() == 'pending') {
+    if (_lastUserInteractionGetRequests[u_h] && _lastUserInteractionGetRequests[u_h].state() === 'pending') {
         return _lastUserInteractionGetRequests[u_h];
     }
     var isDone = false;
-    var $promise = createTimeoutPromise(
+    $promise = createTimeoutPromise(
         function() {
-            return isDone === true
+            return isDone === true;
         },
         500,
         10000

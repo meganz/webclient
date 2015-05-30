@@ -483,8 +483,8 @@ var authring = (function () {
         for (var i = 0; i < 8; i++) {
             value = (value * 256) + sequence.charCodeAt(i);
         }
+        // Check for value > Number.MAX_SAFE_INTEGER (not available in all JS).
         if (value > 9007199254740991) {
-         // Check for value > Number.MAX_SAFE_INTEGER (not available in all JS).
             throw new Error('Integer not suitable for lossless conversion in JavaScript.');
         }
 
@@ -504,17 +504,16 @@ var authring = (function () {
         u_authring.RSA = {};
         ns.setContacts('RSA');
     };
-    
-    
+
+
     /**
-     * Resets the seen or verified fingerprints for a particular user
-     * @param {String} userHandle The user handle e.g. EWh7LzU3Zf0
+     * Resets the seen or verified fingerprints for a particular user.
+     * @param {string} userHandle The user handle e.g. EWh7LzU3Zf0
      */
     ns.resetFingerprintsForUser = function(userHandle) {
-    
         delete u_authring.Ed25519[userHandle];
         delete u_authring.RSA[userHandle];
-        
+
         ns.setContacts('Ed25519');
         ns.setContacts('RSA');
     };

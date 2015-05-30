@@ -567,7 +567,7 @@ describe("crypto unit test", function() {
                 var result = ns.getPubEd25519('you456789xw');
                 assert.strictEqual(result, masterPromise);
                 assert.strictEqual(ns._logger._log.args[0][1][0],
-                                   'First initialising the Ed25519 authring.')
+                                   'First initialising the Ed25519 authring.');
                 assert.strictEqual(authring.getContacts.callCount, 1);
                 assert.strictEqual(authring.getContacts.args[0][0], 'Ed25519');
                 assert.strictEqual(masterPromise.linkFailTo.callCount, 1);
@@ -596,7 +596,7 @@ describe("crypto unit test", function() {
                 var result = ns.getPubEd25519('you456789xw');
                 assert.strictEqual(result, masterPromise);
                 assert.strictEqual(ns._logger._log.args[0][1][0],
-                                   'First initialising the Ed25519 authring.')
+                                   'First initialising the Ed25519 authring.');
                 assert.strictEqual(authring.getContacts.callCount, 1);
                 assert.strictEqual(authring.getContacts.args[0][0], 'Ed25519');
                 assert.strictEqual(masterPromise.linkFailTo.callCount, 1);
@@ -612,103 +612,103 @@ describe("crypto unit test", function() {
             });
         });
 
-            describe('getFingerprintEd25519', function() {
-                it("cached key", function() {
-                    sandbox.stub(ns._logger, '_log');
-                    sandbox.stub(window, 'pubEd25519', { 'you456789xw': 'the key' });
-                    sandbox.stub(authring, 'computeFingerprint').returns('the fingerprint');
-                    var masterPromise = { resolve: sinon.stub() };
-                    sandbox.stub(window, 'MegaPromise').returns(masterPromise);
+        describe('getFingerprintEd25519', function() {
+            it("cached key", function() {
+                sandbox.stub(ns._logger, '_log');
+                sandbox.stub(window, 'pubEd25519', { 'you456789xw': 'the key' });
+                sandbox.stub(authring, 'computeFingerprint').returns('the fingerprint');
+                var masterPromise = { resolve: sinon.stub() };
+                sandbox.stub(window, 'MegaPromise').returns(masterPromise);
 
-                    var result = ns.getFingerprintEd25519('you456789xw');
-                    assert.strictEqual(result, masterPromise);
-                    assert.strictEqual(authring.computeFingerprint.callCount, 1);
-                    assert.strictEqual(masterPromise.resolve.callCount, 1);
-                    assert.strictEqual(masterPromise.resolve.args[0][0], 'the fingerprint');
-                    assert.strictEqual(ns._logger._log.args[0][1][0],
-                                       'Got Ed25519 fingerprint for user "you456789xw": the fingerprint');
-                });
-
-                it("cached key, hex", function() {
-                    sandbox.stub(ns._logger, '_log');
-                    sandbox.stub(window, 'pubEd25519', { 'you456789xw': 'the key' });
-                    sandbox.stub(authring, 'computeFingerprint').returns('the hexprint');
-                    var masterPromise = { resolve: sinon.stub() };
-                    sandbox.stub(window, 'MegaPromise').returns(masterPromise);
-
-                    var result = ns.getFingerprintEd25519('you456789xw', 'hex');
-                    assert.strictEqual(result, masterPromise);
-                    assert.strictEqual(authring.computeFingerprint.callCount, 1);
-                    assert.strictEqual(masterPromise.resolve.callCount, 1);
-                    assert.strictEqual(masterPromise.resolve.args[0][0], 'the hexprint');
-                    assert.strictEqual(ns._logger._log.args[0][1][0],
-                                       'Got Ed25519 fingerprint for user "you456789xw": the hexprint');
-                });
-
-                it("cached key, binary string", function() {
-                    sandbox.stub(ns._logger, '_log');
-                    sandbox.stub(window, 'pubEd25519', { 'you456789xw': 'the key' });
-                    sandbox.stub(authring, 'computeFingerprint').returns('\u0000\u0001\u0002\u0003');
-                    var masterPromise = { resolve: sinon.stub() };
-                    sandbox.stub(window, 'MegaPromise').returns(masterPromise);
-
-                    var result = ns.getFingerprintEd25519('you456789xw', 'string');
-                    assert.strictEqual(result, masterPromise);
-                    assert.strictEqual(authring.computeFingerprint.callCount, 1);
-                    assert.strictEqual(masterPromise.resolve.callCount, 1);
-                    assert.strictEqual(masterPromise.resolve.args[0][0], '\u0000\u0001\u0002\u0003');
-                    assert.strictEqual(ns._logger._log.args[0][1][0],
-                                       'Got Ed25519 fingerprint for user "you456789xw": AAECAw');
-                });
-
-                it("non-cached", function() {
-                    sandbox.stub(ns._logger, '_log');
-                    sandbox.stub(window, 'pubEd25519', {});
-                    sandbox.stub(authring, 'computeFingerprint').returns('the fingerprint');
-                    var masterPromise = { linkDoneAndFailTo: sinon.stub() };
-                    sandbox.stub(window, 'MegaPromise').returns(masterPromise);
-                    var keyPromise = { done: sinon.stub() };
-                    sandbox.stub(crypt, 'getPubEd25519').returns(keyPromise);
-
-                    var result = ns.getFingerprintEd25519('you456789xw');
-                    assert.strictEqual(result, masterPromise);
-                    assert.strictEqual(crypt.getPubEd25519.callCount, 1);
-                    assert.strictEqual(crypt.getPubEd25519.args[0][0], 'you456789xw');
-                    assert.strictEqual(keyPromise.done.callCount, 1);
-
-                    var fingerprintCallback = keyPromise.done.args[0][0];
-                    // Now stub getFingerprintEd25519(), as we're calling it recursively.
-                    sandbox.stub(ns, 'getFingerprintEd25519').returns('recursion');
-                    fingerprintCallback();
-                    assert.strictEqual(ns.getFingerprintEd25519.callCount, 1);
-                    assert.deepEqual(ns.getFingerprintEd25519.args[0], ['you456789xw', undefined]);
-                    assert.strictEqual(masterPromise.linkDoneAndFailTo.callCount, 1);
-                    assert.strictEqual(masterPromise.linkDoneAndFailTo.args[0][0], 'recursion');
-                });
-
-                it("cached, hex", function() {
-                    sandbox.stub(ns._logger, '_log');
-                    sandbox.stub(window, 'pubEd25519', { 'you456789xw': ED25519_PUB_KEY });
-                    sandbox.stub(authring, 'computeFingerprint').returns('21fe31dfa154a261626bf854046fd2271b7bed4b');
-                    ns.getFingerprintEd25519('you456789xw', 'hex');
-                    assert.strictEqual(authring.computeFingerprint.callCount, 1);
-                    assert.strictEqual(authring.computeFingerprint.args[0][2], 'hex');
-                    assert.deepEqual(pubEd25519, { 'you456789xw': ED25519_PUB_KEY });
-                    assert.strictEqual(ns._logger._log.args[0][1][0],
-                                       'Got Ed25519 fingerprint for user "you456789xw": 21fe31dfa154a261626bf854046fd2271b7bed4b');
-                });
-
-                it("cached, string", function() {
-                    sandbox.stub(ns._logger, '_log');
-                    sandbox.stub(window, 'pubEd25519', { 'you456789xw': ED25519_PUB_KEY });
-                    sandbox.stub(authring, 'computeFingerprint').returns(ED25519_FINGERPRINT);
-                    ns.getFingerprintEd25519('you456789xw', 'string');
-                    assert.strictEqual(authring.computeFingerprint.callCount, 1);
-                    assert.strictEqual(authring.computeFingerprint.args[0][2], 'string');
-                    assert.deepEqual(pubEd25519, { 'you456789xw': ED25519_PUB_KEY });
-                    assert.strictEqual(ns._logger._log.args[0][1][0],
-                                       'Got Ed25519 fingerprint for user "you456789xw": If4x36FUomFia_hUBG_SJxt77Us');
-                });
+                var result = ns.getFingerprintEd25519('you456789xw');
+                assert.strictEqual(result, masterPromise);
+                assert.strictEqual(authring.computeFingerprint.callCount, 1);
+                assert.strictEqual(masterPromise.resolve.callCount, 1);
+                assert.strictEqual(masterPromise.resolve.args[0][0], 'the fingerprint');
+                assert.strictEqual(ns._logger._log.args[0][1][0],
+                                   'Got Ed25519 fingerprint for user "you456789xw": the fingerprint');
             });
+
+            it("cached key, hex", function() {
+                sandbox.stub(ns._logger, '_log');
+                sandbox.stub(window, 'pubEd25519', { 'you456789xw': 'the key' });
+                sandbox.stub(authring, 'computeFingerprint').returns('the hexprint');
+                var masterPromise = { resolve: sinon.stub() };
+                sandbox.stub(window, 'MegaPromise').returns(masterPromise);
+
+                var result = ns.getFingerprintEd25519('you456789xw', 'hex');
+                assert.strictEqual(result, masterPromise);
+                assert.strictEqual(authring.computeFingerprint.callCount, 1);
+                assert.strictEqual(masterPromise.resolve.callCount, 1);
+                assert.strictEqual(masterPromise.resolve.args[0][0], 'the hexprint');
+                assert.strictEqual(ns._logger._log.args[0][1][0],
+                                   'Got Ed25519 fingerprint for user "you456789xw": the hexprint');
+            });
+
+            it("cached key, binary string", function() {
+                sandbox.stub(ns._logger, '_log');
+                sandbox.stub(window, 'pubEd25519', { 'you456789xw': 'the key' });
+                sandbox.stub(authring, 'computeFingerprint').returns('\u0000\u0001\u0002\u0003');
+                var masterPromise = { resolve: sinon.stub() };
+                sandbox.stub(window, 'MegaPromise').returns(masterPromise);
+
+                var result = ns.getFingerprintEd25519('you456789xw', 'string');
+                assert.strictEqual(result, masterPromise);
+                assert.strictEqual(authring.computeFingerprint.callCount, 1);
+                assert.strictEqual(masterPromise.resolve.callCount, 1);
+                assert.strictEqual(masterPromise.resolve.args[0][0], '\u0000\u0001\u0002\u0003');
+                assert.strictEqual(ns._logger._log.args[0][1][0],
+                                   'Got Ed25519 fingerprint for user "you456789xw": AAECAw');
+            });
+
+            it("non-cached", function() {
+                sandbox.stub(ns._logger, '_log');
+                sandbox.stub(window, 'pubEd25519', {});
+                sandbox.stub(authring, 'computeFingerprint').returns('the fingerprint');
+                var masterPromise = { linkDoneAndFailTo: sinon.stub() };
+                sandbox.stub(window, 'MegaPromise').returns(masterPromise);
+                var keyPromise = { done: sinon.stub() };
+                sandbox.stub(crypt, 'getPubEd25519').returns(keyPromise);
+
+                var result = ns.getFingerprintEd25519('you456789xw');
+                assert.strictEqual(result, masterPromise);
+                assert.strictEqual(crypt.getPubEd25519.callCount, 1);
+                assert.strictEqual(crypt.getPubEd25519.args[0][0], 'you456789xw');
+                assert.strictEqual(keyPromise.done.callCount, 1);
+
+                var fingerprintCallback = keyPromise.done.args[0][0];
+                // Now stub getFingerprintEd25519(), as we're calling it recursively.
+                sandbox.stub(ns, 'getFingerprintEd25519').returns('recursion');
+                fingerprintCallback();
+                assert.strictEqual(ns.getFingerprintEd25519.callCount, 1);
+                assert.deepEqual(ns.getFingerprintEd25519.args[0], ['you456789xw', undefined]);
+                assert.strictEqual(masterPromise.linkDoneAndFailTo.callCount, 1);
+                assert.strictEqual(masterPromise.linkDoneAndFailTo.args[0][0], 'recursion');
+            });
+
+            it("cached, hex", function() {
+                sandbox.stub(ns._logger, '_log');
+                sandbox.stub(window, 'pubEd25519', { 'you456789xw': ED25519_PUB_KEY });
+                sandbox.stub(authring, 'computeFingerprint').returns('21fe31dfa154a261626bf854046fd2271b7bed4b');
+                ns.getFingerprintEd25519('you456789xw', 'hex');
+                assert.strictEqual(authring.computeFingerprint.callCount, 1);
+                assert.strictEqual(authring.computeFingerprint.args[0][2], 'hex');
+                assert.deepEqual(pubEd25519, { 'you456789xw': ED25519_PUB_KEY });
+                assert.strictEqual(ns._logger._log.args[0][1][0],
+                                   'Got Ed25519 fingerprint for user "you456789xw": 21fe31dfa154a261626bf854046fd2271b7bed4b');
+            });
+
+            it("cached, string", function() {
+                sandbox.stub(ns._logger, '_log');
+                sandbox.stub(window, 'pubEd25519', { 'you456789xw': ED25519_PUB_KEY });
+                sandbox.stub(authring, 'computeFingerprint').returns(ED25519_FINGERPRINT);
+                ns.getFingerprintEd25519('you456789xw', 'string');
+                assert.strictEqual(authring.computeFingerprint.callCount, 1);
+                assert.strictEqual(authring.computeFingerprint.args[0][2], 'string');
+                assert.deepEqual(pubEd25519, { 'you456789xw': ED25519_PUB_KEY });
+                assert.strictEqual(ns._logger._log.args[0][1][0],
+                                   'Got Ed25519 fingerprint for user "you456789xw": If4x36FUomFia_hUBG_SJxt77Us');
+            });
+        });
     });
 });

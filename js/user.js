@@ -212,7 +212,7 @@ function u_wasloggedin() {
 
 // set user's RSA key
 function u_setrsa(rsakey) {
-    var $promise = new $.Deferred();
+    var $promise = new MegaPromise();
 
     var ctx = {
         callback: function (res, ctx) {

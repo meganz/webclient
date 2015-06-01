@@ -176,32 +176,23 @@ function ellipsis(text, location, maxCharacters) {
 }
 
 function translate(html) {
-    var arr = html.split("[$");
-    var items = [];
-    for (var i in arr) {
-        var tmp = arr[i].split(']');
-        if (tmp.length > 1) {
-            var t = tmp[0];
-            items.push(t);
-        }
-    }
-    for (var i in items) {
-        var tmp = items[i].split('.');
-        if (tmp.length > 1) {
-            if (tmp[1] === 'dq') {
-                l[items[i]] = l[tmp[0]].replace('"', '&quot;');
+    return String(html).replace(/\[\$(\d+)(?:\.(\w+))?\]/g, function(m, num, ns) {
+        if (ns) {
+            m = num + '.' + ns;
+
+            if (ns === 'dq') {
+                l[m] = String(l[num]).replace('"', '&quot;', 'g');
             }
-            else if (tmp[1] === 'q') {
-                l[items[i]] = l[tmp[0]].replace("'", "\\'");
+            else if (ns === 'q') {
+                l[m] = String(l[num]).replace("'", "\\'", 'g');
             }
-            else if (tmp[1] === 'dqq') {
-                l[items[i]] = l[tmp[0]].replace("'", "\\'");
-                l[items[i]] = l[items[i]].replace('"', '&quot;');
+            else if (ns === 'dqq') {
+                l[m] = String(l[num]).replace('"', '&quot;', 'g');
+                l[m] = l[m].replace("'", "\\'", 'g');
             }
         }
-        html = html.replace(new RegExp("\\[\\$" + items[i] + "\\]", "g"), l[items[i]]);
-    }
-    return html;
+        return String(l[num]);
+    });
 }
 
 /**

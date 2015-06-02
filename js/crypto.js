@@ -52,7 +52,11 @@ var crypt = (function () {
         else if (recorded && authring.equalFingerprints(recorded.fingerprint, fingerprint) === false) {
             logger.error('Error verifying authenticity of Ed25519 pub key: '
                          + 'fingerprint does not match previously authenticated one!');
-            throw new Error('Ed25519 fingerprint does not match previously authenticated one!');
+            // This function handles what's required for the action, shows a
+            // warning dialogue and throws the exception.
+            ns.showFingerprintMismatchException('Ed25519', userhandle,
+                                                recorded.method,
+                                                recorded.fingerprint, fingerprint);
         }
     };
 
@@ -222,8 +226,14 @@ var crypt = (function () {
                 method = authring.AUTHENTICATION_METHOD.SIGNATURE_VERIFIED;
             }
             else {
-                throw new Error('RSA pub key signature of ' + userhandle
-                                + ' is invalid!');
+                var message = 'RSA pub key signature of ' + userhandle + ' is invalid!'
+                logger.error(message);
+                var instructions = 'Please, ask your contact to get in touch with Mega Support.';
+                // TODO: This should probably be changed to something like mega.ui.CredentialsWarningDialog.
+                msgDialog('warningb',
+                          'RSA Public Key Signature Verification Failed',
+                          message + '<br/>' + instructions);
+                throw new Error('RSA pub key signature is invalid!');
             }
         }
 
@@ -314,7 +324,12 @@ var crypt = (function () {
         }
         else {
             // Something is dodgy, previously seen fingerprint mitsmatches.
-            throw new Error('RSA fingerprint does not match previously authenticated one!');
+            logger.error('RSA fingerprint does not match previously authenticated one!');
+            // This function handles what's required for the action, shows a
+            // warning dialogue and throws the exception.
+            ns.showFingerprintMismatchException('RSA', userhandle,
+                                                recorded.method,
+                                                recorded.fingerprint, fingerprint);
         }
 
         if (callback) {
@@ -486,6 +501,42 @@ var crypt = (function () {
         });
     };
 
+
+    /**
+     * Shows the fingerprint warning dialog
+     * @param {String} fingerprintType either Ed25519 or RSA
+     * @param {String} userHandle The user handle e.g. 3nnYu_071I3
+     * @param {Number} method Whether seen or verified (authring.AUTHENTICATION_METHOD.SEEN or .FINGERPRINT_COMPARISON)
+     * @param {String} previousFingerprint The previously seen or verified fingerprint
+     * @param {String} newFingerprint The new fingerprint
+     * @throws {Error}
+     *     In case the fingerprint of the public key differs from the one previously
+     *     authenticated by the user. This more severe condition warrants to throw
+     *     an exception.
+     */
+    ns.showFingerprintMismatchException = function(fingerprintType, userHandle,
+                                                   method, previousFingerprint,
+                                                   newFingerprint) {
+        // Show warning dialog.
+        mega.ui.CredentialsWarningDialog.singleton(userHandle, method,
+                                                   previousFingerprint,
+                                                   newFingerprint);
+
+        // Remove the cached key, so the key will be fetched and checked against
+        // the stored fingerprint again next time.
+        if (fingerprintType === 'RSA') {
+            delete u_pubkeys[userHandle];
+        }
+        else if (fingerprintType === 'Ed25519') {
+            delete pubEd25519[userHandle];
+        }
+
+        // Throw exception to stop whatever they were doing from progressing
+        // e.g. initiating/accepting call.
+        throw fingerprintType + ' fingerprint does not match the previously authenticated one! ' +
+              'Previous fingerprint: ' + previousFingerprint + '. ' +
+              'New fingerprint: ' + newFingerprint + '. ';
+    };
 
 
     return ns;
@@ -4133,35 +4184,3 @@ function u_initAuthentication2(res, ctx) {
     };
     getUserAttribute(u_handle, 'sigPubk', true, false, storeSigPubkCallback);
 }
-
-/**
- * Shows the fingerprint warning dialog
- * @param {String} fingerprintType either Ed25519 or RSA
- * @param {String} userHandle The user handle e.g. 3nnYu_071I3
- * @param {Number} method Whether seen or verified (authring.AUTHENTICATION_METHOD.SEEN or .FINGERPRINT_COMPARISON)
- * @param {String} previousFingerprint The previously seen or verified fingerprint
- * @param {String} newFingerprint The new fingerprint
- * @throws {Error}
- *     In case the fingerprint of the public key differs from the one previously
- *     authenticated by the user. This more severe condition warrants to throw
- *     an exception.
- */
-function showFingerprintMismatchException(fingerprintType, userHandle, method, previousFingerprint, newFingerprint) {
-
-    // Show warning dialog
-    mega.ui.CredentialsWarningDialog.singleton(userHandle, method, previousFingerprint, newFingerprint);
-
-    // Remove the cached key, so the key will be fetched and checked against the stored fingerprint again next time
-    if (fingerprintType === 'RSA') {
-        delete u_pubkeys[userHandle];
-    }
-    else if (fingerprintType === 'Ed25519') {
-        delete pubEd25519[userHandle];
-    }
-
-    // Throw exception to stop whatever they were doing from progressing e.g. initiating/accepting call
-    throw fingerprintType + ' fingerprint does not match the previously authenticated one! ' +
-          'Previous fingerprint: ' + previousFingerprint + '. ' +
-          'New fingerprint: ' + newFingerprint + '. ';
-}
-

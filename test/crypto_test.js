@@ -50,16 +50,21 @@ describe("crypto unit test", function() {
             });
 
             it("fingerprint mismatch", function() {
+                sandbox.stub(ns._logger, '_log');
                 sandbox.stub(window, 'pubEd25519', { 'you456789xw': ED25519_PUB_KEY });
+                sandbox.stub(ns, 'showFingerprintMismatchException').throws('an exception')
                 var authenticated = { fingerprint: base64urldecode('XyeqVYkXl3DkdXWxYqHe2XuL_G0'),
                                       method: authring.AUTHENTICATION_METHOD.SEEN,
                                       confidence: authring.KEY_CONFIDENCE.UNSURE };
                 sandbox.stub(authring, 'getContactAuthenticated').returns(authenticated);
                 sandbox.stub(authring, 'equalFingerprints').returns(false);
                 sandbox.stub(authring, 'setContactAuthenticated');
-                assert.throws(function() { ns._checkAuthenticationEd25519('you456789xw'); },
-                              'Ed25519 fingerprint does not match previously authenticated one!');
+                assert.throws(function() { ns._checkAuthenticationEd25519('you456789xw'); });
+                assert.strictEqual(ns._logger._log.args[0][1][0],
+                                   'Error verifying authenticity of Ed25519 pub key: '
+                                   + 'fingerprint does not match previously authenticated one!');
                 assert.strictEqual(authring.setContactAuthenticated.callCount, 0);
+                assert.strictEqual(ns.showFingerprintMismatchException.callCount, 1);
             });
         });
 
@@ -178,7 +183,9 @@ describe("crypto unit test", function() {
             });
 
             it("fingerprint mismatch", function() {
+                sandbox.stub(ns._logger, '_log');
                 sandbox.stub(window, 'u_pubkeys', { 'you456789xw': 'foo' });
+                sandbox.stub(ns, 'showFingerprintMismatchException').throws('an exception')
                 var authenticated = { fingerprint: ED25519_FINGERPRINT,
                                       method: authring.AUTHENTICATION_METHOD.SIGNATURE_VERIFIED,
                                       confidence: authring.KEY_CONFIDENCE.UNSURE };
@@ -187,8 +194,9 @@ describe("crypto unit test", function() {
                 sandbox.stub(authring, 'equalFingerprints').returns(false);
                 sandbox.stub(window, 'MegaPromise');
 
-                assert.throws(function () { ns._asynchCheckAuthenticationRSA('you456789xw'); },
-                              'RSA fingerprint does not match previously authenticated one!');
+                assert.throws(function () { ns._asynchCheckAuthenticationRSA('you456789xw'); });
+                assert.strictEqual(ns._logger._log.args[0][1][0],
+                                   'RSA fingerprint does not match previously authenticated one!');
             });
         });
 
@@ -239,14 +247,18 @@ describe("crypto unit test", function() {
             });
 
             it("with bad signature", function() {
+                sandbox.stub(ns._logger, '_log');
                 sandbox.stub(window, 'u_pubkeys', { 'you456789xw': 'the key' });
                 sandbox.stub(authring, 'verifyKey').returns(false);
                 sandbox.stub(authring, 'setContactAuthenticated');
-
+                sandbox.stub(window, 'msgDialog');
                 assert.throws(function() { ns._trackRSAKeyAuthentication(
                     'you456789xw', 'not my autograph', ED25519_FINGERPRINT); },
-                    'RSA pub key signature of you456789xw is invalid!');
+                    'RSA pub key signature is invalid!');
                 assert.strictEqual(authring.setContactAuthenticated.callCount, 0);
+                assert.strictEqual(msgDialog.callCount, 1);
+                assert.strictEqual(ns._logger._log.args[0][1][0],
+                                   'RSA pub key signature of you456789xw is invalid!');
             });
         });
 

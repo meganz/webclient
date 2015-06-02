@@ -119,7 +119,7 @@ describe("authring unit test", function() {
                 callback(EFAILED);
                 assert.strictEqual(u_authring.Ed25519, undefined);
                 assert.strictEqual(ns._logger._log.args[0][1][0],
-                    'Error retrieving authentication ring for key type Ed25519: -5');
+                                   'Error retrieving authentication ring for key type Ed25519: -5');
             });
 
             it("through API", function() {
@@ -136,12 +136,15 @@ describe("authring unit test", function() {
                 callback({ '': SERIALISED_RING_ED25519 });
                 assert.deepEqual(u_authring.Ed25519, RING_ED25519);
                 assert.strictEqual(ns._logger._log.args[0][1][0],
-                    'Got authentication ring for key type Ed25519.');
+                                   'Got authentication ring for key type Ed25519.');
             });
 
             it("unsupported key type", function() {
+                sandbox.stub(ns._logger, '_log');
                 assert.throws(function() { ns.getContacts('DSA'); },
-                              'Unsupporte authentication key type: DSA');
+                              'Unsupporte authentication key type.');
+                assert.strictEqual(ns._logger._log.args[0][1][0],
+                                   'Unsupporte authentication key type: DSA');
             });
 
             it("authring for RSA", function() {
@@ -158,7 +161,7 @@ describe("authring unit test", function() {
                 callback({ '': SERIALISED_RING_RSA });
                 assert.deepEqual(u_authring.RSA, RING_RSA);
                 assert.strictEqual(ns._logger._log.args[0][1][0],
-                    'Got authentication ring for key type RSA.');
+                                   'Got authentication ring for key type RSA.');
             });
         });
 
@@ -185,8 +188,11 @@ describe("authring unit test", function() {
             });
 
             it("unsupported key type", function() {
+                sandbox.stub(ns._logger, '_log');
                 assert.throws(function() { ns.setContacts('DSA'); },
-                              'Unsupporte authentication key type: DSA');
+                              'Unsupporte authentication key type.');
+                assert.strictEqual(ns._logger._log.args[0][1][0],
+                                   'Unsupporte authentication key type: DSA');
             });
         });
     });
@@ -224,8 +230,11 @@ describe("authring unit test", function() {
             });
 
             it("unsupported key type", function() {
+                sandbox.stub(ns._logger, '_log');
                 assert.throws(function() { ns.computeFingerprint(RSA_PUB_KEY, 'DSA'); },
-                              'Unsupporte key type: DSA');
+                              'Unsupporte key type.');
+                assert.strictEqual(ns._logger._log.args[0][1][0],
+                                   'Unsupporte key type: DSA');
             });
         });
 
@@ -239,8 +248,11 @@ describe("authring unit test", function() {
             });
 
             it("unsupported key type", function() {
+                sandbox.stub(ns._logger, '_log');
                 assert.throws(function() { ns.signKey(RSA_PUB_KEY, 'DSA'); },
-                              'Unsupporte key type: DSA');
+                              'Unsupporte key type.');
+                assert.strictEqual(ns._logger._log.args[0][1][0],
+                                   'Unsupporte key type: DSA');
             });
         });
 
@@ -267,8 +279,11 @@ describe("authring unit test", function() {
             });
 
             it("unsupported key type", function() {
+                sandbox.stub(ns._logger, '_log');
                 assert.throws(function() { ns.verifyKey(RSA_SIGNED_PUB_KEY, RSA_PUB_KEY, 'DSA', ED25519_PUB_KEY); },
-                              'Unsupporte key type: DSA');
+                              'Unsupporte key type.');
+                assert.strictEqual(ns._logger._log.args[0][1][0],
+                                   'Unsupporte key type: DSA');
             });
         });
 
@@ -319,12 +334,15 @@ describe("authring unit test", function() {
         });
 
         it("unsupported key type", function() {
+            sandbox.stub(ns._logger, '_log');
             assert.throws(function() { ns.setContactAuthenticated('you456789xw',
                                                                   ED25519_STRING_FINGERPRINT,
                                                                   'DSA',
                                                                   ns.AUTHENTICATION_METHOD.SEEN,
                                                                   ns.KEY_CONFIDENCE.UNSURE); },
-                          'Unsupporte key type: DSA');
+                          'Unsupporte key type.');
+            assert.strictEqual(ns._logger._log.args[0][1][0],
+                               'Unsupporte key type: DSA');
         });
 
         it("normal behaviour Ed25519", function() {
@@ -370,8 +388,11 @@ describe("authring unit test", function() {
         });
 
         it("unsupported key type", function() {
+            sandbox.stub(ns._logger, '_log');
             assert.throws(function() { ns.getContactAuthenticated('you456789xw', 'DSA'); },
-                          'Unsupporte key type: DSA');
+                          'Unsupporte key type.');
+            assert.strictEqual(ns._logger._log.args[0][1][0],
+                               'Unsupporte key type: DSA');
         });
 
         it("unauthenticated contact", function() {
@@ -480,7 +501,7 @@ describe("authring unit test", function() {
                 sandbox.stub(window, 'base64urlencode');
                 sandbox.stub(authring, 'signKey').returns('baz');
                 sandbox.stub(ns, 'setContacts');
-                sandbox.stub(MegaPromise, 'allDone').returns('blah');
+                sandbox.stub(MegaPromise, 'all').returns('blah');
                 var result = ns.setUpAuthenticationSystem();
                 assert.strictEqual(jodid25519.eddsa.generateKeySeed.callCount, 1);
                 assert.strictEqual(jodid25519.eddsa.publicKey.callCount, 1);
@@ -494,9 +515,9 @@ describe("authring unit test", function() {
                 assert.strictEqual(setUserAttribute.args[2][2], true);
                 assert.strictEqual(authring.signKey.callCount, 1);
                 assert.strictEqual(authring.setContacts.callCount, 2);
-                assert.strictEqual(MegaPromise.allDone.callCount, 1);
-                assert.lengthOf(MegaPromise.allDone.args[0], 1);
-                assert.lengthOf(MegaPromise.allDone.args[0][0], 5);
+                assert.strictEqual(MegaPromise.all.callCount, 1);
+                assert.lengthOf(MegaPromise.all.args[0], 1);
+                assert.lengthOf(MegaPromise.all.args[0][0], 5);
                 assert.strictEqual(result, 'blah');
                 assert.strictEqual(ns._logger._log.args[0][1][0],
                                    'Setting up authentication system (Ed25519 keys, RSA pub key signature).');
@@ -582,7 +603,7 @@ describe("authring unit test", function() {
         describe('initAuthenticationSystem()', function() {
             it('works normally', function() {
                 sandbox.stub(authring, 'getContacts').returns('bar');
-                sandbox.stub(MegaPromise, 'allDone', function(input) { return input; });
+                sandbox.stub(MegaPromise, 'all', function(input) { return input; });
                 sandbox.stub(window, 'u_keyring', null);
                 sandbox.stub(window, 'u_handle', 'me3456789xw');
                 sandbox.stub(window, 'u_attr', {});
@@ -596,7 +617,7 @@ describe("authring unit test", function() {
                 var collectivePromise = ns.initAuthenticationSystem();
                 assert.deepEqual(collectivePromise, ['foo', 'bar', 'bar']);
                 assert.strictEqual(authring.getContacts.callCount, 2);
-                assert.strictEqual(MegaPromise.allDone.callCount, 1);
+                assert.strictEqual(MegaPromise.all.callCount, 1);
                 var getCallback = getAttributePromise.then.args[0][0];
                 var getCallbackResult = getCallback({ prEd255: ED25519_PRIV_KEY });
                 assert.strictEqual(getCallbackResult, true);
@@ -613,7 +634,7 @@ describe("authring unit test", function() {
             it('missing keyring, auth system setup succeeds', function() {
                 sandbox.stub(ns._logger, '_log');
                 sandbox.stub(authring, 'getContacts').returns('bar');
-                sandbox.stub(MegaPromise, 'allDone', function(input) { return input; });
+                sandbox.stub(MegaPromise, 'all', function(input) { return input; });
                 sandbox.stub(window, 'u_keyring', null);
                 sandbox.stub(window, 'u_handle', 'me3456789xw');
                 sandbox.stub(window, 'u_attr', {});
@@ -629,7 +650,7 @@ describe("authring unit test", function() {
                 var collectivePromise = ns.initAuthenticationSystem();
                 assert.deepEqual(collectivePromise, ['foo', 'bar', 'bar']);
                 assert.strictEqual(authring.getContacts.callCount, 2);
-                assert.strictEqual(MegaPromise.allDone.callCount, 1);
+                assert.strictEqual(MegaPromise.all.callCount, 1);
                 var getCallback = getAttributePromise.then.args[0][1];
                 var getCallbackResult = getCallback(ENOENT);
                 assert.strictEqual(ns._logger._log.args[0][1][0],
@@ -641,7 +662,7 @@ describe("authring unit test", function() {
             it('keyring get rejected', function() {
                 sandbox.stub(ns._logger, '_log');
                 sandbox.stub(authring, 'getContacts').returns('bar');
-                sandbox.stub(MegaPromise, 'allDone', function(input) { return input; });
+                sandbox.stub(MegaPromise, 'all', function(input) { return input; });
                 sandbox.stub(window, 'u_keyring', null);
                 sandbox.stub(window, 'u_handle', 'me3456789xw');
                 sandbox.stub(window, 'u_attr', {});
@@ -657,7 +678,7 @@ describe("authring unit test", function() {
                 var collectivePromise = ns.initAuthenticationSystem();
                 assert.deepEqual(collectivePromise, ['foo', 'bar', 'bar']);
                 assert.strictEqual(authring.getContacts.callCount, 2);
-                assert.strictEqual(MegaPromise.allDone.callCount, 1);
+                assert.strictEqual(MegaPromise.all.callCount, 1);
                 var getCallback = getAttributePromise.then.args[0][1];
                 var getCallbackResult = getCallback('oh noooo!');
                 assert.strictEqual(ns._logger._log.args[0][1][0],

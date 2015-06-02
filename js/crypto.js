@@ -472,6 +472,22 @@ var crypt = (function () {
     };
 
 
+    /**
+     * Store public Ed25519 key for a contact and notify listeners.
+     *
+     * @param pubKey {string}
+     *     Ed25519 public key in byte string form.
+     */
+    ns.setPubEd25519 = function(pubKey) {
+        logger.debug('crypt.setPubEd25519', u_handle, pubKey);
+        pubEd25519[u_handle] = pubKey;
+        Soon(function __setPubEd25519() {
+            mBroadcaster.sendMessage('pubEd25519');
+        });
+    };
+
+
+
     return ns;
 }());
 
@@ -4099,7 +4115,7 @@ function u_initAuthentication2(res, ctx) {
     u_privEd25519 = u_keyring.prEd255;
     u_pubEd25519 = u_pubEd25519 || jodid25519.eddsa.publicKey(u_privEd25519);
     u_attr.puEd255 = u_pubEd25519;
-    u_setPubEd25519(u_pubEd25519);
+    crypt.setPubEd25519(u_pubEd25519);
 
     getUserAttribute(u_handle, "puEd255", true, false, function (res) {
         if (res !== base64urlencode(u_pubEd25519)) {
@@ -4117,19 +4133,6 @@ function u_initAuthentication2(res, ctx) {
     };
     getUserAttribute(u_handle, 'sigPubk', true, false, storeSigPubkCallback);
 }
-
-/**
- * Store pubEd25519 and notify listeners
- */
-function u_setPubEd25519(u_pubEd25519) {
-    if (d) console.log('u_setPubEd25519', u_handle, u_pubEd25519);
-
-    pubEd25519[u_handle] = u_pubEd25519;
-    Soon(function __u_setPubEd25519() {
-        mBroadcaster.sendMessage('pubEd25519');
-    });
-}
-
 
 /**
  * Shows the fingerprint warning dialog

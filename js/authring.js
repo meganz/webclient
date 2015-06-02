@@ -112,6 +112,9 @@ var authring = (function () {
     ns.serialise = function(container) {
         var result = '';
         for (var userhandle in container) {
+            if (!container.hasOwnProperty(userhandle)) {
+                continue;
+            }
             result += this._serialiseRecord(userhandle,
                                             container[userhandle].fingerprint,
                                             container[userhandle].method,
@@ -183,7 +186,8 @@ var authring = (function () {
      */
     ns.getContacts = function(keyType) {
         if (ns._properties[keyType] === undefined) {
-            throw new Error('Unsupporte authentication key type: ' + keyType);
+            logger.error('Unsupporte authentication key type: ' + keyType);
+            throw new Error('Unsupporte authentication key type.');
         }
 
         var attributePromise = getUserAttribute(u_handle, ns._properties[keyType],
@@ -228,7 +232,8 @@ var authring = (function () {
      */
     ns.setContacts = function(keyType, callback) {
         if (ns._properties[keyType] === undefined) {
-            throw new Error('Unsupporte authentication key type: ' + keyType);
+            logger.error('Unsupporte authentication key type: ' + keyType);
+            throw new Error('Unsupporte authentication key type.');
         }
 
         return setUserAttribute(ns._properties[keyType],
@@ -253,7 +258,8 @@ var authring = (function () {
      */
     ns.getContactAuthenticated = function(userhandle, keyType) {
         if (ns._properties[keyType] === undefined) {
-            throw new Error('Unsupporte key type: ' + keyType);
+            logger.error('Unsupporte key type: ' + keyType);
+            throw new Error('Unsupporte key type.');
         }
         if (u_authring[keyType] === undefined) {
             throw new Error('First initialise u_authring by calling authring.getContacts()');
@@ -287,7 +293,8 @@ var authring = (function () {
     ns.setContactAuthenticated = function(userhandle, fingerprint, keyType,
                                           method, confidence) {
         if (ns._properties[keyType] === undefined) {
-            throw new Error('Unsupporte key type: ' + keyType);
+            logger.error('Unsupporte key type: ' + keyType);
+            throw new Error('Unsupporte key type.');
         }
         if (u_authring[keyType] === undefined) {
             throw new Error('First initialise u_authring by calling authring.getContacts()');
@@ -320,21 +327,24 @@ var authring = (function () {
      */
     ns.computeFingerprint = function(key, keyType, format) {
         if (ns._properties[keyType] === undefined) {
-            throw new Error('Unsupporte key type: ' + keyType);
+            logger.error('Unsupporte key type: ' + keyType);
+            throw new Error('Unsupporte key type.');
         }
         format = format || 'hex';
         keyType = keyType || 'Ed25519';
         var value = key;
         if (keyType === 'Ed25519') {
             if (key.length !== 32) {
-                throw new Error('Unexpected Ed25519 key length: ' + key.length);
+                logger.error('Unexpected Ed25519 key length: ' + key.length);
+                throw new Error('Unexpected Ed25519 key length.');
             }
         }
         else if (keyType === 'RSA') {
             value = key[0] + key[1];
         }
         else {
-            throw new Error('Unexpected key type for fingerprinting: ' + keyType);
+            logger.error('Unexpected key type for fingerprinting: ' + keyType);
+            throw new Error('Unexpected key type for fingerprinting.');
         }
         if (format === "string") {
             return asmCrypto.bytes_to_string(asmCrypto.SHA256.bytes(value)).substring(0, 20);
@@ -359,7 +369,8 @@ var authring = (function () {
      */
     ns.signKey = function(pubKey, keyType) {
         if (ns._properties[keyType] === undefined) {
-            throw new Error('Unsupporte key type: ' + keyType);
+            logger.error('Unsupporte key type: ' + keyType);
+            throw new Error('Unsupporte key type.');
         }
         var timeStamp = ns._longToByteString(Math.round(Date.now() / 1000));
         var value = pubKey;
@@ -392,7 +403,8 @@ var authring = (function () {
      */
     ns.verifyKey = function(signature, pubKey, keyType, signPubKey) {
         if (ns._properties[keyType] === undefined) {
-            throw new Error('Unsupporte key type: ' + keyType);
+            logger.error('Unsupporte key type: ' + keyType);
+            throw new Error('Unsupporte key type.');
         }
         var timestamp = signature.substring(0, 8);
         var timestampValue = ns._byteStringToLong(timestamp);
@@ -537,7 +549,7 @@ var authring = (function () {
                 u_privEd25519 = u_keyring.prEd255;
                 u_pubEd25519 = jodid25519.eddsa.publicKey(u_privEd25519);
                 u_attr.puEd255 = u_pubEd25519;
-                pubEd25519[u_handle] = u_pubEd25519;
+                crypt.setPubEd25519(u_pubEd25519);
                 // Run on the side a sanity check on the stored pub key.
                 ns._checkEd25519PubKey();
 
@@ -568,8 +580,7 @@ var authring = (function () {
         var authringPromise = authring.getContacts('Ed25519');
         var authRsaPromise = authring.getContacts('RSA');
 
-        return MegaPromise.allDone([keyringPromise, authringPromise,
-                                    authRsaPromise]);
+        return MegaPromise.all([keyringPromise, authringPromise, authRsaPromise]);
     };
 
 
@@ -659,7 +670,7 @@ var authring = (function () {
         // Set local values and make the authrings.
         u_attr.keyring = u_keyring;
         u_attr.puEd255 = u_pubEd25519;
-        pubEd25519[u_handle] = u_pubEd25519;
+        crypt.setPubEd25519(u_pubEd25519);
         u_authring = { Ed25519: {}, RSA: {}};
         var edAuthringPromise = ns.setContacts('Ed25519');
         var rsaAuthringPromise = ns.setContacts('RSA');
@@ -671,9 +682,8 @@ var authring = (function () {
                                                 base64urlencode(sigPubk), true,
                                                 false);
 
-        return MegaPromise.allDone([pubkeyPromise, keyringPromise,
-                                    rsaSigKeyPromise, edAuthringPromise,
-                                    rsaAuthringPromise]);
+        return MegaPromise.all([pubkeyPromise, keyringPromise, rsaSigKeyPromise,
+                                edAuthringPromise, rsaAuthringPromise]);
     };
 
 

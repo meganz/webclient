@@ -3176,7 +3176,7 @@ function crypto_processkey(me, master_aes, file) {
     }
     else {
         if (window.d) {
-            console.log("Received no suitable key: " + file.h);
+            console.error("Received no suitable key: " + file.h);
         }
 
         if (!missingkeys[file.h]) {

@@ -111,14 +111,18 @@ function u_checklogin3a(res, ctx) {
 
         init_storage(u_storage);
 
-        try {
-            u_k = JSON.parse(u_storage.k);
-            if (u_attr.privk) {
-                u_privk = crypto_decodeprivkey(base64urldecode(u_storage.privk));
-            }
-        } catch (e) {}
-
+        u_k = JSON.parse(u_storage.k);
         u_k_aes = new sjcl.cipher.aes(u_k);
+        
+        try {
+            if (u_attr.privk) {
+                u_privk = crypto_decodeprivkey(a32_to_str(decrypt_key(u_k_aes, base64_to_a32(u_attr.privk))));
+            }
+        }
+        catch (e) {
+            console.log('Error decoding private RSA key');
+        }
+
         if (!u_attr.email) {
             r = 0;
         }

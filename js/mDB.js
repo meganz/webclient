@@ -296,7 +296,14 @@ var mFileManagerDB = {
                     mDB = this;
                     if (localStorage[u_handle + '_maxaction']) {
                         if (d) console.time('fmdb');
-                        mFileManagerDB.fetch(Object.keys(mFileManagerDB.schema));
+
+                        mFileManagerDB.fetch([
+                            'f', /* <- f should ALWAYS be first! */
+                            'u',
+                            's',
+                            'ok'
+                        ]);
+
                     } else {
                         mFileManagerDB._loadfm(this);
                     }

@@ -498,6 +498,9 @@ function MegaData()
             lSel = this.fsViewSel;
         $(lSel).before($('.fm-empty-folder .fm-empty-pad:first').clone().removeClass('hidden').addClass('fm-empty-sharef'));
         $(lSel).parent().children('table').hide();
+
+        $('.files-grid-view.fm.shared-folder-content').addClass('hidden');
+
         $(window).trigger('resize');
     };
     Object.defineProperty(this, 'fsViewSel', {
@@ -944,6 +947,8 @@ function MegaData()
                     } else {
                         t = '.shared-grid-view .grid-table.shared-with-me';
                         el = 'tr';
+                        var contactName = M.d[u_h] ? htmlentities(M.d[u_h].name) : "N/a";
+
                         html = '<tr id="' + htmlentities(M.v[i].h) + '"><td width="30"><span class="grid-status-icon ' + htmlentities(star)
                             + '"></span></td><td><div class="shared-folder-icon"></div><div class="shared-folder-info-block"><div class="shared-folder-name">'
                             + htmlentities(M.v[i].name) + '</div><div class="shared-folder-info">' + htmlentities(contains)
@@ -951,7 +956,7 @@ function MegaData()
                             + htmlentities(u_h) + ' color' + htmlentities(av_color) + '">' + avatar
                             + '</div><div class="fm-chat-user-info todo-star ustatus ' + htmlentities(u_h) + ' '
                             + htmlentities(onlinestatus[1]) + '"><div class="todo-fm-chat-user-star"></div><div class="fm-chat-user">'
-                            + htmlentities(M.d[u_h].name) + '</div><div class="nw-contact-status"></div><div class="fm-chat-user-status ' + htmlentities(htmlentities(u_h)) + '">' + htmlentities(onlinestatus[0])
+                            + contactName + '</div><div class="nw-contact-status"></div><div class="fm-chat-user-status ' + htmlentities(htmlentities(u_h)) + '">' + htmlentities(onlinestatus[0])
                             + '</div><div class="clear"></div></div></td><td width="270"><div class="shared-folder-access'
                             + htmlentities(rightsclass) + '">' + htmlentities(rights) + '</div></td></tr>';
                     }
@@ -3178,9 +3183,10 @@ function MegaData()
 
     this.nodeShare = function(h, s, ignoreDB) {
         if (this.d[h]) {
-            if (typeof this.d[h].shares == 'undefined') {
+            if (typeof this.d[h].shares === 'undefined') {
                 this.d[h].shares = [];
             }
+
             this.d[h].shares[s.u] = s;
             if (typeof mDB === 'object') {
                 s['h_u'] = h + '_' + s.u;
@@ -3195,6 +3201,8 @@ function MegaData()
             if (typeof mDB === 'object' && !pfkey) {
                 mDBadd('ok', {h: h, k: a32_to_base64(encrypt_key(u_k_aes, u_sharekeys[h])), ha: crypto_handleauth(h)});
             }
+        } else {
+            console.error("nodeShare failed for node:", h, s, ignoreDB);
         }
     };
 
@@ -4437,25 +4445,38 @@ function rendernew()
     var UImain = false;
     var newcontact = false;
     var newpath = false;
+    var newshare = false;
+
     for (var i in newnodes)
     {
         var n = newnodes[i];
-        if (n.h.length == 11)
+        if (n.h.length === 11) {
             newcontact = true;
-        if (n && n.p && n.t)
+        }
+        if (typeof(n.su) !== 'undefined') {
+            newshare = true;
+        }
+        if (n && n.p && n.t) {
             treebuild[n.p] = 1;
-        if (n.p == M.currentdirid || n.h == M.currentdirid)
+        }
+        if (n.p == M.currentdirid || n.h == M.currentdirid) {
             UImain = true;
-        if ($('#path_' + n.h).length > 0)
+        }
+        if ($('#path_' + n.h).length > 0) {
             newpath = true;
+        }
     }
+
+
+
+
     var UItree = false;
     for (var h in treebuild)
     {
         var n = M.d[h];
         if (n)
         {
-            M.buildtree(n);
+            M.buildtree(n, M.buildtree.FORCE_REBUILD);
             UItree = true;
         }
     }
@@ -4472,10 +4493,12 @@ function rendernew()
     if (UItree)
     {
         treeUI();
-        if (RootbyId(M.currentdirid) === 'shares')
+        if (RootbyId(M.currentdirid) === 'shares') {
             M.renderTree();
-        if (M.currentdirid === 'shares' && !M.viewmode)
+        }
+        if (M.currentdirid === 'shares' && !M.viewmode) {
             M.openFolder('shares', 1);
+        }
         treeUIopen(M.currentdirid);
     }
     if (newcontact)
@@ -4488,6 +4511,10 @@ function rendernew()
             megaChat.renderContactTree();
             megaChat.renderMyStatus();
         }
+    }
+
+    if (newshare) {
+        M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
     }
     M.buildSubmenu();
     initContextUI();
@@ -4730,6 +4757,8 @@ function execsc(actionPackets, callback) {
             }
 
             crypto_share_rsa2aes();
+
+            M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
         } else if (actionPacket.a === 'k' && !folderlink) {
             if (actionPacket.sr)
                 crypto_procsr(actionPacket.sr);
@@ -4740,6 +4769,8 @@ function execsc(actionPackets, callback) {
                     a: 'k',
                     cr: crypto_makecr(actionPacket.n, [actionPacket.h], true)
                 });
+
+            M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
         }
         else if (actionPacket.a === 't') {
             if (tparentid) {
@@ -4803,14 +4834,24 @@ function execsc(actionPackets, callback) {
             if (actionPacket.u[0].c === 0) {
                 $('#contact_' + actionPacket.ou).remove();
 
-                // hide the context menu if it is currently visible and this contact was removed.
-                if($.selected && $.selected[0] === actionPacket.ou) {
-                    // was selected
-                    $.selected = [];
-                    if($('.context-menu.files-menu').is(":visible")) {
-                        $.hideContextMenu();
+                $.each(actionPacket.u, function(k, v) {
+                    // hide the context menu if it is currently visible and this contact was removed.
+                    if($.selected && $.selected[0] === v.u) {
+                        // was selected
+                        $.selected = [];
+                        if($('.context-menu.files-menu').is(":visible")) {
+                            $.hideContextMenu();
+                        }
                     }
-                }
+                    if (M.c[v.u]) {
+                        for (var sharenode in M.c[v.u]) {
+                            removeShare(sharenode, 1);
+                        }
+                    }
+                });
+
+
+
                 M.handleEmptyContactGrid();
             }
 

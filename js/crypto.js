@@ -226,7 +226,7 @@ var crypt = (function () {
                 method = authring.AUTHENTICATION_METHOD.SIGNATURE_VERIFIED;
             }
             else {
-                var message = 'RSA pub key signature of ' + userhandle + ' is invalid!'
+                var message = 'RSA pub key signature of ' + userhandle + ' is invalid!';
                 logger.error(message);
                 var instructions = 'Please, ask your contact to get in touch with Mega Support.';
                 // TODO: This should probably be changed to something like mega.ui.CredentialsWarningDialog.
@@ -504,11 +504,11 @@ var crypt = (function () {
 
     /**
      * Shows the fingerprint warning dialog
-     * @param {String} fingerprintType either Ed25519 or RSA
-     * @param {String} userHandle The user handle e.g. 3nnYu_071I3
-     * @param {Number} method Whether seen or verified (authring.AUTHENTICATION_METHOD.SEEN or .FINGERPRINT_COMPARISON)
-     * @param {String} previousFingerprint The previously seen or verified fingerprint
-     * @param {String} newFingerprint The new fingerprint
+     * @param {string} fingerprintType either Ed25519 or RSA
+     * @param {string} userHandle The user handle e.g. 3nnYu_071I3
+     * @param {number} method Whether seen or verified (authring.AUTHENTICATION_METHOD.SEEN or .FINGERPRINT_COMPARISON)
+     * @param {string} previousFingerprint The previously seen or verified fingerprint
+     * @param {string} newFingerprint The new fingerprint
      * @throws {Error}
      *     In case the fingerprint of the public key differs from the one previously
      *     authenticated by the user. This more severe condition warrants to throw

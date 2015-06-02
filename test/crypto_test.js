@@ -52,7 +52,7 @@ describe("crypto unit test", function() {
             it("fingerprint mismatch", function() {
                 sandbox.stub(ns._logger, '_log');
                 sandbox.stub(window, 'pubEd25519', { 'you456789xw': ED25519_PUB_KEY });
-                sandbox.stub(ns, 'showFingerprintMismatchException').throws('an exception')
+                sandbox.stub(ns, 'showFingerprintMismatchException').throws('an exception');
                 var authenticated = { fingerprint: base64urldecode('XyeqVYkXl3DkdXWxYqHe2XuL_G0'),
                                       method: authring.AUTHENTICATION_METHOD.SEEN,
                                       confidence: authring.KEY_CONFIDENCE.UNSURE };
@@ -185,7 +185,7 @@ describe("crypto unit test", function() {
             it("fingerprint mismatch", function() {
                 sandbox.stub(ns._logger, '_log');
                 sandbox.stub(window, 'u_pubkeys', { 'you456789xw': 'foo' });
-                sandbox.stub(ns, 'showFingerprintMismatchException').throws('an exception')
+                sandbox.stub(ns, 'showFingerprintMismatchException').throws('an exception');
                 var authenticated = { fingerprint: ED25519_FINGERPRINT,
                                       method: authring.AUTHENTICATION_METHOD.SIGNATURE_VERIFIED,
                                       confidence: authring.KEY_CONFIDENCE.UNSURE };

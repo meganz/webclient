@@ -1008,12 +1008,15 @@ window.ImageUploadAndCrop = (function() {
  *
  *  @return String  Image SRC base64+svg
  */
-function avatarGenerateImage(text) {
+function avatarGenerateImage(user) {
     var letters = null;
-    if (typeof text === "object") {
-        letters = _generateReadableContactNameFromStr(text.name || text.m, false);
+    if (typeof user === "object") {
+        if (user.avatarUrl) {
+            return user.avatarUrl;
+        }
+        letters = _generateReadableContactNameFromStr(user.name || user.m, false);
     } else {
-        letters = text.substr(0, 2).toUpperCase();
+        letters = user.substr(0, 2).toUpperCase();
     }
     var colors = [
         '#ff6a19', '#5856d6', '#007aff', '#34aadc', '#5ac8fa', 

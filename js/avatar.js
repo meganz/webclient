@@ -1015,7 +1015,10 @@ function avatarGenerateImage(text) {
     } else {
         letters = text.substr(0, 2).toUpperCase();
     }
-    var colors = ['#FF6A19', '#5856d6', '#007aff', '#34aadc', '#5ac8fa', '#4cd964', '#ff1a53', '#d90007', '#ff9500', '#ffcc00'];
+    var colors = [
+        '#ff6a19', '#5856d6', '#007aff', '#34aadc', '#5ac8fa', 
+        '#4cd964', '#ff1a53', '#d90007', '#ff9500', '#ffcc00'
+    ];
     var colorIndex = letters.charCodeAt(0) % 6 + letters.charCodeAt(1) % 6;
     var cobj = $('<text text-anchor="middle"></text>').attr({
         'y': '50%',
@@ -1045,7 +1048,7 @@ function avatarGenerateImage(text) {
         '-moz-border-radius': ' 100%',
         '-webkit-border-radius': ' 100%',
         'border-radius': ' 100%',
-        'background-color': colors[colorIndex],
+        'background-color': colors[colorIndex-1],
         'width': '120px',
         'height': '120px'
     });

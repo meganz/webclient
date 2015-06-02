@@ -973,23 +973,18 @@ var notifyPopup = {
         // If using the new API v2.0 for contacts, the userid will not be available, so use the email
         if (userEmail) {
             email = userEmail;
-            avatarColor = email.charCodeAt(0) % 6 + email.charCodeAt(1) % 6;
-            avatar = email.charAt(0) + email.charAt(1);
+            avatar = avatarGenerateImage(email)
         }
 
         // Otherwise use the userid
         else if (M.u[userid]) {
-            email = M.u[userid].m;
-            avatarColor = email.charCodeAt(0) % 6 + email.charCodeAt(1) % 6;
-            avatar = (avatars[userid] && avatars[userid].url)
-                ? '<img src="' + avatars[userid].url + '">'
-                : (email.charAt(0) + email.charAt(1));
+            avatar = avatarGenerateImage(M.u[userid])
         }
 
         rhtml += '<a class="notification-item ' + className + ' ' + nread + '" ' + nstyle + ' id="' + htmlentities(id) + '">';
         rhtml +=   '<span class="notification-status-icon">';
         rhtml +=     '<span class="notification-status"></span>';
-        rhtml +=     '<span class="notification-avatar color' + avatarColor + '">' + avatar + ' <span class="notification-avatar-icon"></span></span>';
+        rhtml +=     '<span class="notification-avatar"><img src="' + avatar + '"> <span class="notification-avatar-icon"></span></span>';
         rhtml +=     '<span class="notification-type">';
         rhtml +=       ((pendingContactHtml) ? pendingContactHtml : '');
         rhtml +=       '<span class="notification-accepted">Accepted</span>';
@@ -1013,7 +1008,7 @@ var notifyPopup = {
 
         nhtml += '<div class="nt-main-date">' + time2last(time) + '</div>';
         nhtml += '<div class="nt-info-block ' + className + ' ' + nread + '" id="no_' + id + '">';
-        nhtml +=   '<span class="notification-avatar color' + avatarColor + '">' + avatar + ' <span class="notification-avatar-icon"></span></span>';
+        nhtml +=   '<span class="notification-avatar"><img src="' + avatar + '"> <span class="notification-avatar-icon"></span></span>';
         nhtml +=   '<span class="notification-status"></span>';
         nhtml +=   ((pendingContactHtml) ? pendingContactHtml : '');
         nhtml +=   '<span class="notification-accepted">Accepted</span>';

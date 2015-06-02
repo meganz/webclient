@@ -9371,9 +9371,7 @@ function sharedfolderUI() {
         var u_h = n.p;
         var user = M.d[u_h];
         var av_meta = generateAvatarMeta(u_h);
-        var avatar = av_meta.shortName, av_color = av_meta.color;
-        if (av_meta.avatarUrl)
-            avatar = '<img src="' + av_meta.avatarUrl + '">';
+        avatar = '<img src="' + av_meta.avatarUrl + '">';
 
         var rights = l[55], rightsclass = ' read-only';
         if (n.r === 1) {

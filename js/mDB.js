@@ -269,9 +269,9 @@ mBroadcaster.once('startMega', function __msdb_init() {
 var mFileManagerDB = {
     schema: {
         ok: { key: { keyPath: "h"   }},
-        s:  { key: { keyPath: "h_u" }},
         u:  { key: { keyPath: "u"   }},
-        f:  { key: { keyPath: "h"   }}
+        f:  { key: { keyPath: "h"   }},
+        s:  { key: { keyPath: "h_u" }}
     },
 
     init: function mFileManagerDB_init() {
@@ -296,14 +296,6 @@ var mFileManagerDB = {
                     mDB = this;
                     if (localStorage[u_handle + '_maxaction']) {
                         if (d) console.time('fmdb');
-
-                        mFileManagerDB.fetch([
-                            'f', /* <- f should ALWAYS be first! */
-                            'u',
-                            's',
-                            'ok'
-                        ]);
-
                     } else {
                         mFileManagerDB._loadfm(this);
                     }

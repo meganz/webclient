@@ -296,6 +296,7 @@ var mFileManagerDB = {
                     mDB = this;
                     if (localStorage[u_handle + '_maxaction']) {
                         if (d) console.time('fmdb');
+                        mFileManagerDB.fetch(Object.keys(mFileManagerDB.schema));
                     } else {
                         mFileManagerDB._loadfm(this);
                     }

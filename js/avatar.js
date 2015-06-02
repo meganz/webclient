@@ -997,3 +997,64 @@ window.ImageUploadAndCrop = (function() {
     return ImageUploadAndCrop;
 })();
 })(this);
+
+/**
+ *  Generate Avatar Image
+ *
+ *  Generates an SVG image that be included *any where*. It expects an user object (preferred)
+ *  or an string (user name).
+ *
+ *  TODO: instead of do the computation *over* and over, put in a template and user it!
+ *
+ *  @return String  Image SRC base64+svg
+ */
+function avatarGenerateImage(text) {
+    var letters = null;
+    if (typeof text === "object") {
+        letters = _generateReadableContactNameFromStr(text.name || text.m, false);
+    } else {
+        letters = text.substr(0, 2).toUpperCase();
+    }
+    var colors = ['#FF6A19', '#5856d6', '#007aff', '#34aadc', '#5ac8fa', '#4cd964', '#ff1a53', '#d90007', '#ff9500', '#ffcc00'];
+    var colorIndex = letters.charCodeAt(0) % 6 + letters.charCodeAt(1) % 6;
+    var cobj = $('<text text-anchor="middle"></text>').attr({
+        'y': '50%',
+        'x': '50%',
+        'dy' : '0.35em',
+        'pointer-events':'auto',
+        'fill': "#ffffff",
+    }).html(letters).css({
+        'font-family': 'Open Sans Light, HelveticaNeue-Light,Helvetica Neue Light,Helvetica Neue,Helvetica, Arial,Lucida Grande, sans-serif',
+        'font-weight': 400,
+        'font-size': '60px'
+    });
+
+    var svg = $('<svg></svg>').attr({
+        'xmlns': 'http://www.w3.org/2000/svg',
+        'pointer-events':'none',
+        'width': 120,
+        'height': 120,
+    }).css({
+        'position': 'absolute',
+        'margin-left': '-2px',
+        'margin-top': '-2px',
+        'border': '2px solid white',
+        '-webkit-box-sizing': ' border-box',
+        '-moz-box-sizing': ' border-box',
+        'box-sizing': ' border-box',
+        '-moz-border-radius': ' 100%',
+        '-webkit-border-radius': ' 100%',
+        'border-radius': ' 100%',
+        'background-color': colors[colorIndex],
+        'width': '120px',
+        'height': '120px'
+    });
+        
+    
+    svg.append(cobj);
+    var svgHtml = $('<div>').append(svg.clone()).html();
+    svgHtml = window.btoa(unescape(svgHtml));
+
+    return 'data:image/svg+xml;base64,' + svgHtml;
+}
+

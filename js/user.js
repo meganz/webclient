@@ -534,6 +534,9 @@ function generateAvatarMeta(user_hash) {
 
     if (avatar) {
         meta.avatarUrl = avatar.url;
+    } else {
+        // generate Image URL
+        meta.avatarUrl = avatarGenerateImage(shortName);
     }
     return meta;
 }

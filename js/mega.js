@@ -385,24 +385,35 @@ function MegaData()
                                     data: blob,
                                     url: myURL.createObjectURL(blob)
                                 }
-                            var el = $('.contact-block-view-avatar.' + ctx.u + ',.avatar.' + ctx.u + ',.contacts-avatar.' + ctx.u);
-                            if (el.length > 0)
-                                el.find('img').attr('src', avatars[ctx.u].url);
+                        } else {
+                            var user = M.u[ctx.u];
+                            avatars[ctx.u] = {
+                                data: '',
+                                url: avatarGenerateImage(user)
+                            };
+                        }
+                        var el = $('.contact-block-view-avatar.' + ctx.u + ',.avatar.' + ctx.u + ',.contacts-avatar.' + ctx.u);
+                        if (el.length > 0) {
+                            el.find('img').attr('src', avatars[ctx.u].url);
+                        }
 
-                            var el = $('#contact_' + ctx.u);
-                            if (el.length > 0)
-                                el.find('img').attr('src', avatars[ctx.u].url);
+                        el = $('#contact_' + ctx.u);
+                        if (el.length > 0) {
+                            el.find('img').attr('src', avatars[ctx.u].url);
+                        }
 
-                            var el = $('.nw-contact-avatar.' + ctx.u);
-                            if (el.length > 0)
-                                $(el).html('<img src="' + avatars[ctx.u].url + '">');
+                        el = $('.nw-contact-avatar.' + ctx.u);
+                        if (el.length > 0) {
+                            $(el).html('<img src="' + avatars[ctx.u].url + '">');
+                        }
 
-                            var el = $('.nw-contact-block-avatar.' + ctx.u);
-                            if (el.length > 0)
-                                $(el).html('<img src="' + avatars[ctx.u].url + '">');
+                        el = $('.nw-contact-block-avatar.' + ctx.u);
+                        if (el.length > 0) {
+                            $(el).html('<img src="' + avatars[ctx.u].url + '">');
+                        }
 
-                            if (u_handle == ctx.u)
-                                $('.fm-avatar img,.fm-account-avatar img').attr('src', avatars[ctx.u].url);
+                        if (u_handle === ctx.u) {
+                            $('.fm-avatar img,.fm-account-avatar img').attr('src', avatars[ctx.u].url);
                         }
                     }
                 });

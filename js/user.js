@@ -111,16 +111,26 @@ function u_checklogin3a(res, ctx) {
 
         init_storage(u_storage);
 
-        u_k = JSON.parse(u_storage.k);
-        u_k_aes = new sjcl.cipher.aes(u_k);
-        
+        if (u_storage.k) {
+            try {
+                u_k = JSON.parse(u_storage.k);
+            }
+            catch(e) {
+                console.error('Error parsing key', e);
+            }
+        }
+
+        if (u_k) {
+            u_k_aes = new sjcl.cipher.aes(u_k);
+        }
+
         try {
             if (u_attr.privk) {
                 u_privk = crypto_decodeprivkey(a32_to_str(decrypt_key(u_k_aes, base64_to_a32(u_attr.privk))));
             }
         }
         catch (e) {
-            console.log('Error decoding private RSA key');
+            console.error('Error decoding private RSA key', e);
         }
 
         if (!u_attr.email) {

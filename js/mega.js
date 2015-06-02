@@ -3304,27 +3304,30 @@ function MegaData()
         function getFolderlinks() {
 
             if (folderLinks.length > 0) {
-                var n = M.d[folderLinks.shift()];
+                var theNextNodeInTheFolderLinksArray = M.d[folderLinks.shift()];
 
-                if (n) {
-                    if (n.shares && n.shares['EXP']) {
+                if (theNextNodeInTheFolderLinksArray) {
+                    if (theNextNodeInTheFolderLinksArray.shares
+                            && theNextNodeInTheFolderLinksArray.shares['EXP']) {
                         getFolderlinks();
                     }
                     else {
-                        var h = fm_getnodes(n.h);
-                        h.push(n.h);
+                        var theListOfNodesWithinTheCloudFolder = fm_getnodes(theNextNodeInTheFolderLinksArray.h);
+                        theListOfNodesWithinTheCloudFolder.push(theNextNodeInTheFolderLinksArray.h);
 
-                        api_setshare(n.h, [{u: 'EXP', r: 0}], h, {
-                            fln: n.h,
-                            done: function(res, ctx) {
-                                if (res.r && res.r[0] === 0) {
+                        api_setshare(theNextNodeInTheFolderLinksArray.h, [{u: 'EXP', r: 0}],
+                            theListOfNodesWithinTheCloudFolder, {
+                                fln: theNextNodeInTheFolderLinksArray.h,
+                                done: function(res, ctx) {
+                                    if (res.r && res.r[0] === 0) {
 
-                                    // ToDo: timestamp ts can be different here and on server side, check how this influence execution
-                                    M.nodeShare(ctx.fln, {h: ctx.fln, r: 0, u: 'EXP', ts: Math.floor(Date.now() / 1000)});
+                                        // ToDo: timestamp ts can be different here and on server side, check how this influence execution
+                                        M.nodeShare(ctx.fln, {h: ctx.fln, r: 0, u: 'EXP', ts: Math.floor(Date.now() / 1000)});
+                                    }
+                                    getFolderlinks();
                                 }
-                                getFolderlinks();
                             }
-                        });
+                        );
                     }
                 }
                 else {
@@ -3341,12 +3344,12 @@ function MegaData()
         loadingDialog.show();
 
         for (var i in h) {
-            var n = M.d[h[i]];
-            if (n) {
-                if (n.t) {
-                    folderLinks.push(n.h);
+            var theCloudNodeFromTheInputArray = M.d[h[i]];
+            if (theCloudNodeFromTheInputArray) {
+                if (theCloudNodeFromTheInputArray.t) {
+                    folderLinks.push(theCloudNodeFromTheInputArray.h);
                 }
-                links.push(n.h);
+                links.push(theCloudNodeFromTheInputArray.h);
             }
         }
         if (d) {

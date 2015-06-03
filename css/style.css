@@ -233,16 +233,6 @@ a, a:link, a:visited, a:hover, a:active, a:focus img, a:focus img {
 	background-color: rgba(208,39,47,1);
 	background-position: left -30px;
 }
-.beta-text-red {
-	background-image: url("../images/mega/beta_v2.svg");
-	background-position: 0 0;
-	background-repeat: no-repeat;
-	height: 20px;
-	left: 56px;
-	position: absolute;
-	top: 14px;
-	width: 46px;
-}
 .nlanguage-popup {
 	position: absolute;
 	right: 0 !important;
@@ -5315,12 +5305,11 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	background-position: 0 -131px;
 	position: relative;
 }
-/*
 .nw-fm-left-icon.conversations .beta-text, .not-logged .nw-fm-left-icon.conversations:hover .beta-text, .not-logged .nw-fm-left-icon.conversations.active .beta-text {
 	left: 6px;
 	height: 14px;
 	position: absolute;
-	top: 48px;
+	top: 49px;
 	width: 36px;
 	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
 	background-repeat: no-repeat;
@@ -5328,7 +5317,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 }
 .nw-fm-left-icon.conversations.active .beta-text, .nw-fm-left-icon.conversations:hover .beta-text {
 	background-position: center -9958px;
-}*/
+}
 .nw-fm-left-icon.cloud-drive:hover, .nw-fm-left-icon.cloud-drive.active {
 	background-position: 0 -368px;
 }
@@ -22506,7 +22495,7 @@ a.top-login-forgot-pass {
 }
 /** top header feedback button **/
 .feedback-button {
-	margin-left: 70px;
+	margin-left: 14px;
 	color: #888;
 	padding: 2px 6px;
 	margin-top: 14px;

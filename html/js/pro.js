@@ -164,7 +164,7 @@ function populateMembershipPlans() {
  */
 function loadPaymentGatewayOptions() {
 
-    // Payment gateways, hardcoded for now, will call API in future to get list
+    // Payment gateways, hardcoded for now, may call API in future to get list
     var gatewayOptions = [
     {
         apiGatewayId: 8,                // Credit card provider
@@ -183,6 +183,12 @@ function loadPaymentGatewayOptions() {
         displayName: l[504],            // Prepaid balance
         supportsRecurring: false,
         cssClass: 'prepaid-balance'
+    },
+    {
+        apiGatewayId: null,             // Wire transfer
+        displayName: l[6198],           // Wire transfer
+        supportsRecurring: false,
+        cssClass: 'wire-transfer'
     }
     /*{
         apiGatewayId: 5,                // Union Pay
@@ -491,6 +497,9 @@ function pro_continue(e)
         if (pro_paymentmethod === 'credit-card') {
             cardDialog.init();
         }
+        else if (pro_paymentmethod === 'wire-transfer') {
+            wireTransferDialog.init();
+        }
         else {
             // For other methods we do a uts and utc call to get the provider details first
             pro_pay();
@@ -616,6 +625,38 @@ function pro_pay()
         }
     });
 }
+
+var wireTransferDialog = {
+    
+    $dialog: null,
+    $backgroundOverlay: null,
+    
+    init: function() {
+        
+        // Close the pro register dialog if it's already open
+        $('.pro-register-dialog').removeClass('active').addClass('hidden');
+        
+        // Cache DOM reference for lookup in other functions
+        this.$dialog = $('.fm-dialog.wire-transfer-dialog');
+        this.$backgroundOverlay = $('.fm-dialog-overlay');
+        
+        // Add the styling for the overlay
+        this.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+        
+        // Position the dialog and open it
+        this.$dialog.css({
+            'margin-left': -1 * (this.$dialog.outerWidth() / 2),
+            'margin-top': -1 * (this.$dialog.outerHeight() / 2)
+        });
+        this.$dialog.addClass('active').removeClass('hidden');
+        
+        // Initialise the close button
+        this.$dialog.find('.btn-close-dialog').rebind('click', function() {
+            wireTransferDialog.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+            wireTransferDialog.$dialog.removeClass('active').addClass('hidden');            
+        });
+    }
+};
 
 /**
  * Code for Dynamic/Union Pay

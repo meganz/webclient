@@ -14979,6 +14979,9 @@ h5.main-italic-header {
 .membership-radio-label.union-pay {
 	background-position: -444px -524px; /* Todo: replace with correct Union Pay position */
 }
+.membership-radio-label.wire-transfer {
+	background-position: -444px -524px; /* Todo: replace with correct Wire Transfer position */
+}
 .membership-radio-label.bitcoin {
 	background-position: -444px -614px;
 }

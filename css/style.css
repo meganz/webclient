@@ -6927,6 +6927,9 @@ table {
 .fm-dialog-breadcrumbs {
 	background-position: 5px -1000px;
 }
+.fm-breadcrumbs:first-child .right-arrow-bg span {
+	display: none;
+}
 .fm-breadcrumbs.shared-with-me .right-arrow-bg, .fm-dialog-breadcrumbs.shared-with-me .right-arrow-bg, .fm-breadcrumbs.contacts .right-arrow-bg, .fm-dialog-breadcrumbs.contacts .right-arrow-bg {
 	background-image: url(../images/mega/shared-sprite_v3.svg);
 	background-repeat: no-repeat;

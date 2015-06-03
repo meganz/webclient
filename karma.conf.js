@@ -118,6 +118,7 @@ module.exports = function(config) {
         'js/chat/plugins/chatStore.js',
         'js/chat/plugins/chatNotifications.js',
         'js/chat/plugins/callFeedback.js',
+        'js/chat/plugins/callManager.js',
         'js/chat/karereEventObjects.js',
         'js/chat/karere.js',
         'js/chat/chat.js',

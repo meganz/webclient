@@ -39,7 +39,7 @@ function MegaDBEncryption(mdbInstance) {
 
         mdbServerInstance.getUData('enckey')
             .then(function(data) {
-                logger.debug('getUData.enckey', data);
+                logger.info('getUData.enckey', data);
 
                 if (!data) {
                     // Generate new encryption key

@@ -69,7 +69,7 @@ function MegaDB(name, suffix, schema, options) {
     function __dbOpen() {
         dbOpenOptions.version = version;
 
-        self.logger.debug('Opening DB', version, dbOpenOptions);
+        self.logger.info('Opening DB', version, dbOpenOptions);
 
         self._dbOpenPromise = db.open(dbOpenOptions).then( function( s ) {
 
@@ -81,52 +81,24 @@ function MegaDB(name, suffix, schema, options) {
             if (pluginSetupPromises.length) {
                 MegaPromise.all(pluginSetupPromises)
                     .then(function() {
-                        self.logger.debug('MegaDB PlugIn(s) intialization succeed.', arguments);
+                        self.logger.info('MegaDB PlugIn(s) intialization succeed.', arguments);
                         __dbOpenSucceed(s);
-                    }, function(err) {
+                    }, MegaPromise.getTraceableReject(function(err) {
                         if (!err) {
                             err = new Error('Failed to initialize MegaDB PlugIn(s)');
                         }
-                        else if (typeof err === 'object') {
-                            if ("reason" in err) {
-                                err = err.reason;
-                            }
-                            if ("target" in err && err.target.error) {
-                                err = err.target.error;
-                            }
+                        else {
+                            err = MegaDB.getRefError(err) || err;
                         }
                         __dbOpenFailed(err);
-                    });
+                    }));
             }
             else {
                 __dbOpenSucceed(s);
             }
 
         }, function( e ) {
-            var dbError;
-
-            // nb: "reason" comes from our modified db.js
-            if (typeof e === 'object' && "reason" in e) {
-                e = e.reason;
-            }
-
-            if (e instanceof Event) {
-
-                if (e.type === 'blocked') {
-                    dbError = new Error('Database is blocked');
-                }
-                else {
-                    var target = e.target;
-                    var error = target && target.error;
-
-                    if (error instanceof DOMError) {
-                        dbError = error;
-                    }
-                }
-            }
-            else if (e instanceof DOMException) {
-                dbError = e;
-            }
+            var dbError = MegaDB.getRefError(e);
 
             if (!dbError) {
                 dbError = e;
@@ -201,6 +173,41 @@ MegaDB.getDatabaseVersion = function(dbName) {
     }
 
     return promise;
+};
+
+/**
+ * Convert any promise-related error to their ending point
+ *
+ * @param aError {mixed} an error thrown from a reject
+ * @returns {mixed} an expected error or null
+ */
+MegaDB.getRefError = function(aError) {
+    var result = null;
+
+    // nb: "reason" comes from our modified db.js
+    if (typeof aError === 'object' && "reason" in aError) {
+        aError = aError.reason;
+    }
+
+    if (aError instanceof Event) {
+
+        if (aError.type === 'blocked') {
+            result = new Error('Database is blocked');
+        }
+        else {
+            var target = aError.target;
+            var error = target && target.error;
+
+            if (error instanceof DOMError) {
+                result = error;
+            }
+        }
+    }
+    else if (aError instanceof DOMException) {
+        result = aError;
+    }
+
+    return result;
 };
 
 /**

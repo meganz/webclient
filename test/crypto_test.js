@@ -248,17 +248,18 @@ describe("crypto unit test", function() {
 
             it("with bad signature", function() {
                 sandbox.stub(ns._logger, '_log');
+                sandbox.stub(M, 'u', { 'you456789xw': { m: 'you@there.org' } });
                 sandbox.stub(window, 'u_pubkeys', { 'you456789xw': 'the key' });
                 sandbox.stub(authring, 'verifyKey').returns(false);
                 sandbox.stub(authring, 'setContactAuthenticated');
                 sandbox.stub(window, 'msgDialog');
                 assert.throws(function() { ns._trackRSAKeyAuthentication(
                     'you456789xw', 'not my autograph', ED25519_FINGERPRINT); },
-                    'RSA pub key signature is invalid!');
+                    'RSA public key signature for you@there.org is invalid!');
                 assert.strictEqual(authring.setContactAuthenticated.callCount, 0);
                 assert.strictEqual(msgDialog.callCount, 1);
                 assert.strictEqual(ns._logger._log.args[0][1][0],
-                                   'RSA pub key signature of you456789xw is invalid!');
+                                   'RSA public key signature for you@there.org is invalid!');
             });
         });
 

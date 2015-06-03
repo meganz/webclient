@@ -434,14 +434,20 @@ function MegaData()
             if(!M.d[h].ts) {
                 var a = fm_getnodes(h);
                 for (var i in a) {
+                    if (!a.hasOwnProperty(i)) {
+                        continue;
+                    }
                     var n = M.d[a[i]];
                     if (n) {
-                        if (ts < n.ts)
+                        if (ts < n.ts) {
                             ts = n.ts;
-                        if (n.t)
+                        }
+                        if (n.t) {
                             folders++;
-                        else
+                        }
+                        else {
                             files++;
+                        }
                     }
                 }
                 M.d[h].ts = ts;
@@ -1550,7 +1556,7 @@ function MegaData()
                 M.i_cache[a.u] = cs.ts;
 
 
-                var cs = M.contactstatus(b.u);
+                cs = M.contactstatus(b.u);
                 if (cs.ts === 0) {
                     cs.ts = -1;
                 }
@@ -4248,7 +4254,7 @@ function MegaData()
                 }
 
                 // Check for suspended account
-                if (result == EBLOCKED) {
+                if (result === EBLOCKED) {
                     alert(l[730]);
                 }
                 else if (result) {
@@ -4878,7 +4884,7 @@ function execsc(actionPackets, callback) {
                     // pubEd25519 key was updated!
                     // force finger regen.
                     delete pubEd25519[actionPacket.u];
-                    getPubEd25519(actionPacket.u);
+                    crypt.getPubEd25519(actionPacket.u);
                 }
             }
         }

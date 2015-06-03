@@ -1,14 +1,15 @@
 {
     "source": {
         "include": ["."],
-        "exclude": ["test/",
-                    "js/tests/vendor/", "js/vendor/",
-                    "node_modules/",
-                    "js/tests/node_modules",
+
+        "exclude": ["test/", "node_modules/",
+                    "js/tests/", "js/vendor/",
+                    "coverage/", "dont-deploy/", "doc/",
                     "sjcl.js",
                     "fileapi.js",
                     "karma.conf.js.js",
                     "js/jodid25519.js",
+                    "js/chat/mpenc.js",
                     "js/jquery-2.1.1.js",
                     "js/jquery-ui-1.11.2.js",
                     "js/jquery.checkboxes.js",

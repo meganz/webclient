@@ -102,19 +102,26 @@ MegaPromise.prototype.promise = function() {
  * Alias of .then
  *
  * @param res
- * @param rej
+ *     Function to be called on resolution of the promise.
+ * @param [rej]
+ *     Function to be called on rejection of the promise.
  * @returns {MegaPromise}
  */
 MegaPromise.prototype.then = function(res, rej) {
-    this._internalPromise.then(res, rej);
-    return this;
+    function _passthrough(value) {
+        return value;
+    }
+    res = res || _passthrough;
+    rer = rej || _passthrough;
+
+    return MegaPromise.asMegaPromiseProxy(this._internalPromise.then(res, rej));
 };
 
 /**
  * Alias of .done
  *
  * @param res
- * @param rej
+ * @param [rej]
  * @returns {MegaPromise}
  */
 MegaPromise.prototype.done = function(res, rej) {
@@ -170,6 +177,79 @@ MegaPromise.prototype.reject = function() {
 MegaPromise.prototype.always = function() {
     this._internalPromise.always.apply(this._internalPromise, toArray(arguments));
     return this;
+};
+
+/**
+ * Link the `targetPromise`'s state to the current promise. E.g. when targetPromise get resolved, the current promise
+ * will get resolved too with the same arguments passed to targetPromise.
+ *
+ * PS: This is a simple DSL-like helper to save us from duplicating code when using promises :)
+ *
+ * @param targetPromise
+ * @returns {MegaPromise} current promise, helpful for js call chaining
+ */
+MegaPromise.prototype.linkDoneTo = function(targetPromise) {
+    var self = this;
+    targetPromise.done(function() {
+        self.resolve.apply(self, arguments);
+    });
+
+    return self;
+};
+
+/**
+ * Link the `targetPromise`'s state to the current promise. E.g. when targetPromise get rejected, the current promise
+ * will get rejected too with the same arguments passed to targetPromise.
+ * PS: This is a simple DSL-like helper to save us from duplicating code when using promises :)
+ *
+ *
+ * @param targetPromise
+ * @returns {MegaPromise} current promise, helpful for js call chaining
+ */
+MegaPromise.prototype.linkFailTo = function(targetPromise) {
+    var self = this;
+    targetPromise.fail(function() {
+        self.reject.apply(self, arguments);
+    });
+
+    return self;
+};
+/**
+ * Link the `targetPromise`'s state to the current promise (both done and fail, see .linkDoneTo and .linkFailTo)
+ *
+ * PS: This is a simple DSL-like helper to save us from duplicating code when using promises :)
+ *
+ * @param targetPromise
+ * @returns {MegaPromise} current promise, helpful for js call chaining
+ */
+MegaPromise.prototype.linkDoneAndFailTo = function(targetPromise) {
+    var self = this;
+
+    self.linkDoneTo(targetPromise);
+    self.linkFailTo(targetPromise);
+
+    return self;
+};
+
+/**
+ * Development helper, that will dump the result/state change of this promise to the console
+ *
+ * @param [msg] {String} optional msg
+ * @returns {MegaPromise} current promise, helpful for js call chaining
+ */
+MegaPromise.prototype.dumpToConsole = function(msg) {
+    var self = this;
+
+    if (d) {
+        self.done(function () {
+            console.log("success: ", msg ? msg : arguments, !msg ? null : arguments);
+        });
+        self.fail(function () {
+            console.error("error: ", msg ? msg : arguments, !msg ? null : arguments);
+        });
+    }
+
+    return self;
 };
 
 /**

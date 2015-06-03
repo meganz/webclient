@@ -226,14 +226,15 @@ var crypt = (function () {
                 method = authring.AUTHENTICATION_METHOD.SIGNATURE_VERIFIED;
             }
             else {
-                var message = 'RSA pub key signature of ' + userhandle + ' is invalid!';
+                var message = 'RSA public key signature for ' + M.u[userhandle].m + ' is invalid!';
+                var instructions = 'Please ask your contact to get in touch with Mega Support.';
                 logger.error(message);
-                var instructions = 'Please, ask your contact to get in touch with Mega Support.';
+                
                 // TODO: This should probably be changed to something like mega.ui.CredentialsWarningDialog.
                 msgDialog('warningb',
                           'RSA Public Key Signature Verification Failed',
                           message + '<br/>' + instructions);
-                throw new Error('RSA pub key signature is invalid!');
+                throw new Error(message);
             }
         }
 

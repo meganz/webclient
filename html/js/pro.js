@@ -140,10 +140,20 @@ function populateMembershipPlans() {
         var dollars = price[0];
         var cents = price[1];
 
+        // Show only monthly prices in the boxes
         if (months === 1) {
+            
+            // Update the price in the boxes
             $('.reg-st3-membership-bl.pro' + accountLevel + ' .price .num').html(
                 dollars + '<span class="small">.' + cents + ' &euro;</span>'
             );
+    
+            // Copy the price in the left most item to the red box in the bottom middle of the page
+            if (i === 0) {
+                var $redStar = $('.pro-icons-block.star .pro-price-txt');
+                $redStar.find('.dollars').text(dollars);
+                $redStar.find('.cents').text(cents);
+            }
         }
     }
 }

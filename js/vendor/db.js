@@ -60,6 +60,9 @@
         });
 
         this.setUData = function( data, key ) {
+            if (!db.objectStoreNames.contains('__udata__')) {
+                return Promise.reject(DOMException.NOT_FOUND_ERR);
+            }
             return this.update('__udata__', {
                 k: key || '__gbl',
                 v: data
@@ -67,9 +70,19 @@
         };
 
         this.getUData = function( key ) {
-            var promise = this.query('__udata__').filter('k', key || '__gbl').execute();
+            var promise;
 
             return new Promise(function(resolve, reject) {
+                try {
+                    promise = that.query('__udata__')
+                        .filter('k', key || '__gbl').execute();
+                }
+                catch(e) {
+                    if (e.code === DOMException.NOT_FOUND_ERR) {
+                        e = new DOMException(e.message, "VersionError");
+                    }
+                    return reject({'reason': e });
+                }
                 promise.then(function(results) {
                     resolve(results && results.length === 1 && results[0].v);
                 }, reject);

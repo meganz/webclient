@@ -66,9 +66,6 @@ function MegaDBEncryption(mdbInstance) {
                 promise.reject(err);
             });
 
-        // We no longer need this
-        delete this.setup;
-
         return promise;
     };
 

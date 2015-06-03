@@ -117,6 +117,7 @@ function init_pro()
             $selectedPlanHeader.html(selectedPlanText);
             
             pro_next_step();
+            return false;
         });
 
         $('.pro-bottom-button').unbind('click');

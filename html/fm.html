@@ -108,6 +108,14 @@
             <!-- Please add "filled" classname if user have deleted items !-->
             <div class="nw-fm-left-icon rubbish-bin"><div class="nw-fm-left-border"></div><div class="nw-fm-left-tooltip">[$168]</div><div class="rubbish-bin-icon"></div></div>
             <div class="nw-fm-left-icon settings"><div class="nw-fm-left-border"></div><div class="nw-fm-left-tooltip">[$569]</div><div class="settings-icon"></div></div>
+            <div class="nw-fm-left-icon transfers file-transfer-icon download-percents-0 upload-percents-0">
+            	<div class="nw-fm-left-border"></div>
+                <div class="nw-fm-left-tooltip">[$104]</div>
+                <div class="file-transfer-download">
+                    <div class="file-transfer-upload"></div>
+                </div>
+            </div>
+            
         </div>
 
         <div class="new-notifications-bg"></div>
@@ -130,7 +138,7 @@
                 <div class="nw-fm-left-border"></div>
                 <div class="nw-fm-left-tooltip">[$1687]</div>
             </div>
-            <div class="nw-fm-left-icon inbox active">
+            <div class="nw-fm-left-icon inbox">
                 <div class="nw-fm-left-border"></div>
                 <div class="nw-fm-left-tooltip">[$949]</div>
             </div>
@@ -151,6 +159,16 @@
             <!-- Please add "filled" classname if user have deleted items !-->
             <div class="nw-fm-left-icon rubbish-bin"><div class="nw-fm-left-border"></div><div class="nw-fm-left-tooltip">[$168]</div><div class="rubbish-bin-icon"></div></div>
             <div class="nw-fm-left-icon settings"><div class="nw-fm-left-border"></div><div class="nw-fm-left-tooltip">[$569]</div><div class="settings-icon"></div></div>
+            <div class="nw-fm-left-icon transfers">
+            	<div class="nw-fm-left-border"></div>
+                <div class="nw-fm-left-tooltip">[$104]</div>
+            	<div class="file-transfer-icon download-percents-0 upload-percents-0">
+                    <div class="file-transfer-download">
+                        <div class="file-transfer-upload"></div>
+                    </div>
+                </div>
+            </div>
+            
         </div>
 
         <div class="fm-left-panel">
@@ -845,7 +863,6 @@
                 </div>
             </div>
 
-
             <div class="shared-blocks-view hidden">
                 <div class="shared-blocks-scrolling">
                 </div>
@@ -946,10 +963,42 @@
 
                 <div class="fm-blocks-view contact-details-view hidden">
                     <div class="file-block-scrolling">
-                    </div></div></div>
+                    </div>
+                </div></div>
         </div>
 
-
+        <div class="fm-transfers-block">
+             <div class="fm-tranfers-header">
+            
+             </div>
+             <div class="tranfer-table">
+                <div class="transfer-panel-empty-txt">[$5672]</div>
+                <table width="100%" border="0" cellspacing="0" cellpadding="0" class="transfer-table-header">
+                    <tr>
+                        <th>#</th>
+                        <th>[$86]</th>
+                        <th >[$88]</th>
+                        <th>ETA</th>
+                        <th>[$87]</th>
+                        <th>[$89]</th>
+                        <th class="grid-url-header"></th>
+                    </tr>
+                </table>
+                <div class="transfer-scrolling-table">
+                    <table width="100%" height="100%" border="0" cellspacing="0" cellpadding="0" class="transfer-table">
+                        <tr class="clone-of-header">
+                            <th width="50"></th>
+                            <th></th>
+                            <th width="300"></th>
+                            <th width="110"></th>
+                            <th width="100"></th>
+                            <th width="300"></th>
+                            <th width="42" class="grid-url-field"></th>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
 
 
         <div class="fm-right-account-block">
@@ -1492,14 +1541,7 @@
 
     </div>
     <div class="transfer-panel">
-        <div class="transfer-drag-handle"></div>
         <div class="transfer-icons-block">
-            <!-- Please add "download-percents-0"-"download-percents-100" and "upload-percents-0"-"download-percents-100" !-->
-            <div class="file-transfer-icon download-percents-0 upload-percents-0">
-                <div class="file-transfer-download">
-                    <div class="file-transfer-upload"></div>
-                </div>
-            </div>
             <div class="transfer-panel-title">
                 [$104]
             </div>
@@ -1515,33 +1557,7 @@
             <a class="transfer-pause-icon hidden"></a>
             <div class="clear"></div>
         </div>
-        <div class="tranfer-table">
-            <div class="transfer-panel-empty-txt">[$5672]</div>
-            <table width="100%" border="0" cellspacing="0" cellpadding="0" class="transfer-table-header">
-                <tr>
-                    <th>#</th>
-                    <th>[$86]</th>
-                    <th>[$88]</th>
-                    <th>ETA</th>
-                    <th>[$87]</th>
-                    <th>[$89]</th>
-                    <th class="grid-url-header"></th>
-                </tr>
-            </table>
-            <div class="transfer-scrolling-table">
-                <table width="100%" height="100%" border="0" cellspacing="0" cellpadding="0" class="transfer-table">
-                    <tr class="clone-of-header">
-                        <th width="50"></th>
-                        <th></th>
-                        <th width="300"></th>
-                        <th width="110"></th>
-                        <th width="100"></th>
-                        <th width="300"></th>
-                        <th width="42" class="grid-url-field"></th>
-                    </tr>
-                </table>
-            </div>
-        </div>
+       
     </div>
 </div>
 

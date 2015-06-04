@@ -4446,22 +4446,8 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .nw-conversations-item.selected .nw-conversations-name, .nw-conversations-item:hover .nw-conversations-name, .fm-tree-panel .nw-contact-item:hover .nw-contact-name, .fm-tree-panel .nw-contact-item.selected .nw-contact-name {
 	color: white;
 }
-.file-transfer-icon {
-	height: 48px;
-	width: 48px;
-	position: absolute;
-	left: 1px;
-	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
-	background-repeat: no-repeat;
-	background-position: center -581px;
-	cursor: pointer;
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	box-sizing: border-box;
-	padding: 4px 0 0 4px;
-}
-.file-transfer-icon:hover {
-	background-position: center -651px;
+.file-transfer-download {
+	margin:4px 0 0 5px;
 }
 .file-transfer-download, .file-transfer-upload {
 	height: 40px;
@@ -5074,9 +5060,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 }
 .fm-main {
 	height: 100%;
-	height: -webkit-calc(100% -96px);
-	height: -moz-calc(100% - 96px);
-	height: calc(100% - 96px);
+	height: -webkit-calc(100% -48px);
+	height: -moz-calc(100% - 48px);
+	height: calc(100% - 48px);
 	overflow: hidden;
 }
 .fm-left-panel {
@@ -5279,6 +5265,15 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	background-position: 0 -9754px;
 	display: none;
 }
+.nw-fm-left-icon.transfers {
+	position: absolute;
+	left: 0;
+	bottom:0;
+	background-position: center -581px;
+}
+.nw-fm-left-icon.transfers:hover, .nw-fm-left-icon.transfers.active {
+	background-position: center -651px;
+}
 .nw-fm-left-icon.inbox {
 	background-position: 0 -9702px;
 }
@@ -5344,6 +5339,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 .nw-fm-left-icon.shared-with-me.active .nw-fm-left-border {
 	border-color: rgba(255,211,0,1);
 }
+.nw-fm-left-icon.transfers.active .nw-fm-left-border {
+	border-color: #61D2FF;
+}
 .nw-fm-left-icon.inbox.active .nw-fm-left-border {
 	border-color: rgba(255,165,0,1);
 }
@@ -5375,12 +5373,12 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	height: 48px;
 	width: 48px;
 	position: absolute;
-	bottom: 48px;
+	bottom: 96px;
 	cursor: pointer;
 	background-image: none;
 }
 .nw-fm-left-icon.settings {
-	bottom: 0;
+	bottom: 48px;
 }
 .not-logged .top-search-bl, .not-logged .cloud-popup-icon, .not-logged .fm-add-user, .not-logged .nw-fm-left-icon.rubbish-bin {
 	display: none !important;
@@ -6854,9 +6852,11 @@ table {
 	padding: 0;
 }
 .tranfer-table {
-	display: none;
 	position: relative;
 	background-color: white;
+	height: -webkit-calc(100% - 48px);
+	height: -moz-calc(100% - 48px);
+	height: calc(100% - 48px);
 }
 .transfer-panel-opened .tranfer-table {
 	display: block;
@@ -6867,10 +6867,10 @@ table {
 .fm-right-files-block, .fm-right-account-block {
 	height: 100%;
 }
-.fm-right-header {
+.fm-right-header, .fm-tranfers-header {
 	padding-right: 8px;
 }
-.fm-right-header, .new-notification-top {
+.fm-right-header, .new-notification-top, .fm-tranfers-header {
 	height: 48px;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
@@ -23116,6 +23116,17 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 body.pro:after {
 	display: none;
 	content: url(../images/mega/payment-animation.gif);
+}
+.fm-transfers-block {
+	height:100%;
+	display:none;
+	margin-left:48px;
+}
+.transfer-panel-opened .fm-transfers-block {
+	display: block;
+}
+.transfer-panel-opened .fm-left-panel, .transfer-panel-opened .fm-right-files-block {
+	display:none;
 }
  @media only screen and (max-width: 1593px) {
 .download-mid-centered-block {

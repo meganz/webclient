@@ -584,20 +584,6 @@ function initializeTreePanelSorting()
     });
 }
 
-/**
- *    Set the right drag icon to the transfer panel
- */
-function tpDragCursor() {
-    var h = $('.transfer-panel').height()
-    if (h >= $.transferPaneResizable.options.maxHeight) {
-        $('.transfer-drag-handle').css('cursor', 's-resize')
-    } else if (h <= $.transferPaneResizable.options.minHeight) {
-        $('.transfer-drag-handle').css('cursor', 'n-resize')
-    } else {
-        $('.transfer-drag-handle').css('cursor', 'ns-resize')
-    }
-}
-
 function initUI() {
     $('.not-logged .fm-not-logged-button.create-account').rebind('click', function()
     {
@@ -675,10 +661,10 @@ function initUI() {
                         t = M.RootID;
                     else if (c.indexOf('rubbish-bin') > -1)
                         t = M.RubbishID;
+					else if (c.indexOf('transfers') > -1)
+                        dd = 'download';
                 }
             }
-            else if (c && c.indexOf('transfer-panel') > -1)
-                dd = 'download';
             else if (c && c.indexOf('nw-fm-tree-item') > -1 && !$(e.target).visible(!0))
                 dd = 'download';
             else
@@ -1078,31 +1064,6 @@ function initUI() {
         setTimeout(browserDialog, 2000);
     }
 
-    $.transferPaneResizable = new FMResizablePane($('.transfer-panel'), {
-        'direction': 'n',
-        'minHeight': 96,
-        'maxHeight': 312,
-        'persistanceKey': 'transferPaneHeight',
-        'handle': '.transfer-drag-handle'
-    });
-
-    $($.transferPaneResizable).on('resize', function(e, resize_event, ui)
-    {
-        if ($('#fmholder.transfer-panel-opened').size() == 0)
-        {
-            $.transferOpen(undefined, true);
-            $.transferHeader();
-        }
-        tpDragCursor();
-    });
-
-    $($.transferPaneResizable).on('resizestop', function(e, resize_event, ui) {
-        if ($.transferPaneResizable.options.minHeight >= ui.size.height) {
-            $.transferOpen();
-            $.transferHeader();
-        }
-    });
-
     var lPane = $('.fm-left-panel')
     $.leftPaneResizable = new FMResizablePane(lPane, {
         'direction': 'e',
@@ -1182,12 +1143,7 @@ function transferPanelContextMenu(target)
 function openTransferpanel()
 {
     $.transferOpen(1);
-    if (M.currentdirid == 'notifications')
-        notifyPopup.initNotificationsScrolling();
-    else if (M.viewmode)
-        initFileblocksScrolling();
-    else
-        initGridScrolling();
+   
     if (!uldl_hold)
         ulQueue.resume();
     else// make sure that terms of service are accepted before any action
@@ -1197,13 +1153,12 @@ function openTransferpanel()
         ulQueue.pause();
         ui_paused = true;
 
-//        $('.transfer-table tr td:eq(4), .transfer-table tr td:eq(6)').each(function()
-//        {
-//            $(this).text('');
-//        });
+        $('.transfer-table tr td:eq(4), .transfer-table tr td:eq(6)').each(function()
+        {
+            $(this).text('');
+        });
     }
-    initTreeScroll();
-    $(window).trigger('resize');
+    
 
     if ($('table.transfer-table tr').length > 1) {
         $('.transfer-clear-all-icon').removeClass('hidden');
@@ -2688,6 +2643,7 @@ function accountUI()
     $('.fm-account-button').removeClass('active');
     $('.fm-account-sections').addClass('hidden');
     $('.fm-right-files-block').addClass('hidden');
+	$('.fmholder').removeClass('transfer-panel-opened');
     $('.fm-right-account-block').removeClass('hidden');
     $('.nw-fm-left-icon.settings').addClass('active');
     M.accountData(function(account)
@@ -4575,7 +4531,7 @@ function UIkeyevents()
             s = $('.file-block.ui-selected');
         else
             s = $('.grid-table tr.ui-selected');
-        selPanel = $('.transfer-panel tr.ui-selected').not('.clone-of-header')
+        selPanel = $('.fm-transfers-block tr.ui-selected').not('.clone-of-header')
 
         if (M.chat)
             return true;
@@ -5273,80 +5229,35 @@ function transferPanelUI()
             previewsrc(previews[slideshowid].src);
     });
 
-    $('.tranfer-view-icon,.file-transfer-icon').unbind('click');
-    $('.tranfer-view-icon,.file-transfer-icon').bind('click', function(e)
+    $('.transfers .nw-fm-left-border').unbind('click');
+    $('.transfers .nw-fm-left-border').bind('click', function(e)
     {
         $.transferOpen();
     });
 
     $.transferClose = function() {
-
-        var panel = $('.transfer-panel');
-        $('.transfer-drag-handle').css('cursor', 'n-resize');
-
-        panel.animate({'height': $('.transfer-panel-title').height()}, {
-            complete: function() {
-                $('.tranfer-view-icon').removeClass('active');
-                $('#fmholder').removeClass('transfer-panel-opened');
-                $(window).trigger('resize');
-            },
-            progress: fm_resize_handler
-        });
+        $('.nw-fm-left-icon.transfers').removeClass('active');
+		$('.fmholder').removeClass('transfer-panel-opened');
+		
+		$(window).trigger('resize');
+		
     };
 
-    $.transferOpen = function(force, dont_animate)
+    $.transferOpen = function(force)
     {
-        if ($('.tranfer-view-icon').attr('class').indexOf('active') == -1 || force)
+        if ($('.nw-fm-left-icon.transfers').attr('class').indexOf('active') == -1 || force)
         {
-            $('.tranfer-view-icon').addClass('active');
-            $('#fmholder').addClass('transfer-panel-opened');
-
-            // Initialise the functionality within the transfers pane
-            $.transferHeader();
-
-            // If the user has previously resized the transfer panel
-            var height = 192;
-            if (localStorage.transferPaneHeight && $.transferPaneResizable) {
-
-                // Load the previously configured panel height
-                height = Math.max($.transferPaneResizable.options.minHeight, localStorage.transferPaneHeight);
-            }
-
-            var panel = $('.transfer-panel');
-
-            if (dont_animate) {
-                panel.css({'height': height});
-                return fm_resize_handler();
-            }
-
-            panel.animate({'height': height}, {
-                complete: function() {
-                    tpDragCursor();
-                    $.transferHeader();
-                    $(window).trigger('resize');
-                },
-                progress: fm_resize_handler
-            });
+			
+			$('.nw-fm-left-icon').removeClass('active');
+            $('.nw-fm-left-icon.transfers').addClass('active');
+			notificationsUI(1);
+			$('#fmholder').addClass('transfer-panel-opened');
         }
         else {
-            // Close the File Transfers Pane
             $.transferClose();
         }
-
-        initTreeScroll();
-
-        if (M.currentdirid === 'notifications') {
-            notifyPopup.initNotificationsScrolling();
-        }
-        else if (M.currentdirid && M.currentdirid.substr(0, 7) === 'account') {
-            initAccountScroll();
-        }
-        else if (M.viewmode == 1) {
-            initFileblocksScrolling();
-        }
-        else {
-            initGridScrolling();
-        }
+		
+        
     };
 
     $('.nw-fm-left-icon.settings .settings-icon').unbind('click');
@@ -5368,7 +5279,7 @@ function transferPanelUI()
             DownloadManager.abort(null);
             UploadManager.abort(null);
 
-            $('.transfer-table tr').not('.clone-of-header').fadeOut(function() {
+            $('.fm-transfers-block tr').not('.clone-of-header').fadeOut(function() {
                 $(this).remove();
             });
         });
@@ -5395,7 +5306,7 @@ function transferPanelUI()
 
             $('.tranfer-download-indicator,.tranfer-upload-indicator')
                 .removeClass('active');
-            $('.transfer-panel tr span.transfer-type').removeClass('paused');
+            $('.fm-transfers-block tr span.transfer-type').removeClass('paused');
         }
         else
         {
@@ -5405,7 +5316,7 @@ function transferPanelUI()
             ui_paused = true;
             uldl_hold = true;
 
-            $('.transfer-panel tr span.transfer-type').addClass('paused');
+            $('.transfer-table tr span.transfer-type').addClass('paused');
 
             $('.tranfer-download-indicator,.tranfer-upload-indicator')
                 .text('PAUSED');
@@ -5897,7 +5808,7 @@ function treeUI()
             }
         });
 
-    $('.fm-tree-panel .nw-fm-tree-item, .rubbish-bin, .fm-breadcrumbs, .transfer-panel, .nw-fm-left-icons-panel .nw-fm-left-icon, .shared-with-me tr, .nw-conversations-item').droppable(
+    $('.fm-tree-panel .nw-fm-tree-item, .rubbish-bin, .fm-breadcrumbs, .nw-fm-left-icons-panel .nw-fm-left-icon, .shared-with-me tr, .nw-conversations-item').droppable(
         {
             tolerance: 'pointer',
             drop: function(e, ui)
@@ -6005,6 +5916,7 @@ function sectionUIopen(id) {
 
     $('.nw-fm-left-icon').removeClass('active');
     $('.content-panel').removeClass('active');
+	$('#fmholder').removeClass('transfer-panel-opened');
 
     if (id === 'opc' || id === 'ipc') {
         tmpId = 'contacts';
@@ -9290,9 +9202,7 @@ function savecomplete(id)
 function fm_resize_handler() {
     // transfer panel resize logic
     var right_pane_height = (
-        $('#fmholder').outerHeight() - (
-        $('#topmenu').outerHeight() + $('.transfer-panel').outerHeight()
-        )
+        $('#fmholder').outerHeight() - $('#topmenu').outerHeight() 
         );
 
     $('.fm-main.default, .fm-main.notifications').css({
@@ -9301,9 +9211,7 @@ function fm_resize_handler() {
 
     $('.transfer-scrolling-table').css({
         'height': (
-            $('.transfer-panel').outerHeight() - (
-            $('.transfer-panel-title').outerHeight() + $('.transfer-table-header').outerHeight()
-            )
+            $('.fm-transfers-block').outerHeight() -  $('.transfer-table-header').outerHeight()
             ) + "px"
     });
 
@@ -9359,15 +9267,6 @@ function fm_resize_handler() {
             'height': shared_block_height + "px",
             'min-height': shared_block_height + "px"
         });
-
-    // account page tweak, required since the transfer panel resize logic was introduced
-    var $account_save_block = $('.fm-account-save-block');
-    if ($('.transfer-panel').size() > 0) {
-        $account_save_block.css({
-            'top': $('.transfer-panel').position().top - $account_save_block.outerHeight(),
-            'bottom': ''
-        });
-    }
 
 }
 

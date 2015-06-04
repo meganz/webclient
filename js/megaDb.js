@@ -80,7 +80,7 @@ function MegaDB(name, suffix, schema, options) {
     function __dbOpen() {
         dbOpenOptions.version = version;
 
-        self.logger.info('Opening DB', version, dbOpenOptions);
+        self.logger.debug('Opening DB', version, dbOpenOptions);
 
         self._dbOpenPromise = db.open(dbOpenOptions).then( function( s ) {
 
@@ -92,7 +92,7 @@ function MegaDB(name, suffix, schema, options) {
             if (pluginSetupPromises.length) {
                 MegaPromise.all(pluginSetupPromises)
                     .then(function() {
-                        self.logger.info('MegaDB PlugIn(s) intialization succeed.', arguments);
+                        self.logger.debug('MegaDB PlugIn(s) intialization succeed.', arguments);
                         __dbOpenSucceed(s);
                     }, function(err) {
                         s.close();

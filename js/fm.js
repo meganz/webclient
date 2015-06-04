@@ -3669,6 +3669,7 @@ function accountUI()
                     delete avatars[u_handle];
                     $('.fm-account-avatar img').attr('src', staticpath + 'images/mega/default-avatar.png');
                     $('.fm-avatar img').attr('src', staticpath + 'images/mega/default-top-avatar.png');
+                    $('.fm-account-remove-avatar').hide();
                 }
             });
         });
@@ -3678,10 +3679,12 @@ function accountUI()
         {
             avatarDialog();
         });
-        if (avatars[u_handle])
+        if (avatars[u_handle]) {
             $('.fm-account-avatar img').attr('src', avatars[u_handle].url);
-        else
+        } else {
             $('.fm-account-avatar img').attr('src', staticpath + 'images/mega/default-avatar.png');
+            $('.fm-account-remove-avatar').hide();
+        }
 
         $(window).unbind('resize.account');
         $(window).bind('resize.account', function()
@@ -3873,6 +3876,7 @@ function avatarDialog(close)
                     }
                 $('.fm-account-avatar img').attr('src', avatars[u_handle].url);
                 $('.fm-avatar img').attr('src', avatars[u_handle].url);
+                $('.fm-account-remove-avatar').show();
                 avatarDialog(1);
             },
             onImageUpload: function()

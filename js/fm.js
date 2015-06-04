@@ -3667,10 +3667,7 @@ function accountUI()
         {
             avatarDialog();
         });
-        if (avatars[u_handle])
-            $('.fm-account-avatar img').attr('src', avatars[u_handle].url);
-        else
-            $('.fm-account-avatar img').attr('src', staticpath + 'images/mega/default-avatar.png');
+        $('.fm-account-avatar img').attr('src', UserAvatar.mine())
 
         $(window).unbind('resize.account');
         $(window).bind('resize.account', function()
@@ -3860,8 +3857,8 @@ function avatarDialog(close)
                         data: blob,
                         url: myURL.createObjectURL(blob)
                     }
-                $('.fm-account-avatar img').attr('src', avatars[u_handle].url);
-                $('.fm-avatar img').attr('src', avatars[u_handle].url);
+                $('.fm-account-avatar img').attr('src', UserAvatar.mine())
+                $('.fm-avatar img').attr('src', UserAvatar.top());
                 avatarDialog(1);
             },
             onImageUpload: function()

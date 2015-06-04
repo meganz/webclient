@@ -993,6 +993,9 @@ function initUI() {
         if (!clickedClass) {
             return;
         }
+		if ($('.nw-fm-left-icon.transfers').hasClass('active')) {
+			$(this).addClass('active');
+		}
         if (!fmTabState || fmTabState['cloud-drive'].root !== M.RootID) {
             fmTabState = {
                 'cloud-drive':    { root: M.RootID,    prev: null },
@@ -2643,7 +2646,6 @@ function accountUI()
     $('.fm-account-button').removeClass('active');
     $('.fm-account-sections').addClass('hidden');
     $('.fm-right-files-block').addClass('hidden');
-	$('.fmholder').removeClass('transfer-panel-opened');
     $('.fm-right-account-block').removeClass('hidden');
     $('.nw-fm-left-icon.settings').addClass('active');
     M.accountData(function(account)
@@ -5229,35 +5231,30 @@ function transferPanelUI()
             previewsrc(previews[slideshowid].src);
     });
 
-    $('.transfers .nw-fm-left-border').unbind('click');
-    $('.transfers .nw-fm-left-border').bind('click', function(e)
+    $('.file-transfer-icon').unbind('click');
+    $('.file-transfer-icon').bind('click', function(e)
     {
         $.transferOpen();
     });
 
     $.transferClose = function() {
         $('.nw-fm-left-icon.transfers').removeClass('active');
-		$('.fmholder').removeClass('transfer-panel-opened');
-		
-		$(window).trigger('resize');
-		
+	    $('.fmholder').removeClass('transfer-panel-opened');
+	    $(window).trigger('resize');
     };
 
     $.transferOpen = function(force)
     {
         if ($('.nw-fm-left-icon.transfers').attr('class').indexOf('active') == -1 || force)
         {
-			
-			$('.nw-fm-left-icon').removeClass('active');
+		    $('.nw-fm-left-icon').removeClass('active');
             $('.nw-fm-left-icon.transfers').addClass('active');
-			notificationsUI(1);
-			$('#fmholder').addClass('transfer-panel-opened');
+		    notificationsUI(1);
+		    $('#fmholder').addClass('transfer-panel-opened');
         }
         else {
             $.transferClose();
         }
-		
-        
     };
 
     $('.nw-fm-left-icon.settings .settings-icon').unbind('click');
@@ -5267,6 +5264,7 @@ function transferPanelUI()
             ephemeralDialog('Transfer settings are for registered users only.');
         else {
             $('.nw-fm-left-icon').removeClass('active');
+			$('.nw-fm-left-icon.settings').addClass('active');
             document.location.hash = 'fm/account/settings';
         }
     });
@@ -5916,7 +5914,6 @@ function sectionUIopen(id) {
 
     $('.nw-fm-left-icon').removeClass('active');
     $('.content-panel').removeClass('active');
-	$('#fmholder').removeClass('transfer-panel-opened');
 
     if (id === 'opc' || id === 'ipc') {
         tmpId = 'contacts';

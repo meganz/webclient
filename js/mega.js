@@ -1385,6 +1385,10 @@ function MegaData()
 
     this.openFolder = function(id, force, chat) {
         $('.fm-right-account-block').addClass('hidden');
+		if ($('.nw-fm-left-icon.transfers').hasClass('active')) {
+			$('.fmholder').removeClass('transfer-panel-opened');
+			$('.nw-fm-left-icon.transfers').removeClass('active');
+		}
         $('.fm-files-view-icon').removeClass('hidden');
 
         if (d) {

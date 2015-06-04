@@ -4447,7 +4447,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	color: white;
 }
 .file-transfer-download {
-	margin:4px 0 0 5px;
+	margin:4px 0 0 4px;
 }
 .file-transfer-download, .file-transfer-upload {
 	height: 40px;
@@ -5106,7 +5106,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	float: left;
 	height: 100%;
 	position: relative;
-	min-height: 288px;
+	min-height: 398px;
 }
 .nw-fm-tree-header {
 	position: relative;
@@ -5274,6 +5274,17 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 .nw-fm-left-icon.transfers:hover, .nw-fm-left-icon.transfers.active {
 	background-position: center -651px;
 }
+.file-transfer-icon {
+	height:48px;
+	width:47px;
+	left:1px;
+	position:absolute;
+	border-left:1px solid transparent;
+	  -moz-transition: border-color 300ms ease-in-out;
+  -o-transition: border-color 300ms ease-in-out;
+  -ms-transition: border-color 300ms ease-in-out;
+  transition: border-color 300ms ease-in-out;
+}
 .nw-fm-left-icon.inbox {
 	background-position: 0 -9702px;
 }
@@ -5340,7 +5351,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	border-color: rgba(255,211,0,1);
 }
 .nw-fm-left-icon.transfers.active .nw-fm-left-border {
-	border-color: #61D2FF;
+	border-left: 1px solid #13E03C;
+}
+.nw-fm-left-icon.transfers.active .file-transfer-icon {
+	border-left: 1px solid #61D2FF;
 }
 .nw-fm-left-icon.inbox.active .nw-fm-left-border {
 	border-color: rgba(255,165,0,1);
@@ -7599,13 +7613,17 @@ table {
 	background-image: url(../images/mega/empty.png);
 	background-repeat: no-repeat;
 }
-.fm-empty-cloud-bg, .fm-empty-folder-bg, .fm-empty-conversations-bg, .fm-empty-incoming-bg, .fm-empty-contacts-bg, .fm-invalid-folder-bg, .fm-empty-folder-link-bg, .fm-empty-trashbin-bg {
-	background-image: url(../images/mega/empty-sprite_v2.svg);
+.fm-empty-cloud-bg, .fm-empty-folder-bg, .fm-empty-conversations-bg, .fm-empty-incoming-bg, .fm-empty-contacts-bg, .fm-invalid-folder-bg, .fm-empty-folder-link-bg, .fm-empty-trashbin-bg, .fm-empty-transfers-bg {
+	background-image: url(../images/mega/empty-sprite_v3.svg);
 	background-repeat: no-repeat;
 }
 .fm-empty-cloud-bg {
 	height: 202px;
 	background-position: center -286px;
+}
+.fm-empty-transfers-bg {
+	height: 253px;
+  background-position: center -857px;
 }
 .fm-empty-search-bg {
 	height: 249px;
@@ -7699,11 +7717,7 @@ table {
 	text-align: center;
 	width: 100%;
 	top: 50%;
-	color: #7A7E7F;
-	font-size: 18px;
-	line-height: 38px;
-	height: 40px;
-	margin-top: -8px;
+	margin-top: -162px;
 }
 .ui-selectable-helper {
 	position: absolute;
@@ -13109,11 +13123,15 @@ table {
 }
 .fm-account-save-block {
 	position: absolute;
-	bottom: 25px;
+	bottom: 0;
 	width: 100%;
+  width: -webkit-calc(100% - 48px);
+  width: -moz-calc(100% - 48px);
+  width: calc(100% - 48px);
+  -webkit-box-sizing: border-box;
 	background-color: rgba(0,0,0,0.85);
 	height: 50px;
-	left: 0;
+	left: 48px;
 	z-index: 1000;
 }
 .fm-account-cancel {

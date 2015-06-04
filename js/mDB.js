@@ -158,7 +158,7 @@ mStorageDB.prototype = {
         if (t) {
             this.db.query(t)
                 .execute()
-                .done(function _fetchDone(results) {
+                .then(function _fetchDone(results) {
                     if (d) console.log('msdb fetch done', t, results);
 
                     if (results.length) {
@@ -175,7 +175,7 @@ mStorageDB.prototype = {
                         }
                     }
                     self.fetch(aTables, aPromise);
-                }).fail(function _fetchFail() {
+                }, function _fetchFail() {
                     if (d) console.log('msdb fetch failed', t);
                     aPromise.reject.apply(aPromise, arguments);
                 });
@@ -276,7 +276,14 @@ var mFileManagerDB = {
                     mDB = this;
                     if (localStorage[u_handle + '_maxaction']) {
                         if (d) console.time('fmdb');
-                        mFileManagerDB.fetch(Object.keys(mFileManagerDB.schema));
+
+                        mFileManagerDB.fetch([
+                            'f', /* <- f should ALWAYS be first! */
+                            'u',
+                            's',
+                            'ok'
+                        ]);
+
                     } else {
                         mFileManagerDB._loadfm(this);
                     }
@@ -310,7 +317,7 @@ var mFileManagerDB = {
         if (t) {
             this.db.query(t)
                 .execute()
-                .done(function _fetchDone(results) {
+                .then(function _fetchDone(results) {
                     if (d) console.log('fmdb fetch done', t, results);
 
                     if (!results.length) {
@@ -352,7 +359,7 @@ var mFileManagerDB = {
                         }
                         mFileManagerDB.fetch(aTables);
                     }
-                }).fail(function _fetchFail() {
+                }, function _fetchFail() {
                     if (d) console.log('fmdb fetch failed', t);
 
                     if (mFileManagerDB.slave) {
@@ -391,13 +398,16 @@ var mFileManagerDB = {
     },
 
     query: function mFileManagerDB_query(aCommand, aTable, aData) {
-        if (this.schema[aTable]) {
+        if (!this.db) {
+            throw new Error("No database connection.");
+        }
+        else if (this.schema[aTable]) {
+            var u_handle = this.db.suffix, promise;
             var l = (+localStorage['fmdblock_' + u_handle] | 0) + 1;
             localStorage['fmdblock_' + u_handle] = l;
 
             if (d) console.log('fmdb query', aCommand, aTable, aData, l);
 
-            var promise;
             if (aCommand === 'add') {
                 promise = this.db.server.update(aTable, aData);
             } else {
@@ -414,13 +424,61 @@ var mFileManagerDB = {
         }
     },
 
+    exec: function mFileManagerDB_exec(aFunc) {
+        var db = this.db, promise = new MegaPromise();
+
+        if (d) console.log('mFileManagerDB.exec', aFunc, db);
+
+        if (db && db.dbState !== MegaDB.DB_STATE.CLOSED) {
+            var u_handle = db.suffix;
+
+            if (typeof db[aFunc] === 'function') {
+                var expunge = aFunc === 'drop' || aFunc === 'close';
+
+                try {
+                    db[aFunc]()
+                        .done(function() {
+                            promise.resolve();
+                        }).fail(function(e) {
+                            if (expunge) {
+                                localStorage['fmdblock_' + u_handle] = 0xDEAD;
+                            }
+                            promise.reject(e);
+                        });
+                } catch(e) {
+                    promise.reject(e);
+                }
+
+                if (expunge) {
+                    this.state = this.STATE_WAITING;
+                    delete this.db;
+
+                    if (mFileManagerDB.addQueueTimer) {
+                        clearTimeout(mFileManagerDB.addQueueTimer);
+                        delete mFileManagerDB.addQueue;
+                        delete mFileManagerDB.addQueueTimer;
+                        localStorage['fmdblock_' + u_handle] = 0xBADF;
+                    }
+                }
+            }
+            else {
+                promise.reject('INVALID');
+            }
+        }
+        else {
+            promise.reject('CLOSED');
+        }
+
+        return promise;
+    },
+
     reload: function mFileManagerDB_reload() {
         if (this.db) {
             this.db.drop()
-                .done(function _dropDone() {
+                .then(function _dropDone() {
                     if (d) console.log('fmdb dropped');
                     mFileManagerDB._restart();
-                }).fail(function _dropFail() {
+                }, function _dropFail() {
                     if (d) console.log('fmdb drop failed');
                     mFileManagerDB._loadfm();
                 });
@@ -476,9 +534,15 @@ function mDBstart(aSlave) {
             break;
         case mFileManagerDB.STATE_WAITING:
             mFileManagerDB.init();
+        case mFileManagerDB.STATE_READY:
         case mFileManagerDB.STATE_WORKING:
-            if (!aSlave && is_fm()) {
-                loadingDialog.show();
+            if (!aSlave) {
+                if (loadfm.loaded) {
+                    loadfm();
+                }
+                else if (is_fm()) {
+                    loadingDialog.show();
+                }
             }
             break;
         case mFileManagerDB.STATE_FAILED:
@@ -531,8 +595,8 @@ function mDBreload() {
 }
 
 function mDBcls() {
-    if (typeof mDB === 'object' && mDB.close && mDB.dbState !== MegaDB.DB_STATE.CLOSED) {
-        mDB.close();
+    if (typeof mDB === 'object' && mDB.close) {
+        mFileManagerDB.exec('close');
     }
     mDB = indexedDB ? 0x9e : undefined;
 }

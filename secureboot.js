@@ -75,7 +75,7 @@ if (!b_u) try
 
         loadSubScript('chrome://mega/content/strg5.js');
 
-        if(!(localStorage instanceof Ci.nsIDOMStorage)) {
+        if (!(localStorage instanceof Ci.nsIDOMStorage)) {
             throw new Error('Invalid DOM Storage instance.');
         }
         d = !!localStorage.d;
@@ -552,6 +552,10 @@ function init_storage ( storage ) {
     return storage;
 }
 
+function getxhr() {
+    return (typeof XDomainRequest !== 'undefined' && typeof ArrayBuffer === 'undefined') ? new XDomainRequest() : new XMLHttpRequest();
+}
+
 var androidsplash = false;
 var m = false;
 var seqno = Math.ceil(Math.random()*1000000000);
@@ -695,7 +699,7 @@ else if (!b_u)
         var timers = {};
         c.time = function(n) { timers[n] = new Date().getTime()};
         c.timeEnd = function(n) {
-            if(timers[n]) {
+            if (timers[n]) {
                 c.log(n + ': ' + (new Date().getTime() - timers[n]) + 'ms');
                 delete timers[n];
             }
@@ -725,6 +729,18 @@ else if (!b_u)
                 f : mTrim('' + url), l : ln
             }, cc, sbid = +(''+(document.querySelector('script[src*="secureboot"]')||{}).src).split('=').pop()|0;
 
+            if (~dump.m.indexOf('[[:i]]')) {
+                return false;
+            }
+
+            if (~dump.m.indexOf("\n")) {
+                var lns = dump.m.split(/\r?\n/).map(String.trim).filter(String);
+
+                if (lns.length > 6) {
+                    dump.m = [].concat(lns.slice(0,2), "[..!]", lns.slice(-2)).join(" ");
+                }
+            }
+
             if (~dump.m.indexOf('took +10s'))
             {
                 var lrc = +localStorage.ttfbReportCount || 0;
@@ -743,7 +759,9 @@ else if (!b_u)
                 if (errobj.udata) dump.d = errobj.udata;
                 if (errobj.stack)
                 {
-                    dump.s = ('' + errobj.stack).split("\n").splice(0,9).map(mTrim).join("\n");
+                    dump.s = ('' + errobj.stack).replace(''+msg,'')
+                        .split("\n").map(String.trim).filter(String)
+                        .splice(0,15).map(mTrim).join("\n");
                 }
             }
             if (cn) dump.c = cn;
@@ -903,6 +921,7 @@ else if (!b_u)
     jsl.push({f:'js/jsbn.js', n: 'jsbn_js', j:1,w:2});
     jsl.push({f:'js/jsbn2.js', n: 'jsbn2_js', j:1,w:2});
     jsl.push({f:'js/jodid25519.js', n: 'jodid25519_js', j:1,w:7});
+    jsl.push({f:'js/megaPromise.js', n: 'megapromise_js', j:1,w:5});
     jsl.push({f:'js/user.js', n: 'user_js', j:1});
     jsl.push({f:'js/authring.js', n: 'authring_js', j:1});
     jsl.push({f:'js/mouse.js', n: 'mouse_js', j:1});
@@ -920,8 +939,8 @@ else if (!b_u)
     jsl.push({f:'js/jquery.qrcode.js', n: 'jqueryqrcode', j:1});
     jsl.push({f:'js/vendor/qrcode.js', n: 'qrcode', j:1,w:2, g: 'vendor'});
     jsl.push({f:'js/bitcoin-math.js', n: 'bitcoinmath', j:1 });
+    jsl.push({f:'js/paycrypt.js', n: 'paycrypt_js', j:1 });
     jsl.push({f:'js/vendor/jquery.window-active.js', n: 'jquery_windowactive', j:1,w:2});
-    jsl.push({f:'js/megaPromise.js', n: 'megapromise_js', j:1,w:5});
     jsl.push({f:'js/vendor/db.js', n: 'db_js', j:1,w:5});
     jsl.push({f:'js/megaDbEncryptionPlugin.js', n: 'megadbenc_js', j:1,w:5});
     jsl.push({f:'js/megaDb.js', n: 'megadb_js', j:1,w:5});
@@ -1037,6 +1056,8 @@ else if (!b_u)
     jsl.push({f:'js/Int64.js', n: 'int64_js', j:1});
     jsl.push({f:'js/zip64.js', n: 'zip_js', j:1});
     jsl.push({f:'js/cms.js', n: 'cms_js', j:1});
+
+    jsl.push({f:'js/windowOpenerProtection.js', n: 'windowOpenerProtection', j:1,w:1});
 
     // only used on beta
     if (onBetaW) {
@@ -1261,18 +1282,12 @@ else if (!b_u)
         if (d) console.log('jj.total...', waitingToBeLoaded);
     }
 
-    var pages = [];
-    function getxhr()
-    {
-        return (typeof XDomainRequest != 'undefined' && typeof ArrayBuffer == 'undefined') ? new XDomainRequest() : new XMLHttpRequest();
-    }
-
-    var xhr_progress,xhr_stack,jsl_fm_current,jsl_current,jsl_total,jsl_perc,jsli,jslcomplete;
+    var pages = [],xhr_progress,xhr_stack,jsl_fm_current,jsl_current,jsl_total,jsl_perc,jsli,jslcomplete;
 
     function jsl_start()
     {
         jslcomplete = 0;
-        if(d && jj) {
+        if (d && jj) {
             xhr_progress = [0, 0, 0, 0, 0];
         } else {
             xhr_progress = [0, 0];
@@ -1363,8 +1378,8 @@ else if (!b_u)
 
     function xhr_load(url,jsi,xhri)
     {
-        if(d && jj) {
-            if(jsl[jsi].j == 1 || jsl[jsi].j == 2) {
+        if (d && jj) {
+            if (jsl[jsi].j == 1 || jsl[jsi].j == 2) {
                 // DON'T load via XHR any js or css files...since when jj == 1, secureboot will append them in the doc.
 
                 jsl_current += jsl[jsi].w || 1;

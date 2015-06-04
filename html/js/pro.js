@@ -169,31 +169,36 @@ function loadPaymentGatewayOptions() {
     {
         apiGatewayId: 8,                // Credit card provider
         displayName: l[6952],           // Credit card
-        supportsRecurring: true,
+        supportsRecurring: true,        // If subscriptions are possible
+        supportsMonthlyPayment: true,   // If you can pay for 1 month at a time
         cssClass: 'credit-card'
     },
     {
         apiGatewayId: 4,                // Bitcoin provider
         displayName: l[6802],           // Bitcoin
         supportsRecurring: false,
+        supportsMonthlyPayment: true,
         cssClass: 'bitcoin'
     },
     {
         apiGatewayId: null,
         displayName: l[504],            // Prepaid balance
         supportsRecurring: false,
+        supportsMonthlyPayment: true,
         cssClass: 'prepaid-balance'
     },
     {
         apiGatewayId: null,             // Wire transfer
         displayName: l[6198],           // Wire transfer
         supportsRecurring: false,
+        supportsMonthlyPayment: false,  // Accept for 1 year one-time payment only
         cssClass: 'wire-transfer'
     }
     /*{
         apiGatewayId: 5,                // Union Pay
         displayName: 'Union Pay',       // Union Pay
         supportsRecurring: true,
+        supportsMonthlyPayment: true,
         cssClass: 'union-pay'
     },*/
     ];
@@ -219,7 +224,7 @@ function loadPaymentGatewayOptions() {
         // Create a radio button with icon for each payment gateway
         html += '<div class="payment-method">'
              +      '<div class="membership-radio' + classChecked + '">'
-             +          '<input type="radio" name="' + gatewayOption.cssClass + '" id="' + gatewayOption.cssClass + '" ' + optionChecked + ' value="' + gatewayOption.cssClass + '" data-recurring="' + gatewayOption.supportsRecurring + '" />'
+             +          '<input type="radio" name="' + gatewayOption.cssClass + '" id="' + gatewayOption.cssClass + '" ' + optionChecked + ' value="' + gatewayOption.cssClass + '" data-recurring="' + gatewayOption.supportsRecurring + '"  data-supports-monthly-payment="' + gatewayOption.supportsMonthlyPayment + '" />'
              +          '<div></div>'
              +      '</div>'
              +      '<div class="membership-radio-label ' + gatewayOption.cssClass + '">'
@@ -262,6 +267,7 @@ function initPaymentMethodRadioOptions(html) {
         }
         
         updateTextDependingOnRecurring();
+        updatePeriodOptionsDependingOnMonthlyAllowed();
     });
 }
 
@@ -394,16 +400,26 @@ function renderPlanDurationDropDown() {
     
     // Get current plan price
     var planIndex = $firstOption.attr('data-plan-index');
+    
+    updateMainPrice(planIndex);
+    updateTextDependingOnRecurring();
+}
+
+/**
+ * Updates the main price at the bottom of the page
+ * @param {Number} planIndex The array index of the plan in membershipPlans
+ */
+function updateMainPrice(planIndex) {
+    
+    // Get the current plan price
     var currentPlan = membershipPlans[planIndex];
     var price = currentPlan[5].split('.');
     var dollars = price[0];
     var cents = price[1];
     
     // Update main price at the bottom
-    var $mainPrice = $('.membership-bott-price');
+    var $mainPrice = $('.main-mid-pad .membership-bott-price');
     $mainPrice.find('strong').html(dollars + '<span>.' + cents + ' &euro;</span>');
-    
-    updateTextDependingOnRecurring();
 }
 
 /**
@@ -440,6 +456,47 @@ function updateTextDependingOnRecurring() {
     $('.membership-bott-button').html(subscribeOrPurchase);
     $('.membership-bott-descr').html(getTwoMonthsFree);
     $('.payment-dialog .payment-buy-now').html(subscribeOrPurchase);
+}
+
+/**
+ * Updates the duration options if they select a payment method. For example 
+ * for the wire transfer option we only want to accept one year one-off payments
+ */
+function updatePeriodOptionsDependingOnMonthlyAllowed() {
+    
+    var $durationSelect = $('.membership-st2-select');
+    var $durationOptions = $durationSelect.find('.membership-dropdown-item');
+    var supportsMonthlyPayment = ($('.payment-options-list input:checked').attr('data-supports-monthly-payment') === 'true') ? true : false;
+    
+    // Loop through renewal period options (1 month, 1 year)
+    $.each($durationOptions, function(key, dropdownOption) {
+        
+        // Get the plan's number of months
+        var planIndex = $(dropdownOption).attr('data-plan-index');
+        var currentPlan = membershipPlans[planIndex];
+        var numOfMonths = currentPlan[4];
+        
+        // If the currently selected payment option e.g. Wire transfer doesn't support a 1 month payment
+        if ((supportsMonthlyPayment === false) && (numOfMonths === 1)) {
+            
+            // Hide the option
+            $(dropdownOption).addClass('hidden').removeClass('selected');
+            
+            // Select the first remaining option that is not hidden
+            var $firstOption = $durationSelect.find('.membership-dropdown-item').not('.hidden').first();
+            var newPlanIndex = $firstOption.attr('data-plan-index');
+            $durationSelect.find('span').html($firstOption.html());
+            $firstOption.addClass('selected');
+            
+            // Update the text for one-time or recurring
+            updateMainPrice(newPlanIndex);
+            updateTextDependingOnRecurring();
+        }
+        else {
+            // Show the option otherwise
+            $(dropdownOption).removeClass('hidden');
+        }
+    });
 }
 
 function pro_continue(e)
@@ -626,17 +683,23 @@ function pro_pay()
     });
 }
 
+/**
+ * Display the wire transfer dialog
+ */
 var wireTransferDialog = {
     
     $dialog: null,
     $backgroundOverlay: null,
     
+    /**
+     * Open and setup the dialog
+     */
     init: function() {
         
         // Close the pro register dialog if it's already open
         $('.pro-register-dialog').removeClass('active').addClass('hidden');
         
-        // Cache DOM reference for lookup in other functions
+        // Cache DOM reference for faster lookup
         this.$dialog = $('.fm-dialog.wire-transfer-dialog');
         this.$backgroundOverlay = $('.fm-dialog-overlay');
         
@@ -655,6 +718,10 @@ var wireTransferDialog = {
             wireTransferDialog.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
             wireTransferDialog.$dialog.removeClass('active').addClass('hidden');            
         });
+        
+        // Update plan price in the dialog
+        var proPrice = selectedProPackage[5];
+        this.$dialog.find('.amount').text(proPrice);
     }
 };
 

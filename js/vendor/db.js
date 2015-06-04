@@ -608,6 +608,21 @@
     } else if ( typeof define === 'function' && define.amd ) {
         define( function() { return db; } );
     } else {
-        window.db = db;
+        Object.defineProperty(db, '__closeAll', {
+            value: function __dbjsCloseALL() {
+                for (var i in dbCache) {
+                    var db = dbCache[i];
+                    try {
+                        db.close();
+                        console.warn('Forcing DB close', i);
+                    }
+                    catch(e) {
+                        console.error(i, e);
+                    }
+                }
+                dbCache = {};
+            }
+        });
+        Object.defineProperty(window, 'db', {value: Object.freeze(db)});
     }
 })( window );

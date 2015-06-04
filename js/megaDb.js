@@ -209,6 +209,60 @@ MegaDB.getDatabaseNames = function() {
     return promise;
 };
 
+
+/**
+ * Remove all databases
+ *
+ * @param aUserHandle {String} optional
+ */
+MegaDB.dropAllDatabases = function(aUserHandle) {
+    var promise = new MegaPromise();
+
+    MegaDB.getDatabaseNames()
+        .then(function(dbNameList) {
+            assert(dbNameList instanceof DOMStringList, 'Invalid database list.');
+
+            db.__closeAll();
+
+            var promises = [];
+            var len = dbNameList.length;
+            while (len--) {
+                var dbn = dbNameList.item(len);
+
+                if (!aUserHandle || dbn.substr(-aUserHandle.length) === aUserHandle) {
+                    promises.push(__drop(dbn));
+                }
+            }
+
+            MegaPromise.allDone(promises).then(promise.resolve.bind(promise));
+
+        }, function(error) {
+            promise.reject(error);
+        });
+
+    function __drop(dbName) {
+        var promise = new MegaPromise();
+
+        try {
+            var request = indexedDB.deleteDatabase( dbName );
+            request.onsuccess = function() {
+                promise.resolve();
+            };
+            request.onblocked = request.onerror = function(e) {
+                console.error('Unable to delete database', dbName, e);
+                promise.reject(e);
+            };
+        }
+        catch(e) {
+            promise.reject(e);
+        }
+
+        return promise;
+    }
+
+    return promise;
+};
+
 /**
  * Convert any promise-related error to their ending point
  *

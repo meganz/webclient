@@ -185,6 +185,31 @@ MegaDB.getDatabaseVersion = function(dbName) {
 };
 
 /**
+ * Wrapper around indexedDB.getDatabaseNames using promises
+ *
+ * MegaDB.getDatabaseNames().always(console.debug.bind(console))
+ */
+MegaDB.getDatabaseNames = function() {
+    var promise = new MegaPromise();
+
+    if (indexedDB) {
+        var request = indexedDB.getDatabaseNames();
+
+        request.onsuccess = function(ev) {
+            promise.resolve(ev.target.result);
+        };
+        request.onerror = function(ev) {
+            promise.reject(ev.target.result);
+        };
+    }
+    else {
+        promise.reject(DOMException.INVALID_ACCESS_ERR);
+    }
+
+    return promise;
+};
+
+/**
  * Convert any promise-related error to their ending point
  *
  * @param aError {mixed} an error thrown from a reject

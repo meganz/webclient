@@ -193,6 +193,75 @@ mBroadcaster.once('startMega', function __idb_setup() {
     }
     if (indexedDB) {
         mDB = 0x7f;
+
+        if (typeof indexedDB.webkitGetDatabaseNames !== 'function') {
+            if (typeof indexedDB.getDatabaseNames === 'function') {
+                indexedDB.webkitGetDatabaseNames = indexedDB.getDatabaseNames;
+            }
+            else {
+                indexedDB.webkitGetDatabaseNames = function webkitGetDatabaseNames() {
+                    var onsuccess, onerror;
+                    var request = Object.create(IDBRequest.prototype, {
+                        onsuccess: { set: function(fn) { onsuccess = fn; }},
+                        onerror: { set: function(fn) { onerror = fn; }}
+                    });
+
+                    Soon(function __getDatabaseNames_polyfill() {
+                        try {
+                            var length = 0;
+                            var list = Object.create(DOMStringList.prototype, {
+                                item: { value: function(n) {
+                                    return this.hasOwnProperty(n) && this[n] || null;
+                                }},
+                                contains: { value: function(k) {
+                                    return ~Object.getOwnPropertyNames(this).indexOf(k);
+                                }},
+                                length: { get: function() { return length; }}
+                            });
+
+                            for (var i in localStorage) {
+
+                                if (i.substr(0,4) === 'mdb_') {
+                                    var idx = i.split('_').pop();
+
+                                    if (idx == 'hash') {
+                                        list[length++] = i.substr(0, i.length - 5);
+                                    }
+                                }
+                            }
+
+                            __Notify('success', list);
+                        }
+                        catch(e) {
+                            if (typeof onerror === 'function') {
+                                __Notify('error', e);
+                            }
+                            else {
+                                throw e;
+                            }
+                        }
+                    });
+
+                    function __Notify(ev, result) {
+                        ev = new Event(ev);
+                        Object.defineProperty(ev, 'target', {value: request});
+                        Object.defineProperty(request, 'result', {value: result});
+
+                        if (ev.type === 'error') {
+                            onerror(ev);
+                        }
+                        else {
+                            onsuccess(ev);
+                        }
+                    }
+
+                    return request;
+                };
+            }
+        }
+        if (typeof indexedDB.getDatabaseNames !== 'function') {
+            indexedDB.getDatabaseNames = indexedDB.webkitGetDatabaseNames;
+        }
     }
 });
 

@@ -49,10 +49,18 @@ function ul_completepending2(res,ctx)
 		ul_completepending(ctx.target);
 	}
 	else {
-        var n = ctx.file.name;
+        var fileName = ctx.file.name;
         Later(resetUploadDownload);
         Soon(function() {
-            msgDialog('warninga', l[1309], n, res);
+            
+            // If over quota show a special warning dialog
+            if (res === EOVERQUOTA) {
+                showOverQuotaDialog();
+            }
+            else {
+                // Otherwise show 'Upload failed - Error uploading asset [filename]'
+                msgDialog('warninga', l[1309], l[5760] + ' ' + fileName);
+            }
         });
     }
 	if (ctx.file.owner) ctx.file.owner.destroy();

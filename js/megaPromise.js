@@ -59,7 +59,7 @@ MegaPromise.asMegaPromiseProxy  = function(p) {
 
     p.then(function() {
         $promise.resolve.apply($promise, toArray(arguments))
-    }, MegaPromise.getTraceableReject($promise));
+    }, MegaPromise.getTraceableReject($promise, p));
 
     return $promise;
 };
@@ -71,7 +71,7 @@ MegaPromise.asMegaPromiseProxy  = function(p) {
  * @returns {function}
  * @private
  */
-MegaPromise.getTraceableReject = function($promise) {
+MegaPromise.getTraceableReject = function($promise, origPromise) {
     return function(argument) {
         if (window.d) {
             var stack;
@@ -81,9 +81,19 @@ MegaPromise.getTraceableReject = function($promise) {
             } catch(e) {
                 stack = e.stack;
             }
-            console.error("Promise rejected: ", argument, p, stack);
+            console.error("Promise rejected: ", argument, origPromise, stack);
         }
-        $promise.reject.apply($promise, toArray(arguments))
+        try {
+            if (typeof $promise === 'function') {
+                $promise.apply(origPromise, arguments);
+            }
+            else {
+                $promise.reject.apply($promise, toArray(arguments))
+            }
+        }
+        catch(e) {
+            console.error('Unexpected promise error: ', e);
+        }
     };
 };
 

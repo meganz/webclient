@@ -11,6 +11,8 @@ module.exports = function(config) {
     // List of files/patterns to load in the browser.
     // {included: false} files are loaded by requirejs
     files: [
+        // == Basic test setup ==
+        'test/test_main.js',
         // == Test utilities ==
         'node_modules/mocha/mocha.js',
         'node_modules/chai/chai.js',
@@ -126,13 +128,18 @@ module.exports = function(config) {
         'js/chat/ui/incomingCallDialog.js',
 
         // == Tests ==
-        {pattern: 'test/fixtures/**/*.html', included: false, served: true},
         {pattern: 'test/**/*_test.js', included: true}
     ],
 
     // List of files to exclude.
     exclude: [
     ],
+    
+    // Fix up to make it work on the Jenkins server.
+    urlRoot: '/base',
+    proxies: {
+        '/': '/'
+    },
 
     // Test results reporter to use.
     // Possible values: 'dots', 'progress', 'junit', 'growl', 'coverage'.

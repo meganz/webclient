@@ -233,16 +233,6 @@ a, a:link, a:visited, a:hover, a:active, a:focus img, a:focus img {
 	background-color: rgba(208,39,47,1);
 	background-position: left -30px;
 }
-.beta-text-red {
-	background-image: url("../images/mega/beta_v2.svg");
-	background-position: 0 0;
-	background-repeat: no-repeat;
-	height: 20px;
-	left: 56px;
-	position: absolute;
-	top: 14px;
-	width: 46px;
-}
 .nlanguage-popup {
 	position: absolute;
 	right: 0 !important;
@@ -5315,12 +5305,11 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	background-position: 0 -131px;
 	position: relative;
 }
-/*
 .nw-fm-left-icon.conversations .beta-text, .not-logged .nw-fm-left-icon.conversations:hover .beta-text, .not-logged .nw-fm-left-icon.conversations.active .beta-text {
 	left: 6px;
 	height: 14px;
 	position: absolute;
-	top: 48px;
+	top: 49px;
 	width: 36px;
 	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
 	background-repeat: no-repeat;
@@ -5328,7 +5317,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 }
 .nw-fm-left-icon.conversations.active .beta-text, .nw-fm-left-icon.conversations:hover .beta-text {
 	background-position: center -9958px;
-}*/
+}
 .nw-fm-left-icon.cloud-drive:hover, .nw-fm-left-icon.cloud-drive.active {
 	background-position: 0 -368px;
 }
@@ -14770,7 +14759,7 @@ h5.main-italic-header {
 	-moz-border-radius: 100%;
 	-webkit-border-radius: 100%;
 	border-radius: 100%;
-	background-image: url(../images/mega/pro-new-sprite-v3.png);
+	background-image: url(../images/mega/pro-new-sprite-v4.png);
 	background-position: center -252px;
 	background-repeat: no-repeat;
 	display: block;
@@ -14788,7 +14777,7 @@ h5.main-italic-header {
 	-moz-border-radius: 8px;
 	-webkit-border-radius: 8px;
 	border-radius: 8px;
-	background-image: url(../images/mega/pro-new-sprite-v3.png);
+	background-image: url(../images/mega/pro-new-sprite-v4.png);
 	background-position: -292px -401px;
 	background-repeat: no-repeat;
 	-webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
@@ -14908,7 +14897,7 @@ h5.main-italic-header {
 	-webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
 	-moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
 	box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
-	background-image: url(../images/mega/pro-new-sprite-v3.png);
+	background-image: url(../images/mega/pro-new-sprite-v4.png);
 	background-position: right -643px;
 	background-repeat: no-repeat;
 	font-size: 13px;
@@ -14929,7 +14918,7 @@ h5.main-italic-header {
 	width: 110px;
 	height: 110px;
 	float: left;
-	background-image: url(../images/mega/pro-new-sprite-v3.png);
+	background-image: url(../images/mega/pro-new-sprite-v4.png);
 	background-position: -287px -553px;
 	background-repeat: no-repeat;
 	margin: 0 0 0 -7px;
@@ -14975,7 +14964,7 @@ h5.main-italic-header {
 	height: 26px;
 	line-height: 26px;
 	padding-left: 28px;
-	background-image: url(../images/mega/pro-new-sprite-v3.png);
+	background-image: url(../images/mega/pro-new-sprite-v4.png);
 	background-repeat: no-repeat;
 	font-size: 13px;
 	color: #333333;
@@ -14988,7 +14977,10 @@ h5.main-italic-header {
 	background-position: -444px -524px;
 }
 .membership-radio-label.union-pay {
-	background-position: -444px -524px; /* Todo: replace with correct Union Pay position */
+	background-position: -444px -487px;
+}
+.membership-radio-label.wire-transfer {
+	background-position: -444px -450px;
 }
 .membership-radio-label.bitcoin {
 	background-position: -444px -614px;
@@ -16155,7 +16147,7 @@ span.browsers-update {
 	height: 181px;
 	float: left;
 	text-align: center;
-	background-image: url(../images/mega/pro-new-sprite-v3.png);
+	background-image: url(../images/mega/pro-new-sprite-v4.png);
 	background-position: -7px -359px;
 	background-repeat: no-repeat;
 	-moz-box-sizing: border-box;
@@ -22506,7 +22498,7 @@ a.top-login-forgot-pass {
 }
 /** top header feedback button **/
 .feedback-button {
-	margin-left: 70px;
+	margin-left: 14px;
 	color: #888;
 	padding: 2px 6px;
 	margin-top: 14px;
@@ -23605,7 +23597,7 @@ top-login-spr .nlanguage-tooltip-bg, .nlanguage-bottom {
  background-size: 892px auto;
 }
 .pro-icons-block, .membership-question-mark span, .membership-date, .membership-st2-select span, .membership-payment-icon, .membership-radio-label {
- background-image: url(../images/mega/pro-new-sprite-v3@2x.png);
+ background-image: url(../images/mega/pro-new-sprite-v4@2x.png);
  background-size: 755px auto;
 }
 .sync-list-txt, .sync-icon, .mobile-icon, .ios-button, .ff-icon, .blackberry-button, .chrome-icon, .sync-button, .google-play-button, .ff-bott-button, .mobile-small-icon, .chrome-bott-icons, .chrome-download-button, a.chrome-download-button, .ads-top-arrow, .win-phone-button {

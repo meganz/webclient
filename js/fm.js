@@ -3667,6 +3667,8 @@ function accountUI()
                 if (e) {
                     api_req({'a': 'up', '+a':'none'});
                     delete avatars[u_handle];
+                    $('.fm-account-avatar img').attr('src', staticpath + 'images/mega/default-avatar.png');
+                    $('.fm-avatar img').attr('src', staticpath + 'images/mega/default-top-avatar.png');
                 }
             });
         });

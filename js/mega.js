@@ -431,21 +431,31 @@ function MegaData()
         var ts = 0;
         if (M.d[h])
         {
-            var a = fm_getnodes(h);
-            for (var i in a)
-            {
-                var n = M.d[a[i]];
-                if (n)
-                {
-                    if (ts < n.ts)
-                        ts = n.ts;
-                    if (n.t)
-                        folders++;
-                    else
-                        files++;
+            if(!M.d[h].ts) {
+                var a = fm_getnodes(h);
+                for (var i in a) {
+                    if (!a.hasOwnProperty(i)) {
+                        continue;
+                    }
+                    var n = M.d[a[i]];
+                    if (n) {
+                        if (ts < n.ts) {
+                            ts = n.ts;
+                        }
+                        if (n.t) {
+                            folders++;
+                        }
+                        else {
+                            files++;
+                        }
+                    }
                 }
+                M.d[h].ts = ts;
+            } else {
+                ts = M.d[h].ts;
             }
         }
+
         return {files: files, folders: folders, ts: ts};
     };
 
@@ -494,6 +504,9 @@ function MegaData()
             lSel = this.fsViewSel;
         $(lSel).before($('.fm-empty-folder .fm-empty-pad:first').clone().removeClass('hidden').addClass('fm-empty-sharef'));
         $(lSel).parent().children('table').hide();
+
+        $('.files-grid-view.fm.shared-folder-content').addClass('hidden');
+
         $(window).trigger('resize');
     };
     Object.defineProperty(this, 'fsViewSel', {
@@ -855,11 +868,13 @@ function MegaData()
                                     </div>\n\
                                 </td>\n\
                                 <td width="270">\n\
-                                    <div class="contacts-interation ' + interactionclass + '">' + time + '</div>\n\
+                                    <div class="contacts-interation li_' + u_h + '"></div>\n\
                                 </td>\n\
                             </tr>';
                 }
                 mInsertNode(M.v[i], M.v[i-1], M.v[i+1], t, el, html, u);
+
+                getLastInteractionWith(u_h);
             }
         }// renderContactsLayout END
 
@@ -938,6 +953,8 @@ function MegaData()
                     } else {
                         t = '.shared-grid-view .grid-table.shared-with-me';
                         el = 'tr';
+                        var contactName = M.d[u_h] ? htmlentities(M.d[u_h].name) : "N/a";
+
                         html = '<tr id="' + htmlentities(M.v[i].h) + '"><td width="30"><span class="grid-status-icon ' + htmlentities(star)
                             + '"></span></td><td><div class="shared-folder-icon"></div><div class="shared-folder-info-block"><div class="shared-folder-name">'
                             + htmlentities(M.v[i].name) + '</div><div class="shared-folder-info">' + htmlentities(contains)
@@ -945,7 +962,7 @@ function MegaData()
                             + htmlentities(u_h) + ' color' + htmlentities(av_color) + '">' + avatar
                             + '</div><div class="fm-chat-user-info todo-star ustatus ' + htmlentities(u_h) + ' '
                             + htmlentities(onlinestatus[1]) + '"><div class="todo-fm-chat-user-star"></div><div class="fm-chat-user">'
-                            + htmlentities(M.d[u_h].name) + '</div><div class="nw-contact-status"></div><div class="fm-chat-user-status ' + htmlentities(htmlentities(u_h)) + '">' + htmlentities(onlinestatus[0])
+                            + contactName + '</div><div class="nw-contact-status"></div><div class="fm-chat-user-status ' + htmlentities(htmlentities(u_h)) + '">' + htmlentities(onlinestatus[0])
                             + '</div><div class="clear"></div></div></td><td width="270"><div class="shared-folder-access'
                             + htmlentities(rightsclass) + '">' + htmlentities(rights) + '</div></td></tr>';
                     }
@@ -1050,7 +1067,7 @@ function MegaData()
             cache = [],
             files = 0;
 
-        if(d) console.log('renderMain', u);
+        if (d) console.log('renderMain', u);
 
         lSel = this.fsViewSel;
         $(lSel).unbind('jsp-scroll-y.dynlist');
@@ -1356,9 +1373,9 @@ function MegaData()
 
     this.renderTree = function()
     {
-        this.buildtree({h: 'shares'},       0x4fe);
-        this.buildtree(this.d[this.RootID], 0x4fe);
-        this.buildtree({h: M.RubbishID},    0x4fe);
+        this.buildtree({h: 'shares'},       this.buildtree.FORCE_REBUILD);
+        this.buildtree(this.d[this.RootID], this.buildtree.FORCE_REBUILD);
+        this.buildtree({h: M.RubbishID},    this.buildtree.FORCE_REBUILD);
         this.contacts();
         treeUI();
         if (!MegaChatDisabled) {
@@ -1532,20 +1549,18 @@ function MegaData()
 
         treePanelSortElements('contacts', contacts, {
             'last-interaction': function(a, b) {
-                if (!M.i_cache[a.u]) {
-                    var cs = M.contactstatus(a.u);
-                    if (cs.ts === 0) {
-                        cs.ts = -1;
-                    }
-                    M.i_cache[a.u] = cs.ts;
+                var cs = M.contactstatus(a.u);
+                if (cs.ts === 0) {
+                    cs.ts = -1;
                 }
-                if (!M.i_cache[b.u]) {
-                    var cs = M.contactstatus(b.u);
-                    if (cs.ts === 0) {
-                        cs.ts = -1;
-                    }
-                    M.i_cache[b.u] = cs.ts;
+                M.i_cache[a.u] = cs.ts;
+
+
+                cs = M.contactstatus(b.u);
+                if (cs.ts === 0) {
+                    cs.ts = -1;
                 }
+                M.i_cache[b.u] = cs.ts;
 
                 return M.i_cache[a.u] - M.i_cache[b.u]
             },
@@ -1596,7 +1611,7 @@ function MegaData()
                     $('.fm-chat-popup-button', m).removeClass("disabled");
 
                     var $userDiv = $this.parent().parent();
-                    if($userDiv.is(".offline")) {
+                    if ($userDiv.is(".offline")) {
                         $('.fm-chat-popup-button.start-audio, .fm-chat-popup-button.start-video', m).addClass("disabled");
                     }
 
@@ -1641,7 +1656,7 @@ function MegaData()
 
                     window.location = "#fm/chat/" + user_handle;
                     var room = megaChat.createAndShowPrivateRoomFor(user_handle);
-                    if(room) {
+                    if (room) {
                         room.startAudioCall();
                     }
                 }
@@ -1658,7 +1673,7 @@ function MegaData()
 
                     window.location = "#fm/chat/" + user_handle;
                     var room = megaChat.createAndShowPrivateRoomFor(user_handle);
-                    if(room) {
+                    if (room) {
                         room.startVideoCall();
                     }
                 }
@@ -1729,7 +1744,7 @@ function MegaData()
          */
 
         var rebuild = false;
-        if (dialog === 0x4fe) {
+        if (dialog === this.buildtree.FORCE_REBUILD) {
             rebuild = true;
             dialog = undefined;
         }
@@ -1881,6 +1896,7 @@ function MegaData()
             }// END of for folders loop
         }
     };
+    this.buildtree.FORCE_REBUILD = 34675890009;
 
     var icon = '<span class="context-menu-icon"></span>';
     var arrow = '<span class="context-top-arrow"></span><span class="context-bottom-arrow"></span>';
@@ -2957,7 +2973,7 @@ function MegaData()
                         ctx.account.balance = res.balance;
                         ctx.account.reseller = res.reseller;
                         ctx.account.prices = res.prices;
-                        
+
                         // If a subscription, get the timestamp it will be renewed
                         if (res.stype === 'S') {
                             ctx.account.srenew = res.srenew;
@@ -3173,9 +3189,10 @@ function MegaData()
 
     this.nodeShare = function(h, s, ignoreDB) {
         if (this.d[h]) {
-            if (typeof this.d[h].shares == 'undefined') {
+            if (typeof this.d[h].shares === 'undefined') {
                 this.d[h].shares = [];
             }
+
             this.d[h].shares[s.u] = s;
             if (typeof mDB === 'object') {
                 s['h_u'] = h + '_' + s.u;
@@ -3190,6 +3207,8 @@ function MegaData()
             if (typeof mDB === 'object' && !pfkey) {
                 mDBadd('ok', {h: h, k: a32_to_base64(encrypt_key(u_k_aes, u_sharekeys[h])), ha: crypto_handleauth(h)});
             }
+        } else {
+            console.error("nodeShare failed for node:", h, s, ignoreDB);
         }
     };
 
@@ -3277,89 +3296,88 @@ function MegaData()
     };
 
     this.getLinks = function(h) {
-        this.$getLinkPromise = new $.Deferred();
+        function getLinksDone() {
+            for (var i in links) {
+                api_req({a: 'l', n: links[i]}, {
+                    node: links[i],
+                    last: i == links.length - 1,
+                    callback: function(res, ctx) {
 
-        loadingDialog.show();
-        this.links = [];
-        this.folderLinks = [];
-        for (var i in h) {
-            var n = M.d[h[i]];
-            if (n) {
-                if (n.t) {
-                    this.folderLinks.push(n.h);
-                }
-                this.links.push(n.h);
+                        if (typeof res !== 'number') {
+                            M.nodeAttr({h: M.d[ctx.node].h, ph: res});
+                        }
+
+                        if (ctx.last) {
+                            $getLinkPromise.resolve();
+                            loadingDialog.hide();
+                        }
+                    }
+                });
             }
         }
-        if (d) {
-            console.log('getLinks', this.links);
-        }
-        if (this.folderLinks.length > 0) {
-            this.getFolderlinks();
-        }
-        else {
-            this.getLinksDone();
-        }
+        function getFolderlinks() {
 
-        return this.$getLinkPromise;
-    };
+            if (folderLinks.length > 0) {
+                var theNextNodeInTheFolderLinksArray = M.d[folderLinks.shift()];
 
-    this.getLinksDone = function() {
-        var self = this;
-
-        for (var i in this.links) {
-            api_req({a: 'l', n: this.links[i]}, {
-                node: this.links[i],
-                last: i == this.links.length - 1,
-                callback: function(res, ctx) {
-
-                    if (typeof res !== 'number') {
-                        M.nodeAttr({h: M.d[ctx.node].h, ph: res});
+                if (theNextNodeInTheFolderLinksArray) {
+                    if (theNextNodeInTheFolderLinksArray.shares
+                            && theNextNodeInTheFolderLinksArray.shares['EXP']) {
+                        getFolderlinks();
                     }
+                    else {
+                        var theListOfNodesWithinTheCloudFolder = fm_getnodes(theNextNodeInTheFolderLinksArray.h);
+                        theListOfNodesWithinTheCloudFolder.push(theNextNodeInTheFolderLinksArray.h);
 
-                    if (ctx.last) {
-                        self.$getLinkPromise.resolve();
-                        loadingDialog.hide();
+                        api_setshare(theNextNodeInTheFolderLinksArray.h, [{u: 'EXP', r: 0}],
+                            theListOfNodesWithinTheCloudFolder, {
+                                fln: theNextNodeInTheFolderLinksArray.h,
+                                done: function(res, ctx) {
+                                    if (res.r && res.r[0] === 0) {
+
+                                        // ToDo: timestamp ts can be different here and on server side, check how this influence execution
+                                        M.nodeShare(ctx.fln, {h: ctx.fln, r: 0, u: 'EXP', ts: Math.floor(Date.now() / 1000)});
+                                    }
+                                    getFolderlinks();
+                                }
+                            }
+                        );
                     }
-                }
-            });
-        }
-    };
-
-    this.getFolderlinks = function() {
-
-        if (this.folderLinks.length > 0) {
-            var n = M.d[this.folderLinks[0]];
-            this.folderLinks.splice(0, 1);
-
-            if (n) {
-                this.fln = n;
-                if (n.shares && n.shares['EXP']) {
-                    this.getFolderlinks();
                 }
                 else {
-                    var h = fm_getnodes(n.h);
-                    h.push(n.h);
-
-                    api_setshare(n.h, [{u: 'EXP', r: 0}], h, {
-                        done: function(res) {
-                            if (res.r && res.r[0] === 0) {
-
-                                // ToDo: timestamp ts can be different here and on server side, check how this influence execution
-                                M.nodeShare(M.fln.h, {h: M.fln.h, r: 0, u: 'EXP', ts: Math.floor(new Date().getTime() / 1000)});
-                            }
-                            M.getFolderlinks();
-                        }
-                    });
+                    getFolderlinks();
                 }
             }
             else {
-                this.getFolderlinks();
+                getLinksDone();
             }
         }
-        else {
-            this.getLinksDone();
+        var $getLinkPromise = new MegaPromise();
+        var folderLinks = [], links = [];
+
+        loadingDialog.show();
+
+        for (var i in h) {
+            var theCloudNodeFromTheInputArray = M.d[h[i]];
+            if (theCloudNodeFromTheInputArray) {
+                if (theCloudNodeFromTheInputArray.t) {
+                    folderLinks.push(theCloudNodeFromTheInputArray.h);
+                }
+                links.push(theCloudNodeFromTheInputArray.h);
+            }
         }
+        if (d) {
+            console.log('getLinks', links);
+        }
+        if (folderLinks.length > 0) {
+            getFolderlinks();
+        }
+        else {
+            getLinksDone();
+        }
+
+        this.links = links;
+        return $getLinkPromise;
     };
 
     this.makeDir = function(n)
@@ -3775,10 +3793,8 @@ function MegaData()
                 errorstr = l[24];
                 break;
             case EOVERQUOTA:
-                if (d)
-                    console.log('Quota error');
-                // errorstr = l[233];
-                // break;
+                errorstr = l[1673];
+                break;
                 // case EAGAIN:               errorstr = l[233]; break;
                 // case ETEMPUNAVAIL:         errorstr = l[233]; break;
             default:
@@ -4159,23 +4175,25 @@ function MegaData()
      */
     this.transferFromMegaCoNz = function()
     {
-        var parts = /#sitetransfer!(.*)/.exec(window.location);
-        
-        if (parts) {
+        // Get site transfer data from after the hash in the URL
+        var urlParts = /#sitetransfer!(.*)/.exec(window.location);
 
-            // Decode from Base64
-            parts = JSON.parse(atob(parts[1]));
-            
-            if (parts) {
+        if (urlParts) {
+
+            // Decode from Base64 and JSON
+            urlParts = JSON.parse(atob(urlParts[1]));
+
+            if (urlParts) {
                 // If the user is already logged in here with the same account
                 // we can avoid a lot and just take them to the correct page
-                if (JSON.stringify(u_k) === JSON.stringify(parts[0])){
-                    window.location.hash = parts[2];
+                if (JSON.stringify(u_k) === JSON.stringify(urlParts[0])){
+                    window.location.hash = urlParts[2];
                     return;
                 }
 
-                // If the user is already logged in but with a different account just load that account instead
-                else if (u_k && (JSON.stringify(u_k) !== JSON.stringify(parts[0]))) {
+                // If the user is already logged in but with a different account just load that account instead. The
+                // hash they came from e.g. a folder link may not be valid for this account so just load the file manager.
+                else if (u_k && (JSON.stringify(u_k) !== JSON.stringify(urlParts[0]))) {
                     window.location.hash = 'fm';
                     return;
                 }
@@ -4184,67 +4202,74 @@ function MegaData()
                 localStorage.wasloggedin = true;
                 u_logout();
 
-                // Set master key, session key and RSA private key
+                // Set master key, session ID and RSA private key
                 u_storage = init_storage(sessionStorage);
-                u_k = parts[0];
-                u_sid = parts[1];
-                u_privk = parts[3];
+                u_k = urlParts[0];
+                u_sid = urlParts[1];
                 u_storage.k = JSON.stringify(u_k);
                 u_storage.sid = u_sid;
-                
-                // Set session ID
                 api_setsid(u_sid);
-                
-                // Get the page to redirect to
-                var toPage = parts[2];
 
-                // This won't exist if ephemeral redirect
-                if (u_privk) {
-                    u_storage.privk = base64urlencode(crypto_encodeprivkey(u_privk));
-                
-                    var ctx = {
-                        checkloginresult: function(ctx, result)
-                        {
-                            if (m) {
-                                loadingDialog.hide();
-                            }
-                            else {
-                                document.getElementById('overlay').style.display = 'none';
-                            }
+                // Get the page to load
+                var toPage = urlParts[2];
 
-                            // Check for suspended account
-                            if (result == EBLOCKED) {
-                                alert(l[730]);
-                            }
-                            else if (result) {
-                                // Set account type and redirect to the requested location
-                                u_type = result;
-                                window.location.hash = toPage;
-                            }
-                            else {
-                                // Incorrect email or password
-                                alert(l[201]);
-                            }
-                        }
-                    };
+                // The isEphemeralAccount flag may not be set (e.g. if from SDK), but if it is then set it
+                var isEphemeralAccount = (typeof urlParts[3] === 'undefined') ? false : urlParts[3];
 
-                    // Continue through the log in flow from approximately the correct 
-                    // place given that we have the master key, session ID and private RSA key
-                    u_checklogin3(ctx);
+                // If a regular account, log them in
+                if (!isEphemeralAccount) {
+                    this.performRegularLogin(toPage);
                 }
                 else {
-                    // Otherwise this is an ephemeral account so reload to log them in properly
+                    // Otherwise this is an ephemeral account, so reset the page hash
                     if (toPage) {
                         window.location.hash = toPage;
                     }
                     else {
                         window.location.hash = '';
                     }
-                    
+
+                    // Do a full reload to log them in properly
                     document.location.reload(false);
                 }
             }
         }
+    };
+
+    /**
+     * Performs a regular login as part of the transfer from mega.co.nz
+     * @param {String} toPage The page to load e.g. 'fm', 'pro' etc
+     */
+    this.performRegularLogin = function(toPage) {
+
+        var ctx = {
+            checkloginresult: function(ctx, result) {
+                if (m) {
+                    loadingDialog.hide();
+                }
+                else {
+                    document.getElementById('overlay').style.display = 'none';
+                }
+
+                // Check for suspended account
+                if (result === EBLOCKED) {
+                    alert(l[730]);
+                }
+                else if (result) {
+                    // Set account type and redirect to the requested location
+                    u_type = result;
+                    window.location.hash = toPage;
+                }
+                else {
+                    // Incorrect email or password
+                    alert(l[201]);
+                }
+            }
+        };
+
+        // Continue through the log in flow from approximately the correct
+        // place given that we have the master key, session ID and private RSA key
+        u_checklogin3(ctx);
     };
 }
 
@@ -4423,25 +4448,38 @@ function rendernew()
     var UImain = false;
     var newcontact = false;
     var newpath = false;
+    var newshare = false;
+
     for (var i in newnodes)
     {
         var n = newnodes[i];
-        if (n.h.length == 11)
+        if (n.h.length === 11) {
             newcontact = true;
-        if (n && n.p && n.t)
+        }
+        if (typeof(n.su) !== 'undefined') {
+            newshare = true;
+        }
+        if (n && n.p && n.t) {
             treebuild[n.p] = 1;
-        if (n.p == M.currentdirid || n.h == M.currentdirid)
+        }
+        if (n.p == M.currentdirid || n.h == M.currentdirid) {
             UImain = true;
-        if ($('#path_' + n.h).length > 0)
+        }
+        if ($('#path_' + n.h).length > 0) {
             newpath = true;
+        }
     }
+
+
+
+
     var UItree = false;
     for (var h in treebuild)
     {
         var n = M.d[h];
         if (n)
         {
-            M.buildtree(n);
+            M.buildtree(n, M.buildtree.FORCE_REBUILD);
             UItree = true;
         }
     }
@@ -4458,10 +4496,12 @@ function rendernew()
     if (UItree)
     {
         treeUI();
-        if (RootbyId(M.currentdirid) === 'shares')
+        if (RootbyId(M.currentdirid) === 'shares') {
             M.renderTree();
-        if (M.currentdirid === 'shares' && !M.viewmode)
+        }
+        if (M.currentdirid === 'shares' && !M.viewmode) {
             M.openFolder('shares', 1);
+        }
         treeUIopen(M.currentdirid);
     }
     if (newcontact)
@@ -4474,6 +4514,10 @@ function rendernew()
             megaChat.renderContactTree();
             megaChat.renderMyStatus();
         }
+    }
+
+    if (newshare) {
+        M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
     }
     M.buildSubmenu();
     initContextUI();
@@ -4716,6 +4760,8 @@ function execsc(actionPackets, callback) {
             }
 
             crypto_share_rsa2aes();
+
+            M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
         } else if (actionPacket.a === 'k' && !folderlink) {
             if (actionPacket.sr)
                 crypto_procsr(actionPacket.sr);
@@ -4726,6 +4772,8 @@ function execsc(actionPackets, callback) {
                     a: 'k',
                     cr: crypto_makecr(actionPacket.n, [actionPacket.h], true)
                 });
+
+            M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
         }
         else if (actionPacket.a === 't') {
             if (tparentid) {
@@ -4789,14 +4837,24 @@ function execsc(actionPackets, callback) {
             if (actionPacket.u[0].c === 0) {
                 $('#contact_' + actionPacket.ou).remove();
 
-                // hide the context menu if it is currently visible and this contact was removed.
-                if($.selected && $.selected[0] === actionPacket.ou) {
-                    // was selected
-                    $.selected = [];
-                    if($('.context-menu.files-menu').is(":visible")) {
-                        $.hideContextMenu();
+                $.each(actionPacket.u, function(k, v) {
+                    // hide the context menu if it is currently visible and this contact was removed.
+                    if($.selected && $.selected[0] === v.u) {
+                        // was selected
+                        $.selected = [];
+                        if($('.context-menu.files-menu').is(":visible")) {
+                            $.hideContextMenu();
+                        }
                     }
-                }
+                    if (M.c[v.u]) {
+                        for (var sharenode in M.c[v.u]) {
+                            removeShare(sharenode, 1);
+                        }
+                    }
+                });
+
+
+
                 M.handleEmptyContactGrid();
             }
 
@@ -4824,7 +4882,7 @@ function execsc(actionPackets, callback) {
                     // pubEd25519 key was updated!
                     // force finger regen.
                     delete pubEd25519[actionPacket.u];
-                    getPubEd25519(actionPacket.u);
+                    crypt.getPubEd25519(actionPacket.u);
                 }
             }
         }
@@ -5202,7 +5260,7 @@ function getuid(email)
 }
 
 function doshare(h, targets, dontShowShareDialog) {
-    var $promise = new $.Deferred();
+    var $promise = new MegaPromise();
 
     nodeids = fm_getnodes(h);
     nodeids.push(h);
@@ -5233,6 +5291,7 @@ function doshare(h, targets, dontShowShareDialog) {
                             // level (passive)
                             if (M.u[user] && M.u[user].c != 0) {
                                 M.nodeShare(ctx.h, {h: h, r: rights, u: user, ts: Math.floor(new Date().getTime() / 1000)});
+                                setLastInteractionWith(user, "0:" + unixtime());
                             }
                             else if (d) {
                                 console.log('doshare: invalid user', user, M.u[user], ctx.t[i]);
@@ -5262,7 +5321,7 @@ function doshare(h, targets, dontShowShareDialog) {
 function doshare2(nodeHandle, t, dontShowShareDialog, msg)
 {
     // ToDo: wait for msg and implement it
-    var $promise = new $.Deferred();
+    var $promise = new MegaPromise();
 
     nodeids = fm_getnodes(nodeHandle);
     nodeids.push(nodeHandle);
@@ -5345,7 +5404,7 @@ function process_f(f, cb, retry)
             if (skn.length) {
                 process_f(f, cb, 1);
             } else {
-                if (cb) cb();
+                if (cb) cb(!!newmissingkeys);
             }
             if (d) console.timeEnd('process_f');
         }
@@ -5626,7 +5685,7 @@ function process_u(u) {
         M.addUser(u[i]);
     }
 
-    //if(megaChat && megaChat.karere && megaChat.karere.getConnectionState() === Karere.CONNECTION_STATE.CONNECTED) {
+    //if (megaChat && megaChat.karere && megaChat.karere.getConnectionState() === Karere.CONNECTION_STATE.CONNECTED) {
     //    megaChat.karere.forceReconnect();
     //}
 }
@@ -5654,7 +5713,7 @@ function folderreqerr(c, e)
 
 function init_chat() {
     function __init_chat() {
-        if(u_type && !megaChat.is_initialized) {
+        if (u_type && !megaChat.is_initialized) {
             if (d) console.log('Initializing the chat...');
             megaChat.init();
             if (fminitialized) {
@@ -5667,7 +5726,7 @@ function init_chat() {
             }
         }
     }
-    if(!MegaChatDisabled) {
+    if (!MegaChatDisabled) {
         if (pubEd25519[u_handle]) {
             __init_chat();
         } else {
@@ -5702,7 +5761,7 @@ function loadfm_callback(res, ctx) {
         processPS(res.ps);
     }
 
-    process_f(res.f, function onLoadFMDone() {
+    process_f(res.f, function onLoadFMDone(hasMissingKeys) {
 
         // If we have shares, and if a share is for this node, record it on the nodes share list
         if (res.s) {
@@ -5738,6 +5797,10 @@ function loadfm_callback(res, ctx) {
         }
 
         getsc();
+
+        if (hasMissingKeys) {
+            srvlog('Got missing keys processing gettree...', null, true);
+        }
     });
 }
 
@@ -5866,13 +5929,13 @@ function clone(obj)
         for (var attr in obj)
         {
             if (obj.hasOwnProperty(attr)) {
-                if(!(obj[attr] instanceof Object)) {
+                if (!(obj[attr] instanceof Object)) {
                     copy[attr] = obj[attr];
                 } else if (obj[attr] instanceof Array) {
                     copy[attr] = clone(obj[attr]);
-                } else if(!isNativeObject(obj[attr])) {
+                } else if (!isNativeObject(obj[attr])) {
                     copy[attr] = clone(obj[attr]);
-                } else if($.isFunction(obj[attr])) {
+                } else if ($.isFunction(obj[attr])) {
                     copy[attr] = obj[attr];
                 } else {
                     copy[attr] = {};

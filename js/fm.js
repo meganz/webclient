@@ -530,14 +530,14 @@ function treesearchUI()
                     M.contacts();
                     break;
                 case 'shared-with-me':
-                    M.buildtree({h: 'shares'}, 0x4fe);
+                    M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
                     break;
                 case 'cloud-drive':
                 case 'folder-link':
-                    M.buildtree(M.d[M.RootID], 0x4fe);
+                    M.buildtree(M.d[M.RootID], M.buildtree.FORCE_REBUILD);
                     break;
                 case 'rubbish-bin':
-                    M.buildtree({h: M.RubbishID}, 0x4fe);
+                    M.buildtree({h: M.RubbishID}, M.buildtree.FORCE_REBUILD);
                     break;
             }
             treeUI(); // reattach events
@@ -552,10 +552,19 @@ function treePanelType()
 }
 
 function treePanelSortElements(type, elements, handlers, ifEq) {
+    if (!$.sortTreePanel) {
+       // XX: not yet initialised, initUI was not called yet, which means that most likely rendering/sorting should not be
+       // triggered at the moment. Caused receiving action packets, BEFORE the ui was initialised, so this call can simply
+       // do nothing at this moment.
+
+       return;
+    }
     var settings = $.sortTreePanel[type]
         , sort = handlers[settings.by]
+
     if (!sort)
         return;
+
     elements.sort(function(a, b) {
         var d = sort(a, b)
         if (d == 0 && ifEq)
@@ -990,6 +999,7 @@ function initUI() {
     });
 
     var fmTabState;
+
     $('.nw-fm-left-icon').unbind('click');
     $('.nw-fm-left-icon').bind('click', function() {
         treesearch = false;
@@ -1003,6 +1013,7 @@ function initUI() {
                 'shared-with-me': { root: 'shares',    prev: null },
                 'conversations':  { root: 'chat',      prev: null },
                 'contacts':       { root: 'contacts',  prev: null },
+                'inbox':          { root: M.InboxID,   prev: null },
                 'rubbish-bin':    { root: M.RubbishID, prev: null }
             };
         }
@@ -1031,7 +1042,7 @@ function initUI() {
                 if (~clickedClass.indexOf(activeClass)) {
                     targetFolder = tab.root;
                 }
-                else if (tab.prev) {
+                else if (tab.prev && M.d[tab.prev]) {
                     targetFolder = tab.prev;
                 }
                 else {
@@ -1328,6 +1339,10 @@ function removeUInode(h) {
                 $('.grid-table.fm tr').remove();
             }
             break;
+    }
+
+    if (M.currentdirid === h || isCircular(h, M.currentdirid) === true) {
+        M.openFolder(RootbyId(h));
     }
 }
 
@@ -1953,6 +1968,13 @@ function removeShare(shareId, nfk) {
     if (!nfk) api_updfkey(shareId);
     M.delNode(shareId);
     api_req({ a: 'd', n: shareId, i: requesti });
+
+    M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
+
+    if (M.currentdirid === shareId || isCircular(shareId, M.currentdirid) === true) {
+        M.openFolder(RootbyId(shareId));
+    }
+
     delete u_sharekeys[shareId];
 }
 
@@ -2748,11 +2770,11 @@ function accountUI()
 				else {
                     $('.membership-big-txt.type').text('');
                 }
-                
+
                 // Get the date their subscription will renew
                 var timestamp = account.srenew[0];
                 var paymentType = htmlentities('(' + account.sgw.join(',') + ')');      // Credit card etc
-                
+
                 // Display the date their subscription will renew in format '14 March 2015 (credit card)'
                 if (timestamp > 0) {
                     var date = new Date(timestamp * 1000);
@@ -2763,7 +2785,7 @@ function accountUI()
                     // Otherwise just show payment type
                     $('.membership-medium-txt.expiry').html(paymentType);
                 }
-                
+
 				// Check if there are any active subscriptions
                 // ccqns = Credit Card Query Number of Subscriptions
 				api_req({ a: 'ccqns' },
@@ -2780,31 +2802,31 @@ function accountUI()
                                 // Make sure they really want to do it
 								msgDialog('confirmation', l[6822], l[6823], false, function(event)
 								{
-									if (event) 
+									if (event)
 									{
 										$cancelButton.hide();
 										loadingDialog.show();
-                                        
+
                                         // Cancel the subscriptions
                                         // cccs = Credit Card Cancel Subscriptions
 										api_req({ a: 'cccs' },
 										{
 											callback: function()
 											{
-												// Reset account cache and refetch all account data to display UI 
+												// Reset account cache and refetch all account data to display UI
                                                 // (note potential race condition if cancellation callback wasn't received in 7500ms)
 												M.account.lastupdate = 0;
-                                                
+
 												setTimeout(function()
 												{
-													loadingDialog.hide();												
+													loadingDialog.hide();
 													accountUI();
-                                                    
+
 												}, 7500);
-											}											
+											}
 										});
 									}
-								});							
+								});
 							});
 						}
 					}
@@ -2826,6 +2848,7 @@ function accountUI()
             $('.membership-big-txt.type').text(l[435]);
             $('.membership-big-txt.accounttype').text(l[435]);
             $('.membership-medium-txt.expiry').text(l[436]);
+            $('.btn-cancel').hide();
         }
 
         perc = Math.round((account.servbw_used+account.downbw_used)/account.bw*100);
@@ -5999,7 +6022,7 @@ function sectionUIopen(id) {
     }
     $('.nw-fm-left-icon.' + tmpId).addClass('active');
     $('.content-panel.' + tmpId).addClass('active');
-    $('.fm-left-menu').removeClass('cloud-drive folder-link shared-with-me rubbish-bin contacts conversations opc ipc').addClass(tmpId);
+    $('.fm-left-menu').removeClass('cloud-drive folder-link shared-with-me rubbish-bin contacts conversations opc ipc inbox').addClass(tmpId);
     $('.fm-right-header, .fm-import-to-cloudrive, .fm-download-as-zip').addClass('hidden');
     $('.fm-import-to-cloudrive, .fm-download-as-zip').unbind('click');
 
@@ -6092,8 +6115,11 @@ function sectionUIopen(id) {
         case 'cloud-drive':
             headertxt = l[5916];
             break;
+		case 'inbox':
+            headertxt = l[949];
+            break;
         case 'rubbish-bin':
-            headertxt = 'Deleted folders';
+            headertxt = l[6771];
             break;
     }
 
@@ -6115,6 +6141,8 @@ function treeUIopen(id, event, ignoreScroll, dragOver, DragOpen) {
 
     if (id_r === 'shares') {
         sectionUIopen('shared-with-me');
+	} else if (id_r === M.InboxID) {
+        sectionUIopen('inbox');
     } else if (id_r === M.RootID) {
         sectionUIopen('cloud-drive');
     } else if (id_s === 'chat') {
@@ -6145,7 +6173,13 @@ function treeUIopen(id, event, ignoreScroll, dragOver, DragOpen) {
         if (ids[0] === 'contacts' && M.currentdirid && M.currentdirid.length === 11 && RootbyId(M.currentdirid) == 'contacts') {
             sectionUIopen('contacts');
         } else if (ids[0] === 'contacts') {
-            sectionUIopen('shared-with-me');
+            // XX: whats the goal of this? everytime when i'm in the contacts and I receive a share, it changes ONLY the
+            // UI tree -> Shared with me... its a bug from what i can see and i also don't see any points of automatic
+            // redirect in the UI when another user had sent me a shared folder.... its very bad UX. Plus, as a bonus
+            // sectionUIopen is already called with sectionUIopen('contacts') few lines before this (when this func
+            // is called by the rendernew()
+
+            // sectionUIopen('shared-with-me');
         } else if (ids[0] === M.RootID) {
             sectionUIopen('cloud-drive');
         }
@@ -7087,6 +7121,7 @@ function initShareDialog() {
                 if (M.u[handleOrEmail]) {
                     userEmail = M.u[handleOrEmail].m;
                     M.delNodeShare(selectedNodeHandle, handleOrEmail);
+                    setLastInteractionWith(handleOrEmail, "0:" + unixtime());
                 }
 
                 // Pending share
@@ -9393,6 +9428,8 @@ function sharedfolderUI() {
         if (M.viewmode === 1)
             e = '.fm-blocks-view.fm';
 
+        var nameStr = user && user.name ? htmlentities(user.name) : "N/a";
+
         $(e).wrap('<div class="shared-details-block"></div>');
         $('.shared-details-block').prepend(
             '<div class="shared-top-details">'
@@ -9400,12 +9437,12 @@ function sharedfolderUI() {
                 +'<div class="shared-details-info-block">'
                     +'<div class="shared-details-pad">'
                         +'<div class="shared-details-folder-name">'+ htmlentities((c||n).name) +'</div>'
-                        +'<a href="" class="grid-url-arrow"><span></span></a>'
+                        +'<a href="javascript:;" class="grid-url-arrow"><span></span></a>'
                         +'<div class="shared-folder-access'+ rightsclass + '">' + rights + '</div>'
                         +'<div class="clear"></div>'
                         +'<div class="nw-contact-avatar color10">' + avatar + '</div>'
                         +'<div class="fm-chat-user-info">'
-                            +'<div class="fm-chat-user">' + htmlentities(user.name) + '</div>'
+                            +'<div class="fm-chat-user">' + nameStr + '</div>'
                         +'</div>'
                     +'</div>'
                     +'<div class="shared-details-buttons">'
@@ -9430,10 +9467,11 @@ function sharedfolderUI() {
 
 function userAvatar(userid)
 {
-    userid = userid.u || userid
-    var user = M.u[userid]
-    if (!user || !user.u)
+    userid = userid.u || userid;
+    var user = M.u[userid];
+    if (!user || !user.u) {
         return;
+    }
 
     var name = user.name || user.m;
 
@@ -9448,33 +9486,35 @@ function userAvatar(userid)
     return {img: avatar, color: av_color};
 }
 
-function userFingerprint(userid, next)
-{
-    userid = userid.u || userid
+function userFingerprint(userid, next) {
+    userid = userid.u || userid;
     var user = M.u[userid];
-    if (!user || !user.u)
-        return next([])
-    if (userid == u_handle) {
-        var fprint = authring.computeFingerprint(u_pubEd25519, 'Ed25519', 'hex')
-        return next(fprint.toUpperCase().match(/.{4}/g), fprint)
+    if (!user || !user.u) {
+        return next([]);
     }
-    getFingerprintEd25519(user.h || userid, function(response) {
-        next(response.toUpperCase().match(/.{4}/g), response)
+    if (userid === u_handle) {
+        var fprint = authring.computeFingerprint(u_pubEd25519, 'Ed25519', 'hex');
+        return next(fprint.toUpperCase().match(/.{4}/g), fprint);
+    }
+    var fingerprintPromise = crypt.getFingerprintEd25519(user.h || userid);
+    fingerprintPromise.done(function (response) {
+        next(response.toUpperCase().match(/.{4}/g), response);
     });
 }
 
 function isContactVerified(userid)
 {
-    userid = userid.u || userid
+    userid = userid.u || userid;
     return (u_authring.Ed25519[userid] || {}).method >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON;
 }
 
 function fingerprintDialog(userid)
 {
-    userid = userid.u || userid
-    var user = M.u[userid]
-    if (!user || !user.u)
+    userid = userid.u || userid;
+    var user = M.u[userid];
+    if (!user || !user.u) {
         return;
+    }
 
     function closeFngrPrntDialog() {
         fm_hideoverlay();
@@ -9575,23 +9615,52 @@ function contactUI() {
             contextmenuUI(e, 4);
         });
 
-        var fprint = $('.contact-fingerprint-txt').empty();
-        userFingerprint(user, function(fprints) {
-            $.each(fprints, function(k, value) {
-                $('<span>').text(value).appendTo(
-                    fprint.filter(k <= 4 ? ':first' : ':last')
-                )
+        /**
+         * Get and display the fingerprint
+         */
+        var showAuthenticityCredentials = function() {
+            var fprint = $('.contact-fingerprint-txt').empty();
+            userFingerprint(user, function (fprints) {
+                $.each(fprints, function (k, value) {
+                    $('<span>').text(value).appendTo(
+                        fprint.filter(k <= 4 ? ':first' : ':last')
+                    );
+                });
             });
-        });
+        };
 
-        if (isContactVerified(user)) {
-            $('.fm-verify').find('span').text('Verified');
-        } else {
-            $('.fm-verify').find('span').text(l[1960]+'...');
+        /**
+         * Enables the Verify button
+         */
+        var enableVerifyFingerprintsButton = function() {
+            $('.fm-verify').removeClass('disabled');
+            $('.fm-verify').find('span').text(l[1960] + '...');
             $('.fm-verify').rebind('click', function() {
                 fingerprintDialog(user);
             });
+        };
+
+        // Display the current fingerpring
+        showAuthenticityCredentials();
+
+        // If the fingerprints have already been verified for the contact, show 'Verified'
+        if (isContactVerified(user)) {
+            $('.fm-verify').addClass('disabled');
+            $('.fm-verify').find('span').text(l[6776]);
         }
+        else {
+            // Otherwise show the Verify button
+            enableVerifyFingerprintsButton();
+        }
+
+        // Reset seen or verified fingerprints and re-enable the Verify button
+        $('.fm-reset-stored-fingerprint').rebind('click', function() {
+            authring.resetFingerprintsForUser(user.u);
+            enableVerifyFingerprintsButton();
+
+            // Refetch the key
+            showAuthenticityCredentials();
+        });
 
         if (!MegaChatDisabled) {
             if (onlinestatus[1] !== "offline" && u_h !== u_handle) {

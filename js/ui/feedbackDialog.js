@@ -2,11 +2,11 @@
     /**
      * Simple/reusable feedback dialog
      *
-     * @param opts {Object}
+     * @constructor
+     * @class mega.ui.FeedbackDialog
+     * @param [opts] {Object}
      * @constructor
      */
-
-
     var FeedbackDialog = function(opts) {
         var self = this;
 
@@ -41,13 +41,15 @@
                     'className': "fm-dialog-button-green feedback-button-send disabled",
                     'callback': function() {
                         self._report.message = self.$textarea.val();
-                        if($('input[name="share_uh"]', self.$dialog).attr('checked')) {
-                            self._report.u_handle = u_handle;
+                        if ($('input[name="contact_me"]', self.$dialog).attr('checked')) {
+                            self._report.contact_me = 1;
+                        } else {
+                            self._report.contact_me = 0;
                         }
 
 
                         var $selectedRating = $('.rate.active', self.$dialog);
-                        if($selectedRating.length === 0) {
+                        if ($selectedRating.length === 0) {
                             return false;
                         }
 
@@ -61,16 +63,15 @@
                             a: 'clog',
                             t: "feedbackDialog." + self._type,
                             id: reportId,
-                            uh: self._report.u_handle ? self._report.u_handle : "",
                             d: dump
                         });
 
-                        if(self._report.chatRoomState) {
+                        if (self._report.chatRoomState) {
                             Object.keys(self._report.chatRoomState).forEach(function(k) {
                                 var v = self._report.chatRoomState[k];
-                                if(v.callSessions && v.callSessions.length > 0) {
+                                if (v.callSessions && v.callSessions.length > 0) {
                                     v.callSessions.forEach(function(callSession) {
-                                        if(callSession.callStats) {
+                                        if (callSession.callStats) {
                                             callSession.callStats.forEach(function (cs) {
                                                 api_req({
                                                     a: 'clog',
@@ -78,11 +79,11 @@
                                                     id: cs.cid + "_" + cs.isCaller,
                                                     d: reportId
                                                 });
-                                            })
+                                            });
                                         }
                                     });
                                 }
-                            })
+                            });
                         }
                         this.hide();
 
@@ -129,7 +130,7 @@
             $('.stats .checkdiv').rebind('onFakeCheckboxChange.feedbackDialog', function(e, val) {
                 var fnName = val ? "fadeIn" : "fadeOut";
 
-                if(val === true) {
+                if (val === true) {
                     loadingDialog.show();
                     generateAnonymousReport()
                         .done(function (report) {
@@ -152,14 +153,11 @@
                 });
             });
 
-
-
-
             $('input[name="send_stats"]', self.$dialog)
                 .attr('checked', true)
                 .trigger('change');
 
-            $('input[name="share_uh"]', self.$dialog)
+            $('input[name="contact_me"]', self.$dialog)
                 .attr('checked', true)
                 .trigger('change');
         });
@@ -182,33 +180,33 @@
             $('.rating a:not(.active)', self.$dialog)
                 .addClass("faded");
 
-            if(!self.$checkboxes.is(":visible")) {
+            if (!self.$checkboxes.is(":visible")) {
                 self.$checkboxes.slideDown({
                     duration: 250,
                     progress: function(anim, progress, remainingMs) {
-                        if(Math.ceil(progress * 100) % 2 === 0) {
+                        if (Math.ceil(progress * 100) % 2 === 0) {
                             self.reposition();
                         }
                     }
                 });
             }
-            if(!self.$textarea.is(":visible")) {
+            if (!self.$textarea.is(":visible")) {
                 self.$textarea.slideDown({
                     duration: 350,
                     progress: function(anim, progress, remainingMs) {
-                        if(Math.ceil(progress * 100) % 2 === 0) {
+                        if (Math.ceil(progress * 100) % 2 === 0) {
                             self.reposition();
                         }
                     }
                 });
             }
-            $('.feedback-button-send',self.$dialog).removeClass('disabled');
+            $('.feedback-button-send', self.$dialog).removeClass('disabled');
         });
 
         $('.stats-button', self.$dialog).rebind('click.feedbackDialog', function() {
             var dialog = self.$dataReportDialog;
-            if(!dialog) {
-                var dialog = self.$dataReportDialog = new mega.ui.Dialog({
+            if (!dialog) {
+                dialog = self.$dataReportDialog = new mega.ui.Dialog({
                     className: 'collected-data-review-dialog',
 
                     /**
@@ -249,11 +247,11 @@
 
 
     FeedbackDialog.singleton = function($toggleButton, rating, typeOfFeedback) {
-        if(!FeedbackDialog._instance) {
+        if (!FeedbackDialog._instance) {
             FeedbackDialog._instance = new FeedbackDialog();
         }
 
-        if(typeOfFeedback) {
+        if (typeOfFeedback) {
             FeedbackDialog._instance._type = typeOfFeedback;
         }
         FeedbackDialog._instance.show($toggleButton);

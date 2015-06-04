@@ -167,10 +167,12 @@ function dlerror(dl,error)
 {
     var errorstr='';
     var tempe=false;
-    if (error == EOVERQUOTA)
-    {
-        alert('quota dialog');
-    }
+
+    // If over quota show a special warning dialog
+	if (error === EOVERQUOTA) {
+        showOverQuotaDialog();
+	}
+    
     else if (error == ETOOMANYCONNECTIONS) errorstr = l[18];
     else if (error == ESID) errorstr = l[19];
     else if (error == ETEMPUNAVAIL) tempe = l[233];
@@ -362,7 +364,7 @@ function sync_switchOS(os)
  */
 function ImgError(source) {
     source.src =  gifSlider.empty1x1png;
-    source.onerror = "";
+    source.onerror = '';
     return true;
 }
 
@@ -380,7 +382,7 @@ var gifSlider = {
     rightAnimationIntervalId: 0,
 
     // Empty 1x1 image used as placeholder
-    empty1x1png: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQI12NgYAAAAAMAASDVlMcAAAAASUVORK5CYII=",
+    empty1x1png: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQI12NgYAAAAAMAASDVlMcAAAAASUVORK5CYII=',
 
     // There can be more or less images on either side e.g. 2 gifs on left and
     // 3 on right and it will still work because they are run independently.
@@ -449,8 +451,10 @@ var gifSlider = {
      * @param {String} side The side of the page (left or right)
      */
     preLoadImages: function(side) {
-        function __loadHandler(idx, len) {
-            if (d) console.log('gifSlider.__loadHandler', side, imageLoadStep, idx, len, this.src);
+        function __loadHandler(idx, length) {
+            if (d) {
+                console.log('gifSlider.__loadHandler', side, imageLoadStep, idx, length, this.src);
+            }
             ++imageLoadStep;
 
             this.onload = image = null;
@@ -472,8 +476,10 @@ var gifSlider = {
                 // Setup loops to continually change after every slide has finished
                 gifSlider.continueSlideShow(side, idx);
             }
-            else if (imageLoadStep === len) {
-                if (d) console.log('gifSlider.__loadHandler finished.');
+            else if (imageLoadStep === length) {
+                if (d) {
+                    console.log('gifSlider.__loadHandler finished.');
+                }
 
                 setTimeout(function() {
                     $('img.animation-image').attr('src', gifSlider.empty1x1png);
@@ -490,8 +496,9 @@ var gifSlider = {
         var imageLoadStep = 0, imageSrc, image;
         this.state = this.STATE_INIT;
 
-        // Get the current URL without the location hash (#xycabc), also add on the path to the images dir
-        var baseImagePath = staticpath + 'images/products/';
+        // Load locally in dev, but force the .gif animations to load from the static server not CDN to save cost
+        var basePath = (location.href.indexOf('localhost') > -1) ? staticpath : 'https://eu.static.mega.co.nz/';
+        var baseImagePath = basePath + 'images/products/';
 
         // Check if using retina display
         var retina = (window.devicePixelRatio > 1) ? '-2x' : '';
@@ -598,6 +605,7 @@ var gifSlider = {
             this.rightAnimationIntervalId = 0;
         }
 
+        // Set to empty image
         $('img.animation-image, a.currentLink img.currentImage').attr('src', this.empty1x1png);
         this.state = this.STATE_GONE;
     },

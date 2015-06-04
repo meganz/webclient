@@ -277,7 +277,7 @@ function populate_l() {
         '<a href="http://en.wikipedia.org/wiki/Public-key_cryptography" target="_blank" rel="noreferrer">').replace('[/A]',
         '</a>');
     l[1148] = l[1148].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
-    l[6978] = l[6978].replace('[A]', '<span class="red">').replace('[/A]', '</span>');    
+    l[6978] = l[6978].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
     l[1151] = l[1151].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
     l[731] = l[731].replace('[A]', '<a href="#terms">').replace('[/A]', '</a>');
     if (lang === 'en') {
@@ -808,6 +808,23 @@ function makeObservable(kls) {
             }
         }
     });
+}
+
+/**
+ * Instantiates an enum-like list on the provided target object
+ */
+function makeEnum(aEnum, aPrefix, aTarget) {
+    aTarget = aTarget || {};
+
+    var len = aEnum.length;
+    while (len--) {
+        Object.defineProperty(aTarget,
+            (aPrefix || '') + String(aEnum[len]).toUpperCase(), {
+                value: 1 << len,
+                enumerable: true
+            });
+    }
+    return aTarget;
 }
 
 /**
@@ -2527,15 +2544,7 @@ function generateAnonymousReport() {
         var r = {
             'roomUniqueId': roomUniqueId,
             'roomState': v.getStateAsText(),
-            'roomParticipants': participants,
-            'encState': v.encryptionHandler ? v.encryptionHandler.state : "not defined",
-            'opQueueQueueCount': v.encryptionOpQueue
-                ? v.encryptionOpQueue._queue.length : "not defined",
-            'opQueueErrRetries': v.encryptionOpQueue
-                ? v.encryptionOpQueue._error_retries : "not defined",
-            'opQueueCurrentOp': v.encryptionOpQueue
-                && v.encryptionOpQueue._queue.length > 0
-                    ? v.encryptionOpQueue._queue[0][0] : "not defined"
+            'roomParticipants': participants
         };
 
         chatStates[roomUniqueId] = r;

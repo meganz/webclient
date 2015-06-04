@@ -117,6 +117,7 @@ function init_pro()
             $selectedPlanHeader.html(selectedPlanText);
             
             pro_next_step();
+            return false;
         });
 
         $('.pro-bottom-button').unbind('click');
@@ -140,10 +141,20 @@ function populateMembershipPlans() {
         var dollars = price[0];
         var cents = price[1];
 
+        // Show only monthly prices in the boxes
         if (months === 1) {
+            
+            // Update the price in the boxes
             $('.reg-st3-membership-bl.pro' + accountLevel + ' .price .num').html(
                 dollars + '<span class="small">.' + cents + ' &euro;</span>'
             );
+    
+            // Copy the price in the left most item to the red box in the bottom middle of the page
+            if (i === 0) {
+                var $redStar = $('.pro-icons-block.star .pro-price-txt');
+                $redStar.find('.dollars').text(dollars);
+                $redStar.find('.cents').text(cents);
+            }
         }
     }
 }
@@ -153,30 +164,41 @@ function populateMembershipPlans() {
  */
 function loadPaymentGatewayOptions() {
 
-    // Payment gateways, hardcoded for now, will call API in future to get list
+    // Payment gateways, hardcoded for now, may call API in future to get list
     var gatewayOptions = [
     {
         apiGatewayId: 8,                // Credit card provider
         displayName: l[6952],           // Credit card
-        supportsRecurring: true,
+        supportsRecurring: true,        // If subscriptions are possible
+        supportsMonthlyPayment: true,   // If you can pay for 1 month at a time
         cssClass: 'credit-card'
     },
     {
         apiGatewayId: 4,                // Bitcoin provider
         displayName: l[6802],           // Bitcoin
         supportsRecurring: false,
+        supportsMonthlyPayment: true,
         cssClass: 'bitcoin'
     },
     {
         apiGatewayId: null,
         displayName: l[504],            // Prepaid balance
         supportsRecurring: false,
+        supportsMonthlyPayment: true,
         cssClass: 'prepaid-balance'
+    },
+    {
+        apiGatewayId: null,             // Wire transfer
+        displayName: l[6198],           // Wire transfer
+        supportsRecurring: false,
+        supportsMonthlyPayment: false,  // Accept for 1 year one-time payment only
+        cssClass: 'wire-transfer'
     }
     /*{
         apiGatewayId: 5,                // Union Pay
         displayName: 'Union Pay',       // Union Pay
         supportsRecurring: true,
+        supportsMonthlyPayment: true,
         cssClass: 'union-pay'
     },*/
     ];
@@ -202,7 +224,7 @@ function loadPaymentGatewayOptions() {
         // Create a radio button with icon for each payment gateway
         html += '<div class="payment-method">'
              +      '<div class="membership-radio' + classChecked + '">'
-             +          '<input type="radio" name="' + gatewayOption.cssClass + '" id="' + gatewayOption.cssClass + '" ' + optionChecked + ' value="' + gatewayOption.cssClass + '" data-recurring="' + gatewayOption.supportsRecurring + '" />'
+             +          '<input type="radio" name="' + gatewayOption.cssClass + '" id="' + gatewayOption.cssClass + '" ' + optionChecked + ' value="' + gatewayOption.cssClass + '" data-recurring="' + gatewayOption.supportsRecurring + '"  data-supports-monthly-payment="' + gatewayOption.supportsMonthlyPayment + '" />'
              +          '<div></div>'
              +      '</div>'
              +      '<div class="membership-radio-label ' + gatewayOption.cssClass + '">'
@@ -245,6 +267,7 @@ function initPaymentMethodRadioOptions(html) {
         }
         
         updateTextDependingOnRecurring();
+        updatePeriodOptionsDependingOnMonthlyAllowed();
     });
 }
 
@@ -377,16 +400,26 @@ function renderPlanDurationDropDown() {
     
     // Get current plan price
     var planIndex = $firstOption.attr('data-plan-index');
+    
+    updateMainPrice(planIndex);
+    updateTextDependingOnRecurring();
+}
+
+/**
+ * Updates the main price at the bottom of the page
+ * @param {Number} planIndex The array index of the plan in membershipPlans
+ */
+function updateMainPrice(planIndex) {
+    
+    // Get the current plan price
     var currentPlan = membershipPlans[planIndex];
     var price = currentPlan[5].split('.');
     var dollars = price[0];
     var cents = price[1];
     
     // Update main price at the bottom
-    var $mainPrice = $('.membership-bott-price');
+    var $mainPrice = $('.main-mid-pad .membership-bott-price');
     $mainPrice.find('strong').html(dollars + '<span>.' + cents + ' &euro;</span>');
-    
-    updateTextDependingOnRecurring();
 }
 
 /**
@@ -423,6 +456,47 @@ function updateTextDependingOnRecurring() {
     $('.membership-bott-button').html(subscribeOrPurchase);
     $('.membership-bott-descr').html(getTwoMonthsFree);
     $('.payment-dialog .payment-buy-now').html(subscribeOrPurchase);
+}
+
+/**
+ * Updates the duration options if they select a payment method. For example 
+ * for the wire transfer option we only want to accept one year one-off payments
+ */
+function updatePeriodOptionsDependingOnMonthlyAllowed() {
+    
+    var $durationSelect = $('.membership-st2-select');
+    var $durationOptions = $durationSelect.find('.membership-dropdown-item');
+    var supportsMonthlyPayment = ($('.payment-options-list input:checked').attr('data-supports-monthly-payment') === 'true') ? true : false;
+    
+    // Loop through renewal period options (1 month, 1 year)
+    $.each($durationOptions, function(key, dropdownOption) {
+        
+        // Get the plan's number of months
+        var planIndex = $(dropdownOption).attr('data-plan-index');
+        var currentPlan = membershipPlans[planIndex];
+        var numOfMonths = currentPlan[4];
+        
+        // If the currently selected payment option e.g. Wire transfer doesn't support a 1 month payment
+        if ((supportsMonthlyPayment === false) && (numOfMonths === 1)) {
+            
+            // Hide the option
+            $(dropdownOption).addClass('hidden').removeClass('selected');
+            
+            // Select the first remaining option that is not hidden
+            var $firstOption = $durationSelect.find('.membership-dropdown-item').not('.hidden').first();
+            var newPlanIndex = $firstOption.attr('data-plan-index');
+            $durationSelect.find('span').html($firstOption.html());
+            $firstOption.addClass('selected');
+            
+            // Update the text for one-time or recurring
+            updateMainPrice(newPlanIndex);
+            updateTextDependingOnRecurring();
+        }
+        else {
+            // Show the option otherwise
+            $(dropdownOption).removeClass('hidden');
+        }
+    });
 }
 
 function pro_continue(e)
@@ -479,6 +553,9 @@ function pro_continue(e)
         // For credit card we show the dialog first, then do the uts/utc calls
         if (pro_paymentmethod === 'credit-card') {
             cardDialog.init();
+        }
+        else if (pro_paymentmethod === 'wire-transfer') {
+            wireTransferDialog.init();
         }
         else {
             // For other methods we do a uts and utc call to get the provider details first
@@ -607,6 +684,48 @@ function pro_pay()
 }
 
 /**
+ * Display the wire transfer dialog
+ */
+var wireTransferDialog = {
+    
+    $dialog: null,
+    $backgroundOverlay: null,
+    
+    /**
+     * Open and setup the dialog
+     */
+    init: function() {
+        
+        // Close the pro register dialog if it's already open
+        $('.pro-register-dialog').removeClass('active').addClass('hidden');
+        
+        // Cache DOM reference for faster lookup
+        this.$dialog = $('.fm-dialog.wire-transfer-dialog');
+        this.$backgroundOverlay = $('.fm-dialog-overlay');
+        
+        // Add the styling for the overlay
+        this.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+        
+        // Position the dialog and open it
+        this.$dialog.css({
+            'margin-left': -1 * (this.$dialog.outerWidth() / 2),
+            'margin-top': -1 * (this.$dialog.outerHeight() / 2)
+        });
+        this.$dialog.addClass('active').removeClass('hidden');
+        
+        // Initialise the close button
+        this.$dialog.find('.btn-close-dialog').rebind('click', function() {
+            wireTransferDialog.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+            wireTransferDialog.$dialog.removeClass('active').addClass('hidden');            
+        });
+        
+        // Update plan price in the dialog
+        var proPrice = selectedProPackage[5];
+        this.$dialog.find('.amount').text(proPrice);
+    }
+};
+
+/**
  * Code for Dynamic/Union Pay
  */
 var unionPay = {
@@ -615,9 +734,6 @@ var unionPay = {
      * Show the bouncing megacoin icon while loading
      */
     showLoadingOverlay: function() {
-        
-        console.log('zzzz got here');
-        
         $('.fm-dialog-overlay').removeClass('hidden').addClass('payment-dialog-overlay');
         $('.payment-processing').removeClass('hidden');
     },
@@ -648,7 +764,7 @@ var unionPay = {
 var cardDialog = {
     
     $dialog: null,
-    $dialogOverlay: null,
+    $backgroundOverlay: null,
     $successOverlay: null,
     $failureOverlay: null,
     $loadingOverlay: null,
@@ -693,13 +809,13 @@ var cardDialog = {
         
         // Cache DOM reference for lookup in other functions
         this.$dialog = $('.fm-dialog.payment-dialog');
-        this.$dialogOverlay = $('.fm-dialog-overlay');
+        this.$backgroundOverlay = $('.fm-dialog-overlay');
         this.$successOverlay = $('.payment-result.success');
         this.$failureOverlay = $('.payment-result.failed');
         this.$loadingOverlay = $('.payment-processing');
         
         // Add the styling for the overlay
-        this.$dialogOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+        this.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
         
         // Position the dialog and open it
         this.$dialog.css({
@@ -738,12 +854,16 @@ var cardDialog = {
         
         // Initialise the close button
         this.$dialog.find('.btn-close-dialog').rebind('click', function() {
-            cardDialog.$dialogOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+            cardDialog.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
             cardDialog.$dialog.removeClass('active').addClass('hidden');            
             
             // Reset flag so they can try paying again
             cardDialog.paymentInProcess = false;
         });
+        
+        // Check if using retina display and preload loading animation
+        var retina = (window.devicePixelRatio > 1) ? '@2x' : '';
+        $('.payment-animation').attr('src', staticpath + '/images/mega/payment-animation' + retina + '.gif');
     },
     
     /**
@@ -923,7 +1043,7 @@ var cardDialog = {
             
             // Show error popup and on close re-add the overlay
             msgDialog('warninga', l[6954], l[6955], '', function() {
-                cardDialog.$dialogOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+                cardDialog.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
             });
             return false;
         }
@@ -933,7 +1053,7 @@ var cardDialog = {
             
             // Show error popup and on close re-add the overlay
             msgDialog('warninga', l[6956], l[6957], '', function() {
-                cardDialog.$dialogOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+                cardDialog.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
             });
             return false;
         }
@@ -942,7 +1062,7 @@ var cardDialog = {
         else if (!billingData.first_name || !billingData.last_name || !billingData.card_number || !billingData.expiry_date_month || !billingData.expiry_date_year || !billingData.cv2) {
             
             msgDialog('warninga', l[6958], l[6959], '', function() {
-                cardDialog.$dialogOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+                cardDialog.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
             });
             return false;
         }
@@ -989,8 +1109,16 @@ var cardDialog = {
         
         // Proceed with payment
         api_req(requestData, {
-            callback: function (res) {
-                pro_pay();
+            callback: function (result) {
+                
+                // If negative API number
+                if ((typeof result === 'number') && (result < 0)) {
+                    cardDialog.showFailureOverlay();
+                }
+                else {
+                    // Otherwise continue to charge card
+                    pro_pay();
+                }
             }
         });
     },
@@ -1013,11 +1141,16 @@ var cardDialog = {
     showLoadingOverlay: function() {
         
         // Close the card dialog
-        cardDialog.$dialogOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
         cardDialog.$dialog.removeClass('active').addClass('hidden');
         
+        // Prevent clicking on the background overlay while it's loading, which makes 
+        // the background disappear and error triangle appear on white background
+        cardDialog.$backgroundOverlay.rebind('click', function(event) {
+            event.stopPropagation();
+        });
+        
         // Show the loading gif
-        cardDialog.$dialogOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+        cardDialog.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
         cardDialog.$loadingOverlay.removeClass('hidden');
     },
     
@@ -1027,7 +1160,6 @@ var cardDialog = {
     showSuccessfulPayment: function() {
         
         // Close the card dialog and loading overlay
-        cardDialog.$dialogOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
         cardDialog.$failureOverlay.addClass('hidden');
         cardDialog.$loadingOverlay.addClass('hidden');
         cardDialog.$dialog.removeClass('active').addClass('hidden');
@@ -1038,7 +1170,7 @@ var cardDialog = {
         var successMessage = l[6962].replace('%1', '<span>' + proPlan + '</span>');
         
         // Show the success
-        cardDialog.$dialogOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+        cardDialog.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
         cardDialog.$successOverlay.removeClass('hidden');
         cardDialog.$successOverlay.find('.payment-result-txt').html(successMessage);
         
@@ -1046,7 +1178,7 @@ var cardDialog = {
         cardDialog.$successOverlay.find('.payment-result-button, .payment-close').rebind('click', function() {
             
             // Hide the overlay
-            cardDialog.$dialogOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+            cardDialog.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
             cardDialog.$successOverlay.addClass('hidden');
             
             // Remove credit card details from the form
@@ -1070,11 +1202,13 @@ var cardDialog = {
     showFailureOverlay: function(utcResult) {
         
         // Show the failure overlay
+        cardDialog.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
         cardDialog.$failureOverlay.removeClass('hidden');
         cardDialog.$loadingOverlay.addClass('hidden');
+        cardDialog.$successOverlay.addClass('hidden');
         
         // If error is 'Fail Provider', get the exact error or show a default 'Something went wrong' type message
-        var errorMessage = (utcResult.EUR.res === 'FP') ? this.getProviderError(utcResult.EUR.code) : l[6950];
+        var errorMessage = ((typeof utcResult !== 'undefined') && (utcResult.EUR.res === 'FP')) ? this.getProviderError(utcResult.EUR.code) : l[6950];
         cardDialog.$failureOverlay.find('.payment-result-txt').html(errorMessage);
         
         // On click of the 'Try again' or Close buttons, hide the overlay and the user can fix their payment details
@@ -1087,7 +1221,6 @@ var cardDialog = {
             cardDialog.$failureOverlay.addClass('hidden');
             
             // Re-open the card dialog
-            cardDialog.$dialogOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
             cardDialog.$dialog.addClass('active').removeClass('hidden');
         });
     },
@@ -1129,7 +1262,7 @@ var cardDialog = {
      * @param {String} cardNum The credit card number
      * @returns {Boolean}
      */
-    isValidCreditCard: function (cardNum) {
+    isValidCreditCard: function(cardNum) {
 
         // Accept only spaces, digits and dashes
         if (/[^0-9 \-]+/.test(cardNum)) {

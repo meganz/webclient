@@ -97,7 +97,6 @@
         "checkParamNames": true,
         "checkRedundantParams": true,
         "checkRedundantReturns": true,
-        "leadingUnderscoreAccess": true,
         "checkTypes": "strictNativeCase"
     },
     

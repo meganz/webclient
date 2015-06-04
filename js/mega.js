@@ -445,14 +445,20 @@ function MegaData()
             if(!M.d[h].ts) {
                 var a = fm_getnodes(h);
                 for (var i in a) {
+                    if (!a.hasOwnProperty(i)) {
+                        continue;
+                    }
                     var n = M.d[a[i]];
                     if (n) {
-                        if (ts < n.ts)
+                        if (ts < n.ts) {
                             ts = n.ts;
-                        if (n.t)
+                        }
+                        if (n.t) {
                             folders++;
-                        else
+                        }
+                        else {
                             files++;
+                        }
                     }
                 }
                 M.d[h].ts = ts;
@@ -1561,7 +1567,7 @@ function MegaData()
                 M.i_cache[a.u] = cs.ts;
 
 
-                var cs = M.contactstatus(b.u);
+                cs = M.contactstatus(b.u);
                 if (cs.ts === 0) {
                     cs.ts = -1;
                 }
@@ -2978,7 +2984,7 @@ function MegaData()
                         ctx.account.balance = res.balance;
                         ctx.account.reseller = res.reseller;
                         ctx.account.prices = res.prices;
-                        
+
                         // If a subscription, get the timestamp it will be renewed
                         if (res.stype === 'S') {
                             ctx.account.srenew = res.srenew;
@@ -3301,89 +3307,88 @@ function MegaData()
     };
 
     this.getLinks = function(h) {
-        this.$getLinkPromise = new $.Deferred();
+        function getLinksDone() {
+            for (var i in links) {
+                api_req({a: 'l', n: links[i]}, {
+                    node: links[i],
+                    last: i == links.length - 1,
+                    callback: function(res, ctx) {
 
-        loadingDialog.show();
-        this.links = [];
-        this.folderLinks = [];
-        for (var i in h) {
-            var n = M.d[h[i]];
-            if (n) {
-                if (n.t) {
-                    this.folderLinks.push(n.h);
-                }
-                this.links.push(n.h);
+                        if (typeof res !== 'number') {
+                            M.nodeAttr({h: M.d[ctx.node].h, ph: res});
+                        }
+
+                        if (ctx.last) {
+                            $getLinkPromise.resolve();
+                            loadingDialog.hide();
+                        }
+                    }
+                });
             }
         }
-        if (d) {
-            console.log('getLinks', this.links);
-        }
-        if (this.folderLinks.length > 0) {
-            this.getFolderlinks();
-        }
-        else {
-            this.getLinksDone();
-        }
+        function getFolderlinks() {
 
-        return this.$getLinkPromise;
-    };
+            if (folderLinks.length > 0) {
+                var theNextNodeInTheFolderLinksArray = M.d[folderLinks.shift()];
 
-    this.getLinksDone = function() {
-        var self = this;
-
-        for (var i in this.links) {
-            api_req({a: 'l', n: this.links[i]}, {
-                node: this.links[i],
-                last: i == this.links.length - 1,
-                callback: function(res, ctx) {
-
-                    if (typeof res !== 'number') {
-                        M.nodeAttr({h: M.d[ctx.node].h, ph: res});
+                if (theNextNodeInTheFolderLinksArray) {
+                    if (theNextNodeInTheFolderLinksArray.shares
+                            && theNextNodeInTheFolderLinksArray.shares['EXP']) {
+                        getFolderlinks();
                     }
+                    else {
+                        var theListOfNodesWithinTheCloudFolder = fm_getnodes(theNextNodeInTheFolderLinksArray.h);
+                        theListOfNodesWithinTheCloudFolder.push(theNextNodeInTheFolderLinksArray.h);
 
-                    if (ctx.last) {
-                        self.$getLinkPromise.resolve();
-                        loadingDialog.hide();
+                        api_setshare(theNextNodeInTheFolderLinksArray.h, [{u: 'EXP', r: 0}],
+                            theListOfNodesWithinTheCloudFolder, {
+                                fln: theNextNodeInTheFolderLinksArray.h,
+                                done: function(res, ctx) {
+                                    if (res.r && res.r[0] === 0) {
+
+                                        // ToDo: timestamp ts can be different here and on server side, check how this influence execution
+                                        M.nodeShare(ctx.fln, {h: ctx.fln, r: 0, u: 'EXP', ts: Math.floor(Date.now() / 1000)});
+                                    }
+                                    getFolderlinks();
+                                }
+                            }
+                        );
                     }
-                }
-            });
-        }
-    };
-
-    this.getFolderlinks = function() {
-
-        if (this.folderLinks.length > 0) {
-            var n = M.d[this.folderLinks[0]];
-            this.folderLinks.splice(0, 1);
-
-            if (n) {
-                this.fln = n;
-                if (n.shares && n.shares['EXP']) {
-                    this.getFolderlinks();
                 }
                 else {
-                    var h = fm_getnodes(n.h);
-                    h.push(n.h);
-
-                    api_setshare(n.h, [{u: 'EXP', r: 0}], h, {
-                        done: function(res) {
-                            if (res.r && res.r[0] === 0) {
-
-                                // ToDo: timestamp ts can be different here and on server side, check how this influence execution
-                                M.nodeShare(M.fln.h, {h: M.fln.h, r: 0, u: 'EXP', ts: Math.floor(new Date().getTime() / 1000)});
-                            }
-                            M.getFolderlinks();
-                        }
-                    });
+                    getFolderlinks();
                 }
             }
             else {
-                this.getFolderlinks();
+                getLinksDone();
             }
         }
-        else {
-            this.getLinksDone();
+        var $getLinkPromise = new MegaPromise();
+        var folderLinks = [], links = [];
+
+        loadingDialog.show();
+
+        for (var i in h) {
+            var theCloudNodeFromTheInputArray = M.d[h[i]];
+            if (theCloudNodeFromTheInputArray) {
+                if (theCloudNodeFromTheInputArray.t) {
+                    folderLinks.push(theCloudNodeFromTheInputArray.h);
+                }
+                links.push(theCloudNodeFromTheInputArray.h);
+            }
         }
+        if (d) {
+            console.log('getLinks', links);
+        }
+        if (folderLinks.length > 0) {
+            getFolderlinks();
+        }
+        else {
+            getLinksDone();
+        }
+
+        this.links = links;
+        return $getLinkPromise;
     };
 
     this.makeDir = function(n)
@@ -3799,10 +3804,8 @@ function MegaData()
                 errorstr = l[24];
                 break;
             case EOVERQUOTA:
-                if (d)
-                    console.log('Quota error');
-                // errorstr = l[233];
-                // break;
+                errorstr = l[1673];
+                break;
                 // case EAGAIN:               errorstr = l[233]; break;
                 // case ETEMPUNAVAIL:         errorstr = l[233]; break;
             default:
@@ -4185,12 +4188,12 @@ function MegaData()
     {
         // Get site transfer data from after the hash in the URL
         var urlParts = /#sitetransfer!(.*)/.exec(window.location);
-        
+
         if (urlParts) {
 
             // Decode from Base64 and JSON
             urlParts = JSON.parse(atob(urlParts[1]));
-            
+
             if (urlParts) {
                 // If the user is already logged in here with the same account
                 // we can avoid a lot and just take them to the correct page
@@ -4199,7 +4202,7 @@ function MegaData()
                     return;
                 }
 
-                // If the user is already logged in but with a different account just load that account instead. The 
+                // If the user is already logged in but with a different account just load that account instead. The
                 // hash they came from e.g. a folder link may not be valid for this account so just load the file manager.
                 else if (u_k && (JSON.stringify(u_k) !== JSON.stringify(urlParts[0]))) {
                     window.location.hash = 'fm';
@@ -4217,13 +4220,13 @@ function MegaData()
                 u_storage.k = JSON.stringify(u_k);
                 u_storage.sid = u_sid;
                 api_setsid(u_sid);
-                
+
                 // Get the page to load
                 var toPage = urlParts[2];
-                
+
                 // The isEphemeralAccount flag may not be set (e.g. if from SDK), but if it is then set it
                 var isEphemeralAccount = (typeof urlParts[3] === 'undefined') ? false : urlParts[3];
-                
+
                 // If a regular account, log them in
                 if (!isEphemeralAccount) {
                     this.performRegularLogin(toPage);
@@ -4236,20 +4239,20 @@ function MegaData()
                     else {
                         window.location.hash = '';
                     }
-                    
+
                     // Do a full reload to log them in properly
                     document.location.reload(false);
                 }
             }
         }
     };
-    
+
     /**
      * Performs a regular login as part of the transfer from mega.co.nz
      * @param {String} toPage The page to load e.g. 'fm', 'pro' etc
      */
     this.performRegularLogin = function(toPage) {
-        
+
         var ctx = {
             checkloginresult: function(ctx, result) {
                 if (m) {
@@ -4260,7 +4263,7 @@ function MegaData()
                 }
 
                 // Check for suspended account
-                if (result == EBLOCKED) {
+                if (result === EBLOCKED) {
                     alert(l[730]);
                 }
                 else if (result) {
@@ -4275,7 +4278,7 @@ function MegaData()
             }
         };
 
-        // Continue through the log in flow from approximately the correct 
+        // Continue through the log in flow from approximately the correct
         // place given that we have the master key, session ID and private RSA key
         u_checklogin3(ctx);
     };
@@ -4890,7 +4893,7 @@ function execsc(actionPackets, callback) {
                     // pubEd25519 key was updated!
                     // force finger regen.
                     delete pubEd25519[actionPacket.u];
-                    getPubEd25519(actionPacket.u);
+                    crypt.getPubEd25519(actionPacket.u);
                 }
             }
         }
@@ -5268,7 +5271,7 @@ function getuid(email)
 }
 
 function doshare(h, targets, dontShowShareDialog) {
-    var $promise = new $.Deferred();
+    var $promise = new MegaPromise();
 
     nodeids = fm_getnodes(h);
     nodeids.push(h);
@@ -5329,7 +5332,7 @@ function doshare(h, targets, dontShowShareDialog) {
 function doshare2(nodeHandle, t, dontShowShareDialog, msg)
 {
     // ToDo: wait for msg and implement it
-    var $promise = new $.Deferred();
+    var $promise = new MegaPromise();
 
     nodeids = fm_getnodes(nodeHandle);
     nodeids.push(nodeHandle);
@@ -5412,7 +5415,7 @@ function process_f(f, cb, retry)
             if (skn.length) {
                 process_f(f, cb, 1);
             } else {
-                if (cb) cb();
+                if (cb) cb(!!newmissingkeys);
             }
             if (d) console.timeEnd('process_f');
         }
@@ -5769,7 +5772,7 @@ function loadfm_callback(res, ctx) {
         processPS(res.ps);
     }
 
-    process_f(res.f, function onLoadFMDone() {
+    process_f(res.f, function onLoadFMDone(hasMissingKeys) {
 
         // If we have shares, and if a share is for this node, record it on the nodes share list
         if (res.s) {
@@ -5805,6 +5808,10 @@ function loadfm_callback(res, ctx) {
         }
 
         getsc();
+
+        if (hasMissingKeys) {
+            srvlog('Got missing keys processing gettree...', null, true);
+        }
     });
 }
 

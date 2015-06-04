@@ -993,9 +993,6 @@ function initUI() {
         if (!clickedClass) {
             return;
         }
-		if ($('.nw-fm-left-icon.transfers').hasClass('active')) {
-			$(this).addClass('active');
-		}
         if (!fmTabState || fmTabState['cloud-drive'].root !== M.RootID) {
             fmTabState = {
                 'cloud-drive':    { root: M.RootID,    prev: null },
@@ -5263,6 +5260,10 @@ function transferPanelUI()
         if (u_type === 0)
             ephemeralDialog('Transfer settings are for registered users only.');
         else {
+			if ($('.nw-fm-left-icon.transfers').hasClass('active')) {
+				$('.fmholder').removeClass('transfer-panel-opened');
+				$(window).trigger('resize');
+			}
             $('.nw-fm-left-icon').removeClass('active');
 			$('.nw-fm-left-icon.settings').addClass('active');
             document.location.hash = 'fm/account/settings';

@@ -24,9 +24,7 @@
                     "js/jsbn.js",
                     "js/jsbn2.js",
                     "js/dcraw.js",
-                    "js/exif.js",
-                    "js/megaLogger.js",
-                    "js/tlvstore.js"
+                    "js/exif.js"
                    ],
         "includePattern": ".+\\.js(doc)?$",
         "excludePattern": "(^|\\/|\\\\)_"

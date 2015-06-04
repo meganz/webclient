@@ -3793,10 +3793,8 @@ function MegaData()
                 errorstr = l[24];
                 break;
             case EOVERQUOTA:
-                if (d)
-                    console.log('Quota error');
-                // errorstr = l[233];
-                // break;
+                errorstr = l[1673];
+                break;
                 // case EAGAIN:               errorstr = l[233]; break;
                 // case ETEMPUNAVAIL:         errorstr = l[233]; break;
             default:

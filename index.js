@@ -87,7 +87,7 @@ function scrollMenu() {
 }
 
 function init_page() {
-    
+
     // If they are transferring from mega.co.nz
     if (page.substr(0, 13) == 'sitetransfer!') {
         M.transferFromMegaCoNz();
@@ -1016,7 +1016,27 @@ function tooltiplogin() {
     }
 }
 
-function mLogout() {
+function mCleanestLogout(aUserHandle) {
+    if (u_type !== 0 && u_type !== 3) {
+        throw new Error('Operation not permitted.');
+    }
+
+    mLogout(function() {
+        MegaDB.dropAllDatabases(aUserHandle)
+            .always(function(r) {
+                console.debug('mCleanestLogout', r);
+
+                localStorage.clear();
+                sessionStorage.clear();
+
+                setTimeout(function() {
+                    location.reload(true);
+                }, 7e3);
+            });
+    });
+}
+
+function mLogout(aCallback) {
     $.dologout = function (Quiet) {
         if ((fminitialized && downloading) || ul_uploading) {
             if (Quiet) {
@@ -1045,7 +1065,12 @@ function mLogout() {
             var finishLogout = function() {
                 if (--step === 0) {
                     u_logout(true);
-                    document.location.reload();
+                    if (typeof aCallback === 'function') {
+                        aCallback();
+                    }
+                    else {
+                        document.location.reload();
+                    }
                 }
             }, step = 1;
             loadingDialog.show();
@@ -1508,13 +1533,13 @@ function topmenuUI() {
             }
         }
     });
-    
+
     $('.top-menu-popup .top-menu-item').unbind('click');
     $('.top-menu-popup .top-menu-item').rebind('click', function () {
-        
+
         $('.top-menu-popup').removeClass('active');
         $('.top-menu-icon').removeClass('active');
-        
+
         var className = $(this).attr('class');
         if (!className) {
             className = '';

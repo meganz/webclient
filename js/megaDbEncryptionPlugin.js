@@ -4,8 +4,8 @@
  * @param mdbInstance {MegaDB}
  * @constructor
  */
-var MegaDBEncryption = function(mdbInstance) {
-    assert(u_privk, 'missing private key');
+function MegaDBEncryption(mdbInstance) {
+    assert(u_k, 'missing master key');
 
     var self = this;
 
@@ -17,29 +17,57 @@ var MegaDBEncryption = function(mdbInstance) {
 
     var _encDecKeyCache = null;
     var getEncDecKey = function() {
-        assert(u_handle, 'missing u_handle');
-        assert(u_privk, 'missing u_privk');
 
-        // user's already loaded, static key (e.g. u_privk)
-        if(_encDecKeyCache) {
-            return _encDecKeyCache;
-        } else if (typeof(localStorage["mdbk_" + u_handle]) != "undefined") {
-            _encDecKeyCache = stringcrypt.stringDecrypter(localStorage["mdbk_" + u_handle], u_privk);
-            return _encDecKeyCache;
-        } else {
-            _encDecKeyCache = stringcrypt.newKey();
-            localStorage["mdbk_" + u_handle] = stringcrypt.stringEncrypter(_encDecKeyCache, u_privk);
-            return _encDecKeyCache;
+        if(_encDecKeyCache === null) {
+            throw new Error('_encDecKeyCache is not yet initialised');
         }
+
+        return _encDecKeyCache;
     };
 
-    var hasherFunc = (function() {
-        var H = asmCrypto.SHA256.base64;
-        var hCache = H(u_pubEd25519 + getEncDecKey());
-        return function(v) {
-            return H(v + hCache);
-        }
-    })();
+    var hasherFunc = function(v) {
+        assert(u_pubEd25519, "FATAL: u_pubEd25519 is not set!");
+
+        var hashFunc = asmCrypto.SHA256.base64;
+        var hCache = hashFunc(u_pubEd25519 + getEncDecKey());
+        return hashFunc(v + hCache);
+    };
+
+    // PlugIn Initialization
+    this.setup = function MegaDBEncryptionSetup(mdbServerInstance) {
+        var promise = new MegaPromise();
+
+        mdbServerInstance.getUData('enckey')
+            .then(function(data) {
+                logger.debug('getUData.enckey', data);
+
+                if (!data) {
+                    // Generate new encryption key
+
+                    _encDecKeyCache = stringcrypt.newKey();
+                    data = stringcrypt.stringEncrypter(_encDecKeyCache, u_k);
+
+                    mdbInstance.flags |= MegaDB.DB_FLAGS.HASNEWENCKEY;
+
+                    mdbServerInstance.setUData(data, 'enckey')
+                        .then(function() {
+                            logger.info('setUData.enckey', arguments);
+                            promise.resolve();
+                        }, function(err) {
+                            logger.error('Error storing enckey', err);
+                            promise.reject(err);
+                        });
+                }
+                else {
+                    _encDecKeyCache = stringcrypt.stringDecrypter(data, u_k);
+                    promise.resolve();
+                }
+            }, function(err) {
+                promise.reject(err);
+            });
+
+        return promise;
+    };
 
     // funcs which encrypt or decrypt the whole object
 
@@ -139,13 +167,25 @@ var MegaDBEncryption = function(mdbInstance) {
 
         try {
             simpleDecryptObjFunction(table, obj);
-        } catch(exc) {
-            if(exc.message == "data integrity check failed") {
-                logger.error("data integrity check failed for (will be removed): ", table, obj.id, obj);
+        }
+        catch(exc) {
+            if (exc.message == "data integrity check failed") {
+                logger.error("data integrity check failed for (will be removed): ", table, obj[mdbInstance._getTablePk(table)], obj);
+
                 mdbInstance.server.remove(table, obj[mdbInstance._getTablePk(table)]);
                 e.stopPropagation();
-            } else {
+
+                if (!e.data) {
+                    e.data = {};
+                }
+                if (!e.data.errors) {
+                    e.data.errors = [];
+                }
+                e.data.errors.push(exc);
+            }
+            else {
                 logger.error("onDbRead failed: ", exc, exc.stack ? exc.stack : undefined);
+                throw e;
             }
         }
 
@@ -184,4 +224,4 @@ var MegaDBEncryption = function(mdbInstance) {
     //    });
     //    logger.debug("modify:", table, args);
     //});
-};
+}

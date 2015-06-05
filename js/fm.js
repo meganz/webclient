@@ -2033,7 +2033,7 @@ function fmremove() {
             $('#msgDialog .fm-del-contact-avatar span').empty()
         } else {
             var user = M.d[$.selected[0]];
-            avatar = UserAvatar.contct(user);
+            avatar = useravatar.contct(user);
 
             $('#msgDialog .fm-del-contact-avatar').html(avatar);
         }
@@ -3663,7 +3663,7 @@ function accountUI()
         {
             avatarDialog();
         });
-        $('.fm-account-avatar img').attr('src', UserAvatar.mine())
+        $('.fm-account-avatar img').attr('src', useravatar.mine())
 
         $(window).unbind('resize.account');
         $(window).bind('resize.account', function()
@@ -3853,8 +3853,8 @@ function avatarDialog(close)
                         data: blob,
                         url: myURL.createObjectURL(blob)
                     }
-                $('.fm-account-avatar img').attr('src', UserAvatar.mine())
-                $('.fm-avatar img').attr('src', UserAvatar.top());
+                $('.fm-account-avatar img').attr('src', useravatar.mine())
+                $('.fm-avatar img').attr('src', useravatar.top());
                 avatarDialog(1);
             },
             onImageUpload: function()
@@ -9394,7 +9394,7 @@ function sharedfolderUI() {
     if (n) {
         var u_h = n.p;
         var user = M.d[u_h];
-        avatar = UserAvatar.contact(user);
+        avatar = useravatar.contact(user);
 
         var rights = l[55], rightsclass = ' read-only';
         if (n.r === 1) {
@@ -9487,7 +9487,7 @@ function fingerprintDialog(userid)
 
     var $this = $('.fingerprint-dialog');
 
-    $this.find('.fingerprint-avatar').empty().append(UserAvatar.contact(userid));
+    $this.find('.fingerprint-avatar').empty().append(useravatar.contact(userid));
 
     $this.find('.contact-details-user-name')
         .text(user.name || user.m) // escape HTML things
@@ -9550,7 +9550,7 @@ function contactUI() {
         var user = M.d[u_h];
 
         var onlinestatus = M.onlineStatusClass(megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h)));
-        $('.contact-top-details .nw-contact-block-avatar').html(UserAvatar.contact(u_h));
+        $('.contact-top-details .nw-contact-block-avatar').html(useravatar.contact(u_h));
         $('.contact-top-details .onlinestatus').removeClass('away offline online busy');
         $('.contact-top-details .onlinestatus').addClass(onlinestatus[1]);
         $('.contact-top-details .fm-chat-user-status').text(onlinestatus[0]);

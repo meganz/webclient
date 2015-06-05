@@ -384,7 +384,7 @@ function MegaData()
                                 data: blob,
                                 url: myURL.createObjectURL(blob)
                             };
-                            UserAvatar.loaded(M.u[ctx.u]);
+                            useravatar.loaded(M.u[ctx.u]);
                         }
                     }
                 });
@@ -810,7 +810,7 @@ function MegaData()
                 }
 
                 node = M.d[u_h];
-                avatar = UserAvatar.contact(u_h, "nw-contact-avatar")
+                avatar = useravatar.contact(u_h, "nw-contact-avatar")
 
                 onlinestatus = M.onlineStatusClass(megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h)));
 
@@ -1329,7 +1329,7 @@ function MegaData()
                         sr.r2 = ' active';
                     }
 
-                    html += '<div class="add-contact-item" id="' + u + '"><div class="add-contact-pad">' + UserAvatar.contact(u) + 'span class="add-contact-username">' + htmlentities(M.u[u].m) + '</span><div class="fm-share-dropdown">' + rt + '</div><div class="fm-share-permissions-block hidden"><div class="fm-share-permissions' + sr.r0 + '" id="rights_0">' + l[55] + '</div><div class="fm-share-permissions' + sr.r1 + '" id="rights_1">' + l[56] + '</div><div class="fm-share-permissions' + sr.r2 + '" id="rights_2">' + l[57] + '</div><div class="fm-share-permissions" id="rights_3">' + l[83] + '</div></div></div></div>';
+                    html += '<div class="add-contact-item" id="' + u + '"><div class="add-contact-pad">' + useravatar.contact(u) + 'span class="add-contact-username">' + htmlentities(M.u[u].m) + '</span><div class="fm-share-dropdown">' + rt + '</div><div class="fm-share-permissions-block hidden"><div class="fm-share-permissions' + sr.r0 + '" id="rights_0">' + l[55] + '</div><div class="fm-share-permissions' + sr.r1 + '" id="rights_1">' + l[56] + '</div><div class="fm-share-permissions' + sr.r2 + '" id="rights_2">' + l[57] + '</div><div class="fm-share-permissions" id="rights_3">' + l[83] + '</div></div></div></div>';
                 }
             }
             $('.share-dialog .fm-shared-to').html(html);

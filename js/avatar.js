@@ -998,7 +998,7 @@ window.ImageUploadAndCrop = (function() {
 })();
 })(this);
 
-var UserAvatar = {
+var useravatar = {
     /**
      *  List of TWO-letters avatars that we ever generated. It's useful to replace
      *  the moment we discover the real avatar associate with that avatar

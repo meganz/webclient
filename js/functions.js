@@ -175,24 +175,42 @@ function ellipsis(text, location, maxCharacters) {
     return text;
 }
 
+/**
+ * Convert [$nnn] (Eg, [$102]) to their localized string
+ *
+ * @param html (String) html markup string
+ * @returns {String}
+ */
 function translate(html) {
-    return String(html).replace(/\[\$(\d+)(?:\.(\w+))?\]/g, function(m, num, ns) {
+    /**
+     * String.replace callback (__translate_stub)
+     *
+     * @param m {String} The whole matched string
+     * @param num {Number} the locale string number
+     * @param ns {String} "Namespace" (Ie, operation) if any
+     * @returns {String} The localized string
+     */
+    function __translate_stub(m, num, ns) {
         if (ns) {
             m = num + '.' + ns;
 
             if (ns === 'dq') {
+                // Replace double quotes to their html entities
                 l[m] = String(l[num]).replace('"', '&quot;', 'g');
             }
             else if (ns === 'q') {
+                // Escape single quotes
                 l[m] = String(l[num]).replace("'", "\\'", 'g');
             }
             else if (ns === 'dqq') {
+                // Both of the above
                 l[m] = String(l[num]).replace('"', '&quot;', 'g');
                 l[m] = l[m].replace("'", "\\'", 'g');
             }
         }
         return String(l[num]);
-    });
+    }
+    return String(html).replace(/\[\$(\d+)(?:\.(\w+))?\]/g, __translate_stub);
 }
 
 /**
@@ -268,7 +286,7 @@ function populate_l() {
         '<a href="http://en.wikipedia.org/wiki/Public-key_cryptography" target="_blank" rel="noreferrer">').replace('[/A]',
         '</a>');
     l[1148] = l[1148].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
-    l[6978] = l[6978].replace('[A]', '<span class="red">').replace('[/A]', '</span>');    
+    l[6978] = l[6978].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
     l[1151] = l[1151].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
     l[731] = l[731].replace('[A]', '<a href="#terms">').replace('[/A]', '</a>');
     if (lang === 'en') {

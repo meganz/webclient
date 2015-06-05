@@ -1016,13 +1016,14 @@ function resetUploadDownload() {
 	{
 		clearXhr(); /* destroy all xhr */
 
-		$('.transfer-pause-icon').addClass('hidden');
+		$('.transfer-pause-icon').addClass('disabled');
 		$('.transfer-panel-empty-txt').removeClass('hidden');
 		$('.transfer-table-header').hide(0);
 
 		if ($.transferClose) $.transferClose();
 
-		$('.transfer-clear-all-icon').addClass('hidden');
+		$('.transfer-clear-all-icon').addClass('disabled');
+		$('.transfer-clear-completed').addClass('disabled');
 		panelDomQueue = {};
 		GlobalProgress = {};
 		delete $.transferprogress;
@@ -1093,7 +1094,7 @@ ulQueue.stuck = function() {
 			if (ASSERT(chunk instanceof ChunkUpload, 'Invalid pending chunk'))
 			{
 				var id = UploadManager.GetGID(chunk.ul);
-				$('.transfer-table #' + id + ' td:eq(3)').text('Internal Error (0x7f023)');
+				$('.transfer-table #' + id + ' td:eq(0)').text('Internal Error (0x7f023)');
 				$('.transfer-table #' + id).attr('id', 'STUCKed_' + id);
 				srvlog('Upload automatically aborted on stuck detection');
 				UploadManager.abort(id);

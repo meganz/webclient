@@ -108,11 +108,13 @@
             <!-- Please add "filled" classname if user have deleted items !-->
             <div class="nw-fm-left-icon rubbish-bin"><div class="nw-fm-left-border"></div><div class="nw-fm-left-tooltip">[$168]</div><div class="rubbish-bin-icon"></div></div>
             <div class="nw-fm-left-icon settings"><div class="nw-fm-left-border"></div><div class="nw-fm-left-tooltip">[$569]</div><div class="settings-icon"></div></div>
-            <div class="nw-fm-left-icon transfers file-transfer-icon download-percents-0 upload-percents-0">
+            <div class="nw-fm-left-icon transfers">
             	<div class="nw-fm-left-border"></div>
                 <div class="nw-fm-left-tooltip">[$104]</div>
-                <div class="file-transfer-download">
-                    <div class="file-transfer-upload"></div>
+            	<div class="file-transfer-icon download-percents-0 upload-percents-0">
+                    <div class="file-transfer-download">
+                        <div class="file-transfer-upload"></div>
+                    </div>
                 </div>
             </div>
             
@@ -969,7 +971,12 @@
 
         <div class="fm-transfers-block">
              <div class="fm-tranfers-header">
-            
+              <div class="tranfer-top-txt">[$6111]</div>
+              <div class="transfer-clear-completed disabled hidden"><span>Clear completed</span></div>
+              <div class="transfer-clear-all-icon disabled last-button"><span>Clear all transfers</span></div>
+              <div class="transfer-pause-icon disabled"><span>[$6167]</span></div>
+              <div class="clear"></div>
+              
              </div>
              <div class="tranfer-table">
                 <div class="transfer-panel-empty-txt">
@@ -978,11 +985,11 @@
                 </div>
                 <table width="100%" border="0" cellspacing="0" cellpadding="0" class="transfer-table-header">
                     <tr>
-                        <th>#</th>
+                        <th><span></span></th>
                         <th>[$86]</th>
-                        <th >[$88]</th>
                         <th>ETA</th>
                         <th>[$87]</th>
+                        <th></th>
                         <th>[$89]</th>
                         <th class="grid-url-header"></th>
                     </tr>
@@ -990,13 +997,13 @@
                 <div class="transfer-scrolling-table">
                     <table width="100%" height="100%" border="0" cellspacing="0" cellpadding="0" class="transfer-table">
                         <tr class="clone-of-header">
-                            <th width="50"></th>
+                            <th width="230"></th>
                             <th></th>
-                            <th width="300"></th>
-                            <th width="110"></th>
-                            <th width="100"></th>
-                            <th width="300"></th>
-                            <th width="42" class="grid-url-field"></th>
+                            <th width="96"></th>
+                            <th width="96"></th>
+                            <th width="0"></th>
+                            <th width="192"></th>
+                            <th width="64" class="grid-url-field"></th>
                         </tr>
                     </table>
                 </div>
@@ -1543,25 +1550,7 @@
         </div>
 
     </div>
-    <div class="transfer-panel" style="display:none;">
-        <div class="transfer-icons-block">
-            <div class="transfer-panel-title">
-                [$104]
-            </div>
-            <a class="transfer-clear-all-icon hidden"></a>
-            <a class="tranfer-view-icon"></a>
-            <!-- Please add/remove "active" class to sjow/hide upload and download indicators !-->
-            <div class="tranfer-upload-indicator">
-                640 Kb/s
-            </div>
-            <div class="tranfer-download-indicator">
-                1640 Kb/s
-            </div>
-            <a class="transfer-pause-icon hidden"></a>
-            <div class="clear"></div>
-        </div>
-       
-    </div>
+    
 </div>
 
 

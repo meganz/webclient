@@ -10,7 +10,7 @@ function FlashIO(dl_id, dl) {
 
     this.write = function(buffer, position, done) {
         var node = document.getElementById(swfid);
-        if (typeof node.flashdata !== 'function') {
+        if (!node || typeof node.flashdata !== 'function') {
             return setTimeout(function() {
                 if (!dl.cancelled) {
                     if (++retries < 100) {

@@ -111,16 +111,26 @@ function u_checklogin3a(res, ctx) {
 
         init_storage(u_storage);
 
-        u_k = JSON.parse(u_storage.k);
-        u_k_aes = new sjcl.cipher.aes(u_k);
-        
+        if (u_storage.k) {
+            try {
+                u_k = JSON.parse(u_storage.k);
+            }
+            catch(e) {
+                console.error('Error parsing key', e);
+            }
+        }
+
+        if (u_k) {
+            u_k_aes = new sjcl.cipher.aes(u_k);
+        }
+
         try {
             if (u_attr.privk) {
                 u_privk = crypto_decodeprivkey(a32_to_str(decrypt_key(u_k_aes, base64_to_a32(u_attr.privk))));
             }
         }
         catch (e) {
-            console.log('Error decoding private RSA key');
+            console.error('Error decoding private RSA key', e);
         }
 
         if (!u_attr.email) {
@@ -216,7 +226,7 @@ function u_wasloggedin() {
 
 // set user's RSA key
 function u_setrsa(rsakey) {
-    var $promise = new $.Deferred();
+    var $promise = new MegaPromise();
 
     var ctx = {
         callback: function (res, ctx) {
@@ -560,9 +570,16 @@ function generateAvatarMeta(user_hash) {
  * @param ctx {object}
  *     Context, in case higher hierarchies need to inject a context
  *     (default: none).
+ * @return {MegaPromise}
+ *     A promise that is resolved when the original asynch code is settled.
+ *     Can be used to use promises instead of callbacks for asynchronous
+ *     dependencies.
  */
 function getUserAttribute(userhandle, attribute, pub, nonHistoric,
-    callback, ctx) {
+                          callback, ctx) {
+    var myCtx = ctx || {};
+
+    // Assemble property name on Mega API.
     var attributePrefix = '';
     if (pub === true || pub === undefined) {
         attributePrefix = '+';
@@ -575,45 +592,48 @@ function getUserAttribute(userhandle, attribute, pub, nonHistoric,
     }
     attribute = attributePrefix + attribute;
 
-    // Assemble context for this async API request.
-    var myCtx = ctx || {};
-    myCtx.u = userhandle;
-    myCtx.ua = attribute;
-    myCtx.callback = function (res, ctx) {
+    // Make the promise to execute the API code.
+    var thePromise = new MegaPromise();
+
+    function settleFunction(res) {
         if (typeof res !== 'number') {
             // Decrypt if it's a private attribute container.
-            var value = res;
-            if (ctx.ua.charAt(0) === '*') {
+            if (attribute.charAt(0) === '*') {
                 var clearContainer = tlvstore.blockDecrypt(base64urldecode(res),
-                    u_k);
-                value = tlvstore.tlvRecordsToContainer(clearContainer);
+                                                           u_k);
+                res = tlvstore.tlvRecordsToContainer(clearContainer);
             }
             if (window.d) {
-                console.log('Attribute "' + ctx.ua + '" for user "' + ctx.u
-                            + '" is "' + value + '".');
+                console.log('Attribute "' + attribute + '" for user "'
+                            + userhandle + '" is "' + res + '".');
             }
-            if (ctx.callback2) {
-                ctx.callback2(value, ctx);
-            }
+            thePromise.resolve(res);
         }
         else {
+            // Got back an error (a number).
             if (window.d) {
-                console.log('Error retrieving attribute "' + ctx.ua
-                            + '" for user "' + ctx.u + '": ' + res + '!');
+                console.log('Warning, attribute "' + attribute
+                            + '" for user "' + userhandle
+                            + '" could not be retrieved: ' + res + '!');
             }
-            if (ctx.callback2) {
-                ctx.callback2(res, ctx);
-            }
+            thePromise.reject(res);
         }
-    };
-    myCtx.callback2 = callback;
+
+        // Finish off if we have a callback.
+        if (callback) {
+            callback(res, myCtx);
+        }
+    }
+
+    // Assemble context for this async API request.
+    myCtx.u = userhandle;
+    myCtx.ua = attribute;
+    myCtx.callback = settleFunction;
 
     // Fire it off.
-    api_req({
-        'a': 'uga',
-        'u': userhandle,
-        'ua': attribute
-    }, myCtx);
+    api_req({'a': 'uga', 'u': userhandle, 'ua': attribute}, myCtx);
+
+    return thePromise;
 }
 
 /**
@@ -634,13 +654,23 @@ function getUserAttribute(userhandle, attribute, pub, nonHistoric,
  *     Callback function to call upon completion (default: none). This callback
  *     function expects two parameters: the attribute `name`, and its `value`.
  *     In case of an error, the `value` will be undefined.
+ * @param ctx {object}
+ *     Context, in case higher hierarchies need to inject a context
+ *     (default: none).
  * @param mode {integer}
  *     Encryption mode. One of BLOCK_ENCRYPTION_SCHEME (default: AES_CCM_12_16).
+ * @return {MegaPromise}
+ *     A promise that is resolved when the original asynch code is settled.
+ *     Can be used to use promises instead of callbacks for asynchronous
+ *     dependencies.
  */
-function setUserAttribute(attribute, value, pub, nonHistoric, callback,
-    mode) {
+function setUserAttribute(attribute, value, pub, nonHistoric, callback, ctx,
+                          mode) {
+    var myCtx = ctx || {};
+
+    // Prepare all data needed for the call on the Mega API.
     if (mode === undefined) {
-        mode = tlvstore.BLOCK_ENCRYPTION_SCHEME.AES_CCM_12_16;
+        mode = tlvstore.BLOCK_ENCRYPTION_SCHEME.AES_GCM_12_16;
     }
     if (nonHistoric === true || nonHistoric === 1) {
         attribute = '!' + attribute;
@@ -656,37 +686,42 @@ function setUserAttribute(attribute, value, pub, nonHistoric, callback,
             tlvstore.containerToTlvRecords(value), u_k, mode));
     }
 
+    // Make the promise to execute the API code.
+    var thePromise = new MegaPromise();
+
+    function settleFunction(res) {
+        if (typeof res !== 'number') {
+            console.log('Setting user attribute "'
+                        + attribute + '", result: ' + res);
+            thePromise.resolve(res);
+        }
+        else {
+            console.log('Error setting user attribute "'
+                        + attribute + '", result: ' + res + '!');
+            thePromise.reject(res);
+        }
+
+        // Finish off if we have a callback.
+        if (callback) {
+            callback(res, myCtx);
+        }
+    }
+
     // Assemble context for this async API request.
-    var myCtx = {
-        callback: function (res, ctx) {
-            if (window.d) {
-                if (typeof res !== 'number') {
-                    console.log('Setting user attribute "'
-                                + ctx.ua + '", result: ' + res);
-                }
-                else {
-                    console.log('Error setting user attribute "'
-                                + ctx.ua + '", result: ' + res + '!');
-                }
-            }
-            if (ctx.callback2) {
-                ctx.callback2(res, ctx);
-            }
-        },
-        ua: attribute,
-        callback2: callback,
-    };
+    myCtx.ua = attribute;
+    myCtx.callback = settleFunction;
 
     // Fire it off.
-    var apiCall = {
-        'a': 'up'
-    };
+    var apiCall = {'a': 'up'};
     apiCall[attribute] = value;
     api_req(apiCall, myCtx);
+
+    return thePromise;
 }
 
 function isNonActivatedAccount() {
-    return (!u_privk && typeof (u_attr.p) !== 'undefined' && (u_attr.p >= 1 || u_attr.p <= 4));
+    return (!u_privk && typeof (u_attr.p) !== 'undefined'
+            && (u_attr.p >= 1 || u_attr.p <= 4));
 }
 
 function isEphemeral() {
@@ -712,7 +747,7 @@ var setLastInteractionWith = function(u_h, v) {
     var isDone = false;
     var $promise = createTimeoutPromise(
         function() {
-            return isDone === true
+            return isDone === true;
         },
         500,
         10000
@@ -732,7 +767,7 @@ var setLastInteractionWith = function(u_h, v) {
                 } else {
                     setLastInteractionWith(u_h, v)
                         .done(function() { $promise.resolve.apply($promise, arguments); })
-                        .fail(function() { $promise.reject.apply($promise, arguments); })
+                        .fail(function() { $promise.reject.apply($promise, arguments); });
                 }
             })
             .fail(function(e) {
@@ -790,9 +825,9 @@ var getLastInteractionWith = function(u_h) {
             M.u[u_h].ts = ts;
         }
 
-        if (r[0] == "0") {
+        if (r[0] === "0") {
             $elem.addClass('cloud-drive');
-        } else if (r[0] == "1" && megaChat) {
+        } else if (r[0] === "1" && megaChat) {
             M.u[u_h].lastChatActivity = ts;
             var room = megaChat.getPrivateRoom(u_h);
             if (room && megaChat && megaChat.plugins && megaChat.plugins.chatNotifications) {
@@ -811,7 +846,7 @@ var getLastInteractionWith = function(u_h) {
             time2last(ts)
         );
 
-        if ($.sortTreePanel.contacts.by == 'last-interaction') {
+        if ($.sortTreePanel.contacts.by === 'last-interaction') {
             M.contacts(); // we need to resort
         }
     };
@@ -829,9 +864,9 @@ var getLastInteractionWith = function(u_h) {
         $elem.addClass('never');
     };
 
-
+    var $promise;
     if (_lastUserInteractionCache[u_h]) {
-        var $promise = MegaPromise.resolve(_lastUserInteractionCache[u_h]);
+        $promise = MegaPromise.resolve(_lastUserInteractionCache[u_h]);
 
         $promise
             .done(_renderLastInteractionDone)
@@ -839,13 +874,13 @@ var getLastInteractionWith = function(u_h) {
 
         return $promise;
     }
-    if (_lastUserInteractionGetRequests[u_h] && _lastUserInteractionGetRequests[u_h].state() == 'pending') {
+    if (_lastUserInteractionGetRequests[u_h] && _lastUserInteractionGetRequests[u_h].state() === 'pending') {
         return _lastUserInteractionGetRequests[u_h];
     }
     var isDone = false;
-    var $promise = createTimeoutPromise(
+    $promise = createTimeoutPromise(
         function() {
-            return isDone === true
+            return isDone === true;
         },
         500,
         10000

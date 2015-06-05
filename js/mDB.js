@@ -41,11 +41,15 @@ function mStorageDB(aName, aOptions, aCallback) {
         aOptions = undefined;
     }
     this.name     = aName;
-    this.options  = aOptions;
+    this.options  = aOptions || {};
     this.handlers = {};
     this.schema   = {};
     mSDBPromises.push(this);
     this.onReadyState = aCallback;
+
+    if (!("plugins" in this.options)) {
+        this.options.plugins = MegaDB.DB_PLUGIN.ENCRYPTION;
+    }
 }
 mStorageDB.prototype = {
     addSchemaHandler: function mStorageDB_addSchemaHandler(aTable, aKeyPath, aHandler) {
@@ -88,46 +92,36 @@ mStorageDB.prototype = {
     },
 
     setup: function mStorageDB_setup() {
-        this.dbtag  = 'msdb_' + this.name + '_' + u_handle + '_';
-        var version = +localStorage[this.dbtag + 'v'] || 0;
-        var oldHash = +localStorage[this.dbtag + 'hash'];
-        var newHash = MurmurHash3(JSON.stringify(this.schema), 0x9e450134);
         var promise = new MegaPromise(), self = this, db;
 
-        if (oldHash !== newHash) {
-            localStorage[this.dbtag + 'v'] = ++version;
-            localStorage[this.dbtag + 'hash'] = newHash;
-        }
-
         // MegaDB's encryption plugin depends on u_privk
-        if (u_privk) {
+        if (typeof u_k !== 'undefined' && u_k) {
 
-            db = new MegaDB(this.name, u_handle, version, this.schema, this.options);
+            db = new MegaDB(this.name, u_handle, this.schema, this.options);
 
             db.bind('onDbStateReady', function _onDbStateReady() {
                 self.fetch(Object.keys(self.schema))
                     .then(function() {
                         __dbNotifyCompletion();
-                    }, function() {
-                        __dbNotifyCompletion(true);
+                    }, function(err) {
+                        __dbNotifyCompletion(err || true);
                     });
             });
 
-            db.bind('onDbStateFailed', function _onDbStateFailed() {
-                if (d) console.error('onDbStateFailed', arguments);
-                __dbNotifyCompletion(true);
+            db.bind('onDbStateFailed', function _onDbStateFailed(ev, error) {
+                if (d) console.error('onDbStateFailed', error.message || error);
+                __dbNotifyCompletion(0xBADF);
             });
         }
         else {
-            Soon(__dbNotifyCompletion.bind(null, true));
+            Soon(__dbNotifyCompletion.bind(null, 0xBADF));
         }
 
         function __dbNotifyCompletion(aError) {
             if (aError) {
-                self.db = null;
                 promise.reject(aError);
             } else {
-                promise.resolve();
+                promise.resolve(db);
             }
             if (self.onReadyState) {
                 Soon(self.onReadyState.bind(self, aError));
@@ -137,7 +131,7 @@ mStorageDB.prototype = {
                 db.unbind('onDbStateReady').unbind('onDbStateFailed');
             }
             mBroadcaster.sendMessage('mStorageDB:' + self.name, aError);
-            promise = newHash = oldHash = version = db = self = undefined;
+            promise = db = self = undefined;
         }
 
         this.db = db;
@@ -199,37 +193,133 @@ mBroadcaster.once('startMega', function __idb_setup() {
     }
     if (indexedDB) {
         mDB = 0x7f;
+
+        if (typeof indexedDB.webkitGetDatabaseNames !== 'function') {
+            if (typeof indexedDB.getDatabaseNames === 'function') {
+                indexedDB.webkitGetDatabaseNames = indexedDB.getDatabaseNames;
+            }
+            else {
+                indexedDB.webkitGetDatabaseNames = function webkitGetDatabaseNames() {
+                    var onsuccess, onerror;
+                    var request = Object.create(IDBRequest.prototype, {
+                        onsuccess: { set: function(fn) { onsuccess = fn; }},
+                        onerror: { set: function(fn) { onerror = fn; }}
+                    });
+
+                    Soon(function __getDatabaseNames_polyfill() {
+                        try {
+                            var length = 0;
+                            var list = Object.create(DOMStringList.prototype, {
+                                item: { value: function(n) {
+                                    return this.hasOwnProperty(n) && this[n] || null;
+                                }},
+                                contains: { value: function(k) {
+                                    return ~Object.getOwnPropertyNames(this).indexOf(k);
+                                }},
+                                length: { get: function() { return length; }}
+                            });
+
+                            for (var i in localStorage) {
+
+                                if (i.substr(0,4) === 'mdb_') {
+                                    var idx = i.split('_').pop();
+
+                                    if (idx == 'hash') {
+                                        list[length++] = i.substr(0, i.length - 5);
+                                    }
+                                }
+                            }
+
+                            __Notify('success', list);
+                        }
+                        catch(e) {
+                            if (typeof onerror === 'function') {
+                                __Notify('error', e);
+                            }
+                            else {
+                                throw e;
+                            }
+                        }
+                    });
+
+                    function __Notify(ev, result) {
+                        ev = new Event(ev);
+                        Object.defineProperty(ev, 'target', {value: request});
+                        Object.defineProperty(request, 'result', {value: result});
+
+                        if (ev.type === 'error') {
+                            onerror(ev);
+                        }
+                        else {
+                            onsuccess(ev);
+                        }
+                    }
+
+                    return request;
+                };
+            }
+        }
+        if (typeof indexedDB.getDatabaseNames !== 'function') {
+            indexedDB.getDatabaseNames = indexedDB.webkitGetDatabaseNames;
+        }
     }
 });
 
 mBroadcaster.once('startMega', function __msdb_init() {
     var db = new mStorageDB('msmain');
 
-    db.addSchemaHandler( 'ipc',  'p',  processIPC );
     db.addSchemaHandler( 'opc',  'p',  processOPC );
+    db.addSchemaHandler( 'ipc',  'p',  processIPC );
     db.addSchemaHandler( 'ps',   'p',  processPS  );
 
     mBroadcaster.once('mStorageDB:' + db.name,
         function __msdb_ready(aError) {
-            if (d) console.log('mStorageDB.ready', !aError);
-            if (aError) {
+            if (d) console.log('mStorageDB.ready', aError);
+
+            if (aError === 0xBADF) {
                 mSDB = db = undefined;
             }
         });
 
     mBroadcaster.once('mFileManagerDB.done',
         function __msdb_setup(aCallback) {
+            function __msdb_done() {
+                if (d) console.log('__msdb_done', arguments);
+
+                if (aCallback === getsc) {
+                    getsc(1);
+                } else {
+                    aCallback();
+                }
+            }
             var promises = mSDBPromises
-                    .map(function(aDBInstance) {
-                        return aDBInstance.setup();
-                    });
-            MegaPromise.allDone(promises).always(
-                function __msdb_done() {
-                    if (aCallback === getsc) {
-                        getsc(1);
-                    } else {
-                        aCallback();
+                .map(function(aDBInstance) {
+                    return aDBInstance.setup();
+                });
+            MegaPromise.all(promises)
+                .done(function __msdb_ready(resultPromises) {
+                    var requiresReload = resultPromises
+                        .some(function(db) {
+                            return db.flags & MegaDB.DB_FLAGS.HASNEWENCKEY;
+                        });
+
+                    if (requiresReload) {
+                        mDBreload();
                     }
+                    else {
+                        __msdb_done();
+                    }
+                }).fail(function __msdb_failed(err) {
+                    if (d) console.error('__msdb_setup error', err);
+
+                    if (err === 0xBADF) {
+                        // error accessing the db, continue with no mSDB support
+                        __msdb_done();
+                    } else {
+                        // error reading db data on disk, force reload
+                        mDBreload();
+                    }
+                }).always(function() {
                     mBroadcaster.sendMessage('mStorageDB!ready');
                 });
             mSDBPromises = undefined;
@@ -248,14 +338,13 @@ mBroadcaster.once('startMega', function __msdb_init() {
 var mFileManagerDB = {
     schema: {
         ok: { key: { keyPath: "h"   }},
-        s:  { key: { keyPath: "h_u" }},
         u:  { key: { keyPath: "u"   }},
-        f:  { key: { keyPath: "h"   }}
+        f:  { key: { keyPath: "h"   }},
+        s:  { key: { keyPath: "h_u" }}
     },
-    version: 1,
 
     init: function mFileManagerDB_init() {
-        var db = new MegaDB("fm", u_handle, this.version, this.schema, {plugins: {}});
+        var db = new MegaDB("fm", u_handle, this.schema);
 
         if (mBroadcaster.crossTab.master) {
             db.bind('onDbStateReady', function _onDbStateReady() {
@@ -276,14 +365,7 @@ var mFileManagerDB = {
                     mDB = this;
                     if (localStorage[u_handle + '_maxaction']) {
                         if (d) console.time('fmdb');
-
-                        mFileManagerDB.fetch([
-                            'f', /* <- f should ALWAYS be first! */
-                            'u',
-                            's',
-                            'ok'
-                        ]);
-
+                        mFileManagerDB.fetch(Object.keys(mFileManagerDB.schema));
                     } else {
                         mFileManagerDB._loadfm(this);
                     }
@@ -301,8 +383,8 @@ var mFileManagerDB = {
             this.slave = true;
         }
 
-        db.bind('onDbStateFailed', function _onDbStateFailed() {
-            if (d) console.error('onDbStateFailed', arguments);
+        db.bind('onDbStateFailed', function _onDbStateFailed(ev, error) {
+            if (d) console.error('onDbStateFailed', error && error.message || error);
             mFileManagerDB._loadfm();
         });
 
@@ -334,6 +416,7 @@ var mFileManagerDB = {
                         process_f(results, function(hasMissingKeys) {
                             delete $.mDBIgnoreDB;
                             if (hasMissingKeys) {
+                                srvlog('Got missing keys on DB, forcing fm reload...', null, true);
                                 mFileManagerDB.reload();
                             } else {
                                 mFileManagerDB.fetch(aTables);
@@ -398,7 +481,7 @@ var mFileManagerDB = {
     },
 
     query: function mFileManagerDB_query(aCommand, aTable, aData) {
-        if (!this.db) {
+        if (!(this.db && this.db.server)) {
             throw new Error("No database connection.");
         }
         else if (this.schema[aTable]) {

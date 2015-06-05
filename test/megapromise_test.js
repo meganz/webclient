@@ -125,6 +125,44 @@ describe("MegaPromise Unit Test", function() {
         p.reject(123, 456);
     });
 
+    it("then passthrough reject", function(done) {
+        var v = "";
+        var p = new MegaPromise();
+        p.then(function(arg) {
+            v = arg + '-donecb';
+
+            return v;
+        }).then(undefined, function(arg) {
+            v = arg + '-failcb';
+
+            return v;
+        });
+
+        p.reject('rej-arg');
+        expect(v).to.eql('rej-arg-failcb');
+
+        done();
+    });
+
+    it("then passthrough resolve", function(done) {
+        var v = "";
+        var p = new MegaPromise();
+        p.then(function(arg) {
+            v = arg + '-donecb';
+
+            return v;
+        }).then(undefined, function(arg) {
+            v = arg + '-failcb';
+
+            return v;
+        });
+
+        p.resolve('res-arg');
+        expect(v).to.eql('res-arg-donecb');
+
+        done();
+    });
+
     it("all with 2 MegaPromises", function(done) {
         var p1 = new MegaPromise();
         var p2 = new MegaPromise();

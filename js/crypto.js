@@ -534,9 +534,10 @@ var crypt = (function () {
 
         // Throw exception to stop whatever they were doing from progressing
         // e.g. initiating/accepting call.
-        throw fingerprintType + ' fingerprint does not match the previously authenticated one! ' +
+        console.error(fingerprintType + ' fingerprint does not match the previously authenticated one! ' +
               'Previous fingerprint: ' + previousFingerprint + '. ' +
-              'New fingerprint: ' + newFingerprint + '. ';
+              'New fingerprint: ' + newFingerprint + '. ');
+        throw new Error(fingerprintType + ' fingerprint does not match the previously authenticated one!');
     };
 
 

@@ -37,3 +37,8 @@ reviews on merge requests as well as enable developers to check their
 work against a target branch before issuing a merge request to make
 sure things are done correctly. Therefore the number of "round trips"
 for the review process can be significantly reduced.
+
+`diffcheck.py` is configured through `contrib/config.py`, which is part of
+the repository.  If you want to make local adaptations, please use
+`contrib/local_config.py` with local options, which will override those from
+`config.py`.  `local_config.py` will not be committed to the repository.

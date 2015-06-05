@@ -103,7 +103,7 @@ function MegaDB(name, suffix, schema, options) {
                         else {
                             err = MegaDB.getRefError(err) || err;
 
-                            if (err.name === 'VersionError') {
+                            if (err.code === DOMException.NOT_FOUND_ERR) {
                                 return __dbBumpVersion(err);
                             }
                         }

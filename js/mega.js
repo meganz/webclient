@@ -3323,20 +3323,20 @@ function MegaData()
         function getFolderlinks() {
 
             if (folderLinks.length > 0) {
-                var theNextNodeInTheFolderLinksArray = M.d[folderLinks.shift()];
+                var node = M.d[folderLinks.shift()];
 
-                if (theNextNodeInTheFolderLinksArray) {
-                    if (theNextNodeInTheFolderLinksArray.shares
-                            && theNextNodeInTheFolderLinksArray.shares['EXP']) {
+                if (node) {
+                    if (node.shares
+                            && node.shares['EXP']) {
                         getFolderlinks();
                     }
                     else {
-                        var theListOfNodesWithinTheCloudFolder = fm_getnodes(theNextNodeInTheFolderLinksArray.h);
-                        theListOfNodesWithinTheCloudFolder.push(theNextNodeInTheFolderLinksArray.h);
+                        var childNodes = fm_getnodes(node.h);
+                        childNodes.push(node.h);
 
-                        api_setshare(theNextNodeInTheFolderLinksArray.h, [{u: 'EXP', r: 0}],
-                            theListOfNodesWithinTheCloudFolder, {
-                                fln: theNextNodeInTheFolderLinksArray.h,
+                        api_setshare(node.h, [{u: 'EXP', r: 0}],
+                            childNodes, {
+                                fln: node.h,
                                 done: function(res, ctx) {
                                     if (res.r && res.r[0] === 0) {
 
@@ -3363,12 +3363,12 @@ function MegaData()
         loadingDialog.show();
 
         for (var i in h) {
-            var theCloudNodeFromTheInputArray = M.d[h[i]];
-            if (theCloudNodeFromTheInputArray) {
-                if (theCloudNodeFromTheInputArray.t) {
-                    folderLinks.push(theCloudNodeFromTheInputArray.h);
+            var node = M.d[h[i]];
+            if (node) {
+                if (node.t) {
+                    folderLinks.push(node.h);
                 }
-                links.push(theCloudNodeFromTheInputArray.h);
+                links.push(node.h);
             }
         }
         if (d) {

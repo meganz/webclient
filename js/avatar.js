@@ -1022,12 +1022,11 @@ var UserAvatar = {
      *
      *  @param letters      String used to generate the avatar
      *  @param id           ID associate with the avatar (uid, email)
-     *  @param extraClasses Any extra CSS classes that we want to append to the HTML
+     *  @param className Any extra CSS classes that we want to append to the HTML
      *  
      *  @return HTML
      */
-    _twoLetters: function(letters, id, extraClasses) {
-        extraClasses = extraClasses || "";
+    _twoLetters: function(letters, id, className) {
         var words = letters.split(/\s+/)
         if (words.length == 1) {
             letters = words[0].substr(0,2);
@@ -1035,8 +1034,11 @@ var UserAvatar = {
             letters = words[0][0]  + words[1][0];
         }
         var color = letters.charCodeAt(0) % 6 + letters.charCodeAt(1) % 6;
-        this._watching[id] = true;
-        return '<div class="' + extraClasses + ' avatar ' +id+  ' color' +color+'">' + letters.toUpperCase() + '</div>';
+        if (!this._watching[id]) {
+            this._watching[id] = {};
+        }
+        this._watching[id][className] = true;
+        return '<div class="' + className + ' ' + id +  ' color' +color+'">' + letters.toUpperCase() + '</div>';
     },
 
     /**
@@ -1044,11 +1046,10 @@ var UserAvatar = {
      *
      *  @param url          Image URL
      *  @param id           ID associate with the avatar (uid)
-     *  @param extraClasses Any extra CSS classes that we want to append to the HTML
+     *  @param className Any extra CSS classes that we want to append to the HTML
      */
-    _image: function(url, id, extraClasses) {
-        extraClasses = extraClasses || "";
-        return '<img src="' + url + '" class="avatar ' + id + ' ' + extraClasses +'"/>';
+    _image: function(url, id, className) {
+        return '<img src="' + url + '" class="' + id + ' ' + className +'"/>';
     },
 
     isEmail: function(email) {
@@ -1060,15 +1061,31 @@ var UserAvatar = {
      *  that is the case we replace that old avatar *everywhere* with their proper avatar
      */
     loaded: function(user) {
-        if (typeof user != "object" || !(this._watching[user.m] || this._watching[user.u])) {
-            // invalid argument or we don't care about this user
+        if (typeof user != "object") {
             return false;
         }
-        // Replace images in the DOM
-        $('.' + user.u + ',.' + user.m.replace(/[\.@]/g, "\\$1")).replaceWith(this.contact(user));
+
+        if (user.u == u_handle && avatars[user.u]) {
+            // my avatar!
+            $('.fm-avatar img,.fm-account-avatar img').attr('src', avatars[user.u].url)
+        }
+
+        var i;
+        if (this._watching[user.u]) {
+            for (i in this._watching[user.u]) {
+                $('.' + i + '.' + user.u).replaceWith(this.contact(user, i))
+            }
+        }
+
+        if (this._watching[user.m]) {
+            for (i in this._watching[user.m]) {
+                $('.' + i + '.' + user.m.replace(/[\.@]/g, "\\$1")).replaceWith(this.contact(user, i));
+            }
+        }
     },
 
-    contact : function(user) {
+    contact : function(user, className) {
+        className = className || "avatar";
         if (this.isEmail(user)) {
             // User is an email, we should look if the user
             // exists, if it does exists we use the user Object.
@@ -1078,18 +1095,18 @@ var UserAvatar = {
                     return this.contact(M.u[u])
                 }
             }
-            return this._twoLetters(user.substr(0,2), user);
+            return this._twoLetters(user.substr(0,2), user, className);
         } else if (typeof user == "string" && M.u[user]) {
             // It's an user ID
             user = M.u[user];
         } else if (typeof user == "string") {
-            return this._twoLetters(user, user);
+            return this._twoLetters(user, user, className);
         }
 
         if (avatars[user.u]) {
-            return this._image(avatars[user.u].url, user.u);
+            return this._image(avatars[user.u].url, user.u, className);
         }
         
-        return this._twoLetters(user.name || user.m, user.u)
+        return this._twoLetters(user.name || user.m, user.u, className)
     },
 };

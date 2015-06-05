@@ -2033,13 +2033,9 @@ function fmremove() {
             $('#msgDialog .fm-del-contact-avatar span').empty()
         } else {
             var user = M.d[$.selected[0]];
-            var av_meta = generateAvatarMeta(user.h);
-            var avatar = av_meta.shortName, av_color = av_meta.color;
-            if (av_meta.avatarUrl)
-                avatar = '<img src="' + av_meta.avatarUrl + '">';
+            avatar = UserAvatar.contct(user);
 
-            $('#msgDialog .fm-del-contact-avatar').attr('class', 'fm-del-contact-avatar two-letters ' + htmlentities(user.h) + ' color' + av_color)
-            $('#msgDialog .fm-del-contact-avatar span').html(avatar);
+            $('#msgDialog .fm-del-contact-avatar').html(avatar);
         }
     } else if (RootbyId($.selected[0]) === M.RubbishID) {
         msgDialog('clear-bin', l[1003], l[76].replace('[X]', (filecnt + foldercnt)) + ' ' + l[77], l[1007], function(e) {
@@ -9398,8 +9394,7 @@ function sharedfolderUI() {
     if (n) {
         var u_h = n.p;
         var user = M.d[u_h];
-        var av_meta = generateAvatarMeta(u_h);
-        avatar = '<img src="' + av_meta.avatarUrl + '">';
+        avatar = UserAvatar.contact(user);
 
         var rights = l[55], rightsclass = ' read-only';
         if (n.r === 1) {
@@ -9451,27 +9446,6 @@ function sharedfolderUI() {
     return r;
 }
 
-function userAvatar(userid)
-{
-    userid = userid.u || userid;
-    var user = M.u[userid];
-    if (!user || !user.u) {
-        return;
-    }
-
-    var name = user.name || user.m;
-
-    var av_meta = generateAvatarMeta(userid);
-    var avatar = av_meta.shortName, av_color = av_meta.color;
-    if (av_meta.avatarUrl)
-        avatar = '<img src="' + av_meta.avatarUrl + '">';
-
-    if (avatars[userid])
-        avatar = '<img src="' + avatars[userid].url + '">';
-
-    return {img: avatar, color: av_color};
-}
-
 function userFingerprint(userid, next) {
     userid = userid.u || userid;
     var user = M.u[userid];
@@ -9511,12 +9485,9 @@ function fingerprintDialog(userid)
         $this = null;
     }
 
-    var $this = $('.fingerprint-dialog')
-        , avatar = userAvatar(userid);
+    var $this = $('.fingerprint-dialog');
 
-    $this.find('.fingerprint-avatar')
-        .attr('class', 'fingerprint-avatar color' + avatar.color)
-        .html(avatar.img)
+    $this.find('.fingerprint-avatar').empty().append(UserAvatar.contact(userid));
 
     $this.find('.contact-details-user-name')
         .text(user.name || user.m) // escape HTML things
@@ -9578,11 +9549,8 @@ function contactUI() {
 //        var cs = M.contactstatus(u_h);
         var user = M.d[u_h];
 
-        var avatar = userAvatar(u_h);
-
         var onlinestatus = M.onlineStatusClass(megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h)));
-        $('.contact-top-details .nw-contact-block-avatar').attr('class', 'nw-contact-block-avatar two-letters ' + htmlentities(u_h) + ' color' + avatar.color);
-        $('.contact-top-details .nw-contact-block-avatar').html(avatar.img);
+        $('.contact-top-details .nw-contact-block-avatar').html(UserAvatar.contact(u_h));
         $('.contact-top-details .onlinestatus').removeClass('away offline online busy');
         $('.contact-top-details .onlinestatus').addClass(onlinestatus[1]);
         $('.contact-top-details .fm-chat-user-status').text(onlinestatus[0]);

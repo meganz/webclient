@@ -385,29 +385,6 @@ function MegaData()
                                 url: myURL.createObjectURL(blob)
                             };
                             UserAvatar.loaded(M.u[ctx.u]);
-                            var el = $('.contact-block-view-avatar.' + ctx.u + ',.avatar.' + ctx.u + ',.contacts-avatar.' + ctx.u);
-                            if (el.length > 0) {
-                                el.find('img').attr('src', avatars[ctx.u].url);
-                            }
-    
-                            el = $('#contact_' + ctx.u);
-                            if (el.length > 0) {
-                                el.find('img').attr('src', avatars[ctx.u].url);
-                            }
-    
-                            el = $('.nw-contact-avatar.' + ctx.u);
-                            if (el.length > 0) {
-                                $(el).html('<img src="' + avatars[ctx.u].url + '">');
-                            }
-    
-                            el = $('.nw-contact-block-avatar.' + ctx.u);
-                            if (el.length > 0) {
-                                $(el).html('<img src="' + avatars[ctx.u].url + '">');
-                            }
-    
-                            if (u_handle === ctx.u) {
-                                $('.fm-avatar img,.fm-account-avatar img').attr('src', avatars[ctx.u].url);
-                            }
                         }
                     }
                 });
@@ -833,13 +810,7 @@ function MegaData()
                 }
 
                 node = M.d[u_h];
-                av_meta = generateAvatarMeta(u_h);
-                avatar = av_meta.shortName;
-                av_color = av_meta.color;
-
-                if (av_meta.avatarUrl) {
-                    avatar = '<img src="' + av_meta.avatarUrl + '">';
-                }
+                avatar = UserAvatar.contact(u_h, "nw-contact-avatar")
 
                 onlinestatus = M.onlineStatusClass(megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h)));
 
@@ -848,7 +819,7 @@ function MegaData()
                     t = '.contacts-blocks-scrolling';
                     html = '<a class="file-block ustatus ' + htmlentities(u_h) + ' ' + onlinestatus[1] + '" id="' + htmlentities(M.v[i].h) + '">\n\
                                 <span class="nw-contact-status"></span>\n\
-                                <span class="nw-contact-block-avatar two-letters ' + htmlentities(u_h) + ' color' + av_color + '">' + avatar + '</span>\n\
+                                ' + avatar + ' \
                                 <span class="shared-folder-info-block">\n\
                                     <span class="shared-folder-name">' + htmlentities(node.name) + '</span>\n\
                                     <span class="shared-folder-info">' + htmlentities(node.m) + '</span>\n\
@@ -859,7 +830,7 @@ function MegaData()
                     t = '.grid-table.contacts';
                     html = '<tr id="' + htmlentities(M.v[i].h) + '">\n\
                                 <td>\n\
-                                    <div class="nw-contact-avatar ' + htmlentities(u_h) + ' color' + av_color + '">' + avatar + '</div>\n\
+                                    ' + avatar + ' \
                                     <div class="fm-chat-user-info todo-star">\n\
                                         <div class="fm-chat-user">' + htmlentities(node.name) + '</div>\n\
                                         <div class="contact-email">' + htmlentities(node.m) + '</div>\n\
@@ -1358,11 +1329,7 @@ function MegaData()
                         sr.r2 = ' active';
                     }
 
-                    var avatar = staticpath + 'images/mega/default-avatar.png';
-                    if (avatars[M.u[u].h])
-                        avatar = avatars[M.u[u].h].url;
-
-                    html += '<div class="add-contact-item" id="' + u + '"><div class="add-contact-pad"><span class="avatar ' + M.u[u].h + '"><span><img src="' + avatar + '" alt=""/></span></span><span class="add-contact-username">' + htmlentities(M.u[u].m) + '</span><div class="fm-share-dropdown">' + rt + '</div><div class="fm-share-permissions-block hidden"><div class="fm-share-permissions' + sr.r0 + '" id="rights_0">' + l[55] + '</div><div class="fm-share-permissions' + sr.r1 + '" id="rights_1">' + l[56] + '</div><div class="fm-share-permissions' + sr.r2 + '" id="rights_2">' + l[57] + '</div><div class="fm-share-permissions" id="rights_3">' + l[83] + '</div></div></div></div>';
+                    html += '<div class="add-contact-item" id="' + u + '"><div class="add-contact-pad">' + UserAvatar.contact(u) + 'span class="add-contact-username">' + htmlentities(M.u[u].m) + '</span><div class="fm-share-dropdown">' + rt + '</div><div class="fm-share-permissions-block hidden"><div class="fm-share-permissions' + sr.r0 + '" id="rights_0">' + l[55] + '</div><div class="fm-share-permissions' + sr.r1 + '" id="rights_1">' + l[56] + '</div><div class="fm-share-permissions' + sr.r2 + '" id="rights_2">' + l[57] + '</div><div class="fm-share-permissions" id="rights_3">' + l[83] + '</div></div></div></div>';
                 }
             }
             $('.share-dialog .fm-shared-to').html(html);

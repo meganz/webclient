@@ -2381,7 +2381,6 @@ function initContextUI()
             fm_tfspause(id);
             $('span.transfer-type', this).addClass('paused');
         });
-        $('.tranfer-download-indicator,.transfer-upload-indicator').removeClass('active');
     });
 
     $(c + '.select-all').unbind('click');
@@ -5340,8 +5339,6 @@ function transferPanelUI()
                 DEBUG(l[214]);
             }
 
-            $('.tranfer-download-indicator,.tranfer-upload-indicator')
-                .removeClass('active');
             $('.fm-transfers-block tr span.transfer-type').removeClass('paused');
         }
         else
@@ -5353,9 +5350,6 @@ function transferPanelUI()
             uldl_hold = true;
 
             $('.transfer-table tr span.transfer-type').addClass('paused');
-
-            $('.tranfer-download-indicator,.tranfer-upload-indicator')
-                .text('PAUSED');
 
             $('.transfer-table tr td:eq(2)').each(function()
             {

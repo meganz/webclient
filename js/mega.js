@@ -3571,7 +3571,7 @@ function MegaData()
                         + '<td><span class="transfer-filtype-icon ' + fileicon(n) + '"></span><span class="tranfer-filetype-txt">' + htmlentities(n.name) + '</span></td>'
                         + '<td></td>'
                         + '<td>' + bytesToSize(n.s) + '</td>'
-                        + '<td></td>'
+                        + '<td><span class="row-number"></span></td>'
                         + '<td><span class="transfer-status queued">Queued</span></td>'
                         + '<td class="grid-url-field"><a class="grid-url-arrow"><span></span></a><a class="clear-transfer-icon"><span></span></a></td>'
                         + '</tr>');
@@ -3593,7 +3593,7 @@ function MegaData()
                 + '<td><span class="transfer-filtype-icon ' + fileicon({name: 'archive.zip'}) + '"></span><span class="tranfer-filetype-txt">' + htmlentities(zipname) + '</span></td>'
                 + '<td></td>'
                 + '<td>' + bytesToSize(zipsize) + '</td>'
-                + '<td></td>'
+                + '<td><span class="row-number"></span></td>'
                 + '<td><span class="transfer-status queued">Queued</span></td>'
                 + '<td class="grid-url-field"><a class="grid-url-arrow"><span></span></a><a class="clear-transfer-icon"><span></span></a></td></tr>');
 
@@ -4010,7 +4010,7 @@ function MegaData()
                 + '<td><span class="transfer-filtype-icon ' + fileicon({name: f.name}) + '"></span><span class="tranfer-filetype-txt">' + htmlentities(f.name) + '</span></td>'
                 + '<td></td>'
                 + '<td>' + bytesToSize(f.size) + '</td>'
-                + '<td></td>'
+                + '<td><span class="row-number"></span></td>'
                 + '<td><span class="transfer-status queued">Queued</span></td>'
                 + '<td class="grid-url-field"><a class="grid-url-arrow"><span></span></a><a class="clear-transfer-icon"><span></span></a></td></tr>'
                 );

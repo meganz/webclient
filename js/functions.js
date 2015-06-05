@@ -1279,7 +1279,7 @@ function setTransferStatus(dl, status, ethrow, lock) {
     if (text.length > 44) {
         text = text.substr(0, 42) + '...';
     }
-    $('.transfer-table #' + id + ' td:eq(6)').text(text);
+    $('.transfer-table #' + id + ' td:eq(5)').text(text);
     if (lock) {
         $('.transfer-table #' + id).attr('id', 'LOCKed_' + id);
     }
@@ -2106,28 +2106,6 @@ function percent_megatitle() {
     else {
         t = '';
         $.transferprogress = {};
-    }
-
-    if (dl_s > 0) {
-        $('.tranfer-download-indicator')
-            .text(bytesToSize(dl_s, 1) + "/s")
-            .addClass('active');
-        $('.transfer-panel-title').addClass('active');
-    }
-    else {
-        $('.tranfer-download-indicator').removeClass('active');
-        $('.transfer-panel-title').removeClass('active');
-    }
-
-    if (ul_s > 0) {
-        $('.tranfer-upload-indicator')
-            .text(bytesToSize(ul_s, 1) + "/s")
-            .addClass('active');
-        $('.transfer-panel-title').addClass('active');
-    }
-    else {
-        $('.tranfer-upload-indicator').removeClass('active');
-        $('.transfer-panel-title').removeClass('active');
     }
 
     $('.file-transfer-icon')

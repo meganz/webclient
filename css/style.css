@@ -5456,50 +5456,11 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	height: 193px;
 }
 .transfer-panel-title {
+	color: #666666;
 	float: left;
-	height: 48px;
-	line-height: 47px;
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	box-sizing: border-box;
-	padding: 0 0 0 68px;
+	line-height: 23px;
 	font-size: 12px;
-	color: rgba(255,255,255,0.3);
-	font-family: 'Open Sans Semibold';
-	cursor: default;
-	-webkit-transition: color 200ms ease-in-out;
-	-moz-transition: color 200ms ease-in-out;
-	-o-transition: color 200ms ease-in-out;
-	-ms-transition: color 200ms ease-in-out;
-	transition: color 200ms ease-in-out;
-}
-.transfer-panel-title.active {
-	color: rgba(255,255,255,0.5);
-}
-.tranfer-download-indicator, .tranfer-upload-indicator {
-	display: none;
-	float: right;
-	height: 20px;
-	line-height: 19px;
-	color: white;
-	padding: 0 10px 0 20px;
-	margin: 14px 12px 0 0px;
-	background-color: rgba(29,161,233,0.7);
-	-moz-border-radius: 20px;
-	-webkit-border-radius: 20px;
-	border-radius: 20px;
-	font-size: 11px;
-	background-image: url(../images/mega/nw-fm-sprite_v7.svg);
-	background-repeat: no-repeat;
-	background-position: 1px -3916px;
-	cursor: default;
-}
-.tranfer-download-indicator {
-	background-color: rgba(113,173,58,0.7);
-	background-position: 2px -3867px;
-}
-.tranfer-download-indicator.active, .tranfer-upload-indicator.active {
-	display: block;
+	padding: 12px 0 0 12px;
 }
 .transfer-table th, .transfer-table td, .transfer-table-header th, .grid-table th, .grid-table td, .grid-share-table th, .grid-share-table td, .grid-table-header th, .contacts-grid-header th, .contacts-grid-table th, .contacts-grid-table td {
 	-webkit-box-sizing: border-box;
@@ -23131,16 +23092,6 @@ body.pro:after {
 }
 .transfer-panel-opened .fm-left-panel, .transfer-panel-opened .fm-right-files-block {
 	display: none;
-}
-.tranfer-top-txt {
-	color: #666666;
-	float: left;
-	line-height: 23px;
-	font-size: 12px;
-	padding: 12px 0 0 12px;
-}
-.tranfer-top-txt::first-letter {
-	text-transform: uppercase;
 }
  @media only screen and (max-width: 1593px) {
 .download-mid-centered-block {

@@ -78,9 +78,6 @@
                         .filter('k', key || '__gbl').execute();
                 }
                 catch(e) {
-                    if (e.code === DOMException.NOT_FOUND_ERR) {
-                        e = new DOMException(e.message, "VersionError");
-                    }
                     return reject({'reason': e });
                 }
                 promise.then(function(results) {

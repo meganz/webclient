@@ -706,7 +706,7 @@ else if (!b_u)
         };
     })(console);
 
-    Object.defineProperty(window, "__cd_v", { value : 11, writable : false });
+    Object.defineProperty(window, "__cd_v", { value : 12, writable : false });
     if (!d || onBetaW)
     {
         var __cdumps = [], __cd_t;
@@ -725,7 +725,7 @@ else if (!b_u)
             if (__cdumps.length > 3) return false;
 
             var dump = {
-                m : ('' + msg).replace(/'(\w+:\/\/+[^/]+)[^']+'/,"'$1...'").replace(/^Uncaught\s*/,''),
+                m : ('' + msg).replace(/'(\w+:\/\/+[^/]+)[^']+'/,"'$1...'").replace(/^Uncaught\s*(?:exception\s*)?/i,''),
                 f : mTrim('' + url), l : ln
             }, cc, sbid = +(''+(document.querySelector('script[src*="secureboot"]')||{}).src).split('=').pop()|0;
 

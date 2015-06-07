@@ -176,41 +176,41 @@ function ellipsis(text, location, maxCharacters) {
 }
 
 /**
- * Convert [$nnn] (Eg, [$102]) to their localized string
- *
- * @param html (String) html markup string
+ * Convert all instances of [$nnn] e.g. [$102] to their localized strings
+ * @param {String} html The html markup
  * @returns {String}
  */
 function translate(html) {
+    
     /**
-     * String.replace callback (__translate_stub)
-     *
-     * @param m {String} The whole matched string
-     * @param num {Number} the locale string number
-     * @param ns {String} "Namespace" (Ie, operation) if any
+     * String.replace callback
+     * @param {String} match The whole matched string
+     * @param {Number} localeNum The locale string number
+     * @param {String} namespace The operation, if any
      * @returns {String} The localized string
      */
-    function __translate_stub(m, num, ns) {
-        if (ns) {
-            m = num + '.' + ns;
+    var replacer = function(match, localeNum, namespace) {
+        if (namespace) {
+            match = localeNum + '.' + namespace;
 
-            if (ns === 'dq') {
+            if (namespace === 'dq') {
                 // Replace double quotes to their html entities
-                l[m] = String(l[num]).replace('"', '&quot;', 'g');
+                l[match] = String(l[localeNum]).replace('"', '&quot;', 'g');
             }
-            else if (ns === 'q') {
+            else if (namespace === 'q') {
                 // Escape single quotes
-                l[m] = String(l[num]).replace("'", "\\'", 'g');
+                l[match] = String(l[localeNum]).replace("'", "\\'", 'g');
             }
-            else if (ns === 'dqq') {
+            else if (namespace === 'dqq') {
                 // Both of the above
-                l[m] = String(l[num]).replace('"', '&quot;', 'g');
-                l[m] = l[m].replace("'", "\\'", 'g');
+                l[match] = String(l[localeNum]).replace('"', '&quot;', 'g');
+                l[match] = l[match].replace("'", "\\'", 'g');
             }
         }
-        return String(l[num]);
-    }
-    return String(html).replace(/\[\$(\d+)(?:\.(\w+))?\]/g, __translate_stub);
+        return String(l[localeNum]);
+    };
+    
+    return String(html).replace(/\[\$(\d+)(?:\.(\w+))?\]/g, replacer);
 }
 
 /**

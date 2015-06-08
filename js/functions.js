@@ -2851,8 +2851,9 @@ mega.utils.reload = function megaUtilsReload() {
         }
     }
     else {
-        var msg = 'This operation will destroy all the data stored by MEGA in your browser and let you start over.';
-        msgDialog('confirmation', l[761], msg, 'Are you sure you want to continue?', function(doIt) {
+        // Show message that this operation will destroy and reload the data stored by MEGA in the browser
+        var msg = l[6995];
+        msgDialog('confirmation', l[761], msg, l[6994], function(doIt) {
             if (doIt) {
                 mega.utils.abortTransfers().then(function() {
                     loadingDialog.show();

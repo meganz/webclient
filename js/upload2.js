@@ -1033,6 +1033,7 @@ function resetUploadDownload() {
 			clearInterval($.mTransferAnalysis);
 			delete $.mTransferAnalysis;
 		}
+		$('.transfer-panel-title').html(l[104]);
 	}
 
 	if (d) console.log("resetUploadDownload", ul_queue.length, dl_queue.length);

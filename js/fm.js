@@ -5962,7 +5962,7 @@ function sectionUIopen(id) {
         tmpId = 'contacts';
     } else {
         tmpId = id;
-    }alert('d');
+    }
     $('.nw-fm-left-icon.' + tmpId).addClass('active');
     $('.content-panel.' + tmpId).addClass('active');
     $('.fm-left-menu').removeClass('cloud-drive folder-link shared-with-me rubbish-bin contacts conversations opc ipc inbox').addClass(tmpId);

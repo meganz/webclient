@@ -152,15 +152,22 @@ function closedlpopup()
     document.getElementById('download_popup').style.left = '-500px';
 }
 
-function dl_fm_import()
-{
-    api_req(
-    {
+function importFile() {
+    
+    api_req({
         a: 'p',
         t: M.RootID,
-        n: [{ ph: dl_import, t: 0, a: dl_attr, k: a32_to_base64(encrypt_key(u_k_aes,base64_to_a32(dlkey))) }]
+        n: [{ ph: dl_import, t: 0, a: dl_attr, k: a32_to_base64(encrypt_key(u_k_aes, base64_to_a32(dlkey))) }]
+    }, {
+        // Check response and if over quota show a special warning dialog
+        callback: function (result) {
+            if (result === EOVERQUOTA) {
+                showOverQuotaDialog();
+            }
+        }
     });
-    dl_import=false;
+
+    dl_import = false;
 }
 
 function dlerror(dl,error)
@@ -235,21 +242,28 @@ function dlstart(id,name,filesize)
 
 function start_import()
 {
-    dl_import=dlpage_ph;
-    if (u_type)
-    {
+    dl_import = dlpage_ph;
+    
+    if (u_type) {
         document.location.hash = 'fm';
-        if (fminitialized) dl_fm_import();
+        
+        if (fminitialized) {
+            importFile();
+        }
     }
-    else if (u_wasloggedin())
-    {
-        msgDialog('confirmation',l[1193],l[1194],l[1195],function(e)
-        {
-            if(e) start_anoimport();
-            else loginDialog();
+    else if (u_wasloggedin()) {
+        msgDialog('confirmation', l[1193], l[1194], l[1195], function(e) {
+            if (e) {
+                start_anoimport();
+            }
+            else {
+                loginDialog();
+            }
         });
     }
-    else start_anoimport();
+    else {
+        start_anoimport();
+    }
 }
 
 function start_anoimport()

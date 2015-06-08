@@ -5263,8 +5263,8 @@ function transferPanelUI()
             previewsrc(previews[slideshowid].src);
     });
 
-    $('.file-transfer-icon').unbind('click');
-    $('.file-transfer-icon').bind('click', function(e)
+    $('.transfers .nw-fm-left-border').unbind('click');
+    $('.transfers .nw-fm-left-border').bind('click', function(e)
     {
         $.transferOpen();
     });
@@ -5340,6 +5340,7 @@ function transferPanelUI()
             }
 
             $('.fm-transfers-block tr span.transfer-type').removeClass('paused');
+			$('.nw-fm-left-icon').removeClass('paused');
         }
         else
         {
@@ -5350,6 +5351,7 @@ function transferPanelUI()
             uldl_hold = true;
 
             $('.transfer-table tr span.transfer-type').addClass('paused');
+			$('.nw-fm-left-icon').addClass('paused');
 
             $('.transfer-table tr td:eq(2)').each(function()
             {

@@ -2058,7 +2058,9 @@ function percent_megatitle() {
         tp = $.transferprogress || {},
         dl_s = 0,
         ul_s = 0,
-        zips = {}
+        zips = {},
+		d_deg = 0,
+		u_deg = 0;
 
     for (var i in dl_queue) {
         var q = dl_queue[i],
@@ -2117,10 +2119,22 @@ function percent_megatitle() {
         $.transferprogress = {};
     }
 
-    $('.file-transfer-icon')
-        .attr('class',
-            'file-transfer-icon download-percents-' + x_dl + ' upload-percents-' + x_ul
-        );
+    d_deg = 360 * x_dl / 100;
+    u_deg = 360 * x_ul / 100;
+    if (d_deg <= 180) {
+        $('.download .nw-fm-chart0.right-c p').css('transform', 'rotate(' + d_deg + 'deg)');
+	    $('.download .nw-fm-chart0.left-c p').css('transform', 'rotate(0deg)');
+    } else {
+        $('.download .nw-fm-chart0.right-c p').css('transform', 'rotate(180deg)');
+        $('.download .nw-fm-chart0.left-c p').css('transform', 'rotate(' + (d_deg - 180) + 'deg)');
+    }
+    if (u_deg <= 180) {
+        $('.upload .nw-fm-chart0.right-c p').css('transform', 'rotate(' + u_deg + 'deg)');
+	    $('.upload .nw-fm-chart0.left-c p').css('transform', 'rotate(0deg)');
+    } else {
+        $('.upload .nw-fm-chart0.right-c p').css('transform', 'rotate(180deg)');
+        $('.upload .nw-fm-chart0.left-c p').css('transform', 'rotate(' + (u_deg - 180) + 'deg)');
+	}
 
     megatitle(t);
 }

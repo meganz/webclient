@@ -1153,7 +1153,7 @@ function openTransferpanel()
         ulQueue.pause();
         ui_paused = true;
 
-        $('.transfer-table tr td:eq(3), .transfer-table tr td:eq(6)').each(function()
+        $('.transfer-table tr td:eq(2), .transfer-table tr td:eq(5)').each(function()
         {
             $(this).text('');
         });
@@ -1161,7 +1161,6 @@ function openTransferpanel()
     
 	initTreeScroll();
     $(window).trigger('resize');
-
 
     if ($('table.transfer-table tr').length > 1) {
         $('.transfer-clear-all-icon').removeClass('disabled');

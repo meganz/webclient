@@ -5026,16 +5026,16 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	transition: border-left 300ms ease-in-out;
 }
 .transfers.nw-fm-left-icon {
-	position:absolute;
+	position: absolute;
 	bottom: 0;
-	background-image:none;
-	border-left:1px solid transparent;
+	background-image: none;
+	border-left: 1px solid transparent;
 }
 .transfers.nw-fm-left-icon.active {
 	border-color: #13E03C;
 }
-.transfers  .nw-fm-left-border {
-	z-index:100;
+.transfers .nw-fm-left-border {
+	z-index: 100;
 }
 .nw-fm-left-icon.active .nw-fm-left-border {
 	border-left: 2px solid rgba(255,255,255,0);
@@ -6945,7 +6945,7 @@ table {
 	background-position: -18px -6106px;
 	padding: 0 10px 0 28px;
 }
-.transfer-pause-icon span, .transfer-pause-icon.disabled span {
+.transfer-pause-icon span, .transfer-pause-icon:hover.disabled span {
 	background-position: 2px -3954px;
 }
 .transfer-pause-icon:hover span {
@@ -6960,7 +6960,7 @@ table {
 .transfer-pause-icon.active:hover span {
 	background-position: 2px -8272px;
 }
-.transfer-clear-completed span, .transfer-clear-completed.disabled span {
+.transfer-clear-completed span, .transfer-clear-completed.disabled:hover span {
 	background-position: 0 -8183px;
 	padding-left: 30px;
 }
@@ -7158,7 +7158,7 @@ table {
 	background-position: -2px -792px;
 	padding: 0 10px 0 16px;
 }
-.fm-clearbin-button span, .fm-share-download span, .fm-clearbin-button.disabled span, .fm-share-download.disabled span, .transfer-clear-all-icon span, .transfer-clear-all-icon.disabled span {
+.fm-clearbin-button span, .fm-share-download span, .fm-clearbin-button.disabled span, .fm-share-download.disabled span, .transfer-clear-all-icon span, .transfer-clear-all-icon.disabled:hover span {
 	background-position: -5px -5790px;
 	padding: 0 10px 0 29px;
 }
@@ -22889,17 +22889,15 @@ body.pro:after {
 .transfer-panel-opened .fm-left-panel, .transfer-panel-opened .fm-right-files-block {
 	display: none;
 }
-
-
 .nw-fm-percentage.upload, .nw-fm-percentage.download {
 	position: absolute;
 	float: none;
-	background-color:rgba(255,255,255,0.15);
+	background-color: rgba(255,255,255,0.15);
 	margin: 5px 0 0 4px;
 }
 .nw-fm-percentage.upload {
-	margin:9px 0 0 8px;
-	background-color:rgba(255,255,255,0.3);
+	margin: 9px 0 0 8px;
+	background-color: rgba(255,255,255,0.3);
 }
 .nw-fm-percentage.upload p, .nw-fm-percentage.upload li, .nw-fm-percentage.upload ul, .nw-fm-percentage.upload {
 	width: 30px;
@@ -22932,13 +22930,17 @@ body.pro:after {
 	border-top-right-radius: 15px;
 	border-bottom-right-radius: 15px;
 }
-
 .transfer-bar-overlay {
-	position:absolute; width:26px; height:26px; background-color: #222222; left:2px; top:2px; -moz-border-radius: 100%;
--webkit-border-radius: 100%;
-border-radius: 100%;
+	position: absolute;
+	width: 26px;
+	height: 26px;
+	background-color: #222222;
+	left: 2px;
+	top: 2px;
+	-moz-border-radius: 100%;
+	-webkit-border-radius: 100%;
+	border-radius: 100%;
 }
-
 .nw-fm-percentage.download p, .nw-fm-percentage.download li, .nw-fm-percentage.download ul, .nw-fm-percentage.download {
 	width: 38px;
 	height: 38px;
@@ -22970,22 +22972,28 @@ border-radius: 100%;
 	border-top-right-radius: 19px;
 	border-bottom-right-radius: 19px;
 }
-
 .download .transfer-bar-overlay {
-	width:34px; height:34px;
+	width: 34px;
+	height: 34px;
 }
 .upload .nw-fm-chart0.left-c span, .upload .nw-fm-chart0.right-c span {
-	background:#61D2FF;
-	
+	background: #61D2FF;
 }
 .download .nw-fm-chart0.left-c span, .download .nw-fm-chart0.right-c span {
-	background:#13E03C;
+	background: #13E03C;
 }
 .transfer-bar-overlay div {
-	display:block; background-image: url(../images/mega/nw-fm-sprite_v7.svg);
-  background-repeat: no-repeat; background-position: center -594px; background-color:rgba(255,255,255,0.5); -moz-border-radius: 100%;
--webkit-border-radius: 100%;
-border-radius: 100%; margin:2px 0 0 2px; width:22px; height:22px;
+	display: block;
+	background-image: url(../images/mega/nw-fm-sprite_v7.svg);
+	background-repeat: no-repeat;
+	background-position: center -594px;
+	background-color: rgba(255,255,255,0.5);
+	-moz-border-radius: 100%;
+	-webkit-border-radius: 100%;
+	border-radius: 100%;
+	margin: 2px 0 0 2px;
+	width: 22px;
+	height: 22px;
 }
 .paused .transfer-bar-overlay div {
 	background-position: center -664px;

@@ -5174,10 +5174,12 @@ function transferPanelUI()
             };
         })();
         waitForRsizingEvent(function(){
-            $('.transfer-table tr:first-child td').each(function(i, e)
+            $('.transfer-table tr.clone-of-header th').each(function(i, e)
             {
-                var headerColumn = $(el).get(i);
-                $(headerColumn).width($(e).width()+'px');
+			    if ($(e).width() != 0) {
+                    var headerColumn = $(el).get(i);
+                    $(headerColumn).width($(e).width()+'px');
+			    }
             });
         }, 100, 'transferPanel');
 
@@ -5319,7 +5321,7 @@ function transferPanelUI()
             DownloadManager.abort(null);
             UploadManager.abort(null);
 
-            $('.fm-transfers-block tr').not('.clone-of-header').fadeOut(function() {
+            $('.transfer-table tr').not('.clone-of-header').fadeOut(function() {
                 $(this).remove();
             });
             $('.transfer-clear-all-icon').addClass('disabled');

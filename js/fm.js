@@ -5322,6 +5322,10 @@ function transferPanelUI()
             $('.fm-transfers-block tr').not('.clone-of-header').fadeOut(function() {
                 $(this).remove();
             });
+            $('.transfer-clear-all-icon').addClass('disabled');
+            $('.transfer-pause-icon').addClass('disabled');
+            $('.transfer-panel-empty-txt').removeClass('hidden');
+            $('.transfer-panel-title').html(l[104]);
         });
     });
 
@@ -5958,7 +5962,7 @@ function sectionUIopen(id) {
         tmpId = 'contacts';
     } else {
         tmpId = id;
-    }
+    }alert('d');
     $('.nw-fm-left-icon.' + tmpId).addClass('active');
     $('.content-panel.' + tmpId).addClass('active');
     $('.fm-left-menu').removeClass('cloud-drive folder-link shared-with-me rubbish-bin contacts conversations opc ipc inbox').addClass(tmpId);
@@ -9247,7 +9251,7 @@ function fm_resize_handler() {
 
     $('.transfer-scrolling-table').css({
         'height': (
-            $('.fm-transfers-block').outerHeight() -  $('.transfer-table-header').outerHeight()
+            $('.tranfer-table').outerHeight() -  24
             ) + "px"
     });
 

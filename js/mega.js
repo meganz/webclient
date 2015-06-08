@@ -3610,6 +3610,7 @@ function MegaData()
             setupTransferAnalysis();
             if ((downloading = !!dl_queue.length)) {
                 $('.transfer-pause-icon').removeClass('disabled');
+		        $('.transfer-clear-all-icon').removeClass('disabled');
             }
         }
 
@@ -4029,6 +4030,7 @@ function MegaData()
         setupTransferAnalysis();
         if ((ul_uploading = !!ul_queue.length)) {
             $('.transfer-pause-icon').removeClass('disabled');
+		    $('.transfer-clear-all-icon').removeClass('disabled');
         }
     }
 

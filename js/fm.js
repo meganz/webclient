@@ -1195,8 +1195,11 @@ function openTransferpanel()
             $(this).remove();
         });
         toabort = Object.keys(toabort);
-        DownloadManager.abort(toabort);
-        UploadManager.abort(toabort);
+        toabort.forEach(function(downloadId) {
+            DownloadManager.abort(downloadId);
+            UploadManager.abort(downloadId);
+        });
+
         Soon(function() {
             $(window).trigger('resize');
         });
@@ -2400,8 +2403,10 @@ function initContextUI()
         });
 
         toabort = Object.keys(toabort);
-        DownloadManager.abort(toabort);
-        UploadManager.abort(toabort);
+        toabort.forEach(function(downloadId) {
+            DownloadManager.abort(downloadId);
+            UploadManager.abort(downloadId);
+        });
 
         Soon(function() {
             // XXX: better way to stretch the scrollbar?

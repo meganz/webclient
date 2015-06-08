@@ -169,10 +169,10 @@ function dlerror(dl,error)
     var tempe=false;
 
     // If over quota show a special warning dialog
-	if (error === EOVERQUOTA) {
+    if (error === EOVERQUOTA) {
         showOverQuotaDialog();
-	}
-    
+    }
+
     else if (error == ETOOMANYCONNECTIONS) errorstr = l[18];
     else if (error == ESID) errorstr = l[19];
     else if (error == ETEMPUNAVAIL) tempe = l[233];
@@ -443,7 +443,14 @@ var gifSlider = {
 
     // Initialise the slide show and preload the images into memory so they will display straight away
     init: function() {
-        gifSlider.preLoadImages('left');
+        if (browserdetails(ua).browser !== 'Chrome'
+                || parseInt(navigator.userAgent.split('Chrome/').pop()) > 42) {
+            gifSlider.preLoadImages('left');
+        }
+        else {
+            // Anims get disabled in Chrome 42 or older due a mem leak bug
+            $('.products-top-txt').hide();
+        }
     },
 
     /**

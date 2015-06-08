@@ -731,6 +731,11 @@ var wireTransferDialog = {
             wireTransferDialog.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
             wireTransferDialog.$dialog.removeClass('active').addClass('hidden');            
         });
+               
+        // If logged in, pre-populate email address into wire transfer details
+        if (typeof u_attr !== 'undefined') {
+            wireTransferDialog.$dialog.find('.email-address').text(u_attr.email);
+        }
         
         // Update plan price in the dialog
         var proPrice = selectedProPackage[5];

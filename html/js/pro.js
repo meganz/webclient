@@ -132,29 +132,42 @@ function init_pro()
  * Populate the monthly plans across the main #pro page
  */
 function populateMembershipPlans() {
+    
+    var fromPriceSet = false;
 
     for (var i = 0, length = membershipPlans.length; i < length; i++) {
 
+        // Get plan details
         var accountLevel = membershipPlans[i][1];
         var months = membershipPlans[i][4];
-        var price = membershipPlans[i][5].split('.');
-        var dollars = price[0];
-        var cents = price[1];
+        var price = membershipPlans[i][5];
+        var priceParts = price.split('.');
+        var dollars = priceParts[0];
+        var cents = priceParts[1];
 
         // Show only monthly prices in the boxes
         if (months === 1) {
-            
-            // Update the price in the boxes
             $('.reg-st3-membership-bl.pro' + accountLevel + ' .price .num').html(
                 dollars + '<span class="small">.' + cents + ' &euro;</span>'
             );
-    
-            // Copy the price in the left most item to the red box in the bottom middle of the page
-            if (i === 0) {
-                var $redStar = $('.pro-icons-block.star .pro-price-txt');
-                $redStar.find('.dollars').text(dollars);
-                $redStar.find('.cents').text(cents);
-            }
+        }
+        
+        // Get the first plan with yearly price
+        if ((months === 12) && (fromPriceSet === false)) {
+            
+            // Divide the yearly price by 12 to get the lowest from price
+            var fromPrice = (price / 12).toFixed(2);
+            var fromPriceParts = fromPrice.split('.');
+            var fromPriceDollars = fromPriceParts[0];
+            var fromPriceCents = fromPriceParts[1];
+
+            // Update the price inside the red star
+            var $redStar = $('.pro-icons-block.star .pro-price-txt');
+            $redStar.find('.dollars').text(fromPriceDollars);
+            $redStar.find('.cents').text(fromPriceCents);
+            
+            // Don't set it for other plans with 12 months
+            fromPriceSet = true;
         }
     }
 }
@@ -267,7 +280,7 @@ function initPaymentMethodRadioOptions(html) {
         }
         
         updateTextDependingOnRecurring();
-        updatePeriodOptionsDependingOnMonthlyAllowed();
+        updatePeriodOptionsOnPaymentMethodChange();
     });
 }
 
@@ -459,10 +472,10 @@ function updateTextDependingOnRecurring() {
 }
 
 /**
- * Updates the duration options if they select a payment method. For example 
+ * Updates the duration/renewal period options if they select a payment method. For example 
  * for the wire transfer option we only want to accept one year one-off payments
  */
-function updatePeriodOptionsDependingOnMonthlyAllowed() {
+function updatePeriodOptionsOnPaymentMethodChange() {
     
     var $durationSelect = $('.membership-st2-select');
     var $durationOptions = $durationSelect.find('.membership-dropdown-item');

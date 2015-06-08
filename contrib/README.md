@@ -29,11 +29,17 @@ relevant entries from JSHint and JSCS for the change set.
 
     contrib/diffcheck.py 97ab5f8e a2f40975  # Between two commits.
     contrib/diffcheck.py 97ab5f8e           # Against current branch tip.
-    contrib/diffcheck.py my-feature develop # Feature branch vs. develop tip.
-    contrib/diffcheck.py my-feature         # Feature branch vs. current tip.
+    contrib/diffcheck.py develop my-feature # From develop tip to feature tip.
+    contrib/diffcheck.py develop            # From develop to current tip.
 
 This is to ease the enforcement of agreed general style for code
 reviews on merge requests as well as enable developers to check their
 work against a target branch before issuing a merge request to make
 sure things are done correctly. Therefore the number of "round trips"
 for the review process can be significantly reduced.
+
+`diffcheck.py` is configured through `contrib/config.py`, which is
+part of the repository.  If you want to make local adaptations, please
+use `contrib/local_config.py` with local options, which will override
+those from `config.py`.  `local_config.py` will not be committed to
+the repository.

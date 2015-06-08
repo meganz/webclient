@@ -175,33 +175,42 @@ function ellipsis(text, location, maxCharacters) {
     return text;
 }
 
+/**
+ * Convert all instances of [$nnn] e.g. [$102] to their localized strings
+ * @param {String} html The html markup
+ * @returns {String}
+ */
 function translate(html) {
-    var arr = html.split("[$");
-    var items = [];
-    for (var i in arr) {
-        var tmp = arr[i].split(']');
-        if (tmp.length > 1) {
-            var t = tmp[0];
-            items.push(t);
+    
+    /**
+     * String.replace callback
+     * @param {String} match The whole matched string
+     * @param {Number} localeNum The locale string number
+     * @param {String} namespace The operation, if any
+     * @returns {String} The localized string
+     */
+    var replacer = function(match, localeNum, namespace) {
+        if (namespace) {
+            match = localeNum + '.' + namespace;
+
+            if (namespace === 'dq') {
+                // Replace double quotes to their html entities
+                l[match] = String(l[localeNum]).replace('"', '&quot;', 'g');
+            }
+            else if (namespace === 'q') {
+                // Escape single quotes
+                l[match] = String(l[localeNum]).replace("'", "\\'", 'g');
+            }
+            else if (namespace === 'dqq') {
+                // Both of the above
+                l[match] = String(l[localeNum]).replace('"', '&quot;', 'g');
+                l[match] = l[match].replace("'", "\\'", 'g');
+            }
         }
-    }
-    for (var i in items) {
-        var tmp = items[i].split('.');
-        if (tmp.length > 1) {
-            if (tmp[1] === 'dq') {
-                l[items[i]] = l[tmp[0]].replace('"', '&quot;');
-            }
-            else if (tmp[1] === 'q') {
-                l[items[i]] = l[tmp[0]].replace("'", "\\'");
-            }
-            else if (tmp[1] === 'dqq') {
-                l[items[i]] = l[tmp[0]].replace("'", "\\'");
-                l[items[i]] = l[items[i]].replace('"', '&quot;');
-            }
-        }
-        html = html.replace(new RegExp("\\[\\$" + items[i] + "\\]", "g"), l[items[i]]);
-    }
-    return html;
+        return String(l[localeNum]);
+    };
+    
+    return String(html).replace(/\[\$(\d+)(?:\.(\w+))?\]/g, replacer);
 }
 
 /**

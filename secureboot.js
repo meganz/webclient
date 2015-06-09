@@ -1048,7 +1048,7 @@ else if (!b_u)
     jsl.push({f:'html/top.html', n: 'top', j:0});
     jsl.push({f:'js/notifications.js', n: 'notifications_js', j:1});
     jsl.push({f:'css/style.css', n: 'style_css', j:2,w:30,c:1,d:1,cache:1});
-    jsl.push({f:'js/useravatar.js.js', n: 'contact_avatar_js', j:1,w:3});
+    jsl.push({f:'js/useravatar.js', n: 'contact_avatar_js', j:1,w:3});
     jsl.push({f:'js/avatar.js', n: 'avatar_js', j:1,w:3});
     jsl.push({f:'js/countries.js', n: 'countries_js', j:1});
     jsl.push({f:'html/dialogs.html', n: 'dialogs', j:0,w:2});

@@ -9487,7 +9487,7 @@ function fingerprintDialog(userid)
 
     var $this = $('.fingerprint-dialog');
 
-    $this.find('.fingerprint-avatar').empty().append(useravatar.contact(userid));
+    $this.find('.fingerprint-avatar').empty().append($(useravatar.contact(userid)).removeClass('avatar'));
 
     $this.find('.contact-details-user-name')
         .text(user.name || user.m) // escape HTML things
@@ -9548,9 +9548,10 @@ function contactUI() {
         var u_h = M.currentdirid;
 //        var cs = M.contactstatus(u_h);
         var user = M.d[u_h];
+        var avatar = $(useravatar.contact(u_h));
 
         var onlinestatus = M.onlineStatusClass(megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h)));
-        $('.contact-top-details .nw-contact-block-avatar').html(useravatar.contact(u_h));
+        $('.contact-top-details .nw-contact-block-avatar').empty().append( avatar.removeClass('avatar') )
         $('.contact-top-details .onlinestatus').removeClass('away offline online busy');
         $('.contact-top-details .onlinestatus').addClass(onlinestatus[1]);
         $('.contact-top-details .fm-chat-user-status').text(onlinestatus[0]);

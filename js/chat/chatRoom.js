@@ -2139,7 +2139,7 @@ ChatRoom.prototype._generateContactAvatarElement = function(fullJid) {
     }
 
 
-    var $av = generateAvatarElement(contact.u);
+    var $av = $(useravatar.contact(contact.u))
     var cls = $av.attr('class');
     $av.attr('class', '');
 

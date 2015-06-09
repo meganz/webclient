@@ -1010,6 +1010,12 @@ var useravatar = {
         }
         return  staticpath + 'images/mega/default-top-avatar.png';
     },
+    imgUrl: function(contact) {
+        if (avatars[contact]) {
+            return avatars[user.u].url;
+        }
+        return staticpath + 'images/mega/default-avatar.png';
+    },
     mine: function() {
         if (avatars[u_handle]) {
             return avatars[u_handle].url

@@ -247,10 +247,7 @@ CallSession.prototype.onWaitingResponseIncoming = function(e, eventData) {
             self.logger.error("Contact not found: ", participants[0]);
         } else {
 
-            var avatar = undefined;
-            if(avatars[contact.u]) {
-                avatar = avatars[contact.u].url;
-            }
+            var avatar = useravatar.imgUrl(contact.u);
 
             // TODO: legacy event, used by some plugins, please refactor
             self.room.megaChat.trigger('onIncomingCall', [
@@ -886,7 +883,13 @@ CallSession.prototype.renderCallStartedState = function() {
 
 
     // configure elements - avatars
-    var myAvatar = avatars[u_handle];
+    var myAvatar = $(useravatar.contact(u_handle, 'my-avatar-text nw-contact-avatar'));
+    $('.my-avatar-text',self.room.$header)
+        .empty()
+        .append(myAvatar);
+    $('.my-avatar', self.room.$header).hide();
+
+    /*
     if(myAvatar) {
         $('.my-avatar', self.room.$header).attr('src', myAvatar.url);
         $('.my-avatar', self.room.$header).show();
@@ -909,6 +912,8 @@ CallSession.prototype.renderCallStartedState = function() {
         )
             .show();
     }
+    */
+
     var otherUserContact = self.room.megaChat.getContactFromJid(self.room.getParticipantsExceptMe()[0]);
     if(otherUserContact.u && avatars[otherUserContact.u]) {
         $('.other-avatar', self.room.$header).attr('src', avatars[otherUserContact.u].url);

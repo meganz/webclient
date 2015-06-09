@@ -1032,7 +1032,7 @@ var useravatar = {
      *  
      *  @return HTML
      */
-    _twoLetters: function(letters, id, className) {
+    _twoLetters: function(letters, id, className, element) {
         var words = letters.split(/\s+/)
         if (words.length == 1) {
             letters = words[0].substr(0,2);
@@ -1044,7 +1044,7 @@ var useravatar = {
             this._watching[id] = {};
         }
         this._watching[id][className] = true;
-        return '<div class="' + className + ' ' + id +  ' color' +color+'">' + letters.toUpperCase() + '</div>';
+        return '<'+element+' class="' + className + ' ' + id +  ' color' +color+'">' + letters.toUpperCase() + '</'+element+'>';
     },
 
     /**
@@ -1090,8 +1090,9 @@ var useravatar = {
         }
     },
 
-    contact : function(user, className) {
+    contact : function(user, className, element) {
         className = className || "avatar";
+        element   = element || "div";
         if (this.isEmail(user)) {
             // User is an email, we should look if the user
             // exists, if it does exists we use the user Object.
@@ -1101,18 +1102,18 @@ var useravatar = {
                     return this.contact(M.u[u])
                 }
             }
-            return this._twoLetters(user.substr(0,2), user, className);
+            return this._twoLetters(user.substr(0,2), user, className, element);
         } else if (typeof user == "string" && M.u[user]) {
             // It's an user ID
             user = M.u[user];
         } else if (typeof user == "string") {
-            return this._twoLetters(user, user, className);
+            return this._twoLetters(user, user, className, element);
         }
 
         if (avatars[user.u]) {
             return this._image(avatars[user.u].url, user.u, className);
         }
         
-        return this._twoLetters(user.name || user.m, user.u, className)
+        return this._twoLetters(user.name || user.m, user.u, className, element)
     },
 };

@@ -889,56 +889,17 @@ CallSession.prototype.renderCallStartedState = function() {
         .append(myAvatar);
     $('.my-avatar', self.room.$header).hide();
 
-    /*
-    if(myAvatar) {
-        $('.my-avatar', self.room.$header).attr('src', myAvatar.url);
-        $('.my-avatar', self.room.$header).show();
-        $('.my-avatar-text', self.room.$header).hide();
-    } else {
-        $('.my-avatar', self.room.$header).hide();
-        var $txtAvatar = $('<div class="nw-contact-avatar"/>')
-            .append(
-            generateAvatarElement(u_handle)
-        )
-            .addClass(u_handle)
-            .addClass(
-            "color" + generateAvatarMeta(u_handle).color
-        );
-
-        $('.my-avatar-text', self.room.$header)
-            .empty()
-            .append(
-            $txtAvatar
-        )
-            .show();
-    }
-    */
-
     var otherUserContact = self.room.megaChat.getContactFromJid(self.room.getParticipantsExceptMe()[0]);
-    if(otherUserContact.u && avatars[otherUserContact.u]) {
-        $('.other-avatar', self.room.$header).attr('src', avatars[otherUserContact.u].url);
-        $('.other-avatar', self.room.$header).show();
-        $('.other-avatar-text', self.room.$header).hide();
-    } else {
-        $('.other-avatar', self.room.$header).hide();
+    var otherAvatar = $(useravatar.contact(otherUserContact, 'av', 'span'));
+    var otherAvatarWrap = $('<div class="nw-contact-avatar"/>')
+        .addClass(otherAvatar.attr('class'))
+        .append(otherAvatar);
 
-        var $txtAvatar2 = $('<div class="nw-contact-avatar"/>')
-            .append(
-            generateAvatarElement(otherUserContact.u)
-        )
-            .addClass(otherUserContact.u)
-            .addClass(
-            "color" + generateAvatarMeta(otherUserContact.u).color
-        );
-
-        $('.other-avatar-text', self.room.$header)
-            .empty()
-            .append(
-            $txtAvatar2
-        )
-            .show();
-    }
-
+    $('.other-avatar-text',self.room.$header)
+        .empty()
+        .append(otherAvatarWrap)
+        .show();
+    $('.other-avatar', self.room.$header).hide();
 
     // expand/size icon
 //        var $expandButtons = $('.video-call-button.size-icon', self.room.$header);

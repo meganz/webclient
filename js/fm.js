@@ -988,8 +988,9 @@ function initUI() {
         openTransferpanel();
     M.avatars();
 
-    if (typeof dl_import !== 'undefined' && dl_import)
-        dl_fm_import();
+    if ((typeof dl_import !== 'undefined') && dl_import) {
+        importFile();
+    }
 
     $('.context-menu').unbind('contextmenu');
     $('.context-menu').bind('contextmenu', function(e)

@@ -113,7 +113,7 @@ catch(e) {
     }
 }
 
-var mega = {ui: {}};
+var mega = {ui: {}, utils: {}};
 var bootstaticpath = staticpath;
 var urlrootfile = '';
 

@@ -44,7 +44,7 @@ var JinglePlugin = {
         this.onJingleTimeout = function(sess, err, orig){};
         this.onRemoteStreamAdded = function(sess, event){};
         this.onRemoteStreamRemoved = function(sess, event){};
-        this.onIceConnStateChange = function(sess, event){console.log("CONNSTATE->", event);};
+        this.onIceConnStateChange = function(sess, event){};
         this.onNoStunCandidates = function(sess, event){};
         this.onPacketLoss = function(sess, loss){};
 

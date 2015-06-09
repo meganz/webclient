@@ -23,11 +23,16 @@ function init_pro()
     if (u_type == 3)
     {
         // Flag 'pro : 1' includes pro balance in the response
-        api_req({ a : 'uq', pro : 1 }, {
-            callback : function (res)
+        //api_req({ a : 'uq', pro : 1 }, {
+        api_req({ a: 'uq', strg: 1, pro: 1 }, {
+            callback : function (result)
             {
-                if (typeof res == 'object' && res.balance && res.balance[0]) {
-                    pro_balance = res.balance[0][0];
+                // Store current account storage usage for checking later
+                proPage.currentStorageBytes = result.cstrg;
+                
+                // Get account balance
+                if (typeof result == 'object' && result.balance && result.balance[0]) {
+                    pro_balance = result.balance[0][0];
                 }
             }
         });
@@ -56,8 +61,13 @@ function init_pro()
 
                 // Render the plan details
                 populateMembershipPlans();
+                
+                // Check which plans are applicable or grey them out if not
+                proPage.checkApplicablePlans();
 
-                if (pro_do_next) pro_do_next();
+                if (pro_do_next) {
+                    pro_do_next();
+                }
             }
         });
 
@@ -127,6 +137,68 @@ function init_pro()
         });
     }
 }
+
+/**
+ * Functions for the pro page in general
+ * More code to be refactored into here over time
+ */
+var proPage = {
+    
+    // The user's current storage in bytes
+    currentStorageBytes: 0,
+    
+    /**
+     * Check applicable plans for the user based on their current storage usage
+     */
+    checkApplicablePlans: function() {
+        
+        // If their account storage is not available (e.g. not logged in) all plan options will be shown
+        if (this.currentStorageBytes === 0) {
+            return false;
+        }
+        
+        //*// Testing
+        //this.currentStorageBytes = 201 * 1024 * 1024 * 1024;            // 201 GB
+        //this.currentStorageBytes = 501 * 1024 * 1024 * 1024;            // 501 GB
+        //this.currentStorageBytes = 3 * 1024 * 1024 * 1024 * 1024;       // 3TB
+        //this.currentStorageBytes = 5.37577 * 1024 * 1024 * 1024 * 1024; // 5TB
+        //*/
+        
+        var totalNumOfPlans = 4;
+        var numOfPlansNotApplicable = 0;
+        var currentStorageGigabytes = this.currentStorageBytes / 1024 / 1024 / 1024;
+        
+        // Loop through membership plans
+        for (var i = 0, length = membershipPlans.length; i < length; i++) {
+
+            // Get plan details
+            var accountLevel = parseInt(membershipPlans[i][1]);
+            var planStorageGigabytes = parseInt(membershipPlans[i][2]);
+            var months = parseInt(membershipPlans[i][4]);            
+
+            // If their current storage usage is more than the plan's grey it out
+            if ((months === 1) && (currentStorageGigabytes > planStorageGigabytes)) {
+                
+                // Grey out the plan
+                $('.membership-step1 .reg-st3-membership-bl.pro' + accountLevel).addClass('sub-optimal-plan');
+                
+                // Add count of plans that aren't applicableß
+                numOfPlansNotApplicable++;
+            }
+        }
+        
+        // Show message to contact support
+        if (numOfPlansNotApplicable === totalNumOfPlans) {
+            
+            // Get current usage in TB and round to 3 decimal places
+            var currentStorageTerabytes = currentStorageGigabytes / 1024;
+                currentStorageTerabytes = Math.round(currentStorageTerabytes * 1000) / 1000;
+            
+            $('.membership-step1 .no-plans-suitable').removeClass('hidden');            
+            $('.membership-step1 .no-plans-suitable .current-storage').text(currentStorageTerabytes);
+        }
+    }    
+};
 
 /**
  * Populate the monthly plans across the main #pro page
@@ -1650,8 +1722,8 @@ var doProLogin = function($dialog) {
     
     var button = $('.selected .membership-button').parents('.reg-st3-membership-bl').attr('class').match(/pro\d/)[0]
     pro_do_next = function() {
-        $('.' + button + ' .membership-button').trigger('click')
-        pro_do_next = null
+        $('.' + button + ' .membership-button').trigger('click');
+        pro_do_next = null;
     };
 
     var ctx =

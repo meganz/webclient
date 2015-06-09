@@ -14619,6 +14619,9 @@ h5.main-italic-header {
 .membership-step1 .reg-st3-membership-bl:hover, .membership-step1 .reg-st3-membership-bl.selected {
 	background-color: rgba(0,0,0,0.1);
 }
+.membership-step1 .reg-st3-membership-bl.sub-optimal-plan {
+    opacity: 0.7;
+}
 .reg-st3-membership-bl:first-child {
 	margin: 0;
 }
@@ -16147,6 +16150,16 @@ span.browsers-update {
 .pro-gray-block .register-st3-main-bl .register-st2-button {
 	float: right;
 	margin: 50px 0 47px 0;
+}
+.pro-gray-block .no-plans-suitable {
+    color: #bf1900;
+    font-size: 17px;
+    margin-bottom: 30px;
+    text-align: center;
+}
+.pro-gray-block .no-plans-suitable a {
+    color: #bf1900;
+    font-weight: bold;
 }
 .pro-icons-block {
 	width: 280px;

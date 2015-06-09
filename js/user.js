@@ -463,31 +463,6 @@ function generateContactName(user_hash) {
 }
 
 /**
- * Generates a div.nw-contact-avatar for a specific user_hash
- *
- * @param user_hash
- * @returns {*|jQuery|HTMLElement}
- */
-function generateAvatarElement(user_hash) {
-    var $element = $('<span></span>');
-    var meta = generateAvatarMeta(user_hash);
-
-    $element.addClass("color" + meta.color);
-    $element.data("shortName", meta.shortName); // expose the generated name, so that other components can use it
-    $element.data("fullName", meta.fullName); // expose the generated name, so that other components can use it
-
-    if (meta.avatarUrl) {
-        $element.append('<img src="' + meta.avatarUrl + '"/>');
-    }
-    else {
-        $element.text(
-            meta.shortName
-        );
-    }
-    return $element;
-}
-
-/**
  * Generates meta data required for rendering avatars
  *
  * @param user_hash

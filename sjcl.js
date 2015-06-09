@@ -7,7 +7,9 @@
  * @author Mike Hamburg
  * @author Dan Boneh
  *
- * Version 1.0.0
+ * Version 1.0.0-modified
+ * Modifications:
+ *   20150609 - Added call stack to exception constructors
  */
 
 /*jslint indent: 2, bitwise: false, nomen: false, plusplus: false, white: false, regexp: false */
@@ -47,6 +49,7 @@ var sjcl = {
     corrupt: function(message) {
       this.toString = function() { return "CORRUPT: "+this.message; };
       this.message = message;
+      this.stack = (new Error()).stack;
     },
 
     /** @constructor Invalid parameter. */

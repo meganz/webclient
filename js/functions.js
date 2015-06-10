@@ -2779,3 +2779,12 @@ function assertStateChange(currentState, newState, allowedStatesMap, enumMap) {
         );
     }
 }
+
+if (typeof sjcl !== 'undefined') {
+    // We need to track SJCL exceptions for ticket #2348
+    sjcl.exception.invalid = function(message) {
+      this.toString = function() { return "INVALID: "+this.message; };
+      this.message = message;
+      this.stack = (new Error()).stack;
+    };
+}

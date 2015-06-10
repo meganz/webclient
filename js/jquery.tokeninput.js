@@ -32,7 +32,7 @@
         accountHolder: '',
         scrollLocation: 'add',
         resultsFormatter: function (item) {
-            var id, av_color, av, avatar;
+            var id, av, avatar;
 
             var email = item[this.propertyToSearch],
                 type = '';
@@ -56,7 +56,7 @@
                     + "</span><span class='fm-chat-user-email'>email</span></span><span class='clear'></span></li>";
         },
         tokenFormatter: function (item) {
-            var id, av_color, av, avatar;
+            var id, av, avatar;
             var email = item[this.propertyToSearch],
                 type = '';
             $.each(M.u, function (ind, val) {

@@ -504,7 +504,7 @@ function MegaData()
      */
     this.drawReceivedContactRequests = function(ipc, clearGrid) {
         DEBUG('Draw received contacts grid.');
-        var html, email, av_color, shortcut, ps, trClass, id,
+        var html, email, ps, trClass, id,
             type = '',
             drawn = false,
             t = '.grid-table.contact-requests';
@@ -526,8 +526,6 @@ function MegaData()
                     }
                     trClass = (type !== '') ? ' class="' + type + '"' : '';
                     email = ipc[i].m;
-                    av_color = email.charCodeAt(0) % 6 + email.charCodeAt(1) % 6;
-                    shortcut = email.charAt(0) + email.charAt(1);
                     if (ipc[i].ps && ipc[i].ps !== 0) {
                         ps = '<span class="contact-request-content">' + ipc[i].ps + ' ' + l[105] + ' ' + l[813] + '</span>';
                     } else {
@@ -535,7 +533,7 @@ function MegaData()
                     }
                     html = '<tr id="ipc_' + id + '"' + trClass + '>\n\
                         <td>\n\
-                            <div class="nw-contact-avatar color' + av_color + '">' + shortcut + '</div>\n\
+                            ' + useravatar.contact(email, 'nw-contact-avatar') + ' \n\
                             <div class="fm-chat-user-info">\n\
                                 <div class="fm-chat-user">' + htmlentities(email) + '</div>\n\
                                 <div class="contact-email">' + htmlentities(email) + '</div>\n\
@@ -777,7 +775,7 @@ function MegaData()
          *
          */
         function renderContactsLayout(u) {
-            var u_h, contact, node, avatar, av_color, el, t, html, onlinestatus,
+            var u_h, contact, node, avatar, el, t, html, onlinestatus,
                 cs = M.contactstatus(u_h),
                 time = time2last(cs.ts),
                 timems = cs.ts,
@@ -867,7 +865,7 @@ function MegaData()
          */
         function renderLayout(u, n_cache) {
             var html, el, cs, contains, u_h, t, el, time,
-                avatar, av_color, rights, rightsclass, onlinestatus, html,
+                avatar, rights, rightsclass, onlinestatus, html,
                 s = '',
                 ftype = '',
                 c = '',

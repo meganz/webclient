@@ -16166,23 +16166,23 @@ span.browsers-update {
     margin-bottom: 30px;
     text-align: center;
 }
-.pro-gray-block .no-plans-suitable .terabytes {
-    color: #bf1900;
-    display: inline-block;
-    text-align: left;
-    width: 130px;
-}
-.pro-gray-block .no-plans-suitable .terabytes::first-letter {
-    font-size: 40px;
-}
 .pro-gray-block .no-plans-suitable .text {
     color: #777;
     display: inline;
+    padding-right: 10px;
     position: relative;
 }
 .pro-gray-block .no-plans-suitable a {
     color: #bf1900;
     font-weight: bold;
+}
+.pro-gray-block .no-plans-suitable .terabytes {
+    color: #bf1900;
+    display: inline-block;
+    text-align: left;
+}
+.pro-gray-block .no-plans-suitable .terabytes::first-letter {
+    font-size: 40px;
 }
 .no-plans-suitable-text {
     font-weight: bold;

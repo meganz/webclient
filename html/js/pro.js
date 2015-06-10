@@ -157,6 +157,8 @@ var proPage = {
             return false;
         }
         
+        this.currentStorageBytes = 5.347224 * 1024 * 1024 * 1024 * 1024;
+        
         var totalNumOfPlans = 4;
         var numOfPlansNotApplicable = 0;
         var currentStorageGigabytes = this.currentStorageBytes / 1024 / 1024 / 1024;
@@ -194,10 +196,15 @@ var proPage = {
             $noPlansSuitable.removeClass('hidden');            
             $noPlansSuitable.find('.current-storage .terabytes').text(currentStorageTerabytes);
             
+            // Capitalize first letter
+            var currentStorageText = $noPlansSuitable.find('.current-storage .text').text();
+                currentStorageText = currentStorageText.charAt(0).toUpperCase() + currentStorageText.slice(1);
+            $noPlansSuitable.find('.current-storage .text').text(currentStorageText);
+            
             // Replace text with proper link
-            var linkText = $noPlansSuitable.find('.no-plans-suitable-text').html();
-            linkText = linkText.replace('[A]', '<a href="#contact">');
-            linkText = linkText.replace('[/A]', '</a>');
+            var $linkText = $noPlansSuitable.find('.no-plans-suitable-text');
+            var newLinkText = $linkText.html().replace('[A]', '<a href="#contact">').replace('[/A]', '</a>');
+            $linkText.html(newLinkText);
             
             // Redirect to #contact
             $noPlansSuitable.find('.btn-request-plan').rebind('click', function() {

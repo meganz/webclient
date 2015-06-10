@@ -28,10 +28,12 @@ JSHINT_BIN = 'node_modules/.bin/jshint'
 JSCS_BIN = 'node_modules/.bin/jscs'
 CPPCHECK_BIN = 'cppcheck'
 NSIQCPPSTYLE_BIN = '/usr/local/nsiqcppstyle/nsiqcppstyle.py'
+JSHINT_RULES = '--verbose'
+JSCS_RULES = '--verbose'
 
 # Command line configuration.
-JSHINT_COMMAND = 'node {binary} {rules}'
-JSCS_COMMAND = 'node {binary} {rules}'
+JSHINT_COMMAND = 'node {binary} {rules} .'
+JSCS_COMMAND = 'node {binary} {rules} .'
 
 CPPCHECK_COMMAND = ("{command}"
                     " --template={{file}};{{line}};{{severity}};{{id}};{{message}}"

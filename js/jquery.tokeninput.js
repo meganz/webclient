@@ -43,17 +43,13 @@
                     return false;
                 }
             });
-            av_color = email.charCodeAt(0) % 6 + email.charCodeAt(1) % 6;
-            av = (this.addAvatar && avatars[id] && avatars[id].url)
-                ? '<img src="' + avatars[id].url + '">'
-                : (email.charAt(0) + email.charAt(1));
 
             if (!id) {
                 type = 'email';
                 av = '';
             }
 
-            avatar = "<span class='nw-contact-avatar color" + av_color + "'>" + av + "</span>";
+            avatar = useravatar.contact(id, 'nw-contact-avatar', 'span');
             return "<li class='share-search-result " + type + "'>" + (this.addAvatar ? avatar : '')
                     + "<span class='fm-chat-user-info'><span class='fm-chat-user'>"
                     + (this.enableHTML ? email : _escapeHTML(email))
@@ -69,16 +65,11 @@
                     return false;
                 }
             });
-            av_color = email.charCodeAt(0) % 6 + email.charCodeAt(1) % 6;
-            av = (this.addAvatar && avatars[id] && avatars[id].url)
-                ? '<img src="' + avatars[id].url + '">'
-                : (email.charAt(0) + email.charAt(1));
-
             if (!id) {
                 type = 'email';
                 av = '';
             }
-            avatar = "<span class='search-avatar color" + av_color + "'>" + av + "</span>";
+            avatar = useravatar.contact(id, 'search-avatar', 'span');
 
             return "<li class='share-added-contact " + type + "'>" + (this.addAvatar ? avatar : '') + (this.enableHTML ? email : _escapeHTML(email)) + "</li>";
         },

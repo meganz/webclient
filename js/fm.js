@@ -6633,7 +6633,7 @@ function shareDialogContentCheck() {
     }
 }
 
-function addShareDialogContactToContent(type, id, av_color, av, name, permClass, permText, exportLink) {
+function addShareDialogContactToContent(type, id, av, name, permClass, permText, exportLink) {
 
     var html = '',
         htmlEnd = '',
@@ -6646,8 +6646,7 @@ function addShareDialogContactToContent(type, id, av_color, av, name, permClass,
         exportClass = 'share-item-bl';
     }
     else {
-        item = '<div class="nw-contact-avatar color' + av_color + '">' + av + '</div>'
-               +   '<div class="fm-chat-user-info">'
+        item = av +   '<div class="fm-chat-user-info">'
                +       '<div class="fm-chat-user">' + name + '</div>'
                +   '</div>';
     }
@@ -6695,7 +6694,7 @@ function fillShareDialogWithContent() {
             if (userHandle === 'EXP' && M.d[selectedNodeHandle].ph) {
 //                html = generateExportLinkShareDialogRow();
                 window.getLinkState = false;
-                html = addShareDialogContactToContent('', 'EXP', '', '', '', 'read-only', l[55], selectedNodeHandle);
+                html = addShareDialogContactToContent('', 'EXP', '', '', 'read-only', l[55], selectedNodeHandle);
                 $('.share-dialog .share-dialog-contacts').append(html);
             }
         }
@@ -6729,8 +6728,7 @@ function generateShareDialogRow(displayNameOrEmail, email, shareRights, userHand
 
     var rowId = '',
         html = '',
-        av_color = displayNameOrEmail.charCodeAt(0) % 6 + displayNameOrEmail.charCodeAt(1) % 6,
-        av = (avatars[userHandle] && avatars[userHandle].url) ? '<img src="' + avatars[userHandle].url + '">' : (displayNameOrEmail.charAt(0) + displayNameOrEmail.charAt(1)),
+        av =  useravatar.contact(userHandle),
         perm = '',
         permissionLevel = 0;
 
@@ -6751,7 +6749,7 @@ function generateShareDialogRow(displayNameOrEmail, email, shareRights, userHand
     $.sharedTokens.push(email);
 
     rowId = (userHandle) ? userHandle : email;
-    html = addShareDialogContactToContent('', rowId, av_color, av, displayNameOrEmail, perm[0], perm[1]);
+    html = addShareDialogContactToContent('', rowId, av, displayNameOrEmail, perm[0], perm[1]);
 
     $('.share-dialog .share-dialog-contacts').append(html);
 }
@@ -6990,12 +6988,11 @@ function initShareDialog() {
         if (user) {
             email = (user.name && user.name.length > 1) ? user.name : user.m;
         }*/
-        var av_color = email.charCodeAt(0) % 6 + email.charCodeAt(1) % 6;
-        var av = (avatars[i] && avatars[i].url) ? '<img src="' + avatars[i].url + '">' : (email.charAt(0) + email.charAt(1));
+        var av = useravatar.contact(email);
 
         $.sharedTokens.push(item);
 
-        var html = addShareDialogContactToContent('', id, av_color, av, email, perm[0], perm[1]);
+        var html = addShareDialogContactToContent('', id, av, email, perm[0], perm[1]);
 
         $('.share-dialog .share-dialog-contacts').append(html);
     }

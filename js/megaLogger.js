@@ -21,7 +21,7 @@
     var isfunction = require("isfunction");
     var clone = require("clone");
 
-    var isBrowser = typeof(window) !== 'undefined';
+
 
     /**
      * Simple .toArray method to be used to convert `arguments` to a normal JavaScript Array
@@ -89,13 +89,42 @@
     MegaLogger._logRegistry = {};
 
     /**
+     * Returns true IF the currently detected environment (browser/phantomjs/nodejs) supports console formatting or
+     * false if not
+     *
+     * @returns {boolean}
+     * @private
+     */
+    MegaLogger._environmentHaveSupportForColors = function() {
+        var isBrowser = true;
+        var isIE = false;
+
+        if (typeof(window) === 'undefined') {
+            isBrowser = false;
+        }
+        else if (typeof(window) !== 'undefined' && /PhantomJS/.test(window.navigator.userAgent)) {
+            isBrowser = false;
+        } else if (
+            typeof(window) !== 'undefined' && (
+            /MSIE/.test(window.navigator.userAgent) ||
+            /Trident/.test(window.navigator.userAgent) ||
+            /Edge/.test(window.navigator.userAgent)
+            )
+        ) {
+            isIE = true;
+        }
+
+        return (isBrowser === true && isIE === false);
+    };
+
+    /**
      * Static, default options
      *
      * @public
      * @static
      */
     MegaLogger.DEFAULT_OPTIONS = {
-        'colorsEnabled': isBrowser, /* use this only in browsers */
+        'colorsEnabled': MegaLogger._environmentHaveSupportForColors(), /* use this only in browsers */
         'levelColors': {
             'ERROR': '#ff0000',
             'DEBUG': '#0000ff',
@@ -152,6 +181,9 @@
          */
         'dereferenceObjects': false
     };
+
+
+
 
     /**
      * Factory function to return a {@link MegaLogger} instance.

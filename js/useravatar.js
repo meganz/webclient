@@ -4,11 +4,11 @@ var useravatar = {
      *  the moment we discover the real avatar associate with that avatar
      */
     _watching: {},
-    top: function(){ 
+    top: function() {
         if (avatars[u_handle]) {
-            return avatars[u_handle].url
+            return avatars[u_handle].url;
         }
-        return  staticpath + 'images/mega/default-top-avatar.png';
+        return staticpath + 'images/mega/default-top-avatar.png';
     },
     imgUrl: function(contact) {
         if (avatars[contact]) {
@@ -18,10 +18,10 @@ var useravatar = {
     },
     mine: function() {
         if (avatars[u_handle]) {
-            return avatars[u_handle].url
+            return avatars[u_handle].url;
         }
-        return  staticpath + 'images/mega/default-avatar.png';
-    }, 
+        return staticpath + 'images/mega/default-avatar.png';
+    },
 
     /**
      *  Return the HTML to represent a two letter avatar.
@@ -33,9 +33,9 @@ var useravatar = {
      *  @return HTML
      */
     _twoLetters: function(letters, id, className, element) {
-        var words = letters.split(/\s+/)
-        if (words.length == 1) {
-            letters = words[0].substr(0,2);
+        var words = letters.split(/\s+/);
+        if (words.length === 1) {
+            letters = words[0].substr(0, 2);
         } else {
             letters = words[0][0]  + words[1][0];
         }
@@ -44,7 +44,9 @@ var useravatar = {
             this._watching[id] = {};
         }
         this._watching[id][className] = true;
-        return '<'+element+' class="' + className + ' ' + id +  ' color' +color+'">' + letters.toUpperCase() + '</'+element+'>';
+        return '<' + element + ' class="' + className + ' ' + id +  ' color' + color +'">'
+                    + letters.toUpperCase() 
+                + '</' + element + '>';
     },
 
     /**
@@ -55,7 +57,7 @@ var useravatar = {
      *  @param className Any extra CSS classes that we want to append to the HTML
      */
     _image: function(url, id, className) {
-        return '<img src="' + url + '" class="' + id + ' ' + className +'"/>';
+        return '<img src="' + url + '" class="' + id + ' ' + className + '"/>';
     },
 
     isEmail: function(email) {
@@ -73,13 +75,14 @@ var useravatar = {
 
         if (user.u == u_handle && avatars[user.u]) {
             // my avatar!
-            $('.fm-avatar img,.fm-account-avatar img').attr('src', avatars[user.u].url)
+            $('.fm-avatar img,.fm-account-avatar img').attr('src',
+                    avatars[user.u].url);
         }
 
         var i;
         if (this._watching[user.u]) {
             for (i in this._watching[user.u]) {
-                $('.' + i + '.' + user.u).replaceWith(this.contact(user, i))
+                $('.' + i + '.' + user.u).replaceWith(this.contact(user, i));
             }
         }
 
@@ -99,10 +102,10 @@ var useravatar = {
             for (var u in M.u) {
                 if (M.u[u].m == user) {
                     // found the user object
-                    return this.contact(M.u[u])
+                    return this.contact(M.u[u]);
                 }
             }
-            return this._twoLetters(user.substr(0,2), user, className, element);
+            return this._twoLetters(user.substr(0, 2), user, className, element);
         } else if (typeof user == "string" && M.u[user]) {
             // It's an user ID
             user = M.u[user];
@@ -114,7 +117,7 @@ var useravatar = {
             return this._image(avatars[user.u].url, user.u, className);
         }
         
-        return this._twoLetters(user.name || user.m, user.u, className, element)
+        return this._twoLetters(user.name || user.m, user.u, className, element);
     },
 };
 

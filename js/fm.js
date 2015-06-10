@@ -3866,7 +3866,7 @@ function avatarDialog(close)
                         data: blob,
                         url: myURL.createObjectURL(blob)
                     }
-                $('.fm-account-avatar img').attr('src', useravatar.mine())
+                $('.fm-account-avatar img').attr('src', useravatar.mine());
                 $('.fm-avatar img').attr('src', useravatar.top());
                 avatarDialog(1);
             },

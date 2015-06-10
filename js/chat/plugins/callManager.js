@@ -867,7 +867,7 @@ CallSession.prototype.renderCallStartedState = function() {
         $('.video-icon', self.room.$header).removeClass("active");
     }
 
-    $('.btn-chat-call',self.room.$header).addClass('hidden');
+    $('.btn-chat-call', self.room.$header).addClass('hidden');
     $('.fm-end-call', self.room.$header).removeClass('hidden');
 
     $('.drag-handle', self.room.$header).show();
@@ -884,7 +884,7 @@ CallSession.prototype.renderCallStartedState = function() {
 
     // configure elements - avatars
     var myAvatar = $(useravatar.contact(u_handle, 'my-avatar-text nw-contact-avatar'));
-    $('.my-avatar-text',self.room.$header)
+    $('.my-avatar-text', self.room.$header)
         .empty()
         .append(myAvatar);
     $('.my-avatar', self.room.$header).hide();
@@ -895,7 +895,7 @@ CallSession.prototype.renderCallStartedState = function() {
         .addClass(otherAvatar.attr('class'))
         .append(otherAvatar);
 
-    $('.other-avatar-text',self.room.$header)
+    $('.other-avatar-text', self.room.$header)
         .empty()
         .append(otherAvatarWrap)
         .show();

@@ -176,7 +176,7 @@ var proPage = {
                 // Grey out the plan
                 $membershipStepOne.find('.reg-st3-membership-bl.pro' + accountLevel).addClass('sub-optimal-plan');
                 
-                // Add count of plans that aren't applicableß
+                // Add count of plans that aren't applicable
                 numOfPlansNotApplicable++;
             }
         }

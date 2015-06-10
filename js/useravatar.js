@@ -44,7 +44,7 @@ var useravatar = {
             this._watching[id] = {};
         }
         this._watching[id][className] = true;
-        return '<' + element + ' class="' + className + ' ' + id +  ' color' + color +'">'
+        return '<' + element + ' class="avatar-wrapper ' + className + ' ' + id +  ' color' + color +'">'
                     + letters.toUpperCase() 
                 + '</' + element + '>';
     },
@@ -57,7 +57,7 @@ var useravatar = {
      *  @param className Any extra CSS classes that we want to append to the HTML
      */
     _image: function(url, id, className, type) {
-        return '<' + type + ' class="' + id + ' ' + className + '">'
+        return '<' + type + ' class="avatar-wrapper ' + id + ' ' + className + '">'
                 + '<img src="' + url + '">'
          + '</' + type + '>';
     },
@@ -81,18 +81,9 @@ var useravatar = {
                     avatars[user.u].url);
         }
 
-        var i;
-        if (this._watching[user.u]) {
-            for (i in this._watching[user.u]) {
-                $('.' + i + '.' + user.u).replaceWith(this.contact(user, i));
-            }
-        }
-
-        if (this._watching[user.m]) {
-            for (i in this._watching[user.m]) {
-                $('.' + i + '.' + user.m.replace(/[\.@]/g, "\\$1")).replaceWith(this.contact(user, i));
-            }
-        }
+        var avatar = $(this.contact(user)).html();
+        $('.avatar-wrapper.' + user.u).empty().html(avatar);
+        $('.avatar-wrapper.' + user.m.replace(/[\.@]/g, "\\$1")).empty().html(avatar)
     },
 
     contact : function(user, className, element) {

@@ -881,23 +881,20 @@ CallSession.prototype.renderCallStartedState = function() {
         '.my-av-screen'
     ].join(","), self.room.$header.parent()).addClass("hidden");
 
-
     // configure elements - avatars
-    var myAvatar = $(useravatar.contact(u_handle, 'my-avatar-text nw-contact-avatar'));
+    var myAvatar = $(useravatar.contact(u_handle, 'nw-contact-avatar'));
     $('.my-avatar-text', self.room.$header)
         .empty()
         .append(myAvatar);
     $('.my-avatar', self.room.$header).hide();
 
     var otherUserContact = self.room.megaChat.getContactFromJid(self.room.getParticipantsExceptMe()[0]);
-    var otherAvatar = $(useravatar.contact(otherUserContact, 'av', 'span'));
-    var otherAvatarWrap = $('<div class="nw-contact-avatar"/>')
-        .addClass(otherAvatar.attr('class'))
-        .append(otherAvatar);
-
+    var otherAvatar = $(useravatar.contact(otherUserContact, 'nw-contact-avatar', 'div'));
+    otherAvatar.html("<span>"+ otherAvatar.html() + "</span>");
+    otherAvatar.find('img').addClass('nw-contact-avatar');
     $('.other-avatar-text', self.room.$header)
         .empty()
-        .append(otherAvatarWrap)
+        .append(otherAvatar)
         .show();
     $('.other-avatar', self.room.$header).hide();
 

@@ -910,7 +910,7 @@ function MegaData()
 
                     if (M.viewmode === 1) {
                         t = '.shared-blocks-scrolling';
-                        avatar = useravatar.contact(u_h, 'nw-contact-avatar avatar', 'span');
+                        avatar = useravatar.contact(u_h, 'nw-contact-avatar', 'span');
                         el = 'a';
                         html = '<a class="file-block folder" id="'
                             + htmlentities(M.v[i].h) + '"><span class="file-status-icon '

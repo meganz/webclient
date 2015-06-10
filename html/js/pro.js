@@ -157,8 +157,6 @@ var proPage = {
             return false;
         }
         
-        this.currentStorageBytes = 5.347224 * 1024 * 1024 * 1024 * 1024;
-        
         var totalNumOfPlans = 4;
         var numOfPlansNotApplicable = 0;
         var currentStorageGigabytes = this.currentStorageBytes / 1024 / 1024 / 1024;

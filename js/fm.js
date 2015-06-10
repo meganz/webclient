@@ -3659,6 +3659,18 @@ function accountUI()
 			initAccountScroll();
         });
 
+        $('.fm-account-remove-avatar,.fm-account-avatar').rebind('click', function() {
+            msgDialog('confirmation', l[1756], l[6973], false, function(e) {
+                if (e) {
+                    api_req({'a': 'up', '+a':'none'});
+                    delete avatars[u_handle];
+                    $('.fm-account-avatar img').attr('src', staticpath + 'images/mega/default-avatar.png');
+                    $('.fm-avatar img').attr('src', staticpath + 'images/mega/default-top-avatar.png');
+                    $('.fm-account-remove-avatar').hide();
+                }
+            });
+        });
+
         $('.fm-account-change-avatar,.fm-account-avatar').unbind('click');
         $('.fm-account-change-avatar,.fm-account-avatar').bind('click', function(e)
         {

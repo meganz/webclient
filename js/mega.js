@@ -377,7 +377,7 @@ function MegaData()
                     u: u,
                     callback: function(res, ctx)
                     {
-                        if (typeof res !== 'number')
+                        if (typeof res !== 'number' && res.length > 5)
                         {
                             var blob = new Blob([str_to_ab(base64urldecode(res))], {type: 'image/jpeg'});
                             avatars[ctx.u] = {

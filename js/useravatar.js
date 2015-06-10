@@ -56,8 +56,10 @@ var useravatar = {
      *  @param id           ID associate with the avatar (uid)
      *  @param className Any extra CSS classes that we want to append to the HTML
      */
-    _image: function(url, id, className) {
-        return '<img src="' + url + '" class="' + id + ' ' + className + '"/>';
+    _image: function(url, id, className, type) {
+        return '<' + type + ' class="' + id + ' ' + className + '">'
+                + '<img src="' + url + '">'
+         + '</' + type + '>';
     },
 
     isEmail: function(email) {
@@ -114,7 +116,7 @@ var useravatar = {
         }
 
         if (avatars[user.u]) {
-            return this._image(avatars[user.u].url, user.u, className);
+            return this._image(avatars[user.u].url, user.u, className, element);
         }
         
         return this._twoLetters(user.name || user.m, user.u, className, element);

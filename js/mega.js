@@ -777,7 +777,7 @@ function MegaData()
          *
          */
         function renderContactsLayout(u) {
-            var u_h, contact, node, av_meta, avatar, av_color, el, t, html, onlinestatus,
+            var u_h, contact, node, avatar, av_color, el, t, html, onlinestatus,
                 cs = M.contactstatus(u_h),
                 time = time2last(cs.ts),
                 timems = cs.ts,
@@ -866,7 +866,7 @@ function MegaData()
          * @returns {int}
          */
         function renderLayout(u, n_cache) {
-            var html, el, cs, contains, u_h, av_meta, t, el, time,
+            var html, el, cs, contains, u_h, t, el, time,
                 avatar, av_color, rights, rightsclass, onlinestatus, html,
                 s = '',
                 ftype = '',
@@ -894,17 +894,11 @@ function MegaData()
                     cs = M.contactstatus(M.v[i].h),
                     contains = fm_contains(cs.files, cs.folders),
                     u_h = M.v[i].p,
-                    av_meta = generateAvatarMeta(u_h),
-                    avatar = htmlentities(av_meta.shortName),
-                    av_color = av_meta.color,
                     rights = l[55],
                     rightsclass = ' read-only',
                     onlinestatus = M.onlineStatusClass(megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h)));
                     if (cs.files === 0 && cs.folders === 0) {
                         contains = l[1050];
-                    }
-                    if (av_meta.avatarUrl) {
-                        avatar = '<img src="' + av_meta.avatarUrl + '">';
                     }
                     if (M.v[i].r === 1) {
                         rights = l[56];
@@ -916,27 +910,29 @@ function MegaData()
 
                     if (M.viewmode === 1) {
                         t = '.shared-blocks-scrolling';
+                        avatar = useravatar.contact(u_h, 'nw-contact-avatar avatar', 'span');
                         el = 'a';
                         html = '<a class="file-block folder" id="'
                             + htmlentities(M.v[i].h) + '"><span class="file-status-icon '
                             + htmlentities(star) + '"></span><span class="shared-folder-access '
-                            + htmlentities(rightsclass) + '"></span><span class="file-icon-area">\n\
-                            <span class="block-view-file-type folder"></span></span><span class="nw-contact-avatar '
-                            + htmlentities(u_h) + ' color' + htmlentities(av_color) + '">' + avatar
-                            + '</span><span class="shared-folder-info-block"><span class="shared-folder-name">'
+                            + htmlentities(rightsclass) + '"></span><span class="file-icon-area">'
+                            + '<span class="block-view-file-type folder"></span></span>'
+                                 + avatar
+                            + '<span class="shared-folder-info-block"><span class="shared-folder-name">'
                             + htmlentities(M.v[i].name) + '</span><span class="shared-folder-info">by '
                             + htmlentities(M.d[u_h].name) + '</span></span></a>';
                     } else {
                         t = '.shared-grid-view .grid-table.shared-with-me';
                         el = 'tr';
                         var contactName = M.d[u_h] ? htmlentities(M.d[u_h].name) : "N/a";
+                        avatar = useravatar.contact(u_h, 'nw-contact-avatar');
 
                         html = '<tr id="' + htmlentities(M.v[i].h) + '"><td width="30"><span class="grid-status-icon ' + htmlentities(star)
                             + '"></span></td><td><div class="shared-folder-icon"></div><div class="shared-folder-info-block"><div class="shared-folder-name">'
                             + htmlentities(M.v[i].name) + '</div><div class="shared-folder-info">' + htmlentities(contains)
-                            + '</div></div> </td><td width="240"><div class="nw-contact-avatar '
-                            + htmlentities(u_h) + ' color' + htmlentities(av_color) + '">' + avatar
-                            + '</div><div class="fm-chat-user-info todo-star ustatus ' + htmlentities(u_h) + ' '
+                            + '</div></div> </td><td width="240">'
+                                 + avatar
+                            + '<div class="fm-chat-user-info todo-star ustatus ' + htmlentities(u_h) + ' '
                             + htmlentities(onlinestatus[1]) + '"><div class="todo-fm-chat-user-star"></div><div class="fm-chat-user">'
                             + contactName + '</div><div class="nw-contact-status"></div><div class="fm-chat-user-status ' + htmlentities(htmlentities(u_h)) + '">' + htmlentities(onlinestatus[0])
                             + '</div><div class="clear"></div></div></td><td width="270"><div class="shared-folder-access'

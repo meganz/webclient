@@ -9407,7 +9407,7 @@ function sharedfolderUI() {
     if (n) {
         var u_h = n.p;
         var user = M.d[u_h];
-        avatar = useravatar.contact(user);
+        avatar = useravatar.contact(user, 'nw-contact-avatar');
 
         var rights = l[55], rightsclass = ' read-only';
         if (n.r === 1) {
@@ -9434,7 +9434,7 @@ function sharedfolderUI() {
                         +'<a href="javascript:;" class="grid-url-arrow"><span></span></a>'
                         +'<div class="shared-folder-access'+ rightsclass + '">' + rights + '</div>'
                         +'<div class="clear"></div>'
-                        +'<div class="nw-contact-avatar color10">' + avatar + '</div>'
+                        + avatar
                         +'<div class="fm-chat-user-info">'
                             +'<div class="fm-chat-user">' + nameStr + '</div>'
                         +'</div>'

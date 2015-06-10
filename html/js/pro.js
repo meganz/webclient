@@ -157,16 +157,10 @@ var proPage = {
             return false;
         }
         
-        //*// Testing
-        //this.currentStorageBytes = 201 * 1024 * 1024 * 1024;            // 201 GB
-        //this.currentStorageBytes = 501 * 1024 * 1024 * 1024;            // 501 GB
-        //this.currentStorageBytes = 3 * 1024 * 1024 * 1024 * 1024;       // 3TB
-        //this.currentStorageBytes = 5.37577 * 1024 * 1024 * 1024 * 1024; // 5TB
-        //*/
-        
         var totalNumOfPlans = 4;
         var numOfPlansNotApplicable = 0;
         var currentStorageGigabytes = this.currentStorageBytes / 1024 / 1024 / 1024;
+        var $membershipStepOne = $('.membership-step1');
         
         // Loop through membership plans
         for (var i = 0, length = membershipPlans.length; i < length; i++) {
@@ -180,7 +174,7 @@ var proPage = {
             if ((months === 1) && (currentStorageGigabytes > planStorageGigabytes)) {
                 
                 // Grey out the plan
-                $('.membership-step1 .reg-st3-membership-bl.pro' + accountLevel).addClass('sub-optimal-plan');
+                $membershipStepOne.find('.reg-st3-membership-bl.pro' + accountLevel).addClass('sub-optimal-plan');
                 
                 // Add count of plans that aren't applicableß
                 numOfPlansNotApplicable++;
@@ -193,9 +187,22 @@ var proPage = {
             // Get current usage in TB and round to 3 decimal places
             var currentStorageTerabytes = currentStorageGigabytes / 1024;
                 currentStorageTerabytes = Math.round(currentStorageTerabytes * 1000) / 1000;
+                currentStorageTerabytes = l[5816].replace('[X]', currentStorageTerabytes);
             
-            $('.membership-step1 .no-plans-suitable').removeClass('hidden');            
-            $('.membership-step1 .no-plans-suitable .current-storage').text(currentStorageTerabytes);
+            // Show current storage usage and message
+            var $noPlansSuitable = $('.membership-step1 .no-plans-suitable');
+            $noPlansSuitable.removeClass('hidden');            
+            $noPlansSuitable.find('.current-storage .terabytes').text(currentStorageTerabytes);
+            
+            // Replace text with proper link
+            var linkText = $noPlansSuitable.find('.no-plans-suitable-text').html();
+            linkText = linkText.replace('[A]', '<a href="#contact">');
+            linkText = linkText.replace('[/A]', '</a>');
+            
+            // Redirect to #contact
+            $noPlansSuitable.find('.btn-request-plan').rebind('click', function() {
+                document.location.hash = 'contact';
+            });            
         }
     }    
 };

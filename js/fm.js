@@ -2792,57 +2792,28 @@ function accountUI()
 
                 // Check if there are any active subscriptions
                 // ccqns = Credit Card Query Number of Subscriptions
-                api_req({ a: 'ccqns' },
-                {
-                    callback : function(numOfSubscriptions, ctx)
-                    {
-                        // If > 0 then show cancel button and bind cancellation API call to the button
-                        if (numOfSubscriptions > 0)
-                        {
-                            var $cancelButton = $('.btn-cancel');
-                            $cancelButton.show();
-                            $cancelButton.rebind('click', function()
-                            {
-                                // Make sure they really want to do it
-                                msgDialog('confirmation', l[6822], l[6823], false, function(event)
-                                {
-                                    if (event)
-                                    {
-                                        $cancelButton.hide();
-                                        loadingDialog.show();
-
-                                        // Cancel the subscriptions
-                                        // cccs = Credit Card Cancel Subscriptions
-                                        api_req({ a: 'cccs' },
-                                        {
-                                            callback: function()
-                                            {
-                                                // Reset account cache and refetch all account data to display UI
-                                                // (note potential race condition if cancellation callback wasn't received in 7500ms)
-                                                M.account.lastupdate = 0;
-
-                                                setTimeout(function()
-                                                {
-                                                    loadingDialog.hide();
-                                                    accountUI();
-
-                                                }, 7500);
-                                            }
-                                        });
-                                    }
-                                });
+				api_req({ a: 'ccqns' },
+				{
+					callback : function(numOfSubscriptions, ctx)
+					{
+						// If there is an active subscription
+						if (numOfSubscriptions > 0) {
+                            
+                            // Show cancel button and show cancellation dialog
+                            $('.fm-account-blocks .btn-cancel').show().rebind('click', function() {
+                                cancelSubscriptionDialog.init();
                             });
-                        }
-                    }
-                });
-            }
+						}
+					}
+				});
+			}
             else if (account.stype == 'O')
             {
                 // one-time or cancelled subscription
                 $('.fm-account-header.typetitle').text(l[746]+':');
                 $('.membership-big-txt.type').text(l[751]);
                 $('.membership-medium-txt.expiry').html(l[987] + ' <span class="red">' + time2date(account.expiry) + '</span>');
-                $('.btn-cancel').hide();
+                $('.fm-account-blocks .btn-cancel').hide();
             }
         }
         else
@@ -9844,7 +9815,8 @@ function selectText(elementId) {
         range = document.body.createTextRange();
         range.moveToElementText(text);
         range.select();
-    } else if (window.getSelection) {
+    }
+    else if (window.getSelection) {
         selection = window.getSelection();
         range = document.createRange();
         range.selectNodeContents(text);
@@ -9852,3 +9824,121 @@ function selectText(elementId) {
         selection.addRange(range);
     }
 }
+
+/**
+ * Dialog to cancel subscriptions
+ */
+var cancelSubscriptionDialog = {
+    
+    $backgroundOverlay: null,
+    $dialog: null,
+    $dialogSuccess: null,
+    $accountPageCancelButton: null,
+    $continueButton: null,
+    $cancelReason: null,
+    
+    init: function() {
+        
+        this.$dialog = $('.cancel-subscription-st1');
+        this.$dialogSuccess = $('.cancel-subscription-st2');
+        this.$accountPageCancelButton = $('.fm-account-blocks .btn-cancel');
+        this.$continueButton = this.$dialog.find('.continue-cancel-subscription');
+        this.$cancelReason = this.$dialog.find('.cancel-textarea textarea');
+        this.$backgroundOverlay = $('.fm-dialog-overlay');
+        
+        // Show the dialog
+        this.$dialog.removeClass('hidden');
+        this.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+        
+        // Init functionality
+        this.enableButtonWhenReasonEntered();
+        this.initSendingReasonToApi();
+        this.initCloseAndBackButtons();
+    },
+    
+    /**
+     * Close the dialog when either the close or back buttons are clicked
+     */
+    initCloseAndBackButtons: function() {
+        
+        // Close main dialog
+        this.$dialog.find('.fm-dialog-button.cancel, .fm-dialog-close').rebind('click', function() {
+            cancelSubscriptionDialog.$dialog.addClass('hidden');
+            cancelSubscriptionDialog.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+        });
+    },
+    
+    /**
+     * Close success dialog
+     */
+    initCloseButtonSuccessDialog: function() {
+                
+        this.$dialogSuccess.find('.fm-dialog-close').rebind('click', function() {
+            cancelSubscriptionDialog.$dialogSuccess.addClass('hidden');
+            cancelSubscriptionDialog.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+        });
+    },
+    
+    /**
+     * Make sure text has been entered before making the button available
+     */
+    enableButtonWhenReasonEntered: function() {
+        
+        this.$cancelReason.rebind('keyup', function() {
+            
+            // Trim for spaces
+            var reason = $(this).val();
+                reason = $.trim(reason);
+            
+            // Make sure at least 1 character
+            if (reason.length > 0) {
+                cancelSubscriptionDialog.$continueButton.removeClass('disabled');
+            }
+            else {
+                cancelSubscriptionDialog.$continueButton.addClass('disabled');
+            }
+        });
+    },
+    
+    /**
+     * Send the cancellation reason
+     */
+    initSendingReasonToApi: function() {
+        
+        this.$continueButton.rebind('click', function() {
+            
+            // Get the cancellation reason
+            var reason = cancelSubscriptionDialog.$cancelReason.val();
+            
+            // Hide the dialog and show loading spinner
+            cancelSubscriptionDialog.$dialog.addClass('hidden');
+            cancelSubscriptionDialog.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+            loadingDialog.show();
+            
+            // Cancel the subscription/s
+            // cccs = Credit Card Cancel Subscriptions, r = reason
+            api_req({ a: 'cccs', r: reason }, {
+                callback: function() {
+                    
+                    // Reset account cache and refetch all account data to display UI
+                    // (note potential race condition if cancellation callback wasn't received in 7500ms)
+                    M.account.lastupdate = 0;
+
+                    setTimeout(function() {
+                        
+                        // Hide loading dialog and cancel subscription button on account page
+                        loadingDialog.hide();
+                        cancelSubscriptionDialog.$accountPageCancelButton.hide();
+                        
+                        // Show success dialog and refresh UI
+                        cancelSubscriptionDialog.$dialogSuccess.removeClass('hidden');
+                        cancelSubscriptionDialog.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+                        cancelSubscriptionDialog.initCloseButtonSuccessDialog();
+                        accountUI();
+                        
+                    }, 7500);
+                }
+            });
+        });
+    }
+};

@@ -104,7 +104,8 @@
         }
         else if (typeof(window) !== 'undefined' && /PhantomJS/.test(window.navigator.userAgent)) {
             isBrowser = false;
-        } else if (
+        }
+        else if (
             typeof(window) !== 'undefined' && (
             /MSIE/.test(window.navigator.userAgent) ||
             /Trident/.test(window.navigator.userAgent) ||

@@ -77,7 +77,7 @@ MegaPromise.getTraceableReject = function($promise, origPromise) {
             var stack;
             // try to get the stack trace
             try {
-                throw new Error("DEBUG")
+                throw new Error("DEBUG");
             } catch(e) {
                 stack = e.stack;
             }
@@ -91,7 +91,7 @@ MegaPromise.getTraceableReject = function($promise, origPromise) {
                 $promise.reject.apply($promise, toArray(arguments))
             }
         }
-        catch(e) {
+        catch (e) {
             console.error('Unexpected promise error: ', e);
         }
     };

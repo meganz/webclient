@@ -9810,6 +9810,7 @@ function selectText(elementId) {
  */
 var cancelSubscriptionDialog = {
     
+    $backgroundOverlay: null,
     $dialog: null,
     $dialogSuccess: null,
     $accountPageCancelButton: null,
@@ -9823,9 +9824,11 @@ var cancelSubscriptionDialog = {
         this.$accountPageCancelButton = $('.fm-account-blocks .btn-cancel');
         this.$continueButton = this.$dialog.find('.continue-cancel-subscription');
         this.$cancelReason = this.$dialog.find('.cancel-textarea textarea');
+        this.$backgroundOverlay = $('.fm-dialog-overlay');
         
         // Show the dialog
         this.$dialog.removeClass('hidden');
+        this.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
         
         // Init functionality
         this.enableButtonWhenReasonEntered();
@@ -9841,6 +9844,7 @@ var cancelSubscriptionDialog = {
         // Close main dialog
         this.$dialog.find('.fm-dialog-button.cancel, .fm-dialog-close').rebind('click', function() {
             cancelSubscriptionDialog.$dialog.addClass('hidden');
+            cancelSubscriptionDialog.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
         });
     },
     
@@ -9848,11 +9852,10 @@ var cancelSubscriptionDialog = {
      * Close success dialog
      */
     initCloseButtonSuccessDialog: function() {
-        
-        console.log('got here');
-        
+                
         this.$dialogSuccess.find('.fm-dialog-close').rebind('click', function() {
             cancelSubscriptionDialog.$dialogSuccess.addClass('hidden');
+            cancelSubscriptionDialog.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
         });
     },
     
@@ -9869,11 +9872,9 @@ var cancelSubscriptionDialog = {
             
             // Make sure at least 1 character
             if (reason.length > 0) {
-                cancelSubscriptionDialog.$dialog.find('.cancel-subscription-txt').removeClass('hidden');
                 cancelSubscriptionDialog.$continueButton.removeClass('disabled');
             }
             else {
-                cancelSubscriptionDialog.$dialog.find('.cancel-subscription-txt').addClass('hidden');
                 cancelSubscriptionDialog.$continueButton.addClass('disabled');
             }
         });
@@ -9890,7 +9891,8 @@ var cancelSubscriptionDialog = {
             var reason = cancelSubscriptionDialog.$cancelReason.val();
             
             // Hide the dialog and show loading spinner
-            cancelSubscriptionDialog.$dialog.hide();
+            cancelSubscriptionDialog.$dialog.addClass('hidden');
+            cancelSubscriptionDialog.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
             loadingDialog.show();
             
             // Cancel the subscription/s
@@ -9910,6 +9912,7 @@ var cancelSubscriptionDialog = {
                         
                         // Show success dialog and refresh UI
                         cancelSubscriptionDialog.$dialogSuccess.removeClass('hidden');
+                        cancelSubscriptionDialog.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
                         cancelSubscriptionDialog.initCloseButtonSuccessDialog();
                         accountUI();
                         

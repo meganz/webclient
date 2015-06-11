@@ -229,7 +229,7 @@ var crypt = (function () {
                 var message = 'RSA public key signature for ' + M.u[userhandle].m + ' is invalid!';
                 var instructions = 'Please ask your contact to get in touch with Mega Support.';
                 logger.error(message);
-                
+
                 // TODO: This should probably be changed to something like mega.ui.CredentialsWarningDialog.
                 msgDialog('warningb',
                           'RSA Public Key Signature Verification Failed',
@@ -1603,25 +1603,7 @@ function api_proc(q) {
                     var ctx = ctxs[i];
 
                     if (typeof ctx.callback === 'function') {
-                        try {
-                            ctx.callback(t[i], ctx, this);
-                        }
-                        catch (ex) {
-                            // if there is *any* issue on the callback
-                            // we don't want to HALT, instead we let the channel
-                            // a chance to clean itself and continue
-                            // Otherwise if we load #blog *or* #page_<something>
-                            // the whole site is buggy
-                            if (chromehack) {
-                                console.error(ex, ex.stack);
-                            }
-                            else {
-                                console.error(ex);
-                            }
-                            Soon(function sapith() {
-                                throw ex;
-                            });
-                        }
+                        ctx.callback(t[i], ctx, this);
                     }
                 }
 

@@ -14667,6 +14667,11 @@ h5.main-italic-header {
 .membership-step1 .reg-st3-membership-bl:hover, .membership-step1 .reg-st3-membership-bl.selected {
 	background-color: rgba(0,0,0,0.1);
 }
+.membership-step1 .sub-optimal-plan .membership-gray-block,
+.membership-step1 .sub-optimal-plan .reg-st3-storage,
+.membership-step1 .sub-optimal-plan .reg-st3-bandwidth {
+    opacity: 0.7;
+}
 .reg-st3-membership-bl:first-child {
 	margin: 0;
 }
@@ -16195,6 +16200,58 @@ span.browsers-update {
 .pro-gray-block .register-st3-main-bl .register-st2-button {
 	float: right;
 	margin: 50px 0 47px 0;
+}
+.pro-gray-block .no-plans-suitable {
+    font-size: 17px;
+    margin-bottom: 15px;
+    padding-top: 50px;
+    text-align: center;
+}
+.pro-gray-block .no-plans-suitable .current-storage {
+    color: #777;
+    font-size: 25px;
+    font-weight: bold;
+    margin-bottom: 30px;
+    text-align: center;
+}
+.pro-gray-block .no-plans-suitable .text {
+    color: #777;
+    display: inline;
+    padding-right: 10px;
+    position: relative;
+}
+.pro-gray-block .no-plans-suitable a {
+    color: #bf1900;
+    font-weight: bold;
+}
+.pro-gray-block .no-plans-suitable .terabytes {
+    color: #bf1900;
+    display: inline-block;
+    text-align: left;
+}
+.pro-gray-block .no-plans-suitable .terabytes::first-letter {
+    font-size: 40px;
+}
+.no-plans-suitable-text {
+    font-weight: bold;
+}
+.pro-gray-block .btn-request-plan {
+    background-color: #fff;
+    border: 4px solid #777;
+    border-radius: 8px;
+    box-sizing: border-box;
+    color: #777;
+    cursor: pointer;
+    display: inline-block;
+    font-size: 15px;
+    margin: 33px 12px 0;
+    padding: 15px 40px;
+    text-align: center;
+    transition: all 200ms ease-in-out 0s;
+}
+.pro-gray-block .btn-request-plan:hover {
+    border-color: #bf1900;
+    color: #bf1900;
 }
 .pro-icons-block {
 	width: 280px;

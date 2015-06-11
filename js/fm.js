@@ -1001,8 +1001,11 @@ function initUI() {
 
     var fmTabState;
 
-    $('.nw-fm-left-icon').unbind('click');
-    $('.nw-fm-left-icon').bind('click', function() {
+    $('.nw-fm-left-icon').rebind('contextmenu', function(ev) {
+        contextmenuUI(ev,1);
+        return false;
+    });
+    $('.nw-fm-left-icon').rebind('click', function() {
         treesearch = false;
         var clickedClass = $(this).attr('class');
         if (!clickedClass) {
@@ -2761,14 +2764,14 @@ function accountUI()
             // Subscription
             if (account.stype == 'S')
             {
-				$('.fm-account-header.typetitle').text(l[434]);
-				if (account.scycle == '1 M') {
+                $('.fm-account-header.typetitle').text(l[434]);
+                if (account.scycle == '1 M') {
                     $('.membership-big-txt.type').text(l[748]);
                 }
-				else if (account.scycle == '1 Y') {
+                else if (account.scycle == '1 Y') {
                     $('.membership-big-txt.type').text(l[749]);
                 }
-				else {
+                else {
                     $('.membership-big-txt.type').text('');
                 }
 
@@ -2787,7 +2790,7 @@ function accountUI()
                     $('.membership-medium-txt.expiry').html(paymentType);
                 }
 
-				// Check if there are any active subscriptions
+                // Check if there are any active subscriptions
                 // ccqns = Credit Card Query Number of Subscriptions
 				api_req({ a: 'ccqns' },
 				{
@@ -3141,8 +3144,8 @@ function accountUI()
                 if ($(this).attr('name') == 'account-country')
                     val = isocountries[val];
                 $('.fm-account-save-block').removeClass('hidden');
-				$('.fm-account-main').addClass('save');
-				initAccountScroll();
+                $('.fm-account-main').addClass('save');
+                initAccountScroll();
             }
             $(this).parent().find('.account-select-txt').text(val);
         });
@@ -3150,15 +3153,15 @@ function accountUI()
         $('#account-firstname,#account-lastname').bind('keyup', function(e)
         {
             $('.fm-account-save-block').removeClass('hidden');
-			$('.fm-account-main').addClass('save');
-			initAccountScroll();
+            $('.fm-account-main').addClass('save');
+            initAccountScroll();
         });
         $('.fm-account-cancel').unbind('click');
         $('.fm-account-cancel').bind('click', function(e)
         {
             $('.fm-account-save-block').addClass('hidden');
-			$('.fm-account-main').removeClass('save');
-			initAccountScroll();
+            $('.fm-account-main').removeClass('save');
+            initAccountScroll();
             accountUI();
         });
         $('.fm-account-save').unbind('click');
@@ -3187,8 +3190,8 @@ function accountUI()
                 }
             });
             $('.fm-account-save-block').addClass('hidden');
-			$('.fm-account-main').removeClass('save');
-			initAccountScroll();
+            $('.fm-account-main').removeClass('save');
+            initAccountScroll();
 
             if (M.account.dl_maxSlots)
             {
@@ -3230,8 +3233,8 @@ function accountUI()
                     $('#account-password').focus();
                     $('#account-password').bind('keyup.accpwd', function() {
                         $('.fm-account-save-block').removeClass('hidden');
-						$('.fm-account-main').addClass('save');
-						initAccountScroll();
+                        $('.fm-account-main').addClass('save');
+                        initAccountScroll();
                         $('#account-password').unbind('keyup.accpwd');
                     });
                 });
@@ -3260,8 +3263,8 @@ function accountUI()
                                 $('#account-password').focus();
                                 $('#account-password').bind('keyup.accpwd', function() {
                                     $('.fm-account-save-block').removeClass('hidden');
-									$('.fm-account-main').addClass('save');
-									initAccountScroll();
+                                    $('.fm-account-main').addClass('save');
+                                    initAccountScroll();
                                     $('#account-password').unbind('keyup.accpwd');
                                 });
                             });
@@ -3336,8 +3339,8 @@ function accountUI()
             {
                 M.account.dl_maxSlots = ui.value;
                 $('.fm-account-save-block').removeClass('hidden');
-				$('.fm-account-main').addClass('save');
-				initAccountScroll();
+                $('.fm-account-main').addClass('save');
+                initAccountScroll();
             }
         });
         $("#slider-range-max2").slider({
@@ -3345,8 +3348,8 @@ function accountUI()
             {
                 M.account.ul_maxSlots = ui.value;
                 $('.fm-account-save-block').removeClass('hidden');
-				$('.fm-account-main').addClass('save');
-				initAccountScroll();
+                $('.fm-account-main').addClass('save');
+                initAccountScroll();
             }
         });
         $('.ulspeedradio').removeClass('radioOn').addClass('radioOff');
@@ -3378,8 +3381,8 @@ function accountUI()
             $(this).addClass('radioOn').removeClass('radioOff');
             $(this).parent().addClass('radioOn').removeClass('radioOff');
             $('.fm-account-save-block').removeClass('hidden');
-			$('.fm-account-main').addClass('save');
-			initAccountScroll();
+            $('.fm-account-main').addClass('save');
+            initAccountScroll();
         });
         $('#ulspeedvalue').unbind('click keyup');
         $('#ulspeedvalue').bind('click keyup', function(e)
@@ -3391,8 +3394,8 @@ function accountUI()
             else
                 M.account.ul_maxSpeed = 100 * 1024;
             $('.fm-account-save-block').removeClass('hidden');
-			$('.fm-account-main').addClass('save');
-			initAccountScroll();
+            $('.fm-account-main').addClass('save');
+            initAccountScroll();
         });
 
         $('.ulskip').removeClass('radioOn').addClass('radioOff');
@@ -3413,8 +3416,8 @@ function accountUI()
             $(this).addClass('radioOn').removeClass('radioOff');
             $(this).parent().addClass('radioOn').removeClass('radioOff');
             $('.fm-account-save-block').removeClass('hidden');
-			$('.fm-account-main').addClass('save');
-			initAccountScroll();
+            $('.fm-account-main').addClass('save');
+            initAccountScroll();
         });
 
         $('.uisorting').removeClass('radioOn').addClass('radioOff');
@@ -3435,8 +3438,8 @@ function accountUI()
             $(this).addClass('radioOn').removeClass('radioOff');
             $(this).parent().addClass('radioOn').removeClass('radioOff');
             $('.fm-account-save-block').removeClass('hidden');
-			$('.fm-account-main').addClass('save');
-			initAccountScroll();
+            $('.fm-account-main').addClass('save');
+            initAccountScroll();
         });
 
         $('.uiviewmode').removeClass('radioOn').addClass('radioOff');
@@ -3457,8 +3460,8 @@ function accountUI()
             $(this).addClass('radioOn').removeClass('radioOff');
             $(this).parent().addClass('radioOn').removeClass('radioOff');
             $('.fm-account-save-block').removeClass('hidden');
-			$('.fm-account-main').addClass('save');
-			initAccountScroll();
+            $('.fm-account-main').addClass('save');
+            initAccountScroll();
         });
 
         $('.redeem-voucher').unbind('click');
@@ -3630,8 +3633,8 @@ function accountUI()
             $(this).addClass('radioOn').removeClass('radioOff');
             $(this).parent().addClass('radioOn').removeClass('radioOff');
             $('.fm-account-save-block').removeClass('hidden');
-			$('.fm-account-main').addClass('save');
-			initAccountScroll();
+            $('.fm-account-main').addClass('save');
+            initAccountScroll();
         });
 
         $('.fm-account-change-avatar,.fm-account-avatar').unbind('click');
@@ -3747,8 +3750,8 @@ function accountUI()
     {
         if ($(this).val() == $('#account-new-password').val())
             $('.fm-account-save-block').removeClass('hidden');
-			$('.fm-account-main').addClass('save');
-			initAccountScroll();
+            $('.fm-account-main').addClass('save');
+            initAccountScroll();
     });
 }
 
@@ -5516,7 +5519,7 @@ function contextmenuUI(e, ll, topmenu) {
         // detect and show right menu
         if (id && id.length === 11) {
             $(t).filter('.remove-item').show();// transfer panel
-        } else if (c && c.indexOf('cloud-drive-item') > -1) {
+        } else if (c && c.indexOf('cloud-drive') > -1) {
             var flt = '.properties-item';
             if (folderlink) {
                 flt += ',.import-item';
@@ -5526,6 +5529,12 @@ function contextmenuUI(e, ll, topmenu) {
             }
             $.selected = [M.RootID];
             $(t).filter(flt).show();
+        } else if (c && $(e.currentTarget).hasClass('inbox')) {
+            $.selected = [M.InboxID];
+            $(t).filter('.properties-item').show();
+        } else if (c && c.indexOf('rubbish-bin') > -1) {
+            $.selected = [M.RubbishID];
+            $(t).filter('.properties-item').show();
         } else if (c && c.indexOf('recycle-item') > -1) {
             $(t).filter('.clearbin-item').show();
         } else if (c && c.indexOf('contacts-item') > -1) {
@@ -6078,7 +6087,7 @@ function sectionUIopen(id) {
         case 'cloud-drive':
             headertxt = l[5916];
             break;
-		case 'inbox':
+        case 'inbox':
             headertxt = l[949];
             break;
         case 'rubbish-bin':
@@ -6104,7 +6113,7 @@ function treeUIopen(id, event, ignoreScroll, dragOver, DragOpen) {
 
     if (id_r === 'shares') {
         sectionUIopen('shared-with-me');
-	} else if (id_r === M.InboxID) {
+    } else if (id_r === M.InboxID) {
         sectionUIopen('inbox');
     } else if (id_r === M.RootID) {
         sectionUIopen('cloud-drive');
@@ -8497,7 +8506,18 @@ function propertiesDialog(close)
             p.t5 = '';
         }
         p.t1 = l[86] + ':';
-        p.t2 = htmlentities(n.name);
+        if (n.name) {
+            p.t2 = htmlentities(n.name);
+        }
+        else if (n.h === M.RootID) {
+            p.t2 = htmlentities(l[164]);
+        }
+        else if (n.h === M.InboxID) {
+            p.t2 = htmlentities(l[166]);
+        }
+        else if (n.h === M.RubbishID) {
+            p.t2 = htmlentities(l[167]);
+        }
         p.t4 = bytesToSize(size);
         p.t9 = n.ts && htmlentities(time2date(n.ts)) || '';
         p.t8 = p.t9 ? (l[896] + ':') : '';

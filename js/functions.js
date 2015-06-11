@@ -2789,7 +2789,6 @@ function assertStateChange(currentState, newState, allowedStatesMap, enumMap) {
     }
 }
 
-
 /**
  *  Check whether there are pending transfers.
  *
@@ -2972,4 +2971,18 @@ function mCleanestLogout(aUserHandle) {
                 }, 7e3);
             });
     });
+}
+
+
+// FIXME: This is a "Dirty Hack" (TM) that needs to be removed as soon as
+//        the original problem is found and resolved.
+if (typeof sjcl !== 'undefined') {
+    // We need to track SJCL exceptions for ticket #2348
+    sjcl.exception.invalid = function(message) {
+        this.toString = function() {
+            return "INVALID: " + this.message;
+        };
+        this.message = message;
+        this.stack = (new Error()).stack;
+    };
 }

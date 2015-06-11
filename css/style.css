@@ -7936,7 +7936,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .active .fm-account-input input, .error .fm-account-input input {
 	color: white;
 }
-.add-user-notification, .share-message, .feedback-textarea-bl {
+.add-user-notification, .share-message, .feedback-textarea-bl, .cancel-textarea-bl {
 	-moz-border-radius: 5px;
 	-webkit-border-radius: 5px;
 	border-radius: 5px;
@@ -7951,22 +7951,33 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	box-sizing: border-box;
 	margin-top: 12px;
 }
-.feedback-textarea-bl {
+.feedback-textarea-bl, .cancel-textarea-bl {
 	height: 96px;
 	background-image: none;
 	padding: 0;
 	margin: -4px 0 0 0;
 }
+.cancel-subscription-txt {
+	padding: 16px 8px 12px 8px;
+	font-size: 12px;
+    color: #999;
+}
+.cancel-textarea-bl {
+	height: 140px;
+}
 .feedback-textarea-scroll {
 	height: 96px;
+}
+.cancel-textarea-scroll {
+	height: 140px;
 }
 .add-user-nt-scrolling, .share-message-scroll {
 	height: 50px;
 }
-.add-user-nt-scrolling .jspDrag, .share-message-scrolling .jspDrag, .feedback-textarea-scroll .jspDrag {
+.add-user-nt-scrolling .jspDrag, .share-message-scrolling .jspDrag, .feedback-textarea-scroll .jspDrag, .cancel-textarea-scroll .jspDrag {
 	width: 4px;
 }
-.add-user-nt-scrolling textarea, .add-contact-hidden, .share-message-scrolling textarea, .share-message-hidden, .feedback-textarea-scroll textarea, .feedback-hidden {
+.add-user-nt-scrolling textarea, .add-contact-hidden, .share-message-scrolling textarea, .share-message-hidden, .feedback-textarea-scroll textarea, .feedback-hidden, .cancel-textarea-scroll textarea, .cancel-hidden {
 	border: 0;
 	padding: 0;
 	background-color: transparent;
@@ -7990,7 +8001,12 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	height: 96px;
 	font-size: 12px;
 }
-.add-contact-hidden, .share-message-hidden, .feedback-hidden {
+.cancel-textarea-scroll textarea, .cancel-hidden {
+    color: black;
+    font-size: 12px;
+    height: 125px;
+}
+.add-contact-hidden, .share-message-hidden, .feedback-hidden, .cancel-hidden {
 	display: none;
 	height: auto;
 	overflow: visible;
@@ -7998,7 +8014,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .add-user-textarea, .share-message-textarea {
 	padding: 7px 10px 7px 3px;
 }
-.feedback-textarea {
+.feedback-textarea, .cancel-textarea {
 	padding: 7px 10px;
 }
 .add-user-nt-scrolling textarea::selection, .share-message-scrolling textarea::selection {
@@ -9919,6 +9935,25 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
 .fm-dialog.reset-success-st3 {
 	width: 456px;
 	margin: -285px 0 0 -228px;
+}
+.fm-dialog.cancel-subscription-st1 {
+	width: 444px;
+	margin: -193px 0 0 -203px;
+}
+.fm-dialog.cancel-subscription-st2 {
+	width: 390px;
+	margin: -166px 0 0 -203px;
+}
+.fm-dialog.cancel-subscription-st2 .fm-dialog-body {
+    padding: 0;
+}
+.fm-dialog.cancel-subscription-st2 .blue-success-icon {
+    margin: 0 auto;
+    background-position: center -400px;
+    background-image: url("../images/mega/bitcoin-v4.png");
+    background-repeat: no-repeat;
+    height: 200px;
+    width: 200px;
 }
 .fm-dialog.restore-success {
 	width: 364px;
@@ -14523,6 +14558,16 @@ h5.main-italic-header {
 	color: #999999;
 	padding: 20px 8px 8px 8px;
 }
+.cancel-subscription-st1 .reset-small-txt {
+	padding: 25px 8px 15px 8px;
+    font-size: 12px;
+}
+.cancel-bott-txt {
+    font-size:13px; color:#333333; text-align:center; font-size: 13px;
+    color: #333333;
+    text-align: center;
+    padding: 10px 8px 25px 8px;
+}
 .reset-success-st3 .reset-txt {
 	font-family: 'Open Sans Semibold';
 	float: none;
@@ -14532,6 +14577,9 @@ h5.main-italic-header {
 }
 .reset-success-st3 .fm-dialog-header {
 	margin-bottom: 10px;
+}
+.cancel-subscription-st1 .fm-dialog-header, .cancel-subscription-st2 .fm-dialog-header {
+	margin: 19px 0 10px 0;
 }
 .reset-success-st2 .fm-account-input {
 	margin: 0 8px 20px 8px;
@@ -14554,7 +14602,7 @@ h5.main-italic-header {
 	font-family: 'Open Sans Semibold', Arial;
 	text-decoration: none;
 }
-.reset-success-st3 form {
+.reset-success-st3 form, .cancel-subscription-st1 form {
 	padding: 0 8px 8px 8px;
 	display: block;
 }
@@ -14618,6 +14666,11 @@ h5.main-italic-header {
 }
 .membership-step1 .reg-st3-membership-bl:hover, .membership-step1 .reg-st3-membership-bl.selected {
 	background-color: rgba(0,0,0,0.1);
+}
+.membership-step1 .sub-optimal-plan .membership-gray-block,
+.membership-step1 .sub-optimal-plan .reg-st3-storage,
+.membership-step1 .sub-optimal-plan .reg-st3-bandwidth {
+    opacity: 0.7;
 }
 .reg-st3-membership-bl:first-child {
 	margin: 0;
@@ -16147,6 +16200,58 @@ span.browsers-update {
 .pro-gray-block .register-st3-main-bl .register-st2-button {
 	float: right;
 	margin: 50px 0 47px 0;
+}
+.pro-gray-block .no-plans-suitable {
+    font-size: 17px;
+    margin-bottom: 15px;
+    padding-top: 50px;
+    text-align: center;
+}
+.pro-gray-block .no-plans-suitable .current-storage {
+    color: #777;
+    font-size: 25px;
+    font-weight: bold;
+    margin-bottom: 30px;
+    text-align: center;
+}
+.pro-gray-block .no-plans-suitable .text {
+    color: #777;
+    display: inline;
+    padding-right: 10px;
+    position: relative;
+}
+.pro-gray-block .no-plans-suitable a {
+    color: #bf1900;
+    font-weight: bold;
+}
+.pro-gray-block .no-plans-suitable .terabytes {
+    color: #bf1900;
+    display: inline-block;
+    text-align: left;
+}
+.pro-gray-block .no-plans-suitable .terabytes::first-letter {
+    font-size: 40px;
+}
+.no-plans-suitable-text {
+    font-weight: bold;
+}
+.pro-gray-block .btn-request-plan {
+    background-color: #fff;
+    border: 4px solid #777;
+    border-radius: 8px;
+    box-sizing: border-box;
+    color: #777;
+    cursor: pointer;
+    display: inline-block;
+    font-size: 15px;
+    margin: 33px 12px 0;
+    padding: 15px 40px;
+    text-align: center;
+    transition: all 200ms ease-in-out 0s;
+}
+.pro-gray-block .btn-request-plan:hover {
+    border-color: #bf1900;
+    color: #bf1900;
 }
 .pro-icons-block {
 	width: 280px;
@@ -23241,6 +23346,10 @@ body.pro:after {
  content: url(../images/mega/payment-animation@2x.gif);
 }
 .pro-register-paypal-dialog .reg-success-icon, .payment-confirmation .icon, .bitcoin-invoice-dialog .qr-code-mega-icon, .bitcoin-invoice-dialog .clock-icon, .nt-payment-notification .notification-avatar-icon, .payment-result-icon, .payment-close-icon {
+ background-image: url(../images/mega/bitcoin-v4@2x.png);
+ background-size: 200px auto;
+}
+.fm-dialog.cancel-subscription-st2 .blue-success-icon {
  background-image: url(../images/mega/bitcoin-v4@2x.png);
  background-size: 200px auto;
 }

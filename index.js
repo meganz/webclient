@@ -740,11 +740,6 @@ function init_page() {
     }
     else if (page == 'resellers') {
         parsepage(pages['resellers']);
-
-        // If logged in, pre-populate email address into wire transfer details
-        if (typeof u_attr !== 'undefined') {
-            $('#email-address').html(u_attr.email);
-        }
     }
     else if (page == 'takedown') {
         parsepage(pages['takedown']);

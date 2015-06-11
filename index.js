@@ -740,11 +740,6 @@ function init_page() {
     }
     else if (page == 'resellers') {
         parsepage(pages['resellers']);
-
-        // If logged in, pre-populate email address into wire transfer details
-        if (typeof u_attr !== 'undefined') {
-            $('#email-address').html(u_attr.email);
-        }
     }
     else if (page == 'takedown') {
         parsepage(pages['takedown']);
@@ -1013,90 +1008,6 @@ function tooltiplogin() {
                 $('#login-password').select();
             }
         });
-    }
-}
-
-function mCleanestLogout(aUserHandle) {
-    if (u_type !== 0 && u_type !== 3) {
-        throw new Error('Operation not permitted.');
-    }
-
-    mLogout(function() {
-        MegaDB.dropAllDatabases(aUserHandle)
-            .always(function(r) {
-                console.debug('mCleanestLogout', r);
-
-                localStorage.clear();
-                sessionStorage.clear();
-
-                setTimeout(function() {
-                    location.reload(true);
-                }, 7e3);
-            });
-    });
-}
-
-function mLogout(aCallback) {
-    $.dologout = function (Quiet) {
-        if ((fminitialized && downloading) || ul_uploading) {
-            if (Quiet) {
-                return true;
-            }
-            msgDialog('confirmation', l[967], l[377] + ' ' + l[507] + '?', false, function (e) {
-                if (e) {
-                    if (downloading) {
-                        dl_cancel();
-                    }
-                    if (ul_uploading) {
-                        ul_cancel();
-                    }
-
-                    resetUploadDownload();
-                    loadingDialog.show();
-                    var t = setInterval(function () {
-                        if (!$.dologout(!0)) {
-                            clearInterval(t);
-                        }
-                    }, 200);
-                }
-            });
-        }
-        else {
-            var finishLogout = function() {
-                if (--step === 0) {
-                    u_logout(true);
-                    if (typeof aCallback === 'function') {
-                        aCallback();
-                    }
-                    else {
-                        document.location.reload();
-                    }
-                }
-            }, step = 1;
-            loadingDialog.show();
-            if (typeof mDB === 'object' && mDB.drop) {
-                step++;
-                mFileManagerDB.exec('drop').always(finishLogout);
-            }
-            // Use the 'Session Management Logout' API call to kill the current session
-            api_req({ 'a': 'sml' }, { callback: finishLogout });
-        }
-    };
-    var cnt = 0;
-    if (M.c[M.RootID] && u_type === 0) {
-        for (var i in M.c[M.RootID]) {
-            cnt++;
-        }
-    }
-    if (u_type === 0 && cnt > 0) {
-        msgDialog('confirmation', l[1057], l[1058], l[1059], function (e) {
-            if (e) {
-                $.dologout();
-            }
-        });
-    }
-    else {
-        $.dologout();
     }
 }
 
@@ -1622,28 +1533,13 @@ function topmenuUI() {
             document.location.hash = 'fm/account';
         }
         else if (className.indexOf('refresh') > -1) {
-           stopsc();
-           stopapi();
-           if (typeof mDB !== 'undefined' && !pfid) {
-              mDBreload();
-           } else {
-              loadfm(true);
-           }
+            mega.utils.reload();
         }
         else if (className.indexOf('languages') > -1) {
             languageDialog();
         }
         else if (className.indexOf('clouddrive') > -1) {
             document.location.hash = 'fm';
-        }
-        else if (className.indexOf('refresh-item') > -1) {
-            stopsc();
-            stopapi();
-            if (typeof mDB !== 'undefined' && !pfid) {
-                mDBreload();
-            } else {
-                loadfm(true);
-            }
         }
         else if (className.indexOf('logout') > -1) {
             mLogout();

@@ -2780,3 +2780,201 @@ function assertStateChange(currentState, newState, allowedStatesMap, enumMap) {
         );
     }
 }
+
+/**
+ *  Check whether there are pending transfers.
+ *
+ *  @return {Boolean}
+ */
+mega.utils.hasPendingTransfers = function megaUtilsHasPendingTransfers() {
+    return ((fminitialized && downloading) || ul_uploading);
+};
+
+/**
+ *  Abort all pending transfers.
+ *
+ *  @return {Promise}
+ *          Resolved: Transfers were aborted
+ *          Rejected: User canceled confirmation dialog
+ *
+ *  @details This needs to be used when an operation requires that
+ *           there are no pending transfers, such as a logout.
+ */
+mega.utils.abortTransfers = function megaUtilsAbortTransfers() {
+    var promise = new MegaPromise();
+
+    if (!mega.utils.hasPendingTransfers()) {
+        promise.resolve();
+    }
+    else {
+        msgDialog('confirmation', l[967], l[377] + ' ' + l[507] + '?', false, function(doIt) {
+            if (doIt) {
+                if (downloading) {
+                    dl_cancel();
+                }
+                if (ul_uploading) {
+                    ul_cancel();
+                }
+
+                resetUploadDownload();
+                loadingDialog.show();
+                var timer = setInterval(function() {
+                    if (!mega.utils.hasPendingTransfers()) {
+                        clearInterval(timer);
+                        promise.resolve();
+                    }
+                }, 350);
+            }
+            else {
+                promise.reject();
+            }
+        });
+    }
+
+    return promise;
+};
+
+/**
+ *  Reload the site cleaning databases & session/localStorage.
+ *
+ *  Under non-activated/registered accounts this
+ *  will perform a former normal cloud reload.
+ */
+mega.utils.reload = function megaUtilsReload() {
+    if (u_type !== 3) {
+        stopsc();
+        stopapi();
+        if (typeof mDB === 'object' && !pfid) {
+            mDBreload();
+        } else {
+            loadfm(true);
+        }
+    }
+    else {
+        // Show message that this operation will destroy and reload the data stored by MEGA in the browser
+        var msg = l[6995];
+        msgDialog('confirmation', l[761], msg, l[6994], function(doIt) {
+            if (doIt) {
+                mega.utils.abortTransfers().then(function() {
+                    loadingDialog.show();
+                    stopsc();
+                    stopapi();
+
+                    MegaDB.dropAllDatabases(/*u_handle*/)
+                        .always(function(r) {
+                            var u_sid = u_storage.sid,
+                                u_key = u_storage.k,
+                                privk = u_storage.privk,
+                                debug = !!u_storage.d;
+
+                            console.debug('dropAllDatabases', r);
+
+                            localStorage.clear();
+                            sessionStorage.clear();
+
+                            u_storage.sid = u_sid;
+                            u_storage.privk = privk;
+                            u_storage.k = u_key;
+                            u_storage.wasloggedin = true;
+
+                            if (debug) {
+                                u_storage.d = u_storage.dd = u_storage.jj = true;
+                            }
+
+                            location.reload(true);
+                        });
+                });
+            }
+        });
+    }
+};
+
+/**
+ *  Kill session and Logout
+ */
+mega.utils.logout = function megaUtilsLogout() {
+    mega.utils.abortTransfers().then(function() {
+        var finishLogout = function() {
+            if (--step === 0) {
+                u_logout(true);
+                if (typeof aCallback === 'function') {
+                    aCallback();
+                }
+                else {
+                    document.location.reload();
+                }
+            }
+        }, step = 1;
+        loadingDialog.show();
+        if (typeof mDB === 'object' && mDB.drop) {
+            step++;
+            mFileManagerDB.exec('drop').always(finishLogout);
+        }
+        // Use the 'Session Management Logout' API call to kill the current session
+        api_req({ 'a': 'sml' }, { callback: finishLogout });
+    });
+}
+
+/**
+ * Perform a normal logout
+ *
+ * @param {Function} aCallback optional
+ */
+function mLogout(aCallback) {
+    var cnt = 0;
+    if (M.c[M.RootID] && u_type === 0) {
+        for (var i in M.c[M.RootID]) {
+            cnt++;
+        }
+    }
+    if (u_type === 0 && cnt > 0) {
+        msgDialog('confirmation', l[1057], l[1058], l[1059], function (e) {
+            if (e) {
+                mega.utils.logout();
+            }
+        });
+    }
+    else {
+        mega.utils.logout();
+    }
+}
+
+/**
+ * Perform a strict logout, by removing databases
+ * and cleaning sessionStorage/localStorage.
+ *
+ * @param {String} aUserHandle optional
+ */
+function mCleanestLogout(aUserHandle) {
+    if (u_type !== 0 && u_type !== 3) {
+        throw new Error('Operation not permitted.');
+    }
+
+    mLogout(function() {
+        MegaDB.dropAllDatabases(aUserHandle)
+            .always(function(r) {
+                console.debug('mCleanestLogout', r);
+
+                localStorage.clear();
+                sessionStorage.clear();
+
+                setTimeout(function() {
+                    location.reload(true);
+                }, 7e3);
+            });
+    });
+}
+
+
+// FIXME: This is a "Dirty Hack" (TM) that needs to be removed as soon as
+//        the original problem is found and resolved.
+if (typeof sjcl !== 'undefined') {
+    // We need to track SJCL exceptions for ticket #2348
+    sjcl.exception.invalid = function(message) {
+        this.toString = function() {
+            return "INVALID: " + this.message;
+        };
+        this.message = message;
+        this.stack = (new Error()).stack;
+    };
+}

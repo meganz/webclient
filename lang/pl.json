@@ -3391,5 +3391,7 @@
     "7000": "Thank you for your feedback <span class=\"firstname\">\u201cfirstname\u201d<\/span> <span class=\"lastname\">\u201clastname\u201d<\/span>",
     "7001": "Request a plan",
     "7002": "There are no plans suitable for your current usage. Please [A]contact support[\/A] for a custom plan.",
-    "7003": "current storage"
+    "7003": "current storage",
+    "7004": "Thank you for your feedback.",
+    "7005": "Please enter the reason below"
 }

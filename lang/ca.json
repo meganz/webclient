@@ -3384,12 +3384,14 @@
     "6993": "Pausa totes les transfer\u00e8ncies",
     "6994": "Est\u00e0s segur de voler continuar?",
     "6995": "Aquesta operaci\u00f3 destruir\u00e0 les dades que MEGA ha emmagatzemat al teu navegador i et permetr\u00e0 comen\u00e7ar de nou.",
-    "6996": "Before we go ahead and terminate your subscription, we would love to know the reason why you want to cancel your plan.",
-    "6997": "Please enter the reason below:",
-    "6998": "Click continue to cancel your subscription.",
-    "6999": "Subscription Cancellation Successful",
-    "7000": "Thank you for your feedback <span class=\"firstname\">\u201cfirstname\u201d<\/span> <span class=\"lastname\">\u201clastname\u201d<\/span>",
-    "7001": "Request a plan",
-    "7002": "There are no plans suitable for your current usage. Please [A]contact support[\/A] for a custom plan.",
-    "7003": "current storage"
+    "6996": "Abans de seguir i cancel\u00b7lar la teva subscripci\u00f3 ens encantaria saber el motiu pel qual has cancel\u00b7lat el pla.",
+    "6997": "Si us plau, introdueix a sota un motiu:",
+    "6998": "Clica sobre continuar per cancel\u00b7lar la teva subscripci\u00f3.",
+    "6999": "Cancel\u00b7laci\u00f3 de la subscripci\u00f3 completada amb \u00e8xit",
+    "7000": "Gr\u00e0cies pels teus comentaris <span class=\"firstname\">\u201cnom\u201d<\/span> <span class=\"lastname\">\u201ccognom\u201d<\/span>",
+    "7001": "Demana un pla a mida",
+    "7002": "No hi ha plans que s'ajustin al teu \u00fas actual.Si us plau, [A]contacta amb ajuda[\/A] per tal que et facin un pla a mida.",
+    "7003": "emmagatzematge actual",
+    "7004": "Thank you for your feedback.",
+    "7005": "Please enter the reason below"
 }

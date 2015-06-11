@@ -2985,13 +2985,13 @@
     "6594": "danner VERSIONHISTORIK.",
     "6595": "Genupload gennem webbrowseren med SPRING OVER IDENTISKE FILER sl\u00e5et 'TIL' i Indstillinger",
     "6596": "beholder kun den \u00c6LDSTE version.",
-    "6597": "If you are experiencing issues with Versioning or Overwriting please check these factors first:",
-    "6598": "Please check if the timestamp of the file on the server is newer than the clock on the computer you amended the file on.",
-    "6599": "That is usually the problem... The image \/ text editor keeps the timestamps constant and MEGAsync then rightfully believes that it has an old file and overwrites it with the newer file from the server.",
-    "6600": "Please turn off \"keep timestamp constant\" in the settings.",
+    "6597": "Hvis du oplever udfordringer med versionshistorik eller overskrivning, s\u00e5 kontroll\u00e9r disse faktorer f\u00f8rst:",
+    "6598": "Kontroll\u00e9r om tidsstemplet p\u00e5 filen p\u00e5 serveren er nyere end tidspunktet p\u00e5 uret p\u00e5 den computer du redigerede filen p\u00e5.",
+    "6599": "Det er fordet meste problemet... Billede\/tekstredigeringen beholder tidsstemplet og MEGAsync tror s\u00e5 at det opbevarer en gammel fil og overskriver derfor med en nyere fil fra serveren.",
+    "6600": "Sl\u00e5 \"behold tidsstempel\" fra i indstillinger",
     "6601": "Vi opbevarer dine filer p\u00e5 mindst 2 servere i forskellige datacentre, hvis muligt.",
-    "6602": "Always keep redundant copies of important files, online and offline. Although we keep each file in at least two locations, there is no guarantee against multiple concurrent failures and repeated unprecedented government misconduct.",
-    "6603": "Yes. However, your MEGA password is more than just a password - it unlocks your master encryption key, without which your data is entirely unreadable.",
+    "6602": "Opbevar altid redundante kopier af vigtige filer, online og offline. Selv om vi opbevarer hver fil p\u00e5 mindst 2 lokationer, er der ingen garanti mod sammenfaldende fejl, og gentagen uforudsigelige  myndigheds",
+    "6603": "Ja, ikke desto mindre er dit MEGA password mere end bare et password - det l\u00e5ser op for din master krypteringsn\u00f8gle, og uden den er dine data komplet ul\u00e6selige.",
     "6604": "Therefore, there are two kinds of password reset: With or without providing a copy of your backed up master key. With the key, you can just set a new password and retain your existing account. Without the key, you can park your existing account and start a new empty one under your existing account's e-mail address. We recommend that you do keep a backup of your master key in a safe location at all times, just in case! Click <a href=\"#backup\">here<\/a> to export your key or <a href=\"#recovery\">here<\/a> to reset your password.",
     "6605": "Important question - have you got our MEGASync client \/ one of our mobile apps installed and are you logged in? That would make a big difference. Please let us know! You can still export your Master Crypto Key through 'Settings' - 'Account'.",
     "6606": "PRO-abonnenter",
@@ -3391,5 +3391,7 @@
     "7000": "Thank you for your feedback <span class=\"firstname\">\u201cfirstname\u201d<\/span> <span class=\"lastname\">\u201clastname\u201d<\/span>",
     "7001": "Request a plan",
     "7002": "There are no plans suitable for your current usage. Please [A]contact support[\/A] for a custom plan.",
-    "7003": "current storage"
+    "7003": "current storage",
+    "7004": "Thank you for your feedback.",
+    "7005": "Please enter the reason below"
 }

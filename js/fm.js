@@ -698,7 +698,7 @@ function initUI() {
         {
             // grid dropped:
             var c = $(e.target).attr('class');
-            if (c && c.indexOf('folder') > -1)
+            if (c && c.indexOf('folder') > -1 || M.currentrootid === 'contacts')
                 t = $(e.target).attr('id');
         }
 
@@ -2792,21 +2792,21 @@ function accountUI()
 
                 // Check if there are any active subscriptions
                 // ccqns = Credit Card Query Number of Subscriptions
-				api_req({ a: 'ccqns' },
-				{
-					callback : function(numOfSubscriptions, ctx)
-					{
-						// If there is an active subscription
-						if (numOfSubscriptions > 0) {
+                api_req({ a: 'ccqns' },
+                {
+                    callback : function(numOfSubscriptions, ctx)
+                    {
+                        // If there is an active subscription
+                        if (numOfSubscriptions > 0) {
 
                             // Show cancel button and show cancellation dialog
                             $('.fm-account-blocks .btn-cancel').show().rebind('click', function() {
                                 cancelSubscriptionDialog.init();
                             });
-						}
-					}
-				});
-			}
+                        }
+                    }
+                });
+            }
             else if (account.stype == 'O')
             {
                 // one-time or cancelled subscription
@@ -4849,9 +4849,14 @@ function searchPath()
 function selectddUI() {
     if (M.currentdirid && M.currentdirid.substr(0, 7) == 'account')
         return false;
-    if (d)
+    if (d) {
         console.time('selectddUI');
-    $($.selectddUIgrid + ' ' + $.selectddUIitem + '.folder').droppable(
+    }
+    var dropSel = $.selectddUIgrid + ' ' + $.selectddUIitem + '.folder';
+    if (M.currentrootid === 'contacts') {
+        dropSel = $.selectddUIgrid + ' ' + $.selectddUIitem;
+    }
+    $(dropSel).droppable(
         {
             tolerance: 'pointer',
             drop: function(e, ui)

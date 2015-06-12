@@ -382,7 +382,10 @@ var crypt = (function () {
             }
         };
 
-        if (typeof u_authring === 'undefined'
+        if (!userhandle) {
+            masterPromise.reject('Invalid UserHandle');
+        }
+        else if (typeof u_authring === 'undefined'
                 || typeof u_authring.RSA === 'undefined') {
             logger.debug('First initialising the RSA authring.');
             var authringPromise = authring.getContacts('RSA');
@@ -395,24 +398,13 @@ var crypt = (function () {
                 // new ns.getPubRSA() invocation.)
                 masterPromise.linkDoneAndFailTo(ns.getPubRSA(userhandle));
             });
-
-            // Attach the callback ONLY AFTER previous handlers are attached.
-            _callbackAttachAfterDone(masterPromise);
-
-            return masterPromise;
         }
-
-        if (u_pubkeys[userhandle]) {
+        else if (u_pubkeys[userhandle]) {
             // It's cached: Only check the authenticity of the key.
             var checkAuthPromise = crypt._asynchCheckAuthenticationRSA(userhandle);
 
             // Resolve/reject master promise depending on state of checkAuthPromise.
             masterPromise.linkDoneAndFailTo(checkAuthPromise);
-
-            // Attach the callback ONLY AFTER previous handlers are attached.
-            _callbackAttachAfterDone(masterPromise);
-
-            return masterPromise;
         }
         else {
             // Non-cached value.
@@ -428,12 +420,12 @@ var crypt = (function () {
                 var recursionPromise = ns.getPubRSA(userhandle);
                 masterPromise.linkDoneAndFailTo(recursionPromise);
             });
-
-            // Attach the callback ONLY AFTER previous handlers are attached.
-            _callbackAttachAfterDone(masterPromise);
-
-            return masterPromise;
         }
+
+        // Attach the callback ONLY AFTER previous handlers are attached.
+        _callbackAttachAfterDone(masterPromise);
+
+        return masterPromise;
     };
 
 
@@ -2153,7 +2145,7 @@ function api_cachepubkeys(ctx, users) {
     // Fire off the requests and track them.
     var keyPromises = [];
     for (i = u.length; i--;) {
-        keyPromises.push(crypt.getPubRSA(i[i]));
+        keyPromises.push(crypt.getPubRSA(u[i]));
     }
 
     // Make a promise for the bunch of them, and define settlement handlers.

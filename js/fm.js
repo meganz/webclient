@@ -9855,7 +9855,7 @@ var cancelSubscriptionDialog = {
         this.initSendingReasonToApi();
         this.initCloseAndBackButtons();
     },
-    
+        
     /**
      * Close the dialog when either the close or back buttons are clicked
      */
@@ -9865,6 +9865,11 @@ var cancelSubscriptionDialog = {
         this.$dialog.find('.fm-dialog-button.cancel, .fm-dialog-close').rebind('click', function() {
             cancelSubscriptionDialog.$dialog.addClass('hidden');
             cancelSubscriptionDialog.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+        });
+        
+        // Prevent clicking on the background overlay which closes it unintentionally
+        cancelSubscriptionDialog.$backgroundOverlay.rebind('click', function(event) {
+            event.stopPropagation();
         });
     },
     

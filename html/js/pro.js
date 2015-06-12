@@ -50,6 +50,32 @@ function init_pro()
 
     if (!m)
     {
+        $('.membership-button').rebind('click', function() {
+            
+            var $planBlocks = $('.reg-st3-membership-bl');
+            var $selectedPlan = $(this).closest('.reg-st3-membership-bl');
+            var $stageTwoSelectedPlan = $('.membership-selected-block');
+
+            $planBlocks.removeClass('selected');
+            $selectedPlan.addClass('selected');
+
+            account_type_num = $selectedPlan.attr('data-payment');
+            
+            // Clear to prevent extra clicks showing multiple
+            $stageTwoSelectedPlan.html($selectedPlan.clone());
+            
+            var proPlanName = $selectedPlan.find('.reg-st3-bott-title.title').html();
+            $('.membership-step2 .pro span').html(proPlanName);
+            
+            // Update header text with plan
+            var $selectedPlanHeader = $('.membership-step2 .main-italic-header.pro');
+            var selectedPlanText = $selectedPlanHeader.html().replace('%1', proPlanName);
+            $selectedPlanHeader.html(selectedPlanText);
+            
+            pro_next_step();
+            return false;
+        });
+        
         // Get the membership plans. This call will return an array of arrays. Each array contains this data:
         // [api_id, account_level, storage, transfer, months, price, currency, description, ios_id, google_id]
         // More data can be retrieved with 'f : 1'
@@ -105,28 +131,6 @@ function init_pro()
         $('.membership-free-button').bind('click',function(e) {
             if (page == 'fm') document.location.hash = '#start';
             else document.location.hash = '#fm';
-            return false;
-        });
-
-        $('.membership-button').unbind('click');
-        $('.membership-button').bind('click',function(e)
-        {
-            var $membershipBlock = $(this).closest('.reg-st3-membership-bl');
-
-            $('-reg-st3-membership-bl').removeClass('selected');
-            $membershipBlock.addClass('selected');
-
-            account_type_num = $membershipBlock.attr('data-payment');
-            $membershipBlock.clone().appendTo( '.membership-selected-block');
-            var proPlanName = $membershipBlock.find('.reg-st3-bott-title.title').html();
-            $('.membership-step2 .pro span').html(proPlanName);
-            
-            // Update header text with plan
-            var $selectedPlanHeader = $('.membership-step2 .main-italic-header.pro');
-            var selectedPlanText = $selectedPlanHeader.html().replace('%1', proPlanName);
-            $selectedPlanHeader.html(selectedPlanText);
-            
-            pro_next_step();
             return false;
         });
 
@@ -370,6 +374,9 @@ function initPaymentMethodRadioOptions(html) {
 
 // Step2
 function pro_next_step() {
+
+    // Add history so the back button works to go back to choosing their plan
+    history.pushState('', 'MEGA - Choose plan', '#pro2');
 
     if (!u_handle) {
         megaAnalytics.log("pro", "loginreq");

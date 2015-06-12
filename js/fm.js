@@ -9878,6 +9878,11 @@ var cancelSubscriptionDialog = {
             cancelSubscriptionDialog.$dialog.addClass('hidden');
             cancelSubscriptionDialog.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
         });
+
+        // Prevent clicking on the background overlay which closes it unintentionally
+        cancelSubscriptionDialog.$backgroundOverlay.rebind('click', function(event) {
+            event.stopPropagation();
+        });
     },
 
     /**

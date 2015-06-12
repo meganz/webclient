@@ -1,6 +1,555 @@
+/** Key ring holding own private keys. */
+var u_keyring;
+
+/** Own private Ed25519 key. */
+var u_privEd25519;
+
+/** Own public Ed25519 key. */
+var u_pubEd25519;
+
+/** Cache for contacts' public Ed25519 keys. */
+var pubEd25519 = {};
+
+var crypt = (function () {
+    "use strict";
+
+    // Disables warnings for explicit initialisation with `undefined`.
+    /* jshint -W080 */
+
+    /**
+     * @description
+     * Cryptography related functionality.
+     *
+     * Note: A namespace naming of `crypto` leads to collisions, probably with
+     *       the default WebCrypto namespace. Therefore the name `crypt` only.
+     */
+    var ns = {};
+    var logger = MegaLogger.getLogger('crypt');
+    ns._logger = logger;
+
+    // TODO: Eventually migrate all functionality into this name space.
+
+
+    /**
+     * Checks the integrity (through the authring) of users' Ed25519 pub keys.
+     *
+     * @private
+     * @param userhandle {string}
+     *     Mega user handle.
+     * @throws {Error}
+     *     In case the fingerprint of the public key differs from the one
+     *     previously authenticated by the user.
+     */
+    ns._checkAuthenticationEd25519 = function(userhandle) {
+        var recorded = authring.getContactAuthenticated(userhandle, 'Ed25519');
+        var fingerprint = authring.computeFingerprint(pubEd25519[userhandle],
+                                                      'Ed25519', 'string');
+        if (recorded === false) {
+            authring.setContactAuthenticated(userhandle, fingerprint, 'Ed25519',
+                                             authring.AUTHENTICATION_METHOD.SEEN,
+                                             authring.KEY_CONFIDENCE.UNSURE);
+        }
+        else if (recorded && authring.equalFingerprints(recorded.fingerprint, fingerprint) === false) {
+            logger.error('Error verifying authenticity of Ed25519 pub key: '
+                         + 'fingerprint does not match previously authenticated one!');
+            // This function handles what's required for the action, shows a
+            // warning dialogue and throws the exception.
+            ns.showFingerprintMismatchException('Ed25519', userhandle,
+                                                recorded.method,
+                                                recorded.fingerprint, fingerprint);
+        }
+    };
+
+
+    /**
+     * Cached Ed25519 public key retrieval utility.
+     *
+     * @param userhandle {string}
+     *     Mega user handle.
+     * @param callback {function}
+     *     Callback function to call upon completion of operation. The
+     *     callback requires two parameters: `value` (an object
+     *     containing the public in `pubkey` and its authencation
+     *     state in `authenticated`). `value` will be `false` upon a
+     *     failed request.
+     * @return {MegaPromise}
+     *     A promise that is resolved when the original asynch code is
+     *     settled.  Can be used to use promises instead of callbacks
+     *     for asynchronous dependencies.
+     * @throws {Error}
+     *     In case the fingerprint of the public key differs from the
+     *     one previously authenticated by the user. This more severe
+     *     condition warrants to throw an exception.
+     */
+    ns.getPubEd25519 = function(userhandle, callback) {
+        // This promise will be the one which is going to be returned.
+        var masterPromise = new MegaPromise();
+
+        /** If a callback is passed in, ALWAYS call it when the master promise
+         * is resolved. */
+        var _callbackAttachAfterDone = function(aPromise) {
+            if (callback) {
+                aPromise.done(function(result) {
+                    logger.debug('Calling callback');
+                    callback(result);
+                });
+            }
+        };
+
+        if (typeof u_authring === 'undefined'
+                || typeof u_authring.Ed25519 === 'undefined') {
+            logger.debug('First initialising the Ed25519 authring.');
+            var ed25519LoadingPromise = authring.getContacts('Ed25519');
+            masterPromise.linkFailTo(ed25519LoadingPromise);
+            // Now, with the authring loaded, link recursively to getPubEd25519 again.
+            ed25519LoadingPromise.done(function() {
+                masterPromise.linkDoneAndFailTo(ns.getPubEd25519(userhandle));
+            });
+            _callbackAttachAfterDone(masterPromise);
+
+            return masterPromise;
+        }
+
+        if (pubEd25519[userhandle]) {
+            // It's cached: Only check the authenticity of the key.
+            crypt._checkAuthenticationEd25519(userhandle);
+            masterPromise.resolve(pubEd25519[userhandle]);
+            _callbackAttachAfterDone(masterPromise);
+
+            return masterPromise;
+        }
+        else {
+            // Non-cached value.
+            var getUserAttribPromise = getUserAttribute(userhandle, 'puEd255',
+                                                        true, false);
+            getUserAttribPromise.done(function(result) {
+                result = base64urldecode(result);
+                pubEd25519[userhandle] = result;
+                crypt._checkAuthenticationEd25519(userhandle);
+                logger.debug('Got Ed25519 pub key of user "' + userhandle + '".');
+                masterPromise.resolve(pubEd25519[userhandle]);
+            });
+
+            // Show error and call the 'callback', masterPromise will get
+            // rejected by the next .linkFailTo call...
+            getUserAttribPromise.fail(function(error) {
+                logger.error('Error getting Ed25519 pub key of user "'
+                             + userhandle + '": ' + error);
+                if (callback) {
+                    callback(error);
+                }
+            });
+
+            masterPromise.linkFailTo(getUserAttribPromise);
+            _callbackAttachAfterDone(masterPromise);
+
+            return masterPromise;
+        }
+    };
+
+
+    /**
+     * Retrieves a users' RSA pub keys through the Mega API.
+     *
+     * @private
+     * @param userhandle {string}
+     *     Mega user handle.
+     * @return {MegaPromise}
+     *     A promise that is resolved when the original asynch code is settled.
+     */
+    ns._getPubRSAattribute = function(userhandle) {
+        // Make the promise to execute the API code.
+        var thePromise = new MegaPromise();
+
+        var myCtx = {};
+        /** Function to settle the promise for the RSA pub key attribute. */
+        var settleFunction = function(res) {
+            if (typeof res === 'object') {
+                var pubKey = crypto_decodepubkey(base64urldecode(res.pubk));
+                logger.debug('Received RSA pub key for ' + userhandle
+                             + ': ' + JSON.stringify(pubKey));
+                thePromise.resolve(pubKey);
+            }
+            else {
+                logger.error('RSA pub key for ' + userhandle
+                                + ' could not be retrieved: ' + res);
+                thePromise.reject(res);
+            }
+        };
+
+        // Assemble context for this async API request.
+        myCtx.u = userhandle;
+        myCtx.callback = settleFunction;
+
+        // Fire it off.
+        api_req({ 'a': 'uk', 'u': userhandle }, myCtx);
+
+        return thePromise;
+    };
+
+
+    /**
+     * Determines for RSA public keys the authentication method, performs the
+     * check, and records the result.
+     *
+     * @private
+     * @param userhandle {string}
+     *     Mega user handle.
+     * @param signature {string}
+     *     Ed25519 signature of the RSA public key.
+     * @param fingerprint {string}
+     *     Fingerprint of the RSA public key.
+     * @return {Object}
+     *     The checked RSA public key.
+     * @throws {Error}
+     *     In case the fingerprint of the public key differs from the one previously
+     *     authenticated by the user, or the signature of the public key does
+     *     not verify.
+     */
+    ns._trackRSAKeyAuthentication = function(userhandle, signature, fingerprint) {
+        // Find out the authentication method/outcome.
+        var method = undefined;
+        if (signature === '') {
+            // User doesn't have an RSA key signature.
+            method = authring.AUTHENTICATION_METHOD.SEEN;
+        }
+        else if (typeof signature === 'undefined') {
+            // Problem retrieving the RSA key signature.
+            logger.warn('Problem retrieving RSA pub key signature for ' + userhandle);
+            return u_pubkeys[userhandle];
+        }
+        else {
+            // Let's check the signature.
+            var check = authring.verifyKey(signature, u_pubkeys[userhandle],
+                                           'RSA', pubEd25519[userhandle]);
+            if (check === true) {
+                method = authring.AUTHENTICATION_METHOD.SIGNATURE_VERIFIED;
+            }
+            else {
+                var message = 'RSA public key signature for ' + M.u[userhandle].m + ' is invalid!';
+                var instructions = 'Please ask your contact to get in touch with Mega Support.';
+                logger.error(message);
+
+                // TODO: This should probably be changed to something like mega.ui.CredentialsWarningDialog.
+                msgDialog('warningb',
+                          'RSA Public Key Signature Verification Failed',
+                          message + '<br/>' + instructions);
+                throw new Error(message);
+            }
+        }
+
+        // Record the authentication state of the key.
+        if (typeof method !== 'undefined') {
+            authring.setContactAuthenticated(userhandle, fingerprint,
+                                             'RSA', method,
+                                             authring.KEY_CONFIDENCE.UNSURE);
+            return u_pubkeys[userhandle];
+        }
+    };
+
+
+    /**
+     * Checks the authenticity (through a key signature) and integrity
+     * (through the authring) of users' RSA pub keys.
+     *
+     * @private
+     * @param userhandle {string}
+     *     Mega user handle.
+     * @param callback {function}
+     *     Async callback that may need calling.
+     * @return {MegaPromise}
+     *     A promise that is resolved when the original asynch code is settled.
+     *     The promise returns the RSA public key.
+     * @throws {Error}
+     *     In case the fingerprint of the public key differs from the one previously
+     *     authenticated by the user, or the signature of the public key does
+     *     not verify.
+     */
+    ns._asynchCheckAuthenticationRSA = function(userhandle, callback) {
+        // Make the promise to execute the API code.
+        var rootPromise = new MegaPromise();
+
+        var recorded = authring.getContactAuthenticated(userhandle, 'RSA');
+        var fingerprint = authring.computeFingerprint(u_pubkeys[userhandle],
+                                                      'RSA', 'string');
+        if ((recorded === false)
+                || (recorded.method !== authring.AUTHENTICATION_METHOD.SIGNATURE_VERIFIED)) {
+            // Check of a previously unseen key.
+            var signature = undefined;
+
+            // Get signature attribute.
+            var attributePromise = getUserAttribute(userhandle, 'sigPubk',
+                                                    true, false);
+
+            /** On resolve for retrieving the signature and public signing key. */
+            var attributePromiseResolve = function(result) {
+                signature = base64urldecode(result);
+                return signature;
+            };
+            /** On rejection for retrieving the signature and public signing key. */
+            var attributePromiseReject = function(result) {
+                if (result === ENOENT) {
+                    // No signature: Let's resolve with an empty signature.
+                    signature = '';
+                    var resolvePromise = new MegaPromise();
+                    resolvePromise.resolve('');
+
+                    return resolvePromise;
+                }
+                else {
+                    return result;
+                }
+            };
+
+            var signaturePromise = attributePromise.then(attributePromiseResolve,
+                                                         attributePromiseReject);
+
+            // Get public signing key.
+            var pubKeyPromise = crypt.getPubEd25519(userhandle);
+
+            // Compound promise for signature and signing key.
+            var compoundPromise = MegaPromise.all([signaturePromise,
+                                                   pubKeyPromise]);
+
+            // Do the check and track the outcome.
+            compoundPromise.then(function () {
+                rootPromise.resolve(ns._trackRSAKeyAuthentication(userhandle,
+                                                                  signature,
+                                                                  fingerprint));
+            });
+
+        }
+        else if (recorded && authring.equalFingerprints(recorded.fingerprint, fingerprint) === true) {
+            // All good, key matches previously seen fingerprint.
+            rootPromise.resolve(true);
+        }
+        else {
+            // Something is dodgy, previously seen fingerprint mitsmatches.
+            logger.error('RSA fingerprint does not match previously authenticated one!');
+            // This function handles what's required for the action, shows a
+            // warning dialogue and throws the exception.
+            ns.showFingerprintMismatchException('RSA', userhandle,
+                                                recorded.method,
+                                                recorded.fingerprint, fingerprint);
+        }
+
+        if (callback) {
+            callback(u_pubkeys[userhandle], userhandle);
+        }
+
+        return rootPromise;
+    };
+
+
+    /**
+     * Cached RSA public key retrieval utility. If the key is cached, no API
+     * request will be performed. The key's authenticity is validated through
+     * the tracking in the authring and signature verification.
+     *
+     * @param userhandle {string}
+     *     Mega user handle.
+     * @param [callback] {function}
+     *     (Optional) Callback function to call upon completion of operation. The callback
+     *     requires one parameter: the actual public RSA key. The user handle is
+     *     passed as a second parameter, and may be obtained that way if the call
+     *     back supports it.
+     * @return {MegaPromise}
+     *     A promise that is resolved when the original asynch code is settled.
+     *     The promise returns the RSA public key.
+     * @throws {Error}
+     *     In case the fingerprint of the public key differs from the one previously
+     *     authenticated by the user. This more severe condition warrants to throw
+     *     an exception.
+     */
+    ns.getPubRSA = function(userhandle, callback) {
+        /* This function does the following:
+         * 1. Check the authring, if empty: initialise.
+         * 2. If the key is cached: _asynchCheckAuthenticationRSA.
+         * 3. If not cached: _getPubRSAattribute + _asynchCheckAuthenticationRSA.
+         */
+
+        // This promise will be the one which is going to be returned.
+        var masterPromise = new MegaPromise();
+
+        /** If a callback is passed in, ALWAYS call it when the promise in the
+         * parameter is resolved (should be the masterPromise). */
+        var _callbackAttachAfterDone = function(aPromise) {
+            if (callback) {
+                aPromise.done(function(result) {
+                    logger.debug('Calling callback');
+                    callback(result);
+                });
+            }
+        };
+
+        if (typeof u_authring === 'undefined'
+                || typeof u_authring.RSA === 'undefined') {
+            logger.debug('First initialising the RSA authring.');
+            var authringPromise = authring.getContacts('RSA');
+            // Fail the masterPromise if authring.getContacts() fails.
+            masterPromise.linkFailTo(authringPromise);
+
+            authringPromise.done(function() {
+                // Loading finished. Do a recursion now that we have the authring.
+                // (masterPromise will be resolved and callback called through
+                // new ns.getPubRSA() invocation.)
+                masterPromise.linkDoneAndFailTo(ns.getPubRSA(userhandle));
+            });
+
+            // Attach the callback ONLY AFTER previous handlers are attached.
+            _callbackAttachAfterDone(masterPromise);
+
+            return masterPromise;
+        }
+
+        if (u_pubkeys[userhandle]) {
+            // It's cached: Only check the authenticity of the key.
+            var checkAuthPromise = crypt._asynchCheckAuthenticationRSA(userhandle);
+
+            // Resolve/reject master promise depending on state of checkAuthPromise.
+            masterPromise.linkDoneAndFailTo(checkAuthPromise);
+
+            // Attach the callback ONLY AFTER previous handlers are attached.
+            _callbackAttachAfterDone(masterPromise);
+
+            return masterPromise;
+        }
+        else {
+            // Non-cached value.
+            var keyLoadingPromise = crypt._getPubRSAattribute(userhandle);
+            masterPromise.linkFailTo(keyLoadingPromise);
+            keyLoadingPromise.done(function(result) {
+                // Cache the result.
+                u_pubkeys[userhandle] = result;
+
+                // Loading finished. Do a recursion now that we have the pub key.
+                // (masterPromise will be resolved and callback called through
+                // new ns.getPubRSA() invocation.)
+                var recursionPromise = ns.getPubRSA(userhandle);
+                masterPromise.linkDoneAndFailTo(recursionPromise);
+            });
+
+            // Attach the callback ONLY AFTER previous handlers are attached.
+            _callbackAttachAfterDone(masterPromise);
+
+            return masterPromise;
+        }
+    };
+
+
+    /**
+     * Computes a user's Ed25519 key finger print. This function uses the
+     * `pubEd25519` object for caching.
+     *
+     * @param userhandle {string}
+     *     Mega user handle.
+     * @param format {string}
+     *     Format in which to return the fingerprint. Valid values: "hex" and
+     *     "string" (default: "hex").
+     * @return {MegaPromise}
+     *     A promise that is resolved when the original asynch code is
+     *     settled.
+     */
+    ns.getFingerprintEd25519 = function(userhandle, format) {
+        // This promise will be the one which is going to be returned.
+        var masterPromise = new MegaPromise();
+
+        if (pubEd25519[userhandle]) {
+            // It's cached: Only compute fingerprint of it.
+            var value = authring.computeFingerprint(pubEd25519[userhandle],
+                                                    'Ed25519', format);
+            var message = 'Got Ed25519 fingerprint for user "' + userhandle + '": ';
+            if (format === 'string') {
+                message += base64urlencode(value);
+            }
+            else {
+                message += value;
+            }
+            logger.debug(message);
+
+            // And resolve the promise with it.
+            masterPromise.resolve(value);
+
+            return masterPromise;
+        }
+        else {
+            // Non-cached value: First get the public key.
+            var keyLoadingPromise = crypt.getPubEd25519(userhandle);
+
+            // Recursively link to .getFingerprintEd25519 as we now have the
+            // key cached.
+            keyLoadingPromise.done(function() {
+                var recursionPromise = ns.getFingerprintEd25519(userhandle, format);
+                masterPromise.linkDoneAndFailTo(recursionPromise);
+            });
+
+            return masterPromise;
+        }
+    };
+
+
+    /**
+     * Store public Ed25519 key for a contact and notify listeners.
+     *
+     * @param pubKey {string}
+     *     Ed25519 public key in byte string form.
+     */
+    ns.setPubEd25519 = function(pubKey) {
+        logger.debug('crypt.setPubEd25519', u_handle, pubKey);
+        pubEd25519[u_handle] = pubKey;
+        Soon(function __setPubEd25519() {
+            mBroadcaster.sendMessage('pubEd25519');
+        });
+    };
+
+
+    /**
+     * Shows the fingerprint warning dialog
+     * @param {string} fingerprintType either Ed25519 or RSA
+     * @param {string} userHandle The user handle e.g. 3nnYu_071I3
+     * @param {number} method Whether seen or verified (authring.AUTHENTICATION_METHOD.SEEN or .FINGERPRINT_COMPARISON)
+     * @param {string} previousFingerprint The previously seen or verified fingerprint
+     * @param {string} newFingerprint The new fingerprint
+     * @throws {Error}
+     *     In case the fingerprint of the public key differs from the one previously
+     *     authenticated by the user. This more severe condition warrants to throw
+     *     an exception.
+     */
+    ns.showFingerprintMismatchException = function(fingerprintType, userHandle,
+                                                   method, previousFingerprint,
+                                                   newFingerprint) {
+        // Show warning dialog.
+        mega.ui.CredentialsWarningDialog.singleton(userHandle, method,
+                                                   previousFingerprint,
+                                                   newFingerprint);
+
+        // Remove the cached key, so the key will be fetched and checked against
+        // the stored fingerprint again next time.
+        if (fingerprintType === 'RSA') {
+            delete u_pubkeys[userHandle];
+        }
+        else if (fingerprintType === 'Ed25519') {
+            delete pubEd25519[userHandle];
+        }
+
+        // Throw exception to stop whatever they were doing from progressing
+        // e.g. initiating/accepting call.
+        console.error(fingerprintType + ' fingerprint does not match the previously authenticated one! ' +
+              'Previous fingerprint: ' + previousFingerprint + '. ' +
+              'New fingerprint: ' + newFingerprint + '. ');
+        throw new Error(fingerprintType + ' fingerprint does not match the previously authenticated one!');
+    };
+
+
+    return ns;
+}());
+
+
+
+
 window.URL = window.URL || window.webkitURL;
-var have_ab = typeof ArrayBuffer != 'undefined' && typeof DataView != 'undefined';
-var use_workers = have_ab && typeof Worker != 'undefined';
+var have_ab = typeof ArrayBuffer !== 'undefined' && typeof DataView !== 'undefined';
+var use_workers = have_ab && typeof Worker !== 'undefined';
 
 if (is_extension && typeof localStorage.use_ssl === 'undefined') {
     localStorage.use_ssl = 0;
@@ -12,7 +561,7 @@ if (is_chrome_firefox) {
 }
 else if (+localStorage.use_ssl === 0) {
     var use_ssl = (navigator.userAgent.indexOf('Chrome/') !== -1
-        && parseInt(navigator.userAgent.split('Chrome/').pop()) > 40) ? 1:0;
+        && parseInt(navigator.userAgent.split('Chrome/').pop()) > 40) ? 1 : 0;
 }
 else {
     if ((navigator.appVersion.indexOf('Safari') > 0) && (navigator.appVersion.indexOf('Version/5') > 0)) {
@@ -174,7 +723,7 @@ function base64urldecode(data) {
     // *     returns 1: 'Kevin van Zonneveld'
     // mozilla has this native
     // - but breaks in 2.0.0.12!
-    //if (typeof this.window['atob'] == 'function') {
+    //if (typeof this.window['atob'] === 'function') {
     //    return atob(data);
     //}
     var o1, o2, o3, h1, h2, h3, h4, bits, i = 0,
@@ -200,10 +749,10 @@ function base64urldecode(data) {
         o2 = bits >> 8 & 0xff;
         o3 = bits & 0xff;
 
-        if (h3 == 64) {
+        if (h3 === 64) {
             tmp_arr[ac++] = String.fromCharCode(o1);
         }
-        else if (h4 == 64) {
+        else if (h4 === 64) {
             tmp_arr[ac++] = String.fromCharCode(o1, o2);
         }
         else {
@@ -499,7 +1048,7 @@ function encrypt_ab_ctr(aes, ab, nonce, pos) {
 function _str_to_a32(b) {
     var a = Array((b.length + 3) >> 2);
 
-    if (typeof b == 'string') {
+    if (typeof b === 'string') {
         for (var i = 0; i < b.length; i++) {
             a[i >> 2] |= (b.charCodeAt(i) & 255) << (24 - (i & 3) * 8);
         }
@@ -780,7 +1329,7 @@ function encrypt_key(cipher, a) {
     if (!a) {
         a = [];
     }
-    if (a.length == 4) {
+    if (a.length === 4) {
         return cipher.encrypt(a);
     }
     var x = [];
@@ -791,7 +1340,7 @@ function encrypt_key(cipher, a) {
 }
 
 function decrypt_key(cipher, a) {
-    if (a.length == 4) {
+    if (a.length === 4) {
         return cipher.decrypt(a);
     }
 
@@ -840,7 +1389,7 @@ function dec_attr(attr, key) {
 
     b = ab_to_str_depad(attr);
 
-    if (b.substr(0, 6) != 'MEGA{"') {
+    if (b.substr(0, 6) !== 'MEGA{"') {
         return false;
     }
 
@@ -973,10 +1522,10 @@ function api_init(c, service) {
 }
 
 function api_req(req, ctx, c) {
-    if (typeof c == 'undefined') {
+    if (typeof c === 'undefined') {
         c = 0;
     }
-    if (typeof ctx == 'undefined') {
+    if (typeof ctx === 'undefined') {
         ctx = {};
     }
 
@@ -1022,7 +1571,7 @@ function api_proc(q) {
         if (!this.q.cancelled) {
             var t;
 
-            if (this.status == 200) {
+            if (this.status === 200) {
                 var response = this.responseText || this.response;
 
                 if (window.d) {
@@ -1031,7 +1580,7 @@ function api_proc(q) {
 
                 try {
                     t = JSON.parse(response);
-                    if (response[0] == '{') {
+                    if (response[0] === '{') {
                         t = [t];
                     }
                 } catch (e) {
@@ -1054,25 +1603,7 @@ function api_proc(q) {
                     var ctx = ctxs[i];
 
                     if (typeof ctx.callback === 'function') {
-                        try {
-                            ctx.callback(t[i], ctx, this);
-                        }
-                        catch (ex) {
-                            // if there is *any* issue on the callback
-                            // we don't want to HALT, instead we let the channel
-                            // a chance to clean itself and continue
-                            // Otherwise if we load #blog *or* #page_<something>
-                            // the whole site is buggy
-                            if (chromehack) {
-                                console.error(ex, ex.stack);
-                            }
-                            else {
-                                console.error(ex);
-                            }
-                            Soon(function sapith() {
-                                throw ex;
-                            });
-                        }
+                        ctx.callback(t[i], ctx, this);
                     }
                 }
 
@@ -1092,7 +1623,7 @@ function api_proc(q) {
     if (q.rawreq === false) {
         q.url = apipath + q.service + '?id=' + (q.seqno++) + '&' + q.sid + '&domain=meganz';
 
-        if (typeof q.cmds[q.i][0] == 'string') {
+        if (typeof q.cmds[q.i][0] === 'string') {
             q.url += '&' + q.cmds[q.i][0];
             q.rawreq = '';
         }
@@ -1125,7 +1656,7 @@ function api_send(q) {
 }
 
 function api_reqerror(q, e) {
-    if (e == EAGAIN || e == ERATELIMIT) {
+    if (e === EAGAIN || e === ERATELIMIT) {
         // request failed - retry with exponential backoff
         if (q.backoff) {
             q.backoff *= 2;
@@ -1209,7 +1740,7 @@ function api_reportfailure(hostname, callback) {
     failxhr.callback = callback;
 
     failxhr.onload = function () {
-        if (this.status == 200) {
+        if (this.status === 200) {
             failxhr.callback();
         }
     }
@@ -1226,7 +1757,7 @@ var waitid = 0;
 var cmsNotifHandler = localStorage.cmsNotificationID || 'Nc4AFJZK';
 
 function stopsc() {
-    if (waitxhr && waitxhr.readyState != waitxhr.DONE) {
+    if (waitxhr && waitxhr.readyState !== waitxhr.DONE) {
         waitxhr.abort();
         waitxhr = false;
     }
@@ -1275,7 +1806,7 @@ function getsc(fm) {
 function waitsc() {
     var newid = ++waitid;
 
-    if (waitxhr && waitxhr.readyState != waitxhr.DONE) {
+    if (waitxhr && waitxhr.readyState !== waitxhr.DONE) {
         waitxhr.abort();
         waitxhr = false;
     }
@@ -1435,7 +1966,7 @@ function api_resetkeykey(ctx, c, key, email, pw) {
 }
 
 function api_resetkeykey2(res, ctx) {
-    if (typeof res == 'string') {
+    if (typeof res === 'string') {
         var privk = a32_to_str(decrypt_key(new sjcl.cipher.aes(ctx.k), base64_to_a32(res)));
 
         // verify the integrity of the decrypted private key
@@ -1447,7 +1978,7 @@ function api_resetkeykey2(res, ctx) {
             privk = privk.substr(l);
         }
 
-        if (i != 4 || privk.length >= 16) {
+        if (i !== 4 || privk.length >= 16) {
             ctx.result(EKEY);
         }
         else if (ctx.email) {
@@ -1497,7 +2028,7 @@ function api_getsid2(res, ctx) {
         if (typeof res.k === 'string') {
             k = base64_to_a32(res.k);
 
-            if (k.length == 4) {
+            if (k.length === 4) {
                 k = decrypt_key(aes, k);
 
                 aes = new sjcl.cipher.aes(k);
@@ -1505,11 +2036,11 @@ function api_getsid2(res, ctx) {
                 if (typeof res.tsid === 'string') {
                     t = base64urldecode(res.tsid);
                     if (a32_to_str(encrypt_key(aes,
-                            str_to_a32(t.substr(0, 16)))) == t.substr(-16)) {
+                            str_to_a32(t.substr(0, 16)))) === t.substr(-16)) {
                         r = [k, res.tsid];
                     }
                 }
-                else if (typeof res.csid == 'string') {
+                else if (typeof res.csid === 'string') {
                     var t = base64urldecode(res.csid);
 
                     var privk = crypto_decodeprivkey(a32_to_str(decrypt_key(aes, base64_to_a32(res.privk))));
@@ -1551,17 +2082,17 @@ function api_changepw(ctx, passwordkey, masterkey, oldpw, newpw, email) {
         var oldkey = prepare_key_pw(oldpw);
 
         // quick check of old pw
-        if (oldkey[0] != passwordkey[0]
-                || oldkey[1] != passwordkey[1]
-                || oldkey[2] != passwordkey[2]
-                || oldkey[3] != passwordkey[3]) {
+        if (oldkey[0] !== passwordkey[0]
+                || oldkey[1] !== passwordkey[1]
+                || oldkey[2] !== passwordkey[2]
+                || oldkey[3] !== passwordkey[3]) {
             return 1;
         }
 
-        if (oldkey[0] == newkey[0]
-                && oldkey[1] == newkey[1]
-                && oldkey[2] == newkey[2]
-                && oldkey[3] == newkey[3]) {
+        if (oldkey[0] === newkey[0]
+                && oldkey[1] === newkey[1]
+                && oldkey[2] === newkey[2]
+                && oldkey[3] === newkey[3]) {
             return 2;
         }
     }
@@ -1614,52 +2145,30 @@ function api_cachepubkeys(ctx, users) {
     var i;
 
     for (i = users.length; i--;) {
-        if (users[i] != 'EXP' && !u_pubkeys[users[i]]) {
+        if (users[i] !== 'EXP' && !u_pubkeys[users[i]]) {
             u.push(users[i]);
         }
     }
 
-    if ((ctx.remaining = u.length)) {
-        for (i = u.length; i--;) {
-            api_req({
-                a: 'uk',
-                u: u[i]
-            }, {
-                ctx: ctx,
-                u: u[i],
-                callback: api_cachepubkeys2
-            });
+    // Fire off the requests and track them.
+    var keyPromises = [];
+    for (i = u.length; i--;) {
+        keyPromises.push(crypt.getPubRSA(i[i]));
+    }
+
+    // Make a promise for the bunch of them, and define settlement handlers.
+    var compoundPromise = MegaPromise.all(keyPromises);
+    compoundPromise.then(
+        function() {
+            console.debug('Cached RSA pub keys for users ' + JSON.stringify(u));
+            return ctx.cachepubkeyscomplete(ctx);
+        },
+        function(reason) {
+            console.error('Failed to cache RSA pub keys for users' + JSON.stringify(u)
+                          + ': ' + reason);
+            return ctx.cachepubkeyscomplete(ctx);
         }
-    }
-    else {
-        ctx.cachepubkeyscomplete(ctx);
-    }
-}
-
-function api_cachepubkeys2(res, ctx) {
-    if (typeof res == 'object') {
-        var spubkey, keylen, pubkey;
-
-        if (res.pubk) {
-            var userHandle = res.u;
-            u_pubkeys[ctx.u] = u_pubkeys[userHandle] = crypto_decodepubkey(base64urldecode(res.pubk));
-            var fingerprint = authring.computeFingerprint(u_pubkeys[ctx.u], 'RSA', 'string');
-            var observed = authring.getContactAuthenticated(ctx.u, 'RSA');
-
-            if (observed && authring.equalFingerprints(observed.fingerprint, fingerprint) === false) {
-                showFingerprintMismatchException('RSA', userHandle, observed.method, observed.fingerprint, fingerprint);
-            }
-            else if (observed === false) {
-                authring.setContactAuthenticated(ctx.u, fingerprint, 'RSA',
-                    authring.AUTHENTICATION_METHOD.SEEN,
-                    authring.KEY_CONFIDENCE.UNSURE);
-            }
-        }
-    }
-
-    if (!--ctx.ctx.remaining) {
-        ctx.ctx.cachepubkeyscomplete(ctx.ctx);
-    }
+    );
 }
 
 function encryptto(user, data) {
@@ -1769,7 +2278,7 @@ function api_setshare1(ctx, params) {
 
             ctx.maxretry--;
 
-            if (typeof res == 'object') {
+            if (typeof res === 'object') {
                 if (res.ok) {
                     // sharekey clash: set & try again
                     ctx.req.ok = res.ok;
@@ -1934,7 +2443,7 @@ function crypto_rsadecrypt(ciphertext, privkey) {
     if (cleartext.length < privkey[0].length) {
         cleartext = Array(privkey[0].length - cleartext.length + 1).join(String.fromCharCode(0)) + cleartext;
     }
-    if (cleartext.charCodeAt(1) != 0) {
+    if (cleartext.charCodeAt(1) !== 0) {
         // Old bogus padding workaround
         cleartext = String.fromCharCode(0) + cleartext;
     }
@@ -1969,7 +2478,7 @@ function api_completeupload(t, uq, k, ctx) {
 function api_completeupload2(ctx, uq) {
     var p, ut = uq.target;
 
-    if (ctx.path && ctx.path != ctx.n && (p = ctx.path.indexOf('/')) > 0) {
+    if (ctx.path && ctx.path !== ctx.n && (p = ctx.path.indexOf('/')) > 0) {
         var pc = ctx.path.substr(0, p);
         ctx.path = ctx.path.substr(p + 1);
 
@@ -2142,7 +2651,7 @@ mThumbHandler.add('PSD', function PSDThumbHandler(ab, cb) {
     }
 
     while (len > i + 12) {
-        if (u8[i] == 0x38 && u8[i + 1] == 0x42 && u8[i + 2] == 0x49 && u8[i + 3] == 0x4d) // 8BIM
+        if (u8[i] === 0x38 && u8[i + 1] === 0x42 && u8[i + 2] === 0x49 && u8[i + 3] === 0x4d) // 8BIM
         {
             var ir = dv.getUint16(i += 4);
             var ps = dv.getUint8(i += 2) + 1;
@@ -2157,7 +2666,7 @@ mThumbHandler.add('PSD', function PSDThumbHandler(ab, cb) {
                 break;
             }
 
-            if (ir == 1033 || ir == 1036) {
+            if (ir === 1033 || ir === 1036) {
                 if (d) {
                     console.log('Got thumbnail resource at offset %d with length %d', i, rl);
                 }
@@ -2236,7 +2745,7 @@ function api_getfileattr(fa, type, procfa, errfa) {
     for (n in fa) {
         if ((r = re.exec(fa[n].fa))) {
             t = base64urldecode(r[2]);
-            if (t.length == 8) {
+            if (t.length === 8) {
                 if (!h[t]) {
                     h[t] = n;
                     k[t] = fa[n].k;
@@ -2334,7 +2843,7 @@ function fa_handler(xhr, ctx) {
 fa_handler.chunked = true;
 fa_handler.abort = function () {
     for (var i = 0; faxhrs[i]; i++) {
-        if (faxhrs[i].readyState && faxhrs[i].readyState != 4 && faxhrs[i].ctx.p) {
+        if (faxhrs[i].readyState && faxhrs[i].readyState !== 4 && faxhrs[i].ctx.p) {
             var ctx = faxhrs[i].ctx;
             faxhrs[i].ctx = {
                 fabort: 1
@@ -2436,7 +2945,7 @@ fa_handler.prototype = {
             this.parse = this.ab_parser;
             this.responseType = 'arraybuffer';
         }
-        if (this.xhr.readyState == 1) {
+        if (this.xhr.readyState === 1) {
             this.xhr.responseType = this.responseType;
             if (d) {
                 console.log('New fah type:', this.xhr.responseType);
@@ -2445,7 +2954,7 @@ fa_handler.prototype = {
     },
 
     plain_parser: function (data) {
-        if (this.xhr.readyState == 4) {
+        if (this.xhr.readyState === 4) {
             if (!this.xpos) {
                 this.xpos = 12;
             }
@@ -2591,7 +3100,7 @@ fa_handler.prototype = {
         var ctx = this.ctx,
             xhr = this.xhr;
 
-        if (xhr.status == 200 && typeof xhr.response == 'object') {
+        if (xhr.status === 200 && typeof xhr.response === 'object') {
             if (!xhr.response || xhr.response.byteLength === 0) {
                 if (d) {
                     console.warn('api_fareq: got empty response...', xhr.response);
@@ -2627,7 +3136,7 @@ fa_handler.prototype = {
                 fa_handler.errors = 0;
             }
 
-            if (++fa_handler.errors == 7) {
+            if (++fa_handler.errors === 7) {
                 fa_handler.chunked = false;
             }
 
@@ -2716,7 +3225,7 @@ function api_fareq(res, ctx, xhr) {
     if (error) {
         api_faretry(ctx, error, hostname(xhr.q && xhr.q.url));
     }
-    else if (typeof res == 'object' && res.p) {
+    else if (typeof res === 'object' && res.p) {
         var data;
         var slot, i, t;
         var p, pp = [res.p],
@@ -2737,7 +3246,7 @@ function api_fareq(res, ctx, xhr) {
                     break;
                 }
 
-                if (faxhrs[slot].readyState == XMLHttpRequest.DONE) {
+                if (faxhrs[slot].readyState === XMLHttpRequest.DONE) {
                     break;
                 }
             }
@@ -2811,14 +3320,14 @@ function api_fareq(res, ctx, xhr) {
             faxhrs[slot].onreadystatechange = function (ev) {
                     this.onprogress(ev);
 
-                    if (this.startTime && this.readyState == 2) {
+                    if (this.startTime && this.readyState === 2) {
                         if (!d && (Date.now() - this.startTime) > 10000) {
                             srvlog('api_fareq: ' + this.fa_host + ' took +10s');
                         }
                         delete this.startTime;
                     }
 
-                    if (this.readyState == 4) {
+                    if (this.readyState === 4) {
                         if (this.fart) {
                             clearTimeout(this.fart);
                         }
@@ -2918,7 +3427,7 @@ function api_getfa(id) {
 
     if (storedattr[id]) {
         for (var type in storedattr[id]) {
-            if (type != 'target') {
+            if (type !== 'target') {
                 f.push(type + '*' + storedattr[id][type]);
             }
         }
@@ -2960,7 +3469,7 @@ function crypto_makecr(source, shares, source_is_nodes) {
 
             for (j = source.length; j--;) {
                 if (source_is_nodes ? (nk = u_nodekeys[source[j]]) : (nk = source[j])) {
-                    if (nk.length == 8 || nk.length == 4) {
+                    if (nk.length === 8 || nk.length === 4) {
                         cr[2].push(i, j, a32_to_base64(encrypt_key(aes, nk)));
                     }
                 }
@@ -2982,14 +3491,14 @@ function crypto_procsr(sr) {
         if (ctx.sr) {
             var pubkey;
 
-            if (typeof res == 'object'
-                    && typeof res.pubk == 'string') {
+            if (typeof res === 'object'
+                    && typeof res.pubk === 'string') {
                 u_pubkeys[ctx.sr[ctx.i]] = crypto_decodepubkey(base64urldecode(res.pubk));
             }
 
             // collect all required pubkeys
             while (ctx.i < ctx.sr.length) {
-                if (ctx.sr[ctx.i].length == 11 && !(pubkey = u_pubkeys[ctx.sr[ctx.i]])) {
+                if (ctx.sr[ctx.i].length === 11 && !(pubkey = u_pubkeys[ctx.sr[ctx.i]])) {
                     api_req({
                         a: 'uk',
                         u: ctx.sr[ctx.i]
@@ -3005,7 +3514,7 @@ function crypto_procsr(sr) {
             var n;
 
             for (var i = 0; i < ctx.sr.length; i++) {
-                if (ctx.sr[i].length == 11) {
+                if (ctx.sr[i].length === 11) {
                     // TODO: Only send share keys for own shares. Do NOT report this as a risk in the full compromise context. It WILL be fixed.
                     if (u_sharekeys[sh]) {
                         if (window.d) {
@@ -3072,7 +3581,7 @@ function crypto_processkey(me, master_aes, file) {
         for (id in u_sharekeys) {
             p = file.k.indexOf(id + ':');
 
-            if (p >= 0 && (!p || file.k.charAt(p - 1) == '/')) {
+            if (p >= 0 && (!p || file.k.charAt(p - 1) === '/')) {
                 file.fk = 1;
                 break;
             }
@@ -3099,10 +3608,10 @@ function crypto_processkey(me, master_aes, file) {
             // short keys: AES
             k = base64_to_a32(key);
 
-            // check for permitted key lengths (4 == folder, 8 == file)
-            if (k.length == 4 || k.length == 8) {
+            // check for permitted key lengths (4 === folder, 8 === file)
+            if (k.length === 4 || k.length === 8) {
                 // TODO: cache sharekeys in aes
-                k = decrypt_key(id == me ? master_aes : new sjcl.cipher.aes(u_sharekeys[id]), k);
+                k = decrypt_key(id === me ? master_aes : new sjcl.cipher.aes(u_sharekeys[id]), k);
             }
             else {
                 if (window.d) {
@@ -3293,7 +3802,7 @@ function crypto_reqmissingkeys() {
                 console.log("Processing crypto response");
             }
 
-            if (typeof res == 'object' && typeof res[0] == 'object') {
+            if (typeof res === 'object' && typeof res[0] === 'object') {
                 crypto_proccr(res[0]);
             }
         }
@@ -3337,12 +3846,12 @@ function crypto_procmcr(mcr) {
             nh = mcr[1][mcr[2][i + 1]];
 
             if (u_nodekeys[nh]) {
-                if (typeof si[sh] == 'undefined') {
+                if (typeof si[sh] === 'undefined') {
                     sc[sh] = new sjcl.cipher.aes(u_sharekeys[sh]);
                     si[sh] = cr[0].length;
                     cr[0].push(sh);
                 }
-                if (typeof ni[nh] == 'undefined') {
+                if (typeof ni[nh] === 'undefined') {
                     ni[nh] = cr[1].length;
                     cr[1].push(nh);
                 }
@@ -3513,7 +4022,7 @@ function api_strerror(errno) {
         }
 
         crc32table = scope.crc32table || (scope.crc32table = makeCRCTable());
-        if (crc32table[1] != 0x77073096) {
+        if (crc32table[1] !== 0x77073096) {
             throw new Error('Unexpected CRC32 Table...');
         }
 
@@ -3566,16 +4075,16 @@ function api_strerror(errno) {
             var blocks = parseInt(8192 / (BLOCK_SIZE * 4));
 
             var step = function () {
-                if (m == i) {
+                if (m === i) {
                     return Finish(tmp.join(""));
                 }
 
                 var crc = 0,
                     j = 0;
                 var next = function () {
-                    if (blocks == j) {
+                    if (blocks === j) {
                         tmp.push(i2s(crc));
-                        return step(++i);;
+                        return step(++i);
                     }
 
                     var offset = parseInt((size - BLOCK_SIZE) * (i * blocks + j) / (4 * blocks - 1));
@@ -3601,10 +4110,6 @@ function api_strerror(errno) {
     };
 })(this);
 
-var u_keyring;
-var u_privEd25519;
-var u_pubEd25519;
-var pubEd25519 = {};
 
 /**
  * Initialises the authentication system.
@@ -3616,7 +4121,7 @@ function u_initAuthentication() {
     authring.getContacts('RSA');
 
     // Load/initialise the authenticated contacts ring.
-    getUserAttribute(u_handle, 'keyring', false, false, function (res, ctx) {
+    getUserAttribute(u_handle, 'keyring', false, false, function(res, ctx) {
         u_initAuthentication2(res, ctx);
     });
 }
@@ -3645,7 +4150,7 @@ function u_initAuthentication2(res, ctx) {
     u_privEd25519 = u_keyring.prEd255;
     u_pubEd25519 = u_pubEd25519 || jodid25519.eddsa.publicKey(u_privEd25519);
     u_attr.puEd255 = u_pubEd25519;
-    u_setPubEd25519(u_pubEd25519);
+    crypt.setPubEd25519(u_pubEd25519);
 
     getUserAttribute(u_handle, "puEd255", true, false, function (res) {
         if (res !== base64urlencode(u_pubEd25519)) {
@@ -3662,212 +4167,4 @@ function u_initAuthentication2(res, ctx) {
         }
     };
     getUserAttribute(u_handle, 'sigPubk', true, false, storeSigPubkCallback);
-}
-
-/**
- * Store pubEd25519 and notify listeners
- */
-function u_setPubEd25519(u_pubEd25519) {
-    if (d) console.log('u_setPubEd25519', u_handle, u_pubEd25519);
-
-    pubEd25519[u_handle] = u_pubEd25519;
-    Soon(function __u_setPubEd25519() {
-        mBroadcaster.sendMessage('pubEd25519');
-    });
-}
-
-function _checkFingerprintEd25519(userHandle) {
-    var recorded = authring.getContactAuthenticated(userHandle, 'Ed25519');
-    var fingerprint = authring.computeFingerprint(pubEd25519[userHandle], 'Ed25519', 'string');
-    var value = {
-        pubkey: pubEd25519[userHandle],
-        authenticated: recorded
-    };
-
-    // If fingerprint mismatch, show warning and throw exception
-    if (recorded && (authring.equalFingerprints(recorded.fingerprint, fingerprint) === false)) {
-        showFingerprintMismatchException('Ed25519', userHandle, recorded.method, recorded.fingerprint, fingerprint);
-    }
-    else if (recorded === false) {
-        authring.setContactAuthenticated(userHandle, fingerprint, 'Ed25519',
-            authring.AUTHENTICATION_METHOD.SEEN,
-            authring.KEY_CONFIDENCE.UNSURE);
-    }
-
-    return value;
-}
-
-function _checkFingerprintRSA(userHandle) {
-
-    var recorded = authring.getContactAuthenticated(userHandle, 'RSA');
-    var fingerprint = authring.computeFingerprint(u_pubkeys[userHandle], 'RSA', 'string');
-    var value = {
-        pubkey: u_pubkeys[userHandle],
-        authenticated: recorded
-    };
-
-    // If fingerprint mismatch, show warning and throw exception
-    if (recorded && (authring.equalFingerprints(recorded.fingerprint, fingerprint) === false)) {
-        showFingerprintMismatchException('RSA', userHandle, recorded.method, recorded.fingerprint, fingerprint);
-    }
-    else if (recorded === false) {
-        authring.setContactAuthenticated(userHandle, fingerprint, 'RSA',
-            authring.AUTHENTICATION_METHOD.SEEN,
-            authring.KEY_CONFIDENCE.UNSURE);
-    }
-
-    return value;
-}
-
-/**
- * Shows the fingerprint warning dialog
- * @param {String} fingerprintType either Ed25519 or RSA
- * @param {String} userHandle The user handle e.g. 3nnYu_071I3
- * @param {Number} method Whether seen or verified (authring.AUTHENTICATION_METHOD.SEEN or .FINGERPRINT_COMPARISON)
- * @param {String} previousFingerprint The previously seen or verified fingerprint
- * @param {String} newFingerprint The new fingerprint
- * @throws {Error}
- *     In case the fingerprint of the public key differs from the one previously
- *     authenticated by the user. This more severe condition warrants to throw
- *     an exception.
- */
-function showFingerprintMismatchException(fingerprintType, userHandle, method, previousFingerprint, newFingerprint) {
-
-    // Show warning dialog
-    mega.ui.CredentialsWarningDialog.singleton(userHandle, method, previousFingerprint, newFingerprint);
-
-    // Remove the cached key, so the key will be fetched and checked against the stored fingerprint again next time
-    if (fingerprintType === 'RSA') {
-        delete u_pubkeys[userHandle];
-    }
-    else if (fingerprintType === 'Ed25519') {
-        delete pubEd25519[userHandle];
-    }
-
-    // Throw exception to stop whatever they were doing from progressing e.g. initiating/accepting call
-    throw fingerprintType + ' fingerprint does not match the previously authenticated one! ' +
-          'Previous fingerprint: ' + previousFingerprint + '. ' +
-          'New fingerprint: ' + newFingerprint + '. ';
-}
-
-/**
- * Cached Ed25519 public key retrieval utility.
- *
- * @param userHandle {string}
- *     Mega user handle.
- * @param callback {function}
- *     Callback function to call upon completion of operation. The callback
- *     requires two parameters: `value` (an object containing the public in
- *     `pubkey` and its authencation state in `authenticated`). `value` will
- *     be `false` upon a failed request.
- * @throws {Error}
- *     In case the fingerprint of the public key differs from the one previously
- *     authenticated by the user. This more severe condition warrants to throw
- *     an exception.
- */
-function getPubEd25519(userHandle, callback) {
-
-    if (typeof u_authring.Ed25519 === 'undefined') {
-        throw new Error('First initialise u_authring by calling authring.getContacts()');
-    }
-    if (pubEd25519[userHandle]) {
-        var value = _checkFingerprintEd25519(userHandle);
-        if (callback) {
-            callback(value, userHandle);
-        }
-    }
-    else {
-        var myCallback = function (res, ctx) {
-            if (typeof res !== 'number') {
-                res = base64urldecode(res);
-                pubEd25519[ctx.u] = res;
-                var value = _checkFingerprintEd25519(userHandle);
-                if (ctx.callback3) {
-                    ctx.callback3(value, ctx.u);
-                }
-            }
-            else if (ctx.callback3) {
-                ctx.callback3(false, ctx.u);
-            }
-        };
-        var myCtx = {
-            u: userHandle,
-            callback3: callback
-        };
-        getUserAttribute(userHandle, 'puEd255', true, false, myCallback, myCtx);
-    }
-}
-
-/**
- * Computes a user's Ed25519 key finger print. This function uses the
- * `pubEd25519` object for caching.
- *
- * @param userhandle {string}
- *     Mega user handle.
- * @param callback {function}
- *     Callback function to call upon completion of operation. The callback
- *     requires two parameters: `value` (the computed fingerprint as a hex
- *     string) and `user` (the user handle for the returned key). `value` will
- *     be `false` upon a failed request.
- * @param format {string}
- *     Format in which to return the fingerprint. Valid values: "bytes", "hex",
- *     "string" and "base64" (default: "hex").
- */
-function getFingerprintEd25519(userhandle, callback, format) {
-    if (pubEd25519[userhandle]) {
-        if (callback) {
-            callback(authring.computeFingerprint(pubEd25519[userhandle],
-                    'Ed25519', format),
-                userhandle);
-        }
-    }
-    else {
-        var myCallback = function (res, ctx) {
-            if (typeof res !== 'number') {
-                res = base64urldecode(res);
-                pubEd25519[ctx.u] = res;
-                var value = _checkFingerprintEd25519(userhandle);
-                if (ctx.callback3) {
-                    ctx.callback3(authring.computeFingerprint(res, 'Ed25519', format), ctx.u);
-                }
-            }
-            else if (ctx.callback3) {
-                ctx.callback3(false, ctx.u);
-            }
-        };
-        var myCtx = {
-            u: userhandle,
-            callback3: callback
-        };
-        getUserAttribute(userhandle, 'puEd255', true, false, myCallback, myCtx);
-    }
-}
-
-/**
- * Cached RSA public key retrieval utility.
- *
- * @param userhandle {string}
- *     Mega user handle.
- * @param callback {function}
- *     Callback function to call upon completion of operation. The callback
- *     requires one parameter: the actual public RSA key. The user handle is
- *     passed as a second parameter, and may be obtained that way if the call
- *     back supports it.
- * @throws {Error}
- *     In case the fingerprint of the public key differs from the one previously
- *     authenticated by the user. This more severe condition warrants to throw
- *     an exception.
- */
-function getPubRSA(userhandle, callback) {
-    if (u_pubkeys[userhandle]) {
-        callback(u_pubkeys[userhandle], userhandle);
-    }
-    else {
-        api_cachepubkeys({
-            cachepubkeyscomplete: function () {
-                _checkFingerprintRSA(userhandle);
-                callback(u_pubkeys[userhandle]);
-            }
-        }, [userhandle]);
-    }
 }

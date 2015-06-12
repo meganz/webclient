@@ -988,8 +988,9 @@ function initUI() {
         openTransferpanel();
     M.avatars();
 
-    if (typeof dl_import !== 'undefined' && dl_import)
-        dl_fm_import();
+    if ((typeof dl_import !== 'undefined') && dl_import) {
+        importFile();
+    }
 
     $('.context-menu').unbind('contextmenu');
     $('.context-menu').bind('contextmenu', function(e)
@@ -1000,8 +1001,11 @@ function initUI() {
 
     var fmTabState;
 
-    $('.nw-fm-left-icon').unbind('click');
-    $('.nw-fm-left-icon').bind('click', function() {
+    $('.nw-fm-left-icon').rebind('contextmenu', function(ev) {
+        contextmenuUI(ev,1);
+        return false;
+    });
+    $('.nw-fm-left-icon').rebind('click', function() {
         treesearch = false;
         var clickedClass = $(this).attr('class');
         if (!clickedClass) {
@@ -1013,6 +1017,7 @@ function initUI() {
                 'shared-with-me': { root: 'shares',    prev: null },
                 'conversations':  { root: 'chat',      prev: null },
                 'contacts':       { root: 'contacts',  prev: null },
+                'inbox':          { root: M.InboxID,   prev: null },
                 'rubbish-bin':    { root: M.RubbishID, prev: null }
             };
         }
@@ -2759,21 +2764,21 @@ function accountUI()
             // Subscription
             if (account.stype == 'S')
             {
-				$('.fm-account-header.typetitle').text(l[434]);
-				if (account.scycle == '1 M') {
+                $('.fm-account-header.typetitle').text(l[434]);
+                if (account.scycle == '1 M') {
                     $('.membership-big-txt.type').text(l[748]);
                 }
-				else if (account.scycle == '1 Y') {
+                else if (account.scycle == '1 Y') {
                     $('.membership-big-txt.type').text(l[749]);
                 }
-				else {
+                else {
                     $('.membership-big-txt.type').text('');
                 }
-                
+
                 // Get the date their subscription will renew
                 var timestamp = account.srenew[0];
                 var paymentType = htmlentities('(' + account.sgw.join(',') + ')');      // Credit card etc
-                
+
                 // Display the date their subscription will renew in format '14 March 2015 (credit card)'
                 if (timestamp > 0) {
                     var date = new Date(timestamp * 1000);
@@ -2784,49 +2789,20 @@ function accountUI()
                     // Otherwise just show payment type
                     $('.membership-medium-txt.expiry').html(paymentType);
                 }
-                
-				// Check if there are any active subscriptions
+
+                // Check if there are any active subscriptions
                 // ccqns = Credit Card Query Number of Subscriptions
 				api_req({ a: 'ccqns' },
 				{
 					callback : function(numOfSubscriptions, ctx)
 					{
-						// If > 0 then show cancel button and bind cancellation API call to the button
-						if (numOfSubscriptions > 0)
-						{
-                            var $cancelButton = $('.btn-cancel');
-							$cancelButton.show();
-							$cancelButton.rebind('click', function()
-							{
-                                // Make sure they really want to do it
-								msgDialog('confirmation', l[6822], l[6823], false, function(event)
-								{
-									if (event) 
-									{
-										$cancelButton.hide();
-										loadingDialog.show();
-                                        
-                                        // Cancel the subscriptions
-                                        // cccs = Credit Card Cancel Subscriptions
-										api_req({ a: 'cccs' },
-										{
-											callback: function()
-											{
-												// Reset account cache and refetch all account data to display UI 
-                                                // (note potential race condition if cancellation callback wasn't received in 7500ms)
-												M.account.lastupdate = 0;
-                                                
-												setTimeout(function()
-												{
-													loadingDialog.hide();												
-													accountUI();
-                                                    
-												}, 7500);
-											}											
-										});
-									}
-								});							
-							});
+						// If there is an active subscription
+						if (numOfSubscriptions > 0) {
+                            
+                            // Show cancel button and show cancellation dialog
+                            $('.fm-account-blocks .btn-cancel').show().rebind('click', function() {
+                                cancelSubscriptionDialog.init();
+                            });
 						}
 					}
 				});
@@ -2837,7 +2813,7 @@ function accountUI()
                 $('.fm-account-header.typetitle').text(l[746]+':');
                 $('.membership-big-txt.type').text(l[751]);
                 $('.membership-medium-txt.expiry').html(l[987] + ' <span class="red">' + time2date(account.expiry) + '</span>');
-                $('.btn-cancel').hide();
+                $('.fm-account-blocks .btn-cancel').hide();
             }
         }
         else
@@ -3168,8 +3144,8 @@ function accountUI()
                 if ($(this).attr('name') == 'account-country')
                     val = isocountries[val];
                 $('.fm-account-save-block').removeClass('hidden');
-				$('.fm-account-main').addClass('save');
-				initAccountScroll();
+                $('.fm-account-main').addClass('save');
+                initAccountScroll();
             }
             $(this).parent().find('.account-select-txt').text(val);
         });
@@ -3177,15 +3153,15 @@ function accountUI()
         $('#account-firstname,#account-lastname').bind('keyup', function(e)
         {
             $('.fm-account-save-block').removeClass('hidden');
-			$('.fm-account-main').addClass('save');
-			initAccountScroll();
+            $('.fm-account-main').addClass('save');
+            initAccountScroll();
         });
         $('.fm-account-cancel').unbind('click');
         $('.fm-account-cancel').bind('click', function(e)
         {
             $('.fm-account-save-block').addClass('hidden');
-			$('.fm-account-main').removeClass('save');
-			initAccountScroll();
+            $('.fm-account-main').removeClass('save');
+            initAccountScroll();
             accountUI();
         });
         $('.fm-account-save').unbind('click');
@@ -3214,8 +3190,8 @@ function accountUI()
                 }
             });
             $('.fm-account-save-block').addClass('hidden');
-			$('.fm-account-main').removeClass('save');
-			initAccountScroll();
+            $('.fm-account-main').removeClass('save');
+            initAccountScroll();
 
             if (M.account.dl_maxSlots)
             {
@@ -3257,8 +3233,8 @@ function accountUI()
                     $('#account-password').focus();
                     $('#account-password').bind('keyup.accpwd', function() {
                         $('.fm-account-save-block').removeClass('hidden');
-						$('.fm-account-main').addClass('save');
-						initAccountScroll();
+                        $('.fm-account-main').addClass('save');
+                        initAccountScroll();
                         $('#account-password').unbind('keyup.accpwd');
                     });
                 });
@@ -3287,8 +3263,8 @@ function accountUI()
                                 $('#account-password').focus();
                                 $('#account-password').bind('keyup.accpwd', function() {
                                     $('.fm-account-save-block').removeClass('hidden');
-									$('.fm-account-main').addClass('save');
-									initAccountScroll();
+                                    $('.fm-account-main').addClass('save');
+                                    initAccountScroll();
                                     $('#account-password').unbind('keyup.accpwd');
                                 });
                             });
@@ -3363,8 +3339,8 @@ function accountUI()
             {
                 M.account.dl_maxSlots = ui.value;
                 $('.fm-account-save-block').removeClass('hidden');
-				$('.fm-account-main').addClass('save');
-				initAccountScroll();
+                $('.fm-account-main').addClass('save');
+                initAccountScroll();
             }
         });
         $("#slider-range-max2").slider({
@@ -3372,8 +3348,8 @@ function accountUI()
             {
                 M.account.ul_maxSlots = ui.value;
                 $('.fm-account-save-block').removeClass('hidden');
-				$('.fm-account-main').addClass('save');
-				initAccountScroll();
+                $('.fm-account-main').addClass('save');
+                initAccountScroll();
             }
         });
         $('.ulspeedradio').removeClass('radioOn').addClass('radioOff');
@@ -3405,8 +3381,8 @@ function accountUI()
             $(this).addClass('radioOn').removeClass('radioOff');
             $(this).parent().addClass('radioOn').removeClass('radioOff');
             $('.fm-account-save-block').removeClass('hidden');
-			$('.fm-account-main').addClass('save');
-			initAccountScroll();
+            $('.fm-account-main').addClass('save');
+            initAccountScroll();
         });
         $('#ulspeedvalue').unbind('click keyup');
         $('#ulspeedvalue').bind('click keyup', function(e)
@@ -3418,8 +3394,8 @@ function accountUI()
             else
                 M.account.ul_maxSpeed = 100 * 1024;
             $('.fm-account-save-block').removeClass('hidden');
-			$('.fm-account-main').addClass('save');
-			initAccountScroll();
+            $('.fm-account-main').addClass('save');
+            initAccountScroll();
         });
 
         $('.ulskip').removeClass('radioOn').addClass('radioOff');
@@ -3440,8 +3416,8 @@ function accountUI()
             $(this).addClass('radioOn').removeClass('radioOff');
             $(this).parent().addClass('radioOn').removeClass('radioOff');
             $('.fm-account-save-block').removeClass('hidden');
-			$('.fm-account-main').addClass('save');
-			initAccountScroll();
+            $('.fm-account-main').addClass('save');
+            initAccountScroll();
         });
 
         $('.uisorting').removeClass('radioOn').addClass('radioOff');
@@ -3462,8 +3438,8 @@ function accountUI()
             $(this).addClass('radioOn').removeClass('radioOff');
             $(this).parent().addClass('radioOn').removeClass('radioOff');
             $('.fm-account-save-block').removeClass('hidden');
-			$('.fm-account-main').addClass('save');
-			initAccountScroll();
+            $('.fm-account-main').addClass('save');
+            initAccountScroll();
         });
 
         $('.uiviewmode').removeClass('radioOn').addClass('radioOff');
@@ -3484,8 +3460,8 @@ function accountUI()
             $(this).addClass('radioOn').removeClass('radioOff');
             $(this).parent().addClass('radioOn').removeClass('radioOff');
             $('.fm-account-save-block').removeClass('hidden');
-			$('.fm-account-main').addClass('save');
-			initAccountScroll();
+            $('.fm-account-main').addClass('save');
+            initAccountScroll();
         });
 
         $('.redeem-voucher').unbind('click');
@@ -3657,8 +3633,8 @@ function accountUI()
             $(this).addClass('radioOn').removeClass('radioOff');
             $(this).parent().addClass('radioOn').removeClass('radioOff');
             $('.fm-account-save-block').removeClass('hidden');
-			$('.fm-account-main').addClass('save');
-			initAccountScroll();
+            $('.fm-account-main').addClass('save');
+            initAccountScroll();
         });
 
         $('.fm-account-change-avatar,.fm-account-avatar').unbind('click');
@@ -3774,8 +3750,8 @@ function accountUI()
     {
         if ($(this).val() == $('#account-new-password').val())
             $('.fm-account-save-block').removeClass('hidden');
-			$('.fm-account-main').addClass('save');
-			initAccountScroll();
+            $('.fm-account-main').addClass('save');
+            initAccountScroll();
     });
 }
 
@@ -5543,7 +5519,7 @@ function contextmenuUI(e, ll, topmenu) {
         // detect and show right menu
         if (id && id.length === 11) {
             $(t).filter('.remove-item').show();// transfer panel
-        } else if (c && c.indexOf('cloud-drive-item') > -1) {
+        } else if (c && c.indexOf('cloud-drive') > -1) {
             var flt = '.properties-item';
             if (folderlink) {
                 flt += ',.import-item';
@@ -5553,6 +5529,12 @@ function contextmenuUI(e, ll, topmenu) {
             }
             $.selected = [M.RootID];
             $(t).filter(flt).show();
+        } else if (c && $(e.currentTarget).hasClass('inbox')) {
+            $.selected = [M.InboxID];
+            $(t).filter('.properties-item').show();
+        } else if (c && c.indexOf('rubbish-bin') > -1) {
+            $.selected = [M.RubbishID];
+            $(t).filter('.properties-item').show();
         } else if (c && c.indexOf('recycle-item') > -1) {
             $(t).filter('.clearbin-item').show();
         } else if (c && c.indexOf('contacts-item') > -1) {
@@ -6012,7 +5994,7 @@ function sectionUIopen(id) {
     }
     $('.nw-fm-left-icon.' + tmpId).addClass('active');
     $('.content-panel.' + tmpId).addClass('active');
-    $('.fm-left-menu').removeClass('cloud-drive folder-link shared-with-me rubbish-bin contacts conversations opc ipc').addClass(tmpId);
+    $('.fm-left-menu').removeClass('cloud-drive folder-link shared-with-me rubbish-bin contacts conversations opc ipc inbox').addClass(tmpId);
     $('.fm-right-header, .fm-import-to-cloudrive, .fm-download-as-zip').addClass('hidden');
     $('.fm-import-to-cloudrive, .fm-download-as-zip').unbind('click');
 
@@ -6105,8 +6087,11 @@ function sectionUIopen(id) {
         case 'cloud-drive':
             headertxt = l[5916];
             break;
+        case 'inbox':
+            headertxt = l[949];
+            break;
         case 'rubbish-bin':
-            headertxt = 'Deleted folders';
+            headertxt = l[6771];
             break;
     }
 
@@ -6128,6 +6113,8 @@ function treeUIopen(id, event, ignoreScroll, dragOver, DragOpen) {
 
     if (id_r === 'shares') {
         sectionUIopen('shared-with-me');
+    } else if (id_r === M.InboxID) {
+        sectionUIopen('inbox');
     } else if (id_r === M.RootID) {
         sectionUIopen('cloud-drive');
     } else if (id_s === 'chat') {
@@ -8519,7 +8506,18 @@ function propertiesDialog(close)
             p.t5 = '';
         }
         p.t1 = l[86] + ':';
-        p.t2 = htmlentities(n.name);
+        if (n.name) {
+            p.t2 = htmlentities(n.name);
+        }
+        else if (n.h === M.RootID) {
+            p.t2 = htmlentities(l[164]);
+        }
+        else if (n.h === M.InboxID) {
+            p.t2 = htmlentities(l[166]);
+        }
+        else if (n.h === M.RubbishID) {
+            p.t2 = htmlentities(l[167]);
+        }
         p.t4 = bytesToSize(size);
         p.t9 = n.ts && htmlentities(time2date(n.ts)) || '';
         p.t8 = p.t9 ? (l[896] + ':') : '';
@@ -9477,11 +9475,12 @@ function userFingerprint(userid, next) {
     if (!user || !user.u) {
         return next([]);
     }
-    if (userid == u_handle) {
+    if (userid === u_handle) {
         var fprint = authring.computeFingerprint(u_pubEd25519, 'Ed25519', 'hex');
         return next(fprint.toUpperCase().match(/.{4}/g), fprint);
     }
-    getFingerprintEd25519(user.h || userid, function (response) {
+    var fingerprintPromise = crypt.getFingerprintEd25519(user.h || userid);
+    fingerprintPromise.done(function (response) {
         next(response.toUpperCase().match(/.{4}/g), response);
     });
 }
@@ -9612,7 +9611,7 @@ function contactUI() {
                 });
             });
         };
-        
+
         /**
          * Enables the Verify button
          */
@@ -9623,11 +9622,11 @@ function contactUI() {
                 fingerprintDialog(user);
             });
         };
-        
+
         // Display the current fingerpring
         showAuthenticityCredentials();
 
-        // If the fingerprints have already been verified for the contact, show 'Verified' 
+        // If the fingerprints have already been verified for the contact, show 'Verified'
         if (isContactVerified(user)) {
             $('.fm-verify').addClass('disabled');
             $('.fm-verify').find('span').text(l[6776]);
@@ -9641,7 +9640,7 @@ function contactUI() {
         $('.fm-reset-stored-fingerprint').rebind('click', function() {
             authring.resetFingerprintsForUser(user.u);
             enableVerifyFingerprintsButton();
-            
+
             // Refetch the key
             showAuthenticityCredentials();
         });
@@ -9816,7 +9815,8 @@ function selectText(elementId) {
         range = document.body.createTextRange();
         range.moveToElementText(text);
         range.select();
-    } else if (window.getSelection) {
+    }
+    else if (window.getSelection) {
         selection = window.getSelection();
         range = document.createRange();
         range.selectNodeContents(text);
@@ -9824,3 +9824,126 @@ function selectText(elementId) {
         selection.addRange(range);
     }
 }
+
+/**
+ * Dialog to cancel subscriptions
+ */
+var cancelSubscriptionDialog = {
+    
+    $backgroundOverlay: null,
+    $dialog: null,
+    $dialogSuccess: null,
+    $accountPageCancelButton: null,
+    $continueButton: null,
+    $cancelReason: null,
+    
+    init: function() {
+        
+        this.$dialog = $('.cancel-subscription-st1');
+        this.$dialogSuccess = $('.cancel-subscription-st2');
+        this.$accountPageCancelButton = $('.fm-account-blocks .btn-cancel');
+        this.$continueButton = this.$dialog.find('.continue-cancel-subscription');
+        this.$cancelReason = this.$dialog.find('.cancel-textarea textarea');
+        this.$backgroundOverlay = $('.fm-dialog-overlay');
+        
+        // Show the dialog
+        this.$dialog.removeClass('hidden');
+        this.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+        
+        // Init functionality
+        this.enableButtonWhenReasonEntered();
+        this.initSendingReasonToApi();
+        this.initCloseAndBackButtons();
+    },
+        
+    /**
+     * Close the dialog when either the close or back buttons are clicked
+     */
+    initCloseAndBackButtons: function() {
+        
+        // Close main dialog
+        this.$dialog.find('.fm-dialog-button.cancel, .fm-dialog-close').rebind('click', function() {
+            cancelSubscriptionDialog.$dialog.addClass('hidden');
+            cancelSubscriptionDialog.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+        });
+        
+        // Prevent clicking on the background overlay which closes it unintentionally
+        cancelSubscriptionDialog.$backgroundOverlay.rebind('click', function(event) {
+            event.stopPropagation();
+        });
+    },
+    
+    /**
+     * Close success dialog
+     */
+    initCloseButtonSuccessDialog: function() {
+                
+        this.$dialogSuccess.find('.fm-dialog-close').rebind('click', function() {
+            cancelSubscriptionDialog.$dialogSuccess.addClass('hidden');
+            cancelSubscriptionDialog.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+        });
+    },
+    
+    /**
+     * Make sure text has been entered before making the button available
+     */
+    enableButtonWhenReasonEntered: function() {
+        
+        this.$cancelReason.rebind('keyup', function() {
+            
+            // Trim for spaces
+            var reason = $(this).val();
+                reason = $.trim(reason);
+            
+            // Make sure at least 1 character
+            if (reason.length > 0) {
+                cancelSubscriptionDialog.$continueButton.removeClass('disabled');
+            }
+            else {
+                cancelSubscriptionDialog.$continueButton.addClass('disabled');
+            }
+        });
+    },
+    
+    /**
+     * Send the cancellation reason
+     */
+    initSendingReasonToApi: function() {
+        
+        this.$continueButton.rebind('click', function() {
+            
+            // Get the cancellation reason
+            var reason = cancelSubscriptionDialog.$cancelReason.val();
+            
+            // Hide the dialog and show loading spinner
+            cancelSubscriptionDialog.$dialog.addClass('hidden');
+            cancelSubscriptionDialog.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+            loadingDialog.show();
+            
+            // Cancel the subscription/s
+            // cccs = Credit Card Cancel Subscriptions, r = reason
+            api_req({ a: 'cccs', r: reason }, {
+                callback: function() {
+                    
+                    // Reset account cache and refetch all account data to display UI
+                    // (note potential race condition if cancellation callback wasn't received in 7500ms)
+                    M.account.lastupdate = 0;
+
+                    setTimeout(function() {
+                        
+                        // Hide loading dialog and cancel subscription button on account page
+                        loadingDialog.hide();
+                        cancelSubscriptionDialog.$accountPageCancelButton.hide();
+                        
+                        // Show success dialog and refresh UI
+                        cancelSubscriptionDialog.$dialogSuccess.removeClass('hidden');
+                        cancelSubscriptionDialog.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+                        cancelSubscriptionDialog.initCloseButtonSuccessDialog();
+                        accountUI();
+                        
+                    }, 7500);
+                }
+            });
+        });
+    }
+};

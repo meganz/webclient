@@ -87,7 +87,7 @@ function scrollMenu() {
 }
 
 function init_page() {
-    
+
     // If they are transferring from mega.co.nz
     if (page.substr(0, 13) == 'sitetransfer!') {
         M.transferFromMegaCoNz();
@@ -740,11 +740,6 @@ function init_page() {
     }
     else if (page == 'resellers') {
         parsepage(pages['resellers']);
-
-        // If logged in, pre-populate email address into wire transfer details
-        if (typeof u_attr !== 'undefined') {
-            $('#email-address').html(u_attr.email);
-        }
     }
     else if (page == 'takedown') {
         parsepage(pages['takedown']);
@@ -1013,65 +1008,6 @@ function tooltiplogin() {
                 $('#login-password').select();
             }
         });
-    }
-}
-
-function mLogout() {
-    $.dologout = function (Quiet) {
-        if ((fminitialized && downloading) || ul_uploading) {
-            if (Quiet) {
-                return true;
-            }
-            msgDialog('confirmation', l[967], l[377] + ' ' + l[507] + '?', false, function (e) {
-                if (e) {
-                    if (downloading) {
-                        dl_cancel();
-                    }
-                    if (ul_uploading) {
-                        ul_cancel();
-                    }
-
-                    resetUploadDownload();
-                    loadingDialog.show();
-                    var t = setInterval(function () {
-                        if (!$.dologout(!0)) {
-                            clearInterval(t);
-                        }
-                    }, 200);
-                }
-            });
-        }
-        else {
-            var finishLogout = function() {
-                if (--step === 0) {
-                    u_logout(true);
-                    document.location.reload();
-                }
-            }, step = 1;
-            loadingDialog.show();
-            if (typeof mDB === 'object' && mDB.drop) {
-                step++;
-                mFileManagerDB.exec('drop').always(finishLogout);
-            }
-            // Use the 'Session Management Logout' API call to kill the current session
-            api_req({ 'a': 'sml' }, { callback: finishLogout });
-        }
-    };
-    var cnt = 0;
-    if (M.c[M.RootID] && u_type === 0) {
-        for (var i in M.c[M.RootID]) {
-            cnt++;
-        }
-    }
-    if (u_type === 0 && cnt > 0) {
-        msgDialog('confirmation', l[1057], l[1058], l[1059], function (e) {
-            if (e) {
-                $.dologout();
-            }
-        });
-    }
-    else {
-        $.dologout();
     }
 }
 
@@ -1508,13 +1444,13 @@ function topmenuUI() {
             }
         }
     });
-    
+
     $('.top-menu-popup .top-menu-item').unbind('click');
     $('.top-menu-popup .top-menu-item').rebind('click', function () {
-        
+
         $('.top-menu-popup').removeClass('active');
         $('.top-menu-icon').removeClass('active');
-        
+
         var className = $(this).attr('class');
         if (!className) {
             className = '';
@@ -1597,28 +1533,13 @@ function topmenuUI() {
             document.location.hash = 'fm/account';
         }
         else if (className.indexOf('refresh') > -1) {
-           stopsc();
-           stopapi();
-           if (typeof mDB !== 'undefined' && !pfid) {
-              mDBreload();
-           } else {
-              loadfm(true);
-           }
+            mega.utils.reload();
         }
         else if (className.indexOf('languages') > -1) {
             languageDialog();
         }
         else if (className.indexOf('clouddrive') > -1) {
             document.location.hash = 'fm';
-        }
-        else if (className.indexOf('refresh-item') > -1) {
-            stopsc();
-            stopapi();
-            if (typeof mDB !== 'undefined' && !pfid) {
-                mDBreload();
-            } else {
-                loadfm(true);
-            }
         }
         else if (className.indexOf('logout') > -1) {
             mLogout();

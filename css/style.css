@@ -233,16 +233,6 @@ a, a:link, a:visited, a:hover, a:active, a:focus img, a:focus img {
 	background-color: rgba(208,39,47,1);
 	background-position: left -30px;
 }
-.beta-text-red {
-	background-image: url("../images/mega/beta_v2.svg");
-	background-position: 0 0;
-	background-repeat: no-repeat;
-	height: 20px;
-	left: 56px;
-	position: absolute;
-	top: 14px;
-	width: 46px;
-}
 .nlanguage-popup {
 	position: absolute;
 	right: 0 !important;
@@ -3770,7 +3760,7 @@ label.iPhoneCheckLabelOff span {
 	height: 24px;
 	left: 10px;
 	top: 10px;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-position: -1px -3035px;
 	background-repeat: no-repeat;
 }
@@ -3973,7 +3963,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 	cursor: default;
 }
 .nw-fm-tree-item.contains-folders .nw-fm-arrow-icon {
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	background-position: center -845px;
 	cursor: pointer;
@@ -3997,7 +3987,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 	line-height: 23px;
 	color: #666666;
 	height: 24px;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-position: -15px -7465px;
 	background-repeat: no-repeat;
 	-o-text-overflow: ellipsis;
@@ -4091,7 +4081,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 }
 .fm-add-user-scrolling .nw-contact-item {
 	padding-right: 32px;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-position: right -2907px;
 	background-repeat: no-repeat;
 }
@@ -4116,7 +4106,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 	margin: 12px;
 	border: 2px solid #d9d9d9;
 	padding: 0 10px 0 32px;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-position: -10px -2969px;
 	background-repeat: no-repeat;
 	-moz-border-radius: 5px;
@@ -4133,7 +4123,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 	color: #868686;
 }
 .verified .nw-contact-verified-icon {
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-position: -19px -2827px;
 	background-repeat: no-repeat;
 	position: absolute;
@@ -4268,7 +4258,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 	position: absolute;
 	width: 16px;
 	height: 16px;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	z-index: 10;
 	background-position: -11px -2244px;
 	-webkit-box-sizing: border-box;
@@ -4347,7 +4337,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 	position: absolute;
 	right: 2px;
 	top: 0;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	background-position: -12px -752px;
 	cursor: pointer;
@@ -4461,7 +4451,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	width: 48px;
 	position: absolute;
 	left: 1px;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	background-position: center -581px;
 	cursor: pointer;
@@ -5188,7 +5178,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	display: block;
 }
 .nw-fm-search-icon {
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	background-position: -11px -7881px;
 	position: absolute;
@@ -5223,7 +5213,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 .nw-fm-left-icon {
 	width: 48px;
 	height: 48px;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	cursor: pointer;
 	-webkit-box-sizing: border-box;
@@ -5291,7 +5281,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 }
 .nw-fm-left-icon.inbox {
 	background-position: 0 -9702px;
-	display: none;
 }
 .nw-fm-left-icon.inbox:hover, .nw-fm-left-icon.inbox.active {
 	background-position: 0 -9852px;
@@ -5315,20 +5304,19 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	background-position: 0 -131px;
 	position: relative;
 }
-/*
 .nw-fm-left-icon.conversations .beta-text, .not-logged .nw-fm-left-icon.conversations:hover .beta-text, .not-logged .nw-fm-left-icon.conversations.active .beta-text {
 	left: 6px;
 	height: 14px;
 	position: absolute;
-	top: 48px;
+	top: 49px;
 	width: 36px;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	background-position: center -10008px;
 }
 .nw-fm-left-icon.conversations.active .beta-text, .nw-fm-left-icon.conversations:hover .beta-text {
 	background-position: center -9958px;
-}*/
+}
 .nw-fm-left-icon.cloud-drive:hover, .nw-fm-left-icon.cloud-drive.active {
 	background-position: 0 -368px;
 }
@@ -5412,7 +5400,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 .rubbish-bin-icon, .settings-icon {
 	height: 48px;
 	width: 48px;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	background-position: 0 -188px;
 	cursor: pointer;
@@ -5489,7 +5477,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	-webkit-border-radius: 20px;
 	border-radius: 20px;
 	font-size: 11px;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	background-position: 1px -3916px;
 	cursor: default;
@@ -5506,7 +5494,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	float: right;
 	height: 25px;
 	width: 22px;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	background-position: -8px -4002px;
 	margin: 11px 12px 0 0;
@@ -5595,7 +5583,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	height: calc(100% - 303px);
 }
 .files-grid-view th, .contacts-grid-view th, .grid-table-header th, .transfer-table-header th, .grid-table th, .files-grid-view.shared-view th, .files-grid-view.contacts-view th, .shared-grid-view th {
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	background-position: right -1529px;
 }
@@ -5609,7 +5597,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	height: 24px;
 	width: 30px;
 	display: block;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	background-position: -7px -1469px;
 }
@@ -5656,7 +5644,7 @@ th.grid-first-th {
 	height: 24px;
 	width: 25px;
 	display: block;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	background-position: -7px -1469px;
 }
@@ -5667,7 +5655,7 @@ th.grid-first-th {
 	background-image: none;
 }
 .file-status-icon.star, .contact-status-icon.star {
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	background-position: -7px -1469px;
 }
@@ -5901,7 +5889,7 @@ th.grid-first-th {
 	z-index: 10;
 }
 .grid-url-arrow span, .file-settings-icon span {
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	background-position: -18px -7788px;
 	-webkit-transition: opacity 200ms ease-in-out;
@@ -6102,7 +6090,7 @@ table {
 	background-position: -61px -1196px;
 }
 .transfer-filtype-icon.folder, .search-path-icon-span.folder, .transfer-filtype-icon.folder-shared, .search-path-icon-span.folder-shared {
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-position: -14px -7465px;
 	background-repeat: no-repeat;
 }
@@ -6829,7 +6817,7 @@ table {
 	line-height: 23px;
 	padding: 0 0 0 24px;
 	white-space: nowrap;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	display: block;
 }
@@ -6918,7 +6906,7 @@ table {
 	-moz-opacity: 0.5;
 	-khtml-opacity: 0.5;
 	opacity: 0.5;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	background-position: 5px -1003px;
 	cursor: pointer;
@@ -6927,6 +6915,9 @@ table {
 }
 .fm-dialog-breadcrumbs {
 	background-position: 5px -1000px;
+}
+.fm-breadcrumbs:first-child .right-arrow-bg span {
+	display: none;
 }
 .fm-breadcrumbs.shared-with-me .right-arrow-bg, .fm-dialog-breadcrumbs.shared-with-me .right-arrow-bg, .fm-breadcrumbs.contacts .right-arrow-bg, .fm-dialog-breadcrumbs.contacts .right-arrow-bg {
 	background-image: url(../images/mega/shared-sprite_v3.svg);
@@ -6942,6 +6933,9 @@ table {
 }
 .fm-dialog-breadcrumbs.contacts .right-arrow-bg {
 	background-position: 2px -935px;
+}
+.fm-dialog-breadcrumbs.messages .right-arrow-bg {
+	background-position: -2px -6720px;
 }
 .fm-breadcrumbs.conversations .right-arrow-bg {
 	background-position: -1px -9388px;
@@ -6959,7 +6953,7 @@ table {
 	opacity: 0.7;
 }
 .fm-breadcrumbs.has-next-button, a.fm-breadcrumbs.has-next-button, .fm-share-breadcrumbs.has-next-button, a.fm-share-breadcrumbs.has-next-button {
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	background-position: right -1433px;
 }
@@ -6967,7 +6961,7 @@ table {
 	line-height: 23px;
 	color: #777777;
 	font-size: 12px;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	background-position: 5px -1003px;
 	cursor: pointer;
@@ -7010,7 +7004,7 @@ table {
 	font-size: 12px;
 	color: #333333;
 	padding: 0 20px 0 22px;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	background-position: -2px -3304px;
 	float: right;
@@ -7070,6 +7064,9 @@ table {
 }
 .fm-breadcrumbs.shared-folder .right-arrow-bg {
 	background-position: 2px -544px;
+}
+.fm-breadcrumbs.messages .right-arrow-bg {
+	background-position: 7px -6720px;
 }
 .fm-breadcrumbs.folder-link .right-arrow-bg {
 	background-position: -3px -9819px;
@@ -7148,7 +7145,7 @@ table {
 	line-height: 23px;
 	color: #777777;
 	padding: 0 10px 0 30px;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	background-position: -1px -8510px;
 	text-align: center;
@@ -7475,7 +7472,7 @@ table {
 	display: block;
 	float: right;
 	margin: 15px 10px 0 23px;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	-webkit-transition: opacity 200ms ease-in-out;
 	-moz-transition: opacity 200ms ease-in-out;
@@ -7725,7 +7722,7 @@ table {
 	cursor: pointer;
 }
 .context-menu-item.contains-submenu {
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-position: right -4593px;
 	background-repeat: no-repeat;
 }
@@ -7823,7 +7820,7 @@ table {
 	width: 25px;
 	height: 13px;
 	position: absolute;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-position: center -5891px;
 	background-repeat: no-repeat;
 	margin: 25px 0 0 -12px;
@@ -7860,7 +7857,7 @@ table {
 	display: block !important;
 }
 .create-folder-size-icon, .add-user-size-icon {
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-position: center -5509px;
 	background-repeat: no-repeat;
 	width: 20px;
@@ -7939,7 +7936,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .active .fm-account-input input, .error .fm-account-input input {
 	color: white;
 }
-.add-user-notification, .share-message, .feedback-textarea-bl {
+.add-user-notification, .share-message, .feedback-textarea-bl, .cancel-textarea-bl {
 	-moz-border-radius: 5px;
 	-webkit-border-radius: 5px;
 	border-radius: 5px;
@@ -7954,22 +7951,33 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	box-sizing: border-box;
 	margin-top: 12px;
 }
-.feedback-textarea-bl {
+.feedback-textarea-bl, .cancel-textarea-bl {
 	height: 96px;
 	background-image: none;
 	padding: 0;
 	margin: -4px 0 0 0;
 }
+.cancel-subscription-txt {
+	padding: 16px 8px 12px 8px;
+	font-size: 12px;
+    color: #999;
+}
+.cancel-textarea-bl {
+	height: 140px;
+}
 .feedback-textarea-scroll {
 	height: 96px;
+}
+.cancel-textarea-scroll {
+	height: 140px;
 }
 .add-user-nt-scrolling, .share-message-scroll {
 	height: 50px;
 }
-.add-user-nt-scrolling .jspDrag, .share-message-scrolling .jspDrag, .feedback-textarea-scroll .jspDrag {
+.add-user-nt-scrolling .jspDrag, .share-message-scrolling .jspDrag, .feedback-textarea-scroll .jspDrag, .cancel-textarea-scroll .jspDrag {
 	width: 4px;
 }
-.add-user-nt-scrolling textarea, .add-contact-hidden, .share-message-scrolling textarea, .share-message-hidden, .feedback-textarea-scroll textarea, .feedback-hidden {
+.add-user-nt-scrolling textarea, .add-contact-hidden, .share-message-scrolling textarea, .share-message-hidden, .feedback-textarea-scroll textarea, .feedback-hidden, .cancel-textarea-scroll textarea, .cancel-hidden {
 	border: 0;
 	padding: 0;
 	background-color: transparent;
@@ -7993,7 +8001,12 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	height: 96px;
 	font-size: 12px;
 }
-.add-contact-hidden, .share-message-hidden, .feedback-hidden {
+.cancel-textarea-scroll textarea, .cancel-hidden {
+    color: black;
+    font-size: 12px;
+    height: 125px;
+}
+.add-contact-hidden, .share-message-hidden, .feedback-hidden, .cancel-hidden {
 	display: none;
 	height: auto;
 	overflow: visible;
@@ -8001,7 +8014,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .add-user-textarea, .share-message-textarea {
 	padding: 7px 10px 7px 3px;
 }
-.feedback-textarea {
+.feedback-textarea, .cancel-textarea {
 	padding: 7px 10px;
 }
 .add-user-nt-scrolling textarea::selection, .share-message-scrolling textarea::selection {
@@ -8136,7 +8149,7 @@ color: white;
 	width: 18px;
 	height: 18px;
 	position: absolute;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	margin: 20px 0 0 -22px;
 }
@@ -8303,7 +8316,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 	width: 16px;
 	height: 16px;
 	float: right;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	background-position: -13px -6439px;
 	margin: 16px -3px 0 0;
@@ -8459,7 +8472,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
 	height: 16px;
 	width: 16px;
 	margin: 0 auto;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	background-position: center -6763px;
 	-webkit-transition: all 200ms ease-in-out;
@@ -8581,7 +8594,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	height: 25px;
 	float: left;
 	margin: 12px 0 0 9px;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	background-position: -13px -6484px;
 }
@@ -8600,7 +8613,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	width: 16px;
 	height: 8px;
 	position: absolute;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	background-position: center -7239px;
 	left: -8px;
@@ -8696,7 +8709,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	right: 50%;
 	top: -12px;
 	margin-right: -13px;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-position: center -5890px;
 	background-repeat: no-repeat;
 }
@@ -8733,7 +8746,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	float: right;
 }
 .star .fm-chat-user-star {
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-position: -7px -2205px;
 	background-repeat: no-repeat;
 }
@@ -9053,7 +9066,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	height: 27px;
 	margin: 10px 12px 0 10px;
 	background-position: 1px -2417px;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	cursor: pointer;
 	-webkit-transition: all 200ms ease-in-out;
@@ -9082,7 +9095,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	position: relative;
 }
 .nw-chat-message-icon {
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-position: 0 -2460px;
 	background-repeat: no-repeat;
 	width: 26px;
@@ -9255,7 +9268,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	position: absolute;
 	right: 12px;
 	top: 14px;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	background-position: 6px -2771px;
 	cursor: pointer;
@@ -9278,7 +9291,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
 .fm-chat-arrow {
 	width: 8px;
 	height: 20px;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	background-position: left -2719px;
 	position: absolute;
@@ -9451,7 +9464,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	width: 44px;
 	height: 8px;
 	position: absolute;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-position: center -2516px;
 	background-repeat: no-repeat;
 	margin: 0 0 0 -22px;
@@ -9500,7 +9513,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	-o-transition: background-color 200ms ease-in-out;
 	-ms-transition: background-color 200ms ease-in-out;
 	transition: background-color 200ms ease-in-out;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-position: 0 -2516px;
 	background-repeat: no-repeat;
 }
@@ -9928,6 +9941,25 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
 	width: 456px;
 	margin: -285px 0 0 -228px;
 }
+.fm-dialog.cancel-subscription-st1 {
+	width: 444px;
+	margin: -193px 0 0 -203px;
+}
+.fm-dialog.cancel-subscription-st2 {
+	width: 390px;
+	margin: -166px 0 0 -203px;
+}
+.fm-dialog.cancel-subscription-st2 .fm-dialog-body {
+    padding: 0;
+}
+.fm-dialog.cancel-subscription-st2 .blue-success-icon {
+    margin: 0 auto;
+    background-position: center -400px;
+    background-image: url("../images/mega/bitcoin-v4.png");
+    background-repeat: no-repeat;
+    height: 200px;
+    width: 200px;
+}
 .fm-dialog.restore-success {
 	width: 364px;
 	min-height: 274px;
@@ -10123,7 +10155,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
 	height: 30px;
 	width: 30px;
 	background-position: 9px -5961px;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	position: absolute;
 	right: 10px;
@@ -10374,7 +10406,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.1);
 	background-position: -6px -9302px;
 	background-repeat: no-repeat;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	display: none;
 	display: none;
 }
@@ -10499,7 +10531,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	line-height: 21px;
 	color: #333333;
 	padding-left: 32px;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-position: 0 -2317px;
 	background-repeat: no-repeat;
 	float: left;
@@ -10510,7 +10542,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	line-height: 21px;
 	color: #999999;
 	padding-left: 20px;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-position: -5px -2368px;
 	background-repeat: no-repeat;
 	float: left;
@@ -10529,7 +10561,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	cursor: pointer;
 	width: 24px;
 	line-height: 21px;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-position: -22px -2586px;
 	background-repeat: no-repeat;
 }
@@ -10596,7 +10628,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	width: 22px;
 	height: 12px;
 	background-position: center -6062px;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	margin: -12px 0 0 5px;
 }
@@ -10720,7 +10752,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 }
 .fm-share-contacts-body .ui-selected .add-contact-pad {
 	background-position: right -2860px;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 }
 .fm-share-dropdown, .account-history-dropdown-button {
@@ -12194,7 +12226,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
 	width: 100%;
 	position: absolute;
 	top: 6px;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-position: center -8343px;
 	background-repeat: no-repeat;
 	display: none;
@@ -12361,11 +12393,11 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 	background-color: rgba(255,255,255,0.1);
 }
 .sorting-menu-item.active, .sorting-menu-item.selected {
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	color: rgba(255,255,255,1);
 }
 .sorting-menu-arrow, .permissions-menu-arrow {
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	background-position: left -7998px;
 	position: absolute;
@@ -12393,7 +12425,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 }
 .permissions-menu-item.active {
 	color: rgba(255,255,255,1);
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	background-position: right -7963px;
 }
@@ -12407,7 +12439,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 	background-color: rgba(49,181,0,1);
 }
 .context-menu-icon, .context-menu-points {
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-position: left top;
 	background-repeat: no-repeat;
 	height: 32px;
@@ -13015,7 +13047,7 @@ table {
 	width: 25px;
 	height: 13px;
 	position: absolute;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-position: center -5890px;
 	background-repeat: no-repeat;
 	margin: 16px 0 0 -12px;
@@ -14531,6 +14563,16 @@ h5.main-italic-header {
 	color: #999999;
 	padding: 20px 8px 8px 8px;
 }
+.cancel-subscription-st1 .reset-small-txt {
+	padding: 25px 8px 15px 8px;
+    font-size: 12px;
+}
+.cancel-bott-txt {
+    font-size:13px; color:#333333; text-align:center; font-size: 13px;
+    color: #333333;
+    text-align: center;
+    padding: 10px 8px 25px 8px;
+}
 .reset-success-st3 .reset-txt {
 	font-family: 'Open Sans Semibold';
 	float: none;
@@ -14540,6 +14582,9 @@ h5.main-italic-header {
 }
 .reset-success-st3 .fm-dialog-header {
 	margin-bottom: 10px;
+}
+.cancel-subscription-st1 .fm-dialog-header, .cancel-subscription-st2 .fm-dialog-header {
+	margin: 19px 0 10px 0;
 }
 .reset-success-st2 .fm-account-input {
 	margin: 0 8px 20px 8px;
@@ -14562,7 +14607,7 @@ h5.main-italic-header {
 	font-family: 'Open Sans Semibold', Arial;
 	text-decoration: none;
 }
-.reset-success-st3 form {
+.reset-success-st3 form, .cancel-subscription-st1 form {
 	padding: 0 8px 8px 8px;
 	display: block;
 }
@@ -14626,6 +14671,11 @@ h5.main-italic-header {
 }
 .membership-step1 .reg-st3-membership-bl:hover, .membership-step1 .reg-st3-membership-bl.selected {
 	background-color: rgba(0,0,0,0.1);
+}
+.membership-step1 .sub-optimal-plan .membership-gray-block,
+.membership-step1 .sub-optimal-plan .reg-st3-storage,
+.membership-step1 .sub-optimal-plan .reg-st3-bandwidth {
+    opacity: 0.7;
 }
 .reg-st3-membership-bl:first-child {
 	margin: 0;
@@ -14773,7 +14823,7 @@ h5.main-italic-header {
 	-moz-border-radius: 100%;
 	-webkit-border-radius: 100%;
 	border-radius: 100%;
-	background-image: url(../images/mega/pro-new-sprite-v3.png);
+	background-image: url(../images/mega/pro-new-sprite-v4.png);
 	background-position: center -252px;
 	background-repeat: no-repeat;
 	display: block;
@@ -14791,7 +14841,7 @@ h5.main-italic-header {
 	-moz-border-radius: 8px;
 	-webkit-border-radius: 8px;
 	border-radius: 8px;
-	background-image: url(../images/mega/pro-new-sprite-v3.png);
+	background-image: url(../images/mega/pro-new-sprite-v4.png);
 	background-position: -292px -401px;
 	background-repeat: no-repeat;
 	-webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
@@ -14911,7 +14961,7 @@ h5.main-italic-header {
 	-webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
 	-moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
 	box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
-	background-image: url(../images/mega/pro-new-sprite-v3.png);
+	background-image: url(../images/mega/pro-new-sprite-v4.png);
 	background-position: right -643px;
 	background-repeat: no-repeat;
 	font-size: 13px;
@@ -14932,7 +14982,7 @@ h5.main-italic-header {
 	width: 110px;
 	height: 110px;
 	float: left;
-	background-image: url(../images/mega/pro-new-sprite-v3.png);
+	background-image: url(../images/mega/pro-new-sprite-v4.png);
 	background-position: -287px -553px;
 	background-repeat: no-repeat;
 	margin: 0 0 0 -7px;
@@ -14981,7 +15031,7 @@ h5.main-italic-header {
 	height: 26px;
 	line-height: 26px;
 	padding-left: 28px;
-	background-image: url(../images/mega/pro-new-sprite-v3.png);
+	background-image: url(../images/mega/pro-new-sprite-v4.png);
 	background-repeat: no-repeat;
 	font-size: 13px;
 	color: #333333;
@@ -14994,7 +15044,10 @@ h5.main-italic-header {
 	background-position: -444px -524px;
 }
 .membership-radio-label.union-pay {
-	background-position: -444px -524px; /* Todo: replace with correct Union Pay position */
+	background-position: -444px -487px;
+}
+.membership-radio-label.wire-transfer {
+	background-position: -444px -450px;
 }
 .membership-radio-label.bitcoin {
 	background-position: -444px -614px;
@@ -16162,12 +16215,64 @@ span.browsers-update {
 	float: right;
 	margin: 50px 0 47px 0;
 }
+.pro-gray-block .no-plans-suitable {
+    font-size: 17px;
+    margin-bottom: 15px;
+    padding-top: 50px;
+    text-align: center;
+}
+.pro-gray-block .no-plans-suitable .current-storage {
+    color: #777;
+    font-size: 25px;
+    font-weight: bold;
+    margin-bottom: 30px;
+    text-align: center;
+}
+.pro-gray-block .no-plans-suitable .text {
+    color: #777;
+    display: inline;
+    padding-right: 10px;
+    position: relative;
+}
+.pro-gray-block .no-plans-suitable a {
+    color: #bf1900;
+    font-weight: bold;
+}
+.pro-gray-block .no-plans-suitable .terabytes {
+    color: #bf1900;
+    display: inline-block;
+    text-align: left;
+}
+.pro-gray-block .no-plans-suitable .terabytes::first-letter {
+    font-size: 40px;
+}
+.no-plans-suitable-text {
+    font-weight: bold;
+}
+.pro-gray-block .btn-request-plan {
+    background-color: #fff;
+    border: 4px solid #777;
+    border-radius: 8px;
+    box-sizing: border-box;
+    color: #777;
+    cursor: pointer;
+    display: inline-block;
+    font-size: 15px;
+    margin: 33px 12px 0;
+    padding: 15px 40px;
+    text-align: center;
+    transition: all 200ms ease-in-out 0s;
+}
+.pro-gray-block .btn-request-plan:hover {
+    border-color: #bf1900;
+    color: #bf1900;
+}
 .pro-icons-block {
 	width: 280px;
 	height: 181px;
 	float: left;
 	text-align: center;
-	background-image: url(../images/mega/pro-new-sprite-v3.png);
+	background-image: url(../images/mega/pro-new-sprite-v4.png);
 	background-position: -7px -359px;
 	background-repeat: no-repeat;
 	-moz-box-sizing: border-box;
@@ -18920,7 +19025,7 @@ h1.help-home-header {
 .arrow {
 	cursor: pointer;
 	background-position: right top;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	padding: 0 35px 0 0;
 }
@@ -20153,7 +20258,7 @@ span.incoming-call-name {
 	display: inline-block;
 }
 .star .incoming-contact-info span.incoming-call-name {
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-position: right -6265px;
 	background-repeat: no-repeat;
 	padding-right: 25px;
@@ -21561,7 +21666,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 	width: 159px;
 	float: left;
 	background-color: rgba(0,0,0,0.15);
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	cursor: pointer;
 }
@@ -21840,7 +21945,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 	height: 32px;
 	display: block;
 	position: absolute;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	z-index: 10;
 }
@@ -21996,7 +22101,7 @@ fm-right-header .video-controls {
 	right: 4px;
 	background-color: rgba(255,255,255,0.9);
 	z-index: 10;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	background-position: -1px -9474px;
 	cursor: pointer;
@@ -22152,7 +22257,7 @@ video.localViewport {
 	height: 25px;
 	float: right;
 	margin: 18px 17px 0 0;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-position: -12px -8137px;
 	background-repeat: no-repeat;
 	-webkit-transition: opacity 200ms ease-in-out;
@@ -22311,7 +22416,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	margin: 12px 12px 12px 12px
 }
 .fm-mega-dialog-size-icon {
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-position: center -5509px;
 	background-repeat: no-repeat;
 	width: 20px;
@@ -22518,14 +22623,14 @@ a.top-login-forgot-pass {
 }
 /** top header feedback button **/
 .feedback-button {
-	margin-left: 70px;
+	margin-left: 14px;
 	color: #888;
 	padding: 2px 6px;
 	margin-top: 14px;
 	display: inline-block;
 	border-radius: 12px;
 	text-transform: uppercase;
-	background-image: url(../images/mega/nw-fm-sprite_v5.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v6.svg);
 	background-repeat: no-repeat;
 	background-position: 4px -630px;
 	color: rgba(255,255,255,0.7) !important;
@@ -23406,6 +23511,10 @@ body.pro:after {
  background-image: url(../images/mega/bitcoin-v4@2x.png);
  background-size: 200px auto;
 }
+.fm-dialog.cancel-subscription-st2 .blue-success-icon {
+ background-image: url(../images/mega/bitcoin-v4@2x.png);
+ background-size: 200px auto;
+}
 .fm-chat-smile {
  background-image:url(../images/mega/chat-smiles@2x.png);
  background-size:180px auto;
@@ -23765,7 +23874,7 @@ top-login-spr .nlanguage-tooltip-bg, .nlanguage-bottom {
  background-size: 892px auto;
 }
 .pro-icons-block, .membership-question-mark span, .membership-date, .membership-st2-select span, .membership-payment-icon, .membership-radio-label {
- background-image: url(../images/mega/pro-new-sprite-v3@2x.png);
+ background-image: url(../images/mega/pro-new-sprite-v4@2x.png);
  background-size: 755px auto;
 }
 .sync-list-txt, .sync-icon, .mobile-icon, .ios-button, .ff-icon, .blackberry-button, .chrome-icon, .sync-button, .google-play-button, .ff-bott-button, .mobile-small-icon, .chrome-bott-icons, .chrome-download-button, a.chrome-download-button, .ads-top-arrow, .win-phone-button {

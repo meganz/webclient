@@ -152,25 +152,34 @@ function closedlpopup()
     document.getElementById('download_popup').style.left = '-500px';
 }
 
-function dl_fm_import()
-{
-    api_req(
-    {
+function importFile() {
+    
+    api_req({
         a: 'p',
         t: M.RootID,
-        n: [{ ph: dl_import, t: 0, a: dl_attr, k: a32_to_base64(encrypt_key(u_k_aes,base64_to_a32(dlkey))) }]
+        n: [{ ph: dl_import, t: 0, a: dl_attr, k: a32_to_base64(encrypt_key(u_k_aes, base64_to_a32(dlkey))) }]
+    }, {
+        // Check response and if over quota show a special warning dialog
+        callback: function (result) {
+            if (result === EOVERQUOTA) {
+                showOverQuotaDialog();
+            }
+        }
     });
-    dl_import=false;
+
+    dl_import = false;
 }
 
 function dlerror(dl,error)
 {
     var errorstr='';
     var tempe=false;
-    if (error == EOVERQUOTA)
-    {
-        alert('quota dialog');
+
+    // If over quota show a special warning dialog
+    if (error === EOVERQUOTA) {
+        showOverQuotaDialog();
     }
+
     else if (error == ETOOMANYCONNECTIONS) errorstr = l[18];
     else if (error == ESID) errorstr = l[19];
     else if (error == ETEMPUNAVAIL) tempe = l[233];
@@ -233,21 +242,28 @@ function dlstart(id,name,filesize)
 
 function start_import()
 {
-    dl_import=dlpage_ph;
-    if (u_type)
-    {
+    dl_import = dlpage_ph;
+    
+    if (u_type) {
         document.location.hash = 'fm';
-        if (fminitialized) dl_fm_import();
+        
+        if (fminitialized) {
+            importFile();
+        }
     }
-    else if (u_wasloggedin())
-    {
-        msgDialog('confirmation',l[1193],l[1194],l[1195],function(e)
-        {
-            if(e) start_anoimport();
-            else loginDialog();
+    else if (u_wasloggedin()) {
+        msgDialog('confirmation', l[1193], l[1194], l[1195], function(e) {
+            if (e) {
+                start_anoimport();
+            }
+            else {
+                loginDialog();
+            }
         });
     }
-    else start_anoimport();
+    else {
+        start_anoimport();
+    }
 }
 
 function start_anoimport()
@@ -441,7 +457,14 @@ var gifSlider = {
 
     // Initialise the slide show and preload the images into memory so they will display straight away
     init: function() {
-        gifSlider.preLoadImages('left');
+        if (browserdetails(ua).browser !== 'Chrome'
+                || parseInt(navigator.userAgent.split('Chrome/').pop()) > 42) {
+            gifSlider.preLoadImages('left');
+        }
+        else {
+            // Anims get disabled in Chrome 42 or older due a mem leak bug
+            $('.products-top-txt').hide();
+        }
     },
 
     /**

@@ -113,7 +113,7 @@ catch(e) {
     }
 }
 
-var mega = {ui: {}};
+var mega = {ui: {}, utils: {}};
 var bootstaticpath = staticpath;
 var urlrootfile = '';
 
@@ -706,7 +706,7 @@ else if (!b_u)
         };
     })(console);
 
-    Object.defineProperty(window, "__cd_v", { value : 11, writable : false });
+    Object.defineProperty(window, "__cd_v", { value : 12, writable : false });
     if (!d || onBetaW)
     {
         var __cdumps = [], __cd_t;
@@ -725,7 +725,7 @@ else if (!b_u)
             if (__cdumps.length > 3) return false;
 
             var dump = {
-                m : ('' + msg).replace(/'(\w+:\/\/+[^/]+)[^']+'/,"'$1...'").replace(/^Uncaught\s*/,''),
+                m : ('' + msg).replace(/'(\w+:\/\/+[^/]+)[^']+'/,"'$1...'").replace(/^Uncaught\s*(?:exception\s*)?/i,''),
                 f : mTrim('' + url), l : ln
             }, cc, sbid = +(''+(document.querySelector('script[src*="secureboot"]')||{}).src).split('=').pop()|0;
 
@@ -921,6 +921,7 @@ else if (!b_u)
     jsl.push({f:'js/jsbn.js', n: 'jsbn_js', j:1,w:2});
     jsl.push({f:'js/jsbn2.js', n: 'jsbn2_js', j:1,w:2});
     jsl.push({f:'js/jodid25519.js', n: 'jodid25519_js', j:1,w:7});
+    jsl.push({f:'js/megaPromise.js', n: 'megapromise_js', j:1,w:5});
     jsl.push({f:'js/user.js', n: 'user_js', j:1});
     jsl.push({f:'js/authring.js', n: 'authring_js', j:1});
     jsl.push({f:'js/mouse.js', n: 'mouse_js', j:1});
@@ -940,7 +941,6 @@ else if (!b_u)
     jsl.push({f:'js/bitcoin-math.js', n: 'bitcoinmath', j:1 });
     jsl.push({f:'js/paycrypt.js', n: 'paycrypt_js', j:1 });
     jsl.push({f:'js/vendor/jquery.window-active.js', n: 'jquery_windowactive', j:1,w:2});
-    jsl.push({f:'js/megaPromise.js', n: 'megapromise_js', j:1,w:5});
     jsl.push({f:'js/vendor/db.js', n: 'db_js', j:1,w:5});
     jsl.push({f:'js/megaDbEncryptionPlugin.js', n: 'megadbenc_js', j:1,w:5});
     jsl.push({f:'js/megaDb.js', n: 'megadb_js', j:1,w:5});

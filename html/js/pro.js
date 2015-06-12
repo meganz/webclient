@@ -375,6 +375,9 @@ function initPaymentMethodRadioOptions(html) {
 // Step2
 function pro_next_step() {
 
+    // Add history so the back button works to go back to choosing their plan
+    history.pushState('', 'MEGA - Choose plan', '#pro2');
+
     if (!u_handle) {
         megaAnalytics.log("pro", "loginreq");
         showSignupPromptDialog();

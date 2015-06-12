@@ -234,7 +234,8 @@ var crypt = (function () {
                 msgDialog('warningb',
                           'RSA Public Key Signature Verification Failed',
                           message + '<br/>' + instructions);
-                throw new Error(message);
+                console.error(message);
+                throw new Error('RSA Public Key Signature Verification Failed');
             }
         }
 
@@ -316,8 +317,7 @@ var crypt = (function () {
                 rootPromise.resolve(ns._trackRSAKeyAuthentication(userhandle,
                                                                   signature,
                                                                   fingerprint));
-            });
-
+            }, rootPromise.reject.bind(rootPromise));
         }
         else if (recorded && authring.equalFingerprints(recorded.fingerprint, fingerprint) === true) {
             // All good, key matches previously seen fingerprint.
@@ -331,6 +331,8 @@ var crypt = (function () {
             ns.showFingerprintMismatchException('RSA', userhandle,
                                                 recorded.method,
                                                 recorded.fingerprint, fingerprint);
+
+            // XXX: shouldn't we reject the promise?
         }
 
         if (callback) {
@@ -525,7 +527,7 @@ var crypt = (function () {
         }
 
         // Throw exception to stop whatever they were doing from progressing
-        // e.g. initiating/accepting call.
+        // e.g. initiating/accepting call, or sharing a file/folder
         console.error(fingerprintType + ' fingerprint does not match the previously authenticated one! ' +
               'Previous fingerprint: ' + previousFingerprint + '. ' +
               'New fingerprint: ' + newFingerprint + '. ');

@@ -10180,7 +10180,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .download-dialog-icon {
 	padding-left: 94px;
 	min-height: 71px;
-	background-image: url(../images/mega/download-sprite.png);
+	background-image: url(../images/mega/download-sprite-v1.png);
 	background-position: -56px -998px;
 	background-repeat: no-repeat;
 	font-size: 13px;
@@ -10189,7 +10189,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .download-chrome-lnk, a.download-chrome-lnk {
 	font-size: 12px;
 	display: block;
-	background-image: url(../images/mega/download-sprite.png);
+	background-image: url(../images/mega/download-sprite-v1.png);
 	background-position: 0 -1126px;
 	background-repeat: no-repeat;
 	padding-left: 20px;
@@ -15548,12 +15548,12 @@ div.membership-bott-button {
 }
 .new-download-icon {
 	width: 299px;
-	height: 150px;
+	height: 190px;
 	float: left;
-	background-image: url(../images/mega/download-sprite.png);
-	background-position: 68px -469px;
+	background-image: url(../images/mega/download-sprite-v1.png);
+	background-position: 33px -1110px;
 	background-repeat: no-repeat;
-	margin-top: 24px;
+	margin-top: 6px;
 }
 .new-download-right-block {
 	margin-left: 299px;
@@ -15582,38 +15582,76 @@ div.membership-bott-button {
 	margin-left: 70px;
 }
 .new-download-file-title {
-	font-size: 13px;
+	font-size: 14px;
 	line-height: 18px;
 	color: #333333;
-	padding-top: 10px;
+	padding: 7px 0 3px 0;
 	white-space: nowrap;
 	width: 100%;
 	overflow: hidden;
 	text-overflow: ellipsis;
+	font-family: 'source_sans_prosemibold';
 }
 .new-download-file-size {
-	font-size: 11px;
+	font-size: 13px;
+	font-family: 'source_sans_proregular';
 	padding-top: 5px;
 	color: #666666;
 }
-.new-download-red-button, .new-download-gray-button {
+.new-download-sync-app, .new-download-gray-button {
 	height: 50px;
-	min-width: 135px;
-	margin-right: 10px;
+	margin-right: 8px;
 	-moz-border-radius: 5px;
 	-webkit-border-radius: 5px;
 	border-radius: 5px;
-	background-color: #D52600;
+	background-color: rgba(217,0,7,0.7);
 	padding: 7px 13px 0 13px;
 	-moz-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
 	float: left;
-	margin-top: 26px;
+	margin-top: 14px;
 	cursor: pointer;
+	  -webkit-transition: background-color 200ms ease-in-out;
+  -moz-transition: background-color 200ms ease-in-out;
+  -o-transition: background-color 200ms ease-in-out;
+  -ms-transition: background-color 200ms ease-in-out;
+  transition: background-color 200ms ease-in-out;
+}
+.new-download-sync-app:hover {
+	background-color: rgba(217,0,7,1);
+}
+.new-download-sync-app {
+	    background-image: url(../images/mega/download-sprite-v1.png);
+  background-position: -2px -1321px;
+  background-repeat: no-repeat;
+  background-image: url(../images/mega/download-sprite-v1@2x.png);
+  background-size: 257px auto;
+  padding: 7px 13px 0 52px;
+}
+.new-download-red-button {
+	  background-image: url(../images/mega/download-sprite-v1.png);
+    background-position: -2px -1383px;
+  background-repeat: no-repeat;
+  background-image: url(../images/mega/download-sprite-v1@2x.png);
+  background-size: 257px auto;
+  color: #777777;
+  font-size: 13px;
+  line-height: 34px;
+  padding: 0 0 0 36px;
+  cursor: pointer;
+  font-family: 'source_sans_proregular';
+  margin-top:12px;
+}
+.new-download-red-button:hover {
+	  color:#D90007;
+	      background-position: -2px -1423px;
 }
 .new-download-gray-button {
-	background-color: rgba(0,0,0,0.70);
+	background-color: rgba(102,102,102,1);
+}
+.new-download-gray-button:hover {
+	background-color: rgba(51,51,51,1);
 }
 .logged-in .new-download-gray-button {
 	display: block;
@@ -15622,7 +15660,7 @@ div.membership-bott-button {
 	display: none;
 }
 .downloading .new-download-icon {
-	background-position: 68px 11px;
+	background-position: 33px 30px;
 }
 .downloading-block {
 	min-height: 76px;
@@ -15660,16 +15698,16 @@ div.membership-bott-button {
 	font-size: 13px;
 	color: #999999;
 	padding: 0 35px 0 30px;
-	background-image: url(../images/mega/download-sprite.png);
-	background-position: -84px -734px;
+	background-image: url(../images/mega/download-sprite-v1.png);
+	  background-position: -118px -734px;
 	background-repeat: no-repeat;
 	min-height: 20px;
 	margin-top: 20px;
 }
 .download-pause {
 	float: left;
-	background-image: url(../images/mega/download-sprite.png);
-	background-position: -4px -694px;
+	background-image: url(../images/mega/download-sprite-v1.png);
+	background-position: -38px -694px;
 	background-repeat: no-repeat;
 	min-height: 20px;
 	margin: 20px 10px 0 0;
@@ -15677,16 +15715,16 @@ div.membership-bott-button {
 	cursor: pointer;
 }
 .download-pause:hover {
-	background-position: -44px -694px;
+	background-position: -78px -694px;
 }
 .download-pause.active {
-	background-position: -44px -734px;
+	background-position: -78px -734px;
 }
 .downloading-txt.time {
-	background-position: -84px -694px;
+	background-position: -118px -694px;
 }
 .downloading-txt.temporary-error {
-	background-position: -166px -646px;
+	background-position: -200px -646px;
 	float: none;
 	margin-right: 0;
 }
@@ -15696,7 +15734,7 @@ div.membership-bott-button {
 	line-height: 54px;
 	text-align: center;
 	color: #D83200;
-	padding: 69px 0 0 30px;
+	padding: 90px 0 0 30px;
 }
 .new-download-icon div span {
 	font-size: 24px;
@@ -15711,13 +15749,13 @@ div.membership-bott-button {
 	left: 38px;
 	z-index: 10;
 	margin-top: -2px;
-	background-image: url(../images/mega/download-sprite.png);
-	background-position: -87px -646px;
+	background-image: url(../images/mega/download-sprite-v1.png);
+	background-position: -119px -646px;
 	background-repeat: no-repeat;
 	display: none;
 }
 .download-complete-icon {
-	background-position: -127px -646px;
+	background-position: -158px -646px;
 }
 .download-complete .download-complete-icon {
 	display: block;
@@ -15748,21 +15786,20 @@ div.membership-bott-button {
 	font-size: 11px;
 	line-height: 14px;
 	color: #f2beb3;
+	padding-top:1px;
 }
 .new-download-gray-button .new-download-button-txt2 {
 	color: #bebebe;
 }
-.new-download-gray-button:hover {
-	background-color: rgba(0,0,0,0.85);
-}
 .file-info-block {
 	position: relative;
+	margin-left:-1px;
 }
 .not-available-some-reason .file-info-block, .not-available-some-reason .new-download-buttons, .not-available-user .file-info-block, .not-available-user .new-download-buttons, .not-available-temporary .file-info-block, .not-available-temporary .new-download-buttons {
 	display: none;
 }
 .not-available-some-reason .new-download-icon, .not-available-user .new-download-icon {
-	background-position: 68px -309px;
+	background-position: 33px -290px;
 }
 .some-reason-block, .user-block, .temporary-block {
 	display: none;
@@ -15791,8 +15828,8 @@ div.membership-bott-button {
 	line-height: 21px;
 	color: #666666;
 	padding: 5px 0 5px 20px;
-	background-image: url(../images/mega/download-sprite.png);
-	background-position: -84px -877px;
+	background-image: url(../images/mega/download-sprite-v1.png);
+	background-position: -118px -877px;
 	background-repeat: no-repeat;
 }
 .download-user-icon {
@@ -15800,12 +15837,12 @@ div.membership-bott-button {
 	line-height: 20px;
 	color: #666666;
 	padding: 11px 0 0 40px;
-	background-image: url(../images/mega/download-sprite.png);
-	background-position: -84px -768px;
+	background-image: url(../images/mega/download-sprite-v1.png);
+	background-position: -118px -768px;
 	background-repeat: no-repeat;
 }
 .not-available-temporary .new-download-icon {
-	background-position: 68px -149px;
+	background-position: 33px -149px;
 }
 .new-bottom-pages h1, .terms-main h1 {
 	font-size: 20px;
@@ -23671,9 +23708,9 @@ top-login-spr .nlanguage-tooltip-bg, .nlanguage-bottom {
  background-image: url(../images/mega/language-sprite@2x.png);
  background-size: 18px auto;
 }
-.download-dialog-icon, .download-chrome-lnk, a.download-chrome-lnk {
- background-image: url(../images/mega/download-sprite@2x.png);
- background-size: 191px auto;
+.download-dialog-icon, .download-chrome-lnk, a.download-chrome-lnk, .new-download-icon, .downloading-txt, .download-pause, .download-message-icon, .download-complete-icon, .download-error-ul, .download-user-icon {
+ background-image: url(../images/mega/download-sprite-v1@2x.png);
+ background-size: 257px auto;
 }
 .active.new-start-arrow-button, .st-red-header, .st-quote-left, .st-quote-right, .st-privacy-tool-icon, .st-membership-icon, .st-devices-icon, .st-os-icons, .st-cloud-icon, .st-mobile-apps-icon, .st-member-ship-right-bl, .st-apps-icon {
  background-image: url(../images/mega/new-start-full1@2x.png);
@@ -23694,10 +23731,6 @@ top-login-spr .nlanguage-tooltip-bg, .nlanguage-bottom {
 .reg-st5-key-gen, .reg-st5-info-icon {
  background-image: url(../images/mega/reg-st5-rounded@2x.png);
  background-size: 140px auto;
-}
-.new-download-icon, .downloading-txt, .download-pause, .download-message-icon, .download-complete-icon, .download-error-ul, .download-user-icon {
- background-image: url(../images/mega/download-sprite@2x.png);
- background-size: 191px auto;
 }
  .terms-agent-info, p.privacy-list {
  background-image: url(../images/mega/terms-icons@2x.png);

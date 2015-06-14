@@ -1518,16 +1518,18 @@ function addContactUI()
     });
 
     function addContactAreaResizing() {
+        
         var txt = $('.add-user-notification textarea'),
             txtHeight = txt.outerHeight(),
             hiddenDiv = $('.add-contact-hidden'),
             pane = $('.add-user-nt-scrolling'),
             content = txt.val(),
             api;
+        
         content = content.replace(/\n/g, '<br />');
-        hiddenDiv.html(content + '<br/>');
+        hiddenDiv.html(encodeURI(content) + '<br/>');
 
-        if (txtHeight != hiddenDiv.outerHeight()) {
+        if (txtHeight !== hiddenDiv.outerHeight()) {
             txt.height(hiddenDiv.outerHeight());
 
             if ($('.add-user-textarea').outerHeight() >= 50) {
@@ -1539,6 +1541,7 @@ function addContactUI()
             }
             else {
                 api = pane.data('jsp');
+                
                 if (api) {
                     api.destroy();
                     txt.blur();
@@ -7254,20 +7257,22 @@ function initShareDialog() {
     });
 
     function shareMessageResizing() {
+        
       var txt = $('.share-message textarea'),
           txtHeight =  txt.outerHeight(),
           hiddenDiv = $('.share-message-hidden'),
           pane = $('.share-message-scrolling'),
           content = txt.val(),
           api;
+      
       content = content.replace(/\n/g, '<br />');
-      hiddenDiv.html(content + '<br/>');
+      hiddenDiv.html(encodeURI(content) + '<br/>');
 
-      if (txtHeight != hiddenDiv.outerHeight() ) {
+      if (txtHeight !== hiddenDiv.outerHeight() ) {
         txt.height(hiddenDiv.outerHeight());
 
         if( $('.share-message-textarea').outerHeight()>=50) {
-            pane.jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5});
+            pane.jScrollPane({enableKeyboardNavigation:false, showArrows:true, arrowSize:5});
             api = pane.data('jsp');
             txt.blur();
             txt.focus();
@@ -7275,6 +7280,7 @@ function initShareDialog() {
         }
         else {
             api = pane.data('jsp');
+            
             if (api) {
               api.destroy();
               txt.blur();

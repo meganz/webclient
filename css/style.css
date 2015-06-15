@@ -15774,17 +15774,24 @@ div.membership-bott-button {
 }
 .new-download-button-txt1 {
 	color: white;
-	font-size: 13px;
+	font-size: 14px;
+	font-family: 'source_sans_prosemibold';
 	line-height: 18px;
 }
 .new-download-button-txt2 {
-	font-size: 11px;
+	font-size: 13px;
 	line-height: 14px;
-	color: #f2beb3;
+	color: rgba(255,255,255,0.9);
 	padding-top: 1px;
+	-webkit-transition: color 20ms ease-in-out;
+	-moz-transition: color 20ms ease-in-out;
+	-o-transition: color 20ms ease-in-out;
+	-ms-transition: color 20ms ease-in-out;
+	transition: color 20ms ease-in-out;
+	font-family: 'source_sans_proregular';
 }
-.new-download-gray-button .new-download-button-txt2 {
-	color: #bebebe;
+.new-download-gray-button:hover .new-download-button-txt2, .new-download-sync-app:hover .new-download-button-txt2 {
+	color: rgba(255,255,255,1);
 }
 .file-info-block {
 	position: relative;
@@ -23382,7 +23389,7 @@ body.pro:after {
 	-moz-box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
 	-webkit-box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
 	box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
-	display:none;
+	display: none;
 }
 .linux .megasync-dropdown {
 	display: block;

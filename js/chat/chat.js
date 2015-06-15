@@ -605,9 +605,8 @@ var Chat = function() {
              "https://xmpp270n001.karere.mega.nz/bosh",
              "https://xmpp270n002.karere.mega.nz/bosh",
              "https://xmpp270n003.karere.mega.nz/bosh",
-             "https://xmpp302n001.karere.mega.nz/bosh",
-             "https://xmpp302n002.karere.mega.nz/bosh",
-             "https://xmpp302n003.karere.mega.nz/bosh"
+             "https://xmpp270n004.karere.mega.nz/bosh",
+             "https://xmpp270n005.karere.mega.nz/bosh"
         ],
         'rtcSession': {
             'crypto': {

@@ -23,11 +23,16 @@ function init_pro()
     if (u_type == 3)
     {
         // Flag 'pro : 1' includes pro balance in the response
-        api_req({ a : 'uq', pro : 1 }, {
-            callback : function (res)
+        //api_req({ a : 'uq', pro : 1 }, {
+        api_req({ a: 'uq', strg: 1, pro: 1 }, {
+            callback : function (result)
             {
-                if (typeof res == 'object' && res.balance && res.balance[0]) {
-                    pro_balance = res.balance[0][0];
+                // Store current account storage usage for checking later
+                proPage.currentStorageBytes = result.cstrg;
+                
+                // Get account balance
+                if (typeof result == 'object' && result.balance && result.balance[0]) {
+                    pro_balance = result.balance[0][0];
                 }
             }
         });
@@ -45,6 +50,32 @@ function init_pro()
 
     if (!m)
     {
+        $('.membership-button').rebind('click', function() {
+            
+            var $planBlocks = $('.reg-st3-membership-bl');
+            var $selectedPlan = $(this).closest('.reg-st3-membership-bl');
+            var $stageTwoSelectedPlan = $('.membership-selected-block');
+
+            $planBlocks.removeClass('selected');
+            $selectedPlan.addClass('selected');
+
+            account_type_num = $selectedPlan.attr('data-payment');
+            
+            // Clear to prevent extra clicks showing multiple
+            $stageTwoSelectedPlan.html($selectedPlan.clone());
+            
+            var proPlanName = $selectedPlan.find('.reg-st3-bott-title.title').html();
+            $('.membership-step2 .pro span').html(proPlanName);
+            
+            // Update header text with plan
+            var $selectedPlanHeader = $('.membership-step2 .main-italic-header.pro');
+            var selectedPlanText = $selectedPlanHeader.html().replace('%1', proPlanName);
+            $selectedPlanHeader.html(selectedPlanText);
+            
+            pro_next_step();
+            return false;
+        });
+        
         // Get the membership plans. This call will return an array of arrays. Each array contains this data:
         // [api_id, account_level, storage, transfer, months, price, currency, description, ios_id, google_id]
         // More data can be retrieved with 'f : 1'
@@ -56,8 +87,13 @@ function init_pro()
 
                 // Render the plan details
                 populateMembershipPlans();
+                
+                // Check which plans are applicable or grey them out if not
+                proPage.checkApplicablePlans();
 
-                if (pro_do_next) pro_do_next();
+                if (pro_do_next) {
+                    pro_do_next();
+                }
             }
         });
 
@@ -98,28 +134,6 @@ function init_pro()
             return false;
         });
 
-        $('.membership-button').unbind('click');
-        $('.membership-button').bind('click',function(e)
-        {
-            var $membershipBlock = $(this).closest('.reg-st3-membership-bl');
-
-            $('-reg-st3-membership-bl').removeClass('selected');
-            $membershipBlock.addClass('selected');
-
-            account_type_num = $membershipBlock.attr('data-payment');
-            $membershipBlock.clone().appendTo( '.membership-selected-block');
-            var proPlanName = $membershipBlock.find('.reg-st3-bott-title.title').html();
-            $('.membership-step2 .pro span').html(proPlanName);
-            
-            // Update header text with plan
-            var $selectedPlanHeader = $('.membership-step2 .main-italic-header.pro');
-            var selectedPlanText = $selectedPlanHeader.html().replace('%1', proPlanName);
-            $selectedPlanHeader.html(selectedPlanText);
-            
-            pro_next_step();
-            return false;
-        });
-
         $('.pro-bottom-button').unbind('click');
         $('.pro-bottom-button').bind('click',function(e)
         {
@@ -129,32 +143,148 @@ function init_pro()
 }
 
 /**
+ * Functions for the pro page in general
+ * More code to be refactored into here over time
+ */
+var proPage = {
+    
+    lastPaymentProviderId: null,
+    
+    // The user's current storage in bytes
+    currentStorageBytes: 0,
+    
+    /**
+    * Update the state when a payment has been received to show their new Pro Level
+    * @param {Object} actionPacket The action packet {'a':'psts', 'p':<prolevel>, 'r':<s for success or f for failure>}
+    */
+    processPaymentReceived: function (actionPacket) {
+
+        // Check success or failure
+        var success = (actionPacket.r === 's') ? true : false;
+        
+        // Add a notification in the top bar
+        addNotification(actionPacket);
+        
+        // If their payment was successful, redirect to account page to show new Pro Plan
+        if (success) {
+
+            // Make sure it fetches new account data on reload
+            if (M.account) {
+                M.account.lastupdate = 0;
+            }
+
+            // If last payment was Bitcoin, we need to redirect to the account page
+            if (this.lastPaymentProviderId === 4) {
+                window.location.hash = 'fm/account';
+            }
+        }
+    },
+        
+    /**
+     * Check applicable plans for the user based on their current storage usage
+     */
+    checkApplicablePlans: function() {
+        
+        // If their account storage is not available (e.g. not logged in) all plan options will be shown
+        if (this.currentStorageBytes === 0) {
+            return false;
+        }
+        
+        var totalNumOfPlans = 4;
+        var numOfPlansNotApplicable = 0;
+        var currentStorageGigabytes = this.currentStorageBytes / 1024 / 1024 / 1024;
+        var $membershipStepOne = $('.membership-step1');
+        
+        // Loop through membership plans
+        for (var i = 0, length = membershipPlans.length; i < length; i++) {
+
+            // Get plan details
+            var accountLevel = parseInt(membershipPlans[i][1]);
+            var planStorageGigabytes = parseInt(membershipPlans[i][2]);
+            var months = parseInt(membershipPlans[i][4]);            
+
+            // If their current storage usage is more than the plan's grey it out
+            if ((months === 1) && (currentStorageGigabytes > planStorageGigabytes)) {
+                
+                // Grey out the plan
+                $membershipStepOne.find('.reg-st3-membership-bl.pro' + accountLevel).addClass('sub-optimal-plan');
+                
+                // Add count of plans that aren't applicable
+                numOfPlansNotApplicable++;
+            }
+        }
+        
+        // Show message to contact support
+        if (numOfPlansNotApplicable === totalNumOfPlans) {
+            
+            // Get current usage in TB and round to 3 decimal places
+            var currentStorageTerabytes = currentStorageGigabytes / 1024;
+                currentStorageTerabytes = Math.round(currentStorageTerabytes * 1000) / 1000;
+                currentStorageTerabytes = l[5816].replace('[X]', currentStorageTerabytes);
+            
+            // Show current storage usage and message
+            var $noPlansSuitable = $('.membership-step1 .no-plans-suitable');
+            $noPlansSuitable.removeClass('hidden');            
+            $noPlansSuitable.find('.current-storage .terabytes').text(currentStorageTerabytes);
+            
+            // Capitalize first letter
+            var currentStorageText = $noPlansSuitable.find('.current-storage .text').text();
+                currentStorageText = currentStorageText.charAt(0).toUpperCase() + currentStorageText.slice(1);
+            $noPlansSuitable.find('.current-storage .text').text(currentStorageText);
+            
+            // Replace text with proper link
+            var $linkText = $noPlansSuitable.find('.no-plans-suitable-text');
+            var newLinkText = $linkText.html().replace('[A]', '<a href="#contact">').replace('[/A]', '</a>');
+            $linkText.html(newLinkText);
+            
+            // Redirect to #contact
+            $noPlansSuitable.find('.btn-request-plan').rebind('click', function() {
+                document.location.hash = 'contact';
+            });            
+        }
+    }    
+};
+
+/**
  * Populate the monthly plans across the main #pro page
  */
 function populateMembershipPlans() {
+    
+    var fromPriceSet = false;
 
     for (var i = 0, length = membershipPlans.length; i < length; i++) {
 
+        // Get plan details
         var accountLevel = membershipPlans[i][1];
         var months = membershipPlans[i][4];
-        var price = membershipPlans[i][5].split('.');
-        var dollars = price[0];
-        var cents = price[1];
+        var price = membershipPlans[i][5];
+        var priceParts = price.split('.');
+        var dollars = priceParts[0];
+        var cents = priceParts[1];
 
         // Show only monthly prices in the boxes
         if (months === 1) {
-            
-            // Update the price in the boxes
             $('.reg-st3-membership-bl.pro' + accountLevel + ' .price .num').html(
                 dollars + '<span class="small">.' + cents + ' &euro;</span>'
             );
-    
-            // Copy the price in the left most item to the red box in the bottom middle of the page
-            if (i === 0) {
-                var $redStar = $('.pro-icons-block.star .pro-price-txt');
-                $redStar.find('.dollars').text(dollars);
-                $redStar.find('.cents').text(cents);
-            }
+        }
+        
+        // Get the first plan with yearly price
+        if ((months === 12) && (fromPriceSet === false)) {
+            
+            // Divide the yearly price by 12 to get the lowest from price
+            var fromPrice = (price / 12).toFixed(2);
+            var fromPriceParts = fromPrice.split('.');
+            var fromPriceDollars = fromPriceParts[0];
+            var fromPriceCents = fromPriceParts[1];
+
+            // Update the price inside the red star
+            var $redStar = $('.pro-icons-block.star .pro-price-txt');
+            $redStar.find('.dollars').text(fromPriceDollars);
+            $redStar.find('.cents').text(fromPriceCents);
+            
+            // Don't set it for other plans with 12 months
+            fromPriceSet = true;
         }
     }
 }
@@ -267,12 +397,15 @@ function initPaymentMethodRadioOptions(html) {
         }
         
         updateTextDependingOnRecurring();
-        updatePeriodOptionsDependingOnMonthlyAllowed();
+        updatePeriodOptionsOnPaymentMethodChange();
     });
 }
 
 // Step2
 function pro_next_step() {
+
+    // Add history so the back button works to go back to choosing their plan
+    history.pushState('', 'MEGA - Choose plan', '#pro2');
 
     if (!u_handle) {
         megaAnalytics.log("pro", "loginreq");
@@ -459,10 +592,10 @@ function updateTextDependingOnRecurring() {
 }
 
 /**
- * Updates the duration options if they select a payment method. For example 
+ * Updates the duration/renewal period options if they select a payment method. For example 
  * for the wire transfer option we only want to accept one year one-off payments
  */
-function updatePeriodOptionsDependingOnMonthlyAllowed() {
+function updatePeriodOptionsOnPaymentMethodChange() {
     
     var $durationSelect = $('.membership-st2-select');
     var $durationOptions = $durationSelect.find('.membership-dropdown-item');
@@ -592,10 +725,9 @@ function pro_pay()
     var currency = selectedProPackage[6];
 
     // uts = User Transaction Sale
-    api_req({ a : 'uts', it: 0, si: apiId, p: price, c: currency, aff: aff, 'm': m },
-    {
-        callback : function (utsResult)
-        {
+    api_req({ a: 'uts', it: 0, si: apiId, p: price, c: currency, aff: aff, 'm': m }, {   
+        callback: function (utsResult) {
+            
             // Store the sale ID to check with API later
             saleId = utsResult;
             
@@ -618,6 +750,10 @@ function pro_pay()
                 else if (pro_paymentmethod === 'union-pay') {
                     pro_m = 5;
                 }
+                
+                // Update the last payment provider ID for the 'psts' action packet. If the provider e.g. bitcoin 
+                // needs a redirect after confirmation action packet it will redirect to the account page.
+                proPage.lastPaymentProviderId = pro_m;
 
                 var proref = '';
                 if (sessionStorage.proref) {
@@ -718,6 +854,11 @@ var wireTransferDialog = {
             wireTransferDialog.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
             wireTransferDialog.$dialog.removeClass('active').addClass('hidden');            
         });
+               
+        // If logged in, pre-populate email address into wire transfer details
+        if (typeof u_attr !== 'undefined') {
+            wireTransferDialog.$dialog.find('.email-address').text(u_attr.email);
+        }
         
         // Update plan price in the dialog
         var proPrice = selectedProPackage[5];
@@ -1632,8 +1773,8 @@ var doProLogin = function($dialog) {
     
     var button = $('.selected .membership-button').parents('.reg-st3-membership-bl').attr('class').match(/pro\d/)[0]
     pro_do_next = function() {
-        $('.' + button + ' .membership-button').trigger('click')
-        pro_do_next = null
+        $('.' + button + ' .membership-button').trigger('click');
+        pro_do_next = null;
     };
 
     var ctx =

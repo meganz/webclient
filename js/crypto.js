@@ -229,12 +229,13 @@ var crypt = (function () {
                 var message = 'RSA public key signature for ' + M.u[userhandle].m + ' is invalid!';
                 var instructions = 'Please ask your contact to get in touch with Mega Support.';
                 logger.error(message);
-                
+
                 // TODO: This should probably be changed to something like mega.ui.CredentialsWarningDialog.
                 msgDialog('warningb',
                           'RSA Public Key Signature Verification Failed',
                           message + '<br/>' + instructions);
-                throw new Error(message);
+                console.error(message);
+                throw new Error('RSA Public Key Signature Verification Failed');
             }
         }
 
@@ -316,8 +317,7 @@ var crypt = (function () {
                 rootPromise.resolve(ns._trackRSAKeyAuthentication(userhandle,
                                                                   signature,
                                                                   fingerprint));
-            });
-
+            }, rootPromise.reject.bind(rootPromise));
         }
         else if (recorded && authring.equalFingerprints(recorded.fingerprint, fingerprint) === true) {
             // All good, key matches previously seen fingerprint.
@@ -331,6 +331,8 @@ var crypt = (function () {
             ns.showFingerprintMismatchException('RSA', userhandle,
                                                 recorded.method,
                                                 recorded.fingerprint, fingerprint);
+
+            // XXX: shouldn't we reject the promise?
         }
 
         if (callback) {
@@ -382,7 +384,10 @@ var crypt = (function () {
             }
         };
 
-        if (typeof u_authring === 'undefined'
+        if (!userhandle) {
+            masterPromise.reject('Invalid UserHandle');
+        }
+        else if (typeof u_authring === 'undefined'
                 || typeof u_authring.RSA === 'undefined') {
             logger.debug('First initialising the RSA authring.');
             var authringPromise = authring.getContacts('RSA');
@@ -395,24 +400,13 @@ var crypt = (function () {
                 // new ns.getPubRSA() invocation.)
                 masterPromise.linkDoneAndFailTo(ns.getPubRSA(userhandle));
             });
-
-            // Attach the callback ONLY AFTER previous handlers are attached.
-            _callbackAttachAfterDone(masterPromise);
-
-            return masterPromise;
         }
-
-        if (u_pubkeys[userhandle]) {
+        else if (u_pubkeys[userhandle]) {
             // It's cached: Only check the authenticity of the key.
             var checkAuthPromise = crypt._asynchCheckAuthenticationRSA(userhandle);
 
             // Resolve/reject master promise depending on state of checkAuthPromise.
             masterPromise.linkDoneAndFailTo(checkAuthPromise);
-
-            // Attach the callback ONLY AFTER previous handlers are attached.
-            _callbackAttachAfterDone(masterPromise);
-
-            return masterPromise;
         }
         else {
             // Non-cached value.
@@ -428,12 +422,12 @@ var crypt = (function () {
                 var recursionPromise = ns.getPubRSA(userhandle);
                 masterPromise.linkDoneAndFailTo(recursionPromise);
             });
-
-            // Attach the callback ONLY AFTER previous handlers are attached.
-            _callbackAttachAfterDone(masterPromise);
-
-            return masterPromise;
         }
+
+        // Attach the callback ONLY AFTER previous handlers are attached.
+        _callbackAttachAfterDone(masterPromise);
+
+        return masterPromise;
     };
 
 
@@ -533,10 +527,11 @@ var crypt = (function () {
         }
 
         // Throw exception to stop whatever they were doing from progressing
-        // e.g. initiating/accepting call.
-        throw fingerprintType + ' fingerprint does not match the previously authenticated one! ' +
+        // e.g. initiating/accepting call, or sharing a file/folder
+        console.error(fingerprintType + ' fingerprint does not match the previously authenticated one! ' +
               'Previous fingerprint: ' + previousFingerprint + '. ' +
-              'New fingerprint: ' + newFingerprint + '. ';
+              'New fingerprint: ' + newFingerprint + '. ');
+        throw new Error(fingerprintType + ' fingerprint does not match the previously authenticated one!');
     };
 
 
@@ -1602,25 +1597,7 @@ function api_proc(q) {
                     var ctx = ctxs[i];
 
                     if (typeof ctx.callback === 'function') {
-                        try {
-                            ctx.callback(t[i], ctx, this);
-                        }
-                        catch (ex) {
-                            // if there is *any* issue on the callback
-                            // we don't want to HALT, instead we let the channel
-                            // a chance to clean itself and continue
-                            // Otherwise if we load #blog *or* #page_<something>
-                            // the whole site is buggy
-                            if (chromehack) {
-                                console.error(ex, ex.stack);
-                            }
-                            else {
-                                console.error(ex);
-                            }
-                            Soon(function sapith() {
-                                throw ex;
-                            });
-                        }
+                        ctx.callback(t[i], ctx, this);
                     }
                 }
 
@@ -2170,7 +2147,7 @@ function api_cachepubkeys(ctx, users) {
     // Fire off the requests and track them.
     var keyPromises = [];
     for (i = u.length; i--;) {
-        keyPromises.push(crypt.getPubRSA(i[i]));
+        keyPromises.push(crypt.getPubRSA(u[i]));
     }
 
     // Make a promise for the bunch of them, and define settlement handlers.

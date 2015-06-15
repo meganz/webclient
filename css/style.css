@@ -15563,6 +15563,7 @@ div.membership-bott-button {
 .new-download-pad {
 	display: table;
 	table-layout: fixed;
+	width: 100%;
 }
 .new-download-centered-bl {
 	height: 210px;
@@ -23510,6 +23511,11 @@ body.pro:after {
 	width: 33.333333%;
 }
 }
+@media only screen and (max-width: 1466px) {
+.download-mid-centered-block {
+	margin: -130px 0 0 -385px;
+}
+}
 @media only screen and (max-height: 292px) {
 .video-call .fm-right-header {
 	min-height: 48px;
@@ -23540,6 +23546,20 @@ body.pro:after {
 	margin-left: 0;
 }
 }
+@media only screen and (max-width: 1232px) {
+.ads-right-block, .products-right-block {
+	display: none;
+}
+.download-mid-centered-block {
+	margin-left: -240px;
+}
+.download-mid-centered-block.not-available-some-reason {
+	margin-left: -64px;
+}
+.download-mid-centered-block {
+	min-width: 748px;
+}
+}
 @media only screen and (max-width: 1165px) {
 .fm-account-blocks.storage, .fm-account-blocks.bandwidth {
 	width: 100%;
@@ -23551,17 +23571,6 @@ body.pro:after {
 }
 .clear.account {
 	display: none;
-}
-}
-@media only screen and (max-width: 1157px) {
-.ads-right-block, .products-right-block {
-	display: none;
-}
-.download-mid-centered-block {
-	margin-left: -190px;
-}
-.download-mid-centered-block.not-available-some-reason {
-	margin-left: -64px;
 }
 }
 @media only screen and (max-width: 1133px) {

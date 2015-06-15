@@ -1659,7 +1659,7 @@ function api_reqerror(q, e) {
             }
         }
         else {
-            q.backoff = 125;
+            q.backoff = 125+Math.floor(Math.random()*600);
         }
 
         q.timer = setTimeout(api_send, q.backoff, q);
@@ -1673,7 +1673,7 @@ function api_retry() {
     for (var i = 4; i--;) {
         if (apixs[i].timer && apixs[i].backoff > 5000) {
             clearTimeout(apixs[i].timer);
-            apixs[i].backoff = 2000;
+            apixs[i].backoff = 800+Math.floor(Math.random()*1200);
             api_send(apixs[i]);
         }
     }

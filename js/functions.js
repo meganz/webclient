@@ -181,7 +181,7 @@ function ellipsis(text, location, maxCharacters) {
  * @returns {String}
  */
 function translate(html) {
-    
+
     /**
      * String.replace callback
      * @param {String} match The whole matched string
@@ -209,7 +209,7 @@ function translate(html) {
         }
         return String(l[localeNum]);
     };
-    
+
     return String(html).replace(/\[\$(\d+)(?:\.(\w+))?\]/g, replacer);
 }
 
@@ -2790,6 +2790,33 @@ function assertStateChange(currentState, newState, allowedStatesMap, enumMap) {
 }
 
 /**
+ *  Retrieve a call stack
+ *  @return {String}
+ */
+mega.utils.getStack = function megaUtilsGetStack() {
+    var stack;
+
+    if (is_chrome_firefox) {
+        stack = Components.stack.formattedStack;
+    }
+
+    if (!stack) {
+        stack = (new Error()).stack;
+
+        if (!stack) {
+            try {
+                throw new Error();
+            }
+            catch(e) {
+                stack = e.stack;
+            }
+        }
+    }
+
+    return stack;
+};
+
+/**
  *  Check whether there are pending transfers.
  *
  *  @return {Boolean}
@@ -2983,6 +3010,6 @@ if (typeof sjcl !== 'undefined') {
             return "INVALID: " + this.message;
         };
         this.message = message;
-        this.stack = (new Error()).stack;
+        this.stack = mega.utils.getStack();
     };
 }

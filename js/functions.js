@@ -2975,36 +2975,36 @@ function mCleanestLogout(aUserHandle) {
 
 
 // Initialize Rubbish-Bin Cleaning Scheduler
-mBroadcaster.addListener('crossTab:master', function __rubsched_setup() {
-    var RUBSCHED_WAITPROC = 120e3;
-    var RUBSCHED_IDLETIME =  25e3;
+mBroadcaster.addListener('crossTab:master', function _setup() {
+    var RUBSCHED_WAITPROC = 120 * 1000;
+    var RUBSCHED_IDLETIME =  25 * 1000;
     var timer, updId;
 
-    mBroadcaster.once('crossTab:leave', __rubsched_exit);
+    mBroadcaster.once('crossTab:leave', _exit);
 
     // The fm must be initialized before proceeding
     if (!folderlink && fminitialized) {
-        __rubsched_fmready();
+        _fmready();
     }
     else {
-        mBroadcaster.addListener('fm:initialized', __rubsched_fmready);
+        mBroadcaster.addListener('fm:initialized', _fmready);
     }
 
-    function __rubsched_fmready() {
+    function _fmready() {
         if (!folderlink) {
-            __rubsched_init();
+            _init();
             return 0xdead;
         }
     }
 
-    function __rubsched_update(enabled) {
-        __rubsched_exit();
+    function _update(enabled) {
+        _exit();
         if (enabled) {
-            __rubsched_init();
+            _init();
         }
     }
 
-    function __rubsched_exit() {
+    function _exit() {
         if (timer) {
             clearInterval(timer);
             timer = null;
@@ -3015,23 +3015,23 @@ mBroadcaster.addListener('crossTab:master', function __rubsched_setup() {
         }
     }
 
-    function __rubsched_init() {
+    function _init() {
         // if (d) console.log('Initializing Rubbish-Bin Cleaning Scheduler');
 
-        updId = mBroadcaster.addListener('fmconfig:rubsched', __rubsched_update);
+        updId = mBroadcaster.addListener('fmconfig:rubsched', _update);
         if (fmconfig.rubsched) {
-            timer = setInterval(__rubsched_proc, RUBSCHED_WAITPROC);
+            timer = setInterval(_proc, RUBSCHED_WAITPROC);
         }
     }
 
-    function __rubsched_proc() {
+    function _proc() {
 
         // Do nothing unless the user has been idle
         if (Date.now() - lastactive < RUBSCHED_IDLETIME) {
             return;
         }
 
-        __rubsched_exit();
+        _exit();
 
         // Mode 14 - Remove files older than X days
         // Mode 15 - Keep the Rubbish-Bin under X GB
@@ -3039,7 +3039,7 @@ mBroadcaster.addListener('crossTab:master', function __rubsched_setup() {
         var xval = mode[1];
         mode = +mode[0];
 
-        var handler = RubSchedHandler[mode];
+        var handler = _rubSchedHandler[mode];
         if (!handler) {
             throw new Error('Invalid RubSchedHandler', mode);
         }
@@ -3115,7 +3115,7 @@ mBroadcaster.addListener('crossTab:master', function __rubsched_setup() {
 
         // Once we ran for the first time, set up a long running scheduler
         RUBSCHED_WAITPROC = 4 * 3600 * 1e3;
-        __rubsched_init();
+        _init();
     }
 
     /**
@@ -3126,7 +3126,7 @@ mBroadcaster.addListener('crossTab:master', function __rubsched_setup() {
      *   Remove:  Return true if the node is suitable to get removed
      *   Ready:   Once a node is removed, check if the criteria has been meet
      */
-    var RubSchedHandler = {
+    var _rubSchedHandler = {
         // Remove files older than X days
         "14": {
             sort: function(n1, n2) {

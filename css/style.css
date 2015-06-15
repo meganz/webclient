@@ -23273,7 +23273,7 @@ body.pro:after {
 }
 .megasync-logo {
 	width: 256px;
-	height: 66px;
+	height: 67px;
 	background-image: url(../images/mega/download-sprite-v1@2x.png);
 	background-size: 257px auto;
 	background-position: center -1479px;
@@ -23284,7 +23284,7 @@ body.pro:after {
 	font-size: 16px;
 	line-height: 32px;
 	color: white;
-	padding: 34px 0 54px 0;
+	padding: 33px 0 54px 0;
 	font-family: 'source_sans_prolight';
 	text-align: center;
 	width: 800px;
@@ -23377,7 +23377,7 @@ body.pro:after {
 	-moz-border-radius: 4px;
 	-webkit-border-radius: 4px;
 	border-radius: 4px;
-	margin: 64px auto 55px auto;
+	margin: 63px auto 55px auto;
 	text-align: left;
 	-moz-box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
 	-webkit-box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);

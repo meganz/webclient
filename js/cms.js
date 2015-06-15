@@ -258,6 +258,7 @@ var CMS = {
 			doRequest(id);
 			fetching[id] = [];
 		}
+		next = next || function() {};
 		fetching[id].push([next, as]);
 	},
 

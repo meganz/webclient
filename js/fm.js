@@ -698,7 +698,7 @@ function initUI() {
         {
             // grid dropped:
             var c = $(e.target).attr('class');
-            if (c && c.indexOf('folder') > -1)
+            if (c && c.indexOf('folder') > -1 || M.currentrootid === 'contacts')
                 t = $(e.target).attr('id');
         }
 
@@ -1001,8 +1001,11 @@ function initUI() {
 
     var fmTabState;
 
-    $('.nw-fm-left-icon').unbind('click');
-    $('.nw-fm-left-icon').bind('click', function() {
+    $('.nw-fm-left-icon').rebind('contextmenu', function(ev) {
+        contextmenuUI(ev,1);
+        return false;
+    });
+    $('.nw-fm-left-icon').rebind('click', function() {
         treesearch = false;
         var clickedClass = $(this).attr('class');
         if (!clickedClass) {
@@ -1515,16 +1518,18 @@ function addContactUI()
     });
 
     function addContactAreaResizing() {
+        
         var txt = $('.add-user-notification textarea'),
             txtHeight = txt.outerHeight(),
             hiddenDiv = $('.add-contact-hidden'),
             pane = $('.add-user-nt-scrolling'),
             content = txt.val(),
             api;
+        
         content = content.replace(/\n/g, '<br />');
-        hiddenDiv.html(content + '<br/>');
+        hiddenDiv.html(encodeURI(content) + '<br/>');
 
-        if (txtHeight != hiddenDiv.outerHeight()) {
+        if (txtHeight !== hiddenDiv.outerHeight()) {
             txt.height(hiddenDiv.outerHeight());
 
             if ($('.add-user-textarea').outerHeight() >= 50) {
@@ -1536,6 +1541,7 @@ function addContactUI()
             }
             else {
                 api = pane.data('jsp');
+                
                 if (api) {
                     api.destroy();
                     txt.blur();
@@ -2757,14 +2763,14 @@ function accountUI()
             // Subscription
             if (account.stype == 'S')
             {
-				$('.fm-account-header.typetitle').text(l[434]);
-				if (account.scycle == '1 M') {
+                $('.fm-account-header.typetitle').text(l[434]);
+                if (account.scycle == '1 M') {
                     $('.membership-big-txt.type').text(l[748]);
                 }
-				else if (account.scycle == '1 Y') {
+                else if (account.scycle == '1 Y') {
                     $('.membership-big-txt.type').text(l[749]);
                 }
-				else {
+                else {
                     $('.membership-big-txt.type').text('');
                 }
 
@@ -2783,59 +2789,30 @@ function accountUI()
                     $('.membership-medium-txt.expiry').html(paymentType);
                 }
 
-				// Check if there are any active subscriptions
+                // Check if there are any active subscriptions
                 // ccqns = Credit Card Query Number of Subscriptions
-				api_req({ a: 'ccqns' },
-				{
-					callback : function(numOfSubscriptions, ctx)
-					{
-						// If > 0 then show cancel button and bind cancellation API call to the button
-						if (numOfSubscriptions > 0)
-						{
-                            var $cancelButton = $('.btn-cancel');
-							$cancelButton.show();
-							$cancelButton.rebind('click', function()
-							{
-                                // Make sure they really want to do it
-								msgDialog('confirmation', l[6822], l[6823], false, function(event)
-								{
-									if (event)
-									{
-										$cancelButton.hide();
-										loadingDialog.show();
+                api_req({ a: 'ccqns' },
+                {
+                    callback : function(numOfSubscriptions, ctx)
+                    {
+                        // If there is an active subscription
+                        if (numOfSubscriptions > 0) {
 
-                                        // Cancel the subscriptions
-                                        // cccs = Credit Card Cancel Subscriptions
-										api_req({ a: 'cccs' },
-										{
-											callback: function()
-											{
-												// Reset account cache and refetch all account data to display UI
-                                                // (note potential race condition if cancellation callback wasn't received in 7500ms)
-												M.account.lastupdate = 0;
-
-												setTimeout(function()
-												{
-													loadingDialog.hide();
-													accountUI();
-
-												}, 7500);
-											}
-										});
-									}
-								});
-							});
-						}
-					}
-				});
-			}
+                            // Show cancel button and show cancellation dialog
+                            $('.fm-account-blocks .btn-cancel').show().rebind('click', function() {
+                                cancelSubscriptionDialog.init();
+                            });
+                        }
+                    }
+                });
+            }
             else if (account.stype == 'O')
             {
                 // one-time or cancelled subscription
                 $('.fm-account-header.typetitle').text(l[746]+':');
                 $('.membership-big-txt.type').text(l[751]);
                 $('.membership-medium-txt.expiry').html(l[987] + ' <span class="red">' + time2date(account.expiry) + '</span>');
-                $('.btn-cancel').hide();
+                $('.fm-account-blocks .btn-cancel').hide();
             }
         }
         else
@@ -3166,8 +3143,8 @@ function accountUI()
                 if ($(this).attr('name') == 'account-country')
                     val = isocountries[val];
                 $('.fm-account-save-block').removeClass('hidden');
-				$('.fm-account-main').addClass('save');
-				initAccountScroll();
+                $('.fm-account-main').addClass('save');
+                initAccountScroll();
             }
             $(this).parent().find('.account-select-txt').text(val);
         });
@@ -3175,15 +3152,15 @@ function accountUI()
         $('#account-firstname,#account-lastname').bind('keyup', function(e)
         {
             $('.fm-account-save-block').removeClass('hidden');
-			$('.fm-account-main').addClass('save');
-			initAccountScroll();
+            $('.fm-account-main').addClass('save');
+            initAccountScroll();
         });
         $('.fm-account-cancel').unbind('click');
         $('.fm-account-cancel').bind('click', function(e)
         {
             $('.fm-account-save-block').addClass('hidden');
-			$('.fm-account-main').removeClass('save');
-			initAccountScroll();
+            $('.fm-account-main').removeClass('save');
+            initAccountScroll();
             accountUI();
         });
         $('.fm-account-save').unbind('click');
@@ -3212,8 +3189,8 @@ function accountUI()
                 }
             });
             $('.fm-account-save-block').addClass('hidden');
-			$('.fm-account-main').removeClass('save');
-			initAccountScroll();
+            $('.fm-account-main').removeClass('save');
+            initAccountScroll();
 
             if (M.account.dl_maxSlots)
             {
@@ -3255,8 +3232,8 @@ function accountUI()
                     $('#account-password').focus();
                     $('#account-password').bind('keyup.accpwd', function() {
                         $('.fm-account-save-block').removeClass('hidden');
-						$('.fm-account-main').addClass('save');
-						initAccountScroll();
+                        $('.fm-account-main').addClass('save');
+                        initAccountScroll();
                         $('#account-password').unbind('keyup.accpwd');
                     });
                 });
@@ -3285,8 +3262,8 @@ function accountUI()
                                 $('#account-password').focus();
                                 $('#account-password').bind('keyup.accpwd', function() {
                                     $('.fm-account-save-block').removeClass('hidden');
-									$('.fm-account-main').addClass('save');
-									initAccountScroll();
+                                    $('.fm-account-main').addClass('save');
+                                    initAccountScroll();
                                     $('#account-password').unbind('keyup.accpwd');
                                 });
                             });
@@ -3361,8 +3338,8 @@ function accountUI()
             {
                 M.account.dl_maxSlots = ui.value;
                 $('.fm-account-save-block').removeClass('hidden');
-				$('.fm-account-main').addClass('save');
-				initAccountScroll();
+                $('.fm-account-main').addClass('save');
+                initAccountScroll();
             }
         });
         $("#slider-range-max2").slider({
@@ -3370,8 +3347,8 @@ function accountUI()
             {
                 M.account.ul_maxSlots = ui.value;
                 $('.fm-account-save-block').removeClass('hidden');
-				$('.fm-account-main').addClass('save');
-				initAccountScroll();
+                $('.fm-account-main').addClass('save');
+                initAccountScroll();
             }
         });
         $('.ulspeedradio').removeClass('radioOn').addClass('radioOff');
@@ -3403,8 +3380,8 @@ function accountUI()
             $(this).addClass('radioOn').removeClass('radioOff');
             $(this).parent().addClass('radioOn').removeClass('radioOff');
             $('.fm-account-save-block').removeClass('hidden');
-			$('.fm-account-main').addClass('save');
-			initAccountScroll();
+            $('.fm-account-main').addClass('save');
+            initAccountScroll();
         });
         $('#ulspeedvalue').unbind('click keyup');
         $('#ulspeedvalue').bind('click keyup', function(e)
@@ -3416,8 +3393,8 @@ function accountUI()
             else
                 M.account.ul_maxSpeed = 100 * 1024;
             $('.fm-account-save-block').removeClass('hidden');
-			$('.fm-account-main').addClass('save');
-			initAccountScroll();
+            $('.fm-account-main').addClass('save');
+            initAccountScroll();
         });
 
         $('.ulskip').removeClass('radioOn').addClass('radioOff');
@@ -3438,8 +3415,8 @@ function accountUI()
             $(this).addClass('radioOn').removeClass('radioOff');
             $(this).parent().addClass('radioOn').removeClass('radioOff');
             $('.fm-account-save-block').removeClass('hidden');
-			$('.fm-account-main').addClass('save');
-			initAccountScroll();
+            $('.fm-account-main').addClass('save');
+            initAccountScroll();
         });
 
         $('.uisorting').removeClass('radioOn').addClass('radioOff');
@@ -3460,8 +3437,8 @@ function accountUI()
             $(this).addClass('radioOn').removeClass('radioOff');
             $(this).parent().addClass('radioOn').removeClass('radioOff');
             $('.fm-account-save-block').removeClass('hidden');
-			$('.fm-account-main').addClass('save');
-			initAccountScroll();
+            $('.fm-account-main').addClass('save');
+            initAccountScroll();
         });
 
         $('.uiviewmode').removeClass('radioOn').addClass('radioOff');
@@ -3482,8 +3459,8 @@ function accountUI()
             $(this).addClass('radioOn').removeClass('radioOff');
             $(this).parent().addClass('radioOn').removeClass('radioOff');
             $('.fm-account-save-block').removeClass('hidden');
-			$('.fm-account-main').addClass('save');
-			initAccountScroll();
+            $('.fm-account-main').addClass('save');
+            initAccountScroll();
         });
 
         $('.redeem-voucher').unbind('click');
@@ -3655,8 +3632,8 @@ function accountUI()
             $(this).addClass('radioOn').removeClass('radioOff');
             $(this).parent().addClass('radioOn').removeClass('radioOff');
             $('.fm-account-save-block').removeClass('hidden');
-			$('.fm-account-main').addClass('save');
-			initAccountScroll();
+            $('.fm-account-main').addClass('save');
+            initAccountScroll();
         });
 
         $('.fm-account-remove-avatar,.fm-account-avatar').rebind('click', function() {
@@ -3781,8 +3758,8 @@ function accountUI()
     {
         if ($(this).val() == $('#account-new-password').val())
             $('.fm-account-save-block').removeClass('hidden');
-			$('.fm-account-main').addClass('save');
-			initAccountScroll();
+            $('.fm-account-main').addClass('save');
+            initAccountScroll();
     });
 }
 
@@ -4880,9 +4857,14 @@ function searchPath()
 function selectddUI() {
     if (M.currentdirid && M.currentdirid.substr(0, 7) == 'account')
         return false;
-    if (d)
+    if (d) {
         console.time('selectddUI');
-    $($.selectddUIgrid + ' ' + $.selectddUIitem + '.folder').droppable(
+    }
+    var dropSel = $.selectddUIgrid + ' ' + $.selectddUIitem + '.folder';
+    if (M.currentrootid === 'contacts') {
+        dropSel = $.selectddUIgrid + ' ' + $.selectddUIitem;
+    }
+    $(dropSel).droppable(
         {
             tolerance: 'pointer',
             drop: function(e, ui)
@@ -5550,7 +5532,7 @@ function contextmenuUI(e, ll, topmenu) {
         // detect and show right menu
         if (id && id.length === 11) {
             $(t).filter('.remove-item').show();// transfer panel
-        } else if (c && c.indexOf('cloud-drive-item') > -1) {
+        } else if (c && c.indexOf('cloud-drive') > -1) {
             var flt = '.properties-item';
             if (folderlink) {
                 flt += ',.import-item';
@@ -5560,6 +5542,12 @@ function contextmenuUI(e, ll, topmenu) {
             }
             $.selected = [M.RootID];
             $(t).filter(flt).show();
+        } else if (c && $(e.currentTarget).hasClass('inbox')) {
+            $.selected = [M.InboxID];
+            $(t).filter('.properties-item').show();
+        } else if (c && c.indexOf('rubbish-bin') > -1) {
+            $.selected = [M.RubbishID];
+            $(t).filter('.properties-item').show();
         } else if (c && c.indexOf('recycle-item') > -1) {
             $(t).filter('.clearbin-item').show();
         } else if (c && c.indexOf('contacts-item') > -1) {
@@ -6112,7 +6100,7 @@ function sectionUIopen(id) {
         case 'cloud-drive':
             headertxt = l[5916];
             break;
-		case 'inbox':
+        case 'inbox':
             headertxt = l[949];
             break;
         case 'rubbish-bin':
@@ -6138,7 +6126,7 @@ function treeUIopen(id, event, ignoreScroll, dragOver, DragOpen) {
 
     if (id_r === 'shares') {
         sectionUIopen('shared-with-me');
-	} else if (id_r === M.InboxID) {
+    } else if (id_r === M.InboxID) {
         sectionUIopen('inbox');
     } else if (id_r === M.RootID) {
         sectionUIopen('cloud-drive');
@@ -7276,20 +7264,22 @@ function initShareDialog() {
     });
 
     function shareMessageResizing() {
+        
       var txt = $('.share-message textarea'),
           txtHeight =  txt.outerHeight(),
           hiddenDiv = $('.share-message-hidden'),
           pane = $('.share-message-scrolling'),
           content = txt.val(),
           api;
+      
       content = content.replace(/\n/g, '<br />');
-      hiddenDiv.html(content + '<br/>');
+      hiddenDiv.html(encodeURI(content) + '<br/>');
 
-      if (txtHeight != hiddenDiv.outerHeight() ) {
+      if (txtHeight !== hiddenDiv.outerHeight() ) {
         txt.height(hiddenDiv.outerHeight());
 
         if( $('.share-message-textarea').outerHeight()>=50) {
-            pane.jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5});
+            pane.jScrollPane({enableKeyboardNavigation:false, showArrows:true, arrowSize:5});
             api = pane.data('jsp');
             txt.blur();
             txt.focus();
@@ -7297,6 +7287,7 @@ function initShareDialog() {
         }
         else {
             api = pane.data('jsp');
+            
             if (api) {
               api.destroy();
               txt.blur();
@@ -8528,7 +8519,18 @@ function propertiesDialog(close)
             p.t5 = '';
         }
         p.t1 = l[86] + ':';
-        p.t2 = htmlentities(n.name);
+        if (n.name) {
+            p.t2 = htmlentities(n.name);
+        }
+        else if (n.h === M.RootID) {
+            p.t2 = htmlentities(l[164]);
+        }
+        else if (n.h === M.InboxID) {
+            p.t2 = htmlentities(l[166]);
+        }
+        else if (n.h === M.RubbishID) {
+            p.t2 = htmlentities(l[167]);
+        }
         p.t4 = bytesToSize(size);
         p.t9 = n.ts && htmlentities(time2date(n.ts)) || '';
         p.t8 = p.t9 ? (l[896] + ':') : '';
@@ -9472,12 +9474,6 @@ function userFingerprint(userid, next) {
     });
 }
 
-function isContactVerified(userid)
-{
-    userid = userid.u || userid;
-    return (u_authring.Ed25519[userid] || {}).method >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON;
-}
-
 function fingerprintDialog(userid)
 {
     userid = userid.u || userid;
@@ -9608,15 +9604,33 @@ function contactUI() {
         // Display the current fingerpring
         showAuthenticityCredentials();
 
-        // If the fingerprints have already been verified for the contact, show 'Verified'
-        if (isContactVerified(user)) {
-            $('.fm-verify').addClass('disabled');
-            $('.fm-verify').find('span').text(l[6776]);
+        // Set authentication state of contact from authring.
+        var authringPromise = new MegaPromise();
+        if (u_authring.Ed25519) {
+            authringPromise.resolve();
         }
         else {
-            // Otherwise show the Verify button
-            enableVerifyFingerprintsButton();
+            // First load the authentication system.
+            var authSystemPromise = authring.initAuthenticationSystem();
+            authringPromise.linkDoneAndFailTo(authSystemPromise);
         }
+        /** To be called on settled authring promise. */
+        var _setVerifiedState = function() {
+            var handle = user.u || user;
+            var verificationState = u_authring.Ed25519[handle] || {};
+            var isVerified = (verificationState.method
+                              >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON);
+            if (isVerified) {
+                // Show the user is verified.
+                $('.fm-verify').addClass('disabled');
+                $('.fm-verify').find('span').text(l[6776]);
+            }
+            else {
+                // Otherwise show the Verify button.
+                enableVerifyFingerprintsButton();
+            }
+        };
+        authringPromise.done(_setVerifiedState);
 
         // Reset seen or verified fingerprints and re-enable the Verify button
         $('.fm-reset-stored-fingerprint').rebind('click', function() {
@@ -9797,7 +9811,8 @@ function selectText(elementId) {
         range = document.body.createTextRange();
         range.moveToElementText(text);
         range.select();
-    } else if (window.getSelection) {
+    }
+    else if (window.getSelection) {
         selection = window.getSelection();
         range = document.createRange();
         range.selectNodeContents(text);
@@ -9805,3 +9820,126 @@ function selectText(elementId) {
         selection.addRange(range);
     }
 }
+
+/**
+ * Dialog to cancel subscriptions
+ */
+var cancelSubscriptionDialog = {
+
+    $backgroundOverlay: null,
+    $dialog: null,
+    $dialogSuccess: null,
+    $accountPageCancelButton: null,
+    $continueButton: null,
+    $cancelReason: null,
+
+    init: function() {
+
+        this.$dialog = $('.cancel-subscription-st1');
+        this.$dialogSuccess = $('.cancel-subscription-st2');
+        this.$accountPageCancelButton = $('.fm-account-blocks .btn-cancel');
+        this.$continueButton = this.$dialog.find('.continue-cancel-subscription');
+        this.$cancelReason = this.$dialog.find('.cancel-textarea textarea');
+        this.$backgroundOverlay = $('.fm-dialog-overlay');
+
+        // Show the dialog
+        this.$dialog.removeClass('hidden');
+        this.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+
+        // Init functionality
+        this.enableButtonWhenReasonEntered();
+        this.initSendingReasonToApi();
+        this.initCloseAndBackButtons();
+    },
+
+    /**
+     * Close the dialog when either the close or back buttons are clicked
+     */
+    initCloseAndBackButtons: function() {
+
+        // Close main dialog
+        this.$dialog.find('.fm-dialog-button.cancel, .fm-dialog-close').rebind('click', function() {
+            cancelSubscriptionDialog.$dialog.addClass('hidden');
+            cancelSubscriptionDialog.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+        });
+
+        // Prevent clicking on the background overlay which closes it unintentionally
+        cancelSubscriptionDialog.$backgroundOverlay.rebind('click', function(event) {
+            event.stopPropagation();
+        });
+    },
+
+    /**
+     * Close success dialog
+     */
+    initCloseButtonSuccessDialog: function() {
+
+        this.$dialogSuccess.find('.fm-dialog-close').rebind('click', function() {
+            cancelSubscriptionDialog.$dialogSuccess.addClass('hidden');
+            cancelSubscriptionDialog.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+        });
+    },
+
+    /**
+     * Make sure text has been entered before making the button available
+     */
+    enableButtonWhenReasonEntered: function() {
+
+        this.$cancelReason.rebind('keyup', function() {
+
+            // Trim for spaces
+            var reason = $(this).val();
+                reason = $.trim(reason);
+
+            // Make sure at least 1 character
+            if (reason.length > 0) {
+                cancelSubscriptionDialog.$continueButton.removeClass('disabled');
+            }
+            else {
+                cancelSubscriptionDialog.$continueButton.addClass('disabled');
+            }
+        });
+    },
+
+    /**
+     * Send the cancellation reason
+     */
+    initSendingReasonToApi: function() {
+
+        this.$continueButton.rebind('click', function() {
+
+            // Get the cancellation reason
+            var reason = cancelSubscriptionDialog.$cancelReason.val();
+
+            // Hide the dialog and show loading spinner
+            cancelSubscriptionDialog.$dialog.addClass('hidden');
+            cancelSubscriptionDialog.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+            loadingDialog.show();
+
+            // Cancel the subscription/s
+            // cccs = Credit Card Cancel Subscriptions, r = reason
+            api_req({ a: 'cccs', r: reason }, {
+                callback: function() {
+
+                    // Reset account cache and refetch all account data to display UI
+                    // (note potential race condition if cancellation callback wasn't received in 7500ms)
+                    M.account.lastupdate = 0;
+
+                    setTimeout(function() {
+
+                        // Hide loading dialog and cancel subscription button on account page
+                        loadingDialog.hide();
+                        cancelSubscriptionDialog.$accountPageCancelButton.hide();
+
+                        // Show success dialog and refresh UI
+                        cancelSubscriptionDialog.$dialogSuccess.removeClass('hidden');
+                        cancelSubscriptionDialog.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+                        cancelSubscriptionDialog.initCloseButtonSuccessDialog();
+                        accountUI();
+
+                    }, 7500);
+                }
+            });
+        });
+    }
+};

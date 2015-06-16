@@ -26,7 +26,7 @@ function MegaPromise(fn) {
 
     self._internalPromise = new $.Deferred();
 
-    if(fn) {
+    if (fn) {
         fn(
             function() {
                 self.resolve.apply(self, toArray(arguments));
@@ -39,7 +39,7 @@ function MegaPromise(fn) {
     return this;
 };
 
-if(typeof(Promise) !== "undefined") {
+if (typeof(Promise) !== "undefined") {
     MegaPromise._origPromise = Promise;
 } else {
     MegaPromise._origPromise = undefined;
@@ -118,11 +118,6 @@ MegaPromise.prototype.promise = function() {
  * @returns {MegaPromise}
  */
 MegaPromise.prototype.then = function(res, rej) {
-    function _passthrough(value) {
-        return value;
-    }
-    res = res || _passthrough;
-    rer = rej || _passthrough;
 
     return MegaPromise.asMegaPromiseProxy(this._internalPromise.then(res, rej));
 };
@@ -157,6 +152,17 @@ MegaPromise.prototype.state = function() {
 MegaPromise.prototype.fail = function(rej) {
     this._internalPromise.fail(rej);
     return this;
+};
+
+
+/**
+ * Intentionally we'd added this method to throw an exception, since we don't want anyone
+ * using it.
+ *
+ * @throws {Error}
+ */
+MegaPromise.prototype.catch = function() {
+    throw new Error('.catch is prohibited in MegaPromises.');
 };
 
 /**
@@ -272,7 +278,7 @@ MegaPromise.all = function(promisesList) {
 
     var _jQueryPromisesList = [];
     promisesList.forEach(function(v, k) {
-        if(MegaPromise._origPromise && v instanceof MegaPromise._origPromise) {
+        if (MegaPromise._origPromise && v instanceof MegaPromise._origPromise) {
             v = MegaPromise.asMegaPromiseProxy(v);
         }
         _jQueryPromisesList.push(v);
@@ -309,7 +315,7 @@ MegaPromise.allDone = function(promisesList, timeout) {
         totalLeft--;
         results.push(arguments);
 
-        if(totalLeft === 0) {
+        if (totalLeft === 0) {
             masterPromise.resolve(results);
         }
     };
@@ -317,7 +323,7 @@ MegaPromise.allDone = function(promisesList, timeout) {
 
     var _megaPromisesList = [];
     promisesList.forEach(function(v, k) {
-        if(MegaPromise._origPromise && v instanceof MegaPromise._origPromise) {
+        if (MegaPromise._origPromise && v instanceof MegaPromise._origPromise) {
             v = MegaPromise.asMegaPromiseProxy(v);
         }
         _megaPromisesList.push(v);
@@ -325,7 +331,7 @@ MegaPromise.allDone = function(promisesList, timeout) {
         v.fail(alwaysCb);
     });
 
-    if(timeout) {
+    if (timeout) {
         var timeoutTimer = setTimeout(function () {
             masterPromise.reject(results);
         }, timeout);
@@ -334,6 +340,7 @@ MegaPromise.allDone = function(promisesList, timeout) {
             clearTimeout(timeoutTimer);
         });
     }
+
 
     return masterPromise;
 };

@@ -148,9 +148,38 @@ function init_pro()
  */
 var proPage = {
     
+    lastPaymentProviderId: null,
+    
     // The user's current storage in bytes
     currentStorageBytes: 0,
     
+    /**
+    * Update the state when a payment has been received to show their new Pro Level
+    * @param {Object} actionPacket The action packet {'a':'psts', 'p':<prolevel>, 'r':<s for success or f for failure>}
+    */
+    processPaymentReceived: function (actionPacket) {
+
+        // Check success or failure
+        var success = (actionPacket.r === 's') ? true : false;
+        
+        // Add a notification in the top bar
+        addNotification(actionPacket);
+        
+        // If their payment was successful, redirect to account page to show new Pro Plan
+        if (success) {
+
+            // Make sure it fetches new account data on reload
+            if (M.account) {
+                M.account.lastupdate = 0;
+            }
+
+            // If last payment was Bitcoin, we need to redirect to the account page
+            if (this.lastPaymentProviderId === 4) {
+                window.location.hash = 'fm/account';
+            }
+        }
+    },
+        
     /**
      * Check applicable plans for the user based on their current storage usage
      */
@@ -696,10 +725,9 @@ function pro_pay()
     var currency = selectedProPackage[6];
 
     // uts = User Transaction Sale
-    api_req({ a : 'uts', it: 0, si: apiId, p: price, c: currency, aff: aff, 'm': m },
-    {
-        callback : function (utsResult)
-        {
+    api_req({ a: 'uts', it: 0, si: apiId, p: price, c: currency, aff: aff, 'm': m }, {   
+        callback: function (utsResult) {
+            
             // Store the sale ID to check with API later
             saleId = utsResult;
             
@@ -722,6 +750,10 @@ function pro_pay()
                 else if (pro_paymentmethod === 'union-pay') {
                     pro_m = 5;
                 }
+                
+                // Update the last payment provider ID for the 'psts' action packet. If the provider e.g. bitcoin 
+                // needs a redirect after confirmation action packet it will redirect to the account page.
+                proPage.lastPaymentProviderId = pro_m;
 
                 var proref = '';
                 if (sessionStorage.proref) {

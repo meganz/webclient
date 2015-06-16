@@ -1890,7 +1890,8 @@ function MegaData()
                     if (k) {
                         if (containsc) {
                             $('#' + _li + folders[ii].h + ' .nw-fm-tree-item').addClass(containsc);
-                        } else {
+                        }
+                        else {
                             $('#' + _li + folders[ii].h + ' .nw-fm-tree-item').removeClass('contains-folders');
                         }
                     }
@@ -1905,23 +1906,28 @@ function MegaData()
                                         <ul id="' + _sub + folders[ii].h + '" ' + ulc + '></ul>\n\
                                     </li>';
 
-                        if (folders[ii - 1] && $('#' + _li + folders[ii - 1].h).length > 0)
+                        if (folders[ii - 1] && $('#' + _li + folders[ii - 1].h).length > 0) {
                             $('#' + _li + folders[ii - 1].h).after(html);
-                        else if (ii == 0 && $('#' + _sub + n.h + ' li').length > 0)
+                        }
+                        else if (ii === 0 && $('#' + _sub + n.h + ' li').length > 0) {
                             $($('#' + _sub + n.h + ' li')[0]).before(html);
-                        else
+                        }
+                        else {
                             $('#' + _sub + n.h).append(html);
+                        }
                     }
 
                     if (_ts_l && folders[ii].name) {
-                        if (folders[ii].name.toLowerCase().indexOf(_ts_l) == -1) {
+                        if (folders[ii].name.toLowerCase().indexOf(_ts_l) === -1) {
                             $('#' + _li + folders[ii].h).addClass('tree-item-on-search-hidden');
-                        } else {
+                        }
+                        else {
                             $('#' + _li + folders[ii].h).parents('li').removeClass('tree-item-on-search-hidden');
                         }
                     }
-                    if (buildnode)
+                    if (buildnode) {
                         this.buildtree(folders[ii], dialog, stype);
+                    }
 
                     sharedUInode(folders[ii].h);
                 }
@@ -2860,7 +2866,7 @@ function MegaData()
                     if (callback) {
                         callback(res);
                     }
-                    rendernew();
+                    renderNew();
                 }
                 if (typeof res === 'number' && res < 0) {
                     return msgDialog('warninga', l[135], l[47], api_strerror(res));
@@ -2930,7 +2936,7 @@ function MegaData()
                 newnodes.push(M.d[h]);
             }
         }
-        rendernew();
+        renderNew();
         this.rubbishIco();
         processmove(j);
         Soon(function() {
@@ -4471,52 +4477,49 @@ function renderfm()
         console.timeEnd('renderfm');
 }
 
-function rendernew()
-{
-    if (d)
-        console.time('rendernew');
-    var treebuild = [];
-    var UImain = false;
-    var newcontact = false;
-    var newpath = false;
-    var newshare = false;
+function renderNew() {
 
-    for (var i in newnodes)
-    {
-        var n = newnodes[i];
-        if (n.h.length === 11) {
+    var newNode, tb,
+        treebuild = [],
+        UImain = false,
+        UItree = false,
+        newcontact = false,
+        newpath = false,
+        newshare = false;
+
+    if (d) {
+        console.time('rendernew');
+    }
+
+    for (var i in newnodes) {
+
+        newNode = newnodes[i];
+        if (newNode.h.length === 11) {
             newcontact = true;
         }
-        if (typeof(n.su) !== 'undefined') {
+        if (typeof(newNode.su) !== 'undefined') {
             newshare = true;
         }
-        if (n && n.p && n.t) {
-            treebuild[n.p] = 1;
+        if (newNode && newNode.p && newNode.t) {
+            treebuild[newNode.p] = 1;
         }
-        if (n.p == M.currentdirid || n.h == M.currentdirid) {
+        if (newNode.p === M.currentdirid || newNode.h === M.currentdirid) {
             UImain = true;
         }
-        if ($('#path_' + n.h).length > 0) {
+        if ($('#path_' + newNode.h).length > 0) {
             newpath = true;
         }
     }
 
-
-
-
-    var UItree = false;
-    for (var h in treebuild)
-    {
-        var n = M.d[h];
-        if (n)
-        {
-            M.buildtree(n, M.buildtree.FORCE_REBUILD);
+    for (var h in treebuild) {
+        tb = M.d[h];
+        if (tb) {
+            M.buildtree(tb, M.buildtree.FORCE_REBUILD);
             UItree = true;
         }
     }
 
-    if (UImain)
-    {
+    if (UImain) {
         M.filterByParent(M.currentdirid);
         M.sort();
         M.renderMain(true);
@@ -4524,8 +4527,7 @@ function rendernew()
         $(window).trigger('resize');
     }
 
-    if (UItree)
-    {
+    if (UItree) {
         treeUI();
         if (RootbyId(M.currentdirid) === 'shares') {
             M.renderTree();
@@ -4535,8 +4537,7 @@ function rendernew()
         }
         treeUIopen(M.currentdirid);
     }
-    if (newcontact)
-    {
+    if (newcontact) {
         M.avatars();
         M.contacts();
         treeUI();
@@ -4546,17 +4547,18 @@ function rendernew()
             megaChat.renderMyStatus();
         }
     }
-
     if (newshare) {
         M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
     }
     M.buildSubmenu();
     initContextUI();
-    if (newpath)
+    if (newpath) {
         M.renderPath();
+    }
     newnodes = undefined;
-    if (d)
+    if (d) {
         console.timeEnd('rendernew');
+    }
 }
 
 /**
@@ -5008,12 +5010,22 @@ function execsc(actionPackets, callback) {
                 }
             });
         }
-        if (newnodes.length > 0 && fminitialized) rendernew();
-        if (loadavatars) M.avatars();
-        if (M.viewmode) fm_thumbnails();
-        if ($.dialog === 'properties') propertiesDialog();
+        if (newnodes.length > 0 && fminitialized) {
+            renderNew();
+        }
+        if (loadavatars) {
+            M.avatars();
+        }
+        if (M.viewmode) {
+            fm_thumbnails();
+        }
+        if ($.dialog === 'properties') {
+            propertiesDialog();
+        }
         getsc();
-        if (callback) Soon(callback);
+        if (callback) {
+            Soon(callback);
+        }
     }
 }
 
@@ -5242,51 +5254,56 @@ function fm_getcopynodes(cn, t)
     return a;
 }
 
-function createfolder(toid, name, ulparams)
-{
-    var mkat = enc_attr({n: name}, []);
-    var attr = ab_to_base64(mkat[0]);
-    var key = a32_to_base64(encrypt_key(u_k_aes, mkat[1]));
-    var req = {a: 'p', t: toid, n: [{h: 'xxxxxxxx', t: 1, a: attr, k: key}], i: requesti};
-    var sn = fm_getsharenodes(toid);
-    if (sn.length)
-    {
+function createFolder(toid, name, ulparams) {
+    
+    var mkat = enc_attr({n: name}, []),
+        attr = ab_to_base64(mkat[0]),
+        key = a32_to_base64(encrypt_key(u_k_aes, mkat[1])),
+        req = {a: 'p', t: toid, n: [{h: 'xxxxxxxx', t: 1, a: attr, k: key}], i: requesti},
+        sn = fm_getsharenodes(toid);
+
+    if (sn.length) {
         req.cr = crypto_makecr([mkat[1]], sn, false);
         req.cr[1][0] = 'xxxxxxxx';
     }
-    if (!ulparams)
+    if (!ulparams) {
         loadingDialog.show();
-    api_req(req,
-        {
-            ulparams: ulparams,
-            callback: function(res, ctx)
-            {
-                if (typeof res !== 'number')
-                {
-                    $('.fm-new-folder').removeClass('active');
-                    $('.create-new-folder').addClass('hidden');
-                    $('.create-folder-input-bl input').val('');
-                    newnodes = [];
-                    M.addNode(res.f[0]);
-                    rendernew();
-                    refreshDialogContent();
-                    loadingDialog.hide();
-                    if (ctx.ulparams)
-                        ulparams.callback(ctx.ulparams, res.f[0].h);
-                }
-                else {
-                    loadingDialog.hide();
-                    msgDialog('warninga', l[135], l[47], api_strerror(res));
+    }
+    
+    api_req(req, {
+        ulparams: ulparams,
+        callback: function(res, ctx) {
+
+            if (typeof res !== 'number') {
+                $('.fm-new-folder').removeClass('active');
+                $('.create-new-folder').addClass('hidden');
+                $('.create-folder-input-bl input').val('');
+                newnodes = [];
+                M.addNode(res.f[0]);
+                renderNew();
+                refreshDialogContent();
+                loadingDialog.hide();
+                
+                if (ctx.ulparams) {
+                    ulparams.callback(ctx.ulparams, res.f[0].h);
                 }
             }
-        });
+            else {
+                loadingDialog.hide();
+                msgDialog('warninga', l[135], l[47], api_strerror(res));
+            }
+        }
+    });
 }
 
-function getuid(email)
-{
-    for (var j in M.u)
-        if (M.u[j].m == email)
+function getuid(email) {
+    
+    for (var j in M.u) {
+        if (M.u[j].m === email) {
             return j;
+        }
+    }
+    
     return false;
 }
 
@@ -5903,7 +5920,7 @@ function fm_requestfolderid(h, name, ulparams)
             }
         }
     }
-    createfolder(h, name, ulparams);
+    createFolder(h, name, ulparams);
 }
 
 var isNativeObject = function(obj) {

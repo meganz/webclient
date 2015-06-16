@@ -1010,13 +1010,8 @@ function initUI() {
 
     var fmTabState;
 
-//    $('.nw-fm-left-icon').rebind('contextmenu', function(ev) {
-//        contextmenuUI(ev,1);
-//        return false;
-//    });
-
     $('.nw-fm-left-icon').rebind('click', function() {
-//        treesearch = false;
+        
         var clickedClass = $(this).attr('class');
         if (!clickedClass) {
             return;
@@ -2354,9 +2349,7 @@ function initContextUI()
         }
     });
 
-    $(c + '.advanced-item, ' + c + '.move-item').unbind('click');
-    $(c + '.advanced-item, ' + c + '.move-item').bind('click', function()
-    {
+    $(c + '.advanced-item, ' + c + '.move-item').rebind('click', function() {
         $.moveDialog = 'move';// this is used like identifier when key with key code 27 is pressed
         $.mcselected = M.RootID;
         $('.move-dialog').removeClass('hidden');
@@ -2365,9 +2358,7 @@ function initContextUI()
         fm_showoverlay();
     });
 
-    $(c + '.copy-item').unbind('click');
-    $(c + '.copy-item').bind('click', function()
-    {
+    $(c + '.copy-item').rebind('click', function() {
         $.copyDialog = 'copy';// this is used like identifier when key with key code 27 is pressed
         $.mcselected = M.RootID;
         $('.copy-dialog').removeClass('hidden');
@@ -2375,136 +2366,102 @@ function initContextUI()
         fm_showoverlay();
     });
 
-    $(c + '.import-item').unbind('click');
-    $(c + '.import-item').bind('click', function(event)
-    {
+    $(c + '.import-item').rebind('click', function() {
         ASSERT(folderlink, 'Import needs to be used in folder links.');
 
         fm_importflnodes($.selected);
     });
 
-    $(c + '.newfolder-item').unbind('click');
-    $(c + '.newfolder-item').bind('click', function(event)
-    {
-        createfolderDialog();
+    $(c + '.newfolder-item').rebind('click', function() {
+        createFolderDialog();
     });
 
-    $(c + '.fileupload-item').unbind('click');
-    $(c + '.fileupload-item').bind('click', function(event)
-    {
+    $(c + '.fileupload-item').rebind('click', function() {
         $('#fileselect3').click();
     });
 
-    $(c + '.folderupload-item').unbind('click');
-    $(c + '.folderupload-item').bind('click', function(event)
-    {
+    $(c + '.folderupload-item').rebind('click', function() {
         $('#fileselect4').click();
     });
 
-    $(c + '.remove-item').unbind('click');
-    $(c + '.remove-item').bind('click', function(event)
-    {
+    $(c + '.remove-item').rebind('click', function() {
         fmremove();
     });
 
-    $(c + '.removeshare-item').unbind('click');
-    $(c + '.removeshare-item').bind('click', function(event)
-    {
+    $(c + '.removeshare-item').rebind('click', function() {
         fmremove();
     });
 
-    $(c + '.properties-item').unbind('click');
-    $(c + '.properties-item').bind('click', function(event)
-    {
+    $(c + '.properties-item').rebind('click', function() {
         propertiesDialog();
     });
 
-    $(c + '.permissions-item').unbind('click');
-    $(c + '.permissions-item').bind('click', function(event)
-    {
-        if (d)
+    $(c + '.permissions-item').rebind('click', function() {
+        if (d) {
             console.log('permissions');
+        }
     });
 
-    $(c + '.add-star-item').unbind('click');
-    $(c + '.add-star-item').bind('click', function(event)
-    {
+    $(c + '.add-star-item').rebind('click', function() {
         M.favourite($.selected, $.delfav);
-        if (M.viewmode)
+        if (M.viewmode) {
             $('.file-block').removeClass('ui-selected');
-        else
+        }
+        else {
             $('.grid-table.fm tr').removeClass('ui-selected');
+        }
     });
 
-    $(c + '.open-item').unbind('click');
-    $(c + '.open-item').bind('click', function(event)
-    {
+    $(c + '.open-item').rebind('click', function() {
         M.openFolder($.selected[0]);
     });
 
-    $(c + '.preview-item').unbind('click');
-    $(c + '.preview-item').bind('click', function(event)
-    {
+    $(c + '.preview-item').rebind('click', function() {
         slideshow($.selected[0]);
     });
 
-    $(c + '.clearbin-item').unbind('click');
-    $(c + '.clearbin-item').bind('click', function(event)
-    {
+    $(c + '.clearbin-item').rebind('click', function() {
         doClearbin(true);
     });
 
-    $(c + '.move-up').unbind('click');
-    $(c + '.move-up').bind('click', function(event)
-    {
+    $(c + '.move-up').rebind('click', function() {
         $('.transfer-table tr.ui-selected').not('.clone-of-header').each(function(j, el) {
             fm_tfsmove($(this).attr('id'), -1);
         });
         Soon(fmUpdateCount);
     });
 
-    $(c + '.move-down').unbind('click');
-    $(c + '.move-down').bind('click', function(event)
-    {
+    $(c + '.move-down').rebind('click', function() {
         $('.transfer-table tr.ui-selected').not('.clone-of-header').each(function(j, el) {
             fm_tfsmove($(this).attr('id'), +1);
         });
         Soon(fmUpdateCount);
     });
 
-    $(c + '.transfer-play').unbind('click');
-    $(c + '.transfer-play').bind('click', function(event)
-    {
+    $(c + '.transfer-play').rebind('click', function() {
         $('.transfer-table tr.ui-selected').not('.clone-of-header').each(function(j, el) {
-            var id = $(this).attr('id')
-            fm_tfsresume(id)
+            var id = $(this).attr('id');
+            fm_tfsresume(id);
             $('span.transfer-type', this).removeClass('paused');
         });
     });
 
-    $(c + '.transfer-pause').unbind('click');
-    $(c + '.transfer-pause').bind('click', function(event)
-    {
+    $(c + '.transfer-pause').rebind('click', function() {
         $('.transfer-table tr.ui-selected').not('.clone-of-header').each(function(j, el) {
-            var id = $(this).attr('id')
+            var id = $(this).attr('id');
             fm_tfspause(id);
             $('span.transfer-type', this).addClass('paused');
         });
         $('.tranfer-download-indicator,.transfer-upload-indicator').removeClass('active');
     });
 
-    $(c + '.select-all').unbind('click');
-    $(c + '.select-all').bind('click', function(event)
-    {
+    $(c + '.select-all').rebind('click', function() {
         selectionManager.select_all();
     });
 
-    $(c + '.canceltransfer-item,' + c + '.tranfer-clear').unbind('click');
-    $(c + '.canceltransfer-item,' + c + '.tranfer-clear').bind('click', function(event)
-    {
+    $(c + '.canceltransfer-item,' + c + '.tranfer-clear').rebind('click', function() {
         var toabort = {};
-        $('.transfer-table tr.ui-selected').not('.clone-of-header').each(function(j, el)
-        {
+        $('.transfer-table tr.ui-selected').not('.clone-of-header').each(function(j, el) {
             toabort[$(el).attr('id')] = 1;
             $(this).remove();
         });
@@ -2639,7 +2596,7 @@ function createfolderUI() {
         $('.create-new-folder').removeClass('filled-input');
         $('.create-new-folder').addClass('hidden');
         $('.fm-new-folder').removeClass('active');
-        createfolderDialog(0);
+        createFolderDialog(0);
         $('.create-new-folder input').val(l[157]);
     });
 
@@ -2654,7 +2611,7 @@ function createfolderUI() {
         
         $('.fm-new-folder').addClass('active');
         $('.create-new-folder').removeClass('hidden');
-        createfolderDialog(1);
+        createFolderDialog(1);
         $('.create-folder-dialog input').val(l[157]);
         $('.create-new-folder input').focus();
     });
@@ -2687,20 +2644,18 @@ function createfolderUI() {
     });
 }
 
-function docreatefolderUI(e)
-{
-    if ($('.create-folder-input-bl input').val() == '')
-    {
-        $('.create-folder-input-bl input').animate({backgroundColor: "#d22000"}, 150, function()
-        {
-            $('.create-folder-input-bl input').animate({backgroundColor: "white"}, 350, function()
-            {
+function docreatefolderUI(e) {
+    
+    if ($('.create-folder-input-bl input').val() == '') {
+        $('.create-folder-input-bl input').animate({backgroundColor: "#d22000"}, 150, function() {
+            $('.create-folder-input-bl input').animate({backgroundColor: "white"}, 350, function() {
                 $('.create-folder-input-bl input').focus();
             });
         });
     }
-    else
-        createfolder(M.currentdirid, $('.create-folder-input-bl input').val());
+    else {
+        createFolder(M.currentdirid, $('.create-folder-input-bl input').val());
+    }
 }
 
 /**
@@ -6286,7 +6241,7 @@ function treeUIopen(id, event, ignoreScroll, dragOver, DragOpen) {
             // UI tree -> Shared with me... its a bug from what i can see and i also don't see any points of automatic
             // redirect in the UI when another user had sent me a shared folder.... its very bad UX. Plus, as a bonus
             // sectionUIopen is already called with sectionUIopen('contacts') few lines before this (when this func
-            // is called by the rendernew()
+            // is called by the renderNew()
 
             // sectionUIopen('shared-with-me');
         } else if (ids[0] === M.RootID) {
@@ -7661,10 +7616,9 @@ function copyDialog()
         $('.copy-dialog-panel-arrows.active').removeClass('active');
     });
 
-    $('.copy-dialog .dialog-newfolder-button').unbind('click');
-    $('.copy-dialog .dialog-newfolder-button').bind('click', function() {
+    $('.copy-dialog .dialog-newfolder-button').rebind('click', function() {
         $('.copy-dialog').addClass('arrange-to-back');
-        createfolderDialog();
+        createFolderDialog();
 
         $('.fm-dialog.create-folder-dialog .create-folder-size-icon').addClass('hidden');
     });
@@ -7896,10 +7850,9 @@ function moveDialog()
         $('.move-dialog-panel-arrows.active').removeClass('active');
     });
 
-    $('.move-dialog .dialog-newfolder-button').unbind('click');
-    $('.move-dialog .dialog-newfolder-button').bind('click', function() {
+    $('.move-dialog .dialog-newfolder-button').rebind('click', function() {
         $('.move-dialog').addClass('arrange-to-back');
-        createfolderDialog();
+        createFolderDialog();
 
         $('.fm-dialog.create-folder-dialog .create-folder-size-icon').addClass('hidden');
     });
@@ -8324,44 +8277,49 @@ function refreshDialogContent() {
     }
 }
 
-function createfolderDialog(close)
+function createFolderDialog(close)
 {
     $.dialog = 'createfolder';
-    if (close)
-    {
+    if (close) {
         $.dialog = false;
-        if ($.cftarget)
+        if ($.cftarget) {
             delete $.cftarget;
-        if (!($.copyDialog || $.moveDialog))
-        {
+        }
+        if (!($.copyDialog || $.moveDialog)) {
             fm_hideoverlay();
         }
         $('.fm-dialog').removeClass('arrange-to-back');
         $('.fm-dialog.create-folder-dialog').addClass('hidden');
+        
         return true;
     }
+    
     $('.create-folder-dialog input').unbind('focus');
-    $('.create-folder-dialog input').bind('focus', function()
-    {
-        if ($(this).val() == l[157])
+    $('.create-folder-dialog input').bind('focus', function() {
+        if ($(this).val() == l[157]) {
             $('.create-folder-dialog input').val('');
+        }
         $('.create-folder-dialog').addClass('focused');
     });
+    
     $('.create-folder-dialog input').unbind('blur');
-    $('.create-folder-dialog input').bind('blur', function()
-    {
-        if ($('.create-folder-dialog input').val() == '')
+    $('.create-folder-dialog input').bind('blur', function() {
+        if ($('.create-folder-dialog input').val() == '') {
             $('.create-folder-dialog input').val(l[157]);
+        }
         $('.create-folder-dialog').removeClass('focused');
     });
+    
     $('.create-folder-dialog input').unbind('keyup');
-    $('.create-folder-dialog input').bind('keyup', function()
-    {
-        if ($('.create-folder-dialog input').val() == '' || $('.create-folder-dialog input').val() == l[157])
+    $('.create-folder-dialog input').bind('keyup', function() {
+        if ($('.create-folder-dialog input').val() === '' || $('.create-folder-dialog input').val() === l[157]) {
             $('.create-folder-dialog').removeClass('active');
-        else
+        }
+        else {
             $('.create-folder-dialog').addClass('active');
+        }
     });
+    
     $('.create-folder-dialog input').unbind('keypress');
     $('.create-folder-dialog input').bind('keypress', function(e) {
 
@@ -8369,39 +8327,35 @@ function createfolderDialog(close)
             if (!$.cftarget) {
                 $.cftarget = M.currentdirid;
             }
-            createfolder($.cftarget, $(this).val());
-            createfolderDialog(1);
+            createFolder($.cftarget, $(this).val());
+            createFolderDialog(1);
         }
     });
 
-    $('.create-folder-dialog .fm-dialog-close, .create-folder-button-cancel.dialog').unbind('click');
-    $('.create-folder-dialog .fm-dialog-close, .create-folder-button-cancel.dialog').bind('click', function()
-    {
-        createfolderDialog(1);
+    $('.create-folder-dialog .fm-dialog-close, .create-folder-button-cancel.dialog').rebind('click', function() {
+        createFolderDialog(1);
         $('.fm-dialog').removeClass('arrange-to-back');
         $('.create-folder-dialog input').val(l[157]);
     });
-    $('.fm-dialog-input-clear').unbind('click');
-    $('.fm-dialog-input-clear').bind('click', function()
-    {
+    
+    $('.fm-dialog-input-clear').rebind('click', function() {
         $('.create-folder-dialog input').val('');
         $('.create-folder-dialog').removeClass('active');
     });
 
-    $('.fm-dialog-new-folder-button').unbind('click');
-    $('.fm-dialog-new-folder-button').bind('click', function() {
+    $('.fm-dialog-new-folder-button').rebind('click', function() {
 
         var v = $('.create-folder-dialog input').val();
 
-        if (v == '' || v == l[157]) {
+        if (v === '' || v === l[157]) {
             alert(l[1024]);
         }
         else {
             if (!$.cftarget) {
                 $.cftarget = M.currentdirid;
             }
-            createfolder($.cftarget, v);
-            createfolderDialog(1);
+            createFolder($.cftarget, v);
+            createFolderDialog(1);
         }
     });
 

@@ -9712,8 +9712,8 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
 }
 .fm-dialog.bandwidth-dialog {
 	width: 964px;
-	min-height: 704px;
-	margin: -352px 0 0 -482px;
+	min-height: 657px;
+	margin: -329px 0 0 -482px;
 }
 /* Bitcoin invoice dialog */
 .fm-dialog.bitcoin-invoice-dialog {
@@ -23268,10 +23268,10 @@ body.pro:after {
 	text-align: center;
 	font-family: 'source_sans_proregular';
 	color: #333333;
-	padding: 27px 0 10px 0;
+	padding: 22px 0 10px 0;
 }
 .bandwidth-gradient {
-	height: 420px;
+	height: 393px;
 	background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzAwMDAwMCIgc3RvcC1vcGFjaXR5PSIwIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwMDAwMDAiIHN0b3Atb3BhY2l0eT0iMC4wNSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
 	background: -moz-linear-gradient(top, rgba(0,0,0,0) 0%, rgba(0,0,0,0.05) 100%);
 	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, rgba(0,0,0,0)), color-stop(100%, rgba(0,0,0,0.05)));
@@ -23306,11 +23306,11 @@ body.pro:after {
 	line-height: 24px;
 	font-size: 15px;
 	color: #666666;
-	margin: 40px 28px 34px 0;
+	margin: 25px 28px 34px 0;
 	font-family: 'source_sans_proregular';
 }
 .bandwidth-text-bl.first {
-	margin: 40px 48px 34px 44px;
+	margin: 25px 48px 34px 44px;
 }
 .bandwidth-text-bl strong {
 	color: #D90007;

@@ -45,27 +45,35 @@ function reportQuota(chunksize)
     localStorage.q = JSON.stringify(quota);
 }
 
-function hasQuota(filesize, next)
-{
-    checkQuota(filesize,function(r)
-    {
-        if (r.sec == 0 || r.sec == -1)
-        {
+function hasQuota(filesize, next) {
+    checkQuota(filesize, function(r) {
+        if (r.sec == 0 || r.sec == -1) {
             bandwidthDialog(1);
             next(true);
         }
-        else
-        {
-            sessionStorage.proref='bwlimit';
-            if (!$.lastlimit) $.lastlimit=0;
-            $('.fm-bandwidth-number-txt.used').html(bytesToSize(r.used).replace(' ',' <span class="small">') + '</span>');
-            $('.fm-bandwidth-number-txt.available').html(bytesToSize(r.filesize).replace(' ',' <span class="small">') + '</span>');
-            var minutes = Math.ceil(r.sec/60);
-            if (minutes == 1) $('.bwminutes').html(l[5838] + ' *');
-            else $('.bwminutes').html(l[5837].replace('[X]',minutes) + ' *');
+        else {
+            sessionStorage.proref = 'bwlimit';
+
+            if (!$.lastlimit) {
+                $.lastlimit = 0;
+            }
+            $('.bandwidth-dialog .bandwidth-used').html(bytesToSize(r.used));
+            
+            var minutes = Math.ceil(r.sec / 60);
+            if (minutes == 1) {
+                $('.bandwidth-dialog .bandwidth-minutes').html(l[5838]);
+            }
+            else {
+                $('.bandwidth-dialog .bandwidth-minutes').html(l[5837].replace('[X]', minutes));
+            }
+
             bandwidthDialog();
-            if ($.lastlimit < new Date().getTime()-60000)  megaAnalytics.log("dl", "limit",{used:r.used,filesize:r.filesize,seconds:r.sec});
-            $.lastlimit=new Date().getTime();
+
+            if ($.lastlimit < new Date().getTime() - 60000) {
+                megaAnalytics.log("dl", "limit", { used: r.used, filesize: r.filesize, seconds: r.sec });
+            }
+
+            $.lastlimit = new Date().getTime();
             next(false);
         }
     });
@@ -134,53 +142,44 @@ function checkQuota(filesize,callback)
     });
 }
 
-function bandwidthDialog(close)
-{
-    if (close)
-    {
-        $('.fm-dialog.bandwidth-quota').addClass('hidden');
-        $('.fm-dialog-overlay').addClass('hidden');
-        $.dialog=false;
+/**
+ * Shows the bandwidth dialog
+ * @param {Boolean} close If true, closes the dialog, otherwise opens it
+ */
+function bandwidthDialog(close) {
+    
+    var $bandwidthDialog = $('.fm-dialog.bandwidth-dialog');
+    var $backgroundOverlay = $('.fm-dialog-overlay');
+    
+    // Close dialog
+    if (close) {
+        $backgroundOverlay.addClass('hidden');
+        $bandwidthDialog.addClass('hidden');
     }
-    else
-    {
-        if (!is_fm() && page !== 'download') return false;
-
-        $('.fm-dialog-button.quota-later-button').unbind('click');
-        $('.fm-dialog-button.quota-later-button').bind('click',function(e)
-        {
-            bandwidthDialog(1);
+    else {
+        // Don't show if not in filemanager or download page
+        if (!is_fm() && page !== 'download') {
+            return false;
+        }
+        
+        // On close button click, close the dialog
+        $bandwidthDialog.find('.fm-dialog-close').rebind('click', function() {
+            $backgroundOverlay.addClass('hidden');
+            $bandwidthDialog.addClass('hidden');
         });
-
-        $('.fm-dialog bandwidth-quota.fm-dialog-close').unbind('click');
-        $('.fm-dialog bandwidth-quota.fm-dialog-close').bind('click',function(e)
-        {
-            bandwidthDialog(1);
+        
+        // On Select button click
+        $bandwidthDialog.find('.membership-button').rebind('click', function() {
+            
+            // Get the plan number and redirect to pro step 2
+            var planNum = $(this).closest('.reg-st3-membership-bl').attr('data-payment');            
+            document.location.hash = 'pro2?plan=' + planNum;
         });
-
-        $('.fm-dialog-button.quota-upgrade-button').unbind('click');
-        $('.fm-dialog-button.quota-upgrade-button').bind('click',function(e)
-        {
-
-            bandwidthDialog(1);
-            document.location = '#pro';
-        });
-
-        $('.fm-dialog-overlay').removeClass('hidden');
-        $('.fm-dialog.bandwidth-quota').removeClass('hidden');
-        $.dialog='bandwidth';
+        
+        // Show the dialog
+        $backgroundOverlay.removeClass('hidden');
+        $bandwidthDialog.removeClass('hidden');
     }
-}
-
-function andreiScripts()
-{
-    /*
-     $('.on_off :checkbox').iphoneStyle({ resizeContainer: false, resizeHandle: false, onChange: function(elem, data)
-     {
-     if(data) $(elem).closest('.on_off').addClass('active');
-     else $(elem).closest('.on_off').removeClass('active');
-     }});
-     */
 }
 
 function deleteScrollPanel(from, data) {

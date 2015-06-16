@@ -4916,7 +4916,7 @@ function execsc(actionPackets, callback) {
         }
         // Action packet to notify about payment (Payment Service Transaction Status)
         else if (actionPacket.a === 'psts') {
-            processPaymentReceived(actionPacket);
+            proPage.processPaymentReceived(actionPacket);
         }
         else {
             if (d) {
@@ -5637,29 +5637,6 @@ function processUPCO(ap) {
                 $('.fm-empty-contacts').removeClass('hidden');
             }
         }
-    }
-}
-
-/**
- * Update the state when a payment has been received to show their new Pro Level
- * @param {Object} actionPacket The action packet {'a':'psts', 'p':<prolevel>, 'r':<s for success or f for failure>}
- */
-function processPaymentReceived(actionPacket) {
-
-    // Check success or failure
-    var success = (actionPacket.r === 's') ? true : false;
-
-    // Add a notification in the top bar
-    addNotification(actionPacket);
-
-    // If their payment was successful, redirect to account page to show new Pro Plan
-    if (success) {
-
-        // Make sure it fetches new account data on reload
-        if (M.account) {
-            M.account.lastupdate = 0;
-        }
-        window.location.hash = 'fm/account';
     }
 }
 

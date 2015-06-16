@@ -698,7 +698,7 @@ function initUI() {
         {
             // grid dropped:
             var c = $(e.target).attr('class');
-            if (c && c.indexOf('folder') > -1)
+            if (c && c.indexOf('folder') > -1 || M.currentrootid === 'contacts')
                 t = $(e.target).attr('id');
         }
 
@@ -1518,16 +1518,18 @@ function addContactUI()
     });
 
     function addContactAreaResizing() {
+        
         var txt = $('.add-user-notification textarea'),
             txtHeight = txt.outerHeight(),
             hiddenDiv = $('.add-contact-hidden'),
             pane = $('.add-user-nt-scrolling'),
             content = txt.val(),
             api;
+        
         content = content.replace(/\n/g, '<br />');
-        hiddenDiv.html(content + '<br/>');
+        hiddenDiv.html(encodeURI(content) + '<br/>');
 
-        if (txtHeight != hiddenDiv.outerHeight()) {
+        if (txtHeight !== hiddenDiv.outerHeight()) {
             txt.height(hiddenDiv.outerHeight());
 
             if ($('.add-user-textarea').outerHeight() >= 50) {
@@ -1539,6 +1541,7 @@ function addContactUI()
             }
             else {
                 api = pane.data('jsp');
+                
                 if (api) {
                     api.destroy();
                     txt.blur();
@@ -2792,21 +2795,21 @@ function accountUI()
 
                 // Check if there are any active subscriptions
                 // ccqns = Credit Card Query Number of Subscriptions
-				api_req({ a: 'ccqns' },
-				{
-					callback : function(numOfSubscriptions, ctx)
-					{
-						// If there is an active subscription
-						if (numOfSubscriptions > 0) {
-                            
+                api_req({ a: 'ccqns' },
+                {
+                    callback : function(numOfSubscriptions, ctx)
+                    {
+                        // If there is an active subscription
+                        if (numOfSubscriptions > 0) {
+
                             // Show cancel button and show cancellation dialog
                             $('.fm-account-blocks .btn-cancel').show().rebind('click', function() {
                                 cancelSubscriptionDialog.init();
                             });
-						}
-					}
-				});
-			}
+                        }
+                    }
+                });
+            }
             else if (account.stype == 'O')
             {
                 // one-time or cancelled subscription
@@ -4849,9 +4852,14 @@ function searchPath()
 function selectddUI() {
     if (M.currentdirid && M.currentdirid.substr(0, 7) == 'account')
         return false;
-    if (d)
+    if (d) {
         console.time('selectddUI');
-    $($.selectddUIgrid + ' ' + $.selectddUIitem + '.folder').droppable(
+    }
+    var dropSel = $.selectddUIgrid + ' ' + $.selectddUIitem + '.folder';
+    if (M.currentrootid === 'contacts') {
+        dropSel = $.selectddUIgrid + ' ' + $.selectddUIitem;
+    }
+    $(dropSel).droppable(
         {
             tolerance: 'pointer',
             drop: function(e, ui)
@@ -7254,20 +7262,22 @@ function initShareDialog() {
     });
 
     function shareMessageResizing() {
+        
       var txt = $('.share-message textarea'),
           txtHeight =  txt.outerHeight(),
           hiddenDiv = $('.share-message-hidden'),
           pane = $('.share-message-scrolling'),
           content = txt.val(),
           api;
+      
       content = content.replace(/\n/g, '<br />');
-      hiddenDiv.html(content + '<br/>');
+      hiddenDiv.html(encodeURI(content) + '<br/>');
 
-      if (txtHeight != hiddenDiv.outerHeight() ) {
+      if (txtHeight !== hiddenDiv.outerHeight() ) {
         txt.height(hiddenDiv.outerHeight());
 
         if( $('.share-message-textarea').outerHeight()>=50) {
-            pane.jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5});
+            pane.jScrollPane({enableKeyboardNavigation:false, showArrows:true, arrowSize:5});
             api = pane.data('jsp');
             txt.blur();
             txt.focus();
@@ -7275,6 +7285,7 @@ function initShareDialog() {
         }
         else {
             api = pane.data('jsp');
+            
             if (api) {
               api.destroy();
               txt.blur();
@@ -9485,12 +9496,6 @@ function userFingerprint(userid, next) {
     });
 }
 
-function isContactVerified(userid)
-{
-    userid = userid.u || userid;
-    return (u_authring.Ed25519[userid] || {}).method >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON;
-}
-
 function fingerprintDialog(userid)
 {
     userid = userid.u || userid;
@@ -9626,15 +9631,33 @@ function contactUI() {
         // Display the current fingerpring
         showAuthenticityCredentials();
 
-        // If the fingerprints have already been verified for the contact, show 'Verified'
-        if (isContactVerified(user)) {
-            $('.fm-verify').addClass('disabled');
-            $('.fm-verify').find('span').text(l[6776]);
+        // Set authentication state of contact from authring.
+        var authringPromise = new MegaPromise();
+        if (u_authring.Ed25519) {
+            authringPromise.resolve();
         }
         else {
-            // Otherwise show the Verify button
-            enableVerifyFingerprintsButton();
+            // First load the authentication system.
+            var authSystemPromise = authring.initAuthenticationSystem();
+            authringPromise.linkDoneAndFailTo(authSystemPromise);
         }
+        /** To be called on settled authring promise. */
+        var _setVerifiedState = function() {
+            var handle = user.u || user;
+            var verificationState = u_authring.Ed25519[handle] || {};
+            var isVerified = (verificationState.method
+                              >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON);
+            if (isVerified) {
+                // Show the user is verified.
+                $('.fm-verify').addClass('disabled');
+                $('.fm-verify').find('span').text(l[6776]);
+            }
+            else {
+                // Otherwise show the Verify button.
+                enableVerifyFingerprintsButton();
+            }
+        };
+        authringPromise.done(_setVerifiedState);
 
         // Reset seen or verified fingerprints and re-enable the Verify button
         $('.fm-reset-stored-fingerprint').rebind('click', function() {
@@ -9829,67 +9852,72 @@ function selectText(elementId) {
  * Dialog to cancel subscriptions
  */
 var cancelSubscriptionDialog = {
-    
+
     $backgroundOverlay: null,
     $dialog: null,
     $dialogSuccess: null,
     $accountPageCancelButton: null,
     $continueButton: null,
     $cancelReason: null,
-    
+
     init: function() {
-        
+
         this.$dialog = $('.cancel-subscription-st1');
         this.$dialogSuccess = $('.cancel-subscription-st2');
         this.$accountPageCancelButton = $('.fm-account-blocks .btn-cancel');
         this.$continueButton = this.$dialog.find('.continue-cancel-subscription');
         this.$cancelReason = this.$dialog.find('.cancel-textarea textarea');
         this.$backgroundOverlay = $('.fm-dialog-overlay');
-        
+
         // Show the dialog
         this.$dialog.removeClass('hidden');
         this.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
-        
+
         // Init functionality
         this.enableButtonWhenReasonEntered();
         this.initSendingReasonToApi();
         this.initCloseAndBackButtons();
     },
-    
+
     /**
      * Close the dialog when either the close or back buttons are clicked
      */
     initCloseAndBackButtons: function() {
-        
+
         // Close main dialog
         this.$dialog.find('.fm-dialog-button.cancel, .fm-dialog-close').rebind('click', function() {
             cancelSubscriptionDialog.$dialog.addClass('hidden');
             cancelSubscriptionDialog.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
         });
+
+        // Prevent clicking on the background overlay which closes it unintentionally
+        cancelSubscriptionDialog.$backgroundOverlay.rebind('click', function(event) {
+            event.stopPropagation();
+        });
     },
-    
+
     /**
      * Close success dialog
      */
     initCloseButtonSuccessDialog: function() {
-                
+
         this.$dialogSuccess.find('.fm-dialog-close').rebind('click', function() {
             cancelSubscriptionDialog.$dialogSuccess.addClass('hidden');
             cancelSubscriptionDialog.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
         });
     },
-    
+
     /**
      * Make sure text has been entered before making the button available
      */
     enableButtonWhenReasonEntered: function() {
-        
+
         this.$cancelReason.rebind('keyup', function() {
-            
+
             // Trim for spaces
             var reason = $(this).val();
                 reason = $.trim(reason);
-            
+
             // Make sure at least 1 character
             if (reason.length > 0) {
                 cancelSubscriptionDialog.$continueButton.removeClass('disabled');
@@ -9899,43 +9927,43 @@ var cancelSubscriptionDialog = {
             }
         });
     },
-    
+
     /**
      * Send the cancellation reason
      */
     initSendingReasonToApi: function() {
-        
+
         this.$continueButton.rebind('click', function() {
-            
+
             // Get the cancellation reason
             var reason = cancelSubscriptionDialog.$cancelReason.val();
-            
+
             // Hide the dialog and show loading spinner
             cancelSubscriptionDialog.$dialog.addClass('hidden');
             cancelSubscriptionDialog.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
             loadingDialog.show();
-            
+
             // Cancel the subscription/s
             // cccs = Credit Card Cancel Subscriptions, r = reason
             api_req({ a: 'cccs', r: reason }, {
                 callback: function() {
-                    
+
                     // Reset account cache and refetch all account data to display UI
                     // (note potential race condition if cancellation callback wasn't received in 7500ms)
                     M.account.lastupdate = 0;
 
                     setTimeout(function() {
-                        
+
                         // Hide loading dialog and cancel subscription button on account page
                         loadingDialog.hide();
                         cancelSubscriptionDialog.$accountPageCancelButton.hide();
-                        
+
                         // Show success dialog and refresh UI
                         cancelSubscriptionDialog.$dialogSuccess.removeClass('hidden');
                         cancelSubscriptionDialog.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
                         cancelSubscriptionDialog.initCloseButtonSuccessDialog();
                         accountUI();
-                        
+
                     }, 7500);
                 }
             });

@@ -72,16 +72,22 @@ MegaPromise.asMegaPromiseProxy  = function(p) {
  * @private
  */
 MegaPromise.getTraceableReject = function($promise, origPromise) {
-    return function(argument) {
+    // Save the current stack pointer in case of an async call behind
+    // the promise.reject (Ie, onAPIProcXHRLoad shown as initial call)
+    var preStack = mega.utils.getStack();
+
+    return function __mpTraceableReject(aResult) {
         if (window.d) {
-            var stack;
-            // try to get the stack trace
-            try {
-                throw new Error("DEBUG")
-            } catch(e) {
-                stack = e.stack;
+            var postStack = mega.utils.getStack();
+            if (typeof console.group === 'function') {
+                console.group('PROMISE REJECTED');
             }
-            console.error("Promise rejected: ", argument, origPromise, stack);
+            console.error('Promise rejected: ', aResult, origPromise);
+            console.debug('pre-Stack', preStack);
+            console.debug('post-Stack', postStack);
+            if (typeof console.groupEnd === 'function') {
+                console.groupEnd();
+            }
         }
         try {
             if (typeof $promise === 'function') {
@@ -92,7 +98,7 @@ MegaPromise.getTraceableReject = function($promise, origPromise) {
             }
         }
         catch(e) {
-            console.error('Unexpected promise error: ', e);
+            console.error('Unexpected promise error: ', e, preStack);
         }
     };
 };

@@ -45,7 +45,7 @@ function sync_switchOS(os)
 	$('.linuxhint').hide();
 	$('.sync-button').attr('href','');
 	$('.sync-button-block.linux').addClass('hidden');
-	syncurl = megasync.getDownloadUrl(os);
+	syncurl = megasync.getMegaSyncUrl(os);
 	if (os == 'windows')
 	{
 		$('.sync-button-txt.small').text(l[1158]);			
@@ -167,8 +167,8 @@ function changeLinux(i)
 		var platform = '64';		
 		var c = $('.linux32').parent().attr('class');
 		if (c && c.indexOf('radioOn') > -1) platform = '32';
-		syncurl = megasync.getDownloadUrl(linuxsync[i]['name'] + " " + platform);
-		nautilusurl =  megasync.getDownloadUrl(linuxsync[i]['name'] + " " + platform + "n");
+		syncurl = megasync.getMegaSyncUrl(linuxsync[i]['name'] + " " + platform);
+		nautilusurl =  megasync.getMegaSyncUrl(linuxsync[i]['name'] + " " + platform + "n");
 		var filename = syncurl.split('/').pop();
 		$('.sync-button').attr('href',syncurl);
 		$('.sync-bottom-txt.linux-txt a').attr('href',nautilusurl);

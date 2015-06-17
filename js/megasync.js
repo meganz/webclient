@@ -5,6 +5,8 @@ function MegaSync()
     this._enabled = false;
     this._version = 0;
     this._api({a: "v"});
+    this._lastDownload = null;
+    this._retryTimer = null;
     this._prepareDownloadUrls();
 }
 
@@ -12,6 +14,12 @@ MegaSync.prototype.getLinuxReleases = function() {
     return this._linuxsync;
 };
 
+/**
+ *  Prepare all the URLs for the different OS/distros 
+ *  that megasync supports.
+ *  Moved this logic from HTML/js/sync.js to here to keep 
+ *  this in a single file
+ */
 MegaSync.prototype._prepareDownloadUrls = function() {
 	this._linuxsync =  [{
 		'name':'CentOS 7.0',
@@ -179,7 +187,7 @@ MegaSync.prototype._prepareDownloadUrls = function() {
     this._clients = clients;
 };
 
-MegaSync.prototype.getDownloadUrl = function(os) {
+MegaSync.prototype.getMegaSyncUrl = function(os) {
     if (!os) {
 	    var pf = navigator.platform.toUpperCase();
         if (pf.indexOf('MAC')>=0) {
@@ -190,34 +198,41 @@ MegaSync.prototype.getDownloadUrl = function(os) {
             os = "windows";
         }
     }
-    console.error(os, this._clients[os]);
     return this._clients[os] ||  this._clients['windows'];;
 };
 
 MegaSync.prototype.handle_v = function(version) {
     this._enabled = true;
     this._version = version;
+    if (this._lastDownload) {
+        this.download(this._lastDownload[0], this._lastDownload[1]);
+    }
 };
 
 MegaSync.prototype.download = function(pubkey, privkey) {
+    this._lastDownload = [pubkey, privkey];
     if (!this._enabled) {
-        return false;
+        return this.downloadClient();
     }
 
     this._api({a: "l", h: pubkey, k: privkey});
     return true;
 };
 
+MegaSync.prototype._on_error = function() {
+    this._enabled = false;
+    return this.downloadClient();
+};
+
 MegaSync.prototype.handle = function(response) {
     if (response === 0) {
         // alright!
-        return;
+        clearInterval(this._retryTimer);
+        return $('.megasync-overlay').hide();
     }
 
     if (typeof response != "object") {
-        // some error
-        this._enabled = false;
-        return;
+        return this._on_error();
     }
 
     for (var i in response) {
@@ -226,7 +241,33 @@ MegaSync.prototype.handle = function(response) {
 };
 
 MegaSync.prototype._api = function(args) {
-    $.post(this._url, JSON.stringify(args), this.handle.bind(this), "json");
+    $.post(this._url, JSON.stringify(args), this.handle.bind(this), "json")
+        .fail(this._on_error.bind(this));
 };
+
+MegaSync.prototype.downloadClient = function() {
+    if (!this._lastDownload){
+        // An error happened but did not try to download
+        // so we can discard this error
+        return;
+    }
+    var overlay = $('.megasync-overlay');
+    var url = this.getMegaSyncUrl();
+    if (overlay.is(":visible")) {
+        return true;
+    }
+    this._retryTimer = setInterval((function() {
+        // retry!
+        this._api({a: "v"});
+    }).bind(this), 500);
+    overlay.show();
+
+    if (url === '') {
+        // It's linux!
+    } else {
+        window.location = url;
+    }
+};
+
 
 var megasync = new MegaSync;

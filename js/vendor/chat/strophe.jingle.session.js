@@ -103,17 +103,21 @@ initiate: function(isInitiator) {
     };
     this.peerconnection.onsignalingstatechange = function (event) {
         if (!(self && self.peerconnection)) return;
-//        console.log('signallingstate ', self.peerconnection.signalingState, event);
+            console.log('Signalling state change to', self.peerconnection.signalingState);
     };
     this.peerconnection.oniceconnectionstatechange = function (event) {
         if (!(self && self.peerconnection)) return;
-        console.log('iceconnectionstatechange', self.peerconnection.iceConnectionState, event);
-        if (self.peerconnection.iceConnectionState === 'disconnected') {
-            if (self.state != 'ended') {
-                self.jingle.terminate(self, "ice-disconnect");
+        console.log('ICE connstate changed to', self.peerconnection.iceConnectionState);
+        var state = self.peerconnection.iceConnectionState;
+        if (self.state !== 'ended') {
+            if (state == 'disconnected') {
+                self.jingle.terminate(self, 'ice-disconnect');
+            }
+            else if (state == 'failed') {
+                self.jingle.terminate(self, 'ice-fail');
             }
         }
-        self.jingle.onIceConnStateChange.call(self.eventHandler, self, event);
+        self.jingle.onIceConnStateChange.call(self.eventHandler, self, event); //does nothing
     };
 },
 

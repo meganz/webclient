@@ -4749,6 +4749,10 @@ function execsc(actionPackets, callback) {
                             k: n.k
                         };
                         crypto_processkey(u_handle, u_k_aes, f);
+                        if (f.ar) {
+                            // Bug #1983: No-Key issue.
+                            n.ar = f.ar;
+                        }
                         M.nodeAttr({
                             h: nodes[i],
                             name: f.name,
@@ -5189,7 +5193,39 @@ function fm_getcopynodes(cn, t)
         var n = M.d[r[i]];
         if (n)
         {
-            var ar = n.ar && clone(n.ar) || {};
+            var ar;
+            if (!n.ar) {
+                console.warn('Something went wrong, missing node attr - trying to fix in the run...');
+                crypto_processkey(u_handle, u_k_aes, n);
+            }
+            if (n.ar) {
+                ar = clone(n.ar);
+            }
+            else {
+                var cnt = 0;
+                ar = {};
+                if (n.name) {
+                    ar.n = n.name;
+                    cnt++;
+                }
+                if (n.mtime) {
+                    ar.t = n.mtime;
+                    cnt++;
+                }
+                if (n.hash) {
+                    ar.c = n.hash;
+                    cnt++;
+                }
+                else if (n.t) {
+                    cnt++;
+                }
+                if (cnt !== 3) {
+                    console.error('Missing node attr property...', ar, n);
+                }
+                else {
+                    console.log('Missing node attr restored manually...');
+                }
+            }
             if (typeof ar.fav !== 'undefined') delete ar.fav;
             var mkat = enc_attr(ar,n.key);
             var attr = ab_to_base64(mkat[0]);

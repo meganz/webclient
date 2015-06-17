@@ -57,15 +57,23 @@ function hasQuota(filesize, next) {
             if (!$.lastlimit) {
                 $.lastlimit = 0;
             }
-            $('.bandwidth-dialog .bandwidth-used').html(bytesToSize(r.used));
+            
+            // Translate bottom right text block of bandwidth dialog
+            var $bottomRightText = $('.bandwidth-dialog .bandwidth-text-bl.second');
+            var text = $bottomRightText.html().replace('[A]', '<span class="red">').replace('[/A]', '</span>');
+            text = text.replace('%1', '<strong class="bandwidth-used">' + bytesToSize(r.used) + '</strong>');
+            $bottomRightText.html(text);
             
             var minutes = Math.ceil(r.sec / 60);
-            if (minutes == 1) {
-                $('.bandwidth-dialog .bandwidth-minutes').html(l[5838]);
+            var minutesText = l[5838];
+            if (minutes != 1) {
+                minutesText = l[5837].replace('[X]', minutes);
             }
-            else {
-                $('.bandwidth-dialog .bandwidth-minutes').html(l[5837].replace('[X]', minutes));
-            }
+            
+            // Translate header text of bandwidth dialog
+            var $header = $('.bandwidth-dialog .bandwidth-header');
+            var headerText = $header.html().replace('%1', '<span class="bandwidth-minutes">' + minutesText + '</span>');
+            $header.html(headerText);
 
             bandwidthDialog();
 

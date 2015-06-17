@@ -66,6 +66,9 @@ function dl_g(res)
                 $(this).removeClass('active');
             }
         });
+        $('.new-download-sync-app').rebind('click', function(e) {
+            megasync.download(dlpage_ph, dlpage_key);
+        });
         $('.new-download-red-button').unbind('click');
         $('.new-download-red-button').bind('click',function(e)
         {

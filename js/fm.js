@@ -172,8 +172,8 @@ function bandwidthDialog(close) {
         $bandwidthDialog.find('.membership-button').rebind('click', function() {
             
             // Get the plan number and redirect to pro step 2
-            var planNum = $(this).closest('.reg-st3-membership-bl').attr('data-payment');            
-            document.location.hash = 'pro2?plan=' + planNum;
+            var planId = $(this).closest('.reg-st3-membership-bl').attr('data-payment');            
+            document.location.hash = 'pro&planNum=' + planId;
         });
         
         // Show the dialog

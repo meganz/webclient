@@ -19,14 +19,14 @@ function init_pro()
     else {
         $('body').addClass('pro');
     }
-
-    if (u_type == 3)
-    {
-        // Flag 'pro : 1' includes pro balance in the response
-        //api_req({ a : 'uq', pro : 1 }, {
+    
+    if (u_type == 3) {
+        
+        // Flag 'pro: 1' includes pro balance in the response
+        // Flag 'strg: 1' includes current account storage in the response
         api_req({ a: 'uq', strg: 1, pro: 1 }, {
-            callback : function (result)
-            {
+            callback : function (result) {
+                
                 // Store current account storage usage for checking later
                 proPage.currentStorageBytes = result.cstrg;
                 
@@ -50,7 +50,7 @@ function init_pro()
 
     if (!m)
     {
-        $('.membership-button').rebind('click', function() {
+        $('.membership-step1 .membership-button').rebind('click', function() {
             
             var $planBlocks = $('.reg-st3-membership-bl');
             var $selectedPlan = $(this).closest('.reg-st3-membership-bl');
@@ -76,6 +76,8 @@ function init_pro()
             return false;
         });
         
+        loadingDialog.show();
+        
         // Get the membership plans. This call will return an array of arrays. Each array contains this data:
         // [api_id, account_level, storage, transfer, months, price, currency, description, ios_id, google_id]
         // More data can be retrieved with 'f : 1'
@@ -94,6 +96,11 @@ function init_pro()
                 if (pro_do_next) {
                     pro_do_next();
                 }
+                
+                // Check if they have preselected the plan and go straight to the next step
+                proPage.checkForPreselectedPlan();
+                
+                loadingDialog.hide();
             }
         });
 
@@ -242,7 +249,52 @@ var proPage = {
                 document.location.hash = 'contact';
             });            
         }
-    }    
+    },
+    
+    /**
+     * Checks if a plan has already been selected e.g. they came from the bandwidth quota dialog
+     */
+    checkForPreselectedPlan: function() {
+        
+        var planNum = this.getUrlParam('planNum');
+        
+        // If the plan number is preselected
+        if (planNum) {
+            
+            var $selectedPlan = $('.membership-step1 .reg-st3-membership-bl.pro' + planNum);
+            var $stageTwoSelectedPlan = $('.membership-step2 .membership-selected-block');
+
+            account_type_num = $selectedPlan.attr('data-payment');
+            
+            // Clear to prevent extra clicks showing multiple
+            $stageTwoSelectedPlan.html($selectedPlan.clone());
+            
+            var proPlanName = $selectedPlan.find('.reg-st3-bott-title.title').html();
+            $('.membership-step2 .pro span').html(proPlanName);
+            
+            // Update header text with plan
+            var $selectedPlanHeader = $('.membership-step2 .main-italic-header.pro');
+            var selectedPlanText = $selectedPlanHeader.html().replace('%1', proPlanName);
+            $selectedPlanHeader.html(selectedPlanText);
+            
+            // Continue to step 2
+            pro_next_step();
+        }
+    },
+    
+    /**
+     * Gets a parameter from the URL e.g. https://mega.nz/#pro&planNum=4
+     * @param {String} paramToGet Name of the parameter to get e.g. 'planNum'
+     * @returns {String|undefined} Returns the string '4' if it exists, or undefined if not
+     */
+    getUrlParam: function(paramToGet) {
+        
+        var hash = location.hash.substr(1);
+        var index = hash.indexOf(paramToGet + '=');
+        var param = hash.substr(index).split('&')[0].split('=')[1];
+        
+        return param;
+    }
 };
 
 /**
@@ -705,17 +757,17 @@ function pro_pay()
     }
 
     // Only show loading dialog if needing to setup bitcoin invoice
-    if (!ul_uploading && !downloading && (pro_paymentmethod === 'bitcoin')) {
+    if (pro_paymentmethod === 'bitcoin') {
         showLoadingDialog();
     }
     
     // Otherwise if credit card payment, show bouncing coin while loading
-    else if (!ul_uploading && !downloading && (pro_paymentmethod === 'credit-card')) {
+    else if (pro_paymentmethod === 'credit-card') {
         cardDialog.showLoadingOverlay();
     }
     
     // Otherwise if Union Pay payment, show bouncing coin while loading
-    else if (!ul_uploading && !downloading && (pro_paymentmethod === 'union-pay')) {
+    else if (pro_paymentmethod === 'union-pay') {
         unionPay.showLoadingOverlay();
     }
     

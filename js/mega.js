@@ -5374,6 +5374,8 @@ function doShare(h, targets, dontShowShareDialog) {
     return $promise;
 }
 
+
+// ToDo: Absolute, not used
 function doshare2(nodeHandle, t, dontShowShareDialog, msg)
 {
     // ToDo: wait for msg and implement it

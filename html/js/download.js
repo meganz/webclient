@@ -133,7 +133,7 @@ function dl_g(res)
             }
             if (1 > l) $('.new-download-file-title').text(str_mtrunc(n,60));
             $('.new-download-file-size').text(bytesToSize(res.s));
-            $('.new-download-file-icon').addClass(fileicon({name:fdl_file.n}));
+            $('.new-download-file-icon').addClass(fileIcon({name:fdl_file.n}));
         }
         else mKeyDialog(dlpage_ph);
     }

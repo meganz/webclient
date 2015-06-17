@@ -863,7 +863,7 @@ function initUI() {
         }
     };
     InitFileDrag();
-    createfolderUI();
+    createFolderUI();
     cSortMenuUI();
     M.buildSubmenu();
     initContextUI();
@@ -2566,19 +2566,21 @@ function cSortMenuUI()
     });
 }
 
-function createfolderUI() {
-    $('.fm-new-folder').unbind('click');
-    $('.fm-new-folder').bind('click', function(e) {
-        var c = $('.fm-new-folder').attr('class');
-        var c2 = $(e.target).attr('class');
-        var c3 = $(e.target).parent().attr('class');
-        var b1 = $('.fm-new-folder');
+function createFolderUI() {
+    
+    $('.fm-new-folder').rebind('click', function(e) {
+        
+        var c = $('.fm-new-folder').attr('class'),
+            c2 = $(e.target).attr('class'),
+            c3 = $(e.target).parent().attr('class'),
+            b1 = $('.fm-new-folder');
+            
         $('.create-new-folder').removeClass('filled-input');
         var d1 = $('.create-new-folder');
-        if ((!c2 || c2.indexOf('fm-new-folder') == -1) && (!c3 || c3.indexOf('fm-new-folder') == -1)) {
+        if ((!c2 || c2.indexOf('fm-new-folder') === -1) && (!c3 || c3.indexOf('fm-new-folder') === -1)) {
             return false;
         }
-        if (c.indexOf('active') == -1) {
+        if (c.indexOf('active') === -1) {
             b1.addClass('active');
             d1.removeClass('hidden');
             var w1 = $(window).width() - $(this).offset().left - d1.outerWidth() + 2;
@@ -2588,7 +2590,8 @@ function createfolderUI() {
                 d1.css('right', 8 + 'px');
             }
             $('.create-new-folder input').focus();
-        } else {
+        }
+        else {
             b1.removeClass('active filled-input');
             d1.addClass('hidden');
             $('.fm-new-folder input').val(l[157]);
@@ -2596,14 +2599,12 @@ function createfolderUI() {
         $.hideContextMenu();
     });
 
-    $('.create-folder-button').unbind('click');
-    $('.create-folder-button').bind('click', function(e) {
-        docreatefolderUI(e);
+    $('.create-folder-button').rebind('click', function(e) {
+        doCreateFolderUI(e);
         return false;
     });
 
-    $('.create-folder-button-cancel').unbind('click');
-    $('.create-folder-button-cancel').bind('click', function() {
+    $('.create-folder-button-cancel').rebind('click', function() {
         $('.fm-new-folder').removeClass('active');
         $('.create-new-folder').addClass('hidden');
         $('.create-new-folder').removeClass('filled-input');
@@ -2649,7 +2650,7 @@ function createfolderUI() {
             $('.create-new-folder').removeClass('filled-input');
         }
         if (e.which == 13) {
-            docreatefolderUI(e);
+            doCreateFolderUI(e);
         }
     });
 
@@ -2670,9 +2671,9 @@ function createfolderUI() {
     });
 }
 
-function docreatefolderUI(e) {
+function doCreateFolderUI() {
     
-    if ($('.create-folder-input-bl input').val() == '') {
+    if ($('.create-folder-input-bl input').val() === '') {
         $('.create-folder-input-bl input').animate({backgroundColor: "#d22000"}, 150, function() {
             $('.create-folder-input-bl input').animate({backgroundColor: "white"}, 350, function() {
                 $('.create-folder-input-bl input').focus();

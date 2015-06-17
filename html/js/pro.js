@@ -76,6 +76,8 @@ function init_pro()
             return false;
         });
         
+        // Show loading spinner because some stuff may not be rendered properly yet, or
+        // it may quickly switch to the pro_payment_method page if they have preselected a plan
         loadingDialog.show();
         
         // Get the membership plans. This call will return an array of arrays. Each array contains this data:
@@ -92,14 +94,15 @@ function init_pro()
                 
                 // Check which plans are applicable or grey them out if not
                 proPage.checkApplicablePlans();
-
+                
+                // Check if they have preselected the plan (e.g. from bandwidth dialog) and go straight to the next step
+                proPage.checkForPreselectedPlan();
+                                
                 if (pro_do_next) {
                     pro_do_next();
                 }
                 
-                // Check if they have preselected the plan and go straight to the next step
-                proPage.checkForPreselectedPlan();
-                
+                // Close loading spinner
                 loadingDialog.hide();
             }
         });
@@ -461,7 +464,7 @@ function initPaymentMethodRadioOptions(html) {
 function pro_next_step() {
 
     // Add history so the back button works to go back to choosing their plan
-    history.pushState('', 'MEGA - Choose plan', '#pro2');
+    history.pushState('', 'MEGA - Choose plan', '#propay');
 
     if (!u_handle) {
         megaAnalytics.log("pro", "loginreq");

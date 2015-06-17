@@ -900,7 +900,7 @@ function MegaData()
         function renderLayout(u, n_cache) {
             var html, el, cs, contains, u_h, av_meta, t, el, time, bShare,
                 avatar, av_color, rights, rightsclass, onlinestatus, html,
-                sExportLink,
+                sExportLink, sLinkIcon,
                 iShareNum = 0,
                 s = '',
                 ftype = '',
@@ -1041,6 +1041,7 @@ function MegaData()
                         || M.ps[M.v[i].h])
                         ? true : false;
                     sExportLink = (M.v[i].shares && M.v[i].shares.EXP) ? 'linked' : '';
+                    sLinkIcon = (sExportLink === '') ? '' : 'link-icon';
                     
                     // Block view
                     if (M.viewmode === 1) {
@@ -1048,12 +1049,12 @@ function MegaData()
                         el = 'a';
                         html = '<a class="file-block' + c + ' ' + sExportLink + '" id="' + htmlentities(M.v[i].h) + '">\n\
                                     <span class="file-status-icon' + star + '"></span>\n\
-									<span class="link-icon"></span>\n\
+									<span class="' + sLinkIcon + '"></span>\n\
                                     <span class="file-settings-icon">\n\
                                         <span></span>\n\
                                     </span>\n\
                                     <span class="file-icon-area">\n\
-                                        <span class="block-view-file-type ' + fileicon(M.v[i]) + '"><img alt="" /></span>\n\
+                                        <span class="block-view-file-type ' + fileIcon({t: M.v[i].t, share: bShare}) + '"><img alt="" /></span>\n\
                                     </span>\n\
                                     <span class="file-block-title">' + htmlentities(M.v[i].name) + '</span>\n\
                                 </a>';
@@ -1069,7 +1070,7 @@ function MegaData()
                                         <span class="grid-status-icon' + star + '"></span>\n\
                                     </td>\n\
                                     <td>\n\
-                                        <span class="transfer-filtype-icon ' + fileicon(M.v[i]) + '"> </span>\n\
+                                        <span class="transfer-filtype-icon ' + fileIcon({t: M.v[i].t, share: bShare}) + '"> </span>\n\
                                         <span class="tranfer-filetype-txt">' + htmlentities(M.v[i].name) + '</span>\n\
                                     </td>\n\
                                     <td width="100">' + s + '</td>\n\
@@ -1079,7 +1080,7 @@ function MegaData()
                                         <a class="grid-url-arrow">\n\
                                             <span></span>\n\
                                         </a>\n\
-										<span class="link-icon"></span>\n\
+										<span class="' + sLinkIcon + '"></span>\n\
                                     </td>\n\
                                 </tr>';
                     }
@@ -1897,11 +1898,12 @@ function MegaData()
                     }
                     else {
                         var sExportLink = (M.d[folders[ii].h].shares && M.d[folders[ii].h].shares.EXP) ? 'linked' : '';
+                        var sLinkIcon = (sExportLink === '') ? '' : 'link-icon';
                         var html = '<li id="' + _li + folders[ii].h + '">\n\
-                                        <span class="nw-fm-tree-item ' + containsc + ' ' + expandedc + ' ' + openedc + ' ' + sExportLink +  '" id="' + _a + htmlentities(folders[ii].h) + '">\n\
+                                        <span  id="' + _a + htmlentities(folders[ii].h) + '" class="nw-fm-tree-item ' + containsc + ' ' + expandedc + ' ' + openedc + ' ' + sExportLink + '">\n\
                                             <span class="nw-fm-arrow-icon"></span>\n\
                                             <span class="nw-fm-tree-folder' + sharedfolder + '">' + htmlentities(folders[ii].name) + '</span>\n\
-											<span class="link-icon"></span>\n\
+											<span class="' + sLinkIcon + '"></span>\n\
                                         </span>\n\
                                         <ul id="' + _sub + folders[ii].h + '" ' + ulc + '></ul>\n\
                                     </li>';
@@ -3333,6 +3335,7 @@ function MegaData()
     };
 
     this.getLinks = function(h) {
+        
         function getLinksDone() {
             for (var i in links) {
                 api_req({a: 'l', n: links[i]}, {
@@ -3352,7 +3355,8 @@ function MegaData()
                 });
             }
         }
-        function getFolderlinks() {
+        
+        function getFolderLinks() {
 
             if (folderLinks.length > 0) {
                 var node = M.d[folderLinks.shift()];
@@ -3360,7 +3364,7 @@ function MegaData()
                 if (node) {
                     if (node.shares
                             && node.shares['EXP']) {
-                        getFolderlinks();
+                        getFolderLinks();
                     }
                     else {
                         var childNodes = fm_getnodes(node.h);
@@ -3375,14 +3379,14 @@ function MegaData()
                                         // ToDo: timestamp ts can be different here and on server side, check how this influence execution
                                         M.nodeShare(ctx.fln, {h: ctx.fln, r: 0, u: 'EXP', ts: Math.floor(Date.now() / 1000)});
                                     }
-                                    getFolderlinks();
+                                    getFolderLinks();
                                 }
                             }
                         );
                     }
                 }
                 else {
-                    getFolderlinks();
+                    getFolderLinks();
                 }
             }
             else {
@@ -3407,7 +3411,7 @@ function MegaData()
             console.log('getLinks', links);
         }
         if (folderLinks.length > 0) {
-            getFolderlinks();
+            getFolderLinks();
         }
         else {
             getLinksDone();
@@ -3600,7 +3604,7 @@ function MegaData()
                 if (!z)
                     this.addToTransferTable('<tr id="dl_' + htmlentities(n.h) + '">'
                         + '<td><span class="row-number"></span></td>'
-                        + '<td><span class="transfer-filtype-icon ' + fileicon(n) + '"></span><span class="tranfer-filetype-txt">' + htmlentities(n.name) + '</span></td>'
+                        + '<td><span class="transfer-filtype-icon ' + fileIcon(n) + '"></span><span class="tranfer-filetype-txt">' + htmlentities(n.name) + '</span></td>'
                         + '<td><span class="transfer-type download ' + p + '">' + l[373] + '<span class="speed"></span></span>' + flashhtml + '</td>'
                         + '<td></td>'
                         + '<td>' + bytesToSize(n.s) + '</td>'
@@ -3622,7 +3626,7 @@ function MegaData()
         if (z && zipsize)
             this.addToTransferTable('<tr id="zip_' + zipid + '">'
                 + '<td><span class="row-number"></span></td>'
-                + '<td><span class="transfer-filtype-icon ' + fileicon({name: 'archive.zip'}) + '"></span><span class="tranfer-filetype-txt">' + htmlentities(zipname) + '</span></td>'
+                + '<td><span class="transfer-filtype-icon ' + fileIcon({name: 'archive.zip'}) + '"></span><span class="tranfer-filetype-txt">' + htmlentities(zipname) + '</span></td>'
                 + '<td><span class="transfer-type download' + p + '">' + l[373] + '<span class="speed"></span></span>' + flashhtml + '</td>'
                 + '<td></td>'
                 + '<td>' + bytesToSize(zipsize) + '</td>'
@@ -4008,39 +4012,41 @@ function MegaData()
     };
 
     var __ul_id = 8000;
-    this.addUpload = function(u, ignoreWarning)
-    {
+    this.addUpload = function(u, ignoreWarning) {
+        
         /*if (u.length > 99 && !ignoreWarning) {
             if (UploadManager.warning(M.addUpload.bind(M, u, true))) {
                 return;
             }
         }*/
-        var target = $.onDroppedTreeFolder || M.currentdirid, onChat;
+        var target = $.onDroppedTreeFolder || M.currentdirid, onChat,
+            f, ul_id, pause;
         delete $.onDroppedTreeFolder;
 
-        if ((onChat = (M.currentdirid && M.currentdirid.substr(0, 4) === 'chat')))
-        {
-            if (!$.ulBunch)
+        if ((onChat = (M.currentdirid && M.currentdirid.substr(0, 4) === 'chat'))) {
+            if (!$.ulBunch) {
                 $.ulBunch = {};
-            if (!$.ulBunch[M.currentdirid])
+            }
+            if (!$.ulBunch[M.currentdirid]) {
                 $.ulBunch[M.currentdirid] = {};
+            }
         }
 
-        for (var i in u)
-        {
-            var f = u[i];
-            var ul_id = ++__ul_id;
-            if (!f.flashid)
+        for (var i in u) {
+            f = u[i];
+            ul_id = ++__ul_id;
+            if (!f.flashid) {
                 f.flashid = false;
+            }
             f.target = target;
             f.id = ul_id;
 
-            var p = ui_paused ? 'paused' : ''
+            pause = ui_paused ? 'paused' : '';
             this.addToTransferTable(
                 '<tr id="ul_' + ul_id + '">'
                 + '<td><span class="row-number"></span></td>'
-                + '<td><span class="transfer-filtype-icon ' + fileicon({name: f.name}) + '"></span><span class="tranfer-filetype-txt">' + htmlentities(f.name) + '</span></td>'
-                + '<td><span class="transfer-type upload ' + p + '">' + l[372] + '<span class="speed"></span></span></td>'
+                + '<td><span class="transfer-filtype-icon ' + fileIcon({name: f.name}) + '"></span><span class="tranfer-filetype-txt">' + htmlentities(f.name) + '</span></td>'
+                + '<td><span class="transfer-type upload ' + pause + '">' + l[372] + '<span class="speed"></span></span></td>'
                 + '<td></td>'
                 + '<td>' + bytesToSize(f.size) + '</td>'
                 + '<td><span class="transfer-status queued">Queued</span></td>'
@@ -4048,15 +4054,17 @@ function MegaData()
                 );
             ul_queue.push(f);
 
-            if (onChat)
+            if (onChat) {
                 $.ulBunch[M.currentdirid][ul_id] = 1;
+            }
         }
         if (page == 'start') {
             ulQueue.pause();
             uldl_hold = false; /* this isn't a pause generated by the UI */
         }
-        else
+        else {
             openTransferpanel();
+        }
 
         setupTransferAnalysis();
         if ((ul_uploading = !!ul_queue.length)) {

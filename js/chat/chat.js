@@ -1458,7 +1458,7 @@ Chat.prototype._generateIncomingRtcFileMessage = function(room, filesList, sessi
 
         var $file = $('<div class="nw-chat-sharing-body main-body">' +
             '<div class="nw-chat-icons-area">' +
-            '<span class="block-view-file-type ' + fileicon({name: name})+ '"></span>' +
+            '<span class="block-view-file-type ' + fileIcon({name: name})+ '"></span>' +
             '</div>' +
             '<div class="nw-chat-sharing-filename">' +
             name +

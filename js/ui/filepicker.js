@@ -426,7 +426,7 @@
             if(n.t == 0) {
                 // is file
                 $('.transfer-filtype-icon', $newNode).addClass(
-                    fileicon(n)
+                    fileIcon(n)
                 );
             } else {
                 $newNode.addClass("folder");

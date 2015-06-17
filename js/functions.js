@@ -1660,7 +1660,7 @@ function CreateWorkers(url, message, size) {
 function mKeyDialog(ph, fl) {
     $('.new-download-buttons').addClass('hidden');
     $('.new-download-file-title').text(l[1199]);
-    $('.new-download-file-icon').addClass(fileicon({
+    $('.new-download-file-icon').addClass(fileIcon({
         name: 'unknown.unknown'
     }));
     $('.fm-dialog.dlkey-dialog').removeClass('hidden');

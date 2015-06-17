@@ -1395,8 +1395,8 @@ function sharedUInode(nodeHandle) {
         }
     }
     
-    $('.grid-table.fm #' + nodeHandle + ' .transfer-filtype-icon').addClass(fileicon({t: 1, share: bAvailShares}));
-    $('.file-block#' + nodeHandle + ' .block-view-file-type').addClass(fileicon({t: 1, share: bAvailShares}));
+    $('.grid-table.fm #' + nodeHandle + ' .transfer-filtype-icon').addClass(fileIcon({t: 1, share: bAvailShares}));
+    $('.file-block#' + nodeHandle + ' .block-view-file-type').addClass(fileIcon({t: 1, share: bAvailShares}));
     
     if (!bAvailShares) {
         $('#treea_' + nodeHandle + ' .nw-fm-tree-folder').removeClass('shared-folder');
@@ -2238,44 +2238,41 @@ function initContextUI()
         }
     });
 
-    $(c + '.folder-item, ' + c + '.cloud-item').unbind('click');
-    $(c + '.folder-item, ' + c + '.cloud-item').bind('click', function(e)
-    {
-        if (!$(this).is('.disabled'))
-        {
-            var t = $(this).attr('id').replace('fi_', '');
-            var n = [];
-            for (var i in $.selected)
-                if (!isCircular($.selected[i], t))
+    $(c + '.folder-item, ' + c + '.cloud-item').rebind('click', function() {
+        
+        var t = $(this).attr('id').replace('fi_', ''),
+            n = [];
+        if (!$(this).is('.disabled')) {
+            for (var i in $.selected) {
+                if (!isCircular($.selected[i], t)) {
                     n.push($.selected[i]);
+                }
+            }
             $.hideContextMenu();
             M.moveNodes(n, t);
         }
     });
+    
     // Not sure if this will work
 //    $(c + '.folder-item.disabled, ' + c + '.cloud-item.disabled').off('click');
 
-    $(c + '.download-item').unbind('click');
-    $(c + '.download-item').bind('click', function(event)
-    {
+    $(c + '.download-item').rebind('click', function(event) {
         var c = $(event.target).attr('class');
         if (c && c.indexOf('contains-submenu') > -1)
             M.addDownload($.selected);
     });
 
-    $(c + '.download-standart-item').unbind('click');
-    $(c + '.download-standart-item').bind('click', function(event)
-    {
+    $(c + '.download-standart-item').rebind('click', function() {
         M.addDownload($.selected);
     });
 
-    $(c + '.zipdownload-item').unbind('click');
-    $(c + '.zipdownload-item').bind('click', function(event)
-    {
+    $(c + '.zipdownload-item').rebind('click', function() {
         M.addDownload($.selected, true);
     });
 
     $(c + '.getlink-item').rebind('click', function() {
+        
+        var selectedNodeHandle;
         
         if ($.propertiesDialog) {
             propertiesDialog(1);
@@ -2284,7 +2281,19 @@ function initContextUI()
             ephemeralDialog(l[1005]);
         }
         else {
-            M.getLinks($.selected).done(function() {
+            selectedNodeHandle = $.selected;
+            M.getLinks(selectedNodeHandle).done(function() {
+                
+                $('#' + selectedNodeHandle + ' .own-data').addClass('linked');
+                
+                // Add class to the second from the list, prevent failure of the arrow icon
+                $('#' + selectedNodeHandle + ' .own-data span').eq(1).addClass('link-icon');
+                
+                $('#treea_' + selectedNodeHandle).addClass('linked');
+                
+                // Add class to the third from the list
+                $('#treea_' + selectedNodeHandle + ' span').eq(2).addClass('link-icon');
+                
                 linksDialog();
             });
         }
@@ -2310,33 +2319,38 @@ function initContextUI()
 
                     M.delNodeShare(selectedNodeHandle, 'EXP');
                     M.deleteExportLinkShare(selectedNodeHandle);
+                    
+                    // Remove link icon from canvas
+                    $('#' + selectedNodeHandle + ' .own-data').removeClass('linked');
+                    $('#' + selectedNodeHandle + ' .own-data span').removeClass('link-icon');
+                    $('#treeli_' + selectedNodeHandle + ' span').removeClass('linked link-icon');
                 }
             }
         }
     });
     
-    $(c + '.rename-item').unbind('click');
-    $(c + '.rename-item').bind('click', function(event)
-    {
+    $(c + '.rename-item').rebind('click', function() {
         renameDialog();
     });
 
-    $(c + '.move-item').unbind('click');
-    $(c + '.move-item').bind('click', function(event)
-    {
+    $(c + '.move-item').rebind('click', function() {
         $.mctype = 'move';
         mcDialog();
     });
 
     $(c + '.sh4r1ng-item').rebind('click', function() {
+        
+        var $shareDialog = $('.share-dialog');
+
         if (u_type === 0) {
             ephemeralDialog(l[1006]);
-        } else {
-            $.dialog = 'share';// this is used like identifier when key with key code 27 is pressed
+        }
+        else {
+            // this is used like identifier when key with key code 27 is pressed
+            $.dialog = 'share';
             $.hideContextMenu();
 
             // Show the share dialog
-            var $shareDialog = $('.share-dialog');
             $shareDialog.removeClass('hidden');
             $('.export-links-warning').removeClass('hidden');
 
@@ -4856,7 +4870,7 @@ function searchPath()
                     c = '';
                     name = n.name;
                     if (n.t) c = 'folder';
-                    else iconimg = '<span class="search-path-icon-span ' + fileicon(n) + '"></span>';
+                    else iconimg = '<span class="search-path-icon-span ' + fileIcon(n) + '"></span>';
                 }
                 if (id)
                 {
@@ -4940,7 +4954,7 @@ function selectddUI() {
                     if (n) {
                         $.selected.push(id);
                         if (max > i) {
-                            html.push('<div class="transfer-filtype-icon ' + fileicon(n) + ' tranfer-filetype-txt dragger-entry">' + str_mtrunc(htmlentities(n.name)) + '</div>');
+                            html.push('<div class="transfer-filtype-icon ' + fileIcon(n) + ' tranfer-filetype-txt dragger-entry">' + str_mtrunc(htmlentities(n.name)) + '</div>');
                         }
                     }
                 });
@@ -5948,7 +5962,7 @@ function treeUI()
                 if (id)
                     id = id.replace('treea_', '');
                 if (id && M.d[id])
-                    html = ('<div class="transfer-filtype-icon ' + fileicon(M.d[id]) + ' tranfer-filetype-txt dragger-entry">' + str_mtrunc(htmlentities(M.d[id].name)) + '</div>');
+                    html = ('<div class="transfer-filtype-icon ' + fileIcon(M.d[id]) + ' tranfer-filetype-txt dragger-entry">' + str_mtrunc(htmlentities(M.d[id].name)) + '</div>');
                 $('#draghelper .dragger-icon').remove();
                 $('#draghelper .dragger-content').html(html);
                 $('body').addClass('dragging');
@@ -6288,85 +6302,88 @@ function fm_showoverlay() {
     $('body').addClass('overlayed');
 }
 
-function renameDialog()
-{
-    if ($.selected.length > 0)
-    {
+function renameDialog() {
+    
+    if ($.selected.length > 0) {
         $.dialog = 'rename';
         $('.rename-dialog').removeClass('hidden');
         $('.rename-dialog').addClass('active');
         fm_showoverlay();
-        $('.rename-dialog .fm-dialog-close').unbind('click');
-        $('.rename-dialog .fm-dialog-close').bind('click', function()
-        {
+        
+        $('.rename-dialog .fm-dialog-close').rebind('click', function() {
             $.dialog = false;
             $('.rename-dialog').addClass('hidden');
             fm_hideoverlay();
         });
-        $('.rename-dialog-button.rename').unbind('click');
-        $('.rename-dialog-button.rename').bind('click', function()
-        {
+        
+        $('.rename-dialog-button.rename').rebind('click', function() {
             var c = $('.rename-dialog').attr('class');
             if (c && c.indexOf('active') > -1)
                 dorename();
         });
-        $('.rename-dialog-button.cancel').unbind('click');
-        $('.rename-dialog-button.cancel').bind('click', function()
-        {
+        
+        $('.rename-dialog-button.cancel').rebind('click', function() {
             $('.rename-dialog').addClass('hidden');
             fm_hideoverlay();
         });
+        
         var n = M.d[$.selected[0]];
-        if (n.t)
+        if (n.t) {
             $('.rename-dialog .fm-dialog-title').text(l[425]);
-        else
+        }
+        else {
             $('.rename-dialog .fm-dialog-title').text(l[426]);
+        }
+        
         $('.rename-dialog input').val(n.name);
         var ext = fileext(n.name);
-        $('.rename-dialog .transfer-filtype-icon').attr('class', 'transfer-filtype-icon ' + fileicon(n))
-        if (!n.t && ext.length > 0)
-        {
+        $('.rename-dialog .transfer-filtype-icon').attr('class', 'transfer-filtype-icon ' + fileIcon(n));
+        if (!n.t && ext.length > 0) {
             $('.rename-dialog input')[0].selectionStart = 0;
             $('.rename-dialog input')[0].selectionEnd = $('.rename-dialog input').val().length - ext.length - 1;
         }
+        
         $('.rename-dialog input').unbind('focus');
         $('.rename-dialog input').bind('focus', function() {
             var selEnd;
             $(this).closest('.rename-dialog').addClass('focused');
             var d = $(this).val().indexOf('.');
-            if (d > -1)
+            if (d > -1) {
                 selEnd = d;
-            else
+            }
+            else {
                 selEnd = $(this).val().length;
+            }
             $(this)[0].selectionStart = 0;
             $(this)[0].selectionEnd = selEnd;
 
         });
+        
         $('.rename-dialog input').unbind('blur');
         $('.rename-dialog input').bind('blur', function() {
             $(this).closest('.rename-dialog').removeClass('focused');
         });
+        
         $('.rename-dialog input').unbind('click keydown keyup keypress');
         $('.rename-dialog input').focus();
-        $('.rename-dialog input').bind('click keydown keyup keypress', function(e)
-        {
-            var n = M.d[$.selected[0]];
-            var ext = fileext(n.name);
-            if ($(this).val() == '' || (!n.t && ext.length > 0 && $(this).val() == '.' + ext))
+        $('.rename-dialog input').bind('click keydown keyup keypress', function(e) {
+            var n = M.d[$.selected[0]],
+                ext = fileext(n.name);
+            if ($(this).val() == '' || (!n.t && ext.length > 0 && $(this).val() == '.' + ext)) {
                 $('.rename-dialog').removeClass('active');
-            else
+            }
+            else {
                 $('.rename-dialog').addClass('active');
-            if (!n.t && ext.length > 0)
-            {
-                if (this.selectionStart > $('.rename-dialog input').val().length - ext.length - 2)
-                {
+            }
+            if (!n.t && ext.length > 0) {
+                if (this.selectionStart > $('.rename-dialog input').val().length - ext.length - 2) {
                     this.selectionStart = $('.rename-dialog input').val().length - ext.length - 1;
                     this.selectionEnd = $('.rename-dialog input').val().length - ext.length - 1;
-                    if (e.which == 46)
+                    if (e.which === 46) {
                         return false;
+                    }
                 }
-                else if (this.selectionEnd > $('.rename-dialog input').val().length - ext.length - 1)
-                {
+                else if (this.selectionEnd > $('.rename-dialog input').val().length - ext.length - 1) {
                     this.selectionEnd = $('.rename-dialog input').val().length - ext.length - 1;
                     return false;
                 }
@@ -6440,6 +6457,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
             if ($.warningCallback)
                 $.warningCallback(true);
         });
+        
         $('#msgDialog .fm-dialog-button').eq(1).bind('click', function () {
             closeMsg();
             if ($.warningCallback)
@@ -6467,7 +6485,8 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
                 }
             });
         }
-    } else if (type === 'loginrequired') {
+    }
+    else if (type === 'loginrequired') {
 
         $('#msgDialog').addClass('loginrequired-dialog');
 
@@ -7157,6 +7176,9 @@ function initShareDialog() {
             // Due to pending shares, the id could be an email instead of a handle
             userEmail = handleOrEmail;
 
+            // The s2 api call can remove both shares and pending shares
+            api_req({a: 's2', n:  selectedNodeHandle, s: [{ u: userEmail, r: ''}], ha: '', i: requesti});
+            
             // If it was a user handle, the share is a full share
             if (M.u[handleOrEmail]) {
                 userEmail = M.u[handleOrEmail].m;
@@ -7168,11 +7190,9 @@ function initShareDialog() {
             else {
                 pendingContactId = M.findOutgoingPendingContactIdByEmail(userEmail);
                 M.deletePendingShare(selectedNodeHandle, pendingContactId);
-                sharedUInode(selectedNodeHandle);
             }
 
-            // The s2 api call can remove both shares and pending shares
-            api_req({a: 's2', n:  selectedNodeHandle, s: [{ u: userEmail, r: ''}], ha: '', i: requesti});
+            sharedUInode(selectedNodeHandle);
 
             $.sharedTokens.splice($.sharedTokens.indexOf(userEmail), 1);
         }
@@ -8032,7 +8052,7 @@ function itemExportLinkHtml(item) {
     }
     
     html = '<div class="export-link-item">'
-         +      '<div class="export-icon ' + fileicon(item) + '" ></div>'
+         +      '<div class="export-icon ' + fileIcon(item) + '" ></div>'
          +      '<div class="export-link-text-pad">'
          +          '<div class="export-link-txt">'
          +               htmlentities(item.name) + ' <span class="export-link-gray-txt">' + fileSize + '</span>'
@@ -8590,7 +8610,7 @@ function propertiesDialog(close)
         star = ' star';
     pd.find('.file-status-icon').attr('class', 'file-status-icon ' + star)
 
-    if (fileicon(n).indexOf('shared') > -1)
+    if (fileIcon(n).indexOf('shared') > -1)
         pd.addClass('shared');
     if (typeof n.r == "number")
     {
@@ -8782,7 +8802,7 @@ function propertiesDialog(close)
     }
 
     if ((filecnt + foldercnt) == 1)
-        $('.properties-file-icon').html('<div class="' + fileicon(n) + '"></div>');
+        $('.properties-file-icon').html('<div class="' + fileIcon(n) + '"></div>');
     else
     {
         if ((filecnt + foldercnt) == 2)
@@ -8792,7 +8812,7 @@ function propertiesDialog(close)
         $('.properties-file-icon').html('');
         for (var i in $.selected)
         {
-            var ico = fileicon(M.d[$.selected[i]]);
+            var ico = fileIcon(M.d[$.selected[i]]);
 
             if (a <= 3)
             {

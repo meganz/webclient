@@ -1398,6 +1398,7 @@ function MegaData()
         if (!fminitialized) {
             fminitialized = true;
             $('.top-search-bl').show();
+            mBroadcaster.sendMessage('fm:initialized');
         } else if (id && id === this.currentdirid && !force) {// Do nothing if same path is choosen
             return false;
         }
@@ -5800,10 +5801,11 @@ function loadfm_done(pfkey, stackPointer) {
     }
 }
 
-function storefmconfig(n, c)
+function storefmconfig(key, value)
 {
-    fmconfig[n] = c;
+    fmconfig[key] = value;
     localStorage.fmconfig = JSON.stringify(fmconfig);
+    mBroadcaster.sendMessage('fmconfig:' + key, value);
 }
 
 function fmtreenode(id, e)

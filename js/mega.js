@@ -3567,9 +3567,10 @@ function MegaData()
                         + '<td><span class="transfer-filtype-icon ' + fileicon(n) + '"></span><span class="tranfer-filetype-txt">' + htmlentities(n.name) + '</span></td>'
                         + '<td></td>'
                         + '<td>' + bytesToSize(n.s) + '</td>'
-                        + '<td><span class="row-number"></span></td>'
+					    + '<td>' + filetype(n.name) + '</td>'
                         + '<td><span class="transfer-status queued">Queued</span></td>'
                         + '<td class="grid-url-field"><a class="grid-url-arrow"><span></span></a><a class="clear-transfer-icon"><span></span></a></td>'
+					    + '<td><span class="row-number"></span></td>'
                         + '</tr>');
             }
         }
@@ -3589,9 +3590,11 @@ function MegaData()
                 + '<td><span class="transfer-filtype-icon ' + fileicon({name: 'archive.zip'}) + '"></span><span class="tranfer-filetype-txt">' + htmlentities(zipname) + '</span></td>'
                 + '<td></td>'
                 + '<td>' + bytesToSize(zipsize) + '</td>'
-                + '<td><span class="row-number"></span></td>'
+                + '<td>' + filetype({name: 'archive.zip'}) + '</td>'
                 + '<td><span class="transfer-status queued">Queued</span></td>'
-                + '<td class="grid-url-field"><a class="grid-url-arrow"><span></span></a><a class="clear-transfer-icon"><span></span></a></td></tr>');
+                + '<td class="grid-url-field"><a class="grid-url-arrow"><span></span></a><a class="clear-transfer-icon"><span></span></a></td>'
+				+ '<td><span class="row-number"></span></td>'
+                + '</tr>');
 
 //        $('.tranfer-view-icon').addClass('active');
 //        $('.fmholder').addClass('transfer-panel-opened');
@@ -4007,10 +4010,11 @@ function MegaData()
                 + '<td><span class="transfer-filtype-icon ' + fileicon({name: f.name}) + '"></span><span class="tranfer-filetype-txt">' + htmlentities(f.name) + '</span></td>'
                 + '<td></td>'
                 + '<td>' + bytesToSize(f.size) + '</td>'
-                + '<td><span class="row-number"></span></td>'
+                + '<td>' + filetype(f.name) + '</td>'
                 + '<td><span class="transfer-status queued">Queued</span></td>'
-                + '<td class="grid-url-field"><a class="grid-url-arrow"><span></span></a><a class="clear-transfer-icon"><span></span></a></td></tr>'
-                );
+                + '<td class="grid-url-field"><a class="grid-url-arrow"><span></span></a><a class="clear-transfer-icon"><span></span></a></td>'
+				+ '<td><span class="row-number"></span></td>'
+                + '</tr>');
             ul_queue.push(f);
 
             if (onChat)

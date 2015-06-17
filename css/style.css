@@ -5030,6 +5030,11 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	bottom: 0;
 	background-image: none;
 	border-left: 1px solid transparent;
+	-webkit-transition: border-left 300ms ease-in-out;
+	-moz-transition: border-left 300ms ease-in-out;
+	-o-transition: border-left 300ms ease-in-out;
+	-ms-transition: border-left 300ms ease-in-out;
+	transition: border-left 300ms ease-in-out;
 }
 .transfers.nw-fm-left-icon.active {
 	border-color: #13E03C;
@@ -5152,7 +5157,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 .nw-fm-left-icon.inbox.active .nw-fm-left-border {
 	border-color: rgba(255,165,0,1);
 }
-.nw-fm-left-icon.transfers:hover .transfer-bar-overlay div, .nw-fm-left-icon.transfers.active .transfer-bar-overlay div {
+.nw-fm-left-icon.transfers:hover .transfer-bar-overlay div, .nw-fm-left-icon.transfers.active .transfer-bar-overlay div, .transfering.active .transfer-bar-overlay div {
 	background-color: rgba(255,255,255,1);
 }
 .nw-fm-left-icon.settings.active .nw-fm-left-border, .nw-fm-left-icon.contacts.active .nw-fm-left-border {
@@ -12247,7 +12252,10 @@ table {
 .transfer-table-header th:nth-child(3), .transfer-table-header th:nth-child(4) {
 	width: 96px;
 }
-.transfer-table-header th:nth-child(5), .transfer-table td:nth-child(5), .transfer-table th:nth-child(5) {
+.transfer-table-header th:nth-child(5) {
+	width: 288px;
+}
+.transfer-table-header th:nth-child(8), .transfer-table td:nth-child(8), .transfer-table th:nth-child(8) {
 	display: none;
 }
 .transfer-table-header th:nth-child(6) {
@@ -23099,6 +23107,9 @@ body.pro:after {
 	margin: 2px 0 0 2px;
 	width: 22px;
 	height: 22px;
+}
+.transfering .transfer-bar-overlay div {
+	background-color: rgba(255,255,255,0.8);
 }
 .paused .transfer-bar-overlay div {
 	background-position: center -664px;

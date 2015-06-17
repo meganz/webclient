@@ -1158,8 +1158,8 @@ function transferPanelContextMenu(target)
 
 function openTransferpanel()
 {
-    $.transferOpen(1);
-   
+    $('.nw-fm-left-icon.transfers').addClass('transfering');
+
     if (!uldl_hold)
         ulQueue.resume();
     else// make sure that terms of service are accepted before any action
@@ -5345,11 +5345,8 @@ function transferPanelUI()
             $('.nw-fm-left-icon.transfers').addClass('active');
 		    notificationsUI(1);
 		    $('#fmholder').addClass('transfer-panel-opened');
+		    $.transferHeader();
         }
-        else {
-            $.transferClose();
-        }
-        $.transferHeader();
     };
 
     $('.nw-fm-left-icon.settings .settings-icon').unbind('click');
@@ -5395,7 +5392,7 @@ function transferPanelUI()
             // terms of service
             if (u_type || u_attr.terms)
             {
-                $(this).removeClass('active').find('span').html(l[6167]);
+                $(this).removeClass('active').find('span').html(l[6993]);
                 dlQueue.resume();
                 ulQueue.resume();
                 ui_paused = false;
@@ -5411,7 +5408,7 @@ function transferPanelUI()
         }
         else
         {
-			$(this).addClass('active').find('span').html(l[5673]);
+			$(this).addClass('active').find('span').html('Resume transfers');
             dlQueue.pause();
             ulQueue.pause();
             ui_paused = true;

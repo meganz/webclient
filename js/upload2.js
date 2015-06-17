@@ -1016,9 +1016,11 @@ function resetUploadDownload() {
 	{
 		clearXhr(); /* destroy all xhr */
 
-		$('.transfer-pause-icon').addClass('disabled');
-		$('.transfer-panel-empty-txt').removeClass('hidden');
-		$('.transfer-table-header').hide(0);
+	    $('.transfer-pause-icon').addClass('disabled');
+	    $('.transfer-panel-empty-txt').removeClass('hidden');
+	    $('.transfer-table-header').hide(0);
+	    $('.nw-fm-left-icon.transfers').removeClass('transfering');
+	    $('.transfers .nw-fm-percentage li p').css('transform', 'rotate(0deg)');
 
 		if ($.transferClose) $.transferClose();
 

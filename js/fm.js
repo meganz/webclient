@@ -190,10 +190,16 @@ function deleteScrollPanel(from, data) {
     }
 }
 
-function initAccountScroll()
+function initAccountScroll(scroll)
 {
     $('.fm-account-main').jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5, animateScroll: true});
     jScrollFade('.fm-account-main');
+    if (scroll) {
+        var jsp = $('.fm-account-main').data('jsp');
+        if (jsp) {
+            jsp.scrollToBottom();
+        }
+    }
 }
 
 function initGridScrolling()
@@ -3215,10 +3221,15 @@ function accountUI()
                 ul_skipIdentical = M.account.ul_skipIdentical;
             }
 
-            if (typeof M.account.uisorting !== 'undefined')
+            if (typeof M.account.uisorting !== 'undefined') {
                 storefmconfig('uisorting', M.account.uisorting);
-            if (typeof M.account.uiviewmode !== 'undefined')
+            }
+            if (typeof M.account.uiviewmode !== 'undefined') {
                 storefmconfig('uiviewmode', M.account.uiviewmode);
+            }
+            if (typeof M.account.rubsched !== 'undefined') {
+                storefmconfig('rubsched', M.account.rubsched);
+            }
 
             if ($('#account-password').val() == '' && ($('#account-new-password').val() !== '' || $('#account-confirm-password').val() !== ''))
             {
@@ -3456,6 +3467,61 @@ function accountUI()
             $('.fm-account-save-block').removeClass('hidden');
             $('.fm-account-main').addClass('save');
             initAccountScroll();
+        });
+
+        $('.rubsched, .rubschedopt').removeClass('radioOn').addClass('radioOff');
+        var i = 13;
+        if (fmconfig.rubsched) {
+            i = 12;
+            $('#rubsched_options').removeClass('hidden');
+            var opt = String(fmconfig.rubsched).split(':');
+            $('#rad' + opt[0] + '_opt').val(opt[1]);
+            $('#rad' + opt[0] + '_div').removeClass('radioOff').addClass('radioOn');
+            $('#rad' + opt[0]).removeClass('radioOff').addClass('radioOn');
+        }
+        $('#rad' + i + '_div').removeClass('radioOff').addClass('radioOn');
+        $('#rad' + i).removeClass('radioOff').addClass('radioOn');
+        $('.rubschedopt input').rebind('click', function(e) {
+            var id = $(this).attr('id');
+            var opt = $('#' + id + '_opt').val();
+            M.account.rubsched = id.substr(3) + ':' + opt;
+            $('.rubschedopt').removeClass('radioOn').addClass('radioOff');
+            $(this).addClass('radioOn').removeClass('radioOff');
+            $(this).parent().addClass('radioOn').removeClass('radioOff');
+            $('.fm-account-save-block').removeClass('hidden');
+            $('.fm-account-main').addClass('save');
+            initAccountScroll(1);
+        });
+        $('.rubsched_textopt').rebind('click keyup', function(e) {
+            var id = String($(this).attr('id')).split('_')[0];
+            $('.rubschedopt').removeClass('radioOn').addClass('radioOff');
+            $('#'+id+',#'+id+'_div').addClass('radioOn').removeClass('radioOff');
+            M.account.rubsched = id.substr(3) + ':' + $(this).val();
+            $('.fm-account-save-block').removeClass('hidden');
+            $('.fm-account-main').addClass('save');
+            initAccountScroll(1);
+        });
+        $('.rubsched input').rebind('click', function(e) {
+            var id = $(this).attr('id');
+            if (id == 'rad13') {
+                M.account.rubsched = 0;
+                $('#rubsched_options').addClass('hidden');
+            }
+            else if (id == 'rad12') {
+                $('#rubsched_options').removeClass('hidden');
+                if (!fmconfig.rubsched) {
+                    M.account.rubsched = "14:15";
+                    var defOption = 14;
+                    $('#rad' + defOption + '_div').removeClass('radioOff').addClass('radioOn');
+                    $('#rad' + defOption).removeClass('radioOff').addClass('radioOn');
+                }
+            }
+            $('.rubsched').removeClass('radioOn').addClass('radioOff');
+            $(this).addClass('radioOn').removeClass('radioOff');
+            $(this).parent().addClass('radioOn').removeClass('radioOff');
+            $('.fm-account-save-block').removeClass('hidden');
+            $('.fm-account-main').addClass('save');
+            initAccountScroll(1);
         });
 
         $('.redeem-voucher').unbind('click');

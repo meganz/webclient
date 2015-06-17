@@ -24628,3 +24628,19 @@ body, body * {
 	overflow: visible !important;
 }
 }
+
+
+#rubsched_options {
+	border-left:1px dashed #333 !important;
+	margin-left:7px !important;
+	padding-right:15px !important;
+}
+
+#rubsched_options .rubsched_dash {
+	margin-top:16px !important;
+	border-top:1px dashed #333 !important;
+	width:12px !important;
+	float:left !important;
+	margin-right:4px !important;
+}
+

@@ -366,7 +366,7 @@ RtcSession.prototype = {
         case Strophe.Status.CONNFAIL:
         case Strophe.Status.DISCONNECTING:
         {
-            this.terminateAll('disconnected', null, true);
+            this.terminateAll('xmpp-disconnect', null, true);
             this.rtcSession._freeLocalStream();
             break;
         }
@@ -752,7 +752,7 @@ hangupAll: function()
     for (var sid in sessions) {
         var sess = sessions[sid];
         if (sess.peerjid === from) {
-            this.jingle.terminate(sess, 'peer-disconnected');
+            this.jingle.terminate(sess, 'peer-xmpp-disconnect');
         }
     }
     return true; //We dont want this handler to be deleted
@@ -1163,17 +1163,19 @@ hangupAll: function()
  */
  _attachRemoteStreamHandlers: function(stream)
  {
+/* We currently get remote stream mute events over jingle, not over webrtc
+    var self = this;
     var at = stream.getAudioTracks();
     for (var i=0; i<at.length; i++)
-        at[i].onmute =
-        function(e) {
-            this.trigger('remote-audio-muted', stream);
+        at[i].onmute = function(e) {
+            self.trigger('remote-audio-muted', stream);
         };
     var vt = stream.getVideoTracks();
     for (var i=0; i<vt.length; i++)
-        vt[i].muted = function(e) {
-            this.trigger('remote-video-muted', stream);
+        vt[i].onmute = function(e) {
+            self.trigger('remote-video-muted', stream);
         };
+*/
  },
  _refLocalStream: function(sendsVideo) {
     this.gLocalStreamRefcount++;
@@ -1366,7 +1368,7 @@ SessWrapper.prototype = {
     The remote peer's full JID
     @returns {string}
 */
-peerJid: function(){
+peerJid: function() {
     return this._sess.peerjid;
 },
 

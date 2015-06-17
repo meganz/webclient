@@ -211,10 +211,6 @@ MegaSync.prototype.handle_v = function(version) {
 
 MegaSync.prototype.download = function(pubkey, privkey) {
     this._lastDownload = [pubkey, privkey];
-    if (!this._enabled) {
-        return this.downloadClient();
-    }
-
     this._api({a: "l", h: pubkey, k: privkey});
     return true;
 };

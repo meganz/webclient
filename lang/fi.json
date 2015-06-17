@@ -3501,7 +3501,10 @@
     "7092": "VIKKEL\u00c4 & KETTER\u00c4",
     "7093": "Tiedostokoko:",
     "7094": "RAJOITTAMATON",
-    "7095": "Released",
-    "7096": "We have recently made some improvements to our site. Update to the latest version of MEGA?",
-    "7097": "View Updates +"
+    "7095": "Julkaistu",
+    "7096": "Olemme tehneet parannuksia sivustollemme. P\u00e4ivit\u00e4 MEGAn viimeisimp\u00e4\u00e4n versioon?",
+    "7097": "N\u00e4yt\u00e4 p\u00e4ivitykset +",
+    "7098": "Your download could not proceed because it would take you over the current free transfer allowance for your IP address. This limit is dynamic and depends on the amount of unused bandwidth we have available.",
+    "7099": "You have utilized %1 of data transfer in the last 6 hours which took you over our current limit. To circumvent this limit, you can [A]upgrade to Pro[\/A], which will give you your own bandwidth package and also ample extra storage space. ",
+    "7100": "Please upgrade to Pro to continue immediately, or wait %1 to continue for free. "
 }

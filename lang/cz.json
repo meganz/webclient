@@ -3501,7 +3501,10 @@
     "7092": "EFEKTIVN\u00cd",
     "7093": "Velikost souboru:",
     "7094": "NEOMEZEN\u00c1",
-    "7095": "Released",
-    "7096": "We have recently made some improvements to our site. Update to the latest version of MEGA?",
-    "7097": "View Updates +"
+    "7095": "Vyd\u00e1no",
+    "7096": "Ned\u00e1vno jsme na\u0161e str\u00e1nky trochu vylep\u0161ili. Aktualizovat na nejnov\u011bj\u0161\u00ed verzi MEGA?",
+    "7097": "Zobrazit aktualizace +",
+    "7098": "Your download could not proceed because it would take you over the current free transfer allowance for your IP address. This limit is dynamic and depends on the amount of unused bandwidth we have available.",
+    "7099": "You have utilized %1 of data transfer in the last 6 hours which took you over our current limit. To circumvent this limit, you can [A]upgrade to Pro[\/A], which will give you your own bandwidth package and also ample extra storage space. ",
+    "7100": "Please upgrade to Pro to continue immediately, or wait %1 to continue for free. "
 }

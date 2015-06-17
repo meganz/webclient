@@ -253,6 +253,7 @@ var proPage = {
     
     /**
      * Checks if a plan has already been selected e.g. they came from the bandwidth quota dialog
+     * If they are from there, then preselect that plan and go to step two.
      */
     checkForPreselectedPlan: function() {
         
@@ -276,6 +277,9 @@ var proPage = {
             var $selectedPlanHeader = $('.membership-step2 .main-italic-header.pro');
             var selectedPlanText = $selectedPlanHeader.html().replace('%1', proPlanName);
             $selectedPlanHeader.html(selectedPlanText);
+                        
+            // Add history so the back button goes back to #pro page
+            history.pushState('', 'MEGA - Choose plan', '#pro');
             
             // Continue to step 2
             pro_next_step();

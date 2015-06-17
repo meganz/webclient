@@ -1379,7 +1379,7 @@ function sharedUInode(nodeHandle) {
         
         if (oShares && oShares.EXP) {
             $('.grid-table.fm #' + nodeHandle + ' .grid-url-field').addClass('linked');
-            $('.file-block#' + nodeHandle).addClass('linked');
+            $('#' + nodeHandle + '.file-block').addClass('linked');
             
             bExportLink = true;
         }
@@ -1396,17 +1396,17 @@ function sharedUInode(nodeHandle) {
     }
     
     $('.grid-table.fm #' + nodeHandle + ' .transfer-filtype-icon').addClass(fileIcon({t: 1, share: bAvailShares}));
-    $('.file-block#' + nodeHandle + ' .block-view-file-type').addClass(fileIcon({t: 1, share: bAvailShares}));
+    $('#' + nodeHandle + '.file-block .block-view-file-type').addClass(fileIcon({t: 1, share: bAvailShares}));
     
     if (!bAvailShares) {
         $('#treea_' + nodeHandle + ' .nw-fm-tree-folder').removeClass('shared-folder');
         $('.grid-table.fm #' + nodeHandle + ' .transfer-filtype-icon').removeClass('folder-shared');
-        $('.file-block#' + nodeHandle + ' .block-view-file-type').removeClass('folder-shared');
+        $('#' + nodeHandle + '.file-block .block-view-file-type').removeClass('folder-shared');
     }
     
     if (!bExportLink) {
         $('.grid-table.fm #' + nodeHandle + ' .grid-url-field').removeClass('linked');
-        $('.file-block#' + nodeHandle).removeClass('linked');
+        $('#' + nodeHandle + '.file-block').removeClass('linked');
         $('#treea_' + nodeHandle).removeClass('linked');
     }
 }
@@ -1606,7 +1606,7 @@ function addContactUI()
 
         $('.add-contact-multiple-input').tokenInput(contacts, {
             theme: 'mega',
-            hintText: 'Type in an email or contact',
+            hintText: l[5908],
     //        hintText: '',
     //        placeholder: 'Type in an email or contact',
             searchingText: '',
@@ -2284,11 +2284,17 @@ function initContextUI()
             selectedNodeHandle = $.selected;
             M.getLinks(selectedNodeHandle).done(function() {
                 
+                // Add link-icon to list view
                 $('#' + selectedNodeHandle + ' .own-data').addClass('linked');
                 
                 // Add class to the second from the list, prevent failure of the arrow icon
                 $('#' + selectedNodeHandle + ' .own-data span').eq(1).addClass('link-icon');
-                
+
+                // Add link-icon to grid view
+                $('#' + selectedNodeHandle + '.file-block').addClass('linked');
+                $('#' + selectedNodeHandle + '.file-block span').eq(1).addClass('link-icon');
+
+                // Add link-icon to left panel
                 $('#treea_' + selectedNodeHandle).addClass('linked');
                 
                 // Add class to the third from the list
@@ -2320,9 +2326,15 @@ function initContextUI()
                     M.delNodeShare(selectedNodeHandle, 'EXP');
                     M.deleteExportLinkShare(selectedNodeHandle);
                     
-                    // Remove link icon from canvas
+                    // Remove link icon from list view
                     $('#' + selectedNodeHandle + ' .own-data').removeClass('linked');
                     $('#' + selectedNodeHandle + ' .own-data span').removeClass('link-icon');
+
+                    // Remove link icon from grid view
+                    $('#' + selectedNodeHandle + '.file-block').removeClass('linked');
+                    $('#' + selectedNodeHandle + '.file-block span').removeClass('link-icon');
+                    
+                    // Revemo link icon from left panel
                     $('#treeli_' + selectedNodeHandle + ' span').removeClass('linked link-icon');
                 }
             }
@@ -6947,7 +6959,7 @@ function initShareDialog() {
 
         $('.share-multiple-input').tokenInput(contacts, {
             theme: "mega",
-            hintText: "Type in an email or contact",        // l[5908] when generated
+            hintText: l[5908],
             // placeholder: "Type in an email or contact",
             searchingText: "",
             noResultsText: "",
@@ -7072,6 +7084,7 @@ function initShareDialog() {
     }
 
     function handlePermissionMenu($this, m, x, y) {
+        
         m.css('left', x + 'px');
         m.css('top', y + 'px');
         menuPermissionState($this);
@@ -7211,7 +7224,7 @@ function initShareDialog() {
         
         var $this = $(this),
             $m = $('.permissions-menu'),
-            scrollBlock = $('.share-dialog-contacts .jspPane');
+            scrollBlock = $('.share-dialog-contacts .jspPane'),
             scrollPos = 0;
             
         $m.removeClass('search-permissions');
@@ -7273,12 +7286,12 @@ function initShareDialog() {
             aCurrPermLevel = [];
 
         $('.permissions-menu').fadeOut(200);
+        
         // Find where we are permissions-icon or share-dialog-permissions
-
         if ($itemPermLevel.length) {
 
             aCurrPermLevel = checkMultiInputPermission($itemPermLevel);
-            sId = $itemPermLevel.parent().attr('id');
+            sId = $itemPermLevel.parent().attr('id').replace('sdcbl_', '');
             
             if (sId !== '') {
                 iPerm = sharedPermissionLevel(aNewPermLevel[0]);
@@ -9322,14 +9335,12 @@ function fm_thumbnails()
         console.timeEnd('fm_thumbnails');
 }
 
-function fm_thumbnail_render(n)
-{
-    if (n && thumbnails[n.h])
-    {
-        var e = $('.file-block#' + n.h);
+function fm_thumbnail_render(n) {
+    
+    if (n && thumbnails[n.h]) {
+        var e = $('#' + n.h + '.file-block');
 
-        if (e.length > 0)
-        {
+        if (e.length > 0) {
             e = e.find('img:first');
             e.attr('src', thumbnails[n.h]);
             e.parent().addClass('thumb');

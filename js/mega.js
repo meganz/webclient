@@ -1047,7 +1047,7 @@ function MegaData()
                     if (M.viewmode === 1) {
                         t = '.fm-blocks-view.fm .file-block-scrolling';
                         el = 'a';
-                        html = '<a class="file-block' + c + ' ' + sExportLink + '" id="' + htmlentities(M.v[i].h) + '">\n\
+                        html = '<a id="' + htmlentities(M.v[i].h) + '" class="file-block' + c + ' ' + sExportLink + '">\n\
                                     <span class="file-status-icon' + star + '"></span>\n\
 									<span class="' + sLinkIcon + '"></span>\n\
                                     <span class="file-settings-icon">\n\
@@ -2672,7 +2672,7 @@ function MegaData()
                 if (sel)
                 {
                     $('.grid-table.fm#' + h).remove();
-                    $('.file-block#' + h).remove();
+                    $('#' + h + '.file-block').remove();
                 }
             }
         }
@@ -3149,7 +3149,7 @@ function MegaData()
                 M.nodeAttr({h: h, name: name, a: attr});
                 api_req({a: 'a', n: h, attr: attr, key: key, i: requesti});
                 $('.grid-table.fm #' + h + ' .tranfer-filetype-txt').text(name);
-                $('.file-block#' + h + ' .file-block-title').text(name);
+                $('#' + h + '.file-block .file-block-title').text(name);
                 $('#treea_' + h + ' span:nth-child(2)').text(name);
                 if ($('#path_' + h).length > 0)
                     M.renderPath();
@@ -3183,12 +3183,12 @@ function MegaData()
                         if (del)
                         {
                             $('.grid-table.fm #' + n.h + ' .grid-status-icon').addClass('star');
-                            $('.file-block#' + n.h + ' .file-status-icon').addClass('star');
+                            $('#' + n.h + '.file-block .file-status-icon').addClass('star');
                         }
                         else
                         {
                             $('.grid-table.fm #' + n.h + ' .grid-status-icon').removeClass('star');
-                            $('.file-block#' + n.h + ' .file-status-icon').removeClass('star');
+                            $('#' + n.h + '.file-block .file-status-icon').removeClass('star');
                         }
                     }
                 }
@@ -4984,7 +4984,7 @@ function execsc(actionPackets, callback) {
                     if (f.key) {
                         if (f.name !== n.name) {
                             $('.grid-table.fm #' + n.h + ' .tranfer-filetype-txt').text(f.name);
-                            $('.file-block#' + n.h + ' .file-block-title').text(f.name);
+                            $('#' + n.h + '.file-block .file-block-title').text(f.name);
                             $('#treea_' + n.h + ' .nw-fm-tree-folder').text(f.name);
 
                             //@@@Todo: reposition elements according to sorting (if sorted by name)
@@ -4995,10 +4995,10 @@ function execsc(actionPackets, callback) {
                         if (f.fav !== n.fav) {
                             if (f.fav) {
                                 $('.grid-table.fm #' + n.h + ' .grid-status-icon').addClass('star');
-                                $('.file-block#' + n.h + ' .file-status-icon').addClass('star');
+                                $('#' + n.h + '.file-block .file-status-icon').addClass('star');
                             } else {
                                 $('.grid-table.fm #' + n.h + ' .grid-status-icon').removeClass('star');
-                                $('.file-block#' + n.h + ' .file-status-icon').removeClass('star');
+                                $('#' + n.h + '.file-block .file-status-icon').removeClass('star');
                             }
                         }
                         M.nodeAttr({

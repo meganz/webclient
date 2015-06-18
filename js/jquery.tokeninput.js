@@ -874,11 +874,12 @@
 
         // Delete a token from the token list
         function delete_token(token) {
+            
             // Remove the id from the saved list
-            var token_data = $.data(token.get(0), "tokeninput");
-            var callback = $(input).data("settings").onDelete;
-
-            var index = token.prevAll().length;
+            var token_data = $.data(token.get(0), "tokeninput"),
+                callback = $(input).data("settings").onDelete,
+                index = token.prevAll().length;
+            
             if (index > selected_token_index) {
                 index--;
             }

@@ -65,7 +65,7 @@
         }
         if ($.ddhelper) {
             $('#draghelper .dragger-icon').remove();
-            $('<div class="dragger-icon ' + fileicon({
+            $('<div class="dragger-icon ' + fileIcon({
                 name: ''
             }) + '"></div>').insertAfter('#draghelper .dragger-status');
             $('.dragger-icon.fade').fadeTo(500, 0.1);

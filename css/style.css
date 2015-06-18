@@ -23429,7 +23429,8 @@ body.pro:after {
 .megasync-dropdown-link.debian {
 	background-position: 10px -1982px;
 }
-.megasync-dropdown-link.elementary {
+.megasync-dropdown-link.elementary,
+.megasync-dropdown-link.elementaryosfreya {
 	background-position: 10px -1952px;
 }
 .megasync-dropdown-link.fedora {

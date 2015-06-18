@@ -283,13 +283,13 @@ var mBroadcaster = {
             if (d) console.log('Broadcasting ' + topic, args);
 
             for (var id in this._topics[topic]) {
-                var ev = this._topics[topic][id];
+                var ev = this._topics[topic][id], rc;
                 try {
-                    ev.callback.apply(ev.scope, args);
+                    rc = ev.callback.apply(ev.scope, args);
                 } catch (ex) {
                     if (d) console.error(ex);
                 }
-                if (ev.once)
+                if (ev.once || rc === 0xDEAD)
                     idr.push(id);
             }
             if (idr.length)
@@ -396,6 +396,7 @@ var mBroadcaster = {
                 if (d) console.log('crossTab leaving');
             }
             this.unlisten();
+            mBroadcaster.sendMessage('crossTab:leave', this.master);
         },
 
         notify: function crossTab_notify(msg, data) {
@@ -406,6 +407,8 @@ var mBroadcaster = {
 
         setMaster: function crossTab_setMaster() {
             this.master = (Math.random() * Date.now()).toString(36);
+
+            mBroadcaster.sendMessage('crossTab:master', this.master);
 
             // (function liveLoop(tag) {
                 // if (tag === mBroadcaster.crossTab.master) {

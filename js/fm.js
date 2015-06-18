@@ -45,27 +45,43 @@ function reportQuota(chunksize)
     localStorage.q = JSON.stringify(quota);
 }
 
-function hasQuota(filesize, next)
-{
-    checkQuota(filesize,function(r)
-    {
-        if (r.sec == 0 || r.sec == -1)
-        {
+function hasQuota(filesize, next) {
+    checkQuota(filesize, function(r) {
+        if (r.sec == 0 || r.sec == -1) {
             bandwidthDialog(1);
             next(true);
         }
-        else
-        {
-            sessionStorage.proref='bwlimit';
-            if (!$.lastlimit) $.lastlimit=0;
-            $('.fm-bandwidth-number-txt.used').html(bytesToSize(r.used).replace(' ',' <span class="small">') + '</span>');
-            $('.fm-bandwidth-number-txt.available').html(bytesToSize(r.filesize).replace(' ',' <span class="small">') + '</span>');
-            var minutes = Math.ceil(r.sec/60);
-            if (minutes == 1) $('.bwminutes').html(l[5838] + ' *');
-            else $('.bwminutes').html(l[5837].replace('[X]',minutes) + ' *');
+        else {
+            sessionStorage.proref = 'bwlimit';
+
+            if (!$.lastlimit) {
+                $.lastlimit = 0;
+            }
+            
+            // Translate bottom right text block of bandwidth dialog
+            var $bottomRightText = $('.bandwidth-dialog .bandwidth-text-bl.second');
+            var text = $bottomRightText.html().replace('[A]', '<span class="red">').replace('[/A]', '</span>');
+            text = text.replace('%1', '<strong class="bandwidth-used">' + bytesToSize(r.used) + '</strong>');
+            $bottomRightText.html(text);
+            
+            var minutes = Math.ceil(r.sec / 60);
+            var minutesText = l[5838];
+            if (minutes != 1) {
+                minutesText = l[5837].replace('[X]', minutes);
+            }
+            
+            // Translate header text of bandwidth dialog
+            var $header = $('.bandwidth-dialog .bandwidth-header');
+            var headerText = $header.html().replace('%1', '<span class="bandwidth-minutes">' + minutesText + '</span>');
+            $header.html(headerText);
+
             bandwidthDialog();
-            if ($.lastlimit < new Date().getTime()-60000)  megaAnalytics.log("dl", "limit",{used:r.used,filesize:r.filesize,seconds:r.sec});
-            $.lastlimit=new Date().getTime();
+
+            if ($.lastlimit < new Date().getTime() - 60000) {
+                megaAnalytics.log("dl", "limit", { used: r.used, filesize: r.filesize, seconds: r.sec });
+            }
+
+            $.lastlimit = new Date().getTime();
             next(false);
         }
     });
@@ -134,53 +150,44 @@ function checkQuota(filesize,callback)
     });
 }
 
-function bandwidthDialog(close)
-{
-    if (close)
-    {
-        $('.fm-dialog.bandwidth-quota').addClass('hidden');
-        $('.fm-dialog-overlay').addClass('hidden');
-        $.dialog=false;
+/**
+ * Shows the bandwidth dialog
+ * @param {Boolean} close If true, closes the dialog, otherwise opens it
+ */
+function bandwidthDialog(close) {
+    
+    var $bandwidthDialog = $('.fm-dialog.bandwidth-dialog');
+    var $backgroundOverlay = $('.fm-dialog-overlay');
+    
+    // Close dialog
+    if (close) {
+        $backgroundOverlay.addClass('hidden');
+        $bandwidthDialog.addClass('hidden');
     }
-    else
-    {
-        if (!is_fm() && page !== 'download') return false;
-
-        $('.fm-dialog-button.quota-later-button').unbind('click');
-        $('.fm-dialog-button.quota-later-button').bind('click',function(e)
-        {
-            bandwidthDialog(1);
+    else {
+        // Don't show if not in filemanager or download page
+        if (!is_fm() && page !== 'download') {
+            return false;
+        }
+        
+        // On close button click, close the dialog
+        $bandwidthDialog.find('.fm-dialog-close').rebind('click', function() {
+            $backgroundOverlay.addClass('hidden');
+            $bandwidthDialog.addClass('hidden');
         });
-
-        $('.fm-dialog bandwidth-quota.fm-dialog-close').unbind('click');
-        $('.fm-dialog bandwidth-quota.fm-dialog-close').bind('click',function(e)
-        {
-            bandwidthDialog(1);
+        
+        // On Select button click
+        $bandwidthDialog.find('.membership-button').rebind('click', function() {
+                        
+            // Get the plan number and redirect to pro step 2
+            var planId = $(this).closest('.reg-st3-membership-bl').attr('data-payment');            
+            document.location.hash = 'pro&planNum=' + planId;
         });
-
-        $('.fm-dialog-button.quota-upgrade-button').unbind('click');
-        $('.fm-dialog-button.quota-upgrade-button').bind('click',function(e)
-        {
-
-            bandwidthDialog(1);
-            document.location = '#pro';
-        });
-
-        $('.fm-dialog-overlay').removeClass('hidden');
-        $('.fm-dialog.bandwidth-quota').removeClass('hidden');
-        $.dialog='bandwidth';
+        
+        // Show the dialog
+        $backgroundOverlay.removeClass('hidden');
+        $bandwidthDialog.removeClass('hidden');
     }
-}
-
-function andreiScripts()
-{
-    /*
-     $('.on_off :checkbox').iphoneStyle({ resizeContainer: false, resizeHandle: false, onChange: function(elem, data)
-     {
-     if(data) $(elem).closest('.on_off').addClass('active');
-     else $(elem).closest('.on_off').removeClass('active');
-     }});
-     */
 }
 
 function deleteScrollPanel(from, data) {
@@ -190,10 +197,16 @@ function deleteScrollPanel(from, data) {
     }
 }
 
-function initAccountScroll()
+function initAccountScroll(scroll)
 {
     $('.fm-account-main').jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5, animateScroll: true});
     jScrollFade('.fm-account-main');
+    if (scroll) {
+        var jsp = $('.fm-account-main').data('jsp');
+        if (jsp) {
+            jsp.scrollToBottom();
+        }
+    }
 }
 
 function initGridScrolling()
@@ -3293,10 +3306,15 @@ function accountUI()
                 ul_skipIdentical = M.account.ul_skipIdentical;
             }
 
-            if (typeof M.account.uisorting !== 'undefined')
+            if (typeof M.account.uisorting !== 'undefined') {
                 storefmconfig('uisorting', M.account.uisorting);
-            if (typeof M.account.uiviewmode !== 'undefined')
+            }
+            if (typeof M.account.uiviewmode !== 'undefined') {
                 storefmconfig('uiviewmode', M.account.uiviewmode);
+            }
+            if (typeof M.account.rubsched !== 'undefined') {
+                storefmconfig('rubsched', M.account.rubsched);
+            }
 
             if ($('#account-password').val() == '' && ($('#account-new-password').val() !== '' || $('#account-confirm-password').val() !== ''))
             {
@@ -3534,6 +3552,61 @@ function accountUI()
             $('.fm-account-save-block').removeClass('hidden');
             $('.fm-account-main').addClass('save');
             initAccountScroll();
+        });
+
+        $('.rubsched, .rubschedopt').removeClass('radioOn').addClass('radioOff');
+        var i = 13;
+        if (fmconfig.rubsched) {
+            i = 12;
+            $('#rubsched_options').removeClass('hidden');
+            var opt = String(fmconfig.rubsched).split(':');
+            $('#rad' + opt[0] + '_opt').val(opt[1]);
+            $('#rad' + opt[0] + '_div').removeClass('radioOff').addClass('radioOn');
+            $('#rad' + opt[0]).removeClass('radioOff').addClass('radioOn');
+        }
+        $('#rad' + i + '_div').removeClass('radioOff').addClass('radioOn');
+        $('#rad' + i).removeClass('radioOff').addClass('radioOn');
+        $('.rubschedopt input').rebind('click', function(e) {
+            var id = $(this).attr('id');
+            var opt = $('#' + id + '_opt').val();
+            M.account.rubsched = id.substr(3) + ':' + opt;
+            $('.rubschedopt').removeClass('radioOn').addClass('radioOff');
+            $(this).addClass('radioOn').removeClass('radioOff');
+            $(this).parent().addClass('radioOn').removeClass('radioOff');
+            $('.fm-account-save-block').removeClass('hidden');
+            $('.fm-account-main').addClass('save');
+            initAccountScroll(1);
+        });
+        $('.rubsched_textopt').rebind('click keyup', function(e) {
+            var id = String($(this).attr('id')).split('_')[0];
+            $('.rubschedopt').removeClass('radioOn').addClass('radioOff');
+            $('#'+id+',#'+id+'_div').addClass('radioOn').removeClass('radioOff');
+            M.account.rubsched = id.substr(3) + ':' + $(this).val();
+            $('.fm-account-save-block').removeClass('hidden');
+            $('.fm-account-main').addClass('save');
+            initAccountScroll(1);
+        });
+        $('.rubsched input').rebind('click', function(e) {
+            var id = $(this).attr('id');
+            if (id == 'rad13') {
+                M.account.rubsched = 0;
+                $('#rubsched_options').addClass('hidden');
+            }
+            else if (id == 'rad12') {
+                $('#rubsched_options').removeClass('hidden');
+                if (!fmconfig.rubsched) {
+                    M.account.rubsched = "14:15";
+                    var defOption = 14;
+                    $('#rad' + defOption + '_div').removeClass('radioOff').addClass('radioOn');
+                    $('#rad' + defOption).removeClass('radioOff').addClass('radioOn');
+                }
+            }
+            $('.rubsched').removeClass('radioOn').addClass('radioOff');
+            $(this).addClass('radioOn').removeClass('radioOff');
+            $(this).parent().addClass('radioOn').removeClass('radioOff');
+            $('.fm-account-save-block').removeClass('hidden');
+            $('.fm-account-main').addClass('save');
+            initAccountScroll(1);
         });
 
         $('.redeem-voucher').unbind('click');

@@ -169,6 +169,12 @@ function bandwidthDialog(close) {
         if (!is_fm() && page !== 'download') {
             return false;
         }
+        
+        // Send a log to the API the first time the over bandwidth quota dialog is triggered
+        if (!localStorage.seenBandwidthDialog) {
+            api_req({ a: 'log', e: 99333, m: 'bandwidthdialog' });
+            localStorage.setItem('seenBandwidthDialog', true);
+        }
 
         // On close button click, close the dialog
         $bandwidthDialog.find('.fm-dialog-close').rebind('click', function() {

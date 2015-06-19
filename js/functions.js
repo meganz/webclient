@@ -418,6 +418,12 @@ function browserdetails(useragent) {
     else if (useragent.indexOf('opera') > 0 || useragent.indexOf(' opr/') > 0) {
         browser = 'Opera';
     }
+    else if (useragent.indexOf('vivaldi') > 0) {
+        browser = 'Vivaldi';
+    }
+    else if (useragent.indexOf('maxthon') > 0) {
+        browser = 'Maxthon';
+    }
     else if (useragent.indexOf('chrome') > 0) {
         browser = 'Chrome';
     }

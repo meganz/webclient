@@ -5473,8 +5473,8 @@ function transferPanelUI()
 
                 $('.transfer-table tr').not('.clone-of-header').fadeOut(function() {
                     $(this).remove();
+					$.clearTransferPanel();
                 });
-                $.clearTransferPanel();
                 Soon(function() {
                     $(window).trigger('resize');
                 });

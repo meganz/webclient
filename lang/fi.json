@@ -3504,7 +3504,12 @@
     "7095": "Julkaistu",
     "7096": "Olemme tehneet parannuksia sivustollemme. P\u00e4ivit\u00e4 MEGAn viimeisimp\u00e4\u00e4n versioon?",
     "7097": "N\u00e4yt\u00e4 p\u00e4ivitykset +",
-    "7098": "Your download could not proceed because it would take you over the current free transfer allowance for your IP address. This limit is dynamic and depends on the amount of unused bandwidth we have available.",
-    "7099": "You have utilized %1 of data transfer in the last 6 hours which took you over our current limit. To circumvent this limit, you can [A]upgrade to Pro[\/A], which will give you your own bandwidth package and also ample extra storage space. ",
-    "7100": "Please upgrade to Pro to continue immediately, or wait %1 to continue for free. "
+    "7098": "Latauksesi ei voi jatkua, sill\u00e4 se ylitt\u00e4isi nykyisen ilmaisen liikennekiinti\u00f6n IP-osoitteellesi. Rajoite on dynaaminen ja riippuvainen tarjolla olevasta vapaasta tietoliikennekaistasta.",
+    "7099": "Olet k\u00e4ytt\u00e4nyt viime kuuden tunnin aikana %1 tiedonsiirtokiinti\u00f6st\u00e4 ylitt\u00e4en siirtorajan. Rajan ohittaaksesi voit [A]p\u00e4ivitt\u00e4\u00e4 Pro-tasolle[\/A]. P\u00e4ivitt\u00e4m\u00e4ll\u00e4 saat runsaasti lis\u00e4\u00e4 tilaa sek\u00e4 oman tiedonsiirtopaketin.",
+    "7100": "Ole hyv\u00e4 ja p\u00e4ivit\u00e4 tilisi Pro-tasolle, tai odota %1 jatkaaksesi maksuttoman tilin k\u00e4ytt\u00f6\u00e4.",
+    "7101": "Jatka siirtoja",
+    "7102": "Kokeile uutta sivustoamme!",
+    "7103": "JATKA MEGA.CO.NZ",
+    "7104": "KOKEILE MEGA.NZ",
+    "7105": "[A]https:\/\/mega.co.nz[\/A] sis\u00e4lt\u00e4\u00e4 parannetun k\u00e4ytt\u00f6kokemuksen ja yhten\u00e4 uutena ominaisuutena [S]MEGAchatin[\/S] "
 }

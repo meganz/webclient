@@ -1011,18 +1011,19 @@ hangupAll: function()
             data: JSON.stringify(obj.stats||obj.basicStats)
     });
     this.trigger('call-ended', obj);
-    if (!sess.fake) { //non-fake session
-        var videoUsed;
-        if (sess.localStream) {
-            var vt = sess.localStream.getVideoTracks();
-            videoUsed = ((vt.length > 0) && vt[0].enabled);
-        } else {
-            videoUsed = false;
-        }
+//release local video
+    var videoUsed;
+    if (sess.localStream) { //a fake session can also have a localStream, e.g. in case of initiate-timeout
+        var vt = sess.localStream.getVideoTracks();
+        videoUsed = ((vt.length > 0) && vt[0].enabled);
         delete sess.localStream;
-        this.removeVideo(sess); //remove remote video
-        this._unrefLocalStream(videoUsed);
+    } else {
+        videoUsed = false;
     }
+    if (sess.remoteStream) {
+        this.removeVideo(sess); //remove remote video
+    }
+    this._unrefLocalStream(videoUsed);
  } catch(e) {
     console.error("onTerminate() handler threw an exception:\n", e.stack?e.stack:e);
  }

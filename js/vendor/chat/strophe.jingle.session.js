@@ -83,8 +83,7 @@ initiate: function(isInitiator) {
     this.hadturncandidate = false;
     this.lasticecandidate = false;
     this.peerconnection.onicecandidate = function (event) {
-        if(
-            event.candidate &&
+        if(event.candidate &&
             event.candidate.candidate.indexOf("candidate") === 0
         ) { // Chrome, normalizing the event.candidate to start with a=
             event.candidate.candidate = "a=" + event.candidate.candidate;
@@ -94,12 +93,12 @@ initiate: function(isInitiator) {
     this.peerconnection.onaddstream = function (event) {
         self.remoteStream = event.stream;
         self.remoteStreams.push(event.stream);
-        self.jingle.onRemoteStreamAdded.call(self.eventHandler, self, event);
+        self.jingle.onRemoteStreamAdded(self, event);
     };
     this.peerconnection.onremovestream = function (event) {
         self.remoteStream = null;
         // FIXME: remove from this.remoteStreams
-        self.jingle.onRemoteStreamRemoved.call(self.eventHandler, self, event);
+        self.jingle.onRemoteStreamRemoved(self, event);
     };
     this.peerconnection.onsignalingstatechange = function (event) {
         if (!(self && self.peerconnection)) return;
@@ -117,7 +116,7 @@ initiate: function(isInitiator) {
                 self.jingle.terminate(self, 'ice-fail');
             }
         }
-        self.jingle.onIceConnStateChange.call(self.eventHandler, self, event); //does nothing
+        self.jingle.onIceConnStateChange(self, event); //does nothing
     };
 },
 
@@ -195,11 +194,10 @@ sendIceCandidate: function (candidate) {
     if (candidate && !self.lasticecandidate) {
         var mid = candidate.sdpMid;
         if (!mid || (mid.length < 1)) {
-            mid = SDPUtil.find_line(self.localSDP.media[candidate.sdpMLineIndex], 'm=').substr(2);
-            var pos = mid.indexOf(' ');
-            if (pos < 0)
-                throw new Error("Could not find sdpMid of media");
-            candidate.sdpMid = mid.substr(0, pos);
+            mid = SDPUtil.find_line(self.localSDP.media[candidate.sdpMLineIndex], 'a=mid:');
+            if (mid) {
+                candidate.sdpMid = mid.substr(6);
+            }
         }
 
         var ice = SDPUtil.iceparams(self.localSDP.media[candidate.sdpMLineIndex], self.localSDP.session),
@@ -313,7 +311,7 @@ sendIceCandidate: function (candidate) {
         debugLog('Candidates generated -> srflx:', this.hadstuncandidate+ ', relay:', this.hadturncandidate);
 
         if (!(this.hadstuncandidate || this.hadturncandidate) && this.peerconnection.signalingState != 'closed') {
-            self.jingle.onNoStunCandidates.call(self.eventHandler, self);
+            self.jingle.onNoStunCandidates(self);
         }
     }
 },
@@ -425,65 +423,65 @@ setRemoteDescription: function(elem, desctype, successCb, failCb)
 },
 
 addIceCandidate: function (elem) {
-    var obj = this;
-    if (this.peerconnection.signalingState == 'closed')
+    var self = this;
+    if (self.peerconnection.signalingState == 'closed') { //using '==' becauyse signallingState might not be a string (but some internal representation that may have toString() implemented)
         return;
-
-    if (!this.peerconnection.remoteDescription && this.peerconnection.signalingState == 'have-local-offer') {
+    }
+    if (!self.peerconnection.remoteDescription && self.peerconnection.signalingState == 'have-local-offer') {
         console.log('trickle ice candidate arriving before session accept...');
         // create a PRANSWER for setRemoteDescription
-        if (!this.remoteSDP) {
+        if (!self.remoteSDP) {
             var cobbled = 'v=0\r\n' +
                 'o=- ' + '1923518516' + ' 2 IN IP4 0.0.0.0\r\n' +// FIXME
                 's=-\r\n' +
                 't=0 0\r\n';
             // first, take some things from the local description
-            for (var i = 0; i < this.localSDP.media.length; i++) {
-                cobbled += SDPUtil.find_line(this.localSDP.media[i], 'm=') + '\r\n';
-                cobbled += SDPUtil.find_lines(this.localSDP.media[i], 'a=rtpmap:').join('\r\n') + '\r\n';
-                if (SDPUtil.find_line(this.localSDP.media[i], 'a=mid:')) {
-                    cobbled += SDPUtil.find_line(this.localSDP.media[i], 'a=mid:') + '\r\n';
+            for (var i = 0; i < self.localSDP.media.length; i++) {
+                cobbled += SDPUtil.find_line(self.localSDP.media[i], 'm=') + '\r\n';
+                cobbled += SDPUtil.find_lines(self.localSDP.media[i], 'a=rtpmap:').join('\r\n') + '\r\n';
+                if (SDPUtil.find_line(self.localSDP.media[i], 'a=mid:')) {
+                    cobbled += SDPUtil.find_line(self.localSDP.media[i], 'a=mid:') + '\r\n';
                 }
                 cobbled += 'a=inactive\r\n';
             }
-            this.remoteSDP = new SDP(cobbled);
+            self.remoteSDP = new SDP(cobbled);
         }
         // then add things like ice and dtls from remote candidate
         elem.each(function () {
-            for (var i = 0; i < obj.remoteSDP.media.length; i++) {
-                if (SDPUtil.find_line(obj.remoteSDP.media[i], 'a=mid:' + $(this).attr('name')) ||
-                        obj.remoteSDP.media[i].indexOf('m=' + $(this).attr('name')) === 0) {
-                    if (!SDPUtil.find_line(obj.remoteSDP.media[i], 'a=ice-ufrag:')) {
+            for (var i = 0; i < self.remoteSDP.media.length; i++) {
+                if (SDPUtil.find_line(self.remoteSDP.media[i], 'a=mid:' + $(this).attr('name')) ||
+                        self.remoteSDP.media[i].indexOf('m=' + $(this).attr('name')) === 0) {
+                    if (!SDPUtil.find_line(self.remoteSDP.media[i], 'a=ice-ufrag:')) {
                         var tmp = $(this).find('transport');
-                        obj.remoteSDP.media[i] += 'a=ice-ufrag:' + tmp.attr('ufrag') + '\r\n';
-                        obj.remoteSDP.media[i] += 'a=ice-pwd:' + tmp.attr('pwd') + '\r\n';
+                        self.remoteSDP.media[i] += 'a=ice-ufrag:' + tmp.attr('ufrag') + '\r\n';
+                        self.remoteSDP.media[i] += 'a=ice-pwd:' + tmp.attr('pwd') + '\r\n';
                         tmp = $(this).find('transport>fingerprint');
                         if (tmp.length) {
-                            obj.remoteSDP.media[i] += 'a=fingerprint:' + tmp.attr('hash') + ' ' + tmp.text() + '\r\n';
+                            self.remoteSDP.media[i] += 'a=fingerprint:' + tmp.attr('hash') + ' ' + tmp.text() + '\r\n';
                         } else {
                             console.log('no dtls fingerprint (webrtc issue #1718?)');
-                            obj.remoteSDP.media[i] += 'a=crypto:1 AES_CM_128_HMAC_SHA1_80 inline:BAADBAADBAADBAADBAADBAADBAADBAADBAADBAAD\r\n';
+                            self.remoteSDP.media[i] += 'a=crypto:1 AES_CM_128_HMAC_SHA1_80 inline:BAADBAADBAADBAADBAADBAADBAADBAADBAADBAAD\r\n';
                         }
                         break;
                     }
                 }
             }
         });
-        this.remoteSDP.raw = this.remoteSDP.session + this.remoteSDP.media.join('');
+        self.remoteSDP.raw = self.remoteSDP.session + self.remoteSDP.media.join('');
 
         // we need a complete SDP with ice-ufrag/ice-pwd in all parts
         // this makes the assumption that the PRANSWER is constructed such that the ice-ufrag is in all mediaparts
         // but it could be in the session part as well. since the code above constructs this sdp this can't happen however
-        var iscomplete = this.remoteSDP.media.filter(function (mediapart) {
+        var iscomplete = self.remoteSDP.media.filter(function (mediapart) {
             return SDPUtil.find_line(mediapart, 'a=ice-ufrag:');
-        }).length == this.remoteSDP.media.length;
+        }).length === self.remoteSDP.media.length;
 
         if (iscomplete) {
             console.log('setting pranswer');
             try {
-                this.peerconnection.setRemoteDescription(new RTC.RTCSessionDescription({type: 'pranswer', sdp: this.remoteSDP.raw }));
+                self.peerconnection.setRemoteDescription(new RTC.RTCSessionDescription({type: 'pranswer', sdp: this.remoteSDP.raw }));
             } catch (e) {
-                this.reportError({type:'webrtc', op:'setRemoteDescription:pranswer'}, e);
+                self.reportError({type:'webrtc', op:'setRemoteDescription:pranswer'}, e);
             }
         } else {
             console.log('not yet setting pranswer');
@@ -494,17 +492,17 @@ addIceCandidate: function (elem) {
         // would love to deactivate this, but firefox still requires it
         var idx = -1;
         var i;
-        for (i = 0; i < obj.remoteSDP.media.length; i++) {
-            if (SDPUtil.find_line(obj.remoteSDP.media[i], 'a=mid:' + $(this).attr('name')) ||
-                obj.remoteSDP.media[i].indexOf('m=' + $(this).attr('name')) === 0) {
+        for (i = 0; i < self.remoteSDP.media.length; i++) {
+            if (SDPUtil.find_line(self.remoteSDP.media[i], 'a=mid:' + $(this).attr('name')) ||
+                self.remoteSDP.media[i].indexOf('m=' + $(this).attr('name')) === 0) {
                 idx = i;
                 break;
             }
         }
         if (idx == -1) { // fall back to localdescription
-            for (i = 0; i < obj.localSDP.media.length; i++) {
-                if (SDPUtil.find_line(obj.localSDP.media[i], 'a=mid:' + $(this).attr('name')) ||
-                    obj.localSDP.media[i].indexOf('m=' + $(this).attr('name')) === 0) {
+            for (i = 0; i < self.localSDP.media.length; i++) {
+                if (SDPUtil.find_line(self.localSDP.media[i], 'a=mid:' + $(this).attr('name')) ||
+                    self.localSDP.media[i].indexOf('m=' + $(this).attr('name')) === 0) {
                     idx = i;
                     break;
                 }
@@ -519,9 +517,10 @@ addIceCandidate: function (elem) {
                                             sdpMid: name,
                                             candidate: line});
             try {
-                obj.peerconnection.addIceCandidate(candidate);
+                throw new Error("boom");
+                self.peerconnection.addIceCandidate(candidate);
             } catch (e) {
-                this.reportError({type:'webrtc', op:'addIceCandidate', line:line}, e);
+                self.reportError({type:'webrtc', op:'addIceCandidate', cand:line}, e);
             }
         });
     });
@@ -621,7 +620,7 @@ sendIq: function(iq, src, successCb, errorCb, timeout)
             if (successCb)
                 successCb();
             var ack = {source: src};
-            self.jingle.onJingleAck.call(self.eventHandler, self, ack);
+            self.jingle.onJingleAck(self, ack);
         },
         function (stanza) {
             if (errorCb)
@@ -635,7 +634,7 @@ sendIq: function(iq, src, successCb, errorCb, timeout)
             } else { // !stanza
                 error.isTimeout = true;
             }
-            self.jingle.onJingleError.call(self.eventHandler, self, error, stanza, iq);
+            self.jingle.onJingleError(self, error, stanza, iq);
         },
         timeout||this.responseTimeout);
 },
@@ -706,7 +705,8 @@ muteUnmute: function(state, what){
 },
 
 reportError: function(info, e) {
-    this.jingle.onInternalError.call(this.jingle.eventHandler, info, e);
+    info.sid = this.sid;
+    this.jingle.onInternalError(info, e);
 },
 
 addFingerprintMac: function(jiq) {

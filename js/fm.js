@@ -57,19 +57,19 @@ function hasQuota(filesize, next) {
             if (!$.lastlimit) {
                 $.lastlimit = 0;
             }
-            
+
             // Translate bottom right text block of bandwidth dialog
             var $bottomRightText = $('.bandwidth-dialog .bandwidth-text-bl.second');
             var text = $bottomRightText.html().replace('[A]', '<span class="red">').replace('[/A]', '</span>');
             text = text.replace('%1', '<strong class="bandwidth-used">' + bytesToSize(r.used) + '</strong>');
             $bottomRightText.html(text);
-            
+
             var minutes = Math.ceil(r.sec / 60);
             var minutesText = l[5838];
             if (minutes != 1) {
                 minutesText = l[5837].replace('[X]', minutes);
             }
-            
+
             // Translate header text of bandwidth dialog
             var $header = $('.bandwidth-dialog .bandwidth-header');
             var headerText = $header.html().replace('%1', '<span class="bandwidth-minutes">' + minutesText + '</span>');
@@ -155,10 +155,10 @@ function checkQuota(filesize,callback)
  * @param {Boolean} close If true, closes the dialog, otherwise opens it
  */
 function bandwidthDialog(close) {
-    
+
     var $bandwidthDialog = $('.fm-dialog.bandwidth-dialog');
     var $backgroundOverlay = $('.fm-dialog-overlay');
-    
+
     // Close dialog
     if (close) {
         $backgroundOverlay.addClass('hidden');
@@ -169,21 +169,21 @@ function bandwidthDialog(close) {
         if (!is_fm() && page !== 'download') {
             return false;
         }
-        
+
         // On close button click, close the dialog
         $bandwidthDialog.find('.fm-dialog-close').rebind('click', function() {
             $backgroundOverlay.addClass('hidden');
             $bandwidthDialog.addClass('hidden');
         });
-        
+
         // On Select button click
         $bandwidthDialog.find('.membership-button').rebind('click', function() {
-                        
+
             // Get the plan number and redirect to pro step 2
-            var planId = $(this).closest('.reg-st3-membership-bl').attr('data-payment');            
+            var planId = $(this).closest('.reg-st3-membership-bl').attr('data-payment');
             document.location.hash = 'pro&planNum=' + planId;
         });
-        
+
         // Show the dialog
         $backgroundOverlay.removeClass('hidden');
         $bandwidthDialog.removeClass('hidden');
@@ -395,15 +395,15 @@ function treeredraw()
 {
     $('li.tree-item-on-search-hidden').removeClass('tree-item-on-search-hidden');
 
-    if (RootbyId(M.currentdirid) == M.RootID)
+    if (M.currentrootid == M.RootID)
         M.buildtree(M.d[M.RootID]);
-    else if (RootbyId(M.currentdirid) == M.RubbishID)
+    else if (M.currentrootid == M.RubbishID)
         M.buildtree({h: M.RubbishID});
-    else if (RootbyId(M.currentdirid) == 'shares')
+    else if (M.currentrootid == 'shares')
         M.buildtree({h: 'shares'});
-    else if (RootbyId(M.currentdirid) == 'contacts')
+    else if (M.currentrootid == 'contacts')
         M.contacts();
-    else if (RootbyId(M.currentdirid) == 'chat')
+    else if (M.currentrootid == 'chat')
     {
         console.log('render the entire contact list filtered by search query into the conversations list');
     }
@@ -1573,14 +1573,14 @@ function addContactUI()
     });
 
     function addContactAreaResizing() {
-        
+
         var txt = $('.add-user-notification textarea'),
             txtHeight = txt.outerHeight(),
             hiddenDiv = $('.add-contact-hidden'),
             pane = $('.add-user-nt-scrolling'),
             content = txt.val(),
             api;
-        
+
         content = content.replace(/\n/g, '<br />');
         hiddenDiv.html(encodeURI(content) + '<br/>');
 
@@ -1596,7 +1596,7 @@ function addContactUI()
             }
             else {
                 api = pane.data('jsp');
-                
+
                 if (api) {
                     api.destroy();
                     txt.blur();
@@ -2149,7 +2149,7 @@ function fmremove() {
 function fmremdupes(test)
 {
     var hs = {}, i, f = [], s = 0;
-    var cRootID = RootbyId(M.currentdirid);
+    var cRootID = M.currentrootid;
     loadingDialog.show();
     for (i in M.d)
     {
@@ -2708,12 +2708,12 @@ function fmtopUI() {
     $('.fm-contact-requests,.fm-received-requests').removeClass('active');
     $('.fm-new-folder').removeClass('filled-input');
 
-    if (RootbyId(M.currentdirid) === M.RubbishID) {
+    if (M.currentrootid === M.RubbishID) {
         $('.fm-clearbin-button').removeClass('hidden');
         $('.fm-right-files-block').addClass('rubbish-bin');
     } else {
         $('.fm-right-files-block').removeClass('rubbish-bin');
-        if (RootbyId(M.currentdirid) === M.InboxID) {
+        if (M.currentrootid === M.InboxID) {
             if (d) {
                 console.log('Inbox');
             }
@@ -4147,7 +4147,7 @@ function gridUI() {
         $('.shared-grid-view').removeClass('hidden');
         $.sharedGridHeader();
         initGridScrolling();
-    } else if (M.currentdirid.length === 11 && RootbyId(M.currentdirid) == 'contacts') {// Cloud-drive/File manager
+    } else if (String(M.currentdirid).length === 11 && M.currentrootid == 'contacts') {// Cloud-drive/File manager
         $('.contacts-details-block').removeClass('hidden');
         if (M.v.length > 0) {
             $('.files-grid-view.contact-details-view').removeClass('hidden');
@@ -4217,7 +4217,7 @@ function gridUI() {
         $.selectddUIgrid = '.contact-requests-grid .grid-scrolling-table';
     else if (M.currentdirid === 'opc')
         $.selectddUIgrid = '.sent-requests-grid .grid-scrolling-table';
-    else if (M.currentdirid.length === 11 && RootbyId(M.currentdirid) == 'contacts')
+    else if (String(M.currentdirid).length === 11 && M.currentrootid == 'contacts')
         $.selectddUIgrid = '.files-grid-view.contact-details-view .grid-scrolling-table';
     else
         $.selectddUIgrid = '.files-grid-view.fm .grid-scrolling-table';
@@ -5238,7 +5238,7 @@ function iconUI(aQuiet)
         $('.shared-blocks-view').removeClass('hidden');
         initShareBlocksScrolling();
     }
-    else if (M.currentdirid.length == 11 && RootbyId(M.currentdirid) == 'contacts')
+    else if (String(M.currentdirid).length === 11 && M.currentrootid == 'contacts')
     {
         $('.contacts-details-block').removeClass('hidden');
         if (M.v.length > 0)
@@ -5273,7 +5273,7 @@ function iconUI(aQuiet)
         $.selectddUIgrid = '.shared-blocks-scrolling';
         $.selectddUIitem = 'a';
     }
-    else if (M.currentdirid.length == 11 && RootbyId(M.currentdirid) == 'contacts')
+    else if (String(M.currentdirid).length === 11 && M.currentrootid == 'contacts')
     {
         $.selectddUIgrid = '.contact-details-view .file-block-scrolling';
         $.selectddUIitem = 'a';
@@ -5653,7 +5653,7 @@ function contextMenuUI(e, ll) {
     if (ll === 2) {
         
         // Enable upload item menu for clould-drive, don't show it for rubbish and rest of crew
-        if (RightsbyID(M.currentdirid) && RootbyId(M.currentdirid) !== M.RubbishID) {
+        if (RightsbyID(M.currentdirid) && M.currentrootid !== M.RubbishID) {
             $(t).filter('.context-menu-item').hide();
             $(t).filter('.fileupload-item,.newfolder-item').show();
             
@@ -5705,7 +5705,7 @@ function contextMenuUI(e, ll) {
         // detect and show right menu
         if (id && id.length === 11) {
             $(t).filter('.remove-item').show();// transfer panel
-        } else if (c && c.indexOf('cloud-drive-item') > -1) {
+        } else if (c && (c.indexOf('cloud-drive') > -1 || c.indexOf('folder-link') > -1)) {
             var flt = '.properties-item';
             if (folderlink) {
                 flt += ',.import-item';
@@ -6334,7 +6334,7 @@ function treeUIopen(id, event, ignoreScroll, dragOver, DragOpen) {
             }
             i++;
         }
-        if (ids[0] === 'contacts' && M.currentdirid && M.currentdirid.length === 11 && RootbyId(M.currentdirid) == 'contacts') {
+        if (ids[0] === 'contacts' && M.currentdirid && String(M.currentdirid).length === 11 && M.currentrootid == 'contacts') {
             sectionUIopen('contacts');
         } else if (ids[0] === 'contacts') {
             // XX: whats the goal of this? everytime when i'm in the contacts and I receive a share, it changes ONLY the
@@ -7475,14 +7475,14 @@ function initShareDialog() {
     });
 
     function shareMessageResizing() {
-        
+
       var txt = $('.share-message textarea'),
           txtHeight =  txt.outerHeight(),
           hiddenDiv = $('.share-message-hidden'),
           pane = $('.share-message-scrolling'),
           content = txt.val(),
           api;
-      
+
       content = content.replace(/\n/g, '<br />');
       hiddenDiv.html(encodeURI(content) + '<br/>');
 
@@ -7498,7 +7498,7 @@ function initShareDialog() {
         }
         else {
             api = pane.data('jsp');
-            
+
             if (api) {
               api.destroy();
               txt.blur();
@@ -8670,23 +8670,23 @@ function propertiesDialog(close)
     for (var i in $.selected)
     {
         var n = M.d[$.selected[i]];
-        if (n.t)
-        {
+        if (!n) {
+            console.error('propertiesDialog: invalid node', $.selected[i]);
+        }
+        else if (n.t) {
             var nodes = fm_getnodes(n.h);
-            for (var i in nodes)
-            {
-                if (M.d[nodes[i]] && !M.d[nodes[i]].t)
-                {
+            for (var i in nodes) {
+                if (M.d[nodes[i]] && !M.d[nodes[i]].t) {
                     size += M.d[nodes[i]].s;
                     sfilecnt++;
                 }
-                else
+                else {
                     sfoldercnt++;
+                }
             }
             foldercnt++;
         }
-        else
-        {
+        else {
             filecnt++
             size += n.s;
         }
@@ -9046,10 +9046,11 @@ function slideshowsteps()
                 forward.push(M.v[ii[0]].h);
                 backward.push(M.v[ii[n - 1]].h);
                 break;
-                // first
+            // first
             case 0:
                 forward.push(M.v[ii[n + 1]].h);
                 backward.push(M.v[ii[len - 1]].h);
+            case -1:
                 break;
             default:
                 forward.push(M.v[ii[n + 1]].h);

@@ -1160,13 +1160,13 @@ function MegaData()
             else if (M.currentdirid === 'shares') {
                 $('.fm-empty-incoming').removeClass('hidden');
             }
-            else if (RootbyId(M.currentdirid) === M.RootID) {
+            else if (M.currentrootid === M.RootID) {
                 $('.fm-empty-folder').removeClass('hidden');
             }
-            else if (RootbyId(M.currentdirid) === 'shares') {
+            else if (M.currentrootid === 'shares') {
                 this.emptySharefolderUI(lSel);
             }
-            else if (RootbyId(M.currentdirid) === 'contacts') {
+            else if (M.currentrootid === 'contacts') {
                 $('.fm-empty-incoming.contact-details-view').removeClass('hidden');
                 $('.contact-share-notification').addClass('hidden');
             }
@@ -2003,7 +2003,7 @@ function MegaData()
 
             for (var h in M.c[fid])
             {
-                if (M.d[h].t)
+                if (M.d[h] && M.d[h].t)
                 {
                     sub = true;
                     cs = ' contains-submenu';
@@ -2092,7 +2092,7 @@ function MegaData()
             if (M.d[id] || id === 'contacts' || id === 'messages' || id === 'shares'
                 || id === M.InboxID || id === 'opc' || id === 'ipc') {
                 a.push(id);
-            } else if (id.length !== 11) {
+            } else if (!id || id.length !== 11) {
                 return [];
             }
 
@@ -4538,7 +4538,7 @@ function renderNew() {
 
     if (UItree) {
         treeUI();
-        if (RootbyId(M.currentdirid) === 'shares') {
+        if (M.currentrootid === 'shares') {
             M.renderTree();
         }
         if (M.currentdirid === 'shares' && !M.viewmode) {
@@ -5245,6 +5245,10 @@ function fm_getcopynodes(cn, t)
         if (n)
         {
             var ar;
+            if (!n.key) {
+                console.error('fm_getcopynodes: missing node key', n);
+                continue;
+            }
             if (!n.ar) {
                 console.warn('Something went wrong, missing node attr - trying to fix in the run...');
                 crypto_processkey(u_handle, u_k_aes, n);

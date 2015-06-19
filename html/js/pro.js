@@ -269,9 +269,6 @@ var proPage = {
         // If the plan number is preselected
         if (planNum) {
             
-            // Set this flag for some statistics in the 'utc' API call.
-            this.fromBandwidthDialog = true;
-            
             // Set the selected plan
             var $selectedPlan = $('.membership-step1 .reg-st3-membership-bl.pro' + planNum);
             var $stageTwoSelectedPlan = $('.membership-step2 .membership-selected-block');
@@ -828,7 +825,7 @@ function pro_pay()
                 }
                 
                 // Convert from boolean to integer for API
-                var fromBandwidthDialog = proPage.fromBandwidthDialog ? 1 : 0;
+                var fromBandwidthDialog = (localStorage.seenBandwidthDialog) ? 1 : 0;
 
                 // utc = User Transaction Complete
                 // s = sale ID

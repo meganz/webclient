@@ -3609,7 +3609,8 @@ function MegaData()
             setupTransferAnalysis();
             if ((downloading = !!dl_queue.length)) {
                 $('.transfer-pause-icon').removeClass('disabled');
-		        $('.transfer-clear-all-icon').removeClass('disabled');
+                $('.transfer-clear-completed').removeClass('disabled');
+                $('.transfer-clear-all-icon').removeClass('disabled');
             }
         }
 
@@ -3729,11 +3730,6 @@ function MegaData()
                 .removeClass('download')
                 .addClass('safari-downloaded')
                 .text('Save File');
-        } else {
-            $('.transfer-table #' + id).fadeOut('slow', function(e)
-            {
-                $(this).remove();
-            });
         }
         if (dlMethod == FileSystemAPI)
         {
@@ -4030,6 +4026,7 @@ function MegaData()
         setupTransferAnalysis();
         if ((ul_uploading = !!ul_queue.length)) {
             $('.transfer-pause-icon').removeClass('disabled');
+            $('.transfer-clear-completed').removeClass('disabled');
 		    $('.transfer-clear-all-icon').removeClass('disabled');
         }
     }
@@ -4125,12 +4122,6 @@ function MegaData()
         }
         $('.transfer-table #ul_' + id + ' td:eq(5)').html('<span class="transfer-status completed">' + l[554] + '</span>');
         $('.transfer-table #ul_' + id + ' td:eq(2)').text('');
-
-        $('.transfer-table #ul_' + id).fadeOut('slow', function(e)
-        {
-            $(this).remove();
-            $(window).trigger('resize');
-        });
         ul_queue[ul.pos] = Object.freeze({});
         var a=ul_queue.filter(isQueueActive).length;
         if (a < 2 && !ul_uploading)

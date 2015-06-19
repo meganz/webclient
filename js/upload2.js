@@ -244,11 +244,6 @@ var UploadManager =
 				ul_queue[idx] = Object.freeze({});
 			});
 			if (!this._multiAbort) Soon(resetUploadDownload);
-			$('#' + gid).fadeOut('slow', function()
-			{
-				$(this).remove();
-				$(window).trigger('resize');
-			});
 		}
 	},
 
@@ -1017,15 +1012,8 @@ function resetUploadDownload() {
 		clearXhr(); /* destroy all xhr */
 
 	    $('.transfer-pause-icon').addClass('disabled');
-	    $('.transfer-panel-empty-txt').removeClass('hidden');
-	    $('.transfer-table-header').hide(0);
 	    $('.nw-fm-left-icon.transfers').removeClass('transfering');
 	    $('.transfers .nw-fm-percentage li p').css('transform', 'rotate(0deg)');
-
-		if ($.transferClose) $.transferClose();
-
-		$('.transfer-clear-all-icon').addClass('disabled');
-		$('.transfer-clear-completed').addClass('disabled');
 		panelDomQueue = {};
 		GlobalProgress = {};
 		delete $.transferprogress;

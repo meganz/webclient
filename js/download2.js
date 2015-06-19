@@ -78,8 +78,6 @@ var DownloadManager =
 				dl_queue[l] = Object.freeze({});
 			}
 		}
-
-		if (dlMethod !== FlashIO) $('#' + gid).fadeOut('slow', function() { $(this).remove() });
 	},
 
 	GetGID : function DM_GetGID(dl)

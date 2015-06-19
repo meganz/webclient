@@ -1165,6 +1165,7 @@ function transferPanelContextMenu(target)
 
 function openTransferpanel()
 {
+
     $('.nw-fm-left-icon.transfers').addClass('transfering');
 
     if (!uldl_hold)
@@ -1186,8 +1187,8 @@ function openTransferpanel()
     $(window).trigger('resize');
 
     if ($('table.transfer-table tr').length > 1) {
-        $('.transfer-clear-all-icon').removeClass('disabled');
-		$('.transfer-clear-completed').removeClass('disabled');
+       $('.transfer-clear-all-icon').removeClass('disabled');
+       $('.transfer-clear-completed').removeClass('disabled');
     }
 
     $('.tranfer-table .grid-url-arrow').unbind('click')
@@ -1221,7 +1222,9 @@ function openTransferpanel()
             DownloadManager.abort(downloadId);
             UploadManager.abort(downloadId);
         });
-
+		
+        $.clearTransferPanel();
+		
         Soon(function() {
             $(window).trigger('resize');
         });
@@ -2432,6 +2435,7 @@ function initContextUI()
             DownloadManager.abort(downloadId);
             UploadManager.abort(downloadId);
         });
+        $.clearTransferPanel();
 
         Soon(function() {
             // XXX: better way to stretch the scrollbar?
@@ -5238,7 +5242,7 @@ function transferPanelUI()
         waitForRsizingEvent(function(){
             $('.transfer-table tr.clone-of-header th').each(function(i, e)
             {
-			    if ($(e).width() != 0) {
+			    if ($(e).outerWidth() != 0) {
                     var headerColumn = $(el).get(i);
                     $(headerColumn).width($(e).width()+'px');
 			    }
@@ -5246,12 +5250,12 @@ function transferPanelUI()
         }, 100, 'transferPanel');
 
         var tth = $('.transfer-table-header');
-        var toHide = (dl_queue.length || ul_queue.length);
+        var toHide = (dl_queue.length || ul_queue.length || $('.transfer-table tr').length > 1);
         // Show/Hide header if there is no items in transfer list
         if (!toHide)
         {
             $('.transfer-panel-empty-txt').removeClass('hidden');
-            tth.hide(0);
+            tth.hide(0); 
         }
         else
         {
@@ -5356,6 +5360,17 @@ function transferPanelUI()
         }
     };
 
+    $.clearTransferPanel = function() {
+        if ($('.transfer-table tr').length == 1) {
+            $('.transfer-clear-all-icon').addClass('disabled');
+            $('.transfer-pause-icon').addClass('disabled');
+            $('.transfer-clear-completed').addClass('disabled');
+            $('.transfer-table-header').hide();
+            $('.transfer-panel-empty-txt').removeClass('hidden');
+            $('.transfer-panel-title').html(l[104]);
+        }
+    };
+
     $('.nw-fm-left-icon.settings .settings-icon').unbind('click');
     $('.nw-fm-left-icon.settings .settings-icon').bind('click', function()
     {
@@ -5373,61 +5388,77 @@ function transferPanelUI()
     });
     $('.transfer-clear-all-icon').unbind('click');
     $('.transfer-clear-all-icon').bind('click', function() {
-        msgDialog('confirmation', 'cancel all transfers', 'Are you sure you want to cancel all transfers?', '', function(e) {
-            if (!e)
-                return;
+        if (!$(this).hasClass('disabled')) {
+            msgDialog('confirmation', 'cancel all transfers', 'Are you sure you want to cancel all transfers?', '', function(e) {
+                if (!e)
+                    return;
 
-            DownloadManager.abort(null);
-            UploadManager.abort(null);
+                DownloadManager.abort(null);
+                UploadManager.abort(null);
 
-            $('.transfer-table tr').not('.clone-of-header').fadeOut(function() {
-                $(this).remove();
+                $('.transfer-table tr').not('.clone-of-header').fadeOut(function() {
+                    $(this).remove();
+                });
+                $.clearTransferPanel();
+                Soon(function() {
+                    $(window).trigger('resize');
+                });
             });
-            $('.transfer-clear-all-icon').addClass('disabled');
-            $('.transfer-pause-icon').addClass('disabled');
-			$('.transfer-table-header').show();
-            $('.transfer-panel-empty-txt').removeClass('hidden');
-            $('.transfer-panel-title').html(l[104]);
-        });
+        }
+    });
+	
+    $('.transfer-clear-completed').unbind('click');
+    $('.transfer-clear-completed').bind('click', function() {
+        if (!$(this).hasClass('disabled')) {
+            $('.transfer-table tr .transfer-status.completed').closest('tr').fadeOut(function() {
+                $(this).remove();
+                $.clearTransferPanel();
+                Soon(function() {
+                    $(window).trigger('resize');
+                });
+            });
+        }
     });
 
     $('.transfer-pause-icon').unbind('click');
     $('.transfer-pause-icon').bind('click', function()
     {
-        if ($(this).attr('class').indexOf('active') > -1)
-        {
-            // terms of service
-            if (u_type || u_attr.terms)
+        if (!$(this).hasClass('disabled')) {
+            if ($(this).attr('class').indexOf('active') > -1)
             {
-                $(this).removeClass('active').find('span').html(l[6993]);
-                dlQueue.resume();
-                ulQueue.resume();
-                ui_paused = false;
-                uldl_hold = false;
-            } else
-            {
-                alert(l[214]);
-                DEBUG(l[214]);
+                // terms of service
+                if (u_type || u_attr.terms)
+                {
+                    $(this).removeClass('active').find('span').html(l[6993]);
+                    dlQueue.resume();
+                    ulQueue.resume();
+                    ui_paused = false;
+                    uldl_hold = false;
+                } else
+                {
+                    alert(l[214]);
+                    DEBUG(l[214]);
+                }
+
+                $('.fm-transfers-block tr span.transfer-type').removeClass('paused');
+			    $('.nw-fm-left-icon').removeClass('paused');
             }
-
-            $('.fm-transfers-block tr span.transfer-type').removeClass('paused');
-			$('.nw-fm-left-icon').removeClass('paused');
-        }
-        else
-        {
-			$(this).addClass('active').find('span').html('Resume transfers');
-            dlQueue.pause();
-            ulQueue.pause();
-            ui_paused = true;
-            uldl_hold = true;
-
-            $('.transfer-table tr span.transfer-type').addClass('paused');
-			$('.nw-fm-left-icon').addClass('paused');
-
-            $('.transfer-table tr td:eq(2)').each(function()
+            else
             {
-                $(this).text('');
-            });
+			    $(this).addClass('active').find('span').html('Resume transfers');
+                dlQueue.pause();
+                ulQueue.pause();
+                ui_paused = true;
+                uldl_hold = true;
+
+                $('.transfer-table tr span.transfer-type').addClass('paused');
+			    $('.nw-fm-left-icon').addClass('paused');
+
+                $('.transfer-table tr td:eq(2)').each(function()
+                {
+                    $(this).text('');
+                });
+            }
         }
     });
 }

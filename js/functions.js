@@ -1660,7 +1660,7 @@ function CreateWorkers(url, message, size) {
 function mKeyDialog(ph, fl) {
     $('.new-download-buttons').addClass('hidden');
     $('.new-download-file-title').text(l[1199]);
-    $('.new-download-file-icon').addClass(fileicon({
+    $('.new-download-file-icon').addClass(fileIcon({
         name: 'unknown.unknown'
     }));
     $('.fm-dialog.dlkey-dialog').removeClass('hidden');
@@ -2278,6 +2278,41 @@ function getHtmlElemPos(elem, n) {
         x: xPos,
         y: yPos
     };
+}
+
+/*
+ * getServerTime()
+ * 
+ * get server date/time using http header Date field
+ * if fail get client current time
+ * 
+ * It accepts the RFC2822 / IETF date syntax (RFC2822 Section 3.3),
+ * e.g. "Mon, 25 Dec 1995 13:30:00 GMT"
+ *  If a time zone is not specified and the string is in an ISO format
+ *  recognized by ES5, UTC is assumed. GMT and UTC are considered equivalent.
+ * 
+ * @returns {integer} seconds
+ */
+function getServerTime() {
+
+    var req = new XMLHttpRequest(),
+        sDate = '',
+        iTime = 0;
+    
+    // Important: Synchronous request
+    req.open('POST', document.location, false);
+    req.send(null);
+    sDate = req.getResponseHeader('Date');
+    
+    try {
+        iTime = Math.floor(Date.parse(sDate) / 1000);
+    }
+    catch (error) {
+        iTime = Math.floor(new Date().getTime() / 1000);
+        DEBUG('getServerTime() failed: ' + error);
+    }
+
+    return iTime;
 }
 
 function disableDescendantFolders(id, pref) {

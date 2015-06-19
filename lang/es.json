@@ -3446,7 +3446,7 @@
     "7037": "Error obteniendo la informaci\u00f3n del enlace",
     "7038": "Enlace circular detectado",
     "7039": "No preguntar otra vez",
-    "7040": "La carpeta de destino est\u00e1 sincronizada y tiene un archivo en su interior con el mismo nombre (%1). Si contin\u00faas la subida, el archivo previo se sobreescribir\u00e1. \u00bfEst\u00e1s seguro?",
+    "7040": "La carpeta de destino est\u00e1 sincronizada y tiene un archivo en su interior con el mismo nombre. Si contin\u00faas la subida, el archivo previo se sobreescribir\u00e1. \u00bfEst\u00e1s seguro?",
     "7041": "Obteniendo carpetas...",
     "7042": "Tienes %1 en esta carpeta.\u00bfEst\u00e1s seguro de que quieres sincronizarla?",
     "7043": "Carpeta no v\u00e1lida para sincronizaci\u00f3n.Aseg\u00farate de que no usas caracteres como ''', '\/' o ':' en tus nombres de carpeta,",
@@ -3506,5 +3506,10 @@
     "7097": "View Updates +",
     "7098": "Your download could not proceed because it would take you over the current free transfer allowance for your IP address. This limit is dynamic and depends on the amount of unused bandwidth we have available.",
     "7099": "You have utilized %1 of data transfer in the last 6 hours which took you over our current limit. To circumvent this limit, you can [A]upgrade to Pro[\/A], which will give you your own bandwidth package and also ample extra storage space. ",
-    "7100": "Please upgrade to Pro to continue immediately, or wait %1 to continue for free. "
+    "7100": "Please upgrade to Pro to continue immediately, or wait %1 to continue for free. ",
+    "7101": "Resume transfers",
+    "7102": "Try our new site!",
+    "7103": "CONTINUE ON MEGA.CO.NZ",
+    "7104": "TRY MEGA.NZ",
+    "7105": "[A]https:\/\/mega.nz[\/A] has an improved user experience and new features such as [S]MEGAchat[\/S]"
 }

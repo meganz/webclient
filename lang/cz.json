@@ -3504,7 +3504,12 @@
     "7095": "Vyd\u00e1no",
     "7096": "Ned\u00e1vno jsme na\u0161e str\u00e1nky trochu vylep\u0161ili. Aktualizovat na nejnov\u011bj\u0161\u00ed verzi MEGA?",
     "7097": "Zobrazit aktualizace +",
-    "7098": "Your download could not proceed because it would take you over the current free transfer allowance for your IP address. This limit is dynamic and depends on the amount of unused bandwidth we have available.",
-    "7099": "You have utilized %1 of data transfer in the last 6 hours which took you over our current limit. To circumvent this limit, you can [A]upgrade to Pro[\/A], which will give you your own bandwidth package and also ample extra storage space. ",
-    "7100": "Please upgrade to Pro to continue immediately, or wait %1 to continue for free. "
+    "7098": "Va\u0161e stahov\u00e1n\u00ed nemohlo pokra\u010dovat, proto\u017ee byste p\u0159ekro\u010dili aktu\u00e1ln\u00ed povolen\u00ed bezplatn\u00e9ho p\u0159enosu pro va\u0161i IP adresu. Toto omezen\u00ed je dynamick\u00e9 a z\u00e1vis\u00ed na v\u00fd\u0161i nepou\u017eit\u00e9 \u0161\u00ed\u0159ky p\u00e1sma, kterou m\u00e1me k dispozici.",
+    "7099": "Vyu\u017eili jste %1 p\u0159enosu dat za posledn\u00edch 6 hodin, \u010d\u00edm\u017e jste p\u0159ekro\u010dili na\u0161e aktu\u00e1ln\u00ed omezen\u00ed. Abyste toto omezen\u00ed obe\u0161li, m\u016f\u017eete [A]upgradovat na Pro[\/A], co\u017e v\u00e1m poskytne v\u00e1\u0161 vlastn\u00ed bal\u00ed\u010dek \u0161\u00ed\u0159ky p\u00e1sma  a tak\u00e9 dostate\u010dn\u00fd prostor \u00falo\u017ei\u0161t\u011b nav\u00edc.",
+    "7100": "Upgradujte na Pro pro okam\u017eit\u00e9 pokra\u010dov\u00e1n\u00ed, nebo po\u010dkejte %1 pro pokra\u010dov\u00e1n\u00ed zdarma.",
+    "7101": "Obnovit p\u0159enosy",
+    "7102": "Zkuste na\u0161e nov\u00e9 str\u00e1nky!",
+    "7103": "POKRA\u010cOVAT NA MEGA.CO.NZ",
+    "7104": "VYZKOU\u0160ET MEGA.NZ",
+    "7105": "[A]https:\/\/mega.nz[\/A] m\u00e1 vylep\u0161en\u00e9 u\u017eivatelsk\u00e9 rozhran\u00ed a nov\u00e9 funkce, jako je [S]MEGAchat[\/S]"
 }

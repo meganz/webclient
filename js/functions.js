@@ -181,7 +181,7 @@ function ellipsis(text, location, maxCharacters) {
  * @returns {String}
  */
 function translate(html) {
-    
+
     /**
      * String.replace callback
      * @param {String} match The whole matched string
@@ -209,7 +209,7 @@ function translate(html) {
         }
         return String(l[localeNum]);
     };
-    
+
     return String(html).replace(/\[\$(\d+)(?:\.(\w+))?\]/g, replacer);
 }
 
@@ -1660,7 +1660,7 @@ function CreateWorkers(url, message, size) {
 function mKeyDialog(ph, fl) {
     $('.new-download-buttons').addClass('hidden');
     $('.new-download-file-title').text(l[1199]);
-    $('.new-download-file-icon').addClass(fileicon({
+    $('.new-download-file-icon').addClass(fileIcon({
         name: 'unknown.unknown'
     }));
     $('.fm-dialog.dlkey-dialog').removeClass('hidden');
@@ -2280,6 +2280,41 @@ function getHtmlElemPos(elem, n) {
     };
 }
 
+/*
+ * getServerTime()
+ * 
+ * get server date/time using http header Date field
+ * if fail get client current time
+ * 
+ * It accepts the RFC2822 / IETF date syntax (RFC2822 Section 3.3),
+ * e.g. "Mon, 25 Dec 1995 13:30:00 GMT"
+ *  If a time zone is not specified and the string is in an ISO format
+ *  recognized by ES5, UTC is assumed. GMT and UTC are considered equivalent.
+ * 
+ * @returns {integer} seconds
+ */
+function getServerTime() {
+
+    var req = new XMLHttpRequest(),
+        sDate = '',
+        iTime = 0;
+    
+    // Important: Synchronous request
+    req.open('POST', document.location, false);
+    req.send(null);
+    sDate = req.getResponseHeader('Date');
+    
+    try {
+        iTime = Math.floor(Date.parse(sDate) / 1000);
+    }
+    catch (error) {
+        iTime = Math.floor(new Date().getTime() / 1000);
+        DEBUG('getServerTime() failed: ' + error);
+    }
+
+    return iTime;
+}
+
 function disableDescendantFolders(id, pref) {
     var folders = [];
     for (var i in M.c[id]) {
@@ -2790,6 +2825,33 @@ function assertStateChange(currentState, newState, allowedStatesMap, enumMap) {
 }
 
 /**
+ *  Retrieve a call stack
+ *  @return {String}
+ */
+mega.utils.getStack = function megaUtilsGetStack() {
+    var stack;
+
+    if (is_chrome_firefox) {
+        stack = Components.stack.formattedStack;
+    }
+
+    if (!stack) {
+        stack = (new Error()).stack;
+
+        if (!stack) {
+            try {
+                throw new Error();
+            }
+            catch(e) {
+                stack = e.stack;
+            }
+        }
+    }
+
+    return stack;
+};
+
+/**
  *  Check whether there are pending transfers.
  *
  *  @return {Boolean}
@@ -2974,6 +3036,214 @@ function mCleanestLogout(aUserHandle) {
 }
 
 
+// Initialize Rubbish-Bin Cleaning Scheduler
+mBroadcaster.addListener('crossTab:master', function _setup() {
+    var RUBSCHED_WAITPROC = 120 * 1000;
+    var RUBSCHED_IDLETIME =  25 * 1000;
+    var timer, updId;
+
+    mBroadcaster.once('crossTab:leave', _exit);
+
+    // The fm must be initialized before proceeding
+    if (!folderlink && fminitialized) {
+        _fmready();
+    }
+    else {
+        mBroadcaster.addListener('fm:initialized', _fmready);
+    }
+
+    function _fmready() {
+        if (!folderlink) {
+            _init();
+            return 0xdead;
+        }
+    }
+
+    function _update(enabled) {
+        _exit();
+        if (enabled) {
+            _init();
+        }
+    }
+
+    function _exit() {
+        if (timer) {
+            clearInterval(timer);
+            timer = null;
+        }
+        if (updId) {
+            mBroadcaster.removeListener(updId);
+            updId = null;
+        }
+    }
+
+    function _init() {
+        // if (d) console.log('Initializing Rubbish-Bin Cleaning Scheduler');
+
+        updId = mBroadcaster.addListener('fmconfig:rubsched', _update);
+        if (fmconfig.rubsched) {
+            timer = setInterval(_proc, RUBSCHED_WAITPROC);
+        }
+    }
+
+    function _proc() {
+
+        // Do nothing unless the user has been idle
+        if (Date.now() - lastactive < RUBSCHED_IDLETIME) {
+            return;
+        }
+
+        _exit();
+
+        // Mode 14 - Remove files older than X days
+        // Mode 15 - Keep the Rubbish-Bin under X GB
+        var mode = String(fmconfig.rubsched).split(':');
+        var xval = mode[1];
+        mode = +mode[0];
+
+        var handler = _rubSchedHandler[mode];
+        if (!handler) {
+            throw new Error('Invalid RubSchedHandler', mode);
+        }
+
+        if (d) {
+            console.log('Running Rubbish-Bin Cleaning Scheduler', mode, xval);
+            console.time('rubsched');
+        }
+
+        var nodes = Object.keys(M.c[M.RubbishID] || {}), rubnodes = [];
+
+        for (var i in nodes) {
+            var node = M.d[nodes[i]];
+            if (!node) {
+                console.error('Invalid node', nodes[i]);
+                continue;
+            }
+            if (node.t == 1) {
+                rubnodes = rubnodes.concat(fm_getnodes(node.h));
+            }
+            rubnodes.push(node.h);
+        }
+
+        rubnodes.sort(handler.sort);
+        var rNodes = handler.log(rubnodes);
+
+        // if (d) console.log('rubnodes', rubnodes, rNodes);
+
+        var handles = [];
+        if (handler.purge(xval)) {
+            for (var i in rubnodes) {
+                var node = M.d[rubnodes[i]];
+
+                if (handler.remove(node, xval)) {
+                    handles.push(node.h);
+
+                    if (handler.ready(node, xval)) {
+                        break;
+                    }
+                }
+            }
+
+            // if (d) console.log('RubSched-remove', handles);
+
+            if (handles.length) {
+                var inRub = (M.RubbishID === M.currentrootid);
+
+                handles.map(function(handle) {
+                    M.delNode(handle);
+                    api_req({a: 'd', n: handle, i: requesti});
+
+                    if (inRub) {
+                        $('.grid-table.fm#' + handle).remove();
+                        $('.file-block#' + handle).remove();
+                    }
+                });
+
+                if (inRub) {
+                    if (M.viewmode) {
+                        iconUI();
+                    }
+                    else {
+                        gridUI();
+                    }
+                    treeUI();
+                }
+            }
+        }
+
+        if (d) {
+            console.timeEnd('rubsched');
+        }
+
+        // Once we ran for the first time, set up a long running scheduler
+        RUBSCHED_WAITPROC = 4 * 3600 * 1e3;
+        _init();
+    }
+
+    /**
+     * Scheduler Handlers
+     *   Sort:    Sort nodes specifically for the handler purpose
+     *   Log:     Keep a record of nodes if required and return a debugable array
+     *   Purge:   Check whether the Rubbish-Bin should be cleared
+     *   Remove:  Return true if the node is suitable to get removed
+     *   Ready:   Once a node is removed, check if the criteria has been meet
+     */
+    var _rubSchedHandler = {
+        // Remove files older than X days
+        "14": {
+            sort: function(n1, n2) {
+                return M.d[n1].ts > M.d[n2].ts;
+            },
+            log: function(nodes) {
+                return d && nodes.map(function(node) {
+                    return M.d[node].name + '~' + (new Date(M.d[node].ts*1000)).toISOString();
+                });
+            },
+            purge: function(limit) {
+                return true;
+            },
+            remove: function(node, limit) {
+                limit = (Date.now() / 1e3) - (limit * 86400);
+                return node.ts < limit;
+            },
+            ready: function(node, limit) {
+                return false;
+            }
+        },
+        // Keep the Rubbish-Bin under X GB
+        "15": {
+            sort: function(n1, n2) {
+                n1 = M.d[n1].s || 0;
+                n2 = M.d[n2].s || 0;
+                return n1 < n2;
+            },
+            log: function(nodes) {
+                var pnodes, size = 0;
+
+                pnodes = nodes.map(function(node) {
+                    size += (M.d[node].s || 0);
+                    return M.d[node].name + '~' + bytesToSize(M.d[node].s);
+                });
+
+                this._size = size;
+
+                return pnodes;
+            },
+            purge: function(limit) {
+                return this._size > (limit * 1024 * 1024 * 1024);
+            },
+            remove: function(node, limit) {
+                return true;
+            },
+            ready: function(node, limit) {
+                this._size -= (node.s || 0);
+                return this._size < (limit * 1024 * 1024 * 1024);
+            }
+        }
+    }
+});
+
+
 // FIXME: This is a "Dirty Hack" (TM) that needs to be removed as soon as
 //        the original problem is found and resolved.
 if (typeof sjcl !== 'undefined') {
@@ -2983,6 +3253,6 @@ if (typeof sjcl !== 'undefined') {
             return "INVALID: " + this.message;
         };
         this.message = message;
-        this.stack = (new Error()).stack;
+        this.stack = mega.utils.getStack();
     };
 }

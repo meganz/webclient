@@ -233,10 +233,10 @@ function filetype(n) {
     }
 }
 
-function fileicon(nodeInfo) {
+function fileIcon(nodeInfo) {
     var icon;
 
-    if (nodeInfo.t && nodeInfo.shares || typeof nodeInfo.r == "number" || M.ps[nodeInfo.h]) {
+    if ((nodeInfo.t && nodeInfo.share) || (typeof nodeInfo.r === "number") || (nodeInfo.h && M.ps[nodeInfo.h])) {
         icon = 'folder-shared';
     }
     else if (nodeInfo.t) {

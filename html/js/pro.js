@@ -19,14 +19,14 @@ function init_pro()
     else {
         $('body').addClass('pro');
     }
-
-    if (u_type == 3)
-    {
-        // Flag 'pro : 1' includes pro balance in the response
-        //api_req({ a : 'uq', pro : 1 }, {
+    
+    if (u_type == 3) {
+        
+        // Flag 'pro: 1' includes pro balance in the response
+        // Flag 'strg: 1' includes current account storage in the response
         api_req({ a: 'uq', strg: 1, pro: 1 }, {
-            callback : function (result)
-            {
+            callback : function (result) {
+                
                 // Store current account storage usage for checking later
                 proPage.currentStorageBytes = result.cstrg;
                 
@@ -50,7 +50,7 @@ function init_pro()
 
     if (!m)
     {
-        $('.membership-button').rebind('click', function() {
+        $('.membership-step1 .membership-button').rebind('click', function() {
             
             var $planBlocks = $('.reg-st3-membership-bl');
             var $selectedPlan = $(this).closest('.reg-st3-membership-bl');
@@ -76,6 +76,10 @@ function init_pro()
             return false;
         });
         
+        // Show loading spinner because some stuff may not be rendered properly yet, or
+        // it may quickly switch to the pro_payment_method page if they have preselected a plan
+        loadingDialog.show();
+        
         // Get the membership plans. This call will return an array of arrays. Each array contains this data:
         // [api_id, account_level, storage, transfer, months, price, currency, description, ios_id, google_id]
         // More data can be retrieved with 'f : 1'
@@ -90,10 +94,16 @@ function init_pro()
                 
                 // Check which plans are applicable or grey them out if not
                 proPage.checkApplicablePlans();
-
+                
+                // Check if they have preselected the plan (e.g. from bandwidth dialog) and go straight to the next step
+                proPage.checkForPreselectedPlan();
+                                
                 if (pro_do_next) {
                     pro_do_next();
                 }
+                
+                // Close loading spinner
+                loadingDialog.hide();
             }
         });
 
@@ -148,9 +158,42 @@ function init_pro()
  */
 var proPage = {
     
+    // From bandwidth quota dialog
+    fromBandwidthDialog: false,
+    
+    // The last payment provider ID used
+    lastPaymentProviderId: null,
+    
     // The user's current storage in bytes
     currentStorageBytes: 0,
     
+    /**
+    * Update the state when a payment has been received to show their new Pro Level
+    * @param {Object} actionPacket The action packet {'a':'psts', 'p':<prolevel>, 'r':<s for success or f for failure>}
+    */
+    processPaymentReceived: function (actionPacket) {
+
+        // Check success or failure
+        var success = (actionPacket.r === 's') ? true : false;
+        
+        // Add a notification in the top bar
+        addNotification(actionPacket);
+        
+        // If their payment was successful, redirect to account page to show new Pro Plan
+        if (success) {
+
+            // Make sure it fetches new account data on reload
+            if (M.account) {
+                M.account.lastupdate = 0;
+            }
+
+            // If last payment was Bitcoin, we need to redirect to the account page
+            if (this.lastPaymentProviderId === 4) {
+                window.location.hash = 'fm/account';
+            }
+        }
+    },
+        
     /**
      * Check applicable plans for the user based on their current storage usage
      */
@@ -213,7 +256,57 @@ var proPage = {
                 document.location.hash = 'contact';
             });            
         }
-    }    
+    },
+    
+    /**
+     * Checks if a plan has already been selected e.g. they came from the bandwidth quota dialog
+     * If they are from there, then preselect that plan and go to step two.
+     */
+    checkForPreselectedPlan: function() {
+        
+        var planNum = this.getUrlParam('planNum');
+        
+        // If the plan number is preselected
+        if (planNum) {
+            
+            // Set the selected plan
+            var $selectedPlan = $('.membership-step1 .reg-st3-membership-bl.pro' + planNum);
+            var $stageTwoSelectedPlan = $('.membership-step2 .membership-selected-block');
+
+            account_type_num = $selectedPlan.attr('data-payment');
+            
+            // Clear to prevent extra clicks showing multiple
+            $stageTwoSelectedPlan.html($selectedPlan.clone());
+            
+            var proPlanName = $selectedPlan.find('.reg-st3-bott-title.title').html();
+            $('.membership-step2 .pro span').html(proPlanName);
+            
+            // Update header text with plan
+            var $selectedPlanHeader = $('.membership-step2 .main-italic-header.pro');
+            var selectedPlanText = $selectedPlanHeader.html().replace('%1', proPlanName);
+            $selectedPlanHeader.html(selectedPlanText);
+                        
+            // Add history so the back button goes back to #pro page
+            history.pushState('', 'MEGA - Choose plan', '#pro');
+            
+            // Continue to step 2
+            pro_next_step();
+        }
+    },
+    
+    /**
+     * Gets a parameter from the URL e.g. https://mega.nz/#pro&planNum=4
+     * @param {String} paramToGet Name of the parameter to get e.g. 'planNum'
+     * @returns {String|undefined} Returns the string '4' if it exists, or undefined if not
+     */
+    getUrlParam: function(paramToGet) {
+        
+        var hash = location.hash.substr(1);
+        var index = hash.indexOf(paramToGet + '=');
+        var param = hash.substr(index).split('&')[0].split('=')[1];
+        
+        return param;
+    }
 };
 
 /**
@@ -376,7 +469,7 @@ function initPaymentMethodRadioOptions(html) {
 function pro_next_step() {
 
     // Add history so the back button works to go back to choosing their plan
-    history.pushState('', 'MEGA - Choose plan', '#pro2');
+    history.pushState('', 'MEGA - Choose plan', '#propay');
 
     if (!u_handle) {
         megaAnalytics.log("pro", "loginreq");
@@ -676,17 +769,17 @@ function pro_pay()
     }
 
     // Only show loading dialog if needing to setup bitcoin invoice
-    if (!ul_uploading && !downloading && (pro_paymentmethod === 'bitcoin')) {
+    if (pro_paymentmethod === 'bitcoin') {
         showLoadingDialog();
     }
     
     // Otherwise if credit card payment, show bouncing coin while loading
-    else if (!ul_uploading && !downloading && (pro_paymentmethod === 'credit-card')) {
+    else if (pro_paymentmethod === 'credit-card') {
         cardDialog.showLoadingOverlay();
     }
     
     // Otherwise if Union Pay payment, show bouncing coin while loading
-    else if (!ul_uploading && !downloading && (pro_paymentmethod === 'union-pay')) {
+    else if (pro_paymentmethod === 'union-pay') {
         unionPay.showLoadingOverlay();
     }
     
@@ -696,10 +789,9 @@ function pro_pay()
     var currency = selectedProPackage[6];
 
     // uts = User Transaction Sale
-    api_req({ a : 'uts', it: 0, si: apiId, p: price, c: currency, aff: aff, 'm': m },
-    {
-        callback : function (utsResult)
-        {
+    api_req({ a: 'uts', it: 0, si: apiId, p: price, c: currency, aff: aff, 'm': m }, {   
+        callback: function (utsResult) {
+            
             // Store the sale ID to check with API later
             saleId = utsResult;
             
@@ -722,14 +814,24 @@ function pro_pay()
                 else if (pro_paymentmethod === 'union-pay') {
                     pro_m = 5;
                 }
+                
+                // Update the last payment provider ID for the 'psts' action packet. If the provider e.g. bitcoin 
+                // needs a redirect after confirmation action packet it will redirect to the account page.
+                proPage.lastPaymentProviderId = pro_m;
 
                 var proref = '';
                 if (sessionStorage.proref) {
                     proref = sessionStorage.proref;
                 }
+                
+                // Convert from boolean to integer for API
+                var fromBandwidthDialog = (localStorage.seenBandwidthDialog) ? 1 : 0;
 
                 // utc = User Transaction Complete
-                api_req({ a : 'utc', s : [saleId], m : pro_m, r: proref },
+                // s = sale ID
+                // m = pro number
+                // bq = bandwidth quota triggered
+                api_req({ a : 'utc', s: [saleId], m: pro_m, r: proref, bq: fromBandwidthDialog },
                 {
                     callback : function (utcResult)
                     {

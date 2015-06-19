@@ -363,6 +363,10 @@ function MegaData()
         });
     };
 
+    this.hasInboxItems = function() {
+        return M.getFilterBy(function(node) { return node.p === M.InboxID; }).length > 0;
+    };
+
     this.avatars = function()
     {
         if (!M.c.contacts)
@@ -1586,7 +1590,7 @@ function MegaData()
                 onlinestatus = [l[5926], 'offline'];
             }
             if (!treesearch || (treesearch && contacts[i].name && contacts[i].name.toLowerCase().indexOf(treesearch.toLowerCase()) > -1)) {
-                html += '<div class="nw-contact-item ' + onlinestatus[1] + '" id="contact_' + htmlentities(contacts[i].u)
+                html += '<div class="nw-contact-item ui-droppable ' + onlinestatus[1] + '" id="contact_' + htmlentities(contacts[i].u)
                     + '"><div class="nw-contact-status"></div><div class="nw-contact-name">'
                     + htmlentities(contacts[i].name) + ' <a href="#" class="button start-chat-button"><span></span></a></div></div>';
             }
@@ -4527,6 +4531,19 @@ function rendernew()
     newnodes = undefined;
     if (d)
         console.timeEnd('rendernew');
+
+
+    // handle the Inbox section use cases
+    if (M.hasInboxItems() === true) {
+        $('.nw-fm-left-icon.inbox').removeClass('hidden');
+    }
+    else {
+        $('.nw-fm-left-icon.inbox').addClass('hidden');
+        if ($('.nw-fm-left-icon.inbox').is(".active") === true) {
+            M.openFolder(M.RootID);
+        }
+    }
+
 }
 
 /**

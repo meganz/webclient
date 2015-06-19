@@ -7,7 +7,7 @@ var notifyPopup = {
     temporarilyHiddenContactRequests: [],
     renderedPendingContactRequests: [],
     userEmails: {},
-    
+
     /**
      * Setup the notifications popup
      */
@@ -22,7 +22,7 @@ var notifyPopup = {
         $('.cloud-popup-icon').bind('click', function () {
 
             // If the popup is not open already
-            if ($(this).attr('class').indexOf('active') == -1) {
+            if (!$(this).hasClass('active')) {
 
                 // Change the icon to brighter colour
                 $(this).addClass('active');
@@ -46,7 +46,7 @@ var notifyPopup = {
             }
         });
 
-        // Hide the Notification popup when the user resizes the window, then the user needs to re-click 
+        // Hide the Notification popup when the user resizes the window, then the user needs to re-click
         // the Notification icon to show the popup and it will correctly re-calculate its opening position
         $(window).resize(function () {
             $('.cloud-popup-icon').removeClass('active');
@@ -57,13 +57,13 @@ var notifyPopup = {
         $('.notification-scr-list').on('click', '.nt-contact-accepted, .nt-contact-deleted', function(event) {
             document.location.hash = 'fm/contacts';
         });
-        
+
         // When they click the notification for a request denied/blocked it will go to the Pending Requests page (to do)
         $('.notification-scr-list').on('click', '.nt-contact-request-denied, .nt-contact-request-blocked, .nt-contact-request-ignored', function(event) {
             document.location.hash = 'fm/contacts';
         });
 
-        // Initialise click event for existing and future notifications that appear in the 
+        // Initialise click event for existing and future notifications that appear in the
         // Notification popup which have an Accept or Not now button for contact requests
         $('.notification-scr-list, .new-notification-pad').on('click', '.notifications-button', function(event) {
 
@@ -76,10 +76,10 @@ var notifyPopup = {
 
             // If the user does not want to accept the request right now
             if (button.hasClass('not-now')) {
-                
-                // Add this to the hidden requests so it will not show this notification again for this session                
+
+                // Add this to the hidden requests so it will not show this notification again for this session
                 notifyPopup.temporarilyHiddenContactRequests.push(pendingContactId);
-                
+
                 // Hide the buttons
                 button.closest('.notification-item').addClass('not-now');
             }
@@ -88,9 +88,9 @@ var notifyPopup = {
                 M.acceptPendingContactRequest(pendingContactId);
 
                 // Show the Accepted icon and text
-                button.closest('.notification-item').addClass('accepted');    
+                button.closest('.notification-item').addClass('accepted');
             }
-            
+
             // Update popup counter
             notifyPopup.markSpecificNotificationAsRead(notificationId);
         });
@@ -112,11 +112,11 @@ var notifyPopup = {
             {
                 jsp.destroy();
             }
-            
+
             // Mark all notifications [] counted
             notifyPopup.markNotificationsCounted();
             notifyPopup.notifyCounter();
-            
+
             // Update the server so we don't see these again
             api_req({ a: 'sla', i: requesti });
         });
@@ -129,23 +129,23 @@ var notifyPopup = {
      * @param {String} notificationId
      */
     markSpecificNotificationAsRead: function(notificationId) {
-        
+
         // Search the notifications
         for (var i = 0, length = notifyPopup.notifications.length; i < length; i++) {
-            
+
             // If a match on the id
             if (notifyPopup.notifications[i].id === notificationId) {
-                
+
                 // Mark the notification as read
                 notifyPopup.notifications[i].read = true;
                 notifyPopup.notifications[i].count = true;
                 break;
             }
         }
-        
+
         // Update red circle and tooltip
         notifyPopup.notifyCounter();
-        
+
         // Update server so it knows which notifications the user has seen
         //api_req({ a: 'sla', i: requesti });
     },
@@ -154,10 +154,10 @@ var notifyPopup = {
      * Get 100 latest notifications
      */
     pollNotifications: function() {
-        
+
         // If the notifications haven't been loaded yet
         if (u_type == 3 && notifyPopup.notifications == null) {
-            
+
             // Create an array for all the notifications
             notifyPopup.notifications = [];
 
@@ -196,8 +196,8 @@ var notifyPopup = {
                                 popup: true,
                                 count: json.c[i].td >= (json.ltd || 0),
                                 rendered: true,
-                                notificationObj: json.c[i]      // The full notification object                       
-                            });                        
+                                notificationObj: json.c[i]      // The full notification object
+                            });
                         }
 
                         notifyPopup.doNotify();
@@ -207,12 +207,12 @@ var notifyPopup = {
             }, 3);
         }
     },
-    
+
     /**
      * Show the number of notifications in a red circle in the menu bar
      */
     notifyCounter: function() {
-        
+
         if (notifyPopup.notifications === null) {
             return false;
         }
@@ -239,18 +239,18 @@ var notifyPopup = {
 
         megatitle();
     },
-    
+
     /**
      * Hideously long function that needs to be refactored
      */
     doNotify: function() {
-        
+
         if (notifyPopup.notifications === null) {
             return false;
         }
-        
+
         notifyPopup.userEmails = {};
-        
+
         if (M && M.u) {
             for (var i in M.u) {
                 notifyPopup.userEmails[i] = M.u[i].m;
@@ -284,12 +284,12 @@ var notifyPopup = {
             var obj = false;
 
             // If an Incoming Pending Contact (IPC) action packet
-            if (notification.type === 'ipc') {            
+            if (notification.type === 'ipc') {
                 obj = notifyPopup.renderIncomingPendingContactNotification(notification);
             }
             else if (notification.type === 'c') {
                 obj = notifyPopup.renderContactChangeNotification(notification);
-            }            
+            }
             else if (notification.type == 'upci') {
                 obj = notifyPopup.renderUpdatedPendingContactNotificationIncoming(notification);
             }
@@ -297,14 +297,14 @@ var notifyPopup = {
                 obj = notifyPopup.renderUpdatedPendingContactNotificationOutgoing(notification);
             }
             else if (notification.type == 'share') {
-                obj = notifyPopup.renderNewShareNotification(notification);                
+                obj = notifyPopup.renderNewShareNotification(notification);
             }
             else if (notification.type == 'dshare') {
                 obj = notifyPopup.renderRevokedShareNotifications(notification);
             }
             else if (notification.type == 'put') {
                 obj = notifyPopup.renderPutNodeNotifications(notification);
-            }            
+            }
             else if (notification.type == 'psts') {
                 obj = notifyPopup.renderPaymentNotification(notification);
             }
@@ -314,7 +314,7 @@ var notifyPopup = {
                 setLastInteractionWith(notification.user, "0:" + notification.timestamp);
             }
 
-            if (obj) {                        
+            if (obj) {
                 nhtml += obj.nhtml;
                 var max = Math.floor(($('body').height() - 50) / 70);
 
@@ -342,7 +342,7 @@ var notifyPopup = {
         if (M.currentdirid == 'notifications') {
             notifyPopup.renderNotificationsPageSpecificHtml(nhtml);
         }
-                        
+
         // If no notifications at all
         if ((notifyPopup.notifications.length === 0) && (notificationCount === 0)) {
 
@@ -395,49 +395,49 @@ var notifyPopup = {
         // Initialise scrolling on the popup
         $('.notification-scroll').jScrollPane({ showArrows: true, arrowSize: 5 });
         jScrollFade('.notification-scroll');
-        
+
         // Add functionality for when a notification is clicked
         notifyPopup.initClickOnNotification();
-        
+
         // Show the number of new notifications in the Browser's title bar
         megatitle();
     },
-    
+
     /**
      * Open the shared folder for a notification if the user clicks on it inside the popup
      */
     initClickOnNotification: function() {
-        
+
         $('.notification-item.nt-new-files, .notification-item.nt-incoming-share, .notification-item.nt-revocation-of-incoming, .notification-item.nt-deleted-files').rebind('click', function() {
-               
+
             notifyPopup.notifyMarkCount(true);
             notifyPopup.notifyCounter();
 
             var id = $(this).attr('id');
             if (id) {
                 for (var i in notifyPopup.notifications) {
-                    
+
                     if (notifyPopup.notifications[i].id == id && (notifyPopup.notifications[i].type == 'put' || notifyPopup.notifications[i].type == 'share')) {
-                        
+
                         $.selected = [];
                         for (var j in notifyPopup.notifications[i].nodes) {
                             $.selected.push(notifyPopup.notifications[i].nodes[j].h);
                         }
-                        
+
                         M.openFolder(notifyPopup.notifications[i].folderid);
                         reselect(1);
                     }
                 }
             }
-        });        
+        });
     },
-    
+
     /**
      * Render the HTML specifically for the notifications page
      * @param {String} nhtml
      */
     renderNotificationsPageSpecificHtml: function(nhtml) {
-                
+
         notifyPopup.notifyMarkCount(true);
         notifyPopup.notifyCounter();
 
@@ -453,7 +453,7 @@ var notifyPopup = {
                 for (var i in notifyPopup.notifications) {
                     if (notifyPopup.notifications[i].id == id && (notifyPopup.notifications[i].type == 'put' || notifyPopup.notifications[i].type == 'share')) {
 
-                        $.selected = [];						
+                        $.selected = [];
                         for (var j in notifyPopup.notifications[i].nodes) {
                             $.selected.push(notifyPopup.notifications[i].nodes[j].h);
                         }
@@ -465,14 +465,14 @@ var notifyPopup = {
             }
         });
 
-        notifyPopup.initNotificationsScrolling();             
+        notifyPopup.initNotificationsScrolling();
     },
-    
+
     /**
      * Sort the notifications so the most recent ones appear first in the popup
      */
     sortNotificationsByMostRecent: function() {
-        
+
         notifyPopup.notifications.sort(function (a, b) {
 
             if (a.timestamp > b.timestamp) {
@@ -484,31 +484,31 @@ var notifyPopup = {
             else {
                 return 0;
             }
-        });        
+        });
     },
-    
+
     /**
      * Initialises scrolling on the Notifications page
      */
     initNotificationsScrolling: function() {
-        
+
         $('.new-notifications-scroll').jScrollPane({
             enableKeyboardNavigation: false,
             showArrows: true,
             arrowSize: 5,
             verticalDragMinHeight: 250
         });
-        
+
         jScrollFade('.new-notifications-scroll');
     },
-    
+
     /**
      * Render notifications for when another user has added files/folders into an already shared folder
      * @param {Object} notification
      * @return {Object}
      */
     renderPutNodeNotifications: function(notification) {
-                
+
         var nodes = notification.nodes;
         var fileCount = 0;
         var folderCount = 0;
@@ -558,18 +558,18 @@ var notifyPopup = {
             title = l[838].replace('[X]', notificationText);
         }
 
-        return notifyPopup.getNotificationHtml(notification.id, 'put', title, notification.timestamp, notification.read, notification.user);        
+        return notifyPopup.getNotificationHtml(notification.id, 'put', title, notification.timestamp, notification.read, notification.user);
     },
-    
+
     /**
      * Render the HTML for a revoked share notification
      * @param {Object} notification
      * @returns {Object} The HTML to be rendered for the notification
      */
     renderRevokedShareNotifications: function(notification) {
-        
+
         var title = '';
-        
+
         if (notifyPopup.userEmails[notification.user]) {
             title = l[826].replace('[X]', htmlentities(notifyPopup.userEmails[notification.user]));
         }
@@ -579,16 +579,16 @@ var notifyPopup = {
 
         return notifyPopup.getNotificationHtml(notification.id, 'dshare', title, notification.timestamp, notification.read, notification.user);
     },
-    
+
     /**
      * Render new share notifications
      * @param {Object} notification
      * @returns {Object} The HTML to be rendered for the notification
      */
     renderNewShareNotification: function(notification) {
-        
+
         var title = '';
-        
+
         if (notifyPopup.userEmails[notification.user]) {
             title = l[824].replace('[X]', htmlentities(notifyPopup.userEmails[notification.user]));
         }
@@ -596,9 +596,9 @@ var notifyPopup = {
             title = l[825];
         }
 
-        return notifyPopup.getNotificationHtml(notification.id, 'share', title, notification.timestamp, notification.read, notification.user);  
+        return notifyPopup.getNotificationHtml(notification.id, 'share', title, notification.timestamp, notification.read, notification.user);
     },
-    
+
     /**
      * Renders Incoming Pending Contact notifications
      * See new API spec: https://wiki.developers.mega.co.nz/API_Spec
@@ -610,12 +610,12 @@ var notifyPopup = {
         var notificationId = notification.id;
         var timestamp = notification.timestamp;
         var email = (notification.notificationObj.m) ? notification.notificationObj.m : notification.notificationObj.u[0].m;
-        var pendingContactId = notification.notificationObj.p;                        
+        var pendingContactId = notification.notificationObj.p;
         var pendingContactHtml = '';
         var type = '';
         var message = '';
         var mostRecentNotification = true;
-        
+
         // Check if a newer contact request for this user has already been rendered (notifications are sorted by timestamp)
         for (var i = 0, length = notifyPopup.renderedPendingContactRequests.length; i < length; i++) {
 
@@ -627,21 +627,21 @@ var notifyPopup = {
 
         // If this is the most recent IPC from this user
         if (mostRecentNotification) {
-            
+
             // If this notification also exists in the state
             if (M.ipc[pendingContactId]) {
-                
+
                 // Render the Accept/Not now buttons
                 pendingContactHtml = '<span class="notification-request-buttons">'
                                    +    '<span class="fm-dialog-button notifications-button accept" data-notification-id="' + notificationId + '" data-pending-contact-id="' + pendingContactId + '"><span>Accept</span></span>'
                                    +    '<span class="fm-dialog-button notifications-button not-now" data-notification-id="' + notificationId + '" data-pending-contact-id="' + pendingContactId + '"><span>Not now</span></span>'
                                    + '</span>';
             }
-            
+
             // Set a flag so the buttons are not rendered again on older notifications
             notifyPopup.renderedPendingContactRequests.push(pendingContactId);
         };
-        
+
         // Search the contact requests that the user has temporarily hidden
         for (var i = 0, length = notifyPopup.temporarilyHiddenContactRequests.length; i < length; i++) {
 
@@ -652,9 +652,9 @@ var notifyPopup = {
                 pendingContactHtml = '';
             }
         }
-        
+
         // If the other user deleted their contact request to the current user
-        if (typeof notification.notificationObj.dts != 'undefined') {        
+        if (typeof notification.notificationObj.dts != 'undefined') {
             type = 'contactDeleted';
             message = 'Cancelled their contact request';
             pendingContactHtml = '';
@@ -664,7 +664,7 @@ var notifyPopup = {
         else if (typeof notification.notificationObj.rts != 'undefined') {
             type = 'contactRequest';
             message = 'Reminder: you have a contact request';
-        }    
+        }
         else {
             // Creates notification with "Sent you a contact request" with 'Not now' & 'Accept' buttons
             type = 'contactRequest';
@@ -690,7 +690,7 @@ var notifyPopup = {
         var message = '';
 
         // If the user deleted the request
-        if (action === 2) {                
+        if (action === 2) {
             type = 'contactAccepted';
             message = l[5852];
         }
@@ -715,7 +715,7 @@ var notifyPopup = {
         // Get the details from the action packet
         var timestamp = notification.timestamp;
         var email = (notification.notificationObj.m) ? notification.notificationObj.m : notification.notificationObj.u[0].m;
-        var action = (notification.notificationObj.s) ? notification.notificationObj.s : notification.notificationObj.u[0].s;        
+        var action = (notification.notificationObj.s) ? notification.notificationObj.s : notification.notificationObj.u[0].s;
         var type = '';
         var message = '';
 
@@ -724,7 +724,7 @@ var notifyPopup = {
             type = 'contactRequestIgnored';
             message = 'You ignored a contact request';
         }
-        else if (action === 2) {                
+        else if (action === 2) {
             type = 'contactAccepted';
             message = 'You accepted a contact request';
         }
@@ -738,7 +738,7 @@ var notifyPopup = {
 
         return notifyPopup.getNotificationHtml(notification.id, type, message, timestamp, notification.read, null, email);
     },
-    
+
     /**
      * Renders notifications related to contact changes
      * @param {Object} notification The notification
@@ -773,36 +773,36 @@ var notifyPopup = {
 
         return notifyPopup.getNotificationHtml(notification.id, type, message, timestamp, notification.read, null, email);
     },
-    
+
     /**
      * Process payment notification sent from payment provider e.g. Bitcoin
      * To test run: addNotification({'a':'psts', 'p':4, 'r':'f'})
      * @param {Object} notification The action packet {'a':'psts', 'p':<prolevel>, 'r':<s for success or f for failure>}
      */
     renderPaymentNotification: function(notification) {
-    
+
         var actionPacket = notification.notificationObj;
         var timestamp = notification.timestamp;
         var proLevel = actionPacket.p;
         var proPlan = getProPlan(proLevel);
-        var success = (actionPacket.r === 's') ? true : false;        
+        var success = (actionPacket.r === 's') ? true : false;
         var message = 'Your payment for the ' + proPlan + ' plan was unsuccessful.';
         var type = 'proPayment';
-        
+
         if (success) {
             message = 'Your payment for the ' + proPlan + ' plan was received.';
         }
 
         return notifyPopup.getNotificationHtml(notification.id, type, message, timestamp, notification.read, null);
     },
-    
+
     /**
      * Refresh the notifications every second if the popup is open
      */
     notifyClock: function() {
-        
-        if ($('.cloud-popup-icon').attr('class').indexOf('active') > 0) {
-            
+
+        if ($('.cloud-popup-icon').hasClass('active')) {
+
             notifyPopup.doNotify();
             var node = ((notifyPopup.notifications !== null) && notifyPopup.notifications[0]);
 
@@ -814,65 +814,65 @@ var notifyPopup = {
             }
         }
     },
-        
+
     hideNotifyPopup: function(id) {
-        
-        if ((id) && ($('#popup_' + id).css('opacity') == 1)) {            
+
+        if ((id) && ($('#popup_' + id).css('opacity') == 1)) {
             $('#popup_' + id).css('opacity', 1).show().animate({ opacity: 0 });
             setTimeout(notifyPopup.removeNotifyPopup, 1000);
         }
     },
-    
+
     removeNotifyPopup: function() {
-        
+
         $('.nt-popup').each(function (id, el) {
             if ($(el).css('opacity') == 0)
                 $(el).remove();
         });
     },
-    
+
     notifyMarkCount: function(notificationRead) {
-        
+
         var notificationsChanged = 0;
 
         for (var i in notifyPopup.notifications) {
-            
+
             var notification = notifyPopup.notifications[i];
             notification.count = true;
-            
+
             if (notificationRead && !notification.read) {
                 notification.read = true;
                 notificationsChanged++;
             }
         }
-        
+
         if (notificationRead && $.maxnotification !== maxaction && notificationsChanged > 0) {
             $.maxnotification = maxaction;
             api_req({ a: 'sla', i: requesti });
         }
     },
-    
+
     markNotificationsRead: function() {
-        
+
         for (var i in notifyPopup.notifications) {
-            
-            if (notifyPopup.notifications.hasOwnProperty(i)) { 
+
+            if (notifyPopup.notifications.hasOwnProperty(i)) {
                 notifyPopup.notifications[i].count = true;
                 //notifyPopup.notifications[i].read = true;
             }
         }
-        
+
         notifyPopup.notifyCounter();
     },
-    
+
     /**
      * Returns the number of unread notifications
      */
     countUnreadNotifications: function() {
-        
+
         var num = 0;
         for (var i in notifyPopup.notifications) {
-            
+
             var notification = notifyPopup.notifications[i];
             if (!notification.read) {
                 num++;
@@ -881,26 +881,26 @@ var notifyPopup = {
 
         return num;
     },
-    
+
     /**
      * Marks all the notifications as counted
      */
     markNotificationsCounted: function() {
-        
+
         for (var i in notifyPopup.notifications) {
             notifyPopup.notifications[i].count = true;
         }
     },
-    
+
     getNotificationDateHtml: function(timestamp) {
-        
+
         var months = [l[850], l[851], l[852], l[853], l[854], l[855], l[856], l[857], l[858], l[859], l[860], l[861]];
         var month = months[new Date(timestamp).getMonth()];
         var day = new Date(timestamp).getDate();
-        
+
         return '<div class="nt-circle-bg1"><div class="nt-circle-bg2"><div class="nt-circle-bg3"><span class="nt-circle-date">' + day + '</span><span class="nt-circle-month">' + month + '</span></div></div></div>';
     },
-    
+
     /**
      * Gets the HTML to be rendered for each notification
      * @param {String} id
@@ -913,14 +913,14 @@ var notifyPopup = {
      * @param {String} pendingContactHtml Optional parameter, used to render the Not now/Accept contact request buttons
      * @returns {Object}
      */
-    getNotificationHtml: function(id, type, title, time, read, userid, userEmail, pendingContactHtml) {    
+    getNotificationHtml: function(id, type, title, time, read, userid, userEmail, pendingContactHtml) {
 
         var className = '', rhtml = '', phtml = '', nread = '', href = '', nstyle = '', nstyle2 = '', onclick = '', nhtml = '';
 
         if (read) {
             nread = 'read';
         }
-        
+
         if (type == 'share') {
             className = 'nt-incoming-share';
             nstyle2 = 'style="cursor:pointer;"';
@@ -1031,46 +1031,46 @@ var notifyPopup = {
             phtml: phtml
         };
     },
-    
+
     /**
      * Show the popup notifications
      * @param {String} id
      * @param {String} html
      */
     doNotifyPopup: function(id, html) {
-        
+
         $('#popnotifications').append(html);
         $('#popup_' + id).css('bottom', ($('.nt-popup').length * 61) - 50 + 'px');
         $('#popup_' + id).css('opacity', 0).show().animate({ opacity: 1 });
-        
+
         $('.nt-popup').bind('unbind');
         $('.nt-popup').bind('click', function (e) {
-            
+
             var id = $(this).attr('id');
-            
-            if (id) {              
+
+            if (id) {
                 id = id.replace('popup_', '');
                 for (var i in notifyPopup.notifications) {
-                    
+
                     if (notifyPopup.notifications[i].id == id && (notifyPopup.notifications[i].type == 'put' || notifyPopup.notifications[i].type == 'share')) {
-                        
+
                         $.selected = [];
                         for (var j in notifyPopup.notifications[i].nodes) {
                             $.selected.push(notifyPopup.notifications[i].nodes[j].h);
                         }
-                        
+
                         M.openFolder(notifyPopup.notifications[i].folderid);
                         reselect(1);
                     }
                 }
-                
+
                 notifyPopup.hideNotifyPopup(id);
             }
         });
 
         setTimeout(notifyPopup.hideNotifyPopup, 5000, id);
     },
-    
+
     /**
      * Create a tooltip when the user hovers over the Notification icon in the header
      * @param {Number} num The number of new notifications

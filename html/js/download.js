@@ -10,7 +10,7 @@ function dlinfo(ph,key,next)
     dl_next = next;
     if ((lang == 'en') || (lang !== 'en' && l[1388] !== '[B]Download[/B] [A]to your computer[/A]'))
     {
-        $('.new-download-red-button').html(l[1388].replace('[B]','').replace('[/B]','').replace('[A]','').replace('[/A]',''));
+        //$('.new-download-red-button').html(l[1388].replace('[B]','').replace('[/B]','').replace('[A]','').replace('[/A]',''));
         $('.new-download-gray-button').html(l[1389].replace('[B]','<div class="new-download-button-txt1">').replace('[/B]','</div>').replace('[A]','<div class="new-download-button-txt2">').replace('[/A]','</div>'));
     }
 
@@ -136,7 +136,7 @@ function dl_g(res)
             }
             if (1 > l) $('.new-download-file-title').text(str_mtrunc(n,60));
             $('.new-download-file-size').text(bytesToSize(res.s));
-            $('.new-download-file-icon').addClass(fileicon({name:fdl_file.n}));
+            $('.new-download-file-icon').addClass(fileIcon({name:fdl_file.n}));
         }
         else mKeyDialog(dlpage_ph);
     }

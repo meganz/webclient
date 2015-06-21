@@ -2141,13 +2141,15 @@ ChatRoom.prototype._generateContactAvatarElement = function(fullJid) {
 
     var $av = $(useravatar.contact(contact.u))
     var cls = $av.attr('class');
-    $av.attr('class', '');
+    var style = $av.attr('style');
+    $av.attr({'class': '', 'style':''});
 
     var $element = $('<div class="nw-contact-avatar"></div>').append(
         $av
     );
     $element.addClass(cls);
     $element.addClass(contact.u);
+    $element.attr({style: style});
 
 
     // TODO: implement verification logic

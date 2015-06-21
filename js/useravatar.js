@@ -11,6 +11,16 @@ var useravatar = {
 	    '#ff9500',
 	    '#ffcc00',
     ],
+
+    registerColors: function() {
+        var css = "";
+        for (var i in this._colors) {
+            css += ".color" + (parseInt(i)+1) + " { background-color: " + this._colors[i] + "; }";
+        }
+        var css = mObjectURL([css], "text/css");
+        mCreateElement('link', {type: 'text/css', rel: 'stylesheet'}, 'head').href = css;
+    },
+
     /**
      *  List of TWO-letters avatars that we ever generated. It's useful to replace
      *  the moment we discover the real avatar associate with that avatar
@@ -37,7 +47,6 @@ var useravatar = {
 
     _twoLettersImg: function(letters) {
         var s = this._twoLettersSettings(letters);
-        console.error(s);
         var tpl = $('#avatar-svg').clone().removeClass('hidden')
             .find('svg').css('background-color', s.color).end()
             .find('text').text(s.letters).end();
@@ -47,7 +56,6 @@ var useravatar = {
     },
 
     _twoLettersSettings: function(letters) {
-        console.error(letters);
         var words = letters.split(/\s+/);
         if (words.length === 1) {
             letters = words[0].substr(0, 2);
@@ -56,7 +64,7 @@ var useravatar = {
         }
         var colors = parseInt(this._colors.length/2)+1
         var color = letters.charCodeAt(0) % colors + letters.charCodeAt(1) % colors;
-        return {letters: letters.toUpperCase(), color: this._colors[color]};
+        return {letters: letters.toUpperCase(), color: this._colors[color], colorIndex: color};
     },
 
     /**
@@ -77,7 +85,7 @@ var useravatar = {
             this._watching[id] = {};
         }
         this._watching[id][className] = true;
-        return '<' + element + ' class="avatar-wrapper ' + className + ' ' + id +  '" style="background-color: ' + s.color +'">'
+        return '<' + element + ' class="avatar-wrapper ' + className + ' ' + id +  ' color' + s.colorIndex + '">'
                     + s.letters
                 + '</' + element + '>';
     },
@@ -139,10 +147,11 @@ var useravatar = {
         }
 
         if (avatars[user.u]) {
-            return this._image(avatars[user.u].url, user.u, className, element);
+            //return this._image(avatars[user.u].url, user.u, className, element);
         }
         
         return this._twoLetters(user.name || user.m, user.u, className, element);
     },
 };
 
+useravatar.registerColors();

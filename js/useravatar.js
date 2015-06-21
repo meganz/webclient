@@ -56,7 +56,7 @@ var useravatar = {
     },
 
     _twoLettersSettings: function(letters) {
-        var words = letters.split(/\s+/);
+        var words = letters.split(/\W+/);
         if (words.length === 1) {
             letters = words[0].substr(0, 2);
         } else {

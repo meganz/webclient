@@ -3789,8 +3789,8 @@ function accountUI()
                 if (e) {
                     api_req({'a': 'up', '+a':'none'});
                     delete avatars[u_handle];
-                    $('.fm-account-avatar img').attr('src', staticpath + 'images/mega/default-avatar.png');
-                    $('.fm-avatar img').attr('src', staticpath + 'images/mega/default-top-avatar.png');
+                    $('.fm-account-avatar img').attr('src', useravatar.mine());
+                    $('.fm-avatar img').attr('src', useravatar.top());
                     $('.fm-account-remove-avatar').hide();
                 }
             });
@@ -7175,45 +7175,6 @@ function initShareDialog() {
         m.fadeIn(200);
     }
 
-<<<<<<< HEAD
-    /**
-     * Called when multi-input is not empty
-     *
-     * prepare params for dialog content addition
-     * update global sharedTokens var
-     * fill content with dialog contact
-     *
-     * @param {email} item
-     * @param {array} perm, permission class and text
-     *
-     */
-    function determineContactParams(item, perm) {
-        var email = item;// email address
-        var id = '';
-        /*for (var i in M.u)
-        {
-            if (M.u[i].m === item)
-            {
-                id = i;
-                break;
-            }
-        }*/
-
-        /*var user = M.u[id];
-        if (user) {
-            email = (user.name && user.name.length > 1) ? user.name : user.m;
-        }*/
-        var av = useravatar.contact(email);
-
-        $.sharedTokens.push(item);
-
-        var html = addShareDialogContactToContent('', id, av, email, perm[0], perm[1]);
-
-        $('.share-dialog .share-dialog-contacts').append(html);
-    }
-
-=======
->>>>>>> origin/develop
     $('.share-dialog').rebind('click', function(e) {
         var hideMenus = function() {
             // share dialog permission menu

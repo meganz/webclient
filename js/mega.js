@@ -385,6 +385,8 @@ function MegaData()
                                 url: myURL.createObjectURL(blob)
                             };
                             useravatar.loaded(M.u[ctx.u]);
+                        } else if (ctx.u == u_handle) {
+                            useravatar.loaded(M.u[ctx.u]);
                         }
                     }
                 });

@@ -1,4 +1,16 @@
 var useravatar = {
+    _colors: [
+	    '#FF6A19',
+	    '#5856d6',
+	    '#007aff',
+	    '#34aadc',
+	    '#5ac8fa',
+	    '#4cd964',
+	    '#ff1a53',
+	    '#d90007',
+	    '#ff9500',
+	    '#ffcc00',
+    ],
     /**
      *  List of TWO-letters avatars that we ever generated. It's useful to replace
      *  the moment we discover the real avatar associate with that avatar
@@ -8,19 +20,43 @@ var useravatar = {
         if (avatars[u_handle]) {
             return avatars[u_handle].url;
         }
-        return staticpath + 'images/mega/default-top-avatar.png';
+        return this.contact(u_handle, '', 'ximg');
     },
     imgUrl: function(contact) {
         if (avatars[contact]) {
-            return avatars[user.u].url;
+            return avatars[contact].url;
         }
-        return staticpath + 'images/mega/default-avatar.png';
+        return this.contact(contact, '', 'ximg');
     },
     mine: function() {
         if (avatars[u_handle]) {
             return avatars[u_handle].url;
         }
-        return staticpath + 'images/mega/default-avatar.png';
+        return this.contact(u_handle, '', 'ximg');
+    },
+
+    _twoLettersImg: function(letters) {
+        var s = this._twoLettersSettings(letters);
+        console.error(s);
+        var tpl = $('#avatar-svg').clone().removeClass('hidden')
+            .find('svg').css('background-color', s.color).end()
+            .find('text').text(s.letters).end();
+
+        tpl = window.btoa(unescape(tpl.html()));
+        return 'data:image/svg+xml;base64,' + tpl;
+    },
+
+    _twoLettersSettings: function(letters) {
+        console.error(letters);
+        var words = letters.split(/\s+/);
+        if (words.length === 1) {
+            letters = words[0].substr(0, 2);
+        } else {
+            letters = words[0][0]  + words[1][0];
+        }
+        var colors = parseInt(this._colors.length/2)+1
+        var color = letters.charCodeAt(0) % colors + letters.charCodeAt(1) % colors;
+        return {letters: letters.toUpperCase(), color: this._colors[color]};
     },
 
     /**
@@ -33,19 +69,16 @@ var useravatar = {
      *  @return HTML
      */
     _twoLetters: function(letters, id, className, element) {
-        var words = letters.split(/\s+/);
-        if (words.length === 1) {
-            letters = words[0].substr(0, 2);
-        } else {
-            letters = words[0][0]  + words[1][0];
+        if (element == 'ximg') {
+            return this._twoLettersImg(letters);
         }
-        var color = letters.charCodeAt(0) % 6 + letters.charCodeAt(1) % 6;
+        var s = this._twoLettersSettings(letters);
         if (!this._watching[id]) {
             this._watching[id] = {};
         }
         this._watching[id][className] = true;
-        return '<' + element + ' class="avatar-wrapper ' + className + ' ' + id +  ' color' + color +'">'
-                    + letters.toUpperCase() 
+        return '<' + element + ' class="avatar-wrapper ' + className + ' ' + id +  '" style="background-color: ' + s.color +'">'
+                    + s.letters
                 + '</' + element + '>';
     },
 
@@ -75,10 +108,9 @@ var useravatar = {
             return false;
         }
 
-        if (user.u == u_handle && avatars[user.u]) {
+        if (user.u == u_handle) {
             // my avatar!
-            $('.fm-avatar img,.fm-account-avatar img').attr('src',
-                    avatars[user.u].url);
+            $('.fm-avatar img,.fm-account-avatar img').attr('src', this.imgUrl(user.u));
         }
 
         var avatar = $(this.contact(user)).html();

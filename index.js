@@ -1601,10 +1601,6 @@ function topmenuUI() {
         }
     });
 
-    if (avatars[u_handle]) {
-        $('.fm-avatar img').attr('src', avatars[u_handle].url);
-    }
-
     $('.fm-avatar img, .user-name').rebind('click', function () {
         if ($('.fm-avatar img').attr('src').indexOf('blob:') > -1) {
             document.location.hash = 'fm/account';

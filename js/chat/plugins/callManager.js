@@ -1611,7 +1611,12 @@ CallManager.prototype._attachToChatRoom = function(megaChat, chatRoom) {
         } else if (reason === 'busy' || reason === 'hangup' || reason === 'peer-hangup') {
             session.setState(CallSession.STATE.REJECTED);
             self.trigger('CallRejected', [session, reason]);
-        } else if (reason === 'peer-disconnected' || reason === 'ice-disconnect' || reason.indexOf('error') > -1) {
+        } else if (
+            reason === 'peer-disconnected' ||
+            reason === 'ice-disconnect' ||
+            reason.indexOf('error') > -1 ||
+            reason === 'peer-xmpp-disconnect'
+        ) {
             session.setState(CallSession.STATE.FAILED);
             self.trigger('CallFailed', [session, reason, eventData.text]);
         } else if (reason === 'security') {

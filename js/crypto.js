@@ -3447,7 +3447,7 @@ function api_attachfileattr(node, id) {
 
 // generate crypto request response for the given nodes/shares matrix
 function crypto_makecr(source, shares, source_is_nodes) {
-    var i, j, n;
+    var i, j, n, nk;
     var cr = [shares, [], []];
     var aes;
 

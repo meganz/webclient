@@ -1076,8 +1076,7 @@ function initUI() {
         }
     });
 
-    $('.nw-fm-left-icon').unbind('mouseover');
-    $('.nw-fm-left-icon').bind('mouseover', function() {
+    $('.nw-fm-left-icon').rebind('mouseover', function() {
         var tooltip = $(this).find('.nw-fm-left-tooltip');
         if ($.liTooltipTimer)
             clearTimeout($.liTooltipTimer);
@@ -1087,8 +1086,7 @@ function initUI() {
             }, 1000);
     });
 
-    $('.nw-fm-left-icon').unbind('mouseout');
-    $('.nw-fm-left-icon').bind('mouseout', function() {
+    $('.nw-fm-left-icon').rebind('mouseout', function() {
         $(this).find('.nw-fm-left-tooltip').removeClass('hovered');
         clearTimeout($.liTooltipTimer);
     });
@@ -1202,8 +1200,7 @@ function openTransferpanel()
        $('.transfer-clear-completed').removeClass('disabled');
     }
 
-    $('.tranfer-table .grid-url-arrow').unbind('click')
-    $('.tranfer-table .grid-url-arrow').bind('click', function(e) {
+    $('.tranfer-table .grid-url-arrow').rebind('click', function(e) {
         var target = $(this).closest('tr');
         e.preventDefault();
         e.stopPropagation(); // do not treat it as a regular click on the file
@@ -1214,8 +1211,7 @@ function openTransferpanel()
         contextMenuUI(e);
     });
 
-    $('.clear-transfer-icon').unbind('click');
-    $('.clear-transfer-icon').bind('click', function(e)
+    $('.clear-transfer-icon').rebind('click', function(e)
     {
         var target = $(this).closest('tr');
         e.preventDefault();
@@ -5338,8 +5334,7 @@ function transferPanelUI()
             tth.show(0);
         }
 
-        $('.transfer-table tr').unbind('click contextmenu');
-        $('.transfer-table tr').bind('click contextmenu', function(e)
+        $('.transfer-table tr').rebind('click contextmenu', function(e)
         {
             $('.ui-selected').filter(function() {
                 return $(this).parents('.transfer-table').length == 0;
@@ -5398,21 +5393,18 @@ function transferPanelUI()
         });
         initTransferScroll();
     }
-    $(window).unbind('resize.transferpanel');
-    $(window).bind('resize.transferpanel', function(e)
+    $(window).rebind('resize.transferpanel', function(e)
     {
         $.transferHeader();
     });
 
-    $(window).unbind('resize.slideshow');
-    $(window).bind('resize.slideshow', function(e)
+    $(window).rebind('resize.slideshow', function(e)
     {
         if (slideshowid && previews[slideshowid])
             previewsrc(previews[slideshowid].src);
     });
 
-    $('.transfers .nw-fm-left-border').unbind('click');
-    $('.transfers .nw-fm-left-border').bind('click', function(e)
+    $('.transfers .nw-fm-left-border').rebind('click', function(e)
     {
         $.transferOpen();
     });
@@ -5446,8 +5438,7 @@ function transferPanelUI()
         }
     };
 
-    $('.nw-fm-left-icon.settings .settings-icon').unbind('click');
-    $('.nw-fm-left-icon.settings .settings-icon').bind('click', function()
+    $('.nw-fm-left-icon.settings .settings-icon').rebind('click', function()
     {
         if (u_type === 0)
             ephemeralDialog('Transfer settings are for registered users only.');
@@ -5461,8 +5452,8 @@ function transferPanelUI()
             document.location.hash = 'fm/account/settings';
         }
     });
-    $('.transfer-clear-all-icon').unbind('click');
-    $('.transfer-clear-all-icon').bind('click', function() {
+
+    $('.transfer-clear-all-icon').rebind('click', function() {
         if (!$(this).hasClass('disabled')) {
             msgDialog('confirmation', 'cancel all transfers', 'Are you sure you want to cancel all transfers?', '', function(e) {
                 if (!e)
@@ -5481,9 +5472,8 @@ function transferPanelUI()
             });
         }
     });
-	
-    $('.transfer-clear-completed').unbind('click');
-    $('.transfer-clear-completed').bind('click', function() {
+
+    $('.transfer-clear-completed').rebind('click', function() {
         if (!$(this).hasClass('disabled')) {
             $('.transfer-table tr .transfer-status.completed').closest('tr').fadeOut(function() {
                 $(this).remove();
@@ -5495,8 +5485,7 @@ function transferPanelUI()
         }
     });
 
-    $('.transfer-pause-icon').unbind('click');
-    $('.transfer-pause-icon').bind('click', function()
+    $('.transfer-pause-icon').rebind('click', function()
     {
         if (!$(this).hasClass('disabled')) {
             if ($(this).attr('class').indexOf('active') > -1)

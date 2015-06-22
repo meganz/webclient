@@ -3946,7 +3946,8 @@ function MegaData()
     {
         var target = gid[0] === 'u'
             ? $('.transfer-table tr[id^="ul"] .transfer-status.queued:last')
-            : $('.transfer-table tr:not([id^="ul"]) .transfer-status.queued:last');
+            : $('.transfer-table tr:not([id^="ul"]) .transfer-status.queued:last'),
+			transfersLength = $('.transfer-table tr').length;
 
         if (target.length)
             target.closest('tr').after(elem);
@@ -3961,6 +3962,11 @@ function MegaData()
                 target.closest('tr').before(elem);
             else
                 $(elem).appendTo('.transfer-table');
+        }
+        if (transfersLength > 50) {
+            for (var i = 1; i < transfersLength - 50; i++) {
+                $('.transfer-table tr .transfer-status.completed:last').closest('tr').remove();
+            }
         }
         if (!q)
             Soon(fmUpdateCount);

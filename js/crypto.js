@@ -234,7 +234,7 @@ var crypt = (function () {
                 msgDialog('warningb',
                           'RSA Public Key Signature Verification Failed',
                           message + '<br/>' + instructions);
-                console.error(message);
+                logger.error(message);
                 throw new Error('RSA Public Key Signature Verification Failed');
             }
         }

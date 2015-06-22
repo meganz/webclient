@@ -255,11 +255,11 @@ describe("crypto unit test", function() {
                 sandbox.stub(window, 'msgDialog');
                 assert.throws(function() { ns._trackRSAKeyAuthentication(
                     'you456789xw', 'not my autograph', ED25519_FINGERPRINT); },
-                    'RSA public key signature for you@there.org is invalid!');
+                    'RSA Public Key Signature Verification Failed');
                 assert.strictEqual(authring.setContactAuthenticated.callCount, 0);
                 assert.strictEqual(msgDialog.callCount, 1);
                 assert.strictEqual(ns._logger._log.args[0][1][0],
-                                   'RSA public key signature for you@there.org is invalid!');
+                                   'RSA Public Key Signature Verification Failed');
             });
         });
 

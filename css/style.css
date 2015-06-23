@@ -3917,7 +3917,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 }
 .nw-fm-tree-item.linked .link-icon {
 	top: 1px;
-    right: 7px;
+	right: 7px;
 }
 .nw-fm-tree-item:hover {
 	background-color: rgba(217,0,7,0.2);
@@ -5668,24 +5668,24 @@ table .grid-status-icon.star {
 }
 .file-block .file-status-icon, .contact-status-icon, .properties-body .file-status-icon, .link-icon {
 	position: absolute;
-        left: 6px;
-        top: 6px;
-        height: 20px;
-        z-index: 10;
-        width: 20px;
+	left: 6px;
+	top: 6px;
+	height: 20px;
+	z-index: 10;
+	width: 20px;
 }
 .link-icon {
-	left:auto;
-	right:6px;
+	left: auto;
+	right: 6px;
 	background-position: -106px -963px;
-	display:none;
+	display: none;
 }
 .own-data .link-icon {
 	left: 3px;
-        top: 2px;
+	top: 2px;
 }
 .linked .link-icon {
-	display:block;
+	display: block;
 }
 .fm-blocks-view, .fm-contacts-blocks-view, .fm-blocks-view.shared-view, .shared-details-block, .shared-blocks-view, .fm-blocks-view.contacts-view, .contacts-details-block, .contacts-blocks-view {
 	-webkit-box-sizing: border-box;
@@ -5876,7 +5876,7 @@ table .grid-status-icon.star {
 	background-clip: padding-box;
 }
 .own-data .grid-url-arrow {
-	left:32px;
+	left: 32px;
 }
 .file-settings-icon {
 	left: auto;
@@ -7957,7 +7957,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .cancel-subscription-txt {
 	padding: 16px 8px 12px 8px;
 	font-size: 12px;
-    color: #999;
+	color: #999;
 }
 .cancel-textarea-bl {
 	height: 140px;
@@ -7999,9 +7999,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	font-size: 12px;
 }
 .cancel-textarea-scroll textarea, .cancel-hidden {
-    color: black;
-    font-size: 12px;
-    height: 125px;
+	color: black;
+	font-size: 12px;
+	height: 125px;
 }
 .add-contact-hidden, .share-message-hidden, .feedback-hidden, .cancel-hidden {
 	display: none;
@@ -9947,15 +9947,15 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
 	margin: -166px 0 0 -203px;
 }
 .fm-dialog.cancel-subscription-st2 .fm-dialog-body {
-    padding: 0;
+	padding: 0;
 }
 .fm-dialog.cancel-subscription-st2 .blue-success-icon {
-    margin: 0 auto;
-    background-position: center -400px;
-    background-image: url("../images/mega/bitcoin-v4.png");
-    background-repeat: no-repeat;
-    height: 200px;
-    width: 200px;
+	margin: 0 auto;
+	background-position: center -400px;
+	background-image: url("../images/mega/bitcoin-v4.png");
+	background-repeat: no-repeat;
+	height: 200px;
+	width: 200px;
 }
 .fm-dialog.restore-success {
 	width: 364px;
@@ -11977,6 +11977,12 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
 .membership-medium-txt.red-bg.editprofile, .membership-medium-txt.gray-bg.cancel-account {
 	margin-top: 7px;
 }
+.membership-medium-txt.red-bg.vouchercreate {
+	margin: 25px 0 0 0;
+}
+.membership-medium-txt.red-bg.resellerbuy {
+	margin: 18px 0 0 0;
+}
 .membership-medium-txt.gray-bg.cancel-account {
 	margin-top: 7px;
 }
@@ -12947,6 +12953,16 @@ table {
 	padding: 20px 24px;
 	margin: 24px 0;
 }
+.fm-account-reseller .fm-account-mutliple-bl {
+	padding: 0 24px 8px 24px;
+}
+.fm-account-reseller hr {
+	background-color: #eeeeee;
+	height: 2px;
+	margin: 0 24px;
+	border: 0;
+	padding: 0;
+}
 .triple .fm-account-mutliple-bl {
 	width: 33.333333%;
 }
@@ -13013,6 +13029,10 @@ table {
 }
 .huge .fm-account-info-block {
 	margin: 0;
+}
+.fm-account-reseller .huge .fm-account-info-block {
+	margin: -3px 0 0 0;
+	padding: 0;
 }
 .huge .membership-big-txt {
 	font-size: 30px;
@@ -13218,6 +13238,7 @@ table {
 	float: left;
 	width: 50px;
 	padding: 0px 0px;
+	margin: 0;
 }
 .fm-account-select.month {
 	float: left;
@@ -14564,13 +14585,16 @@ h5.main-italic-header {
 }
 .cancel-subscription-st1 .reset-small-txt {
 	padding: 25px 8px 15px 8px;
-    font-size: 12px;
+	font-size: 12px;
 }
 .cancel-bott-txt {
-    font-size:13px; color:#333333; text-align:center; font-size: 13px;
-    color: #333333;
-    text-align: center;
-    padding: 10px 8px 25px 8px;
+	font-size: 13px;
+	color: #333333;
+	text-align: center;
+	font-size: 13px;
+	color: #333333;
+	text-align: center;
+	padding: 10px 8px 25px 8px;
 }
 .reset-success-st3 .reset-txt {
 	font-family: 'Open Sans Semibold';
@@ -14671,10 +14695,8 @@ h5.main-italic-header {
 .membership-step1 .reg-st3-membership-bl:hover, .membership-step1 .reg-st3-membership-bl.selected {
 	background-color: rgba(0,0,0,0.1);
 }
-.membership-step1 .sub-optimal-plan .membership-gray-block,
-.membership-step1 .sub-optimal-plan .reg-st3-storage,
-.membership-step1 .sub-optimal-plan .reg-st3-bandwidth {
-    opacity: 0.7;
+.membership-step1 .sub-optimal-plan .membership-gray-block, .membership-step1 .sub-optimal-plan .reg-st3-storage, .membership-step1 .sub-optimal-plan .reg-st3-bandwidth {
+	opacity: 0.7;
 }
 .reg-st3-membership-bl:first-child {
 	margin: 0;
@@ -16215,56 +16237,56 @@ span.browsers-update {
 	margin: 50px 0 47px 0;
 }
 .pro-gray-block .no-plans-suitable {
-    font-size: 17px;
-    margin-bottom: 15px;
-    padding-top: 50px;
-    text-align: center;
+	font-size: 17px;
+	margin-bottom: 15px;
+	padding-top: 50px;
+	text-align: center;
 }
 .pro-gray-block .no-plans-suitable .current-storage {
-    color: #777;
-    font-size: 25px;
-    font-weight: bold;
-    margin-bottom: 30px;
-    text-align: center;
+	color: #777;
+	font-size: 25px;
+	font-weight: bold;
+	margin-bottom: 30px;
+	text-align: center;
 }
 .pro-gray-block .no-plans-suitable .text {
-    color: #777;
-    display: inline;
-    padding-right: 10px;
-    position: relative;
+	color: #777;
+	display: inline;
+	padding-right: 10px;
+	position: relative;
 }
 .pro-gray-block .no-plans-suitable a {
-    color: #bf1900;
-    font-weight: bold;
+	color: #bf1900;
+	font-weight: bold;
 }
 .pro-gray-block .no-plans-suitable .terabytes {
-    color: #bf1900;
-    display: inline-block;
-    text-align: left;
+	color: #bf1900;
+	display: inline-block;
+	text-align: left;
 }
 .pro-gray-block .no-plans-suitable .terabytes::first-letter {
-    font-size: 40px;
+	font-size: 40px;
 }
 .no-plans-suitable-text {
-    font-weight: bold;
+	font-weight: bold;
 }
 .pro-gray-block .btn-request-plan {
-    background-color: #fff;
-    border: 4px solid #777;
-    border-radius: 8px;
-    box-sizing: border-box;
-    color: #777;
-    cursor: pointer;
-    display: inline-block;
-    font-size: 15px;
-    margin: 33px 12px 0;
-    padding: 15px 40px;
-    text-align: center;
-    transition: all 200ms ease-in-out 0s;
+	background-color: #fff;
+	border: 4px solid #777;
+	border-radius: 8px;
+	box-sizing: border-box;
+	color: #777;
+	cursor: pointer;
+	display: inline-block;
+	font-size: 15px;
+	margin: 33px 12px 0;
+	padding: 15px 40px;
+	text-align: center;
+	transition: all 200ms ease-in-out 0s;
 }
 .pro-gray-block .btn-request-plan:hover {
-    border-color: #bf1900;
-    color: #bf1900;
+	border-color: #bf1900;
+	color: #bf1900;
 }
 .pro-icons-block {
 	width: 280px;
@@ -21144,7 +21166,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
 	display: block;
 	width: 259px;
 	height: 74px;
-	padding-top:8px;
+	padding-top: 8px;
 }
 .share-item-bl .export-icon {
 	margin: 0 10px;
@@ -24910,19 +24932,15 @@ body, body * {
 	overflow: visible !important;
 }
 }
-
-
 #rubsched_options {
-	border-left:1px dashed #333 !important;
-	margin-left:7px !important;
-	padding-right:15px !important;
+	border-left: 1px dashed #333 !important;
+	margin-left: 7px !important;
+	padding-right: 15px !important;
 }
-
 #rubsched_options .rubsched_dash {
-	margin-top:16px !important;
-	border-top:1px dashed #333 !important;
-	width:12px !important;
-	float:left !important;
-	margin-right:4px !important;
+	margin-top: 16px !important;
+	border-top: 1px dashed #333 !important;
+	width: 12px !important;
+	float: left !important;
+	margin-right: 4px !important;
 }
-

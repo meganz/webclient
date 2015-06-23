@@ -388,7 +388,8 @@ var mBroadcaster = {
         },
 
         leave: function crossTab_leave() {
-            if (this.master) {
+            var wasMaster = this.master;
+            if (wasMaster) {
                 localStorage['mCrossTabRef_' + u_handle] = this.master;
                 this.notify('leaving', this.master);
                 delete this.master;
@@ -396,7 +397,7 @@ var mBroadcaster = {
                 if (d) console.log('crossTab leaving');
             }
             this.unlisten();
-            mBroadcaster.sendMessage('crossTab:leave', this.master);
+            mBroadcaster.sendMessage('crossTab:leave', wasMaster);
         },
 
         notify: function crossTab_notify(msg, data) {
@@ -863,7 +864,7 @@ else if (!b_u)
     {
         if (!navigator.language) return 'en';
         var bl = navigator.language.toLowerCase();
-        var l2 = languages;
+        var l2 = languages, b;
         for (var l in l2) for (b in l2[l]) if (l2[l][b] == bl) return l;
         for (var l in l2) for (b in l2[l]) if (l2[l][b].substring(0,3)==bl.substring(0,3)) return l;
         return 'en';

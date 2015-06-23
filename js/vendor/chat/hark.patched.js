@@ -19,10 +19,11 @@ var hark = function(stream, options) {
 
   // make it not break in non-supported browsers
   if (!audioContextType) return harker;
+  
+  options = options || {};
 
   //Config
-  var options = options || {},
-      smoothing = (options.smoothing || 0.5),
+  var smoothing = (options.smoothing || 0.5),
       interval = (options.interval || 100),
       threshold = options.threshold,
       play = options.play;

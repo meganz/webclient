@@ -234,7 +234,6 @@ var crypt = (function () {
                 msgDialog('warningb',
                           'RSA Public Key Signature Verification Failed',
                           message + '<br/>' + instructions);
-                console.error(message);
                 throw new Error('RSA Public Key Signature Verification Failed');
             }
         }
@@ -317,7 +316,9 @@ var crypt = (function () {
                 rootPromise.resolve(ns._trackRSAKeyAuthentication(userhandle,
                                                                   signature,
                                                                   fingerprint));
-            }, rootPromise.reject.bind(rootPromise));
+            }, function() {
+                rootPromise.reject();
+            });
         }
         else if (recorded && authring.equalFingerprints(recorded.fingerprint, fingerprint) === true) {
             // All good, key matches previously seen fingerprint.
@@ -571,9 +572,6 @@ else {
         use_ssl++;
     }
 }
-
-var chromehack = navigator.appVersion.indexOf('Chrome/');
-chromehack = chromehack >= 0 && parseInt(navigator.appVersion.substr(chromehack + 7)) > 21;
 
 var EINTERNAL = -1;
 var EARGS = -2;
@@ -1632,15 +1630,7 @@ function api_proc(q) {
 function api_send(q) {
     q.timer = false;
 
-    if (chromehack) {
-        // plug extreme Chrome memory leak
-        var t = q.url.indexOf('/', 9);
-        q.xhr.open('POST', q.url.substr(0, t + 1), true);
-        q.xhr.setRequestHeader("MEGA-Chrome-Antileak", q.url.substr(t));
-    }
-    else {
-        q.xhr.open('POST', q.url, true);
-    }
+    q.xhr.open('POST', q.url, true);
 
     if (window.d) {
         console.log("Sending API request: " + q.rawreq + " to " + q.url);
@@ -3343,9 +3333,8 @@ function api_fareq(res, ctx, xhr) {
                         data[i] = ctx.p.charCodeAt(dp + i);
                     }
 
-                    if (!chromehack) {
-                        data = data.buffer;
-                    }
+
+                    data = data.buffer;
                 }
                 else {
                     data = false;
@@ -3353,18 +3342,10 @@ function api_fareq(res, ctx, xhr) {
             }
             else {
                 data = ctx.data;
-                if (chromehack) {
-                    data = new Uint8Array(data);
-                }
             }
 
             if (data) {
-                if (chromehack) {
-                    t = pp[m].lastIndexOf('/');
-                }
-                else {
-                    t = -1;
-                }
+                t = -1;
 
                 pp[m] += '/' + ctx.type;
 
@@ -3406,9 +3387,7 @@ function api_fareq(res, ctx, xhr) {
                 if ("text" === faxhrs[slot].responseType) {
                     faxhrs[slot].overrideMimeType('text/plain; charset=x-user-defined');
                 }
-                if (chromehack) {
-                    faxhrs[slot].setRequestHeader("MEGA-Chrome-Antileak", pp[m].substr(t));
-                }
+
                 faxhrs[slot].startTime = Date.now();
                 faxhrs[slot].send(data);
             }
@@ -3447,7 +3426,7 @@ function api_attachfileattr(node, id) {
 
 // generate crypto request response for the given nodes/shares matrix
 function crypto_makecr(source, shares, source_is_nodes) {
-    var i, j, n;
+    var i, j, n, nk;
     var cr = [shares, [], []];
     var aes;
 
@@ -3552,7 +3531,7 @@ var rsa2aes = {};
 // **NB** Any changes made to this function
 //        must be populated to keydec.js
 function crypto_processkey(me, master_aes, file) {
-    var id, key, k, n;
+    var id, key, k, n, decKey;
 
     if (!file.k) {
         if (!keycache[file.h]) {
@@ -3605,11 +3584,42 @@ function crypto_processkey(me, master_aes, file) {
             // check for permitted key lengths (4 === folder, 8 === file)
             if (k.length === 4 || k.length === 8) {
                 // TODO: cache sharekeys in aes
-                k = decrypt_key(id === me ? master_aes : new sjcl.cipher.aes(u_sharekeys[id]), k);
+                if (id === me) {
+                    k = decrypt_key(master_aes, k);
+                }
+                else {
+                    decKey = null;
+                    var shareKey = u_sharekeys[id];
+                    if (shareKey) {
+                        if (Array.isArray(shareKey)) {
+                            var len = shareKey.length;
+                            if (len === 4 || len === 6 || len === 8) {
+                                decKey = decrypt_key(new sjcl.cipher.aes(shareKey), k);
+                            }
+                            else {
+                                console.error('Invalid shareKey length ' + id, shareKey);
+                            }
+                        }
+                        else {
+                            console.error('Invalid shareKey ' + id, shareKey);
+                        }
+                    }
+                    else {
+                        console.error('No shareKey for ' + id);
+                    }
+
+                    if (!decKey) {
+                        if (window.d) {
+                            debugger;
+                        }
+                        return;
+                    }
+                    k = decKey;
+                }
             }
             else {
                 if (window.d) {
-                    console.log("Received invalid key length (" + k.length + "): " + file.h);
+                    console.error("Received invalid key length (" + k.length + "): " + file.h);
                 }
                 return;
             }

@@ -259,7 +259,7 @@ describe("crypto unit test", function() {
                 assert.strictEqual(authring.setContactAuthenticated.callCount, 0);
                 assert.strictEqual(msgDialog.callCount, 1);
                 assert.strictEqual(ns._logger._log.args[0][1][0],
-                                   'RSA Public Key Signature Verification Failed');
+                                   'RSA public key signature for you@there.org is invalid!');
             });
         });
 

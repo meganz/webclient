@@ -871,8 +871,8 @@ function makeMetaAware(kls) {
      * Clear/delete meta data
      *
      * @param prefix string  optional
-     * @param namespace string  optional
-     * @param k string optional
+     * @param [namespace] string  optional
+     * @param [k] string optional
      */
     kls.prototype.clearMeta = function(prefix, namespace, k) {
         var self = this;

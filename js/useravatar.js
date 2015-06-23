@@ -134,7 +134,23 @@ var useravatar = (function() {
     /**
      *  Return the current user's avatar in image URL.
      */
+    ns.top = function() {
+        if (!u_handle) {
+            /* No user */
+            return staticpath + 'images/mega/default-top-avatar.png';
+        }
+        return ns.imgUrl(u_handle);
+    };
+
+
+    /**
+     *  Return the current user's avatar in image URL.
+     */
     ns.mine = function() {
+        if (!u_handle) {
+            /* No user */
+            return staticpath + 'images/mega/default-avatar.png';
+        }
         return ns.imgUrl(u_handle);
     };
 
@@ -143,7 +159,7 @@ var useravatar = (function() {
      *  that is the case we replace that old avatar *everywhere* with their proper avatar
      */
     ns.loaded = function(user) {
-        if (typeof user !== "object") {
+        if (typeof user !== "object" || !user.u) {
             return false;
         }
 
@@ -154,7 +170,9 @@ var useravatar = (function() {
 
         var avatar = $(ns.contact(user)).html();
         $('.avatar-wrapper.' + user.u).empty().html(avatar);
-        $('.avatar-wrapper.' + user.m.replace(/[\.@]/g, "\\$1")).empty().html(avatar);
+        if (user.m) {
+            $('.avatar-wrapper.' + user.m.replace(/[\.@]/g, "\\$1")).empty().html(avatar);
+        }
     };
 
     ns.contact = function(user, className, element) {

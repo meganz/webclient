@@ -1716,7 +1716,7 @@ function parsetopmenu() {
     if (document.location.href.substr(0, 19) == 'chrome-extension://') {
         top = top.replace(/\/#/g, '/' + urlrootfile + '#');
     }
-    top = top.replace("{avatar-top}", useravatar.mine());
+    top = top.replace("{avatar-top}", useravatar.top());
     top = translate(top);
     return top;
 }

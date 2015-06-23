@@ -6318,7 +6318,7 @@ function treeUIopen(id, event, ignoreScroll, dragOver, DragOpen) {
 
     if (id_r === 'shares') {
         sectionUIopen('shared-with-me');
-    } else if (id_r === M.InboxID) {
+    } else if (M.InboxID && id_r === M.InboxID) {
         sectionUIopen('inbox');
     } else if (id_r === M.RootID) {
         sectionUIopen('cloud-drive');

@@ -3790,7 +3790,7 @@ function accountUI()
                     api_req({'a': 'up', '+a':'none'});
                     delete avatars[u_handle];
                     $('.fm-account-avatar img').attr('src', useravatar.mine());
-                    $('.fm-avatar img').attr('src', useravatar.top());
+                    $('.fm-avatar img').attr('src', useravatar.mine());
                     $('.fm-account-remove-avatar').hide();
                 }
             });
@@ -3992,7 +3992,7 @@ function avatarDialog(close)
                         url: myURL.createObjectURL(blob)
                     }
                 $('.fm-account-avatar img').attr('src', useravatar.mine());
-                $('.fm-avatar img').attr('src', useravatar.top());
+                $('.fm-avatar img').attr('src', useravatar.mine());
                 avatarDialog(1);
             },
             onImageUpload: function()

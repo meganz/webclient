@@ -385,7 +385,7 @@ function MegaData()
                                 url: myURL.createObjectURL(blob)
                             };
                             useravatar.loaded(M.u[ctx.u]);
-                        } else if (ctx.u == u_handle) {
+                        } else if (ctx.u === u_handle) {
                             useravatar.loaded(M.u[ctx.u]);
                         }
                     }
@@ -874,7 +874,7 @@ function MegaData()
          * @returns {int}
          */
         function renderLayout(u, n_cache) {
-            var html, el, cs, contains, u_h, t, el, time, bShare,
+            var html, cs, contains, u_h, t, el, time, bShare,
                 avatar, rights, rightsclass, onlinestatus, html,
                 sExportLink, sLinkIcon,
                 iShareNum = 0,

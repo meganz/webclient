@@ -12,12 +12,15 @@ var useravatar = {
 	    '#ffcc00',
     ],
 
+    /**
+     *  Take the class colors and create a inject as a CSS.
+     */
     registerColors: function() {
         var css = "";
         for (var i in this._colors) {
             css += ".color" + (parseInt(i)+1) + " { background-color: " + this._colors[i] + "; }";
         }
-        var css = mObjectURL([css], "text/css");
+        css = mObjectURL([css], "text/css");
         mCreateElement('link', {type: 'text/css', rel: 'stylesheet'}, 'head').href = css;
     },
 
@@ -26,25 +29,30 @@ var useravatar = {
      *  the moment we discover the real avatar associate with that avatar
      */
     _watching: {},
-    top: function() {
-        if (avatars[u_handle]) {
-            return avatars[u_handle].url;
-        }
-        return this.contact(u_handle, '', 'ximg');
-    },
+
+    /**
+     *  Like the `contact` method but instead of returning a
+     *  div with the avatar inside it returns an image URL.
+     */
     imgUrl: function(contact) {
         if (avatars[contact]) {
             return avatars[contact].url;
         }
         return this.contact(contact, '', 'ximg');
     },
+
+    /**
+     *  Return the current user's avatar in image URL.
+     */
     mine: function() {
-        if (avatars[u_handle]) {
-            return avatars[u_handle].url;
-        }
-        return this.contact(u_handle, '', 'ximg');
+        return this.imgUrl(u_handle);
     },
 
+    /**
+     *  private method
+     *
+     *  Return a SVG image representing the TWO-Letters avatar
+     */
     _twoLettersImg: function(letters) {
         var s = this._twoLettersSettings(letters);
         var tpl = $('#avatar-svg').clone().removeClass('hidden')
@@ -55,6 +63,13 @@ var useravatar = {
         return 'data:image/svg+xml;base64,' + tpl;
     },
 
+    /**
+     *  private method
+     *
+     *  Return two letters and the color for a given string
+     *
+     *  @return string
+     */
     _twoLettersSettings: function(letters) {
         var words = letters.split(/\W+/);
         if (words.length === 1) {
@@ -62,7 +77,7 @@ var useravatar = {
         } else {
             letters = words[0][0]  + words[1][0];
         }
-        var colors = parseInt(this._colors.length/2)+1
+        var colors = parseInt(this._colors.length/2)+1;
         var color = letters.charCodeAt(0) % colors + letters.charCodeAt(1) % colors;
         return {letters: letters.toUpperCase(), color: this._colors[color], colorIndex: color};
     },
@@ -77,7 +92,7 @@ var useravatar = {
      *  @return HTML
      */
     _twoLetters: function(letters, id, className, element) {
-        if (element == 'ximg') {
+        if (element === 'ximg') {
             return this._twoLettersImg(letters);
         }
         var s = this._twoLettersSettings(letters);
@@ -103,8 +118,11 @@ var useravatar = {
          + '</' + type + '>';
     },
 
+    /**
+     *  Check if the input is an email address or not.
+     */
     isEmail: function(email) {
-        return typeof email == "string" && email.match(/.+@.+/);
+        return typeof email === "string" && email.match(/.+@.+/);
     },
 
     /**
@@ -112,18 +130,18 @@ var useravatar = {
      *  that is the case we replace that old avatar *everywhere* with their proper avatar
      */
     loaded: function(user) {
-        if (typeof user != "object") {
+        if (typeof user !== "object") {
             return false;
         }
 
-        if (user.u == u_handle) {
+        if (user.u === u_handle) {
             // my avatar!
             $('.fm-avatar img,.fm-account-avatar img').attr('src', this.imgUrl(user.u));
         }
 
         var avatar = $(this.contact(user)).html();
         $('.avatar-wrapper.' + user.u).empty().html(avatar);
-        $('.avatar-wrapper.' + user.m.replace(/[\.@]/g, "\\$1")).empty().html(avatar)
+        $('.avatar-wrapper.' + user.m.replace(/[\.@]/g, "\\$1")).empty().html(avatar);
     },
 
     contact : function(user, className, element) {
@@ -133,21 +151,23 @@ var useravatar = {
             // User is an email, we should look if the user
             // exists, if it does exists we use the user Object.
             for (var u in M.u) {
-                if (M.u[u].m == user) {
+                if (M.u[u].m === user) {
                     // found the user object
                     return this.contact(M.u[u]);
                 }
             }
             return this._twoLetters(user.substr(0, 2), user, className, element);
-        } else if (typeof user == "string" && M.u[user]) {
-            // It's an user ID
-            user = M.u[user];
-        } else if (typeof user == "string") {
-            return this._twoLetters(user, user, className, element);
+        } else if (typeof user === "string") {
+            if (M.u[user]) {
+                // It's an user ID
+                user = M.u[user];
+            } else {
+                return this._twoLetters(user, user, className, element);
+            }
         }
 
         if (avatars[user.u]) {
-            //return this._image(avatars[user.u].url, user.u, className, element);
+            return this._image(avatars[user.u].url, user.u, className, element);
         }
         
         return this._twoLetters(user.name || user.m, user.u, className, element);

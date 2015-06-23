@@ -305,9 +305,10 @@
                 keyRange = type ? IDBKeyRange[ type ].apply( null, args ) : null,
                 results = [],
                 indexArgs = [ keyRange ],
-                limitRange = limitRange ? limitRange : null,
-                filters = filters ? filters : [],
                 counter = 0;
+
+            limitRange = limitRange || null;
+            filters = filters || [];
 
             if ( cursorType !== 'count' ) {
                 indexArgs.push( direction || 'next' );

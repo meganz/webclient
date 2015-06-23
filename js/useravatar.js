@@ -208,5 +208,7 @@ var useravatar = (function() {
         return _twoLetters(user.name || user.m, user.u, className, element);
     };
     
+    registerCssColors();
+    
     return ns;
 })();

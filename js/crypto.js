@@ -3552,7 +3552,7 @@ var rsa2aes = {};
 // **NB** Any changes made to this function
 //        must be populated to keydec.js
 function crypto_processkey(me, master_aes, file) {
-    var id, key, k, n;
+    var id, key, k, n, decKey;
 
     if (!file.k) {
         if (!keycache[file.h]) {
@@ -3605,11 +3605,42 @@ function crypto_processkey(me, master_aes, file) {
             // check for permitted key lengths (4 === folder, 8 === file)
             if (k.length === 4 || k.length === 8) {
                 // TODO: cache sharekeys in aes
-                k = decrypt_key(id === me ? master_aes : new sjcl.cipher.aes(u_sharekeys[id]), k);
+                if (id === me) {
+                    k = decrypt_key(master_aes, k);
+                }
+                else {
+                    decKey = null;
+                    var shareKey = u_sharekeys[id];
+                    if (shareKey) {
+                        if (Array.isArray(shareKey)) {
+                            var len = shareKey.length;
+                            if (len === 4 || len === 6 || len === 8) {
+                                decKey = decrypt_key(new sjcl.cipher.aes(shareKey), k);
+                            }
+                            else {
+                                console.error('Invalid shareKey length ' + id, shareKey);
+                            }
+                        }
+                        else {
+                            console.error('Invalid shareKey ' + id, shareKey);
+                        }
+                    }
+                    else {
+                        console.error('No shareKey for ' + id);
+                    }
+
+                    if (!decKey) {
+                        if (window.d) {
+                            debugger;
+                        }
+                        return;
+                    }
+                    k = decKey;
+                }
             }
             else {
                 if (window.d) {
-                    console.log("Received invalid key length (" + k.length + "): " + file.h);
+                    console.error("Received invalid key length (" + k.length + "): " + file.h);
                 }
                 return;
             }

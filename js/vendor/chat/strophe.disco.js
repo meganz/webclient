@@ -32,7 +32,7 @@
 	};
 
 	/// DISCO_INFO 
-	DiscoInfoNode = function() { DiscoNode.apply(this,arguments); };
+	var DiscoInfoNode = function() { DiscoNode.apply(this,arguments); };
 	DiscoInfoNode.prototype = new DiscoNode();
 	DiscoInfoNode.prototype.addContent = function(req,res) {
 		var nodes = this.features || this.disco.features;
@@ -44,7 +44,7 @@
 	};
 
 	/// DISCO_ITEMS
-	DiscoItemsNode = function() { DiscoNode.apply(this,arguments); };
+	var DiscoItemsNode = function() { DiscoNode.apply(this,arguments); };
 	DiscoItemsNode.prototype = new DiscoNode();
 	DiscoItemsNode.prototype.addContent = function(req,res) {
 		var items = this.items || this.disco.items;
@@ -56,7 +56,7 @@
 	};
 
 	/// NODE_NOT_FOUND
-	DiscoNodeNotFound = function() { DiscoNode.apply(this,arguments); };
+	var DiscoNodeNotFound = function() { DiscoNode.apply(this,arguments); };
 	DiscoNodeNotFound.prototype = new DiscoNode();
 	DiscoNodeNotFound.prototype.addContent = function(req,res) {
 		res.c('error', { type: 'cancel'});
@@ -70,6 +70,7 @@
 	Strophe.Disco = {
 		DiscoNode: DiscoNode,
 		DiscoInfoNode: DiscoInfoNode,
+		DiscoItemsNode: DiscoItemsNode,
 		DiscoNodeNotFound: DiscoNodeNotFound,
 		noop: noop
 	};
@@ -81,6 +82,7 @@
 
 	var DiscoNode = Strophe.Disco.DiscoNode;
 	var DiscoInfoNode = Strophe.Disco.DiscoInfoNode;
+	var DiscoItemsNode = Strophe.Disco.DiscoItemsNode;
 	var DiscoNodeNotFound = Strophe.Disco.DiscoNodeNotFound;
 	var noop = Strophe.Disco.noop;
 

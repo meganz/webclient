@@ -64,8 +64,15 @@ function FlashIO(dl_id, dl) {
         // dl_filename = filename;
         // dl_chunks   = chunks;
         // dl_chunksizes = sizes;
+        var fail;
         if (size > 950 * 0x100000) {
-            dlFatalError(dl, Error('File too big to be reliably handled with Flash.'));
+            fail = Error('File too big to be reliably handled with Flash.');
+        }
+        else if (!flashIsEnabled()) {
+            fail = Error('Adobe Flash is required to download under this browser.');
+        }
+        if (fail) {
+            dlFatalError(dl, fail);
             if (!this.is_zip) {
                 ASSERT(!this.begin, "This should have been destroyed 'while initializing'");
             }

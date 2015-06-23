@@ -1,6 +1,6 @@
 /**
  *  @fileOverview
- *  
+ * 
  *  Handle all logic for rendering for users' avatar
  */
 
@@ -8,16 +8,16 @@
 var useravatar = (function() {
     "use strict";
     var _colors = [
-	    '#FF6A19',
-	    '#5856d6',
-	    '#007aff',
-	    '#34aadc',
-	    '#5ac8fa',
-	    '#4cd964',
-	    '#ff1a53',
-	    '#d90007',
-	    '#ff9500',
-	    '#ffcc00',
+        '#FF6A19',
+        '#5856d6',
+        '#007aff',
+        '#34aadc',
+        '#5ac8fa',
+        '#4cd964',
+        '#ff1a53',
+        '#d90007',
+        '#ff9500',
+        '#ffcc00',
     ];
 
     /**
@@ -25,10 +25,10 @@ var useravatar = (function() {
      *  the moment we discover the real avatar associate with that avatar
      */
     var _watching = {};
-    
+
     /**
      *  Public methods
-     */ 
+     */
     var ns = {};
 
     /**
@@ -37,7 +37,7 @@ var useravatar = (function() {
     function registerCssColors() {
         var css = "";
         for (var i in _colors) {
-            css += ".color" + (parseInt(i)+1) + " { background-color: " + _colors[i] + "; }";
+            css += ".color" + (parseInt(i) + 1) + " { background-color: " + _colors[i] + "; }";
         }
         css = mObjectURL([css], "text/css");
         mCreateElement('link', {type: 'text/css', rel: 'stylesheet'}, 'head').href = css;
@@ -48,7 +48,7 @@ var useravatar = (function() {
      *
      *  Return a SVG image representing the TWO-Letters avatar
      */
-     function _twoLettersImg(letters) {
+    function _twoLettersImg(letters) {
         var s = _twoLettersSettings(letters);
         var tpl = $('#avatar-svg').clone().removeClass('hidden')
             .find('svg').css('background-color', s.color).end()
@@ -72,7 +72,7 @@ var useravatar = (function() {
         } else {
             letters = words[0][0]  + words[1][0];
         }
-        var colors = parseInt(_colors.length/2)+1;
+        var colors = parseInt(_colors.length / 2) + 1;
         var color = letters.charCodeAt(0) % colors + letters.charCodeAt(1) % colors;
         return {letters: letters.toUpperCase(), color: _colors[color], colorIndex: color};
     }
@@ -83,7 +83,7 @@ var useravatar = (function() {
      *  @param letters      String used to generate the avatar
      *  @param id           ID associate with the avatar (uid, email)
      *  @param className Any extra CSS classes that we want to append to the HTML
-     *  
+     *
      *  @return HTML
      */
     function _twoLetters(letters, id, className, element) {
@@ -155,7 +155,7 @@ var useravatar = (function() {
     };
 
     /**
-     *  A new contact has been loaded, let's see if they have any two-letters avatars, if 
+     *  A new contact has been loaded, let's see if they have any two-letters avatars, if
      *  that is the case we replace that old avatar *everywhere* with their proper avatar
      */
     ns.loaded = function(user) {
@@ -204,11 +204,11 @@ var useravatar = (function() {
         if (avatars[user.u]) {
             return _image(avatars[user.u].url, user.u, className, element);
         }
-        
+
         return _twoLetters(user.name || user.m, user.u, className, element);
     };
-    
+
     registerCssColors();
-    
+
     return ns;
 })();

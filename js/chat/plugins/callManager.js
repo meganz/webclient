@@ -925,7 +925,7 @@ CallSession.prototype.renderCallStartedState = function() {
 
     var otherUserContact = self.room.megaChat.getContactFromJid(self.room.getParticipantsExceptMe()[0]);
     var otherAvatar = $(useravatar.contact(otherUserContact, 'nw-contact-avatar', 'div'));
-    otherAvatar.html("<span>"+ otherAvatar.html() + "</span>");
+    otherAvatar.html("<span>" + otherAvatar.html() + "</span>");
     otherAvatar.find('img').addClass('nw-contact-avatar');
     $('.other-avatar-text', self.room.$header)
         .empty()

@@ -5789,6 +5789,9 @@ function folderreqerr(c, e)
 }
 
 function init_chat() {
+    if(folderlink) {
+        return;
+    }
     function __init_chat() {
         if (u_type && !megaChat.is_initialized) {
             if (d) console.log('Initializing the chat...');

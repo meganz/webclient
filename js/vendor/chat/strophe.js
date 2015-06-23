@@ -4197,7 +4197,7 @@ Strophe.Bosh.prototype = {
 
         if (this._requests.length < 2 && data.length > 0 &&
             !this._conn.paused) {
-            body = this._buildBody();
+            var body = this._buildBody();
             for (i = 0; i < data.length; i++) {
                 if (data[i] !== null) {
                     if (data[i] === "restart") {
@@ -4223,7 +4223,7 @@ Strophe.Bosh.prototype = {
         }
 
         if (this._requests.length > 0) {
-            time_elapsed = this._requests[0].age();
+            var time_elapsed = this._requests[0].age();
             if (this._requests[0].dead !== null) {
                 if (this._requests[0].timeDead() >
                     Math.floor(Strophe.SECONDARY_TIMEOUT * this.wait)) {

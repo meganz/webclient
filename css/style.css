@@ -5265,9 +5265,21 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 .active-folder-link .nw-fm-left-icon.folder-link {
 	display: block;
 }
-.active-folder-link .nw-fm-left-icon.cloud-drive, .active-folder-link .nw-fm-tree-header.cloud-drive {
+/**
+ * hide sections of the site if the current visited link is a folder share link
+ */
+.active-folder-link .nw-fm-left-icon.cloud-drive,
+.active-folder-link .nw-fm-tree-header.cloud-drive,
+.active-folder-link .nw-fm-left-icon.inbox,
+.active-folder-link .nw-fm-left-icon.shared-with-me,
+.active-folder-link .nw-fm-left-icon.contacts,
+.active-folder-link .nw-fm-left-icon.conversations,
+.active-folder-link .nw-fm-left-icon.rubbish-bin,
+.active-folder-link .nw-fm-left-icon.settings
+{
 	display: none;
 }
+
 .nw-fm-left-icon.notifications {
 	background-position: 0 -6142px;
 }

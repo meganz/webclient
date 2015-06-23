@@ -1538,7 +1538,7 @@ function addContactUI()
 
     $.shareTokens = [];
 
-    iconSize = function(par)
+    function iconSize(par)
     {
         if (par)// full size icon, popup at bottom of Add contact button
         {
@@ -3211,7 +3211,7 @@ function accountUI()
         $('.fm-account-select.month select').html(html);
         var html = '<option value="">' + l[996] + '</option>', sel = '';
         $('.fm-account-select.country .account-select-txt').text(l[996]);
-        for (country in isocountries)
+        for (var country in isocountries)
         {
             if (u_attr.country && country == u_attr.country)
             {
@@ -4706,7 +4706,7 @@ function UIkeyevents()
             s = $('.file-block.ui-selected');
         else
             s = $('.grid-table tr.ui-selected');
-        selPanel = $('.transfer-panel tr.ui-selected').not('.clone-of-header')
+        var selPanel = $('.transfer-panel tr.ui-selected').not('.clone-of-header')
 
         if (M.chat)
             return true;
@@ -5581,9 +5581,11 @@ function menuItems() {
         $.delfav = 1;
 
         for (var i in $.selected) {
-            n = M.d[$.selected[i]];
-            if (n && !n.fav)
+            var n = M.d[$.selected[i]];
+            if (n && !n.fav) {
                 $.delfav = 0;
+                break;
+            }
         }
 
         if ($.delfav) {

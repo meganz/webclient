@@ -115,7 +115,7 @@ function cmsObjectToId(name)
 		q = null;
 	};
 	var srv = apipath.replace(/https?:\/\//, '').replace(/\//g, '')
-	q.open("GET", (localStorage.cms || "//cms.mega.nz/") + srv + '/' + name);
+	q.open("GET", (localStorage.cms || "https://cms.mega.nz/") + srv + '/' + name);
 	q.responseType = 'arraybuffer';
 	q.send();
 }

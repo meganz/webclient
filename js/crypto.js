@@ -572,9 +572,6 @@ else {
     }
 }
 
-var chromehack = navigator.appVersion.indexOf('Chrome/');
-chromehack = chromehack >= 0 && parseInt(navigator.appVersion.substr(chromehack + 7)) > 21;
-
 var EINTERNAL = -1;
 var EARGS = -2;
 var EAGAIN = -3;
@@ -1632,15 +1629,7 @@ function api_proc(q) {
 function api_send(q) {
     q.timer = false;
 
-    if (chromehack) {
-        // plug extreme Chrome memory leak
-        var t = q.url.indexOf('/', 9);
-        q.xhr.open('POST', q.url.substr(0, t + 1), true);
-        q.xhr.setRequestHeader("MEGA-Chrome-Antileak", q.url.substr(t));
-    }
-    else {
-        q.xhr.open('POST', q.url, true);
-    }
+    q.xhr.open('POST', q.url, true);
 
     if (window.d) {
         console.log("Sending API request: " + q.rawreq + " to " + q.url);
@@ -3343,9 +3332,8 @@ function api_fareq(res, ctx, xhr) {
                         data[i] = ctx.p.charCodeAt(dp + i);
                     }
 
-                    if (!chromehack) {
-                        data = data.buffer;
-                    }
+
+                    data = data.buffer;
                 }
                 else {
                     data = false;
@@ -3353,18 +3341,10 @@ function api_fareq(res, ctx, xhr) {
             }
             else {
                 data = ctx.data;
-                if (chromehack) {
-                    data = new Uint8Array(data);
-                }
             }
 
             if (data) {
-                if (chromehack) {
-                    t = pp[m].lastIndexOf('/');
-                }
-                else {
-                    t = -1;
-                }
+                t = -1;
 
                 pp[m] += '/' + ctx.type;
 
@@ -3406,9 +3386,7 @@ function api_fareq(res, ctx, xhr) {
                 if ("text" === faxhrs[slot].responseType) {
                     faxhrs[slot].overrideMimeType('text/plain; charset=x-user-defined');
                 }
-                if (chromehack) {
-                    faxhrs[slot].setRequestHeader("MEGA-Chrome-Antileak", pp[m].substr(t));
-                }
+
                 faxhrs[slot].startTime = Date.now();
                 faxhrs[slot].send(data);
             }
@@ -3447,7 +3425,7 @@ function api_attachfileattr(node, id) {
 
 // generate crypto request response for the given nodes/shares matrix
 function crypto_makecr(source, shares, source_is_nodes) {
-    var i, j, n;
+    var i, j, n, nk;
     var cr = [shares, [], []];
     var aes;
 

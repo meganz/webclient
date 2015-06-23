@@ -1380,7 +1380,7 @@ function callLoggerWrapper(ctx, fnName, loggerFn, textPrefix, parentLogger) {
     }
 
     var origFn = ctx[fnName];
-    var textPrefix = textPrefix || "missing-prefix";
+    textPrefix = textPrefix || "missing-prefix";
 
     var logger = MegaLogger.getLogger(textPrefix + "[" + fnName + "]", {}, parentLogger);
     var logFnName = loggerFn === console.error ? "error" : "debug";
@@ -1473,13 +1473,13 @@ function megaJidToUserId(jid) {
  * Implementation of a string encryption/decryption.
  */
 var stringcrypt = (function() {
+    "use strict";
+
     /**
      * @description
      * Implementation of a string encryption/decryption.</p>
      */
     var ns = {};
-
-    "use strict";
 
     /**
      * Encrypts clear text data to an authenticated ciphertext, armoured with

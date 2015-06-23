@@ -1029,8 +1029,13 @@ function initUI() {
 
     var fmTabState;
 
-    $('.nw-fm-left-icon').rebind('click', function() {
+    $('.nw-fm-left-icon').rebind('contextmenu', function(ev) {
+        contextMenuUI(ev,1);
+        return false;
+    });
 
+    $('.nw-fm-left-icon').rebind('click', function() {
+        treesearch = false;
         var clickedClass = $(this).attr('class');
         if (!clickedClass) {
             return;
@@ -1159,14 +1164,14 @@ function initUI() {
         $(window).trigger('resize');
     });
 
-    $(window).unbind('resize.fmrh hashchange.fmrh');
-    $(window).bind('resize.fmrh hashchange.fmrh', fm_resize_handler);
+    $(window).rebind('resize.fmrh hashchange.fmrh', fm_resize_handler);
 
-    megaChat.karere.unbind("onPresence.maintainUI");
-    megaChat.karere.bind("onPresence.maintainUI", function(e, presenceEventData)
-    {
-        M.onlineStatusEvent(megaChat.getContactFromJid(presenceEventData.getFromJid()), presenceEventData.getShow());
-    });
+    if (!MegaChatDisabled) {
+        megaChat.karere.rebind("onPresence.maintainUI", function(e, presenceEventData) {
+            var contact = megaChat.getContactFromJid(presenceEventData.getFromJid());
+            M.onlineStatusEvent(contact, presenceEventData.getShow());
+        });
+    }
 }
 
 function transferPanelContextMenu(target)

@@ -636,6 +636,7 @@ function initUI() {
     if (folderlink)
     {
         $('.fm-main').addClass('active-folder-link');
+        $('.activity-status-block').hide();
     }
     else
     {

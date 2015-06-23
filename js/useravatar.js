@@ -179,6 +179,10 @@ var useravatar = (function() {
             }
         }
 
+        if (typeof user != "object" || !user) {
+            throw new Error("Unexpected value" + typeof(user));
+        }
+
         if (avatars[user.u]) {
             return _image(avatars[user.u].url, user.u, className, element);
         }

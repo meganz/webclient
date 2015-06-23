@@ -234,7 +234,6 @@ var crypt = (function () {
                 msgDialog('warningb',
                           'RSA Public Key Signature Verification Failed',
                           message + '<br/>' + instructions);
-                console.error(message);
                 throw new Error('RSA Public Key Signature Verification Failed');
             }
         }
@@ -317,7 +316,9 @@ var crypt = (function () {
                 rootPromise.resolve(ns._trackRSAKeyAuthentication(userhandle,
                                                                   signature,
                                                                   fingerprint));
-            }, rootPromise.reject.bind(rootPromise));
+            }, function() {
+                rootPromise.reject();
+            });
         }
         else if (recorded && authring.equalFingerprints(recorded.fingerprint, fingerprint) === true) {
             // All good, key matches previously seen fingerprint.

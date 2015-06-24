@@ -45,7 +45,9 @@ function getRulesFromSecureBoot()
                      */
                     js[obj.g] = [ obj.f ];
                     obj.f = "js/pack-" + obj.g + ".js";
-                    line = "jsl.push(" + JSON.stringify(obj) + ")";
+                    line = "jsl.push(" + 
+                            RJSON.stringify(obj)
+                            .replace('{"f"', '{f').replace(/"/g, "'") + ")";
                 } else {
                     /**
                      * This JS belongs to a group that was loaded already
@@ -60,13 +62,15 @@ function getRulesFromSecureBoot()
                     htmls.push("build/" + obj.f);
                     /* We load html/boot.json instead, *the first time* */
                     obj.f = "html/boot.json";
-                    line = 'jsl.push(' + RJSON.stringify(obj) + ")";
+                    line = "jsl.push(" + 
+                            RJSON.stringify(obj)
+                            .replace('{"f"', '{f').replace(/"/g, "'") + ")";
                     include = !js['html'];
                     js['html'] = true;
                 } else if (false) {
                     // disable extra.json for now
                     /* It's a template laoded on demand. We group it as html/extra.json */
-                    htmlExtra.push("build/" + obj.f);
+                    RhtmlExtra.push("build/" + obj.f);
                     /* Replace the files to load */
                     line = line.replace(obj.f, "html/extra.json");
                 }

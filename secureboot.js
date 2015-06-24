@@ -914,10 +914,11 @@ else if (!b_u)
     jsl.push({f: langFilepath, n: 'lang', j:3});
     jsl.push({f:'js/jquery-2.1.1.js', n: 'jquery', j: 1, w:10, g: 'jquery'});
     jsl.push({f:'js/megaLogger.js', n: 'megaLogger_js', j: 1});
+    jsl.push({f:'js/functions.js', n: 'functions_js', j: 1});
+    jsl.push({f:'js/filedrag.js', n: 'filedrag_js', j: 1, g: 'common'});
     jsl.push({f:'sjcl.js', n: 'sjcl_js', j: 1, g: 'crypto'}); // Will be replaced with asmCrypto soon
     jsl.push({f:'js/mDB.js', n: 'mDB_js', j: 1, g: 'db'});
     jsl.push({f:'js/asmcrypto.js', n:'asmcrypto_js', j: 1, w:1, g: 'crypto'});
-    jsl.push({f:'js/functions.js', n: 'functions_js', j: 1});
     jsl.push({f:'js/mega.js', n: 'mega_js', j: 1, w: 7});
     jsl.push({f:'js/tlvstore.js', n: 'tlvstore_js', j: 1, g: 'crypto'});
     jsl.push({f:'js/crypto.js', n: 'crypto_js', j: 1, w:5, g: 'crypto'});
@@ -929,7 +930,6 @@ else if (!b_u)
     jsl.push({f:'js/authring.js', n: 'authring_js', j: 1, g: 'crypto'});
     jsl.push({f:'js/mouse.js', n: 'mouse_js', j: 1, g: 'crypto'});
     jsl.push({f:'js/jquery-ui-1.11.2.js', n: 'jqueryui_js', j: 1, w:10, g: 'jquery'});
-    jsl.push({f:'js/filedrag.js', n: 'filedrag_js', j: 1, g: 'common'});
     jsl.push({f:'js/jquery.mousewheel.js', n: 'jquerymouse_js', j: 1, g: 'jquery'});
     jsl.push({f:'js/jquery.jscrollpane.js', n: 'jscrollpane_js', j: 1, g: 'jquery'});
     jsl.push({f:'js/jquery.tokeninput.js', n: 'jquerytokeninput_js', j: 1, g: 'jquery'});

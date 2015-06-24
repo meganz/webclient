@@ -236,6 +236,8 @@ js/tests/coverage
 # JS Docs
 js/docs/
 
+# Local diffcheck.py configuration.
+contrib/local_config.py
 
 #############
 ## Netbeans project metadata

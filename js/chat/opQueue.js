@@ -118,7 +118,7 @@ OpQueue.prototype.preprocess = function(op) {
                 self.logger.debug("[processMessage mpenc]", self.ctx.state, wireMessage);
             });
 
-        getPubEd25519(contact.u, function(r) {
+        crypt.getPubEd25519(contact.u, function(r) {
             if(r) {
                 try {
                     $promise1.resolve();
@@ -133,7 +133,7 @@ OpQueue.prototype.preprocess = function(op) {
                 $promise1.reject();
             }
         });
-        getPubEd25519(contact2.u, function(r) {
+        crypt.getPubEd25519(contact2.u, function(r) {
             if(r) {
                 try {
                     $promise2.resolve();

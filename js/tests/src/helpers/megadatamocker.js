@@ -17,7 +17,7 @@ var MegaDataMocker = function() {
             'pubEd25519': {
                 'A_123456789': atob('11qYAYKxCrfVS/7TyWQHOg7hcvPapiMlrwIaaPcHURo=')
             },
-            'getPubEd25519': function(h, cb) {
+            'crypt.getPubEd25519': function(h, cb) {
                 pubEd25519[h] = atob('11qYAYKxCrfVS/7TyWQHOg7hcvPapiMlrwIaaPcHURo=');
 
                 cb({pubkey: pubEd25519[h], authenticated: false}, h);

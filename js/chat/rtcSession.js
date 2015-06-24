@@ -77,31 +77,32 @@ function RtcSession(stropheConn, options) {
         throw new Error('This browser does not support webRTC');
 
     var self = this;
+
     self.connection = stropheConn;
     self.gLocalStream = null;
     self.gLocalStreamRefcount = 0;
     self.gLocalVid = null;
     self.gLocalVidRefcount = 0;
 
-    var jingle = self.jingle = stropheConn.jingle;
-    if (jingle.rtcSession)
+    var j = self.jingle = stropheConn.jingle;
+    if (j.rtcSession)
         throw new Error("This Strophe connection already has an associated RtcSession instance");
-    self.ftManager = jingle.ftManager;
+    self.ftManager = j.ftManager;
 // Init crypto functions
     if (options.dummyCryptoFunctions) {
-        jingle.encryptMessageForJid = function(msg, bareJid) {
+        j.encryptMessageForJid = function(msg, bareJid) {
             if (!self._dummyKeys || !self._dummyKeys[bareJid]) {
                 throw new Error("pubkey not loaded: " + bareJid);
             }
             return RtcSession.xorEnc(msg, bareJid)
         };
-        jingle.decryptMessage = function(msg) {
-            return RtcSession.xorDec(msg, Strophe.getBareJidFromJid(this.connection.jid));
+        j.decryptMessage = function(msg) {
+            return RtcSession.xorDec(msg, Strophe.getBareJidFromJid(self.connection.jid));
         };
-        jingle.generateMac = function(msg, key) {
+        j.generateMac = function(msg, key) {
             return RtcSession.xorEnc(msg, key);
         };
-        jingle.preloadCryptoKeyForJid = function(f, bareJid) {
+        j.preloadCryptoKeyForJid = function(f, bareJid) {
             self._dummyKeys = self._dummyKeys || {};
             self._dummyKeys[bareJid] = true;
             f();
@@ -116,17 +117,17 @@ function RtcSession(stropheConn, options) {
             !cr.preloadCryptoKeyForJid || !cr.scrambleJid) {
                 throw new Error("At least one crypto function is not provided in 'options.crypto'");
         }
-        jingle.encryptMessageForJid = cr.encryptMessageForJid;
-        jingle.decryptMessage = cr.decryptMessage;
-        jingle.generateMac = cr.generateMac;
-        jingle.generateMacKey = cr.generateMacKey;
-        jingle.preloadCryptoKeyForJid = cr.preloadCryptoKeyForJid;
+        j.encryptMessageForJid = cr.encryptMessageForJid;
+        j.decryptMessage = cr.decryptMessage;
+        j.generateMac = cr.generateMac;
+        j.generateMacKey = cr.generateMacKey;
+        j.preloadCryptoKeyForJid = cr.preloadCryptoKeyForJid;
         self.scrambleJid = cr.scrambleJid;
     }
     if (options.crypto && options.crypto.generateMacKey) {
-        jingle.generateMacKey = options.crypto.generateMacKey;
+        j.generateMacKey = options.crypto.generateMacKey;
     } else {
-        jingle.generateMacKey = function() {
+        j.generateMacKey = function() {
             var array = new Uint8Array(32);
             var result = '';
             window.crypto.getRandomValues(array);
@@ -136,12 +137,12 @@ function RtcSession(stropheConn, options) {
         };
     }
 
-    jingle.verifyMac = function(msg, key, actualMac) {
+    j.verifyMac = function(msg, key, actualMac) {
         if (!actualMac)
             return false;
         var expectedMac;
         try {
-            expectedMac = jingle.generateMac(msg, key);
+            expectedMac = j.generateMac(msg, key);
         } catch(e) {
             return false;
         }
@@ -159,35 +160,34 @@ function RtcSession(stropheConn, options) {
     if (!options.iceServers) {
         console.warn("No default ice servers provided in options, you must set them before a call is started");
     } else {
-        this.jingle.iceServers = options.iceServers;
+        j.iceServers = options.iceServers;
     }
-    this.options = options;
-    this.audioMuted = false;
-    this.videoMuted = false;
-    this.PRANSWER = false; // use either pranswer or autoaccept
+    self.options = options;
+    self.audioMuted = false;
+    self.videoMuted = false;
+    self.PRANSWER = false; // use either pranswer or autoaccept
 
-    stropheConn.jingle.rtcSession = this; //needed to access the RtcSession object from jingle event handlers
+    j.rtcSession = self; //needed to access the RtcSession object from jingle event handlers
 //muc stuff
-    this.myroomjid = null;
-    this.roomjid = null;
-    this.list_members = [];
+    self.myroomjid = null;
+    self.roomjid = null;
+    self.list_members = [];
 //===
-    this.jingle.onConnectionEvent = this.onConnectionEvent;
+    j.onConnectionEvent = self.onConnectionEvent;
 
     if (RtcSession.RAWLOGGING)
     {
-        this.connection.rawInput = function (data)
+        self.connection.rawInput = function (data)
         { if (RtcSession.RAWLOGGING) console.log('RECV: ' + data); };
-        this.connection.rawOutput = function (data)
+        self.connection.rawOutput = function (data)
         { if (RtcSession.RAWLOGGING) console.log('SEND: ' + data); };
     }
 
-    this.jingle.pc_constraints = RTC.pc_constraints;
+    j.pc_constraints = RTC.pc_constraints;
 
-    var j = this.jingle;
 
-    j.eventHandler = this; //all callbacks will be called with this == eventHandler
-    j.onIncomingCallRequest = this.onIncomingCallRequest;
+    j.eventHandler = self; //all callbacks will be called with self == eventHandler
+    j.onIncomingCallRequest = self.onIncomingCallRequest;
   /**
     Fired when the incoming call request is not longer valid. This may happen for the reasons stated below,
     and the reason is specified in the info.event property: <br>
@@ -213,13 +213,13 @@ function RtcSession(stropheConn, options) {
                          info:info
                      });
     };
-    j.onCallAnswered = this.onCallAnswered;
-    j.onCallTerminated = this.onCallTerminated;
-    j.onRemoteStreamAdded = this.onRemoteStreamAdded;
-    j.onRemoteStreamRemoved = this.onRemoteStreamRemoved;
-    j.onNoStunCandidates = this.noStunCandidates;
-    j.onJingleError = this.onJingleError;
-    j.onMuted = function(sess, info) {
+    j.onCallAnswered = self.onCallAnswered.bind(self);
+    j.onCallTerminated = self.onCallTerminated.bind(self);
+    j.onRemoteStreamAdded = self.onRemoteStreamAdded.bind(self);
+    j.onRemoteStreamRemoved = self.onRemoteStreamRemoved.bind(self);
+    j.onNoStunCandidates = self.noStunCandidates.bind(self);
+    j.onJingleError = self.onJingleError.bind(self);
+    j.onMuted = (function(sess, info) {
     /**
     Fired when the remote peer muted a stream
     @event "muted"
@@ -230,9 +230,9 @@ function RtcSession(stropheConn, options) {
     @property {SessWrapper} sess
         The session on which the event occurred
     */
-        this.trigger('muted', {info:info, sess: new SessWrapper(sess), peer: sess.peerjid});
-    };
-    j.onUnmuted = function(sess, info) {
+        self.trigger('muted', {info:info, sess: new SessWrapper(sess), peer: sess.peerjid});
+    }).bind(self);
+    j.onUnmuted = (function(sess, info) {
     /**
     Fired when the remote peer unmuted a stream
     @event "unmuted"
@@ -244,11 +244,11 @@ function RtcSession(stropheConn, options) {
         The session on which the event occurred
     */
 
-        this.trigger("unmuted", {info:info, sess: new SessWrapper(sess), peer: sess.peerjid});
-    }
+        self.trigger("unmuted", {info:info, sess: new SessWrapper(sess), peer: sess.peerjid});
+    }).bind(self);
 
     if (RTC.browser === 'firefox')
-        this.jingle.media_constraints.mandatory.MozDontOfferDataChannel = true;
+        j.media_constraints.mandatory.MozDontOfferDataChannel = true;
 }
 //global variables
 RtcSession.gVolMon = null;
@@ -366,7 +366,7 @@ RtcSession.prototype = {
         case Strophe.Status.CONNFAIL:
         case Strophe.Status.DISCONNECTING:
         {
-            this.terminateAll('disconnected', null, true);
+            this.terminateAll('xmpp-disconnect', null, true);
             this.rtcSession._freeLocalStream();
             break;
         }
@@ -752,7 +752,7 @@ hangupAll: function()
     for (var sid in sessions) {
         var sess = sessions[sid];
         if (sess.peerjid === from) {
-            this.jingle.terminate(sess, 'peer-disconnected');
+            this.jingle.terminate(sess, 'peer-xmpp-disconnect');
         }
     }
     return true; //We dont want this handler to be deleted
@@ -1011,18 +1011,19 @@ hangupAll: function()
             data: JSON.stringify(obj.stats||obj.basicStats)
     });
     this.trigger('call-ended', obj);
-    if (!sess.fake) { //non-fake session
-        var videoUsed;
-        if (sess.localStream) {
-            var vt = sess.localStream.getVideoTracks();
-            videoUsed = ((vt.length > 0) && vt[0].enabled);
-        } else {
-            videoUsed = false;
-        }
+//release local video
+    var videoUsed;
+    if (sess.localStream) { //a fake session can also have a localStream, e.g. in case of initiate-timeout
+        var vt = sess.localStream.getVideoTracks();
+        videoUsed = ((vt.length > 0) && vt[0].enabled);
         delete sess.localStream;
-        this.removeVideo(sess); //remove remote video
-        this._unrefLocalStream(videoUsed);
+    } else {
+        videoUsed = false;
     }
+    if (sess.remoteStream) {
+        this.removeVideo(sess); //remove remote video
+    }
+    this._unrefLocalStream(videoUsed);
  } catch(e) {
     console.error("onTerminate() handler threw an exception:\n", e.stack?e.stack:e);
  }
@@ -1163,17 +1164,19 @@ hangupAll: function()
  */
  _attachRemoteStreamHandlers: function(stream)
  {
+/* We currently get remote stream mute events over jingle, not over webrtc
+    var self = this;
     var at = stream.getAudioTracks();
     for (var i=0; i<at.length; i++)
-        at[i].onmute =
-        function(e) {
-            this.trigger('remote-audio-muted', stream);
+        at[i].onmute = function(e) {
+            self.trigger('remote-audio-muted', stream);
         };
     var vt = stream.getVideoTracks();
     for (var i=0; i<vt.length; i++)
-        vt[i].muted = function(e) {
-            this.trigger('remote-video-muted', stream);
+        vt[i].onmute = function(e) {
+            self.trigger('remote-video-muted', stream);
         };
+*/
  },
  _refLocalStream: function(sendsVideo) {
     this.gLocalStreamRefcount++;
@@ -1366,7 +1369,7 @@ SessWrapper.prototype = {
     The remote peer's full JID
     @returns {string}
 */
-peerJid: function(){
+peerJid: function() {
     return this._sess.peerjid;
 },
 

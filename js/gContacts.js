@@ -126,14 +126,16 @@
                     return false;
                 } else {            
                     var gData = self._readAllEmails(res);
-                    if (where === 'shared') {
-                        addImportedDataToSharedDialog(gData, 'gmail');
-                    } else if (where === 'contacts') {
-                        addImportedDataToAddContactsDialog(gData, 'gmail');
-                    }
-                    $('.import-contacts-dialog').fadeOut(200);
+                    if (gData.length > 0) {
+                        if (where === 'shared') {
+                            addImportedDataToSharedDialog(gData, 'gmail');
+                        } else if (where === 'contacts') {
+                            addImportedDataToAddContactsDialog(gData, 'gmail');
+                        }
+                        $('.import-contacts-dialog').fadeOut(200);
 
-                    self.isImported = true;
+                        self.isImported = true;
+                    }
                 }
             }
         });        
@@ -152,15 +154,16 @@
         var self = this;
 
         var data = [];
-        for (var i = 0; i<json_data.feed.entry.length; i++)
-        {            
-            var obj = json_data.feed.entry[i];
-           
-            if (obj['gd$email']!=undefined)
-            {
-                data.push(obj['gd$email'][0].address);
+        if (json_data && json_data.feed && json_data.feed.entry) {
+            for (var i = 0; i < json_data.feed.entry.length; i++) {            
+                var obj = json_data.feed.entry[i];
+
+                if (obj['gd$email'] != undefined) {
+                    data.push(obj['gd$email'][0].address);
+                }
             }
         }
+        
         return data;       
     };
 

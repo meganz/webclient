@@ -919,19 +919,23 @@ function initUI() {
         return false;
     });
 
-    $.hideContextMenu = function(e)
-    {
-        if (e && e.target)
-        {
-            var c = $(e.target).attr('class');
-            if (!c)
-            {
-                c = $(e.target).parent();
-                if (c)
-                    c = $(c).attr('class');
+    $.hideContextMenu = function(event) {
+        
+        var a, b, currentNodeClass;
+        
+        if (event && event.target) {
+            currentNodeClass = $(event.target).attr('class');
+            if (!currentNodeClass) {
+                currentNodeClass = $(event.target).parent();
+                if (currentNodeClass)
+                    currentNodeClass = $(currentNodeClass).attr('class');
             }
-            if (c && c.indexOf('dropdown') > -1 && (c.indexOf('download-item') > -1 || c.indexOf('more-item') > -1) && c.indexOf('active') > -1)
+            if (currentNodeClass && currentNodeClass.indexOf('dropdown') > -1
+                && (currentNodeClass.indexOf('download-item') > -1
+                || currentNodeClass.indexOf('more-item') > -1)
+                && currentNodeClass.indexOf('active') > -1) {
                 return false;
+            }
         }
 
         $('.nw-sorting-menu').addClass('hidden');
@@ -941,10 +945,11 @@ function initUI() {
         $('.context-menu-item.dropdown').removeClass('active');
         $('.fm-tree-header').removeClass('dragover');
         $('.nw-fm-tree-item').removeClass('dragover');
+        
         // Set to default
-        var a = $('.context-menu.files-menu,.context-menu.download');
+        a = $('.context-menu.files-menu,.context-menu.download');
         a.addClass('hidden');
-        var b = a.find('.context-submenu');
+        b = a.find('.context-submenu');
         b.attr('style', '');
         b.removeClass('active left-position overlap-right overlap-left mega-height');
         a.find('.disabled,.context-scrolling-block').removeClass('disabled context-scrolling-block');
@@ -5652,8 +5657,11 @@ function contextMenuUI(e, ll) {
 
     var items, v, flt,
         m = $('.context-menu.files-menu'),
-        t = '.context-menu.files-menu .context-menu-item',
-        c = $(e.currentTarget).attr('class'),
+        
+        // Selection of first child level ONLY of .context-menu-item in .context-menu
+        menuCMI = '.context-menu.files-menu .context-menu-section > .context-menu-item',
+//            ', .context-menu.files-menu > .context-menu-item',// Selection of .select-all, doesn't belongs to .context-menu-section    
+        currNodeClass = $(e.currentTarget).attr('class'),
         id = $(e.currentTarget).attr('id');
 
     // is contextmenu disabled
@@ -5668,11 +5676,11 @@ function contextMenuUI(e, ll) {
 
         // Enable upload item menu for clould-drive, don't show it for rubbish and rest of crew
         if (RightsbyID(M.currentdirid) && M.currentrootid !== M.RubbishID) {
-            $(t).filter('.context-menu-item').hide();
-            $(t).filter('.fileupload-item,.newfolder-item').show();
+            $(menuCMI).filter('.context-menu-item').hide();
+            $(menuCMI).filter('.fileupload-item,.newfolder-item').show();
 
             if ((is_chrome_firefox & 2) || 'webkitdirectory' in document.createElement('input')) {
-                $(t).filter('.folderupload-item').show();
+                $(menuCMI).filter('.folderupload-item').show();
             }
         }
         else {
@@ -5680,13 +5688,12 @@ function contextMenuUI(e, ll) {
         }
     }
     else if (ll === 3) {// we want just the download menu
-        $(t).hide();
-        // m.hide();
+        $(menuCMI).hide();
         m = $('.context-menu.download');
-        t = '.context-menu.download .context-menu-item';
+        menuCMI = '.context-menu.download .context-menu-item';
     }
     else if (ll === 4 || ll === 5) {// contactUI
-        $(t).hide();
+        $(menuCMI).hide();
         items = menuItems();
         delete items['download'];
         delete items['zipdownload'];
@@ -5698,14 +5705,13 @@ function contextMenuUI(e, ll) {
         }
 
         for (var item in items) {
-            $(t).filter('.' + item + '-item').show();
+            $(menuCMI).filter('.' + item + '-item').show();
         }
     }
     else if (ll) {// Click on item
 
         // Hide all menu-items
-        $(t).hide();
-        c = $(e.currentTarget).attr('class');
+        $(menuCMI).hide();
         id = $(e.currentTarget).attr('id');
 
         if (id) {
@@ -5718,9 +5724,10 @@ function contextMenuUI(e, ll) {
 
         // detect and show right menu
         if (id && id.length === 11) {
-            $(t).filter('.remove-item').show();// transfer panel
-        } else if (c && (c.indexOf('cloud-drive') > -1 || c.indexOf('folder-link') > -1)) {
-            var flt = '.properties-item';
+            $(menuCMI).filter('.remove-item').show();// transfer panel
+        }
+        else if (currNodeClass && (currNodeClass.indexOf('cloud-drive') > -1 || currNodeClass.indexOf('folder-link') > -1)) {
+            flt = '.properties-item';
             if (folderlink) {
                 flt += ',.import-item';
                 if (M.v.length) {
@@ -5728,28 +5735,34 @@ function contextMenuUI(e, ll) {
                 }
             }
             $.selected = [M.RootID];
-            $(t).filter(flt).show();
-        } else if (c && $(e.currentTarget).hasClass('inbox')) {
+            $(menuCMI).filter(flt).show();
+        }
+        else if (currNodeClass && $(e.currentTarget).hasClass('inbox')) {
             $.selected = [M.InboxID];
-            $(t).filter('.properties-item').show();
-        } else if (c && c.indexOf('rubbish-bin') > -1) {
+            $(menuCMI).filter('.properties-item').show();
+        }
+        else if (currNodeClass && currNodeClass.indexOf('rubbish-bin') > -1) {
             $.selected = [M.RubbishID];
-            $(t).filter('.properties-item').show();
+            $(menuCMI).filter('.properties-item').show();
         }
-        else if (c && c.indexOf('recycle-item') > -1) {
-            $(t).filter('.clearbin-item').show();
+        else if (currNodeClass && currNodeClass.indexOf('recycle-item') > -1) {
+            $(menuCMI).filter('.clearbin-item').show();
         }
-        else if (c && c.indexOf('contacts-item') > -1) {
-            $(t).filter('.addcontact-item').show();
+        else if (currNodeClass && currNodeClass.indexOf('contacts-item') > -1) {
+            $(menuCMI).filter('.addcontact-item').show();
         }
-        else if (c && c.indexOf('messages-item') > -1) {
+        else if (currNodeClass && currNodeClass.indexOf('messages-item') > -1) {
             e.preventDefault();
             return false;
         }
-        else if (c && (c.indexOf('file-block') > -1 || c.indexOf('folder') > -1 || c.indexOf('fm-tree-folder') > -1) || id) {
+        else if (currNodeClass
+            && (currNodeClass.indexOf('file-block') > -1
+            || currNodeClass.indexOf('folder') > -1
+            || currNodeClass.indexOf('fm-tree-folder') > -1)
+            || id) {
             items = menuItems();
             for (var item in items) {
-                $(t).filter('.' + item + '-item').show();
+                $(menuCMI).filter('.' + item + '-item').show();
             }
         }
         else {

@@ -920,9 +920,7 @@ function MegaData()
                     ftype = filetype(M.v[i].name);
                     s = htmlentities(bytesToSize(M.v[i].s));
                 }
-                if (M.v[i].fav) {
-                    star = ' star';
-                }
+                star = M.v[i].fav ? ' star' : '';
 
                 if (M.currentdirid === 'shares') {// render shares tab
                     cs = M.contactstatus(M.v[i].h),

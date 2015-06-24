@@ -47,6 +47,7 @@ function getRulesFromSecureBoot()
                     obj.f = "js/pack-" + obj.g + ".js";
                     line = "jsl.push(" + 
                             RJSON.stringify(obj)
+                            .replace('"n":', 'n:')
                             .replace('{"f"', '{f').replace(/"/g, "'") + ")";
                 } else {
                     /**
@@ -64,6 +65,7 @@ function getRulesFromSecureBoot()
                     obj.f = "html/boot.json";
                     line = "jsl.push(" + 
                             RJSON.stringify(obj)
+                            .replace('"n":', 'n:')
                             .replace('{"f"', '{f').replace(/"/g, "'") + ")";
                     include = !js['html'];
                     js['html'] = true;

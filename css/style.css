@@ -3917,7 +3917,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 }
 .nw-fm-tree-item.linked .link-icon {
 	top: 1px;
-    right: 7px;
+	right: 7px;
 }
 .nw-fm-tree-item:hover {
 	background-color: rgba(217,0,7,0.2);
@@ -5295,9 +5295,21 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 .active-folder-link .nw-fm-left-icon.folder-link {
 	display: block;
 }
-.active-folder-link .nw-fm-left-icon.cloud-drive, .active-folder-link .nw-fm-tree-header.cloud-drive {
+/**
+ * hide sections of the site if the current visited link is a folder share link
+ */
+.active-folder-link .nw-fm-left-icon.cloud-drive,
+.active-folder-link .nw-fm-tree-header.cloud-drive,
+.active-folder-link .nw-fm-left-icon.inbox,
+.active-folder-link .nw-fm-left-icon.shared-with-me,
+.active-folder-link .nw-fm-left-icon.contacts,
+.active-folder-link .nw-fm-left-icon.conversations,
+.active-folder-link .nw-fm-left-icon.rubbish-bin,
+.active-folder-link .nw-fm-left-icon.settings
+{
 	display: none;
 }
+
 .nw-fm-left-icon.notifications {
 	background-position: 0 -6142px;
 }
@@ -5668,24 +5680,24 @@ table .grid-status-icon.star {
 }
 .file-block .file-status-icon, .contact-status-icon, .properties-body .file-status-icon, .link-icon {
 	position: absolute;
-        left: 6px;
-        top: 6px;
-        height: 20px;
-        z-index: 10;
-        width: 20px;
+	left: 6px;
+	top: 6px;
+	height: 20px;
+	z-index: 10;
+	width: 20px;
 }
 .link-icon {
-	left:auto;
-	right:6px;
+	left: auto;
+	right: 6px;
 	background-position: -106px -963px;
-	display:none;
+	display: none;
 }
 .own-data .link-icon {
 	left: 3px;
-        top: 2px;
+	top: 2px;
 }
 .linked .link-icon {
-	display:block;
+	display: block;
 }
 .fm-blocks-view, .fm-contacts-blocks-view, .fm-blocks-view.shared-view, .shared-details-block, .shared-blocks-view, .fm-blocks-view.contacts-view, .contacts-details-block, .contacts-blocks-view {
 	-webkit-box-sizing: border-box;
@@ -5876,7 +5888,7 @@ table .grid-status-icon.star {
 	background-clip: padding-box;
 }
 .own-data .grid-url-arrow {
-	left:32px;
+	left: 32px;
 }
 .file-settings-icon {
 	left: auto;
@@ -11977,6 +11989,12 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
 .membership-medium-txt.red-bg.editprofile, .membership-medium-txt.gray-bg.cancel-account {
 	margin-top: 7px;
 }
+.membership-medium-txt.red-bg.vouchercreate {
+	margin: 25px 0 0 0;
+}
+.membership-medium-txt.red-bg.resellerbuy {
+	margin: 18px 0 0 0;
+}
 .membership-medium-txt.gray-bg.cancel-account {
 	margin-top: 7px;
 }
@@ -12947,6 +12965,16 @@ table {
 	padding: 20px 24px;
 	margin: 24px 0;
 }
+.fm-account-reseller .fm-account-mutliple-bl {
+	padding: 0 24px 8px 24px;
+}
+.fm-account-reseller hr {
+	background-color: #eeeeee;
+	height: 2px;
+	margin: 0 24px;
+	border: 0;
+	padding: 0;
+}
 .triple .fm-account-mutliple-bl {
 	width: 33.333333%;
 }
@@ -13013,6 +13041,10 @@ table {
 }
 .huge .fm-account-info-block {
 	margin: 0;
+}
+.fm-account-reseller .huge .fm-account-info-block {
+	margin: -3px 0 0 0;
+	padding: 0;
 }
 .huge .membership-big-txt {
 	font-size: 30px;
@@ -13218,6 +13250,7 @@ table {
 	float: left;
 	width: 50px;
 	padding: 0px 0px;
+	margin: 0;
 }
 .fm-account-select.month {
 	float: left;
@@ -21184,7 +21217,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
 	display: block;
 	width: 259px;
 	height: 74px;
-	padding-top:8px;
+	padding-top: 8px;
 }
 .share-item-bl .export-icon {
 	margin: 0 10px;
@@ -25188,19 +25221,15 @@ body, body * {
 	overflow: visible !important;
 }
 }
-
-
 #rubsched_options {
-	border-left:1px dashed #333 !important;
-	margin-left:7px !important;
-	padding-right:15px !important;
+	border-left: 1px dashed #333 !important;
+	margin-left: 7px !important;
+	padding-right: 15px !important;
 }
-
 #rubsched_options .rubsched_dash {
-	margin-top:16px !important;
-	border-top:1px dashed #333 !important;
-	width:12px !important;
-	float:left !important;
-	margin-right:4px !important;
+	margin-top: 16px !important;
+	border-top: 1px dashed #333 !important;
+	width: 12px !important;
+	float: left !important;
+	margin-right: 4px !important;
 }
-

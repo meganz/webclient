@@ -747,11 +747,17 @@ var Chat = function() {
 
     this.plugins = {};
 
-
-    this.karere = new Karere({
-        'clientName': 'mc',
-        'boshServiceUrl': function() { return self.getBoshServiceUrl(); }
-    });
+    try {
+        // This might throw in browsers which doesn't support Strophe/WebRTC
+        this.karere = new Karere({
+            'clientName': 'mc',
+            'boshServiceUrl': function() { return self.getBoshServiceUrl(); }
+        });
+    }
+    catch(e) {
+        console.error(e);
+        MegaChatDisabled = true;
+    }
 
     self.filePicker = null; // initialized on a later stage when the DOM is fully available.
 

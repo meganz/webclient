@@ -616,15 +616,15 @@ function MegaData()
      *
      */
     this.drawSentContactRequests = function(opc, clearGrid) {
-        
+
         DEBUG('Draw sent invites.');
-        
+
         var html, hideCancel, hideReinvite, hideOPC,
             drawn = false,
             TIME_FRAME = 60 * 60 * 24 * 14,// 14 days in seconds
             iServerTime = getServerTime(),
             t = '.grid-table.sent-requests';
-        
+
         if (M.currentdirid === 'opc') {
 
             if (clearGrid) {
@@ -1028,7 +1028,7 @@ function MegaData()
                                 </tr>';
                     }
                 } else {
-                    
+
                     if (M.v[i].shares) {
                         iShareNum = Object.keys(M.v[i].shares).length;
                     }
@@ -1042,14 +1042,14 @@ function MegaData()
                         ? true : false;
                     sExportLink = (M.v[i].shares && M.v[i].shares.EXP) ? 'linked' : '';
                     sLinkIcon = (sExportLink === '') ? '' : 'link-icon';
-                    
+
                     // Block view
                     if (M.viewmode === 1) {
                         t = '.fm-blocks-view.fm .file-block-scrolling';
                         el = 'a';
                         html = '<a id="' + htmlentities(M.v[i].h) + '" class="file-block' + c + ' ' + sExportLink + '">\n\
                                     <span class="file-status-icon' + star + '"></span>\n\
-									<span class="' + sLinkIcon + '"></span>\n\
+                                    <span class="' + sLinkIcon + '"></span>\n\
                                     <span class="file-settings-icon">\n\
                                         <span></span>\n\
                                     </span>\n\
@@ -1059,7 +1059,7 @@ function MegaData()
                                     <span class="file-block-title">' + htmlentities(M.v[i].name) + '</span>\n\
                                 </a>';
                     }
-                    
+
                     // List view
                     else {
                         time = time2date(M.v[i].ts || (M.v[i].p === 'contacts' && M.contactstatus(M.v[i].h).ts));
@@ -1080,7 +1080,7 @@ function MegaData()
                                         <a class="grid-url-arrow">\n\
                                             <span></span>\n\
                                         </a>\n\
-										<span class="' + sLinkIcon + '"></span>\n\
+                                        <span class="' + sLinkIcon + '"></span>\n\
                                     </td>\n\
                                 </tr>';
                     }
@@ -1130,7 +1130,7 @@ function MegaData()
 
         // Check elements number, if empty draw empty grid
         if (this.v.length === 0) {
-            if (M.currentdirid === M.RubbishID) {
+            if (M.RubbishID && M.currentdirid === M.RubbishID) {
                 $('.fm-empty-trashbin').removeClass('hidden');
             }
             else if (M.currentdirid === 'contacts') {
@@ -1141,7 +1141,7 @@ function MegaData()
                 $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[6196]);
                 $('.fm-empty-contacts').removeClass('hidden');
             }
-            else if (M.currentdirid.substr(0, 7) === 'search/') {
+            else if (String(M.currentdirid).substr(0, 7) === 'search/') {
                 $('.fm-empty-search').removeClass('hidden');
             }
             else if (M.currentdirid === M.RootID && folderlink) {
@@ -1488,7 +1488,13 @@ function MegaData()
         if (this.chat) {
             sharedfolderUI(); // remove shares-specific UI
             $(window).trigger('resize');
-        } else if (id && id.substr(0, 7) !== 'account' && id.substr(0, 13) !== 'notifications') {
+        }
+        else if (id === undefined && folderlink) {
+            // Error reading shared folder link! (Eg, server gave a -11 (EACCESS) error)
+            // Force cleaning the current cloud contents and showing an empty msg
+            M.renderMain();
+        }
+        else if (id && id.substr(0, 7) !== 'account' && id.substr(0, 13) !== 'notifications') {
             $('.fm-right-files-block').removeClass('hidden');
             if (d) {
                 console.time('time for rendering');
@@ -1762,7 +1768,7 @@ function MegaData()
 
     this.buildtree = function(n, dialog, stype) {
         if (!n) {
-            DEBUG('Invalid node passed to M.buildtree');
+            console.error('Invalid node passed to M.buildtree');
             return;
         }
 
@@ -1779,7 +1785,7 @@ function MegaData()
             rebuild = true;
             dialog = undefined;
         }
-        var stype = stype || "cloud-drive";
+        stype = stype || "cloud-drive";
         if (n.h === M.RootID) {
             if (typeof dialog === 'undefined') {
                 if (rebuild || $('.content-panel.cloud-drive ul').length == 0) {
@@ -1877,7 +1883,7 @@ function MegaData()
                         }
                     }
                     var sharedfolder = '';
-                    
+
                     if (M.d[folders[ii].h].shares) {
                         sharedfolder = ' shared-folder';
                     }
@@ -1904,7 +1910,7 @@ function MegaData()
                                         <span  id="' + _a + htmlentities(folders[ii].h) + '" class="nw-fm-tree-item ' + containsc + ' ' + expandedc + ' ' + openedc + ' ' + sExportLink + '">\n\
                                             <span class="nw-fm-arrow-icon"></span>\n\
                                             <span class="nw-fm-tree-folder' + sharedfolder + '">' + htmlentities(folders[ii].name) + '</span>\n\
-											<span class="' + sLinkIcon + '"></span>\n\
+                                            <span class="' + sLinkIcon + '"></span>\n\
                                         </span>\n\
                                         <ul id="' + _sub + folders[ii].h + '" ' + ulc + '></ul>\n\
                                     </li>';
@@ -1970,22 +1976,20 @@ function MegaData()
         $('.context-menu-item.move-item').after(html);
     };
 
-    this.buildSubmenu = function(i, p)
+    this.buildSubmenu = function(id, p)
     {
-        var id;
-        if (typeof i === 'undefined')
-        {
+        var folders = [];
+
+        if (typeof id === 'undefined') {
             this.buildRootSubmenu();
             id = this.RootID;
         }
-        else
-            id = i;
 
-        var folders = [];
-
-        for (var i in this.c[id])
-            if (this.d[i] && this.d[i].t === 1 && this.d[i].name)
+        for (var i in this.c[id]) {
+            if (this.d[i] && this.d[i].t === 1 && this.d[i].name) {
                 folders.push(this.d[i]);
+            }
+        }
 
 // localeCompare is not supported in IE10, >=IE11 only
 // sort by name is default in the tree
@@ -2591,7 +2595,7 @@ function MegaData()
     };
 
     this.reinvitePendingContactRequest = function(target) {
-        
+
         DEBUG('reinvitePendingContactRequest');
         api_req({'a': 'upc', 'u': target, 'aa': 'r', i: requesti});
     };
@@ -3308,7 +3312,7 @@ function MegaData()
     /**
      * hasExportLink, check if at least one selected
      * item have export link already generated
-     * 
+     *
      * @param {array} selected
      * @returns {boolean}
      */
@@ -3336,7 +3340,7 @@ function MegaData()
     };
 
     this.getLinks = function(h) {
-        
+
         function getLinksDone() {
             for (var i in links) {
                 api_req({a: 'l', n: links[i]}, {
@@ -3356,7 +3360,7 @@ function MegaData()
                 });
             }
         }
-        
+
         function getFolderLinks() {
 
             if (folderLinks.length > 0) {
@@ -4014,7 +4018,7 @@ function MegaData()
 
     var __ul_id = 8000;
     this.addUpload = function(u, ignoreWarning) {
-        
+
         /*if (u.length > 99 && !ignoreWarning) {
             if (UploadManager.warning(M.addUpload.bind(M, u, true))) {
                 return;
@@ -5304,7 +5308,7 @@ function fm_getcopynodes(cn, t)
 }
 
 function createFolder(toid, name, ulparams) {
-    
+
     var mkat = enc_attr({n: name}, []),
         attr = ab_to_base64(mkat[0]),
         key = a32_to_base64(encrypt_key(u_k_aes, mkat[1])),
@@ -5318,7 +5322,7 @@ function createFolder(toid, name, ulparams) {
     if (!ulparams) {
         loadingDialog.show();
     }
-    
+
     api_req(req, {
         ulparams: ulparams,
         callback: function(res, ctx) {
@@ -5332,7 +5336,7 @@ function createFolder(toid, name, ulparams) {
                 renderNew();
                 refreshDialogContent();
                 loadingDialog.hide();
-                
+
                 if (ctx.ulparams) {
                     ulparams.callback(ctx.ulparams, res.f[0].h);
                 }
@@ -5346,13 +5350,13 @@ function createFolder(toid, name, ulparams) {
 }
 
 function getuid(email) {
-    
+
     for (var j in M.u) {
         if (M.u[j].m === email) {
             return j;
         }
     }
-    
+
     return false;
 }
 
@@ -5797,12 +5801,13 @@ function init_chat() {
                     megaChat.renderContactTree();
                     megaChat.renderMyStatus();
                 });
-            } else {
-                if (d) console.log('Will not initializing chat [branch:1]');
             }
         }
     }
-    if (!MegaChatDisabled) {
+    if (folderlink) {
+        if (d) console.log('Will not initializing chat [branch:1]');
+    }
+    else if (!MegaChatDisabled) {
         if (pubEd25519[u_handle]) {
             __init_chat();
         } else {
@@ -5816,10 +5821,17 @@ function init_chat() {
 
 function loadfm_callback(res, ctx) {
 
-    if (pfkey && res.f && res.f[0]) {
-        M.RootID = res.f[0].h;
-        u_sharekeys[res.f[0].h] = base64_to_a32(pfkey);
+    if (pfkey) {
+        if (res.f && res.f[0]) {
+            M.RootID = res.f[0].h;
+            u_sharekeys[res.f[0].h] = base64_to_a32(pfkey);
+        }
         folderlink = pfid;
+    }
+    if (typeof res === 'number') {
+        loadfm_done(pfkey, ctx.stackPointer);
+        msgDialog('warninga', l[1311], "Sorry, we were unable to retrieve the Cloud Drive contents.", api_strerror(res));
+        return;
     }
     if (res.u) {
         process_u(res.u);

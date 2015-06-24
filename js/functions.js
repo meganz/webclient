@@ -419,6 +419,12 @@ function browserdetails(useragent) {
     else if (useragent.indexOf('opera') > 0 || useragent.indexOf(' opr/') > 0) {
         browser = 'Opera';
     }
+    else if (useragent.indexOf('vivaldi') > 0) {
+        browser = 'Vivaldi';
+    }
+    else if (useragent.indexOf('maxthon') > 0) {
+        browser = 'Maxthon';
+    }
     else if (useragent.indexOf('chrome') > 0) {
         browser = 'Chrome';
     }
@@ -872,8 +878,8 @@ function makeMetaAware(kls) {
      * Clear/delete meta data
      *
      * @param prefix string  optional
-     * @param namespace string  optional
-     * @param k string optional
+     * @param [namespace] string  optional
+     * @param [k] string optional
      */
     kls.prototype.clearMeta = function(prefix, namespace, k) {
         var self = this;
@@ -1375,7 +1381,7 @@ function callLoggerWrapper(ctx, fnName, loggerFn, textPrefix, parentLogger) {
     }
 
     var origFn = ctx[fnName];
-    var textPrefix = textPrefix || "missing-prefix";
+    textPrefix = textPrefix || "missing-prefix";
 
     var logger = MegaLogger.getLogger(textPrefix + "[" + fnName + "]", {}, parentLogger);
     var logFnName = loggerFn === console.error ? "error" : "debug";
@@ -1468,13 +1474,13 @@ function megaJidToUserId(jid) {
  * Implementation of a string encryption/decryption.
  */
 var stringcrypt = (function() {
+    "use strict";
+
     /**
      * @description
      * Implementation of a string encryption/decryption.</p>
      */
     var ns = {};
-
-    "use strict";
 
     /**
      * Encrypts clear text data to an authenticated ciphertext, armoured with

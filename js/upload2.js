@@ -645,19 +645,9 @@ ChunkUpload.prototype.upload = function() {
 
 	if (d) console.log("pushing", this.file.posturl + this.suffix)
 
-	if (chromehack) {
-		var data8 = new Uint8Array(this.bytes.buffer);
-		var send8 = new Uint8Array(this.bytes.buffer, 0, data8.length);
-		send8.set(data8);
 
-		var t = this.file.posturl.lastIndexOf('/ul/');
-		xhr.open('POST', this.file.posturl.substr(0,t+1));
-		xhr.setRequestHeader("MEGA-Chrome-Antileak", this.file.posturl.substr(t)+this.suffix);
-		xhr.send(send8);
-	} else {
-		xhr.open('POST', this.file.posturl+this.suffix);
-		xhr.send(this.bytes.buffer);
-	}
+    xhr.open('POST', this.file.posturl+this.suffix);
+    xhr.send(this.bytes.buffer);
 
 	this.xhr = xhr;
 };

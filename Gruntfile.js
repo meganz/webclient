@@ -48,7 +48,7 @@ function getRulesFromSecureBoot()
                     line = "jsl.push(" + 
                             RJSON.stringify(obj)
                             .replace('"n":', 'n:')
-                            .replace('{"f"', '{f').replace(/"/g, "'") + ")";
+                            .replace('{"f"', '{f').replace(/"/g, "'") + ");";
                 } else {
                     /**
                      * This JS belongs to a group that was loaded already
@@ -66,7 +66,7 @@ function getRulesFromSecureBoot()
                     line = "jsl.push(" + 
                             RJSON.stringify(obj)
                             .replace('"n":', 'n:')
-                            .replace('{"f"', '{f').replace(/"/g, "'") + ")";
+                            .replace('{"f"', '{f').replace(/"/g, "'") + ");";
                     include = !js['html'];
                     js['html'] = true;
                 } else if (false) {

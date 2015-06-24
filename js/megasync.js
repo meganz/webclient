@@ -58,9 +58,9 @@ MegaSync.prototype._linuxView = function() {
 			.appendTo(select);
 	}.bind(this));
 	$('.megasync-dropdown-link').rebind('click', function() {
-	   $('.megasync-dropdown span').removeClass('active').text($(this).text());
-	   $('.megasync-dropdown-list').addClass('hidden');
-	   window.location = $(this).attr('link');
+		$('.megasync-dropdown span').removeClass('active').text($(this).text());
+		$('.megasync-dropdown-list').addClass('hidden');
+		window.location = $(this).attr('link');
 	});
 	$('.megasync-dropdown span').rebind('click', function() {
 		if ($(this).hasClass('active')) {

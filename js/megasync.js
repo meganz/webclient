@@ -254,9 +254,9 @@ MegaSync.prototype._prepareDownloadUrls = function() {
 MegaSync.prototype.getMegaSyncUrl = function(os) {
 	if (!os) {
 		var pf = navigator.platform.toUpperCase();
-		if (pf.indexOf('MAC')>=0) {
+		if (pf.indexOf('MAC') >= 0) {
 			os = "mac";
-		} else if (pf.indexOf('LINUX')>=0) {
+		} else if (pf.indexOf('LINUX') >= 0) {
 			return '';
 		} else  {
 			os = "windows";

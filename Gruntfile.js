@@ -6,7 +6,7 @@ var RJSON = require('relaxed-json');
  *  Read secureboot.js, get information about the Javascripts, how to group them and
  *  templates info.
  *
- *  Secureboot.js follows some patterns, this function will extract Javascripts and HTML
+ *  Secureboot.js follows some patterns, this function will e/xtract Javascripts and HTML
  *  files that are loaded. It also writes a `secureboot.prod.js` which loads the
  *  concat'ed files
  *
@@ -32,6 +32,7 @@ function getRulesFromSecureBoot()
                 obj = RJSON.parse(isObject[0]);
             } catch (e) {
                 /* It's an invalid JSON */
+                newSecureboot.push(line);
                 return;
             }
             if (obj.g && (obj.f || "").match(/js$/)) {
@@ -62,7 +63,8 @@ function getRulesFromSecureBoot()
                     line = 'jsl.push(' + RJSON.stringify(obj) + ")";
                     include = !js['html'];
                     js['html'] = true;
-                } else {
+                } else if (false) {
+                    // disable extra.json for now
                     /* It's a template laoded on demand. We group it as html/extra.json */
                     htmlExtra.push("build/" + obj.f);
                     /* Replace the files to load */
@@ -126,10 +128,12 @@ module.exports = function(grunt) {
                 src: rules.htmls,
                 dest: "html/boot.json",
             },
+            /*
             extra: {
                 src: rules.htmlExtra,
                 dest: "html/extra.json",
             },
+            */
         },
     });
 

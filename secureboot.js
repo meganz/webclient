@@ -912,11 +912,11 @@ else if (!b_u)
     var langFilepath = getLanguageFilePath(lang);
 
     jsl.push({f: langFilepath, n: 'lang', j:3});
-    jsl.push({f:'sjcl.js', n: 'sjcl_js', j: 1, g: 'crypto'}); // Will be replaced with asmCrypto soon
+    jsl.push({f:'js/jquery-2.1.1.js', n: 'jquery', j: 1, w:10, g: 'jquery'});
     jsl.push({f:'js/megaLogger.js', n: 'megaLogger_js', j: 1});
+    jsl.push({f:'sjcl.js', n: 'sjcl_js', j: 1, g: 'crypto'}); // Will be replaced with asmCrypto soon
     jsl.push({f:'js/mDB.js', n: 'mDB_js', j: 1, g: 'db'});
     jsl.push({f:'js/asmcrypto.js', n:'asmcrypto_js', j: 1, w:1, g: 'crypto'});
-    jsl.push({f:'js/jquery-2.1.1.js', n: 'jquery', j: 1, w:10, g: 'jquery'});
     jsl.push({f:'js/functions.js', n: 'functions_js', j: 1});
     jsl.push({f:'js/mega.js', n: 'mega_js', j: 1, w: 7});
     jsl.push({f:'js/tlvstore.js', n: 'tlvstore_js', j: 1, g: 'crypto'});

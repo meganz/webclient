@@ -1130,7 +1130,7 @@ function MegaData()
 
         // Check elements number, if empty draw empty grid
         if (this.v.length === 0) {
-            if (M.currentdirid === M.RubbishID) {
+            if (M.RubbishID && M.currentdirid === M.RubbishID) {
                 $('.fm-empty-trashbin').removeClass('hidden');
             }
             else if (M.currentdirid === 'contacts') {
@@ -1141,7 +1141,7 @@ function MegaData()
                 $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[6196]);
                 $('.fm-empty-contacts').removeClass('hidden');
             }
-            else if (M.currentdirid.substr(0, 7) === 'search/') {
+            else if (String(M.currentdirid).substr(0, 7) === 'search/') {
                 $('.fm-empty-search').removeClass('hidden');
             }
             else if (M.currentdirid === M.RootID && folderlink) {
@@ -1488,7 +1488,13 @@ function MegaData()
         if (this.chat) {
             sharedfolderUI(); // remove shares-specific UI
             $(window).trigger('resize');
-        } else if (id && id.substr(0, 7) !== 'account' && id.substr(0, 13) !== 'notifications') {
+        }
+        else if (id === undefined && folderlink) {
+            // Error reading shared folder link! (Eg, server gave a -11 (EACCESS) error)
+            // Force cleaning the current cloud contents and showing an empty msg
+            M.renderMain();
+        }
+        else if (id && id.substr(0, 7) !== 'account' && id.substr(0, 13) !== 'notifications') {
             $('.fm-right-files-block').removeClass('hidden');
             if (d) {
                 console.time('time for rendering');
@@ -1762,7 +1768,7 @@ function MegaData()
 
     this.buildtree = function(n, dialog, stype) {
         if (!n) {
-            DEBUG('Invalid node passed to M.buildtree');
+            console.error('Invalid node passed to M.buildtree');
             return;
         }
 
@@ -5786,9 +5792,6 @@ function folderreqerr(c, e)
 }
 
 function init_chat() {
-    if(folderlink) {
-        return;
-    }
     function __init_chat() {
         if (u_type && !megaChat.is_initialized) {
             if (d) console.log('Initializing the chat...');
@@ -5798,12 +5801,13 @@ function init_chat() {
                     megaChat.renderContactTree();
                     megaChat.renderMyStatus();
                 });
-            } else {
-                if (d) console.log('Will not initializing chat [branch:1]');
             }
         }
     }
-    if (!MegaChatDisabled) {
+    if (folderlink) {
+        if (d) console.log('Will not initializing chat [branch:1]');
+    }
+    else if (!MegaChatDisabled) {
         if (pubEd25519[u_handle]) {
             __init_chat();
         } else {
@@ -5817,10 +5821,17 @@ function init_chat() {
 
 function loadfm_callback(res, ctx) {
 
-    if (pfkey && res.f && res.f[0]) {
-        M.RootID = res.f[0].h;
-        u_sharekeys[res.f[0].h] = base64_to_a32(pfkey);
+    if (pfkey) {
+        if (res.f && res.f[0]) {
+            M.RootID = res.f[0].h;
+            u_sharekeys[res.f[0].h] = base64_to_a32(pfkey);
+        }
         folderlink = pfid;
+    }
+    if (typeof res === 'number') {
+        loadfm_done(pfkey, ctx.stackPointer);
+        msgDialog('warninga', l[1311], "Sorry, we were unable to retrieve the Cloud Drive contents.", api_strerror(res));
+        return;
     }
     if (res.u) {
         process_u(res.u);

@@ -286,7 +286,9 @@ MegaDB.getRefError = function(aError) {
             var target = aError.target;
             var error = target && target.error;
 
-            if (error instanceof DOMError) {
+            if (error && (typeof DOMError !== 'undefined'
+                    && error instanceof DOMError
+                    || error instanceof DOMException)) {
                 result = error;
             }
         }

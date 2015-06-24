@@ -891,7 +891,7 @@ function isEphemeral() {
                 time2last(ts)
             );
 
-            if ($.sortTreePanel.contacts.by === 'last-interaction') {
+            if ($.sortTreePanel && $.sortTreePanel.contacts.by === 'last-interaction') {
                 M.contacts(); // we need to resort
             }
         };

@@ -158,6 +158,10 @@ function init_pro()
  */
 var proPage = {
     
+    // From bandwidth quota dialog
+    fromBandwidthDialog: false,
+    
+    // The last payment provider ID used
     lastPaymentProviderId: null,
     
     // The user's current storage in bytes
@@ -265,6 +269,7 @@ var proPage = {
         // If the plan number is preselected
         if (planNum) {
             
+            // Set the selected plan
             var $selectedPlan = $('.membership-step1 .reg-st3-membership-bl.pro' + planNum);
             var $stageTwoSelectedPlan = $('.membership-step2 .membership-selected-block');
 
@@ -818,9 +823,15 @@ function pro_pay()
                 if (sessionStorage.proref) {
                     proref = sessionStorage.proref;
                 }
+                
+                // Convert from boolean to integer for API
+                var fromBandwidthDialog = (localStorage.seenBandwidthDialog) ? 1 : 0;
 
                 // utc = User Transaction Complete
-                api_req({ a : 'utc', s : [saleId], m : pro_m, r: proref },
+                // s = sale ID
+                // m = pro number
+                // bq = bandwidth quota triggered
+                api_req({ a : 'utc', s: [saleId], m: pro_m, r: proref, bq: fromBandwidthDialog },
                 {
                     callback : function (utcResult)
                     {

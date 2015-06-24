@@ -418,6 +418,12 @@ function browserdetails(useragent) {
     else if (useragent.indexOf('opera') > 0 || useragent.indexOf(' opr/') > 0) {
         browser = 'Opera';
     }
+    else if (useragent.indexOf('vivaldi') > 0) {
+        browser = 'Vivaldi';
+    }
+    else if (useragent.indexOf('maxthon') > 0) {
+        browser = 'Maxthon';
+    }
     else if (useragent.indexOf('chrome') > 0) {
         browser = 'Chrome';
     }
@@ -871,8 +877,8 @@ function makeMetaAware(kls) {
      * Clear/delete meta data
      *
      * @param prefix string  optional
-     * @param namespace string  optional
-     * @param k string optional
+     * @param [namespace] string  optional
+     * @param [k] string optional
      */
     kls.prototype.clearMeta = function(prefix, namespace, k) {
         var self = this;
@@ -1374,7 +1380,7 @@ function callLoggerWrapper(ctx, fnName, loggerFn, textPrefix, parentLogger) {
     }
 
     var origFn = ctx[fnName];
-    var textPrefix = textPrefix || "missing-prefix";
+    textPrefix = textPrefix || "missing-prefix";
 
     var logger = MegaLogger.getLogger(textPrefix + "[" + fnName + "]", {}, parentLogger);
     var logFnName = loggerFn === console.error ? "error" : "debug";
@@ -1467,13 +1473,13 @@ function megaJidToUserId(jid) {
  * Implementation of a string encryption/decryption.
  */
 var stringcrypt = (function() {
+    "use strict";
+
     /**
      * @description
      * Implementation of a string encryption/decryption.</p>
      */
     var ns = {};
-
-    "use strict";
 
     /**
      * Encrypts clear text data to an authenticated ciphertext, armoured with
@@ -1660,7 +1666,7 @@ function CreateWorkers(url, message, size) {
 function mKeyDialog(ph, fl) {
     $('.new-download-buttons').addClass('hidden');
     $('.new-download-file-title').text(l[1199]);
-    $('.new-download-file-icon').addClass(fileicon({
+    $('.new-download-file-icon').addClass(fileIcon({
         name: 'unknown.unknown'
     }));
     $('.fm-dialog.dlkey-dialog').removeClass('hidden');
@@ -2278,6 +2284,41 @@ function getHtmlElemPos(elem, n) {
         x: xPos,
         y: yPos
     };
+}
+
+/*
+ * getServerTime()
+ * 
+ * get server date/time using http header Date field
+ * if fail get client current time
+ * 
+ * It accepts the RFC2822 / IETF date syntax (RFC2822 Section 3.3),
+ * e.g. "Mon, 25 Dec 1995 13:30:00 GMT"
+ *  If a time zone is not specified and the string is in an ISO format
+ *  recognized by ES5, UTC is assumed. GMT and UTC are considered equivalent.
+ * 
+ * @returns {integer} seconds
+ */
+function getServerTime() {
+
+    var req = new XMLHttpRequest(),
+        sDate = '',
+        iTime = 0;
+    
+    // Important: Synchronous request
+    req.open('POST', document.location, false);
+    req.send(null);
+    sDate = req.getResponseHeader('Date');
+    
+    try {
+        iTime = Math.floor(Date.parse(sDate) / 1000);
+    }
+    catch (error) {
+        iTime = Math.floor(new Date().getTime() / 1000);
+        DEBUG('getServerTime() failed: ' + error);
+    }
+
+    return iTime;
 }
 
 function disableDescendantFolders(id, pref) {

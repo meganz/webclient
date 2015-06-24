@@ -6370,13 +6370,6 @@ function crypto_rsadecrypt(ciphertext,privkey)
     return cleartext.substr(2);
 }
 
-function str_to_a32(b)
-{
-	var a = Array((b.length+3) >> 2);
-	for (var i = 0; i < b.length; i++) a[i>>2] |= (b.charCodeAt(i) << (24-(i & 3)*8));
-	return a;
-}
-
 function a32_to_str(a)
 {
 	var b = '';

@@ -87,7 +87,8 @@ CallSession.ALLOWED_STATE_TRANSITIONS[CallSession.STATE.WAITING_RESPONSE_INCOMIN
 CallSession.ALLOWED_STATE_TRANSITIONS[CallSession.STATE.STARTING] = // ->
         [
             CallSession.STATE.STARTED,
-            CallSession.STATE.FAILED
+            CallSession.STATE.FAILED,
+            CallSession.STATE.REJECTED
         ];
 
 CallSession.ALLOWED_STATE_TRANSITIONS[CallSession.STATE.STARTED] = // ->
@@ -130,10 +131,11 @@ CallSession.prototype.onRemoteStreamRemoved = function(e, eventData) {
 
     if (self.remotePlayer && self.remotePlayer.length > 0) {
         self.remotePlayer[0].pause();
-    } else {
+    }
+    else if (self.remotePlayer && self.remotePlayer.pause) {
         self.remotePlayer.pause();
     }
-    $(self.remotelayer).remove();
+    $(self.remotePlayer).remove();
 };
 
 CallSession._extractMediaOptionsFromEventData = function(eventData) {
@@ -1606,10 +1608,15 @@ CallManager.prototype._attachToChatRoom = function(megaChat, chatRoom) {
                 session.setState(CallSession.STATE.REJECTED);
                 self.trigger('CallRejected', [session, reason]);
             }
-        } else if (reason === 'busy') {
+        } else if (reason === 'busy' || reason === 'hangup' || reason === 'peer-hangup') {
             session.setState(CallSession.STATE.REJECTED);
             self.trigger('CallRejected', [session, reason]);
-        } else if (reason === 'peer-disconnected' || reason === 'ice-disconnect') {
+        } else if (
+            reason === 'peer-disconnected' ||
+            reason === 'ice-disconnect' ||
+            reason.indexOf('error') > -1 ||
+            reason === 'peer-xmpp-disconnect'
+        ) {
             session.setState(CallSession.STATE.FAILED);
             self.trigger('CallFailed', [session, reason, eventData.text]);
         } else if (reason === 'security') {

@@ -622,7 +622,7 @@ function MegaData()
         var html, hideCancel, hideReinvite, hideOPC,
             drawn = false,
             TIME_FRAME = 60 * 60 * 24 * 14,// 14 days in seconds
-            iServerTime = getServerTime(),
+            utcDateNow = Math.floor(Date.now() / 1000),
             t = '.grid-table.sent-requests';
 
         if (M.currentdirid === 'opc') {
@@ -642,7 +642,7 @@ function MegaData()
                         hideCancel = 'hidden';
                     }
                     else {
-                        if (iServerTime < (opc[i].rts + TIME_FRAME)) {
+                        if (utcDateNow < (opc[i].rts + TIME_FRAME)) {
                             hideReinvite = 'hidden';
                         }
                     }

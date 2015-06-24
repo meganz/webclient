@@ -108,35 +108,138 @@ describe("authring unit test", function() {
             it("API error", function() {
                 sandbox.stub(ns._logger, '_log');
                 sandbox.stub(u_authring, 'Ed25519', undefined);
-                var attributePromise = { then: sinon.stub(),
-                                         reject: sinon.stub() };
+                var masterPromise = { linkDoneAndFailTo: sinon.stub() };
+                var rejectedPromise = { reject: sinon.stub() };
+                sandbox.stub(window, 'MegaPromise');
+                MegaPromise.onFirstCall().returns(masterPromise);
+                MegaPromise.onSecondCall().returns(rejectedPromise);
+                var attributePromise = { then: sinon.stub() };
                 sandbox.stub(window, 'getUserAttribute').returns(attributePromise);
+
                 var aPromise = ns.getContacts('Ed25519');
+                assert.strictEqual(aPromise, masterPromise);
                 assert.strictEqual(getUserAttribute.callCount, 1);
                 assert.lengthOf(getUserAttribute.args[0], 4);
                 assert.strictEqual(getUserAttribute.args[0][1], 'authring');
+                assert.strictEqual(masterPromise.linkDoneAndFailTo.callCount, 1);
+                assert.strictEqual(masterPromise.linkDoneAndFailTo.args[0][0], attributePromise);
+
                 var callback = attributePromise.then.args[0][0];
-                callback(EFAILED);
+                var result = callback(EFAILED);
+                assert.strictEqual(result, rejectedPromise);
                 assert.strictEqual(u_authring.Ed25519, undefined);
                 assert.strictEqual(ns._logger._log.args[0][1][0],
                                    'Error retrieving authentication ring for key type Ed25519: -5');
             });
 
-            it("through API", function() {
+            it("API ENOENT", function() {
                 sandbox.stub(ns._logger, '_log');
                 sandbox.stub(u_authring, 'Ed25519', undefined);
-                var attributePromise = { then: sinon.stub(),
-                                         resolve: sinon.stub() };
+                var masterPromise = { linkDoneAndFailTo: sinon.stub() };
+                sandbox.stub(window, 'MegaPromise').returns(masterPromise);
+                var attributePromise = { then: sinon.stub() };
                 sandbox.stub(window, 'getUserAttribute').returns(attributePromise);
+                sandbox.stub(ns, 'setContacts').returns('a promise');
+
                 var aPromise = ns.getContacts('Ed25519');
+                assert.strictEqual(aPromise, masterPromise);
                 assert.strictEqual(getUserAttribute.callCount, 1);
                 assert.lengthOf(getUserAttribute.args[0], 4);
                 assert.strictEqual(getUserAttribute.args[0][1], 'authring');
+                assert.strictEqual(masterPromise.linkDoneAndFailTo.callCount, 1);
+                assert.strictEqual(masterPromise.linkDoneAndFailTo.args[0][0], attributePromise);
+
                 var callback = attributePromise.then.args[0][0];
-                callback({ '': SERIALISED_RING_ED25519 });
-                assert.deepEqual(u_authring.Ed25519, RING_ED25519);
+                var result = callback(ENOENT);
+                assert.strictEqual(result, 'a promise');
+                assert.deepEqual(u_authring.Ed25519, {});
+                assert.strictEqual(ns.setContacts.callCount, 1);
+                assert.strictEqual(ns.setContacts.args[0][0], 'Ed25519');
+                assert.strictEqual(ns._logger._log.args[0][1][0],
+                                   'No authentication ring for key type Ed25519, making one.');
+            });
+
+            it("normal operation", function() {
+                sandbox.stub(ns._logger, '_log');
+                sandbox.stub(u_authring, 'Ed25519', undefined);
+                var masterPromise = { linkDoneAndFailTo: sinon.stub() };
+                sandbox.stub(window, 'MegaPromise').returns(masterPromise);
+                var attributePromise = { then: sinon.stub() };
+                sandbox.stub(window, 'getUserAttribute').returns(attributePromise);
+                sandbox.stub(ns, 'deserialise').returns('the authring');
+
+                var aPromise = ns.getContacts('Ed25519');
+                assert.strictEqual(aPromise, masterPromise);
+                assert.strictEqual(getUserAttribute.callCount, 1);
+                assert.lengthOf(getUserAttribute.args[0], 4);
+                assert.strictEqual(getUserAttribute.args[0][1], 'authring');
+                assert.strictEqual(masterPromise.linkDoneAndFailTo.callCount, 1);
+                assert.strictEqual(masterPromise.linkDoneAndFailTo.args[0][0], attributePromise);
+
+                var callback = attributePromise.then.args[0][0];
+                var result = callback({ '': 'some content'});
+                assert.strictEqual(result, 'the authring');
+                assert.deepEqual(u_authring.Ed25519, 'the authring');
+                assert.strictEqual(ns.deserialise.callCount, 1);
+                assert.strictEqual(ns.deserialise.args[0][0], 'some content');
                 assert.strictEqual(ns._logger._log.args[0][1][0],
                                    'Got authentication ring for key type Ed25519.');
+            });
+
+            it("reject API error", function() {
+                sandbox.stub(ns._logger, '_log');
+                sandbox.stub(u_authring, 'Ed25519', undefined);
+                var masterPromise = { linkDoneAndFailTo: sinon.stub(),
+                                      reject: sinon.stub() };
+                var rejectedPromise = { reject: sinon.stub() };
+                sandbox.stub(window, 'MegaPromise');
+                MegaPromise.onFirstCall().returns(masterPromise);
+                MegaPromise.onSecondCall().returns(rejectedPromise);
+                var attributePromise = { then: sinon.stub() };
+                sandbox.stub(window, 'getUserAttribute').returns(attributePromise);
+
+                var aPromise = ns.getContacts('Ed25519');
+                assert.strictEqual(aPromise, masterPromise);
+                assert.strictEqual(getUserAttribute.callCount, 1);
+                assert.lengthOf(getUserAttribute.args[0], 4);
+                assert.strictEqual(getUserAttribute.args[0][1], 'authring');
+                assert.strictEqual(masterPromise.linkDoneAndFailTo.callCount, 1);
+                assert.strictEqual(masterPromise.linkDoneAndFailTo.args[0][0], attributePromise);
+
+                var callback = attributePromise.then.args[0][1];
+                var result = callback(EFAILED);
+                assert.strictEqual(result, undefined);
+                assert.strictEqual(u_authring.Ed25519, undefined);
+                assert.strictEqual(masterPromise.reject.callCount, 1);
+                assert.strictEqual(ns._logger._log.args[0][1][0],
+                                   'Error retrieving authentication ring for key type Ed25519: -5');
+            });
+
+            it("reject API ENOENT", function() {
+                sandbox.stub(ns._logger, '_log');
+                sandbox.stub(u_authring, 'Ed25519', undefined);
+                var masterPromise = { linkDoneAndFailTo: sinon.stub() };
+                sandbox.stub(window, 'MegaPromise').returns(masterPromise);
+                var attributePromise = { then: sinon.stub() };
+                sandbox.stub(window, 'getUserAttribute').returns(attributePromise);
+                sandbox.stub(ns, 'setContacts').returns('a promise');
+
+                var aPromise = ns.getContacts('Ed25519');
+                assert.strictEqual(aPromise, masterPromise);
+                assert.strictEqual(getUserAttribute.callCount, 1);
+                assert.lengthOf(getUserAttribute.args[0], 4);
+                assert.strictEqual(getUserAttribute.args[0][1], 'authring');
+                assert.strictEqual(masterPromise.linkDoneAndFailTo.callCount, 1);
+                assert.strictEqual(masterPromise.linkDoneAndFailTo.args[0][0], attributePromise);
+
+                var callback = attributePromise.then.args[0][1];
+                var result = callback(ENOENT);
+                assert.strictEqual(result, 'a promise');
+                assert.deepEqual(u_authring.Ed25519, {});
+                assert.strictEqual(ns.setContacts.callCount, 1);
+                assert.strictEqual(ns.setContacts.args[0][0], 'Ed25519');
+                assert.strictEqual(ns._logger._log.args[0][1][0],
+                                   'No authentication ring for key type Ed25519, making one.');
             });
 
             it("unsupported key type", function() {
@@ -150,16 +253,26 @@ describe("authring unit test", function() {
             it("authring for RSA", function() {
                 sandbox.stub(ns._logger, '_log');
                 sandbox.stub(u_authring, 'RSA', undefined);
-                var attributePromise = { then: sinon.stub(),
-                                         resolve: sinon.stub() };
+                var masterPromise = { linkDoneAndFailTo: sinon.stub() };
+                sandbox.stub(window, 'MegaPromise').returns(masterPromise);
+                var attributePromise = { then: sinon.stub() };
                 sandbox.stub(window, 'getUserAttribute').returns(attributePromise);
+                sandbox.stub(ns, 'deserialise').returns('the authring');
+
                 var aPromise = ns.getContacts('RSA');
+                assert.strictEqual(aPromise, masterPromise);
                 assert.strictEqual(getUserAttribute.callCount, 1);
                 assert.lengthOf(getUserAttribute.args[0], 4);
                 assert.strictEqual(getUserAttribute.args[0][1], 'authRSA');
+                assert.strictEqual(masterPromise.linkDoneAndFailTo.callCount, 1);
+                assert.strictEqual(masterPromise.linkDoneAndFailTo.args[0][0], attributePromise);
+
                 var callback = attributePromise.then.args[0][0];
-                callback({ '': SERIALISED_RING_RSA });
-                assert.deepEqual(u_authring.RSA, RING_RSA);
+                var result = callback({ '': 'some content'});
+                assert.strictEqual(result, 'the authring');
+                assert.deepEqual(u_authring.RSA, 'the authring');
+                assert.strictEqual(ns.deserialise.callCount, 1);
+                assert.strictEqual(ns.deserialise.args[0][0], 'some content');
                 assert.strictEqual(ns._logger._log.args[0][1][0],
                                    'Got authentication ring for key type RSA.');
             });

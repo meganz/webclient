@@ -1,7 +1,7 @@
 
 function MegaSync()
 {
-	this._url	 = "https://localhost.megasyncloopback.mega.nz:6342/";
+	this._url = "https://localhost.megasyncloopback.mega.nz:6342/";
 	this._enabled = false;
 	this._version = 0;
 	this._api({a: "v"});
@@ -21,13 +21,13 @@ function linuxDropdownScroll() {
 		overlayHeight = $('.megasync-overlay').outerHeight(),
 		listHeight = $('.megasync-scr-pad').outerHeight() + 72,
 		listPosition = $list.offset().top;
-	
+
 	if (overlayHeight < (listHeight + listPosition)) {
 		$('.megasync-list-arrow').removeClass('hidden inactive');
 		$pane.height(overlayHeight - listPosition - 72);
 		$pane.jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true});
-		
-		
+
+
 		$pane.bind('jsp-arrow-change', function(event, isAtTop, isAtBottom, isAtLeft, isAtRight) {
 			if (isAtBottom) {
 				$('.megasync-list-arrow').addClass('inactive');
@@ -35,7 +35,7 @@ function linuxDropdownScroll() {
 				$('.megasync-list-arrow').removeClass('inactive');
 			}
 		});
-		
+
 	} else {
 		if (api) {
 			api.destroy();
@@ -46,22 +46,22 @@ function linuxDropdownScroll() {
 	}
 }
 
-MegaSync.prototype._linux_view = function() {
+MegaSync.prototype._linuxView = function() {
 	$('.megasync-overlay').addClass('linux');
 	var is64   = browserdetails().is64bit;
 	var select = $('.megasync-scr-pad').empty();
 	this.getLinuxReleases().forEach(function(client) {
-		var icon = client.name.toLowerCase().replace(/[^a-z]/g, '')
+		var icon = client.name.toLowerCase().replace(/[^a-z]/g, '');
 		$('<div/>').addClass('megasync-dropdown-link ' + icon)
 			.text(client.name)
-            .attr('link', this.getMegaSyncUrl(client.name + " " + (is64 ? "64" : "32")))
+			.attr('link', this.getMegaSyncUrl(client.name + " " + (is64 ? "64" : "32")))
 			.appendTo(select);
 	}.bind(this));
-    $('.megasync-dropdown-link').rebind('click', function() {
+	$('.megasync-dropdown-link').rebind('click', function() {
 	   $('.megasync-dropdown span').removeClass('active').text($(this).text());
 	   $('.megasync-dropdown-list').addClass('hidden');
-       window.location = $(this).attr('link');
-    });
+	   window.location = $(this).attr('link');
+	});
 	$('.megasync-dropdown span').rebind('click', function() {
 		if ($(this).hasClass('active')) {
 			$(this).removeClass('active');
@@ -69,19 +69,19 @@ MegaSync.prototype._linux_view = function() {
 		} else {
 			$(this).addClass('active');
 			$('.megasync-dropdown-list').removeClass('hidden');
-			linuxDropdownScroll(); 
+			linuxDropdownScroll();
 		}
 	});
 	$(window).rebind('resize.linuxDropdown', function() {
-		linuxDropdownScroll(); 
+		linuxDropdownScroll();
 	});
 
 };
 
 /**
- *  Prepare all the URLs for the different OS/distros 
+ *  Prepare all the URLs for the different OS/distros
  *  that megasync supports.
- *  Moved this logic from HTML/js/sync.js to here to keep 
+ *  Moved this logic from HTML/js/sync.js to here to keep
  *  this in a single file
  */
 MegaSync.prototype._prepareDownloadUrls = function() {
@@ -262,7 +262,7 @@ MegaSync.prototype.getMegaSyncUrl = function(os) {
 			os = "windows";
 		}
 	}
-	return this._clients[os] ||  this._clients['windows'];;
+	return this._clients[os] ||  this._clients['windows'];
 };
 
 MegaSync.prototype.handle_v = function(version) {
@@ -279,7 +279,7 @@ MegaSync.prototype.download = function(pubkey, privkey) {
 	return true;
 };
 
-MegaSync.prototype._on_error = function() {
+MegaSync.prototype._onError = function() {
 	this._enabled = false;
 	return this.downloadClient();
 };
@@ -291,8 +291,8 @@ MegaSync.prototype.handle = function(response) {
 		return $('.megasync-overlay').hide();
 	}
 
-	if (typeof response != "object") {
-		return this._on_error();
+	if (typeof response !== "object") {
+		return this._onError();
 	}
 
 	for (var i in response) {
@@ -302,7 +302,7 @@ MegaSync.prototype.handle = function(response) {
 
 MegaSync.prototype._api = function(args) {
 	$.post(this._url, JSON.stringify(args), this.handle.bind(this), "json")
-		.fail(this._on_error.bind(this));
+		.fail(this._onError.bind(this));
 };
 
 
@@ -327,7 +327,7 @@ MegaSync.prototype.downloadClient = function() {
 
 	if (url === '') {
 		// It's linux!
-        this._linux_view();
+		this._linuxView();
 	} else {
 		window.location = url;
 	}

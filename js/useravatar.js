@@ -75,7 +75,7 @@ var useravatar = (function() {
             color += letters.charCodeAt(i);
         }
         color = color % _colors.length;
-        return {letters: letters, color: _colors[color], colorIndex: color+1 };
+        return {letters: letters, color: _colors[color], colorIndex: color + 1 };
     }
 
     /**

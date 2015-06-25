@@ -604,7 +604,7 @@ function MegaData()
         var html, hideCancel, hideReinvite, hideOPC,
             drawn = false,
             TIME_FRAME = 60 * 60 * 24 * 14,// 14 days in seconds
-            iServerTime = getServerTime(),
+            utcDateNow = Math.floor(Date.now() / 1000),
             t = '.grid-table.sent-requests';
 
         if (M.currentdirid === 'opc') {
@@ -624,7 +624,7 @@ function MegaData()
                         hideCancel = 'hidden';
                     }
                     else {
-                        if (iServerTime < (opc[i].rts + TIME_FRAME)) {
+                        if (utcDateNow < (opc[i].rts + TIME_FRAME)) {
                             hideReinvite = 'hidden';
                         }
                     }
@@ -791,14 +791,14 @@ function MegaData()
                 timems = cs.ts,
                 interactionclass = 'cloud-drive';
 
+            if (cs.files === 0 && cs.folders === 0) {
+                time = l[1051];
+                interactionclass = 'never';
+            }
+
             // Render all items given in glob M.v
             for (var i in M.v) {
                 u_h = M.v[i].h;
-                if (cs.files === 0 && cs.folders === 0) {
-                    time = l[1051];
-                    interactionclass = 'never';
-                }
-
                 contact = M.u[u_h];
 
                 // chat is enabled?
@@ -878,17 +878,16 @@ function MegaData()
                 avatar, rights, rightsclass, onlinestatus, html,
                 sExportLink, sLinkIcon,
                 iShareNum = 0,
-                s = '',
-                ftype = '',
-                c = '',
-                cc = null,
-                star = '';
+                s, ftype, c, cc, star;
 
             for (var i in M.v) {
                 if (!M.v[i].name) {
                     DEBUG('Skipping M.v node with no name.', M.v[i]);
                     continue;
                 }
+                s  = '';
+                c  = '';
+                cc = null;
                 if (M.v[i].t) {
                     ftype = l[1049];
                     c = ' folder';
@@ -896,9 +895,7 @@ function MegaData()
                     ftype = filetype(M.v[i].name);
                     s = htmlentities(bytesToSize(M.v[i].s));
                 }
-                if (M.v[i].fav) {
-                    star = ' star';
-                }
+                star = M.v[i].fav ? ' star' : '';
 
                 if (M.currentdirid === 'shares') {// render shares tab
                     cs = M.contactstatus(M.v[i].h),
@@ -1026,7 +1023,7 @@ function MegaData()
                                         <span></span>\n\
                                     </span>\n\
                                     <span class="file-icon-area">\n\
-                                        <span class="block-view-file-type ' + fileIcon({t: M.v[i].t, share: bShare}) + '"><img alt="" /></span>\n\
+                                        <span class="block-view-file-type ' + fileIcon({t: M.v[i].t, share: bShare, name: M.v[i].name}) + '"><img alt="" /></span>\n\
                                     </span>\n\
                                     <span class="file-block-title">' + htmlentities(M.v[i].name) + '</span>\n\
                                 </a>';
@@ -1042,7 +1039,7 @@ function MegaData()
                                         <span class="grid-status-icon' + star + '"></span>\n\
                                     </td>\n\
                                     <td>\n\
-                                        <span class="transfer-filtype-icon ' + fileIcon({t: M.v[i].t, share: bShare}) + '"> </span>\n\
+                                        <span class="transfer-filtype-icon ' + fileIcon({t: M.v[i].t, share: bShare, name: M.v[i].name}) + '"> </span>\n\
                                         <span class="tranfer-filetype-txt">' + htmlentities(M.v[i].name) + '</span>\n\
                                     </td>\n\
                                     <td width="100">' + s + '</td>\n\
@@ -1102,7 +1099,7 @@ function MegaData()
 
         // Check elements number, if empty draw empty grid
         if (this.v.length === 0) {
-            if (M.currentdirid === M.RubbishID) {
+            if (M.RubbishID && M.currentdirid === M.RubbishID) {
                 $('.fm-empty-trashbin').removeClass('hidden');
             }
             else if (M.currentdirid === 'contacts') {
@@ -1113,7 +1110,7 @@ function MegaData()
                 $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[6196]);
                 $('.fm-empty-contacts').removeClass('hidden');
             }
-            else if (M.currentdirid.substr(0, 7) === 'search/') {
+            else if (String(M.currentdirid).substr(0, 7) === 'search/') {
                 $('.fm-empty-search').removeClass('hidden');
             }
             else if (M.currentdirid === M.RootID && folderlink) {
@@ -1456,7 +1453,13 @@ function MegaData()
         if (this.chat) {
             sharedfolderUI(); // remove shares-specific UI
             $(window).trigger('resize');
-        } else if (id && id.substr(0, 7) !== 'account' && id.substr(0, 13) !== 'notifications') {
+        }
+        else if (id === undefined && folderlink) {
+            // Error reading shared folder link! (Eg, server gave a -11 (EACCESS) error)
+            // Force cleaning the current cloud contents and showing an empty msg
+            M.renderMain();
+        }
+        else if (id && id.substr(0, 7) !== 'account' && id.substr(0, 13) !== 'notifications') {
             $('.fm-right-files-block').removeClass('hidden');
             if (d) {
                 console.time('time for rendering');
@@ -1730,7 +1733,7 @@ function MegaData()
 
     this.buildtree = function(n, dialog, stype) {
         if (!n) {
-            DEBUG('Invalid node passed to M.buildtree');
+            console.error('Invalid node passed to M.buildtree');
             return;
         }
 
@@ -5754,9 +5757,6 @@ function folderreqerr(c, e)
 }
 
 function init_chat() {
-    if(folderlink) {
-        return;
-    }
     function __init_chat() {
         if (u_type && !megaChat.is_initialized) {
             if (d) console.log('Initializing the chat...');
@@ -5766,12 +5766,13 @@ function init_chat() {
                     megaChat.renderContactTree();
                     megaChat.renderMyStatus();
                 });
-            } else {
-                if (d) console.log('Will not initializing chat [branch:1]');
             }
         }
     }
-    if (!MegaChatDisabled) {
+    if (folderlink) {
+        if (d) console.log('Will not initializing chat [branch:1]');
+    }
+    else if (!MegaChatDisabled) {
         if (pubEd25519[u_handle]) {
             __init_chat();
         } else {
@@ -5785,10 +5786,17 @@ function init_chat() {
 
 function loadfm_callback(res, ctx) {
 
-    if (pfkey && res.f && res.f[0]) {
-        M.RootID = res.f[0].h;
-        u_sharekeys[res.f[0].h] = base64_to_a32(pfkey);
+    if (pfkey) {
+        if (res.f && res.f[0]) {
+            M.RootID = res.f[0].h;
+            u_sharekeys[res.f[0].h] = base64_to_a32(pfkey);
+        }
         folderlink = pfid;
+    }
+    if (typeof res === 'number') {
+        loadfm_done(pfkey, ctx.stackPointer);
+        msgDialog('warninga', l[1311], "Sorry, we were unable to retrieve the Cloud Drive contents.", api_strerror(res));
+        return;
     }
     if (res.u) {
         process_u(res.u);

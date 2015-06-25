@@ -3144,7 +3144,7 @@ function api_faretry(ctx, error, host) {
     if (ctx.errfa && ctx.errfa.timeout && ctx.faRetryI > ctx.errfa.timeout) {
         api_faerrlauncher(ctx, host);
     }
-    else if (ctx.faRetryI < 5e5) {
+    else if (error !== EACCESS && ctx.faRetryI < 5e5) {
         if (d) {
             console.log("Attribute " + (ctx.p ? 'retrieval' : 'storage') + " failed (" + error + "), retrying...",
                 ctx.faRetryI);

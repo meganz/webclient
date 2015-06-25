@@ -97,12 +97,12 @@ var mIDBPlaceHolder = false;
 			try {
 				Object.defineProperty(scope, "indexedDB",
 				{
-					value : Object.freeze({
+					value : {
 						open: indexedDB.openForPrincipal.bind(indexedDB, principal),
 						openForPrincipal: indexedDB.openForPrincipal.bind(indexedDB),
 						deleteDatabase: indexedDB.deleteForPrincipal.bind(indexedDB, principal),
 						cmp: indexedDB.cmp.bind(indexedDB)
-					})
+					}
 				});
 			} catch(e) {
 				Cu.reportError(e);

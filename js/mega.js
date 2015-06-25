@@ -809,14 +809,14 @@ function MegaData()
                 timems = cs.ts,
                 interactionclass = 'cloud-drive';
 
+            if (cs.files === 0 && cs.folders === 0) {
+                time = l[1051];
+                interactionclass = 'never';
+            }
+
             // Render all items given in glob M.v
             for (var i in M.v) {
                 u_h = M.v[i].h;
-                if (cs.files === 0 && cs.folders === 0) {
-                    time = l[1051];
-                    interactionclass = 'never';
-                }
-
                 contact = M.u[u_h];
 
                 // chat is enabled?
@@ -902,17 +902,16 @@ function MegaData()
                 avatar, av_color, rights, rightsclass, onlinestatus, html,
                 sExportLink, sLinkIcon,
                 iShareNum = 0,
-                s = '',
-                ftype = '',
-                c = '',
-                cc = null,
-                star = '';
+                s, ftype, c, cc, star;
 
             for (var i in M.v) {
                 if (!M.v[i].name) {
                     DEBUG('Skipping M.v node with no name.', M.v[i]);
                     continue;
                 }
+                s  = '';
+                c  = '';
+                cc = null;
                 if (M.v[i].t) {
                     ftype = l[1049];
                     c = ' folder';
@@ -1052,7 +1051,7 @@ function MegaData()
                                         <span></span>\n\
                                     </span>\n\
                                     <span class="file-icon-area">\n\
-                                        <span class="block-view-file-type ' + fileIcon({t: M.v[i].t, share: bShare}) + '"><img alt="" /></span>\n\
+                                        <span class="block-view-file-type ' + fileIcon({t: M.v[i].t, share: bShare, name: M.v[i].name}) + '"><img alt="" /></span>\n\
                                     </span>\n\
                                     <span class="file-block-title">' + htmlentities(M.v[i].name) + '</span>\n\
                                 </a>';
@@ -1068,7 +1067,7 @@ function MegaData()
                                         <span class="grid-status-icon' + star + '"></span>\n\
                                     </td>\n\
                                     <td>\n\
-                                        <span class="transfer-filtype-icon ' + fileIcon({t: M.v[i].t, share: bShare}) + '"> </span>\n\
+                                        <span class="transfer-filtype-icon ' + fileIcon({t: M.v[i].t, share: bShare, name: M.v[i].name}) + '"> </span>\n\
                                         <span class="tranfer-filetype-txt">' + htmlentities(M.v[i].name) + '</span>\n\
                                     </td>\n\
                                     <td width="100">' + s + '</td>\n\

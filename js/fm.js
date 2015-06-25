@@ -885,7 +885,7 @@ function initUI() {
     InitFileDrag();
     createFolderUI();
     cSortMenuUI();
-    M.buildSubmenu();
+    M.buildRootSubMenu();
     initContextUI();
     copyDialog();
     moveDialog();
@@ -894,28 +894,30 @@ function initUI() {
     UIkeyevents();
     addContactUI();
 
-    $('.fm-files-view-icon').unbind('click');
-    $('.fm-files-view-icon').bind('click', function(event)
-    {
+    $('.fm-files-view-icon').rebind('click', function() {
+        
         $.hideContextMenu();
         cacheselect();
-        if ($(this).attr('class').indexOf('listing-view') > -1)
-        {
-            if (fmconfig.uiviewmode)
+        if ($(this).attr('class').indexOf('listing-view') > -1) {
+            if (fmconfig.uiviewmode) {
                 storefmconfig('viewmode', 0);
-            else
+            }
+            else {
                 fmviewmode(M.currentdirid, 0);
+            }
             M.openFolder(M.currentdirid, true);
         }
-        else
-        {
-            if (fmconfig.uiviewmode)
+        else {
+            if (fmconfig.uiviewmode) {
                 storefmconfig('viewmode', 1);
-            else
+            }
+            else {
                 fmviewmode(M.currentdirid, 1);
+            }
             M.openFolder(M.currentdirid, true);
         }
         reselect();
+        
         return false;
     });
 
@@ -927,12 +929,13 @@ function initUI() {
             currentNodeClass = $(event.target).attr('class');
             if (!currentNodeClass) {
                 currentNodeClass = $(event.target).parent();
-                if (currentNodeClass)
+                if (currentNodeClass) {
                     currentNodeClass = $(currentNodeClass).attr('class');
+                }
             }
             if (currentNodeClass && currentNodeClass.indexOf('dropdown') > -1
                 && (currentNodeClass.indexOf('download-item') > -1
-                || currentNodeClass.indexOf('more-item') > -1)
+                || currentNodeClass.indexOf('move-item') > -1)
                 && currentNodeClass.indexOf('active') > -1) {
                 return false;
             }
@@ -954,6 +957,9 @@ function initUI() {
         b.removeClass('active left-position overlap-right overlap-left mega-height');
         a.find('.disabled,.context-scrolling-block').removeClass('disabled context-scrolling-block');
         a.find('.context-menu-item.contains-submenu.opened').removeClass('opened');
+        
+        // Remove all sub-menues from context-menu move-item
+        $('#csb_' + M.RootID).empty();
     };
 
     $('#fmholder').unbind('click.contextmenu');
@@ -2202,25 +2208,26 @@ function fmremdupes(test)
     return f.length;
 }
 
-function initContextUI()
-{
+function initContextUI() {
+    
     var c = '.context-menu-item';
 
-    $(c).unbind('mouseover');
-    $(c).bind('mouseover', function()
-    {
-        if ($(this).parent().parent().is('.context-submenu'))// is move... or download...
-        {
-            if (!$(this).is('.contains-submenu'))// if just item hide child context-submenu
-            {
+    $('.context-menu-section').off('mouseover', c);
+    $('.context-menu-section').on('mouseover', c, function() {
+
+        // is move... or download... 
+        if ($(this).parent().parent().is('.context-submenu')) {
+
+            // if just item hide child context-submenu
+            if (!$(this).is('.contains-submenu')) {
                 $(this).parent().children().removeClass('active opened');
                 $(this).parent().find('.context-submenu').addClass('hidden');
             }
         }
-        else
-        {
-            if (!$(this).is('.contains-submenu'))// Hide all submenues, for download and for move...
-            {
+
+        // Hide all submenues, for download and for move...
+        else {
+            if (!$(this).is('.contains-submenu')) {
                 $('.context-menu .context-submenu.active ').removeClass('active');
                 $('.context-menu .contains-submenu.opened').removeClass('opened');
                 $('.context-menu .context-submenu').addClass('hidden');
@@ -2228,47 +2235,69 @@ function initContextUI()
         }
     });
 
-    $(c + '.contains-submenu').unbind('mouseover');
-    $(c + '.contains-submenu').bind('mouseover', function()
-    {
-        var a = $(this).next();// context-submenu
+    $('.context-menu-section').off('mouseover', '.contains-submenu');
+    $('.context-menu-section').on('mouseover', '.contains-submenu', function() {
+
+        var $this = $(this),
+            // situation when we have 2 contains-submenus in same context-submenu one near another
+            b = $this.closest('.context-submenu').find('.context-submenu,.contains-submenu').not($this.next()),
+            a = $this.next(),// context-submenu
+            pos = $this.offset(),
+            menuPos,
+            currentId;
+
         a.children().removeClass('active opened');
         a.find('.context-submenu').addClass('hidden');
         a.find('.opened').removeClass('opened');
-        // situation when we have 2 contains-submenus in same context-submenu one neer another
-        var b = $(this).closest('.context-submenu').find('.context-submenu,.contains-submenu').not($(this).next());
-        if (b.length)
-        {
+
+        if (b.length) {
             b.removeClass('active opened')
                 .find('.context-submenu').addClass('hidden');
         }
-        if ($(this).is('.move-item'))
-        {
+        
+        currentId = $this.attr('id');        
+        if (currentId) {
+            M.buildSubMenu(currentId.replace('fi_', ''));
+        }
+
+        if ($this.is('.move-item')) {
             $('.context-menu .download-item').removeClass('opened')
                 .next().removeClass('active opened')
                 .next().find('.context-submenu').addClass('hidden');
         }
-        if ($(this).is('.download-item'))
-        {
+        if ($this.is('.download-item')) {
             $('.context-menu .move-item').removeClass('opened')
                 .next().removeClass('active opened')
                 .next().find('.context-submenu').addClass('hidden');
         }
-
-        if (!$(this).is('.opened'))
-        {
-            var pos = $(this).offset();
-            var c = reCalcMenuPosition($(this), pos.left, pos.top, 'submenu');
-            $(this).next('.context-submenu')
-                .css({'top': c.top})
+        if (!$this.is('.opened')) {
+            menuPos = reCalcMenuPosition($this, pos.left, pos.top, 'submenu'),
+            $this.next('.context-submenu')
+                .css({'top': menuPos.top})
                 .addClass('active')
                 .removeClass('hidden');
 
-            $(this).addClass('opened');
+            $this.addClass('opened');
         }
     });
 
-    $(c + '.folder-item, ' + c + '.cloud-item').rebind('click', function() {
+    $(c + '.cloud-item').rebind('click', function() {
+
+        var t = $(this).attr('id').replace('fi_', ''),
+            n = [];
+        if (!$(this).is('.disabled')) {
+            for (var i in $.selected) {
+                if (!isCircular($.selected[i], t)) {
+                    n.push($.selected[i]);
+                }
+            }
+            $.hideContextMenu();
+            M.moveNodes(n, t);
+        }
+    });
+
+    $('.context-menu.files-menu').off('click', '.folder-item');
+    $('.context-menu.files-menu').on('click', '.folder-item', function() {
 
         var t = $(this).attr('id').replace('fi_', ''),
             n = [];
@@ -5712,6 +5741,7 @@ function contextMenuUI(e, ll) {
 
         // Hide all menu-items
         $(menuCMI).hide();
+
         id = $(e.currentTarget).attr('id');
 
         if (id) {

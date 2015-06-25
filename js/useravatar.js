@@ -1,9 +1,6 @@
 /**
- *  @fileOverview
- * 
  *  Handle all logic for rendering for users' avatar
  */
-
 
 var useravatar = (function() {
     "use strict";

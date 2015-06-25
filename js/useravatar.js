@@ -63,15 +63,17 @@ var useravatar = (function() {
      *  @return string
      */
     function _twoLettersSettings(letters) {
-        var words = letters.split(/\W+/);
+        var words = letters.toUpperCase().split(/\W+/);
         if (words.length === 1) {
             letters = words[0].substr(0, 2);
         } else {
             letters = words[0][0]  + words[1][0];
         }
         var colors = parseInt(_colors.length / 2) + 1;
-        var color = letters.charCodeAt(0) % colors + letters.charCodeAt(1) % colors;
-        return {letters: letters.toUpperCase(), color: _colors[color], colorIndex: color};
+        var color  = letters.split('')
+            .map(function(e) { return e.charCodeAt(0); })
+            .reduce(function(e,v) { return e+v;}, 0) % colors;
+        return {letters: letters, color: _colors[color], colorIndex: color};
     }
 
     /**

@@ -403,6 +403,8 @@ function treeredraw()
 
     if (M.currentrootid == M.RootID)
         M.buildtree(M.d[M.RootID]);
+    if (M.currentrootid === M.InboxID)
+        M.buildtree(M.d[M.InboxID]);
     else if (M.currentrootid == M.RubbishID)
         M.buildtree({h: M.RubbishID});
     else if (M.currentrootid == 'shares')
@@ -552,6 +554,7 @@ function treesearchUI()
                     M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
                     break;
                 case 'cloud-drive':
+                case 'inbox':
                 case 'folder-link':
                     M.buildtree(M.d[M.RootID], M.buildtree.FORCE_REBUILD);
                     break;
@@ -595,7 +598,7 @@ function treePanelSortElements(type, elements, handlers, ifEq) {
 function initializeTreePanelSorting()
 {
     $.sortTreePanel = {};
-    $.each(['folder-link', 'contacts', 'conversations', 'shared-with-me', 'cloud-drive', 'rubbish-bin'], function(key, type) {
+    $.each(['folder-link', 'contacts', 'conversations', 'inbox', 'shared-with-me', 'cloud-drive', 'rubbish-bin'], function(key, type) {
         $.sortTreePanel[type] = {
             by: anyOf(['name', 'status', 'last-interaction'], localStorage['sort' + type + 'By']) || (type == 'contacts' ? "status":"name"),
             dir: parseInt(anyOf(['-1', '1'], localStorage['sort' + type + 'Dir']) || '1')

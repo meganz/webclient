@@ -364,7 +364,21 @@ function MegaData()
     };
 
     this.hasInboxItems = function() {
-        return M.getFilterBy(function(node) { return node.p === M.InboxID; }).length > 0;
+        return this.getInboxItems().length > 0;
+    };
+
+    this.getInboxUsers = function() {
+        var uniqueUsersList = {};
+        this.getInboxItems().forEach(function(v, k) {
+            assert(M.u[v.u], 'user is not in M.u when trying to access inbox item users');
+            uniqueUsersList[v.u] = M.u[v.u];
+        });
+
+        return obj_values(uniqueUsersList);
+    };
+
+    this.getInboxItems = function() {
+        return M.getFilterBy(function(node) { return node.p === M.InboxID; });
     };
 
     this.avatars = function()
@@ -1410,11 +1424,61 @@ function MegaData()
         this.buildtree({h: 'shares'},       this.buildtree.FORCE_REBUILD);
         this.buildtree(this.d[this.RootID], this.buildtree.FORCE_REBUILD);
         this.buildtree({h: M.RubbishID},    this.buildtree.FORCE_REBUILD);
+        this.buildtree({h: M.InboxID},    this.buildtree.FORCE_REBUILD);
         this.contacts();
+        this.renderInboxTree();
         treeUI();
         if (!MegaChatDisabled) {
             megaChat.renderContactTree();
         }
+    };
+
+    this.renderInboxTree = function() {
+        var inboxUsers = this.getInboxUsers();
+
+        if (typeof this.i_cache !== "object") {
+            this.i_cache = {};
+        }
+
+        treePanelSortElements('inbox', inboxUsers, {
+            name: sortContactByName
+        }, sortContactByName);
+
+        var html = '';
+
+        for (var i in inboxUsers)
+        {
+            var onlinestatus;
+
+            if (!MegaChatDisabled) {
+                onlinestatus = M.onlineStatusClass(megaChat.karere.getPresence(megaChat.getJidFromNodeId(inboxUsers[i].u)));
+            } else {
+                onlinestatus = [l[5926], 'offline'];
+            }
+            if (!treesearch || (treesearch && inboxUsers[i].name && inboxUsers[i].name.toLowerCase().indexOf(treesearch.toLowerCase()) > -1)) {
+                html += '<div class="nw-contact-item ui-droppable ' + onlinestatus[1] + '" id="contact_' + htmlentities(inboxUsers[i].u)
+                + '"><div class="nw-contact-status"></div><div class="nw-contact-name">'
+                + htmlentities(inboxUsers[i].name) + '</div></div>';
+            }
+        }
+
+        //TODO: what are we going to show here?
+
+        $('.content-panel.inbox').html(html);
+
+
+        var $scope = $('.content-panel.inbox');
+
+        $scope.undelegate('.nw-contact-item', 'click');
+        $scope.delegate('.nw-contact-item', 'click', function() {
+            var id = $(this).attr('id');
+            if (id) {
+                id = id.replace('contact_', '');
+            }
+            M.openFolder(id);
+
+            return false; // stop propagation!
+        });
     };
 
     this.openFolder = function(id, force, chat) {
@@ -1808,6 +1872,18 @@ function MegaData()
                 // }
             }
             stype = "shared-with-me";
+        } else if (n.h === M.InboxID) {
+            if (typeof dialog === 'undefined') {
+                // if ($('.content-panel.inbox ul').length == 0) {
+                    $('.content-panel.inbox').html('<ul id="treesub_inbox"></ul>');
+                // }
+            }
+            else {
+                // if ($('.' + dialog + ' .inbox .dialog-content-block ul').length == 0) {
+                    $('.' + dialog + ' .inbox .dialog-content-block').html('<ul id="mctreesub_inbox"></ul>');
+                // }
+            }
+            stype = "inbox";
         }
         else if (n.h === M.RubbishID) {
             if (typeof dialog === 'undefined') {

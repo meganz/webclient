@@ -5622,6 +5622,9 @@ table .grid-status-icon.star {
 .clear-transfer-icon {
 	left: 36px;
 }
+.own-data .grid-url-arrow {
+	left: 32px;
+}
 .file-settings-icon {
 	left: auto;
 	right: 7px;
@@ -11741,6 +11744,12 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
 .membership-medium-txt.red-bg.editprofile, .membership-medium-txt.gray-bg.cancel-account {
 	margin-top: 7px;
 }
+.membership-medium-txt.red-bg.vouchercreate {
+	margin: 25px 0 0 0;
+}
+.membership-medium-txt.red-bg.resellerbuy {
+	margin: 18px 0 0 0;
+}
 .membership-medium-txt.gray-bg.cancel-account {
 	margin-top: 7px;
 }
@@ -12736,6 +12745,16 @@ table {
 	padding: 20px 24px;
 	margin: 24px 0;
 }
+.fm-account-reseller .fm-account-mutliple-bl {
+	padding: 0 24px 8px 24px;
+}
+.fm-account-reseller hr {
+	background-color: #eeeeee;
+	height: 2px;
+	margin: 0 24px;
+	border: 0;
+	padding: 0;
+}
 .triple .fm-account-mutliple-bl {
 	width: 33.333333%;
 }
@@ -12802,6 +12821,10 @@ table {
 }
 .huge .fm-account-info-block {
 	margin: 0;
+}
+.fm-account-reseller .huge .fm-account-info-block {
+	margin: -3px 0 0 0;
+	padding: 0;
 }
 .huge .membership-big-txt {
 	font-size: 30px;
@@ -13011,6 +13034,7 @@ table {
 	float: left;
 	width: 50px;
 	padding: 0px 0px;
+	margin: 0;
 }
 .fm-account-select.month {
 	float: left;
@@ -14796,6 +14820,14 @@ h5.main-italic-header {
 	border-radius: 100%;
 	position: relative;
 	margin: 5px 12px 0 0;
+}
+.payment-options-list {
+    -webkit-column-count: 2;
+    -moz-column-count: 2;
+    column-count: 2;
+    -webkit-column-width: 170px;
+    -moz-column-width: 170px;
+    column-width: 170px;
 }
 .payment-options-list .payment-method {
 	cursor: pointer;

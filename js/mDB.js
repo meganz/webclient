@@ -475,7 +475,7 @@ var mFileManagerDB = {
             }
             else {
                 this._setstate(this.db);
-                mBroadcaster.sendMessage('mFileManagerDB.done', getsc);
+                mBroadcaster.sendMessage('mFileManagerDB.done', getsc) || getsc(1);
             }
         }
     },

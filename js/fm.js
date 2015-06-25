@@ -554,10 +554,12 @@ function treesearchUI()
                     M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
                     break;
                 case 'cloud-drive':
-                case 'inbox':
                 case 'folder-link':
                     M.buildtree(M.d[M.RootID], M.buildtree.FORCE_REBUILD);
                     break;
+                case 'inbox':
+                    M.buildtree(M.d[M.InboxID], M.buildtree.FORCE_REBUILD);
+                    break
                 case 'rubbish-bin':
                     M.buildtree({h: M.RubbishID}, M.buildtree.FORCE_REBUILD);
                     break;
@@ -588,10 +590,12 @@ function treePanelSortElements(type, elements, handlers, ifEq) {
         return;
 
     elements.sort(function(a, b) {
-        var d = sort(a, b)
-        if (d == 0 && ifEq)
-            return ifEq(a, b)
-        return d * settings.dir
+        var d = sort(a, b);
+
+        if (d == 0 && ifEq) {
+            return ifEq(a, b);
+        }
+        return d * settings.dir;
     });
 }
 

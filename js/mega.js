@@ -1434,51 +1434,7 @@ function MegaData()
     };
 
     this.renderInboxTree = function() {
-        var inboxUsers = this.getInboxUsers();
 
-        if (typeof this.i_cache !== "object") {
-            this.i_cache = {};
-        }
-
-        treePanelSortElements('inbox', inboxUsers, {
-            name: sortContactByName
-        }, sortContactByName);
-
-        var html = '';
-
-        for (var i in inboxUsers)
-        {
-            var onlinestatus;
-
-            if (!MegaChatDisabled) {
-                onlinestatus = M.onlineStatusClass(megaChat.karere.getPresence(megaChat.getJidFromNodeId(inboxUsers[i].u)));
-            } else {
-                onlinestatus = [l[5926], 'offline'];
-            }
-            if (!treesearch || (treesearch && inboxUsers[i].name && inboxUsers[i].name.toLowerCase().indexOf(treesearch.toLowerCase()) > -1)) {
-                html += '<div class="nw-contact-item ui-droppable ' + onlinestatus[1] + '" id="contact_' + htmlentities(inboxUsers[i].u)
-                + '"><div class="nw-contact-status"></div><div class="nw-contact-name">'
-                + htmlentities(inboxUsers[i].name) + '</div></div>';
-            }
-        }
-
-        //TODO: what are we going to show here?
-
-        $('.content-panel.inbox').html(html);
-
-
-        var $scope = $('.content-panel.inbox');
-
-        $scope.undelegate('.nw-contact-item', 'click');
-        $scope.delegate('.nw-contact-item', 'click', function() {
-            var id = $(this).attr('id');
-            if (id) {
-                id = id.replace('contact_', '');
-            }
-            M.openFolder(id);
-
-            return false; // stop propagation!
-        });
     };
 
     this.openFolder = function(id, force, chat) {
@@ -1872,15 +1828,16 @@ function MegaData()
                 // }
             }
             stype = "shared-with-me";
-        } else if (n.h === M.InboxID) {
+        }
+        else if (n.h === M.InboxID) {
             if (typeof dialog === 'undefined') {
                 // if ($('.content-panel.inbox ul').length == 0) {
-                    $('.content-panel.inbox').html('<ul id="treesub_inbox"></ul>');
+                    $('.content-panel.inbox').html('<ul id="treesub_' + htmlentities(M.InboxID) + '"></ul>');
                 // }
             }
             else {
                 // if ($('.' + dialog + ' .inbox .dialog-content-block ul').length == 0) {
-                    $('.' + dialog + ' .inbox .dialog-content-block').html('<ul id="mctreesub_inbox"></ul>');
+                    $('.' + dialog + ' .inbox .dialog-content-block').html('<ul id="mctreesub_' + htmlentities(M.InboxID) + '"></ul>');
                 // }
             }
             stype = "inbox";

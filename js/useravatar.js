@@ -70,10 +70,12 @@ var useravatar = (function() {
             letters = words[0][0]  + words[1][0];
         }
         var colors = parseInt(_colors.length / 2) + 1;
-        var color  = letters.split('')
-            .map(function(e) { return e.charCodeAt(0); })
-            .reduce(function(e,v) { return e+v;}, 0) % colors;
-        return {letters: letters, color: _colors[color], colorIndex: color};
+        var color  = 0;
+        for (var i = 0; i < letters.length; i++) {
+            color += letters.charCodeAt(i);
+        }
+        color = color % _colors.length;
+        return {letters: letters, color: _colors[color], colorIndex: color+1 };
     }
 
     /**
@@ -174,20 +176,25 @@ var useravatar = (function() {
         }
     };
 
+    function emailAvatar(user)
+    {
+        // User is an email, we should look if the user
+        // exists, if it does exists we use the user Object.
+        for (var u in M.u) {
+            if (M.u[u].m === user) {
+                // found the user object
+                return ns.contact(M.u[u], className, element);
+            }
+        }
+        return _twoLetters(user.substr(0, 2), user, className, element);
+    }
+
     ns.contact = function(user, className, element) {
         className = className || "avatar";
         element   = element || "div";
         if (typeof user === "string") {
             if (isEmail(user)) {
-                // User is an email, we should look if the user
-                // exists, if it does exists we use the user Object.
-                for (var u in M.u) {
-                    if (M.u[u].m === user) {
-                        // found the user object
-                        return ns.contact(M.u[u], className, element);
-                    }
-                }
-                return _twoLetters(user.substr(0, 2), user, className, element);
+                return emailAvatar(user);
             } else if (M.u[user]) {
                 // It's an user ID
                 user = M.u[user];
@@ -196,7 +203,7 @@ var useravatar = (function() {
             }
         }
 
-        if (typeof user != "object" || !user) {
+        if (typeof user !== "object" || !user) {
             throw new Error("Unexpected value" + typeof(user));
         }
 

@@ -373,28 +373,29 @@ function loadPaymentGatewayOptions() {
         supportsRecurring: false,
         supportsMonthlyPayment: true,
         cssClass: 'bitcoin'
-    },/*
+    },
     {
         apiGatewayId: null,
         displayName: l[504],            // Prepaid balance
         supportsRecurring: false,
         supportsMonthlyPayment: true,
         cssClass: 'prepaid-balance'
-    },*/
+    },
     {
         apiGatewayId: null,             // Wire transfer
         displayName: l[6198],           // Wire transfer
         supportsRecurring: false,
         supportsMonthlyPayment: false,  // Accept for 1 year one-time payment only
         cssClass: 'wire-transfer'
-    },
+    }/*,
     {
         apiGatewayId: 5,                // Union Pay
         displayName: 'Union Pay',       // Union Pay
         supportsRecurring: true,
         supportsMonthlyPayment: true,
         cssClass: 'union-pay'
-    }];
+    }*/
+    ];
     var html = '';
 
     // Loop through gateway providers (change to use list from API soon)

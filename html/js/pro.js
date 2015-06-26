@@ -1445,23 +1445,23 @@ var cardDialog = {
         
         switch (errorCode) {
             case -1:
-                // There is an error with your credit card details
+                // There is an error with your credit card details.
                 return l[6966];
             case -2:
-                // There is an error with your billing details
+                // There is an error with your billing details.
                 return l[6967];
             case -3:
-                // Your transaction was detected as being fraudulent
+                // Your transaction was detected as being fraudulent.
                 return l[6968];
             case -4:
-                // You have tried to pay too many times with this credit card recently
+                // You have tried to pay too many times with this credit card recently.
                 return l[6969];
             case -5:
-                // You have insufficient funds to make this payment
+                // You have insufficient funds to make this payment.
                 return l[6970];
             default:
-                // Please verify your payment information and try again
-                return l[6950];
+                // An unknown error occurred. Please try again later.
+                return l[215];
         }
     },
     

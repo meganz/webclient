@@ -192,7 +192,7 @@ MegaDB.getDatabaseVersion = function(dbName) {
 MegaDB.getDatabaseNames = function() {
     var promise = new MegaPromise();
 
-    if (indexedDB) {
+    if (indexedDB && typeof indexedDB.getDatabaseNames === 'function') {
         var request = indexedDB.getDatabaseNames();
 
         request.onsuccess = function(ev) {

@@ -167,6 +167,10 @@ var proPage = {
     // The user's current storage in bytes
     currentStorageBytes: 0,
     
+    // Overlay for loading/processing/redirecting
+    $backgroundOverlay: null,
+    $loadingOverlay: null,
+            
     /**
     * Update the state when a payment has been received to show their new Pro Level
     * @param {Object} actionPacket The action packet {'a':'psts', 'p':<prolevel>, 'r':<s for success or f for failure>}
@@ -306,6 +310,52 @@ var proPage = {
         var param = hash.substr(index).split('&')[0].split('=')[1];
         
         return param;
+    },
+    
+    /**
+     * Preloads the large loading animation so it displays immediately when shown
+     */
+    preloadAnimation: function() {
+        
+        this.$backgroundOverlay = $('.fm-dialog-overlay');
+        this.$loadingOverlay = $('.payment-processing');
+        
+        // Check if using retina display and preload loading animation
+        var retina = (window.devicePixelRatio > 1) ? '@2x' : '';
+        this.$loadingOverlay.find('.payment-animation').attr('src', staticpath + '/images/mega/payment-animation' + retina + '.gif');
+    },
+    
+    /**
+     * Generic function to show the bouncing megacoin icon while loading
+     * @param {String} messageType Which message to display e.g. 'processing', 'transferring'
+     */
+    showLoadingOverlay: function(messageType) {
+        
+        // Show the loading gif
+        this.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+        this.$loadingOverlay.removeClass('hidden');
+        
+        // Prevent clicking on the background overlay while it's loading, which makes 
+        // the background disappear and error triangle appear on white background
+        $('.fm-dialog-overlay.payment-dialog-overlay').rebind('click', function(event) {
+            event.stopPropagation();
+        });
+        
+        var message = '';
+        
+        // Choose which message to display underneath the animation
+        if (messageType === 'processing') {
+            message = l[6960];                  // Processing your payment...
+        }
+        else if (messageType === 'transferring') {
+            message = 'Transferring to payment provider...';    // Transferring to payment provider...
+        }
+        else if (messageType === 'loading') {
+            message = 'Loading...';             // Loading...
+        }
+        
+        // Display message
+        this.$loadingOverlay.find('.payment-animation-txt').html(message);
     }
 };
 
@@ -470,6 +520,9 @@ function pro_next_step() {
 
     // Add history so the back button works to go back to choosing their plan
     history.pushState('', 'MEGA - Choose plan', '#propay');
+
+    // Preload loading/transferring/processing animation
+    proPage.preloadAnimation();
 
     if (!u_handle) {
         megaAnalytics.log("pro", "loginreq");
@@ -775,12 +828,12 @@ function pro_pay()
     
     // Otherwise if credit card payment, show bouncing coin while loading
     else if (pro_paymentmethod === 'credit-card') {
-        cardDialog.showLoadingOverlay();
+        cardDialog.closeDialogAndShowProcessing();
     }
     
     // Otherwise if Union Pay payment, show bouncing coin while loading
     else if (pro_paymentmethod === 'union-pay') {
-        unionPay.showLoadingOverlay();
+        proPage.showLoadingOverlay('transferring');
     }
     
     // Data for API request
@@ -940,14 +993,6 @@ var wireTransferDialog = {
  * Code for Dynamic/Union Pay
  */
 var unionPay = {
-    
-    /**
-     * Show the bouncing megacoin icon while loading
-     */
-    showLoadingOverlay: function() {
-        $('.fm-dialog-overlay').removeClass('hidden').addClass('payment-dialog-overlay');
-        $('.payment-processing').removeClass('hidden');
-    },
     
     /**
      * Redirect to the site
@@ -1347,22 +1392,12 @@ var cardDialog = {
     },
     
     /**
-     * Show the bouncing megacoin icon while loading
+     * Close the card dialog and show the loading overlay
      */
-    showLoadingOverlay: function() {
+    closeDialogAndShowProcessing: function() {        
         
-        // Close the card dialog
         cardDialog.$dialog.removeClass('active').addClass('hidden');
-        
-        // Prevent clicking on the background overlay while it's loading, which makes 
-        // the background disappear and error triangle appear on white background
-        cardDialog.$backgroundOverlay.rebind('click', function(event) {
-            event.stopPropagation();
-        });
-        
-        // Show the loading gif
-        cardDialog.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
-        cardDialog.$loadingOverlay.removeClass('hidden');
+        proPage.showLoadingOverlay('processing');
     },
     
     /**

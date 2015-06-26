@@ -1767,6 +1767,7 @@ function MegaData()
     };
 
     this.buildtree = function(n, dialog, stype) {
+        
         if (!n) {
             console.error('Invalid node passed to M.buildtree');
             return;
@@ -1835,6 +1836,7 @@ function MegaData()
                 }
             }
 
+            // localCompare >=IE10, FF and Chrome OK
             // sort by name is default in the tree
             treePanelSortElements(stype, folders, {
                 name: function(a, b) {
@@ -1906,9 +1908,13 @@ function MegaData()
                     else {
                         var sExportLink = (M.d[folders[ii].h].shares && M.d[folders[ii].h].shares.EXP) ? 'linked' : '';
                         var sLinkIcon = (sExportLink === '') ? '' : 'link-icon';
+                        var arrowIcon = '';
+                        if (M.c[folders[ii].h]) {
+                            arrowIcon = 'class="nw-fm-arrow-icon"';
+                        }
                         var html = '<li id="' + _li + folders[ii].h + '">\n\
                                         <span  id="' + _a + htmlentities(folders[ii].h) + '" class="nw-fm-tree-item ' + containsc + ' ' + expandedc + ' ' + openedc + ' ' + sExportLink + '">\n\
-                                            <span class="nw-fm-arrow-icon"></span>\n\
+                                            <span ' + arrowIcon + '></span>\n\
                                             <span class="nw-fm-tree-folder' + sharedfolder + '">' + htmlentities(folders[ii].name) + '</span>\n\
                                             <span class="' + sLinkIcon + '"></span>\n\
                                         </span>\n\
@@ -1934,9 +1940,9 @@ function MegaData()
                             $('#' + _li + folders[ii].h).parents('li').removeClass('tree-item-on-search-hidden');
                         }
                     }
-                    if (buildnode) {
-                        this.buildtree(folders[ii], dialog, stype);
-                    }
+//                    if (buildnode) {
+//                        this.buildtree(folders[ii], dialog, stype);
+//                    }
 
                     sharedUInode(folders[ii].h);
                 }

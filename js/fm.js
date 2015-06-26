@@ -1414,7 +1414,11 @@ function sharedUInode(nodeHandle) {
         }
 
         if (oShares && oShares.EXP) {
+            
+            // List view
             $('.grid-table.fm #' + nodeHandle + ' .grid-url-field').addClass('linked');
+            
+            // Grid view
             $('#' + nodeHandle + '.file-block').addClass('linked');
 
             bExportLink = true;
@@ -1424,6 +1428,7 @@ function sharedUInode(nodeHandle) {
             || (oShares && !oShares.EXP && iShareNum)
             || M.ps[nodeHandle]) {
 
+            // Left panel
             $('#treea_' + nodeHandle + ' .nw-fm-tree-folder').addClass('shared-folder');
             $('#treea_' + nodeHandle).addClass('linked');
 
@@ -2272,6 +2277,7 @@ function initContextUI() {
         }
         if (!$this.is('.opened')) {
             menuPos = reCalcMenuPosition($this, pos.left, pos.top, 'submenu'),
+
             $this.next('.context-submenu')
                 .css({'top': menuPos.top})
                 .addClass('active')

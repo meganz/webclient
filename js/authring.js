@@ -190,33 +190,64 @@ var authring = (function () {
             throw new Error('Unsupporte authentication key type.');
         }
 
+        // This promise will be the one which is going to be returned.
+        var masterPromise = new MegaPromise();
+
         var attributePromise = getUserAttribute(u_handle, ns._properties[keyType],
                                                 false, true);
-        var contactPromise = attributePromise.then(
-            // Function on fulfilment.
-            function(result) {
-                if (typeof result !== 'number') {
-                    // Authring is in the empty-name record.
-                    u_authring[keyType] = ns.deserialise(result['']);
-                    logger.debug('Got authentication ring for key type '
-                                 + keyType + '.');
-                    return u_authring[keyType];
-                } else {
-                    logger.error('Error retrieving authentication ring for key type '
-                                 + keyType + ': ' + result);
-                    var rejectedPromise = new MegaPromise();
-                    rejectedPromise.reject(result);
-                    return rejectedPromise;
-                }
-            },
-            // Function on rejection.
-            function(result) {
+
+        /**
+         * Function on promise fulfilment.
+         * @private
+         */
+        var _attributePromiseResolve = function(result) {
+            if (typeof result !== 'number') {
+                // Authring is in the empty-name record.
+                u_authring[keyType] = ns.deserialise(result['']);
+                logger.debug('Got authentication ring for key type '
+                             + keyType + '.');
+                return u_authring[keyType];
+            }
+            else if (result === ENOENT) {
+                // This authring is missing. Let's make it.
+                logger.debug('No authentication ring for key type '
+                             + keyType + ', making one.');
+                u_authring[keyType] = {};
+                return ns.setContacts(keyType);
+            }
+            else {
                 logger.error('Error retrieving authentication ring for key type '
                              + keyType + ': ' + result);
-                return result;
+                var rejectedPromise = new MegaPromise();
+                rejectedPromise.reject(result);
+                return rejectedPromise;
             }
-        );
-        return contactPromise;
+        };
+
+        /**
+         * Function on promise rejection.
+         * @private
+         */
+        var _attributePromiseReject = function(result) {
+            if (result === ENOENT) {
+                // This authring is missing. Let's make it.
+                logger.debug('No authentication ring for key type '
+                             + keyType + ', making one.');
+                u_authring[keyType] = {};
+                return ns.setContacts(keyType);
+            }
+            else {
+                logger.error('Error retrieving authentication ring for key type '
+                             + keyType + ': ' + result);
+                masterPromise.reject(result);
+            }
+        };
+
+        attributePromise.then(_attributePromiseResolve,
+                              _attributePromiseReject);
+        masterPromise.linkDoneAndFailTo(attributePromise);
+
+        return masterPromise;
     };
 
 

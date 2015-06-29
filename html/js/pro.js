@@ -467,15 +467,14 @@ var proPage = {
         supportsRecurring: false,
         supportsMonthlyPayment: false,  // Accept for 1 year one-time payment only
         cssClass: 'wire-transfer'
-    }/*,
+    },
     {
         apiGatewayId: 5,                // Union Pay
         displayName: 'Union Pay',       // Union Pay
         supportsRecurring: true,
         supportsMonthlyPayment: true,
         cssClass: 'union-pay'
-    }*/
-    ],
+    }],
     
     /**
     * Update the state when a payment has been received to show their new Pro Level

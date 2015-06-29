@@ -363,6 +363,24 @@ function MegaData()
         });
     };
 
+    this.hasInboxItems = function() {
+        return this.getInboxItems().length > 0;
+    };
+
+    this.getInboxUsers = function() {
+        var uniqueUsersList = {};
+        this.getInboxItems().forEach(function(v, k) {
+            assert(M.u[v.u], 'user is not in M.u when trying to access inbox item users');
+            uniqueUsersList[v.u] = M.u[v.u];
+        });
+
+        return obj_values(uniqueUsersList);
+    };
+
+    this.getInboxItems = function() {
+        return M.getFilterBy(function(node) { return node.p === M.InboxID; });
+    };
+
     this.avatars = function()
     {
         if (!M.c.contacts)
@@ -622,7 +640,7 @@ function MegaData()
         var html, hideCancel, hideReinvite, hideOPC,
             drawn = false,
             TIME_FRAME = 60 * 60 * 24 * 14,// 14 days in seconds
-            iServerTime = getServerTime(),
+            utcDateNow = Math.floor(Date.now() / 1000),
             t = '.grid-table.sent-requests';
 
         if (M.currentdirid === 'opc') {
@@ -642,7 +660,7 @@ function MegaData()
                         hideCancel = 'hidden';
                     }
                     else {
-                        if (iServerTime < (opc[i].rts + TIME_FRAME)) {
+                        if (utcDateNow < (opc[i].rts + TIME_FRAME)) {
                             hideReinvite = 'hidden';
                         }
                     }
@@ -809,14 +827,14 @@ function MegaData()
                 timems = cs.ts,
                 interactionclass = 'cloud-drive';
 
+            if (cs.files === 0 && cs.folders === 0) {
+                time = l[1051];
+                interactionclass = 'never';
+            }
+
             // Render all items given in glob M.v
             for (var i in M.v) {
                 u_h = M.v[i].h;
-                if (cs.files === 0 && cs.folders === 0) {
-                    time = l[1051];
-                    interactionclass = 'never';
-                }
-
                 contact = M.u[u_h];
 
                 // chat is enabled?
@@ -902,17 +920,16 @@ function MegaData()
                 avatar, av_color, rights, rightsclass, onlinestatus, html,
                 sExportLink, sLinkIcon,
                 iShareNum = 0,
-                s = '',
-                ftype = '',
-                c = '',
-                cc = null,
-                star = '';
+                s, ftype, c, cc, star;
 
             for (var i in M.v) {
                 if (!M.v[i].name) {
                     DEBUG('Skipping M.v node with no name.', M.v[i]);
                     continue;
                 }
+                s  = '';
+                c  = '';
+                cc = null;
                 if (M.v[i].t) {
                     ftype = l[1049];
                     c = ' folder';
@@ -920,9 +937,7 @@ function MegaData()
                     ftype = filetype(M.v[i].name);
                     s = htmlentities(bytesToSize(M.v[i].s));
                 }
-                if (M.v[i].fav) {
-                    star = ' star';
-                }
+                star = M.v[i].fav ? ' star' : '';
 
                 if (M.currentdirid === 'shares') {// render shares tab
                     cs = M.contactstatus(M.v[i].h),
@@ -1054,7 +1069,7 @@ function MegaData()
                                         <span></span>\n\
                                     </span>\n\
                                     <span class="file-icon-area">\n\
-                                        <span class="block-view-file-type ' + fileIcon({t: M.v[i].t, share: bShare}) + '"><img alt="" /></span>\n\
+                                        <span class="block-view-file-type ' + fileIcon({t: M.v[i].t, share: bShare, name: M.v[i].name}) + '"><img alt="" /></span>\n\
                                     </span>\n\
                                     <span class="file-block-title">' + htmlentities(M.v[i].name) + '</span>\n\
                                 </a>';
@@ -1070,7 +1085,7 @@ function MegaData()
                                         <span class="grid-status-icon' + star + '"></span>\n\
                                     </td>\n\
                                     <td>\n\
-                                        <span class="transfer-filtype-icon ' + fileIcon({t: M.v[i].t, share: bShare}) + '"> </span>\n\
+                                        <span class="transfer-filtype-icon ' + fileIcon({t: M.v[i].t, share: bShare, name: M.v[i].name}) + '"> </span>\n\
                                         <span class="tranfer-filetype-txt">' + htmlentities(M.v[i].name) + '</span>\n\
                                     </td>\n\
                                     <td width="100">' + s + '</td>\n\
@@ -1406,11 +1421,17 @@ function MegaData()
         this.buildtree({h: 'shares'},       this.buildtree.FORCE_REBUILD);
         this.buildtree(this.d[this.RootID], this.buildtree.FORCE_REBUILD);
         this.buildtree({h: M.RubbishID},    this.buildtree.FORCE_REBUILD);
+        this.buildtree({h: M.InboxID},    this.buildtree.FORCE_REBUILD);
         this.contacts();
+        this.renderInboxTree();
         treeUI();
         if (!MegaChatDisabled) {
             megaChat.renderContactTree();
         }
+    };
+
+    this.renderInboxTree = function() {
+
     };
 
     this.openFolder = function(id, force, chat) {
@@ -1622,7 +1643,7 @@ function MegaData()
                 onlinestatus = [l[5926], 'offline'];
             }
             if (!treesearch || (treesearch && contacts[i].name && contacts[i].name.toLowerCase().indexOf(treesearch.toLowerCase()) > -1)) {
-                html += '<div class="nw-contact-item ' + onlinestatus[1] + '" id="contact_' + htmlentities(contacts[i].u)
+                html += '<div class="nw-contact-item ui-droppable ' + onlinestatus[1] + '" id="contact_' + htmlentities(contacts[i].u)
                     + '"><div class="nw-contact-status"></div><div class="nw-contact-name">'
                     + htmlentities(contacts[i].name) + ' <a href="#" class="button start-chat-button"><span></span></a></div></div>';
             }
@@ -1811,6 +1832,19 @@ function MegaData()
                 // }
             }
             stype = "shared-with-me";
+        }
+        else if (n.h === M.InboxID) {
+            if (typeof dialog === 'undefined') {
+                // if ($('.content-panel.inbox ul').length == 0) {
+                    $('.content-panel.inbox').html('<ul id="treesub_' + htmlentities(M.InboxID) + '"></ul>');
+                // }
+            }
+            else {
+                // if ($('.' + dialog + ' .inbox .dialog-content-block ul').length == 0) {
+                    $('.' + dialog + ' .inbox .dialog-content-block').html('<ul id="mctreesub_' + htmlentities(M.InboxID) + '"></ul>');
+                // }
+            }
+            stype = "inbox";
         }
         else if (n.h === M.RubbishID) {
             if (typeof dialog === 'undefined') {
@@ -4579,6 +4613,18 @@ function renderNew() {
     if (d) {
         console.timeEnd('rendernew');
     }
+
+    // handle the Inbox section use cases
+    if (M.hasInboxItems() === true) {
+        $('.nw-fm-left-icon.inbox').removeClass('hidden');
+    }
+    else {
+        $('.nw-fm-left-icon.inbox').addClass('hidden');
+        if ($('.nw-fm-left-icon.inbox').is(".active") === true) {
+            M.openFolder(M.RootID);
+        }
+    }
+
 }
 
 /**

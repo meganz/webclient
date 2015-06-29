@@ -403,6 +403,8 @@ function treeredraw()
 
     if (M.currentrootid == M.RootID)
         M.buildtree(M.d[M.RootID]);
+    if (M.currentrootid === M.InboxID)
+        M.buildtree(M.d[M.InboxID]);
     else if (M.currentrootid == M.RubbishID)
         M.buildtree({h: M.RubbishID});
     else if (M.currentrootid == 'shares')
@@ -555,6 +557,9 @@ function treesearchUI()
                 case 'folder-link':
                     M.buildtree(M.d[M.RootID], M.buildtree.FORCE_REBUILD);
                     break;
+                case 'inbox':
+                    M.buildtree(M.d[M.InboxID], M.buildtree.FORCE_REBUILD);
+                    break
                 case 'rubbish-bin':
                     M.buildtree({h: M.RubbishID}, M.buildtree.FORCE_REBUILD);
                     break;
@@ -585,17 +590,19 @@ function treePanelSortElements(type, elements, handlers, ifEq) {
         return;
 
     elements.sort(function(a, b) {
-        var d = sort(a, b)
-        if (d == 0 && ifEq)
-            return ifEq(a, b)
-        return d * settings.dir
+        var d = sort(a, b);
+
+        if (d == 0 && ifEq) {
+            return ifEq(a, b);
+        }
+        return d * settings.dir;
     });
 }
 
 function initializeTreePanelSorting()
 {
     $.sortTreePanel = {};
-    $.each(['folder-link', 'contacts', 'conversations', 'shared-with-me', 'cloud-drive', 'rubbish-bin'], function(key, type) {
+    $.each(['folder-link', 'contacts', 'conversations', 'inbox', 'shared-with-me', 'cloud-drive', 'rubbish-bin'], function(key, type) {
         $.sortTreePanel[type] = {
             by: anyOf(['name', 'status', 'last-interaction'], localStorage['sort' + type + 'By']) || (type == 'contacts' ? "status":"name"),
             dir: parseInt(anyOf(['-1', '1'], localStorage['sort' + type + 'Dir']) || '1')
@@ -652,6 +659,7 @@ function initUI() {
 
     $.doDD = function(e, ui, a, type)
     {
+
         function nRevert(r)
         {
             try {
@@ -664,12 +672,17 @@ function initUI() {
         var c = $(ui.draggable.context).attr('class');
         var t, ids, dd;
 
+
         if (c && c.indexOf('nw-fm-tree-item') > -1)
         {
             // tree dragged:
             var id = $(ui.draggable.context).attr('id');
-            if (id.indexOf('treea_') > -1)
+            if (id.indexOf('treea_') > -1) {
                 ids = [id.replace('treea_', '')];
+            }
+            else if (id.indexOf('contact_') > -1) {
+                ids = [id.replace('contact_', '')];
+            }
         }
         else
         {
@@ -710,6 +723,8 @@ function initUI() {
                     t = t.replace('path_', '');
                 else if (t && t.indexOf('contact2_') > -1)
                     t = t.replace('contact2_', '');
+                else if (t && t.indexOf('contact_') > -1)
+                    t = t.replace('contact_', '');
                 else if (M.currentdirid !== 'shares' || !M.d[t] || RootbyId(t) !== 'shares')
                     t = undefined;
             }
@@ -5299,6 +5314,15 @@ function iconUI(aQuiet)
             initFileblocksScrolling2();
         }
     }
+    else if (M.currentdirid === M.InboxID || RootbyId(M.currentdirid) === M.InboxID)
+    {
+        //console.error("Inbox iconUI");
+        if (M.v.length > 0)
+        {
+            $('.fm-blocks-view.fm').removeClass('hidden');
+            initFileblocksScrolling();
+        }
+    }
     else
     {
         $('.fm-blocks-view.fm').removeClass('hidden');
@@ -6086,7 +6110,7 @@ function scrollMegaSubMenu(e)
 
 function treeUI()
 {
-    // console.error('treeUI');
+    //console.error('treeUI');
     if (d)
         console.time('treeUI');
     $('.fm-tree-panel .nw-fm-tree-item').draggable(
@@ -6133,8 +6157,16 @@ function treeUI()
             }
         });
 
-    $('.fm-tree-panel .nw-fm-tree-item, .rubbish-bin, .fm-breadcrumbs, .transfer-panel, .nw-fm-left-icons-panel .nw-fm-left-icon, .shared-with-me tr, .nw-conversations-item').droppable(
-        {
+    $(
+        '.fm-tree-panel .nw-fm-tree-item,' +
+        ' .rubbish-bin,' +
+        ' .fm-breadcrumbs,' +
+        ' .transfer-panel,' +
+        ' .nw-fm-left-icons-panel .nw-fm-left-icon,' +
+        ' .shared-with-me tr,' +
+        ' .nw-conversations-item,' +
+        ' .nw-contact-item'
+    ).droppable({
             tolerance: 'pointer',
             drop: function(e, ui)
             {
@@ -6240,7 +6272,15 @@ function sectionUIopen(id) {
     }
 
     $('.nw-fm-left-icon').removeClass('active');
+    if(M.hasInboxItems() === true) {
+        $('.nw-fm-left-icon.inbox').removeClass('hidden');
+    } else {
+        $('.nw-fm-left-icon.inbox').addClass('hidden');
+    }
+
     $('.content-panel').removeClass('active');
+
+
 
     if (id === 'opc' || id === 'ipc') {
         tmpId = 'contacts';
@@ -6289,7 +6329,15 @@ function sectionUIopen(id) {
         $('.fm-chat-block').show();
     }
 
-    if ((id !== 'cloud-drive') && (id !== 'rubbish-bin') && ((id !== 'shared-with-me') && (M.currentdirid !== 'shares'))) {
+    if (
+        (id !== 'cloud-drive') &&
+        (id !== 'rubbish-bin') &&
+        (id !== 'inbox') &&
+        (
+            (id !== 'shared-with-me') &&
+            (M.currentdirid !== 'shares')
+        )
+    ) {
         $('.files-grid-view.fm').addClass('hidden');
         $('.fm-blocks-view.fm').addClass('hidden');
     }
@@ -6365,6 +6413,8 @@ function sectionUIopen(id) {
 function treeUIopen(id, event, ignoreScroll, dragOver, DragOpen) {
     var id_s = id.split('/')[0], id_r = RootbyId(id);
     var e, scrollTo = false, stickToTop = false;
+
+    //console.error("treeUIopen", id);
 
     if (id_r === 'shares') {
         sectionUIopen('shared-with-me');

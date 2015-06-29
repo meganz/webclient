@@ -3545,5 +3545,20 @@
     "7136": "seconds",
     "7137": "second",
     "7138": "MEGAsync is being downloaded to your computer. Please install it as soon as the download has completed.",
-    "7139": "Once MEGAsync is running, your file will start downloading automatically."
+    "7139": "Once MEGAsync is running, your file will start downloading automatically.",
+    "7140": "An unknown error occurred. Please try again later.",
+    "7141": "Your payment for the %1 plan was unsuccessful.",
+    "7142": "Your payment for the %1 plan was received.",
+    "7143": "Blocked you as a contact",
+    "7144": "Account has been deleted\/deactivated",
+    "7145": "You are now both contacts",
+    "7146": "Deleted you as a contact",
+    "7147": "You denied a contact request",
+    "7148": "You accepted a contact request",
+    "7149": "You ignored a contact request",
+    "7150": "Reminder: you have a contact request",
+    "7151": "Cancelled their contact request",
+    "7152": "Heavy",
+    "7153": "Light",
+    "7154": "You can close this tab, your download is managed from another tab where you have your file manager open."
 }

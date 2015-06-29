@@ -3546,5 +3546,19 @@
     "7137": "sekunda",
     "7138": "MEGAsync se stahuje do va\u0161eho po\u010d\u00edta\u010de. A\u017e bude stahov\u00e1n\u00ed dokon\u010deno, nainstalujte ho.",
     "7139": "Jakmile se MEGAsync spust\u00ed, v\u00e1\u0161 soubor se za\u010dne automaticky stahovat.",
-    "7140": "An unknown error occurred. Please try again later."
+    "7140": "An unknown error occurred. Please try again later.",
+    "7141": "Your payment for the %1 plan was unsuccessful.",
+    "7142": "Your payment for the %1 plan was received.",
+    "7143": "Blocked you as a contact",
+    "7144": "Account has been deleted\/deactivated",
+    "7145": "You are now both contacts",
+    "7146": "Deleted you as a contact",
+    "7147": "You denied a contact request",
+    "7148": "You accepted a contact request",
+    "7149": "You ignored a contact request",
+    "7150": "Reminder: you have a contact request",
+    "7151": "Cancelled their contact request",
+    "7152": "Heavy",
+    "7153": "Light",
+    "7154": "You can close this tab, your download is managed from another tab where you have your file manager open."
 }

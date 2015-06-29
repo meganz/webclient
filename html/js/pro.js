@@ -1498,7 +1498,7 @@ var cardDialog = {
                 return l[6970];
             default:
                 // An unknown error occurred. Please try again later.
-                return l[215];
+                return l[7140];
         }
     },
     

@@ -438,44 +438,6 @@ var proPage = {
     $backgroundOverlay: null,
     $loadingOverlay: null,
         
-    // Payment gateways, hardcoded for now, may call API in future to get list
-    gatewayOptions: [
-    {
-        apiGatewayId: 8,                // Credit card provider
-        displayName: l[6952],           // Credit card
-        supportsRecurring: true,        // If subscriptions are possible
-        supportsMonthlyPayment: true,   // If you can pay for 1 month at a time
-        cssClass: 'credit-card'
-    },
-    {
-        apiGatewayId: 4,                // Bitcoin provider
-        displayName: l[6802],           // Bitcoin
-        supportsRecurring: false,
-        supportsMonthlyPayment: true,
-        cssClass: 'bitcoin'
-    },
-    {
-        apiGatewayId: null,
-        displayName: l[504],            // Prepaid balance
-        supportsRecurring: false,
-        supportsMonthlyPayment: true,
-        cssClass: 'prepaid-balance'
-    },
-    {
-        apiGatewayId: null,             // Wire transfer
-        displayName: l[6198],           // Wire transfer
-        supportsRecurring: false,
-        supportsMonthlyPayment: false,  // Accept for 1 year one-time payment only
-        cssClass: 'wire-transfer'
-    },
-    {
-        apiGatewayId: 5,                // Union Pay
-        displayName: 'Union Pay',       // Union Pay
-        supportsRecurring: true,
-        supportsMonthlyPayment: true,
-        cssClass: 'union-pay'
-    }],
-    
     /**
     * Update the state when a payment has been received to show their new Pro Level
     * @param {Object} actionPacket The action packet {'a':'psts', 'p':<prolevel>, 'r':<s for success or f for failure>}
@@ -668,39 +630,77 @@ var proPage = {
      */
     loadPaymentGatewayOptions: function() {
 
-       var html = '';
+        // Payment gateways, hardcoded for now, may call API in future to get list
+        var gatewayOptions = [
+        {
+            apiGatewayId: 8,
+            displayName: l[6952],           // Credit card
+            supportsRecurring: true,        // If subscriptions are possible
+            supportsMonthlyPayment: true,   // If you can pay for 1 month at a time
+            cssClass: 'credit-card'
+        },
+        {
+            apiGatewayId: 4,
+            displayName: l[6802],           // Bitcoin
+            supportsRecurring: false,
+            supportsMonthlyPayment: true,
+            cssClass: 'bitcoin'
+        },
+        {
+            apiGatewayId: null,
+            displayName: l[504],            // Prepaid balance
+            supportsRecurring: false,
+            supportsMonthlyPayment: true,
+            cssClass: 'prepaid-balance'
+        },
+        {
+            apiGatewayId: null,
+            displayName: l[6198],           // Wire transfer
+            supportsRecurring: false,
+            supportsMonthlyPayment: false,  // Accept for 1 year one-time payment only
+            cssClass: 'wire-transfer'
+        },
+        {
+            apiGatewayId: 5,
+            displayName: l[7109],           // UnionPay
+            supportsRecurring: false,
+            supportsMonthlyPayment: true,
+            cssClass: 'union-pay'
+        }];
 
-       // Loop through gateway providers (change to use list from API soon)
-       for (var i = 0, length = proPage.gatewayOptions.length; i < length; i++) {
+        var html = '';
 
-           var gatewayOption = proPage.gatewayOptions[i];
-           var optionChecked = '', classChecked = '';
+        // Loop through gateway providers (change to use list from API soon)
+        for (var i = 0, length = gatewayOptions.length; i < length; i++) {
 
-           // Pre-select the first option in the list
-           if (!html) {
-               optionChecked = 'checked="checked" ';
-               classChecked = ' checked';
-           }
+            var gatewayOption = gatewayOptions[i];
+            var optionChecked = '', classChecked = '';
 
-           // If their prepay balance is less than 0 don't show that option
-           if ((gatewayOption.cssClass === 'prepaid-balance') && (parseFloat(pro_balance) <= 0)) {
-               continue;
-           }
+            // Pre-select the first option in the list
+            if (!html) {
+                optionChecked = 'checked="checked" ';
+                classChecked = ' checked';
+            }
 
-           // Create a radio button with icon for each payment gateway
-           html += '<div class="payment-method">'
-                +      '<div class="membership-radio' + classChecked + '">'
-                +          '<input type="radio" name="' + gatewayOption.cssClass + '" id="' + gatewayOption.cssClass + '" ' + optionChecked + ' value="' + gatewayOption.cssClass + '" data-recurring="' + gatewayOption.supportsRecurring + '"  data-supports-monthly-payment="' + gatewayOption.supportsMonthlyPayment + '" />'
-                +          '<div></div>'
-                +      '</div>'
-                +      '<div class="membership-radio-label ' + gatewayOption.cssClass + '">'
-                +          gatewayOption.displayName
-                +      '</div>'
-                +  '</div>';
-       }
+            // If their prepay balance is less than 0 don't show that option
+            if ((gatewayOption.cssClass === 'prepaid-balance') && (parseFloat(pro_balance) <= 0)) {
+                continue;
+            }
 
-       // Change radio button states when clicked
-       proPage.initPaymentMethodRadioOptions(html);
+            // Create a radio button with icon for each payment gateway
+            html += '<div class="payment-method">'
+                 +      '<div class="membership-radio' + classChecked + '">'
+                 +          '<input type="radio" name="' + gatewayOption.cssClass + '" id="' + gatewayOption.cssClass + '" ' + optionChecked + ' value="' + gatewayOption.cssClass + '" data-recurring="' + gatewayOption.supportsRecurring + '"  data-supports-monthly-payment="' + gatewayOption.supportsMonthlyPayment + '" />'
+                 +          '<div></div>'
+                 +      '</div>'
+                 +      '<div class="membership-radio-label ' + gatewayOption.cssClass + '">'
+                 +          gatewayOption.displayName
+                 +      '</div>'
+                 +  '</div>';
+        }
+
+        // Change radio button states when clicked
+        proPage.initPaymentMethodRadioOptions(html);
     },
     
     /**

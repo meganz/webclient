@@ -3544,6 +3544,7 @@
     "7135": "minuutti",
     "7136": "sekuntia",
     "7137": "sekunti",
-    "7138": "MEGAsync is being downloaded to your computer. Please install it as soon as the download has completed.",
-    "7139": "Once MEGAsync is running, your file will start downloading automatically."
+    "7138": "MEGAsync -ohjelmaa ladataan tietokoneellesi. Ole hyv\u00e4 ja asenna se heti kun lataus on valmistunut.",
+    "7139": "Tiedostolataus alkaa heti MEGAsyncin ollessa k\u00e4ynniss\u00e4.",
+    "7140": "An unknown error occurred. Please try again later."
 }

@@ -3545,5 +3545,6 @@
     "7136": "seconds",
     "7137": "second",
     "7138": "MEGAsync is being downloaded to your computer. Please install it as soon as the download has completed.",
-    "7139": "Once MEGAsync is running, your file will start downloading automatically."
+    "7139": "Once MEGAsync is running, your file will start downloading automatically.",
+    "7140": "An unknown error occurred. Please try again later."
 }

@@ -659,14 +659,14 @@ var proPage = {
             supportsRecurring: false,
             supportsMonthlyPayment: false,  // Accept for 1 year one-time payment only
             cssClass: 'wire-transfer'
-        },
+        }/*,
         {
             apiGatewayId: 5,
             displayName: l[7109],           // UnionPay
             supportsRecurring: false,
             supportsMonthlyPayment: true,
             cssClass: 'union-pay'
-        }];
+        }*/];
 
         var html = '';
 

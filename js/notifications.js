@@ -656,14 +656,14 @@ var notifyPopup = {
         // If the other user deleted their contact request to the current user
         if (typeof notification.notificationObj.dts != 'undefined') {
             type = 'contactDeleted';
-            message = 'Cancelled their contact request';
+            message = l[7151];      // Cancelled their contact request
             pendingContactHtml = '';
         }
 
         // If the other user sent a reminder about their contact request
         else if (typeof notification.notificationObj.rts != 'undefined') {
             type = 'contactRequest';
-            message = 'Reminder: you have a contact request';
+            message = l[7150];      // Reminder: you have a contact request
         }
         else {
             // Creates notification with "Sent you a contact request" with 'Not now' & 'Accept' buttons
@@ -722,15 +722,15 @@ var notifyPopup = {
         // If the user deleted the request
         if (action === 1) {
             type = 'contactRequestIgnored';
-            message = 'You ignored a contact request';
+            message = l[7149];      // You ignored a contact request
         }
         else if (action === 2) {
             type = 'contactAccepted';
-            message = 'You accepted a contact request';
+            message = l[7148];      // You accepted a contact request
         }
         else if (action === 3) {
             type = 'contactRequestDenied';
-            message = 'You denied a contact request';
+            message = l[7147];      // You denied a contact request
         }
         else {
             return false;
@@ -756,19 +756,19 @@ var notifyPopup = {
         // If the user deleted the request
         if (action === 0) {
             type = 'contactDeleted';
-            message = 'Deleted you as a contact';
+            message = l[7146];      // Deleted you as a contact
         }
         else if (action === 1) {
             type = 'contactAccepted';
-            message = 'You are both now contacts';
+            message = l[7145];       // You are now both contacts
         }
         else if (action === 2) {
             type = 'contactDeleted';
-            message = 'Account has been deleted/deactivated';
+            message = l[7144];       // Account has been deleted/deactivated
         }
         else if (action === 3) {
             type = 'contactBlocked';
-            message = 'Blocked you as a contact';
+            message = l[7143];      // Blocked you as a contact
         }
 
         return notifyPopup.getNotificationHtml(notification.id, type, message, timestamp, notification.read, null, email);
@@ -786,11 +786,11 @@ var notifyPopup = {
         var proLevel = actionPacket.p;
         var proPlan = getProPlan(proLevel);
         var success = (actionPacket.r === 's') ? true : false;
-        var message = 'Your payment for the ' + proPlan + ' plan was unsuccessful.';
+        var message = l[7141].replace('%1', proPlan);   // Your payment for the PRO II plan was unsuccessful.
         var type = 'proPayment';
 
         if (success) {
-            message = 'Your payment for the ' + proPlan + ' plan was received.';
+            message = l[7142].replace('%1', proPlan);   // Your payment for the PRO III plan was received.
         }
 
         return notifyPopup.getNotificationHtml(notification.id, type, message, timestamp, notification.read, null);

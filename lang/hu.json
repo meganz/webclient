@@ -3546,5 +3546,16 @@
     "7137": "m\u00e1sodperc",
     "7138": "MEGAsync let\u00f6lt\u00e9sre fog ker\u00fclni a sz\u00e1m\u00edt\u00f3g\u00e9pedre. K\u00e9rj\u00fck telep\u00edtsd, amint befejez\u0151d\u00f6tt a let\u00f6lt\u00e9s.",
     "7139": "Amint elindul a MEGAsync, let\u00f6lt\u00e9sed automatikusan el fog indulni.",
-    "7140": "An unknown error occurred. Please try again later."
+    "7140": "An unknown error occurred. Please try again later.",
+    "7141": "Your payment for the %1 plan was unsuccessful.",
+    "7142": "Your payment for the %1 plan was received.",
+    "7143": "Blocked you as a contact",
+    "7144": "Account has been deleted\/deactivated",
+    "7145": "You are now both contacts",
+    "7146": "Deleted you as a contact",
+    "7147": "You denied a contact request",
+    "7148": "You accepted a contact request",
+    "7149": "You ignored a contact request",
+    "7150": "Reminder: you have a contact request",
+    "7151": "Cancelled their contact request"
 }

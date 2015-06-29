@@ -23410,7 +23410,8 @@ body.pro:after {
 	display: inline-block;
 }
 .megasync-table table span.tick {
-	background-position: -4px -1768px;
+    background-position: -4px -1768px;
+    text-transform: uppercase;
 }
 .megasync-table table span.dots {
 	background-position: -3px -1648px;

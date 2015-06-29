@@ -335,6 +335,7 @@ var mBroadcaster = {
             if (this.handle) {
                 this.eTag = this.eTag.split(this.handle).shift();
             }
+            this.slaves = [];
             this.handle = u_handle;
             this.eTag += u_handle + '!';
 
@@ -391,17 +392,17 @@ var mBroadcaster = {
             var wasMaster = this.master;
             if (wasMaster) {
                 localStorage['mCrossTabRef_' + u_handle] = this.master;
-                this.notify('leaving', this.master);
                 delete this.master;
             } else {
                 if (d) console.log('crossTab leaving');
             }
             this.unlisten();
+            this.notify('leaving', wasMaster || -1);
             mBroadcaster.sendMessage('crossTab:leave', wasMaster);
         },
 
         notify: function crossTab_notify(msg, data) {
-            data = { origin: this.ctID, data: data || Math.random()};
+            data = { origin: this.ctID, data: data, sid: Math.random()};
             localStorage.setItem(this.eTag + msg, JSON.stringify(data));
             if (d) console.log('crossTab Notifying', this.eTag + msg, localStorage[this.eTag + msg]);
         },
@@ -444,9 +445,14 @@ var mBroadcaster = {
 
             switch (msg) {
                 case 'ping':
+                    this.slaves.push(strg.origin);
                     this.notify('pong');
                     break;
                 case 'leaving':
+                    var idx = this.slaves.indexOf(strg.origin);
+                    if (idx !== -1) {
+                        this.slaves.splice(idx, 1);
+                    }
                     if (localStorage['mCrossTabRef_' + u_handle] === strg.data) {
                         if (d) console.log('Taking crossTab-master ownership');
                         delete localStorage['mCrossTabRef_' + u_handle];

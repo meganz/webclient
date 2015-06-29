@@ -2882,6 +2882,30 @@ mega.utils.abortTransfers = function megaUtilsAbortTransfers() {
  *  will perform a former normal cloud reload.
  */
 mega.utils.reload = function megaUtilsReload() {
+    function _reload() {
+        var u_sid = u_storage.sid,
+            u_key = u_storage.k,
+            privk = u_storage.privk,
+            debug = !!u_storage.d;
+
+        localStorage.clear();
+        sessionStorage.clear();
+
+        u_storage.sid = u_sid;
+        u_storage.privk = privk;
+        u_storage.k = u_key;
+        u_storage.wasloggedin = true;
+
+        if (debug) {
+            u_storage.d = u_storage.dd = true;
+            if (!is_extension) {
+                u_storage.jj = true;
+            }
+        }
+
+        location.reload(true);
+    }
+
     if (u_type !== 3) {
         stopsc();
         stopapi();
@@ -2893,44 +2917,82 @@ mega.utils.reload = function megaUtilsReload() {
     }
     else {
         // Show message that this operation will destroy and reload the data stored by MEGA in the browser
-        var msg = l[6995];
-        msgDialog('confirmation', l[761], msg, l[6994], function(doIt) {
+        msgDialog('confirmation', l[761], l[6995], l[6994], function(doIt) {
             if (doIt) {
-                mega.utils.abortTransfers().then(function() {
-                    loadingDialog.show();
-                    stopsc();
-                    stopapi();
+                if (!mBroadcaster.crossTab.master || mBroadcaster.crossTab.slaves.length) {
+                    msgDialog('warningb', l[882], 'Please close all other browser windows/tabs with MEGA loaded in them before procedding.');
+                }
+                if (mBroadcaster.crossTab.master) {
+                    mega.utils.abortTransfers().then(function() {
+                        loadingDialog.show();
+                        stopsc();
+                        stopapi();
 
-                    MegaDB.dropAllDatabases(/*u_handle*/)
-                        .always(function(r) {
-                            var u_sid = u_storage.sid,
-                                u_key = u_storage.k,
-                                privk = u_storage.privk,
-                                debug = !!u_storage.d;
-
-                            console.debug('dropAllDatabases', r);
-
-                            localStorage.clear();
-                            sessionStorage.clear();
-
-                            u_storage.sid = u_sid;
-                            u_storage.privk = privk;
-                            u_storage.k = u_key;
-                            u_storage.wasloggedin = true;
-
-                            if (debug) {
-                                u_storage.d = u_storage.dd = true;
-                                if (!is_extension) {
-                                    u_storage.jj = true;
-                                }
-                            }
-
-                            location.reload(true);
-                        });
-                });
+                        MegaPromise.allDone([
+                            MegaDB.dropAllDatabases(/*u_handle*/),
+                            mega.utils.clearFileSystemStorage()
+                        ]).then(function(r) {
+                                console.debug('megaUtilsReload', r);
+                                _reload();
+                            });
+                    });
+                }
             }
         });
     }
+};
+
+/**
+ * Clear the data on FileSystem storage.
+ *
+ * mega.utils.clearFileSystemStorage().always(console.debug.bind(console));
+ */
+mega.utils.clearFileSystemStorage = function megaUtilsClearFileSystemStorage() {
+    function _done(status) {
+        if (promise) {
+            if (status !== 0x7ffe) {
+                promise.reject(status);
+            }
+            else {
+                promise.resolve();
+            }
+            promise = undefined;
+        }
+    }
+
+    if (is_chrome_firefox || !window.requestFileSystem) {
+        return MegaPromise.resolve();
+    }
+
+    setTimeout(_done, 4000);
+
+    var promise = new MegaPromise();
+
+    (function _clear(storagetype) {
+        function onInitFs(fs) {
+            var dirReader = fs.root.createReader();
+            dirReader.readEntries(function (entries) {
+                for (var i = 0, entry; entry = entries[i]; ++i) {
+                    if (entry.isDirectory && entry.name === 'mega') {
+                        console.debug('Cleaning storage...', entry);
+                        entry.removeRecursively(_next.bind(null, 0x7ffe), _next);
+                        break;
+                    }
+                }
+            });
+        }
+        function _next(status) {
+            if (storagetype === 0) {
+                _clear(1);
+            }
+            else {
+                _done(status);
+            }
+        }
+        window.requestFileSystem(storagetype, 1024, onInitFs, _next);
+    })(0);
+
+    return promise;
 };
 
 /**

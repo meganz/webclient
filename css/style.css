@@ -15611,7 +15611,7 @@ div.membership-bott-button {
 	background-image: url(../images/mega/download-sprite-v1.png);
 	background-position: 33px -1110px;
 	background-repeat: no-repeat;
-	margin-top: 6px;
+	margin-top: 4px;
 }
 .new-download-right-block {
 	margin-left: 299px;
@@ -15693,11 +15693,11 @@ div.membership-bott-button {
 	line-height: 34px;
 	padding: 0 0 0 36px;
 	cursor: pointer;
-	font-family: 'source_sans_proregular';
+	font-family: 'source_sans_prosemibold';
 	margin-top: 12px;
 }
 .new-download-red-button:hover {
-	color: #D90007;
+	color: #2BA6DE;
 	background-position: -2px -1423px;
 }
 .new-download-gray-button {
@@ -15808,7 +15808,7 @@ div.membership-bott-button {
 	display: none;
 }
 .download-complete-icon {
-	background-position: -158px -646px;
+	background-position: -159px -646px;
 }
 .download-complete .download-complete-icon {
 	display: block;
@@ -23413,7 +23413,7 @@ body.pro:after {
 	background-position: -4px -1768px;
 }
 .megasync-table table span.dots {
-	background-position: -5px -1648px;
+	background-position: -3px -1648px;
 }
 .megasync-table table span.globe {
 	background-position: -2px -1577px;

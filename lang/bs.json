@@ -2784,7 +2784,7 @@
     "6375": "Mi obezbe\u0111ujemo posve\u0107ene [A]aplikacije[\/A] za Va\u0161 mobitel, uklju\u010duju\u0107i [B]iOS[\/B], [C]Android[\/C], Windows Phone i BlackBerry.",
     "6376": "Iz razloga \u0161to server ne mo\u017ee vidjeti nazive fajlova, koliziju imena fajlova mora da bude default na client side. Sa standardnim pode\u0161avanjima, ako Vi otpremite fajl koji ve\u0107 vidite da imate na Va\u0161em nalogu (isti ciljani put\/ime fajla, ista veli\u010dina, isto posljednje vrijeme modifikacije), bi\u0107e presko\u010deno, ali ni\u0161ta ne mo\u017ee da sprije\u010di da \u010duvate vi\u0161e fajlova ili foldera sa istim imenom u istom folderu.",
     "6377": "Ukoliko ne \u017eelite da imate vi\u0161estruke kopije istog fajla idite na Meni - Moj Nalog - Pode\u0161avanja i otka\u010dite 'Presko\u010di identi\u010dne fajlove prilikom otpremanja'.",
-    "6378": "You can relate bandwidth to the width of a highway, which then has multiple lanes for cars, depending on the width of the highway = maximum channel capacity at any given time of performing an upload or a download. The speed (of downloads\/uploads) can be related to the speed of the cars. That is dependent on the state and speed of your computer, software, OS and versions, browsers and versions and your ISP provider. With Mega, you can control the 'speed' of downloads or of uploads, depending on your priorities in 'My Account' - 'Transfer Settings'.",
+    "6378": "You can relate bandwidth to the width of a highway, which has multiple lanes for cars, depending on the width of the highway = maximum channel capacity at any given time of performing an upload or a download. The speed (of downloads\/uploads) can be related to the speed of the cars. That is dependent on the state and speed of your computer, software, OS and versions, browsers and versions and your ISP provider. With MEGA, you can control the speed of your uploads in 'My Account' - 'Transfer Settings'.",
     "6379": "MEGA propusnost opsijega = totalna koli\u010dina podataka, tipi\u010dno izmjerena u MegaBytes ili GigaBytes, tako da mogu biti preuzeti ili otpremljeni sa odre\u0111ene web stranice ili naloga web hostinga tokom datog mjeseca. To je frekvencija mre\u017ene konekcije izme\u0111u lokalnog i daljinskog sistema upravljanja (daljinski sistem je Va\u0161 ISP), i Va\u0161a brzina ne mo\u017ee biti prekora\u010dena zbog frekvencije bez promjene frekvencije (koja per se ne mijenja frekvenciju ve\u0107 du\u017eina talasa).",
     "6380": "Na\u0161 besplatni nalog ima dinami\u010dki propusni opsijeg dostupnosti i startuje sa 10 GB i raste 30 minuta nakog logovanja",
     "6381": "PRO I nalog kapacitet propusnog opsijega je 1 TB mjese\u010dno (12 TB godi\u0161nje)",
@@ -3562,5 +3562,6 @@
     "7153": "Light",
     "7154": "You can close this tab, your download is managed from another tab where you have your file manager open.",
     "7155": "Download through your browser",
-    "7156": "You can also pay via the Google Play Store, Apple App Store or Android mobile carrier billing when using our [A]MEGA apps[\/A]."
+    "7156": "You can also pay via the Google Play Store, Apple App Store or Android mobile carrier billing when using our [A]MEGA apps[\/A].",
+    "7157": "Please close all other browser windows\/tabs which are running MEGA before proceeding."
 }

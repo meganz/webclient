@@ -3381,8 +3381,7 @@ function MegaData()
                                 done: function(res, ctx) {
                                     if (res.r && res.r[0] === 0) {
 
-                                        // ToDo: timestamp ts can be different here and on server side, check how this influence execution
-                                        M.nodeShare(ctx.fln, {h: ctx.fln, r: 0, u: 'EXP', ts: Math.floor(Date.now() / 1000)});
+                                        M.nodeShare(ctx.fln, {h: ctx.fln, r: 0, u: 'EXP', ts: getServerTime()});
                                     }
                                     getFolderLinks();
                                 }
@@ -5366,79 +5365,62 @@ function doShare(h, targets, dontShowShareDialog) {
     nodeids = fm_getnodes(h);
     nodeids.push(h);
 
-    api_setshare(h, targets, nodeids,
-        {
-            t: targets,
-            h: h,
-            done: function(res, ctx) {
-                var i;
+    api_setshare(h, targets, nodeids, {
+        t: targets,
+        h: h,
+        done: function(res, ctx) {
 
-                if (res.r && res.r[0] == '0') {
-                    for (i in res.u) {
-                        M.addUser(res.u[i]);
-                    }
+            // Loose comparasion is important
+            if (res.r && res.r[0] == '0') {
+                for (var i in res.u) {
+                    M.addUser(res.u[i]);
+                }
 
-                    for (i in res.r) {
-                        if (res.r[i] == 0) {
-                            var rights = ctx.t[i].r;
-                            var user = ctx.t[i].u;
+                for (var k in res.r) {
+                    if (res.r[k] === 0) {
+                        var rights = ctx.t[k].r;
+                        var user = ctx.t[k].u;
 
-                            if (user.indexOf('@') >= 0) {
-                                user = getuid(ctx.t[i].u);
-                            }
+                        if (user.indexOf('@') >= 0) {
+                            user = getuid(ctx.t[k].u);
+                        }
 
-                            // A pending share may not have a corresponding user and should not be added
-                            // A pending share can also be identified by a user who is only a '0' contact
-                            // level (passive)
-                            if (M.u[user] && M.u[user].c != 0) {
-                                M.nodeShare(ctx.h, {h: h, r: rights, u: user, ts: Math.floor(new Date().getTime() / 1000)});
-                                setLastInteractionWith(user, "0:" + unixtime());
-                            }
-                            else if (d) {
-                                console.log('doshare: invalid user', user, M.u[user], ctx.t[i]);
-                            }
+                        // A pending share may not have a corresponding user and should not be added
+                        // A pending share can also be identified by a user who is only a '0' contact
+                        // level (passive)
+                        if (M.u[user] && M.u[user].c !== 0) {
+                            M.nodeShare(ctx.h, {
+                                h: h,
+                                r: rights,
+                                u: user,
+                                ts: getServerTime()
+                            });
+                            setLastInteractionWith(user, "0:" + getServerTime());
+                        }
+                        else if (d) {
+                            console.log('doshare: invalid user', user, M.u[user], ctx.t[k]);
                         }
                     }
-                    if (dontShowShareDialog != true) {
-                        $('.fm-dialog.share-dialog').removeClass('hidden');
-                    }
-                    loadingDialog.hide();
-                    M.renderShare(h);
-
-                    if (dontShowShareDialog != true) {
-                        shareDialog();
-                    }
-                    $promise.resolve();
-                } else {
-                    $('.fm-dialog.share-dialog').removeClass('hidden');
-                    loadingDialog.hide();
-                    $promise.reject(res);
                 }
+                if (dontShowShareDialog !== true) {
+                    $('.fm-dialog.share-dialog').removeClass('hidden');
+                }
+                loadingDialog.hide();
+                M.renderShare(h);
+
+                if (dontShowShareDialog !== true) {
+                    shareDialog();
+                }
+                $promise.resolve();
             }
-        });
-    return $promise;
-}
-
-
-// ToDo: Absolute, not used
-function doshare2(nodeHandle, t, dontShowShareDialog, msg)
-{
-    // ToDo: wait for msg and implement it
-    var $promise = new MegaPromise();
-
-    nodeids = fm_getnodes(nodeHandle);
-    nodeids.push(nodeHandle);
-
-    api_setshare2(nodeHandle, t, nodeids,
-        {
-            t: t,
-            h: nodeHandle,
-            done: function(res, ctx)
-            {
-                //ToDo: Handle response codes
-                // All updates to variables should be made in execsc(..)
+            else {
+                $('.fm-dialog.share-dialog').removeClass('hidden');
+                loadingDialog.hide();
+                $promise.reject(res);
             }
-        });
+        }
+    });
+    
     return $promise;
 }
 

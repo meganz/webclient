@@ -288,6 +288,7 @@ MegaSync.prototype.handle = function(response) {
     if (response === 0) {
         // alright!
         clearInterval(this._retryTimer);
+        $('body').unbind('keyup');
         return $('.megasync-overlay').hide().removeClass('downloading');
     }
 
@@ -324,8 +325,15 @@ MegaSync.prototype.downloadClient = function() {
         this._api({a: "v"});
     }).bind(this), 500);
     overlay.show().addClass('downloading');
-    $('.megasync-close').bind('click', function(e) {
+    
+    $('.megasync-close').rebind('click', function(e) {
         $('.megasync-overlay').hide();
+    });
+    
+    $('body').bind('keyup', function(e) {
+        if (e.keyCode == 27) {
+            $('.megasync-overlay').hide();
+        }
     });
 
     if (url === '') {

@@ -3415,7 +3415,7 @@ function MegaData()
                                 done: function(res, ctx) {
                                     if (res.r && res.r[0] === 0) {
 
-                                        M.nodeShare(ctx.fln, {h: ctx.fln, r: 0, u: 'EXP', ts: getServerTime()});
+                                        M.nodeShare(ctx.fln, {h: ctx.fln, r: 0, u: 'EXP', ts: unixtime()});
                                     }
                                     getFolderLinks();
                                 }
@@ -5439,9 +5439,9 @@ function doShare(h, targets, dontShowShareDialog) {
                                 h: h,
                                 r: rights,
                                 u: user,
-                                ts: getServerTime()
+                                ts: unixtime()
                             });
-                            setLastInteractionWith(user, "0:" + getServerTime());
+                            setLastInteractionWith(user, "0:" + unixtime());
                         }
                         else if (d) {
                             console.log('doshare: invalid user', user, M.u[user], ctx.t[k]);

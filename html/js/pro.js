@@ -19,15 +19,20 @@ function init_pro()
     else {
         $('body').addClass('pro');
     }
-
-    if (u_type == 3)
-    {
-        // Flag 'pro : 1' includes pro balance in the response
-        api_req({ a : 'uq', pro : 1 }, {
-            callback : function (res)
-            {
-                if (typeof res == 'object' && res.balance && res.balance[0]) {
-                    pro_balance = res.balance[0][0];
+    
+    if (u_type == 3) {
+        
+        // Flag 'pro: 1' includes pro balance in the response
+        // Flag 'strg: 1' includes current account storage in the response
+        api_req({ a: 'uq', strg: 1, pro: 1 }, {
+            callback : function (result) {
+                
+                // Store current account storage usage for checking later
+                proPage.currentStorageBytes = result.cstrg;
+                
+                // Get account balance
+                if (typeof result == 'object' && result.balance && result.balance[0]) {
+                    pro_balance = result.balance[0][0];
                 }
             }
         });
@@ -45,6 +50,36 @@ function init_pro()
 
     if (!m)
     {
+        $('.membership-step1 .membership-button').rebind('click', function() {
+            
+            var $planBlocks = $('.reg-st3-membership-bl');
+            var $selectedPlan = $(this).closest('.reg-st3-membership-bl');
+            var $stageTwoSelectedPlan = $('.membership-selected-block');
+
+            $planBlocks.removeClass('selected');
+            $selectedPlan.addClass('selected');
+
+            account_type_num = $selectedPlan.attr('data-payment');
+            
+            // Clear to prevent extra clicks showing multiple
+            $stageTwoSelectedPlan.html($selectedPlan.clone());
+            
+            var proPlanName = $selectedPlan.find('.reg-st3-bott-title.title').html();
+            $('.membership-step2 .pro span').html(proPlanName);
+            
+            // Update header text with plan
+            var $selectedPlanHeader = $('.membership-step2 .main-italic-header.pro');
+            var selectedPlanText = $selectedPlanHeader.html().replace('%1', proPlanName);
+            $selectedPlanHeader.html(selectedPlanText);
+            
+            pro_next_step();
+            return false;
+        });
+        
+        // Show loading spinner because some stuff may not be rendered properly yet, or
+        // it may quickly switch to the pro_payment_method page if they have preselected a plan
+        loadingDialog.show();
+        
         // Get the membership plans. This call will return an array of arrays. Each array contains this data:
         // [api_id, account_level, storage, transfer, months, price, currency, description, ios_id, google_id]
         // More data can be retrieved with 'f : 1'
@@ -55,9 +90,20 @@ function init_pro()
                 membershipPlans = result;
 
                 // Render the plan details
-                populateMembershipPlans();
-
-                if (pro_do_next) pro_do_next();
+                proPage.populateMembershipPlans();
+                
+                // Check which plans are applicable or grey them out if not
+                proPage.checkApplicablePlans();
+                
+                // Check if they have preselected the plan (e.g. from bandwidth dialog) and go straight to the next step
+                proPage.checkForPreselectedPlan();
+                                
+                if (pro_do_next) {
+                    pro_do_next();
+                }
+                
+                // Close loading spinner
+                loadingDialog.hide();
             }
         });
 
@@ -98,27 +144,6 @@ function init_pro()
             return false;
         });
 
-        $('.membership-button').unbind('click');
-        $('.membership-button').bind('click',function(e)
-        {
-            var $membershipBlock = $(this).closest('.reg-st3-membership-bl');
-
-            $('-reg-st3-membership-bl').removeClass('selected');
-            $membershipBlock.addClass('selected');
-
-            account_type_num = $membershipBlock.attr('data-payment');
-            $membershipBlock.clone().appendTo( '.membership-selected-block');
-            var proPlanName = $membershipBlock.find('.reg-st3-bott-title.title').html();
-            $('.membership-step2 .pro span').html(proPlanName);
-            
-            // Update header text with plan
-            var $selectedPlanHeader = $('.membership-step2 .main-italic-header.pro');
-            var selectedPlanText = $selectedPlanHeader.html().replace('%1', proPlanName);
-            $selectedPlanHeader.html(selectedPlanText);
-            
-            pro_next_step();
-        });
-
         $('.pro-bottom-button').unbind('click');
         $('.pro-bottom-button').bind('click',function(e)
         {
@@ -127,129 +152,15 @@ function init_pro()
     }
 }
 
-/**
- * Populate the monthly plans across the main #pro page
- */
-function populateMembershipPlans() {
-
-    for (var i = 0, length = membershipPlans.length; i < length; i++) {
-
-        var accountLevel = membershipPlans[i][1];
-        var months = membershipPlans[i][4];
-        var price = membershipPlans[i][5].split('.');
-        var dollars = price[0];
-        var cents = price[1];
-
-        if (months === 1) {
-            $('.reg-st3-membership-bl.pro' + accountLevel + ' .price .num').html(
-                dollars + '<span class="small">.' + cents + ' &euro;</span>'
-            );
-        }
-    }
-}
-
-/**
- * Loads the payment gateway options into Payment options section
- */
-function loadPaymentGatewayOptions() {
-
-    // Payment gateways, hardcoded for now, will call API in future to get list
-    var gatewayOptions = [
-    {
-        apiGatewayId: 8,                // Credit card provider
-        displayName: l[6952],           // Credit card
-        supportsRecurring: true,
-        cssClass: 'credit-card'
-    },
-    {
-        apiGatewayId: 4,                // Bitcoin provider
-        displayName: l[6802],           // Bitcoin
-        supportsRecurring: false,
-        cssClass: 'bitcoin'
-    },
-    {
-        apiGatewayId: null,
-        displayName: l[504],            // Prepaid balance
-        supportsRecurring: false,
-        cssClass: 'prepaid-balance'
-    }
-    /*{
-        apiGatewayId: 5,                // Union Pay
-        displayName: 'Union Pay',       // Union Pay
-        supportsRecurring: true,
-        cssClass: 'union-pay'
-    },*/
-    ];
-    var html = '';
-
-    // Loop through gateway providers (change to use list from API soon)
-    for (var i = 0, length = gatewayOptions.length; i < length; i++) {
-
-        var gatewayOption = gatewayOptions[i];
-        var optionChecked = '', classChecked = '';
-
-        // Pre-select the first option in the list
-        if (!html) {
-            optionChecked = 'checked="checked" ';
-            classChecked = ' checked';
-        }
-
-        // If their prepay balance is less than 0 don't show that option
-        if ((gatewayOption.cssClass === 'prepaid-balance') && (parseFloat(pro_balance) <= 0)) {
-            continue;
-        }
-
-        // Create a radio button with icon for each payment gateway
-        html += '<div class="payment-method">'
-             +      '<div class="membership-radio' + classChecked + '">'
-             +          '<input type="radio" name="' + gatewayOption.cssClass + '" id="' + gatewayOption.cssClass + '" ' + optionChecked + ' value="' + gatewayOption.cssClass + '" data-recurring="' + gatewayOption.supportsRecurring + '" />'
-             +          '<div></div>'
-             +      '</div>'
-             +      '<div class="membership-radio-label ' + gatewayOption.cssClass + '">'
-             +          gatewayOption.displayName
-             +      '</div>'
-             +  '</div>';
-    }
-
-    // Change radio button states when clicked
-    initPaymentMethodRadioOptions(html);
-}
-
-/**
- * Change payment method radio button states when clicked
- * @param {String} html The radio button html
- */
-function initPaymentMethodRadioOptions(html) {
-
-    var paymentOptionsList = $('.payment-options-list');
-    paymentOptionsList.html(html);
-    paymentOptionsList.find('.payment-method').rebind('click', function() {
-
-        // Remove checked state from all radio inputs
-        paymentOptionsList.find('.membership-radio').removeClass('checked');
-        paymentOptionsList.find('input').prop('checked', false);
-
-        var $this = $(this);
-        var $bitcoinInstructions = $('.membership-center p');
-        
-        // Add checked state for this radio button
-        $this.find('input').prop('checked', true);        
-        $this.find('.membership-radio').addClass('checked');
-        
-        // Hide instructions below the purchase button if other option is selected
-        if ($this.find('.membership-radio-label').hasClass('bitcoin')) {
-            $bitcoinInstructions.removeClass('hidden');
-        }
-        else {
-            $bitcoinInstructions.addClass('hidden');
-        }
-        
-        updateTextDependingOnRecurring();
-    });
-}
 
 // Step2
 function pro_next_step() {
+
+    // Add history so the back button works to go back to choosing their plan
+    history.pushState('', 'MEGA - Choose plan', '#propay');
+
+    // Preload loading/transferring/processing animation
+    proPage.preloadAnimation();
 
     if (!u_handle) {
         megaAnalytics.log("pro", "loginreq");
@@ -269,8 +180,14 @@ function pro_next_step() {
         day = currentDate.getDate(),
         price = [];
 
-    loadPaymentGatewayOptions();
-    renderPlanDurationDropDown();
+    // Add hyperlink to mobile payment providers at top of #pro page step 2
+    var $otherPaymentProviders = $('.membership-step2 .other-payment-providers');
+    var html = $otherPaymentProviders.html().replace('[A]', '<a href="#mobile">').replace('[/A]', '</a>');
+    $otherPaymentProviders.html(html);
+
+    // Load payment methods and plan durations
+    proPage.loadPaymentGatewayOptions();
+    proPage.renderPlanDurationDropDown();
 
     $('.membership-step1').addClass('hidden');
     $('.membership-step2').removeClass('hidden');
@@ -305,7 +222,7 @@ function pro_next_step() {
             $('.membership-bott-price strong').html(price.split('.')[0] + '<span>.' + price.split('.')[1] + ' &euro;</span>');
         }
         
-        updateTextDependingOnRecurring();
+        proPage.updateTextDependingOnRecurring();
     });
     
     $('.membership-bott-button').rebind('click',function(e)
@@ -313,116 +230,6 @@ function pro_next_step() {
         pro_continue(e);
         return false;
     });
-}
-
-/**
- * Renders the pro plan prices into the Plan Duration dropdown
- */
-function renderPlanDurationDropDown() {
-
-    // Sort plan durations by lowest number of months first
-    membershipPlans.sort(function (planA, planB) {
-
-        var numOfMonthsPlanA = planA[4];
-        var numOfMonthsPlanB = planB[4];
-
-        if (numOfMonthsPlanA < numOfMonthsPlanB) {
-            return -1;
-        }
-        if (numOfMonthsPlanA > numOfMonthsPlanB) {
-            return 1;
-        }
-
-        return 0;
-    });
-
-    var html = '';
-
-    // Loop through the available plan durations for the current membership plan
-    for (var i = 0, length = membershipPlans.length; i < length; i++) {
-
-        var currentPlan = membershipPlans[i];
-
-        // If match on the membership plan, display that pricing option in the dropdown
-        if (currentPlan[1] == account_type_num) {
-
-            // Get the price and number of months duration
-            var price = currentPlan[5];
-            var numOfMonths = currentPlan[4];
-            var monthsWording = l[922];     // 1 month
-
-            // Change wording depending on number of months
-            if (numOfMonths === 12) {
-                monthsWording = l[923];     // 1 year
-            }
-            else if (numOfMonths > 1) {
-                monthsWording = l[6803].replace('%1', numOfMonths);     // x months
-            }
-
-            // Build select option
-            html += '<div class="membership-dropdown-item" data-plan-index="' + i + '">'
-                 +       monthsWording + ' (<strong>' + price + '</strong> &euro;)'
-                 +  '</div>';
-        }
-    }
-
-    // Update drop down HTML
-    $('.membership-st2-dropdown').html(html);
-    
-    // Select first option
-    var $durationSelect = $('.membership-st2-select');
-    var $firstOption = $durationSelect.find('.membership-dropdown-item:first-child');
-    $durationSelect.find('span').html($firstOption.html());
-    $firstOption.addClass('selected');
-    
-    // Get current plan price
-    var planIndex = $firstOption.attr('data-plan-index');
-    var currentPlan = membershipPlans[planIndex];
-    var price = currentPlan[5].split('.');
-    var dollars = price[0];
-    var cents = price[1];
-    
-    // Update main price at the bottom
-    var $mainPrice = $('.membership-bott-price');
-    $mainPrice.find('strong').html(dollars + '<span>.' + cents + ' &euro;</span>');
-    
-    updateTextDependingOnRecurring();
-}
-
-/**
- * Updates the text on the page depending on the payment option they've selected and 
- * the duration/period so it is accurate for a recurring subscription or one off payment.
- */
-function updateTextDependingOnRecurring() {
-    
-    // Update whether this selected option is recurring or one-time
-    var $durationSelect = $('.membership-st2-select');
-    var $durationOption = $durationSelect.find('.membership-dropdown-item.selected');
-    var $mainPrice = $('.membership-bott-price');
-    var recurring = ($('.payment-options-list input:checked').attr('data-recurring') === 'true') ? true : false;
-    var planIndex = $durationOption.attr('data-plan-index');
-    var currentPlan = membershipPlans[planIndex];
-    var numOfMonths = currentPlan[4];
-    var subscribeOrPurchase = (recurring) ? l[6172] : l[6190].toLowerCase();
-    var durationOrRenewal = (recurring) ? l[6977] : l[6817];
-    var getTwoMonthsFree = (recurring) ? l[6978] : l[1148];
-    
-    // Set to /month, /year or /one time next to the price
-    if (recurring && (numOfMonths === 1)) {
-        $mainPrice.find('.period').text('/' + l[913]);
-    }
-    else if (recurring && (numOfMonths > 1)) {
-        $mainPrice.find('.period').text('/' + l[932]);
-    }
-    else {
-        $mainPrice.find('.period').text('/' + l[6809]);
-    }
-    
-    // Update depending on recurring or one off payment
-    $('.membership-st2-head.choose-duration').html(durationOrRenewal);
-    $('.membership-bott-button').html(subscribeOrPurchase);
-    $('.membership-bott-descr').html(getTwoMonthsFree);
-    $('.payment-dialog .payment-buy-now').html(subscribeOrPurchase);
 }
 
 function pro_continue(e)
@@ -480,6 +287,9 @@ function pro_continue(e)
         if (pro_paymentmethod === 'credit-card') {
             cardDialog.init();
         }
+        else if (pro_paymentmethod === 'wire-transfer') {
+            wireTransferDialog.init();
+        }
         else {
             // For other methods we do a uts and utc call to get the provider details first
             pro_pay();
@@ -495,18 +305,18 @@ function pro_pay()
     }
 
     // Only show loading dialog if needing to setup bitcoin invoice
-    if (!ul_uploading && !downloading && (pro_paymentmethod === 'bitcoin')) {
+    if (pro_paymentmethod === 'bitcoin') {
         showLoadingDialog();
     }
     
     // Otherwise if credit card payment, show bouncing coin while loading
-    else if (!ul_uploading && !downloading && (pro_paymentmethod === 'credit-card')) {
-        cardDialog.showLoadingOverlay();
+    else if (pro_paymentmethod === 'credit-card') {
+        cardDialog.closeDialogAndShowProcessing();
     }
     
     // Otherwise if Union Pay payment, show bouncing coin while loading
-    else if (!ul_uploading && !downloading && (pro_paymentmethod === 'union-pay')) {
-        unionPay.showLoadingOverlay();
+    else if (pro_paymentmethod === 'union-pay') {
+        proPage.showLoadingOverlay('transferring');
     }
     
     // Data for API request
@@ -515,10 +325,9 @@ function pro_pay()
     var currency = selectedProPackage[6];
 
     // uts = User Transaction Sale
-    api_req({ a : 'uts', it: 0, si: apiId, p: price, c: currency, aff: aff, 'm': m },
-    {
-        callback : function (utsResult)
-        {
+    api_req({ a: 'uts', it: 0, si: apiId, p: price, c: currency, aff: aff, 'm': m }, {   
+        callback: function (utsResult) {
+            
             // Store the sale ID to check with API later
             saleId = utsResult;
             
@@ -541,14 +350,24 @@ function pro_pay()
                 else if (pro_paymentmethod === 'union-pay') {
                     pro_m = 5;
                 }
+                
+                // Update the last payment provider ID for the 'psts' action packet. If the provider e.g. bitcoin 
+                // needs a redirect after confirmation action packet it will redirect to the account page.
+                proPage.lastPaymentProviderId = pro_m;
 
                 var proref = '';
                 if (sessionStorage.proref) {
                     proref = sessionStorage.proref;
                 }
+                
+                // Convert from boolean to integer for API
+                var fromBandwidthDialog = (localStorage.seenBandwidthDialog) ? 1 : 0;
 
                 // utc = User Transaction Complete
-                api_req({ a : 'utc', s : [saleId], m : pro_m, r: proref },
+                // s = sale ID
+                // m = pro number
+                // bq = bandwidth quota triggered
+                api_req({ a : 'utc', s: [saleId], m: pro_m, r: proref, bq: fromBandwidthDialog },
                 {
                     callback : function (utcResult)
                     {
@@ -607,17 +426,598 @@ function pro_pay()
 }
 
 /**
+ * Functions for the pro page in general
+ * More code to be refactored into here over time
+ */
+var proPage = {
+    
+    // From bandwidth quota dialog
+    fromBandwidthDialog: false,
+    
+    // The last payment provider ID used
+    lastPaymentProviderId: null,
+    
+    // The user's current storage in bytes
+    currentStorageBytes: 0,
+    
+    // Overlay for loading/processing/redirecting
+    $backgroundOverlay: null,
+    $loadingOverlay: null,
+        
+    /**
+    * Update the state when a payment has been received to show their new Pro Level
+    * @param {Object} actionPacket The action packet {'a':'psts', 'p':<prolevel>, 'r':<s for success or f for failure>}
+    */
+    processPaymentReceived: function (actionPacket) {
+
+        // Check success or failure
+        var success = (actionPacket.r === 's') ? true : false;
+        
+        // Add a notification in the top bar
+        addNotification(actionPacket);
+        
+        // If their payment was successful, redirect to account page to show new Pro Plan
+        if (success) {
+
+            // Make sure it fetches new account data on reload
+            if (M.account) {
+                M.account.lastupdate = 0;
+            }
+
+            // If last payment was Bitcoin, we need to redirect to the account page
+            if (this.lastPaymentProviderId === 4) {
+                window.location.hash = 'fm/account';
+            }
+        }
+    },
+        
+    /**
+     * Check applicable plans for the user based on their current storage usage
+     */
+    checkApplicablePlans: function() {
+        
+        // If their account storage is not available (e.g. not logged in) all plan options will be shown
+        if (this.currentStorageBytes === 0) {
+            return false;
+        }
+        
+        var totalNumOfPlans = 4;
+        var numOfPlansNotApplicable = 0;
+        var currentStorageGigabytes = this.currentStorageBytes / 1024 / 1024 / 1024;
+        var $membershipStepOne = $('.membership-step1');
+        
+        // Loop through membership plans
+        for (var i = 0, length = membershipPlans.length; i < length; i++) {
+
+            // Get plan details
+            var accountLevel = parseInt(membershipPlans[i][1]);
+            var planStorageGigabytes = parseInt(membershipPlans[i][2]);
+            var months = parseInt(membershipPlans[i][4]);            
+
+            // If their current storage usage is more than the plan's grey it out
+            if ((months === 1) && (currentStorageGigabytes > planStorageGigabytes)) {
+                
+                // Grey out the plan
+                $membershipStepOne.find('.reg-st3-membership-bl.pro' + accountLevel).addClass('sub-optimal-plan');
+                
+                // Add count of plans that aren't applicable
+                numOfPlansNotApplicable++;
+            }
+        }
+        
+        // Show message to contact support
+        if (numOfPlansNotApplicable === totalNumOfPlans) {
+            
+            // Get current usage in TB and round to 3 decimal places
+            var currentStorageTerabytes = currentStorageGigabytes / 1024;
+                currentStorageTerabytes = Math.round(currentStorageTerabytes * 1000) / 1000;
+                currentStorageTerabytes = l[5816].replace('[X]', currentStorageTerabytes);
+            
+            // Show current storage usage and message
+            var $noPlansSuitable = $('.membership-step1 .no-plans-suitable');
+            $noPlansSuitable.removeClass('hidden');            
+            $noPlansSuitable.find('.current-storage .terabytes').text(currentStorageTerabytes);
+            
+            // Capitalize first letter
+            var currentStorageText = $noPlansSuitable.find('.current-storage .text').text();
+                currentStorageText = currentStorageText.charAt(0).toUpperCase() + currentStorageText.slice(1);
+            $noPlansSuitable.find('.current-storage .text').text(currentStorageText);
+            
+            // Replace text with proper link
+            var $linkText = $noPlansSuitable.find('.no-plans-suitable-text');
+            var newLinkText = $linkText.html().replace('[A]', '<a href="#contact">').replace('[/A]', '</a>');
+            $linkText.html(newLinkText);
+            
+            // Redirect to #contact
+            $noPlansSuitable.find('.btn-request-plan').rebind('click', function() {
+                document.location.hash = 'contact';
+            });            
+        }
+    },
+    
+    /**
+     * Checks if a plan has already been selected e.g. they came from the bandwidth quota dialog
+     * If they are from there, then preselect that plan and go to step two.
+     */
+    checkForPreselectedPlan: function() {
+        
+        var planNum = this.getUrlParam('planNum');
+        
+        // If the plan number is preselected
+        if (planNum) {
+            
+            // Set the selected plan
+            var $selectedPlan = $('.membership-step1 .reg-st3-membership-bl.pro' + planNum);
+            var $stageTwoSelectedPlan = $('.membership-step2 .membership-selected-block');
+
+            account_type_num = $selectedPlan.attr('data-payment');
+            
+            // Clear to prevent extra clicks showing multiple
+            $stageTwoSelectedPlan.html($selectedPlan.clone());
+            
+            var proPlanName = $selectedPlan.find('.reg-st3-bott-title.title').html();
+            $('.membership-step2 .pro span').html(proPlanName);
+            
+            // Update header text with plan
+            var $selectedPlanHeader = $('.membership-step2 .main-italic-header.pro');
+            var selectedPlanText = $selectedPlanHeader.html().replace('%1', proPlanName);
+            $selectedPlanHeader.html(selectedPlanText);
+                        
+            // Add history so the back button goes back to #pro page
+            history.pushState('', 'MEGA - Choose plan', '#pro');
+            
+            // Continue to step 2
+            pro_next_step();
+        }
+    },
+    
+    /**
+     * Gets a parameter from the URL e.g. https://mega.nz/#pro&planNum=4
+     * @param {String} paramToGet Name of the parameter to get e.g. 'planNum'
+     * @returns {String|undefined} Returns the string '4' if it exists, or undefined if not
+     */
+    getUrlParam: function(paramToGet) {
+        
+        var hash = location.hash.substr(1);
+        var index = hash.indexOf(paramToGet + '=');
+        var param = hash.substr(index).split('&')[0].split('=')[1];
+        
+        return param;
+    },
+    
+    /**
+     * Preloads the large loading animation so it displays immediately when shown
+     */
+    preloadAnimation: function() {
+        
+        this.$backgroundOverlay = $('.fm-dialog-overlay');
+        this.$loadingOverlay = $('.payment-processing');
+        
+        // Check if using retina display and preload loading animation
+        var retina = (window.devicePixelRatio > 1) ? '@2x' : '';
+        this.$loadingOverlay.find('.payment-animation').attr('src', staticpath + '/images/mega/payment-animation' + retina + '.gif');
+    },
+    
+    /**
+     * Generic function to show the bouncing megacoin icon while loading
+     * @param {String} messageType Which message to display e.g. 'processing', 'transferring'
+     */
+    showLoadingOverlay: function(messageType) {
+        
+        // Show the loading gif
+        this.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+        this.$loadingOverlay.removeClass('hidden');
+        
+        // Prevent clicking on the background overlay while it's loading, which makes 
+        // the background disappear and error triangle appear on white background
+        $('.fm-dialog-overlay.payment-dialog-overlay').rebind('click', function(event) {
+            event.stopPropagation();
+        });
+        
+        var message = '';
+        
+        // Choose which message to display underneath the animation
+        if (messageType === 'processing') {
+            message = l[6960];                  // Processing your payment...
+        }
+        else if (messageType === 'transferring') {
+            message = 'Transferring to payment provider...';    // Transferring to payment provider...
+        }
+        else if (messageType === 'loading') {
+            message = 'Loading...';             // Loading...
+        }
+        
+        // Display message
+        this.$loadingOverlay.find('.payment-animation-txt').html(message);
+    },
+    
+    /**
+     * Loads the payment gateway options into Payment options section
+     */
+    loadPaymentGatewayOptions: function() {
+        
+        // All payment gateways for the webclient with options
+        var gatewayOptions = [
+        {
+            apiGatewayId: 8,
+            displayName: l[6952],           // Credit card
+            supportsRecurring: true,        // If subscriptions are possible
+            supportsMonthlyPayment: true,   // If you can pay for 1 month at a time
+            cssClass: 'credit-card'
+        },
+        {
+            apiGatewayId: 4,
+            displayName: l[6802],           // Bitcoin
+            supportsRecurring: false,
+            supportsMonthlyPayment: true,
+            cssClass: 'bitcoin'
+        },
+        {
+            apiGatewayId: 0,
+            displayName: l[504],            // Prepaid balance
+            supportsRecurring: false,
+            supportsMonthlyPayment: true,
+            cssClass: 'prepaid-balance'
+        },
+        {
+            apiGatewayId: null,
+            displayName: l[6198],           // Wire transfer
+            supportsRecurring: false,
+            supportsMonthlyPayment: false,  // Accept 1 year, one-time payment only (wire transfer fees are expensive)
+            cssClass: 'wire-transfer'
+        },
+        {
+            apiGatewayId: 5,
+            displayName: l[7109],           // UnionPay
+            supportsRecurring: false,
+            supportsMonthlyPayment: true,
+            cssClass: 'union-pay'
+        }];
+        
+        // Do API request (User Forms of Payment Query) to get the valid list of currently active 
+        // payment providers. Returns an array of active payment providers e.g. [0,2,3,4,5,8].
+        api_req({ a: 'ufpq' }, {
+            callback: function (validGatewayIds) {
+                
+                // If an API error (negative number) exit early
+                if ((typeof validGatewayIds === 'number') && (validGatewayIds < 0)) {
+                    return false;
+                }
+                
+                var html = '';
+
+                // Loop through gateway providers (change to use list from API soon)
+                for (var i = 0, length = gatewayOptions.length; i < length; i++) {
+
+                    var gatewayOption = gatewayOptions[i];
+                    var optionChecked = '';
+                    var classChecked = '';
+
+                    // Pre-select the first option in the list
+                    if (!html) {
+                        optionChecked = 'checked="checked" ';
+                        classChecked = ' checked';
+                    }
+
+                    // If their prepay balance is less than 0 don't show that option
+                    if ((gatewayOption.apiGatewayId === 0) && (parseFloat(pro_balance) <= 0)) {
+                        continue;
+                    }
+                    
+                    // If it's not the wire transfer option and not in the list of enabled gateways skip it
+                    if ((gatewayOption.apiGatewayId !== null) && (validGatewayIds.indexOf(gatewayOption.apiGatewayId) === -1)) {
+                        continue;
+                    }
+
+                    // Create a radio button with icon for each payment gateway
+                    html += '<div class="payment-method">'
+                         +      '<div class="membership-radio' + classChecked + '">'
+                         +          '<input type="radio" name="' + gatewayOption.cssClass + '" id="' + gatewayOption.cssClass + '" ' + optionChecked + ' value="' + gatewayOption.cssClass + '" data-recurring="' + gatewayOption.supportsRecurring + '"  data-supports-monthly-payment="' + gatewayOption.supportsMonthlyPayment + '" />'
+                         +          '<div></div>'
+                         +      '</div>'
+                         +      '<div class="membership-radio-label ' + gatewayOption.cssClass + '">'
+                         +          gatewayOption.displayName
+                         +      '</div>'
+                         +  '</div>';
+                }
+
+                // Change radio button states when clicked
+                proPage.initPaymentMethodRadioOptions(html);                
+            }
+        });
+    },
+    
+    /**
+     * Renders the pro plan prices into the Plan Duration dropdown
+     */
+    renderPlanDurationDropDown: function() {
+
+        // Sort plan durations by lowest number of months first
+        membershipPlans.sort(function (planA, planB) {
+
+            var numOfMonthsPlanA = planA[4];
+            var numOfMonthsPlanB = planB[4];
+
+            if (numOfMonthsPlanA < numOfMonthsPlanB) {
+                return -1;
+            }
+            if (numOfMonthsPlanA > numOfMonthsPlanB) {
+                return 1;
+            }
+
+            return 0;
+        });
+
+        var html = '';
+
+        // Loop through the available plan durations for the current membership plan
+        for (var i = 0, length = membershipPlans.length; i < length; i++) {
+
+            var currentPlan = membershipPlans[i];
+
+            // If match on the membership plan, display that pricing option in the dropdown
+            if (currentPlan[1] == account_type_num) {
+
+                // Get the price and number of months duration
+                var price = currentPlan[5];
+                var numOfMonths = currentPlan[4];
+                var monthsWording = l[922];     // 1 month
+
+                // Change wording depending on number of months
+                if (numOfMonths === 12) {
+                    monthsWording = l[923];     // 1 year
+                }
+                else if (numOfMonths > 1) {
+                    monthsWording = l[6803].replace('%1', numOfMonths);     // x months
+                }
+
+                // Build select option
+                html += '<div class="membership-dropdown-item" data-plan-index="' + i + '">'
+                     +       monthsWording + ' (<strong>' + price + '</strong> &euro;)'
+                     +  '</div>';
+            }
+        }
+
+        // Update drop down HTML
+        $('.membership-st2-dropdown').html(html);
+
+        // Select first option
+        var $durationSelect = $('.membership-st2-select');
+        var $firstOption = $durationSelect.find('.membership-dropdown-item:first-child');
+        $durationSelect.find('span').html($firstOption.html());
+        $firstOption.addClass('selected');
+
+        // Get current plan price
+        var planIndex = $firstOption.attr('data-plan-index');
+
+        proPage.updateMainPrice(planIndex);
+        proPage.updateTextDependingOnRecurring();
+    },
+    
+    /**
+     * Updates the main price at the bottom of the page
+     * @param {Number} planIndex The array index of the plan in membershipPlans
+     */
+    updateMainPrice: function(planIndex) {
+
+        // Get the current plan price
+        var currentPlan = membershipPlans[planIndex];
+        var price = currentPlan[5].split('.');
+        var dollars = price[0];
+        var cents = price[1];
+
+        // Update main price at the bottom
+        var $mainPrice = $('.main-mid-pad .membership-bott-price');
+        $mainPrice.find('strong').html(dollars + '<span>.' + cents + ' &euro;</span>');
+    },
+    
+    /**
+     * Updates the text on the page depending on the payment option they've selected and 
+     * the duration/period so it is accurate for a recurring subscription or one off payment.
+     */
+    updateTextDependingOnRecurring: function() {
+
+        // Update whether this selected option is recurring or one-time
+        var $durationSelect = $('.membership-st2-select');
+        var $durationOption = $durationSelect.find('.membership-dropdown-item.selected');
+        var $mainPrice = $('.membership-bott-price');
+        var recurring = ($('.payment-options-list input:checked').attr('data-recurring') === 'true') ? true : false;
+        var planIndex = $durationOption.attr('data-plan-index');
+        var currentPlan = membershipPlans[planIndex];
+        var numOfMonths = currentPlan[4];
+        var subscribeOrPurchase = (recurring) ? l[6172] : l[6190].toLowerCase();
+        var durationOrRenewal = (recurring) ? l[6977] : l[6817];
+        var getTwoMonthsFree = (recurring) ? l[6978] : l[1148];
+
+        // Set to /month, /year or /one time next to the price
+        if (recurring && (numOfMonths === 1)) {
+            $mainPrice.find('.period').text('/' + l[913]);
+        }
+        else if (recurring && (numOfMonths > 1)) {
+            $mainPrice.find('.period').text('/' + l[932]);
+        }
+        else {
+            $mainPrice.find('.period').text('/' + l[6809]);
+        }
+
+        // Update depending on recurring or one off payment
+        $('.membership-st2-head.choose-duration').html(durationOrRenewal);
+        $('.membership-bott-button').html(subscribeOrPurchase);
+        $('.membership-bott-descr').html(getTwoMonthsFree);
+        $('.payment-dialog .payment-buy-now').html(subscribeOrPurchase);
+    },
+    
+    /**
+     * Updates the duration/renewal period options if they select a payment method. For example 
+     * for the wire transfer option we only want to accept one year one-off payments
+     */
+    updatePeriodOptionsOnPaymentMethodChange: function() {
+
+        var $durationSelect = $('.membership-st2-select');
+        var $durationOptions = $durationSelect.find('.membership-dropdown-item');
+        var supportsMonthlyPayment = ($('.payment-options-list input:checked').attr('data-supports-monthly-payment') === 'true') ? true : false;
+
+        // Loop through renewal period options (1 month, 1 year)
+        $.each($durationOptions, function(key, dropdownOption) {
+
+            // Get the plan's number of months
+            var planIndex = $(dropdownOption).attr('data-plan-index');
+            var currentPlan = membershipPlans[planIndex];
+            var numOfMonths = currentPlan[4];
+
+            // If the currently selected payment option e.g. Wire transfer doesn't support a 1 month payment
+            if ((supportsMonthlyPayment === false) && (numOfMonths === 1)) {
+
+                // Hide the option
+                $(dropdownOption).addClass('hidden').removeClass('selected');
+
+                // Select the first remaining option that is not hidden
+                var $firstOption = $durationSelect.find('.membership-dropdown-item').not('.hidden').first();
+                var newPlanIndex = $firstOption.attr('data-plan-index');
+                $durationSelect.find('span').html($firstOption.html());
+                $firstOption.addClass('selected');
+
+                // Update the text for one-time or recurring
+                proPage.updateMainPrice(newPlanIndex);
+                proPage.updateTextDependingOnRecurring();
+            }
+            else {
+                // Show the option otherwise
+                $(dropdownOption).removeClass('hidden');
+            }
+        });
+    },
+    
+    /**
+     * Populate the monthly plans across the main #pro page
+     */
+    populateMembershipPlans: function() {
+
+        var fromPriceSet = false;
+
+        for (var i = 0, length = membershipPlans.length; i < length; i++) {
+
+            // Get plan details
+            var accountLevel = membershipPlans[i][1];
+            var months = membershipPlans[i][4];
+            var price = membershipPlans[i][5];
+            var priceParts = price.split('.');
+            var dollars = priceParts[0];
+            var cents = priceParts[1];
+
+            // Show only monthly prices in the boxes
+            if (months === 1) {
+                $('.reg-st3-membership-bl.pro' + accountLevel + ' .price .num').html(
+                    dollars + '<span class="small">.' + cents + ' &euro;</span>'
+                );
+            }
+
+            // Get the first plan with yearly price
+            if ((months === 12) && (fromPriceSet === false)) {
+
+                // Divide the yearly price by 12 to get the lowest from price
+                var fromPrice = (price / 12).toFixed(2);
+                var fromPriceParts = fromPrice.split('.');
+                var fromPriceDollars = fromPriceParts[0];
+                var fromPriceCents = fromPriceParts[1];
+
+                // Update the price inside the red star
+                var $redStar = $('.pro-icons-block.star .pro-price-txt');
+                $redStar.find('.dollars').text(fromPriceDollars);
+                $redStar.find('.cents').text(fromPriceCents);
+
+                // Don't set it for other plans with 12 months
+                fromPriceSet = true;
+            }
+        }
+    },
+    
+    /**
+     * Change payment method radio button states when clicked
+     * @param {String} html The radio button html
+     */
+    initPaymentMethodRadioOptions: function(html) {
+
+        var paymentOptionsList = $('.payment-options-list');
+        paymentOptionsList.html(html);
+        paymentOptionsList.find('.payment-method').rebind('click', function() {
+
+            // Remove checked state from all radio inputs
+            paymentOptionsList.find('.membership-radio').removeClass('checked');
+            paymentOptionsList.find('input').prop('checked', false);
+
+            var $this = $(this);
+            var $bitcoinInstructions = $('.membership-center p');
+
+            // Add checked state for this radio button
+            $this.find('input').prop('checked', true);        
+            $this.find('.membership-radio').addClass('checked');
+
+            // Hide instructions below the purchase button if other option is selected
+            if ($this.find('.membership-radio-label').hasClass('bitcoin')) {
+                $bitcoinInstructions.removeClass('hidden');
+            }
+            else {
+                $bitcoinInstructions.addClass('hidden');
+            }
+
+            proPage.updateTextDependingOnRecurring();
+            proPage.updatePeriodOptionsOnPaymentMethodChange();
+        });
+    }
+};
+
+/**
+ * Display the wire transfer dialog
+ */
+var wireTransferDialog = {
+    
+    $dialog: null,
+    $backgroundOverlay: null,
+    
+    /**
+     * Open and setup the dialog
+     */
+    init: function() {
+        
+        // Close the pro register dialog if it's already open
+        $('.pro-register-dialog').removeClass('active').addClass('hidden');
+        
+        // Cache DOM reference for faster lookup
+        this.$dialog = $('.fm-dialog.wire-transfer-dialog');
+        this.$backgroundOverlay = $('.fm-dialog-overlay');
+        
+        // Add the styling for the overlay
+        this.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+        
+        // Position the dialog and open it
+        this.$dialog.css({
+            'margin-left': -1 * (this.$dialog.outerWidth() / 2),
+            'margin-top': -1 * (this.$dialog.outerHeight() / 2)
+        });
+        this.$dialog.addClass('active').removeClass('hidden');
+        
+        // Initialise the close button
+        this.$dialog.find('.btn-close-dialog').rebind('click', function() {
+            wireTransferDialog.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+            wireTransferDialog.$dialog.removeClass('active').addClass('hidden');            
+        });
+               
+        // If logged in, pre-populate email address into wire transfer details
+        if (typeof u_attr !== 'undefined') {
+            wireTransferDialog.$dialog.find('.email-address').text(u_attr.email);
+        }
+        
+        // Update plan price in the dialog
+        var proPrice = selectedProPackage[5];
+        this.$dialog.find('.amount').text(proPrice);
+    }
+};
+
+/**
  * Code for Dynamic/Union Pay
  */
 var unionPay = {
-    
-    /**
-     * Show the bouncing megacoin icon while loading
-     */
-    showLoadingOverlay: function() {
-        $('.fm-dialog-overlay').removeClass('hidden').addClass('payment-dialog-overlay');
-        $('.payment-processing').removeClass('hidden');
-    },
     
     /**
      * Redirect to the site
@@ -1017,22 +1417,12 @@ var cardDialog = {
     },
     
     /**
-     * Show the bouncing megacoin icon while loading
+     * Close the card dialog and show the loading overlay
      */
-    showLoadingOverlay: function() {
+    closeDialogAndShowProcessing: function() {        
         
-        // Close the card dialog
         cardDialog.$dialog.removeClass('active').addClass('hidden');
-        
-        // Prevent clicking on the background overlay while it's loading, which makes 
-        // the background disappear and error triangle appear on white background
-        cardDialog.$backgroundOverlay.rebind('click', function(event) {
-            event.stopPropagation();
-        });
-        
-        // Show the loading gif
-        cardDialog.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
-        cardDialog.$loadingOverlay.removeClass('hidden');
+        proPage.showLoadingOverlay('processing');
     },
     
     /**
@@ -1115,23 +1505,23 @@ var cardDialog = {
         
         switch (errorCode) {
             case -1:
-                // There is an error with your credit card details
+                // There is an error with your credit card details.
                 return l[6966];
             case -2:
-                // There is an error with your billing details
+                // There is an error with your billing details.
                 return l[6967];
             case -3:
-                // Your transaction was detected as being fraudulent
+                // Your transaction was detected as being fraudulent.
                 return l[6968];
             case -4:
-                // You have tried to pay too many times with this credit card recently
+                // You have tried to pay too many times with this credit card recently.
                 return l[6969];
             case -5:
-                // You have insufficient funds to make this payment
+                // You have insufficient funds to make this payment.
                 return l[6970];
             default:
-                // Please verify your payment information and try again
-                return l[6950];
+                // An unknown error occurred. Please try again later.
+                return l[7140];
         }
     },
     
@@ -1513,8 +1903,8 @@ var doProLogin = function($dialog) {
     
     var button = $('.selected .membership-button').parents('.reg-st3-membership-bl').attr('class').match(/pro\d/)[0]
     pro_do_next = function() {
-        $('.' + button + ' .membership-button').trigger('click')
-        pro_do_next = null
+        $('.' + button + ' .membership-button').trigger('click');
+        pro_do_next = null;
     };
 
     var ctx =

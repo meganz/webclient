@@ -153,9 +153,6 @@
                 });
             });
 
-
-
-
             $('input[name="send_stats"]', self.$dialog)
                 .attr('checked', true)
                 .trigger('change');

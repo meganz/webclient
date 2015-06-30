@@ -111,14 +111,28 @@ function u_checklogin3a(res, ctx) {
 
         init_storage(u_storage);
 
-        try {
-            u_k = JSON.parse(u_storage.k);
-            if (u_attr.privk) {
-                u_privk = crypto_decodeprivkey(base64urldecode(u_storage.privk));
+        if (u_storage.k) {
+            try {
+                u_k = JSON.parse(u_storage.k);
             }
-        } catch (e) {}
+            catch(e) {
+                console.error('Error parsing key', e);
+            }
+        }
 
-        u_k_aes = new sjcl.cipher.aes(u_k);
+        if (u_k) {
+            u_k_aes = new sjcl.cipher.aes(u_k);
+        }
+
+        try {
+            if (u_attr.privk) {
+                u_privk = crypto_decodeprivkey(a32_to_str(decrypt_key(u_k_aes, base64_to_a32(u_attr.privk))));
+            }
+        }
+        catch (e) {
+            console.error('Error decoding private RSA key', e);
+        }
+
         if (!u_attr.email) {
             r = 0;
         }
@@ -212,7 +226,7 @@ function u_wasloggedin() {
 
 // set user's RSA key
 function u_setrsa(rsakey) {
-    var $promise = new $.Deferred();
+    var $promise = new MegaPromise();
 
     var ctx = {
         callback: function (res, ctx) {
@@ -556,9 +570,16 @@ function generateAvatarMeta(user_hash) {
  * @param ctx {object}
  *     Context, in case higher hierarchies need to inject a context
  *     (default: none).
+ * @return {MegaPromise}
+ *     A promise that is resolved when the original asynch code is settled.
+ *     Can be used to use promises instead of callbacks for asynchronous
+ *     dependencies.
  */
 function getUserAttribute(userhandle, attribute, pub, nonHistoric,
-    callback, ctx) {
+                          callback, ctx) {
+    var myCtx = ctx || {};
+
+    // Assemble property name on Mega API.
     var attributePrefix = '';
     if (pub === true || pub === undefined) {
         attributePrefix = '+';
@@ -571,45 +592,48 @@ function getUserAttribute(userhandle, attribute, pub, nonHistoric,
     }
     attribute = attributePrefix + attribute;
 
-    // Assemble context for this async API request.
-    var myCtx = ctx || {};
-    myCtx.u = userhandle;
-    myCtx.ua = attribute;
-    myCtx.callback = function (res, ctx) {
+    // Make the promise to execute the API code.
+    var thePromise = new MegaPromise();
+
+    function settleFunction(res) {
         if (typeof res !== 'number') {
             // Decrypt if it's a private attribute container.
-            var value = res;
-            if (ctx.ua.charAt(0) === '*') {
+            if (attribute.charAt(0) === '*') {
                 var clearContainer = tlvstore.blockDecrypt(base64urldecode(res),
-                    u_k);
-                value = tlvstore.tlvRecordsToContainer(clearContainer);
+                                                           u_k);
+                res = tlvstore.tlvRecordsToContainer(clearContainer);
             }
             if (window.d) {
-                console.log('Attribute "' + ctx.ua + '" for user "' + ctx.u
-                            + '" is "' + value + '".');
+                console.log('Attribute "' + attribute + '" for user "'
+                            + userhandle + '" is "' + res + '".');
             }
-            if (ctx.callback2) {
-                ctx.callback2(value, ctx);
-            }
+            thePromise.resolve(res);
         }
         else {
+            // Got back an error (a number).
             if (window.d) {
-                console.log('Error retrieving attribute "' + ctx.ua
-                            + '" for user "' + ctx.u + '": ' + res + '!');
+                console.log('Warning, attribute "' + attribute
+                            + '" for user "' + userhandle
+                            + '" could not be retrieved: ' + res + '!');
             }
-            if (ctx.callback2) {
-                ctx.callback2(res, ctx);
-            }
+            thePromise.reject(res);
         }
-    };
-    myCtx.callback2 = callback;
+
+        // Finish off if we have a callback.
+        if (callback) {
+            callback(res, myCtx);
+        }
+    }
+
+    // Assemble context for this async API request.
+    myCtx.u = userhandle;
+    myCtx.ua = attribute;
+    myCtx.callback = settleFunction;
 
     // Fire it off.
-    api_req({
-        'a': 'uga',
-        'u': userhandle,
-        'ua': attribute
-    }, myCtx);
+    api_req({'a': 'uga', 'u': userhandle, 'ua': attribute}, myCtx);
+
+    return thePromise;
 }
 
 /**
@@ -630,13 +654,23 @@ function getUserAttribute(userhandle, attribute, pub, nonHistoric,
  *     Callback function to call upon completion (default: none). This callback
  *     function expects two parameters: the attribute `name`, and its `value`.
  *     In case of an error, the `value` will be undefined.
+ * @param ctx {object}
+ *     Context, in case higher hierarchies need to inject a context
+ *     (default: none).
  * @param mode {integer}
  *     Encryption mode. One of BLOCK_ENCRYPTION_SCHEME (default: AES_CCM_12_16).
+ * @return {MegaPromise}
+ *     A promise that is resolved when the original asynch code is settled.
+ *     Can be used to use promises instead of callbacks for asynchronous
+ *     dependencies.
  */
-function setUserAttribute(attribute, value, pub, nonHistoric, callback,
-    mode) {
+function setUserAttribute(attribute, value, pub, nonHistoric, callback, ctx,
+                          mode) {
+    var myCtx = ctx || {};
+
+    // Prepare all data needed for the call on the Mega API.
     if (mode === undefined) {
-        mode = tlvstore.BLOCK_ENCRYPTION_SCHEME.AES_CCM_12_16;
+        mode = tlvstore.BLOCK_ENCRYPTION_SCHEME.AES_GCM_12_16;
     }
     if (nonHistoric === true || nonHistoric === 1) {
         attribute = '!' + attribute;
@@ -652,39 +686,287 @@ function setUserAttribute(attribute, value, pub, nonHistoric, callback,
             tlvstore.containerToTlvRecords(value), u_k, mode));
     }
 
+    // Make the promise to execute the API code.
+    var thePromise = new MegaPromise();
+
+    function settleFunction(res) {
+        if (typeof res !== 'number') {
+            console.log('Setting user attribute "'
+                        + attribute + '", result: ' + res);
+            thePromise.resolve(res);
+        }
+        else {
+            console.log('Error setting user attribute "'
+                        + attribute + '", result: ' + res + '!');
+            thePromise.reject(res);
+        }
+
+        // Finish off if we have a callback.
+        if (callback) {
+            callback(res, myCtx);
+        }
+    }
+
     // Assemble context for this async API request.
-    var myCtx = {
-        callback: function (res, ctx) {
-            if (window.d) {
-                if (typeof res !== 'number') {
-                    console.log('Setting user attribute "'
-                                + ctx.ua + '", result: ' + res);
-                }
-                else {
-                    console.log('Error setting user attribute "'
-                                + ctx.ua + '", result: ' + res + '!');
-                }
-            }
-            if (ctx.callback2) {
-                ctx.callback2(res, ctx);
-            }
-        },
-        ua: attribute,
-        callback2: callback,
-    };
+    myCtx.ua = attribute;
+    myCtx.callback = settleFunction;
 
     // Fire it off.
-    var apiCall = {
-        'a': 'up'
-    };
+    var apiCall = {'a': 'up'};
     apiCall[attribute] = value;
     api_req(apiCall, myCtx);
+
+    return thePromise;
 }
 
 function isNonActivatedAccount() {
-    return (!u_privk && typeof (u_attr.p) !== 'undefined' && (u_attr.p >= 1 || u_attr.p <= 4));
+    return (!u_privk && typeof (u_attr.p) !== 'undefined'
+            && (u_attr.p >= 1 || u_attr.p <= 4));
 }
 
 function isEphemeral() {
     return (u_type === 0);
 }
+
+
+(function(exportScope) {
+    var _lastUserInteractionCache = false;
+    var _lastUserInteractionCacheIsLoading = false;
+
+    /**
+     * Compare and return `true` if:
+     * - `a` is > `b`
+     *
+     * @param a
+     * @param b
+     * @private
+     */
+    var _compareLastInteractionStamp = function (a, b) {
+        var timestampA = parseInt(a.split(":")[1], 10);
+        var timestampB = parseInt(b.split(":")[1], 10);
+
+        return timestampA > timestampB;
+    };
+
+
+    var _lastInteractionFlushThrottleTimer = null;
+    /**
+     * Used internally to throttle the updates to the API
+     * @private
+     */
+    var _flushLastInteractionData = function () {
+        assert(u_handle, "missing u_handle, can't proceed");
+
+        if (_lastInteractionFlushThrottleTimer) {
+            clearTimeout(_lastInteractionFlushThrottleTimer);
+        }
+        _lastInteractionFlushThrottleTimer = setTimeout(function () {
+            setUserAttribute(
+                "lstint",
+                _lastUserInteractionCache,
+                false,
+                true
+            );
+        }, 250);
+    };
+
+    /**
+     * Set the last interaction for a contact
+     *
+     * @param u_h {String} user handle
+     * @param v {String} "$typeOfInteraction:$unixTimestamp" (see getLastInteractionWith for the types of int...)
+     * @returns {Deferred}
+     */
+    var setLastInteractionWith = function (u_h, v) {
+        assert(u_handle, "missing u_handle, can't proceed");
+        assert(u_h, "missing argument u_h, can't proceed");
+
+        var isDone = false;
+        var $promise = createTimeoutPromise(
+            function () {
+                return isDone === true;
+            },
+            500,
+            10000
+        );
+
+        $promise.always(function () {
+            isDone = true;
+        });
+
+
+        getLastInteractionWith(u_h)
+            .done(function (timestamp) {
+                if (_compareLastInteractionStamp(v, timestamp) === false) {
+                    // older timestamp found in `v`, resolve the promise with the latest timestamp
+                    $promise.resolve(v);
+                    $promise.verify();
+                }
+                else {
+                    _lastUserInteractionCache[u_h] = v;
+
+                    _flushLastInteractionData();
+
+                    $promise.resolve(_lastUserInteractionCache[u_h]);
+                    $promise.verify();
+                }
+            })
+            .fail(function (res) {
+                if (res === false || res === -9) {
+                    if (res === -9 && _lastUserInteractionCache === false) {
+                        _lastUserInteractionCache = {};
+                    }
+                    _lastUserInteractionCache[u_h] = v;
+
+                    _flushLastInteractionData();
+
+                    $promise.resolve(_lastUserInteractionCache[u_h]);
+                    $promise.verify();
+                }
+                else {
+                    $promise.reject(res);
+                    console.error("setLastInteraction failed, err: ", res);
+                    $promise.verify();
+                }
+            });
+
+        return $promise;
+
+    };
+
+    /**
+     * Returns a promise which will be resolved with a string, formatted like this "$typeOfInteraction:$timestamp"
+     * Where $typeOfInteraction can be:
+     *  - 0 - cloud drive/sharing
+     *  - 1 - chat
+     *
+     * @param u_h
+     * @returns {MegaPromise}
+     */
+    var getLastInteractionWith = function (u_h) {
+        assert(u_handle, "missing u_handle, can't proceed");
+        assert(u_h, "missing argument u_h, can't proceed");
+
+
+        var _renderLastInteractionDone = function (r) {
+
+            r = r.split(":");
+
+            var $elem = $('.li_' + u_h);
+
+            $elem
+                .removeClass('never')
+                .removeClass('cloud-drive')
+                .removeClass('conversations')
+                .removeClass('unread-conversations');
+
+            var ts = parseInt(r[1], 10);
+
+            if (M.u[u_h]) {
+                M.u[u_h].ts = ts;
+            }
+
+            if (r[0] === "0") {
+                $elem.addClass('cloud-drive');
+            }
+            else if (r[0] === "1" && megaChat) {
+                M.u[u_h].lastChatActivity = ts;
+                var room = megaChat.getPrivateRoom(u_h);
+                if (room && megaChat && megaChat.plugins && megaChat.plugins.chatNotifications) {
+                    if (megaChat.plugins.chatNotifications.notifications.getCounterGroup(room.roomJid) > 0) {
+                        $elem.addClass('unread-conversations');
+                    }
+                    else {
+                        $elem.addClass('conversations');
+                    }
+                }
+                else {
+                    $elem.addClass('conversations');
+                }
+            }
+            else {
+                $elem.addClass('never');
+            }
+            $elem.text(
+                time2last(ts)
+            );
+
+            if ($.sortTreePanel && $.sortTreePanel.contacts.by === 'last-interaction') {
+                M.contacts(); // we need to resort
+            }
+        };
+
+        var _renderLastInteractionFail = function (r) {
+            var $elem = $('.li_' + u_h);
+
+            $elem
+                .removeClass('never')
+                .removeClass('cloud-drive')
+                .removeClass('conversations')
+                .removeClass('unread-conversations');
+
+
+            $elem.addClass('never');
+        };
+
+        var $promise = new MegaPromise();
+
+        $promise
+            .done(_renderLastInteractionDone)
+            .fail(_renderLastInteractionFail);
+
+        if (_lastUserInteractionCache === false) {
+            // load and retry logic
+
+            // loading is already in progress?
+            if (_lastUserInteractionCacheIsLoading === false) {
+                _lastUserInteractionCacheIsLoading = getUserAttribute(
+                    u_handle,
+                    'lstint',
+                    false,
+                    true
+                )
+                    .done(function (res) {
+                        if (typeof(res) !== 'number') {
+                            _lastUserInteractionCache = res;
+                            // recurse, and return the data from the mem cache
+                            $promise.linkDoneAndFailTo(
+                                getLastInteractionWith(u_h)
+                            );
+                        }
+                        else {
+                            $promise.reject(false);
+                            console.error("Failed to retrieve last interaction cache from attrib, response: ", err);
+                        }
+                    })
+                    .always(function () {
+                        _lastUserInteractionCacheIsLoading = false;
+                    });
+
+                $promise.linkFailTo(_lastUserInteractionCacheIsLoading);
+            }
+            else {
+                _lastUserInteractionCacheIsLoading
+                    .done(function () {
+                        $promise.linkDoneAndFailTo(
+                            getLastInteractionWith(u_h)
+                        );
+                    });
+                $promise.linkFailTo(_lastUserInteractionCacheIsLoading);
+            }
+        }
+        else if (!_lastUserInteractionCache[u_h]) {
+            $promise.reject(false);
+        }
+        else if (_lastUserInteractionCache[u_h]) {
+            $promise.resolve(_lastUserInteractionCache[u_h]);
+        }
+        else {
+            throw new Error("This should not happen.");
+        }
+
+        return $promise;
+    };
+    exportScope.setLastInteractionWith = setLastInteractionWith;
+    exportScope.getLastInteractionWith = getLastInteractionWith;
+})(window);

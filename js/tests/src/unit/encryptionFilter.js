@@ -1572,8 +1572,8 @@ describe("EncryptionFilter", function() {
             room.encryptionHandler.processMessage = function(){};
 
             sinon.stub(encryptionFilter, 'syncRoomUsersWithEncMembers', function(){});
-            if(!getPubEd25519.restore) {
-                sinon.spy(window, 'getPubEd25519');
+            if (!crypt.getPubEd25519.restore) {
+                sinon.spy(crypt, 'getPubEd25519');
             }
 
             room.encryptionHandler.askeMember.members = room.getOrderedUsers();
@@ -1615,18 +1615,18 @@ describe("EncryptionFilter", function() {
                     );
 
 
-                expect(getPubEd25519.callCount).to.eql(2);
-                expect(getPubEd25519.getCall(0).args[0]).to.eql("B_123456789");
+                expect(crypt.getPubEd25519.callCount).to.eql(2);
+                expect(crypt.getPubEd25519.getCall(0).args[0]).to.eql("B_123456789");
 
                 room.encryptionHandler.processMessage.restore();
             }
 
             // test the case when the 25519 keys are NOT loaded successfully OR processMessage had failed
             {
-                var _tmp = getPubEd25519;
+                var _tmp = crypt.getPubEd25519;
 
                 // force the getPubEd25519 to fail
-                getPubEd25519 = function(h, cb) {
+                crypt.getPubEd25519 = function(h, cb) {
                     cb(false, h);
                 };
 
@@ -1685,7 +1685,7 @@ describe("EncryptionFilter", function() {
 
                 window.setTimeout.restore(); // restore the stub method
 
-                getPubEd25519 = _tmp; // restore getPubEd25519 method
+                crypt.getPubEd25519 = _tmp; // restore getPubEd25519 method
 
                 encryptionFilter.syncRoomUsersWithEncMembers.restore();
 

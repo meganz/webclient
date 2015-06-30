@@ -59,6 +59,33 @@
             }
         });
 
+        this.setUData = function( data, key ) {
+            if (!db.objectStoreNames.contains('__udata__')) {
+                return Promise.reject(DOMException.NOT_FOUND_ERR);
+            }
+            return this.update('__udata__', {
+                k: key || '__gbl',
+                v: data
+            });
+        };
+
+        this.getUData = function( key ) {
+            var promise;
+
+            return new Promise(function(resolve, reject) {
+                try {
+                    promise = that.query('__udata__')
+                        .filter('k', key || '__gbl').execute();
+                }
+                catch(e) {
+                    return reject({'reason': e });
+                }
+                promise.then(function(results) {
+                    resolve(results && results.length === 1 && results[0].v);
+                }, reject);
+            });
+        };
+
         this.add = function( table ) {
             if ( closed ) {
                 throw 'Database has been closed';
@@ -253,7 +280,7 @@
             (function ( storeName ) {
                 that[ storeName ] = { };
                 for ( var i in that ) {
-                    if ( !hasOwn.call( that , i ) || i === 'close' ) {
+                    if ( !hasOwn.call( that , i ) || i === 'close' || i === 'getUData' || i === 'setUData' ) {
                         continue;
                     }
                     that[ storeName ][ i ] = (function ( i ) {
@@ -278,9 +305,10 @@
                 keyRange = type ? IDBKeyRange[ type ].apply( null, args ) : null,
                 results = [],
                 indexArgs = [ keyRange ],
-                limitRange = limitRange ? limitRange : null,
-                filters = filters ? filters : [],
                 counter = 0;
+
+            limitRange = limitRange || null;
+            filters = filters || [];
 
             if ( cursorType !== 'count' ) {
                 indexArgs.push( direction || 'next' );
@@ -482,9 +510,6 @@
     };
 
     var createSchema = function ( e , schema , db ) {
-        if ( typeof schema === 'function' ) {
-            schema = schema();
-        }
 
         for ( var tableName in schema ) {
             var table = schema[ tableName ];
@@ -535,8 +560,23 @@
                     try {
                         request = indexedDB.open( options.server , options.version );
                     } catch (e) {
+                        console.error("indexedDB.open('"+ options.server +"', "+ options.version +"); FAILED", e);
                         reject({ 'reason': e });
                         return;
+                    }
+
+                    var schema = options.schema || {};
+                    if ( typeof schema === 'function' ) {
+                        schema = schema();
+                    }
+                    if (options.UDataSlave) {
+                        schema = clone(schema);
+                        schema['__udata__'] = {
+                            key: { keyPath: 'k' },
+                            indexes: {
+                                k: { unique: true }
+                            }
+                        };
                     }
 
                     request.onblocked = function ( e ) {
@@ -546,12 +586,12 @@
                     };
 
                     request.onsuccess = function ( e ) {
-                        open( e , options.server , options.version , options.schema )
+                        open( e , options.server , options.version , schema )
                             .then(resolve, reject)
                     };
 
                     request.onupgradeneeded = function ( e ) {
-                        createSchema( e , options.schema , e.target.result );
+                        createSchema( e , schema , e.target.result );
                     };
                     request.onerror = function ( e ) {
                         reject({ 'reason': e });
@@ -566,6 +606,21 @@
     } else if ( typeof define === 'function' && define.amd ) {
         define( function() { return db; } );
     } else {
-        window.db = db;
+        Object.defineProperty(db, '__closeAll', {
+            value: function __dbjsCloseALL() {
+                for (var i in dbCache) {
+                    var db = dbCache[i];
+                    try {
+                        db.close();
+                        console.warn('Forcing DB close', i);
+                    }
+                    catch(e) {
+                        console.error(i, e);
+                    }
+                }
+                dbCache = {};
+            }
+        });
+        Object.defineProperty(window, 'db', {value: Object.freeze(db)});
     }
 })( window );

@@ -10,7 +10,7 @@ function dlinfo(ph,key,next)
     dl_next = next;
     if ((lang == 'en') || (lang !== 'en' && l[1388] !== '[B]Download[/B] [A]to your computer[/A]'))
     {
-        $('.new-download-red-button').html(l[1388].replace('[B]','<div class="new-download-button-txt1">').replace('[/B]','</div>').replace('[A]','<div class="new-download-button-txt2">').replace('[/A]','</div>'));
+        //$('.new-download-red-button').html(l[1388].replace('[B]','').replace('[/B]','').replace('[A]','').replace('[/A]',''));
         $('.new-download-gray-button').html(l[1389].replace('[B]','<div class="new-download-button-txt1">').replace('[/B]','</div>').replace('[A]','<div class="new-download-button-txt2">').replace('[/A]','</div>'));
     }
 
@@ -65,6 +65,9 @@ function dl_g(res)
                 ui_paused = false;
                 $(this).removeClass('active');
             }
+        });
+        $('.new-download-sync-app').rebind('click', function(e) {
+            megasync.download(dlpage_ph, dlpage_key);
         });
         $('.new-download-red-button').unbind('click');
         $('.new-download-red-button').bind('click',function(e)
@@ -133,7 +136,7 @@ function dl_g(res)
             }
             if (1 > l) $('.new-download-file-title').text(str_mtrunc(n,60));
             $('.new-download-file-size').text(bytesToSize(res.s));
-            $('.new-download-file-icon').addClass(fileicon({name:fdl_file.n}));
+            $('.new-download-file-icon').addClass(fileIcon({name:fdl_file.n}));
         }
         else mKeyDialog(dlpage_ph);
     }
@@ -152,25 +155,34 @@ function closedlpopup()
     document.getElementById('download_popup').style.left = '-500px';
 }
 
-function dl_fm_import()
-{
-    api_req(
-    {
+function importFile() {
+    
+    api_req({
         a: 'p',
         t: M.RootID,
-        n: [{ ph: dl_import, t: 0, a: dl_attr, k: a32_to_base64(encrypt_key(u_k_aes,base64_to_a32(dlkey))) }]
+        n: [{ ph: dl_import, t: 0, a: dl_attr, k: a32_to_base64(encrypt_key(u_k_aes, base64_to_a32(dlkey))) }]
+    }, {
+        // Check response and if over quota show a special warning dialog
+        callback: function (result) {
+            if (result === EOVERQUOTA) {
+                showOverQuotaDialog();
+            }
+        }
     });
-    dl_import=false;
+
+    dl_import = false;
 }
 
 function dlerror(dl,error)
 {
     var errorstr='';
     var tempe=false;
-    if (error == EOVERQUOTA)
-    {
-        alert('quota dialog');
+
+    // If over quota show a special warning dialog
+    if (error === EOVERQUOTA) {
+        showOverQuotaDialog();
     }
+
     else if (error == ETOOMANYCONNECTIONS) errorstr = l[18];
     else if (error == ESID) errorstr = l[19];
     else if (error == ETEMPUNAVAIL) tempe = l[233];
@@ -233,21 +245,28 @@ function dlstart(id,name,filesize)
 
 function start_import()
 {
-    dl_import=dlpage_ph;
-    if (u_type)
-    {
+    dl_import = dlpage_ph;
+    
+    if (u_type) {
         document.location.hash = 'fm';
-        if (fminitialized) dl_fm_import();
+        
+        if (fminitialized) {
+            importFile();
+        }
     }
-    else if (u_wasloggedin())
-    {
-        msgDialog('confirmation',l[1193],l[1194],l[1195],function(e)
-        {
-            if(e) start_anoimport();
-            else loginDialog();
+    else if (u_wasloggedin()) {
+        msgDialog('confirmation', l[1193], l[1194], l[1195], function(e) {
+            if (e) {
+                start_anoimport();
+            }
+            else {
+                loginDialog();
+            }
         });
     }
-    else start_anoimport();
+    else {
+        start_anoimport();
+    }
 }
 
 function start_anoimport()
@@ -362,7 +381,7 @@ function sync_switchOS(os)
  */
 function ImgError(source) {
     source.src =  gifSlider.empty1x1png;
-    source.onerror = "";
+    source.onerror = '';
     return true;
 }
 
@@ -380,7 +399,7 @@ var gifSlider = {
     rightAnimationIntervalId: 0,
 
     // Empty 1x1 image used as placeholder
-    empty1x1png: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQI12NgYAAAAAMAASDVlMcAAAAASUVORK5CYII=",
+    empty1x1png: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQI12NgYAAAAAMAASDVlMcAAAAASUVORK5CYII=',
 
     // There can be more or less images on either side e.g. 2 gifs on left and
     // 3 on right and it will still work because they are run independently.
@@ -441,7 +460,14 @@ var gifSlider = {
 
     // Initialise the slide show and preload the images into memory so they will display straight away
     init: function() {
-        gifSlider.preLoadImages('left');
+        if (browserdetails(ua).browser !== 'Chrome'
+                || parseInt(navigator.userAgent.split('Chrome/').pop()) > 42) {
+            gifSlider.preLoadImages('left');
+        }
+        else {
+            // Anims get disabled in Chrome 42 or older due a mem leak bug
+            $('.products-top-txt').hide();
+        }
     },
 
     /**
@@ -449,8 +475,10 @@ var gifSlider = {
      * @param {String} side The side of the page (left or right)
      */
     preLoadImages: function(side) {
-        function __loadHandler(idx, len) {
-            if (d) console.log('gifSlider.__loadHandler', side, imageLoadStep, idx, len, this.src);
+        function __loadHandler(idx, length) {
+            if (d) {
+                console.log('gifSlider.__loadHandler', side, imageLoadStep, idx, length, this.src);
+            }
             ++imageLoadStep;
 
             this.onload = image = null;
@@ -472,8 +500,10 @@ var gifSlider = {
                 // Setup loops to continually change after every slide has finished
                 gifSlider.continueSlideShow(side, idx);
             }
-            else if (imageLoadStep === len) {
-                if (d) console.log('gifSlider.__loadHandler finished.');
+            else if (imageLoadStep === length) {
+                if (d) {
+                    console.log('gifSlider.__loadHandler finished.');
+                }
 
                 setTimeout(function() {
                     $('img.animation-image').attr('src', gifSlider.empty1x1png);
@@ -490,8 +520,9 @@ var gifSlider = {
         var imageLoadStep = 0, imageSrc, image;
         this.state = this.STATE_INIT;
 
-        // Get the current URL without the location hash (#xycabc), also add on the path to the images dir
-        var baseImagePath = staticpath + 'images/products/';
+        // Load locally in dev, but force the .gif animations to load from the static server not CDN to save cost
+        var basePath = (location.href.indexOf('localhost') > -1) ? staticpath : 'https://eu.static.mega.co.nz/';
+        var baseImagePath = basePath + 'images/products/';
 
         // Check if using retina display
         var retina = (window.devicePixelRatio > 1) ? '-2x' : '';
@@ -598,6 +629,7 @@ var gifSlider = {
             this.rightAnimationIntervalId = 0;
         }
 
+        // Set to empty image
         $('img.animation-image, a.currentLink img.currentImage').attr('src', this.empty1x1png);
         this.state = this.STATE_GONE;
     },

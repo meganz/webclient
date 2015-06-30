@@ -40,7 +40,7 @@ function ul_completepending2(res,ctx)
 
 		newnodes = [];
 		process_f(res.f);
-		rendernew();
+		renderNew();
 		if (M.viewmode) fm_thumbnails();
 		if (ctx.faid) api_attachfileattr(n.h,ctx.faid);
 		onUploadSuccess(ul_queue[ctx.ul_queue_num],n.h,ctx.faid);
@@ -49,10 +49,18 @@ function ul_completepending2(res,ctx)
 		ul_completepending(ctx.target);
 	}
 	else {
-        var n = ctx.file.name;
+        var fileName = ctx.file.name;
         Later(resetUploadDownload);
         Soon(function() {
-            msgDialog('warninga', l[1309], n, res);
+            
+            // If over quota show a special warning dialog
+            if (res === EOVERQUOTA) {
+                showOverQuotaDialog();
+            }
+            else {
+                // Otherwise show 'Upload failed - Error uploading asset [filename]'
+                msgDialog('warninga', l[1309], l[5760] + ' ' + fileName);
+            }
         });
     }
 	if (ctx.file.owner) ctx.file.owner.destroy();
@@ -637,19 +645,9 @@ ChunkUpload.prototype.upload = function() {
 
 	if (d) console.log("pushing", this.file.posturl + this.suffix)
 
-	if (chromehack) {
-		var data8 = new Uint8Array(this.bytes.buffer);
-		var send8 = new Uint8Array(this.bytes.buffer, 0, data8.length);
-		send8.set(data8);
 
-		var t = this.file.posturl.lastIndexOf('/ul/');
-		xhr.open('POST', this.file.posturl.substr(0,t+1));
-		xhr.setRequestHeader("MEGA-Chrome-Antileak", this.file.posturl.substr(t)+this.suffix);
-		xhr.send(send8);
-	} else {
-		xhr.open('POST', this.file.posturl+this.suffix);
-		xhr.send(this.bytes.buffer);
-	}
+    xhr.open('POST', this.file.posturl+this.suffix);
+    xhr.send(this.bytes.buffer);
 
 	this.xhr = xhr;
 };

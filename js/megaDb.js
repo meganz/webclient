@@ -7,72 +7,297 @@
  *
  * @param suffix {string} used for suffixing the db name
  * @param name {string} name of the database (a-zA-Z0-9_-)
- * @param version {Integer} version
  * @param schema {Object} db schema (IndexedDB format)
+ * @param options {Object}
  * @returns {MegaDB}
  * @constructor
  */
-function MegaDB(name, suffix, version, schema, options) {
+function MegaDB(name, suffix, schema, options) {
     this.name = name;
     this.suffix = suffix;
-
-
-    this.logger = new MegaLogger("megaDB[" + name + "]", {}, options && options.parentLogger ? options.parentLogger : undefined);
-
-
     this.server = null;
-
-    this.currentVersion = version;
     this.schema = schema;
     this.dbState = MegaDB.DB_STATE.OPENING;
     this.plugins = {};
+    this.flags = 0;
+
+    options = options || {};
     this.options = $.extend({}, clone(MegaDB.DEFAULT_OPTIONS), options);
 
+    this.logger = new MegaLogger("megaDB[" + name + "]", {}, options.parentLogger);
+
     var self = this;
+    var dbName = 'mdb_' + name + '_' + suffix;
+    var murSeed = options.murSeed || 0x4d444201;
+    var murData =
+        JSON.stringify(this.schema) +
+        JSON.stringify(clone(this.options));
 
-    // init code goes here
-    $.each(self.options.plugins, function(k, v) {
-        self.plugins[k] = new v(self);
-    });
+    var version = +localStorage[dbName + '_v'] || 0;
+    var oldHash = +localStorage[dbName + '_hash'];
+    var newHash = MurmurHash3( murData, murSeed );
 
+    if (oldHash !== newHash) {
+        localStorage[dbName + '_v'] = ++version;
+        localStorage[dbName + '_hash'] = newHash;
+    }
 
-    self._dbOpenPromise = db.open({
-        server: 'mdb_' + name + '_' + suffix,
-        version: version,
+    var dbOpenOptions = {
+        server: dbName,
         schema: schema
-    }).then( function ( s ) {
-        self.server = s;
+    };
+    if (this.options.plugins & MegaDB.DB_PLUGIN.ENCRYPTION) {
+        this.plugins.megaDbEncryptionPlugin = new MegaDBEncryption(this);
+        dbOpenOptions.UDataSlave = true;
+    }
+
+    __dbOpen();
+
+    function __dbOpenFailed(dbError) {
+        self.dbState = MegaDB.DB_STATE.FAILED_TO_INITIALIZE;
+        self.logger.error("Could not initialise MegaDB: ", arguments, name, version, schema);
+        self.trigger('onDbStateFailed', dbError);
+    }
+    function __dbOpenSucceed(dbServer) {
+        self.server = dbServer;
+        self.currentVersion = version;
+        self.dbName = dbName;
         self.dbState = MegaDB.DB_STATE.INITIALIZED;
         self.trigger('onDbStateReady');
         self.initialize();
-    }, function() {
-        self.dbState = MegaDB.DB_STATE.FAILED_TO_INITIALIZE;
-        self.logger.error("Could not initialise MegaDB: ", arguments, name, version, schema);
-        self.trigger('onDbStateFailed');
-    });
+    }
+    function __dbBumpVersion(dbError) {
+        MegaDB.getDatabaseVersion(dbName)
+            .then(function(dbProp) {
+                self.logger.info('Current DB Version', dbProp.version);
+                localStorage[dbName + '_v'] = version = dbProp.version + 1;
+                __dbOpen();
+            }, function(error) {
+                self.logger.error('MegaDB.getDatabaseVersion', error);
+                __dbOpenFailed(dbError);
+            });
+    }
+    function __dbOpen() {
+        dbOpenOptions.version = version;
+
+        self.logger.debug('Opening DB', version, dbOpenOptions);
+
+        self._dbOpenPromise = db.open(dbOpenOptions).then( function( s ) {
+
+            var pluginSetupPromises = obj_values(self.plugins)
+                .map(function(pl) {
+                    return typeof pl.setup === 'function' && pl.setup(s) || true;
+                });
+
+            if (pluginSetupPromises.length) {
+                MegaPromise.all(pluginSetupPromises)
+                    .then(function() {
+                        self.logger.debug('MegaDB PlugIn(s) intialization succeed.', arguments);
+                        __dbOpenSucceed(s);
+                    }, function(err) {
+                        s.close();
+
+                        if (!err) {
+                            err = new Error('Failed to initialize MegaDB PlugIn(s)');
+                        }
+                        else {
+                            err = MegaDB.getRefError(err) || err;
+
+                            if (err.code === DOMException.NOT_FOUND_ERR) {
+                                return __dbBumpVersion(err);
+                            }
+                        }
+                        __dbOpenFailed(err);
+                    });
+            }
+            else {
+                __dbOpenSucceed(s);
+            }
+
+        }, function( e ) {
+            var dbError = MegaDB.getRefError(e);
+
+            if (!dbError) {
+                dbError = e;
+                self.logger.error('Unexpected error', dbError);
+            }
+
+            if (dbError.name === 'VersionError' || dbError.name === 'InvalidAccessError') {
+                self.logger.info(dbError.name + ' (retrying)');
+
+                __dbBumpVersion(dbError);
+            }
+            else {
+                __dbOpenFailed(dbError);
+            }
+        });
+    }
 
     return this;
-};
+}
 
 makeObservable(MegaDB);
 
 /**
- * Static, DB state
+ * Static, DB state/flags
  */
-MegaDB.DB_STATE = {
-    'OPENING': 0,
-    'INITIALIZED': 10,
-    'FAILED_TO_INITIALIZE': 20,
-    'CLOSED': 30
-};
+MegaDB.DB_STATE = makeEnum(['OPENING','INITIALIZED','FAILED_TO_INITIALIZE','CLOSED']);
+MegaDB.DB_FLAGS = makeEnum(['HASNEWENCKEY']);
+MegaDB.DB_PLUGIN = makeEnum(['ENCRYPTION']);
 
 /**
  * Static, default options
  */
 MegaDB.DEFAULT_OPTIONS = {
-    'plugins': {
-        'megaDbEncryptionPlugin': MegaDBEncryption
+    'murSeed': 0,
+    'version': false,
+    'plugins': 0
+};
+
+/**
+ * Get Database version
+ */
+MegaDB.getDatabaseVersion = function(dbName) {
+    var promise = new MegaPromise();
+
+    try {
+        var request = indexedDB.open(dbName);
+        request.onsuccess = function(e) {
+            var idb = e.target.result;
+            var ver = idb.version;
+
+            idb.close();
+            promise.resolve({
+                name: dbName,
+                version: ver,
+                gdbvSucceed: true
+            });
+        };
+        request.onblocked = request.onerror = function(e) {
+            promise.reject(e);
+        };
     }
+    catch(e) {
+        promise.reject(e);
+    }
+
+    return promise;
+};
+
+/**
+ * Wrapper around indexedDB.getDatabaseNames using promises
+ *
+ * MegaDB.getDatabaseNames().always(console.debug.bind(console))
+ */
+MegaDB.getDatabaseNames = function() {
+    var promise = new MegaPromise();
+
+    if (indexedDB && typeof indexedDB.getDatabaseNames === 'function') {
+        var request = indexedDB.getDatabaseNames();
+
+        request.onsuccess = function(ev) {
+            promise.resolve(ev.target.result);
+        };
+        request.onerror = function(ev) {
+            promise.reject(ev.target.result);
+        };
+    }
+    else {
+        promise.reject(DOMException.INVALID_ACCESS_ERR);
+    }
+
+    return promise;
+};
+
+
+/**
+ * Remove all databases
+ *
+ * @param aUserHandle {String} optional
+ */
+MegaDB.dropAllDatabases = function(aUserHandle) {
+    var promise = new MegaPromise();
+
+    MegaDB.getDatabaseNames()
+        .then(function(dbNameList) {
+            assert(dbNameList instanceof DOMStringList, 'Invalid database list.');
+
+            db.__closeAll();
+
+            var promises = [];
+            var len = dbNameList.length;
+            while (len--) {
+                var dbn = dbNameList.item(len);
+
+                if (!aUserHandle || dbn.substr(-aUserHandle.length) === aUserHandle) {
+                    promises.push(__drop(dbn));
+                }
+            }
+
+            MegaPromise.allDone(promises).then(promise.resolve.bind(promise));
+
+        }, function(error) {
+            promise.reject(error);
+        });
+
+    function __drop(dbName) {
+        var promise = new MegaPromise();
+
+        try {
+            var request = indexedDB.deleteDatabase( dbName );
+            request.onsuccess = function() {
+                promise.resolve();
+            };
+            request.onblocked = request.onerror = function(e) {
+                console.error('Unable to delete database', dbName, e);
+                promise.reject(e);
+            };
+        }
+        catch(e) {
+            promise.reject(e);
+        }
+
+        return promise;
+    }
+
+    return promise;
+};
+
+/**
+ * Convert any promise-related error to their ending point
+ *
+ * @param aError {mixed} an error thrown from a reject
+ * @returns {mixed} an expected error or null
+ */
+MegaDB.getRefError = function(aError) {
+    var result = null;
+
+    // nb: "reason" comes from our modified db.js
+    if (typeof aError === 'object' && "reason" in aError) {
+        aError = aError.reason;
+    }
+
+    if (aError instanceof Event) {
+
+        if (aError.type === 'blocked') {
+            result = new Error('Database is blocked');
+        }
+        else {
+            var target = aError.target;
+            var error = target && target.error;
+
+            if (error && (typeof DOMError !== 'undefined'
+                    && error instanceof DOMError
+                    || error instanceof DOMException)) {
+                result = error;
+            }
+        }
+    }
+    else if (aError instanceof DOMException) {
+        result = aError;
+    }
+
+    return result;
 };
 
 /**
@@ -251,7 +476,7 @@ MegaDB.prototype.update = function(tableName, k, val) {
     val = clone(val);
     self.trigger("onModifyQuery", [tableName, val]);
     self.trigger("onBeforeUpdate", [tableName, val[self._getTablePk(tableName)], val, true]);
-    return self.server.update(tableName, val);
+    return MegaPromise.asMegaPromiseProxy(self.server.update(tableName, val));
 };
 
 MegaDB.prototype.update = _wrapFnWithBeforeAndAfterEvents(
@@ -310,7 +535,7 @@ MegaDB.prototype.removeBy = function(tableName, keyName, value) {
     }
 
 
-    var promise = new $.Deferred();
+    var promise = new MegaPromise();
 
     q.execute()
         .then(function(r) {
@@ -318,7 +543,9 @@ MegaDB.prototype.removeBy = function(tableName, keyName, value) {
             if(r.length && r.length > 0) { // found
                 r.forEach(function(v) {
                     promises.push(
-                        self.server.remove(tableName, v[self._getTablePk(tableName)])
+                        MegaPromise.asMegaPromiseProxy(
+                            self.server.remove(tableName, v[self._getTablePk(tableName)])
+                        )
                     );
                 });
             }
@@ -363,9 +590,10 @@ MegaDB.prototype.clear = _wrapFnWithBeforeAndAfterEvents(
  * @returns {MegaPromise}
  */
 MegaDB.prototype.drop = function() {
-    var self = this;
-    self.close();
-    return self.server.destroy();
+    this.close();
+    delete localStorage[this.dbName + '_v'];
+    delete localStorage[this.dbName + '_hash'];
+    return MegaPromise.asMegaPromiseProxy(this.server.destroy());
 };
 
 MegaDB.prototype.drop = _wrapFnWithBeforeAndAfterEvents(
@@ -589,6 +817,7 @@ MegaDB.QuerySet.prototype.execute = MegaDB._delayFnCallUntilDbReady(
                 q = self._dequeueOps(q, opName);
             });
 
+        var $proxyPromise = new MegaPromise();
 
         // by using .map trigger an event when an object is loaded, so that the encryption can kick in and decrypt it
         q = q.map(function(r) {
@@ -597,6 +826,9 @@ MegaDB.QuerySet.prototype.execute = MegaDB._delayFnCallUntilDbReady(
             if(!$event.isPropagationStopped()) {
                 return r;
             } else {
+                if($event.data && $event.data.errors && $event.data.errors.length > 0) {
+                    $proxyPromise.reject($event.data.errors);
+                }
                 return undefined;
             }
         });
@@ -606,8 +838,6 @@ MegaDB.QuerySet.prototype.execute = MegaDB._delayFnCallUntilDbReady(
         q = self._dequeueOps(q, "map");
         q = self._dequeueOps(q, "modify");
 
-
-        var $proxyPromise = new MegaPromise();
 
         q.execute()
             .then(function(r) {

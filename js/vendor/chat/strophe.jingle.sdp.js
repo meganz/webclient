@@ -56,20 +56,7 @@ SDP.prototype.toJingle = function (elem, thecreator) {
                 elem.c('content', {name: tmp[j]}).up();
             }
             elem.up();
-
-            // temporary plan, to be removed
-            elem.c('group', {xmlns: 'urn:ietf:rfc:5888', type: semantics});
-            for (j = 0; j < tmp.length; j++) {
-                elem.c('content', {name: tmp[j]}).up();
-            }
-            elem.up();
         }
-    }
-    // old bundle plan, to be removed
-    var bundle = [];
-    if (SDPUtil.find_line(this.session, 'a=group:BUNDLE')) {
-        bundle = SDPUtil.find_line(this.session, 'a=group:BUNDLE ').split(' ');
-        bundle.shift();
     }
     for (i = 0; i < this.media.length; i++) {
         mline = SDPUtil.parse_mline(this.media[i].split('\r\n')[0]);
@@ -81,19 +68,14 @@ SDP.prototype.toJingle = function (elem, thecreator) {
         } else {
             ssrc = false;
         }
-
-        elem.c('content', {creator: thecreator, name: mline.media});
-        if (SDPUtil.find_line(this.media[i], 'a=mid:')) {
-            // prefer identifier from a=mid if present
-            var mid = SDPUtil.parse_mid(SDPUtil.find_line(this.media[i], 'a=mid:'));
-            elem.attrs({ name: mid });
-
-            // old BUNDLE plan, to be removed
-            if (bundle.indexOf(mid) != -1) {
-                elem.c('bundle', {xmlns: 'http://estos.de/ns/bundle'}).up();
-                bundle.splice(bundle.indexOf(mid), 1);
-            }
+        var name, mid;
+        if (mid = SDPUtil.find_line(this.media[i], 'a=mid:')) {
+            name = mid.substring(6);
+        } else {
+            name = mline.media;
         }
+
+        elem.c('content', {creator: thecreator, name: name});
         if (mline.media === 'application') {
             parseTransport(elem, this.media[i], this.session);
             var sctpmap = SDPUtil.find_line(this.media[i], 'a=sctpmap:');
@@ -309,9 +291,9 @@ SDP.prototype.fromJingle = function (jingle) {
         's=-\r\n' +
         't=0 0\r\n';
     // http://tools.ietf.org/html/draft-ietf-mmusic-sdp-bundle-negotiation-04#section-8
-    if ($(jingle).find('>group[xmlns="urn:xmpp:jingle:apps:grouping:0"]').length) {
-        try {
-        $(jingle).find('>group[xmlns="urn:xmpp:jingle:apps:grouping:0"]').each(function (idx, group) {
+    var group = $(jingle).find('>group[xmlns="urn:xmpp:jingle:apps:grouping:0"]');
+    if (group.length) {
+        group.each(function (idx, group) {
             var contents = $(group).find('>content').map(function (idx, content) {
                 return $(content).attr('name');
             }).get();
@@ -319,29 +301,6 @@ SDP.prototype.fromJingle = function (jingle) {
                 obj.raw += 'a=group:' + ($(group).attr('semantics') || $(group).attr('type')) + ' ' + contents.join(' ') + '\r\n';
             }
         });
-        } catch (e) { console.error(e.toString()); }
-    } else if ($(jingle).find('>group[xmlns="urn:ietf:rfc:5888"]').length) {
-        // temporary namespace, not to be used. to be removed soon.
-        $(jingle).find('>group[xmlns="urn:ietf:rfc:5888"]').each(function (idx, group) {
-            var contents = $(group).find('>content').map(function (idx, content) {
-                return $(content).attr('name');
-            }).get();
-            if ($(group).attr('type') !== null && contents.length > 0) {
-                obj.raw += 'a=group:' + $(group).attr('type') + ' ' + contents.join(' ') + '\r\n';
-            }
-        });
-    } else {
-        // for backward compability, to be removed soon
-        // assume all contents are in the same bundle group, can be improved upon later
-        var bundle = $(jingle).find('>content').filter(function (idx, content) {
-            //elem.c('bundle', {xmlns:'http://estos.de/ns/bundle'});
-            return $(content).find('>bundle').length > 0;
-        }).map(function (idx, content) {
-            return $(content).attr('name');
-        }).get();
-        if (bundle.length) {
-            this.raw += 'a=group:BUNDLE ' + bundle.join(' ') + '\r\n';
-        }
     }
 
     this.session = this.raw;
@@ -737,7 +696,7 @@ SDPUtil = {
         var lines = haystack.split('\r\n'),
             needles = [];
         for (var i = 0; i < lines.length; i++) {
-            if (lines[i].substring(0, needle.length) == needle)
+            if (lines[i].substring(0, needle.length) === needle)
                 needles.push(lines[i]);
         }
         if (needles.length || !sessionpart) {
@@ -746,7 +705,7 @@ SDPUtil = {
         // search session part
         lines = sessionpart.split('\r\n');
         for (var j = 0; j < lines.length; j++) {
-            if (lines[j].substring(0, needle.length) == needle) {
+            if (lines[j].substring(0, needle.length) === needle) {
                 needles.push(lines[j]);
             }
         }
@@ -755,17 +714,17 @@ SDPUtil = {
     candidateToJingle: function (line) {
         // a=candidate:2979166662 1 udp 2113937151 192.168.2.100 57698 typ host generation 0
         //      <candidate component=... foundation=... generation=... id=... ip=... network=... port=... priority=... protocol=... type=.../>
-        if (line.substring(0, 12) != 'a=candidate:') {
+        if (line.substring(0, 12) !== 'a=candidate:') {
             console.log('parseCandidate called with a line that is not a candidate line');
             console.log(line);
             return null;
         }
-        if (line.substring(line.length - 2) == '\r\n') // chomp it
+        if (line.substring(line.length - 2) === '\r\n') // chomp it
             line = line.substring(0, line.length - 2);
         var candidate = {},
             elems = line.split(' '),
             i;
-        if (elems[6] != 'typ') {
+        if (elems[6] !== 'typ') {
             console.log('did not find typ in the right place');
             console.log(line);
             return null;

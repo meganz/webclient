@@ -1,5 +1,5 @@
 var IMAGE_PLACEHOLDER = staticpath + "/images/img_loader@2x.png";
-var CMS_HOST = "http://46.101.165.59";
+var CMS_HOST = "https://cms.mega.nz/";
 
 (function(window, asmCrypto) {
 
@@ -107,7 +107,7 @@ function doRequest(id) {
 	var q = getxhr();
 	q.onerror = function() {
 		Later(function() {
-			cmsObjectToId(name);
+            doRequest(id);
 		})
 		q = null;
 	};
@@ -193,6 +193,7 @@ var CMS = {
 			doRequest(id);
 			fetching[id] = [];
 		}
+		next = next || function() {};
 		fetching[id].push([next, as]);
 	},
 

@@ -75,7 +75,7 @@ if (!b_u) try
 
         loadSubScript('chrome://mega/content/strg5.js');
 
-        if(!(localStorage instanceof Ci.nsIDOMStorage)) {
+        if (!(localStorage instanceof Ci.nsIDOMStorage)) {
             throw new Error('Invalid DOM Storage instance.');
         }
         d = !!localStorage.d;
@@ -113,7 +113,7 @@ catch(e) {
     }
 }
 
-var mega = {ui: {}};
+var mega = {ui: {}, utils: {}};
 var bootstaticpath = staticpath;
 var urlrootfile = '';
 
@@ -283,13 +283,13 @@ var mBroadcaster = {
             if (d) console.log('Broadcasting ' + topic, args);
 
             for (var id in this._topics[topic]) {
-                var ev = this._topics[topic][id];
+                var ev = this._topics[topic][id], rc;
                 try {
-                    ev.callback.apply(ev.scope, args);
+                    rc = ev.callback.apply(ev.scope, args);
                 } catch (ex) {
                     if (d) console.error(ex);
                 }
-                if (ev.once)
+                if (ev.once || rc === 0xDEAD)
                     idr.push(id);
             }
             if (idr.length)
@@ -388,7 +388,8 @@ var mBroadcaster = {
         },
 
         leave: function crossTab_leave() {
-            if (this.master) {
+            var wasMaster = this.master;
+            if (wasMaster) {
                 localStorage['mCrossTabRef_' + u_handle] = this.master;
                 this.notify('leaving', this.master);
                 delete this.master;
@@ -396,6 +397,7 @@ var mBroadcaster = {
                 if (d) console.log('crossTab leaving');
             }
             this.unlisten();
+            mBroadcaster.sendMessage('crossTab:leave', wasMaster);
         },
 
         notify: function crossTab_notify(msg, data) {
@@ -406,6 +408,8 @@ var mBroadcaster = {
 
         setMaster: function crossTab_setMaster() {
             this.master = (Math.random() * Date.now()).toString(36);
+
+            mBroadcaster.sendMessage('crossTab:master', this.master);
 
             // (function liveLoop(tag) {
                 // if (tag === mBroadcaster.crossTab.master) {
@@ -699,14 +703,14 @@ else if (!b_u)
         var timers = {};
         c.time = function(n) { timers[n] = new Date().getTime()};
         c.timeEnd = function(n) {
-            if(timers[n]) {
+            if (timers[n]) {
                 c.log(n + ': ' + (new Date().getTime() - timers[n]) + 'ms');
                 delete timers[n];
             }
         };
     })(console);
 
-    Object.defineProperty(window, "__cd_v", { value : 11, writable : false });
+    Object.defineProperty(window, "__cd_v", { value : 13, writable : false });
     if (!d || onBetaW)
     {
         var __cdumps = [], __cd_t;
@@ -725,7 +729,7 @@ else if (!b_u)
             if (__cdumps.length > 3) return false;
 
             var dump = {
-                m : ('' + msg).replace(/'(\w+:\/\/+[^/]+)[^']+'/,"'$1...'").replace(/^Uncaught\s*/,''),
+                m : ('' + msg).replace(/'(\w+:\/\/+[^/]+)[^']+'/,"'$1...'").replace(/^Uncaught\W*(?:exception\W*)?/i,''),
                 f : mTrim('' + url), l : ln
             }, cc, sbid = +(''+(document.querySelector('script[src*="secureboot"]')||{}).src).split('=').pop()|0;
 
@@ -860,7 +864,7 @@ else if (!b_u)
     {
         if (!navigator.language) return 'en';
         var bl = navigator.language.toLowerCase();
-        var l2 = languages;
+        var l2 = languages, b;
         for (var l in l2) for (b in l2[l]) if (l2[l][b] == bl) return l;
         for (var l in l2) for (b in l2[l]) if (l2[l][b].substring(0,3)==bl.substring(0,3)) return l;
         return 'en';
@@ -921,6 +925,7 @@ else if (!b_u)
     jsl.push({f:'js/jsbn.js', n: 'jsbn_js', j:1,w:2});
     jsl.push({f:'js/jsbn2.js', n: 'jsbn2_js', j:1,w:2});
     jsl.push({f:'js/jodid25519.js', n: 'jodid25519_js', j:1,w:7});
+    jsl.push({f:'js/megaPromise.js', n: 'megapromise_js', j:1,w:5});
     jsl.push({f:'js/user.js', n: 'user_js', j:1});
     jsl.push({f:'js/authring.js', n: 'authring_js', j:1});
     jsl.push({f:'js/mouse.js', n: 'mouse_js', j:1});
@@ -940,7 +945,6 @@ else if (!b_u)
     jsl.push({f:'js/bitcoin-math.js', n: 'bitcoinmath', j:1 });
     jsl.push({f:'js/paycrypt.js', n: 'paycrypt_js', j:1 });
     jsl.push({f:'js/vendor/jquery.window-active.js', n: 'jquery_windowactive', j:1,w:2});
-    jsl.push({f:'js/megaPromise.js', n: 'megapromise_js', j:1,w:5});
     jsl.push({f:'js/vendor/db.js', n: 'db_js', j:1,w:5});
     jsl.push({f:'js/megaDbEncryptionPlugin.js', n: 'megadbenc_js', j:1,w:5});
     jsl.push({f:'js/megaDb.js', n: 'megadb_js', j:1,w:5});
@@ -1056,6 +1060,7 @@ else if (!b_u)
     jsl.push({f:'js/Int64.js', n: 'int64_js', j:1});
     jsl.push({f:'js/zip64.js', n: 'zip_js', j:1});
     jsl.push({f:'js/cms.js', n: 'cms_js', j:1});
+    jsl.push({f:'js/megasync.js', n: 'megasync_js', j:1});
 
     jsl.push({f:'js/windowOpenerProtection.js', n: 'windowOpenerProtection', j:1,w:1});
 
@@ -1287,7 +1292,7 @@ else if (!b_u)
     function jsl_start()
     {
         jslcomplete = 0;
-        if(d && jj) {
+        if (d && jj) {
             xhr_progress = [0, 0, 0, 0, 0];
         } else {
             xhr_progress = [0, 0];
@@ -1378,8 +1383,8 @@ else if (!b_u)
 
     function xhr_load(url,jsi,xhri)
     {
-        if(d && jj) {
-            if(jsl[jsi].j == 1 || jsl[jsi].j == 2) {
+        if (d && jj) {
+            if (jsl[jsi].j == 1 || jsl[jsi].j == 2) {
                 // DON'T load via XHR any js or css files...since when jj == 1, secureboot will append them in the doc.
 
                 jsl_current += jsl[jsi].w || 1;

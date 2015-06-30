@@ -2169,7 +2169,6 @@ function encryptto(user, data) {
 var u_sharekeys = {};
 var u_nodekeys = {};
 
-// u_nodekeys must be set for all sharenodes
 // Add/cancel share(s) to a set of users or email addresses
 // targets is an array of {u,r} - if no r given, cancel share
 // If no sharekey known, tentatively generates one and encrypts
@@ -2177,20 +2176,13 @@ var u_nodekeys = {};
 // an error, and the whole operation gets repeated (exceedingly
 // rare race condition).
 function api_setshare(node, targets, sharenodes, ctx) {
-    // cache all targets' public keys
-    var u = [];
-
-    for (var i = targets.length; i--;) {
-        u.push(targets[i].u);
-    }
-
-    api_cachepubkeys({
+    
+    api_setshare1({
             node: node,
             targets: targets,
             sharenodes: sharenodes,
-            ctx: ctx,
-            cachepubkeyscomplete: api_setshare1
-        }, u);
+            ctx: ctx
+        });
 }
 
 function api_setshare1(ctx, params) {

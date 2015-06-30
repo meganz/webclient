@@ -31,21 +31,24 @@ var useravatar = (function() {
     /**
      *  Take the class colors and create a inject as a CSS.
      */
-    function registerCssColors() {
+    var registerCssColors = function() {
         var css = "";
         for (var i in _colors) {
-            css += ".color" + (parseInt(i) + 1) + " { background-color: " + _colors[i] + "; }";
+            if (!_colors.hasOwnProperty(i)) {
+                continue;
+            }
+            css += ".color" + (parseInt(i) + 1) + " { background-color: "
+                + _colors[i] + "; }";
         }
         css = mObjectURL([css], "text/css");
         mCreateElement('link', {type: 'text/css', rel: 'stylesheet'}, 'head').href = css;
-    }
+    };
 
     /**
-     *  private method
-     *
-     *  Return a SVG image representing the TWO-Letters avatar
+     * Return a SVG image representing the TWO-Letters avatar
+     * @private
      */
-    function _twoLettersImg(letters) {
+    var _twoLettersImg = function(letters) {
         var s = _twoLettersSettings(letters);
         var tpl = $('#avatar-svg').clone().removeClass('hidden')
             .find('svg').css('background-color', s.color).end()
@@ -53,16 +56,15 @@ var useravatar = (function() {
 
         tpl = window.btoa(unescape(tpl.html()));
         return 'data:image/svg+xml;base64,' + tpl;
-    }
+    };
 
     /**
-     *  private method
+     * Return two letters and the color for a given string
      *
-     *  Return two letters and the color for a given string
-     *
-     *  @return string
+     * @return {string}
+     * @private
      */
-    function _twoLettersSettings(letters) {
+    var _twoLettersSettings = function(letters) {
         var words = letters.toUpperCase().split(/\W+/);
         if (words.length === 1) {
             letters = words[0].substr(0, 2);
@@ -76,7 +78,7 @@ var useravatar = (function() {
         }
         color = color % _colors.length;
         return {letters: letters, color: _colors[color], colorIndex: color + 1 };
-    }
+    };
 
     /**
      *  Return the HTML to represent a two letter avatar.
@@ -87,7 +89,7 @@ var useravatar = (function() {
      *
      *  @return HTML
      */
-    function _twoLetters(letters, id, className, element) {
+    var _twoLetters = function(letters, id, className, element) {
         if (element === 'ximg') {
             return _twoLettersImg(letters);
         }
@@ -99,7 +101,7 @@ var useravatar = (function() {
         return '<' + element + ' class="avatar-wrapper ' + className + ' ' + id +  ' color' + s.colorIndex + '">'
                     + s.letters
                 + '</' + element + '>';
-    }
+    };
 
     /**
      *  Return an image HTML from an URL
@@ -108,11 +110,11 @@ var useravatar = (function() {
      *  @param id           ID associate with the avatar (uid)
      *  @param className Any extra CSS classes that we want to append to the HTML
      */
-    function _image(url, id, className, type) {
+    var _image = function(url, id, className, type) {
         return '<' + type + ' class="avatar-wrapper ' + id + ' ' + className + '">'
                 + '<img src="' + url + '">'
          + '</' + type + '>';
-    }
+    };
 
     /**
      *  Check if the input is an email address or not.

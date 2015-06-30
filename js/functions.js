@@ -2920,7 +2920,7 @@ mega.utils.reload = function megaUtilsReload() {
         msgDialog('confirmation', l[761], l[6995], l[6994], function(doIt) {
             if (doIt) {
                 if (!mBroadcaster.crossTab.master || mBroadcaster.crossTab.slaves.length) {
-                    msgDialog('warningb', l[882], 'Please close all other browser windows/tabs with MEGA loaded in them before procedding.');
+                    msgDialog('warningb', l[882], l[7157]);
                 }
                 if (mBroadcaster.crossTab.master) {
                     mega.utils.abortTransfers().then(function() {

@@ -15319,6 +15319,9 @@ div.membership-bott-button {
 	line-height: 20px;
 	color: #3F4646;
 }
+.membership-step2 .other-payment-providers {
+    margin-top: 3px;
+}
 .affiliate-txt-pad {
 	padding-top: 6px;
 }

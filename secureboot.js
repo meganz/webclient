@@ -1060,6 +1060,7 @@ else if (!b_u)
     jsl.push({f:'js/Int64.js', n: 'int64_js', j:1});
     jsl.push({f:'js/zip64.js', n: 'zip_js', j:1});
     jsl.push({f:'js/cms.js', n: 'cms_js', j:1});
+    jsl.push({f:'js/megasync.js', n: 'megasync_js', j:1});
 
     jsl.push({f:'js/windowOpenerProtection.js', n: 'windowOpenerProtection', j:1,w:1});
 

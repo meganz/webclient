@@ -258,10 +258,7 @@ CallSession.prototype.onWaitingResponseIncoming = function(e, eventData) {
             self.logger.error("Contact not found: ", participants[0]);
         } else {
 
-            var avatar = null;
-            if (avatars[contact.u]) {
-                avatar = avatars[contact.u].url;
-            }
+            var avatar = useravatar.imgUrl(contact.u);
 
             self.room.megaChat.trigger('onIncomingCall', [
                 self.room,
@@ -919,56 +916,22 @@ CallSession.prototype.renderCallStartedState = function() {
         '.my-av-screen'
     ].join(","), self.room.$header.parent()).addClass("hidden");
 
-
     // configure elements - avatars
-    var myAvatar = avatars[u_handle];
-    if (myAvatar) {
-        $('.my-avatar', self.room.$header).attr('src', myAvatar.url);
-        $('.my-avatar', self.room.$header).show();
-        $('.my-avatar-text', self.room.$header).hide();
-    } else {
-        $('.my-avatar', self.room.$header).hide();
-        var $txtAvatar = $('<div class="nw-contact-avatar"/>')
-            .append(
-            generateAvatarElement(u_handle)
-        )
-            .addClass(u_handle)
-            .addClass(
-            "color" + generateAvatarMeta(u_handle).color
-        );
+    var myAvatar = $(useravatar.contact(u_handle, 'nw-contact-avatar'));
+    $('.my-avatar-text', self.room.$header)
+        .empty()
+        .append(myAvatar);
+    $('.my-avatar', self.room.$header).hide();
 
-        $('.my-avatar-text', self.room.$header)
-            .empty()
-            .append(
-            $txtAvatar
-        )
-            .show();
-    }
     var otherUserContact = self.room.megaChat.getContactFromJid(self.room.getParticipantsExceptMe()[0]);
-    if (otherUserContact.u && avatars[otherUserContact.u]) {
-        $('.other-avatar', self.room.$header).attr('src', avatars[otherUserContact.u].url);
-        $('.other-avatar', self.room.$header).show();
-        $('.other-avatar-text', self.room.$header).hide();
-    } else {
-        $('.other-avatar', self.room.$header).hide();
-
-        var $txtAvatar2 = $('<div class="nw-contact-avatar"/>')
-            .append(
-            generateAvatarElement(otherUserContact.u)
-        )
-            .addClass(otherUserContact.u)
-            .addClass(
-            "color" + generateAvatarMeta(otherUserContact.u).color
-        );
-
-        $('.other-avatar-text', self.room.$header)
-            .empty()
-            .append(
-            $txtAvatar2
-        )
-            .show();
-    }
-
+    var otherAvatar = $(useravatar.contact(otherUserContact, 'nw-contact-avatar', 'div'));
+    otherAvatar.html("<span>" + otherAvatar.html() + "</span>");
+    otherAvatar.find('img').addClass('nw-contact-avatar');
+    $('.other-avatar-text', self.room.$header)
+        .empty()
+        .append(otherAvatar)
+        .show();
+    $('.other-avatar', self.room.$header).hide();
 
     // new fullscreen logic
     var $expandButtons = $('.video-call-button.size-icon');

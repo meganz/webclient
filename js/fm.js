@@ -2148,13 +2148,9 @@ function fmremove() {
             $('#msgDialog .fm-del-contact-avatar span').empty()
         } else {
             var user = M.d[$.selected[0]];
-            var av_meta = generateAvatarMeta(user.h);
-            var avatar = av_meta.shortName, av_color = av_meta.color;
-            if (av_meta.avatarUrl)
-                avatar = '<img src="' + av_meta.avatarUrl + '">';
+            avatar = useravatar.contct(user);
 
-            $('#msgDialog .fm-del-contact-avatar').attr('class', 'fm-del-contact-avatar two-letters ' + htmlentities(user.h) + ' color' + av_color)
-            $('#msgDialog .fm-del-contact-avatar span').html(avatar);
+            $('#msgDialog .fm-del-contact-avatar').html(avatar);
         }
     } else if (RootbyId($.selected[0]) === M.RubbishID) {
         msgDialog('clear-bin', l[1003], l[76].replace('[X]', (filecnt + foldercnt)) + ' ' + l[77], l[1007], function(e) {
@@ -3849,15 +3845,24 @@ function accountUI()
             initAccountScroll();
         });
 
+        $('.fm-account-remove-avatar,.fm-account-avatar').rebind('click', function() {
+            msgDialog('confirmation', l[1756], l[6973], false, function(e) {
+                if (e) {
+                    api_req({'a': 'up', '+a':'none'});
+                    delete avatars[u_handle];
+                    $('.fm-account-avatar img').attr('src', useravatar.mine());
+                    $('.fm-avatar img').attr('src', useravatar.mine());
+                    $('.fm-account-remove-avatar').hide();
+                }
+            });
+        });
+
         $('.fm-account-change-avatar,.fm-account-avatar').unbind('click');
         $('.fm-account-change-avatar,.fm-account-avatar').bind('click', function(e)
         {
             avatarDialog();
         });
-        if (avatars[u_handle])
-            $('.fm-account-avatar img').attr('src', avatars[u_handle].url);
-        else
-            $('.fm-account-avatar img').attr('src', staticpath + 'images/mega/default-avatar.png');
+        $('.fm-account-avatar img').attr('src', useravatar.mine())
 
         $(window).unbind('resize.account');
         $(window).bind('resize.account', function()
@@ -4047,8 +4052,8 @@ function avatarDialog(close)
                         data: blob,
                         url: myURL.createObjectURL(blob)
                     }
-                $('.fm-account-avatar img').attr('src', avatars[u_handle].url);
-                $('.fm-avatar img').attr('src', avatars[u_handle].url);
+                $('.fm-account-avatar img').attr('src', useravatar.mine());
+                $('.fm-avatar img').attr('src', useravatar.mine());
                 avatarDialog(1);
             },
             onImageUpload: function()
@@ -6928,7 +6933,7 @@ function shareDialogContentCheck() {
     }
 }
 
-function addShareDialogContactToContent(type, id, av_color, av, name, permClass, permText, exportLink) {
+function addShareDialogContactToContent(type, id, av, name, permClass, permText, exportLink) {
 
     var html = '',
         htmlEnd = '',
@@ -6941,8 +6946,7 @@ function addShareDialogContactToContent(type, id, av_color, av, name, permClass,
         exportClass = 'share-item-bl';
     }
     else {
-        item = '<div class="nw-contact-avatar color' + av_color + '">' + av + '</div>'
-               +   '<div class="fm-chat-user-info">'
+        item = av +   '<div class="fm-chat-user-info">'
                +       '<div class="fm-chat-user">' + name + '</div>'
                +   '</div>';
     }
@@ -7017,8 +7021,7 @@ function generateShareDialogRow(displayNameOrEmail, email, shareRights, userHand
 
     var rowId = '',
         html = '',
-        av_color = displayNameOrEmail.charCodeAt(0) % 6 + displayNameOrEmail.charCodeAt(1) % 6,
-        av = (avatars[userHandle] && avatars[userHandle].url) ? '<img src="' + avatars[userHandle].url + '">' : (displayNameOrEmail.charAt(0) + displayNameOrEmail.charAt(1)),
+        av =  useravatar.contact(userHandle),
         perm = '',
         permissionLevel = 0;
 
@@ -7039,7 +7042,7 @@ function generateShareDialogRow(displayNameOrEmail, email, shareRights, userHand
     $.sharedTokens.push(email);
 
     rowId = (userHandle) ? userHandle : email;
-    html = addShareDialogContactToContent('', rowId, av_color, av, displayNameOrEmail, perm[0], perm[1]);
+    html = addShareDialogContactToContent('', rowId, av, displayNameOrEmail, perm[0], perm[1]);
 
     $('.share-dialog .share-dialog-contacts').append(html);
 }
@@ -9734,10 +9737,7 @@ function sharedfolderUI() {
     if (n) {
         var u_h = n.p;
         var user = M.d[u_h];
-        var av_meta = generateAvatarMeta(u_h);
-        var avatar = av_meta.shortName, av_color = av_meta.color;
-        if (av_meta.avatarUrl)
-            avatar = '<img src="' + av_meta.avatarUrl + '">';
+        avatar = useravatar.contact(user, 'nw-contact-avatar');
 
         var rights = l[55], rightsclass = ' read-only';
         if (n.r === 1) {
@@ -9764,7 +9764,7 @@ function sharedfolderUI() {
                         +'<a href="javascript:;" class="grid-url-arrow"><span></span></a>'
                         +'<div class="shared-folder-access'+ rightsclass + '">' + rights + '</div>'
                         +'<div class="clear"></div>'
-                        +'<div class="nw-contact-avatar color10">' + avatar + '</div>'
+                        + avatar
                         +'<div class="fm-chat-user-info">'
                             +'<div class="fm-chat-user">' + nameStr + '</div>'
                         +'</div>'
@@ -9787,27 +9787,6 @@ function sharedfolderUI() {
     }
 
     return r;
-}
-
-function userAvatar(userid)
-{
-    userid = userid.u || userid;
-    var user = M.u[userid];
-    if (!user || !user.u) {
-        return;
-    }
-
-    var name = user.name || user.m;
-
-    var av_meta = generateAvatarMeta(userid);
-    var avatar = av_meta.shortName, av_color = av_meta.color;
-    if (av_meta.avatarUrl)
-        avatar = '<img src="' + av_meta.avatarUrl + '">';
-
-    if (avatars[userid])
-        avatar = '<img src="' + avatars[userid].url + '">';
-
-    return {img: avatar, color: av_color};
 }
 
 function userFingerprint(userid, next) {
@@ -9843,12 +9822,9 @@ function fingerprintDialog(userid)
         $this = null;
     }
 
-    var $this = $('.fingerprint-dialog')
-        , avatar = userAvatar(userid);
+    var $this = $('.fingerprint-dialog');
 
-    $this.find('.fingerprint-avatar')
-        .attr('class', 'fingerprint-avatar color' + avatar.color)
-        .html(avatar.img)
+    $this.find('.fingerprint-avatar').empty().append($(useravatar.contact(userid)).removeClass('avatar'));
 
     $this.find('.contact-details-user-name')
         .text(user.name || user.m) // escape HTML things
@@ -9909,12 +9885,10 @@ function contactUI() {
         var u_h = M.currentdirid;
 //        var cs = M.contactstatus(u_h);
         var user = M.d[u_h];
-
-        var avatar = userAvatar(u_h);
+        var avatar = $(useravatar.contact(u_h));
 
         var onlinestatus = M.onlineStatusClass(megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h)));
-        $('.contact-top-details .nw-contact-block-avatar').attr('class', 'nw-contact-block-avatar two-letters ' + htmlentities(u_h) + ' color' + avatar.color);
-        $('.contact-top-details .nw-contact-block-avatar').html(avatar.img);
+        $('.contact-top-details .nw-contact-block-avatar').empty().append( avatar.removeClass('avatar') )
         $('.contact-top-details .onlinestatus').removeClass('away offline online busy');
         $('.contact-top-details .onlinestatus').addClass(onlinestatus[1]);
         $('.contact-top-details .fm-chat-user-status').text(onlinestatus[0]);

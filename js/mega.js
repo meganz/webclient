@@ -1788,6 +1788,7 @@ function MegaData()
     };
 
     this.buildtree = function(n, dialog, stype) {
+        
         if (!n) {
             console.error('Invalid node passed to M.buildtree');
             return;
@@ -1869,6 +1870,7 @@ function MegaData()
                 }
             }
 
+            // localCompare >=IE10, FF and Chrome OK
             // sort by name is default in the tree
             treePanelSortElements(stype, folders, {
                 name: function(a, b) {
@@ -1940,9 +1942,13 @@ function MegaData()
                     else {
                         var sExportLink = (M.d[folders[ii].h].shares && M.d[folders[ii].h].shares.EXP) ? 'linked' : '';
                         var sLinkIcon = (sExportLink === '') ? '' : 'link-icon';
+                        var arrowIcon = '';
+                        if (M.c[folders[ii].h]) {
+                            arrowIcon = 'class="nw-fm-arrow-icon"';
+                        }
                         var html = '<li id="' + _li + folders[ii].h + '">\n\
                                         <span  id="' + _a + htmlentities(folders[ii].h) + '" class="nw-fm-tree-item ' + containsc + ' ' + expandedc + ' ' + openedc + ' ' + sExportLink + '">\n\
-                                            <span class="nw-fm-arrow-icon"></span>\n\
+                                            <span ' + arrowIcon + '></span>\n\
                                             <span class="nw-fm-tree-folder' + sharedfolder + '">' + htmlentities(folders[ii].name) + '</span>\n\
                                             <span class="' + sLinkIcon + '"></span>\n\
                                         </span>\n\
@@ -1968,9 +1974,9 @@ function MegaData()
                             $('#' + _li + folders[ii].h).parents('li').removeClass('tree-item-on-search-hidden');
                         }
                     }
-                    if (buildnode) {
-                        this.buildtree(folders[ii], dialog, stype);
-                    }
+//                    if (buildnode) {
+//                        this.buildtree(folders[ii], dialog, stype);
+//                    }
 
                     sharedUInode(folders[ii].h);
                 }
@@ -1984,23 +1990,21 @@ function MegaData()
     // divider & advanced
     var adv = '<span class="context-menu-divider"></span><span class="context-menu-item advanced-item"><span class="context-menu-icon"></span>Select Location</span>';
 
-    this.buildRootSubmenu = function()
-    {
-        $('#sm_move').remove();
-        var cs = '';
-        var sm = '';
-
-        for (var h in M.c[M.RootID])
-        {
-            if (M.d[h].t)
-            {
+    this.buildRootSubMenu = function() {
+        
+        var cs = '',
+            sm = '',
+            html = '';
+        
+        for (var h in M.c[M.RootID]) {
+            if (M.d[h].t) {
                 cs = ' contains-submenu';
                 sm = '<span class="context-submenu" id="sm_' + this.RootID + '"><span id="csb_' + this.RootID + '"></span>' + arrow + '</span>';
                 break;
             }
         }
 
-        var html = '<span class="context-submenu" id="sm_move"><span id="csb_move">';
+        html = '<span class="context-submenu" id="sm_move"><span id="csb_move">';
         html += '<span class="context-menu-item cloud-item' + cs + '" id="fi_' + this.RootID + '">' + icon + 'Cloud Drive' + '</span>' + sm;
         html += '<span class="context-menu-item remove-item" id="fi_' + this.RubbishID + '">' + icon + 'Rubbish Bin' + '</span>';
         html += adv;
@@ -2010,14 +2014,16 @@ function MegaData()
         $('.context-menu-item.move-item').after(html);
     };
 
-    this.buildSubmenu = function(id, p)
-    {
-        var folders = [];
-
-        if (typeof id === 'undefined') {
-            this.buildRootSubmenu();
-            id = this.RootID;
-        }
+    /*
+     * buildSubMenu - context menu related
+     * Create sub-menu for context menu parent directory
+     * 
+     * @param {string} id - parent folder handle 
+     */
+    this.buildSubMenu = function(id) {
+        
+        var folders = [],
+            sub, cs, sm, fid, sharedFolder, html;
 
         for (var i in this.c[id]) {
             if (this.d[i] && this.d[i].t === 1 && this.d[i].name) {
@@ -2025,37 +2031,39 @@ function MegaData()
             }
         }
 
-// localeCompare is not supported in IE10, >=IE11 only
-// sort by name is default in the tree
-        folders.sort(function(a, b)
-        {
-            if (a.name)
-                return a.name.localeCompare(b.name);
-        });
-        for (var i in folders)
-        {
-            var sub = false;
-            var cs = '';
-            var sm = '';
-            var fid = folders[i].h;
+        // Check existance of sub-menu
+        if ($('#csb_' + id + ' > .context-menu-item').length !== folders.length)  {
+            // localeCompare is not supported in IE10, >=IE11 only
+            // sort by name is default in the tree
+            folders.sort(function(a, b) {
+                if (a.name)
+                    return a.name.localeCompare(b.name);
+            });
+        
+            for (var i in folders) {
+                sub = false;
+                cs = '';
+                sm = '';
+                fid = folders[i].h;
 
-            for (var h in M.c[fid])
-            {
-                if (M.d[h] && M.d[h].t)
-                {
-                    sub = true;
-                    cs = ' contains-submenu';
-                    sm = '<span class="context-submenu" id="sm_' + fid + '"><span id="csb_' + fid + '"></span>' + arrow + '</span>';
-                    break;
+                for (var h in M.c[fid]) {
+                    if (M.d[h] && M.d[h].t) {
+                        sub = true;
+                        cs = ' contains-submenu';
+                        sm = '<span class="context-submenu" id="sm_' + fid + '"><span id="csb_' + fid + '"></span>' + arrow + '</span>';
+                        break;
+                    }
                 }
+
+                sharedFolder = 'folder-item';
+                if (typeof M.d[fid].shares !== 'undefined') {
+                    sharedFolder += ' shared-folder-item';
+                }
+
+                html = '<span class="context-menu-item ' + sharedFolder + cs + '" id="fi_' + fid + '">' + icon + htmlentities(this.d[fid].name) + '</span>' + sm;
+
+                $('#csb_' + id).append(html);
             }
-            var sharedfolder = 'folder-item';
-            if (typeof M.d[fid].shares !== 'undefined')
-                sharedfolder += ' shared-folder-item';
-            var html = '<span class="context-menu-item ' + sharedfolder + cs + '" id="fi_' + fid + '">' + icon + htmlentities(this.d[fid].name) + '</span>' + sm;
-            $('#csb_' + id).append(html);
-            if (sub)
-                this.buildSubmenu(fid);
         }
     };
 
@@ -4597,7 +4605,6 @@ function renderNew() {
     if (newshare) {
         M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
     }
-    M.buildSubmenu();
     initContextUI();
     if (newpath) {
         M.renderPath();

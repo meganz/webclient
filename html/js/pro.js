@@ -629,8 +629,8 @@ var proPage = {
      * Loads the payment gateway options into Payment options section
      */
     loadPaymentGatewayOptions: function() {
-
-        // Payment gateways, hardcoded for now, may call API in future to get list
+        
+        // All payment gateways for the webclient with options
         var gatewayOptions = [
         {
             apiGatewayId: 8,
@@ -647,7 +647,7 @@ var proPage = {
             cssClass: 'bitcoin'
         },
         {
-            apiGatewayId: null,
+            apiGatewayId: 0,
             displayName: l[504],            // Prepaid balance
             supportsRecurring: false,
             supportsMonthlyPayment: true,
@@ -657,50 +657,68 @@ var proPage = {
             apiGatewayId: null,
             displayName: l[6198],           // Wire transfer
             supportsRecurring: false,
-            supportsMonthlyPayment: false,  // Accept for 1 year one-time payment only
+            supportsMonthlyPayment: false,  // Accept 1 year, one-time payment only (wire transfer fees are expensive)
             cssClass: 'wire-transfer'
-        }/*,
+        },
         {
             apiGatewayId: 5,
             displayName: l[7109],           // UnionPay
             supportsRecurring: false,
             supportsMonthlyPayment: true,
             cssClass: 'union-pay'
-        }*/];
+        }];
+        
+        // Do API request (User Forms of Payment Query) to get the valid list of currently active 
+        // payment providers. Returns an array of active payment providers e.g. [0,2,3,4,5,8].
+        api_req({ a: 'ufpq' }, {
+            callback: function (validGatewayIds) {
+                
+                // If an API error (negative number) exit early
+                if ((typeof validGatewayIds === 'number') && (validGatewayIds < 0)) {
+                    return false;
+                }
+                
+                var html = '';
 
-        var html = '';
+                // Loop through gateway providers (change to use list from API soon)
+                for (var i = 0, length = gatewayOptions.length; i < length; i++) {
 
-        // Loop through gateway providers (change to use list from API soon)
-        for (var i = 0, length = gatewayOptions.length; i < length; i++) {
+                    var gatewayOption = gatewayOptions[i];
+                    var optionChecked = '';
+                    var classChecked = '';
 
-            var gatewayOption = gatewayOptions[i];
-            var optionChecked = '', classChecked = '';
+                    // Pre-select the first option in the list
+                    if (!html) {
+                        optionChecked = 'checked="checked" ';
+                        classChecked = ' checked';
+                    }
 
-            // Pre-select the first option in the list
-            if (!html) {
-                optionChecked = 'checked="checked" ';
-                classChecked = ' checked';
+                    // If their prepay balance is less than 0 don't show that option
+                    if ((gatewayOption.apiGatewayId === 0) && (parseFloat(pro_balance) <= 0)) {
+                        continue;
+                    }
+                    
+                    // If it's not the wire transfer option and not in the list of enabled gateways skip it
+                    if ((gatewayOption.apiGatewayId !== null) && (validGatewayIds.indexOf(gatewayOption.apiGatewayId) === -1)) {
+                        continue;
+                    }
+
+                    // Create a radio button with icon for each payment gateway
+                    html += '<div class="payment-method">'
+                         +      '<div class="membership-radio' + classChecked + '">'
+                         +          '<input type="radio" name="' + gatewayOption.cssClass + '" id="' + gatewayOption.cssClass + '" ' + optionChecked + ' value="' + gatewayOption.cssClass + '" data-recurring="' + gatewayOption.supportsRecurring + '"  data-supports-monthly-payment="' + gatewayOption.supportsMonthlyPayment + '" />'
+                         +          '<div></div>'
+                         +      '</div>'
+                         +      '<div class="membership-radio-label ' + gatewayOption.cssClass + '">'
+                         +          gatewayOption.displayName
+                         +      '</div>'
+                         +  '</div>';
+                }
+
+                // Change radio button states when clicked
+                proPage.initPaymentMethodRadioOptions(html);                
             }
-
-            // If their prepay balance is less than 0 don't show that option
-            if ((gatewayOption.cssClass === 'prepaid-balance') && (parseFloat(pro_balance) <= 0)) {
-                continue;
-            }
-
-            // Create a radio button with icon for each payment gateway
-            html += '<div class="payment-method">'
-                 +      '<div class="membership-radio' + classChecked + '">'
-                 +          '<input type="radio" name="' + gatewayOption.cssClass + '" id="' + gatewayOption.cssClass + '" ' + optionChecked + ' value="' + gatewayOption.cssClass + '" data-recurring="' + gatewayOption.supportsRecurring + '"  data-supports-monthly-payment="' + gatewayOption.supportsMonthlyPayment + '" />'
-                 +          '<div></div>'
-                 +      '</div>'
-                 +      '<div class="membership-radio-label ' + gatewayOption.cssClass + '">'
-                 +          gatewayOption.displayName
-                 +      '</div>'
-                 +  '</div>';
-        }
-
-        // Change radio button states when clicked
-        proPage.initPaymentMethodRadioOptions(html);
+        });
     },
     
     /**

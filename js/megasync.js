@@ -288,7 +288,7 @@ MegaSync.prototype.handle = function(response) {
 	if (response === 0) {
 		// alright!
 		clearInterval(this._retryTimer);
-		return $('.megasync-overlay').hide();
+		return $('.megasync-overlay').hide().removeClass('downloading');
 	}
 
 	if (typeof response !== "object") {
@@ -315,7 +315,7 @@ MegaSync.prototype.downloadClient = function() {
 	}
 	var overlay = $('.megasync-overlay');
 	var url = this.getMegaSyncUrl();
-	if (overlay.is(":visible")) {
+	if (overlay.hasClass('downloading')) {
 		return true;
 	}
 
@@ -323,7 +323,10 @@ MegaSync.prototype.downloadClient = function() {
 		// retry!
 		this._api({a: "v"});
 	}).bind(this), 500);
-	overlay.show();
+	overlay.show().addClass('downloading');
+	$('.megasync-overlay').bind('click', function(e) {
+		$(this).hide();
+	});
 
 	if (url === '') {
 		// It's linux!

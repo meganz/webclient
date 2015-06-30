@@ -23425,6 +23425,7 @@ body.pro:after {
 }
 .megasync-table table th:nth-child(1) span, .megasync-table table td:nth-child(1) span {
 	color: rgba(51,51,51,0.7);
+	background-image: none;
 }
 .megasync-table table th:nth-child(2) span, .megasync-table table td:nth-child(2) span {
 	padding: 0 0 0 45px;

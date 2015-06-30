@@ -380,6 +380,7 @@ function removeHash() {
 }
 
 function browserdetails(useragent) {
+    useragent = useragent || navigator.userAgent;
     useragent = (' ' + useragent).toLowerCase();
     var os = false;
     var browser = false;

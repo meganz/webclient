@@ -363,6 +363,24 @@ function MegaData()
         });
     };
 
+    this.hasInboxItems = function() {
+        return this.getInboxItems().length > 0;
+    };
+
+    this.getInboxUsers = function() {
+        var uniqueUsersList = {};
+        this.getInboxItems().forEach(function(v, k) {
+            assert(M.u[v.u], 'user is not in M.u when trying to access inbox item users');
+            uniqueUsersList[v.u] = M.u[v.u];
+        });
+
+        return obj_values(uniqueUsersList);
+    };
+
+    this.getInboxItems = function() {
+        return M.getFilterBy(function(node) { return node.p === M.InboxID; });
+    };
+
     this.avatars = function()
     {
         if (!M.c.contacts)
@@ -1371,11 +1389,17 @@ function MegaData()
         this.buildtree({h: 'shares'},       this.buildtree.FORCE_REBUILD);
         this.buildtree(this.d[this.RootID], this.buildtree.FORCE_REBUILD);
         this.buildtree({h: M.RubbishID},    this.buildtree.FORCE_REBUILD);
+        this.buildtree({h: M.InboxID},    this.buildtree.FORCE_REBUILD);
         this.contacts();
+        this.renderInboxTree();
         treeUI();
         if (!MegaChatDisabled) {
             megaChat.renderContactTree();
         }
+    };
+
+    this.renderInboxTree = function() {
+
     };
 
     this.openFolder = function(id, force, chat) {
@@ -1587,7 +1611,7 @@ function MegaData()
                 onlinestatus = [l[5926], 'offline'];
             }
             if (!treesearch || (treesearch && contacts[i].name && contacts[i].name.toLowerCase().indexOf(treesearch.toLowerCase()) > -1)) {
-                html += '<div class="nw-contact-item ' + onlinestatus[1] + '" id="contact_' + htmlentities(contacts[i].u)
+                html += '<div class="nw-contact-item ui-droppable ' + onlinestatus[1] + '" id="contact_' + htmlentities(contacts[i].u)
                     + '"><div class="nw-contact-status"></div><div class="nw-contact-name">'
                     + htmlentities(contacts[i].name) + ' <a href="#" class="button start-chat-button"><span></span></a></div></div>';
             }
@@ -1775,6 +1799,19 @@ function MegaData()
                 // }
             }
             stype = "shared-with-me";
+        }
+        else if (n.h === M.InboxID) {
+            if (typeof dialog === 'undefined') {
+                // if ($('.content-panel.inbox ul').length == 0) {
+                    $('.content-panel.inbox').html('<ul id="treesub_' + htmlentities(M.InboxID) + '"></ul>');
+                // }
+            }
+            else {
+                // if ($('.' + dialog + ' .inbox .dialog-content-block ul').length == 0) {
+                    $('.' + dialog + ' .inbox .dialog-content-block').html('<ul id="mctreesub_' + htmlentities(M.InboxID) + '"></ul>');
+                // }
+            }
+            stype = "inbox";
         }
         else if (n.h === M.RubbishID) {
             if (typeof dialog === 'undefined') {
@@ -4537,6 +4574,18 @@ function renderNew() {
     if (d) {
         console.timeEnd('rendernew');
     }
+
+    // handle the Inbox section use cases
+    if (M.hasInboxItems() === true) {
+        $('.nw-fm-left-icon.inbox').removeClass('hidden');
+    }
+    else {
+        $('.nw-fm-left-icon.inbox').addClass('hidden');
+        if ($('.nw-fm-left-icon.inbox').is(".active") === true) {
+            M.openFolder(M.RootID);
+        }
+    }
+
 }
 
 /**

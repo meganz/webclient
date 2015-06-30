@@ -1,154 +1,4 @@
-var linuxsync = 
-[{
-	'name':'CentOS 7.0',
-	'64':'CentOS_7/x86_64/megasync-CentOS_7.x86_64.rpm',
-	'64n':'CentOS_7/x86_64/nautilus-megasync-CentOS_7.x86_64.rpm',
-	'c':'sudo yum localinstall'
-},
-{
-	'name':'Debian 7.0',
-	'32':'Debian_7.0/i386/megasync-Debian_7.0_i386.deb',
-	'32n':'Debian_7.0/i386/nautilus-megasync-Debian_7.0_i386.deb',
-	'64':'Debian_7.0/amd64/megasync-Debian_7.0_amd64.deb',
-	'64n':'Debian_7.0/amd64/nautilus-megasync-Debian_7.0_amd64.deb',
-	'c':'sudo gdebi'
-},
-{
-	'name':'Debian 8.0',
-	'32':'Debian_8.0/i386/megasync-Debian_8.0_i386.deb',
-	'32n':'Debian_8.0/i386/nautilus-megasync-Debian_8.0_i386.deb',
-	'64':'Debian_8.0/amd64/megasync-Debian_8.0_amd64.deb',
-	'64n':'Debian_8.0/amd64/nautilus-megasync-Debian_8.0_amd64.deb',
-	'c':'sudo gdebi'
-},
-{
-	'name':'elementary OS Freya',
-	'32':'xUbuntu_14.04/i386/megasync-xUbuntu_14.04_i386.deb',
-	'32n':'xUbuntu_14.04/i386/nautilus-megasync-xUbuntu_14.04_i386.deb',
-	'64':'xUbuntu_14.04/amd64/megasync-xUbuntu_14.04_amd64.deb',
-	'64n':'xUbuntu_14.04/amd64/nautilus-megasync-xUbuntu_14.04_amd64.deb',
-	'c':'sudo gdebi'
-},
-{
-	'name':'Fedora 19',
-	'32':'Fedora_19/i686/megasync-Fedora_19.i686.rpm',
-	'32n':'Fedora_19/i686/nautilus-megasync-Fedora_19.i686.rpm',
-	'64':'Fedora_19/x86_64/megasync-Fedora_19.x86_64.rpm',
-	'64n':'Fedora_19/x86_64/nautilus-megasync-Fedora_19.x86_64.rpm',
-	'c':'sudo yum localinstall'
-},
-{
-	'name':'Fedora 20',
-	'32':'Fedora_20/i686/megasync-Fedora_20.i686.rpm',
-	'32n':'Fedora_20/i686/nautilus-megasync-Fedora_20.i686.rpm',
-	'64':'Fedora_20/x86_64/megasync-Fedora_20.x86_64.rpm',
-	'64n':'Fedora_20/x86_64/nautilus-megasync-Fedora_20.x86_64.rpm',
-	'c':'sudo yum localinstall'
-},
-{
-	'name':'Fedora 21',
-	'32':'Fedora_21/i686/megasync-Fedora_21.i686.rpm',
-	'32n':'Fedora_21/i686/nautilus-megasync-Fedora_21.i686.rpm',
-	'64':'Fedora_21/x86_64/megasync-Fedora_21.x86_64.rpm',
-	'64n':'Fedora_21/x86_64/nautilus-megasync-Fedora_21.x86_64.rpm',
-	'c':'sudo yum localinstall'
-},
-{
-	'name':'Mint 17',
-	'32':'xUbuntu_14.04/i386/megasync-xUbuntu_14.04_i386.deb',
-	'32n':'xUbuntu_14.04/i386/nautilus-megasync-xUbuntu_14.04_i386.deb',
-	'64':'xUbuntu_14.04/amd64/megasync-xUbuntu_14.04_amd64.deb',
-	'64n':'xUbuntu_14.04/amd64/nautilus-megasync-xUbuntu_14.04_amd64.deb',
-	'c':'sudo gdebi'
-},
-{
-	'name':'openSUSE 12.2',
-	'32':'openSUSE_12.2/i586/megasync-openSUSE_12.2.i586.rpm',
-	'32n':'openSUSE_12.2/i586/nautilus-megasync-openSUSE_12.2.i586.rpm',
-	'64':'openSUSE_12.2/x86_64/megasync-openSUSE_12.2.x86_64.rpm',
-	'64n':'openSUSE_12.2/x86_64/nautilus-megasync-openSUSE_12.2.x86_64.rpm',
-	'c':'sudo zypper in'
-},
-{
-	'name':'openSUSE 12.3',
-	'32':'openSUSE_12.3/i586/megasync-openSUSE_12.3.i586.rpm',
-	'32n':'openSUSE_12.3/i586/nautilus-megasync-openSUSE_12.3.i586.rpm',
-	'64':'openSUSE_12.3/x86_64/megasync-openSUSE_12.3.x86_64.rpm',
-	'64n':'openSUSE_12.3/x86_64/nautilus-megasync-openSUSE_12.3.x86_64.rpm',
-	'c':'sudo zypper in'
-},
-{
-	'name':'openSUSE 13.1',
-	'32':'openSUSE_13.1/i586/megasync-openSUSE_13.1.i586.rpm',
-	'32n':'openSUSE_13.1/i586/nautilus-megasync-openSUSE_13.1.i586.rpm',
-	'64':'openSUSE_13.1/x86_64/megasync-openSUSE_13.1.x86_64.rpm',
-	'64n':'openSUSE_13.1/x86_64/nautilus-megasync-openSUSE_13.1.x86_64.rpm',
-	'c':'sudo zypper in'
-},
-{
-	'name':'openSUSE 13.2',
-	'32':'openSUSE_13.2/i586/megasync-openSUSE_13.2.i586.rpm',
-	'32n':'openSUSE_13.2/i586/nautilus-megasync-openSUSE_13.2.i586.rpm',
-	'64':'openSUSE_13.2/x86_64/megasync-openSUSE_13.2.x86_64.rpm',
-	'64n':'openSUSE_13.2/x86_64/nautilus-megasync-openSUSE_13.2.x86_64.rpm',
-	'c':'sudo zypper in'
-},
-{
-	'name':'Red Hat 7',
-	'64':'RHEL_7/x86_64/megasync-RHEL_7.x86_64.rpm',
-	'64n':'RHEL_7/x86_64/nautilus-megasync-RHEL_7.x86_64.rpm',
-	'c':'sudo yum localinstall'
-},
-{
-	'name':'Ubuntu 12.04',
-	'32':'xUbuntu_12.04/i386/megasync-xUbuntu_12.04_i386.deb',
-	'32n':'xUbuntu_12.04/i386/nautilus-megasync-xUbuntu_12.04_i386.deb',
-	'64':'xUbuntu_12.04/amd64/megasync-xUbuntu_12.04_amd64.deb',
-	'64n':'xUbuntu_12.04/amd64/nautilus-megasync-xUbuntu_12.04_amd64.deb',
-	'c':'sudo gdebi'
-},
-{
-	'name':'Ubuntu 12.10',
-	'32':'xUbuntu_12.10/i386/megasync-xUbuntu_12.10_i386.deb',
-	'32n':'xUbuntu_12.10/i386/nautilus-megasync-xUbuntu_12.10_i386.deb',
-	'64':'xUbuntu_12.10/amd64/megasync-xUbuntu_12.10_amd64.deb',
-	'64n':'xUbuntu_12.10/amd64/nautilus-megasync-xUbuntu_12.10_amd64.deb',
-	'c':'sudo gdebi'
-},
-{
-	'name':'Ubuntu 13.10',
-	'32':'xUbuntu_13.10/i386/megasync-xUbuntu_13.10_i386.deb',
-	'32n':'xUbuntu_13.10/i386/nautilus-megasync-xUbuntu_13.10_i386.deb',
-	'64':'xUbuntu_13.10/amd64/megasync-xUbuntu_13.10_amd64.deb',
-	'64n':'xUbuntu_13.10/amd64/nautilus-megasync-xUbuntu_13.10_amd64.deb',
-	'c':'sudo gdebi'
-},
-{
-	'name':'Ubuntu 14.04',
-	'32':'xUbuntu_14.04/i386/megasync-xUbuntu_14.04_i386.deb',
-	'32n':'xUbuntu_14.04/i386/nautilus-megasync-xUbuntu_14.04_i386.deb',
-	'64':'xUbuntu_14.04/amd64/megasync-xUbuntu_14.04_amd64.deb',
-	'64n':'xUbuntu_14.04/amd64/nautilus-megasync-xUbuntu_14.04_amd64.deb',
-	'c':'sudo gdebi'
-},
-{
-	'name':'Ubuntu 14.10',
-	'32':'xUbuntu_14.10/i386/megasync-xUbuntu_14.10_i386.deb',
-	'32n':'xUbuntu_14.10/i386/nautilus-megasync-xUbuntu_14.10_i386.deb',
-	'64':'xUbuntu_14.10/amd64/megasync-xUbuntu_14.10_amd64.deb',
-	'64n':'xUbuntu_14.10/amd64/nautilus-megasync-xUbuntu_14.10_amd64.deb',
-	'c':'sudo gdebi'
-},
-{
-	'name':'Ubuntu 15.04',
-	'32':'xUbuntu_15.04/i386/megasync-xUbuntu_15.04_i386.deb',
-	'32n':'xUbuntu_15.04/i386/nautilus-megasync-xUbuntu_15.04_i386.deb',
-	'64':'xUbuntu_15.04/amd64/megasync-xUbuntu_15.04_amd64.deb',
-	'64n':'xUbuntu_15.04/amd64/nautilus-megasync-xUbuntu_15.04_amd64.deb',
-	'c':'sudo gdebi'
-}];
-
-
+var linuxsync = megasync.getLinuxReleases();
 
 function init_sync()
 {
@@ -195,9 +45,9 @@ function sync_switchOS(os)
 	$('.linuxhint').hide();
 	$('.sync-button').attr('href','');
 	$('.sync-button-block.linux').addClass('hidden');
+	syncurl = megasync.getMegaSyncUrl(os);
 	if (os == 'windows')
 	{
-		syncurl = 'https://mega.nz/MEGAsyncSetup.exe';
 		$('.sync-button-txt.small').text(l[1158]);			
 		$('.sync-bottom-txt.button-txt').html(l[2025]);
 		$('.sync-button').removeClass('mac linux');
@@ -206,7 +56,6 @@ function sync_switchOS(os)
 	}
 	else if (os == 'mac')
 	{
-		syncurl = 'https://mega.nz/MEGAsyncSetup.dmg';
 		var ostxt = l[2031];
 		if (l[1158].indexOf('Windows') > -1) ostxt = l[1158].replace('Windows','Mac');	
 		if (l[1158].indexOf('Linux') > -1) ostxt = l[1158].replace('Linux','Mac');			
@@ -318,11 +167,9 @@ function changeLinux(i)
 		var platform = '64';		
 		var c = $('.linux32').parent().attr('class');
 		if (c && c.indexOf('radioOn') > -1) platform = '32';
-		var path = linuxsync[i][platform];
-		syncurl = 'https://mega.nz/linux/MEGAsync/' + path;
-		nautilusurl = 'https://mega.nz/linux/MEGAsync/' + linuxsync[i][platform + 'n'];
-		var filename = path.split('/');
-		filename = filename[filename.length-1];
+		syncurl = megasync.getMegaSyncUrl(linuxsync[i]['name'] + " " + platform);
+		nautilusurl =  megasync.getMegaSyncUrl(linuxsync[i]['name'] + " " + platform + "n");
+		var filename = syncurl.split('/').pop();
 		$('.sync-button').attr('href',syncurl);
 		$('.sync-bottom-txt.linux-txt a').attr('href',nautilusurl);
 		$('.linuxhint').html('*' + l[1909] + ': <font style="font-family:courier;">' + linuxsync[i].c + ' ' + filename + '</font>');

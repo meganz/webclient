@@ -64,7 +64,7 @@
             }
             else if (i < entries.length) {
                 var file = entries[i];
-                if (file.isFile && !isTrasferActive(file.name)) {
+                if (file.isFile) {
                     file.getMetadata(function(metadata) {
                         // do not delete file while it's being copied from FS to DL folder
                         // conservative assumption that a file is being written at 1024 bytes per ms
@@ -73,7 +73,7 @@
                         var deltime = metadata.modificationTime.getTime()
                             + tsec * 1000 + metadata.size / 1024 + 30000;
 
-                        if (deltime < Date.now() && deltime < lastactive) {
+                        if (!isTrasferActive(file.name) && deltime < Date.now() && deltime < lastactive) {
                             file.remove(function() {
                                     totalsize += metadata.size;
                                     if (d) {

@@ -178,7 +178,7 @@ var useravatar = (function() {
         }
     };
 
-    function emailAvatar(user)
+    function emailAvatar(user, className, element)
     {
         // User is an email, we should look if the user
         // exists, if it does exists we use the user Object.
@@ -196,7 +196,7 @@ var useravatar = (function() {
         element   = element || "div";
         if (typeof user === "string") {
             if (isEmail(user)) {
-                return emailAvatar(user);
+                return emailAvatar(user, className, element);
             } else if (M.u[user]) {
                 // It's an user ID
                 user = M.u[user];

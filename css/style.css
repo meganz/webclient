@@ -23509,6 +23509,43 @@ body.pro:after {
 .megasync-dropdown span.active {
 	background-position: right -1883px;
 }
+.megasync-close {
+  width: 14px;
+  height: 14px;
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background-image: url(../images/mega/close-white-icon.png);
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
+  -moz-opacity: 0.7;
+  -khtml-opacity: 0.7;
+  opacity: 0.7;
+  cursor: pointer;
+  -webkit-transition: all 200ms ease-in-out;
+  -moz-transition: all 200ms ease-in-out;
+  -o-transition: all 200ms ease-in-out;
+  -ms-transition: all 200ms ease-in-out;
+  transition: all 200ms ease-in-out;
+}
+.megasync-close:hover {
+	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+  -moz-opacity: 1;
+  -khtml-opacity: 1;
+  opacity: 1;
+}
+.megasync-close-txt {
+  width: 48px;
+  height: 20px;
+  position: absolute;
+  top: 36px;
+  right: 0;
+  text-align: center;
+  color: rgba(255,255,255,0.3);
+  font-size: 11px;
+  cursor: default;
+}
 .megasync-dropdown-list {
 	width: 288px;
 	position: absolute;
@@ -23830,6 +23867,10 @@ body.pro:after {
 }
 }
  @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
+.try-new-close {
+  background-image: url(../images/mega/close-white-icon@2x.png);
+  background-size: 14px auto;
+}
 body.pro:after {
  content: url(../images/mega/payment-animation@2x.gif);
 }

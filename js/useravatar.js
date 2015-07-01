@@ -48,8 +48,8 @@ var useravatar = (function() {
      * Return a SVG image representing the TWO-Letters avatar
      * @private
      */
-    var _twoLettersImg = function(letters) {
-        var s = _twoLettersSettings(letters);
+    var _lettersImg = function(letters) {
+        var s = _lettersSettings(letters);
         var tpl = $('#avatar-svg').clone().removeClass('hidden')
             .find('svg').css('background-color', s.color).end()
             .find('text').text(s.letters).end();
@@ -64,19 +64,13 @@ var useravatar = (function() {
      * @return {string}
      * @private
      */
-    var _twoLettersSettings = function(letters) {
-        var words = letters.toUpperCase().split(/\W+/);
-        if (words.length === 1) {
-            letters = words[0].substr(0, 2);
-        } else {
-            letters = words[0][0]  + words[1][0];
+    var _lettersSettings = function(word) {
+        var words = $.trim(word).toUpperCase().split(/\W+/);
+        var letters = words[0][0];
+        var color   = letters.charCodeAt(0) % _colors.length;
+        if (word === u_handle) {
+            letters = "";
         }
-        var colors = parseInt(_colors.length / 2) + 1;
-        var color  = 0;
-        for (var i = 0; i < letters.length; i++) {
-            color += letters.charCodeAt(i);
-        }
-        color = color % _colors.length;
         return {letters: letters, color: _colors[color], colorIndex: color + 1 };
     };
 
@@ -89,11 +83,11 @@ var useravatar = (function() {
      *
      *  @return HTML
      */
-    var _twoLetters = function(letters, id, className, element) {
+    var _letters = function(letters, id, className, element) {
         if (element === 'ximg') {
-            return _twoLettersImg(letters);
+            return _lettersImg(letters);
         }
-        var s = _twoLettersSettings(letters);
+        var s = _lettersSettings(letters);
         if (!_watching[id]) {
             _watching[id] = {};
         }
@@ -188,7 +182,7 @@ var useravatar = (function() {
                 return ns.contact(M.u[u], className, element);
             }
         }
-        return _twoLetters(user.substr(0, 2), user, className, element);
+        return _letters(user.substr(0, 2), user, className, element);
     }
 
     ns.contact = function(user, className, element) {
@@ -201,7 +195,7 @@ var useravatar = (function() {
                 // It's an user ID
                 user = M.u[user];
             } else {
-                return _twoLetters(user, user, className, element);
+                return _letters(user, user, className, element);
             }
         }
 
@@ -213,7 +207,7 @@ var useravatar = (function() {
             return _image(avatars[user.u].url, user.u, className, element);
         }
 
-        return _twoLetters(user.name || user.m, user.u, className, element);
+        return _letters(user.name || user.m, user.u, className, element);
     };
 
     registerCssColors();

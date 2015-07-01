@@ -5075,18 +5075,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 /**
  * hide sections of the site if the current visited link is a folder share link
  */
-.active-folder-link .nw-fm-left-icon.cloud-drive,
-.active-folder-link .nw-fm-tree-header.cloud-drive,
-.active-folder-link .nw-fm-left-icon.inbox,
-.active-folder-link .nw-fm-left-icon.shared-with-me,
-.active-folder-link .nw-fm-left-icon.contacts,
-.active-folder-link .nw-fm-left-icon.conversations,
-.active-folder-link .nw-fm-left-icon.rubbish-bin,
-.active-folder-link .nw-fm-left-icon.settings
-{
+.active-folder-link .nw-fm-left-icon.cloud-drive, .active-folder-link .nw-fm-tree-header.cloud-drive, .active-folder-link .nw-fm-left-icon.inbox, .active-folder-link .nw-fm-left-icon.shared-with-me, .active-folder-link .nw-fm-left-icon.contacts, .active-folder-link .nw-fm-left-icon.conversations, .active-folder-link .nw-fm-left-icon.rubbish-bin, .active-folder-link .nw-fm-left-icon.settings {
 	display: none;
 }
-
 .nw-fm-left-icon.notifications {
 	background-position: 0 -6142px;
 }
@@ -11807,7 +11798,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
 	-moz-transition: background-color 200ms ease-in-out;
 	-o-transition: background-color 200ms ease-in-out;
 	-ms-transition: background-color 200ms ease-in-out;
-	transition: background-color 200ms 
+	transition: background-color 200ms
 }
 .membership-medium-txt.red-bg {
 	background-color: rgba(213,38,0,0.9);
@@ -12157,7 +12148,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 	top: 14px;
 }
 .context-menu-item, .permissions-menu-item {
-	padding: 0 30px 0 42px;
+	padding: 0 10px 0 42px;
 	color: rgba(204,204,204,1);
 }
 .permissions-menu-item {
@@ -12931,7 +12922,7 @@ table {
 	-moz-transition: background-color 200ms ease-in-out;
 	-o-transition: background-color 200ms ease-in-out;
 	-ms-transition: background-color 200ms ease-in-out;
-	transition: background-color 200ms 
+	transition: background-color 200ms
 }
 .fm-account-change-avatar:hover, .fm-account-save:hover, .fm-account-cancel:hover {
 	background-color: rgba(213,38,0,1);
@@ -14805,25 +14796,25 @@ h5.main-italic-header {
 	background-color: #3B99FC;
 }
 .membership-radio {
-    background-color: #bbbbbb;
-    -moz-border-radius: 100%;
-    -webkit-border-radius: 100%;
-    border-radius: 100%;
-    display: inline-block;
-    height: 16px;
-    line-height: 26px;
-    margin: 0 12px 0 0;
-    position: relative;
-    vertical-align: middle;
-    width: 16px;
+	background-color: #bbbbbb;
+	-moz-border-radius: 100%;
+	-webkit-border-radius: 100%;
+	border-radius: 100%;
+	display: inline-block;
+	height: 16px;
+	line-height: 26px;
+	margin: 0 12px 0 0;
+	position: relative;
+	vertical-align: middle;
+	width: 16px;
 }
 .payment-options-list {
-    -webkit-column-count: 2;
-    -moz-column-count: 2;
-    column-count: 2;
-    -webkit-column-width: 170px;
-    -moz-column-width: 170px;
-    column-width: 170px;
+	-webkit-column-count: 2;
+	-moz-column-count: 2;
+	column-count: 2;
+	-webkit-column-width: 170px;
+	-moz-column-width: 170px;
+	column-width: 170px;
 }
 .payment-options-list .payment-method {
 	cursor: pointer;
@@ -14848,16 +14839,16 @@ h5.main-italic-header {
 	margin: 5px;
 }
 .membership-radio-label {
-    background-image: url("../images/mega/pro-new-sprite-v4.png");
-    background-repeat: no-repeat;
-    color: #333333;
-    display: inline-block;
-    font-family: "Open Sans Semibold", Arial;
-    font-size: 13px;
-    height: 26px;
-    line-height: 26px;
-    padding-left: 28px;
-    vertical-align: middle;
+	background-image: url("../images/mega/pro-new-sprite-v4.png");
+	background-repeat: no-repeat;
+	color: #333333;
+	display: inline-block;
+	font-family: "Open Sans Semibold", Arial;
+	font-size: 13px;
+	height: 26px;
+	line-height: 26px;
+	padding-left: 28px;
+	vertical-align: middle;
 }
 .membership-radio-label.prepaid-balance {
 	background-position: -444px -569px;
@@ -15098,7 +15089,7 @@ div.membership-bott-button {
 	color: #3F4646;
 }
 .membership-step2 .other-payment-providers {
-    margin-top: 3px;
+	margin-top: 3px;
 }
 .affiliate-txt-pad {
 	padding-top: 6px;
@@ -23299,8 +23290,8 @@ body.pro:after {
 	display: inline-block;
 }
 .megasync-table table span.tick {
-    background-position: -4px -1768px;
-    text-transform: uppercase;
+	background-position: -4px -1768px;
+	text-transform: uppercase;
 }
 .megasync-table table span.dots {
 	background-position: -3px -1648px;
@@ -23378,8 +23369,7 @@ body.pro:after {
 .megasync-dropdown-link.debian {
 	background-position: 10px -1982px;
 }
-.megasync-dropdown-link.elementary,
-.megasync-dropdown-link.elementaryosfreya {
+.megasync-dropdown-link.elementary, .megasync-dropdown-link.elementaryosfreya {
 	background-position: 10px -1952px;
 }
 .megasync-dropdown-link.fedora {

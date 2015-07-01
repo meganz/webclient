@@ -604,7 +604,7 @@ var ETOOERR = -400;
 
 function ssl_needed() {
     var ssl_opt = ['Chrome/'];
-    var ssl_off = ['Firefox/14', 'Firefox/15', 'Firefox/17', 'Safari', 'Firefox/16'];
+    var ssl_off = ['Firefox/14', 'Firefox/15', 'Firefox/16', 'Firefox/17'];
     for (var i = ssl_opt.length; i--;) {
         if (navigator.userAgent.indexOf(ssl_opt[i]) >= 0) {
             return parseInt(navigator.userAgent.split(ssl_opt[i]).pop()) > 40;

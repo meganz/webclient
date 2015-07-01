@@ -208,7 +208,7 @@ ClassChunk.prototype.on_error = function(args, xhr) {
 	this.Progress.data[this.xid][0] = 0; /* reset progress */
 	this.updateProgress(2);
 
-	this.oet = setTimeout(this.finish_download.bind(this, false, xhr.readyState > 1 && xhr.status), 950+Math.floor(Math.random()*2e3));
+	this.oet = setTimeout(this.finish_download.bind(this, false, xhr.readyState > 1 && xhr.status), 3950+Math.floor(Math.random()*2e3));
 }
 // }}}
 

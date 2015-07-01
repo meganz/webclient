@@ -90,6 +90,9 @@ function getRulesFromSecureBoot()
 
     for (var i in js) {
         concat[i] = {
+            options: {
+                sourceMap: true,
+            },
             src: js[i],
             dest: "js/pack-" + i + ".js"
         };
@@ -97,7 +100,7 @@ function getRulesFromSecureBoot()
             options: {
                 sourceMap: true,
             },
-            src: "js/pack-" + i + ".js",
+            src: js[i],
             dest: "js/pack-" + i + ".js",
         };
     }
@@ -116,12 +119,13 @@ module.exports = function(grunt) {
     // Project configuration.
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
-        uglify: rules.glify,
+        uglify: rules.uglify,
         concat: rules.concat,
         htmlmin: {
             default_options: {
                 options: {
                     removeComments: true,
+                    keepClosingSlash: true,
                     collapseWhitespace: true,
                 },
                 files:[

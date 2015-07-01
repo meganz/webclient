@@ -1193,7 +1193,7 @@ function initUI() {
 
     $(window).rebind('resize.fmrh hashchange.fmrh', fm_resize_handler);
 
-    if (!MegaChatDisabled) {
+    if (!megaChatDisabled) {
         megaChat.karere.rebind("onPresence.maintainUI", function(e, presenceEventData) {
             var contact = megaChat.getContactFromJid(presenceEventData.getFromJid());
             M.onlineStatusEvent(contact, presenceEventData.getShow());
@@ -9972,7 +9972,7 @@ function contactUI() {
             showAuthenticityCredentials();
         });
 
-        if (!MegaChatDisabled) {
+        if (!megaChatDisabled) {
             if (onlinestatus[1] !== "offline" && u_h !== u_handle) {
                 // user is online, lets display the "Start chat" button
 

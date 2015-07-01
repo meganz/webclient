@@ -1393,7 +1393,7 @@ function MegaData()
         this.contacts();
         this.renderInboxTree();
         treeUI();
-        if (!MegaChatDisabled) {
+        if (!megaChatDisabled) {
             megaChat.renderContactTree();
         }
     };
@@ -1455,13 +1455,13 @@ function MegaData()
             this.chat = true;
             treeUI();
 
-            if (!MegaChatDisabled) {
+            if (!megaChatDisabled) {
                 chatui(id); // XX: using the old code...for now
             }
         } else if (!id || !M.d[id])
             id = this.RootID;
 
-        if (!MegaChatDisabled) {
+        if (!megaChatDisabled) {
             if (!this.chat) {
                 if (megaChat.getCurrentRoom()) {
                     megaChat.getCurrentRoom().hide();
@@ -1620,7 +1620,7 @@ function MegaData()
 
         $('.content-panel.contacts').html(html);
 
-        if (!MegaChatDisabled) {
+        if (!megaChatDisabled) {
             megaChat.renderContactTree();
 
             $('.fm-tree-panel').undelegate('.start-chat-button', 'click.megaChat');
@@ -4565,7 +4565,7 @@ function renderNew() {
         M.contacts();
         treeUI();
 
-        if (!MegaChatDisabled) {
+        if (!megaChatDisabled) {
             megaChat.renderContactTree();
             megaChat.renderMyStatus();
         }
@@ -5828,7 +5828,7 @@ function init_chat() {
     if (folderlink) {
         if (d) console.log('Will not initializing chat [branch:1]');
     }
-    else if (!MegaChatDisabled) {
+    else if (!megaChatDisabled) {
         if (pubEd25519[u_handle]) {
             __init_chat();
         } else {

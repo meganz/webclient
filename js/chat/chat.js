@@ -3,7 +3,7 @@
  *
  * @type {boolean}
  */
-var MegaChatDisabled = !!localStorage.chatDisabled;
+var megaChatDisabled = !!localStorage.chatDisabled;
 
 var disableMpEnc = true;
 
@@ -742,7 +742,7 @@ var Chat = function() {
 
     this.plugins = {};
 
-    if (!MegaChatDisabled) {
+    if (!megaChatDisabled) {
         try {
             // This might throw in browsers which doesn't support Strophe/WebRTC
             this.karere = new Karere({
@@ -750,19 +750,19 @@ var Chat = function() {
                 'boshServiceUrl': function() { return self.getBoshServiceUrl(); }
             });
         }
-        catch(e) {
+        catch (e) {
             console.error(e);
-            MegaChatDisabled = true;
+            megaChatDisabled = true;
         }
     }
 
     Object.defineProperty(this, 'isReady', {
         get: function() {
-            return !MegaChatDisabled && self.is_initialized;
+            return !megaChatDisabled && self.is_initialized;
         }
     });
 
-    if (MegaChatDisabled) {
+    if (megaChatDisabled) {
         this.logger.info('MEGAChat is disabled.');
         $(document.body).addClass("megaChatDisabled");
     }

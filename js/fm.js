@@ -2148,7 +2148,7 @@ function fmremove() {
             $('#msgDialog .fm-del-contact-avatar span').empty()
         } else {
             var user = M.d[$.selected[0]];
-            avatar = useravatar.contct(user);
+            avatar = useravatar.contact(user);
 
             $('#msgDialog .fm-del-contact-avatar').html(avatar);
         }

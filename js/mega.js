@@ -363,6 +363,24 @@ function MegaData()
         });
     };
 
+    this.hasInboxItems = function() {
+        return this.getInboxItems().length > 0;
+    };
+
+    this.getInboxUsers = function() {
+        var uniqueUsersList = {};
+        this.getInboxItems().forEach(function(v, k) {
+            assert(M.u[v.u], 'user is not in M.u when trying to access inbox item users');
+            uniqueUsersList[v.u] = M.u[v.u];
+        });
+
+        return obj_values(uniqueUsersList);
+    };
+
+    this.getInboxItems = function() {
+        return M.getFilterBy(function(node) { return node.p === M.InboxID; });
+    };
+
     this.avatars = function()
     {
         if (!M.c.contacts)
@@ -377,32 +395,16 @@ function MegaData()
                     u: u,
                     callback: function(res, ctx)
                     {
-                        if (typeof res !== 'number')
+                        if (typeof res !== 'number' && res.length > 5)
                         {
                             var blob = new Blob([str_to_ab(base64urldecode(res))], {type: 'image/jpeg'});
-                            avatars[ctx.u] =
-                                {
-                                    data: blob,
-                                    url: myURL.createObjectURL(blob)
-                                }
-                            var el = $('.contact-block-view-avatar.' + ctx.u + ',.avatar.' + ctx.u + ',.contacts-avatar.' + ctx.u);
-                            if (el.length > 0)
-                                el.find('img').attr('src', avatars[ctx.u].url);
-
-                            var el = $('#contact_' + ctx.u);
-                            if (el.length > 0)
-                                el.find('img').attr('src', avatars[ctx.u].url);
-
-                            var el = $('.nw-contact-avatar.' + ctx.u);
-                            if (el.length > 0)
-                                $(el).html('<img src="' + avatars[ctx.u].url + '">');
-
-                            var el = $('.nw-contact-block-avatar.' + ctx.u);
-                            if (el.length > 0)
-                                $(el).html('<img src="' + avatars[ctx.u].url + '">');
-
-                            if (u_handle == ctx.u)
-                                $('.fm-avatar img,.fm-account-avatar img').attr('src', avatars[ctx.u].url);
+                            avatars[ctx.u] = {
+                                data: blob,
+                                url: myURL.createObjectURL(blob)
+                            };
+                            useravatar.loaded(M.u[ctx.u]);
+                        } else if (ctx.u === u_handle) {
+                            useravatar.loaded(M.u[ctx.u]);
                         }
                     }
                 });
@@ -522,7 +524,7 @@ function MegaData()
      */
     this.drawReceivedContactRequests = function(ipc, clearGrid) {
         DEBUG('Draw received contacts grid.');
-        var html, email, av_color, shortcut, ps, trClass, id,
+        var html, email, ps, trClass, id,
             type = '',
             drawn = false,
             t = '.grid-table.contact-requests';
@@ -544,8 +546,6 @@ function MegaData()
                     }
                     trClass = (type !== '') ? ' class="' + type + '"' : '';
                     email = ipc[i].m;
-                    av_color = email.charCodeAt(0) % 6 + email.charCodeAt(1) % 6;
-                    shortcut = email.charAt(0) + email.charAt(1);
                     if (ipc[i].ps && ipc[i].ps !== 0) {
                         ps = '<span class="contact-request-content">' + ipc[i].ps + ' ' + l[105] + ' ' + l[813] + '</span>';
                     } else {
@@ -553,7 +553,7 @@ function MegaData()
                     }
                     html = '<tr id="ipc_' + id + '"' + trClass + '>\n\
                         <td>\n\
-                            <div class="nw-contact-avatar color' + av_color + '">' + shortcut + '</div>\n\
+                            ' + useravatar.contact(email, 'nw-contact-avatar') + ' \n\
                             <div class="fm-chat-user-info">\n\
                                 <div class="fm-chat-user">' + htmlentities(email) + '</div>\n\
                                 <div class="contact-email">' + htmlentities(email) + '</div>\n\
@@ -803,7 +803,7 @@ function MegaData()
          *
          */
         function renderContactsLayout(u) {
-            var u_h, contact, node, av_meta, avatar, av_color, el, t, html, onlinestatus,
+            var u_h, contact, node, avatar, el, t, html, onlinestatus,
                 cs = M.contactstatus(u_h),
                 time = time2last(cs.ts),
                 timems = cs.ts,
@@ -836,13 +836,7 @@ function MegaData()
                 }
 
                 node = M.d[u_h];
-                av_meta = generateAvatarMeta(u_h);
-                avatar = av_meta.shortName;
-                av_color = av_meta.color;
-
-                if (av_meta.avatarUrl) {
-                    avatar = '<img src="' + av_meta.avatarUrl + '">';
-                }
+                avatar = useravatar.contact(u_h, "nw-contact-avatar")
 
                 onlinestatus = M.onlineStatusClass(megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h)));
 
@@ -851,7 +845,7 @@ function MegaData()
                     t = '.contacts-blocks-scrolling';
                     html = '<a class="file-block ustatus ' + htmlentities(u_h) + ' ' + onlinestatus[1] + '" id="' + htmlentities(M.v[i].h) + '">\n\
                                 <span class="nw-contact-status"></span>\n\
-                                <span class="nw-contact-block-avatar two-letters ' + htmlentities(u_h) + ' color' + av_color + '">' + avatar + '</span>\n\
+                                ' + avatar + ' \
                                 <span class="shared-folder-info-block">\n\
                                     <span class="shared-folder-name">' + htmlentities(node.name) + '</span>\n\
                                     <span class="shared-folder-info">' + htmlentities(node.m) + '</span>\n\
@@ -862,7 +856,7 @@ function MegaData()
                     t = '.grid-table.contacts';
                     html = '<tr id="' + htmlentities(M.v[i].h) + '">\n\
                                 <td>\n\
-                                    <div class="nw-contact-avatar ' + htmlentities(u_h) + ' color' + av_color + '">' + avatar + '</div>\n\
+                                    ' + avatar + ' \
                                     <div class="fm-chat-user-info todo-star">\n\
                                         <div class="fm-chat-user">' + htmlentities(node.name) + '</div>\n\
                                         <div class="contact-email">' + htmlentities(node.m) + '</div>\n\
@@ -898,8 +892,8 @@ function MegaData()
          * @returns {int}
          */
         function renderLayout(u, n_cache) {
-            var html, el, cs, contains, u_h, av_meta, t, el, time, bShare,
-                avatar, av_color, rights, rightsclass, onlinestatus, html,
+            var html, cs, contains, u_h, t, el, time, bShare,
+                avatar, rights, rightsclass, onlinestatus, html,
                 sExportLink, sLinkIcon,
                 iShareNum = 0,
                 s, ftype, c, cc, star;
@@ -925,17 +919,11 @@ function MegaData()
                     cs = M.contactstatus(M.v[i].h),
                     contains = fm_contains(cs.files, cs.folders),
                     u_h = M.v[i].p,
-                    av_meta = generateAvatarMeta(u_h),
-                    avatar = htmlentities(av_meta.shortName),
-                    av_color = av_meta.color,
                     rights = l[55],
                     rightsclass = ' read-only',
                     onlinestatus = M.onlineStatusClass(megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h)));
                     if (cs.files === 0 && cs.folders === 0) {
                         contains = l[1050];
-                    }
-                    if (av_meta.avatarUrl) {
-                        avatar = '<img src="' + av_meta.avatarUrl + '">';
                     }
                     if (M.v[i].r === 1) {
                         rights = l[56];
@@ -947,27 +935,29 @@ function MegaData()
 
                     if (M.viewmode === 1) {
                         t = '.shared-blocks-scrolling';
+                        avatar = useravatar.contact(u_h, 'nw-contact-avatar', 'span');
                         el = 'a';
                         html = '<a class="file-block folder" id="'
                             + htmlentities(M.v[i].h) + '"><span class="file-status-icon '
                             + htmlentities(star) + '"></span><span class="shared-folder-access '
-                            + htmlentities(rightsclass) + '"></span><span class="file-icon-area">\n\
-                            <span class="block-view-file-type folder"></span></span><span class="nw-contact-avatar '
-                            + htmlentities(u_h) + ' color' + htmlentities(av_color) + '">' + avatar
-                            + '</span><span class="shared-folder-info-block"><span class="shared-folder-name">'
+                            + htmlentities(rightsclass) + '"></span><span class="file-icon-area">'
+                            + '<span class="block-view-file-type folder"></span></span>'
+                                 + avatar
+                            + '<span class="shared-folder-info-block"><span class="shared-folder-name">'
                             + htmlentities(M.v[i].name) + '</span><span class="shared-folder-info">by '
                             + htmlentities(M.d[u_h].name) + '</span></span></a>';
                     } else {
                         t = '.shared-grid-view .grid-table.shared-with-me';
                         el = 'tr';
                         var contactName = M.d[u_h] ? htmlentities(M.d[u_h].name) : "N/a";
+                        avatar = useravatar.contact(u_h, 'nw-contact-avatar');
 
                         html = '<tr id="' + htmlentities(M.v[i].h) + '"><td width="30"><span class="grid-status-icon ' + htmlentities(star)
                             + '"></span></td><td><div class="shared-folder-icon"></div><div class="shared-folder-info-block"><div class="shared-folder-name">'
                             + htmlentities(M.v[i].name) + '</div><div class="shared-folder-info">' + htmlentities(contains)
-                            + '</div></div> </td><td width="240"><div class="nw-contact-avatar '
-                            + htmlentities(u_h) + ' color' + htmlentities(av_color) + '">' + avatar
-                            + '</div><div class="fm-chat-user-info todo-star ustatus ' + htmlentities(u_h) + ' '
+                            + '</div></div> </td><td width="240">'
+                                 + avatar
+                            + '<div class="fm-chat-user-info todo-star ustatus ' + htmlentities(u_h) + ' '
                             + htmlentities(onlinestatus[1]) + '"><div class="todo-fm-chat-user-star"></div><div class="fm-chat-user">'
                             + contactName + '</div><div class="nw-contact-status"></div><div class="fm-chat-user-status ' + htmlentities(htmlentities(u_h)) + '">' + htmlentities(onlinestatus[0])
                             + '</div><div class="clear"></div></div></td><td width="270"><div class="shared-folder-access'
@@ -1380,11 +1370,7 @@ function MegaData()
                         sr.r2 = ' active';
                     }
 
-                    var avatar = staticpath + 'images/mega/default-avatar.png';
-                    if (avatars[M.u[u].h])
-                        avatar = avatars[M.u[u].h].url;
-
-                    html += '<div class="add-contact-item" id="' + u + '"><div class="add-contact-pad"><span class="avatar ' + M.u[u].h + '"><span><img src="' + avatar + '" alt=""/></span></span><span class="add-contact-username">' + htmlentities(M.u[u].m) + '</span><div class="fm-share-dropdown">' + rt + '</div><div class="fm-share-permissions-block hidden"><div class="fm-share-permissions' + sr.r0 + '" id="rights_0">' + l[55] + '</div><div class="fm-share-permissions' + sr.r1 + '" id="rights_1">' + l[56] + '</div><div class="fm-share-permissions' + sr.r2 + '" id="rights_2">' + l[57] + '</div><div class="fm-share-permissions" id="rights_3">' + l[83] + '</div></div></div></div>';
+                    html += '<div class="add-contact-item" id="' + u + '"><div class="add-contact-pad">' + useravatar.contact(u) + 'span class="add-contact-username">' + htmlentities(M.u[u].m) + '</span><div class="fm-share-dropdown">' + rt + '</div><div class="fm-share-permissions-block hidden"><div class="fm-share-permissions' + sr.r0 + '" id="rights_0">' + l[55] + '</div><div class="fm-share-permissions' + sr.r1 + '" id="rights_1">' + l[56] + '</div><div class="fm-share-permissions' + sr.r2 + '" id="rights_2">' + l[57] + '</div><div class="fm-share-permissions" id="rights_3">' + l[83] + '</div></div></div></div>';
                 }
             }
             $('.share-dialog .fm-shared-to').html(html);
@@ -1403,11 +1389,17 @@ function MegaData()
         this.buildtree({h: 'shares'},       this.buildtree.FORCE_REBUILD);
         this.buildtree(this.d[this.RootID], this.buildtree.FORCE_REBUILD);
         this.buildtree({h: M.RubbishID},    this.buildtree.FORCE_REBUILD);
+        this.buildtree({h: M.InboxID},    this.buildtree.FORCE_REBUILD);
         this.contacts();
+        this.renderInboxTree();
         treeUI();
         if (!MegaChatDisabled) {
             megaChat.renderContactTree();
         }
+    };
+
+    this.renderInboxTree = function() {
+
     };
 
     this.openFolder = function(id, force, chat) {
@@ -1619,7 +1611,7 @@ function MegaData()
                 onlinestatus = [l[5926], 'offline'];
             }
             if (!treesearch || (treesearch && contacts[i].name && contacts[i].name.toLowerCase().indexOf(treesearch.toLowerCase()) > -1)) {
-                html += '<div class="nw-contact-item ' + onlinestatus[1] + '" id="contact_' + htmlentities(contacts[i].u)
+                html += '<div class="nw-contact-item ui-droppable ' + onlinestatus[1] + '" id="contact_' + htmlentities(contacts[i].u)
                     + '"><div class="nw-contact-status"></div><div class="nw-contact-name">'
                     + htmlentities(contacts[i].name) + ' <a href="#" class="button start-chat-button"><span></span></a></div></div>';
             }
@@ -1764,6 +1756,7 @@ function MegaData()
     };
 
     this.buildtree = function(n, dialog, stype) {
+        
         if (!n) {
             console.error('Invalid node passed to M.buildtree');
             return;
@@ -1808,6 +1801,19 @@ function MegaData()
             }
             stype = "shared-with-me";
         }
+        else if (n.h === M.InboxID) {
+            if (typeof dialog === 'undefined') {
+                // if ($('.content-panel.inbox ul').length == 0) {
+                    $('.content-panel.inbox').html('<ul id="treesub_' + htmlentities(M.InboxID) + '"></ul>');
+                // }
+            }
+            else {
+                // if ($('.' + dialog + ' .inbox .dialog-content-block ul').length == 0) {
+                    $('.' + dialog + ' .inbox .dialog-content-block').html('<ul id="mctreesub_' + htmlentities(M.InboxID) + '"></ul>');
+                // }
+            }
+            stype = "inbox";
+        }
         else if (n.h === M.RubbishID) {
             if (typeof dialog === 'undefined') {
                 // if ($('.content-panel.rubbish-bin ul').length == 0) {
@@ -1832,6 +1838,7 @@ function MegaData()
                 }
             }
 
+            // localCompare >=IE10, FF and Chrome OK
             // sort by name is default in the tree
             treePanelSortElements(stype, folders, {
                 name: function(a, b) {
@@ -1903,9 +1910,13 @@ function MegaData()
                     else {
                         var sExportLink = (M.d[folders[ii].h].shares && M.d[folders[ii].h].shares.EXP) ? 'linked' : '';
                         var sLinkIcon = (sExportLink === '') ? '' : 'link-icon';
+                        var arrowIcon = '';
+                        if (M.c[folders[ii].h]) {
+                            arrowIcon = 'class="nw-fm-arrow-icon"';
+                        }
                         var html = '<li id="' + _li + folders[ii].h + '">\n\
                                         <span  id="' + _a + htmlentities(folders[ii].h) + '" class="nw-fm-tree-item ' + containsc + ' ' + expandedc + ' ' + openedc + ' ' + sExportLink + '">\n\
-                                            <span class="nw-fm-arrow-icon"></span>\n\
+                                            <span ' + arrowIcon + '></span>\n\
                                             <span class="nw-fm-tree-folder' + sharedfolder + '">' + htmlentities(folders[ii].name) + '</span>\n\
                                             <span class="' + sLinkIcon + '"></span>\n\
                                         </span>\n\
@@ -1931,9 +1942,9 @@ function MegaData()
                             $('#' + _li + folders[ii].h).parents('li').removeClass('tree-item-on-search-hidden');
                         }
                     }
-                    if (buildnode) {
-                        this.buildtree(folders[ii], dialog, stype);
-                    }
+//                    if (buildnode) {
+//                        this.buildtree(folders[ii], dialog, stype);
+//                    }
 
                     sharedUInode(folders[ii].h);
                 }
@@ -1947,23 +1958,21 @@ function MegaData()
     // divider & advanced
     var adv = '<span class="context-menu-divider"></span><span class="context-menu-item advanced-item"><span class="context-menu-icon"></span>Select Location</span>';
 
-    this.buildRootSubmenu = function()
-    {
-        $('#sm_move').remove();
-        var cs = '';
-        var sm = '';
-
-        for (var h in M.c[M.RootID])
-        {
-            if (M.d[h].t)
-            {
+    this.buildRootSubMenu = function() {
+        
+        var cs = '',
+            sm = '',
+            html = '';
+        
+        for (var h in M.c[M.RootID]) {
+            if (M.d[h].t) {
                 cs = ' contains-submenu';
                 sm = '<span class="context-submenu" id="sm_' + this.RootID + '"><span id="csb_' + this.RootID + '"></span>' + arrow + '</span>';
                 break;
             }
         }
 
-        var html = '<span class="context-submenu" id="sm_move"><span id="csb_move">';
+        html = '<span class="context-submenu" id="sm_move"><span id="csb_move">';
         html += '<span class="context-menu-item cloud-item' + cs + '" id="fi_' + this.RootID + '">' + icon + 'Cloud Drive' + '</span>' + sm;
         html += '<span class="context-menu-item remove-item" id="fi_' + this.RubbishID + '">' + icon + 'Rubbish Bin' + '</span>';
         html += adv;
@@ -1973,14 +1982,16 @@ function MegaData()
         $('.context-menu-item.move-item').after(html);
     };
 
-    this.buildSubmenu = function(id, p)
-    {
-        var folders = [];
-
-        if (typeof id === 'undefined') {
-            this.buildRootSubmenu();
-            id = this.RootID;
-        }
+    /*
+     * buildSubMenu - context menu related
+     * Create sub-menu for context menu parent directory
+     * 
+     * @param {string} id - parent folder handle 
+     */
+    this.buildSubMenu = function(id) {
+        
+        var folders = [],
+            sub, cs, sm, fid, sharedFolder, html;
 
         for (var i in this.c[id]) {
             if (this.d[i] && this.d[i].t === 1 && this.d[i].name) {
@@ -1988,37 +1999,39 @@ function MegaData()
             }
         }
 
-// localeCompare is not supported in IE10, >=IE11 only
-// sort by name is default in the tree
-        folders.sort(function(a, b)
-        {
-            if (a.name)
-                return a.name.localeCompare(b.name);
-        });
-        for (var i in folders)
-        {
-            var sub = false;
-            var cs = '';
-            var sm = '';
-            var fid = folders[i].h;
+        // Check existance of sub-menu
+        if ($('#csb_' + id + ' > .context-menu-item').length !== folders.length)  {
+            // localeCompare is not supported in IE10, >=IE11 only
+            // sort by name is default in the tree
+            folders.sort(function(a, b) {
+                if (a.name)
+                    return a.name.localeCompare(b.name);
+            });
+        
+            for (var i in folders) {
+                sub = false;
+                cs = '';
+                sm = '';
+                fid = folders[i].h;
 
-            for (var h in M.c[fid])
-            {
-                if (M.d[h] && M.d[h].t)
-                {
-                    sub = true;
-                    cs = ' contains-submenu';
-                    sm = '<span class="context-submenu" id="sm_' + fid + '"><span id="csb_' + fid + '"></span>' + arrow + '</span>';
-                    break;
+                for (var h in M.c[fid]) {
+                    if (M.d[h] && M.d[h].t) {
+                        sub = true;
+                        cs = ' contains-submenu';
+                        sm = '<span class="context-submenu" id="sm_' + fid + '"><span id="csb_' + fid + '"></span>' + arrow + '</span>';
+                        break;
+                    }
                 }
+
+                sharedFolder = 'folder-item';
+                if (typeof M.d[fid].shares !== 'undefined') {
+                    sharedFolder += ' shared-folder-item';
+                }
+
+                html = '<span class="context-menu-item ' + sharedFolder + cs + '" id="fi_' + fid + '">' + icon + htmlentities(this.d[fid].name) + '</span>' + sm;
+
+                $('#csb_' + id).append(html);
             }
-            var sharedfolder = 'folder-item';
-            if (typeof M.d[fid].shares !== 'undefined')
-                sharedfolder += ' shared-folder-item';
-            var html = '<span class="context-menu-item ' + sharedfolder + cs + '" id="fi_' + fid + '">' + icon + htmlentities(this.d[fid].name) + '</span>' + sm;
-            $('#csb_' + id).append(html);
-            if (sub)
-                this.buildSubmenu(fid);
         }
     };
 
@@ -3378,8 +3391,7 @@ function MegaData()
                                 done: function(res, ctx) {
                                     if (res.r && res.r[0] === 0) {
 
-                                        // ToDo: timestamp ts can be different here and on server side, check how this influence execution
-                                        M.nodeShare(ctx.fln, {h: ctx.fln, r: 0, u: 'EXP', ts: Math.floor(Date.now() / 1000)});
+                                        M.nodeShare(ctx.fln, {h: ctx.fln, r: 0, u: 'EXP', ts: unixtime()});
                                     }
                                     getFolderLinks();
                                 }
@@ -4563,7 +4575,6 @@ function renderNew() {
     if (newshare) {
         M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
     }
-    M.buildSubmenu();
     initContextUI();
     if (newpath) {
         M.renderPath();
@@ -4572,6 +4583,18 @@ function renderNew() {
     if (d) {
         console.timeEnd('rendernew');
     }
+
+    // handle the Inbox section use cases
+    if (M.hasInboxItems() === true) {
+        $('.nw-fm-left-icon.inbox').removeClass('hidden');
+    }
+    else {
+        $('.nw-fm-left-icon.inbox').addClass('hidden');
+        if ($('.nw-fm-left-icon.inbox').is(".active") === true) {
+            M.openFolder(M.RootID);
+        }
+    }
+
 }
 
 /**
@@ -5366,79 +5389,62 @@ function doShare(h, targets, dontShowShareDialog) {
     nodeids = fm_getnodes(h);
     nodeids.push(h);
 
-    api_setshare(h, targets, nodeids,
-        {
-            t: targets,
-            h: h,
-            done: function(res, ctx) {
-                var i;
+    api_setshare(h, targets, nodeids, {
+        t: targets,
+        h: h,
+        done: function(res, ctx) {
 
-                if (res.r && res.r[0] == '0') {
-                    for (i in res.u) {
-                        M.addUser(res.u[i]);
-                    }
+            // Loose comparasion is important
+            if (res.r && res.r[0] == '0') {
+                for (var i in res.u) {
+                    M.addUser(res.u[i]);
+                }
 
-                    for (i in res.r) {
-                        if (res.r[i] == 0) {
-                            var rights = ctx.t[i].r;
-                            var user = ctx.t[i].u;
+                for (var k in res.r) {
+                    if (res.r[k] === 0) {
+                        var rights = ctx.t[k].r;
+                        var user = ctx.t[k].u;
 
-                            if (user.indexOf('@') >= 0) {
-                                user = getuid(ctx.t[i].u);
-                            }
+                        if (user.indexOf('@') >= 0) {
+                            user = getuid(ctx.t[k].u);
+                        }
 
-                            // A pending share may not have a corresponding user and should not be added
-                            // A pending share can also be identified by a user who is only a '0' contact
-                            // level (passive)
-                            if (M.u[user] && M.u[user].c != 0) {
-                                M.nodeShare(ctx.h, {h: h, r: rights, u: user, ts: Math.floor(new Date().getTime() / 1000)});
-                                setLastInteractionWith(user, "0:" + unixtime());
-                            }
-                            else if (d) {
-                                console.log('doshare: invalid user', user, M.u[user], ctx.t[i]);
-                            }
+                        // A pending share may not have a corresponding user and should not be added
+                        // A pending share can also be identified by a user who is only a '0' contact
+                        // level (passive)
+                        if (M.u[user] && M.u[user].c !== 0) {
+                            M.nodeShare(ctx.h, {
+                                h: h,
+                                r: rights,
+                                u: user,
+                                ts: unixtime()
+                            });
+                            setLastInteractionWith(user, "0:" + unixtime());
+                        }
+                        else if (d) {
+                            console.log('doshare: invalid user', user, M.u[user], ctx.t[k]);
                         }
                     }
-                    if (dontShowShareDialog != true) {
-                        $('.fm-dialog.share-dialog').removeClass('hidden');
-                    }
-                    loadingDialog.hide();
-                    M.renderShare(h);
-
-                    if (dontShowShareDialog != true) {
-                        shareDialog();
-                    }
-                    $promise.resolve();
-                } else {
-                    $('.fm-dialog.share-dialog').removeClass('hidden');
-                    loadingDialog.hide();
-                    $promise.reject(res);
                 }
+                if (dontShowShareDialog !== true) {
+                    $('.fm-dialog.share-dialog').removeClass('hidden');
+                }
+                loadingDialog.hide();
+                M.renderShare(h);
+
+                if (dontShowShareDialog !== true) {
+                    shareDialog();
+                }
+                $promise.resolve();
             }
-        });
-    return $promise;
-}
-
-
-// ToDo: Absolute, not used
-function doshare2(nodeHandle, t, dontShowShareDialog, msg)
-{
-    // ToDo: wait for msg and implement it
-    var $promise = new MegaPromise();
-
-    nodeids = fm_getnodes(nodeHandle);
-    nodeids.push(nodeHandle);
-
-    api_setshare2(nodeHandle, t, nodeids,
-        {
-            t: t,
-            h: nodeHandle,
-            done: function(res, ctx)
-            {
-                //ToDo: Handle response codes
-                // All updates to variables should be made in execsc(..)
+            else {
+                $('.fm-dialog.share-dialog').removeClass('hidden');
+                loadingDialog.hide();
+                $promise.reject(res);
             }
-        });
+        }
+    });
+    
     return $promise;
 }
 

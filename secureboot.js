@@ -335,6 +335,7 @@ var mBroadcaster = {
             if (this.handle) {
                 this.eTag = this.eTag.split(this.handle).shift();
             }
+            this.slaves = [];
             this.handle = u_handle;
             this.eTag += u_handle + '!';
 
@@ -391,17 +392,17 @@ var mBroadcaster = {
             var wasMaster = this.master;
             if (wasMaster) {
                 localStorage['mCrossTabRef_' + u_handle] = this.master;
-                this.notify('leaving', this.master);
                 delete this.master;
             } else {
                 if (d) console.log('crossTab leaving');
             }
             this.unlisten();
+            this.notify('leaving', wasMaster || -1);
             mBroadcaster.sendMessage('crossTab:leave', wasMaster);
         },
 
         notify: function crossTab_notify(msg, data) {
-            data = { origin: this.ctID, data: data || Math.random()};
+            data = { origin: this.ctID, data: data, sid: Math.random()};
             localStorage.setItem(this.eTag + msg, JSON.stringify(data));
             if (d) console.log('crossTab Notifying', this.eTag + msg, localStorage[this.eTag + msg]);
         },
@@ -444,9 +445,14 @@ var mBroadcaster = {
 
             switch (msg) {
                 case 'ping':
+                    this.slaves.push(strg.origin);
                     this.notify('pong');
                     break;
                 case 'leaving':
+                    var idx = this.slaves.indexOf(strg.origin);
+                    if (idx !== -1) {
+                        this.slaves.splice(idx, 1);
+                    }
                     if (localStorage['mCrossTabRef_' + u_handle] === strg.data) {
                         if (d) console.log('Taking crossTab-master ownership');
                         delete localStorage['mCrossTabRef_' + u_handle];
@@ -1052,6 +1058,7 @@ else if (!b_u)
     jsl.push({f:'html/top.html', n: 'top', j:0});
     jsl.push({f:'js/notifications.js', n: 'notifications_js', j:1});
     jsl.push({f:'css/style.css', n: 'style_css', j:2,w:30,c:1,d:1,cache:1});
+    jsl.push({f:'js/useravatar.js', n: 'contact_avatar_js', j:1,w:3});
     jsl.push({f:'js/avatar.js', n: 'avatar_js', j:1,w:3});
     jsl.push({f:'js/countries.js', n: 'countries_js', j:1});
     jsl.push({f:'html/dialogs.html', n: 'dialogs', j:0,w:2});
@@ -1060,6 +1067,7 @@ else if (!b_u)
     jsl.push({f:'js/Int64.js', n: 'int64_js', j:1});
     jsl.push({f:'js/zip64.js', n: 'zip_js', j:1});
     jsl.push({f:'js/cms.js', n: 'cms_js', j:1});
+    jsl.push({f:'js/megasync.js', n: 'megasync_js', j:1});
 
     jsl.push({f:'js/windowOpenerProtection.js', n: 'windowOpenerProtection', j:1,w:1});
 

@@ -350,6 +350,12 @@ function pro_pay()
                 else if (pro_paymentmethod === 'union-pay') {
                     pro_m = 5;
                 }
+                else if (pro_paymentmethod === 'fortumo') {
+                    // pro_m = 6;
+                    // Fortumo does not do a utc request, we immediately redirect
+                    fortumo.redirectToSite(saleId);
+                    return;
+                }
                 
                 // Update the last payment provider ID for the 'psts' action packet. If the provider e.g. bitcoin 
                 // needs a redirect after confirmation action packet it will redirect to the account page.
@@ -643,6 +649,7 @@ var proPage = {
             displayName: l[6952],           // Credit card
             supportsRecurring: true,        // If subscriptions are possible
             supportsMonthlyPayment: true,   // If you can pay for 1 month at a time
+            supportsAnnualPayment: true,
             cssClass: 'credit-card'
         },
         {
@@ -650,6 +657,7 @@ var proPage = {
             displayName: l[6802],           // Bitcoin
             supportsRecurring: false,
             supportsMonthlyPayment: true,
+            supportsAnnualPayment: true,
             cssClass: 'bitcoin'
         },
         {
@@ -657,6 +665,7 @@ var proPage = {
             displayName: l[504],            // Prepaid balance
             supportsRecurring: false,
             supportsMonthlyPayment: true,
+            supportsAnnualPayment: true,
             cssClass: 'prepaid-balance'
         },
         {
@@ -664,6 +673,7 @@ var proPage = {
             displayName: l[6198],           // Wire transfer
             supportsRecurring: false,
             supportsMonthlyPayment: false,  // Accept 1 year, one-time payment only (wire transfer fees are expensive)
+            supportsAnnualPayment: true,
             cssClass: 'wire-transfer'
         },
         {
@@ -671,7 +681,16 @@ var proPage = {
             displayName: l[7109],           // UnionPay
             supportsRecurring: false,
             supportsMonthlyPayment: true,
+            supportsAnnualPayment: true,
             cssClass: 'union-pay'
+        },
+        {
+            apiGatewayId: 6,
+            displayName: "Fortumo Mobile Payments",           // Fortumo
+            supportsRecurring: false,
+            supportsMonthlyPayment: true,
+            supportsAnnualPayment: false,
+            cssClass: 'fortumo'
         }];
         
         // Do API request (User Forms of Payment Query) to get the valid list of currently active 
@@ -712,7 +731,7 @@ var proPage = {
                     // Create a radio button with icon for each payment gateway
                     html += '<div class="payment-method">'
                          +      '<div class="membership-radio' + classChecked + '">'
-                         +          '<input type="radio" name="' + gatewayOption.cssClass + '" id="' + gatewayOption.cssClass + '" ' + optionChecked + ' value="' + gatewayOption.cssClass + '" data-recurring="' + gatewayOption.supportsRecurring + '"  data-supports-monthly-payment="' + gatewayOption.supportsMonthlyPayment + '" />'
+                         +          '<input type="radio" name="' + gatewayOption.cssClass + '" id="' + gatewayOption.cssClass + '" ' + optionChecked + ' value="' + gatewayOption.cssClass + '" data-recurring="' + gatewayOption.supportsRecurring + '"  data-supports-monthly-payment="' + gatewayOption.supportsMonthlyPayment + '"  data-supports-annual-payment="' + gatewayOption.supportsAnnualPayment + '" />'
                          +          '<div></div>'
                          +      '</div>'
                          +      '<div class="membership-radio-label ' + gatewayOption.cssClass + '">'
@@ -856,6 +875,9 @@ var proPage = {
         var $durationSelect = $('.membership-st2-select');
         var $durationOptions = $durationSelect.find('.membership-dropdown-item');
         var supportsMonthlyPayment = ($('.payment-options-list input:checked').attr('data-supports-monthly-payment') === 'true') ? true : false;
+        var supportsAnnualPayment = ($('.payment-options-list input:checked').attr('data-supports-annual-payment') === 'true') ? true : false;
+
+        $durationOptions.removeClass('hidden');
 
         // Loop through renewal period options (1 month, 1 year)
         $.each($durationOptions, function(key, dropdownOption) {
@@ -866,7 +888,7 @@ var proPage = {
             var numOfMonths = currentPlan[4];
 
             // If the currently selected payment option e.g. Wire transfer doesn't support a 1 month payment
-            if ((supportsMonthlyPayment === false) && (numOfMonths === 1)) {
+            if (((supportsMonthlyPayment === false) && (numOfMonths === 1)) || ((supportsAnnualPayment === false) && (numOfMonths === 12))) {
 
                 // Hide the option
                 $(dropdownOption).addClass('hidden').removeClass('selected');
@@ -1036,6 +1058,22 @@ var unionPay = {
             $("body").append(form);
             form.submit();
         }
+    }
+};
+
+
+/**
+ * Code for Dynamic/Union Pay
+ */
+var fortumo = {
+    
+    /**
+     * Redirect to the site
+     * @param {String} utsResult (a saleid)
+     */
+    redirectToSite: function(utsResult) {
+        
+        window.location = "http://localhost/megapay/fortumo.html?saleid=" + utsResult;
     }
 };
 

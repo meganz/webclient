@@ -1604,10 +1604,6 @@ function topmenuUI() {
         }
     });
 
-    if (avatars[u_handle]) {
-        $('.fm-avatar img').attr('src', avatars[u_handle].url);
-    }
-
     $('.fm-avatar img, .user-name').rebind('click', function () {
         if ($('.fm-avatar img').attr('src').indexOf('blob:') > -1) {
             document.location.hash = 'fm/account';
@@ -1720,6 +1716,7 @@ function parsetopmenu() {
     if (document.location.href.substr(0, 19) == 'chrome-extension://') {
         top = top.replace(/\/#/g, '/' + urlrootfile + '#');
     }
+    top = top.replace("{avatar-top}", useravatar.top());
     top = translate(top);
     return top;
 }

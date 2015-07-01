@@ -380,6 +380,7 @@ function removeHash() {
 }
 
 function browserdetails(useragent) {
+    useragent = useragent || navigator.userAgent;
     useragent = (' ' + useragent).toLowerCase();
     var os = false;
     var browser = false;
@@ -2286,41 +2287,6 @@ function getHtmlElemPos(elem, n) {
     };
 }
 
-/*
- * getServerTime()
- * 
- * get server date/time using http header Date field
- * if fail get client current time
- * 
- * It accepts the RFC2822 / IETF date syntax (RFC2822 Section 3.3),
- * e.g. "Mon, 25 Dec 1995 13:30:00 GMT"
- *  If a time zone is not specified and the string is in an ISO format
- *  recognized by ES5, UTC is assumed. GMT and UTC are considered equivalent.
- * 
- * @returns {integer} seconds
- */
-function getServerTime() {
-
-    var req = new XMLHttpRequest(),
-        sDate = '',
-        iTime = 0;
-    
-    // Important: Synchronous request
-    req.open('POST', document.location, false);
-    req.send(null);
-    sDate = req.getResponseHeader('Date');
-    
-    try {
-        iTime = Math.floor(Date.parse(sDate) / 1000);
-    }
-    catch (error) {
-        iTime = Math.floor(new Date().getTime() / 1000);
-        DEBUG('getServerTime() failed: ' + error);
-    }
-
-    return iTime;
-}
-
 function disableDescendantFolders(id, pref) {
     var folders = [];
     for (var i in M.c[id]) {
@@ -2917,6 +2883,30 @@ mega.utils.abortTransfers = function megaUtilsAbortTransfers() {
  *  will perform a former normal cloud reload.
  */
 mega.utils.reload = function megaUtilsReload() {
+    function _reload() {
+        var u_sid = u_storage.sid,
+            u_key = u_storage.k,
+            privk = u_storage.privk,
+            debug = !!u_storage.d;
+
+        localStorage.clear();
+        sessionStorage.clear();
+
+        u_storage.sid = u_sid;
+        u_storage.privk = privk;
+        u_storage.k = u_key;
+        u_storage.wasloggedin = true;
+
+        if (debug) {
+            u_storage.d = u_storage.dd = true;
+            if (!is_extension) {
+                u_storage.jj = true;
+            }
+        }
+
+        location.reload(true);
+    }
+
     if (u_type !== 3) {
         stopsc();
         stopapi();
@@ -2928,41 +2918,82 @@ mega.utils.reload = function megaUtilsReload() {
     }
     else {
         // Show message that this operation will destroy and reload the data stored by MEGA in the browser
-        var msg = l[6995];
-        msgDialog('confirmation', l[761], msg, l[6994], function(doIt) {
+        msgDialog('confirmation', l[761], l[6995], l[6994], function(doIt) {
             if (doIt) {
-                mega.utils.abortTransfers().then(function() {
-                    loadingDialog.show();
-                    stopsc();
-                    stopapi();
+                if (!mBroadcaster.crossTab.master || mBroadcaster.crossTab.slaves.length) {
+                    msgDialog('warningb', l[882], l[7157]);
+                }
+                if (mBroadcaster.crossTab.master) {
+                    mega.utils.abortTransfers().then(function() {
+                        loadingDialog.show();
+                        stopsc();
+                        stopapi();
 
-                    MegaDB.dropAllDatabases(/*u_handle*/)
-                        .always(function(r) {
-                            var u_sid = u_storage.sid,
-                                u_key = u_storage.k,
-                                privk = u_storage.privk,
-                                debug = !!u_storage.d;
-
-                            console.debug('dropAllDatabases', r);
-
-                            localStorage.clear();
-                            sessionStorage.clear();
-
-                            u_storage.sid = u_sid;
-                            u_storage.privk = privk;
-                            u_storage.k = u_key;
-                            u_storage.wasloggedin = true;
-
-                            if (debug) {
-                                u_storage.d = u_storage.dd = u_storage.jj = true;
-                            }
-
-                            location.reload(true);
-                        });
-                });
+                        MegaPromise.allDone([
+                            MegaDB.dropAllDatabases(/*u_handle*/),
+                            mega.utils.clearFileSystemStorage()
+                        ]).then(function(r) {
+                                console.debug('megaUtilsReload', r);
+                                _reload();
+                            });
+                    });
+                }
             }
         });
     }
+};
+
+/**
+ * Clear the data on FileSystem storage.
+ *
+ * mega.utils.clearFileSystemStorage().always(console.debug.bind(console));
+ */
+mega.utils.clearFileSystemStorage = function megaUtilsClearFileSystemStorage() {
+    function _done(status) {
+        if (promise) {
+            if (status !== 0x7ffe) {
+                promise.reject(status);
+            }
+            else {
+                promise.resolve();
+            }
+            promise = undefined;
+        }
+    }
+
+    if (is_chrome_firefox || !window.requestFileSystem) {
+        return MegaPromise.resolve();
+    }
+
+    setTimeout(_done, 4000);
+
+    var promise = new MegaPromise();
+
+    (function _clear(storagetype) {
+        function onInitFs(fs) {
+            var dirReader = fs.root.createReader();
+            dirReader.readEntries(function (entries) {
+                for (var i = 0, entry; entry = entries[i]; ++i) {
+                    if (entry.isDirectory && entry.name === 'mega') {
+                        console.debug('Cleaning storage...', entry);
+                        entry.removeRecursively(_next.bind(null, 0x7ffe), _next);
+                        break;
+                    }
+                }
+            });
+        }
+        function _next(status) {
+            if (storagetype === 0) {
+                _clear(1);
+            }
+            else {
+                _done(status);
+            }
+        }
+        window.requestFileSystem(storagetype, 1024, onInitFs, _next);
+    })(0);
+
+    return promise;
 };
 
 /**

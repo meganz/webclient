@@ -1659,12 +1659,13 @@ function api_reqerror(q, e) {
     }
 }
 
+var apiFloorCap = 3000;
 function api_retry() {
     for (var i = 4; i--;) {
-        if (apixs[i].timer && apixs[i].backoff > 5000) {
+        if (apixs[i].timer && apixs[i].backoff > apiFloorCap) {
             clearTimeout(apixs[i].timer);
-            apixs[i].backoff = 800+Math.floor(Math.random()*1200);
-            api_send(apixs[i]);
+            apixs[i].backoff = apiFloorCap;
+            apixs[i].timer = setTimeout(api_send, apiFloorCap, apixs[i]);
         }
     }
 }
@@ -2176,7 +2177,7 @@ var u_nodekeys = {};
 // an error, and the whole operation gets repeated (exceedingly
 // rare race condition).
 function api_setshare(node, targets, sharenodes, ctx) {
-    
+
     api_setshare1({
             node: node,
             targets: targets,

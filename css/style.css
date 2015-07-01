@@ -4225,36 +4225,6 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 .fm-tree-panel .nw-contact-avatar {
 	display: none;
 }
-.fm-avatar.color0, .nw-contact-avatar.color0, .contacts-avatar.color0, .avatar.color0, .fm-avatar.color0, .color0, .fm-avatar.color1, .nw-contact-avatar.color1, .contacts-avatar.color1, .avatar.color1, .fm-avatar.color1, .color1 {
-	background-color: #FF6A19;
-}
-.nw-contact-avatar.color2, .contacts-avatar.color2, .avatar.color2, .fm-avatar.color2, .color2 {
-	background-color: #5856d6;
-}
-.nw-contact-avatar.color3, .contacts-avatar.color3, .avatar.color3, .fm-avatar.color3, .color3 {
-	background-color: #007aff;
-}
-.nw-contact-avatar.color4, .contacts-avatar.color4, .avatar.color4, .fm-avatar.color4, .color4 {
-	background-color: #34aadc;
-}
-.nw-contact-avatar.color5, .contacts-avatar.color5, .avatar.color5, .fm-avatar.color5, .color5 {
-	background-color: #5ac8fa;
-}
-.nw-contact-avatar.color6, .contacts-avatar.color6, .avatar.color6, .fm-avatar.color6, .color6 {
-	background-color: #4cd964;
-}
-.nw-contact-avatar.color7, .contacts-avatar.color7, .avatar.color7, .fm-avatar.color7, .color7 {
-	background-color: #ff1a53;
-}
-.nw-contact-avatar.color8, .contacts-avatar.color8, .avatar.color8, .fm-avatar.color8, .color8 {
-	background-color: #d90007;
-}
-.nw-contact-avatar.color9, .contacts-avatar.color9, .avatar.color9, .fm-avatar.color9, .color9 {
-	background-color: #ff9500;
-}
-.nw-contact-avatar.color10, .contacts-avatar.color10, .avatar.color10, .fm-avatar.color10, .color10 {
-	background-color: #ffcc00;
-}
 .add-contact-item, .add-contact-pad {
 	display: block;
 }
@@ -12078,9 +12048,17 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
 	display: block;
 	float: left;
 	position: relative;
+	-webkit-transition: background-color 200ms ease-in-out;
+	-moz-transition: background-color 200ms ease-in-out;
+	-o-transition: background-color 200ms ease-in-out;
+	-ms-transition: background-color 200ms ease-in-out;
+	transition: background-color 200ms 
 }
 .membership-medium-txt.red-bg {
-	background-color: #D32200;
+	background-color: rgba(213,38,0,0.9);
+}
+.membership-medium-txt.red-bg:hover {
+	background-color: rgba(213,38,0,1);
 }
 .membership-medium-txt.blue-bg {
 	background-color: #1FA4E5;
@@ -13154,10 +13132,10 @@ table {
 .fm-account-profile .fm-account-info-block {
 	margin-left: 120px;
 }
-.fm-account-change-avatar, .fm-account-save, .fm-account-cancel {
+.fm-account-remove-avatar, .fm-account-change-avatar, .fm-account-save, .fm-account-cancel {
 	height: 28px;
 	line-height: 27px;
-	background-color: #D52600;
+	background-color: rgba(213,38,0,0.9);
 	color: white;
 	float: left;
 	-webkit-box-sizing: border-box;
@@ -13169,10 +13147,26 @@ table {
 	padding: 0 15px;
 	margin: 14px 0;
 	cursor: pointer;
+	-webkit-transition: background-color 200ms ease-in-out;
+	-moz-transition: background-color 200ms ease-in-out;
+	-o-transition: background-color 200ms ease-in-out;
+	-ms-transition: background-color 200ms ease-in-out;
+	transition: background-color 200ms 
+}
+.fm-account-change-avatar:hover, .fm-account-save:hover, .fm-account-cancel:hover {
+	background-color: rgba(213,38,0,1);
 }
 .fm-account-change-avatar {
 	padding: 0 10px;
 	margin: 37px 0 15px 0;
+}
+.fm-account-remove-avatar {
+	padding: 0 10px;
+	margin: 37px 0 15px 15px;
+	background-color: #4c4c4c;
+}
+.fm-account-remove-avatar:hover {
+	background-color: black;
 }
 .fm-account-save, .fm-account-cancel {
 	float: right;

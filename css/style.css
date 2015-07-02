@@ -15042,9 +15042,10 @@ h5.main-italic-header {
     column-width: 170px;
 }
 .payment-options-list .payment-method {
-	cursor: pointer;
-	margin-bottom: 3px;
-	overflow: auto;
+    cursor: pointer;
+    margin-bottom: 3px;
+    overflow: visible;
+    width: 200px;
 }
 .membership-radio div {
 	width: 14px;
@@ -15085,7 +15086,7 @@ h5.main-italic-header {
 	background-position: -444px -487px;
 }
 .membership-radio-label.fortumo {
-	background-position: -444px -410px;
+    background-position: -444px -412px;
 }
 .membership-radio-label.wire-transfer {
 	background-position: -444px -450px;

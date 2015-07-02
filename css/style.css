@@ -5737,7 +5737,7 @@ table .grid-status-icon.star {
 	transition: background-color 100ms ease-in-out;
 }
 .file-block.ui-selected, .contact-block-view.ui-selected, .file-block.ui-selecting, .contact-block-view.ui-selecting {
-	background-color: rgba(0,0,0,0.1);
+    background-color: rgba(0, 0, 0, 0.19);
 }
 .file-block.dragover, .contact-block-view.dragover {
 	background-color: rgba(0,0,0,0.075);

@@ -669,14 +669,6 @@ var proPage = {
             cssClass: 'prepaid-balance'
         },
         {
-            apiGatewayId: null,
-            displayName: l[6198],           // Wire transfer
-            supportsRecurring: false,
-            supportsMonthlyPayment: false,  // Accept 1 year, one-time payment only (wire transfer fees are expensive)
-            supportsAnnualPayment: true,
-            cssClass: 'wire-transfer'
-        },
-        {
             apiGatewayId: 5,
             displayName: l[7109],           // UnionPay
             supportsRecurring: false,
@@ -686,11 +678,19 @@ var proPage = {
         },
         {
             apiGatewayId: 6,
-            displayName: "Fortumo Mobile Payments",           // Fortumo
+            displayName: l[7161],           // Mobile carrier billing
             supportsRecurring: false,
             supportsMonthlyPayment: true,
             supportsAnnualPayment: false,
             cssClass: 'fortumo'
+        },
+        {
+            apiGatewayId: null,
+            displayName: l[6198],           // Wire transfer
+            supportsRecurring: false,
+            supportsMonthlyPayment: false,  // Accept 1 year, one-time payment only (wire transfer fees are expensive)
+            supportsAnnualPayment: true,
+            cssClass: 'wire-transfer'
         }];
         
         // Do API request (User Forms of Payment Query) to get the valid list of currently active 

@@ -15037,9 +15037,9 @@ h5.main-italic-header {
     -webkit-column-count: 2;
     -moz-column-count: 2;
     column-count: 2;
-    -webkit-column-width: 170px;
-    -moz-column-width: 170px;
-    column-width: 170px;
+    -webkit-column-width: 200px;
+    -moz-column-width: 200px;
+    column-width: 200px;
 }
 .payment-options-list .payment-method {
     cursor: pointer;

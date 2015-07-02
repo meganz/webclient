@@ -67,6 +67,7 @@ function dl_g(res)
             }
         });
         $('.new-download-sync-app').rebind('click', function(e) {
+			$('.megasync-overlay').removeClass('downloading');
             megasync.download(dlpage_ph, dlpage_key);
         });
         $('.new-download-red-button').unbind('click');

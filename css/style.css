@@ -5268,18 +5268,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 /**
  * hide sections of the site if the current visited link is a folder share link
  */
-.active-folder-link .nw-fm-left-icon.cloud-drive,
-.active-folder-link .nw-fm-tree-header.cloud-drive,
-.active-folder-link .nw-fm-left-icon.inbox,
-.active-folder-link .nw-fm-left-icon.shared-with-me,
-.active-folder-link .nw-fm-left-icon.contacts,
-.active-folder-link .nw-fm-left-icon.conversations,
-.active-folder-link .nw-fm-left-icon.rubbish-bin,
-.active-folder-link .nw-fm-left-icon.settings
-{
+.active-folder-link .nw-fm-left-icon.cloud-drive, .active-folder-link .nw-fm-tree-header.cloud-drive, .active-folder-link .nw-fm-left-icon.inbox, .active-folder-link .nw-fm-left-icon.shared-with-me, .active-folder-link .nw-fm-left-icon.contacts, .active-folder-link .nw-fm-left-icon.conversations, .active-folder-link .nw-fm-left-icon.rubbish-bin, .active-folder-link .nw-fm-left-icon.settings {
 	display: none;
 }
-
 .nw-fm-left-icon.notifications {
 	background-position: 0 -6142px;
 }
@@ -12059,7 +12050,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
 	-moz-transition: background-color 200ms ease-in-out;
 	-o-transition: background-color 200ms ease-in-out;
 	-ms-transition: background-color 200ms ease-in-out;
-	transition: background-color 200ms 
+	transition: background-color 200ms
 }
 .membership-medium-txt.red-bg {
 	background-color: rgba(213,38,0,0.9);
@@ -13158,7 +13149,7 @@ table {
 	-moz-transition: background-color 200ms ease-in-out;
 	-o-transition: background-color 200ms ease-in-out;
 	-ms-transition: background-color 200ms ease-in-out;
-	transition: background-color 200ms 
+	transition: background-color 200ms
 }
 .fm-account-change-avatar:hover, .fm-account-save:hover, .fm-account-cancel:hover {
 	background-color: rgba(213,38,0,1);
@@ -15028,25 +15019,25 @@ h5.main-italic-header {
 	background-color: #3B99FC;
 }
 .membership-radio {
-    background-color: #bbbbbb;
-    -moz-border-radius: 100%;
-    -webkit-border-radius: 100%;
-    border-radius: 100%;
-    display: inline-block;
-    height: 16px;
-    line-height: 26px;
-    margin: 0 12px 0 0;
-    position: relative;
-    vertical-align: middle;
-    width: 16px;
+	background-color: #bbbbbb;
+	-moz-border-radius: 100%;
+	-webkit-border-radius: 100%;
+	border-radius: 100%;
+	display: inline-block;
+	height: 16px;
+	line-height: 26px;
+	margin: 0 12px 0 0;
+	position: relative;
+	vertical-align: middle;
+	width: 16px;
 }
 .payment-options-list {
-    -webkit-column-count: 2;
-    -moz-column-count: 2;
-    column-count: 2;
-    -webkit-column-width: 170px;
-    -moz-column-width: 170px;
-    column-width: 170px;
+	-webkit-column-count: 2;
+	-moz-column-count: 2;
+	column-count: 2;
+	-webkit-column-width: 170px;
+	-moz-column-width: 170px;
+	column-width: 170px;
 }
 .payment-options-list .payment-method {
 	cursor: pointer;
@@ -15071,16 +15062,16 @@ h5.main-italic-header {
 	margin: 5px;
 }
 .membership-radio-label {
-    background-image: url("../images/mega/pro-new-sprite-v4.png");
-    background-repeat: no-repeat;
-    color: #333333;
-    display: inline-block;
-    font-family: "Open Sans Semibold", Arial;
-    font-size: 13px;
-    height: 26px;
-    line-height: 26px;
-    padding-left: 28px;
-    vertical-align: middle;
+	background-image: url("../images/mega/pro-new-sprite-v4.png");
+	background-repeat: no-repeat;
+	color: #333333;
+	display: inline-block;
+	font-family: "Open Sans Semibold", Arial;
+	font-size: 13px;
+	height: 26px;
+	line-height: 26px;
+	padding-left: 28px;
+	vertical-align: middle;
 }
 .membership-radio-label.prepaid-balance {
 	background-position: -444px -569px;
@@ -15321,7 +15312,7 @@ div.membership-bott-button {
 	color: #3F4646;
 }
 .membership-step2 .other-payment-providers {
-    margin-top: 3px;
+	margin-top: 3px;
 }
 .affiliate-txt-pad {
 	padding-top: 6px;
@@ -23413,8 +23404,8 @@ body.pro:after {
 	display: inline-block;
 }
 .megasync-table table span.tick {
-    background-position: -4px -1768px;
-    text-transform: uppercase;
+	background-position: -4px -1768px;
+	text-transform: uppercase;
 }
 .megasync-table table span.dots {
 	background-position: -3px -1648px;
@@ -23492,8 +23483,7 @@ body.pro:after {
 .megasync-dropdown-link.debian {
 	background-position: 10px -1982px;
 }
-.megasync-dropdown-link.elementary,
-.megasync-dropdown-link.elementaryosfreya {
+.megasync-dropdown-link.elementary, .megasync-dropdown-link.elementaryosfreya {
 	background-position: 10px -1952px;
 }
 .megasync-dropdown-link.fedora {
@@ -23515,41 +23505,41 @@ body.pro:after {
 	background-position: right -1883px;
 }
 .megasync-close {
-  width: 14px;
-  height: 14px;
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  background-image: url(../images/mega/close-white-icon.png);
-  background-repeat: no-repeat;
-  background-position: 0 0;
-  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
-  -moz-opacity: 0.7;
-  -khtml-opacity: 0.7;
-  opacity: 0.7;
-  cursor: pointer;
-  -webkit-transition: all 200ms ease-in-out;
-  -moz-transition: all 200ms ease-in-out;
-  -o-transition: all 200ms ease-in-out;
-  -ms-transition: all 200ms ease-in-out;
-  transition: all 200ms ease-in-out;
+	width: 14px;
+	height: 14px;
+	position: absolute;
+	top: 15px;
+	right: 15px;
+	background-image: url(../images/mega/close-white-icon.png);
+	background-repeat: no-repeat;
+	background-position: 0 0;
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
+	-moz-opacity: 0.7;
+	-khtml-opacity: 0.7;
+	opacity: 0.7;
+	cursor: pointer;
+	-webkit-transition: all 200ms ease-in-out;
+	-moz-transition: all 200ms ease-in-out;
+	-o-transition: all 200ms ease-in-out;
+	-ms-transition: all 200ms ease-in-out;
+	transition: all 200ms ease-in-out;
 }
 .megasync-close:hover {
-	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
-  -moz-opacity: 1;
-  -khtml-opacity: 1;
-  opacity: 1;
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+	-moz-opacity: 1;
+	-khtml-opacity: 1;
+	opacity: 1;
 }
 .megasync-close-txt {
-  width: 48px;
-  height: 20px;
-  position: absolute;
-  top: 36px;
-  right: 0;
-  text-align: center;
-  color: rgba(255,255,255,0.3);
-  font-size: 11px;
-  cursor: default;
+	width: 48px;
+	height: 20px;
+	position: absolute;
+	top: 36px;
+	right: 0;
+	text-align: center;
+	color: rgba(255,255,255,0.3);
+	font-size: 11px;
+	cursor: default;
 }
 .megasync-dropdown-list {
 	width: 288px;
@@ -23872,8 +23862,8 @@ body.pro:after {
 }
  @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
 .try-new-close {
-  background-image: url(../images/mega/close-white-icon@2x.png);
-  background-size: 14px auto;
+ background-image: url(../images/mega/close-white-icon@2x.png);
+ background-size: 14px auto;
 }
 body.pro:after {
  content: url(../images/mega/payment-animation@2x.gif);

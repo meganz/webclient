@@ -2525,14 +2525,19 @@ function generateAnonymousReport() {
     report.io = window.dlMethod && dlMethod.name;
     report.sb = +('' + $('script[src*="secureboot"]').attr('src')).split('=').pop();
     report.tp = $.transferprogress;
-    report.karereState = megaChat.karere.getConnectionState();
-    report.karereCurrentConnRetries = megaChat.karere._connectionRetries;
-    report.myPresence = megaChat.karere.getPresence(megaChat.karere.getJid());
-    report.karereServer = megaChat.karere.connection.service;
-    report.numOpenedChats = Object.keys(megaChat.chats).length;
-    report.haveRtc = megaChat.rtc ? true : false;
-    if (report.haveRtc) {
-        report.rtcStatsAnonymousId = megaChat.rtc.ownAnonId;
+    if (!megaChat.karere) {
+        report.karereState = '#disabled#';
+    }
+    else {
+        report.karereState = megaChat.karere.getConnectionState();
+        report.karereCurrentConnRetries = megaChat.karere._connectionRetries;
+        report.myPresence = megaChat.karere.getPresence(megaChat.karere.getJid());
+        report.karereServer = megaChat.karere.connection.service;
+        report.numOpenedChats = Object.keys(megaChat.chats).length;
+        report.haveRtc = megaChat.rtc ? true : false;
+        if (report.haveRtc) {
+            report.rtcStatsAnonymousId = megaChat.rtc.ownAnonId;
+        }
     }
 
     var chatStates = {};

@@ -131,7 +131,7 @@ module.exports = function(grunt) {
                     sourceMap: true,
                     process: function(content, filename) {
                         return "/*! Filename: " + filename + " */\n"
-                            + content
+                            + content.trim()
                             + "\n";
                     }
                 },

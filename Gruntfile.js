@@ -1,11 +1,16 @@
 var fs = require('fs');
 var RJSON = require('relaxed-json');
 var fileLimit = 512*1024;
+var useHtmlMin = false;
 
 var Secureboot = function() {
     var content = fs.readFileSync("secureboot.js").toString().split("\n");
     var jsl = getFiles();
     var ns  = {};
+
+    function getWeight(filename) {
+        return Math.round((fs.statSync(filename)['size']/fileLimit)*30);
+    }
 
     function getFiles() {
         var jsl   = [];
@@ -49,14 +54,14 @@ var Secureboot = function() {
                 }
                 file = file[0].substr(1, file[0].length-2);
                 if (groups[keys[0]] && groups[keys[0]][0] == file) {
-                    lines.push("jsl.push({f:'" + keys[0] + "', n: '" + keys[0].replace(/[^a-z0-9]/ig, "-") + "', j: 1});");
+                    lines.push("jsl.push({f:'" + keys[0] + "', n: '" + keys[0].replace(/[^a-z0-9]/ig, "-") + "', j: 1, w: " + getWeight(keys[0]) + "});");
                     group = groups[keys.shift()];
                 } else if (group.indexOf(file) == -1) {
                     lines.push(content[i]);
                 }
             } else if (content[i].match(/jsl\.push.+html/)) {
                 if (!addedHtml) {
-                    lines.push("jsl.push({f:'html/templates.json', n: 'templates', j: 0, w: 3});");
+                    lines.push("jsl.push({f:'html/templates.json', n: 'templates', j: 0, w: " + getWeight("html/templates.json") +  "});");
                 }
                 addedHtml = true;
             } else {
@@ -76,7 +81,7 @@ var Secureboot = function() {
         return jsl.filter(function(f) {
             return f.f.match(/html?$/);
         }).map(function(f) {
-            return 'build/' + f.f;
+            return useHtmlMin ? 'build/' + f.f : f.f;
         });
     };
 
@@ -111,7 +116,6 @@ var Secureboot = function() {
     return ns;
 }();
 
-Secureboot.rewrite("secureboot.prod.js");
 
 module.exports = function(grunt) {
     // Project configuration.
@@ -172,6 +176,10 @@ module.exports = function(grunt) {
 
 
     // Default task(s).
-    grunt.registerTask('default', ['htmlmin', 'concat', 'htmljson']);
-    grunt.registerTask('prod', ['default', 'uglify']);
+    grunt.registerTask('secureboot', function() {
+        console.log("Write secureboot.prod.js");
+        Secureboot.rewrite("secureboot.prod.js");
+    });
+    grunt.registerTask('default', ['htmlmin', 'concat', 'htmljson', 'secureboot']);
+    grunt.registerTask('prod', ['htmlmin', 'htmljson', 'uglify', 'secureboot']);
 };

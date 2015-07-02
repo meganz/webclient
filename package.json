@@ -32,6 +32,9 @@
   "devDependencies": {
     "dateformat": "~1.0.7-1.2.3",
     "fb-flo": "^0.3.1",
+    "grunt-contrib-concat": "^0.5.1",
+    "grunt-contrib-htmlmin": "^0.4.0",
+    "grunt-htmljson": "^0.1.1",
     "ibrik": "~1.1.1",
     "istanbul": "~0.2.10",
     "jsdoc": "~3.3.0",
@@ -53,5 +56,9 @@
     "karma-sinon": "~1.0.3",
     "mocha": "~1.17.1",
     "sinon": "~1.9.0"
+  },
+  "dependencies": {
+    "grunt-contrib-uglify": "^0.8.0",
+    "relaxed-json": "^0.2.9"
   }
 }

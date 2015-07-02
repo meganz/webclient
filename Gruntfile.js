@@ -54,14 +54,14 @@ var Secureboot = function() {
                 }
                 file = file[0].substr(1, file[0].length-2);
                 if (groups[keys[0]] && groups[keys[0]][0] == file) {
-                    lines.push("jsl.push({f:'" + keys[0] + "', n: '" + keys[0].replace(/[^a-z0-9]/ig, "-") + "', j: 1, w: " + getWeight(keys[0]) + "});");
+                    lines.push("    jsl.push({f:'" + keys[0] + "', n: '" + keys[0].replace(/[^a-z0-9]/ig, "-") + "', j: 1, w: " + getWeight(keys[0]) + "});");
                     group = groups[keys.shift()];
                 } else if (group.indexOf(file) == -1) {
                     lines.push(content[i]);
                 }
             } else if (content[i].match(/jsl\.push.+html/)) {
                 if (!addedHtml) {
-                    lines.push("jsl.push({f:'html/templates.json', n: 'templates', j: 0, w: " + getWeight("html/templates.json") +  "});");
+                    lines.push("    jsl.push({f:'html/templates.json', n: 'templates', j: 0, w: " + getWeight("html/templates.json") +  "});");
                 }
                 addedHtml = true;
             } else {

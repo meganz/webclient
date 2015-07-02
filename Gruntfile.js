@@ -1,126 +1,138 @@
 var fs = require('fs');
 var RJSON = require('relaxed-json');
+var fileLimit = 512*1024;
 
-/* GetFilesFromSecureBoot {{{
- *
- *  Read secureboot.js, get information about the Javascripts, how to group them and
- *  templates info.
- *
- *  Secureboot.js follows some patterns, this function will e/xtract Javascripts and HTML
- *  files that are loaded. It also writes a `secureboot.prod.js` which loads the
- *  concat'ed files
- *
- *  Return a hash with rules to build
- *
- *  @return hash
- */
-function getRulesFromSecureBoot()
-{
+var Secureboot = function() {
     var content = fs.readFileSync("secureboot.js").toString().split("\n");
+    var jsl = getFiles();
+    var ns  = {};
 
-    var htmls = [];  /* list of HTML templates */
-    var htmlExtra = [];  /* list of HTML templates which are loaded on demand */
-    var js = {};  /* list of JS files */
-    var newSecureboot = [];  /* lines of JS, to rebuild secureboot.js */
-
-    content.forEach(function(line) {
-        var include = true;
-        var isObject = line.match(/{[^}]+}/);
-        var obj;
-        if (isObject && isObject[0]) {
-            try {
-                obj = RJSON.parse(isObject[0]);
-            } catch (e) {
-                /* It's an invalid JSON */
-                newSecureboot.push(line);
-                return;
+    function getFiles() {
+        var jsl   = [];
+        var begin = false;
+        var lines = [];
+        for (var i in content) {
+            var line = content[i];
+            if (line.match(/jsl\.push.+(html|js)/)) {
+                begin = true;
+            } else if (line.match(/var.+jsl2/)) {
+                break;
             }
-            if (obj.g && (obj.f || "").match(/js$/)) {
-                /*
-                 * It's a Javascript definition and it belongs to a group
-                 */
-                if (!js[obj.g]) {
-                    /* We never saw this group before, therefore
-                     * we replace this entry with the group javascript
-                     */
-                    js[obj.g] = [ obj.f ];
-                    obj.f = "js/pack-" + obj.g + ".js";
-                    line = "jsl.push(" + 
-                            RJSON.stringify(obj)
-                            .replace('"n":', 'n:')
-                            .replace('{"f"', '{f').replace(/"/g, "'") + ");";
-                } else {
-                    /**
-                     * This JS belongs to a group that was loaded already
-                     * so we ignore this line
-                     */
-                    include = false;
-                    js[obj.g].push(obj.f);
+            if (begin) {
+                if (line.trim().match(/^(\}.+)?(if|else)/)) {
+                    /* We must break the group, there is an if */
+                    if (line.trim().match(/^if/)) {
+                        lines.push('jsl.push({f:"\0.js"})');
+                    }
+                    line = line.replace(/else/, 'else if (false)');
+                    line = line.replace(/\(.+\)/, '(false)');
                 }
-            } else if ((obj.f || "").match(/\.html$/)) {
-                if (line.indexOf("jsl.push") > 1) {
-                    /* It's an HTML template that needs to be loaded at boot time */
-                    htmls.push("build/" + obj.f);
-                    /* We load html/boot.json instead, *the first time* */
-                    obj.f = "html/boot.json";
-                    line = "jsl.push(" + 
-                            RJSON.stringify(obj)
-                            .replace('"n":', 'n:')
-                            .replace('{"f"', '{f').replace(/"/g, "'") + ");";
-                    include = !js['html'];
-                    js['html'] = true;
-                } else if (false) {
-                    // disable extra.json for now
-                    /* It's a template laoded on demand. We group it as html/extra.json */
-                    RhtmlExtra.push("build/" + obj.f);
-                    /* Replace the files to load */
-                    line = line.replace(obj.f, "html/extra.json");
-                }
+                lines.push(line);
             }
         }
-        if (include) {
-            newSecureboot.push(line);
+        eval(lines.join("\n"));
+        return jsl;
+    };
+
+    ns.rewrite = function(name) {
+        var addedHtml = false;
+        var lines = [];
+        var groups = this.getJSGroups();
+        var keys   = Object.keys(groups);
+        var group  = []
+        for (var i in content) {
+            if (content[i].match(/jsl\.push.+js/)) {
+                var file = content[i].match(/'.+\.js'/);
+                if (!file) {
+                    lines.push(content[i]);
+                    continue;
+                }
+                file = file[0].substr(1, file[0].length-2);
+                if (groups[keys[0]] && groups[keys[0]][0] == file) {
+                    lines.push("jsl.push({f:'" + keys[0] + "', n: '" + keys[0].replace(/[^a-z0-9]/ig, "-") + "', j: 1});");
+                    group = groups[keys.shift()];
+                } else if (group.indexOf(file) == -1) {
+                    lines.push(content[i]);
+                }
+            } else if (content[i].match(/jsl\.push.+html/)) {
+                if (!addedHtml) {
+                    lines.push("jsl.push({f:'html/templates.json', n: 'templates', j: 0, w: 3});");
+                }
+                addedHtml = true;
+            } else {
+                lines.push(content[i]);
+            }
         }
-    });
+        fs.writeFileSync(name, lines.join("\n"));
+    };
 
-    var concat = {}; /* concat rules */
-    var uglify = {}; /* uglify rules */
+    ns.getJS = function() {
+        return jsl.filter(function(f) {
+            return f.f.match(/js$/);
+        });
+    };
 
-    delete js['html'];
+    ns.getHTML = function() {
+        return jsl.filter(function(f) {
+            return f.f.match(/html?$/);
+        }).map(function(f) {
+            return 'build/' + f.f;
+        });
+    };
 
-    for (var i in js) {
-        concat[i] = {
-            options: {
-                sourceMap: true,
-            },
-            src: js[i],
-            dest: "js/pack-" + i + ".js"
-        };
-        uglify[i] = {
-            options: {
-                sourceMap: true,
-            },
-            src: js[i],
-            dest: "js/pack-" + i + ".js",
-        };
-    }
+    ns.getJSGroups = function() {
+        var groups = [];
+        var size = 0;
+        this.getJS().forEach(function(f) {
+            if (f.f == "\0.js") {
+                groups.push(null);
+                size = 0;
+            } else {
+                if (size > fileLimit) {
+                    size = 0;
+                    groups.push(null);
+                }
+                groups.push(f.f);
+                size += fs.statSync(f.f)['size'];
+            }
+        });
 
-    fs.writeFileSync("secureboot.prod.js", newSecureboot.join("\n"));
+        var files = {};
+        var i = 0;
+        while (groups.length > 0) {
+            var id = groups.indexOf(null);
+            files['js/mega-' + (++i) + '.js'] = groups.splice(0, id);
+            groups.splice(0, 1);
+        }
 
-    return {concat: concat, uglify: uglify, htmls: htmls, htmlExtra: htmlExtra};
-}
-/* }}} */
+        return files;
+    };
+
+    return ns;
+}();
+
+Secureboot.rewrite("secureboot.prod.js");
 
 module.exports = function(grunt) {
-
-    var rules = getRulesFromSecureBoot();
-
-
     // Project configuration.
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
-        uglify: rules.uglify,
-        concat: rules.concat,
+        uglify: {
+            prod: {
+                options: {
+                    sourceMap: true,
+                },
+                files: Secureboot.getJSGroups(),
+            }
+        },
+        concat: {
+            prod: {
+                options: {
+                    sourceMap: true,
+                },
+                files: Secureboot.getJSGroups(),
+            }
+        },
         htmlmin: {
             default_options: {
                 options: {
@@ -135,8 +147,8 @@ module.exports = function(grunt) {
         },
         htmljson: {
             required: {
-                src: rules.htmls,
-                dest: "html/boot.json",
+                src: Secureboot.getHTML(),
+                dest: "html/templates.json",
             },
             /*
             extra: {

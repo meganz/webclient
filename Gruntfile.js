@@ -129,6 +129,11 @@ module.exports = function(grunt) {
             prod: {
                 options: {
                     sourceMap: true,
+                    process: function(content, filename) {
+                        return "/*! Filename: " + filename + " */\n"
+                            + content
+                            + "\n";
+                    }
                 },
                 files: Secureboot.getJSGroups(),
             }

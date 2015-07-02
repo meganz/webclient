@@ -200,7 +200,7 @@ var useravatar = (function() {
         }
 
         if (typeof user !== "object" || !user) {
-            throw new Error("Unexpected value" + typeof(user));
+            throw new Error("Unexpected value " + typeof(user));
         }
 
         if (avatars[user.u]) {

@@ -9,6 +9,8 @@ which can contain options overlaying those specified for the proejct
 here.
 """
 
+import os
+
 # Checkers to run. Available options for checkers are:
 # "jshint", "jscs", "cppcheck", "nsiqcppstyle"
 checkers = ['jshint', 'jscs']

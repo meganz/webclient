@@ -50,7 +50,7 @@
             }
 
             avatar = useravatar.contact(id || email, 'nw-contact-avatar', 'span');
-            return "<li class='share-search-result " + type + "'>" + (this.addAvatar ? avatar : '')
+            return "<li class='share-search-result'>" + (this.addAvatar ? avatar : '')
                     + "<span class='fm-chat-user-info'><span class='fm-chat-user'>"
                     + (this.enableHTML ? email : _escapeHTML(email))
                     + "</span><span class='fm-chat-user-email'>email</span></span><span class='clear'></span></li>";
@@ -71,7 +71,7 @@
             }
 
             avatar = useravatar.contact(id || email, 'search-avatar', 'span');
-            return "<li class='share-added-contact " + type + "'>" + (this.addAvatar ? avatar : '') + (this.enableHTML ? email : _escapeHTML(email)) + "</li>";
+            return "<li class='share-added-contact'>" + (this.addAvatar ? avatar : '') + (this.enableHTML ? email : _escapeHTML(email)) + "</li>";
         },
         // Tokenization settings
         tokenLimit: null,

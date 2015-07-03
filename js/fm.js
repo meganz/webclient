@@ -7021,7 +7021,7 @@ function generateShareDialogRow(displayNameOrEmail, email, shareRights, userHand
 
     var rowId = '',
         html = '',
-        av =  useravatar.contact(userHandle),
+        av =  useravatar.contact(email),
         perm = '',
         permissionLevel = 0;
 

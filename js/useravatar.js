@@ -188,7 +188,7 @@ var useravatar = (function() {
     ns.contact = function(user, className, element) {
         className = className || "avatar";
         element   = element || "div";
-        if (typeof user === "string") {
+        if (typeof user === "string" && user.length > 0) {
             if (isEmail(user)) {
                 return emailAvatar(user, className, element);
             } else if (M.u[user]) {
@@ -199,8 +199,9 @@ var useravatar = (function() {
             }
         }
 
-        if (typeof user !== "object" || !user) {
-            throw new Error("Useravatar: Unexpected value " + typeof(user));
+        if (typeof user !== "object" || !(user||{}).u) {
+            console.error("Useravatar: Unexpected value " + typeof(user), user);
+            return "";
         }
 
         if (avatars[user.u]) {

@@ -27,6 +27,13 @@ extra_options = {
 JSHINT_BIN = 'node_modules/.bin/jshint'
 JSCS_BIN = 'node_modules/.bin/jscs'
 CPPCHECK_BIN = 'cppcheck'
+
+# Some attempts to "auto fix" for Win.
+if os.name == 'nt':
+    JSHINT_BIN += '.cmd'
+    JSCS_BIN += '.cmd'
+    CPPCHECK_BIN += '.exe'
+
 NSIQCPPSTYLE_BIN = '/usr/local/nsiqcppstyle/nsiqcppstyle.py'
 JSHINT_RULES = '--verbose'
 JSCS_RULES = '--verbose'

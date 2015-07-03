@@ -49,7 +49,7 @@
                 av = '';
             }
 
-            avatar = id ? useravatar.contact(id, 'nw-contact-avatar', 'span') : '';
+            avatar = useravatar.contact(id || email, 'nw-contact-avatar', 'span');
             return "<li class='share-search-result " + type + "'>" + (this.addAvatar ? avatar : '')
                     + "<span class='fm-chat-user-info'><span class='fm-chat-user'>"
                     + (this.enableHTML ? email : _escapeHTML(email))
@@ -69,8 +69,8 @@
                 type = 'email';
                 av = '';
             }
-            avatar = useravatar.contact(id, 'search-avatar', 'span');
 
+            avatar = useravatar.contact(id || email, 'search-avatar', 'span');
             return "<li class='share-added-contact " + type + "'>" + (this.addAvatar ? avatar : '') + (this.enableHTML ? email : _escapeHTML(email)) + "</li>";
         },
         // Tokenization settings

@@ -1073,7 +1073,7 @@ var fortumo = {
      */
     redirectToSite: function(utsResult) {
         
-        window.location = "http://localhost/megapay/fortumo.html?saleid=" + utsResult;
+        window.location = 'https://megapay.nz/?saleid=' + utsResult;
     }
 };
 

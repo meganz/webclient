@@ -87,6 +87,8 @@ var Karere = function(user_options) {
 
     self._triggeredActions = {};
 
+    self._lastConnectionRetryTime = false;
+
     self.bind("onPresence", function(e, eventObject) {
         var bareJid = Karere.getNormalizedBareJid(eventObject.getFromJid());
 
@@ -305,7 +307,23 @@ Karere.DEFAULTS = {
      * Connection retry delay in ms (reconnection will be triggered with a timeout calculated as:
      * self._connectionRetries * this value)
      */
-    reconnectDelay: 10,
+    reconnectDelay: 750,
+
+    /**
+     * Multipliers used in a rand(retryFuzzinesFactors[0], retryFuzzinesFactors[1])
+     * to add randomness to the connection retry timers.
+     */
+    retryFuzzinesFactors: [0.7, 1],
+
+    /**
+     * 10 mins timeout after the maxConnectionRetries is reached.
+     */
+    restartConnectionRetryTimeout: (10 * 1000 * 60),
+
+    /**
+     * Minimum milliseconds after which a mousemove will trigger a connection retry.
+     */
+    connectionRetryFloorVal: 5000,
 
 
     /**
@@ -518,7 +536,7 @@ makeMetaAware(Karere);
                         self.trigger('onConnfail');
                         self.trigger('onConnectionClosed');
 
-                        if (arguments[1] === "system-shutdown") {
+                        if (arguments[1] === "system-shutdown" || arguments[1] === "improper-addressing") {
                             self._connectionRetry();
                         }
                     }
@@ -606,25 +624,11 @@ makeMetaAware(Karere);
         self._$connectingPromise = createTimeoutPromise(function() {
             return self.getConnectionState() === Karere.CONNECTION_STATE.CONNECTED;
         }, 100, self.options.connectTimeout, undefined, remoteBoshServiceUrlPromise)
-            .fail(function() {
+            .always(function() {
                 delete self._$connectingPromise;
-
-                if ((self._connectionRetries + 1) < self.options.maxConnectionRetries) {
-                    self._connectionRetries++;
-
-                    self.disconnect()
-                        .always(function() {
-                            clearTimeout(self._connectionRetryInProgress);
-
-                            self._connectionRetryInProgress = setTimeout(function() {
-                                self.reconnect();
-                            }, (self._connectionRetries + 1) * self.options.reconnectDelay);
-
-                        });
-                }
-                else {
-                    self.disconnect();
-                }
+            })
+            .fail(function() {
+                self._connectionRetry();
             });
 
         // sync the _$connectionPromise in realtime with the original $promise
@@ -744,7 +748,7 @@ makeMetaAware(Karere);
         var self = this;
 
         if (self._myPresence === Karere.PRESENCE.OFFLINE) {
-            self.logger.error("Will halt the reconnect operation, my presence is set to 'offline'.");
+            self.logger.warn("Will halt the reconnect operation, my presence is set to 'offline'.");
             return MegaPromise.reject(Karere.CONNECTION_STATE.DISCONNTED);
         }
         if (!self._jid || !self._password) {
@@ -2713,7 +2717,7 @@ makeMetaAware(Karere);
  *
  * @private
  */
-Karere.prototype._connectionRetry = function() {
+Karere.prototype._connectionRetry = function(immediately) {
     var self = this;
 
     if (!self._connectionRetries) {
@@ -2723,21 +2727,53 @@ Karere.prototype._connectionRetry = function() {
 
 
     if (self.logger) {
-        self.logger.error(
+        self.logger.warn(
             "request error, passed arguments: " + arguments + ", number of errors: " + self._connectionRetries
         );
     }
     else if (window.d) {
-        console.warn("request error, passed arguments: " + arguments + ", number of errors: " + self._connectionRetries);
+        self.logger.warn("request error, passed arguments: " + arguments + ", number of errors: " + self._connectionRetries);
     }
 
-    if (self._connectionRetries > (self.options.maxConnectionRetries * 2)) {
-        /* *2, because every conn. counts as 2, 2 XHR conns = 1 jabber connection */
+    if (!immediately && self._connectionRetries > self.options.maxConnectionRetries) {
         self._connectionRetries = 0;
         self.forceDisconnect();
+
+        self._connectionRetryInProgress = setTimeout(function() {
+            if (
+                self.getConnectionState() !== Karere.CONNECTION_STATE.CONNECTED &&
+                self.getConnectionState() !== Karere.CONNECTION_STATE.CONNECTING
+            ) {
+                self.reconnect();
+            }
+        }, self.options.restartConnectionRetryTimeout);
+
+        self.logger.warn(
+            "Reached max connection retries. Resetting counters and doing a bigger delay: ",
+            self.options.restartConnectionRetryTimeout
+        );
+
+
+        self._lastConnectionRetryTime = unixtime();
+
     }
     else {
         self.forceDisconnect();
+
+        var connectionRetryTimeout = (
+            self._connectionRetries * self.options.reconnectDelay
+        );
+        if (self._connectionRetries === 0 || immediately === true) {
+            // start imidiately
+            connectionRetryTimeout = 0;
+        }
+
+        // add some randomness
+        connectionRetryTimeout = (
+            connectionRetryTimeout * rand_range(
+                self.options.retryFuzzinesFactors[0], self.options.retryFuzzinesFactors[1]
+            )
+        );
 
         if (self._connectionRetryInProgress) {
             clearTimeout(
@@ -2751,11 +2787,30 @@ Karere.prototype._connectionRetry = function() {
             ) {
                 self.reconnect();
             }
-        }, self._connectionRetries * self.options.reconnectDelay);
+        }, connectionRetryTimeout);
+
+        self.logger.warn("Will do a reconnect retry in: ", connectionRetryTimeout, " if still not connected.");
+
+
+        self._lastConnectionRetryTime = unixtime();
 
     }
 };
 
+Karere.prototype._connectionRetryUI = function() {
+    var self = this;
+
+    if (
+        self.getConnectionState() !== Karere.CONNECTION_STATE.CONNECTED &&
+        (unixtime() - self._lastConnectionRetryTime) > (self.options.connectionRetryFloorVal / 1000)
+    ) {
+        self.logger.warn("Will do a forced connection retry immediately because of UI interaction.");
+        self._connectionRetry(true);
+        return true;
+    } else {
+        return false;
+    }
+};
 
 /**
  * Wrap all methods which require a connection to actually use the ._requiresConnectionWrapper helper

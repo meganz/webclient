@@ -173,7 +173,7 @@ function u_logout(logout) {
     }
 
     if (logout) {
-        if (!MegaChatDisabled) {
+        if (!megaChatDisabled) {
 
             localStorage.removeItem("audioVideoScreenSize");
 

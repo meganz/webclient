@@ -477,7 +477,7 @@ makeMetaAware(Karere);
     Karere.prototype.connect = function(jid, password) {
         var self = this;
 
-        var $promise = new $.Deferred();
+        var $promise = new MegaPromise();
 
         // don't call Strophe.connect again if already connected/connecting
         if (self.getConnectionState() === Karere.CONNECTION_STATE.CONNECTED) {
@@ -664,7 +664,7 @@ makeMetaAware(Karere);
             var args = toArray(arguments);
 
             var internalPromises = [];
-            var $promise = new $.Deferred();
+            var $promise = new MegaPromise();
 
             /**
              * Reconnect if connection is dropped or not available and there are actual credentials in _jid and
@@ -1997,7 +1997,7 @@ makeMetaAware(Karere);
         type = type || "private";
         roomName = roomName || self._generateNewRoomIdx();
 
-        var $promise = new $.Deferred();
+        var $promise = new MegaPromise();
 
 
         var roomPassword;
@@ -2084,7 +2084,7 @@ makeMetaAware(Karere);
     Karere.prototype._waitForUserPresenceInRoom = function(eventName, roomJid, userJid) {
         var self = this;
 
-        var $promise = new $.Deferred();
+        var $promise = new MegaPromise();
         var generatedEventName = generateEventSuffixFromArguments(
                                     "onUsers" + eventName,
                                     "inv",
@@ -2217,7 +2217,7 @@ makeMetaAware(Karere);
     Karere.prototype.leaveChat = function(roomJid, exitMessage) {
         var self = this;
 
-        var $promise = new $.Deferred();
+        var $promise = new MegaPromise();
 
         self.connection.muc.leave(
             roomJid,
@@ -2347,7 +2347,7 @@ makeMetaAware(Karere);
 
         reason = reason || "";
 
-        var $promise = new $.Deferred();
+        var $promise = new MegaPromise();
         var nickname = false;
 
         if (!self.connection.muc.rooms[roomJid] || !self.connection.muc.rooms[roomJid].roster) {

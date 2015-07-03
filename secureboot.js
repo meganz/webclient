@@ -1531,6 +1531,17 @@ else if (!b_u)
                     throw new Error('Error parsing language file '+lang+'.json');
                 }
             }
+            else if (jsl[i].j === 0 && jsl[i].f.match(/\.json$/)) {
+                try {
+                    var templates = JSON.parse(jsl[i].text);
+                    for (var e in templates) {
+                        pages[e] = templates[e];
+                        jsl_loaded[e] = 1;
+                    }
+                } catch (ex) {
+                    throw new Error("Error parsing template");
+                }
+            }
             else if (jsl[i].j == 0) pages[jsl[i].n] = jsl[i].text;
         }
         if (window.URL)

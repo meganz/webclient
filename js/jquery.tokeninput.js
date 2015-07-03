@@ -49,7 +49,7 @@
                 av = '';
             }
 
-            avatar = useravatar.contact(id, 'nw-contact-avatar', 'span');
+            avatar = id ? useravatar.contact(id, 'nw-contact-avatar', 'span') : '';
             return "<li class='share-search-result " + type + "'>" + (this.addAvatar ? avatar : '')
                     + "<span class='fm-chat-user-info'><span class='fm-chat-user'>"
                     + (this.enableHTML ? email : _escapeHTML(email))

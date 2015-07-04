@@ -16,6 +16,7 @@ var useravatar = (function() {
         '#ff9500',
         '#ffcc00',
     ];
+    var logger = MegaLogger.getLogger('avatars');
 
     /**
      *  List of TWO-letters avatars that we ever generated. It's useful to replace
@@ -186,21 +187,25 @@ var useravatar = (function() {
     }
 
     ns.contact = function(user, className, element) {
+        
         className = className || "avatar";
         element   = element || "div";
-        if (typeof user === "string") {
+        if (typeof user === "string" && user.length > 0) {
             if (isEmail(user)) {
                 return emailAvatar(user, className, element);
-            } else if (M.u[user]) {
+            }
+            else if (M.u[user]) {
                 // It's an user ID
                 user = M.u[user];
-            } else {
+            }
+            else {
                 return _letters(user, user, className, element);
             }
         }
 
-        if (typeof user !== "object" || !user) {
-            throw new Error("Useravatar: Unexpected value " + typeof(user));
+        if (typeof user !== "object" || !(user||{}).u) {
+            logger.error("Useravatar: Unexpected value " + typeof(user), user);
+            return "";
         }
 
         if (avatars[user.u]) {

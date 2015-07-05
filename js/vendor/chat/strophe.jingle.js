@@ -36,15 +36,20 @@ var JinglePlugin = {
         this.onUnmuted = function(sess, affected){};
         this.onInternalError = function(info, e)  {
             console.error("Internal error:", JinglePlugin.jsonStringifyOneLevel(info),
-            ((e instanceof Error)?e.stack:e.toString()));
+                ((e instanceof Error)?e.stack:e.toString()));
+            if (info.sid) {
+                var sess = this.sessions[info.sid];
+                if (sess)
+                    this.terminate(sess, "internal-error", info.type);
+            }
         };
 // Callbacks called by session objects
         this.onJingleAck = function(sess, ack){};
-        this.onJingleError = function(sess, err, stanza, orig){};
+        this.onJingleError = function(sid, err, stanza, orig){};
         this.onJingleTimeout = function(sess, err, orig){};
         this.onRemoteStreamAdded = function(sess, event){};
         this.onRemoteStreamRemoved = function(sess, event){};
-        this.onIceConnStateChange = function(sess, event){console.log("CONNSTATE->", event);};
+        this.onIceConnStateChange = function(sess, event){};
         this.onNoStunCandidates = function(sess, event){};
         this.onPacketLoss = function(sess, loss){};
 
@@ -122,9 +127,12 @@ var JinglePlugin = {
     },
 
     onJingle: function (iq) {
+     var sid = $(iq).find('jingle').attr('sid'); //we need this before the try block because we will use in the catch()
      try {
-        var sid = $(iq).find('jingle').attr('sid');
-        var sess = this.sessions[sid];
+        var sess;
+        if (sid) {
+             sess = this.sessions[sid];
+        }
         if (sess && sess.inputQueue) {
             sess.inputQueue.push(iq);
             return true;
@@ -137,7 +145,7 @@ var JinglePlugin = {
         });
         console.log('on jingle', action, 'from', $(iq).attr('from'));
 
-        if ('session-initiate' != action) {
+        if ('session-initiate' !== action) {
             if (!sess) {
                 if ('session-terminate' === action)
                     return true;
@@ -174,7 +182,6 @@ var JinglePlugin = {
         case 'session-initiate': {
             var self = this;
             var j = $(iq).find('>jingle');
-            var sid = j.attr('sid');
             var peerjid = $(iq).attr('from');
             var barePeerJid = Strophe.getBareJidFromJid(peerjid);
             debugLog("received INITIATE from", peerjid);
@@ -232,7 +239,7 @@ var JinglePlugin = {
 
             sess.inputQueue = [];
             var ret = self.onCallIncoming.call(self.eventHandler, {sess: sess, peerMedia: ans.peerMedia, files: ans.files});
-            if (ret != true) {
+            if (ret !== true) {
                 self.terminate(sess, ret.reason, ret.text);
                 delete sess.inputQueue;
                 return true;
@@ -323,7 +330,7 @@ var JinglePlugin = {
         } //end switch
      } catch(e) {
         console.error('Exception in onJingle handler:', e);
-        this.onInternalError.call(this.eventHandler, {sess:sess, type: 'jingle'}, e);
+        this.onInternalError.call(this.eventHandler, {sid: sid, type: 'jingle'}, e);
      }
      return true;
     },
@@ -333,10 +340,10 @@ var JinglePlugin = {
       var handledElsewhere = false;
       var elsewhereHandler = null;
       var cancelHandler = null;
+      var sid = $(callmsg).attr('sid'); //this will become the sid of the Jingle call once it is established
 
       try {
         var from = $(callmsg).attr('from');
-        var sid = $(callmsg).attr('sid'); //this will become the sid of the Jingle call once it is established
         if (!sid)
             throw new Error("Incoming call message does not have a 'sid' attribute");
         var peerAnonId = $(callmsg).attr('anonid');
@@ -453,7 +460,7 @@ var JinglePlugin = {
                     from: from,
                     tsReceived: tsReceived,
                     tsTill: tsTillJingle,
-                    options: obj.options,
+                    options: obj.options, //contains localStream
                     peerFprMacKey: peerFprMacKey,
                     ownFprMacKey: ownFprMacKey,
                     peerAnonId: peerAnonId,
@@ -490,7 +497,7 @@ var JinglePlugin = {
         });
       } catch(e) {
             console.error('Exception in onIncomingCallRequest handler:', e);
-            self.onInternalError.call(self.eventHandler, {type:'jingle'} , e);
+            self.onInternalError.call(self.eventHandler, {sid: sid, type: 'jingle'} , e);
       }
       return true;
     },
@@ -506,11 +513,12 @@ var JinglePlugin = {
         } else {
             delete this.acceptCallsFrom[aid];
             this.onCallTerminated.call(this.eventHandler, {
-               fake: true,
-               sid: aid,
-               peerjid: item.from,
-               isInitiator: false,
-               peerAnonId: item.peerAnonId
+                fake: true,
+                sid: aid,
+                peerjid: item.from,
+                isInitiator: false,
+                peerAnonId: item.peerAnonId,
+                localStream: item.options.localStream
             }, reason, text);
         }
         return true;

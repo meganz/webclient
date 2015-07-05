@@ -5,6 +5,7 @@ var init_l = true;
 var pfkey = false;
 var pfid = false;
 var n_h = false;
+var u_n = false;
 var n_k_aes = false;
 var fmdirid = false;
 var u_type, cur_page, u_checked;
@@ -21,6 +22,8 @@ var mobileparsed = false;
 var mobilekeygen = false;
 var subdirid = false;
 var subsubdirid = false;
+var blogmonth = false;
+var blogsearch = false;
 var notifications;
 var account = false;
 var register_txt = false;
@@ -87,6 +90,12 @@ function scrollMenu() {
 }
 
 function init_page() {
+
+    // If they are transferring from mega.co.nz
+    if (page.substr(0, 13) == 'sitetransfer!') {
+        M.transferFromMegaCoNz();
+    }
+
     if (!u_type) {
         $('body').attr('class', 'not-logged');
     }
@@ -216,7 +225,7 @@ function init_page() {
     }
 
     var fmwasinitialized = !!fminitialized;
-    if (u_handle || pfid || folderlink) {
+    if ((u_type === 0 || u_type === 3) || pfid || folderlink) {
 
         if (is_fm()) {
             // switch between FM & folderlinks (completely reinitialize)
@@ -234,7 +243,6 @@ function init_page() {
 
         if (!fminitialized) {
             if (typeof mDB !== 'undefined' && !pfid) {
-                throw 'fix me'; // TODO
                 mDBstart();
             }
             else {
@@ -735,11 +743,6 @@ function init_page() {
     }
     else if (page == 'resellers') {
         parsepage(pages['resellers']);
-
-        // If logged in, pre-populate email address into wire transfer details
-        if (typeof u_attr !== 'undefined') {
-            $('#email-address').html(u_attr.email);
-        }
     }
     else if (page == 'takedown') {
         parsepage(pages['takedown']);
@@ -843,7 +846,7 @@ function init_page() {
             }
         }
 
-        if (typeof (MegaChatDisabled) != "undefined" && MegaChatDisabled === true) {
+        if (typeof (megaChatDisabled) != "undefined" && megaChatDisabled === true) {
             $(document.body).addClass("megaChatDisabled");
         }
     }
@@ -1011,64 +1014,6 @@ function tooltiplogin() {
     }
 }
 
-function mLogout() {
-    $.dologout = function (Quiet) {
-        if ((fminitialized && downloading) || ul_uploading) {
-            if (Quiet) {
-                return true;
-            }
-            msgDialog('confirmation', l[967], l[377] + ' ' + l[507] + '?', false, function (e) {
-                if (e) {
-                    if (downloading) {
-                        dl_cancel();
-                    }
-                    if (ul_uploading) {
-                        ul_cancel();
-                    }
-
-                    resetUploadDownload();
-                    loadingDialog.show();
-                    var t = setInterval(function () {
-                        if (!$.dologout(!0)) {
-                            clearInterval(t);
-                        }
-                    }, 200);
-                }
-            });
-        }
-        else {
-            // Use the 'Session Management Logout' API call to kill the current session
-            loadingDialog.show();
-            api_req({
-                'a': 'sml'
-            }, {
-                callback: function (result) {
-                    // After the API call, clear other data and reload page
-                    loadingDialog.hide();
-                    u_logout(true);
-                    document.location.reload();
-                }
-            });
-        }
-    };
-    var cnt = 0;
-    if (M.c[M.RootID] && u_type === 0) {
-        for (var i in M.c[M.RootID]) {
-            cnt++;
-        }
-    }
-    if (u_type === 0 && cnt > 0) {
-        msgDialog('confirmation', l[1057], l[1058], l[1059], function (e) {
-            if (e) {
-                $.dologout();
-            }
-        });
-    }
-    else {
-        $.dologout();
-    }
-}
-
 function topmenuUI() {
     if (u_type === 0) {
         $('.top-login-button').text(l[967]);
@@ -1153,7 +1098,7 @@ function topmenuUI() {
         }
 
         // If the chat is disabled don't show the green status icon in the header
-        if (!MegaChatDisabled) {
+        if (!megaChatDisabled) {
             $('.activity-status-block, .activity-status').show();
             megaChat.renderMyStatus();
         }
@@ -1502,113 +1447,104 @@ function topmenuUI() {
             }
         }
     });
+
+    $('.top-menu-popup .top-menu-item').unbind('click');
     $('.top-menu-popup .top-menu-item').rebind('click', function () {
+
         $('.top-menu-popup').removeClass('active');
         $('.top-menu-icon').removeClass('active');
-        var c = $(this).attr('class');
-        if (!c) {
-            c = '';
+
+        var className = $(this).attr('class');
+        if (!className) {
+            className = '';
         }
-        if (c.indexOf('privacycompany') > -1) {
+        if (className.indexOf('privacycompany') > -1) {
             document.location.hash = 'privacycompany';
         }
-        else if (c.indexOf('upgrade-your-account') > -1) {
+        else if (className.indexOf('upgrade-your-account') > -1) {
             document.location.hash = 'pro';
+            return false;
         }
-        else if (c.indexOf('register') > -1) {
+        else if (className.indexOf('register') > -1) {
             document.location.hash = 'register';
         }
-        else if (c.indexOf('login') > -1) {
+        else if (className.indexOf('login') > -1) {
             document.location.hash = 'login';
         }
-        else if (c.indexOf('aboutus') > -1) {
+        else if (className.indexOf('aboutus') > -1) {
             document.location.hash = 'about';
         }
-        else if (c.indexOf('corporate') > -1) {
+        else if (className.indexOf('corporate') > -1) {
             document.location.hash = 'corporate';
         }
-        else if (c.indexOf('megablog') > -1) {
+        else if (className.indexOf('megablog') > -1) {
             document.location.hash = 'blog';
         }
-        else if (c.indexOf('credits') > -1) {
+        else if (className.indexOf('credits') > -1) {
             document.location.hash = 'credits';
         }
-        else if (c.indexOf('chrome') > -1) {
+        else if (className.indexOf('chrome') > -1) {
             document.location.hash = 'chrome';
         }
-        else if (c.indexOf('resellers') > -1) {
+        else if (className.indexOf('resellers') > -1) {
             document.location.hash = 'resellers';
+            return false;
         }
-        else if (c.indexOf('firefox') > -1) {
+        else if (className.indexOf('firefox') > -1) {
             document.location.hash = 'firefox';
         }
-        else if (c.indexOf('mobile') > -1) {
+        else if (className.indexOf('mobile') > -1) {
             document.location.hash = 'mobile';
         }
-        else if (c.indexOf('sync') > -1) {
+        else if (className.indexOf('sync') > -1) {
             document.location.hash = 'sync';
         }
-        else if (c.indexOf('help') > -1) {
+        else if (className.indexOf('help') > -1) {
             document.location.hash = 'help';
         }
-        else if (c.indexOf('contact') > -1) {
+        else if (className.indexOf('contact') > -1) {
             document.location.hash = 'contact';
         }
-        else if (c.indexOf('sitemap') > -1) {
+        else if (className.indexOf('sitemap') > -1) {
             document.location.hash = 'sitemap';
         }
-        else if (c.indexOf('sdk') > -1) {
+        else if (className.indexOf('sdk') > -1) {
             document.location.hash = 'sdk';
         }
-        else if (c.indexOf('doc') > -1) {
+        else if (className.indexOf('doc') > -1) {
             document.location.hash = 'doc';
         }
-        else if (c.indexOf('affiliateterms') > -1) {
+        else if (className.indexOf('affiliateterms') > -1) {
             document.location.hash = 'affiliateterms';
         }
-        else if (c.indexOf('aff') > -1) {
+        else if (className.indexOf('aff') > -1) {
             document.location.hash = 'affiliates';
         }
-        else if (c.indexOf('terms') > -1) {
+        else if (className.indexOf('terms') > -1) {
             document.location.hash = 'terms';
         }
-        else if (c.indexOf('privacypolicy') > -1) {
+        else if (className.indexOf('privacypolicy') > -1) {
             document.location.hash = 'privacy';
         }
-        else if (c.indexOf('copyright') > -1) {
+        else if (className.indexOf('copyright') > -1) {
             document.location.hash = 'copyright';
         }
-        else if (c.indexOf('takedown') > -1) {
+        else if (className.indexOf('takedown') > -1) {
             document.location.hash = 'takedown';
         }
-        else if (c.indexOf('account') > -1) {
+        else if (className.indexOf('account') > -1) {
             document.location.hash = 'fm/account';
         }
-        else if (c.indexOf('refresh') > -1) {
-           stopsc();
-           stopapi();
-           if (typeof mDB !== 'undefined' && !pfid) {
-              mDBreload();
-           } else {
-              loadfm(true);
-           }
+        else if (className.indexOf('refresh') > -1) {
+            mega.utils.reload();
         }
-        else if (c.indexOf('languages') > -1) {
+        else if (className.indexOf('languages') > -1) {
             languageDialog();
         }
-        else if (c.indexOf('clouddrive') > -1) {
+        else if (className.indexOf('clouddrive') > -1) {
             document.location.hash = 'fm';
         }
-        else if (c.indexOf('refresh-item') > -1) {
-            stopsc();
-            stopapi();
-            if (typeof mDB !== 'undefined' && !pfid) {
-                mDBreload();
-            } else {
-                loadfm(true);
-            }
-        }
-        else if (c.indexOf('logout') > -1) {
+        else if (className.indexOf('logout') > -1) {
             mLogout();
         }
     });
@@ -1668,10 +1604,6 @@ function topmenuUI() {
         }
     });
 
-    if (avatars[u_handle]) {
-        $('.fm-avatar img').attr('src', avatars[u_handle].url);
-    }
-
     $('.fm-avatar img, .user-name').rebind('click', function () {
         if ($('.fm-avatar img').attr('src').indexOf('blob:') > -1) {
             document.location.hash = 'fm/account';
@@ -1683,7 +1615,7 @@ function topmenuUI() {
 
 
     $('.top-head .logo').rebind('click', function () {
-        document.location.hash = typeof u_type !== 'undefined' && +u_type > 2 ? '#fm' : '#index';
+        document.location.hash = typeof u_type !== 'undefined' && +u_type > 2 ? '#fm' : '#start';
     });
 
     var c = $('.fm-dialog.registration-page-success').attr('class');
@@ -1784,12 +1716,18 @@ function parsetopmenu() {
     if (document.location.href.substr(0, 19) == 'chrome-extension://') {
         top = top.replace(/\/#/g, '/' + urlrootfile + '#');
     }
+    top = top.replace("{avatar-top}", useravatar.top());
     top = translate(top);
     return top;
 }
 
-window.onhashchange = function () {
+window.onhashchange = function() {
     var tpage = document.location.hash;
+
+    if (typeof gifSlider !== 'undefined') {
+        gifSlider.clear();
+    }
+
     if (silent_loading) {
         document.location.hash = hash;
         return false;
@@ -1842,7 +1780,7 @@ window.onhashchange = function () {
     else {
         init_page();
     }
-}
+};
 
 function languageDialog(close) {
     if (close) {
@@ -1921,8 +1859,5 @@ window.onbeforeunload = function () {
         return l[377];
     }
 
-    if (typeof mDB !== 'undefined' && mDB
-            && mDBact && localStorage[u_handle + '_mDBactive']) {
-        delete localStorage[u_handle + '_mDBactive'];
-    }
+    mBroadcaster.crossTab.leave();
 }

@@ -1,0 +1,24 @@
+{
+    "curly": true,
+    "eqeqeq": true,
+    "forin": true,
+    "freeze": true,
+    "futurehostile": true,
+    "latedef": "nofunc",
+    "maxcomplexity": 10,
+    "maxdepth": 5,
+    "noarg": true,
+    "nocomma": true,
+    "nonbsp": true,
+    "nonew": true,
+    "nomen": true,
+
+    "laxbreak": true,
+    "sub": true,
+
+    "browser": true,
+    "devel": true,
+    "typed": true,
+    "worker": true,
+    "maxerr": 9999
+}

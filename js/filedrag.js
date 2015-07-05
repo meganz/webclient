@@ -65,7 +65,7 @@
         }
         if ($.ddhelper) {
             $('#draghelper .dragger-icon').remove();
-            $('<div class="dragger-icon ' + fileicon({
+            $('<div class="dragger-icon ' + fileIcon({
                 name: ''
             }) + '"></div>').insertAfter('#draghelper .dragger-status');
             $('.dragger-icon.fade').fadeTo(500, 0.1);
@@ -267,7 +267,8 @@
                 || browserdetails(ua).browser === 'Firefox';
             for (var i = 0, f; f = files[i]; i++) {
                 if (f.webkitRelativePath) {
-                    f.path = f.webkitRelativePath;
+                    f.path = String(f.webkitRelativePath).replace(RegExp("[\\/]"
+                            + String(f.name).replace(/([^\w])/g,'\\$1') + "$"), '');
                 }
                 if (gecko) {
                     f.gecko = true;

@@ -208,7 +208,7 @@ ClassChunk.prototype.on_error = function(args, xhr) {
 	this.Progress.data[this.xid][0] = 0; /* reset progress */
 	this.updateProgress(2);
 
-	this.oet = setTimeout(this.finish_download.bind(this, false, xhr.readyState > 1 && xhr.status), 950+Math.floor(Math.random()*2e3));
+	this.oet = setTimeout(this.finish_download.bind(this, false, xhr.readyState > 1 && xhr.status), 3950+Math.floor(Math.random()*2e3));
 }
 // }}}
 
@@ -275,13 +275,8 @@ ClassChunk.prototype.run = function(task_done) {
 	this.xhr = getXhr(this);
 	this.xhr._murl = this.url;
 
-	if (chromehack) {
-		var t = this.url.lastIndexOf('/dl/');
-		this.xhr.open('POST', this.url.substr(0, t+1));
-		this.xhr.setRequestHeader("MEGA-Chrome-Antileak", this.url.substr(t));
-	} else {
-		this.xhr.open('POST', this.url, true);
-	}
+
+    this.xhr.open('POST', this.url, true);
 
 	this.xhr.responseType = have_ab ? 'arraybuffer' : 'text';
 	this.xhr.send();

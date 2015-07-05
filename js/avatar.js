@@ -997,3 +997,4 @@ window.ImageUploadAndCrop = (function() {
     return ImageUploadAndCrop;
 })();
 })(this);
+

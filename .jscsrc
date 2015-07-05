@@ -1,0 +1,129 @@
+{
+    "requireCurlyBraces": [
+        "if",
+        "else",
+        "for",
+        "while",
+        "do",
+        "try",
+        "catch"
+    ],
+    "requireSpaceAfterKeywords": [
+        "if",
+        "else",
+        "for",
+        "while",
+        "do",
+        "switch",
+        "return",
+        "try",
+        "catch"
+    ],
+    "disallowKeywords": [
+        "with"
+    ],
+
+    "disallowSpaceAfterPrefixUnaryOperators": true,
+    "disallowSpaceBeforePostfixUnaryOperators": [
+        "++",
+        "--"
+    ],
+    "requireSpaceBeforeBinaryOperators": true,
+    "requireSpaceAfterBinaryOperators": true,
+
+    "disallowMultipleVarDecl": true,
+
+    "disallowSpacesInsideParentheses": true,
+    "disallowEmptyBlocks": true,
+
+    "requireParenthesesAroundIIFE": true,
+    "requireSpaceBetweenArguments": true,
+    "requireSpacesInFunctionDeclaration": {
+        "beforeOpeningCurlyBrace": true
+    },
+    "disallowSpacesInFunctionDeclaration": {
+        "beforeOpeningRoundBrace": true
+    },
+    "requireSpacesInAnonymousFunctionExpression": {
+        "beforeOpeningCurlyBrace": true
+    },
+    "disallowSpacesInNamedFunctionExpression": {
+        "beforeOpeningRoundBrace": true
+    },
+    "requireSpacesInNamedFunctionExpression": {
+        "beforeOpeningCurlyBrace": true
+    },
+
+    "requireSpacesInConditionalExpression": {
+        "afterTest": true,
+        "beforeConsequent": true,
+        "afterConsequent": true,
+        "beforeAlternate": true
+    },
+
+    "disallowSpaceBeforeBinaryOperators": [
+        ",", ":"
+    ],
+    "requireCommaBeforeLineBreak": true,
+
+    "disallowMultipleLineStrings": true,
+
+    "disallowImplicitTypeConversion": [
+        "numeric",
+        "boolean",
+        "binary",
+        "string"
+    ],
+    "disallowYodaConditions": true,
+
+    "maximumLineLength": {
+        "value": 120,
+        "allowUrlComments": true
+    },
+    "requireSpaceAfterLineComment": true,
+    "requireLineFeedAtFileEnd": true,
+    "disallowMixedSpacesAndTabs": true,
+    "disallowTrailingWhitespace": true,
+    "validateIndentation": 4,
+    "validateLineBreaks": "LF",
+
+    "requireSemicolons": true,
+
+    "plugins": [
+        "jscs-jsdoc"
+    ],
+    "jsDoc": {
+        "checkAnnotations": "jsdoc3",
+        "checkParamNames": true,
+        "checkRedundantParams": true,
+        "checkRedundantReturns": true,
+        "checkTypes": "strictNativeCase"
+    },
+    
+    "excludeFiles": [
+        "node_modules/**",
+        "test/node_modules/**",
+        "test/lang_dummy.js",
+        "js/vendor/**",
+        "coverage/**",
+        "dont-deploy/**",
+        "doc/**",
+        "contrib/**",
+        "scripts/**",
+        "sjcl.js",
+        "fileapi.js",
+        "aesasm.js",
+        "megapix.js",
+        "keygen.js",
+        "karma.conf.js",
+        "js/jodid25519.js",
+        "js/jquery*.js",
+        "js/asmcrypto.js",
+        "js/jsbn.js",
+        "js/jsbn2.js",
+        "js/dcraw.js",
+        "js/exif.js",
+        "js/zxcvbn.js",
+        "js/chat/mpenc.js"
+    ]
+}

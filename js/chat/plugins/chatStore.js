@@ -12,8 +12,9 @@ var ChatStore = function(megaChat) {
     self.logger = MegaLogger.getLogger("chatStore", {}, megaChat.logger);
 
     self.megaChat = megaChat;
-    self.db = new MegaDB("megaChat", u_handle, 5, ChatStore.DBSchema, {
-        'parentLogger': self.logger
+    self.db = new MegaDB("megaChat", u_handle, ChatStore.DBSchema, {
+        'parentLogger': self.logger,
+        'plugins': MegaDB.DB_PLUGIN.ENCRYPTION
     });
 
     self.db.bind("onDbStateFailed", function() {
@@ -389,7 +390,7 @@ ChatStore.prototype.restoreConversationsFromDb = function() {
 ChatStore.prototype.cleanup = function() {
     var self = this;
 
-    if(MegaChatDisabled || !self.megaChat.is_initialized) {
+    if(megaChatDisabled || !self.megaChat.is_initialized) {
         return;
     }
 

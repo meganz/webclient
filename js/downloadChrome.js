@@ -64,7 +64,7 @@
             }
             else if (i < entries.length) {
                 var file = entries[i];
-                if (file.isFile && !isTrasferActive(file.name)) {
+                if (file.isFile) {
                     file.getMetadata(function(metadata) {
                         // do not delete file while it's being copied from FS to DL folder
                         // conservative assumption that a file is being written at 1024 bytes per ms
@@ -73,7 +73,7 @@
                         var deltime = metadata.modificationTime.getTime()
                             + tsec * 1000 + metadata.size / 1024 + 30000;
 
-                        if (deltime < Date.now() && deltime < lastactive) {
+                        if (!isTrasferActive(file.name) && deltime < Date.now() && deltime < lastactive) {
                             file.remove(function() {
                                     totalsize += metadata.size;
                                     if (d) {
@@ -516,7 +516,7 @@
     };
 
     if (navigator.webkitGetUserMedia) {
-        Later(function() {
+        mBroadcaster.once('startMega', function __setup_fs() {
             if (dlMethod === FileSystemAPI) {
                 if (window.requestFileSystem) {
                     window.requestFileSystem(0, 0x10000,
@@ -525,9 +525,25 @@
                         },
                         function(e) {
                             if (e && e.code === FileError.SECURITY_ERR) {
-                                console.error('Switching to MemoryIO');
-                                window.Incognito = true;
-                                dlMethod = MemoryIO;
+                                window.Incognito = 0xC120E;
+
+                            /* Apparently indexedDBs are handled in memory on
+                               Incognito windows, which turns it a non-suitable
+                               workaround for the 496MB Blob limit :(
+
+                                if (idbDownloadIO.usable()) {
+                                    dlMethod = idbDownloadIO;
+                                }
+                                else*/ if (MemoryIO.usable()) {
+                                    dlMethod = MemoryIO;
+                                }
+                                else {
+                                    dlMethod = FlashIO;
+                                }
+                                console.error('Switching to ' + dlMethod.name);
+
+                                // https://code.google.com/p/chromium/issues/detail?id=375297
+                                MemoryIO.fileSizeLimit = 496*1024*1024;
                             }
                         }
                     );
@@ -542,6 +558,108 @@
         });
     }
 })(this);
+
+
+function idbDownloadIO(dl_id, dl) {
+    var db;
+    var schema = {
+        chunks: {
+            key: { keyPath: 'id' , autoIncrement: true }
+        }
+    };
+
+    this.write = function(buffer, offset, done) {
+        if (d) console.log('iDB Writing...', buffer.byteLength, offset);
+
+        db.server.update('chunks', new Blob([buffer]))
+            .then(done, function(e) {
+                dlFatalError(dl, e.reason);
+            });
+    };
+
+    this.download = function(name, path) {
+        var blobs = [], self = this;
+        var idb = db.server.idbRequestInstance;
+
+        idb.transaction("chunks",'readonly')
+            .objectStore("chunks")
+            .openCursor().onsuccess = function(ev) {
+                try {
+                    var cursor = ev.target.result;
+
+                    if (cursor) {
+                        blobs.push(cursor.value);
+                        cursor.continue();
+                    }
+                    else {
+                        __completeDownload();
+                    }
+                } catch(e) {
+                    console.error(e);
+                    dlFatalError(dl, e);
+                }
+            };
+
+        function __completeDownload() {
+            var dlLinkNode = document.getElementById('dllink');
+            var file_url = myURL.createObjectURL(new Blob(blobs));
+            blobs.length = 0;
+            dlLinkNode.download = name;
+            dlLinkNode.href = file_url;
+            dlLinkNode.click();
+            Later(function() {
+                myURL.revokeObjectURL(file_url);
+                file_url = undefined;
+                self.abort();
+            });
+        }
+    };
+    this.download1 = function(name, path) {
+        var self = this;
+        db.query('chunks').execute()
+            .done(function(chunks) {
+
+            }).fail(function(e) {
+                dlFatalError(dl, e);
+            });
+    };
+
+    this.abort = function(err) {
+        if (db) {
+            db.drop();
+            db = null;
+        }
+    };
+
+    this.setCredentials = function(url, size, name) {
+        if (this.is_zip || !dl.zipid) {
+            var __onDbStateChange = function(ev) {
+                db.unbind('onDbStateReady').unbind('onDbStateFailed');
+
+                if (ev.type === 'onDbStateFailed') {
+                    dlFatalError(dl, Error('iDB State Error'));
+                } else {
+                    db.clear('chunks').then(this.begin.bind(this), function() {
+                        dlFatalError(dl, Error('iDB Clear Error'));
+                    });
+                }
+            }.bind(this);
+
+            db = new MegaDB('dl', dl_id, schema);
+
+            db.bind('onDbStateReady', __onDbStateChange)
+                .bind('onDbStateFailed', __onDbStateChange);
+
+        } else {
+            this.begin();
+        }
+    };
+}
+
+idbDownloadIO.usable = function()
+{
+    return !!window.indexedDB;
+};
 
 function FileIO(dl_id, dl) {
     var file;
@@ -592,3 +710,33 @@ FileIO.usable = function() {
 
     return r;
 }
+
+function mTestIOMethod(c) {
+    var chunks = c || 60, chunk_size = 0x1000000, chunk = 0;
+    var dl_id = Date.now().toString(36),
+        dl = {
+            id: dl_id,
+            pos: 0,
+            name: 'foo-'+dl_id+'.bin',
+            size: chunks * chunk_size,
+        };
+    var io = new dlMethod(dl_id, dl);
+    dl.io = io;
+    dl.io.size = dl.size;
+    io.begin = function() {
+        nextChunk();
+
+        function nextChunk() {
+            if (chunk === chunks) {
+                io.download(dl.name);
+            } else {
+                console.log('Writing chunk', chunk);
+                io.write(new ArrayBuffer(chunk_size), chunk++ * chunk_size, nextChunk);
+            }
+        }
+    };
+    setTimeout(function() {
+        io.setCredentials('https://example.org', dl.size, dl.name);
+    }, 4000);
+}
+// dlMethod = idbDownloadIO;mTestIOMethod()

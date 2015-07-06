@@ -313,7 +313,7 @@ Karere.DEFAULTS = {
      * Multipliers used in a rand(retryFuzzinesFactors[0], retryFuzzinesFactors[1])
      * to add randomness to the connection retry timers.
      */
-    retryFuzzinesFactors: [0.7, 1],
+    retryFuzzinesFactors: [0.7, 1.3],
 
     /**
      * 10 mins timeout after the maxConnectionRetries is reached.

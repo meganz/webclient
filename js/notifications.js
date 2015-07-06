@@ -971,7 +971,7 @@ var notifyPopup = {
         var avatar = '';
 
         // If using the new API v2.0 for contacts, the userid will not be available, so use the email
-        avatar = useravatar.contact(M.u[userid] || userEmail)
+        avatar = M.u[userid] || userEmail ? useravatar.contact(M.u[userid] || userEmail) : '';
 
         rhtml += '<a class="notification-item ' + className + ' ' + nread + '" ' + nstyle + ' id="' + htmlentities(id) + '">';
         rhtml +=   '<span class="notification-status-icon">';

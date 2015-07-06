@@ -3317,7 +3317,7 @@
     "6908": "Choose folder",
     "6909": "Manage link",
     "6910": "Leave",
-    "6911": "This link will not be publicly available anymore",
+    "6911": "\u0627\u06cc\u0646 \u0644\u06cc\u0646\u06a9 \u062f\u06cc\u06af\u0631 \u0628\u0647 \u0637\u0648\u0631 \u0637\u0628\u06cc\u0639\u06cc \u0645\u0648\u062c\u0648\u062f \u0646\u062e\u0648\u0627\u0647\u062f \u0628\u0648\u062f",
     "6912": "Open link",
     "6913": "Download folder",
     "6914": "Import folder",
@@ -3391,7 +3391,7 @@
     "6982": "Exclude by size",
     "6983": "Can we contact you for more information?",
     "6984": "The fingerprints for this user have changed.<br \/> We recommend you <span>reset<\/span> these credentials and re-verify them manually.",
-    "6985": "Choose your payment method below",
+    "6985": "\u0631\u0648\u0634 \u067e\u0631\u062f\u0627\u062e\u062a \u062e\u0648\u062f \u0631\u0627 \u0627\u0632 \u0632\u06cc\u0631 \u0627\u0646\u062a\u062e\u0627\u0628 \u06a9\u0646\u06cc\u062f",
     "6986": "Your download could not proceed because it would take you over the current free transfer allowance for you IP address. This limit is dynamic and depends on the amount of unused bandwidth we have available. ",
     "6987": "You have utilized <strong>532 MB<\/strong> of data transfer in the last 6 hours which took you over our current limit. To circumvent this limit, you can <span class=\"red\">upgrade to pro<\/span>, which will give you your own bandwidth package and also ample extra storage space. ",
     "6988": "Please upgrade to PRO to continue immediately, or wait 87 minutes to continue for free.",
@@ -3563,5 +3563,10 @@
     "7154": "You can close this tab, your download is managed from another tab where you have your file manager open.",
     "7155": "Download through your browser",
     "7156": "You can also pay via the Google Play Store, Apple App Store or Android mobile carrier billing when using our [A]MEGA apps[\/A].",
-    "7157": "Please close all other browser windows\/tabs which are running MEGA before proceeding."
+    "7157": "Please close all other browser windows\/tabs which are running MEGA before proceeding.",
+    "7158": "Your Account",
+    "7159": "Your current account balance is:",
+    "7160": "Redeem Voucher",
+    "7161": "Mobile carrier billing",
+    "7162": "This plan is too expensive to be purchased with this payment provider."
 }

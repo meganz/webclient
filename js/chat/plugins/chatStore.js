@@ -390,7 +390,7 @@ ChatStore.prototype.restoreConversationsFromDb = function() {
 ChatStore.prototype.cleanup = function() {
     var self = this;
 
-    if(MegaChatDisabled || !self.megaChat.is_initialized) {
+    if(megaChatDisabled || !self.megaChat.is_initialized) {
         return;
     }
 

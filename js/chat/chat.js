@@ -3,14 +3,9 @@
  *
  * @type {boolean}
  */
-var MegaChatDisabled = localStorage.chatDisabled === true ? true : false;
+var megaChatDisabled = !!localStorage.chatDisabled;
 
 var disableMpEnc = true;
-
-if (MegaChatDisabled) {
-    $(document.body).addClass("megaChatDisabled");
-}
-
 
 var chatui;
 (function() {
@@ -747,16 +742,29 @@ var Chat = function() {
 
     this.plugins = {};
 
-    try {
-        // This might throw in browsers which doesn't support Strophe/WebRTC
-        this.karere = new Karere({
-            'clientName': 'mc',
-            'boshServiceUrl': function() { return self.getBoshServiceUrl(); }
-        });
+    if (!megaChatDisabled) {
+        try {
+            // This might throw in browsers which doesn't support Strophe/WebRTC
+            this.karere = new Karere({
+                'clientName': 'mc',
+                'boshServiceUrl': function() { return self.getBoshServiceUrl(); }
+            });
+        }
+        catch (e) {
+            console.error(e);
+            megaChatDisabled = true;
+        }
     }
-    catch(e) {
-        console.error(e);
-        MegaChatDisabled = true;
+
+    Object.defineProperty(this, 'isReady', {
+        get: function() {
+            return !megaChatDisabled && self.is_initialized;
+        }
+    });
+
+    if (megaChatDisabled) {
+        this.logger.info('MEGAChat is disabled.');
+        $(document.body).addClass("megaChatDisabled");
     }
 
     self.filePicker = null; // initialized on a later stage when the DOM is fully available.
@@ -2130,7 +2138,7 @@ Chat.prototype.openChat = function(jids, type) {
     var self = this;
     type = type || "private";
 
-    var $promise = new $.Deferred();
+    var $promise = new MegaPromise();
 
     if (type === "private") {
         var $element = $('.nw-conversations-item[data-jid="' + jids[0] + '"]');
@@ -2186,7 +2194,7 @@ Chat.prototype.openChat = function(jids, type) {
 
 
     if (self.karere.getConnectionState() != Karere.CONNECTION_STATE.CONNECTED) {
-        return [roomJid, room, (new $.Deferred()).reject(roomJid, room)];
+        return [roomJid, room, (new MegaPromise()).reject(roomJid, room)];
     }
 
     var jidsWithoutMyself = room.getParticipantsExceptMe(jids);

@@ -604,7 +604,7 @@ var ETOOERR = -400;
 
 function ssl_needed() {
     var ssl_opt = ['Chrome/'];
-    var ssl_off = ['Firefox/14', 'Firefox/15', 'Firefox/17', 'Safari', 'Firefox/16'];
+    var ssl_off = ['Firefox/14', 'Firefox/15', 'Firefox/16', 'Firefox/17'];
     for (var i = ssl_opt.length; i--;) {
         if (navigator.userAgent.indexOf(ssl_opt[i]) >= 0) {
             return parseInt(navigator.userAgent.split(ssl_opt[i]).pop()) > 40;
@@ -1659,12 +1659,13 @@ function api_reqerror(q, e) {
     }
 }
 
+var apiFloorCap = 3000;
 function api_retry() {
     for (var i = 4; i--;) {
-        if (apixs[i].timer && apixs[i].backoff > 5000) {
+        if (apixs[i].timer && apixs[i].backoff > apiFloorCap) {
             clearTimeout(apixs[i].timer);
-            apixs[i].backoff = 800+Math.floor(Math.random()*1200);
-            api_send(apixs[i]);
+            apixs[i].backoff = apiFloorCap;
+            apixs[i].timer = setTimeout(api_send, apiFloorCap, apixs[i]);
         }
     }
 }
@@ -2176,7 +2177,7 @@ var u_nodekeys = {};
 // an error, and the whole operation gets repeated (exceedingly
 // rare race condition).
 function api_setshare(node, targets, sharenodes, ctx) {
-    
+
     api_setshare1({
             node: node,
             targets: targets,

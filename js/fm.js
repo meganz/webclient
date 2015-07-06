@@ -1162,7 +1162,7 @@ function initUI() {
 
     $(window).rebind('resize.fmrh hashchange.fmrh', fm_resize_handler);
 
-    if (!MegaChatDisabled) {
+    if (!megaChatDisabled) {
         megaChat.karere.rebind("onPresence.maintainUI", function(e, presenceEventData) {
             var contact = megaChat.getContactFromJid(presenceEventData.getFromJid());
             M.onlineStatusEvent(contact, presenceEventData.getShow());
@@ -7005,7 +7005,7 @@ function generateShareDialogRow(displayNameOrEmail, email, shareRights, userHand
 
     var rowId = '',
         html = '',
-        av =  useravatar.contact(userHandle),
+        av =  useravatar.contact(email),
         perm = '',
         permissionLevel = 0;
 
@@ -8870,7 +8870,7 @@ function propertiesDialog(close)
                 for (var u in n.shares) {
                     if (M.u[u]) {
                         var u = M.u[u]
-                        var onlinestatus = M.onlineStatusClass(megaChat.karere.getPresence(megaChat.getJidFromNodeId(u.u)));
+                        var onlinestatus = M.onlineStatusClass(megaChat.isReady && megaChat.karere.getPresence(megaChat.getJidFromNodeId(u.u)));
                         if (++total <= 5)
                             susers.append('<div class="properties-context-item ' + onlinestatus[1] + '">'
                                 + '<div class="properties-contact-status"></div>'
@@ -9653,7 +9653,7 @@ function fm_resize_handler() {
             initContactsGridScrolling();
     }
 
-    if (typeof(megaChat) != 'undefined' && megaChat && megaChat.resized) {
+    if (megaChat.isReady && megaChat.resized) {
         megaChat.resized();
     }
 
@@ -9858,7 +9858,7 @@ function contactUI() {
         var user = M.d[u_h];
         var avatar = $(useravatar.contact(u_h));
 
-        var onlinestatus = M.onlineStatusClass(megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h)));
+        var onlinestatus = M.onlineStatusClass(megaChat.isReady && megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h)));
         $('.contact-top-details .nw-contact-block-avatar').empty().append( avatar.removeClass('avatar') )
         $('.contact-top-details .onlinestatus').removeClass('away offline online busy');
         $('.contact-top-details .onlinestatus').addClass(onlinestatus[1]);
@@ -9943,7 +9943,7 @@ function contactUI() {
             showAuthenticityCredentials();
         });
 
-        if (!MegaChatDisabled) {
+        if (!megaChatDisabled) {
             if (onlinestatus[1] !== "offline" && u_h !== u_handle) {
                 // user is online, lets display the "Start chat" button
 

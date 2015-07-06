@@ -702,7 +702,8 @@
         <div class="clear"></div>
     </div>
     <div class="fm-dialog-body">
-        <div class="download-dialog-icon">
+        <div class="download-dialog-icon"></div>
+        <div class="download-dialog-txt-bl">
             [$240]
             <a href="https://www.google.com/chrome" class="download-chrome-lnk" target="_blank" rel="noreferrer">
                 [$242]
@@ -1614,73 +1615,77 @@
 </div>
 
 <div class="megasync-overlay hidden">
-   <div class="megasync-content">
-       <div class="megasync-logo"></div>
-       <div class="megasync-info">
-        [$7138]<br/>
-        [$7139]
-       </div>
-       <div class="megasync-dropdown">
-       		<span>[$7086]</span>
-       </div>
-       <div class="megasync-dropdown-list hidden">
-       		<div class="megasync-dropdown-pad">
+    <div class="megasync-close"></div>
+    <div class="megasync-close-txt">[$6951]</div>
+    <div class="megasync-content">
+        <div class="megasync-logo"></div>
+        <div class="megasync-info">
+            [$7138]<br/>
+            [$7139]
+        </div>
+        <div class="megasync-dropdown">
+            <span>[$7086]</span>
+        </div>
+        <div class="megasync-dropdown-list hidden">
+            <div class="megasync-dropdown-pad">
                 <div class="megasync-dropdown-scroll">
-       		        <div class="megasync-scr-pad">
+                    <div class="megasync-scr-pad">
                         <div class="megasync-dropdown-link centos">CentOS 7.0</div>
                     </div>
                 </div>
                 <div class="megasync-list-arrow hidden"></div>
             </div>
-       </div>
-       <div class="megasync-table">
-       		<table border="0" cellspacing="0" cellpadding="0">
-            	<tr>
-                  <th>
-    			  </th>
-                  <th>
-    			  	<span class="globe">[$7087]</span>
-    			  </th>
-                  <th>
-    			  	<span class="sync">MEGAsync</span>
-    			  </th>
+        </div>
+        <div class="megasync-table">
+            <table border="0" cellspacing="0" cellpadding="0">
+                <tr>
+                    <th>
+                    </th>
+                    <th>
+                        <span class="globe">[$7087]</span>
+                    </th>
+                    <th>
+                        <span class="sync">MEGAsync</span>
+                    </th>
                 </tr>
                 <tr>
-                  <td>
-    			  	<span>[$7088]</span>
-    			  </td>
-                  <td>
-    			  	<span class="dots">[$1165]</span>
-    			  </td>
-                  <td>
-    			  	<span class="tick">[$7089]</span>
-    			  </td>
+                    <td>
+                        <span>[$7088]</span>
+                    </td>
+                    <td>
+                        <span class="dots">[$1165]</span>
+                    </td>
+                    <td>
+                        <span class="tick">[$7089]</span>
+                    </td>
                 </tr>
                 <tr>
-                  <td>
-    			  	<span>[$7090]</span>
-    			  </td>
-                  <td>
-    			  	<span class="dots">[$7152]</span>
-    			  </td>
-                  <td>
-    			  	<span class="tick">[$7153]</span>
-    			  </td>
+                    <td>
+                        <span>[$7090]</span>
+                    </td>
+                    <td>
+                        <span class="dots">[$7152]</span>
+                    </td>
+                    <td>
+                        <span class="tick">[$7153]</span>
+                    </td>
                 </tr>
                 <tr>
-                  <td>
-    			  	<span>[$7093]</span>
-    			  </td>
-                  <td>
-    			  	<span class="dots">[$1149]</span>
-    			  </td>
-                  <td>
-    			  	<span class="tick">[$7094]</span>
-    			  </td>
+                    <td>
+                        <span>[$7093]</span>
+                    </td>
+                    <td>
+                        <span class="dots">[$1149]</span>
+                    </td>
+                    <td>
+                        <span class="tick">[$7094]</span>
+                    </td>
                 </tr>
             </table>
-       </div>
-   </div>
+        </div>
+    </div>
+</div>
+
 <div class="fm-dialog bandwidth-quota hidden">
      <div class="fm-dialog-header">
        <div class="fm-dialog-title">[$17]</div>
@@ -1869,4 +1874,42 @@
     C
     </text>
     </svg>
+</div>
+
+<div class="fm-dialog voucher-dialog hidden">
+    <div class="btn-close-dialog"></div>
+    <div class="voucher-dialog-body">
+        <div class="plan-icon pro1">
+            <div class="reg-st3-membership-icon"></div>
+        </div>
+        <div class="voucher-plan-info">
+            <div class="voucher-plan-title">PRO I</div>
+            <div class="voucher-plan-txt">1 month <span>(non-recurring)</span></div>
+        </div>
+        <div class="voucher-plan-price">9.99<span class="payment-eurosign">&euro;</span></div>
+        <div class="clear"></div>
+        <div class="voucher-block">
+            <div class="voucher-account-balance"> 0.00<span class="payment-eurosign">&euro;</span> </div>
+            <div class="voucher-sub-title"> Your account balance is: </div>
+            <div class="voucher-information-help">
+                To increase your balance, click the Redeem Voucher button and enter your voucher code. If you 
+                don't have a voucher, please 
+                <a href="https://mega.nz/#resellers" class="voucher-reseller-link">purchase a voucher</a>.
+            </div>
+            <div class="voucher-dialog-buttons">
+                <div class="voucher-dialog-td">
+                    <div class="fm-account-input" id="voucher-code-input">
+                        <input type='text' placeholder='Enter your voucher code' value='' />
+                    </div>
+                </div>
+                <div class="voucher-dialog-td">
+                    <div class="voucher-redeem-now"> Redeem Voucher </div>
+                </div>
+                <div class="voucher-dialog-td">
+                    <div class="voucher-buy-now"> [$6190] </div>
+                </div>
+            </div>
+        </div>
+        <div class="clear"></div>
+    </div>
 </div>

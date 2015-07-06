@@ -186,21 +186,24 @@ var useravatar = (function() {
     }
 
     ns.contact = function(user, className, element) {
+        
         className = className || "avatar";
         element   = element || "div";
-        if (typeof user === "string") {
+        if (typeof user === "string" && user.length > 0) {
             if (isEmail(user)) {
                 return emailAvatar(user, className, element);
-            } else if (M.u[user]) {
+            }
+            else if (M.u[user]) {
                 // It's an user ID
                 user = M.u[user];
-            } else {
+            }
+            else {
                 return _letters(user, user, className, element);
             }
         }
 
-        if (typeof user !== "object" || !user) {
-            throw new Error("Unexpected value" + typeof(user));
+        if (typeof user !== "object" || !(user||{}).u) {
+            return "";
         }
 
         if (avatars[user.u]) {

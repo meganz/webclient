@@ -65,11 +65,13 @@ var useravatar = (function() {
      * @private
      */
     var _lettersSettings = function(word) {
-        var words = $.trim(word).toUpperCase().split(/\W+/);
-        var letters = words[0][0];
-        var color   = letters.charCodeAt(0) % _colors.length;
-        if (word === u_handle) {
-            letters = "";
+        var letters = "";
+        var color   = 1;
+        if (word && word !== u_handle) {
+            // Word is indeed not empty nor our user ID.
+            var words = $.trim(word).toUpperCase().split(/\W+/);
+            letters = words[0][0];
+            color   = letters.charCodeAt(0) % _colors.length;
         }
         return {letters: letters, color: _colors[color], colorIndex: color + 1 };
     };

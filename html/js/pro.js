@@ -264,7 +264,7 @@ function pro_continue(e)
 
         }}, true);
     }
-
+    /*
     // Warn them about insufficient funds
     else if (prepaidMethodSelected && (parseFloat(pro_balance) < parseFloat(selectedPlanPrice))) {
         msgDialog('warninga', l[6804], l[6805], false, false);
@@ -279,13 +279,16 @@ function pro_continue(e)
                 pro_pay();
             }
         });
-    }
+    }*/
     else {
         pro_paymentmethod = selectedPaymentMethod;
         
         // For credit card we show the dialog first, then do the uts/utc calls
         if (pro_paymentmethod === 'credit-card') {
             cardDialog.init();
+        }
+        else if (pro_paymentmethod === 'prepaid-balance') {
+            voucherDialog.init();
         }
         else if (pro_paymentmethod === 'wire-transfer') {
             wireTransferDialog.init();
@@ -1013,6 +1016,35 @@ var proPage = {
 };
 
 /**
+ * Code for the voucher dialog
+ */
+var voucherDialog = {
+    
+    $dialog: null,
+    $backgroundOverlay: null,
+    
+    init: function() {
+        this.showVoucherDialog();
+    },
+    
+    /**
+     * Display the dialog
+     */
+    showVoucherDialog: function() {
+    
+        // Cache DOM reference for lookup in other functions
+        this.$dialog = $('.fm-dialog.voucher-dialog');
+        this.$backgroundOverlay = $('.fm-dialog-overlay');
+        
+        // Add the styling for the overlay
+        this.$dialog.removeClass('hidden');
+        this.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+        
+        
+    }
+};
+
+/**
  * Display the wire transfer dialog
  */
 var wireTransferDialog = {
@@ -1078,12 +1110,11 @@ var unionPay = {
         {
             var input = $("<input type='hidden' name='" + key + "' value='" + utcResult.EUR['postdata'][key] + "' />");
             form.append(input);
-            $("body").append(form);
+            $('body').append(form);
             form.submit();
         }
     }
 };
-
 
 /**
  * Code for Dynamic/Union Pay

@@ -15045,6 +15045,13 @@ h5.main-italic-header {
     overflow: visible;
     width: 200px;
 }
+.payment-options-list .payment-method.disabled {
+    cursor: auto;
+    opacity: 0.5;
+}
+.payment-options-list .payment-method.disabled .membership-radio div {
+    cursor: auto;
+}
 .membership-radio div {
 	width: 14px;
 	height: 14px;
@@ -15063,7 +15070,6 @@ h5.main-italic-header {
 	margin: 5px;
 }
 .membership-radio-label {
-<<<<<<< HEAD
     background-image: url("../images/mega/pro-new-sprite-v5.png");
     background-repeat: no-repeat;
     color: #333333;
@@ -15074,18 +15080,6 @@ h5.main-italic-header {
     line-height: 26px;
     padding-left: 28px;
     vertical-align: middle;
-=======
-	background-image: url("../images/mega/pro-new-sprite-v4.png");
-	background-repeat: no-repeat;
-	color: #333333;
-	display: inline-block;
-	font-family: "Open Sans Semibold", Arial;
-	font-size: 13px;
-	height: 26px;
-	line-height: 26px;
-	padding-left: 28px;
-	vertical-align: middle;
->>>>>>> develop
 }
 .membership-radio-label.prepaid-balance {
 	background-position: -444px -569px;

@@ -649,7 +649,8 @@ var proPage = {
             displayName: l[6952],           // Credit card
             supportsRecurring: true,        // If subscriptions are possible
             supportsMonthlyPayment: true,   // If you can pay for 1 month at a time
-            supportsAnnualPayment: true,
+            supportsAnnualPayment: true,    // Can pay for an annual amount
+            supportsExpensivePlans: true,   // The provider can be used to buy plans other than LITE
             cssClass: 'credit-card'
         },
         {
@@ -658,6 +659,7 @@ var proPage = {
             supportsRecurring: false,
             supportsMonthlyPayment: true,
             supportsAnnualPayment: true,
+            supportsExpensivePlans: true,
             cssClass: 'bitcoin'
         },
         {
@@ -666,6 +668,7 @@ var proPage = {
             supportsRecurring: false,
             supportsMonthlyPayment: true,
             supportsAnnualPayment: true,
+            supportsExpensivePlans: true,
             cssClass: 'prepaid-balance'
         },
         {
@@ -674,6 +677,7 @@ var proPage = {
             supportsRecurring: false,
             supportsMonthlyPayment: true,
             supportsAnnualPayment: true,
+            supportsExpensivePlans: true,
             cssClass: 'union-pay'
         },
         {
@@ -682,6 +686,7 @@ var proPage = {
             supportsRecurring: false,
             supportsMonthlyPayment: true,
             supportsAnnualPayment: false,
+            supportsExpensivePlans: false,  // Provider has a max of EUR 3.00 per payment
             cssClass: 'fortumo'
         },
         {
@@ -690,9 +695,10 @@ var proPage = {
             supportsRecurring: false,
             supportsMonthlyPayment: false,  // Accept 1 year, one-time payment only (wire transfer fees are expensive)
             supportsAnnualPayment: true,
+            supportsExpensivePlans: true,
             cssClass: 'wire-transfer'
         }];
-        
+    
         // Do API request (User Forms of Payment Query) to get the valid list of currently active 
         // payment providers. Returns an array of active payment providers e.g. [0,2,3,4,5,8].
         api_req({ a: 'ufpq' }, {
@@ -703,6 +709,8 @@ var proPage = {
                     return false;
                 }
                 
+                // Get their currently selected plan
+                var selectedPlan = $('.membership-step2 .reg-st3-membership-bl.selected').attr('data-payment');
                 var html = '';
 
                 // Loop through gateway providers (change to use list from API soon)
@@ -727,11 +735,20 @@ var proPage = {
                     if ((gatewayOption.apiGatewayId !== null) && (validGatewayIds.indexOf(gatewayOption.apiGatewayId) === -1)) {
                         continue;
                     }
+                    
+                    var disabledClass = '';
+                    var disabledTitleText = '';
+                    
+                    // Add disabled class if this payment method is not supported for this plan
+                    if ((gatewayOption.supportsExpensivePlans === false) && (selectedPlan != 4)) {
+                        disabledClass = ' disabled';
+                        disabledTitleText = ' title="' + l[7162] + '"';
+                    }
 
                     // Create a radio button with icon for each payment gateway
-                    html += '<div class="payment-method">'
+                    html += '<div class="payment-method' + disabledClass + '"' + disabledTitleText + '>'
                          +      '<div class="membership-radio' + classChecked + '">'
-                         +          '<input type="radio" name="' + gatewayOption.cssClass + '" id="' + gatewayOption.cssClass + '" ' + optionChecked + ' value="' + gatewayOption.cssClass + '" data-recurring="' + gatewayOption.supportsRecurring + '"  data-supports-monthly-payment="' + gatewayOption.supportsMonthlyPayment + '"  data-supports-annual-payment="' + gatewayOption.supportsAnnualPayment + '" />'
+                         +          '<input type="radio" name="' + gatewayOption.cssClass + '" id="' + gatewayOption.cssClass + '" ' + optionChecked + ' value="' + gatewayOption.cssClass + '" data-recurring="' + gatewayOption.supportsRecurring + '"  data-supports-monthly-payment="' + gatewayOption.supportsMonthlyPayment + '" data-supports-annual-payment="' + gatewayOption.supportsAnnualPayment + '" data-supports-expensive-plans="' + gatewayOption.supportsExpensivePlans + '" />'
                          +          '<div></div>'
                          +      '</div>'
                          +      '<div class="membership-radio-label ' + gatewayOption.cssClass + '">'
@@ -962,14 +979,20 @@ var proPage = {
 
         var paymentOptionsList = $('.payment-options-list');
         paymentOptionsList.html(html);
-        paymentOptionsList.find('.payment-method').rebind('click', function() {
+        paymentOptionsList.find('.payment-method').rebind('click', function(event) {
+
+            var $this = $(this);
+            var $bitcoinInstructions = $('.membership-center p');
+
+            // Don't let the user select this option if it's disabled e.g. disabled because 
+            // they must select a cheaper plan to work with this payment provider e.g. Fortumo
+            if ($this.hasClass('disabled')) {
+                return false;
+            }
 
             // Remove checked state from all radio inputs
             paymentOptionsList.find('.membership-radio').removeClass('checked');
             paymentOptionsList.find('input').prop('checked', false);
-
-            var $this = $(this);
-            var $bitcoinInstructions = $('.membership-center p');
 
             // Add checked state for this radio button
             $this.find('input').prop('checked', true);        

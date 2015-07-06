@@ -16,7 +16,6 @@ var useravatar = (function() {
         '#ff9500',
         '#ffcc00',
     ];
-    var logger = MegaLogger.getLogger('avatars');
 
     /**
      *  List of TWO-letters avatars that we ever generated. It's useful to replace
@@ -204,7 +203,6 @@ var useravatar = (function() {
         }
 
         if (typeof user !== "object" || !(user||{}).u) {
-            logger.error("Useravatar: Unexpected value " + typeof(user), user);
             return "";
         }
 

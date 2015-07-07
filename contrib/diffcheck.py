@@ -27,6 +27,7 @@ __author__ = 'Guy Kloss <gk@mega.co.nz>'
 
 import argparse
 import os
+import sys
 import re
 import logging
 import tempfile
@@ -89,7 +90,8 @@ def reduce_jshint(file_line_mapping, **extra):
     :param extra: Optional keyword arguments:
         `norules`: If true, omit verbose output of violated rule identifier
                    (default: `False` to include rules).
-    :return: A formatted string suitable for output.
+    :return: A tuple containing the formatted string suitable for output and
+        an integer containing the number of failed rules.
     """
     norules = extra['norules'] if 'norules' in extra else False
     # Get the JSHint output.
@@ -121,8 +123,9 @@ def reduce_jshint(file_line_mapping, **extra):
                 result.append(line)
 
     # Add the number of errors and return in a nicely formatted way.
-    result.append('\n{} errors'.format(len(result) - 1))
-    return '\n'.join(result)
+    error_count = len(result) - 1
+    result.append('\n{} errors'.format(error_count))
+    return '\n'.join(result), error_count
 
 
 def reduce_jscs(file_line_mapping, **extra):
@@ -135,7 +138,8 @@ def reduce_jscs(file_line_mapping, **extra):
     :param extra: Optional keyword arguments:
         `norules`: If true, omit verbose output of violated rule identifier
                    (default: `False` to include rules).
-    :return: A formatted string suitable for output.
+    :return: A tuple containing the formatted string suitable for output and
+        an integer containing the number of failed rules.
     """
     norules = extra['norules'] if 'norules' in extra else False
     # Get the JSCS output.
@@ -170,8 +174,9 @@ def reduce_jscs(file_line_mapping, **extra):
                 result.append(item)
 
     # Add the number of errors and return in a nicely formatted way.
-    result.append('\n{} code style errors found.'.format(len(result) - 1))
-    return '\n\n'.join(result)
+    error_count = len(result) - 1
+    result.append('\n{} code style errors found.'.format(error_count))
+    return '\n\n'.join(result), error_count
 
 
 def reduce_cppcheck(file_line_mapping, **extra):
@@ -184,7 +189,8 @@ def reduce_cppcheck(file_line_mapping, **extra):
     :param extra: Optional keyword arguments:
         `platform`: A specific platform to test for, as used in
                     `include/mega/` (default: detect local system's platform).
-    :return: A formatted string suitable for output.
+    :return: A tuple containing the formatted string suitable for output and
+        an integer containing the number of failed rules.
     """
     logging.info('Obtaining CppCheck output ...')
     platform = platform = PLATFORMS[os.name]
@@ -222,19 +228,21 @@ def reduce_cppcheck(file_line_mapping, **extra):
                 result.append(formatted)
 
     # Add the number of errors and return in a nicely formatted way.
-    result.append('\n{} errors'.format(len(result) - 1))
-    return '\n'.join(result)
+    error_count = len(result) - 1
+    result.append('\n{} errors'.format(error_count))
+    return '\n'.join(result), error_count
 
 
 def reduce_nsiqcppstyle(file_line_mapping, **extra):
     """
     Runs N'SIQ CppStyle on the project with the project configured rules.
-    Thet outpu is reduced to only contain entries from the Git change set.
+    Thet output is reduced to only contain entries from the Git change set.
 
     :param file_line_mapping: Mapping of files with changed lines (obtained
         `get_git_line_sets()`).
     :param extra: Optional keyword arguments.
-    :return: A formatted string suitable for output.
+    :return: A tuple containing the formatted string suitable for output and
+        an integer containing the number of failed rules.
     """
     logging.info("Obtaining N'SIQ CppStyle output ...")
     
@@ -281,9 +289,73 @@ def reduce_nsiqcppstyle(file_line_mapping, **extra):
                 result.append(formatted)
 
     # Add the number of errors and return in a nicely formatted way.
-    result.append('\n{} errors'.format(len(result) - 1))
-    return '\n'.join(result)
+    error_count = len(result) - 1
+    result.append('\n{} errors'.format(error_count))
+    return '\n'.join(result), error_count
 
+
+def reduce_verapp(file_line_mapping, **extra):
+    """
+    Runs Vera++ on the project with the project configured rules. The output
+    is reduced to only contain entries from the Git change set.
+
+    :param file_line_mapping: Mapping of files with changed lines (obtained
+        `get_git_line_sets()`).
+    :param extra: Optional keyword arguments.
+    :return: A tuple containing the formatted string suitable for output and
+        an integer containing the number of failed rules.
+    """
+    logging.info('Obtaining Vera++ output ...')
+
+    # Collect all C++ source files.
+    cpp_source_expression = re.compile(r'\.(h|cpp)$')
+    source_files = [os.path.join(dirpath, name)
+                    for dirpath, _, items in os.walk(PROJECT_PATH)
+                    for name in items
+                    if cpp_source_expression.findall(name.lower())]
+
+    # Get the Vera++ output.
+    os.chdir(PROJECT_PATH)
+    command = config.VERAPP_COMMAND.format(command=config.VERAPP_BIN,
+                                           rules=' '.join(['-R {}'.format(item)
+                                                           for item in config.VERAPP_RULES]))
+    output = None
+    try:
+        process = subprocess.Popen(command.split(),
+                                   stdout=subprocess.PIPE,
+                                   stderr=subprocess.STDOUT,
+                                   stdin=subprocess.PIPE)
+        output, _ = process.communicate(bytes('\n'.join(source_files)
+                                        .encode('ASCII')))
+    except subprocess.CalledProcessError as ex:
+        # Vera++ found something, so it has returned an error code.
+        # But we still want the output in the same fashion.
+        output = ex.output
+    output = output.decode('utf8').split('\n')
+
+    # Go through output and collect only relevant lines to the result.
+    result = ['\nVera++ output:\n==============\n']
+    # This stunt is required to fix Windows path problems with backslashes.
+    base_path = os.path.join(PROJECT_PATH, '')
+    if os.name == 'nt':
+        base_path = base_path.replace('\\', '\\\\')
+    verapp_expression = re.compile(r'^{}(.+?):(\d+): '.format(base_path))
+    for line in output:
+        parse_result = verapp_expression.findall(line)
+        # Check if we've got a relevant line.
+        if parse_result:
+            file_name, line_no = parse_result[0][0], int(parse_result[0][1])
+            file_name = tuple(re.split(PATH_SPLITTER, file_name))
+            # Check if the line is part of our selection list.
+            # TODO: find proper file name sub-set (remove base path)
+            if line_no in file_line_mapping[file_name]:
+                result.append(line)
+
+    # Add the number of errors and return in a nicely formatted way.
+    error_count = len(result) - 1
+    result.append('\n{} errors'.format(error_count))
+    return '\n'.join(result), error_count
+    
 
 def main(base, target, norules):
     """
@@ -292,16 +364,22 @@ def main(base, target, norules):
     CHECKER_MAPPING = {'jshint': reduce_jshint,
                        'jscs': reduce_jscs,
                        'cppcheck': reduce_cppcheck,
-                       'nsiqcppstyle': reduce_nsiqcppstyle}
+                       'nsiqcppstyle': reduce_nsiqcppstyle,
+                       'vera++': reduce_verapp}
     
     file_line_mapping = get_git_line_sets(base, target)
     results = []
+    total_errors = 0
     for checker in config.checkers:
         worker = CHECKER_MAPPING[checker]
         extra_options = config.extra_options[checker]
-        results.append(worker(file_line_mapping, **extra_options))
+        output, error_count = worker(file_line_mapping, **extra_options)
+        results.append(output)
+        total_errors += error_count
     logging.info('Output of reduced results ...')
     print('\n\n'.join(results))
+    if total_errors > 0:
+        sys.exit(1)
 
 
 if __name__ == '__main__':

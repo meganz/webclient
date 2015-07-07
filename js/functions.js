@@ -3277,6 +3277,16 @@ mBroadcaster.addListener('crossTab:master', function _setup() {
     }
 });
 
+/**
+ * Simple alias that will return a random number in the range of: a < b
+ *
+ * @param a {Number} min
+ * @param b {Number} max
+ * @returns {*}
+ */
+function rand_range(a, b) {
+    return Math.random() * (b - a) + a;
+};
 
 // FIXME: This is a "Dirty Hack" (TM) that needs to be removed as soon as
 //        the original problem is found and resolved.

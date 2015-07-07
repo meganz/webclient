@@ -1237,7 +1237,10 @@ function openTransferpanel()
         var target = $(this).closest('tr');
         e.preventDefault();
         e.stopPropagation(); // do not treat it as a regular click on the file
-        target.addClass('ui-selected');
+        if (!target.hasClass('ui-selected')) {
+            $('.tranfer-table tr').removeClass('ui-selected');
+            target.addClass('ui-selected');
+        }
         e.currentTarget = target;
         transferPanelContextMenu(target);
         contextMenuUI(e);
@@ -1248,7 +1251,10 @@ function openTransferpanel()
         var target = $(this).closest('tr');
         e.preventDefault();
         e.stopPropagation();
-        target.addClass('ui-selected');
+        if (!target.hasClass('ui-selected')) {
+            $('.tranfer-table tr').removeClass('ui-selected');
+            target.addClass('ui-selected');
+        }
         var toabort = {};
         $('.transfer-table tr.ui-selected').not('.clone-of-header').each(function(j, el)
         {
@@ -5430,6 +5436,9 @@ function transferPanelUI()
 
             if (e.type == 'contextmenu')
             {
+                var c = $(this).attr('class');
+                if (!c || (c && c.indexOf('ui-selected') == -1))
+                    $('.transfer-table tr').removeClass('ui-selected');
                 transferPanelContextMenu($(this));
                 $(this).addClass('ui-selected');
                 $(this).addClass('dragover');

@@ -325,7 +325,7 @@ TransferQueue.prototype.pause = function(gid) {
             this._running--;
         }
         this._qpaused[gid] = this.slurp(gid);
-        $('.transfer-table #' + gid + ' td:eq(0) span.speed').text(' (paused)');
+        $('.transfer-table #' + gid + ' td:eq(0) span.speed').text(' (' + l[1651] + ')');
         GlobalProgress[gid].speed = 0; // reset speed
         if (($.transferprogress || {})[gid]) {
             $.transferprogress[gid][2] = 0; // reset speed

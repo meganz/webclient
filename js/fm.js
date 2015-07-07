@@ -1014,6 +1014,7 @@ function initUI() {
             api_req({a: 'up', terms: 'Mq'});
             // queued work is continued when user accept terms of service
             $('.transfer-pause-icon').removeClass('active');
+            $('.nw-fm-left-icon.transfers').removeClass('paused');
             dlQueue.resume();
             ulQueue.resume();
             ui_paused = false;
@@ -1219,11 +1220,8 @@ function openTransferpanel()
         dlQueue.pause();
         ulQueue.pause();
         ui_paused = true;
-        $('.transfer-table td:eq(0) .speed').text(' (' + l[1651] + '/s)');
-        $('.transfer-table tr td:eq(2), .transfer-table tr td:eq(5)').each(function()
-        {
-            $(this).text('');
-        });
+        $('.transfer-table td:eq(0) .speed').text('');
+        $('.transfer-table tr td:eq(2), .transfer-table tr td:eq(5)').text('');
     }
     initTreeScroll();
     $(window).trigger('resize');
@@ -5583,7 +5581,6 @@ function transferPanelUI()
         }
     });
 
-
     $('.transfer-pause-icon').rebind('click', function()
     {
         if (!$(this).hasClass('disabled')) {
@@ -5601,15 +5598,15 @@ function transferPanelUI()
                             else dlQueue.resume(elId);
                         }
                     });
+                    //ui_paused = false;
+                    $('.fm-transfers-block tr span.transfer-type').removeClass('paused');
+                    $('.nw-fm-left-icon').removeClass('paused');
         
                 } else
                 {
                     alert(l[214]);
                     DEBUG(l[214]);
                 }
-
-                $('.fm-transfers-block tr span.transfer-type').removeClass('paused');
-                $('.nw-fm-left-icon').removeClass('paused');
             }
             else
             {
@@ -5622,15 +5619,9 @@ function transferPanelUI()
                         else dlQueue.pause(elId);
                     }
                 });
-
+                //ui_paused = true;
                 $('.transfer-table tr span.transfer-type').addClass('paused');
-                $('.transfer-table td:eq(0) .speed').text(' (' + l[1651] + ')');
                 $('.nw-fm-left-icon').addClass('paused');
-
-                $('.transfer-table tr td:eq(2)').each(function()
-                {
-                    $(this).text('');
-                });
             }
         }
     });

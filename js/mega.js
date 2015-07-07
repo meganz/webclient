@@ -3525,6 +3525,7 @@ function MegaData()
         var path;
         var nodes = [];
         var paths = {};
+        var pauseTxt = '', p = '';
         if (!is_extension && !preview && !z && (dlMethod === MemoryIO || dlMethod === FlashIO))
         {
             var nf = [], cbs = [];
@@ -3614,10 +3615,13 @@ function MegaData()
                     flashhtml = '<object width="1" height="1" id="dlswf_' + htmlentities(n.h) + '" type="application/x-shockwave-flash"><param name=FlashVars value="buttonclick=1" /><param name="movie" value="' + document.location.origin + '/downloader.swf"/><param value="always" name="allowscriptaccess"><param name="wmode" value="transparent"><param value="all" name="allowNetworking"></object>';
                 }
 
-                var p = ui_paused ? 'paused' : ''
+                if (ui_paused) {
+                    p = 'paused';
+                    pauseTxt = ' (' + l[1651] + ')';
+                }
                 if (!z)
                     this.addToTransferTable('<tr id="dl_' + htmlentities(n.h) + '">'
-                        + '<td><span class="transfer-type download ' + p + '">' + l[373] + '<span class="speed"></span></span>' + flashhtml + '</td>'
+                        + '<td><span class="transfer-type download ' + p + '">' + l[373] + '<span class="speed">' + pauseTxt + '</span></span>' + flashhtml + '</td>'
                         + '<td><span class="transfer-filtype-icon ' + fileIcon(n) + '"></span><span class="tranfer-filetype-txt">' + htmlentities(n.name) + '</span></td>'
                         + '<td></td>'
                         + '<td>' + bytesToSize(n.s) + '</td>'
@@ -3637,10 +3641,13 @@ function MegaData()
             flashhtml = '<object width="1" height="1" id="dlswf_zip_' + htmlentities(z) + '" type="application/x-shockwave-flash"><param name=FlashVars value="buttonclick=1" /><param name="movie" value="' + document.location.origin + '/downloader.swf"/><param value="always" name="allowscriptaccess"><param name="wmode" value="transparent"><param value="all" name="allowNetworking"></object>';
         }
 
-        var p = ui_paused ? 'paused' : ''
+        if (ui_paused) {
+                p = 'paused';
+                pauseTxt = ' (' + l[1651] + ')';
+        }
         if (z && zipsize)
             this.addToTransferTable('<tr id="zip_' + zipid + '">'
-                + '<td><span class="transfer-type download' + p + '">' + l[373] + '<span class="speed"></span></span>' + flashhtml + '</td>'
+                + '<td><span class="transfer-type download' + p + '">' + l[373] + '<span class="speed">' + pauseTxt + '</span></span>' + flashhtml + '</td>'
                 + '<td><span class="transfer-filtype-icon ' + fileIcon({name: 'archive.zip'}) + '"></span><span class="tranfer-filetype-txt">' + htmlentities(zipname) + '</span></td>'
                 + '<td></td>'
                 + '<td>' + bytesToSize(zipsize) + '</td>'
@@ -4032,7 +4039,8 @@ function MegaData()
         }
     };
 
-    var __ul_id = 8000;
+    var __ul_id = 8000,
+        pauseTxt = '';
     this.addUpload = function(u, ignoreWarning) {
 
         /*if (u.length > 99 && !ignoreWarning) {
@@ -4061,11 +4069,13 @@ function MegaData()
             }
             f.target = target;
             f.id = ul_id;
-
-            pause = ui_paused ? 'paused' : '';
+            if (ui_paused) {
+                pause = 'paused';
+                pauseTxt = ' (' + l[1651] + ')';
+            }
             this.addToTransferTable(
                 '<tr id="ul_' + ul_id + '">'
-                + '<td><span class="transfer-type upload ' + pause + '">' + l[372] + '<span class="speed"></span></span></td>'
+                + '<td><span class="transfer-type upload ' + pause + '">' + l[372] + '<span class="speed">' + pauseTxt + '</span></span></td>'
                 + '<td><span class="transfer-filtype-icon ' + fileIcon({name: f.name}) + '"></span><span class="tranfer-filetype-txt">' + htmlentities(f.name) + '</span></td>'
                 + '<td></td>'
                 + '<td>' + bytesToSize(f.size) + '</td>'
@@ -4187,7 +4197,7 @@ function MegaData()
         }
         $('.transfer-table #ul_' + id + ' td:eq(5)').html('<span class="transfer-status completed">' + l[554] + '</span>');
         $('.transfer-table #ul_' + id + ' td:eq(2)').text('');
-        $('.transfer-table #ul' + id + ' td:eq(0) span.transfer-type').html(l[1501]);
+        $('.transfer-table #ul_' + id + ' td:eq(0) span.transfer-type').html(l[1501]);
         ul_queue[ul.pos] = Object.freeze({});
         var a=ul_queue.filter(isQueueActive).length;
         if (a < 2 && !ul_uploading)

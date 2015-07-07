@@ -119,7 +119,7 @@ function MegaDB(name, suffix, schema, options) {
 
             if (!dbError) {
                 dbError = e;
-                self.logger.error('Unexpected error', dbError);
+                self.logger.error('Unexpected error', dbError.reason || dbError);
             }
 
             if (dbError.name === 'VersionError' || dbError.name === 'InvalidAccessError') {
@@ -167,15 +167,27 @@ MegaDB.getDatabaseVersion = function(dbName) {
             var ver = idb.version;
 
             idb.close();
-            promise.resolve({
-                name: dbName,
-                version: ver,
-                gdbvSucceed: true
-            });
+            if (promise) {
+                promise.resolve({
+                    name: dbName,
+                    version: ver,
+                    gdbvSucceed: true
+                });
+                promise = null;
+            }
         };
         request.onblocked = request.onerror = function(e) {
-            promise.reject(e);
+            if (promise) {
+                promise.reject(e);
+                promise = null;
+            }
         };
+        setTimeout(function _gdbvTimeout() {
+            if (promise) {
+                promise.reject(DOMException.TIMEOUT_ERR);
+                promise = null;
+            }
+        }, 7200);
     }
     catch(e) {
         promise.reject(e);

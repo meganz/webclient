@@ -3772,7 +3772,8 @@ function MegaData()
         else
             id = 'dl_' + id;
         $('.transfer-table #' + id + ' td:eq(5)').html('<span class="transfer-status completed">' + l[554] + '</span>');
-        $('.transfer-table #' + id + ' td:eq(2)').text('');
+		$('.transfer-table #' + id + ' td:eq(5)').html('<span class="transfer-status completed">' + l[554] + '</span>');
+        $('.transfer-table #' + id + ' td:eq(0) span.transfer-type').html(l[1495]);
 
         var p = ui_paused ? 'paused' : ''
         if ($('#dlswf_' + id.replace('dl_', '')).length > 0)
@@ -4186,6 +4187,7 @@ function MegaData()
         }
         $('.transfer-table #ul_' + id + ' td:eq(5)').html('<span class="transfer-status completed">' + l[554] + '</span>');
         $('.transfer-table #ul_' + id + ' td:eq(2)').text('');
+		$('.transfer-table #ul' + id + ' td:eq(0) span.transfer-type').html(l[1501]);
         ul_queue[ul.pos] = Object.freeze({});
         var a=ul_queue.filter(isQueueActive).length;
         if (a < 2 && !ul_uploading)

@@ -554,7 +554,7 @@ label span.black {
 	margin: 0 0 0 0 !important;
 }
 .progress-block {
-	margin: 6px 10px 1px 1px;
+	margin: 6px 10px 1px 0;
 }
 .progressbarfill {
 	height: 6px !important;
@@ -6518,6 +6518,12 @@ table {
 	background-repeat: no-repeat;
 	display: block;
 }
+.transfer-type .speed {
+	text-transform: lowercase;
+}
+.transfer-type:first-letter, .transfer-status:first-letter {
+    text-transform: uppercase;
+}
 .transfer-type.safari-downloaded {
 	background-position: -7px -4064px;
 	color: #d32200;
@@ -6529,7 +6535,7 @@ table {
 	background-position: -7px -3538px;
 }
 .transfer-status.completed {
-	background-position: -9px -4094px;
+	background-position: -9px -4095px;
 	padding: 0 0 0 21px;
 }
 .transfer-status.queued {

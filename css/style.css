@@ -23119,17 +23119,15 @@ a.voucher-reseller-link {
 	background-color: #D90007;
 }
 .voucher-redeem-now {
-	margin: 24px 6px 0 0;
-	border: 2px solid #6A6A6A;
-	background-color: #6A6A6A;
-	color: white;
-	left: 0;
-	letter-spacing: .4px;
+    border: 2px solid #6a6a6a;
+    color: #6a6a6a;
+    left: 0;
+    letter-spacing: 0.4px;
+    margin: 24px 6px 0 0;
 }
 .voucher-redeem-now:hover {
-	color: white;
-	background-color: #6A6A6A;
-	box-shadow: 0 0 0px 4px #A5A5A5;
+    background-color: #6a6a6a;
+    color: white;
 }
 .voucher-dialog-body .fm-account-input {
 	margin: 0 0 0 0;
@@ -23149,9 +23147,6 @@ a.voucher-reseller-link {
 }
 .voucher-dialog-td:nth-child(1) {
 	width: 0;
-}
-.voucher-dialog-td:nth-child(2) {
-	width: 166px;
 }
 .redeem .voucher-dialog-td:nth-child(1) {
 	width: 254px;

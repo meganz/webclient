@@ -264,22 +264,6 @@ function pro_continue(e)
 
         }}, true);
     }
-    /*
-    // Warn them about insufficient funds
-    else if (prepaidMethodSelected && (parseFloat(pro_balance) < parseFloat(selectedPlanPrice))) {
-        msgDialog('warninga', l[6804], l[6805], false, false);
-    }
-
-    // Ask for confirmation to use their prepaid funds
-    else if (prepaidMethodSelected && (parseFloat(pro_balance) >= parseFloat(selectedPlanPrice))) {
-
-        msgDialog('confirmation', l[504], l[5844], false, function(event) {
-            if (event) {
-                pro_paymentmethod = 'pro_prepaid';
-                pro_pay();
-            }
-        });
-    }*/
     else {
         pro_paymentmethod = selectedPaymentMethod;
         
@@ -667,7 +651,7 @@ var proPage = {
         },
         {
             apiGatewayId: 0,
-            displayName: l[504],            // Prepaid balance
+            displayName: l[428],            // Vouchers
             supportsRecurring: false,
             supportsMonthlyPayment: true,
             supportsAnnualPayment: true,
@@ -1012,7 +996,27 @@ var proPage = {
             proPage.updateTextDependingOnRecurring();
             proPage.updatePeriodOptionsOnPaymentMethodChange();
         });
-    }
+    },
+    
+    /**
+     * Gets the wording for the plan subscription duration in months or years
+     * @param {Number} numOfMonths The number of months
+     * @returns {String} Returns the number of months e.g. '1 month', '1 year'
+     */
+    getNumOfMonthsWording: function(numOfMonths) {
+        
+        var monthsWording = l[922];     // 1 month
+
+        // Change wording depending on number of months
+        if (numOfMonths === 12) {
+            monthsWording = l[923];     // 1 year
+        }
+        else if (numOfMonths > 1) {
+            monthsWording = l[6803].replace('%1', numOfMonths);     // x months
+        }
+        
+        return monthsWording;
+    },
 };
 
 /**
@@ -1023,8 +1027,14 @@ var voucherDialog = {
     $dialog: null,
     $backgroundOverlay: null,
     
+    /**
+     * Initialisation of the dialog
+     */
     init: function() {
         this.showVoucherDialog();
+        this.initCloseButton();
+        this.setDialogDetails();
+        this.initPurchaseButton();
     },
     
     /**
@@ -1039,8 +1049,77 @@ var voucherDialog = {
         // Add the styling for the overlay
         this.$dialog.removeClass('hidden');
         this.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+    },
+    
+    /**
+     * Set voucher dialog details on load
+     */
+    setDialogDetails: function() {
         
+        // Get the selected Pro plan details
+        var proNum = selectedProPackage[1];
+        var proPlan = getProPlan(proNum);
+        var proPrice = selectedProPackage[5];
+        var numOfMonths = selectedProPackage[4];
+        var monthsWording = proPage.getNumOfMonthsWording(numOfMonths);
         
+        // Update template
+        this.$dialog.find('.plan-icon').removeClass('pro1 pro2 pro3 pro4').addClass('pro' + proNum);
+        this.$dialog.find('.voucher-plan-title').text(proPlan);
+        this.$dialog.find('.voucher-plan-txt .duration').text(monthsWording);
+        this.$dialog.find('.voucher-plan-price .price').text(proPrice);
+        this.$dialog.find('.voucher-account-balance .balance').text(pro_balance);
+    },
+    
+    /**
+     * Functionality for the close button
+     */
+    initCloseButton: function() {
+        
+         // Initialise the close button
+        this.$dialog.find('.btn-close-dialog').rebind('click', function() {
+            
+            // Hide the overlay and dialog
+            voucherDialog.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+            voucherDialog.$dialog.addClass('hidden');
+        });
+        
+        // Prevent close of dialog from clicking outside the dialog
+        $('.fm-dialog-overlay.payment-dialog-overlay').rebind('click', function(event) {
+            event.stopPropagation();
+        });
+    },
+    
+    /**
+     * Purchase using account balance when the button is clicked inside the Voucher dialog
+     */
+    initPurchaseButton: function() {
+        
+        // On Purchase button click run the purchase process
+        this.$dialog.find('.voucher-buy-now').rebind('click', function() {
+            
+            // Get which plan is selected
+            var selectedProPackageIndex = $('.membership-dropdown-item.selected').attr('data-plan-index');
+
+            // Set the pro package (used in pro_pay function)
+            selectedProPackage = membershipPlans[selectedProPackageIndex];
+
+            // Get the plan price
+            var selectedPlanPrice = selectedProPackage[5];
+    
+            // Warn them about insufficient funds
+            if ((parseFloat(pro_balance) < parseFloat(selectedPlanPrice))) {
+                
+                // Show warning and re-apply the background
+                msgDialog('warninga', l[6804], l[6805], '', function() {
+                    voucherDialog.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+                });
+            }
+            else {
+                pro_paymentmethod = 'pro_prepaid';
+                pro_pay();
+            }
+        });
     }
 };
 
@@ -1202,15 +1281,7 @@ var cardDialog = {
         var proPlan = getProPlan(proNum);
         var proPrice = selectedProPackage[5];
         var numOfMonths = selectedProPackage[4];
-        var monthsWording = l[922];     // 1 month
-
-        // Change wording depending on number of months
-        if (numOfMonths === 12) {
-            monthsWording = l[923];     // 1 year
-        }
-        else if (numOfMonths > 1) {
-            monthsWording = l[6803].replace('%1', numOfMonths);     // x months
-        }
+        var monthsWording = proPage.getNumOfMonthsWording(numOfMonths);
         
         // Update the Pro plan details
         this.$dialog.find('.plan-icon').removeClass('pro1 pro2 pro3 pro4').addClass('pro' + proNum);

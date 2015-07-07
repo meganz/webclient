@@ -3621,10 +3621,10 @@ function MegaData()
                         + '<td><span class="transfer-filtype-icon ' + fileIcon(n) + '"></span><span class="tranfer-filetype-txt">' + htmlentities(n.name) + '</span></td>'
                         + '<td></td>'
                         + '<td>' + bytesToSize(n.s) + '</td>'
-					    + '<td>' + filetype(n.name) + '</td>'
+                        + '<td>' + filetype(n.name) + '</td>'
                         + '<td><span class="transfer-status queued">Queued</span></td>'
                         + '<td class="grid-url-field"><a class="grid-url-arrow"><span></span></a><a class="clear-transfer-icon"><span></span></a></td>'
-					    + '<td><span class="row-number"></span></td>'
+                        + '<td><span class="row-number"></span></td>'
                         + '</tr>');
             }
         }
@@ -3647,7 +3647,7 @@ function MegaData()
                 + '<td>' + filetype({name: 'archive.zip'}) + '</td>'
                 + '<td><span class="transfer-status queued">Queued</span></td>'
                 + '<td class="grid-url-field"><a class="grid-url-arrow"><span></span></a><a class="clear-transfer-icon"><span></span></a></td>'
-				+ '<td><span class="row-number"></span></td>'
+                + '<td><span class="row-number"></span></td>'
                 + '</tr>');
 
 //        $('.tranfer-view-icon').addClass('active');
@@ -3772,7 +3772,7 @@ function MegaData()
         else
             id = 'dl_' + id;
         $('.transfer-table #' + id + ' td:eq(5)').html('<span class="transfer-status completed">' + l[554] + '</span>');
-		$('.transfer-table #' + id + ' td:eq(5)').html('<span class="transfer-status completed">' + l[554] + '</span>');
+        $('.transfer-table #' + id + ' td:eq(5)').html('<span class="transfer-status completed">' + l[554] + '</span>');
         $('.transfer-table #' + id + ' td:eq(0) span.transfer-type').html(l[1495]);
 
         var p = ui_paused ? 'paused' : ''
@@ -3961,7 +3961,7 @@ function MegaData()
         var target = gid[0] === 'u'
             ? $('.transfer-table tr[id^="ul"] .transfer-status.queued:last')
             : $('.transfer-table tr:not([id^="ul"]) .transfer-status.queued:last'),
-			transfersLength = $('.transfer-table tr').length;
+            transfersLength = $('.transfer-table tr').length;
 
         if (target.length)
             target.closest('tr').after(elem);
@@ -4072,7 +4072,7 @@ function MegaData()
                 + '<td>' + filetype(f.name) + '</td>'
                 + '<td><span class="transfer-status queued">Queued</span></td>'
                 + '<td class="grid-url-field"><a class="grid-url-arrow"><span></span></a><a class="clear-transfer-icon"><span></span></a></td>'
-				+ '<td><span class="row-number"></span></td>'
+                + '<td><span class="row-number"></span></td>'
                 + '</tr>');
             ul_queue.push(f);
 
@@ -4092,7 +4092,7 @@ function MegaData()
         if ((ul_uploading = !!ul_queue.length)) {
             $('.transfer-pause-icon').removeClass('disabled');
             $('.transfer-clear-completed').removeClass('disabled');
-		    $('.transfer-clear-all-icon').removeClass('disabled');
+            $('.transfer-clear-all-icon').removeClass('disabled');
         }
     }
 
@@ -4187,7 +4187,7 @@ function MegaData()
         }
         $('.transfer-table #ul_' + id + ' td:eq(5)').html('<span class="transfer-status completed">' + l[554] + '</span>');
         $('.transfer-table #ul_' + id + ' td:eq(2)').text('');
-		$('.transfer-table #ul' + id + ' td:eq(0) span.transfer-type').html(l[1501]);
+        $('.transfer-table #ul' + id + ' td:eq(0) span.transfer-type').html(l[1501]);
         ul_queue[ul.pos] = Object.freeze({});
         var a=ul_queue.filter(isQueueActive).length;
         if (a < 2 && !ul_uploading)

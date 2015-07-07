@@ -1237,7 +1237,7 @@ function openTransferpanel()
         var target = $(this).closest('tr');
         e.preventDefault();
         e.stopPropagation(); // do not treat it as a regular click on the file
-		target.addClass('ui-selected');
+        target.addClass('ui-selected');
         e.currentTarget = target;
         transferPanelContextMenu(target);
         contextMenuUI(e);
@@ -1248,7 +1248,7 @@ function openTransferpanel()
         var target = $(this).closest('tr');
         e.preventDefault();
         e.stopPropagation();
-		target.addClass('ui-selected');
+        target.addClass('ui-selected');
         var toabort = {};
         $('.transfer-table tr.ui-selected').not('.clone-of-header').each(function(j, el)
         {
@@ -2531,7 +2531,8 @@ function initContextUI() {
     $(c + '.transfer-play').rebind('click', function() {
         $('.transfer-table tr.ui-selected').not('.clone-of-header').each(function(j, el) {
             var id = $(this).attr('id');
-            fm_tfsresume(id);
+            if (id[0] === 'u') ulQueue.resume(id);
+            else dlQueue.resume(id);
             $('span.transfer-type', this).removeClass('paused');
         });
     });
@@ -2539,7 +2540,8 @@ function initContextUI() {
     $(c + '.transfer-pause').rebind('click', function() {
         $('.transfer-table tr.ui-selected').not('.clone-of-header').each(function(j, el) {
             var id = $(this).attr('id');
-            fm_tfspause(id);
+            if (id[0] === 'u') ulQueue.pause(id);
+            else dlQueue.pause(id);
             $('span.transfer-type', this).addClass('paused');
         });
     });
@@ -4646,6 +4648,7 @@ var SelectionManager = function($selectable) {
         $(window).trigger('dynlist.flush');
         var $selectable_containers = $(
             [
+                ".fm-transfers-block",
                 ".fm-blocks-view.fm",
                 ".fm-blocks-view.contacts-view",
                 ".files-grid-view.fm",
@@ -4661,7 +4664,8 @@ var SelectionManager = function($selectable) {
                 ".file-block",
                 "tr.ui-draggable",
                 "tr.ui-selectee",
-                ".contact-block-view.ui-draggable"
+                ".contact-block-view.ui-draggable",
+                ".transfer-table tr:not(.clone-of-header)"
             ].join(","),
             $selectable_containers
             ).filter(":visible");
@@ -5410,19 +5414,23 @@ function transferPanelUI()
             $('.transfer-panel-empty-txt').addClass('hidden');
             tth.show(0);
         }
+    
+        $('.transfer-scrolling-table').rebind('click contextmenu', function(e)
+        {
+            if (!$(e.target).closest('.transfer-table').length) {
+                $('.transfer-table tr').removeClass('ui-selected');
+            }
+        });
 
         $('.transfer-table tr').rebind('click contextmenu', function(e)
         {
             $('.ui-selected').filter(function() {
-                return $(this).parents('.transfer-table').length == 0;
+                return $(this).parent('.transfer-table').length;
             }).removeClass('ui-selected');
 
             if (e.type == 'contextmenu')
             {
                 transferPanelContextMenu($(this));
-                var c = $(this).attr('class');
-                if (!c || (c && c.indexOf('ui-selected') == -1))
-                    $('.transfer-table tr').removeClass('ui-selected');
                 $(this).addClass('ui-selected');
                 $(this).addClass('dragover');
                 return !!contextMenuUI(e);
@@ -5545,8 +5553,8 @@ function transferPanelUI()
                     $(this).remove();
                     $.clearTransferPanel();
                 });
-				$('.nw-fm-left-icon.transfers').removeClass('transfering').find('p').removeAttr('style');
-				
+                $('.nw-fm-left-icon.transfers').removeClass('transfering').find('p').removeAttr('style');
+                
                 Soon(function() {
                     $(window).trigger('resize');
                 });
@@ -5576,15 +5584,15 @@ function transferPanelUI()
                 if (u_type || u_attr.terms)
                 {
                     $(this).removeClass('active').find('span').html(l[6993]);
-				    $('.transfer-table tr').not('.clone-of-header').each(function(j, el)
-        		    {
-						if (!$(el).find('.transfer-status.completed').length) {
-							var elId = $(el).attr('id');
-							if (elId[0] === 'u') ulQueue.resume(elId);
-							else dlQueue.resume(elId);
-						}
-        		    });
-		
+                    $('.transfer-table tr').not('.clone-of-header').each(function(j, el)
+                    {
+                        if (!$(el).find('.transfer-status.completed').length) {
+                            var elId = $(el).attr('id');
+                            if (elId[0] === 'u') ulQueue.resume(elId);
+                            else dlQueue.resume(elId);
+                        }
+                    });
+        
                 } else
                 {
                     alert(l[214]);
@@ -5601,13 +5609,13 @@ function transferPanelUI()
                 {
                     if (!$(el).find('.transfer-status.completed').length && !$(el).find('.transfer-type.paused').length) {
                         var elId = $(el).attr('id');
-						if (elId[0] === 'u') ulQueue.pause(elId);
-						else dlQueue.pause(elId);
-					}
+                        if (elId[0] === 'u') ulQueue.pause(elId);
+                        else dlQueue.pause(elId);
+                    }
                 });
 
                 $('.transfer-table tr span.transfer-type').addClass('paused');
-				$('.transfer-table td:eq(0) .speed').text(' (' + l[1651] + ')');
+                $('.transfer-table td:eq(0) .speed').text(' (' + l[1651] + ')');
                 $('.nw-fm-left-icon').addClass('paused');
 
                 $('.transfer-table tr td:eq(2)').each(function()

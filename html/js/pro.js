@@ -296,7 +296,7 @@ function pro_pay()
     
     // If using pre-paid credit show loading dialog
     else if (pro_paymentmethod === 'pro_prepaid') {
-        proPage.showLoadingOverlay('processing');
+        loadingDialog.show();
     }
     
     // Otherwise if credit card payment, show bouncing coin while loading
@@ -369,7 +369,7 @@ function pro_pay()
                     {
                         if (pro_paymentmethod == 'pro_prepaid')
                         {
-                            proPage.hideLoadingOverlay();
+                            loadingDialog.hide();
                             
                             if (typeof utcResult == 'number' && utcResult < 0)
                             {
@@ -1093,13 +1093,13 @@ var voucherDialog = {
         this.$dialog.find('.voucher-plan-txt .duration').text(monthsWording);
         this.$dialog.find('.voucher-plan-price .price').text(proPrice);
         this.$dialog.find('.voucher-account-balance .balance').text(balance);
-        this.$dialog.find('#voucher-code-input input').text('');
+        this.$dialog.find('#voucher-code-input input').val('');
         this.changeColourIfSufficientBalance();
         
         // Reset state to hide voucher input
-        voucherDialog.$dialog.find('.voucher-redeem-container').show();
-        voucherDialog.$dialog.find('.purchase-now-container').show();
-        voucherDialog.$dialog.find('.voucher-input-container').hide();
+        voucherDialog.$dialog.find('.voucher-input-container').fadeOut('fast', function() {
+            voucherDialog.$dialog.find('.voucher-redeem-container, .purchase-now-container').fadeIn('fast');
+        });
     },
     
     /**
@@ -1128,14 +1128,30 @@ var voucherDialog = {
         this.$dialog.find('.btn-close-dialog').rebind('click', function() {
             
             // Hide the overlay and dialog
-            voucherDialog.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
-            voucherDialog.$dialog.addClass('hidden');
+            voucherDialog.hideDialog();
         });
         
         // Prevent close of dialog from clicking outside the dialog
         $('.fm-dialog-overlay.payment-dialog-overlay').rebind('click', function(event) {
             event.stopPropagation();
         });
+    },
+    
+    /**
+     * Shows the background overlay
+     */
+    showBackgroundOverlay: function() {
+        
+        voucherDialog.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+    },
+    
+    /**
+     * Hide the overlay and dialog
+     */
+    hideDialog: function() {
+        
+        voucherDialog.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+        voucherDialog.$dialog.addClass('hidden');
     },
     
     /**
@@ -1158,12 +1174,16 @@ var voucherDialog = {
             // Warn them about insufficient funds
             if ((parseFloat(pro_balance) < parseFloat(selectedPlanPrice))) {
                 
-                // Show warning and re-apply the background
+                // Show warning and re-apply the background because the msgDialog function removes it on close
                 msgDialog('warninga', l[6804], l[6805], '', function() {
                     voucherDialog.showBackgroundOverlay();
                 });
             }
             else {
+                // Hide the overlay and dialog
+                voucherDialog.hideDialog();
+                
+                // Proceed with payment via account balance
                 pro_paymentmethod = 'pro_prepaid';
                 pro_pay();
             }
@@ -1180,18 +1200,10 @@ var voucherDialog = {
         this.$dialog.find('.voucher-redeem').rebind('click', function() {
             
             // Show voucher input
-            voucherDialog.$dialog.find('.voucher-redeem-container').hide();
-            voucherDialog.$dialog.find('.purchase-now-container').hide();
-            voucherDialog.$dialog.find('.voucher-input-container').show();
+            voucherDialog.$dialog.find('.voucher-redeem-container, .purchase-now-container').fadeOut('fast', function() {
+                voucherDialog.$dialog.find('.voucher-input-container').fadeIn();
+            });
         });
-    },
-    
-    /**
-     * Shows the background overlay
-     */
-    showBackgroundOverlay: function() {
-        
-        voucherDialog.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
     },
     
     /**
@@ -1212,6 +1224,9 @@ var voucherDialog = {
                 });
             }
             else {                
+                // Clear text box
+                voucherDialog.$dialog.find('#voucher-code-input input').val('');
+                
                 // Add the voucher
                 loadingDialog.show();
                 voucherDialog.addVoucher(voucherCode);

@@ -426,7 +426,7 @@ CallSession.prototype.onCallStarted = function(e, eventData) {
     }
 
 
-    if(self.remotePlayer) {
+    if (self.remotePlayer) {
         if (self.remotePlayer.length && self.remotePlayer.length === 1) {
             // api incompatibility ?
             self.room._othersAvElement = self.remotePlayer[0];

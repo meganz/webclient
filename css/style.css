@@ -23088,7 +23088,9 @@ a.voucher-reseller-link {
 	table-layout: fixed;
 	margin: -4px;
 }
-.voucher-buy-now, .voucher-redeem-now {
+.voucher-buy-now,
+.voucher-redeem,
+.voucher-redeem-now {
 	margin: 24px 0 0 0;
 	height: 32px;
 	border: 2px solid #D90007;
@@ -23118,14 +23120,14 @@ a.voucher-reseller-link {
 	color: white;
 	background-color: #D90007;
 }
-.voucher-redeem-now {
+.voucher-redeem, .voucher-redeem-now {
     border: 2px solid #6a6a6a;
     color: #6a6a6a;
     left: 0;
     letter-spacing: 0.4px;
     margin: 24px 6px 0 0;
 }
-.voucher-redeem-now:hover {
+.voucher-redeem:hover, .voucher-redeem-now:hover {
     background-color: #6a6a6a;
     color: white;
 }
@@ -23144,6 +23146,9 @@ a.voucher-reseller-link {
 	-moz-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
+}
+.voucher-dialog-td.voucher-input-container {
+    display: none;
 }
 .voucher-dialog-td:nth-child(1) {
 	width: 0;

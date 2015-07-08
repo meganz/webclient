@@ -630,7 +630,16 @@ var proPage = {
     loadPaymentGatewayOptions: function() {
         
         // All payment gateways for the webclient with options
-        var gatewayOptions = [
+        var gatewayOptions = [            
+        {
+            apiGatewayId: 0,
+            displayName: l[428],            // Vouchers
+            supportsRecurring: false,
+            supportsMonthlyPayment: true,
+            supportsAnnualPayment: true,
+            supportsExpensivePlans: true,
+            cssClass: 'prepaid-balance'
+        },
         {
             apiGatewayId: 8,
             displayName: l[6952],           // Credit card
@@ -648,15 +657,6 @@ var proPage = {
             supportsAnnualPayment: true,
             supportsExpensivePlans: true,
             cssClass: 'bitcoin'
-        },
-        {
-            apiGatewayId: 0,
-            displayName: l[428],            // Vouchers
-            supportsRecurring: false,
-            supportsMonthlyPayment: true,
-            supportsAnnualPayment: true,
-            supportsExpensivePlans: true,
-            cssClass: 'prepaid-balance'
         },
         {
             apiGatewayId: 5,
@@ -1016,7 +1016,7 @@ var proPage = {
         }
         
         return monthsWording;
-    },
+    }
 };
 
 /**
@@ -1035,6 +1035,7 @@ var voucherDialog = {
         this.initCloseButton();
         this.setDialogDetails();
         this.initPurchaseButton();
+        this.initRedeemVoucherButton();
     },
     
     /**
@@ -1119,6 +1120,20 @@ var voucherDialog = {
                 pro_paymentmethod = 'pro_prepaid';
                 pro_pay();
             }
+        });
+    },
+    
+    /**
+     * Functionality for the initial redeem voucher button
+     */
+    initRedeemVoucherButton: function() {
+        
+        // On redeem button click
+        this.$dialog.find('.voucher-redeem').rebind('click', function() {
+            
+            voucherDialog.$dialog.find('.voucher-redeem-container').hide();
+            voucherDialog.$dialog.find('.purchase-now-container').hide();
+            voucherDialog.$dialog.find('.voucher-input-container').show();
         });
     }
 };

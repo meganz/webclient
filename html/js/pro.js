@@ -618,10 +618,10 @@ var proPage = {
             message = l[6960];                  // Processing your payment...
         }
         else if (messageType === 'transferring') {
-            message = 'Transferring to payment provider...';    // Transferring to payment provider...
+            message = l[7203];                  // Transferring to payment provider...
         }
         else if (messageType === 'loading') {
-            message = 'Loading...';             // Loading...
+            message = l[7006];                  // Loading...
         }
         
         // Display message
@@ -1095,6 +1095,12 @@ var voucherDialog = {
         this.$dialog.find('.voucher-account-balance .balance').text(balance);
         this.$dialog.find('#voucher-code-input input').val('');
         this.changeColourIfSufficientBalance();
+        
+        // Translate text
+        var html = this.$dialog.find('.voucher-information-help').html();
+            html.replace('[A]', '<a href="#resellers" class="voucher-reseller-link">');
+            html.replace('[/A]', '</a>');
+        this.$dialog.find('.voucher-information-help').html(html);
         
         // Reset state to hide voucher input
         voucherDialog.$dialog.find('.voucher-input-container').fadeOut('fast', function() {

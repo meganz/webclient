@@ -1260,13 +1260,9 @@ function openTransferpanel()
             $(this).remove();
         });
         toabort = Object.keys(toabort);
-        toabort.forEach(function(downloadId) {
-            DownloadManager.abort(downloadId);
-            UploadManager.abort(downloadId);
-        });
-        
+        DownloadManager.abort(toabort);
+        UploadManager.abort(toabort);
         $.clearTransferPanel();
-        
         Soon(function() {
             $(window).trigger('resize');
         });
@@ -2562,10 +2558,8 @@ function initContextUI() {
         });
 
         toabort = Object.keys(toabort);
-        toabort.forEach(function(downloadId) {
-            DownloadManager.abort(downloadId);
-            UploadManager.abort(downloadId);
-        });
+        DownloadManager.abort(toabort);
+        UploadManager.abort(toabort);
         $.clearTransferPanel();
 
         Soon(function() {

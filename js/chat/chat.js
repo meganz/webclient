@@ -747,7 +747,7 @@ var Chat = function() {
             // This might throw in browsers which doesn't support Strophe/WebRTC
             this.karere = new Karere({
                 'clientName': 'mc',
-                'boshServiceUrl': function() { return self.getBoshServiceUrl(); }
+                'xmppServiceUrl': function() { return self.getXmppServiceUrl(); }
             });
         }
         catch (e) {
@@ -1689,7 +1689,7 @@ Chat.prototype.destroy = function(isLogout) {
         .done(function() {
             self.karere = new Karere({
                 'clientName': 'mc',
-                'boshServiceUrl': function() { return self.getBoshServiceUrl(); }
+                'xmppServiceUrl': function() { return self.getXmppServiceUrl(); }
             });
 
             self.is_initialized = false;
@@ -2432,11 +2432,13 @@ Chat.prototype.getChatNum = function(idx) {
  * Called when the BOSH service url is requested for Karere to connect. Should return a full URL to the actual
  * BOSH service that should be used for connecting the current user.
  */
-Chat.prototype.getBoshServiceUrl = function() {
+Chat.prototype.getXmppServiceUrl = function() {
     var self = this;
 
     if (localStorage.megaChatUseSandbox) {
         return "https://karere-005.developers.mega.co.nz/bosh";
+    } else if (localStorage.customXmppServiceUrl) {
+        return localStorage.customXmppServiceUrl;
     } else {
         var $promise = new MegaPromise();
 

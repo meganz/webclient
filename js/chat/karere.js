@@ -2,12 +2,12 @@
  * Karere - Mega XMPP Client
  */
 
-// Because of several bugs in Strophe's connection handler for Bosh (throwing uncatchable exceptions) this is currently
-// not working. We should isolate and prepare a test case to to submit as a bug to Strophe's devs.
+// Because of several bugs in Strophe's connection handler for Bosh and WebSockets (throwing uncatchable exceptions)
+// this is currently not working. We should isolate and prepare a test case to to submit as a bug to Strophe's devs.
 // Exception:
 // Uncaught InvalidStateError: Failed to execute 'send' on 'XMLHttpRequest': the object's state must be OPENED.
 
-Strophe.Bosh.prototype._hitError = function (reqStatus) {
+Strophe.Bosh.prototype._hitError = Strophe.Websocket.prototype._hitError = function (reqStatus) {
     var self = this;
     var karere = this._conn.karere;
 
@@ -235,7 +235,7 @@ Karere.DEFAULTS = {
     /**
      * Used to connect to the BOSH service endpoint
      */
-    "boshServiceUrl": 'https://sandbox.developers.mega.co.nz:5281/bosh',
+    "xmppServiceUrl": 'https://sandbox.developers.mega.co.nz:5281/bosh',
 
     /**
      * Used when /resource is not passed when calling .connect() to generate a unique new resource id
@@ -514,6 +514,12 @@ makeMetaAware(Karere);
         self.connection.reset(); // clear any old attached handlers
 
         var _doConnectTo = function() {
+            if (self.connection.service.indexOf("wss://") !== -1) {
+                self.connection._proto = new Strophe.Websocket(self.connection);
+            } else {
+                this._proto = new Strophe.Bosh(self.connection);
+            }
+
             self.connection.connect(
                 self._fullJid,
                 self._password,
@@ -598,8 +604,8 @@ makeMetaAware(Karere);
         };
 
         var remoteBoshServiceUrlPromise = false;
-        if ($.isFunction(self.options.boshServiceUrl)) {
-            var service = self.options.boshServiceUrl();
+        if ($.isFunction(self.options.xmppServiceUrl)) {
+            var service = self.options.xmppServiceUrl();
             if (service.fail && service.resolve) { // its a promise!
                 self._connectionState = Karere.CONNECTION_STATE.CONNECTING;
 
@@ -615,7 +621,7 @@ makeMetaAware(Karere);
 
         }
         else {
-            self.connection.service = self.options.boshServiceUrl;
+            self.connection.service = self.options.xmppServiceUrl;
             _doConnectTo();
         }
 

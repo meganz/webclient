@@ -1672,19 +1672,10 @@ CallManager.prototype._attachToChatRoom = function(megaChat, chatRoom) {
             eventData.continue(true);
         }
 
-        var msg = "Could not start call.";
-
-        if (eventData.error === "PermissionDeniedError" || eventData === "PermissionDeniedError") {
-            msg = "You may have forbidden camera access for that site previously " +
+        var msg = "You may have forbidden camera access for that site previously " +
             "- in this case any subsequent camera requests fail silently. You can " +
             "check the camera icon next to the address bar, or in the site" +
             " permissions settings.";
-        } else if (eventData.error === "DevicesNotFoundError") {
-            msg = "You may have forbidden camera access for that site previously - " +
-            "in this case any subsequent camera requests fail silently. You can check" +
-            " the camera icon next to the address bar, or in the site permissions " +
-            "settings.";
-        }
 
         if (!eventData.continue && chatRoom.callSession) {
             session.endCall('failed');

@@ -1393,31 +1393,28 @@ Chat.prototype.init = function() {
     // always last
 
     // trigger reconnect on mouse move
-    self.karere.bind('onDisconnected', function() {
-        if (self.karere._connectionRetryInProgress && self.karere.getConnectionState() === Karere.CONNECTION_STATE.DISCONNECTED) {
-            $(document).bind("mousemove.megaChatRetry", function() {
-                $(document).unbind("onmousemove.megaChatRetry");
-                if (self.karere._connectionRetryInProgress && self.karere.getConnectionState() === Karere.CONNECTION_STATE.DISCONNECTED) {
-                    clearTimeout(self.karere._connectionRetryInProgress);
-                    self.karere._connectionRetryInProgress = setTimeout(function () {
-                        if (
-                            self.karere._connectionRetryInProgress &&
-                            (
-                                self.karere.getConnectionState() === Karere.CONNECTION_STATE.DISCONNECTED ||
-                                self.karere.getConnectionState() === Karere.CONNECTION_STATE.AUTHFAIL ||
-                                self.karere.getConnectionState() === Karere.CONNECTION_STATE.CONNFAIL
-                            )
-                        ) {
-                            self.karere.reconnect();
-                        }
+    self.karere.unbind('onDisconnected.megaChatRetry');
+    self.karere.unbind('onConnfail.megaChatRetry');
+    self.karere.unbind('onConnectionClosed.megaChatRetry');
 
-                        if (self.karere._connectionRetryInProgress) {
-                            self.karere._connectionRetryInProgress = null;
-                        }
-                    }, rand(1500));
-                }
-            })
-        }
+    self.karere.bind(
+        'onDisconnected.megaChatRetry onConnfail.megaChatRetry onConnectionClosed.megaChatRetry',
+        function() {
+
+            if (
+                self.karere._connectionRetryInProgress &&
+                self.karere.getConnectionState() === Karere.CONNECTION_STATE.DISCONNECTED &&
+                localStorage.megaChatPresence !== "unavailable"
+            ) {
+                self.logger.warn("Will bind a mousemove to re-trigger a connection retry on mousemove.");
+
+                $(document).rebind("mousemove.megaChatRetry", function() {
+                    if (self.karere._connectionRetryUI() === true) {
+                        $(document).unbind("mousemove.megaChatRetry");
+                        self.logger.warn("Connection retry triggered because of a mousemove.");
+                    }
+                });
+            }
     });
 
     self.trigger("onInit");

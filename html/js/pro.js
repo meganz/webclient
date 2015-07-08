@@ -310,9 +310,12 @@ function pro_pay()
     var apiId = selectedProPackage[0];
     var price = selectedProPackage[5];
     var currency = selectedProPackage[6];
+    
+    // Convert from boolean to integer for API
+    var fromBandwidthDialog = (localStorage.seenBandwidthDialog) ? 1 : 0;
 
     // uts = User Transaction Sale
-    api_req({ a: 'uts', it: 0, si: apiId, p: price, c: currency, aff: aff, 'm': m }, {   
+    api_req({ a: 'uts', it: 0, si: apiId, p: price, c: currency, aff: aff, 'm': m, bq: fromBandwidthDialog }, {   
         callback: function (utsResult) {
             
             // Store the sale ID to check with API later
@@ -353,9 +356,6 @@ function pro_pay()
                     proref = sessionStorage.proref;
                 }
                 
-                // Convert from boolean to integer for API
-                var fromBandwidthDialog = (localStorage.seenBandwidthDialog) ? 1 : 0;
-
                 // utc = User Transaction Complete
                 // s = sale ID
                 // m = pro number

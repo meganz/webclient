@@ -534,7 +534,16 @@
     var open = function ( e , server , version , schema ) {
         var db = e.target.result;
         var s = new Server( db , server );
-        var upgrade;
+
+        if (db.objectStoreNames.length !== Object.keys(schema).length) {
+            // This will handle an extreme case where the DB is successfully
+            // opened but it doesn't exists... apparently caused by dropping
+            // the db while it is in use/has pending requests...
+            console.warn('Inconsistent objectStoreNames for schema', schema);
+            s.close();
+            s.destroy();
+            return Promise.reject(DOMException.HIERARCHY_REQUEST_ERR);
+        }
 
         dbCache[ server ] = db;
 
@@ -582,20 +591,36 @@
                     request.onblocked = function ( e ) {
                         // If some other tab is loaded with the database,
                         // then it needs to be closed before we can proceed.
-                        reject({ 'reason': e });
+                        if (reject) {
+                            reject({ 'reason': e });
+                            reject = resolve = null;
+                        }
                     };
 
                     request.onsuccess = function ( e ) {
-                        open( e , options.server , options.version , schema )
-                            .then(resolve, reject)
+                        if (resolve) {
+                            open( e , options.server , options.version , schema )
+                                .then(resolve, reject);
+                            reject = resolve = null;
+                        }
                     };
 
                     request.onupgradeneeded = function ( e ) {
                         createSchema( e , schema , e.target.result );
                     };
                     request.onerror = function ( e ) {
-                        reject({ 'reason': e });
+                        if (reject) {
+                            reject({ 'reason': e });
+                            reject = resolve = null;
+                        }
                     };
+
+                    setTimeout(function _dbjsOpenTimeout() {
+                        if (reject) {
+                            reject({ 'reason': DOMException.TIMEOUT_ERR });
+                            reject = resolve = null;
+                        }
+                    }, 7200);
                 }
             });
         }

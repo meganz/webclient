@@ -237,14 +237,12 @@ function pro_continue(e)
     // Selected payment method and package
     var selectedPaymentMethod = $('.membership-radio input:checked').val();
     var selectedProPackageIndex = $('.membership-dropdown-item.selected').attr('data-plan-index');
-    var prepaidMethodSelected = (selectedPaymentMethod === 'prepaid-balance') ? true : false;
 
     // Set the pro package (used in pro_pay function)
     selectedProPackage = membershipPlans[selectedProPackageIndex];
 
     // Get the months and price
     var selectedPlanMonths = selectedProPackage[4];
-    var selectedPlanPrice = selectedProPackage[5];
 
     if (selectedPlanMonths < 12) {
         pro_package = 'pro' + account_type_num + '_month';
@@ -291,9 +289,14 @@ function pro_pay()
         aff = localStorage.affid;
     }
 
-    // Only show loading dialog if needing to setup bitcoin invoice
+    // Only show old loading dialog if needing to setup bitcoin invoice
     if (pro_paymentmethod === 'bitcoin') {
         showLoadingDialog();
+    }
+    
+    // If using pre-paid credit show loading dialog
+    else if (pro_paymentmethod === 'pro_prepaid') {
+        proPage.showLoadingOverlay('processing');
     }
     
     // Otherwise if credit card payment, show bouncing coin while loading
@@ -344,7 +347,7 @@ function pro_pay()
                     // pro_m = 6;
                     // Fortumo does not do a utc request, we immediately redirect
                     fortumo.redirectToSite(saleId);
-                    return;
+                    return false;
                 }
                 
                 // Update the last payment provider ID for the 'psts' action packet. If the provider e.g. bitcoin 
@@ -366,7 +369,8 @@ function pro_pay()
                     {
                         if (pro_paymentmethod == 'pro_prepaid')
                         {
-                            loadingDialog.hide();
+                            proPage.hideLoadingOverlay();
+                            
                             if (typeof utcResult == 'number' && utcResult < 0)
                             {
                                 if (utcResult == EOVERQUOTA) {
@@ -382,7 +386,7 @@ function pro_pay()
                                 if (M.account) {
                                     M.account.lastupdate = 0;
                                 }
-                                document.location.hash = 'account';
+                                window.location.hash = 'fm/account';
                             }
                         }
                         else {
@@ -593,7 +597,7 @@ var proPage = {
     
     /**
      * Generic function to show the bouncing megacoin icon while loading
-     * @param {String} messageType Which message to display e.g. 'processing', 'transferring'
+     * @param {String} messageType Which message to display e.g. 'processing', 'transferring', 'loading'
      */
     showLoadingOverlay: function(messageType) {
         
@@ -625,6 +629,15 @@ var proPage = {
     },
     
     /**
+     * Hides the payment processing/transferring/loading overlay
+     */
+    hideLoadingOverlay: function() {
+        
+        this.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+        this.$loadingOverlay.addClass('hidden');
+    },
+    
+    /**
      * Loads the payment gateway options into Payment options section
      */
     loadPaymentGatewayOptions: function() {
@@ -633,7 +646,7 @@ var proPage = {
         var gatewayOptions = [            
         {
             apiGatewayId: 0,
-            displayName: l[428],            // Vouchers
+            displayName: l[487],            // Voucher code
             supportsRecurring: false,
             supportsMonthlyPayment: true,
             supportsAnnualPayment: true,
@@ -698,6 +711,9 @@ var proPage = {
                 
                 // Get their currently selected plan
                 var selectedPlan = $('.membership-step2 .reg-st3-membership-bl.selected').attr('data-payment');
+                var selectedPlanPrice = $('.membership-dropdown-item.selected strong').html();
+                var planPriceFloat = parseFloat(selectedPlanPrice);
+                var balanceFloat = parseFloat(pro_balance);
                 var html = '';
 
                 // Loop through gateway providers (change to use list from API soon)
@@ -712,11 +728,6 @@ var proPage = {
                         optionChecked = 'checked="checked" ';
                         classChecked = ' checked';
                     }
-
-                    // If their prepay balance is less than 0 don't show that option
-                    if ((gatewayOption.apiGatewayId === 0) && (parseFloat(pro_balance) <= 0)) {
-                        continue;
-                    }
                     
                     // If it's not the wire transfer option and not in the list of enabled gateways skip it
                     if ((gatewayOption.apiGatewayId !== null) && (validGatewayIds.indexOf(gatewayOption.apiGatewayId) === -1)) {
@@ -730,6 +741,16 @@ var proPage = {
                     if ((gatewayOption.supportsExpensivePlans === false) && (selectedPlan != 4)) {
                         disabledClass = ' disabled';
                         disabledTitleText = ' title="' + l[7162] + '"';
+                    }
+                    
+                    // If their prepay balance is less than 0 they can buy a voucher
+                    if ((gatewayOption.apiGatewayId === 0) && (balanceFloat <= 0)) {
+                        gatewayOption.displayName = l[487];     // Voucher code
+                    }
+                    
+                    // Otherwise if they have account balance, then they can use that
+                    else if ((gatewayOption.apiGatewayId === 0) && (balanceFloat >= planPriceFloat)) {
+                        gatewayOption.displayName = l[7108] + ' (' + balanceFloat.toFixed(2) + ' &euro;)';  // Balance (x.xx)
                     }
 
                     // Create a radio button with icon for each payment gateway
@@ -1036,6 +1057,7 @@ var voucherDialog = {
         this.setDialogDetails();
         this.initPurchaseButton();
         this.initRedeemVoucherButton();
+        this.initRedeemVoucherNow();
     },
     
     /**
@@ -1049,7 +1071,7 @@ var voucherDialog = {
         
         // Add the styling for the overlay
         this.$dialog.removeClass('hidden');
-        this.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+        this.showBackgroundOverlay();
     },
     
     /**
@@ -1063,13 +1085,38 @@ var voucherDialog = {
         var proPrice = selectedProPackage[5];
         var numOfMonths = selectedProPackage[4];
         var monthsWording = proPage.getNumOfMonthsWording(numOfMonths);
+        var balance = parseFloat(pro_balance).toFixed(2);
         
         // Update template
         this.$dialog.find('.plan-icon').removeClass('pro1 pro2 pro3 pro4').addClass('pro' + proNum);
         this.$dialog.find('.voucher-plan-title').text(proPlan);
         this.$dialog.find('.voucher-plan-txt .duration').text(monthsWording);
         this.$dialog.find('.voucher-plan-price .price').text(proPrice);
-        this.$dialog.find('.voucher-account-balance .balance').text(pro_balance);
+        this.$dialog.find('.voucher-account-balance .balance').text(balance);
+        this.$dialog.find('#voucher-code-input input').text('');
+        this.changeColourIfSufficientBalance();
+        
+        // Reset state to hide voucher input
+        voucherDialog.$dialog.find('.voucher-redeem-container').show();
+        voucherDialog.$dialog.find('.purchase-now-container').show();
+        voucherDialog.$dialog.find('.voucher-input-container').hide();
+    },
+    
+    /**
+     * Show green price if they have sufficient funds, or red if they need to top up
+     */
+    changeColourIfSufficientBalance: function() {
+        
+        var price = selectedProPackage[5];
+        
+        // If they have enough balance to purchase the plan, make it green
+        if (parseFloat(pro_balance) >= parseFloat(price)) {
+            this.$dialog.find('.voucher-account-balance').addClass('sufficient-funds');
+        }
+        else {
+            // Otherwise leave it as red
+            this.$dialog.find('.voucher-account-balance').removeClass('sufficient-funds');
+        }
     },
     
     /**
@@ -1113,7 +1160,7 @@ var voucherDialog = {
                 
                 // Show warning and re-apply the background
                 msgDialog('warninga', l[6804], l[6805], '', function() {
-                    voucherDialog.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+                    voucherDialog.showBackgroundOverlay();
                 });
             }
             else {
@@ -1124,16 +1171,123 @@ var voucherDialog = {
     },
     
     /**
-     * Functionality for the initial redeem voucher button
+     * Functionality for the initial redeem voucher button which shows
+     * a text box to enter the voucher code and another Redeem Voucher button
      */
     initRedeemVoucherButton: function() {
         
         // On redeem button click
         this.$dialog.find('.voucher-redeem').rebind('click', function() {
             
+            // Show voucher input
             voucherDialog.$dialog.find('.voucher-redeem-container').hide();
             voucherDialog.$dialog.find('.purchase-now-container').hide();
             voucherDialog.$dialog.find('.voucher-input-container').show();
+        });
+    },
+    
+    /**
+     * Shows the background overlay
+     */
+    showBackgroundOverlay: function() {
+        
+        voucherDialog.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+    },
+    
+    /**
+     * Redeems the voucher
+     */
+    initRedeemVoucherNow: function() {
+        
+        // On redeem button click
+        this.$dialog.find('.voucher-redeem-now').rebind('click', function() {
+            
+            // Get the voucher code from the input
+            var voucherCode = voucherDialog.$dialog.find('#voucher-code-input input').val();
+            
+            // If empty voucher show message Error - Please enter your voucher code
+            if (voucherCode == '') {
+                msgDialog('warninga', l[135], l[1015], '', function() {
+                    voucherDialog.showBackgroundOverlay();
+                });
+            }
+            else {                
+                // Add the voucher
+                loadingDialog.show();
+                voucherDialog.addVoucher(voucherCode);
+            }
+        });
+    },
+    
+    /**
+     * Redeems the voucher code
+     * @param {String} voucherCode The voucher code
+     */
+    addVoucher: function(voucherCode) {
+        
+        // Make API call to add voucher
+        api_req({ a: 'uavr', v: voucherCode },
+        {
+            callback: function(result, ctx)
+            {
+                if (typeof result === 'number')
+                {
+                    // This voucher has already been redeemed
+                    if (result == -11) {
+                        loadingDialog.hide();
+                        msgDialog('warninga', l[135], l[714], '', function() {
+                            voucherDialog.showBackgroundOverlay();
+                        });
+                    }
+
+                    // Not a valid voucher code
+                    else if (result < 0) {
+                        loadingDialog.hide();
+                        msgDialog('warninga', l[135], l[714], '', function() {
+                            voucherDialog.showBackgroundOverlay();
+                        });
+                    }
+                    else {
+                        // Get the latest account balance and update the price in the dialog
+                        voucherDialog.getLatestBalance();
+                    }
+                }
+            }
+        });
+    },
+    
+    /**
+     * Gets the latest Pro balance from the API
+     */
+    getLatestBalance: function() {
+        
+        // Flag 'pro: 1' includes pro balance in the response
+        api_req({ a: 'uq', pro: 1 }, {
+            callback : function (result) {
+                
+                // Hide loading dialog
+                loadingDialog.hide();
+                
+                // If successful result
+                if (typeof result == 'object' && result.balance && result.balance[0]) {
+                    
+                    // Update the balance
+                    var balance = parseFloat(result.balance[0][0]);
+                    var balanceString = balance.toFixed(2);
+                    
+                    // Update for pro_pay
+                    pro_balance = balance;
+                    
+                    // Update dialog details
+                    voucherDialog.$dialog.find('.voucher-account-balance .balance').text(balanceString);
+                    voucherDialog.changeColourIfSufficientBalance();
+                    
+                    // Hide voucher input
+                    voucherDialog.$dialog.find('.voucher-redeem-container').show();
+                    voucherDialog.$dialog.find('.purchase-now-container').show();
+                    voucherDialog.$dialog.find('.voucher-input-container').hide();
+                }
+            }
         });
     }
 };

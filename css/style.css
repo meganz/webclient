@@ -5614,6 +5614,9 @@ th.grid-first-th {
 .grid-table tr.ui-selected td, .grid-share-table tr.ui-selected td, .contacts-grid-table tr.ui-selected td, .contact-requests-grid tr.ui-selected td, .sent-requests-grid tr.ui-selected td, .grid-table tr.ui-selected:nth-child(odd) td, .grid-share-table tr.ui-selected:nth-child(odd) td, .contacts-grid-table tr.ui-selected:nth-child(odd) td, .contact-requests-grid tr.ui-selected:nth-child(odd) td, .sent-requests-grid tr.ui-selected:nth-child(odd) td, .transfer-table tr.ui-selected:nth-child(odd) td, .transfer-table tr.ui-selected td, .grid-table tr.ui-selecting td, .grid-share-table tr.ui-selecting td, .contacts-grid-table tr.ui-selecting td, .contact-requests-grid tr.ui-selecting td, .sent-requests-grid tr.ui-selecting td, .grid-table tr.ui-selecting:nth-child(odd) td, .grid-share-table tr.ui-selecting:nth-child(odd) td, .contacts-grid-table tr.ui-selecting:nth-child(odd) td, .contact-requests-grid tr.ui-selecting:nth-child(odd) td, .sent-requests-grid tr.ui-selecting:nth-child(odd) td, .transfer-table tr.ui-selecting:nth-child(odd) td, .transfer-table tr.ui-selecting td {
 	background-color: rgba(233,233,233,1);
 }
+.grid-table.vouchers tr td:first-child {
+	padding-left: 12px;
+}
 .grid-table tr td:first-child, .grid-share-table tr td:first-child, .contacts-grid-table tr td:first-child {
 	padding: 0;
 }
@@ -23053,6 +23056,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
     font-size: 36px;
     padding: 3px 10px 0 0;
 }
+.voucher-account-balance.sufficient-funds {
+    color: green;
+}
 .voucher-block {
 	-moz-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
@@ -23124,7 +23130,6 @@ a.voucher-reseller-link {
     border: 2px solid #6a6a6a;
     color: #6a6a6a;
     left: 0;
-    letter-spacing: 0.4px;
     margin: 24px 6px 0 0;
 }
 .voucher-redeem:hover, .voucher-redeem-now:hover {
@@ -23147,23 +23152,32 @@ a.voucher-reseller-link {
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
 }
-.voucher-dialog-td.voucher-input-container {
-    display: none;
-}
-.voucher-dialog-td:nth-child(1) {
-	width: 0;
-}
-.redeem .voucher-dialog-td:nth-child(1) {
-	width: 254px;
-}
-.redeem .voucher-dialog-td:nth-child(3) {
-	width: 0;
-}
 .redeem .voucher-redeem-now {
 	margin: 24px 0 0 6px;
 }
 .payment-eurosign {
 	font-size: 24px;
+}
+.voucher-input-container {
+    display: none;
+    height: auto;
+    margin-top: 30px;
+    padding-bottom: 35px;
+    position: relative;
+}
+.voucher-input-container .fm-account-input {
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 250px;
+}
+.voucher-input-container .voucher-redeem-now {
+    left: auto;
+    margin: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 157px;
 }
 
 /* CC payment dialog */

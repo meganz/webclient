@@ -2741,15 +2741,15 @@
     "6329": "Take this link for example:  (This is just a sample picture from my account, you can try these links to understand how it works) ",
     "6330": "https:\/\/mega.co.nz\/#!qIB1UICR!Wwhs4wI9ifAMDLISZgHwNV9fyA1JWbauAPepZUQoB00 - If you click on the link above, you can share it with others straight away, or you could send it the link split up (which would add more security, as the end user would need both the link and the key to get the file to download.) ",
     "6331": "https:\/\/mega.co.nz\/#!qIB1UICR 'Liamm ar Fichennaoueg' eo ar rannad-ma\u00f1",
-    "6332": "Wwhs4wI9ifAMDLISZgHwNV9fyA1JWbauAPepZUQoB00 - This portion is the 'File Key' (You can see that this is just the second half of the complete link) ",
-    "6333": "If you click on the short link, it will ask you for the file (decryption) key, which is where you just paste the second half of the link into, thus unlocking the file, and making it retrievable. ",
+    "6332": "Wwhs4wI9ifAMDLISZgHwNV9fyA1JWbauAPepZUQoB00 - Ar 'fichennaoueg alc'hwez' eo al lodenn-ma\u00f1 (gallout a reer  gwelout eo eil hanterenn al liamm klok.)",
+    "6333": "Pa klikit war al liamm berr e vo goulennet alc'hwez (dikripta\u00f1) ar fichennaoueg diganeoc'h ha n'ho po ket ket nemet pega\u00f1 eil hanterenn al liamm e-barzh. Se a dibrenno ar fichennaoueg, a c'hello bout adtapet. ",
     "6334": "If you don't have the decryption key to a file that was shared with you - you will need to get the key from the generator of the link. The user who uploaded and shared the data.",
     "6335": "The streaming feature of audio and video file types is already possible on the MEGA iOS app and in our Android app. We are currently working on implementation for BlackBerry app, Windows Phone app as well as in-browser. ",
     "6336": "The preview feature of image file types is now possible in both most compatible browsers Mozilla Firefox (+ MEGA extension https:\/\/mega.nz\/#firefox) and Google Chrome (+ MEGA extension https:\/\/mega.nz\/#chrome). ",
     "6337": "Because encrypted in-browser video streaming and document preview deployment is going to be very difficult, so it will be more of a later-stage feature.",
     "6338": "What you can do is to connect the two accounts through a share. You can only share folders, so you need to put all files and folders under one master folder in your file manager (In the account with the data in it). Lets call this Account 1. ",
     "6339": "Then right-click on the master folder, which has all your other folders and files in it, and select 'sharing' and add Account 2 email address and grant full access. You can then log into Account 2 and you will see the folder available to you in 'Incoming Shares' area.",
-    "6340": "You can have both Account 1 and Account 2 open in different tabs to make things easier. ",
+    "6340": "Gallout a rit kaout ur c'hont 1 hag ur c'hont 2 digoret a-gevret e ivinenno\u00f9 dishe\u00f1vel a-benn lakaat aesetoc'h an trao\u00f9.",
     "6341": "That is the sharing method, you can also achieve the same outcome by generating a link for yourself to follow : ",
     "6342": "Generate Link method : ",
     "6343": "You can right click on the files within the folder (or the whole folder) and select 'Get Link & Key', then open up a new tab, copy and paste these links into browser, and it will bring up an option to 'Import'. From there, you log into Account 2, refresh the page, and all the files form the master folder will now have been imported into your Account 2. ",
@@ -3606,5 +3606,8 @@
     "7197": "CVV",
     "7198": "Account successfully upgraded!",
     "7199": "The operation has not finished correctly. The credit card will not be charged.",
-    "7200": "The credit card information is not correct. The credit card will not be charged."
+    "7200": "The credit card information is not correct. The credit card will not be charged.",
+    "7201": "Your account balance is",
+    "7202": "To increase your balance, click the Redeem Voucher button and enter your voucher code. If you don't have a voucher, please [A]purchase a voucher[\/A].",
+    "7203": "Transferring to payment provider..."
 }

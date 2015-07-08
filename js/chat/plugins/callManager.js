@@ -115,7 +115,7 @@ CallSession.prototype.onRemoteStreamReceived = function(e, eventData) {
 
     if (!$.isArray(eventData.player)) {
         self.remotePlayer = eventData.player;
-    } else {
+    } else if (eventData.player) {
         self.remotePlayer = eventData.player[0];
     }
 };
@@ -426,11 +426,13 @@ CallSession.prototype.onCallStarted = function(e, eventData) {
     }
 
 
-    if (self.remotePlayer.length && self.remotePlayer.length === 1) {
-        // api incompatibility ?
-        self.room._othersAvElement = self.remotePlayer[0];
-    } else {
-        self.room._othersAvElement = self.remotePlayer;
+    if(self.remotePlayer) {
+        if (self.remotePlayer.length && self.remotePlayer.length === 1) {
+            // api incompatibility ?
+            self.room._othersAvElement = self.remotePlayer[0];
+        } else {
+            self.room._othersAvElement = self.remotePlayer;
+        }
     }
 
     self.room.megaChat.dumpCallStats = self.room.dumpCallStats = function() {
@@ -549,24 +551,40 @@ CallSession.prototype.onCallEnded = function(e, reason) {
     self.getCallManager().trigger('CallTerminated', [self, e]);
 };
 
-CallSession.prototype.onCallRejected = function(e) {
+CallSession.prototype.onCallRejected = function(e, reason) {
     var self = this;
 
     var peer = self.room.getParticipantsExceptMe()[0];
 
-    // Show "Call with [X] was rejected."
-    // ^^ should this should be changed to "canceled", not "rejected"?
-    var msg = l[5892].replace('[X]', self.room.megaChat.getContactNameFromJid(peer));
+    if (reason === "caller") {
+        // Show "Call with [X] was canceled."
+        // ^^ should this should be changed to "canceled", not "rejected"?
+        var msg = "Call with [X] was canceled".replace('[X]', self.room.megaChat.getContactNameFromJid(peer));
 
-    self.room.appendDomMessage(
-        self.room.generateInlineDialog(
-            "rejected-call-" + unixtime(),
-            peer,
-            "rejected-call",
-            msg,
-            []
-        )
-    );
+        self.room.appendDomMessage(
+            self.room.generateInlineDialog(
+                "ended-call-" + unixtime(),
+                peer,
+                "call-ended",
+                msg,
+                []
+            )
+        );
+    } else {
+        // Show "Call with [X] was rejected."
+        // ^^ should this should be changed to "canceled", not "rejected"?
+        var msg = l[5892].replace('[X]', self.room.megaChat.getContactNameFromJid(peer));
+
+        self.room.appendDomMessage(
+            self.room.generateInlineDialog(
+                "rejected-call-" + unixtime(),
+                peer,
+                "rejected-call",
+                msg,
+                []
+            )
+        );
+    }
 
     self.getCallManager().trigger('CallTerminated', [self, e]);
 };
@@ -694,16 +712,16 @@ CallSession.prototype.endCall = function(reason) {
         if (self.answer && self.reqStillValid && self.reqStillValid()) {
             if (reason === 'failed') {
                 self.setState(CallSession.STATE.FAILED);
-                self.getCallManager().trigger('CallFailed', [self]);
+                self.getCallManager().trigger('CallFailed', [self, reason]);
                 return self.answer(false, {reason: reason});
             } else {
                 self.setState(CallSession.STATE.MISSED);
-                self.getCallManager().trigger('CallMissed', [self]);
+                self.getCallManager().trigger('CallMissed', [self, reason]);
                 return self.answer(false, {reason: reason});
             }
         } else if (self.cancel) {
             self.setState(CallSession.STATE.REJECTED);
-            self.getCallManager().trigger('CallRejected', [self]);
+            self.getCallManager().trigger('CallRejected', [self, reason]);
             return self.cancel();
         } else {
             // no need to trigger event, the RTC module will trigger it, when receiving the session ended stanzas
@@ -876,8 +894,21 @@ CallSession.prototype.getJingleSession = function() {
 };
 
 CallSession.prototype.getPeer = function() {
-    return this.getJingleSession().peerJid();
+    var jingleSession = this.getJingleSession();
+    if (jingleSession && jingleSession.peerJid) {
+        return jingleSession.peerJid();
+    } else if (this.state === CallSession.STATE.WAITING_RESPONSE_OUTGOING) {
+        // jingleSession.peerJid === undefined
+        if (this.room) {
+            return this.room.getParticipantsExceptMe()[0];
+        } else {
+            assert(false, "Failed to get peerJid [1]");
+        }
+    } else {
+        assert(false, "Failed to get peerJid [2]");
+    }
 };
+
 CallSession.prototype.getMediaOptions = function() {
     return this.getJingleSession().sentMediaTypes();
 };
@@ -1473,6 +1504,14 @@ CallManager.prototype._attachToChatRoom = function(megaChat, chatRoom) {
         var session = self.getOrCreateSessionFromEventData(e.type, eventData, chatRoom);
         session.setState(CallSession.STATE.STARTING);
         self.trigger('CallStarting', [session]);
+
+        var remoteMediaOpts = session.getRemoteMediaOptions();
+
+        if (remoteMediaOpts && remoteMediaOpts.audio === false && remoteMediaOpts.video === false) {
+            session.setState(CallSession.STATE.STARTED);
+            self.trigger('RemoteStreamReceived', [session, eventData]);
+            self.trigger('CallStarted', [session, eventData]);
+        }
     });
 
 
@@ -1640,21 +1679,16 @@ CallManager.prototype._attachToChatRoom = function(megaChat, chatRoom) {
             "- in this case any subsequent camera requests fail silently. You can " +
             "check the camera icon next to the address bar, or in the site" +
             " permissions settings.";
-
-            session.endCall('failed');
         } else if (eventData.error === "DevicesNotFoundError") {
             msg = "You may have forbidden camera access for that site previously - " +
             "in this case any subsequent camera requests fail silently. You can check" +
             " the camera icon next to the address bar, or in the site permissions " +
             "settings.";
-
-            session.endCall('failed');
         }
 
         if (!eventData.continue && chatRoom.callSession) {
             session.endCall('failed');
         }
-
 
 
         chatRoom.appendDomMessage(
@@ -1843,7 +1877,7 @@ CallManager.prototype.startCall = function(chatRoom, mediaOptions) {
                     'type': 'secondary',
                     'text': l[1686],
                     'callback': function() {
-                        if (session) { session.endCall(); }
+                        if (session) { session.endCall('caller'); }
                     }
                 }
             }

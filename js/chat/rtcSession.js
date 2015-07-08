@@ -282,12 +282,16 @@ RtcSession.prototype = {
         self.gLocalVidRefcount = 0;
     }
 
-    RTC.getUserMediaWithConstraintsAndCallback({audio: true, video: true}, this,
+    RTC.getUserMediaWithConstraintsAndCallback({audio: true, video: true}, self,
       function(stream) {
+          self.assert(stream, "getUserMedia returned null stream");
           self.gLocalStream = stream;
-          var sessStream = RTC.cloneMediaStream(this.gLocalStream,
+          self.assert(self.gLocalStreamRefcount === 0, "gLocalStreamRefcount not 0 when obtaining user media");
+          self.assert(self.gLocalVidRefcount === 0, "gLocalVidRefcount not 0 when obtaining user media");
+
+          var sessStream = RTC.cloneMediaStream(self.gLocalStream,
                                                 {audio:true, video:true});
-          self._onMediaReady(this.gLocalStream);
+          self._onMediaReady(self.gLocalStream);
           self._refLocalStream(options.video); //we must call this after onMediaReady because it will enable the local video display, and that is created in onMediaReady
           successCallback.call(self, sessStream);
       },
@@ -330,6 +334,7 @@ RtcSession.prototype = {
                 } else {
                     self.gLocalStream = null;
                     self.gLocalStreamRefcount = 0;
+                    self.gLocalVidRefcount = 0;
                     if (self.gLocalVid)
                         console.warn("Assertion failed: Could not get local stream, but local video element is not null");
                     successCallback.call(self, null);
@@ -417,6 +422,8 @@ RtcSession.prototype = {
       var actualAv = getStreamAv(sessStream);
       if ((options.audio && !actualAv.audio) || (options.video && !actualAv.video)) {
           console.warn("startMediaCall: Could not obtain audio or video stream requested by the user");
+          if (!sessStream)
+              console.warn("...and stream is null");
           options.audio = actualAv.audio;
           options.video = actualAv.video;
       }
@@ -1195,17 +1202,24 @@ hangupAll: function()
     this.trigger('local-stream-connect', {player: this.gLocalVid});
  },
  _unrefLocalStream: function(video) {
-    if (video) {
+     if (!this.gLocalStream) {
+         console.error('_unrefLocalStream: gLocalStream is null. refcount= ', this.gLocalStreamRefcount, 'vidRefCount =', this.gLocalVidRefcount);
+         this.gLocalStreamRefcount = 0;
+         this.gLocalVidRefcount = 0;
+         return;
+     }
+
+     this.assert(this.gLocalStreamRefcount > 0, "unrefLocalStream: refcount is already <= 0");
+     this.assert((!video) || (this.gLocalVidRefcount > 0), "unrefLocalStream: unreferencing video, but its refcount is already <= 0");
+
+//localStream is not null
+     if (video) {
         if (--this.gLocalVidRefcount <= 0)
             this._disableLocalVid();
     }
     if (--this.gLocalStreamRefcount > 0)
         return;
 
-    if (!this.gLocalStream) {
-        console.error('_unrefLocalStream: gLocalStream is null. refcount = ', this.gLocalStreamRefcount);
-        return;
-    }
     this._freeLocalStream();
  },
  _freeLocalStream: function() {
@@ -1270,6 +1284,11 @@ hangupAll: function()
     } catch(e) {
         console.error("Exception thrown from user event handler '"+name+"':\n"+e.stack?e.stack:e);
     }
+ },
+ assert: function(cond, msg) {
+     if (!cond) {
+         console.error("Assertion failed:", msg);
+     }
  },
  /**
     Releases any global resources referenced by this instance, such as the reference
@@ -1441,11 +1460,16 @@ sentMediaTypes: function()
     if (sess.isFake) {
         return null;
     }
+    var localStream = sess.localStream;
+    if (!sess.localStream) {
+        return { audio: false, video: false};
+    }
+
    //we don't use sess.mutedState because in Forefox we don't have a separate
    //local streams for each session, so (un)muting one session's local stream applies to all
    //other sessions, making mutedState out of sync
-    var audTracks = sess.localStream.getAudioTracks();
-    var vidTracks = sess.localStream.getVideoTracks();
+    var audTracks = localStream.getAudioTracks();
+    var vidTracks = localStream.getVideoTracks();
     return {
         audio: (audTracks.length > 0) && audTracks[0].enabled,
         video: (vidTracks.length > 0) && vidTracks[0].enabled
@@ -1461,11 +1485,15 @@ receivedMediaTypes: function() {
     if (sess.isFake) {
         return null;
     }
+    var remoteStream = sess.remoteStream;
+    if (!remoteStream) {
+        return {audio: false, video: false};
+    }
 
     var m = sess.remoteMutedState;
     return {
-        audio: (sess.remoteStream.getAudioTracks().length > 0) && !m.audioMuted,
-        video: (sess.remoteStream.getVideoTracks().length > 0) && !m.videoMuted
+        audio: (remoteStream.getAudioTracks().length > 0) && !m.audioMuted,
+        video: (remoteStream.getVideoTracks().length > 0) && !m.videoMuted
     }
 },
 

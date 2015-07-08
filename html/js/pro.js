@@ -1098,8 +1098,8 @@ var voucherDialog = {
         
         // Translate text
         var html = this.$dialog.find('.voucher-information-help').html();
-            html.replace('[A]', '<a href="#resellers" class="voucher-reseller-link">');
-            html.replace('[/A]', '</a>');
+            html = html.replace('[A]', '<a href="#resellers" class="voucher-reseller-link">');
+            html = html.replace('[/A]', '</a>');
         this.$dialog.find('.voucher-information-help').html(html);
         
         // Reset state to hide voucher input

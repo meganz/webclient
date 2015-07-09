@@ -1692,7 +1692,9 @@ else if (!b_u)
             boot_done();
         }
         dlxhr.open("POST", apipath + 'cs?id=0', true);
-        dlxhr.send(JSON.stringify([{'a':'g',p:page.substr(1,8)}]));
+        // Need to inform the API if we want to see ads, but only if we are not logged in
+        var showad = (typeof(u_sid)=='undefined') ? 1 : 0;
+        dlxhr.send(JSON.stringify([{'a':'g',p:page.substr(1,8),'ad':showad}]));
     }
 }
 

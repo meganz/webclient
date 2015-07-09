@@ -33,7 +33,7 @@ function dlinfo(ph,key,next)
     }
     else {
         // We need to tell the API we would like ad urls, but only if we are not logged in
-        var showad = (typeof(u_sid)=='undefined') ? 1 : 0;
+        var showad = (typeof(localStorage.testAds) === 'undefined') ? ((typeof(u_sid) === 'undefined') ? 1 : 0) : localStorage.testAds;
         api_req({a:'g',p:ph,'ad':showad},{callback:dl_g});
     }
 
@@ -404,13 +404,12 @@ var megaAds = {
     // Set to an ad object containing src and other info if we should display an ad
     ad: false,
 
-    showAds: function(addiv) {
-        // Only show ads if we successfully fetched an ad, and the user is not logged in
-        if (this.ad && (typeof u_sid === 'undefined')) {
-
+    showAds: function(adContainer) {
+        // Only show ads if we successfully fetched an ad
+        if (this.ad) {
             // The init ads method injected this iframe into the dom, we make it visible, the correct size, set its src to show the ad
-            var iframe = addiv.find('iframe');
-            addiv.css("visibility", "visible");
+            var iframe = adContainer.find('iframe');
+            adContainer.css("visibility", "visible");
             iframe.css("height", this.ad.height + "px");
             iframe.css("width", this.ad.width + "px");
             iframe.attr("src", this.ad.src);
@@ -423,18 +422,18 @@ var megaAds = {
 
     init: function() {
         // Inject ad html into download page
-        var addiv = $("<div id='ads-block-frame' style='visibility:hidden'></div>");
+        var adContainer = $("<div id='ads-block-frame'></div>");
         var iframe = $("<iframe></iframe>");
-        addiv.append(iframe);
+        adContainer.append(iframe);
         iframe.css("border", "none");
 
         // Fill with an ad if we already have one
-        megaAds.showAds(addiv);
+        megaAds.showAds(adContainer);
 
         // Inject header html to alert users that this is advertisement content and not directly from mega
-        var note = $("<div style='background-color:black;color:white;text-align:center;padding-bottom:3px;'>Advertisement</div>");
-        addiv.prepend(note);
-        $(".ads-left-block").prepend(addiv);
+        var note = $("<div class='ads-block-header'>Advertisement</div>");
+        adContainer.prepend(note);
+        $(".ads-left-block").prepend(adContainer);
     }
 };
 

@@ -1693,7 +1693,7 @@ else if (!b_u)
         }
         dlxhr.open("POST", apipath + 'cs?id=0', true);
         // Need to inform the API if we want to see ads, but only if we are not logged in
-        var showad = (typeof(u_sid)=='undefined') ? 1 : 0;
+        var showad = (typeof(localStorage.testAds) === 'undefined') ? ((typeof(u_sid) === 'undefined') ? 1 : 0) : localStorage.testAds;
         dlxhr.send(JSON.stringify([{'a':'g',p:page.substr(1,8),'ad':showad}]));
     }
 }

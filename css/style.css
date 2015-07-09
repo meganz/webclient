@@ -20073,6 +20073,15 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 .ads-right-block {
 	right: 0;
 }
+#ads-block-frame {
+	visibility:hidden;
+}
+.ads-block-header {
+	background-color:black;
+	color:white;
+	text-align:center;
+	padding-bottom:3px;
+}
 .download-adv-bl {
 	position: absolute;
 	width: 100%;

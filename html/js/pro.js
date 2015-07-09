@@ -282,8 +282,8 @@ function pro_continue(e)
     }
 }
 
-function pro_pay()
-{
+function pro_pay() {
+    
     var aff = 0;
     if (localStorage.affid && localStorage.affts > new Date().getTime() - 86400000) {
         aff = localStorage.affid;
@@ -367,12 +367,14 @@ function pro_pay()
                 {
                     callback : function (utcResult)
                     {
-                        if (pro_paymentmethod == 'pro_prepaid')
-                        {
+                        // If using prepaid balance
+                        if (pro_m === 0) {
+                            
+                            // Hide the loading dialog
                             loadingDialog.hide();
                             
-                            if (typeof utcResult == 'number' && utcResult < 0)
-                            {
+                            // If an error code
+                            if (typeof utcResult == 'number' && utcResult < 0) {
                                 if (utcResult == EOVERQUOTA) {
                                     alert(l[514]);
                                 }
@@ -380,13 +382,9 @@ function pro_pay()
                                     alert(l[200]);
                                 }
                             }
-                            else
-                            {
-                                // Redirect to account page to show purchase
-                                if (M.account) {
-                                    M.account.lastupdate = 0;
-                                }
-                                window.location.hash = 'fm/account';
+                            else {
+                                // Show success dialog
+                                voucherDialog.showSuccessfulPayment();
                             }
                         }
                         else {
@@ -1047,6 +1045,7 @@ var voucherDialog = {
     
     $dialog: null,
     $backgroundOverlay: null,
+    $successOverlay: null,
     
     /**
      * Initialisation of the dialog
@@ -1068,6 +1067,7 @@ var voucherDialog = {
         // Cache DOM reference for lookup in other functions
         this.$dialog = $('.fm-dialog.voucher-dialog');
         this.$backgroundOverlay = $('.fm-dialog-overlay');
+        this.$successOverlay = $('.payment-result.success');
         
         // Add the styling for the overlay
         this.$dialog.removeClass('hidden');
@@ -1158,42 +1158,6 @@ var voucherDialog = {
         
         voucherDialog.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
         voucherDialog.$dialog.addClass('hidden');
-    },
-    
-    /**
-     * Purchase using account balance when the button is clicked inside the Voucher dialog
-     */
-    initPurchaseButton: function() {
-        
-        // On Purchase button click run the purchase process
-        this.$dialog.find('.voucher-buy-now').rebind('click', function() {
-            
-            // Get which plan is selected
-            var selectedProPackageIndex = $('.membership-dropdown-item.selected').attr('data-plan-index');
-
-            // Set the pro package (used in pro_pay function)
-            selectedProPackage = membershipPlans[selectedProPackageIndex];
-
-            // Get the plan price
-            var selectedPlanPrice = selectedProPackage[5];
-    
-            // Warn them about insufficient funds
-            if ((parseFloat(pro_balance) < parseFloat(selectedPlanPrice))) {
-                
-                // Show warning and re-apply the background because the msgDialog function removes it on close
-                msgDialog('warninga', l[6804], l[6805], '', function() {
-                    voucherDialog.showBackgroundOverlay();
-                });
-            }
-            else {
-                // Hide the overlay and dialog
-                voucherDialog.hideDialog();
-                
-                // Proceed with payment via account balance
-                pro_paymentmethod = 'pro_prepaid';
-                pro_pay();
-            }
-        });
     },
     
     /**
@@ -1309,6 +1273,73 @@ var voucherDialog = {
                     voucherDialog.$dialog.find('.voucher-input-container').hide();
                 }
             }
+        });
+    },
+    
+    /**
+     * Purchase using account balance when the button is clicked inside the Voucher dialog
+     */
+    initPurchaseButton: function() {
+        
+        // On Purchase button click run the purchase process
+        this.$dialog.find('.voucher-buy-now').rebind('click', function() {
+            
+            // Get which plan is selected
+            var selectedProPackageIndex = $('.membership-dropdown-item.selected').attr('data-plan-index');
+
+            // Set the pro package (used in pro_pay function)
+            selectedProPackage = membershipPlans[selectedProPackageIndex];
+
+            // Get the plan price
+            var selectedPlanPrice = selectedProPackage[5];
+    
+            // Warn them about insufficient funds
+            if ((parseFloat(pro_balance) < parseFloat(selectedPlanPrice))) {
+                
+                // Show warning and re-apply the background because the msgDialog function removes it on close
+                msgDialog('warninga', l[6804], l[6805], '', function() {
+                    voucherDialog.showBackgroundOverlay();
+                });
+            }
+            else {
+                // Hide the overlay and dialog
+                voucherDialog.hideDialog();
+                
+                // Proceed with payment via account balance
+                pro_paymentmethod = 'pro_prepaid';
+                pro_pay();
+            }
+        });
+    },
+    
+    /**
+     * Shows a successful payment modal dialog
+     */
+    showSuccessfulPayment: function() {
+        
+        // Get the selected Pro plan details
+        var proNum = selectedProPackage[1];
+        var proPlan = getProPlan(proNum);
+        var successMessage = l[6962].replace('%1', '<span>' + proPlan + '</span>');
+        
+        // Show the success
+        voucherDialog.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+        voucherDialog.$successOverlay.removeClass('hidden');
+        voucherDialog.$successOverlay.find('.payment-result-txt').html(successMessage);
+        
+        // Add click handlers for 'Go to my account' and Close buttons
+        voucherDialog.$successOverlay.find('.payment-result-button, .payment-close').rebind('click', function() {
+            
+            // Hide the overlay
+            voucherDialog.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+            voucherDialog.$successOverlay.addClass('hidden');
+            
+            // Make sure it fetches new account data on reload
+            // and redirect to account page to show purchase
+            if (M.account) {
+                M.account.lastupdate = 0;
+            }
+            window.location.hash = 'fm/account';
         });
     }
 };

@@ -321,6 +321,7 @@ MegaSync.prototype.downloadClient = function() {
 
     this._retryTimer = setInterval((function() {
         if ($('.megasync-overlay:visible').length === 0) {
+            this._lastDownload = null;
             return clearInterval(this._retryTimer);
         }
         this._api({a: "v"});

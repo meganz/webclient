@@ -5256,6 +5256,8 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	text-align: left;
 	white-space: nowrap;
 	overflow: hidden;
+	-o-text-overflow: ellipsis;
+  	text-overflow: ellipsis;
 }
 .transfer-table-header tr, .grid-table-header tr, .contacts-grid-header tr {
 	white-space: nowrap;
@@ -6496,6 +6498,14 @@ table {
 	box-sizing: border-box;
 	font-size: 11px;
 	color: #666666;
+}
+.tranfer-filetype-txt {
+	padding: 0 0 0 26px;
+	margin-right:10px;
+	white-space: nowrap;
+	-o-text-overflow: ellipsis;
+  	text-overflow: ellipsis;
+	overflow:hidden;
 }
 .backup-file-info span.tranfer-filetype-txt.backup {
 	padding: 0;

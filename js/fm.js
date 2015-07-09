@@ -2534,7 +2534,7 @@ function initContextUI() {
 
     $(c + '.transfer-play').rebind('click', function() {
         $('.transfer-table tr.ui-selected').not('.clone-of-header').each(function(j, el) {
-            var id = $(this).attr('id');
+            var id = $(this).attr('id'); 
             if (id[0] === 'u') ulQueue.resume(id);
             else dlQueue.resume(id);
             $('span.transfer-type', this).removeClass('paused');
@@ -5600,7 +5600,7 @@ function transferPanelUI()
                             else dlQueue.resume(elId);
                         }
                     });
-                    //ui_paused = false;
+
                     $('.fm-transfers-block tr span.transfer-type').removeClass('paused');
                     $('.nw-fm-left-icon').removeClass('paused');
         
@@ -5621,8 +5621,8 @@ function transferPanelUI()
                         else dlQueue.pause(elId);
                     }
                 });
-                //ui_paused = true;
-                $('.transfer-table tr span.transfer-type').addClass('paused');
+
+                $('.transfer-table tr span.transfer-type').not('.done').addClass('paused');
                 $('.nw-fm-left-icon').addClass('paused');
             }
         }

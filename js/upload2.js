@@ -1085,7 +1085,9 @@ ulQueue.stuck = function() {
 };
 
 ulQueue.validateTask = function(pzTask) {
-	if (pzTask instanceof ChunkUpload && (!pzTask.file.paused || pzTask.__retry)) {
+	// XXX: pzTask.file *must* be valid, it doesn't sometimes which indicates
+	// a problem somewhere with the entry not getting removed from ulQueue._queue
+	if (pzTask instanceof ChunkUpload && pzTask.file && (!pzTask.file.paused || pzTask.__retry)) {
 		return true;
 	}
 

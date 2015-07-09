@@ -2531,9 +2531,8 @@ function initContextUI() {
 
     $(c + '.transfer-play').rebind('click', function() {
         $('.transfer-table tr.ui-selected').not('.clone-of-header').each(function(j, el) {
-            var id = $(this).attr('id'); 
-            if (id[0] === 'u') ulQueue.resume(id);
-            else dlQueue.resume(id);
+            var id = $(this).attr('id');
+            fm_tfsresume(id);
             $('span.transfer-type', this).removeClass('paused');
         });
     });
@@ -2541,8 +2540,7 @@ function initContextUI() {
     $(c + '.transfer-pause').rebind('click', function() {
         $('.transfer-table tr.ui-selected').not('.clone-of-header').each(function(j, el) {
             var id = $(this).attr('id');
-            if (id[0] === 'u') ulQueue.pause(id);
-            else dlQueue.pause(id);
+            fm_tfspause(id);
             $('span.transfer-type', this).addClass('paused');
         });
     });
@@ -5593,29 +5591,26 @@ function transferPanelUI()
                     {
                         if (!$(el).find('.transfer-status.completed').length) {
                             var elId = $(el).attr('id');
-                            if (elId[0] === 'u') ulQueue.resume(elId);
-                            else dlQueue.resume(elId);
+                            fm_tfsresume(elId);
                         }
                     });
 
                     $('.fm-transfers-block tr span.transfer-type').removeClass('paused');
                     $('.nw-fm-left-icon').removeClass('paused');
         
-                } else
-                {
+                }
+				else {
                     alert(l[214]);
                     DEBUG(l[214]);
                 }
             }
-            else
-            {
+            else {
                 $(this).addClass('active').find('span').html('Resume transfers');
                 $('.transfer-table tr').not('.clone-of-header').each(function(j, el)
                 {
                     if (!$(el).find('.transfer-status.completed').length && !$(el).find('.transfer-type.paused').length) {
                         var elId = $(el).attr('id');
-                        if (elId[0] === 'u') ulQueue.pause(elId);
-                        else dlQueue.pause(elId);
+                        fm_tfspause(elId);
                     }
                 });
 

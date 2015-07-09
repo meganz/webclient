@@ -1199,7 +1199,7 @@ function transferPanelContextMenu(target)
         if (target.prev().length == 0 || target.prev().find('.queued').length == 0) {
             menuitems.filter('.move-up').hide();
         }
-        if (target.next().length == 0) {
+        if (target.next().hasClass('clone-of-header')) {
             menuitems.filter('.move-down').hide();
         }
     }

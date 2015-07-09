@@ -3606,5 +3606,8 @@
     "7197": "CVV",
     "7198": "Account successfully upgraded!",
     "7199": "The operation has not finished correctly. The credit card will not be charged.",
-    "7200": "The credit card information is not correct. The credit card will not be charged."
+    "7200": "The credit card information is not correct. The credit card will not be charged.",
+    "7201": "Your account balance is",
+    "7202": "To increase your balance, click the Redeem Voucher button and enter your voucher code. If you don't have a voucher, please [A]purchase a voucher[\/A].",
+    "7203": "Transferring to payment provider..."
 }

@@ -3609,5 +3609,13 @@
     "7200": "La informaci\u00f3n de la tarjeta de cr\u00e9dito no es correcta. No se realizar\u00e1 el pago.",
     "7201": "Your account balance is",
     "7202": "To increase your balance, click the Redeem Voucher button and enter your voucher code. If you don't have a voucher, please [A]purchase a voucher[\/A].",
-    "7203": "Transferring to payment provider..."
+    "7203": "Transferring to payment provider...",
+    "7204": "You may have forbidden camera access for that site previously - in this case any subsequent camera requests fail silently. You can check the camera icon next to the address bar, or in the site permissions settings.",
+    "7205": "Answer",
+    "7206": "Call with [X] is now starting...",
+    "7207": "Call with [X] is now initialising...",
+    "7208": "Call duration: [X]",
+    "7209": "Call with [X] failed.",
+    "7210": "You have one missed call from [X].",
+    "7211": "Your browser does not have the required audio\/video capabilities for making calls."
 }

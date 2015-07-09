@@ -205,14 +205,18 @@ function fm_tfsorderupd()
 
 function fm_tfspause(gid)
 {
-	if (gid[0] === 'u') ulQueue.pause(gid);
-	else dlQueue.pause(gid);
+	if (ASSERT(typeof gid === 'string' && "zdu".indexOf(gid[0]) !== -1, 'Ivalid GID to pause')) {
+		if (gid[0] === 'u') ulQueue.pause(gid);
+		else dlQueue.pause(gid);
+	}
 }
 
 function fm_tfsresume(gid)
 {
-	if (gid[0] === 'u') ulQueue.resume(gid);
-	else dlQueue.resume(gid);
+	if (ASSERT(typeof gid === 'string' && "zdu".indexOf(gid[0]) !== -1, 'Invalid GID to resume')) {
+		if (gid[0] === 'u') ulQueue.resume(gid);
+		else dlQueue.resume(gid);
+	}
 }
 
 function fm_tfsmove(gid, dir) // -1:up, 1:down

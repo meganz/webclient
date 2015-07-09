@@ -1064,14 +1064,14 @@ function initUI() {
                 'rubbish-bin':    { root: M.RubbishID, prev: null }
             };
         }
-        
+
         if ($('.nw-fm-left-icon.transfers').hasClass('active')  && clickedClass.indexOf('transfers') == -1) {
             $('.fmholder').removeClass('transfer-panel-opened');
             $('.nw-fm-left-icon.transfers').removeClass('active');
             $(this).addClass('active');
             $(window).trigger('resize');
         }
-        
+
         var activeClass = (''+$('.nw-fm-left-icon.active:visible')
             .attr('class')).split(" ").filter(function(c) {
                 return !!fmTabState[c];
@@ -1243,7 +1243,7 @@ function openTransferpanel()
         transferPanelContextMenu(target);
         contextMenuUI(e);
     });
-    
+
     $('.clear-transfer-icon').rebind('click', function(e)
     {
         var target = $(this).closest('tr');
@@ -2534,6 +2534,11 @@ function initContextUI() {
             var id = $(this).attr('id');
             fm_tfsresume(id);
             $('span.transfer-type', this).removeClass('paused');
+            if (uldl_hold) {
+                uldl_hold = false;
+                $('.transfer-pause-icon').removeClass('active').find('span').text(l[6993]);
+                $('.nw-fm-left-icon.transfers').removeClass('paused');
+            }
         });
     });
 
@@ -5402,7 +5407,7 @@ function transferPanelUI()
 
         var tth = $('.transfer-table-header');
         var toHide = (dl_queue.length || ul_queue.length || $('.transfer-table tr').length > 1);
-        
+
         // Show/Hide header if there is no items in transfer list
         if (!toHide)
         {
@@ -5414,7 +5419,7 @@ function transferPanelUI()
             $('.transfer-panel-empty-txt').addClass('hidden');
             tth.show(0);
         }
-    
+
         $('.transfer-scrolling-table').rebind('click contextmenu', function(e)
         {
             if (!$(e.target).closest('.transfer-table').length) {
@@ -5481,7 +5486,7 @@ function transferPanelUI()
         });
         initTransferScroll();
     }
-    
+
     $(window).rebind('resize.transferpanel', function(e)
     {
         $.transferHeader();
@@ -5557,20 +5562,20 @@ function transferPanelUI()
                     $.clearTransferPanel();
                 });
                 $('.nw-fm-left-icon.transfers').removeClass('transfering').find('p').removeAttr('style');
-                
+
                 Soon(function() {
                     $(window).trigger('resize');
                 });
             });
         }
     });
-    
+
     $('.transfer-clear-completed').rebind('click', function() {
         if (!$(this).hasClass('disabled')) {
             $('.transfer-table tr .transfer-status.completed').closest('tr').fadeOut(function() {
                 $(this).remove();
                 $.clearTransferPanel();
-				fmUpdateCount();
+                fmUpdateCount();
                 Soon(function() {
                     $(window).trigger('resize');
                 });
@@ -5581,12 +5586,11 @@ function transferPanelUI()
     $('.transfer-pause-icon').rebind('click', function()
     {
         if (!$(this).hasClass('disabled')) {
-            if ($(this).attr('class').indexOf('active') > -1)
-            {
+            if ($(this).hasClass('active')) {
                 // terms of service
                 if (u_type || u_attr.terms)
                 {
-                    $(this).removeClass('active').find('span').html(l[6993]);
+                    $(this).removeClass('active').find('span').text(l[6993]);
                     $('.transfer-table tr').not('.clone-of-header').each(function(j, el)
                     {
                         if (!$(el).find('.transfer-status.completed').length) {
@@ -5597,15 +5601,15 @@ function transferPanelUI()
 
                     $('.fm-transfers-block tr span.transfer-type').removeClass('paused');
                     $('.nw-fm-left-icon').removeClass('paused');
-        
+                    uldl_hold = false;
                 }
-				else {
+                else {
                     alert(l[214]);
                     DEBUG(l[214]);
                 }
             }
             else {
-                $(this).addClass('active').find('span').html('Resume transfers');
+                $(this).addClass('active').find('span').text('Resume transfers');
                 $('.transfer-table tr').not('.clone-of-header').each(function(j, el)
                 {
                     if (!$(el).find('.transfer-status.completed').length && !$(el).find('.transfer-type.paused').length) {
@@ -5613,6 +5617,7 @@ function transferPanelUI()
                         fm_tfspause(elId);
                     }
                 });
+                uldl_hold = true;
 
                 $('.transfer-table tr span.transfer-type').not('.done').addClass('paused');
                 $('.nw-fm-left-icon').addClass('paused');
@@ -9622,7 +9627,7 @@ function savecomplete(id)
 function fm_resize_handler() {
     // transfer panel resize logic
     var right_pane_height = (
-            $('#fmholder').outerHeight() - $('#topmenu').outerHeight() 
+            $('#fmholder').outerHeight() - $('#topmenu').outerHeight()
     );
 
     $('.fm-main.default, .fm-main.notifications').css({

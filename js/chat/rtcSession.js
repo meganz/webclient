@@ -422,8 +422,9 @@ RtcSession.prototype = {
       var actualAv = getStreamAv(sessStream);
       if ((options.audio && !actualAv.audio) || (options.video && !actualAv.video)) {
           console.warn("startMediaCall: Could not obtain audio or video stream requested by the user");
-          if (!sessStream)
+          if (!sessStream) {
               console.warn("...and stream is null");
+          }
           options.audio = actualAv.audio;
           options.video = actualAv.video;
       }

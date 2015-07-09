@@ -554,7 +554,7 @@ label span.black {
 	margin: 0 0 0 0 !important;
 }
 .progress-block {
-	margin: 6px 10px 1px 0;
+	margin: 6px 0 1px 0;
 }
 .progressbarfill {
 	height: 6px !important;
@@ -5243,6 +5243,31 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	font-size: 12px;
 	padding: 12px 0 0 12px;
 }
+.transfer-table {
+	table-layout: fixed;
+	width: 100%;
+}
+.transfer-table td:nth-child(1) {
+	width: 230px;
+}
+.transfer-table td:nth-child(3) {
+	width: 96px;
+}
+.transfer-table td:nth-child(4) {
+	width: 96px;
+}
+.transfer-table td:nth-child(5) {
+	width: 288px;
+}
+.transfer-table td:nth-child(6) {
+	width: 192px;
+}
+.transfer-table td:nth-child(7) {
+	width: 64px;
+}
+.transfer-table td:nth-child(8) {
+	width: 0px;
+}
 .transfer-table th, .transfer-table td, .transfer-table-header th, .grid-table th, .grid-table td, .grid-share-table th, .grid-share-table td, .grid-table-header th, .contacts-grid-header th, .contacts-grid-table th, .contacts-grid-table td {
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
@@ -5250,14 +5275,20 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	height: 24px;
 	line-height: 23px;
 	font-size: 12px;
-	padding-left: 12px;
+	padding: 0 10px 0 12px;
 	color: #999999;
 	font-weight: normal;
 	text-align: left;
 	white-space: nowrap;
 	overflow: hidden;
 	-o-text-overflow: ellipsis;
-  	text-overflow: ellipsis;
+	text-overflow: ellipsis;
+}
+.transfer-table .transfer-type, .transfer-table .tranfer-filetype-txt {
+	white-space: nowrap;
+	overflow: hidden;
+	-o-text-overflow: ellipsis;
+	text-overflow: ellipsis;
 }
 .transfer-table-header tr, .grid-table-header tr, .contacts-grid-header tr {
 	white-space: nowrap;
@@ -5471,7 +5502,7 @@ table .grid-status-icon.star {
 	transition: background-color 100ms ease-in-out;
 }
 .file-block.ui-selected, .contact-block-view.ui-selected, .file-block.ui-selecting, .contact-block-view.ui-selecting {
-    background-color: rgba(0, 0, 0, 0.19);
+	background-color: rgba(0, 0, 0, 0.19);
 }
 .file-block.dragover, .contact-block-view.dragover {
 	background-color: rgba(0,0,0,0.075);
@@ -6500,12 +6531,7 @@ table {
 	color: #666666;
 }
 .tranfer-filetype-txt {
-	padding: 0 0 0 26px;
-	margin-right:10px;
-	white-space: nowrap;
-	-o-text-overflow: ellipsis;
-  	text-overflow: ellipsis;
-	overflow:hidden;
+	padding-right: 0;
 }
 .backup-file-info span.tranfer-filetype-txt.backup {
 	padding: 0;
@@ -6522,7 +6548,7 @@ table {
 .transfer-type, .transfer-status {
 	height: 24px;
 	line-height: 23px;
-	padding: 0 12px 0 24px;
+	padding: 0 0 0 24px;
 	white-space: nowrap;
 	background-image: url(../images/mega/nw-fm-sprite_v7.svg);
 	background-repeat: no-repeat;
@@ -6532,7 +6558,7 @@ table {
 	text-transform: lowercase;
 }
 .transfer-type:first-letter, .transfer-status:first-letter {
-    text-transform: uppercase;
+	text-transform: uppercase;
 }
 .transfer-type.safari-downloaded {
 	background-position: -7px -4064px;
@@ -14832,25 +14858,25 @@ h5.main-italic-header {
 	width: 16px;
 }
 .payment-options-list {
-    -webkit-column-count: 2;
-    -moz-column-count: 2;
-    column-count: 2;
-    -webkit-column-width: 200px;
-    -moz-column-width: 200px;
-    column-width: 200px;
+	-webkit-column-count: 2;
+	-moz-column-count: 2;
+	column-count: 2;
+	-webkit-column-width: 200px;
+	-moz-column-width: 200px;
+	column-width: 200px;
 }
 .payment-options-list .payment-method {
-    cursor: pointer;
-    margin-bottom: 3px;
-    overflow: visible;
-    width: 200px;
+	cursor: pointer;
+	margin-bottom: 3px;
+	overflow: visible;
+	width: 200px;
 }
 .payment-options-list .payment-method.disabled {
-    cursor: auto;
-    opacity: 0.5;
+	cursor: auto;
+	opacity: 0.5;
 }
 .payment-options-list .payment-method.disabled .membership-radio div {
-    cursor: auto;
+	cursor: auto;
 }
 .membership-radio div {
 	width: 14px;
@@ -14870,16 +14896,16 @@ h5.main-italic-header {
 	margin: 5px;
 }
 .membership-radio-label {
-    background-image: url("../images/mega/pro-new-sprite-v5.png");
-    background-repeat: no-repeat;
-    color: #333333;
-    display: inline-block;
-    font-family: "Open Sans Semibold", Arial;
-    font-size: 13px;
-    height: 26px;
-    line-height: 26px;
-    padding-left: 28px;
-    vertical-align: middle;
+	background-image: url("../images/mega/pro-new-sprite-v5.png");
+	background-repeat: no-repeat;
+	color: #333333;
+	display: inline-block;
+	font-family: "Open Sans Semibold", Arial;
+	font-size: 13px;
+	height: 26px;
+	line-height: 26px;
+	padding-left: 28px;
+	vertical-align: middle;
 }
 .membership-radio-label.prepaid-balance {
 	background-position: -444px -569px;
@@ -14891,7 +14917,7 @@ h5.main-italic-header {
 	background-position: -444px -487px;
 }
 .membership-radio-label.fortumo {
-    background-position: -444px -412px;
+	background-position: -444px -412px;
 }
 .membership-radio-label.wire-transfer {
 	background-position: -444px -450px;
@@ -22790,7 +22816,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 .fm-chat-inline-dialog-button-sendFeedback {
 	margin-left: 4px;
 }
-
 /* Voucher dialog */
 .fm-dialog.voucher-dialog {
 	border: 0 none;
@@ -22832,11 +22857,11 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 	font-family: 'source_sans_prolight', 'Open Sans Light', Helvetica;
 }
 .voucher-account-balance {
-    color: #d90007;
-    float: right;
-    font-family: "source_sans_prolight","Open Sans Light",Helvetica;
-    font-size: 36px;
-    padding: 3px 10px 0 0;
+	color: #d90007;
+	float: right;
+	font-family: "source_sans_prolight", "Open Sans Light", Helvetica;
+	font-size: 36px;
+	padding: 3px 10px 0 0;
 }
 .voucher-block {
 	-moz-box-sizing: border-box;
@@ -22950,7 +22975,6 @@ a.voucher-reseller-link {
 .payment-eurosign {
 	font-size: 24px;
 }
-
 /* CC payment dialog */
 .fm-dialog.payment-dialog {
 	border: 0 none;

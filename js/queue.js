@@ -258,8 +258,8 @@ MegaQueue.prototype.destroy = function() {
     // this._limit = -1
     // this._queue = null;
     // this._queue = [];
-    if (d && this.qname !== 'downloads') {
-        ASSERT(this._queue.length == 0, 'This queue was not properly cleaned...');
+    if (d && this.qname !== 'downloads' && this.qname !== 'download-writer') {
+        ASSERT(this._queue.length == 0, 'The queue "' + this.qname + '" was not properly cleaned.');
     }
     oDestroy(this);
 }

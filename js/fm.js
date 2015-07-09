@@ -1199,7 +1199,7 @@ function transferPanelContextMenu(target)
         if (target.prev().length == 0 || target.prev().find('.queued').length == 0) {
             menuitems.filter('.move-up').hide();
         }
-        if (target.next().length == 0) {
+        if (target.next().hasClass('clone-of-header')) {
             menuitems.filter('.move-down').hide();
         }
     }
@@ -1263,6 +1263,7 @@ function openTransferpanel()
         DownloadManager.abort(toabort);
         UploadManager.abort(toabort);
         $.clearTransferPanel();
+        fmUpdateCount();
         Soon(function() {
             $(window).trigger('resize');
         });
@@ -2530,7 +2531,7 @@ function initContextUI() {
 
     $(c + '.transfer-play').rebind('click', function() {
         $('.transfer-table tr.ui-selected').not('.clone-of-header').each(function(j, el) {
-            var id = $(this).attr('id');
+            var id = $(this).attr('id'); 
             if (id[0] === 'u') ulQueue.resume(id);
             else dlQueue.resume(id);
             $('span.transfer-type', this).removeClass('paused');
@@ -2561,6 +2562,7 @@ function initContextUI() {
         DownloadManager.abort(toabort);
         UploadManager.abort(toabort);
         $.clearTransferPanel();
+        fmUpdateCount();
 
         Soon(function() {
             // XXX: better way to stretch the scrollbar?
@@ -5570,6 +5572,7 @@ function transferPanelUI()
             $('.transfer-table tr .transfer-status.completed').closest('tr').fadeOut(function() {
                 $(this).remove();
                 $.clearTransferPanel();
+				fmUpdateCount();
                 Soon(function() {
                     $(window).trigger('resize');
                 });
@@ -5594,7 +5597,7 @@ function transferPanelUI()
                             else dlQueue.resume(elId);
                         }
                     });
-                    //ui_paused = false;
+
                     $('.fm-transfers-block tr span.transfer-type').removeClass('paused');
                     $('.nw-fm-left-icon').removeClass('paused');
         
@@ -5615,8 +5618,8 @@ function transferPanelUI()
                         else dlQueue.pause(elId);
                     }
                 });
-                //ui_paused = true;
-                $('.transfer-table tr span.transfer-type').addClass('paused');
+
+                $('.transfer-table tr span.transfer-type').not('.done').addClass('paused');
                 $('.nw-fm-left-icon').addClass('paused');
             }
         }

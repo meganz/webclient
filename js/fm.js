@@ -5576,6 +5576,7 @@ function transferPanelUI()
             $('.transfer-table tr .transfer-status.completed').closest('tr').fadeOut(function() {
                 $(this).remove();
                 $.clearTransferPanel();
+				fmUpdateCount();
                 Soon(function() {
                     $(window).trigger('resize');
                 });

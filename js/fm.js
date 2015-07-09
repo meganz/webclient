@@ -1266,7 +1266,7 @@ function openTransferpanel()
         });
         
         $.clearTransferPanel();
-        
+        fmUpdateCount();
         Soon(function() {
             $(window).trigger('resize');
         });
@@ -2567,6 +2567,7 @@ function initContextUI() {
             UploadManager.abort(downloadId);
         });
         $.clearTransferPanel();
+        fmUpdateCount();
 
         Soon(function() {
             // XXX: better way to stretch the scrollbar?

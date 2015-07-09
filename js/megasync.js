@@ -4,7 +4,6 @@ function MegaSync()
     this._url = "https://localhost.megasyncloopback.mega.nz:6342/";
     this._enabled = false;
     this._version = 0;
-    this._api({a: "v"});
     this._lastDownload = null;
     this._retryTimer = null;
     this._prepareDownloadUrls();
@@ -321,7 +320,10 @@ MegaSync.prototype.downloadClient = function() {
     }
 
     this._retryTimer = setInterval((function() {
-        // retry!
+        if ($('.megasync-overlay:visible').length === 0) {
+            this._lastDownload = null;
+            return clearInterval(this._retryTimer);
+        }
         this._api({a: "v"});
     }).bind(this), 500);
     overlay.show().addClass('downloading');

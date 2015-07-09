@@ -3607,7 +3607,16 @@
     "7198": "Ra\u010dun uspe\u0161no nadgrajen!",
     "7199": "Postopek se ni pravilno zaklju\u010dil. Kreditna kartica ne bo bremenjena.",
     "7200": "Podatki za kreditno kartico niso pravi. Kreditna kartica ne bo bremenjena.",
-    "7201": "Your account balance is",
-    "7202": "To increase your balance, click the Redeem Voucher button and enter your voucher code. If you don't have a voucher, please [A]purchase a voucher[\/A].",
-    "7203": "Transferring to payment provider..."
+    "7201": "Stanje na va\u0161em ra\u010dunu je",
+    "7202": "Za povi\u0161anje stanja na va\u0161em ra\u010dunu, kliknite na 'unov\u010di kupon' gumb in vnesite kodo kupona. \u010ce nimate kupona, prosim, [A]kupite kupon[\/A].",
+    "7203": "Usmerjam k va\u0161em ponudniku pla\u010dil...",
+    "7204": "You may have forbidden camera access for that site previously - in this case any subsequent camera requests fail silently. You can check the camera icon next to the address bar, or in the site permissions settings.",
+    "7205": "Answer",
+    "7206": "Call with [X] is now starting...",
+    "7207": "Call with [X] is now initialising...",
+    "7208": "Call duration: [X]",
+    "7209": "Call with [X] failed.",
+    "7210": "You have one missed call from [X].",
+    "7211": "Your browser does not have the required audio\/video capabilities for making calls.",
+    "7212": "Advertisement"
 }

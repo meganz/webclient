@@ -3607,7 +3607,16 @@
     "7198": "Konts ir veiksm\u012bgi moderniz\u0113ts!",
     "7199": "Oper\u0101cija nav pabeigta pareizi. No kred\u012btkartes netiks iekas\u0113ta samaksa.",
     "7200": "Kred\u012btkartes inform\u0101cija nav pareiza. No kred\u012btkartes netiks iekas\u0113ta samaksa.",
-    "7201": "Your account balance is",
-    "7202": "To increase your balance, click the Redeem Voucher button and enter your voucher code. If you don't have a voucher, please [A]purchase a voucher[\/A].",
-    "7203": "Transferring to payment provider..."
+    "7201": "J\u016bsu konta atlikums ir",
+    "7202": "Lai palielin\u0101tu savu konta atlikumu, noklik\u0161\u0137iniet uz Izpirkt Kuponu pogas un ievadiet savu kupona kodu. Ja Jums nav kuponu, l\u016bdzu [A]ieg\u0101d\u0101jaties kuponu[\/A].",
+    "7203": "P\u0101rs\u016bta uz maks\u0101juma sniedz\u0113ju...",
+    "7204": "You may have forbidden camera access for that site previously - in this case any subsequent camera requests fail silently. You can check the camera icon next to the address bar, or in the site permissions settings.",
+    "7205": "Atbild\u0113t",
+    "7206": "Zvans ar [X] tiek uzs\u0101kts...",
+    "7207": "Zvans ar [X] tiek sagatavots...",
+    "7208": "Zvana ilgums: [X]",
+    "7209": "Zvans ar [X] nenotika.",
+    "7210": "Tev ir viens neatbild\u0113ts zvans no [X].",
+    "7211": "J\u016bsu p\u0101rl\u016bkprogrammai nav nepiecie\u0161am\u0101 audio\/video atbalsta iesp\u0113jas, lai veiktu zvanus.",
+    "7212": "Rekl\u0101ma"
 }

@@ -3035,7 +3035,7 @@
     "6626": "Opsummering:",
     "6627": "1. If you do have your Master crypto key backed up - you can reset the password to your account and your data will stay.",
     "6628": "2. If you do not have your Master crypto key backed up - you can re-register with the same email address however your data will be lost after the 60 day 'recovery' period.",
-    "6629": "If you are positively sure that you will never lose your password, there is no need to back up your key. If you do decide to make a [A]backup[\/A], however, please ensure that you keep it in a safe location: Anyone with access to your backed up key and your e-mail account will be able to reset your password and gain access to your data.",
+    "6629": "Hvis du er helt 100% sikker p\u00e5 at du aldrig nogensinde kommer til at glemme din kode, er der ingen grund til at lave backup af dine n\u00f8gle. Hvis du beslutter dig for at lave [A]backup[\/A], s\u00e5 sikr dig  at du opbevarer den p\u00e5 en sikker lokation: Enhver med adgang til din gemte n\u00f8gle og din emailkonto vil v\u00e6re i stand til at nulstille din kode og dermed f\u00e5 adgang til dine data.",
     "6630": "Vi anbefaler at du eksporterer din kontos Master Krypteringsn\u00f8gle s\u00e5 du kan nulstille din konto og dine data i fremtiden, hvis du mister din kontos kode.",
     "6631": "Du kan gemme din master krypteringsn\u00f8gle lokalt eller i et dokuemnt du har lavet backup af andetsteds.",
     "6632": "Hvordan laver du backup af din Master krypteringsn\u00f8gle:",
@@ -3609,5 +3609,14 @@
     "7200": "The credit card information is not correct. The credit card will not be charged.",
     "7201": "Your account balance is",
     "7202": "To increase your balance, click the Redeem Voucher button and enter your voucher code. If you don't have a voucher, please [A]purchase a voucher[\/A].",
-    "7203": "Transferring to payment provider..."
+    "7203": "Transferring to payment provider...",
+    "7204": "You may have forbidden camera access for that site previously - in this case any subsequent camera requests fail silently. You can check the camera icon next to the address bar, or in the site permissions settings.",
+    "7205": "Answer",
+    "7206": "Call with [X] is now starting...",
+    "7207": "Call with [X] is now initialising...",
+    "7208": "Call duration: [X]",
+    "7209": "Call with [X] failed.",
+    "7210": "You have one missed call from [X].",
+    "7211": "Your browser does not have the required audio\/video capabilities for making calls.",
+    "7212": "Advertisement"
 }

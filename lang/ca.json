@@ -3607,7 +3607,16 @@
     "7198": "Compte millorat de forma satisfact\u00f2ria!",
     "7199": "La operaci\u00f3 no ha acabat de forma satisfact\u00f2ria. No es carregar\u00e0 cap import a la targeta de cr\u00e8dit.",
     "7200": "La informaci\u00f3 de la targeta de cr\u00e8dit no \u00e9s correcta. No es carregar\u00e0 cap import a la targeta.",
-    "7201": "Your account balance is",
-    "7202": "To increase your balance, click the Redeem Voucher button and enter your voucher code. If you don't have a voucher, please [A]purchase a voucher[\/A].",
-    "7203": "Transferring to payment provider..."
+    "7201": "El saldo del teu compte \u00e9s de",
+    "7202": "Per augmentar el teu saldo, clica sobre Valida un val i introdueix el codi del teu val. Si no tens cap val, si us plau, [A]compra un val[\/A].",
+    "7203": "Transferint al prove\u00efdor de pagaments...",
+    "7204": "You may have forbidden camera access for that site previously - in this case any subsequent camera requests fail silently. You can check the camera icon next to the address bar, or in the site permissions settings.",
+    "7205": "Answer",
+    "7206": "Call with [X] is now starting...",
+    "7207": "Call with [X] is now initialising...",
+    "7208": "Call duration: [X]",
+    "7209": "Call with [X] failed.",
+    "7210": "You have one missed call from [X].",
+    "7211": "Your browser does not have the required audio\/video capabilities for making calls.",
+    "7212": "Advertisement"
 }

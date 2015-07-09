@@ -397,46 +397,53 @@ function ImgError(source) {
 }
 
 /**
- * Enable ads for some countries and only when they are not logged in
- * Note: The html for the ads is injected on page load rather than existing withing download.html
+ * Enable ads for some countries and _only_ when they are not logged in.
+ * Note: The html for the ads is added on page load rather than existing withing download.html.
  */
 var megaAds = {
 
     // Set to an ad object containing src and other info if we should display an ad
     ad: false,
 
+    /**
+     * Initialise the HTML for ads
+     */
     init: function() {
         
         // Remove any previous ad containers
         $('#ads-block-frame, ads-block-header').remove();
         
-        // Inject ad html into download page
-        var adContainer = $('<div id="ads-block-frame"></div>');
-        var iframe = $('<iframe></iframe>');
-        adContainer.append(iframe);
-        iframe.css('border', 'none');
+        // Add the ad html into download page
+        var $adContainer = $('<div id="ads-block-frame"></div>');
+        var $iframe = $('<iframe></iframe>');
+        $adContainer.append($iframe);
+        $iframe.css('border', 'none');
 
         // Fill with an ad if we already have one
-        megaAds.showAds(adContainer);
+        megaAds.showAds($adContainer);
 
         // Inject header html to alert users that this is advertisement content and not directly from mega
-        var note = $('<div class="ads-block-header">' + l[7212] + '</div>');
-        adContainer.prepend(note);
-        $('.ads-left-block').prepend(adContainer);
+        var $header = $('<div class="ads-block-header">' + l[7212] + '</div>');
+        $adContainer.prepend($header);
+        $('.ads-left-block').prepend($adContainer);
     },
 
-    showAds: function(adContainer) {
+    /**
+     * Show the ads inside a cross-domain iframe
+     * @param {Object} $adContainer jQuery object of the ads-block-frame
+     */
+    showAds: function($adContainer) {
         
-        var iframe = adContainer.find('iframe');
+        var $iframe = $adContainer.find('iframe');
         
         // Only show ads if we successfully fetched an ad
         if (this.ad) {
             
             // The init ads method injected this iframe into the DOM, we make it visible, the correct size, set its src to show the ad
-            adContainer.css('visibility', 'visible');
-            iframe.css('height', this.ad.height + 'px');
-            iframe.css('width', this.ad.width + 'px');
-            iframe.attr('src', this.ad.src);
+            $adContainer.css('visibility', 'visible');
+            $iframe.css('height', this.ad.height + 'px');
+            $iframe.css('width', this.ad.width + 'px');
+            $iframe.attr('src', this.ad.src);
 
             // Adjust the other elements within the left column so that they display nicer when the advertisement is present
             $('.animations-left-container').hide();
@@ -444,11 +451,12 @@ var megaAds = {
         }
         else {
             // Reset to show no ads
-            adContainer.css('visibility', 'hidden');
-            iframe.css('height', '0px');
-            iframe.css('width', '0px');
-            iframe.removeAttr('src');
+            $adContainer.css('visibility', 'hidden');
+            $iframe.css('height', '0px');
+            $iframe.css('width', '0px');
+            $iframe.removeAttr('src');
             
+            // Hide ad block
             $('.animations-left-container').show();
             $('.ads-left-block').removeClass('ads-enabled');
         }

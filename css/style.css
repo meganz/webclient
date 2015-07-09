@@ -20077,10 +20077,10 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 	visibility:hidden;
 }
 .ads-block-header {
-	background-color:black;
-	color:white;
-	text-align:center;
-	padding-bottom:3px;
+    background-color: black;
+    color: white;
+    padding: 3px 0;
+    text-align: center;
 }
 .download-adv-bl {
 	position: absolute;

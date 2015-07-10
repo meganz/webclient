@@ -1236,7 +1236,7 @@ function srvlog(msg, data, silent) {
         };
     }
     if (!silent && d) {
-        console.error(msg);
+        console.error(msg, data);
     }
     if (!d || onBetaW) {
         window.onerror(msg, '', data ? 1 : -1, 0, data || null);

@@ -1065,7 +1065,7 @@ function initUI() {
             };
         }
 
-        if ($('.nw-fm-left-icon.transfers').hasClass('active')  && clickedClass.indexOf('transfers') == -1) {
+        if ($('.nw-fm-left-icon.transfers').hasClass('active')  && clickedClass.indexOf('transfers') === -1) {
             $('.fmholder').removeClass('transfer-panel-opened');
             $('.nw-fm-left-icon.transfers').removeClass('active');
             $(this).addClass('active');
@@ -5397,7 +5397,7 @@ function transferPanelUI()
         waitForRsizingEvent(function(){
             $('.transfer-table tr.clone-of-header th').each(function(i, e)
             {
-                if ($(e).outerWidth() != 0) {
+                if ($(e).outerWidth()) {
                     var headerColumn = $(el).get(i);
                     $(headerColumn).width($(e).width()+'px');
                 }
@@ -5524,7 +5524,7 @@ function transferPanelUI()
     };
 
     $.clearTransferPanel = function() {
-        if ($('.transfer-table tr').length == 1) {
+        if ($('.transfer-table tr').length === 1) {
             $('.transfer-clear-all-icon').addClass('disabled');
             $('.transfer-pause-icon').addClass('disabled');
             $('.transfer-clear-completed').addClass('disabled');

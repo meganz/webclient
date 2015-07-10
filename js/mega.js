@@ -3970,27 +3970,29 @@ function MegaData()
             : $('.transfer-table tr:not([id^="ul"]) .transfer-status.queued:last'),
             transfersLength = $('.transfer-table tr').length;
 
-        if (target.length)
+        if (target.length) {
             target.closest('tr').after(elem);
-        else
-        {
-            if (gid[0] != 'u')
-            {
+        }
+        else {
+            if (gid[0] != 'u') {
                 target = $('.transfer-table tr[id^="ul"] .transfer-status.queued:first');
             }
 
-            if (target.length)
+            if (target.length) {
                 target.closest('tr').before(elem);
-            else
+            }
+            else {
                 $(elem).insertBefore('.transfer-table .clone-of-header');
+            }
         }
         if (transfersLength > 50) {
             for (var i = 1; i < transfersLength - 50; i++) {
                 $('.transfer-table tr .transfer-status.completed:last').closest('tr').remove();
             }
         }
-        if (!q)
+        if (!q) {
             Soon(fmUpdateCount);
+        }
     }
     this.addToTransferTable = function(elem)
     {

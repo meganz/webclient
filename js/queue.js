@@ -191,10 +191,16 @@ MegaQueue.prototype.validateTask = function() {
     return true;
 }
 
-MegaQueue.prototype.getNextTask = function() {
-    var i, r, len = this._queue.length
+MegaQueue.prototype.getNextTask = function(sp) {
+    var i, r, len = this._queue.length;
     for (i = 0; i < len; i++) {
-        if ((r = this.validateTask(this._queue[i][0]))) {
+        if (!(this._queue && this._queue[i])) {
+            srvlog('Invalid queue' + (this._queue ? ' entry' : '') + ' for ' + this.qname, sp);
+            if (!this._queue) {
+                break;
+            }
+        }
+        else if ((r = this.validateTask(this._queue[i][0]))) {
             return r < 0 ? null : this._queue.splice(i, 1)[0];
         }
     }
@@ -211,7 +217,7 @@ MegaQueue.prototype.process = function(sp) {
         delete this._later;
     }
     while (this._running < this._limit && this._queue.length > 0) {
-        args = this.getNextTask();
+        args = this.getNextTask(sp);
         if (!args) {
             if (++this._noTaskCount == 666) {
                 /**
@@ -230,7 +236,9 @@ MegaQueue.prototype.process = function(sp) {
                     srvlog('MegaQueue.getNextTask gave no tasks for too long... (' + this.qname + ')', sp);
                 }
             }
-            this._process(1600, sp);
+            if (this._queue) {
+                this._process(1600, sp);
+            }
             return false;
         }
         this._noTaskCount = 0;

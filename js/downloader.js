@@ -123,7 +123,7 @@ ClassChunk.prototype.shouldIReportDone = function(report_done) {
 
 // updateProgress {{{
 ClassChunk.prototype.updateProgress = function(force) {
-	if (ui_paused) {
+	if (uldl_hold) {
 		// do not update the UI
 		return false;
 	}

@@ -1017,19 +1017,21 @@ function initUI() {
             $('.nw-fm-left-icon.transfers').removeClass('paused');
             dlQueue.resume();
             ulQueue.resume();
-            ui_paused = false;
+            uldl_hold = false;
         };
 
         $.termsDeny = function() {
             u_logout();
             document.location.reload();
         };
+
+        dlQueue.pause();
+        ulQueue.pause();
+        uldl_hold = true;
+
         termsDialog();
     }
 
-    if (ul_queue.length > 0) {
-        openTransferpanel();
-    }
     M.avatars();
 
     if ((typeof dl_import !== 'undefined') && dl_import) {
@@ -1212,17 +1214,15 @@ function transferPanelContextMenu(target)
 function openTransferpanel()
 {
     $('.nw-fm-left-icon.transfers').addClass('transfering');
-    if (!uldl_hold)
+    // Start the new transfer right away even if the queue is paused?
+    // XXX: Remove fm_tfspause calls at M.addDownload/addUpload to enable this
+    /*if (uldl_hold) {
+        uldl_hold = false;
+        dlQueue.resume();
         ulQueue.resume();
-    else// make sure that terms of service are accepted before any action
-    {
-        $('.transfer-pause-icon').addClass('active');
-        dlQueue.pause();
-        ulQueue.pause();
-        ui_paused = true;
-        $('.transfer-table td:eq(0) .speed').text('');
-        $('.transfer-table tr td:eq(2), .transfer-table tr td:eq(5)').text('');
-    }
+        $('.transfer-pause-icon').removeClass('active').find('span').text(l[6993]);
+        $('.nw-fm-left-icon.transfers').removeClass('paused');
+    }*/
     initTreeScroll();
     $(window).trigger('resize');
 
@@ -1230,8 +1230,7 @@ function openTransferpanel()
         $('.transfer-clear-all-icon').removeClass('hidden');
     }
 
-    $('.tranfer-table .grid-url-arrow').unbind('click')
-    $('.tranfer-table .grid-url-arrow').bind('click', function(e) {
+    $('.tranfer-table .grid-url-arrow').rebind('click', function(e) {
         var target = $(this).closest('tr');
         e.preventDefault();
         e.stopPropagation(); // do not treat it as a regular click on the file
@@ -1268,8 +1267,6 @@ function openTransferpanel()
             $(window).trigger('resize');
         });
     });
-
-
 }
 
 function searchFM()
@@ -5551,8 +5548,9 @@ function transferPanelUI()
     $('.transfer-clear-all-icon').rebind('click', function() {
         if (!$(this).hasClass('disabled')) {
             msgDialog('confirmation', 'cancel all transfers', 'Are you sure you want to cancel all transfers?', '', function(e) {
-                if (!e)
+                if (!e) {
                     return;
+                }
 
                 DownloadManager.abort(null);
                 UploadManager.abort(null);
@@ -5588,11 +5586,13 @@ function transferPanelUI()
         if (!$(this).hasClass('disabled')) {
             if ($(this).hasClass('active')) {
                 // terms of service
-                if (u_type || u_attr.terms)
-                {
+                if (u_type || u_attr.terms) {
+                    dlQueue.resume();
+                    ulQueue.resume();
+                    uldl_hold = false;
+
                     $(this).removeClass('active').find('span').text(l[6993]);
-                    $('.transfer-table tr').not('.clone-of-header').each(function(j, el)
-                    {
+                    $('.transfer-table tr').not('.clone-of-header').each(function(j, el) {
                         if (!$(el).find('.transfer-status.completed').length) {
                             var elId = $(el).attr('id');
                             fm_tfsresume(elId);
@@ -5601,7 +5601,6 @@ function transferPanelUI()
 
                     $('.fm-transfers-block tr span.transfer-type').removeClass('paused');
                     $('.nw-fm-left-icon').removeClass('paused');
-                    uldl_hold = false;
                 }
                 else {
                     alert(l[214]);
@@ -5617,6 +5616,8 @@ function transferPanelUI()
                         fm_tfspause(elId);
                     }
                 });
+                dlQueue.pause();
+                ulQueue.pause();
                 uldl_hold = true;
 
                 $('.transfer-table tr span.transfer-type').not('.done').addClass('paused');

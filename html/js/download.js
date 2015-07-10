@@ -55,19 +55,19 @@ function dl_g(res)
             {
                 ulQueue.pause();
                 dlQueue.pause();
-                ui_paused = true;
+                uldl_hold = true;
                 $(this).addClass('active');
             }
             else
             {
                 dlQueue.resume();
                 ulQueue.resume();
-                ui_paused = false;
+                uldl_hold = false;
                 $(this).removeClass('active');
             }
         });
         $('.new-download-sync-app').rebind('click', function(e) {
-			$('.megasync-overlay').removeClass('downloading');
+            $('.megasync-overlay').removeClass('downloading');
             megasync.download(dlpage_ph, dlpage_key);
         });
         $('.new-download-red-button').unbind('click');
@@ -157,7 +157,7 @@ function closedlpopup()
 }
 
 function importFile() {
-    
+
     api_req({
         a: 'p',
         t: M.RootID,
@@ -247,10 +247,10 @@ function dlstart(id,name,filesize)
 function start_import()
 {
     dl_import = dlpage_ph;
-    
+
     if (u_type) {
         document.location.hash = 'fm';
-        
+
         if (fminitialized) {
             importFile();
         }

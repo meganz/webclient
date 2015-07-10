@@ -2145,10 +2145,10 @@ function fmremove() {
             $('#msgDialog').addClass('multiple');
             $('.fm-del-contacts-number').text($.selected.length);
             $('#msgDialog .fm-del-contact-avatar').attr('class', 'fm-del-contact-avatar');
-            $('#msgDialog .fm-del-contact-avatar span').empty()
+            $('#msgDialog .fm-del-contact-avatar span').empty();
         } else {
-            var user = M.d[$.selected[0]];
-            avatar = useravatar.contact(user);
+            var user = M.d[$.selected[0]],
+                avatar = useravatar.contact(user);
 
             $('#msgDialog .fm-del-contact-avatar').html(avatar);
         }
@@ -6644,14 +6644,21 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
     }
     if (type === 'delete-contact') {
         $('#msgDialog').addClass('delete-contact');
-        $('#msgDialog .fm-notifications-bottom').html('<div class="fm-dialog-button notification-button confirm"><span>' + l[78] + '</span></div><div class="fm-dialog-button notification-button cancel"><span>' + l[79] + '</span></div><div class="clear"></div>');
+        $('#msgDialog .fm-notifications-bottom')
+            .html('<div class="fm-dialog-button notification-button confirm"><span>'
+                + l[78] + '</span></div><div class="fm-dialog-button notification-button cancel"><span>'
+                + l[79] + '</span></div><div class="clear"></div>');
         $('#msgDialog .fm-dialog-button').eq(0).bind('click',function() {
             closeMsg();
-            if ($.warningCallback) $.warningCallback(true);
+            if ($.warningCallback) {
+                $.warningCallback(true);
+            }
         });
         $('#msgDialog .fm-dialog-button').eq(1).bind('click',function() {
             closeMsg();
-            if ($.warningCallback) $.warningCallback(false);
+            if ($.warningCallback) {
+                $.warningCallback(false);
+            }
         });
     }
     else if (type === 'warninga' || type === 'warningb' || type === 'info') {

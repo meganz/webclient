@@ -3581,13 +3581,15 @@ function MegaData()
             $.totalDL = 0;
         }
 
-        var pauseTxt = '', p = '';
+        var p = '';
+        var pauseTxt = '';
         if (uldl_hold) {
             p = 'paused';
             pauseTxt = ' (' + l[1651] + ')';
         }
 
         for (var k in nodes) {
+            /* jshint -W089 */
             if (!nodes.hasOwnProperty(k) || !(n = M.d[nodes[k]])) {
                 console.error('** CHECK THIS **', 'Invalid node', k, nodes[k]);
                 continue;
@@ -3674,7 +3676,7 @@ function MegaData()
             initFileblocksScrolling();
             initTreeScroll();
             setupTransferAnalysis();
-            if ((downloading = !!dl_queue.length)) {
+            if ((dlmanager.isDownloading = !!dl_queue.length)) {
                 $('.transfer-pause-icon').removeClass('disabled');
                 $('.transfer-clear-completed').removeClass('disabled');
                 $('.transfer-clear-all-icon').removeClass('disabled');
@@ -3759,7 +3761,7 @@ function MegaData()
                 {
                     $('.widget-block').removeClass('hidden');
                     $('.widget-block').show();
-                    if (!ul_uploading)
+                    if (!ulmanager.isUploading)
                         $('.widget-circle').attr('class', 'widget-circle percents-' + perc);
                     $('.widget-icon.downloading').removeClass('hidden');
                     $('.widget-speed-block.dlspeed').text(bytesToSize(bps, 1) + '/s');
@@ -3805,7 +3807,7 @@ function MegaData()
             setTimeout(fm_chromebar, 1000, $.dlheight);
         }
         var a = dl_queue.filter(isQueueActive).length;
-        if (a < 2 && !ul_uploading)
+        if (a < 2 && !ulmanager.isUploading)
         {
             $('.widget-block').fadeOut('slow', function(e)
             {
@@ -3826,7 +3828,7 @@ function MegaData()
         }
 
         $.transferHeader();
-        Soon(resetUploadDownload);
+        Soon(mega.utils.resetUploadDownload);
     }
 
     this.dlbeforecomplete = function()
@@ -4050,7 +4052,7 @@ function MegaData()
     this.addUpload = function(u, ignoreWarning) {
 
         /*if (u.length > 99 && !ignoreWarning) {
-            if (UploadManager.warning(M.addUpload.bind(M, u, true))) {
+            if (ulmanager.warning(M.addUpload.bind(M, u, true))) {
                 return;
             }
         }*/
@@ -4111,7 +4113,7 @@ function MegaData()
         }
 
         setupTransferAnalysis();
-        if ((ul_uploading = !!ul_queue.length)) {
+        if ((ulmanager.isUploading = !!ul_queue.length)) {
             $('.transfer-pause-icon').removeClass('disabled');
             $('.transfer-clear-completed').removeClass('disabled');
             $('.transfer-clear-all-icon').removeClass('disabled');
@@ -4212,7 +4214,7 @@ function MegaData()
         $('.transfer-table #ul_' + id + ' td:eq(0) span.transfer-type').addClass('done').html(l[1501]);
         ul_queue[ul.pos] = Object.freeze({});
         var a=ul_queue.filter(isQueueActive).length;
-        if (a < 2 && !ul_uploading)
+        if (a < 2 && !ulmanager.isUploading)
         {
             $('.widget-block').fadeOut('slow',function(e)
             {
@@ -4229,7 +4231,7 @@ function MegaData()
             delete $.transferprogress['ul_'+ id];
         }
         $.transferHeader();
-        Soon(resetUploadDownload);
+        Soon(mega.utils.resetUploadDownload);
     }
 
     this.ulstart = function(ul)

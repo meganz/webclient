@@ -716,7 +716,7 @@ else if (!b_u)
         };
     })(console);
 
-    Object.defineProperty(window, "__cd_v", { value : 13, writable : false });
+    Object.defineProperty(window, "__cd_v", { value : 14, writable : false });
     if (!d || onBetaW)
     {
         var __cdumps = [], __cd_t;
@@ -1180,8 +1180,6 @@ else if (!b_u)
             }
         }
     }
-    var downloading = false;
-    var ul_uploading = false;
     var lightweight=false;
     var waitingToBeLoaded = 0,jsl_done,jj_done = !jj;
     var fx_startup_cache = is_chrome_firefox && nocontentcheck;

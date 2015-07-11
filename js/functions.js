@@ -1282,7 +1282,9 @@ function dlError(text) {
  */
 function removeValue(array, value, can_fail) {
     var idx = array.indexOf(value);
-    ASSERT(can_fail || idx !== -1, 'Unable to Remove Value ' + value);
+    if (d) {
+        ASSERT(can_fail || idx !== -1, 'Unable to Remove Value ' + value);
+    }
     if (idx !== -1) {
         array.splice(idx, 1);
     }
@@ -1290,7 +1292,7 @@ function removeValue(array, value, can_fail) {
 }
 
 function setTransferStatus(dl, status, ethrow, lock) {
-    var id = dl && DownloadManager.GetGID(dl);
+    var id = dl && dlmanager.getGID(dl);
     var text = '' + status;
     if (text.length > 44) {
         text = text.substr(0, 42) + '...';
@@ -1327,7 +1329,7 @@ function dlFatalError(dl, error, ethrow) {
     }
     msgDialog('warninga', l[1676], m, error);
     setTransferStatus(dl, error, ethrow, true);
-    DownloadManager.abort(dl);
+    dlmanager.abort(dl);
 }
 
 /**
@@ -2826,7 +2828,7 @@ mega.utils.getStack = function megaUtilsGetStack() {
  *  @return {Boolean}
  */
 mega.utils.hasPendingTransfers = function megaUtilsHasPendingTransfers() {
-    return ((fminitialized && downloading) || ul_uploading);
+    return ((fminitialized && dlmanager.isDownloading) || ulmanager.isUploading);
 };
 
 /**
@@ -2848,14 +2850,14 @@ mega.utils.abortTransfers = function megaUtilsAbortTransfers() {
     else {
         msgDialog('confirmation', l[967], l[377] + ' ' + l[507] + '?', false, function(doIt) {
             if (doIt) {
-                if (downloading) {
-                    dl_cancel();
+                if (dlmanager.isDownloading) {
+                    dlmanager.abort(null);
                 }
-                if (ul_uploading) {
-                    ul_cancel();
+                if (ulmanager.isUploading) {
+                    ulmanager.abort(null);
                 }
 
-                resetUploadDownload();
+                mega.utils.resetUploadDownload();
                 loadingDialog.show();
                 var timer = setInterval(function() {
                     if (!mega.utils.hasPendingTransfers()) {
@@ -2871,6 +2873,45 @@ mega.utils.abortTransfers = function megaUtilsAbortTransfers() {
     }
 
     return promise;
+};
+
+/**
+ * On transfers completion cleanup
+ */
+mega.utils.resetUploadDownload = function megaUtilsResetUploadDownload() {
+    if (!ul_queue.some(isQueueActive)) {
+        ul_queue = new UploadQueue();
+        ulmanager.isUploading = false;
+        ASSERT(ulQueue._running === 0, 'ulQueue._running inconsistency on completion');
+        ulQueue._pending = [];
+    }
+    if (!dl_queue.some(isQueueActive)) {
+        dl_queue = new DownloadQueue();
+        dlmanager.isDownloading = false;
+    }
+
+    if (!dlmanager.isDownloading && !ulmanager.isUploading) {
+        clearXhr(); /* destroy all xhr */
+
+        $('.transfer-pause-icon').addClass('disabled');
+        $('.nw-fm-left-icon.transfers').removeClass('transfering');
+        $('.transfers .nw-fm-percentage li p').css('transform', 'rotate(0deg)');
+        panelDomQueue = {};
+        GlobalProgress = {};
+        delete $.transferprogress;
+        fmUpdateCount();
+        if ($.mTransferAnalysis) {
+            clearInterval($.mTransferAnalysis);
+            delete $.mTransferAnalysis;
+        }
+        $('.transfer-panel-title').html(l[104]);
+    }
+
+    if (d) {
+        dlmanager.logger.info("resetUploadDownload", ul_queue.length, dl_queue.length);
+    }
+
+    Later(percent_megatitle);
 };
 
 /**

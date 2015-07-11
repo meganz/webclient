@@ -1628,7 +1628,7 @@ function topmenuUI() {
     if (page.substr(0, 2) !== 'fm' && u_type == 3 && !avatars[u_handle]) {
         M.avatars();
     }
-    if (ul_uploading || downloading) {
+    if (ulmanager.isUploading || dlmanager.isDownloading) {
         $('.widget-block').removeClass('hidden');
     }
 
@@ -1855,7 +1855,7 @@ function languageDialog(close) {
 }
 
 window.onbeforeunload = function () {
-    if (downloading || ul_uploading) {
+    if (dlmanager.isDownloading || ulmanager.isUploading) {
         return l[377];
     }
 

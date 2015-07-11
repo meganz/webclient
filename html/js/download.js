@@ -86,7 +86,7 @@ function dl_g(res)
             }
             else
             {
-                downloading = true;
+                dlmanager.isDownloading = true;
                 dl_queue.push(fdl_queue_var);
                 $('.download-mid-centered-block').addClass('downloading');
                 $.dlhash = window.location.hash;
@@ -241,7 +241,7 @@ function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
 
 function dlstart(id,name,filesize)
 {
-    downloading = true;
+    dlmanager.isDownloading = true;
 }
 
 function start_import()
@@ -317,7 +317,7 @@ function dlcomplete(id)
     }
     var a=0;
     for(var i in dl_queue) if (typeof dl_queue[i] == 'object' && dl_queue[i]['dl_id']) a++;
-    if (a < 2 && !ul_uploading)
+    if (a < 2 && !ulmanager.isUploading)
     {
         $('.widget-block').fadeOut('slow',function(e)
         {
@@ -327,7 +327,7 @@ function dlcomplete(id)
     }
     else if (a < 2) $('.widget-icon.downloading').addClass('hidden');
     else $('.widget-circle').attr('class','widget-circle percents-0');
-    Soon(resetUploadDownload);
+    Soon(mega.utils.resetUploadDownload);
 }
 
 function sync_switchOS(os)

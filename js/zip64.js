@@ -462,7 +462,7 @@ ZipWriter.prototype.destroy = function(error) {
             }
         }
         else if (dlMethod != FlashIO) {
-            DownloadManager.cleanupUI(dl, true);
+            dlmanager.cleanupUI(dl, true);
         }
         oDestroy(this);
     }

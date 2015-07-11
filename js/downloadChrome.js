@@ -73,7 +73,7 @@
                         var deltime = metadata.modificationTime.getTime()
                             + tsec * 1000 + metadata.size / 1024 + 30000;
 
-                        if (!isTrasferActive(file.name) && deltime < Date.now() && deltime < lastactive) {
+                        if (!dlmanager.isTrasferActive(file.name) && deltime < Date.now() && deltime < lastactive) {
                             file.remove(function() {
                                     totalsize += metadata.size;
                                     if (d) {

@@ -690,12 +690,15 @@ function initUI() {
                 dd = 'nw-fm-left-icon';
                 if (a == 'drop')
                 {
-                    if (c.indexOf('cloud') > -1)
+                    if (c.indexOf('cloud') > -1) {
                         t = M.RootID;
-                    else if (c.indexOf('rubbish-bin') > -1)
+                    }
+                    else if (c.indexOf('rubbish-bin') > -1) {
                         t = M.RubbishID;
-                    else if (c.indexOf('transfers') > -1)
+                    }
+                    else if (c.indexOf('transfers') > -1) {
                         dd = 'download';
+                    }
                 }
             }
             else if (c && c.indexOf('nw-fm-tree-item') > -1 && !$(e.target).visible(!0))
@@ -1259,8 +1262,8 @@ function openTransferpanel()
             $(this).remove();
         });
         toabort = Object.keys(toabort);
-        DownloadManager.abort(toabort);
-        UploadManager.abort(toabort);
+        dlmanager.abort(toabort);
+        ulmanager.abort(toabort);
         $.clearTransferPanel();
         fmUpdateCount();
         Soon(function() {
@@ -2559,8 +2562,8 @@ function initContextUI() {
         });
 
         toabort = Object.keys(toabort);
-        DownloadManager.abort(toabort);
-        UploadManager.abort(toabort);
+        dlmanager.abort(toabort);
+        ulmanager.abort(toabort);
         $.clearTransferPanel();
         fmUpdateCount();
 
@@ -5382,25 +5385,14 @@ function transferPanelUI()
     {
         fm_resize_handler();
         var el = $('.transfer-table-header th');
-        var waitForRsizingEvent = (function () {
-            var timers = {};
-            return function (callback, ms, uniqueId) {
-                if (timers[uniqueId]) {
-                    clearTimeout (timers[uniqueId]);
-                }
-                timers[uniqueId] = setTimeout(callback, ms);
-            };
-        })();
-        waitForRsizingEvent(function(){
-            $('.transfer-table tr.clone-of-header th').each(function(i, e)
-            {
+        setTimeout(function() {
+            $('.transfer-table tr.clone-of-header th').each(function(i, e) {
                 if ($(e).outerWidth()) {
                     var headerColumn = $(el).get(i);
-                    $(headerColumn).width($(e).width()+'px');
+                    $(headerColumn).width($(e).width() + 'px');
                 }
             });
-        }, 100, 'transferPanel');
-
+        }, 100);
 
         var tth = $('.transfer-table-header');
         var toHide = (dl_queue.length || ul_queue.length || $('.transfer-table tr').length > 1);
@@ -5552,8 +5544,8 @@ function transferPanelUI()
                     return;
                 }
 
-                DownloadManager.abort(null);
-                UploadManager.abort(null);
+                dlmanager.abort(null);
+                ulmanager.abort(null);
 
                 $('.transfer-table tr').not('.clone-of-header').fadeOut(function() {
                     $(this).remove();
@@ -5609,11 +5601,11 @@ function transferPanelUI()
             }
             else {
                 $(this).addClass('active').find('span').text('Resume transfers');
-                $('.transfer-table tr').not('.clone-of-header').each(function(j, el)
-                {
-                    if (!$(el).find('.transfer-status.completed').length && !$(el).find('.transfer-type.paused').length) {
-                        var elId = $(el).attr('id');
-                        fm_tfspause(elId);
+                $('.transfer-table tr').not('.clone-of-header').each(function(j, el) {
+                    if (!$(el).find('.transfer-status.completed').length
+                            && !$(el).find('.transfer-type.paused').length) {
+
+                        fm_tfspause($(el).attr('id'));
                     }
                 });
                 dlQueue.pause();
@@ -9226,7 +9218,7 @@ function slideshow(id, close)
             {
                 if (dl_queue[i].preview)
                 {
-                    DownloadManager.abort(dl_queue[i]);
+                    dlmanager.abort(dl_queue[i]);
                 }
                 break;
             }
@@ -9613,9 +9605,9 @@ function savecomplete(id)
     fm_hideoverlay();
     if (!$.dialog)
         $('#dlswf_' + id).remove();
-    var dl = IdToFile(id);
+    var dl = dlmanager.idToFile(id);
     M.dlcomplete(dl);
-    DownloadManager.cleanupUI(dl, true);
+    dlmanager.cleanupUI(dl, true);
 }
 
 /**
@@ -9637,7 +9629,9 @@ function fm_resize_handler() {
 
     $('.transfer-scrolling-table').css({
         'height': (
-             $('.fm-transfers-block').outerHeight() -  $('.transfer-table-header').outerHeight() - $('.fm-tranfers-header').outerHeight()
+             $('.fm-transfers-block').outerHeight()
+                - $('.transfer-table-header').outerHeight()
+                - $('.fm-tranfers-header').outerHeight()
         ) + "px"
     });
 

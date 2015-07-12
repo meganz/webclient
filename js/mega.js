@@ -3676,7 +3676,7 @@ function MegaData()
             initFileblocksScrolling();
             initTreeScroll();
             setupTransferAnalysis();
-            if ((dlmanager.isDownloading = !!dl_queue.length)) {
+            if ((dlmanager.isDownloading = Boolean(dl_queue.length))) {
                 $('.transfer-pause-icon').removeClass('disabled');
                 $('.transfer-clear-completed').removeClass('disabled');
                 $('.transfer-clear-all-icon').removeClass('disabled');
@@ -4113,7 +4113,7 @@ function MegaData()
         }
 
         setupTransferAnalysis();
-        if ((ulmanager.isUploading = !!ul_queue.length)) {
+        if ((ulmanager.isUploading = Boolean(ul_queue.length))) {
             $('.transfer-pause-icon').removeClass('disabled');
             $('.transfer-clear-completed').removeClass('disabled');
             $('.transfer-clear-all-icon').removeClass('disabled');

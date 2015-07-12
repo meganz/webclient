@@ -1,5 +1,5 @@
 function MemoryIO(dl_id, dl) {
-    var dblob, offset = 0,
+    var dblob, offset = 0, logger,
         msie = typeof MSBlobBuilder === 'function'
 
     if (d) {
@@ -61,7 +61,8 @@ function MemoryIO(dl_id, dl) {
 
     this.setCredentials = function(url, size, filename, chunks, sizes) {
         if (d) {
-            DEBUG('MemoryIO Begin', dl_id, Array.prototype.slice.call(arguments));
+            logger = new MegaLogger('MemoryIO', {}, dl.writer.logger);
+            logger.info('MemoryIO Begin', dl_id, Array.prototype.slice.call(arguments));
         }
         if (size > MemoryIO.fileSizeLimit) {
             dlFatalError(dl, Error('File too big to be reliably handled in memory.'));

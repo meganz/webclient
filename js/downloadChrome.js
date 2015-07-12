@@ -310,6 +310,7 @@
             targetpos = 0,
             zfileEntry,
             wTimer,
+            logger,
             failed = false,
             that = this;
 
@@ -319,7 +320,7 @@
             };
             fs.root.getDirectory('mega', options, function(dirEntry) {
                 if (d) {
-                    console.log("Opening file for writing: mega/" + dl_id);
+                    logger.info("Opening file for writing: mega/" + dl_id);
                 }
 
                 if (is_chrome_firefox) {
@@ -333,14 +334,14 @@
                 fs.root.getFile('mega/' + dl_id, options, function(fileEntry) {
                     fileEntry.createWriter(function(fileWriter) {
                         if (d) {
-                            console.log('File "mega/' + dl_id + '" created');
+                            logger.info('File "mega/' + dl_id + '" created');
                         }
                         dl_fw = fileWriter;
 
                         dl_fw.onerror = function(e) {
                             /* onwriteend() will take care of it */
                             if (d) {
-                                console.error(e);
+                                logger.error(e);
                             }
                         };
 
@@ -353,7 +354,7 @@
                                         that.begin();
                                     }
                                     else if (d) {
-                                        console.error("No 'begin' function, this must be aborted...", dl);
+                                        logger.error("No 'begin' function, this must be aborted...", dl);
                                     }
                                     that = null;
                                 }
@@ -366,7 +367,7 @@
                                 dl_ack_write();
                             }
                             else {
-                                console.error('Short write (' + dl_fw.position + ' / ' +
+                                logger.error('Short write (' + dl_fw.position + ' / ' +
                                     targetpos + ')');
 
                                 /* try to release disk space and retry */
@@ -413,7 +414,7 @@
                 dl_storagetype = aStorageType !== 1 ? 0 : 1;
 
                 if (d) {
-                    console.log('Using Storage: ' + storage_n2s(dl_storagetype),
+                    logger.info('Using Storage: ' + storage_n2s(dl_storagetype),
                         aStorageType, aEvent, aFail);
                 }
 
@@ -443,7 +444,7 @@
                     }
                     catch (e) {
                         if (d) {
-                            console.error(e);
+                            logger.error(e);
                         }
                     }
                 }
@@ -456,7 +457,9 @@
                 failed = false;
                 /* retry */
                 dl_fw.seek(dl_position);
-                DEBUG('IO: error, retrying');
+                if (d) {
+                    logger.info('IO: error, retrying');
+                }
                 return wTimer = setTimeout(function() {
                     dl_fw.write(new Blob([dl_buffer]))
                 }, 2600);
@@ -487,7 +490,7 @@
             dl_done = done;
 
             if (d) {
-                console.log("Write " + buffer.length + " bytes at " + position + "/" + dl_fw.position);
+                logger.info("Write " + buffer.length + " bytes at " + position + "/" + dl_fw.position);
             }
             try {
                 dl_fw.write(new Blob([buffer]));
@@ -506,6 +509,7 @@
         };
 
         this.setCredentials = function(url, size, filename, chunks, sizes) {
+            logger = new MegaLogger('FileSystemAPI', {}, dl.writer.logger);
             dl_geturl = url;
             dl_filesize = size;
             dl_filename = filename;

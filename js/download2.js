@@ -1,13 +1,6 @@
 
 var dlMethod;
 var dl_maxSlots = readLocalStorage('dl_maxSlots', 'int', { min: 1, max: 6, def: 5 });
-var dlQueue = new TransferQueue(function _downloader(task, done) {
-    if (!task.dl) {
-        dlmanager.logger.info('Skipping frozen task ' + task);
-        return done();
-    }
-    return task.run(done);
-}, dl_maxSlots, 'downloads');
 
 /* jshint -W003 */
 var dlmanager = {
@@ -364,7 +357,7 @@ var dlmanager = {
     throttleByIO: function DM_throttleByIO(writer) {
         writer.on('queue', function() {
             if (writer._queue.length >= dlmanager.ioThrottleLimit && !dlQueue.isPaused()) {
-                dlmanager.logger.info("IO_THROTTLE: pause XHR");
+                writer.logger.info("IO_THROTTLE: pause XHR");
                 dlQueue.pause();
                 dlmanager.ioThrottlePaused = true;
             }
@@ -372,7 +365,7 @@ var dlmanager = {
 
         writer.on('working', function() {
             if (writer._queue.length < dlmanager.ioThrottleLimit && dlmanager.ioThrottlePaused) {
-                dlmanager.logger.info("IO_THROTTLE: resume XHR");
+                writer.logger.info("IO_THROTTLE: resume XHR");
                 dlQueue.resume();
                 dlmanager.ioThrottlePaused = false;
             }
@@ -447,7 +440,7 @@ var dlmanager = {
         dl.writer = new MegaQueue(function dlIOWriterStub(task, done) {
             if (!task.data.byteLength || dl.cancelled) {
                 if (d) {
-                    dlmanager.logger.error(dl.cancelled ? "download cancelled" : "writing empty chunk");
+                    dl.writer.logger.error(dl.cancelled ? "download cancelled" : "writing empty chunk");
                 }
                 return finish_write(task, done);
             }
@@ -476,7 +469,7 @@ var dlmanager = {
 
         dl.writer.validateTask = function(t) {
             var r = (!is_ready || is_ready()) && t.offset === dl.writer.pos;
-            // if (d) dlmanager.logger.info('validateTask', r, t.offset, dl.writer.pos, t, dl, dl.writer);
+            // if (d) this.logger.info('validateTask', r, t.offset, dl.writer.pos, t, dl, dl.writer);
             return r;
         };
     },
@@ -697,6 +690,14 @@ function fm_tfsmove(gid, dir) { // -1:up, 1:down
     }
 }
 
+
+var dlQueue = new TransferQueue(function _downloader(task, done) {
+    if (!task.dl) {
+        dlQueue.logger.info('Skipping frozen task ' + task);
+        return done();
+    }
+    return task.run(done);
+}, dl_maxSlots, 'downloader');
 
 // chunk scheduler {{{
 dlQueue.validateTask = function(pzTask) {

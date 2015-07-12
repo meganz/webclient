@@ -1642,28 +1642,28 @@ function CreateWorkers(url, message, size) {
     }
 
     return new MegaQueue(function(task, done) {
-            for (var i = 0; i < size; i++) {
-                if (worker[i] === null) {
-                    worker[i] = create(i);
-                }
-                if (!worker[i].busy) {
-                    break;
-                }
+        for (var i = 0; i < size; i++) {
+            if (worker[i] === null) {
+                worker[i] = create(i);
             }
-            worker[i].busy = true;
-            instances[i] = done;
-            $.each(task, function(e, t) {
-                    if (e === 0) {
-                        worker[i].context = t;
-                    }
-                    else if (t.constructor === Uint8Array && typeof MSBlobBuilder !== "function") {
-                        worker[i].postMessage(t.buffer, [t.buffer]);
-                    }
-                    else {
-                        worker[i].postMessage(t);
-                    }
-                });
-        }, size, 'worker-' + url);
+            if (!worker[i].busy) {
+                break;
+            }
+        }
+        worker[i].busy = true;
+        instances[i] = done;
+        $.each(task, function(e, t) {
+                if (e === 0) {
+                    worker[i].context = t;
+                }
+                else if (t.constructor === Uint8Array && typeof MSBlobBuilder !== "function") {
+                    worker[i].postMessage(t.buffer, [t.buffer]);
+                }
+                else {
+                    worker[i].postMessage(t);
+                }
+            });
+    }, size, url.split('/').pop().split('.').shift() + '-worker');
 }
 
 function mKeyDialog(ph, fl) {

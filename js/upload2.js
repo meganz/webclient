@@ -3,12 +3,6 @@ var ul_maxSpeed = 0;
 var uldl_hold = false;
 var ul_skipIdentical = 0;
 var ul_maxSlots = readLocalStorage('ul_maxSlots', 'int', { min:1, max:6, def:4 });
-var ulQueue = new TransferQueue(function _workerUploader(task, done) {
-    if (d && d > 1) {
-        ulmanager.logger.info('worker_uploader', task, done);
-    }
-    task.run(done);
-}, ul_maxSlots, 'uploads');
 
 if (localStorage.ul_maxSpeed) {
     ul_maxSpeed = parseInt(localStorage.ul_maxSpeed);
@@ -315,7 +309,7 @@ var ulmanager = {
                                     error = null;
                                 }
                                 catch (e) {
-                                    ulmanager.logger.error(e);
+                                    handler.logger.error(e);
                                     error = e;
                                 }
                             }
@@ -340,13 +334,14 @@ var ulmanager = {
                     fs.readAsArrayBuffer(blob);
                 }
                 catch (e) {
-                    ulmanager.logger.error(e);
+                    handler.logger.error(e);
                     done(e);
                     done = null;
                 }
             };
         }
-        return new MegaQueue(handler, 1, 'ul-filereader');
+        handler = new MegaQueue(handler, 1, 'ul-filereader');
+        return handler;
     },
 
     ulFinalize: function UM_ul_finalize(file, target) {
@@ -859,7 +854,7 @@ ChunkUpload.prototype.on_ready = function(args, xhr) {
 
             if (response.length === 27) {
                 var ul_key = this.file.ul_key;
-                var t = Object.getOwnPropertyNames(this.file.ul_macs);
+                var t = Object.keys(this.file.ul_macs);
                 t.sort(function(a, b) {
                         return parseInt(a) - parseInt(b);
                     });
@@ -1145,34 +1140,16 @@ var Mkdir = Parallel(function(args, next) {
     });
 });
 
-var isQueueActive = function(q) {
+function isQueueActive(q) {
     return typeof q.id !== 'undefined';
 }
 
-var Encrypter = CreateWorkers('encrypter.js', function(context, e, done) {
-    var file = context.file;
-    if (!file || !file.ul_macs) {
-        // TODO: This upload was cancelled, we should terminate the worker rather than waiting
-        if (d) {
-            ulmanager.logger.error('This upload was cancelled, we should terminate the worker rather than waiting');
-        }
-        return typeof e.data === 'string' || done();
+var ulQueue = new TransferQueue(function _workerUploader(task, done) {
+    if (d && d > 1) {
+        ulQueue.logger.info('worker_uploader', task, done);
     }
-
-    if (typeof e.data === 'string') {
-        if (e.data[0] === '[') {
-            file.ul_macs[context.start] = JSON.parse(e.data);
-        }
-        else {
-            ulmanager.logger.info('WORKER:', e.data);
-        }
-    }
-    else {
-        context.bytes = new Uint8Array(e.data.buffer || e.data);
-        context.suffix = '/' + context.start + '?c=' + base64urlencode(chksum(context.bytes.buffer));
-        done();
-    }
-}, 4);
+    task.run(done);
+}, ul_maxSlots, 'uploader');
 
 ulQueue.poke = function(file, meth) {
     if (file.owner) {
@@ -1249,5 +1226,35 @@ ulQueue.validateTask = function(pzTask) {
 
     return false;
 };
+
+
+mBroadcaster.once('startMega', function _setupEncrypter() {
+    var encrypter = CreateWorkers('encrypter.js', function(context, e, done) {
+        var file = context.file;
+        if (!file || !file.ul_macs) {
+            // TODO: This upload was cancelled, we should terminate the worker rather than waiting
+            if (d) {
+                encrypter.logger.error('This upload was cancelled, we should terminate the worker rather than waiting');
+            }
+            return typeof e.data === 'string' || done();
+        }
+
+        if (typeof e.data === 'string') {
+            if (e.data[0] === '[') {
+                file.ul_macs[context.start] = JSON.parse(e.data);
+            }
+            else {
+                encrypter.logger.info('WORKER:', e.data);
+            }
+        }
+        else {
+            context.bytes = new Uint8Array(e.data.buffer || e.data);
+            context.suffix = '/' + context.start + '?c=' + base64urlencode(chksum(context.bytes.buffer));
+            done();
+        }
+    }, 4);
+
+    Object.defineProperty(window, 'Encrypter', { value: encrypter });
+});
 
 var ul_queue = new UploadQueue();

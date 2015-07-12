@@ -560,33 +560,36 @@ ClassFile.prototype.run = function(task_done) {
 };
 // }}}
 
-var Decrypter = CreateWorkers('decrypter.js', function(context, e, done) {
-    var dl = context[0];
-    var offset = context[1];
+mBroadcaster.once('startMega', function _setupDecrypter() {
+    var decrypter = CreateWorkers('decrypter.js', function(context, e, done) {
+        var dl = context[0];
+        var offset = context[1];
 
-    if (typeof (e.data) === "string") {
-        if (e.data[0] === '[') {
-            var pos = offset;
-            var t = JSON.parse(e.data);
-            for (var i = 0; i < t.length; i += 4) {
-                dl.macs[pos] = [t[i], t[i + 1], t[i + 2], t[i + 3]];
-                pos += 1048576;
+        if (typeof (e.data) === "string") {
+            if (e.data[0] === '[') {
+                var pos = offset;
+                var t = JSON.parse(e.data);
+                for (var i = 0; i < t.length; i += 4) {
+                    dl.macs[pos] = [t[i], t[i + 1], t[i + 2], t[i + 3]];
+                    pos += 1048576;
+                }
             }
+            decrypter.logger.info("worker replied string", e.data, dl.macs);
         }
-        dlmanager.logger.info("worker replied string", e.data, dl.macs);
-    }
-    else {
-        var plain = new Uint8Array(e.data.buffer || e.data);
-        dlmanager.logger.info("Decrypt done", dl.cancelled);
-        dl.decrypter--;
-        if (!dl.cancelled) {
-            dl.writer.push({
-                data: plain,
-                offset: offset
-            });
+        else {
+            var plain = new Uint8Array(e.data.buffer || e.data);
+            decrypter.logger.info("Decrypt done", dl.cancelled);
+            dl.decrypter--;
+            if (!dl.cancelled) {
+                dl.writer.push({
+                    data: plain,
+                    offset: offset
+                });
+            }
+            plain = null;
+            done();
         }
-        plain = null;
-        done();
-    }
-}, 4);
+    }, 4);
 
+    Object.defineProperty(window, 'Decrypter', { value: decrypter });
+});

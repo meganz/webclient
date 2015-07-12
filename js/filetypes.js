@@ -225,8 +225,15 @@ for (var i in extensions) {
 }
 
 function filetype(n) {
-    if (ext[fileext(n)]) {
-        return ext[fileext(n)][1];
+    if (typeof n === 'object') {
+        n = n.name;
+    }
+    var fext = fileext(String(n));
+    if (ext[fext]) {
+        return ext[fext][1];
+    }
+    else if (fext && fext.length > 1) {
+        return fext.toUpperCase() + ' File';
     }
     else {
         return 'File';
@@ -261,5 +268,4 @@ function fileext(name) {
         ext = '';
     }
     return ext.toLowerCase();
-    return name;
 }

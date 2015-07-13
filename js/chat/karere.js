@@ -45,8 +45,8 @@ var Karere = function(user_options) {
 
     Strophe.fatal = function (msg) { self.error(msg); };
     Strophe.error = function (msg) { self.error(msg); };
-    Strophe.info = function (msg) { self.logger.info(msg); };
-    Strophe.debug = function (msg) { self.logger.debug(msg); };
+    //Strophe.info = function (msg) { self.logger.info(msg); };
+    //Strophe.debug = function (msg) { self.logger.debug(msg); };
 
 
     // initialize the connection state

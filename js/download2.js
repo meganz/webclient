@@ -96,10 +96,15 @@ var dlmanager = {
             this._multiAbort = 1;
 
             if (gid) {
-                gid.forEach(this.abort.bind(this));
+                gid.forEach(function(dl) {
+                    dlmanager.abort(dl, keepUI);
+                });
             }
             else {
-                dl_queue.filter(isQueueActive).forEach(this.abort.bind(this));
+                dl_queue.filter(isQueueActive)
+                    .forEach(function(dl) {
+                        dlmanager.abort(dl, keepUI);
+                    });
             }
 
             delete this._multiAbort;

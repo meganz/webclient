@@ -358,10 +358,10 @@ ZipEntryIO.prototype.toString = function() {
     return "[ZipEntry " + (this.file && this.file.n) + "]";
 };
 ZipEntryIO.prototype.destroy = function() {
-    if (d) {
-        this.logger.info('Destroying ' + this);
-    }
-    if (this.file) {
+    if (!oIsFrozen(this)) {
+        if (d) {
+            this.logger.info('Destroying ' + this);
+        }
         oDestroy(this);
     }
 };

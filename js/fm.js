@@ -2535,6 +2535,8 @@ function initContextUI() {
             fm_tfsresume(id);
             $('span.transfer-type', this).removeClass('paused');
             if (uldl_hold) {
+                dlQueue.resume();
+                ulQueue.resume();
                 uldl_hold = false;
                 $('.transfer-pause-icon').removeClass('active').find('span').text(l[6993]);
                 $('.nw-fm-left-icon.transfers').removeClass('paused');
@@ -5519,7 +5521,7 @@ function transferPanelUI()
             $('.transfer-table-header').hide();
             $('.transfer-panel-empty-txt').removeClass('hidden');
             $('.transfer-panel-title').html(l[104]);
-			$('.nw-fm-left-icon.transfers').removeClass('transfering').find('p').removeAttr('style');
+            $('.nw-fm-left-icon.transfers').removeClass('transfering').find('p').removeAttr('style');
         }
     };
 

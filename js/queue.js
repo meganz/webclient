@@ -98,7 +98,7 @@ MegaQueue.prototype.filter = function(gid, foreach) {
 
     if (!len) {
         if (d) {
-            this.logger.debug('Nothing to filter', gid);
+            this.logger.info('Nothing to filter', gid);
         }
     }
     else {
@@ -111,7 +111,7 @@ MegaQueue.prototype.filter = function(gid, foreach) {
                 if (aTask.destroy) {
                     aTask.destroy();
                 }
-            };
+            }.bind(this);
         }
 
         var tasks = this.slurp(gid);

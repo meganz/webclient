@@ -692,7 +692,8 @@ var Chat = function() {
             'urlFilter': UrlFilter,
             'emoticonsFilter': EmoticonsFilter,
             'attachmentsFilter': AttachmentsFilter,
-            'callFeedback': CallFeedback
+            'callFeedback': CallFeedback,
+            'karerePing': KarerePing
         },
         'chatNotificationOptions': {
             'textMessages': {

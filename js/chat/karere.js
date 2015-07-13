@@ -45,6 +45,8 @@ var Karere = function(user_options) {
 
     Strophe.fatal = function (msg) { self.error(msg); };
     Strophe.error = function (msg) { self.error(msg); };
+    Strophe.info = function (msg) { self.logger.info(msg); };
+    Strophe.debug = function (msg) { self.logger.debug(msg); };
 
 
     // initialize the connection state
@@ -367,7 +369,18 @@ Karere.DEFAULTS = {
             return !!localStorage.dxmpp;
             // jscs:enable disallowImplicitTypeConversion
         }
-    }
+    },
+
+    /**
+     * Interval in ms which will be used for the ping-pong (c2s) pings via the KarerePing plugin to determinate if the
+     * client is currently connected
+     */
+    karerePingInterval: 60000,
+
+    /**
+     * Timeout (in ms) when waiting for a c2s response (should be <= karerePingInterval)
+     */
+    serverPingTimeout: 5000
 };
 
 
@@ -1072,10 +1085,12 @@ makeMetaAware(Karere);
             additional = arguments[0].stack;
         }
         var msg = toArray(arguments).join(" ");
+
+        this.logger.error(msg, additional);
+
         if (msg.indexOf("_processRequest - sendFunc")) {
             this.connection._proto._hitError(0);
         }
-        this.logger.error(msg, additional);
     };
 }
 
@@ -2611,6 +2626,55 @@ makeMetaAware(Karere);
             return createTimeoutPromise(function() {
                 return gotResponse;
             }, 133, self.options.pingTimeout, targetFullUserJid).always(function() {
+                // cleanup
+                self.unbind(evtName);
+            });
+        }
+    };
+
+    /**
+     * Send server ping
+     */
+    Karere.prototype.sendServerPing = function() {
+        var self = this;
+
+        if (self.getConnectionState() === Karere.CONNECTION_STATE.CONNECTED) {
+            if (!self._serverPingRequests) {
+                self._serverPingRequests = {};
+            }
+
+            var messageId = self.generateMessageId("server", "ping");
+
+            self._serverPingRequests[messageId] = true;
+
+            var evtName = generateEventSuffixFromArguments("onServerPingResponse", "respWait", messageId);
+
+            var gotResponse = false;
+
+            self.bind(evtName, function(e, eventObject) {
+                if (eventObject.messageId === messageId) {
+                    gotResponse = true;
+                }
+            });
+
+
+            var msg = $iq({
+                from: self.getJid(),
+                to: megaChat.karere.getBareJid().split("@")[1],
+                type: "get",
+                id: messageId
+            }).c("ping", {
+                'xmlns': 'urn:xmpp:ping'
+            });
+            self._iqRequests[messageId] = "ServerPingResponse";
+
+            self.connection.send(
+                msg.tree()
+            );
+
+            return createTimeoutPromise(function() {
+                return gotResponse;
+            }, 133, self.options.serverPingTimeout, messageId).always(function() {
                 // cleanup
                 self.unbind(evtName);
             });

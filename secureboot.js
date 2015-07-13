@@ -1001,6 +1001,7 @@ else if (!b_u)
     jsl.push({f:'js/vendor/favico.js', n: 'favico_js', j:1,w:7});
     jsl.push({f:'js/vendor/notification.js', n: 'notification_js', j:1,w:7});
 
+    jsl.push({f:'js/chat/plugins/karerePing.js', n: 'karerePing_js', j:1,w:7});
     jsl.push({f:'js/chat/plugins/callManager.js', n: 'callManager_js', j:1,w:7});
     jsl.push({f:'js/chat/plugins/urlFilter.js', n: 'urlFilter_js', j:1,w:7});
     jsl.push({f:'js/chat/plugins/emoticonsFilter.js', n: 'emoticonsFilter_js', j:1,w:7});

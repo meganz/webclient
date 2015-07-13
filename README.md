@@ -90,7 +90,7 @@ JavaScript files
 
 **js/mouse.js** captures mouse events for entropy collection
 
-**js/notifications.js** contains the notification logic
+**js/notify.js** contains the notifications logic
 
 **js/rsa.js** cryto library for RSA
 

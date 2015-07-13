@@ -178,7 +178,7 @@ var notifyPopup = {
                         // Clear existing notifications
                         notifyPopup.notifications = [];
 
-                        // Get the current UNIX timestamp
+                        // Get the cMath.floor(new Date().getTime() / 1000)urrent UNIX timestamp
                         var currentTime = Math.floor(new Date().getTime() / 1000);
 
                         // Loop through the received notifications

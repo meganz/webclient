@@ -5520,6 +5520,9 @@ function transferPanelUI()
             $('.transfer-table-header').hide();
             $('.transfer-panel-empty-txt').removeClass('hidden');
             $('.transfer-panel-title').html(l[104]);
+			$('.nw-fm-left-icon.transfers').removeClass('transfering').find('p').removeAttr('style');
+			//dl_queue.length = 0;
+			//ul_queue.length = 0;
         }
     };
 
@@ -5551,7 +5554,6 @@ function transferPanelUI()
                     $(this).remove();
                     $.clearTransferPanel();
                 });
-                $('.nw-fm-left-icon.transfers').removeClass('transfering').find('p').removeAttr('style');
 
                 Soon(function() {
                     $(window).trigger('resize');

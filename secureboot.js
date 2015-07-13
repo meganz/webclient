@@ -73,7 +73,7 @@ if (!b_u) try
             var mozBrowserID = ua;
         }
 
-        loadSubScript('chrome://mega/content/strg5.js');
+        loadSubScript('chrome://mega/content/strg.js');
 
         if (!(localStorage instanceof Ci.nsIDOMStorage)) {
             throw new Error('Invalid DOM Storage instance.');

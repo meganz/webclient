@@ -910,7 +910,7 @@ function initUI() {
     addContactUI();
 
     $('.fm-files-view-icon').rebind('click', function() {
-
+        
         $.hideContextMenu();
         cacheselect();
         if ($(this).attr('class').indexOf('listing-view') > -1) {
@@ -932,14 +932,14 @@ function initUI() {
             M.openFolder(M.currentdirid, true);
         }
         reselect();
-
+        
         return false;
     });
 
     $.hideContextMenu = function(event) {
-
+        
         var a, b, currentNodeClass;
-
+        
         if (event && event.target) {
             currentNodeClass = $(event.target).attr('class');
             if (!currentNodeClass) {
@@ -963,7 +963,7 @@ function initUI() {
         $('.context-menu-item.dropdown').removeClass('active');
         $('.fm-tree-header').removeClass('dragover');
         $('.nw-fm-tree-item').removeClass('dragover');
-
+        
         // Set to default
         a = $('.context-menu.files-menu,.context-menu.download');
         a.addClass('hidden');
@@ -972,7 +972,7 @@ function initUI() {
         b.removeClass('active left-position overlap-right overlap-left mega-height');
         a.find('.disabled,.context-scrolling-block').removeClass('disabled context-scrolling-block');
         a.find('.context-menu-item.contains-submenu.opened').removeClass('opened');
-
+        
         // Remove all sub-menues from context-menu move-item
         $('#csb_' + M.RootID).empty();
     };
@@ -1429,10 +1429,10 @@ function sharedUInode(nodeHandle) {
         }
 
         if (oShares && oShares.EXP) {
-
+            
             // List view
             $('.grid-table.fm #' + nodeHandle + ' .grid-url-field').addClass('linked');
-
+            
             // Grid view
             $('#' + nodeHandle + '.file-block').addClass('linked');
 
@@ -2225,13 +2225,13 @@ function fmremdupes(test)
 }
 
 function initContextUI() {
-
+    
     var c = '.context-menu-item';
 
     $('.context-menu-section').off('mouseover', c);
     $('.context-menu-section').on('mouseover', c, function() {
 
-        // is move... or download...
+        // is move... or download... 
         if ($(this).parent().parent().is('.context-submenu')) {
 
             // if just item hide child context-submenu
@@ -2270,8 +2270,8 @@ function initContextUI() {
             b.removeClass('active opened')
                 .find('.context-submenu').addClass('hidden');
         }
-
-        currentId = $this.attr('id');
+        
+        currentId = $this.attr('id');        
         if (currentId) {
             M.buildSubMenu(currentId.replace('fi_', ''));
         }
@@ -4378,7 +4378,7 @@ var FMShortcuts = function() {
             return false; // stop prop.
         } else if (charCode == 8) {
             var $items = selectionManager.get_selected();
-            if ($items.size() == 0 || (RightsbyID(M.currentdirid || '') | 0) < 1 || M.currentrootid === 'shares') {
+            if ($items.size() == 0 || (RightsbyID(M.currentdirid || '') | 0) < 1) {
                 return; // dont do anything.
             }
 
@@ -4895,8 +4895,7 @@ function UIkeyevents()
                 quickFinder.disable_if_active();
             }
         }
-        else if (e.keyCode === 46 && s.length > 0 && !$.dialog
-            && RightsbyID(M.currentdirid) > 1 && M.currentrootid !== 'shares')
+        else if (e.keyCode == 46 && s.length > 0 && !$.dialog && RightsbyID(M.currentdirid) > 1)
         {
             $.selected = [];
             s.each(function(i, e)
@@ -4905,8 +4904,7 @@ function UIkeyevents()
             });
             fmremove();
         }
-        else if (e.keyCode === 46 && selPanel.length > 0 && !$.dialog
-            && RightsbyID(M.currentdirid) > 1 && M.currentrootid !== 'shares')
+        else if (e.keyCode == 46 && selPanel.length > 0 && !$.dialog && RightsbyID(M.currentdirid) > 1)
         {
             var selected = [];
             selPanel.each(function() {
@@ -5683,7 +5681,7 @@ function menuItems() {
     if (selItem && selItem.p.length === 11) {
         items['removeshare'] = 1;
     }
-    else if (RightsbyID($.selected[0]) > 1 && M.currentrootid !== 'shares') {
+    else if (RightsbyID($.selected[0]) > 1) {
         items['remove'] = 1;
     }
 
@@ -5733,10 +5731,10 @@ function contextMenuUI(e, ll) {
 
     var items, v, flt,
         m = $('.context-menu.files-menu'),
-
+        
         // Selection of first child level ONLY of .context-menu-item in .context-menu
         menuCMI = '.context-menu.files-menu .context-menu-section > .context-menu-item',
-//            ', .context-menu.files-menu > .context-menu-item',// Selection of .select-all, doesn't belongs to .context-menu-section
+//            ', .context-menu.files-menu > .context-menu-item',// Selection of .select-all, doesn't belongs to .context-menu-section    
         currNodeClass = $(e.currentTarget).attr('class'),
         id = $(e.currentTarget).attr('id');
 

@@ -5395,10 +5395,9 @@ function transferPanelUI()
         }, 100);
 
         var tth = $('.transfer-table-header');
-        var toHide = (dl_queue.length || ul_queue.length || $('.transfer-table tr').length > 1);
 
         // Show/Hide header if there is no items in transfer list
-        if (!toHide)
+        if (!$('.transfer-table tr').not('.clone-of-header').length > 0)
         {
             $('.transfer-panel-empty-txt').removeClass('hidden');
             tth.hide(0);
@@ -5521,8 +5520,6 @@ function transferPanelUI()
             $('.transfer-panel-empty-txt').removeClass('hidden');
             $('.transfer-panel-title').html(l[104]);
 			$('.nw-fm-left-icon.transfers').removeClass('transfering').find('p').removeAttr('style');
-			//dl_queue.length = 0;
-			//ul_queue.length = 0;
         }
     };
 

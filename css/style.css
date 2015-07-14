@@ -23114,7 +23114,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 	color: #9B9B9B;
 	letter-spacing: .1px;
 	line-height: 20px;
-	font-family: 'Open Sans Semibold';
+	font-family: 'Open Sans';
 }
 a.voucher-reseller-link {
 	font-family: 'Open Sans Bold';
@@ -23123,7 +23123,7 @@ a.voucher-reseller-link {
 	display: table;
 	width: 428px;
 	table-layout: fixed;
-	margin: -4px;
+	margin: 7px 0 0 0;
 }
 .voucher-buy-now,
 .voucher-redeem,

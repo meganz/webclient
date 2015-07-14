@@ -1178,20 +1178,66 @@ function initUI() {
 
 function transferPanelContextMenu(target)
 {
+    var file;
+
     $('.context-menu.files-menu .context-menu-item').hide();
     var menuitems = $('.context-menu.files-menu .context-menu-item');
 
     menuitems.filter('.transfer-pause,.transfer-play,.move-up,.move-down,.tranfer-clear')
         .show();
 
-    var file = GlobalProgress[$(target).attr('id')];
-    if (!file) {
+    if (target === null && (target = $('.transfer-table tr.ui-selected')).length > 1) {
+        var ids = target.attrs('id');
+        var finished = 0;
+        var paused = 0;
+        var started = false;
+
+        ids.forEach(function(id) {
+            file = GlobalProgress[id];
+            if (!file) {
+                finished++;
+            }
+            else {
+                if (file.paused) {
+                    paused++;
+                }
+                if (file.started) {
+                    started = true;
+                }
+            }
+        });
+
+        if (finished === ids.length) {
+            menuitems.hide()
+                .filter('.tranfer-clear')
+                .show();
+        }
+        else {
+            if (started) {
+                menuitems.filter('.move-up,.move-down').hide();
+            }
+            if (paused === ids.length) {
+                menuitems.filter('.transfer-pause').hide();
+            }
+
+            var prev = target.first().prev();
+            var next = target.last().next();
+
+            if (prev.length === 0 || prev.find('.queued').length === 0) {
+                menuitems.filter('.move-up').hide();
+            }
+            if (next.hasClass('clone-of-header')) {
+                menuitems.filter('.move-down').hide();
+            }
+        }
+    }
+    else if (!(file = GlobalProgress[$(target).attr('id')])) {
         /* no file, it is a finished operation */
         menuitems.hide()
             .filter('.tranfer-clear')
-            .show()
-
-    } else {
+            .show();
+    }
+    else {
         if (file.started) {
             menuitems.filter('.move-up,.move-down').hide();
         }
@@ -1237,10 +1283,8 @@ function openTransferpanel()
         var target = $(this).closest('tr');
         e.preventDefault();
         e.stopPropagation(); // do not treat it as a regular click on the file
-        if (!target.hasClass('ui-selected')) {
-            $('.tranfer-table tr').removeClass('ui-selected');
-            target.addClass('ui-selected');
-        }
+        $('.tranfer-table tr').removeClass('ui-selected');
+        target.addClass('ui-selected');
         e.currentTarget = target;
         transferPanelContextMenu(target);
         contextMenuUI(e);
@@ -1255,13 +1299,7 @@ function openTransferpanel()
             $('.tranfer-table tr').removeClass('ui-selected');
             target.addClass('ui-selected');
         }
-        var toabort = {};
-        $('.transfer-table tr.ui-selected').not('.clone-of-header').each(function(j, el)
-        {
-            toabort[$(el).attr('id')] = 1;
-            $(this).remove();
-        });
-        toabort = Object.keys(toabort);
+        var toabort = $('.transfer-table tr.ui-selected').attrs('id');
         dlmanager.abort(toabort);
         ulmanager.abort(toabort);
         $.clearTransferPanel();
@@ -2526,16 +2564,21 @@ function initContextUI() {
     });
 
     $(c + '.move-up').rebind('click', function() {
-        $('.transfer-table tr.ui-selected').not('.clone-of-header').each(function(j, el) {
-            fm_tfsmove($(this).attr('id'), -1);
-        });
+        $('.transfer-table tr.ui-selected')
+            .attrs('id')
+            .map(function(id) {
+                fm_tfsmove(id, -1);
+            });
         Soon(fmUpdateCount);
     });
 
     $(c + '.move-down').rebind('click', function() {
-        $('.transfer-table tr.ui-selected').not('.clone-of-header').each(function(j, el) {
-            fm_tfsmove($(this).attr('id'), +1);
-        });
+        $('.transfer-table tr.ui-selected')
+            .attrs('id')
+            .reverse()
+            .map(function(id) {
+                fm_tfsmove(id, 1);
+            });
         Soon(fmUpdateCount);
     });
 
@@ -2567,13 +2610,9 @@ function initContextUI() {
     });
 
     $(c + '.canceltransfer-item,' + c + '.tranfer-clear').rebind('click', function() {
-        var toabort = {};
-        $('.transfer-table tr.ui-selected').not('.clone-of-header').each(function(j, el) {
-            toabort[$(el).attr('id')] = 1;
-            $(this).remove();
-        });
-
-        toabort = Object.keys(toabort);
+        var $trs = $('.transfer-table tr.ui-selected');
+        var toabort = $trs.attrs('id');
+        $trs.remove();
         dlmanager.abort(toabort);
         ulmanager.abort(toabort);
         $.clearTransferPanel();
@@ -5446,9 +5485,8 @@ function transferPanelUI()
                 var c = $(this).attr('class');
                 if (!c || (c && c.indexOf('ui-selected') == -1))
                     $('.transfer-table tr').removeClass('ui-selected');
-                transferPanelContextMenu($(this));
-                $(this).addClass('ui-selected');
-                $(this).addClass('dragover');
+                $(this).addClass('ui-selected dragover');
+                transferPanelContextMenu(null);
                 return !!contextMenuUI(e);
             }
             else

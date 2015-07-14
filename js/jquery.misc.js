@@ -47,37 +47,52 @@ jQuery.expr[':'].istartswith = function(a, i, m) {
         .indexOf(m[3].toUpperCase()) == 0;
 };
 
+/**
+ * Get a specific attribute across a nodelist
+ * @param {String} attr attribute
+ */
+$.fn.attrs = function(attr) {
+    var i = 0, l = this.length, result = {};
+    while (l > i) {
+        var val = this[i++].getAttribute(attr);
+        if (val) {
+            result[val] = 1;
+        }
+    }
+    return Object.keys(result);
+};
+
 $.fn.visible = function (e, i)
 { // https://github.com/teamdf/jquery-visible
-	var a = $(this).eq(0),
-		f = a.get(0),
-		c = $(window),
-		g = c.scrollTop();
-	c = g + c.height() - ($('.transfer-panel').height() || 48);
-	var b = a.offset().top,
-		h = b + a.height();
-	a = e === true ? h : b;
-	b = e === true ? b : h;
-	return !!(i === true ? f.offsetWidth * f.offsetHeight : true) && b <= c && a >= g
+    var a = $(this).eq(0),
+        f = a.get(0),
+        c = $(window),
+        g = c.scrollTop();
+    c = g + c.height() - ($('.transfer-panel').height() || 48);
+    var b = a.offset().top,
+        h = b + a.height();
+    a = e === true ? h : b;
+    b = e === true ? b : h;
+    return !!(i === true ? f.offsetWidth * f.offsetHeight : true) && b <= c && a >= g
 };
 
 // Based on http://stackoverflow.com/a/10835425
 $.fn.removeClassWith = function(pfx)
 {
-	var i = 0, l = this.length, n;
-	while (l > i)
-	{
-		if ((n = this[i++]).className)
-			n.className = $.trim(n.className.split(" ")
-				.filter(function(c) {
-					return c.lastIndexOf(pfx, 0) !== 0;
-				}).join(" "));
-	}
-	return this;
+    var i = 0, l = this.length, n;
+    while (l > i)
+    {
+        if ((n = this[i++]).className)
+            n.className = $.trim(n.className.split(" ")
+                .filter(function(c) {
+                    return c.lastIndexOf(pfx, 0) !== 0;
+                }).join(" "));
+    }
+    return this;
 };
 
 $.len = function(obj) {
-	return Object.keys(obj).length;
+    return Object.keys(obj).length;
 };
 
 /*

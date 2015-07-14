@@ -579,15 +579,16 @@ function fm_tfsmove(gid, dir) { // -1:up, 1:down
     var p2;
     var i;
     var x;
-    ASSERT(tfs.length === 1, 'Invalid transfer node: ' + gid);
+    var mng;
+    gid = String(gid);
+    mng = gid[0] === 'u' ? ulmanager : dlmanager;
     if (tfs.length !== 1) {
+        mng.logger.warn('Invalid transfer node', gid, tfs);
         return;
     }
 
-    ASSERT(GlobalProgress[gid] && GlobalProgress[gid].working.length === 0,
-        'Invalid transfer state (' + (gid[0] === 'd' ? 'download' : (gid[0] === 'u' ? 'upload' : 'zip')) + ')');
-
     if (!GlobalProgress[gid] || GlobalProgress[gid].working.length) {
+        mng.logger.warn('Invalid transfer state', gid);
         return;
     }
 
@@ -602,11 +603,10 @@ function fm_tfsmove(gid, dir) { // -1:up, 1:down
 
     var id = to && to.attr('id') || 'x';
 
-    ASSERT(GlobalProgress[id] && GlobalProgress[id].working.length === 0,
-        'Invalid [to] transfer state (' + (gid[0] === 'd' ? 'download' :
-            (gid[0] === 'u' ? 'upload' : 'zip')) + ')');
-
     if (!GlobalProgress[id] || GlobalProgress[id].working.length) {
+        if (id !== 'x') {
+            mng.logger.warn('Invalid [to] transfer state', gid, id, to);
+        }
         return;
     }
 
@@ -615,7 +615,7 @@ function fm_tfsmove(gid, dir) { // -1:up, 1:down
     }
     else {
         if (d) {
-            dlmanager.logger.info('Unable to move ' + gid);
+            dlmanager.logger.error('Unable to move ' + gid);
         }
         return;
     }

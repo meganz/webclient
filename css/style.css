@@ -20944,6 +20944,9 @@ span.incoming-call-name {
 	font-family: 'Open Sans Light', Arial;
 	text-transform: uppercase;
 	float:none;
+	-webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
 }
 .contacts-blocks-scrolling .nw-contact-avatar img, .nw-contact-block-avatar img, .nw-contact-block-avatar .avatar-wrapper {
 	width: 156px;

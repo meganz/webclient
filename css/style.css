@@ -5614,6 +5614,18 @@ th.grid-first-th {
 .grid-table tr.ui-selected td, .grid-share-table tr.ui-selected td, .contacts-grid-table tr.ui-selected td, .contact-requests-grid tr.ui-selected td, .sent-requests-grid tr.ui-selected td, .grid-table tr.ui-selected:nth-child(odd) td, .grid-share-table tr.ui-selected:nth-child(odd) td, .contacts-grid-table tr.ui-selected:nth-child(odd) td, .contact-requests-grid tr.ui-selected:nth-child(odd) td, .sent-requests-grid tr.ui-selected:nth-child(odd) td, .transfer-table tr.ui-selected:nth-child(odd) td, .transfer-table tr.ui-selected td, .grid-table tr.ui-selecting td, .grid-share-table tr.ui-selecting td, .contacts-grid-table tr.ui-selecting td, .contact-requests-grid tr.ui-selecting td, .sent-requests-grid tr.ui-selecting td, .grid-table tr.ui-selecting:nth-child(odd) td, .grid-share-table tr.ui-selecting:nth-child(odd) td, .contacts-grid-table tr.ui-selecting:nth-child(odd) td, .contact-requests-grid tr.ui-selecting:nth-child(odd) td, .sent-requests-grid tr.ui-selecting:nth-child(odd) td, .transfer-table tr.ui-selecting:nth-child(odd) td, .transfer-table tr.ui-selecting td {
 	background-color: rgba(233,233,233,1);
 }
+.grid-table.vouchers th,
+.grid-table.vouchers td {
+    webkit-touch-callout: text !important;
+	-webkit-user-select: text !important;
+	-khtml-user-select: text !important;
+	-moz-user-select: text !important;
+	-ms-user-select: text !important;
+	user-select: text !important;
+}
+.grid-table.vouchers tr td:first-child {
+	padding-left: 12px;
+}
 .grid-table tr td:first-child, .grid-share-table tr td:first-child, .contacts-grid-table tr td:first-child {
 	padding: 0;
 }
@@ -20057,8 +20069,30 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 	position: absolute;
 	min-height: 620px;
 }
+.ads-left-block.ads-enabled .products-top-txt {
+	bottom: 180px;
+	margin-top: 0;
+	top: 268px;
+}
+.ads-left-block.ads-enabled .products-top-txt .titleLink {
+	bottom: 0;
+	left: 0;
+	margin-top: -22px; /* Subtract half the height */
+	position: absolute;
+	top: 50%;
+	vertical-align: middle;
+}
 .ads-right-block {
 	right: 0;
+}
+#ads-block-frame {
+	visibility:hidden;
+}
+.ads-block-header {
+    background-color: black;
+    color: white;
+    padding: 3px 0;
+    text-align: center;
 }
 .download-adv-bl {
 	position: absolute;
@@ -23053,6 +23087,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
     font-size: 36px;
     padding: 3px 10px 0 0;
 }
+.voucher-account-balance.sufficient-funds {
+    color: green;
+}
 .voucher-block {
 	-moz-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
@@ -23088,7 +23125,9 @@ a.voucher-reseller-link {
 	table-layout: fixed;
 	margin: -4px;
 }
-.voucher-buy-now, .voucher-redeem-now {
+.voucher-buy-now,
+.voucher-redeem,
+.voucher-redeem-now {
 	margin: 24px 0 0 0;
 	height: 32px;
 	border: 2px solid #D90007;
@@ -23118,18 +23157,15 @@ a.voucher-reseller-link {
 	color: white;
 	background-color: #D90007;
 }
-.voucher-redeem-now {
-	margin: 24px 6px 0 0;
-	border: 2px solid #6A6A6A;
-	background-color: #6A6A6A;
-	color: white;
-	left: 0;
-	letter-spacing: .4px;
+.voucher-redeem, .voucher-redeem-now {
+    border: 2px solid #6a6a6a;
+    color: #6a6a6a;
+    left: 0;
+    margin: 24px 6px 0 0;
 }
-.voucher-redeem-now:hover {
-	color: white;
-	background-color: #6A6A6A;
-	box-shadow: 0 0 0px 4px #A5A5A5;
+.voucher-redeem:hover, .voucher-redeem-now:hover {
+    background-color: #6a6a6a;
+    color: white;
 }
 .voucher-dialog-body .fm-account-input {
 	margin: 0 0 0 0;
@@ -23147,23 +23183,32 @@ a.voucher-reseller-link {
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
 }
-.voucher-dialog-td:nth-child(1) {
-	width: 0;
-}
-.voucher-dialog-td:nth-child(2) {
-	width: 166px;
-}
-.redeem .voucher-dialog-td:nth-child(1) {
-	width: 254px;
-}
-.redeem .voucher-dialog-td:nth-child(3) {
-	width: 0;
-}
 .redeem .voucher-redeem-now {
 	margin: 24px 0 0 6px;
 }
 .payment-eurosign {
 	font-size: 24px;
+}
+.voucher-input-container {
+    display: none;
+    height: auto;
+    margin-top: 30px;
+    padding-bottom: 35px;
+    position: relative;
+}
+.voucher-input-container .fm-account-input {
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 250px;
+}
+.voucher-input-container .voucher-redeem-now {
+    left: auto;
+    margin: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 157px;
 }
 
 /* CC payment dialog */

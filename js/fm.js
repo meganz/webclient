@@ -3150,20 +3150,30 @@ function accountUI()
         $(account.purchases).each(function(index, purchaseTransaction)
         {
             // Set payment method
+            //['Voucher', 'PayPal', 'Apple', 'Google', 'Bitcoin', 'Union Pay', 'Fortumo', 'Credit Card', 'Credit Card']
             var paymentMethodIndex = purchaseTransaction[4];
-            var paymentMethod = l[428];
+            var paymentMethod = l[428];             // Voucher
 
             if (paymentMethodIndex == 1) {
-                paymentMethod = 'PayPal';
+                paymentMethod = l[1233];            // PayPal
             }
             else if (paymentMethodIndex == 2) {
-                paymentMethod = l[6953];
+                paymentMethod = l[6953];            // iTunes
+            }
+            else if (paymentMethodIndex == 3) {
+                paymentMethod = l[7188];            // Google
             }
             else if (paymentMethodIndex == 4) {
                 paymentMethod = l[6802];            // Bitcoin
             }
             else if (paymentMethodIndex == 5) {
                 paymentMethod = l[6952];            // Union Pay
+            }
+            else if (paymentMethodIndex == 6) {
+                paymentMethod = l[7161];            // Mobile carrier billing
+            }
+            else if (paymentMethodIndex == 7) {
+                paymentMethod = l[6952];            // Credit card
             }
             else if (paymentMethodIndex == 8) {
                 paymentMethod = l[6952];            // Credit card

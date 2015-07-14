@@ -3789,9 +3789,6 @@ label.iPhoneCheckLabelOff span {
 	overflow: hidden;
 	display: none;
 }
-.content-panel.cloud-drive, .content-panel.shared-with-me, .content-panel.rubbish-bin {
-	padding: 0 0 24px 0;
-}
 .fm-tree-panel ul, .fm-move-dialog-body ul, .fm-dialog-body ul {
 	padding: 0;
 	margin: 0;
@@ -5257,7 +5254,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	width: 96px;
 }
 .transfer-table td:nth-child(5) {
-	width: 288px;
+	max-width: 288px;
 }
 .transfer-table td:nth-child(6) {
 	width: 192px;
@@ -5439,10 +5436,12 @@ table .grid-status-icon.star {
 }
 .file-block-scrolling, .contacts-blocks-scrolling, .shared-blocks-scrolling {
 	height: 100%;
-	padding: 0 0 10px 0;
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	box-sizing: border-box;
+}
+.file-block-scrolling .jspPane:after, .contacts-blocks-scrolling .jspPane:after, .shared-blocks-scrolling .jspPane:after {
+	clear: both;
+	display: block;
+	content: '';
+	height: 12px;
 }
 .file-block, .contact-block-view {
 	height: 152px;

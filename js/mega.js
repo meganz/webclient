@@ -4231,7 +4231,10 @@ function MegaData()
             delete $.transferprogress['ul_'+ id];
         }
         $.transferHeader();
-        Soon(mega.utils.resetUploadDownload);
+        Soon(function() {
+            mega.utils.resetUploadDownload();
+            $(window).trigger('resize');
+        });
     }
 
     this.ulstart = function(ul)

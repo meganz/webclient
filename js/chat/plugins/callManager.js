@@ -260,18 +260,24 @@ CallSession.prototype.onWaitingResponseIncoming = function(e, eventData) {
 
             var avatar = useravatar.imgUrl(contact.u);
 
+            // callOptions, can be == {} in the cases then the user does not have/have not provided access
+            // to the cam & mic
+            var showVideoButton = true;
+
+            if (self.getRemoteMediaOptions().video === false && self.getRemoteMediaOptions().audio === true) {
+                showVideoButton = false;
+            }
+
             self.room.megaChat.trigger('onIncomingCall', [
                 self.room,
                 self.room.megaChat.getContactNameFromJid(participants[0]),
                 avatar,
-                self.getRemoteMediaOptions().video ? true : false,
+                showVideoButton,
                 eventData.sid,
                 self
             ]);
 
-            // callOptions, can be == {} in the cases then the user does not have/have not provided access
-            // to the cam & mic
-            var showVideoButton = self.getRemoteMediaOptions().video ? true : false;
+
 
             self.getCallManager().incomingCallDialog.show(
                 self.room.megaChat.getContactNameFromJid(participants[0]),

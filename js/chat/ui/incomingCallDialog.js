@@ -31,7 +31,7 @@
     IncomingCallDialog.prototype.show = function(username, avatarImg, sid, isVideoCall, answerAudioFn, answerVideoFn, cancelFn) {
         var self = this;
 
-        if(!self.$dialog) {
+        if (!self.$dialog) {
             self._createDialog();
         } else {
             // hide the old dialog and show the new one
@@ -41,14 +41,14 @@
 
         self.sid = sid;
 
-        if(self.visible) {
+        if (self.visible) {
             return;
         }
 
 
         $('.incoming-call-name', self.$dialog).text(username);
 
-        if(avatarImg) {
+        if (avatarImg) {
             $('.incoming-call-avatar img', self.$dialog).attr(
                 'src',
                 avatarImg
@@ -76,7 +76,7 @@
         });
 
 
-        if(isVideoCall) {
+        if (isVideoCall) {
             $('.incoming-call-buttons', self.$dialog).addClass("video-enabled");
         } else {
             $('.incoming-call-buttons', self.$dialog).removeClass("video-enabled");
@@ -89,7 +89,7 @@
         // auto hide on click out of the dialog
         //$(document).unbind('mouseup.IncomingCallDialog');
         //$(document).bind('mouseup.IncomingCallDialog', function(e) {
-        //    if($(e.target).parents('.fm-chat-attach-popup').size() == 0 && !$(e.target).is(self.options.buttonElement)) {
+        //    if ($(e.target).parents('.fm-chat-attach-popup').size() == 0 && !$(e.target).is(self.options.buttonElement)) {
         //        self.hide();
         //    }
         //});
@@ -103,7 +103,7 @@
     IncomingCallDialog.prototype.hide = function() {
         var self = this;
 
-        if(!self.visible) {
+        if (!self.visible) {
             return;
         }
         // auto hide on click out of the dialog - cleanup
@@ -124,7 +124,7 @@
      */
     IncomingCallDialog.prototype.toggle = function() {
         var self = this;
-        if(self.visible) {
+        if (self.visible) {
             self.hide();
         } else {
             self.show();
@@ -152,7 +152,7 @@
      */
     IncomingCallDialog.prototype.destroy = function() {
         var self = this;
-        if(self.$dialog) {
+        if (self.$dialog) {
             self.hide();
         }
     };

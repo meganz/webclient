@@ -2643,7 +2643,9 @@ makeMetaAware(Karere);
                 self._serverPingRequests = {};
             }
 
-            var messageId = self.generateMessageId("server", "ping");
+            var messageId = (
+                self.generateMessageId("server", "ping").substr(-3) + Math.ceil(rand_range(0, 1000))
+            ).replace(".", "");
 
             self._serverPingRequests[messageId] = true;
 
@@ -2659,8 +2661,8 @@ makeMetaAware(Karere);
 
 
             var msg = $iq({
-                from: self.getJid(),
-                to: megaChat.karere.getBareJid().split("@")[1],
+                //from: self.getJid(),
+                //to: megaChat.karere.getBareJid().split("@")[1],
                 type: "get",
                 id: messageId
             }).c("ping", {

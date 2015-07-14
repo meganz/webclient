@@ -1178,13 +1178,16 @@ function initUI() {
 
 function transferPanelContextMenu(target)
 {
-    var file;
+    var file, tclear;
 
     $('.context-menu.files-menu .context-menu-item').hide();
     var menuitems = $('.context-menu.files-menu .context-menu-item');
 
-    menuitems.filter('.transfer-pause,.transfer-play,.move-up,.move-down,.tranfer-clear')
+    menuitems.filter('.transfer-pause,.transfer-play,.move-up,.move-down,.transfer-clear')
         .show();
+
+    tclear = menuitems.filter('.transfer-clear').contents().last().get(0) || {};
+    tclear.textContent = l[103];
 
     if (target === null && (target = $('.transfer-table tr.ui-selected')).length > 1) {
         var ids = target.attrs('id');
@@ -1209,8 +1212,9 @@ function transferPanelContextMenu(target)
 
         if (finished === ids.length) {
             menuitems.hide()
-                .filter('.tranfer-clear')
+                .filter('.transfer-clear')
                 .show();
+            tclear.textContent = (l[7218] || 'Clear transfer');
         }
         else {
             if (started) {
@@ -1234,8 +1238,9 @@ function transferPanelContextMenu(target)
     else if (!(file = GlobalProgress[$(target).attr('id')])) {
         /* no file, it is a finished operation */
         menuitems.hide()
-            .filter('.tranfer-clear')
+            .filter('.transfer-clear')
             .show();
+        tclear.textContent = (l[7218] || 'Clear transfer');
     }
     else {
         if (file.started) {
@@ -1255,9 +1260,14 @@ function transferPanelContextMenu(target)
         }
     }
 
-    menuitems.parent()
+    var parent = menuitems.parent();
+    parent
         .children('.context-menu-divider').hide().end()
         .children('.pause-item-divider').show().end()
+
+    if (parent.height() < 56) {
+        parent.find('.pause-item-divider').hide();
+    }
 }
 
 function openTransferpanel()
@@ -2609,7 +2619,7 @@ function initContextUI() {
         selectionManager.select_all();
     });
 
-    $(c + '.canceltransfer-item,' + c + '.tranfer-clear').rebind('click', function() {
+    $(c + '.canceltransfer-item,' + c + '.transfer-clear').rebind('click', function() {
         var $trs = $('.transfer-table tr.ui-selected');
         var toabort = $trs.attrs('id');
         $trs.remove();
@@ -4964,7 +4974,7 @@ function UIkeyevents()
                 // we should encapsule the click handler
                 // to call a function rather than use this hacking
                 if (e)
-                    $('.tranfer-clear').trigger('click');
+                    $('.transfer-clear').trigger('click');
             });
         }
         else if (e.keyCode == 13 && s.length > 0 && !$.dialog && !$.msgDialog && $('.fm-new-folder').attr('class').indexOf('active') == -1 && $('.top-search-bl').attr('class').indexOf('active') == -1)

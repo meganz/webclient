@@ -31,14 +31,24 @@ function dlinfo(ph,key,next)
         dl_g(dl_res);
         dl_res = false;
     }
-    else api_req({a:'g',p:ph},{callback:dl_g});
+    else {
+        // Fetch the file information and optionally the download URL
+        api_req({ a: 'g', p: ph, 'ad': showAd() }, { callback: dl_g });
+    }
+
+    // Initialise ads
+    megaAds.init();
 
     // Initialise slide show
     gifSlider.init();
 }
 
-function dl_g(res)
-{
+function dl_g(res) {
+    
+    // Show ad if enabled
+    megaAds.ad = res.ad;
+    megaAds.showAds($('#ads-block-frame'));
+
     $('.widget-block').addClass('hidden');
     loadingDialog.hide();
     $('.download-mid-white-block').removeClass('hidden');
@@ -385,6 +395,73 @@ function ImgError(source) {
     source.onerror = '';
     return true;
 }
+
+/**
+ * Enable ads for some countries and _only_ when they are not logged in.
+ * Note: The html for the ads is added on page load rather than existing withing download.html.
+ */
+var megaAds = {
+
+    // Set to an ad object containing src and other info if we should display an ad
+    ad: false,
+
+    /**
+     * Initialise the HTML for ads
+     */
+    init: function() {
+        
+        // Remove any previous ad containers
+        $('#ads-block-frame, ads-block-header').remove();
+        
+        // Add the ad html into download page
+        var $adContainer = $('<div id="ads-block-frame"></div>');
+        var $iframe = $('<iframe></iframe>');
+        $adContainer.append($iframe);
+        $iframe.css('border', 'none');
+
+        // Fill with an ad if we already have one
+        megaAds.showAds($adContainer);
+
+        // Inject header html to alert users that this is advertisement content and not directly from mega
+        var $header = $('<div class="ads-block-header">' + l[7212] + '</div>');
+        $adContainer.prepend($header);
+        $('.ads-left-block').prepend($adContainer);
+    },
+
+    /**
+     * Show the ads inside a cross-domain iframe
+     * @param {Object} $adContainer jQuery object of the ads-block-frame
+     */
+    showAds: function($adContainer) {
+        
+        var $iframe = $adContainer.find('iframe');
+        
+        // Only show ads if we successfully fetched an ad
+        if (this.ad) {
+            
+            // The init ads method injected this iframe into the DOM, we make it visible, the correct size, set its src to show the ad
+            $adContainer.css('visibility', 'visible');
+            $iframe.css('height', this.ad.height + 'px');
+            $iframe.css('width', this.ad.width + 'px');
+            $iframe.attr('src', this.ad.src);
+
+            // Adjust the other elements within the left column so that they display nicer when the advertisement is present
+            $('.animations-left-container').hide();
+            $('.ads-left-block').addClass('ads-enabled');
+        }
+        else {
+            // Reset to show no ads
+            $adContainer.css('visibility', 'hidden');
+            $iframe.css('height', '0px');
+            $iframe.css('width', '0px');
+            $iframe.removeAttr('src');
+            
+            // Hide ad block
+            $('.animations-left-container').show();
+            $('.ads-left-block').removeClass('ads-enabled');
+        }
+    }
+};
 
 /**
  * Changes the animated product images on the download page

@@ -73,7 +73,7 @@ if (!b_u) try
             var mozBrowserID = ua;
         }
 
-        loadSubScript('chrome://mega/content/strg5.js');
+        loadSubScript('chrome://mega/content/strg.js');
 
         if (!(localStorage instanceof Ci.nsIDOMStorage)) {
             throw new Error('Invalid DOM Storage instance.');
@@ -1683,15 +1683,30 @@ else if (!b_u)
                 catch (e) {}
             }
             boot_done();
-        }
+        };
         dlxhr.onerror = function()
         {
             dl_res= false;
             boot_done();
-        }
+        };
         dlxhr.open("POST", apipath + 'cs?id=0', true);
-        dlxhr.send(JSON.stringify([{'a':'g',p:page.substr(1,8)}]));
+        dlxhr.send(JSON.stringify([{ 'a': 'g', p: page.substr(1,8), 'ad': showAd() }]));
     }
+}
+
+/**
+ * Determines whether to show an ad or not
+ * @returns {Number} Returns a 0 for no ads, 1 will enable ads dependant on country, 2 will always show ads
+ */
+function showAd() {
+    
+    // We need to tell the API we would like ad urls, but only if we are not logged in
+    var showAd = (typeof u_sid === 'undefined') ? 1 : 0;
+        
+    // Override for testing, 0 for no ads, 1 is normal (enabled dependant on country), 2 is ads always on
+    showAd = (typeof localStorage.testAds === 'undefined') ? showAd : parseInt(localStorage.testAds);
+    
+    return showAd;
 }
 
 function safeCall(fn)

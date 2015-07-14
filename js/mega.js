@@ -5949,7 +5949,10 @@ function loadfm_done(pfkey, stackPointer) {
     if (is_fm() || $('.fm-main.default').is(":visible")) {
         renderfm();
     }
-    loadingDialog.hide();
+
+    if (!CMS.isLoading()) {
+        loadingDialog.hide();
+    }
 
     if (!pfkey) {
         notifyPopup.pollNotifications();

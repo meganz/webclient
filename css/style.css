@@ -20534,7 +20534,8 @@ span.incoming-call-name {
 	position: absolute;
 }
 .contact-fingerprint-block {
-	padding: 52px 45px 0 0;
+	margin: 52px 45px 0 0;
+	min-width: 214px;
 	position: absolute;
 	right: 0;
 }

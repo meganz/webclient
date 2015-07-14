@@ -528,7 +528,7 @@ var dlmanager = {
             st: 0,
             window: 60000
         };
-    }
+    },
 
     apiQuota: function DM_apiQuota(callback2) {
         // cache 'bq' for up to 60 seconds for each limitation
@@ -597,6 +597,7 @@ var dlmanager = {
     },
 
     checkQuota: function DM_checkQuota(filesize, callback) {
+        /* jshint -W074 */
         if (u_attr && u_attr.p) {
             if (callback) {
                 callback({
@@ -625,7 +626,7 @@ var dlmanager = {
                 }
                 t2++;
             }
-            if (quotabytes == 0) {
+            if (quotabytes === 0) {
                 sec = 0;
             }
             else if (quotabytes - filesize < 0) {
@@ -633,7 +634,7 @@ var dlmanager = {
             }
             else if (quotabytes - consumed - filesize < 0) {
                 var shortage = quotabytes - consumed - filesize;
-                var t2 = t - 360;
+                t2 = t - 360;
                 while (t2 <= t) {
                     if (quota[t2]) {
                         shortage += quota[t2];
@@ -645,7 +646,7 @@ var dlmanager = {
                     }
                     t2++;
                 }
-                if (sec == 0 || sec > 21600) {
+                if (sec === 0 || sec > 21600) {
                     sec = 21600;
                     newbw = quotabytes;
                 }
@@ -667,7 +668,7 @@ var dlmanager = {
 
     hasQuota: function DM_hasQuota(filesize, next) {
         dlmanager.checkQuota(filesize, function(r) {
-            if (r.sec == 0 || r.sec == -1) {
+            if (r.sec === 0 || r.sec === -1) {
                 dlmanager.bandwidthDialog(1);
                 next(true);
             }
@@ -688,7 +689,7 @@ var dlmanager = {
 
                 var minutes = Math.ceil(r.sec / 60);
                 var minutesText = l[5838];
-                if (minutes != 1) {
+                if (minutes !== 1) {
                     minutesText = l[5837].replace('[X]', minutes);
                 }
 

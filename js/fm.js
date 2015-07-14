@@ -1013,7 +1013,8 @@ function initUI() {
 
 function transferPanelContextMenu(target)
 {
-    var file, tclear;
+    var file;
+    var tclear;
 
     $('.context-menu.files-menu .context-menu-item').hide();
     var menuitems = $('.context-menu.files-menu .context-menu-item');

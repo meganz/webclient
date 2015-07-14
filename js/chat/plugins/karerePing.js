@@ -44,9 +44,14 @@ var KarerePing = function(megaChat) {
  */
 KarerePing.prototype.startTimer = function() {
     var self = this;
-    
+
+
     if (self._intervalId) {
         self.stopTimer();
+    }
+
+    if (megaChat.karere.connection.service.indexOf("wss://") !== 0) {
+        return;
     }
 
     self._intervalId = setInterval(function() {

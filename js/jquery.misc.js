@@ -68,7 +68,7 @@ $.fn.visible = function (e, i)
         f = a.get(0),
         c = $(window),
         g = c.scrollTop();
-    c = g + c.height() - ($('.transfer-panel').height() || 48);
+    c = g + c.height() /*- ($('.transfer-panel').height() || 48)*/;
     var b = a.offset().top,
         h = b + a.height();
     a = e === true ? h : b;

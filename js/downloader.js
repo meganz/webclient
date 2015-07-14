@@ -231,7 +231,7 @@ ClassChunk.prototype.on_ready = function(args, xhr) {
             new Uint8Array(r)
         ]);
         this.dl.retries = 0;
-        reportQuota(this.size);
+        dlmanager.reportQuota(this.size);
         this.finish_download();
         this.destroy();
     }
@@ -410,7 +410,7 @@ ClassFile.prototype.checkQuota = function(task_done) {
 
     var that = this;
 
-    hasQuota(this.dl.size, function(hasQuota) {
+    dlmanager.hasQuota(this.dl.size, function(hasQuota) {
         that.hasQuota = hasQuota;
         if (hasQuota) {
             return that.run(task_done);

@@ -529,6 +529,212 @@ var dlmanager = {
             window: 60000
         };
     }
+
+    apiQuota: function DM_apiQuota(callback2) {
+        // cache 'bq' for up to 60 seconds for each limitation
+        if (typeof $.bq !== 'undefined' && $.lastlimit > new Date().getTime() - 60000) {
+            callback2($.bq);
+        }
+        else {
+            api_req({
+                a: 'bq'
+            }, {
+                callback: function(res) {
+                    $.bq = res;
+                    callback2(res);
+                }
+            });
+        }
+    },
+    /**
+     * Shows the bandwidth dialog
+     * @param {Boolean} close If true, closes the dialog, otherwise opens it
+     */
+    bandwidthDialog: function DM_bandwidthDialog(close) {
+
+        var $bandwidthDialog = $('.fm-dialog.bandwidth-dialog');
+        var $backgroundOverlay = $('.fm-dialog-overlay');
+
+        // Close dialog
+        if (close) {
+            $backgroundOverlay.addClass('hidden');
+            $bandwidthDialog.addClass('hidden');
+        }
+        else {
+            // Don't show if not in filemanager or download page
+            if (!is_fm() && page !== 'download') {
+                return false;
+            }
+
+            // Send a log to the API the first time the over bandwidth quota dialog is triggered
+            if (!localStorage.seenBandwidthDialog) {
+                api_req({
+                    a: 'log',
+                    e: 99333,
+                    m: 'bandwidthdialog'
+                });
+                localStorage.setItem('seenBandwidthDialog', true);
+            }
+
+            // On close button click, close the dialog
+            $bandwidthDialog.find('.fm-dialog-close').rebind('click', function() {
+                $backgroundOverlay.addClass('hidden');
+                $bandwidthDialog.addClass('hidden');
+            });
+
+            // On Select button click
+            $bandwidthDialog.find('.membership-button').rebind('click', function() {
+
+                // Get the plan number and redirect to pro step 2
+                var planId = $(this).closest('.reg-st3-membership-bl').attr('data-payment');
+                document.location.hash = 'pro&planNum=' + planId;
+            });
+
+            // Show the dialog
+            $backgroundOverlay.removeClass('hidden');
+            $bandwidthDialog.removeClass('hidden');
+        }
+    },
+
+    checkQuota: function DM_checkQuota(filesize, callback) {
+        if (u_attr && u_attr.p) {
+            if (callback) {
+                callback({
+                    sec: -1
+                });
+            }
+            return false;
+        }
+        dlmanager.apiQuota(function(quotabytes) {
+            if (localStorage.bq) {
+                quotabytes = localStorage.bq;
+            }
+            var consumed = 0;
+            var quota = {};
+            if (localStorage.q) {
+                quota = JSON.parse(localStorage.q);
+            }
+            var t = Math.floor(new Date().getTime() / 60000);
+            var t2 = t - 360;
+            var sec = 0;
+            var available = 0;
+            var newbw = 0;
+            while (t2 <= t) {
+                if (quota[t2]) {
+                    consumed += quota[t2];
+                }
+                t2++;
+            }
+            if (quotabytes == 0) {
+                sec = 0;
+            }
+            else if (quotabytes - filesize < 0) {
+                sec = -1;
+            }
+            else if (quotabytes - consumed - filesize < 0) {
+                var shortage = quotabytes - consumed - filesize;
+                var t2 = t - 360;
+                while (t2 <= t) {
+                    if (quota[t2]) {
+                        shortage += quota[t2];
+                    }
+                    if (shortage > 0) {
+                        newbw = shortage - quotabytes - consumed - filesize;
+                        sec = (t2 + 360 - t) * 60;
+                        break;
+                    }
+                    t2++;
+                }
+                if (sec == 0 || sec > 21600) {
+                    sec = 21600;
+                    newbw = quotabytes;
+                }
+            }
+            else {
+                sec = 0;
+            }
+            if (callback) {
+                callback({
+                    used: consumed,
+                    sec: sec,
+                    filesize: filesize,
+                    newbw: newbw
+                });
+            }
+
+        });
+    },
+
+    hasQuota: function DM_hasQuota(filesize, next) {
+        dlmanager.checkQuota(filesize, function(r) {
+            if (r.sec == 0 || r.sec == -1) {
+                dlmanager.bandwidthDialog(1);
+                next(true);
+            }
+            else {
+                sessionStorage.proref = 'bwlimit';
+
+                if (!$.lastlimit) {
+                    $.lastlimit = 0;
+                }
+
+                // Translate bottom right text block of bandwidth dialog
+                var $bottomRightText = $('.bandwidth-dialog .bandwidth-text-bl.second');
+                var text = $bottomRightText.html().replace('[A]',
+                    '<span class="red">').replace('[/A]', '</span>');
+                text = text.replace('%1',
+                    '<strong class="bandwidth-used">' + bytesToSize(r.used) + '</strong>');
+                $bottomRightText.html(text);
+
+                var minutes = Math.ceil(r.sec / 60);
+                var minutesText = l[5838];
+                if (minutes != 1) {
+                    minutesText = l[5837].replace('[X]', minutes);
+                }
+
+                // Translate header text of bandwidth dialog
+                var $header = $('.bandwidth-dialog .bandwidth-header');
+                var headerText = $header.html().replace('%1',
+                    '<span class="bandwidth-minutes">' + minutesText + '</span>');
+                $header.html(headerText);
+
+                dlmanager.bandwidthDialog();
+
+                if ($.lastlimit < new Date().getTime() - 60000) {
+                    megaAnalytics.log("dl",
+                        "limit", {
+                            used: r.used,
+                            filesize: r.filesize,
+                            seconds: r.sec
+                        });
+                }
+
+                $.lastlimit = new Date().getTime();
+                next(false);
+            }
+        });
+    },
+
+    reportQuota: function DM_reportQuota(chunksize) {
+        if (u_attr && u_attr.p) {
+            return false;
+        }
+        var quota = {};
+        var t = Math.floor(new Date().getTime() / 60000);
+        if (localStorage.q) {
+            quota = JSON.parse(localStorage.q);
+        }
+        for (var i in quota) {
+            if (i < t - 360) {
+                delete quota[i];
+            }
+        }
+        if (!quota[t]) {
+            quota[t] = 0;
+        }
+        quota[t] += chunksize;
+        localStorage.q = JSON.stringify(quota);
+    }
 };
 
 // TODO: move the next functions to fm.js when no possible conflicts

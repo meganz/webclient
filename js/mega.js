@@ -5921,10 +5921,6 @@ function loadfm_done(pfkey, stackPointer) {
     if (!CMS.isLoading()) {
         loadingDialog.hide();
     }
-
-    if (!pfkey) {
-        notifyPopup.pollNotifications();
-    }
 }
 
 function storefmconfig(key, value)

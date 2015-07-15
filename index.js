@@ -1654,7 +1654,8 @@ function topmenuUI() {
             $('.top-menu-icon').width() + $('.membership-status-block').width() / 2 + 57 + 'px');
     }
 
-    notifyPopup.initNotifications();
+    // Initialise notifications
+    notify.init();
 }
 
 function is_fm() {

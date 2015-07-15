@@ -1,15 +1,34 @@
 /**
  * Functionality for the Notifications popup
+ * 
+ * 1) On page load, fetch the latest x number of notifications. If there are any new ones, these should show a 
+ *    number e.g. (3) in the red circle to indicate there are new notifications.
+ * 2) When they click the notifications icon, show the popup and whatever recent notifications that are in there.
+ * 3) 
  */
 var notify = {
 
+    // The current notifications
     notifications: [],
+    
+    // Number of notifications to fetch
+    numOfNotifications: 50,
+    
+    // jQuery object of the notification popup
+    $popup: null,
     
     /**
      * Initialise the notifications system
      */
     init: function() {
+        
+        // Cache lookup to the popup container
+        this.$popup = $('.top-head .notification-popup');
+        this.$popupIcon = $('.top-head .cloud-popup-icon');
+        
+        // Get initial notifications
         notify.getInitialNotifications();
+        notify.initNotifyIconClickHandler();
     },
     
     /**
@@ -17,8 +36,8 @@ var notify = {
      */
     getInitialNotifications: function() {
         
-        // Call API to fetch the most recent 100 notifications
-        api_req('c=100', {
+        // Call API to fetch the most recent notifications
+        api_req('c=' + notify.numOfNotifications, {
             callback: function (result) {
 
                 // Check it wasn't a negative number error response
@@ -31,25 +50,100 @@ var notify = {
                 var notifications = result.c;
 
                 // Loop through the notifications
-                for (var notification in notifications) {
-
-                    // If the current property is not a direct property skip it
-                    if (!notification.hasOwnProperty(notifications)) {
-                        continue;
-                    }
+                for (var i = 0; i < notifications.length; i++) {
 
                     // Add notifications to list
                     notify.notifications.push({
-                        id: makeid(10),                             // Random ID
-                        type: notifications[notification].t,        // Type of notification  
-                        timestamp: notifications[notification].td,  // Time when notification occurred
-                        info: notifications[notification]           // The full notification object
+                        id: makeid(10),                                 // Make random ID
+                        notification: notifications[i],                 // The full notification object
+                        timeDelta: notifications[i].td,                 // Seconds since the notification occurred
+                        timestamp: currentTime - notifications[i].td,   // Timestamp of the notification
+                        type: notifications[i].t                        // Type of notification
                     });
                 }
 
-                console.log(notify.notifications);
+                // Show the notifications
+                notify.showNotifications();
             }
-        }, 3);
+        }, 3);  // Use channel 3
+    },
+    
+    /**
+     * Show the most recent notifications
+     */
+    showNotifications: function() {
+        
+        // Sort the notifications
+        notify.sortNotificationsByMostRecent();
+        
+        console.log('zzzz sorted notifications', notify.notifications);
+        console.log('zzzz notifications length', notify.notifications.length);
+
+        // Show notification count
+    },
+    
+    /**
+     * Sort the notifications so the most recent ones appear first in the popup
+     */
+    sortNotificationsByMostRecent: function() {
+
+        notify.notifications.sort(function(notificationA, notificationB) {
+
+            if (notificationA.timestamp > notificationB.timestamp) {
+                return -1;
+            }
+            else if (notificationA.timestamp < notificationB.timestamp) {
+                return 1;
+            }
+            else {
+                return 0;
+            }
+        });
+    },
+    
+    /**
+     * Open the notifications popup when clicking the notifications icon
+     */
+    initNotifyIconClickHandler: function() {
+        
+        // On notifications icon click
+        notify.$popupIcon.rebind('click', function() {
+            
+            // If the popup is already open, then close it
+            if (notify.$popup.hasClass('active')) {
+                notify.closePopup();
+            }
+            else {
+                // Otherwise open the popup
+                notify.openPopup();
+            }
+        });
+    },
+    
+    /**
+     * Opens the notification popup with notifications
+     */
+    openPopup: function() {
+        
+        // Calculate the position of the notifications popup so it is centered beneath the notifications icon.
+        // This is dynamically calculated because sometimes the icon position can change depending on the top nav.
+        var popupPosition = notify.$popupIcon.offset().left - 40;
+
+        // Set the position of the notifications popup and open it
+        notify.$popup.css('left', popupPosition + 'px');
+        notify.$popup.addClass('active');
+        notify.$popupIcon.addClass('active');
+
+        // Render and show notifications currently in queue
+    },
+    
+    /**
+     * Closes the popup
+     */
+    closePopup: function() {
+        
+        notify.$popup.removeClass('active');
+        notify.$popupIcon.removeClass('active');
     }
 };
 

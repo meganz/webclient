@@ -1242,8 +1242,9 @@ function transferPanelContextMenu(target)
 function openTransferpanel()
 {
     $.transferOpen(1);
-    if (M.currentdirid == 'notifications')
-        notifyPopup.initNotificationsScrolling();
+    if (M.currentdirid == 'notifications') {
+        //notifyPopup.initNotificationsScrolling();
+    }
     else if (M.viewmode)
         initFileblocksScrolling();
     else
@@ -1469,6 +1470,7 @@ function sharedUInode(nodeHandle) {
 
 function addShareNotification(notification) {
 
+    /*
     if (notifyPopup.notifications == null) {
         return false;
     }
@@ -1513,10 +1515,11 @@ function addShareNotification(notification) {
     }
 
     notifyPopup.doNotify();
+    */
 }
 
 function addNotification(actionPacket) {
-
+    /*
     if (notifyPopup.notifications === null) {
         return false;
     }
@@ -1538,6 +1541,7 @@ function addNotification(actionPacket) {
     });
 
     notifyPopup.doNotify();
+    */
 }
 
 function getContactsEMails() {

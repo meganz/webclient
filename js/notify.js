@@ -79,7 +79,7 @@ var notify = {
         console.log('zzzz sorted notifications', notify.notifications);
         console.log('zzzz notifications length', notify.notifications.length);
 
-        // Show notification count
+        // Todo: Show notification count
     },
     
     /**
@@ -134,7 +134,7 @@ var notify = {
         notify.$popup.addClass('active');
         notify.$popupIcon.addClass('active');
 
-        // Render and show notifications currently in queue
+        // Todo: Render and show notifications currently in queue
     },
     
     /**
@@ -144,6 +144,8 @@ var notify = {
         
         notify.$popup.removeClass('active');
         notify.$popupIcon.removeClass('active');
+        
+        // Todo: Clear read notifications
     }
 };
 

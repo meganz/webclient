@@ -1205,8 +1205,7 @@ function topmenuUI() {
         }
         if (!e || ($(e.target).parents('.notification-popup').length == 0
                 && ((c && c.indexOf('cloud-popup-icon') == -1) || !c))) {
-            $('.notification-popup').removeClass('active');
-            $('.cloud-popup-icon').removeClass('active');
+            notify.closePopup();
         }
         if (!e || ($(e.target).parents('.top-login-popup').length == 0
                 && ((c && c.indexOf('top-login-button') == -1) || !c))) {

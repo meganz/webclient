@@ -910,7 +910,7 @@ function initUI() {
     addContactUI();
 
     $('.fm-files-view-icon').rebind('click', function() {
-        
+
         $.hideContextMenu();
         cacheselect();
         if ($(this).attr('class').indexOf('listing-view') > -1) {
@@ -932,14 +932,14 @@ function initUI() {
             M.openFolder(M.currentdirid, true);
         }
         reselect();
-        
+
         return false;
     });
 
     $.hideContextMenu = function(event) {
-        
+
         var a, b, currentNodeClass;
-        
+
         if (event && event.target) {
             currentNodeClass = $(event.target).attr('class');
             if (!currentNodeClass) {
@@ -963,7 +963,7 @@ function initUI() {
         $('.context-menu-item.dropdown').removeClass('active');
         $('.fm-tree-header').removeClass('dragover');
         $('.nw-fm-tree-item').removeClass('dragover');
-        
+
         // Set to default
         a = $('.context-menu.files-menu,.context-menu.download');
         a.addClass('hidden');
@@ -972,7 +972,7 @@ function initUI() {
         b.removeClass('active left-position overlap-right overlap-left mega-height');
         a.find('.disabled,.context-scrolling-block').removeClass('disabled context-scrolling-block');
         a.find('.context-menu-item.contains-submenu.opened').removeClass('opened');
-        
+
         // Remove all sub-menues from context-menu move-item
         $('#csb_' + M.RootID).empty();
     };
@@ -1193,7 +1193,7 @@ function initUI() {
 
     $(window).rebind('resize.fmrh hashchange.fmrh', fm_resize_handler);
 
-    if (!MegaChatDisabled) {
+    if (!megaChatDisabled) {
         megaChat.karere.rebind("onPresence.maintainUI", function(e, presenceEventData) {
             var contact = megaChat.getContactFromJid(presenceEventData.getFromJid());
             M.onlineStatusEvent(contact, presenceEventData.getShow());
@@ -1429,10 +1429,10 @@ function sharedUInode(nodeHandle) {
         }
 
         if (oShares && oShares.EXP) {
-            
+
             // List view
             $('.grid-table.fm #' + nodeHandle + ' .grid-url-field').addClass('linked');
-            
+
             // Grid view
             $('#' + nodeHandle + '.file-block').addClass('linked');
 
@@ -2174,11 +2174,21 @@ function fmremove() {
         }
     } else {
         if (localStorage.skipDelWarning) {
-            M.moveNodes($.selected, M.RubbishID);
+            if (M.currentrootid === 'shares') {
+                M.copyNodes($.selected, M.RubbishID, true);
+            }
+            else {
+                M.moveNodes($.selected, M.RubbishID);
+            }
         } else {
             msgDialog('remove', l[1003], l[1004].replace('[X]', fm_contains(filecnt, foldercnt)), false, function(e) {
                 if (e) {
-                    M.moveNodes($.selected, M.RubbishID);
+                    if (M.currentrootid === 'shares') {
+                        M.copyNodes($.selected, M.RubbishID, true);
+                    }
+                    else {
+                        M.moveNodes($.selected, M.RubbishID);
+                    }
                 }
             }, true);
         }
@@ -2225,13 +2235,13 @@ function fmremdupes(test)
 }
 
 function initContextUI() {
-    
+
     var c = '.context-menu-item';
 
     $('.context-menu-section').off('mouseover', c);
     $('.context-menu-section').on('mouseover', c, function() {
 
-        // is move... or download... 
+        // is move... or download...
         if ($(this).parent().parent().is('.context-submenu')) {
 
             // if just item hide child context-submenu
@@ -2270,8 +2280,8 @@ function initContextUI() {
             b.removeClass('active opened')
                 .find('.context-submenu').addClass('hidden');
         }
-        
-        currentId = $this.attr('id');        
+
+        currentId = $this.attr('id');
         if (currentId) {
             M.buildSubMenu(currentId.replace('fi_', ''));
         }
@@ -3150,20 +3160,30 @@ function accountUI()
         $(account.purchases).each(function(index, purchaseTransaction)
         {
             // Set payment method
+            //['Voucher', 'PayPal', 'Apple', 'Google', 'Bitcoin', 'Union Pay', 'Fortumo', 'Credit Card', 'Credit Card']
             var paymentMethodIndex = purchaseTransaction[4];
-            var paymentMethod = l[428];
+            var paymentMethod = l[428];             // Voucher
 
             if (paymentMethodIndex == 1) {
-                paymentMethod = 'PayPal';
+                paymentMethod = l[1233];            // PayPal
             }
             else if (paymentMethodIndex == 2) {
-                paymentMethod = l[6953];
+                paymentMethod = l[6953];            // iTunes
+            }
+            else if (paymentMethodIndex == 3) {
+                paymentMethod = l[7188];            // Google
             }
             else if (paymentMethodIndex == 4) {
                 paymentMethod = l[6802];            // Bitcoin
             }
             else if (paymentMethodIndex == 5) {
                 paymentMethod = l[6952];            // Union Pay
+            }
+            else if (paymentMethodIndex == 6) {
+                paymentMethod = l[7161];            // Mobile carrier billing
+            }
+            else if (paymentMethodIndex == 7) {
+                paymentMethod = l[6952];            // Credit card
             }
             else if (paymentMethodIndex == 8) {
                 paymentMethod = l[6952];            // Credit card
@@ -5721,10 +5741,10 @@ function contextMenuUI(e, ll) {
 
     var items, v, flt,
         m = $('.context-menu.files-menu'),
-        
+
         // Selection of first child level ONLY of .context-menu-item in .context-menu
         menuCMI = '.context-menu.files-menu .context-menu-section > .context-menu-item',
-//            ', .context-menu.files-menu > .context-menu-item',// Selection of .select-all, doesn't belongs to .context-menu-section    
+//            ', .context-menu.files-menu > .context-menu-item',// Selection of .select-all, doesn't belongs to .context-menu-section
         currNodeClass = $(e.currentTarget).attr('class'),
         id = $(e.currentTarget).attr('id');
 
@@ -7021,7 +7041,7 @@ function generateShareDialogRow(displayNameOrEmail, email, shareRights, userHand
 
     var rowId = '',
         html = '',
-        av =  useravatar.contact(userHandle),
+        av =  useravatar.contact(email),
         perm = '',
         permissionLevel = 0;
 
@@ -8886,7 +8906,7 @@ function propertiesDialog(close)
                 for (var u in n.shares) {
                     if (M.u[u]) {
                         var u = M.u[u]
-                        var onlinestatus = M.onlineStatusClass(megaChat.karere.getPresence(megaChat.getJidFromNodeId(u.u)));
+                        var onlinestatus = M.onlineStatusClass(megaChat.isReady && megaChat.karere.getPresence(megaChat.getJidFromNodeId(u.u)));
                         if (++total <= 5)
                             susers.append('<div class="properties-context-item ' + onlinestatus[1] + '">'
                                 + '<div class="properties-contact-status"></div>'
@@ -9673,7 +9693,7 @@ function fm_resize_handler() {
             initContactsGridScrolling();
     }
 
-    if (typeof(megaChat) != 'undefined' && megaChat && megaChat.resized) {
+    if (megaChat.isReady && megaChat.resized) {
         megaChat.resized();
     }
 
@@ -9887,7 +9907,7 @@ function contactUI() {
         var user = M.d[u_h];
         var avatar = $(useravatar.contact(u_h));
 
-        var onlinestatus = M.onlineStatusClass(megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h)));
+        var onlinestatus = M.onlineStatusClass(megaChat.isReady && megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h)));
         $('.contact-top-details .nw-contact-block-avatar').empty().append( avatar.removeClass('avatar') )
         $('.contact-top-details .onlinestatus').removeClass('away offline online busy');
         $('.contact-top-details .onlinestatus').addClass(onlinestatus[1]);
@@ -9972,7 +9992,7 @@ function contactUI() {
             showAuthenticityCredentials();
         });
 
-        if (!MegaChatDisabled) {
+        if (!megaChatDisabled) {
             if (onlinestatus[1] !== "offline" && u_h !== u_handle) {
                 // user is online, lets display the "Start chat" button
 

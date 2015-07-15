@@ -2,21 +2,21 @@ var newnodes;
 var fminitialized = false;
 var panelDomQueue = {};
 
-if (typeof seqno == 'undefined')
+if (typeof seqno === 'undefined')
     var seqno = Math.floor(Math.random() * 1000000000);
-if (typeof n_h == 'undefined')
+if (typeof n_h === 'undefined')
     var n_h = false;
-if (typeof requesti == 'undefined')
+if (typeof requesti === 'undefined')
     var requesti = makeid(10);
-if (typeof folderlink == 'undefined')
+if (typeof folderlink === 'undefined')
     var folderlink = false;
-if (typeof lang == 'undefined')
+if (typeof lang === 'undefined')
     var lang = 'en';
-if (typeof Ext == 'undefined')
+if (typeof Ext === 'undefined')
     var Ext = false;
-if (typeof ie9 == 'undefined')
+if (typeof ie9 === 'undefined')
     var ie9 = false;
-if (typeof loadingDialog == 'undefined')
+if (typeof loadingDialog === 'undefined')
 {
     var loadingDialog = {};
     loadingDialog.show = function()
@@ -232,7 +232,7 @@ function MegaData()
 
     this.getSortStatus = function(u)
     {
-        var status = megaChat.karere.getPresence(megaChat.getJidFromNodeId(u));
+        var status = megaChat.isReady && megaChat.karere.getPresence(megaChat.getJidFromNodeId(u));
         if (status == 'chat')
             return 1;
         else if (status == 'dnd')
@@ -475,7 +475,7 @@ function MegaData()
 
     this.onlineStatusEvent = function(u, status)
     {
-        if (u && megaChat && megaChat.is_initialized)
+        if (u && megaChat.isReady)
         {
             // this event is triggered for a specific resource/device (fullJid), so we need to get the presen for the
             // user's devices, which is aggregated by Karere already
@@ -820,7 +820,7 @@ function MegaData()
                 contact = M.u[u_h];
 
                 // chat is enabled?
-                if (megaChat && megaChat.is_initialized && !MegaChatDisabled) {
+                if (megaChat.isReady) {
                     if (contact && contact.lastChatActivity > timems) {
                         interactionclass = 'conversations';
                         time = time2last(contact.lastChatActivity);
@@ -838,7 +838,7 @@ function MegaData()
                 node = M.d[u_h];
                 avatar = useravatar.contact(u_h, "nw-contact-avatar")
 
-                onlinestatus = M.onlineStatusClass(megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h)));
+                onlinestatus = M.onlineStatusClass(megaChat.isReady && megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h)));
 
                 if (M.viewmode === 1) {
                     el = 'div';
@@ -921,7 +921,7 @@ function MegaData()
                     u_h = M.v[i].p,
                     rights = l[55],
                     rightsclass = ' read-only',
-                    onlinestatus = M.onlineStatusClass(megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h)));
+                    onlinestatus = M.onlineStatusClass(megaChat.isReady && megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h)));
                     if (cs.files === 0 && cs.folders === 0) {
                         contains = l[1050];
                     }
@@ -1393,7 +1393,7 @@ function MegaData()
         this.contacts();
         this.renderInboxTree();
         treeUI();
-        if (!MegaChatDisabled) {
+        if (!megaChatDisabled) {
             megaChat.renderContactTree();
         }
     };
@@ -1455,13 +1455,13 @@ function MegaData()
             this.chat = true;
             treeUI();
 
-            if (!MegaChatDisabled) {
+            if (!megaChatDisabled) {
                 chatui(id); // XX: using the old code...for now
             }
         } else if (!id || !M.d[id])
             id = this.RootID;
 
-        if (!MegaChatDisabled) {
+        if (!megaChatDisabled) {
             if (!this.chat) {
                 if (megaChat.getCurrentRoom()) {
                     megaChat.getCurrentRoom().hide();
@@ -1605,7 +1605,7 @@ function MegaData()
             }
             var onlinestatus;
 
-            if (!MegaChatDisabled) {
+            if (megaChat.isReady) {
                 onlinestatus = M.onlineStatusClass(megaChat.karere.getPresence(megaChat.getJidFromNodeId(contacts[i].u)));
             } else {
                 onlinestatus = [l[5926], 'offline'];
@@ -1620,7 +1620,7 @@ function MegaData()
 
         $('.content-panel.contacts').html(html);
 
-        if (!MegaChatDisabled) {
+        if (!megaChatDisabled) {
             megaChat.renderContactTree();
 
             $('.fm-tree-panel').undelegate('.start-chat-button', 'click.megaChat');
@@ -1756,7 +1756,7 @@ function MegaData()
     };
 
     this.buildtree = function(n, dialog, stype) {
-        
+
         if (!n) {
             console.error('Invalid node passed to M.buildtree');
             return;
@@ -1959,11 +1959,11 @@ function MegaData()
     var adv = '<span class="context-menu-divider"></span><span class="context-menu-item advanced-item"><span class="context-menu-icon"></span>Select Location</span>';
 
     this.buildRootSubMenu = function() {
-        
+
         var cs = '',
             sm = '',
             html = '';
-        
+
         for (var h in M.c[M.RootID]) {
             if (M.d[h].t) {
                 cs = ' contains-submenu';
@@ -1985,11 +1985,11 @@ function MegaData()
     /*
      * buildSubMenu - context menu related
      * Create sub-menu for context menu parent directory
-     * 
-     * @param {string} id - parent folder handle 
+     *
+     * @param {string} id - parent folder handle
      */
     this.buildSubMenu = function(id) {
-        
+
         var folders = [],
             sub, cs, sm, fid, sharedFolder, html;
 
@@ -2007,7 +2007,7 @@ function MegaData()
                 if (a.name)
                     return a.name.localeCompare(b.name);
             });
-        
+
             for (var i in folders) {
                 sub = false;
                 cs = '';
@@ -2345,7 +2345,7 @@ function MegaData()
             mDBadd('f', clone(n));
         }
         if (n.p) {
-            if (typeof this.c[n.p] == 'undefined') {
+            if (typeof this.c[n.p] === 'undefined') {
                 this.c[n.p] = [];
             }
             this.c[n.p][n.h] = 1;
@@ -2945,7 +2945,7 @@ function MegaData()
                         break;
                     }
                 }
-                if (typeof M.c[t] == 'undefined')
+                if (typeof M.c[t] === 'undefined')
                     M.c[t] = [];
                 M.c[t][h] = 1;
                 removeUInode(h);
@@ -4490,7 +4490,7 @@ function renderfm()
     }
 
     M.openFolder(M.currentdirid);
-    if (!MegaChatDisabled && megaChat.is_initialized) {
+    if (megaChat.isReady) {
         megaChat.renderContactTree();
         megaChat.renderMyStatus();
     }
@@ -4564,7 +4564,7 @@ function renderNew() {
         M.contacts();
         treeUI();
 
-        if (!MegaChatDisabled) {
+        if (!megaChatDisabled) {
             megaChat.renderContactTree();
             megaChat.renderMyStatus();
         }
@@ -4634,7 +4634,7 @@ function execsc(actionPackets, callback) {
                     addNotification(actionPacket);
                 }
 
-                if (megaChat && megaChat.is_initialized) {
+                if (megaChat.isReady) {
                     $.each(actionPacket.u, function (k, v) {
                         megaChat[v.c == 0 ? "processRemovedUser" : "processNewUser"](v.u);
                     });
@@ -4714,7 +4714,7 @@ function execsc(actionPackets, callback) {
                 if (typeof actionPacket.r == "undefined") {
                     M.delNodeShare(actionPacket.n, actionPacket.u);
                 } else if (M.d[actionPacket.n]
-                    && typeof M.d[actionPacket.n].shares != 'undefined'
+                    && typeof M.d[actionPacket.n].shares !== 'undefined'
                     && M.d[actionPacket.n].shares[actionPacket.u]
                     || actionPacket.ha == crypto_handleauth(actionPacket.n)) {
 
@@ -4728,17 +4728,27 @@ function execsc(actionPackets, callback) {
                     });
                 }
             } else {
-                if (typeof actionPacket.n != 'undefined' && typeof actionPacket.k != 'undefined' && typeof u_sharekeys[actionPacket.n] == 'undefined') {
-                    u_sharekeys[actionPacket.n] = crypto_process_sharekey(actionPacket.n, actionPacket.k);
-                    tsharekey = a32_to_base64(u_k_aes.encrypt(u_sharekeys[actionPacket.n]));
-                    prockey = true;
+                if (typeof actionPacket.n !== 'undefined'
+                        && typeof actionPacket.k !== 'undefined'
+                        && typeof u_sharekeys[actionPacket.n] === 'undefined') {
+
+                    if (!actionPacket.k) {
+                        // XXX: We need to find out which API call is causing it
+                        //      (it might be a bug in the SDK or the webclient)
+                        srvlog('Got share action-packet with no key.');
+                    }
+                    else {
+                        u_sharekeys[actionPacket.n] = crypto_process_sharekey(actionPacket.n, actionPacket.k);
+                        tsharekey = a32_to_base64(u_k_aes.encrypt(u_sharekeys[actionPacket.n]));
+                        prockey = true;
+                    }
                 }
 
                 if (actionPacket && actionPacket.u === 'EXP') {
                     M.getLinks([actionPacket.h]);
                 }
 
-                if (typeof actionPacket.o != 'undefined') {
+                if (typeof actionPacket.o !== 'undefined') {
                     if (typeof actionPacket.r == "undefined") {
                         if (d) {
                             console.log('delete a share');
@@ -4781,7 +4791,7 @@ function execsc(actionPackets, callback) {
                                 console.log('look up other root-share-nodes from this user');
                             }
                             // look up other root-share-nodes from this user:
-                            if (typeof M.c[actionPacket.o] != 'undefined') {
+                            if (typeof M.c[actionPacket.o] !== 'undefined') {
                                 for (var i in M.c[actionPacket.o]) {
                                     if (M.d[i] && M.d[i].t == 1) {
                                         rootsharenodes[i] = 1;
@@ -4933,7 +4943,7 @@ function execsc(actionPackets, callback) {
                 addNotification(actionPacket);
             }
 
-            if (megaChat && megaChat.is_initialized) {
+            if (megaChat.isReady) {
                 $.each(actionPacket.u, function(k, v) {
                     megaChat[v.c == 0 ? "processRemovedUser" : "processNewUser"](v.u);
                 });
@@ -5441,7 +5451,7 @@ function doShare(h, targets, dontShowShareDialog) {
             }
         }
     });
-    
+
     return $promise;
 }
 
@@ -5810,7 +5820,7 @@ function init_chat() {
     if (folderlink) {
         if (d) console.log('Will not initializing chat [branch:1]');
     }
-    else if (!MegaChatDisabled) {
+    else if (!megaChatDisabled) {
         if (pubEd25519[u_handle]) {
             __init_chat();
         } else {
@@ -5907,7 +5917,10 @@ function loadfm_done(pfkey, stackPointer) {
     if (is_fm() || $('.fm-main.default').is(":visible")) {
         renderfm();
     }
-    loadingDialog.hide();
+
+    if (!CMS.isLoading()) {
+        loadingDialog.hide();
+    }
 
     if (!pfkey) {
         notifyPopup.pollNotifications();

@@ -1,0 +1,64 @@
+{
+  "name": "Mega_Webclient",
+  "version": "2.0.0",
+  "description": "Web Client to access the Mega Cloud Infrastructure",
+  "main": "index.js",
+  "directories": {
+    "src": "js",
+    "test": "test",
+    "doc": "doc"
+  },
+  "scripts": {
+    "test": "make test",
+    "api-doc": "make api-doc"
+  },
+  "homepage": "https://mega.co.nz/",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:meganz/webclient.git"
+  },
+  "bugs": {
+    "url": "https://issues.developers.mega.co.nz/projects/webclient"
+  },
+  "keywords": [
+    "Mega",
+    "storage",
+    "chat",
+    "encryption"
+  ],
+  "author": "Mega Limited",
+  "license": "proprietary",
+  "readmeFilename": "README.md",
+  "devDependencies": {
+    "dateformat": "~1.0.7-1.2.3",
+    "fb-flo": "^0.3.1",
+    "grunt-contrib-concat": "^0.5.1",
+    "grunt-contrib-htmlmin": "^0.4.0",
+    "grunt-htmljson": "^0.1.1",
+    "ibrik": "~1.1.1",
+    "istanbul": "~0.2.10",
+    "jsdoc": "~3.3.0",
+    "jshint": "~2.7.0",
+    "jscs": "~1.13.1",
+    "jscs-jsdoc": "~1.0.1",
+    "karma": "~0.12.8",
+    "karma-chai": "0.1.0",
+    "karma-chai-plugins": "0.2.1",
+    "karma-chrome-launcher": "~0.1.2",
+    "karma-coverage": "~0.2.4",
+    "karma-firefox-launcher": "~0.1.3",
+    "karma-html2js-preprocessor": "~0.1.0",
+    "karma-jasmine": "~0.1.5",
+    "karma-junit-reporter": "~0.2",
+    "karma-mocha": "~0.1.1",
+    "karma-phantomjs-launcher": "~0.1.1",
+    "karma-script-launcher": "~0.1.0",
+    "karma-sinon": "~1.0.3",
+    "mocha": "~1.17.1",
+    "sinon": "~1.9.0"
+  },
+  "dependencies": {
+    "grunt-contrib-uglify": "^0.8.0",
+    "relaxed-json": "^0.2.9"
+  }
+}

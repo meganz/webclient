@@ -10,16 +10,11 @@ function init_help()
 	$('.new-left-menu-link,.help-block').unbind('click');
 	$('.new-left-menu-link,.help-block').bind('click',function(e)
 	{
-		var c = $(this).attr('class');
+		var c = $(this).attr('class').replace(/.+ /, '');
 		if (!c) return false;
-		if (c.indexOf('basics') > -1) document.location.hash = 'help/basics';
-		else if (c.indexOf('sharing') > -1) document.location.hash = 'help/sharing';
-		else if (c.indexOf('security') > -1) document.location.hash = 'help/security';
-		else if (c.indexOf('account') > -1) document.location.hash = 'help/account';
-		else if (c.indexOf('sync') > -1) document.location.hash = 'help/sync';
-		else if (c.indexOf('ios') > -1) document.location.hash = 'help/ios';
-		else if (c.indexOf('android') > -1) document.location.hash = 'help/android';
-		else document.location.hash = 'help';
+
+        if (c == 'home') document.location.hash = 'help';
+        else document.location.hash = 'help/' + c;
 	});	
 	
 	

@@ -3,14 +3,9 @@
  *
  * @type {boolean}
  */
-var MegaChatDisabled = localStorage.chatDisabled === true ? true : false;
+var megaChatDisabled = !!localStorage.chatDisabled;
 
 var disableMpEnc = true;
-
-if (MegaChatDisabled) {
-    $(document.body).addClass("megaChatDisabled");
-}
-
 
 var chatui;
 (function() {
@@ -747,16 +742,29 @@ var Chat = function() {
 
     this.plugins = {};
 
-    try {
-        // This might throw in browsers which doesn't support Strophe/WebRTC
-        this.karere = new Karere({
-            'clientName': 'mc',
-            'boshServiceUrl': function() { return self.getBoshServiceUrl(); }
-        });
+    if (!megaChatDisabled) {
+        try {
+            // This might throw in browsers which doesn't support Strophe/WebRTC
+            this.karere = new Karere({
+                'clientName': 'mc',
+                'boshServiceUrl': function() { return self.getBoshServiceUrl(); }
+            });
+        }
+        catch (e) {
+            console.error(e);
+            megaChatDisabled = true;
+        }
     }
-    catch(e) {
-        console.error(e);
-        MegaChatDisabled = true;
+
+    Object.defineProperty(this, 'isReady', {
+        get: function() {
+            return !megaChatDisabled && self.is_initialized;
+        }
+    });
+
+    if (megaChatDisabled) {
+        this.logger.info('MEGAChat is disabled.');
+        $(document.body).addClass("megaChatDisabled");
     }
 
     self.filePicker = null; // initialized on a later stage when the DOM is fully available.
@@ -1385,31 +1393,28 @@ Chat.prototype.init = function() {
     // always last
 
     // trigger reconnect on mouse move
-    self.karere.bind('onDisconnected', function() {
-        if (self.karere._connectionRetryInProgress && self.karere.getConnectionState() === Karere.CONNECTION_STATE.DISCONNECTED) {
-            $(document).bind("mousemove.megaChatRetry", function() {
-                $(document).unbind("onmousemove.megaChatRetry");
-                if (self.karere._connectionRetryInProgress && self.karere.getConnectionState() === Karere.CONNECTION_STATE.DISCONNECTED) {
-                    clearTimeout(self.karere._connectionRetryInProgress);
-                    self.karere._connectionRetryInProgress = setTimeout(function () {
-                        if (
-                            self.karere._connectionRetryInProgress &&
-                            (
-                                self.karere.getConnectionState() === Karere.CONNECTION_STATE.DISCONNECTED ||
-                                self.karere.getConnectionState() === Karere.CONNECTION_STATE.AUTHFAIL ||
-                                self.karere.getConnectionState() === Karere.CONNECTION_STATE.CONNFAIL
-                            )
-                        ) {
-                            self.karere.reconnect();
-                        }
+    self.karere.unbind('onDisconnected.megaChatRetry');
+    self.karere.unbind('onConnfail.megaChatRetry');
+    self.karere.unbind('onConnectionClosed.megaChatRetry');
 
-                        if (self.karere._connectionRetryInProgress) {
-                            self.karere._connectionRetryInProgress = null;
-                        }
-                    }, rand(1500));
-                }
-            })
-        }
+    self.karere.bind(
+        'onDisconnected.megaChatRetry onConnfail.megaChatRetry onConnectionClosed.megaChatRetry',
+        function() {
+
+            if (
+                self.karere._connectionRetryInProgress &&
+                self.karere.getConnectionState() === Karere.CONNECTION_STATE.DISCONNECTED &&
+                localStorage.megaChatPresence !== "unavailable"
+            ) {
+                self.logger.warn("Will bind a mousemove to re-trigger a connection retry on mousemove.");
+
+                $(document).rebind("mousemove.megaChatRetry", function() {
+                    if (self.karere._connectionRetryUI() === true) {
+                        $(document).unbind("mousemove.megaChatRetry");
+                        self.logger.warn("Connection retry triggered because of a mousemove.");
+                    }
+                });
+            }
     });
 
     self.trigger("onInit");
@@ -2130,7 +2135,7 @@ Chat.prototype.openChat = function(jids, type) {
     var self = this;
     type = type || "private";
 
-    var $promise = new $.Deferred();
+    var $promise = new MegaPromise();
 
     if (type === "private") {
         var $element = $('.nw-conversations-item[data-jid="' + jids[0] + '"]');
@@ -2186,7 +2191,7 @@ Chat.prototype.openChat = function(jids, type) {
 
 
     if (self.karere.getConnectionState() != Karere.CONNECTION_STATE.CONNECTED) {
-        return [roomJid, room, (new $.Deferred()).reject(roomJid, room)];
+        return [roomJid, room, (new MegaPromise()).reject(roomJid, room)];
     }
 
     var jidsWithoutMyself = room.getParticipantsExceptMe(jids);

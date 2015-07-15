@@ -65,11 +65,13 @@ var useravatar = (function() {
      * @private
      */
     var _lettersSettings = function(word) {
-        var words = $.trim(word).toUpperCase().split(/\W+/);
-        var letters = words[0][0];
-        var color   = letters.charCodeAt(0) % _colors.length;
-        if (word === u_handle) {
-            letters = "";
+        var letters = "";
+        var color   = 1;
+        if (word && word !== u_handle) {
+            // Word is indeed not empty nor our user ID.
+            var words = $.trim(word).toUpperCase().split(/\W+/);
+            letters = words[0][0];
+            color   = letters.charCodeAt(0) % _colors.length;
         }
         return {letters: letters, color: _colors[color], colorIndex: color + 1 };
     };
@@ -186,21 +188,24 @@ var useravatar = (function() {
     }
 
     ns.contact = function(user, className, element) {
+        
         className = className || "avatar";
         element   = element || "div";
-        if (typeof user === "string") {
+        if (typeof user === "string" && user.length > 0) {
             if (isEmail(user)) {
                 return emailAvatar(user, className, element);
-            } else if (M.u[user]) {
+            }
+            else if (M.u[user]) {
                 // It's an user ID
                 user = M.u[user];
-            } else {
+            }
+            else {
                 return _letters(user, user, className, element);
             }
         }
 
-        if (typeof user !== "object" || !user) {
-            throw new Error("Unexpected value" + typeof(user));
+        if (typeof user !== "object" || !(user||{}).u) {
+            return "";
         }
 
         if (avatars[user.u]) {

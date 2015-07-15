@@ -2525,14 +2525,19 @@ function generateAnonymousReport() {
     report.io = window.dlMethod && dlMethod.name;
     report.sb = +('' + $('script[src*="secureboot"]').attr('src')).split('=').pop();
     report.tp = $.transferprogress;
-    report.karereState = megaChat.karere.getConnectionState();
-    report.karereCurrentConnRetries = megaChat.karere._connectionRetries;
-    report.myPresence = megaChat.karere.getPresence(megaChat.karere.getJid());
-    report.karereServer = megaChat.karere.connection.service;
-    report.numOpenedChats = Object.keys(megaChat.chats).length;
-    report.haveRtc = megaChat.rtc ? true : false;
-    if (report.haveRtc) {
-        report.rtcStatsAnonymousId = megaChat.rtc.ownAnonId;
+    if (!megaChat.karere) {
+        report.karereState = '#disabled#';
+    }
+    else {
+        report.karereState = megaChat.karere.getConnectionState();
+        report.karereCurrentConnRetries = megaChat.karere._connectionRetries;
+        report.myPresence = megaChat.karere.getPresence(megaChat.karere.getJid());
+        report.karereServer = megaChat.karere.connection.service;
+        report.numOpenedChats = Object.keys(megaChat.chats).length;
+        report.haveRtc = megaChat.rtc ? true : false;
+        if (report.haveRtc) {
+            report.rtcStatsAnonymousId = megaChat.rtc.ownAnonId;
+        }
     }
 
     var chatStates = {};
@@ -3280,6 +3285,16 @@ mBroadcaster.addListener('crossTab:master', function _setup() {
     }
 });
 
+/**
+ * Simple alias that will return a random number in the range of: a < b
+ *
+ * @param a {Number} min
+ * @param b {Number} max
+ * @returns {*}
+ */
+function rand_range(a, b) {
+    return Math.random() * (b - a) + a;
+};
 
 // FIXME: This is a "Dirty Hack" (TM) that needs to be removed as soon as
 //        the original problem is found and resolved.

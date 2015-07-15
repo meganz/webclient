@@ -115,7 +115,7 @@ CallSession.prototype.onRemoteStreamReceived = function(e, eventData) {
 
     if (!$.isArray(eventData.player)) {
         self.remotePlayer = eventData.player;
-    } else {
+    } else if (eventData.player) {
         self.remotePlayer = eventData.player[0];
     }
 };
@@ -323,7 +323,7 @@ CallSession.prototype.onWaitingResponseIncoming = function(e, eventData) {
             {
                 'answer': {
                     'type': 'primary',
-                    'text': "Answer",
+                    'text': l[7205],
                     'callback': doAnswer
                 },
                 'reject': {
@@ -346,7 +346,7 @@ CallSession.prototype.onCallStarting = function(e) {
     // cleanup old video elements.
     $('.my-av-screen video, video.rmtViewport', self.room.$header);
 
-    var msg = "Call with [X] is now starting...".replace(
+    var msg = l[7206].replace(
         '[X]',
         self.room.megaChat.getContactNameFromJid(
             self.getPeer()
@@ -373,7 +373,7 @@ CallSession.prototype.onCallAnswered = function(e) {
     self.room.getInlineDialogInstance("call-starting").remove();
 
 
-    var msg = "Call with [X] is now initialising...".replace(
+    var msg = l[7207].replace(
         '[X]',
         self.room.megaChat.getContactNameFromJid(
             self.getPeer()
@@ -426,11 +426,13 @@ CallSession.prototype.onCallStarted = function(e, eventData) {
     }
 
 
-    if (self.remotePlayer.length && self.remotePlayer.length === 1) {
-        // api incompatibility ?
-        self.room._othersAvElement = self.remotePlayer[0];
-    } else {
-        self.room._othersAvElement = self.remotePlayer;
+    if (self.remotePlayer) {
+        if (self.remotePlayer.length && self.remotePlayer.length === 1) {
+            // api incompatibility ?
+            self.room._othersAvElement = self.remotePlayer[0];
+        } else {
+            self.room._othersAvElement = self.remotePlayer;
+        }
     }
 
     self.room.megaChat.dumpCallStats = self.room.dumpCallStats = function() {
@@ -532,7 +534,7 @@ CallSession.prototype.onCallEnded = function(e, reason) {
 
     if (self.room.megaChat._currentCallCounter) {
         var msg = l[5889].replace('[X]', self.room.megaChat.getContactNameFromJid(self.getPeer()));
-        msg += " Call duration: [X].".replace("[X]", secToDuration(self.room.megaChat._currentCallCounter));
+        msg += " " + l[7208] + ".".replace("[X]", secToDuration(self.room.megaChat._currentCallCounter));
 
         self.room.appendDomMessage(
             self.room.generateInlineDialog(
@@ -549,24 +551,40 @@ CallSession.prototype.onCallEnded = function(e, reason) {
     self.getCallManager().trigger('CallTerminated', [self, e]);
 };
 
-CallSession.prototype.onCallRejected = function(e) {
+CallSession.prototype.onCallRejected = function(e, reason) {
     var self = this;
 
     var peer = self.room.getParticipantsExceptMe()[0];
 
-    // Show "Call with [X] was rejected."
-    // ^^ should this should be changed to "canceled", not "rejected"?
-    var msg = l[5892].replace('[X]', self.room.megaChat.getContactNameFromJid(peer));
+    if (reason === "caller") {
+        // Show "Call with [X] was canceled."
+        // ^^ should this should be changed to "canceled", not "rejected"?
+        var msg = l[5894].replace('[X]', self.room.megaChat.getContactNameFromJid(peer));
 
-    self.room.appendDomMessage(
-        self.room.generateInlineDialog(
-            "rejected-call-" + unixtime(),
-            peer,
-            "rejected-call",
-            msg,
-            []
-        )
-    );
+        self.room.appendDomMessage(
+            self.room.generateInlineDialog(
+                "ended-call-" + unixtime(),
+                peer,
+                "call-ended",
+                msg,
+                []
+            )
+        );
+    } else {
+        // Show "Call with [X] was rejected."
+        // ^^ should this should be changed to "canceled", not "rejected"?
+        var msg = l[5892].replace('[X]', self.room.megaChat.getContactNameFromJid(peer));
+
+        self.room.appendDomMessage(
+            self.room.generateInlineDialog(
+                "rejected-call-" + unixtime(),
+                peer,
+                "rejected-call",
+                msg,
+                []
+            )
+        );
+    }
 
     self.getCallManager().trigger('CallTerminated', [self, e]);
 };
@@ -598,9 +616,9 @@ CallSession.prototype.onCallFailed = function(e, reason, txt) {
     var peer = self.room.getParticipantsExceptMe()[0];
 
     // Substitute email into language string
-    var msg = "Call with [X] failed.".replace('[X]', self.room.megaChat.getContactNameFromJid(peer));
+    var msg = l[7209].replace('[X]', self.room.megaChat.getContactNameFromJid(peer));
     if (self.room.megaChat._currentCallCounter) {
-        msg += " Call duration: [X].".replace("[X]", secToDuration(self.room.megaChat._currentCallCounter));
+        msg += " " + l[7208] + ".".replace("[X]", secToDuration(self.room.megaChat._currentCallCounter));
     }
 
     self.room.appendDomMessage(
@@ -621,7 +639,7 @@ CallSession.prototype.onCallMissed = function(e) {
 
     var peer = self.room.getParticipantsExceptMe()[0];
 
-    var translationMissing = "You have one missed call from [X].";
+    var translationMissing = l[7210];
     var msg = translationMissing.replace('[X]', self.room.megaChat.getContactNameFromJid(peer));
 
     self.room.appendDomMessage(
@@ -694,16 +712,16 @@ CallSession.prototype.endCall = function(reason) {
         if (self.answer && self.reqStillValid && self.reqStillValid()) {
             if (reason === 'failed') {
                 self.setState(CallSession.STATE.FAILED);
-                self.getCallManager().trigger('CallFailed', [self]);
+                self.getCallManager().trigger('CallFailed', [self, reason]);
                 return self.answer(false, {reason: reason});
             } else {
                 self.setState(CallSession.STATE.MISSED);
-                self.getCallManager().trigger('CallMissed', [self]);
+                self.getCallManager().trigger('CallMissed', [self, reason]);
                 return self.answer(false, {reason: reason});
             }
         } else if (self.cancel) {
             self.setState(CallSession.STATE.REJECTED);
-            self.getCallManager().trigger('CallRejected', [self]);
+            self.getCallManager().trigger('CallRejected', [self, reason]);
             return self.cancel();
         } else {
             // no need to trigger event, the RTC module will trigger it, when receiving the session ended stanzas
@@ -876,8 +894,21 @@ CallSession.prototype.getJingleSession = function() {
 };
 
 CallSession.prototype.getPeer = function() {
-    return this.getJingleSession().peerJid();
+    var jingleSession = this.getJingleSession();
+    if (jingleSession && jingleSession.peerJid) {
+        return jingleSession.peerJid();
+    } else if (this.state === CallSession.STATE.WAITING_RESPONSE_OUTGOING) {
+        // jingleSession.peerJid === undefined
+        if (this.room) {
+            return this.room.getParticipantsExceptMe()[0];
+        } else {
+            assert(false, "Failed to get peerJid [1]");
+        }
+    } else {
+        assert(false, "Failed to get peerJid [2]");
+    }
 };
+
 CallSession.prototype.getMediaOptions = function() {
     return this.getJingleSession().sentMediaTypes();
 };
@@ -948,7 +979,9 @@ CallSession.prototype.renderCallStartedState = function() {
                 self.localPlayer.play();
             }
             if (self.room._othersAvElement) {
-                $('.video-full-canvas-block.other-user .front', $fullscreenContainer).append(self.room._othersAvElement);
+                $('.video-full-canvas-block.other-user .front', $fullscreenContainer).append(
+                    self.room._othersAvElement
+                );
                 self.room._othersAvElement.play();
             }
 
@@ -968,8 +1001,12 @@ CallSession.prototype.renderCallStartedState = function() {
                 $('.video-full-canvas-block.other-user').removeClass('video-off');
             }
 
-            $('.video-full-container .video-call-button.video-icon')[self.getMediaOptions().video ? "removeClass" : "addClass"]("active");
-            $('.video-full-container .video-call-button.audio-icon')[self.getMediaOptions().audio ? "removeClass" : "addClass"]("active");
+            $('.video-full-container .video-call-button.video-icon')[
+                    self.getMediaOptions().video ? "removeClass" : "addClass"
+                ]("active");
+            $('.video-full-container .video-call-button.audio-icon')[
+                    self.getMediaOptions().audio ? "removeClass" : "addClass"
+                ]("active");
 
             $(document).fullScreen(true);
             $(window).trigger('resize');
@@ -996,8 +1033,13 @@ CallSession.prototype.renderCallStartedState = function() {
             }
 
 
-            $('.video-call-button.video-icon', self.room.$header)[self.getMediaOptions().video ? "removeClass" : "addClass"]("active");
-            $('.video-call-button.audio-icon', self.room.$header)[self.getMediaOptions().audio ? "removeClass" : "addClass"]("active");
+            $('.video-call-button.video-icon', self.room.$header)[
+                    self.getMediaOptions().video ? "removeClass" : "addClass"
+                ]("active");
+            $('.video-call-button.audio-icon', self.room.$header)[
+                    self.getMediaOptions().audio ? "removeClass" : "addClass"
+                ]("active");
+
             self.renderAudioVideoScreens();
             $fullscreenContainer.addClass("hidden");
 
@@ -1416,7 +1458,7 @@ CallManager.prototype._attachToChat = function(megaChat) {
 
         self._detachFromChatRoom(megaChat, chatRoom);
     });
-    
+
     megaChat.unbind("onRoomCreated.chatStore");
     megaChat.bind("onRoomCreated.chatStore", function(e, chatRoom) {
         assert(chatRoom.type, 'missing room type');
@@ -1473,6 +1515,14 @@ CallManager.prototype._attachToChatRoom = function(megaChat, chatRoom) {
         var session = self.getOrCreateSessionFromEventData(e.type, eventData, chatRoom);
         session.setState(CallSession.STATE.STARTING);
         self.trigger('CallStarting', [session]);
+
+        var remoteMediaOpts = session.getRemoteMediaOptions();
+
+        if (remoteMediaOpts && remoteMediaOpts.audio === false && remoteMediaOpts.video === false) {
+            session.setState(CallSession.STATE.STARTED);
+            self.trigger('RemoteStreamReceived', [session, eventData]);
+            self.trigger('CallStarted', [session, eventData]);
+        }
     });
 
 
@@ -1546,7 +1596,7 @@ CallManager.prototype._attachToChatRoom = function(megaChat, chatRoom) {
             );
         }
 
-        var reason = eventData.reason ? eventData.reason : (eventData.info && eventData.info.reason ? eventData.info.reason : undefined);var reason = eventData.reason ?
+        var reason = eventData.reason ?
             eventData.reason : (
             eventData.info && eventData.info.reason ?
                 eventData.info.reason : undefined
@@ -1633,28 +1683,11 @@ CallManager.prototype._attachToChatRoom = function(megaChat, chatRoom) {
             eventData.continue(true);
         }
 
-        var msg = "Could not start call.";
-
-        if (eventData.error === "PermissionDeniedError" || eventData === "PermissionDeniedError") {
-            msg = "You may have forbidden camera access for that site previously " +
-            "- in this case any subsequent camera requests fail silently. You can " +
-            "check the camera icon next to the address bar, or in the site" +
-            " permissions settings.";
-
-            session.endCall('failed');
-        } else if (eventData.error === "DevicesNotFoundError") {
-            msg = "You may have forbidden camera access for that site previously - " +
-            "in this case any subsequent camera requests fail silently. You can check" +
-            " the camera icon next to the address bar, or in the site permissions " +
-            "settings.";
-
-            session.endCall('failed');
-        }
+        var msg = l[7204];
 
         if (!eventData.continue && chatRoom.callSession) {
             session.endCall('failed');
         }
-
 
 
         chatRoom.appendDomMessage(
@@ -1789,7 +1822,7 @@ CallManager.prototype.startCall = function(chatRoom, mediaOptions) {
     assert(participants.length > 0, "No participants.");
 
     if (!chatRoom.megaChat.rtc) {
-        msgDialog('warninga', 'Error', 'Your browser does not have the required audio/video capabilities for making calls.');
+        msgDialog('warninga', 'Error', l[7211]);
         return;
     }
     if (chatRoom._conv_ended === true) {
@@ -1843,7 +1876,7 @@ CallManager.prototype.startCall = function(chatRoom, mediaOptions) {
                     'type': 'secondary',
                     'text': l[1686],
                     'callback': function() {
-                        if (session) { session.endCall(); }
+                        if (session) { session.endCall('caller'); }
                     }
                 }
             }

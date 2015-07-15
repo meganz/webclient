@@ -1141,17 +1141,19 @@ function openTransferpanel()
         var target = $(this).closest('tr');
         e.preventDefault();
         e.stopPropagation();
-        if (!target.hasClass('ui-selected')) {
-            $('.tranfer-table tr').removeClass('ui-selected');
-            target.addClass('ui-selected');
+        $('.tranfer-table tr').removeClass('ui-selected');
+        if (!target.find('.transfer-status.completed').length) {
+            var toabort = target.attr('id');
+            dlmanager.abort(toabort);
+            ulmanager.abort(toabort);
         }
-        var toabort = $('.transfer-table tr.ui-selected').attrs('id');
-        dlmanager.abort(toabort);
-        ulmanager.abort(toabort);
-        $.clearTransferPanel();
-        fmUpdateCount();
-        Soon(function() {
-            $(window).trigger('resize');
+        target.fadeOut(function() {
+            $(this).remove();
+            $.clearTransferPanel();
+            fmUpdateCount();
+            Soon(function() {
+                $(window).trigger('resize');
+            });
         });
     });
 }

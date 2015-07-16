@@ -3591,7 +3591,7 @@ function MegaData()
         for (var k in nodes) {
             /* jshint -W089 */
             if (!nodes.hasOwnProperty(k) || !(n = M.d[nodes[k]])) {
-                console.error('** CHECK THIS **', 'Invalid node', k, nodes[k]);
+                dlmanager.logger.error('** CHECK THIS **', 'Invalid node', k, nodes[k]);
                 continue;
             }
             path = paths[nodes[k]] || '';
@@ -3839,10 +3839,12 @@ function MegaData()
     this.dlerror = function(dl, error)
     {
         var errorstr, fileid = dl.dl_id, x;
-        if (d)
-            console.log('dlerror', fileid, error);
-        else
+        if (d) {
+            dlmanager.logger.error('dlerror', fileid, error);
+        }
+        else {
             srvlog('onDownloadError :: ' + error + ' [' + hostname(dl.url) + '] ' + (dl.zipid ? 'isZIP' : ''));
+        }
 
         switch (error) {
             case ETOOMANYCONNECTIONS:
@@ -4003,11 +4005,13 @@ function MegaData()
     }
     this.addToTransferTable = function(elem)
     {
-        var T = this.getTransferTableLengths(),
-            gid = elem.match(/id="([^"]+)"/).pop();
+        var T = this.getTransferTableLengths();
+        var gid = String(elem.match(/id="([^"]+)"/).pop());
 
-        if (d)
-            console.log('Adding Transfer', gid, JSON.stringify(T));
+        if (d) {
+            var logger = (gid[0] === 'u' ? ulmanager : dlmanager).logger;
+            logger.info('Adding Transfer', gid, JSON.stringify(T));
+        }
 
         if (this.dynListR)
         {
@@ -4241,8 +4245,9 @@ function MegaData()
     {
         var id = ul.id;
 
-        if (d)
-            console.log('ulstart', id);
+        if (d) {
+            ulmanager.logger.log('ulstart', id);
+        }
         $('.transfer-table #ul_' + id + ' td:eq(5)').html('<span class="transfer-status initiliazing">' + htmlentities(l[1042]) + '</span>');
         $('.transfer-table').prepend($('.transfer-table #ul_' + id));
         Soon(fmUpdateCount);

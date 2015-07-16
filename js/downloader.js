@@ -331,6 +331,9 @@ function ClassFile(dl) {
 }
 
 ClassFile.prototype.toString = function() {
+    if (d && d > 1) {
+        return "[ClassFile " + this.gid + "/" + (this.dl ? (this.dl.zipname || this.dl.n) : '') + "]";
+    }
     return "[ClassFile " + this.gid + "]";
 };
 
@@ -395,7 +398,7 @@ ClassFile.prototype.destroy = function() {
 
     this.dl.ready = function onDeadEnd() {
         if (d) {
-            dlmanager.logger.error('We reached a dead end..');
+            dlmanager.logger.warn('We reached a dead end..');
         }
     };
 
@@ -428,6 +431,7 @@ ClassFile.prototype.run = function(task_done) {
     ASSERT(this.gid
         && GlobalProgress[this.gid],
         'Invalid ClassFile state (' + Boolean(this.gid) + ', ' + (this.dl && this.dl.cancelled) + ')');
+
     if (!this.gid || !GlobalProgress[this.gid]) {
         return task_done(); // Hmm..
     }
@@ -439,7 +443,7 @@ ClassFile.prototype.run = function(task_done) {
         return;
     }
 
-    dlmanager.logger.info("dl_key " + this.dl.key);
+    // dlmanager.logger.info("dl_key " + this.dl.key);
     if (!GlobalProgress[this.gid].started) {
         GlobalProgress[this.gid].started = true;
         this.dl.onDownloadStart(this.dl);
@@ -447,7 +451,7 @@ ClassFile.prototype.run = function(task_done) {
 
     this.dl.ready = function() {
         if (d) {
-            dlmanager.logger.info('@dl.ready',
+            this.dl.writer.logger.info(this + ' readyState',
                 this.chunkFinished, this.dl.writer.isEmpty(), this.dl.decrypter);
         }
         if (this.chunkFinished && this.dl.decrypter === 0 && this.dl.writer.isEmpty()) {
@@ -466,7 +470,7 @@ ClassFile.prototype.run = function(task_done) {
         }
         else {
             if (d) {
-                dlmanager.logger.info('Adding', (this.dl.urls || []).length, 'tasks for', this.dl.dl_id);
+                dlmanager.logger.info(this + ' Adding %d tasks...', (this.dl.urls || []).length);
             }
 
             if (this.dl.urls) {

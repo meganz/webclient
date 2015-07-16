@@ -4,7 +4,7 @@
  * 1) On page load, fetch the latest x number of notifications. If there are any new ones, these should show a 
  *    number e.g. (3) in the red circle to indicate there are new notifications.
  * 2) When they click the notifications icon, show the popup and whatever recent notifications that are in there.
- * 3) 
+ * 3) On action packet receive, put the notification at the top of the queue
  */
 var notify = {
 
@@ -12,7 +12,7 @@ var notify = {
     notifications: [],
     
     // Number of notifications to fetch
-    numOfNotifications: 50,
+    numOfNotifications: 100,
     
     // jQuery object of the notification popup
     $popup: null,
@@ -47,21 +47,37 @@ var notify = {
                 
                 // Get the current UNIX timestamp and notifications
                 var currentTime = Math.round(new Date().getTime() / 1000);
+                
+                // Get the last time delta (the last time the user saw a notification)
+                var lastTimeDelta = (result.ltd) ? result.ltd : 0;       
                 var notifications = result.c;
+                
+                console.log('zzzz lastTimeDelta', lastTimeDelta);
 
                 // Loop through the notifications
                 for (var i = 0; i < notifications.length; i++) {
-
+                    
+                    var notification = notifications[i];            // The full notification object
+                    var id = makeid(10);                            // Make random ID
+                    var type = notification.t;                      // Type of notification e.g. share
+                    var timeDelta = notification.td;                // Seconds since the notification occurred                    
+                    var seen = (timeDelta >= lastTimeDelta);        // If the notification time delta is older than the last time the user saw the notification then it is read
+                    var timestamp = currentTime - timeDelta;        // Timestamp of the notification
+                
                     // Add notifications to list
                     notify.notifications.push({
-                        id: makeid(10),                                 // Make random ID
-                        notification: notifications[i],                 // The full notification object
-                        timeDelta: notifications[i].td,                 // Seconds since the notification occurred
-                        timestamp: currentTime - notifications[i].td,   // Timestamp of the notification
-                        type: notifications[i].t                        // Type of notification
+                        id: id,
+                        notification: notification,
+                        seen: seen,
+                        timeDelta: timeDelta,
+                        timestamp: timestamp,
+                        type: type
                     });
                 }
 
+                // Sort the notifications
+                notify.sortNotificationsByMostRecent();
+                
                 // Show the notifications
                 notify.showNotifications();
             }
@@ -73,13 +89,15 @@ var notify = {
      */
     showNotifications: function() {
         
-        // Sort the notifications
-        notify.sortNotificationsByMostRecent();
+        for (var i = 0; i < notify.notifications.length; i++) {
+            
+            var notification = notify.notifications[i];
+            console.log('zzzz', notification.type, notification.seen, notification.timeDelta, notification.timestamp, new Date(notification.timestamp * 1000));
+        }
         
-        console.log('zzzz sorted notifications', notify.notifications);
-        console.log('zzzz notifications length', notify.notifications.length);
-
         // Todo: Show notification count
+        
+        
     },
     
     /**

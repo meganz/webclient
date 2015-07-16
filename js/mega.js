@@ -3231,8 +3231,9 @@ function MegaData()
             if (typeof mDB === 'object' && !pfkey) {
                 mDBadd('ok', {h: h, k: a32_to_base64(encrypt_key(u_k_aes, u_sharekeys[h])), ha: crypto_handleauth(h)});
             }
-        } else {
-            console.error("nodeShare failed for node:", h, s, ignoreDB);
+        }
+        else if (d) {
+            console.log("nodeShare failed for node:", h, s, ignoreDB);
         }
     };
 

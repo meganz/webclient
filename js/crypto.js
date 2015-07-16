@@ -2179,10 +2179,10 @@ var u_nodekeys = {};
 function api_setshare(node, targets, sharenodes, ctx) {
     
     // cache all targets' public keys
-    var u = [];
+    var targetsPubKeys = [];
 
     for (var i = targets.length; i--;) {
-        u.push(targets[i].u);
+        targetsPubKeys.push(targets[i].u);
     }
 
     api_cachepubkeys({
@@ -2191,7 +2191,7 @@ function api_setshare(node, targets, sharenodes, ctx) {
             sharenodes: sharenodes,
             ctx: ctx,
             cachepubkeyscomplete: api_setshare1
-        }, u);
+        }, targetsPubKeys);
 }
 
 function api_setshare1(ctx, params) {

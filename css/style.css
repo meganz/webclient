@@ -15047,10 +15047,9 @@ h5.main-italic-header {
 	column-width: 200px;
 }
 .payment-options-list .payment-method {
-    cursor: pointer;
-    margin-bottom: 3px;
-    overflow: visible;
-    /*width: 200px;*/
+	cursor: pointer;
+	margin-bottom: 3px;
+	overflow: visible;/*width: 200px;*/
 }
 .payment-options-list .payment-method.disabled {
 	cursor: auto;
@@ -15077,16 +15076,16 @@ h5.main-italic-header {
 	margin: 5px;
 }
 .membership-radio-label {
-    background-image: url("../images/mega/pro-new-sprite-v6.png");
-    background-repeat: no-repeat;
-    color: #333333;
-    display: inline-block;
-    font-family: "Open Sans Semibold", Arial;
-    font-size: 13px;
-    height: 26px;
-    line-height: 26px;
-    padding-left: 28px;
-    vertical-align: middle;
+	background-image: url("../images/mega/pro-new-sprite-v6.png");
+	background-repeat: no-repeat;
+	color: #333333;
+	display: inline-block;
+	font-family: "Open Sans Semibold", Arial;
+	font-size: 13px;
+	height: 26px;
+	line-height: 26px;
+	padding-left: 28px;
+	vertical-align: middle;
 }
 .membership-radio-label.prepaid-balance {
 	background-position: -444px -569px;
@@ -18347,7 +18346,7 @@ p.copyrights-red {
 	position: relative;
 }
 .new-left-menu-icon.help-icon {
-	background-image: url(../images/mega/help-new-sprite.png);
+	background-image: url(../images/mega/help-new-sprite-v1.png);
 	background-position: 0px -5px;
 	background-repeat: no-repeat;
 }
@@ -18375,6 +18374,15 @@ p.copyrights-red {
 .new-left-menu-icon.help-icon.help-android {
 	background-position: 11px -342px;
 }
+.new-left-menu-icon.help-icon.help-mega {
+	background-position: 10px -799px;
+}
+.new-left-menu-icon.help-icon.help-windows {
+	background-position: 10px -897px;
+}
+.new-left-menu-icon.help-icon.help-BlackBerry {
+	background-position: -477px -112px;
+}
 .new-left-menu-link:hover .new-left-menu-icon.help-icon.help-home, .active .new-left-menu-icon.help-icon.help-home {
 	background-position: 11px -391px;
 }
@@ -18398,6 +18406,15 @@ p.copyrights-red {
 }
 .new-left-menu-link:hover .new-left-menu-icon.help-icon.help-android, .active .new-left-menu-icon.help-icon.help-android {
 	background-position: 11px -742px;
+}
+.new-left-menu-link:hover .new-left-menu-icon.help-icon.help-mega, .active .new-left-menu-icon.help-icon.help-mega {
+	background-position: 10px -849px;
+}
+.new-left-menu-link:hover .new-left-menu-icon.help-icon.help-windows, .active .new-left-menu-icon.help-icon.help-windows {
+	background-position: 10px -947px;
+}
+.new-left-menu-link:hover .new-left-menu-icon.help-icon.help-BlackBerry, .active .new-left-menu-icon.help-icon.help-BlackBerry {
+	background-position: -477px -162px;
 }
 h1.help-home-header {
 	color: #38393D;
@@ -18426,7 +18443,7 @@ h1.help-home-header {
 	margin: 10px 0 25px 0;
 }
 .help-nw .dev-new-button {
-	background-image: url(../images/mega/help-new-sprite.png);
+	background-image: url(../images/mega/help-new-sprite-v1.png);
 	background-position: right -365px;
 	background-repeat: no-repeat;
 	padding: 0 38px 0 13px;
@@ -18438,8 +18455,8 @@ h1.help-home-header {
 	line-height: 27px;
 	color: #666666;
 	min-height: 0;
-	background-image: url(../images/mega/help-new-sprite.png);
-	background-position: -862px 3px;
+	background-image: url(../images/mega/help-new-sprite-v1.png);
+	background-position: -862px 2px;
 	background-repeat: no-repeat;
 	padding: 0 0 0 20px;
 	margin: 10px 0 0 0;
@@ -18467,6 +18484,7 @@ h1.help-home-header {
 	box-sizing: border-box;
 	padding: 0 20px 20px 20px;
 	cursor: pointer;
+	min-height: 136px;
 }
 .help-block:first-child {
 	margin: 20px 3px 0 3px;
@@ -18477,7 +18495,7 @@ h1.help-home-header {
 .help-block:hover {
 	border: 5px solid #BF1900;
 	margin: 37px 0 -3px 0;
-	min-height: 136px;
+	min-height: 142px;
 }
 .help-short-icon {
 	display: table-cell;
@@ -18491,7 +18509,7 @@ h1.help-home-header {
 	line-height: 24px;
 	padding: 10px 20px 0 47px;
 	font-family: 'Open Sans Semibold Italic', Arial;
-	background-image: url(../images/mega/help-new-sprite.png);
+	background-image: url(../images/mega/help-new-sprite-v1.png);
 	background-position: 0 0;
 	background-repeat: no-repeat;
 	vertical-align: middle;
@@ -18516,6 +18534,15 @@ h1.help-home-header {
 }
 .help-short-icon.ios {
 	background-position: -849px -812px;
+}
+.help-short-icon.windows {
+	background-position: -502px -901px;
+}
+.help-short-icon.mega {
+	background-position: -498px -725px;
+}
+.help-short-icon.BlackBerry {
+	background-position: -501px -560px;
 }
 .help-short-txt {
 	font-size: 13px;
@@ -21515,6 +21542,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	transition: background-color 200ms ease-in-out;
 	background-color: rgba(0,0,0,0);
 	cursor: default;
+	padding: 0 0 6px 0;
 }
 .share-dialog-contact-bl:nth-child(even) {
 	background-color: rgba(0,0,0,0.02);
@@ -24494,7 +24522,7 @@ background-image: url(../images/mega/blog-new-sprite@2x_v2.png);
 background-size: 217px auto;
 }
 .new-left-menu-icon.help-icon, .help-nw .dev-new-button, .help-listing, .help-short-icon {
- background-image: url(../images/mega/help-new-sprite@2x.png);
+ background-image: url(../images/mega/help-new-sprite-v1@2x.png);
  background-size: 886px auto;
 }
 .st-main-button-icon, .st-main-button-icon-hovered, .st-main-cursor, .st-main-logo, .st-bottom-button, .st-bottom-scroll-button {

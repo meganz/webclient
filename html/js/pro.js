@@ -686,7 +686,7 @@ var proPage = {
         },
         {
             apiGatewayId: 6,
-            displayName: l[7219] + " (Fortumo)",           // Mobile carrier billing
+            displayName: l[7219] + ' (Fortumo)',           // Mobile (Fortumo)
             supportsRecurring: false,
             supportsMonthlyPayment: true,
             supportsAnnualPayment: false,
@@ -695,7 +695,7 @@ var proPage = {
         },
         {
             apiGatewayId: 9,
-            displayName: l[7219] + " (Centili)",           // Mobile carrier billing
+            displayName: l[7219] + ' (Centili)',           // Mobile (Centili)
             supportsRecurring: false,
             supportsMonthlyPayment: true,
             supportsAnnualPayment: false,
@@ -1458,7 +1458,7 @@ var centili = {
      */
     redirectToSite: function(utsResult) {
         
-        window.location = 'https://megapay.nz/?saleid=' + utsResult + "&provider=centili";
+        window.location = 'https://megapay.nz/?saleid=' + utsResult + '&provider=centili';
     }
 };
 

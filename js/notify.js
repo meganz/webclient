@@ -14,17 +14,20 @@ var notify = {
     // Number of notifications to fetch
     numOfNotifications: 100,
     
-    // jQuery object of the notification popup
+    // jQuery objects for faster lookup
     $popup: null,
+    $popupIcon: null,
+    $popupNum: null,
     
     /**
      * Initialise the notifications system
      */
     init: function() {
         
-        // Cache lookup to the popup container
+        // Cache lookups
         this.$popup = $('.top-head .notification-popup');
         this.$popupIcon = $('.top-head .cloud-popup-icon');
+        this.$popupNum = $('.top-head .notification-num');
         
         // Get initial notifications
         notify.getInitialNotifications();
@@ -75,49 +78,67 @@ var notify = {
                     });
                 }
 
-                // Sort the notifications
-                notify.sortNotificationsByMostRecent();
-                
                 // Show the notifications
-                notify.showNotifications();
+                notify.countAndShowNewNotifications();
             }
         }, 3);  // Use channel 3
     },
     
     /**
-     * Show the most recent notifications
+     * Counts the new notifications and shows the number of new notifications in a red circle
      */
-    showNotifications: function() {
+    countAndShowNewNotifications: function() {
         
+        var newNotifications = 0;
+        
+        // Loop through the notifications
         for (var i = 0; i < notify.notifications.length; i++) {
             
             var notification = notify.notifications[i];
+            
+            // If it hasn't been seen yet increment the count
+            if (notification.seen === false) {
+                newNotifications++;
+            }
+            
             console.log('zzzz', notification.type, notification.seen, notification.timeDelta, notification.timestamp, new Date(notification.timestamp * 1000));
         }
         
         // Todo: Show notification count
+        console.log('zzzz', 'new notifications', newNotifications);
         
-        
+        // If there is a new notification, show the red circle with the number of notifications in it
+        if (newNotifications >= 1) {
+            notify.$popupNum.removeClass('hidden');
+            notify.$popupNum.html(newNotifications);
+        }
+        else {
+            // Otherwise hide it
+            notify.$popupNum.addClass('hidden');
+            notify.$popupNum.html(newNotifications);
+        }
     },
     
     /**
-     * Sort the notifications so the most recent ones appear first in the popup
+     * Marks all notifications so far as seen, this will hide the red circle 
+     * and also make sure on reload these notifications are not new anymore
      */
-    sortNotificationsByMostRecent: function() {
-
-        notify.notifications.sort(function(notificationA, notificationB) {
-
-            if (notificationA.timestamp > notificationB.timestamp) {
-                return -1;
-            }
-            else if (notificationA.timestamp < notificationB.timestamp) {
-                return 1;
-            }
-            else {
-                return 0;
-            }
-        });
+    markAllNotificationsAsSeen: function() {
+        
+        // Loop through the notifications and mark them as seen (read)
+        for (var i = 0; i < notify.notifications.length; i++) {
+            notify.notifications[i].seen = true;
+        }
+        
+        // Hide red circle with number of new notifications
+        notify.$popupNum.addClass('hidden');
+        notify.$popupNum.html(0);
+        
+        // Send packet to API to inform it which notifications I have seen up to
+        // then they won't show these notifications as new next time they are fetched
+        api_req({ a: 'sla', i: requesti });
     },
+    
     
     /**
      * Open the notifications popup when clicking the notifications icon
@@ -152,6 +173,9 @@ var notify = {
         notify.$popup.addClass('active');
         notify.$popupIcon.addClass('active');
 
+        // Sort the notifications
+        notify.sortNotificationsByMostRecent();
+
         // Todo: Render and show notifications currently in queue
     },
     
@@ -160,10 +184,35 @@ var notify = {
      */
     closePopup: function() {
         
-        notify.$popup.removeClass('active');
-        notify.$popupIcon.removeClass('active');
-        
-        // Todo: Clear read notifications
+        // Make sure it is actually shown (otherwise any call to $.hideTopMenu could trigger this
+        if (notify.$popup.hasClass('active')) {
+
+            // Hide the popup
+            notify.$popup.removeClass('active');
+            notify.$popupIcon.removeClass('active');
+
+            // Mark all notifications as seen seeing the popup has been opened and they have been viewed
+            notify.markAllNotificationsAsSeen();
+        }
+    },
+    
+    /**
+     * Sort the notifications so the most recent ones appear first in the popup
+     */
+    sortNotificationsByMostRecent: function() {
+
+        notify.notifications.sort(function(notificationA, notificationB) {
+
+            if (notificationA.timestamp > notificationB.timestamp) {
+                return -1;
+            }
+            else if (notificationA.timestamp < notificationB.timestamp) {
+                return 1;
+            }
+            else {
+                return 0;
+            }
+        });
     }
 };
 

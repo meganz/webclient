@@ -58,8 +58,6 @@ var notify = {
                 var lastTimeDelta = (result.ltd) ? result.ltd : 0;       
                 var notifications = result.c;
                 
-                console.log('zzzz lastTimeDelta', lastTimeDelta);
-
                 // Loop through the notifications
                 for (var i = 0; i < notifications.length; i++) {
                     
@@ -103,12 +101,7 @@ var notify = {
             if (notification.seen === false) {
                 newNotifications++;
             }
-            
-            console.log('zzzz', notification.type, notification.seen, notification.timeDelta, notification.timestamp, new Date(notification.timestamp * 1000));
         }
-        
-        // Todo: Show notification count
-        console.log('zzzz', 'new notifications', newNotifications);
         
         // If there is a new notification, show the red circle with the number of notifications in it
         if (newNotifications >= 1) {
@@ -179,7 +172,8 @@ var notify = {
         // Sort the notifications
         notify.sortNotificationsByMostRecent();
 
-        // Todo: Render and show notifications currently in queue
+        // Render and show notifications currently in list
+        notify.renderNotifications();
     },
     
     /**
@@ -216,6 +210,13 @@ var notify = {
                 return 0;
             }
         });
+    },
+    
+    /**
+     * To do: render the notifications in the popup
+     */
+    renderNotifications: function() {
+        
     }
 };
 

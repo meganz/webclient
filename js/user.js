@@ -201,7 +201,7 @@ function u_logout(logout) {
         fminitialized = false;
         mBroadcaster.crossTab.leave();
         u_sid = u_handle = u_k = u_attr = u_privk = u_k_aes = undefined;
-        notifyPopup.notifications = null;
+        notify.notifications = [];
         api_setsid(false);
         u_sharekeys = {};
         u_nodekeys = {};

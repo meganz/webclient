@@ -237,7 +237,7 @@ function init_page() {
                 if (typeof mDBcls === 'function') {
                     mDBcls();
                 }
-                notifyPopup.notifications = null;
+                //notifyPopup.notifications = null;
             }
         }
 

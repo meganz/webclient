@@ -39,6 +39,9 @@ var notify = {
      */
     getInitialNotifications: function() {
         
+        // Clear notifications before fetching (sometimes this needs to be done if re-logging in)
+        notify.notifications = [];
+        
         // Call API to fetch the most recent notifications
         api_req('c=' + notify.numOfNotifications, {
             callback: function (result) {
@@ -134,8 +137,8 @@ var notify = {
         notify.$popupNum.addClass('hidden');
         notify.$popupNum.html(0);
         
-        // Send packet to API to inform it which notifications I have seen up to
-        // then they won't show these notifications as new next time they are fetched
+        // Send 'set last acknowledged' packet to API to inform it which notifications have been seen 
+        // up to this point then they won't show these notifications as new next time they are fetched
         api_req({ a: 'sla', i: requesti });
     },
     

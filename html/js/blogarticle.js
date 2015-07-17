@@ -43,7 +43,7 @@ function render_blogarticle()
 		$('#blog_next').removeClass('active');		
 	}
 	content = '';
-	if (blogposts[i].attaches.bimg) content += '<img alt="" data-img="loading_'+blogposts[i].attaches.bimg+'" src="' + CMS.img(blogposts[i].attaches.bimg) + '" class="blog-new-full-img" />';
+	if (blogposts[i].attaches.bimg) content += '<img alt=""  integrity="ni:///sha-256;' +blogposts[i].attaches.bimg + '" src="' + CMS.img(blogposts[i].attaches.bimg) + '" class="blog-new-full-img" />';
 	content += blogposts[i].c;				
 	content = content.replace('[READMORE]','').replace(/(%7Bstaticpath%7D|{staticpath})/g,staticpath);
 	var by = 'Admin';

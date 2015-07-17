@@ -2178,11 +2178,21 @@ function fmremove() {
         }
     } else {
         if (localStorage.skipDelWarning) {
-            M.moveNodes($.selected, M.RubbishID);
+            if (M.currentrootid === 'shares') {
+                M.copyNodes($.selected, M.RubbishID, true);
+            }
+            else {
+                M.moveNodes($.selected, M.RubbishID);
+            }
         } else {
             msgDialog('remove', l[1003], l[1004].replace('[X]', fm_contains(filecnt, foldercnt)), false, function(e) {
                 if (e) {
-                    M.moveNodes($.selected, M.RubbishID);
+                    if (M.currentrootid === 'shares') {
+                        M.copyNodes($.selected, M.RubbishID, true);
+                    }
+                    else {
+                        M.moveNodes($.selected, M.RubbishID);
+                    }
                 }
             }, true);
         }
@@ -4382,7 +4392,7 @@ var FMShortcuts = function() {
             return false; // stop prop.
         } else if (charCode == 8) {
             var $items = selectionManager.get_selected();
-            if ($items.size() == 0 || (RightsbyID(M.currentdirid || '') | 0) < 1 || M.currentrootid === 'shares') {
+            if ($items.size() == 0 || (RightsbyID(M.currentdirid || '') | 0) < 1) {
                 return; // dont do anything.
             }
 
@@ -4899,8 +4909,7 @@ function UIkeyevents()
                 quickFinder.disable_if_active();
             }
         }
-        else if (e.keyCode === 46 && s.length > 0 && !$.dialog
-            && RightsbyID(M.currentdirid) > 1 && M.currentrootid !== 'shares')
+        else if (e.keyCode == 46 && s.length > 0 && !$.dialog && RightsbyID(M.currentdirid) > 1)
         {
             $.selected = [];
             s.each(function(i, e)
@@ -4909,8 +4918,7 @@ function UIkeyevents()
             });
             fmremove();
         }
-        else if (e.keyCode === 46 && selPanel.length > 0 && !$.dialog
-            && RightsbyID(M.currentdirid) > 1 && M.currentrootid !== 'shares')
+        else if (e.keyCode == 46 && selPanel.length > 0 && !$.dialog && RightsbyID(M.currentdirid) > 1)
         {
             var selected = [];
             selPanel.each(function() {
@@ -5687,7 +5695,7 @@ function menuItems() {
     if (selItem && selItem.p.length === 11) {
         items['removeshare'] = 1;
     }
-    else if (RightsbyID($.selected[0]) > 1 && M.currentrootid !== 'shares') {
+    else if (RightsbyID($.selected[0]) > 1) {
         items['remove'] = 1;
     }
 

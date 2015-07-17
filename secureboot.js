@@ -93,6 +93,9 @@ if (!b_u) try
             // set the staticpath for debug mode
             localStorage.staticpath = window.location.protocol + "//" + devhost + pathSuffix + "/";
             // localStorage.staticpath = location.protocol + "//" + location.host + location.pathname.replace(/[^/]+$/,'');
+            if (localStorage.d) {
+                console.debug('StaticPath set to "' + localStorage.staticpath + '"');
+            }
         }
         staticpath = localStorage.staticpath || geoStaticpath();
         apipath = localStorage.apipath || 'https://eu.api.mega.co.nz/';
@@ -1701,13 +1704,13 @@ else if (!b_u)
  * @returns {Number} Returns a 0 for no ads, 1 will enable ads dependant on country, 2 will always show ads
  */
 function showAd() {
-    
+
     // We need to tell the API we would like ad urls, but only if we are not logged in
     var showAd = (typeof u_sid === 'undefined') ? 1 : 0;
-        
+
     // Override for testing, 0 for no ads, 1 is normal (enabled dependant on country), 2 is ads always on
     showAd = (typeof localStorage.testAds === 'undefined') ? showAd : parseInt(localStorage.testAds);
-    
+
     return showAd;
 }
 

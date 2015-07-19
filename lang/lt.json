@@ -1248,7 +1248,7 @@
     "1364": "Bandyti dar kart\u0105",
     "1365": "J\u016bs nesate prisijung\u0119s prie Interneto",
     "1366": "\u012eveskite nauj\u0105 pavadinim\u0105",
-    "1367": "Gaukite 50 GB nemokamai arba u\u017esiregistruokite su vienu i\u0161 m\u016bs\u0173 Pro paketu ir gaukite iki 4 TB \u0161ifruojamos talpos u\u017e ne ma\u017eiau kaip 8,33 \u20ac per m\u0117nes\u012f.",
+    "1367": "Gaukite 50 GB nemokamai arba u\u017esiregistruokite su vienu i\u0161 m\u016bs\u0173 Pro paketu ir gaukite iki 4 TB \u0161ifruojamos talpos nuo 8,33 \u20ac per m\u0117nes\u012f.",
     "1368": "iki [X]",
     "1369": "ir [X]",
     "1370": "El. pa\u0161tas ir Pokalbiai",
@@ -3618,5 +3618,12 @@
     "7209": "Call with [X] failed.",
     "7210": "You have one missed call from [X].",
     "7211": "Your browser does not have the required audio\/video capabilities for making calls.",
-    "7212": "Advertisement"
+    "7212": "Advertisement",
+    "7213": "The email address you entered seems incorrect - please check again!",
+    "7214": "Logged in as",
+    "7215": "Not You?",
+    "7216": "Loading Files",
+    "7217": "PURCHASE WITH BALANCE",
+    "7218": "Clear transfer",
+    "7219": "Mobile"
 }

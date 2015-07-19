@@ -1115,13 +1115,6 @@ else if (!b_u)
         'sync': {f:'html/sync.html', n: 'sync', j:0},
         'sync_js': {f:'html/js/sync.js', n: 'sync_js', j:1},
         'mobile': {f:'html/mobile.html', n: 'mobile', j:0},
-        'affiliates': {f:'html/affiliates.html', n: 'affiliates', j:0},
-        'affiliate_js': {f:'html/js/affiliate.js', n: 'affiliate_js', j:0},
-        'affiliateterms': {f:'html/affiliateterms.html', n: 'affiliateterms', j:0},
-        'affiliatesignup': {f:'html/affiliatesignup.html', n: 'affiliatesignup', j:0},
-        'affiliatesignup_js': {f:'html/js/affiliatesignup.js', n: 'affiliatesignup_js', j:1},
-        'affiliatemember': {f:'html/affiliatemember.html', n: 'affiliatemember', j:0},
-        'affiliatemember_js': {f:'html/js/affiliatemember.js', n: 'affiliatemember_js', j:1},
         'contact': {f:'html/contact.html', n: 'contact', j:0},
         'privacycompany': {f:'html/privacycompany.html', n: 'privacycompany', j:0},
         'chrome': {f:'html/chrome.html', n: 'chrome', j:0},
@@ -1156,7 +1149,6 @@ else if (!b_u)
         'help': ['help_js'],
         'chrome': ['chrome'],
         'plugin': ['chrome','firefox'],
-        'affiliate': ['affiliates','affiliateterms','affiliatesignup','affiliatesignup_js','affiliatemember','affiliatemember_js','affiliate_js'],
         'recover': ['reset','reset_js']
     };
 

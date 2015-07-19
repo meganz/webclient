@@ -295,12 +295,9 @@ function populate_l() {
     l[1159] = l[1159].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
     l[1171] = l[1171].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
     l[1185] = l[1185].replace('[X]', '<strong>MEGA.crx</strong>');
-    l[1242] = l[1242].replace('[A]', '<a href="#affiliateterms" target="_blank" rel="noreferrer">').replace('[/A]', '</a>');
-    l[1218] = l[1218].replace('[A]', '<a href="#affiliateterms" class="red">').replace('[/A]', '</a>');
     l[1212] = l[1212].replace('[A]', '<a href="#sdk" class="red">').replace('[/A]', '</a>');
     l[1274] = l[1274].replace('[A]', '<a href="#takedown">').replace('[/A]', '</a>');
     l[1275] = l[1275].replace('[A]', '<a href="#copyright">').replace('[/A]', '</a>');
-    l[1244] = l[1244].replace('[A]', '<a href="#affiliateterms" class="red">').replace('[/A]', '</a>');
     l[1201] = l[1201].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
     l[1208] = l[1208].replace('[B]', '<strong>').replace('[/B]', '</strong>');
     l[1915] = l[1915].replace('[A]',

@@ -686,9 +686,6 @@ function init_page() {
     else if (page == 'takedown') {
         parsepage(pages['takedown']);
     }
-    else if (page == 'affiliateterms') {
-        parsepage(pages['affiliateterms']);
-    }
     else if (page == 'blog') {
         parsepage(pages['blog']);
         init_blog();
@@ -734,31 +731,11 @@ function init_page() {
     else if (page == 'mobile') {
         parsepage(pages['mobile']);
     }
-    else if (page == 'affiliates' && u_attr && u_attr.aff_payment) {
-        parsepage(pages['affiliatemember']);
-        init_affiliatemember();
-    }
-    else if (page == 'affiliates') {
-        parsepage(pages['affiliates']);
-    }
     else if (page == 'resellers') {
         parsepage(pages['resellers']);
     }
     else if (page == 'takedown') {
         parsepage(pages['takedown']);
-    }
-    else if (page == 'affiliatesignup' && u_type < 3) {
-        if (loggedout) {
-            document.location.hash = 'start';
-            return false;
-        }
-        login_txt = l[376];
-        parsepage(pages['login']);
-        init_login();
-    }
-    else if (page == 'affiliatesignup') {
-        parsepage(pages['affiliatesignup']);
-        init_affiliatesignup();
     }
     else if (page == 'done') {
         parsepage(pages['done']);
@@ -1513,12 +1490,6 @@ function topmenuUI() {
         }
         else if (className.indexOf('doc') > -1) {
             document.location.hash = 'doc';
-        }
-        else if (className.indexOf('affiliateterms') > -1) {
-            document.location.hash = 'affiliateterms';
-        }
-        else if (className.indexOf('aff') > -1) {
-            document.location.hash = 'affiliates';
         }
         else if (className.indexOf('terms') > -1) {
             document.location.hash = 'terms';

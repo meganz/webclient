@@ -51,10 +51,8 @@ var notify = {
                     return false;
                 }
                 
-                // Get the current UNIX timestamp and notifications
+                // Get the current UNIX timestamp and the last time delta (the last time the user saw a notification)
                 var currentTime = Math.round(new Date().getTime() / 1000);
-                
-                // Get the last time delta (the last time the user saw a notification)
                 var lastTimeDelta = (result.ltd) ? result.ltd : 0;       
                 var notifications = result.c;
                 
@@ -130,7 +128,7 @@ var notify = {
         notify.$popupNum.addClass('hidden');
         notify.$popupNum.html(0);
         
-        // Send 'set last acknowledged' packet to API to inform it which notifications have been seen 
+        // Send 'set last acknowledged' API request to inform it which notifications have been seen 
         // up to this point then they won't show these notifications as new next time they are fetched
         api_req({ a: 'sla', i: requesti });
     },

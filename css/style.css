@@ -15672,7 +15672,7 @@ div.membership-bott-button {
 	padding-top: 5px;
 	color: #666666;
 }
-.new-download-sync-app, .new-download-gray-button {
+.new-download-sync-app, .regular-download, .new-download-gray-button {
 	height: 50px;
 	margin-right: 8px;
 	-moz-border-radius: 5px;
@@ -15692,7 +15692,7 @@ div.membership-bott-button {
 	-ms-transition: background-color 200ms ease-in-out;
 	transition: background-color 200ms ease-in-out;
 }
-.new-download-sync-app:hover {
+.new-download-sync-app:hover, .regular-download:hover {
 	background-color: rgba(217,0,7,1);
 }
 .new-download-sync-app, .new-download-red-button {
@@ -15700,6 +15700,12 @@ div.membership-bott-button {
 	background-position: -2px -1321px;
 	background-repeat: no-repeat;
 	padding: 7px 13px 0 52px;
+}
+.regular-download {
+    padding: 7px 33px 0 33px;
+}
+.regular-download .new-download-button-txt1 {
+    line-height: 36px;
 }
 .new-download-red-button {
 	background-position: -2px -1383px;

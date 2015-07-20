@@ -18205,13 +18205,13 @@ p.copyrights-red {
 .new-left-menu-icon.help-icon.help-android {
 	background-position: 11px -342px;
 }
-.new-left-menu-icon.help-icon.help-mega {
+.new-left-menu-icon.help-icon.help-mega-chat {
 	background-position: 10px -799px;
 }
-.new-left-menu-icon.help-icon.help-windows {
+.new-left-menu-icon.help-icon.help-windows-phone {
 	background-position: 10px -897px;
 }
-.new-left-menu-icon.help-icon.help-BlackBerry {
+.new-left-menu-icon.help-icon.help-blackberry {
 	background-position: -477px -112px;
 }
 .new-left-menu-link:hover .new-left-menu-icon.help-icon.help-home, .active .new-left-menu-icon.help-icon.help-home {
@@ -18238,13 +18238,13 @@ p.copyrights-red {
 .new-left-menu-link:hover .new-left-menu-icon.help-icon.help-android, .active .new-left-menu-icon.help-icon.help-android {
 	background-position: 11px -742px;
 }
-.new-left-menu-link:hover .new-left-menu-icon.help-icon.help-mega, .active .new-left-menu-icon.help-icon.help-mega {
+.new-left-menu-link:hover .new-left-menu-icon.help-icon.help-mega-chat, .active .new-left-menu-icon.help-icon.help-mega-chat {
 	background-position: 10px -849px;
 }
-.new-left-menu-link:hover .new-left-menu-icon.help-icon.help-windows, .active .new-left-menu-icon.help-icon.help-windows {
+.new-left-menu-link:hover .new-left-menu-icon.help-icon.help-windows-phone, .active .new-left-menu-icon.help-icon.help-windows-phone {
 	background-position: 10px -947px;
 }
-.new-left-menu-link:hover .new-left-menu-icon.help-icon.help-BlackBerry, .active .new-left-menu-icon.help-icon.help-BlackBerry {
+.new-left-menu-link:hover .new-left-menu-icon.help-icon.help-blackberry, .active .new-left-menu-icon.help-icon.help-blackberry {
 	background-position: -477px -162px;
 }
 h1.help-home-header {
@@ -18366,13 +18366,13 @@ h1.help-home-header {
 .help-short-icon.ios {
 	background-position: -849px -812px;
 }
-.help-short-icon.windows {
+.help-short-icon.windows-phone {
 	background-position: -502px -901px;
 }
-.help-short-icon.mega {
+.help-short-icon.mega-chat {
 	background-position: -498px -725px;
 }
-.help-short-icon.BlackBerry {
+.help-short-icon.blackberry {
 	background-position: -501px -560px;
 }
 .help-short-txt {

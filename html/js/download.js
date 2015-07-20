@@ -49,6 +49,13 @@ function dl_g(res) {
     megaAds.ad = res.ad;
     megaAds.showAds($('#ads-block-frame'));
 
+    // If 'msd' (MegaSync download) flag is turned off via the API then hide the download with MEGAsync button.
+    if (res.msd === 0) {
+        $('.new-download-sync-app').addClass('hidden');
+        $('.regular-download').removeClass('hidden');
+        $('.new-download-red-button').addClass('hidden');
+    }
+
     $('.widget-block').addClass('hidden');
     loadingDialog.hide();
     $('.download-mid-white-block').removeClass('hidden');
@@ -80,9 +87,9 @@ function dl_g(res) {
             $('.megasync-overlay').removeClass('downloading');
             megasync.download(dlpage_ph, dlpage_key);
         });
-        $('.new-download-red-button').unbind('click');
-        $('.new-download-red-button').bind('click',function(e)
-        {
+        
+        $('.new-download-red-button, .regular-download').rebind('click', function() {
+            
             if (dlMethod == MemoryIO && !localStorage.firefoxDialog && fdl_filesize > 1048576000 && navigator.userAgent.indexOf('Firefox') > -1)
             {
                 firefoxDialog();
@@ -92,7 +99,7 @@ function dl_g(res) {
             || ((navigator.userAgent.indexOf('Safari') > -1) && (navigator.userAgent.indexOf('Chrome') == -1)))
             && fdl_filesize > 1048576000 && !localStorage.browserDialog)
             {
-              browserDialog();
+                browserDialog();
             }
             else
             {

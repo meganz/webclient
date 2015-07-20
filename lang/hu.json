@@ -3619,9 +3619,11 @@
     "7210": "Van egy nem fogadott h\u00edv\u00e1sod [X] felhaszn\u00e1l\u00f3t\u00f3l.",
     "7211": "A b\u00f6ng\u00e9sz\u0151dnek nem t\u00e1mogatja a sz\u00fcks\u00e9ges audio\/video szolg\u00e1ltat\u00e1sokat a h\u00edv\u00e1s l\u00e9trehoz\u00e1s\u00e1hoz.",
     "7212": "Rekl\u00e1m",
-    "7213": "The email address you entered seems incorrect - please check again!",
-    "7214": "Logged in as",
-    "7215": "Not You?",
-    "7216": "Loading Files",
-    "7217": "PURCHASE WITH BALANCE"
+    "7213": "A megadott email c\u00edm \u00e9rv\u00e9nytelen - k\u00e9rlek ellen\u0151rizd \u00fajra!",
+    "7214": "Bejelentkezve, mint: ",
+    "7215": "Nem Te vagy Az?",
+    "7216": "F\u00e1jlok Bet\u00f6lt\u00e9se",
+    "7217": "V\u00c1S\u00c1RL\u00c1S EGYENLEGB\u0150L",
+    "7218": "Clear transfer",
+    "7219": "Mobile"
 }

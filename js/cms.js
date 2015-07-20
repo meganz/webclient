@@ -72,7 +72,6 @@ function process_cms_response(bytes, next, as, id)
 }
 
 var assets = {};
-var cmsToId = null;
 var booting = false;
 
 var is_img;
@@ -96,32 +95,6 @@ function img_placeholder(str, sep, rid, id) {
     return "'" + IMAGE_PLACEHOLDER + "' data-img='loading_" +  id + "'";
 }
 
-function cmsObjectToId(name)
-{
-    var q = getxhr();
-    q.onload = function() {
-        if (name === '_all') {
-            cmsToId = JSON.parse(ab_to_str(q.response));
-        } else {
-            cmsToId[name] = ab_to_str(q.response).split(".");
-        }
-        q = null;
-        if (name !== '_all') {
-            doRequest(name);
-        }
-    };
-    q.onerror = function() {
-        Later(function() {
-            cmsObjectToId(name);
-        });
-        q = null;
-    };
-    var srv = apipath.replace(/https?:\/\//, '').replace(/\//g, '');
-    q.open("GET", (localStorage.cms || "https://cms.mega.nz/") + srv + '/' + name);
-    q.responseType = 'arraybuffer';
-    q.send();
-}
-
 /**
  *    Internal function to communicate with the BLOB server.
  *
@@ -134,24 +107,25 @@ function doRequest(id) {
     if (!id) {
         throw new Error("Calling CMS.doRequest without an ID");
     }
-    if (cmsToId === null) {
-        if (!booting) {
-            booting = true;
-            cmsObjectToId('_all');
-        }
-        return Later(function() {
+    var q = getxhr();
+    q.onerror = function() {
+        Later(function() {
             doRequest(id);
         });
-    }
-    if (!cmsToId[id]) {
-        return cmsObjectToId(id);
-    }
-    _cms_request(cmsToId[id], function(blob) {
+    };
+    q.onload = function() {
         for (var i in fetching[id]) {
-            process_cms_response(blob, fetching[id][i][0], fetching[id][i][1], id);
+            if (fetching[id].hasOwnProperty(i)) {
+                process_cms_response(q.response, fetching[id][i][0], fetching[id][i][1], id);
+            }
         }
         delete fetching[id];
-    });
+    };
+    var url = (localStorage.cms || "https://cms.mega.nz/content/") + id;
+    console.error(url);
+    q.open("GET", url);
+    q.responseType = 'arraybuffer';
+    q.send();
 }
 
 var _listeners = {};
@@ -166,39 +140,6 @@ function loaded(id)
     CMS.attachEvents();
 }
 
-function _concat_arraybuf(arr)
-{
-    var len = arr.reduce(function(prev, e) {
-        return prev+e.byteLength;
-    }, 0);
-    var buffer = new Uint8Array(len);
-    var offset = 0;
-    for (var i in arr) {
-        buffer.set(new Uint8Array(arr[i]), offset);
-        offset += arr[i].byteLength;
-    }
-    return buffer.buffer;
-}
-
-function _cms_request(ids, next)
-{
-    var args = [];
-    var q  = [];
-    var done = 0;
-    for (var i in ids) {
-        args.push({fa:i+":1*" + ids[i], k:i, plaintext: true});
-        q[i] = null;
-    }
-
-    api_getfileattr(args, 1, function(ctx, id, bytes)
-    {
-        q[id] = bytes;
-        if (++done === q.length) {
-            next(_concat_arraybuf(q));
-        }
-    });
-}
-
 var curType;
 var curCallback;
 
@@ -211,16 +152,6 @@ var CMS = {
 
     reRender: function(type, nodeId)
     {
-        //ERRDEBUG(type, nodeId)
-        // If cmsToId is NULL it means we didn't open
-        // *any* CMS content so we should ignore this
-        // update, we will get the newest version always
-        // when we need it (the first time)
-        if (!(cmsToId instanceof Object)) {
-            return;
-        }
-
-        cmsToId[type] = nodeId;
         if (type === curType) {
             curCallback(nodeId);
         }
@@ -251,14 +182,15 @@ var CMS = {
 
     loaded: loaded,
 
-    img : function(id) {
+    img: function(id) {
         if (!assets[id]) {
             this.get(id, function(err, obj) {
                 $('*[data-img=loading_' + id + ']').attr({'id': '', 'src': obj.url});
+                $('*[src="' + IMAGE_PLACEHOLDER + "#" + id + '"]').attr({'id': '', 'src': obj.url});
                 assets[id] = obj.url;
             });
         }
-        return assets[id] ? assets[id] : IMAGE_PLACEHOLDER;
+        return assets[id] ? assets[id] : IMAGE_PLACEHOLDER + "#" + id;
     },
     get: function(id, next, as) {
         if (typeof fetching[id] === "undefined") {

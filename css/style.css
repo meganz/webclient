@@ -18559,6 +18559,10 @@ h1.help-home-header {
 	padding-bottom: 10px;
 }
 
+.new-bottom-pages .help-info-pages li {
+    margin: 0px;
+}
+
 .new-bottom-pages .help-info-pages ul,
 .new-bottom-pages .help-info-pages ol {
     padding-left: 20px;

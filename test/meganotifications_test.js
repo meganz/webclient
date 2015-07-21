@@ -1,35 +1,41 @@
+/**
+ * @fileOverview
+ * Notifications unit tests.
+ */
+
 describe("MegaNotifications Unit Test", function() {
+    "use strict";
 
-    var megaNotifications;
-    var globalMocker;
+    var assert = chai.assert;
+
+    // Create/restore Sinon stub/spy/mock sandboxes.
+    var sandbox = null;
+
+    var megaNotifications = null;
+
     beforeEach(function(done) {
-        globalMocker = new ObjectMocker(window, {
-            'ion': {
-                'sound': function() {
-                    ion.sound.play = function(){};
-                    ion.sound.stop = function(){};
-
-                    sinon.spy(ion.sound, 'play');
-                    sinon.spy(ion.sound, 'stop');
-                }
-            },
-            'bootstaticpath': './',
-            'Notification': function() {
-                this.close = function() {};
-
-                sinon.spy(this, 'close');
-
-                return this;
-            },
-            'Favico': function() {
-                this.badge = function(){};
-
-                sinon.spy(this, 'badge');
-                return this;
+        sandbox = sinon.sandbox.create();
+        sandbox.stub(window, 'ion', {
+            'sound': function() {
+                ion.sound.play = function() {};
+                sinon.spy(ion.sound, 'play');
+                ion.sound.stop = function() {};
+                sinon.spy(ion.sound, 'stop');
             }
         });
+        sandbox.stub(window, 'bootstaticpath', './');
+        sandbox.stub(window, 'Notification', function() {
+            this.close = function() {};
+            sinon.spy(this, 'close');
+            return this;
+        });
+        sandbox.stub(window, 'Favico', function() {
+            this.badge = function(){};
+            sinon.spy(this, 'badge');
+            return this;
+        });
 
-        sinon.spy(Notification, 'requestPermission', function(){});
+        sinon.spy(Notification, 'requestPermission', function() {});
         Notification.permission = 'granted';
 
         megaNotifications = new MegaNotifications({
@@ -50,7 +56,7 @@ describe("MegaNotifications Unit Test", function() {
 
 
     afterEach(function(done) {
-        globalMocker.restore();
+        sandbox.restore();
         done();
     });
 
@@ -104,7 +110,6 @@ describe("MegaNotifications Unit Test", function() {
             true
         );
 
-
         expect(n._showDesktopNotification.called).to.eql(true);
         expect(n._desktopNotification instanceof Notification).to.eql(true);
 
@@ -119,12 +124,9 @@ describe("MegaNotifications Unit Test", function() {
         expect(ion.sound.stop.callCount).to.eql(1);
         expect(ion.sound.stop.calledWith("type1-sound")).to.eql(true);
 
-
         // play was called
         expect(ion.sound.play.callCount).to.eql(1);
         expect(ion.sound.play.calledWith("type1-sound")).to.eql(true);
-
-
 
         n.setUnread(false);
 
@@ -158,7 +160,6 @@ describe("MegaNotifications Unit Test", function() {
             true
         );
 
-
         expect(Notification.requestPermission.called).to.eql(false);
 
         Notification.permission = 'unknown';
@@ -177,5 +178,4 @@ describe("MegaNotifications Unit Test", function() {
 
         done();
     });
-
 });

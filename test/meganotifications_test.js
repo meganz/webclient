@@ -30,7 +30,7 @@ describe("MegaNotifications Unit Test", function() {
             return this;
         });
         sandbox.stub(window, 'Favico', function() {
-            this.badge = function(){};
+            this.badge = function() {};
             sinon.spy(this, 'badge');
             return this;
         });
@@ -62,7 +62,7 @@ describe("MegaNotifications Unit Test", function() {
 
     it("is initialised", function(done) {
         assert(megaNotifications instanceof MegaNotifications, 'MegaNotifications is not initialised properly');
-        assert(typeof(megaNotifications.options.textMessages) != undefined, 'options were not set properly');
+        assert(typeof(megaNotifications.options.textMessages) !== undefined, 'options were not set properly');
         done();
     });
     it("can create notification", function(done) {
@@ -117,8 +117,8 @@ describe("MegaNotifications Unit Test", function() {
         expect(megaNotifications.favico.badge.callCount).to.eql(1);
         expect(megaNotifications.favico.badge.calledWith(1)).to.eql(true);
 
-        expect(typeof(ion.sound.play) != "undefined").to.eql(true);
-        expect(typeof(ion.sound.stop) != "undefined").to.eql(true);
+        expect(typeof(ion.sound.play) !== "undefined").to.eql(true);
+        expect(typeof(ion.sound.stop) !== "undefined").to.eql(true);
 
         // when loop is on, .stop will be called before .play()
         expect(ion.sound.stop.callCount).to.eql(1);

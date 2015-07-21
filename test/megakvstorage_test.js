@@ -9,15 +9,13 @@ describe("MegaKVStorage Unit Test", function() {
     var mkv;
     beforeEach(function(done) {
         localStorage.clear();
-        mkv = new MegaKVStorage("unittests", localStorage)
-
+        mkv = new MegaKVStorage("unittests", localStorage);
         done();
     });
 
 
     afterEach(function(done) {
         mkv.clear();
-
         done();
     });
 

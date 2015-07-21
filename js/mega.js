@@ -67,54 +67,6 @@ function fmUpdateCount() {
     $tpt.text(l + t);
 }
 
-function showTransferToast(t_type, t_length) {
-    if (!$('.fmholder').hasClass('transfer-panel-opened')) {
-        var $toast, 
-            $second_toast,
-            interval,
-            nt_txt;
-            
-        if (t_type != 'u') {
-            interval = dl_interval;
-            $toast = $('.toast-notification.download');
-            $second_toast = $('.toast-notification.upload');
-            if (t_length > 1) {
-                nt_txt = '<span>' + t_length +'</span> downloads were added to the transfers queue';
-            } else {
-                nt_txt = 'One download was added to the transfers queue';
-            }
-        } else {
-            interval = ul_interval;
-            $toast = $('.toast-notification.upload');
-            $second_toast = $('.toast-notification.download');
-            if (t_length > 1) {
-                nt_txt = '<span>' + t_length +'</span> uploads were added to the transfers queue';
-            } else {
-                nt_txt = 'One upload was added to the transfers queue';
-            }
-        }
-            
-        $toast.find('.toast-transfer-col:first-child').html(nt_txt);
-            
-        if ($second_toast.hasClass('visible')) {
-            $second_toast.addClass('second');
-        }
-            
-        clearInterval(interval);
-        $toast.removeClass('second').addClass('visible');
-        interval = setInterval(function() {
-            hideTransferToast($toast,interval);
-        }, 10000);
-    }
-}
-
-function hideTransferToast ($toast,int) {
-    $toast.removeClass('visible');
-      $('.toast-notification').removeClass('second');
-    $toast.find('.toast-transfer-col').html('');
-      clearInterval(int);
-}
-
 function MegaData()
 {
     this.d = {};

@@ -741,7 +741,7 @@ var dlmanager = {
 // TODO: move the next functions to fm.js when no possible conflicts
 function fm_tfsorderupd() {
     M.t = {};
-    $('.transfer-table tr[id]').each(function(pos, node) {
+    $('.transfer-table tr[id]:visible').each(function(pos, node) {
         if (d) {
             ASSERT(-1 !== ['ul', 'dl', 'zip'].indexOf(String(node.id).split('_').shift()),
                 'Huh, unexpected node id: ' + node.id);
@@ -753,6 +753,7 @@ function fm_tfsorderupd() {
     if (d) {
         dlmanager.logger.info('M.t', M.t);
     }
+    return M.t;
 }
 
 function fm_tfspause(gid) {

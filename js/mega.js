@@ -3731,6 +3731,7 @@ function MegaData()
 
         if ($('.transfer-table #' + id + ' .progress-block').length == 0) {
             $('.transfer-table #' + id + ' td:eq(5)').html('<div class="progress-block" style=""><div class="progressbar"><div class="progressbarfill" style="width:0%;"></div></div><div class="clear"></div></div>');
+            $('.transfer-table #' + id).addClass('started');
             $.transferHeader();
         }
 
@@ -3994,6 +3995,9 @@ function MegaData()
                 $(elem).insertBefore('.transfer-table .clone-of-header');
             }
         }
+        if ($.mSortableT) {
+            $.mSortableT.sortable('refresh');
+        }
         if (transfersLength > 50) {
             for (var i = 1; i < transfersLength - 50; i++) {
                 $('.transfer-table tr .transfer-status.completed:last').closest('tr').remove();
@@ -4133,6 +4137,7 @@ function MegaData()
             $('.transfer-table #ul_' + id + ' .transfer-status').removeClass('queued');
             $('.transfer-table #ul_' + id + ' .transfer-status').addClass('download');
             $('.transfer-table #ul_' + id + ' td:eq(5)').html('<div class="progress-block" style=""><div class="progressbar"><div class="progressbarfill" style="width:0%;"></div></div></div>');
+            $('.transfer-table #ul_' + id).addClass('started');
             $.transferHeader();
         }
         if (!bl || !ul.starttime)

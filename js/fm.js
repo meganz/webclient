@@ -1136,6 +1136,97 @@ function openTransferpanel()
         contextMenuUI(e);
     });
 
+    if (!$.mSortableT) {
+        $.mSortableT = $('.transfer-table tbody');
+        $.mSortableT.sortable({
+            revert: 100,
+            start: function(ev, ui) {
+                this.order = fm_tfsorderupd();
+            },
+            stop: function(ev, ui) {
+                var $tr = $(ui.item[0]);
+                var id = String($tr.attr('id'));
+                var $next = $tr.next();
+                var cancel = false;
+                if ($tr.hasClass('started') || $next.hasClass('started')) {
+                    cancel = true;
+                }
+                else {
+                    var $prev = $tr.prev();
+                    var pid = $prev.attr('id');
+                    var nid = $next.attr('id');
+
+                    cancel = ((id[0] === 'u' && nid && nid[0] !== 'u')
+                            || (id[0] !== 'u' && pid && pid[0] === 'u'));
+                }
+                if (cancel) {
+                    $.mSortableT.sortable('cancel');
+                }
+                else {
+                    var order = fm_tfsorderupd();
+
+                    if (JSON.stringify(order) !== JSON.stringify(this.order)) {
+                        var mDL = {
+                            pos: 0,
+                            etmp: [],
+                            oQueue: [],
+                            mQueue: dlQueue,
+                            m_queue: dl_queue,
+                            prop: 'dl'
+                        };
+                        var mUL = {
+                            pos: 0,
+                            etmp: [],
+                            oQueue: [],
+                            mQueue: ulQueue,
+                            m_queue: ul_queue,
+                            prop: 'ul'
+                        };
+                        var i = 0;
+                        var len = Object.keys(order).length / 2;
+
+                        [dl_queue,ul_queue].forEach(function(queue) {
+                            var t_queue = queue.filter(isQueueActive);
+                            if (t_queue.length !== queue.length) {
+                                var m = t_queue.length;
+                                var i = 0;
+                                while (i < m) {
+                                    (queue[i] = t_queue[i]).pos = i;
+                                    ++i;
+                                }
+                                queue.length = i;
+                                while (queue[i]) {
+                                    delete queue[i++];
+                                }
+                            }
+                        });
+
+                        while (len > i) {
+                            id = M.t[i++];
+
+                            var dst = (id[0] === 'u' ? mUL : mDL);
+                            var mQ = dst.mQueue.slurp(id);
+                            for (var x in mQ) {
+                                if (mQ.hasOwnProperty(x)) {
+                                    var entry = mQ[x][0][dst.prop];
+                                    if (dst.etmp.indexOf(entry) === -1) {
+                                        (dst.m_queue[dst.pos] = entry).pos = dst.pos;
+                                        dst.etmp.push(entry);
+                                        dst.pos++;
+                                    }
+                                }
+                            }
+                            dst.oQueue = dst.oQueue.concat(mQ);
+                        }
+
+                        dlQueue._queue = mDL.oQueue;
+                        ulQueue._queue = mUL.oQueue;
+                    }
+                }
+            }
+        });
+    }
+
     $('.clear-transfer-icon').rebind('click', function(e)
     {
         var target = $(this).closest('tr');

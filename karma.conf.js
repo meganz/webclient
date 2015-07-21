@@ -18,6 +18,7 @@ module.exports = function(config) {
         'node_modules/chai/chai.js',
         'node_modules/karma-chai-plugins/node_modules/sinon-chai/lib/sinon-chai.js',
         'node_modules/sinon/pkg/sinon.js',
+        'node_modules/indexeddbshim/dist/indexeddbshim.js',
 
         // == Basics ==
         'js/jquery-2.1.1.js',
@@ -62,7 +63,7 @@ module.exports = function(config) {
         'js/vendor/Autolinker.js',
         'js/vendor/qrcode.js',
         'js/bitcoin-math.js',
-        // 'js/vendor/db.js', // Requires IndexedDB, not available for PhantomJS.
+        'js/vendor/db.js',
 
         // == Test helpers and test configuration ==
         'test/lang_dummy.js',
@@ -134,7 +135,7 @@ module.exports = function(config) {
     // List of files to exclude.
     exclude: [
     ],
-    
+
     // Fix up to make it work on the Jenkins server.
     urlRoot: '/base',
     proxies: {

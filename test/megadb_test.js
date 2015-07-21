@@ -60,7 +60,16 @@ describe("MegaDB - Unit Test", function() {
                 }
             }
         };
-        mdb = new MegaDB("test", "unit", 1, schema);
+        try {
+            if (typeof indexedDB === 'undefined') {
+                throw 'No indexedDB support.';
+            }
+            mdb = new MegaDB("test", "unit", schema);
+        }
+        catch(ex) {
+            console.error(ex);
+            throw ex;
+        }
         window.mdb = mdb; // debug helper
 
         done();

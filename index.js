@@ -594,7 +594,6 @@ function init_page() {
                 doRenderHelp();
             });
             CMS.get(['help2:' + lang, 'help:' + lang + '.json'], function (err, content, json) {
-                console.error(err, content, json);
                 helpdata = json.object
                 parsepage(window.helpTemplate = content.html);
                 init_help();

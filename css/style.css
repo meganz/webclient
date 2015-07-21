@@ -18558,8 +18558,14 @@ h1.help-home-header {
 .help-info-pages h1.help-home-header {
 	padding-bottom: 10px;
 }
+
+.new-bottom-pages .help-info-pages ul,
+.new-bottom-pages .help-info-pages ol {
+    padding-left: 20px;
+}
+
 .new-bottom-pages .help-info-pages p {
-	padding: 15px 0 15px 0;
+	padding: 5px 0 5px 0;
 	color: #666666;
 }
 .new-bottom-pages .help-info-pages p strong, .new-bottom-pages .help-info-pages p b {

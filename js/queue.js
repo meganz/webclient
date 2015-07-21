@@ -28,8 +28,13 @@ function MegaQueue(worker, limit, name) {
             break;
     }
     this.logger = MegaLogger.getLogger('mQueue[' + this.qname + ']', {}, parentLogger);
+    if (d) {
+        MegaQueue.weakRef.push(this);
+    }
 }
 inherits(MegaQueue, MegaEvents);
+
+MegaQueue.weakRef = [];
 
 MegaQueue.prototype.setSize = function(size) {
     this._limit = size;
@@ -277,14 +282,19 @@ MegaQueue.prototype.process = function(sp) {
 };
 
 MegaQueue.prototype.destroy = function() {
-    clearTimeout(this._later);
-    // this._limit = -1
-    // this._queue = null;
-    // this._queue = [];
-    if (d && this.qname !== 'downloads' && this.qname !== 'download-writer') {
-        ASSERT(this._queue.length === 0, 'The queue "' + this.qname + '" was not properly cleaned.');
+    if (!oIsFrozen(this)) {
+        this.logger.info('Destroying');
+        if (this._later) {
+            clearTimeout(this._later);
+        }
+        if (d && this.qname !== 'downloads' && this.qname !== 'download-writer') {
+            ASSERT(this._queue.length === 0, 'The queue "' + this.qname + '" was not properly cleaned.');
+        }
+        if (d) {
+            removeValue(MegaQueue.weakRef, this);
+        }
+        oDestroy(this);
     }
-    oDestroy(this);
 };
 
 MegaQueue.prototype._process = function(ms, sp) {

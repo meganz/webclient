@@ -5405,7 +5405,7 @@ th.grid-first-th {
 	background-image: none;
 }
 .file-status-icon.star, .contact-status-icon.star, .grid-status-icon.star, .link-icon {
-	background-image: url(../images/mega/register-big-sprite-v3.png);
+	background-image: url(../images/mega/register-big-sprite-v4.png);
 	background-repeat: no-repeat;
 	background-position: -69px -963px;
 }
@@ -14383,7 +14383,7 @@ h5.main-italic-header {
 .reg-success-icon, .payment-confirmation .icon {
 	width: 200px;
 	height: 192px;
-	background-image: url(../images/mega/register-big-sprite-v3.png);
+	background-image: url(../images/mega/register-big-sprite-v4.png);
 	background-position: left top;
 	background-repeat: no-repeat;
 	margin: 30px auto 4px auto;
@@ -14617,7 +14617,7 @@ h5.main-italic-header {
 .reg-st3-membership-icon, .membership-icon {
 	width: 70px;
 	height: 70px;
-	background-image: url(../images/mega/register-big-sprite-v3.png);
+	background-image: url(../images/mega/register-big-sprite-v4.png);
 	background-position: center -210px;
 	background-repeat: no-repeat;
 	margin: 0 0 0 -35px;
@@ -15188,7 +15188,7 @@ div.membership-bott-button {
 	height: 82px;
 	width: 82px;
 	float: left;
-	background-image: url(../images/mega/register-big-sprite-v3.png);
+	background-image: url(../images/mega/register-big-sprite-v4.png);
 	background-position: center -960px;
 	background-repeat: no-repeat;
 	margin-top: 28px;
@@ -15527,10 +15527,10 @@ div.membership-bott-button {
 	padding: 7px 13px 0 52px;
 }
 .regular-download {
-    padding: 7px 33px 0 33px;
+	padding: 7px 33px 0 33px;
 }
 .regular-download .new-download-button-txt1 {
-    line-height: 36px;
+	line-height: 36px;
 }
 .new-download-red-button {
 	background-position: -2px -1383px;
@@ -22484,7 +22484,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .loginrequired-dialog .fm-notification-icon {
 	width: 70px;
 	height: 70px;
-	background-image: url(../images/mega/register-big-sprite-v3.png);
+	background-image: url(../images/mega/register-big-sprite-v4.png);
 	background-position: center -210px;
 	background-repeat: no-repeat;
 	margin: 4px 16px 0 0px;
@@ -23924,6 +23924,114 @@ body.pro:after {
 .membership-step2 .bandwidth-back-button {
 	display: block;
 }
+.toast-notification {
+	width: 480px;
+	position: absolute;
+	bottom: 8px;
+	left: 50%;
+	margin: 0 0 -48px -240px;
+	background-color: #777777;
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	border-radius: 8px;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	padding: 4px 4px 4px 52px;
+	z-index: 1000;
+	color: white;
+	font-size: 14px;
+	line-height: 18px;
+	-webkit-transition: all 1000ms ease-in-out;
+	-moz-transition: all 1000ms ease-in-out;
+	-o-transition: all 1000ms ease-in-out;
+	-ms-transition: all 1000ms ease-in-out;
+	transition: all 1000ms ease-in-out;
+	cursor: default;
+	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+	-moz-opacity: 0;
+	-khtml-opacity: 0;
+	opacity: 0;
+}
+.toast-notification.visible {
+	margin-bottom: 0;
+	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+	-moz-opacity: 1;
+	-khtml-opacity: 1;
+	opacity: 1;
+}
+.toast-notification.second {
+	margin-bottom: 48px;
+	bottom: 16px;
+}
+.toast-notification:hover {
+	background-color: #666666;
+}
+.toast-transfer-icon {
+	width: 30px;
+	height: 30px;
+	position: absolute;
+	left: 9px;
+	top: 50%;
+	margin: -15px 0 0 0;
+	background-image: url(../images/mega/register-big-sprite-v4.png);
+	background-position: -85px -860px;
+}
+.upload .toast-transfer-icon {
+	background-position: -85px -900px;
+}
+.toast-transfer-body {
+	display: table;
+	width: 100%;
+}
+.toast-transfer-col {
+	display: table-cell;
+	vertical-align: middle;
+	font-family: 'source_sans_proregular';
+}
+.toast-transfer-col:nth-child(1) {
+	padding: 0px 16px 2px 0;
+}
+.toast-transfer-col:nth-child(2) {
+	width: 50px;
+	height: 40px;
+}
+.toast-transfer-button {
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	border-radius: 8px;
+	display: inline-block;
+	color: #777777;
+	-webkit-transition: all 200ms ease-in-out;
+	-moz-transition: all 200ms ease-in-out;
+	-o-transition: all 200ms ease-in-out;
+	-ms-transition: all 200ms ease-in-out;
+	transition: all 200ms ease-in-out;
+	padding: 4px;
+	background-color: rgba(0,0,0,0);
+}
+.toast-transfer-button:hover {
+	color: #666666;
+	background-color: rgba(0,0,0,0.3);
+}
+.toast-transfer-button span {
+	background-color: white;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+	height: 32px;
+	line-height: 31px;
+	display: block;
+	cursor: pointer;
+	padding: 0 16px;
+	text-align: center;
+	-webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
+	-moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
+	box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
+	font-family: 'source_sans_proregular';
+	white-space: nowrap;
+	font-size: 13px;
+}
  @media only screen and (max-width: 1593px) {
 .download-mid-centered-block {
 	min-width: 648px;
@@ -24401,8 +24509,8 @@ top-login-spr .nlanguage-tooltip-bg, .nlanguage-bottom {
  background-image: url(../images/mega/top-login-sprite@2x_v4.png);
  background-size:48px auto;
 }
- .reg-success-icon, .reg-st3-save-icon, .reg-st3-membership-icon, .membership-icon, .loginrequired-dialog .fm-notification-icon, .file-status-icon.star, .contact-status-icon.star, .grid-status-icon.star, .link-icon {
- background-image: url(../images/mega/register-big-sprite-v3@2x.png);
+ .reg-success-icon, .reg-st3-save-icon, .reg-st3-membership-icon, .membership-icon, .loginrequired-dialog .fm-notification-icon, .file-status-icon.star, .contact-status-icon.star, .grid-status-icon.star, .link-icon, .toast-transfer-icon {
+ background-image: url(../images/mega/register-big-sprite-v4@2x.png);
  background-size: 200px auto;
 }
 .reg-st5-key-gen, .reg-st5-info-icon {

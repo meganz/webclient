@@ -1255,7 +1255,7 @@ function showTransferToast(t_type, t_length) {
             $second_toast,
             interval,
             nt_txt;
-            
+
         if (t_type != 'u') {
             interval = dl_interval;
             $toast = $('.toast-notification.download');
@@ -1275,19 +1275,24 @@ function showTransferToast(t_type, t_length) {
                 nt_txt = 'One upload was added to the transfers queue';
             }
         }
-            
+
         $toast.find('.toast-transfer-col:first-child').html(nt_txt);
             
         if ($second_toast.hasClass('visible')) {
             $second_toast.addClass('second');
         }
-            
+
         clearInterval(interval);
         $toast.removeClass('second').addClass('visible');
         interval = setInterval(function() {
             hideTransferToast($toast,interval);
         }, 7000);
     }
+    $('.toast-transfer-button').rebind('click', function(e)
+    {
+        $('.toast-notification').removeClass('visible second'); 
+        $.transferOpen();
+    });
 }
 
 function hideTransferToast ($toast,int) {

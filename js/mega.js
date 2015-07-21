@@ -1473,6 +1473,10 @@ function MegaData()
         this.currentdirid = id;
         this.currentrootid = RootbyId(id);
 
+        if (M.currentrootid === M.RootID) {
+            M.lastSeenCloudFolder = M.currentdirid;
+        }
+
         $('.nw-fm-tree-item').removeClass('opened');
 
         if (this.chat) {
@@ -4067,9 +4071,19 @@ function MegaData()
                 return;
             }
         }*/
-        var target = $.onDroppedTreeFolder || M.currentdirid, onChat,
+        var target, onChat,
             f, ul_id, pause, pauseTxt = '';
-        delete $.onDroppedTreeFolder;
+
+        if ($.onDroppedTreeFolder) {
+            target = $.onDroppedTreeFolder;
+            delete $.onDroppedTreeFolder;
+        }
+        else if ($('.nw-fm-left-icon.transfers').hasClass('active')) {
+            target = M.lastSeenCloudFolder || M.RootID;
+        }
+        else {
+            target = M.currentdirid;
+        }
 
         if ((onChat = (M.currentdirid && M.currentdirid.substr(0, 4) === 'chat'))) {
             if (!$.ulBunch) {

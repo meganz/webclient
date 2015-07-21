@@ -18581,6 +18581,9 @@ h1.help-home-header {
 	font-family: 'Open Sans Semibold Italic', Arial;
 	font-style: normal;
 }
+.new-bottom-pages .help-info-pages li p {
+	padding: 0px;
+}
 .sync-coming-soon-txt {
 	text-align: center;
 	line-height: 68px;

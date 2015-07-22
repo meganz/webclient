@@ -56,8 +56,8 @@
 }
 @font-face {
 	font-family: 'source_sans_proSBdIt';
-	src: url('../fonts/SourceSansPro-Semibold.eot');
-	src: url('../fonts/SourceSansPro-Semibold.eot?#iefix') format('embedded-opentype'), url('../fonts/SourceSansPro-Semibold.woff2') format('woff2'), url('../fonts/SourceSansPro-Semibold.woff') format('woff'), url('../fonts/SourceSansPro-Semibold.ttf') format('truetype'), url('../fonts/SourceSansPro-Semibold.svg#source_sans_prosemibold') format('svg');
+	src: url('../fonts/SourceSansPro-SemiboldIt.eot');
+	src: url('../fonts/SourceSansPro-SemiboldIt.eot?#iefix') format('embedded-opentype'), url('../fonts/SourceSansPro-SemiboldIt.woff2') format('woff2'), url('../fonts/SourceSansPro-SemiboldIt.woff') format('woff'), url('../fonts/SourceSansPro-SemiboldIt.ttf') format('truetype'), url('../fonts/SourceSansPro-SemiboldIt.svg#source_sans_proSBdIt') format('svg');
 	font-weight: normal;
 	font-style: normal;
 }

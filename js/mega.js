@@ -3789,7 +3789,7 @@ function MegaData()
             id = 'zip_' + z;
         else
             id = 'dl_' + id;
-        $('.transfer-table #' + id + ' td:eq(5)').html('<span class="transfer-status completed">' + l[554] + '</span>');
+        $('.transfer-table #' + id + ' td:eq(5)').html('<span class="transfer-status completed">' + l[1418] + '</span>');
         $('.transfer-table #' + id + ' td:eq(2)').text('');
         $('.transfer-table #' + id + ' td:eq(0) span.transfer-type').addClass('done').html(l[1495]);
 
@@ -4216,12 +4216,12 @@ function MegaData()
         }
         if (this.mobile_ul_completed)
         {
-            $('.upload-status-txt').text(l[554]);
+            $('.upload-status-txt').text(l[1418]);
             $('#mobileuploadtime').addClass('complete');
             $('#uploadpopbtn').text(l[726]);
-            $('#mobileupload_header').text(l[554]);
+            $('#mobileupload_header').text(l[1418]);
         }
-        $('.transfer-table #ul_' + id + ' td:eq(5)').html('<span class="transfer-status completed">' + l[554] + '</span>');
+        $('.transfer-table #ul_' + id + ' td:eq(5)').html('<span class="transfer-status completed">' + l[1418] + '</span>');
         $('.transfer-table #ul_' + id + ' td:eq(2)').text('');
         $('.transfer-table #ul_' + id + ' td:eq(0) span.transfer-type').addClass('done').html(l[1501]);
         ul_queue[ul.pos] = Object.freeze({});

@@ -12,6 +12,7 @@ describe("MegaDB - Unit Test", function() {
     var sandbox = null;
 
     var mdb = null;
+    var msdb = null;
 
     beforeEach(function(done) {
         sandbox = sinon.sandbox.create();
@@ -28,6 +29,7 @@ describe("MegaDB - Unit Test", function() {
             cb({pubkey: pubEd25519[h], authenticated: false}, h);
         });
         sandbox.stub(window, 'u_privEd25519', atob('nWGxne/9WmC6hEr0kuwsxERJxWl7MmkZcDusAxyuf2A='));
+        sandbox.stub(window, 'u_k', JSON.parse("[4222562981,1974701603,3975828479,1142305397]"));
         sandbox.stub(window, 'avatars', {});
         sandbox.stub(window, 'M', {
             'u': {
@@ -86,11 +88,18 @@ describe("MegaDB - Unit Test", function() {
                 fail("db not dropped: ", toArray(arguments));
             })
             .then(function() {
-                done();
+                if (msdb) {
+                    msdb.db.drop()
+                        .done(done)
+                        .fail(function() {
+                            fail("Failed to drop msdb", toArray(arguments))
+                        });
+                }
+                else {
+                    done();
+                }
+                msdb = null;
             });
-        return;
-
-        done();
     });
 
 
@@ -321,6 +330,34 @@ describe("MegaDB - Unit Test", function() {
                     }).fail(function() {
                         fail("could not get obj with answer=12");
                     })
+            });
+    });
+
+    it('can encrypt, mStorageDB', function(done) {
+        msdb = new mStorageDB('encTest');
+        msdb.addSchemaHandler('people', 'h', function() {
+            console.error('people schema handler', arguments);
+        });
+
+        msdb.setup()
+            .done(function(db) {
+                expect(db.dbName).to.eql("mdb_encTest_A_123456789");
+                expect(db.flags & MegaDB.DB_FLAGS.HASNEWENCKEY).to.eql(MegaDB.DB_FLAGS.HASNEWENCKEY);
+
+                var data = { h: 'xGtrEHoT', name: 'John' };
+                msdb.add("people", data)
+                    .done(function(rr) {
+                        expect(rr.length).to.eql(1);
+                        expect(rr[0].h).to.eql(data.h); // keyPath is NOT encrypted
+                        expect(rr[0].name).to.not.eql(data.name); // name must be encrypted
+                        done();
+                    })
+                    .fail(function() {
+                        fail("Failed to add");
+                    });
+            })
+            .fail(function() {
+                fail('Failed to setup database.');
             });
     });
 });

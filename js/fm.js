@@ -1287,27 +1287,12 @@ function showTransferToast(t_type, t_length) {
         interval = setInterval(function() {
             hideTransferToast($toast,interval);
         }, 7000);
-
-        $('.toast-transfer-button').rebind('click', function(e)
-        {
-            $('.toast-notification').removeClass('visible second'); 
-            if (!$('.slideshow-dialog').hasClass('hidden')) {
-                $('.slideshow-dialog').addClass('hidden');
-                $('.slideshow-overlay').addClass('hidden');
-            }
-            $.transferOpen();
-        });
-        $toast.rebind('mouseover', function(e)
-        {
-            clearInterval(interval);
-        });
-        $toast.rebind('mouseout', function(e)
-        {
-            interval = setInterval(function() {
-                hideTransferToast($toast,interval);
-            }, 7000);
-        });
     }
+    $('.toast-transfer-button').rebind('click', function(e)
+    {
+        $('.toast-notification').removeClass('visible second'); 
+        $.transferOpen();
+    });
 }
 
 function hideTransferToast ($toast,int) {

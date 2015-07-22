@@ -147,7 +147,6 @@ function doRequest(id) {
         delete fetching[id];
     };
     var url = (localStorage.cms || "https://cms.mega.nz/content/") + id;
-    console.error(url);
     q.open("GET", url);
     q.responseType = 'arraybuffer';
     q.send();

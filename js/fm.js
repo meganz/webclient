@@ -899,6 +899,7 @@ function initUI() {
                 'shared-with-me': { root: 'shares',    prev: null },
                 'conversations':  { root: 'chat',      prev: null },
                 'contacts':       { root: 'contacts',  prev: null },
+                'transfers':      { root: 'transfers', prev: null },
                 'inbox':          { root: M.InboxID,   prev: null },
                 'rubbish-bin':    { root: M.RubbishID, prev: null }
             };
@@ -917,13 +918,6 @@ function initUI() {
             else if (d) {
                 console.warn('Root mismatch', M.currentrootid, M.currentdirid, activeTab);
             }
-        }
-
-        if (clickedClass.indexOf('transfers') !== -1) {
-            return $.transferOpen(true);
-        }
-        if ($('.nw-fm-left-icon.transfers').hasClass('active')) {
-            $.transferClose();
         }
 
         for (var tab in fmTabState) {
@@ -1289,7 +1283,7 @@ function showTransferToast(t_type, t_length) {
 
         $('.toast-transfer-button').rebind('click', function(e)
         {
-            $('.toast-notification').removeClass('visible second'); 
+            $('.toast-notification').removeClass('visible second');
             if (!$('.slideshow-dialog').hasClass('hidden')) {
                 $('.slideshow-dialog').addClass('hidden');
                 $('.slideshow-overlay').addClass('hidden');
@@ -6430,6 +6424,18 @@ function sectionUIopen(id) {
         $('.shared-grid-view').addClass('hidden');
     }
 
+    if (id !== 'transfers') {
+        if ($.transferClose) {
+            $.transferClose();
+        }
+    }
+    else {
+        if (!$.transferOpen) {
+            transferPanelUI();
+        }
+        $.transferOpen(true);
+    }
+
     var headertxt = '';
     switch (id) {
         case 'contacts':
@@ -6488,6 +6494,9 @@ function treeUIopen(id, event, ignoreScroll, dragOver, DragOpen) {
         sectionUIopen('opc');
     } else if (id_r === M.RubbishID) {
         sectionUIopen('rubbish-bin');
+    }
+    else if (id_s === 'transfers') {
+        sectionUIopen('transfers');
     }
 
     if (!fminitialized) {

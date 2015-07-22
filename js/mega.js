@@ -1459,8 +1459,10 @@ function MegaData()
             if (!megaChatDisabled) {
                 chatui(id); // XX: using the old code...for now
             }
-        } else if (!id || !M.d[id])
+        }
+        else if ((!id || !M.d[id]) && id !== 'transfers') {
             id = this.RootID;
+        }
 
         if (!megaChatDisabled) {
             if (!this.chat) {
@@ -1493,9 +1495,13 @@ function MegaData()
             if (d) {
                 console.time('time for rendering');
             }
-            if (id.substr(0, 6) === 'search') {
+            if (id === 'transfers') {
+                M.v = [];
+            }
+            else if (id.substr(0, 6) === 'search') {
                 M.filterBySearch(M.currentdirid);
-            } else {
+            }
+            else {
                 M.filterByParent(M.currentdirid);
             }
             var viewmode = 0;// 0 is list view, 1 block view

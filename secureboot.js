@@ -1331,7 +1331,7 @@ else if (!b_u)
                     {
                         Cu.reportError(e);
 
-                        alert('An error occurred while loading MEGA.\n\nFilename: '
+                        console.log('An error occurred while loading MEGA.\n\nFilename: '
                             + file + "\n" + e + '\n\n' + mozBrowserID);
                     }
                     step(jsi);
@@ -1347,7 +1347,7 @@ else if (!b_u)
                         if (!Components.isSuccessCode(s))
                         {
                             alert('An error occurred while loading MEGA.' +
-                                ' The file ' + file + ' could not be loaded.');
+                                  ' The file ' + file + ' could not be loaded.');
                         }
                         else
                         {

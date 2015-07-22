@@ -589,19 +589,17 @@ function init_page() {
                 return;
             }
             loadingDialog.show();
-            CMS.watch('help:' + lang, function () {
+            CMS.watch('help2:' + lang, function () {
                 window.helpTemplate = null;
                 doRenderHelp();
             });
-            CMS.get('help:' + lang, function (err, content) {
-                CMS.get('help:' + lang + '.json', function (err, json) {
-                    helpdata = json.object
-                    parsepage(window.helpTemplate = content.html);
-                    init_help();
-                    loadingDialog.hide();
-                    topmenuUI();
-                    mainScroll();
-                });
+            CMS.get(['help2:' + lang, 'help:' + lang + '.json'], function (err, content, json) {
+                helpdata = json.object
+                parsepage(window.helpTemplate = content.html);
+                init_help();
+                loadingDialog.hide();
+                topmenuUI();
+                mainScroll();
             });
         }
         doRenderHelp();

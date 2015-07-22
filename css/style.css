@@ -16000,7 +16000,8 @@ div.membership-bott-button {
 .new-bottom-pages p.sub-list span.number, .new-bottom-pages h2.sub-list span.number {
 	margin: 2px 0 0 70px;
 }
-.new-bottom-page p span.red, .new-bottom-page h2 span.red, .new-bottom-page p a, .new-bottom-page h2 a, .new-bottom-pages p a {
+.new-bottom-page p span.red, .new-bottom-page h2 span.red, .new-bottom-page p a, .new-bottom-page h2 a, .new-bottom-pages p a,
+.new-bottom-page li a, .new-bottom-pages li a {
 	color: #D22400;
 }
 .new-bottom-pages h2 span.number, .new-bottom-pages h2.list span.number, .new-bottom-pages h2.sub-list span.number {
@@ -18558,8 +18559,18 @@ h1.help-home-header {
 .help-info-pages h1.help-home-header {
 	padding-bottom: 10px;
 }
+
+.new-bottom-pages .help-info-pages li {
+    margin: 0px;
+}
+
+.new-bottom-pages .help-info-pages ul,
+.new-bottom-pages .help-info-pages ol {
+    padding-left: 20px;
+}
+
 .new-bottom-pages .help-info-pages p {
-	padding: 15px 0 15px 0;
+	padding: 5px 0 5px 0;
 	color: #666666;
 }
 .new-bottom-pages .help-info-pages p strong, .new-bottom-pages .help-info-pages p b {
@@ -18569,6 +18580,9 @@ h1.help-home-header {
 .new-bottom-pages .help-info-pages p strong.italic, .new-bottom-pages .help-info-pages p i {
 	font-family: 'Open Sans Semibold Italic', Arial;
 	font-style: normal;
+}
+.new-bottom-pages .help-info-pages li p {
+	padding: 0px;
 }
 .sync-coming-soon-txt {
 	text-align: center;

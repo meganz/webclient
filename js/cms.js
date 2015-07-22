@@ -4,8 +4,7 @@ var IMAGE_PLACEHOLDER = staticpath + "/images/img_loader@2x.png";
 
 var pubkey = ab_to_str(asmCrypto.base64_to_bytes('gVbVNtVJf210qJLe+GxWX8w9mC+WPnTPiUDjBCv9tr4='))
 
-function verify_cms_content(content, signature)
-{
+function verify_cms_content(content, signature) {
     var hash = asmCrypto.SHA256.hex(content);
     signature = ab_to_str(signature);
 
@@ -17,8 +16,7 @@ function verify_cms_content(content, signature)
     }
 }
 
-function process_cms_response(bytes, next, as, id)
-{
+function process_cms_response(bytes, next, as, id) {
     var viewer = new Uint8Array(bytes);
 
     var signature = bytes.slice(3, 67); // 64 bytes, signature
@@ -77,7 +75,34 @@ var booting = false;
 var is_img;
 
 /**
- *    Rewrite links. Basically this links
+ *  Steps
+ *  
+ *  Call many things in parallel, buffer the results
+ *  and give it back once everything is ready
+ *
+ *  @param int times
+ *  @param function next
+ *
+ *  @return function
+ */
+function steps(times, next) {
+    var responses = new Array(times + 1);
+    var done = 0;
+    function step_done(i, err, arg) {
+        responses[0]   = responses[0] || err;
+        responses[i+1] = arg; 
+        if (++done === times) {
+            next.apply(null, responses);
+        }
+    };
+
+    return function(id) {
+        return step_done.bind(null, parseInt(id));
+    };
+}
+
+/**
+ *  Rewrite links. Basically this links
  *  shouldn't trigger the `CMS.get` and force
  *  a download
  */
@@ -142,6 +167,7 @@ function loaded(id)
 
 var curType;
 var curCallback;
+var reRendered = {};
 
 var CMS = {
     watch: function(type, callback)
@@ -152,7 +178,8 @@ var CMS = {
 
     reRender: function(type, nodeId)
     {
-        if (type === curType) {
+        if (type === curType && !reRendered[nodeId]) {
+            reRendered[nodeId] = true;
             curCallback(nodeId);
         }
     },
@@ -193,6 +220,15 @@ var CMS = {
         return assets[id] ? assets[id] : IMAGE_PLACEHOLDER + "#" + id;
     },
     get: function(id, next, as) {
+        if (id instanceof Array) {
+            var step = steps(id.length, next);
+            for (var i in id) {
+                if (id.hasOwnProperty(i)) {
+                    this.get(id[i], step(i), as);
+                }
+            }
+            return;
+        }
         if (typeof fetching[id] === "undefined") {
             doRequest(id);
             fetching[id] = [];

@@ -167,9 +167,6 @@ var notify = {
         notify.$popup.addClass('active');
         notify.$popupIcon.addClass('active');
 
-        // Sort the notifications
-        notify.sortNotificationsByMostRecent();
-
         // Render and show notifications currently in list
         notify.renderNotifications();
     },
@@ -215,6 +212,28 @@ var notify = {
      */
     renderNotifications: function() {
         
+        // Get the number of notifications
+        var numOfNotifications = notify.notifications.length;
+        
+        // If no notifications, show empty
+        if (numOfNotifications === 0) {
+            notify.$popup.addClass('empty');
+            return false;
+        }
+        
+        // Sort the notifications
+        notify.sortNotificationsByMostRecent();
+
+        // Store for the all the generated HTML
+        var notificationHtml = '';
+
+        // Loop through all the notifications
+        for (var i = 0; i < numOfNotifications; i++) {
+            
+            var notification = notify.notifications[i];
+            
+            
+        }
     }
 };
 

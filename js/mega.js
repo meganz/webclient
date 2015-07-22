@@ -365,7 +365,7 @@ function MegaData()
     };
 
     this.hasInboxItems = function() {
-        return this.getInboxItems().length > 0;
+        return $.len(M.c[M.InboxID] || {}) > 0;
     };
 
     this.getInboxUsers = function() {

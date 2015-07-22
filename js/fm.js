@@ -5560,7 +5560,6 @@ function transferPanelUI()
         $('.nw-fm-left-icon.transfers').removeClass('active');
         $('.fmholder').removeClass('transfer-panel-opened');
         $(window).trigger('resize');
-
     };
 
     $.transferOpen = function(force)
@@ -5603,7 +5602,7 @@ function transferPanelUI()
     });
     $('.transfer-clear-all-icon').rebind('click', function() {
         if (!$(this).hasClass('disabled')) {
-            msgDialog('confirmation', 'cancel all transfers', 'Are you sure you want to cancel all transfers?', '', function(e) {
+            msgDialog('confirmation', 'clear all transfers', 'Are you sure you want to clear all transfers?', '', function(e) {
                 if (!e) {
                     return;
                 }
@@ -5663,7 +5662,7 @@ function transferPanelUI()
                 }
             }
             else {
-                $(this).addClass('active').find('span').text('Resume transfers');
+                $(this).addClass('active').find('span').text(l[7101]);
                 $('.transfer-table tr').not('.clone-of-header').each(function(j, el) {
                     if (!$(el).find('.transfer-status.completed').length
                             && !$(el).find('.transfer-type.paused').length) {

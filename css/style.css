@@ -55,9 +55,9 @@
 	font-style: normal;
 }
 @font-face {
-	font-family: 'source_sans_proSBdIt';
-	src: url('../fonts/SourceSansPro-SemiboldIt.eot');
-	src: url('../fonts/SourceSansPro-SemiboldIt.eot?#iefix') format('embedded-opentype'), url('../fonts/SourceSansPro-SemiboldIt.woff2') format('woff2'), url('../fonts/SourceSansPro-SemiboldIt.woff') format('woff'), url('../fonts/SourceSansPro-SemiboldIt.ttf') format('truetype'), url('../fonts/SourceSansPro-SemiboldIt.svg#source_sans_proSBdIt') format('svg');
+	font-family: 'Open Sans Semibold Italic';
+	src: url('../fonts/OpenSans-SemiboldItalic_v3.eot');
+	src: url('../fonts/OpenSans-SemiboldItalic_v3.eot?#iefix') format('embedded-opentype'), url('../fonts/OpenSans-SemiboldItalic.woff2') format('woff2'), url('../fonts/OpenSans-SemiboldItalic_v3.woff') format('woff'), url('../fonts/OpenSans-SemiboldItalic_v3.ttf') format('truetype'), url('../fonts/OpenSans-SemiboldItalic_v3.svg#open_sanssemibold_italic') format('svg');
 	font-weight: normal;
 	font-style: normal;
 }
@@ -3151,11 +3151,12 @@ img.blog-new-logos {
 }
 .investors-reader-txt1 {
 	display: block;
-	font-size: 10px;
+	font-size: 9px;
+	letter-spacing: -0.1px;
 	color: #666666;
 	line-height: 13px;
 	padding: 4px 6px 0 6px;
-	font-family: 'source_sans_proSBdIt', Arial;
+	font-family: 'Open Sans Semibold Italic', Arial;
 }
 .investors-reader-txt2 {
 	display: block;
@@ -13648,7 +13649,9 @@ body.new-startpage {
 	line-height: 24px;
 }
 .st-blocks-header a, .st-blocks-header a:link, .st-blocks-header a:visited, .st-blocks-header a:hover, .st-blocks-header a:active {
-	font-family: 'source_sans_proSBdIt', Arial;
+	font-family: 'Open Sans Semibold Italic', Arial;
+	font-size:20px;
+	letter-spacing: -0.1px;
 }
 .st-privacy-tool-icon {
 	width: 480px;
@@ -13678,9 +13681,10 @@ body.new-startpage {
 	box-sizing: border-box;
 }
 .st-dark-gray-txt {
-	font-size: 17px;
+	font-size: 16px;
 	line-height: 32px;
-	font-family: 'source_sans_proSBdIt', Arial;
+	letter-spacing: -0.1px;
+	font-family: 'Open Sans Semibold Italic', Arial;
 	color: white;
 	float: left;
 	padding-right: 30px;
@@ -13708,10 +13712,11 @@ body.new-startpage {
 	background-position: -523px -687px;
 }
 .st-mid-header {
-	font-size: 17px;
+	font-size: 16px;
+	letter-spacing: -0.1px;
 	color: #333333;
 	line-height: 21px;
-	font-family: 'source_sans_proSBdIt', Arial;
+	font-family: 'Open Sans Semibold Italic', Arial;
 }
 .st-mid-txt {
 	font-size: 14px;
@@ -14538,11 +14543,12 @@ h5.main-italic-header {
 	margin: 14px auto 0 auto;
 }
 .reg-success-header {
-	font-size: 21px;
+	font-size: 20px;
 	line-height: 32px;
+	letter-spacing: -0.1px;
 	text-align: center;
 	color: #78B240;
-	font-family: 'source_sans_proSBdIt', Arial;
+	font-family: 'Open Sans Semibold Italic', Arial;
 }
 .reg-success-txt {
 	font-size: 14px;
@@ -15342,9 +15348,10 @@ div.membership-bott-button {
 .reg-st3-save-txt {
 	text-align: center;
 	color: white;
-	font-size: 18px;
-	font-family: 'source_sans_proSBdIt', Arial;
+	font-size: 17px;
+	font-family: 'Open Sans Semibold Italic', Arial;
 	line-height: 21px;
+	letter-spacing: -0.1px;
 	padding-top: 20px;
 }
 .reg-st3-save-txt.ru, .reg-st3-save-txt.es, .reg-st3-save-txt.de, .reg-st3-save-txt.br, .reg-st3-save-txt.dk, .reg-st3-save-txt.sl, .reg-st3-save-txt.vn, .reg-st3-save-txt.ca, .reg-st3-save-txt.bs, .reg-st3-save-txt.tr, .reg-st3-save-txt.sr {
@@ -15481,14 +15488,15 @@ div.membership-bott-button {
 	display: table-cell;
 	vertical-align: middle;
 	text-align: center;
-	font-size: 13px;
+	font-size: 12px;
 	line-height: 18px;
+	letter-spacing: -0.1px;
 	color: #666666;
 	-moz-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
 	padding: 0 25px;
-	font-family: 'source_sans_proSBdIt', Arial;
+	font-family: 'Open Sans Semibold Italic', Arial;
 }
 .reg-st5-info-icon {
 	width: 32px;
@@ -15860,10 +15868,11 @@ div.membership-bott-button {
 	display: block;
 }
 .download-error-title {
-	font-size: 17px;
+	font-size: 16px;
 	line-height: 20px;
+	letter-spacing: -0.1px;
 	color: #D22400;
-	font-family: 'source_sans_proSBdIt', Arial;
+	font-family: 'Open Sans Semibold Italic', Arial;
 }
 .download-error-txt, .download-error-temp-txt {
 	font-size: 14px;
@@ -15907,9 +15916,10 @@ div.membership-bott-button {
 }
 .new-bottom-pages h2, .terms-main h2 {
 	color: #666666;
-	font-size: 17px;
+	font-size: 16px;
 	line-height: 24px;
-	font-family: 'source_sans_proSBdIt', Arial;
+	letter-spacing: -0.1px;
+	font-family: 'Open Sans Semibold Italic', Arial;
 	padding: 22px 0 0 0;
 	margin: 0;
 	font-weight: normal;
@@ -16053,9 +16063,10 @@ p.privacy-list {
 .team-person-name {
 	text-align: center;
 	color: #D32700;
-	font-family: 'source_sans_proSBdIt';
-	font-size: 17px;
+	font-family: 'Open Sans Semibold Italic';
+	font-size: 16px;
 	line-height: 24px;
+	letter-spacing: -0.1px;
 	padding-top: 10px
 }
 .team-person-occupation {
@@ -16107,10 +16118,11 @@ p.privacy-list {
 	height: 344px;
 }
 .browsers-header {
-	font-size: 21px;
+	font-size: 20px;
 	line-height: 31px;
+	letter-spacing: -0.1px;
 	color: #D22400;
-	font-family: 'source_sans_proSBdIt', Arial;
+	font-family: 'Open Sans Semibold Italic', Arial;
 	padding-bottom: 17px;
 }
 .browsers-centered-block img {
@@ -16260,18 +16272,20 @@ span.browsers-update {
 }
 .credits-title {
 	display: block;
-	font-size: 21px;
+	font-size: 20px;
 	line-height: 31px;
+	letter-spacing: -0.1px;
 	color: #666666;
-	font-family: 'source_sans_proSBdIt', Arial;
+	font-family: 'Open Sans Semibold Italic', Arial;
 	padding: 5px 0 0 0;
 }
 .credits-info {
 	display: block;
-	font-size: 14px;
+	font-size: 13px;
 	line-height: 24px;
+	letter-spacing: -0.1px;
 	color: #D82D00;
-	font-family: 'source_sans_proSBdIt', Arial;
+	font-family: 'Open Sans Semibold Italic', Arial;
 	padding-top: 2px;
 }
 .nihilogics.credits-logo-block img {
@@ -16381,10 +16395,11 @@ span.browsers-update {
 .pro-mid-header {
 	padding-top: 34px;
 	margin-bottom: -8px;
-	font-size: 17px;
+	font-size: 16px;
 	line-height: 18px;
+	letter-spacing: -0.1px;
 	color: #333333;
-	font-family: 'source_sans_proSBdIt', Arial;
+	font-family: 'Open Sans Semibold Italic', Arial;
 }
 .diagonal {
 	color: white;
@@ -16410,8 +16425,9 @@ span.browsers-update {
 	height: 24px;
 	background-color: white;
 	color: #D90007;
-	font-size: 14px;
-	font-family: 'source_sans_proSBdIt';
+	font-size: 13px;
+	letter-spacing: -0.1px;
+	font-family: 'Open Sans Semibold Italic';
 	padding: 0 10px;
 	line-height: 23px;
 	-webkit-border-radius: 13px;
@@ -16823,11 +16839,12 @@ span.browsers-update {
 	padding: 15px 0 17px 0;
 }
 .mobile-text-header {
-	font-size: 17px;
+	font-size: 16px;
 	line-height: 25px;
+	letter-spacing: -0.1px;
 	color: #BF1900;
 	padding-bottom: 5px;
-	font-family: 'source_sans_proSBdIt';
+	font-family: 'Open Sans Semibold Italic';
 }
 .mobile-text, .ff-txt, .chrome-txt {
 	font-size: 14px;
@@ -16996,10 +17013,11 @@ strong, b {
 	margin-left: 171px;
 }
 .privacy-company-header {
-	font-size: 17px;
+	font-size: 16px;
 	line-height: 20px;
+	letter-spacing: -0.1px;
 	color: #BF1900;
-	font-family: 'source_sans_proSBdIt', Arial;
+	font-family: 'Open Sans Semibold Italic', Arial;
 	padding: 2px 0 0 0;
 }
 .privacy-company-txt p {
@@ -17533,10 +17551,11 @@ input[type='range']::-webkit-slider-thumb {
 	width: 100%;
 }
 .new-affiliate-mid-header, .new-affiliate-bot-header {
-	font-size: 17px;
+	font-size: 16px;
 	line-height: 20px;
+	letter-spacing: -0.1px;
 	color: #3F4646;
-	font-family: 'source_sans_proSBdIt', Arial;
+	font-family: 'Open Sans Semibold Italic', Arial;
 	padding: 23px 0 4px 0;
 }
 .new-affiliate-mid-header.new-affiliate-bot-pad {
@@ -17624,11 +17643,12 @@ ul.cannt-ul li span {
 }
 .new-affiliate-icon-title {
 	margin-left: 110px;
-	font-size: 17px;
+	font-size: 16px;
 	line-height: 24px;
+	letter-spacing: -0.1px;
 	padding: 32px 0 0 0;
 	color: #666666;
-	font-family: 'source_sans_proSBdIt', Arial;
+	font-family: 'Open Sans Semibold Italic', Arial;
 }
 .new-affiliate-bot-txt {
 	line-height: 25px;
@@ -17765,9 +17785,10 @@ ul.cannt-ul li span {
 	width: 100%;
 	vertical-align: middle;
 	color: #D32700;
-	font-size: 17px;
+	font-size: 16px;
 	line-height: 21px;
-	font-family: 'source_sans_proSBdIt', Arial;
+	letter-spacing: -0.1px;
+	font-family: 'Open Sans Semibold Italic', Arial;
 	padding-left: 47px;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
@@ -18042,10 +18063,11 @@ a.contact-new-button:hover {
 	overflow: hidden;
 }
 .dev-new-app-header {
-	font-size: 17px;
+	font-size: 16px;
 	line-height: 24px;
+	letter-spacing: -0.1px;
 	color: #BF1900;
-	font-family: 'source_sans_proSBdIt', Arial;
+	font-family: 'Open Sans Semibold Italic', Arial;
 	padding: 13px 10px;
 }
 .dev-new-appplications-table table {
@@ -18256,8 +18278,9 @@ code, c {
 	margin-left: 28px;
 }
 span.roman-number {
-	font-family: 'source_sans_proSBdIt', Arial;
-	font-size: 17px;
+	font-family: 'Open Sans Semibold Italic', Arial;
+	font-size: 16px;
+	letter-spacing: -0.1px;
 	color: #D32400;
 	float: left;
 	display: block;
@@ -18483,10 +18506,11 @@ h1.help-home-header {
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	color: #BF1900;
-	font-size: 17px;
+	font-size: 16px;
 	line-height: 24px;
+	letter-spacing: -0.1px;
 	padding: 10px 20px 0 47px;
-	font-family: 'source_sans_proSBdIt', Arial;
+	font-family: 'Open Sans Semibold Italic', Arial;
 	background-image: url(../images/mega/help-new-sprite-v1.png);
 	background-position: 0 0;
 	background-repeat: no-repeat;
@@ -18549,7 +18573,9 @@ h1.help-home-header {
 	font-family: 'source_sans_prosemibold', Arial;
 }
 .new-bottom-pages .help-info-pages p strong.italic, .new-bottom-pages .help-info-pages p i {
-	font-family: 'source_sans_proSBdIt', Arial;
+	font-family: 'Open Sans Semibold Italic', Arial;
+	letter-spacing: -0.1px;
+	font-size: 13px;
 	font-style: normal;
 }
 .new-bottom-pages .help-info-pages li p {
@@ -18672,9 +18698,10 @@ h1.help-home-header {
 .st-top-italic-txt {
 	text-align: center;
 	color: #333333;
-	font-size: 17px;
+	font-size: 16px;
 	line-height: 24px;
-	font-family: 'source_sans_proSBdIt', Arial;
+	letter-spacing: -0.1px;
+	font-family: 'Open Sans Semibold Italic', Arial;
 }
 .st-top-red-txt {
 	text-align: center;

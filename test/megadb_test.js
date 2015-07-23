@@ -1,19 +1,23 @@
+/**
+ * @fileOverview
+ * MegaDB unit tests.
+ */
+
 describe("MegaDB - Unit Test", function() {
-    var mdb;
-    var megaDataMocker;
+    "use strict";
 
+    var assert = chai.assert;
 
-    beforeEach(function(done) {
-        window.u_handle = "A_1234567890";
-        window.u_privk = asmCrypto.bytes_to_string(asmCrypto.hex_to_bytes('0f0e0d0c0b0a09080706050403020100'));
+    // Create/restore Sinon stub/spy/mock sandboxes.
+    var sandbox = null;
 
-        megaDataMocker = new MegaDataMocker();
+    var mdb = null;
+    var msdb = null;
 
-        localStorage.clear();
-
+    var makeTestDB = function() {
         var schema = {
             people: {
-                key: { keyPath: 'id' , autoIncrement: true },
+                key: { keyPath: 'id', autoIncrement: true },
                 // Optionally add indexes
                 indexes: {
                     firstName: { },
@@ -21,32 +25,120 @@ describe("MegaDB - Unit Test", function() {
                 }
             }
         };
-        mdb = new MegaDB("test", "unit", 1, schema);
+
+        try {
+            if (typeof indexedDB === 'undefined') {
+                throw 'No indexedDB support.';
+            }
+            mdb = new MegaDB("test", "unit", schema);
+            mdb.logger.isEnabled = false;
+        }
+        catch (ex) {
+            console.error(ex);
+            throw ex;
+        }
         window.mdb = mdb; // debug helper
+
+        // Silence the logger.
+        sandbox.stub(mdb.logger, '_log');
+    };
+
+    beforeEach(function(done) {
+        sandbox = sinon.sandbox.create();
+        sandbox.stub(window, 'u_handle', "A_123456789");
+        sandbox.stub(window, 'u_sid', "c5N5zoeMFzja_tScIA3QQVo2aWpwS0NsT184ggY0ta9BlkYxFfmIDdkvig");
+        // 25519 keys mocker
+        sandbox.stub(window, 'u_pubEd25519', atob('11qYAYKxCrfVS/7TyWQHOg7hcvPapiMlrwIaaPcHURo='));
+        sandbox.stub(window, 'pubEd25519', {
+            'A_123456789': atob('11qYAYKxCrfVS/7TyWQHOg7hcvPapiMlrwIaaPcHURo=')
+        });
+        sandbox.stub(crypt, 'getPubEd25519', function(h, cb) {
+            pubEd25519[h] = atob('11qYAYKxCrfVS/7TyWQHOg7hcvPapiMlrwIaaPcHURo=');
+
+            cb({pubkey: pubEd25519[h], authenticated: false}, h);
+        });
+        sandbox.stub(window, 'u_privEd25519', atob('nWGxne/9WmC6hEr0kuwsxERJxWl7MmkZcDusAxyuf2A='));
+        sandbox.stub(window, 'u_k', [4222562981, 1974701603, 3975828479, 1142305397]);
+        sandbox.stub(window, 'avatars', {});
+        sandbox.stub(window, 'M', {
+            'u': {
+                "A_123456789": {
+                    "u": "A_123456789", "c": 2, "m": "lpetrov@me.com",
+                    "presence": "chat", "name": "lyubomir.Zetrov@mega.co.nz",
+                    "presenceMtime": 1391783363.743, "h": "A_123456789"
+                },
+                "B_123456789": {
+                    "u": "B_123456789", "c": 1, "m": "lp@mega.co.nz",
+                    "ts": 1390835777, "name": "lyubomir.Xetrov@mega.co.nz",
+                    "h": "B_123456789", "t": 1, "p": "B_123456789",
+                    "presence": "chat", "presenceMtime": 1392042647
+                }
+            },
+            'd': {
+                'd1123456': {"h": "d1123456", "p": "ROOTID", "u": "A_123456789",
+                             "t": 1, "a": "aFAWhoQFmmLYXUK5VZpswJByb6ICMBIxjnfjz_IBpa8",
+                             "k": "A_123456789:Qof93iBM8wG6rRJNCiCnwg",
+                             "ts": 1384600611,
+                             "key": [1919488715, 1389955760, 1439516433, 407573463],
+                             "ar": {"n": "dir1"}, "name": "dir1"},
+                'd2123456': {"h": "d2123456", "p": "ROOTID", "u": "A_123456789",
+                             "t": 1, "a": "aFAWhoQFmmLYXUK5VZpswJByb6ICMBIxjnfjz_IBpa8",
+                             "k": "A_123456789:Qof93iBM8wG6rRJNCiCnwg", "ts": 1384600611,
+                             "key": [1919488715, 1389955760, 1439516433, 407573463],
+                             "ar": {"n": "dir2"}, "name": "dir2"},
+                'f1123456': {"h": "f1123456", "p": "ROOTID", "u": "A_123456789",
+                             "t": 1, "a": "aFAWhoQFmmLYXUK5VZpswJByb6ICMBIxjnfjz_IBpa8",
+                             "k": "A_123456789:Qof93iBM8wG6rRJNCiCnwg", "ts": 1384600611,
+                             "key": [1919488715, 1389955760, 1439516433, 407573463],
+                             "ar":{"n": "file1"}, "name": "file1"},
+                'f2123456': {"h":  "f2123456", "p": "ROOTID", "u": "A_123456789",
+                             "t": 1, "a": "aFAWhoQFmmLYXUK5VZpswJByb6ICMBIxjnfjz_IBpa8",
+                             "k": "A_123456789:Qof93iBM8wG6rRJNCiCnwg", "ts": 1384600611,
+                             "key": [1919488715, 1389955760, 1439516433, 407573463],
+                             "ar": {"n": "file2"}, "name": "file2"},
+                'cf112345': {"h": "cf112345", "p": "d1123456", "u": "A_123456789",
+                             "t": 1, "a": "aFAWhoQFmmLYXUK5VZpswJByb6ICMBIxjnfjz_IBpa8",
+                             "k": "A_123456789:Qof93iBM8wG6rRJNCiCnwg", "ts": 1384600611,
+                             "key": [1919488715, 1389955760, 1439516433, 407573463],
+                             "ar": {"n": "dir1 file1"}, "name": "dir1 file1"}
+            },
+            'RootID': 'ROOTID'
+        });
+
+        localStorage.clear();
 
         done();
     });
 
 
     afterEach(function(done) {
-        megaDataMocker.restore();
-
         localStorage.clear();
 
-        mdb.drop()
-            .fail(function() {
-                fail("db not dropped: ", toArray(arguments));
-            })
-            .then(function() {
-                done();
-            });
-        return;
+        // Only drop if we do have a DB.
+        if (mdb !== null) {
+            mdb.drop()
+                .fail(function() {
+                    fail("db not dropped: ", toArray(arguments));
+                });
+            mdb = null;
+        }
 
+        // Only drop if we do have an encrypted DB.
+        if (msdb !== null) {
+            msdb.db.drop()
+                   .fail(function() {
+                       fail("db not dropped: ", toArray(arguments));
+                   });
+            msdb = null;
+        }
         done();
+
+        sandbox.restore();
     });
 
 
     it("add, get, remove", function(done) {
+        makeTestDB();
         mdb.add("people", {
             'firstName': "John",
             'lastName': "Doe",
@@ -68,7 +160,7 @@ describe("MegaDB - Unit Test", function() {
                                 mdb.remove("people", 1)
                                     .then(function() {
                                         mdb.get("people", 1).then(function(obj) {
-                                            if(obj.length === 0) {
+                                            if (obj.length === 0) {
                                                 done();
                                             } else {
                                                 fail("person with id 1 not removed.");
@@ -76,7 +168,7 @@ describe("MegaDB - Unit Test", function() {
                                         }, function() {
                                             fail("person with id 1 not removed.");
                                         });
-                                    },function() {
+                                    }, function() {
                                         fail("could not remove obj with id 1");
                                     });
                             },
@@ -84,7 +176,7 @@ describe("MegaDB - Unit Test", function() {
                                 fail("could not get obj with id 1");
                             }
                         );
-                    },function() {
+                    }, function() {
                         fail("Could not add person 2");
                     });
             }, function() {
@@ -93,6 +185,7 @@ describe("MegaDB - Unit Test", function() {
     });
 
     it(".query, .filter, .update (single row)", function(done) {
+        makeTestDB();
         mdb.add("people", {
             'firstName': "John",
             'lastName': "Doe",
@@ -136,6 +229,7 @@ describe("MegaDB - Unit Test", function() {
     });
 
     it(".query, .filter, .modify (all matched rows)", function(done) {
+        makeTestDB();
         mdb.add("people", {
             'firstName': "John",
             'lastName': "Doe",
@@ -171,6 +265,7 @@ describe("MegaDB - Unit Test", function() {
     });
 
     it(".remove(table, obj), .addOrUpdate(table, obj)", function(done) {
+        makeTestDB();
         var obj1 = {
             'id': "johnDoe1",
             'firstName': "John",
@@ -231,6 +326,7 @@ describe("MegaDB - Unit Test", function() {
     });
 
     it(".remove(table, array[Obj]), .addOrUpdate(table, array[Obj])", function(done) {
+        makeTestDB();
         var obj1 = {
             'id': "johnDoe1",
             'firstName': "John",
@@ -272,7 +368,39 @@ describe("MegaDB - Unit Test", function() {
 
                     }).fail(function() {
                         fail("could not get obj with answer=12");
+                    });
+            });
+    });
+
+    it('can encrypt, mStorageDB', function(done) {
+        msdb = new mStorageDB('encTest');
+        msdb.addSchemaHandler('people', 'h', function() {
+            console.error('people schema handler', arguments);
+        });
+
+        // Don't know how to (easily) stub out the logger created for the
+        // mDBEncryptionPlugin through the MegaDB constructor in the start() call.
+        msdb.setup()
+            .done(function(db) {
+                // Silence the logger.
+                sandbox.stub(msdb.db.logger, '_log');
+                expect(db.dbName).to.eql("mdb_encTest_A_123456789");
+                expect(db.flags & MegaDB.DB_FLAGS.HASNEWENCKEY).to.eql(MegaDB.DB_FLAGS.HASNEWENCKEY);
+
+                var data = { h: 'xGtrEHoT', name: 'John' };
+                msdb.add("people", data)
+                    .done(function(rr) {
+                        expect(rr.length).to.eql(1);
+                        expect(rr[0].h).to.eql(data.h); // keyPath is NOT encrypted
+                        expect(rr[0].name).to.not.eql(data.name); // name must be encrypted
+                        done();
                     })
+                    .fail(function() {
+                        fail("Failed to add");
+                    });
+            })
+            .fail(function() {
+                fail('Failed to setup database.');
             });
     });
 });

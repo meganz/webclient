@@ -93,7 +93,7 @@
         "jscs-jsdoc"
     ],
     "jsDoc": {
-        "checkAnnotations": "jsdoc3",
+        "checkAnnotations": true,
         "checkParamNames": true,
         "checkRedundantParams": true,
         "checkRedundantReturns": true,

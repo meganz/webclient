@@ -62,10 +62,10 @@
 	font-style: normal;
 }
 body, td, th {
-	font-family: 'source_sans_proregular', Arial, Helvetica, sans-serif;
 	font-size: 13px;
 	color: #333333;
 	line-height: 15px;
+	font-family: 'source_sans_proregular';
 }
 body.dragging * {
 	cursor: url(../images/mega/cursor1.png), auto !important
@@ -131,10 +131,10 @@ body {
 	font-style: italic;
 }
 a, a:link, a:visited, a:hover, a:active {
-	font-family: 'source_sans_proregular', Arial, Helvetica, sans-serif;
 	color: #333333;
 	outline: none;
 	text-decoration: none;
+	font-family: 'source_sans_proregular';
 }
 strong {
 	font-weight: normal;
@@ -226,7 +226,6 @@ a, a:link, a:visited, a:hover, a:active, a:focus img, a:focus img {
 	-moz-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
-	font-family: 'source_sans_proregular', Arial, Helvetica;
 	font-size: 14px;
 	line-height: 23px;
 	color: #605F5D;
@@ -274,7 +273,6 @@ a.nlanguage-lnk:hover .nlanguage-tooltip {
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
 	font-size: 14px;
-	font-family: 'source_sans_proregular', Arial, Helvetica;
 	line-height: 24px;
 	color: white;
 	padding: 0 5px 0 10px;
@@ -295,7 +293,6 @@ a.nlanguage-lnk:hover .nlanguage-tooltip {
 	color: #5F5F5D;
 	font-size: 14px;
 	line-height: 24px;
-	font-family: 'source_sans_proregular', Arial, Helvetica, sans-serif;
 	-moz-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
@@ -321,7 +318,6 @@ a.nlanguage-lnk:hover .nlanguage-tooltip {
 	float: right;
 	font-size: 14px;
 	color: #6C9D3F;
-	font-family: 'source_sans_proregular', Arial, Helvetica, sans-serif;
 	line-height: 25px;
 	display: none;
 }
@@ -546,7 +542,6 @@ label span.black {
 	width: 423px;
 }
 .select_box option {
-	font-family: 'source_sans_proregular', Arial, Helvetica, sans-serif;
 	font-size: 14px;
 	line-height: 16px;
 	color: #888787;
@@ -558,7 +553,6 @@ label span.black {
 .select_box span.select-txt {
 	position: absolute;
 	left: 10px;
-	font-family: 'source_sans_proregular', Arial, Helvetica, sans-serif;
 	font-size: 14px;
 	line-height: 25px;
 	color: #888787;
@@ -584,7 +578,6 @@ label span.black {
 	opacity: 0;
 	width: 973px;
 	height: 30px;
-	font-family: 'source_sans_proregular', Arial, Helvetica, sans-serif;
 	font-size: 13px;
 	line-height: 16px;
 	color: #888787;
@@ -667,7 +660,6 @@ label span.black {
 	font-size: 14px;
 	line-height: 16px;
 	color: white;
-	font-family: 'source_sans_proregular', Arial, Helvetica, sans-serif;
 	float: right;
 	display: block;
 	background-color: #a3a3a3;
@@ -685,7 +677,6 @@ a.account-manage-button:hover {
 	font-size: 14px;
 	line-height: 16px;
 	color: #6c6d6f;
-	font-family: 'source_sans_proregular', Arial, Helvetica, sans-serif;
 	padding: 0 0 0 0;
 }
 .transfer-settings .account-bandwidth-txt {
@@ -695,11 +686,9 @@ a.account-manage-button:hover {
 	color: #38393D;
 	font-size: 19px;
 	line-height: 23px;
-	font-family: 'source_sans_proregular', Arial, Helvetica, sans-serif;
 	padding-bottom: 7px;
 }
 .account-tooltip-txt2 {
-	font-family: 'source_sans_proregular', Arial, Helvetica, sans-serif;
 	font-size: 14px;
 	line-height: 21px;
 	color: #727375;
@@ -728,7 +717,6 @@ a.account-manage-button:hover {
 	color: #38393D;
 	font-size: 17px;
 	line-height: 23px;
-	font-family: 'source_sans_proregular', Arial, Helvetica, sans-serif;
 	padding: 35px 0 15px 0;
 }
 .account-set-bg1 {
@@ -807,7 +795,6 @@ a.account-manage-button:hover {
 	-moz-border-radius: 5px;
 	-webkit-border-radius: 5px;
 	border-radius: 5px;
-	font-family: 'source_sans_proregular', Arial, Helvetica, sans-serif;
 	text-align: center;
 	box-sizing: border-box;
 }
@@ -820,7 +807,6 @@ a.account-manage-button:hover {
 	color: #999999;
 	font-size: 14px;
 	line-height: 28px;
-	font-family: 'source_sans_proregular', Arial, Helvetica, sans-serif;
 }
 .account-italic-txt {
 	font-style: italic;
@@ -1144,7 +1130,6 @@ input.radioOn, input.radioOff {
 	font-size: 13px;
 	line-height: 17px;
 	color: #666666;
-	font-family: 'source_sans_proregular', Arial, Helvetica, sans-serif;
 	padding-right: 25px;
 	padding-top: 7px;
 }
@@ -1170,7 +1155,6 @@ input.radioOn, input.radioOff {
 .terms-main {
 	color: #595959;
 	font-size: 15px;
-	font-family: 'source_sans_proregular', Arial, Helvetica, sans-serif;
 	line-height: 23px;
 }
 .terms-dialog .terms-main {
@@ -1190,7 +1174,6 @@ input.radioOn, input.radioOff {
 .slingshot-main {
 	color: #595959;
 	font-size: 15px;
-	font-family: 'source_sans_proregular', Arial, Helvetica, sans-serif;
 	line-height: 23px;
 }
 .slingshot-dialog .slingshot-main {
@@ -1215,7 +1198,6 @@ input.radioOn, input.radioOff {
 	font-size: 15px;
 	line-height: 23px;
 	color: #38393D;
-	font-family: 'source_sans_proregular', Arial, Helvetica, sans-serif;
 	background-position: -16px -1px;
 	background-image: url(../images/mega/dev-point.png);
 	background-repeat: no-repeat;
@@ -1225,7 +1207,6 @@ input.radioOn, input.radioOff {
 .blog-article h2 {
 	padding: 0;
 	margin: 0;
-	font-family: 'source_sans_proregular', Arial, Helvetica, sans-serif;
 	font-size: 21px;
 	line-height: 29px;
 	color: #505050;
@@ -1237,7 +1218,6 @@ input.radioOn, input.radioOff {
 	background-image: url(../images/mega/account_sprite.png);
 	background-position: left -1094px;
 	background-repeat: no-repeat;
-	font-family: 'source_sans_proregular', Arial, Helvetica, sans-serif;
 	font-size: 15px;
 	line-height: 24px;
 	color: #68696b;
@@ -1245,7 +1225,6 @@ input.radioOn, input.radioOff {
 	float: left;
 }
 .blog-short-content {
-	font-family: 'source_sans_proregular', Arial, Helvetica, sans-serif;
 	font-size: 15px;
 	line-height: 24px;
 	color: #414646;
@@ -1295,7 +1274,6 @@ input.radioOn, input.radioOff {
 	color: white;
 	font-size: 15px;
 	line-height: 26px;
-	font-family: 'source_sans_proregular', Arial, Helvetica, sans-serif;
 	-moz-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
@@ -1314,7 +1292,6 @@ a.blog-button:hover {
 	color: white;
 	font-size: 15px;
 	line-height: 26px;
-	font-family: 'source_sans_proregular', Arial, Helvetica, sans-serif;
 	-moz-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
@@ -1329,7 +1306,6 @@ a.blog-button:hover {
 .blog-article p {
 	padding: 0 0 20px 0;
 	margin: 0;
-	font-family: 'source_sans_proregular', Arial, Helvetica, sans-serif;
 	font-size: 15px;
 	line-height: 24px;
 	color: #414646;
@@ -1693,7 +1669,6 @@ a.blog-button:hover {
 }
 .notification-info {
 	display: block;
-	font-family: 'source_sans_proregular', Arial, Helvetica, sans-serif;
 	font-size: 14px;
 	color: #666666;
 	padding: 0;
@@ -1742,7 +1717,6 @@ a.blog-button:hover {
 }
 .notification-date {
 	display: block;
-	font-family: 'source_sans_proregular', Arial, Helvetica, sans-serif;
 	font-size: 12px;
 	color: #999999;
 	line-height: 16px;
@@ -1812,7 +1786,6 @@ body.notification-body {
 	display: block;
 	font-size: 23px;
 	line-height: 24px;
-	font-family: 'source_sans_proregular', Arial, Helvetica, sans-serif;
 	text-align: center;
 	color: white;
 	padding: 4px 0 0 0;
@@ -1821,7 +1794,6 @@ body.notification-body {
 	display: block;
 	font-size: 13px;
 	line-height: 12px;
-	font-family: 'source_sans_proregular', Arial, Helvetica, sans-serif;
 	text-align: center;
 	color: white;
 	text-transform: uppercase;
@@ -1877,7 +1849,6 @@ body.notification-body {
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	font-family: 'source_sans_proregular', Arial, Helvetica, sans-serif;
 	padding: 0;
 }
 .nt-red-bar {
@@ -1886,7 +1857,6 @@ body.notification-body {
 	padding: 15px 15px 16px 16px;
 	font-size: 15px;
 	font-weight: normal;
-	font-family: 'source_sans_proregular', Arial, Helvetica, sans-serif;
 	line-height: 19px;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
@@ -1919,7 +1889,6 @@ a.nt-back-button:hover {
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	line-height: 29px;
-	font-family: 'source_sans_proregular', Arial, Helvetica, sans-serif;
 	color: #363636;
 	box-sizing: border-box;
 	font-size: 14px;
@@ -2286,7 +2255,6 @@ form {
 	float: left;
 }
 .new-bottom-pages .blog-new-item p {
-	font-family: 'source_sans_proregular', Arial, Helvetica, sans-serif;
 	padding-left: 281px;
 	font-size: 14px;
 	line-height: 24px;
@@ -2405,7 +2373,6 @@ p a.blog-new-read-more:hover {
 	background-color: white;
 	width: 100%;
 	outline: none;
-	font-family: 'source_sans_proregular', Arial, Helvetica, sans-serif;
 	font-size: 14px;
 	line-height: 26px;
 	color: #7F7E7F;
@@ -2421,7 +2388,6 @@ a.blog-new-archive-lnk {
 	font-size: 14px;
 	line-height: 24px;
 	color: #3F4646;
-	font-family: 'source_sans_proregular', Arial, Helvetica, sans-serif;
 	margin-top: 10px;
 }
 .blog-search-header {
@@ -2748,7 +2714,6 @@ a.blog-new-archive-lnk {
 .blog-new-full ul li, .sync li, .affiliate li, .pro li {
 	margin: 0;
 	padding: 0 0 18px 20px;
-	font-family: 'source_sans_proregular', Arial, Helvetica, sans-serif;
 	font-size: 14px;
 	line-height: 28px;
 	color: #3F4646;
@@ -4777,7 +4742,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	padding: 0 8px;
 	color: rgba(255,255,255,0.7);
 	text-transform: uppercase;
-	font-family: 'source_sans_proregular', Arial, Helvetica, sans-serif;
 	font-size: 13px;
 	-webkit-transition: all 200ms ease-in-out;
 	-moz-transition: all 200ms ease-in-out;
@@ -4812,7 +4776,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	display: block;
 	line-height: 24px;
 	color: rgba(255,255,255,0.7);
-	font-family: 'source_sans_proregular', Arial, Helvetica, sans-serif;
 	font-size: 14px;
 	cursor: pointer;
 }
@@ -5013,10 +4976,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	width: 100%;
 	line-height: 23px;
 	color: black;
-	font-size: 13px;
+	font-size: 14px;
 	margin: 0;
 	padding: 0;
-	font-family: 'source_sans_proregular', Arial, Helvetica, sans-serif;
 	background-color: transparent;
 }
 .fm-main {
@@ -12107,7 +12069,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
 	position: absolute;
 	bottom: 24px;
 	width: 320px;
-	font-family: 'source_sans_proregular', Arial, Helvetica, sans-serif;
 	right: -30px;
 	display: none;
 	text-align: center;
@@ -13435,7 +13396,6 @@ table {
 	line-height: 24px;
 	padding: 10px 0 10px 0;
 	color: #666666;
-	font-family: 'source_sans_proregular', Arial, Helvetica, sans-serif;
 	-moz-border-radius: 24px;
 	-webkit-border-radius: 24px;
 	border-radius: 24px;
@@ -14861,7 +14821,6 @@ h5.main-italic-header {
 	display: block;
 	color: white;
 	padding: 9px 0 0 24px;
-	font-family: 'source_sans_proregular';
 }
 .membership-date .day {
 	text-align: center;
@@ -15099,14 +15058,12 @@ h5.main-italic-header {
 	font-family: 'source_sans_prolight';
 }
 .membership-bott-price strong span {
-	font-family: 'source_sans_proregular';
 }
 .membership-bott-price span {
 	font-size: 36px;
 	padding-right: 10px;
 }
 .membership-bott-price span.period {
-	font-family: 'source_sans_proregular';
 	color: #999999;
 }
 .membership-bott-descr {
@@ -15176,7 +15133,6 @@ div.membership-bott-button {
 	font-size: 16px;
 	line-height: 32px;
 	text-transform: uppercase;
-	font-family: 'source_sans_proregular';
 }
 .reg-st3-button {
 	width: 205px;
@@ -15210,7 +15166,6 @@ div.membership-bott-button {
 	display: none;
 }
 .membership-new-offer text {
-	font-family: 'source_sans_proregular';
 	font-weight: normal;
 }
 .membership-step2 .pro4 .membership-new-offer {
@@ -15228,7 +15183,6 @@ div.membership-bott-button {
 	color: white;
 	text-align: center;
 	padding: 56px 10px 0 10px;
-	font-family: 'source_sans_proregular';
 }
 .pro4 .reg-st3-bott-title.title {
 	font-family: 'source_sans_proextralight';
@@ -15237,7 +15191,6 @@ div.membership-bott-button {
 	font-family: 'source_sans_prolight';
 }
 .pro2 .reg-st3-bott-title.title {
-	font-family: 'source_sans_proregular';
 }
 .pro3 .reg-st3-bott-title.title {
 	font-family: 'source_sans_prosemibold';
@@ -15645,7 +15598,6 @@ div.membership-bott-button {
 }
 .new-download-file-size {
 	font-size: 13px;
-	font-family: 'source_sans_proregular';
 	padding-top: 5px;
 	color: #666666;
 }
@@ -15844,7 +15796,6 @@ div.membership-bott-button {
 	-o-transition: color 20ms ease-in-out;
 	-ms-transition: color 20ms ease-in-out;
 	transition: color 20ms ease-in-out;
-	font-family: 'source_sans_proregular';
 }
 .new-download-gray-button:hover .new-download-button-txt2, .new-download-sync-app:hover .new-download-button-txt2 {
 	color: rgba(255,255,255,1);
@@ -17741,7 +17692,6 @@ ul.cannt-ul li span {
 	box-sizing: border-box;
 	resize: none;
 	outline: none;
-	font-family: 'source_sans_proregular', Arial, Helvetica, sans-serif;
 }
 .new-affiliate-label.textarea-label {
 	padding-top: 30px;
@@ -19851,7 +19801,6 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 	text-align: center;
 	line-height: 24px;
 	padding-top: 22px;
-	font-family: 'source_sans_proregular';
 	width: 79px;
 	margin-left: -100px;
 	display: none;
@@ -19955,7 +19904,6 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 .backup-notification-txt {
 	font-size: 13px;
 	color: white;
-	font-family: 'source_sans_proregular';
 	height: 90px;
 	vertical-align: middle;
 	line-height: 16px;
@@ -21434,7 +21382,6 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
 }
 .token-input-dropdown-mega .fm-chat-user {
 	color: #666666;
-	font-family: 'source_sans_proregular';
 }
 .token-input-dropdown-mega .fm-chat-user-email {
 	color: #999999;
@@ -23161,7 +23108,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 	color: #9B9B9B;
 	letter-spacing: .1px;
 	line-height: 20px;
-	font-family: 'source_sans_proregular';
 }
 a.voucher-reseller-link {
 	font-family: 'source_sans_probold';
@@ -23513,7 +23459,6 @@ a.voucher-reseller-link {
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	font-family: 'source_sans_proregular';
 	-webkit-transition: all 200ms ease-in-out;
 	-moz-transition: all 200ms ease-in-out;
 	-o-transition: all 200ms ease-in-out;
@@ -23571,7 +23516,6 @@ a.voucher-reseller-link {
 	font-size: 13px;
 	color: rgba(255,255,255,0.3);
 	padding-top: 2px;
-	font-family: 'source_sans_proregular';
 }
 body.pro:after {
 	display: none;
@@ -23634,7 +23578,6 @@ body.pro:after {
 	text-align: left;
 	white-space: nowrap;
 	border-left: 1px solid rgba(0,0,0,0.1);
-	font-family: 'source_sans_proregular';
 	font-weight: normal;
 }
 .megasync-table table td {
@@ -23712,7 +23655,6 @@ body.pro:after {
 	display: block;
 }
 .megasync-dropdown span, .megasync-dropdown-link {
-	font-family: 'source_sans_proregular';
 	padding: 0 30px 0 11px;
 	background-image: url(../images/mega/download-sprite-v2.png);
 	background-position: right -1811px;
@@ -23852,7 +23794,6 @@ body.pro:after {
 .bandwidth-dialog .nw-fm-dialog-title {
 	color: #999999;
 	font-size: 17px;
-	font-family: 'source_sans_proregular';
 	position: relative;
 	padding-top: 14px;
 }
@@ -23876,7 +23817,6 @@ body.pro:after {
 	font-size: 20px;
 	line-height: 34px;
 	text-align: center;
-	font-family: 'source_sans_proregular';
 	color: #333333;
 	padding: 22px 0 10px 0;
 }
@@ -23917,7 +23857,6 @@ body.pro:after {
 	font-size: 15px;
 	color: #666666;
 	margin: 25px 28px 34px 0;
-	font-family: 'source_sans_proregular';
 }
 .bandwidth-text-bl.first {
 	margin: 25px 48px 34px 44px;
@@ -23946,7 +23885,6 @@ body.pro:after {
 }
 .bandwidth-red-txt {
 	font-size: 14px;
-	font-family: 'source_sans_proregular';
 	text-align: center;
 	height: 68px;
 	margin-top: -3px;
@@ -23973,7 +23911,6 @@ body.pro:after {
 	padding: 2px 0 4px 20px;
 	z-index: 10;
 	cursor: pointer;
-	font-family: 'source_sans_proregular';
 	-webkit-transition: opacity 200ms ease-in-out;
 	-moz-transition: opacity 200ms ease-in-out;
 	-o-transition: opacity 200ms ease-in-out;

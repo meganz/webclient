@@ -189,10 +189,6 @@ module.exports = function(config) {
 
     // If browser does not capture in given timeout [ms], kill it
     captureTimeout: 120000,
-    browserNoActivityTimeout: 120000,
-
-    // Continuous Integration mode.
-    // If true, it capture browsers, run tests and exit.
-    singleRun: false
+    browserNoActivityTimeout: 120000
   });
 };

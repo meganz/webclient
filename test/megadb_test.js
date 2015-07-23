@@ -6,7 +6,10 @@
 describe("MegaDB - Unit Test", function() {
     "use strict";
 
-    var assert = chai.assert;
+    var _isPhantomJS = false;
+    if (typeof(window) !== 'undefined' && /PhantomJS/.test(window.navigator.userAgent)) {
+        _isPhantomJS = true;
+    }
 
     // Create/restore Sinon stub/spy/mock sandboxes.
     var sandbox = null;
@@ -54,7 +57,6 @@ describe("MegaDB - Unit Test", function() {
         });
         sandbox.stub(crypt, 'getPubEd25519', function(h, cb) {
             pubEd25519[h] = atob('11qYAYKxCrfVS/7TyWQHOg7hcvPapiMlrwIaaPcHURo=');
-
             cb({pubkey: pubEd25519[h], authenticated: false}, h);
         });
         sandbox.stub(window, 'u_privEd25519', atob('nWGxne/9WmC6hEr0kuwsxERJxWl7MmkZcDusAxyuf2A='));
@@ -185,6 +187,10 @@ describe("MegaDB - Unit Test", function() {
     });
 
     it(".query, .filter, .update (single row)", function(done) {
+        if (_isPhantomJS) {
+            done();
+            return;
+        }
         makeTestDB();
         mdb.add("people", {
             'firstName': "John",
@@ -229,6 +235,10 @@ describe("MegaDB - Unit Test", function() {
     });
 
     it(".query, .filter, .modify (all matched rows)", function(done) {
+        if (_isPhantomJS) {
+            done();
+            return;
+        }
         makeTestDB();
         mdb.add("people", {
             'firstName': "John",
@@ -265,6 +275,10 @@ describe("MegaDB - Unit Test", function() {
     });
 
     it(".remove(table, obj), .addOrUpdate(table, obj)", function(done) {
+        if (_isPhantomJS) {
+            done();
+            return;
+        }
         makeTestDB();
         var obj1 = {
             'id': "johnDoe1",
@@ -326,6 +340,10 @@ describe("MegaDB - Unit Test", function() {
     });
 
     it(".remove(table, array[Obj]), .addOrUpdate(table, array[Obj])", function(done) {
+        if (_isPhantomJS) {
+            done();
+            return;
+        }
         makeTestDB();
         var obj1 = {
             'id': "johnDoe1",
@@ -373,6 +391,10 @@ describe("MegaDB - Unit Test", function() {
     });
 
     it('can encrypt, mStorageDB', function(done) {
+        if (_isPhantomJS) {
+            done();
+            return;
+        }
         msdb = new mStorageDB('encTest');
         msdb.addSchemaHandler('people', 'h', function() {
             console.error('people schema handler', arguments);
@@ -380,6 +402,7 @@ describe("MegaDB - Unit Test", function() {
 
         // Don't know how to (easily) stub out the logger created for the
         // mDBEncryptionPlugin through the MegaDB constructor in the start() call.
+        sandbox.stub(console, 'info');
         msdb.setup()
             .done(function(db) {
                 // Silence the logger.

@@ -5550,7 +5550,9 @@ function transferPanelUI()
     $.transferClose = function() {
         $('.nw-fm-left-icon.transfers').removeClass('active');
         $('.fmholder').removeClass('transfer-panel-opened');
-        $(window).trigger('resize');
+        setTimeout(function() {
+            $(window).trigger('resize');
+        }, 200);
     };
 
     $.transferOpen = function(force) {

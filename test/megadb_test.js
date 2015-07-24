@@ -3,7 +3,7 @@
  * MegaDB unit tests.
  */
 
-describe("MegaDB - Unit Test", function() {
+describe("MegaDB unit test", function() {
     "use strict";
 
     var _isPhantomJS = false;
@@ -17,35 +17,6 @@ describe("MegaDB - Unit Test", function() {
     var mdb = null;
     var msdb = null;
 
-    var makeTestDB = function() {
-        var schema = {
-            people: {
-                key: { keyPath: 'id', autoIncrement: true },
-                // Optionally add indexes
-                indexes: {
-                    firstName: { },
-                    answer: { }
-                }
-            }
-        };
-
-        try {
-            if (typeof indexedDB === 'undefined') {
-                throw 'No indexedDB support.';
-            }
-            mdb = new MegaDB("test", "unit", schema);
-            mdb.logger.isEnabled = false;
-        }
-        catch (ex) {
-            console.error(ex);
-            throw ex;
-        }
-        window.mdb = mdb; // debug helper
-
-        // Silence the logger.
-        sandbox.stub(mdb.logger, '_log');
-    };
-
     beforeEach(function(done) {
         sandbox = sinon.sandbox.create();
         sandbox.stub(window, 'u_handle', "A_123456789");
@@ -57,6 +28,7 @@ describe("MegaDB - Unit Test", function() {
         });
         sandbox.stub(crypt, 'getPubEd25519', function(h, cb) {
             pubEd25519[h] = atob('11qYAYKxCrfVS/7TyWQHOg7hcvPapiMlrwIaaPcHURo=');
+
             cb({pubkey: pubEd25519[h], authenticated: false}, h);
         });
         sandbox.stub(window, 'u_privEd25519', atob('nWGxne/9WmC6hEr0kuwsxERJxWl7MmkZcDusAxyuf2A='));
@@ -79,8 +51,7 @@ describe("MegaDB - Unit Test", function() {
             'd': {
                 'd1123456': {"h": "d1123456", "p": "ROOTID", "u": "A_123456789",
                              "t": 1, "a": "aFAWhoQFmmLYXUK5VZpswJByb6ICMBIxjnfjz_IBpa8",
-                             "k": "A_123456789:Qof93iBM8wG6rRJNCiCnwg",
-                             "ts": 1384600611,
+                             "k": "A_123456789:Qof93iBM8wG6rRJNCiCnwg", "ts": 1384600611,
                              "key": [1919488715, 1389955760, 1439516433, 407573463],
                              "ar": {"n": "dir1"}, "name": "dir1"},
                 'd2123456': {"h": "d2123456", "p": "ROOTID", "u": "A_123456789",
@@ -109,38 +80,51 @@ describe("MegaDB - Unit Test", function() {
 
         localStorage.clear();
 
+        var schema = {
+            people: {
+                key: { keyPath: 'id' , autoIncrement: true },
+                // Optionally add indexes
+                indexes: {
+                    firstName: { },
+                    answer: { }
+                }
+            }
+        };
+        try {
+            if (typeof indexedDB === 'undefined') {
+                throw 'No indexedDB support.';
+            }
+            mdb = new MegaDB("test", "unit", schema);
+            mdb.logger.options.isEnabled = false;
+        }
+        catch(ex) {
+            console.error(ex);
+            throw ex;
+        }
+        window.mdb = mdb; // debug helper
+
         done();
     });
 
 
     afterEach(function(done) {
+        sandbox.restore();
         localStorage.clear();
 
-        // Only drop if we do have a DB.
-        if (mdb !== null) {
-            mdb.drop()
-                .fail(function() {
-                    fail("db not dropped: ", toArray(arguments));
-                });
-            mdb = null;
-        }
+        mdb.drop()
+            .fail(function() {
+                fail("db not dropped: ", toArray(arguments));
+            })
+            .then(function() {
+                done();
+            });
+        return;
 
-        // Only drop if we do have an encrypted DB.
-        if (msdb !== null) {
-            msdb.db.drop()
-                   .fail(function() {
-                       fail("db not dropped: ", toArray(arguments));
-                   });
-            msdb = null;
-        }
         done();
-
-        sandbox.restore();
     });
 
 
     it("add, get, remove", function(done) {
-        makeTestDB();
         mdb.add("people", {
             'firstName': "John",
             'lastName': "Doe",
@@ -187,11 +171,6 @@ describe("MegaDB - Unit Test", function() {
     });
 
     it(".query, .filter, .update (single row)", function(done) {
-        if (_isPhantomJS) {
-            done();
-            return;
-        }
-        makeTestDB();
         mdb.add("people", {
             'firstName': "John",
             'lastName': "Doe",
@@ -235,11 +214,6 @@ describe("MegaDB - Unit Test", function() {
     });
 
     it(".query, .filter, .modify (all matched rows)", function(done) {
-        if (_isPhantomJS) {
-            done();
-            return;
-        }
-        makeTestDB();
         mdb.add("people", {
             'firstName': "John",
             'lastName': "Doe",
@@ -275,11 +249,6 @@ describe("MegaDB - Unit Test", function() {
     });
 
     it(".remove(table, obj), .addOrUpdate(table, obj)", function(done) {
-        if (_isPhantomJS) {
-            done();
-            return;
-        }
-        makeTestDB();
         var obj1 = {
             'id': "johnDoe1",
             'firstName': "John",
@@ -340,11 +309,6 @@ describe("MegaDB - Unit Test", function() {
     });
 
     it(".remove(table, array[Obj]), .addOrUpdate(table, array[Obj])", function(done) {
-        if (_isPhantomJS) {
-            done();
-            return;
-        }
-        makeTestDB();
         var obj1 = {
             'id': "johnDoe1",
             'firstName': "John",
@@ -390,40 +354,38 @@ describe("MegaDB - Unit Test", function() {
             });
     });
 
-    it('can encrypt, mStorageDB', function(done) {
-        if (_isPhantomJS) {
-            done();
-            return;
-        }
-        msdb = new mStorageDB('encTest');
-        msdb.addSchemaHandler('people', 'h', function() {
-            console.error('people schema handler', arguments);
-        });
-
-        // Don't know how to (easily) stub out the logger created for the
-        // mDBEncryptionPlugin through the MegaDB constructor in the start() call.
-        sandbox.stub(console, 'info');
-        msdb.setup()
-            .done(function(db) {
-                // Silence the logger.
-                sandbox.stub(msdb.db.logger, '_log');
-                expect(db.dbName).to.eql("mdb_encTest_A_123456789");
-                expect(db.flags & MegaDB.DB_FLAGS.HASNEWENCKEY).to.eql(MegaDB.DB_FLAGS.HASNEWENCKEY);
-
-                var data = { h: 'xGtrEHoT', name: 'John' };
-                msdb.add("people", data)
-                    .done(function(rr) {
-                        expect(rr.length).to.eql(1);
-                        expect(rr[0].h).to.eql(data.h); // keyPath is NOT encrypted
-                        expect(rr[0].name).to.not.eql(data.name); // name must be encrypted
-                        done();
-                    })
-                    .fail(function() {
-                        fail("Failed to add");
-                    });
-            })
-            .fail(function() {
-                fail('Failed to setup database.');
+    if (!_isPhantomJS) {
+        it('can encrypt, mStorageDB', function(done) {
+            msdb = new mStorageDB('encTest');
+            msdb.addSchemaHandler('people', 'h', function() {
+                console.error('people schema handler', arguments);
             });
-    });
+
+            // Don't know how to (easily) stub out the logger created for the
+            // mDBEncryptionPlugin through the MegaDB constructor in the start() call.
+            sandbox.stub(console, 'info');
+            msdb.setup()
+                .done(function(db) {
+                    // Silence the logger.
+                    sandbox.stub(msdb.db.logger, '_log');
+                    expect(db.dbName).to.eql("mdb_encTest_A_123456789");
+                    expect(db.flags & MegaDB.DB_FLAGS.HASNEWENCKEY).to.eql(MegaDB.DB_FLAGS.HASNEWENCKEY);
+
+                    var data = { h: 'xGtrEHoT', name: 'John' };
+                    msdb.add("people", data)
+                        .done(function(rr) {
+                            expect(rr.length).to.eql(1);
+                            expect(rr[0].h).to.eql(data.h); // keyPath is NOT encrypted
+                            expect(rr[0].name).to.not.eql(data.name); // name must be encrypted
+                            done();
+                        })
+                        .fail(function() {
+                            fail("Failed to add");
+                        });
+                })
+                .fail(function() {
+                    fail('Failed to setup database.');
+                });
+        });
+    }
 });

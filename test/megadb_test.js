@@ -116,11 +116,20 @@ describe("MegaDB unit test", function() {
                 fail("db not dropped: ", toArray(arguments));
             })
             .then(function() {
-                done();
+                if (msdb) {
+                    msdb.db.drop()
+                        .done(function() {
+                            done();
+                        })
+                        .fail(function() {
+                            fail("Failed to drop msdb", toArray(arguments));
+                        });
+                    msdb = null;
+                }
+                else {
+                    done();
+                }
             });
-        return;
-
-        done();
     });
 
 
@@ -354,11 +363,11 @@ describe("MegaDB unit test", function() {
             });
     });
 
-    if (!_isPhantomJS) {
+    // if (!_isPhantomJS) {
         it('can encrypt, mStorageDB', function(done) {
             msdb = new mStorageDB('encTest');
             msdb.addSchemaHandler('people', 'h', function() {
-                console.error('people schema handler', arguments);
+                console.error('people schema handler -- this should not happen (the db must not exists)', arguments);
             });
 
             // Don't know how to (easily) stub out the logger created for the
@@ -367,7 +376,8 @@ describe("MegaDB unit test", function() {
             msdb.setup()
                 .done(function(db) {
                     // Silence the logger.
-                    sandbox.stub(msdb.db.logger, '_log');
+                    db.logger.options.isEnabled = false;
+
                     expect(db.dbName).to.eql("mdb_encTest_A_123456789");
                     expect(db.flags & MegaDB.DB_FLAGS.HASNEWENCKEY).to.eql(MegaDB.DB_FLAGS.HASNEWENCKEY);
 
@@ -387,5 +397,5 @@ describe("MegaDB unit test", function() {
                     fail('Failed to setup database.');
                 });
         });
-    }
+    // }
 });

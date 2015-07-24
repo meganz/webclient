@@ -16,6 +16,7 @@ describe("MegaDB unit test", function() {
 
     var mdb = null;
     var msdb = null;
+    var testCount = 0;
 
     beforeEach(function(done) {
         sandbox = sinon.sandbox.create();
@@ -94,7 +95,7 @@ describe("MegaDB unit test", function() {
             if (typeof indexedDB === 'undefined') {
                 throw 'No indexedDB support.';
             }
-            mdb = new MegaDB("test", "unit", schema);
+            mdb = new MegaDB("test" + (++testCount), "unit", schema);
             mdb.logger.options.isEnabled = false;
         }
         catch(ex) {
@@ -116,8 +117,8 @@ describe("MegaDB unit test", function() {
                 fail("db not dropped: ", toArray(arguments));
             })
             .then(function() {
-                if (msdb) {
-                    msdb.db.drop()
+                if (msdb && msdb.dbState === MegaDB.DB_STATE.INITIALIZED) {
+                    msdb.drop()
                         .done(function() {
                             done();
                         })
@@ -365,24 +366,26 @@ describe("MegaDB unit test", function() {
 
     // if (!_isPhantomJS) {
         it('can encrypt, mStorageDB', function(done) {
-            msdb = new mStorageDB('encTest');
-            msdb.addSchemaHandler('people', 'h', function() {
+            var sName = 'encTest-' + Math.random().toString(26);
+            var sdb = new mStorageDB(sName);
+            sdb.addSchemaHandler('people', 'h', function() {
                 console.error('people schema handler -- this should not happen (the db must not exists)', arguments);
             });
 
             // Don't know how to (easily) stub out the logger created for the
             // mDBEncryptionPlugin through the MegaDB constructor in the start() call.
             sandbox.stub(console, 'info');
-            msdb.setup()
+            sdb.setup()
                 .done(function(db) {
                     // Silence the logger.
                     db.logger.options.isEnabled = false;
+                    msdb = db;
 
-                    expect(db.dbName).to.eql("mdb_encTest_A_123456789");
+                    expect(db.dbName).to.eql("mdb_" + sName + "_A_123456789");
                     expect(db.flags & MegaDB.DB_FLAGS.HASNEWENCKEY).to.eql(MegaDB.DB_FLAGS.HASNEWENCKEY);
 
                     var data = { h: 'xGtrEHoT', name: 'John' };
-                    msdb.add("people", data)
+                    sdb.add("people", data)
                         .done(function(rr) {
                             expect(rr.length).to.eql(1);
                             expect(rr[0].h).to.eql(data.h); // keyPath is NOT encrypted

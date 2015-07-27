@@ -317,18 +317,7 @@
                     text = args.join(' ');
                 }
 
-                var fn = "log";
-                if (level === MegaLogger.LEVELS.DEBUG) {
-                    fn = "debug";
-                } else if (level === MegaLogger.LEVELS.LOG) {
-                    fn = "log";
-                } else if (level === MegaLogger.LEVELS.INFO) {
-                    fn = "info";
-                } else if (level === MegaLogger.LEVELS.WARN) {
-                    fn = "warn";
-                } else if (level === MegaLogger.LEVELS.ERROR) {
-                    fn = "error";
-                }
+                var fn = "error";
 
                 var callbackName = "on" + fn.substr(0, 1).toUpperCase() + fn.substr(1);
                 if (this.options[callbackName]) {

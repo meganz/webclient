@@ -928,7 +928,7 @@ else if (!b_u)
     jsl.push({f:'js/jquery-2.1.1.js', n: 'jquery', j:1,w:10});
     jsl.push({f:'js/functions.js', n: 'functions_js', j:1});
     jsl.push({f:'js/mega.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/megaLogger.js', n: 'megaLogger_js', j:1});
+    jsl.push({f:'js/vendor/megaLogger.js', n: 'megaLogger_js', j:1});
     jsl.push({f:'js/tlvstore.js', n: 'tlvstore_js', j:1});
     jsl.push({f:'js/crypto.js', n: 'crypto_js', j:1,w:5});
     jsl.push({f:'js/jsbn.js', n: 'jsbn_js', j:1,w:2});

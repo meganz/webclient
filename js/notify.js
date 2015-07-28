@@ -226,14 +226,36 @@ var notify = {
 
         // Store for the all the generated HTML
         var notificationHtml = '';
+        var $template = this.$popup.find('.notification-item.template');
 
         // Loop through all the notifications
         for (var i = 0; i < numOfNotifications; i++) {
             
-            var notification = notify.notifications[i];
+            // Get the notification data and clone the template
+            var notificationData = notify.notifications[i];
+            var $notificationHtml = $template.clone();
             
+            // Remove the template class
+            $notificationHtml.removeClass('template');
             
+            // Update template
+            $notificationHtml.find('.notification-date').text(Date.now());
+            
+            // Build the html
+            notificationHtml += notify.getOuterHtml($notificationHtml);
         }
+        
+        
+    },
+    
+    /**
+     * Gets the outer HTML of an element
+     * @param {Object} $element The jQuery element $('<div class="notification-item">...</div>')
+     * @returns {String} Returns just the outer HTML '<div class="notification-item">...</div>'
+     */
+    getOuterHtml: function($element)
+    {
+        return $element.clone().wrap('<div>').parent().html();
     }
 };
 

@@ -1518,6 +1518,9 @@ a.blog-button:hover {
 .notification-settings:hover {
 	background-position: 1px -9786px;
 }
+.notification-item.template {
+    display: none;
+}
 .notification-item {
 	display: block;
 	cursor: pointer;

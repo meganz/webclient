@@ -1,16 +1,21 @@
+/**
+ * @fileOverview
+ * Mega key value storage unit tests.
+ */
+
 describe("MegaKVStorage Unit Test", function() {
+    "use strict";
+
     var mkv;
     beforeEach(function(done) {
         localStorage.clear();
-        mkv = new MegaKVStorage("unittests", localStorage)
-
+        mkv = new MegaKVStorage("unittests", localStorage);
         done();
     });
 
 
     afterEach(function(done) {
         mkv.clear();
-
         done();
     });
 

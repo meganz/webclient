@@ -1288,7 +1288,7 @@ function showTransferToast(t_type, t_length) {
                 $('.slideshow-dialog').addClass('hidden');
                 $('.slideshow-overlay').addClass('hidden');
             }
-            $.transferOpen();
+            document.location.hash = 'fm/transfers';
         });
         $toast.rebind('mouseover', function(e)
         {
@@ -5583,8 +5583,7 @@ function transferPanelUI()
             ephemeralDialog('Transfer settings are for registered users only.');
         else {
             if ($('.nw-fm-left-icon.transfers').hasClass('active')) {
-                $('.fmholder').removeClass('transfer-panel-opened');
-                $(window).trigger('resize');
+                $.transferClose();
             }
             $('.nw-fm-left-icon').removeClass('active');
             $('.nw-fm-left-icon.settings').addClass('active');

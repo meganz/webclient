@@ -8506,20 +8506,21 @@ function linksDialog(close) {
         resizeContainer: false,
         resizeHandle: false,
         onChange: function(elem, data) {
+            var selclass;
+
             if (data) {
                 $(elem).closest('.on_off').removeClass('off').addClass('on');
-
-                // Show link with key
-                var fileLinkWithKey = $('.file-link-with-key').text();
-                $('.export-link-url').val(fileLinkWithKey);
+                selclass = '.file-link-with-key';
             }
             else {
                 $(elem).closest('.on_off').removeClass('on').addClass('off');
-
-                // Show link without key
-                var fileLinkWithoutKey = $('.file-link-without-key').text();
-                $('.export-link-url').val(fileLinkWithoutKey);
+                selclass = '.file-link-without-key';
             }
+            $('.export-link-url').each(function(idx, elm) {
+                elm = $(elm);
+                var parent = elm.closest('.export-link-text-pad');
+                elm.val($(selclass, parent).text());
+            });
             window.getLinkState = !!data;
         }
     });

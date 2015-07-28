@@ -2641,6 +2641,13 @@ function generateAnonymousReport() {
     $('script').each(function() {
         var self = this;
         var src = self.src.replace(window.location.host, "$current");
+        if (is_chrome_firefox) {
+            if (!promises.length) {
+                promises.push(MegaPromise.resolve());
+            }
+            report.scripts[self.src] = false;
+            return;
+        }
         promises.push(
             $.ajax({
                 url: self.src,

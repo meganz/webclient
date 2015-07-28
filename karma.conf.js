@@ -74,7 +74,7 @@ module.exports = function(config) {
         'index.js',
         'js/functions.js',
         'js/mega.js',
-        'js/megaLogger.js',
+        'js/vendor/megaLogger.js',
         'js/tlvstore.js',
         'js/crypto.js',
         'js/megaPromise.js',

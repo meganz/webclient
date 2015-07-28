@@ -289,13 +289,13 @@ MegaSync.prototype.download = function(pubkey, privkey) {
 
 MegaSync.prototype._onError = function(next, e) {
     this._enabled = false;
-    next = typeof next == "function" ? next : function() {};
+    next = (typeof next === "function") ? next : function() {};
     next(e || new Error("Internal error"));
     return this.downloadClient();
 };
 
 MegaSync.prototype.handle = function(response, next) {
-    next = typeof next == "function" ? next : function() {};
+    next = (typeof next === "function") ? next : function() {};
     if (response === 0) {
         // alright!
         clearInterval(this._retryTimer);

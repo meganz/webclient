@@ -9429,6 +9429,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
 .invoice-container {
 	position: relative;
 }
+.bitcoin-invoice-dialog .helper-explanation {
+  font-size: 12px;
+  margin-top: 10px;
+}
 .bitcoin-invoice-dialog .payment-confirmation {
 	display: none;
 	position: absolute;
@@ -9569,10 +9573,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
 	font-size: 0.8em;
 }
 .bitcoin-invoice-dialog .plan-price-bitcoins {
-	display: inline-block;
-	font-size: 39px;
-	line-height: 42px;
-	padding-top: 45px;
+    display: inline-block;
+    font-size: 38px;
+    line-height: 42px;
+    padding-top: 26px;
 }
 .bitcoin-invoice-dialog .plan-price-bitcoins-btc {
 	display: inline-block;

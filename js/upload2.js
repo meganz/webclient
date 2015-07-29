@@ -91,6 +91,7 @@ var ulmanager = {
         var start = chunk.start;
         var end = chunk.end;
         var cid = String(chunk);
+        var altport = !chunk.altport;
 
         file.ul_failed = true;
         api_reportfailure(hostname(file.posturl), ulmanager.networkErrorCheck);
@@ -114,7 +115,7 @@ var ulmanager = {
             }
 
             if (tid < 34) {
-                var newTask = new ChunkUpload(file, start, end);
+                var newTask = new ChunkUpload(file, start, end, altport);
                 ulQueue.pushFirst(newTask);
             }
             else {
@@ -207,9 +208,9 @@ var ulmanager = {
         for (i = 0; i < dl_queue.length; i++) {
             if (dl_queue[i] && dl_queue[i].dl_failed) {
                 if (d) {
-                    ulmanager.logger.info('Failed download:',
-                        dl_queue[i].zipname
-                        || dl_queue[i].n, 'Retries: ' + dl_queue[i].retries, dl_queue[i].zipid);
+                    dlmanager.logger.info('Failed download:',
+                        dl_queue[i].zipname || dl_queue[i].n,
+                        'Retries: ' + dl_queue[i].retries, dl_queue[i].zipid);
                 }
                 dl.retries += dl_queue[i].retries;
                 if (dl_queue[i].retries++ === 5) {
@@ -737,7 +738,7 @@ UploadQueue.prototype.push = function() {
 };
 
 
-function ChunkUpload(file, start, end) {
+function ChunkUpload(file, start, end, altport) {
     this.file = file;
     this.ul = file;
     this.start = start;
@@ -745,6 +746,7 @@ function ChunkUpload(file, start, end) {
     this.gid = file.owner.gid;
     this.xid = this.gid + '_' + start + '-' + end;
     this.jid = (Math.random() * Date.now()).toString(36);
+    this.altport = altport;
     this[this.gid] = !0;
     // if (d) ulmanager.logger.info('Creating ' + this);
 }
@@ -918,6 +920,7 @@ ChunkUpload.prototype.on_ready = function(args, xhr) {
 }
 
 ChunkUpload.prototype.upload = function() {
+    var url, xhr;
 
     if (!this.file) {
         if (d) {
@@ -935,15 +938,15 @@ ChunkUpload.prototype.upload = function() {
         return;
     }
 
-    var xhr = getXhr(this);
-    xhr._murl = this.file.posturl;
+    xhr = getXhr(this);
+    url = dlmanager.uChangePort(this.file.posturl + this.suffix, this.altport ? 8080 : 0);
+    xhr._murl = url;
 
     if (d) {
-        ulmanager.logger.info("pushing", this.file.posturl + this.suffix);
+        ulmanager.logger.info("pushing", url);
     }
 
-
-    xhr.open('POST', this.file.posturl + this.suffix);
+    xhr.open('POST', url);
     xhr.send(this.bytes.buffer);
 
     this.xhr = xhr;

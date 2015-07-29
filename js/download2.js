@@ -63,6 +63,22 @@ var dlmanager = {
         }.bind(this));
     },
 
+    uChangePort: function DM_uChangePort(url, port) {
+        if (String(url).substr(0,5) === 'http:') {
+            var uri = document.createElement('a');
+            uri.href = url;
+
+            if (port) {
+                url = url.replace(uri.host, uri.hostname + ':' + port);
+            }
+            else if (uri.host !== uri.hostname) {
+                url = url.replace(uri.host, uri.hostname);
+            }
+        }
+
+        return url;
+    },
+
     cleanupUI: function DM_cleanupUI(gid) {
         if (typeof gid === 'object') {
             gid = this.getGID(gid);
@@ -333,6 +349,7 @@ var dlmanager = {
         else {
             /* check for network error  */
             dl.dl_failed = true;
+            task.altport = !task.altport;
             api_reportfailure(hostname(dl.url), ulmanager.networkErrorCheck);
             dlmanager.dlQueuePushBack(task);
         }

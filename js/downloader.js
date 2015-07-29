@@ -36,6 +36,7 @@ function ClassChunk(task) {
     this.gid = task.file.gid;
     this.xid = this.gid + "_" + (++__ccXID);
     this.failed = false;
+    this.altport = false;
     // this.backoff  = 1936+Math.floor(Math.random()*2e3);
     this.lastPing = NOW();
     this.lastUpdate = NOW();
@@ -277,8 +278,9 @@ ClassChunk.prototype.run = function(task_done) {
     this.Progress.working.push(this);
 
     /* let the fun begin! */
+    this.url = dlmanager.uChangePort(this.url, this.altport ? 8080 : 0);
     if (d) {
-        dlmanager.logger.info(this + " Fetching " + this.url);
+        dlmanager.logger.info(this + " Fetching ", this.url);
     }
     this.xhr = getXhr(this);
     this.xhr._murl = this.url;

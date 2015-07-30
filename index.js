@@ -1206,10 +1206,12 @@ function topmenuUI() {
         }
     };
 
-    $('#pageholder, #startholder').rebind('click', function(e) {
-        if (typeof $.hideTopMenu === 'function') {
-            $.hideTopMenu(e);
-        }
+    $('#pageholder').rebind('click', function (e) {
+        $.hideTopMenu(e);
+    });
+
+    $('#startholder').rebind('click', function (e) {
+        $.hideTopMenu(e);
     });
 
     $('.top-menu-icon').rebind('click', function (e) {

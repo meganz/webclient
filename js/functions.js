@@ -1250,12 +1250,10 @@ function oDestroy(obj) {
             delete obj[memb];
         }
     });
-    if (!oIsFrozen(obj)) {
-        Object.defineProperty(obj, ":$:frozen:", {
-            value: String(new Date()),
-            writable: false
-        });
-    }
+    Object.defineProperty(obj, ":$:frozen:", {
+        value: String(new Date()),
+        writable: false
+    });
 
     if (window.d) {
         Object.freeze(obj);
@@ -2064,41 +2062,37 @@ function percent_megatitle() {
         tp = $.transferprogress || {},
         dl_s = 0,
         ul_s = 0,
-        zips = {};
+        zips = {}
 
     for (var i in dl_queue) {
-        if (dl_queue.hasOwnProperty(i)) {
-            var q = dl_queue[i];
-            var t = q && tp[q.zipid ? 'zip_' + q.zipid : 'dl_' + q.id];
+        var q = dl_queue[i],
+            t = tp[q.zipid ? 'zip_' + q.zipid : 'dl_' + q.id];
 
-            if (t) {
-                dl_r += t[0];
-                dl_t += t[1];
-                if (!q.zipid || !zips[q.zipid]) {
-                    if (q.zipid) {
-                        zips[q.zipid] = 1;
-                    }
-                    dl_s += t[2];
+        if (t) {
+            dl_r += t[0];
+            dl_t += t[1];
+            if (!q.zipid || !zips[q.zipid]) {
+                if (q.zipid) {
+                    zips[q.zipid] = 1;
                 }
+                dl_s += t[2];
             }
-            else {
-                dl_t += q && q.size || 0;
-            }
+        }
+        else {
+            dl_t += q.size || 0;
         }
     }
 
     for (var i in ul_queue) {
-        if (ul_queue.hasOwnProperty(i)) {
-            var t = tp['ul_' + ul_queue[i].id]
+        var t = tp['ul_' + ul_queue[i].id]
 
-            if (t) {
-                ul_r += t[0];
-                ul_t += t[1];
-                ul_s += t[2];
-            }
-            else {
-                ul_t += ul_queue[i].size || 0;
-            }
+        if (t) {
+            ul_r += t[0];
+            ul_t += t[1];
+            ul_s += t[2];
+        }
+        else {
+            ul_t += ul_queue[i].size || 0;
         }
     }
     if (dl_t) {
@@ -2302,7 +2296,7 @@ function disableDescendantFolders(id, pref) {
         var fid = folders[i].h;
 
         for (var h in M.c[fid]) {
-            if (M.d[h] && M.d[h].t) {
+            if (M.d[h].t) {
                 sub = true;
                 break;
             }

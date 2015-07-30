@@ -36,7 +36,9 @@ else if (ua.indexOf('firefox') > -1 && typeof DataView == 'undefined') b_u = 1;
 else if (ua.indexOf('opera') > -1 && typeof window.webkitRequestFileSystem == 'undefined') b_u = 1;
 var apipath, staticpath = 'https://eu.static.mega.co.nz/3/';
 var myURL, URL = window.URL || window.webkitURL;
-if (!(myURL=URL)) b_u=1;
+if (!(myURL = URL) || typeof String.prototype.trim !== 'function') {
+    b_u = 1;
+}
 
 if (!b_u) try
 {
@@ -727,7 +729,7 @@ else if (!b_u)
         {
             function mTrim(s)
             {
-                return s
+                return String(s)
                     .replace(/resource:.+->\s/,'')
                     .replace(/blob:[^:\s]+/, '..')
                     .replace(/\.\.:\/\/[^:\s]+/, '..')
@@ -738,9 +740,12 @@ else if (!b_u)
             if (__cdumps.length > 3) return false;
 
             var dump = {
-                m : ('' + msg).replace(/'(\w+:\/\/+[^/]+)[^']+'/,"'$1...'").replace(/^Uncaught\W*(?:exception\W*)?/i,''),
-                f : mTrim('' + url), l : ln
-            }, cc, sbid = +(''+(document.querySelector('script[src*="secureboot"]')||{}).src).split('=').pop()|0;
+                l: ln,
+                f: mTrim(url),
+                m: mTrim(msg).replace(/'(\w+:\/\/+[^/]+)[^']+'/, "'$1...'")
+                    .replace(/^Uncaught\W*(?:exception\W*)?/i, ''),
+            }, cc;
+            var sbid = +(''+(document.querySelector('script[src*="secureboot"]')||{}).src).split('=').pop()|0;
 
             if (~dump.m.indexOf('[[:i]]')) {
                 return false;

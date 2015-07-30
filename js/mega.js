@@ -3335,13 +3335,16 @@ function MegaData()
         for (i = selected.length; i--;) {
 
             selectedNodeHandle = selected[i];
-            shares = M.d[selectedNodeHandle].shares;
+            shares = M.d[selectedNodeHandle]
+                && M.d[selectedNodeHandle].shares;
 
-            // Loop through selected items and search for export link share
-            for (var userHandle in shares) {
-                if (shares.hasOwnProperty(userHandle)) {
-                    if (userHandle === 'EXP' && M.d[selectedNodeHandle].ph) {
-                        return true;
+            if (shares) {
+                // Loop through selected items and search for export link share
+                for (var userHandle in shares) {
+                    if (shares.hasOwnProperty(userHandle)) {
+                        if (userHandle === 'EXP' && M.d[selectedNodeHandle].ph) {
+                            return true;
+                        }
                     }
                 }
             }
@@ -5231,16 +5234,23 @@ function ddtype(ids, toid, alt)
 function fm_getnodes(h, ignore)
 {
     var nodes = [];
-    function procnode(h)
-    {
-        if (M.c[h])
-        {
-            for (var n in M.c[h])
-            {
-                if (M.d[n].name || ignore)
-                    nodes.push(n);
-                if (M.d[n].t == 1)
-                    procnode(n);
+    function procnode(h) {
+        if (M.c[h]) {
+            for (var n in M.c[h]) {
+                if (M.c[h].hasOwnProperty(n)) {
+                    if (!M.d[n]) {
+                        if (d) {
+                            console.warn('Invalid node: ' + n, h, M.c[h][n]);
+                        }
+                        continue;
+                    }
+                    if (M.d[n].name || ignore) {
+                        nodes.push(n);
+                    }
+                    if (M.d[n].t === 1) {
+                        procnode(n);
+                    }
+                }
             }
         }
     }

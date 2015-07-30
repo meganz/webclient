@@ -148,19 +148,19 @@ function sync_switchOS(os)
 
 function changeLinux(i)
 {
-	if (linuxsync[i]['32'])
-	{
-		$('.linux32').parent().show();
-		$('.radio-txt.32').show();
-	}
-	else
-	{
-		$('.linux32').parent().hide();
-		$('.radio-txt.32').hide();
-	}
-
 	if (linuxsync[i])
 	{
+		if (linuxsync[i]['32'])
+		{
+			$('.linux32').parent().show();
+			$('.radio-txt.32').show();
+		}
+		else
+		{
+			$('.linux32').parent().hide();
+			$('.radio-txt.32').hide();
+		}
+
 		$('.version-select-txt').text(linuxsync[i].name);
 		$('.sync-button.linux').removeClass('disabled');
 		$('.sync-bottom-txt.linux-txt').css('opacity', '1');	

@@ -105,7 +105,7 @@ function init_page() {
     }
 
 	if (localStorage.font_size) {
-        $('body').removeClass('fontsize1 fontsize2 fontsize3').addClass('fontsize' + localStorage.font_size);
+        $('body').removeClass('fontsize1 fontsize2').addClass('fontsize' + localStorage.font_size);
     }
 
     // Add language class to body for CSS fixes for specific language strings

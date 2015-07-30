@@ -3567,7 +3567,7 @@ function accountUI()
         $('.uifontsize input').unbind('click');
         $('.uifontsize input').bind('click', function(e)
         {
-            $('body').removeClass('fontsize1 fontsize2 fontsize3').addClass('fontsize' + $(this).val());
+            $('body').removeClass('fontsize1 fontsize2').addClass('fontsize' + $(this).val());
             $('.uifontsize input').removeClass('radioOn').addClass('radioOff').parent().removeClass('radioOn').addClass('radioOff');
             $(this).removeClass('radioOff').addClass('radioOn').parent().removeClass('radioOff').addClass('radioOn');
             M.account.font_size = $(this).val();

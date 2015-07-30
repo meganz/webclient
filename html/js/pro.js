@@ -315,7 +315,7 @@ function pro_pay() {
     }
     
     // Otherwise if Union Pay payment, show bouncing coin while loading
-    else if (pro_paymentmethod === 'union-pay') {
+    else if (pro_paymentmethod === 'union-pay' || pro_paymentmethod === "paysafecard") {
         proPage.showLoadingOverlay('transferring');
     }
     
@@ -366,7 +366,7 @@ function pro_pay() {
                     return false;
                 }
                 else if (pro_paymentmethod === 'paysafecard') {
-                    pro_m = 10;
+                    pro_m = 10;                    
                 }
                 
                 // Update the last payment provider ID for the 'psts' action packet. If the provider e.g. bitcoin 
@@ -433,8 +433,15 @@ function pro_pay() {
                             }
 
                             // If paysafecard provider then redirect to their site
-                            else if ((pro_m === 10) && utcResult && utcResult.EUR) {
-                                paysafecard.redirectToSite(utcResult);
+                            else if ((pro_m === 10))
+                            {
+                                if (utcResult && utcResult.EUR) {
+                                    paysafecard.redirectToSite(utcResult);
+                                }
+                                else
+                                {
+                                    paysafecard.showConnectionError();
+                                }
                             }
                         }
                     }
@@ -722,13 +729,13 @@ var proPage = {
         },
         {
             apiGatewayId: 10,
-            displayName: 'Paysafecard',           // Paysafecard
+            displayName: 'paysafecard',           // Paysafecard
             supportsRecurring: false,
             supportsMonthlyPayment: true,
             supportsAnnualPayment: true,
             supportsExpensivePlans: true,  // Prepaid card so we support whatever the user can afford!
             cssClass: 'paysafecard'
-        },    
+        },
         {
             apiGatewayId: null,
             displayName: l[6198],           // Wire transfer
@@ -1485,10 +1492,14 @@ var paysafecard = {
      * Redirect to the site
      * @param {String} utcResult, containing the url to redirect to
      */
-    redirectToSite: function(utcResult) {
-        proPage.showLoadingOverlay('processing');
+    redirectToSite: function(utcResult) {       
         var url = utcResult.EUR['url'];
         window.location = url;
+    },
+
+    showConnectionError: function() {
+        msgDialog('warninga', 'Payment Failed', 'Transaction could not be initiated due to connection problems. If the problem persists, please contact support@mega.co.nz');
+        document.location.hash = "pro";
     },
 
     /**
@@ -1513,6 +1524,7 @@ var paysafecard = {
                     if ((typeof result === 'number') && (result < 0)) {
                         // Something went wrong with the payment, either card association or actually debitting it.
                         msgDialog('warninga', 'Payment Failed', 'Something has gone wrong and we were unable to charge your card.');
+                        document.location.hash = "pro";
                     }
                     else {
                         // Continue to account screen

@@ -44,7 +44,7 @@ var notify = {
         
         // Call API to fetch the most recent notifications
         api_req('c=' + notify.numOfNotifications, {
-            callback: function (result) {
+            callback: function(result) {
 
                 // Check it wasn't a negative number error response
                 if (typeof result !== 'object') {
@@ -65,7 +65,7 @@ var notify = {
                     var timeDelta = notification.td;                // Seconds since the notification occurred                    
                     var seen = (timeDelta >= lastTimeDelta);        // If the notification time delta is older than the last time the user saw the notification then it is read
                     var timestamp = currentTime - timeDelta;        // Timestamp of the notification
-                
+                    
                     // Add notifications to list
                     notify.notifications.push({
                         id: id,

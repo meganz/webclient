@@ -1652,9 +1652,6 @@ function topmenuUI() {
         $('.membership-popup-arrow').css('margin-right',
             $('.top-menu-icon').width() + $('.membership-status-block').width() / 2 + 57 + 'px');
     }
-
-    // Initialise notifications
-    notify.init();
 }
 
 function is_fm() {

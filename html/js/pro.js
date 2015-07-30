@@ -11,6 +11,16 @@ var pro_package,
 
 function init_pro()
 {
+    // Detect if there exists a verify get parameter
+    if (typeof(proPage.getUrlParam("verify")) !== 'undefined')
+    {
+        if (proPage.getUrlParam("verify") == "paysafe")
+        {
+            // We are required to do paysafecard verification
+            paysafecard.verify();
+        }
+    }
+
     if (localStorage.keycomplete) {
         $('body').addClass('key');
         sessionStorage.proref = 'accountcompletion';
@@ -355,6 +365,9 @@ function pro_pay() {
                     centili.redirectToSite(saleId);
                     return false;
                 }
+                else if (pro_paymentmethod === 'paysafecard') {
+                    pro_m = 10;
+                }
                 
                 // Update the last payment provider ID for the 'psts' action packet. If the provider e.g. bitcoin 
                 // needs a redirect after confirmation action packet it will redirect to the account page.
@@ -417,6 +430,11 @@ function pro_pay() {
                             // Show credit card failure
                             else if ((pro_m === 8) && (!utcResult || (utcResult.EUR.res === 'FP') || (utcResult.EUR.res === 'FI'))) {
                                 cardDialog.showFailureOverlay(utcResult);
+                            }
+
+                            // If paysafecard provider then redirect to their site
+                            else if ((pro_m === 10) && utcResult && utcResult.EUR) {
+                                paysafecard.redirectToSite(utcResult);
                             }
                         }
                     }
@@ -701,7 +719,16 @@ var proPage = {
             supportsAnnualPayment: false,
             supportsExpensivePlans: false,  // Provider has a max of EUR 3.00 per payment
             cssClass: 'centili'
-        },     
+        },
+        {
+            apiGatewayId: 10,
+            displayName: 'Paysafecard',           // Paysafecard
+            supportsRecurring: false,
+            supportsMonthlyPayment: true,
+            supportsAnnualPayment: true,
+            supportsExpensivePlans: true,  // Prepaid card so we support whatever the user can afford!
+            cssClass: 'paysafecard'
+        },    
         {
             apiGatewayId: null,
             displayName: l[6198],           // Wire transfer
@@ -1446,6 +1473,57 @@ var fortumo = {
     }
 };
 
+
+/**
+ * Code for paysafecard
+ */
+var paysafecard = {
+    
+    gatewayId: 10,
+
+    /**
+     * Redirect to the site
+     * @param {String} utcResult, containing the url to redirect to
+     */
+    redirectToSite: function(utcResult) {
+        proPage.showLoadingOverlay('processing');
+        var url = utcResult.EUR['url'];
+        window.location = url;
+    },
+
+    /**
+     * We have been redirected back to mega with the 'okUrl'. We need to ask the API to verify the payment succeeded as per
+     * paysafecard's requirements, which they enforce with integration tests we must pass... so yeap, gotta do this.
+     */
+    verify: function() {
+        var saleidstring = proPage.getUrlParam('saleidstring');
+        if (typeof(saleidstring)!=='undefined') {
+
+            // Make the vpay API request to follow up on this sale
+            var requestData = {
+                'a': 'vpay',                            // Credit Card Store
+                't': this.gatewayId,                    // The paysafecard gateway
+                'saleidstring': saleidstring            // Required by the API to know what to investigate            
+            };
+        
+            api_req(requestData, {
+                callback: function (result) {
+                    
+                    // If negative API number
+                    if ((typeof result === 'number') && (result < 0)) {
+                        // Something went wrong with the payment, either card association or actually debitting it.
+                        msgDialog('warninga', 'Payment Failed', 'Something has gone wrong and we were unable to charge your card.');
+                    }
+                    else {
+                        // Continue to account screen
+                        document.location.hash = "account";
+                    }
+                }
+            });
+        }
+        return false;
+    }
+};
 
 /**
  * Code for Centili mobile payments

@@ -3625,5 +3625,17 @@
     "7216": "Ladataan tiedostoja",
     "7217": "OSTA SALDOLLA",
     "7218": "Tyhjenn\u00e4 siirto",
-    "7219": "Mobile"
+    "7219": "Mobiili",
+    "7220": "<span>XX<\/span> latausta lis\u00e4tty siirtojonoon",
+    "7221": "<span>XX<\/span> l\u00e4hetyst\u00e4 lis\u00e4tty siirtojonoon",
+    "7222": "Lataus lis\u00e4tty siirtojonoon",
+    "7223": "L\u00e4hetys lis\u00e4tty siirtojonoon",
+    "7224": "N\u00e4yt\u00e4",
+    "7225": "Haluatko varmasti poistaa kaikki siirrot?",
+    "7226": "Roskakorin tyhjennysajastin",
+    "7227": "Jonossa",
+    "7228": "Kirjasinkoko:",
+    "7229": "Pieni",
+    "7230": "Suuri",
+    "7231": "Price excludes Bitcoin transaction fee."
 }

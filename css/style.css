@@ -16955,43 +16955,6 @@ span.browsers-update {
 	background-position: -4px -919px;
 	color: white;
 }
-
-
-
-.firefox-download-button, a.firefox-download-button {
-	height: 60px;
-	display: block;
-	background-color: white;
-	margin: 10px 10px 0 10px;
-	cursor: pointer;
-	padding: 0 15px 0 70px;
-	background-image: url("../images/mega/mobile-sprite-v6.png");
-	background-repeat: no-repeat;
-	background-position: 10px -249px;
-	-moz-box-sizing: border-box;
-	-webkit-box-sizing: border-box;
-	box-sizing: border-box;
-	-moz-border-radius: 5px;
-	-webkit-border-radius: 5px;
-	border-radius: 5px;
-	text-align: left;
-	white-space: nowrap;
-	color: #666666;
-	font-size: 12px;
-	line-height: 21px;
-	border: 2px solid #d0d0d0;
-}
-.firefox-download-button:hover, a.firefox-download-button:hover {
-	background-color: #DB0605;
-	border: 2px solid #DB0605;
-	background-image: url("../images/mega/mobile-sprite-v6.png");
-	background-repeat: no-repeat;
-	background-position: 10px -249px;
-	color: white;
-}
-
-
-
 .chrome-bottom-txt {
 	font-size: 13px;
 	line-height: 20px;
@@ -24546,8 +24509,8 @@ top-login-spr .nlanguage-tooltip-bg, .nlanguage-bottom {
  background-image: url(../images/mega/pro-new-sprite-v6@2x.png);
  background-size: 755px auto;
 }
-.sync-list-txt, .sync-icon, .mobile-icon, .ios-button, .ff-icon, .blackberry-button, .chrome-icon, .sync-button, .google-play-button, .ff-bott-button, .mobile-small-icon, .chrome-bott-icons, .chrome-download-button, a.chrome-download-button, .firefox-download-button, a.firefox-download-button, .ads-top-arrow, .win-phone-button, .products-top-arrow {
- background-image: url(../images/mega/mobile-sprite-v6@2x.png);
+.sync-list-txt, .sync-icon, .mobile-icon, .ios-button, .ff-icon, .blackberry-button, .chrome-icon, .sync-button, .google-play-button, .ff-bott-button, .mobile-small-icon, .chrome-bott-icons, .chrome-download-button, a.chrome-download-button, .ads-top-arrow, .win-phone-button, .products-top-arrow {
+ background-image: url(../images/mega/mobile-sprite-v6@2x.png?v=4);
  background-size: 836px auto;
 }
  .privacy-company-icon, .privacy-company-bott .st-quote-left, .privacy-company-bott .st-quote-right {

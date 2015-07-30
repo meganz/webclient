@@ -2590,8 +2590,6 @@ function initContextUI() {
                 dlQueue.resume();
                 ulQueue.resume();
                 uldl_hold = false;
-                $('.transfer-pause-icon').removeClass('active').find('span').text(l[6993]);
-                $('.nw-fm-left-icon.transfers').removeClass('paused');
             }
         });
     });

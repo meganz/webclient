@@ -1,5 +1,8 @@
 var b_u = 0;
-var maintenance=false;
+var apipath;
+var maintenance = false;
+var URL = window.URL || window.webkitURL;
+var staticpath = 'https://eu.static.mega.co.nz/3/';
 var ua = window.navigator.userAgent.toLowerCase();
 var is_chrome_firefox = document.location.protocol === 'chrome:' && document.location.host === 'mega' || document.location.protocol === 'mega:';
 var is_extension = is_chrome_firefox || document.location.href.substr(0,19) == 'chrome-extension://';
@@ -31,13 +34,30 @@ function geoStaticpath(eu)
     return 'https://eu.static.mega.co.nz/3/';
 }
 
-if (ua.indexOf('chrome') > -1 && ua.indexOf('mobile') == -1 && parseInt(window.navigator.appVersion.match(/Chrome\/(\d+)\./)[1], 10) < 22) b_u = 1;
-else if (ua.indexOf('firefox') > -1 && typeof DataView == 'undefined') b_u = 1;
-else if (ua.indexOf('opera') > -1 && typeof window.webkitRequestFileSystem == 'undefined') b_u = 1;
-var apipath, staticpath = 'https://eu.static.mega.co.nz/3/';
-var myURL, URL = window.URL || window.webkitURL;
-if (!(myURL = URL) || typeof String.prototype.trim !== 'function') {
+if (ua.indexOf('chrome') !== -1 && ua.indexOf('mobile') === -1
+        && parseInt(navigator.appVersion.match(/Chrome\/(\d+)\./)[1]) < 22) {
     b_u = 1;
+}
+else if (ua.indexOf('firefox') > -1 && typeof DataView === 'undefined') {
+    b_u = 1;
+}
+else if (ua.indexOf('opera') > -1 && typeof window.webkitRequestFileSystem === 'undefined') {
+    b_u = 1;
+}
+var myURL = URL;
+if (!myURL) {
+    b_u = 1;
+}
+
+if (!String.prototype.trim) {
+    String.prototype.trim = function() {
+        return this.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, '');
+    };
+}
+if (!String.trim) {
+    String.trim = function(s) {
+        return String(s).trim();
+    };
 }
 
 if (!b_u) try

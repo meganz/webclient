@@ -2888,6 +2888,9 @@ function accountUI()
     $('.fm-right-account-block').removeClass('hidden');
     $('.nw-fm-left-icon').removeClass('active');
     $('.nw-fm-left-icon.settings').addClass('active');
+    if ($('.fmholder').hasClass('transfer-panel-opened')) {
+        $.transferClose();
+    }
     M.accountData(function(account)
     {
         var perc, warning, perc_c;
@@ -5600,9 +5603,6 @@ function transferPanelUI()
         if (u_type === 0)
             ephemeralDialog('Transfer settings are for registered users only.');
         else {
-            if ($('.nw-fm-left-icon.transfers').hasClass('active')) {
-                $.transferClose();
-            }
             $('.nw-fm-left-icon').removeClass('active');
             $('.nw-fm-left-icon.settings').addClass('active');
             document.location.hash = 'fm/account/settings';

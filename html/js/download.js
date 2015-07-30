@@ -51,9 +51,13 @@ function dl_g(res) {
 
     // If 'msd' (MegaSync download) flag is turned off via the API then hide the download with MEGAsync button.
     if (res.msd === 0) {
-        $('.new-download-sync-app').addClass('hidden');
-        $('.regular-download').removeClass('hidden');
-        $('.new-download-red-button').addClass('hidden');
+        megasync.isInstalled(function(err, is) {
+            if (err || !is) {
+                $('.new-download-sync-app').addClass('hidden');
+                $('.regular-download').removeClass('hidden');
+                $('.new-download-red-button').addClass('hidden');
+            }
+        });
     }
 
     $('.widget-block').addClass('hidden');

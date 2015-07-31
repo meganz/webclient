@@ -1134,6 +1134,14 @@ function openTransferpanel()
         $.mSortableT.sortable({
             revert: 100,
             start: function(ev, ui) {
+                var headerColumn;
+                $('body').addClass('dndc-sort');
+                $('.transfer-table tr').not('.clone-of-header').each(function(i, e) {
+                    $(e).find('td').each(function(j,el) {
+                        headerColumn = $('.transfer-table-header th').get(j);
+                        $(el).width($(headerColumn).width());
+                    });
+                });
                 this.order = fm_tfsorderupd();
             },
             stop: function(ev, ui) {
@@ -1141,6 +1149,12 @@ function openTransferpanel()
                 var id = String($tr.attr('id'));
                 var $next = $tr.next();
                 var cancel = false;
+                $('body').removeClass('dndc-sort');
+                $('.transfer-table tr').not('.clone-of-header').each(function(i, e) {
+                    $(e).find('td').each(function(j,el) {
+                        $(el).removeAttr('style');
+                    });
+                });
                 if ($tr.hasClass('started') || $next.hasClass('started')) {
                     cancel = true;
                 }

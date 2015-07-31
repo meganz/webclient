@@ -5622,7 +5622,7 @@ function transferPanelUI()
     });
     $('.transfer-clear-all-icon').rebind('click', function() {
         if (!$(this).hasClass('disabled')) {
-            msgDialog('confirmation', 'clear all transfers', 'Are you sure you want to clear all transfers?', '', function(e) {
+            msgDialog('confirmation', 'clear all transfers', l[7225], '', function(e) {
                 if (!e) {
                     return;
                 }

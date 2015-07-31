@@ -1,3 +1,6 @@
+var syncurl;
+var nautilusurl;
+var syncsel = false;
 var linuxsync = megasync.getLinuxReleases();
 
 function init_sync() {
@@ -25,7 +28,7 @@ function init_sync() {
     }, 1000);
     var pf = navigator.platform.toUpperCase();
 
-    if (page.substr(-5) == 'linux') {
+    if (page.substr(-5) === 'linux') {
         sync_switchOS('linux');
     }
     else if (pf.indexOf('MAC') >= 0) {
@@ -39,25 +42,21 @@ function init_sync() {
     }
 }
 
-
-
-var syncurl, nautilusurl;
-var syncsel = false;
-
 function sync_switchOS(os) {
+    var ostxt;
     $('.linuxhint').hide();
     $('.sync-button').attr('href', '');
     $('.sync-button-block.linux').addClass('hidden');
     syncurl = megasync.getMegaSyncUrl(os);
-    if (os == 'windows') {
+    if (os === 'windows') {
         $('.sync-button-txt.small').text(l[1158]);
         $('.sync-bottom-txt.button-txt').html(l[2025]);
         $('.sync-button').removeClass('mac linux');
         $('.sync-button').attr('href', syncurl);
         $('.sync-button').unbind('click');
     }
-    else if (os == 'mac') {
-        var ostxt = l[2031];
+    else if (os === 'mac') {
+        ostxt = l[2031];
         if (l[1158].indexOf('Windows') > -1) {
             ostxt = l[1158].replace('Windows', 'Mac');
         }
@@ -70,10 +69,10 @@ function sync_switchOS(os) {
         $('.sync-button').attr('href', syncurl);
         $('.sync-button').unbind('click');
     }
-    else if (os == 'linux') {
+    else if (os === 'linux') {
         syncurl = undefined;
         syncsel = false;
-        var ostxt = l[2032];
+        ostxt = l[2032];
         if (l[1158].indexOf('Windows') > -1) {
             ostxt = l[1158].replace('Windows', 'Linux');
         }
@@ -82,13 +81,16 @@ function sync_switchOS(os) {
         }
         $('.sync-button-txt.small').text(ostxt);
         $('.sync-bottom-txt.button-txt').html(l[2027]);
-        $('.sync-bottom-txt.linux-txt').html('<span class="nautilus-lnk">MEGA <a href="" class="red">Nautilus extension</a> (' + l[2028] + ')</span>');
+        $('.sync-bottom-txt.linux-txt')
+            .html('<span class="nautilus-lnk">'
+                + 'MEGA <a href="" class="red">Nautilus extension</a> ('
+                + l[2028] + ')</span>');
         $('.sync-button').removeClass('mac linux').addClass('linux');
         $('.sync-button-block.linux').removeClass('hidden');
         $('.architecture-checkbox input').bind('click', function() {
             $('.architecture-checkbox.radioOn').removeClass('radioOn').addClass('radioOff');
             $(this).parent().removeClass('radioOff').addClass('radioOn');
-            $(this).attr('checked', true)
+            $(this).attr('checked', true);
         });
         $('.fm-version-select select').bind('change', function() {
             $('.version-select-txt').text($('.fm-version-select select option:selected').text());
@@ -104,15 +106,17 @@ function sync_switchOS(os) {
         }
         var options = '<option id="-1">' + l[2029] + '</option>';
         for (var i in linuxsync) {
-            var selected = '';
-            var version = linuxsync[i].name.split(' ');
-            version = version[version.length - 1];
-            var name = linuxsync[i].name.replace(' ' + version, '');
-            if (ua.indexOf(name.toLowerCase()) > -1 && ua.indexOf(version) > -1) {
-                selected = 'selected';
-                changeLinux(i);
+            if (linuxsync.hasOwnProperty(i)) {
+                var selected = '';
+                var version = linuxsync[i].name.split(' ');
+                version = version[version.length - 1];
+                var name = linuxsync[i].name.replace(' ' + version, '');
+                if (ua.indexOf(name.toLowerCase()) > -1 && ua.indexOf(version) > -1) {
+                    selected = 'selected';
+                    changeLinux(i);
+                }
+                options += '<option value="' + i + '" ' + selected + '>' + linuxsync[i].name + '</option>';
             }
-            options += '<option value="' + i + '" ' + selected + '>' + linuxsync[i].name + '</option>';
         }
         $('.fm-version-select.sync select').html(options);
 

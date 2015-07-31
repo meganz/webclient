@@ -1268,18 +1268,18 @@ function showTransferToast(t_type, t_length) {
             $toast = $('.toast-notification.download');
             $second_toast = $('.toast-notification.upload');
             if (t_length > 1) {
-                nt_txt = '<span>' + t_length +'</span> downloads were added to the transfers queue';
+                nt_txt = l[7220].replace('XX',t_length);
             } else {
-                nt_txt = 'One download was added to the transfers queue';
+                nt_txt = l[7222];
             }
         } else {
             interval = ul_interval;
             $toast = $('.toast-notification.upload');
             $second_toast = $('.toast-notification.download');
             if (t_length > 1) {
-                nt_txt = '<span>' + t_length +'</span> uploads were added to the transfers queue';
+                nt_txt = l[7221].replace('XX',t_length);
             } else {
-                nt_txt = 'One upload was added to the transfers queue';
+                nt_txt = l[7223];
             }
         }
 

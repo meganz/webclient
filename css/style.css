@@ -5179,26 +5179,30 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	table-layout: fixed;
 	width: 100%;
 }
-.transfer-table td:nth-child(1) {
+.transfer-table td:nth-child(1), .transfer-table-header th:nth-child(1) {
 	width: 230px;
 }
-.transfer-table td:nth-child(3) {
+.transfer-table td:nth-child(3), .transfer-table-header th:nth-child(3) {
 	width: 96px;
 }
-.transfer-table td:nth-child(4) {
+.transfer-table td:nth-child(4), .transfer-table-header th:nth-child(4) {
 	width: 96px;
 }
-.transfer-table td:nth-child(5) {
-	max-width: 288px;
+.transfer-table td:nth-child(5), .transfer-table-header th:nth-child(5) {
+	width: 256px;
 }
-.transfer-table td:nth-child(6) {
+.transfer-table td:nth-child(6), .transfer-table-header th:nth-child(6) {
 	width: 192px;
+	background-image: none;
 }
-.transfer-table td:nth-child(7) {
+.transfer-table td:nth-child(7), .transfer-table-header th:nth-child(7) {
 	width: 64px;
 }
-.transfer-table td:nth-child(8) {
+.transfer-table td:nth-child(8), .transfer-table-header th:nth-child(8) {
 	width: 0px;
+}
+.transfer-table-header th:nth-child(8), .transfer-table td:nth-child(8), .dndc-sort .transfer-table td:nth-child(8), .transfer-table th:nth-child(8) {
+	display: none;
 }
 .transfer-table th, .transfer-table td, .transfer-table-header th, .grid-table th, .grid-table td, .grid-share-table th, .grid-share-table td, .grid-table-header th, .contacts-grid-header th, .contacts-grid-table th, .contacts-grid-table td {
 	-webkit-box-sizing: border-box;
@@ -12226,24 +12230,6 @@ table {
 	background-position: -6px -4019px;
 	height: 24px;
 }
-.transfer-table-header th:nth-child(1) {
-	width: 230px;
-}
-.transfer-table-header th:nth-child(3), .transfer-table-header th:nth-child(4) {
-	width: 96px;
-}
-.transfer-table-header th:nth-child(5) {
-	width: 288px;
-}
-.transfer-table-header th:nth-child(8), .transfer-table td:nth-child(8), .dndc-sort .transfer-table td:nth-child(8), .transfer-table th:nth-child(8) {
-	display: none;
-}
-.transfer-table-header th:nth-child(6) {
-	background-image: none;
-}
-.transfer-table-header th:nth-child(6) {
-	width: 64px;
-}
 .left-points-position .context-menu-points, .right-points-position .context-menu-points, .top-points-position .context-menu-points, .bottom-points-position .context-menu-points {
 	display: block;
 }
@@ -18771,7 +18757,7 @@ h1.help-home-header {
 	display: block;
 }
 .dndc-sort .transfer-table tr td {
-	display:inline-block;
+	display: inline-block;
 }
 .transfer-table td object {
 	position: absolute;
@@ -24036,6 +24022,9 @@ body.pro:after {
 	font-size: 11px;
 	line-height: 18px;
 }
+.transfer-table td:nth-child(5), .transfer-table-header th:nth-child(5) {
+	width: 230px;
+}
 }
 @media only screen and (max-width: 1296px) {
 .download-mid-centered-block.not-available-some-reason {
@@ -24062,6 +24051,9 @@ body.pro:after {
 .download-mid-centered-block {
 	min-width: 748px;
 }
+.transfer-table td:nth-child(5), .transfer-table-header th:nth-child(5) {
+	width: 192px;
+}
 }
 @media only screen and (max-width: 1165px) {
 .fm-account-blocks.storage, .fm-account-blocks.bandwidth {
@@ -24079,6 +24071,9 @@ body.pro:after {
 @media only screen and (max-width: 1133px) {
 .conversations-block {
 	width: 50%;
+}
+.transfer-table td:nth-child(5), .transfer-table-header th:nth-child(5) {
+	width: 130px;
 }
 }
 @media only screen and (max-height:  833px) {

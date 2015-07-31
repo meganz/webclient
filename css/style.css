@@ -12235,7 +12235,7 @@ table {
 .transfer-table-header th:nth-child(5) {
 	width: 288px;
 }
-.transfer-table-header th:nth-child(8), .transfer-table td:nth-child(8), .transfer-table th:nth-child(8) {
+.transfer-table-header th:nth-child(8), .transfer-table td:nth-child(8), .dndc-sort .transfer-table td:nth-child(8), .transfer-table th:nth-child(8) {
 	display: none;
 }
 .transfer-table-header th:nth-child(6) {
@@ -18768,8 +18768,10 @@ h1.help-home-header {
 }
 .dndc-sort .transfer-table tr {
 	left: 0 !important;
-	display: table;
-	table-layout: fixed;
+	display: block;
+}
+.dndc-sort .transfer-table tr td {
+	display:inline-block;
 }
 .transfer-table td object {
 	position: absolute;

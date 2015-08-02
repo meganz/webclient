@@ -1463,7 +1463,7 @@ function sharedUInode(nodeHandle) {
 
     if ((M.d[nodeHandle] && M.d[nodeHandle].shares) || M.ps[nodeHandle]) {
 
-        oShares = M.d[nodeHandle].shares;
+        oShares = M.d[nodeHandle] && M.d[nodeHandle].shares;
 
         if (oShares) {
             iShareNum = Object.keys(oShares).length;
@@ -6694,9 +6694,12 @@ function dorename()
     {
         var h = $.selected[0];
         var n = M.d[h];
-        var nn = $('.rename-dialog input').val();
-        if (nn !== n.name)
-            M.rename(h, nn);
+        if (n) {
+            var nn = $('.rename-dialog input').val();
+            if (nn !== n.name) {
+                M.rename(h, nn);
+            }
+        }
         $.dialog = false;
         $('.rename-dialog').addClass('hidden');
         fm_hideoverlay();

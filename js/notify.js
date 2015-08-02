@@ -93,10 +93,8 @@ var notify = {
         // Loop through the notifications
         for (var i = 0; i < notify.notifications.length; i++) {
             
-            var notification = notify.notifications[i];
-            
             // If it hasn't been seen yet increment the count
-            if (notification.seen === false) {
+            if (notify.notifications[i].seen === false) {
                 newNotifications++;
             }
         }
@@ -232,7 +230,7 @@ var notify = {
         for (var i = 0; i < numOfNotifications; i++) {
             
             // Get the notification data and clone the template
-            var notificationData = notify.notifications[i];
+            var notification = notify.notifications[i];
             var $notificationHtml = $template.clone();
             
             // Remove the template class

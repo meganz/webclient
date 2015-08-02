@@ -5892,9 +5892,7 @@ function loadfm_callback(res, ctx) {
         loadfm_done(pfkey, ctx.stackPointer);
         
         // Initialise notifications
-        if (!pfkey) {
-            notify.init();
-        }
+        notify.init();
 
         if (res.cr) {
             crypto_procmcr(res.cr);

@@ -104,7 +104,7 @@ function init_page() {
         $('body').attr('class', '');
     }
 
-	if (localStorage.font_size) {
+    if (localStorage.font_size) {
         $('body').removeClass('fontsize1 fontsize2').addClass('fontsize' + localStorage.font_size);
     }
 

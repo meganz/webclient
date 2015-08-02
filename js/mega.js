@@ -3677,7 +3677,9 @@ function MegaData()
             }
         }
 
-        showTransferToast('d', nodes.length);
+        if (!z || zipsize) {
+            showTransferToast('d', z ? 1 : nodes.length);
+        }
         //$('.tranfer-view-icon').addClass('active');
         //$('.fmholder').addClass('transfer-panel-opened');
         $.transferHeader();

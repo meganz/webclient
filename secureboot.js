@@ -1,5 +1,8 @@
 var b_u = 0;
-var maintenance=false;
+var apipath;
+var maintenance = false;
+var URL = window.URL || window.webkitURL;
+var staticpath = 'https://eu.static.mega.co.nz/3/';
 var ua = window.navigator.userAgent.toLowerCase();
 var is_chrome_firefox = document.location.protocol === 'chrome:' && document.location.host === 'mega' || document.location.protocol === 'mega:';
 var is_extension = is_chrome_firefox || document.location.href.substr(0,19) == 'chrome-extension://';
@@ -31,12 +34,31 @@ function geoStaticpath(eu)
     return 'https://eu.static.mega.co.nz/3/';
 }
 
-if (ua.indexOf('chrome') > -1 && ua.indexOf('mobile') == -1 && parseInt(window.navigator.appVersion.match(/Chrome\/(\d+)\./)[1], 10) < 22) b_u = 1;
-else if (ua.indexOf('firefox') > -1 && typeof DataView == 'undefined') b_u = 1;
-else if (ua.indexOf('opera') > -1 && typeof window.webkitRequestFileSystem == 'undefined') b_u = 1;
-var apipath, staticpath = 'https://eu.static.mega.co.nz/3/';
-var myURL, URL = window.URL || window.webkitURL;
-if (!(myURL=URL)) b_u=1;
+if (ua.indexOf('chrome') !== -1 && ua.indexOf('mobile') === -1
+        && parseInt(navigator.appVersion.match(/Chrome\/(\d+)\./)[1]) < 22) {
+    b_u = 1;
+}
+else if (ua.indexOf('firefox') > -1 && typeof DataView === 'undefined') {
+    b_u = 1;
+}
+else if (ua.indexOf('opera') > -1 && typeof window.webkitRequestFileSystem === 'undefined') {
+    b_u = 1;
+}
+var myURL = URL;
+if (!myURL) {
+    b_u = 1;
+}
+
+if (!String.prototype.trim) {
+    String.prototype.trim = function() {
+        return this.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, '');
+    };
+}
+if (!String.trim) {
+    String.trim = function(s) {
+        return String(s).trim();
+    };
+}
 
 if (!b_u) try
 {
@@ -727,7 +749,7 @@ else if (!b_u)
         {
             function mTrim(s)
             {
-                return s
+                return String(s)
                     .replace(/resource:.+->\s/,'')
                     .replace(/blob:[^:\s]+/, '..')
                     .replace(/\.\.:\/\/[^:\s]+/, '..')
@@ -738,9 +760,12 @@ else if (!b_u)
             if (__cdumps.length > 3) return false;
 
             var dump = {
-                m : ('' + msg).replace(/'(\w+:\/\/+[^/]+)[^']+'/,"'$1...'").replace(/^Uncaught\W*(?:exception\W*)?/i,''),
-                f : mTrim('' + url), l : ln
-            }, cc, sbid = +(''+(document.querySelector('script[src*="secureboot"]')||{}).src).split('=').pop()|0;
+                l: ln,
+                f: mTrim(url),
+                m: mTrim(msg).replace(/'(\w+:\/\/+[^/]+)[^']+'/, "'$1...'")
+                    .replace(/^Uncaught\W*(?:exception\W*)?/i, ''),
+            }, cc;
+            var sbid = +(''+(document.querySelector('script[src*="secureboot"]')||{}).src).split('=').pop()|0;
 
             if (~dump.m.indexOf('[[:i]]')) {
                 return false;

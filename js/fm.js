@@ -896,6 +896,7 @@ function initUI() {
         if (!fmTabState || fmTabState['cloud-drive'].root !== M.RootID) {
             fmTabState = {
                 'cloud-drive':    { root: M.RootID,    prev: null },
+                'folder-link':    { root: M.RootID,    prev: null },
                 'shared-with-me': { root: 'shares',    prev: null },
                 'conversations':  { root: 'chat',      prev: null },
                 'contacts':       { root: 'contacts',  prev: null },
@@ -937,7 +938,7 @@ function initUI() {
                     targetFolder = tab.root
                 }
 
-                M.openFolder(targetFolder);
+                M.openFolder(targetFolder, true);
 
                 break;
             }
@@ -1192,7 +1193,7 @@ function openTransferpanel()
                         var i = 0;
                         var len = Object.keys(order).length / 2;
 
-                        [dl_queue,ul_queue].forEach(function(queue) {
+                        [dl_queue, ul_queue].forEach(function(queue) {
                             var t_queue = queue.filter(isQueueActive);
                             if (t_queue.length !== queue.length) {
                                 var m = t_queue.length;
@@ -1302,7 +1303,7 @@ function showTransferToast(t_type, t_length) {
                 $('.slideshow-dialog').addClass('hidden');
                 $('.slideshow-overlay').addClass('hidden');
             }
-            document.location.hash = 'fm/transfers';
+            $.transferOpen(true);
         });
         $toast.rebind('mouseover', function(e)
         {
@@ -6381,14 +6382,14 @@ function sectionUIopen(id) {
     if (folderlink) {
         if (!isValidShareLink()) {
             $('.fm-breadcrumbs.folder-link .right-arrow-bg').text('Invalid folder');
-        } else if (id === 'cloud-drive') {
+        } else if (id === 'cloud-drive' || id === 'transfers') {
             $('.fm-main').addClass('active-folder-link');
             $('.fm-right-header').addClass('folder-link');
             $('.nw-fm-left-icon.folder-link').addClass('active');
             $('.fm-left-menu').addClass('folder-link');
             $('.nw-fm-tree-header.folder-link').show();
             $('.fm-import-to-cloudrive, .fm-download-as-zip').removeClass('hidden');
-            $('.fm-import-to-cloudrive, .fm-download-as-zip').bind('click', function() {
+            $('.fm-import-to-cloudrive, .fm-download-as-zip').rebind('click', function() {
                 var c = '' + $(this).attr('class');
 
                 if (~c.indexOf('fm-import-to-cloudrive')) {
@@ -6523,7 +6524,7 @@ function treeUIopen(id, event, ignoreScroll, dragOver, DragOpen) {
         sectionUIopen('ipc');
     } else if (id_r === 'opc') {
         sectionUIopen('opc');
-    } else if (id_r === M.RubbishID) {
+    } else if (M.RubbishID && id_r === M.RubbishID) {
         sectionUIopen('rubbish-bin');
     }
     else if (id_s === 'transfers') {

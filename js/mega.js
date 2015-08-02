@@ -2744,6 +2744,7 @@ function MegaData()
             if (typeof mDB === 'object' && !ignoreDB && !pfkey) {
                 mDBadd('u', clone(u));
             }
+            useravatar.loaded(u);
         }
     };
 

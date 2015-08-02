@@ -359,8 +359,13 @@ ZipEntryIO.prototype.toString = function() {
 };
 ZipEntryIO.prototype.destroy = function() {
     if (!oIsFrozen(this)) {
+        var dl = this.file || {};
         if (d) {
             this.logger.info('Destroying ' + this);
+        }
+        if (/*dl.cancelled && */dl.owner) {
+            // call ClassFile.abortTimers
+            dl.owner.abortTimers();
         }
         oDestroy(this);
     }
@@ -564,8 +569,10 @@ ZipWriter.prototype.done = function(zfile) {
 }
 
 ZipWriter.prototype.finalize_file = function() {
-    this.file_offset = 0;
-    this.zwriter.resume();
+    if (!oIsFrozen(this)) {
+        this.file_offset = 0;
+        this.zwriter.resume();
+    }
 };
 
 ZipWriter.prototype._eof = function() {

@@ -330,6 +330,7 @@ function ClassFile(dl) {
         dlmanager.dlSetActiveTransfer(dl.zipid || dl.dl_id);
     }
     this[this.gid] = !0;
+    this.dl.owner = this;
 }
 
 ClassFile.prototype.toString = function() {
@@ -337,6 +338,19 @@ ClassFile.prototype.toString = function() {
         return "[ClassFile " + this.gid + "/" + (this.dl ? (this.dl.zipname || this.dl.n) : '') + "]";
     }
     return "[ClassFile " + this.gid + "]";
+};
+
+ClassFile.prototype.abortTimers = function() {
+    if (this.dl) {
+        if (this.dl.quota_t) {
+            clearTimeout(this.dl.quota_t);
+            delete this.dl.quota_t;
+        }
+        if (this.dl.retry_t) {
+            clearTimeout(this.dl.retry_t);
+            delete this.dl.retry_t;
+        }
+    }
 };
 
 ClassFile.prototype.destroy = function() {
@@ -348,14 +362,7 @@ ClassFile.prototype.destroy = function() {
         return;
     }
 
-    if (this.dl.quota_t) {
-        clearTimeout(this.dl.quota_t);
-        delete this.dl.quota_t;
-    }
-    if (this.dl.retry_t) {
-        clearTimeout(this.dl.retry_t);
-        delete this.dl.retry_t;
-    }
+    this.abortTimers();
 
     if (this.dl.cancelled) {
         if (this.dl.zipid && Zips[this.dl.zipid]) {
@@ -524,24 +531,32 @@ ClassFile.prototype.run = function(task_done) {
     }.bind(this);
 
     dlmanager.dlGetUrl(this.dl, function(error, res, o) {
-        if (!this.dl || this.dl.cancelled) {
-            if (d) {
-                dlmanager.logger.error('Knock, knock..', this.dl);
+        var cancelOnInit = function() {
+            if (!this.dl || this.dl.cancelled) {
+                if (d) {
+                    dlmanager.logger.error('Knock, knock..', this.dl);
+                }
+                if (this.dl) {
+                    /* Remove leaked items from dlQueue & dl_queue */
+                    dlmanager.abort(this.dl);
+                    this.destroy(); // XXX: should be expunged already
+                }
+                return true;
             }
-            if (this.dl) {
-                /* Remove leaked items from dlQueue & dl_queue */
-                dlmanager.abort(this.dl);
-                this.destroy(); // XXX: should be expunged already
-            }
+            return false;
+        }.bind(this);
+        if (cancelOnInit()) {
             error = true;
         }
         else if (error) {
             /* failed */
             this.dl.retry_t = setTimeout(function onGetUrlError() { /* retry !*/
-                dlmanager.logger.error('retrying ', this.dl.n);
-                dlQueue.pushFirst(this);
-                if (dlmanager.ioThrottlePaused) {
-                    dlQueue.resume();
+                if (!cancelOnInit()) {
+                    dlmanager.logger.error('retrying ', this.dl.n);
+                    dlQueue.pushFirst(this);
+                    if (dlmanager.ioThrottlePaused) {
+                        dlQueue.resume();
+                    }
                 }
             }.bind(this), dlmanager.dlRetryInterval);
             dlmanager.logger.info('retry to fetch url in ', dlmanager.dlRetryInterval, ' ms');

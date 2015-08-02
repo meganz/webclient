@@ -190,12 +190,12 @@ MegaQueue.prototype.run_in_context = function(task) {
         if (!task[0]) {
             return;
         } /* already called */
-        this._running--;
-        var done = task[1] || task[0].onQueueDone;
-        if (done) {
-            done.apply(task[2] || this, [task[0], arguments]);
-        }
         if (!oIsFrozen(this)) {
+            this._running--;
+            var done = task[1] || task[0].onQueueDone;
+            if (done) {
+                done.apply(task[2] || this, [task[0], arguments]);
+            }
             if (ASSERT(this._pending, 'MegaQueue pending array got expunged, ' + this.qname)) {
                 removeValue(this._pending, task[0]);
             }
@@ -283,14 +283,40 @@ MegaQueue.prototype.process = function(sp) {
 
 MegaQueue.prototype.destroy = function() {
     if (!oIsFrozen(this)) {
-        this.logger.info('Destroying');
+        this.logger.info('', 'Destroying ' + this.qname, this._queue.length, this._pending);
+
         if (this._later) {
             clearTimeout(this._later);
         }
-        if (d && this.qname !== 'downloads' && this.qname !== 'download-writer') {
-            ASSERT(this._queue.length === 0, 'The queue "' + this.qname + '" was not properly cleaned.');
-        }
+        /**
+        this._pending.forEach(function(aRunningTask) {
+            if (d) {
+                this.logger.info('aRunningTask: ' + aRunningTask, aRunningTask);
+            }
+            if (aRunningTask && typeof aRunningTask.destroy === 'function') {
+                try {
+                    aRunningTask.destroy();
+                }
+                catch(ex) {
+                    this.logger.error(ex);
+                }
+            }
+        }.bind(this));
+        /**/
         if (d) {
+            if (this._queue.length !== 0) {
+                var fn = 'error';
+                switch (this.qname) {
+                    case 'downloads':
+                    case 'zip-writer':
+                    case 'download-writer':
+                        fn = (d > 1 ? 'warn' : 'debug');
+                    default:
+                        break;
+                }
+                this.logger[fn]('The queue "%s" was not empty.', this.qname, this._queue);
+            }
+
             removeValue(MegaQueue.weakRef, this);
         }
         oDestroy(this);

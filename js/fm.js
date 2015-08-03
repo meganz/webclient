@@ -3398,7 +3398,10 @@ function accountUI()
             if (typeof M.account.rubsched !== 'undefined') {
                 storefmconfig('rubsched', M.account.rubsched);
             }
-
+            if (typeof M.account.font_size !== 'undefined') {
+                localStorage.font_size = M.account.font_size;
+                font_size = M.account.font_size;
+            }
             if ($('#account-password').val() == '' && ($('#account-new-password').val() !== '' || $('#account-confirm-password').val() !== ''))
             {
                 msgDialog('warninga', l[135], l[719], false, function()
@@ -3535,6 +3538,10 @@ function accountUI()
             $('#ulspeedvalue').val(Math.floor(ul_maxSpeed / 1024));
         $('#rad' + i + '_div').removeClass('radioOff').addClass('radioOn');
         $('#rad' + i).removeClass('radioOff').addClass('radioOn');
+        if (localStorage.font_size) {
+            $('.uifontsize input').removeClass('radioOn').addClass('radioOff').parent().removeClass('radioOn').addClass('radioOff');
+            $('#fontsize' + localStorage.font_size).removeClass('radioOff').addClass('radioOn').parent().removeClass('radioOff').addClass('radioOn');
+        }
         $('.ulspeedradio input').unbind('click');
         $('.ulspeedradio input').bind('click', function(e)
         {
@@ -3553,6 +3560,17 @@ function accountUI()
             $('.ulspeedradio').removeClass('radioOn').addClass('radioOff');
             $(this).addClass('radioOn').removeClass('radioOff');
             $(this).parent().addClass('radioOn').removeClass('radioOff');
+            $('.fm-account-save-block').removeClass('hidden');
+            $('.fm-account-main').addClass('save');
+            initAccountScroll();
+        });
+        $('.uifontsize input').unbind('click');
+        $('.uifontsize input').bind('click', function(e)
+        {
+            $('body').removeClass('fontsize1 fontsize2').addClass('fontsize' + $(this).val());
+            $('.uifontsize input').removeClass('radioOn').addClass('radioOff').parent().removeClass('radioOn').addClass('radioOff');
+            $(this).removeClass('radioOff').addClass('radioOn').parent().removeClass('radioOff').addClass('radioOn');
+            M.account.font_size = $(this).val();
             $('.fm-account-save-block').removeClass('hidden');
             $('.fm-account-main').addClass('save');
             initAccountScroll();

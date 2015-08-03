@@ -29,8 +29,7 @@ var notify = {
         this.$popupIcon = $('.top-head .cloud-popup-icon');
         this.$popupNum = $('.top-head .notification-num');
         
-        // Get initial notifications
-        notify.getInitialNotifications();
+        // Init event handlers
         notify.initNotifyIconClickHandler();
     },
     
@@ -50,22 +49,22 @@ var notify = {
                 if (typeof result !== 'object') {
                     return false;
                 }
-                
+
                 // Get the current UNIX timestamp and the last time delta (the last time the user saw a notification)
                 var currentTime = Math.round(new Date().getTime() / 1000);
                 var lastTimeDelta = (result.ltd) ? result.ltd : 0;       
                 var notifications = result.c;
-                
+
                 // Loop through the notifications
                 for (var i = 0; i < notifications.length; i++) {
-                    
+
                     var notification = notifications[i];            // The full notification object
                     var id = makeid(10);                            // Make random ID
                     var type = notification.t;                      // Type of notification e.g. share
                     var timeDelta = notification.td;                // Seconds since the notification occurred                    
                     var seen = (timeDelta >= lastTimeDelta);        // If the notification time delta is older than the last time the user saw the notification then it is read
                     var timestamp = currentTime - timeDelta;        // Timestamp of the notification
-                    
+
                     // Add notifications to list
                     notify.notifications.push({
                         id: id,
@@ -137,8 +136,8 @@ var notify = {
      */
     initNotifyIconClickHandler: function() {
         
-        // On notifications icon click
-        notify.$popupIcon.rebind('click', function() {
+        // Add delegated event for when the notifications icon is clicked
+        $('.top-head').on('click', '.cloud-popup-icon', function() {
             
             // If the popup is already open, then close it
             if (notify.$popup.hasClass('active')) {
@@ -175,7 +174,7 @@ var notify = {
     closePopup: function() {
         
         // Make sure it is actually shown (otherwise any call to $.hideTopMenu could trigger this
-        if (notify.$popup.hasClass('active')) {
+        if ((notify.$popup !== null) && (notify.$popup.hasClass('active'))) {
 
             // Hide the popup
             notify.$popup.removeClass('active');
@@ -243,7 +242,9 @@ var notify = {
             notificationHtml += notify.getOuterHtml($notificationHtml);
         }
         
-        
+        // Update the list of notifications
+        notify.$popup.find('.notification-scr-list').append(notificationHtml);
+        notify.$popup.removeClass('empty');;
     },
     
     /**

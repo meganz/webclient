@@ -438,8 +438,7 @@ function pro_pay() {
                                 if (utcResult && utcResult.EUR) {
                                     paysafecard.redirectToSite(utcResult);
                                 }
-                                else
-                                {
+                                else {
                                     paysafecard.showConnectionError();
                                 }
                             }
@@ -1497,9 +1496,22 @@ var paysafecard = {
         window.location = url;
     },
 
+    /**
+     * Something has gone wrong just talking to paysafecard
+     */
     showConnectionError: function() {
-        msgDialog('warninga', 'Payment Failed', 'Transaction could not be initiated due to connection problems. If the problem persists, please contact support@mega.co.nz');
-        document.location.hash = "pro";
+        msgDialog('warninga', 'Payment Failed', 'Transaction could not be initiated due to connection problems. If the problem persists, please contact support@mega.co.nz', '', function() {
+            document.location.hash = "pro"; // redirect to remove any query parameters from the url
+        });
+    },
+
+    /**
+     * Something has gone wrong with the card association or debiting of the card
+     */
+    showPaymentError: function() {
+        msgDialog('warninga', 'Payment Failed', 'Something has gone wrong and we were unable to charge your card.', '', function(){
+            document.location.hash = "pro"; // redirect to remove any query parameters from the url
+        });
     },
 
     /**
@@ -1516,6 +1528,8 @@ var paysafecard = {
                 't': this.gatewayId,                    // The paysafecard gateway
                 'saleidstring': saleidstring            // Required by the API to know what to investigate            
             };
+
+            var parent = this;
         
             api_req(requestData, {
                 callback: function (result) {
@@ -1523,8 +1537,7 @@ var paysafecard = {
                     // If negative API number
                     if ((typeof result === 'number') && (result < 0)) {
                         // Something went wrong with the payment, either card association or actually debitting it.
-                        msgDialog('warninga', 'Payment Failed', 'Something has gone wrong and we were unable to charge your card.');
-                        document.location.hash = "pro";
+                        parent.showPaymentError();
                     }
                     else {
                         // Continue to account screen

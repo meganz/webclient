@@ -294,7 +294,7 @@ MegaSync.prototype._onError = function(next, e) {
     return this.downloadClient();
 };
 
-MegaSync.prototype.handle = function(response, next) {
+MegaSync.prototype.handle = function(next, response) {
     next = (typeof next === "function") ? next : function() {};
     if (response === 0) {
         // alright!

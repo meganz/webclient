@@ -3637,6 +3637,9 @@
     "7228": "Saiz tulisan:",
     "7229": "Kecil",
     "7230": "Besar",
-    "7231": "Price excludes Bitcoin transaction fee.",
-    "7232": "Drag and drop the downloaded file into the browser and confirm installation."
+    "7231": "Harga tidak termasuk yuran transaksi Bitcoin.",
+    "7232": "Seret dan lepas fail yang dimuat turun ke pelayar dan sahkan pemasangan.",
+    "7233": "Transaction could not be initiated due to connection problems. If the problem persists, please contact support@mega.co.nz",
+    "7234": "Something has gone wrong and we were unable to charge your card.",
+    "7235": "Payment Failed"
 }

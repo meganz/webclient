@@ -3638,5 +3638,8 @@
     "7229": "Kicsi",
     "7230": "Nagy",
     "7231": "Price excludes Bitcoin transaction fee.",
-    "7232": "Drag and drop the downloaded file into the browser and confirm installation."
+    "7232": "Drag and drop the downloaded file into the browser and confirm installation.",
+    "7233": "Transaction could not be initiated due to connection problems. If the problem persists, please contact support@mega.co.nz",
+    "7234": "Something has gone wrong and we were unable to charge your card.",
+    "7235": "Payment Failed"
 }

@@ -1500,7 +1500,7 @@ var paysafecard = {
      * Something has gone wrong just talking to paysafecard
      */
     showConnectionError: function() {
-        msgDialog('warninga', 'Payment Failed', 'Transaction could not be initiated due to connection problems. If the problem persists, please contact support@mega.co.nz', '', function() {
+        msgDialog('warninga', l[7235], l[7233], '', function() {
             document.location.hash = "pro"; // redirect to remove any query parameters from the url
         });
     },
@@ -1509,7 +1509,7 @@ var paysafecard = {
      * Something has gone wrong with the card association or debiting of the card
      */
     showPaymentError: function() {
-        msgDialog('warninga', 'Payment Failed', 'Something has gone wrong and we were unable to charge your card.', '', function(){
+        msgDialog('warninga', l[7235], l[7234], '', function(){
             document.location.hash = "pro"; // redirect to remove any query parameters from the url
         });
     },

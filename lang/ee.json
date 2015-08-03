@@ -3634,8 +3634,12 @@
     "7225": "Olete k\u00f5ikide edastuste eemaldamises kindel?",
     "7226": "Pr\u00fcgikasti puhastamisgraafik:",
     "7227": "J\u00e4rjekorras",
-    "7228": "Font size:",
-    "7229": "Small",
-    "7230": "Big",
-    "7231": "Price excludes Bitcoin transaction fee."
+    "7228": "Fondi suurus:",
+    "7229": "V\u00e4ike",
+    "7230": "Suur",
+    "7231": "Hind ei sisalda Bitcoini makse teenustasu.",
+    "7232": "Lohistage ja asetage allalaetud fail veebilehitsejasse ja kinnitage paigaldus.",
+    "7233": "Transaction could not be initiated due to connection problems. If the problem persists, please contact support@mega.co.nz",
+    "7234": "Something has gone wrong and we were unable to charge your card.",
+    "7235": "Payment Failed"
 }

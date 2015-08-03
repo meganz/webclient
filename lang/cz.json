@@ -1037,7 +1037,7 @@
     "1145": "Dnes, o 4000 let pozd\u011bji, v\u011bt\u0161ina hlavn\u00edch poskytovatel\u016f cloudov\u00fdch \u00falo\u017ei\u0161\u0165 st\u00e1le je\u0161t\u011b pln\u011b nep\u0159ijala \u0161ifrov\u00e1n\u00ed.",
     "1146": "Dokon\u010dit \u00fa\u010det",
     "1147": "Vyberte typ sv\u00e9ho \u00fa\u010dtu",
-    "1148": "[A]Z\u00edskejte 2 m\u011bs\u00edce zdarma[\/A], pokud si koup\u00edte ro\u010dn\u00ed pl\u00e1n Pro.",
+    "1148": "[A]Z\u00edskejte 2 m\u011bs\u00edce zdarma[\/A], p\u0159i zakoupen\u00ed ro\u010dn\u00edho bal\u00ed\u010dku Pro.",
     "1149": "Omezen\u00e1",
     "1150": "Zdarma",
     "1151": "Vyu\u017eijte pln\u011b mo\u017enosti MEGA s [A]\u00fa\u010dtem Pro[\/A]",
@@ -2282,7 +2282,7 @@
     "5868": "Zobrazit profil",
     "5869": "Odebrat kontakt",
     "5870": "Odebrat kontakt",
-    "5871": "Obl\u00edben\u00ed",
+    "5871": "Obl\u00edben\u00e9",
     "5872": "Odebrat obl\u00edben\u00e9",
     "5873": "P\u0159\u00edchoz\u00ed sd\u00edlen\u00e9 slo\u017eky",
     "5874": "P\u0159\u00edchoz\u00ed sd\u00edlen\u00e9 slo\u017eky",
@@ -2318,7 +2318,7 @@
     "5905": "Vlastn\u00edk",
     "5906": "P\u0159\u00edstup",
     "5907": "beta",
-    "5908": "Zadejte e-mial nebo kontakt",
+    "5908": "Zadejte e-mail nebo kontakt",
     "5909": "N\u00e1zvy soubor\u016f v MacOS\/UNIX rozli\u0161uj\u00ed mal\u00e1 a velk\u00e1 p\u00edsmena, ve Windows ne. Slo\u017eka obsahuj\u00edc\u00ed \"ABC.TXT\" i \"abc.txt\" m\u016f\u017ee b\u00fdt synchronizov\u00e1na do po\u010d\u00edta\u010de s UNIX bez probl\u00e9m\u016f, ale kdy\u017e synchronizujete do po\u010d\u00edta\u010de s Windows, z\u016fstane pouze jeden z t\u011bchto dvou soubor\u016f.MEGA neukl\u00e1d\u00e1 \u017e\u00e1dn\u00e1 omezen\u00ed na n\u00e1zvy soubor\u016f \u2013 mohou obsahovat znaky, kter\u00e9 nejsou kompatibiln\u00ed s opera\u010dn\u00edm syst\u00e9mem, jako nap\u0159\u00edklad : nebo *. Ty budou p\u0159eps\u00e1ny jako %xx na m\u00edstn\u00ed stran\u011b a p\u0159evedeny zp\u011bt na p\u016fvodn\u00ed znak, kdy\u017e budou synchronizov\u00e1ny zp\u011bt. Pr\u016fzkumn\u00edk Windows m\u00e1 tak\u00e9 probl\u00e9my s \u0159adou zd\u00e1nliv\u011b ne\u0161kodn\u00fdch n\u00e1zv\u016f soubor\u016f a slo\u017eek \u2013 \"con.doc\" by nap\u0159\u00edklad nebyl p\u0159\u00edstupn\u00fd (abyste pochopili pro\u010d, mus\u00edte b\u00fdt po\u010d\u00edta\u010dov\u00fd expert nebo zku\u0161en\u00fd u\u017eivatel, nebo oboj\u00ed). Pokud se setk\u00e1te s takovou situac\u00ed, jednodu\u0161e p\u0159ejmenujte soubor na cloudov\u00e9 stran\u011b. Ciz\u00ed znaky v n\u00e1zvech soubor\u016f jsou pln\u011b podporov\u00e1ny.MEGAsync podporuje pom\u011brn\u011b hlubok\u00e9 struktury slo\u017eek (samotn\u00e9 MEGA je omezeno na maxim\u00e1ln\u011b 63 \u00farovn\u00ed) a velice dlouh\u00e9 n\u00e1zvy cest (a\u017e 32.000 znak\u016f pod Windows). Bohu\u017eel, v\u011bt\u0161ina program\u016f ve Windows (v\u010detn\u011b Pr\u016fzkumn\u00edku) nen\u00ed schopna p\u0159istupovat k soubor\u016fm, jejich\u017e cesta je del\u0161\u00ed ne\u017e 260 znak\u016f.",
     "5910": "Existuj\u00ed t\u0159i zp\u016fsoby nahr\u00e1v\u00e1n\u00ed soubor\u016f na MEGA pomoc\u00ed webov\u00e9ho prohl\u00ed\u017ee\u010de:1. Klikn\u011bte na \u010derven\u00e9 tla\u010d\u00edtko na \u00favodn\u00ed str\u00e1nce2. P\u0159ejd\u011bte do sv\u00e9ho spr\u00e1vce soubor\u016f a klikn\u011bte na tla\u010d\u00edtko \"Nahr\u00e1t soubor\" nebo (pokud pou\u017e\u00edv\u00e1te Chrome) \"Nahr\u00e1t slo\u017eku\" pobl\u00ed\u017e horn\u00edho okraje3. P\u0159et\u00e1hn\u011bte soubory nebo (pokud pou\u017e\u00edv\u00e1te Chrome) slo\u017eky na str\u00e1nku",
     "5911": "P\u0159idat kontakty",
@@ -3637,5 +3637,9 @@
     "7228": "Velikost p\u00edsma",
     "7229": "Mal\u00e9",
     "7230": "Velk\u00e9",
-    "7231": "Price excludes Bitcoin transaction fee."
+    "7231": "Cena nezahrnuje poplatek za transakci s Bitcoiny.",
+    "7232": "P\u0159et\u00e1hn\u011bte sta\u017een\u00fd soubor do prohl\u00ed\u017ee\u010de a potvr\u010fte instalaci.",
+    "7233": "Transaction could not be initiated due to connection problems. If the problem persists, please contact support@mega.co.nz",
+    "7234": "Something has gone wrong and we were unable to charge your card.",
+    "7235": "Payment Failed"
 }

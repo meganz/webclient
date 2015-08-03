@@ -1501,6 +1501,7 @@ var paysafecard = {
      */
     showConnectionError: function() {
         msgDialog('warninga', l[7235], l[7233], '', function() {
+            proPage.hideLoadingOverlay();
             document.location.hash = "pro"; // redirect to remove any query parameters from the url
         });
     },
@@ -1510,6 +1511,7 @@ var paysafecard = {
      */
     showPaymentError: function() {
         msgDialog('warninga', l[7235], l[7234], '', function(){
+            proPage.hideLoadingOverlay();
             document.location.hash = "pro"; // redirect to remove any query parameters from the url
         });
     },
@@ -1541,6 +1543,7 @@ var paysafecard = {
                     }
                     else {
                         // Continue to account screen
+                        proPage.hideLoadingOverlay();
                         document.location.hash = "account";
                     }
                 }

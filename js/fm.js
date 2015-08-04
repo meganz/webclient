@@ -5659,21 +5659,14 @@ function transferPanelUI()
                 }
             }
             else {
-                var ids = [];
-
-                $(this).addClass('active').find('span').text(l[7101]);
-                $('.transfer-table tr').not('.clone-of-header').each(function(j, el) {
-                    if (!$(el).find('.transfer-status.completed').length
-                            && !$(el).find('.transfer-type.paused').length) {
-
-                        ids.push($(el).attr('id'));
-                    }
-                });
-                ids.concat(Object.keys(panelDomQueue)).map(fm_tfspause);
+                $('.transfer-table tr[id] .transfer-status:not(.completed)')
+                    .closest('tr').attrs('id')
+                    .concat(Object.keys(panelDomQueue)).map(fm_tfspause);
                 dlQueue.pause();
                 ulQueue.pause();
                 uldl_hold = true;
 
+                $(this).addClass('active').find('span').text(l[7101]);
                 $('.transfer-table tr span.transfer-type').not('.done').addClass('paused');
                 $('.nw-fm-left-icon').addClass('paused');
             }

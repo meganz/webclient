@@ -42,6 +42,25 @@ var dl_interval, ul_interval;
 
 function fmUpdateCount() {
     var i = 0, u = 0;
+
+    // Move completed transfers to the bottom
+    $('.transfer-table td .transfer-status.completed')
+        .closest('tr').remove()
+        .insertBefore($('.transfer-table tr.clone-of-header'));
+
+    // Remove completed transfers filling the whole table
+    var trLen = M.getTransferTableLengths().size;
+    if ($('.transfer-table .transfer-status.completed').length >= trLen) {
+        // $('.transfer-table .transfer-status.completed')
+            // .slice(0, trLen)
+            // .closest('tr')
+            // .fadeOut(function() {
+                // $(this).remove();
+            // });
+        // Hm, rather just leave them at the bottom
+        $('.transfer-scrolling-table').trigger('jsp-scroll-y.tfsdynlist', [0, 0, 1]);
+    }
+
     $('.transfer-table span.row-number').each(function() {
         var $this = $(this);
         $this.text(++i);
@@ -3540,6 +3559,7 @@ function MegaData()
         var path;
         var nodes = [];
         var paths = {};
+        var zipsize = 0;
         if (!is_extension && !preview && !z && (dlMethod === MemoryIO || dlMethod === FlashIO))
         {
             var nf = [], cbs = [];
@@ -3588,7 +3608,6 @@ function MegaData()
             z=zipid;
             if (M.d[n[0]] && M.d[n[0]].t) zipname = M.d[n[0]].name + '.zip';
             else zipname = (zipname || ('Archive-'+ Math.random().toString(16).slice(-4))) + '.zip';
-            var zipsize = 0;
         }
         else {
             z = false;
@@ -3996,8 +4015,7 @@ function MegaData()
     {
         var target = gid[0] === 'u'
             ? $('.transfer-table tr[id^="ul"] .transfer-status.queued:last')
-            : $('.transfer-table tr:not([id^="ul"]) .transfer-status.queued:last'),
-            transfersLength = $('.transfer-table tr').length;
+            : $('.transfer-table tr:not([id^="ul"]) .transfer-status.queued:last');
 
         if (target.length) {
             target.closest('tr').after(elem);
@@ -4016,11 +4034,6 @@ function MegaData()
         }
         if ($.mSortableT) {
             $.mSortableT.sortable('refresh');
-        }
-        if (transfersLength > 50) {
-            for (var i = 1; i < transfersLength - 50; i++) {
-                $('.transfer-table tr .transfer-status.completed:last').closest('tr').remove();
-            }
         }
         if (!q) {
             Soon(fmUpdateCount);

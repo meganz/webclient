@@ -2921,6 +2921,7 @@ mega.utils.resetUploadDownload = function megaUtilsResetUploadDownload() {
         dlmanager.logger.info("resetUploadDownload", ul_queue.length, dl_queue.length);
     }
 
+    fmUpdateCount();
     Later(percent_megatitle);
 };
 

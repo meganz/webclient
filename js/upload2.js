@@ -92,6 +92,8 @@ var ulmanager = {
         var end = chunk.end;
         var cid = String(chunk);
         var altport = !chunk.altport;
+        var suffix = chunk.suffix;
+        var bytes = suffix && chunk.bytes;
 
         file.ul_failed = true;
         api_reportfailure(hostname(file.posturl), ulmanager.networkErrorCheck);
@@ -116,6 +118,10 @@ var ulmanager = {
 
             if (tid < 34) {
                 var newTask = new ChunkUpload(file, start, end, altport);
+                if (suffix) {
+                    newTask.suffix = suffix;
+                    newTask.bytes = bytes;
+                }
                 ulQueue.pushFirst(newTask);
             }
             else {
@@ -747,6 +753,7 @@ function ChunkUpload(file, start, end, altport) {
     this.xid = this.gid + '_' + start + '-' + end;
     this.jid = (Math.random() * Date.now()).toString(36);
     this.altport = altport;
+    this.logger = new MegaLogger(String(this), {}, ulmanager.logger);
     this[this.gid] = !0;
     // if (d) ulmanager.logger.info('Creating ' + this);
 }
@@ -795,6 +802,8 @@ ChunkUpload.prototype.updateprogress = function() {
 };
 
 ChunkUpload.prototype.abort = function() {
+    this.logger.info('Aborting', this.oet, Boolean(this.xhr));
+
     if (this.oet) {
         clearTimeout(this.oet);
     }
@@ -805,7 +814,7 @@ ChunkUpload.prototype.abort = function() {
         removeValue(GlobalProgress[this.gid].working, this, 1);
     }
     else if (d) {
-        ulmanager.logger.error('This should not be reached twice or after FileUpload destroy...');
+        this.logger.error('This should not be reached twice or after FileUpload destroy...', this);
     }
     delete this.xhr;
 };
@@ -839,7 +848,7 @@ ChunkUpload.prototype.on_error = function(args, xhr, reason) {
 ChunkUpload.prototype.on_ready = function(args, xhr) {
     if (!this.file || !this.file.progress) {
         if (d) {
-            ulmanager.logger.error('Upload aborted... ' + this, this);
+            this.logger.error('Upload aborted...', this);
         }
         return Soon(this.done.bind(this));
     }
@@ -907,7 +916,7 @@ ChunkUpload.prototype.on_ready = function(args, xhr) {
     this.srverr = xhr.status + 1;
 
     if (d) {
-        ulmanager.logger.info(this + " bad response from server",
+        this.logger.info("Bad response from server",
             xhr.status,
             this.file.name,
             typeof xhr.response === 'string',
@@ -924,10 +933,17 @@ ChunkUpload.prototype.upload = function() {
 
     if (!this.file) {
         if (d) {
-            ulmanager.logger.error('This upload was cancelled while the Encrypter was working,'
+            this.logger.error('This upload was cancelled while the Encrypter was working,'
                 + ' prevent this aborting it beforehand');
         }
         return;
+    }
+
+    if (!GlobalProgress[this.gid]) {
+        return this.logger.error('No upload associated with gid ' + this.gid);
+    }
+    if (GlobalProgress[this.gid].paused) {
+        return this.logger.info('Encrypter finished, but the upload was paused meanwhile.');
     }
 
     if (!this.file.posturl) {
@@ -943,7 +959,7 @@ ChunkUpload.prototype.upload = function() {
     xhr._murl = url;
 
     if (d) {
-        ulmanager.logger.info("pushing", url);
+        this.logger.info("pushing", url);
     }
 
     xhr.open('POST', url);
@@ -956,7 +972,7 @@ ChunkUpload.prototype.io_ready = function(task, args) {
     if (args[0] || !this.file || !this.file.ul_keyNonce) {
         if (this.file) {
             if (d) {
-                ulmanager.logger.error('UL IO Error', args[0]);
+                this.logger.error('UL IO Error', args[0]);
             }
 
             if (this.file.done_starting) {
@@ -966,7 +982,7 @@ ChunkUpload.prototype.io_ready = function(task, args) {
         }
         else {
             if (d) {
-                ulmanager.logger.error('The FileReader finished, but this upload was cancelled...');
+                this.logger.error('The FileReader finished, but this upload was cancelled...');
             }
         }
     }
@@ -981,7 +997,7 @@ ChunkUpload.prototype.io_ready = function(task, args) {
 
 ChunkUpload.prototype.done = function(ee) {
     if (d) {
-        ulmanager.logger.info(this + '.done');
+        this.logger.info('.done');
     }
 
     if (this._done) {
@@ -995,7 +1011,15 @@ ChunkUpload.prototype.done = function(ee) {
 
 ChunkUpload.prototype.run = function(done) {
     this._done = done;
-    this.file.ul_reader.push(this, this.io_ready, this);
+    if (this.bytes && this.suffix) {
+        this.logger.info('.run', 'Reusing previously encrypted data.');
+        this.upload();
+    }
+    else {
+        this.logger.info('.run');
+        this.file.ul_reader.push(this, this.io_ready, this);
+    }
+    removeValue(GlobalProgress[this.gid].working, this, 1);
     GlobalProgress[this.gid].working.push(this);
 };
 

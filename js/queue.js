@@ -191,16 +191,21 @@ MegaQueue.prototype.run_in_context = function(task) {
             return;
         } /* already called */
         if (!oIsFrozen(this)) {
-            this._running--;
-            var done = task[1] || task[0].onQueueDone;
-            if (done) {
-                done.apply(task[2] || this, [task[0], arguments]);
+            if (!this._pending || this._pending.indexOf(task[0]) === -1) {
+                this.logger.warn('Task is no longer pending.', task[0], this._pending);
             }
-            if (ASSERT(this._pending, 'MegaQueue pending array got expunged, ' + this.qname)) {
+            else {
+                this._running--;
                 removeValue(this._pending, task[0]);
-            }
-            if (!this.isEmpty() || $.len(this._qpaused)) {
-                this._process();
+                ASSERT(this._running > -1, 'Queue inconsistency (RIC)');
+
+                var done = task[1] || task[0].onQueueDone;
+                if (done) {
+                    done.apply(task[2] || this, [task[0], arguments]);
+                }
+                if (!this.isEmpty() || $.len(this._qpaused)) {
+                    this._process();
+                }
             }
         }
         task[0] = task[1] = task[2] = undefined;
@@ -353,10 +358,14 @@ TransferQueue.prototype.mull = function() {
 
 TransferQueue.prototype.dispatch = function(gid) {
     // dispatch a paused transfer
-    ASSERT(GlobalProgress[gid], 'No transfer associated with ' + gid);
-    ASSERT(!GlobalProgress[gid] || this._qpaused[gid], 'This transfer is not in hold: ' + gid);
 
-    if (this._qpaused[gid] && !GlobalProgress[gid].paused) {
+    if (!GlobalProgress[gid]) {
+        this.logger.error('', 'No transfer associated with ' + gid);
+    }
+    else if (!this._qpaused[gid]) {
+        this.logger.error('', 'This transfer is not in hold: ' + gid);
+    }
+    else if (!GlobalProgress[gid].paused) {
         this._queue = this._qpaused[gid].concat(this._queue);
         delete this._qpaused[gid];
         this._process();
@@ -381,7 +390,13 @@ TransferQueue.prototype.pause = function(gid) {
             }
             chunk.abort();
             this.pushFirst(chunk);
-            this._running--;
+            if (removeValue(this._pending, chunk, 1)) {
+                this._running--;
+                ASSERT(this._running > -1, 'Queue inconsistency on pause');
+            }
+            else {
+                this.logger.warn("Paused chunk was NOT in pending state: " + chunk, chunk, this);
+            }
         }
         this._qpaused[gid] = this.slurp(gid).concat(this._qpaused[gid] || []);
         $('.transfer-table #' + gid + ' td:eq(0) span.speed').text(' (' + l[1651] + ')');

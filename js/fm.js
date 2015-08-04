@@ -1292,7 +1292,7 @@ function showTransferToast(t_type, t_length) {
                 $('.slideshow-dialog').addClass('hidden');
                 $('.slideshow-overlay').addClass('hidden');
             }
-            $.transferOpen(true);
+            M.openFolder('transfers', true);
         });
         $toast.rebind('mouseover', function(e)
         {
@@ -5642,18 +5642,14 @@ function transferPanelUI()
             if ($(this).hasClass('active')) {
                 // terms of service
                 if (u_type || u_attr.terms) {
-                    dlQueue.resume();
-                    ulQueue.resume();
+                    [dlQueue, ulQueue].forEach(function(queue) {
+                        Object.keys(queue._qpaused).map(fm_tfsresume);
+                    });
                     uldl_hold = false;
+                    ulQueue.resume();
+                    dlQueue.resume();
 
                     $(this).removeClass('active').find('span').text(l[6993]);
-                    $('.transfer-table tr').not('.clone-of-header').each(function(j, el) {
-                        if (!$(el).find('.transfer-status.completed').length) {
-                            var elId = $(el).attr('id');
-                            fm_tfsresume(elId);
-                        }
-                    });
-
                     $('.fm-transfers-block tr span.transfer-type').removeClass('paused');
                     $('.nw-fm-left-icon').removeClass('paused');
                 }
@@ -5663,14 +5659,17 @@ function transferPanelUI()
                 }
             }
             else {
+                var ids = [];
+
                 $(this).addClass('active').find('span').text(l[7101]);
                 $('.transfer-table tr').not('.clone-of-header').each(function(j, el) {
                     if (!$(el).find('.transfer-status.completed').length
                             && !$(el).find('.transfer-type.paused').length) {
 
-                        fm_tfspause($(el).attr('id'));
+                        ids.push($(el).attr('id'));
                     }
                 });
+                ids.concat(Object.keys(panelDomQueue)).map(fm_tfspause);
                 dlQueue.pause();
                 ulQueue.pause();
                 uldl_hold = true;

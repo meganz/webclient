@@ -1137,12 +1137,6 @@ function openTransferpanel()
             start: function(ev, ui) {
                 var headerColumn;
                 $('body').addClass('dndc-sort');
-                $('.transfer-table tr').not('.clone-of-header').each(function(i, e) {
-                    $(e).find('td').each(function(j,el) {
-                        headerColumn = $('.transfer-table-header th').get(j);
-                        $(el).width($(headerColumn).width());
-                    });
-                });
                 this.order = fm_tfsorderupd();
             },
             stop: function(ev, ui) {
@@ -1151,11 +1145,6 @@ function openTransferpanel()
                 var $next = $tr.next();
                 var cancel = false;
                 $('body').removeClass('dndc-sort');
-                $('.transfer-table tr').not('.clone-of-header').each(function(i, e) {
-                    $(e).find('td').each(function(j,el) {
-                        $(el).removeAttr('style');
-                    });
-                });
                 if ($tr.hasClass('started') || $next.hasClass('started')) {
                     cancel = true;
                 }
@@ -5476,15 +5465,6 @@ function transferPanelUI()
     $.transferHeader = function()
     {
         fm_resize_handler();
-        var el = $('.transfer-table-header th');
-        setTimeout(function() {
-            $('.transfer-table tr.clone-of-header th').each(function(i, e) {
-                if ($(e).outerWidth()) {
-                    var headerColumn = $(el).get(i);
-                    $(headerColumn).width($(e).width() + 'px');
-                }
-            });
-        }, 100);
 
         var tth = $('.transfer-table-header');
 

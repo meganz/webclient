@@ -1238,7 +1238,7 @@ function openTransferpanel()
         target.fadeOut(function() {
             $(this).remove();
             $.clearTransferPanel();
-            fmUpdateCount();
+            fm_tfsupdate();
             Soon(function() {
                 $(window).trigger('resize');
             });
@@ -2572,7 +2572,7 @@ function initContextUI() {
             .map(function(id) {
                 fm_tfsmove(id, -1);
             });
-        Soon(fmUpdateCount);
+        Soon(fm_tfsupdate);
     });
 
     $(c + '.move-down').rebind('click', function() {
@@ -2582,7 +2582,7 @@ function initContextUI() {
             .map(function(id) {
                 fm_tfsmove(id, 1);
             });
-        Soon(fmUpdateCount);
+        Soon(fm_tfsupdate);
     });
 
     $(c + '.transfer-play').rebind('click', function() {
@@ -2617,7 +2617,7 @@ function initContextUI() {
         dlmanager.abort(toabort);
         ulmanager.abort(toabort);
         $.clearTransferPanel();
-        fmUpdateCount();
+        fm_tfsupdate();
 
         Soon(function() {
             // XXX: better way to stretch the scrollbar?
@@ -5628,7 +5628,7 @@ function transferPanelUI()
             $('.transfer-table tr .transfer-status.completed').closest('tr').fadeOut(function() {
                 $(this).remove();
                 $.clearTransferPanel();
-                fmUpdateCount();
+                fm_tfsupdate();
                 Soon(function() {
                     $(window).trigger('resize');
                 });
@@ -5661,7 +5661,7 @@ function transferPanelUI()
             else {
                 $('.transfer-table tr[id] .transfer-status:not(.completed)')
                     .closest('tr').attrs('id')
-                    .concat(Object.keys(panelDomQueue)).map(fm_tfspause);
+                    .concat(Object.keys(M.tfsdomqueue)).map(fm_tfspause);
                 dlQueue.pause();
                 ulQueue.pause();
                 uldl_hold = true;
@@ -9930,7 +9930,6 @@ function fingerprintDialog(userid)
             'margin-left': '-' + $this.width() / 2 + 'px'
         });
     fm_showoverlay();
-
 }
 
 function contactUI() {

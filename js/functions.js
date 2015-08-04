@@ -2906,10 +2906,10 @@ mega.utils.resetUploadDownload = function megaUtilsResetUploadDownload() {
         $('.transfer-pause-icon').addClass('disabled');
         $('.nw-fm-left-icon.transfers').removeClass('transfering');
         $('.transfers .nw-fm-percentage li p').css('transform', 'rotate(0deg)');
-        panelDomQueue = {};
+        M.tfsdomqueue = {};
         GlobalProgress = {};
         delete $.transferprogress;
-        fmUpdateCount();
+        fm_tfsupdate();
         if ($.mTransferAnalysis) {
             clearInterval($.mTransferAnalysis);
             delete $.mTransferAnalysis;
@@ -2921,7 +2921,7 @@ mega.utils.resetUploadDownload = function megaUtilsResetUploadDownload() {
         dlmanager.logger.info("resetUploadDownload", ul_queue.length, dl_queue.length);
     }
 
-    fmUpdateCount();
+    fm_tfsupdate();
     Later(percent_megatitle);
 };
 

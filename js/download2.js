@@ -20,6 +20,7 @@ var dlmanager = {
     dlRetryInterval: 1000,
     dlMaxChunkSize: 16 * 1048576,
     isDownloading: false,
+    dlZipID: 0,
     logger: MegaLogger.getLogger('dlmanager'),
 
     newUrl: function DM_newUrl(dl, callback) {
@@ -918,6 +919,52 @@ function fm_tfsmove(gid, dir) { // -1:up, 1:down
             break;
         }
     }
+}
+
+function fm_tfsupdate() {
+    var i = 0, u = 0;
+
+    // Move completed transfers to the bottom
+    $('.transfer-table td .transfer-status.completed')
+        .closest('tr').remove()
+        .insertBefore($('.transfer-table tr.clone-of-header'));
+
+    // Remove completed transfers filling the whole table
+    var trLen = M.getTransferTableLengths().size;
+    if ($('.transfer-table .transfer-status.completed').length >= trLen) {
+        // $('.transfer-table .transfer-status.completed')
+            // .slice(0, trLen)
+            // .closest('tr')
+            // .fadeOut(function() {
+                // $(this).remove();
+            // });
+        // Hm, rather just leave them at the bottom
+        $('.transfer-scrolling-table').trigger('jsp-scroll-y.tfsdynlist', [0, 0, 1]);
+    }
+
+    $('.transfer-table span.row-number').each(function() {
+        var $this = $(this);
+        $this.text(++i);
+        if ($this.closest('tr').find('.transfer-type.upload').length) ++u;
+    });
+    i -= u;
+    for (var k in M.tfsdomqueue) {
+        if (k[0] === 'u') ++u;
+        else ++i;
+    }
+    var sep = "\u202F", $tpt = $('.transfer-panel-title');
+    var t, l = $.trim($tpt.text()).split(sep)[0];
+    if (i && u) {
+        t = '\u2191 ' + i + ' \u2193 ' + u;
+    } else if (i) {
+        t = i;
+    } else if (u) {
+        t = u;
+    } else {
+        t = '';
+    }
+    if (t) t = sep + ' ' + t;
+    $tpt.text(l + t);
 }
 
 

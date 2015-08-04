@@ -1,6 +1,12 @@
 var newnodes;
+var maxaction;
 var fminitialized = false;
-var panelDomQueue = {};
+var dl_interval, ul_interval;
+
+var fmconfig = {};
+if (localStorage.fmconfig) {
+    fmconfig = JSON.parse(localStorage.fmconfig);
+}
 
 if (typeof seqno === 'undefined')
     var seqno = Math.floor(Math.random() * 1000000000);
@@ -33,78 +39,9 @@ if (typeof loadingDialog === 'undefined')
     };
 }
 
-var fmconfig = {};
-if (localStorage.fmconfig)
-    fmconfig = JSON.parse(localStorage.fmconfig);
-var maxaction;
-var zipid = 1;
-var dl_interval, ul_interval;
-
-function fmUpdateCount() {
-    var i = 0, u = 0;
-
-    // Move completed transfers to the bottom
-    $('.transfer-table td .transfer-status.completed')
-        .closest('tr').remove()
-        .insertBefore($('.transfer-table tr.clone-of-header'));
-
-    // Remove completed transfers filling the whole table
-    var trLen = M.getTransferTableLengths().size;
-    if ($('.transfer-table .transfer-status.completed').length >= trLen) {
-        // $('.transfer-table .transfer-status.completed')
-            // .slice(0, trLen)
-            // .closest('tr')
-            // .fadeOut(function() {
-                // $(this).remove();
-            // });
-        // Hm, rather just leave them at the bottom
-        $('.transfer-scrolling-table').trigger('jsp-scroll-y.tfsdynlist', [0, 0, 1]);
-    }
-
-    $('.transfer-table span.row-number').each(function() {
-        var $this = $(this);
-        $this.text(++i);
-        if ($this.closest('tr').find('.transfer-type.upload').length) ++u;
-    });
-    i -= u;
-    for (var k in panelDomQueue) {
-        if (k[0] === 'u') ++u;
-        else ++i;
-    }
-    var sep = "\u202F", $tpt = $('.transfer-panel-title');
-    var t, l = $.trim($tpt.text()).split(sep)[0];
-    if (i && u) {
-        t = '\u2191 ' + i + ' \u2193 ' + u;
-    } else if (i) {
-        t = i;
-    } else if (u) {
-        t = u;
-    } else {
-        t = '';
-    }
-    if (t) t = sep + ' ' + t;
-    $tpt.text(l + t);
-}
-
 function MegaData()
 {
-    this.d = {};
-    this.v = [];
-    this.c = {};
-    this.u = {};
-    this.t = {};
     this.h = {};
-    this.opc = {};
-    this.ipc = {};
-    this.ps = {};
-    this.sn = false;
-    this.filter = false;
-    this.sortfn = false;
-    this.sortd = false;
-    this.rendered = false;
-    this.currentdirid = false;
-    this.viewmode = 0;// 0 list view, 1 block view
-
     this.csortd = -1;
     this.csort = 'name';
 
@@ -126,8 +63,10 @@ function MegaData()
         this.RootID = undefined;
         this.RubbishID = undefined;
         this.InboxID = undefined;
-        this.viewmode = 0;
+        this.viewmode = 0; // 0 list view, 1 block view
+        this.tfsdomqueue = {};
     };
+    this.reset();
 
     this.sortBy = function(fn, d)
     {
@@ -3604,10 +3543,13 @@ function MegaData()
         }
 
         if (z) {
-            zipid++;
-            z=zipid;
-            if (M.d[n[0]] && M.d[n[0]].t) zipname = M.d[n[0]].name + '.zip';
-            else zipname = (zipname || ('Archive-'+ Math.random().toString(16).slice(-4))) + '.zip';
+            z = ++dlmanager.dlZipID;
+            if (M.d[n[0]] && M.d[n[0]].t) {
+                zipname = M.d[n[0]].name + '.zip';
+            }
+            else {
+                zipname = (zipname || ('Archive-'+ Math.random().toString(16).slice(-4))) + '.zip';
+            }
         }
         else {
             z = false;
@@ -3684,7 +3626,7 @@ function MegaData()
         }
 
         if (z && zipsize) {
-            this.addToTransferTable('<tr id="zip_' + zipid + '">'
+            this.addToTransferTable('<tr id="zip_' + z + '">'
                 + '<td><span class="transfer-type download' + p + '">' + l[373] + '<span class="speed">' + pauseTxt + '</span></span>' + flashhtml + '</td>'
                 + '<td><span class="transfer-filtype-icon ' + fileIcon({name: 'archive.zip'}) + '"></span><span class="tranfer-filetype-txt">' + htmlentities(zipname) + '</span></td>'
                 + '<td></td>'
@@ -3696,7 +3638,7 @@ function MegaData()
                 + '</tr>');
 
             if (uldl_hold) {
-                fm_tfspause('zip_' + zipid);
+                fm_tfspause('zip_' + z);
             }
         }
 
@@ -3944,7 +3886,7 @@ function MegaData()
         var id = (dl.zipid ? 'zip_' + dl.zipid : 'dl_' + dl.dl_id);
         $('.transfer-table #' + id + ' td:eq(5)').html('<span class="transfer-status initiliazing">' + htmlentities(l[1042]) + '</span>');
         $('.transfer-table').prepend($('.transfer-table #' + id));
-        Soon(fmUpdateCount);
+        Soon(fm_tfsupdate);
         dl.st = NOW();
         ASSERT(typeof dl_queue[dl.pos] === 'object', 'No dl_queue entry for the provided dl...');
         ASSERT(typeof dl_queue[dl.pos] !== 'object' || dl.n == dl_queue[dl.pos].n, 'No matching dl_queue entry...');
@@ -3958,15 +3900,15 @@ function MegaData()
     {
         function flush_cached_nodes(n)
         {
-            n = Object.keys(panelDomQueue).slice(0, n);
+            n = Object.keys(M.tfsdomqueue).slice(0, n);
 
             if (n.length)
             {
                 for (var i in n)
                 {
                     i = n[i];
-                    addToTransferTable(i, panelDomQueue[i], 1);
-                    delete panelDomQueue[i];
+                    addToTransferTable(i, M.tfsdomqueue[i], 1);
+                    delete M.tfsdomqueue[i];
                 }
 
                 if (M._tfsDynlistR)
@@ -3975,7 +3917,7 @@ function MegaData()
                 {
                     delete M._tfsDynlistR;
                     Soon(transferPanelUI);
-                    Soon(fmUpdateCount);
+                    Soon(fm_tfsupdate);
                 }, 350);
                 $(window).trigger('resize');
             }
@@ -4036,7 +3978,7 @@ function MegaData()
             $.mSortableT.sortable('refresh');
         }
         if (!q) {
-            Soon(fmUpdateCount);
+            Soon(fm_tfsupdate);
         }
     }
     this.addToTransferTable = function(elem)
@@ -4084,7 +4026,7 @@ function MegaData()
             }
 
             if (!fit)
-                panelDomQueue[gid] = elem;
+                M.tfsdomqueue[gid] = elem;
         }
     };
 
@@ -4298,7 +4240,7 @@ function MegaData()
         }
         $('.transfer-table #ul_' + id + ' td:eq(5)').html('<span class="transfer-status initiliazing">' + htmlentities(l[1042]) + '</span>');
         $('.transfer-table').prepend($('.transfer-table #ul_' + id));
-        Soon(fmUpdateCount);
+        Soon(fm_tfsupdate);
         ul.starttime = new Date().getTime();
         M.ulprogress(ul, 0, 0, 0);
         $.transferHeader();

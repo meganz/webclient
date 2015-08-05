@@ -169,7 +169,7 @@ var useravatar = (function() {
 
         var avatar = $(ns.contact(user)).html();
         $('.avatar-wrapper.' + user).empty().html(avatar);
-        if ((M.u[user]||{}).m) {
+        if ((M.u[user] || {}).m) {
             $('.avatar-wrapper.' + M.u[user].m.replace(/[\.@]/g, "\\$1")).empty().html(avatar);
         }
     };

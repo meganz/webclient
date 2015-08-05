@@ -14,6 +14,9 @@ var notify = {
     // Number of notifications to fetch
     numOfNotifications: 100,
     
+    // Locally cached emails and pending contact emails
+    userEmails: {},
+    
     // jQuery objects for faster lookup
     $popup: null,
     $popupIcon: null,
@@ -44,42 +47,48 @@ var notify = {
         // Call API to fetch the most recent notifications
         api_req('c=' + notify.numOfNotifications, {
             callback: function(result) {
-
+                
                 // Check it wasn't a negative number error response
                 if (typeof result !== 'object') {
                     return false;
                 }
-
+                
                 // Get the current UNIX timestamp and the last time delta (the last time the user saw a notification)
                 var currentTime = Math.round(new Date().getTime() / 1000);
                 var lastTimeDelta = (result.ltd) ? result.ltd : 0;       
                 var notifications = result.c;
-
+                var pendingContactUsers = result.u;
+                
+                // Add pending contact users
+                notify.addUserEmails(pendingContactUsers);
+                
                 // Loop through the notifications
                 for (var i = 0; i < notifications.length; i++) {
-
+                    
                     var notification = notifications[i];            // The full notification object
                     var id = makeid(10);                            // Make random ID
                     var type = notification.t;                      // Type of notification e.g. share
                     var timeDelta = notification.td;                // Seconds since the notification occurred                    
                     var seen = (timeDelta >= lastTimeDelta);        // If the notification time delta is older than the last time the user saw the notification then it is read
                     var timestamp = currentTime - timeDelta;        // Timestamp of the notification
-
+                    var userHandle = notification.u;                      // User handle e.g. new share from this user
+                    
                     // Add notifications to list
                     notify.notifications.push({
+                        data: notification,                         // The full notification object
                         id: id,
-                        notification: notification,
                         seen: seen,
                         timeDelta: timeDelta,
                         timestamp: timestamp,
-                        type: type
+                        type: type,
+                        userHandle: userHandle
                     });
                 }
-
+                
                 // Show the notifications
                 notify.countAndShowNewNotifications();
             }
-        }, 3);  // Use channel 3
+        }, 3);  // Channel 3
     },
     
     /**
@@ -129,7 +138,6 @@ var notify = {
         // up to this point then they won't show these notifications as new next time they are fetched
         api_req({ a: 'sla', i: requesti });
     },
-    
     
     /**
      * Open the notifications popup when clicking the notifications icon
@@ -205,6 +213,37 @@ var notify = {
     },
     
     /**
+     * Populates the user emails into a list which can be looked up later for incoming 
+     * notifications where there is no known contact handle e.g. pending shares/contacts
+     * @param {Array} pendingContactUsers The 
+     */
+    addUserEmails: function(pendingContactUsers) {
+        
+        // Add the pending contact email addresses
+        for (var i = 0, length = pendingContactUsers.length; i < length; i++) {
+            
+            var userHandle = pendingContactUsers[i].u;
+            var userEmail = pendingContactUsers[i].m;
+            
+            notify.userEmails[userHandle] = userEmail;
+        }
+
+        // Add the emails from the user's list of known contacts
+        if (M && M.u) {
+            for (var userHandle in M.u) {
+                
+                // Skip if not own property
+                if (!M.u.hasOwnProperty(userHandle)) {
+                    continue;
+                }
+                
+                // Add the email
+                notify.userEmails[userHandle] = M.u[userHandle].m;
+            }
+        }
+    },
+    
+    /**
      * To do: render the notifications in the popup
      */
     renderNotifications: function() {
@@ -222,7 +261,7 @@ var notify = {
         notify.sortNotificationsByMostRecent();
 
         // Store for the all the generated HTML
-        var notificationHtml = '';
+        var allNotificationsHtml = '';
         var $template = this.$popup.find('.notification-item.template');
 
         // Loop through all the notifications
@@ -232,19 +271,19 @@ var notify = {
             var notification = notify.notifications[i];
             var $notificationHtml = $template.clone();
             
-            // Remove the template class
-            $notificationHtml.removeClass('template');
-            
             // Update template
-            $notificationHtml.find('.notification-date').text(Date.now());
+            $notificationHtml = notify.updateTemplate($notificationHtml, notification);
             
             // Build the html
-            notificationHtml += notify.getOuterHtml($notificationHtml);
+            allNotificationsHtml += notify.getOuterHtml($notificationHtml);
         }
         
         // Update the list of notifications
-        notify.$popup.find('.notification-scr-list').append(notificationHtml);
-        notify.$popup.removeClass('empty');;
+        notify.$popup.find('.notification-scr-list').append(allNotificationsHtml);
+        notify.$popup.removeClass('empty');
+        
+        // Add scrolling for the notifications
+        notify.initPopupScrolling();
     },
     
     /**
@@ -255,6 +294,122 @@ var notify = {
     getOuterHtml: function($element)
     {
         return $element.clone().wrap('<div>').parent().html();
+    },
+    
+    updateTemplate: function($notificationHtml, notification)
+    {
+        // Remove the template class
+        $notificationHtml.removeClass('template');
+        
+        // Populate based on each type of notification
+        switch (notification.type) {
+            
+            case 'share':
+                $notificationHtml = notify.renderNewShare($notificationHtml, notification);
+                break;
+            default:
+                break;
+        }
+        
+        var date = time2last(notification.timestamp);
+        var userHandle = notification.userHandle;
+        var userEmail = '';
+        
+        // Use the email address of the contact
+        if (typeof userHandle === 'undefined') {
+            userEmail = notification.data.m;
+        }
+        else if (typeof notify.userEmails[userHandle] !== 'undefined') {
+            userEmail = notify.userEmails[userHandle];
+        }
+        
+        // Update common template variables
+        $notificationHtml.attr('id', notification.id);
+        $notificationHtml.find('.notification-date').text(date);
+        $notificationHtml.find('.notification-username').text(userEmail);
+        
+        // Add read status
+        if (notification.seen) {
+            $notificationHtml.addClass('read');
+        }
+        
+        return $notificationHtml;
+        
+        /*
+            <a class="notification-item template">
+                <span class="notification-status-icon">
+                    <span class="notification-status"></span>
+                    <span class="notification-avatar">
+                        <span class="notification-avatar-icon"></span>
+                    </span>
+                    <span class="notification-type">
+                        <span class="notification-accepted">Accepted</span>
+                        <span class="notification-content">
+                            <span class="notification-username"></span>
+                            <span class="notification-info"></span>
+                            <span class="notification-date"></span>
+                        </span>
+                    </span>
+                </span>
+            </a>
+                
+            rhtml += '<a class="notification-item ' + className + ' ' + nread + '" ' + nstyle + ' id="' + htmlentities(id) + '">';
+            rhtml +=   '<span class="notification-status-icon">';
+            rhtml +=     '<span class="notification-status"></span>';
+            rhtml +=     '<span class="notification-avatar">' + avatar + '<span class="notification-avatar-icon"></span></span>';
+            rhtml +=     '<span class="notification-type">';
+            rhtml +=       ((pendingContactHtml) ? pendingContactHtml : '');
+            rhtml +=       '<span class="notification-accepted">Accepted</span>';
+            rhtml +=       '<span class="notification-content">';
+            rhtml +=         '<span class="notification-username">' + email + '</span>';
+            rhtml +=         '<span class="notification-info">' + title + '</span>';
+            rhtml +=         '<span class="notification-date">' + time2last(time) + '</span>';
+            rhtml +=       '</span>';
+            rhtml +=     '</span>';
+            rhtml +=   '</span>';
+            rhtml += '</a>';
+         */
+    },
+    
+    /**
+     * Render new share notification
+     * @param {Object} $notificationHtml jQuery object of the notification template HTML
+     * @param {Object} notification
+     * @returns {Object} The HTML to be rendered for the notification
+     */
+    renderNewShare: function($notificationHtml, notification) {
+
+        var title = '';
+        var userHandle = notification.userHandle;
+
+        // If the email exists use language string 'New shared folder from [X]'
+        if (notify.userEmails[userHandle]) {
+            title = l[824].replace('[X]', htmlentities(notify.userEmails[userHandle]));
+        }
+        else {
+            // Otherwise use string 'New shared folder'
+            title = l[825];
+        }
+        
+        $notificationHtml.addClass('nt-incoming-share');
+        $notificationHtml.addClass('clickable');
+        $notificationHtml.find('.notification-info').text(title);
+        
+        return $notificationHtml;
+    },
+    
+    /**
+     * Initialise scrolling on the notifications popup
+     */
+    initPopupScrolling: function() {
+
+        // Initialise scrolling on the popup
+        $('.notification-scroll').jScrollPane({
+            showArrows: true,
+            arrowSize: 5
+        });
+        
+        jScrollFade('.notification-scroll');
     }
 };
 

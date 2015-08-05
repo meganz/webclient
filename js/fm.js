@@ -2840,10 +2840,10 @@ function notificationsUI(close)
         return false;
     }
     notifyPopup.notifyMarkCount(true);
-    notifyPopup.doNotify();
+    //notifyPopup.doNotify();
     $('.fm-main.notifications').removeClass('hidden');
     $('.notifications .nw-fm-left-icon').removeClass('active');
-    notifyPopup.initNotificationsScrolling();
+    //notifyPopup.initNotificationsScrolling();
     $('.fm-main.default').addClass('hidden');
     $(window).trigger('resize');
 }

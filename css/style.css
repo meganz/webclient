@@ -1521,9 +1521,11 @@ a.blog-button:hover {
 .notification-item.template {
     display: none;
 }
+.notification-item.clickable {
+    cursor: pointer;
+}
 .notification-item {
 	display: block;
-	cursor: pointer;
 }
 .notification-item:nth-child(even) {
 	background-color: rgba(0,0,0,0.02);

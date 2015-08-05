@@ -402,10 +402,8 @@ function MegaData()
                                 data: blob,
                                 url: myURL.createObjectURL(blob)
                             };
-                            useravatar.loaded(M.u[ctx.u]);
-                        } else if (ctx.u === u_handle) {
-                            useravatar.loaded(M.u[ctx.u]);
                         }
+                        useravatar.loaded(ctx.u);
                     }
                 });
             }
@@ -2744,7 +2742,6 @@ function MegaData()
             if (typeof mDB === 'object' && !ignoreDB && !pfkey) {
                 mDBadd('u', clone(u));
             }
-            useravatar.loaded(u);
         }
     };
 

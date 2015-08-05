@@ -158,19 +158,19 @@ var useravatar = (function() {
      *  that is the case we replace that old avatar *everywhere* with their proper avatar
      */
     ns.loaded = function(user) {
-        if (typeof user !== "object" || !user.u) {
+        if (typeof user !== "string") {
             return false;
         }
 
-        if (user.u === u_handle) {
+        if (user === u_handle) {
             // my avatar!
-            $('.fm-avatar img,.fm-account-avatar img').attr('src', ns.imgUrl(user.u));
+            $('.fm-avatar img,.fm-account-avatar img').attr('src', ns.imgUrl(user));
         }
 
         var avatar = $(ns.contact(user)).html();
-        $('.avatar-wrapper.' + user.u).empty().html(avatar);
-        if (user.m) {
-            $('.avatar-wrapper.' + user.m.replace(/[\.@]/g, "\\$1")).empty().html(avatar);
+        $('.avatar-wrapper.' + user).empty().html(avatar);
+        if ((M.u[user]||{}).m) {
+            $('.avatar-wrapper.' + M.u[user].m.replace(/[\.@]/g, "\\$1")).empty().html(avatar);
         }
     };
 

@@ -47,6 +47,7 @@ function dl_g(res) {
     
     // Show ad if enabled
     megaAds.ad = res.ad;
+    megaAds.popAd = res.popad;
     megaAds.showAds($('#ads-block-frame'));
 
     // If 'msd' (MegaSync download) flag is turned off via the API then hide the download with MEGAsync button.
@@ -416,11 +417,19 @@ var megaAds = {
     // Set to an ad object containing src and other info if we should display an ad
     ad: false,
 
+    // Set to a list of urls for potential popunder ads
+    popAd: false,
+
     /**
      * Initialise the HTML for ads
      */
     init: function() {
         
+        if (this.popAd) {
+            advertising.megaPopunder.popurls = this.popAd;
+            advertising.megaPopunder.init($(".new-download-buttons"));
+        }
+
         // Remove any previous ad containers
         $('#ads-block-frame, ads-block-header').remove();
         

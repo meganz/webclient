@@ -11,7 +11,7 @@ advertising.megaPopunder = {
 	
 	// Cookies prevent multiple popunders within short periods of time
 	cookieTime:30,
-	cookieName: "megachIousx1",
+	cookieName: "megapopobjx1",
 
 	// To stop multiple popunders in a row
 	block: 0,
@@ -20,16 +20,18 @@ advertising.megaPopunder = {
 	// The window itself
 	popunder: null,
 
+	$button: null,
+
 	/*
 		Initialises the popunder to launch on a click
 	*/
-	init: function() {
+	init: function(button) {
+		console.log(button);
+		if (typeof (button) === 'undefined' || button == null) return;
+		this.$button = button;
+
 		var parent = this;
 		popIndex = parseInt(this.getCookie());
-	    var browser = this.getBrowser();
-	    if(browser.webkit && this.popIndex < this.popTimes && navigator.cookieEnabled) {		
-			this.initFlashObj();
-		}
 
 		(function () {
 		    var addEvent = function (element, event, fn) {
@@ -41,55 +43,7 @@ advertising.megaPopunder = {
 		    addEvent(window, "load", parent.setupPopunder(parent.popurls[parent.popIndex]) );
 		})();
 	},
-
-	/*
-		Sets up the flash object required by some browsers
-	*/
-	initFlashObj: function() {
-		if (!this.hasFlash()) return;
-
-		var locationFile = "http://getpopunder.com/"; // Set to the mega hosted location for this file
-
-	    var c = document.createElement("object");
-	    c.setAttribute("type", "application/x-shockwave-flash");
-	    c.setAttribute("id", "chIOUS");
-	    c.setAttribute("name", "chIOUS");
-	    c.setAttribute("data", locationFile+"/rdsev.swf");
-	    c.setAttribute("style", "position:fixed;visibility:visible;left:0;top:0;width:1px;height:1px;z-index:99999;");
-	    var r = document.createElement("param");
-	    r.setAttribute("name", "wmode");
-	    r.setAttribute("value", "transparent");
-	    c.appendChild(r);
-	    var h = document.createElement("param");
-	    h.setAttribute("name", "menu");
-	    h.setAttribute("value", "false");
-	    c.appendChild(h);
-	    var a = document.createElement("param");
-	    a.setAttribute("name", "allowscriptaccess");
-	    a.setAttribute("value", "always");
-	    c.appendChild(a);
-
-		var parent = this;
-
-	    var b = setInterval(function () {
-	        if (document.readyState === "complete") {
-	            clearInterval(b);
-	            document.body.insertBefore(c, document.body.firstChild);
-	            
-	            $(".new-download-buttons").on("mousedown", function(g)
-	            {
-	                if (g.button === 0) {
-	                	parent.stopListening = true;
-	                    document.getElementById('chIOUS').style.width = "100%";
-	                    document.getElementById('chIOUS').style.height = "100%";
-	                }
-	                return;
-	            });
-	        }
-	    }, 10)
-	    setTimeout(function(){ if (document.getElementById('chIOUS')!=null) document.getElementById('chIOUS').remove(); parent.block=1;}, 10000);	   
-	},
-
+	
 	/*
 		Is flash available?
 	*/
@@ -143,12 +97,9 @@ advertising.megaPopunder = {
 	},
 
 	/*
-		Bind the event to the target
+		Bind the event to the entire page
 	*/
-	bindOnDocumentClick: function(handler) {
-
-		//$(".new-download-buttons").click(handler);
-		
+	bindOnDocumentClick: function(handler) {	
 		var topWindow = self;
 	    if (top != self) {
 	        try {
@@ -165,6 +116,14 @@ advertising.megaPopunder = {
 	},
 
 	/*
+		Bind the event to just the button object
+	*/
+	bindOnButtonClick: function(handler) {
+		this.$button.click(handler);
+	},
+
+
+	/*
 		We do not have the ability to do a standard popunder, so we fall back to a sad popup
 	*/
 	triggerAlternatePopunder: function(sUrl) {
@@ -172,8 +131,7 @@ advertising.megaPopunder = {
 	        this.block = 1;
 	        this.setCookie(this.popIndex + 1);
 	        // We have to do a popup in this situation or it screws with the download functionality
-	        window.open(sUrl/*document.URL*/);
-	        //window.location.assign(sUrl);
+	        window.open(sUrl);
 	    }
 	},
 
@@ -211,15 +169,13 @@ advertising.megaPopunder = {
                     }
                 }
                 else {     
-                	//var event = e || window.event;
-                	//event.stopPropagation();
                     parent.triggerAlternatePopunder(sUrl);
                     return false;
                 }
             }
         };
 
-	    this.bindOnDocumentClick(listenerEvent);
+	    this.bindOnButtonClick(listenerEvent);
 	},
 
 	/*
@@ -229,10 +185,6 @@ advertising.megaPopunder = {
 		this.block = 1;
 
 		var browser = this.getBrowser();
-
-		if (browser.webkit) {
-			setTimeout(function(){ if (document.getElementById('chIOUS')!=null) document.getElementById('chIOUS').remove();}, 700);
-		}
 
 		try {
             this.popunder.blur();

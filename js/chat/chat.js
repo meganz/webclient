@@ -1407,12 +1407,10 @@ Chat.prototype.init = function() {
                 self.karere.getConnectionState() === Karere.CONNECTION_STATE.DISCONNECTED &&
                 localStorage.megaChatPresence !== "unavailable"
             ) {
-                self.logger.warn("Will bind a mousemove to re-trigger a connection retry on mousemove.");
 
                 $(document).rebind("mousemove.megaChatRetry", function() {
                     if (self.karere._connectionRetryUI() === true) {
                         $(document).unbind("mousemove.megaChatRetry");
-                        self.logger.warn("Connection retry triggered because of a mousemove.");
                     }
                 });
             }
@@ -2447,18 +2445,24 @@ Chat.prototype.getXmppServiceUrl = function() {
             .done(function(r) {
                 if (r.xmpp && r.xmpp.length > 0) {
                     var randomHost = array_random(r.xmpp);
-                    $promise.resolve("https://" + randomHost.host + ":" + randomHost.port + "/bosh");
-                } else {
+                    //$promise.resolve("https://" + randomHost.host + ":" + randomHost.port + "/bosh");
+                    $promise.resolve("wss://" + randomHost.host + "/ws");
+                }
+                else if(!r.xmpp || r.xmpp.length === 0) {
+                    self.logger.error("GeLB returned no results. Halting.");
+                    $promise.reject();
+                }
+                else {
                     var server = array_random(self.options.fallbackXmppServers);
                     self.logger.error("Got empty list from the load balancing service for xmpp, will fallback to: " + server + ".");
-                    $promise.resolve(server);
+                    $promise.resolve(server.replace("https:", "wss:").replace("/bosh", "/ws"));
                 }
             })
             .fail(function() {
                 var server = array_random(self.options.fallbackXmppServers);
                 self.logger.error("Could not connect to load balancing service for xmpp, will fallback to: " + server + ".");
 
-                $promise.resolve(server);
+                $promise.resolve(server.replace("https:", "wss:").replace("/bosh", "/ws"));
             });
 
         return $promise;

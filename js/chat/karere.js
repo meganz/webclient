@@ -2861,8 +2861,6 @@ Karere.prototype._connectionRetry = function(immediately) {
             }
         }, connectionRetryTimeout);
 
-        self.logger.warn("Will do a reconnect retry in: ", connectionRetryTimeout, " if still not connected.");
-
 
         self._lastConnectionRetryTime = unixtime();
 
@@ -2876,7 +2874,7 @@ Karere.prototype._connectionRetryUI = function() {
         self.getConnectionState() !== Karere.CONNECTION_STATE.CONNECTED &&
         (unixtime() - self._lastConnectionRetryTime) > (self.options.connectionRetryFloorVal / 1000)
     ) {
-        self.logger.warn("Will do a forced connection retry immediately because of UI interaction.");
+        //self.logger.warn("Will do a forced connection retry immediately because of UI interaction.");
         self._connectionRetry(true);
         return true;
     } else {

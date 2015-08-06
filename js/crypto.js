@@ -2177,13 +2177,21 @@ var u_nodekeys = {};
 // an error, and the whole operation gets repeated (exceedingly
 // rare race condition).
 function api_setshare(node, targets, sharenodes, ctx) {
+    
+    // cache all targets' public keys
+    var targetsPubKeys = [];
 
-    api_setshare1({
+    for (var i = targets.length; i--;) {
+        targetsPubKeys.push(targets[i].u);
+    }
+
+    api_cachepubkeys({
             node: node,
             targets: targets,
             sharenodes: sharenodes,
-            ctx: ctx
-        });
+            ctx: ctx,
+            cachepubkeyscomplete: api_setshare1
+        }, targetsPubKeys);
 }
 
 function api_setshare1(ctx, params) {

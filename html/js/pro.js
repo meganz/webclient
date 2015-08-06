@@ -349,6 +349,12 @@ function pro_pay() {
                     fortumo.redirectToSite(saleId);
                     return false;
                 }
+                else if (pro_paymentmethod === 'centili') {
+                    // pro_m = 9;
+                    // Centili does not do a utc request, we immediately redirect
+                    centili.redirectToSite(saleId);
+                    return false;
+                }
                 
                 // Update the last payment provider ID for the 'psts' action packet. If the provider e.g. bitcoin 
                 // needs a redirect after confirmation action packet it will redirect to the account page.
@@ -659,7 +665,7 @@ var proPage = {
             supportsAnnualPayment: true,    // Can pay for an annual amount
             supportsExpensivePlans: true,   // The provider can be used to buy plans other than LITE
             cssClass: 'credit-card'
-        },
+        },        
         {
             apiGatewayId: 4,
             displayName: l[6802],           // Bitcoin
@@ -680,13 +686,22 @@ var proPage = {
         },
         {
             apiGatewayId: 6,
-            displayName: l[7161],           // Mobile carrier billing
+            displayName: l[7219] + ' (Fortumo)',           // Mobile (Fortumo)
             supportsRecurring: false,
             supportsMonthlyPayment: true,
             supportsAnnualPayment: false,
             supportsExpensivePlans: false,  // Provider has a max of EUR 3.00 per payment
             cssClass: 'fortumo'
         },
+        {
+            apiGatewayId: 9,
+            displayName: l[7219] + ' (Centili)',           // Mobile (Centili)
+            supportsRecurring: false,
+            supportsMonthlyPayment: true,
+            supportsAnnualPayment: false,
+            supportsExpensivePlans: false,  // Provider has a max of EUR 3.00 per payment
+            cssClass: 'centili'
+        },     
         {
             apiGatewayId: null,
             displayName: l[6198],           // Wire transfer
@@ -1417,7 +1432,7 @@ var unionPay = {
 };
 
 /**
- * Code for Dynamic/Union Pay
+ * Code for Fortumo mobile payments
  */
 var fortumo = {
     
@@ -1428,6 +1443,22 @@ var fortumo = {
     redirectToSite: function(utsResult) {
         
         window.location = 'https://megapay.nz/?saleid=' + utsResult;
+    }
+};
+
+
+/**
+ * Code for Centili mobile payments
+ */
+var centili = {
+    
+    /**
+     * Redirect to the site
+     * @param {String} utsResult (a saleid)
+     */
+    redirectToSite: function(utsResult) {
+        
+        window.location = 'https://megapay.nz/?saleid=' + utsResult + '&provider=centili';
     }
 };
 

@@ -2903,7 +2903,10 @@ mega.utils.reload = function megaUtilsReload() {
         u_storage.wasloggedin = true;
 
         if (debug) {
-            u_storage.d = u_storage.dd = true;
+            u_storage.d = true;
+            if (location.host !== 'mega.nz') {
+                u_storage.dd = true;
+            }
             if (!is_extension) {
                 u_storage.jj = true;
             }

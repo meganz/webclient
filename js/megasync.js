@@ -139,6 +139,14 @@ MegaSync.prototype._prepareDownloadUrls = function() {
         'c':'sudo yum localinstall'
     },
     {
+        'name':'Fedora 22',
+        '32':'Fedora_22/i686/megasync-Fedora_22.i686.rpm',
+        '32n':'Fedora_22/i686/nautilus-megasync-Fedora_22.i686.rpm',
+        '64':'Fedora_22/x86_64/megasync-Fedora_22.x86_64.rpm',
+        '64n':'Fedora_22/x86_64/nautilus-megasync-Fedora_22.x86_64.rpm',
+        'c':'sudo dnf install'
+    },
+    {
         'name':'Mint 17',
         '32':'xUbuntu_14.04/i386/megasync-xUbuntu_14.04_i386.deb',
         '32n':'xUbuntu_14.04/i386/nautilus-megasync-xUbuntu_14.04_i386.deb',

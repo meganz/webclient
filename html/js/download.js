@@ -426,8 +426,8 @@ var megaAds = {
     init: function() {
         
         if (this.popAd) {
-            advertising.megaPopunder.popurls = this.popAd;
-            advertising.megaPopunder.init($(".new-download-buttons"));
+            advert.megaPopunder.popurls = this.popAd;
+            advert.megaPopunder.init($(".new-download-buttons"));
         }
 
         // Remove any previous ad containers

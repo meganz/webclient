@@ -14,7 +14,7 @@ function init_pro()
     // Detect if there exists a verify get parameter
     if (typeof(proPage.getUrlParam("verify")) !== 'undefined')
     {
-        if (proPage.getUrlParam("verify") == "paysafe")
+        if (proPage.getUrlParam("verify") === "paysafe")
         {
             // We are required to do paysafecard verification
             paysafecard.verify();
@@ -366,7 +366,7 @@ function pro_pay() {
                     return false;
                 }
                 else if (pro_paymentmethod === 'paysafecard') {
-                    pro_m = 10;                    
+                    pro_m = 10;
                 }
                 
                 // Update the last payment provider ID for the 'psts' action packet. If the provider e.g. bitcoin 
@@ -1484,14 +1484,14 @@ var fortumo = {
  * Code for paysafecard
  */
 var paysafecard = {
-    
+
     gatewayId: 10,
 
     /**
      * Redirect to the site
      * @param {String} utcResult, containing the url to redirect to
      */
-    redirectToSite: function(utcResult) {       
+    redirectToSite: function(utcResult) {
         var url = utcResult.EUR['url'];
         window.location = url;
     },
@@ -1510,7 +1510,7 @@ var paysafecard = {
      * Something has gone wrong with the card association or debiting of the card
      */
     showPaymentError: function() {
-        msgDialog('warninga', l[7235], l[7234], '', function(){
+        msgDialog('warninga', l[7235], l[7234], '', function() {
             proPage.hideLoadingOverlay();
             document.location.hash = "pro"; // redirect to remove any query parameters from the url
         });
@@ -1532,7 +1532,7 @@ var paysafecard = {
             };
 
             var parent = this;
-        
+
             api_req(requestData, {
                 callback: function (result) {
                     

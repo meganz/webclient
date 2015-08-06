@@ -277,6 +277,7 @@ MegaSync.prototype.handle_v = function(version) {
     this._version = version;
     if (this._lastDownload) {
         this.download(this._lastDownload[0], this._lastDownload[1]);
+        this._lastDownload = null;
     }
     
 };
@@ -294,7 +295,7 @@ MegaSync.prototype._onError = function(next, e) {
     return this.downloadClient();
 };
 
-MegaSync.prototype.handle = function(response, next) {
+MegaSync.prototype.handle = function(next, response) {
     next = (typeof next === "function") ? next : function() {};
     if (response === 0) {
         // alright!
@@ -341,7 +342,7 @@ MegaSync.prototype.downloadClient = function() {
             return clearInterval(this._retryTimer);
         }
         this._api({a: "v"});
-    }).bind(this), 500);
+    }).bind(this), 1000);
     overlay.show().addClass('downloading');
     
     $('.megasync-close').rebind('click', function(e) {

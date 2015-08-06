@@ -104,6 +104,10 @@ function init_page() {
         $('body').attr('class', '');
     }
 
+	if (localStorage.font_size) {
+        $('body').removeClass('fontsize1 fontsize2').addClass('fontsize' + localStorage.font_size);
+    }
+
     // Add language class to body for CSS fixes for specific language strings
     $('body').addClass(lang);
 
@@ -1206,12 +1210,10 @@ function topmenuUI() {
         }
     };
 
-    $('#pageholder').rebind('click', function (e) {
-        $.hideTopMenu(e);
-    });
-
-    $('#startholder').rebind('click', function (e) {
-        $.hideTopMenu(e);
+    $('#pageholder, #startholder').rebind('click', function(e) {
+        if (typeof $.hideTopMenu === 'function') {
+            $.hideTopMenu(e);
+        }
     });
 
     $('.top-menu-icon').rebind('click', function (e) {

@@ -1511,8 +1511,7 @@ var paysafecard = {
      * Something has gone wrong with the card association or debiting of the card
      */
     showPaymentError: function() {
-        msgDialog('warninga', l[7235], l[7234], '', function() {
-            proPage.hideLoadingOverlay();
+        msgDialog('warninga', l[7235], l[7234], '', function() {            
             document.location.hash = "pro"; // redirect to remove any query parameters from the url
         });
     },
@@ -1543,8 +1542,7 @@ var paysafecard = {
                         parent.showPaymentError();
                     }
                     else {
-                        // Continue to account screen
-                        proPage.hideLoadingOverlay();
+                        // Continue to account screen                       
                         document.location.hash = "account";
                     }
                 }

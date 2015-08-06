@@ -1085,6 +1085,7 @@ else if (!b_u)
     jsl.push({f:'html/fm.html', n: 'fm', j:0,w:3});
     jsl.push({f:'html/top.html', n: 'top', j:0});
     jsl.push({f:'js/notifications.js', n: 'notifications_js', j:1});
+    jsl.push({f:'js/vendor/advert.js', n: 'advert_js', j:1});
     jsl.push({f:'css/style.css', n: 'style_css', j:2,w:30,c:1,d:1,cache:1});
     jsl.push({f:'js/useravatar.js', n: 'contact_avatar_js', j:1,w:3});
     jsl.push({f:'js/avatar.js', n: 'avatar_js', j:1,w:3});
@@ -1727,6 +1728,9 @@ function showAd() {
 
     // We need to tell the API we would like ad urls, but only if we are not logged in
     var showAd = (typeof u_sid === 'undefined') ? 1 : 0;
+    
+    // If using a browser extension, do not show ads
+    showAd = (is_extension) ? 0 : showAd;
 
     // Override for testing, 0 for no ads, 1 is normal (enabled dependant on country), 2 is ads always on
     showAd = (typeof localStorage.testAds === 'undefined') ? showAd : parseInt(localStorage.testAds);

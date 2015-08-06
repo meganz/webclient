@@ -3637,5 +3637,9 @@
     "7228": "\u0413\u043e\u043b\u0435\u043c\u0438\u043d\u0430 \u043d\u0430 \u0444\u043e\u043d\u0442:",
     "7229": "\u041c\u0430\u043b",
     "7230": "\u0413\u043e\u043b\u0435\u043c",
-    "7231": "Price excludes Bitcoin transaction fee."
+    "7231": "Price excludes Bitcoin transaction fee.",
+    "7232": "Drag and drop the downloaded file into the browser and confirm installation.",
+    "7233": "Transaction could not be initiated due to connection problems. If the problem persists, please contact support@mega.co.nz",
+    "7234": "Something has gone wrong and we were unable to charge your card.",
+    "7235": "Payment Failed"
 }

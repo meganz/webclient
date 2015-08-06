@@ -3637,5 +3637,9 @@
     "7228": "Velikost pisave:",
     "7229": "Malo",
     "7230": "Veliko",
-    "7231": "Price excludes Bitcoin transaction fee."
+    "7231": "Cena ne vklju\u010duje stro\u0161ka Bitcoin transakcije.",
+    "7232": "Povlecite in spustite prevzeto datoteko v brskljalnik in potrdite namestitev.",
+    "7233": "Transaction could not be initiated due to connection problems. If the problem persists, please contact support@mega.co.nz",
+    "7234": "Something has gone wrong and we were unable to charge your card.",
+    "7235": "Payment Failed"
 }

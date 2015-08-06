@@ -3637,5 +3637,9 @@
     "7228": "Kirjasinkoko:",
     "7229": "Pieni",
     "7230": "Suuri",
-    "7231": "Price excludes Bitcoin transaction fee."
+    "7231": "Hinta ei sis\u00e4ll\u00e4 Bitcoin-v\u00e4lityspalkkiota.",
+    "7232": "Ved\u00e4 ja pudota ladattu tiedosto selaimeen sek\u00e4 vahvista asennus.",
+    "7233": "Transaction could not be initiated due to connection problems. If the problem persists, please contact support@mega.co.nz",
+    "7234": "Something has gone wrong and we were unable to charge your card.",
+    "7235": "Payment Failed"
 }

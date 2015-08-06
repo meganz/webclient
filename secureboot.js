@@ -1728,6 +1728,9 @@ function showAd() {
 
     // We need to tell the API we would like ad urls, but only if we are not logged in
     var showAd = (typeof u_sid === 'undefined') ? 1 : 0;
+    
+    // If using a browser extension, do not show ads
+    showAd = (is_extension) ? 0 : showAd;
 
     // Override for testing, 0 for no ads, 1 is normal (enabled dependant on country), 2 is ads always on
     showAd = (typeof localStorage.testAds === 'undefined') ? showAd : parseInt(localStorage.testAds);

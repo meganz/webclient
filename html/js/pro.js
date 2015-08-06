@@ -12,9 +12,10 @@ var pro_package,
 function init_pro()
 {
     // Detect if there exists a verify get parameter
-    if (typeof(proPage.getUrlParam("verify")) !== 'undefined')
+    var verifyUrlParam = proPage.getUrlParam("verify");
+    if (typeof verifyUrlParam !== 'undefined')
     {
-        if (proPage.getUrlParam("verify") === "paysafe")
+        if (verifyUrlParam === "paysafe")
         {
             // We are required to do paysafecard verification
             paysafecard.verify();
@@ -1522,7 +1523,7 @@ var paysafecard = {
      */
     verify: function() {
         var saleidstring = proPage.getUrlParam('saleidstring');
-        if (typeof(saleidstring)!=='undefined') {
+        if (typeof saleidstring !== 'undefined') {
 
             // Make the vpay API request to follow up on this sale
             var requestData = {

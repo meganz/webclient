@@ -1,8 +1,8 @@
 var advertising = advertising || {};
 
-/* 
-	Used to initialise and trigger popunder functionality on the site.
-*/
+/** 
+ *	Used to initialise and trigger popunder functionality on the site.
+ */
 advertising.megaPopunder = {
 	
 	popurls: ["http://www.adcash.com/a/display.php?r=453254"],
@@ -22,11 +22,11 @@ advertising.megaPopunder = {
 
 	$button: null,
 
-	/*
-		Initialises the popunder to launch on a click
-	*/
+	/**
+	 *	Initialises the popunder to launch on a click
+	 *  @param {jquery element} button The element to trigger click events from
+	 */
 	init: function(button) {
-		console.log(button);
 		if (typeof (button) === 'undefined' || button == null) return;
 		this.$button = button;
 
@@ -44,16 +44,16 @@ advertising.megaPopunder = {
 		})();
 	},
 	
-	/*
-		Is flash available?
-	*/
+	/**
+	 *	Is flash available?
+	 */
 	hasFlash: function() {
 		return !(!navigator.mimeTypes["application/x-shockwave-flash"]);
 	},
 
-	/*
-		Set up an object that flags which browser is available, as different behaviour needs to trigger depending on the browser
-	*/
+	/**
+	 *	Set up an object that flags which browser is available, as different behaviour needs to trigger depending on the browser
+	 */
 	getBrowser: function() {
 		var n = navigator.userAgent.toLowerCase();
 	    var b = {
@@ -70,9 +70,10 @@ advertising.megaPopunder = {
 	    return b;
 	},
 
-	/*
-		Set the popunder specific cookie
-	*/
+	/**
+	 *	Set the popunder specific cookie
+	 *  @param {integer} cvalue The cookie value
+	 */
 	setCookie: function(cvalue) {
 		var extime  = this.cookieTime;
 		var cname = this.cookieName;
@@ -82,9 +83,9 @@ advertising.megaPopunder = {
 	    document.cookie = cname + "=" + cvalue + "; " + expires;
 	},
 
-	/* 
-		Get the popunder specific cookie 
-	*/
+	/**
+	 *	Get the popunder specific cookie 
+	 */
 	getCookie: function() {
 	    var name = this.cookieName + "=";
 	    var ca = document.cookie.split(';');
@@ -96,9 +97,10 @@ advertising.megaPopunder = {
 	    return "";
 	},
 
-	/*
-		Bind the event to the entire page
-	*/
+	/**
+	 *	Bind the event to the entire page
+	 *  @param {function} handler The handler function to bind to the document click
+	 */
 	bindOnDocumentClick: function(handler) {	
 		var topWindow = self;
 	    if (top != self) {
@@ -115,17 +117,18 @@ advertising.megaPopunder = {
 	    }
 	},
 
-	/*
-		Bind the event to just the button object
-	*/
+	/**
+	 *	Bind the event to just the button object
+	 *  @param {function} handler The handler function to bind to the button click
+	 */
 	bindOnButtonClick: function(handler) {
 		this.$button.click(handler);
 	},
 
 
-	/*
-		We do not have the ability to do a standard popunder, so we fall back to a sad popup
-	*/
+	/**
+	 *	We do not have the ability to do a standard popunder, so we fall back to a sad popup
+	 */
 	triggerAlternatePopunder: function(sUrl) {
 		if (this.block == 0 && this.popIndex < this.popTimes && navigator.cookieEnabled) {
 	        this.block = 1;
@@ -135,9 +138,9 @@ advertising.megaPopunder = {
 	    }
 	},
 
-	/*
-		Sets up the event to launch the window upon a click
-	*/
+	/**
+	 *	Sets up the event to launch the window upon a click
+	 */
 	setupPopunder: function(sUrl, sConfig) {
 		sConfig      = (sConfig || {});
 		var sName    = (sConfig.name   || Math.floor((Math.random() * 1000) + 1));
@@ -178,9 +181,9 @@ advertising.megaPopunder = {
 	    this.bindOnButtonClick(listenerEvent);
 	},
 
-	/*
-		Attempts to trigger the window to move behind
-	*/
+	/**
+	 *	Attempts to trigger the window to move behind
+	 */
 	triggerSpecialBehaviour: function() {
 		this.block = 1;
 
@@ -199,9 +202,9 @@ advertising.megaPopunder = {
         } catch (e) {}
 	},
 
-	/*
-		Specific code for ie
-	*/
+	/**
+	 *	Specific code for ie
+	 */
 	doMsiePopunder: function() {
 		setTimeout(function() {
             popunder.blur();
@@ -211,9 +214,9 @@ advertising.megaPopunder = {
         }, 1000);
 	},
 
-	/*
-		Specific code for chrome
-	*/
+	/**
+	 *	Specific code for chrome
+	 */
 	doChromePopunder: function()
     {
         var fakeLink = document.createElement('A');
@@ -227,9 +230,9 @@ advertising.megaPopunder = {
         }, 250);
     },
 
-    /*
-    	Used for firefox
-    */
+    /**
+     *	Used for firefox
+     */
     openCloseWindow: function() {
         var ghost = window.open('about:blank');
         ghost.focus();
@@ -237,8 +240,8 @@ advertising.megaPopunder = {
     },
 
     /*
-    	Used for webkit
-    */
+     *	Used for webkit
+     */
     openCloseTab: function() {
         var nothing = '';
         var ghost = document.createElement("a");

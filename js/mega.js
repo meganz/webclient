@@ -3548,7 +3548,7 @@ function MegaData()
                 zipname = M.d[n[0]].name + '.zip';
             }
             else {
-                zipname = (zipname || ('Archive-'+ Math.random().toString(16).slice(-4))) + '.zip';
+                zipname = (zipname || ('Archive-' + Math.random().toString(16).slice(-4))) + '.zip';
             }
         }
         else {
@@ -3712,6 +3712,7 @@ function MegaData()
         if ($('.transfer-table #' + id + ' .progress-block').length == 0) {
             $('.transfer-table #' + id + ' td:eq(5)').html('<div class="progress-block" style=""><div class="progressbar"><div class="progressbarfill" style="width:0%;"></div></div><div class="clear"></div></div>');
             $('.transfer-table #' + id).addClass('started');
+            $('.transfer-table').prepend($('.transfer-table #' + id));
             $.transferHeader();
         }
 
@@ -3885,7 +3886,6 @@ function MegaData()
     {
         var id = (dl.zipid ? 'zip_' + dl.zipid : 'dl_' + dl.dl_id);
         $('.transfer-table #' + id + ' td:eq(5)').html('<span class="transfer-status initiliazing">' + htmlentities(l[1042]) + '</span>');
-        $('.transfer-table').prepend($('.transfer-table #' + id));
         Soon(fm_tfsupdate);
         dl.st = NOW();
         ASSERT(typeof dl_queue[dl.pos] === 'object', 'No dl_queue entry for the provided dl...');
@@ -4038,8 +4038,12 @@ function MegaData()
                 return;
             }
         }*/
-        var target, onChat,
-            f, ul_id, pause, pauseTxt = '';
+        var target;
+        var onChat;
+        var f;
+        var ul_id;
+        var pause;
+        var pauseTxt = '';
 
         if ($.onDroppedTreeFolder) {
             target = $.onDroppedTreeFolder;
@@ -4102,6 +4106,7 @@ function MegaData()
         }
         else {
             showTransferToast('u', u.length);
+            $.transferHeader();
             openTransferpanel();
         }
 
@@ -4122,6 +4127,7 @@ function MegaData()
             $('.transfer-table #ul_' + id + ' .transfer-status').removeClass('queued');
             $('.transfer-table #ul_' + id + ' .transfer-status').addClass('download');
             $('.transfer-table #ul_' + id + ' td:eq(5)').html('<div class="progress-block" style=""><div class="progressbar"><div class="progressbarfill" style="width:0%;"></div></div></div>');
+            $('.transfer-table').prepend($('.transfer-table #ul_' + id));
             $('.transfer-table #ul_' + id).addClass('started');
             $.transferHeader();
         }
@@ -4239,7 +4245,6 @@ function MegaData()
             ulmanager.logger.log('ulstart', id);
         }
         $('.transfer-table #ul_' + id + ' td:eq(5)').html('<span class="transfer-status initiliazing">' + htmlentities(l[1042]) + '</span>');
-        $('.transfer-table').prepend($('.transfer-table #ul_' + id));
         Soon(fm_tfsupdate);
         ul.starttime = new Date().getTime();
         M.ulprogress(ul, 0, 0, 0);

@@ -1119,33 +1119,38 @@ function openTransferpanel()
         $('.transfer-clear-all-icon').removeClass('hidden');
     }
 
-    $('.tranfer-table .grid-url-arrow').rebind('click', function(e) {
-        var target = $(this).closest('tr');
-        e.preventDefault();
-        e.stopPropagation(); // do not treat it as a regular click on the file
-        $('.tranfer-table tr').removeClass('ui-selected');
-        target.addClass('ui-selected');
-        e.currentTarget = target;
-        transferPanelContextMenu(target);
-        contextMenuUI(e);
-    });
-
     if (!$.mSortableT) {
         $.mSortableT = $('.transfer-table tbody');
         $.mSortableT.sortable({
+            delay: 200,
             revert: 100,
             start: function(ev, ui) {
-                var headerColumn;
                 $('body').addClass('dndc-sort');
+            },
+            helper: function(ev, tr) {
+                if (!tr.hasClass('ui-selected')) {
+                    tr.addClass('ui-selected');
+                }
                 this.order = fm_tfsorderupd();
+                var $selected = tr.parent().children('.ui-selected').clone();
+                tr.data('multidrag', $selected).siblings('.ui-selected').hide();
+                var $helper = $('<tr/>');
+                return $helper.append($selected);
             },
             stop: function(ev, ui) {
-                var $tr = $(ui.item[0]);
-                var id = String($tr.attr('id'));
-                var $next = $tr.next();
                 var cancel = false;
                 $('body').removeClass('dndc-sort');
-                if ($tr.hasClass('started') || $next.hasClass('started')) {
+
+                var $selected = ui.item.data('multidrag');
+                ui.item.after($selected).remove();
+                $('.transfer-table tr.ui-selected:not(:visible)').remove();
+                $.transferHeader(); // rebind cloned trs
+
+                // var $tr = $(ui.item[0]);
+                // var id = String($tr.attr('id'));
+                // var $next = $tr.next();
+
+                /*if ($selected.hasClass('started')) {
                     cancel = true;
                 }
                 else {
@@ -1155,7 +1160,7 @@ function openTransferpanel()
 
                     cancel = ((id[0] === 'u' && nid && nid[0] !== 'u')
                             || (id[0] !== 'u' && pid && pid[0] === 'u'));
-                }
+                }*/
                 if (cancel) {
                     $.mSortableT.sortable('cancel');
                 }
@@ -1167,6 +1172,7 @@ function openTransferpanel()
                             pos: 0,
                             etmp: [],
                             oQueue: [],
+                            pQueue: {},
                             mQueue: dlQueue,
                             m_queue: dl_queue,
                             prop: 'dl'
@@ -1175,10 +1181,13 @@ function openTransferpanel()
                             pos: 0,
                             etmp: [],
                             oQueue: [],
+                            pQueue: {},
                             mQueue: ulQueue,
                             m_queue: ul_queue,
                             prop: 'ul'
                         };
+                        var id;
+                        var dst;
                         var i = 0;
                         var len = Object.keys(order).length / 2;
 
@@ -1201,49 +1210,64 @@ function openTransferpanel()
                         while (len > i) {
                             id = M.t[i++];
 
-                            var dst = (id[0] === 'u' ? mUL : mDL);
+                            dst = (id[0] === 'u' ? mUL : mDL);
                             var mQ = dst.mQueue.slurp(id);
-                            for (var x in mQ) {
-                                if (mQ.hasOwnProperty(x)) {
-                                    var entry = mQ[x][0][dst.prop];
-                                    if (dst.etmp.indexOf(entry) === -1) {
-                                        (dst.m_queue[dst.pos] = entry).pos = dst.pos;
-                                        dst.etmp.push(entry);
-                                        dst.pos++;
-                                    }
-                                }
-                            }
+                            // for (var x in mQ) {
+                                // if (mQ.hasOwnProperty(x)) {
+                                    // var entry = mQ[x][0][dst.prop];
+                                    // if (dst.etmp.indexOf(entry) === -1) {
+                                        // (dst.m_queue[dst.pos] = entry).pos = dst.pos;
+                                        // dst.etmp.push(entry);
+                                        // dst.pos++;
+                                    // }
+                                // }
+                            // }
                             dst.oQueue = dst.oQueue.concat(mQ);
+
+                            if (dst.mQueue._qpaused.hasOwnProperty(id)) {
+                                dst.pQueue[id] = dst.mQueue._qpaused[id];
+                            }
                         }
 
                         dlQueue._queue = mDL.oQueue;
                         ulQueue._queue = mUL.oQueue;
+                        dlQueue._qpaused = mDL.pQueue;
+                        ulQueue._qpaused = mUL.pQueue;
+
+                        // Check for transfers moved before any started one
+                        var $prev = $('.transfer-table tr .progress-block')
+                            .closest('tr')
+                            .first()
+                            .prevAll()
+                            .not('.paused');
+                        // XXX: we rely on the speed field being non-numeric
+                        if ($prev.length && !$prev.find('.speed').text().replace(/\D/g, '')) {
+                            var ids = $('.transfer-table tr:not(.paused)').attrs('id');
+                            ids.forEach(fm_tfspause);
+                            if (dlQueue._queue.length || ulQueue._queue.length) {
+                                dlmanager.logger.error('The move operation should have cleared the queues.');
+                            }
+                            ids.forEach(fm_tfsresume);
+                            i = 0;
+                            mDL.pQueue = {};
+                            mUL.pQueue = {};
+                            while (len > i) {
+                                id = M.t[i++];
+                                dst = (id[0] === 'u' ? mUL : mDL);
+                                if (dst.mQueue._qpaused.hasOwnProperty(id)) {
+                                    dst.pQueue[id] = dst.mQueue._qpaused[id];
+                                }
+                            }
+                            dlQueue._qpaused = mDL.pQueue;
+                            ulQueue._qpaused = mUL.pQueue;
+                        }
                     }
                 }
+
+                $('.transfer-table tr.ui-selected').removeClass('ui-selected');
             }
         });
     }
-
-    $('.clear-transfer-icon').rebind('click', function(e)
-    {
-        var target = $(this).closest('tr');
-        e.preventDefault();
-        e.stopPropagation();
-        $('.tranfer-table tr').removeClass('ui-selected');
-        if (!target.find('.transfer-status.completed').length) {
-            var toabort = target.attr('id');
-            dlmanager.abort(toabort);
-            ulmanager.abort(toabort);
-        }
-        target.fadeOut(function() {
-            $(this).remove();
-            $.clearTransferPanel();
-            fm_tfsupdate();
-            Soon(function() {
-                $(window).trigger('resize');
-            });
-        });
-    });
 }
 
 function showTransferToast(t_type, t_length) {
@@ -2572,6 +2596,7 @@ function initContextUI() {
             .map(function(id) {
                 fm_tfsmove(id, -1);
             });
+        $('.transfer-table tr.ui-selected').removeClass('ui-selected');
         Soon(fm_tfsupdate);
     });
 
@@ -2582,28 +2607,23 @@ function initContextUI() {
             .map(function(id) {
                 fm_tfsmove(id, 1);
             });
+        $('.transfer-table tr.ui-selected').removeClass('ui-selected');
         Soon(fm_tfsupdate);
     });
 
     $(c + '.transfer-play').rebind('click', function() {
-        $('.transfer-table tr.ui-selected').not('.clone-of-header').each(function(j, el) {
-            var id = $(this).attr('id');
-            fm_tfsresume(id);
-            $('span.transfer-type', this).removeClass('paused');
-            if (uldl_hold) {
-                dlQueue.resume();
-                ulQueue.resume();
-                uldl_hold = false;
-            }
-        });
+        $('.transfer-table tr.ui-selected').attrs('id').map(fm_tfsresume);
+        $('.transfer-table tr.ui-selected').removeClass('ui-selected');
+        if (uldl_hold) {
+            dlQueue.resume();
+            ulQueue.resume();
+            uldl_hold = false;
+        }
     });
 
     $(c + '.transfer-pause').rebind('click', function() {
-        $('.transfer-table tr.ui-selected').not('.clone-of-header').each(function(j, el) {
-            var id = $(this).attr('id');
-            fm_tfspause(id);
-            $('span.transfer-type', this).addClass('paused');
-        });
+        $('.transfer-table tr.ui-selected').attrs('id').map(fm_tfspause);
+        $('.transfer-table tr.ui-selected').removeClass('ui-selected');
     });
 
     $(c + '.select-all').rebind('click', function() {
@@ -2623,6 +2643,7 @@ function initContextUI() {
             // XXX: better way to stretch the scrollbar?
             $(window).trigger('resize');
         });
+        $('.transfer-table tr.ui-selected').removeClass('ui-selected');
     });
 
     $(document).trigger('onInitContextUI');
@@ -5487,6 +5508,35 @@ function transferPanelUI()
             }
         });
 
+        $('.tranfer-table .grid-url-arrow, .tranfer-table .clear-transfer-icon').rebind('click', function(e) {
+            var target = $(this).closest('tr');
+            e.preventDefault();
+            e.stopPropagation(); // do not treat it as a regular click on the file
+            $('.tranfer-table tr').removeClass('ui-selected');
+
+            if ($(this).hasClass('grid-url-arrow')) {
+                target.addClass('ui-selected');
+                e.currentTarget = target;
+                transferPanelContextMenu(target);
+                contextMenuUI(e);
+            }
+            else {
+                if (!target.find('.transfer-status.completed').length) {
+                    var toabort = target.attr('id');
+                    dlmanager.abort(toabort);
+                    ulmanager.abort(toabort);
+                }
+                target.fadeOut(function() {
+                    $(this).remove();
+                    $.clearTransferPanel();
+                    fm_tfsupdate();
+                    Soon(function() {
+                        $(window).trigger('resize');
+                    });
+                });
+            }
+        });
+
         $('.transfer-table tr').rebind('click contextmenu', function(e)
         {
             $('.ui-selected').filter(function() {
@@ -5509,26 +5559,23 @@ function transferPanelUI()
                 {
                     var start = s[0];
                     var end = this;
-                    if ($.TgridLastSelected && $($.TgridLastSelected).attr('class').indexOf('ui-selected') > -1)
+                    if ($.TgridLastSelected && $($.TgridLastSelected).hasClass('ui-selected')) {
                         start = $.TgridLastSelected;
-                    if ($(start).index() > $(end).index())
-                    {
+                    }
+                    if ($(start).index() > $(end).index()) {
                         end = start;
                         start = this;
                     }
                     $('.transfer-table tr').removeClass('ui-selected');
                     $([start, end]).addClass('ui-selected');
-                    $(start).nextUntil($(end)).each(function(i, e)
-                    {
+                    $(start).nextUntil($(end)).each(function(i, e) {
                         $(e).addClass('ui-selected');
                     });
                 }
-                else if (e.metaKey == false)
+                else if (!e.ctrlKey && !e.metaKey)
                 {
-                    var had = $(this).hasClass('ui-selected');
                     $('.transfer-table tr').removeClass('ui-selected');
-                    if (!had)
-                        $(this).addClass('ui-selected');
+                    $(this).addClass('ui-selected');
                     $.TgridLastSelected = this;
                 }
                 else
@@ -5546,20 +5593,15 @@ function transferPanelUI()
         initTransferScroll();
     }
 
-    $(window).rebind('resize.transferpanel', function(e)
-    {
+    $(window).rebind('resize.transferpanel', function(e) {
         $.transferHeader();
     });
 
-    $(window).rebind('resize.slideshow', function(e)
-    {
-        if (slideshowid && previews[slideshowid])
+    $(window).rebind('resize.slideshow', function(e) {
+        if (slideshowid && previews[slideshowid]) {
             previewsrc(previews[slideshowid].src);
+        }
     });
-
-    // $('.tranfer-view-icon,.file-transfer-icon').rebind('click', function(e) {
-        // $.transferOpen();
-    // });
 
     $.transferClose = function() {
         $('.nw-fm-left-icon.transfers').removeClass('active');
@@ -5591,10 +5633,10 @@ function transferPanelUI()
         }
     };
 
-    $('.nw-fm-left-icon.settings .settings-icon').rebind('click', function()
-    {
-        if (u_type === 0)
+    $('.nw-fm-left-icon.settings .settings-icon').rebind('click', function() {
+        if (u_type === 0) {
             ephemeralDialog('Transfer settings are for registered users only.');
+        }
         else {
             $('.nw-fm-left-icon').removeClass('active');
             $('.nw-fm-left-icon.settings').addClass('active');
@@ -5659,7 +5701,7 @@ function transferPanelUI()
                 }
             }
             else {
-                $('.transfer-table tr[id] .transfer-status:not(.completed)')
+                $('.transfer-table tr[id] .progress-block, .transfer-table tr[id] .transfer-status:not(.completed)')
                     .closest('tr').attrs('id')
                     .concat(Object.keys(M.tfsdomqueue)).map(fm_tfspause);
                 dlQueue.pause();

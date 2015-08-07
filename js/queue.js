@@ -217,8 +217,8 @@ MegaQueue.prototype.validateTask = function() {
 };
 
 MegaQueue.prototype.getNextTask = function(sp) {
-    var i, r;
-    for (i = 0; i < this._queue.length; i++) {
+    var r;
+    for (var i = 0; i < this._queue.length; i++) {
         if (!(this._queue && this._queue[i])) {
             srvlog('Invalid queue' + (this._queue ? ' entry' : '') + ' for ' + this.qname, sp);
             if (!this._queue) {
@@ -352,12 +352,25 @@ inherits(TransferQueue, MegaQueue);
 
 TransferQueue.prototype.mull = function() {
     if (this.isEmpty() && $.len(this._qpaused)) {
-        this.dispatch(Object.keys(this._qpaused).shift());
+        var gids = Object.keys(this._qpaused);
+        while (gids.length) {
+            var gid = gids.shift();
+            if (this.dispatch(gid)) {
+                if (d) {
+                    this.logger.info('Dispatching transfer', gid);
+                }
+                break;
+            }
+        }
     }
 };
 
 TransferQueue.prototype.dispatch = function(gid) {
     // dispatch a paused transfer
+
+    if (d) {
+        this.logger.info('', 'TransferQueue.dispatch', gid);
+    }
 
     if (!GlobalProgress[gid]) {
         this.logger.error('', 'No transfer associated with ' + gid);

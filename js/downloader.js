@@ -612,5 +612,12 @@ mBroadcaster.once('startMega', function _setupDecrypter() {
         }
     }, 4);
 
+    dlmanager.logger.options.levelColors = {
+        'ERROR': '#fe1111',
+        'DEBUG': '#0000ff',
+        'WARN':  '#C25700',
+        'INFO':  '#189530',
+        'LOG':   '#000044'
+    };
     Object.defineProperty(window, 'Decrypter', { value: decrypter });
 });

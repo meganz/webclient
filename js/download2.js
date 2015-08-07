@@ -135,6 +135,7 @@ var dlmanager = {
                 return;
             }
 
+            var found = 0;
             var l = dl_queue.length;
             while (l--) {
                 var dl = dl_queue[l];
@@ -164,8 +165,17 @@ var dlmanager = {
                          */
                         dl.io.begin();
                     }
+                    found++;
                 }
             }
+
+            if (!found) {
+                this.logger.warn('Download %s was not found in dl_queue', gid);
+            }
+            else if (found > 1 && gid[0] !== 'z') {
+                this.logger.error('Too many matches looking for %s in dl_queue (!?)', gid);
+            }
+
             if (!keepUI) {
                 this.cleanupUI(gid);
             }
@@ -190,7 +200,11 @@ var dlmanager = {
                 var chunk;
                 var w = GlobalProgress[gid].working;
                 while ((chunk = w.pop())) {
-                    chunk.isCancelled();
+                    var result = chunk.isCancelled();
+                    if (!result) {
+                        this.logger.error('Download chunk %s(%s) should have been cancelled itself.', gid, chunk);
+                        if (d) debugger;
+                    }
                 }
             }
 
@@ -760,13 +774,15 @@ var dlmanager = {
 function fm_tfsorderupd() {
     M.t = {};
     $('.transfer-table tr[id]:visible').each(function(pos, node) {
-        if (d) {
-            ASSERT(-1 !== ['ul', 'dl', 'zip'].indexOf(String(node.id).split('_').shift()),
-                'Huh, unexpected node id: ' + node.id);
+        var t = String(node.id).split('_').shift();
+        if (['ul', 'dl', 'zip', 'LOCKed'].indexOf(t) === -1) {
+            dlmanager.logger.error('fm_tfsorderupd', 'Unexpected node id: ' + node.id);
         }
 
-        M.t[pos] = node.id;
-        M.t[node.id] = pos;
+        // if (t !== 'LOCKed') {
+            M.t[pos] = node.id;
+            M.t[node.id] = pos;
+        // }
     });
     if (d) {
         dlmanager.logger.info('M.t', M.t);
@@ -782,7 +798,13 @@ function fm_tfspause(gid) {
         else {
             dlQueue.pause(gid);
         }
+        var $tr = $('.transfer-table tr#' + gid);
+        $tr.addClass('paused');
+        $tr.find('span.transfer-type').addClass('paused');
+        $tr.find('td:eq(5)').html('<span class="transfer-status queued">Queued</span>');
+        return true;
     }
+    return false;
 }
 
 function fm_tfsresume(gid) {
@@ -793,7 +815,16 @@ function fm_tfsresume(gid) {
         else {
             dlQueue.resume(gid);
         }
+        var $tr = $('.transfer-table tr#' + gid);
+        $tr.removeClass('paused');
+        $tr.find('span.transfer-type').removeClass('paused');
+
+        if (!$('.transfer-table .progress-block, .transfer-table .transfer-status.initiliazing').length) {
+            $tr.find('td:eq(5)').html('<span class="transfer-status initiliazing">' + htmlentities(l[1042]) + '</span>');
+        }
+        return true;
     }
+    return false;
 }
 
 function fm_tfsmove(gid, dir) { // -1:up, 1:down
@@ -922,7 +953,8 @@ function fm_tfsmove(gid, dir) { // -1:up, 1:down
 }
 
 function fm_tfsupdate() {
-    var i = 0, u = 0;
+    var i = 0;
+    var u = 0;
 
     // Move completed transfers to the bottom
     $('.transfer-table td .transfer-status.completed')
@@ -945,25 +977,38 @@ function fm_tfsupdate() {
     $('.transfer-table span.row-number').each(function() {
         var $this = $(this);
         $this.text(++i);
-        if ($this.closest('tr').find('.transfer-type.upload').length) ++u;
+        if ($this.closest('tr').find('.transfer-type.upload').length) {
+            ++u;
+        }
     });
     i -= u;
     for (var k in M.tfsdomqueue) {
-        if (k[0] === 'u') ++u;
-        else ++i;
+        if (k[0] === 'u') {
+            ++u;
+        }
+        else {
+            ++i;
+        }
     }
-    var sep = "\u202F", $tpt = $('.transfer-panel-title');
-    var t, l = $.trim($tpt.text()).split(sep)[0];
+    var t;
+    var sep = "\u202F";
+    var $tpt = $('.transfer-panel-title');
+    var l = $.trim($tpt.text()).split(sep)[0];
     if (i && u) {
         t = '\u2191 ' + i + ' \u2193 ' + u;
-    } else if (i) {
+    }
+    else if (i) {
         t = i;
-    } else if (u) {
+    }
+    else if (u) {
         t = u;
-    } else {
+    }
+    else {
         t = '';
     }
-    if (t) t = sep + ' ' + t;
+    if (t) {
+        t = sep + ' ' + t;
+    }
     $tpt.text(l + t);
 }
 

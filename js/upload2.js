@@ -1281,6 +1281,13 @@ mBroadcaster.once('startMega', function _setupEncrypter() {
         }
     }, 4);
 
+    ulmanager.logger.options.levelColors = {
+        'ERROR': '#fe1111',
+        'DEBUG': '#0000ff',
+        'WARN':  '#C25700',
+        'INFO':  '#44829D',
+        'LOG':   '#000044'
+    };
     Object.defineProperty(window, 'Encrypter', { value: encrypter });
 });
 

@@ -1965,8 +1965,9 @@ function setupTransferAnalysis() {
             var tp = $.transferprogress;
 
             for (var i in tp) {
-                if (!GlobalProgress[i] || GlobalProgress[i].paused || tp[i][0] === tp[i][1]
-                        || (i[0] === 'u' ? ulQueue : dlQueue).isPaused()) {
+                var q = (i[0] === 'u' ? ulQueue : dlQueue);
+                if (!GlobalProgress[i] || GlobalProgress[i].paused
+                        || tp[i][0] === tp[i][1] || q.isPaused() || q._qpaused[i]) {
                     delete prev[i];
                 }
                 else if (prev[i] && prev[i] === tp[i][0]) {

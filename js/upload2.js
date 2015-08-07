@@ -789,7 +789,7 @@ FileUpload.prototype.run = function(done) {
 
 			if (!window['!ZeroByte']) {
 				window['!ZeroByte'] = true;
-				Later(firefoxDialog);
+				Later(megaSyncDialog);
 				msgDialog('warninga', str_mtrunc(file.name, 40), msg, l[1677] + ': ' + (e.message || e.name || e));
 			}
 			UploadManager.abort(file);

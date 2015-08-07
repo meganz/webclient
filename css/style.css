@@ -19128,6 +19128,43 @@ h1.help-home-header {
 .arrow.desc {
 	background-position: right -1286px;
 }
+
+.fm-dialog.download-megasync-dialog {
+    margin: -154px 0 0 -265px;
+    width: auto;
+}
+.download-megasync-dialog .button {
+    border: 2px solid #d9d9d9;
+    border-radius: 4px;
+    display: inline-block;
+    margin: 25px;
+    padding: 7px 20px 14px;
+}
+.download-megasync-dialog .button:hover {
+    background-color: #b2b2b2;
+    border: 2px solid #fff;
+}
+.download-megasync-dialog .icon {
+    background-image: url("../images/mega/sync_nw2.png");
+    background-position: center 1px;
+    background-repeat: no-repeat;
+    display: block;
+    height: 42px;
+    width: 160px;
+}
+.download-megasync-dialog .content {
+    text-align: center;
+}
+.download-megasync-dialog .txt {
+    color: #777;
+    font-size: 14px;
+    line-height: 24px;
+    margin: 20px 25px 0;
+    max-width: 477px;
+    padding: 0;
+    text-align: left;
+}
+
 .ff-extension-icon {
 	float: left;
 	width: 140px;
@@ -24132,6 +24169,10 @@ background-size:27px auto;
 .ff-extension-icon, .ff-extension-button {
  background-image: url(../images/mega/firefox-sprite@2x.png);
 background-size: 90px auto;
+}
+.download-megasync-dialog .icon {
+    background-image: url(../images/mega/sync_nw2@2x.png?v=1);
+    background-size: 168px auto;
 }
 .st-green-note {
  background-image: url(../images/mega/en/start-green-note@2x.png);

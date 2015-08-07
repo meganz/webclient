@@ -95,7 +95,7 @@ function dl_g(res) {
         
         $('.new-download-red-button, .regular-download').rebind('click', function() {
             
-            if (dlMethod == MemoryIO && !localStorage.firefoxDialog && fdl_filesize > 1048576000 && navigator.userAgent.indexOf('Firefox') > -1)
+            if (dlMethod == MemoryIO && !localStorage.megaSyncDialog && fdl_filesize > 1048576000 && navigator.userAgent.indexOf('Firefox') > -1)
             {
                 firefoxDialog();
             }

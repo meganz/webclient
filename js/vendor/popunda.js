@@ -1,9 +1,9 @@
-var advert = advert || {};
+var popunda = popunda || {};
 
 /** 
  *  Used to initialise and trigger popunder functionality on the site.
  */
-advert.megaPopunder = {
+popunda.megaPopunder = {
     
     popurls: [""],
     popTimes: 1,

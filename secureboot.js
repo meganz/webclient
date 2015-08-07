@@ -1715,7 +1715,7 @@ else if (!b_u)
             dl_res= false;
             boot_done();
         };
-        dlxhr.open("POST", apipath + 'cs?id=0', true);
+        dlxhr.open("POST", apipath + 'cs?id=0&domain=meganz', true);
         dlxhr.send(JSON.stringify([{ 'a': 'g', p: page.substr(1,8), 'ad': showAd() }]));
     }
 }

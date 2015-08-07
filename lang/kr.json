@@ -3634,8 +3634,12 @@
     "7225": "\ubaa8\ub4e0 \uc804\uc1a1\uc744 \uc0ad\uc81c\ud558\uc2dc\uaca0\uc2b5\ub2c8\uae4c?",
     "7226": "\ud734\uc9c0\ud1b5 \ube44\uc6c0 \uc77c\uc815:",
     "7227": "\ub300\uae30\uc5f4",
-    "7228": "Font size:",
-    "7229": "Small",
-    "7230": "Big",
-    "7231": "Price excludes Bitcoin transaction fee."
+    "7228": "\ud3f0\ud2b8 \ud06c\uae30:",
+    "7229": "\uc791\uc74c",
+    "7230": "\ud07c",
+    "7231": "\ube44\ud2b8\ucf54\uc778 \uc804\uc1a1 \uc218\uc218\ub8cc\uac00 \uc81c\uc678\ub41c \uae08\uc561\uc785\ub2c8\ub2e4.",
+    "7232": "\ub2e4\uc6b4\ub85c\ub4dc\ud55c \ud30c\uc77c\uc744 \ube0c\ub77c\uc6b0\uc800\ub85c \ub04c\uc5b4\ub2e4 \ub193\uc740 \ud6c4 \uc124\uce58\ub97c \uc2b9\uc778\ud558\uc138\uc694.",
+    "7233": "Transaction could not be initiated due to connection problems. If the problem persists, please contact support@mega.co.nz",
+    "7234": "Something has gone wrong and we were unable to charge your card.",
+    "7235": "Payment Failed"
 }

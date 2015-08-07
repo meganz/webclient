@@ -3639,7 +3639,8 @@
     "7230": "Velk\u00e9",
     "7231": "Cena nezahrnuje poplatek za transakci s Bitcoiny.",
     "7232": "P\u0159et\u00e1hn\u011bte sta\u017een\u00fd soubor do prohl\u00ed\u017ee\u010de a potvr\u010fte instalaci.",
-    "7233": "Transaction could not be initiated due to connection problems. If the problem persists, please contact support@mega.co.nz",
-    "7234": "Something has gone wrong and we were unable to charge your card.",
-    "7235": "Payment Failed"
+    "7233": "Transakce nem\u016f\u017ee b\u00fdt zah\u00e1jena kv\u016fli probl\u00e9m\u016fm s p\u0159ipojen\u00edm. Pokud probl\u00e9m p\u0159etrv\u00e1v\u00e1, obra\u0165te se na support@mega.co.nz",
+    "7234": "N\u011bco se nepovedlo a nepoda\u0159ilo se n\u00e1m strhnout \u010d\u00e1stku z va\u0161\u00ed karty.",
+    "7235": "Platba selhala",
+    "7236": "To download files larger than 1GB or to upload folders, please install our MEGAsync client. This will allow easy, automated syncing between your computer and your MEGA cloud drive."
 }

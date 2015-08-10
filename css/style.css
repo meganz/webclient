@@ -19151,7 +19151,7 @@ h1.help-home-header {
 }
 .download-megasync-dialog .icon {
     background-image: url("../images/mega/sync-nw-v3.png");
-    background-position: -115px -125px;
+    background-position: -15px -1150px;
     background-repeat: no-repeat;
     display: block;
     height: 50px;
@@ -19161,7 +19161,7 @@ h1.help-home-header {
     width: 50px;
 }
 .download-megasync-dialog .button:hover .icon {
-    background-position: -115px -175px;
+    background-position: -15px -1199px;
 }
 .download-megasync-dialog .button-txt {
     color: #777;

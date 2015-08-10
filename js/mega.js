@@ -3630,8 +3630,9 @@ function MegaData()
             }
         }
 
-        if (dlMethod == MemoryIO && ~ua.indexOf(') gecko') && !localStorage.firefoxDialog && $.totalDL > 104857600)
-            Later(firefoxDialog);
+        if (dlMethod == MemoryIO && ~ua.indexOf(') gecko') && !localStorage.megaSyncDialog && $.totalDL > 104857600) {
+            Later(megaSyncDialog);
+        }
 
         var flashhtml = '';
         if (dlMethod == FlashIO) {

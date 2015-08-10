@@ -1310,21 +1310,21 @@ function dlFatalError(dl, error, ethrow) {
     var m = 'This issue should be resolved ';
     if (navigator.webkitGetUserMedia) {
         m += 'exiting from Incognito mode.';
+        msgDialog('warninga', l[1676], m, error);
     }
     else if (navigator.msSaveOrOpenBlob) {
         Later(browserDialog);
         m = l[1933];
+        msgDialog('warninga', l[1676], m, error);
     }
     else if (dlMethod === FlashIO) {
         Later(browserDialog);
         m = l[1308];
+        msgDialog('warninga', l[1676], m, error);
     }
     else {
-        Later(firefoxDialog);
-        // m += 'installing our extension.'
-        m = l[1932];
+        Later(megaSyncDialog);
     }
-    msgDialog('warninga', l[1676], m, error);
     setTransferStatus(dl, error, ethrow, true);
     DownloadManager.abort(dl);
 }

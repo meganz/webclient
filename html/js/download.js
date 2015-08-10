@@ -95,9 +95,9 @@ function dl_g(res) {
         
         $('.new-download-red-button, .regular-download').rebind('click', function() {
             
-            if (dlMethod == MemoryIO && !localStorage.firefoxDialog && fdl_filesize > 1048576000 && navigator.userAgent.indexOf('Firefox') > -1)
+            if (dlMethod == MemoryIO && !localStorage.megaSyncDialog && fdl_filesize > 1048576000 && navigator.userAgent.indexOf('Firefox') > -1)
             {
-                firefoxDialog();
+                megaSyncDialog();
             }
             else if ((('-ms-scroll-limit' in document.documentElement.style && '-ms-ime-align' in document.documentElement.style)
             || (navigator.userAgent.indexOf('MSIE 10') > -1)

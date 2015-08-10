@@ -8668,6 +8668,48 @@ function chromeDialog(close)
     });
 }
 
+/**
+ * Open a dialog asking the user to download MEGAsync for files over 1GB
+ */
+function megaSyncDialog() {
+    
+    // Cache selector
+    var $dialog = $('.fm-dialog.download-megasync-dialog');
+
+    // Show the dialog and overlay
+    $dialog.removeClass('hidden');
+    fm_showoverlay();
+
+    // Add close button handler
+    $dialog.find('.fm-dialog-close, .close-button').rebind('click', function() {
+        $dialog.addClass('hidden');
+        fm_hideoverlay();
+    });
+    
+    // Add checkbox handling
+    $dialog.find('#megasync-checkbox').rebind('click', function() {
+        
+        var $this = $(this);
+        
+        // If it has not been checked, check it
+        if (!$this.hasClass('checkboxOn')) {
+            
+            // Store a flag so that it won't show this dialog again if triggered
+            localStorage.megaSyncDialog = 1;
+            $this.attr('class', 'checkboxOn');
+            $this.parent().attr('class', 'checkboxOn');
+            $this.attr('checked', true);
+        }
+        else {
+            // Otherwise uncheck it
+            delete localStorage.megaSyncDialog;
+            $this.attr('class', 'checkboxOff');
+            $this.parent().attr('class', 'checkboxOff');
+            $this.attr('checked', false);
+        }
+    });
+};
+
 function firefoxDialog(close)
 {
     if (close)

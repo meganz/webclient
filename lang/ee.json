@@ -3639,7 +3639,8 @@
     "7230": "Suur",
     "7231": "Hind ei sisalda Bitcoini makse teenustasu.",
     "7232": "Lohistage ja asetage allalaetud fail veebilehitsejasse ja kinnitage paigaldus.",
-    "7233": "Transaction could not be initiated due to connection problems. If the problem persists, please contact support@mega.co.nz",
-    "7234": "Something has gone wrong and we were unable to charge your card.",
-    "7235": "Payment Failed"
+    "7233": "Makse sooritamine eba\u00f5nnestus \u00fchendusprobleemide t\u00f5ttu. Probleemi uuesti ilmnemise korral v\u00f5tke \u00fchendust aadressil support@mega.co.nz",
+    "7234": "Midagi l\u00e4ks valesti ja me ei suutnud Teie kaardilt raha v\u00f5tta.",
+    "7235": "Makse eba\u00f5nnestus",
+    "7236": "To download files larger than 1GB or to upload folders, please install our MEGAsync client. This will allow easy, automated syncing between your computer and your MEGA cloud drive."
 }

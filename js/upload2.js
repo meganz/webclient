@@ -23,6 +23,24 @@ var ulmanager = {
     ulBlockExtraSize: 1048576,
     logger: MegaLogger.getLogger('ulmanager'),
 
+    // Errors megad might return while uploading
+    ulErrorMap: Object.freeze({
+        "EAGAIN":    -3,
+        "EFAILED":   -4,
+        "ENOTFOUND": -5,
+        "ETOOMANY":  -6,
+        "ERANGE":    -7,
+        "EEXPIRED":  -8,
+        "EKEY":     -14
+    }),
+
+    ulStrError: function UM_ulStrError(code) {
+        code = parseInt(code);
+        var keys = Object.keys(this.ulErrorMap);
+        var values = obj_values(this.ulErrorMap);
+        return keys[values.indexOf(code)] || code;
+    },
+
     getGID: function UM_GetGID(ul) {
         return 'ul_' + ul.id;
     },
@@ -835,7 +853,7 @@ ChunkUpload.prototype.on_error = function(args, xhr, reason) {
         if (!xhr) {
             xhr = this.xhr;
         }
-        if (args === EKEY) {
+        if (args === "$FATAL") {
             ulmanager.restart(this.file, reason, xhr);
         }
         else {
@@ -903,29 +921,31 @@ ChunkUpload.prototype.on_ready = function(args, xhr) {
             this.file.retries = 0; /* reset error flag */
 
             return this.done();
-
         }
         else {
-            ASSERT(0, "Invalid upload response: " + response);
-            if (response !== EKEY) {
-                return this.on_error(EKEY, null, "EKEY error");
+            var estr = ulmanager.ulStrError(response);
+            this.logger.error("Invalid upload response: ", response, estr);
+            if (estr !== "EKEY") {
+                return this.on_error("$FATAL", null,
+                    (estr ? (estr + " error")
+                    : "IUR[" + String(response).trim().substr(0, 5) + "]"));
             }
         }
     }
 
     this.srverr = xhr.status + 1;
 
+    this.oet = setTimeout(this.on_error.bind(this, null, xhr,
+        "BRFS [l:" + (xhr.response ? xhr.response.length : 'Unk') + "]"), 1950 + Math.floor(Math.random() * 2e3));
+
     if (d) {
-        this.logger.info("Bad response from server",
+        this.logger.warn("Bad response from server",
             xhr.status,
             this.file.name,
             typeof xhr.response === 'string',
             xhr.statusText
         );
     }
-
-    this.oet = setTimeout(this.on_error.bind(this, null, xhr,
-        "BRFS [l:" + (xhr.response ? xhr.response.length : 'Unk') + "]"), 1950 + Math.floor(Math.random() * 2e3));
 }
 
 ChunkUpload.prototype.upload = function() {

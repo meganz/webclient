@@ -4417,12 +4417,13 @@ function onUploadError(ul, errorstr, reason, xhr)
         }
     }
 
-    if (d)
-        console.error('onUploadError', ul.id, ul.name, errorstr, reason, hn);
+    if (d) {
+        ulmanager.logger.error('onUploadError', ul.id, ul.name, errorstr, reason, hn);
+    }
 
-    $('.transfer-table #ul_' + ul.id + ' td:eq(2)')
-        .html('<span class="transfer-status error">' + htmlentities(errorstr) + '</span>')
-        .parents('tr').data({'failed': NOW()});
+    $('.transfer-table #ul_' + ul.id + ' td:eq(5)')
+        .html('<span class="transfer-status error">' + htmlentities(errorstr) + '</span>');
+        // .parents('tr').data({'failed': NOW()});
 }
 
 function addupload(u)

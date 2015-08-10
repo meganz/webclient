@@ -19129,31 +19129,52 @@ h1.help-home-header {
 	background-position: right -1286px;
 }
 
+/* MegaSync dialog */
 .fm-dialog.download-megasync-dialog {
     margin: -154px 0 0 -265px;
     width: auto;
+}
+.download-megasync-dialog .content {
+    text-align: center;
+    padding: 10px;
 }
 .download-megasync-dialog .button {
     border: 2px solid #d9d9d9;
     border-radius: 4px;
     display: inline-block;
-    margin: 25px;
-    padding: 7px 20px 14px;
+    margin: 30px 25px 25px;
+    position: relative;
 }
 .download-megasync-dialog .button:hover {
     background-color: #b2b2b2;
     border: 2px solid #fff;
 }
 .download-megasync-dialog .icon {
-    background-image: url("../images/mega/sync_nw2.png");
-    background-position: center 1px;
+    background-image: url("../images/mega/sync-nw-v3.png");
+    background-position: -115px -125px;
     background-repeat: no-repeat;
     display: block;
-    height: 42px;
-    width: 160px;
+    height: 50px;
+    left: 10px;
+    position: absolute;
+    top: 5px;
+    width: 50px;
 }
-.download-megasync-dialog .content {
-    text-align: center;
+.download-megasync-dialog .button:hover .icon {
+    background-position: -115px -175px;
+}
+.download-megasync-dialog .button-txt {
+    color: #777;
+    display: block;
+    font-family: "source_sans_prosemibold",Arial;
+    font-size: 14px;
+    line-height: 60px;
+    margin-left: 70px;
+    margin-right: 15px;
+    text-transform: capitalize;
+}
+.download-megasync-dialog .button:hover .button-txt {
+    color: #fff;
 }
 .download-megasync-dialog .txt {
     color: #777;
@@ -19355,7 +19376,7 @@ a.ff-extension-button:hover {
 .sync-top-logo {
 	width: 160px;
 	height: 42px;
-	background-image: url(../images/mega/sync_nw2.png?v=1);
+	background-image: url(../images/mega/sync-nw-v3.png);
 	background-position: center 1px;
 	background-repeat: no-repeat;
 	margin: 38px auto 26px auto;
@@ -19410,7 +19431,7 @@ a.ff-extension-button:hover {
 	margin: 0;
 	padding: 7px 0 7px 25px;
 	line-height: 28px;
-	background-image: url(../images/mega/sync_nw2.png?v=1);
+	background-image: url(../images/mega/sync-nw-v3.png);
 	background-position: left -128px;
 	background-repeat: no-repeat;
 }
@@ -19434,7 +19455,7 @@ a.ff-extension-button:hover {
 	border-left: 0;
 }
 .sync-help-center {
-	background-image: url(../images/mega/sync_nw2.png?v=1);
+	background-image: url(../images/mega/sync-nw-v3.png);
 	background-position: center -352px;
 	background-repeat: no-repeat;
 	text-align: center;
@@ -24151,7 +24172,7 @@ background-image: url(../images/mega/slideshow-sprite@2x.png?v=1);
  background-size: 200px auto;
 }
 .sync-top-logo, .sync-short-block li, .sync-help-center {
- background-image: url(../images/mega/sync_nw2@2x.png?v=1);
+ background-image: url(../images/mega/sync-nw-v3@2x.png);
  background-size: 168px auto;
 }
 .sync-main-img {
@@ -24171,7 +24192,7 @@ background-size:27px auto;
 background-size: 90px auto;
 }
 .download-megasync-dialog .icon {
-    background-image: url(../images/mega/sync_nw2@2x.png?v=1);
+    background-image: url(../images/mega/sync-nw-v3@2x.png);
     background-size: 168px auto;
 }
 .st-green-note {

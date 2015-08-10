@@ -790,7 +790,7 @@ FileUpload.prototype.run = function(done) {
 			if (!window['!ZeroByte']) {
 				window['!ZeroByte'] = true;
 				Later(megaSyncDialog);
-				msgDialog('warninga', str_mtrunc(file.name, 40), msg, l[1677] + ': ' + (e.message || e.name || e));
+				console.warn(str_mtrunc(file.name, 40), msg, l[1677] + ': ' + (e.message || e.name || e));
 			}
 			UploadManager.abort(file);
 			this.destroy();
@@ -801,7 +801,7 @@ FileUpload.prototype.run = function(done) {
 
 UploadQueue.prototype.push = function() {
 	var pos = Array.prototype.push.apply(this, arguments) - 1
-		, file = this[pos]
+		, file = this[pos];
 
 	file.pos = pos;
 	ulQueue.poke(file);

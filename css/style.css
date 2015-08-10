@@ -13,13 +13,6 @@
 	font-style: normal;
 }
 @font-face {
-	font-family: 'Open Sans Bold';
-	src: url('../fonts/OpenSans-Bold.eot');
-	src: url('../fonts/OpenSans-Bold.eot?#iefix') format('embedded-opentype'), url('../fonts/OpenSans-Bold.woff2') format('woff2'), url('../fonts/OpenSans-Bold.woff') format('woff'), url('../fonts/OpenSans-Bold.ttf') format('truetype'), url('../fonts/OpenSans-Bold.svg#open_sansbold') format('svg');
-	font-weight: normal;
-	font-style: normal;
-}
-@font-face {
 	font-family: 'source_sans_probold';
 	src: url('../fonts/SourceSansPro-Bold.eot');
 	src: url('../fonts/SourceSansPro-Bold.eot?#iefix') format('embedded-opentype'), url('../fonts/SourceSansPro-Bold.woff2') format('woff2'), url('../fonts/SourceSansPro-Bold.woff') format('woff'), url('../fonts/SourceSansPro-Bold.ttf') format('truetype'), url('../fonts/SourceSansPro-Bold.svg#source_sans_probold') format('svg');
@@ -3394,7 +3387,7 @@ img.blog-new-logos {
 	-moz-border-radius: 100%;
 	-webkit-border-radius: 100%;
 	border-radius: 100%;
-	background-image: url(../images/mega/dialogs-sprite_v3.svg);
+	background-image: url(../images/mega/dialogs-sprite_v4.svg);
 	background-position: 2px -496px;
 	background-repeat: no-repeat;
 	-webkit-transition: background-color 200ms ease-in-out;
@@ -3458,7 +3451,7 @@ img.blog-new-logos {
 	bottom: -16px;
 	left: 50%;
 	margin: 0 0 0 -8px;
-	background-image: url(../images/mega/dialogs-sprite_v3.svg);
+	background-image: url(../images/mega/dialogs-sprite_v4.svg);
 	background-position: -5px -2117px;
 	background-repeat: no-repeat;
 }
@@ -3497,7 +3490,7 @@ img.blog-new-logos {
 	height: 18px;
 	left: 11px;
 	top: 6px;
-	background-image: url(../images/mega/dialogs-sprite_v3.svg);
+	background-image: url(../images/mega/dialogs-sprite_v4.svg);
 	background-position: -132px -3180px;
 	background-repeat: no-repeat;
 	-webkit-transition: all 200ms ease-in-out;
@@ -6011,7 +6004,7 @@ table {
 	background-position: -14px -7566px;
 }
 .rename-input-bl .transfer-filtype-icon.folder, .rename-input-bl .transfer-filtype-icon.folder-shared {
-	background-image: url(../images/mega/dialogs-sprite_v3.svg);
+	background-image: url(../images/mega/dialogs-sprite_v4.svg);
 	background-position: -7px -1974px;
 }
 .focused .rename-input-bl .transfer-filtype-icon.folder {
@@ -6343,7 +6336,7 @@ table {
 	background-position: center -4614px;
 }
 .export-icon.folder-shared, .export-icon.folder {
-	background-image: url(../images/mega/dialogs-sprite_v3.svg);
+	background-image: url(../images/mega/dialogs-sprite_v4.svg);
 	background-position: -10px -2680px;
 }
 .dragger-icon.flash, .export-icon.flash, .new-download-file-icon.flash, .share-folder-icon div.flash {
@@ -7830,7 +7823,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	color: #666666;
 	padding: 0 10px 0 42px;
 	margin: 0;
-	background-image: url(../images/mega/dialogs-sprite_v3.svg);
+	background-image: url(../images/mega/dialogs-sprite_v4.svg);
 	background-position: 3px -1890px;
 	background-repeat: no-repeat;
 	background-color: transparent;
@@ -7851,7 +7844,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	border-radius: 5px;
 	background-color: rgba(0,0,0,0.05);
 	height: 50px;
-	background-image: url(../images/mega/dialogs-sprite_v3.svg);
+	background-image: url(../images/mega/dialogs-sprite_v4.svg);
 	background-position: -3px -3527px;
 	background-repeat: no-repeat;
 	padding: 0 0 0 31px;
@@ -9553,7 +9546,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
 	top: 0;
 	left: 0;
 }
-.fm-dialog-overlay.bitcoin-invoice-dialog, .fm-dialog-overlay.payment-dialog-overlay, .fm-dialog-overlay.voucher-dialog-overlay {
+.fm-dialog-overlay.bitcoin-invoice-dialog, .fm-dialog-overlay.payment-dialog-overlay, .fm-dialog-overlay.voucher-dialog-overlay, .fm-dialog-overlay.dark-overlay {
 	background: rgba(34,34,34,0.95);
 }
 .fm-dialog {
@@ -9634,8 +9627,8 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
 	position: relative;
 }
 .bitcoin-invoice-dialog .helper-explanation {
-  font-size: 12px;
-  margin-top: 10px;
+	font-size: 12px;
+	margin-top: 10px;
 }
 .bitcoin-invoice-dialog .payment-confirmation {
 	display: none;
@@ -9777,10 +9770,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
 	font-size: 0.8em;
 }
 .bitcoin-invoice-dialog .plan-price-bitcoins {
-    display: inline-block;
-    font-size: 39px;
-    line-height: 42px;
-    padding-top: 26px;
+	display: inline-block;
+	font-size: 39px;
+	line-height: 42px;
+	padding-top: 26px;
 }
 .bitcoin-invoice-dialog .plan-price-bitcoins-btc {
 	display: inline-block;
@@ -10763,7 +10756,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	float: left;
 	width: 106px;
 	height: 75px;
-	background-image: url(../images/mega/dialogs-sprite_v3.svg);
+	background-image: url(../images/mega/dialogs-sprite_v4.svg);
 	background-repeat: no-repeat;
 }
 .notification-dialog .fm-notification-icon {
@@ -10847,7 +10840,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	display: inline;
 }
 .delete-contact.multiple .fm-del-contact-avatar {
-	background-image: url(../images/mega/dialogs-sprite_v3.svg);
+	background-image: url(../images/mega/dialogs-sprite_v4.svg);
 	background-repeat: no-repeat;
 	background-position: -5px -3080px;
 	background-color: rgba(0,0,0,0.2);
@@ -10870,7 +10863,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	line-height: 21px;
 	color: #999999;
 	padding: 15px 0 0 23px;
-	background-image: url(../images/mega/dialogs-sprite_v3.svg);
+	background-image: url(../images/mega/dialogs-sprite_v4.svg);
 	background-position: -1px -1829px;
 	background-repeat: no-repeat;
 }
@@ -10899,7 +10892,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	width: 100%;
 	position: absolute;
 	left: 0;
-	background-image: url(../images/mega/dialogs-sprite_v3.svg);
+	background-image: url(../images/mega/dialogs-sprite_v4.svg);
 	background-position: left -2771px;
 	background-repeat: repeat-x;
 	z-index: 100;
@@ -11128,7 +11121,7 @@ label.radio-txt {
 }
 .export-warning-content {
 	max-width: 947px;
-	background-image: url(../images/mega/dialogs-sprite_v3.svg);
+	background-image: url(../images/mega/dialogs-sprite_v4.svg);
 	background-position: left -2880px;
 	background-repeat: no-repeat;
 	margin: 0 auto;
@@ -11421,20 +11414,20 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
 }
 .shared-with-me.read-only .properties-elements-counter span {
 	background-color: #61D2FF;
-	background-image: url(../images/mega/dialogs-sprite_v3.svg);
+	background-image: url(../images/mega/dialogs-sprite_v4.svg);
 	background-position: -81px -238px;
 	background-repeat: no-repeat;
 }
 .shared-with-me.read-and-write .properties-elements-counter span {
 	background-color: #FFD300;
 	background-position: -81px -207px;
-	background-image: url(../images/mega/dialogs-sprite_v3.svg);
+	background-image: url(../images/mega/dialogs-sprite_v4.svg);
 	background-repeat: no-repeat;
 }
 .shared-with-me.full-access .properties-elements-counter span {
 	background-color: #00E22C;
 	background-position: -81px -174px;
-	background-image: url(../images/mega/dialogs-sprite_v3.svg);
+	background-image: url(../images/mega/dialogs-sprite_v4.svg);
 	background-repeat: no-repeat;
 }
 .multiple .properties-file-icon div:nth-child(2) {
@@ -12552,7 +12545,7 @@ table {
 	background-position: 5px -3716px;
 }
 .full-access .context-menu-icon, .read-and-write .context-menu-icon, .read-only .context-menu-icon {
-	background-image: url(../images/mega/dialogs-sprite_v3.svg);
+	background-image: url(../images/mega/dialogs-sprite_v4.svg);
 	background-repeat: no-repeat;
 }
 .full-access .context-menu-icon {
@@ -15644,7 +15637,7 @@ div.membership-bott-button {
 	line-height: 36px;
 }
 .new-download-red-button {
-    background-position: -2px -1423px;
+	background-position: -2px -1423px;
 	color: #2BA6DE;
 	font-size: 14px;
 	line-height: 34px;
@@ -15654,7 +15647,7 @@ div.membership-bott-button {
 	margin-top: 12px;
 }
 .new-download-red-button:hover {
-    background-position: -2px -1383px;
+	background-position: -2px -1383px;
 	color: #777;
 }
 .new-download-gray-button {
@@ -18222,7 +18215,7 @@ code, c {
 }
 .notification-empty-icon {
 	height: 225px;
-	background-image: url(../images/mega/dialogs-sprite_v3.svg);
+	background-image: url(../images/mega/dialogs-sprite_v4.svg);
 	background-position: center -3245px;
 	background-repeat: no-repeat;
 }
@@ -19128,64 +19121,62 @@ h1.help-home-header {
 .arrow.desc {
 	background-position: right -1286px;
 }
-
 /* MegaSync dialog */
 .fm-dialog.download-megasync-dialog {
-    margin: -154px 0 0 -265px;
-    width: auto;
+	margin: -154px 0 0 -265px;
+	width: auto;
 }
 .download-megasync-dialog .content {
-    text-align: center;
-    padding: 10px;
+	text-align: center;
+	padding: 10px;
 }
 .download-megasync-dialog .button {
-    border: 2px solid #d9d9d9;
-    border-radius: 4px;
-    display: inline-block;
-    margin: 30px 25px 25px;
-    position: relative;
+	border: 2px solid #d9d9d9;
+	border-radius: 4px;
+	display: inline-block;
+	margin: 30px 25px 25px;
+	position: relative;
 }
 .download-megasync-dialog .button:hover {
-    background-color: #b2b2b2;
-    border: 2px solid #fff;
+	background-color: #b2b2b2;
+	border: 2px solid #fff;
 }
 .download-megasync-dialog .icon {
-    background-image: url("../images/mega/sync-nw-v3.png");
-    background-position: -15px -1150px;
-    background-repeat: no-repeat;
-    display: block;
-    height: 50px;
-    left: 10px;
-    position: absolute;
-    top: 5px;
-    width: 50px;
+	background-image: url("../images/mega/sync-nw-v3.png");
+	background-position: -15px -1150px;
+	background-repeat: no-repeat;
+	display: block;
+	height: 50px;
+	left: 10px;
+	position: absolute;
+	top: 5px;
+	width: 50px;
 }
 .download-megasync-dialog .button:hover .icon {
-    background-position: -15px -1199px;
+	background-position: -15px -1199px;
 }
 .download-megasync-dialog .button-txt {
-    color: #777;
-    display: block;
-    font-family: "source_sans_prosemibold",Arial;
-    font-size: 14px;
-    line-height: 60px;
-    margin-left: 70px;
-    margin-right: 15px;
-    text-transform: capitalize;
+	color: #777;
+	display: block;
+	font-family: "source_sans_prosemibold", Arial;
+	font-size: 14px;
+	line-height: 60px;
+	margin-left: 70px;
+	margin-right: 15px;
+	text-transform: capitalize;
 }
 .download-megasync-dialog .button:hover .button-txt {
-    color: #fff;
+	color: #fff;
 }
 .download-megasync-dialog .txt {
-    color: #777;
-    font-size: 14px;
-    line-height: 24px;
-    margin: 20px 25px 0;
-    max-width: 477px;
-    padding: 0;
-    text-align: left;
+	color: #777;
+	font-size: 14px;
+	line-height: 24px;
+	margin: 20px 25px 0;
+	max-width: 477px;
+	padding: 0;
+	text-align: left;
 }
-
 .ff-extension-icon {
 	float: left;
 	width: 140px;
@@ -20510,7 +20501,7 @@ span.incoming-call-name {
 	top: 4px;
 	width: 32px;
 	height: 16px;
-	background-image: url(../images/mega/dialogs-sprite_v3.svg);
+	background-image: url(../images/mega/dialogs-sprite_v4.svg);
 	background-position: -2px -3669px;
 	background-repeat: no-repeat;
 	cursor: pointer;
@@ -20539,7 +20530,7 @@ span.incoming-call-name {
 	display: block;
 	width: 32px;
 	height: 16px;
-	background-image: url(../images/mega/dialogs-sprite_v3.svg);
+	background-image: url(../images/mega/dialogs-sprite_v4.svg);
 	background-position: -122px -3719px;
 	background-repeat: no-repeat;
 }
@@ -21161,7 +21152,7 @@ ul.token-input-list-mega {
 }
 .multiple-input-warning .arrow {
 	height: 32px;
-	background-image: url(../images/mega/dialogs-sprite_v3.svg);
+	background-image: url(../images/mega/dialogs-sprite_v4.svg);
 	background-repeat: no-repeat;
 	background-position: right -2009px;
 	position: absolute;
@@ -21217,7 +21208,7 @@ li.token-input-token-mega p {
 li.token-input-token-mega .input-close {
 	height: 20px;
 	width: 10px;
-	background-image: url(../images/mega/dialogs-sprite_v3.svg);
+	background-image: url(../images/mega/dialogs-sprite_v4.svg);
 	background-position: -94px -460px;
 	background-repeat: no-repeat;
 	display: block;
@@ -21392,7 +21383,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
 	left: 50%;
 	margin-left: -9px;
 	width: 18px;
-	background-image: url(../images/mega/dialogs-sprite_v3.svg);
+	background-image: url(../images/mega/dialogs-sprite_v4.svg);
 	background-repeat: no-repeat;
 	background-position: left -3831px;
 }
@@ -21421,7 +21412,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
 	-moz-border-radius: 0;
 	-webkit-border-radius: 0;
 	border-radius: 0;
-	background-image: url(../images/mega/dialogs-sprite_v3.svg);
+	background-image: url(../images/mega/dialogs-sprite_v4.svg);
 	background-repeat: no-repeat;
 	background-position: center -535px;
 }
@@ -21461,13 +21452,13 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
 	cursor: pointer;
 }
 .share-search-result.selected {
-	background-image: url(../images/mega/dialogs-sprite_v3.svg);
+	background-image: url(../images/mega/dialogs-sprite_v4.svg);
 	background-repeat: no-repeat;
 	background-position: right -748px;
 }
 .share-dialog-img {
 	height: 90px;
-	background-image: url(../images/mega/dialogs-sprite_v3.svg);
+	background-image: url(../images/mega/dialogs-sprite_v4.svg);
 	background-repeat: no-repeat;
 	background-position: center 8px;
 }
@@ -21476,7 +21467,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
 	width: 25px;
 	height: 25px;
 	z-index: 10;
-	background-image: url(../images/mega/dialogs-sprite_v3.svg);
+	background-image: url(../images/mega/dialogs-sprite_v4.svg);
 	background-position: -81px -84px;
 	background-repeat: no-repeat;
 }
@@ -21523,7 +21514,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
 	width: 25px;
 	height: 25px;
 	left: 0;
-	background-image: url(../images/mega/dialogs-sprite_v3.svg);
+	background-image: url(../images/mega/dialogs-sprite_v4.svg);
 	background-position: -89px -134px;
 	background-repeat: no-repeat;
 	-webkit-transition: opacity 200ms ease-in-out;
@@ -21619,7 +21610,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	-o-transition: border-color 200ms ease-in-out;
 	-ms-transition: border-color 200ms ease-in-out;
 	transition: border-color 200ms ease-in-out;
-	background-image: url(../images/mega/dialogs-sprite_v3.svg);
+	background-image: url(../images/mega/dialogs-sprite_v4.svg);
 	background-repeat: no-repeat;
 	background-position: right -3714px;
 }
@@ -21636,7 +21627,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	top: 2px;
 	left: 8px;
 	display: block;
-	background-image: url(../images/mega/dialogs-sprite_v3.svg);
+	background-image: url(../images/mega/dialogs-sprite_v4.svg);
 	background-repeat: no-repeat;
 	background-position: -87px -278px;
 	-webkit-transition: opacity 200ms ease-in-out;
@@ -21666,7 +21657,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	height: 20px;
 	float: right;
 	margin: 13px 7px 0 0;
-	background-image: url(../images/mega/dialogs-sprite_v3.svg);
+	background-image: url(../images/mega/dialogs-sprite_v4.svg);
 	background-repeat: no-repeat;
 	background-position: -91px -826px;
 	-webkit-transition: opacity 200ms ease-in-out;
@@ -21732,7 +21723,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	cursor: pointer;
 }
 .import-contacts-service.imported {
-	background-image: url(../images/mega/dialogs-sprite_v3.svg);
+	background-image: url(../images/mega/dialogs-sprite_v4.svg);
 	background-position: right -2163px;
 	background-repeat: no-repeat;
 }
@@ -21744,7 +21735,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	float: left;
 	margin: 12px 0 0 10px;
 	font-family: 'source_sans_prosemibold', Arial;
-	background-image: url(../images/mega/dialogs-sprite_v3.svg);
+	background-image: url(../images/mega/dialogs-sprite_v4.svg);
 	background-position: -11px -2074px;
 	background-repeat: no-repeat;
 }
@@ -21758,7 +21749,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	-webkit-border-radius: 100%;
 	border-radius: 100%;
 	background-color: rgba(0,0,0,0.2);
-	background-image: url(../images/mega/dialogs-sprite_v3.svg);
+	background-image: url(../images/mega/dialogs-sprite_v4.svg);
 	background-position: 1px -2137px;
 	background-repeat: no-repeat;
 	-webkit-transition: background-color 200ms ease-in-out;
@@ -21794,7 +21785,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	position: absolute;
 	bottom: -6px;
 	right: 12px;
-	background-image: url(../images/mega/dialogs-sprite_v3.svg);
+	background-image: url(../images/mega/dialogs-sprite_v4.svg);
 	background-position: -5px -2117px;
 	background-repeat: no-repeat;
 }
@@ -21804,7 +21795,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	top: 5px;
 	width: 20px;
 	height: 20px;
-	background-image: url(../images/mega/dialogs-sprite_v3.svg);
+	background-image: url(../images/mega/dialogs-sprite_v4.svg);
 	background-position: -2px -3178px;
 	background-repeat: no-repeat;
 	-webkit-transition: opacity 200ms ease-in-out;
@@ -21886,7 +21877,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 }
 .copy-dialog-empty-icon, .move-dialog-empty-icon {
 	height: 166px;
-	background-image: url(../images/mega/dialogs-sprite_v3.svg);
+	background-image: url(../images/mega/dialogs-sprite_v4.svg);
 	background-position: center -867px;
 	background-repeat: no-repeat;
 }
@@ -22807,6 +22798,73 @@ a.top-login-forgot-pass {
 	opacity: 1;
 }
 /** top header feedback button **/
+.feedback-dialog {
+	height: 100%;
+	width: 100%;
+	left: 0;
+	top: 0;
+	z-index: 1200;
+	border: 0;
+	background-color: rgba(34,34,34,0.95);
+}
+.feedback-dialog-body {
+	text-align: center;
+	position: absolute;
+	width: 100%;
+	top: 50%;
+	margin: -230px 0 0 0;
+}
+.feedback-dialog-header {
+	color: white;
+	font-size: 32px;
+	line-height: 40px;
+	font-family: 'source_sans_proextralight';
+}
+.feedback-dialog .fm-mega-dialog-pad {
+	width: 380px;
+	margin: 0 auto;
+	padding: 0;
+}
+.feedback-dialog .rating {
+	padding: 31px 0 24px 0;
+}
+.feedback-dialog-textarea, .feedback-dialog-input {
+	background-color: rgba(0,0,0,0.5);
+	height: 32px;
+	margin: 20px 0 8px 0;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+}
+.feedback-dialog-textarea {
+	height: 96px;
+}
+.feedback-dialog-textarea textarea, .feedback-dialog-input input {
+	background-color: transparent;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	resize: none;
+	font-size: 14px;
+	line-height: 24px;
+	color: #999999;
+	width: 100%;
+	padding: 0 17px;
+	height: 30px;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+.feedback-dialog-textarea textarea::selection, .feedback-dialog-input input::selection {
+	background: rgba(255,255,255,0.15);
+}
+.feedback-dialog-textarea textarea::-moz-selection, .feedback-dialog-input input::-moz-selection {
+	background: rgba(255,255,255,0.15);
+}
+.feedback-dialog-textarea textarea {
+	padding: 9px 17px;
+	height: 96px;
+}
 .feedback-button {
 	margin-left: 14px;
 	color: #888;
@@ -22837,154 +22895,150 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 	-khtml-opacity: 1;
 	opacity: 1;
 }
-.feedback-dialog {
-	width: 420px;
-	z-index: 1200;
+.rating a {
+	display: block;
+	float: left;
+	width: 60px;
+	height: 60px;
+	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-repeat: no-repeat;
+	background-position: 0 -3927px;
+	margin-left: 20px;
+	cursor:pointer;
 }
-.feedback-dialog .content {
-	width: 100%;
-	overflow: auto;
-	padding-top: 10px;
-	padding-bottom: 10px;
+.rating a.active, .rating a.colored {
+	background-position: 0 -3847px;
+}
+.rating a:first-child {
+	margin: 0;
+}
+.feedback-dialog .radio-txt {
+	font-size: 14px;
+	color: #CCCCCC;
+	line-height: 18px;
+	float: none;
+	margin-left: 46px;
+	display: block;
+	text-align: left;
+	padding: 15px 0 1px 0;
+}
+.fm-dialog.feedback-dialog div.checkboxOn, div.fm-dialog.feedback-dialog .checkboxOff, .membership-arrow {
+	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-position: 0 -4112px;
+	background-size: auto;
+	margin: 13px 0 1px 14px;
+}
+div.fm-dialog.feedback-dialog .checkboxOff {
+	background-position: 0 -4060px;
+}
+.feedback-dialog .membership-arrow {
+	background-position: -1px -4166px;
+	width: 24px;
+	height: 13px;
+	margin: 0 -12px 0 0;
+	right: 50%;
+	display: block;
+	bottom: -13px;
 }
 .feedback-dialog .membership-notification {
-	width: 295px;
-}
-.feedback-dialog textarea {
-	width: 86%;
-	height: 60px;
-	margin: 0 auto;
-	display: block;
-	margin-top: 16px;
-	background-color: rgba(0,0,0,0.05);
-	height: 55px;
-	font-size: 13px;
+	background-color: white;
+	color: #333333;
+	font-size: 14px;
 	line-height: 18px;
-	padding: 8px 12px;
+	padding: 15px;
+	width: 276px;
+	text-align: center;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	bottom: 34px;
+	right: -126px;
 	-moz-border-radius: 6px;
 	-webkit-border-radius: 6px;
 	border-radius: 6px;
-	border: 0;
-	resize: none;
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	box-sizing: border-box;
+}
+.membership-question.stats-button {
+	width: 24px;
+	height: 24px;
+	background-color: rgba(2555,255,255,0.5);
+	font-size: 14px;
 	line-height: 18px;
-	color: #999999;
-	margin-bottom: 4px;
-}
-.feedback-dialog .reply label {
-	padding-right: 32px;
-}
-.feedback-dialog .rating {
-	text-align: center;
-	padding-bottom: 6px;
-}
-.feedback-dialog label {
-	display: block;
-	float: none;
-	vertical-align: top;
-}
-.feedback-dialog .rating .rate.faded {
-	opacity: 0.3;
-}
-.feedback-dialog input[type="checkbox"] {
-	cursor: pointer;
-}
-.feedback-dialog .stats-button {
-	vertical-align: top;
-}
-.feedback-dialog .reply {
-	width: 390px;
-	min-height: 56px;
-	display: inline-block;
-	clear: both;
-}
-.feedback-dialog .reply .radio-txt {
-	margin-bottom: 4px;
-}
-.feedback-dialog input[name="email"] {
-	width: 50%;
-	margin: 0 36px;
-	display: block;
-	border-radius: 4px;
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	box-sizing: border-box;
-	background-color: white;
-	line-height: 18px;
-	font-size: 13px;
-	padding: 6px 10px 8px 10px;
-	border: 0;
-	background: rgba(0,0,0,0.3);
-	color: white;
-}
-.feedback-dialog .rating .rate {
-	display: inline-block;
-	width: 50px;
-	height: 50px;
-	border: 4px solid black;
-	background-color: white;
-	margin: 0 12px;
-	border-radius: 100%;
-	color: white;
+	font-family: 'source_sans_proregular', Arial;
+	background-image: url(../images/mega/dialogs-sprite_v4.svg);
 	background-repeat: no-repeat;
-	background-image: url(../images/mega/feedback/emotions.svg);
-	-webkit-transition: box-shadow 100ms ease-in-out, border-color 200ms ease-in-out, background-color 50ms ease-in-out, color 150ms ease-in-out, background-position 450ms ease, opacity 350ms ease-in-out;
-	-moz-transition: box-shadow 100ms ease-in-out, border-color 200ms ease-in-out, background-color 50ms ease-in-out, color 150ms ease-in-out, background-position 450ms ease, opacity 350ms ease-in-out;
-	-o-transition: box-shadow 100ms ease-in-out, border-color 200ms ease-in-out, background-color 50ms ease-in-out, color 150ms ease-in-out, background-position 450ms ease, opacity 350ms ease-in-out;
-	-ms-transition: box-shadow 100ms ease-in-out, border-color 200ms ease-in-out, background-color 50ms ease-in-out, color 150ms ease-in-out, background-position 450ms ease, opacity 350ms ease-in-out;
-	transition: box-shadow 100ms ease-in-out, border-color 200ms ease-in-out, background-color 50ms ease-in-out, color 150ms ease-in-out, background-position 450ms ease, opacity 350ms ease-in-out;
-	box-shadow: inset 0 0px 0px 0px rgba(0, 0, 0, 0.1), 0 1px 2px 1px rgba(0, 0, 0, 0.1);
-	opacity: 1;
+	background-position: 2px -4011px;
+	margin: 0 0 0 12px;
+	top: -3px;
 }
-.feedback-dialog .rating .rate.unhappy {
-	border-color: #FF1A53;
-	background-position: 10px 6px;
+.membership-question.stats-button::before {
+	content: '\00a0';
 }
-.feedback-dialog .rating .rate.neutral {
-	border-color: #B0DAEB;
-	background-position: -44px 6px;
+.feedback-dialog-bottom {
+	display: table;
+	width: 100%;
+	padding-top: 41px;
 }
-.feedback-dialog .rating .rate.happy {
-	border-color: #61D2FF;
-	background-position: -101px 6px;
+.feedback-button-send, .feedback-button-cancel {
+	display: table-cell;
+	height: 48px;
 }
-.feedback-dialog .rating .rate.awesome {
-	border-color: #13E03C;
-	background-position: -157px 6px;
+.feedback-button-send span, .feedback-button-cancel span {
+	display: block;
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	border-radius: 8px;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	height: 48px;
+	border: 2px solid rgba(255,255,255,0.5);
+	color: rgba(255,255,255,0.7);
+	font-size: 16px;
+	text-align: center;
+	padding: 0 10px;
+	text-transform: uppercase;
+	line-height: 44px;
+	cursor: pointer;
+	-webkit-background-clip: padding-box;
+	background-clip: padding-box;
+	-webkit-transition: all 200ms ease-in-out;
+	-moz-transition: all 200ms ease-in-out;
+	-o-transition: all 200ms ease-in-out;
+	-ms-transition: all 200ms ease-in-out;
+	transition: all 200ms ease-in-out;
 }
-.feedback-dialog .rating .rate.unhappy:hover, .feedback-dialog .rating .rate.unhappy.active {
-	box-shadow: inset -1px 0 1px 1px rgba(0, 0, 0, 0.1), 0 1px 2px 1px rgba(0, 0, 0, 0.1), 0 0 0 6px rgba(255, 26, 83, 0.1), 0 0 0 4px rgba(255, 26, 83, 0.4);
-	background-color: #FF1A53;
-	border-color: white;
-	color: white;
-	background-position: 10px -45px;
-	opacity: 1;
+.feedback-button-cancel span:hover {
+	border-color: rgba(255,255,255,0.7);
+	background-color: rgba(255,255,255,0.7);
+	color: rgba(34,34,34,1);
 }
-.feedback-dialog .rating .rate.neutral:hover, .feedback-dialog .rating .rate.neutral.active {
-	box-shadow: inset -1px 0 1px 1px rgba(0, 0, 0, 0.1), 0 1px 2px 1px rgba(0, 0, 0, 0.1), 0 0 0 6px rgba(176, 218, 235, 0.1), 0 0 0 4px rgba(176, 218, 235, 0.4);
-	background-color: #B0DAEB;
-	border-color: white;
-	color: white;
-	background-position: -44px -45px;
-	opacity: 1;
+.feedback-button-send span {
+	border-color: rgba(19,224,60,0.7);
+	color: rgba(19,224,60,1);
 }
-.feedback-dialog .rating .rate.happy:hover, .feedback-dialog .rating .rate.happy.active {
-	box-shadow: inset -1px 0 1px 1px rgba(0, 0, 0, 0.1), 0 1px 2px 1px rgba(0, 0, 0, 0.1), 0 0 0 6px rgba(97, 210, 255, 0.1), 0 0 0 4px rgba(97, 210, 255, 0.4);
-	background-color: #61D2FF;
-	border-color: white;
-	color: white;
-	background-position: -101px -45px;
-	opacity: 1;
+.feedback-button-send span:hover {
+	border-color: rgba(19,224,60,1);
+	background-color: rgba(19,224,60,1);
+	color: rgba(34,34,34,1);
 }
-.feedback-dialog .rating .rate.awesome:hover, .feedback-dialog .rating .rate.awesome.active {
-	box-shadow: inset -1px 0 1px 1px rgba(0, 0, 0, 0.1), 0 1px 2px 1px rgba(0, 0, 0, 0.1), 0 0 0 6px rgba(19, 224, 60, 0.1), 0 0 0 4px rgba(19, 224, 60, 0.4);
-	background-color: #13E03C;
-	border-color: white;
-	color: white;
-	background-position: -157px -45px;
-	opacity: 1;
+.feedback-button-cancel {
+	padding-right: 10px;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	width: 116px;
+}
+.feedback-button-cancel.disabled span, .feedback-button-send.disabled span {
+	cursor: default;
+	background-color: transparent;
+}
+.feedback-button-cancel.disabled span {
+	border-color: rgba(255,255,255,0.1);
+	color: rgba(255,255,255,0.1);
+}
+.feedback-button-send.disabled span {
+	border-color: rgba(19,224,60,0.2);
+	color: rgba(19,224,60,0.1);
 }
 /* Credentials / Fingerprint warning dialog */
 .credential-warning-button {
@@ -23088,13 +23142,35 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 }
 .collected-data-review-dialog {
 	z-index: 1250;
-	width: 70%;
+	width: 600px;
+}
+.collected-data-textarea {
+	max-height: 470px;
+	overflow: hidden;
+	margin-top: 10px;
+}
+.collected-data li::selection {
+	background-color:#D6F1CC;
+}
+.collected-data li::-moz-selection {
+	background-color:#D6F1CC;
+}
+.collected-data {
+	width: 100%;
+    border: 0;
+    margin: 0;
+    padding: 0 0 0 40px;
+    resize: none;
+}
+.collected-data li {
+	color: #666666;
+    font-size: 13px;
+    line-height: 24px;
+    list-style-type: decimal;
+    padding: 0 0 0 15px;
 }
 .collected-data-review-dialog textarea {
 	display: block;
-	width: 99%;
-	min-height: 200px;
-	margin: 0 auto;
 }
 .fm-chat-inline-dialog-button-sendFeedback {
 	margin-left: 4px;
@@ -23546,14 +23622,14 @@ a.voucher-reseller-link {
 	background-color: rgba(255,211,0,1);
 	border-color: rgba(255,211,0,1);
 }
-.payment-close {
+.payment-close, .overlay-close {
 	width: 50px;
 	position: absolute;
 	z-index: 2300;
 	top: 14px;
 	right: 0;
 }
-.payment-close-icon {
+.payment-close-icon, .overlay-close-icon {
 	background: url(../images/mega/bitcoin-v4.png) -183px -791px no-repeat;
 	width: 20px;
 	height: 20px;
@@ -23568,14 +23644,15 @@ a.voucher-reseller-link {
 	-ms-transition: all 200ms ease-in-out;
 	transition: all 200ms ease-in-out;
 	cursor: pointer;
+	position: static;
 }
-.payment-close-icon:hover {
+.payment-close-icon:hover, .overlay-close-icon:hover {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
 	-moz-opacity: 1;
 	-khtml-opacity: 1;
 	opacity: 1;
 }
-.payment-close span {
+.payment-close span, .overlay-close span {
 	display: block;
 	text-align: center;
 	font-size: 13px;
@@ -23864,7 +23941,7 @@ body.pro:after {
 }
 .nw-fm-dialog-title span, .bandwidth-text-bl .star {
 	width: 15px;
-	background-image: url(../images/mega/dialogs-sprite_v3.svg);
+	background-image: url(../images/mega/dialogs-sprite_v4.svg);
 	background-position: -50px -1551px;
 	background-repeat: no-repeat;
 	display: inline-block;
@@ -23966,7 +24043,7 @@ body.pro:after {
 	padding-top: 9px;
 }
 .bandwidth-back-button {
-	background-image: url(../images/mega/dialogs-sprite_v3.svg);
+	background-image: url(../images/mega/dialogs-sprite_v4.svg);
 	background-position: -95px -1551px;
 	background-repeat: no-repeat;
 	font-size: 14px;
@@ -23997,12 +24074,12 @@ body.pro:after {
 	display: block;
 }
 .fontsize1 .nw-fm-tree-header input {
-	margin:12 0 0 0;
+	margin: 12 0 0 0;
 }
 .fontsize1 .nw-fm-tree-folder, .fontsize1 .nw-conversations-name, .fontsize1 .fm-tree-panel .nw-contact-name, .fontsize1 .nw-conversations-header, .fontsize1 .nw-tree-panel-header, .fontsize1 .copy-dialog-panel-header, .fontsize1 .move-dialog-panel-header, .fontsize1 .share-dialog-panel-header, .fontsize1 .top-menu-item, .fontsize1 .top-user-status-item, .fontsize1 .context-menu-item, .fontsize1 .sorting-menu-item, .fontsize1 .permissions-menu-item, .fontsize1 .top-menu-popup, .fontsize1 .top-submenu-popup, .fontsize1 .top-user-status-popup, .fontsize1 .context-submenu, .fontsize1 .tranfer-filetype-txt, .fontsize1 .fm-browsers-txt, .fontsize1 .fm-flags-txt, .fontsize1 .fm-member-icon-txt, .fontsize1 .transfer-table td, .fontsize1 .grid-table td, .fontsize1 .grid-share-table td, .fontsize1 .contacts-grid-table td, .fontsize1 .file-block-title, .fontsize1 .contact-block-view-name, .fontsize1 .shared-folder-info-block, .fontsize1 .fm-chat-user, .fontsize1 .fm-chat-user-status, .fontsize1 .fm-chat-user-email, .fontsize1 .shared-folder-access, .fontsize1 .contacts-interation, .fontsize1 .transfer-table th, .fontsize1 .transfer-table td, .fontsize1 .transfer-table-header th, .fontsize1 .grid-table th, .fontsize1 .grid-table td, .fontsize1 .grid-share-table th, .fontsize1 .grid-share-table td, .fontsize1 .grid-table-header th, .fontsize1 .contacts-grid-header th, .fontsize1 .contacts-grid-table th, .fontsize1 .contacts-grid-table td, .fontsize1 .membership-status, .fontsize1 .new-notification-txt, .fontsize1 .nw-fm-left-tooltip, .fontsize1 .chat-time-txt, .fontsize1 .new-notification-info {
 	font-size: 12px;
 }
-.fontsize1 .fm-add-user span, .fontsize1 .fm-start-video-call span, .fontsize1 .fm-clearbin-button span, .fontsize1 .fm-send-files span, .fontsize1 .fm-start-call span, .fontsize1 .fm-leave-share span, .fontsize1 .fm-share-copy span, .fontsize1 .fm-share-download span, .fontsize1 .contact-send-files span, .fontsize1 .fm-start-conversation span, .fontsize1 .fm-share-folders span, .fontsize1 .fm-verify span, .fontsize1 .fm-reset-stored-fingerprint span, .fontsize1 .fm-question span, .fontsize1 .fm-chat-end span, .fontsize1 .fm-end-call span, .fontsize1 .fm-download-as-zip span, .fontsize1 .fm-import-to-cloudrive span, .fontsize1 .fm-chat-file-button span, .fontsize1 .fm-dialog-button span, .fontsize1 .fm-account-button span, .fontsize1 .avatar-dialog .fm-account-change-avatar span, .fontsize1 .top-dialog-login-button span, .fontsize1 .nw-chat-button span, .fontsize1 .multiple-sharing.expanded .main-body .nw-chat-button span, .fontsize1 .fm-chat-attach-button span, .fontsize1 .fm-chat-contact-button span, .fontsize1 .fm-new-folder span, .fontsize1 .search-files-result span, .fontsize1 .search-messages-result span, .fontsize1 .fm-file-upload span, .fontsize1 .search-messages-result span, .fontsize1 .fm-folder-upload span, .fontsize1 .fm-notification-settings span, .fontsize1 .create-folder-button span, .fontsize1 .add-user-popup-button span, .fontsize1 .create-folder-button-cancel span, .fontsize1 .fm-dialog-new-folder-button span, .fontsize1 .rename-dialog-button span, .fontsize1 .contact-request-button span, .fontsize1 .transfer-clear-all-icon span, .fontsize1 .transfer-clear-completed span, .fontsize1 .transfer-pause-icon span,  .fontsize1 .user-name, .fontsize1 a.user-name, .fontsize1 .top-menu-icon, .fontsize1 .create-account-button, .fontsize1 .top-login-button, .fontsize1 .top-search-input, .fontsize1 .nw-fm-tree-header input, .fontsize1 .notification-info, .fontsize1 .notification-username, .fontsize1 .fm-account-remove-avatar, .fm-account-change-avatar, .fontsize1 .fm-account-save, .fontsize1 .fm-account-cancel, .fontsize1 .nlanguage-bottom, .fontsize1 .nlanguage-lnk, .fontsize1 a.nlanguage-lnk, .fontsize1 a.nlanguage-lnk:link, .fontsize1 a.nlanguage-lnk:visited, .fontsize1 a.nlanguage-lnk:hover, .fontsize1 a.nlanguage-lnk:active, .fontsize1 .share-dialog-permissions, .fontsize1 .share-dialog-icon.permissions-icon, .fontsize1 .transfer-panel-title, .fontsize1 .fm-breadcrumbs .right-arrow-bg, .fontsize1 .fm-share-breadcrumbs .right-arrow-bg {
+.fontsize1 .fm-add-user span, .fontsize1 .fm-start-video-call span, .fontsize1 .fm-clearbin-button span, .fontsize1 .fm-send-files span, .fontsize1 .fm-start-call span, .fontsize1 .fm-leave-share span, .fontsize1 .fm-share-copy span, .fontsize1 .fm-share-download span, .fontsize1 .contact-send-files span, .fontsize1 .fm-start-conversation span, .fontsize1 .fm-share-folders span, .fontsize1 .fm-verify span, .fontsize1 .fm-reset-stored-fingerprint span, .fontsize1 .fm-question span, .fontsize1 .fm-chat-end span, .fontsize1 .fm-end-call span, .fontsize1 .fm-download-as-zip span, .fontsize1 .fm-import-to-cloudrive span, .fontsize1 .fm-chat-file-button span, .fontsize1 .fm-dialog-button span, .fontsize1 .fm-account-button span, .fontsize1 .avatar-dialog .fm-account-change-avatar span, .fontsize1 .top-dialog-login-button span, .fontsize1 .nw-chat-button span, .fontsize1 .multiple-sharing.expanded .main-body .nw-chat-button span, .fontsize1 .fm-chat-attach-button span, .fontsize1 .fm-chat-contact-button span, .fontsize1 .fm-new-folder span, .fontsize1 .search-files-result span, .fontsize1 .search-messages-result span, .fontsize1 .fm-file-upload span, .fontsize1 .search-messages-result span, .fontsize1 .fm-folder-upload span, .fontsize1 .fm-notification-settings span, .fontsize1 .create-folder-button span, .fontsize1 .add-user-popup-button span, .fontsize1 .create-folder-button-cancel span, .fontsize1 .fm-dialog-new-folder-button span, .fontsize1 .rename-dialog-button span, .fontsize1 .contact-request-button span, .fontsize1 .transfer-clear-all-icon span, .fontsize1 .transfer-clear-completed span, .fontsize1 .transfer-pause-icon span, .fontsize1 .user-name, .fontsize1 a.user-name, .fontsize1 .top-menu-icon, .fontsize1 .create-account-button, .fontsize1 .top-login-button, .fontsize1 .top-search-input, .fontsize1 .nw-fm-tree-header input, .fontsize1 .notification-info, .fontsize1 .notification-username, .fontsize1 .fm-account-remove-avatar, .fm-account-change-avatar, .fontsize1 .fm-account-save, .fontsize1 .fm-account-cancel, .fontsize1 .nlanguage-bottom, .fontsize1 .nlanguage-lnk, .fontsize1 a.nlanguage-lnk, .fontsize1 a.nlanguage-lnk:link, .fontsize1 a.nlanguage-lnk:visited, .fontsize1 a.nlanguage-lnk:hover, .fontsize1 a.nlanguage-lnk:active, .fontsize1 .share-dialog-permissions, .fontsize1 .share-dialog-icon.permissions-icon, .fontsize1 .transfer-panel-title, .fontsize1 .fm-breadcrumbs .right-arrow-bg, .fontsize1 .fm-share-breadcrumbs .right-arrow-bg {
 	font-size: 13px;
 }
 .fontsize1 .nw-fm-dialog-title, .fm-dialog-title {
@@ -24143,7 +24220,7 @@ body.pro:after {
 body.pro:after {
  content: url(../images/mega/payment-animation@2x.gif);
 }
-.pro-register-paypal-dialog .reg-success-icon, .payment-confirmation .icon, .bitcoin-invoice-dialog .qr-code-mega-icon, .bitcoin-invoice-dialog .clock-icon, .nt-payment-notification .notification-avatar-icon, .payment-result-icon, .payment-close-icon {
+.pro-register-paypal-dialog .reg-success-icon, .payment-confirmation .icon, .bitcoin-invoice-dialog .qr-code-mega-icon, .bitcoin-invoice-dialog .clock-icon, .nt-payment-notification .notification-avatar-icon, .payment-result-icon, .payment-close-icon, .overlay-close-icon {
  background-image: url(../images/mega/bitcoin-v4@2x.png);
  background-size: 200px auto;
 }
@@ -24192,8 +24269,8 @@ background-size:27px auto;
 background-size: 90px auto;
 }
 .download-megasync-dialog .icon {
-    background-image: url(../images/mega/sync-nw-v3@2x.png);
-    background-size: 168px auto;
+ background-image: url(../images/mega/sync-nw-v3@2x.png);
+ background-size: 168px auto;
 }
 .st-green-note {
  background-image: url(../images/mega/en/start-green-note@2x.png);

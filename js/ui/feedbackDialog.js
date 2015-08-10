@@ -21,14 +21,16 @@
              */
             'focusable': true,
             'closable': true,
-            'expandable': false,
-            'requiresOverlay': true,
+			'closableByEsc': true,
+            'expandable': true,
+            'requiresOverlay': false,
+			'defaultButtonStyle': false,
 
             /**
              * css class names
              */
             'expandableButtonClass': '.fm-mega-dialog-size-icon',
-            'buttonContainerClassName': 'fm-mega-dialog-bottom',
+            'buttonContainerClassName': 'feedback-dialog-bottom',
             'buttonPlaceholderClassName': 'fm-mega-dialog-pad',
 
             /**
@@ -37,8 +39,15 @@
             'title': l[1356],
             'buttons': [
                 {
-                    'label': "Send",
-                    'className': "fm-dialog-button-green feedback-button-send disabled",
+                    'label': "Cancel",
+                    'className': "feedback-button-cancel disabled",
+                    'callback': function() {
+                        this.hide();
+                    }
+                },
+				{
+                    'label': "SUBMIT YOUR FEEDBACK",
+                    'className': "feedback-button-send disabled",
                     'callback': function() {
                         self._report.message = self.$textarea.val();
                         if ($('input[name="contact_me"]', self.$dialog).attr('checked')) {
@@ -48,12 +57,12 @@
                         }
 
 
-                        var $selectedRating = $('.rate.active', self.$dialog);
+                        var $selectedRating = $('.rating a.active', self.$dialog);
                         if ($selectedRating.length === 0) {
                             return false;
                         }
 
-                        var rated = $('.rate.active', self.$dialog)[0].className;
+                        var rated = $('.rating a.active', self.$dialog)[0].className;
                         rated = rated.replace("rate", "").replace("active", "").replace(/\s+/g, "");
                         self._report.rated = rated;
                         var dump = JSON.stringify(self._report);
@@ -89,13 +98,6 @@
 
                         msgDialog('info', 'Feedback', 'Thank you for your feedback!');
                     }
-                },
-                {
-                    'label': "Cancel",
-                    'className': "fm-dialog-button-red feedback-button-cancel",
-                    'callback': function() {
-                        this.hide();
-                    }
                 }
             ]
         };
@@ -113,19 +115,13 @@
 
 
         self.bind("onBeforeShow", function() {
-            self.$checkboxes.hide();
 
             $('.rating a', self.$dialog)
-                .removeClass("faded")
-                .removeClass("active");
+                .removeClass("active colored");
 
             self.$textarea = $('textarea', self.$dialog);
             self.$textarea
                 .val('')
-                .hide();
-
-            $('.stats-button', self.$dialog)
-                .hide();
 
             $('.stats .checkdiv').rebind('onFakeCheckboxChange.feedbackDialog', function(e, val) {
                 var fnName = val ? "fadeIn" : "fadeOut";
@@ -142,15 +138,6 @@
                 } else {
                     self._report = {};
                 }
-
-                $('.stats-button', self.$dialog)[fnName]({
-                    duration: 250,
-                    progress: function (anim, progress, remainingMs) {
-                        if (Math.ceil(progress * 100) % 5 === 0) {
-                            self.reposition();
-                        }
-                    }
-                });
             });
 
             $('input[name="send_stats"]', self.$dialog)
@@ -158,8 +145,10 @@
                 .trigger('change');
 
             $('input[name="contact_me"]', self.$dialog)
-                .attr('checked', true)
+                .attr('checked', false)
                 .trigger('change');
+				
+			$('.feedback-dialog-input').addClass('hidden');
         });
 
         self.bind("onHide", function() {
@@ -173,35 +162,20 @@
         var self = this;
         $('.rating a', self.$dialog).rebind('click.feedbackDialog', function() {
             $('.rating a', self.$dialog)
-                .removeClass("active");
+                .removeClass('active colored');
 
-            $(this).toggleClass("active");
-
-            $('.rating a:not(.active)', self.$dialog)
-                .addClass("faded");
-
-            if (!self.$checkboxes.is(":visible")) {
-                self.$checkboxes.slideDown({
-                    duration: 250,
-                    progress: function(anim, progress, remainingMs) {
-                        if (Math.ceil(progress * 100) % 2 === 0) {
-                            self.reposition();
-                        }
-                    }
-                });
-            }
-            if (!self.$textarea.is(":visible")) {
-                self.$textarea.slideDown({
-                    duration: 350,
-                    progress: function(anim, progress, remainingMs) {
-                        if (Math.ceil(progress * 100) % 2 === 0) {
-                            self.reposition();
-                        }
-                    }
-                });
-            }
-            $('.feedback-button-send', self.$dialog).removeClass('disabled');
+            $(this).addClass('active').prevAll().addClass('colored');
+				
+            $('.feedback-button-send, .feedback-button-cancel', self.$dialog).removeClass('disabled');
         });
+		
+		$('input[name="contact_me"]').rebind('click', function() {
+			if (!$(this).attr('checked')) {
+				$('.feedback-dialog-input').removeClass('hidden');
+			} else {
+				$('.feedback-dialog-input').addClass('hidden');
+			}
+		});
 
         $('.stats-button', self.$dialog).rebind('click.feedbackDialog', function() {
             var dialog = self.$dataReportDialog;
@@ -212,10 +186,10 @@
                     /**
                      * features:
                      */
-                    'focusable': false,
-                    'closable': true,
-                    'expandable': false,
-                    'requiresOverlay': true,
+                    'focusable': true,
+            		'closable': true,
+           			'expandable': true,
+            		'requiresOverlay': false,
 
                     /**
                      * optional:
@@ -233,8 +207,8 @@
                 });
             }
 
-            $('textarea', dialog.$dialog).val(
-                JSON.stringify(self._report, null, 2)
+            $('.collected-data', dialog.$dialog).html(
+                '<li>' + JSON.stringify(self._report, null, 2).replace(/\n/g, '</li> <li>')
             );
             dialog.show();
         });

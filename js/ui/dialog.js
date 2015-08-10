@@ -31,8 +31,10 @@
              */
             'focusable': true,
             'closable': true,
+            'closableByEsc': false,
             'expandable': true,
             'requiresOverlay': false,
+            'defaultButtonStyle': true,
 
             /**
              * css class names
@@ -88,6 +90,14 @@
         if(self.options.closable) {
             $('.fm-dialog-close', self.$dialog).rebind('click.dialog' + self._getEventSuffix(), function() {
                 self.hide();
+            });
+        }
+        if(self.options.closableByEsc) {
+            $(document).rebind('keyup',function(evt) {
+                if (evt.keyCode == 27) {
+                    self.hide();
+                    $(document).unbind('keyup');
+                }
             });
         }
         if(self.options.expandable) {
@@ -148,7 +158,11 @@
 
         if(self.options.buttons.length > 0) {
             self.options.buttons.forEach(function(buttonMeta, k) {
-                var $button = $('<div class="fm-dialog-button"><span></span></div>');
+                if (self.options.defaultButtonStyle) {
+                    var $button = $('<div class="fm-dialog-button"><span></span></div>');
+                } else {
+                    var $button = $('<div><span></span></div>');
+                }
                 $button
                     .addClass(
                         buttonMeta.className

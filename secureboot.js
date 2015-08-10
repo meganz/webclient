@@ -179,7 +179,7 @@ var ln ={}; ln.en = 'English'; ln.cn = '简体中文';  ln.ct = '中文繁體'; 
 var ln2 ={}; ln2.en = 'English'; ln2.cn = 'Chinese';  ln2.ct = 'Traditional Chinese'; ln2.ru = 'Russian'; ln2.es = 'Spanish'; ln2.fr = 'French'; ln2.de = 'German'; ln2.it = 'Italian'; ln2.br = 'Brazilian Portuguese'; ln2.mi = 'Maori'; ln2.vn = 'Vietnamese'; ln2.nl = 'Dutch'; ln2.kr = 'Korean';   ln2.ar = 'Arabic'; ln2.jp = 'Japanese'; ln2.pt = 'Portuguese'; ln2.he = 'Hebrew'; ln2.pl = 'Polish'; ln2.ca = 'Catalan'; ln2.eu = 'Basque'; ln2.sk = 'Slovak'; ln2.af = 'Afrikaans'; ln2.cz = 'Czech'; ln2.ro = 'Romanian'; ln2.fi = 'Finnish'; ln2.no = 'Norwegian'; ln2.se = 'Swedish'; ln2.bs = 'Bosnian'; ln2.hu = 'Hungarian'; ln2.sr = 'Serbian'; ln2.dk = 'Danish'; ln2.sl = 'Slovenian'; ln2.tr = 'Turkish'; ln2.id = 'Indonesian'; ln2.hr = 'Croatian'; ln2.el = 'Greek'; ln2.uk = 'Ukrainian'; ln2.gl = 'Galician'; ln2.sr = 'Serbian'; ln2.lt = 'Lithuanian'; ln2.th = 'Thai'; ln2.lv = 'Latvian'; ln2.bg = 'Bulgarian'; ln2.mk = 'Macedonian'; ln2.hi = 'Hindi'; ln2.fa = 'Farsi'; ln2.ee = 'Estonian';  ln2.ms = 'Malaysian'; ln2.cy = 'Welsh'; ln2.be = 'Breton'; ln2.tl = 'Tagalog'; ln2.ka = 'Georgian';
 
 /**
- * Below is the asmCrypto SHA-256 library which was converted to a string so it can be run by the web worker which 
+ * Below is the asmCrypto SHA-256 library which was converted to a string so it can be run by the web worker which
  * hashes the files. This was created by:
  * 1) Running 'git clone https://github.com/vibornoff/asmcrypto.js.git'
  * 2) Running 'npm install' to install Grunt and other dependencies
@@ -497,6 +497,76 @@ var mBroadcaster = {
 if (typeof Object.freeze === 'function') {
     mBroadcaster = Object.freeze(mBroadcaster);
 }
+
+/**
+ * mWatchDog: Quite the same than crossTab,
+ * but it does not depend on the user handle.
+ */
+var mWatchDog = {
+    Strg: {},
+    eTag: '$WDE$!_',
+    wdID: ~~(Math.random() * Date.now()),
+
+    setup: function mWatchDog_setup() {
+        if (window.addEventListener) {
+            window.addEventListener('storage', this, false);
+        }
+        else if (window.attachEvent) {
+            window.attachEvent('onstorage', this.handleEvent.bind(this));
+        }
+    },
+
+    notify: function mWatchDog_notify(msg, data) {
+        data = { origin: this.wdID, data: data, sid: Math.random()};
+        localStorage.setItem(this.eTag + msg, JSON.stringify(data));
+        if (d) {
+            console.log('mWatchDog Notifying', this.eTag + msg, localStorage[this.eTag + msg]);
+        }
+    },
+
+    handleEvent: function mWatchDog_handleEvent(ev) {
+        if (String(ev.key).indexOf(this.eTag) !== 0) {
+            return;
+        }
+        if (d) {
+            console.debug('mWatchDog ' + ev.type + '-event', ev.key, ev.newValue, ev);
+        }
+
+        var msg = ev.key.substr(this.eTag.length);
+        var strg = JSON.parse(ev.newValue || '""');
+
+        if (!strg || strg.origin === this.wdID) {
+            if (d) {
+                console.log('Ignoring mWatchDog event', msg, strg);
+            }
+            return;
+        }
+
+        switch (msg) {
+            case 'loadfm_done':
+                if (this.Strg.login === strg.origin) {
+                    location.assign('/');
+                }
+                break;
+
+            case 'login':
+                loadingDialog.show();
+                this.Strg.login = strg.origin;
+                break;
+
+            case 'logout':
+                u_logout(-0xDEADF);
+                location.reload();
+                break;
+        }
+
+        delete localStorage[ev.key];
+    }
+};
+if (typeof Object.freeze === 'function') {
+    mWatchDog = Object.freeze(mWatchDog);
+}
+
 
 var sh = [];
 
@@ -1493,6 +1563,7 @@ else if (!b_u)
     window.onload = function ()
     {
         if (!maintenance && !androidsplash) jsl_start();
+        mWatchDog.setup();
     };
     function jsl_load(xhri)
     {
@@ -1728,7 +1799,7 @@ function showAd() {
 
     // We need to tell the API we would like ad urls, but only if we are not logged in
     var showAd = (typeof u_sid === 'undefined') ? 1 : 0;
-    
+
     // If using a browser extension, do not show ads
     showAd = (is_extension) ? 0 : showAd;
 

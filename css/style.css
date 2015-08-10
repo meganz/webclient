@@ -15644,9 +15644,9 @@ div.membership-bott-button {
 	line-height: 36px;
 }
 .new-download-red-button {
-	background-position: -2px -1383px;
-	color: #777777;
-	font-size: 13px;
+    background-position: -2px -1423px;
+	color: #2BA6DE;
+	font-size: 14px;
 	line-height: 34px;
 	padding: 0 0 0 36px;
 	cursor: pointer;
@@ -15654,8 +15654,8 @@ div.membership-bott-button {
 	margin-top: 12px;
 }
 .new-download-red-button:hover {
-	color: #2BA6DE;
-	background-position: -2px -1423px;
+    background-position: -2px -1383px;
+	color: #777;
 }
 .new-download-gray-button {
 	background-color: rgba(102,102,102,1);

@@ -22859,7 +22859,7 @@ a.top-login-forgot-pass {
 	background: rgba(255,255,255,0.15);
 }
 .feedback-dialog-textarea textarea::-moz-selection, .feedback-dialog-input input::-moz-selection {
-	background: rgba(255,255,255,0.15);
+ background: rgba(255,255,255,0.15);
 }
 .feedback-dialog-textarea textarea {
 	padding: 9px 17px;
@@ -22904,7 +22904,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 	background-repeat: no-repeat;
 	background-position: 0 -3927px;
 	margin-left: 20px;
-	cursor:pointer;
+	cursor: pointer;
 }
 .rating a.active, .rating a.colored {
 	background-position: 0 -3847px;
@@ -23150,24 +23150,30 @@ div.fm-dialog.feedback-dialog .checkboxOff {
 	margin-top: 10px;
 }
 .collected-data li::selection {
-	background-color:#D6F1CC;
+	background-color: #D6F1CC;
 }
 .collected-data li::-moz-selection {
-	background-color:#D6F1CC;
+ background-color:#D6F1CC;
 }
 .collected-data {
 	width: 100%;
-    border: 0;
-    margin: 0;
-    padding: 0 0 0 40px;
-    resize: none;
+	border: 0;
+	margin: 0;
+	padding: 0 20px;
+	resize: none;
 }
 .collected-data li {
 	color: #666666;
-    font-size: 13px;
-    line-height: 24px;
-    list-style-type: decimal;
-    padding: 0 0 0 15px;
+	font-size: 13px;
+	line-height: 24px;
+	list-style-type: none;
+	padding: 0 10px 0 0;
+	counter-increment: step-counter;
+}
+.collected-data li::before {
+	content: counter(step-counter);
+	color: #2BA6DE;
+	padding-right: 20px;
 }
 .collected-data-review-dialog textarea {
 	display: block;

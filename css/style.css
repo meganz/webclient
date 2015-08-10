@@ -22570,9 +22570,22 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 /**
  * Hide UI elements when the chat is disabled
  */
-.megaChatDisabled .fm-start-conversation, .megaChatDisabled .nw-contact-status, .megaChatDisabled .nw-fm-left-icon.conversations, .megaChatDisabled .fm-send-files {
-	display: none;
+/**
+ * Hide UI elements when the chat is disabled
+ */
+.megaChatDisabled .fm-start-conversation,
+.megaChatDisabled .nw-contact-status,
+.megaChatDisabled .nw-fm-left-icon.conversations,
+.megaChatDisabled .fm-send-files,
+.megaChatDisabled .start-chat-button,
+.megaChatDisabled .copy-dialog-button.conversations {
+	display: none !important;
 }
+.megaChatDisabled .copy-dialog-button.cloud-drive,
+.megaChatDisabled .copy-dialog-button.shared-with-me {
+	width: 238px;
+}
+
 /**
  * MegaDialog.js
  */

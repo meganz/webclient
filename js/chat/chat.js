@@ -1,11 +1,9 @@
 /**
- * Use this localStorage.chatDisabled flag to disable/enable the chat (note the "==" logical comparison!)
+ * Use this localStorage.chatDisabled flag to disable/enable the chat (note the "!!" logical comparison!)
  *
  * @type {boolean}
  */
 var megaChatDisabled = !!localStorage.chatDisabled;
-
-var disableMpEnc = true;
 
 var chatui;
 (function() {

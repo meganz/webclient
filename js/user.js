@@ -94,7 +94,7 @@ function u_checklogin3a(res, ctx) {
     }
     else {
         u_attr = res;
-        var exclude = ['c', 'email', 'k', 'name', 'p', 'privk', 'pubk', 's', 'ts', 'u', 'currk'];
+        var exclude = ['c', 'email', 'k', 'name', 'p', 'privk', 'pubk', 's', 'ts', 'u', 'currk', 'flags'];
 
         for (var n in u_attr) {
             if (exclude.indexOf(n) == -1) {
@@ -118,6 +118,14 @@ function u_checklogin3a(res, ctx) {
             catch(e) {
                 console.error('Error parsing key', e);
             }
+        }
+
+        if (typeof(u_attr.flags) !== 'undefined') {
+            Object.keys(u_attr.flags).forEach(function(k) {
+                if (k === "mcs") {
+                    localStorage.chatDisabled = u_attr.flags[k];
+                }
+            });
         }
 
         if (u_k) {
@@ -173,7 +181,7 @@ function u_logout(logout) {
     }
 
     if (logout) {
-        if (!megaChatDisabled) {
+        if (!megaChatIsDisabled()) {
 
             localStorage.removeItem("audioVideoScreenSize");
 
@@ -844,7 +852,7 @@ function isEphemeral() {
             if (r[0] === "0") {
                 $elem.addClass('cloud-drive');
             }
-            else if (r[0] === "1" && megaChat) {
+            else if (r[0] === "1" && typeof(megaChat) !== 'undefined') {
                 M.u[u_h].lastChatActivity = ts;
                 var room = megaChat.getPrivateRoom(u_h);
                 if (room && megaChat && megaChat.plugins && megaChat.plugins.chatNotifications) {

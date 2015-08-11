@@ -825,7 +825,7 @@ function init_page() {
             }
         }
 
-        if (typeof (megaChatDisabled) != "undefined" && megaChatDisabled === true) {
+        if (megaChatIsDisabled() === true) {
             $(document.body).addClass("megaChatDisabled");
         }
     }
@@ -1077,9 +1077,11 @@ function topmenuUI() {
         }
 
         // If the chat is disabled don't show the green status icon in the header
-        if (!megaChatDisabled) {
+        if (!megaChatIsDisabled()) {
             $('.activity-status-block, .activity-status').show();
-            megaChat.renderMyStatus();
+            if(typeof(megaChat) !== 'undefined') {
+                megaChat.renderMyStatus();
+            }
         }
     }
     else {

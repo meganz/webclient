@@ -22,6 +22,9 @@ var notify = {
     $popupIcon: null,
     $popupNum: null,
     
+    // A list of already rendered pending contact request IDs (multiple can exist with reminders)
+    renderedContactRequests: [],
+    
     /**
      * Initialise the notifications system
      */
@@ -385,6 +388,9 @@ var notify = {
         // Populate other information based on each type of notification
         switch (notification.type) {
             
+            case 'ipc':
+                $notificationHtml = notify.renderIncomingPendingContact($notificationHtml, notification, userEmail);
+                break;
             case 'share':
                 $notificationHtml = notify.renderNewShare($notificationHtml, notification, userEmail);
                 break;
@@ -392,7 +398,7 @@ var notify = {
                 $notificationHtml = notify.renderDeletedShare($notificationHtml, userEmail);
                 break;
             case 'put':
-                $notificationHtml = notify.renderNewNodes($notificationHtml, notification, userEmail);
+                $notificationHtml = notify.renderNewSharedNodes($notificationHtml, notification, userEmail);
                 break;
             case 'psts':
                 $notificationHtml = notify.renderPayment($notificationHtml, notification);
@@ -437,6 +443,67 @@ var notify = {
             rhtml +=   '</span>';
             rhtml += '</a>';
          */
+    },
+    
+    /**
+     * Render pending contact requests
+     * @param {Object} $notificationHtml jQuery object of the notification template HTML
+     * @param {Object} notification
+     * @returns {Object} The HTML to be rendered for the notification
+     */
+    renderIncomingPendingContact: function($notificationHtml, notification) {
+        
+        var pendingContactId = notification.data.p;
+        var mostRecentNotification = true;
+        var className = '';
+        var title = '';
+
+        // Check if a newer contact request for this user has already been rendered (notifications are sorted by timestamp)
+        for (var i = 0, length = notify.renderedContactRequests.length; i < length; i++) {
+
+            // If this contact request has already been rendered, don't render the current notification with buttons
+            if (pendingContactId === notify.renderedContactRequests[i]) {
+                mostRecentNotification = false;
+            }
+        }
+        
+        // If this is the most recent contact request from this user
+        if (mostRecentNotification) {
+            
+            // If this notification also exists in the state
+            if (M.ipc[pendingContactId]) {
+                
+                // Show the Accept button
+                $notificationHtml.find('.notification-request-buttons').removeClass('hidden');
+            }
+            
+            // Set a flag so the buttons are not rendered again on older notifications
+            notify.renderedContactRequests.push(pendingContactId);
+        }
+        
+        // If the other user deleted their contact request to the current user
+        if (typeof notification.data.dts !== 'undefined') {
+            className = 'nt-contact-deleted';
+            title = l[7151];      // Cancelled their contact request
+        }
+
+        // If the other user sent a reminder about their contact request
+        else if (typeof notification.data.rts !== 'undefined') {
+            className = 'nt-contact-request';
+            title = l[7150];      // Reminder: you have a contact request
+        }
+        else {
+            // Creates notification with 'Sent you a contact request' and 'Accept' button
+            className = 'nt-contact-request';
+            title = l[5851];
+        }
+        
+        // Populate other template information
+        $notificationHtml.addClass(className);
+        $notificationHtml.find('.notification-info').text(title);
+        // Todo: add pending contact id attribute and click handler
+        
+        return $notificationHtml;
     },
     
     /**
@@ -503,7 +570,7 @@ var notify = {
      * @param {String} email The email address
      * @returns {Object} The HTML to be rendered for the notification
      */
-    renderNewNodes: function($notificationHtml, notification, email) {
+    renderNewSharedNodes: function($notificationHtml, notification, email) {
 
         var nodes = notification.data.f;
         var fileCount = 0;
@@ -602,7 +669,7 @@ var notify = {
         $notificationHtml.addClass('nt-payment-notification');
         $notificationHtml.addClass('clickable');
         $notificationHtml.find('.notification-info').text(title);
-        $notificationHtml.find('.notification-username').text(header);
+        $notificationHtml.find('.notification-username').text(header);      // Use 'Payment info' instead of an email
         
         return $notificationHtml;
     }

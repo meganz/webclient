@@ -39,14 +39,14 @@
             'title': l[1356],
             'buttons': [
                 {
-                    'label': "Cancel",
+                    'label': l[1686],
                     'className': "feedback-button-cancel disabled",
                     'callback': function() {
                         this.hide();
                     }
                 },
                 {
-                    'label': "SUBMIT YOUR FEEDBACK",
+                    'label': 'SUBMIT YOUR FEEDBACK',
                     'className': "feedback-button-send disabled",
                     'callback': function() {
                         self._report.message = self.$textarea.val();
@@ -94,9 +94,14 @@
                                 }
                             });
                         }
-                        this.hide();
+                        
+                        $('.feedback-dialog-body').addClass('hidden');
+                        $('.feedback-result-pad').removeClass('hidden');    
 
-                        msgDialog('info', 'Feedback', 'Thank you for your feedback!');
+                        $('.feedback-result-button', self.$dialog).rebind('click.feedbackDialog', function() {
+                            self.hide();
+                        });
+
                     }
                 }
             ]
@@ -113,7 +118,6 @@
 
         self.$checkboxes = $('.reply, .stats', self.$dialog);
 
-
         self.bind("onBeforeShow", function() {
 
             $('.rating a', self.$dialog)
@@ -122,6 +126,11 @@
             self.$textarea = $('textarea', self.$dialog);
             self.$textarea
                 .val('')
+
+            $('.feedback-button-send, .feedback-button-cancel', self.$dialog).addClass('disabled');
+
+            $('.feedback-dialog-body').removeClass('hidden');
+            $('.feedback-result-pad').addClass('hidden');
 
             $('.stats .checkdiv').rebind('onFakeCheckboxChange.feedbackDialog', function(e, val) {
                 if (val === true) {
@@ -165,14 +174,6 @@
             $(this).addClass('active').prevAll().addClass('colored');
                 
             $('.feedback-button-send, .feedback-button-cancel', self.$dialog).removeClass('disabled');
-        });
-        
-        $('input[name="contact_me"]').rebind('click', function() {
-            if (!$(this).attr('checked')) {
-                $('.feedback-dialog-input').removeClass('hidden');
-            } else {
-                $('.feedback-dialog-input').addClass('hidden');
-            }
         });
 
         $('.feedback-dialog-textarea textarea').on('keyup', function() {
@@ -226,7 +227,7 @@
                     'title': 'Collected Data Report',
                     'buttons': [
                         {
-                            'label': "Close",
+                            'label': l[148],
                             'className': "fm-dialog-button-red collected-data-review-button-cancel",
                             'callback': function () {
                                 this.hide();

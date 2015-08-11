@@ -54,6 +54,13 @@
 	font-weight: normal;
 	font-style: normal;
 }
+@font-face {
+	font-family: 'source_code_proregular';
+	src: url('../fonts/sourcecodepro-regular-webfont.eot');
+	src: url('../fonts/sourcecodepro-regular-webfont.eot?#iefix') format('embedded-opentype'),  url('../fonts/sourcecodepro-regular-webfont.woff2') format('woff2'),  url('../fonts/sourcecodepro-regular-webfont.woff') format('woff'),  url('../fonts/sourcecodepro-regular-webfont.ttf') format('truetype'),  url('../fonts/sourcecodepro-regular-webfont.svg#source_code_proregular') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
 body, td, th {
 	font-size: 13px;
 	color: #333333;
@@ -7998,7 +8005,7 @@ color: white;
 	top: 0;
 	cursor: pointer;
 }
-.nw-contact-avatar, .nw-contact-avatar img, div.nw-chat-sharing-body, div.fm-chat-messages-pad, .block-view-file-type, .nw-chat-expand-arrow, .fm-chat-message, .nw-chat-sharing-body, .nw-chat-sharing-body div, .nw-contact-avatar img, .create-folder-button, a.create-folder-button, .add-user-popup-button, a.add-user-popup-button, .create-folder-button-cancel, .fm-dialog-new-folder-button, .fm-dialog, .fmholder div, .fmholder a, .fmholder span, .fmholder td, div.new-bottom-pages div.new-left-menu-link, div.new-bottom-pages a.dev-new-button, .fm-subfolders, .add-contact-item, .share-folder-info, .fm-dialog-header, .fm-share-body, .share-dialog div, .fm-chat-file-button, .reg-st3-membership-bl, .megasync-overlay {
+.nw-contact-avatar, .nw-contact-avatar img, div.nw-chat-sharing-body, div.fm-chat-messages-pad, .block-view-file-type, .nw-chat-expand-arrow, .fm-chat-message, .nw-chat-sharing-body, .nw-chat-sharing-body div, .nw-contact-avatar img, .create-folder-button, a.create-folder-button, .add-user-popup-button, a.add-user-popup-button, .create-folder-button-cancel, .fm-dialog-new-folder-button, .fm-dialog, .fmholder div, .fmholder a, .fmholder span, .fmholder td, div.new-bottom-pages div.new-left-menu-link, div.new-bottom-pages a.dev-new-button, .fm-subfolders, .add-contact-item, .share-folder-info, .fm-dialog-header, .fm-share-body, .share-dialog div, .fm-chat-file-button, .reg-st3-membership-bl, .megasync-overlay, .collected-data li::before, .collected-data {
 	-webkit-touch-callout: none !important;
 	-webkit-user-select: none !important;
 	-khtml-user-select: none !important;
@@ -8006,7 +8013,7 @@ color: white;
 	-ms-user-select: none !important;
 	user-select: none !important;
 }
-.fm-chat-message span, div.nw-chat-sharing-filename, div.nw-chat-sharing-filesize, .nw-chat-date-txt, .fm-chat-smile, .properties-file-link, .contact-fingerprint-txt, .contact-fingerprint-txt span, .fingerprint-txt, .contact-details-user-name, .contact-details-email, .nw-contact-name, .fm-breadcrumbs.contact .right-arrow-bg span, div.new-download-file-title, .dev-nw *, .fmholder .dev-nw div, .fmholder div.new-affiliate-bg1 *, .fmholder div.main-mid-pad.new-bottom-pages * {
+.fm-chat-message span, div.nw-chat-sharing-filename, div.nw-chat-sharing-filesize, .nw-chat-date-txt, .fm-chat-smile, .properties-file-link, .contact-fingerprint-txt, .contact-fingerprint-txt span, .fingerprint-txt, .contact-details-user-name, .contact-details-email, .nw-contact-name, .fm-breadcrumbs.contact .right-arrow-bg span, div.new-download-file-title, .dev-nw *, .fmholder .dev-nw div, .fmholder div.new-affiliate-bg1 *, .fmholder div.main-mid-pad.new-bottom-pages *, .collected-data li {
 	-webkit-touch-callout: text !important;
 	-webkit-user-select: text !important;
 	-khtml-user-select: text !important;
@@ -23145,9 +23152,10 @@ div.fm-dialog.feedback-dialog .checkboxOff {
 	width: 600px;
 }
 .collected-data-textarea {
-	max-height: 470px;
 	overflow: hidden;
-	margin-top: 10px;
+	max-height: 462px;
+	margin: 18px 0 8px 0;
+	position: relative;
 }
 .collected-data li::selection {
 	background-color: #D6F1CC;
@@ -23156,24 +23164,33 @@ div.fm-dialog.feedback-dialog .checkboxOff {
  background-color:#D6F1CC;
 }
 .collected-data {
-	width: 100%;
 	border: 0;
-	margin: 0;
-	padding: 0 20px;
-	resize: none;
+	padding: 0;
+	margin: 0 24px 0 50px;
+	overflow: hidden;
+	display: block;
 }
 .collected-data li {
 	color: #666666;
-	font-size: 13px;
-	line-height: 24px;
+	font-size: 12px;
+	line-height: 21px;
 	list-style-type: none;
-	padding: 0 10px 0 0;
+	text-indent: 13px;
+	padding: 0;
 	counter-increment: step-counter;
+	font-family: 'source_code_proregular';
+}
+.collected-data li:first-child, .collected-data li:last-child {
+	text-indent: 0;
 }
 .collected-data li::before {
 	content: counter(step-counter);
 	color: #2BA6DE;
-	padding-right: 20px;
+	text-align: right;
+	display: block;
+	position: absolute;
+	min-width: 40px;
+	left: -15px;
 }
 .collected-data-review-dialog textarea {
 	display: block;

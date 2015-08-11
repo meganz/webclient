@@ -21,10 +21,10 @@
              */
             'focusable': true,
             'closable': true,
-			'closableByEsc': true,
+            'closableByEsc': true,
             'expandable': true,
             'requiresOverlay': false,
-			'defaultButtonStyle': false,
+            'defaultButtonStyle': false,
 
             /**
              * css class names
@@ -45,7 +45,7 @@
                         this.hide();
                     }
                 },
-				{
+                {
                     'label': "SUBMIT YOUR FEEDBACK",
                     'className': "feedback-button-send disabled",
                     'callback': function() {
@@ -147,8 +147,8 @@
             $('input[name="contact_me"]', self.$dialog)
                 .attr('checked', false)
                 .trigger('change');
-				
-			$('.feedback-dialog-input').addClass('hidden');
+                
+            $('.feedback-dialog-input').addClass('hidden');
         });
 
         self.bind("onHide", function() {
@@ -165,17 +165,17 @@
                 .removeClass('active colored');
 
             $(this).addClass('active').prevAll().addClass('colored');
-				
+                
             $('.feedback-button-send, .feedback-button-cancel', self.$dialog).removeClass('disabled');
         });
-		
-		$('input[name="contact_me"]').rebind('click', function() {
-			if (!$(this).attr('checked')) {
-				$('.feedback-dialog-input').removeClass('hidden');
-			} else {
-				$('.feedback-dialog-input').addClass('hidden');
-			}
-		});
+        
+        $('input[name="contact_me"]').rebind('click', function() {
+            if (!$(this).attr('checked')) {
+                $('.feedback-dialog-input').removeClass('hidden');
+            } else {
+                $('.feedback-dialog-input').addClass('hidden');
+            }
+        });
 
         $('.stats-button', self.$dialog).rebind('click.feedbackDialog', function() {
             var dialog = self.$dataReportDialog;
@@ -187,9 +187,9 @@
                      * features:
                      */
                     'focusable': true,
-            		'closable': true,
-           			'expandable': true,
-            		'requiresOverlay': false,
+                    'closable': true,
+                       'expandable': true,
+                    'requiresOverlay': false,
 
                     /**
                      * optional:
@@ -210,7 +210,9 @@
             $('.collected-data', dialog.$dialog).html(
                 '<li>' + JSON.stringify(self._report, null, 2).replace(/\n/g, '</li> <li>')
             );
+
             dialog.show();
+            $('.collected-data-textarea').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5,animateScroll: true});
         });
 
         mega.ui.Dialog.prototype._initGenericEvents.apply(self);

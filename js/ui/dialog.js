@@ -92,14 +92,6 @@
                 self.hide();
             });
         }
-        if(self.options.closableByEsc) {
-            $(document).rebind('keyup',function(evt) {
-                if (evt.keyCode == 27) {
-                    self.hide();
-                    $(document).unbind('keyup');
-                }
-            });
-        }
         if(self.options.expandable) {
             $(self.options.expandableButtonClass, self.$dialog).rebind('click.dialog' + self._getEventSuffix(), function() {
                 self.toggleExpandCollapse();
@@ -265,6 +257,13 @@
                 }
             });
         }
+        if(self.options.closableByEsc) {
+            $(document).rebind('keyup.' + self.options.className, function(evt) {
+                if (evt.keyCode == 27) {
+                    self.hide();
+                }
+            });
+        }
         if(!self.options.expandable || self.options.requiresOverlay) {
             self._showOverlay();
         }
@@ -300,6 +299,11 @@
         if(self.options.closable) {
             $(document.body).unbind('mousedown.dialogClose' + self.dialogIdx);
         }
+
+        if(self.options.closableByEsc) {
+            $(document).unbind('keyup.' + self.options.className);
+        }
+
         self.$dialog.addClass('hidden');
 
         if(!self.options.expandable && self.options.requiresOverlay) {

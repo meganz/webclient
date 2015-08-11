@@ -216,7 +216,8 @@
                      */
                     'focusable': true,
                     'closable': true,
-                       'expandable': true,
+                    'closableByEsc': true,
+                    'expandable': true,
                     'requiresOverlay': false,
 
                     /**

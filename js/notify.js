@@ -12,7 +12,7 @@ var notify = {
     notifications: [],
     
     // Number of notifications to fetch
-    numOfNotifications: 100,
+    numOfNotifications: 200,
     
     // Locally cached emails and pending contact emails
     userEmails: {},
@@ -285,8 +285,9 @@ var notify = {
         // Add scrolling for the notifications
         notify.initPopupScrolling();
         
-        // Add click handler for shared files and folders
+        // Add click handlers for various notifications
         notify.initShareClickHandler();
+        notify.initPaymentClickHandler();
     },
     
     /**
@@ -317,6 +318,17 @@ var notify = {
             // Open the folder
             M.openFolder(folderId);
             reselect(true);
+        });
+    },
+    
+    /**
+     * If they click on a payment notification, then redirect them to the Account History page
+     */
+    initPaymentClickHandler: function() {
+        
+        // Redirect them to the Account History page on click
+        this.$popup.find('.notification-item.nt-payment-notification').rebind('click', function() {
+            document.location.hash = '#fm/account/history';
         });
     },
     
@@ -374,10 +386,17 @@ var notify = {
         switch (notification.type) {
             
             case 'share':
-                $notificationHtml = notify.renderNewShare($notificationHtml, notification);
+                $notificationHtml = notify.renderNewShare($notificationHtml, notification, userEmail);
+                break;
+            case 'dshare':
+                $notificationHtml = notify.renderDeletedShare($notificationHtml, userEmail);
                 break;
             case 'put':
-                $notificationHtml = notify.renderNewPutNodes($notificationHtml, notification, userEmail);
+                $notificationHtml = notify.renderNewNodes($notificationHtml, notification, userEmail);
+                break;
+            case 'psts':
+                $notificationHtml = notify.renderPayment($notificationHtml, notification);
+                break;
             default:
                 break;
         }
@@ -424,17 +443,17 @@ var notify = {
      * Render new share notification
      * @param {Object} $notificationHtml jQuery object of the notification template HTML
      * @param {Object} notification
+     * @param {String} email The email address
      * @returns {Object} The HTML to be rendered for the notification
      */
-    renderNewShare: function($notificationHtml, notification) {
+    renderNewShare: function($notificationHtml, notification, email) {
 
         var title = '';
-        var userHandle = notification.userHandle;
         var folderId = notification.data.n;
 
         // If the email exists use language string 'New shared folder from [X]'
-        if (notify.userEmails[userHandle]) {
-            title = l[824].replace('[X]', htmlentities(notify.userEmails[userHandle]));
+        if (email) {
+            title = l[824].replace('[X]', email);
         }
         else {
             // Otherwise use string 'New shared folder'
@@ -451,13 +470,40 @@ var notify = {
     },
     
     /**
-     * Render notification for when another user has added files/folders into an already shared folder
+     * Render a deleted share notification
+     * @param {Object} $notificationHtml jQuery object of the notification template HTML
+     * @param {String} email The email address
+     * @returns {Object} The HTML to be rendered for the notification
+     */
+    renderDeletedShare: function($notificationHtml, email) {
+
+        var title = '';
+
+        // If the email exists use string '[X] revoked a shared folder'
+        if (email) {
+            title = l[826].replace('[X]', email);
+        }
+        else {
+            // Otherwise use string 'Shared folder revoked'
+            title = l[827];
+        }
+        
+        // Populate other template information
+        $notificationHtml.addClass('nt-revocation-of-incoming');
+        $notificationHtml.find('.notification-info').text(title);
+        
+        return $notificationHtml;
+    },
+    
+    /**
+     * Render a notification for when another user has added files/folders into an already shared folder. 
+     * This condenses all the files and folders that were shared into a single notification.
      * @param {Object} $notificationHtml jQuery object of the notification template HTML
      * @param {Object} notification
      * @param {String} email The email address
      * @returns {Object} The HTML to be rendered for the notification
      */
-    renderNewPutNodes: function($notificationHtml, notification, email) {
+    renderNewNodes: function($notificationHtml, notification, email) {
 
         var nodes = notification.data.f;
         var fileCount = 0;
@@ -527,6 +573,36 @@ var notify = {
         $notificationHtml.addClass('clickable');
         $notificationHtml.find('.notification-info').text(title);
         $notificationHtml.attr('data-folder-id', folderId);
+        
+        return $notificationHtml;
+    },
+    
+    /**
+     * Process payment notification sent from payment provider e.g. Bitcoin
+     * @param {Object} $notificationHtml jQuery object of the notification template HTML
+     * @param {Object} notification
+     */
+    renderPayment: function($notificationHtml, notification) {
+        
+        var proLevel = notification.data.p;
+        var proPlan = getProPlan(proLevel);
+        var success = (notification.data.r === 's') ? true : false;
+        var header = l[1230];   // Payment info
+        var title = '';
+        
+        // Change wording depending on success or failure
+        if (success) {
+            title = l[7142].replace('%1', proPlan);   // Your payment for the PRO III plan was received.
+        }
+        else {
+            title = l[7141].replace('%1', proPlan);   // Your payment for the PRO II plan was unsuccessful.
+        }
+        
+        // Populate other template information
+        $notificationHtml.addClass('nt-payment-notification');
+        $notificationHtml.addClass('clickable');
+        $notificationHtml.find('.notification-info').text(title);
+        $notificationHtml.find('.notification-username').text(header);
         
         return $notificationHtml;
     }

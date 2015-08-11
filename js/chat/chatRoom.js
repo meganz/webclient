@@ -458,7 +458,7 @@ ChatRoom.prototype._retrieveTurnServerFromLoadBalancer = function() {
                 var servers = [];
                 r.turn.forEach(function(v) {
                     var transport = v.transport;
-                    if(!transport) {
+                    if (!transport) {
                         transport = "udp";
                     }
 

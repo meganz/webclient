@@ -45,9 +45,6 @@ var Karere = function(user_options) {
 
     Strophe.fatal = function (msg) { self.error(msg); };
     Strophe.error = function (msg) { self.error(msg); };
-    //Strophe.info = function (msg) { self.logger.info(msg); };
-    //Strophe.debug = function (msg) { self.logger.debug(msg); };
-
 
     // initialize the connection state
     self._connectionState = Karere.CONNECTION_STATE.DISCONNECTED;
@@ -2661,8 +2658,6 @@ makeMetaAware(Karere);
 
 
             var msg = $iq({
-                //from: self.getJid(),
-                //to: megaChat.karere.getBareJid().split("@")[1],
                 type: "get",
                 id: messageId
             }).c("ping", {

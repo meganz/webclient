@@ -2445,10 +2445,9 @@ Chat.prototype.getXmppServiceUrl = function() {
             .done(function(r) {
                 if (r.xmpp && r.xmpp.length > 0) {
                     var randomHost = array_random(r.xmpp);
-                    //$promise.resolve("https://" + randomHost.host + ":" + randomHost.port + "/bosh");
                     $promise.resolve("wss://" + randomHost.host + "/ws");
                 }
-                else if(!r.xmpp || r.xmpp.length === 0) {
+                else if (!r.xmpp || r.xmpp.length === 0) {
                     self.logger.error("GeLB returned no results. Halting.");
                     $promise.reject();
                 }

@@ -30,7 +30,8 @@ var KarerePing = function(megaChat) {
             "onDisconnected.karerePing onConnectionClosed.karerePing onDisconnecting.karerePing",
             function() {
                 self.stopTimer();
-        });
+            }
+        );
     });
 
     return self;

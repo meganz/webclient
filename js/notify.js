@@ -250,6 +250,7 @@ var notify = {
         
         // Get the number of notifications
         var numOfNotifications = notify.notifications.length;
+        var allNotificationsHtml = '';
         
         // If no notifications, show empty
         if (numOfNotifications === 0) {
@@ -260,8 +261,7 @@ var notify = {
         // Sort the notifications
         notify.sortNotificationsByMostRecent();
 
-        // Store for the all the generated HTML
-        var allNotificationsHtml = '';
+        // Cache the template selector
         var $template = this.$popup.find('.notification-item.template');
 
         // Loop through all the notifications
@@ -284,6 +284,40 @@ var notify = {
         
         // Add scrolling for the notifications
         notify.initPopupScrolling();
+        
+        // Add click handler for shared files and folders
+        notify.initShareClickHandler();
+    },
+    
+    /**
+     * Initialise scrolling on the notifications popup
+     */
+    initPopupScrolling: function() {
+
+        // Initialise scrolling on the popup
+        $('.notification-scroll').jScrollPane({
+            showArrows: true,
+            arrowSize: 5
+        });
+        
+        jScrollFade('.notification-scroll');
+    },
+    
+    /**
+     * On click of a share or new files/folders notification, go to that share
+     */
+    initShareClickHandler: function() {
+        
+        // Select the notifications with shares or new files/folders
+        this.$popup.find('.notification-item.nt-incoming-share, .notification-item.nt-new-files').rebind('click', function() {
+            
+            // Get the folder ID from the HTML5 data attribute
+            var folderId = $(this).attr('data-folder-id');
+            
+            // Open the folder
+            M.openFolder(folderId);
+            reselect(true);
+        });
     },
     
     /**
@@ -296,20 +330,16 @@ var notify = {
         return $element.clone().wrap('<div>').parent().html();
     },
     
+    /**
+     * Updates the notification with relevant style and details
+     * @param {Object} $notificationHtml The jQuery clone of the HTML notification template
+     * @param {Object} notification The notification object
+     * @returns {Object}
+     */
     updateTemplate: function($notificationHtml, notification)
     {
         // Remove the template class
         $notificationHtml.removeClass('template');
-        
-        // Populate based on each type of notification
-        switch (notification.type) {
-            
-            case 'share':
-                $notificationHtml = notify.renderNewShare($notificationHtml, notification);
-                break;
-            default:
-                break;
-        }
         
         var date = time2last(notification.timestamp);
         var userHandle = notification.userHandle;
@@ -323,14 +353,33 @@ var notify = {
             userEmail = notify.userEmails[userHandle];
         }
         
+        // Escape email address
+        userEmail = htmlentities(userEmail);
+        
+        // If using the new v2.0 API for contacts, the userid will not be available, so use the email
+        var avatar = (M.u[userHandle] || userEmail) ? useravatar.contact(M.u[userHandle] || userEmail) : '';
+        
         // Update common template variables
         $notificationHtml.attr('id', notification.id);
         $notificationHtml.find('.notification-date').text(date);
         $notificationHtml.find('.notification-username').text(userEmail);
+        $notificationHtml.find('.notification-avatar').prepend(avatar);
         
         // Add read status
         if (notification.seen) {
             $notificationHtml.addClass('read');
+        }
+        
+        // Populate other information based on each type of notification
+        switch (notification.type) {
+            
+            case 'share':
+                $notificationHtml = notify.renderNewShare($notificationHtml, notification);
+                break;
+            case 'put':
+                $notificationHtml = notify.renderNewPutNodes($notificationHtml, notification, userEmail);
+            default:
+                break;
         }
         
         return $notificationHtml;
@@ -381,6 +430,7 @@ var notify = {
 
         var title = '';
         var userHandle = notification.userHandle;
+        var folderId = notification.data.n;
 
         // If the email exists use language string 'New shared folder from [X]'
         if (notify.userEmails[userHandle]) {
@@ -391,25 +441,94 @@ var notify = {
             title = l[825];
         }
         
+        // Populate other template information
         $notificationHtml.addClass('nt-incoming-share');
         $notificationHtml.addClass('clickable');
         $notificationHtml.find('.notification-info').text(title);
+        $notificationHtml.attr('data-folder-id', folderId);
         
         return $notificationHtml;
     },
     
     /**
-     * Initialise scrolling on the notifications popup
+     * Render notification for when another user has added files/folders into an already shared folder
+     * @param {Object} $notificationHtml jQuery object of the notification template HTML
+     * @param {Object} notification
+     * @param {String} email The email address
+     * @returns {Object} The HTML to be rendered for the notification
      */
-    initPopupScrolling: function() {
+    renderNewPutNodes: function($notificationHtml, notification, email) {
 
-        // Initialise scrolling on the popup
-        $('.notification-scroll').jScrollPane({
-            showArrows: true,
-            arrowSize: 5
-        });
+        var nodes = notification.data.f;
+        var fileCount = 0;
+        var folderCount = 0;
+        var folderId = notification.data.n;
+        var notificationText = '';
+        var title = '';
+
+        // Count the number of new files and folders
+        for (var node in nodes) {
+            
+            // Skip if not own property
+            if (!nodes.hasOwnProperty(node)) {
+                continue;
+            }
+            
+            // If folder, increment
+            if (nodes[node].t == 1) {
+                folderCount++;
+            }
+            else {
+                // Otherwise is file
+                fileCount++;
+            }
+        }
         
-        jScrollFade('.notification-scroll');
+        // Get wording for the number of files and folders added
+        if ((folderCount > 1) && (fileCount > 1)) {
+            notificationText = l[828].replace('[X1]', folderCount).replace('[X2]', fileCount);  // [X1] folders and [X2] files
+        }
+        else if ((folderCount > 1) && (fileCount == 1)) {
+            notificationText = l[829].replace('[X]', folderCount);  // [X] folders and 1 file
+        }
+        else if ((folderCount == 1) && (fileCount > 1)) {
+            notificationText = l[830].replace('[X]', fileCount);    // 1 folder and [X] files
+        }
+        else if ((folderCount == 1) && (fileCount == 1)) {
+            notificationText = l[831];                              // 1 folder and 1 file
+        }
+        else if (folderCount > 1) {
+            notificationText = l[832].replace('[X]', folderCount);  // [X] folders
+        }
+        else if (fileCount > 1) {
+            notificationText = l[833].replace('[X]', fileCount);    // [X] files
+        }
+        else if (folderCount == 1) {
+            notificationText = l[834];  // 1 folder
+        }
+        else if (fileCount == 1) {
+            notificationText = l[835];  // 1 file
+        }
+        
+        // Set wording of the title
+        if (email) {
+            title = l[836].replace('[X]', email);
+            title = title.replace('[DATA]', notificationText);  // [X] added [DATA]
+        }
+        else if ((fileCount + folderCount) > 1) {
+            title = l[837].replace('[X]', notificationText);    // [X] have been added
+        }
+        else {
+            title = l[838].replace('[X]', notificationText);    // [X] has been added
+        }
+        
+        // Populate other template information
+        $notificationHtml.addClass('nt-new-files');
+        $notificationHtml.addClass('clickable');
+        $notificationHtml.find('.notification-info').text(title);
+        $notificationHtml.attr('data-folder-id', folderId);
+        
+        return $notificationHtml;
     }
 };
 

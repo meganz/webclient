@@ -57,7 +57,7 @@
 @font-face {
 	font-family: 'source_code_proregular';
 	src: url('../fonts/sourcecodepro-regular-webfont.eot');
-	src: url('../fonts/sourcecodepro-regular-webfont.eot?#iefix') format('embedded-opentype'),  url('../fonts/sourcecodepro-regular-webfont.woff2') format('woff2'),  url('../fonts/sourcecodepro-regular-webfont.woff') format('woff'),  url('../fonts/sourcecodepro-regular-webfont.ttf') format('truetype'),  url('../fonts/sourcecodepro-regular-webfont.svg#source_code_proregular') format('svg');
+	src: url('../fonts/sourcecodepro-regular-webfont.eot?#iefix') format('embedded-opentype'), url('../fonts/sourcecodepro-regular-webfont.woff2') format('woff2'), url('../fonts/sourcecodepro-regular-webfont.woff') format('woff'), url('../fonts/sourcecodepro-regular-webfont.ttf') format('truetype'), url('../fonts/sourcecodepro-regular-webfont.svg#source_code_proregular') format('svg');
 	font-weight: normal;
 	font-style: normal;
 }
@@ -331,6 +331,7 @@ input[type="checkbox"] {
 	-moz-appearance: none;
 	width: 21px;
 	height: 21px;
+	cursor: pointer;
 }
 .checkboxOn {
 	width: 30px;
@@ -7915,7 +7916,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	font-size: 13px;
 	height: 125px;
 }
-.add-contact-hidden, .share-message-hidden, .feedback-hidden, .cancel-hidden {
+.add-contact-hidden, .share-message-hidden, .feedback-hidden, .cancel-hidden, .feedback-dialog .feedback-dialog-hidden {
 	display: none;
 	height: auto;
 	overflow: visible;
@@ -22846,10 +22847,9 @@ a.top-login-forgot-pass {
 .feedback-dialog-textarea {
 	height: 96px;
 }
-.feedback-dialog-textarea textarea, .feedback-dialog-input input {
+.feedback-dialog-textarea textarea, .feedback-dialog-input input, .feedback-dialog-hidden {
 	background-color: transparent;
 	margin: 0;
-	padding: 0;
 	border: 0;
 	resize: none;
 	font-size: 14px;
@@ -22861,6 +22861,7 @@ a.top-login-forgot-pass {
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
+	overflow: hidden;
 }
 .feedback-dialog-textarea textarea::selection, .feedback-dialog-input input::selection {
 	background: rgba(255,255,255,0.15);
@@ -22868,9 +22869,27 @@ a.top-login-forgot-pass {
 .feedback-dialog-textarea textarea::-moz-selection, .feedback-dialog-input input::-moz-selection {
  background: rgba(255,255,255,0.15);
 }
-.feedback-dialog-textarea textarea {
+.feedback-dialog-textarea textarea, .feedback-dialog-hidden {
+	padding: 0;
+	height: 78px;
+	line-height: 18px;
+}
+.feedback-dialog-scr {
 	padding: 9px 17px;
-	height: 96px;
+}
+.feedback-dialog-textarea .jspDrag {
+	background-color: rgba(255, 255, 255, 1);
+	right: 6px;
+	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
+    -moz-opacity: 0.3;
+    -khtml-opacity: 0.3;
+    opacity: 0.3;
+}
+.feedback-dialog-textarea .jspVerticalBar {
+	width: 12px;
+}
+.feedback-dialog-textarea .jspArrow {
+	height: 6px;
 }
 .feedback-button {
 	margin-left: 14px;
@@ -22895,6 +22914,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 	-moz-opacity: 0.8;
 	-khtml-opacity: 0.8;
 	opacity: 0.8;
+	cursor: pointer;
 }
 .feedback-button:hover {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
@@ -22919,21 +22939,26 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 .rating a:first-child {
 	margin: 0;
 }
+.feedback-label-txt {
+	margin-left: 56px;
+	font-size: 14px;
+	line-height: 18px;
+	text-align: left;
+	padding: 15px 0 1px 0;
+}
 .feedback-dialog .radio-txt {
 	font-size: 14px;
 	color: #CCCCCC;
 	line-height: 18px;
 	float: none;
-	margin-left: 46px;
-	display: block;
-	text-align: left;
-	padding: 15px 0 1px 0;
+	padding: 0;
 }
 .fm-dialog.feedback-dialog div.checkboxOn, div.fm-dialog.feedback-dialog .checkboxOff, .membership-arrow {
 	background-image: url(../images/mega/dialogs-sprite_v4.svg);
 	background-position: 0 -4112px;
 	background-size: auto;
-	margin: 13px 0 1px 14px;
+	margin: -2px 0 1px -42px;
+	cursor: pointer;
 }
 div.fm-dialog.feedback-dialog .checkboxOff {
 	background-position: 0 -4060px;

@@ -104,6 +104,10 @@ function init_page() {
         $('body').attr('class', '');
     }
 
+	if (localStorage.font_size) {
+        $('body').removeClass('fontsize1 fontsize2').addClass('fontsize' + localStorage.font_size);
+    }
+
     // Add language class to body for CSS fixes for specific language strings
     $('body').addClass(lang);
 
@@ -589,19 +593,17 @@ function init_page() {
                 return;
             }
             loadingDialog.show();
-            CMS.watch('help:' + lang, function () {
+            CMS.watch('help2:' + lang, function () {
                 window.helpTemplate = null;
                 doRenderHelp();
             });
-            CMS.get('help:' + lang, function (err, content) {
-                CMS.get('help:' + lang + '.json', function (err, json) {
-                    helpdata = json.object
-                    parsepage(window.helpTemplate = content.html);
-                    init_help();
-                    loadingDialog.hide();
-                    topmenuUI();
-                    mainScroll();
-                });
+            CMS.get(['help2:' + lang, 'help:' + lang + '.json'], function (err, content, json) {
+                helpdata = json.object
+                parsepage(window.helpTemplate = content.html);
+                init_help();
+                loadingDialog.hide();
+                topmenuUI();
+                mainScroll();
             });
         }
         doRenderHelp();
@@ -686,9 +688,6 @@ function init_page() {
     else if (page == 'takedown') {
         parsepage(pages['takedown']);
     }
-    else if (page == 'affiliateterms') {
-        parsepage(pages['affiliateterms']);
-    }
     else if (page == 'blog') {
         parsepage(pages['blog']);
         init_blog();
@@ -734,31 +733,11 @@ function init_page() {
     else if (page == 'mobile') {
         parsepage(pages['mobile']);
     }
-    else if (page == 'affiliates' && u_attr && u_attr.aff_payment) {
-        parsepage(pages['affiliatemember']);
-        init_affiliatemember();
-    }
-    else if (page == 'affiliates') {
-        parsepage(pages['affiliates']);
-    }
     else if (page == 'resellers') {
         parsepage(pages['resellers']);
     }
     else if (page == 'takedown') {
         parsepage(pages['takedown']);
-    }
-    else if (page == 'affiliatesignup' && u_type < 3) {
-        if (loggedout) {
-            document.location.hash = 'start';
-            return false;
-        }
-        login_txt = l[376];
-        parsepage(pages['login']);
-        init_login();
-    }
-    else if (page == 'affiliatesignup') {
-        parsepage(pages['affiliatesignup']);
-        init_affiliatesignup();
     }
     else if (page == 'done') {
         parsepage(pages['done']);
@@ -1231,12 +1210,10 @@ function topmenuUI() {
         }
     };
 
-    $('#pageholder').rebind('click', function (e) {
-        $.hideTopMenu(e);
-    });
-
-    $('#startholder').rebind('click', function (e) {
-        $.hideTopMenu(e);
+    $('#pageholder, #startholder').rebind('click', function(e) {
+        if (typeof $.hideTopMenu === 'function') {
+            $.hideTopMenu(e);
+        }
     });
 
     $('.top-menu-icon').rebind('click', function (e) {
@@ -1513,12 +1490,6 @@ function topmenuUI() {
         }
         else if (className.indexOf('doc') > -1) {
             document.location.hash = 'doc';
-        }
-        else if (className.indexOf('affiliateterms') > -1) {
-            document.location.hash = 'affiliateterms';
-        }
-        else if (className.indexOf('aff') > -1) {
-            document.location.hash = 'affiliates';
         }
         else if (className.indexOf('terms') > -1) {
             document.location.hash = 'terms';

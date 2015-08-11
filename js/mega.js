@@ -402,10 +402,8 @@ function MegaData()
                                 data: blob,
                                 url: myURL.createObjectURL(blob)
                             };
-                            useravatar.loaded(M.u[ctx.u]);
-                        } else if (ctx.u === u_handle) {
-                            useravatar.loaded(M.u[ctx.u]);
                         }
+                        useravatar.loaded(ctx.u);
                     }
                 });
             }
@@ -3231,8 +3229,9 @@ function MegaData()
             if (typeof mDB === 'object' && !pfkey) {
                 mDBadd('ok', {h: h, k: a32_to_base64(encrypt_key(u_k_aes, u_sharekeys[h])), ha: crypto_handleauth(h)});
             }
-        } else {
-            console.error("nodeShare failed for node:", h, s, ignoreDB);
+        }
+        else if (d) {
+            console.log('nodeShare failed for node:', h, s, ignoreDB);
         }
     };
 
@@ -3334,13 +3333,16 @@ function MegaData()
         for (i = selected.length; i--;) {
 
             selectedNodeHandle = selected[i];
-            shares = M.d[selectedNodeHandle].shares;
+            shares = M.d[selectedNodeHandle]
+                && M.d[selectedNodeHandle].shares;
 
-            // Loop through selected items and search for export link share
-            for (var userHandle in shares) {
-                if (shares.hasOwnProperty(userHandle)) {
-                    if (userHandle === 'EXP' && M.d[selectedNodeHandle].ph) {
-                        return true;
+            if (shares) {
+                // Loop through selected items and search for export link share
+                for (var userHandle in shares) {
+                    if (shares.hasOwnProperty(userHandle)) {
+                        if (userHandle === 'EXP' && M.d[selectedNodeHandle].ph) {
+                            return true;
+                        }
                     }
                 }
             }
@@ -3628,8 +3630,9 @@ function MegaData()
             }
         }
 
-        if (dlMethod == MemoryIO && ~ua.indexOf(') gecko') && !localStorage.firefoxDialog && $.totalDL > 104857600)
-            Later(firefoxDialog);
+        if (dlMethod == MemoryIO && ~ua.indexOf(') gecko') && !localStorage.megaSyncDialog && $.totalDL > 104857600) {
+            Later(megaSyncDialog);
+        }
 
         var flashhtml = '';
         if (dlMethod == FlashIO) {
@@ -5230,16 +5233,23 @@ function ddtype(ids, toid, alt)
 function fm_getnodes(h, ignore)
 {
     var nodes = [];
-    function procnode(h)
-    {
-        if (M.c[h])
-        {
-            for (var n in M.c[h])
-            {
-                if (M.d[n].name || ignore)
-                    nodes.push(n);
-                if (M.d[n].t == 1)
-                    procnode(n);
+    function procnode(h) {
+        if (M.c[h]) {
+            for (var n in M.c[h]) {
+                if (M.c[h].hasOwnProperty(n)) {
+                    if (!M.d[n]) {
+                        if (d) {
+                            console.warn('Invalid node: ' + n, h, M.c[h][n]);
+                        }
+                        continue;
+                    }
+                    if (M.d[n].name || ignore) {
+                        nodes.push(n);
+                    }
+                    if (M.d[n].t === 1) {
+                        procnode(n);
+                    }
+                }
             }
         }
     }

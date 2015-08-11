@@ -116,7 +116,6 @@ function init_help()
 
 
 l[1212] = l[1212].replace('[A]','<a href="#sdk" class="red">').replace('[/A]','</a>');
-l[1218] = l[1218].replace('[A]','<a href="#affiliateterms" class="red">').replace('[/A]','</a>');
 l[1863] = l[1863].replace('[A]','<a href="#mobile">').replace('[/A]','</a>');
 l[1863] = l[1863].replace('[B]','<a href="https://itunes.apple.com/app/mega/id706857885" target="_blank" rel="noreferrer">').replace('[/B]','</a>');
 l[1863] = l[1863].replace('[C]','<a href="https://play.google.com/store/apps/details?id=nz.mega.android&referrer=meganzhelp" target="_blank" rel="noreferrer">').replace('[/C]','</a>');

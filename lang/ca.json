@@ -3625,5 +3625,22 @@
     "7216": "Carregant els fitxers",
     "7217": "COMPRA AMB SALDO",
     "7218": "Elimina la transfer\u00e8ncia",
-    "7219": "Mobile"
+    "7219": "M\u00f2bil",
+    "7220": "S'ha afegit <span>XX<\/span> desc\u00e0rregues a la llista de transfer\u00e8ncies",
+    "7221": "S'ha afegit <span>XX<\/span> pujades a la llista de transfer\u00e8ncies",
+    "7222": "S'ha afegit una desc\u00e0rrega a la llista de transfer\u00e8ncies",
+    "7223": "S'ha afegit una pujada a la cua de transfer\u00e8ncies",
+    "7224": "Mostra-m'ho",
+    "7225": "Segur que vols eliminar totes les transfer\u00e8ncies?",
+    "7226": "Programaci\u00f3 de neteja de la paperera:",
+    "7227": "En cua",
+    "7228": "Mida de la lletra:",
+    "7229": "Petita",
+    "7230": "Gran",
+    "7231": "El preu no inclou el cost de la transacci\u00f3 en Bitcoins.",
+    "7232": "Arrossega el fitxer descarregat al navegador i confirma la instal\u00b7laci\u00f3.",
+    "7233": "No s'ha pogut iniciar la transacci\u00f3 per problemes de connexi\u00f3. Si el problema persisteix, si us plau, contacta amb support@mega.co.nz",
+    "7234": "Quelcom ha anat malament i no podem fer c\u00e0rrecs a la teva targeta.",
+    "7235": "Pagament fallit",
+    "7236": "To download files larger than 1GB or to upload folders, please install our MEGAsync client. This will allow easy, automated syncing between your computer and your MEGA cloud drive."
 }

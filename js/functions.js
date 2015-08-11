@@ -295,12 +295,9 @@ function populate_l() {
     l[1159] = l[1159].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
     l[1171] = l[1171].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
     l[1185] = l[1185].replace('[X]', '<strong>MEGA.crx</strong>');
-    l[1242] = l[1242].replace('[A]', '<a href="#affiliateterms" target="_blank" rel="noreferrer">').replace('[/A]', '</a>');
-    l[1218] = l[1218].replace('[A]', '<a href="#affiliateterms" class="red">').replace('[/A]', '</a>');
     l[1212] = l[1212].replace('[A]', '<a href="#sdk" class="red">').replace('[/A]', '</a>');
     l[1274] = l[1274].replace('[A]', '<a href="#takedown">').replace('[/A]', '</a>');
     l[1275] = l[1275].replace('[A]', '<a href="#copyright">').replace('[/A]', '</a>');
-    l[1244] = l[1244].replace('[A]', '<a href="#affiliateterms" class="red">').replace('[/A]', '</a>');
     l[1201] = l[1201].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
     l[1208] = l[1208].replace('[B]', '<strong>').replace('[/B]', '</strong>');
     l[1915] = l[1915].replace('[A]',
@@ -1253,10 +1250,12 @@ function oDestroy(obj) {
             delete obj[memb];
         }
     });
-    Object.defineProperty(obj, ":$:frozen:", {
-        value: String(new Date()),
-        writable: false
-    });
+    if (!oIsFrozen(obj)) {
+        Object.defineProperty(obj, ":$:frozen:", {
+            value: String(new Date()),
+            writable: false
+        });
+    }
 
     if (window.d) {
         Object.freeze(obj);
@@ -1311,21 +1310,21 @@ function dlFatalError(dl, error, ethrow) {
     var m = 'This issue should be resolved ';
     if (navigator.webkitGetUserMedia) {
         m += 'exiting from Incognito mode.';
+        msgDialog('warninga', l[1676], m, error);
     }
     else if (navigator.msSaveOrOpenBlob) {
         Later(browserDialog);
         m = l[1933];
+        msgDialog('warninga', l[1676], m, error);
     }
     else if (dlMethod === FlashIO) {
         Later(browserDialog);
         m = l[1308];
+        msgDialog('warninga', l[1676], m, error);
     }
     else {
-        Later(firefoxDialog);
-        // m += 'installing our extension.'
-        m = l[1932];
+        Later(megaSyncDialog);
     }
-    msgDialog('warninga', l[1676], m, error);
     setTransferStatus(dl, error, ethrow, true);
     DownloadManager.abort(dl);
 }
@@ -2065,37 +2064,41 @@ function percent_megatitle() {
         tp = $.transferprogress || {},
         dl_s = 0,
         ul_s = 0,
-        zips = {}
+        zips = {};
 
     for (var i in dl_queue) {
-        var q = dl_queue[i],
-            t = tp[q.zipid ? 'zip_' + q.zipid : 'dl_' + q.id];
+        if (dl_queue.hasOwnProperty(i)) {
+            var q = dl_queue[i];
+            var t = q && tp[q.zipid ? 'zip_' + q.zipid : 'dl_' + q.id];
 
-        if (t) {
-            dl_r += t[0];
-            dl_t += t[1];
-            if (!q.zipid || !zips[q.zipid]) {
-                if (q.zipid) {
-                    zips[q.zipid] = 1;
+            if (t) {
+                dl_r += t[0];
+                dl_t += t[1];
+                if (!q.zipid || !zips[q.zipid]) {
+                    if (q.zipid) {
+                        zips[q.zipid] = 1;
+                    }
+                    dl_s += t[2];
                 }
-                dl_s += t[2];
             }
-        }
-        else {
-            dl_t += q.size || 0;
+            else {
+                dl_t += q && q.size || 0;
+            }
         }
     }
 
     for (var i in ul_queue) {
-        var t = tp['ul_' + ul_queue[i].id]
+        if (ul_queue.hasOwnProperty(i)) {
+            var t = tp['ul_' + ul_queue[i].id]
 
-        if (t) {
-            ul_r += t[0];
-            ul_t += t[1];
-            ul_s += t[2];
-        }
-        else {
-            ul_t += ul_queue[i].size || 0;
+            if (t) {
+                ul_r += t[0];
+                ul_t += t[1];
+                ul_s += t[2];
+            }
+            else {
+                ul_t += ul_queue[i].size || 0;
+            }
         }
     }
     if (dl_t) {
@@ -2299,7 +2302,7 @@ function disableDescendantFolders(id, pref) {
         var fid = folders[i].h;
 
         for (var h in M.c[fid]) {
-            if (M.d[h].t) {
+            if (M.d[h] && M.d[h].t) {
                 sub = true;
                 break;
             }
@@ -2650,6 +2653,13 @@ function generateAnonymousReport() {
     $('script').each(function() {
         var self = this;
         var src = self.src.replace(window.location.host, "$current");
+        if (is_chrome_firefox) {
+            if (!promises.length) {
+                promises.push(MegaPromise.resolve());
+            }
+            report.scripts[self.src] = false;
+            return;
+        }
         promises.push(
             $.ajax({
                 url: self.src,

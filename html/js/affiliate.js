@@ -1,7 +1,0 @@
-function init_affiliate()
-{
-	
-	
-
-
-}

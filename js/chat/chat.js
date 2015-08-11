@@ -2382,7 +2382,7 @@ Chat.prototype.processRemovedUser = function(u) {
 Chat.prototype.refreshConversations = function() {
     var self = this;
 
-    if (!self.$container && !megaChat.is_initialized && u_type === 0) {
+    if (!self.$container || !megaChat.isReady || u_type === 0) {
         $('.fm-chat-block').hide();
         return false;
     }

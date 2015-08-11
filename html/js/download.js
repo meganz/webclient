@@ -47,7 +47,19 @@ function dl_g(res) {
     
     // Show ad if enabled
     megaAds.ad = res.ad;
+    megaAds.popAd = res.popad;
     megaAds.showAds($('#ads-block-frame'));
+
+    // If 'msd' (MegaSync download) flag is turned off via the API then hide the download with MEGAsync button.
+    if (res.msd === 0) {
+        megasync.isInstalled(function(err, is) {
+            if (err || !is) {
+                $('.new-download-sync-app').addClass('hidden');
+                $('.regular-download').removeClass('hidden');
+                $('.new-download-red-button').addClass('hidden');
+            }
+        });
+    }
 
     $('.widget-block').addClass('hidden');
     loadingDialog.hide();
@@ -80,19 +92,19 @@ function dl_g(res) {
 			$('.megasync-overlay').removeClass('downloading');
             megasync.download(dlpage_ph, dlpage_key);
         });
-        $('.new-download-red-button').unbind('click');
-        $('.new-download-red-button').bind('click',function(e)
-        {
-            if (dlMethod == MemoryIO && !localStorage.firefoxDialog && fdl_filesize > 1048576000 && navigator.userAgent.indexOf('Firefox') > -1)
+        
+        $('.new-download-red-button, .regular-download').rebind('click', function() {
+            
+            if (dlMethod == MemoryIO && !localStorage.megaSyncDialog && fdl_filesize > 1048576000 && navigator.userAgent.indexOf('Firefox') > -1)
             {
-                firefoxDialog();
+                megaSyncDialog();
             }
             else if ((('-ms-scroll-limit' in document.documentElement.style && '-ms-ime-align' in document.documentElement.style)
             || (navigator.userAgent.indexOf('MSIE 10') > -1)
             || ((navigator.userAgent.indexOf('Safari') > -1) && (navigator.userAgent.indexOf('Chrome') == -1)))
             && fdl_filesize > 1048576000 && !localStorage.browserDialog)
             {
-              browserDialog();
+                browserDialog();
             }
             else
             {
@@ -405,11 +417,19 @@ var megaAds = {
     // Set to an ad object containing src and other info if we should display an ad
     ad: false,
 
+    // Set to a list of urls for potential popunder ads
+    popAd: false,
+
     /**
      * Initialise the HTML for ads
      */
     init: function() {
         
+        if (this.popAd) {
+            popunda.megaPopunder.popurls = this.popAd;
+            popunda.megaPopunder.init($(".new-download-buttons"));
+        }
+
         // Remove any previous ad containers
         $('#ads-block-frame, ads-block-header').remove();
         

@@ -1422,7 +1422,7 @@ function sharedUInode(nodeHandle) {
 
     if ((M.d[nodeHandle] && M.d[nodeHandle].shares) || M.ps[nodeHandle]) {
 
-        oShares = M.d[nodeHandle].shares;
+        oShares = M.d[nodeHandle] && M.d[nodeHandle].shares;
 
         if (oShares) {
             iShareNum = Object.keys(oShares).length;
@@ -3398,7 +3398,10 @@ function accountUI()
             if (typeof M.account.rubsched !== 'undefined') {
                 storefmconfig('rubsched', M.account.rubsched);
             }
-
+            if (typeof M.account.font_size !== 'undefined') {
+                localStorage.font_size = M.account.font_size;
+                font_size = M.account.font_size;
+            }
             if ($('#account-password').val() == '' && ($('#account-new-password').val() !== '' || $('#account-confirm-password').val() !== ''))
             {
                 msgDialog('warninga', l[135], l[719], false, function()
@@ -3535,6 +3538,10 @@ function accountUI()
             $('#ulspeedvalue').val(Math.floor(ul_maxSpeed / 1024));
         $('#rad' + i + '_div').removeClass('radioOff').addClass('radioOn');
         $('#rad' + i).removeClass('radioOff').addClass('radioOn');
+        if (localStorage.font_size) {
+            $('.uifontsize input').removeClass('radioOn').addClass('radioOff').parent().removeClass('radioOn').addClass('radioOff');
+            $('#fontsize' + localStorage.font_size).removeClass('radioOff').addClass('radioOn').parent().removeClass('radioOff').addClass('radioOn');
+        }
         $('.ulspeedradio input').unbind('click');
         $('.ulspeedradio input').bind('click', function(e)
         {
@@ -3553,6 +3560,17 @@ function accountUI()
             $('.ulspeedradio').removeClass('radioOn').addClass('radioOff');
             $(this).addClass('radioOn').removeClass('radioOff');
             $(this).parent().addClass('radioOn').removeClass('radioOff');
+            $('.fm-account-save-block').removeClass('hidden');
+            $('.fm-account-main').addClass('save');
+            initAccountScroll();
+        });
+        $('.uifontsize input').unbind('click');
+        $('.uifontsize input').bind('click', function(e)
+        {
+            $('body').removeClass('fontsize1 fontsize2').addClass('fontsize' + $(this).val());
+            $('.uifontsize input').removeClass('radioOn').addClass('radioOff').parent().removeClass('radioOn').addClass('radioOff');
+            $(this).removeClass('radioOff').addClass('radioOn').parent().removeClass('radioOff').addClass('radioOn');
+            M.account.font_size = $(this).val();
             $('.fm-account-save-block').removeClass('hidden');
             $('.fm-account-main').addClass('save');
             initAccountScroll();
@@ -6622,9 +6640,12 @@ function dorename()
     {
         var h = $.selected[0];
         var n = M.d[h];
-        var nn = $('.rename-dialog input').val();
-        if (nn !== n.name)
-            M.rename(h, nn);
+        if (n) {
+            var nn = $('.rename-dialog input').val();
+            if (nn !== n.name) {
+                M.rename(h, nn);
+            }
+        }
         $.dialog = false;
         $('.rename-dialog').addClass('hidden');
         fm_hideoverlay();
@@ -8465,20 +8486,21 @@ function linksDialog(close) {
         resizeContainer: false,
         resizeHandle: false,
         onChange: function(elem, data) {
+            var selclass;
+
             if (data) {
                 $(elem).closest('.on_off').removeClass('off').addClass('on');
-
-                // Show link with key
-                var fileLinkWithKey = $('.file-link-with-key').text();
-                $('.export-link-url').val(fileLinkWithKey);
+                selclass = '.file-link-with-key';
             }
             else {
                 $(elem).closest('.on_off').removeClass('on').addClass('off');
-
-                // Show link without key
-                var fileLinkWithoutKey = $('.file-link-without-key').text();
-                $('.export-link-url').val(fileLinkWithoutKey);
+                selclass = '.file-link-without-key';
             }
+            $('.export-link-url').each(function(idx, elm) {
+                elm = $(elm);
+                var parent = elm.closest('.export-link-text-pad');
+                elm.val($(selclass, parent).text());
+            });
             window.getLinkState = !!data;
         }
     });
@@ -8645,6 +8667,48 @@ function chromeDialog(close)
         }
     });
 }
+
+/**
+ * Open a dialog asking the user to download MEGAsync for files over 1GB
+ */
+function megaSyncDialog() {
+    
+    // Cache selector
+    var $dialog = $('.fm-dialog.download-megasync-dialog');
+
+    // Show the dialog and overlay
+    $dialog.removeClass('hidden');
+    fm_showoverlay();
+
+    // Add close button handler
+    $dialog.find('.fm-dialog-close, .close-button').rebind('click', function() {
+        $dialog.addClass('hidden');
+        fm_hideoverlay();
+    });
+    
+    // Add checkbox handling
+    $dialog.find('#megasync-checkbox').rebind('click', function() {
+        
+        var $this = $(this);
+        
+        // If it has not been checked, check it
+        if (!$this.hasClass('checkboxOn')) {
+            
+            // Store a flag so that it won't show this dialog again if triggered
+            localStorage.megaSyncDialog = 1;
+            $this.attr('class', 'checkboxOn');
+            $this.parent().attr('class', 'checkboxOn');
+            $this.attr('checked', true);
+        }
+        else {
+            // Otherwise uncheck it
+            delete localStorage.megaSyncDialog;
+            $this.attr('class', 'checkboxOff');
+            $this.parent().attr('class', 'checkboxOff');
+            $this.attr('checked', false);
+        }
+    });
+};
 
 function firefoxDialog(close)
 {

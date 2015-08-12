@@ -382,7 +382,7 @@ var notify = {
     },
     
     /**
-     * Updates the notification with relevant style and details
+     * Main function to update each notification with relevant style and details
      * @param {Object} $notificationHtml The jQuery clone of the HTML notification template
      * @param {Object} notification The notification object
      * @returns {Object}
@@ -433,6 +433,9 @@ var notify = {
             case 'upci':
                 $notificationHtml = notify.renderUpdatedPendingContactIncoming($notificationHtml, notification, userEmail);
                 break;
+            case 'upco':
+                $notificationHtml = notify.renderUpdatedPendingContactOutgoing($notificationHtml, notification);
+                break;
             case 'share':
                 $notificationHtml = notify.renderNewShare($notificationHtml, notification, userEmail);
                 break;
@@ -450,41 +453,6 @@ var notify = {
         }
         
         return $notificationHtml;
-        
-        /*
-            <a class="notification-item template">
-                <span class="notification-status-icon">
-                    <span class="notification-status"></span>
-                    <span class="notification-avatar">
-                        <span class="notification-avatar-icon"></span>
-                    </span>
-                    <span class="notification-type">
-                        <span class="notification-accepted">Accepted</span>
-                        <span class="notification-content">
-                            <span class="notification-username"></span>
-                            <span class="notification-info"></span>
-                            <span class="notification-date"></span>
-                        </span>
-                    </span>
-                </span>
-            </a>
-                
-            rhtml += '<a class="notification-item ' + className + ' ' + nread + '" ' + nstyle + ' id="' + htmlentities(id) + '">';
-            rhtml +=   '<span class="notification-status-icon">';
-            rhtml +=     '<span class="notification-status"></span>';
-            rhtml +=     '<span class="notification-avatar">' + avatar + '<span class="notification-avatar-icon"></span></span>';
-            rhtml +=     '<span class="notification-type">';
-            rhtml +=       ((pendingContactHtml) ? pendingContactHtml : '');
-            rhtml +=       '<span class="notification-accepted">Accepted</span>';
-            rhtml +=       '<span class="notification-content">';
-            rhtml +=         '<span class="notification-username">' + email + '</span>';
-            rhtml +=         '<span class="notification-info">' + title + '</span>';
-            rhtml +=         '<span class="notification-date">' + time2last(time) + '</span>';
-            rhtml +=       '</span>';
-            rhtml +=     '</span>';
-            rhtml +=   '</span>';
-            rhtml += '</a>';
-         */
     },
     
     /**
@@ -556,8 +524,8 @@ var notify = {
      */
     renderContactChange: function($notificationHtml, notification) {
 
-        // Get the details
-        var action = (notification.data.c) ? notification.data.c : notification.data.u[0].c;
+        // The action 'c' will only be available if initial fetch of notifications, 'u[0].c' is used if action packet
+        var action = (typeof notification.data.c !== 'undefined') ? notification.data.c : notification.data.u[0].c;
         var className = '';
         var title = '';
 
@@ -587,15 +555,15 @@ var notify = {
     },
     
     /**
-     * Render pending contact requests
+     * Renders Updated Pending Contact (Incoming) notifications
      * @param {Object} $notificationHtml jQuery object of the notification template HTML
      * @param {Object} notification
      * @returns {Object} The HTML to be rendered for the notification
      */
     renderUpdatedPendingContactIncoming: function($notificationHtml, notification) {
         
-        // Get the details
-        var action = (notification.data.s) ? notification.data.s : notification.data.u[0].s;
+        // The action 's' will only be available if initial fetch of notifications, 'u[0].s' is used if action packet
+        var action = (typeof notification.data.s !== 'undefined') ? notification.data.s : notification.data.u[0].s;
         var className = '';
         var title = '';
 
@@ -612,6 +580,36 @@ var notify = {
             title = l[7147];      // You denied a contact request
         }
     
+        // Populate other template information
+        $notificationHtml.addClass(className);
+        $notificationHtml.find('.notification-info').text(title);
+        
+        return $notificationHtml;
+    },
+    
+    /**
+     * Renders Updated Pending Contact (Outgoing) notifications
+     * @param {Object} $notificationHtml jQuery object of the notification template HTML
+     * @param {Object} notification
+     * @returns {Object} The HTML to be rendered for the notification
+     */
+    renderUpdatedPendingContactOutgoing: function($notificationHtml, notification) {
+        
+        // The action 's' will only be available if initial fetch of notifications, 'u[0].s' is used if action packet
+        var action = (typeof notification.data.s !== 'undefined') ? notification.data.s : notification.data.u[0].s;        
+        var className = '';
+        var title = '';
+
+        // Display message depending on action
+        if (action === 2) {
+            className = 'nt-contact-accepted';
+            title = l[5852];        // Accepted your contact request
+        }
+        else if (action === 3) {
+            className = 'nt-contact-request-denied';
+            title = l[5853];        // Denied your contact request
+        }
+        
         // Populate other template information
         $notificationHtml.addClass(className);
         $notificationHtml.find('.notification-info').text(title);

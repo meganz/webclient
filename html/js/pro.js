@@ -455,7 +455,7 @@ var proPage = {
         var success = (actionPacket.r === 's') ? true : false;
         
         // Add a notification in the top bar
-        addNotification(actionPacket);
+        notify.notifyFromActionPacket(actionPacket);
         
         // If their payment was successful, redirect to account page to show new Pro Plan
         if (success) {

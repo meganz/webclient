@@ -1808,7 +1808,7 @@ function waitsc() {
     waittimeout = setTimeout(waitsc, 300000);
 
     waitxhr.onerror = function () {
-        if (d) console.error('waitsc.onerror');
+        if (d) console.log('waitsc.onerror');
 
         if (this.waitid === waitid) {
             clearTimeout(waittimeout);

@@ -4632,7 +4632,7 @@ function execsc(actionPackets, callback) {
 
                 // Only show a notification if we did not trigger the action ourselves
                 if (actionPacket.ou !== u_attr.u) {
-                    addNotification(actionPacket);
+                    notify.notifyFromActionPacket(actionPacket);
                 }
 
                 if (megaChat.isReady) {
@@ -4656,7 +4656,7 @@ function execsc(actionPackets, callback) {
             else if (actionPacket.a === 'ipc') {
                 processIPC([actionPacket]);
                 M.drawReceivedContactRequests([actionPacket]);
-                addNotification(actionPacket);
+                notify.notifyFromActionPacket(actionPacket);
             }
 
             // Pending shares
@@ -4675,7 +4675,7 @@ function execsc(actionPackets, callback) {
 
                 // If the status is accepted ('2') then this will be followed by a contact packet and we do not need to notify
                 if (actionPacket.s !== 2) {
-                    addNotification(actionPacket);
+                    notify.notifyFromActionPacket(actionPacket);
                 }
             }
             else if (actionPacket.a === 'ua') {
@@ -4766,8 +4766,8 @@ function execsc(actionPackets, callback) {
                             M.delNode(actionPacket.n);
                         }
                         if (!folderlink && actionPacket.u !== 'EXP' && fminitialized) {
-                            addShareNotification({
-                                t: 'dshare',
+                            notify.notifyFromActionPacket({
+                                a: 'dshare',
                                 n: actionPacket.n,
                                 u: actionPacket.o
                             });
@@ -4801,8 +4801,8 @@ function execsc(actionPackets, callback) {
                             }
 
                             if (!folderlink && fminitialized) {
-                                addShareNotification({
-                                    t: 'share',
+                                notify.notifyFromActionPacket({
+                                    a: 'share',
                                     n: actionPacket.n,
                                     u: actionPacket.o
                                 });
@@ -4895,8 +4895,8 @@ function execsc(actionPackets, callback) {
                         });
                     }
                 }
-                addShareNotification({
-                    t: 'put',
+                notify.notifyFromActionPacket({
+                    a: 'put',
                     n: targetid,
                     u: actionPacket.ou,
                     f: pnodes
@@ -4941,7 +4941,7 @@ function execsc(actionPackets, callback) {
 
             // Only show a notification if we did not trigger the action ourselves
             if (actionPacket.ou !== u_attr.u) {
-                addNotification(actionPacket);
+                notify.notifyFromActionPacket(actionPacket);
             }
 
             if (megaChat.isReady) {
@@ -4977,7 +4977,7 @@ function execsc(actionPackets, callback) {
         else if (actionPacket.a === 'ipc') {
             processIPC([actionPacket]);
             M.drawReceivedContactRequests([actionPacket]);
-            addNotification(actionPacket);
+            notify.notifyFromActionPacket(actionPacket);
         }
         else if (actionPacket.a === 's2') {
             processPS([actionPacket]);
@@ -4990,7 +4990,7 @@ function execsc(actionPackets, callback) {
 
             // If the status is accepted ('2') then this will be followed by a contact packet and we do not need to notify
             if (actionPacket.s !== 2) {
-                addNotification(actionPacket);
+                notify.notifyFromActionPacket(actionPacket);
             }
         }
         // Action packet to notify about payment (Payment Service Transaction Status)

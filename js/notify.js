@@ -60,7 +60,7 @@ var notify = {
                 }
                 
                 // Get the current UNIX timestamp and the last time delta (the last time the user saw a notification)
-                var currentTime = Math.round(new Date().getTime() / 1000);
+                var currentTime = notify.getCurrentTimestamp();
                 var lastTimeDelta = (result.ltd) ? result.ltd : 0;       
                 var notifications = result.c;
                 var pendingContactUsers = result.u;
@@ -95,6 +95,48 @@ var notify = {
                 notify.countAndShowNewNotifications();
             }
         }, 3);  // Channel 3
+    },
+    
+    /**
+     * Adds a notification from an Action Packet
+     * @param {Object} actionPacket The action packet object
+     */
+    notifyFromActionPacket: function(actionPacket) {
+        
+        var notification = actionPacket;                // The action packet
+        var id = makeid(10);                            // Make random ID
+        var type = notification.a;                      // Type of notification e.g. share
+        var currentTime = notify.getCurrentTimestamp(); // Get the current timestamps in seconds
+        var seen = false;                               // New notification, so mark as unread
+        var userHandle = notification.u;                // User handle e.g. new share from this user
+
+        // Add notifications to start of the list
+        notify.notifications.unshift({
+            data: notification,                         // The full notification object
+            id: id,
+            seen: seen,
+            timeDelta: 0,
+            timestamp: currentTime,
+            type: type,
+            userHandle: userHandle
+        });
+        
+        // Show the new notification icon
+        notify.countAndShowNewNotifications();
+        
+        // If the popup is open, re-render the notifications to show the latest one
+        if (notify.$popup.hasClass('active')) {
+            notify.renderNotifications();
+        }
+    },
+    
+    /**
+     * Gets the current UNIX timestamp
+     * @returns {Number} Returns an integer with the current UNIX timestamp (in seconds)
+     */
+    getCurrentTimestamp: function() {
+        
+        return Math.round(new Date().getTime() / 1000);
     },
     
     /**

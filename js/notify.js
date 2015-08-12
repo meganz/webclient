@@ -12,7 +12,7 @@ var notify = {
     notifications: [],
     
     // Number of notifications to fetch
-    numOfNotifications: 200,
+    numOfNotifications: 100,
     
     // Locally cached emails and pending contact emails
     userEmails: {},
@@ -167,16 +167,16 @@ var notify = {
     openPopup: function() {
         
         // Calculate the position of the notifications popup so it is centered beneath the notifications icon.
-        // This is dynamically calculated because sometimes the icon position can change depending on the top nav.
+        // This is dynamically calculated because sometimes the icon position can change depending on the top nav items.
         var popupPosition = notify.$popupIcon.offset().left - 40;
 
         // Set the position of the notifications popup and open it
         notify.$popup.css('left', popupPosition + 'px');
         notify.$popup.addClass('active');
         notify.$popupIcon.addClass('active');
-
+        
         // Render and show notifications currently in list
-        notify.renderNotifications();
+        notify.renderInitialNotifications();
     },
     
     /**
@@ -223,12 +223,15 @@ var notify = {
     addUserEmails: function(pendingContactUsers) {
         
         // Add the pending contact email addresses
-        for (var i = 0, length = pendingContactUsers.length; i < length; i++) {
+        if (typeof pendingContactUsers !== 'undefined') {
             
-            var userHandle = pendingContactUsers[i].u;
-            var userEmail = pendingContactUsers[i].m;
-            
-            notify.userEmails[userHandle] = userEmail;
+            for (var i = 0, length = pendingContactUsers.length; i < length; i++) {
+
+                var userHandle = pendingContactUsers[i].u;
+                var userEmail = pendingContactUsers[i].m;
+
+                notify.userEmails[userHandle] = userEmail;
+            }
         }
 
         // Add the emails from the user's list of known contacts
@@ -249,7 +252,7 @@ var notify = {
     /**
      * To do: render the notifications in the popup
      */
-    renderNotifications: function() {
+    renderInitialNotifications: function() {
         
         // Get the number of notifications
         var numOfNotifications = notify.notifications.length;
@@ -291,6 +294,7 @@ var notify = {
         // Add click handlers for various notifications
         notify.initShareClickHandler();
         notify.initPaymentClickHandler();
+        notify.initAcceptContactClickHandler();
     },
     
     /**
@@ -332,6 +336,25 @@ var notify = {
         // Redirect them to the Account History page on click
         this.$popup.find('.notification-item.nt-payment-notification').rebind('click', function() {
             document.location.hash = '#fm/account/history';
+        });
+    },
+    
+    /**
+     * If the click on Accept for a contact request, accept the contact 
+     */
+    initAcceptContactClickHandler: function() {
+        
+        // Add click handler to Accept button
+        this.$popup.find('.notification-item .notifications-button.accept').rebind('click', function() {
+            
+            var $this = $(this);
+            var pendingContactId = $this.attr('data-pending-contact-id');
+            
+            // Send the User Pending Contact Action (upca) API 2.0 request to accept the request
+            M.acceptPendingContactRequest(pendingContactId);
+
+            // Show the Accepted icon and text
+            $this.closest('.notification-item').addClass('accepted');
         });
     },
     
@@ -470,8 +493,10 @@ var notify = {
         // If this is the most recent contact request from this user
         if (mostRecentNotification) {
             
-            // If this notification also exists in the state
-            if (M.ipc[pendingContactId]) {
+            // If this IPC notification also exists in the state
+            if (typeof M.ipc[pendingContactId] === 'object') {
+                
+                console.log('zzzz', 'got here', M.ipc[pendingContactId]);
                 
                 // Show the Accept button
                 $notificationHtml.find('.notification-request-buttons').removeClass('hidden');
@@ -501,7 +526,7 @@ var notify = {
         // Populate other template information
         $notificationHtml.addClass(className);
         $notificationHtml.find('.notification-info').text(title);
-        // Todo: add pending contact id attribute and click handler
+        $notificationHtml.find('.notifications-button.accept').attr('data-pending-contact-id', pendingContactId);
         
         return $notificationHtml;
     },

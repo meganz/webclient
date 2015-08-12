@@ -1653,7 +1653,7 @@ function topmenuUI() {
             $('.top-menu-icon').width() + $('.membership-status-block').width() / 2 + 57 + 'px');
     }
     
-    // Initialise notifications
+    // Initialise notification popup and tooltip
     notify.init();
 }
 

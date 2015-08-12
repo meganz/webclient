@@ -35,8 +35,11 @@ var notify = {
         this.$popupIcon = $('.top-head .cloud-popup-icon');
         this.$popupNum = $('.top-head .notification-num');
         
-        // Init event handlers
+        // Init event handler to open popup
         notify.initNotifyIconClickHandler();
+        
+        // Recount the notifications and display red tooltip because they opened a new page within Mega
+        notify.countAndShowNewNotifications();
     },
     
     /**
@@ -176,15 +179,18 @@ var notify = {
         notify.$popupIcon.addClass('active');
         
         // Render and show notifications currently in list
-        notify.renderInitialNotifications();
+        notify.renderNotifications();
     },
     
     /**
-     * Closes the popup
+     * Closes the popup. If the popup is currently open and a) the user clicks onto a new page within Mega or b) clicks 
+     * outside of the popup then this will mark the notifications as read. If the popup is not open, then functions 
+     * like $.hideTopMenu will try to hide any popups that may be open, but in this scenario we don't want to mark the 
+     * notifications as seen/read, we want the number of new notifications to remain in the red tooltip.
      */
     closePopup: function() {
         
-        // Make sure it is actually shown (otherwise any call to $.hideTopMenu could trigger this
+        // Make sure it is actually visible (otherwise any call to $.hideTopMenu in index.js could trigger this
         if ((notify.$popup !== null) && (notify.$popup.hasClass('active'))) {
 
             // Hide the popup
@@ -193,6 +199,10 @@ var notify = {
 
             // Mark all notifications as seen seeing the popup has been opened and they have been viewed
             notify.markAllNotificationsAsSeen();
+        }
+        else {
+            // Otherwise this call probably came from $.hideTopMenu in index.js so just hide the popup
+            notify.$popup.removeClass('active');
         }
     },
     
@@ -252,7 +262,7 @@ var notify = {
     /**
      * To do: render the notifications in the popup
      */
-    renderInitialNotifications: function() {
+    renderNotifications: function() {
         
         // Get the number of notifications
         var numOfNotifications = notify.notifications.length;
@@ -269,11 +279,14 @@ var notify = {
 
         // Cache the template selector
         var $template = this.$popup.find('.notification-item.template');
+        
+        // Remove existing notifications and so they are re-rendered
+        this.$popup.find('.notification-item:not(.template)').remove();
 
         // Loop through all the notifications
         for (var i = 0; i < numOfNotifications; i++) {
             
-            // Get the notification data and clone the template
+            // Get the notification data and clone the notification template in /html/top.html
             var notification = notify.notifications[i];
             var $notificationHtml = $template.clone();
             
@@ -414,6 +427,12 @@ var notify = {
             case 'ipc':
                 $notificationHtml = notify.renderIncomingPendingContact($notificationHtml, notification, userEmail);
                 break;
+            case 'c':
+                $notificationHtml = notify.renderContactChange($notificationHtml, notification);
+                break;
+            case 'upci':
+                $notificationHtml = notify.renderUpdatedPendingContactIncoming($notificationHtml, notification, userEmail);
+                break;
             case 'share':
                 $notificationHtml = notify.renderNewShare($notificationHtml, notification, userEmail);
                 break;
@@ -496,8 +515,6 @@ var notify = {
             // If this IPC notification also exists in the state
             if (typeof M.ipc[pendingContactId] === 'object') {
                 
-                console.log('zzzz', 'got here', M.ipc[pendingContactId]);
-                
                 // Show the Accept button
                 $notificationHtml.find('.notification-request-buttons').removeClass('hidden');
             }
@@ -527,6 +544,77 @@ var notify = {
         $notificationHtml.addClass(className);
         $notificationHtml.find('.notification-info').text(title);
         $notificationHtml.find('.notifications-button.accept').attr('data-pending-contact-id', pendingContactId);
+        
+        return $notificationHtml;
+    },
+    
+    /**
+     * Renders notifications related to contact changes
+     * @param {Object} $notificationHtml jQuery object of the notification template HTML
+     * @param {Object} notification
+     * @returns {Object} The HTML to be rendered for the notification
+     */
+    renderContactChange: function($notificationHtml, notification) {
+
+        // Get the details
+        var action = (notification.data.c) ? notification.data.c : notification.data.u[0].c;
+        var className = '';
+        var title = '';
+
+        // If the user deleted the request
+        if (action === 0) {
+            className = 'nt-contact-deleted';
+            title = l[7146];        // Deleted you as a contact
+        }
+        else if (action === 1) {
+            className = 'nt-contact-accepted';
+            title = l[7145];        // You are now both contacts
+        }
+        else if (action === 2) {
+            className = 'nt-contact-deleted';
+            title = l[7144];        // Account has been deleted/deactivated
+        }
+        else if (action === 3) {
+            className = 'nt-contact-request-blocked';
+            title = l[7143];        // Blocked you as a contact
+        }
+        
+        // Populate other template information
+        $notificationHtml.addClass(className);
+        $notificationHtml.find('.notification-info').text(title);
+        
+        return $notificationHtml;
+    },
+    
+    /**
+     * Render pending contact requests
+     * @param {Object} $notificationHtml jQuery object of the notification template HTML
+     * @param {Object} notification
+     * @returns {Object} The HTML to be rendered for the notification
+     */
+    renderUpdatedPendingContactIncoming: function($notificationHtml, notification) {
+        
+        // Get the details
+        var action = (notification.data.s) ? notification.data.s : notification.data.u[0].s;
+        var className = '';
+        var title = '';
+
+        if (action === 1) {
+            className = 'nt-contact-request-ignored';
+            title = l[7149];      // You ignored a contact request
+        }
+        else if (action === 2) {
+            className = 'nt-contact-accepted';
+            title = l[7148];      // You accepted a contact request
+        }
+        else if (action === 3) {
+            className = 'nt-contact-request-denied';
+            title = l[7147];      // You denied a contact request
+        }
+    
+        // Populate other template information
+        $notificationHtml.addClass(className);
+        $notificationHtml.find('.notification-info').text(title);
         
         return $notificationHtml;
     },

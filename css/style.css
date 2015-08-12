@@ -23607,6 +23607,9 @@ a.voucher-reseller-link {
 	margin: -172px 0 0 0;
 	z-index: 2200;
 }
+.feedback-result-pad {
+	margin: -152px 0 0 0;
+}
 .payment-rusult-header, .payment-result-txt {
 	font-size: 32px;
 	font-family: 'source_sans_prolight';

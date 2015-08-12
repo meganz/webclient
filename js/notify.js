@@ -335,6 +335,9 @@ var notify = {
             // Get the folder ID from the HTML5 data attribute
             var folderId = $(this).attr('data-folder-id');
             
+            // Mark all notifications as seen (because they clicked on a notification within the popup)
+            notify.markAllNotificationsAsSeen();
+            
             // Open the folder
             M.openFolder(folderId);
             reselect(true);
@@ -346,8 +349,13 @@ var notify = {
      */
     initPaymentClickHandler: function() {
         
-        // Redirect them to the Account History page on click
+        // On payment notification click
         this.$popup.find('.notification-item.nt-payment-notification').rebind('click', function() {
+            
+            // Mark all notifications as seen (because they clicked on a notification within the popup)
+            notify.markAllNotificationsAsSeen();
+            
+            // Redirect to payment history
             document.location.hash = '#fm/account/history';
         });
     },
@@ -368,6 +376,9 @@ var notify = {
 
             // Show the Accepted icon and text
             $this.closest('.notification-item').addClass('accepted');
+            
+            // Mark all notifications as seen (because they clicked on a notification within the popup)
+            notify.markAllNotificationsAsSeen();
         });
     },
     

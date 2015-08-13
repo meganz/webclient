@@ -125,12 +125,19 @@
 
             self.$textarea = $('textarea', self.$dialog);
             self.$textarea
-                .val('')
+                .val('');
+            
+            $('.collected-data', self.$dialog)
+                .html('');
 
-            $('.feedback-button-send, .feedback-button-cancel', self.$dialog).addClass('disabled');
+            $('.feedback-button-send, .feedback-button-cancel', self.$dialog)
+                .addClass('disabled');
 
             $('.feedback-dialog-body').removeClass('hidden');
             $('.feedback-result-pad').addClass('hidden');
+
+            $('.collected-data', self.$dialog)
+                .html('');
 
             $('.stats .checkdiv').rebind('onFakeCheckboxChange.feedbackDialog', function(e, val) {
                 if (val === true) {
@@ -155,7 +162,6 @@
                 .attr('checked', false)
                 .trigger('change');
                 
-            $('.feedback-dialog-input').addClass('hidden');
         });
 
         self.bind("onHide", function() {
@@ -166,13 +172,16 @@
     };
 
     FeedbackDialog.prototype._initGenericEvents = function() {
-        var self = this;
+        var self = this,
+            collectedData,
+            renderTimer;
+
         $('.rating a', self.$dialog).rebind('click.feedbackDialog', function() {
             $('.rating a', self.$dialog)
                 .removeClass('active colored');
 
             $(this).addClass('active').prevAll().addClass('colored');
-                
+
             $('.feedback-button-send, .feedback-button-cancel', self.$dialog).removeClass('disabled');
         });
 
@@ -237,12 +246,17 @@
                 });
             }
 
-            $('.collected-data', dialog.$dialog).html(
-                '<li>' + JSON.stringify(self._report, null, 2).replace(/\n/g, '</li> <li>')
-            );
-            
             dialog.show();
-            $('.collected-data-textarea').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5,animateScroll: true});
+            
+            collectedData = '<li>' + JSON.stringify(self._report, null, 2).replace(/\n/g, '</li> <li>');
+            $('.collected-data', dialog.$dialog).html(collectedData);
+            
+            // Content render fix for correct scrolling
+            var renderTimer = setInterval(function(){
+                    $('.collected-data-textarea').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5,animateScroll: true});
+                    clearInterval(renderTimer);
+            }, 200);
+
         });
 
         mega.ui.Dialog.prototype._initGenericEvents.apply(self);

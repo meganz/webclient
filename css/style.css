@@ -15484,9 +15484,9 @@ div.membership-bott-button {
 	line-height: 36px;
 }
 .new-download-red-button {
-	background-position: -2px -1383px;
-	color: #777777;
-	font-size: 13px;
+    background-position: -2px -1423px;
+	color: #2BA6DE;
+	font-size: 14px;
 	line-height: 34px;
 	padding: 0 0 0 36px;
 	cursor: pointer;
@@ -15494,8 +15494,8 @@ div.membership-bott-button {
 	margin-top: 12px;
 }
 .new-download-red-button:hover {
-	color: #2BA6DE;
-	background-position: -2px -1423px;
+    background-position: -2px -1383px;
+	color: #777;
 }
 .new-download-gray-button {
 	background-color: rgba(102,102,102,1);
@@ -18953,6 +18953,64 @@ h1.help-home-header {
 .arrow.desc {
 	background-position: right -1286px;
 }
+
+/* MegaSync dialog */
+.fm-dialog.download-megasync-dialog {
+    margin: -154px 0 0 -265px;
+    width: auto;
+}
+.download-megasync-dialog .content {
+    text-align: center;
+    padding: 10px;
+}
+.download-megasync-dialog .button {
+    border: 2px solid #d9d9d9;
+    border-radius: 4px;
+    display: inline-block;
+    margin: 30px 25px 25px;
+    position: relative;
+}
+.download-megasync-dialog .button:hover {
+    background-color: #b2b2b2;
+    border: 2px solid #fff;
+}
+.download-megasync-dialog .icon {
+    background-image: url("../images/mega/sync-nw-v3.png");
+    background-position: -15px -1150px;
+    background-repeat: no-repeat;
+    display: block;
+    height: 50px;
+    left: 10px;
+    position: absolute;
+    top: 5px;
+    width: 50px;
+}
+.download-megasync-dialog .button:hover .icon {
+    background-position: -15px -1199px;
+}
+.download-megasync-dialog .button-txt {
+    color: #777;
+    display: block;
+    font-family: "source_sans_prosemibold",Arial;
+    font-size: 14px;
+    line-height: 60px;
+    margin-left: 70px;
+    margin-right: 15px;
+    text-transform: capitalize;
+}
+.download-megasync-dialog .button:hover .button-txt {
+    color: #fff;
+}
+.download-megasync-dialog .txt {
+    color: #777;
+    font-size: 14px;
+    line-height: 24px;
+    margin: 20px 25px 0;
+    max-width: 477px;
+    padding: 0;
+    text-align: left;
+}
+
 .ff-extension-icon {
 	float: left;
 	width: 140px;
@@ -19143,7 +19201,7 @@ a.ff-extension-button:hover {
 .sync-top-logo {
 	width: 160px;
 	height: 42px;
-	background-image: url(../images/mega/sync_nw2.png?v=1);
+	background-image: url(../images/mega/sync-nw-v3.png);
 	background-position: center 1px;
 	background-repeat: no-repeat;
 	margin: 38px auto 26px auto;
@@ -19198,7 +19256,7 @@ a.ff-extension-button:hover {
 	margin: 0;
 	padding: 7px 0 7px 25px;
 	line-height: 28px;
-	background-image: url(../images/mega/sync_nw2.png?v=1);
+	background-image: url(../images/mega/sync-nw-v3.png);
 	background-position: left -128px;
 	background-repeat: no-repeat;
 }
@@ -19222,7 +19280,7 @@ a.ff-extension-button:hover {
 	border-left: 0;
 }
 .sync-help-center {
-	background-image: url(../images/mega/sync_nw2.png?v=1);
+	background-image: url(../images/mega/sync-nw-v3.png);
 	background-position: center -352px;
 	background-repeat: no-repeat;
 	text-align: center;
@@ -24183,7 +24241,7 @@ background-image: url(../images/mega/slideshow-sprite@2x.png?v=1);
  background-size: 200px auto;
 }
 .sync-top-logo, .sync-short-block li, .sync-help-center {
- background-image: url(../images/mega/sync_nw2@2x.png?v=1);
+ background-image: url(../images/mega/sync-nw-v3@2x.png);
  background-size: 168px auto;
 }
 .sync-main-img {
@@ -24201,6 +24259,10 @@ background-size:27px auto;
 .ff-extension-icon, .ff-extension-button {
  background-image: url(../images/mega/firefox-sprite@2x.png);
 background-size: 90px auto;
+}
+.download-megasync-dialog .icon {
+    background-image: url(../images/mega/sync-nw-v3@2x.png);
+    background-size: 168px auto;
 }
 .st-green-note {
  background-image: url(../images/mega/en/start-green-note@2x.png);

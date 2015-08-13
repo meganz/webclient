@@ -54,7 +54,7 @@ if(window.location.hostname == "beta.mega.nz"/* || window.location.hostname == "
             report.tp = $.transferprogress;
             report.id = ids.join(",");
             report.ud = uds;
-            report.karereState = self.megaChat.karere.getConnectionState();
+            report.karereState = (typeof self.megaChat !== 'undefined') ? self.megaChat.karere.getConnectionState() : null;
             report.myPresence = self.megaChat.karere.getPresence(self.megaChat.karere.getJid());
             report.karereServer = self.megaChat.karere.connection.service;
             report.numOpenedChats = Object.keys(self.megaChat.chats).length;

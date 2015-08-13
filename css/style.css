@@ -16609,6 +16609,22 @@ span.browsers-update {
 	font-family: 'source_sans_prosemibold';
 	white-space: nowrap;
 }
+.ff-bottom-block .sync-button-txt {
+    color: #777777;
+    font-family: "source_sans_prosemibold";
+    font-size: 17px;
+    line-height: 15px;
+    padding-left: 70px;
+    white-space: nowrap;
+}
+.ff-bottom-block .url {
+    color: #777;
+    display: block;
+    font-size: 12px;
+    font-weight: bold;
+    margin-left: 59px;
+    text-align: center;
+}
 .sync-button-txt.small {
 	font-size: 13px;
 	line-height: 20px;

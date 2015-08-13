@@ -1310,49 +1310,65 @@
 </div>
 
 
-<div class="fm-dialog fm-mega-dialog feedback-dialog filled-input hidden">
-    <div class="fm-dialog-close"></div>
-    <div class="nw-fm-dialog-title"></div>
-    <div class="fm-mega-dialog-pad">
-        <div class="fm-dialog-contents">
-            <div class="content">
+<div class="fm-dialog fm-mega-dialog feedback-dialog hidden">
+    <div class="overlay-close">
+        <div class="fm-dialog-close overlay-close-icon"></div>
+        <span>or Esc</span>
+    </div>
+    <div class="feedback-dialog-body">
+    	<div class="feedback-dialog-header">How do you rate your experience with MEGA?</div>
+        <div class="fm-mega-dialog-pad">
                 <div class="rating">
-                    <a href="javascript:;" class="rate unhappy">
-                    </a>
-                    <a href="javascript:;" class="rate neutral">
-                    </a>
-                    <a href="javascript:;" class="rate happy">
-                    </a>
-                    <a href="javascript:;" class="rate awesome">
-                    </a>
+                    <a class="unhappy"></a>
+                    <a class="sad"></a>
+                    <a class="neutral"></a>
+                    <a class="happy"></a>
+                    <a class="awesome"></a>
+                    <div class="clear"></div>
                 </div>
-                <textarea name="feedback" type="text" placeholder="(Optional) You can type here your thoughts on how we can make your experience better"></textarea>
-
+                <div class="feedback-dialog-textarea">
+                	<div class="feedback-dialog-scr">
+                		<textarea name="feedback" placeholder="Your message here… (optional)"></textarea>
+                        <div class="feedback-dialog-hidden"></div>
+                    </div>
+                </div>
                 <div class="reply">
-                    <div class="checkdiv checkboxOff">
-                        <input type="checkbox" name="contact_me" id="contact_me" />
+                	<div class="feedback-label-txt">
+                        <div class="checkdiv checkboxOff">
+                            <input type="checkbox" name="contact_me" id="contact_me" />
+                        </div>
+                    
+                    	<label for="contact_me" class="radio-txt">I’m happy to share my email for future communication related to my feedback</label>
                     </div>
-                    <label for="contact_me" class="radio-txt">[$6983]</label>
+                    <div class="clear"></div>
                 </div>
-
+                <div class="feedback-dialog-input hidden">
+                	<input name="feedback-email" type="text" placeholder="email@domain.com" />
+                </div>
                 <div class="stats">
-                    <div class="checkdiv checkboxOff">
-                        <input type="checkbox" name="send_stats" id="send_stats" />
-                    </div>
-                    <label for="send_stats" class="radio-txt">
-                        [$6945]
-                        <span class="membership-question stats-button">
-                                            ?
+                	<div class="feedback-label-txt">
+                        <div class="checkdiv checkboxOff">
+                            <input type="checkbox" name="send_stats" id="send_stats" />
+                        </div>
+                    
+                        <label for="send_stats" class="radio-txt">
+                            [$6945]
+                        </label>
+                    	<span class="membership-question stats-button">
                             <span class="membership-notification">
                                 <span>Click here to see <strong>exactly the same</strong> information that will be sent to our servers.</span>
                                 <span class="membership-arrow"></span>
                             </span>
                         </span>
-                    </label>
-                    
+                    </div>
+                    <div class="clear"></div>
                 </div>
-            </div>
         </div>
+    </div>
+    <div class="feedback-result-pad hidden">
+        <div class="payment-rusult-header">Thank you for your feedback!</div>
+        <div class="payment-result-icon"></div>
+        <div class="feedback-result-button">[$148]</div>
     </div>
 </div>
 
@@ -1363,8 +1379,11 @@
     <div class="fm-mega-dialog-pad">
         <div class="fm-dialog-contents">
             <div class="content">
-                <label>[$6857]</label>
-                <textarea name="data" type="text" readonly="1"></textarea>
+                <div class="collected-data-textarea">
+                    <ul class="collected-data">
+                            
+                    </ul>
+                </div>
             </div>
         </div>
     </div>

@@ -3641,5 +3641,6 @@
     "7232": "\u62d6\u653e\u4e0b\u8f09\u7684\u6a94\u6848\u5230\u700f\u89bd\u5668\uff0c\u5e76\u78ba\u8a8d\u5b89\u88dd\u3002",
     "7233": "Transaction could not be initiated due to connection problems. If the problem persists, please contact support@mega.co.nz",
     "7234": "Something has gone wrong and we were unable to charge your card.",
-    "7235": "Payment Failed"
+    "7235": "Payment Failed",
+    "7236": "To download files larger than 1GB or to upload folders, please install our MEGAsync client. This will allow easy, automated syncing between your computer and your MEGA cloud drive."
 }

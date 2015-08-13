@@ -77,27 +77,27 @@ function dl_g(res) {
             {
                 ulQueue.pause();
                 dlQueue.pause();
-                ui_paused = true;
+                uldl_hold = true;
                 $(this).addClass('active');
             }
             else
             {
                 dlQueue.resume();
                 ulQueue.resume();
-                ui_paused = false;
+                uldl_hold = false;
                 $(this).removeClass('active');
             }
         });
         $('.new-download-sync-app').rebind('click', function(e) {
-			$('.megasync-overlay').removeClass('downloading');
+            $('.megasync-overlay').removeClass('downloading');
             megasync.download(dlpage_ph, dlpage_key);
         });
         
         $('.new-download-red-button, .regular-download').rebind('click', function() {
             
-            if (dlMethod == MemoryIO && !localStorage.firefoxDialog && fdl_filesize > 1048576000 && navigator.userAgent.indexOf('Firefox') > -1)
+            if (dlMethod == MemoryIO && !localStorage.megaSyncDialog && fdl_filesize > 1048576000 && navigator.userAgent.indexOf('Firefox') > -1)
             {
-                firefoxDialog();
+                megaSyncDialog();
             }
             else if ((('-ms-scroll-limit' in document.documentElement.style && '-ms-ime-align' in document.documentElement.style)
             || (navigator.userAgent.indexOf('MSIE 10') > -1)
@@ -108,7 +108,7 @@ function dl_g(res) {
             }
             else
             {
-                downloading = true;
+                dlmanager.isDownloading = true;
                 dl_queue.push(fdl_queue_var);
                 $('.download-mid-centered-block').addClass('downloading');
                 $.dlhash = window.location.hash;
@@ -179,7 +179,7 @@ function closedlpopup()
 }
 
 function importFile() {
-    
+
     api_req({
         a: 'p',
         t: M.RootID,
@@ -263,16 +263,16 @@ function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
 
 function dlstart(id,name,filesize)
 {
-    downloading = true;
+    dlmanager.isDownloading = true;
 }
 
 function start_import()
 {
     dl_import = dlpage_ph;
-    
+
     if (u_type) {
         document.location.hash = 'fm';
-        
+
         if (fminitialized) {
             importFile();
         }
@@ -339,7 +339,7 @@ function dlcomplete(id)
     }
     var a=0;
     for(var i in dl_queue) if (typeof dl_queue[i] == 'object' && dl_queue[i]['dl_id']) a++;
-    if (a < 2 && !ul_uploading)
+    if (a < 2 && !ulmanager.isUploading)
     {
         $('.widget-block').fadeOut('slow',function(e)
         {
@@ -349,7 +349,7 @@ function dlcomplete(id)
     }
     else if (a < 2) $('.widget-icon.downloading').addClass('hidden');
     else $('.widget-circle').attr('class','widget-circle percents-0');
-    Soon(resetUploadDownload);
+    Soon(mega.utils.resetUploadDownload);
 }
 
 function sync_switchOS(os)

@@ -457,8 +457,13 @@ ChatRoom.prototype._retrieveTurnServerFromLoadBalancer = function() {
             if (r.turn && r.turn.length > 0) {
                 var servers = [];
                 r.turn.forEach(function(v) {
+                    var transport = v.transport;
+                    if (!transport) {
+                        transport = "udp";
+                    }
+
                     servers.push({
-                        url: 'turn:' + v.host + ':' + v.port + '?transport=udp',
+                        url: 'turn:' + v.host + ':' + v.port + '?transport=' + transport,
                         username: "inoo20jdnH",
                         credential: '02nNKDBkkS'
                     });

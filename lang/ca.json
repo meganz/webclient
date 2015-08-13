@@ -3639,7 +3639,8 @@
     "7230": "Gran",
     "7231": "El preu no inclou el cost de la transacci\u00f3 en Bitcoins.",
     "7232": "Arrossega el fitxer descarregat al navegador i confirma la instal\u00b7laci\u00f3.",
-    "7233": "Transaction could not be initiated due to connection problems. If the problem persists, please contact support@mega.co.nz",
-    "7234": "Something has gone wrong and we were unable to charge your card.",
-    "7235": "Payment Failed"
+    "7233": "No s'ha pogut iniciar la transacci\u00f3 per problemes de connexi\u00f3. Si el problema persisteix, si us plau, contacta amb support@mega.co.nz",
+    "7234": "Quelcom ha anat malament i no podem fer c\u00e0rrecs a la teva targeta.",
+    "7235": "Pagament fallit",
+    "7236": "To download files larger than 1GB or to upload folders, please install our MEGAsync client. This will allow easy, automated syncing between your computer and your MEGA cloud drive."
 }

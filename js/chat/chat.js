@@ -4,7 +4,7 @@
  * @type {boolean}
  */
 var megaChatIsDisabled = function() {
-    return typeof(localStorage.chatDisabled) === "undefined" || localStorage.chatDisabled === "0" ? false : true;
+    return typeof localStorage.chatDisabled === "undefined" || localStorage.chatDisabled === "0" ? false : true;
 };
 
 
@@ -1599,7 +1599,7 @@ Chat.prototype._onUsersUpdate = function(type, e, eventObject) {
                         room.state === ChatRoom.STATE.WAITING_FOR_PARTICIPANTS || room.state === ChatRoom.STATE.JOINING
                     )
                 ) {
-                    if (room._conv_ended === true || typeof(room._conv_ended) === 'undefined') {
+                    if (room._conv_ended === true || typeof room._conv_ended === 'undefined') {
                         room._conversationStarted(room.getParticipantsExceptMe()[0]);
                     }
                 }
@@ -1634,7 +1634,7 @@ Chat.prototype._onUsersUpdate = function(type, e, eventObject) {
             room = self.chats[eventObject.getRoomJid()];
             if (room) {
                 if (room._waitingForOtherParticipants() === false && room.state === ChatRoom.STATE.WAITING_FOR_PARTICIPANTS) {
-                    if (room._conv_ended === true || typeof(room._conv_ended) === 'undefined') {
+                    if (room._conv_ended === true || typeof room._conv_ended === 'undefined') {
                         room._conversationStarted(eventObject.getFromJid());
                     } else {
                         if (room.state === ChatRoom.STATE.WAITING_FOR_PARTICIPANTS) {

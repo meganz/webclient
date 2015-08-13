@@ -888,7 +888,7 @@ makeMetaAware(Karere);
      * @private
      */
     Karere.prototype._generateNewIdx = function() {
-        if (typeof(localStorage.karereIdx) === "undefined") {
+        if (typeof localStorage.karereIdx === "undefined") {
             localStorage.karereIdx = 0;
         }
         else {
@@ -1362,7 +1362,7 @@ makeMetaAware(Karere);
                 eventData['status'] = $(status[0]).text();
             }
 
-            if (typeof(eventData['show']) === "undefined" && typeof(eventData['status']) === "undefined") {
+            if (typeof eventData['show'] === "undefined" && typeof eventData['status'] === "undefined") {
                 // is handled in the onPresence in Karere
             }
 

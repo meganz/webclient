@@ -1605,7 +1605,7 @@ ChatRoom.prototype.sendMessagesSyncResponse = function(request) {
         // remove Non-Plain Objects from messages
         $.each(messages, function(k, v) {
             $.each(v, function(prop, val) {
-                if (typeof(val) === "object" && !$.isPlainObject(val)) {
+                if (typeof val === "object" && !$.isPlainObject(val)) {
                     delete messages[k][prop];
                 }
             });

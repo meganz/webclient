@@ -640,7 +640,8 @@ function mDBstart(aSlave) {
 }
 
 function mDBadd(t, n) {
-    if (mFileManagerDB.state !== mFileManagerDB.STATE_READY) {
+    if (mFileManagerDB.state !== mFileManagerDB.STATE_WORKING
+            && mFileManagerDB.state !== mFileManagerDB.STATE_READY) {
         console.warn('Invalid fmdb state', mFileManagerDB.state);
         localStorage['fmdblock_' + u_handle] = 0xBADF;
         return;
@@ -676,7 +677,8 @@ function mDBadd(t, n) {
 }
 
 function mDBdel(t, id) {
-    if (mFileManagerDB.state !== mFileManagerDB.STATE_READY) {
+    if (mFileManagerDB.state !== mFileManagerDB.STATE_WORKING
+            && mFileManagerDB.state !== mFileManagerDB.STATE_READY) {
         console.warn('Invalid fmdb state', mFileManagerDB.state);
         localStorage['fmdblock_' + u_handle] = 0xBADF;
     }

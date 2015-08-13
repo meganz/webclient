@@ -47,7 +47,19 @@ function dl_g(res) {
     
     // Show ad if enabled
     megaAds.ad = res.ad;
+    megaAds.popAd = res.popad;
     megaAds.showAds($('#ads-block-frame'));
+
+    // If 'msd' (MegaSync download) flag is turned off via the API then hide the download with MEGAsync button.
+    if (res.msd === 0) {
+        megasync.isInstalled(function(err, is) {
+            if (err || !is) {
+                $('.new-download-sync-app').addClass('hidden');
+                $('.regular-download').removeClass('hidden');
+                $('.new-download-red-button').addClass('hidden');
+            }
+        });
+    }
 
     $('.widget-block').addClass('hidden');
     loadingDialog.hide();
@@ -65,38 +77,38 @@ function dl_g(res) {
             {
                 ulQueue.pause();
                 dlQueue.pause();
-                ui_paused = true;
+                uldl_hold = true;
                 $(this).addClass('active');
             }
             else
             {
                 dlQueue.resume();
                 ulQueue.resume();
-                ui_paused = false;
+                uldl_hold = false;
                 $(this).removeClass('active');
             }
         });
         $('.new-download-sync-app').rebind('click', function(e) {
-			$('.megasync-overlay').removeClass('downloading');
+            $('.megasync-overlay').removeClass('downloading');
             megasync.download(dlpage_ph, dlpage_key);
         });
-        $('.new-download-red-button').unbind('click');
-        $('.new-download-red-button').bind('click',function(e)
-        {
-            if (dlMethod == MemoryIO && !localStorage.firefoxDialog && fdl_filesize > 1048576000 && navigator.userAgent.indexOf('Firefox') > -1)
+        
+        $('.new-download-red-button, .regular-download').rebind('click', function() {
+            
+            if (dlMethod == MemoryIO && !localStorage.megaSyncDialog && fdl_filesize > 1048576000 && navigator.userAgent.indexOf('Firefox') > -1)
             {
-                firefoxDialog();
+                megaSyncDialog();
             }
             else if ((('-ms-scroll-limit' in document.documentElement.style && '-ms-ime-align' in document.documentElement.style)
             || (navigator.userAgent.indexOf('MSIE 10') > -1)
             || ((navigator.userAgent.indexOf('Safari') > -1) && (navigator.userAgent.indexOf('Chrome') == -1)))
             && fdl_filesize > 1048576000 && !localStorage.browserDialog)
             {
-              browserDialog();
+                browserDialog();
             }
             else
             {
-                downloading = true;
+                dlmanager.isDownloading = true;
                 dl_queue.push(fdl_queue_var);
                 $('.download-mid-centered-block').addClass('downloading');
                 $.dlhash = window.location.hash;
@@ -167,7 +179,7 @@ function closedlpopup()
 }
 
 function importFile() {
-    
+
     api_req({
         a: 'p',
         t: M.RootID,
@@ -251,16 +263,16 @@ function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
 
 function dlstart(id,name,filesize)
 {
-    downloading = true;
+    dlmanager.isDownloading = true;
 }
 
 function start_import()
 {
     dl_import = dlpage_ph;
-    
+
     if (u_type) {
         document.location.hash = 'fm';
-        
+
         if (fminitialized) {
             importFile();
         }
@@ -327,7 +339,7 @@ function dlcomplete(id)
     }
     var a=0;
     for(var i in dl_queue) if (typeof dl_queue[i] == 'object' && dl_queue[i]['dl_id']) a++;
-    if (a < 2 && !ul_uploading)
+    if (a < 2 && !ulmanager.isUploading)
     {
         $('.widget-block').fadeOut('slow',function(e)
         {
@@ -337,7 +349,7 @@ function dlcomplete(id)
     }
     else if (a < 2) $('.widget-icon.downloading').addClass('hidden');
     else $('.widget-circle').attr('class','widget-circle percents-0');
-    Soon(resetUploadDownload);
+    Soon(mega.utils.resetUploadDownload);
 }
 
 function sync_switchOS(os)
@@ -405,11 +417,19 @@ var megaAds = {
     // Set to an ad object containing src and other info if we should display an ad
     ad: false,
 
+    // Set to a list of urls for potential popunder ads
+    popAd: false,
+
     /**
      * Initialise the HTML for ads
      */
     init: function() {
         
+        if (this.popAd) {
+            popunda.megaPopunder.popurls = this.popAd;
+            popunda.megaPopunder.init($(".new-download-buttons"));
+        }
+
         // Remove any previous ad containers
         $('#ads-block-frame, ads-block-header').remove();
         

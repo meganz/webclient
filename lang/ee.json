@@ -3625,5 +3625,22 @@
     "7216": "Failide laadimine",
     "7217": "OSTA KONTOL OLEVA SUMMAGA",
     "7218": "Eemalda edastus",
-    "7219": "Mobile"
+    "7219": "Mobiil",
+    "7220": "Edastuste j\u00e4rjekorda lisati <span>XX<\/span> allalaadimist",
+    "7221": "Edastuste j\u00e4rjekorda lisati <span>XX<\/span> \u00fcleslaadimist",
+    "7222": "Edastuste j\u00e4rjekorda lisati \u00fcks allalaadimine",
+    "7223": "Edastuste j\u00e4rjekorda lisati \u00fcks \u00fcleslaadimine",
+    "7224": "N\u00e4ita",
+    "7225": "Olete k\u00f5ikide edastuste eemaldamises kindel?",
+    "7226": "Pr\u00fcgikasti puhastamisgraafik:",
+    "7227": "J\u00e4rjekorras",
+    "7228": "Fondi suurus:",
+    "7229": "V\u00e4ike",
+    "7230": "Suur",
+    "7231": "Hind ei sisalda Bitcoini makse teenustasu.",
+    "7232": "Lohistage ja asetage allalaetud fail veebilehitsejasse ja kinnitage paigaldus.",
+    "7233": "Makse sooritamine eba\u00f5nnestus \u00fchendusprobleemide t\u00f5ttu. Probleemi uuesti ilmnemise korral v\u00f5tke \u00fchendust aadressil support@mega.co.nz",
+    "7234": "Midagi l\u00e4ks valesti ja me ei suutnud Teie kaardilt raha v\u00f5tta.",
+    "7235": "Makse eba\u00f5nnestus",
+    "7236": "To download files larger than 1GB or to upload folders, please install our MEGAsync client. This will allow easy, automated syncing between your computer and your MEGA cloud drive."
 }

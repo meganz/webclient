@@ -277,7 +277,9 @@ MegaSync.prototype.handle_v = function(version) {
     this._version = version;
     if (this._lastDownload) {
         this.download(this._lastDownload[0], this._lastDownload[1]);
+        this._lastDownload = null;
     }
+    
 };
 
 MegaSync.prototype.download = function(pubkey, privkey) {
@@ -286,12 +288,15 @@ MegaSync.prototype.download = function(pubkey, privkey) {
     return true;
 };
 
-MegaSync.prototype._onError = function() {
+MegaSync.prototype._onError = function(next, e) {
     this._enabled = false;
+    next = (typeof next === "function") ? next : function() {};
+    next(e || new Error("Internal error"));
     return this.downloadClient();
 };
 
-MegaSync.prototype.handle = function(response) {
+MegaSync.prototype.handle = function(next, response) {
+    next = (typeof next === "function") ? next : function() {};
     if (response === 0) {
         // alright!
         clearInterval(this._retryTimer);
@@ -300,20 +305,24 @@ MegaSync.prototype.handle = function(response) {
     }
 
     if (typeof response !== "object") {
+        next(new Error("Internal error"));
         return this._onError();
     }
 
     for (var i in response) {
         this['handle_' + i](response[i]);
+        next(null, response[i]);
     }
 };
 
-MegaSync.prototype._api = function(args) {
-    $.post(this._url, JSON.stringify(args), this.handle.bind(this), "json")
-        .fail(this._onError.bind(this));
+MegaSync.prototype._api = function(args, next) {
+    $.post(this._url, JSON.stringify(args), this.handle.bind(this, next), "json")
+        .fail(this._onError.bind(this, next));
 };
 
-
+MegaSync.prototype.isInstalled = function(next) {
+    this._api({a: "v"}, next);
+};
 
 MegaSync.prototype.downloadClient = function() {
     if (!this._lastDownload){
@@ -333,7 +342,7 @@ MegaSync.prototype.downloadClient = function() {
             return clearInterval(this._retryTimer);
         }
         this._api({a: "v"});
-    }).bind(this), 500);
+    }).bind(this), 1000);
     overlay.show().addClass('downloading');
     
     $('.megasync-close').rebind('click', function(e) {

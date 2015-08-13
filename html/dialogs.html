@@ -733,7 +733,7 @@
             <div class="ff-extension-txt">
                 Please install our extension for improved download performance and added security. Unfortunately, there is a <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=939510" class="red" target="_blank" rel="noreferrer">bug</a> in the current version of Firefox that will cause excessive memory consumption during and after large downloads.
             </div>
-            <a href="https://mega.co.nz/mega.xpi" class="ff-extension-button">
+            <a href="https://mega.nz/meganz.xpi" class="ff-extension-button">
                 [$1178]
             </a>
             <div class="clear"></div>
@@ -743,6 +743,31 @@
     <div class="fm-notifications-bottom">
         <div class="checkboxOff"> <input type="checkbox" name="firefox-checkbox" id="firefox-checkbox" class="checkboxOff"> </div>
         <label for="firefox-checkbox" class="radio-txt">[$229]</label> 
+        <div class="fm-dialog-button close-button">
+            <span>[$148]</span>
+        </div>
+        <div class="clear"></div>
+    </div>
+</div>
+
+<div class="fm-dialog download-megasync-dialog hidden">
+    <div class="fm-dialog-header">
+        <div class="fm-dialog-title">[$1626]</div>
+        <div class="fm-dialog-close"></div>
+        <div class="clear"></div>
+    </div>
+    <div class="content">
+        <div class="txt">[$7236]</div>
+        <a class="button" href="#sync">
+            <span class="icon"></span>
+            <span class="button-txt">[$5565] [$1626]</span>
+        </a>
+    </div>
+    <div class="fm-notifications-bottom">
+        <div class="checkboxOff">
+            <input type="checkbox" name="megasync-checkbox" id="megasync-checkbox" class="checkboxOff">
+        </div>
+        <label for="megasync-checkbox" class="radio-txt">[$229]</label> 
         <div class="fm-dialog-button close-button">
             <span>[$148]</span>
         </div>
@@ -1285,49 +1310,65 @@
 </div>
 
 
-<div class="fm-dialog fm-mega-dialog feedback-dialog filled-input hidden">
-    <div class="fm-dialog-close"></div>
-    <div class="nw-fm-dialog-title"></div>
-    <div class="fm-mega-dialog-pad">
-        <div class="fm-dialog-contents">
-            <div class="content">
+<div class="fm-dialog fm-mega-dialog feedback-dialog hidden">
+    <div class="overlay-close">
+        <div class="fm-dialog-close overlay-close-icon"></div>
+        <span>or Esc</span>
+    </div>
+    <div class="feedback-dialog-body">
+    	<div class="feedback-dialog-header">How do you rate your experience with MEGA?</div>
+        <div class="fm-mega-dialog-pad">
                 <div class="rating">
-                    <a href="javascript:;" class="rate unhappy">
-                    </a>
-                    <a href="javascript:;" class="rate neutral">
-                    </a>
-                    <a href="javascript:;" class="rate happy">
-                    </a>
-                    <a href="javascript:;" class="rate awesome">
-                    </a>
+                    <a class="unhappy"></a>
+                    <a class="sad"></a>
+                    <a class="neutral"></a>
+                    <a class="happy"></a>
+                    <a class="awesome"></a>
+                    <div class="clear"></div>
                 </div>
-                <textarea name="feedback" type="text" placeholder="(Optional) You can type here your thoughts on how we can make your experience better"></textarea>
-
+                <div class="feedback-dialog-textarea">
+                	<div class="feedback-dialog-scr">
+                		<textarea name="feedback" placeholder="Your message here… (optional)"></textarea>
+                        <div class="feedback-dialog-hidden"></div>
+                    </div>
+                </div>
                 <div class="reply">
-                    <div class="checkdiv checkboxOff">
-                        <input type="checkbox" name="contact_me" id="contact_me" />
+                	<div class="feedback-label-txt">
+                        <div class="checkdiv checkboxOff">
+                            <input type="checkbox" name="contact_me" id="contact_me" />
+                        </div>
+                    
+                    	<label for="contact_me" class="radio-txt">I’m happy to share my email for future communication related to my feedback</label>
                     </div>
-                    <label for="contact_me" class="radio-txt">[$6983]</label>
+                    <div class="clear"></div>
                 </div>
-
+                <div class="feedback-dialog-input hidden">
+                	<input name="feedback-email" type="text" placeholder="email@domain.com" />
+                </div>
                 <div class="stats">
-                    <div class="checkdiv checkboxOff">
-                        <input type="checkbox" name="send_stats" id="send_stats" />
-                    </div>
-                    <label for="send_stats" class="radio-txt">
-                        [$6945]
-                        <span class="membership-question stats-button">
-                                            ?
+                	<div class="feedback-label-txt">
+                        <div class="checkdiv checkboxOff">
+                            <input type="checkbox" name="send_stats" id="send_stats" />
+                        </div>
+                    
+                        <label for="send_stats" class="radio-txt">
+                            [$6945]
+                        </label>
+                    	<span class="membership-question stats-button">
                             <span class="membership-notification">
                                 <span>Click here to see <strong>exactly the same</strong> information that will be sent to our servers.</span>
                                 <span class="membership-arrow"></span>
                             </span>
                         </span>
-                    </label>
-                    
+                    </div>
+                    <div class="clear"></div>
                 </div>
-            </div>
         </div>
+    </div>
+    <div class="feedback-result-pad hidden">
+        <div class="payment-rusult-header">Thank you for your feedback!</div>
+        <div class="payment-result-icon"></div>
+        <div class="feedback-result-button">[$148]</div>
     </div>
 </div>
 
@@ -1338,8 +1379,11 @@
     <div class="fm-mega-dialog-pad">
         <div class="fm-dialog-contents">
             <div class="content">
-                <label>[$6857]</label>
-                <textarea name="data" type="text" readonly="1"></textarea>
+                <div class="collected-data-textarea">
+                    <ul class="collected-data">
+                            
+                    </ul>
+                </div>
             </div>
         </div>
     </div>

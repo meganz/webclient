@@ -13,7 +13,7 @@ var notify = {
     notifications: [],
     
     // Number of notifications to fetch
-    numOfNotifications: 100,
+    numOfNotifications: 50,
     
     // Locally cached emails and pending contact emails
     userEmails: {},

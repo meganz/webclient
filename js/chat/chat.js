@@ -1,11 +1,12 @@
 /**
- * Use this localStorage.chatDisabled flag to disable/enable the chat (note the "==" logical comparison!)
+ * Use this localStorage.chatDisabled flag to disable/enable the chat (note the "!!" logical comparison!)
  *
  * @type {boolean}
  */
-var megaChatDisabled = !!localStorage.chatDisabled;
+var megaChatIsDisabled = function() {
+    return typeof localStorage.chatDisabled === "undefined" || localStorage.chatDisabled === "0" ? false : true;
+};
 
-var disableMpEnc = true;
 
 var chatui;
 (function() {
@@ -743,7 +744,7 @@ var Chat = function() {
 
     this.plugins = {};
 
-    if (!megaChatDisabled) {
+    if (!megaChatIsDisabled()) {
         try {
             // This might throw in browsers which doesn't support Strophe/WebRTC
             this.karere = new Karere({
@@ -753,17 +754,17 @@ var Chat = function() {
         }
         catch (e) {
             console.error(e);
-            megaChatDisabled = true;
+            megaChatIsDisabled = function() { return true; };
         }
     }
 
     Object.defineProperty(this, 'isReady', {
         get: function() {
-            return !megaChatDisabled && self.is_initialized;
+            return !megaChatIsDisabled() && self.is_initialized;
         }
     });
 
-    if (megaChatDisabled) {
+    if (megaChatIsDisabled()) {
         this.logger.info('MEGAChat is disabled.');
         $(document.body).addClass("megaChatDisabled");
     }
@@ -1597,7 +1598,7 @@ Chat.prototype._onUsersUpdate = function(type, e, eventObject) {
                         room.state === ChatRoom.STATE.WAITING_FOR_PARTICIPANTS || room.state === ChatRoom.STATE.JOINING
                     )
                 ) {
-                    if (room._conv_ended === true || typeof(room._conv_ended) === 'undefined') {
+                    if (room._conv_ended === true || typeof room._conv_ended === 'undefined') {
                         room._conversationStarted(room.getParticipantsExceptMe()[0]);
                     }
                 }
@@ -1632,7 +1633,7 @@ Chat.prototype._onUsersUpdate = function(type, e, eventObject) {
             room = self.chats[eventObject.getRoomJid()];
             if (room) {
                 if (room._waitingForOtherParticipants() === false && room.state === ChatRoom.STATE.WAITING_FOR_PARTICIPANTS) {
-                    if (room._conv_ended === true || typeof(room._conv_ended) === 'undefined') {
+                    if (room._conv_ended === true || typeof room._conv_ended === 'undefined') {
                         room._conversationStarted(eventObject.getFromJid());
                     } else {
                         if (room.state === ChatRoom.STATE.WAITING_FOR_PARTICIPANTS) {
@@ -1797,6 +1798,9 @@ Chat.prototype.xmppPresenceToCssClass = function(presence) {
  */
 Chat.prototype.renderMyStatus = function() {
     var self = this;
+    if (!self.is_initialized) {
+        return;
+    }
 
     // reset
     var $status = $('.activity-status-block .activity-status');
@@ -2576,5 +2580,3 @@ Chat.prototype.createAndShowPrivateRoomFor = function(h) {
     chatui(h);
     return this.getPrivateRoom(h);
 };
-
-window.megaChat = new Chat();

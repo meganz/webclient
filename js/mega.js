@@ -191,7 +191,7 @@ function MegaData()
 
     this.getSortStatus = function(u)
     {
-        var status = megaChat.isReady && megaChat.karere.getPresence(megaChat.getJidFromNodeId(u));
+        var status = typeof megaChat !== 'undefined' && megaChat.isReady && megaChat.karere.getPresence(megaChat.getJidFromNodeId(u));
         if (status == 'chat')
             return 1;
         else if (status == 'dnd')
@@ -432,7 +432,7 @@ function MegaData()
 
     this.onlineStatusEvent = function(u, status)
     {
-        if (u && megaChat.isReady)
+        if (u && typeof megaChat !== 'undefined' && megaChat.isReady)
         {
             // this event is triggered for a specific resource/device (fullJid), so we need to get the presen for the
             // user's devices, which is aggregated by Karere already
@@ -777,7 +777,7 @@ function MegaData()
                 contact = M.u[u_h];
 
                 // chat is enabled?
-                if (megaChat.isReady) {
+                if (typeof megaChat !== 'undefined' && megaChat.isReady) {
                     if (contact && contact.lastChatActivity > timems) {
                         interactionclass = 'conversations';
                         time = time2last(contact.lastChatActivity);
@@ -793,9 +793,13 @@ function MegaData()
                 }
 
                 node = M.d[u_h];
-                avatar = useravatar.contact(u_h, "nw-contact-avatar")
+                avatar = useravatar.contact(u_h, "nw-contact-avatar");
 
-                onlinestatus = M.onlineStatusClass(megaChat.isReady && megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h)));
+                onlinestatus = M.onlineStatusClass(
+                    typeof megaChat !== 'undefined' &&
+                    megaChat.isReady &&
+                    megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h))
+                );
 
                 if (M.viewmode === 1) {
                     el = 'div';
@@ -878,7 +882,12 @@ function MegaData()
                     u_h = M.v[i].p,
                     rights = l[55],
                     rightsclass = ' read-only',
-                    onlinestatus = M.onlineStatusClass(megaChat.isReady && megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h)));
+                    onlinestatus = M.onlineStatusClass(
+                        typeof megaChat !== 'undefined' &&
+                        megaChat.isReady &&
+                        megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h))
+                    );
+
                     if (cs.files === 0 && cs.folders === 0) {
                         contains = l[1050];
                     }
@@ -1350,7 +1359,7 @@ function MegaData()
         this.contacts();
         this.renderInboxTree();
         treeUI();
-        if (!megaChatDisabled) {
+        if (!megaChatIsDisabled()) {
             megaChat.renderContactTree();
         }
     };
@@ -1412,7 +1421,7 @@ function MegaData()
             this.chat = true;
             treeUI();
 
-            if (!megaChatDisabled) {
+            if (!megaChatIsDisabled()) {
                 chatui(id); // XX: using the old code...for now
             }
         }
@@ -1420,7 +1429,7 @@ function MegaData()
             id = this.RootID;
         }
 
-        if (!megaChatDisabled) {
+        if (!megaChatIsDisabled()) {
             if (!this.chat) {
                 if (megaChat.getCurrentRoom()) {
                     megaChat.getCurrentRoom().hide();
@@ -1572,7 +1581,7 @@ function MegaData()
             }
             var onlinestatus;
 
-            if (megaChat.isReady) {
+            if (typeof megaChat !== 'undefined' && megaChat.isReady) {
                 onlinestatus = M.onlineStatusClass(megaChat.karere.getPresence(megaChat.getJidFromNodeId(contacts[i].u)));
             } else {
                 onlinestatus = [l[5926], 'offline'];
@@ -1587,7 +1596,7 @@ function MegaData()
 
         $('.content-panel.contacts').html(html);
 
-        if (!megaChatDisabled) {
+        if (!megaChatIsDisabled()) {
             megaChat.renderContactTree();
 
             $('.fm-tree-panel').undelegate('.start-chat-button', 'click.megaChat');
@@ -4522,7 +4531,7 @@ function renderfm()
     }
 
     M.openFolder(M.currentdirid);
-    if (megaChat.isReady) {
+    if (typeof megaChat !== 'undefined' && megaChat.isReady) {
         megaChat.renderContactTree();
         megaChat.renderMyStatus();
     }
@@ -4596,7 +4605,7 @@ function renderNew() {
         M.contacts();
         treeUI();
 
-        if (!megaChatDisabled) {
+        if (!megaChatIsDisabled()) {
             megaChat.renderContactTree();
             megaChat.renderMyStatus();
         }
@@ -4666,7 +4675,7 @@ function execsc(actionPackets, callback) {
                     addNotification(actionPacket);
                 }
 
-                if (megaChat.isReady) {
+                if (typeof megaChat !== 'undefined' && megaChat.isReady) {
                     $.each(actionPacket.u, function (k, v) {
                         megaChat[v.c == 0 ? "processRemovedUser" : "processNewUser"](v.u);
                     });
@@ -4975,7 +4984,7 @@ function execsc(actionPackets, callback) {
                 addNotification(actionPacket);
             }
 
-            if (megaChat.isReady) {
+            if (typeof megaChat !== 'undefined' && megaChat.isReady) {
                 $.each(actionPacket.u, function(k, v) {
                     megaChat[v.c == 0 ? "processRemovedUser" : "processNewUser"](v.u);
                 });
@@ -5845,9 +5854,11 @@ function folderreqerr(c, e)
 
 function init_chat() {
     function __init_chat() {
-        if (u_type && !megaChat.is_initialized) {
+        if (u_type && (typeof megaChat === 'undefined' || !megaChat.is_initialized)) {
             if (d) console.log('Initializing the chat...');
-            megaChat.init();
+            window.megaChat = new Chat();
+            window.megaChat.init();
+
             if (fminitialized) {
                 Soon(function() {
                     megaChat.renderContactTree();
@@ -5859,7 +5870,7 @@ function init_chat() {
     if (folderlink) {
         if (d) console.log('Will not initializing chat [branch:1]');
     }
-    else if (!megaChatDisabled) {
+    else if (!megaChatIsDisabled()) {
         if (pubEd25519[u_handle]) {
             __init_chat();
         } else {

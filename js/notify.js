@@ -122,6 +122,9 @@ var notify = {
             userHandle: userHandle
         });
         
+        // Update store of user emails that it knows about if a contact request was recently accepted
+        notify.addUserEmails();
+        
         // Show the new notification icon
         notify.countAndShowNewNotifications();
         
@@ -448,11 +451,7 @@ var notify = {
      * @returns {Object}
      */
     updateTemplate: function($notificationHtml, notification)
-    {
-        if (notification.userHandle === 'UCQh2d5h5vI') {
-            console.log('zzzz broken notification');
-        }
-        
+    {   
         // Remove the template class
         $notificationHtml.removeClass('template');
         
@@ -461,10 +460,17 @@ var notify = {
         var userEmail = '';
         var avatar = '';
         
+        // If a contact action packet
+        if ((typeof userHandle === 'object') && (typeof notification.data.u[0].m !== 'undefined')) {
+            userEmail = notification.data.u[0].m;
+        }
+        
         // Use the email address in the notification/action packet if the contact doesn't exist locally
-        if (typeof M.u[userHandle] === 'undefined') {
+        else if ((typeof M.u[userHandle] === 'undefined') && (typeof notification.data.m !== 'undefined')) {
             userEmail = notification.data.m;
         }
+        
+        // Otherwise get from the list of emails we know about
         else if (typeof notify.userEmails[userHandle] !== 'undefined') {
             userEmail = notify.userEmails[userHandle];
         }

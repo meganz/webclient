@@ -133,9 +133,6 @@ function init_page() {
             page = 'chrome';
         }
     }
-    else if (page == 'notifications') {
-        page = 'fm/notifications';
-    }
 
     if (localStorage.signupcode && u_type !== false) {
         delete localStorage.signupcode;
@@ -241,7 +238,6 @@ function init_page() {
                 if (typeof mDBcls === 'function') {
                     mDBcls();
                 }
-                notifyPopup.notifications = null;
             }
         }
 
@@ -817,9 +813,6 @@ function init_page() {
             if (M.currentdirid == 'account') {
                 accountUI();
             }
-            else if (M.currentdirid == 'notifications') {
-                notificationsUI();
-            }
             else if (M.currentdirid == 'search') {
                 searchFM();
             }
@@ -1186,8 +1179,7 @@ function topmenuUI() {
         }
         if (!e || ($(e.target).parents('.notification-popup').length == 0
                 && ((c && c.indexOf('cloud-popup-icon') == -1) || !c))) {
-            $('.notification-popup').removeClass('active');
-            $('.cloud-popup-icon').removeClass('active');
+            notify.closePopup();
         }
         if (!e || ($(e.target).parents('.top-login-popup').length == 0
                 && ((c && c.indexOf('top-login-button') == -1) || !c))) {
@@ -1626,8 +1618,9 @@ function topmenuUI() {
         $('.membership-popup-arrow').css('margin-right',
             $('.top-menu-icon').width() + $('.membership-status-block').width() / 2 + 57 + 'px');
     }
-
-    notifyPopup.initNotifications();
+    
+    // Initialise notification popup and tooltip
+    notify.init();
 }
 
 function is_fm() {
@@ -1654,10 +1647,7 @@ function parsepage(pagehtml, pp) {
         pagehtml = pagehtml.replace(/\/#/g, '/' + urlrootfile + '#');
     }
     $('body').removeClass('notification-body bottom-pages new-startpage');
-    if (page == 'notifications') {
-        $('body').addClass('notification-body');
-    }
-    else if (page == 'start') {
+    if (page == 'start') {
         $('body').addClass('new-startpage');
     }
     else {

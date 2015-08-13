@@ -1087,7 +1087,7 @@ else if (!b_u)
     jsl.push({f:'html/js/login.js', n: 'login_js', j:1});
     jsl.push({f:'html/fm.html', n: 'fm', j:0,w:3});
     jsl.push({f:'html/top.html', n: 'top', j:0});
-    jsl.push({f:'js/notifications.js', n: 'notifications_js', j:1});
+    jsl.push({f:'js/notify.js', n: 'notify_js', j:1});
     jsl.push({f:'js/vendor/popunda.js', n: 'popunda_js', j:1});
     jsl.push({f:'css/style.css', n: 'style_css', j:2,w:30,c:1,d:1,cache:1});
     jsl.push({f:'js/useravatar.js', n: 'contact_avatar_js', j:1,w:3});

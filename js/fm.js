@@ -1521,79 +1521,6 @@ function sharedUInode(nodeHandle) {
     }
 }
 
-function addShareNotification(notification) {
-
-    if (notifyPopup.notifications == null) {
-        return false;
-    }
-
-    var timestamp = Math.round(new Date().getTime() / 1000);
-    var updated = false;
-
-    if (notification.t == 'put') {
-        for (i in notifyPopup.notifications) {
-            if (notifyPopup.notifications[i].folderid == notification.n && notifyPopup.notifications[i].user == notification.u && notifyPopup.notifications[i].timestamp > timestamp - 120 && notifyPopup.notifications[i].type !== 'share' && !updated) {
-
-                notifyPopup.notifications[i].timestamp = timestamp;
-                notifyPopup.notifications[i].read = false;
-                notifyPopup.notifications[i].count = false;
-
-                if (!notifyPopup.notifications[i].nodes) {
-                    notifyPopup.notifications[i].nodes = [];
-                }
-
-                for (var i in notification.f) {
-                    notifyPopup.notifications[i].nodes.push(notification.f[i]);
-                }
-
-                updated = true;
-            }
-        }
-    }
-
-    if (!updated) {
-        notifyPopup.notifications.push({
-            id: makeid(10),
-            type: notification.t,
-            timestamp: timestamp,
-            user: notification.u,
-            folderid: notification.n,
-            nodes: notification.f,
-            read: false,
-            popup: false,
-            count: false,
-            rendered: false
-        });
-    }
-
-    notifyPopup.doNotify();
-}
-
-function addNotification(actionPacket) {
-
-    if (notifyPopup.notifications === null) {
-        return false;
-    }
-
-    var timestamp = Math.round(new Date().getTime() / 1000);
-
-    notifyPopup.notifications.push({
-        id: makeid(10),
-        type: actionPacket.a,
-        timestamp: timestamp,
-        user: false,
-        folderid: false,
-        nodes: false,
-        read: false,
-        popup: false,
-        count: false,
-        rendered: false,
-        notificationObj: actionPacket
-    });
-
-    notifyPopup.doNotify();
-}
-
 function getContactsEMails() {
     var n, i,
         contacts = [];
@@ -2893,11 +2820,8 @@ function notificationsUI(close)
         $('.fm-main.default').removeClass('hidden');
         return false;
     }
-    notifyPopup.notifyMarkCount(true);
-    notifyPopup.doNotify();
     $('.fm-main.notifications').removeClass('hidden');
     $('.notifications .nw-fm-left-icon').removeClass('active');
-    notifyPopup.initNotificationsScrolling();
     $('.fm-main.default').addClass('hidden');
     $(window).trigger('resize');
 }

@@ -142,16 +142,16 @@ function u_checklogin3a(res, ctx) {
         }
 
         if (!u_attr.email) {
-            r = 0;
+            r = 0;      // Ephemeral account
         }
         else if (!u_attr.c) {
-            r = 1;
+            r = 1;      // Haven't confimed email yet
         }
         else if (!u_attr.privk) {
-            r = 2;
+            r = 2;      // Don't have a private key yet (maybe they quit before key generation completed)
         }
         else {
-            r = 3;
+            r = 3;      // Fully registered
         }
 
         if (r == 3) {
@@ -209,7 +209,7 @@ function u_logout(logout) {
         fminitialized = false;
         mBroadcaster.crossTab.leave();
         u_sid = u_handle = u_k = u_attr = u_privk = u_k_aes = undefined;
-        notifyPopup.notifications = null;
+        notify.notifications = [];
         api_setsid(false);
         u_sharekeys = {};
         u_nodekeys = {};

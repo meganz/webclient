@@ -213,10 +213,6 @@ function translate(html) {
     return String(html).replace(/\[\$(\d+)(?:\.(\w+))?\]/g, replacer);
 }
 
-/**
- * Show the number of new notifications in the Browser's title bar e.g. (3) MEGA
- * @param {type} nperc
- */
 function megatitle(nperc) {
     if (!nperc) {
         nperc = '';

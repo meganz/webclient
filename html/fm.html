@@ -69,8 +69,7 @@
         <div class="pause-item-divider hidden"></div>
         <a class="context-menu-item move-up"><span class="context-menu-icon"></span>[$6864]</a>
         <a class="context-menu-item move-down"><span class="context-menu-icon"></span>[$6865]</a>
-        <a class="context-menu-item tranfer-clear"><span class="context-menu-icon"></span>[$103]</a>
-        <div class="context-menu-divider"></div>
+        <a class="context-menu-item transfer-clear"><span class="context-menu-icon"></span>[$103]</a>
     </div>
     <a class="context-menu-item select-all"><span class="context-menu-icon"></span>[$5550]</a>
 
@@ -109,6 +108,26 @@
             <!-- Please add "filled" classname if user have deleted items !-->
             <div class="nw-fm-left-icon rubbish-bin"><div class="nw-fm-left-border"></div><div class="nw-fm-left-tooltip">[$168]</div><div class="rubbish-bin-icon"></div></div>
             <div class="nw-fm-left-icon settings"><div class="nw-fm-left-border"></div><div class="nw-fm-left-tooltip">[$569]</div><div class="settings-icon"></div></div>
+            <div class="nw-fm-left-icon transfers">
+            	<div class="nw-fm-left-border file-transfer-icon"></div>
+                <div class="nw-fm-left-tooltip">[$104]</div>
+                <div class="nw-fm-percentage download">
+                    <ul>
+                      <li class="nw-fm-chart0 right-c"><p><span></span></p></li>
+                      <li class="nw-fm-chart0 left-c"><p><span></span></p></li>
+                    </ul>
+                    <div class="transfer-bar-overlay"></div>
+                </div>
+                  
+                <div class="nw-fm-percentage upload">
+                    <ul>
+                      <li class="nw-fm-chart0 right-c"><p><span></span></p></li>
+                      <li class="nw-fm-chart0 left-c"><p><span></span></p></li>
+                    </ul>
+                    <div class="transfer-bar-overlay"><div></div></div>
+                </div>
+            </div>
+            
         </div>
 
         <div class="new-notifications-bg"></div>
@@ -131,7 +150,7 @@
                 <div class="nw-fm-left-border"></div>
                 <div class="nw-fm-left-tooltip">[$1687]</div>
             </div>
-            <div class="nw-fm-left-icon inbox active">
+            <div class="nw-fm-left-icon inbox">
                 <div class="nw-fm-left-border"></div>
                 <div class="nw-fm-left-tooltip">[$949]</div>
             </div>
@@ -152,6 +171,26 @@
             <!-- Please add "filled" classname if user have deleted items !-->
             <div class="nw-fm-left-icon rubbish-bin"><div class="nw-fm-left-border"></div><div class="nw-fm-left-tooltip">[$168]</div><div class="rubbish-bin-icon"></div></div>
             <div class="nw-fm-left-icon settings"><div class="nw-fm-left-border"></div><div class="nw-fm-left-tooltip">[$569]</div><div class="settings-icon"></div></div>
+            <div class="nw-fm-left-icon transfers">
+            	<div class="nw-fm-left-border file-transfer-icon"></div>
+                <div class="nw-fm-left-tooltip">[$104]</div>
+                <div class="nw-fm-percentage download">
+                    <ul>
+                      <li class="nw-fm-chart0 right-c"><p><span></span></p></li>
+                      <li class="nw-fm-chart0 left-c"><p><span></span></p></li>
+                    </ul>
+                    <div class="transfer-bar-overlay"></div>
+                </div>
+                  
+                <div class="nw-fm-percentage upload">
+                    <ul>
+                      <li class="nw-fm-chart0 right-c"><p><span></span></p></li>
+                      <li class="nw-fm-chart0 left-c"><p><span></span></p></li>
+                    </ul>
+                    <div class="transfer-bar-overlay"><div></div></div>
+                </div>
+            </div>
+            
         </div>
 
         <div class="fm-left-panel">
@@ -848,7 +887,6 @@
                 </div>
             </div>
 
-
             <div class="shared-blocks-view hidden">
                 <div class="shared-blocks-scrolling">
                 </div>
@@ -949,10 +987,54 @@
 
                 <div class="fm-blocks-view contact-details-view hidden">
                     <div class="file-block-scrolling">
-                    </div></div></div>
+                    </div>
+                </div></div>
         </div>
 
-
+        <div class="fm-transfers-block">
+             <div class="fm-tranfers-header">
+              <div class="transfer-panel-title">
+                [$104]
+              </div>
+              <div class="transfer-clear-completed disabled"><span>[$6992]</span></div>
+              <div class="transfer-clear-all-icon disabled"><span>[$6991]</span></div>
+              <div class="transfer-pause-icon disabled"><span>[$6993]</span></div>
+              <div class="clear"></div>
+              
+             </div>
+             <div class="tranfer-table">
+                <div class="transfer-panel-empty-txt">
+                	<div class="fm-empty-transfers-bg"></div>
+                    <div class="fm-empty-cloud-txt">[$6089]</div>
+                </div>
+                <table width="100%" border="0" cellspacing="0" cellpadding="0" class="transfer-table-header">
+                    <tr>
+                        <th><span></span></th>
+                        <th>[$86]</th>
+                        <th>ETA</th>
+                        <th>[$87]</th>
+                        <th>[$93]</th>
+                        <th>[$89]</th>
+                        <th class="grid-url-header"></th>
+                        <th></th>
+                    </tr>
+                </table>
+                <div class="transfer-scrolling-table">
+                    <table width="100%" height="100%" border="0" cellspacing="0" cellpadding="0" class="transfer-table">
+                        <tr class="clone-of-header">
+                            <th width="230"></th>
+                            <th></th>
+                            <th width="96"></th>
+                            <th width="96"></th>
+                            <th></th>
+                            <th width="192"></th>
+                            <th width="64" class="grid-url-field"></th>
+                            <th width="0"></th>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
 
 
         <div class="fm-right-account-block">
@@ -1554,56 +1636,31 @@
         </div>
 
     </div>
-    <div class="transfer-panel">
-        <div class="transfer-drag-handle"></div>
-        <div class="transfer-icons-block">
-            <!-- Please add "download-percents-0"-"download-percents-100" and "upload-percents-0"-"download-percents-100" !-->
-            <div class="file-transfer-icon download-percents-0 upload-percents-0">
-                <div class="file-transfer-download">
-                    <div class="file-transfer-upload"></div>
+    
+    <div class="toast-notification download">
+    	<div class="toast-transfer-icon"></div>
+  		<div class="toast-transfer-body">
+        	<div class="toast-transfer-col">
+            </div>
+            <div  class="toast-transfer-col">
+            	<div class="toast-transfer-button">
+                	<span>Show me</span>
                 </div>
-            </div>
-            <div class="transfer-panel-title">
-                [$104]
-            </div>
-            <a class="transfer-clear-all-icon hidden"></a>
-            <a class="tranfer-view-icon"></a>
-            <!-- Please add/remove "active" class to sjow/hide upload and download indicators !-->
-            <div class="tranfer-upload-indicator">
-                640 Kb/s
-            </div>
-            <div class="tranfer-download-indicator">
-                1640 Kb/s
-            </div>
-            <a class="transfer-pause-icon hidden"></a>
-            <div class="clear"></div>
-        </div>
-        <div class="tranfer-table">
-            <div class="transfer-panel-empty-txt">[$5672]</div>
-            <table width="100%" border="0" cellspacing="0" cellpadding="0" class="transfer-table-header">
-                <tr>
-                    <th>#</th>
-                    <th>[$86]</th>
-                    <th>[$88]</th>
-                    <th>ETA</th>
-                    <th>[$87]</th>
-                    <th>[$89]</th>
-                    <th class="grid-url-header"></th>
-                </tr>
-            </table>
-            <div class="transfer-scrolling-table">
-                <table width="100%" height="100%" border="0" cellspacing="0" cellpadding="0" class="transfer-table">
-                    <tr class="clone-of-header">
-                        <th width="50"></th>
-                        <th></th>
-                        <th width="300"></th>
-                        <th width="110"></th>
-                        <th width="100"></th>
-                        <th width="300"></th>
-                        <th width="42" class="grid-url-field"></th>
-                    </tr>
-                </table>
             </div>
         </div>
     </div>
+    
+    <div class="toast-notification upload">
+    	<div class="toast-transfer-icon"></div>
+  		<div class="toast-transfer-body">
+        	<div class="toast-transfer-col">
+            </div>
+            <div  class="toast-transfer-col">
+            	<div class="toast-transfer-button">
+                	<span>Show me</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
 </div>

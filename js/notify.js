@@ -449,26 +449,40 @@ var notify = {
      */
     updateTemplate: function($notificationHtml, notification)
     {
+        if (notification.userHandle === 'UCQh2d5h5vI') {
+            console.log('zzzz broken notification');
+        }
+        
         // Remove the template class
         $notificationHtml.removeClass('template');
         
         var date = time2last(notification.timestamp);
         var userHandle = notification.userHandle;
         var userEmail = '';
+        var avatar = '';
         
-        // Use the email address of the contact
-        if (typeof userHandle === 'undefined') {
+        // Use the email address in the notification/action packet if the contact doesn't exist locally
+        if (typeof M.u[userHandle] === 'undefined') {
             userEmail = notification.data.m;
         }
         else if (typeof notify.userEmails[userHandle] !== 'undefined') {
             userEmail = notify.userEmails[userHandle];
         }
         
+        // Generate from the user handle which will load their profile pic if they are already a contact
+        if (typeof M.u[userHandle] !== 'undefined') {
+            avatar = useravatar.contact(userHandle);
+        }
+        
+        // If it failed to generate an avatar from the user handle, or we haven't generated one yet use the email 
+        // address. With the new v2.0 API for pending contacts, the user handle will usually not be available as they 
+        // are not a full contact yet.
+        if (avatar === '') {
+            avatar = useravatar.contact(userEmail);
+        }
+        
         // Escape email address
         userEmail = htmlentities(userEmail);
-        
-        // If using the new v2.0 API for contacts, the userid will not be available, so use the email
-        var avatar = (M.u[userHandle] || userEmail) ? useravatar.contact(M.u[userHandle] || userEmail) : '';
         
         // Update common template variables
         $notificationHtml.attr('id', notification.id);

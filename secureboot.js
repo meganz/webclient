@@ -498,76 +498,6 @@ if (typeof Object.freeze === 'function') {
     mBroadcaster = Object.freeze(mBroadcaster);
 }
 
-/**
- * mWatchDog: Quite the same than crossTab,
- * but it does not depend on the user handle.
- */
-var mWatchDog = {
-    Strg: {},
-    eTag: '$WDE$!_',
-    wdID: ~~(Math.random() * Date.now()),
-
-    setup: function mWatchDog_setup() {
-        if (window.addEventListener) {
-            window.addEventListener('storage', this, false);
-        }
-        else if (window.attachEvent) {
-            window.attachEvent('onstorage', this.handleEvent.bind(this));
-        }
-    },
-
-    notify: function mWatchDog_notify(msg, data) {
-        data = { origin: this.wdID, data: data, sid: Math.random()};
-        localStorage.setItem(this.eTag + msg, JSON.stringify(data));
-        if (d) {
-            console.log('mWatchDog Notifying', this.eTag + msg, localStorage[this.eTag + msg]);
-        }
-    },
-
-    handleEvent: function mWatchDog_handleEvent(ev) {
-        if (String(ev.key).indexOf(this.eTag) !== 0) {
-            return;
-        }
-        if (d) {
-            console.debug('mWatchDog ' + ev.type + '-event', ev.key, ev.newValue, ev);
-        }
-
-        var msg = ev.key.substr(this.eTag.length);
-        var strg = JSON.parse(ev.newValue || '""');
-
-        if (!strg || strg.origin === this.wdID) {
-            if (d) {
-                console.log('Ignoring mWatchDog event', msg, strg);
-            }
-            return;
-        }
-
-        switch (msg) {
-            case 'loadfm_done':
-                if (this.Strg.login === strg.origin) {
-                    location.assign('/');
-                }
-                break;
-
-            case 'login':
-                loadingDialog.show();
-                this.Strg.login = strg.origin;
-                break;
-
-            case 'logout':
-                u_logout(-0xDEADF);
-                location.reload();
-                break;
-        }
-
-        delete localStorage[ev.key];
-    }
-};
-if (typeof Object.freeze === 'function') {
-    mWatchDog = Object.freeze(mWatchDog);
-}
-
-
 var sh = [];
 
 /**
@@ -1563,7 +1493,6 @@ else if (!b_u)
     window.onload = function ()
     {
         if (!maintenance && !androidsplash) jsl_start();
-        mWatchDog.setup();
     };
     function jsl_load(xhri)
     {

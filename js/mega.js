@@ -5964,7 +5964,7 @@ function loadfm_done(pfkey, stackPointer) {
     if (!pfkey) {
         notifyPopup.pollNotifications();
     }
-    mWatchDog.notify('loadfm_done');
+    watchdog.notify('loadfm_done');
 }
 
 function storefmconfig(key, value)

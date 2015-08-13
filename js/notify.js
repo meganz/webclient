@@ -328,6 +328,9 @@ var notify = {
         
         // Sort the notifications
         notify.sortNotificationsByMostRecent();
+        
+        // Reset rendered contact requests so the Accept button will show again
+        notify.renderedContactRequests = [];
 
         // Cache the template selector
         var $template = this.$popup.find('.notification-item.template');

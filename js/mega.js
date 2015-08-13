@@ -4968,7 +4968,7 @@ function execsc(actionPackets, callback) {
             }
         }
         else if (actionPacket.a === 'la') {
-            //notifyPopup.doNotify();
+            notify.countAndShowNewNotifications();
         }
         else if (actionPacket.a === 'opc') {
             processOPC([actionPacket]);

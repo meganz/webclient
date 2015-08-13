@@ -129,9 +129,6 @@ function init_page() {
             page = 'chrome';
         }
     }
-    else if (page == 'notifications') {
-        page = 'fm/notifications';
-    }
 
     if (localStorage.signupcode && u_type !== false) {
         delete localStorage.signupcode;
@@ -237,7 +234,6 @@ function init_page() {
                 if (typeof mDBcls === 'function') {
                     mDBcls();
                 }
-                //notifyPopup.notifications = null;
             }
         }
 
@@ -837,9 +833,6 @@ function init_page() {
         if (fminitialized) {
             if (M.currentdirid == 'account') {
                 accountUI();
-            }
-            else if (M.currentdirid == 'notifications') {
-                notificationsUI();
             }
             else if (M.currentdirid == 'search') {
                 searchFM();
@@ -1681,10 +1674,7 @@ function parsepage(pagehtml, pp) {
         pagehtml = pagehtml.replace(/\/#/g, '/' + urlrootfile + '#');
     }
     $('body').removeClass('notification-body bottom-pages new-startpage');
-    if (page == 'notifications') {
-        $('body').addClass('notification-body');
-    }
-    else if (page == 'start') {
+    if (page == 'start') {
         $('body').addClass('new-startpage');
     }
     else {

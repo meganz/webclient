@@ -692,7 +692,8 @@ var Chat = function() {
             'urlFilter': UrlFilter,
             'emoticonsFilter': EmoticonsFilter,
             'attachmentsFilter': AttachmentsFilter,
-            'callFeedback': CallFeedback
+            'callFeedback': CallFeedback,
+            'karerePing': KarerePing
         },
         'chatNotificationOptions': {
             'textMessages': {
@@ -747,7 +748,7 @@ var Chat = function() {
             // This might throw in browsers which doesn't support Strophe/WebRTC
             this.karere = new Karere({
                 'clientName': 'mc',
-                'boshServiceUrl': function() { return self.getBoshServiceUrl(); }
+                'xmppServiceUrl': function() { return self.getXmppServiceUrl(); }
             });
         }
         catch (e) {
@@ -1406,12 +1407,10 @@ Chat.prototype.init = function() {
                 self.karere.getConnectionState() === Karere.CONNECTION_STATE.DISCONNECTED &&
                 localStorage.megaChatPresence !== "unavailable"
             ) {
-                self.logger.warn("Will bind a mousemove to re-trigger a connection retry on mousemove.");
 
                 $(document).rebind("mousemove.megaChatRetry", function() {
                     if (self.karere._connectionRetryUI() === true) {
                         $(document).unbind("mousemove.megaChatRetry");
-                        self.logger.warn("Connection retry triggered because of a mousemove.");
                     }
                 });
             }
@@ -1689,7 +1688,7 @@ Chat.prototype.destroy = function(isLogout) {
         .done(function() {
             self.karere = new Karere({
                 'clientName': 'mc',
-                'boshServiceUrl': function() { return self.getBoshServiceUrl(); }
+                'xmppServiceUrl': function() { return self.getXmppServiceUrl(); }
             });
 
             self.is_initialized = false;
@@ -2432,11 +2431,13 @@ Chat.prototype.getChatNum = function(idx) {
  * Called when the BOSH service url is requested for Karere to connect. Should return a full URL to the actual
  * BOSH service that should be used for connecting the current user.
  */
-Chat.prototype.getBoshServiceUrl = function() {
+Chat.prototype.getXmppServiceUrl = function() {
     var self = this;
 
     if (localStorage.megaChatUseSandbox) {
         return "https://karere-005.developers.mega.co.nz/bosh";
+    } else if (localStorage.customXmppServiceUrl) {
+        return localStorage.customXmppServiceUrl;
     } else {
         var $promise = new MegaPromise();
 
@@ -2444,18 +2445,23 @@ Chat.prototype.getBoshServiceUrl = function() {
             .done(function(r) {
                 if (r.xmpp && r.xmpp.length > 0) {
                     var randomHost = array_random(r.xmpp);
-                    $promise.resolve("https://" + randomHost.host + ":" + randomHost.port + "/bosh");
-                } else {
+                    $promise.resolve("wss://" + randomHost.host + "/ws");
+                }
+                else if (!r.xmpp || r.xmpp.length === 0) {
+                    self.logger.error("GeLB returned no results. Halting.");
+                    $promise.reject();
+                }
+                else {
                     var server = array_random(self.options.fallbackXmppServers);
                     self.logger.error("Got empty list from the load balancing service for xmpp, will fallback to: " + server + ".");
-                    $promise.resolve(server);
+                    $promise.resolve(server.replace("https:", "wss:").replace("/bosh", "/ws"));
                 }
             })
             .fail(function() {
                 var server = array_random(self.options.fallbackXmppServers);
                 self.logger.error("Could not connect to load balancing service for xmpp, will fallback to: " + server + ".");
 
-                $promise.resolve(server);
+                $promise.resolve(server.replace("https:", "wss:").replace("/bosh", "/ws"));
             });
 
         return $promise;

@@ -118,6 +118,8 @@ CallSession.prototype.onRemoteStreamReceived = function(e, eventData) {
     } else if (eventData.player) {
         self.remotePlayer = eventData.player[0];
     }
+
+    self._renderInCallUI();
 };
 
 CallSession.prototype.onLocalStreamRemoved = function(e, eventData) {
@@ -260,18 +262,24 @@ CallSession.prototype.onWaitingResponseIncoming = function(e, eventData) {
 
             var avatar = useravatar.imgUrl(contact.u);
 
+            // callOptions, can be == {} in the cases then the user does not have/have not provided access
+            // to the cam & mic
+            var showVideoButton = true;
+
+            if (self.getRemoteMediaOptions().video === false && self.getRemoteMediaOptions().audio === true) {
+                showVideoButton = false;
+            }
+
             self.room.megaChat.trigger('onIncomingCall', [
                 self.room,
                 self.room.megaChat.getContactNameFromJid(participants[0]),
                 avatar,
-                self.getRemoteMediaOptions().video ? true : false,
+                showVideoButton,
                 eventData.sid,
                 self
             ]);
 
-            // callOptions, can be == {} in the cases then the user does not have/have not provided access
-            // to the cam & mic
-            var showVideoButton = self.getRemoteMediaOptions().video ? true : false;
+
 
             self.getCallManager().incomingCallDialog.show(
                 self.room.megaChat.getContactNameFromJid(participants[0]),
@@ -286,7 +294,7 @@ CallSession.prototype.onWaitingResponseIncoming = function(e, eventData) {
                 },
                 function() {
                     mediaOptions.audio = true;
-                    mediaOptions.true = false;
+                    mediaOptions.video = true;
 
                     doAnswer();
                 },
@@ -394,37 +402,8 @@ CallSession.prototype.onCallAnswered = function(e) {
 
 };
 
-CallSession.prototype.onCallStarted = function(e, eventData) {
+CallSession.prototype._renderInCallUI = function() {
     var self = this;
-
-    self.liveCallStats = {};
-
-    eventData.stats = {
-        scanPeriod: 1, maxSamplePeriod: 5,
-        onSample: function(stats, type) {
-            if (type === 1) {
-                self.liveCallStats.stats = stats;
-            } else if (type === 0) {
-                self.liveCallStats.commonStats = stats;
-            }
-        }
-    };
-
-    if (
-        self.room.callSession &&
-        self.room.callSession !== self &&
-        (
-            self.room.callSession.isStarted() || self.room.callSession.isStarting()
-        )
-    ) {
-        self.room.callSession.endCall('busy');
-    }
-
-    if (!self.room.callSession || self.room.callSession !== self) {
-        delete self.room.callSession;
-        self.room.callSession = self;
-    }
-
 
     if (self.remotePlayer) {
         if (self.remotePlayer.length && self.remotePlayer.length === 1) {
@@ -434,36 +413,6 @@ CallSession.prototype.onCallStarted = function(e, eventData) {
             self.room._othersAvElement = self.remotePlayer;
         }
     }
-
-    self.room.megaChat.dumpCallStats = self.room.dumpCallStats = function() {
-        var s = self.callStats.stats ? RTC.Stats.statItemToString(self.callStats.stats) : "";
-        s += self.callStats.commonStats ? RTC.Stats.statItemToString(self.callStats.commonStats) : "";
-        s = s.replace(/\n/g, '<br/>\n');
-
-        var $inlineDialog = self.room.generateInlineDialog(
-            "alert-info",
-            self.room.megaChat.karere.getJid(),
-            "debug",
-            "Debug Call Stats...",
-            [],
-            {},
-            !self.room.isActive()
-        );
-        $('.chat-message-txt', $inlineDialog).html(
-            "Debug Call Stats: <br/>" + s
-        );
-
-        self.room.appendDomMessage(
-            $inlineDialog
-        );
-
-        return {
-            'str': s,
-            'stats': self.callStats.stats,
-            'commonStats': self.callStats.commonStats
-        };
-    };
-
 
     $('.others-av-screen video', self.room.$header).remove();
 
@@ -511,6 +460,73 @@ CallSession.prototype.onCallStarted = function(e, eventData) {
         self.room.megaChat._currentCallCounter++;
     }, 1000);
 
+    self.renderCallStartedState();
+};
+
+CallSession.prototype.onCallStarted = function(e, eventData) {
+    var self = this;
+
+    self.liveCallStats = {};
+
+    eventData.stats = {
+        scanPeriod: 1, maxSamplePeriod: 5,
+        onSample: function(stats, type) {
+            if (type === 1) {
+                self.liveCallStats.stats = stats;
+            } else if (type === 0) {
+                self.liveCallStats.commonStats = stats;
+            }
+        }
+    };
+
+    if (
+        self.room.callSession &&
+        self.room.callSession !== self &&
+        (
+            self.room.callSession.isStarted() || self.room.callSession.isStarting()
+        )
+    ) {
+        self.room.callSession.endCall('busy');
+    }
+
+    if (!self.room.callSession || self.room.callSession !== self) {
+        delete self.room.callSession;
+        self.room.callSession = self;
+    }
+
+
+    self._renderInCallUI();
+
+    self.room.megaChat.dumpCallStats = self.room.dumpCallStats = function() {
+        var s = self.callStats.stats ? RTC.Stats.statItemToString(self.callStats.stats) : "";
+        s += self.callStats.commonStats ? RTC.Stats.statItemToString(self.callStats.commonStats) : "";
+        s = s.replace(/\n/g, '<br/>\n');
+
+        var $inlineDialog = self.room.generateInlineDialog(
+            "alert-info",
+            self.room.megaChat.karere.getJid(),
+            "debug",
+            "Debug Call Stats...",
+            [],
+            {},
+            !self.room.isActive()
+        );
+        $('.chat-message-txt', $inlineDialog).html(
+            "Debug Call Stats: <br/>" + s
+        );
+
+        self.room.appendDomMessage(
+            $inlineDialog
+        );
+
+        return {
+            'str': s,
+            'stats': self.callStats.stats,
+            'commonStats': self.callStats.commonStats
+        };
+    };
+
+
 
     // Substitute email into language string
     var callWithString = l[5888].replace('[X]', self.room.megaChat.getContactNameFromJid(self.getPeer()));
@@ -534,7 +550,7 @@ CallSession.prototype.onCallEnded = function(e, reason) {
 
     if (self.room.megaChat._currentCallCounter) {
         var msg = l[5889].replace('[X]', self.room.megaChat.getContactNameFromJid(self.getPeer()));
-        msg += " " + l[7208] + ".".replace("[X]", secToDuration(self.room.megaChat._currentCallCounter));
+        msg = (msg + " " + l[7208] + ".").replace("[X]", secToDuration(self.room.megaChat._currentCallCounter));
 
         self.room.appendDomMessage(
             self.room.generateInlineDialog(
@@ -1493,9 +1509,8 @@ CallManager.prototype._attachToChatRoom = function(megaChat, chatRoom) {
 
     chatRoom.rebind('media-recv.callManager', function(e, eventData) {
         var session = self.getOrCreateSessionFromEventData(e.type, eventData, chatRoom);
-        session.setState(CallSession.STATE.STARTED);
+
         self.trigger('RemoteStreamReceived', [session, eventData]);
-        self.trigger('CallStarted', [session, eventData]);
     });
 
     chatRoom.rebind('local-stream-connect.callManager', function(e, eventData) {
@@ -1516,13 +1531,8 @@ CallManager.prototype._attachToChatRoom = function(megaChat, chatRoom) {
         session.setState(CallSession.STATE.STARTING);
         self.trigger('CallStarting', [session]);
 
-        var remoteMediaOpts = session.getRemoteMediaOptions();
-
-        if (remoteMediaOpts && remoteMediaOpts.audio === false && remoteMediaOpts.video === false) {
-            session.setState(CallSession.STATE.STARTED);
-            self.trigger('RemoteStreamReceived', [session, eventData]);
-            self.trigger('CallStarted', [session, eventData]);
-        }
+        session.setState(CallSession.STATE.STARTED);
+        self.trigger('CallStarted', [session, eventData]);
     });
 
 

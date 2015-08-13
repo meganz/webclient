@@ -165,6 +165,9 @@ var notify = {
             notify.$popupNum.addClass('hidden');
             notify.$popupNum.html(newNotifications);
         }
+        
+        // Update page title
+        megatitle();
     },
     
     /**
@@ -181,6 +184,9 @@ var notify = {
         // Hide red circle with number of new notifications
         notify.$popupNum.addClass('hidden');
         notify.$popupNum.html(0);
+        
+        // Update page title
+        megatitle();
         
         // Send 'set last acknowledged' API request to inform it which notifications have been seen 
         // up to this point then they won't show these notifications as new next time they are fetched

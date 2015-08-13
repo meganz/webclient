@@ -4403,16 +4403,18 @@ function onUploadError(ul, errorstr, reason, xhr)
 {
     var hn = hostname(ul.posturl);
 
-    if (!d && (!xhr || xhr.readyState < 2 || xhr.status))
-    {
+    if (!d && (!xhr || xhr.readyState < 2 || xhr.status)) {
         var details = [
             browserdetails(ua).name,
-            '' + reason,
-            xhr ? (xhr.readyState > 1 && xhr.status) : 'NoXHR',
-            hn
+            String(reason)
         ];
-        if (details[1].indexOf('mtimeout') == -1 && -1 == details[1].indexOf('BRFS [l:Unk]'))
-        {
+        if (xhr || reason === 'peer-err') {
+            if (xhr && xhr.readyState > 1) {
+                details.push(xhr.status);
+            }
+            details.push(hn);
+        }
+        if (details[1].indexOf('mtimeout') == -1 && -1 == details[1].indexOf('BRFS [l:Unk]')) {
             srvlog('onUploadError :: ' + errorstr + ' [' + details.join("] [") + ']');
         }
     }
@@ -4423,7 +4425,6 @@ function onUploadError(ul, errorstr, reason, xhr)
 
     $('.transfer-table #ul_' + ul.id + ' td:eq(5)')
         .html('<span class="transfer-status error">' + htmlentities(errorstr) + '</span>');
-        // .parents('tr').data({'failed': NOW()});
 }
 
 function addupload(u)

@@ -763,6 +763,7 @@ else if (!b_u)
                 l: ln,
                 f: mTrim(url),
                 m: mTrim(msg).replace(/'(\w+:\/\/+[^/]+)[^']+'/, "'$1...'")
+                    .replace(/(Access to '\.\.).*(' from script denied)/, '$1$2')
                     .replace(/^Uncaught\W*(?:exception\W*)?/i, ''),
             }, cc;
             var sbid = +(''+(document.querySelector('script[src*="secureboot"]')||{}).src).split('=').pop()|0;
@@ -1726,7 +1727,7 @@ function showAd() {
 
     // We need to tell the API we would like ad urls, but only if we are not logged in
     var showAd = (typeof u_sid === 'undefined') ? 1 : 0;
-    
+
     // If using a browser extension, do not show ads
     showAd = (is_extension) ? 0 : showAd;
 

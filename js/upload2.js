@@ -264,7 +264,7 @@ var ulmanager = {
                     if (d) {
                         ulmanager.logger.error("restarting because it failed", ul_queue[i].retries, 'times', ul);
                     }
-                    ulmanager.restart(ul_queue[i], 'network_error_check');
+                    ulmanager.restart(ul_queue[i], 'peer-err');
                     ul_queue[i].retries = 0;
                 }
                 ul.error++;
@@ -284,7 +284,8 @@ var ulmanager = {
                     // if we're failing in average for the 3rd time,
                     // lets shrink our upload queue size
                     if (d) {
-                        ulmanager.logger.error('shrinking: ' + (k === ul ? 'ul' : 'dl'));
+                        var mng = (k === ul ? ulmanager : dlmanager);
+                        mng.logger.warn(' --- SHRINKING --- ');
                     }
                     var queue = (k === ul ? ulQueue : dlQueue);
                     queue.shrink();
@@ -935,8 +936,21 @@ ChunkUpload.prototype.on_ready = function(args, xhr) {
 
     this.srverr = xhr.status + 1;
 
-    this.oet = setTimeout(this.on_error.bind(this, null, xhr,
-        "BRFS [l:" + (xhr.response ? xhr.response.length : 'Unk') + "]"), 1950 + Math.floor(Math.random() * 2e3));
+    var errstr = 'BRFS [l:Unk]';
+    if (typeof xhr.response === 'string') {
+        if (xhr.response.length && xhr.response.length < 5) {
+            errstr = 'BRFS [s:' + xhr.response + ']';
+        }
+        else if (xhr.status >= 400) {
+            errstr = 'BRFS [-]';
+        }
+        else {
+            errstr = 'BRFS [l:' + xhr.response.length + ']';
+        }
+    }
+
+    this.oet = setTimeout(this.on_error.bind(this, null, xhr, errstr),
+        1950 + Math.floor(Math.random() * 2e3));
 
     if (d) {
         this.logger.warn("Bad response from server",
@@ -1016,7 +1030,7 @@ ChunkUpload.prototype.io_ready = function(task, args) {
 };
 
 ChunkUpload.prototype.done = function(ee) {
-    if (d) {
+    if (d && this.logger) {
         this.logger.info('.done');
     }
 

@@ -104,7 +104,7 @@ function init_page() {
         $('body').attr('class', '');
     }
 
-	if (localStorage.font_size) {
+    if (localStorage.font_size) {
         $('body').removeClass('fontsize1 fontsize2').addClass('fontsize' + localStorage.font_size);
     }
 
@@ -825,7 +825,7 @@ function init_page() {
             }
         }
 
-        if (typeof (megaChatDisabled) != "undefined" && megaChatDisabled === true) {
+        if (megaChatIsDisabled() === true) {
             $(document.body).addClass("megaChatDisabled");
         }
     }
@@ -1077,9 +1077,11 @@ function topmenuUI() {
         }
 
         // If the chat is disabled don't show the green status icon in the header
-        if (!megaChatDisabled) {
+        if (!megaChatIsDisabled()) {
             $('.activity-status-block, .activity-status').show();
-            megaChat.renderMyStatus();
+            if(typeof(megaChat) !== 'undefined') {
+                megaChat.renderMyStatus();
+            }
         }
     }
     else {
@@ -1599,7 +1601,7 @@ function topmenuUI() {
     if (page.substr(0, 2) !== 'fm' && u_type == 3 && !avatars[u_handle]) {
         M.avatars();
     }
-    if (ul_uploading || downloading) {
+    if (ulmanager.isUploading || dlmanager.isDownloading) {
         $('.widget-block').removeClass('hidden');
     }
 
@@ -1826,7 +1828,7 @@ function languageDialog(close) {
 }
 
 window.onbeforeunload = function () {
-    if (downloading || ul_uploading) {
+    if (dlmanager.isDownloading || ulmanager.isUploading) {
         return l[377];
     }
 

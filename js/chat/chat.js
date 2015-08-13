@@ -1,11 +1,12 @@
 /**
- * Use this localStorage.chatDisabled flag to disable/enable the chat (note the "==" logical comparison!)
+ * Use this localStorage.chatDisabled flag to disable/enable the chat (note the "!!" logical comparison!)
  *
  * @type {boolean}
  */
-var megaChatDisabled = !!localStorage.chatDisabled;
+var megaChatIsDisabled = function() {
+    return typeof localStorage.chatDisabled === "undefined" || localStorage.chatDisabled === "0" ? false : true;
+};
 
-var disableMpEnc = true;
 
 var chatui;
 (function() {
@@ -692,7 +693,8 @@ var Chat = function() {
             'urlFilter': UrlFilter,
             'emoticonsFilter': EmoticonsFilter,
             'attachmentsFilter': AttachmentsFilter,
-            'callFeedback': CallFeedback
+            'callFeedback': CallFeedback,
+            'karerePing': KarerePing
         },
         'chatNotificationOptions': {
             'textMessages': {
@@ -742,27 +744,27 @@ var Chat = function() {
 
     this.plugins = {};
 
-    if (!megaChatDisabled) {
+    if (!megaChatIsDisabled()) {
         try {
             // This might throw in browsers which doesn't support Strophe/WebRTC
             this.karere = new Karere({
                 'clientName': 'mc',
-                'boshServiceUrl': function() { return self.getBoshServiceUrl(); }
+                'xmppServiceUrl': function() { return self.getXmppServiceUrl(); }
             });
         }
         catch (e) {
             console.error(e);
-            megaChatDisabled = true;
+            megaChatIsDisabled = function() { return true; };
         }
     }
 
     Object.defineProperty(this, 'isReady', {
         get: function() {
-            return !megaChatDisabled && self.is_initialized;
+            return !megaChatIsDisabled() && self.is_initialized;
         }
     });
 
-    if (megaChatDisabled) {
+    if (megaChatIsDisabled()) {
         this.logger.info('MEGAChat is disabled.');
         $(document.body).addClass("megaChatDisabled");
     }
@@ -1406,12 +1408,10 @@ Chat.prototype.init = function() {
                 self.karere.getConnectionState() === Karere.CONNECTION_STATE.DISCONNECTED &&
                 localStorage.megaChatPresence !== "unavailable"
             ) {
-                self.logger.warn("Will bind a mousemove to re-trigger a connection retry on mousemove.");
 
                 $(document).rebind("mousemove.megaChatRetry", function() {
                     if (self.karere._connectionRetryUI() === true) {
                         $(document).unbind("mousemove.megaChatRetry");
-                        self.logger.warn("Connection retry triggered because of a mousemove.");
                     }
                 });
             }
@@ -1598,7 +1598,7 @@ Chat.prototype._onUsersUpdate = function(type, e, eventObject) {
                         room.state === ChatRoom.STATE.WAITING_FOR_PARTICIPANTS || room.state === ChatRoom.STATE.JOINING
                     )
                 ) {
-                    if (room._conv_ended === true || typeof(room._conv_ended) === 'undefined') {
+                    if (room._conv_ended === true || typeof room._conv_ended === 'undefined') {
                         room._conversationStarted(room.getParticipantsExceptMe()[0]);
                     }
                 }
@@ -1633,7 +1633,7 @@ Chat.prototype._onUsersUpdate = function(type, e, eventObject) {
             room = self.chats[eventObject.getRoomJid()];
             if (room) {
                 if (room._waitingForOtherParticipants() === false && room.state === ChatRoom.STATE.WAITING_FOR_PARTICIPANTS) {
-                    if (room._conv_ended === true || typeof(room._conv_ended) === 'undefined') {
+                    if (room._conv_ended === true || typeof room._conv_ended === 'undefined') {
                         room._conversationStarted(eventObject.getFromJid());
                     } else {
                         if (room.state === ChatRoom.STATE.WAITING_FOR_PARTICIPANTS) {
@@ -1689,7 +1689,7 @@ Chat.prototype.destroy = function(isLogout) {
         .done(function() {
             self.karere = new Karere({
                 'clientName': 'mc',
-                'boshServiceUrl': function() { return self.getBoshServiceUrl(); }
+                'xmppServiceUrl': function() { return self.getXmppServiceUrl(); }
             });
 
             self.is_initialized = false;
@@ -1798,6 +1798,9 @@ Chat.prototype.xmppPresenceToCssClass = function(presence) {
  */
 Chat.prototype.renderMyStatus = function() {
     var self = this;
+    if (!self.is_initialized) {
+        return;
+    }
 
     // reset
     var $status = $('.activity-status-block .activity-status');
@@ -2432,11 +2435,13 @@ Chat.prototype.getChatNum = function(idx) {
  * Called when the BOSH service url is requested for Karere to connect. Should return a full URL to the actual
  * BOSH service that should be used for connecting the current user.
  */
-Chat.prototype.getBoshServiceUrl = function() {
+Chat.prototype.getXmppServiceUrl = function() {
     var self = this;
 
     if (localStorage.megaChatUseSandbox) {
         return "https://karere-005.developers.mega.co.nz/bosh";
+    } else if (localStorage.customXmppServiceUrl) {
+        return localStorage.customXmppServiceUrl;
     } else {
         var $promise = new MegaPromise();
 
@@ -2444,18 +2449,23 @@ Chat.prototype.getBoshServiceUrl = function() {
             .done(function(r) {
                 if (r.xmpp && r.xmpp.length > 0) {
                     var randomHost = array_random(r.xmpp);
-                    $promise.resolve("https://" + randomHost.host + ":" + randomHost.port + "/bosh");
-                } else {
+                    $promise.resolve("wss://" + randomHost.host + "/ws");
+                }
+                else if (!r.xmpp || r.xmpp.length === 0) {
+                    self.logger.error("GeLB returned no results. Halting.");
+                    $promise.reject();
+                }
+                else {
                     var server = array_random(self.options.fallbackXmppServers);
                     self.logger.error("Got empty list from the load balancing service for xmpp, will fallback to: " + server + ".");
-                    $promise.resolve(server);
+                    $promise.resolve(server.replace("https:", "wss:").replace("/bosh", "/ws"));
                 }
             })
             .fail(function() {
                 var server = array_random(self.options.fallbackXmppServers);
                 self.logger.error("Could not connect to load balancing service for xmpp, will fallback to: " + server + ".");
 
-                $promise.resolve(server);
+                $promise.resolve(server.replace("https:", "wss:").replace("/bosh", "/ws"));
             });
 
         return $promise;
@@ -2570,5 +2580,3 @@ Chat.prototype.createAndShowPrivateRoomFor = function(h) {
     chatui(h);
     return this.getPrivateRoom(h);
 };
-
-window.megaChat = new Chat();

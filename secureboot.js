@@ -742,7 +742,7 @@ else if (!b_u)
         };
     })(console);
 
-    Object.defineProperty(window, "__cd_v", { value : 13, writable : false });
+    Object.defineProperty(window, "__cd_v", { value : 14, writable : false });
     if (!d || onBetaW)
     {
         var __cdumps = [], __cd_t;
@@ -764,6 +764,7 @@ else if (!b_u)
                 l: ln,
                 f: mTrim(url),
                 m: mTrim(msg).replace(/'(\w+:\/\/+[^/]+)[^']+'/, "'$1...'")
+                    .replace(/(Access to '\.\.).*(' from script denied)/, '$1$2')
                     .replace(/^Uncaught\W*(?:exception\W*)?/i, ''),
             }, cc;
             var sbid = +(''+(document.querySelector('script[src*="secureboot"]')||{}).src).split('=').pop()|0;
@@ -1030,6 +1031,7 @@ else if (!b_u)
     jsl.push({f:'js/vendor/favico.js', n: 'favico_js', j:1,w:7});
     jsl.push({f:'js/vendor/notification.js', n: 'notification_js', j:1,w:7});
 
+    jsl.push({f:'js/chat/plugins/karerePing.js', n: 'karerePing_js', j:1,w:7});
     jsl.push({f:'js/chat/plugins/callManager.js', n: 'callManager_js', j:1,w:7});
     jsl.push({f:'js/chat/plugins/urlFilter.js', n: 'urlFilter_js', j:1,w:7});
     jsl.push({f:'js/chat/plugins/emoticonsFilter.js', n: 'emoticonsFilter_js', j:1,w:7});
@@ -1205,8 +1207,6 @@ else if (!b_u)
             }
         }
     }
-    var downloading = false;
-    var ul_uploading = false;
     var lightweight=false;
     var waitingToBeLoaded = 0,jsl_done,jj_done = !jj;
     var fx_startup_cache = is_chrome_firefox && nocontentcheck;
@@ -1728,7 +1728,7 @@ function showAd() {
 
     // We need to tell the API we would like ad urls, but only if we are not logged in
     var showAd = (typeof u_sid === 'undefined') ? 1 : 0;
-    
+
     // If using a browser extension, do not show ads
     showAd = (is_extension) ? 0 : showAd;
 

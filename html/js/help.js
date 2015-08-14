@@ -108,7 +108,11 @@ function init_help()
 		$('.new-right-content-block.help-info-pages').removeClass('hidden');
 		$('.help-info-pages .sections').addClass('hidden');
 		$('#section-' + subpage).removeClass('hidden');
-		mainScroll();
+		$('.help-info-pages img').rebind('load',function()
+		{
+			mainScroll();
+		});
+		
 	}
 	else
 	{

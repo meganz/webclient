@@ -12,7 +12,7 @@
     "test": "make test",
     "api-doc": "make api-doc"
   },
-  "homepage": "https://mega.co.nz/",
+  "homepage": "https://mega.nz/",
   "repository": {
     "type": "git",
     "url": "git@github.com:meganz/webclient.git"

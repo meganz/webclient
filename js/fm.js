@@ -8218,10 +8218,10 @@ function getclipboardlinks()
             if (n.t) F = 'F';
             if (i > 0) link += '\n';
 
-            // Add the link to the file e.g. https://mega.co.nz/#!qRN33YbK
+            // Add the link to the file e.g. https://mega.nz/#!qRN33YbK
             link += getBaseUrl() + '/#' + F + '!' + htmlentities(n.ph);
 
-            // If they want the file key as well, add it e.g. https://mega.co.nz/#!qRN33YbK!o4Z76qDqP...
+            // If they want the file key as well, add it e.g. https://mega.nz/#!qRN33YbK!o4Z76qDqP...
             if (key && $('#export-checkbox').is(':checked')) {
                 link += '!' + a32_to_base64(key);
             }

@@ -263,7 +263,7 @@ function populate_l() {
     l[208] = l[208].replace('[/A]', '</a>');
     l[517] = l[517].replace('[A]', '<a href="#help">').replace('[/A]', '</a>');
     l[521] = l[521].replace('[A]', '<a href="#copyright">').replace('[/A]', '</a>');
-    l[553] = l[553].replace('[A]', '<a href="mailto:resellers@mega.co.nz">').replace('[/A]', '</a>');
+    l[553] = l[553].replace('[A]', '<a href="mailto:resellers@mega.nz">').replace('[/A]', '</a>');
     l[555] = l[555].replace('[A]', '<a href="#terms">').replace('[/A]', '</a>');
     l[754] = l[754].replace('[A]',
         '<a href="http://www.google.com/chrome" target="_blank" rel="noreferrer" style="color:#D9290B;">');
@@ -301,8 +301,8 @@ function populate_l() {
             .replace('[/A]', '</a>');
     l[1936] = l[1936].replace('[A]', '<a href="#backup">').replace('[/A]', '</a>');
     l[1942] = l[1942].replace('[A]', '<a href="#backup">').replace('[/A]', '</a>');
-    l[1943] = l[1943].replace('[A]', '<a href="mailto:support@mega.co.nz">').replace('[/A]', '</a>');
-    l[1948] = l[1948].replace('[A]', '<a href="mailto:support@mega.co.nz">').replace('[/A]', '</a>');
+    l[1943] = l[1943].replace('[A]', '<a href="mailto:support@mega.nz">').replace('[/A]', '</a>');
+    l[1948] = l[1948].replace('[A]', '<a href="mailto:support@mega.nz">').replace('[/A]', '</a>');
     l[1957] = l[1957].replace('[A]', '<a href="#recovery">').replace('[/A]', '</a>');
     l[1965] = l[1965].replace('[A]', '<a href="#recovery">').replace('[/A]', '</a>');
     l[1982] = l[1982].replace('[A]', '<font style="color:#D21F00;">').replace('[/A]', '</font>');
@@ -2442,12 +2442,12 @@ function flashIsEnabled() {
 
 /**
  * Gets the current base URL of the page (protocol + hostname) e.g. If on beta.mega.nz it will return https://beta.mega.nz.
- * If on the browser extension it will return the default https://mega.co.nz. If on localhost it will return https://mega.co.nz.
- * This can be used to create external links, for example file downloads https://mega.co.nz/#!qRN33YbK!o4Z76qDqPbiK2G0I...
+ * If on the browser extension it will return the default https://mega.nz. If on localhost it will return https://mega.nz.
+ * This can be used to create external links, for example file downloads https://mega.nz/#!qRN33YbK!o4Z76qDqPbiK2G0I...
  * @returns {String}
  */
 function getBaseUrl() {
-    return 'https://' + (((location.protocol === 'https:') && location.host) || 'mega.co.nz');
+    return 'https://' + (((location.protocol === 'https:') && location.host) || 'mega.nz');
 }
 
 /**

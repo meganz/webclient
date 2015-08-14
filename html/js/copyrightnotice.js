@@ -85,7 +85,7 @@ function init_cn()
 		var c = $(this).attr('class');
 		if (c && c.indexOf('type') > -1 && $(this).val() == 4)
 		{
-			msgDialog('info',l[701],l[700].replace('[A1]','<a href="mailto:copyright@mega.co.nz" class="red">').replace('[/A1]','</A>').replace('[A2]','<a href="#copyright" class="red">').replace('[/A2]','</A>'));
+			msgDialog('info',l[701],l[700].replace('[A1]','<a href="mailto:copyright@mega.nz" class="red">').replace('[/A1]','</A>').replace('[A2]','<a href="#copyright" class="red">').replace('[/A2]','</A>'));
 			$(this).val(0);
 			$(this).parent().find('.affiliate-select-txt').text(l[1278]);
 		}	

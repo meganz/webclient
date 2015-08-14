@@ -503,10 +503,10 @@ define('mpenc/helper/utils',[
     var ns = {};
 
     /*
-     * Created: 7 Feb 2014 Guy K. Kloss <gk@mega.co.nz>
+     * Created: 7 Feb 2014 Guy K. Kloss <gk@mega.nz>
      *
      * (c) 2014 by Mega Limited, Wellsford, New Zealand
-     *     http://mega.co.nz/
+     *     http://mega.nz/
      *     Simplified (2-clause) BSD License.
      *
      * You should have received a copy of the license along with this
@@ -948,10 +948,10 @@ define('mpenc/helper/assert',[
  */
 
 /*
- * Created: 11 Feb 2014 Guy K. Kloss <gk@mega.co.nz>
+ * Created: 11 Feb 2014 Guy K. Kloss <gk@mega.nz>
  *
  * (c) 2014 by Mega Limited, Wellsford, New Zealand
- *     http://mega.co.nz/
+ *     http://mega.nz/
  *     Simplified (2-clause) BSD License.
  *
  * You should have received a copy of the license along with this
@@ -1016,10 +1016,10 @@ define('mpenc/codec',[
     var _PROTOCOL_PREFIX = '?' + _PROTOCOL_INDICATOR;
 
     /*
-     * Created: 19 Mar 2014 Guy K. Kloss <gk@mega.co.nz>
+     * Created: 19 Mar 2014 Guy K. Kloss <gk@mega.nz>
      *
      * (c) 2014 by Mega Limited, Wellsford, New Zealand
-     *     http://mega.co.nz/
+     *     http://mega.nz/
      *     Simplified (2-clause) BSD License.
      *
      * You should have received a copy of the license along with this
@@ -2291,10 +2291,10 @@ define('mpenc/greet/cliques',[
     var _assert = assert.assert;
 
     /*
-     * Created: 20 Jan 2014 Guy K. Kloss <gk@mega.co.nz>
+     * Created: 20 Jan 2014 Guy K. Kloss <gk@mega.nz>
      *
      * (c) 2014 by Mega Limited, Wellsford, New Zealand
-     *     http://mega.co.nz/
+     *     http://mega.nz/
      *     Simplified (2-clause) BSD License.
      *
      * You should have received a copy of the license along with this
@@ -2785,10 +2785,10 @@ define('mpenc/greet/ske',[
     var _assert = assert.assert;
 
     /*
-     * Created: 5 Feb 2014 Guy K. Kloss <gk@mega.co.nz>
+     * Created: 5 Feb 2014 Guy K. Kloss <gk@mega.nz>
      *
      * (c) 2014 by Mega Limited, Wellsford, New Zealand
-     *     http://mega.co.nz/
+     *     http://mega.nz/
      *     Simplified (2-clause) BSD License.
      *
      * You should have received a copy of the license along with this
@@ -3353,10 +3353,10 @@ define('mpenc/handler',[
     var _assert = assert.assert;
 
     /*
-     * Created: 27 Feb 2014 Guy K. Kloss <gk@mega.co.nz>
+     * Created: 27 Feb 2014 Guy K. Kloss <gk@mega.nz>
      *
      * (c) 2014 by Mega Limited, Wellsford, New Zealand
-     *     http://mega.co.nz/
+     *     http://mega.nz/
      *     Simplified (2-clause) BSD License.
      *
      * You should have received a copy of the license along with this
@@ -4389,10 +4389,10 @@ define('mpenc/handler',[
  */
 
 /*
- * Created: 11 Feb 2014 Guy K. Kloss <gk@mega.co.nz>
+ * Created: 11 Feb 2014 Guy K. Kloss <gk@mega.nz>
  *
  * (c) 2014 by Mega Limited, Wellsford, New Zealand
- *     http://mega.co.nz/
+ *     http://mega.nz/
  *     Simplified (2-clause) BSD License.
  *
  * You should have received a copy of the license along with this

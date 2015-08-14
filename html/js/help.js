@@ -122,7 +122,7 @@ l[1863] = l[1863].replace('[C]','<a href="https://play.google.com/store/apps/det
 l[1862] = l[1862].replace('[A]','<a href="https://play.google.com/store/apps/details?id=nz.mega.android&referrer=meganzhelp" target="_blank" rel="noreferrer">').replace('[/A]','</a>');
 l[1860] = l[1860].replace('[A]','<a href="https://itunes.apple.com/app/mega/id706857885" target="_blank" rel="noreferrer">').replace('[/A]','</a>');
 l[1828] = l[1828].replace('[A]','<a href="#sync">').replace('[/A]','</a>');
-l[1996] = l[1996].replace('[A]','<a href="mailto:support@mega.co.nz">').replace('[/A]','</a>');
+l[1996] = l[1996].replace('[A]','<a href="mailto:support@mega.nz">').replace('[/A]','</a>');
 l[1998]	= l[1998].replace('[A]','<a href="#backup">').replace('[/A]','</a>');
 l[1838] = l[1838].replace('"Debris"','"Rubbish"');
 

@@ -8,10 +8,10 @@ branches' tips.
 This test runner will work with both Python 2.7 as well as 3.x.
 """
 
-## Created: 23 May 2015 Guy Kloss <gk@mega.co.nz>
+## Created: 23 May 2015 Guy Kloss <gk@mega.nz>
 ##
 ## (c) 2015 by Mega Limited, Auckland, New Zealand
-##     http://mega.co.nz/
+##     http://mega.nz/
 ##     Simplified (2-clause) BSD License.
 ##
 ## You should have received a copy of the license along with this
@@ -23,7 +23,7 @@ This test runner will work with both Python 2.7 as well as 3.x.
 ## but WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-__author__ = 'Guy Kloss <gk@mega.co.nz>'
+__author__ = 'Guy Kloss <gk@mega.nz>'
 
 import argparse
 import os

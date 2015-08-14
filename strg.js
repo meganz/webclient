@@ -3,7 +3,7 @@ var mIDBPlaceHolder = false;
 
 (function(scope) {
 	var nsIDOMStorage, nsIDOMSesStorage,
-		uri = "https://mega.co.nz/",
+		uri = "https://mega.nz/",
 		inPrivateBrowsing,
 		storageURI,
 		principal;

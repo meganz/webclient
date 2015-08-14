@@ -356,7 +356,7 @@ function sync_switchOS(os)
 {
     if (os == 'windows')
     {
-        syncurl = 'https://mega.co.nz/MEGAsyncSetup.exe';
+        syncurl = 'https://mega.nz/MEGAsyncSetup.exe';
         $('.sync-button-txt.small').text(l[1158]);
         $('.sync-bottom-txt').html('Also available for <a href="" class="red mac">Mac</a> and <a href="" class="red linux">Linux</a>');
         $('.sync-button').removeClass('mac linux');
@@ -365,7 +365,7 @@ function sync_switchOS(os)
     else if (os == 'mac')
     {
 
-        syncurl = 'https://mega.co.nz/MEGAsyncSetup.dmg';
+        syncurl = 'https://mega.nz/MEGAsyncSetup.dmg';
         var ostxt = 'For Mac';
         if (l[1158].indexOf('Windows') > -1) ostxt = l[1158].replace('Windows','Mac');
         if (l[1158].indexOf('Linux') > -1) ostxt = l[1158].replace('Linux','Mac');

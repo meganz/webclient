@@ -181,9 +181,9 @@ var ulmanager = {
             if (os_class === 'Apple') {
                 os_class = 'Mac';
             }
-            var os_file = 'https://mega.co.nz/MEGAsyncSetup.exe';
+            var os_file = 'https://mega.nz/MEGAsyncSetup.exe';
             if (os_class === 'Mac') {
-                os_file = 'https://mega.co.nz/MEGAsyncSetup.dmg';
+                os_file = 'https://mega.nz/MEGAsyncSetup.dmg';
             }
             else if (os_class === 'Linux') {
                 os_file = '/#sync';

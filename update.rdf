@@ -9,7 +9,7 @@
   <RDF:Seq RDF:about="rdf:#$HIU611">
     <RDF:li RDF:resource="rdf:#$IIU611"/>
   </RDF:Seq>
-  <RDF:Description RDF:about="urn:mozilla:extension:firefox@mega.nz"
+  <RDF:Description RDF:about="urn:mozilla:extension:firefox@mega.co.nz"
                    NS1:signature="MIGTMA0GCSqGSIb3DQEBDQUAA4GBALMbqrpGTb5nGmMSXaczj+ptKIFCggzkwyETp7bmQnS4cHKhlfgy+p508ZzWFOfxNWNVTBZOX7POh+lg74U9EpW378R8ABKYBCG0PnSuU4nVAFfLNcnlPs4fgskJ0sVxh1Ca4Wx5iwz23C/Qp3GQrhEIUGSquBuJ/oWdL2CD6DYN">
     <NS1:updates RDF:resource="rdf:#$HIU611"/>
   </RDF:Description>

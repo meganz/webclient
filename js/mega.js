@@ -340,6 +340,9 @@ function MegaData()
         return M.getFilterBy(function(node) { return node.p === M.InboxID; });
     };
 
+    // @TODO PERF: This should use the localStorage/sessionStorage/mDB for caching the avatars and keeping them up to
+    // date by listening and maintaining the local cache via the actionpackets
+    // OR maybe just start using getUserAttribute? (and the cache can be implemented there?)
     this.avatars = function()
     {
         if (!M.c.contacts)
@@ -1920,6 +1923,7 @@ function MegaData()
                         this.buildtree(folders[ii], dialog, stype);
                     }
 
+                    // @TODO PERF: the following call is not optimal. It will call the sharedUInode for non-shared folders
                     sharedUInode(folders[ii].h);
                 }
             }// END of for folders loop

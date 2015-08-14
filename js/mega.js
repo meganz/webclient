@@ -4308,27 +4308,11 @@ function MegaData()
 
                 // Get the page to load
                 var toPage = urlParts[2];
+				var toLang = urlParts[4];
 
-                // The isEphemeralAccount flag may not be set (e.g. if from SDK), but if it is then set it
-                var isEphemeralAccount = (typeof urlParts[3] === 'undefined') ? false : urlParts[3];
-
-                // If a regular account, log them in
-                if (!isEphemeralAccount) {
-                    if (toPage == '') toPage = 'fm';
-                    this.performRegularLogin(toPage);
-                }
-                else {
-                    // Otherwise this is an ephemeral account, so reset the page hash
-                    if (toPage) {
-                        window.location.hash = toPage;
-                    }
-                    else {
-                        window.location.hash = '';
-                    }
-
-                    // Do a full reload to log them in properly
-                    document.location.reload(false);
-                }
+                // initialize all account types and redirect to the FM:
+				if (toPage == '') toPage = 'fm';
+				this.performRegularLogin(toPage);                
             }
         }
     };
@@ -4358,8 +4342,9 @@ function MegaData()
                     window.location.hash = toPage;
                 }
                 else {
-                    // Incorrect email or password
-                    alert(l[201]);
+                    // Must be an ephemeral account, attempt to initialize:
+                    u_type=0;
+					window.location.hash = toPage;
                 }
             }
         };

@@ -436,13 +436,13 @@ var mFileManagerDB = {
                             for (var i in results) {
                                 if (!(results[i].n || results[i].h)) {
                                     console.error('missing required .n property for a nodeShare (mDB init)');
+                                } else {
+                                    M.nodeShare(
+                                        results[i].n ? results[i].n : results[i].h,
+                                        results[i],
+                                        1
+                                    );
                                 }
-
-                                M.nodeShare(
-                                    results[i].n ? results[i].n : results[i].h,
-                                    results[i],
-                                    1
-                                );
                             }
                         }
                         else {

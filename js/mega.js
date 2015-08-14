@@ -1836,14 +1836,19 @@ function MegaData()
                     var ulc = '';
                     var expandedc = '';
                     var buildnode = false;
-                    if (fmconfig && fmconfig.treenodes && fmconfig.treenodes[folders[ii].h] && M.c[folders[ii].h]) {
-                        for (var h in M.c[folders[ii].h]) {
-                            var n2 = M.d[h];
-                            if (n2 && n2.t) {
-                                buildnode = true;
+                    var containsc = '';
+                    var cns = M.c[folders[ii].h];
+                    if (cns) {
+                        for (var cn in cns) {
+                            /* jshint -W073 */
+                            if (M.d[cn] && M.d[cn].t) {
+                                containsc = 'contains-folders';
                                 break;
                             }
                         }
+                    }
+                    if (fmconfig && fmconfig.treenodes && fmconfig.treenodes[folders[ii].h]) {
+                        buildnode = Boolean(containsc);
                     }
                     if (buildnode) {
                         ulc = 'class="opened"';
@@ -1852,18 +1857,7 @@ function MegaData()
                     else if (fmconfig && fmconfig.treenodes && fmconfig.treenodes[folders[ii].h]) {
                         fmtreenode(folders[ii].h, false);
                     }
-                    var containsc = '';
-                    var cns = M.c[folders[ii].h];
-                    if (cns) {
-                        for (var cn in cns) {
-                            if (M.d[cn] && M.d[cn].t) {
-                                containsc = 'contains-folders';
-                                break;
-                            }
-                        }
-                    }
                     var sharedfolder = '';
-
                     if (M.d[folders[ii].h].shares) {
                         sharedfolder = ' shared-folder';
                     }
@@ -1887,7 +1881,7 @@ function MegaData()
                         var sExportLink = (M.d[folders[ii].h].shares && M.d[folders[ii].h].shares.EXP) ? 'linked' : '';
                         var sLinkIcon = (sExportLink === '') ? '' : 'link-icon';
                         var arrowIcon = '';
-                        if (M.c[folders[ii].h]) {
+                        if (containsc) {
                             arrowIcon = 'class="nw-fm-arrow-icon"';
                         }
                         var html = '<li id="' + _li + folders[ii].h + '">\n\
@@ -1918,9 +1912,9 @@ function MegaData()
                             $('#' + _li + folders[ii].h).parents('li').removeClass('tree-item-on-search-hidden');
                         }
                     }
-//                    if (buildnode) {
-//                        this.buildtree(folders[ii], dialog, stype);
-//                    }
+                    if (buildnode) {
+                        this.buildtree(folders[ii], dialog, stype);
+                    }
 
                     sharedUInode(folders[ii].h);
                 }

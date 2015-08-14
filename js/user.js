@@ -121,12 +121,9 @@ function u_checklogin3a(res, ctx) {
             }
         }
 
-        if (typeof(u_attr.flags) !== 'undefined') {
-            Object.keys(u_attr.flags).forEach(function(k) {
-                if (k === "mcs") {
-                    localStorage.chatDisabled = u_attr.flags[k];
-                }
-            });
+        // If 'mcs' Mega Chat Status flag is 0 then MegaChat is off, otherwise if flag is 1 MegaChat is on
+        if ((typeof u_attr.flags !== 'undefined') && (typeof u_attr.flags.mcs !== 'undefined')) {
+            localStorage.chatDisabled = (u_attr.flags.mcs === 0) ? '1' : '0';
         }
 
         if (u_k) {

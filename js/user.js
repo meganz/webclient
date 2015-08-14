@@ -614,6 +614,10 @@ function getUserAttribute(userhandle, attribute, pub, nonHistoric,
     myCtx.ua = attribute;
     myCtx.callback = settleFunction;
 
+    // @TODO PERF: This may reduce the number of API calls made during the page initialisation if the next line is
+    // replaced with a clever cache (localStorage/sessionStorage/mDB) that will do cache all api_req's related to
+    // attributes and keep it in sync via actionpackets.
+
     // Fire it off.
     api_req({'a': 'uga', 'u': userhandle, 'ua': attribute}, myCtx);
 

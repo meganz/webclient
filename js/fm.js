@@ -996,13 +996,6 @@ function initUI() {
     });
 
     $(window).rebind('resize.fmrh hashchange.fmrh', fm_resize_handler);
-
-    if (!megaChatIsDisabled()) {
-        megaChat.karere.rebind("onPresence.maintainUI", function(e, presenceEventData) {
-            var contact = megaChat.getContactFromJid(presenceEventData.getFromJid());
-            M.onlineStatusEvent(contact, presenceEventData.getShow());
-        });
-    }
 }
 
 function transferPanelContextMenu(target)
@@ -1505,6 +1498,9 @@ function sharedUInode(nodeHandle) {
         }
     }
 
+    // @TODO PERF: In case of a lot of file nodes, the following 2 jQuery selectors will consume a lot of CPU/time. Please
+    // Please find a way to optimise this via the actionpackets system, M.nodeShare and M.delNodeShare to only execute
+    // this query in case it is needed.
     $('.grid-table.fm #' + nodeHandle + ' .transfer-filtype-icon').addClass(fileIcon({t: 1, share: bAvailShares}));
     $('#' + nodeHandle + '.file-block .block-view-file-type').addClass(fileIcon({t: 1, share: bAvailShares}));
 

@@ -16690,6 +16690,22 @@ span.browsers-update {
 .chrome-bottom-block.first {
 	margin-left: 0;
 }
+.chrome-bottom-block .actual-links {
+    display: none;
+}
+.chrome-bottom-block .chrome-download-button:hover .actual-links > a {
+    color: #fff;
+} 
+.chrome-bottom-block .actual-links > a {
+    display: block;
+    font-size: 14px;
+}
+.chrome-bottom-block .actual-links > a:hover {
+    font-weight: bold;
+}
+.chrome-bottom-block .actual-links > a:first-child {
+    margin-top: 7px;
+}
 .chrome-number {
 	width: 30px;
 	height: 30px;

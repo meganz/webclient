@@ -8664,7 +8664,7 @@ function chromeDialog(close)
  * Open a dialog asking the user to download MEGAsync for files over 1GB
  */
 function megaSyncDialog() {
-    
+
     // Cache selector
     var $dialog = $('.fm-dialog.download-megasync-dialog');
 
@@ -8677,15 +8677,15 @@ function megaSyncDialog() {
         $dialog.addClass('hidden');
         fm_hideoverlay();
     });
-    
+
     // Add checkbox handling
     $dialog.find('#megasync-checkbox').rebind('click', function() {
-        
+
         var $this = $(this);
-        
+
         // If it has not been checked, check it
         if (!$this.hasClass('checkboxOn')) {
-            
+
             // Store a flag so that it won't show this dialog again if triggered
             localStorage.megaSyncDialog = 1;
             $this.attr('class', 'checkboxOn');
@@ -9557,6 +9557,7 @@ function fm_thumbnails()
                 console.log('Requesting %d thumbs (%d loaded)', a, fa_reqcnt);
 
             var rt = Date.now();
+            var cdid = M.currentdirid;
             api_getfileattr(treq, 0, function(ctx, node, uint8arr)
             {
                 if (uint8arr === 0xDEAD)
@@ -9579,7 +9580,7 @@ function fm_thumbnails()
                     blob = new Blob([uint8arr.buffer]);
                 // thumbnailblobs[node] = blob;
                 thumbnails[node] = myURL.createObjectURL(blob);
-                if (M.d[node] && M.d[node].seen)
+                if (M.d[node] && M.d[node].seen && M.currentdirid === cdid)
                     fm_thumbnail_render(M.d[node]);
 
                 // deduplicate in view when there is a duplicate fa:
@@ -9590,7 +9591,7 @@ function fm_thumbnails()
                         if (M.v[i].h !== node && M.v[i].fa == M.d[node].fa && !thumbnails[M.v[i].h])
                         {
                             thumbnails[M.v[i].h] = thumbnails[node];
-                            if (M.v[i].seen)
+                            if (M.v[i].seen && M.currentdirid === cdid)
                                 fm_thumbnail_render(M.v[i]);
                         }
                     }

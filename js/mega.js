@@ -1175,7 +1175,11 @@ function MegaData()
                 }
             });
 
+            var cdid = M.currentdirid;
             $(window).bind("resize.dynlist", SoonFc(function() {
+                if (cdid !== M.currentdirid) {
+                    return;
+                }
                 if (cache.length) {
                     if (!$(lSel).find('.jspDrag:visible').length) {
                         var n;
@@ -5933,7 +5937,7 @@ function loadfm_callback(res, ctx) {
         }
 
         loadfm_done(pfkey, ctx.stackPointer);
-        
+
         if (!pfkey) {
             notify.getInitialNotifications();
         }

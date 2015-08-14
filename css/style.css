@@ -25817,10 +25817,14 @@ body, body * {
     padding-left: 10px !important;
 }
 
+.help-nw li, .help-nw p {
+    margin-top: 10px;
+}
+
 .help-nw h2 {
     margin-top: 20px;
 }
 
 .help-nw img {
-    max-width: 100%;
+    max-width: 50%;
 }

@@ -9,6 +9,9 @@ var megaChatIsDisabled = function() {
 	if (u_type < 3) {
         return true;
     }
+    else if (window.location.hash.indexOf("#F!") === 0) {
+        return true;
+    }
     
     return (typeof localStorage.chatDisabled === 'undefined' || localStorage.chatDisabled === '0') ? false : true;
 };
@@ -1421,6 +1424,11 @@ Chat.prototype.init = function() {
                     }
                 });
             }
+    });
+
+    self.karere.rebind("onPresence.maintainUI", function(e, presenceEventData) {
+        var contact = self.getContactFromJid(presenceEventData.getFromJid());
+        M.onlineStatusEvent(contact, presenceEventData.getShow());
     });
 
     self.trigger("onInit");

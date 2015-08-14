@@ -996,13 +996,6 @@ function initUI() {
     });
 
     $(window).rebind('resize.fmrh hashchange.fmrh', fm_resize_handler);
-
-    if (!megaChatIsDisabled()) {
-        megaChat.karere.rebind("onPresence.maintainUI", function(e, presenceEventData) {
-            var contact = megaChat.getContactFromJid(presenceEventData.getFromJid());
-            M.onlineStatusEvent(contact, presenceEventData.getShow());
-        });
-    }
 }
 
 function transferPanelContextMenu(target)

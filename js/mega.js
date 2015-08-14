@@ -449,7 +449,11 @@ function MegaData()
             var e = $('.fm-chat-user-status.' + u.u);
             if (e.length > 0)
                 $(e).html(this.onlineStatusClass(status)[0]);
-            if ($.sortTreePanel.contacts.by == 'status') {
+            if (
+                typeof $.sortTreePanel !== 'undefined' &&
+                typeof $.sortTreePanel.contacts !== 'undefined' &&
+                $.sortTreePanel.contacts.by == 'status'
+            ) {
                 M.contacts(); // we need to resort
             }
 

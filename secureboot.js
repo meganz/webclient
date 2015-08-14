@@ -368,7 +368,9 @@ var mBroadcaster = {
             this.ctID = ~~(Math.random() * Date.now());
             this.listen(setup);
             this.notify('ping');
-            setTimeout(setup, 2000);
+
+            // @TODO PERF: This should be optimised to <1s.
+            setTimeout(setup, 1000);
 
             // if (typeof u_handle !== 'undefined') {
                 // if (+localStorage['mCrossTabRef_' + u_handle] + 14e3 > Date.now()) {

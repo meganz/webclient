@@ -1471,10 +1471,10 @@ a.blog-button:hover {
 	background-position: 1px -9786px;
 }
 .notification-item.template {
-    display: none;
+	display: none;
 }
 .notification-item.clickable {
-    cursor: pointer;
+	cursor: pointer;
 }
 .notification-item {
 	display: block;
@@ -1573,13 +1573,12 @@ a.blog-button:hover {
 	padding: 4px 20px 0 8px;
 }
 .nt-contact-request .notification-request-buttons.hidden {
-    display: none;
+	display: none;
 }
 .nt-contact-request .notification-request-buttons {
 	display: block;
 }
-.nt-contact-request.accepted .notification-request-buttons,
-.nt-contact-request.not-now .notification-request-buttons {
+.nt-contact-request.accepted .notification-request-buttons, .nt-contact-request.not-now .notification-request-buttons {
 	display: none;
 }
 .notification-accepted {
@@ -16610,20 +16609,20 @@ span.browsers-update {
 	white-space: nowrap;
 }
 .ff-bottom-block .sync-button-txt {
-    color: #777777;
-    font-family: "source_sans_prosemibold";
-    font-size: 17px;
-    line-height: 15px;
-    padding-left: 70px;
-    white-space: nowrap;
+	color: #777777;
+	font-family: "source_sans_prosemibold";
+	font-size: 17px;
+	line-height: 15px;
+	padding-left: 70px;
+	white-space: nowrap;
 }
 .ff-bottom-block .url {
-    color: #777;
-    display: block;
-    font-size: 12px;
-    font-weight: bold;
-    margin-left: 59px;
-    text-align: center;
+	color: #777;
+	display: block;
+	font-size: 12px;
+	font-weight: bold;
+	margin-left: 59px;
+	text-align: center;
 }
 .sync-button-txt.small {
 	font-size: 13px;
@@ -16691,20 +16690,20 @@ span.browsers-update {
 	margin-left: 0;
 }
 .chrome-bottom-block .actual-links {
-    display: none;
+	display: none;
 }
 .chrome-bottom-block .chrome-download-button:hover .actual-links > a {
-    color: #fff;
-} 
+	color: #fff;
+}
 .chrome-bottom-block .actual-links > a {
-    display: block;
-    font-size: 14px;
+	display: block;
+	font-size: 14px;
 }
 .chrome-bottom-block .actual-links > a:hover {
-    font-weight: bold;
+	font-weight: bold;
 }
 .chrome-bottom-block .actual-links > a:first-child {
-    margin-top: 7px;
+	margin-top: 7px;
 }
 .chrome-number {
 	width: 30px;
@@ -18411,6 +18410,22 @@ h1.help-home-header {
 .new-bottom-pages .help-info-pages li p {
 	padding: 0px;
 }
+.help-nw ol, .help-nw ul {
+	padding-left: 10px !important;
+}
+.help-nw li, .help-nw p {
+	margin-top: 10px;
+}
+.help-nw h2 {
+	margin-top: 20px;
+}
+.help-nw p {
+	text-align: left;
+	position: relative;
+}
+.help-nw img {
+	max-width: 100%;
+}
 .sync-coming-soon-txt {
 	text-align: center;
 	line-height: 68px;
@@ -18521,6 +18536,9 @@ h1.help-home-header {
 	-moz-user-select: text;
 	-ms-user-select: text;
 	user-select: text;
+}
+div.new-bottom-pages li, div.new-bottom-pages p {
+	text-align: justify;
 }
 .blog-new-full ul.small-pad li {
 	padding-bottom: 0;
@@ -22423,19 +22441,12 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 /**
  * Hide UI elements when the chat is disabled
  */
-.megaChatDisabled .fm-start-conversation,
-.megaChatDisabled .nw-contact-status,
-.megaChatDisabled .nw-fm-left-icon.conversations,
-.megaChatDisabled .fm-send-files,
-.megaChatDisabled .start-chat-button,
-.megaChatDisabled .copy-dialog-button.conversations {
+.megaChatDisabled .fm-start-conversation, .megaChatDisabled .nw-contact-status, .megaChatDisabled .nw-fm-left-icon.conversations, .megaChatDisabled .fm-send-files, .megaChatDisabled .start-chat-button, .megaChatDisabled .copy-dialog-button.conversations {
 	display: none !important;
 }
-.megaChatDisabled .copy-dialog-button.cloud-drive,
-.megaChatDisabled .copy-dialog-button.shared-with-me {
+.megaChatDisabled .copy-dialog-button.cloud-drive, .megaChatDisabled .copy-dialog-button.shared-with-me {
 	width: 238px;
 }
-
 /**
  * MegaDialog.js
  */
@@ -22864,7 +22875,7 @@ div.fm-dialog.feedback-dialog .checkboxOff {
 	background-repeat: no-repeat;
 	background-position: 2px -4011px;
 	margin: 0 0 0 12px;
-	top: -3px;
+	top: -2px;
 }
 .membership-question.stats-button::before {
 	content: '\00a0';
@@ -25810,21 +25821,4 @@ body, body * {
 	width: 12px !important;
 	float: left !important;
 	margin-right: 4px !important;
-}
-
-.help-nw ol,
-.help-nw ul {
-    padding-left: 10px !important;
-}
-
-.help-nw li, .help-nw p {
-    margin-top: 10px;
-}
-
-.help-nw h2 {
-    margin-top: 20px;
-}
-
-.help-nw img {
-    max-width: 50%;
 }

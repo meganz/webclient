@@ -87,6 +87,24 @@ function init_help()
 			title = 'Android App';
 			$('.new-left-menu-link.android').addClass('active');
 		}
+		else if (subpage == 'mega-chat')
+		{
+			id=7;
+			title = 'MegaChat';
+			$('.new-left-menu-link.mega-chat').addClass('active');
+		}
+		else if (subpage == 'windows-phone')
+		{
+			id=8;
+			title = 'Windows Phone App';
+			$('.new-left-menu-link.windows-phone').addClass('active');
+		}
+		else if (subpage == 'backberry')
+		{
+			id=9;
+			title = 'BlackBerry App';
+			$('.new-left-menu-link.blackberry').addClass('active');
+		}
 		$('.new-right-content-block.help-info-pages').removeClass('hidden');
 		$('.help-info-pages .sections').addClass('hidden');
 		$('#section-' + subpage).removeClass('hidden');

@@ -1049,7 +1049,7 @@ function mozClearStartupCache() {
 var mozMEGAExtensionVersion;
 try {
 	var { AddonManager } = Cu.import("resource://gre/modules/AddonManager.jsm", {});
-	AddonManager.getAddonByID('firefox@mega.co.nz',function(data)
+	AddonManager.getAddonByID('firefox@mega.nz',function(data)
 	{
 		mozMEGAExtensionVersion = data.version;
 		AddonManager = undefined;

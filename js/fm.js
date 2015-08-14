@@ -997,7 +997,7 @@ function initUI() {
 
     $(window).rebind('resize.fmrh hashchange.fmrh', fm_resize_handler);
 
-    if (!megaChatDisabled) {
+    if (!megaChatIsDisabled()) {
         megaChat.karere.rebind("onPresence.maintainUI", function(e, presenceEventData) {
             var contact = megaChat.getContactFromJid(presenceEventData.getFromJid());
             M.onlineStatusEvent(contact, presenceEventData.getShow());
@@ -1519,79 +1519,6 @@ function sharedUInode(nodeHandle) {
         $('#' + nodeHandle + '.file-block').removeClass('linked');
         $('#treea_' + nodeHandle).removeClass('linked');
     }
-}
-
-function addShareNotification(notification) {
-
-    if (notifyPopup.notifications == null) {
-        return false;
-    }
-
-    var timestamp = Math.round(new Date().getTime() / 1000);
-    var updated = false;
-
-    if (notification.t == 'put') {
-        for (i in notifyPopup.notifications) {
-            if (notifyPopup.notifications[i].folderid == notification.n && notifyPopup.notifications[i].user == notification.u && notifyPopup.notifications[i].timestamp > timestamp - 120 && notifyPopup.notifications[i].type !== 'share' && !updated) {
-
-                notifyPopup.notifications[i].timestamp = timestamp;
-                notifyPopup.notifications[i].read = false;
-                notifyPopup.notifications[i].count = false;
-
-                if (!notifyPopup.notifications[i].nodes) {
-                    notifyPopup.notifications[i].nodes = [];
-                }
-
-                for (var i in notification.f) {
-                    notifyPopup.notifications[i].nodes.push(notification.f[i]);
-                }
-
-                updated = true;
-            }
-        }
-    }
-
-    if (!updated) {
-        notifyPopup.notifications.push({
-            id: makeid(10),
-            type: notification.t,
-            timestamp: timestamp,
-            user: notification.u,
-            folderid: notification.n,
-            nodes: notification.f,
-            read: false,
-            popup: false,
-            count: false,
-            rendered: false
-        });
-    }
-
-    notifyPopup.doNotify();
-}
-
-function addNotification(actionPacket) {
-
-    if (notifyPopup.notifications === null) {
-        return false;
-    }
-
-    var timestamp = Math.round(new Date().getTime() / 1000);
-
-    notifyPopup.notifications.push({
-        id: makeid(10),
-        type: actionPacket.a,
-        timestamp: timestamp,
-        user: false,
-        folderid: false,
-        nodes: false,
-        read: false,
-        popup: false,
-        count: false,
-        rendered: false,
-        notificationObj: actionPacket
-    });
-
-    notifyPopup.doNotify();
 }
 
 function getContactsEMails() {
@@ -2893,11 +2820,8 @@ function notificationsUI(close)
         $('.fm-main.default').removeClass('hidden');
         return false;
     }
-    notifyPopup.notifyMarkCount(true);
-    notifyPopup.doNotify();
     $('.fm-main.notifications').removeClass('hidden');
     $('.notifications .nw-fm-left-icon').removeClass('active');
-    notifyPopup.initNotificationsScrolling();
     $('.fm-main.default').addClass('hidden');
     $(window).trigger('resize');
 }
@@ -8294,10 +8218,10 @@ function getclipboardlinks()
             if (n.t) F = 'F';
             if (i > 0) link += '\n';
 
-            // Add the link to the file e.g. https://mega.co.nz/#!qRN33YbK
+            // Add the link to the file e.g. https://mega.nz/#!qRN33YbK
             link += getBaseUrl() + '/#' + F + '!' + htmlentities(n.ph);
 
-            // If they want the file key as well, add it e.g. https://mega.co.nz/#!qRN33YbK!o4Z76qDqP...
+            // If they want the file key as well, add it e.g. https://mega.nz/#!qRN33YbK!o4Z76qDqP...
             if (key && $('#export-checkbox').is(':checked')) {
                 link += '!' + a32_to_base64(key);
             }
@@ -8740,7 +8664,7 @@ function chromeDialog(close)
  * Open a dialog asking the user to download MEGAsync for files over 1GB
  */
 function megaSyncDialog() {
-    
+
     // Cache selector
     var $dialog = $('.fm-dialog.download-megasync-dialog');
 
@@ -8753,15 +8677,15 @@ function megaSyncDialog() {
         $dialog.addClass('hidden');
         fm_hideoverlay();
     });
-    
+
     // Add checkbox handling
     $dialog.find('#megasync-checkbox').rebind('click', function() {
-        
+
         var $this = $(this);
-        
+
         // If it has not been checked, check it
         if (!$this.hasClass('checkboxOn')) {
-            
+
             // Store a flag so that it won't show this dialog again if triggered
             localStorage.megaSyncDialog = 1;
             $this.attr('class', 'checkboxOn');
@@ -9633,6 +9557,7 @@ function fm_thumbnails()
                 console.log('Requesting %d thumbs (%d loaded)', a, fa_reqcnt);
 
             var rt = Date.now();
+            var cdid = M.currentdirid;
             api_getfileattr(treq, 0, function(ctx, node, uint8arr)
             {
                 if (uint8arr === 0xDEAD)
@@ -9655,7 +9580,7 @@ function fm_thumbnails()
                     blob = new Blob([uint8arr.buffer]);
                 // thumbnailblobs[node] = blob;
                 thumbnails[node] = myURL.createObjectURL(blob);
-                if (M.d[node] && M.d[node].seen)
+                if (M.d[node] && M.d[node].seen && M.currentdirid === cdid)
                     fm_thumbnail_render(M.d[node]);
 
                 // deduplicate in view when there is a duplicate fa:
@@ -9666,7 +9591,7 @@ function fm_thumbnails()
                         if (M.v[i].h !== node && M.v[i].fa == M.d[node].fa && !thumbnails[M.v[i].h])
                         {
                             thumbnails[M.v[i].h] = thumbnails[node];
-                            if (M.v[i].seen)
+                            if (M.v[i].seen && M.currentdirid === cdid)
                                 fm_thumbnail_render(M.v[i]);
                         }
                     }
@@ -9823,7 +9748,7 @@ function fm_resize_handler() {
             initContactsGridScrolling();
     }
 
-    if (megaChat.isReady && megaChat.resized) {
+    if (typeof(megaChat) !== 'undefined' && megaChat.isReady && megaChat.resized) {
         megaChat.resized();
     }
 
@@ -10027,7 +9952,12 @@ function contactUI() {
         var user = M.d[u_h];
         var avatar = $(useravatar.contact(u_h));
 
-        var onlinestatus = M.onlineStatusClass(megaChat.isReady && megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h)));
+        var onlinestatus = M.onlineStatusClass(
+            typeof(megaChat) !== 'undefined' &&
+            megaChat.isReady &&
+            megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h))
+        );
+
         $('.contact-top-details .nw-contact-block-avatar').empty().append( avatar.removeClass('avatar') )
         $('.contact-top-details .onlinestatus').removeClass('away offline online busy');
         $('.contact-top-details .onlinestatus').addClass(onlinestatus[1]);
@@ -10112,7 +10042,7 @@ function contactUI() {
             showAuthenticityCredentials();
         });
 
-        if (!megaChatDisabled) {
+        if (!megaChatIsDisabled()) {
             if (onlinestatus[1] !== "offline" && u_h !== u_handle) {
                 // user is online, lets display the "Start chat" button
 

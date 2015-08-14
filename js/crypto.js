@@ -1491,13 +1491,13 @@ function api_cancel(q) {
     }
 }
 
-function api_init(c, service) {
-    if (apixs[c]) {
-        api_cancel(apixs[c]);
+function api_init(channel, service) {
+    if (apixs[channel]) {
+        api_cancel(apixs[channel]);
     }
 
-    apixs[c] = {
-        c: c,                       // channel
+    apixs[channel] = {
+        c: channel,                 // channel
         cmds: [[], []],             // queued/executing commands (double-buffered)
         ctxs: [[], []],             // associated command contexts
         i: 0,                       // currently executing buffer
@@ -1513,21 +1513,21 @@ function api_init(c, service) {
     };
 }
 
-function api_req(req, ctx, c) {
-    if (typeof c === 'undefined') {
-        c = 0;
+function api_req(request, context, channel) {
+    if (typeof channel === 'undefined') {
+        channel = 0;
     }
-    if (typeof ctx === 'undefined') {
-        ctx = {};
+    if (typeof context === 'undefined') {
+        context = {};
     }
 
-    var q = apixs[c];
+    var queue = apixs[channel];
 
-    q.cmds[q.i ^ 1].push(req);
-    q.ctxs[q.i ^ 1].push(ctx);
+    queue.cmds[queue.i ^ 1].push(request);
+    queue.ctxs[queue.i ^ 1].push(context);
 
-    if (!q.setimmediate) {
-        q.setimmediate = setTimeout(api_proc, 0, q);
+    if (!queue.setimmediate) {
+        queue.setimmediate = setTimeout(api_proc, 0, queue);
     }
 }
 
@@ -1690,7 +1690,7 @@ function api_reqfailed(c, e) {
         // On clicking OK, log the user out and redirect to contact page
         msgDialog('warninga', 'Suspended account',
             'You have been suspended due to excess data usage.\n\
-            Please contact support@mega.co.nz to get your account reinstated.',
+            Please contact support@mega.nz to get your account reinstated.',
             false,
             function() {
                 var redirectUrl = window.location.origin + window.location.pathname + '#contact';
@@ -1770,6 +1770,7 @@ function getsc(fm) {
                     if (ctx.fm) {
                         // mDBloaded = true;
                         loadfm_done();
+                        notify.getInitialNotifications();
                     }
                 }
                 if (res.w) {
@@ -1807,7 +1808,7 @@ function waitsc() {
     waittimeout = setTimeout(waitsc, 300000);
 
     waitxhr.onerror = function () {
-        if (d) console.error('waitsc.onerror');
+        if (d) console.log('waitsc.onerror');
 
         if (this.waitid === waitid) {
             clearTimeout(waittimeout);

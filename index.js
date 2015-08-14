@@ -133,9 +133,6 @@ function init_page() {
             page = 'chrome';
         }
     }
-    else if (page == 'notifications') {
-        page = 'fm/notifications';
-    }
 
     if (localStorage.signupcode && u_type !== false) {
         delete localStorage.signupcode;
@@ -241,7 +238,6 @@ function init_page() {
                 if (typeof mDBcls === 'function') {
                     mDBcls();
                 }
-                notifyPopup.notifications = null;
             }
         }
 
@@ -571,6 +567,17 @@ function init_page() {
             });
             $('.chrome-app-scr').css('cursor', 'pointer');
         }
+        
+        // On the manual download button click
+        $('.chrome-download-button').rebind('click', function() {
+            
+            var $this = $(this);
+            
+            // Hide the button text and show the mega.co.nz and mega.nz links
+            $this.css('cursor', 'default');
+            $this.find('.initial-state').hide();
+            $this.find('.actual-links').show();
+        });
     }
     else if (page == 'key') {
         parsepage(pages['key']);
@@ -677,8 +684,8 @@ function init_page() {
                 a++;
             });
 
-        $('#emailp').html($('#emailp').text().replace('jobs@mega.co.nz',
-            '<a href="mailto:jobs@mega.co.nz">jobs@mega.co.nz</a>'));
+        $('#emailp').html($('#emailp').text().replace('jobs@mega.nz',
+            '<a href="mailto:jobs@mega.nz">jobs@mega.nz</a>'));
         $('.new-bottom-pages.about').html(html + '<div class="clear"></div>');
         mainScroll();
     }
@@ -817,15 +824,12 @@ function init_page() {
             if (M.currentdirid == 'account') {
                 accountUI();
             }
-            else if (M.currentdirid == 'notifications') {
-                notificationsUI();
-            }
             else if (M.currentdirid == 'search') {
                 searchFM();
             }
         }
 
-        if (typeof (megaChatDisabled) != "undefined" && megaChatDisabled === true) {
+        if (megaChatIsDisabled() === true) {
             $(document.body).addClass("megaChatDisabled");
         }
     }
@@ -1077,9 +1081,11 @@ function topmenuUI() {
         }
 
         // If the chat is disabled don't show the green status icon in the header
-        if (!megaChatDisabled) {
+        if (!megaChatIsDisabled()) {
             $('.activity-status-block, .activity-status').show();
-            megaChat.renderMyStatus();
+            if(typeof(megaChat) !== 'undefined') {
+                megaChat.renderMyStatus();
+            }
         }
     }
     else {
@@ -1184,8 +1190,7 @@ function topmenuUI() {
         }
         if (!e || ($(e.target).parents('.notification-popup').length == 0
                 && ((c && c.indexOf('cloud-popup-icon') == -1) || !c))) {
-            $('.notification-popup').removeClass('active');
-            $('.cloud-popup-icon').removeClass('active');
+            notify.closePopup();
         }
         if (!e || ($(e.target).parents('.top-login-popup').length == 0
                 && ((c && c.indexOf('top-login-button') == -1) || !c))) {
@@ -1624,8 +1629,9 @@ function topmenuUI() {
         $('.membership-popup-arrow').css('margin-right',
             $('.top-menu-icon').width() + $('.membership-status-block').width() / 2 + 57 + 'px');
     }
-
-    notifyPopup.initNotifications();
+    
+    // Initialise notification popup and tooltip
+    notify.init();
 }
 
 function is_fm() {
@@ -1652,10 +1658,7 @@ function parsepage(pagehtml, pp) {
         pagehtml = pagehtml.replace(/\/#/g, '/' + urlrootfile + '#');
     }
     $('body').removeClass('notification-body bottom-pages new-startpage');
-    if (page == 'notifications') {
-        $('body').addClass('notification-body');
-    }
-    else if (page == 'start') {
+    if (page == 'start') {
         $('body').addClass('new-startpage');
     }
     else {

@@ -95,7 +95,7 @@ function u_checklogin3a(res, ctx) {
     }
     else {
         u_attr = res;
-        var exclude = ['c', 'email', 'k', 'name', 'p', 'privk', 'pubk', 's', 'ts', 'u', 'currk'];
+        var exclude = ['c', 'email', 'k', 'name', 'p', 'privk', 'pubk', 's', 'ts', 'u', 'currk', 'flags'];
 
         for (var n in u_attr) {
             if (exclude.indexOf(n) == -1) {
@@ -121,6 +121,14 @@ function u_checklogin3a(res, ctx) {
             }
         }
 
+        if (typeof(u_attr.flags) !== 'undefined') {
+            Object.keys(u_attr.flags).forEach(function(k) {
+                if (k === "mcs") {
+                    localStorage.chatDisabled = u_attr.flags[k];
+                }
+            });
+        }
+
         if (u_k) {
             u_k_aes = new sjcl.cipher.aes(u_k);
         }
@@ -135,16 +143,16 @@ function u_checklogin3a(res, ctx) {
         }
 
         if (!u_attr.email) {
-            r = 0;
+            r = 0;      // Ephemeral account
         }
         else if (!u_attr.c) {
-            r = 1;
+            r = 1;      // Haven't confimed email yet
         }
         else if (!u_attr.privk) {
-            r = 2;
+            r = 2;      // Don't have a private key yet (maybe they quit before key generation completed)
         }
         else {
-            r = 3;
+            r = 3;      // Fully registered
         }
 
         if (r == 3) {
@@ -174,7 +182,7 @@ function u_logout(logout) {
     }
 
     if (logout) {
-        if (!megaChatDisabled) {
+        if (!megaChatIsDisabled()) {
 
             localStorage.removeItem("audioVideoScreenSize");
 
@@ -205,7 +213,7 @@ function u_logout(logout) {
         }
         mBroadcaster.crossTab.leave();
         u_sid = u_handle = u_k = u_attr = u_privk = u_k_aes = undefined;
-        notifyPopup.notifications = null;
+        notify.notifications = [];
         api_setsid(false);
         u_sharekeys = {};
         u_nodekeys = {};
@@ -848,7 +856,7 @@ function isEphemeral() {
             if (r[0] === "0") {
                 $elem.addClass('cloud-drive');
             }
-            else if (r[0] === "1" && megaChat) {
+            else if (r[0] === "1" && typeof(megaChat) !== 'undefined') {
                 M.u[u_h].lastChatActivity = ts;
                 var room = megaChat.getPrivateRoom(u_h);
                 if (room && megaChat && megaChat.plugins && megaChat.plugins.chatNotifications) {

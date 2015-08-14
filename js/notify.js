@@ -12,7 +12,8 @@ var notify = {
     // The current notifications
     notifications: [],
     
-    // Number of notifications to fetch
+    // Number of notifications to fetch in the 'c=100' API request.
+    // This is reduced to 50 for fast rendering.
     numOfNotifications: 50,
     
     // Locally cached emails and pending contact emails

@@ -1363,8 +1363,12 @@ else if (!b_u)
                     {
                         Cu.reportError(e);
 
-                        console.log('An error occurred while loading MEGA.\n\nFilename: '
-                            + file + "\n" + e + '\n\n' + mozBrowserID);
+                        if (String(e) !== "Error: AsmJS modules are not yet supported in XDR serialization."
+                                && file.indexOf('dcraw') === -1) {
+
+                            return alert('An error occurred while loading MEGA.\n\nFilename: '
+                                + file + "\n" + e + '\n\n' + mozBrowserID);
+                        }
                     }
                     step(jsi);
                 }

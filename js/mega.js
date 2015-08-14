@@ -4314,6 +4314,7 @@ function MegaData()
 
                 // If a regular account, log them in
                 if (!isEphemeralAccount) {
+					if (toPage == '') toPage = 'fm';
                     this.performRegularLogin(toPage);
                 }
                 else {

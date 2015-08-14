@@ -3647,15 +3647,15 @@ function MegaData()
             }
         }
 
-        if (!z || zipsize) {
-            showTransferToast('d', z ? 1 : nodes.length);
-        }
         //$('.tranfer-view-icon').addClass('active');
         //$('.fmholder').addClass('transfer-panel-opened');
         $.transferHeader();
 
         if (!preview)
         {
+            if (!z || zipsize) {
+                showTransferToast('d', z ? 1 : nodes.length);
+            }
             openTransferpanel();
             initGridScrolling();
             initFileblocksScrolling();
@@ -5959,7 +5959,7 @@ function loadfm_done(pfkey, stackPointer) {
     if (!CMS.isLoading()) {
         loadingDialog.hide();
     }
-    
+
     watchdog.notify('loadfm_done');
 }
 

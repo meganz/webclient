@@ -23,6 +23,7 @@ function u_login2(ctx, ks) {
         u_storage = init_storage(ctx.permanent ? localStorage : sessionStorage);
         u_storage.k = JSON.stringify(ks[0]);
         u_storage.sid = ks[1];
+        watchdog.notify('login', ks[1]);
         if (ks[2]) {
             u_storage.privk = base64urlencode(crypto_encodeprivkey(ks[2]));
         }
@@ -207,6 +208,9 @@ function u_logout(logout) {
             mDBcls(); // resets mDBloaded
         }
         fminitialized = false;
+        if (logout !== -0xDEADF) {
+            watchdog.notify('logout');
+        }
         mBroadcaster.crossTab.leave();
         u_sid = u_handle = u_k = u_attr = u_privk = u_k_aes = undefined;
         notify.notifications = [];

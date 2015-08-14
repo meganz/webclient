@@ -3329,6 +3329,82 @@ mBroadcaster.addListener('crossTab:master', function _setup() {
     }
 });
 
+
+/**
+ * Cross-tab communication using WebStorage
+ */
+var watchdog = Object.freeze({
+    Strg: {},
+    // Tag prepended to messages to identify watchdog-events
+    eTag: '$WDE$!_',
+    // ID to identify tab's origin
+    wdID: (Math.random() * Date.now()),
+
+    /** setup watchdog/webstorage listeners */
+    setup: function() {
+        if (window.addEventListener) {
+            window.addEventListener('storage', this, false);
+        }
+        else if (window.attachEvent) {
+            window.attachEvent('onstorage', this.handleEvent.bind(this));
+        }
+    },
+
+    /**
+     * Notify watchdog event/message
+     * @param {String} msg  The message
+     * @param {String} data Any data sent to other tabs, optional
+     */
+    notify: function(msg, data) {
+        data = { origin: this.wdID, data: data, sid: Math.random()};
+        localStorage.setItem(this.eTag + msg, JSON.stringify(data));
+        if (d) {
+            console.log('mWatchDog Notifying', this.eTag + msg, localStorage[this.eTag + msg]);
+        }
+    },
+
+    /** Handle watchdog/webstorage event */
+    handleEvent: function(ev) {
+        if (String(ev.key).indexOf(this.eTag) !== 0) {
+            return;
+        }
+        if (d) {
+            console.debug('mWatchDog ' + ev.type + '-event', ev.key, ev.newValue, ev);
+        }
+
+        var msg = ev.key.substr(this.eTag.length);
+        var strg = JSON.parse(ev.newValue || '""');
+
+        if (!strg || strg.origin === this.wdID) {
+            if (d) {
+                console.log('Ignoring mWatchDog event', msg, strg);
+            }
+            return;
+        }
+
+        switch (msg) {
+            case 'loadfm_done':
+                if (this.Strg.login === strg.origin) {
+                    location.assign(location.pathname);
+                }
+                break;
+
+            case 'login':
+                loadingDialog.show();
+                this.Strg.login = strg.origin;
+                break;
+
+            case 'logout':
+                u_logout(-0xDEADF);
+                location.reload();
+                break;
+        }
+
+        delete localStorage[ev.key];
+    }
+});
+watchdog.setup();
+
 /**
  * Simple alias that will return a random number in the range of: a < b
  *

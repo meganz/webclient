@@ -5973,6 +5973,8 @@ function loadfm_done(pfkey, stackPointer) {
     if (!CMS.isLoading()) {
         loadingDialog.hide();
     }
+    
+    watchdog.notify('loadfm_done');
 }
 
 function storefmconfig(key, value)

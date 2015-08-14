@@ -146,7 +146,7 @@ function init_page() {
         document.location.hash = 'signup' + localStorage.signupcode;
         return false;
     }
-    if (!page.match(/^(blog|corporate|page_)/)) {
+    if (!page.match(/^(blog|help|corporate|page_)/)) {
         $('.top-head').remove();
     }
     $('#loading').hide();

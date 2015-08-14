@@ -874,5 +874,5 @@ var notify = {
  * Tests
  *  
  * IPC action packet:
- * notify.notifyFromActionPacket({ a: "ipc", p: "mkwfd6Fpwsk", m: "test+401@mega.co.nz", msg: "Hello, join me on MEGA and get acce…", ps: 0, ts: 1439427955, uts: 1439427955, i: "6ZWnwU8ujK" });
+ * notify.notifyFromActionPacket({ a: "ipc", p: "mkwfd6Fpwsk", m: "test+401@mega.co.nz", msg: "Hello, join me on MEGA and get acce...", ps: 0, ts: 1439427955, uts: 1439427955, i: "6ZWnwU8ujK" });
  */

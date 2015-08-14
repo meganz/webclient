@@ -4,8 +4,13 @@
  * @type {boolean}
  */
 var megaChatIsDisabled = function() {
-	if (typeof megaChat == 'undefined' || u_type < 3) return true;
-    return typeof localStorage.chatDisabled === "undefined" || localStorage.chatDisabled === "0" ? false : true;
+    
+    // If an ephemeral account, disable megaChat
+	if (u_type < 3) {
+        return true;
+    }
+    
+    return (typeof localStorage.chatDisabled === 'undefined' || localStorage.chatDisabled === '0') ? false : true;
 };
 
 

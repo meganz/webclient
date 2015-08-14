@@ -25811,3 +25811,16 @@ body, body * {
 	float: left !important;
 	margin-right: 4px !important;
 }
+
+.help-nw ol,
+.help-nw ul {
+    padding-left: 10px !important;
+}
+
+.help-nw h2 {
+    margin-top: 20px;
+}
+
+.help-nw img {
+    max-width: 100%;
+}

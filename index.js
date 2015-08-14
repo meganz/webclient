@@ -567,6 +567,17 @@ function init_page() {
             });
             $('.chrome-app-scr').css('cursor', 'pointer');
         }
+        
+        // On the manual download button click
+        $('.chrome-download-button').rebind('click', function() {
+            
+            var $this = $(this);
+            
+            // Hide the button text and show the mega.co.nz and mega.nz links
+            $this.css('cursor', 'default');
+            $this.find('.initial-state').hide();
+            $this.find('.actual-links').show();
+        });
     }
     else if (page == 'key') {
         parsepage(pages['key']);

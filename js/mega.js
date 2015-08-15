@@ -4298,7 +4298,11 @@ function MegaData()
                 // If the user is already logged in but with a different account just load that account instead. The
                 // hash they came from e.g. a folder link may not be valid for this account so just load the file manager.
                 else if (u_k && (JSON.stringify(u_k) !== JSON.stringify(urlParts[0]))) {
-                    window.location.hash = 'fm';
+                    if ((urlParts[2]||"").match(/^fm/)) {
+                        window.location.hash = 'fm';
+                    } else {
+                        window.location.hash = urlParts[2];
+                    }
                     return;
                 }
 

@@ -54,35 +54,38 @@ if(window.location.hostname == "beta.mega.nz"/* || window.location.hostname == "
             report.tp = $.transferprogress;
             report.id = ids.join(",");
             report.ud = uds;
-            report.karereState = self.megaChat.karere.getConnectionState();
-            report.myPresence = self.megaChat.karere.getPresence(self.megaChat.karere.getJid());
-            report.karereServer = self.megaChat.karere.connection.service;
-            report.numOpenedChats = Object.keys(self.megaChat.chats).length;
 
-            var chatStates = [];
+            if(typeof megaChat !== 'undefined') {
+                report.karereState = megaChat.karere.getConnectionState();
+                report.myPresence = megaChat.karere.getPresence(megaChat.karere.getJid());
+                report.karereServer = megaChat.karere.connection.service;
+                report.numOpenedChats = Object.keys(megaChat.chats).length;
 
-            Object.keys(megaChat.chats).forEach(function(k) {
-                var v = megaChat.chats[k];
+                var chatStates = [];
 
-                var participants = v.getParticipants();
+                Object.keys(megaChat.chats).forEach(function (k) {
+                    var v = megaChat.chats[k];
 
-                participants.forEach(function(v, k) {
-                    var cc = megaChat.getContactFromJid(v);
-                    participants[k] = cc ? cc : v;
+                    var participants = v.getParticipants();
+
+                    participants.forEach(function (v, k) {
+                        var cc = megaChat.getContactFromJid(v);
+                        participants[k] = cc ? cc : v;
+                    });
+
+                    chatStates.push({
+                        'roomUniqueId': k,
+                        'roomState': v.getStateAsText(),
+                        'roomParticipants': participants,
+                        'encState': v.encryptionHandler ? v.encryptionHandler.state : "not defined",
+                        'opQueueQueueCount': v.encryptionOpQueue ? v.encryptionOpQueue._queue.length : "not defined",
+                        'opQueueErrRetries': v.encryptionOpQueue ? v.encryptionOpQueue._error_retries : "not defined",
+                        'opQueueCurrentOp': v.encryptionOpQueue && v.encryptionOpQueue._queue.length > 0 ? v.encryptionOpQueue._queue[0][0] : "not defined"
+                    });
                 });
 
-                chatStates.push({
-                    'roomUniqueId': k,
-                    'roomState': v.getStateAsText(),
-                    'roomParticipants': participants,
-                    'encState': v.encryptionHandler ? v.encryptionHandler.state : "not defined",
-                    'opQueueQueueCount': v.encryptionOpQueue ? v.encryptionOpQueue._queue.length : "not defined",
-                    'opQueueErrRetries': v.encryptionOpQueue ? v.encryptionOpQueue._error_retries : "not defined",
-                    'opQueueCurrentOp': v.encryptionOpQueue && v.encryptionOpQueue._queue.length > 0 ? v.encryptionOpQueue._queue[0][0] : "not defined"
-                });
-            });
-
-            report.chatRoomState = chatStates;
+                report.chatRoomState = chatStates;
+            }
 
 
             report.cc = cc;

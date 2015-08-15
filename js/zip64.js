@@ -607,11 +607,17 @@ function CacheIO(dl_id, dl) {
     }
 
     function PUSH(done, buffer) {
+        var neuter = false;
         if (!buffer) {
             buffer = u8buf.subarray(0, offsetI);
+            neuter = ((typeof FirefoxIO !== 'undefined') && dlMethod === FirefoxIO);
         }
+        var abLen = buffer.byteLength;
         IO.write(buffer, offsetO, done);
-        offsetO += buffer.byteLength;
+        if (neuter) {
+            u8buf = new Uint8Array(__max_chunk_size);
+        }
+        offsetO += abLen;
     }
 
     function FILL(buffer) {

@@ -8958,7 +8958,7 @@ function propertiesDialog(close)
                 for (var u in n.shares) {
                     if (M.u[u]) {
                         var u = M.u[u]
-                        var onlinestatus = M.onlineStatusClass(megaChat.isReady && megaChat.karere.getPresence(megaChat.getJidFromNodeId(u.u)));
+                        var onlinestatus = M.onlineStatusClass(megaChatIsReady && megaChat.karere.getPresence(megaChat.getJidFromNodeId(u.u)));
                         if (++total <= 5)
                             susers.append('<div class="properties-context-item ' + onlinestatus[1] + '">'
                                 + '<div class="properties-contact-status"></div>'
@@ -9744,7 +9744,7 @@ function fm_resize_handler() {
             initContactsGridScrolling();
     }
 
-    if (typeof(megaChat) !== 'undefined' && megaChat.isReady && megaChat.resized) {
+    if (megaChatIsReady && megaChat.resized) {
         megaChat.resized();
     }
 
@@ -9949,8 +9949,7 @@ function contactUI() {
         var avatar = $(useravatar.contact(u_h));
 
         var onlinestatus = M.onlineStatusClass(
-            typeof(megaChat) !== 'undefined' &&
-            megaChat.isReady &&
+            megaChatIsReady &&
             megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h))
         );
 
@@ -10038,7 +10037,7 @@ function contactUI() {
             showAuthenticityCredentials();
         });
 
-        if (!megaChatIsDisabled()) {
+        if (!megaChatIsDisabled) {
             if (onlinestatus[1] !== "offline" && u_h !== u_handle) {
                 // user is online, lets display the "Start chat" button
 

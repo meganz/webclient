@@ -1,13 +1,16 @@
 var b_u = 0;
 var apipath;
 var maintenance = false;
+var androidsplash = false;
 var URL = window.URL || window.webkitURL;
+var seqno = Math.ceil(Math.random()*1000000000);
 var staticpath = 'https://eu.static.mega.co.nz/3/';
 var ua = window.navigator.userAgent.toLowerCase();
 var is_chrome_firefox = document.location.protocol === 'chrome:' && document.location.host === 'mega' || document.location.protocol === 'mega:';
 var is_extension = is_chrome_firefox || document.location.href.substr(0,19) == 'chrome-extension://';
 var storage_version = '1'; // clear localStorage when version doesn't match
 var page = document.location.hash, l, d = false;
+var m = isMobile();
 
 function isMobile()
 {
@@ -58,6 +61,44 @@ if (!String.trim) {
     String.trim = function(s) {
         return String(s).trim();
     };
+}
+
+if (!m) {
+    try {
+        // Browser compatibility
+        // Fx 4.0   Chrome 5   MSIE 9   Opera 11.60   Safari 5.1
+        Object.defineProperty(this, 'megaChatIsDisabled', (function() {
+            var status;
+            return {
+                set: function(val) {
+                    status = val;
+                    if (status) {
+                        $(document.body).addClass("megaChatDisabled");
+                    }
+                    else {
+                        $(document.body).removeClass("megaChatDisabled");
+                    }
+                },
+                get: function() {
+                    return status || localStorage.testChatDisabled
+                        || (localStorage.chatDisabled !== undefined
+                            && localStorage.chatDisabled !== "0");
+                }
+            };
+        })());
+        // Check whether Mega Chat is enabled *and* initialized
+        Object.defineProperty(this, 'megaChatIsReady', {
+            get: function() {
+                return !megaChatIsDisabled
+                    && typeof megaChat !== 'undefined'
+                    && megaChat.is_initialized;
+            }
+        });
+    }
+    catch (ex) {
+        console.error(ex);
+        b_u = true;
+    }
 }
 
 if (!b_u) try
@@ -124,7 +165,7 @@ if (!b_u) try
     }
 }
 catch(e) {
-    if (!isMobile() || e.message !== 'SecurityError: DOM Exception 18') {
+    if (!m || e.message !== 'SecurityError: DOM Exception 18') {
         alert(
             "Sorry, we were unable to initialize the browser's local storage, "+
             "either you're using an outdated browser or it's something from our side.\n"+
@@ -594,10 +635,7 @@ function getxhr() {
     return (typeof XDomainRequest !== 'undefined' && typeof ArrayBuffer === 'undefined') ? new XDomainRequest() : new XMLHttpRequest();
 }
 
-var androidsplash = false;
-var m = false;
-var seqno = Math.ceil(Math.random()*1000000000);
-if (isMobile() || (typeof localStorage !== 'undefined' && localStorage.mobile))
+if (m || (typeof localStorage !== 'undefined' && localStorage.mobile))
 {
     var tag=document.createElement('meta');
     tag.name = "viewport";

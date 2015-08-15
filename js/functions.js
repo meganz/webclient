@@ -2519,7 +2519,7 @@ function generateAnonymousReport() {
     report.io = window.dlMethod && dlMethod.name;
     report.sb = +('' + $('script[src*="secureboot"]').attr('src')).split('=').pop();
     report.tp = $.transferprogress;
-    if (!megaChat.karere) {
+    if (!megaChatIsReady) {
         report.karereState = '#disabled#';
     }
     else {
@@ -2540,7 +2540,7 @@ function generateAnonymousReport() {
     var roomUniqueId = 0;
     var roomUniqueIdMap = {};
 
-    Object.keys(megaChat.chats).forEach(function(k) {
+    Object.keys(megaChatIsReady && megaChat.chats || {}).forEach(function(k) {
         var v = megaChat.chats[k];
 
         var participants = v.getParticipants();

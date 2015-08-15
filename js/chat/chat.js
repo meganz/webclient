@@ -1,21 +1,3 @@
-/**
- * Use this localStorage.chatDisabled flag to disable/enable the chat (note the "!!" logical comparison!)
- *
- * @type {boolean}
- */
-var megaChatIsDisabled = function() {
-    
-    // If an ephemeral account, disable megaChat
-	if (u_type < 3) {
-        return true;
-    }
-    else if (window.location.hash.indexOf("#F!") === 0) {
-        return true;
-    }
-    
-    return (typeof localStorage.chatDisabled === 'undefined' || localStorage.chatDisabled === '0') ? false : true;
-};
-
 
 var chatui;
 (function() {
@@ -753,7 +735,7 @@ var Chat = function() {
 
     this.plugins = {};
 
-    if (!megaChatIsDisabled()) {
+    if (!megaChatIsDisabled) {
         try {
             // This might throw in browsers which doesn't support Strophe/WebRTC
             this.karere = new Karere({
@@ -763,19 +745,8 @@ var Chat = function() {
         }
         catch (e) {
             console.error(e);
-            megaChatIsDisabled = function() { return true; };
+            megaChatIsDisabled = true;
         }
-    }
-
-    Object.defineProperty(this, 'isReady', {
-        get: function() {
-            return !megaChatIsDisabled() && self.is_initialized;
-        }
-    });
-
-    if (megaChatIsDisabled()) {
-        this.logger.info('MEGAChat is disabled.');
-        $(document.body).addClass("megaChatDisabled");
     }
 
     self.filePicker = null; // initialized on a later stage when the DOM is fully available.
@@ -2400,7 +2371,7 @@ Chat.prototype.processRemovedUser = function(u) {
 Chat.prototype.refreshConversations = function() {
     var self = this;
 
-    if (!self.$container || !megaChat.isReady || u_type === 0) {
+    if (!self.$container || !megaChatIsReady || u_type === 0) {
         $('.fm-chat-block').hide();
         return false;
     }

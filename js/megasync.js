@@ -279,7 +279,7 @@ MegaSync.prototype.handle_v = function(version) {
         this.download(this._lastDownload[0], this._lastDownload[1]);
         this._lastDownload = null;
     }
-    
+
 };
 
 MegaSync.prototype.download = function(pubkey, privkey) {
@@ -310,8 +310,11 @@ MegaSync.prototype.handle = function(next, response) {
     }
 
     for (var i in response) {
-        this['handle_' + i](response[i]);
-        next(null, response[i]);
+        var fn = 'handle_' + i;
+        if (typeof this[fn] === 'function') {
+            this[fn](response[i]);
+            next(null, response[i]); // XXX: <- this should be called once and not in a loop i guess
+        }
     }
 };
 
@@ -344,11 +347,11 @@ MegaSync.prototype.downloadClient = function() {
         this._api({a: "v"});
     }).bind(this), 1000);
     overlay.show().addClass('downloading');
-    
+
     $('.megasync-close').rebind('click', function(e) {
         $('.megasync-overlay').hide();
     });
-    
+
     $('body').bind('keyup', function(e) {
         if (e.keyCode == 27) {
             $('.megasync-overlay').hide();

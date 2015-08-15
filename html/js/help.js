@@ -90,6 +90,9 @@ function init_help()
 		$('.new-right-content-block.help-info-pages').removeClass('hidden');
 		$('.help-info-pages .sections').addClass('hidden');
 		$('#section-' + subpage).removeClass('hidden');
+        $('#section-' + subpage + " img").each(function() {
+            this.onload = mainScroll;
+        });
 		mainScroll();
 	}
 	else

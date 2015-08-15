@@ -93,7 +93,11 @@ function init_page() {
 
     // If they are transferring from mega.co.nz
     if (page.substr(0, 13) == 'sitetransfer!') {
-        M.transferFromMegaCoNz();
+        
+        // If false, then the page is changing hash URL so don't continue past here
+        if (M.transferFromMegaCoNz() === false) {
+            return false;
+        }
     }
 
     if (!u_type) {

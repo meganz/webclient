@@ -4289,24 +4289,25 @@ function MegaData()
 
             // Decode from Base64 and JSON
             urlParts = JSON.parse(atob(urlParts[1]));
-
+            
             if (urlParts) {
                 // If the user is already logged in here with the same account
                 // we can avoid a lot and just take them to the correct page
                 if (JSON.stringify(u_k) === JSON.stringify(urlParts[0])){
                     window.location.hash = urlParts[2];
-                    return;
+                    return false;
                 }
 
                 // If the user is already logged in but with a different account just load that account instead. The
                 // hash they came from e.g. a folder link may not be valid for this account so just load the file manager.
                 else if (u_k && (JSON.stringify(u_k) !== JSON.stringify(urlParts[0]))) {
-                    if ((urlParts[2]||"").match(/^fm/)) {
+                    if ((urlParts[2] || '').match(/^fm/)) {
                         window.location.hash = 'fm';
+                        return false;
                     } else {
                         window.location.hash = urlParts[2];
+                        return false;
                     }
-                    return;
                 }
 
                 // Likely that they have never logged in here before so we must set this
@@ -4325,11 +4326,14 @@ function MegaData()
                 var toPage = urlParts[2];
                 var toLang = urlParts[4];
 
-                // initialize all account types and redirect to the FM:
+                // Initialize all account types and redirect to the FM
                 if (!toPage) {
                     toPage = 'fm';
                 }
                 this.performRegularLogin(toPage);
+                
+                // Successful transfer, continue load
+                return true;
             }
         }
     };
@@ -4357,11 +4361,13 @@ function MegaData()
                     // Set account type and redirect to the requested location
                     u_type = result;
                     window.location.hash = toPage;
+                    return false;
                 }
                 else {
                     // Must be an ephemeral account, attempt to initialize:
                     u_type=0;
                     window.location.hash = toPage;
+                    return false;
                 }
             }
         };

@@ -191,7 +191,7 @@ function MegaData()
 
     this.getSortStatus = function(u)
     {
-        var status = typeof megaChat !== 'undefined' && megaChat.isReady && megaChat.karere.getPresence(megaChat.getJidFromNodeId(u));
+        var status = megaChatIsReady && megaChat.karere.getPresence(megaChat.getJidFromNodeId(u));
         if (status == 'chat')
             return 1;
         else if (status == 'dnd')
@@ -435,7 +435,7 @@ function MegaData()
 
     this.onlineStatusEvent = function(u, status)
     {
-        if (u && typeof megaChat !== 'undefined' && megaChat.isReady)
+        if (u && megaChatIsReady)
         {
             // this event is triggered for a specific resource/device (fullJid), so we need to get the presen for the
             // user's devices, which is aggregated by Karere already
@@ -762,6 +762,7 @@ function MegaData()
          * @param {} u
          *
          */
+        var chatIsReady = megaChatIsReady;
         function renderContactsLayout(u) {
             var u_h, contact, node, avatar, el, t, html, onlinestatus,
                 cs = M.contactstatus(u_h),
@@ -780,7 +781,7 @@ function MegaData()
                 contact = M.u[u_h];
 
                 // chat is enabled?
-                if (typeof megaChat !== 'undefined' && megaChat.isReady) {
+                if (chatIsReady) {
                     if (contact && contact.lastChatActivity > timems) {
                         interactionclass = 'conversations';
                         time = time2last(contact.lastChatActivity);
@@ -799,8 +800,7 @@ function MegaData()
                 avatar = useravatar.contact(u_h, "nw-contact-avatar");
 
                 onlinestatus = M.onlineStatusClass(
-                    typeof megaChat !== 'undefined' &&
-                    megaChat.isReady &&
+                    chatIsReady &&
                     megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h))
                 );
 
@@ -886,8 +886,7 @@ function MegaData()
                     rights = l[55],
                     rightsclass = ' read-only',
                     onlinestatus = M.onlineStatusClass(
-                        typeof megaChat !== 'undefined' &&
-                        megaChat.isReady &&
+                        chatIsReady &&
                         megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h))
                     );
 
@@ -1366,7 +1365,7 @@ function MegaData()
         this.contacts();
         this.renderInboxTree();
         treeUI();
-        if (!megaChatIsDisabled()) {
+        if (megaChatIsReady) {
             megaChat.renderContactTree();
         }
     };
@@ -1409,15 +1408,19 @@ function MegaData()
         else if (id === 'shares')
             id = 'shares';
         else if (id === 'chat') {
-            this.chat = true;
-            id = 'chat';
-
-            if (megaChat.renderListing() === true) {
-                window.location = megaChat.getCurrentRoom().getRoomUrl();
-                return;
+            if (!megaChatIsReady) {
+                id = this.RootID;
             }
-            megaChat.refreshConversations();
-            treeUI();
+            else {
+                this.chat = true;
+
+                if (megaChat.renderListing() === true) {
+                    window.location = megaChat.getCurrentRoom().getRoomUrl();
+                    return;
+                }
+                megaChat.refreshConversations();
+                treeUI();
+            }
         } else if (id && id.substr(0, 7) === 'account')
             accountUI();
         else if (id && id.substr(0, 13) === 'notifications')
@@ -1428,7 +1431,7 @@ function MegaData()
             this.chat = true;
             treeUI();
 
-            if (!megaChatIsDisabled()) {
+            if (!megaChatIsDisabled) {
                 chatui(id); // XX: using the old code...for now
             }
         }
@@ -1436,7 +1439,7 @@ function MegaData()
             id = this.RootID;
         }
 
-        if (!megaChatIsDisabled()) {
+        if (megaChatIsReady) {
             if (!this.chat) {
                 if (megaChat.getCurrentRoom()) {
                     megaChat.getCurrentRoom().hide();
@@ -1588,7 +1591,7 @@ function MegaData()
             }
             var onlinestatus;
 
-            if (typeof megaChat !== 'undefined' && megaChat.isReady) {
+            if (megaChatIsReady) {
                 onlinestatus = M.onlineStatusClass(megaChat.karere.getPresence(megaChat.getJidFromNodeId(contacts[i].u)));
             } else {
                 onlinestatus = [l[5926], 'offline'];
@@ -1603,7 +1606,7 @@ function MegaData()
 
         $('.content-panel.contacts').html(html);
 
-        if (!megaChatIsDisabled()) {
+        if (megaChatIsReady) {
             megaChat.renderContactTree();
 
             $('.fm-tree-panel').undelegate('.start-chat-button', 'click.megaChat');
@@ -4312,11 +4315,13 @@ function MegaData()
 
                 // Get the page to load
                 var toPage = urlParts[2];
-				var toLang = urlParts[4];
+                var toLang = urlParts[4];
 
                 // initialize all account types and redirect to the FM:
-				if (toPage == '') toPage = 'fm';
-				this.performRegularLogin(toPage);                
+                if (!toPage) {
+                    toPage = 'fm';
+                }
+                this.performRegularLogin(toPage);
             }
         }
     };
@@ -4348,7 +4353,7 @@ function MegaData()
                 else {
                     // Must be an ephemeral account, attempt to initialize:
                     u_type=0;
-					window.location.hash = toPage;
+                    window.location.hash = toPage;
                 }
             }
         };
@@ -4519,7 +4524,7 @@ function renderfm()
     }
 
     M.openFolder(M.currentdirid);
-    if (typeof megaChat !== 'undefined' && megaChat.isReady) {
+    if (megaChatIsReady) {
         megaChat.renderContactTree();
         megaChat.renderMyStatus();
     }
@@ -4593,7 +4598,7 @@ function renderNew() {
         M.contacts();
         treeUI();
 
-        if (!megaChatIsDisabled()) {
+        if (megaChatIsReady) {
             megaChat.renderContactTree();
             megaChat.renderMyStatus();
         }
@@ -4663,7 +4668,7 @@ function execsc(actionPackets, callback) {
                     notify.notifyFromActionPacket(actionPacket);
                 }
 
-                if (typeof megaChat !== 'undefined' && megaChat.isReady) {
+                if (megaChatIsReady) {
                     $.each(actionPacket.u, function (k, v) {
                         megaChat[v.c == 0 ? "processRemovedUser" : "processNewUser"](v.u);
                     });
@@ -4972,7 +4977,7 @@ function execsc(actionPackets, callback) {
                 notify.notifyFromActionPacket(actionPacket);
             }
 
-            if (typeof megaChat !== 'undefined' && megaChat.isReady) {
+            if (megaChatIsReady) {
                 $.each(actionPacket.u, function(k, v) {
                     megaChat[v.c == 0 ? "processRemovedUser" : "processNewUser"](v.u);
                 });
@@ -5842,23 +5847,27 @@ function folderreqerr(c, e)
 
 function init_chat() {
     function __init_chat() {
-        if (u_type && (typeof megaChat === 'undefined' || !megaChat.is_initialized)) {
+        if (u_type && !megaChatIsReady) {
             if (d) console.log('Initializing the chat...');
-            window.megaChat = new Chat();
-            window.megaChat.init();
+            try {
+                window.megaChat = new Chat();
+                window.megaChat.init();
 
-            if (fminitialized) {
-                Soon(function() {
+                if (fminitialized) {
                     megaChat.renderContactTree();
                     megaChat.renderMyStatus();
-                });
+                }
+            }
+            catch (ex) {
+                console.error(ex);
+                megaChatIsDisabled = true;
             }
         }
     }
     if (folderlink) {
         if (d) console.log('Will not initializing chat [branch:1]');
     }
-    else if (!megaChatIsDisabled()) {
+    else if (!megaChatIsDisabled) {
         if (pubEd25519[u_handle]) {
             __init_chat();
         } else {

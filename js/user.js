@@ -179,11 +179,11 @@ function u_logout(logout) {
     }
 
     if (logout) {
-        if (!megaChatIsDisabled()) {
+        if (!megaChatIsDisabled) {
 
             localStorage.removeItem("audioVideoScreenSize");
 
-            if (megaChat.is_initialized) {
+            if (megaChatIsReady) {
                 megaChat.destroy( /* isLogout: */ true).always(function () {
                     window.megaChat = new Chat();
                     localStorage.removeItem("megaChatPresence");

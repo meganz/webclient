@@ -550,16 +550,31 @@ ClassFile.prototype.run = function(task_done) {
         }
         else if (error) {
             /* failed */
-            this.dl.retry_t = setTimeout(function onGetUrlError() { /* retry !*/
-                if (!cancelOnInit()) {
-                    dlmanager.logger.error('retrying ', this.dl.n);
-                    dlQueue.pushFirst(this);
-                    if (dlmanager.ioThrottlePaused) {
-                        dlQueue.resume();
-                    }
+            this.dlGetUrlErrors = (this.dlGetUrlErrors | 0) + 1;
+            if (this.dl.zipid && this.dlGetUrlErrors > 20) {
+                // Prevent stuck ZIP downloads if there are repetitive errors for some of the files
+                // TODO: show notification to the user about empty files in the zip?
+                console.error('Too many errors for "' + this.dl.n + '", saving as 0-bytes...');
+                try {
+                    this.dl.size = 0;
+                    return this.dl.io.setCredentials("", 0, this.dl.n);
                 }
-            }.bind(this), dlmanager.dlRetryInterval);
-            dlmanager.logger.info('retry to fetch url in ', dlmanager.dlRetryInterval, ' ms');
+                catch (e) {
+                    setTransferStatus(this.dl, e, true);
+                }
+            }
+            else {
+                this.dl.retry_t = setTimeout(function onGetUrlError() { /* retry !*/
+                    if (!cancelOnInit()) {
+                        dlmanager.logger.error('retrying ', this.dl.n);
+                        dlQueue.pushFirst(this);
+                        if (dlmanager.ioThrottlePaused) {
+                            dlQueue.resume();
+                        }
+                    }
+                }.bind(this), dlmanager.dlRetryInterval);
+                dlmanager.logger.info('retry to fetch url in ', dlmanager.dlRetryInterval, ' ms');
+            }
         }
         else {
             var info = dl_queue.splitFile(res.s);

@@ -3884,7 +3884,8 @@ function MegaData()
         if (errorstr) {
             dl.failed = new Date;
             var id = (dl.zipid ? 'zip_' + dl.zipid : 'dl_' + fileid);
-            if (x != 233 || !(GlobalProgress[id] || {}).speed) {
+            var prog = GlobalProgress[id] || {};
+            if (x != 233 || !prog.speed || !(prog.working || []).length) {
                 /**
                  * a chunk may fail at any time, don't report a temporary error while
                  * there is network activity associated with the download, though.

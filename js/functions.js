@@ -1321,7 +1321,7 @@ function dlFatalError(dl, error, ethrow) {
         msgDialog('warninga', l[1676], m, error);
     }
     else {
-        Later(megaSyncDialog);
+        Later(firefoxDialog);
     }
     setTransferStatus(dl, error, ethrow, true);
     dlmanager.abort(dl);

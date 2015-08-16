@@ -99,7 +99,7 @@ function init_help()
 			title = 'Windows Phone App';
 			$('.new-left-menu-link.windows-phone').addClass('active');
 		}
-		else if (subpage == 'backberry')
+		else if (subpage == 'blackberry')
 		{
 			id=9;
 			title = 'BlackBerry App';

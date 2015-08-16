@@ -3118,6 +3118,8 @@ function accountUI()
             var recent = l[483];
             if (!el[5])
                 recent = time2date(el[0]);
+            if (!country.icon || country.icon === '??.gif')
+                country.icon = 'ud.gif';
             html += '<tr><td><span class="fm-browsers-icon"><img alt="" src="' + staticpath + 'images/browser/' + browser.icon + '" /></span><span class="fm-browsers-txt">' + htmlentities(browser.name) + '</span></td><td>' + htmlentities(el[3]) + '</td><td><span class="fm-flags-icon"><img alt="" src="' + staticpath + 'images/flags/' + country.icon + '" style="margin-left: 0px;" /></span><span class="fm-flags-txt">' + htmlentities(country.name) + '</span></td><td>' + htmlentities(recent) + '</td></tr>';
         });
         $('.grid-table.sessions').html(html);

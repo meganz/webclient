@@ -782,7 +782,7 @@ else if (!b_u)
         };
     })(console);
 
-    Object.defineProperty(window, "__cd_v", { value : 14, writable : false });
+    Object.defineProperty(window, "__cd_v", { value : 15, writable : false });
     if (!d || onBetaW)
     {
         var __cdumps = [], __cd_t;
@@ -1229,12 +1229,12 @@ else if (!b_u)
         if (page.indexOf('%25') !== -1)
         {
             do {
-                page = page.replace('%25','%', 'g');
+                page = page.replace(/%25/g, '%');
             } while (~page.indexOf('%25'));
         }
         if (page.indexOf('%21') !== -1)
         {
-            page = page.replace('%21','!', 'g');
+            page = page.replace(/%21/g, '!');
             document.location.hash = page;
         }
 

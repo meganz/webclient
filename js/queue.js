@@ -235,11 +235,15 @@ MegaQueue.prototype.getNextTask = function(sp) {
 MegaQueue.prototype.process = function(sp) {
     var args;
     if (this._paused) {
-        return;
+        return false;
     }
     if (this._later) {
         clearTimeout(this._later);
         delete this._later;
+    }
+    if (!this._queue) {
+        console.error('queue destroyed', this.qname, sp);
+        return false;
     }
     while (this._running < this._limit && this._queue.length > 0) {
         args = this.getNextTask(sp);

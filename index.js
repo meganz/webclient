@@ -91,6 +91,10 @@ function scrollMenu() {
 
 function init_page() {
 
+    /*if (page.substr(0, 8) == 'redirect') {
+        return location.hash = page.substr(8);
+    }*/
+
     // If they are transferring from mega.co.nz
     if (page.substr(0, 13) == 'sitetransfer!') {
         M.transferFromMegaCoNz();
@@ -567,12 +571,12 @@ function init_page() {
             });
             $('.chrome-app-scr').css('cursor', 'pointer');
         }
-        
+
         // On the manual download button click
         $('.chrome-download-button').rebind('click', function() {
-            
+
             var $this = $(this);
-            
+
             // Hide the button text and show the mega.co.nz and mega.nz links
             $this.css('cursor', 'default');
             $this.find('.initial-state').hide();
@@ -1629,7 +1633,7 @@ function topmenuUI() {
         $('.membership-popup-arrow').css('margin-right',
             $('.top-menu-icon').width() + $('.membership-status-block').width() / 2 + 57 + 'px');
     }
-    
+
     // Initialise notification popup and tooltip
     notify.init();
 }
@@ -1736,6 +1740,14 @@ window.onhashchange = function() {
     }
 
     if (page) {
+        if (page.indexOf('%25') !== -1) {
+            do {
+                page = page.replace(/%25/g, '%');
+            } while (page.indexOf('%25') !== -1);
+        }
+        if (page.indexOf('%21') !== -1) {
+            page = page.replace(/%21/g, '!');
+        }
         for (var p in subpages) {
             if (page && page.substr(0, p.length) == p) {
                 for (i in subpages[p]) {

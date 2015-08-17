@@ -544,6 +544,9 @@ function init_page() {
         init_key();
     }
     else if (page == 'login') {
+        if (u_storage.sid) {
+            return document.location.hash = '#fm';
+        }
         parsepage(pages['login']);
         init_login();
     }

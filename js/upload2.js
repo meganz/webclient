@@ -617,7 +617,6 @@ var ulmanager = {
         if (d) {
             ulmanager.logger.info("ul_completepending2", res, ctx);
         }
-        ASSERT(typeof res === 'object' && res.f, 'Unexpected UL Server Response.', res);
         if (typeof res === 'object' && res.f) {
             var n = res.f[0];
 
@@ -654,6 +653,10 @@ var ulmanager = {
                     msgDialog('warninga', l[1309], l[5760] + ' ' + fileName);
                 }
             });
+            if (res !== EOVERQUOTA) {
+                srvlog('Unexpected upload completion server response (' + res
+                    + ' @ ' + hostname(ctx.file.posturl) + ')');
+            }
         }
         if (ctx.file.owner) {
             ctx.file.owner.destroy();
@@ -823,7 +826,9 @@ ChunkUpload.prototype.updateprogress = function() {
 };
 
 ChunkUpload.prototype.abort = function() {
-    this.logger.info('Aborting', this.oet, Boolean(this.xhr));
+    if (d && this.logger) {
+        this.logger.info('Aborting', this.oet, Boolean(this.xhr));
+    }
 
     if (this.oet) {
         clearTimeout(this.oet);
@@ -834,7 +839,7 @@ ChunkUpload.prototype.abort = function() {
     if (GlobalProgress[this.gid]) {
         removeValue(GlobalProgress[this.gid].working, this, 1);
     }
-    else if (d) {
+    else if (d && this.logger) {
         this.logger.error('This should not be reached twice or after FileUpload destroy...', this);
     }
     delete this.xhr;

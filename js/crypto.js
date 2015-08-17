@@ -1909,6 +1909,7 @@ function api_createuser(ctx, invitecode, invitename, uh) {
     }
 
     api_req(req, ctx);
+    watchdog.notify('createuser');
 }
 
 function api_checkconfirmcode(ctx, c) {
@@ -2178,7 +2179,7 @@ var u_nodekeys = {};
 // an error, and the whole operation gets repeated (exceedingly
 // rare race condition).
 function api_setshare(node, targets, sharenodes, ctx) {
-    
+
     // cache all targets' public keys
     var targetsPubKeys = [];
 

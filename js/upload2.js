@@ -15,6 +15,7 @@ if (localStorage.ul_skipIdentical) {
 /* jshint -W003 */
 var ulmanager = {
     ulFaId: 0,
+    ulIDToNode: {},
     isUploading: false,
     ulStartingPhase: false,
     ulCompletingPhase: false,
@@ -633,6 +634,7 @@ var ulmanager = {
             if (ctx.faid) {
                 api_attachfileattr(n.h, ctx.faid);
             }
+            ulmanager.ulIDToNode[ulmanager.getGID(ul_queue[ctx.ul_queue_num])] = n.h;
             onUploadSuccess(ul_queue[ctx.ul_queue_num], n.h, ctx.faid);
             ctx.file.ul_failed = false;
             ctx.file.retries = 0;

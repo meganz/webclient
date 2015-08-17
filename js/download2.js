@@ -973,6 +973,7 @@ function fm_tfsupdate() {
         // Hm, rather just leave them at the bottom
         $('.transfer-scrolling-table').trigger('jsp-scroll-y.tfsdynlist', [0, 0, 1]);
     }
+    $.transferHeader();
 
     $('.transfer-table span.row-number').each(function() {
         var $this = $(this);

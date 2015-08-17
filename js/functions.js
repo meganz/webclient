@@ -3390,6 +3390,7 @@ var watchdog = Object.freeze({
                 break;
 
             case 'login':
+            case 'createuser':
                 loadingDialog.show();
                 this.Strg.login = strg.origin;
                 break;

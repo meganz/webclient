@@ -97,7 +97,7 @@ function init_page() {
 
     // If they are transferring from mega.co.nz
     if (page.substr(0, 13) == 'sitetransfer!') {
-        
+
         // If false, then the page is changing hash URL so don't continue past here
         if (M.transferFromMegaCoNz() === false) {
             return false;
@@ -798,6 +798,36 @@ function init_page() {
         }
         else if (!pfid && id && id !== M.currentdirid) {
             M.openFolder(id);
+        }
+        else {
+            if (ul_queue.length > 0) {
+                openTransferpanel();
+            }
+
+            if (u_type === 0 && !u_attr.terms) {
+                $.termsAgree = function() {
+                    u_attr.terms = 1;
+                    api_req({a: 'up', terms: 'Mq'});
+                    // queued work is continued when user accept terms of service
+                    $('.transfer-pause-icon').removeClass('active');
+                    $('.nw-fm-left-icon.transfers').removeClass('paused');
+                    dlQueue.resume();
+                    ulQueue.resume();
+                    uldl_hold = false;
+                    showTransferToast('u', ul_queue.length);
+                };
+
+                $.termsDeny = function() {
+                    u_logout();
+                    document.location.reload();
+                };
+
+                dlQueue.pause();
+                ulQueue.pause();
+                uldl_hold = true;
+
+                termsDialog();
+            }
         }
         $('#topmenu').html(parsetopmenu());
 

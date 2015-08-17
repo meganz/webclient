@@ -446,6 +446,9 @@ function initializeTreePanelSorting()
 }
 
 function initUI() {
+    if (d) {
+        console.time('iconUI');
+    }
     $('.not-logged .fm-not-logged-button.create-account').rebind('click', function()
     {
         document.location.hash = 'register';
@@ -841,35 +844,6 @@ function initUI() {
         folderlink = 0;
     }
 
-    if (ul_queue.length > 0) {
-        openTransferpanel();
-    }
-
-    if (u_type === 0 && !u_attr.terms) {
-        $.termsAgree = function() {
-
-            u_attr.terms = 1;
-            api_req({a: 'up', terms: 'Mq'});
-            // queued work is continued when user accept terms of service
-            $('.transfer-pause-icon').removeClass('active');
-            $('.nw-fm-left-icon.transfers').removeClass('paused');
-            dlQueue.resume();
-            ulQueue.resume();
-            uldl_hold = false;
-        };
-
-        $.termsDeny = function() {
-            u_logout();
-            document.location.reload();
-        };
-
-        dlQueue.pause();
-        ulQueue.pause();
-        uldl_hold = true;
-
-        termsDialog();
-    }
-
     M.avatars();
 
     if ((typeof dl_import !== 'undefined') && dl_import) {
@@ -996,6 +970,9 @@ function initUI() {
     });
 
     $(window).rebind('resize.fmrh hashchange.fmrh', fm_resize_handler);
+    if (d) {
+        console.timeEnd('iconUI');
+    }
 }
 
 function transferPanelContextMenu(target)
@@ -1309,7 +1286,8 @@ function showTransferToast(t_type, t_length) {
                 $('.slideshow-dialog').addClass('hidden');
                 $('.slideshow-overlay').addClass('hidden');
             }
-            M.openFolder('transfers', true);
+            // M.openFolder('transfers', true);
+            $('.nw-fm-left-icon.transfers').click();
         });
         $toast.rebind('mouseover', function(e)
         {

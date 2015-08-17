@@ -23,6 +23,7 @@ function u_login2(ctx, ks) {
         u_storage = init_storage(ctx.permanent ? localStorage : sessionStorage);
         u_storage.k = JSON.stringify(ks[0]);
         u_storage.sid = ks[1];
+        watchdog.notify('login', ks[1]);
         if (ks[2]) {
             u_storage.privk = base64urlencode(crypto_encodeprivkey(ks[2]));
         }
@@ -94,7 +95,7 @@ function u_checklogin3a(res, ctx) {
     }
     else {
         u_attr = res;
-        var exclude = ['c', 'email', 'k', 'name', 'p', 'privk', 'pubk', 's', 'ts', 'u', 'currk'];
+        var exclude = ['c', 'email', 'k', 'name', 'p', 'privk', 'pubk', 's', 'ts', 'u', 'currk', 'flags'];
 
         for (var n in u_attr) {
             if (exclude.indexOf(n) == -1) {
@@ -120,6 +121,11 @@ function u_checklogin3a(res, ctx) {
             }
         }
 
+        // If 'mcs' Mega Chat Status flag is 0 then MegaChat is off, otherwise if flag is 1 MegaChat is on
+        if ((typeof u_attr.flags !== 'undefined') && (typeof u_attr.flags.mcs !== 'undefined')) {
+            localStorage.chatDisabled = (u_attr.flags.mcs === 0) ? '1' : '0';
+        }
+
         if (u_k) {
             u_k_aes = new sjcl.cipher.aes(u_k);
         }
@@ -134,16 +140,16 @@ function u_checklogin3a(res, ctx) {
         }
 
         if (!u_attr.email) {
-            r = 0;
+            r = 0;      // Ephemeral account
         }
         else if (!u_attr.c) {
-            r = 1;
+            r = 1;      // Haven't confimed email yet
         }
         else if (!u_attr.privk) {
-            r = 2;
+            r = 2;      // Don't have a private key yet (maybe they quit before key generation completed)
         }
         else {
-            r = 3;
+            r = 3;      // Fully registered
         }
 
         if (r == 3) {
@@ -173,11 +179,11 @@ function u_logout(logout) {
     }
 
     if (logout) {
-        if (!megaChatDisabled) {
+        if (!megaChatIsDisabled) {
 
             localStorage.removeItem("audioVideoScreenSize");
 
-            if (megaChat.is_initialized) {
+            if (megaChatIsReady) {
                 megaChat.destroy( /* isLogout: */ true).always(function () {
                     window.megaChat = new Chat();
                     localStorage.removeItem("megaChatPresence");
@@ -199,9 +205,12 @@ function u_logout(logout) {
             mDBcls(); // resets mDBloaded
         }
         fminitialized = false;
+        if (logout !== -0xDEADF) {
+            watchdog.notify('logout');
+        }
         mBroadcaster.crossTab.leave();
         u_sid = u_handle = u_k = u_attr = u_privk = u_k_aes = undefined;
-        notifyPopup.notifications = null;
+        notify.notifications = [];
         api_setsid(false);
         u_sharekeys = {};
         u_nodekeys = {};
@@ -605,6 +614,10 @@ function getUserAttribute(userhandle, attribute, pub, nonHistoric,
     myCtx.ua = attribute;
     myCtx.callback = settleFunction;
 
+    // @TODO PERF: This may reduce the number of API calls made during the page initialisation if the next line is
+    // replaced with a clever cache (localStorage/sessionStorage/mDB) that will do cache all api_req's related to
+    // attributes and keep it in sync via actionpackets.
+
     // Fire it off.
     api_req({'a': 'uga', 'u': userhandle, 'ua': attribute}, myCtx);
 
@@ -844,7 +857,7 @@ function isEphemeral() {
             if (r[0] === "0") {
                 $elem.addClass('cloud-drive');
             }
-            else if (r[0] === "1" && megaChat) {
+            else if (r[0] === "1" && typeof(megaChat) !== 'undefined') {
                 M.u[u_h].lastChatActivity = ts;
                 var room = megaChat.getPrivateRoom(u_h);
                 if (room && megaChat && megaChat.plugins && megaChat.plugins.chatNotifications) {

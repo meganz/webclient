@@ -70,7 +70,7 @@
 	Strophe.Disco = {
 		DiscoNode: DiscoNode,
 		DiscoInfoNode: DiscoInfoNode,
-		DiscoItemsNode: DiscoItemsNode,
+        DiscoItemsNode: DiscoItemsNode,
 		DiscoNodeNotFound: DiscoNodeNotFound,
 		noop: noop
 	};

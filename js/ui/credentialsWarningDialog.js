@@ -39,7 +39,7 @@
             'buttons': [
                 {
                     'label': "Close",
-                    'className': "fm-dialog-button-red feedback-button-cancel",
+                    'className': "fm-dialog-button-red",
                     'callback': function() {
                         this.hide();
                     }

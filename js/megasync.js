@@ -4,7 +4,6 @@ function MegaSync()
     this._url = "https://localhost.megasyncloopback.mega.nz:6342/";
     this._enabled = false;
     this._version = 0;
-    this._api({a: "v"});
     this._lastDownload = null;
     this._retryTimer = null;
     this._prepareDownloadUrls();
@@ -140,6 +139,14 @@ MegaSync.prototype._prepareDownloadUrls = function() {
         'c':'sudo yum localinstall'
     },
     {
+        'name':'Fedora 22',
+        '32':'Fedora_22/i686/megasync-Fedora_22.i686.rpm',
+        '32n':'Fedora_22/i686/nautilus-megasync-Fedora_22.i686.rpm',
+        '64':'Fedora_22/x86_64/megasync-Fedora_22.x86_64.rpm',
+        '64n':'Fedora_22/x86_64/nautilus-megasync-Fedora_22.x86_64.rpm',
+        'c':'sudo dnf install'
+    },
+    {
         'name':'Mint 17',
         '32':'xUbuntu_14.04/i386/megasync-xUbuntu_14.04_i386.deb',
         '32n':'xUbuntu_14.04/i386/nautilus-megasync-xUbuntu_14.04_i386.deb',
@@ -270,7 +277,9 @@ MegaSync.prototype.handle_v = function(version) {
     this._version = version;
     if (this._lastDownload) {
         this.download(this._lastDownload[0], this._lastDownload[1]);
+        this._lastDownload = null;
     }
+
 };
 
 MegaSync.prototype.download = function(pubkey, privkey) {
@@ -279,12 +288,15 @@ MegaSync.prototype.download = function(pubkey, privkey) {
     return true;
 };
 
-MegaSync.prototype._onError = function() {
+MegaSync.prototype._onError = function(next, e) {
     this._enabled = false;
+    next = (typeof next === "function") ? next : function() {};
+    next(e || new Error("Internal error"));
     return this.downloadClient();
 };
 
-MegaSync.prototype.handle = function(response) {
+MegaSync.prototype.handle = function(next, response) {
+    next = (typeof next === "function") ? next : function() {};
     if (response === 0) {
         // alright!
         clearInterval(this._retryTimer);
@@ -293,20 +305,27 @@ MegaSync.prototype.handle = function(response) {
     }
 
     if (typeof response !== "object") {
+        next(new Error("Internal error"));
         return this._onError();
     }
 
     for (var i in response) {
-        this['handle_' + i](response[i]);
+        var fn = 'handle_' + i;
+        if (typeof this[fn] === 'function') {
+            this[fn](response[i]);
+            next(null, response[i]); // XXX: <- this should be called once and not in a loop i guess
+        }
     }
 };
 
-MegaSync.prototype._api = function(args) {
-    $.post(this._url, JSON.stringify(args), this.handle.bind(this), "json")
-        .fail(this._onError.bind(this));
+MegaSync.prototype._api = function(args, next) {
+    $.post(this._url, JSON.stringify(args), this.handle.bind(this, next), "json")
+        .fail(this._onError.bind(this, next));
 };
 
-
+MegaSync.prototype.isInstalled = function(next) {
+    this._api({a: "v"}, next);
+};
 
 MegaSync.prototype.downloadClient = function() {
     if (!this._lastDownload){
@@ -321,15 +340,18 @@ MegaSync.prototype.downloadClient = function() {
     }
 
     this._retryTimer = setInterval((function() {
-        // retry!
+        if ($('.megasync-overlay:visible').length === 0) {
+            this._lastDownload = null;
+            return clearInterval(this._retryTimer);
+        }
         this._api({a: "v"});
-    }).bind(this), 500);
+    }).bind(this), 1000);
     overlay.show().addClass('downloading');
-    
+
     $('.megasync-close').rebind('click', function(e) {
         $('.megasync-overlay').hide();
     });
-    
+
     $('body').bind('keyup', function(e) {
         if (e.keyCode == 27) {
             $('.megasync-overlay').hide();

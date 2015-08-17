@@ -10,16 +10,11 @@ function init_help()
 	$('.new-left-menu-link,.help-block').unbind('click');
 	$('.new-left-menu-link,.help-block').bind('click',function(e)
 	{
-		var c = $(this).attr('class');
+		var c = $(this).attr('class').replace(/.+ /, '');
 		if (!c) return false;
-		if (c.indexOf('basics') > -1) document.location.hash = 'help/basics';
-		else if (c.indexOf('sharing') > -1) document.location.hash = 'help/sharing';
-		else if (c.indexOf('security') > -1) document.location.hash = 'help/security';
-		else if (c.indexOf('account') > -1) document.location.hash = 'help/account';
-		else if (c.indexOf('sync') > -1) document.location.hash = 'help/sync';
-		else if (c.indexOf('ios') > -1) document.location.hash = 'help/ios';
-		else if (c.indexOf('android') > -1) document.location.hash = 'help/android';
-		else document.location.hash = 'help';
+
+        if (c == 'home') document.location.hash = 'help';
+        else document.location.hash = 'help/' + c;
 	});	
 	
 	
@@ -92,9 +87,30 @@ function init_help()
 			title = 'Android App';
 			$('.new-left-menu-link.android').addClass('active');
 		}
+		else if (subpage == 'mega-chat')
+		{
+			id=7;
+			title = 'MegaChat';
+			$('.new-left-menu-link.mega-chat').addClass('active');
+		}
+		else if (subpage == 'windows-phone')
+		{
+			id=8;
+			title = 'Windows Phone App';
+			$('.new-left-menu-link.windows-phone').addClass('active');
+		}
+		else if (subpage == 'blackberry')
+		{
+			id=9;
+			title = 'BlackBerry App';
+			$('.new-left-menu-link.blackberry').addClass('active');
+		}
 		$('.new-right-content-block.help-info-pages').removeClass('hidden');
 		$('.help-info-pages .sections').addClass('hidden');
 		$('#section-' + subpage).removeClass('hidden');
+        $('#section-' + subpage + " img").each(function() {
+            this.onload = mainScroll;
+        });
 		mainScroll();
 	}
 	else
@@ -121,14 +137,13 @@ function init_help()
 
 
 l[1212] = l[1212].replace('[A]','<a href="#sdk" class="red">').replace('[/A]','</a>');
-l[1218] = l[1218].replace('[A]','<a href="#affiliateterms" class="red">').replace('[/A]','</a>');
 l[1863] = l[1863].replace('[A]','<a href="#mobile">').replace('[/A]','</a>');
 l[1863] = l[1863].replace('[B]','<a href="https://itunes.apple.com/app/mega/id706857885" target="_blank" rel="noreferrer">').replace('[/B]','</a>');
 l[1863] = l[1863].replace('[C]','<a href="https://play.google.com/store/apps/details?id=nz.mega.android&referrer=meganzhelp" target="_blank" rel="noreferrer">').replace('[/C]','</a>');
 l[1862] = l[1862].replace('[A]','<a href="https://play.google.com/store/apps/details?id=nz.mega.android&referrer=meganzhelp" target="_blank" rel="noreferrer">').replace('[/A]','</a>');
 l[1860] = l[1860].replace('[A]','<a href="https://itunes.apple.com/app/mega/id706857885" target="_blank" rel="noreferrer">').replace('[/A]','</a>');
 l[1828] = l[1828].replace('[A]','<a href="#sync">').replace('[/A]','</a>');
-l[1996] = l[1996].replace('[A]','<a href="mailto:support@mega.co.nz">').replace('[/A]','</a>');
+l[1996] = l[1996].replace('[A]','<a href="mailto:support@mega.nz">').replace('[/A]','</a>');
 l[1998]	= l[1998].replace('[A]','<a href="#backup">').replace('[/A]','</a>');
 l[1838] = l[1838].replace('"Debris"','"Rubbish"');
 

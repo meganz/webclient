@@ -16,7 +16,6 @@ var useravatar = (function() {
         '#ff9500',
         '#ffcc00',
     ];
-    var logger = MegaLogger.getLogger('avatars');
 
     /**
      *  List of TWO-letters avatars that we ever generated. It's useful to replace
@@ -66,11 +65,13 @@ var useravatar = (function() {
      * @private
      */
     var _lettersSettings = function(word) {
-        var words = $.trim(word).toUpperCase().split(/\W+/);
-        var letters = words[0][0];
-        var color   = letters.charCodeAt(0) % _colors.length;
-        if (word === u_handle) {
-            letters = "";
+        var letters = "";
+        var color   = 1;
+        if (word && word !== u_handle) {
+            // Word is indeed not empty nor our user ID.
+            var words = $.trim(word).toUpperCase().split(/\W+/);
+            letters = words[0][0];
+            color   = letters.charCodeAt(0) % _colors.length;
         }
         return {letters: letters, color: _colors[color], colorIndex: color + 1 };
     };
@@ -157,19 +158,19 @@ var useravatar = (function() {
      *  that is the case we replace that old avatar *everywhere* with their proper avatar
      */
     ns.loaded = function(user) {
-        if (typeof user !== "object" || !user.u) {
+        if (typeof user !== "string") {
             return false;
         }
 
-        if (user.u === u_handle) {
+        if (user === u_handle) {
             // my avatar!
-            $('.fm-avatar img,.fm-account-avatar img').attr('src', ns.imgUrl(user.u));
+            $('.fm-avatar img,.fm-account-avatar img').attr('src', ns.imgUrl(user));
         }
 
         var avatar = $(ns.contact(user)).html();
-        $('.avatar-wrapper.' + user.u).empty().html(avatar);
-        if (user.m) {
-            $('.avatar-wrapper.' + user.m.replace(/[\.@]/g, "\\$1")).empty().html(avatar);
+        $('.avatar-wrapper.' + user).empty().html(avatar);
+        if ((M.u[user] || {}).m) {
+            $('.avatar-wrapper.' + M.u[user].m.replace(/[\.@]/g, "\\$1")).empty().html(avatar);
         }
     };
 
@@ -204,7 +205,6 @@ var useravatar = (function() {
         }
 
         if (typeof user !== "object" || !(user||{}).u) {
-            logger.error("Useravatar: Unexpected value " + typeof(user), user);
             return "";
         }
 

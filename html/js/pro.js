@@ -11,6 +11,17 @@ var pro_package,
 
 function init_pro()
 {
+    // Detect if there exists a verify get parameter
+    var verifyUrlParam = proPage.getUrlParam("verify");
+    if (typeof verifyUrlParam !== 'undefined')
+    {
+        if (verifyUrlParam === "paysafe")
+        {
+            // We are required to do paysafecard verification
+            paysafecard.verify();
+        }
+    }
+
     if (localStorage.keycomplete) {
         $('body').addClass('key');
         sessionStorage.proref = 'accountcompletion';
@@ -237,14 +248,12 @@ function pro_continue(e)
     // Selected payment method and package
     var selectedPaymentMethod = $('.membership-radio input:checked').val();
     var selectedProPackageIndex = $('.membership-dropdown-item.selected').attr('data-plan-index');
-    var prepaidMethodSelected = (selectedPaymentMethod === 'prepaid-balance') ? true : false;
 
     // Set the pro package (used in pro_pay function)
     selectedProPackage = membershipPlans[selectedProPackageIndex];
 
     // Get the months and price
     var selectedPlanMonths = selectedProPackage[4];
-    var selectedPlanPrice = selectedProPackage[5];
 
     if (selectedPlanMonths < 12) {
         pro_package = 'pro' + account_type_num + '_month';
@@ -264,28 +273,15 @@ function pro_continue(e)
 
         }}, true);
     }
-
-    // Warn them about insufficient funds
-    else if (prepaidMethodSelected && (parseFloat(pro_balance) < parseFloat(selectedPlanPrice))) {
-        msgDialog('warninga', l[6804], l[6805], false, false);
-    }
-
-    // Ask for confirmation to use their prepaid funds
-    else if (prepaidMethodSelected && (parseFloat(pro_balance) >= parseFloat(selectedPlanPrice))) {
-
-        msgDialog('confirmation', l[504], l[5844], false, function(event) {
-            if (event) {
-                pro_paymentmethod = 'pro_prepaid';
-                pro_pay();
-            }
-        });
-    }
     else {
         pro_paymentmethod = selectedPaymentMethod;
         
         // For credit card we show the dialog first, then do the uts/utc calls
         if (pro_paymentmethod === 'credit-card') {
             cardDialog.init();
+        }
+        else if (pro_paymentmethod === 'prepaid-balance') {
+            voucherDialog.init();
         }
         else if (pro_paymentmethod === 'wire-transfer') {
             wireTransferDialog.init();
@@ -297,16 +293,21 @@ function pro_continue(e)
     }
 }
 
-function pro_pay()
-{
+function pro_pay() {
+    
     var aff = 0;
     if (localStorage.affid && localStorage.affts > new Date().getTime() - 86400000) {
         aff = localStorage.affid;
     }
 
-    // Only show loading dialog if needing to setup bitcoin invoice
+    // Only show old loading dialog if needing to setup bitcoin invoice
     if (pro_paymentmethod === 'bitcoin') {
         showLoadingDialog();
+    }
+    
+    // If using pre-paid credit show loading dialog
+    else if (pro_paymentmethod === 'pro_prepaid') {
+        loadingDialog.show();
     }
     
     // Otherwise if credit card payment, show bouncing coin while loading
@@ -315,7 +316,7 @@ function pro_pay()
     }
     
     // Otherwise if Union Pay payment, show bouncing coin while loading
-    else if (pro_paymentmethod === 'union-pay') {
+    else if (pro_paymentmethod === 'union-pay' || pro_paymentmethod === "paysafecard") {
         proPage.showLoadingOverlay('transferring');
     }
     
@@ -323,9 +324,12 @@ function pro_pay()
     var apiId = selectedProPackage[0];
     var price = selectedProPackage[5];
     var currency = selectedProPackage[6];
+    
+    // Convert from boolean to integer for API
+    var fromBandwidthDialog = (localStorage.seenBandwidthDialog) ? 1 : 0;
 
     // uts = User Transaction Sale
-    api_req({ a: 'uts', it: 0, si: apiId, p: price, c: currency, aff: aff, 'm': m }, {   
+    api_req({ a: 'uts', it: 0, si: apiId, p: price, c: currency, aff: aff, 'm': m, bq: fromBandwidthDialog }, {   
         callback: function (utsResult) {
             
             // Store the sale ID to check with API later
@@ -354,7 +358,16 @@ function pro_pay()
                     // pro_m = 6;
                     // Fortumo does not do a utc request, we immediately redirect
                     fortumo.redirectToSite(saleId);
-                    return;
+                    return false;
+                }
+                else if (pro_paymentmethod === 'centili') {
+                    // pro_m = 9;
+                    // Centili does not do a utc request, we immediately redirect
+                    centili.redirectToSite(saleId);
+                    return false;
+                }
+                else if (pro_paymentmethod === 'paysafecard') {
+                    pro_m = 10;
                 }
                 
                 // Update the last payment provider ID for the 'psts' action packet. If the provider e.g. bitcoin 
@@ -366,9 +379,6 @@ function pro_pay()
                     proref = sessionStorage.proref;
                 }
                 
-                // Convert from boolean to integer for API
-                var fromBandwidthDialog = (localStorage.seenBandwidthDialog) ? 1 : 0;
-
                 // utc = User Transaction Complete
                 // s = sale ID
                 // m = pro number
@@ -377,11 +387,14 @@ function pro_pay()
                 {
                     callback : function (utcResult)
                     {
-                        if (pro_paymentmethod == 'pro_prepaid')
-                        {
+                        // If using prepaid balance
+                        if (pro_m === 0) {
+                            
+                            // Hide the loading dialog
                             loadingDialog.hide();
-                            if (typeof utcResult == 'number' && utcResult < 0)
-                            {
+                            
+                            // If an error code
+                            if (typeof utcResult == 'number' && utcResult < 0) {
                                 if (utcResult == EOVERQUOTA) {
                                     alert(l[514]);
                                 }
@@ -389,13 +402,9 @@ function pro_pay()
                                     alert(l[200]);
                                 }
                             }
-                            else
-                            {
-                                // Redirect to account page to show purchase
-                                if (M.account) {
-                                    M.account.lastupdate = 0;
-                                }
-                                document.location.hash = 'account';
+                            else {
+                                // Show success dialog
+                                voucherDialog.showSuccessfulPayment();
                             }
                         }
                         else {
@@ -422,6 +431,17 @@ function pro_pay()
                             // Show credit card failure
                             else if ((pro_m === 8) && (!utcResult || (utcResult.EUR.res === 'FP') || (utcResult.EUR.res === 'FI'))) {
                                 cardDialog.showFailureOverlay(utcResult);
+                            }
+
+                            // If paysafecard provider then redirect to their site
+                            else if ((pro_m === 10))
+                            {
+                                if (utcResult && utcResult.EUR) {
+                                    paysafecard.redirectToSite(utcResult);
+                                }
+                                else {
+                                    paysafecard.showConnectionError();
+                                }
                             }
                         }
                     }
@@ -460,7 +480,7 @@ var proPage = {
         var success = (actionPacket.r === 's') ? true : false;
         
         // Add a notification in the top bar
-        addNotification(actionPacket);
+        notify.notifyFromActionPacket(actionPacket);
         
         // If their payment was successful, redirect to account page to show new Pro Plan
         if (success) {
@@ -606,7 +626,7 @@ var proPage = {
     
     /**
      * Generic function to show the bouncing megacoin icon while loading
-     * @param {String} messageType Which message to display e.g. 'processing', 'transferring'
+     * @param {String} messageType Which message to display e.g. 'processing', 'transferring', 'loading'
      */
     showLoadingOverlay: function(messageType) {
         
@@ -627,14 +647,23 @@ var proPage = {
             message = l[6960];                  // Processing your payment...
         }
         else if (messageType === 'transferring') {
-            message = 'Transferring to payment provider...';    // Transferring to payment provider...
+            message = l[7203];                  // Transferring to payment provider...
         }
         else if (messageType === 'loading') {
-            message = 'Loading...';             // Loading...
+            message = l[7006];                  // Loading...
         }
         
         // Display message
         this.$loadingOverlay.find('.payment-animation-txt').html(message);
+    },
+    
+    /**
+     * Hides the payment processing/transferring/loading overlay
+     */
+    hideLoadingOverlay: function() {
+        
+        this.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+        this.$loadingOverlay.addClass('hidden');
     },
     
     /**
@@ -643,30 +672,33 @@ var proPage = {
     loadPaymentGatewayOptions: function() {
         
         // All payment gateways for the webclient with options
-        var gatewayOptions = [
+        var gatewayOptions = [            
+        {
+            apiGatewayId: 0,
+            displayName: l[487],            // Voucher code
+            supportsRecurring: false,
+            supportsMonthlyPayment: true,
+            supportsAnnualPayment: true,
+            supportsExpensivePlans: true,
+            cssClass: 'prepaid-balance'
+        },
         {
             apiGatewayId: 8,
             displayName: l[6952],           // Credit card
             supportsRecurring: true,        // If subscriptions are possible
             supportsMonthlyPayment: true,   // If you can pay for 1 month at a time
-            supportsAnnualPayment: true,
+            supportsAnnualPayment: true,    // Can pay for an annual amount
+            supportsExpensivePlans: true,   // The provider can be used to buy plans other than LITE
             cssClass: 'credit-card'
-        },
+        },        
         {
             apiGatewayId: 4,
             displayName: l[6802],           // Bitcoin
             supportsRecurring: false,
             supportsMonthlyPayment: true,
             supportsAnnualPayment: true,
+            supportsExpensivePlans: true,
             cssClass: 'bitcoin'
-        },
-        {
-            apiGatewayId: 0,
-            displayName: l[504],            // Prepaid balance
-            supportsRecurring: false,
-            supportsMonthlyPayment: true,
-            supportsAnnualPayment: true,
-            cssClass: 'prepaid-balance'
         },
         {
             apiGatewayId: 5,
@@ -674,15 +706,35 @@ var proPage = {
             supportsRecurring: false,
             supportsMonthlyPayment: true,
             supportsAnnualPayment: true,
+            supportsExpensivePlans: true,
             cssClass: 'union-pay'
         },
         {
             apiGatewayId: 6,
-            displayName: l[7161],           // Mobile carrier billing
+            displayName: l[7219] + ' (Fortumo)',           // Mobile (Fortumo)
             supportsRecurring: false,
             supportsMonthlyPayment: true,
             supportsAnnualPayment: false,
+            supportsExpensivePlans: false,  // Provider has a max of EUR 3.00 per payment
             cssClass: 'fortumo'
+        },
+        {
+            apiGatewayId: 9,
+            displayName: l[7219] + ' (Centili)',           // Mobile (Centili)
+            supportsRecurring: false,
+            supportsMonthlyPayment: true,
+            supportsAnnualPayment: false,
+            supportsExpensivePlans: false,  // Provider has a max of EUR 3.00 per payment
+            cssClass: 'centili'
+        },
+        {
+            apiGatewayId: 10,
+            displayName: 'paysafecard',           // Paysafecard
+            supportsRecurring: false,
+            supportsMonthlyPayment: true,
+            supportsAnnualPayment: true,
+            supportsExpensivePlans: true,  // Prepaid card so we support whatever the user can afford!
+            cssClass: 'paysafecard'
         },
         {
             apiGatewayId: null,
@@ -690,9 +742,10 @@ var proPage = {
             supportsRecurring: false,
             supportsMonthlyPayment: false,  // Accept 1 year, one-time payment only (wire transfer fees are expensive)
             supportsAnnualPayment: true,
+            supportsExpensivePlans: true,
             cssClass: 'wire-transfer'
         }];
-        
+    
         // Do API request (User Forms of Payment Query) to get the valid list of currently active 
         // payment providers. Returns an array of active payment providers e.g. [0,2,3,4,5,8].
         api_req({ a: 'ufpq' }, {
@@ -703,6 +756,11 @@ var proPage = {
                     return false;
                 }
                 
+                // Get their currently selected plan
+                var selectedPlan = $('.membership-step2 .reg-st3-membership-bl.selected').attr('data-payment');
+                var selectedPlanPrice = $('.membership-dropdown-item.selected strong').html();
+                var planPriceFloat = parseFloat(selectedPlanPrice);
+                var balanceFloat = parseFloat(pro_balance);
                 var html = '';
 
                 // Loop through gateway providers (change to use list from API soon)
@@ -717,21 +775,35 @@ var proPage = {
                         optionChecked = 'checked="checked" ';
                         classChecked = ' checked';
                     }
-
-                    // If their prepay balance is less than 0 don't show that option
-                    if ((gatewayOption.apiGatewayId === 0) && (parseFloat(pro_balance) <= 0)) {
-                        continue;
-                    }
                     
                     // If it's not the wire transfer option and not in the list of enabled gateways skip it
                     if ((gatewayOption.apiGatewayId !== null) && (validGatewayIds.indexOf(gatewayOption.apiGatewayId) === -1)) {
                         continue;
                     }
+                    
+                    var disabledClass = '';
+                    var disabledTitleText = '';
+                    
+                    // Add disabled class if this payment method is not supported for this plan
+                    if ((gatewayOption.supportsExpensivePlans === false) && (selectedPlan != 4)) {
+                        disabledClass = ' disabled';
+                        disabledTitleText = ' title="' + l[7162] + '"';
+                    }
+                    
+                    // If their prepay balance is less than 0 they can buy a voucher
+                    if ((gatewayOption.apiGatewayId === 0) && (balanceFloat <= 0)) {
+                        gatewayOption.displayName = l[487];     // Voucher code
+                    }
+                    
+                    // Otherwise if they have account balance, then they can use that
+                    else if ((gatewayOption.apiGatewayId === 0) && (balanceFloat >= planPriceFloat)) {
+                        gatewayOption.displayName = l[7108] + ' (' + balanceFloat.toFixed(2) + ' &euro;)';  // Balance (x.xx)
+                    }
 
                     // Create a radio button with icon for each payment gateway
-                    html += '<div class="payment-method">'
+                    html += '<div class="payment-method' + disabledClass + '"' + disabledTitleText + '>'
                          +      '<div class="membership-radio' + classChecked + '">'
-                         +          '<input type="radio" name="' + gatewayOption.cssClass + '" id="' + gatewayOption.cssClass + '" ' + optionChecked + ' value="' + gatewayOption.cssClass + '" data-recurring="' + gatewayOption.supportsRecurring + '"  data-supports-monthly-payment="' + gatewayOption.supportsMonthlyPayment + '"  data-supports-annual-payment="' + gatewayOption.supportsAnnualPayment + '" />'
+                         +          '<input type="radio" name="' + gatewayOption.cssClass + '" id="' + gatewayOption.cssClass + '" ' + optionChecked + ' value="' + gatewayOption.cssClass + '" data-recurring="' + gatewayOption.supportsRecurring + '"  data-supports-monthly-payment="' + gatewayOption.supportsMonthlyPayment + '" data-supports-annual-payment="' + gatewayOption.supportsAnnualPayment + '" data-supports-expensive-plans="' + gatewayOption.supportsExpensivePlans + '" />'
                          +          '<div></div>'
                          +      '</div>'
                          +      '<div class="membership-radio-label ' + gatewayOption.cssClass + '">'
@@ -962,14 +1034,20 @@ var proPage = {
 
         var paymentOptionsList = $('.payment-options-list');
         paymentOptionsList.html(html);
-        paymentOptionsList.find('.payment-method').rebind('click', function() {
+        paymentOptionsList.find('.payment-method').rebind('click', function(event) {
+
+            var $this = $(this);
+            var $bitcoinInstructions = $('.membership-center p');
+
+            // Don't let the user select this option if it's disabled e.g. disabled because 
+            // they must select a cheaper plan to work with this payment provider e.g. Fortumo
+            if ($this.hasClass('disabled')) {
+                return false;
+            }
 
             // Remove checked state from all radio inputs
             paymentOptionsList.find('.membership-radio').removeClass('checked');
             paymentOptionsList.find('input').prop('checked', false);
-
-            var $this = $(this);
-            var $bitcoinInstructions = $('.membership-center p');
 
             // Add checked state for this radio button
             $this.find('input').prop('checked', true);        
@@ -985,6 +1063,332 @@ var proPage = {
 
             proPage.updateTextDependingOnRecurring();
             proPage.updatePeriodOptionsOnPaymentMethodChange();
+        });
+    },
+    
+    /**
+     * Gets the wording for the plan subscription duration in months or years
+     * @param {Number} numOfMonths The number of months
+     * @returns {String} Returns the number of months e.g. '1 month', '1 year'
+     */
+    getNumOfMonthsWording: function(numOfMonths) {
+        
+        var monthsWording = l[922];     // 1 month
+
+        // Change wording depending on number of months
+        if (numOfMonths === 12) {
+            monthsWording = l[923];     // 1 year
+        }
+        else if (numOfMonths > 1) {
+            monthsWording = l[6803].replace('%1', numOfMonths);     // x months
+        }
+        
+        return monthsWording;
+    }
+};
+
+/**
+ * Code for the voucher dialog
+ */
+var voucherDialog = {
+    
+    $dialog: null,
+    $backgroundOverlay: null,
+    $successOverlay: null,
+    
+    /**
+     * Initialisation of the dialog
+     */
+    init: function() {
+        this.showVoucherDialog();
+        this.initCloseButton();
+        this.setDialogDetails();
+        this.initPurchaseButton();
+        this.initRedeemVoucherButton();
+        this.initRedeemVoucherNow();
+    },
+    
+    /**
+     * Display the dialog
+     */
+    showVoucherDialog: function() {
+    
+        // Cache DOM reference for lookup in other functions
+        this.$dialog = $('.fm-dialog.voucher-dialog');
+        this.$backgroundOverlay = $('.fm-dialog-overlay');
+        this.$successOverlay = $('.payment-result.success');
+        
+        // Add the styling for the overlay
+        this.$dialog.removeClass('hidden');
+        this.showBackgroundOverlay();
+    },
+    
+    /**
+     * Set voucher dialog details on load
+     */
+    setDialogDetails: function() {
+        
+        // Get the selected Pro plan details
+        var proNum = selectedProPackage[1];
+        var proPlan = getProPlan(proNum);
+        var proPrice = selectedProPackage[5];
+        var numOfMonths = selectedProPackage[4];
+        var monthsWording = proPage.getNumOfMonthsWording(numOfMonths);
+        var balance = parseFloat(pro_balance).toFixed(2);
+        
+        // Update template
+        this.$dialog.find('.plan-icon').removeClass('pro1 pro2 pro3 pro4').addClass('pro' + proNum);
+        this.$dialog.find('.voucher-plan-title').text(proPlan);
+        this.$dialog.find('.voucher-plan-txt .duration').text(monthsWording);
+        this.$dialog.find('.voucher-plan-price .price').text(proPrice);
+        this.$dialog.find('.voucher-account-balance .balance').text(balance);
+        this.$dialog.find('#voucher-code-input input').val('');
+        this.changeColourIfSufficientBalance();
+        
+        // Translate text
+        var html = this.$dialog.find('.voucher-information-help').html();
+            html = html.replace('[A]', '<a href="#resellers" class="voucher-reseller-link">');
+            html = html.replace('[/A]', '</a>');
+        this.$dialog.find('.voucher-information-help').html(html);
+        
+        // Reset state to hide voucher input
+        voucherDialog.$dialog.find('.voucher-input-container').fadeOut('fast', function() {
+            voucherDialog.$dialog.find('.voucher-redeem-container, .purchase-now-container').fadeIn('fast');
+        });
+    },
+    
+    /**
+     * Show green price if they have sufficient funds, or red if they need to top up
+     */
+    changeColourIfSufficientBalance: function() {
+        
+        var price = selectedProPackage[5];
+        
+        // If they have enough balance to purchase the plan, make it green
+        if (parseFloat(pro_balance) >= parseFloat(price)) {
+            this.$dialog.find('.voucher-account-balance').addClass('sufficient-funds');
+        }
+        else {
+            // Otherwise leave it as red
+            this.$dialog.find('.voucher-account-balance').removeClass('sufficient-funds');
+        }
+    },
+    
+    /**
+     * Functionality for the close button
+     */
+    initCloseButton: function() {
+        
+         // Initialise the close button
+        this.$dialog.find('.btn-close-dialog').rebind('click', function() {
+            
+            // Hide the overlay and dialog
+            voucherDialog.hideDialog();
+        });
+        
+        // Prevent close of dialog from clicking outside the dialog
+        $('.fm-dialog-overlay.payment-dialog-overlay').rebind('click', function(event) {
+            event.stopPropagation();
+        });
+    },
+    
+    /**
+     * Shows the background overlay
+     */
+    showBackgroundOverlay: function() {
+        
+        voucherDialog.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+    },
+    
+    /**
+     * Hide the overlay and dialog
+     */
+    hideDialog: function() {
+        
+        voucherDialog.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+        voucherDialog.$dialog.addClass('hidden');
+    },
+    
+    /**
+     * Functionality for the initial redeem voucher button which shows
+     * a text box to enter the voucher code and another Redeem Voucher button
+     */
+    initRedeemVoucherButton: function() {
+        
+        // On redeem button click
+        this.$dialog.find('.voucher-redeem').rebind('click', function() {
+            
+            // Show voucher input
+            voucherDialog.$dialog.find('.voucher-redeem-container, .purchase-now-container').fadeOut('fast', function() {
+                voucherDialog.$dialog.find('.voucher-input-container').fadeIn();
+            });
+        });
+    },
+    
+    /**
+     * Redeems the voucher
+     */
+    initRedeemVoucherNow: function() {
+        
+        // On redeem button click
+        this.$dialog.find('.voucher-redeem-now').rebind('click', function() {
+            
+            // Get the voucher code from the input
+            var voucherCode = voucherDialog.$dialog.find('#voucher-code-input input').val();
+            
+            // If empty voucher show message Error - Please enter your voucher code
+            if (voucherCode == '') {
+                msgDialog('warninga', l[135], l[1015], '', function() {
+                    voucherDialog.showBackgroundOverlay();
+                });
+            }
+            else {                
+                // Clear text box
+                voucherDialog.$dialog.find('#voucher-code-input input').val('');
+                
+                // Add the voucher
+                loadingDialog.show();
+                voucherDialog.addVoucher(voucherCode);
+            }
+        });
+    },
+    
+    /**
+     * Redeems the voucher code
+     * @param {String} voucherCode The voucher code
+     */
+    addVoucher: function(voucherCode) {
+        
+        // Make API call to add voucher
+        api_req({ a: 'uavr', v: voucherCode },
+        {
+            callback: function(result, ctx)
+            {
+                if (typeof result === 'number')
+                {
+                    // This voucher has already been redeemed
+                    if (result == -11) {
+                        loadingDialog.hide();
+                        msgDialog('warninga', l[135], l[714], '', function() {
+                            voucherDialog.showBackgroundOverlay();
+                        });
+                    }
+
+                    // Not a valid voucher code
+                    else if (result < 0) {
+                        loadingDialog.hide();
+                        msgDialog('warninga', l[135], l[714], '', function() {
+                            voucherDialog.showBackgroundOverlay();
+                        });
+                    }
+                    else {
+                        // Get the latest account balance and update the price in the dialog
+                        voucherDialog.getLatestBalance();
+                    }
+                }
+            }
+        });
+    },
+    
+    /**
+     * Gets the latest Pro balance from the API
+     */
+    getLatestBalance: function() {
+        
+        // Flag 'pro: 1' includes pro balance in the response
+        api_req({ a: 'uq', pro: 1 }, {
+            callback : function (result) {
+                
+                // Hide loading dialog
+                loadingDialog.hide();
+                
+                // If successful result
+                if (typeof result == 'object' && result.balance && result.balance[0]) {
+                    
+                    // Update the balance
+                    var balance = parseFloat(result.balance[0][0]);
+                    var balanceString = balance.toFixed(2);
+                    
+                    // Update for pro_pay
+                    pro_balance = balance;
+                    
+                    // Update dialog details
+                    voucherDialog.$dialog.find('.voucher-account-balance .balance').text(balanceString);
+                    voucherDialog.changeColourIfSufficientBalance();
+                    
+                    // Hide voucher input
+                    voucherDialog.$dialog.find('.voucher-redeem-container').show();
+                    voucherDialog.$dialog.find('.purchase-now-container').show();
+                    voucherDialog.$dialog.find('.voucher-input-container').hide();
+                }
+            }
+        });
+    },
+    
+    /**
+     * Purchase using account balance when the button is clicked inside the Voucher dialog
+     */
+    initPurchaseButton: function() {
+        
+        // On Purchase button click run the purchase process
+        this.$dialog.find('.voucher-buy-now').rebind('click', function() {
+            
+            // Get which plan is selected
+            var selectedProPackageIndex = $('.membership-dropdown-item.selected').attr('data-plan-index');
+
+            // Set the pro package (used in pro_pay function)
+            selectedProPackage = membershipPlans[selectedProPackageIndex];
+
+            // Get the plan price
+            var selectedPlanPrice = selectedProPackage[5];
+    
+            // Warn them about insufficient funds
+            if ((parseFloat(pro_balance) < parseFloat(selectedPlanPrice))) {
+                
+                // Show warning and re-apply the background because the msgDialog function removes it on close
+                msgDialog('warninga', l[6804], l[6805], '', function() {
+                    voucherDialog.showBackgroundOverlay();
+                });
+            }
+            else {
+                // Hide the overlay and dialog
+                voucherDialog.hideDialog();
+                
+                // Proceed with payment via account balance
+                pro_paymentmethod = 'pro_prepaid';
+                pro_pay();
+            }
+        });
+    },
+    
+    /**
+     * Shows a successful payment modal dialog
+     */
+    showSuccessfulPayment: function() {
+        
+        // Get the selected Pro plan details
+        var proNum = selectedProPackage[1];
+        var proPlan = getProPlan(proNum);
+        var successMessage = l[6962].replace('%1', '<span>' + proPlan + '</span>');
+        
+        // Show the success
+        voucherDialog.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+        voucherDialog.$successOverlay.removeClass('hidden');
+        voucherDialog.$successOverlay.find('.payment-result-txt').html(successMessage);
+        
+        // Add click handlers for 'Go to my account' and Close buttons
+        voucherDialog.$successOverlay.find('.payment-result-button, .payment-close').rebind('click', function() {
+            
+            // Hide the overlay
+            voucherDialog.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+            voucherDialog.$successOverlay.addClass('hidden');
+            
+            // Make sure it fetches new account data on reload
+            // and redirect to account page to show purchase
+            if (M.account) {
+                M.account.lastupdate = 0;
+            }
+            window.location.hash = 'fm/account';
         });
     }
 };
@@ -1055,15 +1459,14 @@ var unionPay = {
         {
             var input = $("<input type='hidden' name='" + key + "' value='" + utcResult.EUR['postdata'][key] + "' />");
             form.append(input);
-            $("body").append(form);
+            $('body').append(form);
             form.submit();
         }
     }
 };
 
-
 /**
- * Code for Dynamic/Union Pay
+ * Code for Fortumo mobile payments
  */
 var fortumo = {
     
@@ -1074,6 +1477,93 @@ var fortumo = {
     redirectToSite: function(utsResult) {
         
         window.location = 'https://megapay.nz/?saleid=' + utsResult;
+    }
+};
+
+
+/**
+ * Code for paysafecard
+ */
+var paysafecard = {
+
+    gatewayId: 10,
+
+    /**
+     * Redirect to the site
+     * @param {String} utcResult, containing the url to redirect to
+     */
+    redirectToSite: function(utcResult) {
+        var url = utcResult.EUR['url'];
+        window.location = url;
+    },
+
+    /**
+     * Something has gone wrong just talking to paysafecard
+     */
+    showConnectionError: function() {
+        msgDialog('warninga', l[7235], l[7233], '', function() {
+            proPage.hideLoadingOverlay();
+            document.location.hash = "pro"; // redirect to remove any query parameters from the url
+        });
+    },
+
+    /**
+     * Something has gone wrong with the card association or debiting of the card
+     */
+    showPaymentError: function() {
+        msgDialog('warninga', l[7235], l[7234], '', function() {            
+            document.location.hash = "pro"; // redirect to remove any query parameters from the url
+        });
+    },
+
+    /**
+     * We have been redirected back to mega with the 'okUrl'. We need to ask the API to verify the payment succeeded as per
+     * paysafecard's requirements, which they enforce with integration tests we must pass... so yeap, gotta do this.
+     */
+    verify: function() {
+        var saleidstring = proPage.getUrlParam('saleidstring');
+        if (typeof saleidstring !== 'undefined') {
+
+            // Make the vpay API request to follow up on this sale
+            var requestData = {
+                'a': 'vpay',                            // Credit Card Store
+                't': this.gatewayId,                    // The paysafecard gateway
+                'saleidstring': saleidstring            // Required by the API to know what to investigate            
+            };
+
+            var parent = this;
+
+            api_req(requestData, {
+                callback: function (result) {
+                    
+                    // If negative API number
+                    if ((typeof result === 'number') && (result < 0)) {
+                        // Something went wrong with the payment, either card association or actually debitting it.
+                        parent.showPaymentError();
+                    }
+                    else {
+                        // Continue to account screen                       
+                        document.location.hash = "account";
+                    }
+                }
+            });
+        }
+        return false;
+    }
+};
+
+/**
+ * Code for Centili mobile payments
+ */
+var centili = {
+    
+    /**
+     * Redirect to the site
+     * @param {String} utsResult (a saleid)
+     */
+    redirectToSite: function(utsResult) {
+        
+        window.location = 'https://megapay.nz/?saleid=' + utsResult + '&provider=centili';
     }
 };
 
@@ -1148,15 +1638,7 @@ var cardDialog = {
         var proPlan = getProPlan(proNum);
         var proPrice = selectedProPackage[5];
         var numOfMonths = selectedProPackage[4];
-        var monthsWording = l[922];     // 1 month
-
-        // Change wording depending on number of months
-        if (numOfMonths === 12) {
-            monthsWording = l[923];     // 1 year
-        }
-        else if (numOfMonths > 1) {
-            monthsWording = l[6803].replace('%1', numOfMonths);     // x months
-        }
+        var monthsWording = proPage.getNumOfMonthsWording(numOfMonths);
         
         // Update the Pro plan details
         this.$dialog.find('.plan-icon').removeClass('pro1 pro2 pro3 pro4').addClass('pro' + proNum);

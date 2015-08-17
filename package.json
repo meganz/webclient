@@ -12,7 +12,7 @@
     "test": "make test",
     "api-doc": "make api-doc"
   },
-  "homepage": "https://mega.co.nz/",
+  "homepage": "https://mega.nz/",
   "repository": {
     "type": "git",
     "url": "git@github.com:meganz/webclient.git"
@@ -54,6 +54,7 @@
     "karma-phantomjs-launcher": "~0.1.1",
     "karma-script-launcher": "~0.1.0",
     "karma-sinon": "~1.0.3",
+    "indexeddbshim": "~2.0.4",
     "mocha": "~1.17.1",
     "sinon": "~1.9.0"
   },

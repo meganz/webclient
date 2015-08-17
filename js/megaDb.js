@@ -24,7 +24,7 @@ function MegaDB(name, suffix, schema, options) {
     options = options || {};
     this.options = $.extend({}, clone(MegaDB.DEFAULT_OPTIONS), options);
 
-    this.logger = new MegaLogger("megaDB[" + name + "]", {}, options.parentLogger);
+    this.logger = MegaLogger.getLogger("megaDB[" + name + "]", {}, options.parentLogger);
 
     var self = this;
     var dbName = 'mdb_' + name + '_' + suffix;
@@ -119,7 +119,7 @@ function MegaDB(name, suffix, schema, options) {
 
             if (!dbError) {
                 dbError = e;
-                self.logger.error('Unexpected error', dbError);
+                self.logger.error('Unexpected error', dbError.reason || dbError);
             }
 
             if (dbError.name === 'VersionError' || dbError.name === 'InvalidAccessError') {
@@ -167,15 +167,27 @@ MegaDB.getDatabaseVersion = function(dbName) {
             var ver = idb.version;
 
             idb.close();
-            promise.resolve({
-                name: dbName,
-                version: ver,
-                gdbvSucceed: true
-            });
+            if (promise) {
+                promise.resolve({
+                    name: dbName,
+                    version: ver,
+                    gdbvSucceed: true
+                });
+                promise = null;
+            }
         };
         request.onblocked = request.onerror = function(e) {
-            promise.reject(e);
+            if (promise) {
+                promise.reject(e);
+                promise = null;
+            }
         };
+        setTimeout(function _gdbvTimeout() {
+            if (promise) {
+                promise.reject(DOMException.TIMEOUT_ERR);
+                promise = null;
+            }
+        }, 7200);
     }
     catch(e) {
         promise.reject(e);
@@ -677,7 +689,7 @@ MegaDB.prototype.close = function() {
     self.server.close();
 
 
-    self.logger.info("Closing db: ", self);
+    self.logger.info("Closing db: ", self.dbName);
 
     self.dbState = MegaDB.DB_STATE.CLOSED;
 

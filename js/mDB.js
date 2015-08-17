@@ -434,7 +434,15 @@ var mFileManagerDB = {
                         }
                         else if (t === 's') {
                             for (var i in results) {
-                                M.nodeShare(results[i].h, results[i], 1);
+                                if (!(results[i].n || results[i].h)) {
+                                    console.error('missing required .n property for a nodeShare (mDB init)');
+                                } else {
+                                    M.nodeShare(
+                                        results[i].n ? results[i].n : results[i].h,
+                                        results[i],
+                                        1
+                                    );
+                                }
                             }
                         }
                         else {
@@ -467,11 +475,7 @@ var mFileManagerDB = {
             }
 
             if (!maxaction || !hasEntries) {
-                if (this.slave) {
-                    this._loadfm();
-                } else {
-                    this.reload();
-                }
+                this.reload();
             }
             else {
                 this._setstate(this.db);
@@ -556,7 +560,13 @@ var mFileManagerDB = {
     },
 
     reload: function mFileManagerDB_reload() {
-        if (this.db) {
+        if (this.slave) {
+            this.exec('close')
+                .always(function() {
+                    mFileManagerDB._loadfm();
+                });
+        }
+        else if (this.db) {
             this.db.drop()
                 .then(function _dropDone() {
                     if (d) console.log('fmdb dropped');
@@ -638,6 +648,12 @@ function mDBstart(aSlave) {
 }
 
 function mDBadd(t, n) {
+    if (mFileManagerDB.state !== mFileManagerDB.STATE_WORKING
+            && mFileManagerDB.state !== mFileManagerDB.STATE_READY) {
+        console.warn('Invalid fmdb state', mFileManagerDB.state);
+        localStorage['fmdblock_' + u_handle] = 0xBADF;
+        return;
+    }
     var a = n;
     if (a.name && a.p !== 'contacts') {
         delete a.name;
@@ -669,7 +685,14 @@ function mDBadd(t, n) {
 }
 
 function mDBdel(t, id) {
-    mFileManagerDB.query('remove', t, id);
+    if (mFileManagerDB.state !== mFileManagerDB.STATE_WORKING
+            && mFileManagerDB.state !== mFileManagerDB.STATE_READY) {
+        console.warn('Invalid fmdb state', mFileManagerDB.state);
+        localStorage['fmdblock_' + u_handle] = 0xBADF;
+    }
+    else {
+        mFileManagerDB.query('remove', t, id);
+    }
 }
 
 function mDBreload() {

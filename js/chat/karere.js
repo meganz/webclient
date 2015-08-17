@@ -2,12 +2,12 @@
  * Karere - Mega XMPP Client
  */
 
-// Because of several bugs in Strophe's connection handler for Bosh (throwing uncatchable exceptions) this is currently
-// not working. We should isolate and prepare a test case to to submit as a bug to Strophe's devs.
+// Because of several bugs in Strophe's connection handler for Bosh and WebSockets (throwing uncatchable exceptions)
+// this is currently not working. We should isolate and prepare a test case to to submit as a bug to Strophe's devs.
 // Exception:
 // Uncaught InvalidStateError: Failed to execute 'send' on 'XMLHttpRequest': the object's state must be OPENED.
 
-Strophe.Bosh.prototype._hitError = function (reqStatus) {
+Strophe.Bosh.prototype._hitError = Strophe.Websocket.prototype._hitError = function (reqStatus) {
     var self = this;
     var karere = this._conn.karere;
 
@@ -45,7 +45,6 @@ var Karere = function(user_options) {
 
     Strophe.fatal = function (msg) { self.error(msg); };
     Strophe.error = function (msg) { self.error(msg); };
-
 
     // initialize the connection state
     self._connectionState = Karere.CONNECTION_STATE.DISCONNECTED;
@@ -86,6 +85,8 @@ var Karere = function(user_options) {
     self._waitForPresenceCache = {};
 
     self._triggeredActions = {};
+
+    self._lastConnectionRetryTime = false;
 
     self.bind("onPresence", function(e, eventObject) {
         var bareJid = Karere.getNormalizedBareJid(eventObject.getFromJid());
@@ -233,7 +234,7 @@ Karere.DEFAULTS = {
     /**
      * Used to connect to the BOSH service endpoint
      */
-    "boshServiceUrl": 'https://sandbox.developers.mega.co.nz:5281/bosh',
+    "xmppServiceUrl": 'https://sandbox.developers.mega.co.nz:5281/bosh',
 
     /**
      * Used when /resource is not passed when calling .connect() to generate a unique new resource id
@@ -305,7 +306,23 @@ Karere.DEFAULTS = {
      * Connection retry delay in ms (reconnection will be triggered with a timeout calculated as:
      * self._connectionRetries * this value)
      */
-    reconnectDelay: 10,
+    reconnectDelay: 750,
+
+    /**
+     * Multipliers used in a rand(retryFuzzinesFactors[0], retryFuzzinesFactors[1])
+     * to add randomness to the connection retry timers.
+     */
+    retryFuzzinesFactors: [0.7, 1.3],
+
+    /**
+     * 10 mins timeout after the maxConnectionRetries is reached.
+     */
+    restartConnectionRetryTimeout: (10 * 1000 * 60),
+
+    /**
+     * Minimum milliseconds after which a mousemove will trigger a connection retry.
+     */
+    connectionRetryFloorVal: 5000,
 
 
     /**
@@ -349,7 +366,18 @@ Karere.DEFAULTS = {
             return !!localStorage.dxmpp;
             // jscs:enable disallowImplicitTypeConversion
         }
-    }
+    },
+
+    /**
+     * Interval in ms which will be used for the ping-pong (c2s) pings via the KarerePing plugin to determinate if the
+     * client is currently connected
+     */
+    karerePingInterval: 60000,
+
+    /**
+     * Timeout (in ms) when waiting for a c2s response (should be <= karerePingInterval)
+     */
+    serverPingTimeout: 5000
 };
 
 
@@ -496,6 +524,12 @@ makeMetaAware(Karere);
         self.connection.reset(); // clear any old attached handlers
 
         var _doConnectTo = function() {
+            if (self.connection.service.indexOf("wss://") !== -1) {
+                self.connection._proto = new Strophe.Websocket(self.connection);
+            } else {
+                this._proto = new Strophe.Bosh(self.connection);
+            }
+
             self.connection.connect(
                 self._fullJid,
                 self._password,
@@ -518,7 +552,7 @@ makeMetaAware(Karere);
                         self.trigger('onConnfail');
                         self.trigger('onConnectionClosed');
 
-                        if (arguments[1] === "system-shutdown") {
+                        if (arguments[1] === "system-shutdown" || arguments[1] === "improper-addressing") {
                             self._connectionRetry();
                         }
                     }
@@ -580,8 +614,8 @@ makeMetaAware(Karere);
         };
 
         var remoteBoshServiceUrlPromise = false;
-        if ($.isFunction(self.options.boshServiceUrl)) {
-            var service = self.options.boshServiceUrl();
+        if ($.isFunction(self.options.xmppServiceUrl)) {
+            var service = self.options.xmppServiceUrl();
             if (service.fail && service.resolve) { // its a promise!
                 self._connectionState = Karere.CONNECTION_STATE.CONNECTING;
 
@@ -597,7 +631,7 @@ makeMetaAware(Karere);
 
         }
         else {
-            self.connection.service = self.options.boshServiceUrl;
+            self.connection.service = self.options.xmppServiceUrl;
             _doConnectTo();
         }
 
@@ -606,25 +640,11 @@ makeMetaAware(Karere);
         self._$connectingPromise = createTimeoutPromise(function() {
             return self.getConnectionState() === Karere.CONNECTION_STATE.CONNECTED;
         }, 100, self.options.connectTimeout, undefined, remoteBoshServiceUrlPromise)
-            .fail(function() {
+            .always(function() {
                 delete self._$connectingPromise;
-
-                if ((self._connectionRetries + 1) < self.options.maxConnectionRetries) {
-                    self._connectionRetries++;
-
-                    self.disconnect()
-                        .always(function() {
-                            clearTimeout(self._connectionRetryInProgress);
-
-                            self._connectionRetryInProgress = setTimeout(function() {
-                                self.reconnect();
-                            }, (self._connectionRetries + 1) * self.options.reconnectDelay);
-
-                        });
-                }
-                else {
-                    self.disconnect();
-                }
+            })
+            .fail(function() {
+                self._connectionRetry();
             });
 
         // sync the _$connectionPromise in realtime with the original $promise
@@ -744,7 +764,7 @@ makeMetaAware(Karere);
         var self = this;
 
         if (self._myPresence === Karere.PRESENCE.OFFLINE) {
-            self.logger.error("Will halt the reconnect operation, my presence is set to 'offline'.");
+            self.logger.warn("Will halt the reconnect operation, my presence is set to 'offline'.");
             return MegaPromise.reject(Karere.CONNECTION_STATE.DISCONNTED);
         }
         if (!self._jid || !self._password) {
@@ -884,7 +904,7 @@ makeMetaAware(Karere);
      * @private
      */
     Karere.prototype._generateNewIdx = function() {
-        if (typeof(localStorage.karereIdx) === "undefined") {
+        if (typeof localStorage.karereIdx === "undefined") {
             localStorage.karereIdx = 0;
         }
         else {
@@ -1062,10 +1082,12 @@ makeMetaAware(Karere);
             additional = arguments[0].stack;
         }
         var msg = toArray(arguments).join(" ");
+
+        this.logger.error(msg, additional);
+
         if (msg.indexOf("_processRequest - sendFunc")) {
             this.connection._proto._hitError(0);
         }
-        this.logger.error(msg, additional);
     };
 }
 
@@ -1358,7 +1380,7 @@ makeMetaAware(Karere);
                 eventData['status'] = $(status[0]).text();
             }
 
-            if (typeof(eventData['show']) === "undefined" && typeof(eventData['status']) === "undefined") {
+            if (typeof eventData['show'] === "undefined" && typeof eventData['status'] === "undefined") {
                 // is handled in the onPresence in Karere
             }
 
@@ -2607,6 +2629,55 @@ makeMetaAware(Karere);
         }
     };
 
+    /**
+     * Send server ping
+     */
+    Karere.prototype.sendServerPing = function() {
+        var self = this;
+
+        if (self.getConnectionState() === Karere.CONNECTION_STATE.CONNECTED) {
+            if (!self._serverPingRequests) {
+                self._serverPingRequests = {};
+            }
+
+            var messageId = (
+                self.generateMessageId("server", "ping").substr(-3) + Math.ceil(rand_range(0, 1000))
+            ).replace(".", "");
+
+            self._serverPingRequests[messageId] = true;
+
+            var evtName = generateEventSuffixFromArguments("onServerPingResponse", "respWait", messageId);
+
+            var gotResponse = false;
+
+            self.bind(evtName, function(e, eventObject) {
+                if (eventObject.messageId === messageId) {
+                    gotResponse = true;
+                }
+            });
+
+
+            var msg = $iq({
+                type: "get",
+                id: messageId
+            }).c("ping", {
+                'xmlns': 'urn:xmpp:ping'
+            });
+            self._iqRequests[messageId] = "ServerPingResponse";
+
+            self.connection.send(
+                msg.tree()
+            );
+
+            return createTimeoutPromise(function() {
+                return gotResponse;
+            }, 133, self.options.serverPingTimeout, messageId).always(function() {
+                // cleanup
+                self.unbind(evtName);
+            });
+        }
+    };
+
 
     /**
      * Send pong
@@ -2713,7 +2784,7 @@ makeMetaAware(Karere);
  *
  * @private
  */
-Karere.prototype._connectionRetry = function() {
+Karere.prototype._connectionRetry = function(immediately) {
     var self = this;
 
     if (!self._connectionRetries) {
@@ -2723,21 +2794,53 @@ Karere.prototype._connectionRetry = function() {
 
 
     if (self.logger) {
-        self.logger.error(
+        self.logger.warn(
             "request error, passed arguments: " + arguments + ", number of errors: " + self._connectionRetries
         );
     }
     else if (window.d) {
-        console.warn("request error, passed arguments: " + arguments + ", number of errors: " + self._connectionRetries);
+        self.logger.warn("request error, passed arguments: " + arguments + ", number of errors: " + self._connectionRetries);
     }
 
-    if (self._connectionRetries > (self.options.maxConnectionRetries * 2)) {
-        /* *2, because every conn. counts as 2, 2 XHR conns = 1 jabber connection */
+    if (!immediately && self._connectionRetries > self.options.maxConnectionRetries) {
         self._connectionRetries = 0;
         self.forceDisconnect();
+
+        self._connectionRetryInProgress = setTimeout(function() {
+            if (
+                self.getConnectionState() !== Karere.CONNECTION_STATE.CONNECTED &&
+                self.getConnectionState() !== Karere.CONNECTION_STATE.CONNECTING
+            ) {
+                self.reconnect();
+            }
+        }, self.options.restartConnectionRetryTimeout);
+
+        self.logger.warn(
+            "Reached max connection retries. Resetting counters and doing a bigger delay: ",
+            self.options.restartConnectionRetryTimeout
+        );
+
+
+        self._lastConnectionRetryTime = unixtime();
+
     }
     else {
         self.forceDisconnect();
+
+        var connectionRetryTimeout = (
+            self._connectionRetries * self.options.reconnectDelay
+        );
+        if (self._connectionRetries === 0 || immediately === true) {
+            // start imidiately
+            connectionRetryTimeout = 0;
+        }
+
+        // add some randomness
+        connectionRetryTimeout = (
+            connectionRetryTimeout * rand_range(
+                self.options.retryFuzzinesFactors[0], self.options.retryFuzzinesFactors[1]
+            )
+        );
 
         if (self._connectionRetryInProgress) {
             clearTimeout(
@@ -2751,11 +2854,28 @@ Karere.prototype._connectionRetry = function() {
             ) {
                 self.reconnect();
             }
-        }, self._connectionRetries * self.options.reconnectDelay);
+        }, connectionRetryTimeout);
+
+
+        self._lastConnectionRetryTime = unixtime();
 
     }
 };
 
+Karere.prototype._connectionRetryUI = function() {
+    var self = this;
+
+    if (
+        self.getConnectionState() !== Karere.CONNECTION_STATE.CONNECTED &&
+        (unixtime() - self._lastConnectionRetryTime) > (self.options.connectionRetryFloorVal / 1000)
+    ) {
+        //self.logger.warn("Will do a forced connection retry immediately because of UI interaction.");
+        self._connectionRetry(true);
+        return true;
+    } else {
+        return false;
+    }
+};
 
 /**
  * Wrap all methods which require a connection to actually use the ._requiresConnectionWrapper helper

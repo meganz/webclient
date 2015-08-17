@@ -31,14 +31,36 @@ function dlinfo(ph,key,next)
         dl_g(dl_res);
         dl_res = false;
     }
-    else api_req({a:'g',p:ph},{callback:dl_g});
+    else {
+        // Fetch the file information and optionally the download URL
+        api_req({ a: 'g', p: ph, 'ad': showAd() }, { callback: dl_g });
+    }
+
+    // Initialise ads
+    megaAds.init();
 
     // Initialise slide show
     gifSlider.init();
 }
 
-function dl_g(res)
-{
+function dl_g(res) {
+    
+    // Show ad if enabled
+    megaAds.ad = res.ad;
+    megaAds.popAd = res.popad;
+    megaAds.showAds($('#ads-block-frame'));
+
+    // If 'msd' (MegaSync download) flag is turned off via the API then hide the download with MEGAsync button.
+    if (res.msd === 0) {
+        megasync.isInstalled(function(err, is) {
+            if (err || !is) {
+                $('.new-download-sync-app').addClass('hidden');
+                $('.regular-download').removeClass('hidden');
+                $('.new-download-red-button').addClass('hidden');
+            }
+        });
+    }
+
     $('.widget-block').addClass('hidden');
     loadingDialog.hide();
     $('.download-mid-white-block').removeClass('hidden');
@@ -55,24 +77,24 @@ function dl_g(res)
             {
                 ulQueue.pause();
                 dlQueue.pause();
-                ui_paused = true;
+                uldl_hold = true;
                 $(this).addClass('active');
             }
             else
             {
                 dlQueue.resume();
                 ulQueue.resume();
-                ui_paused = false;
+                uldl_hold = false;
                 $(this).removeClass('active');
             }
         });
         $('.new-download-sync-app').rebind('click', function(e) {
-			$('.megasync-overlay').removeClass('downloading');
+            $('.megasync-overlay').removeClass('downloading');
             megasync.download(dlpage_ph, dlpage_key);
         });
-        $('.new-download-red-button').unbind('click');
-        $('.new-download-red-button').bind('click',function(e)
-        {
+        
+        $('.new-download-red-button, .regular-download').rebind('click', function() {
+            
             if (dlMethod == MemoryIO && !localStorage.firefoxDialog && fdl_filesize > 1048576000 && navigator.userAgent.indexOf('Firefox') > -1)
             {
                 firefoxDialog();
@@ -82,11 +104,11 @@ function dl_g(res)
             || ((navigator.userAgent.indexOf('Safari') > -1) && (navigator.userAgent.indexOf('Chrome') == -1)))
             && fdl_filesize > 1048576000 && !localStorage.browserDialog)
             {
-              browserDialog();
+                browserDialog();
             }
             else
             {
-                downloading = true;
+                dlmanager.isDownloading = true;
                 dl_queue.push(fdl_queue_var);
                 $('.download-mid-centered-block').addClass('downloading');
                 $.dlhash = window.location.hash;
@@ -157,7 +179,7 @@ function closedlpopup()
 }
 
 function importFile() {
-    
+
     api_req({
         a: 'p',
         t: M.RootID,
@@ -241,16 +263,16 @@ function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
 
 function dlstart(id,name,filesize)
 {
-    downloading = true;
+    dlmanager.isDownloading = true;
 }
 
 function start_import()
 {
     dl_import = dlpage_ph;
-    
+
     if (u_type) {
         document.location.hash = 'fm';
-        
+
         if (fminitialized) {
             importFile();
         }
@@ -317,7 +339,7 @@ function dlcomplete(id)
     }
     var a=0;
     for(var i in dl_queue) if (typeof dl_queue[i] == 'object' && dl_queue[i]['dl_id']) a++;
-    if (a < 2 && !ul_uploading)
+    if (a < 2 && !ulmanager.isUploading)
     {
         $('.widget-block').fadeOut('slow',function(e)
         {
@@ -327,14 +349,14 @@ function dlcomplete(id)
     }
     else if (a < 2) $('.widget-icon.downloading').addClass('hidden');
     else $('.widget-circle').attr('class','widget-circle percents-0');
-    Soon(resetUploadDownload);
+    Soon(mega.utils.resetUploadDownload);
 }
 
 function sync_switchOS(os)
 {
     if (os == 'windows')
     {
-        syncurl = 'https://mega.co.nz/MEGAsyncSetup.exe';
+        syncurl = 'https://mega.nz/MEGAsyncSetup.exe';
         $('.sync-button-txt.small').text(l[1158]);
         $('.sync-bottom-txt').html('Also available for <a href="" class="red mac">Mac</a> and <a href="" class="red linux">Linux</a>');
         $('.sync-button').removeClass('mac linux');
@@ -343,7 +365,7 @@ function sync_switchOS(os)
     else if (os == 'mac')
     {
 
-        syncurl = 'https://mega.co.nz/MEGAsyncSetup.dmg';
+        syncurl = 'https://mega.nz/MEGAsyncSetup.dmg';
         var ostxt = 'For Mac';
         if (l[1158].indexOf('Windows') > -1) ostxt = l[1158].replace('Windows','Mac');
         if (l[1158].indexOf('Linux') > -1) ostxt = l[1158].replace('Linux','Mac');
@@ -385,6 +407,81 @@ function ImgError(source) {
     source.onerror = '';
     return true;
 }
+
+/**
+ * Enable ads for some countries and _only_ when they are not logged in.
+ * Note: The html for the ads is added on page load rather than existing withing download.html.
+ */
+var megaAds = {
+
+    // Set to an ad object containing src and other info if we should display an ad
+    ad: false,
+
+    // Set to a list of urls for potential popunder ads
+    popAd: false,
+
+    /**
+     * Initialise the HTML for ads
+     */
+    init: function() {
+        
+        if (this.popAd) {
+            popunda.megaPopunder.popurls = this.popAd;
+            popunda.megaPopunder.init($(".new-download-buttons"));
+        }
+
+        // Remove any previous ad containers
+        $('#ads-block-frame, ads-block-header').remove();
+        
+        // Add the ad html into download page
+        var $adContainer = $('<div id="ads-block-frame"></div>');
+        var $iframe = $('<iframe></iframe>');
+        $adContainer.append($iframe);
+        $iframe.css('border', 'none');
+
+        // Fill with an ad if we already have one
+        megaAds.showAds($adContainer);
+
+        // Inject header html to alert users that this is advertisement content and not directly from mega
+        var $header = $('<div class="ads-block-header">' + l[7212] + '</div>');
+        $adContainer.prepend($header);
+        $('.ads-left-block').prepend($adContainer);
+    },
+
+    /**
+     * Show the ads inside a cross-domain iframe
+     * @param {Object} $adContainer jQuery object of the ads-block-frame
+     */
+    showAds: function($adContainer) {
+        
+        var $iframe = $adContainer.find('iframe');
+        
+        // Only show ads if we successfully fetched an ad
+        if (this.ad) {
+            
+            // The init ads method injected this iframe into the DOM, we make it visible, the correct size, set its src to show the ad
+            $adContainer.css('visibility', 'visible');
+            $iframe.css('height', this.ad.height + 'px');
+            $iframe.css('width', this.ad.width + 'px');
+            $iframe.attr('src', this.ad.src);
+
+            // Adjust the other elements within the left column so that they display nicer when the advertisement is present
+            $('.animations-left-container').hide();
+            $('.ads-left-block').addClass('ads-enabled');
+        }
+        else {
+            // Reset to show no ads
+            $adContainer.css('visibility', 'hidden');
+            $iframe.css('height', '0px');
+            $iframe.css('width', '0px');
+            $iframe.removeAttr('src');
+            
+            // Hide ad block
+            $('.animations-left-container').show();
+            $('.ads-left-block').removeClass('ads-enabled');
+        }
+    }
+};
 
 /**
  * Changes the animated product images on the download page

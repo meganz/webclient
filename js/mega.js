@@ -1950,7 +1950,7 @@ function MegaData()
             html = '';
 
         for (var h in M.c[M.RootID]) {
-            if (M.d[h].t) {
+            if (M.d[h] && M.d[h].t) {
                 cs = ' contains-submenu';
                 sm = '<span class="context-submenu" id="sm_' + this.RootID + '"><span id="csb_' + this.RootID + '"></span>' + arrow + '</span>';
                 break;

@@ -610,17 +610,28 @@ mBroadcaster.once('startMega', function _setupDecrypter() {
                     pos += 1048576;
                 }
             }
-            decrypter.logger.info("worker replied string", e.data, dl.macs);
+            if (d) {
+                decrypter.logger.info("worker replied string", e.data, dl.macs);
+            }
         }
         else {
             var plain = new Uint8Array(e.data.buffer || e.data);
-            decrypter.logger.info("Decrypt done", dl.cancelled);
+            if (d) {
+                decrypter.logger.info("Decrypt done", dl.cancelled);
+            }
             dl.decrypter--;
             if (!dl.cancelled) {
-                dl.writer.push({
-                    data: plain,
-                    offset: offset
-                });
+                if (oIsFrozen(dl.writer)) {
+                    if (d) {
+                        decrypter.logger.warn('Writer is frozen.', dl);
+                    }
+                }
+                else {
+                    dl.writer.push({
+                        data: plain,
+                        offset: offset
+                    });
+                }
             }
             plain = null;
             done();

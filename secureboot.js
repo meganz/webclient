@@ -540,6 +540,10 @@ var mBroadcaster = {
 if (typeof Object.freeze === 'function') {
     mBroadcaster = Object.freeze(mBroadcaster);
 }
+Object.defineProperty(this, 'mBroadcaster', {
+    value: mBroadcaster,
+    writable: false
+});
 
 var sh = [];
 
@@ -803,7 +807,7 @@ else if (!b_u)
             var dump = {
                 l: ln,
                 f: mTrim(url),
-                m: mTrim(msg).replace(/'(\w+:\/\/+[^/]+)[^']+'/, "'$1...'")
+                m: mTrim(msg).replace(/'(\w+:\/\/+[^/]+)[^']+(?:'|$)/, "'$1...'")
                     .replace(/(Access to '\.\.).*(' from script denied)/, '$1$2')
                     .replace(/^Uncaught\W*(?:exception\W*)?/i, ''),
             }, cc;
@@ -839,7 +843,14 @@ else if (!b_u)
                 if (errobj.udata) dump.d = errobj.udata;
                 if (errobj.stack)
                 {
-                    dump.s = ('' + errobj.stack).replace(''+msg,'')
+                    var re = RegExp(
+                        String(msg).substr(0, 70)
+                        .replace(/^\w+:\s/, '')
+                        .replace(/([^\w])/g, '\\$1')
+                        + '[^\r\n]+'
+                    );
+
+                    dump.s = String(errobj.stack).replace(re, '')
                         .split("\n").map(String.trim).filter(String)
                         .splice(0,15).map(mTrim).join("\n");
                 }

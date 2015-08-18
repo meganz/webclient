@@ -410,8 +410,51 @@ var mBroadcaster = {
             this.listen(setup);
             this.notify('ping');
 
-            // @TODO PERF: This should be optimised to <1s.
-            setTimeout(setup, 1000);
+
+            var crossTabInstances = [];
+            try {
+                crossTabInstances = (
+                    typeof localStorage.ctInstances === 'undefined' ? [] : JSON.parse(localStorage.ctInstances)
+                );
+            } catch(e) {
+                if (e.name !== 'SyntaxError') {
+                    throw e; // rethrow if not the exception we were looking for...
+                }
+            }
+
+
+            if (crossTabInstances.length === 0) {
+                if (d) {
+                    console.log("crossTab - imidiate init (no other running instances)");
+                }
+                setup();
+            }
+            else {
+                if (d) {
+                    console.log("crossTab - delayed init, waiting for master pong response. Instances found: " + localStorage.ctInstances);
+                }
+                setTimeout(setup, 1000);
+            }
+
+
+            crossTabInstances.push(this.eTag + this.ctID);
+            localStorage.ctInstances = JSON.stringify(crossTabInstances);
+
+            var self = this;
+
+            $(window).rebind('beforeunload.crossTab', function() {
+                crossTabInstances = (
+                    typeof localStorage.ctInstances === 'undefined' ? [] : JSON.parse(localStorage.ctInstances)
+                );
+
+                removeValue(
+                    crossTabInstances,
+                    self.eTag + self.ctID,
+                    true
+                );
+                localStorage.ctInstances = JSON.stringify(crossTabInstances);
+            });
+
 
             // if (typeof u_handle !== 'undefined') {
                 // if (+localStorage['mCrossTabRef_' + u_handle] + 14e3 > Date.now()) {

@@ -3658,6 +3658,9 @@ function MegaData()
             }
         }
 
+        if (!$.transferHeader) {
+            transferPanelUI();
+        }
         //$('.tranfer-view-icon').addClass('active');
         //$('.fmholder').addClass('transfer-panel-opened');
         $.transferHeader();
@@ -4116,6 +4119,9 @@ function MegaData()
             if (onChat) {
                 $.ulBunch[M.currentdirid][ul_id] = 1;
             }
+        }
+        if (!$.transferHeader) {
+            transferPanelUI();
         }
         if (page == 'start') {
             ulQueue.pause();

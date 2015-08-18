@@ -218,7 +218,8 @@ MegaQueue.prototype.validateTask = function() {
 
 MegaQueue.prototype.getNextTask = function(sp) {
     var r;
-    for (var i = 0; i < this._queue.length; i++) {
+    var i = -1;
+    while (++i < (this._queue && this._queue.length)) {
         if (!(this._queue && this._queue[i])) {
             srvlog('Invalid queue' + (this._queue ? ' entry' : '') + ' for ' + this.qname, sp);
             if (!this._queue) {
@@ -255,7 +256,7 @@ MegaQueue.prototype.process = function(sp) {
                  * a stalled % Status... [dc]
                  */
                 this._noTaskCount = -1;
-                if (!$.len(this._qpaused)) {
+                if (!$.len(this._qpaused) && !uldl_hold) {
                     if (d) {
                         this.logger.error('*** CHECK THIS ***', this);
                     }

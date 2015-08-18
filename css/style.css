@@ -1161,6 +1161,9 @@ input.radioOn, input.radioOff {
 	font-size: 15px;
 	line-height: 23px;
 }
+.terms-dialog .fm-dialog-button {
+    top: -6px;
+}
 .terms-dialog .terms-main {
 	padding: 5px 20px 20px 20px;
 	-webkit-box-sizing: border-box;

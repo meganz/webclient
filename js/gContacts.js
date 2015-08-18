@@ -18,7 +18,7 @@
             'retreiveAllUrl': 'https://www.google.com/m8/feeds/contacts/default/full',
             'width': '800', // popup width
             'height': '600', // poput height
-            'domains': ['mega.nz', 'beta.mega.nz', 'sandbox3.developers.mega.co.nz'],
+            'domains': ['mega.nz', 'beta.mega.nz', 'sandbox3.developers.mega.co.nz', 'beta.developers.mega.co.nz'],
             'client_ids': [
                 {// mega.nz
                     'client_id': '84490490123-deqm1aegeqcmfhdq0aduptcj1rak2civ.apps.googleusercontent.com',
@@ -31,6 +31,10 @@
                 {// sandbox3.developers.mega.co.nz
                     'client_id': '84490490123-hnabnjak7pv6qo3ns2julvmh1dibb91c.apps.googleusercontent.com',
                     'redirect_uri': 'https://sandbox3.developers.mega.co.nz/'
+                },
+                {// beta.developers.mega.co.nz
+                    'client_id': '84490490123-68i0k30gvvddmeceppoucon74il8s8gc.apps.googleusercontent.com',
+                    'redirect_uri': 'https://beta.developers.mega.co.nz/'
                 }]
         };
 
@@ -115,6 +119,7 @@
      * @param {boolean} false = addContacts, true=share dialog
      */
     GContacts.prototype.getContactList = function(where) {
+        
         var self = this;
 
         var url = self.options.retreiveAllUrl + "?access_token=" + self.accessToken + "&v=3.0&alt=json&max-results=999";
@@ -122,19 +127,28 @@
         api_req({ a: 'prox', url: url }, {
             callback: function(res) {
                 if (typeof res == 'number') {
-                    console.log("Contacts importing failed.");
+                    DEBUG("Contacts importing failed.");
                     return false;
                 } else {            
                     var gData = self._readAllEmails(res);
                     if (gData.length > 0) {
                         if (where === 'shared') {
                             addImportedDataToSharedDialog(gData, 'gmail');
-                        } else if (where === 'contacts') {
+                        }
+                        else if (where === 'contacts') {
                             addImportedDataToAddContactsDialog(gData, 'gmail');
                         }
                         $('.import-contacts-dialog').fadeOut(200);
 
                         self.isImported = true;
+                    }
+                    else {
+                        loadingDialog.hide();
+                        DEBUG("Contacts importing canceled.");
+                        
+                        $('.import-contacts-dialog').fadeOut(200);
+
+                        self.isImported = false;
                     }
                 }
             }

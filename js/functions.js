@@ -1278,7 +1278,9 @@ function dlError(text) {
 function removeValue(array, value, can_fail) {
     var idx = array.indexOf(value);
     if (d) {
-        ASSERT(can_fail || idx !== -1, 'Unable to Remove Value ' + value);
+        if (!(can_fail || idx !== -1)) {
+            console.warn('Unable to Remove Value ' + value, value);
+        }
     }
     if (idx !== -1) {
         array.splice(idx, 1);
@@ -3390,6 +3392,7 @@ var watchdog = Object.freeze({
                 break;
 
             case 'login':
+            case 'createuser':
                 loadingDialog.show();
                 this.Strg.login = strg.origin;
                 break;

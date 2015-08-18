@@ -447,7 +447,7 @@ function initializeTreePanelSorting()
 
 function initUI() {
     if (d) {
-        console.time('iconUI');
+        console.time('initUI');
     }
     $('.not-logged .fm-not-logged-button.create-account').rebind('click', function()
     {
@@ -971,7 +971,7 @@ function initUI() {
 
     $(window).rebind('resize.fmrh hashchange.fmrh', fm_resize_handler);
     if (d) {
-        console.timeEnd('iconUI');
+        console.timeEnd('initUI');
     }
 }
 
@@ -1059,6 +1059,10 @@ function transferPanelContextMenu(target)
             menuitems.filter('.move-down').hide();
         }
     }
+
+    // XXX: Hide context-menu's menu-up/down items for now to check if that's the
+    // origin of some problems, users can still use the new d&d logic to move transfers
+    menuitems.filter('.move-up,.move-down').hide();
 
     var parent = menuitems.parent();
     parent
@@ -5434,6 +5438,27 @@ function transferPanelUI()
                         $(window).trigger('resize');
                     });
                 });
+            }
+        });
+
+        $('.transfer-table tr').rebind('dblclick', function(e) {
+            if ($(this).find('.transfer-status.completed').length) {
+                var id = String($(this).attr('id'));
+                if (id[0] === 'd') {
+                    id = id.split('_').pop();
+                }
+                else if (id[0] === 'u') {
+                    id = String(ulmanager.ulIDToNode[id]);
+                }
+                var path = M.getPath(id);
+                if (path.length > 1) {
+                    M.openFolder(path[1], true);
+                    if (!$('#' + id).length) {
+                        $(window).trigger('dynlist.flush');
+                    }
+                    $.selected = [id];
+                    reselect(1);
+                }
             }
         });
 

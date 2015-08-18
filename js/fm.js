@@ -6535,6 +6535,8 @@ function fm_hideoverlay() {
 function fm_showoverlay() {
     $('.fm-dialog-overlay').removeClass('hidden');
     $('body').addClass('overlayed');
+    $('input').blur();
+    $(document).bind('keydown', _closeDialogKeyboard);
 }
 
 function renameDialog() {
@@ -6778,8 +6780,24 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
     fm_showoverlay();
 }
 
+function _closeDialogKeyboard(e) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (e.keyCode === 13 || e.keyCode === 27) {
+        closeMsg();
+        if ($.warningCallback) {
+            $.warningCallback(e.keyCode === 13);
+        }
+    }
+
+    return false;
+}
+
+
 function closeMsg() {
     $('#msgDialog').addClass('hidden');
+    $(document).unbind('keydown', _closeDialogKeyboard);
 
     if(!$('.pro-register-dialog').is(':visible')) {
         fm_hideoverlay();

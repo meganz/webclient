@@ -410,17 +410,9 @@ var mBroadcaster = {
             this.listen(setup);
             this.notify('ping');
 
-
-            var crossTabInstances = 0;
-            try {
-                crossTabInstances = (
+            var crossTabInstances = (
                     typeof localStorage.ctInstances === 'undefined' ? 0 : parseInt(localStorage.ctInstances, 10)
                 );
-            } catch(e) {
-                if (e.name !== 'SyntaxError') {
-                    throw e; // rethrow if not the exception we were looking for...
-                }
-            }
 
 
             if (crossTabInstances === 0) {
@@ -498,9 +490,7 @@ var mBroadcaster = {
             );
 
 
-            if (crossTabInstances > 0) {
-                crossTabInstances--;
-            }
+            crossTabInstances--;
             localStorage.ctInstances = crossTabInstances;
 
             this.unlisten();

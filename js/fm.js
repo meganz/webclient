@@ -6535,7 +6535,7 @@ function fm_hideoverlay() {
 function fm_showoverlay() {
     $('.fm-dialog-overlay').removeClass('hidden');
     $('body').addClass('overlayed');
-    $('input').blur();
+    $('input:visible').blur();
     $(document).bind('keydown', _closeDialogKeyboard);
 }
 

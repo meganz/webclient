@@ -1,5 +1,7 @@
 
 var chatui;
+var webSocketsSupport = typeof(WebSocket) !== 'undefined';
+
 (function() {
     var createChatDialog;
     chatui = function(id) {
@@ -2434,7 +2436,11 @@ Chat.prototype.getXmppServiceUrl = function() {
             .done(function(r) {
                 if (r.xmpp && r.xmpp.length > 0) {
                     var randomHost = array_random(r.xmpp);
-                    $promise.resolve("wss://" + randomHost.host + "/ws");
+                    if (webSocketsSupport) {
+                        $promise.resolve("wss://" + randomHost.host + "/ws");
+                    } else {
+                        $promise.resolve("https://" + randomHost.host + "/bosh");
+                    }
                 }
                 else if (!r.xmpp || r.xmpp.length === 0) {
                     self.logger.error("GeLB returned no results. Halting.");
@@ -2443,14 +2449,20 @@ Chat.prototype.getXmppServiceUrl = function() {
                 else {
                     var server = array_random(self.options.fallbackXmppServers);
                     self.logger.error("Got empty list from the load balancing service for xmpp, will fallback to: " + server + ".");
-                    $promise.resolve(server.replace("https:", "wss:").replace("/bosh", "/ws"));
+                    if (webSocketsSupport) {
+                        server = server.replace("https:", "wss:").replace("/bosh", "/ws");
+                    }
+                    $promise.resolve(server);
                 }
             })
             .fail(function() {
                 var server = array_random(self.options.fallbackXmppServers);
                 self.logger.error("Could not connect to load balancing service for xmpp, will fallback to: " + server + ".");
 
-                $promise.resolve(server.replace("https:", "wss:").replace("/bosh", "/ws"));
+                if (webSocketsSupport) {
+                    server = server.replace("https:", "wss:").replace("/bosh", "/ws");
+                }
+                $promise.resolve(server);
             });
 
         return $promise;

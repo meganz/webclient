@@ -411,10 +411,10 @@ var mBroadcaster = {
             this.notify('ping');
 
 
-            var crossTabInstances = [];
+            var crossTabInstances = 0;
             try {
                 crossTabInstances = (
-                    typeof localStorage.ctInstances === 'undefined' ? [] : JSON.parse(localStorage.ctInstances)
+                    typeof localStorage.ctInstances === 'undefined' ? 0 : parseInt(localStorage.ctInstances, 10)
                 );
             } catch(e) {
                 if (e.name !== 'SyntaxError') {
@@ -423,7 +423,7 @@ var mBroadcaster = {
             }
 
 
-            if (crossTabInstances.length === 0) {
+            if (crossTabInstances === 0) {
                 if (d) {
                     console.log("crossTab - imidiate init (no other running instances)");
                 }
@@ -437,24 +437,8 @@ var mBroadcaster = {
             }
 
 
-            crossTabInstances.push(this.eTag + this.ctID);
-            localStorage.ctInstances = JSON.stringify(crossTabInstances);
-
-            var self = this;
-
-            $(window).rebind('beforeunload.crossTab', function() {
-                crossTabInstances = (
-                    typeof localStorage.ctInstances === 'undefined' ? [] : JSON.parse(localStorage.ctInstances)
-                );
-
-                removeValue(
-                    crossTabInstances,
-                    self.eTag + self.ctID,
-                    true
-                );
-                localStorage.ctInstances = JSON.stringify(crossTabInstances);
-            });
-
+            crossTabInstances++;
+            localStorage.ctInstances = crossTabInstances;
 
             // if (typeof u_handle !== 'undefined') {
                 // if (+localStorage['mCrossTabRef_' + u_handle] + 14e3 > Date.now()) {
@@ -508,8 +492,20 @@ var mBroadcaster = {
             } else {
                 if (d) console.log('crossTab leaving');
             }
+
+            var crossTabInstances = (
+                typeof localStorage.ctInstances === 'undefined' ? 0 : parseInt(localStorage.ctInstances, 10)
+            );
+
+
+            if (crossTabInstances > 0) {
+                crossTabInstances--;
+            }
+            localStorage.ctInstances = crossTabInstances;
+
             this.unlisten();
             this.notify('leaving', wasMaster || -1);
+
             mBroadcaster.sendMessage('crossTab:leave', wasMaster);
         },
 

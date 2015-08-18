@@ -1883,4 +1883,4 @@ window.onbeforeunload = function () {
     }
 
     mBroadcaster.crossTab.leave();
-}
+};

@@ -147,6 +147,15 @@ var ulmanager = {
                 if (d) {
                     ulmanager.logger.error('Too many retries for ' + cid);
                 }
+                var errorstr = reason.match(/"([^"]+)"/);
+                if (errorstr) {
+                    errorstr = errorstr.pop();
+                }
+                else {
+                    errorstr = reason.substr(0, 50) + '...';
+                }
+                $('.transfer-table #ul_' + file.id + ' td:eq(5)')
+                    .html('<span class="transfer-status error">' + htmlentities(errorstr) + '</span>');
                 msgDialog('warninga', l[1309], l[1498] + ': ' + file.name, reason);
                 ulmanager.abort(file);
             }
@@ -1140,6 +1149,29 @@ FileUpload.prototype.run = function(done) {
         done();
     };
 
+    var readError = function(code) {
+        var errorstr;
+
+        if (code === 0x8052000e) {
+            // File is locked
+            errorstr = l[7399] || l[1517];
+        }
+        else if (code === 0x80520015) {
+            // "Access denied"
+            errorstr = l[1667];
+        }
+        else {
+            // "Read error"
+            errorstr = l[1677];
+        }
+
+        $('.transfer-table #ul_' + file.id + ' td:eq(5)')
+            .html('<span class="transfer-status error">' + htmlentities(errorstr) + '</span>');
+
+        ulmanager.abort(file);
+        this.destroy();
+    }.bind(this);
+
     try {
         if (file.hash && file.ts) {
             throw "The fingerprint exists already.";
@@ -1154,6 +1186,9 @@ FileUpload.prototype.run = function(done) {
                     ulmanager.logger.info('fingerprint', hash, 'UPLOAD CANCELED');
                 }
                 return;
+            }
+            if (hash === 0xBADF) {
+                return readError(ts);
             }
             file.hash = hash;
             file.ts = ts;
@@ -1187,8 +1222,10 @@ FileUpload.prototype.run = function(done) {
                 msgDialog('warninga',
                     str_mtrunc(file.name, 40), msg, l[1677] + ': ' + (e.message || e.name || e));
             }
-            ulmanager.abort(file);
-            this.destroy();
+            readError(e.result);
+        }
+        else if (e.result === 0x8052000e /* NS_ERROR_FILE_IS_LOCKED */) {
+            readError(e.result);
         }
         else {
             ulmanager.ulStart(this);

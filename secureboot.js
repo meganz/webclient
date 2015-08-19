@@ -512,7 +512,6 @@ var mBroadcaster = {
         setMaster: function crossTab_setMaster() {
             this.master = (Math.random() * Date.now()).toString(36);
 
-            console.error("setMaster", (this.slaves.length + 1));
             localStorage.ctInstances = (this.slaves.length + 1);
             mBroadcaster.sendMessage('crossTab:master', this.master);
 
@@ -552,7 +551,6 @@ var mBroadcaster = {
                     this.slaves.push(strg.origin);
                     if (this.master) {
                         localStorage.ctInstances = (this.slaves.length + 1);
-                        console.error("ping", (this.slaves.length + 1));
                     }
 
                     this.notify('pong');
@@ -562,7 +560,6 @@ var mBroadcaster = {
                     if (idx !== -1) {
                         this.slaves.splice(idx, 1);
                         if (this.master) {
-                            console.error("leaving", (this.slaves.length + 1));
                             localStorage.ctInstances = (this.slaves.length + 1);
                         }
                     }

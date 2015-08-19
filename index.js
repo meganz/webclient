@@ -1881,6 +1881,4 @@ window.onbeforeunload = function () {
     if (dlmanager.isDownloading || ulmanager.isUploading) {
         return l[377];
     }
-
-    mBroadcaster.crossTab.leave();
 };

@@ -417,7 +417,7 @@ var mBroadcaster = {
 
             if (crossTabInstances === 0) {
                 if (d) {
-                    console.log("crossTab - imidiate init (no other running instances)");
+                    console.log("crossTab - immediate init (no other running instances)");
                 }
                 setup();
             }
@@ -425,12 +425,13 @@ var mBroadcaster = {
                 if (d) {
                     console.log("crossTab - delayed init, waiting for master pong response. Instances found: " + localStorage.ctInstances);
                 }
-                setTimeout(setup, 1000);
+                setTimeout(setup, 2000);
             }
 
 
-            crossTabInstances++;
-            localStorage.ctInstances = crossTabInstances;
+            $(window).rebind('unload.crossTab', function() {
+                mBroadcaster.crossTab.leave();
+            });
 
             // if (typeof u_handle !== 'undefined') {
                 // if (+localStorage['mCrossTabRef_' + u_handle] + 14e3 > Date.now()) {

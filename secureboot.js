@@ -482,22 +482,22 @@ var mBroadcaster = {
             if (wasMaster) {
                 localStorage['mCrossTabRef_' + u_handle] = this.master;
                 delete this.master;
+
+                var crossTabInstances = (
+                    typeof localStorage.ctInstances === 'undefined' ? 0 : parseInt(localStorage.ctInstances, 10)
+                );
+
+
+                crossTabInstances--;
+                localStorage.ctInstances = crossTabInstances;
             } else {
                 if (d) console.log('crossTab leaving');
             }
 
-            var crossTabInstances = (
-                typeof localStorage.ctInstances === 'undefined' ? 0 : parseInt(localStorage.ctInstances, 10)
-            );
-
-
-            crossTabInstances--;
-            localStorage.ctInstances = crossTabInstances;
-
             this.unlisten();
             this.notify('leaving', {
                 wasMaster: wasMaster || -1,
-                newMaster: this.slaves.length > 0 ? this.slaves[0] : false
+                newMaster: wasMaster && this.slaves.length > 0 ? this.slaves[0] : false
             });
 
             mBroadcaster.sendMessage('crossTab:leave', wasMaster);

@@ -1499,7 +1499,7 @@ else if (!b_u)
                     var hashHex = asmCryptoSha256.SHA256.hex(jsl[this.jsi].text);
 
                     // Compare the hash from the file and the correct hash determined at deployment time
-                    if (!compareHashes(hashHex, jsl[e.data.jsi].f))
+                    if (!compareHashes(hashHex, jsl[this.jsi].f))
                     {
                         alert('An error occurred while loading MEGA. The file ' + bootstaticpath + jsl[this.jsi].f + ' is corrupt. Please try again later. We apologize for the inconvenience.');
                         contenterror = 1;

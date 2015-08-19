@@ -545,7 +545,8 @@ function init_page() {
     }
     else if (page == 'login') {
         if (u_storage.sid) {
-            return document.location.hash = '#fm';
+            document.location.hash = '#fm';
+            return false;
         }
         parsepage(pages['login']);
         init_login();
@@ -555,6 +556,10 @@ function init_page() {
         return false;
     }
     else if (page == 'register') {
+        if (u_storage.sid) {
+            document.location.hash = '#fm';
+            return false;
+        }
         parsepage(pages['register']);
         init_register();
     }

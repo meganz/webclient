@@ -4033,9 +4033,24 @@ function api_strerror(errno) {
             throw new Error('Unexpected CRC32 Table...');
         }
 
+        var timer;
+        var onTimeout = function(abort) {
+            if (timer) {
+                clearTimeout(timer);
+            }
+            if (!abort) {
+                timer = setTimeout(function() {
+                    ulmanager.logger.warn('Fingerprint timed out, the file is locked or unreadable.');
+                    callback(0xBADF, 0x8052000e);
+                }, 6000);
+            }
+        };
+
         function Finish(crc) {
-            callback(base64urlencode(crc + serialize((uq_entry.lastModifiedDate
-                || 0) / 1000)), ((uq_entry.lastModifiedDate || 0) / 1000));
+            onTimeout(1);
+            var modtime = (uq_entry.lastModifiedDate || 0) / 1000;
+            callback(base64urlencode(crc + serialize(modtime)), modtime);
+            callback = null;
         }
 
         var sfn = uq_entry.slice ? 'slice' : (uq_entry.mozSlice ? 'mozSlice' : 'webkitSlice');
@@ -4093,6 +4108,7 @@ function api_strerror(errno) {
                         tmp.push(i2s(crc));
                         return step(++i);
                     }
+                    onTimeout();
 
                     var offset = parseInt((size - BLOCK_SIZE) * (i * blocks + j) / (4 * blocks - 1));
                     var blob = uq_entry[sfn](offset, offset + BLOCK_SIZE);

@@ -23,6 +23,8 @@ var notify = {
     $popup: null,
     $popupIcon: null,
     $popupNum: null,
+
+    initialLoadComplete: false,
     
     // A list of already rendered pending contact request IDs (multiple can exist with reminders)
     renderedContactRequests: [],
@@ -31,7 +33,9 @@ var notify = {
      * Initialise the notifications system
      */
     init: function() {
-        
+
+        notify.initialLoadComplete = false;
+
         // Cache lookups
         this.$popup = $('.top-head .notification-popup');
         this.$popupIcon = $('.top-head .cloud-popup-icon');
@@ -48,7 +52,7 @@ var notify = {
      * Get the most recent 100 notifications from the API
      */
     getInitialNotifications: function() {
-        
+
         // Clear notifications before fetching (sometimes this needs to be done if re-logging in)
         notify.notifications = [];
         
@@ -95,6 +99,9 @@ var notify = {
                 
                 // Show the notifications
                 notify.countAndShowNewNotifications();
+
+                // Mark the initial load complete so that incoming actionpackets after this time generate notifications
+                notify.initialLoadComplete = true;
             }
         }, 3);  // Channel 3
     },
@@ -104,7 +111,10 @@ var notify = {
      * @param {Object} actionPacket The action packet object
      */
     notifyFromActionPacket: function(actionPacket) {
-        
+
+        // We should not show notifications if we haven't yet done the initial notifications load yet
+        if (!notify.initialLoadComplete) return false;
+
         var notification = actionPacket;                // The action packet
         var id = makeid(10);                            // Make random ID
         var type = notification.a;                      // Type of notification e.g. share

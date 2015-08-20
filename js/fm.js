@@ -6535,6 +6535,8 @@ function fm_hideoverlay() {
 function fm_showoverlay() {
     $('.fm-dialog-overlay').removeClass('hidden');
     $('body').addClass('overlayed');
+    $('input:visible').blur();
+    $(document).bind('keydown', _closeDialogKeyboard);
 }
 
 function renameDialog() {
@@ -6776,8 +6778,6 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
     });
     $('#msgDialog').removeClass('hidden');
     fm_showoverlay();
-    $('input:visible').blur();
-    $(document).bind('keydown', _closeDialogKeyboard);
 }
 
 function _closeDialogKeyboard(e) {

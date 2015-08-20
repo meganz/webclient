@@ -17,7 +17,12 @@ function init_help()
         else document.location.hash = 'help/' + c;
 	});	
 	
-	
+	// Log that the help page has been viewed
+	api_req({
+                    a: 'log',
+                    e: 99332,
+                    m: 'web help viewed'
+                });
 	
 	$('.new-left-menu-link.home').addClass('active');
 	

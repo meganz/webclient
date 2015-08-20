@@ -1888,4 +1888,8 @@ window.onbeforeunload = function () {
     }
 
     mBroadcaster.crossTab.leave();
-}
+};
+
+window.onunload = function() {
+    mBroadcaster.crossTab.leave();
+};

@@ -410,26 +410,11 @@ var mBroadcaster = {
             this.listen(setup);
             this.notify('ping');
 
-            // @TODO PERF: This should be optimised to <1s.
-            setTimeout(setup, 1000);
+            // TODO: Remove this debugging
+            if (!parseInt(localStorage.ctInstances)) console.log("crossTab - immediate init (no other running instances)");
+            else console.log("crossTab - delayed init, waiting for master pong response. Instances found: " + localStorage.ctInstances);
 
-            // if (typeof u_handle !== 'undefined') {
-                // if (+localStorage['mCrossTabRef_' + u_handle] + 14e3 > Date.now()) {
-                     // if (window.addEventListener) {
-                        // window.addEventListener('storage', this, false);
-                    // }
-                    // else if (window.attachEvent) {
-                        // window.attachEvent('onstorage', this.handleEvent.bind(this));
-                    // }
-                // }
-                // else {
-                    // this.setMaster();
-                // }
-                // if (d) {
-                    // console.log('CROSSTAB COMMUNICATION INITIALIZED AS '
-                        // + (this.master ? 'MASTER':'SLAVE'));
-                // }
-            // }
+            setTimeout(setup, !parseInt(localStorage.ctInstances) ? 0 : 2000);
         },
 
         listen: function crossTab_listen(aListener) {
@@ -458,16 +443,25 @@ var mBroadcaster = {
         },
 
         leave: function crossTab_leave() {
-            var wasMaster = this.master;
-            if (wasMaster) {
-                localStorage['mCrossTabRef_' + u_handle] = this.master;
-                delete this.master;
-            } else {
-                if (d) console.log('crossTab leaving');
+            if (this.ctID) {
+                var wasMaster = this.master;
+                if (wasMaster) {
+                    localStorage.ctInstances--;
+                    localStorage['mCrossTabRef_' + u_handle] = this.master;
+                    delete this.master;
+                } else if (d) {
+                    console.log('crossTab leaving');
+                }
+
+                this.unlisten();
+                this.notify('leaving', {
+                    wasMaster: wasMaster || -1,
+                    newMaster: this.slaves[0]
+                });
+
+                mBroadcaster.sendMessage('crossTab:leave', wasMaster);
+                this.ctID = 0;
             }
-            this.unlisten();
-            this.notify('leaving', wasMaster || -1);
-            mBroadcaster.sendMessage('crossTab:leave', wasMaster);
         },
 
         notify: function crossTab_notify(msg, data) {
@@ -479,6 +473,7 @@ var mBroadcaster = {
         setMaster: function crossTab_setMaster() {
             this.master = (Math.random() * Date.now()).toString(36);
 
+            localStorage.ctInstances = (this.slaves.length + 1);
             mBroadcaster.sendMessage('crossTab:master', this.master);
 
             // (function liveLoop(tag) {
@@ -515,19 +510,31 @@ var mBroadcaster = {
             switch (msg) {
                 case 'ping':
                     this.slaves.push(strg.origin);
+                    if (this.master) {
+                        localStorage.ctInstances = (this.slaves.length + 1);
+                    }
+
                     this.notify('pong');
                     break;
                 case 'leaving':
                     var idx = this.slaves.indexOf(strg.origin);
                     if (idx !== -1) {
                         this.slaves.splice(idx, 1);
+                        if (this.master) {
+                            localStorage.ctInstances = (this.slaves.length + 1);
+                        }
                     }
-                    if (localStorage['mCrossTabRef_' + u_handle] === strg.data) {
-                        if (d) console.log('Taking crossTab-master ownership');
-                        delete localStorage['mCrossTabRef_' + u_handle];
-                        this.setMaster();
-                        if (u_handle && window.indexedDB) {
-                            mDBstart(true);
+
+                    if (localStorage['mCrossTabRef_' + u_handle] === strg.data.wasMaster) {
+                        if (strg.data.newMaster === this.ctID) {
+                            if (d) {
+                                console.log('Taking crossTab-master ownership');
+                            }
+                            delete localStorage['mCrossTabRef_' + u_handle];
+                            this.setMaster();
+                            if (u_handle && window.indexedDB) {
+                                mDBstart(true);
+                            }
                         }
                     }
                     break;

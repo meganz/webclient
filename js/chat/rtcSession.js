@@ -970,7 +970,7 @@ hangupAll: function()
     sess.tsMediaStart = Date.now();
  },
 
- onCallTerminated: function(sess, reason, text) {
+ onCallTerminated: function(sess, reason, text, errInfo) {
  try {
  //WARNING: sess may be a dummy object, only with peerjid property, in case something went
  //wrong before the actual session was created, e.g. if SRTP fingerprint verification failed
@@ -1008,6 +1008,9 @@ hangupAll: function()
         if (text) {
             stats.termMsg = text;
         }
+        if (errInfo) {
+            stats.errInfo = errInfo;
+        }
     } else { //no stats, but will still provide callId and duration
         var bstats = obj.basicStats = {
             isCaller: sess.isInitiator?1:0,
@@ -1016,6 +1019,9 @@ hangupAll: function()
         };
         if (text) {
             bstats.termMsg = text;
+        }
+        if (errInfo) {
+            bstats.errInfo = errInfo;
         }
 
         if (sess.fake) {
@@ -1332,7 +1338,7 @@ hangupAll: function()
 
  onInternalError: function(msg, info) {
      if (srvlog) {
-         srvlog(msg, info, true); //log to #jscrashes
+         srvlog("WEBRTC: "+msg, info, true); //log to #jscrashes
      }
  }
 }

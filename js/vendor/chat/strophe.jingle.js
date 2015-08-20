@@ -40,17 +40,19 @@ var JinglePlugin = {
                     return;
                 }
             }
-
             if (!info)
                 info = {};
-            var e = info.e;
-            if (!e)
-                e = '';
-            console.error("onInternalError:", msg, "\n"+(e.stack||e));
+            if (info.e) {
+                var e = info.e;
+                if (e.stack) {
+                    info.e = e.stack;
+                }
+            }
+            console.error("onInternalError:", msg, "\n"+(info.e||''));
             if (info.sid) {
                 var sess = this.sessions[info.sid];
                 if (sess)
-                    this.terminate(sess, "internal-error", msg);
+                    this.terminate(sess, "internal-error", msg, false, info);
             }
         };
 // Callbacks called by session objects
@@ -586,7 +588,7 @@ var JinglePlugin = {
     {
         return this.terminate(this.sessions[sid], reason, text, nosend);
     },
-    terminate: function(sess, reason, text, nosend)
+    terminate: function(sess, reason, text, nosend, errInfo)
     {
         if ((!sess) || (!this.sessions[sess.sid])) {
             console.warn("Unknown session:", sess.sid)
@@ -603,7 +605,7 @@ var JinglePlugin = {
             sess.fileTransferHandler.remove(reason, text);
          else
             try {
-                this.onCallTerminated.call(this.eventHandler, sess, reason||'term', text);
+                this.onCallTerminated.call(this.eventHandler, sess, reason||'term', text, errInfo);
             } catch(e) {
                 console.error('Jingle.onCallTerminated() threw an exception:', e.stack);
             }

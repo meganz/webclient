@@ -21,7 +21,7 @@ var JinglePlugin = {
         this.connection = conn;
 // Timeout after which if an iq response is not received, an error is generated
         this.jingleTimeout = 50000;
-        this.jingleAutoAcceptTimeout = 15000;
+        this.jingleAutoAcceptTimeout = 25000;
         this.eventHandler = this;
         this.ftManager = new FileTransferManager(this);
 // Callbacks called by the connection.jingle object

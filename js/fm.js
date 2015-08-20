@@ -6776,10 +6776,28 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
     });
     $('#msgDialog').removeClass('hidden');
     fm_showoverlay();
+    $('input:visible').blur();
+    $(document).bind('keydown', _closeDialogKeyboard);
 }
+
+function _closeDialogKeyboard(e) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (e.keyCode === 13 || e.keyCode === 27) {
+        closeMsg();
+        if ($.warningCallback) {
+            $.warningCallback(e.keyCode === 13);
+        }
+    }
+
+    return false;
+}
+
 
 function closeMsg() {
     $('#msgDialog').addClass('hidden');
+    $(document).unbind('keydown', _closeDialogKeyboard);
 
     if(!$('.pro-register-dialog').is(':visible')) {
         fm_hideoverlay();

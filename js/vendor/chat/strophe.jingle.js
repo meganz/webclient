@@ -591,7 +591,7 @@ var JinglePlugin = {
     terminateAll: function(reason, text, nosend)
     {
     //terminate all existing sessions
-        this.cancelAllAutoanswerEntries(reason, text);
+        this.cancelAllAutoAnswerEntries(reason, text);
         for (sid in this.sessions)
             this.terminate(this.sessions[sid], reason, text, nosend);
     },

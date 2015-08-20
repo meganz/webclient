@@ -484,9 +484,19 @@ var JinglePlugin = {
 // This timer is for the period from the megaCallAnswer to the jingle-initiate stanza
                 setTimeout(function() { //invalidate auto-answer after a timeout
                     var call = self.acceptCallsFrom[sid];
-                    if (!call || (call.tsTill !== tsTillJingle))
+                    if (!call || (call.tsTill !== tsTillJingle)) {
                         return; //entry was removed or updated by a new call request
-                    self.cancelAutoAnswerEntry(sid, 'initiate-timeout', 'timed out waiting for caller to start call');
+                    }
+                    //we dont care anymore about that call, so remove all handlers, as we have already signalled a timeout
+                    if (cancelHandler) {
+                        self.connection.deleteHandler(cancelHandler);
+                        cancelHandler = null;
+                    }
+                    if (elsewhereHandler) {
+                        self.connection.deleteHandler(elsewhereHandler);
+                        elsewhereHandler = null;
+                    }
+                    self.cancelAutoAnswerEntry(sid, 'initiate-timeout', 'Timed out waiting for caller to start call');
                 }, self.jingleAutoAcceptTimeout);
 
                 self.preloadCryptoKeyForJid(function() {
@@ -581,6 +591,7 @@ var JinglePlugin = {
     terminateAll: function(reason, text, nosend)
     {
     //terminate all existing sessions
+        this.cancelAllAutoanswerEntries(reason, text);
         for (sid in this.sessions)
             this.terminate(this.sessions[sid], reason, text, nosend);
     },

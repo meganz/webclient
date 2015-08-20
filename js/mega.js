@@ -5965,8 +5965,8 @@ function loadfm_callback(res, ctx) {
             crypto_procsr(res.sr);
         }
 
-        // Pass 1 to indicate this is an fm load and that we want to fetch initial notifications afterwards
-        getsc(1);
+        // Pass true to indicate this is an fm load and that we want to fetch initial notifications afterwards
+        getsc(true);
 
         if (hasMissingKeys) {
             srvlog('Got missing keys processing gettree...', null, true);

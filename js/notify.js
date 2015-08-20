@@ -113,7 +113,9 @@ var notify = {
     notifyFromActionPacket: function(actionPacket) {
 
         // We should not show notifications if we haven't yet done the initial notifications load yet
-        if (!notify.initialLoadComplete) return false;
+        if (!notify.initialLoadComplete) {
+            return false;
+        }
 
         var notification = actionPacket;                // The action packet
         var id = makeid(10);                            // Make random ID

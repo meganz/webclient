@@ -6540,9 +6540,6 @@ table {
 	background-repeat: no-repeat;
 	display: block;
 }
-.transfer-type .speed {
-	text-transform: lowercase;
-}
 .transfer-type:first-letter, .transfer-status:first-letter {
 	text-transform: uppercase;
 }

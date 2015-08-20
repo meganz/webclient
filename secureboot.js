@@ -410,10 +410,6 @@ var mBroadcaster = {
             this.listen(setup);
             this.notify('ping');
 
-            // TODO: Remove this debugging
-            if (!parseInt(localStorage.ctInstances)) console.log("crossTab - immediate init (no other running instances)");
-            else console.log("crossTab - delayed init, waiting for master pong response. Instances found: " + localStorage.ctInstances);
-
             setTimeout(setup, !parseInt(localStorage.ctInstances) ? 0 : 2000);
         },
 

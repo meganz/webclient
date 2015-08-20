@@ -2905,37 +2905,39 @@ function MegaData()
 
         newnodes = [];
         var j = [];
-        for (var i in n)
-        {
+        for (var i in n) {
             var h = n[i];
-            if (this.rubNodes[this.d[h].h] && t != this.RubbishID)
-                delete this.rubNodes[this.d[h].h]
-            j.push(
-                {
-                    a: 'm',
-                    n: h,
-                    t: t,
-                    i: requesti
-                });
-            if (M.d[h] && M.d[h].p)
-            {
-                if (M.c[M.d[h].p] && M.c[M.d[h].p][h])
-                    delete M.c[M.d[h].p][h];
+            var node = M.d[h];
+            if (t !== this.RubbishID && node && this.rubNodes[node.h]) {
+                delete this.rubNodes[node.h];
+            }
+            j.push({
+                a: 'm',
+                n: h,
+                t: t,
+                i: requesti
+            });
+            if (node && node.p) {
+                if (M.c[node.p] && M.c[node.p][h]) {
+                    delete M.c[node.p][h];
+                }
                 // Update M.v it's used for slideshow preview at least
-                for (var k in M.v)
-                {
-                    if (M.v[k].h === h)
-                    {
+                for (var k in M.v) {
+                    if (M.v[k].h === h) {
                         M.v.splice(k, 1);
                         break;
                     }
                 }
-                if (typeof M.c[t] === 'undefined')
+                if (typeof M.c[t] === 'undefined') {
                     M.c[t] = [];
+                }
                 M.c[t][h] = 1;
                 removeUInode(h);
-                this.nodeAttr({h: h, p: t});
-                newnodes.push(M.d[h]);
+                this.nodeAttr({
+                        h: h,
+                        p: t
+                    });
+                newnodes.push(node);
             }
         }
         renderNew();

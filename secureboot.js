@@ -793,7 +793,7 @@ else if (!b_u)
         };
     })(console);
 
-    Object.defineProperty(window, "__cd_v", { value : 15, writable : false });
+    Object.defineProperty(window, "__cd_v", { value : 16, writable : false });
     if (!d || onBetaW)
     {
         var __cdumps = [], __cd_t;
@@ -816,6 +816,7 @@ else if (!b_u)
                 f: mTrim(url),
                 m: mTrim(msg).replace(/'(\w+:\/\/+[^/]+)[^']+(?:'|$)/, "'$1...'")
                     .replace(/(Access to '\.\.).*(' from script denied)/, '$1$2')
+                    .replace(/gfs\w+\.userstorage/, 'gfs...userstorage')
                     .replace(/^Uncaught\W*(?:exception\W*)?/i, ''),
             }, cc;
             var sbid = +(''+(document.querySelector('script[src*="secureboot"]')||{}).src).split('=').pop()|0;
@@ -850,14 +851,16 @@ else if (!b_u)
                 if (errobj.udata) dump.d = errobj.udata;
                 if (errobj.stack)
                 {
+                    var omsg = String(msg).trim();
                     var re = RegExp(
-                        String(msg).substr(0, 70)
+                        omsg.substr(0, 70)
                         .replace(/^\w+:\s/, '')
                         .replace(/([^\w])/g, '\\$1')
                         + '[^\r\n]+'
                     );
 
-                    dump.s = String(errobj.stack).replace(re, '')
+                    dump.s = String(errobj.stack)
+                        .replace(omsg, '').replace(re, '')
                         .split("\n").map(String.trim).filter(String)
                         .splice(0,15).map(mTrim).join("\n");
                 }

@@ -1,3 +1,6 @@
+// We only want to log that they visited the help page once
+var helpAlreadyLogged = false;
+
 function init_help()
 {
 	var subpage='',search ='';	
@@ -17,7 +20,15 @@ function init_help()
         else document.location.hash = 'help/' + c;
 	});	
 	
-	
+	// Log that the help page has been viewed
+	if (!helpAlreadyLogged) {
+		helpAlreadyLogged = true;
+		api_req({
+		    a: 'log',
+		    e: 99332,
+		    m: 'web help viewed'
+		});
+	}
 	
 	$('.new-left-menu-link.home').addClass('active');
 	

@@ -166,10 +166,10 @@ accept: function (cb) {
     self.peerconnection.setLocalDescription(new RTC.RTCSessionDescription({type: 'answer', sdp: sdp}),
         function () {
             self.sendIq(accept, 'answer', cb,
-              function() {self.reportError({type:'jingle', op:'sendIq session-accept'})});
+              function() {self.reportError('Error response to "answer" jingle iq stanza')});
         },
         function (e) {
-            self.reportError({type: 'jingle', op:'setLocalDescription'}, e);
+            self.reportError("setLocalDescription returned error", {e:e});
         }
     );
 },
@@ -203,7 +203,7 @@ sendIceCandidate: function (candidate) {
         var ice = SDPUtil.iceparams(self.localSDP.media[candidate.sdpMLineIndex], self.localSDP.session),
             jcand = SDPUtil.candidateToJingle(candidate.candidate);
         if (!(ice && jcand)) {
-            self.reportError({type:'jingle', op:'get ice && jcand'}, '');
+            self.reportError("Error extracting ice candidate or converting it to Jingle");
             return;
         }
         ice.xmlns = 'urn:xmpp:jingle:transports:ice-udp:1';
@@ -322,7 +322,7 @@ sendOffer: function (cb) {
             self.createdOffer(sdp, cb);
         },
         function (e) {
-            self.reportError({type:'webrtc', op:'createOffer'}, e);
+            self.reportError("createOffer() returned error", {e: e});
         },
         self.media_constraints
     );
@@ -355,7 +355,7 @@ createdOffer: function (sdp, cb) {
         cb();
     },
     function (e) {
-        self.reportError({type:'webrtc', op:'setLocalDescription'}, e);
+        self.reportError("setLocalDescription() returned error", {e:e});
     });
 
     var cands = SDPUtil.find_lines(self.localSDP.raw, 'a=candidate:');
@@ -415,7 +415,7 @@ setRemoteDescription: function(elem, desctype, successCb, failCb)
         },
         function(e)
         {
-            self.reportError({type:'webrtc', op:'setRemoteDescription'}, e);
+            self.reportError('setRemoteDescription returned error', {e:e});
             if (failCb)
                 failCb();
         }
@@ -481,7 +481,7 @@ addIceCandidate: function (elem) {
             try {
                 self.peerconnection.setRemoteDescription(new RTC.RTCSessionDescription({type: 'pranswer', sdp: this.remoteSDP.raw }));
             } catch (e) {
-                self.reportError({type:'webrtc', op:'setRemoteDescription:pranswer'}, e);
+                self.reportError('setRemoteDescription(pranswer) returned error', {e: e});
             }
         } else {
             console.log('not yet setting pranswer');
@@ -519,7 +519,7 @@ addIceCandidate: function (elem) {
             try {
                 self.peerconnection.addIceCandidate(candidate);
             } catch (e) {
-                self.reportError({type:'webrtc', op:'addIceCandidate', cand:line}, e);
+                self.reportError('addIceCandidate() returned error', {cand:line, e:e});
             }
         });
     });
@@ -532,7 +532,7 @@ sendAnswer: function (cb, provisional) {
             self.createdAnswer(sdp, cb, provisional);
         },
         function (e) {
-            self.reportError({type:'webrtc', op:'createAnswer'}, e);
+            self.reportError('createAnswer() returned error', {e: e});
         },
         self.media_constraints
     );
@@ -577,7 +577,7 @@ createdAnswer: function (sdp, cb, provisional) {
                 cb();
         },
         function (e) {
-            self.reportError({type:'webrtc', op:'setLocalDescription'}, e);
+            self.reportError('setLocalDescription() returned error', {e:e});
         }
     );
     var cands = SDPUtil.find_lines(self.localSDP.raw, 'a=candidate:');
@@ -705,9 +705,13 @@ muteUnmute: function(state, what){
         this.sendMute(state, 'video');
 },
 
-reportError: function(info, e) {
-    info.sid = this.sid;
-    this.jingle.onInternalError(info, e);
+reportError: function(msg, info) {
+    if (!info) {
+         info = {sid: this.sid};
+    } else {
+        info.sid = this.sid;
+    }
+    this.jingle.onInternalError(msg, info);
 },
 
 addFingerprintMac: function(jiq) {

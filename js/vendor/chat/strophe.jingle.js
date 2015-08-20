@@ -34,13 +34,23 @@ var JinglePlugin = {
         this.onRinging = function(sess){};
         this.onMuted = function(sess, affected){};
         this.onUnmuted = function(sess, affected){};
-        this.onInternalError = function(info, e)  {
-            console.error("Internal error:", JinglePlugin.jsonStringifyOneLevel(info),
-                ((e instanceof Error)?e.stack:e.toString()));
+        this.onInternalError = function(msg, info)  {
+            if ((this.eventHandler !== this) && this.eventHandler.onInternalError) {
+                if (this.eventHandler.onInternalError(msg, info)) { //if handler returns true, means all handling is done by it, bail out
+                    return;
+                }
+            }
+
+            if (!info)
+                info = {};
+            var e = info.e;
+            if (!e)
+                e = '';
+            console.error("onInternalError:", msg, "\n"+(e.stack||e));
             if (info.sid) {
                 var sess = this.sessions[info.sid];
                 if (sess)
-                    this.terminate(sess, "internal-error", info.type);
+                    this.terminate(sess, "internal-error", msg);
             }
         };
 // Callbacks called by session objects
@@ -329,8 +339,7 @@ var JinglePlugin = {
             break;
         } //end switch
      } catch(e) {
-        console.error('Exception in onJingle handler:', e);
-        this.onInternalError.call(this.eventHandler, {sid: sid, type: 'jingle'}, e);
+        this.onInternalError('Exception in onJingle handler:', {sid: sid, e: e});
      }
      return true;
     },
@@ -496,8 +505,7 @@ var JinglePlugin = {
             return true;
         });
       } catch(e) {
-            console.error('Exception in onIncomingCallRequest handler:', e);
-            self.onInternalError.call(self.eventHandler, {sid: sid, type: 'jingle'} , e);
+            self.onInternalError('Exception in onIncomingCallRequest handler', {sid: sid, e: e});
       }
       return true;
     },

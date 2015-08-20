@@ -412,7 +412,11 @@ RtcSession.prototype = {
  {
   var ansHandler = null;
   var declineHandler = null;
-  var state = 0; //state 0 means not yet got usermedia, 1 means got user media and waiting for peer, state 2 means pear answered or timed out, 4 means call was canceled by us via the cancel() method of the returned object
+  var STATE_NO_USERMEDIA_YET = 0,
+      STATE_GOT_USERMEDIA_WAIT_PEER = 1,
+      STATE_PEER_ANS_OR_TIMEOUT = 2,
+      STATE_CALL_CANCELED_BY_US = 4; //call was canceled by us via the cancel() method of the returned object
+  var state = STATE_NO_USERMEDIA_YET;
   var self = this;
   var isBroadcast = (!Strophe.getResourceFromJid(targetJid));
   var ownFprMacKey = self.jingle.generateMacKey();
@@ -429,18 +433,18 @@ RtcSession.prototype = {
           options.video = actualAv.video;
       }
 
-      if (state === 4) {//call was canceled
+      if (state === STATE_CALL_CANCELED_BY_US) {//call was canceled
           return;
       }
-      state = 1;
+      state = STATE_GOT_USERMEDIA_WAIT_PEER;
 // Call accepted handler
       ansHandler = self.connection.addHandler(function(stanza) {
-          if ($(stanza).attr('sid') !== sid)
-              return true;
         try {
-          if (state !== 1)
+          if ($(stanza).attr('sid') !== sid)
+                return true;
+          if (state !== STATE_GOT_USERMEDIA_WAIT_PEER)
               return;
-          state = 2;
+          state = STATE_PEER_ANS_OR_TIMEOUT;
           self.connection.deleteHandler(declineHandler);
           declineHandler = null;
           ansHandler = null;
@@ -469,8 +473,9 @@ RtcSession.prototype = {
 
           var sess = self.jingle.initiate(sid, fullPeerJid,
             myJid || self.connection.jid, sessStream,
-            sessStream?
-                 RtcSession.avFlagsToMutedState(options, sessStream):undefined,
+            sessStream
+                ?RtcSession.avFlagsToMutedState(options, sessStream)
+                :undefined,
             {
               ownFprMacKey: ownFprMacKey,
               peerFprMacKey: peerFprMacKey,
@@ -496,57 +501,62 @@ RtcSession.prototype = {
               isDataCall:!!options.files
           });
         } catch(e) {
-          self._unrefLocalStream(options.video);
-          console.error("Exception in call answer handler:\n"+e.stack+'\nIgnoring call');
+            self._unrefLocalStream(options.video);
+            self.jingle.onInternalError('Exception in call answer handler. Ignoring call', {sid: sid, e: e});
         }
       }, null, 'message', 'megaCallAnswer', null, targetJid, {matchBare: true});
 
 //Call declined handler
       declineHandler = self.connection.addHandler(function(stanza) {
-          if ($(stanza).attr('sid') !== sid) //this message was not for us
-              return true;
-          if (state !== 1)
-              return;
+        try {
+            if ($(stanza).attr('sid') !== sid) //this message was not for us
+                return true;
+            if (state !== STATE_GOT_USERMEDIA_WAIT_PEER)
+                return;
 
-          state = 2;
-          self.connection.deleteHandler(ansHandler);
-          ansHandler = null;
-          declineHandler = null;
-          sessStream = null;
-          self._unrefLocalStream(options.video);
+            state = STATE_PEER_ANS_OR_TIMEOUT;
+            self.connection.deleteHandler(ansHandler);
+            ansHandler = null;
+            declineHandler = null;
+            sessStream = null;
+            self._unrefLocalStream(options.video);
 
-          var body = stanza.getElementsByTagName('body');
-          var fullPeerJid = $(stanza).attr('from');
+            var body = stanza.getElementsByTagName('body');
+            var fullPeerJid = $(stanza).attr('from');
 
-          if (isBroadcast)
-              self.connection.send($msg({
-                  to:Strophe.getBareJidFromJid(targetJid),
-                  type: 'megaNotifyCallHandled',
-                  sid: sid,
-                  by: fullPeerJid,
-                  accepted:'0'
-          }));
-        /**
-         A call that we have initiated has been declined by the remote peer
-         @event "call-declined"
-         @type {object}
-         @property {string} peer
-            The full JID of the peer that declined the call
-         @property {string} reason
-            The short(one word) reason that the remote specified for declining the call.
-            If the remote user didn't explicitly specify one, the default is 'busy'
-         @property {string} [text]
-            Optional verbose message specifying the reason
-            why the remote declined the call. Can be an error message
-        */
-          self.trigger('call-declined', {
-              peer: fullPeerJid,
-              reason: $(stanza).attr('reason'),
-              sid: sid,
-              isDataCall: !!options.files,
-              text : body.length ? RtcSession.xmlUnescape(body[0].textContent) : undefined,
-              callOptions: options
-          });
+            if (isBroadcast) {
+                self.connection.send($msg({
+                    to:Strophe.getBareJidFromJid(targetJid),
+                    type: 'megaNotifyCallHandled',
+                    sid: sid,
+                    by: fullPeerJid,
+                    accepted:'0'
+                }));
+            }
+            /**
+             A call that we have initiated has been declined by the remote peer
+             @event "call-declined"
+             @type {object}
+             @property {string} peer
+                The full JID of the peer that declined the call
+             @property {string} reason
+                The short(one word) reason that the remote specified for declining the call.
+                If the remote user didn't explicitly specify one, the default is 'busy'
+             @property {string} [text]
+                Optional verbose message specifying the reason
+                why the remote declined the call. Can be an error message
+            */
+            self.trigger('call-declined', {
+                peer: fullPeerJid,
+                reason: $(stanza).attr('reason'),
+                sid: sid,
+                isDataCall: !!options.files,
+                text : body.length ? RtcSession.xmlUnescape(body[0].textContent) : undefined,
+                callOptions: options
+            });
+        } catch(e) {
+            self.jingle.onInternalError("Exception in call decline handler", {sid: sid, e: e});
+        }
       },
       null, 'message', 'megaCallDecline', null, targetJid, {matchBare: true});
 
@@ -585,10 +595,10 @@ RtcSession.prototype = {
 
       if (!options.files) { //set answer timeout
           setTimeout(function() {
-              if (state !== 1)
+              if (state !== STATE_GOT_USERMEDIA_WAIT_PEER)
                   return;
 
-              state = 2;
+              state = STATE_PEER_ANS_OR_TIMEOUT;
               self.connection.deleteHandler(ansHandler);
               ansHandler = null;
               self.connection.deleteHandler(declineHandler);
@@ -602,31 +612,31 @@ RtcSession.prototype = {
                   type: 'megaCallCancel',
                   reason: 'answer-timeout'
               }));
-       /**
-        A call that we initiated was not answered (neither accepted nor rejected)
-        within the acceptable timeout.
-        @event "call-answer-timeout"
-        @type {object}
-        @property {string} peer The JID of the callee
-       */
-              self.trigger('call-answer-timeout', {peer: targetJid, info: { sid: sid }});
+              /**
+              A call that we initiated was not answered (neither accepted nor rejected)
+              within the acceptable timeout.
+              @event "call-answer-timeout"
+              @type {object}
+              @property {string} peer The JID of the callee
+             */
+             self.trigger('call-answer-timeout', {peer: targetJid, info: { sid: sid }});
           }, self.jingle.callAnswerTimeout);
       } //end set answer timeout
   } //end initiateCallback()
-  if (options.audio || options.video)
+  if (options.audio || options.video) {
       self._myGetUserMedia(options, initiateCallback, null, true, sid);
-  else
+  } else {
       initiateCallback(null);
-
+  }
   //return an object with a cancel() method
   return {
       sid: sid,
       callOptions: options,
       cancel: function() {
-        if (state === 2)
+        if (state === STATE_PEER_ANS_OR_TIMEOUT)
             return false;
-        if (state === 1) { //same as if (ansHandler)
-            state = 4;
+        if (state === STATE_GOT_USERMEDIA_WAIT_PEER) { //same as if (ansHandler)
+            state = STATE_CALL_CANCELED_BY_US;
             self.connection.deleteHandler(ansHandler);
             ansHandler = null;
             self.connection.deleteHandler(declineHandler);
@@ -641,8 +651,8 @@ RtcSession.prototype = {
             }));
             self.trigger('call-canceled-caller', {peer: targetJid, info: { sid: sid, reason: 'caller' }, callOptions: options});
             return true;
-        } else if (state === 0) {
-            state = 4;
+        } else if (state === STATE_NO_USERMEDIA_YET) {
+            state = STATE_CALL_CANCELED_BY_US;
             return true;
         }
         console.warn("RtcSession: BUG: cancel() called when state has an unexpected value of", state);
@@ -995,12 +1005,18 @@ hangupAll: function()
         var stats = obj.stats = sess.statsRecorder.terminate(this._makeCallId(sess));
         stats.isCaller = sess.isInitiator?1:0;
         stats.termRsn = reason;
+        if (text) {
+            stats.termMsg = text;
+        }
     } else { //no stats, but will still provide callId and duration
         var bstats = obj.basicStats = {
             isCaller: sess.isInitiator?1:0,
             termRsn: reason,
             bws: stats_getBrowserVersion()
         };
+        if (text) {
+            bstats.termMsg = text;
+        }
 
         if (sess.fake) {
             sess.me = this.jid; //just in case someone wants to access the own jid of the fake session
@@ -1033,7 +1049,7 @@ hangupAll: function()
     }
     this._unrefLocalStream(videoUsed);
  } catch(e) {
-    console.error("onTerminate() handler threw an exception:\n", e.stack?e.stack:e);
+    this.jingle.onInternalError("onTerminate() handler threw an exception", {e:e});
  }
  },
 
@@ -1204,7 +1220,8 @@ hangupAll: function()
  },
  _unrefLocalStream: function(video) {
      if (!this.gLocalStream) {
-         console.error('_unrefLocalStream: gLocalStream is null. refcount= ', this.gLocalStreamRefcount, 'vidRefCount =', this.gLocalVidRefcount);
+         console.warn('_unrefLocalStream: gLocalStream is null. This is normal if access to camera was denined. refcount= ',
+             this.gLocalStreamRefcount, 'vidRefCount =', this.gLocalVidRefcount);
          this.gLocalStreamRefcount = 0;
          this.gLocalVidRefcount = 0;
          return;
@@ -1225,11 +1242,11 @@ hangupAll: function()
  },
  _freeLocalStream: function() {
     if (this.gLocalStreamRefcount > 0) {
-        console.error("_freeLocalStream: gLocalStreamRefcount is > 0, wont free it, aborting");
+        this.jingle.onInternalError("_freeLocalStream: gLocalStreamRefcount is > 0, wont free it, aborting");
         return;
     }
     if (this.gLocalVidRefcount > 0) {
-        console.error("_freeLocalStream: gLocalVidRefcount is > 0, but gLocalStreamRefcount is <=0 , aborting");
+        this.jingle.onInternalError("_freeLocalStream: gLocalVidRefcount is > 0, but gLocalStreamRefcount is <=0 , aborting");
         return;
     }
 
@@ -1283,12 +1300,12 @@ hangupAll: function()
     try {
         $(this).trigger(name, [obj]);
     } catch(e) {
-        console.error("Exception thrown from user event handler '"+name+"':\n"+e.stack?e.stack:e);
+        this.jingle.onInternalError("Exception thrown from user event handler '"+name+"'", {e:e});
     }
  },
  assert: function(cond, msg) {
      if (!cond) {
-         console.error("Assertion failed:", msg);
+         this.jingle.onInternalError("Assertion failed: "+ msg);
      }
  },
  /**
@@ -1312,6 +1329,12 @@ hangupAll: function()
          return undefined;
      return sess.statsRecorder.isRelay();
  },
+
+ onInternalError: function(msg, info) {
+     if (srvlog) {
+         srvlog(msg, info, true); //log to #jscrashes
+     }
+ }
 }
 
 

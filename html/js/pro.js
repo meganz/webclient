@@ -710,6 +710,15 @@ var proPage = {
             cssClass: 'union-pay'
         },
         {
+            apiGatewayId: 10,
+            displayName: 'paysafecard',           // Paysafecard
+            supportsRecurring: false,
+            supportsMonthlyPayment: true,
+            supportsAnnualPayment: true,
+            supportsExpensivePlans: true,  // Prepaid card so we support whatever the user can afford!
+            cssClass: 'paysafecard'
+        },
+        {
             apiGatewayId: 6,
             displayName: l[7219] + ' (Fortumo)',           // Mobile (Fortumo)
             supportsRecurring: false,
@@ -726,15 +735,6 @@ var proPage = {
             supportsAnnualPayment: false,
             supportsExpensivePlans: false,  // Provider has a max of EUR 3.00 per payment
             cssClass: 'centili'
-        },
-        {
-            apiGatewayId: 10,
-            displayName: 'paysafecard',           // Paysafecard
-            supportsRecurring: false,
-            supportsMonthlyPayment: true,
-            supportsAnnualPayment: true,
-            supportsExpensivePlans: true,  // Prepaid card so we support whatever the user can afford!
-            cssClass: 'paysafecard'
         },
         {
             apiGatewayId: null,
@@ -1167,10 +1167,16 @@ var voucherDialog = {
         // If they have enough balance to purchase the plan, make it green
         if (parseFloat(pro_balance) >= parseFloat(price)) {
             this.$dialog.find('.voucher-account-balance').addClass('sufficient-funds');
+            this.$dialog.find('.voucher-buy-now').addClass('sufficient-funds');
+            this.$dialog.find('.voucher-information-help').hide();
+            this.$dialog.find('.voucher-redeem').hide();
         }
         else {
             // Otherwise leave it as red
             this.$dialog.find('.voucher-account-balance').removeClass('sufficient-funds');
+            this.$dialog.find('.voucher-buy-now').removeClass('sufficient-funds');
+            this.$dialog.find('.voucher-information-help').show();
+            this.$dialog.find('.voucher-redeem').show();
         }
     },
     

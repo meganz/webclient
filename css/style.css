@@ -14837,8 +14837,8 @@ h5.main-italic-header {
 }
 .payment-options-list .payment-method {
 	cursor: pointer;
-	margin-bottom: 3px;
-	overflow: visible;/*width: 200px;*/
+	margin-bottom: 2px;
+	overflow: visible;
 }
 .payment-options-list .payment-method.disabled {
 	cursor: auto;
@@ -23150,7 +23150,17 @@ div.fm-dialog.feedback-dialog .checkboxOff {
 	padding: 3px 10px 0 0;
 }
 .voucher-account-balance.sufficient-funds {
-	color: green;
+	color: #3aaa5a;
+}
+.voucher-buy-now.sufficient-funds {
+	border-color: #3aaa5a;
+    color: #3aaa5a;
+    font-weight: bold;
+}
+.voucher-buy-now.sufficient-funds:hover {
+    background-color: #3aaa5a;
+    border-color: #3aaa5a;
+    color: white;
 }
 .voucher-block {
 	-moz-box-sizing: border-box;

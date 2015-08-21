@@ -198,7 +198,8 @@ function pro_next_step() {
 
     // Load payment methods and plan durations
     proPage.loadPaymentGatewayOptions();
-    proPage.renderPlanDurationDropDown();
+    proPage.renderPlanDurationOptions();
+    proPage.initPlanDurationClickHandler();
 
     $('.membership-step1').addClass('hidden');
     $('.membership-step2').removeClass('hidden');
@@ -211,43 +212,26 @@ function pro_next_step() {
         $(this).find('strong').html(price[$(this).attr('data-months')]);
     });
 
-    $('.membership-st2-select span').rebind('click', function ()
-    {
-        if ($('.membership-st2-select').attr('class').indexOf('active') == -1) {
+    $('.membership-st2-select span').rebind('click', function() {
+        if ($('.membership-st2-select').hasClass('active') === false) {
             $('.membership-st2-select').addClass('active');
         }
         else {
             $('.membership-st2-select').removeClass('active');
         }
     });
-
-    $('.membership-dropdown-item').rebind('click', function ()
-    {
-        var price = $(this).find('strong').html();
-        $('.membership-dropdown-item').removeClass('selected');
-        $(this).addClass('selected');
-        $('.membership-st2-select').removeClass('active');
-        $('.membership-st2-select span').html($(this).html());
-
-        if (price) {
-            $('.membership-bott-price strong').html(price.split('.')[0] + '<span>.' + price.split('.')[1] + ' &euro;</span>');
-        }
-        
-        proPage.updateTextDependingOnRecurring();
-    });
     
-    $('.membership-bott-button').rebind('click',function(e)
-    {
-        pro_continue(e);
+    $('.membership-bott-button').rebind('click', function() {
+        pro_continue();
         return false;
     });
 }
 
-function pro_continue(e)
+function pro_continue()
 {
     // Selected payment method and package
-    var selectedPaymentMethod = $('.membership-radio input:checked').val();
-    var selectedProPackageIndex = $('.membership-dropdown-item.selected').attr('data-plan-index');
+    var selectedPaymentMethod = $('.payment-options-list input:checked').val();
+    var selectedProPackageIndex = $('.duration-options-list .membership-radio.checked').parent().attr('data-plan-index');
 
     // Set the pro package (used in pro_pay function)
     selectedProPackage = membershipPlans[selectedProPackageIndex];
@@ -492,7 +476,7 @@ var proPage = {
 
             // If last payment was Bitcoin, we need to redirect to the account page
             if (this.lastPaymentProviderId === 4) {
-                window.location.hash = 'fm/account';
+                window.location.hash = 'fm/account/history';
             }
         }
     },
@@ -755,6 +739,11 @@ var proPage = {
                 if ((typeof validGatewayIds === 'number') && (validGatewayIds < 0)) {
                     return false;
                 }
+                    
+                // Enable CCs for test
+                if (d) {
+                    validGatewayIds.push(8);
+                }
                 
                 // Get their currently selected plan
                 var selectedPlan = $('.membership-step2 .reg-st3-membership-bl.selected').attr('data-payment');
@@ -821,7 +810,7 @@ var proPage = {
     /**
      * Renders the pro plan prices into the Plan Duration dropdown
      */
-    renderPlanDurationDropDown: function() {
+    renderPlanDurationOptions: function() {
 
         // Sort plan durations by lowest number of months first
         membershipPlans.sort(function (planA, planB) {
@@ -839,7 +828,8 @@ var proPage = {
             return 0;
         });
 
-        var html = '';
+        // Clear the radio options, incase they revisted the page
+        $('.duration-options-list .payment-duration:not(.template)').remove();
 
         // Loop through the available plan durations for the current membership plan
         for (var i = 0, length = membershipPlans.length; i < length; i++) {
@@ -863,26 +853,54 @@ var proPage = {
                 }
 
                 // Build select option
-                html += '<div class="membership-dropdown-item" data-plan-index="' + i + '">'
-                     +       monthsWording + ' (<strong>' + price + '</strong> &euro;)'
-                     +  '</div>';
+                var $durationOption = $('.payment-duration.template').clone();
+                
+                // Update months and price
+                $durationOption.removeClass('template');
+                $durationOption.attr('data-plan-index', i);
+                $durationOption.find('.duration').text(monthsWording);
+                $durationOption.find('.price').text(price);
+                
+                // Update the list of duration options
+                $durationOption.appendTo('.duration-options-list');
             }
         }
 
-        // Update drop down HTML
-        $('.membership-st2-dropdown').html(html);
-
-        // Select first option
-        var $durationSelect = $('.membership-st2-select');
-        var $firstOption = $durationSelect.find('.membership-dropdown-item:first-child');
-        $durationSelect.find('span').html($firstOption.html());
-        $firstOption.addClass('selected');
+        // Pre-select the first option
+        var $firstOption = $('.duration-options-list .payment-duration:not(.template').first();
+        $firstOption.find('.membership-radio').addClass('checked');
+        $firstOption.find('input').attr('checked', 'checked');
 
         // Get current plan price
         var planIndex = $firstOption.attr('data-plan-index');
 
         proPage.updateMainPrice(planIndex);
         proPage.updateTextDependingOnRecurring();
+    },
+    
+    /**
+     * Add click handler for the radio buttons which are used for selecting the plan/subscription duration
+     */
+    initPlanDurationClickHandler: function() {
+    
+        var $durationOptions = $('.duration-options-list .payment-duration');
+
+        // Add click handler
+        $durationOptions.rebind('click', function() {
+
+            var $this = $(this);
+            var planIndex = $this.attr('data-plan-index');
+
+            // Remove checked state on the other buttons and add just to the clicked one
+            $durationOptions.find('.membership-radio').removeClass('checked');
+            $durationOptions.find('input').removeAttr('checked');
+            $this.find('.membership-radio').addClass('checked');
+            $this.find('input').attr('checked', 'checked');
+
+            // Update the main price and wording for one-time or recurring
+            proPage.updateMainPrice(planIndex);
+            proPage.updateTextDependingOnRecurring();
+        });
     },
     
     /**
@@ -909,11 +927,10 @@ var proPage = {
     updateTextDependingOnRecurring: function() {
 
         // Update whether this selected option is recurring or one-time
-        var $durationSelect = $('.membership-st2-select');
-        var $durationOption = $durationSelect.find('.membership-dropdown-item.selected');
+        var $selectDurationOption = $('.duration-options-list .membership-radio.checked');
         var $mainPrice = $('.membership-bott-price');
         var recurring = ($('.payment-options-list input:checked').attr('data-recurring') === 'true') ? true : false;
-        var planIndex = $durationOption.attr('data-plan-index');
+        var planIndex = $selectDurationOption.parent().attr('data-plan-index');
         var currentPlan = membershipPlans[planIndex];
         var numOfMonths = currentPlan[4];
         var subscribeOrPurchase = (recurring) ? l[6172] : l[6190].toLowerCase();
@@ -944,18 +961,21 @@ var proPage = {
      */
     updatePeriodOptionsOnPaymentMethodChange: function() {
 
-        var $durationSelect = $('.membership-st2-select');
-        var $durationOptions = $durationSelect.find('.membership-dropdown-item');
+        var $durationOptionsList = $('.duration-options-list');
+        var $durationOptions = $durationOptionsList.find('.payment-duration:not(.template)');
         var supportsMonthlyPayment = ($('.payment-options-list input:checked').attr('data-supports-monthly-payment') === 'true') ? true : false;
         var supportsAnnualPayment = ($('.payment-options-list input:checked').attr('data-supports-annual-payment') === 'true') ? true : false;
 
+        // Reset all options, they will be hidden or checked again if necessary below
         $durationOptions.removeClass('hidden');
+        $durationOptions.find('.membership-radio').removeClass('checked');
+        $durationOptions.find('input').removeAttr('checked', 'checked');
 
         // Loop through renewal period options (1 month, 1 year)
-        $.each($durationOptions, function(key, dropdownOption) {
+        $.each($durationOptions, function(key, durationOption) {
 
             // Get the plan's number of months
-            var planIndex = $(dropdownOption).attr('data-plan-index');
+            var planIndex = $(durationOption).attr('data-plan-index');
             var currentPlan = membershipPlans[planIndex];
             var numOfMonths = currentPlan[4];
 
@@ -963,23 +983,23 @@ var proPage = {
             if (((supportsMonthlyPayment === false) && (numOfMonths === 1)) || ((supportsAnnualPayment === false) && (numOfMonths === 12))) {
 
                 // Hide the option
-                $(dropdownOption).addClass('hidden').removeClass('selected');
-
-                // Select the first remaining option that is not hidden
-                var $firstOption = $durationSelect.find('.membership-dropdown-item').not('.hidden').first();
-                var newPlanIndex = $firstOption.attr('data-plan-index');
-                $durationSelect.find('span').html($firstOption.html());
-                $firstOption.addClass('selected');
-
-                // Update the text for one-time or recurring
-                proPage.updateMainPrice(newPlanIndex);
-                proPage.updateTextDependingOnRecurring();
+                $(durationOption).addClass('hidden');
             }
             else {
                 // Show the option otherwise
-                $(dropdownOption).removeClass('hidden');
+                $(durationOption).removeClass('hidden');
             }
         });
+
+        // Select the first remaining option that is not hidden
+        var $firstOption = $durationOptionsList.find('.payment-duration:not(.template, .hidden)').first();
+        var newPlanIndex = $firstOption.attr('data-plan-index');
+        $firstOption.find('.membership-radio').addClass('checked');
+        $firstOption.find('input').attr('checked', 'checked');
+
+        // Update the text for one-time or recurring
+        proPage.updateMainPrice(newPlanIndex);
+        proPage.updateTextDependingOnRecurring();
     },
     
     /**
@@ -1340,7 +1360,7 @@ var voucherDialog = {
         this.$dialog.find('.voucher-buy-now').rebind('click', function() {
             
             // Get which plan is selected
-            var selectedProPackageIndex = $('.membership-dropdown-item.selected').attr('data-plan-index');
+            var selectedProPackageIndex = $('.duration-options-list .membership-radio.checked').parent().attr('data-plan-index');
 
             // Set the pro package (used in pro_pay function)
             selectedProPackage = membershipPlans[selectedProPackageIndex];

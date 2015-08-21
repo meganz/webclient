@@ -14911,7 +14911,11 @@ h5.main-italic-header {
 }
 .duration-options-list .payment-duration .membership-radio-label {
 	background: none;
+    font-family: 'source_sans_proregular';
 	padding-left: 0;
+}
+.duration-options-list .payment-duration.template {
+    display: none;
 }
 .membership-bott-price {
 	font-size: 72px;

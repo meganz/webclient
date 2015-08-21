@@ -2349,5 +2349,11 @@
     "7390": "Vana mega.co.nz v\u00e4limuse jaoks",
     "7391": "Uue mega.nz v\u00e4limuse jaoks",
     "7392": "Chrome Dev",
-    "7399": "File is locked."
+    "7399": "Fail on kasutuses.",
+    "7400": "Soovitame tungivalt kasutada suurel hulgal failide \u00fcleslaadimiseks meie suure j\u00f5udlusega<br\/> s\u00fcnkroonimisklienti.<a>Hankige MEGAsync kohe.<\/a>",
+    "7401": "J\u00c4TKA",
+    "7402": "LAE ALLA MEGAs\u00fcnk",
+    "7403": "\u00dcleslaadimiseks asetage failid siia",
+    "7404": "Deleted one or more items.",
+    "7405": "One or more of your items were deleted by another user."
 }

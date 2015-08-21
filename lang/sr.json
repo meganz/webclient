@@ -2349,5 +2349,11 @@
     "7390": "For old mega.co.nz design",
     "7391": "For new mega.nz design",
     "7392": "Chrome Dev",
-    "7399": "File is locked."
+    "7399": "File is locked.",
+    "7400": "We strongly suggest using our sync client for vastly improved performance<br\/> uploading hundreds of files. <a>Get MEGAsync now.<\/a>",
+    "7401": "CONTINUE ANYWAY",
+    "7402": "DOWNLOAD MEGAsync",
+    "7403": "Drop your files here to start uploading",
+    "7404": "Deleted one or more items.",
+    "7405": "One or more of your items were deleted by another user."
 }

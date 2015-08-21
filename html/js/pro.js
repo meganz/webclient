@@ -740,10 +740,10 @@ var proPage = {
                     return false;
                 }
                     
-                // Enable CCs for test
+                /* Enable CCs for testing
                 if (d) {
                     validGatewayIds.push(8);
-                }
+                }//*/
                 
                 // Get their currently selected plan
                 var selectedPlan = $('.membership-step2 .reg-st3-membership-bl.selected').attr('data-payment');

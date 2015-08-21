@@ -14834,8 +14834,8 @@ h5.main-italic-header {
 }
 .payment-options-list .payment-method {
 	cursor: pointer;
-	margin-bottom: 3px;
-	overflow: visible;/*width: 200px;*/
+	margin-bottom: 2px;
+	overflow: visible;
 }
 .payment-options-list .payment-method.disabled {
 	cursor: auto;
@@ -14896,6 +14896,23 @@ h5.main-italic-header {
 }
 .membership-radio-label.bitcoin {
 	background-position: -444px -614px;
+}
+.duration-options-list {
+    -webkit-column-count: 2;
+	-moz-column-count: 2;
+	column-count: 2;
+	-webkit-column-width: 200px;
+	-moz-column-width: 200px;
+	column-width: 200px;
+    padding-top: 5px;
+}
+.duration-options-list .payment-duration .membership-radio-label {
+	background: none;
+    font-family: 'source_sans_proregular';
+	padding-left: 0;
+}
+.duration-options-list .payment-duration.template {
+    display: none;
 }
 .membership-bott-price {
 	font-size: 72px;
@@ -23178,7 +23195,17 @@ div.fm-dialog.feedback-dialog .checkboxOff {
 	padding: 3px 10px 0 0;
 }
 .voucher-account-balance.sufficient-funds {
-	color: green;
+	color: #3aaa5a;
+}
+.voucher-buy-now.sufficient-funds {
+	border-color: #3aaa5a;
+    color: #3aaa5a;
+    font-weight: bold;
+}
+.voucher-buy-now.sufficient-funds:hover {
+    background-color: #3aaa5a;
+    border-color: #3aaa5a;
+    color: white;
 }
 .voucher-block {
 	-moz-box-sizing: border-box;

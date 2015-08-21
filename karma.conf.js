@@ -96,7 +96,7 @@ module.exports = function(config) {
         'js/ui/feedbackDialog.js',
         'js/ui/credentialsWarningDialog.js',
         'js/ui/loginRequiredDialog.js',
-        'js/notifications.js',
+        'js/notify.js',
         'js/megaNotifications.js',
         'js/avatar.js',
         'js/countries.js',
@@ -185,7 +185,16 @@ module.exports = function(config) {
     // - Safari (only Mac; has to be installed with `npm install karma-safari-launcher`)
     // - PhantomJS
     // - IE (only Windows; has to be installed with `npm install karma-ie-launcher`)
-    browsers: ['PhantomJS', 'Firefox', 'Chrome'],
+    browsers: ['PhantomJS', 'PhantomJS_custom', 'Firefox', 'Chrome'],
+
+    customLaunchers: {
+        'PhantomJS_custom': {
+            base: 'PhantomJS',
+            // PhantomJS 2.0 -- https://github.com/ariya/phantomjs/issues/11596
+            // flags: ['--local-storage-path=./test/phantomjs-storage', '--offline-storage-path=./test/phantomjs-storage']
+            flags: ['--local-storage-path=./test/phantomjs-storage']
+        }
+    },
 
     // If browser does not capture in given timeout [ms], kill it
     captureTimeout: 120000,

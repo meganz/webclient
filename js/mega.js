@@ -4296,13 +4296,20 @@ function MegaData()
 
         if (urlParts) {
 
-            // Decode from Base64 and JSON
-            urlParts = JSON.parse(atob(urlParts[1]));
+            try {
+                // Decode from Base64 and JSON
+                urlParts = JSON.parse(atob(urlParts[1]));
+            }
+            catch (ex) {
+                console.error(ex);
+                window.location.hash = 'login';
+                return false;
+            }
 
             if (urlParts) {
                 // If the user is already logged in here with the same account
                 // we can avoid a lot and just take them to the correct page
-                if (JSON.stringify(u_k) === JSON.stringify(urlParts[0])){
+                if (JSON.stringify(u_k) === JSON.stringify(urlParts[0])) {
                     window.location.hash = urlParts[2];
                     return false;
                 }
@@ -4310,7 +4317,7 @@ function MegaData()
                 // If the user is already logged in but with a different account just load that account instead. The
                 // hash they came from e.g. a folder link may not be valid for this account so just load the file manager.
                 else if (u_k && (JSON.stringify(u_k) !== JSON.stringify(urlParts[0]))) {
-                    if ((urlParts[2] || '').match(/^fm/)) {
+                    if (!urlParts[2] || String(urlParts[2]).match(/^fm/)) {
                         window.location.hash = 'fm';
                         return false;
                     } else {

@@ -1414,7 +1414,7 @@ var voucherDialog = {
             if (M.account) {
                 M.account.lastupdate = 0;
             }
-            window.location.hash = 'fm/account';
+            window.location.hash = 'fm/account/history';
         });
     }
 };
@@ -2008,7 +2008,7 @@ var cardDialog = {
             if (M.account) {
                 M.account.lastupdate = 0;
             }
-            window.location.hash = 'fm/account';
+            window.location.hash = 'fm/account/history';
         });
     },
     

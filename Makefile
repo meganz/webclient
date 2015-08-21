@@ -20,7 +20,8 @@ test: $(KARMA)
 	$(NODE) $(KARMA) start --preprocessors= karma.conf.js --browsers PhantomJS_custom
 
 test-ci: $(KARMA)
-	$(NODE) $(KARMA) start --singleRun=true --no-colors karma.conf.js --browsers PhantomJS
+	@rm -fr ./test/phantomjs-storage
+	$(NODE) $(KARMA) start --singleRun=true --no-colors karma.conf.js --browsers PhantomJS_custom
 
 api-doc: $(JSDOC)
 	$(NODE) $(JSDOC) --destination doc/api/ --private \

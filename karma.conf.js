@@ -190,8 +190,8 @@ module.exports = function(config) {
     customLaunchers: {
         'PhantomJS_custom': {
             base: 'PhantomJS',
-            // PhantomJS 2.0 -- https://github.com/ariya/phantomjs/issues/11596
-            // flags: ['--local-storage-path=./test/phantomjs-storage', '--offline-storage-path=./test/phantomjs-storage']
+            // Works with PhantomJS 1.9.8 (on Linux), but seems to need
+            // PhantomJS 2.0 for Windows
             flags: ['--local-storage-path=./test/phantomjs-storage']
         }
     },

@@ -24,10 +24,10 @@ endif
 all: test api-doc dist test-shared
 
 test: $(KARMA)
-	$(NODE) $(KARMA) start --preprocessors= karma.conf.js --browsers PhantomJS $(testOptions)
+	$(NODE) $(KARMA) start --preprocessors= karma.conf.js --browsers PhantomJS_custom $(testOptions)
 
 test-ci: $(KARMA)
-	$(NODE) $(KARMA) start --singleRun=true --no-colors karma.conf.js --browsers PhantomJS $(testOptions)
+	$(NODE) $(KARMA) start --singleRun=true --no-colors karma.conf.js --browsers PhantomJS_custom $(testOptions)
 
 api-doc: $(JSDOC)
 	$(NODE) $(JSDOC) --destination doc/api/ --private \
@@ -43,7 +43,7 @@ jscs: $(JSCS)
 checks: jshint jscs
 
 clean:
-	rm -rf doc/api/ coverage/ build/ test-results.xml
+	rm -rf doc/api/ coverage/ build/ test-results.xml test/phantomjs-storage
 
 clean-all: clean
 	rm -f $(BUILD_DEP_ALL)

@@ -556,7 +556,7 @@ function init_page() {
         return false;
     }
     else if (page == 'register') {
-        if (u_storage.sid) {
+        if (u_storage.sid && u_type !== 0) {
             document.location.hash = '#fm';
             return false;
         }

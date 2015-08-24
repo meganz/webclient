@@ -1160,7 +1160,7 @@ function topmenuUI() {
                 if (sep.length > 1) {
                     var wrd = sep[0].split(/\s+/).filter(String);
                     var green = wrd.pop() + ' 50' + sep[1];
-                    body = htmlentities(wrd.join(" ")) + ' <span class="green">' + htmlentities(green) + '</span';
+                    body = htmlentities(wrd.join(" ")) + ' <span class="green">' + htmlentities(green) + '</span>';
                 }
                 else {
                     body = htmlentities(body);

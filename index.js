@@ -1139,27 +1139,61 @@ function topmenuUI() {
 
             $('.top-menu-item.register').text(l[968]);
             $('.top-menu-item.clouddrive').show();
-            $('.warning-popup-icon').removeClass('hidden');
-            $('.warning-icon-area').rebind('click', function (e) {
 
-                var c = $('.top-warning-popup').attr('class');
+            if ($.len(M.c[M.RootID] || {})) {
+                var body;
+                var header;
+                var lstr = String(l[881]);
+                var dot = lstr.indexOf('.') + 1;
 
-                if (c && c.indexOf('active') > -1) {
-                    $('.top-warning-popup').removeClass('active');
+                // 881 is a long string of plain text, adapt it to the new warning layout
+                if (lang === 'en' || dot === 0) {
+                    header = 'You are using an ephemeral session.';
+                    body = lstr.substr(dot);
                 }
                 else {
-                    $('.top-warning-popup').addClass('active');
+                    header = lstr.substr(0, dot);
+                    body = lstr.substr(dot);
                 }
-            });
-            $('.top-warning-popup').rebind('click', function (e) {
-
-                if (isNonActivatedAccount()) {
-                    return;
+                // Look for "50 GB" to turn green the last sentence
+                var sep = body.split('50');
+                if (sep.length > 1) {
+                    var wrd = sep[0].split(/\s+/).filter(String);
+                    var green = wrd.pop() + ' 50' + sep[1];
+                    body = htmlentities(wrd.join(" ")) + ' <span class="green">' + htmlentities(green) + '</span';
                 }
+                else {
+                    body = htmlentities(body);
+                }
+                header = htmlentities(header);
 
-                $('.top-warning-popup').removeClass('active');
-                document.location.hash = 'register';
-            });
+                $('.top-warning-popup .warning-popup-body').html(
+                    '<div class="warning-header">' + header.trim() + '</div>' + body.trim()
+                );
+                $('.top-warning-popup .warning-button span').text(l[779]);
+
+                $('.warning-popup-icon').removeClass('hidden');
+                $('.warning-icon-area').rebind('click', function (e) {
+
+                    var c = $('.top-warning-popup').attr('class');
+
+                    if (c && c.indexOf('active') > -1) {
+                        $('.top-warning-popup').removeClass('active');
+                    }
+                    else {
+                        $('.top-warning-popup').addClass('active');
+                    }
+                });
+                $('.top-warning-popup').rebind('click', function (e) {
+
+                    if (isNonActivatedAccount()) {
+                        return;
+                    }
+
+                    $('.top-warning-popup').removeClass('active');
+                    document.location.hash = 'register';
+                });
+            }
 
             if (isNonActivatedAccount()) {
                 showNonActivatedAccountDialog();

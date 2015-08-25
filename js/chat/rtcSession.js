@@ -77,26 +77,32 @@ function RtcSession(stropheConn, options) {
         throw new Error('This browser does not support webRTC');
 
     var self = this;
-    this.connection = stropheConn;
-    var jingle = this.jingle = stropheConn.jingle;
-    if (jingle.rtcSession)
+
+    self.connection = stropheConn;
+    self.gLocalStream = null;
+    self.gLocalStreamRefcount = 0;
+    self.gLocalVid = null;
+    self.gLocalVidRefcount = 0;
+
+    var j = self.jingle = stropheConn.jingle;
+    if (j.rtcSession)
         throw new Error("This Strophe connection already has an associated RtcSession instance");
-    this.ftManager = jingle.ftManager;
+    self.ftManager = j.ftManager;
 // Init crypto functions
     if (options.dummyCryptoFunctions) {
-        jingle.encryptMessageForJid = function(msg, bareJid) {
+        j.encryptMessageForJid = function(msg, bareJid) {
             if (!self._dummyKeys || !self._dummyKeys[bareJid]) {
                 throw new Error("pubkey not loaded: " + bareJid);
             }
             return RtcSession.xorEnc(msg, bareJid)
         };
-        jingle.decryptMessage = function(msg) {
-            return RtcSession.xorDec(msg, Strophe.getBareJidFromJid(this.connection.jid));
+        j.decryptMessage = function(msg) {
+            return RtcSession.xorDec(msg, Strophe.getBareJidFromJid(self.connection.jid));
         };
-        jingle.generateMac = function(msg, key) {
+        j.generateMac = function(msg, key) {
             return RtcSession.xorEnc(msg, key);
         };
-        jingle.preloadCryptoKeyForJid = function(f, bareJid) {
+        j.preloadCryptoKeyForJid = function(f, bareJid) {
             self._dummyKeys = self._dummyKeys || {};
             self._dummyKeys[bareJid] = true;
             f();
@@ -111,17 +117,17 @@ function RtcSession(stropheConn, options) {
             !cr.preloadCryptoKeyForJid || !cr.scrambleJid) {
                 throw new Error("At least one crypto function is not provided in 'options.crypto'");
         }
-        jingle.encryptMessageForJid = cr.encryptMessageForJid;
-        jingle.decryptMessage = cr.decryptMessage;
-        jingle.generateMac = cr.generateMac;
-        jingle.generateMacKey = cr.generateMacKey;
-        jingle.preloadCryptoKeyForJid = cr.preloadCryptoKeyForJid;
+        j.encryptMessageForJid = cr.encryptMessageForJid;
+        j.decryptMessage = cr.decryptMessage;
+        j.generateMac = cr.generateMac;
+        j.generateMacKey = cr.generateMacKey;
+        j.preloadCryptoKeyForJid = cr.preloadCryptoKeyForJid;
         self.scrambleJid = cr.scrambleJid;
     }
     if (options.crypto && options.crypto.generateMacKey) {
-        jingle.generateMacKey = options.crypto.generateMacKey;
+        j.generateMacKey = options.crypto.generateMacKey;
     } else {
-        jingle.generateMacKey = function() {
+        j.generateMacKey = function() {
             var array = new Uint8Array(32);
             var result = '';
             window.crypto.getRandomValues(array);
@@ -131,12 +137,12 @@ function RtcSession(stropheConn, options) {
         };
     }
 
-    jingle.verifyMac = function(msg, key, actualMac) {
+    j.verifyMac = function(msg, key, actualMac) {
         if (!actualMac)
             return false;
         var expectedMac;
         try {
-            expectedMac = jingle.generateMac(msg, key);
+            expectedMac = j.generateMac(msg, key);
         } catch(e) {
             return false;
         }
@@ -154,35 +160,34 @@ function RtcSession(stropheConn, options) {
     if (!options.iceServers) {
         console.warn("No default ice servers provided in options, you must set them before a call is started");
     } else {
-        this.jingle.iceServers = options.iceServers;
+        j.iceServers = options.iceServers;
     }
-    this.options = options;
-    this.audioMuted = false;
-    this.videoMuted = false;
-    this.PRANSWER = false; // use either pranswer or autoaccept
+    self.options = options;
+    self.audioMuted = false;
+    self.videoMuted = false;
+    self.PRANSWER = false; // use either pranswer or autoaccept
 
-    stropheConn.jingle.rtcSession = this; //needed to access the RtcSession object from jingle event handlers
+    j.rtcSession = self; //needed to access the RtcSession object from jingle event handlers
 //muc stuff
-    this.myroomjid = null;
-    this.roomjid = null;
-    this.list_members = [];
+    self.myroomjid = null;
+    self.roomjid = null;
+    self.list_members = [];
 //===
-    this.jingle.onConnectionEvent = this.onConnectionEvent;
+    j.onConnectionEvent = self.onConnectionEvent;
 
     if (RtcSession.RAWLOGGING)
     {
-        this.connection.rawInput = function (data)
+        self.connection.rawInput = function (data)
         { if (RtcSession.RAWLOGGING) console.log('RECV: ' + data); };
-        this.connection.rawOutput = function (data)
+        self.connection.rawOutput = function (data)
         { if (RtcSession.RAWLOGGING) console.log('SEND: ' + data); };
     }
 
-    this.jingle.pc_constraints = RTC.pc_constraints;
+    j.pc_constraints = RTC.pc_constraints;
 
-    var j = this.jingle;
 
-    j.eventHandler = this; //all callbacks will be called with this == eventHandler
-    j.onIncomingCallRequest = this.onIncomingCallRequest;
+    j.eventHandler = self; //all callbacks will be called with self == eventHandler
+    j.onIncomingCallRequest = self.onIncomingCallRequest;
   /**
     Fired when the incoming call request is not longer valid. This may happen for the reasons stated below,
     and the reason is specified in the info.event property: <br>
@@ -208,13 +213,13 @@ function RtcSession(stropheConn, options) {
                          info:info
                      });
     };
-    j.onCallAnswered = this.onCallAnswered;
-    j.onCallTerminated = this.onCallTerminated;
-    j.onRemoteStreamAdded = this.onRemoteStreamAdded;
-    j.onRemoteStreamRemoved = this.onRemoteStreamRemoved;
-    j.onNoStunCandidates = this.noStunCandidates;
-    j.onJingleError = this.onJingleError;
-    j.onMuted = function(sess, info) {
+    j.onCallAnswered = self.onCallAnswered.bind(self);
+    j.onCallTerminated = self.onCallTerminated.bind(self);
+    j.onRemoteStreamAdded = self.onRemoteStreamAdded.bind(self);
+    j.onRemoteStreamRemoved = self.onRemoteStreamRemoved.bind(self);
+    j.onNoStunCandidates = self.noStunCandidates.bind(self);
+    j.onJingleError = self.onJingleError.bind(self);
+    j.onMuted = (function(sess, info) {
     /**
     Fired when the remote peer muted a stream
     @event "muted"
@@ -225,9 +230,9 @@ function RtcSession(stropheConn, options) {
     @property {SessWrapper} sess
         The session on which the event occurred
     */
-        this.trigger('muted', {info:info, sess: new SessWrapper(sess), peer: sess.peerjid});
-    };
-    j.onUnmuted = function(sess, info) {
+        self.trigger('muted', {info:info, sess: new SessWrapper(sess), peer: sess.peerjid});
+    }).bind(self);
+    j.onUnmuted = (function(sess, info) {
     /**
     Fired when the remote peer unmuted a stream
     @event "unmuted"
@@ -239,42 +244,56 @@ function RtcSession(stropheConn, options) {
         The session on which the event occurred
     */
 
-        this.trigger("unmuted", {info:info, sess: new SessWrapper(sess), peer: sess.peerjid});
-    }
+        self.trigger("unmuted", {info:info, sess: new SessWrapper(sess), peer: sess.peerjid});
+    }).bind(self);
 
     if (RTC.browser === 'firefox')
-        this.jingle.media_constraints.mandatory.MozDontOfferDataChannel = true;
+        j.media_constraints.mandatory.MozDontOfferDataChannel = true;
 }
 //global variables
-//RtcSession.gLocalAudioOnlyStream = {stream: null, refcount:0};
-//RtcSession.gLocalAudioVideoStream = {stream: null, refcount:0};
-
-RtcSession.gLocalStream = null;
-RtcSession.gLocalVid = null;
 RtcSession.gVolMon = null;
 RtcSession.gVolMonCallback = null;
 
 RtcSession.prototype = {
   NO_DTLS: false, //compat with android
-  _myGetUserMedia: function(options, successCallback, errCallback, allowContinueOnFail)
+  _myGetUserMedia: function(options, successCallback, errCallback, allowContinueOnFail, sid)
   {
     var self = this;
-    if (RtcSession.gLocalStream)
+    if (self.gLocalStream)
     {
-        var sessStream = RTC.cloneMediaStream(RtcSession.gLocalStream, {audio:true, video:true});
+        var sessStream = RTC.cloneMediaStream(self.gLocalStream, {audio:true, video:true});
         self._refLocalStream(options.video);
         successCallback.call(self, sessStream);
         return;
     }
+//self.gLocalStream is null
+    if (self.gLocalStreamRefcount !== 0) {
+        console.error("_myGetUserMedia: gLocalStream is null, but gLocalStreamRefcount is", this.gLocalStreamRefcount,"(!= 0)");
+        self.gLocalStreamRefcount = 0;
+    }
 
-    RTC.getUserMediaWithConstraintsAndCallback({audio: true, video: true}, this,
+    if (self.gLocalVid !== null) {
+        console.error("_myGetUserMedia: gLocalStream is null, but gLocalVid is != null");
+        self.gLocalVid = null;
+    }
+
+    if (self.gLocalVidRefcount !== 0) {
+        console.error("_myGetUserMedia: gLocalStream is null, but gLocalVidRefcount is",self.gLocalVidRefcount,"(!= 0)");
+        self.gLocalVidRefcount = 0;
+    }
+
+    RTC.getUserMediaWithConstraintsAndCallback({audio: true, video: true}, self,
       function(stream) {
-        RtcSession.gLocalStream = stream;
-        RtcSession.gLocalStreamRefcount = 0;
-        var sessStream = RTC.cloneMediaStream(RtcSession.gLocalStream, {audio:true, video:true});
-        self._onMediaReady(RtcSession.gLocalStream);
-        self._refLocalStream(options.video);
-        successCallback.call(self, sessStream);
+          self.assert(stream, "getUserMedia returned null stream");
+          self.gLocalStream = stream;
+          self.assert(self.gLocalStreamRefcount === 0, "gLocalStreamRefcount not 0 when obtaining user media");
+          self.assert(self.gLocalVidRefcount === 0, "gLocalVidRefcount not 0 when obtaining user media");
+
+          var sessStream = RTC.cloneMediaStream(self.gLocalStream,
+                                                {audio:true, video:true});
+          self._onMediaReady(self.gLocalStream);
+          self._refLocalStream(options.video); //we must call this after onMediaReady because it will enable the local video display, and that is created in onMediaReady
+          successCallback.call(self, sessStream);
       },
       function(error, e) {
         var msg;
@@ -299,12 +318,13 @@ RtcSession.prototype = {
         }
         if (!allowContinueOnFail) {
             fail();
-            self.trigger('local-media-fail', {error: msg});
+            self.trigger('local-media-fail', {error: msg, sid: sid});
             return;
         }
 
         var obj = {
             error: msg,
+            sid: sid,
             continue: function(cont) {
                 if (failed)
                     throw new Error("Already handled by failure handler");
@@ -312,9 +332,10 @@ RtcSession.prototype = {
                     if (errCallback)
                         errCallback(msg);
                 } else {
-                    RtcSession.gLocalStream = null;
-                    RtcSession.gLocalStreamRefcount = 0;
-                    if (RtcSession.gLocalVid)
+                    self.gLocalStream = null;
+                    self.gLocalStreamRefcount = 0;
+                    self.gLocalVidRefcount = 0;
+                    if (self.gLocalVid)
                         console.warn("Assertion failed: Could not get local stream, but local video element is not null");
                     successCallback.call(self, null);
                 }
@@ -350,7 +371,7 @@ RtcSession.prototype = {
         case Strophe.Status.CONNFAIL:
         case Strophe.Status.DISCONNECTING:
         {
-            this.terminateAll('disconnected', null, true);
+            this.terminateAll('xmpp-disconnect', null, true);
             this.rtcSession._freeLocalStream();
             break;
         }
@@ -391,7 +412,11 @@ RtcSession.prototype = {
  {
   var ansHandler = null;
   var declineHandler = null;
-  var state = 0; //state 0 means not yet got usermedia, 1 means got user media and waiting for peer, state 2 means pear answered or timed out, 4 means call was canceled by us via the cancel() method of the returned object
+  var STATE_NO_USERMEDIA_YET = 0,
+      STATE_GOT_USERMEDIA_WAIT_PEER = 1,
+      STATE_PEER_ANS_OR_TIMEOUT = 2,
+      STATE_CALL_CANCELED_BY_US = 4; //call was canceled by us via the cancel() method of the returned object
+  var state = STATE_NO_USERMEDIA_YET;
   var self = this;
   var isBroadcast = (!Strophe.getResourceFromJid(targetJid));
   var ownFprMacKey = self.jingle.generateMacKey();
@@ -401,23 +426,25 @@ RtcSession.prototype = {
       var actualAv = getStreamAv(sessStream);
       if ((options.audio && !actualAv.audio) || (options.video && !actualAv.video)) {
           console.warn("startMediaCall: Could not obtain audio or video stream requested by the user");
+          if (!sessStream) {
+              console.warn("...and stream is null");
+          }
           options.audio = actualAv.audio;
           options.video = actualAv.video;
       }
 
-      if (state === 4) {//call was canceled before we got user media
-          self._freeLocalStreamIfUnused();
+      if (state === STATE_CALL_CANCELED_BY_US) {//call was canceled
           return;
       }
-      state = 1;
+      state = STATE_GOT_USERMEDIA_WAIT_PEER;
 // Call accepted handler
       ansHandler = self.connection.addHandler(function(stanza) {
-          if ($(stanza).attr('sid') !== sid)
-              return true;
         try {
-          if (state !== 1)
+          if ($(stanza).attr('sid') !== sid)
+                return true;
+          if (state !== STATE_GOT_USERMEDIA_WAIT_PEER)
               return;
-          state = 2;
+          state = STATE_PEER_ANS_OR_TIMEOUT;
           self.connection.deleteHandler(declineHandler);
           declineHandler = null;
           ansHandler = null;
@@ -446,8 +473,9 @@ RtcSession.prototype = {
 
           var sess = self.jingle.initiate(sid, fullPeerJid,
             myJid || self.connection.jid, sessStream,
-            sessStream?
-                 RtcSession.avFlagsToMutedState(options, sessStream):undefined,
+            sessStream
+                ?RtcSession.avFlagsToMutedState(options, sessStream)
+                :undefined,
             {
               ownFprMacKey: ownFprMacKey,
               peerFprMacKey: peerFprMacKey,
@@ -473,56 +501,62 @@ RtcSession.prototype = {
               isDataCall:!!options.files
           });
         } catch(e) {
-          self._freeLocalStreamIfUnused();
-          console.error("Exception in call answer handler:\n"+e.stack+'\nIgnoring call');
+            self._unrefLocalStream(options.video);
+            self.jingle.onInternalError('Exception in call answer handler. Ignoring call', {sid: sid, e: e});
         }
       }, null, 'message', 'megaCallAnswer', null, targetJid, {matchBare: true});
 
 //Call declined handler
       declineHandler = self.connection.addHandler(function(stanza) {
-          if ($(stanza).attr('sid') !== sid) //this message was not for us
-              return true;
-          if (state !== 1)
-              return;
+        try {
+            if ($(stanza).attr('sid') !== sid) //this message was not for us
+                return true;
+            if (state !== STATE_GOT_USERMEDIA_WAIT_PEER)
+                return;
 
-          state = 2;
-          self.connection.deleteHandler(ansHandler);
-          ansHandler = null;
-          declineHandler = null;
-          sessStream = null;
-          self._freeLocalStreamIfUnused();
+            state = STATE_PEER_ANS_OR_TIMEOUT;
+            self.connection.deleteHandler(ansHandler);
+            ansHandler = null;
+            declineHandler = null;
+            sessStream = null;
+            self._unrefLocalStream(options.video);
 
-          var body = stanza.getElementsByTagName('body');
-          var fullPeerJid = $(stanza).attr('from');
+            var body = stanza.getElementsByTagName('body');
+            var fullPeerJid = $(stanza).attr('from');
 
-          if (isBroadcast)
-              self.connection.send($msg({
-                  to:Strophe.getBareJidFromJid(targetJid),
-                  type: 'megaNotifyCallHandled',
-                  sid: sid,
-                  by: fullPeerJid,
-                  accepted:'0'
-          }));
-        /**
-         A call that we have initiated has been declined by the remote peer
-         @event "call-declined"
-         @type {object}
-         @property {string} peer
-            The full JID of the peer that declined the call
-         @property {string} reason
-            The short(one word) reason that the remote specified for declining the call.
-            If the remote user didn't explicitly specify one, the default is 'busy'
-         @property {string} [text]
-            Optional verbose message specifying the reason
-            why the remote declined the call. Can be an error message
-        */
-          self.trigger('call-declined', {
-              peer: fullPeerJid,
-              reason: $(stanza).attr('reason'),
-              sid: sid,
-              isDataCall: !!options.files,
-              text : body.length ? RtcSession.xmlUnescape(body[0].textContent) : undefined
-          });
+            if (isBroadcast) {
+                self.connection.send($msg({
+                    to:Strophe.getBareJidFromJid(targetJid),
+                    type: 'megaNotifyCallHandled',
+                    sid: sid,
+                    by: fullPeerJid,
+                    accepted:'0'
+                }));
+            }
+            /**
+             A call that we have initiated has been declined by the remote peer
+             @event "call-declined"
+             @type {object}
+             @property {string} peer
+                The full JID of the peer that declined the call
+             @property {string} reason
+                The short(one word) reason that the remote specified for declining the call.
+                If the remote user didn't explicitly specify one, the default is 'busy'
+             @property {string} [text]
+                Optional verbose message specifying the reason
+                why the remote declined the call. Can be an error message
+            */
+            self.trigger('call-declined', {
+                peer: fullPeerJid,
+                reason: $(stanza).attr('reason'),
+                sid: sid,
+                isDataCall: !!options.files,
+                text : body.length ? RtcSession.xmlUnescape(body[0].textContent) : undefined,
+                callOptions: options
+            });
+        } catch(e) {
+            self.jingle.onInternalError("Exception in call decline handler", {sid: sid, e: e});
+        }
       },
       null, 'message', 'megaCallDecline', null, targetJid, {matchBare: true});
 
@@ -550,7 +584,7 @@ RtcSession.prototype = {
                   infos[file.name] = info;
               }
               msgattrs.files = JSON.stringify(infos);
-          } else {
+          } else { //!options.files
               msgattrs.media = (options.audio?'a':'')+(options.video?'v':'');
               if (!msgattrs.media)
                   msgattrs.media = '_';
@@ -559,18 +593,18 @@ RtcSession.prototype = {
           self.connection.send($msg(msgattrs));
       }, targetJid);
 
-      if (!options.files)
+      if (!options.files) { //set answer timeout
           setTimeout(function() {
-              if (state !== 1)
+              if (state !== STATE_GOT_USERMEDIA_WAIT_PEER)
                   return;
 
-              state = 2;
+              state = STATE_PEER_ANS_OR_TIMEOUT;
               self.connection.deleteHandler(ansHandler);
               ansHandler = null;
               self.connection.deleteHandler(declineHandler);
               declineHandler = null;
               sessStream = null;
-              self._freeLocalStreamIfUnused();
+              self._unrefLocalStream(options.video);
 
               self.connection.send($msg({
                   to:Strophe.getBareJidFromJid(targetJid),
@@ -578,45 +612,47 @@ RtcSession.prototype = {
                   type: 'megaCallCancel',
                   reason: 'answer-timeout'
               }));
-       /**
-        A call that we initiated was not answered (neither accepted nor rejected)
-        within the acceptable timeout.
-        @event "call-answer-timeout"
-        @type {object}
-        @property {string} peer The JID of the callee
-       */
-              self.trigger('call-answer-timeout', {peer: targetJid, info: { sid: sid }});
+              /**
+              A call that we initiated was not answered (neither accepted nor rejected)
+              within the acceptable timeout.
+              @event "call-answer-timeout"
+              @type {object}
+              @property {string} peer The JID of the callee
+             */
+             self.trigger('call-answer-timeout', {peer: targetJid, info: { sid: sid }});
           }, self.jingle.callAnswerTimeout);
+      } //end set answer timeout
   } //end initiateCallback()
-  if (options.audio || options.video)
-      self._myGetUserMedia(options, initiateCallback, null, true);
-  else
+  if (options.audio || options.video) {
+      self._myGetUserMedia(options, initiateCallback, null, true, sid);
+  } else {
       initiateCallback(null);
-
+  }
   //return an object with a cancel() method
   return {
       sid: sid,
+      callOptions: options,
       cancel: function() {
-        if (state === 2)
+        if (state === STATE_PEER_ANS_OR_TIMEOUT)
             return false;
-        if (state === 1) { //same as if (ansHandler)
-            state = 4;
+        if (state === STATE_GOT_USERMEDIA_WAIT_PEER) { //same as if (ansHandler)
+            state = STATE_CALL_CANCELED_BY_US;
             self.connection.deleteHandler(ansHandler);
             ansHandler = null;
             self.connection.deleteHandler(declineHandler);
             declineHandler = null;
 
-            self._freeLocalStreamIfUnused();
+            self._unrefLocalStream(options.video);
             self.connection.send($msg({
                 to:Strophe.getBareJidFromJid(targetJid),
                 sid: sid,
                 reason: 'caller',
                 type: 'megaCallCancel'
             }));
-            self.trigger('call-canceled-caller', {peer: targetJid, info: { sid: sid, reason: 'caller' }});
+            self.trigger('call-canceled-caller', {peer: targetJid, info: { sid: sid, reason: 'caller' }, callOptions: options});
             return true;
-        } else if (state === 0) {
-            state = 4;
+        } else if (state === STATE_NO_USERMEDIA_YET) {
+            state = STATE_CALL_CANCELED_BY_US;
             return true;
         }
         console.warn("RtcSession: BUG: cancel() called when state has an unexpected value of", state);
@@ -624,49 +660,33 @@ RtcSession.prototype = {
   }};
  },
 
+/** Terminates all current calls and file transfers */
+hangupAll: function()
+{
+    this.jingle.terminateAll('hangup', '');
+    for (var asid in this.jingle.acceptCallsFrom) {
+        this.jingle.cancelAutoAnswerEntry(asid, 'hangup', '');
+    }
+},
  /**
-    Terminates an ongoing (media) call
-    @param {string} [jid]
-        The JID of the peer, serves to identify the call. If no jid is specified,
-        all current calls are terminated. If JID is a bare JID, all calls to this bare JID
-        will be terminated. If it is a full JID, only the call to that full JID is terminated
-        Note that this function does not terminate file transfer calls
-        @param {boolean} [all] If set to true, does not filter only media calls, and can terminate
-                               data calls as well
+    Terminates an ongoing call or file transfer
+    @param {string} sid The sid of the session to hangup.
+    @returns {bool} true if the sid matched a call, false otherwsise
  */
- hangup: function(jid, all)
+ hangup: function(sid)
  {
-    var isBareJid = jid && (jid.indexOf('/') < 0);
-    var sessions = this.jingle.sessions;
-    for (var sid in sessions) {
-        var sess = sessions[sid];
-        if (sess.fileTransferHandler && !all)
-            continue;
-        if (jid) {
-            if (isBareJid) {
-                 if (Strophe.getBareJidFromJid(sess.peerjid) != jid)
-                    continue;
-            } else {
-                if (sess.peerjid != jid)
-                    continue;
-            }
-        }
+    var sess = this.jingle.sessions[sid];
+    if (sess) {
         this.jingle.terminateBySid(sid, 'hangup');
+        return true;
     }
-    var autoAnswers = this.jingle.acceptCallsFrom;
-    for (var aid in autoAnswers) {
-        var item = autoAnswers[aid];
-        if (jid) {
-            if (isBareJid) {
-                if (Strophe.getBareJidFromJid(item.from) != jid)
-                    continue;
-            } else {
-                if (item.from != jid)
-                    continue;
-            }
-        }
-        this.jingle.cancelAutoAnswerEntry(aid, 'hangup', '', all?undefined:'m');
+
+    var item = this.jingle.acceptCallsFrom[sid];
+    if (item) {
+        this.jingle.cancelAutoAnswerEntry(sid, 'hangup', '');
+        return true;
     }
+    return false;
  },
 
  /**
@@ -686,53 +706,72 @@ RtcSession.prototype = {
  muteUnmute: function(state, what, jid)
  {
     var sessions = this._getSessionsForJid(jid);
-    if (!sessions)
+    if (!sessions) {
         return false;
+    }
 // If we are muting all calls, disable also local video playback as well
 // In Firefox, all local streams are only references to gLocalStream, so muting any of them
 // mutes all and the local video playback.
 // In Chrome all local streams are independent, so the local video stream has to be
 // muted explicitly as well
-    if (what.video && RtcSession.gLocalVid && (!jid || (sessions.length >= RtcSession.gLocalStreamRefcount))) {
-        if (state)
-            RtcSession._disableLocalVid(this);
-        else
-            RtcSession._enableLocalVid(this);
+    for (var i=0; i<sessions.length; i++) {
+        var sess = sessions[i];
+        if (what.video && this.gLocalVid) {
+            if (state) {//mute
+                if (!sess.mutedState.videoMuted) {
+                    this.gLocalVidRefcount--;
+                }
+            } else { //unmute
+                if (sess.mutedState.videoMuted) {
+                    this.gLocalVidRefcount++;
+                }
+            }
+        }
+        sess.muteUnmute(state, what);
     }
-    for (var i=0; i<sessions.length; i++)
-        sessions[i].muteUnmute(state, what);
+    if (this.gLocalVid) {
+        if (this.gLocalVidRefcount <= 0) {
+            this._disableLocalVid(); //does nothing if already disabled
+        } else {
+            this._enableLocalVid(); //does nothing if already enabled
+        }
+    }
     return true;
  },
  _getSessionsForJid: function(jid) {
     var sessions = [];
     if (!jid) {
-        for (var k in this.jingle.sessions)
+        for (var k in this.jingle.sessions) {
             sessions.push(this.jingle.sessions[k]);
-        if (sessions.length < 1)
+        }
+        if (sessions.length < 1) {
             return null;
+        }
     } else {
         var isFullJid = (jid.indexOf('/') >= 0);
         for(var sid in this.jingle.sessions) {
             var sess = this.jingle.sessions[sid];
             if (isFullJid) {
-                if (sess.peerjid === jid)
+                if (sess.peerjid === jid) {
                     sessions.push(sess);
+                }
             } else {
-            if (Strophe.getBareJidFromJid(sess.peerjid) === jid)
-                sessions.push(sess);
+                if (Strophe.getBareJidFromJid(sess.peerjid) === jid) {
+                    sessions.push(sess);
+                }
             }
         }
     }
     return sessions;
  },
- _onPresenceUnavailable: function(pres)
- {
+ _onPresenceUnavailable: function(pres) {
     var from = $(pres).attr('from');
     var sessions = this.jingle.sessions;
     for (var sid in sessions) {
         var sess = sessions[sid];
-        if (sess.peerjid === from)
-            this.jingle.terminate(sess, 'peer-disconnected');
+        if (sess.peerjid === from) {
+            this.jingle.terminate(sess, 'peer-xmpp-disconnect');
+        }
     }
     return true; //We dont want this handler to be deleted
  },
@@ -740,27 +779,28 @@ RtcSession.prototype = {
  _onMediaReady: function(localStream) {
 // localStream is actually RtcSession.gLocalStream
 
-    for (var i = 0; i < localStream.getAudioTracks().length; i++)
+    for (var i = 0; i < localStream.getAudioTracks().length; i++) {
         console.log('using audio device "' +localStream.getAudioTracks()[i].label + '"');
-
-    for (i = 0; i < localStream.getVideoTracks().length; i++)
+    }
+    for (i = 0; i < localStream.getVideoTracks().length; i++) {
         console.log('using video device "' + localStream.getVideoTracks()[i].label + '"');
-
+    }
     // mute video on firefox and recent canary
     var elemClass = "localViewport";
-    if (localStream.getVideoTracks().length < 1)
+    if (localStream.getVideoTracks().length < 1) {
         elemClass +=" localNoVideo";
-
-    if (RtcSession.gLocalVid)
+    }
+    if (this.gLocalVid) {
         throw new Error("Local stream just obtained, but localVid was not null");
-
-    var vid = $('<video class="'+elemClass+'" autoplay="autoplay" />');
-    if (vid.length < 1)
+    }
+    var vid = $('<video class="'+elemClass+'" autoplay="autoplay" defaultMuted="true" muted="true" volume="0"/>');
+    if (vid.length < 1) {
         throw new Error("Failed to create local video element");
+    }
     vid = vid[0];
-    vid.muted = true;
+    vid.muted = vid.defaultMuted = true;
     vid.volume = 0;
-    RtcSession.gLocalVid = vid;
+    this.gLocalVid = vid;
     /**
         Local media stream has just been opened and a video element was
         created (the player param), but not yet added to the DOM. The stream object
@@ -784,8 +824,7 @@ RtcSession.prototype = {
     RtcSession._maybeCreateVolMon();
  },
 
- onIncomingCallRequest: function(params, ansFunc)
- {
+ onIncomingCallRequest: function(params, ansFunc) {
     var self = this;
     /**
     Incoming call request received
@@ -807,11 +846,15 @@ RtcSession.prototype = {
     */
     params.answer = 
     function(accept, obj) {
-        if (!params.reqStillValid()) //expired
+        if (!params.reqStillValid()) {//expired
             return false;
-
-        if (!accept)
-            return ansFunc(false, {reason: obj.reason?obj.reason:'busy', text: obj.text});
+        }
+        if (!accept) {
+            return ansFunc(false, {
+                reason: obj.reason?obj.reason:'busy',
+                text: obj.text
+            });
+        }
         if (!params.files) {
             var media = obj.mediaOptions;
             self._myGetUserMedia(media,
@@ -830,13 +873,14 @@ RtcSession.prototype = {
                     });
                 },
                 //allow to answer with no media only if peer is sending something
-                (params.peerMedia.audio || params.peerMedia.video)
+                (params.peerMedia.audio || params.peerMedia.video),
+                params.sid
             );
-    } else {//file transfer
-         ansFunc(true, {});
-     }
-          return true;
+        } else {//file transfer
+            ansFunc(true, {});
     }
+    return true;
+    };
     this.trigger('call-incoming-request', params);
     /**
     Function parameter to <i>call-incoming-request</i> to check if the call request is still valid
@@ -926,7 +970,7 @@ RtcSession.prototype = {
     sess.tsMediaStart = Date.now();
  },
 
- onCallTerminated: function(sess, reason, text) {
+ onCallTerminated: function(sess, reason, text, errInfo) {
  try {
  //WARNING: sess may be a dummy object, only with peerjid property, in case something went
  //wrong before the actual session was created, e.g. if SRTP fingerprint verification failed
@@ -961,12 +1005,24 @@ RtcSession.prototype = {
         var stats = obj.stats = sess.statsRecorder.terminate(this._makeCallId(sess));
         stats.isCaller = sess.isInitiator?1:0;
         stats.termRsn = reason;
+        if (text) {
+            stats.termMsg = text;
+        }
+        if (errInfo) {
+            stats.errInfo = errInfo;
+        }
     } else { //no stats, but will still provide callId and duration
         var bstats = obj.basicStats = {
             isCaller: sess.isInitiator?1:0,
             termRsn: reason,
             bws: stats_getBrowserVersion()
         };
+        if (text) {
+            bstats.termMsg = text;
+        }
+        if (errInfo) {
+            bstats.errInfo = errInfo;
+        }
 
         if (sess.fake) {
             sess.me = this.jid; //just in case someone wants to access the own jid of the fake session
@@ -985,24 +1041,22 @@ RtcSession.prototype = {
             data: JSON.stringify(obj.stats||obj.basicStats)
     });
     this.trigger('call-ended', obj);
-    if (!sess.fake) { //non-fake session
+//release local video
+    var videoUsed;
+    if (sess.localStream) { //a fake session can also have a localStream, e.g. in case of initiate-timeout
+        var vt = sess.localStream.getVideoTracks();
+        videoUsed = ((vt.length > 0) && vt[0].enabled);
         delete sess.localStream;
-        this.removeVideo(sess);
+    } else {
+        videoUsed = false;
     }
-    this._freeLocalStreamIfUnused();
+    if (sess.remoteStream) {
+        this.removeVideo(sess); //remove remote video
+    }
+    this._unrefLocalStream(videoUsed);
  } catch(e) {
-    console.error("onTerminate() handler threw an exception:\n", e.stack?e.stack:e);
+    this.jingle.onInternalError("onTerminate() handler threw an exception", {e:e});
  }
- },
-
- _freeLocalStreamIfUnused: function() {
-     var sessions = this.jingle.sessions;
-    for (var sess in sessions)
-        if (sessions[sess].localStream) //in use
-            return;
-
-//last call ended
-    this._unrefLocalStream();
  },
 
  waitForRemoteMedia: function(playerElem, sess) {
@@ -1095,52 +1149,14 @@ RtcSession.prototype = {
  },
 
  /**
-    Get info whether local audio and video are being sent at the moment in a call to the specified JID
-    @param {string} fullJid The <b>full</b> JID of the peer to whom there is an ongoing call
-    @returns {{audio: Boolean, video: Boolean}} If there is no call to the specified JID, null is returned
+     Get a SessWrapper object for a session, identified by the specified sid
+     @param {string} sid The sid of the session
  */
- getSentMediaTypes: function(fullJid)
- {
-     var sess = this.getMediaSessionToJid(fullJid);
+ getSessionBySid: function(sid) {
+     var sess = this.jingle.sessions[sid];
      if (!sess)
-        return null;
-//we don't use sess.mutedState because in Forefox we don't have a separate
-//local streams for each session, so (un)muting one session's local stream applies to all
-//other sessions, making mutedState out of sync
-    var audTracks = sess.localStream.getAudioTracks();
-    var vidTracks = sess.localStream.getVideoTracks();
-    return {
-        audio: (audTracks.length > 0) && audTracks[0].enabled,
-        video: (vidTracks.length > 0) && vidTracks[0].enabled
-    }
- },
-
- /**
-    Get info whether remote audio and video are being received at the moment in a call to the specified JID
-    @param {string} fullJid The full peer JID to identify the call
-    @returns {{audio: Boolean, video: Boolean}} If there is no call to the specified JID, null is returned
- */
- getReceivedMediaTypes: function(fullJid) {
-    var sess = this.getMediaSessionToJid(fullJid);
-    if (!sess)
-        return null;
-    var m = sess.remoteMutedState;
-    return {
-        audio: (sess.remoteStream.getAudioTracks().length > 0) && !m.audioMuted,
-        video: (sess.remoteStream.getVideoTracks().length > 0) && !m.videoMuted
-    }
- },
-
- getMediaSessionToJid: function(fullJid) {
- //TODO: We get only the first media session to fullJid, but there may be more
-    var sessions = this.jingle.sessions;
-    for (var sid in sessions) {
-        var s = sessions[sid];
-        if (s.peerjid === fullJid) {
-            return s;
-        }
-    }
-    return null;
+         return null;
+     return new SessWrapper(sess);
  },
 
 /**
@@ -1178,22 +1194,26 @@ RtcSession.prototype = {
  */
  _attachRemoteStreamHandlers: function(stream)
  {
+/* We currently get remote stream mute events over jingle, not over webrtc
+    var self = this;
     var at = stream.getAudioTracks();
     for (var i=0; i<at.length; i++)
-        at[i].onmute =
-        function(e) {
-            this.trigger('remote-audio-muted', stream);
+        at[i].onmute = function(e) {
+            self.trigger('remote-audio-muted', stream);
         };
     var vt = stream.getVideoTracks();
     for (var i=0; i<vt.length; i++)
-        vt[i].muted = function(e) {
-            this.trigger('remote-video-muted', stream);
+        vt[i].onmute = function(e) {
+            self.trigger('remote-video-muted', stream);
         };
+*/
  },
  _refLocalStream: function(sendsVideo) {
-    RtcSession.gLocalStreamRefcount++;
-    if (sendsVideo)
-        RtcSession._enableLocalVid(this);
+    this.gLocalStreamRefcount++;
+    if (sendsVideo) {
+        this.gLocalVidRefcount++;
+        this._enableLocalVid(this);
+    }
     /**
       @event "local-stream-connect"
       @type {object}
@@ -1202,35 +1222,83 @@ RtcSession.prototype = {
       of whether the local stream has been just obtained or not, i.e. this
       event is always fired during a call setup
     */
-    this.trigger('local-stream-connect', {player: RtcSession.gLocalVid});
+    this.trigger('local-stream-connect', {player: this.gLocalVid});
  },
- _unrefLocalStream: function() {
-    var cnt = --RtcSession.gLocalStreamRefcount;
-    if (cnt > 0)
+ _unrefLocalStream: function(video) {
+     if (!this.gLocalStream) {
+         console.warn('_unrefLocalStream: gLocalStream is null. This is normal if access to camera was denined. refcount= ',
+             this.gLocalStreamRefcount, 'vidRefCount =', this.gLocalVidRefcount);
+         this.gLocalStreamRefcount = 0;
+         this.gLocalVidRefcount = 0;
+         return;
+     }
+
+     this.assert(this.gLocalStreamRefcount > 0, "unrefLocalStream: refcount is already <= 0");
+     this.assert((!video) || (this.gLocalVidRefcount > 0), "unrefLocalStream: unreferencing video, but its refcount is already <= 0");
+
+//localStream is not null
+     if (video) {
+        if (--this.gLocalVidRefcount <= 0)
+            this._disableLocalVid();
+    }
+    if (--this.gLocalStreamRefcount > 0)
         return;
 
-    if (!RtcSession.gLocalStream) {
-        console.warn('RtcSession.unrefLocalStream: gLocalStream is null. refcount = ', cnt);
-        return;
-    }
     this._freeLocalStream();
  },
  _freeLocalStream: function() {
-    RtcSession.gLocalStreamRefcount = 0;
-    if (!RtcSession.gLocalStream)
+    if (this.gLocalStreamRefcount > 0) {
+        this.jingle.onInternalError("_freeLocalStream: gLocalStreamRefcount is > 0, wont free it, aborting");
         return;
-    RtcSession._disableLocalVid(this);
+    }
+    if (this.gLocalVidRefcount > 0) {
+        this.jingle.onInternalError("_freeLocalStream: gLocalVidRefcount is > 0, but gLocalStreamRefcount is <=0 , aborting");
+        return;
+    }
+
+    if (!this.gLocalStream) {
+        return;
+    }
 /**
     Local stream is about to be closed and local video player to be destroyed
     @event local-video-destroy
     @type {object}
     @property {DOM} player The local video player, which is about to be destroyed
 */
-    this.trigger('local-player-remove', {player: RtcSession.gLocalVid});
-    RtcSession.gLocalVid = null;
-    RtcSession.gLocalStream.stop();
-    RtcSession.gLocalStream = null;
+    this.trigger('local-player-remove', {player: this.gLocalVid});
+    this.gLocalVid = null;
+    this.gLocalStream.stop();
+    this.gLocalStream = null;
  },
+ _disableLocalVid: function() {
+    if (!this._localVidEnabled)
+        return;
+    // All references to local video are muted, disable local video display
+    // We need sess only to have where an object to trigger the event on
+        RTC.attachMediaStream($(this.gLocalVid), null);
+    /**
+        Local camera playback has been disabled because all calls have muted their video
+        @event local-video-disabled
+        @type {object}
+        @property {DOM} player - the local camera video HTML element
+    */
+        this._localVidEnabled = false;
+        this.trigger('local-video-disabled', {player: this.gLocalVid});
+  },
+ _enableLocalVid: function() {
+     if(this._localVidEnabled)
+         return;
+     RTC.attachMediaStream($(this.gLocalVid), this.gLocalStream);
+    /**
+        Local video playback has been re-enabled because at least one call started sending video
+        @event local-video-enabled
+        @type {object}
+        @property {DOM} player The local video player HTML element
+    */
+     this.trigger('local-video-enabled', {player: this.gLocalVid});
+     this.gLocalVid.play();
+     this._localVidEnabled = true;
+  },
 
  trigger: function(name, obj) {
     if (this.logEvent)
@@ -1238,8 +1306,13 @@ RtcSession.prototype = {
     try {
         $(this).trigger(name, [obj]);
     } catch(e) {
-        console.error("Exception thrown from user event handler '"+name+"':\n"+e.stack?e.stack:e);
+        this.jingle.onInternalError("Exception thrown from user event handler '"+name+"'", {e:e});
     }
+ },
+ assert: function(cond, msg) {
+     if (!cond) {
+         this.jingle.onInternalError("Assertion failed: "+ msg);
+     }
  },
  /**
     Releases any global resources referenced by this instance, such as the reference
@@ -1248,7 +1321,6 @@ RtcSession.prototype = {
  */
  destroy: function() {
     this.hangup();
-    this._freeLocalStream();
  },
 
 /** Returns whether the call or file transfer with the given
@@ -1264,12 +1336,11 @@ RtcSession.prototype = {
      return sess.statsRecorder.isRelay();
  },
 
- _requiredLocalStream: function(channels) {
-    if (channels.video)
-        return RtcSession.gLocalAudioVideoStream;
-      else
-        return RtcSession.gLocalAudioOnlyStream;
-  }
+ onInternalError: function(msg, info) {
+     if (srvlog) {
+         srvlog("WEBRTC: "+msg, info, true); //log to #jscrashes
+     }
+ }
 }
 
 
@@ -1314,38 +1385,6 @@ RtcSession.xmlUnescape = function(text) {
                .replace(/\&quot;/g, '"');
 }
 
-RtcSession._disableLocalVid = function(rtc) {
-    if (!this._localVidEnabled)
-        return;
-// All references to local video are muted, disable local video display
-// We need sess only to have where an object to trigger the event on
-    RTC.attachMediaStream($(this.gLocalVid), null);
-/**
-    Local camera playback has been disabled because all calls have muted their video
-    @event local-video-disabled
-    @type {object}
-    @property {DOM} player - the local camera video HTML element
-*/
-    this._localVidEnabled = false;
-    rtc.trigger('local-video-disabled', {player: this.gLocalVid});
-
-}
-
-RtcSession._enableLocalVid = function(rtc) {
-    if(this._localVidEnabled)
-        return;
-    RTC.attachMediaStream($(this.gLocalVid), this.gLocalStream);
-/**
-    Local video playback has been re-enabled because at least one call started sending video
-    @event local-video-enabled
-    @type {object}
-    @property {DOM} player The local video player HTML element
-*/
-    rtc.trigger('local-video-enabled', {player: this.gLocalVid});
-    this.gLocalVid.play();
-    this._localVidEnabled = true;
-}
-
 /**
  Creates a unique string identifying the call,
  that is independent of whether the
@@ -1379,7 +1418,7 @@ SessWrapper.prototype = {
     The remote peer's full JID
     @returns {string}
 */
-peerJid: function(){
+peerJid: function() {
     return this._sess.peerjid;
 },
 
@@ -1388,7 +1427,7 @@ peerJid: function(){
     @returns {string}
 */
 jid:function() {
-return this._sess.jid;
+    return this._sess.jid;
 },
 
 /**
@@ -1440,12 +1479,59 @@ isRelay: function() {
         return undefined;
     else
         return statsRec.isRelay();
-}
+},
+/**
+    Get info whether local audio and video are being sent at the moment in that session
+    @returns {{audio: Boolean, video: Boolean}} If the session is fake, null is returned
+*/
+sentMediaTypes: function()
+{
+    var sess = this._sess;
+    if (sess.isFake) {
+        return null;
+    }
+    var localStream = sess.localStream;
+    if (!sess.localStream) {
+        return { audio: false, video: false};
+    }
+
+   //we don't use sess.mutedState because in Forefox we don't have a separate
+   //local streams for each session, so (un)muting one session's local stream applies to all
+   //other sessions, making mutedState out of sync
+    var audTracks = localStream.getAudioTracks();
+    var vidTracks = localStream.getVideoTracks();
+    return {
+        audio: (audTracks.length > 0) && audTracks[0].enabled,
+        video: (vidTracks.length > 0) && vidTracks[0].enabled
+    }
+},
+
+/**
+    Get info whether remote audio and video are being received at the moment in that session
+    @returns {{audio: Boolean, video: Boolean}} If the session is fake, null is returned
+*/
+receivedMediaTypes: function() {
+    var sess = this._sess;
+    if (sess.isFake) {
+        return null;
+    }
+    var remoteStream = sess.remoteStream;
+    if (!remoteStream) {
+        return {audio: false, video: false};
+    }
+
+    var m = sess.remoteMutedState;
+    return {
+        audio: (remoteStream.getAudioTracks().length > 0) && !m.audioMuted,
+        video: (remoteStream.getVideoTracks().length > 0) && !m.videoMuted
+    }
+},
+
 }
 function getStreamAv(stream) {
-    if (!stream)
+    if (!stream) {
         return {audio:false, video: false};
-
+    }
     var result = {};
     result.audio = (stream.getAudioTracks().length > 0);
     result.video = (stream.getVideoTracks().length > 0);

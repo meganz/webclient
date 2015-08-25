@@ -1,0 +1,67 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/Tr</xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>MEGA 2.0</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+        <link rel="stylesheet" type="text/css" href="../css/style.css" />
+        <script type="text/javascript" src="../js/jquery-2.1.1.js"></script>
+		<script type="text/javascript" src="../js/jquery.jscrollpane.js"></script>
+		<script type="text/javascript" src="../js/jquery.mousewheel.js"></script>
+		<script type="text/javascript">
+        $(document).ready(function() {  
+		
+            $('.payment-close-icon').unbind('click');
+			$('.payment-close-icon').bind('click', function() {
+				$(this).closest('.payment-result').addClass('hidden');
+				$('.fm-dialog-overlay').removeClass('payment-dialog-overlay').addClass('hidden');
+			});
+			  
+		});
+        
+        </script>
+        
+    </head>
+
+    <body id="bodyel" class="bottom-pages">
+
+        <div class="fm-dialog-overlay payment-dialog-overlay"></div>
+        
+        <!-- Payment processing !-->
+        <div class="payment-processing hidden">
+          <div class="payment-animation-pad">
+             <div class="payment-animation"></div>
+             <div class="payment-animation-txt">Processing your payment ...</div>
+          </div>
+        </div>
+        
+        <!-- Payment success !-->
+        <div class="payment-result success">
+          <div class="payment-close">
+             <div class="payment-close-icon"></div>
+             <span>or Esc</span>
+          </div>
+          <div class="payment-result-pad">
+             <div class="payment-rusult-header">Purchase Successful!</div>
+             <div class="payment-result-txt">You successfully upgraded your account to PRO I</div>
+             <div class="payment-result-icon"></div>
+             <div class="payment-result-button">GO TO MY ACCOUNT</div>
+          </div>
+        </div>
+        
+        <!-- Payment failed !-->
+        <div class="payment-result failed hidden">
+          <div class="payment-close">
+             <div class="payment-close-icon"></div>
+             <span>or Esc</span>
+          </div>
+          <div class="payment-result-pad">
+             <div class="payment-rusult-header">Something went wrong</div>
+             <div class="payment-result-txt">Please verify your payment information and try again.</div>
+             <div class="payment-result-icon"></div>
+             <div class="payment-result-button">TRY AGAIN</div>
+          </div>
+        </div>
+        
+    </body>
+</html>

@@ -43,7 +43,9 @@ UrlFilter.prototype.processMessage = function(e, eventData) {
                         tag.setAttr('onclick', "window.location = '#fm/" + contactFound.h + "';");
                         tag.setAttr('target', "");
                         tag.addClass("inline-profile-link");
-                        tag.innerHtml = '<div class="nw-contact-avatar ' + htmlentities(contactFound.h) + '">' + generateAvatarElement(contactFound.h)[0].outerHTML + '</div>' + tag.innerHtml;
+                        tag.innerHtml = '<div class="nw-contact-avatar ' + htmlentities(contactFound.h) + '">'
+                            +  usercontact.contact(contactFound, 'av', 'span')
+                        + '</div>' + tag.innerHtml;
                         return tag;
 
                     } else {

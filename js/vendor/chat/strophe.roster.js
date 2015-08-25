@@ -415,7 +415,7 @@ Strophe.addConnectionPlugin('roster',
             return;
         }
 
-        var item = this.findItem(jid);
+        item = this.findItem(jid);
         if (!item)
         {
             this.items.push({

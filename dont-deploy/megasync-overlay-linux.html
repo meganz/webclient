@@ -1,0 +1,160 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title></title>
+<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+<link rel="stylesheet" type="text/css" href="../css/style.css" />
+<script type="text/javascript" src="../js/jquery-2.1.1.js"></script>
+<script type="text/javascript" src="../js/jquery.jscrollpane.js"></script>
+<script type="text/javascript" src="../js/jquery.mousewheel.js"></script>
+<script type="text/javascript">
+$(document).ready(function() { 
+   
+   function linuxDropdownScroll() {
+	   
+	   var $pane = $('.megasync-dropdown-scroll'),
+	       api = $pane.data('jsp'),
+		   $list = $('.megasync-dropdown-list'),
+		   overlayHeight = $('.megasync-overlay').outerHeight(),
+	       listHeight = $('.megasync-scr-pad').outerHeight() + 72,
+		   listPosition = $list.offset().top;
+	   
+	   if (overlayHeight < (listHeight + listPosition)) {
+		   $('.megasync-list-arrow').removeClass('hidden inactive');
+		   $pane.height(overlayHeight - listPosition - 72);
+		   $pane.jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true});
+		   
+		   
+		   $pane.bind('jsp-arrow-change', function(event, isAtTop, isAtBottom, isAtLeft, isAtRight) {
+               if (isAtBottom) {
+				   $('.megasync-list-arrow').addClass('inactive');
+			   } else {
+				   $('.megasync-list-arrow').removeClass('inactive');
+			   }
+           });
+		   
+	   } else {
+		    api.destroy();
+			$pane.unbind('jsp-arrow-change');
+		    $('.megasync-dropdown-scroll').removeAttr('style');
+			$('.megasync-list-arrow').addClass('hidden');
+	   }
+	   
+   }
+
+   $('.megasync-dropdown span').unbind('click');
+   $('.megasync-dropdown span').bind('click', function() {
+	   if ($(this).hasClass('active')) {
+		   $(this).removeClass('active');
+		   $('.megasync-dropdown-list').addClass('hidden');
+	   } else {
+		   $(this).addClass('active');
+		   $('.megasync-dropdown-list').removeClass('hidden');
+		   linuxDropdownScroll();
+	   }
+   });
+   
+   $('.megasync-dropdown-link').unbind('click');
+   $('.megasync-dropdown-link').bind('click', function() {
+	   $('.megasync-dropdown span').removeClass('active').text($(this).text());
+	   $('.megasync-dropdown-list').addClass('hidden');
+   });
+
+   $(window).bind('resize.linuxDropdown', function() {
+	  linuxDropdownScroll(); 
+   });
+});
+
+</script>
+</head>
+
+<body>
+
+<div class="megasync-overlay linux">
+   <div class="megasync-content">
+       <div class="megasync-logo"></div>
+       <div class="megasync-info">MEGAsync is being downloaded to your computer. Please install it as soon as the download has completed.<br />Once MEGAsync is running, your file will start downloading automatically.</div>
+       <div class="megasync-dropdown">
+       		<span>Please select your Linux Distro</span>
+       </div>
+       <div class="megasync-dropdown-list hidden">
+       		<div class="megasync-dropdown-pad">
+                <div class="megasync-dropdown-scroll">
+                	<div class="megasync-scr-pad">
+                        <div class="megasync-dropdown-link centos">CentOS 7.0</div>
+                        <div class="megasync-dropdown-link debian">Debian 7.0</div>
+                        <div class="megasync-dropdown-link debian">Debian 8.0</div>
+                        <div class="megasync-dropdown-link elementary">Elementary OS Freya</div>
+                        <div class="megasync-dropdown-link fedora">Fedora 19</div>
+                        <div class="megasync-dropdown-link fedora">Fedora 20</div>
+                        <div class="megasync-dropdown-link fedora">Fedora 21</div>
+                        <div class="megasync-dropdown-link mint">Mint 17</div>
+                        <div class="megasync-dropdown-link opensuse">OpenSUSE 12.2</div>
+                        <div class="megasync-dropdown-link opensuse">OpenSUSE 12.3</div>
+                        <div class="megasync-dropdown-link opensuse">OpenSUSE 13.1</div>
+                        <div class="megasync-dropdown-link opensuse">OpenSUSE 13.2</div>
+                        <div class="megasync-dropdown-link redhat">Red Hat 7</div>
+                        <div class="megasync-dropdown-link ubuntu">Ubuntu 12.04</div>
+                        <div class="megasync-dropdown-link ubuntu">Ubuntu 12.10</div>
+                        <div class="megasync-dropdown-link ubuntu">Ubuntu 13.10</div>
+                        <div class="megasync-dropdown-link ubuntu">Ubuntu 14.04</div>
+                        <div class="megasync-dropdown-link ubuntu">Ubuntu 14.10</div>
+                        <div class="megasync-dropdown-link ubuntu">Ubuntu 15.04</div>
+                    </div>
+                </div>
+                <div class="megasync-list-arrow hidden"></div>
+            </div>
+       </div>
+       <div class="megasync-table">
+       		<table border="0" cellspacing="0" cellpadding="0">
+            	<tr>
+                  <th>
+    			  </th>
+                  <th>
+    			  	<span class="globe">Web Browser</span>
+    			  </th>
+                  <th>
+    			  	<span class="sync">MEGAsync</span>
+    			  </th>
+                </tr>
+                <tr>
+                  <td>
+    			  	<span>Transfer Speed:</span>
+    			  </td>
+                  <td>
+    			  	<span class="dots">Fast</span>
+    			  </td>
+                  <td>
+    			  	<span class="tick">FASTER</span>
+    			  </td>
+                </tr>
+                <tr>
+                  <td>
+    			  	<span>Resource Usage:</span>
+    			  </td>
+                  <td>
+    			  	<span class="dots">Gluttonous</span>
+    			  </td>
+                  <td>
+    			  	<span class="tick">LEAN & MEAN</span>
+    			  </td>
+                </tr>
+                <tr>
+                  <td>
+    			  	<span>File Size:</span>
+    			  </td>
+                  <td>
+    			  	<span class="dots">Limited</span>
+    			  </td>
+                  <td>
+    			  	<span class="tick">UNLIMITED</span>
+    			  </td>
+                </tr>
+            </table>
+       </div>
+   </div>
+</div>
+
+</body>
+</html>

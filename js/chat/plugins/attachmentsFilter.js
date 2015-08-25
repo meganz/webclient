@@ -85,7 +85,7 @@ AttachmentsFilter.prototype.processBeforeRenderMessage = function(e, eventData) 
         if(attachment.t == 0) {
             // is file
             $('.block-view-file-type', $element).addClass(
-                fileicon({'name': attachment.name})
+                fileIcon({'name': attachment.name})
             );
 
             $('.nw-chat-sharing-filesize', $element).text(bytesToSize(attachment.s));

@@ -1,13 +1,19 @@
 <div class="top-head"> 
   <div class="top-centered-margin">
     <a class="logo"></a>
-    <div class="beta-text-red"></div>
-    <a class="feedback-button hidden" href="javascript:;">Feedback</a>
+    <a class="feedback-button hidden">[$1356]</a>
     <a class="top-menu-icon">[$169]</a>
     <div class="top-menu-popup">
        <div class="top-menu-arrow"></div>
-       <div class="top-menu-item upgrade-your-account">[$920]</div>
-       <div class="context-menu-divider upgrade-your-account"></div>
+       <div class="top-menu-item account">[$187]</div>
+       <div class="top-menu-item contains-submenu pro-item">
+          <span>[$5814]</span>
+          <div class="top-submenu-popup">
+            <div class="top-menu-item upgrade-your-account">[$1488]</div>
+            <div class="top-menu-item resellers">[$391]</div>        
+          </div>
+       </div>
+       <div class="context-menu-divider"></div>
        <div class="top-menu-item contains-submenu">
           MEGA
           <div class="top-submenu-popup">
@@ -30,7 +36,6 @@
           <div class="top-submenu-popup">
             <div class="top-menu-item help">[$384]</div>
             <div class="top-menu-item contact">[$399]</div>
-			<div class="top-menu-item resellers">[$391]</div>
           </div>
        </div> 
        <div class="top-menu-item contains-submenu">
@@ -38,7 +43,6 @@
           <div class="top-submenu-popup">
             <div class="top-menu-item sdk">[$962]</div>
             <div class="top-menu-item doc">[$963]</div>
-            <div class="top-menu-item aff">[$964]</div>
           </div>
        </div> 
        <div class="top-menu-item contains-submenu">
@@ -48,7 +52,6 @@
             <div class="top-menu-item privacypolicy">[$386]</div>
             <div class="top-menu-item copyright">[$387]</div>
             <div class="top-menu-item takedown">[$966]</div>
-			<div class="top-menu-item affiliateterms">[$1200]</div>
           </div>
        </div>   
        <div class="top-menu-item megablog">[$389]</div> 
@@ -57,8 +60,8 @@
 	   <div class="top-menu-item login">[$171]</div>
 	   <div class="top-menu-item register">[$968]</div>	   
 	   <div class="top-menu-item clouddrive">[$164]</div> 
-       <div class="top-menu-item account">[$187]</div>	   
-       <div class="top-menu-item languages">[$670]</div>        
+       <div class="top-menu-item languages">[$670]</div> 
+       <div class="top-menu-item refresh-item">[$85]</div>       
        <div class="context-menu-divider logout"></div> 
        <div class="top-menu-item logout">[$967]</div>
     </div>
@@ -216,7 +219,7 @@ Don't want to wait? <a href="">Upgrade your account.</a></span>
       </div>
       </div>
       <div class="fm-notifications-bottom">
-          <div class="fm-dialog-button membership-button"><span>[$974]</span></div>
+          <div class="fm-dialog-button mem-button"><span>[$974]</span></div>
       </div>
     </div>
     <div class="membership-popup free-popup">
@@ -310,13 +313,13 @@ Please delete files or <a href="">upgrade your account.</a></span>
       </div>
 	  </div>
       <div class="fm-notifications-bottom">
-          <div class="fm-dialog-button membership-button"><span>[$974]</span></div>
+          <div class="fm-dialog-button mem-button"><span>[$974]</span></div>
       </div>
     </div>
     
     <a class="user-name"></a>
     
-    <a class="fm-avatar"><img alt="" src="{staticpath}images/mega/default-top-avatar.png"/></a>
+    <a class="fm-avatar"><img alt="" src="{avatar-top}"/></a>
     
     <div class="activity-status-block">
       <div class="loading-animation"></div>
@@ -327,20 +330,20 @@ Please delete files or <a href="">upgrade your account.</a></span>
        <div class="top-user-status-arrow"></div>
        <div class="top-user-status-item active"  data-presence="chat">
          <div class="activity-status online"></div>
-         <div class="top-user-status-txt">Online</div>
+         <div class="top-user-status-txt">[$5923]</div>
        </div>
        <div class="top-user-status-item" data-presence="away">
          <div class="activity-status away"></div>
-         <div class="top-user-status-txt">Away</div>
+         <div class="top-user-status-txt">[$5924]</div>
        </div>
        <div class="top-user-status-item"  data-presence="dnd">
          <div class="activity-status busy"></div>
-         <div class="top-user-status-txt">Busy</div>
+         <div class="top-user-status-txt">[$5925]</div>
        </div>
        <div class="context-menu-divider"></div> 
        <div class="top-user-status-item"  data-presence="unavailable">
          <div class="activity-status offline"></div>
-         <div class="top-user-status-txt">Offline</div>
+         <div class="top-user-status-txt">[$5926]</div>
        </div>
     </div>
     
@@ -355,24 +358,44 @@ Please delete files or <a href="">upgrade your account.</a></span>
       </div>
     </div>
     <div class="notification-popup empty">
-      <div class="notification-arrow"></div>
-      <div class="notification-header"> 
-        <a href="#notificationsettings" class="notification-settings hidden"></a>
-        <div class="notification-txt">[$862]</div>
-      </div>
-      <div class="notification-scroll">
-        <div class="notification-scr-list">
-           
+        <div class="notification-arrow"></div>
+        <div class="notification-header"> 
+            <a href="#notificationsettings" class="notification-settings hidden"></a>
+            <div class="notification-txt">[$862]</div>
         </div>
-      </div>
-      <div class="notification-popup-empty"> 
-        <div class="notification-empty-icon"></div>
-        <div class="notification-popup-empty-txt">[$79] [$862]</div>
-      </div>
-      <div class="fm-notifications-bottom">
-          <div class="fm-dialog-button notifications-button red"><span>See all notifications</span></div>
-          <div class="fm-dialog-button notifications-button clear-button"><span>Clear</span></div>
-      </div>
+        <div class="notification-scroll">
+            <div class="notification-scr-list">
+                <a class="notification-item template">
+                    <span class="notification-status-icon">
+                        <span class="notification-status"></span>
+                        <span class="notification-avatar">
+                            <span class="notification-avatar-icon"></span>
+                        </span>
+                        <span class="notification-type">
+                            <span class="notification-request-buttons hidden">
+                                <span class="fm-dialog-button notifications-button accept">
+                                    <span>[$5856]</span>
+                                </span>
+                            </span>
+                            <span class="notification-accepted">Accepted</span>
+                            <span class="notification-content">
+                                <span class="notification-username"></span>
+                                <span class="notification-info"></span>
+                                <span class="notification-date"></span>
+                            </span>
+                        </span>
+                    </span>
+                </a>
+            </div>
+        </div>
+        <div class="notification-popup-empty"> 
+            <div class="notification-empty-icon"></div>
+            <div class="notification-popup-empty-txt">[$79] [$862]</div>
+        </div>
+        <div class="fm-notifications-bottom hidden">
+            <div class="fm-dialog-button notifications-button red"><span>See all notifications</span></div>
+            <div class="fm-dialog-button notifications-button clear-button"><span>Clear</span></div>
+        </div>
     </div>
 	
     

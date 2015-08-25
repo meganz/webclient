@@ -1,10 +1,16 @@
 var b_u = 0;
-var maintenance=false;
+var apipath;
+var maintenance = false;
+var androidsplash = false;
+var URL = window.URL || window.webkitURL;
+var seqno = Math.ceil(Math.random()*1000000000);
+var staticpath = 'https://eu.static.mega.co.nz/3/';
 var ua = window.navigator.userAgent.toLowerCase();
 var is_chrome_firefox = document.location.protocol === 'chrome:' && document.location.host === 'mega' || document.location.protocol === 'mega:';
 var is_extension = is_chrome_firefox || document.location.href.substr(0,19) == 'chrome-extension://';
 var storage_version = '1'; // clear localStorage when version doesn't match
-var page = document.location.hash;
+var page = document.location.hash, l, d = false;
+var m = isMobile();
 
 function isMobile()
 {
@@ -31,12 +37,69 @@ function geoStaticpath(eu)
     return 'https://eu.static.mega.co.nz/3/';
 }
 
-if (ua.indexOf('chrome') > -1 && ua.indexOf('mobile') == -1 && parseInt(window.navigator.appVersion.match(/Chrome\/(\d+)\./)[1], 10) < 22) b_u = 1;
-else if (ua.indexOf('firefox') > -1 && typeof DataView == 'undefined') b_u = 1;
-else if (ua.indexOf('opera') > -1 && typeof window.webkitRequestFileSystem == 'undefined') b_u = 1;
-var apipath, staticpath = 'https://eu.static.mega.co.nz/3/';
-var myURL, URL = window.URL || window.webkitURL;
-if (!(myURL=URL)) b_u=1;
+if (ua.indexOf('chrome') !== -1 && ua.indexOf('mobile') === -1
+        && parseInt(navigator.appVersion.match(/Chrome\/(\d+)\./)[1]) < 22) {
+    b_u = 1;
+}
+else if (ua.indexOf('firefox') > -1 && typeof DataView === 'undefined') {
+    b_u = 1;
+}
+else if (ua.indexOf('opera') > -1 && typeof window.webkitRequestFileSystem === 'undefined') {
+    b_u = 1;
+}
+var myURL = URL;
+if (!myURL) {
+    b_u = 1;
+}
+
+if (!String.prototype.trim) {
+    String.prototype.trim = function() {
+        return this.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, '');
+    };
+}
+if (!String.trim) {
+    String.trim = function(s) {
+        return String(s).trim();
+    };
+}
+
+if (!m) {
+    try {
+        // Browser compatibility
+        // Fx 4.0   Chrome 5   MSIE 9   Opera 11.60   Safari 5.1
+        Object.defineProperty(this, 'megaChatIsDisabled', (function() {
+            var status;
+            return {
+                set: function(val) {
+                    status = val;
+                    if (status) {
+                        $(document.body).addClass("megaChatDisabled");
+                    }
+                    else {
+                        $(document.body).removeClass("megaChatDisabled");
+                    }
+                },
+                get: function() {
+                    return status || localStorage.testChatDisabled
+                        || (localStorage.chatDisabled !== undefined
+                            && localStorage.chatDisabled !== "0");
+                }
+            };
+        })());
+        // Check whether Mega Chat is enabled *and* initialized
+        Object.defineProperty(this, 'megaChatIsReady', {
+            get: function() {
+                return !megaChatIsDisabled
+                    && typeof megaChat !== 'undefined'
+                    && megaChat.is_initialized;
+            }
+        });
+    }
+    catch (ex) {
+        console.error(ex);
+        b_u = true;
+    }
+}
 
 if (!b_u) try
 {
@@ -63,7 +126,7 @@ if (!b_u) try
 
         try {
             var mozBrowserID =
-            [    Services.appinfo.name,
+            [   Services.appinfo.name,
                 Services.appinfo.platformVersion,
                 Services.appinfo.platformBuildID,
                 Services.appinfo.OS,
@@ -72,12 +135,12 @@ if (!b_u) try
             var mozBrowserID = ua;
         }
 
-        loadSubScript('chrome://mega/content/strg2.js');
+        loadSubScript('chrome://mega/content/strg.js');
 
-        if(!(localStorage instanceof Ci.nsIDOMStorage)) {
+        if (!(localStorage instanceof Ci.nsIDOMStorage)) {
             throw new Error('Invalid DOM Storage instance.');
         }
-        var d = !!localStorage.d;
+        d = !!localStorage.d;
     }
     if (typeof localStorage == 'undefined') b_u = 1;
     else
@@ -92,25 +155,30 @@ if (!b_u) try
             // set the staticpath for debug mode
             localStorage.staticpath = window.location.protocol + "//" + devhost + pathSuffix + "/";
             // localStorage.staticpath = location.protocol + "//" + location.host + location.pathname.replace(/[^/]+$/,'');
+            if (localStorage.d) {
+                console.debug('StaticPath set to "' + localStorage.staticpath + '"');
+            }
         }
         staticpath = localStorage.staticpath || geoStaticpath();
         apipath = localStorage.apipath || 'https://eu.api.mega.co.nz/';
     }
 }
-catch(e)
-{
-    alert(
-        "Sorry, we were unable to initialize the browser's local storage, "+
-        "either you're using an outdated browser or it's something from our side.\n"+
-        "\n"+
-        "If you think it's our fault, please report the issue back to us.\n"+
-        "\n"+
-        "Reason: " + (e.message || e)+
-        "\nBrowser: " + (typeof mozBrowserID !== 'undefined' ? mozBrowserID : ua)
-    );
-    b_u = 1;
+catch(e) {
+    if (!m || e.message !== 'SecurityError: DOM Exception 18') {
+        alert(
+            "Sorry, we were unable to initialize the browser's local storage, "+
+            "either you're using an outdated browser or it's something from our side.\n"+
+            "\n"+
+            "If you think it's our fault, please report the issue back to us.\n"+
+            "\n"+
+            "Reason: " + (e.message || e)+
+            "\nBrowser: " + (typeof mozBrowserID !== 'undefined' ? mozBrowserID : ua)
+        );
+        b_u = 1;
+    }
 }
 
+var mega = {ui: {}, utils: {}};
 var bootstaticpath = staticpath;
 var urlrootfile = '';
 
@@ -151,33 +219,68 @@ var ln ={}; ln.en = 'English'; ln.cn = '简体中文';  ln.ct = '中文繁體'; 
 var ln2 ={}; ln2.en = 'English'; ln2.cn = 'Chinese';  ln2.ct = 'Traditional Chinese'; ln2.ru = 'Russian'; ln2.es = 'Spanish'; ln2.fr = 'French'; ln2.de = 'German'; ln2.it = 'Italian'; ln2.br = 'Brazilian Portuguese'; ln2.mi = 'Maori'; ln2.vn = 'Vietnamese'; ln2.nl = 'Dutch'; ln2.kr = 'Korean';   ln2.ar = 'Arabic'; ln2.jp = 'Japanese'; ln2.pt = 'Portuguese'; ln2.he = 'Hebrew'; ln2.pl = 'Polish'; ln2.ca = 'Catalan'; ln2.eu = 'Basque'; ln2.sk = 'Slovak'; ln2.af = 'Afrikaans'; ln2.cz = 'Czech'; ln2.ro = 'Romanian'; ln2.fi = 'Finnish'; ln2.no = 'Norwegian'; ln2.se = 'Swedish'; ln2.bs = 'Bosnian'; ln2.hu = 'Hungarian'; ln2.sr = 'Serbian'; ln2.dk = 'Danish'; ln2.sl = 'Slovenian'; ln2.tr = 'Turkish'; ln2.id = 'Indonesian'; ln2.hr = 'Croatian'; ln2.el = 'Greek'; ln2.uk = 'Ukrainian'; ln2.gl = 'Galician'; ln2.sr = 'Serbian'; ln2.lt = 'Lithuanian'; ln2.th = 'Thai'; ln2.lv = 'Latvian'; ln2.bg = 'Bulgarian'; ln2.mk = 'Macedonian'; ln2.hi = 'Hindi'; ln2.fa = 'Farsi'; ln2.ee = 'Estonian';  ln2.ms = 'Malaysian'; ln2.cy = 'Welsh'; ln2.be = 'Breton'; ln2.tl = 'Tagalog'; ln2.ka = 'Georgian';
 
 /**
- * SJCL SHA-256 library which was converted to a string so it can be run by the web worker which hashes the files.
- * Created by:
- * 1) Downloading SJCL v1.0.0 release
- * 2) Running './configure --without-all --with-sha256 --with-codecHex'
- * 3) Running 'make' and 'make test'
- * 4) Removing comments and whitespace (variable names remain unobfuscated)
- * 5) Changing namespace from 'sjcl' to 'sjcl_sha256' so it does not conflict with the main SJCL library loaded in from the CDN
+ * Below is the asmCrypto SHA-256 library which was converted to a string so it can be run by the web worker which
+ * hashes the files. This was created by:
+ * 1) Running 'git clone https://github.com/vibornoff/asmcrypto.js.git'
+ * 2) Running 'npm install' to install Grunt and other dependencies
+ * 3) Running 'git checkout v0.0.9' to switch to the v0.0.9 stable release version
+ * 4) Running 'grunt --with="sha256" devel' to build the library with just SHA-256
+ * 5) Changing namespace to asmCryptoSha256 so it does not interfere with the main asmCrypto library that is loaded later
+ * 5) Replacing single quotes with double quotes, removing comments and whitespace (variable and function names remain unobfuscated)
  */
-var sjcl_sha256_js = 'var sjcl_sha256={cipher:{},hash:{},keyexchange:{},mode:{},misc:{},codec:{},exception:{corrupt:function(message){this.toString=function(){return"CORRUPT: "+this.message};this.message=message},invalid:function(message){this.toString=function(){return"INVALID: "+this.message};this.message=message},bug:function(message){this.toString=function(){return"BUG: "+this.message};this.message=message},notReady:function(message){this.toString=function(){return"NOT READY: "+this.message};this.message=message}}};if(typeof module!=="undefined"&&module.exports){module.exports=sjcl_sha256}sjcl_sha256.bitArray={bitSlice:function(a,bstart,bend){a=sjcl_sha256.bitArray._shiftRight(a.slice(bstart/32),32-(bstart&31)).slice(1);return(bend===undefined)?a:sjcl_sha256.bitArray.clamp(a,bend-bstart)},extract:function(a,bstart,blength){var x,sh=Math.floor((-bstart-blength)&31);if((bstart+blength-1^bstart)&-32){x=(a[bstart/32|0]<<(32-sh))^(a[bstart/32+1|0]>>>sh)}else{x=a[bstart/32|0]>>>sh}return x&((1<<blength)-1)},concat:function(a1,a2){if(a1.length===0||a2.length===0){return a1.concat(a2)}var out,i,last=a1[a1.length-1],shift=sjcl_sha256.bitArray.getPartial(last);if(shift===32){return a1.concat(a2)}else{return sjcl_sha256.bitArray._shiftRight(a2,shift,last|0,a1.slice(0,a1.length-1))}},bitLength:function(a){var l=a.length,x;if(l===0){return 0}x=a[l-1];return(l-1)*32+sjcl_sha256.bitArray.getPartial(x)},clamp:function(a,len){if(a.length*32<len){return a}a=a.slice(0,Math.ceil(len/32));var l=a.length;len=len&31;if(l>0&&len){a[l-1]=sjcl_sha256.bitArray.partial(len,a[l-1]&0x80000000>>(len-1),1)}return a},partial:function(len,x,_end){if(len===32){return x}return(_end?x|0:x<<(32-len))+len*0x10000000000},getPartial:function(x){return Math.round(x/0x10000000000)||32},equal:function(a,b){if(sjcl_sha256.bitArray.bitLength(a)!==sjcl_sha256.bitArray.bitLength(b)){return false}var x=0,i;for(i=0;i<a.length;i++){x|=a[i]^b[i]}return(x===0)},_shiftRight:function(a,shift,carry,out){var i,last2=0,shift2;if(out===undefined){out=[]}for(;shift>=32;shift-=32){out.push(carry);carry=0}if(shift===0){return out.concat(a)}for(i=0;i<a.length;i++){out.push(carry|a[i]>>>shift);carry=a[i]<<(32-shift)}last2=a.length?a[a.length-1]:0;shift2=sjcl_sha256.bitArray.getPartial(last2);out.push(sjcl_sha256.bitArray.partial(shift+shift2&31,(shift+shift2>32)?carry:out.pop(),1));return out},_xor4:function(x,y){return[x[0]^y[0],x[1]^y[1],x[2]^y[2],x[3]^y[3]]}};sjcl_sha256.codec.utf8String={fromBits:function(arr){var out="",bl=sjcl_sha256.bitArray.bitLength(arr),i,tmp;for(i=0;i<bl/8;i++){if((i&3)===0){tmp=arr[i/4]}out+=String.fromCharCode(tmp>>>24);tmp<<=8}return decodeURIComponent(escape(out))},toBits:function(str){str=unescape(encodeURIComponent(str));var out=[],i,tmp=0;for(i=0;i<str.length;i++){tmp=tmp<<8|str.charCodeAt(i);if((i&3)===3){out.push(tmp);tmp=0}}if(i&3){out.push(sjcl_sha256.bitArray.partial(8*(i&3),tmp))}return out}};sjcl_sha256.codec.hex={fromBits:function(arr){var out="",i,x;for(i=0;i<arr.length;i++){out+=((arr[i]|0)+0xF00000000000).toString(16).substr(4)}return out.substr(0,sjcl_sha256.bitArray.bitLength(arr)/4)},toBits:function(str){var i,out=[],len;str=str.replace(/\s|0x/g,"");len=str.length;str=str+"00000000";for(i=0;i<str.length;i+=8){out.push(parseInt(str.substr(i,8),16)^0)}return sjcl_sha256.bitArray.clamp(out,len*4)}};sjcl_sha256.hash.sha256=function(hash){if(!this._key[0]){this._precompute()}if(hash){this._h=hash._h.slice(0);this._buffer=hash._buffer.slice(0);this._length=hash._length}else{this.reset()}};sjcl_sha256.hash.sha256.hash=function(data){return(new sjcl_sha256.hash.sha256()).update(data).finalize()};sjcl_sha256.hash.sha256.prototype={blockSize:512,reset:function(){this._h=this._init.slice(0);this._buffer=[];this._length=0;return this},update:function(data){if(typeof data==="string"){data=sjcl_sha256.codec.utf8String.toBits(data)}var i,b=this._buffer=sjcl_sha256.bitArray.concat(this._buffer,data),ol=this._length,nl=this._length=ol+sjcl_sha256.bitArray.bitLength(data);for(i=512+ol&-512;i<=nl;i+=512){this._block(b.splice(0,16))}return this},finalize:function(){var i,b=this._buffer,h=this._h;b=sjcl_sha256.bitArray.concat(b,[sjcl_sha256.bitArray.partial(1,1)]);for(i=b.length+2;i&15;i++){b.push(0)}b.push(Math.floor(this._length/0x100000000));b.push(this._length|0);while(b.length){this._block(b.splice(0,16))}this.reset();return h},_init:[],_key:[],_precompute:function(){var i=0,prime=2,factor;function frac(x){return(x-Math.floor(x))*0x100000000|0}outer:for(;i<64;prime++){for(factor=2;factor*factor<=prime;factor++){if(prime%factor===0){continue outer}}if(i<8){this._init[i]=frac(Math.pow(prime,1/2))}this._key[i]=frac(Math.pow(prime,1/3));i++}},_block:function(words){var i,tmp,a,b,w=words.slice(0),h=this._h,k=this._key,h0=h[0],h1=h[1],h2=h[2],h3=h[3],h4=h[4],h5=h[5],h6=h[6],h7=h[7];for(i=0;i<64;i++){if(i<16){tmp=w[i]}else{a=w[(i+1)&15];b=w[(i+14)&15];tmp=w[i&15]=((a>>>7^a>>>18^a>>>3^a<<25^a<<14)+(b>>>17^b>>>19^b>>>10^b<<15^b<<13)+w[i&15]+w[(i+9)&15])|0}tmp=(tmp+h7+(h4>>>6^h4>>>11^h4>>>25^h4<<26^h4<<21^h4<<7)+(h6^h4&(h5^h6))+k[i]);h7=h6;h6=h5;h5=h4;h4=h3+tmp|0;h3=h2;h2=h1;h1=h0;h0=(tmp+((h1&h2)^(h3&(h1^h2)))+(h1>>>2^h1>>>13^h1>>>22^h1<<30^h1<<19^h1<<10))|0}h[0]=h[0]+h0|0;h[1]=h[1]+h1|0;h[2]=h[2]+h2|0;h[3]=h[3]+h3|0;h[4]=h[4]+h4|0;h[5]=h[5]+h5|0;h[6]=h[6]+h6|0;h[7]=h[7]+h7|0}};';
+var asmCryptoSha256Js = '!function(exports,global){function IllegalStateError(){var err=Error.apply(this,arguments);this.message=err.message,this.stack=err.stack}IllegalStateError.prototype=Object.create(Error.prototype,{name:{value:"IllegalStateError"}});function IllegalArgumentError(){var err=Error.apply(this,arguments);this.message=err.message,this.stack=err.stack}IllegalArgumentError.prototype=Object.create(Error.prototype,{name:{value:"IllegalArgumentError"}});function SecurityError(){var err=Error.apply(this,arguments);this.message=err.message,this.stack=err.stack}SecurityError.prototype=Object.create(Error.prototype,{name:{value:"SecurityError"}});var FloatArray=global.Float64Array||global.Float32Array;function string_to_bytes(str,utf8){utf8=!!utf8;var len=str.length,bytes=new Uint8Array(utf8?4*len:len);for(var i=0,j=0;i<len;i++){var c=str.charCodeAt(i);if(utf8&&0xd800<=c&&c<=0xdbff){if(++i>=len)throw new Error("Malformed string, low surrogate expected at position "+i);c=((c^0xd800)<<10)|0x10000|(str.charCodeAt(i)^0xdc00)}else if(!utf8&&c>>>8){throw new Error("Wide characters are not allowed.");}if(!utf8||c<=0x7f){bytes[j++]=c}else if(c<=0x7ff){bytes[j++]=0xc0|(c>>6);bytes[j++]=0x80|(c&0x3f)}else if(c<=0xffff){bytes[j++]=0xe0|(c>>12);bytes[j++]=0x80|(c>>6&0x3f);bytes[j++]=0x80|(c&0x3f)}else{bytes[j++]=0xf0|(c>>18);bytes[j++]=0x80|(c>>12&0x3f);bytes[j++]=0x80|(c>>6&0x3f);bytes[j++]=0x80|(c&0x3f)}}return bytes.subarray(0,j)}function hex_to_bytes(str){var len=str.length;if(len&1){str="0"+str;len++}var bytes=new Uint8Array(len>>1);for(var i=0;i<len;i+=2){bytes[i>>1]=parseInt(str.substr(i,2),16)}return bytes}function base64_to_bytes(str){return string_to_bytes(atob(str))}function bytes_to_string(bytes,utf8){utf8=!!utf8;var len=bytes.length,chars=new Array(len);for(var i=0,j=0;i<len;i++){var b=bytes[i];if(!utf8||b<128){chars[j++]=b}else if(b>=192&&b<224&&i+1<len){chars[j++]=((b&0x1f)<<6)|(bytes[++i]&0x3f)}else if(b>=224&&b<240&&i+2<len){chars[j++]=((b&0xf)<<12)|((bytes[++i]&0x3f)<<6)|(bytes[++i]&0x3f)}else if(b>=240&&b<248&&i+3<len){var c=((b&7)<<18)|((bytes[++i]&0x3f)<<12)|((bytes[++i]&0x3f)<<6)|(bytes[++i]&0x3f);if(c<=0xffff){chars[j++]=c}else{c^=0x10000;chars[j++]=0xd800|(c>>10);chars[j++]=0xdc00|(c&0x3ff)}}else{throw new Error("Malformed UTF8 character at byte offset "+i);}}var str="",bs=16384;for(var i=0;i<j;i+=bs){str+=String.fromCharCode.apply(String,chars.slice(i,i+bs<=j?i+bs:j))}return str}function bytes_to_hex(arr){var str="";for(var i=0;i<arr.length;i++){var h=(arr[i]&0xff).toString(16);if(h.length<2)str+="0";str+=h}return str}function bytes_to_base64(arr){return btoa(bytes_to_string(arr))}function pow2_ceil(a){a-=1;a|=a>>>1;a|=a>>>2;a|=a>>>4;a|=a>>>8;a|=a>>>16;a+=1;return a}function is_number(a){return(typeof a==="number")}function is_string(a){return(typeof a==="string")}function is_buffer(a){return(a instanceof ArrayBuffer)}function is_bytes(a){return(a instanceof Uint8Array)}function is_typed_array(a){return(a instanceof Int8Array)||(a instanceof Uint8Array)||(a instanceof Int16Array)||(a instanceof Uint16Array)||(a instanceof Int32Array)||(a instanceof Uint32Array)||(a instanceof Float32Array)||(a instanceof Float64Array)}function _heap_init(constructor,options){var heap=options.heap,size=heap?heap.byteLength:options.heapSize||65536;if(size&0xfff||size<=0)throw new Error("heap size must be a positive integer and a multiple of 4096");heap=heap||new constructor(new ArrayBuffer(size));return heap}function _heap_write(heap,hpos,data,dpos,dlen){var hlen=heap.length-hpos,wlen=(hlen<dlen)?hlen:dlen;heap.set(data.subarray(dpos,dpos+wlen),hpos);return wlen}function hash_reset(){this.result=null;this.pos=0;this.len=0;this.asm.reset();return this}function hash_process(data){if(this.result!==null)throw new IllegalStateError("state must be reset before processing new data");if(is_string(data))data=string_to_bytes(data);if(is_buffer(data))data=new Uint8Array(data);if(!is_bytes(data))throw new TypeError("data isnt of expected type");var asm=this.asm,heap=this.heap,hpos=this.pos,hlen=this.len,dpos=0,dlen=data.length,wlen=0;while(dlen>0){wlen=_heap_write(heap,hpos+hlen,data,dpos,dlen);hlen+=wlen;dpos+=wlen;dlen-=wlen;wlen=asm.process(hpos,hlen);hpos+=wlen;hlen-=wlen;if(!hlen)hpos=0}this.pos=hpos;this.len=hlen;return this}function hash_finish(){if(this.result!==null)throw new IllegalStateError("state must be reset before processing new data");this.asm.finish(this.pos,this.len,0);this.result=new Uint8Array(this.HASH_SIZE);this.result.set(this.heap.subarray(0,this.HASH_SIZE));this.pos=0;this.len=0;return this}function sha256_asm(stdlib,foreign,buffer){"use asm";var H0=0,H1=0,H2=0,H3=0,H4=0,H5=0,H6=0,H7=0,TOTAL0=0,TOTAL1=0;var I0=0,I1=0,I2=0,I3=0,I4=0,I5=0,I6=0,I7=0,O0=0,O1=0,O2=0,O3=0,O4=0,O5=0,O6=0,O7=0;var HEAP=new stdlib.Uint8Array(buffer);function _core(w0,w1,w2,w3,w4,w5,w6,w7,w8,w9,w10,w11,w12,w13,w14,w15){w0=w0|0;w1=w1|0;w2=w2|0;w3=w3|0;w4=w4|0;w5=w5|0;w6=w6|0;w7=w7|0;w8=w8|0;w9=w9|0;w10=w10|0;w11=w11|0;w12=w12|0;w13=w13|0;w14=w14|0;w15=w15|0;var a=0,b=0,c=0,d=0,e=0,f=0,g=0,h=0,t=0;a=H0;b=H1;c=H2;d=H3;e=H4;f=H5;g=H6;h=H7;t=(w0+h+(e>>>6^e>>>11^e>>>25^e<<26^e<<21^e<<7)+(g^e&(f^g))+0x428a2f98)|0;h=g;g=f;f=e;e=(d+t)|0;d=c;c=b;b=a;a=(t+((b&c)^(d&(b^c)))+(b>>>2^b>>>13^b>>>22^b<<30^b<<19^b<<10))|0;t=(w1+h+(e>>>6^e>>>11^e>>>25^e<<26^e<<21^e<<7)+(g^e&(f^g))+0x71374491)|0;h=g;g=f;f=e;e=(d+t)|0;d=c;c=b;b=a;a=(t+((b&c)^(d&(b^c)))+(b>>>2^b>>>13^b>>>22^b<<30^b<<19^b<<10))|0;t=(w2+h+(e>>>6^e>>>11^e>>>25^e<<26^e<<21^e<<7)+(g^e&(f^g))+0xb5c0fbcf)|0;h=g;g=f;f=e;e=(d+t)|0;d=c;c=b;b=a;a=(t+((b&c)^(d&(b^c)))+(b>>>2^b>>>13^b>>>22^b<<30^b<<19^b<<10))|0;t=(w3+h+(e>>>6^e>>>11^e>>>25^e<<26^e<<21^e<<7)+(g^e&(f^g))+0xe9b5dba5)|0;h=g;g=f;f=e;e=(d+t)|0;d=c;c=b;b=a;a=(t+((b&c)^(d&(b^c)))+(b>>>2^b>>>13^b>>>22^b<<30^b<<19^b<<10))|0;t=(w4+h+(e>>>6^e>>>11^e>>>25^e<<26^e<<21^e<<7)+(g^e&(f^g))+0x3956c25b)|0;h=g;g=f;f=e;e=(d+t)|0;d=c;c=b;b=a;a=(t+((b&c)^(d&(b^c)))+(b>>>2^b>>>13^b>>>22^b<<30^b<<19^b<<10))|0;t=(w5+h+(e>>>6^e>>>11^e>>>25^e<<26^e<<21^e<<7)+(g^e&(f^g))+0x59f111f1)|0;h=g;g=f;f=e;e=(d+t)|0;d=c;c=b;b=a;a=(t+((b&c)^(d&(b^c)))+(b>>>2^b>>>13^b>>>22^b<<30^b<<19^b<<10))|0;t=(w6+h+(e>>>6^e>>>11^e>>>25^e<<26^e<<21^e<<7)+(g^e&(f^g))+0x923f82a4)|0;h=g;g=f;f=e;e=(d+t)|0;d=c;c=b;b=a;a=(t+((b&c)^(d&(b^c)))+(b>>>2^b>>>13^b>>>22^b<<30^b<<19^b<<10))|0;t=(w7+h+(e>>>6^e>>>11^e>>>25^e<<26^e<<21^e<<7)+(g^e&(f^g))+0xab1c5ed5)|0;h=g;g=f;f=e;e=(d+t)|0;d=c;c=b;b=a;a=(t+((b&c)^(d&(b^c)))+(b>>>2^b>>>13^b>>>22^b<<30^b<<19^b<<10))|0;t=(w8+h+(e>>>6^e>>>11^e>>>25^e<<26^e<<21^e<<7)+(g^e&(f^g))+0xd807aa98)|0;h=g;g=f;f=e;e=(d+t)|0;d=c;c=b;b=a;a=(t+((b&c)^(d&(b^c)))+(b>>>2^b>>>13^b>>>22^b<<30^b<<19^b<<10))|0;t=(w9+h+(e>>>6^e>>>11^e>>>25^e<<26^e<<21^e<<7)+(g^e&(f^g))+0x12835b01)|0;h=g;g=f;f=e;e=(d+t)|0;d=c;c=b;b=a;a=(t+((b&c)^(d&(b^c)))+(b>>>2^b>>>13^b>>>22^b<<30^b<<19^b<<10))|0;t=(w10+h+(e>>>6^e>>>11^e>>>25^e<<26^e<<21^e<<7)+(g^e&(f^g))+0x243185be)|0;h=g;g=f;f=e;e=(d+t)|0;d=c;c=b;b=a;a=(t+((b&c)^(d&(b^c)))+(b>>>2^b>>>13^b>>>22^b<<30^b<<19^b<<10))|0;t=(w11+h+(e>>>6^e>>>11^e>>>25^e<<26^e<<21^e<<7)+(g^e&(f^g))+0x550c7dc3)|0;h=g;g=f;f=e;e=(d+t)|0;d=c;c=b;b=a;a=(t+((b&c)^(d&(b^c)))+(b>>>2^b>>>13^b>>>22^b<<30^b<<19^b<<10))|0;t=(w12+h+(e>>>6^e>>>11^e>>>25^e<<26^e<<21^e<<7)+(g^e&(f^g))+0x72be5d74)|0;h=g;g=f;f=e;e=(d+t)|0;d=c;c=b;b=a;a=(t+((b&c)^(d&(b^c)))+(b>>>2^b>>>13^b>>>22^b<<30^b<<19^b<<10))|0;t=(w13+h+(e>>>6^e>>>11^e>>>25^e<<26^e<<21^e<<7)+(g^e&(f^g))+0x80deb1fe)|0;h=g;g=f;f=e;e=(d+t)|0;d=c;c=b;b=a;a=(t+((b&c)^(d&(b^c)))+(b>>>2^b>>>13^b>>>22^b<<30^b<<19^b<<10))|0;t=(w14+h+(e>>>6^e>>>11^e>>>25^e<<26^e<<21^e<<7)+(g^e&(f^g))+0x9bdc06a7)|0;h=g;g=f;f=e;e=(d+t)|0;d=c;c=b;b=a;a=(t+((b&c)^(d&(b^c)))+(b>>>2^b>>>13^b>>>22^b<<30^b<<19^b<<10))|0;t=(w15+h+(e>>>6^e>>>11^e>>>25^e<<26^e<<21^e<<7)+(g^e&(f^g))+0xc19bf174)|0;h=g;g=f;f=e;e=(d+t)|0;d=c;c=b;b=a;a=(t+((b&c)^(d&(b^c)))+(b>>>2^b>>>13^b>>>22^b<<30^b<<19^b<<10))|0;w0=t=((w1>>>7^w1>>>18^w1>>>3^w1<<25^w1<<14)+(w14>>>17^w14>>>19^w14>>>10^w14<<15^w14<<13)+w0+w9)|0;t=(t+h+(e>>>6^e>>>11^e>>>25^e<<26^e<<21^e<<7)+(g^e&(f^g))+0xe49b69c1)|0;h=g;g=f;f=e;e=(d+t)|0;d=c;c=b;b=a;a=(t+((b&c)^(d&(b^c)))+(b>>>2^b>>>13^b>>>22^b<<30^b<<19^b<<10))|0;w1=t=((w2>>>7^w2>>>18^w2>>>3^w2<<25^w2<<14)+(w15>>>17^w15>>>19^w15>>>10^w15<<15^w15<<13)+w1+w10)|0;t=(t+h+(e>>>6^e>>>11^e>>>25^e<<26^e<<21^e<<7)+(g^e&(f^g))+0xefbe4786)|0;h=g;g=f;f=e;e=(d+t)|0;d=c;c=b;b=a;a=(t+((b&c)^(d&(b^c)))+(b>>>2^b>>>13^b>>>22^b<<30^b<<19^b<<10))|0;w2=t=((w3>>>7^w3>>>18^w3>>>3^w3<<25^w3<<14)+(w0>>>17^w0>>>19^w0>>>10^w0<<15^w0<<13)+w2+w11)|0;t=(t+h+(e>>>6^e>>>11^e>>>25^e<<26^e<<21^e<<7)+(g^e&(f^g))+0x0fc19dc6)|0;h=g;g=f;f=e;e=(d+t)|0;d=c;c=b;b=a;a=(t+((b&c)^(d&(b^c)))+(b>>>2^b>>>13^b>>>22^b<<30^b<<19^b<<10))|0;w3=t=((w4>>>7^w4>>>18^w4>>>3^w4<<25^w4<<14)+(w1>>>17^w1>>>19^w1>>>10^w1<<15^w1<<13)+w3+w12)|0;t=(t+h+(e>>>6^e>>>11^e>>>25^e<<26^e<<21^e<<7)+(g^e&(f^g))+0x240ca1cc)|0;h=g;g=f;f=e;e=(d+t)|0;d=c;c=b;b=a;a=(t+((b&c)^(d&(b^c)))+(b>>>2^b>>>13^b>>>22^b<<30^b<<19^b<<10))|0;w4=t=((w5>>>7^w5>>>18^w5>>>3^w5<<25^w5<<14)+(w2>>>17^w2>>>19^w2>>>10^w2<<15^w2<<13)+w4+w13)|0;t=(t+h+(e>>>6^e>>>11^e>>>25^e<<26^e<<21^e<<7)+(g^e&(f^g))+0x2de92c6f)|0;h=g;g=f;f=e;e=(d+t)|0;d=c;c=b;b=a;a=(t+((b&c)^(d&(b^c)))+(b>>>2^b>>>13^b>>>22^b<<30^b<<19^b<<10))|0;w5=t=((w6>>>7^w6>>>18^w6>>>3^w6<<25^w6<<14)+(w3>>>17^w3>>>19^w3>>>10^w3<<15^w3<<13)+w5+w14)|0;t=(t+h+(e>>>6^e>>>11^e>>>25^e<<26^e<<21^e<<7)+(g^e&(f^g))+0x4a7484aa)|0;h=g;g=f;f=e;e=(d+t)|0;d=c;c=b;b=a;a=(t+((b&c)^(d&(b^c)))+(b>>>2^b>>>13^b>>>22^b<<30^b<<19^b<<10))|0;w6=t=((w7>>>7^w7>>>18^w7>>>3^w7<<25^w7<<14)+(w4>>>17^w4>>>19^w4>>>10^w4<<15^w4<<13)+w6+w15)|0;t=(t+h+(e>>>6^e>>>11^e>>>25^e<<26^e<<21^e<<7)+(g^e&(f^g))+0x5cb0a9dc)|0;h=g;g=f;f=e;e=(d+t)|0;d=c;c=b;b=a;a=(t+((b&c)^(d&(b^c)))+(b>>>2^b>>>13^b>>>22^b<<30^b<<19^b<<10))|0;w7=t=((w8>>>7^w8>>>18^w8>>>3^w8<<25^w8<<14)+(w5>>>17^w5>>>19^w5>>>10^w5<<15^w5<<13)+w7+w0)|0;t=(t+h+(e>>>6^e>>>11^e>>>25^e<<26^e<<21^e<<7)+(g^e&(f^g))+0x76f988da)|0;h=g;g=f;f=e;e=(d+t)|0;d=c;c=b;b=a;a=(t+((b&c)^(d&(b^c)))+(b>>>2^b>>>13^b>>>22^b<<30^b<<19^b<<10))|0;w8=t=((w9>>>7^w9>>>18^w9>>>3^w9<<25^w9<<14)+(w6>>>17^w6>>>19^w6>>>10^w6<<15^w6<<13)+w8+w1)|0;t=(t+h+(e>>>6^e>>>11^e>>>25^e<<26^e<<21^e<<7)+(g^e&(f^g))+0x983e5152)|0;h=g;g=f;f=e;e=(d+t)|0;d=c;c=b;b=a;a=(t+((b&c)^(d&(b^c)))+(b>>>2^b>>>13^b>>>22^b<<30^b<<19^b<<10))|0;w9=t=((w10>>>7^w10>>>18^w10>>>3^w10<<25^w10<<14)+(w7>>>17^w7>>>19^w7>>>10^w7<<15^w7<<13)+w9+w2)|0;t=(t+h+(e>>>6^e>>>11^e>>>25^e<<26^e<<21^e<<7)+(g^e&(f^g))+0xa831c66d)|0;h=g;g=f;f=e;e=(d+t)|0;d=c;c=b;b=a;a=(t+((b&c)^(d&(b^c)))+(b>>>2^b>>>13^b>>>22^b<<30^b<<19^b<<10))|0;w10=t=((w11>>>7^w11>>>18^w11>>>3^w11<<25^w11<<14)+(w8>>>17^w8>>>19^w8>>>10^w8<<15^w8<<13)+w10+w3)|0;t=(t+h+(e>>>6^e>>>11^e>>>25^e<<26^e<<21^e<<7)+(g^e&(f^g))+0xb00327c8)|0;h=g;g=f;f=e;e=(d+t)|0;d=c;c=b;b=a;a=(t+((b&c)^(d&(b^c)))+(b>>>2^b>>>13^b>>>22^b<<30^b<<19^b<<10))|0;w11=t=((w12>>>7^w12>>>18^w12>>>3^w12<<25^w12<<14)+(w9>>>17^w9>>>19^w9>>>10^w9<<15^w9<<13)+w11+w4)|0;t=(t+h+(e>>>6^e>>>11^e>>>25^e<<26^e<<21^e<<7)+(g^e&(f^g))+0xbf597fc7)|0;h=g;g=f;f=e;e=(d+t)|0;d=c;c=b;b=a;a=(t+((b&c)^(d&(b^c)))+(b>>>2^b>>>13^b>>>22^b<<30^b<<19^b<<10))|0;w12=t=((w13>>>7^w13>>>18^w13>>>3^w13<<25^w13<<14)+(w10>>>17^w10>>>19^w10>>>10^w10<<15^w10<<13)+w12+w5)|0;t=(t+h+(e>>>6^e>>>11^e>>>25^e<<26^e<<21^e<<7)+(g^e&(f^g))+0xc6e00bf3)|0;h=g;g=f;f=e;e=(d+t)|0;d=c;c=b;b=a;a=(t+((b&c)^(d&(b^c)))+(b>>>2^b>>>13^b>>>22^b<<30^b<<19^b<<10))|0;w13=t=((w14>>>7^w14>>>18^w14>>>3^w14<<25^w14<<14)+(w11>>>17^w11>>>19^w11>>>10^w11<<15^w11<<13)+w13+w6)|0;t=(t+h+(e>>>6^e>>>11^e>>>25^e<<26^e<<21^e<<7)+(g^e&(f^g))+0xd5a79147)|0;h=g;g=f;f=e;e=(d+t)|0;d=c;c=b;b=a;a=(t+((b&c)^(d&(b^c)))+(b>>>2^b>>>13^b>>>22^b<<30^b<<19^b<<10))|0;w14=t=((w15>>>7^w15>>>18^w15>>>3^w15<<25^w15<<14)+(w12>>>17^w12>>>19^w12>>>10^w12<<15^w12<<13)+w14+w7)|0;t=(t+h+(e>>>6^e>>>11^e>>>25^e<<26^e<<21^e<<7)+(g^e&(f^g))+0x06ca6351)|0;h=g;g=f;f=e;e=(d+t)|0;d=c;c=b;b=a;a=(t+((b&c)^(d&(b^c)))+(b>>>2^b>>>13^b>>>22^b<<30^b<<19^b<<10))|0;w15=t=((w0>>>7^w0>>>18^w0>>>3^w0<<25^w0<<14)+(w13>>>17^w13>>>19^w13>>>10^w13<<15^w13<<13)+w15+w8)|0;t=(t+h+(e>>>6^e>>>11^e>>>25^e<<26^e<<21^e<<7)+(g^e&(f^g))+0x14292967)|0;h=g;g=f;f=e;e=(d+t)|0;d=c;c=b;b=a;a=(t+((b&c)^(d&(b^c)))+(b>>>2^b>>>13^b>>>22^b<<30^b<<19^b<<10))|0;w0=t=((w1>>>7^w1>>>18^w1>>>3^w1<<25^w1<<14)+(w14>>>17^w14>>>19^w14>>>10^w14<<15^w14<<13)+w0+w9)|0;t=(t+h+(e>>>6^e>>>11^e>>>25^e<<26^e<<21^e<<7)+(g^e&(f^g))+0x27b70a85)|0;h=g;g=f;f=e;e=(d+t)|0;d=c;c=b;b=a;a=(t+((b&c)^(d&(b^c)))+(b>>>2^b>>>13^b>>>22^b<<30^b<<19^b<<10))|0;w1=t=((w2>>>7^w2>>>18^w2>>>3^w2<<25^w2<<14)+(w15>>>17^w15>>>19^w15>>>10^w15<<15^w15<<13)+w1+w10)|0;t=(t+h+(e>>>6^e>>>11^e>>>25^e<<26^e<<21^e<<7)+(g^e&(f^g))+0x2e1b2138)|0;h=g;g=f;f=e;e=(d+t)|0;d=c;c=b;b=a;a=(t+((b&c)^(d&(b^c)))+(b>>>2^b>>>13^b>>>22^b<<30^b<<19^b<<10))|0;w2=t=((w3>>>7^w3>>>18^w3>>>3^w3<<25^w3<<14)+(w0>>>17^w0>>>19^w0>>>10^w0<<15^w0<<13)+w2+w11)|0;t=(t+h+(e>>>6^e>>>11^e>>>25^e<<26^e<<21^e<<7)+(g^e&(f^g))+0x4d2c6dfc)|0;h=g;g=f;f=e;e=(d+t)|0;d=c;c=b;b=a;a=(t+((b&c)^(d&(b^c)))+(b>>>2^b>>>13^b>>>22^b<<30^b<<19^b<<10))|0;w3=t=((w4>>>7^w4>>>18^w4>>>3^w4<<25^w4<<14)+(w1>>>17^w1>>>19^w1>>>10^w1<<15^w1<<13)+w3+w12)|0;t=(t+h+(e>>>6^e>>>11^e>>>25^e<<26^e<<21^e<<7)+(g^e&(f^g))+0x53380d13)|0;h=g;g=f;f=e;e=(d+t)|0;d=c;c=b;b=a;a=(t+((b&c)^(d&(b^c)))+(b>>>2^b>>>13^b>>>22^b<<30^b<<19^b<<10))|0;w4=t=((w5>>>7^w5>>>18^w5>>>3^w5<<25^w5<<14)+(w2>>>17^w2>>>19^w2>>>10^w2<<15^w2<<13)+w4+w13)|0;t=(t+h+(e>>>6^e>>>11^e>>>25^e<<26^e<<21^e<<7)+(g^e&(f^g))+0x650a7354)|0;h=g;g=f;f=e;e=(d+t)|0;d=c;c=b;b=a;a=(t+((b&c)^(d&(b^c)))+(b>>>2^b>>>13^b>>>22^b<<30^b<<19^b<<10))|0;w5=t=((w6>>>7^w6>>>18^w6>>>3^w6<<25^w6<<14)+(w3>>>17^w3>>>19^w3>>>10^w3<<15^w3<<13)+w5+w14)|0;t=(t+h+(e>>>6^e>>>11^e>>>25^e<<26^e<<21^e<<7)+(g^e&(f^g))+0x766a0abb)|0;h=g;g=f;f=e;e=(d+t)|0;d=c;c=b;b=a;a=(t+((b&c)^(d&(b^c)))+(b>>>2^b>>>13^b>>>22^b<<30^b<<19^b<<10))|0;w6=t=((w7>>>7^w7>>>18^w7>>>3^w7<<25^w7<<14)+(w4>>>17^w4>>>19^w4>>>10^w4<<15^w4<<13)+w6+w15)|0;t=(t+h+(e>>>6^e>>>11^e>>>25^e<<26^e<<21^e<<7)+(g^e&(f^g))+0x81c2c92e)|0;h=g;g=f;f=e;e=(d+t)|0;d=c;c=b;b=a;a=(t+((b&c)^(d&(b^c)))+(b>>>2^b>>>13^b>>>22^b<<30^b<<19^b<<10))|0;w7=t=((w8>>>7^w8>>>18^w8>>>3^w8<<25^w8<<14)+(w5>>>17^w5>>>19^w5>>>10^w5<<15^w5<<13)+w7+w0)|0;t=(t+h+(e>>>6^e>>>11^e>>>25^e<<26^e<<21^e<<7)+(g^e&(f^g))+0x92722c85)|0;h=g;g=f;f=e;e=(d+t)|0;d=c;c=b;b=a;a=(t+((b&c)^(d&(b^c)))+(b>>>2^b>>>13^b>>>22^b<<30^b<<19^b<<10))|0;w8=t=((w9>>>7^w9>>>18^w9>>>3^w9<<25^w9<<14)+(w6>>>17^w6>>>19^w6>>>10^w6<<15^w6<<13)+w8+w1)|0;t=(t+h+(e>>>6^e>>>11^e>>>25^e<<26^e<<21^e<<7)+(g^e&(f^g))+0xa2bfe8a1)|0;h=g;g=f;f=e;e=(d+t)|0;d=c;c=b;b=a;a=(t+((b&c)^(d&(b^c)))+(b>>>2^b>>>13^b>>>22^b<<30^b<<19^b<<10))|0;w9=t=((w10>>>7^w10>>>18^w10>>>3^w10<<25^w10<<14)+(w7>>>17^w7>>>19^w7>>>10^w7<<15^w7<<13)+w9+w2)|0;t=(t+h+(e>>>6^e>>>11^e>>>25^e<<26^e<<21^e<<7)+(g^e&(f^g))+0xa81a664b)|0;h=g;g=f;f=e;e=(d+t)|0;d=c;c=b;b=a;a=(t+((b&c)^(d&(b^c)))+(b>>>2^b>>>13^b>>>22^b<<30^b<<19^b<<10))|0;w10=t=((w11>>>7^w11>>>18^w11>>>3^w11<<25^w11<<14)+(w8>>>17^w8>>>19^w8>>>10^w8<<15^w8<<13)+w10+w3)|0;t=(t+h+(e>>>6^e>>>11^e>>>25^e<<26^e<<21^e<<7)+(g^e&(f^g))+0xc24b8b70)|0;h=g;g=f;f=e;e=(d+t)|0;d=c;c=b;b=a;a=(t+((b&c)^(d&(b^c)))+(b>>>2^b>>>13^b>>>22^b<<30^b<<19^b<<10))|0;w11=t=((w12>>>7^w12>>>18^w12>>>3^w12<<25^w12<<14)+(w9>>>17^w9>>>19^w9>>>10^w9<<15^w9<<13)+w11+w4)|0;t=(t+h+(e>>>6^e>>>11^e>>>25^e<<26^e<<21^e<<7)+(g^e&(f^g))+0xc76c51a3)|0;h=g;g=f;f=e;e=(d+t)|0;d=c;c=b;b=a;a=(t+((b&c)^(d&(b^c)))+(b>>>2^b>>>13^b>>>22^b<<30^b<<19^b<<10))|0;w12=t=((w13>>>7^w13>>>18^w13>>>3^w13<<25^w13<<14)+(w10>>>17^w10>>>19^w10>>>10^w10<<15^w10<<13)+w12+w5)|0;t=(t+h+(e>>>6^e>>>11^e>>>25^e<<26^e<<21^e<<7)+(g^e&(f^g))+0xd192e819)|0;h=g;g=f;f=e;e=(d+t)|0;d=c;c=b;b=a;a=(t+((b&c)^(d&(b^c)))+(b>>>2^b>>>13^b>>>22^b<<30^b<<19^b<<10))|0;w13=t=((w14>>>7^w14>>>18^w14>>>3^w14<<25^w14<<14)+(w11>>>17^w11>>>19^w11>>>10^w11<<15^w11<<13)+w13+w6)|0;t=(t+h+(e>>>6^e>>>11^e>>>25^e<<26^e<<21^e<<7)+(g^e&(f^g))+0xd6990624)|0;h=g;g=f;f=e;e=(d+t)|0;d=c;c=b;b=a;a=(t+((b&c)^(d&(b^c)))+(b>>>2^b>>>13^b>>>22^b<<30^b<<19^b<<10))|0;w14=t=((w15>>>7^w15>>>18^w15>>>3^w15<<25^w15<<14)+(w12>>>17^w12>>>19^w12>>>10^w12<<15^w12<<13)+w14+w7)|0;t=(t+h+(e>>>6^e>>>11^e>>>25^e<<26^e<<21^e<<7)+(g^e&(f^g))+0xf40e3585)|0;h=g;g=f;f=e;e=(d+t)|0;d=c;c=b;b=a;a=(t+((b&c)^(d&(b^c)))+(b>>>2^b>>>13^b>>>22^b<<30^b<<19^b<<10))|0;w15=t=((w0>>>7^w0>>>18^w0>>>3^w0<<25^w0<<14)+(w13>>>17^w13>>>19^w13>>>10^w13<<15^w13<<13)+w15+w8)|0;t=(t+h+(e>>>6^e>>>11^e>>>25^e<<26^e<<21^e<<7)+(g^e&(f^g))+0x106aa070)|0;h=g;g=f;f=e;e=(d+t)|0;d=c;c=b;b=a;a=(t+((b&c)^(d&(b^c)))+(b>>>2^b>>>13^b>>>22^b<<30^b<<19^b<<10))|0;w0=t=((w1>>>7^w1>>>18^w1>>>3^w1<<25^w1<<14)+(w14>>>17^w14>>>19^w14>>>10^w14<<15^w14<<13)+w0+w9)|0;t=(t+h+(e>>>6^e>>>11^e>>>25^e<<26^e<<21^e<<7)+(g^e&(f^g))+0x19a4c116)|0;h=g;g=f;f=e;e=(d+t)|0;d=c;c=b;b=a;a=(t+((b&c)^(d&(b^c)))+(b>>>2^b>>>13^b>>>22^b<<30^b<<19^b<<10))|0;w1=t=((w2>>>7^w2>>>18^w2>>>3^w2<<25^w2<<14)+(w15>>>17^w15>>>19^w15>>>10^w15<<15^w15<<13)+w1+w10)|0;t=(t+h+(e>>>6^e>>>11^e>>>25^e<<26^e<<21^e<<7)+(g^e&(f^g))+0x1e376c08)|0;h=g;g=f;f=e;e=(d+t)|0;d=c;c=b;b=a;a=(t+((b&c)^(d&(b^c)))+(b>>>2^b>>>13^b>>>22^b<<30^b<<19^b<<10))|0;w2=t=((w3>>>7^w3>>>18^w3>>>3^w3<<25^w3<<14)+(w0>>>17^w0>>>19^w0>>>10^w0<<15^w0<<13)+w2+w11)|0;t=(t+h+(e>>>6^e>>>11^e>>>25^e<<26^e<<21^e<<7)+(g^e&(f^g))+0x2748774c)|0;h=g;g=f;f=e;e=(d+t)|0;d=c;c=b;b=a;a=(t+((b&c)^(d&(b^c)))+(b>>>2^b>>>13^b>>>22^b<<30^b<<19^b<<10))|0;w3=t=((w4>>>7^w4>>>18^w4>>>3^w4<<25^w4<<14)+(w1>>>17^w1>>>19^w1>>>10^w1<<15^w1<<13)+w3+w12)|0;t=(t+h+(e>>>6^e>>>11^e>>>25^e<<26^e<<21^e<<7)+(g^e&(f^g))+0x34b0bcb5)|0;h=g;g=f;f=e;e=(d+t)|0;d=c;c=b;b=a;a=(t+((b&c)^(d&(b^c)))+(b>>>2^b>>>13^b>>>22^b<<30^b<<19^b<<10))|0;w4=t=((w5>>>7^w5>>>18^w5>>>3^w5<<25^w5<<14)+(w2>>>17^w2>>>19^w2>>>10^w2<<15^w2<<13)+w4+w13)|0;t=(t+h+(e>>>6^e>>>11^e>>>25^e<<26^e<<21^e<<7)+(g^e&(f^g))+0x391c0cb3)|0;h=g;g=f;f=e;e=(d+t)|0;d=c;c=b;b=a;a=(t+((b&c)^(d&(b^c)))+(b>>>2^b>>>13^b>>>22^b<<30^b<<19^b<<10))|0;w5=t=((w6>>>7^w6>>>18^w6>>>3^w6<<25^w6<<14)+(w3>>>17^w3>>>19^w3>>>10^w3<<15^w3<<13)+w5+w14)|0;t=(t+h+(e>>>6^e>>>11^e>>>25^e<<26^e<<21^e<<7)+(g^e&(f^g))+0x4ed8aa4a)|0;h=g;g=f;f=e;e=(d+t)|0;d=c;c=b;b=a;a=(t+((b&c)^(d&(b^c)))+(b>>>2^b>>>13^b>>>22^b<<30^b<<19^b<<10))|0;w6=t=((w7>>>7^w7>>>18^w7>>>3^w7<<25^w7<<14)+(w4>>>17^w4>>>19^w4>>>10^w4<<15^w4<<13)+w6+w15)|0;t=(t+h+(e>>>6^e>>>11^e>>>25^e<<26^e<<21^e<<7)+(g^e&(f^g))+0x5b9cca4f)|0;h=g;g=f;f=e;e=(d+t)|0;d=c;c=b;b=a;a=(t+((b&c)^(d&(b^c)))+(b>>>2^b>>>13^b>>>22^b<<30^b<<19^b<<10))|0;w7=t=((w8>>>7^w8>>>18^w8>>>3^w8<<25^w8<<14)+(w5>>>17^w5>>>19^w5>>>10^w5<<15^w5<<13)+w7+w0)|0;t=(t+h+(e>>>6^e>>>11^e>>>25^e<<26^e<<21^e<<7)+(g^e&(f^g))+0x682e6ff3)|0;h=g;g=f;f=e;e=(d+t)|0;d=c;c=b;b=a;a=(t+((b&c)^(d&(b^c)))+(b>>>2^b>>>13^b>>>22^b<<30^b<<19^b<<10))|0;w8=t=((w9>>>7^w9>>>18^w9>>>3^w9<<25^w9<<14)+(w6>>>17^w6>>>19^w6>>>10^w6<<15^w6<<13)+w8+w1)|0;t=(t+h+(e>>>6^e>>>11^e>>>25^e<<26^e<<21^e<<7)+(g^e&(f^g))+0x748f82ee)|0;h=g;g=f;f=e;e=(d+t)|0;d=c;c=b;b=a;a=(t+((b&c)^(d&(b^c)))+(b>>>2^b>>>13^b>>>22^b<<30^b<<19^b<<10))|0;w9=t=((w10>>>7^w10>>>18^w10>>>3^w10<<25^w10<<14)+(w7>>>17^w7>>>19^w7>>>10^w7<<15^w7<<13)+w9+w2)|0;t=(t+h+(e>>>6^e>>>11^e>>>25^e<<26^e<<21^e<<7)+(g^e&(f^g))+0x78a5636f)|0;h=g;g=f;f=e;e=(d+t)|0;d=c;c=b;b=a;a=(t+((b&c)^(d&(b^c)))+(b>>>2^b>>>13^b>>>22^b<<30^b<<19^b<<10))|0;w10=t=((w11>>>7^w11>>>18^w11>>>3^w11<<25^w11<<14)+(w8>>>17^w8>>>19^w8>>>10^w8<<15^w8<<13)+w10+w3)|0;t=(t+h+(e>>>6^e>>>11^e>>>25^e<<26^e<<21^e<<7)+(g^e&(f^g))+0x84c87814)|0;h=g;g=f;f=e;e=(d+t)|0;d=c;c=b;b=a;a=(t+((b&c)^(d&(b^c)))+(b>>>2^b>>>13^b>>>22^b<<30^b<<19^b<<10))|0;w11=t=((w12>>>7^w12>>>18^w12>>>3^w12<<25^w12<<14)+(w9>>>17^w9>>>19^w9>>>10^w9<<15^w9<<13)+w11+w4)|0;t=(t+h+(e>>>6^e>>>11^e>>>25^e<<26^e<<21^e<<7)+(g^e&(f^g))+0x8cc70208)|0;h=g;g=f;f=e;e=(d+t)|0;d=c;c=b;b=a;a=(t+((b&c)^(d&(b^c)))+(b>>>2^b>>>13^b>>>22^b<<30^b<<19^b<<10))|0;w12=t=((w13>>>7^w13>>>18^w13>>>3^w13<<25^w13<<14)+(w10>>>17^w10>>>19^w10>>>10^w10<<15^w10<<13)+w12+w5)|0;t=(t+h+(e>>>6^e>>>11^e>>>25^e<<26^e<<21^e<<7)+(g^e&(f^g))+0x90befffa)|0;h=g;g=f;f=e;e=(d+t)|0;d=c;c=b;b=a;a=(t+((b&c)^(d&(b^c)))+(b>>>2^b>>>13^b>>>22^b<<30^b<<19^b<<10))|0;w13=t=((w14>>>7^w14>>>18^w14>>>3^w14<<25^w14<<14)+(w11>>>17^w11>>>19^w11>>>10^w11<<15^w11<<13)+w13+w6)|0;t=(t+h+(e>>>6^e>>>11^e>>>25^e<<26^e<<21^e<<7)+(g^e&(f^g))+0xa4506ceb)|0;h=g;g=f;f=e;e=(d+t)|0;d=c;c=b;b=a;a=(t+((b&c)^(d&(b^c)))+(b>>>2^b>>>13^b>>>22^b<<30^b<<19^b<<10))|0;w14=t=((w15>>>7^w15>>>18^w15>>>3^w15<<25^w15<<14)+(w12>>>17^w12>>>19^w12>>>10^w12<<15^w12<<13)+w14+w7)|0;t=(t+h+(e>>>6^e>>>11^e>>>25^e<<26^e<<21^e<<7)+(g^e&(f^g))+0xbef9a3f7)|0;h=g;g=f;f=e;e=(d+t)|0;d=c;c=b;b=a;a=(t+((b&c)^(d&(b^c)))+(b>>>2^b>>>13^b>>>22^b<<30^b<<19^b<<10))|0;w15=t=((w0>>>7^w0>>>18^w0>>>3^w0<<25^w0<<14)+(w13>>>17^w13>>>19^w13>>>10^w13<<15^w13<<13)+w15+w8)|0;t=(t+h+(e>>>6^e>>>11^e>>>25^e<<26^e<<21^e<<7)+(g^e&(f^g))+0xc67178f2)|0;h=g;g=f;f=e;e=(d+t)|0;d=c;c=b;b=a;a=(t+((b&c)^(d&(b^c)))+(b>>>2^b>>>13^b>>>22^b<<30^b<<19^b<<10))|0;H0=(H0+a)|0;H1=(H1+b)|0;H2=(H2+c)|0;H3=(H3+d)|0;H4=(H4+e)|0;H5=(H5+f)|0;H6=(H6+g)|0;H7=(H7+h)|0}function _core_heap(offset){offset=offset|0;_core(HEAP[offset|0]<<24|HEAP[offset|1]<<16|HEAP[offset|2]<<8|HEAP[offset|3],HEAP[offset|4]<<24|HEAP[offset|5]<<16|HEAP[offset|6]<<8|HEAP[offset|7],HEAP[offset|8]<<24|HEAP[offset|9]<<16|HEAP[offset|10]<<8|HEAP[offset|11],HEAP[offset|12]<<24|HEAP[offset|13]<<16|HEAP[offset|14]<<8|HEAP[offset|15],HEAP[offset|16]<<24|HEAP[offset|17]<<16|HEAP[offset|18]<<8|HEAP[offset|19],HEAP[offset|20]<<24|HEAP[offset|21]<<16|HEAP[offset|22]<<8|HEAP[offset|23],HEAP[offset|24]<<24|HEAP[offset|25]<<16|HEAP[offset|26]<<8|HEAP[offset|27],HEAP[offset|28]<<24|HEAP[offset|29]<<16|HEAP[offset|30]<<8|HEAP[offset|31],HEAP[offset|32]<<24|HEAP[offset|33]<<16|HEAP[offset|34]<<8|HEAP[offset|35],HEAP[offset|36]<<24|HEAP[offset|37]<<16|HEAP[offset|38]<<8|HEAP[offset|39],HEAP[offset|40]<<24|HEAP[offset|41]<<16|HEAP[offset|42]<<8|HEAP[offset|43],HEAP[offset|44]<<24|HEAP[offset|45]<<16|HEAP[offset|46]<<8|HEAP[offset|47],HEAP[offset|48]<<24|HEAP[offset|49]<<16|HEAP[offset|50]<<8|HEAP[offset|51],HEAP[offset|52]<<24|HEAP[offset|53]<<16|HEAP[offset|54]<<8|HEAP[offset|55],HEAP[offset|56]<<24|HEAP[offset|57]<<16|HEAP[offset|58]<<8|HEAP[offset|59],HEAP[offset|60]<<24|HEAP[offset|61]<<16|HEAP[offset|62]<<8|HEAP[offset|63])}function _state_to_heap(output){output=output|0;HEAP[output|0]=H0>>>24;HEAP[output|1]=H0>>>16&255;HEAP[output|2]=H0>>>8&255;HEAP[output|3]=H0&255;HEAP[output|4]=H1>>>24;HEAP[output|5]=H1>>>16&255;HEAP[output|6]=H1>>>8&255;HEAP[output|7]=H1&255;HEAP[output|8]=H2>>>24;HEAP[output|9]=H2>>>16&255;HEAP[output|10]=H2>>>8&255;HEAP[output|11]=H2&255;HEAP[output|12]=H3>>>24;HEAP[output|13]=H3>>>16&255;HEAP[output|14]=H3>>>8&255;HEAP[output|15]=H3&255;HEAP[output|16]=H4>>>24;HEAP[output|17]=H4>>>16&255;HEAP[output|18]=H4>>>8&255;HEAP[output|19]=H4&255;HEAP[output|20]=H5>>>24;HEAP[output|21]=H5>>>16&255;HEAP[output|22]=H5>>>8&255;HEAP[output|23]=H5&255;HEAP[output|24]=H6>>>24;HEAP[output|25]=H6>>>16&255;HEAP[output|26]=H6>>>8&255;HEAP[output|27]=H6&255;HEAP[output|28]=H7>>>24;HEAP[output|29]=H7>>>16&255;HEAP[output|30]=H7>>>8&255;HEAP[output|31]=H7&255}function reset(){H0=0x6a09e667;H1=0xbb67ae85;H2=0x3c6ef372;H3=0xa54ff53a;H4=0x510e527f;H5=0x9b05688c;H6=0x1f83d9ab;H7=0x5be0cd19;TOTAL0=TOTAL1=0}function init(h0,h1,h2,h3,h4,h5,h6,h7,total0,total1){h0=h0|0;h1=h1|0;h2=h2|0;h3=h3|0;h4=h4|0;h5=h5|0;h6=h6|0;h7=h7|0;total0=total0|0;total1=total1|0;H0=h0;H1=h1;H2=h2;H3=h3;H4=h4;H5=h5;H6=h6;H7=h7;TOTAL0=total0;TOTAL1=total1}function process(offset,length){offset=offset|0;length=length|0;var hashed=0;if(offset&63)return-1;while((length|0)>=64){_core_heap(offset);offset=(offset+64)|0;length=(length-64)|0;hashed=(hashed+64)|0}TOTAL0=(TOTAL0+hashed)|0;if(TOTAL0>>>0<hashed>>>0)TOTAL1=(TOTAL1+1)|0;return hashed|0}function finish(offset,length,output){offset=offset|0;length=length|0;output=output|0;var hashed=0,i=0;if(offset&63)return-1;if(~output)if(output&31)return-1;if((length|0)>=64){hashed=process(offset,length)|0;if((hashed|0)==-1)return-1;offset=(offset+hashed)|0;length=(length-hashed)|0}hashed=(hashed+length)|0;TOTAL0=(TOTAL0+length)|0;if(TOTAL0>>>0<length>>>0)TOTAL1=(TOTAL1+1)|0;HEAP[offset|length]=0x80;if((length|0)>=56){for(i=(length+1)|0;(i|0)<64;i=(i+1)|0)HEAP[offset|i]=0x00;_core_heap(offset);length=0;HEAP[offset|0]=0}for(i=(length+1)|0;(i|0)<59;i=(i+1)|0)HEAP[offset|i]=0;HEAP[offset|56]=TOTAL1>>>21&255;HEAP[offset|57]=TOTAL1>>>13&255;HEAP[offset|58]=TOTAL1>>>5&255;HEAP[offset|59]=TOTAL1<<3&255|TOTAL0>>>29;HEAP[offset|60]=TOTAL0>>>21&255;HEAP[offset|61]=TOTAL0>>>13&255;HEAP[offset|62]=TOTAL0>>>5&255;HEAP[offset|63]=TOTAL0<<3&255;_core_heap(offset);if(~output)_state_to_heap(output);return hashed|0}function hmac_reset(){H0=I0;H1=I1;H2=I2;H3=I3;H4=I4;H5=I5;H6=I6;H7=I7;TOTAL0=64;TOTAL1=0}function _hmac_opad(){H0=O0;H1=O1;H2=O2;H3=O3;H4=O4;H5=O5;H6=O6;H7=O7;TOTAL0=64;TOTAL1=0}function hmac_init(p0,p1,p2,p3,p4,p5,p6,p7,p8,p9,p10,p11,p12,p13,p14,p15){p0=p0|0;p1=p1|0;p2=p2|0;p3=p3|0;p4=p4|0;p5=p5|0;p6=p6|0;p7=p7|0;p8=p8|0;p9=p9|0;p10=p10|0;p11=p11|0;p12=p12|0;p13=p13|0;p14=p14|0;p15=p15|0;reset();_core(p0^0x5c5c5c5c,p1^0x5c5c5c5c,p2^0x5c5c5c5c,p3^0x5c5c5c5c,p4^0x5c5c5c5c,p5^0x5c5c5c5c,p6^0x5c5c5c5c,p7^0x5c5c5c5c,p8^0x5c5c5c5c,p9^0x5c5c5c5c,p10^0x5c5c5c5c,p11^0x5c5c5c5c,p12^0x5c5c5c5c,p13^0x5c5c5c5c,p14^0x5c5c5c5c,p15^0x5c5c5c5c);O0=H0;O1=H1;O2=H2;O3=H3;O4=H4;O5=H5;O6=H6;O7=H7;reset();_core(p0^0x36363636,p1^0x36363636,p2^0x36363636,p3^0x36363636,p4^0x36363636,p5^0x36363636,p6^0x36363636,p7^0x36363636,p8^0x36363636,p9^0x36363636,p10^0x36363636,p11^0x36363636,p12^0x36363636,p13^0x36363636,p14^0x36363636,p15^0x36363636);I0=H0;I1=H1;I2=H2;I3=H3;I4=H4;I5=H5;I6=H6;I7=H7;TOTAL0=64;TOTAL1=0}function hmac_finish(offset,length,output){offset=offset|0;length=length|0;output=output|0;var t0=0,t1=0,t2=0,t3=0,t4=0,t5=0,t6=0,t7=0,hashed=0;if(offset&63)return-1;if(~output)if(output&31)return-1;hashed=finish(offset,length,-1)|0;t0=H0,t1=H1,t2=H2,t3=H3,t4=H4,t5=H5,t6=H6,t7=H7;_hmac_opad();_core(t0,t1,t2,t3,t4,t5,t6,t7,0x80000000,0,0,0,0,0,0,768);if(~output)_state_to_heap(output);return hashed|0}function pbkdf2_generate_block(offset,length,block,count,output){offset=offset|0;length=length|0;block=block|0;count=count|0;output=output|0;var h0=0,h1=0,h2=0,h3=0,h4=0,h5=0,h6=0,h7=0,t0=0,t1=0,t2=0,t3=0,t4=0,t5=0,t6=0,t7=0;if(offset&63)return-1;if(~output)if(output&31)return-1;HEAP[(offset+length)|0]=block>>>24;HEAP[(offset+length+1)|0]=block>>>16&255;HEAP[(offset+length+2)|0]=block>>>8&255;HEAP[(offset+length+3)|0]=block&255;hmac_finish(offset,(length+4)|0,-1)|0;h0=t0=H0,h1=t1=H1,h2=t2=H2,h3=t3=H3,h4=t4=H4,h5=t5=H5,h6=t6=H6,h7=t7=H7;count=(count-1)|0;while((count|0)>0){hmac_reset();_core(t0,t1,t2,t3,t4,t5,t6,t7,0x80000000,0,0,0,0,0,0,768);t0=H0,t1=H1,t2=H2,t3=H3,t4=H4,t5=H5,t6=H6,t7=H7;_hmac_opad();_core(t0,t1,t2,t3,t4,t5,t6,t7,0x80000000,0,0,0,0,0,0,768);t0=H0,t1=H1,t2=H2,t3=H3,t4=H4,t5=H5,t6=H6,t7=H7;h0=h0^H0;h1=h1^H1;h2=h2^H2;h3=h3^H3;h4=h4^H4;h5=h5^H5;h6=h6^H6;h7=h7^H7;count=(count-1)|0}H0=h0;H1=h1;H2=h2;H3=h3;H4=h4;H5=h5;H6=h6;H7=h7;if(~output)_state_to_heap(output);return 0}return{reset:reset,init:init,process:process,finish:finish,hmac_reset:hmac_reset,hmac_init:hmac_init,hmac_finish:hmac_finish,pbkdf2_generate_block:pbkdf2_generate_block}}var _sha256_block_size=64,_sha256_hash_size=32;function sha256_constructor(options){options=options||{};this.heap=_heap_init(Uint8Array,options);this.asm=options.asm||sha256_asm(global,null,this.heap.buffer);this.BLOCK_SIZE=_sha256_block_size;this.HASH_SIZE=_sha256_hash_size;this.reset()}sha256_constructor.BLOCK_SIZE=_sha256_block_size;sha256_constructor.HASH_SIZE=_sha256_hash_size;var sha256_prototype=sha256_constructor.prototype;sha256_prototype.reset=hash_reset;sha256_prototype.process=hash_process;sha256_prototype.finish=hash_finish;var sha256_instance=null;function get_sha256_instance(){if(sha256_instance===null)sha256_instance=new sha256_constructor({heapSize:0x100000});return sha256_instance}function sha256_bytes(data){if(data===undefined)throw new SyntaxError("data required");return get_sha256_instance().reset().process(data).finish().result}function sha256_hex(data){var result=sha256_bytes(data);return bytes_to_hex(result)}function sha256_base64(data){var result=sha256_bytes(data);return bytes_to_base64(result)}sha256_constructor.bytes=sha256_bytes;sha256_constructor.hex=sha256_hex;sha256_constructor.base64=sha256_base64;exports.SHA256=sha256_constructor;global.asmCryptoSha256=exports}({},function(){return this}());';
 
 function evalscript(text)
 {
-    var script = document.createElement('script');
-    script.type = "text/javascript";
-    document.getElementsByTagName('head')[0].appendChild(script);
-    script.text = text;
+    mCreateElement('script', {type: 'text/javascript'}, 'head').text = text;
 }
 
 function evalscript_url(jarray)
 {
-    var head = document.head || document.getElementsByTagName('head')[0];
-    var script = document.createElement('script');
-    script.type = "text/javascript";
-    head.appendChild(script);
-    var url = mObjectURL(jarray, script.type);
-    script.src = url;
+    var url = mObjectURL(jarray, 'text/javascript');
+    mCreateElement('script', {type: 'text/javascript'}, 'head').src = url;
     return url;
+}
+
+function mCreateElement(aNode, aAttrs, aChildNodes, aTarget)
+{
+    aNode = document.createElement(aNode);
+    if (!aNode) {
+        return null;
+    }
+
+    if (aAttrs) {
+        for (var attr in aAttrs) {
+            aNode.setAttribute( attr, '' + aAttrs[attr]);
+        }
+    }
+
+    if (!Array.isArray(aChildNodes)) {
+        aTarget = aChildNodes;
+        aChildNodes = null;
+    }
+
+    if (aChildNodes) {
+        for (var cn in aChildNodes) {
+            if (aChildNodes[cn]) {
+                aNode.appendChild(aChildNodes[cn]);
+            }
+        }
+    }
+
+    if (aTarget) {
+        if (typeof aTarget === 'string') {
+            aTarget = document[aTarget] || document.getElementsByTagName(aTarget)[0];
+        }
+        if (aTarget) {
+            aTarget.appendChild(aNode);
+        }
+        else if (d) {
+            console.error('Invalid target', aNode, aAttrs, aTarget);
+        }
+    }
+
+    return aNode;
 }
 
 function mObjectURL(data, type)
@@ -239,24 +342,29 @@ var mBroadcaster = {
     },
 
     sendMessage: function mBroadcaster_sendMessage(topic) {
-        if (d) console.log('Broadcasting ' + topic);
         if (this._topics.hasOwnProperty(topic)) {
             var args = Array.prototype.slice.call(arguments, 1);
             var idr = [];
 
+            if (d) console.log('Broadcasting ' + topic, args);
+
             for (var id in this._topics[topic]) {
-                var ev = this._topics[topic][id];
+                var ev = this._topics[topic][id], rc;
                 try {
-                    ev.callback.apply(ev.scope, args);
+                    rc = ev.callback.apply(ev.scope, args);
                 } catch (ex) {
                     if (d) console.error(ex, ex.stack ? ex.stack : null);
                 }
-                if (ev.once)
+                if (ev.once || rc === 0xDEAD)
                     idr.push(id);
             }
             if (idr.length)
                 idr.forEach(this.removeListener.bind(this));
+
+            return true;
         }
+
+        return false;
     },
 
     once: function mBroadcaster_once(topic, callback) {
@@ -264,11 +372,180 @@ var mBroadcaster = {
             once : true,
             callback : callback
         });
+    },
+
+    crossTab: {
+        eTag: '$CTE$!_',
+
+        initialize: function crossTab_init(cb) {
+            var setup = function(ev) {
+                var msg = String(ev && ev.key).substr(this.eTag.length);
+                if (d) console.log('crossTab setup-event', msg, ev);
+                if (cb && (!ev || msg === 'pong')) {
+                    this.unlisten(setup);
+                    if (msg !== 'pong') {
+                        this.setMaster();
+                    } else {
+                        delete localStorage[ev.key];
+                    }
+                    this.listen();
+                    if (d) {
+                        console.log('CROSSTAB COMMUNICATION INITIALIZED AS '
+                            + (this.master ? 'MASTER':'SLAVE'));
+                    }
+                    cb(this.master);
+                    cb = null;
+                }
+            }.bind(this);
+
+            if (this.handle) {
+                this.eTag = this.eTag.split(this.handle).shift();
+            }
+            this.slaves = [];
+            this.handle = u_handle;
+            this.eTag += u_handle + '!';
+
+            this.ctID = ~~(Math.random() * Date.now());
+            this.listen(setup);
+            this.notify('ping');
+
+            setTimeout(setup, !parseInt(localStorage.ctInstances) ? 0 : 2000);
+        },
+
+        listen: function crossTab_listen(aListener) {
+            if (window.addEventListener) {
+                window.addEventListener('storage', aListener || this, false);
+            }
+            else if (window.attachEvent) {
+                if (!aListener) {
+                    aListener = this.__msie_listener = this.handleEvent.bind(this);
+                }
+                window.attachEvent('onstorage', aListener);
+            }
+        },
+
+        unlisten: function crossTab_unlisten(aListener) {
+            if (window.addEventListener) {
+                window.removeEventListener('storage', aListener || this, false);
+            }
+            else if (window.attachEvent) {
+                if (!aListener) {
+                    aListener = this.__msie_listener;
+                    delete this.__msie_listener;
+                }
+                window.detachEvent('onstorage', aListener);
+            }
+        },
+
+        leave: function crossTab_leave() {
+            if (this.ctID) {
+                var wasMaster = this.master;
+                if (wasMaster) {
+                    localStorage.ctInstances--;
+                    localStorage['mCrossTabRef_' + u_handle] = this.master;
+                    delete this.master;
+                } else if (d) {
+                    console.log('crossTab leaving');
+                }
+
+                this.unlisten();
+                this.notify('leaving', {
+                    wasMaster: wasMaster || -1,
+                    newMaster: this.slaves[0]
+                });
+
+                mBroadcaster.sendMessage('crossTab:leave', wasMaster);
+                this.ctID = 0;
+            }
+        },
+
+        notify: function crossTab_notify(msg, data) {
+            data = { origin: this.ctID, data: data, sid: Math.random()};
+            localStorage.setItem(this.eTag + msg, JSON.stringify(data));
+            if (d) console.log('crossTab Notifying', this.eTag + msg, localStorage[this.eTag + msg]);
+        },
+
+        setMaster: function crossTab_setMaster() {
+            this.master = (Math.random() * Date.now()).toString(36);
+
+            localStorage.ctInstances = (this.slaves.length + 1);
+            mBroadcaster.sendMessage('crossTab:master', this.master);
+
+            // (function liveLoop(tag) {
+                // if (tag === mBroadcaster.crossTab.master) {
+                    // localStorage['mCrossTabRef_' + u_handle] = Date.now();
+                    // setTimeout(liveLoop, 6e3, tag);
+                // }
+            // })(this.master);
+        },
+
+        clear: function crossTab_clear() {
+            Object.keys(localStorage).forEach(function(key) {
+                if (key.substr(0,this.eTag.length) === this.eTag) {
+                    if (d) console.log('crossTab Removing ' + key);
+                    delete localStorage[key];
+                }
+            }.bind(this));
+        },
+
+        handleEvent: function crossTab_handleEvent(ev) {
+            if (d) console.log('crossTab ' + ev.type + '-event', ev.key, ev.newValue, ev);
+
+            if (String(ev.key).indexOf(this.eTag) !== 0) {
+                return;
+            }
+            var msg = ev.key.substr(this.eTag.length),
+                strg = JSON.parse(ev.newValue ||'""');
+
+            if (!strg || strg.origin === this.ctID) {
+                if (d) console.log('Ignoring crossTab event', msg, strg);
+                return;
+            }
+
+            switch (msg) {
+                case 'ping':
+                    this.slaves.push(strg.origin);
+                    if (this.master) {
+                        localStorage.ctInstances = (this.slaves.length + 1);
+                    }
+
+                    this.notify('pong');
+                    break;
+                case 'leaving':
+                    var idx = this.slaves.indexOf(strg.origin);
+                    if (idx !== -1) {
+                        this.slaves.splice(idx, 1);
+                        if (this.master) {
+                            localStorage.ctInstances = (this.slaves.length + 1);
+                        }
+                    }
+
+                    if (localStorage['mCrossTabRef_' + u_handle] === strg.data.wasMaster) {
+                        if (strg.data.newMaster === this.ctID) {
+                            if (d) {
+                                console.log('Taking crossTab-master ownership');
+                            }
+                            delete localStorage['mCrossTabRef_' + u_handle];
+                            this.setMaster();
+                            if (u_handle && window.indexedDB) {
+                                mDBstart(true);
+                            }
+                        }
+                    }
+                    break;
+            }
+
+            delete localStorage[ev.key];
+        }
     }
 };
 if (typeof Object.freeze === 'function') {
     mBroadcaster = Object.freeze(mBroadcaster);
 }
+Object.defineProperty(this, 'mBroadcaster', {
+    value: mBroadcaster,
+    writable: false
+});
 
 var sh = [];
 
@@ -284,7 +561,7 @@ function compareHashes(hashFromWorker, fileName) {
     var startOfHash = fileName.lastIndexOf('_') + 1;
     var endOfHash = fileName.lastIndexOf('.');
     var hashFromDeployment = fileName.substring(startOfHash, endOfHash);
-    
+
     if (hashFromWorker === hashFromDeployment) {
         //console.log('Hash match on file: ' + fileName + '. Hash from worker thread: ' + hashFromWorker + ' Hash from deployment script: ' + hashFromDeployment);
         return true;
@@ -360,10 +637,11 @@ function init_storage ( storage ) {
     return storage;
 }
 
-var androidsplash = false;
-var m = false;
-var seqno = Math.ceil(Math.random()*1000000000);
-if (isMobile() || (typeof localStorage !== 'undefined' && localStorage.mobile))
+function getxhr() {
+    return (typeof XDomainRequest !== 'undefined' && typeof ArrayBuffer === 'undefined') ? new XDomainRequest() : new XMLHttpRequest();
+}
+
+if (m || (typeof localStorage !== 'undefined' && localStorage.mobile))
 {
     var tag=document.createElement('meta');
     tag.name = "viewport";
@@ -399,7 +677,7 @@ if (isMobile() || (typeof localStorage !== 'undefined' && localStorage.mobile))
     var tag=document.createElement('link');
     tag.rel = "shortcut icon";
     tag.type = "image/vnd.microsoft.icon";
-    tag.href = "https://mega.co.nz/favicon.ico";
+    tag.href = "https://mega.nz/favicon.ico";
     document.getElementsByTagName('head')[0].appendChild(tag);
     m=true;
 }
@@ -423,7 +701,7 @@ if (m)
     }
     else if (ua.indexOf('android') > -1)
     {
-        app='https://play.google.com/store/apps/details?id=com.flyingottersoftware.mega';
+        app='https://play.google.com/store/apps/details?id=nz.mega.android&referrer=meganzsb';
         document.body.className = 'android full-mode supported';
         android=1;
     }
@@ -435,6 +713,8 @@ if (m)
     }
     else if (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1 || ua.indexOf('ipod') > -1)
     {
+        // http://whatsmyuseragent.com/Devices/iPhone-User-Agent-Strings
+        // http://www.enterpriseios.com/wiki/Complete_List_of_iOS_User_Agent_Strings
         app='https://itunes.apple.com/app/mega/id706857885';
         document.body.className = 'ios full-mode supported';
         document.getElementById('m_desc').innerHTML = 'Free 50 GB - End-to-end encryption';
@@ -453,26 +733,51 @@ if (m)
     }
     if (window.location.hash.substr(1,1) == '!' || window.location.hash.substr(1,2) == 'F!')
     {
-        var i=0;
-        if (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1 || ua.indexOf('ipod') > -1 || ua.indexOf('windows phone') > -1) i=1;
+        var i = 0;
+        var intent = false;
+        if (ua.indexOf('windows phone') > -1) {
+            i = 1;
+        }
+
+        if (android) {
+            var ver = ua.match(/android (\d+)\.(\d+)/);
+            if (ver) {
+                var rev = ver.pop();
+                ver = ver.pop();
+                // Check for Android 2.3+
+                if (ver > 2 || (ver === 2 && rev > 3)) {
+                    intent = 'intent://' + location.hash + '/#Intent;scheme=mega;package=nz.mega.android;end';
+                }
+            }
+            if (intent) {
+                document.location = intent;
+            }
+        }
 
         if (app) {
-            document.getElementById('m_title').innerHTML = 'Install the free MEGA app to access this file from your mobile';
+            document.getElementById('m_title').innerHTML = 'Install the free MEGA app to access this file from your mobile.';
             document.getElementById('m_appbtn').href += '&referrer=link';
         }
         if (ua.indexOf('chrome') > -1)
         {
-            setTimeout(function()
-            {
-                if (confirm('Do you already have the MEGA app installed?')) document.location = 'mega://' + window.location.hash;
-            },2500);
+            if (intent) {
+                document.getElementById('m_title').innerHTML
+                    += '<br/><em>If you already have it installed, <a href="' + intent + '">Click here!</a></em>';
+            }
+            else {
+                setTimeout(function() {
+                    if (confirm('Do you already have the MEGA app installed?')) {
+                        document.location = intent ? intent : 'mega://' + window.location.hash;
+                    }
+                }, 2500);
+            }
         }
         else document.getElementById('m_iframe').src = 'mega://' + window.location.hash.substr(i);
     }
     else if (window.location.hash.substr(1,7) == 'confirm' || window.location.hash.substr(1,7) == 'account')
     {
         var i=0;
-        if (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1 || ua.indexOf('ipod') > -1 || ua.indexOf('windows phone') > -1) i=1;
+        if (ua.indexOf('windows phone') > -1) i=1;
         if (ua.indexOf('chrome') > -1) window.location ='mega://' + window.location.hash.substr(i);
         else document.getElementById('m_iframe').src = 'mega://' + window.location.hash.substr(i);
     }
@@ -482,17 +787,16 @@ if (m)
         var script = document.createElement('script');
         script.type = "text/javascript";
         document.head.appendChild(script);
-        //script.src = 'https://mega.nz/blog.js'
-        script.src = '/html/js/blog.js'
+        script.src = '/blog.js';
     }
 }
 else if (page == '#android')
 {
-    document.location = 'https://play.google.com/store/apps/details?id=com.flyingottersoftware.mega';
+    document.location = 'https://play.google.com/store/apps/details?id=nz.mega.android&referrer=meganzmobileapps';
 }
 else if (!b_u)
 {
-    var d = localStorage.d || 0,l;
+    d = localStorage.d || 0;
     var jj = localStorage.jj || 0;
     var onBetaW = location.hostname === 'beta.mega.nz' || location.hostname.indexOf("developers.") === 0;
     var languages = {'en':['en','en-'],'es':['es','es-'],'fr':['fr','fr-'],'de':['de','de-'],'it':['it','it-'],'nl':['nl','nl-'],'pt':['pt'],'br':['pt-br'],'dk':['da'],'se':['sv'],'fi':['fi'],'no':['no'],'pl':['pl'],'cz':['cz','cz-'],'sk':['sk','sk-'],'sl':['sl','sl-'],'hu':['hu','hu-'],'jp':['ja'],'cn':['zh','zh-cn'],'ct':['zh-hk','zh-sg','zh-tw'],'kr':['ko'],'ru':['ru','ru-mo'],'ar':['ar','ar-'],'he':['he'],'id':['id'],'ca':['ca','ca-'],'eu':['eu','eu-'],'af':['af','af-'],'bs':['bs','bs-'],'sg':[],'tr':['tr','tr-'],'mk':[],'hi':[],'hr':['hr'],'ro':['ro','ro-'],'uk':['||'],'gl':['||'],'sr':['||'],'lt':['||'],'th':['||'],'lv':['||'],'fa':['||'],'ee':['et'],'ms':['ms'],'cy':['cy'],'bg':['bg'],'be':['br'],'tl':['en-ph'],'ka':['||']};
@@ -502,14 +806,14 @@ else if (!b_u)
         var timers = {};
         c.time = function(n) { timers[n] = new Date().getTime()};
         c.timeEnd = function(n) {
-            if(timers[n]) {
+            if (timers[n]) {
                 c.log(n + ': ' + (new Date().getTime() - timers[n]) + 'ms');
                 delete timers[n];
             }
         };
     })(console);
 
-    Object.defineProperty(window, "__cd_v", { value : 9, writable : false });
+    Object.defineProperty(window, "__cd_v", { value : 16, writable : false });
     if (!d || onBetaW)
     {
         var __cdumps = [], __cd_t;
@@ -517,7 +821,7 @@ else if (!b_u)
         {
             function mTrim(s)
             {
-                return s
+                return String(s)
                     .replace(/resource:.+->\s/,'')
                     .replace(/blob:[^:\s]+/, '..')
                     .replace(/\.\.:\/\/[^:\s]+/, '..')
@@ -528,9 +832,26 @@ else if (!b_u)
             if (__cdumps.length > 3) return false;
 
             var dump = {
-                m : ('' + msg).replace(/'(\w+:\/\/+[^/]+)[^']+'/,"'$1...'").replace(/^Uncaught\s*/,''),
-                f : mTrim('' + url), l : ln
-            }, cc, sbid = +(''+(document.querySelector('script[src*="secureboot"]')||{}).src).split('=').pop()|0;
+                l: ln,
+                f: mTrim(url),
+                m: mTrim(msg).replace(/'(\w+:\/\/+[^/]+)[^']+(?:'|$)/, "'$1...'")
+                    .replace(/(Access to '\.\.).*(' from script denied)/, '$1$2')
+                    .replace(/gfs\w+\.userstorage/, 'gfs...userstorage')
+                    .replace(/^Uncaught\W*(?:exception\W*)?/i, ''),
+            }, cc;
+            var sbid = +(''+(document.querySelector('script[src*="secureboot"]')||{}).src).split('=').pop()|0;
+
+            if (~dump.m.indexOf('[[:i]]')) {
+                return false;
+            }
+
+            if (~dump.m.indexOf("\n")) {
+                var lns = dump.m.split(/\r?\n/).map(String.trim).filter(String);
+
+                if (lns.length > 6) {
+                    dump.m = [].concat(lns.slice(0,2), "[..!]", lns.slice(-2)).join(" ");
+                }
+            }
 
             if (~dump.m.indexOf('took +10s'))
             {
@@ -550,7 +871,18 @@ else if (!b_u)
                 if (errobj.udata) dump.d = errobj.udata;
                 if (errobj.stack)
                 {
-                    dump.s = ('' + errobj.stack).split("\n").splice(0,9).map(mTrim).join("\n");
+                    var omsg = String(msg).trim();
+                    var re = RegExp(
+                        omsg.substr(0, 70)
+                        .replace(/^\w+:\s/, '')
+                        .replace(/([^\w])/g, '\\$1')
+                        + '[^\r\n]+'
+                    );
+
+                    dump.s = String(errobj.stack)
+                        .replace(omsg, '').replace(re, '')
+                        .split("\n").map(String.trim).filter(String)
+                        .splice(0,15).map(mTrim).join("\n");
                 }
             }
             if (cn) dump.c = cn;
@@ -634,7 +966,7 @@ else if (!b_u)
 
                 for (var i in __cdumps)
                 {
-                    api_req({ a : 'cd', c : JSON.stringify(__cdumps[i]), v : report, t : +__cd_v }, ctx(ids[i]));
+                    api_req({ a : 'cd', c : JSON.stringify(__cdumps[i]), v : report, t : +__cd_v, s : window.location.host }, ctx(ids[i]));
                 }
                 __cd_t = 0;
                 __cdumps = [];
@@ -644,17 +976,17 @@ else if (!b_u)
             return false;
         };
     }
-    
+
     function detectlang()
     {
         if (!navigator.language) return 'en';
         var bl = navigator.language.toLowerCase();
-        var l2 = languages;
+        var l2 = languages, b;
         for (var l in l2) for (b in l2[l]) if (l2[l][b] == bl) return l;
         for (var l in l2) for (b in l2[l]) if (l2[l][b].substring(0,3)==bl.substring(0,3)) return l;
         return 'en';
     }
-    
+
     /**
      * Gets the file path for a language file
      * @param {String} language
@@ -664,13 +996,13 @@ else if (!b_u)
     {
         // If the sh1 (filename with hashes) array has been created from deploy script
         if (typeof sh1 !== 'undefined') {
-            
+
             // Search the array
             for (var i = 0, length = sh1.length; i < length; i++)
             {
                 var filePath = sh1[i];
 
-                // If the language e.g. 'en' matches part of the filename from the deploy script e.g. 
+                // If the language e.g. 'en' matches part of the filename from the deploy script e.g.
                 // 'lang/en_0a8e1591149050ef1884b0c4abfbbeb759bbe9eaf062fa54e5b856fdb78e1eb3.json'
                 if (filePath.indexOf('lang/' + language) > -1)
                 {
@@ -683,50 +1015,53 @@ else if (!b_u)
             return 'lang/' + language + '.json';
         }
     }
-    
+
     var lang = detectlang();
     var jsl = [];
-    
+
     // If they've already selected a language, use that
-    if (typeof localStorage.lang !== 'undefined' && languages[localStorage.lang]) {
-        lang = localStorage.lang;
+    if ((typeof localStorage != 'undefined') && (localStorage.lang)) {
+        if (languages[localStorage.lang]) {
+            lang = localStorage.lang;
+        }
     }
-    
+
     // Get the language file path e.g. lang/en.json or 'lang/en_7a8e15911490...f1878e1eb3.json'
     var langFilepath = getLanguageFilePath(lang);
 
     jsl.push({f: langFilepath, n: 'lang', j:3});
     jsl.push({f:'sjcl.js', n: 'sjcl_js', j:1}); // Will be replaced with asmCrypto soon
+    jsl.push({f:'js/mDB.js', n: 'mDB_js', j:1});
     jsl.push({f:'js/asmcrypto.js',n:'asmcrypto_js',j:1,w:1});
+    jsl.push({f:'js/jquery-2.1.1.js', n: 'jquery', j:1,w:10});
+    jsl.push({f:'js/functions.js', n: 'functions_js', j:1});
+    jsl.push({f:'js/mega.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/vendor/megaLogger.js', n: 'megaLogger_js', j:1});
     jsl.push({f:'js/tlvstore.js', n: 'tlvstore_js', j:1});
     jsl.push({f:'js/crypto.js', n: 'crypto_js', j:1,w:5});
     jsl.push({f:'js/jsbn.js', n: 'jsbn_js', j:1,w:2});
     jsl.push({f:'js/jsbn2.js', n: 'jsbn2_js', j:1,w:2});
     jsl.push({f:'js/jodid25519.js', n: 'jodid25519_js', j:1,w:7});
-    jsl.push({f:'js/stringcrypt.js', n: 'stringcrypt_js', j:1});
+    jsl.push({f:'js/megaPromise.js', n: 'megapromise_js', j:1,w:5});
     jsl.push({f:'js/user.js', n: 'user_js', j:1});
     jsl.push({f:'js/authring.js', n: 'authring_js', j:1});
     jsl.push({f:'js/mouse.js', n: 'mouse_js', j:1});
-    jsl.push({f:'js/jquery-2.1.1.js', n: 'jquery', j:1,w:10});
-    jsl.push({f:'js/functions.js', n: 'functions_js', j:1});
-    jsl.push({f:'js/datastructs.js', n: 'datastructs_js', j:1});
-    jsl.push({f:'js/megaLogger.js', n: 'megaLogger_js', j:1});
     jsl.push({f:'js/jquery-ui-1.11.2.js', n: 'jqueryui_js', j:1,w:10});
-    jsl.push({f:'js/base64.js', n: 'base64_js', j:1});
     jsl.push({f:'js/filedrag.js', n: 'filedrag_js', j:1});
     jsl.push({f:'js/jquery.mousewheel.js', n: 'jquerymouse_js', j:1});
     jsl.push({f:'js/jquery.jscrollpane.js', n: 'jscrollpane_js', j:1});
     jsl.push({f:'js/jquery.tokeninput.js', n: 'jquerytokeninput_js', j:1});
     jsl.push({f:'js/jquery.misc.js', n: 'jquerymisc_js', j:1});
-    jsl.push({f:'js/mDB.js', n: 'mDB_js', j:1});
     jsl.push({f:'js/thumbnail.js', n: 'thumbnail_js', j:1});
     jsl.push({f:'js/exif.js', n: 'exif_js', j:1,w:3});
     jsl.push({f:'js/megapix.js', n: 'megapix_js', j:1});
     jsl.push({f:'js/smartcrop.js', n: 'smartcrop_js', j:1,w:7});
-    jsl.push({f:'js/mega.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/jquery.fullscreen.js', n: 'jquery_fullscreen', j:1,w:10});
+    jsl.push({f:'js/jquery.qrcode.js', n: 'jqueryqrcode', j:1});
+    jsl.push({f:'js/vendor/qrcode.js', n: 'qrcode', j:1,w:2, g: 'vendor'});
+    jsl.push({f:'js/bitcoin-math.js', n: 'bitcoinmath', j:1 });
+    jsl.push({f:'js/paycrypt.js', n: 'paycrypt_js', j:1 });
     jsl.push({f:'js/vendor/jquery.window-active.js', n: 'jquery_windowactive', j:1,w:2});
-    jsl.push({f:'js/megaPromise.js', n: 'megapromise_js', j:1,w:5});
     jsl.push({f:'js/vendor/db.js', n: 'db_js', j:1,w:5});
     jsl.push({f:'js/megaDbEncryptionPlugin.js', n: 'megadbenc_js', j:1,w:5});
     jsl.push({f:'js/megaDb.js', n: 'megadb_js', j:1,w:5});
@@ -769,6 +1104,7 @@ else if (!b_u)
     jsl.push({f:'js/ui/dialog.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/ui/feedbackDialog.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/ui/credentialsWarningDialog.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/ui/loginRequiredDialog.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/chat/ui/incomingCallDialog.js', n: 'mega_js', j:1,w:7});
 
     // notifications
@@ -777,6 +1113,8 @@ else if (!b_u)
     jsl.push({f:'js/vendor/favico.js', n: 'favico_js', j:1,w:7});
     jsl.push({f:'js/vendor/notification.js', n: 'notification_js', j:1,w:7});
 
+    jsl.push({f:'js/chat/plugins/karerePing.js', n: 'karerePing_js', j:1,w:7});
+    jsl.push({f:'js/chat/plugins/callManager.js', n: 'callManager_js', j:1,w:7});
     jsl.push({f:'js/chat/plugins/urlFilter.js', n: 'urlFilter_js', j:1,w:7});
     jsl.push({f:'js/chat/plugins/emoticonsFilter.js', n: 'emoticonsFilter_js', j:1,w:7});
     jsl.push({f:'js/chat/plugins/attachmentsFilter.js', n: 'attachmentsFilter_js', j:1,w:7});
@@ -792,110 +1130,110 @@ else if (!b_u)
 
     // END OF MEGA CHAT
 
-	jsl.push({f:'js/fm.js', n: 'fm_js', j:1,w:12});
-	jsl.push({f:'js/filetypes.js', n: 'filetypes_js', j:1});
-	jsl.push({f:'js/miniui.js', n: 'miniui_js', j:1});
-	if (is_extension)
-	{
-		jsl.push({f:'js/dcraw.js', n: 'dcraw_js', j:1});
-	}
-	/* better download */
-	jsl.push({f:'js/xhr.js', n: 'xhr_js', j:1});
-	jsl.push({f:'js/events.js', n: 'events', j:1,w:4});
-	jsl.push({f:'js/queue.js', n: 'queue', j:1,w:4});
-	jsl.push({f:'js/downloadChrome.js', n: 'dl_chrome', j:1,w:3});
-	if (is_chrome_firefox && parseInt(Services.appinfo.version) > 27)
-	{
-		is_chrome_firefox |= 4;
-		jsl.push({f:'js/downloadFirefox.js', n: 'dl_firefox', j:1,w:3});
-	}
-	else
-	{
-		jsl.push({f:'js/downloadMemory.js', n: 'dl_memory', j:1,w:3});
-		jsl.push({f:'js/downloadFlash.js', n: 'dl_flash', j:1,w:3});
-	}
-	jsl.push({f:'js/downloader.js', n: 'dl_downloader', j:1,w:3});
-	jsl.push({f:'js/download2.js', n: 'dl_js', j:1,w:3});
-	jsl.push({f:'js/upload2.js', n: 'upload_js', j:1,w:2});
-	/* end better download */
-	jsl.push({f:'index.js', n: 'index', j:1,w:4});
-	jsl.push({f:'html/start.html', n: 'start', j:0});
-	jsl.push({f:'html/megainfo.html', n: 'megainfo', j:0});
-	jsl.push({f:'html/js/start.js', n: 'start_js', j:1});
-	jsl.push({f:'html/bottom2.html', n: 'bottom2',j:0});
-	jsl.push({f:'html/key.html', n: 'key', j:0});
-	jsl.push({f:'html/js/key.js', n: 'key_js', j:1});
-	jsl.push({f:'html/pro.html', n: 'pro', j:0});
-	jsl.push({f:'html/js/pro.js', n: 'pro_js', j:1});
-	jsl.push({f:'html/login.html', n: 'login', j:0});
-	jsl.push({f:'html/js/login.js', n: 'login_js', j:1});
-	jsl.push({f:'html/fm.html', n: 'fm', j:0,w:3});
-	jsl.push({f:'html/top.html', n: 'top', j:0});
-	jsl.push({f:'js/notifications.js', n: 'notifications_js', j:1});
-	jsl.push({f:'css/style.css', n: 'style_css', j:2,w:30,c:1,d:1,cache:1});
-	jsl.push({f:'js/avatar.js', n: 'avatar_js', j:1,w:3});
-	jsl.push({f:'js/countries.js', n: 'countries_js', j:1});
-	jsl.push({f:'html/dialogs.html', n: 'dialogs', j:0,w:2});
-	jsl.push({f:'html/transferwidget.html', n: 'transferwidget', j:0});
-	jsl.push({f:'js/checkboxes.js', n: 'checkboxes_js', j:1});
-	jsl.push({f:'js/Int64.js', n: 'int64_js', j:1});
-	jsl.push({f:'js/zip64.js', n: 'zip_js', j:1});
-	jsl.push({f:'js/cms.js', n: 'cms_js', j:1});
-	jsl.push({f:'js/analytics.js', n: 'analytics_js', j:1});
+    jsl.push({f:'js/fm.js', n: 'fm_js', j:1,w:12});
+    jsl.push({f:'js/filetypes.js', n: 'filetypes_js', j:1});
+    jsl.push({f:'js/miniui.js', n: 'miniui_js', j:1});
+    if (is_extension)
+    {
+        jsl.push({f:'js/dcraw.js', n: 'dcraw_js', j:1});
+    }
+    /* better download */
+    jsl.push({f:'js/xhr.js', n: 'xhr_js', j:1});
+    jsl.push({f:'js/queue.js', n: 'queue', j:1,w:4});
+    jsl.push({f:'js/downloadChrome.js', n: 'dl_chrome', j:1,w:3});
+    if (is_chrome_firefox && parseInt(Services.appinfo.version) > 27)
+    {
+        is_chrome_firefox |= 4;
+        jsl.push({f:'js/downloadFirefox.js', n: 'dl_firefox', j:1,w:3});
+    }
+    else
+    {
+        jsl.push({f:'js/downloadMemory.js', n: 'dl_memory', j:1,w:3});
+        jsl.push({f:'js/downloadFlash.js', n: 'dl_flash', j:1,w:3});
+    }
+    jsl.push({f:'js/downloader.js', n: 'dl_downloader', j:1,w:3});
+    jsl.push({f:'js/download2.js', n: 'dl_js', j:1,w:3});
+    jsl.push({f:'js/upload2.js', n: 'upload_js', j:1,w:2});
+    /* end better download */
+    jsl.push({f:'index.js', n: 'index', j:1,w:4});
+    jsl.push({f:'html/start.html', n: 'start', j:0});
+    jsl.push({f:'html/megainfo.html', n: 'megainfo', j:0});
+    jsl.push({f:'html/js/start.js', n: 'start_js', j:1});
+    jsl.push({f:'html/bottom2.html', n: 'bottom2',j:0});
+    jsl.push({f:'html/key.html', n: 'key', j:0});
+    jsl.push({f:'html/js/key.js', n: 'key_js', j:1});
+    jsl.push({f:'html/pro.html', n: 'pro', j:0});
+    jsl.push({f:'html/js/pro.js', n: 'pro_js', j:1});
+    jsl.push({f:'html/login.html', n: 'login', j:0});
+    jsl.push({f:'html/js/login.js', n: 'login_js', j:1});
+    jsl.push({f:'html/fm.html', n: 'fm', j:0,w:3});
+    jsl.push({f:'html/top.html', n: 'top', j:0});
+    jsl.push({f:'js/notify.js', n: 'notify_js', j:1});
+    jsl.push({f:'js/vendor/popunda.js', n: 'popunda_js', j:1});
+    jsl.push({f:'css/style.css', n: 'style_css', j:2,w:30,c:1,d:1,cache:1});
+    jsl.push({f:'js/useravatar.js', n: 'contact_avatar_js', j:1,w:3});
+    jsl.push({f:'js/avatar.js', n: 'avatar_js', j:1,w:3});
+    jsl.push({f:'js/countries.js', n: 'countries_js', j:1});
+    jsl.push({f:'html/dialogs.html', n: 'dialogs', j:0,w:2});
+    jsl.push({f:'html/transferwidget.html', n: 'transferwidget', j:0});
+    jsl.push({f:'js/jquery.checkboxes.js', n: 'checkboxes_js', j:1});
+    jsl.push({f:'js/Int64.js', n: 'int64_js', j:1});
+    jsl.push({f:'js/zip64.js', n: 'zip_js', j:1});
+    jsl.push({f:'js/cms.js', n: 'cms_js', j:1});
+    jsl.push({f:'js/megasync.js', n: 'megasync_js', j:1});
 
-	// only used on beta
-	if (onBetaW) {
-		jsl.push({f: 'js/betacrashes.js', n: 'betacrashes_js', j: 1});
-	}
+    if (!is_chrome_firefox) {
+        // XXX: In Firefox this throws SecurityError: The operation is insecure.
+        jsl.push({f:'js/windowOpenerProtection.js', n: 'windowOpenerProtection', j:1, w:1});
+    }
 
-	var jsl2 =
-	{
-		'about': {f:'html/about.html', n: 'about', j:0},
-		'blog': {f:'html/blog.html', n: 'blog', j:0},
-		'blog_js': {f:'html/js/blog.js', n: 'blog_js', j:1},
-		'blogarticle': {f:'html/blogarticle.html', n: 'blogarticle', j:0},
-		'blogarticle_js': {f:'html/js/blogarticle.js', n: 'blogarticle_js', j:1},
-		'register': {f:'html/register.html', n: 'register', j:0},
-		'register_js': {f:'html/js/register.js', n: 'register_js', j:1},
-		'resellers': {f:'html/resellers.html', n: 'resellers', j:0},
-		'download': {f:'html/download.html', n: 'download', j:0},
-		'download_js': {f:'html/js/download.js', n: 'download_js', j:1},
-		'copyright': {f:'html/copyright.html', n: 'copyright', j:0},
-		'copyrightnotice': {f:'html/copyrightnotice.html', n: 'copyrightnotice', j:0},
-		'copyrightnotice_js': {f:'html/js/copyrightnotice.js', n: 'copyrightnotice_js', j:1},
-		'privacy': {f:'html/privacy.html', n: 'privacy', j:0},
-		'terms': {f:'html/terms.html', n: 'terms', j:0},
-		'backup': {f:'html/backup.html', n: 'backup', j:0},
-		'backup_js': {f:'html/js/backup.js', n: 'backup_js', j:1},
-		'reset': {f:'html/reset.html', n: 'reset', j:0},
-		'reset_js': {f:'html/js/reset.js', n: 'reset_js', j:1},
-		'filesaver': {f:'js/filesaver.js', n: 'filesaver', j:1},
-		'recovery': {f:'html/recovery.html', n: 'recovery', j:0},
-		'recovery_js': {f:'html/js/recovery.js', n: 'recovery_js', j:1},
-		'credits': {f:'html/credits.html', n: 'credits', j:0},
-		'takedown': {f:'html/takedown.html', n: 'takedown', j:0},
-		'dev': {f:'html/dev.html', n: 'dev', j:0},
-		'arkanoid_js': {f:'js/arkanoid.js', n: 'arkanoid_js', j:1},
-		'dev_js': {f:'html/js/dev.js', n: 'dev_js', j:1},
-		'sdkterms': {f:'html/sdkterms.html', n: 'sdkterms', j:0},
-		'help_js': {f:'html/js/help.js', n: 'help_js', j:1},
-		'firefox': {f:'html/firefox.html', n: 'firefox', j:0},
-		'sync': {f:'html/sync.html', n: 'sync', j:0},
-		'sync_js': {f:'html/js/sync.js', n: 'sync_js', j:1},
-		'mobile': {f:'html/mobile.html', n: 'mobile', j:0},
-		'affiliates': {f:'html/affiliates.html', n: 'affiliates', j:0},
-		'affiliate_js': {f:'html/js/affiliate.js', n: 'affiliate_js', j:0},
-		'affiliateterms': {f:'html/affiliateterms.html', n: 'affiliateterms', j:0},
-		'affiliatesignup': {f:'html/affiliatesignup.html', n: 'affiliatesignup', j:0},
-		'affiliatesignup_js': {f:'html/js/affiliatesignup.js', n: 'affiliatesignup_js', j:1},
-		'affiliatemember': {f:'html/affiliatemember.html', n: 'affiliatemember', j:0},
-		'affiliatemember_js': {f:'html/js/affiliatemember.js', n: 'affiliatemember_js', j:1},
-		'contact': {f:'html/contact.html', n: 'contact', j:0},
-		'privacycompany': {f:'html/privacycompany.html', n: 'privacycompany', j:0},
-		'chrome': {f:'html/chrome.html', n: 'chrome', j:0},
-		'zxcvbn_js': {f:'js/zxcvbn.js', n: 'zxcvbn_js', j:1}
-	};
-	
+    // only used on beta
+    if (onBetaW) {
+        jsl.push({f: 'js/betacrashes.js', n: 'betacrashes_js', j: 1});
+    }
+
+    var jsl2 =
+    {
+        'about': {f:'html/about.html', n: 'about', j:0},
+        'blog': {f:'html/blog.html', n: 'blog', j:0},
+        'blog_js': {f:'html/js/blog.js', n: 'blog_js', j:1},
+        'blogarticle': {f:'html/blogarticle.html', n: 'blogarticle', j:0},
+        'blogarticle_js': {f:'html/js/blogarticle.js', n: 'blogarticle_js', j:1},
+        'register': {f:'html/register.html', n: 'register', j:0},
+        'register_js': {f:'html/js/register.js', n: 'register_js', j:1},
+        'resellers': {f:'html/resellers.html', n: 'resellers', j:0},
+        'download': {f:'html/download.html', n: 'download', j:0},
+        'download_js': {f:'html/js/download.js', n: 'download_js', j:1},
+        'copyright': {f:'html/copyright.html', n: 'copyright', j:0},
+        'copyrightnotice': {f:'html/copyrightnotice.html', n: 'copyrightnotice', j:0},
+        'copyrightnotice_js': {f:'html/js/copyrightnotice.js', n: 'copyrightnotice_js', j:1},
+        'privacy': {f:'html/privacy.html', n: 'privacy', j:0},
+        'terms': {f:'html/terms.html', n: 'terms', j:0},
+        'backup': {f:'html/backup.html', n: 'backup', j:0},
+        'backup_js': {f:'html/js/backup.js', n: 'backup_js', j:1},
+        'cancel': {f:'html/cancel.html', n: 'cancel', j:0},
+        'cancel_js': {f:'html/js/cancel.js', n: 'cancel_js', j:1},
+        'reset': {f:'html/reset.html', n: 'reset', j:0},
+        'reset_js': {f:'html/js/reset.js', n: 'reset_js', j:1},
+        'filesaver': {f:'js/filesaver.js', n: 'filesaver', j:1},
+        'recovery': {f:'html/recovery.html', n: 'recovery', j:0},
+        'recovery_js': {f:'html/js/recovery.js', n: 'recovery_js', j:1},
+        'credits': {f:'html/credits.html', n: 'credits', j:0},
+        'takedown': {f:'html/takedown.html', n: 'takedown', j:0},
+        'dev': {f:'html/dev.html', n: 'dev', j:0},
+        'dev_js': {f:'html/js/dev.js', n: 'dev_js', j:1},
+        'sdkterms': {f:'html/sdkterms.html', n: 'sdkterms', j:0},
+        'help_js': {f:'html/js/help.js', n: 'help_js', j:1},
+        'firefox': {f:'html/firefox.html', n: 'firefox', j:0},
+        'sync': {f:'html/sync.html', n: 'sync', j:0},
+        'sync_js': {f:'html/js/sync.js', n: 'sync_js', j:1},
+        'mobile': {f:'html/mobile.html', n: 'mobile', j:0},
+        'contact': {f:'html/contact.html', n: 'contact', j:0},
+        'privacycompany': {f:'html/privacycompany.html', n: 'privacycompany', j:0},
+        'chrome': {f:'html/chrome.html', n: 'chrome', j:0},
+        'zxcvbn_js': {f:'js/zxcvbn.js', n: 'zxcvbn_js', j:1}
+    };
+
     var subpages =
     {
         'about': ['about'],
@@ -904,13 +1242,13 @@ else if (!b_u)
         'backup': ['backup','backup_js','filesaver'],
         'recovery': ['recovery','recovery_js'],
         'reset': ['reset','reset_js'],
+        'cancel': ['cancel', 'cancel_js'],
         'blog': ['blog','blog_js','blogarticle','blogarticle_js'],
         'register': ['register','register_js'],
         'android': ['android'],
         'resellers': ['resellers'],
         '!': ['download','download_js'],
         'copyright': ['copyright'],
-        'key':['arkanoid_js'],
         'copyrightnotice': ['copyrightnotice','copyrightnotice_js'],
         'privacy': ['privacy','privacycompany'],
         'takedown': ['takedown'],
@@ -924,7 +1262,6 @@ else if (!b_u)
         'help': ['help_js'],
         'chrome': ['chrome'],
         'plugin': ['chrome','firefox'],
-        'affiliate': ['affiliates','affiliateterms','affiliatesignup','affiliatesignup_js','affiliatemember','affiliatemember_js','affiliate_js'],
         'recover': ['reset','reset_js']
     };
 
@@ -933,12 +1270,12 @@ else if (!b_u)
         if (page.indexOf('%25') !== -1)
         {
             do {
-                page = page.replace('%25','%', 'g');
+                page = page.replace(/%25/g, '%');
             } while (~page.indexOf('%25'));
         }
         if (page.indexOf('%21') !== -1)
         {
-            page = page.replace('%21','!', 'g');
+            page = page.replace(/%21/g, '!');
             document.location.hash = page;
         }
 
@@ -951,19 +1288,17 @@ else if (!b_u)
             }
         }
     }
-    var downloading = false;
-    var ul_uploading = false;
     var lightweight=false;
     var waitingToBeLoaded = 0,jsl_done,jj_done = !jj;
     var fx_startup_cache = is_chrome_firefox && nocontentcheck;
     if (!fx_startup_cache && !nocontentcheck)
     {
-        if (window.URL) evalscript_url([sjcl_sha256_js]);
-        else evalscript(sjcl_sha256_js);
+        if (window.URL) evalscript_url([asmCryptoSha256Js]);
+        else evalscript(asmCryptoSha256Js);
     }
     if ((typeof Worker !== 'undefined') && (typeof window.URL !== 'undefined') && !fx_startup_cache && !nocontentcheck)
     {
-        var hashdata = ['self.postMessage = self.webkitPostMessage || self.postMessage;', sjcl_sha256_js, 'self.onmessage = function(e) { try { var hash = sjcl_sha256.hash.sha256.hash(e.data.text); var hashHex = sjcl_sha256.codec.hex.fromBits(hash); e.data.hash = hashHex; self.postMessage(e.data); } catch(err) { e.data.error = err.message; self.postMessage(e.data);  } };'];
+        var hashdata = ['self.postMessage = self.webkitPostMessage || self.postMessage;', asmCryptoSha256Js, 'self.onmessage = function(e) { try { var hashHex = asmCryptoSha256.SHA256.hex(e.data.text); e.data.hash = hashHex; self.postMessage(e.data); } catch(err) { e.data.error = err.message; self.postMessage(e.data);  } };'];
         var hash_url = mObjectURL(hashdata, "text/javascript");
         var hash_workers = [];
         var i =0;
@@ -1018,7 +1353,7 @@ else if (!b_u)
         var _queueWaitToBeLoaded = function(id, elem) {
             waitingToBeLoaded++;
             elem.onload = function() {
-                if (d) console.log('jj.progress...', waitingToBeLoaded);
+                // if (d) console.log('jj.progress...', waitingToBeLoaded);
                 if (--waitingToBeLoaded == 0) {
                     jj_done = true;
                     boot_done();
@@ -1065,18 +1400,12 @@ else if (!b_u)
         if (d) console.log('jj.total...', waitingToBeLoaded);
     }
 
-    var pages = [];
-    function getxhr()
-    {
-        return (typeof XDomainRequest != 'undefined' && typeof ArrayBuffer == 'undefined') ? new XDomainRequest() : new XMLHttpRequest();
-    }
-
-    var xhr_progress,xhr_stack,jsl_fm_current,jsl_current,jsl_total,jsl_perc,jsli,jslcomplete;
+    var pages = [],xhr_progress,xhr_stack,jsl_fm_current,jsl_current,jsl_total,jsl_perc,jsli,jslcomplete;
 
     function jsl_start()
     {
         jslcomplete = 0;
-        if(d && jj) {
+        if (d && jj) {
             xhr_progress = [0, 0, 0, 0, 0];
         } else {
             xhr_progress = [0, 0];
@@ -1115,8 +1444,12 @@ else if (!b_u)
                     {
                         Cu.reportError(e);
 
-                        alert('An error occurred while loading MEGA.\n\nFilename: '
-                            + file + "\n" + e + '\n\n' + mozBrowserID);
+                        if (String(e) !== "Error: AsmJS modules are not yet supported in XDR serialization."
+                                && file.indexOf('dcraw') === -1) {
+
+                            return alert('An error occurred while loading MEGA.\n\nFilename: '
+                                + file + "\n" + e + '\n\n' + mozBrowserID);
+                        }
                     }
                     step(jsi);
                 }
@@ -1131,7 +1464,7 @@ else if (!b_u)
                         if (!Components.isSuccessCode(s))
                         {
                             alert('An error occurred while loading MEGA.' +
-                                ' The file ' + file + ' could not be loaded.');
+                                  ' The file ' + file + ' could not be loaded.');
                         }
                         else
                         {
@@ -1167,8 +1500,8 @@ else if (!b_u)
 
     function xhr_load(url,jsi,xhri)
     {
-        if(d && jj) {
-            if(jsl[jsi].j == 1 || jsl[jsi].j == 2) {
+        if (d && jj) {
+            if (jsl[jsi].j == 1 || jsl[jsi].j == 2) {
                 // DON'T load via XHR any js or css files...since when jj == 1, secureboot will append them in the doc.
 
                 jsl_current += jsl[jsi].w || 1;
@@ -1191,19 +1524,18 @@ else if (!b_u)
             else
             {
                 if (!nocontentcheck) {
-                    
+
                     // Hash the file content and convert to hex
-                    var hash = sjcl_sha256.hash.sha256.hash(jsl[this.jsi].text);
-                    var hashHex = sjcl_sha256.codec.hex.fromBits(hash);
-                    
+                    var hashHex = asmCryptoSha256.SHA256.hex(jsl[this.jsi].text);
+
                     // Compare the hash from the file and the correct hash determined at deployment time
-                    if (!compareHashes(hashHex, jsl[e.data.jsi].f))
+                    if (!compareHashes(hashHex, jsl[this.jsi].f))
                     {
                         alert('An error occurred while loading MEGA. The file ' + bootstaticpath + jsl[this.jsi].f + ' is corrupt. Please try again later. We apologize for the inconvenience.');
                         contenterror = 1;
                     }
                 }
-                
+
                 if (!contenterror)
                 {
                     jsl_current += jsl[this.jsi].w || 1;
@@ -1290,11 +1622,8 @@ else if (!b_u)
                 }
                 else
                 {
-                    var css = document.createElement('style');
-                    css.type = "text/css";
-                    css.rel = 'stylesheet';
-                    document.getElementsByTagName('head')[0].appendChild(css);
-                    css.textContent = jsl[i].text.replace(/\.\.\//g,staticpath).replace(new RegExp( "\\/en\\/", "g"),'/' + lang + '/');
+                    mCreateElement('style', {type: 'text/css', rel: 'stylesheet'}, 'head')
+                        .textContent = jsl[i].text.replace(/\.\.\//g,staticpath).replace(new RegExp( "\\/en\\/", "g"),'/' + lang + '/');
                 }
             }
             else if (jsl[i].j == 3) {
@@ -1311,6 +1640,17 @@ else if (!b_u)
                     throw new Error('Error parsing language file '+lang+'.json');
                 }
             }
+            else if (jsl[i].j === 0 && jsl[i].f.match(/\.json$/)) {
+                try {
+                    var templates = JSON.parse(jsl[i].text);
+                    for (var e in templates) {
+                        pages[e] = templates[e];
+                        jsl_loaded[e] = 1;
+                    }
+                } catch (ex) {
+                    throw new Error("Error parsing template");
+                }
+            }
             else if (jsl[i].j == 0) pages[jsl[i].n] = jsl[i].text;
         }
         if (window.URL)
@@ -1318,11 +1658,7 @@ else if (!b_u)
             cssar = cssar.length && mObjectURL(cssar, "text/css");
             if (cssar)
             {
-                var link = document.createElement('link');
-                link.setAttribute('rel', 'stylesheet');
-                link.type = 'text/css';
-                link.href = cssar;
-                document.head.appendChild(link);
+                mCreateElement('link', {type: 'text/css', rel: 'stylesheet'}, 'head').href = cssar;
             }
             if (!jsl_done || jsar.length) {
                 jsar.push('jsl_done=true; boot_done();');
@@ -1345,14 +1681,14 @@ else if (!b_u)
     {
         if (document.location.hash == '#android')
         {
-            document.location = 'https://play.google.com/store/apps/details?id=com.flyingottersoftware.mega';
+            document.location = 'https://play.google.com/store/apps/details?id=nz.mega.android&referrer=meganzindexandroid';
         }
         else
         {
             document.write('<link rel="stylesheet" type="text/css" href="' + staticpath + 'css/mobile-android.css" /><div class="overlay"></div><div class="new-folder-popup" id="message"><div class="new-folder-popup-bg"><div class="new-folder-header">MEGA for Android</div><div class="new-folder-main-bg"><div class="new-folder-descr">Do you want to install the latest<br/> version of the MEGA app for Android?</div><a class="new-folder-input left-button" id="trashbinYes"> <span class="new-folder-bg1"> <span class="new-folder-bg2" id="android_yes"> Yes </span> </span></a><a class="new-folder-input right-button" id="trashbinNo"> <span class="new-folder-bg1"> <span class="new-folder-bg2" id="android_no">No </span> </span></a><div class="clear"></div></div></div></div></div>');
             document.getElementById('android_yes').addEventListener("click", function ()
             {
-                document.location = 'https://play.google.com/store/apps/details?id=com.flyingottersoftware.mega';
+                document.location = 'https://play.google.com/store/apps/details?id=nz.mega.android&referrer=meganzandroid';
             }, false);
             document.getElementById('android_no').addEventListener("click", function ()
             {
@@ -1368,9 +1704,27 @@ else if (!b_u)
         if (document.location.href.substr(0,19) == 'chrome-extension://')  istaticpath = '../';
         else if (is_chrome_firefox) istaticpath = 'chrome://mega/content/';
 
-        document.write('<style type="text/css">.div, span, input {outline: none;}.hidden {display: none;}.clear {clear: both;margin: 0px;padding: 0px;display: block;}.loading-main-block {width: 100%;height: 100%;overflow: auto;font-family:Arial, Helvetica, sans-serif;}.loading-mid-white-block {height: 100%;width:100%;}.mid-centered-block {position: absolute;width: 494px;min-height: 158px;top: 50%;left: 50%;margin: -95px 0 0 -247px;}.loading-main-bottom {max-width: 940px;width: 100%;position: absolute;bottom: 20px;left: 50%;margin: 0 0 0 -470px;text-align: center;}.loading-bottom-button {height: 29px;width: 29px;float: left;background-image: url(' + istaticpath + 'images/mega/loading-sprite1.png);background-repeat: no-repeat;cursor: pointer;}.st-social-block-load {position: absolute;bottom: 20px;left: 0;width: 100%;height: 43px;text-align: center;}.st-bottom-button {height: 29px;width: 29px;display: inline-block;background-image: url(' + istaticpath + 'images/mega/new-startpage-spite1.png?v=1);background-repeat: no-repeat;cursor: pointer;}.st-bottom-button.st-google-button {background-position: -93px -1233px;position: relative;margin: 0 5px;}.st-bottom-button.st-google-button:hover {background-position: -93px -1173px;}.st-bottom-button.st-facebook-button {background-position: -49px -1233px;margin: 0 5px;}.st-bottom-button.st-facebook-button:hover {background-position: -49px -1173px;}.st-bottom-button.st-twitter-button {background-position: left -1233px;margin: 0 5px;}.st-bottom-button.st-twitter-button:hover {background-position: left -1173px;}.loading-cloud {width: 222px;height: 158px;background-image: url(' + istaticpath + 'images/mega/loading-sprite1.png);background-repeat: no-repeat;background-position: 0 -2128px;margin: 0 auto;-webkit-box-sizing: border-box;-moz-box-sizing: border-box;-ms-box-sizing: border-box;box-sizing: border-box;padding-top: 55px;}.loading-progress-bar, .loading-progress-bar div {width: 80px;height: 80px;margin: 0 0 0 71px;background-image: url(' + istaticpath + 'images/mega/loading-sprite1.png);background-repeat: no-repeat;background-position: 0 top;}.loading-progress-bar div {background-position: -71px -2183px;margin: 0;}.maintance-block {position: absolute;width: 484px;min-height: 94px;border: 2px solid #d9d9d9;-moz-border-radius: 7px;-webkit-border-radius: 7px;border-radius: 7px;padding: 10px;color: #333333;font-size: 13px;line-height: 30px;padding: 15px 15px 15px 102px;-webkit-box-sizing: border-box;-moz-box-sizing: border-box;-ms-box-sizing: border-box;box-sizing: border-box;background-image: url(' + istaticpath + 'images/mega/loading-sprite1.png);background-repeat: no-repeat;background-position: -60px -2428px;margin-top: 45px;}.loading-progress-bar.percents-0 {background-position: 0 0;}.loading-progress-bar.percents-1, .loading-progress-bar.percents-2, .loading-progress-bar.percents-3 {background-position: -130px 0;}.loading-progress-bar.percents-4, .loading-progress-bar.percents-5, .loading-progress-bar.percents-6 {background-position: 0 -100px;}.loading-progress-bar.percents-7, .loading-progress-bar.percents-8, .loading-progress-bar.percents-9 {background-position: -130px -100px;}.loading-progress-bar.percents-10, .loading-progress-bar.percents-11, .loading-progress-bar.percents-12 {background-position: 0 -200px;}.loading-progress-bar.percents-13, .loading-progress-bar.percents-14, .loading-progress-bar.percents-15 {background-position: -130px -200px;}.loading-progress-bar.percents-16, .loading-progress-bar.percents-17, .loading-progress-bar.percents-18 {background-position: 0 -300px;}.loading-progress-bar.percents-19, .loading-progress-bar.percents-20, .loading-progress-bar.percents-21 {background-position: -130px -300px;}.loading-progress-bar.percents-22, .loading-progress-bar.percents-23, .loading-progress-bar.percents-24 {background-position: 0 -400px;}.loading-progress-bar.percents-25, .loading-progress-bar.percents-26, .loading-progress-bar.percents-27 {background-position: -130px -400px;}.loading-progress-bar.percents-28, .loading-progress-bar.percents-29, .loading-progress-bar.percents-30 {background-position: 0 -500px;}.loading-progress-bar.percents-31, .loading-progress-bar.percents-32, .loading-progress-bar.percents-33 {background-position: -130px -500px;}.loading-progress-bar.percents-34, .loading-progress-bar.percents-35 {background-position: 0 -600px;}.loading-progress-bar.percents-36, .loading-progress-bar.percents-37 {background-position: -130px -600px;}.loading-progress-bar.percents-38, .loading-progress-bar.percents-39 {background-position: 0 -700px;}.loading-progress-bar.percents-40, .loading-progress-bar.percents-41 {background-position: -130px -700px;}.loading-progress-bar.percents-42, .loading-progress-bar.percents-43 {background-position: 0 -800px;}.loading-progress-bar.percents-44, .loading-progress-bar.percents-45 {background-position: -130px -800px;}.loading-progress-bar.percents-46, .loading-progress-bar.percents-47 {background-position: 0 -900px;}.loading-progress-bar.percents-48, .loading-progress-bar.percents-49 {background-position: -130px -900px;}.loading-progress-bar.percents-50 {background-position: 0 -1000px;}.loading-progress-bar.percents-51, .loading-progress-bar.percents-52, .loading-progress-bar.percents-53 {background-position: -130px -1000px;}.loading-progress-bar.percents-54, .loading-progress-bar.percents-55, .loading-progress-bar.percents-56 {background-position: 0 -1100px;}.loading-progress-bar.percents-57, .loading-progress-bar.percents-58, .loading-progress-bar.percents-59 {background-position: -130px -1100px;}.loading-progress-bar.percents-60, .loading-progress-bar.percents-61, .loading-progress-bar.percents-62 {background-position: 0 -1200px;}.loading-progress-bar.percents-63, .loading-progress-bar.percents-64, .loading-progress-bar.percents-65 {background-position: -130px -1200px;}.loading-progress-bar.percents-66, .loading-progress-bar.percents-67, .loading-progress-bar.percents-68 {background-position: 0 -1300px;}.loading-progress-bar.percents-69, .loading-progress-bar.percents-70, .loading-progress-bar.percents-71 {background-position: -130px -1300px;}.loading-progress-bar.percents-72, .loading-progress-bar.percents-73, .loading-progress-bar.percents-74 {background-position: 0 -1400px;}.loading-progress-bar.percents-75, .loading-progress-bar.percents-76, .loading-progress-bar.percents-77 {background-position: -130px -1400px;}.loading-progress-bar.percents-78, .loading-progress-bar.percents-79, .loading-progress-bar.percents-80 {background-position: 0 -1500px;}.loading-progress-bar.percents-81, .loading-progress-bar.percents-82, .loading-progress-bar.percents-83 {background-position: -130px -1500px;}.loading-progress-bar.percents-84, .loading-progress-bar.percents-85, .loading-progress-bar.percents-86 {background-position: 0 -1600px;}.loading-progress-bar.percents-87, .loading-progress-bar.percents-88, .loading-progress-bar.percents-89 {background-position: -130px -1600px;}.loading-progress-bar.percents-90, .loading-progress-bar.percents-91, .loading-progress-bar.percents-92 {background-position: 0 -1800px;}.loading-progress-bar.percents-93, .loading-progress-bar.percents-94, .loading-progress-bar.percents-95 {background-position: -130px -1800px;}.loading-progress-bar.percents-96, .loading-progress-bar.percents-97 {background-position: 0 -1900px;}.loading-progress-bar.percents-98, .loading-progress-bar.percents-99 {background-position: -130px -1900px;}.loading-progress-bar.percents-100 {background-position: 0 -2000px;}.follow-txt {text-decoration:none; line-height: 28px; float:right; color:#666666; font-size:12px;}@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {.maintance-block, .loading-progress-bar, .loading-progress-bar div, .loading-cloud, .loading-bottom-button {background-image: url(' + istaticpath + 'images/mega/loading-sprite1@2x.png);    background-size: 222px auto;}.st-bottom-button, .st-bottom-scroll-button {background-image: url(' + istaticpath + 'images/mega/new-startpage-spite1@2x.png?v=1);background-size: 356px auto;}}</style><div class="loading-main-block" id="loading"><div class="loading-mid-white-block"><div class="mid-centered-block"><div class="loading-cloud"><div class="loading-progress-bar percents-1" id="loadinganim"><div></div></div></div><div class="maintance-block hidden">Scheduled System Maintenance - Expect Disruptions<br/>Sunday 04:00 - 10:00 UTC </div></div><div class="st-social-block-load" id="bootbottom"><a href="https://www.facebook.com/MEGAprivacy" target="_blank" class="st-bottom-button st-facebook-button"></a><a href="https://www.twitter.com/MEGAprivacy" target="_blank" class="st-bottom-button st-twitter-button"></a><a href="https://plus.google.com/b/108055545377490138410/" target="_blank" class="st-bottom-button st-google-button"></a></div></div></div>');
+        mCreateElement('style', {type: 'text/css'}, 'body').textContent = '.div, span, input {outline: none;}.hidden {display: none;}.clear {clear: both;margin: 0px;padding: 0px;display: block;}.loading-main-block {width: 100%;height: 100%;overflow: auto;font-family:Arial, Helvetica, sans-serif;}.loading-mid-white-block {height: 100%;width:100%;}.mid-centered-block {position: absolute;width: 494px;min-height: 158px;top: 50%;left: 50%;margin: -95px 0 0 -247px;}.loading-main-bottom {max-width: 940px;width: 100%;position: absolute;bottom: 20px;left: 50%;margin: 0 0 0 -470px;text-align: center;}.loading-bottom-button {height: 29px;width: 29px;float: left;background-image: url(' + istaticpath + 'images/mega/loading-sprite1.png);background-repeat: no-repeat;cursor: pointer;}.st-social-block-load {position: absolute;bottom: 20px;left: 0;width: 100%;height: 43px;text-align: center;}.st-bottom-button {height: 29px;width: 29px;display: inline-block;background-image: url(' + istaticpath + 'images/mega/new-startpage-spite1.png?v=1);background-repeat: no-repeat;cursor: pointer;}.st-bottom-button.st-google-button {background-position: -93px -1233px;position: relative;margin: 0 5px;}.st-bottom-button.st-google-button:hover {background-position: -93px -1173px;}.st-bottom-button.st-facebook-button {background-position: -49px -1233px;margin: 0 5px;}.st-bottom-button.st-facebook-button:hover {background-position: -49px -1173px;}.st-bottom-button.st-twitter-button {background-position: left -1233px;margin: 0 5px;}.st-bottom-button.st-twitter-button:hover {background-position: left -1173px;}.loading-cloud {width: 222px;height: 158px;background-image: url(' + istaticpath + 'images/mega/loading-sprite1.png);background-repeat: no-repeat;background-position: 0 -2128px;margin: 0 auto;-webkit-box-sizing: border-box;-moz-box-sizing: border-box;-ms-box-sizing: border-box;box-sizing: border-box;padding-top: 55px;}.loading-progress-bar, .loading-progress-bar div {width: 80px;height: 80px;margin: 0 0 0 71px;background-image: url(' + istaticpath + 'images/mega/loading-sprite1.png);background-repeat: no-repeat;background-position: 0 top;}.loading-progress-bar div {background-position: -71px -2183px;margin: 0;}.maintance-block {position: absolute;width: 484px;min-height: 94px;border: 2px solid #d9d9d9;-moz-border-radius: 7px;-webkit-border-radius: 7px;border-radius: 7px;padding: 10px;color: #333333;font-size: 13px;line-height: 30px;padding: 15px 15px 15px 102px;-webkit-box-sizing: border-box;-moz-box-sizing: border-box;-ms-box-sizing: border-box;box-sizing: border-box;background-image: url(' + istaticpath + 'images/mega/loading-sprite1.png);background-repeat: no-repeat;background-position: -60px -2428px;margin-top: 45px;}.loading-progress-bar.percents-0 {background-position: 0 0;}.loading-progress-bar.percents-1, .loading-progress-bar.percents-2, .loading-progress-bar.percents-3 {background-position: -130px 0;}.loading-progress-bar.percents-4, .loading-progress-bar.percents-5, .loading-progress-bar.percents-6 {background-position: 0 -100px;}.loading-progress-bar.percents-7, .loading-progress-bar.percents-8, .loading-progress-bar.percents-9 {background-position: -130px -100px;}.loading-progress-bar.percents-10, .loading-progress-bar.percents-11, .loading-progress-bar.percents-12 {background-position: 0 -200px;}.loading-progress-bar.percents-13, .loading-progress-bar.percents-14, .loading-progress-bar.percents-15 {background-position: -130px -200px;}.loading-progress-bar.percents-16, .loading-progress-bar.percents-17, .loading-progress-bar.percents-18 {background-position: 0 -300px;}.loading-progress-bar.percents-19, .loading-progress-bar.percents-20, .loading-progress-bar.percents-21 {background-position: -130px -300px;}.loading-progress-bar.percents-22, .loading-progress-bar.percents-23, .loading-progress-bar.percents-24 {background-position: 0 -400px;}.loading-progress-bar.percents-25, .loading-progress-bar.percents-26, .loading-progress-bar.percents-27 {background-position: -130px -400px;}.loading-progress-bar.percents-28, .loading-progress-bar.percents-29, .loading-progress-bar.percents-30 {background-position: 0 -500px;}.loading-progress-bar.percents-31, .loading-progress-bar.percents-32, .loading-progress-bar.percents-33 {background-position: -130px -500px;}.loading-progress-bar.percents-34, .loading-progress-bar.percents-35 {background-position: 0 -600px;}.loading-progress-bar.percents-36, .loading-progress-bar.percents-37 {background-position: -130px -600px;}.loading-progress-bar.percents-38, .loading-progress-bar.percents-39 {background-position: 0 -700px;}.loading-progress-bar.percents-40, .loading-progress-bar.percents-41 {background-position: -130px -700px;}.loading-progress-bar.percents-42, .loading-progress-bar.percents-43 {background-position: 0 -800px;}.loading-progress-bar.percents-44, .loading-progress-bar.percents-45 {background-position: -130px -800px;}.loading-progress-bar.percents-46, .loading-progress-bar.percents-47 {background-position: 0 -900px;}.loading-progress-bar.percents-48, .loading-progress-bar.percents-49 {background-position: -130px -900px;}.loading-progress-bar.percents-50 {background-position: 0 -1000px;}.loading-progress-bar.percents-51, .loading-progress-bar.percents-52, .loading-progress-bar.percents-53 {background-position: -130px -1000px;}.loading-progress-bar.percents-54, .loading-progress-bar.percents-55, .loading-progress-bar.percents-56 {background-position: 0 -1100px;}.loading-progress-bar.percents-57, .loading-progress-bar.percents-58, .loading-progress-bar.percents-59 {background-position: -130px -1100px;}.loading-progress-bar.percents-60, .loading-progress-bar.percents-61, .loading-progress-bar.percents-62 {background-position: 0 -1200px;}.loading-progress-bar.percents-63, .loading-progress-bar.percents-64, .loading-progress-bar.percents-65 {background-position: -130px -1200px;}.loading-progress-bar.percents-66, .loading-progress-bar.percents-67, .loading-progress-bar.percents-68 {background-position: 0 -1300px;}.loading-progress-bar.percents-69, .loading-progress-bar.percents-70, .loading-progress-bar.percents-71 {background-position: -130px -1300px;}.loading-progress-bar.percents-72, .loading-progress-bar.percents-73, .loading-progress-bar.percents-74 {background-position: 0 -1400px;}.loading-progress-bar.percents-75, .loading-progress-bar.percents-76, .loading-progress-bar.percents-77 {background-position: -130px -1400px;}.loading-progress-bar.percents-78, .loading-progress-bar.percents-79, .loading-progress-bar.percents-80 {background-position: 0 -1500px;}.loading-progress-bar.percents-81, .loading-progress-bar.percents-82, .loading-progress-bar.percents-83 {background-position: -130px -1500px;}.loading-progress-bar.percents-84, .loading-progress-bar.percents-85, .loading-progress-bar.percents-86 {background-position: 0 -1600px;}.loading-progress-bar.percents-87, .loading-progress-bar.percents-88, .loading-progress-bar.percents-89 {background-position: -130px -1600px;}.loading-progress-bar.percents-90, .loading-progress-bar.percents-91, .loading-progress-bar.percents-92 {background-position: 0 -1800px;}.loading-progress-bar.percents-93, .loading-progress-bar.percents-94, .loading-progress-bar.percents-95 {background-position: -130px -1800px;}.loading-progress-bar.percents-96, .loading-progress-bar.percents-97 {background-position: 0 -1900px;}.loading-progress-bar.percents-98, .loading-progress-bar.percents-99 {background-position: -130px -1900px;}.loading-progress-bar.percents-100 {background-position: 0 -2000px;}.follow-txt {text-decoration:none; line-height: 28px; float:right; color:#666666; font-size:12px;}@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {.maintance-block, .loading-progress-bar, .loading-progress-bar div, .loading-cloud, .loading-bottom-button {background-image: url(' + istaticpath + 'images/mega/loading-sprite1@2x.png);    background-size: 222px auto;}.st-bottom-button, .st-bottom-scroll-button {background-image: url(' + istaticpath + 'images/mega/new-startpage-spite1@2x.png?v=1);background-size: 356px auto;}}';
+
+        mCreateElement('div', { "class": "loading-main-block", id: "loading"}, 'body')
+            .innerHTML =
+                '<div class="loading-mid-white-block">'+
+                '   <div class="mid-centered-block">'+
+                '       <div class="loading-cloud">'+
+                '           <div class="loading-progress-bar percents-1" id="loadinganim">'+
+                '               <div></div>'+
+                '           </div>'+
+                '       </div>'+
+                // '       <div class="maintance-block hidden">Scheduled System Maintenance - Expect Disruptions<br/>Sunday 04:00 - 10:00 UTC </div>'+
+                '   </div>'+
+                '   <div class="st-social-block-load" id="bootbottom">'+
+                '       <a href="https://www.facebook.com/MEGAprivacy" target="_blank" class="st-bottom-button st-facebook-button"></a>'+
+                '       <a href="https://www.twitter.com/MEGAprivacy" target="_blank" class="st-bottom-button st-twitter-button"></a>'+
+                '       <a href="https://plus.google.com/b/108055545377490138410/" target="_blank" class="st-bottom-button st-google-button"></a>'+
+                '   </div>'+
+                '</div>';
     }
-    var u_storage,loginresponse,u_sid,dl_res;
+    var u_storage, loginresponse, u_sid, dl_res;
     u_storage = init_storage( localStorage.sid ? localStorage : sessionStorage );
     if ((u_sid = u_storage.sid))
     {
@@ -1440,15 +1794,33 @@ else if (!b_u)
                 catch (e) {}
             }
             boot_done();
-        }
+        };
         dlxhr.onerror = function()
         {
             dl_res= false;
             boot_done();
-        }
-        dlxhr.open("POST", apipath + 'cs?id=0', true);
-        dlxhr.send(JSON.stringify([{'a':'g',p:page.substr(1,8)}]));
+        };
+        dlxhr.open("POST", apipath + 'cs?id=0&domain=meganz', true);
+        dlxhr.send(JSON.stringify([{ 'a': 'g', p: page.substr(1,8), 'ad': showAd() }]));
     }
+}
+
+/**
+ * Determines whether to show an ad or not
+ * @returns {Number} Returns a 0 for no ads, 1 will enable ads dependant on country, 2 will always show ads
+ */
+function showAd() {
+
+    // We need to tell the API we would like ad urls, but only if we are not logged in
+    var showAd = (typeof u_sid === 'undefined') ? 1 : 0;
+
+    // If using a browser extension, do not show ads
+    showAd = (is_extension) ? 0 : showAd;
+
+    // Override for testing, 0 for no ads, 1 is normal (enabled dependant on country), 2 is ads always on
+    showAd = (typeof localStorage.testAds === 'undefined') ? showAd : parseInt(localStorage.testAds);
+
+    return showAd;
 }
 
 function safeCall(fn)

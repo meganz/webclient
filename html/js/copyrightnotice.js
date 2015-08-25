@@ -60,20 +60,24 @@ function init_cn()
 		$('.cn.step1').removeClass('hidden');
 		$('.cn.step2').addClass('hidden');		
 	});		
-	$('.cn_check1,.cn_check2,.cn_check3').unbind('click');
-	$('.cn_check1,.cn_check2,.cn_check3').bind('click',function(e)
-	{
-		var c = $(e.target).attr('class');
-		if (c && c.indexOf('checkinput') == -1)
-		{
-			if ($(this).find('.checkinput').attr('checked')) $(this).find('.checkinput').attr('checked',false);
-			else $(this).find('.checkinput').attr('checked',true);
-		}		
-		$(this).find('.checkdiv,.checkinput').removeClass('checkboxOn');
-		$(this).find('.checkdiv,.checkinput').removeClass('checkboxOff');
-		if ($(this).find('input').attr('checked')) $(this).find('.checkdiv,.checkinput').addClass('checkboxOn');		
-		else $(this).find('.checkdiv,.checkinput').addClass('checkboxOff');			
-	});
+	
+    // Add click and unclick functionality for the custom styled checkboxes
+    $('.cn_check1, .cn_check2, .cn_check3').rebind('click', function(event) {
+        
+        $input = $(this).find('input');
+        $checkboxDiv = $(this).find('.checkdiv');
+        
+        // If unticked, tick the box
+        if ($input.hasClass('checkboxOff')) {
+            $input.removeClass('checkboxOff').addClass('checkboxOn').attr('checked', 'checked');
+            $checkboxDiv.removeClass('checkboxOff').addClass('checkboxOn');
+        }
+        else {
+            // Otherwise untick the box
+            $input.removeClass('checkboxOn').addClass('checkboxOff').removeAttr('checked');
+            $checkboxDiv.removeClass('checkboxOn').addClass('checkboxOff');
+        }        
+    });
 	
 	$('.select select').unbind('change');
 	$('.select select').bind('change',function(e)
@@ -81,7 +85,7 @@ function init_cn()
 		var c = $(this).attr('class');
 		if (c && c.indexOf('type') > -1 && $(this).val() == 4)
 		{
-			msgDialog('info',l[701],l[700].replace('[A1]','<a href="mailto:copyright@mega.co.nz" class="red">').replace('[/A1]','</A>').replace('[A2]','<a href="#copyright" class="red">').replace('[/A2]','</A>'));
+			msgDialog('info',l[701],l[700].replace('[A1]','<a href="mailto:copyright@mega.nz" class="red">').replace('[/A1]','</A>').replace('[A2]','<a href="#copyright" class="red">').replace('[/A2]','</A>'));
 			$(this).val(0);
 			$(this).parent().find('.affiliate-select-txt').text(l[1278]);
 		}	

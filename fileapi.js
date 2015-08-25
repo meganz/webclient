@@ -192,10 +192,33 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 				return this.blob(aStart,aEnd-aStart);
 			}
 		};
-		mozRunAsync(function() {
+		var __done = function() {
 			aCallback(file);
-			file = undefined;
-		});
+			__done = file = undefined;
+		};
+		var nop = true;
+		if (aFile.fileSize === 0) {
+			// If this is a junction, try to get the real size
+			try {
+				OS.File.stat(aFile.path)
+					.then(function statSucceed(aInfo) {
+						if (ASSERT(!aInfo.isDir, 'Stat operation performed over directory')) {
+							file.size = +aInfo.size | 0;
+						}
+						if (d) console.log('Stat.fileSize', file.size, aInfo);
+						__done();
+					}, function statFailed() {
+						mozError(arguments);
+						__done();
+					});
+				nop = false;
+			} catch(e) {
+				mozError(e);
+			}
+		}
+		if (nop) {
+			mozRunAsync(__done);
+		}
 	};
 
 	this.readEntries = function(aCallback)
@@ -820,7 +843,7 @@ function mozClearStartupCache() {
 
 						scope.addEventListener('unload',function() {
 
-							if(downloading || File.streaming) {
+							if(dlmanager.isDownloading || File.streaming) {
 								var finish = function() {
 									if(File.hasFinished) {
 										File.finishDownload();
@@ -838,14 +861,14 @@ function mozClearStartupCache() {
 
 								for (var slot = scope.dl_maxSlots;
 									slot--; dl_xhrs[slot].abort());
-								scope.dl_cancel();
+								scope.dlmanager.abort(null);
 							}
 						}, false);
 
 					} else {
 						if (typeof page !== 'undefined' && page === 'download') {
 							try {
-								scope.downloading = !1;
+								scope.dlmanager.isDownloading = !1;
 
 								$('.downloading-txt.temporary-error').text('Download ' + (f ? 'Error!':'Cancelled.'));
 								$('.downloading-txt.temporary-error').removeClass('hidden');

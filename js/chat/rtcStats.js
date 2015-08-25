@@ -341,8 +341,12 @@ statRecProto.onStats = function(rtcStats) {
     var vs = samples.v;
     var as = samples.a;
     var audio = stats.a;
-    var d = {};
-    if (!isFirstSample) {
+    var addSample = false;
+
+    if (isFirstSample) {
+        addSample = true;
+    } else {
+        var d = {};
         d.dly = (vs.r.dly[lastSampleIdx] - stats.v.r.dly);
         if (d.dly < 0)
             d.dly = -d.dly;
@@ -357,11 +361,12 @@ statRecProto.onStats = function(rtcStats) {
             d.auJtr = -d.auJtr;
         d.ts = ts-samples.ts[lastSampleIdx];
         d.apl = as.pl[lastSampleIdx] - audio.pl;
-    }
 
-	if ((d.ts >= this._maxSamplePeriod) ||
-        (vstat.r.width!==vs.r.width[lastSampleIdx]) || (vstat.s.width!==vs.s.width[lastSampleIdx]) ||
-        isFirstSample || (d.dly > 100) || (d.auRtt > 100) || (d.apl > 0) || (d.vrtt > 150) || (d.auJtr > 40)) {
+        addSample = ((d.ts >= this._maxSamplePeriod)
+          || (vstat.r.width !== vs.r.width[lastSampleIdx]) || (vstat.s.width !== vs.s.width[lastSampleIdx])
+          || (d.dly > 100) || (d.auRtt > 100) || (d.apl > 0) || (d.vrtt > 150) || (d.auJtr > 40));
+    }
+    if (addSample) {
         this.addStat();
         if (this._onSample) {
             if (isFirstSample)

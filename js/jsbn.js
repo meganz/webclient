@@ -1,3 +1,8 @@
+/**
+ * The original jsbn.js code, but wrapped in a closure and added a code to ONLY export "BigInteger" into the
+ * global (window) scope.
+ */
+(function(scope) {
 // Copyright (c) 2005  Tom Wu
 // All Rights Reserved.
 // See "LICENSE" for details.
@@ -557,3 +562,7 @@ BigInteger.prototype.modPowInt = bnModPowInt;
 // "constants"
 BigInteger.ZERO = nbv(0);
 BigInteger.ONE = nbv(1);
+
+scope.BigInteger = BigInteger;
+scope.nbi = nbi;
+})(window);

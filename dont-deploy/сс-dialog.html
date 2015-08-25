@@ -1,0 +1,137 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/Tr</xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>MEGA 2.0</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+        <link rel="stylesheet" type="text/css" href="../css/style.css" />
+        <script type="text/javascript" src="../js/jquery-2.1.1.js"></script>
+		<script type="text/javascript" src="../js/jquery.jscrollpane.js"></script>
+		<script type="text/javascript" src="../js/jquery.mousewheel.js"></script>
+		<script type="text/javascript">
+        $(document).ready(function() {  
+
+			$('.fm-account-select select').unbind('change');
+			$('.fm-account-select select').bind('change', function(e)
+			{
+				var val = $(this).find(':selected').text();
+				$(this).parent().find('.account-select-txt').text(val);
+			});
+			  
+		});
+        
+        </script>
+        
+    </head>
+
+    <body id="bodyel" class="bottom-pages">
+
+        <div class="fm-dialog-overlay payment-dialog-overlay"></div>
+
+        <div class="fm-dialog payment-dialog">
+                <div class="btn-close-dialog"></div>
+                
+                <div class="payment-dialog-body">
+                   <div class="plan-icon pro1" ><div class="reg-st3-membership-icon"></div></div>
+                   <div class="payment-plan-info">
+                      <div class="payment-plan-title">PRO I</div>
+                      <div class="payment-plan-txt">1 month <span>(non-recurring)</span></div>
+                   </div>
+                   <div class="payment-plan-price">9.99€</div>
+                   <div class="clear"></div>
+                   
+                   <div class="payment-half-block first">
+                        
+                        <div class="payment-form-title">
+                        	Enter your billing details:
+                        </div>
+                        <div class="fm-account-input">
+                        	<input type="text" value="" placeholder="Address 1" >
+                        </div>
+                        <div class="fm-account-input">
+                        	<input type="text" value="" placeholder="Address 2" >
+                        </div>
+                        <div class="fm-account-input">
+                        	<input type="text" value="" placeholder="City" >
+                        </div>
+                        <div class="fm-account-input">
+                        	<input type="text" value="" placeholder="Province" >
+                        </div>
+                        <div class="fm-account-select">
+                        <span class="account-select-txt">Country</span>
+                            <select>
+                                <option value="nz">Newe Zealand</option>
+                                <option value="rb">Belarus</option>
+                            </select>
+                        </div>
+                        <div class="fm-account-input code">
+                                <input type="text" value="" placeholder="Postal Code" >
+                        </div>
+                        <div class="clear"></div>
+                   
+                   </div>
+                   
+                   <div class="payment-half-block second">
+                    	
+                        <div class="payment-form-title">
+                        	Enter your payment details:
+                        </div>
+                        <div class="payment-cc">
+                            <div class="radioOn hidden" id="rad1_div">
+                            	<input type="radio" id="rad1" class="radioOn" value="1" checked="checked">
+                            </div>
+                            <div class="payment-cc-icon visa"></div>
+                            <div class="payment-cc-icon mastercard"></div>
+                        </div>
+                        <div class="payment-short-bl first">
+                            <div class="fm-account-input">
+                            	<input type="text" value="" placeholder="First Name" >
+                            </div>
+                        </div>
+                        <div class="payment-short-bl second">
+                        	<div class="fm-account-input">
+                        		<input type="text" value="" placeholder="Last Name" >
+                        	</div>
+                        </div>
+                        <div class="clear"></div>
+                        <div class="fm-account-input">
+                        	<input type="text" value="" placeholder="Credit Card Number" >
+                        </div>
+                        <div class="payment-short-bl triplex first">
+                        	<div class="fm-account-select">
+                        		<span class="account-select-txt">Month</span>
+                                <select>
+                                    <option value="october">Oct.</option>
+                                    <option value="november">Nov.</option>
+                                </select>
+                        	</div>
+                        </div>
+                        <div class="payment-short-bl triplex second">
+                        	<div class="fm-account-select">
+                        		<span class="account-select-txt">Year</span>
+                        		<select>
+                        			<option value="2014">2014</option>
+                        			<option value="2014">2015</option>
+                        		</select>
+                        	</div>
+                        </div>
+                        <div class="payment-short-bl triplex third">
+                        	<div class="fm-account-input">
+                        		<input type="text" value="" placeholder="CCV" >
+                       		</div>
+                        </div>
+                        <div class="clear"></div>
+                        
+                        <div class="payment-buy-now">
+                        	Buy Now
+                        </div>
+                   
+                   </div>
+                   <div class="clear"></div>
+   
+                </div>
+                
+        </div>
+
+    </body>
+</html>

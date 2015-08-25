@@ -10,10 +10,6 @@
 
     var hasOwn = Object.prototype.hasOwnProperty;
 
-    if ( !indexedDB ) {
-        throw 'IndexedDB required';
-    }
-
     var defaultMapper = function (value) {
         return value;
     };
@@ -56,6 +52,39 @@
     var Server = function ( db , name ) {
         var that = this,
             closed = false;
+
+        Object.defineProperty(this, 'idbRequestInstance', {
+            get: function() {
+                return db;
+            }
+        });
+
+        this.setUData = function( data, key ) {
+            if (!db.objectStoreNames.contains('__udata__')) {
+                return Promise.reject(DOMException.NOT_FOUND_ERR);
+            }
+            return this.update('__udata__', {
+                k: key || '__gbl',
+                v: data
+            });
+        };
+
+        this.getUData = function( key ) {
+            var promise;
+
+            return new Promise(function(resolve, reject) {
+                try {
+                    promise = that.query('__udata__')
+                        .filter('k', key || '__gbl').execute();
+                }
+                catch(e) {
+                    return reject({'reason': e });
+                }
+                promise.then(function(results) {
+                    resolve(results && results.length === 1 && results[0].v);
+                }, reject);
+            });
+        };
 
         this.add = function( table ) {
             if ( closed ) {
@@ -107,7 +136,9 @@
                 transaction.oncomplete = function () {
                     resolve( records , that );
                 };
+                //https://bugzilla.mozilla.org/show_bug.cgi?id=872873
                 transaction.onerror = function ( e ) {
+                    e.preventDefault();
                     reject({ 'records': records , 'reason': e });
                 };
                 transaction.onabort = function ( e ) {
@@ -122,10 +153,9 @@
                 throw 'Database has been closed';
             }
 
-            var records = [];
-            for ( var i = 0 ; i < arguments.length - 1 ; i++ ) {
-                records[ i ] = arguments[ i + 1 ];
-            }
+            var records = Array.isArray(arguments[1])
+                ? arguments[1]
+                : [].slice.call(arguments, 1);
 
             var transaction = db.transaction( table , transactionModes.readwrite ),
                 store = transaction.objectStore( table ),
@@ -250,7 +280,7 @@
             (function ( storeName ) {
                 that[ storeName ] = { };
                 for ( var i in that ) {
-                    if ( !hasOwn.call( that , i ) || i === 'close' ) {
+                    if ( !hasOwn.call( that , i ) || i === 'close' || i === 'getUData' || i === 'setUData' ) {
                         continue;
                     }
                     that[ storeName ][ i ] = (function ( i ) {
@@ -275,9 +305,10 @@
                 keyRange = type ? IDBKeyRange[ type ].apply( null, args ) : null,
                 results = [],
                 indexArgs = [ keyRange ],
-                limitRange = limitRange ? limitRange : null,
-                filters = filters ? filters : [],
                 counter = 0;
+
+            limitRange = limitRange || null;
+            filters = filters || [];
 
             if ( cursorType !== 'count' ) {
                 indexArgs.push( direction || 'next' );
@@ -309,6 +340,7 @@
                     } else {
                         var matchFilter = true;
                         var result = 'value' in cursor ? cursor.value : cursor.key;
+                        // debugger;
 
                         filters.forEach( function ( filter ) {
                             if ( !filter || !filter.length ) {
@@ -478,9 +510,6 @@
     };
 
     var createSchema = function ( e , schema , db ) {
-        if ( typeof schema === 'function' ) {
-            schema = schema();
-        }
 
         for ( var tableName in schema ) {
             var table = schema[ tableName ];
@@ -505,7 +534,16 @@
     var open = function ( e , server , version , schema ) {
         var db = e.target.result;
         var s = new Server( db , server );
-        var upgrade;
+
+        if (db.objectStoreNames.length !== Object.keys(schema).length) {
+            // This will handle an extreme case where the DB is successfully
+            // opened but it doesn't exists... apparently caused by dropping
+            // the db while it is in use/has pending requests...
+            console.warn('Inconsistent objectStoreNames for schema', schema);
+            s.close();
+            s.destroy();
+            return Promise.reject(DOMException.HIERARCHY_REQUEST_ERR);
+        }
 
         dbCache[ server ] = db;
 
@@ -515,7 +553,7 @@
     var dbCache = {};
 
     var db = {
-        version: '0.9.2',
+        version: '0.9.2-modified',
         open: function ( options ) {
             var request;
 
@@ -528,19 +566,61 @@
                     } , options.server , options.version , options.schema )
                         .then(resolve, reject)
                 } else {
-                    request = indexedDB.open( options.server , options.version );
+                    try {
+                        request = indexedDB.open( options.server , options.version );
+                    } catch (e) {
+                        console.error("indexedDB.open('"+ options.server +"', "+ options.version +"); FAILED", e);
+                        reject({ 'reason': e });
+                        return;
+                    }
+
+                    var schema = options.schema || {};
+                    if ( typeof schema === 'function' ) {
+                        schema = schema();
+                    }
+                    if (options.UDataSlave) {
+                        schema = clone(schema);
+                        schema['__udata__'] = {
+                            key: { keyPath: 'k' },
+                            indexes: {
+                                k: { unique: true }
+                            }
+                        };
+                    }
+
+                    request.onblocked = function ( e ) {
+                        // If some other tab is loaded with the database,
+                        // then it needs to be closed before we can proceed.
+                        if (reject) {
+                            reject({ 'reason': e });
+                            reject = resolve = null;
+                        }
+                    };
 
                     request.onsuccess = function ( e ) {
-                        open( e , options.server , options.version , options.schema )
-                            .then(resolve, reject)
+                        if (resolve) {
+                            open( e , options.server , options.version , schema )
+                                .then(resolve, reject);
+                            reject = resolve = null;
+                        }
                     };
 
                     request.onupgradeneeded = function ( e ) {
-                        createSchema( e , options.schema , e.target.result );
+                        createSchema( e , schema , e.target.result );
                     };
                     request.onerror = function ( e ) {
-                        reject({ 'reason': e });
+                        if (reject) {
+                            reject({ 'reason': e });
+                            reject = resolve = null;
+                        }
                     };
+
+                    setTimeout(function _dbjsOpenTimeout() {
+                        if (reject) {
+                            reject({ 'reason': DOMException.TIMEOUT_ERR });
+                            reject = resolve = null;
+                        }
+                    }, 7200);
                 }
             });
         }
@@ -551,6 +631,21 @@
     } else if ( typeof define === 'function' && define.amd ) {
         define( function() { return db; } );
     } else {
-        window.db = db;
+        Object.defineProperty(db, '__closeAll', {
+            value: function __dbjsCloseALL() {
+                for (var i in dbCache) {
+                    var db = dbCache[i];
+                    try {
+                        db.close();
+                        console.warn('Forcing DB close', i);
+                    }
+                    catch(e) {
+                        console.error(i, e);
+                    }
+                }
+                dbCache = {};
+            }
+        });
+        Object.defineProperty(window, 'db', {value: Object.freeze(db)});
     }
 })( window );

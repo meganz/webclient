@@ -74,9 +74,9 @@ JavaScript files
 
 **js/jquery.mousewheel.js** jQuery mousewheel plugin for cross browser mousewheel event handling
 
-**js/jquery-1.8.1.js** jQuery library
+**js/jquery-2.1.1.js** jQuery library
 
-**js/jquery-ui-1.10.4.js** jQuery User Interface for various UI functionallity, such as: rubberband selection, drag&drop
+**js/jquery-ui-1.11.2.js** jQuery User Interface for various UI functionallity, such as: rubberband selection, drag&drop
 
 **js/json.js** provides JSON.parse & JSON.stringify to older browsers
 
@@ -90,7 +90,7 @@ JavaScript files
 
 **js/mouse.js** captures mouse events for entropy collection
 
-**js/notifications.js** contains the notification logic
+**js/notify.js** contains the notifications logic
 
 **js/rsa.js** cryto library for RSA
 

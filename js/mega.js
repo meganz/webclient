@@ -1627,7 +1627,7 @@ function MegaData()
         $('.content-panel.contacts').html(html);
 
         if (megaChatIsReady) {
-            megaChat.renderContactTree();
+            //megaChat.renderContactTree();
 
             $('.fm-tree-panel').undelegate('.start-chat-button', 'click.megaChat');
             $('.fm-tree-panel').delegate('.start-chat-button', 'click.megaChat', function() {
@@ -2343,7 +2343,12 @@ function MegaData()
             }
         }
         if (typeof mDB === 'object' && !ignoreDB && !pfkey) {
-            mDBadd('f', clone(n));
+            if (n instanceof MegaDataObject) {
+                mDBadd('f', clone(n.toJS()));
+            }
+            else {
+                mDBadd('f', clone(n));
+            }
         }
         if (n.p) {
             if (typeof this.c[n.p] === 'undefined') {
@@ -4574,7 +4579,7 @@ function renderfm()
 
     M.openFolder(M.currentdirid);
     if (megaChatIsReady) {
-        megaChat.renderContactTree();
+        //megaChat.renderContactTree();
         megaChat.renderMyStatus();
     }
 
@@ -4648,7 +4653,7 @@ function renderNew() {
         treeUI();
 
         if (megaChatIsReady) {
-            megaChat.renderContactTree();
+            //megaChat.renderContactTree();
             megaChat.renderMyStatus();
         }
     }
@@ -5910,7 +5915,7 @@ function init_chat() {
                 window.megaChat.init();
 
                 if (fminitialized) {
-                    megaChat.renderContactTree();
+                    //megaChat.renderContactTree();
                     megaChat.renderMyStatus();
                 }
             }

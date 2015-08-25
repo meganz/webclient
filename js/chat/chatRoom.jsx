@@ -856,16 +856,6 @@ ChatRoom.prototype.refreshUI = function(scrollToBottom) {
         this.$header.removeClass("hidden");
         //$('.nw-conversations-item').removeClass("selected");
         //$('.nw-conversations-item[data-room-jid="' + self.roomJid.split("@")[0] + '"]').addClass("selected");
-
-
-        // active call?
-        if (this.callSession && this.callSession.isStarted() === true) {
-            var $currentCall = $('.nw-conversations-item.current-calling[data-jid="' + self.roomJid + '"]');
-            if ($currentCall.length > 0) {
-                $currentCall.addClass('selected');
-            }
-        }
-
     }
 
     var $jsp = self.$messages.data("jsp");
@@ -2385,3 +2375,6 @@ ChatRoom.prototype.startVideoCall = function() {
     var self = this;
     return self.megaChat.plugins.callManager.startCall(self, {audio: true, video: true});
 };
+
+window.ChatRoom = ChatRoom;
+module.exports = ChatRoom;

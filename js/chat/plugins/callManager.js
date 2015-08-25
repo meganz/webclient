@@ -98,6 +98,13 @@ CallSession.ALLOWED_STATE_TRANSITIONS[CallSession.STATE.STARTED] = // ->
         ];
 
 
+CallSession.prototype.isActive = function() {
+    return (
+        this.state === CallSession.STATE.STARTED ||
+        this.state === CallSession.STATE.STARTING
+    );
+};
+
 /**
  * UI -> event mapping stuff
  */
@@ -433,20 +440,9 @@ CallSession.prototype._renderInCallUI = function() {
     $('.btn-chat-call', self.room.$header).addClass('disabled');
 
 
-    $('.nw-conversations-item.current-calling').rebind('click.megaChat', function() {
+    $('.nw-conversations-item.current-calling', $('.section.conversations')).rebind('click.megaChat', function() {
         self.room.activateWindow();
     });
-
-    var otherUsersJid = self.room.getParticipantsExceptMe()[0];
-
-    var contactName = self.room.megaChat.getContactNameFromJid(
-        otherUsersJid
-    );
-    if (contactName) {
-        $('.nw-conversations-item.current-calling .nw-conversations-name').text(
-            contactName
-        );
-    }
 
     self.room.megaChat._currentCallCounter = 0;
     if (self.room.megaChat._currentCallTimer) {
@@ -715,7 +711,10 @@ CallSession.prototype.onCallTerminated = function(e) {
     self.renderCallEndedState();
 };
 
-CallSession.prototype.onStateChanged = function(e, session, oldState, newState) {};
+CallSession.prototype.onStateChanged = function(e, session, oldState, newState) {
+    //console.error("State changed: ", this, arguments);
+    this.room.trackDataChange();
+};
 
 CallSession.prototype.endCall = function(reason) {
     var self = this;
@@ -1150,18 +1149,18 @@ CallSession.prototype.renderCallStartedState = function() {
 
 
 
-    self.room.megaChat.activeCallRoom = self;
-    $('.nw-conversations-header.call-started, .nw-conversations-item.current-calling').removeClass('hidden');
-    $('.nw-conversations-item.current-calling').addClass('selected');
+    self.room.megaChat.activeCallSession = self;
+    //$('.nw-conversations-header.call-started, .nw-conversations-item.current-calling').removeClass('hidden');
+    //$('.nw-conversations-item.current-calling').addClass('selected');
 
-    self.room.getNavElement().hide();
+    //self.room.getNavElement().hide();
 
-    $('.nw-conversations-item.current-calling').attr('data-jid', self.room.roomJid);
-
-    $('.nw-conversations-item.current-calling .chat-cancel-icon').unbind('click.megaChat');
-    $('.nw-conversations-item.current-calling .chat-cancel-icon').bind('click.megaChat', function() {
-        self.endCall('hangup');
-    });
+    //$('.nw-conversations-item.current-calling').attr('data-jid', self.room.roomJid);
+    //
+    //$('.nw-conversations-item.current-calling .chat-cancel-icon').unbind('click.megaChat');
+    //$('.nw-conversations-item.current-calling .chat-cancel-icon').bind('click.megaChat', function() {
+    //    self.endCall('hangup');
+    //});
 
     // .chat-header-indicator.muted-video and .muted-audio should be synced when the .mute event is called
 
@@ -1173,8 +1172,7 @@ CallSession.prototype.renderCallStartedState = function() {
 
 
     $cancel.show();
-
-    self.room.megaChat.renderContactTree();
+    // self.room.megaChat.renderContactTree();
 
     self.renderAudioVideoScreens();
 
@@ -1784,7 +1782,6 @@ CallManager.prototype.getOrCreateSessionFromEventData = function(eventName, even
             callSession = self.callSessions[sid];
         } else {
             callSession = self.callSessions[sid] = new CallSession(chatRoom, sid);
-
             var peer = eventData.peer;
 
             if (!chatRoom) {

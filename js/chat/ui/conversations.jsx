@@ -72,9 +72,9 @@ var ConversationsList = React.createClass({
         e.stopPropagation();
     },
     currentCallClicked: function(e) {
-        var activeCallRoom = this.props.megaChat.activeCallRoom;
-        if(activeCallRoom) {
-            this.conversationClicked(activeCallRoom, e);
+        var activeCallSession = this.props.megaChat.activeCallSession;
+        if(activeCallSession) {
+            this.conversationClicked(activeCallSession.room, e);
         }
     },
     contactClicked: function(contact, e) {
@@ -82,11 +82,10 @@ var ConversationsList = React.createClass({
         e.stopPropagation();
     },
     endCurrentCall: function(e) {
-        var activeCallRoom = this.props.megaChat.activeCallRoom;
-        if(activeCallRoom) {
-            activeCallRoom._resetCallStateNoCall();
-            activeCallRoom._cancelCallRequest();
-            this.conversationClicked(activeCallRoom, e);
+        var activeCallSession = this.props.megaChat.activeCallSession;
+        if(activeCallSession) {
+            activeCallSession.endCall('hangup');
+            this.conversationClicked(activeCallSession.room, e);
         }
     },
     handleWindowResize: function() {
@@ -121,16 +120,18 @@ var ConversationsList = React.createClass({
 
         var megaChat = this.props.megaChat;
 
-        var activeCallRoom = megaChat.activeCallRoom;
-        if(activeCallRoom) {
-            var user = activeCallRoom.getParticipantsExceptMe()[0];
+        var activeCallSession = megaChat.activeCallSession;
+        if(activeCallSession && activeCallSession.room && megaChat.activeCallSession.isActive()) {
+            var room = activeCallSession.room;
+            var user = room.getParticipantsExceptMe()[0];
             user = megaChat.getContactFromJid(user);
+            console.error(user, user ? megaChat.xmppPresenceToCssClass(user.presence) : "nah!");
             if(user) {
                 currentCallingContactStatusProps.className += " " + user.u + " " + megaChat.xmppPresenceToCssClass(user.presence);
-                currentCallingContactStatusProps['data-jid'] = activeCallRoom.roomJid;
-                callName = activeCallRoom.getRoomTitle();
+                currentCallingContactStatusProps['data-jid'] = room.roomJid;
+                callName = room.getRoomTitle();
 
-                if(activeCallRoom.roomJid == megaChat.currentlyOpenedChat) {
+                if(room.roomJid == megaChat.currentlyOpenedChat) {
                     currentCallingContactStatusProps.className += " selected";
                 }
             } else {
@@ -143,27 +144,16 @@ var ConversationsList = React.createClass({
         if(!callName) {
             currentCallingHeaderClasses += " hidden";
         }
-        var currentConversations = [(
-            <div key="headerConversations">
-                <div className={currentCallingHeaderClasses}>{__("CURRENT CALLING")}</div>
-                <div {...currentCallingContactStatusProps}  onClick={this.currentCallClicked}>
-                    <div className="nw-contact-status"></div>
-                    <div className="chat-cancel-icon" onClick={this.endCurrentCall}></div>
-                    <div className="chat-time-txt"></div>
-                    <div className="nw-conversations-name">{callName}</div>
-                </div>
-                <div className="nw-tree-panel-header">
-                    <span>{__("Current Conversations")}</span>
-                    <div className="nw-tree-panel-arrows"></div>
-                </div>
-            </div>
-        )];
-
+        var currConvsList = [];
         this.props.chats.map((chatRoom, k) => {
             if(chatRoom._leaving || chatRoom.state == ChatRoom.STATE.LEFT || chatRoom.state == ChatRoom.STATE.LEAVING) {
                 return;
             }
-            if(megaChat.activeCallRoom && chatRoom == megaChat.activeCallRoom) {
+            if(
+                megaChat.activeCallSession &&
+                chatRoom == megaChat.activeCallSession.room &&
+                megaChat.activeCallSession.isActive()
+            ) {
                 return;
             }
 
@@ -178,10 +168,32 @@ var ConversationsList = React.createClass({
                 return;
             }
 
-            currentConversations.push(
+            currConvsList.push(
                 <ConversationsListItem key={k} chatRoom={chatRoom} megaChat={megaChat} onConversationClicked={this.conversationClicked.bind(this, chatRoom)} />
             );
         });
+
+
+        var currentConversations = [(
+            <div key="headerConversations">
+                <div className={currentCallingHeaderClasses}>{__("CURRENT CALLING")}</div>
+                <div {...currentCallingContactStatusProps}  onClick={this.currentCallClicked}>
+                    <div className="nw-contact-status"></div>
+                    <div className="chat-cancel-icon" onClick={this.endCurrentCall}></div>
+                    <div className="chat-time-txt"></div>
+                    <div className="nw-conversations-name">{callName}</div>
+                </div>
+                {
+                    currConvsList.length > 0 ? (
+                        <div className="nw-tree-panel-header">
+                            <span>{__("Current Conversations")}</span>
+                            <div className="nw-tree-panel-arrows"></div>
+                        </div>
+                    ) : null
+                }
+            </div>
+        ), currConvsList];
+
 
         // current contacts
         var currentContacts = [(
@@ -487,7 +499,7 @@ var ConversationsApp = React.createClass({
                             className="chat-button fm-start-call"
                             disabled={onlineContactsAudioCall.length === 0 ? true : false}
                         >
-                            <ButtonsUI.ButtonPopup>
+                            <ButtonsUI.ButtonPopup contacts={this.props.contacts}>
                                 {onlineContactsAudioCall}
                             </ButtonsUI.ButtonPopup>
                         </ButtonsUI.Button>

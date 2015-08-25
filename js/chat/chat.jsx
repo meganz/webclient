@@ -4,10 +4,6 @@ var ChatRoom = require('./chatRoom.jsx');
 
 var disableMpEnc = true;
 
-if(MegaChatDisabled) {
-    $(document.body).addClass("megaChatDisabled");
-}
-
 
 var chatui;
 var webSocketsSupport = typeof(WebSocket) !== 'undefined';
@@ -2034,8 +2030,6 @@ Chat.prototype.openChat = function(jids, type) {
 
     var room = new ChatRoom(self, roomJid + "@" + self.karere.options.mucDomain, type, jids, unixtime());
 
-    if (!self.currentlyOpenedChat) {
-
     self.chats.set(
         room.roomJid,
         room
@@ -2456,12 +2450,10 @@ Chat.prototype.createAndShowPrivateRoomFor = function(h) {
 };
 
 
-window.megaChat = new Chat();
+window.Chat = Chat;
 window.chatui = chatui;
-window.MegaChatDisabled = MegaChatDisabled;
 
 module.exports = {
     Chat,
-    chatui,
-    MegaChatDisabled
+    chatui
 };

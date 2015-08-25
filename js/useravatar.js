@@ -176,15 +176,23 @@ var useravatar = (function() {
 
     function emailAvatar(user, className, element)
     {
+        var found;
         // User is an email, we should look if the user
         // exists, if it does exists we use the user Object.
-        for (var u in M.u) {
-            if (M.u[u].m === user) {
+        M.u.forEach(function(contact, h) {
+            if (contact.m === user) {
                 // found the user object
-                return ns.contact(M.u[u], className, element);
+                found = ns.contact(contact, className, element);
+
+                return false;
             }
+        });
+        if (found) {
+            return found;
         }
-        return _letters(user.substr(0, 2), user, className, element);
+        else {
+            return _letters(user.substr(0, 2), user, className, element);
+        }
     }
 
     ns.contact = function(user, className, element) {

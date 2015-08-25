@@ -13,21 +13,13 @@ BUILD_DEP_ALL_NAMES = karma jsdoc
 
 ASMCRYPTO_MODULES = utils,aes-cbc,aes-ccm,sha1,sha256,sha512,hmac-sha1,hmac-sha256,hmac-sha512,pbkdf2-hmac-sha1,pbkdf2-hmac-sha256,pbkdf2-hmac-sha512,rng,bn,rsa-pkcs1,globals-rng,globals
 
-# Per-platform options.
-testOptions=
-
-# Disable colour for Windows hosts.
-ifeq ($(shell uname -o), Msys)
-	testOptions := "--no-colors"
-endif
-
 all: test api-doc dist test-shared
 
 test: $(KARMA)
-	$(NODE) $(KARMA) start --preprocessors= karma.conf.js --browsers PhantomJS $(testOptions)
+	$(NODE) $(KARMA) start --preprocessors= karma.conf.js --browsers PhantomJS_custom
 
 test-ci: $(KARMA)
-	$(NODE) $(KARMA) start --singleRun=true --no-colors karma.conf.js --browsers PhantomJS $(testOptions)
+	$(NODE) $(KARMA) start --singleRun=true --no-colors karma.conf.js --browsers PhantomJS_custom
 
 api-doc: $(JSDOC)
 	$(NODE) $(JSDOC) --destination doc/api/ --private \
@@ -43,7 +35,7 @@ jscs: $(JSCS)
 checks: jshint jscs
 
 clean:
-	rm -rf doc/api/ coverage/ build/ test-results.xml
+	rm -rf doc/api/ coverage/ build/ test-results.xml test/phantomjs-storage
 
 clean-all: clean
 	rm -f $(BUILD_DEP_ALL)

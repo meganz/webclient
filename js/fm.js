@@ -2150,6 +2150,30 @@ function fmremove() {
                         M.copyNodes($.selected, M.RubbishID, true);
                     }
                     else {
+                        
+                        // Remove all shares related to selected nodes
+                        for (var selection in $.selected) {
+                            if ($.selected.hasOwnProperty(selection)) {
+                                
+                                // Remove regular/full share
+                                for (var share in M.d[$.selected[selection]].shares) {
+                                    if (M.d[$.selected[selection]].shares.hasOwnProperty(share)) {
+                                        api_req({a: 's2', n:  $.selected[selection], s: [{ u: M.d[$.selected[selection]].shares[share].u, r: ''}], ha: '', i: requesti});
+                                        M.delNodeShare($.selected[selection], M.d[$.selected[selection]].shares[share].u);
+                                        setLastInteractionWith($.selected[selection], "0:" + unixtime());
+                                    }
+                                }
+                                
+                                // Remove pending share
+                                for (var pendingUserId in M.ps[$.selected[selection]]) {
+                                    if (M.ps[$.selected[selection]].hasOwnProperty(pendingUserId)) {
+                                        api_req({a: 's2', n:  $.selected[selection], s: [{ u: pendingUserId, r: ''}], ha: '', i: requesti});
+                                        M.deletePendingShare($.selected[selection], pendingUserId);
+                                    }
+                                }
+                            }
+                        }
+                        
                         M.moveNodes($.selected, M.RubbishID);
                     }
                 }

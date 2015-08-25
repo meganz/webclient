@@ -550,7 +550,9 @@ CallSession.prototype.onCallEnded = function(e, reason) {
 
     if (self.room.megaChat._currentCallCounter) {
         var msg = l[5889].replace('[X]', self.room.megaChat.getContactNameFromJid(self.getPeer()));
-        msg = (msg + " " + l[7208] + ".").replace("[X]", secToDuration(self.room.megaChat._currentCallCounter));
+        msg = (msg + " " + l[7208] + ".").replace("[X]", secToDuration(
+            self.room.megaChat._currentCallCounter ? self.room.megaChat._currentCallCounter : 0
+        ));
 
         self.room.appendDomMessage(
             self.room.generateInlineDialog(
@@ -634,7 +636,9 @@ CallSession.prototype.onCallFailed = function(e, reason, txt) {
     // Substitute email into language string
     var msg = l[7209].replace('[X]', self.room.megaChat.getContactNameFromJid(peer));
     if (self.room.megaChat._currentCallCounter) {
-        msg += " " + l[7208] + ".".replace("[X]", secToDuration(self.room.megaChat._currentCallCounter));
+        msg += " " + l[7208] + ".".replace("[X]", secToDuration(
+                self.room.megaChat._currentCallCounter ? self.room.megaChat._currentCallCounter : 0
+            ));
     }
 
     self.room.appendDomMessage(

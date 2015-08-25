@@ -4640,10 +4640,6 @@ function renderNew() {
     if (newpath) {
         M.renderPath();
     }
-    newnodes = undefined;
-    if (d) {
-        console.timeEnd('rendernew');
-    }
 
     // handle the Inbox section use cases
     if (M.hasInboxItems() === true) {
@@ -4656,6 +4652,15 @@ function renderNew() {
         }
     }
 
+    if (u_type === 0) {
+        // Show "ephemeral session warning"
+        topmenuUI();
+    }
+
+    newnodes = undefined;
+    if (d) {
+        console.timeEnd('rendernew');
+    }
 }
 
 /**

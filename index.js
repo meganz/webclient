@@ -705,6 +705,9 @@ function init_page() {
         $('.new-bottom-pages.about').html(html + '<div class="clear"></div>');
         mainScroll();
     }
+	else if (page == 'sourcecode') {
+        parsepage(pages['sourcecode']);
+    }
     else if (page == 'terms') {
         parsepage(pages['terms']);
     }

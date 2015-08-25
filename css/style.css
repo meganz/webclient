@@ -14898,21 +14898,21 @@ h5.main-italic-header {
 	background-position: -444px -614px;
 }
 .duration-options-list {
-    -webkit-column-count: 2;
+	-webkit-column-count: 2;
 	-moz-column-count: 2;
 	column-count: 2;
 	-webkit-column-width: 200px;
 	-moz-column-width: 200px;
 	column-width: 200px;
-    padding-top: 5px;
+	padding-top: 5px;
 }
 .duration-options-list .payment-duration .membership-radio-label {
 	background: none;
-    font-family: 'source_sans_proregular';
+	font-family: 'source_sans_proregular';
 	padding-left: 0;
 }
 .duration-options-list .payment-duration.template {
-    display: none;
+	display: none;
 }
 .membership-bott-price {
 	font-size: 72px;
@@ -23199,13 +23199,13 @@ div.fm-dialog.feedback-dialog .checkboxOff {
 }
 .voucher-buy-now.sufficient-funds {
 	border-color: #3aaa5a;
-    color: #3aaa5a;
-    font-weight: bold;
+	color: #3aaa5a;
+	font-weight: bold;
 }
 .voucher-buy-now.sufficient-funds:hover {
-    background-color: #3aaa5a;
-    border-color: #3aaa5a;
-    color: white;
+	background-color: #3aaa5a;
+	border-color: #3aaa5a;
+	color: white;
 }
 .voucher-block {
 	-moz-box-sizing: border-box;
@@ -24292,6 +24292,91 @@ body.pro:after {
 	white-space: nowrap;
 	font-size: 13px;
 }
+.main-mid-pad.opensource {
+	padding: 76px 124px
+}
+.opensource-bg {
+	background-color: #F2F2F2;
+	position: absolute;
+	width: 100%;
+	height: 100%;
+}
+.opensource-bg::after {
+	background-color: white;
+	width: 1024px;
+	height: inherit;
+	margin: 0 auto;
+	content: '';
+	display: block;
+}
+.opensource-top-icon {
+	background-image: url(../images/mega/opensource.png);
+	background-position: -30px 1px;
+	background-repeat: no-repeat;
+	float: left;
+	width: 44px;
+	height: 46px;
+}
+.opensource hr {
+	float: left;
+	width: 1px;
+	height: 17px;
+	border: 0;
+	margin: 12px 0 0 11px;
+	padding: 0;
+	background-color: rgba(151,151,151,0.2);
+}
+.opensource h1 {
+	color: rgba(34,34,34,0.75);
+	font-size: 28px;
+	line-height: 40px;
+	font-family: 'source_sans_prosemibold';
+	padding: 0;
+	margin: 0 0 4px 15px;
+	float: left;
+}
+.opensource-icons-bl {
+	border-top: 1px solid rgba(0,0,0,0.04);
+	border-bottom: 1px solid rgba(0,0,0,0.04);
+	margin: 44px 0 0 0;
+	padding: 31px 26px 40px 26px;
+}
+.opensource-icon-pad {
+	width: 33.333333%;
+	float: left;
+	padding: 22px 0;
+	text-align: center;
+}
+.opensource-icon {
+	display: block;
+	width: 102px;
+	height: 102px;
+	background-image: url(../images/mega/opensource.png);
+	background-repeat: no-repeat;
+	background-position: center -109px;
+	margin: 0 auto;
+}
+.opensource-icon.firefox {
+	background-position: center -249px;
+}
+.opensource-icon.chrome {
+	background-position: center -389px;
+}
+.opensource-icon.megasync {
+	background-position: center -529px;
+}
+.opensource-icon.android {
+	background-position: center -669px;
+}
+.opensource-icon.sdk {
+	background-position: center -809px;
+}
+a.opensource-icon-txt {
+	display: inline-block;
+	color: #444444;
+	font-family: 'source_sans_prosemibold';
+	padding: 20px 0 0 0;
+}
 .fontsize1 .nw-fm-tree-header input {
 	margin: 12 0 0 0;
 }
@@ -24459,6 +24544,10 @@ body.pro:after {
 }
 }
  @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
+.opensource-top-icon, .opensource-icon {
+ background-image: url(../images/mega/opensource@2x.png);
+ background-size: 102px auto;
+}
 .try-new-close {
  background-image: url(../images/mega/close-white-icon@2x.png);
  background-size: 14px auto;

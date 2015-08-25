@@ -64,7 +64,7 @@ initiate: function(isInitiator) {
         if ((RTC.Stats === undefined) && (typeof statsGlobalInit === 'function'))
             statsGlobalInit(self.peerconnection);
     } catch (e) {
-        console.error('Failed to create PeerConnection, exception: ', e.stack);
+        self.reportError('Failed to create PeerConnection', {e:e});
         return;
     }
     if (self.localStream)
@@ -319,10 +319,14 @@ sendIceCandidate: function (candidate) {
 sendOffer: function (cb) {
     var self = this;
     self.peerconnection.createOffer(function (sdp) {
-            self.createdOffer(sdp, cb);
+            try {
+                self.createdOffer(sdp, cb);
+            } catch(e) {
+                self.reportError("createdOffer() returned error", {e:e});
+            }
         },
         function (e) {
-            self.reportError("createOffer() returned error", {e: e});
+            self.reportError("peerconnection.createOffer() returned error", {e: e});
         },
         self.media_constraints
     );

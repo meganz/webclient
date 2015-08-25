@@ -2261,7 +2261,7 @@
     "7287": "Matagumpay ang pagdadagdag sa contact",
     "7288": "Di pinapagana ang background agents para sa MEGA ng user",
     "7289": "Nakapatay ang background agents",
-    "7290": "Para mapagana ang agarang Camera Uploads nang tama, kailangang mong buksan ang option na \\\"Manatiling nakalog-in\\\". Gusto mo bang paganahin ito?",
+    "7290": "Para mapagana ang agarang Camera Uploads nang tama, kailangang mong buksan ang option na \"Manatiling nakalog-in\". Gusto mo bang paganahin ito?",
     "7291": "Prerequisites para sa Auto Camera Uploads",
     "7300": "thumbnails",
     "7303": "64",
@@ -2350,10 +2350,10 @@
     "7391": "Para sa bagong mega.nz na disenyo",
     "7392": "Chrome Dev",
     "7399": "Nakakandado ang file.",
-    "7400": "We strongly suggest using our sync client for vastly improved performance<br\/> uploading hundreds of files. <a>Get MEGAsync now.<\/a>",
-    "7401": "CONTINUE ANYWAY",
-    "7402": "DOWNLOAD MEGAsync",
-    "7403": "Drop your files here to start uploading",
-    "7404": "Deleted one or more items.",
-    "7405": "One or more of your items were deleted by another user."
+    "7400": "Pinapayohan ka naming gamitin ang aming sync client para sa mas pinagandang performance<br\/> sa pag-aupload ng maramihang files. <a>Kunin ang MEGAsync ngayon na.<\/a>",
+    "7401": "MAGPATULOY NA",
+    "7402": "I-DOWNLOAD ang MEGAsync",
+    "7403": "Ihulog dito ang file upang simulan ang pag-uupload",
+    "7404": "Binura ang isa o higit pang item(s).",
+    "7405": "Ang isa o higit pang item(s) ay binura ng ibang user."
 }

@@ -1436,7 +1436,18 @@ function MegaData()
             treeUI();
 
             if (!megaChatIsDisabled) {
-                chatui(id); // XX: using the old code...for now
+                if(typeof(megaChat) === 'undefined') {
+                    // queue for opening the megachat UI WHEN the pubEd keys are loaded
+                    // happens, often when the APIs are returning -3
+
+                    mBroadcaster.once('pubEd25519', function() {
+                        chatui(id);
+                    });
+                } else {
+                    // XX: using the old code...for now
+                    chatui(id);
+                }
+
             }
         }
         else if ((!id || !M.d[id]) && id !== 'transfers') {

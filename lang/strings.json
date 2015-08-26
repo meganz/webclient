@@ -9438,5 +9438,9 @@
     "7411": {
         "text": "Source Code",
         "context": "A title for the main menu and footer which will link to the open source page containing Mega's source code."
+    },
+    "7412": {
+        "text": "Backup master key",
+        "context": "The is a button on the Account page which takes a user to the #backup page where they can backup\/save their master encryption key."
     }
 }

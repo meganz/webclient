@@ -2144,7 +2144,7 @@ function fmremove() {
                 M.moveNodes($.selected, M.RubbishID);
             }
         } else {
-            var delShareInfo = isShareExists($.selected) ? ' ' + l[1952] + ' ' + 'Any shared files or folders will no longer be accessible to other users.' : '';
+            var delShareInfo = isShareExist($.selected) ? ' ' + l[1952] + ' ' + 'Any shared files or folders will no longer be accessible to other users.' : '';
             
             msgDialog('remove', l[1003], l[1004].replace('[X]', fm_contains(filecnt, foldercnt)) + delShareInfo, false, function(e) {
                 if (e) {
@@ -2182,29 +2182,6 @@ function fmremove() {
             }, true);
         }
     }
-}
-
-/*
- * isShareExists, checking if there's available shares for selected nodes
- * 
- * @params {array} nodes, holds array of ids from selected folders/files (nodes)
- * 
- * @returns {boolean}
- */
-function isShareExists(nodes) {
-    
-    for (var i in nodes) {
-        if (nodes.hasOwnProperty(i)) {
-            if (M.d[nodes[i]].shares && Object.keys(M.d[nodes[i]].shares).length) {
-                return true;
-            }
-            if (M.ps && M.ps[nodes[i]] && Object.keys(M.ps[nodes[i]]).length) {
-                return true;
-            }
-        }
-    }
-    
-    return false;
 }
 
 function fmremdupes(test)

@@ -3431,3 +3431,64 @@ if (typeof sjcl !== 'undefined') {
         this.stack = mega.utils.getStack();
     };
 }
+
+/**
+ * isShareExists
+ * 
+ * checking if there's available shares for selected nodes
+ * 
+ * @param {array} nodes, holds array of ids from selected folders/files (nodes)
+ * 
+ * @returns {boolean}
+ */
+function isShareExist(nodes) {
+    
+    for (var i in nodes) {
+        if (nodes.hasOwnProperty(i)) {
+            if (M.d[nodes[i]].shares && Object.keys(M.d[nodes[i]].shares).length) {
+                return true;
+            }
+            if (M.ps && M.ps[nodes[i]] && Object.keys(M.ps[nodes[i]]).length) {
+                return true;
+            }
+        }
+    }
+    
+    return false;
+}
+
+/**
+ * loopSubdirs
+ * 
+ * Loops through all subdirs of given node
+ * 
+ * @param {string} id: node id
+ * @param {array} tmp: nodes
+ * 
+ * @returns child nodes id
+ */
+function loopSubdirs(id, tmp) {
+    
+    var subDirs = [];
+    
+    if (subDirs.indexOf(id) === -1) {
+        subDirs.push(id);
+    }
+
+    if (tmp) {
+        subDirs.push.apply(subDirs, tmp);
+    }
+    
+    for (var item in M.c[id]) {
+        if (M.c[id].hasOwnProperty(item)) {
+            
+            // Prevent duplication
+            if (subDirs.indexOf(item) === -1) {
+                subDirs.push(item);
+            }
+            return loopSubdirs(item, subDirs);
+        }
+    }
+
+    return subDirs;
+}

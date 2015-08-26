@@ -2358,5 +2358,6 @@
     "7404": "\u10ec\u10d0\u10e8\u10d0\u10da\u10d0 \u10d4\u10e0\u10d7\u10d8 \u10d0\u10dc \u10db\u10d4\u10e2\u10d8 \u10dd\u10d1\u10d8\u10d4\u10e5\u10e2\u10d8",
     "7405": "One or more of your items were deleted by another user.",
     "7410": "Any shared files or folders will no longer be accessible to other users.",
-    "7411": "Source Code"
+    "7411": "Source Code",
+    "7412": "Backup master key"
 }

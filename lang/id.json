@@ -220,6 +220,7 @@
     "499": "per tahun",
     "501": "Hemat 17%",
     "507": "Lanjutkan",
+    "509": "PERUSAHAAN PRIVASI",
     "511": "2084-bit RSA kunci publik\/privat anda sekarang sedang dibuat",
     "514": "Saldo anda tidak mencukupi, harap coba kembali.",
     "516": "Dapatkan dukungan",
@@ -2355,5 +2356,7 @@
     "7402": "DOWNLOAD MEGAsync",
     "7403": "Drop your files here to start uploading",
     "7404": "Deleted one or more items.",
-    "7405": "One or more of your items were deleted by another user."
+    "7405": "One or more of your items were deleted by another user.",
+    "7410": "Any shared files or folders will no longer be accessible to other users.",
+    "7411": "Source Code"
 }

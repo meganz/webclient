@@ -220,6 +220,7 @@
     "499": "por ano",
     "501": "Economize 17%",
     "507": "Continue",
+    "509": "A COMPANHIA DE PRIVACIDADE",
     "511": "Seu par de chaves p\u00fablica\/privada de 2048-bit est\u00e1 sendo criada agora.",
     "514": "Saldo insuficiente, por favor tente novamente.",
     "516": "Solicitar suporte",
@@ -2355,5 +2356,7 @@
     "7402": "DOWNLOAD MEGAsync",
     "7403": "Drop your files here to start uploading",
     "7404": "Deleted one or more items.",
-    "7405": "One or more of your items were deleted by another user."
+    "7405": "One or more of your items were deleted by another user.",
+    "7410": "Any shared files or folders will no longer be accessible to other users.",
+    "7411": "Source Code"
 }

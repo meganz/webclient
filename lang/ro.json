@@ -220,6 +220,7 @@
     "499": "per an",
     "501": "economise\u015fti 17%",
     "507": "continu\u0103",
+    "509": "CONFIDEN\u0162IALITATEA COMPANIEI",
     "511": "Perechea de chei private \/ publice de 2048 de bi\u0163i RSA sunt acum create.",
     "514": "Sold insuficient, te rug\u0103m s\u0103 \u00eencerci din nou.",
     "516": "Ob\u0163ine asisten\u0163\u0103",
@@ -2355,5 +2356,7 @@
     "7402": "DESCARC\u0102 MEGAsync",
     "7403": "Drop your files here to start uploading",
     "7404": "Unul sau mai multe elemente \u015fterse.",
-    "7405": "One or more of your items were deleted by another user."
+    "7405": "One or more of your items were deleted by another user.",
+    "7410": "Any shared files or folders will no longer be accessible to other users.",
+    "7411": "Source Code"
 }

@@ -883,6 +883,10 @@
         "text": "Continue",
         "context": ""
     },
+    "509": {
+        "text": "THE PRIVACY COMPANY",
+        "context": ""
+    },
     "511": {
         "text": "Your 2048-bit RSA public \/ private key pair is now being created.",
         "context": "Bit is the computer term (http:\/\/en.wikipedia.org\/wiki\/Bit)\r\nRSA is name of an algorithm for public-key cryptography and should be kept as RSA in every language. Encryption is also a computer term (http:\/\/en.wikipedia.org\/wiki\/Encryption)."
@@ -9426,5 +9430,13 @@
     "7405": {
         "text": "One or more of your items were deleted by another user.",
         "context": "This is a notification informing the user that somebody else (who we do not know the email of) has deleted some of their files or folders. We can not tell if it was a file, or a folder, or many of them, so the ambiguous word 'items' was chosen."
+    },
+    "7410": {
+        "text": "Any shared files or folders will no longer be accessible to other users.",
+        "context": "Additional message dialog information when node is removed\/moved to Rubbish Bin."
+    },
+    "7411": {
+        "text": "Source Code",
+        "context": "A title for the main menu and footer which will link to the open source page containing Mega's source code."
     }
 }

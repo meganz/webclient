@@ -220,6 +220,7 @@
     "499": "ia tau",
     "501": "penapenahia tahi tekau m\u0101 whitu orau",
     "507": "Haere tonu",
+    "509": "He kamupene tumataiti",
     "511": "Ko t\u014d iti 2048 RSA k\u012b takirua \u014dkawa\/t\u016bmataiti kei te mahia in\u0101ianei",
     "514": "Kore moni, mahia an\u014dtia",
     "516": "Tikina he manaakitanga",
@@ -2355,5 +2356,7 @@
     "7402": "DOWNLOAD MEGAsync",
     "7403": "Drop your files here to start uploading",
     "7404": "Deleted one or more items.",
-    "7405": "One or more of your items were deleted by another user."
+    "7405": "One or more of your items were deleted by another user.",
+    "7410": "Any shared files or folders will no longer be accessible to other users.",
+    "7411": "Source Code"
 }

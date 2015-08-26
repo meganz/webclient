@@ -3903,14 +3903,14 @@ function accountUI()
         document.location.hash = 'fm/account/profile';
     });
 
+    // Cancel account button on main Account page
     $('.cancel-account').rebind('click', function() {
-        DEBUG('Cancel your account');
 
         // Ask for confirmation
-        msgDialog('confirmation', l[6181], l[1974], false, function(e) {
-            if (e) {
+        msgDialog('confirmation', l[6181], l[1974], false, function(event) {
+            if (event) {
                 loadingDialog.show();
-                api_req({a: 'erm', m: M.u[u_handle].m, t: 21}, {
+                api_req({ a: 'erm', m: M.u[u_handle].m, t: 21 }, {
                     callback: function(res) {
                         loadingDialog.hide();
                         if (res === ENOENT) {
@@ -3926,6 +3926,11 @@ function accountUI()
                 });
             }
         });
+    });
+    
+    // Button on main Account page to backup their master key
+    $('.backup-master-key').rebind('click', function() {
+        document.location.hash = 'backup';
     });
 
     $('.fm-account-button').unbind('click');

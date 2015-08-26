@@ -220,6 +220,7 @@
     "499": "m\u1ed7i n\u0103m",
     "501": "ti\u1ebft ki\u1ec7m 17%",
     "507": "Ti\u1ebfp t\u1ee5c",
+    "509": "C\u00d4NG TY B\u1ea2O M\u1eacT",
     "511": "C\u1eb7p s\u1ed1 kh\u00f3a c\u00e1 nh\u00e2n v\u00e0 kh\u00f3a c\u00f4ng khai m\u00e3 h\u00f3a 2048-bit RSA  \u0111ang \u0111\u01b0\u1ee3c t\u1ea1o.",
     "514": "Ti\u1ec1n t\u00e0i kho\u1ea3n kh\u00f4ng \u0111\u1ee7, xin th\u1eed l\u1ea1i.",
     "516": "Nh\u1eadn h\u1ed7 tr\u1ee3",
@@ -2355,5 +2356,7 @@
     "7402": "DOWNLOAD MEGAsync",
     "7403": "Drop your files here to start uploading",
     "7404": "Deleted one or more items.",
-    "7405": "One or more of your items were deleted by another user."
+    "7405": "One or more of your items were deleted by another user.",
+    "7410": "Any shared files or folders will no longer be accessible to other users.",
+    "7411": "Source Code"
 }

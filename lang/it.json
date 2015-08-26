@@ -220,6 +220,7 @@
     "499": "all'anno",
     "501": "risparmia il 17%",
     "507": "Continua",
+    "509": "L'AZIENDA DELLA PRIVACY",
     "511": "Le tue key pubbliche \/ private a 2048-bit SRA sono in fase di creazione.",
     "514": "Credito insufficiente, riprova per favore.",
     "516": "Ottieni supporto",
@@ -2355,5 +2356,7 @@
     "7402": "SCARICA MEGAsync",
     "7403": "Drop your files here to start uploading",
     "7404": "Cancellato uno o pi\u00f9 elementi.",
-    "7405": "One or more of your items were deleted by another user."
+    "7405": "One or more of your items were deleted by another user.",
+    "7410": "Any shared files or folders will no longer be accessible to other users.",
+    "7411": "Source Code"
 }

@@ -220,6 +220,7 @@
     "499": "\u6bcf\u5e74",
     "501": "\u8282\u770117%",
     "507": "\u7ee7\u7eed",
+    "509": "\u9690\u79c1\u4fdd\u5bc6\u516c\u53f8",
     "511": "\u73b0\u5728\u6b63\u5728\u521b\u5efa\u4f60\u76842048\u4f4d\u7684RSA\u516c\u94a5\/\u79c1\u94a5\u5bf9\u3002",
     "514": "\u4f59\u989d\u4e0d\u8db3\uff0c\u8bf7\u518d\u8bd5\u4e00\u6b21\u3002",
     "516": "\u8bf7\u6c42\u5e2e\u52a9",
@@ -2355,5 +2356,7 @@
     "7402": "DOWNLOAD MEGAsync",
     "7403": "Drop your files here to start uploading",
     "7404": "Deleted one or more items.",
-    "7405": "One or more of your items were deleted by another user."
+    "7405": "One or more of your items were deleted by another user.",
+    "7410": "Any shared files or folders will no longer be accessible to other users.",
+    "7411": "Source Code"
 }

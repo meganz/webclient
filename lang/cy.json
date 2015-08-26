@@ -220,6 +220,7 @@
     "499": "y flwyddyn",
     "501": "arbedwch 17%",
     "507": "Parhau",
+    "509": "Y CWMNI PREIFATRWYDD",
     "511": "Mae eich p\u00e2r o allweddi 2048-bit RSA cyhoeddus a phreifat yn cael ei greu nawr.",
     "514": "Gweddill annigonol, rhowch gynnig arall arni.",
     "516": "Cymorth",
@@ -2355,5 +2356,7 @@
     "7402": "LAWRLWYTHO MEGAsync",
     "7403": "Gollyngwch eich ffeiliau yma i ddechrau uwchlwytho",
     "7404": "Dil\u00ebwyd un neu fwy o eitemau.",
-    "7405": "Dil\u00ebwyd un neu fwy o'ch eitemau gan ddefnyddiwr arall."
+    "7405": "Dil\u00ebwyd un neu fwy o'ch eitemau gan ddefnyddiwr arall.",
+    "7410": "Any shared files or folders will no longer be accessible to other users.",
+    "7411": "Source Code"
 }

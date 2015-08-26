@@ -220,6 +220,7 @@
     "499": "vuodessa",
     "501": "s\u00e4\u00e4st\u00e4 17%",
     "507": "Jatka",
+    "509": "YKSITYISYYSYRITYS",
     "511": "2048-bittist\u00e4 julkista \/ yksityist\u00e4 RSA-avainparia luodaan.",
     "514": "Riitt\u00e4m\u00e4t\u00f6n saldo, yrit\u00e4 uudelleen.",
     "516": "Hanki tukea",
@@ -2355,5 +2356,7 @@
     "7402": "LATAA MEGAsync",
     "7403": "Pudota l\u00e4hetett\u00e4v\u00e4t tiedostosi t\u00e4h\u00e4n",
     "7404": "Yksi tai useampi kohde poistettu.",
-    "7405": "Toinen k\u00e4ytt\u00e4j\u00e4 on poistanut yhden tai useamman kohteesi."
+    "7405": "Toinen k\u00e4ytt\u00e4j\u00e4 on poistanut yhden tai useamman kohteesi.",
+    "7410": "Any shared files or folders will no longer be accessible to other users.",
+    "7411": "Source Code"
 }

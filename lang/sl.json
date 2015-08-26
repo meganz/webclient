@@ -220,6 +220,7 @@
     "499": "letno",
     "501": "prihranite 17%",
     "507": "Nadaljuj",
+    "509": "DRU\u017dBA ZA VARNOST",
     "511": "Va\u0161 2028-bitni RSA javni \/ zasebni par klju\u010dev se sedaj generira.",
     "514": "Prenizko stanje, prosim poskusite ponovno.",
     "516": "Pridobi podporo",
@@ -2355,5 +2356,7 @@
     "7402": "DOWNLOAD MEGAsync",
     "7403": "Drop your files here to start uploading",
     "7404": "Deleted one or more items.",
-    "7405": "One or more of your items were deleted by another user."
+    "7405": "One or more of your items were deleted by another user.",
+    "7410": "Any shared files or folders will no longer be accessible to other users.",
+    "7411": "Source Code"
 }

@@ -220,6 +220,7 @@
     "499": "gad\u0101",
     "501": "ietaupi 17%",
     "507": "Turpin\u0101t",
+    "509": "PRIV\u0100TUMA KOMP\u0100NIJA",
     "511": "Tavs 2048-bit RSA publiskais \/ priv\u0101tais atsl\u0113gu p\u0101ris tiek veidots.",
     "514": "Nepietiekama bilance, l\u016bdzu, m\u0113\u0123iniet v\u0113lreiz.",
     "516": "Sa\u0146emt atbalstu",
@@ -2355,5 +2356,7 @@
     "7402": "DOWNLOAD MEGAsync",
     "7403": "Drop your files here to start uploading",
     "7404": "Deleted one or more items.",
-    "7405": "One or more of your items were deleted by another user."
+    "7405": "One or more of your items were deleted by another user.",
+    "7410": "Any shared files or folders will no longer be accessible to other users.",
+    "7411": "Source Code"
 }

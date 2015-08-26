@@ -220,6 +220,7 @@
     "499": "kada taon",
     "501": "makakatipid ka ng 17%",
     "507": "Ipagpatuloy",
+    "509": "Ang Pribadong Kompanya",
     "511": "Ang iyong 2048-bit RSA public\/private key pairs ay ginagawa ngayon.",
     "514": "Kunlang ang inyong balanse,Subukan ulit.",
     "516": "kumuha ng suporta",
@@ -2355,5 +2356,7 @@
     "7402": "I-DOWNLOAD ang MEGAsync",
     "7403": "Ihulog dito ang file upang simulan ang pag-uupload",
     "7404": "Binura ang isa o higit pang item(s).",
-    "7405": "Ang isa o higit pang item(s) ay binura ng ibang user."
+    "7405": "Ang isa o higit pang item(s) ay binura ng ibang user.",
+    "7410": "Any shared files or folders will no longer be accessible to other users.",
+    "7411": "Source Code"
 }

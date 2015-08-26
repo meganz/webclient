@@ -220,6 +220,7 @@
     "499": "setahun",
     "501": "Simpan 17%",
     "507": "Teruskan",
+    "509": "SYARIKAT PRIVASI",
     "511": "Pasangan kunci awam \/ peribadi 2048-bit RSA anda sedang dibuat.",
     "514": "Baki tidak mencukupi, sila cuba lagi.",
     "516": "Dapatkan sokongan",
@@ -2355,5 +2356,7 @@
     "7402": "DOWNLOAD MEGAsync",
     "7403": "Drop your files here to start uploading",
     "7404": "Deleted one or more items.",
-    "7405": "One or more of your items were deleted by another user."
+    "7405": "One or more of your items were deleted by another user.",
+    "7410": "Any shared files or folders will no longer be accessible to other users.",
+    "7411": "Source Code"
 }

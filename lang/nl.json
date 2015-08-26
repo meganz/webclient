@@ -220,6 +220,7 @@
     "499": "per jaar",
     "501": "bespaar 17%",
     "507": "Ga verder",
+    "509": "THE PRIVACY COMPANY",
     "511": "Uw publieke \/ priv\u00e9 2048-bit RSA sleutelpaar wordt nu aangemaakt.",
     "514": "Onvoldoende saldo, probeer het opnieuw.",
     "516": "Ondersteuning",
@@ -2355,5 +2356,7 @@
     "7402": "DOWNLOAD MEGAsync",
     "7403": "Drop je bestanden hier om te beginnen met het uploaden",
     "7404": "Verwijderde \u00e9\u00e9n of meer bestanden.",
-    "7405": "E\u00e9n of meer van uw bestanden werden verwijderd door een andere gebruiker."
+    "7405": "E\u00e9n of meer van uw bestanden werden verwijderd door een andere gebruiker.",
+    "7410": "Any shared files or folders will no longer be accessible to other users.",
+    "7411": "Source Code"
 }

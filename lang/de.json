@@ -220,6 +220,7 @@
     "499": "pro Jahr",
     "501": "Sparen Sie 17%",
     "507": "Fortfahren",
+    "509": "THE PRIVACY COMPANY",
     "511": "Ihr 2048-bit RSA Schl\u00fcssel wird jetzt f\u00fcr Sie erstellt.",
     "514": "Ihr derzeitiger Kontostand reicht nicht aus. Bitte versuchen Sie es erneut.",
     "516": "Brauchen Sie Hilfe?",
@@ -2355,5 +2356,7 @@
     "7402": "DOWNLOAD MEGAsync",
     "7403": "Drop your files here to start uploading",
     "7404": "Deleted one or more items.",
-    "7405": "One or more of your items were deleted by another user."
+    "7405": "One or more of your items were deleted by another user.",
+    "7410": "Any shared files or folders will no longer be accessible to other users.",
+    "7411": "Source Code"
 }

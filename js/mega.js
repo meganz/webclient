@@ -1436,7 +1436,18 @@ function MegaData()
             treeUI();
 
             if (!megaChatIsDisabled) {
-                chatui(id); // XX: using the old code...for now
+                if(typeof(megaChat) === 'undefined') {
+                    // queue for opening the megachat UI WHEN the pubEd keys are loaded
+                    // happens, often when the APIs are returning -3
+
+                    mBroadcaster.once('pubEd25519', function() {
+                        chatui(id);
+                    });
+                } else {
+                    // XX: using the old code...for now
+                    chatui(id);
+                }
+
             }
         }
         else if ((!id || !M.d[id]) && id !== 'transfers') {
@@ -2905,37 +2916,39 @@ function MegaData()
 
         newnodes = [];
         var j = [];
-        for (var i in n)
-        {
+        for (var i in n) {
             var h = n[i];
-            if (this.rubNodes[this.d[h].h] && t != this.RubbishID)
-                delete this.rubNodes[this.d[h].h]
-            j.push(
-                {
-                    a: 'm',
-                    n: h,
-                    t: t,
-                    i: requesti
-                });
-            if (M.d[h] && M.d[h].p)
-            {
-                if (M.c[M.d[h].p] && M.c[M.d[h].p][h])
-                    delete M.c[M.d[h].p][h];
+            var node = M.d[h];
+            if (t !== this.RubbishID && node && this.rubNodes[node.h]) {
+                delete this.rubNodes[node.h];
+            }
+            j.push({
+                a: 'm',
+                n: h,
+                t: t,
+                i: requesti
+            });
+            if (node && node.p) {
+                if (M.c[node.p] && M.c[node.p][h]) {
+                    delete M.c[node.p][h];
+                }
                 // Update M.v it's used for slideshow preview at least
-                for (var k in M.v)
-                {
-                    if (M.v[k].h === h)
-                    {
+                for (var k in M.v) {
+                    if (M.v[k].h === h) {
                         M.v.splice(k, 1);
                         break;
                     }
                 }
-                if (typeof M.c[t] === 'undefined')
+                if (typeof M.c[t] === 'undefined') {
                     M.c[t] = [];
+                }
                 M.c[t][h] = 1;
                 removeUInode(h);
-                this.nodeAttr({h: h, p: t});
-                newnodes.push(M.d[h]);
+                this.nodeAttr({
+                        h: h,
+                        p: t
+                    });
+                newnodes.push(node);
             }
         }
         renderNew();
@@ -4294,13 +4307,20 @@ function MegaData()
 
         if (urlParts) {
 
-            // Decode from Base64 and JSON
-            urlParts = JSON.parse(atob(urlParts[1]));
+            try {
+                // Decode from Base64 and JSON
+                urlParts = JSON.parse(atob(urlParts[1]));
+            }
+            catch (ex) {
+                console.error(ex);
+                window.location.hash = 'login';
+                return false;
+            }
 
             if (urlParts) {
                 // If the user is already logged in here with the same account
                 // we can avoid a lot and just take them to the correct page
-                if (JSON.stringify(u_k) === JSON.stringify(urlParts[0])){
+                if (JSON.stringify(u_k) === JSON.stringify(urlParts[0])) {
                     window.location.hash = urlParts[2];
                     return false;
                 }
@@ -4308,7 +4328,7 @@ function MegaData()
                 // If the user is already logged in but with a different account just load that account instead. The
                 // hash they came from e.g. a folder link may not be valid for this account so just load the file manager.
                 else if (u_k && (JSON.stringify(u_k) !== JSON.stringify(urlParts[0]))) {
-                    if ((urlParts[2] || '').match(/^fm/)) {
+                    if (!urlParts[2] || String(urlParts[2]).match(/^fm/)) {
                         window.location.hash = 'fm';
                         return false;
                     } else {
@@ -4631,10 +4651,6 @@ function renderNew() {
     if (newpath) {
         M.renderPath();
     }
-    newnodes = undefined;
-    if (d) {
-        console.timeEnd('rendernew');
-    }
 
     // handle the Inbox section use cases
     if (M.hasInboxItems() === true) {
@@ -4647,6 +4663,15 @@ function renderNew() {
         }
     }
 
+    if (u_type === 0) {
+        // Show "ephemeral session warning"
+        topmenuUI();
+    }
+
+    newnodes = undefined;
+    if (d) {
+        console.timeEnd('rendernew');
+    }
 }
 
 /**

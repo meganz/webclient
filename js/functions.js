@@ -2949,9 +2949,9 @@ mega.utils.reload = function megaUtilsReload() {
             u_storage.d = true;
             if (location.host !== 'mega.nz') {
                 u_storage.dd = true;
-            }
-            if (!is_extension) {
-                u_storage.jj = true;
+                if (!is_extension) {
+                    u_storage.jj = true;
+                }
             }
         }
 

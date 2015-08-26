@@ -182,10 +182,10 @@ function treeDroppable()
 function cacheselect()
 {
     $.selected = [];
-    $($.selectddUIgrid + ' ' + $.selectddUIitem).each(function(i, o)
-    {
-        if ($(o).attr('class').indexOf('ui-selected') > -1)
+    $($.selectddUIgrid + ' ' + $.selectddUIitem).each(function(i, o) {
+        if ($(o).hasClass('ui-selected')) {
             $.selected.push($(o).attr('id'));
+        }
     });
 }
 
@@ -2057,15 +2057,19 @@ function fmremove() {
         foldercnt = 0,
         contactcnt = 0,
         removesharecnt = 0;
+
     for (var i in $.selected) {
         var n = M.d[$.selected[i]];
         if (n && n.p.length === 11) {
             removesharecnt++;
-        } else if ($.selected[i].length === 11) {
+        }
+        else if (String($.selected[i]).length === 11) {
             contactcnt++;
-        } else if (M.d[$.selected[i]].t) {
+        }
+        else if (n && n.t) {
             foldercnt++;
-        } else {
+        }
+        else {
             filecnt++;
         }
     }
@@ -6444,7 +6448,9 @@ function sectionUIopen(id) {
 }
 
 function treeUIopen(id, event, ignoreScroll, dragOver, DragOpen) {
-    var id_s = id.split('/')[0], id_r = RootbyId(id);
+    id = String(id);
+    var id_r = RootbyId(id);
+    var id_s = id.split('/')[0];
     var e, scrollTo = false, stickToTop = false;
 
     //console.error("treeUIopen", id);
@@ -6776,28 +6782,10 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
     });
     $('#msgDialog').removeClass('hidden');
     fm_showoverlay();
-    $('input:visible').blur();
-    $(document).bind('keydown', _closeDialogKeyboard);
 }
-
-function _closeDialogKeyboard(e) {
-    e.preventDefault();
-    e.stopPropagation();
-
-    if (e.keyCode === 13 || e.keyCode === 27) {
-        closeMsg();
-        if ($.warningCallback) {
-            $.warningCallback(e.keyCode === 13);
-        }
-    }
-
-    return false;
-}
-
 
 function closeMsg() {
     $('#msgDialog').addClass('hidden');
-    $(document).unbind('keydown', _closeDialogKeyboard);
 
     if(!$('.pro-register-dialog').is(':visible')) {
         fm_hideoverlay();

@@ -1162,7 +1162,7 @@ input.radioOn, input.radioOff {
 	line-height: 23px;
 }
 .terms-dialog .fm-dialog-button {
-    top: -6px;
+	top: -6px;
 }
 .terms-dialog .terms-main {
 	padding: 5px 20px 20px 20px;
@@ -1571,6 +1571,16 @@ a.blog-button:hover {
 	text-transform: uppercase;
 	font-family: 'source_sans_prolight';
 }
+.notification-item .avatar-wrapper.avatar {
+	width: 48px;
+	height: 48px;
+	line-height: 42px;
+	margin: 0;
+}
+.notification-item .avatar img {
+	width: 44px;
+	height: 44px;
+}
 .notification-request-buttons {
 	float: right;
 	padding: 4px 20px 0 8px;
@@ -1683,7 +1693,7 @@ a.blog-button:hover {
 }
 .notification-info {
 	display: block;
-	font-size: 14px;
+	font-size: 13px;
 	color: #666666;
 	padding: 0;
 	line-height: 16px;
@@ -6539,9 +6549,6 @@ table {
 	background-image: url(../images/mega/nw-fm-sprite_v7.svg);
 	background-repeat: no-repeat;
 	display: block;
-}
-.transfer-type .speed {
-	text-transform: lowercase;
 }
 .transfer-type:first-letter, .transfer-status:first-letter {
 	text-transform: uppercase;
@@ -14837,8 +14844,8 @@ h5.main-italic-header {
 }
 .payment-options-list .payment-method {
 	cursor: pointer;
-	margin-bottom: 3px;
-	overflow: visible;/*width: 200px;*/
+	margin-bottom: 2px;
+	overflow: visible;
 }
 .payment-options-list .payment-method.disabled {
 	cursor: auto;
@@ -14899,6 +14906,23 @@ h5.main-italic-header {
 }
 .membership-radio-label.bitcoin {
 	background-position: -444px -614px;
+}
+.duration-options-list {
+	-webkit-column-count: 2;
+	-moz-column-count: 2;
+	column-count: 2;
+	-webkit-column-width: 200px;
+	-moz-column-width: 200px;
+	column-width: 200px;
+	padding-top: 5px;
+}
+.duration-options-list .payment-duration .membership-radio-label {
+	background: none;
+	font-family: 'source_sans_proregular';
+	padding-left: 0;
+}
+.duration-options-list .payment-duration.template {
+	display: none;
 }
 .membership-bott-price {
 	font-size: 72px;
@@ -15004,21 +15028,52 @@ div.membership-bott-button {
 	border: 2px solid #d9d9d9;
 	margin: 8px;
 }
-.bg .reg-st3-big-txt span, .uk .reg-st3-big-txt span, .ru .reg-st3-big-txt span, .ca .reg-st3-mid-txt, .ca .reg-st3-big-txt span, .gl .reg-st3-mid-txt, .gl .reg-st3-big-txt span, .it .reg-st3-mid-txt, .it .reg-st3-big-txt span, .lv .reg-st3-mid-txt, .lv .reg-st3-big-txt span, .nl .reg-st3-mid-txt, .nl .reg-st3-big-txt span, .pt .reg-st3-mid-txt, .pt .reg-st3-big-txt span, .br .reg-st3-mid-txt, .br .reg-st3-big-txt span, .sk .reg-st3-mid-txt, .sk .reg-st3-big-txt span, .ka .reg-st3-big-txt span {
+.bg .reg-st3-big-txt span, .uk .reg-st3-big-txt span, .ru .reg-st3-big-txt span, .ca .reg-st3-mid-txt, .ca .reg-st3-big-txt span, .gl .reg-st3-mid-txt, .gl .reg-st3-big-txt span, .it .reg-st3-mid-txt, .it .reg-st3-big-txt span, .lv .reg-st3-mid-txt, .lv .reg-st3-big-txt span, .nl .reg-st3-mid-txt, .nl .reg-st3-big-txt span, .pt .reg-st3-mid-txt, .pt .reg-st3-big-txt span, .br .reg-st3-mid-txt, .br .reg-st3-big-txt span, .sk .reg-st3-mid-txt, .sk .reg-st3-big-txt span, .ka .reg-st3-big-txt span, .es .reg-st3-big-txt span, .ro .reg-st3-big-txt span {
 	font-size: 14px;
 }
-.bg .reg-st3-big-txt, .uk .reg-st3-big-txt, .ru .reg-st3-big-txt, .ka .reg-st3-big-txt {
-	font-size: 18px;
-}
-.bg .reg-st3-mid-txt, .uk .reg-st3-mid-txt, .ru .reg-st3-mid-txt, .ka .reg-st3-mid-txt {
+.bg .reg-st3-mid-txt, .uk .reg-st3-mid-txt, .ru .reg-st3-mid-txt, .ka .reg-st3-mid-txt, .es .reg-st3-mid-txt, .ro .reg-st3-mid-txt {
 	font-size: 13px;
 }
-.bg .reg-st3-storage, .bg .reg-st3-bandwidth, .uk .reg-st3-storage, .uk .reg-st3-bandwidth, .ru .reg-st3-storage, .ru .reg-st3-bandwidth, .gl .reg-st3-storage, .gl .reg-st3-bandwidth, .it .reg-st3-storage, .it .reg-st3-bandwidth, .lv .reg-st3-storage, .lv .reg-st3-bandwidth, .pt .reg-st3-storage, .pt .reg-st3-bandwidth, .br .reg-st3-storage, .br .reg-st3-bandwidth, .sk .reg-st3-storage, .sk .reg-st3-bandwidth, .ka .reg-st3-storage, .ka .reg-st3-bandwidth {
+.bg .reg-st3-storage, .bg .reg-st3-bandwidth, .uk .reg-st3-storage, .uk .reg-st3-bandwidth, .ru .reg-st3-storage, .ru .reg-st3-bandwidth, .gl .reg-st3-storage, .gl .reg-st3-bandwidth, .it .reg-st3-storage, .it .reg-st3-bandwidth, .lv .reg-st3-storage, .lv .reg-st3-bandwidth, .pt .reg-st3-storage, .pt .reg-st3-bandwidth, .br .reg-st3-storage, .br .reg-st3-bandwidth, .sk .reg-st3-storage, .sk .reg-st3-bandwidth, .ka .reg-st3-storage, .ka .reg-st3-bandwidth, .es .reg-st3-storage, .es .reg-st3-bandwidth, .ro .reg-st3-bandwidth {
 	padding-left: 20px;
 	padding-right: 20px;
 }
-.ca .reg-st3-mid-txt, .gl .reg-st3-mid-txt, .it .reg-st3-mid-txt, .nl .reg-st3-mid-txt, .pt .reg-st3-mid-txt, .br .reg-st3-mid-txt, .sk .reg-st3-mid-txt {
+.ca .reg-st3-mid-txt, .gl .reg-st3-mid-txt, .it .reg-st3-mid-txt, .nl .reg-st3-mid-txt, .pt .reg-st3-mid-txt, .br .reg-st3-mid-txt, .sk .reg-st3-mid-txt, .es .reg-st3-mid-txt, .ro .reg-st3-mid-txt {
 	line-height: 34px;
+}
+.no .membership-new-offer text, .kr .membership-new-offer text, .ct .membership-new-offer text {
+	transform: translate(37.500000px, 39.000000px) rotate(-45.000000deg) translate(-27.500000px, -39.000000px) !important;
+}
+.bs .membership-new-offer text, .be .membership-new-offer text, .ca .membership-new-offer text, .cz .membership-new-offer text, .es .membership-new-offer text, .gl .membership-new-offer text, .hr .membership-new-offer text, .nl .membership-new-offer text, .pl .membership-new-offer text, .pt .membership-new-offer text, .br .membership-new-offer text, .ro .membership-new-offer text, .sk .membership-new-offer text, .fi .membership-new-offer text, .hi .membership-new-offer text {
+	font-size: 13px !important;
+	transform: translate(37.500000px, 39.000000px) rotate(-45.000000deg) translate(-41.500000px, -39.000000px) !important;
+}
+.bg .membership-new-offer text, .mk .membership-new-offer text, .sr .membership-new-offer text, .id .membership-new-offer text, .ms .membership-new-offer text, .cy .membership-new-offer text, .ee .membership-new-offer text, .fr .membership-new-offer text, .sl .membership-new-offer text, .tl .membership-new-offer text {
+	font-size: 12px !important;
+	transform: translate(37.500000px, 39.000000px) rotate(-45.000000deg) translate(-42.500000px, -39.000000px) !important;
+}
+.uk .membership-new-offer text, .lv .membership-new-offer text {
+	font-size: 10px !important;
+	transform: translate(37.500000px, 39.000000px) rotate(-45.000000deg) translate(-47.500000px, -39.000000px) !important;
+}
+.ru .membership-new-offer text, .ru .membership-new-offer text, .ka .membership-new-offer text {
+	font-size: 8.5px !important;
+	transform: translate(37.500000px, 39.000000px) rotate(-45.000000deg) translate(-47.500000px, -40.000000px) !important;
+}
+.he .membership-new-offer text {
+	font-size: 12px !important;
+	transform: translate(37.500000px, 39.000000px) rotate(-45.000000deg) translate(32.500000px, -39.000000px) !important;
+}
+.ar .membership-new-offer text {
+	font-size: 16px !important;
+	transform: translate(37.500000px, 39.000000px) rotate(-45.000000deg) translate(26.500000px, -39.000000px) !important;
+}
+.fa .membership-new-offer text {
+	font-size: 16px !important;
+	transform: translate(37.500000px, 39.000000px) rotate(-45.000000deg) translate(32.500000px, -39.000000px) !important;
+}
+.he .membership-new-offer, .ar .membership-new-offer, .fa .membership-new-offer {
+	left: 0;
 }
 .membership-step2 .membership-new-offer {
 	display: none;
@@ -23150,7 +23205,17 @@ div.fm-dialog.feedback-dialog .checkboxOff {
 	padding: 3px 10px 0 0;
 }
 .voucher-account-balance.sufficient-funds {
-	color: green;
+	color: #3aaa5a;
+}
+.voucher-buy-now.sufficient-funds {
+	border-color: #3aaa5a;
+	color: #3aaa5a;
+	font-weight: bold;
+}
+.voucher-buy-now.sufficient-funds:hover {
+	background-color: #3aaa5a;
+	border-color: #3aaa5a;
+	color: white;
 }
 .voucher-block {
 	-moz-box-sizing: border-box;

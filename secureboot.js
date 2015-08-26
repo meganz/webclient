@@ -410,10 +410,6 @@ var mBroadcaster = {
             this.listen(setup);
             this.notify('ping');
 
-            // TODO: Remove this debugging
-            if (!parseInt(localStorage.ctInstances)) console.log("crossTab - immediate init (no other running instances)");
-            else console.log("crossTab - delayed init, waiting for master pong response. Instances found: " + localStorage.ctInstances);
-
             setTimeout(setup, !parseInt(localStorage.ctInstances) ? 0 : 2000);
         },
 
@@ -738,19 +734,44 @@ if (m)
     }
     if (window.location.hash.substr(1,1) == '!' || window.location.hash.substr(1,2) == 'F!')
     {
-        var i=0;
-        if (ua.indexOf('windows phone') > -1) i=1;
+        var i = 0;
+        var intent = false;
+        if (ua.indexOf('windows phone') > -1) {
+            i = 1;
+        }
+
+        if (android) {
+            var ver = ua.match(/android (\d+)\.(\d+)/);
+            if (ver) {
+                var rev = ver.pop();
+                ver = ver.pop();
+                // Check for Android 2.3+
+                if (ver > 2 || (ver === 2 && rev > 3)) {
+                    intent = 'intent://' + location.hash + '/#Intent;scheme=mega;package=nz.mega.android;end';
+                }
+            }
+            if (intent) {
+                document.location = intent;
+            }
+        }
 
         if (app) {
-            document.getElementById('m_title').innerHTML = 'Install the free MEGA app to access this file from your mobile';
+            document.getElementById('m_title').innerHTML = 'Install the free MEGA app to access this file from your mobile.';
             document.getElementById('m_appbtn').href += '&referrer=link';
         }
         if (ua.indexOf('chrome') > -1)
         {
-            setTimeout(function()
-            {
-                if (confirm('Do you already have the MEGA app installed?')) document.location = 'mega://' + window.location.hash;
-            },2500);
+            if (intent) {
+                document.getElementById('m_title').innerHTML
+                    += '<br/><em>If you already have it installed, <a href="' + intent + '">Click here!</a></em>';
+            }
+            else {
+                setTimeout(function() {
+                    if (confirm('Do you already have the MEGA app installed?')) {
+                        document.location = intent ? intent : 'mega://' + window.location.hash;
+                    }
+                }, 2500);
+            }
         }
         else document.getElementById('m_iframe').src = 'mega://' + window.location.hash.substr(i);
     }
@@ -793,7 +814,7 @@ else if (!b_u)
         };
     })(console);
 
-    Object.defineProperty(window, "__cd_v", { value : 15, writable : false });
+    Object.defineProperty(window, "__cd_v", { value : 16, writable : false });
     if (!d || onBetaW)
     {
         var __cdumps = [], __cd_t;
@@ -816,6 +837,7 @@ else if (!b_u)
                 f: mTrim(url),
                 m: mTrim(msg).replace(/'(\w+:\/\/+[^/]+)[^']+(?:'|$)/, "'$1...'")
                     .replace(/(Access to '\.\.).*(' from script denied)/, '$1$2')
+                    .replace(/gfs\w+\.userstorage/, 'gfs...userstorage')
                     .replace(/^Uncaught\W*(?:exception\W*)?/i, ''),
             }, cc;
             var sbid = +(''+(document.querySelector('script[src*="secureboot"]')||{}).src).split('=').pop()|0;
@@ -850,14 +872,16 @@ else if (!b_u)
                 if (errobj.udata) dump.d = errobj.udata;
                 if (errobj.stack)
                 {
+                    var omsg = String(msg).trim();
                     var re = RegExp(
-                        String(msg).substr(0, 70)
+                        omsg.substr(0, 70)
                         .replace(/^\w+:\s/, '')
                         .replace(/([^\w])/g, '\\$1')
                         + '[^\r\n]+'
                     );
 
-                    dump.s = String(errobj.stack).replace(re, '')
+                    dump.s = String(errobj.stack)
+                        .replace(omsg, '').replace(re, '')
                         .split("\n").map(String.trim).filter(String)
                         .splice(0,15).map(mTrim).join("\n");
                 }

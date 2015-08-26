@@ -3593,6 +3593,7 @@ function MegaData()
             pauseTxt = ' (' + l[1651] + ')';
         }
 
+        var ttl = this.getTransferTableLengths();
         for (var k in nodes) {
             /* jshint -W089 */
             if (!nodes.hasOwnProperty(k) || !(n = M.d[nodes[k]])) {
@@ -3627,7 +3628,8 @@ function MegaData()
                 }
 
                 if (!z) {
-                    this.addToTransferTable('<tr id="dl_' + htmlentities(n.h) + '">'
+                    this.addToTransferTable('dl_' + n.h, ttl,
+                        '<tr id="dl_' + htmlentities(n.h) + '">'
                         + '<td><span class="transfer-type download ' + p + '">' + l[373] + '<span class="speed">' + pauseTxt + '</span></span>' + flashhtml + '</td>'
                         + '<td><span class="transfer-filtype-icon ' + fileIcon(n) + '"></span><span class="tranfer-filetype-txt">' + htmlentities(n.name) + '</span></td>'
                         + '<td></td>'
@@ -3641,6 +3643,7 @@ function MegaData()
                     if (uldl_hold) {
                         fm_tfspause('dl_' + n.h);
                     }
+                    ttl.left--;
                 }
             }
         }
@@ -3655,7 +3658,8 @@ function MegaData()
         }
 
         if (z && zipsize) {
-            this.addToTransferTable('<tr id="zip_' + z + '">'
+            this.addToTransferTable('zip_' + z, ttl,
+                '<tr id="zip_' + z + '">'
                 + '<td><span class="transfer-type download' + p + '">' + l[373] + '<span class="speed">' + pauseTxt + '</span></span>' + flashhtml + '</td>'
                 + '<td><span class="transfer-filtype-icon ' + fileIcon({name: 'archive.zip'}) + '"></span><span class="tranfer-filetype-txt">' + htmlentities(zipname) + '</span></td>'
                 + '<td></td>'
@@ -3688,6 +3692,7 @@ function MegaData()
             initFileblocksScrolling();
             initTreeScroll();
             setupTransferAnalysis();
+            Soon(fm_tfsupdate);
             if ((dlmanager.isDownloading = Boolean(dl_queue.length))) {
                 $('.transfer-pause-icon').removeClass('disabled');
                 $('.transfer-clear-completed').removeClass('disabled');
@@ -3800,6 +3805,7 @@ function MegaData()
             id = 'zip_' + z;
         else
             id = 'dl_' + id;
+        $('.transfer-table #' + id).addClass('completed');
         $('.transfer-table #' + id + ' td:eq(5)').html('<span class="transfer-status completed">' + l[1418] + '</span>');
         $('.transfer-table #' + id + ' td:eq(2)').text('');
         $('.transfer-table #' + id + ' td:eq(0) span.transfer-type').addClass('done').html(l[1495]);
@@ -4014,12 +4020,11 @@ function MegaData()
             Soon(fm_tfsupdate);
         }
     }
-    this.addToTransferTable = function(elem)
+    this.addToTransferTable = function(gid, ttl, elem)
     {
-        var T = this.getTransferTableLengths();
-        var gid = String(elem.match(/id="([^"]+)"/).pop());
+        var T = ttl || this.getTransferTableLengths();
 
-        if (d) {
+        if (d > 1) {
             var logger = (gid[0] === 'u' ? ulmanager : dlmanager).logger;
             logger.info('Adding Transfer', gid, JSON.stringify(T));
         }
@@ -4032,7 +4037,7 @@ function MegaData()
 
         if (T.left > 0)
         {
-            addToTransferTable(gid, elem);
+            addToTransferTable(gid, elem, true);
             // In some cases UI is not yet initialized, nor transferHeader()
             $('.transfer-table-header').show(0);
         }
@@ -4075,8 +4080,9 @@ function MegaData()
         var onChat;
         var f;
         var ul_id;
-        var pause;
+        var pause = "";
         var pauseTxt = '';
+        var ttl = this.getTransferTableLengths();
 
         if ($.onDroppedTreeFolder) {
             target = $.onDroppedTreeFolder;
@@ -4112,8 +4118,9 @@ function MegaData()
             f.target = target;
             f.id = ul_id;
 
-            this.addToTransferTable(
-                '<tr id="ul_' + ul_id + '">'
+            var gid = 'ul_' + ul_id;
+            this.addToTransferTable(gid, ttl,
+                '<tr id="' + gid + '">'
                 + '<td><span class="transfer-type upload ' + pause + '">' + l[372] + '<span class="speed">' + pauseTxt + '</span></span></td>'
                 + '<td><span class="transfer-filtype-icon ' + fileIcon({name: f.name}) + '"></span><span class="tranfer-filetype-txt">' + htmlentities(f.name) + '</span></td>'
                 + '<td></td>'
@@ -4124,6 +4131,7 @@ function MegaData()
                 + '<td><span class="row-number"></span></td>'
                 + '</tr>');
             ul_queue.push(f);
+            ttl.left--;
 
             if (uldl_hold) {
                 fm_tfspause('ul_' + ul_id);
@@ -4144,6 +4152,7 @@ function MegaData()
             showTransferToast('u', u.length);
             $.transferHeader();
             openTransferpanel();
+            Soon(fm_tfsupdate);
         }
 
         setupTransferAnalysis();
@@ -4245,6 +4254,7 @@ function MegaData()
             $('#uploadpopbtn').text(l[726]);
             $('#mobileupload_header').text(l[1418]);
         }
+        $('.transfer-table #ul_' + id).addClass('completed');
         $('.transfer-table #ul_' + id + ' td:eq(5)').html('<span class="transfer-status completed">' + l[1418] + '</span>');
         $('.transfer-table #ul_' + id + ' td:eq(2)').text('');
         $('.transfer-table #ul_' + id + ' td:eq(0) span.transfer-type').addClass('done').html(l[1501]);

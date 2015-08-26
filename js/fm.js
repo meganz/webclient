@@ -5564,6 +5564,29 @@ function transferPanelUI()
             $('.transfer-panel-empty-txt').removeClass('hidden');
             $('.transfer-panel-title').html(l[104]);
             $('.nw-fm-left-icon.transfers').removeClass('transfering').find('p').removeAttr('style');
+            fm_tfsupdate();
+            Soon(function() {
+                $(window).trigger('resize');
+            });
+        }
+    };
+
+    $.removeTransferItems = function($trs) {
+        if (!$trs) {
+            $trs = $('.transfer-table tr.completed');
+        }
+        var $len = $trs.length;
+        if ($len && $len < 100) {
+            $trs.fadeOut(function() {
+                $(this).remove();
+                if (!--$len) {
+                    $.clearTransferPanel();
+                }
+            });
+        }
+        else {
+            $trs.remove();
+            Soon($.clearTransferPanel);
         }
     };
 
@@ -5587,28 +5610,14 @@ function transferPanelUI()
                 dlmanager.abort(null);
                 ulmanager.abort(null);
 
-                $('.transfer-table tr').not('.clone-of-header').fadeOut(function() {
-                    $(this).remove();
-                    $.clearTransferPanel();
-                });
-
-                Soon(function() {
-                    $(window).trigger('resize');
-                });
+                $.removeTransferItems($('.transfer-table tr').not('.clone-of-header'));
             });
         }
     });
 
     $('.transfer-clear-completed').rebind('click', function() {
         if (!$(this).hasClass('disabled')) {
-            $('.transfer-table tr .transfer-status.completed').closest('tr').fadeOut(function() {
-                $(this).remove();
-                $.clearTransferPanel();
-                fm_tfsupdate();
-                Soon(function() {
-                    $(window).trigger('resize');
-                });
-            });
+            $.removeTransferItems();
         }
     });
 

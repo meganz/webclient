@@ -835,7 +835,7 @@ else if (!b_u)
             var dump = {
                 l: ln,
                 f: mTrim(url),
-                m: mTrim(msg).replace(/'(\w+:\/\/+[^/]+)[^']+(?:'|$)/, "'$1...'")
+                m: mTrim(msg).replace(/'(\w+:\/\/+[^/]+?)[^']+(?:'|$)/, "'$1...'")
                     .replace(/(Access to '\.\.).*(' from script denied)/, '$1$2')
                     .replace(/gfs\w+\.userstorage/, 'gfs...userstorage')
                     .replace(/^Uncaught\W*(?:exception\W*)?/i, ''),

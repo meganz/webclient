@@ -10657,7 +10657,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	font-size: 30px;
 	font-family: 'source_sans_prosemibold', Arial;
 }
-.delete-contact .fm-del-contact-avatar img {
+.delete-contact .fm-del-contact-avatar img, .avatar-wrapper.avatar-remove-dialog {
 	width: 64px;
 	height: 64px;
 	-moz-border-radius: 100%;

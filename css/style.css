@@ -15898,9 +15898,10 @@ p.privacy-list {
 	background-repeat: no-repeat;
 }
 .team-person-block {
-	float: left;
-	margin: 30px 0 10px 100px;
-	width: 160px;
+    float: left;
+    height: 267px;
+    margin: 30px 0 10px 100px;
+    width: 160px;
 }
 .team-person-block.first {
 	margin-left: 0;

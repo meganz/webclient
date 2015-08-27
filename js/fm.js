@@ -2144,13 +2144,51 @@ function fmremove() {
                 M.moveNodes($.selected, M.RubbishID);
             }
         } else {
-            msgDialog('remove', l[1003], l[1004].replace('[X]', fm_contains(filecnt, foldercnt)), false, function(e) {
+            
+            var nodes = new mega.Nodes({}),
+                // Additional message in case that there's a shared node
+                delShareInfo,
+                // Contains complete directory structure of selected nodes, their ids
+                dirTree = [];
+            
+            for (var item in $.selected) {
+                if ($.selected.hasOwnProperty(item)) {
+                    dirTree = $.merge(dirTree, nodes.loopSubdirs($.selected[item], null));
+                }
+            }
+            
+            delShareInfo = nodes.isShareExist(dirTree) ? ' ' + l[1952] + ' ' + l[7410] : '';
+            
+            msgDialog('remove', l[1003], l[1004].replace('[X]', fm_contains(filecnt, foldercnt)) + delShareInfo, false, function(e) {
                 if (e) {
                     if (M.currentrootid === 'shares') {
                         M.copyNodes($.selected, M.RubbishID, true);
                     }
                     else {
-                        M.moveNodes($.selected, M.RubbishID);
+                        M.moveNodes($.selected, M.RubbishID);                        
+                        
+                        // Remove all shares related to selected nodes
+                        for (var selection in dirTree) {
+                            if (dirTree.hasOwnProperty(selection)) {
+                                
+                                // Remove regular/full share
+                                for (var share in M.d[dirTree[selection]].shares) {
+                                    if (M.d[dirTree[selection]].shares.hasOwnProperty(share)) {
+                                        api_req({a: 's2', n:  dirTree[selection], s: [{ u: M.d[dirTree[selection]].shares[share].u, r: ''}], ha: '', i: requesti});
+                                        M.delNodeShare(dirTree[selection], M.d[dirTree[selection]].shares[share].u);
+                                        setLastInteractionWith(dirTree[selection], "0:" + unixtime());
+                                    }
+                                }
+                                
+                                // Remove pending share
+                                for (var pendingUserId in M.ps[dirTree[selection]]) {
+                                    if (M.ps[dirTree[selection]].hasOwnProperty(pendingUserId)) {
+                                        api_req({a: 's2', n:  dirTree[selection], s: [{ u: pendingUserId, r: ''}], ha: '', i: requesti});
+                                        M.deletePendingShare(dirTree[selection], pendingUserId);
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }, true);

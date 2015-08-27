@@ -2157,7 +2157,7 @@ function fmremove() {
                 }
             }
             
-            delShareInfo = nodes.isShareExist(dirTree) ? ' ' + l[1952] + ' ' + 'Any shared files or folders will no longer be accessible to other users.' : '';
+            delShareInfo = nodes.isShareExist(dirTree) ? ' ' + l[1952] + ' ' + l[7410] : '';
             
             msgDialog('remove', l[1003], l[1004].replace('[X]', fm_contains(filecnt, foldercnt)) + delShareInfo, false, function(e) {
                 if (e) {

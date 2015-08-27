@@ -21,6 +21,7 @@ var dlmanager = {
     dlMaxChunkSize: 16 * 1048576,
     isDownloading: false,
     dlZipID: 0,
+    gotHSTS: false,
     logger: MegaLogger.getLogger('dlmanager'),
 
     newUrl: function DM_newUrl(dl, callback) {
@@ -65,7 +66,7 @@ var dlmanager = {
     },
 
     uChangePort: function DM_uChangePort(url, port) {
-        if (String(url).substr(0,5) === 'http:') {
+        if (!this.gotHSTS && String(url).substr(0,5) === 'http:') {
             var uri = document.createElement('a');
             uri.href = url;
 
@@ -78,6 +79,21 @@ var dlmanager = {
         }
 
         return url;
+    },
+
+    checkHSTS: function(xhr) {
+        if (!use_ssl && !this.gotHSTS) {
+            try {
+                if (String(xhr.responseURL).substr(0, 6) === 'https:') {
+                    this.gotHSTS = true;
+                }
+            }
+            catch (ex) {
+                if (d) {
+                    this.logger.error(ex);
+                }
+            }
+        }
     },
 
     cleanupUI: function DM_cleanupUI(gid) {

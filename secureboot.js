@@ -200,6 +200,16 @@ if (!b_u && is_extension)
             Cu.reportError(e);
             alert('Unable to initialize core functionality:\n\n' + e + '\n\n' + mozBrowserID);
         }
+        if (location.protocol === 'mega:') {
+            try {
+                var url = mObjectURL([""]);
+                myURL.revokeObjectURL(url);
+            }
+            catch(e) {
+                console.error('mObjectURL failed, is this TOR?', e);
+                document.location = bootstaticpath + urlrootfile + location.hash;
+            }
+        }
     }
     else /* Google Chrome */
     {

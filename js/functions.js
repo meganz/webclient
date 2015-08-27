@@ -3068,8 +3068,14 @@ mega.utils.logout = function megaUtilsLogout() {
             step++;
             mFileManagerDB.exec('drop').always(finishLogout);
         }
-        // Use the 'Session Management Logout' API call to kill the current session
-        api_req({ 'a': 'sml' }, { callback: finishLogout });
+        if (u_privk) {
+            // Use the 'Session Management Logout' API call to kill the current session
+            api_req({ 'a': 'sml' }, { callback: finishLogout });
+        }
+        else {
+            finishLogout();
+        }
+
     });
 }
 

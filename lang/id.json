@@ -220,6 +220,7 @@
     "499": "per tahun",
     "501": "Hemat 17%",
     "507": "Lanjutkan",
+    "509": "PERUSAHAAN PRIVASI",
     "511": "2084-bit RSA kunci publik\/privat anda sekarang sedang dibuat",
     "514": "Saldo anda tidak mencukupi, harap coba kembali.",
     "516": "Dapatkan dukungan",
@@ -2261,7 +2262,7 @@
     "7287": "Kontak ditambahkan",
     "7288": "Background agents untuk MEGA telah di non-aktifkan oleh pengguna",
     "7289": "Background agents dibatalkan",
-    "7290": "Supaya Upload Kamera otomatis bekerja dengan benar, anda harus mengaktifkan pilihan \\\"Tetap masuk\\\". Apakah anda ingin mengaktifkan pilihan ini?",
+    "7290": "Supaya Upload Kamera otomatis bekerja dengan benar, anda harus mengaktifkan pilihan \"Tetap masuk\". Apakah anda ingin mengaktifkan pilihan ini?",
     "7291": "Persayaratan Kamera Upload Otomatis",
     "7300": "thumbnails",
     "7303": "64",
@@ -2355,5 +2356,8 @@
     "7402": "DOWNLOAD MEGAsync",
     "7403": "Drop your files here to start uploading",
     "7404": "Deleted one or more items.",
-    "7405": "One or more of your items were deleted by another user."
+    "7405": "One or more of your items were deleted by another user.",
+    "7410": "Any shared files or folders will no longer be accessible to other users.",
+    "7411": "Source Code",
+    "7412": "Backup master key"
 }

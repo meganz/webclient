@@ -220,6 +220,7 @@
     "499": "vuodessa",
     "501": "s\u00e4\u00e4st\u00e4 17%",
     "507": "Jatka",
+    "509": "YKSITYISYYSYRITYS",
     "511": "2048-bittist\u00e4 julkista \/ yksityist\u00e4 RSA-avainparia luodaan.",
     "514": "Riitt\u00e4m\u00e4t\u00f6n saldo, yrit\u00e4 uudelleen.",
     "516": "Hanki tukea",
@@ -331,7 +332,7 @@
     "729": "T\u00e4m\u00e4 linkki on jo vahvistettu.",
     "730": "Tilisi on poistettu k\u00e4yt\u00f6st\u00e4. Tarkista s\u00e4hk\u00f6postisi saadaksesi lis\u00e4tietoja ja vastaa mahdollisimman pian.",
     "731": "Liittyv\u00e4 k\u00e4ytt\u00e4j\u00e4tunnus on poistettu k\u00e4yt\u00f6st\u00e4 useiden [A]K\u00e4ytt\u00f6ehtojen[\/A] rikkomusten takia.",
-    "732": "Olet jo kirjautunut tiliin, joka on eri kuin jota olet vahvistamassa. Tarkista nykyinen sessiosi, kirjaudu ulos ja paina vahvistuslinkki\u00e4 uudelleen.",
+    "732": "Olet jo kirjautunut tilille, joka on eri kuin jota olet vahvistamassa. Tarkista nykyinen sessiosi, kirjaudu ulos ja paina vahvistuslinkki\u00e4 uudelleen.",
     "735": "Tarkista s\u00e4hk\u00f6postisi.",
     "738": "Pyyd\u00e4",
     "739": "unohditko salasanasi?",
@@ -1404,7 +1405,7 @@
     "5706": "Nimi liian lyhyt",
     "5707": "Salasana liian lyhyt",
     "5708": "Sinun tulee hyv\u00e4ksy\u00e4 k\u00e4ytt\u00f6ehdot",
-    "5709": "Pysy kirjautuneena sis\u00e4\u00e4n",
+    "5709": "Pysy sis\u00e4\u00e4nkirjautuneena",
     "5710": "Haluatko varmasti keskeytt\u00e4\u00e4 rekister\u00f6innin?",
     "5711": "Keskeyt\u00e4",
     "5712": "Rekister\u00f6inti valmis",
@@ -2354,6 +2355,9 @@
     "7401": "JATKA",
     "7402": "LATAA MEGAsync",
     "7403": "Pudota l\u00e4hetett\u00e4v\u00e4t tiedostosi t\u00e4h\u00e4n",
-    "7404": "Deleted one or more items.",
-    "7405": "One or more of your items were deleted by another user."
+    "7404": "Yksi tai useampi kohde poistettu.",
+    "7405": "Toinen k\u00e4ytt\u00e4j\u00e4 on poistanut yhden tai useamman kohteesi.",
+    "7410": "Any shared files or folders will no longer be accessible to other users.",
+    "7411": "Source Code",
+    "7412": "Backup master key"
 }

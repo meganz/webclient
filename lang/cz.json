@@ -220,6 +220,7 @@
     "499": "ro\u010dn\u011b",
     "501": "u\u0161et\u0159ete 17 %",
     "507": "Pokra\u010dovat",
+    "509": "OCHRANA SOUKROM\u00cd",
     "511": "Je vytv\u00e1\u0159ena va\u0161e dvojice ve\u0159ejn\u00e9ho a soukrom\u00e9ho 2048bitov\u00e9ho kl\u00ed\u010de RSA.",
     "514": "Nedostate\u010dn\u00fd z\u016fstatek, zkuste to znovu.",
     "516": "Z\u00edskat podporu",
@@ -2355,5 +2356,8 @@
     "7402": "ST\u00c1HNOUT MEGAsync",
     "7403": "P\u0159et\u00e1hn\u011bte sv\u00e9 soubory sem pro spu\u0161t\u011bn\u00ed nahr\u00e1v\u00e1n\u00ed",
     "7404": "Odstran\u011bna jedna nebo v\u00edce polo\u017eek.",
-    "7405": "Jedna nebo v\u00edce va\u0161ich polo\u017eek byly odstran\u011bny jin\u00fdm u\u017eivatelem."
+    "7405": "Jedna nebo v\u00edce va\u0161ich polo\u017eek byly odstran\u011bny jin\u00fdm u\u017eivatelem.",
+    "7410": "Any shared files or folders will no longer be accessible to other users.",
+    "7411": "Source Code",
+    "7412": "Backup master key"
 }

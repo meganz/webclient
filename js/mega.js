@@ -1436,7 +1436,18 @@ function MegaData()
             treeUI();
 
             if (!megaChatIsDisabled) {
-                chatui(id); // XX: using the old code...for now
+                if(typeof(megaChat) === 'undefined') {
+                    // queue for opening the megachat UI WHEN the pubEd keys are loaded
+                    // happens, often when the APIs are returning -3
+
+                    mBroadcaster.once('pubEd25519', function() {
+                        chatui(id);
+                    });
+                } else {
+                    // XX: using the old code...for now
+                    chatui(id);
+                }
+
             }
         }
         else if ((!id || !M.d[id]) && id !== 'transfers') {
@@ -4640,10 +4651,6 @@ function renderNew() {
     if (newpath) {
         M.renderPath();
     }
-    newnodes = undefined;
-    if (d) {
-        console.timeEnd('rendernew');
-    }
 
     // handle the Inbox section use cases
     if (M.hasInboxItems() === true) {
@@ -4656,6 +4663,15 @@ function renderNew() {
         }
     }
 
+    if (u_type === 0) {
+        // Show "ephemeral session warning"
+        topmenuUI();
+    }
+
+    newnodes = undefined;
+    if (d) {
+        console.timeEnd('rendernew');
+    }
 }
 
 /**
@@ -5967,10 +5983,6 @@ function loadfm_callback(res, ctx) {
 
         loadfm_done(pfkey, ctx.stackPointer);
 
-        if (!pfkey) {
-            notify.getInitialNotifications();
-        }
-
         if (res.cr) {
             crypto_procmcr(res.cr);
         }
@@ -5978,7 +5990,8 @@ function loadfm_callback(res, ctx) {
             crypto_procsr(res.sr);
         }
 
-        getsc();
+        // Pass true to indicate this is an fm load and that we want to fetch initial notifications afterwards
+        getsc(true);
 
         if (hasMissingKeys) {
             srvlog('Got missing keys processing gettree...', null, true);

@@ -220,6 +220,7 @@
     "499": "aastas",
     "501": "s\u00e4\u00e4stke 17%",
     "507": "J\u00e4tka",
+    "509": "PRIVAATSUSKOMPANII",
     "511": "Teie 2048-bitine RSA avalik\/privaatne v\u00f5tmepaar on n\u00fc\u00fcd loodud.",
     "514": "Ebapiisav kontoj\u00e4\u00e4k, palun proovige uuesti.",
     "516": "Hankige abi",
@@ -2354,6 +2355,9 @@
     "7401": "J\u00c4TKA",
     "7402": "LAE ALLA MEGAs\u00fcnk",
     "7403": "\u00dcleslaadimiseks asetage failid siia",
-    "7404": "Deleted one or more items.",
-    "7405": "One or more of your items were deleted by another user."
+    "7404": "Kustutati \u00fcks v\u00f5i mitu faili\/kausta.",
+    "7405": "Kasutaja kustutas \u00fche v\u00f5i mitu faili\/kausta.",
+    "7410": "Any shared files or folders will no longer be accessible to other users.",
+    "7411": "Source Code",
+    "7412": "Backup master key"
 }

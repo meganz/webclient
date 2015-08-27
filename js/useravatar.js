@@ -189,7 +189,6 @@ var useravatar = (function() {
 
     ns.contact = function(user, className, element) {
         
-        className = className || "avatar";
         element   = element || "div";
         if (typeof user === "string" && user.length > 0) {
             if (isEmail(user)) {

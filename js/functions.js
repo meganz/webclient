@@ -3432,63 +3432,91 @@ if (typeof sjcl !== 'undefined') {
     };
 }
 
-/**
- * isShareExists
- * 
- * checking if there's available shares for selected nodes
- * 
- * @param {array} nodes, holds array of ids from selected folders/files (nodes)
- * 
- * @returns {boolean}
- */
-function isShareExist(nodes) {
-    
-    for (var i in nodes) {
-        if (nodes.hasOwnProperty(i)) {
-            if (M.d[nodes[i]].shares && Object.keys(M.d[nodes[i]].shares).length) {
-                return true;
-            }
-            if (M.ps && M.ps[nodes[i]] && Object.keys(M.ps[nodes[i]]).length) {
-                return true;
+(function($, scope) {
+    /**
+     * Nodes related operations
+     *
+     * @param opts {Object}
+     * 
+     * @constructor
+     */
+    var Nodes = function(opts) {
+        
+        var self = this;
+        var defaultOptions = {
+        };
+
+        self.options = $.extend(true, {}, defaultOptions, opts);    };
+
+    /**
+     * isShareExists
+     * 
+     * checking if there's available shares for selected nodes
+     * 
+     * @param {array} nodes, holds array of ids from selected folders/files (nodes)
+     * 
+     * @returns {boolean}
+     */
+    Nodes.prototype.isShareExist = function(nodes) {
+
+        var self = this;
+        
+        for (var i in nodes) {
+            if (nodes.hasOwnProperty(i)) {
+                if (M.d[nodes[i]].shares && Object.keys(M.d[nodes[i]].shares).length) {
+                    return true;
+                }
+                if (M.ps && M.ps[nodes[i]] && Object.keys(M.ps[nodes[i]]).length) {
+                    return true;
+                }
             }
         }
-    }
-    
-    return false;
-}
 
-/**
- * loopSubdirs
- * 
- * Loops through all subdirs of given node
- * 
- * @param {string} id: node id
- * @param {array} tmp: nodes
- * 
- * @returns child nodes id
- */
-function loopSubdirs(id, tmp) {
-    
-    var subDirs = [];
-    
-    if (subDirs.indexOf(id) === -1) {
-        subDirs.push(id);
-    }
+        return false;
+    };
 
-    if (tmp) {
-        subDirs.push.apply(subDirs, tmp);
-    }
-    
-    for (var item in M.c[id]) {
-        if (M.c[id].hasOwnProperty(item)) {
-            
-            // Prevent duplication
-            if (subDirs.indexOf(item) === -1) {
-                subDirs.push(item);
+    /**
+     * loopSubdirs
+     * 
+     * Loops through all subdirs of given node
+     * 
+     * @param {string} id: node id
+     * @param {array} nodesId
+     * 
+     * @returns child nodes id
+     */
+    Nodes.prototype.loopSubdirs = function(id, nodesId) {
+
+        var self = this;
+        
+        var subDirs = nodesId;
+
+        if (subDirs) {
+            if (subDirs.indexOf(id) === -1) {
+                subDirs.push(id);
             }
-            return loopSubdirs(item, subDirs);
         }
-    }
+        else {
+            // Make subDirs an array
+            subDirs = [id];
+        }
 
-    return subDirs;
-}
+        for (var item in M.c[id]) {
+            if (M.c[id].hasOwnProperty(item)) {
+
+                // Prevent duplication
+                if (subDirs && subDirs.indexOf(item) === -1) {
+                    subDirs.push(item);
+                }
+
+                self.loopSubdirs(item, subDirs);
+            }
+        }
+
+        return subDirs;
+    };
+
+    // export
+    scope.mega = scope.mega || {};
+    scope.mega.Nodes = Nodes;
+})(jQuery, window);

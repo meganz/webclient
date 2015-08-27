@@ -2165,8 +2165,7 @@ function fmremove() {
                         M.copyNodes($.selected, M.RubbishID, true);
                     }
                     else {
-                        M.moveNodes($.selected, M.RubbishID);                        
-                        
+   
                         // Remove all shares related to selected nodes
                         for (var selection in dirTree) {
                             if (dirTree.hasOwnProperty(selection)) {
@@ -2189,7 +2188,9 @@ function fmremove() {
                                 }
                             }
                         }
+                        M.moveNodes($.selected, M.RubbishID);
                     }
+                    
                 }
             }, true);
         }

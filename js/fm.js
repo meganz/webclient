@@ -334,14 +334,22 @@ function treesearchUI()
             $(this).addClass('active');
             var menu = $('.nw-sorting-menu').removeClass('hidden')
                 , type = treePanelType()
+
+            // hide everything
+            menu.find('.sorting-item-divider,.sort-by .sorting-menu-item').addClass('hidden');
+
             switch (type) {
                 case 'contacts':
+                case 'conversations':
                     // show all the options
-                    menu.find('.sorting-item-divider,.sorting-menu-item').removeClass('hidden');
+                    menu.find('.sorting-item-divider,*[data-by=status],*[data-by=last-interaction],*[data-by=name]').removeClass('hidden');
                     break;
-                default:
-                    // hide everything
-                    menu.find('.sorting-item-divider,*[data-by=name],*[data-by=status],*[data-by=last-interaction]').addClass('hidden');
+
+                case 'cloud-drive':
+                case 'shared-with-me':
+                case 'rubbish-bin':
+                    menu.find('.sorting-item-divider,*[data-by=size],*[data-by=name]').removeClass('hidden');
+                    break;
             }
             var sortTreePanel = $.sortTreePanel[type];
             if (d && !sortTreePanel) {
@@ -407,7 +415,8 @@ function treesearchUI()
 function treePanelType()
 {
     // is there an easy way of knowing it?
-    return $.trim($('.nw-fm-left-icon.active').attr('class').replace(/(active|nw-fm-left-icon|ui-droppable)/g, ''))
+    return $.trim($('.nw-fm-tree-header:visible').attr('class').replace(/[^ ]+ /, '')); 
+    return $.trim($('.nw-fm-left-icon.active').attr('class').replace(/(active|nw-fm-left-icon|ui-droppable|filled)/g, ''))
 }
 
 function treePanelSortElements(type, elements, handlers, ifEq) {

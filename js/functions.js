@@ -3064,7 +3064,7 @@ mega.utils.logout = function megaUtilsLogout() {
             }
         }, step = 1;
         loadingDialog.show();
-        if (typeof mDB === 'object' && mDB.drop) {
+        if (u_privk && typeof mDB === 'object' && mDB.drop) {
             step++;
             mFileManagerDB.exec('drop').always(finishLogout);
         }

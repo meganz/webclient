@@ -2,6 +2,8 @@ var React = require("react");
 var ConversationsUI = require("./ui/conversations.jsx");
 var ChatRoom = require('./chatRoom.jsx');
 
+
+
 var disableMpEnc = true;
 
 
@@ -102,10 +104,6 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
                 return false;
             });
 
-        $(document.body).undelegate('.message-textarea', 'keyup.autoresize');
-        $(document.body).delegate('.message-textarea', 'keyup.autoresize',function() {
-            megaChat.resized();
-        });
 
         $('.fm-chat-emotions-icon').unbind('click.megaChat');
         $('.fm-chat-emotions-icon').bind('click.megaChat', function()
@@ -285,7 +283,7 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
                                 'text': "Close",
                                 'callback': function() {
                                     $dialog.remove();
-                                    room.refreshUI();
+                                    //room.refreshUI();
                                 }
                             }
                         },
@@ -418,7 +416,6 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
 
                     messageAreaResizing();
 
-                    megaChat.resized();
 
                     return false;
                 } else {
@@ -466,7 +463,6 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
                         txt.focus();
                     }
                 }
-                megaChat.resized();
             }
         }
 
@@ -807,6 +803,7 @@ Chat.prototype.init = function() {
         if (eventObject.error) {
             return;
         }
+        console.error("onPresence:", eventObject.getFromJid(), eventObject.getShow());
 
         var bareJid = eventObject.getFromJid().split("/")[0];
 
@@ -817,24 +814,27 @@ Chat.prototype.init = function() {
                 if (room.participantExistsInRoom(bareJid)) {
                     // if this user is part of the currently visible room, then refresh the UI
                     if (self.getCurrentRoomJid() === room.roomJid) {
-                        room.refreshUI();
+                        //room.refreshUI();
                     }
                 }
             });
         }
 
+        if (eventObject.isMyOwn(self.karere) === false) {
+
+            // update M.u
+            var contact = self.getContactFromJid(eventObject.getFromJid());
+            console.error("presence: ", contact, eventObject.getShow());
+            if (contact) {
+                if (!contact.presenceMtime || parseFloat(contact.presenceMtime) < eventObject.getDelay()) {
+                    contact.presence = megaChat.karere.getPresence(megaChat.getJidFromNodeId(contact.u));
+                    contact.presenceMtime = eventObject.getDelay();
+                }
+            }
+        }
+
         if (eventObject.getShow() !== "unavailable") {
             if (eventObject.isMyOwn(self.karere) === false) {
-
-                // update M.u
-                var contact = self.getContactFromJid(eventObject.getFromJid());
-                if (contact) {
-                    if (!contact.presenceMtime || parseFloat(contact.presenceMtime) < eventObject.getDelay()) {
-                        contact.presence = eventObject.getShow();
-                        contact.presenceMtime = eventObject.getDelay();
-                    }
-                }
-
                 self.chats.forEach(function(room, roomJid) {
                     if(room._leaving === true || room._conv_ended === true) {
                         return; // continue
@@ -891,7 +891,7 @@ Chat.prototype.init = function() {
 
         var room = self.chats[roomJid + "@conference." + megaChat.options.xmppDomain];
         if (room) { // refresh UI if new capabilities were received.
-            room.refreshUI();
+            //room.refreshUI();
         }
 
     });
@@ -958,7 +958,7 @@ Chat.prototype.init = function() {
         room.setState(ChatRoom.STATE.JOINING);
         self.karere.joinChat(roomJid, eventObject.getPassword());
 
-        room.refreshUI();
+        //room.refreshUI();
 
 
         e.stopPropagation();
@@ -1015,7 +1015,7 @@ Chat.prototype.init = function() {
         if (eventData.newUsers[self.karere.getJid()]) {
             // i'm the first of my devices to join the room..notify all my other devices please
             var iAmFirstToJoin = true;
-            Object.keys(eventData.currentUsers).forEach(function(v, k) {
+            Object.keys(eventData.currentUsers).forEach(function(k) {
                 if(k.indexOf(self.karere.getBareJid()) !== -1) {
                     iAmFirstToJoin = false;
                     return false;
@@ -1135,7 +1135,7 @@ Chat.prototype.init = function() {
                 msgObject.setMeta(meta); // trigger change event
 
                 $('.fm-chat-message-container[data-id="' + msgId + '"]', room.$messages).remove();
-                room.refreshUI();
+                //room.refreshUI();
 
                 var msgIdx = room.messagesIndex[msgId];
 
@@ -1178,7 +1178,6 @@ Chat.prototype.init = function() {
 
 
             room.refreshScrollUI();
-            room.resized(true);
 
         }
     });
@@ -1233,7 +1232,7 @@ Chat.prototype.init = function() {
     $(window).bind('hashchange.megaChat' + this.instanceId, function() {
         var room = self.getCurrentRoom();
 
-        if (room && !room.$messages.is(":visible") && room.roomJid != lastOpenedRoom) { // opened window, different then one from the chat ones
+        if (room && !room.isCurrentlyActive && room.roomJid != lastOpenedRoom) { // opened window, different then one from the chat ones
             room.hide();
             self.currentlyOpenedChat = null;
         }
@@ -1287,34 +1286,34 @@ Chat.prototype.init = function() {
 
 
 
-    self.$header_tpl = $('.fm-right-header', self.$container).clone().removeClass("template");
-    assert(self.$header_tpl.length > 0, "Header template not found.");
-
-    self.$messages_tpl = $('.fm-chat-message-scroll', self.$container).clone().removeClass("template");
-    assert(self.$messages_tpl.length > 0, "Messages template not found.");
-
-    self.$message_tpl = $('.message.template', self.$container).clone();
-    assert(self.$message_tpl.length > 0, "Message template not found.");
-
-    self.$message_tpl
-        .removeClass("template")
-        .removeClass("message")
-        .removeClass("hidden");
-
-    self.$inline_dialog_tpl = $('.fm-chat-messages-block.inline-dialog.template', self.$container).clone();
-    assert(self.$inline_dialog_tpl.length > 0, "Inline dialog template not found.");
-
-    self.$inline_dialog_tpl
-        .removeClass("template")
-        .removeClass("message")
-        .removeClass("hidden");
-
-
-    // cleanup dom nodes that were used as templates
-    $('.fm-right-header', self.$container).remove();
-    $('.fm-chat-message-scroll', self.$container).remove();
-    $('.fm-chat-messages-block.message.template', self.$container).remove();
-    $('.fm-chat-messages-block.inline-dialog.template', self.$container).remove();
+    //self.$header_tpl = $('.fm-right-header', self.$container).clone().removeClass("template");
+    //assert(self.$header_tpl.length > 0, "Header template not found.");
+    //
+    //self.$messages_tpl = $('.fm-chat-message-scroll', self.$container).clone().removeClass("template");
+    //assert(self.$messages_tpl.length > 0, "Messages template not found.");
+    //
+    //self.$message_tpl = $('.message.template', self.$container).clone();
+    //assert(self.$message_tpl.length > 0, "Message template not found.");
+    //
+    //self.$message_tpl
+    //    .removeClass("template")
+    //    .removeClass("message")
+    //    .removeClass("hidden");
+    //
+    //self.$inline_dialog_tpl = $('.fm-chat-messages-block.inline-dialog.template', self.$container).clone();
+    //assert(self.$inline_dialog_tpl.length > 0, "Inline dialog template not found.");
+    //
+    //self.$inline_dialog_tpl
+    //    .removeClass("template")
+    //    .removeClass("message")
+    //    .removeClass("hidden");
+    //
+    //
+    //// cleanup dom nodes that were used as templates
+    //$('.fm-right-header', self.$container).remove();
+    //$('.fm-chat-message-scroll', self.$container).remove();
+    //$('.fm-chat-messages-block.message.template', self.$container).remove();
+    //$('.fm-chat-messages-block.inline-dialog.template', self.$container).remove();
 
 
 
@@ -1472,7 +1471,6 @@ Chat.prototype.connect = function() {
             });
 };
 
-
 Chat.prototype._generateIncomingRtcFileMessage = function(room, filesList, sessionId, cancelFunc, acceptFunc) {
     var $message = megaChat.$message_tpl.clone().removeClass("template").addClass("fm-chat-message-container");
     var jid = megaChat.karere.getBareJid();
@@ -1527,7 +1525,7 @@ Chat.prototype._generateIncomingRtcFileMessage = function(room, filesList, sessi
         $(this).replaceWith("<em>Canceled</em>");
         $('.primary-button', $p).remove();
 
-        room.refreshUI();
+        //room.refreshUI();
         cancelFunc();
     });
 
@@ -1538,7 +1536,7 @@ Chat.prototype._generateIncomingRtcFileMessage = function(room, filesList, sessi
 
         $acceptButton.on('click', function() {
             $(this).remove();
-            room.refreshUI();
+            //room.refreshUI();
             acceptFunc();
         });
     }
@@ -1678,7 +1676,7 @@ Chat.prototype._onUsersUpdate = function(type, e, eventObject) {
         assert(anyOf(updatedJids, "null") === false, "updatedJids should not contain \"null\".");
 
         room.syncUsers(clone(updatedJids));
-        room.refreshUI();
+        //room.refreshUI();
     }
     //TODO: group chats?
 };
@@ -1827,13 +1825,13 @@ Chat.prototype.xmppPresenceToCssClass = function(presence) {
  */
 Chat.prototype.xmppPresenceToText = function(presence) {
     if(presence == Karere.PRESENCE.ONLINE || presence == Karere.PRESENCE.AVAILABLE || presence === true) {
-        return __('Online');
+        return l[5923];
     } else if(presence == Karere.PRESENCE.AWAY || presence == "xa") {
-        return __('Away');
+        return l[5924];
     } else if(presence == Karere.PRESENCE.BUSY) {
-        return __('Busy');
+        return l[5925];
     } else if(!presence || presence == Karere.PRESENCE.OFFLINE) {
-        return __('Offline');
+        return l[5926];
     } else {
         return __('Unknown');
     }
@@ -2052,7 +2050,7 @@ Chat.prototype.openChat = function(jids, type) {
             }
         } else {
             if (room) {
-                room.refreshUI();
+                //room.refreshUI();
             }
         }
 //    });
@@ -2104,7 +2102,7 @@ Chat.prototype.openChat = function(jids, type) {
 Chat.prototype.hideAllChats = function() {
     var self = this;
     self.chats.forEach((chatRoom, k) => {
-        if(!chatRoom.$header.is(".hidden") || !chatRoom.$messages.is(".hidden") || chatRoom.isCurrentlyActive) {
+        if(chatRoom.isCurrentlyActive) {
             chatRoom.hide();
         }
     });
@@ -2188,16 +2186,6 @@ Chat.prototype.sendMessage = function(roomJid, val) {
     }
 };
 
-/**
- * Simple function that takes care to reposition some elements, when the window is resized
- */
-Chat.prototype.resized = function() {
-    var self = this;
-    var room = self.getCurrentRoom();
-    if (room) {
-        room.resized();
-    }
-};
 
 
 /**

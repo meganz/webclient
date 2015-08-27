@@ -6,9 +6,9 @@ var React = require("react");
 var utils = require('./../../ui/utils.jsx');
 var RenderDebugger = require('./../../stores/mixins.js').RenderDebugger;
 var MegaRenderMixin = require('./../../stores/mixins.js').MegaRenderMixin;
-var ChatRoom = require('./../chatRoom.jsx');
 var ButtonsUI = require('./../../ui/buttons.jsx');
 var ContactsUI = require('./../ui/contacts.jsx');
+var ConversationPanelUI = require("./../ui/conversationpanel.jsx");
 
 
 var ConversationsListItem = React.createClass({
@@ -44,7 +44,7 @@ var ConversationsListItem = React.createClass({
         }
 
         classString += " " + this.props.chatRoom.megaChat.xmppPresenceToCssClass(
-            this.props.chatRoom.megaChat.karere.getPresence(contactJid)
+            contact.presence
         );
 
         return (
@@ -146,7 +146,7 @@ var ConversationsList = React.createClass({
         }
         var currConvsList = [];
         this.props.chats.map((chatRoom, k) => {
-            if(chatRoom._leaving || chatRoom.state == ChatRoom.STATE.LEFT || chatRoom.state == ChatRoom.STATE.LEAVING) {
+            if(chatRoom._leaving || chatRoom.stateIsLeftOrLeaving()) {
                 return;
             }
             if(
@@ -211,8 +211,7 @@ var ConversationsList = React.createClass({
                 k != u_handle &&
                 (
                     roomFound === false ||
-                    roomFound.state == ChatRoom.STATE.LEFT ||
-                    roomFound.state == ChatRoom.STATE.LEAVING ||
+                    roomFound.stateIsLeftOrLeaving() ||
                     roomFound._leaving
                 ) &&
                 (v.c == 2 || v.c == 1)
@@ -260,7 +259,7 @@ var ConversationsMainListing =  React.createClass({
         var conversations = [];
         var anyChatWindowVisible = false;
         self.props.conversations.map((room, roomJid) => {
-            if(room._leaving || room.state == ChatRoom.STATE.LEFT || room.state == ChatRoom.STATE.LEAVING) {
+            if(room._leaving || room.stateIsLeftOrLeaving()) {
                 return;
             }
 
@@ -389,7 +388,6 @@ var ConversationsMainListing =  React.createClass({
     }
 });
 
-
 var ConversationsApp = React.createClass({
     mixins: [MegaRenderMixin, RenderDebugger],
     startCallClicked: function(contact, e) {
@@ -459,6 +457,8 @@ var ConversationsApp = React.createClass({
         var onlineContactsAudioCall = self.renderOnlineContactsPopup(self.startCallClicked);
         var onlineContactsVideoCall = self.renderOnlineContactsPopup(self.startVideoCallClicked);
 
+        var callButtonsAreDisabled = onlineContactsAudioCall.length === 0 || onlineContactsVideoCall.length === 0;
+
         return (
             <div className="conversationsApp" key="conversationsApp">
                 <div className="fm-left-panel">
@@ -485,7 +485,7 @@ var ConversationsApp = React.createClass({
                             group="conversationsListing"
                             label={__('Start video call ...')}
                             className="chat-button fm-start-video-call"
-                            disabled={onlineContactsVideoCall.length === 0 ? true : false}
+                            disabled={callButtonsAreDisabled}
                             contacts={this.props.contacts}
                         >
                             <ButtonsUI.ButtonPopup contacts={this.props.contacts}>
@@ -497,7 +497,7 @@ var ConversationsApp = React.createClass({
                             group="conversationsListing"
                             label={__('Start call ...')}
                             className="chat-button fm-start-call"
-                            disabled={onlineContactsAudioCall.length === 0 ? true : false}
+                            disabled={callButtonsAreDisabled}
                         >
                             <ButtonsUI.ButtonPopup contacts={this.props.contacts}>
                                 {onlineContactsAudioCall}
@@ -527,11 +527,101 @@ var ConversationsApp = React.createClass({
                     </div>
 
                     <ConversationsMainListing {...this.props} conversations={this.props.megaChat.chats} />
+
+                    <div className="fm-chat-block hidden">
+                        <div className="fm-chat-messages-block inline-dialog chat-notification template hidden">
+                            <div className="fm-chat-messages-pad">
+                                <div className="nw-chat-notification-icon"></div>
+
+                                <div className="nw-contact-avatar color1">
+                                    A
+                                </div>
+
+
+                                <div className="fm-chat-message">
+                                    <div className="chat-message-date">2:02 pm</div>
+                                    <div className="chat-message-txt"></div>
+
+                                    <div className="fm-chat-file-button primary-button"><span>Primary button</span></div>
+                                    <div className="fm-chat-file-button secondary-button"><span>Secondary button</span></div>
+
+                                    <div className="clear"></div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div className="message template hidden">
+
+                            <div className="fm-chat-messages-block">
+                                <div className="fm-chat-messages-pad">
+                                    <div className="nw-contact-avatar">
+                                        <img alt="" src="{staticpath}images/mega/default-small-avatar.png" />
+                                        </div>
+                                        <div className="fm-chat-message">
+                                            <span className="chat-username">[$86]</span>
+                                            <span className="clear"></span>
+                                            <div className="chat-message-date">2:02 pm</div>
+                                            <div className="chat-message-txt"><span>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</span>
+                                            </div>
+                                            <div className="clear"></div>
+                                        </div>
+                                        <div className="clear"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                            <ConversationPanelUI.ConversationPanels
+                                {...this.props}
+                                conversations={this.props.megaChat.chats}
+                                />
+
+                            <div className="fm-chat-line-block">
+                                <div className="hiddendiv"></div>
+                                <div className="fm-chat-attach-file">
+                                    <div className="fm-chat-attach-arrow"></div>
+                                </div>
+
+                                <div className="fm-chat-emotions-icon">
+                                    <div className="fm-chat-emotion-arrow"></div>
+                                </div>
+                                <div className="fm-chat-emotion-popup hidden">
+                                    <div className="fm-chat-arrow"></div>
+                                    <div className="fm-chat-smile smile" data-text=":)"></div>
+                                    <div className="fm-chat-smile wink" data-text=";)"></div>
+                                    <div className="fm-chat-smile tongue" data-text=":P"></div>
+                                    <div className="fm-chat-smile grin" data-text=":D"></div>
+                                    <div className="fm-chat-smile confuse" data-text=":|"></div>
+                                    <div className="fm-chat-smile grasp" data-text=":O"></div>
+                                    <div className="fm-chat-smile sad" data-text=":("></div>
+                                    <div className="fm-chat-smile cry" data-text=";("></div>
+                                    <div className="fm-chat-smile angry" data-text="(angry)"></div>
+                                    <div className="fm-chat-smile mega" data-text="(mega)"></div>
+                                    <div className="clear"></div>
+                                </div>
+
+                                <div className="nw-chat-message-icon"></div>
+                                <div className="fm-chat-input-scroll hidden">
+                                    <div className="fm-chat-input-block">
+                                        <textarea className="message-textarea" placeholder="Write a message..."></textarea>
+                                    </div>
+                                </div>
+                                <div className="clear"></div>
+
+                            </div>
+
+                        </div>
+
+                        
+                        
                 </div>
             </div>
         );
     }
 });
+
 
 module.exports = {
     ConversationsList,

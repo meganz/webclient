@@ -1,4 +1,8 @@
 var utils = require("../utils.jsx");
+var React = require("react");
+var ConversationPanelUI = require("./ui/conversationpanel.jsx");
+
+
 
 /**
  * Class used to represent a MUC Room in which the current user is present
@@ -92,29 +96,10 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
 
     this.setState(ChatRoom.STATE.INITIALIZED);
 
-    this.$messages = megaChat.$messages_tpl.clone();
-    this.$header = megaChat.$header_tpl.clone();
+    this.isCurrentlyActive = false;
 
-    var droppableConfig = {
-        tolerance: 'pointer',
-        drop: function(e, ui)
-        {
-            $.doDD(e,ui,'drop',1);
-        },
-        over: function (e, ui)
-        {
-            $.doDD(e,ui,'over',1);
-        },
-        out: function (e, ui)
-        {
-            var c1 = $(e.srcElement).attr('class'),c2 = $(e.target).attr('class');
-            if (c2 && c2.indexOf('fm-menu-item') > -1 && c1 && (c1.indexOf('cloud') > -1 || c1.indexOf('cloud') > -1)) return false;
-            $.doDD(e,ui,'out',1);
-        }
-    };
 
-    this.$messages.droppable(droppableConfig);
-    this.$header.droppable(droppableConfig);
+    this.$header = $('.fm-right-header[data-room-jid="' + this.roomJid.split("@")[0] + '"]');
 
     // Events
     this.bind('onStateChange', function(e, oldState, newState) {
@@ -201,93 +186,12 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
         }
     });
 
-    this.$header.addClass('hidden');
-    this.$header.addClass('conv-ended');
-
-    this.$messages.addClass('hidden');
-
-    this.$header.insertBefore(
-        $('.fm-chat-line-block', this.megaChat.$container)
-    );
-
-    this.$messages.insertBefore(
-        $('.fm-chat-line-block', this.megaChat.$container)
-    );
-
-
-    this.$messages.jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5, animateDuration: 70});
 
 
 
-    // button triggered popups
-    // - start-call
-    $('.chat-button > span', self.$header).unbind("click.megaChat");
 
-    $('.chat-button.fm-start-call', self.$header).bind("click.megaChat", function() {
-        if ($(this).is(".disabled")) {
-            return false;
-        }
-		var sendFilesPopup = $('.fm-start-call-popup', self.$header);
-        var positionX = $('.fm-chat-block').outerWidth() - $(this).position().left - ($(this).outerWidth() * 0.5) - (sendFilesPopup.outerWidth() * 0.5);
-        
-        if ($(this).attr('class').indexOf('active') === -1) {
-            self.megaChat.closeChatPopups();
-            sendFilesPopup.addClass('active');
-            $(this).addClass('active');
 
-            var $arrow = $('.fm-start-call-popup .fm-send-files-arrow', self.$header);
-            
-			if (positionX < 8) {
-				sendFilesPopup.css('right',  '8px');
-				$arrow.css('left', sendFilesPopup.outerWidth() - ($(this).outerWidth() * 0.5)  + 'px');
-				
-			} else {
-				sendFilesPopup.css('right',  positionX + 'px');
-				$arrow.css('left', '50%');
-			}
-			
-        } else {
-            self.megaChat.closeChatPopups();
-        }
-    });
-    // - send-files
-    $('.chat-button.fm-send-files', self.$header).unbind('click.megaChat');
-    $('.chat-button.fm-send-files', self.$header).bind('click', function()
-    {
-        var positionX = $(this).position().left;
-        var manuallyAddedOffset = 60; // since this is the last button, i had to add this offset so that it wont go out
-                                      // of the screen
-        var sendFilesPopup = $('.fm-send-files-popup', self.$header);
-        if ($(this).attr('class').indexOf('active') === -1)
-        {
-            self.megaChat.closeChatPopups();
-            sendFilesPopup.addClass('active');
-            $(this).addClass('active');
-            $('.fm-send-files-arrow', self.$header).css('left', $(this).outerWidth()/2 + manuallyAddedOffset  + 'px');
-            sendFilesPopup.css('left',  ($(this).position().left - manuallyAddedOffset) + 'px');
-        }
-        else
-        {
-            self.megaChat.closeChatPopups();
 
-        }
-    });
-
-    // - end call
-    $('.chat-button.fm-chat-end', self.$header).unbind("click.megaChat");
-    $('.chat-button.fm-chat-end', self.$header).bind("click.megaChat", function() {
-        self.destroy(true);
-    });
-
-    /**
-     * Audio/Video button handlers
-     */
-    $('.start-audio', self.$header).rebind('click.megaChat', function() {
-        self.startAudioCall();
-    });
-    $('.start-video', self.$header).rebind('click.megaChat', function() {
-        self.startVideoCall();
-    });
 
 
     $('.audio-icon', self.$header).bind('click.megaChat', function() {
@@ -328,24 +232,6 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
     });
 
 
-    // make the audio/video screen resizable
-    self.audioVideoPaneResizable = new FMResizablePane(self.$header, {
-        'handle': $('.drag-handle', self.$header),
-        'persistanceKey': false,
-        'direction': 's'
-    });
-
-    $(self.audioVideoPaneResizable).bind("resizestop", function() {
-        self.resized();
-    });
-    $(self.audioVideoPaneResizable).bind("resize", function() {
-        self.resized();
-    });
-
-    $('.drag-handle', self.$header).hide();
-
-
-
     var $avscreen = $('.my-av-screen', self.$header);
     $avscreen.draggable({
         'containment': $avscreen.parents('.chat-call-block'),
@@ -384,51 +270,8 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
     });
 
 
-    self.$messages
-        .undelegate('.delete-button', 'mousedown.megaChatDeleteMessage')
-        .delegate('.delete-button', 'mousedown.megaChatDeleteMessage', function(e) {
-            var $message = $(this).parents('.fm-chat-message-container');
-            if (!$message) { return; };
-
-            var messageId = $message.attr('data-id');
-            var msgObject = self.getMessageById(messageId);
-            if (!msgObject) {
-                return;
-            }
-
-            if (Karere.getNormalizedBareJid(msgObject.getFromJid()) === self.megaChat.karere.getBareJid()) {
-                var meta = clone(msgObject.getMeta());
-                meta['isDeleted'] = true;
-                msgObject.setMeta(meta); // trigger change event
-
-                $('.fm-chat-message-container[data-id="' + messageId + '"]', self.$messages).remove();
-                self.refreshUI();
-
-                self.megaChat.sendBroadcastAction(self.roomJid, 'delete-message', {
-                    'messageId': messageId,
-                    'plaintext': true,
-                    'roomJid': self.roomJid
-                });
-            }
-        });
 
     self.megaChat.trigger('onRoomCreated', [self]);
-
-    // Hide this block until text chat is ready
-    /*
-    self.bind('onConversationStarted', function(e) {
-        self.appendDomMessage(
-            self.generateInlineDialog(
-                "conv-started",
-                self.megaChat.karere.getJid(),
-                "conv-started",
-                "You have joined the conversation.",
-                [],
-                {},
-                !self.isActive()
-            )
-        );
-    });*/
 
     return this;
 };
@@ -838,142 +681,6 @@ ChatRoom.prototype.getRoomIcon = function() {
 };
 
 /**
- * Refreshes the UI of the chat room.
- *
- * @param [scrollToBottom] {boolean|jQuery} set to true if you want to automatically scroll the messages pane to the
- * bottom OR to a specific element
- */
-ChatRoom.prototype.refreshUI = function(scrollToBottom) {
-    var self = this;
-
-    if (self._leaving) {
-        return;
-    }
-
-    this.$header.attr("data-room-jid", this.roomJid.split("@")[0]);
-
-    if (this.$header.is(":visible")) {
-        this.$header.removeClass("hidden");
-        //$('.nw-conversations-item').removeClass("selected");
-        //$('.nw-conversations-item[data-room-jid="' + self.roomJid.split("@")[0] + '"]').addClass("selected");
-    }
-
-    var $jsp = self.$messages.data("jsp");
-    if (!$jsp) { debugger; }
-    assert($jsp, "JSP not available?!");
-
-    $jsp.reinitialise();
-
-    if (scrollToBottom === true) {
-        self.$messages.one('jsp-initialised', function() {
-            $jsp.scrollToBottom();
-        });
-    } else if (scrollToBottom) {
-        self.$messages.one('jsp-initialised', function() {
-            $jsp.scrollToElement(scrollToBottom);
-        });
-    }
-
-    $('.fm-chat-user', this.$header).text(this.roomJid.split("@")[0]);
-
-    var participants = self.getParticipantsExceptMe();
-
-    if (self.type === "private") {
-        $.each(self.users, function(k, v) {
-            if (v === self.megaChat.karere.getBareJid()) {
-                // ignore me
-                return; // continue;
-            }
-            var $element = $('.nw-conversations-item[data-jid="' + v + '"]');
-            $element.attr("data-room-jid", self.roomJid.split("@")[0]);
-        });
-    }
-
-    if (self.type === "private") {
-
-        assert(participants[0], "No participants found.");
-
-        $('.fm-chat-user', self.$header).text(
-            self.megaChat.getContactNameFromJid(participants[0])
-        );
-        var contact = self.megaChat.getContactFromJid(participants[0]);
-
-        if (!contact) {
-            self.logger.warn("Contact not found: ", participants[0]);
-        } else {
-            var presence = self.megaChat.karere.getPresence(
-                self.megaChat.getJidFromNodeId(contact.u)
-            );
-
-            var presenceCssClass = self.megaChat.xmppPresenceToCssClass(
-                presence
-            );
-
-            $('.fm-chat-user-info', self.$header)
-                .removeClass('online')
-                .removeClass('away')
-                .removeClass('busy')
-                .removeClass('offline')
-                .removeClass('black')
-                .addClass(presenceCssClass);
-
-
-            if ($('#topmenu').children().length === 0) {
-                $('#topmenu').html(parsetopmenu()); // we need the top menu!
-            }
-            var presenceText = $.trim($('.top-user-status-item > .' + presenceCssClass).parent().text());
-
-            assert(presenceText && presenceText.length > 0, 'missing presence text');
-
-            $('.fm-chat-user-status', self.$header)
-                .text(
-                presenceText
-            );
-
-            $('> .nw-contact-avatar', self.$header).replaceWith(self._generateContactAvatarElement(participants[0]));
-
-        }
-    } else {
-        throw new Error("Not implemented"); //TODO: Groups, TBD
-    }
-
-
-    /**
-     * Audio/Video buttons
-     */
-
-    if (presenceCssClass === "offline") { // the other user is offline
-        $('.btn-chat-call', self.$header).addClass('disabled');
-        if (self.callSession) {
-            self.callSession.endCall('hangup');
-        }
-    } else if (self.callSession && (self.callSession.isStarted() === false || self.callSession.isStarting() || self.callSession.isNotStarted())) {
-        $('.btn-chat-call', self.$header).addClass('disabled');
-    } else if (self.megaChat.karere.getPresence(self.megaChat.karere.getJid()) === false) { // i'm offline
-        $('.btn-chat-call', self.$header).addClass('disabled');
-        if (self.callSession) {
-            self.callSession.endCall('hangup');
-        }
-    } else {
-        if (presenceCssClass === "offline") { // the other user is offline
-            $('.btn-chat-call', self.$header).addClass('disabled');
-            if (self.callSession) {
-                self.callSession.endCall('hangup');
-            }
-        } else {
-            $('.btn-chat-call', self.$header).removeClass('disabled');
-        }
-    }
-
-    self.renderContactTree();
-
-    self.megaChat.refreshConversations();
-
-    self.trigger('RefreshUI');
-};
-
-
-/**
  * Leave this chat room
  *
  * @param [notifyOtherDevices] {boolean|undefined} true if you want to notify other devices, falsy value if you don't want action to be sent
@@ -1078,32 +785,13 @@ ChatRoom.prototype.show = function() {
     sectionUIopen('conversations');
 
 
-    //$('.nw-conversations-item[data-room-jid="' + self.roomJid.split("@")[0] + '"]').addClass("selected");
-
-    self.$header.removeClass('hidden');
-    self.$messages.removeClass('hidden');
-    self.$messages.parent().removeClass('hidden'); // show .fm-chat-block if hidden
-    self.$messages.attr('data-roomJid', self.roomJid); // TODO: debug, remove this.
-
-    if (self.callSession && self.callSession.isStarted()) {
-        self.$header.parent('.fm-chat-block').addClass('video-call');
-    } else {
-        self.$header.parent('.fm-chat-block').removeClass('video-call');
-    }
-
     self.megaChat.currentlyOpenedChat = self.roomJid;
 
-    // update unread messages count
-    $('.fm-chat-message-container.unread', self.$messages).removeClass('unread');
-
-
-    self.resized(true);
 
     self.megaChat.lastOpenedChat = self.roomJid;
 
     self.trigger('activity');
     self.trigger('onChatShown');
-    $('.message-textarea').focus();
 };
 
 /**
@@ -1143,9 +831,6 @@ ChatRoom.prototype.hide = function() {
     var self = this;
 
     self.isCurrentlyActive = false;
-
-    self.$header.addClass('hidden');
-    self.$messages.addClass('hidden');
 
     if (self.megaChat.currentlyOpenedChat === self.roomJid) {
         self.megaChat.currentlyOpenedChat = null;
@@ -1337,8 +1022,6 @@ ChatRoom.prototype.appendDomMessage = function($message, messageObject) {
     self._regroupMessages();
 
 
-    self.resized();
-
     // update unread messages count
     if (self.megaChat.plugins.chatNotifications) {
         if (self.roomJid != self.megaChat.getCurrentRoomJid() && $message.is('.unread')) {
@@ -1491,7 +1174,7 @@ ChatRoom.prototype.generateInlineDialog = function(type, user, iconCssClasses, m
     });
 
     if (user) {
-        var $element = self._generateContactAvatarElement(user)
+        var $element = self._generateContactAvatarElement(user);
         $('.nw-contact-avatar', $inlineDialog).replaceWith($element);
     } else {
         $('.nw-contact-avatar', $inlineDialog).remove();
@@ -2167,26 +1850,6 @@ ChatRoom.prototype.recover = function() {
 };
 
 /**
- * Handle UI resize (triggered by the window, document or manually from our code)
- */
-ChatRoom.prototype.resized = function(scrollToBottom) {
-    var self = this;
-
-    // Important. Please insure we have correct height detection for Chat messages block. We need to check ".fm-chat-input-scroll" instead of ".fm-chat-line-block" height
-    var scrollBlockHeight = $('.fm-chat-block').outerHeight() - $('.fm-chat-line-block').outerHeight() - self.$header.outerHeight() + 2;
-
-    if (scrollBlockHeight != self.$messages.outerHeight())
-    {
-        self.$messages.height(scrollBlockHeight);
-
-        self.refreshUI(scrollToBottom);
-    } else {
-        self.refreshUI();
-    }
-};
-
-
-/**
  * This method will be called on room state change, only when the mpenc's state is === READY
  *
  * @private
@@ -2375,6 +2038,10 @@ ChatRoom.prototype.startVideoCall = function() {
     var self = this;
     return self.megaChat.plugins.callManager.startCall(self, {audio: true, video: true});
 };
+
+ChatRoom.prototype.stateIsLeftOrLeaving = function() {
+    return (this.state == ChatRoom.STATE.LEFT || this.state == ChatRoom.STATE.LEAVING);
+}
 
 window.ChatRoom = ChatRoom;
 module.exports = ChatRoom;

@@ -37,6 +37,7 @@ var MegaRenderMixin = {
         window.addEventListener('resize', this.onResizeDoUpdate);
         window.addEventListener('hashchange', this.onHashChangeDoUpdate);
 
+
         // init on data structure change events
         if(this.props) {
             this._recurseAddListenersIfNeeded("p", this.props);
@@ -70,7 +71,7 @@ var MegaRenderMixin = {
 
 
         if(typeof(map._dataChangeIndex) !== "undefined") {
-            var cacheKey = "" + map._dataChangeTrackedId + "_" + idx;
+            var cacheKey = "" + map._dataChangeTrackedId + "_" + "_" + this.getElementName() + "_" + idx;
             if (map.addChangeListener && !_propertyTrackChangesVars._listenersMap[cacheKey]) {
                 _propertyTrackChangesVars._listenersMap[cacheKey] = map.addChangeListener(function () {
                     self.onPropOrStateUpdated(map, idx);
@@ -104,7 +105,7 @@ var MegaRenderMixin = {
         }
 
         if(typeof(v._dataChangeIndex) !== "undefined") {
-            var cacheKey = "" + v._dataChangeTrackedId + "_" + idx;
+            var cacheKey = "" + v._dataChangeTrackedId + "_" + "_" + this.getElementName() + "_" + idx;
 
             if(dataChangeHistory[cacheKey] !== v._dataChangeIndex) {
                 if(window.RENDER_DEBUG) console.error("changed: ", self.getElementName(), cacheKey, v._dataChangeTrackedId, v._dataChangeIndex, v);
@@ -182,10 +183,13 @@ var MegaRenderMixin = {
             shouldRerender = this._recursiveSearchForDataChanges("s", nextState, this.state);
         }
 
+        if(this.getElementName() === "unknown") {
+            debugger;
+        }
         if(window.RENDER_DEBUG) console.error("shouldRerender?",
             shouldRerender,
-            "rendered: ", this._currentElement.type.displayName,
-            "owner: ", this._owner ? this._owner._currentElement.type.displayName : "none",
+            "rendered: ", this.getElementName(),
+            "owner: ", this.getOwnerElement() ? this.getOwnerElement()._reactInternalInstance.getName() : "none",
             "props:", this.props,
             "state:", this.state
         );
@@ -215,19 +219,19 @@ var MegaRenderMixin = {
         this.forceUpdateIfChanged();
     },
     getElementName: function() {
-        return this._currentElement.type.displayName;
+        return this.constructor.displayName;
     },
     getRootElement: function() {
         var rootElement = this;
-        while(rootElement = rootElement._owner) {
+        while(rootElement = this._reactInternalInstance._currentElement._owner) {
             //
         }
         return rootElement === this ? null : rootElement;
     },
     getOwnerElement: function() {
-        var owner = this._owner;
+        var owner = this._reactInternalInstance._currentElement._owner;
         if(owner) {
-            return this._owner._currentElement.type;
+            return this._reactInternalInstance._currentElement._owner._instance;
         } else {
             return null;
         }
@@ -237,12 +241,22 @@ var MegaRenderMixin = {
 
 var RenderDebugger = {
     componentDidUpdate: function() {
-        if(window.RENDER_DEBUG) console.error(
-            "rendered: ", this._currentElement.type.displayName,
-            "owner: ", this._owner ? this._owner._currentElement.type.displayName : "none",
-            "props:", this.props,
-            "state:", this.state
-        );
+        if(window.RENDER_DEBUG) {
+            var self = this;
+            var getElementName = function() {
+                if(!self.constructor) {
+                    return "unknown";
+                }
+                return self.constructor.displayName;
+            };
+
+            console.error(
+                "rendered: ", getElementName(),
+                "owner: ", this.getOwnerElement() ? this.getOwnerElement()._reactInternalInstance.getName() : "none",
+                "props:", this.props,
+                "state:", this.state
+            );
+        }
     }
 };
 

@@ -11,10 +11,10 @@ var ContactsListItem = React.createClass({
         var contact = this.props.contact;
 
         var contactJid = this.props.megaChat.getJidFromNodeId(contact.u);
-        var id = 'contact_' + htmlentities(contact.u);
+        var id = 'whatever'; //'contact_' + htmlentities(contact.u);
 
         classString += " " + this.props.megaChat.xmppPresenceToCssClass(
-            this.props.megaChat.karere.getPresence(contactJid)
+            contact.presence
         );
 
         return (

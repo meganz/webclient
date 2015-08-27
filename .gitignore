@@ -221,6 +221,7 @@ test-results.xml
 .coverage
 .tox
 js/tests/coverage
+test/phantomjs-storage
 
 
 #############

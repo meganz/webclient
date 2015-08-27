@@ -21,14 +21,16 @@
              */
             'focusable': true,
             'closable': true,
-            'expandable': false,
-            'requiresOverlay': true,
+            'closableByEsc': true,
+            'expandable': true,
+            'requiresOverlay': false,
+            'defaultButtonStyle': false,
 
             /**
              * css class names
              */
             'expandableButtonClass': '.fm-mega-dialog-size-icon',
-            'buttonContainerClassName': 'fm-mega-dialog-bottom',
+            'buttonContainerClassName': 'feedback-dialog-bottom',
             'buttonPlaceholderClassName': 'fm-mega-dialog-pad',
 
             /**
@@ -37,8 +39,15 @@
             'title': l[1356],
             'buttons': [
                 {
-                    'label': "Send",
-                    'className': "fm-dialog-button-green feedback-button-send disabled",
+                    'label': l[1686],
+                    'className': "feedback-button-cancel disabled",
+                    'callback': function() {
+                        this.hide();
+                    }
+                },
+                {
+                    'label': 'SUBMIT YOUR FEEDBACK',
+                    'className': "feedback-button-send disabled",
                     'callback': function() {
                         self._report.message = self.$textarea.val();
                         if ($('input[name="contact_me"]', self.$dialog).attr('checked')) {
@@ -48,12 +57,12 @@
                         }
 
 
-                        var $selectedRating = $('.rate.active', self.$dialog);
+                        var $selectedRating = $('.rating a.active', self.$dialog);
                         if ($selectedRating.length === 0) {
                             return false;
                         }
 
-                        var rated = $('.rate.active', self.$dialog)[0].className;
+                        var rated = $('.rating a.active', self.$dialog)[0].className;
                         rated = rated.replace("rate", "").replace("active", "").replace(/\s+/g, "");
                         self._report.rated = rated;
                         var dump = JSON.stringify(self._report);
@@ -65,36 +74,14 @@
                             id: reportId,
                             d: dump
                         });
+                        
+                        $('.feedback-dialog-body').addClass('hidden');
+                        $('.feedback-result-pad').removeClass('hidden');    
 
-                        if (self._report.chatRoomState) {
-                            Object.keys(self._report.chatRoomState).forEach(function(k) {
-                                var v = self._report.chatRoomState[k];
-                                if (v.callSessions && v.callSessions.length > 0) {
-                                    v.callSessions.forEach(function(callSession) {
-                                        if (callSession.callStats) {
-                                            callSession.callStats.forEach(function (cs) {
-                                                api_req({
-                                                    a: 'clog',
-                                                    t: "callStats",
-                                                    id: cs.cid + "_" + cs.isCaller,
-                                                    d: reportId
-                                                });
-                                            });
-                                        }
-                                    });
-                                }
-                            });
-                        }
-                        this.hide();
+                        $('.feedback-result-button', self.$dialog).rebind('click.feedbackDialog', function() {
+                            self.hide();
+                        });
 
-                        msgDialog('info', 'Feedback', 'Thank you for your feedback!');
-                    }
-                },
-                {
-                    'label': "Cancel",
-                    'className': "fm-dialog-button-red feedback-button-cancel",
-                    'callback': function() {
-                        this.hide();
                     }
                 }
             ]
@@ -111,25 +98,28 @@
 
         self.$checkboxes = $('.reply, .stats', self.$dialog);
 
-
         self.bind("onBeforeShow", function() {
-            self.$checkboxes.hide();
 
             $('.rating a', self.$dialog)
-                .removeClass("faded")
-                .removeClass("active");
+                .removeClass("active colored");
 
             self.$textarea = $('textarea', self.$dialog);
             self.$textarea
-                .val('')
-                .hide();
+                .val('');
+            
+            $('.collected-data', self.$dialog)
+                .html('');
 
-            $('.stats-button', self.$dialog)
-                .hide();
+            $('.feedback-button-send, .feedback-button-cancel', self.$dialog)
+                .addClass('disabled');
+
+            $('.feedback-dialog-body').removeClass('hidden');
+            $('.feedback-result-pad').addClass('hidden');
+
+            $('.collected-data', self.$dialog)
+                .html('');
 
             $('.stats .checkdiv').rebind('onFakeCheckboxChange.feedbackDialog', function(e, val) {
-                var fnName = val ? "fadeIn" : "fadeOut";
-
                 if (val === true) {
                     loadingDialog.show();
                     generateAnonymousReport()
@@ -142,15 +132,6 @@
                 } else {
                     self._report = {};
                 }
-
-                $('.stats-button', self.$dialog)[fnName]({
-                    duration: 250,
-                    progress: function (anim, progress, remainingMs) {
-                        if (Math.ceil(progress * 100) % 5 === 0) {
-                            self.reposition();
-                        }
-                    }
-                });
             });
 
             $('input[name="send_stats"]', self.$dialog)
@@ -158,8 +139,9 @@
                 .trigger('change');
 
             $('input[name="contact_me"]', self.$dialog)
-                .attr('checked', true)
+                .attr('checked', false)
                 .trigger('change');
+                
         });
 
         self.bind("onHide", function() {
@@ -170,37 +152,47 @@
     };
 
     FeedbackDialog.prototype._initGenericEvents = function() {
-        var self = this;
+        var self = this,
+            collectedData,
+            renderTimer;
+
         $('.rating a', self.$dialog).rebind('click.feedbackDialog', function() {
             $('.rating a', self.$dialog)
-                .removeClass("active");
+                .removeClass('active colored');
 
-            $(this).toggleClass("active");
+            $(this).addClass('active').prevAll().addClass('colored');
 
-            $('.rating a:not(.active)', self.$dialog)
-                .addClass("faded");
+            $('.feedback-button-send, .feedback-button-cancel', self.$dialog).removeClass('disabled');
+        });
 
-            if (!self.$checkboxes.is(":visible")) {
-                self.$checkboxes.slideDown({
-                    duration: 250,
-                    progress: function(anim, progress, remainingMs) {
-                        if (Math.ceil(progress * 100) % 2 === 0) {
-                            self.reposition();
-                        }
-                    }
-                });
+        $('.feedback-dialog-textarea textarea').on('keyup', function() {
+            var $txt = $('.feedback-dialog-textarea textarea'),
+                $hiddenDiv = $('.feedback-dialog-hidden'),
+                $pane = $('.feedback-dialog-textarea'),
+                txtHeight = $txt.outerHeight(),
+                content = $txt.val(),
+                api;
+
+            content = content.replace(/\n/g, '<br />');
+            $hiddenDiv.html(content + '<br/>');
+
+            if ($hiddenDiv.height() > 78) {
+                $txt.height($hiddenDiv.outerHeight());
+                $pane.jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
+                api = $pane.data('jsp');
+                $txt.blur();
+                $txt.focus();
+                api.scrollByY(0);
             }
-            if (!self.$textarea.is(":visible")) {
-                self.$textarea.slideDown({
-                    duration: 350,
-                    progress: function(anim, progress, remainingMs) {
-                        if (Math.ceil(progress * 100) % 2 === 0) {
-                            self.reposition();
-                        }
-                    }
-                });
+            else {
+                $txt.removeAttr('style');
+                api = $pane.data('jsp');
+                if (api) {
+                    api.destroy();
+                    $txt.blur();
+                    $txt.focus();
+                }
             }
-            $('.feedback-button-send', self.$dialog).removeClass('disabled');
         });
 
         $('.stats-button', self.$dialog).rebind('click.feedbackDialog', function() {
@@ -212,10 +204,11 @@
                     /**
                      * features:
                      */
-                    'focusable': false,
+                    'focusable': true,
                     'closable': true,
-                    'expandable': false,
-                    'requiresOverlay': true,
+                    'closableByEsc': true,
+                    'expandable': true,
+                    'requiresOverlay': false,
 
                     /**
                      * optional:
@@ -223,7 +216,7 @@
                     'title': 'Collected Data Report',
                     'buttons': [
                         {
-                            'label': "Close",
+                            'label': l[148],
                             'className': "fm-dialog-button-red collected-data-review-button-cancel",
                             'callback': function () {
                                 this.hide();
@@ -233,10 +226,17 @@
                 });
             }
 
-            $('textarea', dialog.$dialog).val(
-                JSON.stringify(self._report, null, 2)
-            );
             dialog.show();
+            
+            collectedData = '<li>' + JSON.stringify(self._report, null, 2).replace(/\n/g, '</li> <li>');
+            $('.collected-data', dialog.$dialog).html(collectedData);
+            
+            // Content render fix for correct scrolling
+            var renderTimer = setInterval(function(){
+                    $('.collected-data-textarea').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5,animateScroll: true});
+                    clearInterval(renderTimer);
+            }, 200);
+
         });
 
         mega.ui.Dialog.prototype._initGenericEvents.apply(self);

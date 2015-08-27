@@ -434,7 +434,15 @@ var mFileManagerDB = {
                         }
                         else if (t === 's') {
                             for (var i in results) {
-                                M.nodeShare(results[i].h, results[i], 1);
+                                if (!(results[i].n || results[i].h)) {
+                                    console.error('missing required .n property for a nodeShare (mDB init)');
+                                } else {
+                                    M.nodeShare(
+                                        results[i].n ? results[i].n : results[i].h,
+                                        results[i],
+                                        1
+                                    );
+                                }
                             }
                         }
                         else {
@@ -640,7 +648,8 @@ function mDBstart(aSlave) {
 }
 
 function mDBadd(t, n) {
-    if (mFileManagerDB.state !== mFileManagerDB.STATE_READY) {
+    if (mFileManagerDB.state !== mFileManagerDB.STATE_WORKING
+            && mFileManagerDB.state !== mFileManagerDB.STATE_READY) {
         console.warn('Invalid fmdb state', mFileManagerDB.state);
         localStorage['fmdblock_' + u_handle] = 0xBADF;
         return;
@@ -676,7 +685,8 @@ function mDBadd(t, n) {
 }
 
 function mDBdel(t, id) {
-    if (mFileManagerDB.state !== mFileManagerDB.STATE_READY) {
+    if (mFileManagerDB.state !== mFileManagerDB.STATE_WORKING
+            && mFileManagerDB.state !== mFileManagerDB.STATE_READY) {
         console.warn('Invalid fmdb state', mFileManagerDB.state);
         localStorage['fmdblock_' + u_handle] = 0xBADF;
     }

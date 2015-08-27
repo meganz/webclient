@@ -213,10 +213,6 @@ function translate(html) {
     return String(html).replace(/\[\$(\d+)(?:\.(\w+))?\]/g, replacer);
 }
 
-/**
- * Show the number of new notifications in the Browser's title bar e.g. (3) MEGA
- * @param {type} nperc
- */
 function megatitle(nperc) {
     if (!nperc) {
         nperc = '';
@@ -267,7 +263,7 @@ function populate_l() {
     l[208] = l[208].replace('[/A]', '</a>');
     l[517] = l[517].replace('[A]', '<a href="#help">').replace('[/A]', '</a>');
     l[521] = l[521].replace('[A]', '<a href="#copyright">').replace('[/A]', '</a>');
-    l[553] = l[553].replace('[A]', '<a href="mailto:resellers@mega.co.nz">').replace('[/A]', '</a>');
+    l[553] = l[553].replace('[A]', '<a href="mailto:resellers@mega.nz">').replace('[/A]', '</a>');
     l[555] = l[555].replace('[A]', '<a href="#terms">').replace('[/A]', '</a>');
     l[754] = l[754].replace('[A]',
         '<a href="http://www.google.com/chrome" target="_blank" rel="noreferrer" style="color:#D9290B;">');
@@ -295,12 +291,9 @@ function populate_l() {
     l[1159] = l[1159].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
     l[1171] = l[1171].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
     l[1185] = l[1185].replace('[X]', '<strong>MEGA.crx</strong>');
-    l[1242] = l[1242].replace('[A]', '<a href="#affiliateterms" target="_blank" rel="noreferrer">').replace('[/A]', '</a>');
-    l[1218] = l[1218].replace('[A]', '<a href="#affiliateterms" class="red">').replace('[/A]', '</a>');
     l[1212] = l[1212].replace('[A]', '<a href="#sdk" class="red">').replace('[/A]', '</a>');
     l[1274] = l[1274].replace('[A]', '<a href="#takedown">').replace('[/A]', '</a>');
     l[1275] = l[1275].replace('[A]', '<a href="#copyright">').replace('[/A]', '</a>');
-    l[1244] = l[1244].replace('[A]', '<a href="#affiliateterms" class="red">').replace('[/A]', '</a>');
     l[1201] = l[1201].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
     l[1208] = l[1208].replace('[B]', '<strong>').replace('[/B]', '</strong>');
     l[1915] = l[1915].replace('[A]',
@@ -308,8 +301,8 @@ function populate_l() {
             .replace('[/A]', '</a>');
     l[1936] = l[1936].replace('[A]', '<a href="#backup">').replace('[/A]', '</a>');
     l[1942] = l[1942].replace('[A]', '<a href="#backup">').replace('[/A]', '</a>');
-    l[1943] = l[1943].replace('[A]', '<a href="mailto:support@mega.co.nz">').replace('[/A]', '</a>');
-    l[1948] = l[1948].replace('[A]', '<a href="mailto:support@mega.co.nz">').replace('[/A]', '</a>');
+    l[1943] = l[1943].replace('[A]', '<a href="mailto:support@mega.nz">').replace('[/A]', '</a>');
+    l[1948] = l[1948].replace('[A]', '<a href="mailto:support@mega.nz">').replace('[/A]', '</a>');
     l[1957] = l[1957].replace('[A]', '<a href="#recovery">').replace('[/A]', '</a>');
     l[1965] = l[1965].replace('[A]', '<a href="#recovery">').replace('[/A]', '</a>');
     l[1982] = l[1982].replace('[A]', '<font style="color:#D21F00;">').replace('[/A]', '</font>');
@@ -1236,7 +1229,7 @@ function srvlog(msg, data, silent) {
         };
     }
     if (!silent && d) {
-        console.error(msg);
+        console.error(msg, data);
     }
     if (!d || onBetaW) {
         window.onerror(msg, '', data ? 1 : -1, 0, data || null);
@@ -1253,10 +1246,12 @@ function oDestroy(obj) {
             delete obj[memb];
         }
     });
-    Object.defineProperty(obj, ":$:frozen:", {
-        value: String(new Date()),
-        writable: false
-    });
+    if (!oIsFrozen(obj)) {
+        Object.defineProperty(obj, ":$:frozen:", {
+            value: String(new Date()),
+            writable: false
+        });
+    }
 
     if (window.d) {
         Object.freeze(obj);
@@ -1282,7 +1277,11 @@ function dlError(text) {
  */
 function removeValue(array, value, can_fail) {
     var idx = array.indexOf(value);
-    ASSERT(can_fail || idx !== -1, 'Unable to Remove Value ' + value);
+    if (d) {
+        if (!(can_fail || idx !== -1)) {
+            console.warn('Unable to Remove Value ' + value, value);
+        }
+    }
     if (idx !== -1) {
         array.splice(idx, 1);
     }
@@ -1290,12 +1289,12 @@ function removeValue(array, value, can_fail) {
 }
 
 function setTransferStatus(dl, status, ethrow, lock) {
-    var id = dl && DownloadManager.GetGID(dl);
+    var id = dl && dlmanager.getGID(dl);
     var text = '' + status;
     if (text.length > 44) {
         text = text.substr(0, 42) + '...';
     }
-    $('.transfer-table #' + id + ' td:eq(6)').text(text);
+    $('.transfer-table #' + id + ' td:eq(5)').text(text);
     if (lock) {
         $('.transfer-table #' + id).attr('id', 'LOCKed_' + id);
     }
@@ -1311,23 +1310,23 @@ function dlFatalError(dl, error, ethrow) {
     var m = 'This issue should be resolved ';
     if (navigator.webkitGetUserMedia) {
         m += 'exiting from Incognito mode.';
+        msgDialog('warninga', l[1676], m, error);
     }
     else if (navigator.msSaveOrOpenBlob) {
         Later(browserDialog);
         m = l[1933];
+        msgDialog('warninga', l[1676], m, error);
     }
     else if (dlMethod === FlashIO) {
         Later(browserDialog);
         m = l[1308];
+        msgDialog('warninga', l[1676], m, error);
     }
     else {
         Later(firefoxDialog);
-        // m += 'installing our extension.'
-        m = l[1932];
     }
-    msgDialog('warninga', l[1676], m, error);
     setTransferStatus(dl, error, ethrow, true);
-    DownloadManager.abort(dl);
+    dlmanager.abort(dl);
 }
 
 /**
@@ -1640,28 +1639,28 @@ function CreateWorkers(url, message, size) {
     }
 
     return new MegaQueue(function(task, done) {
-            for (var i = 0; i < size; i++) {
-                if (worker[i] === null) {
-                    worker[i] = create(i);
-                }
-                if (!worker[i].busy) {
-                    break;
-                }
+        for (var i = 0; i < size; i++) {
+            if (worker[i] === null) {
+                worker[i] = create(i);
             }
-            worker[i].busy = true;
-            instances[i] = done;
-            $.each(task, function(e, t) {
-                    if (e === 0) {
-                        worker[i].context = t;
-                    }
-                    else if (t.constructor === Uint8Array && typeof MSBlobBuilder !== "function") {
-                        worker[i].postMessage(t.buffer, [t.buffer]);
-                    }
-                    else {
-                        worker[i].postMessage(t);
-                    }
-                });
-        }, size, 'worker-' + url);
+            if (!worker[i].busy) {
+                break;
+            }
+        }
+        worker[i].busy = true;
+        instances[i] = done;
+        $.each(task, function(e, t) {
+                if (e === 0) {
+                    worker[i].context = t;
+                }
+                else if (t.constructor === Uint8Array && typeof MSBlobBuilder !== "function") {
+                    worker[i].postMessage(t.buffer, [t.buffer]);
+                }
+                else {
+                    worker[i].postMessage(t);
+                }
+            });
+    }, size, url.split('/').pop().split('.').shift() + '-worker');
 }
 
 function mKeyDialog(ph, fl) {
@@ -1964,8 +1963,9 @@ function setupTransferAnalysis() {
             var tp = $.transferprogress;
 
             for (var i in tp) {
-                if (!GlobalProgress[i] || GlobalProgress[i].paused || tp[i][0] === tp[i][1]
-                        || (i[0] === 'u' ? ulQueue : dlQueue).isPaused()) {
+                var q = (i[0] === 'u' ? ulQueue : dlQueue);
+                if (!GlobalProgress[i] || GlobalProgress[i].paused
+                        || tp[i][0] === tp[i][1] || q.isPaused() || q._qpaused[i]) {
                     delete prev[i];
                 }
                 else if (prev[i] && prev[i] === tp[i][0]) {
@@ -2065,37 +2065,43 @@ function percent_megatitle() {
         tp = $.transferprogress || {},
         dl_s = 0,
         ul_s = 0,
-        zips = {}
+        zips = {},
+        d_deg = 0,
+        u_deg = 0;
 
     for (var i in dl_queue) {
-        var q = dl_queue[i],
-            t = tp[q.zipid ? 'zip_' + q.zipid : 'dl_' + q.id];
+        if (dl_queue.hasOwnProperty(i)) {
+            var q = dl_queue[i];
+            var t = q && tp[q.zipid ? 'zip_' + q.zipid : 'dl_' + q.id];
 
-        if (t) {
-            dl_r += t[0];
-            dl_t += t[1];
-            if (!q.zipid || !zips[q.zipid]) {
-                if (q.zipid) {
-                    zips[q.zipid] = 1;
+            if (t) {
+                dl_r += t[0];
+                dl_t += t[1];
+                if (!q.zipid || !zips[q.zipid]) {
+                    if (q.zipid) {
+                        zips[q.zipid] = 1;
+                    }
+                    dl_s += t[2];
                 }
-                dl_s += t[2];
             }
-        }
-        else {
-            dl_t += q.size || 0;
+            else {
+                dl_t += q && q.size || 0;
+            }
         }
     }
 
     for (var i in ul_queue) {
-        var t = tp['ul_' + ul_queue[i].id]
+        if (ul_queue.hasOwnProperty(i)) {
+            var t = tp['ul_' + ul_queue[i].id]
 
-        if (t) {
-            ul_r += t[0];
-            ul_t += t[1];
-            ul_s += t[2];
-        }
-        else {
-            ul_t += ul_queue[i].size || 0;
+            if (t) {
+                ul_r += t[0];
+                ul_t += t[1];
+                ul_s += t[2];
+            }
+            else {
+                ul_t += ul_queue[i].size || 0;
+            }
         }
     }
     if (dl_t) {
@@ -2124,32 +2130,22 @@ function percent_megatitle() {
         $.transferprogress = {};
     }
 
-    if (dl_s > 0) {
-        $('.tranfer-download-indicator')
-            .text(bytesToSize(dl_s, 1) + "/s")
-            .addClass('active');
-        $('.transfer-panel-title').addClass('active');
+    d_deg = 360 * x_dl / 100;
+    u_deg = 360 * x_ul / 100;
+    if (d_deg <= 180) {
+        $('.download .nw-fm-chart0.right-c p').css('transform', 'rotate(' + d_deg + 'deg)');
+        $('.download .nw-fm-chart0.left-c p').css('transform', 'rotate(0deg)');
+    } else {
+        $('.download .nw-fm-chart0.right-c p').css('transform', 'rotate(180deg)');
+        $('.download .nw-fm-chart0.left-c p').css('transform', 'rotate(' + (d_deg - 180) + 'deg)');
     }
-    else {
-        $('.tranfer-download-indicator').removeClass('active');
-        $('.transfer-panel-title').removeClass('active');
+    if (u_deg <= 180) {
+        $('.upload .nw-fm-chart0.right-c p').css('transform', 'rotate(' + u_deg + 'deg)');
+        $('.upload .nw-fm-chart0.left-c p').css('transform', 'rotate(0deg)');
+    } else {
+        $('.upload .nw-fm-chart0.right-c p').css('transform', 'rotate(180deg)');
+        $('.upload .nw-fm-chart0.left-c p').css('transform', 'rotate(' + (u_deg - 180) + 'deg)');
     }
-
-    if (ul_s > 0) {
-        $('.tranfer-upload-indicator')
-            .text(bytesToSize(ul_s, 1) + "/s")
-            .addClass('active');
-        $('.transfer-panel-title').addClass('active');
-    }
-    else {
-        $('.tranfer-upload-indicator').removeClass('active');
-        $('.transfer-panel-title').removeClass('active');
-    }
-
-    $('.file-transfer-icon')
-        .attr('class',
-            'file-transfer-icon download-percents-' + x_dl + ' upload-percents-' + x_ul
-        );
 
     megatitle(t);
 }
@@ -2299,7 +2295,7 @@ function disableDescendantFolders(id, pref) {
         var fid = folders[i].h;
 
         for (var h in M.c[fid]) {
-            if (M.d[h].t) {
+            if (M.d[h] && M.d[h].t) {
                 sub = true;
                 break;
             }
@@ -2448,12 +2444,12 @@ function flashIsEnabled() {
 
 /**
  * Gets the current base URL of the page (protocol + hostname) e.g. If on beta.mega.nz it will return https://beta.mega.nz.
- * If on the browser extension it will return the default https://mega.co.nz. If on localhost it will return https://mega.co.nz.
- * This can be used to create external links, for example file downloads https://mega.co.nz/#!qRN33YbK!o4Z76qDqPbiK2G0I...
+ * If on the browser extension it will return the default https://mega.nz. If on localhost it will return https://mega.nz.
+ * This can be used to create external links, for example file downloads https://mega.nz/#!qRN33YbK!o4Z76qDqPbiK2G0I...
  * @returns {String}
  */
 function getBaseUrl() {
-    return 'https://' + (((location.protocol === 'https:') && location.host) || 'mega.co.nz');
+    return 'https://' + (((location.protocol === 'https:') && location.host) || 'mega.nz');
 }
 
 /**
@@ -2525,7 +2521,7 @@ function generateAnonymousReport() {
     report.io = window.dlMethod && dlMethod.name;
     report.sb = +('' + $('script[src*="secureboot"]').attr('src')).split('=').pop();
     report.tp = $.transferprogress;
-    if (!megaChat.karere) {
+    if (!megaChatIsReady) {
         report.karereState = '#disabled#';
     }
     else {
@@ -2546,7 +2542,7 @@ function generateAnonymousReport() {
     var roomUniqueId = 0;
     var roomUniqueIdMap = {};
 
-    Object.keys(megaChat.chats).forEach(function(k) {
+    Object.keys(megaChatIsReady && megaChat.chats || {}).forEach(function(k) {
         var v = megaChat.chats[k];
 
         var participants = v.getParticipants();
@@ -2650,6 +2646,13 @@ function generateAnonymousReport() {
     $('script').each(function() {
         var self = this;
         var src = self.src.replace(window.location.host, "$current");
+        if (is_chrome_firefox) {
+            if (!promises.length) {
+                promises.push(MegaPromise.resolve());
+            }
+            report.scripts[self.src] = false;
+            return;
+        }
         promises.push(
             $.ajax({
                 url: self.src,
@@ -2834,7 +2837,7 @@ mega.utils.getStack = function megaUtilsGetStack() {
  *  @return {Boolean}
  */
 mega.utils.hasPendingTransfers = function megaUtilsHasPendingTransfers() {
-    return ((fminitialized && downloading) || ul_uploading);
+    return ((fminitialized && dlmanager.isDownloading) || ulmanager.isUploading);
 };
 
 /**
@@ -2856,14 +2859,14 @@ mega.utils.abortTransfers = function megaUtilsAbortTransfers() {
     else {
         msgDialog('confirmation', l[967], l[377] + ' ' + l[507] + '?', false, function(doIt) {
             if (doIt) {
-                if (downloading) {
-                    dl_cancel();
+                if (dlmanager.isDownloading) {
+                    dlmanager.abort(null);
                 }
-                if (ul_uploading) {
-                    ul_cancel();
+                if (ulmanager.isUploading) {
+                    ulmanager.abort(null);
                 }
 
-                resetUploadDownload();
+                mega.utils.resetUploadDownload();
                 loadingDialog.show();
                 var timer = setInterval(function() {
                     if (!mega.utils.hasPendingTransfers()) {
@@ -2879,6 +2882,46 @@ mega.utils.abortTransfers = function megaUtilsAbortTransfers() {
     }
 
     return promise;
+};
+
+/**
+ * On transfers completion cleanup
+ */
+mega.utils.resetUploadDownload = function megaUtilsResetUploadDownload() {
+    if (!ul_queue.some(isQueueActive)) {
+        ul_queue = new UploadQueue();
+        ulmanager.isUploading = false;
+        ASSERT(ulQueue._running === 0, 'ulQueue._running inconsistency on completion');
+        ulQueue._pending = [];
+    }
+    if (!dl_queue.some(isQueueActive)) {
+        dl_queue = new DownloadQueue();
+        dlmanager.isDownloading = false;
+    }
+
+    if (!dlmanager.isDownloading && !ulmanager.isUploading) {
+        clearXhr(); /* destroy all xhr */
+
+        $('.transfer-pause-icon').addClass('disabled');
+        $('.nw-fm-left-icon.transfers').removeClass('transfering');
+        $('.transfers .nw-fm-percentage li p').css('transform', 'rotate(0deg)');
+        M.tfsdomqueue = {};
+        GlobalProgress = {};
+        delete $.transferprogress;
+        fm_tfsupdate();
+        if ($.mTransferAnalysis) {
+            clearInterval($.mTransferAnalysis);
+            delete $.mTransferAnalysis;
+        }
+        $('.transfer-panel-title').html(l[104]);
+    }
+
+    if (d) {
+        dlmanager.logger.info("resetUploadDownload", ul_queue.length, dl_queue.length);
+    }
+
+    fm_tfsupdate();
+    Later(percent_megatitle);
 };
 
 /**
@@ -2903,9 +2946,12 @@ mega.utils.reload = function megaUtilsReload() {
         u_storage.wasloggedin = true;
 
         if (debug) {
-            u_storage.d = u_storage.dd = true;
-            if (!is_extension) {
-                u_storage.jj = true;
+            u_storage.d = true;
+            if (location.host !== 'mega.nz') {
+                u_storage.dd = true;
+                if (!is_extension) {
+                    u_storage.jj = true;
+                }
             }
         }
 
@@ -3285,6 +3331,83 @@ mBroadcaster.addListener('crossTab:master', function _setup() {
     }
 });
 
+
+/**
+ * Cross-tab communication using WebStorage
+ */
+var watchdog = Object.freeze({
+    Strg: {},
+    // Tag prepended to messages to identify watchdog-events
+    eTag: '$WDE$!_',
+    // ID to identify tab's origin
+    wdID: (Math.random() * Date.now()),
+
+    /** setup watchdog/webstorage listeners */
+    setup: function() {
+        if (window.addEventListener) {
+            window.addEventListener('storage', this, false);
+        }
+        else if (window.attachEvent) {
+            window.attachEvent('onstorage', this.handleEvent.bind(this));
+        }
+    },
+
+    /**
+     * Notify watchdog event/message
+     * @param {String} msg  The message
+     * @param {String} data Any data sent to other tabs, optional
+     */
+    notify: function(msg, data) {
+        data = { origin: this.wdID, data: data, sid: Math.random()};
+        localStorage.setItem(this.eTag + msg, JSON.stringify(data));
+        if (d) {
+            console.log('mWatchDog Notifying', this.eTag + msg, localStorage[this.eTag + msg]);
+        }
+    },
+
+    /** Handle watchdog/webstorage event */
+    handleEvent: function(ev) {
+        if (String(ev.key).indexOf(this.eTag) !== 0) {
+            return;
+        }
+        if (d) {
+            console.debug('mWatchDog ' + ev.type + '-event', ev.key, ev.newValue, ev);
+        }
+
+        var msg = ev.key.substr(this.eTag.length);
+        var strg = JSON.parse(ev.newValue || '""');
+
+        if (!strg || strg.origin === this.wdID) {
+            if (d) {
+                console.log('Ignoring mWatchDog event', msg, strg);
+            }
+            return;
+        }
+
+        switch (msg) {
+            case 'loadfm_done':
+                if (this.Strg.login === strg.origin) {
+                    location.assign(location.pathname);
+                }
+                break;
+
+            case 'login':
+            case 'createuser':
+                loadingDialog.show();
+                this.Strg.login = strg.origin;
+                break;
+
+            case 'logout':
+                u_logout(-0xDEADF);
+                location.reload();
+                break;
+        }
+
+        delete localStorage[ev.key];
+    }
+});
+watchdog.setup();
+
 /**
  * Simple alias that will return a random number in the range of: a < b
  *
@@ -3308,3 +3431,92 @@ if (typeof sjcl !== 'undefined') {
         this.stack = mega.utils.getStack();
     };
 }
+
+(function($, scope) {
+    /**
+     * Nodes related operations
+     *
+     * @param opts {Object}
+     * 
+     * @constructor
+     */
+    var Nodes = function(opts) {
+        
+        var self = this;
+        var defaultOptions = {
+        };
+
+        self.options = $.extend(true, {}, defaultOptions, opts);    };
+
+    /**
+     * isShareExists
+     * 
+     * checking if there's available shares for selected nodes
+     * 
+     * @param {array} nodes, holds array of ids from selected folders/files (nodes)
+     * 
+     * @returns {boolean}
+     */
+    Nodes.prototype.isShareExist = function(nodes) {
+
+        var self = this;
+        
+        for (var i in nodes) {
+            if (nodes.hasOwnProperty(i)) {
+                if (M.d[nodes[i]].shares && Object.keys(M.d[nodes[i]].shares).length) {
+                    return true;
+                }
+                if (M.ps && M.ps[nodes[i]] && Object.keys(M.ps[nodes[i]]).length) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    };
+
+    /**
+     * loopSubdirs
+     * 
+     * Loops through all subdirs of given node
+     * 
+     * @param {string} id: node id
+     * @param {array} nodesId
+     * 
+     * @returns child nodes id
+     */
+    Nodes.prototype.loopSubdirs = function(id, nodesId) {
+
+        var self = this;
+        
+        var subDirs = nodesId;
+
+        if (subDirs) {
+            if (subDirs.indexOf(id) === -1) {
+                subDirs.push(id);
+            }
+        }
+        else {
+            // Make subDirs an array
+            subDirs = [id];
+        }
+
+        for (var item in M.c[id]) {
+            if (M.c[id].hasOwnProperty(item)) {
+
+                // Prevent duplication
+                if (subDirs && subDirs.indexOf(item) === -1) {
+                    subDirs.push(item);
+                }
+
+                self.loopSubdirs(item, subDirs);
+            }
+        }
+
+        return subDirs;
+    };
+
+    // export
+    scope.mega = scope.mega || {};
+    scope.mega.Nodes = Nodes;
+})(jQuery, window);

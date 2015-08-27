@@ -2,10 +2,11 @@
 var DEFAULT_CONCURRENCY = 4
 
 function MegaQueue(worker, limit, name) {
+    var parentLogger;
     this._limit = limit || 5;
     this._queue = [];
-    this._running = 0
-    this._worker = worker
+    this._running = 0;
+    this._worker = worker;
     this._noTaskCount = 0;
     this._qpaused = {};
     this._pending = [];
@@ -13,24 +14,43 @@ function MegaQueue(worker, limit, name) {
         value: String(name || 'unk'),
         writable: false
     });
+    switch (name) {
+        case 'downloader':
+        case 'zip-writer':
+        case 'download-writer':
+        case 'decrypter-worker':
+            parentLogger = dlmanager.logger;
+            break;
+        case 'uploader':
+        case 'ul-filereader':
+        case 'encrypter-worker':
+            parentLogger = ulmanager.logger;
+            break;
+    }
+    this.logger = MegaLogger.getLogger('mQueue[' + this.qname + ']', {}, parentLogger);
+    if (d) {
+        MegaQueue.weakRef.push(this);
+    }
 }
-inherits(MegaQueue, MegaEvents)
+inherits(MegaQueue, MegaEvents);
+
+MegaQueue.weakRef = [];
 
 MegaQueue.prototype.setSize = function(size) {
     this._limit = size;
     this._process();
-}
+};
 
 MegaQueue.prototype.isEmpty = function() {
-    return this._running == 0
-        && this._queue.length == 0;
-}
+    return this._running === 0
+        && this._queue.length === 0;
+};
 
 MegaQueue.prototype.pushFirst = function(arg, next, self) {
     if (d) {
         var found;
         for (var i in this._queue) {
-            if (this._queue[i][0] == arg) {
+            if (this._queue[i][0] === arg) {
                 found = true;
                 break;
             }
@@ -44,12 +64,12 @@ MegaQueue.prototype.pushFirst = function(arg, next, self) {
 MegaQueue.prototype.resume = function() {
     this._paused = false;
     this._process();
-    this.trigger('resume')
+    this.trigger('resume');
 };
 
 MegaQueue.prototype.canExpand = function() {
     return this._limit <= this._running && this._limit * 1.5 >= this._running;
-}
+};
 
 /**
  * Expand temporarily the queue size, it should be called
@@ -63,7 +83,7 @@ MegaQueue.prototype.expand = function() {
         this._expanded = true;
         this._process();
         if (d) {
-            console.log("expand queue " + this._running);
+            this.logger.info("expand queue " + this._running);
         }
         return true;
     }
@@ -73,17 +93,17 @@ MegaQueue.prototype.expand = function() {
 MegaQueue.prototype.shrink = function() {
     this._limit = Math.max(this._limit - 1, 1);
     if (d) {
-        console.error("shrking queue to ", this._limit);
+        this.logger.error("shrking queue to ", this._limit);
     }
     return this._limit;
-}
+};
 
 MegaQueue.prototype.filter = function(gid, foreach) {
     var len = this._queue.length + $.len(this._qpaused);
 
     if (!len) {
         if (d) {
-            console.debug('Nothing to filter', gid);
+            this.logger.info('Nothing to filter', gid);
         }
     }
     else {
@@ -91,12 +111,12 @@ MegaQueue.prototype.filter = function(gid, foreach) {
             foreach = function(aTask) {
                 aTask = aTask[0];
                 if (d && !aTask.destroy) {
-                    console.log('Removing Task ' + aTask);
+                    this.logger.info('Removing Task ' + aTask);
                 }
                 if (aTask.destroy) {
                     aTask.destroy();
                 }
-            };
+            }.bind(this);
         }
 
         var tasks = this.slurp(gid);
@@ -110,7 +130,7 @@ MegaQueue.prototype.filter = function(gid, foreach) {
         // XXX: For Transfers, check if there might be leaked tasks without the file reference (ie, "dl" for dlQueue)
 
         if (d) {
-            console.log('Queue filtered, %d/%d tasks remaining',
+            this.logger.info('Queue filtered, %d/%d tasks remaining',
                 this._queue.length + $.len(this._qpaused), len, gid);
         }
     }
@@ -126,18 +146,18 @@ MegaQueue.prototype.slurp = function(gid) {
 
 MegaQueue.prototype.pause = function() {
     if (d) {
-        console.log("pausing queue");
+        this.logger.info("pausing queue");
         if (d > 1 && console.trace) {
             console.trace();
         }
     }
     this._paused = true;
-    this.trigger('pause')
+    this.trigger('pause');
 };
 
 MegaQueue.prototype.isPaused = function() {
     return this._paused;
-}
+};
 
 MegaQueue.prototype.pushAll = function(tasks, next, error) {
     function CCQueueChecker(task, response) {
@@ -149,12 +169,12 @@ MegaQueue.prototype.pushAll = function(tasks, next, error) {
             return error(task, response);
         }
         removeValue(tasks, task);
-        if (tasks.length == 0) {
+        if (tasks.length === 0) {
             next();
         }
     }
-    var i = 0,
-        len = tasks.length
+    var i = 0;
+    var len = tasks.length;
 
     for (i = 0; i < len; i++) {
         tasks[i].onQueueDone = CCQueueChecker;
@@ -170,31 +190,43 @@ MegaQueue.prototype.run_in_context = function(task) {
         if (!task[0]) {
             return;
         } /* already called */
-        this._running--;
-        var done = task[1] || task[0].onQueueDone;
-        if (done) {
-            done.apply(task[2] || this, [task[0], arguments]);
-        }
         if (!oIsFrozen(this)) {
-            if (ASSERT(this._pending, 'MegaQueue pending array got expunged, ' + this.qname)) {
-                removeValue(this._pending, task[0]);
+            if (!this._pending || this._pending.indexOf(task[0]) === -1) {
+                this.logger.warn('Task is no longer pending.', task[0], this._pending);
             }
-            if (!this.isEmpty() || $.len(this._qpaused)) {
-                this._process();
+            else {
+                this._running--;
+                removeValue(this._pending, task[0]);
+                ASSERT(this._running > -1, 'Queue inconsistency (RIC)');
+
+                var done = task[1] || task[0].onQueueDone;
+                if (done) {
+                    done.apply(task[2] || this, [task[0], arguments]);
+                }
+                if (!this.isEmpty() || $.len(this._qpaused)) {
+                    this._process();
+                }
             }
         }
         task[0] = task[1] = task[2] = undefined;
     }.bind(this));
-}
+};
 
 MegaQueue.prototype.validateTask = function() {
     return true;
-}
+};
 
-MegaQueue.prototype.getNextTask = function() {
-    var i, r, len = this._queue.length
-    for (i = 0; i < len; i++) {
-        if ((r = this.validateTask(this._queue[i][0]))) {
+MegaQueue.prototype.getNextTask = function(sp) {
+    var r;
+    var i = -1;
+    while (++i < (this._queue && this._queue.length)) {
+        if (!(this._queue && this._queue[i])) {
+            srvlog('Invalid queue' + (this._queue ? ' entry' : '') + ' for ' + this.qname, sp);
+            if (!this._queue) {
+                break;
+            }
+        }
+        else if ((r = this.validateTask(this._queue[i][0]))) {
             return r < 0 ? null : this._queue.splice(i, 1)[0];
         }
     }
@@ -204,25 +236,29 @@ MegaQueue.prototype.getNextTask = function() {
 MegaQueue.prototype.process = function(sp) {
     var args;
     if (this._paused) {
-        return;
+        return false;
     }
     if (this._later) {
         clearTimeout(this._later);
         delete this._later;
     }
+    if (!this._queue) {
+        console.error('queue destroyed', this.qname, sp);
+        return false;
+    }
     while (this._running < this._limit && this._queue.length > 0) {
-        args = this.getNextTask();
+        args = this.getNextTask(sp);
         if (!args) {
-            if (++this._noTaskCount == 666) {
+            if (++this._noTaskCount === 666) {
                 /**
                  * XXX: Prevent an infinite loop when there's a connection hang,
                  * with the UI reporting either "Temporary error; retrying" or
                  * a stalled % Status... [dc]
                  */
                 this._noTaskCount = -1;
-                if (!$.len(this._qpaused)) {
+                if (!$.len(this._qpaused) && !uldl_hold) {
                     if (d) {
-                        console.error('*** CHECK THIS ***', this);
+                        this.logger.error('*** CHECK THIS ***', this);
                     }
                     if (this.stuck) {
                         this.stuck();
@@ -230,7 +266,9 @@ MegaQueue.prototype.process = function(sp) {
                     srvlog('MegaQueue.getNextTask gave no tasks for too long... (' + this.qname + ')', sp);
                 }
             }
-            this._process(1600, sp);
+            if (this._queue) {
+                this._process(1600, sp);
+            }
             return false;
         }
         this._noTaskCount = 0;
@@ -254,15 +292,46 @@ MegaQueue.prototype.process = function(sp) {
 };
 
 MegaQueue.prototype.destroy = function() {
-    clearTimeout(this._later);
-    // this._limit = -1
-    // this._queue = null;
-    // this._queue = [];
-    if (d && this.qname !== 'downloads') {
-        ASSERT(this._queue.length == 0, 'This queue was not properly cleaned...');
+    if (!oIsFrozen(this)) {
+        this.logger.info('', 'Destroying ' + this.qname, this._queue.length, this._pending);
+
+        if (this._later) {
+            clearTimeout(this._later);
+        }
+        /**
+        this._pending.forEach(function(aRunningTask) {
+            if (d) {
+                this.logger.info('aRunningTask: ' + aRunningTask, aRunningTask);
+            }
+            if (aRunningTask && typeof aRunningTask.destroy === 'function') {
+                try {
+                    aRunningTask.destroy();
+                }
+                catch(ex) {
+                    this.logger.error(ex);
+                }
+            }
+        }.bind(this));
+        /**/
+        if (d) {
+            if (this._queue.length !== 0) {
+                var fn = 'error';
+                switch (this.qname) {
+                    case 'downloads':
+                    case 'zip-writer':
+                    case 'download-writer':
+                        fn = (d > 1 ? 'warn' : 'debug');
+                    default:
+                        break;
+                }
+                this.logger[fn]('The queue "%s" was not empty.', this.qname, this._queue);
+            }
+
+            removeValue(MegaQueue.weakRef, this);
+        }
+        oDestroy(this);
     }
-    oDestroy(this);
-}
+};
 
 MegaQueue.prototype._process = function(ms, sp) {
     if (this._later) {
@@ -288,16 +357,33 @@ inherits(TransferQueue, MegaQueue);
 
 TransferQueue.prototype.mull = function() {
     if (this.isEmpty() && $.len(this._qpaused)) {
-        this.dispatch(Object.keys(this._qpaused).shift());
+        var gids = Object.keys(this._qpaused);
+        while (gids.length) {
+            var gid = gids.shift();
+            if (this.dispatch(gid)) {
+                if (d) {
+                    this.logger.info('Dispatching transfer', gid);
+                }
+                break;
+            }
+        }
     }
 };
 
 TransferQueue.prototype.dispatch = function(gid) {
     // dispatch a paused transfer
-    ASSERT(GlobalProgress[gid], 'No transfer associated with ' + gid);
-    ASSERT(!GlobalProgress[gid] || this._qpaused[gid], 'This transfer is not in hold: ' + gid);
 
-    if (this._qpaused[gid] && !GlobalProgress[gid].paused) {
+    if (d) {
+        this.logger.info('', 'TransferQueue.dispatch', gid);
+    }
+
+    if (!GlobalProgress[gid]) {
+        this.logger.error('', 'No transfer associated with ' + gid);
+    }
+    else if (!this._qpaused[gid]) {
+        this.logger.error('', 'This transfer is not in hold: ' + gid);
+    }
+    else if (!GlobalProgress[gid].paused) {
         this._queue = this._qpaused[gid].concat(this._queue);
         delete this._qpaused[gid];
         this._process();
@@ -313,19 +399,25 @@ TransferQueue.prototype.pause = function(gid) {
 
     // pause single transfer
     if (GlobalProgress[gid] && !GlobalProgress[gid].paused) {
-        var p = GlobalProgress[gid],
-            chunk;
+        var p = GlobalProgress[gid];
+        var chunk;
         p.paused = true;
         while ((chunk = p.working.pop())) {
             if (d) {
-                console.error('Aborting by pause: ' + chunk);
+                this.logger.info('Aborting by pause: ' + chunk);
             }
             chunk.abort();
             this.pushFirst(chunk);
-            this._running--;
+            if (removeValue(this._pending, chunk, 1)) {
+                this._running--;
+                ASSERT(this._running > -1, 'Queue inconsistency on pause');
+            }
+            else {
+                this.logger.warn("Paused chunk was NOT in pending state: " + chunk, chunk, this);
+            }
         }
-        this._qpaused[gid] = this.slurp(gid);
-        $('.transfer-table #' + gid + ' td:eq(2) span.speed').text(' (paused)');
+        this._qpaused[gid] = this.slurp(gid).concat(this._qpaused[gid] || []);
+        $('.transfer-table #' + gid + ' td:eq(0) span.speed').text(' (' + l[1651] + ')');
         GlobalProgress[gid].speed = 0; // reset speed
         if (($.transferprogress || {})[gid]) {
             $.transferprogress[gid][2] = 0; // reset speed
@@ -334,10 +426,10 @@ TransferQueue.prototype.pause = function(gid) {
     }
     else if (d) {
         if (!GlobalProgress[gid]) {
-            console.error('No transfer associated with ' + gid);
+            this.logger.error('No transfer associated with ' + gid);
         }
         else {
-            console.log('This transfer is ALREADY paused: ' + gid);
+            this.logger.info('This transfer is ALREADY paused: ' + gid);
         }
     }
 };
@@ -352,14 +444,14 @@ TransferQueue.prototype.resume = function(gid) {
         if (this.isEmpty()) {
             this.dispatch(gid);
         }
-        $('.transfer-table #' + gid + ' td:eq(2) span.speed').text('');
+        $('.transfer-table #' + gid + ' td:eq(0) span.speed').text('');
     }
     else if (d) {
         if (!GlobalProgress[gid]) {
-            console.error('No transfer associated with ' + gid);
+            this.logger.error('No transfer associated with ' + gid);
         }
         else {
-            console.error('This transfer is not paused: ' + gid);
+            this.logger.error('This transfer is not paused: ' + gid);
         }
 
     }

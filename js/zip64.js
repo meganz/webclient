@@ -350,17 +350,23 @@ var ZIPClass = function(totalSize) {
 function ZipEntryIO(zipWriter, aFile) {
     this.file = aFile;
     this.zipWriter = zipWriter;
-    this.queued = 0
+    this.queued = 0;
+    this.logger = MegaLogger.getLogger('ZipEntryIO', {}, dlmanager.logger);
 };
 
 ZipEntryIO.prototype.toString = function() {
     return "[ZipEntry " + (this.file && this.file.n) + "]";
 };
 ZipEntryIO.prototype.destroy = function() {
-    if (d) {
-        console.log('Destroying ' + this);
-    }
-    if (this.file) {
+    if (!oIsFrozen(this)) {
+        var dl = this.file || {};
+        if (d) {
+            this.logger.info('Destroying ' + this);
+        }
+        if (/*dl.cancelled && */dl.owner) {
+            // call ClassFile.abortTimers
+            dl.owner.abortTimers();
+        }
         oDestroy(this);
     }
 };
@@ -412,6 +418,7 @@ function ZipWriter(dl_id, dl) {
     this.io.is_zip = true;
     this.zwriter = new MegaQueue(dlZipWriterIOWorker.bind(this), 1, 'zip-writer');
     this.zwriter.validateTask = dlZipWriterValidate.bind(this);
+    this.logger = MegaLogger.getLogger('ZipWriter', {}, dlmanager.logger);
 
     this.io.begin = function() {
         this.is_ready = true;
@@ -439,7 +446,7 @@ ZipWriter.prototype.createZipObject = function() {
             this.size += 22 // final bytes
         }
         if (d) {
-            console.error("isZip64", this.ZipObject.isZip64, this.size);
+            this.logger.info("isZip64", this.ZipObject.isZip64, this.size);
         }
 
         this.io.setCredentials("", this.size, this.dl.zipname);
@@ -449,7 +456,7 @@ ZipWriter.prototype.createZipObject = function() {
 
 ZipWriter.prototype.destroy = function(error) {
     if (d) {
-        console.log('Destroying ' + this, this.cancelled);
+        this.logger.info('Destroying ' + this, this.cancelled);
     }
     if (this.dl) {
         var dl = this.dl;
@@ -462,7 +469,7 @@ ZipWriter.prototype.destroy = function(error) {
             }
         }
         else if (dlMethod != FlashIO) {
-            DownloadManager.cleanupUI(dl, true);
+            dlmanager.cleanupUI(dl, true);
         }
         oDestroy(this);
     }
@@ -562,8 +569,10 @@ ZipWriter.prototype.done = function(zfile) {
 }
 
 ZipWriter.prototype.finalize_file = function() {
-    this.file_offset = 0;
-    this.zwriter.resume();
+    if (!oIsFrozen(this)) {
+        this.file_offset = 0;
+        this.zwriter.resume();
+    }
 };
 
 ZipWriter.prototype._eof = function() {
@@ -588,7 +597,7 @@ ZipWriter.prototype.addEntryFile = function(file) {
  *          creating ZIPs with several small files.
  */
 function CacheIO(dl_id, dl) {
-    var IO, u8buf,
+    var IO, u8buf, logger,
         offsetI = 0,
         offsetO = 0,
         __max_chunk_size = 32 * 0x100000;
@@ -598,11 +607,17 @@ function CacheIO(dl_id, dl) {
     }
 
     function PUSH(done, buffer) {
+        var neuter = false;
         if (!buffer) {
             buffer = u8buf.subarray(0, offsetI);
+            neuter = ((typeof FirefoxIO !== 'undefined') && dlMethod === FirefoxIO);
         }
+        var abLen = buffer.byteLength;
         IO.write(buffer, offsetO, done);
-        offsetO += buffer.byteLength;
+        if (neuter) {
+            u8buf = new Uint8Array(__max_chunk_size);
+        }
+        offsetO += abLen;
     }
 
     function FILL(buffer) {
@@ -612,7 +627,7 @@ function CacheIO(dl_id, dl) {
 
     this.write = function(buffer, offset, done) {
         if (d) {
-            console.log('CacheIOing...', buffer.byteLength, offset, offsetI, offsetO);
+            logger.info('CacheIOing...', buffer.byteLength, offset, offsetI, offsetO);
         }
 
         if (offsetI + buffer.byteLength > __max_chunk_size) {
@@ -669,7 +684,8 @@ function CacheIO(dl_id, dl) {
 
     this.setCredentials = function(url, size) {
         if (d) {
-            console.log('CacheIO Begin', dl_id, arguments);
+            logger = new MegaLogger('CacheIO', {}, dl.writer.logger);
+            logger.info('CacheIO Begin', dl_id, arguments);
         }
 
         if (this.is_zip || !dl.zipid) {

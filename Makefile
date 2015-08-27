@@ -16,7 +16,10 @@ ASMCRYPTO_MODULES = utils,aes-cbc,aes-ccm,sha1,sha256,sha512,hmac-sha1,hmac-sha2
 all: test api-doc dist test-shared
 
 test: $(KARMA)
-	$(NODE) $(KARMA) start --singleRun=true karma.conf.js --browsers PhantomJS
+	$(NODE) $(KARMA) start --preprocessors= karma.conf.js --browsers PhantomJS_custom
+
+test-ci: $(KARMA)
+	$(NODE) $(KARMA) start --singleRun=true --no-colors karma.conf.js --browsers PhantomJS_custom
 
 api-doc: $(JSDOC)
 	$(NODE) $(JSDOC) --destination doc/api/ --private \
@@ -32,10 +35,10 @@ jscs: $(JSCS)
 checks: jshint jscs
 
 clean:
-	rm -rf doc/api/ coverage/ build/ test-results.xml
+	rm -rf doc/api/ coverage/ build/ test-results.xml test/phantomjs-storage
 
 clean-all: clean
 	rm -f $(BUILD_DEP_ALL)
 	rm -rf $(BUILD_DEP_ALL_NAMES:%=$(NODE_PATH)/%) $(DEP_ALL_NAMES:%=$(NODE_PATH)/%)
 
-.PHONY: all test api-doc jshint jscs checks clean clean-all
+.PHONY: all test test-ci api-doc jshint jscs checks clean clean-all

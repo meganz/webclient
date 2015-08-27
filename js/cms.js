@@ -4,8 +4,7 @@ var IMAGE_PLACEHOLDER = staticpath + "/images/img_loader@2x.png";
 
 var pubkey = ab_to_str(asmCrypto.base64_to_bytes('gVbVNtVJf210qJLe+GxWX8w9mC+WPnTPiUDjBCv9tr4='))
 
-function verify_cms_content(content, signature)
-{
+function verify_cms_content(content, signature) {
     var hash = asmCrypto.SHA256.hex(content);
     signature = ab_to_str(signature);
 
@@ -17,8 +16,7 @@ function verify_cms_content(content, signature)
     }
 }
 
-function process_cms_response(bytes, next, as, id)
-{
+function process_cms_response(bytes, next, as, id) {
     var viewer = new Uint8Array(bytes);
 
     var signature = bytes.slice(3, 67); // 64 bytes, signature
@@ -72,13 +70,39 @@ function process_cms_response(bytes, next, as, id)
 }
 
 var assets = {};
-var cmsToId = null;
 var booting = false;
 
 var is_img;
 
 /**
- *    Rewrite links. Basically this links
+ *  Steps
+ *  
+ *  Call many things in parallel, buffer the results
+ *  and give it back once everything is ready
+ *
+ *  @param int times
+ *  @param function next
+ *
+ *  @return function
+ */
+function steps(times, next) {
+    var responses = new Array(times + 1);
+    var done = 0;
+    function step_done(i, err, arg) {
+        responses[0]   = responses[0] || err;
+        responses[i+1] = arg; 
+        if (++done === times) {
+            next.apply(null, responses);
+        }
+    };
+
+    return function(id) {
+        return step_done.bind(null, parseInt(id));
+    };
+}
+
+/**
+ *  Rewrite links. Basically this links
  *  shouldn't trigger the `CMS.get` and force
  *  a download
  */
@@ -96,32 +120,6 @@ function img_placeholder(str, sep, rid, id) {
     return "'" + IMAGE_PLACEHOLDER + "' data-img='loading_" +  id + "'";
 }
 
-function cmsObjectToId(name)
-{
-    var q = getxhr();
-    q.onload = function() {
-        if (name === '_all') {
-            cmsToId = JSON.parse(ab_to_str(q.response));
-        } else {
-            cmsToId[name] = ab_to_str(q.response).split(".");
-        }
-        q = null;
-        if (name !== '_all') {
-            doRequest(name);
-        }
-    };
-    q.onerror = function() {
-        Later(function() {
-            cmsObjectToId(name);
-        });
-        q = null;
-    };
-    var srv = apipath.replace(/https?:\/\//, '').replace(/\//g, '');
-    q.open("GET", (localStorage.cms || "https://cms.mega.nz/") + srv + '/' + name);
-    q.responseType = 'arraybuffer';
-    q.send();
-}
-
 /**
  *    Internal function to communicate with the BLOB server.
  *
@@ -134,24 +132,24 @@ function doRequest(id) {
     if (!id) {
         throw new Error("Calling CMS.doRequest without an ID");
     }
-    if (cmsToId === null) {
-        if (!booting) {
-            booting = true;
-            cmsObjectToId('_all');
-        }
-        return Later(function() {
+    var q = getxhr();
+    q.onerror = function() {
+        Later(function() {
             doRequest(id);
         });
-    }
-    if (!cmsToId[id]) {
-        return cmsObjectToId(id);
-    }
-    _cms_request(cmsToId[id], function(blob) {
+    };
+    q.onload = function() {
         for (var i in fetching[id]) {
-            process_cms_response(blob, fetching[id][i][0], fetching[id][i][1], id);
+            if (fetching[id].hasOwnProperty(i)) {
+                process_cms_response(q.response, fetching[id][i][0], fetching[id][i][1], id);
+            }
         }
         delete fetching[id];
-    });
+    };
+    var url = (localStorage.cms || "https://cms.mega.nz/content/") + id;
+    q.open("GET", url);
+    q.responseType = 'arraybuffer';
+    q.send();
 }
 
 var _listeners = {};
@@ -166,41 +164,9 @@ function loaded(id)
     CMS.attachEvents();
 }
 
-function _concat_arraybuf(arr)
-{
-    var len = arr.reduce(function(prev, e) {
-        return prev+e.byteLength;
-    }, 0);
-    var buffer = new Uint8Array(len);
-    var offset = 0;
-    for (var i in arr) {
-        buffer.set(new Uint8Array(arr[i]), offset);
-        offset += arr[i].byteLength;
-    }
-    return buffer.buffer;
-}
-
-function _cms_request(ids, next)
-{
-    var args = [];
-    var q  = [];
-    var done = 0;
-    for (var i in ids) {
-        args.push({fa:i+":1*" + ids[i], k:i, plaintext: true});
-        q[i] = null;
-    }
-
-    api_getfileattr(args, 1, function(ctx, id, bytes)
-    {
-        q[id] = bytes;
-        if (++done === q.length) {
-            next(_concat_arraybuf(q));
-        }
-    });
-}
-
 var curType;
 var curCallback;
+var reRendered = {};
 
 var CMS = {
     watch: function(type, callback)
@@ -211,17 +177,8 @@ var CMS = {
 
     reRender: function(type, nodeId)
     {
-        //ERRDEBUG(type, nodeId)
-        // If cmsToId is NULL it means we didn't open
-        // *any* CMS content so we should ignore this
-        // update, we will get the newest version always
-        // when we need it (the first time)
-        if (!(cmsToId instanceof Object)) {
-            return;
-        }
-
-        cmsToId[type] = nodeId;
-        if (type === curType) {
+        if (type === curType && !reRendered[nodeId]) {
+            reRendered[nodeId] = true;
             curCallback(nodeId);
         }
     },
@@ -251,16 +208,26 @@ var CMS = {
 
     loaded: loaded,
 
-    img : function(id) {
+    img: function(id) {
         if (!assets[id]) {
             this.get(id, function(err, obj) {
                 $('*[data-img=loading_' + id + ']').attr({'id': '', 'src': obj.url});
+                $('*[src="' + IMAGE_PLACEHOLDER + "#" + id + '"]').attr({'id': '', 'src': obj.url});
                 assets[id] = obj.url;
             });
         }
-        return assets[id] ? assets[id] : IMAGE_PLACEHOLDER;
+        return assets[id] ? assets[id] : IMAGE_PLACEHOLDER + "#" + id;
     },
     get: function(id, next, as) {
+        if (id instanceof Array) {
+            var step = steps(id.length, next);
+            for (var i in id) {
+                if (id.hasOwnProperty(i)) {
+                    this.get(id[i], step(i), as);
+                }
+            }
+            return;
+        }
         if (typeof fetching[id] === "undefined") {
             doRequest(id);
             fetching[id] = [];

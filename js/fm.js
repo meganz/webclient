@@ -31,171 +31,6 @@ function voucherCentering(button)
     }
 }
 
-function reportQuota(chunksize)
-{
-    if (u_attr && u_attr.p) return false;
-    var quota = {}, t = Math.floor(new Date().getTime()/60000);
-    if (localStorage.q) quota = JSON.parse(localStorage.q);
-    for (var i in quota)
-    {
-        if (i < t-360) delete quota[i];
-    }
-    if (!quota[t]) quota[t]=0;
-    quota[t] += chunksize;
-    localStorage.q = JSON.stringify(quota);
-}
-
-function hasQuota(filesize, next) {
-    checkQuota(filesize, function(r) {
-        if (r.sec == 0 || r.sec == -1) {
-            bandwidthDialog(1);
-            next(true);
-        }
-        else {
-            sessionStorage.proref = 'bwlimit';
-
-            if (!$.lastlimit) {
-                $.lastlimit = 0;
-            }
-
-            // Translate bottom right text block of bandwidth dialog
-            var $bottomRightText = $('.bandwidth-dialog .bandwidth-text-bl.second');
-            var text = $bottomRightText.html().replace('[A]', '<span class="red">').replace('[/A]', '</span>');
-            text = text.replace('%1', '<strong class="bandwidth-used">' + bytesToSize(r.used) + '</strong>');
-            $bottomRightText.html(text);
-
-            var minutes = Math.ceil(r.sec / 60);
-            var minutesText = l[5838];
-            if (minutes != 1) {
-                minutesText = l[5837].replace('[X]', minutes);
-            }
-
-            // Translate header text of bandwidth dialog
-            var $header = $('.bandwidth-dialog .bandwidth-header');
-            var headerText = $header.html().replace('%1', '<span class="bandwidth-minutes">' + minutesText + '</span>');
-            $header.html(headerText);
-
-            bandwidthDialog();
-
-            if ($.lastlimit < new Date().getTime() - 60000) {
-                megaAnalytics.log("dl", "limit", { used: r.used, filesize: r.filesize, seconds: r.sec });
-            }
-
-            $.lastlimit = new Date().getTime();
-            next(false);
-        }
-    });
-}
-
-function apiQuota(callback2)
-{
-    // cache 'bq' for up to 60 seconds for each limitation
-    if (typeof $.bq !== 'undefined' && $.lastlimit > new Date().getTime()-60000) callback2($.bq);
-    else
-    {
-        api_req({a:'bq'},{callback:function(res)
-        {
-            $.bq=res;
-            callback2(res);
-        }});
-    }
-}
-
-function checkQuota(filesize,callback)
-{
-    if (u_attr && u_attr.p)
-    {
-        if (callback) callback({sec:-1});
-        return false;
-    }
-    apiQuota(function(quotabytes)
-    {
-        if (localStorage.bq) quotabytes = localStorage.bq;
-        var consumed=0,quota = {};
-        if (localStorage.q) quota = JSON.parse(localStorage.q);
-        var t = Math.floor(new Date().getTime()/60000);
-        var t2 = t-360;
-        var sec = 0,available=0, newbw=0;
-        while (t2 <= t)
-        {
-            if (quota[t2]) consumed += quota[t2];
-            t2++;
-        }
-        if (quotabytes == 0) sec=0;
-        else if (quotabytes-filesize < 0) sec=-1;
-        else if (quotabytes-consumed-filesize < 0)
-        {
-            var shortage = quotabytes-consumed-filesize;
-            var t2 = t-360;
-            while (t2 <= t)
-            {
-                if (quota[t2]) shortage += quota[t2];
-                if (shortage > 0)
-                {
-                    newbw = shortage-quotabytes-consumed-filesize;
-                    sec = (t2+360-t)*60;
-                    break;
-                }
-                t2++;
-            }
-            if (sec == 0 || sec > 21600)
-            {
-                sec = 21600;
-                newbw = quotabytes;
-            }
-        }
-        else sec=0;
-        if (callback) callback({used:consumed,sec:sec,filesize:filesize,newbw:newbw});
-
-    });
-}
-
-/**
- * Shows the bandwidth dialog
- * @param {Boolean} close If true, closes the dialog, otherwise opens it
- */
-function bandwidthDialog(close) {
-
-    var $bandwidthDialog = $('.fm-dialog.bandwidth-dialog');
-    var $backgroundOverlay = $('.fm-dialog-overlay');
-
-    // Close dialog
-    if (close) {
-        $backgroundOverlay.addClass('hidden');
-        $bandwidthDialog.addClass('hidden');
-    }
-    else {
-        // Don't show if not in filemanager or download page
-        if (!is_fm() && page !== 'download') {
-            return false;
-        }
-
-        // Send a log to the API the first time the over bandwidth quota dialog is triggered
-        if (!localStorage.seenBandwidthDialog) {
-            api_req({ a: 'log', e: 99333, m: 'bandwidthdialog' });
-            localStorage.setItem('seenBandwidthDialog', true);
-        }
-
-        // On close button click, close the dialog
-        $bandwidthDialog.find('.fm-dialog-close').rebind('click', function() {
-            $backgroundOverlay.addClass('hidden');
-            $bandwidthDialog.addClass('hidden');
-        });
-
-        // On Select button click
-        $bandwidthDialog.find('.membership-button').rebind('click', function() {
-
-            // Get the plan number and redirect to pro step 2
-            var planId = $(this).closest('.reg-st3-membership-bl').attr('data-payment');
-            document.location.hash = 'pro&planNum=' + planId;
-        });
-
-        // Show the dialog
-        $backgroundOverlay.removeClass('hidden');
-        $bandwidthDialog.removeClass('hidden');
-    }
-}
-
 function deleteScrollPanel(from, data) {
     var jsp = $(from).data(data);
     if (jsp) {
@@ -347,10 +182,10 @@ function treeDroppable()
 function cacheselect()
 {
     $.selected = [];
-    $($.selectddUIgrid + ' ' + $.selectddUIitem).each(function(i, o)
-    {
-        if ($(o).attr('class').indexOf('ui-selected') > -1)
+    $($.selectddUIgrid + ' ' + $.selectddUIitem).each(function(i, o) {
+        if ($(o).hasClass('ui-selected')) {
             $.selected.push($(o).attr('id'));
+        }
     });
 }
 
@@ -610,21 +445,10 @@ function initializeTreePanelSorting()
     });
 }
 
-/**
- *    Set the right drag icon to the transfer panel
- */
-function tpDragCursor() {
-    var h = $('.transfer-panel').height()
-    if (h >= $.transferPaneResizable.options.maxHeight) {
-        $('.transfer-drag-handle').css('cursor', 's-resize')
-    } else if (h <= $.transferPaneResizable.options.minHeight) {
-        $('.transfer-drag-handle').css('cursor', 'n-resize')
-    } else {
-        $('.transfer-drag-handle').css('cursor', 'ns-resize')
-    }
-}
-
 function initUI() {
+    if (d) {
+        console.time('initUI');
+    }
     $('.not-logged .fm-not-logged-button.create-account').rebind('click', function()
     {
         document.location.hash = 'register';
@@ -704,14 +528,17 @@ function initUI() {
                 dd = 'nw-fm-left-icon';
                 if (a == 'drop')
                 {
-                    if (c.indexOf('cloud') > -1)
+                    if (c.indexOf('cloud') > -1) {
                         t = M.RootID;
-                    else if (c.indexOf('rubbish-bin') > -1)
+                    }
+                    else if (c.indexOf('rubbish-bin') > -1) {
                         t = M.RubbishID;
+                    }
+                    else if (c.indexOf('transfers') > -1) {
+                        dd = 'download';
+                    }
                 }
             }
-            else if (c && c.indexOf('transfer-panel') > -1)
-                dd = 'download';
             else if (c && c.indexOf('nw-fm-tree-item') > -1 && !$(e.target).visible(!0))
                 dd = 'download';
             else
@@ -1017,32 +844,6 @@ function initUI() {
         folderlink = 0;
     }
 
-    if (ul_queue.length > 0) {
-        openTransferpanel();
-    }
-
-    if (u_type === 0 && !u_attr.terms) {
-        $.termsAgree = function() {
-
-            u_attr.terms = 1;
-            api_req({a: 'up', terms: 'Mq'});
-            // queued work is continued when user accept terms of service
-            $('.transfer-pause-icon').removeClass('active');
-            dlQueue.resume();
-            ulQueue.resume();
-            ui_paused = false;
-        };
-
-        $.termsDeny = function() {
-            u_logout();
-            document.location.reload();
-        };
-        termsDialog();
-    }
-
-    if (ul_queue.length > 0) {
-        openTransferpanel();
-    }
     M.avatars();
 
     if ((typeof dl_import !== 'undefined') && dl_import) {
@@ -1054,13 +855,12 @@ function initUI() {
             e.preventDefault();
     });
 
-    var fmTabState;
-
     $('.nw-fm-left-icon').rebind('contextmenu', function(ev) {
         contextMenuUI(ev,1);
         return false;
     });
 
+    var fmTabState;
     $('.nw-fm-left-icon').rebind('click', function() {
         treesearch = false;
         var clickedClass = $(this).attr('class');
@@ -1070,13 +870,16 @@ function initUI() {
         if (!fmTabState || fmTabState['cloud-drive'].root !== M.RootID) {
             fmTabState = {
                 'cloud-drive':    { root: M.RootID,    prev: null },
+                'folder-link':    { root: M.RootID,    prev: null },
                 'shared-with-me': { root: 'shares',    prev: null },
                 'conversations':  { root: 'chat',      prev: null },
                 'contacts':       { root: 'contacts',  prev: null },
+                'transfers':      { root: 'transfers', prev: null },
                 'inbox':          { root: M.InboxID,   prev: null },
                 'rubbish-bin':    { root: M.RubbishID, prev: null }
             };
         }
+
         var activeClass = (''+$('.nw-fm-left-icon.active:visible')
             .attr('class')).split(" ").filter(function(c) {
                 return !!fmTabState[c];
@@ -1109,7 +912,7 @@ function initUI() {
                     targetFolder = tab.root
                 }
 
-                M.openFolder(targetFolder);
+                M.openFolder(targetFolder, true);
 
                 break;
             }
@@ -1137,31 +940,6 @@ function initUI() {
     {
         setTimeout(browserDialog, 2000);
     }
-
-    $.transferPaneResizable = new FMResizablePane($('.transfer-panel'), {
-        'direction': 'n',
-        'minHeight': 96,
-        'maxHeight': 312,
-        'persistanceKey': 'transferPaneHeight',
-        'handle': '.transfer-drag-handle'
-    });
-
-    $($.transferPaneResizable).on('resize', function(e, resize_event, ui)
-    {
-        if ($('#fmholder.transfer-panel-opened').size() == 0)
-        {
-            $.transferOpen(undefined, true);
-            $.transferHeader();
-        }
-        tpDragCursor();
-    });
-
-    $($.transferPaneResizable).on('resizestop', function(e, resize_event, ui) {
-        if ($.transferPaneResizable.options.minHeight >= ui.size.height) {
-            $.transferOpen();
-            $.transferHeader();
-        }
-    });
 
     var lPane = $('.fm-left-panel')
     $.leftPaneResizable = new FMResizablePane(lPane, {
@@ -1192,31 +970,79 @@ function initUI() {
     });
 
     $(window).rebind('resize.fmrh hashchange.fmrh', fm_resize_handler);
-
-    if (!megaChatDisabled) {
-        megaChat.karere.rebind("onPresence.maintainUI", function(e, presenceEventData) {
-            var contact = megaChat.getContactFromJid(presenceEventData.getFromJid());
-            M.onlineStatusEvent(contact, presenceEventData.getShow());
-        });
+    if (d) {
+        console.timeEnd('initUI');
     }
 }
 
 function transferPanelContextMenu(target)
 {
+    var file;
+    var tclear;
+
     $('.context-menu.files-menu .context-menu-item').hide();
     var menuitems = $('.context-menu.files-menu .context-menu-item');
 
-    menuitems.filter('.transfer-pause,.transfer-play,.move-up,.move-down,.tranfer-clear')
+    menuitems.filter('.transfer-pause,.transfer-play,.move-up,.move-down,.transfer-clear')
         .show();
 
-    var file = GlobalProgress[$(target).attr('id')]
-    if (!file) {
+    tclear = menuitems.filter('.transfer-clear').contents().last().get(0) || {};
+    tclear.textContent = l[103];
+
+    if (target === null && (target = $('.transfer-table tr.ui-selected')).length > 1) {
+        var ids = target.attrs('id');
+        var finished = 0;
+        var paused = 0;
+        var started = false;
+
+        ids.forEach(function(id) {
+            file = GlobalProgress[id];
+            if (!file) {
+                finished++;
+            }
+            else {
+                if (file.paused) {
+                    paused++;
+                }
+                if (file.started) {
+                    started = true;
+                }
+            }
+        });
+
+        if (finished === ids.length) {
+            menuitems.hide()
+                .filter('.transfer-clear')
+                .show();
+            tclear.textContent = (l[7218] || 'Clear transfer');
+        }
+        else {
+            if (started) {
+                menuitems.filter('.move-up,.move-down').hide();
+            }
+            if (paused === ids.length) {
+                menuitems.filter('.transfer-pause').hide();
+            }
+
+            var prev = target.first().prev();
+            var next = target.last().next();
+
+            if (prev.length === 0 || prev.find('.queued').length === 0) {
+                menuitems.filter('.move-up').hide();
+            }
+            if (next.hasClass('clone-of-header')) {
+                menuitems.filter('.move-down').hide();
+            }
+        }
+    }
+    else if (!(file = GlobalProgress[$(target).attr('id')])) {
         /* no file, it is a finished operation */
         menuitems.hide()
-            .filter('.tranfer-clear')
-            .show()
-
-    } else {
+            .filter('.transfer-clear')
+            .show();
+        tclear.textContent = (l[7218] || 'Clear transfer');
+    }
+    else {
         if (file.started) {
             menuitems.filter('.move-up,.move-down').hide();
         }
@@ -1229,39 +1055,37 @@ function transferPanelContextMenu(target)
         if (target.prev().length == 0 || target.prev().find('.queued').length == 0) {
             menuitems.filter('.move-up').hide();
         }
-        if (target.next().length == 0) {
+        if (target.next().hasClass('clone-of-header')) {
             menuitems.filter('.move-down').hide();
         }
     }
 
-    menuitems.parent()
+    // XXX: Hide context-menu's menu-up/down items for now to check if that's the
+    // origin of some problems, users can still use the new d&d logic to move transfers
+    menuitems.filter('.move-up,.move-down').hide();
+
+    var parent = menuitems.parent();
+    parent
         .children('.context-menu-divider').hide().end()
         .children('.pause-item-divider').show().end()
+
+    if (parent.height() < 56) {
+        parent.find('.pause-item-divider').hide();
+    }
 }
 
 function openTransferpanel()
 {
-    $.transferOpen(1);
-    if (M.currentdirid == 'notifications')
-        notifyPopup.initNotificationsScrolling();
-    else if (M.viewmode)
-        initFileblocksScrolling();
-    else
-        initGridScrolling();
-    if (!uldl_hold)
+    $('.nw-fm-left-icon.transfers').addClass('transfering');
+    // Start the new transfer right away even if the queue is paused?
+    // XXX: Remove fm_tfspause calls at M.addDownload/addUpload to enable this
+    /*if (uldl_hold) {
+        uldl_hold = false;
+        dlQueue.resume();
         ulQueue.resume();
-    else// make sure that terms of service are accepted before any action
-    {
-        $('.transfer-pause-icon').addClass('active');
-        dlQueue.pause();
-        ulQueue.pause();
-        ui_paused = true;
-
-//        $('.transfer-table tr td:eq(4), .transfer-table tr td:eq(6)').each(function()
-//        {
-//            $(this).text('');
-//        });
-    }
+        $('.transfer-pause-icon').removeClass('active').find('span').text(l[6993]);
+        $('.nw-fm-left-icon.transfers').removeClass('paused');
+    }*/
     initTreeScroll();
     $(window).trigger('resize');
 
@@ -1269,18 +1093,223 @@ function openTransferpanel()
         $('.transfer-clear-all-icon').removeClass('hidden');
     }
 
-    $('.tranfer-table .grid-url-arrow').unbind('click')
-    $('.tranfer-table .grid-url-arrow').bind('click', function(e) {
-        var target = $(this).closest('tr');
-        e.preventDefault();
-        e.stopPropagation(); // do not treat it as a regular click on the file
-        e.currentTarget = target;
-        transferPanelContextMenu(target);
-        target.parent().find('tr').removeClass('ui-selected');
-        target.addClass('ui-selected');
-        contextMenuUI(e);
-    });
+    if (!$.mSortableT) {
+        $.mSortableT = $('.transfer-table tbody');
+        $.mSortableT.sortable({
+            delay: 200,
+            revert: 100,
+            start: function(ev, ui) {
+                $('body').addClass('dndc-sort');
+            },
+            helper: function(ev, tr) {
+                if (!tr.hasClass('ui-selected')) {
+                    tr.addClass('ui-selected');
+                }
+                this.order = fm_tfsorderupd();
+                var $selected = tr.parent().children('.ui-selected').clone();
+                tr.data('multidrag', $selected).siblings('.ui-selected').hide();
+                var $helper = $('<tr/>');
+                return $helper.append($selected);
+            },
+            stop: function(ev, ui) {
+                var cancel = false;
+                $('body').removeClass('dndc-sort');
 
+                var $selected = ui.item.data('multidrag');
+                ui.item.after($selected).remove();
+                $('.transfer-table tr.ui-selected:not(:visible)').remove();
+                $.transferHeader(); // rebind cloned trs
+
+                // var $tr = $(ui.item[0]);
+                // var id = String($tr.attr('id'));
+                // var $next = $tr.next();
+
+                /*if ($selected.hasClass('started')) {
+                    cancel = true;
+                }
+                else {
+                    var $prev = $tr.prev();
+                    var pid = $prev.attr('id');
+                    var nid = $next.attr('id');
+
+                    cancel = ((id[0] === 'u' && nid && nid[0] !== 'u')
+                            || (id[0] !== 'u' && pid && pid[0] === 'u'));
+                }*/
+                if (cancel) {
+                    $.mSortableT.sortable('cancel');
+                }
+                else {
+                    var order = fm_tfsorderupd();
+
+                    if (JSON.stringify(order) !== JSON.stringify(this.order)) {
+                        var mDL = {
+                            pos: 0,
+                            etmp: [],
+                            oQueue: [],
+                            pQueue: {},
+                            mQueue: dlQueue,
+                            m_queue: dl_queue,
+                            prop: 'dl'
+                        };
+                        var mUL = {
+                            pos: 0,
+                            etmp: [],
+                            oQueue: [],
+                            pQueue: {},
+                            mQueue: ulQueue,
+                            m_queue: ul_queue,
+                            prop: 'ul'
+                        };
+                        var id;
+                        var dst;
+                        var i = 0;
+                        var len = Object.keys(order).length / 2;
+
+                        [dl_queue, ul_queue].forEach(function(queue) {
+                            var t_queue = queue.filter(isQueueActive);
+                            if (t_queue.length !== queue.length) {
+                                var m = t_queue.length;
+                                var i = 0;
+                                while (i < m) {
+                                    (queue[i] = t_queue[i]).pos = i;
+                                    ++i;
+                                }
+                                queue.length = i;
+                                while (queue[i]) {
+                                    delete queue[i++];
+                                }
+                            }
+                        });
+
+                        while (len > i) {
+                            id = M.t[i++];
+
+                            dst = (id[0] === 'u' ? mUL : mDL);
+                            var mQ = dst.mQueue.slurp(id);
+                            // for (var x in mQ) {
+                                // if (mQ.hasOwnProperty(x)) {
+                                    // var entry = mQ[x][0][dst.prop];
+                                    // if (dst.etmp.indexOf(entry) === -1) {
+                                        // (dst.m_queue[dst.pos] = entry).pos = dst.pos;
+                                        // dst.etmp.push(entry);
+                                        // dst.pos++;
+                                    // }
+                                // }
+                            // }
+                            dst.oQueue = dst.oQueue.concat(mQ);
+
+                            if (dst.mQueue._qpaused.hasOwnProperty(id)) {
+                                dst.pQueue[id] = dst.mQueue._qpaused[id];
+                            }
+                        }
+
+                        dlQueue._queue = mDL.oQueue;
+                        ulQueue._queue = mUL.oQueue;
+                        dlQueue._qpaused = mDL.pQueue;
+                        ulQueue._qpaused = mUL.pQueue;
+
+                        // Check for transfers moved before any started one
+                        var $prev = $('.transfer-table tr .progress-block')
+                            .closest('tr')
+                            .first()
+                            .prevAll()
+                            .not('.paused');
+                        // XXX: we rely on the speed field being non-numeric
+                        if ($prev.length && !$prev.find('.speed').text().replace(/\D/g, '')) {
+                            var ids = $('.transfer-table tr:not(.paused)').attrs('id');
+                            ids.forEach(fm_tfspause);
+                            if (dlQueue._queue.length || ulQueue._queue.length) {
+                                dlmanager.logger.error('The move operation should have cleared the queues.');
+                            }
+                            ids.forEach(fm_tfsresume);
+                            i = 0;
+                            mDL.pQueue = {};
+                            mUL.pQueue = {};
+                            while (len > i) {
+                                id = M.t[i++];
+                                dst = (id[0] === 'u' ? mUL : mDL);
+                                if (dst.mQueue._qpaused.hasOwnProperty(id)) {
+                                    dst.pQueue[id] = dst.mQueue._qpaused[id];
+                                }
+                            }
+                            dlQueue._qpaused = mDL.pQueue;
+                            ulQueue._qpaused = mUL.pQueue;
+                        }
+                    }
+                }
+
+                $('.transfer-table tr.ui-selected').removeClass('ui-selected');
+            }
+        });
+    }
+}
+
+function showTransferToast(t_type, t_length) {
+    if (!$('.fmholder').hasClass('transfer-panel-opened')) {
+        var $toast,
+            $second_toast,
+            interval,
+            nt_txt;
+
+        if (t_type != 'u') {
+            interval = dl_interval;
+            $toast = $('.toast-notification.download');
+            $second_toast = $('.toast-notification.upload');
+            if (t_length > 1) {
+                nt_txt = l[7220].replace('XX',t_length);
+            } else {
+                nt_txt = l[7222];
+            }
+        } else {
+            interval = ul_interval;
+            $toast = $('.toast-notification.upload');
+            $second_toast = $('.toast-notification.download');
+            if (t_length > 1) {
+                nt_txt = l[7221].replace('XX',t_length);
+            } else {
+                nt_txt = l[7223];
+            }
+        }
+
+        $toast.find('.toast-transfer-col:first-child').html(nt_txt);
+
+        if ($second_toast.hasClass('visible')) {
+            $second_toast.addClass('second');
+        }
+
+        clearInterval(interval);
+        $toast.removeClass('second').addClass('visible');
+        interval = setInterval(function() {
+            hideTransferToast($toast,interval);
+        }, 5000);
+
+        $('.toast-transfer-button').rebind('click', function(e)
+        {
+            $('.toast-notification').removeClass('visible second');
+            if (!$('.slideshow-dialog').hasClass('hidden')) {
+                $('.slideshow-dialog').addClass('hidden');
+                $('.slideshow-overlay').addClass('hidden');
+            }
+            // M.openFolder('transfers', true);
+            $('.nw-fm-left-icon.transfers').click();
+        });
+        $toast.rebind('mouseover', function(e)
+        {
+            clearInterval(interval);
+        });
+        $toast.rebind('mouseout', function(e)
+        {
+            interval = setInterval(function() {
+                hideTransferToast($toast,interval);
+            }, 5000);
+        });
+    }
+}
+
+function hideTransferToast ($toast,int) {
+    $toast.removeClass('visible');
+    $('.toast-notification').removeClass('second');
+    clearInterval(int);
 }
 
 function searchFM()
@@ -1422,7 +1451,7 @@ function sharedUInode(nodeHandle) {
 
     if ((M.d[nodeHandle] && M.d[nodeHandle].shares) || M.ps[nodeHandle]) {
 
-        oShares = M.d[nodeHandle].shares;
+        oShares = M.d[nodeHandle] && M.d[nodeHandle].shares;
 
         if (oShares) {
             iShareNum = Object.keys(oShares).length;
@@ -1451,6 +1480,9 @@ function sharedUInode(nodeHandle) {
         }
     }
 
+    // @TODO PERF: In case of a lot of file nodes, the following 2 jQuery selectors will consume a lot of CPU/time. Please
+    // Please find a way to optimise this via the actionpackets system, M.nodeShare and M.delNodeShare to only execute
+    // this query in case it is needed.
     $('.grid-table.fm #' + nodeHandle + ' .transfer-filtype-icon').addClass(fileIcon({t: 1, share: bAvailShares}));
     $('#' + nodeHandle + '.file-block .block-view-file-type').addClass(fileIcon({t: 1, share: bAvailShares}));
 
@@ -1465,79 +1497,6 @@ function sharedUInode(nodeHandle) {
         $('#' + nodeHandle + '.file-block').removeClass('linked');
         $('#treea_' + nodeHandle).removeClass('linked');
     }
-}
-
-function addShareNotification(notification) {
-
-    if (notifyPopup.notifications == null) {
-        return false;
-    }
-
-    var timestamp = Math.round(new Date().getTime() / 1000);
-    var updated = false;
-
-    if (notification.t == 'put') {
-        for (i in notifyPopup.notifications) {
-            if (notifyPopup.notifications[i].folderid == notification.n && notifyPopup.notifications[i].user == notification.u && notifyPopup.notifications[i].timestamp > timestamp - 120 && notifyPopup.notifications[i].type !== 'share' && !updated) {
-
-                notifyPopup.notifications[i].timestamp = timestamp;
-                notifyPopup.notifications[i].read = false;
-                notifyPopup.notifications[i].count = false;
-
-                if (!notifyPopup.notifications[i].nodes) {
-                    notifyPopup.notifications[i].nodes = [];
-                }
-
-                for (var i in notification.f) {
-                    notifyPopup.notifications[i].nodes.push(notification.f[i]);
-                }
-
-                updated = true;
-            }
-        }
-    }
-
-    if (!updated) {
-        notifyPopup.notifications.push({
-            id: makeid(10),
-            type: notification.t,
-            timestamp: timestamp,
-            user: notification.u,
-            folderid: notification.n,
-            nodes: notification.f,
-            read: false,
-            popup: false,
-            count: false,
-            rendered: false
-        });
-    }
-
-    notifyPopup.doNotify();
-}
-
-function addNotification(actionPacket) {
-
-    if (notifyPopup.notifications === null) {
-        return false;
-    }
-
-    var timestamp = Math.round(new Date().getTime() / 1000);
-
-    notifyPopup.notifications.push({
-        id: makeid(10),
-        type: actionPacket.a,
-        timestamp: timestamp,
-        user: false,
-        folderid: false,
-        nodes: false,
-        read: false,
-        popup: false,
-        count: false,
-        rendered: false,
-        notificationObj: actionPacket
-    });
-
-    notifyPopup.doNotify();
 }
 
 function getContactsEMails() {
@@ -2098,15 +2057,19 @@ function fmremove() {
         foldercnt = 0,
         contactcnt = 0,
         removesharecnt = 0;
+
     for (var i in $.selected) {
         var n = M.d[$.selected[i]];
         if (n && n.p.length === 11) {
             removesharecnt++;
-        } else if ($.selected[i].length === 11) {
+        }
+        else if (String($.selected[i]).length === 11) {
             contactcnt++;
-        } else if (M.d[$.selected[i]].t) {
+        }
+        else if (n && n.t) {
             foldercnt++;
-        } else {
+        }
+        else {
             filecnt++;
         }
     }
@@ -2174,11 +2137,60 @@ function fmremove() {
         }
     } else {
         if (localStorage.skipDelWarning) {
-            M.moveNodes($.selected, M.RubbishID);
+            if (M.currentrootid === 'shares') {
+                M.copyNodes($.selected, M.RubbishID, true);
+            }
+            else {
+                M.moveNodes($.selected, M.RubbishID);
+            }
         } else {
-            msgDialog('remove', l[1003], l[1004].replace('[X]', fm_contains(filecnt, foldercnt)), false, function(e) {
+            
+            var nodes = new mega.Nodes({}),
+                // Additional message in case that there's a shared node
+                delShareInfo,
+                // Contains complete directory structure of selected nodes, their ids
+                dirTree = [];
+            
+            for (var item in $.selected) {
+                if ($.selected.hasOwnProperty(item)) {
+                    dirTree = $.merge(dirTree, nodes.loopSubdirs($.selected[item], null));
+                }
+            }
+            
+            delShareInfo = nodes.isShareExist(dirTree) ? ' ' + l[1952] + ' ' + l[7410] : '';
+            
+            msgDialog('remove', l[1003], l[1004].replace('[X]', fm_contains(filecnt, foldercnt)) + delShareInfo, false, function(e) {
                 if (e) {
-                    M.moveNodes($.selected, M.RubbishID);
+                    if (M.currentrootid === 'shares') {
+                        M.copyNodes($.selected, M.RubbishID, true);
+                    }
+                    else {
+   
+                        // Remove all shares related to selected nodes
+                        for (var selection in dirTree) {
+                            if (dirTree.hasOwnProperty(selection)) {
+                                
+                                // Remove regular/full share
+                                for (var share in M.d[dirTree[selection]].shares) {
+                                    if (M.d[dirTree[selection]].shares.hasOwnProperty(share)) {
+                                        api_req({a: 's2', n:  dirTree[selection], s: [{ u: M.d[dirTree[selection]].shares[share].u, r: ''}], ha: '', i: requesti});
+                                        M.delNodeShare(dirTree[selection], M.d[dirTree[selection]].shares[share].u);
+                                        setLastInteractionWith(dirTree[selection], "0:" + unixtime());
+                                    }
+                                }
+                                
+                                // Remove pending share
+                                for (var pendingUserId in M.ps[dirTree[selection]]) {
+                                    if (M.ps[dirTree[selection]].hasOwnProperty(pendingUserId)) {
+                                        api_req({a: 's2', n:  dirTree[selection], s: [{ u: pendingUserId, r: ''}], ha: '', i: requesti});
+                                        M.deletePendingShare(dirTree[selection], pendingUserId);
+                                    }
+                                }
+                            }
+                        }
+                        M.moveNodes($.selected, M.RubbishID);
+                    }
+                    
                 }
             }, true);
         }
@@ -2527,55 +2539,59 @@ function initContextUI() {
     });
 
     $(c + '.move-up').rebind('click', function() {
-        $('.transfer-table tr.ui-selected').not('.clone-of-header').each(function(j, el) {
-            fm_tfsmove($(this).attr('id'), -1);
-        });
-        Soon(fmUpdateCount);
+        $('.transfer-table tr.ui-selected')
+            .attrs('id')
+            .map(function(id) {
+                fm_tfsmove(id, -1);
+            });
+        $('.transfer-table tr.ui-selected').removeClass('ui-selected');
+        Soon(fm_tfsupdate);
     });
 
     $(c + '.move-down').rebind('click', function() {
-        $('.transfer-table tr.ui-selected').not('.clone-of-header').each(function(j, el) {
-            fm_tfsmove($(this).attr('id'), +1);
-        });
-        Soon(fmUpdateCount);
+        $('.transfer-table tr.ui-selected')
+            .attrs('id')
+            .reverse()
+            .map(function(id) {
+                fm_tfsmove(id, 1);
+            });
+        $('.transfer-table tr.ui-selected').removeClass('ui-selected');
+        Soon(fm_tfsupdate);
     });
 
     $(c + '.transfer-play').rebind('click', function() {
-        $('.transfer-table tr.ui-selected').not('.clone-of-header').each(function(j, el) {
-            var id = $(this).attr('id');
-            fm_tfsresume(id);
-            $('span.transfer-type', this).removeClass('paused');
-        });
+        $('.transfer-table tr.ui-selected').attrs('id').map(fm_tfsresume);
+        $('.transfer-table tr.ui-selected').removeClass('ui-selected');
+        if (uldl_hold) {
+            dlQueue.resume();
+            ulQueue.resume();
+            uldl_hold = false;
+        }
     });
 
     $(c + '.transfer-pause').rebind('click', function() {
-        $('.transfer-table tr.ui-selected').not('.clone-of-header').each(function(j, el) {
-            var id = $(this).attr('id');
-            fm_tfspause(id);
-            $('span.transfer-type', this).addClass('paused');
-        });
-        $('.tranfer-download-indicator,.transfer-upload-indicator').removeClass('active');
+        $('.transfer-table tr.ui-selected').attrs('id').map(fm_tfspause);
+        $('.transfer-table tr.ui-selected').removeClass('ui-selected');
     });
 
     $(c + '.select-all').rebind('click', function() {
         selectionManager.select_all();
     });
 
-    $(c + '.canceltransfer-item,' + c + '.tranfer-clear').rebind('click', function() {
-        var toabort = {};
-        $('.transfer-table tr.ui-selected').not('.clone-of-header').each(function(j, el) {
-            toabort[$(el).attr('id')] = 1;
-            $(this).remove();
-        });
-
-        toabort = Object.keys(toabort);
-        DownloadManager.abort(toabort);
-        UploadManager.abort(toabort);
+    $(c + '.canceltransfer-item,' + c + '.transfer-clear').rebind('click', function() {
+        var $trs = $('.transfer-table tr.ui-selected');
+        var toabort = $trs.attrs('id');
+        $trs.remove();
+        dlmanager.abort(toabort);
+        ulmanager.abort(toabort);
+        $.clearTransferPanel();
+        fm_tfsupdate();
 
         Soon(function() {
             // XXX: better way to stretch the scrollbar?
             $(window).trigger('resize');
         });
+        $('.transfer-table tr.ui-selected').removeClass('ui-selected');
     });
 
     $(document).trigger('onInitContextUI');
@@ -2825,11 +2841,8 @@ function notificationsUI(close)
         $('.fm-main.default').removeClass('hidden');
         return false;
     }
-    notifyPopup.notifyMarkCount(true);
-    notifyPopup.doNotify();
     $('.fm-main.notifications').removeClass('hidden');
     $('.notifications .nw-fm-left-icon').removeClass('active');
-    notifyPopup.initNotificationsScrolling();
     $('.fm-main.default').addClass('hidden');
     $(window).trigger('resize');
 }
@@ -2841,7 +2854,11 @@ function accountUI()
     $('.fm-account-sections').addClass('hidden');
     $('.fm-right-files-block').addClass('hidden');
     $('.fm-right-account-block').removeClass('hidden');
+    $('.nw-fm-left-icon').removeClass('active');
     $('.nw-fm-left-icon.settings').addClass('active');
+    if ($('.fmholder').hasClass('transfer-panel-opened')) {
+        $.transferClose();
+    }
     M.accountData(function(account)
     {
         var perc, warning, perc_c;
@@ -3126,6 +3143,8 @@ function accountUI()
             var recent = l[483];
             if (!el[5])
                 recent = time2date(el[0]);
+            if (!country.icon || country.icon === '??.gif')
+                country.icon = 'ud.gif';
             html += '<tr><td><span class="fm-browsers-icon"><img alt="" src="' + staticpath + 'images/browser/' + browser.icon + '" /></span><span class="fm-browsers-txt">' + htmlentities(browser.name) + '</span></td><td>' + htmlentities(el[3]) + '</td><td><span class="fm-flags-icon"><img alt="" src="' + staticpath + 'images/flags/' + country.icon + '" style="margin-left: 0px;" /></span><span class="fm-flags-txt">' + htmlentities(country.name) + '</span></td><td>' + htmlentities(recent) + '</td></tr>';
         });
         $('.grid-table.sessions').html(html);
@@ -3388,7 +3407,10 @@ function accountUI()
             if (typeof M.account.rubsched !== 'undefined') {
                 storefmconfig('rubsched', M.account.rubsched);
             }
-
+            if (typeof M.account.font_size !== 'undefined') {
+                localStorage.font_size = M.account.font_size;
+                font_size = M.account.font_size;
+            }
             if ($('#account-password').val() == '' && ($('#account-new-password').val() !== '' || $('#account-confirm-password').val() !== ''))
             {
                 msgDialog('warninga', l[135], l[719], false, function()
@@ -3525,6 +3547,10 @@ function accountUI()
             $('#ulspeedvalue').val(Math.floor(ul_maxSpeed / 1024));
         $('#rad' + i + '_div').removeClass('radioOff').addClass('radioOn');
         $('#rad' + i).removeClass('radioOff').addClass('radioOn');
+        if (localStorage.font_size) {
+            $('.uifontsize input').removeClass('radioOn').addClass('radioOff').parent().removeClass('radioOn').addClass('radioOff');
+            $('#fontsize' + localStorage.font_size).removeClass('radioOff').addClass('radioOn').parent().removeClass('radioOff').addClass('radioOn');
+        }
         $('.ulspeedradio input').unbind('click');
         $('.ulspeedradio input').bind('click', function(e)
         {
@@ -3543,6 +3569,17 @@ function accountUI()
             $('.ulspeedradio').removeClass('radioOn').addClass('radioOff');
             $(this).addClass('radioOn').removeClass('radioOff');
             $(this).parent().addClass('radioOn').removeClass('radioOff');
+            $('.fm-account-save-block').removeClass('hidden');
+            $('.fm-account-main').addClass('save');
+            initAccountScroll();
+        });
+        $('.uifontsize input').unbind('click');
+        $('.uifontsize input').bind('click', function(e)
+        {
+            $('body').removeClass('fontsize1 fontsize2').addClass('fontsize' + $(this).val());
+            $('.uifontsize input').removeClass('radioOn').addClass('radioOff').parent().removeClass('radioOn').addClass('radioOff');
+            $(this).removeClass('radioOff').addClass('radioOn').parent().removeClass('radioOff').addClass('radioOn');
+            M.account.font_size = $(this).val();
             $('.fm-account-save-block').removeClass('hidden');
             $('.fm-account-main').addClass('save');
             initAccountScroll();
@@ -3905,14 +3942,14 @@ function accountUI()
         document.location.hash = 'fm/account/profile';
     });
 
+    // Cancel account button on main Account page
     $('.cancel-account').rebind('click', function() {
-        DEBUG('Cancel your account');
 
         // Ask for confirmation
-        msgDialog('confirmation', l[6181], l[1974], false, function(e) {
-            if (e) {
+        msgDialog('confirmation', l[6181], l[1974], false, function(event) {
+            if (event) {
                 loadingDialog.show();
-                api_req({a: 'erm', m: M.u[u_handle].m, t: 21}, {
+                api_req({ a: 'erm', m: M.u[u_handle].m, t: 21 }, {
                     callback: function(res) {
                         loadingDialog.hide();
                         if (res === ENOENT) {
@@ -3928,6 +3965,11 @@ function accountUI()
                 });
             }
         });
+    });
+    
+    // Button on main Account page to backup their master key
+    $('.backup-master-key').rebind('click', function() {
+        document.location.hash = 'backup';
     });
 
     $('.fm-account-button').unbind('click');
@@ -4378,7 +4420,7 @@ var FMShortcuts = function() {
             return false; // stop prop.
         } else if (charCode == 8) {
             var $items = selectionManager.get_selected();
-            if ($items.size() == 0 || (RightsbyID(M.currentdirid || '') | 0) < 1 || M.currentrootid === 'shares') {
+            if ($items.size() == 0 || (RightsbyID(M.currentdirid || '') | 0) < 1) {
                 return; // dont do anything.
             }
 
@@ -4665,6 +4707,7 @@ var SelectionManager = function($selectable) {
         $(window).trigger('dynlist.flush');
         var $selectable_containers = $(
             [
+                ".fm-transfers-block",
                 ".fm-blocks-view.fm",
                 ".fm-blocks-view.contacts-view",
                 ".files-grid-view.fm",
@@ -4680,7 +4723,8 @@ var SelectionManager = function($selectable) {
                 ".file-block",
                 "tr.ui-draggable",
                 "tr.ui-selectee",
-                ".contact-block-view.ui-draggable"
+                ".contact-block-view.ui-draggable",
+                ".transfer-table tr:not(.clone-of-header)"
             ].join(","),
             $selectable_containers
             ).filter(":visible");
@@ -4777,7 +4821,7 @@ function UIkeyevents()
             s = $('.file-block.ui-selected');
         else
             s = $('.grid-table tr.ui-selected');
-        var selPanel = $('.transfer-panel tr.ui-selected').not('.clone-of-header')
+        var selPanel = $('.fm-transfers-block tr.ui-selected').not('.clone-of-header');
 
         if (M.chat)
             return true;
@@ -4895,8 +4939,7 @@ function UIkeyevents()
                 quickFinder.disable_if_active();
             }
         }
-        else if (e.keyCode === 46 && s.length > 0 && !$.dialog
-            && RightsbyID(M.currentdirid) > 1 && M.currentrootid !== 'shares')
+        else if (e.keyCode == 46 && s.length > 0 && !$.dialog && RightsbyID(M.currentdirid) > 1)
         {
             $.selected = [];
             s.each(function(i, e)
@@ -4905,8 +4948,7 @@ function UIkeyevents()
             });
             fmremove();
         }
-        else if (e.keyCode === 46 && selPanel.length > 0 && !$.dialog
-            && RightsbyID(M.currentdirid) > 1 && M.currentrootid !== 'shares')
+        else if (e.keyCode == 46 && selPanel.length > 0 && !$.dialog && RightsbyID(M.currentdirid) > 1)
         {
             var selected = [];
             selPanel.each(function() {
@@ -4917,7 +4959,7 @@ function UIkeyevents()
                 // we should encapsule the click handler
                 // to call a function rather than use this hacking
                 if (e)
-                    $('.tranfer-clear').trigger('click');
+                    $('.transfer-clear').trigger('click');
             });
         }
         else if (e.keyCode == 13 && s.length > 0 && !$.dialog && !$.msgDialog && $('.fm-new-folder').attr('class').indexOf('active') == -1 && $('.top-search-bl').attr('class').indexOf('active') == -1)
@@ -5396,18 +5438,11 @@ function transferPanelUI()
     $.transferHeader = function()
     {
         fm_resize_handler();
-        var el = $('.transfer-table-header th');
-        // Get first item in transfer queue, and loop through each column
-        $('.transfer-table tr:nth-child(2) td').each(function(i, e)
-        {
-            var headerColumn = $(el).get(i);
-            $(headerColumn).width($(e).width());
-        });
 
         var tth = $('.transfer-table-header');
-        var toHide = (dl_queue.length || ul_queue.length);
+
         // Show/Hide header if there is no items in transfer list
-        if (!toHide)
+        if (!$('.transfer-table tr').not('.clone-of-header').length > 0)
         {
             $('.transfer-panel-empty-txt').removeClass('hidden');
             tth.hide(0);
@@ -5418,21 +5453,76 @@ function transferPanelUI()
             tth.show(0);
         }
 
-        $('.transfer-table tr').unbind('click contextmenu');
-        $('.transfer-table tr').bind('click contextmenu', function(e)
+        $('.transfer-scrolling-table').rebind('click contextmenu', function(e)
+        {
+            if (!$(e.target).closest('.transfer-table').length) {
+                $('.transfer-table tr').removeClass('ui-selected');
+            }
+        });
+
+        $('.tranfer-table .grid-url-arrow, .tranfer-table .clear-transfer-icon').rebind('click', function(e) {
+            var target = $(this).closest('tr');
+            e.preventDefault();
+            e.stopPropagation(); // do not treat it as a regular click on the file
+            $('.tranfer-table tr').removeClass('ui-selected');
+
+            if ($(this).hasClass('grid-url-arrow')) {
+                target.addClass('ui-selected');
+                e.currentTarget = target;
+                transferPanelContextMenu(target);
+                contextMenuUI(e);
+            }
+            else {
+                if (!target.find('.transfer-status.completed').length) {
+                    var toabort = target.attr('id');
+                    dlmanager.abort(toabort);
+                    ulmanager.abort(toabort);
+                }
+                target.fadeOut(function() {
+                    $(this).remove();
+                    $.clearTransferPanel();
+                    fm_tfsupdate();
+                    Soon(function() {
+                        $(window).trigger('resize');
+                    });
+                });
+            }
+        });
+
+        $('.transfer-table tr').rebind('dblclick', function(e) {
+            if ($(this).find('.transfer-status.completed').length) {
+                var id = String($(this).attr('id'));
+                if (id[0] === 'd') {
+                    id = id.split('_').pop();
+                }
+                else if (id[0] === 'u') {
+                    id = String(ulmanager.ulIDToNode[id]);
+                }
+                var path = M.getPath(id);
+                if (path.length > 1) {
+                    M.openFolder(path[1], true);
+                    if (!$('#' + id).length) {
+                        $(window).trigger('dynlist.flush');
+                    }
+                    $.selected = [id];
+                    reselect(1);
+                }
+            }
+        });
+
+        $('.transfer-table tr').rebind('click contextmenu', function(e)
         {
             $('.ui-selected').filter(function() {
-                return $(this).parents('.transfer-table').length == 0;
+                return $(this).parent('.transfer-table').length;
             }).removeClass('ui-selected');
 
             if (e.type == 'contextmenu')
             {
-                transferPanelContextMenu($(this));
                 var c = $(this).attr('class');
                 if (!c || (c && c.indexOf('ui-selected') == -1))
                     $('.transfer-table tr').removeClass('ui-selected');
-                $(this).addClass('ui-selected');
-                $(this).addClass('dragover');
+                $(this).addClass('ui-selected dragover');
+                transferPanelContextMenu(null);
                 return !!contextMenuUI(e);
             }
             else
@@ -5442,26 +5532,23 @@ function transferPanelUI()
                 {
                     var start = s[0];
                     var end = this;
-                    if ($.TgridLastSelected && $($.TgridLastSelected).attr('class').indexOf('ui-selected') > -1)
+                    if ($.TgridLastSelected && $($.TgridLastSelected).hasClass('ui-selected')) {
                         start = $.TgridLastSelected;
-                    if ($(start).index() > $(end).index())
-                    {
+                    }
+                    if ($(start).index() > $(end).index()) {
                         end = start;
                         start = this;
                     }
                     $('.transfer-table tr').removeClass('ui-selected');
                     $([start, end]).addClass('ui-selected');
-                    $(start).nextUntil($(end)).each(function(i, e)
-                    {
+                    $(start).nextUntil($(end)).each(function(i, e) {
                         $(e).addClass('ui-selected');
                     });
                 }
-                else if (e.metaKey == false)
+                else if (!e.ctrlKey && !e.metaKey)
                 {
-                    var had = $(this).hasClass('ui-selected');
                     $('.transfer-table tr').removeClass('ui-selected');
-                    if (!had)
-                        $(this).addClass('ui-selected');
+                    $(this).addClass('ui-selected');
                     $.TgridLastSelected = this;
                 }
                 else
@@ -5478,160 +5565,126 @@ function transferPanelUI()
         });
         initTransferScroll();
     }
-    $(window).unbind('resize.transferpanel');
-    $(window).bind('resize.transferpanel', function(e)
-    {
+
+    $(window).rebind('resize.transferpanel', function(e) {
         $.transferHeader();
     });
 
-    $(window).unbind('resize.slideshow');
-    $(window).bind('resize.slideshow', function(e)
-    {
-        if (slideshowid && previews[slideshowid])
+    $(window).rebind('resize.slideshow', function(e) {
+        if (slideshowid && previews[slideshowid]) {
             previewsrc(previews[slideshowid].src);
-    });
-
-    $('.tranfer-view-icon,.file-transfer-icon').unbind('click');
-    $('.tranfer-view-icon,.file-transfer-icon').bind('click', function(e)
-    {
-        $.transferOpen();
+        }
     });
 
     $.transferClose = function() {
-
-        var panel = $('.transfer-panel');
-        $('.transfer-drag-handle').css('cursor', 'n-resize');
-
-        panel.animate({'height': $('.transfer-panel-title').height()}, {
-            complete: function() {
-                $('.tranfer-view-icon').removeClass('active');
-                $('#fmholder').removeClass('transfer-panel-opened');
-                $(window).trigger('resize');
-            },
-            progress: fm_resize_handler
-        });
+        $('.nw-fm-left-icon.transfers').removeClass('active');
+        $('.fmholder').removeClass('transfer-panel-opened');
+        setTimeout(function() {
+            $(window).trigger('resize');
+        }, 200);
     };
 
-    $.transferOpen = function(force, dont_animate)
-    {
-        if ($('.tranfer-view-icon').attr('class').indexOf('active') == -1 || force)
-        {
-            $('.tranfer-view-icon').addClass('active');
+    $.transferOpen = function(force) {
+        if (force || !$('.nw-fm-left-icon.transfers').hasClass('active')) {
+            $('.nw-fm-left-icon').removeClass('active');
+            $('.nw-fm-left-icon.transfers').addClass('active');
+            notificationsUI(1);
             $('#fmholder').addClass('transfer-panel-opened');
-
-            // Initialise the functionality within the transfers pane
             $.transferHeader();
-
-            // If the user has previously resized the transfer panel
-            var height = 192;
-            if (localStorage.transferPaneHeight && $.transferPaneResizable) {
-
-                // Load the previously configured panel height
-                height = Math.max($.transferPaneResizable.options.minHeight, localStorage.transferPaneHeight);
-            }
-
-            var panel = $('.transfer-panel');
-
-            if (dont_animate) {
-                panel.css({'height': height});
-                return fm_resize_handler();
-            }
-
-            panel.animate({'height': height}, {
-                complete: function() {
-                    tpDragCursor();
-                    $.transferHeader();
-                    $(window).trigger('resize');
-                },
-                progress: fm_resize_handler
-            });
-        }
-        else {
-            // Close the File Transfers Pane
-            $.transferClose();
-        }
-
-        initTreeScroll();
-
-        if (M.currentdirid === 'notifications') {
-            notifyPopup.initNotificationsScrolling();
-        }
-        else if (M.currentdirid && M.currentdirid.substr(0, 7) === 'account') {
-            initAccountScroll();
-        }
-        else if (M.viewmode == 1) {
-            initFileblocksScrolling();
-        }
-        else {
-            initGridScrolling();
         }
     };
 
-    $('.nw-fm-left-icon.settings .settings-icon').unbind('click');
-    $('.nw-fm-left-icon.settings .settings-icon').bind('click', function()
-    {
-        if (u_type === 0)
+    $.clearTransferPanel = function() {
+        if ($('.transfer-table tr').length === 1) {
+            $('.transfer-clear-all-icon').addClass('disabled');
+            $('.transfer-pause-icon').addClass('disabled');
+            $('.transfer-clear-completed').addClass('disabled');
+            $('.transfer-table-header').hide();
+            $('.transfer-panel-empty-txt').removeClass('hidden');
+            $('.transfer-panel-title').html(l[104]);
+            $('.nw-fm-left-icon.transfers').removeClass('transfering').find('p').removeAttr('style');
+        }
+    };
+
+    $('.nw-fm-left-icon.settings .settings-icon').rebind('click', function() {
+        if (u_type === 0) {
             ephemeralDialog('Transfer settings are for registered users only.');
+        }
         else {
             $('.nw-fm-left-icon').removeClass('active');
+            $('.nw-fm-left-icon.settings').addClass('active');
             document.location.hash = 'fm/account/settings';
         }
     });
-    $('.transfer-clear-all-icon').unbind('click');
-    $('.transfer-clear-all-icon').bind('click', function() {
-        msgDialog('confirmation', 'cancel all transfers', 'Are you sure you want to cancel all transfers?', '', function(e) {
-            if (!e)
-                return;
+    $('.transfer-clear-all-icon').rebind('click', function() {
+        if (!$(this).hasClass('disabled')) {
+            msgDialog('confirmation', 'clear all transfers', l[7225], '', function(e) {
+                if (!e) {
+                    return;
+                }
 
-            DownloadManager.abort(null);
-            UploadManager.abort(null);
+                dlmanager.abort(null);
+                ulmanager.abort(null);
 
-            $('.transfer-table tr').not('.clone-of-header').fadeOut(function() {
-                $(this).remove();
+                $('.transfer-table tr').not('.clone-of-header').fadeOut(function() {
+                    $(this).remove();
+                    $.clearTransferPanel();
+                });
+
+                Soon(function() {
+                    $(window).trigger('resize');
+                });
             });
-        });
+        }
     });
 
-    $('.transfer-pause-icon').unbind('click');
-    $('.transfer-pause-icon').bind('click', function()
-    {
-        if ($(this).attr('class').indexOf('active') > -1)
-        {
-            // terms of service
-            if (u_type || u_attr.terms)
-            {
-                $(this).removeClass('active');
-                dlQueue.resume();
-                ulQueue.resume();
-                ui_paused = false;
-                uldl_hold = false;
-            } else
-            {
-                alert(l[214]);
-                DEBUG(l[214]);
-            }
-
-            $('.tranfer-download-indicator,.tranfer-upload-indicator')
-                .removeClass('active');
-            $('.transfer-panel tr span.transfer-type').removeClass('paused');
-        }
-        else
-        {
-            $(this).addClass('active');
-            dlQueue.pause();
-            ulQueue.pause();
-            ui_paused = true;
-            uldl_hold = true;
-
-            $('.transfer-panel tr span.transfer-type').addClass('paused');
-
-            $('.tranfer-download-indicator,.tranfer-upload-indicator')
-                .text('PAUSED');
-
-            $('.transfer-table tr td:eq(3)').each(function()
-            {
-                $(this).text('');
+    $('.transfer-clear-completed').rebind('click', function() {
+        if (!$(this).hasClass('disabled')) {
+            $('.transfer-table tr .transfer-status.completed').closest('tr').fadeOut(function() {
+                $(this).remove();
+                $.clearTransferPanel();
+                fm_tfsupdate();
+                Soon(function() {
+                    $(window).trigger('resize');
+                });
             });
+        }
+    });
+
+    $('.transfer-pause-icon').rebind('click', function()
+    {
+        if (!$(this).hasClass('disabled')) {
+            if ($(this).hasClass('active')) {
+                // terms of service
+                if (u_type || u_attr.terms) {
+                    [dlQueue, ulQueue].forEach(function(queue) {
+                        Object.keys(queue._qpaused).map(fm_tfsresume);
+                    });
+                    uldl_hold = false;
+                    ulQueue.resume();
+                    dlQueue.resume();
+
+                    $(this).removeClass('active').find('span').text(l[6993]);
+                    $('.fm-transfers-block tr span.transfer-type').removeClass('paused');
+                    $('.nw-fm-left-icon').removeClass('paused');
+                }
+                else {
+                    alert(l[214]);
+                    DEBUG(l[214]);
+                }
+            }
+            else {
+                $('.transfer-table tr[id] .progress-block, .transfer-table tr[id] .transfer-status:not(.completed)')
+                    .closest('tr').attrs('id')
+                    .concat(Object.keys(M.tfsdomqueue)).map(fm_tfspause);
+                dlQueue.pause();
+                ulQueue.pause();
+                uldl_hold = true;
+
+                $(this).addClass('active').find('span').text(l[7101]);
+                $('.transfer-table tr span.transfer-type').not('.done').addClass('paused');
+                $('.nw-fm-left-icon').addClass('paused');
+            }
         }
     });
 }
@@ -5683,7 +5736,7 @@ function menuItems() {
     if (selItem && selItem.p.length === 11) {
         items['removeshare'] = 1;
     }
-    else if (RightsbyID($.selected[0]) > 1 && M.currentrootid !== 'shares') {
+    else if (RightsbyID($.selected[0]) > 1) {
         items['remove'] = 1;
     }
 
@@ -6178,7 +6231,6 @@ function treeUI()
         '.fm-tree-panel .nw-fm-tree-item,' +
         ' .rubbish-bin,' +
         ' .fm-breadcrumbs,' +
-        ' .transfer-panel,' +
         ' .nw-fm-left-icons-panel .nw-fm-left-icon,' +
         ' .shared-with-me tr,' +
         ' .nw-conversations-item,' +
@@ -6202,7 +6254,7 @@ function treeUI()
     // disabling right click, default contextmenu.
     $(document).unbind('contextmenu');
     $(document).bind('contextmenu', function(e) {
-        if($(e.target).parents('.fm-chat-block').length > 0) {
+        if($(e.target).parents('.fm-chat-block').length > 0 || $(e.target).parents('.export-link-item').length) {
             return;
         } else if (!localStorage.contextmenu) {
             $.hideContextMenu();
@@ -6317,14 +6369,14 @@ function sectionUIopen(id) {
     if (folderlink) {
         if (!isValidShareLink()) {
             $('.fm-breadcrumbs.folder-link .right-arrow-bg').text('Invalid folder');
-        } else if (id === 'cloud-drive') {
+        } else if (id === 'cloud-drive' || id === 'transfers') {
             $('.fm-main').addClass('active-folder-link');
             $('.fm-right-header').addClass('folder-link');
             $('.nw-fm-left-icon.folder-link').addClass('active');
             $('.fm-left-menu').addClass('folder-link');
             $('.nw-fm-tree-header.folder-link').show();
             $('.fm-import-to-cloudrive, .fm-download-as-zip').removeClass('hidden');
-            $('.fm-import-to-cloudrive, .fm-download-as-zip').bind('click', function() {
+            $('.fm-import-to-cloudrive, .fm-download-as-zip').rebind('click', function() {
                 var c = '' + $(this).attr('class');
 
                 if (~c.indexOf('fm-import-to-cloudrive')) {
@@ -6391,6 +6443,18 @@ function sectionUIopen(id) {
         $('.shared-grid-view').addClass('hidden');
     }
 
+    if (id !== 'transfers') {
+        if ($.transferClose) {
+            $.transferClose();
+        }
+    }
+    else {
+        if (!$.transferOpen) {
+            transferPanelUI();
+        }
+        $.transferOpen(true);
+    }
+
     var headertxt = '';
     switch (id) {
         case 'contacts':
@@ -6428,7 +6492,9 @@ function sectionUIopen(id) {
 }
 
 function treeUIopen(id, event, ignoreScroll, dragOver, DragOpen) {
-    var id_s = id.split('/')[0], id_r = RootbyId(id);
+    id = String(id);
+    var id_r = RootbyId(id);
+    var id_s = id.split('/')[0];
     var e, scrollTo = false, stickToTop = false;
 
     //console.error("treeUIopen", id);
@@ -6447,8 +6513,11 @@ function treeUIopen(id, event, ignoreScroll, dragOver, DragOpen) {
         sectionUIopen('ipc');
     } else if (id_r === 'opc') {
         sectionUIopen('opc');
-    } else if (id_r === M.RubbishID) {
+    } else if (M.RubbishID && id_r === M.RubbishID) {
         sectionUIopen('rubbish-bin');
+    }
+    else if (id_s === 'transfers') {
+        sectionUIopen('transfers');
     }
 
     if (!fminitialized) {
@@ -6614,9 +6683,12 @@ function dorename()
     {
         var h = $.selected[0];
         var n = M.d[h];
-        var nn = $('.rename-dialog input').val();
-        if (nn !== n.name)
-            M.rename(h, nn);
+        if (n) {
+            var nn = $('.rename-dialog input').val();
+            if (nn !== n.name) {
+                M.rename(h, nn);
+            }
+        }
         $.dialog = false;
         $('.rename-dialog').addClass('hidden');
         fm_hideoverlay();
@@ -8204,10 +8276,10 @@ function getclipboardlinks()
             if (n.t) F = 'F';
             if (i > 0) link += '\n';
 
-            // Add the link to the file e.g. https://mega.co.nz/#!qRN33YbK
+            // Add the link to the file e.g. https://mega.nz/#!qRN33YbK
             link += getBaseUrl() + '/#' + F + '!' + htmlentities(n.ph);
 
-            // If they want the file key as well, add it e.g. https://mega.co.nz/#!qRN33YbK!o4Z76qDqP...
+            // If they want the file key as well, add it e.g. https://mega.nz/#!qRN33YbK!o4Z76qDqP...
             if (key && $('#export-checkbox').is(':checked')) {
                 link += '!' + a32_to_base64(key);
             }
@@ -8464,20 +8536,21 @@ function linksDialog(close) {
         resizeContainer: false,
         resizeHandle: false,
         onChange: function(elem, data) {
+            var selclass;
+
             if (data) {
                 $(elem).closest('.on_off').removeClass('off').addClass('on');
-
-                // Show link with key
-                var fileLinkWithKey = $('.file-link-with-key').text();
-                $('.export-link-url').val(fileLinkWithKey);
+                selclass = '.file-link-with-key';
             }
             else {
                 $(elem).closest('.on_off').removeClass('on').addClass('off');
-
-                // Show link without key
-                var fileLinkWithoutKey = $('.file-link-without-key').text();
-                $('.export-link-url').val(fileLinkWithoutKey);
+                selclass = '.file-link-without-key';
             }
+            $('.export-link-url').each(function(idx, elm) {
+                elm = $(elm);
+                var parent = elm.closest('.export-link-text-pad');
+                elm.val($(selclass, parent).text());
+            });
             window.getLinkState = !!data;
         }
     });
@@ -8644,6 +8717,48 @@ function chromeDialog(close)
         }
     });
 }
+
+/**
+ * Open a dialog asking the user to download MEGAsync for files over 1GB
+ */
+function megaSyncDialog() {
+
+    // Cache selector
+    var $dialog = $('.fm-dialog.download-megasync-dialog');
+
+    // Show the dialog and overlay
+    $dialog.removeClass('hidden');
+    fm_showoverlay();
+
+    // Add close button handler
+    $dialog.find('.fm-dialog-close, .close-button').rebind('click', function() {
+        $dialog.addClass('hidden');
+        fm_hideoverlay();
+    });
+
+    // Add checkbox handling
+    $dialog.find('#megasync-checkbox').rebind('click', function() {
+
+        var $this = $(this);
+
+        // If it has not been checked, check it
+        if (!$this.hasClass('checkboxOn')) {
+
+            // Store a flag so that it won't show this dialog again if triggered
+            localStorage.megaSyncDialog = 1;
+            $this.attr('class', 'checkboxOn');
+            $this.parent().attr('class', 'checkboxOn');
+            $this.attr('checked', true);
+        }
+        else {
+            // Otherwise uncheck it
+            delete localStorage.megaSyncDialog;
+            $this.attr('class', 'checkboxOff');
+            $this.parent().attr('class', 'checkboxOff');
+            $this.attr('checked', false);
+        }
+    });
+};
 
 function firefoxDialog(close)
 {
@@ -8905,7 +9020,7 @@ function propertiesDialog(close)
                 for (var u in n.shares) {
                     if (M.u[u]) {
                         var u = M.u[u]
-                        var onlinestatus = M.onlineStatusClass(megaChat.isReady && megaChat.karere.getPresence(megaChat.getJidFromNodeId(u.u)));
+                        var onlinestatus = M.onlineStatusClass(megaChatIsReady && megaChat.karere.getPresence(megaChat.getJidFromNodeId(u.u)));
                         if (++total <= 5)
                             susers.append('<div class="properties-context-item ' + onlinestatus[1] + '">'
                                 + '<div class="properties-contact-status"></div>'
@@ -9243,7 +9358,7 @@ function slideshow(id, close)
             {
                 if (dl_queue[i].preview)
                 {
-                    DownloadManager.abort(dl_queue[i]);
+                    dlmanager.abort(dl_queue[i]);
                 }
                 break;
             }
@@ -9500,6 +9615,7 @@ function fm_thumbnails()
                 console.log('Requesting %d thumbs (%d loaded)', a, fa_reqcnt);
 
             var rt = Date.now();
+            var cdid = M.currentdirid;
             api_getfileattr(treq, 0, function(ctx, node, uint8arr)
             {
                 if (uint8arr === 0xDEAD)
@@ -9522,7 +9638,7 @@ function fm_thumbnails()
                     blob = new Blob([uint8arr.buffer]);
                 // thumbnailblobs[node] = blob;
                 thumbnails[node] = myURL.createObjectURL(blob);
-                if (M.d[node] && M.d[node].seen)
+                if (M.d[node] && M.d[node].seen && M.currentdirid === cdid)
                     fm_thumbnail_render(M.d[node]);
 
                 // deduplicate in view when there is a duplicate fa:
@@ -9533,7 +9649,7 @@ function fm_thumbnails()
                         if (M.v[i].h !== node && M.v[i].fa == M.d[node].fa && !thumbnails[M.v[i].h])
                         {
                             thumbnails[M.v[i].h] = thumbnails[node];
-                            if (M.v[i].seen)
+                            if (M.v[i].seen && M.currentdirid === cdid)
                                 fm_thumbnail_render(M.v[i]);
                         }
                     }
@@ -9630,9 +9746,9 @@ function savecomplete(id)
     fm_hideoverlay();
     if (!$.dialog)
         $('#dlswf_' + id).remove();
-    var dl = IdToFile(id);
+    var dl = dlmanager.idToFile(id);
     M.dlcomplete(dl);
-    DownloadManager.cleanupUI(dl, true);
+    dlmanager.cleanupUI(dl, true);
 }
 
 /**
@@ -9645,10 +9761,8 @@ function savecomplete(id)
 function fm_resize_handler() {
     // transfer panel resize logic
     var right_pane_height = (
-        $('#fmholder').outerHeight() - (
-        $('#topmenu').outerHeight() + $('.transfer-panel').outerHeight()
-        )
-        );
+            $('#fmholder').outerHeight() - $('#topmenu').outerHeight()
+    );
 
     $('.fm-main.default, .fm-main.notifications').css({
         'height': right_pane_height + "px"
@@ -9656,10 +9770,10 @@ function fm_resize_handler() {
 
     $('.transfer-scrolling-table').css({
         'height': (
-            $('.transfer-panel').outerHeight() - (
-            $('.transfer-panel-title').outerHeight() + $('.transfer-table-header').outerHeight()
-            )
-            ) + "px"
+             $('.fm-transfers-block').outerHeight()
+                - $('.transfer-table-header').outerHeight()
+                - $('.fm-tranfers-header').outerHeight()
+        ) + "px"
     });
 
     // left panel resize logic
@@ -9692,7 +9806,7 @@ function fm_resize_handler() {
             initContactsGridScrolling();
     }
 
-    if (megaChat.isReady && megaChat.resized) {
+    if (megaChatIsReady && megaChat.resized) {
         megaChat.resized();
     }
 
@@ -9714,15 +9828,6 @@ function fm_resize_handler() {
             'height': shared_block_height + "px",
             'min-height': shared_block_height + "px"
         });
-
-    // account page tweak, required since the transfer panel resize logic was introduced
-    var $account_save_block = $('.fm-account-save-block');
-    if ($('.transfer-panel').size() > 0) {
-        $account_save_block.css({
-            'top': $('.transfer-panel').position().top - $account_save_block.outerHeight(),
-            'bottom': ''
-        });
-    }
 
 }
 
@@ -9892,7 +9997,6 @@ function fingerprintDialog(userid)
             'margin-left': '-' + $this.width() / 2 + 'px'
         });
     fm_showoverlay();
-
 }
 
 function contactUI() {
@@ -9906,7 +10010,11 @@ function contactUI() {
         var user = M.d[u_h];
         var avatar = $(useravatar.contact(u_h));
 
-        var onlinestatus = M.onlineStatusClass(megaChat.isReady && megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h)));
+        var onlinestatus = M.onlineStatusClass(
+            megaChatIsReady &&
+            megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h))
+        );
+
         $('.contact-top-details .nw-contact-block-avatar').empty().append( avatar.removeClass('avatar') )
         $('.contact-top-details .onlinestatus').removeClass('away offline online busy');
         $('.contact-top-details .onlinestatus').addClass(onlinestatus[1]);
@@ -9991,7 +10099,7 @@ function contactUI() {
             showAuthenticityCredentials();
         });
 
-        if (!megaChatDisabled) {
+        if (!megaChatIsDisabled) {
             if (onlinestatus[1] !== "offline" && u_h !== u_handle) {
                 // user is online, lets display the "Start chat" button
 

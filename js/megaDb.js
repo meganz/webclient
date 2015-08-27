@@ -24,7 +24,7 @@ function MegaDB(name, suffix, schema, options) {
     options = options || {};
     this.options = $.extend({}, clone(MegaDB.DEFAULT_OPTIONS), options);
 
-    this.logger = new MegaLogger("megaDB[" + name + "]", {}, options.parentLogger);
+    this.logger = MegaLogger.getLogger("megaDB[" + name + "]", {}, options.parentLogger);
 
     var self = this;
     var dbName = 'mdb_' + name + '_' + suffix;
@@ -689,7 +689,7 @@ MegaDB.prototype.close = function() {
     self.server.close();
 
 
-    self.logger.info("Closing db: ", self);
+    self.logger.info("Closing db: ", self.dbName);
 
     self.dbState = MegaDB.DB_STATE.CLOSED;
 

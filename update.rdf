@@ -3,7 +3,7 @@
          xmlns:NC="http://home.netscape.com/NC-rdf#"
          xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
   <RDF:Description RDF:about="rdf:#$IIU611"
-                   NS1:version="2.0.219">
+                   NS1:version="1.0.0">
     <NS1:targetApplication RDF:resource="rdf:#$LIU611"/>
   </RDF:Description>
   <RDF:Seq RDF:about="rdf:#$HIU611">
@@ -17,6 +17,6 @@
                    NS1:id="{ec8030f7-c20a-464f-9b0e-13a3a9e97384}"
                    NS1:minVersion="4.0"
                    NS1:maxVersion="30.*"
-                   NS1:updateLink="http://eu.static.mega.co.nz/mega.xpi"
+                   NS1:updateLink="http://eu.static.mega.co.nz/3/meganz.xpi"
                    NS1:updateHash="sha256:71eaa92682323abc74daa4f8cd15f82852a5033415c1a32fd5a7cdf2b3c35d62" />
 </RDF:RDF>

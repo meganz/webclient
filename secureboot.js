@@ -205,7 +205,7 @@ if (!b_u && is_extension)
                 var url = mObjectURL([""]);
                 myURL.revokeObjectURL(url);
             }
-            catch(e) {
+            catch (e) {
                 console.error('mObjectURL failed, is this TOR?', e);
                 document.location = bootstaticpath + urlrootfile + location.hash;
             }

@@ -3524,6 +3524,7 @@ function MegaData()
     {
         delete $.dlhash;
         var path;
+        var added = 0;
         var nodes = [];
         var paths = {};
         var zipsize = 0;
@@ -3602,50 +3603,73 @@ function MegaData()
             }
             path = paths[nodes[k]] || '';
             $.totalDL += n.s;
-            var li = $('.transfer-table #' + 'dl_'+htmlentities(n.h));
-            if (!li.length) {
-                dl_queue.push({
-                    id: n.h,
-                    key: n.key,
-                    n: n.name,
-                    t: n.ts,
-                    p: path,
-                    size: n.s,
-                    onDownloadProgress: this.dlprogress,
-                    onDownloadComplete: this.dlcomplete,
-                    onBeforeDownloadComplete: this.dlbeforecomplete,
-                    onDownloadError: this.dlerror,
-                    onDownloadStart: this.dlstart,
-                    zipid: z,
-                    zipname: zipname,
-                    preview: preview
-                });
-                zipsize += n.s;
-
-                var flashhtml = '';
-                if (dlMethod == FlashIO) {
-                    flashhtml = '<object width="1" height="1" id="dlswf_' + htmlentities(n.h) + '" type="application/x-shockwave-flash"><param name=FlashVars value="buttonclick=1" /><param name="movie" value="' + document.location.origin + '/downloader.swf"/><param value="always" name="allowscriptaccess"><param name="wmode" value="transparent"><param value="all" name="allowNetworking"></object>';
+            var tr = $('.transfer-table #dl_' + htmlentities(n.h));
+            if (tr.length) {
+                if (!tr.hasClass('completed')) {
+                    continue;
                 }
-
-                if (!z) {
-                    this.addToTransferTable('dl_' + n.h, ttl,
-                        '<tr id="dl_' + htmlentities(n.h) + '">'
-                        + '<td><span class="transfer-type download ' + p + '">' + l[373] + '<span class="speed">' + pauseTxt + '</span></span>' + flashhtml + '</td>'
-                        + '<td><span class="transfer-filtype-icon ' + fileIcon(n) + '"></span><span class="tranfer-filetype-txt">' + htmlentities(n.name) + '</span></td>'
-                        + '<td></td>'
-                        + '<td>' + bytesToSize(n.s) + '</td>'
-                        + '<td>' + filetype(n.name) + '</td>'
-                        + '<td><span class="transfer-status queued">Queued</span></td>'
-                        + '<td class="grid-url-field"><a class="grid-url-arrow"><span></span></a><a class="clear-transfer-icon"><span></span></a></td>'
-                        + '<td><span class="row-number"></span></td>'
-                        + '</tr>');
-
-                    if (uldl_hold) {
-                        fm_tfspause('dl_' + n.h);
-                    }
-                    ttl.left--;
-                }
+                tr.remove();
             }
+            dl_queue.push({
+                id: n.h,
+                key: n.key,
+                n: n.name,
+                t: n.ts,
+                p: path,
+                size: n.s,
+                onDownloadProgress: this.dlprogress,
+                onDownloadComplete: this.dlcomplete,
+                onBeforeDownloadComplete: this.dlbeforecomplete,
+                onDownloadError: this.dlerror,
+                onDownloadStart: this.dlstart,
+                zipid: z,
+                zipname: zipname,
+                preview: preview
+            });
+            added++;
+            zipsize += n.s;
+
+            var flashhtml = '';
+            if (dlMethod === FlashIO) {
+                flashhtml = '<object width="1" height="1" id="dlswf_'
+                    + htmlentities(n.h)
+                    + '" type="application/x-shockwave-flash">'
+                    + '<param name=FlashVars value="buttonclick=1" />'
+                    + '<param name="movie" value="' + location.origin + '/downloader.swf"/>'
+                    + '<param value="always" name="allowscriptaccess"/>'
+                    + '<param name="wmode" value="transparent"/>'
+                    + '<param value="all" name="allowNetworking">'
+                    + '</object>';
+            }
+
+            if (!z) {
+                this.addToTransferTable('dl_' + n.h, ttl,
+                    '<tr id="dl_' + htmlentities(n.h) + '">'
+                    + '<td><span class="transfer-type download ' + p + '">' + l[373]
+                    + '<span class="speed">' + pauseTxt + '</span></span>' + flashhtml + '</td>'
+                    + '<td><span class="transfer-filtype-icon ' + fileIcon(n)
+                    + '"></span><span class="tranfer-filetype-txt">' + htmlentities(n.name) + '</span></td>'
+                    + '<td></td>'
+                    + '<td>' + bytesToSize(n.s) + '</td>'
+                    + '<td>' + filetype(n.name) + '</td>'
+                    + '<td><span class="transfer-status queued">Queued</span></td>'
+                    + '<td class="grid-url-field"><a class="grid-url-arrow"><span></span></a>'
+                    + '<a class="clear-transfer-icon"><span></span></a></td>'
+                    + '<td><span class="row-number"></span></td>'
+                    + '</tr>');
+
+                if (uldl_hold) {
+                    fm_tfspause('dl_' + n.h);
+                }
+                ttl.left--;
+            }
+        }
+
+        if (!added) {
+            if (d) {
+                dlmanager.logger.warn('Nothing to download.');
+            }
+            return;
         }
 
         if (dlMethod == MemoryIO && ~ua.indexOf(') gecko') && !localStorage.firefoxDialog && $.totalDL > 104857600) {
@@ -3653,7 +3677,7 @@ function MegaData()
         }
 
         var flashhtml = '';
-        if (dlMethod == FlashIO) {
+        if (dlMethod === FlashIO) {
             flashhtml = '<object width="1" height="1" id="dlswf_zip_' + htmlentities(z) + '" type="application/x-shockwave-flash"><param name=FlashVars value="buttonclick=1" /><param name="movie" value="' + document.location.origin + '/downloader.swf"/><param value="always" name="allowscriptaccess"><param name="wmode" value="transparent"><param value="all" name="allowNetworking"></object>';
         }
 
@@ -3685,7 +3709,7 @@ function MegaData()
         if (!preview)
         {
             if (!z || zipsize) {
-                showTransferToast('d', z ? 1 : nodes.length);
+                showTransferToast('d', z ? 1 : added);
             }
             openTransferpanel();
             initGridScrolling();

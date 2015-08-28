@@ -1582,6 +1582,7 @@
     "5914": "Perbualan saya",
     "5915": "Kongsian masuk saya",
     "5916": "Folder saya",
+    "5918": "Kelihatan seperti ada emel cacat!",
     "5921": "Menaik",
     "5922": "Menurun",
     "5923": "Atas Talian",
@@ -2359,5 +2360,7 @@
     "7405": "One or more of your items were deleted by another user.",
     "7410": "Any shared files or folders will no longer be accessible to other users.",
     "7411": "Source Code",
-    "7412": "Backup master key"
+    "7412": "Backup master key",
+    "7413": "You already have a contact with that email",
+    "7414": "There's no need to add your own email address"
 }

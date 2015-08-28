@@ -1582,6 +1582,7 @@
     "5914": "\u041c\u043e\u0438\u0442\u0435 \u0440\u0430\u0437\u0433\u043e\u0432\u043e\u0440\u0438",
     "5915": "\u041c\u043e\u0438\u0442\u0435 \u0432\u0445\u043e\u0434\u044f\u0449\u0438 \u0441\u043f\u043e\u0434\u0435\u043b\u044f\u043d\u0438\u044f",
     "5916": "\u041c\u043e\u0438\u0442\u0435 \u043f\u0430\u043f\u043a\u0438",
+    "5918": "\u0418\u0437\u0433\u043b\u0435\u0436\u0434\u0430, \u0447\u0435 \u0438\u043c\u0435\u0439\u043b\u044a\u0442 \u0435 \u043d\u0435\u043f\u0440\u0430\u0432\u0438\u043b\u0435\u043d!",
     "5921": "\u0412\u044a\u0437\u0445\u043e\u0434\u044f\u0449\u043e",
     "5922": "\u041d\u0438\u0437\u0445\u043e\u0434\u044f\u0449\u043e",
     "5923": "\u041d\u0430 \u043b\u0438\u043d\u0438\u044f",
@@ -2359,5 +2360,7 @@
     "7405": "One or more of your items were deleted by another user.",
     "7410": "Any shared files or folders will no longer be accessible to other users.",
     "7411": "Source Code",
-    "7412": "Backup master key"
+    "7412": "Backup master key",
+    "7413": "You already have a contact with that email",
+    "7414": "There's no need to add your own email address"
 }

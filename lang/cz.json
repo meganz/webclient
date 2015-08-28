@@ -1582,6 +1582,7 @@
     "5914": "M\u00e9 konverzace",
     "5915": "M\u00e1 p\u0159\u00edchoz\u00ed sd\u00edlen\u00ed",
     "5916": "M\u00e9 slo\u017eky",
+    "5918": "Vypad\u00e1 to na po\u0161kozen\u00fd e-mail!",
     "5921": "Vzestupn\u011b",
     "5922": "Sestupn\u011b",
     "5923": "Online",
@@ -2359,5 +2360,7 @@
     "7405": "Jedna nebo v\u00edce va\u0161ich polo\u017eek byly odstran\u011bny jin\u00fdm u\u017eivatelem.",
     "7410": "Jak\u00e9koliv sd\u00edlen\u00e9 soubory nebo slo\u017eky ji\u017e nebudou dostupn\u00e9 ostatn\u00edm u\u017eivatel\u016fm.",
     "7411": "Zdrojov\u00fd k\u00f3d",
-    "7412": "Z\u00e1lohovat hlavn\u00ed kl\u00ed\u010d"
+    "7412": "Z\u00e1lohovat hlavn\u00ed kl\u00ed\u010d",
+    "7413": "You already have a contact with that email",
+    "7414": "There's no need to add your own email address"
 }

@@ -1582,6 +1582,7 @@
     "5914": "Ma c'haozeadenno\u00f9",
     "5915": "Ma rannadurio\u00f9 o tont e-barzh",
     "5916": "Ma zeuliado\u00f9",
+    "5918": "war a seblant eo un e-mailh droukstummet!",
     "5921": "War grec'h",
     "5922": "O tiskenn",
     "5923": "Enlinet",
@@ -2359,5 +2360,7 @@
     "7405": "One or more of your items were deleted by another user.",
     "7410": "Any shared files or folders will no longer be accessible to other users.",
     "7411": "Source Code",
-    "7412": "Backup master key"
+    "7412": "Backup master key",
+    "7413": "You already have a contact with that email",
+    "7414": "There's no need to add your own email address"
 }

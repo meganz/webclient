@@ -1582,6 +1582,7 @@
     "5914": "Besz\u00e9lget\u00e9seim",
     "5915": "Bej\u00f6v\u0151 megoszt\u00e1saim",
     "5916": "Mapp\u00e1im",
+    "5918": "\u00dagy n\u00e9z ki van egy rosszul megform\u00e1zott e-mail!",
     "5921": "N\u00f6vekv\u0151",
     "5922": "Cs\u00f6kken\u0151",
     "5923": "Online",
@@ -2359,5 +2360,7 @@
     "7405": "Egy m\u00e1sik felhaszn\u00e1l\u00f3 t\u00f6r\u00f6lte egy vagy t\u00f6bb elem\u00e9t.",
     "7410": "A megosztott k\u00f6nyvt\u00e1rak vagy f\u00e1jlok nem lesznek t\u00f6bbet el\u00e9rhet\u0151ek a t\u00f6bbi felhaszn\u00e1l\u00f3 sz\u00e1m\u00e1ra.",
     "7411": "Forr\u00e1s K\u00f3d",
-    "7412": "F\u0151 kulcs biztons\u00e1gi ment\u00e9s"
+    "7412": "F\u0151 kulcs biztons\u00e1gi ment\u00e9s",
+    "7413": "You already have a contact with that email",
+    "7414": "There's no need to add your own email address"
 }

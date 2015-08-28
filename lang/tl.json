@@ -1582,6 +1582,7 @@
     "5914": "Aking mga pag-uusap",
     "5915": "Mga padating kong shares",
     "5916": "Aking folders",
+    "5918": "Naku merong kang malformed email!",
     "5921": "Pataas",
     "5922": "Pababa",
     "5923": "Online",
@@ -2359,5 +2360,7 @@
     "7405": "Ang isa o higit pang item(s) ay binura ng ibang user.",
     "7410": "Any shared files or folders will no longer be accessible to other users.",
     "7411": "Source Code",
-    "7412": "Backup master key"
+    "7412": "Backup master key",
+    "7413": "You already have a contact with that email",
+    "7414": "There's no need to add your own email address"
 }

@@ -1582,6 +1582,7 @@
     "5914": "Mano pokalbiai",
     "5915": "Mano \u012feinantys bendrinimai",
     "5916": "Mano aplankai",
+    "5918": "Pan\u0161u, jog elektroninis lai\u0161kas buvo neteisingai suformoluotas!",
     "5921": "Did\u0117jimo tvarka",
     "5922": "Ma\u017e\u0117jimo tvarka",
     "5923": "Prisijung\u0119s",
@@ -2359,5 +2360,7 @@
     "7405": "One or more of your items were deleted by another user.",
     "7410": "Any shared files or folders will no longer be accessible to other users.",
     "7411": "Source Code",
-    "7412": "Backup master key"
+    "7412": "Backup master key",
+    "7413": "You already have a contact with that email",
+    "7414": "There's no need to add your own email address"
 }

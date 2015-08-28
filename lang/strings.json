@@ -6331,6 +6331,10 @@
         "text": "My folders",
         "context": ""
     },
+    "5918": {
+        "text": "Looks like there's a malformed email!",
+        "context": ""
+    },
     "5921": {
         "text": "Ascending",
         "context": ""
@@ -7520,7 +7524,7 @@
         "context": ""
     },
     "6841": {
-        "text": "We re sorry to see you go",
+        "text": "We're sorry to see you go",
         "context": ""
     },
     "6842": {
@@ -7536,11 +7540,11 @@
         "context": ""
     },
     "6845": {
-        "text": "I don t use my account anymore",
+        "text": "I don't use my account anymore",
         "context": ""
     },
     "6846": {
-        "text": "My favourite browser is not technologically compatible and I don t want to change",
+        "text": "My favourite browser is not technologically compatible and I don't want to change",
         "context": ""
     },
     "6847": {
@@ -9442,5 +9446,13 @@
     "7412": {
         "text": "Backup master key",
         "context": "The is a button on the Account page which takes a user to the #backup page where they can backup\/save their master encryption key."
+    },
+    "7413": {
+        "text": "You already have a contact with that email",
+        "context": "Add contacts and share dialog error message when user try to add already existing email address."
+    },
+    "7414": {
+        "text": "There's no need to add your own email address",
+        "context": "Add contacts and share dialog error message when user try to add  your email address"
     }
 }

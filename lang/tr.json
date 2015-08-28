@@ -1582,6 +1582,7 @@
     "5914": "Konu\u015fmalar\u0131m",
     "5915": "Benimle payla\u015f\u0131nlar",
     "5916": "Klas\u00f6rlerim",
+    "5918": "E-posta adresi format\u0131 hatal\u0131 gibi g\u00f6r\u00fcn\u00fcyor!",
     "5921": "Artan",
     "5922": "Azalan",
     "5923": "\u00c7evrim i\u00e7i",
@@ -2357,7 +2358,9 @@
     "7403": "Y\u00fcklemeye ba\u015flamak i\u00e7in dosyalar\u0131n\u0131z\u0131 buraya b\u0131rak\u0131n",
     "7404": "Bir veya daha fazla \u00f6\u011fe silindi.",
     "7405": "Bir ya da daha fazla \u00f6\u011feniz ba\u015fka bir kullan\u0131c\u0131 taraf\u0131ndan silindi.",
-    "7410": "Any shared files or folders will no longer be accessible to other users.",
-    "7411": "Source Code",
-    "7412": "Backup master key"
+    "7410": "Payla\u015f\u0131lan dosya ve klas\u00f6rler art\u0131k di\u011fer kullan\u0131c\u0131lar taraf\u0131ndan eri\u015filemeyecek.",
+    "7411": "Kaynak Kodu",
+    "7412": "Ana anahtar\u0131 yedekle",
+    "7413": "You already have a contact with that email",
+    "7414": "There's no need to add your own email address"
 }

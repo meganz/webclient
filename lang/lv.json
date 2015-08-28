@@ -1582,6 +1582,7 @@
     "5914": "Manas sarunas",
     "5915": "Mani ien\u0101ko\u0161ie koplieto\u0161anas piepras\u012bjumi",
     "5916": "Manas mapes",
+    "5918": "Izskat\u0101s, ka ir nepareiza e-pasta adrese!",
     "5921": "Augo\u0161\u0101",
     "5922": "Dilsto\u0161\u0101",
     "5923": "Piesl\u0113dzies",
@@ -2359,5 +2360,7 @@
     "7405": "One or more of your items were deleted by another user.",
     "7410": "Any shared files or folders will no longer be accessible to other users.",
     "7411": "Source Code",
-    "7412": "Backup master key"
+    "7412": "Backup master key",
+    "7413": "You already have a contact with that email",
+    "7414": "There's no need to add your own email address"
 }

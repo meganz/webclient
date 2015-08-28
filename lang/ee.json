@@ -1582,6 +1582,7 @@
     "5914": "Minu vestlused",
     "5915": "Minu sissetulevad jagamised",
     "5916": "Minu kaustad",
+    "5918": "Tundub, et see e-mail on ebaturvaline!",
     "5921": "Suurenev",
     "5922": "V\u00e4henev",
     "5923": "Saadaval",
@@ -2359,5 +2360,7 @@
     "7405": "Kasutaja kustutas \u00fche v\u00f5i mitu faili\/kausta.",
     "7410": "Any shared files or folders will no longer be accessible to other users.",
     "7411": "Source Code",
-    "7412": "Backup master key"
+    "7412": "Backup master key",
+    "7413": "You already have a contact with that email",
+    "7414": "There's no need to add your own email address"
 }

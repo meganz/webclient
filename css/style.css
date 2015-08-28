@@ -22748,7 +22748,8 @@ a.top-login-forgot-pass {
 	height: 100%;
 	width: 100%;
 	left: 0;
-	top: 0;
+	top: 0 !important;
+	margin: 0 !important;
 	z-index: 1200;
 	border: 0;
 	background-color: rgba(34,34,34,0.95);

@@ -32,7 +32,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
             'roomJid': null,
             'type': null,
             'messages': [],
-            'messagesIndex': [],
+            'messagesIndex': {},
             'ctime': 0,
             'lastActivity': 0,
             'callRequest': null,
@@ -47,7 +47,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
     this.users = users ? users : [];
     this.roomJid = roomJid;
     this.type = type;
-    this.messages = [];
+    this.messages = new MegaDataArray(this);
     this.messagesIndex = {};
     this.ctime = ctime;
     this.lastActivity = lastActivity ? lastActivity : ctime;
@@ -141,21 +141,21 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
                         var pres = self.megaChat.karere.getPresence(contact);
 
                         if (pres && pres != "offline" && self.encryptionHandler && self.encryptionHandler.state !== 3) {
-                            var $dialog = self.generateInlineDialog(
-                                "error-" + unixtime(),
-                                self.megaChat.karere.getBareJid(),
-                                "mpenc-setup-failed",
-                                "Could not initialise the encryption in a timely manner. To try again, you can close and start the chat again.",
-                                [],
-                                undefined,
-                                false
-                            );
-
-                            self._mpencFailedDialog = $dialog;
-
-                            self.appendDomMessage(
-                                $dialog
-                            );
+                            //var $dialog = self.generateInlineDialog(
+                            //    "error-" + unixtime(),
+                            //    self.megaChat.karere.getBareJid(),
+                            //    "mpenc-setup-failed",
+                            //    "Could not initialise the encryption in a timely manner. To try again, you can close and start the chat again.",
+                            //    [],
+                            //    undefined,
+                            //    false
+                            //);
+                            //
+                            //self._mpencFailedDialog = $dialog;
+                            //
+                            //self.appendDomMessage(
+                            //    $dialog
+                            //);
 
                             var othersJid = self.getParticipantsExceptMe()[0];
                             var data = {
@@ -731,8 +731,8 @@ ChatRoom.prototype.destroy = function(notifyOtherDevices) {
 
     self.leave(notifyOtherDevices);
 
-    self.$header.remove();
-    self.$messages.remove();
+    //self.$header.remove();
+    //self.$messages.remove();
 
     var $element = $('.nw-conversations-item[data-room-jid="' + self.roomJid.split("@")[0] + '"]');
     $element.remove();
@@ -838,20 +838,69 @@ ChatRoom.prototype.hide = function() {
 };
 
 /**
+ * Simple interface/structure wrapper for inline dialogs
+ * @param opts
+ * @constructor
+ */
+var ChatDialogMessage = function(opts) {
+    assert(opts.messageId, 'missing messageId');
+    assert(opts.type, 'missing type');
+
+    MegaDataObject.attachToExistingJSObject(
+        this,
+        {
+            'type': true,
+            'messageId': true,
+            'textMessage': true,
+            'authorContact': true,
+            'timestamp': true,
+            'buttons': true,
+            'read': true,
+            'persist': true
+        },
+        true,
+        ChatDialogMessage.DEFAULT_OPTS
+    );
+    $.extend(true, this, opts);
+
+    return this;
+};
+
+/**
+ * Default values for the ChatDialogMessage interface/datastruct.
+ *
+ * @type {Object}
+ */
+ChatDialogMessage.DEFAULT_OPTS = {
+    'type': '',
+    'messageId': '',
+    'textMessage': '',
+    'authorContact': '',
+    'timestamp': 0,
+    'buttons': {},
+    'read': false,
+    'persist': true
+};
+
+/**
  * Append message to the UI of this room.
  * Note: This method will also log the message, so that later when someone asks for message sync this log will be used.
  *
- * @param message {KarereEventObjects.IncomingMessage|KarereEventObjects.OutgoingMessage|Object}
+ * @param message {KarereEventObjects.IncomingMessage|KarereEventObjects.OutgoingMessage|ChatDialogMessage}
  * @returns {boolean}
  */
 ChatRoom.prototype.appendMessage = function(message) {
     var self = this;
 
-    if (message.getFromJid() === self.roomJid) {
+    if (message.getFromJid && message.getFromJid() === self.roomJid) {
         return; // dont show any system messages (from the conf room)
     }
 
-    if (message instanceof KarereEventObjects.IncomingMessage && Karere.getNormalizedBareJid(message.getFromJid()) === self.megaChat.karere.getJid()) {
+    if (
+        message.getFromJid &&
+        message instanceof KarereEventObjects.IncomingMessage &&
+        Karere.getNormalizedBareJid(message.getFromJid()) === self.megaChat.karere.getJid()
+    ) {
         // my own IncomingMessage message, should be converted to Outgoing
         message = new KarereEventObjects.OutgoingMessage(
             message.toJid,
@@ -865,97 +914,69 @@ ChatRoom.prototype.appendMessage = function(message) {
             message.roomJid
         );
     }
-    if (self.messagesIndex[message.getMessageId()] !== undefined) {
+    if (self.messagesIndex[message.messageId] !== undefined) {
 
-        //self.logger.debug(self.roomJid.split("@")[0], message.getMessageId(), "This message is already added to the message list (and displayed).");
+        //self.logger.debug(self.roomJid.split("@")[0], message.messageId, "This message is already added to the message list (and displayed).");
         return false;
     }
 
-    self.messagesIndex[message.getMessageId()] = self.messages.push(
+    self.messagesIndex[message.messageId] = self.messages.push(
         message
     );
 
-    var $message = self.megaChat.$message_tpl.clone().removeClass("template").addClass("fm-chat-message-container");
+    var jid;
+    var contact;
+    if(message.getFromJid) {
+        jid = Karere.getNormalizedBareJid(message.getFromJid());
+        //var timestamp = message.getDelay() ? message.getDelay() : unixtime();
 
-    var jid = Karere.getNormalizedBareJid(message.getFromJid());
-
-
-    if (jid != self.megaChat.karere.getBareJid() && !self.isActive()) {
-        $message.addClass('unread');
+        contact = self.megaChat.getContactFromJid(jid);
+    } else {
+        contact = message.authorContact;
     }
-
-    var timestamp = message.getDelay() ? message.getDelay() : unixtime();
-
-    $('.chat-message-date', $message).text(
-        unixtimeToTimeString(timestamp) //time2last is a too bad performance idea.
-    );
-
-    var name = self.megaChat.getContactNameFromJid(jid);
-    var contact = self.megaChat.getContactFromJid(jid);
 
     if (!contact) {
-        self.logger.error("Missing contact for jid: ", jid);
-        return false;
-    }
-
-    $('.nw-contact-avatar', $message).replaceWith(self._generateContactAvatarElement(jid));
-
-    $('.chat-username', $message).text(name);
-
-    // add .current-name if this is my own message
-    if (jid != self.megaChat.karere.getBareJid()) {
-        $('.fm-chat-messages-block', $message).addClass("right-block");
-    }
-
-
-
-    $message.attr('data-timestamp', timestamp);
-    $message.attr('data-id', message.getMessageId());
-    $message.attr('data-from', jid.split("@")[0]);
-    $message.addClass(contact.u);
-
-
-    if (!message.messageHtml) {
-        message.messageHtml = htmlentities(message.getContents()).replace(/\n/gi, "<br/>");
-    }
-
-    var event = new $.Event("onReceiveMessage");
-    self.megaChat.trigger(event, message);
-
-    if (event.isPropagationStopped()) {
-        self.logger.warn("Event propagation stopped receiving (rendering) of message: ", message)
+        self.logger.error("Missing contact/jid: ", jid, contact);
         return false;
     }
 
 
-    if (message.messageHtml) {
-        $('.fm-chat-message .chat-message-txt span', $message).html(
-            message.messageHtml.replace(/\s{2}/gi, "&nbsp;")
-        );
-    } else {
-        $('.fm-chat-message .chat-message-txt span', $message).html(
-            htmlentities(message.getContents()).replace(/\n/gi, "<br/>").replace(/\s/gi, "&nbsp;")
-        );
-    }
 
-
-
-    var event = new $.Event("onBeforeRenderMessage");
-    self.megaChat.trigger(event, {
-        message: message,
-        $message: $message,
-        room: self
-    });
-
-    if ($('.fm-chat-message .chat-message-txt span', $message).text().length === 0 && (!message.meta || !message.meta.attachments)) {
-        self.logger.warn("Message was empty: ", message, $message);
-        return false;
-    }
-    if (event.isPropagationStopped()) {
-        self.logger.warn("Event propagation stopped receiving (rendering) of message: ", message);
-        return false;
-    }
-    return self.appendDomMessage($message, message);
+    //// TODO: Move this to the render method.
+    //if (!message.messageHtml) {
+    //    message.messageHtml = htmlentities(message.getContents()).replace(/\n/gi, "<br/>");
+    //}
+    //
+    //var event = new $.Event("onReceiveMessage");
+    //self.megaChat.trigger(event, message);
+    //
+    //if (event.isPropagationStopped()) {
+    //    self.logger.warn("Event propagation stopped receiving (rendering) of message: ", message)
+    //    return false;
+    //}
+    //
+    //
+    //
+    //// TODO: Move this to the render method.
+    //if (message.messageHtml) {
+    //    message.messageHtml = message.messageHtml.replace(/\s{2}/gi, "&nbsp;");
+    //} else {
+    //    message.messageHtml = htmlentities(message.getContents()).replace(/\n/gi, "<br/>").replace(/\s/gi, "&nbsp;");
+    //}
+    //
+    //
+    //
+    //// TODO: Move this to the render method.
+    //var event = new $.Event("onBeforeRenderMessage");
+    //self.megaChat.trigger(event, {
+    //    message: message,
+    //    room: self
+    //});
+    //
+    //if (event.isPropagationStopped()) {
+    //    self.logger.warn("Event propagation stopped receiving (rendering) of message: ", message);
+    //    return false;
+    //}
 };
 
 
@@ -963,11 +984,11 @@ ChatRoom.prototype.appendMessage = function(message) {
  * Will refresh the room's chat messages scroll pane
  */
 ChatRoom.prototype.refreshScrollUI = function() {
-    var self = this;
-    var $jsp = self.$messages.data('jsp');
+    // TODO: remove me.
+};
 
-    assert($jsp, "JSP not available.");
-    $jsp.reinitialise();
+ChatRoom.prototype.refreshUI = function() {
+    // TODO: remove me.
 };
 
 /**
@@ -1978,17 +1999,17 @@ ChatRoom.prototype._conversationEnded = function(userFullJid) {
 
         $('.fm-chat-file-button.fm-chat-inline-dialog-button-end-chat span', self.$messages).remove();
 
-        self.appendDomMessage(
-            self.generateInlineDialog(
-                "user-left",
-                userFullJid,
-                "user-left",
-                "Conversation ended by user: " + self.megaChat.getContactNameFromJid(userFullJid),
-                [],
-                {},
-                !self.isActive()
-            )
-        );
+        //self.appendDomMessage(
+        //    self.generateInlineDialog(
+        //        "user-left",
+        //        userFullJid,
+        //        "user-left",
+        //        "Conversation ended by user: " + self.megaChat.getContactNameFromJid(userFullJid),
+        //        [],
+        //        {},
+        //        !self.isActive()
+        //    )
+        //);
     }
 };
 
@@ -2041,7 +2062,9 @@ ChatRoom.prototype.startVideoCall = function() {
 
 ChatRoom.prototype.stateIsLeftOrLeaving = function() {
     return (this.state == ChatRoom.STATE.LEFT || this.state == ChatRoom.STATE.LEAVING);
-}
+};
+
+window.ChatDialogMessage = ChatDialogMessage; //TODO: remove me, debug
 
 window.ChatRoom = ChatRoom;
 module.exports = ChatRoom;

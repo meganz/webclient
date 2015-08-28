@@ -36,43 +36,40 @@ CallFeedback.prototype.attachToChat = function(megaChat) {
             megaRoom
                 .unbind('call-ended.CallFeedback')
                 .bind('call-ended.CallFeedback', function(e, eventData) {
-                    var from = megaChat.getContactNameFromJid(eventData.peer);
-                    var $dialog = megaRoom.generateInlineDialog(
-                        "call-feedback",
-                        "",
-                        "call-feedback",
-                        "To help us improve our service, it would be great if you want to rate how was your call with " + from + "? ",
-                        [],
-                        {
-                            'sendFeedback': {
-                                'type': 'primary',
-                                'text': "Send Feedback",
-                                'callback': function() {
-                                    var feedbackDialog = mega.ui.FeedbackDialog.singleton($(this));
-                                    feedbackDialog._type = "call-ended";
-                                    feedbackDialog.bind('onHide.callEnded', function() {
+                    var msgId = 'call-feedback' + unixtime();
+                    megaRoom.appendMessage(
+                        new ChatDialogMessage({
+                            messageId: msgId,
+                            type: 'call-feedback',
+                            authorContact: megaChat.getContactFromJid(eventData.peer),
+                            timestamp: unixtime(),
+                            buttons: {
+                                'sendFeedback': {
+                                    'type': 'primary',
+                                    'text': "Send Feedback",
+                                    'callback': function() {
+                                        var feedbackDialog = mega.ui.FeedbackDialog.singleton($(this));
+                                        feedbackDialog._type = "call-ended";
+                                        feedbackDialog.bind('onHide.callEnded', function() {
 
-                                        $dialog.remove();
+                                            //TODO: Use msgid to remove the msg
+                                            megaRoom.trigger('resize');
+
+                                            feedbackDialog.unbind('onHide.callEnded');
+                                        });
+                                    }
+                                },
+                                'noThanks': {
+                                    'type': 'secondary',
+                                    'text': "No thanks",
+                                    'callback': function() {
+                                        //TODO: Use msgid to remove the msg
+
                                         megaRoom.trigger('resize');
-
-                                        feedbackDialog.unbind('onHide.callEnded');
-                                    });
-                                }
-                            },
-                            'noThanks': {
-                                'type': 'secondary',
-                                'text': "No thanks",
-                                'callback': function() {
-                                    $dialog.remove();
-
-                                    megaRoom.trigger('resize');
+                                    }
                                 }
                             }
-                        }
-                    );
-
-                    megaRoom.appendDomMessage(
-                        $dialog
+                        })
                     );
                 });
         });

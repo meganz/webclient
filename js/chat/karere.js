@@ -1046,6 +1046,12 @@ makeMetaAware(Karere);
      * @returns {*}
      */
     Karere.getNormalizedBareJid = function(jid) {
+        if(!jid || !jid.split) {
+            if(d) {
+                console.error("Karere.getNormalizedBareJid got", jid, "instead of a jid.");
+            }
+        }
+
         if (jid.indexOf("conference.") !== -1 && jid.indexOf("/") !== -1) {
             jid = jid.split("/")[1].split("__")[0] + "@" + jid.split("@")[1].split("/")[0].replace("conference.", "");
         }
@@ -1063,6 +1069,11 @@ makeMetaAware(Karere);
      * @returns {*}
      */
     Karere.getNormalizedFullJid = function(jid) {
+        if(!jid || !jid.split) {
+            if(d) {
+                console.error("Karere.getNormalizedFullJid got", jid, "instead of a jid.");
+            }
+        }
         if (jid.indexOf("conference.") !== -1) {
             jid = jid.split("/")[1].split("__")[0] +
                         "@" +

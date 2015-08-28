@@ -8,6 +8,147 @@ var ContactsUI = require('./../ui/contacts.jsx');
 var ConversationsUI = require('./../ui/conversations.jsx');
 
 
+/**
+ * The most dummies lazy load ever... but no need for something more complicated, until we get the new __(...)
+ */
+var getMessageString;
+(function() {
+    var MESSAGE_STRINGS;
+    getMessageString = function(type) {
+        if(!MESSAGE_STRINGS) {
+            MESSAGE_STRINGS = {
+                'outgoing-call': l[5891],
+                'incoming-call': "Incoming call from [X]",
+                'call-timeout': l[5890],
+                'call-starting': l[7206],
+                'call-feedback': "To help us improve our service, it would be great if you want to rate how was your call with [X]? ",
+                'call-initialising': l[7207],
+                'call-ended': [l[5889], l[7208]],
+                'call-failed-media': l[7204],
+                'call-failed': [l[7209], l[7208]],
+                'call-handled-elsewhere': l[5895],
+                'call-missed': l[7210],
+                'call-rejected': l[5892],
+                'call-started': l[5888],
+            };
+        }
+        return MESSAGE_STRINGS[type];
+    }
+})();
+
+var ConversationMessage = React.createClass({
+    mixins: [MegaRenderMixin, RenderDebugger],
+    render: function () {
+        var self = this;
+        var cssClasses = "fm-chat-messages-block fm-chat-message-container";
+
+        var message = this.props.message;
+        var megaChat = this.props.chatRoom.megaChat;
+        var chatRoom = this.props.chatRoom;
+
+        if (message.type) {
+            cssClasses += " inline-dialog chat-notification " + message.type;
+        }
+
+        var contact;
+
+        if (message.authorContact) {
+            contact = message.authorContact;
+        }
+        else if (message.getFromJid) {
+            contact = megaChat.getContactFromJid(message.getFromJid());
+        }
+        else {
+            console.error("No idea how to render this: ", this.props);
+        }
+
+        var timestamp;
+        if (message.getDelay) {
+            timestamp = message.getDelay()
+        }
+        else if (message.timestamp) {
+            timestamp = message.timestamp;
+        }
+        else {
+            timestamp = unixtime();
+        }
+
+        timestamp = unixtimeToTimeString(timestamp);
+
+        var msg;
+
+        // if this is an inline dialog
+        if(message.type) {
+            msg = getMessageString(message.type);
+            if(!msg) {
+                console.error("Message with type: ", message.type, "does not have a text string defined. Message: ", message);
+                debugger;
+                throw new Error("boom");
+            }
+            // if is an array.
+            if(msg.splice) {
+                msg = (
+                    msg[0].replace("[X]", generateContactName(contact.u)) + " " +
+                    msg[1].replace("[X]", secToDuration(chatRoom.megaChat._currentCallCounter)) + " "
+                );
+            } else {
+                msg = msg.replace("[X]", generateContactName(contact.u));
+            }
+
+            // mapping css icons to msg types
+            if(message.type === "call-rejected") {
+                cssClasses += " rejected-call";
+            }
+            else if(message.type === "call-handled-elsewhere") {
+                cssClasses += " call-from-different-device";
+            }
+            else if(message.type === "call-failed") {
+                cssClasses += " rejected-call";
+            }
+            else if(message.type === "call-failed-media") {
+                cssClasses += " call-canceled";
+            }
+        }
+
+
+        if(message.cssClasses) {
+            cssClasses += " " + message.cssClasses.join(" ");
+        }
+
+        var buttons = [];
+
+        if(message.buttons) {
+            Object.keys(message.buttons).forEach(function(k) {
+                var button = message.buttons[k];
+                var classes = "fm-chat-file-button " + button.type + "-button fm-chat-inline-dialog-button-" + k;
+                buttons.push(
+                    <div key={k} className={classes} onClick={(() => { button.callback(); })}>
+                        <span>{button.text}</span>
+                    </div>
+                );
+            });
+        }
+
+        return (
+            <div className={cssClasses} data-id={"id" + message.messageId}>
+                <div className="fm-chat-messages-pad">
+                    <div className="nw-chat-notification-icon"></div>
+                    <ContactsUI.Avatar contact={contact} />
+
+                    <div className="fm-chat-message">
+                        <div className="chat-message-date">{timestamp}</div>
+                        <div className="chat-message-txt">
+                            {msg}
+                            {buttons}
+                        </div>
+                        <div className="clear"></div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+});
+
 var ConversationPanel = React.createClass({
     mixins: [MegaRenderMixin, RenderDebugger],
 
@@ -218,6 +359,13 @@ var ConversationPanel = React.createClass({
                 room.megaChat.closeChatPopups();
             }
         }
+        var messagesList = [];
+
+        self.props.messages.forEach(function(v, k) {
+            messagesList.push(
+                <ConversationMessage message={v} chatRoom={room} />
+            );
+        });
 
         return (
             <div className="conversation-panel">
@@ -301,6 +449,7 @@ var ConversationPanel = React.createClass({
                             </div>
                         </div>
 
+                        {messagesList}
                         <div className="fm-chat-messages-block typing-template right-block">
                             <div className="fm-chat-messages-pad">
                                 <div className="nw-contact-avatar">
@@ -340,6 +489,7 @@ var ConversationPanels = React.createClass({
                     chatRoom={chatRoom}
                     contacts={M.u}
                     contact={contact}
+                    messages={chatRoom.messages}
                     key={chatRoom.roomJid}
                     chat={self.props.megaChat}
                     />

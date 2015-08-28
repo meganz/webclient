@@ -125,7 +125,7 @@ var ConversationsList = React.createClass({
             var room = activeCallSession.room;
             var user = room.getParticipantsExceptMe()[0];
             user = megaChat.getContactFromJid(user);
-            console.error(user, user ? megaChat.xmppPresenceToCssClass(user.presence) : "nah!");
+
             if(user) {
                 currentCallingContactStatusProps.className += " " + user.u + " " + megaChat.xmppPresenceToCssClass(user.presence);
                 currentCallingContactStatusProps['data-jid'] = room.roomJid;
@@ -353,12 +353,11 @@ var ConversationsMainListing =  React.createClass({
         }
 
         //console.error("ConversationsMainListing render");
-        //console.error("convs size: ", conversations.length, emptyClasses, jspClasses);
+        //console.error("convs size: ", conversations.length, "emptyClasses: ", emptyClasses, "jsp: ", jspClasses);
 
         return (
-            <div className={containerClasses} key="convMainListing">
-
-                <div className={emptyClasses} key="emptyMainListing">
+            <div className={containerClasses}>
+                <div className={emptyClasses}>
                     <div className="fm-empty-pad">
                         <div className="fm-empty-conversations-bg"></div>
                         <div className="fm-empty-cloud-txt">No Conversations</div>
@@ -375,7 +374,7 @@ var ConversationsMainListing =  React.createClass({
                         </div>
                     </div>
                 </div>
-                <utils.JScrollPane className={jspClasses} key="jspMainListing">
+                <utils.JScrollPane className={jspClasses}>
                     <div className={classes}>
                         <div className="fm-chat-message-pad">
                             {conversations}

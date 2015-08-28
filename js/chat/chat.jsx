@@ -803,7 +803,6 @@ Chat.prototype.init = function() {
         if (eventObject.error) {
             return;
         }
-        console.error("onPresence:", eventObject.getFromJid(), eventObject.getShow());
 
         var bareJid = eventObject.getFromJid().split("/")[0];
 
@@ -824,7 +823,6 @@ Chat.prototype.init = function() {
 
             // update M.u
             var contact = self.getContactFromJid(eventObject.getFromJid());
-            console.error("presence: ", contact, eventObject.getShow());
             if (contact) {
                 if (!contact.presenceMtime || parseFloat(contact.presenceMtime) < eventObject.getDelay()) {
                     contact.presence = megaChat.karere.getPresence(megaChat.getJidFromNodeId(contact.u));
@@ -2370,15 +2368,6 @@ Chat.prototype.renderListing = function() {
     sectionUIopen('conversations');
 
     $('.section.conversations .fm-right-header').removeClass('hidden');
-
-
-    if(self.chats.size === 0) {
-        $('.fm-empty-conversations').removeClass('hidden');
-    } else {
-        $('.fm-empty-conversations').addClass('hidden');
-        $('.conversations-main-listing').removeClass("hidden");
-    }
-    $('.fm-create-chat-button').show();
 
 
     self.renderConversationsApp();

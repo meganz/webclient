@@ -24406,6 +24406,9 @@ body.pro:after {
 	background-position: center -3065px;
 	margin: 0 auto 53px auto;
 }
+.left-arrow .camera-top-icon {
+	background-position: center -2895px;
+}
 .camera-top-txt {
 	max-width: 800px;
 	margin: 0 auto;

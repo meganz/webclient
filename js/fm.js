@@ -1639,13 +1639,13 @@ function addContactUI()
             scrollLocation: 'add',
             excludeCurrent: true,// Exclude from dropdownlist only emails/names which exists in multi-input (tokens)
             onEmailCheck: function() {
-                errorMsg("Looks like there's a malformed email");
+                errorMsg(l[7415]);
             },
             onDoublet: function(u) {
-                errorMsg('You already have a contact with that email');
+                errorMsg(l[7413]);
             },
             onHolder: function() {
-                errorMsg("There's no need to add your own email address");
+                errorMsg(l[7414]);
             },
             onAdd: function() {
                 var itemNum = $('.token-input-list-mega .token-input-token-mega').length;
@@ -7254,13 +7254,13 @@ function initShareDialog() {
             scrollLocation: 'share',
             excludeCurrent: true,// Exclude from dropdownlist only emails/names which exists in multi-input (tokens)
             onEmailCheck: function() {
-                errorMsg("Looks like there's a malformed email");
+                errorMsg(l[7415]);
             },
             onDoublet: function(u) {
-                errorMsg('You already have a contact with that email');
+                errorMsg(l[7413]);
             },
             onHolder: function() {
-                errorMsg("There's no need to add your own email address");
+                errorMsg(l[7414]);
             },
             onAdd: function(item) {
 

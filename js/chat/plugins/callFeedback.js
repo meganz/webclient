@@ -46,13 +46,13 @@ CallFeedback.prototype.attachToChat = function(megaChat) {
                             buttons: {
                                 'sendFeedback': {
                                     'type': 'primary',
-                                    'text': "Send Feedback",
+                                    'text': __("Send Feedback"),
                                     'callback': function() {
                                         var feedbackDialog = mega.ui.FeedbackDialog.singleton($(this));
                                         feedbackDialog._type = "call-ended";
                                         feedbackDialog.bind('onHide.callEnded', function() {
 
-                                            //TODO: Use msgid to remove the msg
+                                            megaRoom.removeMessageById(msgId);
                                             megaRoom.trigger('resize');
 
                                             feedbackDialog.unbind('onHide.callEnded');
@@ -61,10 +61,9 @@ CallFeedback.prototype.attachToChat = function(megaChat) {
                                 },
                                 'noThanks': {
                                     'type': 'secondary',
-                                    'text': "No thanks",
+                                    'text': __("No thanks"),
                                     'callback': function() {
-                                        //TODO: Use msgid to remove the msg
-
+                                        megaRoom.removeMessageById(msgId);
                                         megaRoom.trigger('resize');
                                     }
                                 }

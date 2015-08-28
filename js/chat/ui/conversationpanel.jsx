@@ -29,6 +29,7 @@ var getMessageString;
                 'call-handled-elsewhere': l[5895],
                 'call-missed': l[7210],
                 'call-rejected': l[5892],
+                'call-canceled': l[5894],
                 'call-started': l[5888],
             };
         }
@@ -87,10 +88,12 @@ var ConversationMessage = React.createClass({
             }
             // if is an array.
             if(msg.splice) {
-                msg = (
-                    msg[0].replace("[X]", generateContactName(contact.u)) + " " +
-                    msg[1].replace("[X]", secToDuration(chatRoom.megaChat._currentCallCounter)) + " "
-                );
+                var txtMsg = msg[0].replace("[X]", generateContactName(contact.u));
+
+                if(chatRoom.megaChat._currentCallCounter) {
+                    txtMsg += msg[1].replace("[X]", secToDuration(chatRoom.megaChat._currentCallCounter)) + " "
+                }
+                msg = txtMsg;
             } else {
                 msg = msg.replace("[X]", generateContactName(contact.u));
             }
@@ -99,14 +102,20 @@ var ConversationMessage = React.createClass({
             if(message.type === "call-rejected") {
                 cssClasses += " rejected-call";
             }
-            else if(message.type === "call-handled-elsewhere") {
+            else if (message.type === "call-missed") {
+                cssClasses += " missed-call";
+            }
+            else if (message.type === "call-handled-elsewhere") {
                 cssClasses += " call-from-different-device";
             }
-            else if(message.type === "call-failed") {
+            else if (message.type === "call-failed") {
                 cssClasses += " rejected-call";
             }
-            else if(message.type === "call-failed-media") {
+            else if (message.type === "call-failed-media") {
                 cssClasses += " call-canceled";
+            }
+            else if (message.type === "call-canceled") {
+                cssClasses += " call-ended";
             }
         }
 
@@ -228,8 +237,12 @@ var ConversationPanel = React.createClass({
 
         this.$messages.jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5, animateDuration: 70});
     },
-    onStartCallClicked: function() {
+    onStartCallClicked: function(e) {
         var self = this;
+
+        if($(e.target).parent().is(".disabled")) {
+            return;
+        }
 
         var hidePopup = function() {
             self.setState({
@@ -257,7 +270,7 @@ var ConversationPanel = React.createClass({
     componentDidUpdate: function() {
         this.handleWindowResize();
     },
-    handleWindowResize: function(scrollToBottom) {
+    handleWindowResize: function(e, scrollToBottom) {
         var $container = $(this.getDOMNode());
         var self = this;
 
@@ -287,6 +300,7 @@ var ConversationPanel = React.createClass({
 
         var room = this.props.chatRoom;
 
+        var conversationPanelClasses = "conversation-panel";
         var headerClasses = "fm-right-header";
         var messagesClasses = "fm-chat-message-scroll";
         var endCallClasses = "chat-button fm-end-call";
@@ -294,6 +308,7 @@ var ConversationPanel = React.createClass({
         if (!room.isCurrentlyActive) {
             headerClasses += " hidden";
             messagesClasses += " hidden";
+            conversationPanelClasses += " hidden";
         }
 
         if(room._conv_ended === true) {
@@ -323,6 +338,14 @@ var ConversationPanel = React.createClass({
             $('.fm-chat-block').addClass('video-call');
         } else {
             $('.fm-chat-block').removeClass('video-call');
+
+            if(room.callSession && (
+                room.callSession.state === CallSession.STATE.WAITING_RESPONSE_OUTGOING ||
+                room.callSession.state === CallSession.STATE.WAITING_RESPONSE_INCOMING
+                )
+            ) {
+                startCallButtonClasses += " disabled";
+            }
         }
 
         if(!contact.presence) {
@@ -362,13 +385,16 @@ var ConversationPanel = React.createClass({
         var messagesList = [];
 
         self.props.messages.forEach(function(v, k) {
-            messagesList.push(
-                <ConversationMessage message={v} chatRoom={room} />
-            );
+            if(v.deleted !== 1) {
+                messagesList.push(
+                    <ConversationMessage message={v} chatRoom={room} />
+                );
+            }
         });
 
+
         return (
-            <div className="conversation-panel">
+            <div className={conversationPanelClasses}>
                 <div className={headerClasses} data-room-jid={self.props.chatRoom.roomJid.split("@")[0]}>
                     <ContactsUI.Avatar contact={contact} />
                     <div className={contactClassString}>
@@ -384,7 +410,9 @@ var ConversationPanel = React.createClass({
                     <div className="chat-header-indicator muted-audio hidden"></div>
                     <div className="chat-header-indicator muted-video hidden"></div>
 
-                    <div className={endCallClasses} onClick={room.endCall}> <span className="fm-chatbutton">{l[5884]}</span> </div>
+                    <div className={endCallClasses} onClick={(() => {
+                        room.callSession.endCall();
+                    })}><span className="fm-chatbutton">{l[5884]}</span></div>
                     <div className="chat-button fm-chat-end end-chat hidden" onClick={(() => function() {
                         room.destroy(true);
                     })}> <span className="fm-chatbutton">{l[6833]}</span> </div>

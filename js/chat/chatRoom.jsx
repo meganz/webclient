@@ -765,6 +765,8 @@ ChatRoom.prototype.show = function() {
     self.megaChat.hideAllChats();
     self.isCurrentlyActive = true;
 
+    self.$header = $('.fm-right-header[data-room-jid="' + this.roomJid.split("@")[0] + '"]');
+
     $('.files-grid-view').addClass('hidden');
     $('.fm-blocks-view').addClass('hidden');
     $('.contacts-grid-view').addClass('hidden');
@@ -856,7 +858,8 @@ var ChatDialogMessage = function(opts) {
             'timestamp': true,
             'buttons': true,
             'read': true,
-            'persist': true
+            'persist': true,
+            'deleted': 0
         },
         true,
         ChatDialogMessage.DEFAULT_OPTS
@@ -892,8 +895,12 @@ ChatDialogMessage.DEFAULT_OPTS = {
 ChatRoom.prototype.appendMessage = function(message) {
     var self = this;
 
+    if(message.deleted) { // deleted messages should not be .append-ed
+        return false;
+    }
+
     if (message.getFromJid && message.getFromJid() === self.roomJid) {
-        return; // dont show any system messages (from the conf room)
+        return false; // dont show any system messages (from the conf room)
     }
 
     if (
@@ -1245,18 +1252,6 @@ ChatRoom.prototype.generateInlineDialog = function(type, user, iconCssClasses, m
     }
 
     return $inlineDialog;
-};
-
-/**
- * Simple getter to get an inline dialog by `type` from the current message pane
- *
- * @param type {string} whatever type you'd used before when calling `.generateInlineDialog`
- * @returns {*|jQuery|HTMLElement}
- */
-ChatRoom.prototype.getInlineDialogInstance = function(type) {
-    var self = this;
-
-    return $('.inline-dialog.' + type, self.$messages);
 };
 
 
@@ -2063,6 +2058,41 @@ ChatRoom.prototype.startVideoCall = function() {
 ChatRoom.prototype.stateIsLeftOrLeaving = function() {
     return (this.state == ChatRoom.STATE.LEFT || this.state == ChatRoom.STATE.LEAVING);
 };
+ChatRoom.prototype.removeMessageById = function(messageId) {
+    var self = this;
+    self.messages.forEach((v, k) => {
+        if(v.deleted === 1) {
+            return; // skip
+        }
+
+        if (v.messageId === messageId) {
+            v.deleted = 1;
+            // cleanup the messagesIndex
+            delete self.messagesIndex[self.messages._data[0].messageId];
+            return false; // break;
+        }
+    });
+};
+ChatRoom.prototype.removeMessageBy = function(cb) {
+    var self = this;
+    self.messages.forEach((v, k) => {
+        if(cb(v, k) === true) {
+            self.removeMessageById(v.messageId);
+        }
+    });
+};
+ChatRoom.prototype.removeMessageByType = function(type) {
+    var self = this;
+    self.removeMessageBy((v, k) => {
+        if(v.type === type) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    })
+};
+
 
 window.ChatDialogMessage = ChatDialogMessage; //TODO: remove me, debug
 

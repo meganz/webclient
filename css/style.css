@@ -8092,6 +8092,16 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 	display: none !important;
 }
 /* end */
+
+/* .conversation-panel(s) sizing, so that height: 100% will work in the .video-call enabled
+ right header */
+
+.conversation-panels, .conversation-panel {
+	box-sizing: border-box;
+	height: 100% !important;
+	position: relative;
+}
+
 .full-sized .fm-right-header {
 	max-height: -webkit-calc(100% - 48px);
 	max-height: -moz-calc(100% - 48px);

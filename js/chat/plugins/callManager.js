@@ -188,8 +188,6 @@ CallSession.prototype.onWaitingResponseIncoming = function(e, eventData) {
 
     var callOptions = CallSession._extractMediaOptionsFromEventData(eventData);
 
-    $('.btn-chat-call', self.room.$header).addClass("disabled");
-
     // since the session is not YET created in jingle, i will need to find a way to fake it
     self.answer = eventData.answer;
     self.reqStillValid = eventData.reqStillValid;
@@ -316,24 +314,13 @@ CallSession.prototype.onWaitingResponseIncoming = function(e, eventData) {
         throw new Error("Not implemented");
     }
 
-
-
-    var $answer = $('.btn-chat-answer-incoming-call', self.room.$header);
-    $answer.unbind('click.megaChat');
-    $answer.bind('click.megaChat', doAnswer);
-    $answer.show();
-
-    var $cancel = $('.btn-chat-reject-incoming-call', self.room.$header);
-    $cancel.unbind('click.megaChat');
-    $cancel.bind('click.megaChat', doCancel);
-    $cancel.show();
-
     self.room.appendMessage(
         new ChatDialogMessage({
-            messageId: 'incoming-call-' + unixtime(),
+            messageId: 'incoming-call-' + self.sid,
             type: 'incoming-call',
             authorContact: self.room.megaChat.getContactFromJid(self.getPeer()),
             timestamp: unixtime(),
+            persist: false,
             buttons: {
                 'answer': {
                     'type': 'primary',
@@ -348,99 +335,58 @@ CallSession.prototype.onWaitingResponseIncoming = function(e, eventData) {
             }
         })
     );
-
-    //self.room.appendDomMessage(
-    //    self.room.generateInlineDialog(
-    //        "incoming-call",
-    //        participants[0],
-    //        "incoming-call",
-    //        "Incoming call from " + self.room.megaChat.getContactNameFromJid(self.getPeer()),
-    //        [],
-    //        {
-    //            'answer': {
-    //                'type': 'primary',
-    //                'text': l[7205],
-    //                'callback': doAnswer
-    //            },
-    //            'reject': {
-    //                'type': 'secondary',
-    //                'text': l[1686],
-    //                'callback': doCancel
-    //            }
-    //        }
-    //    )
-    //);
 };
 
+CallSession.prototype._removeTempMessages = function() {
+    var self = this;
+
+    var toBeRemovedTypes = [
+        'call-initialising',
+        'call-starting',
+        'incoming-call',
+        'outgoing-call',
+    ];
+
+    self.room.removeMessageBy(function(v) {
+        if (toBeRemovedTypes.indexOf(v.type) >= 0 && v.messageId === v.type+"-"+self.sid) {
+            return true;
+        }
+    });
+
+    self.room.removeMessageByType("call-initialising-" + self.sid);
+    self.room.removeMessageByType("incoming-call-" + self.sid);
+    self.room.removeMessageByType("outgoing-call-" + self.sid);
+    self.room.removeMessageByType("call-starting-" + self.sid);
+};
 CallSession.prototype.onCallStarting = function(e) {
     var self = this;
 
-    self.room.getInlineDialogInstance("incoming-call").remove();
-    self.room.getInlineDialogInstance("outgoing-call").remove();
-    self.room.getInlineDialogInstance("call-starting").remove();
-
-    // cleanup old video elements.
-    $('.my-av-screen video, video.rmtViewport', self.room.$header);
+    self._removeTempMessages();
 
     self.room.appendMessage(
         new ChatDialogMessage({
-            messageId: 'call-starting' + unixtime(),
+            messageId: 'call-starting-' + self.sid,
             type: 'call-starting',
             authorContact: self.room.megaChat.getContactFromJid(self.getPeer()),
-            timestamp: unixtime()
+            timestamp: unixtime(),
+            persist: false
         })
     );
-    //
-    //var msg = l[7206].replace(
-    //    '[X]',
-    //    self.room.megaChat.getContactNameFromJid(
-    //        self.getPeer()
-    //    )
-    //);
-    //
-    //self.room.appendDomMessage(
-    //    self.room.generateInlineDialog(
-    //        "call-starting-" + self.sid,
-    //        self.getPeer(),
-    //        "call-starting",
-    //        msg,
-    //        ['fm-chat-call-starting']
-    //    )
-    //);
 
 };
 
 CallSession.prototype.onCallAnswered = function(e) {
     var self = this;
 
-    self.room.getInlineDialogInstance("incoming-call").remove();
-    self.room.getInlineDialogInstance("outgoing-call").remove();
-    self.room.getInlineDialogInstance("call-starting").remove();
-
-
-    //var msg = l[7207].replace(
-    //    '[X]',
-    //    self.room.megaChat.getContactNameFromJid(
-    //        self.getPeer()
-    //    )
-    //);
-    //
-    //self.room.appendDomMessage(
-    //    self.room.generateInlineDialog(
-    //        "call-initialising-" + self.sid,
-    //        self.getPeer(),
-    //        "call-starting",
-    //        msg,
-    //        ['fm-chat-call-starting']
-    //    )
-    //);
+    self._removeTempMessages();
 
     self.room.appendMessage(
         new ChatDialogMessage({
-            messageId: 'call-initialising' + unixtime(),
+            messageId: 'call-initialising-' + unixtime(),
             type: 'call-initialising',
             authorContact: self.room.megaChat.getContactFromJid(self.getPeer()),
-            timestamp: unixtime()
+            timestamp: unixtime(),
+            persist: false
         })
     );
 
@@ -533,24 +479,12 @@ CallSession.prototype.onCallStarted = function(e, eventData) {
     self.room.megaChat.dumpCallStats = self.room.dumpCallStats = function() {
         var s = self.callStats.stats ? RTC.Stats.statItemToString(self.callStats.stats) : "";
         s += self.callStats.commonStats ? RTC.Stats.statItemToString(self.callStats.commonStats) : "";
-        s = s.replace(/\n/g, '<br/>\n');
+        s = s.replace(/\n/g, '\n');
 
-        var $inlineDialog = self.room.generateInlineDialog(
-            "alert-info",
-            self.room.megaChat.karere.getJid(),
-            "debug",
-            "Debug Call Stats...",
-            [],
-            {},
-            !self.room.isActive()
-        );
-        $('.chat-message-txt', $inlineDialog).html(
-            "Debug Call Stats: <br/>" + s
+        console.debug(
+            "Debug Call Stats: \n" + s
         );
 
-        self.room.appendDomMessage(
-            $inlineDialog
-        );
 
         return {
             'str': s,
@@ -560,28 +494,15 @@ CallSession.prototype.onCallStarted = function(e, eventData) {
     };
 
 
-
     self.room.appendMessage(
         new ChatDialogMessage({
-            messageId: 'call-started' + unixtime(),
+            messageId: 'call-started-' + self.sid,
             type: 'call-started',
             authorContact: self.room.megaChat.getContactFromJid(self.getPeer()),
-            timestamp: unixtime()
+            timestamp: unixtime(),
+            persist: false
         })
     );
-
-    //// Substitute email into language string
-    //var callWithString = l[5888].replace('[X]', self.room.megaChat.getContactNameFromJid(self.getPeer()));
-    //
-    //self.room.appendDomMessage(
-    //    self.room.generateInlineDialog(
-    //        "started-call-" + unixtime(),
-    //        self.getPeer(),
-    //        "call-started",
-    //        callWithString,
-    //        []
-    //    )
-    //);
 
     self.renderCallStartedState();
 };
@@ -591,29 +512,15 @@ CallSession.prototype.onCallEnded = function(e, reason) {
 
 
     if (self.room.megaChat._currentCallCounter) {
-        //var msg = l[5889].replace('[X]', self.room.megaChat.getContactNameFromJid(self.getPeer()));
-        //msg = (msg + " " + l[7208] + ".").replace("[X]", secToDuration(self.room.megaChat._currentCallCounter));
-        //
-        //self.room.appendDomMessage(
-        //    self.room.generateInlineDialog(
-        //        "ended-call-" + unixtime(),
-        //        self.getPeer(),
-        //        "call-ended",
-        //        msg,
-        //        ['fm-chat-call-reason-' + reason]
-        //    )
-        //);
-
         self.room.appendMessage(
             new ChatDialogMessage({
-                messageId: 'call-ended' + unixtime(),
+                messageId: 'call-ended-' + self.sid,
                 type: 'call-ended',
                 authorContact: self.room.megaChat.getContactFromJid(self.getPeer()),
                 timestamp: unixtime(),
                 cssClasses: ['fm-chat-call-reason-' + reason]
             })
         );
-
     }
     self.room.trigger('CallTerminated', [e, self.room]);
     self.getCallManager().trigger('CallTerminated', [self, e]);
@@ -625,45 +532,18 @@ CallSession.prototype.onCallRejected = function(e, reason) {
     var peer = self.room.getParticipantsExceptMe()[0];
 
     if (reason === "caller") {
-        // Show "Call with [X] was canceled."
-        // ^^ should this should be changed to "canceled", not "rejected"?
-        //var msg = l[5894].replace('[X]', self.room.megaChat.getContactNameFromJid(peer));
-        //
-        //self.room.appendDomMessage(
-        //    self.room.generateInlineDialog(
-        //        "ended-call-" + unixtime(),
-        //        peer,
-        //        "call-ended",
-        //        msg,
-        //        []
-        //    )
-        //);
-
         self.room.appendMessage(
             new ChatDialogMessage({
-                messageId: 'call-ended' + unixtime(),
-                type: 'call-ended',
+                messageId: 'call-ended-' + self.sid,
+                type: 'call-canceled',
                 authorContact: self.room.megaChat.getContactFromJid(self.getPeer()),
                 timestamp: unixtime(),
             })
         );
     } else {
-        // Show "Call with [X] was rejected."
-        // ^^ should this should be changed to "canceled", not "rejected"?
-        //var msg = l[5892].replace('[X]', self.room.megaChat.getContactNameFromJid(peer));
-        //
-        //self.room.appendDomMessage(
-        //    self.room.generateInlineDialog(
-        //        "rejected-call-" + unixtime(),
-        //        peer,
-        //        "rejected-call",
-        //        msg,
-        //        []
-        //    )
-        //);
         self.room.appendMessage(
             new ChatDialogMessage({
-                messageId: 'call-rejected' + unixtime(),
+                messageId: 'call-rejected-' + self.sid,
                 type: 'call-rejected',
                 authorContact: self.room.megaChat.getContactFromJid(self.getPeer()),
                 timestamp: unixtime()
@@ -678,26 +558,13 @@ CallSession.prototype.onCallHandledElsewhere = function(e) {
 
     var peer = self.room.getParticipantsExceptMe()[0];
 
-    //self.room.appendDomMessage(
-    //    self.room.generateInlineDialog(
-    //        "canceled-call-" + unixtime(),
-    //        peer,
-    //        "call-from-different-device",
-    //        l[5895].replace(
-    //            '[X]',
-    //            // Call with [X] was handled on some other device.
-    //            self.room.megaChat.getContactNameFromJid(peer)
-    //        ),
-    //        []
-    //    )
-    //);
-
     self.room.appendMessage(
         new ChatDialogMessage({
-            messageId: 'call-handled-elsewhere' + unixtime(),
+            messageId: 'call-handled-elsewhere-' + self.sid,
             type: 'call-handled-elsewhere',
             authorContact: self.room.megaChat.getContactFromJid(peer),
-            timestamp: unixtime()
+            timestamp: unixtime(),
+            persist: false
         })
     );
 
@@ -711,10 +578,11 @@ CallSession.prototype.onCallFailed = function(e, reason, txt) {
 
     self.room.appendMessage(
         new ChatDialogMessage({
-            messageId: 'call-failed' + unixtime(),
+            messageId: 'call-failed-' + self.sid,
             type: 'call-failed',
             authorContact: self.room.megaChat.getContactFromJid(peer),
-            timestamp: unixtime()
+            timestamp: unixtime(),
+            persist: false
         })
     );
 
@@ -728,7 +596,7 @@ CallSession.prototype.onCallMissed = function(e) {
 
     self.room.appendMessage(
         new ChatDialogMessage({
-            messageId: 'call-missed' + unixtime(),
+            messageId: 'call-missed-' + self.sid,
             type: 'call-missed',
             authorContact: self.room.megaChat.getContactFromJid(peer),
             timestamp: unixtime()
@@ -744,7 +612,7 @@ CallSession.prototype.onCallTimeout = function(e) {
 
     self.room.appendMessage(
         new ChatDialogMessage({
-            messageId: 'call-timeout' + unixtime(),
+            messageId: 'call-timeout-' + self.sid,
             type: 'call-timeout',
             authorContact: self.room.megaChat.getContactFromJid(peer),
             timestamp: unixtime()
@@ -763,8 +631,8 @@ CallSession.prototype.onCallTerminated = function(e) {
 
     if (self.getCallManager().incomingCallDialog.sid === self.sid) {
         self.getCallManager().incomingCallDialog.hide();
-        self.room.getInlineDialogInstance("incoming-call").remove();
-        self.room.getInlineDialogInstance("call-starting").remove();
+
+        self._removeTempMessages();
     }
 
     if (self.room.callSession === self) {
@@ -773,11 +641,25 @@ CallSession.prototype.onCallTerminated = function(e) {
     self.renderCallEndedState();
 };
 
+/**
+ * onStateChanged handler, for now will only notify the room that there was a change in
+ * the underlying data (e.g. state)
+ *
+ * @param e
+ * @param session
+ * @param oldState
+ * @param newState
+ */
 CallSession.prototype.onStateChanged = function(e, session, oldState, newState) {
-    //console.error("State changed: ", this, arguments);
     this.room.trackDataChange();
 };
 
+/**
+ * End/cancel/reject a call.
+ *
+ * @param [reason] {String}
+ * @returns {*}
+ */
 CallSession.prototype.endCall = function(reason) {
     var self = this;
 
@@ -974,7 +856,10 @@ CallSession.prototype.getPeer = function() {
     var jingleSession = this.getJingleSession();
     if (jingleSession && jingleSession.peerJid) {
         return jingleSession.peerJid();
-    } else if (this.state === CallSession.STATE.WAITING_RESPONSE_OUTGOING) {
+    } else if (
+        this.state === CallSession.STATE.WAITING_RESPONSE_OUTGOING ||
+        this.state === CallSession.STATE.REJECTED
+    ) {
         // jingleSession.peerJid === undefined
         if (this.room) {
             return this.room.getParticipantsExceptMe()[0];
@@ -1238,15 +1123,7 @@ CallSession.prototype.renderCallStartedState = function() {
 
     self.renderAudioVideoScreens();
 
-    self.room.getInlineDialogInstance("call-starting").remove();
-    self.room.getInlineDialogInstance("incoming-call").remove();
-    self.room.getInlineDialogInstance("outgoing-call").remove();
-
-    self.room.refreshScrollUI();
-
-    self.room.refreshUI(true);
-
-    //self.room.resized();
+    self._removeTempMessages();
 };
 
 CallSession.prototype.renderCallEndedState = function() {
@@ -1282,13 +1159,7 @@ CallSession.prototype.renderCallEndedState = function() {
         clearInterval(self.room.megaChat._currentCallTimer);
     }
 
-
-
-
-
-    self.room.getInlineDialogInstance("call-starting").remove();
-    self.room.getInlineDialogInstance("incoming-call").remove();
-    self.room.getInlineDialogInstance("outgoing-call").remove();
+    self._removeTempMessages();
 
     $('.video-full-container').addClass("hidden");
 
@@ -1758,12 +1629,13 @@ CallManager.prototype._attachToChatRoom = function(megaChat, chatRoom) {
         }
 
 
-        self.room.appendMessage(
+        chatRoom.appendMessage(
             new ChatDialogMessage({
-                messageId: 'call-failed-media' + unixtime(),
+                messageId: 'call-failed-media-' + session.sid,
                 type: 'call-failed-media',
-                authorContact: self.room.megaChat.getContactFromJid(session.getPeer()),
-                timestamp: unixtime()
+                authorContact: chatRoom.megaChat.getContactFromJid(session.getPeer()),
+                timestamp: unixtime(),
+                persist: false
             })
         );
 
@@ -1905,68 +1777,48 @@ CallManager.prototype.startCall = function(chatRoom, mediaOptions) {
         var req = chatRoom.megaChat.rtc.startMediaCall(participants[0], mediaOptions);
         session = self.callSessions[req.sid] = new CallSession(chatRoom, req.sid);
 
+
+        $('.btn-chat-cancel-active-call', chatRoom.$header).bind('click.megaChat', function() {
+            if (chatRoom.callSession) {
+                if (chatRoom.callSession.isStarted() || chatRoom.callSession.isStarting()) {
+                    chatRoom.callSession.endCall();
+                }
+            }
+        });
+
+
+        chatRoom._resetCallStateInCall();
+
         session.setState(CallSession.STATE.WAITING_RESPONSE_OUTGOING);
 
         chatRoom.trigger('onOutgoingCall', [req, mediaOptions, session]);
+
+        chatRoom.appendMessage(
+            new ChatDialogMessage({
+                messageId: 'outgoing-call-' + session.sid,
+                type: 'outgoing-call',
+                authorContact: chatRoom.megaChat.getContactFromJid(participants[0]),
+                timestamp: unixtime(),
+                persist: false,
+                buttons: {
+                    'reject': {
+                        'type': 'secondary',
+                        'text': l[1686],
+                        'callback': function () {
+                            if (session) {
+                                session.endCall('caller');
+                            }
+                        }
+                    }
+                }
+            })
+        );
 
 
         self.trigger('WaitingResponseOutgoing', [session, req]);
         $masterPromise.resolve(session);
 
     });
-
-
-
-    $('.btn-chat-cancel-active-call', chatRoom.$header).bind('click.megaChat', function() {
-        if (chatRoom.callSession) {
-            if (chatRoom.callSession.isStarted() || chatRoom.callSession.isStarting()) {
-                chatRoom.callSession.endCall();
-            }
-        }
-    });
-
-
-    chatRoom._resetCallStateInCall();
-
-
-    //chatRoom.appendDomMessage(
-    //    chatRoom.generateInlineDialog(
-    //        "outgoing-call",
-    //        participants[0],
-    //        "outgoing-call",
-    //        callingString,
-    //        [], {
-    //            'reject': {
-    //                'type': 'secondary',
-    //                'text': l[1686],
-    //                'callback': function() {
-    //                    if (session) { session.endCall('caller'); }
-    //                }
-    //            }
-    //        }
-    //    )
-    //);
-
-
-    chatRoom.appendMessage(
-        new ChatDialogMessage({
-            messageId: 'outgoing-call' + unixtime(),
-            type: 'outgoing-call',
-            authorContact: chatRoom.megaChat.getContactFromJid(participants[0]),
-            timestamp: unixtime(),
-            buttons: {
-                'reject': {
-                    'type': 'secondary',
-                    'text': l[1686],
-                    'callback': function () {
-                        if (session) {
-                            session.endCall('caller');
-                        }
-                    }
-                }
-            }
-        })
-    );
 
     return $masterPromise;
 };

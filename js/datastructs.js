@@ -260,7 +260,7 @@ _arrayAliases.forEach(function(methodName) {
             if(methodName == "push") {
                 if(
                     arguments.length > 0 &&
-                    (arguments[0]._dataChangeIndex) &&
+                    (typeof(arguments[0]._dataChangeIndex) !== 'undefined') &&
                     !arguments[0]._parent
                 ) {
                     arguments[0]._parent = this;

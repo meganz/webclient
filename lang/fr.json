@@ -1582,6 +1582,7 @@
     "5914": "Mes conversations",
     "5915": "Mes partages entrantes",
     "5916": "Mes dossiers",
+    "5918": "On dirait que c'est un e-mail non valide !",
     "5921": "Montant",
     "5922": "Descendant",
     "5923": "En ligne",
@@ -2359,5 +2360,7 @@
     "7405": "Un ou plusieurs de vos \u00e9l\u00e9ments ont \u00e9t\u00e9 supprim\u00e9s par un autre utilisateur.",
     "7410": "Tout dossier ou fichier partag\u00e9 ne sera plus accessible aux autres utilisateurs.",
     "7411": "Code Source",
-    "7412": "Sauvegarder la clef ma\u00eetre de chiffrement"
+    "7412": "Sauvegarder la clef ma\u00eetre de chiffrement",
+    "7413": "You already have a contact with that email",
+    "7414": "There's no need to add your own email address"
 }

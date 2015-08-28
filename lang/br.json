@@ -1582,6 +1582,7 @@
     "5914": "Minhas conversas",
     "5915": "Minhas pastas recebidas",
     "5916": "Minhas pastas",
+    "5918": "Parece que o e-mail n\u00e3o est\u00e1 escrito corretamente",
     "5921": "Crescente",
     "5922": "Decrescente",
     "5923": "Online",
@@ -2192,7 +2193,7 @@
     "7199": "A opera\u00e7\u00e3o n\u00e3o tenha terminado correctamente. O cart\u00e3o de cr\u00e9dito n\u00e3o ser\u00e1 cobrado.",
     "7200": "As informa\u00e7\u00f5es do cart\u00e3o de cr\u00e9dito n\u00e3o est\u00e1 correto. O cart\u00e3o de cr\u00e9dito n\u00e3o ser\u00e1 cobrado.",
     "7201": "O saldo da sua conta \u00e9",
-    "7202": "Para aumentar o seu saldo, clique no bot\u00e3o Resgatar voucher e insira seu c\u00f3digo de voucher. Se voc\u00ea n\u00e3o tiver um voucher, por favor [A] comprar um voucher [\/ A].",
+    "7202": "Para aumentar o seu saldo, clique no bot\u00e3o Resgatar voucher e insira seu c\u00f3digo de voucher. Se voc\u00ea n\u00e3o tiver um voucher, por favor [A] comprar um voucher [\/A].",
     "7203": "Transferindo-se para provedor de pagamento ...",
     "7204": "Voc\u00ea pode ter acesso \u00e0 c\u00e2mera proibido para esse site anteriormente - neste caso, todos os pedidos subsequentes c\u00e2mera falhar silenciosamente. Voc\u00ea pode verificar o \u00edcone de c\u00e2mera ao lado da barra de endere\u00e7os, ou nas configura\u00e7\u00f5es de permiss\u00f5es do site.",
     "7205": "Responda",
@@ -2359,5 +2360,7 @@
     "7405": "One or more of your items were deleted by another user.",
     "7410": "Any shared files or folders will no longer be accessible to other users.",
     "7411": "Source Code",
-    "7412": "Backup master key"
+    "7412": "Backup master key",
+    "7413": "You already have a contact with that email",
+    "7414": "There's no need to add your own email address"
 }

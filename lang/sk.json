@@ -1582,6 +1582,7 @@
     "5914": "Moje konverz\u00e1cie",
     "5915": "Pr\u00edchodzie zdie\u013eania",
     "5916": "Moje prie\u010dinky",
+    "5918": "Vyzer\u00e1 to na chyb\u00fd form\u00e1t emailu!",
     "5921": "Vzostupne",
     "5922": "Zostupne",
     "5923": "Online",
@@ -1884,7 +1885,7 @@
     "6843": "but before you leave we would love to know why you are leaving us",
     "6844": "Pros\u00edm jedno si vyberte",
     "6845": "Svoj \u00fa\u010det u\u017e nepou\u017e\u00edvam",
-    "6846": "My favourite browser is not technologically compatible and I don t want to change",
+    "6846": "My favourite browser is not technologically compatible and I don't want to change",
     "6847": "MEGA has under delivered on its promise",
     "6848": "Zanecha\u0165 koment\u00e1r",
     "6849": "Mo\u017enosti zdie\u013eania",
@@ -2359,5 +2360,7 @@
     "7405": "One or more of your items were deleted by another user.",
     "7410": "Any shared files or folders will no longer be accessible to other users.",
     "7411": "Source Code",
-    "7412": "Backup master key"
+    "7412": "Backup master key",
+    "7413": "You already have a contact with that email",
+    "7414": "There's no need to add your own email address"
 }

@@ -1582,6 +1582,7 @@
     "5914": "Keskusteluni",
     "5915": "Saapuvat jaot",
     "5916": "Kansioni",
+    "5918": "N\u00e4ytt\u00e4\u00e4 silt\u00e4, ett\u00e4 sinulla on virheellisesti muotoiltu s\u00e4hk\u00f6posti!",
     "5921": "Nouseva",
     "5922": "Laskeva",
     "5923": "Paikalla",
@@ -2359,5 +2360,7 @@
     "7405": "Toinen k\u00e4ytt\u00e4j\u00e4 on poistanut yhden tai useamman kohteesi.",
     "7410": "Jaetut tiedostot tai kansiot poistetaan k\u00e4ytt\u00e4jien saatavilta.",
     "7411": "L\u00e4hdekoodi",
-    "7412": "Is\u00e4nt\u00e4avaimen varmistus"
+    "7412": "Is\u00e4nt\u00e4avaimen varmistus",
+    "7413": "You already have a contact with that email",
+    "7414": "There's no need to add your own email address"
 }

@@ -1582,6 +1582,7 @@
     "5914": "\u05d4\u05e9\u05d9\u05d7\u05d5\u05ea \u05e9\u05dc\u05d9",
     "5915": "\u05d4\u05e9\u05d9\u05ea\u05d5\u05e4\u05d9\u05dd \u05e9\u05d4\u05ea\u05e7\u05d1\u05dc\u05d5",
     "5916": "\u05d4\u05ea\u05d9\u05e7\u05d9\u05d5\u05ea \u05e9\u05dc\u05d9",
+    "5918": "\u05e0\u05e8\u05d0\u05d4 \u05e9\u05d9\u05e9 \u05db\u05ea\u05d5\u05d1\u05ea \u05de\u05d9\u05d9\u05dc \u05e9\u05d2\u05d5\u05d9\u05d4!",
     "5921": "\u05e2\u05d5\u05dc\u05d4",
     "5922": "\u05d9\u05d5\u05e8\u05d3",
     "5923": "\u05de\u05d7\u05d5\u05d1\u05e8",
@@ -2359,5 +2360,7 @@
     "7405": "\u05d0\u05d7\u05d3 \u05d0\u05d5 \u05d9\u05d5\u05ea\u05e8 \u05de\u05e7\u05d1\u05e6\u05d9\u05da \u05e0\u05de\u05d7\u05e7\u05d5 \u05e2\u05dc \u05d9\u05d3\u05d9 \u05de\u05e9\u05ea\u05de\u05e9 \u05d0\u05d7\u05e8.",
     "7410": "Any shared files or folders will no longer be accessible to other users.",
     "7411": "Source Code",
-    "7412": "Backup master key"
+    "7412": "Backup master key",
+    "7413": "You already have a contact with that email",
+    "7414": "There's no need to add your own email address"
 }

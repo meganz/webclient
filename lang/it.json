@@ -1582,6 +1582,7 @@
     "5914": "Le mie conversazioni",
     "5915": "Le mie azioni in arrivo",
     "5916": "Cartelle",
+    "5918": "Sembra che ci sia una e-mail non valida!",
     "5921": "Ascendente",
     "5922": "Discendente",
     "5923": "Online",
@@ -1884,7 +1885,7 @@
     "6843": "but before you leave we would love to know why you are leaving us",
     "6844": "Scegli",
     "6845": "Non utilizzo pi\u00f9 il mio account",
-    "6846": "My favourite browser is not technologically compatible and I don t want to change",
+    "6846": "My favourite browser is not technologically compatible and I don't want to change",
     "6847": "MEGA has under delivered on its promise",
     "6848": "Lascia un commento",
     "6849": "Opzioni condivisione",
@@ -2359,5 +2360,7 @@
     "7405": "One or more of your items were deleted by another user.",
     "7410": "Any shared files or folders will no longer be accessible to other users.",
     "7411": "Source Code",
-    "7412": "Backup master key"
+    "7412": "Backup master key",
+    "7413": "You already have a contact with that email",
+    "7414": "There's no need to add your own email address"
 }

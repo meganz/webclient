@@ -1582,6 +1582,7 @@
     "5914": "\u0e01\u0e32\u0e23\u0e2a\u0e19\u0e17\u0e19\u0e32\u0e02\u0e2d\u0e07\u0e09\u0e31\u0e19",
     "5915": "\u0e41\u0e0a\u0e23\u0e4c\u0e02\u0e32\u0e40\u0e02\u0e49\u0e32\u0e02\u0e2d\u0e07\u0e09\u0e31\u0e19",
     "5916": "\u0e42\u0e1f\u0e25\u0e40\u0e14\u0e2d\u0e23\u0e4c\u0e02\u0e2d\u0e07\u0e09\u0e31\u0e19",
+    "5918": "\u0e14\u0e39\u0e40\u0e2b\u0e21\u0e37\u0e2d\u0e19\u0e27\u0e48\u0e32\u0e21\u0e35\u0e2d\u0e35\u0e40\u0e21\u0e25\u0e44\u0e21\u0e48\u0e16\u0e39\u0e01\u0e15\u0e49\u0e2d\u0e07!",
     "5921": "\u0e08\u0e32\u0e01\u0e19\u0e49\u0e2d\u0e22\u0e44\u0e1b\u0e21\u0e32\u0e01",
     "5922": "\u0e08\u0e32\u0e01\u0e21\u0e32\u0e01\u0e44\u0e1b\u0e19\u0e49\u0e2d\u0e22",
     "5923": "\u0e2d\u0e2d\u0e19\u0e44\u0e25\u0e19\u0e4c",
@@ -1879,12 +1880,12 @@
     "6838": "From your computer",
     "6839": "Download to your Cloud Drive",
     "6840": "Download to your computer",
-    "6841": "We re sorry to see you go",
+    "6841": "We're sorry to see you go",
     "6842": "Your account has now been closed",
     "6843": "but before you leave we would love to know why you are leaving us",
     "6844": "Please select one",
-    "6845": "I don t use my account anymore",
-    "6846": "My favourite browser is not technologically compatible and I don t want to change",
+    "6845": "I don't use my account anymore",
+    "6846": "My favourite browser is not technologically compatible and I don't want to change",
     "6847": "MEGA has under delivered on its promise",
     "6848": "Leave a comment",
     "6849": "Share options",
@@ -2359,5 +2360,7 @@
     "7405": "One or more of your items were deleted by another user.",
     "7410": "Any shared files or folders will no longer be accessible to other users.",
     "7411": "Source Code",
-    "7412": "Backup master key"
+    "7412": "Backup master key",
+    "7413": "You already have a contact with that email",
+    "7414": "There's no need to add your own email address"
 }

@@ -1582,6 +1582,7 @@
     "5914": "C\u00e1c cu\u1ed9c tr\u00f2 chuy\u1ec7n",
     "5915": "N\u1ed9i dung chia s\u1ebb m\u1edbi",
     "5916": "Th\u01b0 m\u1ee5c c\u1ee7a t\u00f4i",
+    "5918": "H\u00ecnh nh\u01b0 email kh\u00f4ng n\u00e0y kh\u00f4ng \u0111\u00fang!",
     "5921": "T\u0103ng d\u1ea7n",
     "5922": "Gi\u1ea3m d\u1ea7n",
     "5923": "\u0110ang online",
@@ -1879,12 +1880,12 @@
     "6838": "T\u1eeb m\u00e1y t\u00ednh",
     "6839": "Download to your Cloud Drive",
     "6840": "Download to your computer",
-    "6841": "We re sorry to see you go",
+    "6841": "We're sorry to see you go",
     "6842": "Your account has now been closed",
     "6843": "but before you leave we would love to know why you are leaving us",
     "6844": "Xin ch\u1ecdn m\u1ed9t m\u1ee5c",
-    "6845": "I don t use my account anymore",
-    "6846": "My favourite browser is not technologically compatible and I don t want to change",
+    "6845": "I don't use my account anymore",
+    "6846": "My favourite browser is not technologically compatible and I don't want to change",
     "6847": "MEGA \u0111\u00e3 kh\u00f4ng l\u00e0m tr\u00f2n l\u1eddi h\u1ee9a c\u1ee7a m\u00ecnh",
     "6848": "Vi\u1ebft m\u1ed9t l\u1eddi b\u00ecnh lu\u1eadn",
     "6849": "Share options",
@@ -2359,5 +2360,7 @@
     "7405": "One or more of your items were deleted by another user.",
     "7410": "Any shared files or folders will no longer be accessible to other users.",
     "7411": "Source Code",
-    "7412": "Backup master key"
+    "7412": "Backup master key",
+    "7413": "You already have a contact with that email",
+    "7414": "There's no need to add your own email address"
 }

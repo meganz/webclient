@@ -1582,6 +1582,7 @@
     "5914": "\u6211\u7684\u901a\u8bdd\u8bb0\u5f55",
     "5915": "\u5f97\u5230\u7684\u5206\u4eab",
     "5916": "\u6211\u7684\u6587\u4ef6\u5939",
+    "5918": "\u7535\u5b50\u90ae\u4ef6\u683c\u5f0f\u4e0d\u5bf9",
     "5921": "\u5347\u5e8f",
     "5922": "\u964d\u5e8f",
     "5923": "Online",
@@ -1879,12 +1880,12 @@
     "6838": "From your computer",
     "6839": "Download to your Cloud Drive",
     "6840": "Download to your computer",
-    "6841": "We re sorry to see you go",
+    "6841": "We're sorry to see you go",
     "6842": "\u60a8\u7684\u8cec\u6236\u5df2\u8a3b\u92b7",
     "6843": "but before you leave we would love to know why you are leaving us",
     "6844": "Please select one",
-    "6845": "I don t use my account anymore",
-    "6846": "My favourite browser is not technologically compatible and I don t want to change",
+    "6845": "I don't use my account anymore",
+    "6846": "My favourite browser is not technologically compatible and I don't want to change",
     "6847": "MEGA has under delivered on its promise",
     "6848": "Leave a comment",
     "6849": "Share options",
@@ -2359,5 +2360,7 @@
     "7405": "One or more of your items were deleted by another user.",
     "7410": "Any shared files or folders will no longer be accessible to other users.",
     "7411": "Source Code",
-    "7412": "Backup master key"
+    "7412": "Backup master key",
+    "7413": "You already have a contact with that email",
+    "7414": "There's no need to add your own email address"
 }

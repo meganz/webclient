@@ -1582,6 +1582,7 @@
     "5914": "Moji pogovori",
     "5915": "Moje dohodne delitve",
     "5916": "Moje mape",
+    "5918": "Izgleda, da je e-po\u0161ta po\u0161kodovana!",
     "5921": "Rasto\u010d",
     "5922": "Padajo\u010d",
     "5923": "Dostopen",
@@ -2359,5 +2360,7 @@
     "7405": "One or more of your items were deleted by another user.",
     "7410": "Any shared files or folders will no longer be accessible to other users.",
     "7411": "Source Code",
-    "7412": "Backup master key"
+    "7412": "Backup master key",
+    "7413": "You already have a contact with that email",
+    "7414": "There's no need to add your own email address"
 }

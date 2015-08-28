@@ -1582,6 +1582,7 @@
     "5914": "\u79c1\u306e\u4f1a\u8a71",
     "5915": "\u5171\u6709\u53d7\u4fe1\u4e2d",
     "5916": "\u79c1\u306e\u30d5\u30a9\u30eb\u30c0",
+    "5918": "\u304a\u304b\u3057\u306a\u30e1\u30fc\u30eb\u304c\u3042\u308b\u3088\u3046\u3067\u3059\u3002",
     "5921": "\u4e0a\u6607\u4e2d",
     "5922": "\u4e0b\u964d\u4e2d",
     "5923": "\u30aa\u30f3\u30e9\u30a4\u30f3",
@@ -2359,5 +2360,7 @@
     "7405": "One or more of your items were deleted by another user.",
     "7410": "Any shared files or folders will no longer be accessible to other users.",
     "7411": "Source Code",
-    "7412": "Backup master key"
+    "7412": "Backup master key",
+    "7413": "You already have a contact with that email",
+    "7414": "There's no need to add your own email address"
 }

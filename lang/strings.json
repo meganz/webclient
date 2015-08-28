@@ -9454,5 +9454,9 @@
     "7414": {
         "text": "There's no need to add your own email address",
         "context": "Add contacts and share dialog error message when user try to add  your email address"
+    },
+    "7415": {
+        "text": "Looks like there's a malformed email",
+        "context": "Add contacts and share dialog error message when user try to add wrong email address"
     }
 }

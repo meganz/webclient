@@ -2362,5 +2362,6 @@
     "7411": "\u0418\u0441\u0445\u043e\u0434\u043d\u044b\u0439 \u043a\u043e\u0434",
     "7412": "Backup master key",
     "7413": "You already have a contact with that email",
-    "7414": "There's no need to add your own email address"
+    "7414": "There's no need to add your own email address",
+    "7415": "Looks like there's a malformed email"
 }

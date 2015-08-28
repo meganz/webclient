@@ -1639,13 +1639,13 @@ function addContactUI()
             scrollLocation: 'add',
             excludeCurrent: true,// Exclude from dropdownlist only emails/names which exists in multi-input (tokens)
             onEmailCheck: function() {
-                errorMsg("Looks like there's a malformed email!");
+                errorMsg("Looks like there's a malformed email");
             },
             onDoublet: function(u) {
-                errorMsg('You already have contact with that email!');
+                errorMsg('You already have a contact with that email');
             },
             onHolder: function() {
-                errorMsg('No need for that, you are THE owner!');
+                errorMsg("There's no need to add your own email address");
             },
             onAdd: function() {
                 var itemNum = $('.token-input-list-mega .token-input-token-mega').length;
@@ -4808,87 +4808,93 @@ var SelectionManager = function($selectable) {
 
 var selectionManager;
 
-function UIkeyevents()
-{
+function UIkeyevents() {
     $(window).unbind('keydown.uikeyevents');
-    $(window).bind('keydown.uikeyevents', function(e)
-    {
-        if (e.keyCode == 9 && !$(e.target).is("input,textarea,select"))
+    $(window).bind('keydown.uikeyevents', function(e) {
+        if (e.keyCode == 9 && !$(e.target).is("input,textarea,select")) {
             return false;
+        }
 
         var sl = false, s;
-        if (M.viewmode)
+        if (M.viewmode) {
             s = $('.file-block.ui-selected');
-        else
+        }
+        else {
             s = $('.grid-table tr.ui-selected');
+        }
         var selPanel = $('.fm-transfers-block tr.ui-selected').not('.clone-of-header');
 
-        if (M.chat)
+        if (M.chat) {
             return true;
+        }
 
-        if (!is_fm())
+        if (!is_fm()) {
             return true;
+        }
 
         /**
          * Because of te .unbind, this can only be here... it would be better if its moved to iconUI(), but maybe some
          * other day :)
          */
-        if (!$.dialog && !slideshowid && M.viewmode == 1)
-        {
+        if (!$.dialog && !slideshowid && M.viewmode == 1) {
             var items_per_row = Math.floor($('.file-block').parent().outerWidth() / $('.file-block:first').outerWidth(true));
             var total_rows = Math.ceil($('.file-block').size() / items_per_row);
 
-            if (e.keyCode == 37)
-            {
+            if (e.keyCode == 37) {
                 // left
                 var current = selectionManager.get_currently_selected("first");
                 // clear old selection if no shiftKey
-                if (!e.shiftKey)
+                if (!e.shiftKey) {
                     s.removeClass("ui-selected");
+                }
                 var $target_element = null;
-                if (current.length > 0 && current.prev(".file-block").length > 0)
+                if (current.length > 0 && current.prev(".file-block").length > 0) {
                     $target_element = current.prev(".file-block");
-                else
+                }
+                else {
                     $target_element = $('.file-block:last');
-                if ($target_element)
-                {
+                }
+                if ($target_element) {
                     $target_element.addClass('ui-selected');
                     selectionManager.set_currently_selected($target_element);
                 }
             }
-            else if (e.keyCode == 39)
-            {
+            else if (e.keyCode == 39) {
+                
                 // right
                 var current = selectionManager.get_currently_selected("last");
-                if (!e.shiftKey)
+                if (!e.shiftKey) {
                     s.removeClass("ui-selected");
+                }
                 var $target_element = null;
                 var next = current.next(".file-block");
+                
                 // clear old selection if no shiftKey
-                if (next.length > 0)
+                if (next.length > 0) {
                     $target_element = next;
-                else
+                }
+                else {
                     $target_element = $('.file-block:first');
-                if ($target_element)
-                {
+                }
+                if ($target_element) {
                     $target_element.addClass('ui-selected');
                     selectionManager.set_currently_selected($target_element);
                 }
-
-            } else if (e.keyCode == 38 || e.keyCode == 40) { // up & down
-                var current = selectionManager.get_currently_selected("first");
-                var current_idx = $.elementInArray(
-                    current,
-                    $('.file-block')
-                    ) + 1;
+            }
+            
+            // up & down
+            else if (e.keyCode == 38 || e.keyCode == 40) {
+                var current = selectionManager.get_currently_selected("first"),
+                    current_idx = $.elementInArray(current, $('.file-block')) + 1;
 
                 if (!e.shiftKey) {
                     s.removeClass("ui-selected");
                 }
 
-                var current_row = Math.ceil(current_idx / items_per_row);
-                var current_col = current_idx % items_per_row;
-                var target_row;
+                var current_row = Math.ceil(current_idx / items_per_row),
+                    current_col = current_idx % items_per_row,
+                    target_row;
+                    
                 if (e.keyCode == 38) { // up
                     // handle the case when the users presses ^ and the current row is the first row
                     target_row = current_row == 1 ? total_rows : current_row - 1;
@@ -4898,136 +4904,127 @@ function UIkeyevents()
                 }
 
                 // calc the index of the target element
-                var target_element_num = ((target_row - 1) * items_per_row) + (current_col - 1);
-
-                var $target = $('.file-block:eq(' + target_element_num + ')');
+                var target_element_num = ((target_row - 1) * items_per_row) + (current_col - 1),
+                    $target = $('.file-block:eq(' + target_element_num + ')');
 
                 $target.addClass("ui-selected");
-                selectionManager.set_currently_selected(
-                    $target
-                    );
+                selectionManager.set_currently_selected($target);
 
             }
         }
-        if (e.keyCode == 38 && s.length > 0 && $.selectddUIgrid.indexOf('.grid-scrolling-table') > -1 && !$.dialog)
-        {
+        if (e.keyCode == 38 && s.length > 0 && $.selectddUIgrid.indexOf('.grid-scrolling-table') > -1 && !$.dialog) {
+            
             // up in grid
-            if (e.shiftKey)
+            if (e.shiftKey) {
                 $(e).addClass('ui-selected');
-            if ($(s[0]).prev().length > 0)
-            {
-                if (!e.shiftKey)
+            }
+            if ($(s[0]).prev().length > 0) {
+                if (!e.shiftKey) {
                     $('.grid-table tr').removeClass('ui-selected');
+                }
                 $(s[0]).prev().addClass('ui-selected');
                 sl = $(s[0]).prev();
 
                 quickFinder.disable_if_active();
             }
         }
-        else if (e.keyCode == 40 && s.length > 0 && $.selectddUIgrid.indexOf('.grid-scrolling-table') > -1 && !$.dialog)
-        {
+        else if (e.keyCode == 40 && s.length > 0 && $.selectddUIgrid.indexOf('.grid-scrolling-table') > -1 && !$.dialog) {
+            
             // down in grid
-            if (e.shiftKey)
+            if (e.shiftKey) {
                 $(e).addClass('ui-selected');
-            if ($(s[s.length - 1]).next().length > 0)
-            {
-                if (!e.shiftKey)
+            }
+            if ($(s[s.length - 1]).next().length > 0) {
+                if (!e.shiftKey) {
                     $('.grid-table tr').removeClass('ui-selected');
+                }
                 $(s[s.length - 1]).next().addClass('ui-selected');
                 sl = $(s[0]).next();
 
                 quickFinder.disable_if_active();
             }
         }
-        else if (e.keyCode == 46 && s.length > 0 && !$.dialog && RightsbyID(M.currentdirid) > 1)
-        {
+        else if (e.keyCode == 46 && s.length > 0 && !$.dialog && RightsbyID(M.currentdirid) > 1) {
             $.selected = [];
-            s.each(function(i, e)
-            {
+            s.each(function(i, e) {
                 $.selected.push($(e).attr('id'));
             });
             fmremove();
         }
-        else if (e.keyCode == 46 && selPanel.length > 0 && !$.dialog && RightsbyID(M.currentdirid) > 1)
-        {
+        else if (e.keyCode == 46 && selPanel.length > 0 && !$.dialog && RightsbyID(M.currentdirid) > 1) {
             var selected = [];
             selPanel.each(function() {
                 selected.push($(this).attr('id'));
             });
-            msgDialog('confirmation', l[1003], "Cancel " + selected.length + " transferences?", false, function(e)
-            {
+            msgDialog('confirmation', l[1003], "Cancel " + selected.length + " transferences?", false, function(e) {
+                
                 // we should encapsule the click handler
                 // to call a function rather than use this hacking
-                if (e)
+                if (e) {
                     $('.transfer-clear').trigger('click');
+                }
             });
         }
-        else if (e.keyCode == 13 && s.length > 0 && !$.dialog && !$.msgDialog && $('.fm-new-folder').attr('class').indexOf('active') == -1 && $('.top-search-bl').attr('class').indexOf('active') == -1)
-        {
+        else if (e.keyCode == 13 && s.length > 0 && !$.dialog && !$.msgDialog && $('.fm-new-folder').attr('class').indexOf('active') == -1 && $('.top-search-bl').attr('class').indexOf('active') == -1) {
             $.selected = [];
-            s.each(function(i, e)
-            {
+            s.each(function(i, e) {
                 $.selected.push($(e).attr('id'));
             });
-            if ($.selected && $.selected.length > 0)
-            {
+            if ($.selected && $.selected.length > 0) {
                 var n = M.d[$.selected[0]];
-                if (n && n.t)
+                if (n && n.t) {
                     M.openFolder(n.h);
-                else if ($.selected.length == 1 && M.d[$.selected[0]] && is_image(M.d[$.selected[0]]))
+                }
+                else if ($.selected.length == 1 && M.d[$.selected[0]] && is_image(M.d[$.selected[0]])) {
                     slideshow($.selected[0]);
-                else
+                }
+                else {
                     M.addDownload($.selected);
+                }
             }
         }
-        else if (e.keyCode == 13 && $.dialog == 'rename')
-        {
+        else if (e.keyCode == 13 && $.dialog == 'share') {
+            alert('Share Dialog');
+        }
+        else if (e.keyCode == 13 && $.dialog == 'rename') {
             dorename();
         }
-        else if (e.keyCode == 27 && ($.copyDialog || $.moveDialog))
-        {
+        else if (e.keyCode == 27 && ($.copyDialog || $.moveDialog)) {
             closeDialog();
         }
-        else if (e.keyCode == 27 && $.dialog)
-        {
+        else if (e.keyCode == 27 && $.dialog) {
             closeDialog();
         }
-        else if (e.keyCode == 27 && $.msgDialog)
-        {
+        else if (e.keyCode == 27 && $.msgDialog) {
             closeMsg();
-            if ($.warningCallback)
+            if ($.warningCallback) {
                 $.warningCallback(false);
+            }
         }
-        else if ((e.keyCode == 13 && $.msgDialog == 'confirmation') && (e.keyCode == 13 && $.msgDialog == 'remove'))
-        {
+        else if ((e.keyCode == 13 && $.msgDialog == 'confirmation') && (e.keyCode == 13 && $.msgDialog == 'remove')) {
             closeMsg();
-            if ($.warningCallback)
+            if ($.warningCallback) {
                 $.warningCallback(true);
+            }
         }
-        else if (e.keyCode == 65 && e.ctrlKey && !$.dialog)
-        {
+        else if (e.keyCode == 65 && e.ctrlKey && !$.dialog) {
             $('.grid-table.fm tr').addClass('ui-selected');
             $('.file-block').addClass('ui-selected');
         }
-        else if (e.keyCode == 37 && slideshowid)
-        {
+        else if (e.keyCode == 37 && slideshowid) {
             slideshow_prev();
         }
-        else if (e.keyCode == 39 && slideshowid)
-        {
+        else if (e.keyCode == 39 && slideshowid) {
             slideshow_next();
         }
-        else if (e.keyCode == 27 && slideshowid)
-        {
+        else if (e.keyCode == 27 && slideshowid) {
             slideshow(slideshowid, true);
         }
-        else if (e.keyCode == 27)
-        {
+        else if (e.keyCode == 27) {
             $.hideTopMenu();
         }
 
-        if (sl && $.selectddUIgrid.indexOf('.grid-scrolling-table') > -1)
-        {
+        if (sl && $.selectddUIgrid.indexOf('.grid-scrolling-table') > -1) {
             var jsp = $($.selectddUIgrid).data('jsp');
             jsp.scrollToElement(sl);
         }
@@ -7257,13 +7254,13 @@ function initShareDialog() {
             scrollLocation: 'share',
             excludeCurrent: true,// Exclude from dropdownlist only emails/names which exists in multi-input (tokens)
             onEmailCheck: function() {
-                errorMsg("Looks like there's a malformed email!");
+                errorMsg("Looks like there's a malformed email");
             },
-            onDoublet: function(item) {
-                errorMsg('You already have contact with that email!');
+            onDoublet: function(u) {
+                errorMsg('You already have a contact with that email');
             },
             onHolder: function() {
-                errorMsg('No need for that, you are THE owner!');
+                errorMsg("There's no need to add your own email address");
             },
             onAdd: function(item) {
 

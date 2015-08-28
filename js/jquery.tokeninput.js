@@ -410,14 +410,17 @@
                         if (selected_dropdown_item) {
                             add_token($(selected_dropdown_item).data("tokeninput"));
                             hidden_input.change();
-                        } else {
+                        }
+                        else {
                             if ($(input).data("settings").allowFreeTagging) {
                                 if ($(input).data("settings").allowTabOut && $(this).val() === "") {
                                     return true;
-                                } else {
+                                }
+                                else {
                                     add_freetagging_tokens();
                                 }
-                            } else {
+                            }
+                            else {
                                 $(this).val("");
                                 if ($(input).data("settings").allowTabOut) {
                                     return true;
@@ -426,6 +429,7 @@
                             event.stopPropagation();
                             event.preventDefault();
                         }
+                        
                         return false;
 
                     case KEY.ESCAPE:
@@ -712,13 +716,15 @@
 
         // Add a token to the token list based on user input
         function add_token(item) {
+            
             var callback = $(input).data("settings").onAdd;
 
-            if ($(input).data("settings").emailCheck)
-            {
+            if ($(input).data("settings").emailCheck) {
+                
                 var isValidEmail = IsEmail(item[settings.tokenValue]);
-                if (!isValidEmail)// Prevent further execution if email format is wrong
-                {
+                
+                // Prevent further execution if email format is wrong
+                if (!isValidEmail) {
                     var cb = $(input).data("settings").onEmailCheck;
                     if ($.isFunction(cb)) {
                         cb.call(hidden_input, item);
@@ -728,10 +734,8 @@
                 }
             }
 
-            if ($(input).data("settings").accountHolder)
-            {
-                if ($(input).data("settings").accountHolder.toLowerCase() === item[settings.tokenValue].toLowerCase())
-                {
+            if ($(input).data("settings").accountHolder) {
+                if ($(input).data("settings").accountHolder.toLowerCase() === item[settings.tokenValue].toLowerCase()) {
                     select_token(item);
                     var cb = $(input).data("settings").onHolder;
                     if ($.isFunction(cb)) {
@@ -742,14 +746,14 @@
                 }
             }
 
-            if ($(input).data("settings").preventDoublet)
-            {
+            if ($(input).data("settings").preventDoublet) {
+                
                 var doubleEmail = $.grep($(input).data("settings").local_data, function(row) {
                     return row[$(input).data("settings").propertyToSearch].toLowerCase().indexOf(item[settings.tokenValue].toLowerCase()) > -1;
                 });
-
-                if (doubleEmail.length)// Prevent further execution if email is duplicated
-                {
+                
+                // Prevent further execution if email is duplicated
+                if (doubleEmail.length) {
                     select_token(item);
                     var cb = $(input).data("settings").onDoublet;
                     if ($.isFunction(cb)) {
@@ -760,8 +764,8 @@
                 }
             }
 
-            if ($.inArray(item[settings.tokenValue], $.sharedTokens) !== -1)// compare against already added contacts, for shared folder exlusivelly
-            {
+            // compare against already added contacts, for shared folder exlusivelly
+            if ($.inArray(item[settings.tokenValue], $.sharedTokens) !== -1) {
                 var cb = $(input).data("settings").onDoublet;
                 if ($.isFunction(cb)) {
                     cb.call(hidden_input, item);
@@ -799,6 +803,7 @@
             // Insert the new tokens
             if ($(input).data("settings").tokenLimit == null || token_count < $(input).data("settings").tokenLimit && isValidEmail) {
                 insert_token(item);
+                
                 // Remove the placeholder so it's not seen after you've added a token
                 input_box.attr("placeholder", null)
                 checkTokenLimit();
@@ -809,13 +814,14 @@
 
             // Don't show the help dropdown, they've got the idea
             hide_dropdown();
+            
             // Execute the onAdd callback if defined
             if ($.isFunction(callback)) {
                 callback.call(hidden_input, item);
             }
 
             $(input).data("settings").local_data.push({id: item[settings.tokenValue], name: item[settings.tokenValue]});
-        }
+        }// END of function add_token
 
         // Select a token in the token list
         function select_token(token) {

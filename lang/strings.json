@@ -61,7 +61,7 @@
     },
     "53": {
         "text": "1 folder",
-        "context": "refering to a file folder in the file manager"
+        "context": "Subtitle shown on the Contacts section under the name of the contact you have shared one folder with"
     },
     "55": {
         "text": "Read-only",
@@ -69,19 +69,19 @@
     },
     "56": {
         "text": "Read & Write",
-        "context": "Refers to access rights for a file folder."
+        "context": "Permissions given to the user you share your folder with"
     },
     "57": {
         "text": "Full access",
-        "context": "Refers to access rights for a file folder."
+        "context": "Permissions given to the user you share your folder with"
     },
     "58": {
         "text": "Download",
-        "context": "Item menu option upon right click on one or multiple files."
+        "context": "Button title which downloads a file\/folder to your device"
     },
     "59": {
         "text": "Get link",
-        "context": "Item menu option upon right click on one or multiple files."
+        "context": "List option shown on the details of a file or folder"
     },
     "60": {
         "text": "Sharing",
@@ -89,31 +89,31 @@
     },
     "61": {
         "text": "Rename",
-        "context": "Item menu option upon right click on one or multiple files."
+        "context": "RENAME\nTitle for the action that allows you to rename a file or folder"
     },
     "62": {
         "text": "Move",
-        "context": "Item menu option upon right click on one or multiple files."
+        "context": "MOVE\nTitle for the action that allows you to move a file or folder"
     },
     "63": {
         "text": "Copy",
-        "context": "Item menu option upon right click on one or multiple files."
+        "context": "COPY\nList option shown on the details of a file or folder"
     },
     "64": {
         "text": "Permissions",
         "context": "Item menu option upon right click on a file folder. Refers to the permissions of a file folder in the file manager."
     },
     "68": {
-        "text": "New folder",
-        "context": "Menu option to create a new folder in the file manager."
+        "text": "New Folder",
+        "context": "Menu option from the `Add` section that allows you to create a \"New Folder\""
     },
     "70": {
         "text": "Empty rubbish bin",
-        "context": "Menu option"
+        "context": "Title shown when your Rubbish Bin is empty."
     },
     "71": {
         "text": "Add contact",
-        "context": "Menu option to add a contact to your contact list."
+        "context": "Alert title shown when you select to add a contact inserting his\/her email"
     },
     "76": {
         "text": "You are about to permanently remove [X] files from the rubbish bin.",
@@ -133,15 +133,15 @@
     },
     "81": {
         "text": "OK",
-        "context": "Answer for confirmation dialog."
+        "context": "Button title to accept something"
     },
     "82": {
         "text": "Cancel",
-        "context": "Answer for confirmation dialog."
+        "context": "Button title to cancel something"
     },
     "83": {
         "text": "Remove",
-        "context": "Menu option to delete one or multiple selected items."
+        "context": "SETTINGS TAB (5) - Rubbish Bin\nTitle for the action that allows to remove a file or folder"
     },
     "85": {
         "text": "Reload",
@@ -149,11 +149,11 @@
     },
     "86": {
         "text": "Name",
-        "context": "Refers to the name of a folder or file."
+        "context": ""
     },
     "87": {
         "text": "Size",
-        "context": "Refers to the size of a file."
+        "context": "\"Size\" of the file or folder you are sharing"
     },
     "88": {
         "text": "Transfer Type",
@@ -285,7 +285,7 @@
     },
     "155": {
         "text": "Add",
-        "context": "button"
+        "context": "Button title to \"Add\" the contact to your contacts list"
     },
     "156": {
         "text": "Cancel",
@@ -297,7 +297,7 @@
     },
     "158": {
         "text": "Create",
-        "context": "Button"
+        "context": "Title button for the create folder alert."
     },
     "159": {
         "text": "Cancel",
@@ -317,11 +317,11 @@
     },
     "164": {
         "text": "Cloud Drive",
-        "context": "The name of every user's main filesystem in the cloud of MEGA. The term 'cloud' is a new computer term and can probably not be translated. Do not translate \"cloud\" literally unless your language allows this. Please see http:\/\/en.wikipedia.org\/wiki\/Cloud_computing for your reference."
+        "context": "CLOUD DRIVE TAB (1)\nTitle of the Cloud Drive section"
     },
     "165": {
         "text": "Contacts",
-        "context": "Title of the contact list"
+        "context": "CONTACTS TAB (4)\nTitle of the Contacts section"
     },
     "166": {
         "text": "Inbox",
@@ -329,7 +329,7 @@
     },
     "167": {
         "text": "Rubbish Bin",
-        "context": "The title of the trash bin in the tree of the file manager."
+        "context": "Title of one of the Settings sections where you can see your MEGA \"Rubbish Bin\""
     },
     "168": {
         "text": "Rubbish Bin",
@@ -345,7 +345,7 @@
     },
     "171": {
         "text": "Login",
-        "context": "Login button"
+        "context": "Button title which triggers the action to login in your MEGA account"
     },
     "174": {
         "text": "or",
@@ -356,8 +356,8 @@
         "context": "button to log out"
     },
     "187": {
-        "text": "My account",
-        "context": "button to the settings of the user's account"
+        "text": "My Account",
+        "context": "MY ACCOUNT TAB (7)\nTitle of My Account section. There you can see your account details"
     },
     "190": {
         "text": "Login",
@@ -441,7 +441,7 @@
     },
     "217": {
         "text": "Please check your e-mail and click the link to confirm your account.",
-        "context": ""
+        "context": "Text shown just after creating an account to remenber the user what to do to complete the account creation proccess"
     },
     "218": {
         "text": "This e-mail address has already registered an account with MEGA.",
@@ -449,7 +449,7 @@
     },
     "219": {
         "text": "This e-mail address has already registered an account with MEGA",
-        "context": ""
+        "context": "Error text shown when the users tries to create an account with an email already in use"
     },
     "220": {
         "text": "Weak",
@@ -493,7 +493,7 @@
     },
     "236": {
         "text": "Import",
-        "context": "Import button. When the user clicks this button the file will be imported to his account."
+        "context": "Button title that triggers the importing link action"
     },
     "239": {
         "text": "Download completed",
@@ -588,16 +588,16 @@
         "context": "Title header for the bottom menu with various menu sections that suit the category support."
     },
     "384": {
-        "text": "Help Centre",
-        "context": ""
+        "text": "Help centre",
+        "context": "SETTINGS TAB (5) - FeedbackTableViewController\nTitle of the section to access MEGA's help centre"
     },
     "385": {
         "text": "Terms of Service",
-        "context": ""
+        "context": "Title of one of the Settings sections where you can see the MEGA's \"Terms of Service\""
     },
     "386": {
         "text": "Privacy Policy",
-        "context": ""
+        "context": "Title of one of the Settings sections where you can see the MEGA's \"Privacy Policy\""
     },
     "387": {
         "text": "Copyright",
@@ -725,7 +725,7 @@
     },
     "435": {
         "text": "FREE",
-        "context": ""
+        "context": "Text relative to the MEGA account level. UPPER CASE"
     },
     "436": {
         "text": "No billing cycle",
@@ -1185,7 +1185,7 @@
     },
     "670": {
         "text": "Language",
-        "context": ""
+        "context": "Title of one of the Settings sections where you can set up the \"Language\" of the app"
     },
     "671": {
         "text": "Do you speak multiple languages?",
@@ -1261,7 +1261,7 @@
     },
     "704": {
         "text": "Your account has already been activated. Please log in.",
-        "context": ""
+        "context": "APPDELEGATE\nMessage shown when the user clicks on a confirm account link that has already been used"
     },
     "705": {
         "text": "Your confirmation could not be processed. Please sign up again. Error code:",
@@ -1269,7 +1269,7 @@
     },
     "706": {
         "text": "Change password",
-        "context": "Label for any 'Change password' button, menu, link, text, title, etc. - (String as short as possible)."
+        "context": "Section title where you can change your MEGA's password"
     },
     "707": {
         "text": "Update",
@@ -1284,12 +1284,12 @@
         "context": "When the user wants to change his password he has to enter the new password twice, and if they do not match the user will see this error message."
     },
     "716": {
-        "text": "Current password",
-        "context": ""
+        "text": "Current Password",
+        "context": "SETTINGS TAB (5) - ChangePasswordViewController\nHint text to suggest that the user have to write his\/her current password"
     },
     "717": {
-        "text": "New password",
-        "context": ""
+        "text": "New Password",
+        "context": "Hint text to suggest that the user have to write the new password on it"
     },
     "718": {
         "text": "Confirm new password",
@@ -1305,7 +1305,7 @@
     },
     "725": {
         "text": "Your password has been changed.",
-        "context": ""
+        "context": "Success message shown when the password has been changed"
     },
     "726": {
         "text": "Done",
@@ -1397,7 +1397,7 @@
     },
     "776": {
         "text": "Save",
-        "context": "Button to save the changed file or folder name."
+        "context": "Button title to \"Save\" the selected option"
     },
     "778": {
         "text": "Don't have a MEGA account?",
@@ -1417,11 +1417,19 @@
     },
     "783": {
         "text": "No files in your Cloud Drive",
-        "context": ""
+        "context": "EMPTY STATES - CLOUD DRIVE\nTitle shown when your Cloud Drive is empty, when you don't have any files."
     },
     "784": {
         "text": "No Contacts",
         "context": "Message shown when the user does not have any contacts in his contact list."
+    },
+    "790": {
+        "text": "Open file",
+        "context": "Button title to trigger the action of opening the file without downloading or opening it."
+    },
+    "797": {
+        "text": "Share folder",
+        "context": "CONTACTS TAB (4) - SHARE FOLDER\nButton title which, if tapped, will trigger the action of sharing with the contact or contacts selected, the folder you want inside your Cloud Drive"
     },
     "798": {
         "text": "Storage Space",
@@ -1457,7 +1465,7 @@
     },
     "823": {
         "text": "Settings",
-        "context": ""
+        "context": "SETTINGS TAB (5)\nTitle of the Settings section"
     },
     "824": {
         "text": "New shared folder from [X]",
@@ -1649,7 +1657,7 @@
     },
     "909": {
         "text": "Password",
-        "context": ""
+        "context": "Hint text to suggest that the user has to write his password"
     },
     "912": {
         "text": "from",
@@ -1805,7 +1813,7 @@
     },
     "968": {
         "text": "Create Account",
-        "context": "button that allows the user to create an account"
+        "context": "Button title which triggers the action to create a MEGA account"
     },
     "969": {
         "text": "Please try again",
@@ -1917,7 +1925,7 @@
     },
     "1001": {
         "text": "Remove contact",
-        "context": "Title in a dialog"
+        "context": "Alert title shown when you want to remove one or more contacts"
     },
     "1002": {
         "text": "Are you sure you want to remove [X] from your contact-list?",
@@ -1925,7 +1933,7 @@
     },
     "1003": {
         "text": "Confirm removal",
-        "context": "Title in dialog"
+        "context": "Alert title shown on the Rubbish Bin when you want to remove some files and folders of your MEGA account"
     },
     "1004": {
         "text": "Are you sure that you want to move [X] to the rubbish bin?",
@@ -1985,11 +1993,11 @@
     },
     "1021": {
         "text": "On",
-        "context": "Button state when something is turned on."
+        "context": "State shown to if something is enabled or disabled on Settings main tab. For example: \"Passcode On\""
     },
     "1022": {
         "text": "Off",
-        "context": "Button state when something is turned off."
+        "context": "State shown to if something is enabled or disabled on Settings main tab. For example: \"Passcode Off\""
     },
     "1023": {
         "text": "You do not have write access to this folder.",
@@ -2069,7 +2077,7 @@
     },
     "1043": {
         "text": "Folder link unavailable",
-        "context": "Title for a folder link that is unavailable"
+        "context": "Error title shown when a folder link doesn't exist."
     },
     "1044": {
         "text": "The folder link you are trying to access is no longer available. This could be due to the following reasons:",
@@ -2093,7 +2101,7 @@
     },
     "1049": {
         "text": "Folder",
-        "context": "Folder \/ Directory"
+        "context": ""
     },
     "1050": {
         "text": "No shares",
@@ -2292,8 +2300,8 @@
         "context": ""
     },
     "1118": {
-        "text": "You need to agree with the terms of service to register an account on MEGA.",
-        "context": ""
+        "text": "You need to agree with the Terms of Service to register an account on MEGA.",
+        "context": "Error text shown when you don't have selected the checkbox to agree with the Terms of Service"
     },
     "1119": {
         "text": "Your password is easily guessed. Try making your password longer. Combine uppercase & lowercase letters. Add special characters. Do not use names or dictionary words",
@@ -2345,7 +2353,7 @@
     },
     "1131": {
         "text": "Confirm your account",
-        "context": "Title of the page that opens after clicking on the confirmation link during registration"
+        "context": "Button title that triggers the confirm account action"
     },
     "1133": {
         "text": "This game will collect [A]entropy[\/A] based on your mouse movements.",
@@ -2591,10 +2599,6 @@
         "text": "Payment info",
         "context": ""
     },
-    "1233": {
-        "text": "PayPal",
-        "context": ""
-    },
     "1253": {
         "text": "Date",
         "context": ""
@@ -2691,137 +2695,21 @@
         "text": "Please log in to your account.",
         "context": ""
     },
-    "1301": {
-        "text": "Today",
-        "context": ""
-    },
-    "1302": {
-        "text": "Yesterday",
-        "context": ""
-    },
-    "1303": {
-        "text": "This week",
-        "context": ""
-    },
-    "1304": {
-        "text": "Last week",
-        "context": ""
-    },
-    "1305": {
-        "text": "This month",
-        "context": ""
-    },
-    "1306": {
-        "text": "This year",
-        "context": ""
-    },
-    "1307": {
-        "text": "Older",
-        "context": ""
-    },
-    "1308": {
-        "text": "Download failed",
-        "context": ""
-    },
-    "1309": {
-        "text": "Upload failed",
-        "context": ""
-    },
-    "1311": {
-        "text": "Error loading files",
-        "context": ""
-    },
-    "1313": {
-        "text": "Login failed",
-        "context": ""
-    },
-    "1319": {
-        "text": "Password is too short",
-        "context": ""
-    },
-    "1323": {
-        "text": "Logging in",
-        "context": ""
-    },
-    "1325": {
-        "text": "Generating link",
-        "context": ""
-    },
     "1329": {
         "text": "Waiting",
         "context": "Label of tray icon to indicate that MEGAsync is in a waiting state."
     },
-    "1331": {
-        "text": "E-mail",
-        "context": ""
-    },
-    "1332": {
-        "text": "Confirm registration",
-        "context": ""
-    },
-    "1333": {
-        "text": "Please check your e-mail and paste the confirmation code below or click on the special iOS confirmation link.",
-        "context": "iOS refers to apple devices"
-    },
-    "1334": {
-        "text": "Abort registration",
-        "context": ""
-    },
-    "1335": {
-        "text": "Confirmation code",
-        "context": ""
-    },
-    "1339": {
-        "text": "Add folder",
-        "context": ""
-    },
-    "1342": {
-        "text": "Edit",
-        "context": "Caption of a button to edit the files that are selected"
-    },
-    "1343": {
-        "text": "Empty Cloud Drive",
-        "context": "Message for an empty cloud drive"
-    },
-    "1344": {
-        "text": "Share",
-        "context": "caption of a button that allows the user to share a file\/folder by creating a link to it"
-    },
     "1346": {
         "text": "Transfers",
-        "context": "Title for the file transfer screen (with the up & download)"
-    },
-    "1348": {
-        "text": "Shared Folders",
-        "context": "Title of the incoming shared folders of a user."
-    },
-    "1349": {
-        "text": "No Photos",
-        "context": ""
-    },
-    "1350": {
-        "text": "Photos",
-        "context": ""
+        "context": "TRANSFERS TAB (6)\nTitle of the Transfers section"
     },
     "1352": {
         "text": "Available",
-        "context": ""
+        "context": "Title for MEGA \"Available\" space."
     },
     "1355": {
         "text": "Version",
-        "context": ""
-    },
-    "1356": {
-        "text": "Feedback",
-        "context": ""
-    },
-    "1357": {
-        "text": "Sign out",
-        "context": ""
-    },
-    "1362": {
-        "text": "Restore purchases",
-        "context": "Button to allow the user to restore a purchase that got interrupted."
+        "context": "SETTINGS TAB (5) - AboutTableViewController\nLabel for the \"Version\" number of the app"
     },
     "1367": {
         "text": "Get 50 GB for free, or sign up for one of our Pro packages and get up to 4 TB of encrypted storage starting at \u20ac8.33 per month.",
@@ -2861,7 +2749,7 @@
     },
     "1379": {
         "text": "Skip",
-        "context": "Label for any 'Skip' button, link, text, title, etc. - (String as short as possible)."
+        "context": "Button title that skips the current action"
     },
     "1381": {
         "text": "User interface settings",
@@ -2907,157 +2795,33 @@
         "text": "Files & Folders",
         "context": "A header on top of the search results, indicating that this result set is for files and folders. (in the future the search feature will also result e-mails)"
     },
-    "1394": {
-        "text": "Copy link",
-        "context": "Caption of a button to copy the link to the clipboard"
+    "1403": {
+        "text": "Send Feedback",
+        "context": "Title of one of the Settings sections where you can \"Send Feedback\" to MEGA"
     },
-    "1399": {
-        "text": "How are you feeling?",
-        "context": ""
-    },
-    "1400": {
-        "text": "Happy",
-        "context": ""
-    },
-    "1401": {
-        "text": "Confused",
-        "context": ""
-    },
-    "1402": {
-        "text": "Unhappy",
-        "context": ""
+    "1406": {
+        "text": "Rate us!",
+        "context": "Title to rate the app"
     },
     "1408": {
         "text": "About",
-        "context": "Caption of a title, in the context of \"About MEGA\" or \"About us\""
+        "context": "Title of one of the Settings sections where you can see things \"About\" the app"
     },
     "1409": {
         "text": "Acknowledgements",
-        "context": "Title of a section, in the context of \" MEGA Acknowledgements\""
-    },
-    "1411": {
-        "text": "PhotoSync",
-        "context": "PhotoSync is the title of a feature that allows users to automatically synchronize their photos with MEGA."
-    },
-    "1418": {
-        "text": "Completed",
-        "context": ""
-    },
-    "1419": {
-        "text": "Enable Passcode",
-        "context": "Allows the user to enable a 4-digit passcocde for the app, for security."
+        "context": "Title for the section \"Acknowledgements\" of the app"
     },
     "1421": {
-        "text": "Change Passcode",
-        "context": ""
-    },
-    "1423": {
-        "text": "Enter your passcode",
-        "context": ""
-    },
-    "1424": {
-        "text": "Turn Off Passcode",
-        "context": ""
-    },
-    "1425": {
-        "text": "Re-enter your passcode",
-        "context": ""
-    },
-    "1426": {
-        "text": "Enter your new passcode",
-        "context": ""
-    },
-    "1427": {
-        "text": "Re-enter your new passcode",
-        "context": ""
-    },
-    "1428": {
-        "text": "Passcodes did not match. Try again.",
-        "context": ""
-    },
-    "1429": {
-        "text": "1 Passcode Failed Attempt",
-        "context": ""
-    },
-    "1430": {
-        "text": "%i Passcode Failed Attempts",
-        "context": "%i will be replaced by a number "
-    },
-    "1431": {
-        "text": "Passcode lock",
-        "context": ""
+        "text": "Change passcode",
+        "context": "SETTINGS TAB (5) - PasscodeTableViewController\nSection title where you can change the app's passcode"
     },
     "1436": {
-        "text": "Application language",
-        "context": ""
+        "text": "English",
+        "context": "On each translation this should be the target language. So, if it's English, English then. If it's Spanish = \"Espa\u00f1ol\", if it's German \"Deustch\""
     },
     "1437": {
         "text": "English",
         "context": "Label for English language."
-    },
-    "1438": {
-        "text": "Bulgarian",
-        "context": ""
-    },
-    "1439": {
-        "text": "Portuguese",
-        "context": ""
-    },
-    "1441": {
-        "text": "German",
-        "context": ""
-    },
-    "1442": {
-        "text": "Spanish",
-        "context": ""
-    },
-    "1443": {
-        "text": "French",
-        "context": ""
-    },
-    "1444": {
-        "text": "Hungarian",
-        "context": ""
-    },
-    "1445": {
-        "text": "Indonesian",
-        "context": ""
-    },
-    "1446": {
-        "text": "Italian",
-        "context": ""
-    },
-    "1447": {
-        "text": "Japanese",
-        "context": ""
-    },
-    "1448": {
-        "text": "Polish",
-        "context": ""
-    },
-    "1449": {
-        "text": "Slovak",
-        "context": ""
-    },
-    "1450": {
-        "text": "Slovenian",
-        "context": ""
-    },
-    "1451": {
-        "text": "Hebrew",
-        "context": ""
-    },
-    "1452": {
-        "text": "Dutch",
-        "context": ""
-    },
-    "1453": {
-        "text": "Korean",
-        "context": ""
-    },
-    "1454": {
-        "text": "Russian",
-        "context": ""
     },
     "1455": {
         "text": "Updating",
@@ -3149,7 +2913,7 @@
     },
     "1491": {
         "text": "Do you want to cancel the download?",
-        "context": "Confirmation text when attempting to cancel the download"
+        "context": "Message shown when you tap on the cancel button of an active transfer"
     },
     "1492": {
         "text": "Updating file list",
@@ -3244,8 +3008,8 @@
         "context": ""
     },
     "1523": {
-        "text": "Select",
-        "context": "Label for any 'Select' button, link, etc. - (String as short as possible)."
+        "text": "Select ",
+        "context": "Button that allows you to select a given folder"
     },
     "1524": {
         "text": "Rename",
@@ -3293,10 +3057,6 @@
     },
     "1565": {
         "text": "Audio",
-        "context": ""
-    },
-    "1566": {
-        "text": "Video",
         "context": ""
     },
     "1567": {
@@ -4307,10 +4067,6 @@
         "text": "If you continue the upload, the previous file will be overwritten.\nAre you sure?",
         "context": ""
     },
-    "1882": {
-        "text": "Oh my, it's full of stars!",
-        "context": "Supposedly a funny line under the rating stars where the user can rate the iOS app."
-    },
     "1888": {
         "text": "Home",
         "context": "Link on the help page to go back to the startpage"
@@ -4745,7 +4501,7 @@
     },
     "2023": {
         "text": "Choose",
-        "context": "Caption of a button to choose something"
+        "context": "CLOUD DRIVE TAB (1) - ADD \"+\" SECTION\nMenu option from the `Add` section that allows the user to choose a photo or video to upload it to MEGA."
     },
     "2024": {
         "text": "Your config is corrupt, please start over",
@@ -4860,8 +4616,8 @@
         "context": ""
     },
     "2222": {
-        "text": "downloads",
-        "context": "Item menu option upon clicking on one or multiple files. Plural"
+        "text": "Downloads",
+        "context": "Title of one of the filters in the Transfers section. In this case \"Downloads\" transfers."
     },
     "2426": {
         "text": "The name \"%1\" is already in use for another sync\nPlease enter a different name to identify this synced folder:",
@@ -4968,8 +4724,8 @@
         "context": "When copying a file to a location in MEGA. This is the text of the button after selection the destination"
     },
     "5531": {
-        "text": "Import to",
-        "context": "When importing a file to a location in MEGA. This is the text of the button after selection the destination"
+        "text": "Import to ",
+        "context": "BROWSER (BrowserViewController) - LINKS\nTitle shown on the main bar when you are importing a link to your Cloud Drive"
     },
     "5532": {
         "text": "Upload File",
@@ -4989,7 +4745,7 @@
     },
     "5538": {
         "text": "Security warning! This is a high risk operation. Do you want to continue?",
-        "context": "confirmation message before downloading to the device the master key file"
+        "context": "Message shown when you try to export the Master Key to alert the user."
     },
     "5540": {
         "text": "Do you want to remove the contact",
@@ -5001,7 +4757,7 @@
     },
     "5542": {
         "text": "Incoming Shares",
-        "context": ""
+        "context": "MY ACCOUNT TAB (7) - UsageViewController\nTitle of the Incoming Shares section. Here you can see the folders that your contacts have shared with you"
     },
     "5543": {
         "text": "Outgoing Shares",
@@ -5025,7 +4781,7 @@
     },
     "5549": {
         "text": "Upgrade account",
-        "context": "Change from a free account to paying MEGA"
+        "context": "MY ACCOUNT TAB (7) - UpgradeTableViewController\nButton title which triggers the action to upgrade your MEGA account level"
     },
     "5550": {
         "text": "Select All",
@@ -5096,8 +4852,8 @@
         "context": "Transfer type description in the active file transfer panel, can either be upload or download. Singular"
     },
     "5567": {
-        "text": "uploads",
-        "context": ""
+        "text": "Uploads",
+        "context": "Title of one of the filters in the Transfers section. In this case \"Uploads\" transfers."
     },
     "5568": {
         "text": "user",
@@ -5116,8 +4872,8 @@
         "context": "password label"
     },
     "5572": {
-        "text": "Confirm password",
-        "context": "label shown in the confirmation of the password when creating an account"
+        "text": "Confirm Password",
+        "context": "Hint text where the user have to re-write the new password to confirm it"
     },
     "5573": {
         "text": "ABC",
@@ -5161,11 +4917,11 @@
     },
     "5587": {
         "text": "Passwords do not match",
-        "context": "when creating the account"
+        "context": "Error text shown when you have not written the same password"
     },
     "5588": {
         "text": "Saved for Offline",
-        "context": "title of the screen that shows the files saved for offline in the device"
+        "context": "List option shown on the details of a file or folder"
     },
     "5589": {
         "text": "Shared with me",
@@ -5193,7 +4949,7 @@
     },
     "5595": {
         "text": "Camera Uploads",
-        "context": "Label for any 'Camera Uploads' button, link, text, title, etc. - (String as short as possible)."
+        "context": "Title of one of the Settings sections where you can set up the \"Camera Uploads\" options"
     },
     "5596": {
         "text": "%1$s of %2$s",
@@ -5313,7 +5069,7 @@
     },
     "5627": {
         "text": "Contact email",
-        "context": "when adding a new contact. in the dialog"
+        "context": "Clue text to help the user know what should write there. In this case the contact email you want to add to your contacts list"
     },
     "5629": {
         "text": "Adding contact",
@@ -5529,7 +5285,7 @@
     },
     "5685": {
         "text": "Enable Camera Uploads",
-        "context": "Label for the switch button to enable or disable the Camera Uploads service - (String as short as possible)."
+        "context": "Button title that enables the functionality \"Camera Uploads\", which uploads all the photos in your device to MEGA"
     },
     "5686": {
         "text": "Disable Camera Uploads",
@@ -5587,505 +5343,101 @@
         "text": "The ZIP file will be unzipped ",
         "context": "A compressed file will be decompressed."
     },
-    "5700": {
-        "text": "Got it",
-        "context": "Answer meaning 'I understand'"
-    },
-    "5701": {
-        "text": "Turn on",
-        "context": "To enable"
-    },
-    "5702": {
-        "text": "Missing password",
-        "context": "error when the password has not been entered"
-    },
-    "5703": {
-        "text": "Email missing",
-        "context": "enter when the email has not been entered"
-    },
-    "5704": {
-        "text": "Invalid login credentials",
-        "context": "error when the login details are incorrect. For example, incorrect username or password"
-    },
-    "5705": {
-        "text": "Invalid e-mail",
-        "context": "error when the email address is not valid"
-    },
-    "5706": {
-        "text": "Name too short",
-        "context": "error when the user's name has too few letters"
-    },
-    "5707": {
-        "text": "Password too short",
-        "context": "error when the user's password has too few letters"
-    },
-    "5708": {
-        "text": "You have to accept our Terms of Service",
-        "context": "warning the user that they need to accept MEGA's terms to use the application"
-    },
     "5709": {
         "text": "Remain logged in",
-        "context": "login button. Keep the user logged in, without requiring a username\/password each time."
-    },
-    "5710": {
-        "text": "Are you sure you want to abort the registration?",
-        "context": "Asking whether the user really wants to abort\/stop the registration process or continue on."
-    },
-    "5711": {
-        "text": "Abort",
-        "context": "To stop the registration process"
-    },
-    "5712": {
-        "text": "Registration complete",
-        "context": "the registration process has been successfully completed."
-    },
-    "5713": {
-        "text": "I agree with the MEGA <a href='terms'>Terms of Service<\/a>",
-        "context": "Do not change the href link, but only the text \"I agree with MEGA\" and \"Terms of Service\"; \"Terms of Service\" will be a link"
-    },
-    "5714": {
-        "text": "Your email",
-        "context": "The user's email address"
-    },
-    "5715": {
-        "text": "Share with MEGA contact",
-        "context": "Select a user to share a link with"
-    },
-    "5716": {
-        "text": "Delete one file?",
-        "context": "menu item"
-    },
-    "5718": {
-        "text": "Confirm delete",
-        "context": "menu item, asking the user to make sure before a file is deleted"
+        "context": "LOGIN (LoginViewController)\nText shown next to a switch button on login, which if it's enabled keeps you logged after the app is closed. Otherwise you will be logged out as soon as the app's gets out of the memory"
     },
     "5719": {
         "text": "Name for the new folder",
-        "context": "menu item"
-    },
-    "5720": {
-        "text": "Upload last photo",
-        "context": "Upload the last photo taken"
+        "context": "Hint text shown on the create folder alert."
     },
     "5721": {
         "text": "Capture",
-        "context": "Capture foto or video"
-    },
-    "5722": {
-        "text": "Choose",
-        "context": "Choose photo or video"
-    },
-    "5723": {
-        "text": "Files shared",
-        "context": "The number of files that are shared"
-    },
-    "5724": {
-        "text": "No files in the Cloud Drive",
-        "context": "The cloud drive is empty. There are no files"
+        "context": "Menu option from the `Add` section that allows the user to capture a video or a photo and upload it directly to MEGA."
     },
     "5725": {
-        "text": "No files in folder",
-        "context": "Empty folder"
+        "text": "Empty Folder",
+        "context": "Title shown when a folder doesn't have any files"
     },
-    "5726": {
-        "text": "Restore",
-        "context": "If a file is deleted it can be restored or undeleted."
-    },
-    "5727": {
-        "text": "Please select destination folder for move",
-        "context": "message appears when users selects a file\/folder to move"
-    },
-    "5728": {
-        "text": "Please select destination folder for import",
-        "context": "message appears when users import a file from another app"
-    },
-    "5729": {
-        "text": "Release notes",
-        "context": "The changes since the last public application release in the Apple app store"
-    },
-    "5730": {
-        "text": "Load contacts",
-        "context": "Load the device contacts into MEGA"
-    },
-    "5731": {
-        "text": "Can't access contacts",
-        "context": "Error, the application can't access the device contact detail"
-    },
-    "5732": {
-        "text": "Allow MEGA access to contacts from Settings > Privacy > Contacts !",
-        "context": "Asking the user to allow access to their contacts"
-    },
-    "5733": {
-        "text": "No files shared",
-        "context": "There are no files shared with this user"
-    },
-    "5734": {
-        "text": "Sharing one node",
-        "context": "Only 1 node will be shared with other users"
-    },
-    "5736": {
-        "text": "Invitation sent",
-        "context": "Sending an invitation. Currently by email but maybe SMS too."
-    },
-    "5737": {
-        "text": "No contacts",
-        "context": "Message shown when the user does not have any contacts in his contact list."
-    },
-    "5738": {
-        "text": "Rubbish bin",
-        "context": "\"Trash\" or \"recycle bin\""
-    },
-    "5739": {
-        "text": "Something went completely wrong!",
-        "context": "Error due to an error of some kind."
-    },
-    "5741": {
-        "text": "Preparing download",
-        "context": "Starting the download process"
-    },
-    "5743": {
-        "text": "Saved locally",
-        "context": "The file will be saved to the device"
+    "5740": {
+        "text": "Downloading...",
+        "context": "Title show when a file is being downloaded"
     },
     "5744": {
         "text": "Enter the new name",
-        "context": "Asking the user to enter the new file or folder name"
-    },
-    "5745": {
-        "text": "Are you sure?",
-        "context": "Asking the user if they are sure, yes or no."
-    },
-    "5746": {
-        "text": "Offline files",
-        "context": "Files downloaded locally onto the mobile device"
-    },
-    "5747": {
-        "text": "No files downloaded",
-        "context": "The user hasn't downloaded any files locally"
-    },
-    "5748": {
-        "text": "No photo",
-        "context": "there are no photos"
-    },
-    "5749": {
-        "text": "One photo",
-        "context": "there is only 1 photo"
-    },
-    "5752": {
-        "text": "No photos",
-        "context": "There are no photos to process"
-    },
-    "5753": {
-        "text": "Creating Camera Uploads folder",
-        "context": "Message while creating the 'Camera Uploads' folder on MEGA. This is the location of uploading photos"
-    },
-    "5754": {
-        "text": "Finished listing photos",
-        "context": "The application has finished getting the photo filenames from the mobile album"
-    },
-    "5755": {
-        "text": "Exporting photo",
-        "context": "copying the photo from the mobile photo album into MEGA"
-    },
-    "5756": {
-        "text": "Skipping photo",
-        "context": "The file was not uploaded because it had already been processed. The file was skipped."
-    },
-    "5757": {
-        "text": "Uploading photo",
-        "context": "The photo is encrypted and uploaded to MEGA"
-    },
-    "5758": {
-        "text": "Uploading video",
-        "context": "The video is encrypted and uploaded to MEGA"
-    },
-    "5759": {
-        "text": "Created Camera Uploads folder",
-        "context": "Message while creating the 'Camera Uploads' folder on MEGA. This is the location of uploading photos"
-    },
-    "5760": {
-        "text": "Error uploading asset",
-        "context": "there was a problem uploading the file to MEGA"
-    },
-    "5761": {
-        "text": "Camera Uploads enabled",
-        "context": "The process of copying\/backing up photos to MEGA is enabled"
-    },
-    "5762": {
-        "text": "Camera Uploads disabled",
-        "context": "The process of copying\/backing up photos to MEGA is disabled"
-    },
-    "5763": {
-        "text": "Camera Uploads completed",
-        "context": "All of the photos\/videos have been uploaded to MEGA."
-    },
-    "5764": {
-        "text": "Select albums for Camera Uploads",
-        "context": "Asking the user to select albums to be uploaded to MEGA"
-    },
-    "5765": {
-        "text": "Camera Uploads Options",
-        "context": "The options relating to the Camera Uploads process."
-    },
-    "5766": {
-        "text": "When disabled, new photos and videos won't be uploaded",
-        "context": "Warning message when disabling camera uploads"
-    },
-    "5767": {
-        "text": "Enable Camera Uploads to automatically upload your photos and videos to your Cloud Drive",
-        "context": "Message explaining the Camera Uploads process"
+        "context": "Hint text to suggest that the user have to write the new name for the file or folder"
     },
     "5768": {
         "text": "Upload videos",
-        "context": "Uploading movies (as opposed to photos)"
+        "context": "Option title to enable upload videos with Camera Uploads"
     },
     "5769": {
         "text": "Use cellular connection",
-        "context": "Use cell phone data as well as Wi-Fi"
-    },
-    "5770": {
-        "text": "Run periodically in the background",
-        "context": "Copy images\/movies to Cloud Drive while the MEGA app is not running"
-    },
-    "5771": {
-        "text": "Loading photos",
-        "context": "Loading the photos from the device album"
-    },
-    "5772": {
-        "text": "Can't access photos",
-        "context": "Problem accessing the device album"
-    },
-    "5773": {
-        "text": "Exporting file",
-        "context": "Exporting\/copying the file from the album to a folder that MEGA can access"
+        "context": "Option title to enable using the device cellular connection with Camera Uploads"
     },
     "5774": {
         "text": "Passcode",
-        "context": "The passcode (like a PIN)"
+        "context": ""
     },
     "5775": {
         "text": "Used",
-        "context": "as in storage used in the CloudDrive"
+        "context": "Title for \"Used\" MEGA space."
     },
     "5776": {
         "text": "Local",
-        "context": "as in local space used by the app"
-    },
-    "5777": {
-        "text": "If maximum number of failed attempts reached",
-        "context": "Telling the user what will happen if the passcode is incorrectly entered"
-    },
-    "5778": {
-        "text": "Turn passcode off",
-        "context": "Turning off the passcode (like a PIN)"
-    },
-    "5779": {
-        "text": "Turn passcode on",
-        "context": "Turning on the passcode (like a PIN)"
-    },
-    "5780": {
-        "text": "Use TouchID",
-        "context": "Use the fingerprint\/biometric ID. TouchID is the Apple name."
-    },
-    "5781": {
-        "text": "Change passcode",
-        "context": "Prompt the user to change the passcode"
-    },
-    "5782": {
-        "text": "Erase all local data",
-        "context": "If a passcode is incorrect, erase all local data and logout"
-    },
-    "5783": {
-        "text": "Automatic language",
-        "context": "We shouldn't translate the languages below, but leave them in the original language; so for example greekLanguage should be written in Greek and so on!"
-    },
-    "5786": {
-        "text": "Send feedback",
-        "context": "e-mail feedback to support at MEGA"
-    },
-    "5787": {
-        "text": "Rate us!",
-        "context": "Give the application a rating for the Apple app store"
-    },
-    "5788": {
-        "text": "Contact the support team by e-mail",
-        "context": "Contact support through email"
+        "context": "Title for \"Local\" used space."
     },
     "5789": {
         "text": "Get support or read popular topics.",
-        "context": "Help description"
-    },
-    "5790": {
-        "text": "Oh my, it's full of stars!",
-        "context": "A references to the 2001 movie quote that there are lots of stars (for feedback)."
+        "context": "Footer message that explain what you can do on the \"Help centre\""
     },
     "5791": {
-        "text": "Export master key",
-        "context": "Menu item to let the user export the master key"
-    },
-    "5792": {
-        "text": "Enable logging",
-        "context": "Enable debugging information for software developers"
-    },
-    "5793": {
-        "text": "Deleted files go into the rubbish bin.",
-        "context": "Information telling the user where files are placed."
-    },
-    "5794": {
-        "text": "Exporting the master key and keeping it in a secure location enables you to set a new password without data loss.",
-        "context": "Advising the user to keep the user's master key safe."
-    },
-    "5795": {
-        "text": "Log files help developers to solve problems",
-        "context": "The log files including debugging information that is helpful for the software developers."
-    },
-    "5796": {
-        "text": "MasterKey.txt was exported to the Documents folder. You can transfer it by connecting the device to the computer and opening iTunes. We strongly advise you against emailing this file!",
-        "context": "Instructions how to open the MasterKey.txt file using iTunes."
-    },
-    "5797": {
-        "text": "Failed to export master key",
-        "context": "There was a problem creating the file for the master key"
+        "text": "Export Master Key",
+        "context": "Title shown when you try to export your MEGA master key"
     },
     "5798": {
-        "text": "Master key exported",
-        "context": "The master key file is a highly secure set of characters that enables a password to be reset. This is the most secure part of MEGA and must be kept safe. The key has been exported so the user can read it or write it down to keep it safe."
+        "text": "Master Key exported",
+        "context": "Alert title shown when you have exported your MEGA master key"
     },
     "5799": {
         "text": "Usage",
-        "context": "The information about the storage\/network traffic a user has been consuming"
-    },
-    "5800": {
-        "text": "available",
-        "context": "the amount of storage space available to be used"
-    },
-    "5801": {
-        "text": "used",
-        "context": "as in storage used in the CloudDrive"
-    },
-    "5802": {
-        "text": "Images",
-        "context": "A label for photos"
-    },
-    "5803": {
-        "text": "Videos",
-        "context": "Label for movies\/videos\/mp4"
-    },
-    "5804": {
-        "text": "Documents",
-        "context": "label for DOCs\/PDFs\/spreadsheets"
-    },
-    "5805": {
-        "text": "Archives",
-        "context": "label for archived files"
-    },
-    "5806": {
-        "text": "Local cache",
-        "context": "The temporary files stored to speed up the application (as it doesn't need to download them over the network)"
-    },
-    "5807": {
-        "text": "Cache",
-        "context": "The header for local storage, temporary files for speeding up the application"
-    },
-    "5808": {
-        "text": "Local storage",
-        "context": "The files\/storage that exist on the mobile device."
-    },
-    "5809": {
-        "text": "Clear Cache",
-        "context": "The section title for clearing temporary files"
-    },
-    "5810": {
-        "text": "Clearing the cache will delete all locally saved documents, thumbnails & other temporary files.",
-        "context": "Informing the user that 'clearing the cache' means cleaning\/removing temporary files"
-    },
-    "5811": {
-        "text": "Clear Cache?",
-        "context": "Asking the user whether they want the local files removed"
-    },
-    "5812": {
-        "text": "This will delete all locally stored files",
-        "context": "Removes all local files that are stored on the mobile device."
-    },
-    "5813": {
-        "text": "Cache has been cleared.",
-        "context": "Message informing the user that the local files have been removed."
-    },
-    "5814": {
-        "text": "Upgrade Account",
-        "context": "Change from a free account to paying MEGA"
-    },
-    "5816": {
-        "text": "[X] TB",
-        "context": "TB means Terabytes. Please adjust the position of the [X] based on linguistics !!!"
+        "context": "Button title that goes to the section Usage where you can see how your MEGA space is used"
     },
     "5819": {
         "text": "PRO I",
         "context": "Label to indicate that the current user has a PRO I account."
     },
-    "5820": {
-        "text": "Enter your old passcode",
-        "context": "To change the password, the previous\/old passcode must be entered. The passcode is like a PIN."
-    },
-    "5821": {
-        "text": "Authenticate using your fingerprint?",
-        "context": "Allow login using the biometric\/fingerprint scanner on the device."
-    },
-    "5822": {
-        "text": "File Upload failed",
-        "context": "The file transfer\/upload stopped for some reason. Reasons might be due to lack of network\/Wi-Fi or some device or service problem."
-    },
-    "5823": {
-        "text": "The file you selected failed to upload. Please try again.",
-        "context": "There was a problem uploading a file"
-    },
-    "5824": {
-        "text": "File Upload cancelled",
-        "context": "The file transfer\/upload was stopped\/cancelled by the user."
-    },
-    "5825": {
-        "text": "The file you selected has not been uploaded to MEGA.",
-        "context": "The warning message after cancelling an update"
-    },
     "5826": {
         "text": "MEGA SPACE",
-        "context": "section title about how much disk space MEGA provides"
+        "context": "TOUR (TourViewController)\nTitle shown on the app's start animation to explain what MEGA offers you (1\/4)"
     },
     "5827": {
         "text": "MEGA SPEED",
-        "context": "section title about the speed of MEGA's network"
+        "context": "Title shown on the app's start animation to explain what MEGA offers you (2\/4)"
     },
     "5828": {
         "text": "MEGA PRIVACY",
-        "context": "section title about the end-to-end encryption and privacy"
+        "context": "Title shown on the app's start animation to explain what MEGA offers you (3\/4)"
     },
     "5829": {
         "text": "MEGA ACCESS",
-        "context": "section title about how the files can be accessed from anywhere, desktops, mobiles"
+        "context": "Title shown on the app's start animation to explain what MEGA offers you (4\/4)"
     },
     "5830": {
         "text": "Register now and get 50 GB of free space.",
-        "context": "welcome information telling the new user they get 50GB of disk storage"
+        "context": "Message shown on the app's start animation to explain what MEGA SPACE means"
     },
     "5831": {
-        "text": "Uploads are fast.\nQuickly share files with everyone.",
-        "context": "Please adjust the new line position accordingly"
+        "text": "Uploads are fast. Quickly share files with everyone.",
+        "context": "Message shown on the app's start animation to explain what MEGA SPEED means"
     },
     "5832": {
-        "text": "Keep all your files safe with MEGA's\nend-to-end encryption.",
-        "context": "Please adjust the new line position accordingly"
+        "text": "Keep all your files safe with MEGA's end-to-end encryption.",
+        "context": "Message shown on the app's start animation to explain what MEGA PRIVACY means"
     },
     "5833": {
-        "text": "Get fully encrypted access anywhere,\nanytime.",
-        "context": "Please adjust the new line position accordingly"
-    },
-    "5835": {
-        "text": "With PhotoSync, the photos you take with your iPhone will be automatically backed up to MEGA.\nYou can use WiFi or cellular connection and by enabling Background mode the app will upload photos when your location changes significantly.\n\nPasscode lock adds a new layer of security by requiring a four-digit passcode to be entered every time the app is launched. This will protect your files even if your iPhone falls into the wrong hands. There is also an option to erase all data and logout if the wrong password is entered over 10 times.\n\nVarious bug fixes and speed improvements.\n\nYour feedback is very important to us and, although we might not answer every email, we read each and every one.\n\nAlso, your 5-stars rating in the AppStore is always appreciated.",
-        "context": "MEGA description. Please adjust the new line position accordingly"
-    },
-    "5836": {
-        "text": "upload, backup, cloud, file, sharing, secure, MEGA",
-        "context": "Common keywords that describe MEGA."
+        "text": "Get fully encrypted access anywhere, anytime.",
+        "context": "Message shown on the app's start animation to explain what MEGA ACCESS means"
     },
     "5837": {
         "text": "[X] minutes",
@@ -6357,7 +5709,7 @@
     },
     "5926": {
         "text": "Offline",
-        "context": ""
+        "context": "OFFLINE TAB (3)\nTitle of the Offline section"
     },
     "5928": {
         "text": "Standard Download",
@@ -6372,8 +5724,8 @@
         "context": "The placeholder \"[A]\" and \"[\/A]\" are important. They will be converted into a link. "
     },
     "5932": {
-        "text": "Quota exceeded",
-        "context": "Message informing the user that he exceeded his storage quota"
+        "text": "Storage quota exceeded",
+        "context": "Error message shown when you have used more MEGA storage than you can"
     },
     "5935": {
         "text": "Your account has been created, confirmed and activated. You will be logged in automatically.",
@@ -6521,7 +5873,7 @@
     },
     "5978": {
         "text": "Logged out",
-        "context": ""
+        "context": "Alert title shown when your account has been closed through another client or the web by killing all your sessions"
     },
     "5980": {
         "text": "Logout failed",
@@ -6601,7 +5953,7 @@
     },
     "6001": {
         "text": "Wrong password",
-        "context": ""
+        "context": "Error text shown when you introduce a wrong password on the confirmation proccess"
     },
     "6003": {
         "text": "Download count",
@@ -7124,24 +6476,32 @@
         "context": ""
     },
     "6156": {
-        "text": "largest",
-        "context": ""
+        "text": "Largest",
+        "context": "Sort by option (3\/6). This one order the files by its size, in this case from bigger to smaller size"
     },
     "6157": {
         "text": "Make a PIN Lock",
         "context": ""
     },
     "6158": {
-        "text": "Master key",
-        "context": ""
+        "text": "Master Key",
+        "context": "SETTINGS TAB (5) - SecurityOptionsTableViewController\nTitle for the MEGA Master Key"
     },
     "6159": {
         "text": "MEGA SDK",
         "context": ""
     },
+    "6160": {
+        "text": "Name (ascending)",
+        "context": "Sort by option (1\/6). This one orders the files alphabethically"
+    },
+    "6161": {
+        "text": "Name (descending)",
+        "context": "Sort by option (2\/6). This one arranges the files on reverse alphabethical order"
+    },
     "6162": {
-        "text": "newest",
-        "context": ""
+        "text": "Newest",
+        "context": "Sort by option (5\/6). This one order the files by its modification date, newer first"
     },
     "6164": {
         "text": "No data to show",
@@ -7152,16 +6512,20 @@
         "context": ""
     },
     "6166": {
-        "text": "oldest",
-        "context": ""
+        "text": "Oldest",
+        "context": "Sort by option (6\/6). This one order the files by its modification date, older first"
     },
     "6168": {
         "text": "Privacy policy",
         "context": ""
     },
     "6169": {
-        "text": "smallest",
-        "context": ""
+        "text": "Smallest",
+        "context": "Sort by option (4\/6). This one order the files by its size, in this case from smaller to bigger size"
+    },
+    "6170": {
+        "text": "Sort by",
+        "context": "CLOUD DRIVE TAB (1) - SORT BY SECTION\nSection title of the \"Sort by\""
     },
     "6172": {
         "text": "subscribe",
@@ -7399,22 +6763,6 @@
         "text": "months",
         "context": "Used to display the number of months a plan was purchased for e.g. 3 months, 6 months."
     },
-    "6793": {
-        "text": "Recover space by emptying the rubbish bin",
-        "context": "Explain the user that he can recover space by emptying the Rubbish Bin"
-    },
-    "6794": {
-        "text": "Empty the rubbish bin",
-        "context": "Title of the button to empty the Rubbish Bin (action!)"
-    },
-    "6795": {
-        "text": "Are you sure you want to permanently remove all items from your rubbish bin?\nYou cannot undo this action!",
-        "context": "Warn the user that by emptying the Rubbish Bin the files will be permanently deleted and the action cannot be reversed!"
-    },
-    "6802": {
-        "text": "Bitcoin",
-        "context": ""
-    },
     "6803": {
         "text": "%1 months",
         "context": "The number of months e.g. 2 months, 5 months etc."
@@ -7469,7 +6817,7 @@
     },
     "6821": {
         "text": "Remove link",
-        "context": "Context menu item"
+        "context": "Message shown when there is an active link that can be removed or disabled"
     },
     "6822": {
         "text": "Subscription cancellation",
@@ -7477,7 +6825,7 @@
     },
     "6824": {
         "text": "Awesome!",
-        "context": "Label for any 'Awesome' text, title, etc. - (String as short as possible)."
+        "context": "Message displayed when an action is completed successfully"
     },
     "6826": {
         "text": "Continue",
@@ -7773,7 +7121,7 @@
     },
     "6910": {
         "text": "Leave",
-        "context": "Item menu option upon right click on one or multiple files."
+        "context": "Button title of the action that allows to leave a shared folder"
     },
     "6911": {
         "text": "This link will not be publicly available anymore",
@@ -7829,7 +7177,7 @@
     },
     "6924": {
         "text": "Only when charging",
-        "context": "Option to choose that the camera sync will only be enable when the device is charging"
+        "context": "Option title to enable Camera Uploads only when the device is charging"
     },
     "6925": {
         "text": "Keep file names as in the device",
@@ -7918,10 +7266,6 @@
     "6952": {
         "text": "Credit card",
         "context": "Payment by credit card."
-    },
-    "6953": {
-        "text": "iTunes",
-        "context": ""
     },
     "6954": {
         "text": "Incorrect card number",
@@ -8411,130 +7755,6 @@
         "text": "Resume transfers",
         "context": "Resume transfers after pause"
     },
-    "7107": {
-        "text": "Get 2 months free",
-        "context": "Discount message for users purchasing an yearly plan: Two months free"
-    },
-    "7108": {
-        "text": "Balance",
-        "context": "Payments methods"
-    },
-    "7109": {
-        "text": "UnionPay",
-        "context": ""
-    },
-    "7110": {
-        "text": "Fortumo",
-        "context": ""
-    },
-    "7111": {
-        "text": "Credit Card",
-        "context": ""
-    },
-    "7112": {
-        "text": "Manage your subscription",
-        "context": "Text of the button that shows how to manage the subscription via iTunes"
-    },
-    "7113": {
-        "text": "%ld Photo Selected",
-        "context": ""
-    },
-    "7114": {
-        "text": "%ld Photos Selected",
-        "context": ""
-    },
-    "7115": {
-        "text": "%ld Video Selected",
-        "context": ""
-    },
-    "7116": {
-        "text": "%ld Videos Selected",
-        "context": ""
-    },
-    "7117": {
-        "text": "%ld Items Selected",
-        "context": ""
-    },
-    "7118": {
-        "text": "%ld Photos",
-        "context": ""
-    },
-    "7119": {
-        "text": "%ld Videos",
-        "context": ""
-    },
-    "7120": {
-        "text": "%1$ld Photos, %2$ld Videos",
-        "context": ""
-    },
-    "7121": {
-        "text": "%1$ld of %2$ld",
-        "context": ""
-    },
-    "7122": {
-        "text": "This app does not have access to your photos or videos.",
-        "context": ""
-    },
-    "7123": {
-        "text": "You can enable access in the Privacy Settings.",
-        "context": ""
-    },
-    "7124": {
-        "text": "No Photos or Videos",
-        "context": ""
-    },
-    "7125": {
-        "text": "You can take photos and videos using the camera, or sync photos and videos onto your %@\nusing iTunes.",
-        "context": ""
-    },
-    "7126": {
-        "text": "You can sync photos and videos onto your %@ using iTunes.",
-        "context": ""
-    },
-    "7127": {
-        "text": "Photo",
-        "context": ""
-    },
-    "7128": {
-        "text": "Portrait",
-        "context": ""
-    },
-    "7129": {
-        "text": "Landscape",
-        "context": ""
-    },
-    "7130": {
-        "text": "Play",
-        "context": ""
-    },
-    "7131": {
-        "text": "Not available",
-        "context": ""
-    },
-    "7132": {
-        "text": "hours",
-        "context": ""
-    },
-    "7133": {
-        "text": "hour",
-        "context": ""
-    },
-    "7134": {
-        "text": "minutes",
-        "context": ""
-    },
-    "7135": {
-        "text": "minute",
-        "context": ""
-    },
-    "7136": {
-        "text": "seconds",
-        "context": ""
-    },
-    "7137": {
-        "text": "second",
-        "context": ""
-    },
     "7138": {
         "text": "MEGAsync is being downloaded to your computer. Please install it as soon as the download has completed.",
         "context": ""
@@ -8819,22 +8039,6 @@
         "text": "Advertisement",
         "context": "Shown on the download page to inform the user that the image below is an external ad."
     },
-    "7213": {
-        "text": "The e-mail address you entered seems incorrect - please check again",
-        "context": "Warn the user that his email address seems invalid; This warning is only shown once"
-    },
-    "7214": {
-        "text": "Logged in as",
-        "context": "Currently logged in as"
-    },
-    "7215": {
-        "text": "Not You?",
-        "context": "Logged in with a different account, question (Not you?)"
-    },
-    "7216": {
-        "text": "Loading Files",
-        "context": "Message shown when loading the file list for the first time"
-    },
     "7217": {
         "text": "PURCHASE WITH BALANCE",
         "context": "Button text on the #pro page voucher dialog to tell the user they can purchase a Pro account using their account balance."
@@ -8869,7 +8073,7 @@
     },
     "7227": {
         "text": "Queued",
-        "context": "Transfer status"
+        "context": "Text shown when one file has been selected to be downloaded but it's on the queue to be downloaded, it's pending for download"
     },
     "7228": {
         "text": "Font size:",
@@ -9041,7 +8245,7 @@
     },
     "7286": {
         "text": "Error adding contact",
-        "context": "Title of the dialog displayed when the the process to add a contact failed - (String as short as possible)."
+        "context": "Error message shown when it hasn't been posible to add a contact"
     },
     "7287": {
         "text": "Contact added",
@@ -9458,5 +8662,641 @@
     "7415": {
         "text": "Looks like there's a malformed email",
         "context": "Add contacts and share dialog error message when user try to add wrong email address"
+    },
+    "7416": {
+        "text": "Before you start, you need to allow your browser to<br \/> access your microphone and camera",
+        "context": "Information before start call.\r\n<br \/> - for new line"
+    },
+    "7417": {
+        "text": "Tips:",
+        "context": "Tips before start call."
+    },
+    "7418": {
+        "text": "Use headphones or an headset",
+        "context": "Tips (before start call) :\r\n-Use headphones or an headset\r\n-Pause any transfers"
+    },
+    "7419": {
+        "text": "Pause any transfers",
+        "context": "Tips (before start call) :\r\n-Use headphones or an headset\r\n-Pause any transfers"
+    },
+    "7420": {
+        "text": "No camera available",
+        "context": "Error message shown when there's no camera available on the device"
+    },
+    "7421": {
+        "text": "Attention",
+        "context": "Alert title to attract attention"
+    },
+    "7422": {
+        "text": "Please give MEGA app permission to access your Camera in your Settings!",
+        "context": "Alert message to remember that MEGA app needs permission to use the Camera to take a photo or video and it doesn't have it"
+    },
+    "7423": {
+        "text": "Please give MEGA app permission to access your photo library in Settings!",
+        "context": "Alert message to explain that the MEGA app needs permission to access your device photos"
+    },
+    "7424": {
+        "text": "You can't download an empty folder",
+        "context": "Alert message shown when the user tries to download an empty folder"
+    },
+    "7425": {
+        "text": "Invalid MEGA Link",
+        "context": "Message shown when the user clicks on an invalid link"
+    },
+    "7426": {
+        "text": "File encrypted",
+        "context": "Alert title shown when you click on a encrypted file link that can't be opened because it doesn't include the rest of the key to see its contents"
+    },
+    "7427": {
+        "text": "For the moment you can't import or download an encrypted file.",
+        "context": "Alert message shown when you click on a encrypted file link that can't be opened because it doesn't include the rest of the key to see its contents"
+    },
+    "7428": {
+        "text": "Folder encrypted",
+        "context": "Alert title shown when you click on a encrypted folder link that can't be opened because it doesn't include the rest of the key to see its contents"
+    },
+    "7429": {
+        "text": "For the moment you can't import or download an encrypted folder.",
+        "context": "Alert message shown when you click on a encrypted folder link that can't be opened because it doesn't include the rest of the key to see its contents"
+    },
+    "7430": {
+        "text": "You have been logged out of this device from another location",
+        "context": "Alert title shown when your account has been closed through another client or the web by killing all your sessions"
+    },
+    "7431": {
+        "text": "Invalid e-mail and\/or password. Please try again",
+        "context": "Message shown when the user writes a wrong email or password on login"
+    },
+    "7432": {
+        "text": "Enter a valid email",
+        "context": "Message shown when the user writes an invalid format in the email field"
+    },
+    "7433": {
+        "text": "Enter a valid password",
+        "context": "Message shown when the user enters a wrong password"
+    },
+    "7434": {
+        "text": "Email",
+        "context": "CREATE ACCOUNT (CreateAccountViewController)\nHint text to suggest that the user has to write his email"
+    },
+    "7435": {
+        "text": "I agree with the MEGA Terms of Service",
+        "context": "Text shown on a button that if clicked shows the MEGA Terms of Service"
+    },
+    "7436": {
+        "text": "Enter a valid name",
+        "context": "Error text shown when you have not entered a correct name"
+    },
+    "7437": {
+        "text": "Please enter your password to confirm your account",
+        "context": "CONFIRM ACCOUNT (ConfirmAccountViewController)\nText shown on the confirm account view to remind the user what to do"
+    },
+    "7438": {
+        "text": "You are logged in with another account",
+        "context": "Warning title shown when you try to confirm an account but you are logged in with another one"
+    },
+    "7439": {
+        "text": "If you agree, the current account will be logged out and all Offline data will be erased. Do you want to continue?",
+        "context": "Warning message shown when you try to confirm an account but you are logged in with another one"
+    },
+    "7440": {
+        "text": "You need to free up some space",
+        "context": "LINKS\nTitle shown inside an alert if you don't have enough space on your device to download something"
+    },
+    "7441": {
+        "text": "MEGA Link",
+        "context": "FILE LINKS (FileLinkViewController)\nTitle for the MEGA link view"
+    },
+    "7442": {
+        "text": "Import to your Cloud Drive",
+        "context": "Button title to trigger the action of importing the file to your MEGA account. This way you will add the file to your cloud files"
+    },
+    "7443": {
+        "text": "Download to your MEGA App",
+        "context": "Button title to trigger the action of downloading the file to your device."
+    },
+    "7444": {
+        "text": "The file you are trying to download is bigger than the available memory.",
+        "context": "Error message shown when you try to download something bigger than the space available in your device"
+    },
+    "7445": {
+        "text": "The file you are trying to open is bigger than the avaliable memory.",
+        "context": "Error message shown when you try to open something bigger than the free space in your device"
+    },
+    "7446": {
+        "text": "File link unavailable",
+        "context": "Error title shown when you open a file link and it's no longer available"
+    },
+    "7447": {
+        "text": "This could be due to the following reasons:\n- The file has been removed because of a ToS\/AUP violation.\n- Invalid URL \u2013 the link you are trying to access does not exist.\n- The file has been deleted by the user.",
+        "context": "Error message shown when you open a file link and it's no longer available. It explains the reasons that could be causing it."
+    },
+    "7448": {
+        "text": "Download started!",
+        "context": "Message shown when a download starts"
+    },
+    "7449": {
+        "text": "The folder you are trying to download is bigger than the avaliable memory.",
+        "context": "Message shown when you try to downlonad a folder bigger than the available memory."
+    },
+    "7450": {
+        "text": "The folder '%@' can't be created",
+        "context": "Error message shown when a folder can't be created."
+    },
+    "7451": {
+        "text": "This could be due to the following reasons:\n- The folder link has been removed because of a ToS\/AUP violation.\n- Invalid URL \u2013 the link you are trying to access does not exist.\n- The folder link has been deleted by the user.",
+        "context": "Error message shown when a folder link doesn't exist."
+    },
+    "7452": {
+        "text": "No Internet Connection",
+        "context": "EMPTY STATES\nText shown on the app when you don't have connection to the internet or when you have lost it"
+    },
+    "7453": {
+        "text": "Empty folder link",
+        "context": "EMPTY STATES - LINKS\nTitle shown when you open a folder link and the given folder doesn't have any files"
+    },
+    "7454": {
+        "text": "Currently, this link doesn't have any files.",
+        "context": "Message shown when you open a folder link and the given folder doesn't have any files"
+    },
+    "7455": {
+        "text": "Currently, this child folder doesn't have any files.",
+        "context": "Message shown when you open a folder link and one of the given folders inside of it doesn't have any files"
+    },
+    "7456": {
+        "text": "No files in this shared folder",
+        "context": "Title shown when the shared folder with a contact is empty."
+    },
+    "7457": {
+        "text": "Add files using the upper button.",
+        "context": "Message shown when your Cloud Drive is empty, when you don't have any files."
+    },
+    "7458": {
+        "text": "Share something! Add files using the upper button.",
+        "context": "Message shown when the shared folder with a contact is empty."
+    },
+    "7459": {
+        "text": "Camera Uploads is disabled",
+        "context": "EMPTY STATES - CAMERA UPLOADS\nTitle shown when Camera Uploads is disabled"
+    },
+    "7460": {
+        "text": "Enable Camera Uploads to have a copy of your device photos on MEGA.",
+        "context": "Message shown when Camera Uploads is disabled"
+    },
+    "7461": {
+        "text": "No files saved for Offline",
+        "context": "EMPTY STATES - OFFLINE\nTitle shown when the Offline section is empty, when you don't have download any files."
+    },
+    "7462": {
+        "text": "Download files to use them when you don't have internet connection.",
+        "context": "Message shown when the Offline section is empty, when you don't have download any files."
+    },
+    "7463": {
+        "text": "You don't have any contacts added yet!",
+        "context": "EMPTY STATES - CONTACTS\nTitle shown when the Contacts section is empty, when you have not added any contact."
+    },
+    "7464": {
+        "text": "Add contacts using the upper button.",
+        "context": "Message shown when the Contacts section is empty, when you have not added any contact."
+    },
+    "7465": {
+        "text": "Transfers Paused",
+        "context": "EMPTY STATES - TRANSFERS\nTitle shown when the transfers are paused"
+    },
+    "7466": {
+        "text": "Resume the transfers using the upper button.",
+        "context": "Text shown under the upper title when the transfers are paused"
+    },
+    "7467": {
+        "text": "You don't have any pending downloads.",
+        "context": "Text shown under the upper title when the transfers, and the filter \"Download\" option is selected"
+    },
+    "7468": {
+        "text": "You don't have any pending uploads.",
+        "context": "Text shown under the upper title when the transfers, and the filter \"Upload\" option is selected"
+    },
+    "7469": {
+        "text": "%d file",
+        "context": "Subtitle shown on folders that gives you information about its content. This case \"{1} file\""
+    },
+    "7470": {
+        "text": "%d files",
+        "context": "Subtitle shown on folders that gives you information about its content. This case \"{1+} files\""
+    },
+    "7471": {
+        "text": "%d folder",
+        "context": "Subtitle shown on folders that gives you information about its content. This case \"{1} folder\""
+    },
+    "7472": {
+        "text": "%d folders",
+        "context": "Subtitle shown on the Contacts section under the name of the contact you have shared {Number of folders} with"
+    },
+    "7473": {
+        "text": "%d folder \u2022 %d file",
+        "context": "Subtitle shown on folders that gives you information about its content. This case \"{1} folder \u2022 {1} file\""
+    },
+    "7474": {
+        "text": "%d folders \u2022 %d files",
+        "context": "Subtitle shown on folders that gives you information about its content. This case \"{1+} folder \u2022 {1+} file\""
+    },
+    "7475": {
+        "text": "%d folders \u2022 %d file",
+        "context": "Subtitle shown on folders that gives you information about its content. This case \"{1+} folder \u2022 {1} file\""
+    },
+    "7476": {
+        "text": "%d folder \u2022 %d files",
+        "context": "Subtitle shown on folders that gives you information about its content. This case \"{1} folder \u2022 {1+} file\""
+    },
+    "7477": {
+        "text": "Transfer canceled!",
+        "context": "Message shown when a transfer has been canceled"
+    },
+    "7478": {
+        "text": "There are pending downloads",
+        "context": "Alert title shown when you try to open a Cloud Drive document and is not posible because there's some active download"
+    },
+    "7479": {
+        "text": "Try later or cancel them",
+        "context": "Alert message shown when you try to open a Cloud Drive document and is not posible because there's some active download"
+    },
+    "7480": {
+        "text": "Upload from...",
+        "context": "UPLOAD FROM...\nOption given on the `Add` section to allow the user upload something from another cloud storage provider. The three dots implies that an action occurs after tapping on it."
+    },
+    "7481": {
+        "text": "%@ already uploaded",
+        "context": "Message shown when the user selects a file from another cloud storage provider that's already uploaded. \"{File name} already uploaded\""
+    },
+    "7482": {
+        "text": "Upload started!",
+        "context": "Message shown when a upload starts"
+    },
+    "7483": {
+        "text": "Save for Offline",
+        "context": "CLOUD DRIVE TAB (1) - NODE DETAILS (DetailsNodeInfoViewController)\nList option shown on the details of a file or folder"
+    },
+    "7484": {
+        "text": "Generating link...",
+        "context": "Message shown when a link to the file is being generated"
+    },
+    "7485": {
+        "text": "The link has been removed!",
+        "context": "Message shown when the link to a file has been removed"
+    },
+    "7486": {
+        "text": "1 file moved!",
+        "context": "Success message shown when you have moved 1 file"
+    },
+    "7487": {
+        "text": "%d files moved!",
+        "context": "Success message shown when you have moved {1+} files"
+    },
+    "7488": {
+        "text": "1 folder moved!",
+        "context": "Success message shown when you have moved 1 folder"
+    },
+    "7489": {
+        "text": "%d folders moved!",
+        "context": "Success message shown when you have moved {1+} folders"
+    },
+    "7490": {
+        "text": "1 file and 1 folder moved!",
+        "context": "Success message shown when you have moved 1 file and 1 folder"
+    },
+    "7491": {
+        "text": "1 file and %d folders moved!",
+        "context": "Success message shown when you have moved 1 file and {1+} folders"
+    },
+    "7492": {
+        "text": "%d files and 1 folder moved!",
+        "context": "Success message shown when you have moved {1+} files and 1 folder"
+    },
+    "7493": {
+        "text": "%d files and %d folders moved!",
+        "context": "Success message shown when you have moved {1+} files and {1+} folders"
+    },
+    "7494": {
+        "text": "1 file copied",
+        "context": "Success message shown when you have copied 1 file"
+    },
+    "7495": {
+        "text": "%d files copied",
+        "context": "Success message shown when you have copied {1+} files"
+    },
+    "7496": {
+        "text": "1 folder copied",
+        "context": "Success message shown when you have copied 1 folder"
+    },
+    "7497": {
+        "text": "%d folders copied",
+        "context": "Success message shown when you have copied {1+} folders"
+    },
+    "7498": {
+        "text": "1 file and 1 folder copied",
+        "context": "Success message shown when you have copied 1 file and 1 folder"
+    },
+    "7499": {
+        "text": "1 file and %d folders copied",
+        "context": "Success message shown when you have copied 1 file and {1+} folders"
+    },
+    "7500": {
+        "text": "%d files and 1 folder copied",
+        "context": "Success message shown when you have copied {1+} files and 1 folder"
+    },
+    "7501": {
+        "text": "%d files and %d folders copied",
+        "context": "Success message shown when you have copied {1+} files and {1+} folders"
+    },
+    "7502": {
+        "text": "Move to the Rubbish Bin",
+        "context": "MOVE TO THE RUBBISH BIN\nTitle for the action that allows you to \"Move to the Rubbish Bin\" files or folders"
+    },
+    "7503": {
+        "text": "Are you sure you want to move 1 file to the Rubbish Bin?",
+        "context": "Alert message to confirm if the user wants to move to the Rubbish Bin \"1 file\""
+    },
+    "7504": {
+        "text": "Are you sure you want to move %d files to the Rubbish Bin?",
+        "context": "Alert message to confirm if the user wants to move to the Rubbish Bin \"{1+} files\""
+    },
+    "7505": {
+        "text": "Are you sure you want to move 1 folder to the Rubbish Bin?",
+        "context": "Alert message to confirm if the user wants to move to the Rubbish Bin \"1 folder\""
+    },
+    "7506": {
+        "text": "Are you sure you want to move %d folders to the Rubbish Bin?",
+        "context": "Alert message to confirm if the user wants to move to the Rubbish Bin \"{1+} folders\""
+    },
+    "7507": {
+        "text": "Are you sure you want to move 1 file and 1 folder to the Rubbish Bin?",
+        "context": "Alert message to confirm if the user wants to move to the Rubbish Bin \"1 file and 1 folder\""
+    },
+    "7508": {
+        "text": "Are you sure you want to move 1 file and %d folders to the Rubbish Bin?",
+        "context": "Alert message to confirm if the user wants to move to the Rubbish Bin \"1 file and {1+} folders\""
+    },
+    "7509": {
+        "text": "Are you sure you want to move %d files and 1 folder to the Rubbish Bin?",
+        "context": "Alert message to confirm if the user wants to move to the Rubbish Bin \"{1+} files and 1 folder\""
+    },
+    "7510": {
+        "text": "Are you sure you want to move %d files and %d folders to the Rubbish Bin?",
+        "context": "Alert message to confirm if the user wants to move to the Rubbish Bin \"{1+} files and {1+} folders\""
+    },
+    "7511": {
+        "text": "1 file moved to the Rubbish Bin!",
+        "context": "MOVE TO THE RUBBISH BIN - SVProgressHUD Messages\nSuccess message shown when one file has been moved to the Rubbish Bin"
+    },
+    "7512": {
+        "text": "%d files moved to the Rubbish Bin!",
+        "context": "Success message shown when {1+} files have been moved to the Rubbish Bin"
+    },
+    "7513": {
+        "text": "Permissions error",
+        "context": "BROWSER (BrowserViewController)\nError title shown when you are trying to do an action with a file or folder and you don't have the necessary permissions"
+    },
+    "7514": {
+        "text": "Check your permissions on this folder",
+        "context": "Error message shown when you are trying to do an action with a file or folder and you don't have the necessary permissions"
+    },
+    "7515": {
+        "text": "Folder shared!",
+        "context": "Message shown when a folder have been shared"
+    },
+    "7516": {
+        "text": "File imported!",
+        "context": "Message shown when a file have been imported"
+    },
+    "7517": {
+        "text": "Select items",
+        "context": "CAMERA UPLOADS TAB (2)\nTitle shown on the Camera Uploads section when the edit mode is enabled. On this mode you can select photos"
+    },
+    "7518": {
+        "text": "%lu photos",
+        "context": "Title shown on the Camera Uploads section that specifies the number of photos uploaded during a month. \"{1+} photos\""
+    },
+    "7519": {
+        "text": "%lu photo",
+        "context": "Title shown on the Camera Uploads section that specifies the number of photos uploaded during a month. \"{1} photo\""
+    },
+    "7520": {
+        "text": "Camera Uploads enabled!",
+        "context": "Success message shown when Camera Uploads has been enabled"
+    },
+    "7521": {
+        "text": "%lu item selected",
+        "context": "Title shown on the Camera Uploads section when the edit mode is enabled and you have selected one photo"
+    },
+    "7522": {
+        "text": "%lu items selected",
+        "context": "Title shown on the Camera Uploads section when the edit mode is enabled and you have selected more than one photo"
+    },
+    "7523": {
+        "text": "Camera Uploads will be disabled, because you don't have enough space on your device",
+        "context": "Message shown when you have Camera Uploads enabled and your device don't have enough space to make it work"
+    },
+    "7524": {
+        "text": "No folders shared",
+        "context": "Subtitle shown on the Contacts section under the name of the contact you haven't shared anything with"
+    },
+    "7525": {
+        "text": "Insert an email",
+        "context": "Item menu option to add a contact writting his\/her email"
+    },
+    "7526": {
+        "text": "Add from contacts",
+        "context": "Item menu option to add a contact through your device app Contacts"
+    },
+    "7527": {
+        "text": "Contact added!",
+        "context": "Success message shown when a contact has been added"
+    },
+    "7528": {
+        "text": "Are you sure you want to remove %@ from your contact list?",
+        "context": "Alert confirmation message shown when you want to remove one contact from your contacts list"
+    },
+    "7529": {
+        "text": "Are you sure you want to remove %d users from your contact list?",
+        "context": "Alert confirmation message shown when you want to remove more than one contact from your contacts list"
+    },
+    "7530": {
+        "text": "%d contacts removed",
+        "context": "Success message shown when the selected contacts have been removed"
+    },
+    "7531": {
+        "text": "Contact %@ removed!",
+        "context": "Success message shown when the selected contact has been removed. \"Contact {Name of contact} removed!\""
+    },
+    "7532": {
+        "text": "The contact does not have an email",
+        "context": "Alert title shown when you add a contact from your device and the selected one doesn't have an email."
+    },
+    "7533": {
+        "text": "Folder left!",
+        "context": "Success message shown when a shared folder have been left"
+    },
+    "7534": {
+        "text": "Read only",
+        "context": "Permissions given to the user you share your folder with"
+    },
+    "7535": {
+        "text": "Security Options",
+        "context": "Title of one of the Settings sections where you can configure \"Security Options\" of your MEGA account"
+    },
+    "7536": {
+        "text": "No email account set up on your device",
+        "context": "Text shown when you want to send feedback of the app and you don't have an email account set up on your device"
+    },
+    "7537": {
+        "text": "Options",
+        "context": "SETTINGS TAB (5) - CameraUploadsTableViewController\nHeader to explain that \"Upload videos\", \"Use cellular connection\" and \"Only when charging\" are options of the Camera Uploads"
+    },
+    "7538": {
+        "text": "When enabled new photos and videos will be uploaded.",
+        "context": "Footer text to explain the Camera Uploads functionality"
+    },
+    "7539": {
+        "text": "Exporting the Master Key and keeping it in a secure location enables you to recover your account in the case of a lost password without data loss.",
+        "context": "Footer shown on the Settings \/ Security Options section that explains what means to export the Master Key"
+    },
+    "7540": {
+        "text": "Masterkey.txt was saved on this device. Connect to your computer and open iTunes to access it on MEGA Documents. We strongly advise you to keep this file secure!",
+        "context": "Alert message shown to explain that the master key was saved on your device. Also that you can access it through iTunes. And ends with and security advise."
+    },
+    "7541": {
+        "text": "Master Key removed",
+        "context": "Alert title shown when you have removed your MEGA master key"
+    },
+    "7542": {
+        "text": "MasterKey.txt was removed from the Documents folder.",
+        "context": "Alert message shown to explain that the master was removed of your device."
+    },
+    "7543": {
+        "text": "You are about to permanently remove 1 file. Would you like to proceed? (You cannot undo this action.)",
+        "context": "Alert message shown on the Rubbish Bin when you want to remove \"1 file\""
+    },
+    "7544": {
+        "text": "You are about to permanently remove %d files. Would you like to proceed? (You cannot undo this action.)",
+        "context": "Alert message shown on the Rubbish Bin when you want to remove \"{1+} files\""
+    },
+    "7545": {
+        "text": "You are about to permanently remove 1 folder. Would you like to proceed? (You cannot undo this action.)",
+        "context": "Alert message shown on the Rubbish Bin when you want to remove \"1 folder\""
+    },
+    "7546": {
+        "text": "You are about to permanently remove %d folders. Would you like to proceed? (You cannot undo this action.)",
+        "context": "Alert message shown on the Rubbish Bin when you want to remove \"{1+} folders\""
+    },
+    "7547": {
+        "text": "You are about to permanently remove 1 file and 1 folder. Would you like to proceed? (You cannot undo this action.)",
+        "context": "Alert message shown on the Rubbish Bin when you want to remove \"1 file and 1 folder\""
+    },
+    "7548": {
+        "text": "You are about to permanently remove 1 file and %d folders. Would you like to proceed? (You cannot undo this action.)",
+        "context": "Alert message shown on the Rubbish Bin when you want to remove \"1 file and {1+} folders\""
+    },
+    "7549": {
+        "text": "You are about to permanently remove %d files and 1 folder. Would you like to proceed? (You cannot undo this action.)",
+        "context": "Alert message shown on the Rubbish Bin when you want to remove \"{1+} files and 1 folder\""
+    },
+    "7550": {
+        "text": "You are about to permanently remove %d files and %d folders. Would you like to proceed? (You cannot undo this action.)",
+        "context": "Alert message shown on the Rubbish Bin when you want to remove \"{1+} files and {1+} folders"
+    },
+    "7551": {
+        "text": "1 file removed from MEGA!",
+        "context": "Success message shown when one file has been removed from MEGA"
+    },
+    "7552": {
+        "text": "%d files removed from MEGA!",
+        "context": "Success message shown when {1+} files have been removed from MEGA"
+    },
+    "7553": {
+        "text": "The new and the old password can not match.",
+        "context": "Error message shown when the users tryes to change his\/her password and writes the current one as if it's new"
+    },
+    "7554": {
+        "text": "Simple passcode",
+        "context": "Title to describe a simple (four digit) passcode"
+    },
+    "7555": {
+        "text": "Erase local data",
+        "context": "Title of one of the passcode options. If enabled will do what footer explains."
+    },
+    "7556": {
+        "text": "Log out and erase local data after 10 failed passcode attempts",
+        "context": "Footer text that explain what will happen if \"Erase local data\" is enabled"
+    },
+    "7557": {
+        "text": "All",
+        "context": "Title of one of the filters in the Transfers section. In this case \"All\" transfers."
+    },
+    "7558": {
+        "text": "Transfers resumed!",
+        "context": "Success message shown when the transfers have been resumed"
+    },
+    "7559": {
+        "text": "Transfers paused!",
+        "context": "Success message shown when the transfers have been paused"
+    },
+    "7560": {
+        "text": "Transfers cancelled!",
+        "context": "Success message shown when all the transfers have been cancelled"
+    },
+    "7561": {
+        "text": "Cancel transfers",
+        "context": "Title of the alert shown when you try to cancel transfers"
+    },
+    "7562": {
+        "text": "Do you want to cancel %@?",
+        "context": "Message of the alert shown when you try to cancel transfers where {%@} = {ALL, UPLOAD or DOWNLOAD} + {tranfers}"
+    },
+    "7563": {
+        "text": "ALL transfers",
+        "context": "Rest of the message of the alert shown when you try to cancel transfers. ALL uppercase."
+    },
+    "7564": {
+        "text": "UPLOAD transfers",
+        "context": "Rest of the message of the alert shown when you try to cancel transfers. UPLOAD uppercase."
+    },
+    "7565": {
+        "text": "DOWNLOAD transfers",
+        "context": "Rest of the message of the alert shown when you try to cancel transfers. DOWNLOAD uppercase."
+    },
+    "7566": {
+        "text": "Log out",
+        "context": "Title of the button which logs out from your account."
+    },
+    "7567": {
+        "text": "Logging out",
+        "context": "String shown when you are logging out of your account."
+    },
+    "7568": {
+        "text": "expires on %@",
+        "context": "Text that shows the expiry date of the account PRO level"
+    },
+    "7569": {
+        "text": "of %@",
+        "context": "Sentence shown under the used space percentage to complete the info with the user account maximum storage. \"of {maximun storage}\""
+    },
+    "7570": {
+        "text": "used of %@",
+        "context": "Sentence shown under the used space to complete the info with the user account maximum storage. \"used of {maximun storage}\""
+    },
+    "7571": {
+        "text": "available of %@",
+        "context": "Sentence shown under the available space to complete the info with the user account maximum storage. \"available of {maximun storage}\""
+    },
+    "7572": {
+        "text": "Storage %@",
+        "context": "Storage related with the MEGA PRO account level you can subscribe"
+    },
+    "7573": {
+        "text": "Bandwidth %@",
+        "context": "Bandwich related with the MEGA PRO account level you can subscribe"
+    },
+    "7574": {
+        "text": "%.2f %@ per month",
+        "context": "Price asociated with the MEGA PRO account level you can subscribe"
     }
 }

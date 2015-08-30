@@ -1436,6 +1436,96 @@ function removeUInode(h) {
 }
 
 /**
+ * Add verified email addresses to folder shares
+ * 
+ */
+function addContactToFolderShare() {
+    
+    var targets = [],
+        $newContacts, sMsg, $txtArea, iPerm;
+    
+    // Enabled share button
+    if ($.dialog === 'share' && !$('.share-dialog .dialog-share-button').is('.disabled')) {
+        
+        $newContacts = $('.share-dialog .token-input-list-mega .token-input-token-mega');
+        $txtArea = $('.share-dialog .share-message-textarea textarea');
+        
+        loadingDialog.show();
+
+        if ($txtArea.is(':visible') &&  ($txtArea.val() !== l[6853])) {
+            sMsg = $txtArea.val();
+        }
+        else {
+            sMsg = '';
+        }
+
+        if ($newContacts.length) {
+
+            iPerm = sharedPermissionLevel(checkMultiInputPermission($('.share-dialog .permissions-icon'))[0]);
+            $.each($newContacts, function(ind, val) {
+                targets.push({u: $(val).contents().eq(1).text(), r: iPerm});
+            });
+        }
+
+        closeDialog();
+        $('.export-links-warning').addClass('hidden');
+        if (targets.length > 0) {
+            doShare($.selected[0], targets, true, sMsg);
+        }
+
+        loadingDialog.hide();
+    }
+}
+
+/**
+ * Handles behavior when user want to add new contact/s from add contact dialog
+ * 
+ * @param {string} addBtnClass, contact dialog add button class, .add-user-popup-button
+ */
+function addNewContact($addButton) {
+    
+    var mailNum, msg, title, email;
+        
+    if ($addButton.is('.add') && !$addButton.is('.disabled')) {
+        if (u_type === 0) {
+            ephemeralDialog(l[997]);
+        }
+        else {
+            var mailNum,
+                emailText = $('.add-user-textarea textarea').val(),
+                $mails = $('.token-input-list-mega .token-input-token-mega');
+
+            mailNum = $mails.length;
+            
+            if (mailNum) {
+                $mails.each(function(index, value) {
+                    email = $(value).contents().eq(1).text();
+                    if (!M.inviteContact(M.u[u_handle].m, email, emailText)) {
+                        if (index === mailNum - 1) {
+                            if (mailNum === 1) {
+                                title = l[150];
+                                msg = l[5898].replace('[X]', email);
+                            }
+                            else {
+                                title = l[165] + ' ' + l[5859];
+                                msg = l[5899];
+                            }
+
+                            closeDialog();
+                            msgDialog('info', title, msg);
+                            $('.token-input-token-mega').remove();
+                        }
+                    }
+                });
+            }
+        }
+    }
+    else if ($addButton.is('.cancel')) {
+        closeDialog();
+    }
+}
+
+/**
  * sharedUInode(nodeHandle)
  * Handle shared/export link icons in Cloud Drive
  *
@@ -1862,43 +1952,8 @@ function addContactUI()
 
     $('.add-user-popup-button').off('click');
     $('.add-user-popup-button').on('click', function() {
-        var mailNum, msg, title, email,
-            $self = $(this);
-        if ($self.is('.add') && !$self.is('.disabled')) {
-            if (u_type === 0) {
-                ephemeralDialog(l[997]);
-            } else {
-                var $mails = $('.token-input-list-mega .token-input-token-mega');
-                var mailNum = $mails.length;
-                var emailText = $('.add-user-textarea textarea').val();
-
-                if (mailNum) {
-                    $mails.each(function(index, value) {
-                        email = $(value).contents().eq(1).text();
-                        if (!M.inviteContact(M.u[u_handle].m, email, emailText)) {
-                            if (index === mailNum - 1) {
-                                if (mailNum === 1) {
-                                    title = l[150];
-                                    msg = l[5898].replace('[X]', email);
-                                } else {
-                                    title = l[165] + ' ' + l[5859];
-                                    msg = l[5899];
-                                }
-
-                                // It's important to call this function here and not after msgDialog
-                                // In case that we call it after, both dialogs are closed
-                                // and user is not notified about action or error
-                                closeDialog();
-                                msgDialog('info', title, msg);
-                                $('.token-input-token-mega').remove();
-                            }
-                        }
-                    });
-                }
-            }
-        } else {
-            closeDialog();
-        }
+        
+        addNewContact($(this));
     });
 
     $('.add-user-popup .fm-dialog-close').off('click');
@@ -4983,9 +5038,13 @@ function UIkeyevents() {
                 }
             }
         }
-        else if (e.keyCode == 13 && $.dialog == 'share') {
-            alert('Share Dialog');
+        else if (e.keyCode == 13 && $.dialog === 'share') {
+            addContactToFolderShare();
         }
+        else if (e.keyCode == 13 && $.dialog === 'add-contact-popup') {
+            addNewContact($('.add-user-popup-button.add'));
+        }
+
         else if (e.keyCode == 13 && $.dialog == 'rename') {
             dorename();
         }
@@ -7213,6 +7272,30 @@ function checkIfContactExists(email) {
     return userIsAlreadyContact;
 }
 
+/**
+ * sharedPermissionLevel()
+ *
+ * @param {string} permission level class value
+ */
+function sharedPermissionLevel(value) {
+
+    var iPerm = 0;
+
+    if (value === 'read-and-write') {
+        iPerm = 1;
+    }
+    else if (value === 'full-access') {
+        iPerm = 2;
+    }
+
+    // read-only
+    else {
+        iPerm = 0;
+    }
+
+    return iPerm;
+}
+
 function initShareDialog() {
     if (!u_type) {
         return; // not for ephemeral
@@ -7327,30 +7410,6 @@ function initShareDialog() {
         });
     }
 
-    /**
-     * sharedPermissionLevel()
-     *
-     * @param {string} permission level class value
-     */
-    function sharedPermissionLevel(value) {
-
-        var iPerm = 0;
-
-        if (value === 'read-and-write') {
-            iPerm = 1;
-        }
-        else if (value === 'full-access') {
-            iPerm = 2;
-        }
-
-        // read-only
-        else {
-            iPerm = 0;
-        }
-
-        return iPerm;
-    }
-
     function menuPermissionState($this) {
 
         var mi = '.permissions-menu .permissions-menu-item',
@@ -7407,46 +7466,12 @@ function initShareDialog() {
     });
 
     /*
-     * On share dialog Share button
+     * On share dialog, done/share button
+     * 
      * Adding new contacts to shared item
      */
     $('.share-dialog .dialog-share-button').rebind('click', function() {
-
-        // If share button is NOT disabled
-        if (!$(this).is('.disabled')) {
-
-            // If there's a contacts in multi-input add them to top
-            loadingDialog.show();
-
-            var $newContacts = $('.share-dialog .token-input-list-mega .token-input-token-mega'),
-                targets = [],
-                sMsg,
-                $txtArea = $('.share-dialog .share-message-textarea textarea'),
-                iPerm;
-
-                if ($txtArea.is(':visible') &&  ($txtArea.val() !== 'Include personal message for new contacts...')) {
-                    sMsg = $txtArea.val();
-                }
-                else {
-                    sMsg = '';
-                }
-
-            if ($newContacts.length) {
-
-                iPerm = sharedPermissionLevel(checkMultiInputPermission($('.share-dialog .permissions-icon'))[0]);
-                $.each($newContacts, function(ind, val) {
-                    targets.push({u: $(val).contents().eq(1).text(), r: iPerm});
-                });
-            }
-
-            closeDialog();
-            $('.export-links-warning').addClass('hidden');
-            if (targets.length > 0) {
-                doShare($.selected[0], targets, true, sMsg);
-            }
-
-            loadingDialog.hide();
-        }
+        addContactToFolderShare();
     });
 
     $('.share-dialog').off('click', '.share-dialog-remove-button');
@@ -7656,7 +7681,7 @@ function initShareDialog() {
         var $this = $(this);
         $('.share-message').addClass('active');
 
-        if ($this.val() == 'Include personal message for new contacts...') {
+        if ($this.val() === l[6853]) {
 
             // Clear the default message
             $this.val('');

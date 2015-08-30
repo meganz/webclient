@@ -407,27 +407,34 @@
                     case KEY.ENTER:
                     case KEY.NUMPAD_ENTER:
                     case KEY.COMMA:
-                        if (selected_dropdown_item) {
-                            add_token($(selected_dropdown_item).data("tokeninput"));
-                            hidden_input.change();
-                        }
-                        else {
-                            if ($(input).data("settings").allowFreeTagging) {
-                                if ($(input).data("settings").allowTabOut && $(this).val() === "") {
-                                    return true;
-                                }
-                                else {
-                                    add_freetagging_tokens();
-                                }
+                        
+                        if (this.value.length) {
+                            if (selected_dropdown_item) {
+                                add_token($(selected_dropdown_item).data("tokeninput"));
+                                hidden_input.change();
                             }
                             else {
-                                $(this).val("");
-                                if ($(input).data("settings").allowTabOut) {
-                                    return true;
+                                if ($(input).data("settings").allowFreeTagging) {
+                                    if ($(input).data("settings").allowTabOut && $(this).val() === "") {
+                                        return true;
+                                    }
+                                    else {
+                                        add_freetagging_tokens();
+                                    }
+                                }
+                                else {
+                                    $(this).val("");
+                                    if ($(input).data("settings").allowTabOut) {
+                                        return true;
+                                    }
                                 }
                             }
-                            event.stopPropagation();
-                            event.preventDefault();
+                        }
+                        
+                        // If users press enter/return on empty input field behave like done/share button is clicked
+                        else {
+                            addContactToFolderShare();
+                            addNewContact($('.add-user-popup-button.add'));
                         }
                         
                         return false;
@@ -652,8 +659,10 @@
         }
 
         function add_freetagging_tokens() {
-            var value = $.trim(input_box.val());
-            var tokens = value.split($(input).data("settings").tokenDelimiter);
+            
+            var value = $.trim(input_box.val()).replace(/\s|\n/gi, ''),
+                tokens = value.split($(input).data("settings").tokenDelimiter);
+            
             $.each(tokens, function(i, token) {
                 if (!token) {
                     return;

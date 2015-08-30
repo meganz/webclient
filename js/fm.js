@@ -7225,7 +7225,7 @@ function handleShareDialogContent() {
         .addClass('read-only');
 
     // Update dialog title text
-    $(dc + ' .fm-dialog-title').text(l[1344] + ' "' + M.d[$.selected].name + '"');
+    $(dc + ' .fm-dialog-title').text(l[5631] + ' "' + M.d[$.selected].name + '"');
     $(dc + ' .multiple-input .token-input-token-mega').remove();
     dialogPositioning('.fm-dialog.share-dialog');
     $(dc + ' .token-input-input-token-mega input').focus();
@@ -7893,7 +7893,7 @@ function copyDialog()
                     handleDialogContent(section, 'ul', true, 'copy', $.mcImport ? l[236] : "Paste" /*l[63]*/);
                     break;
                 case 'shared-with-me':
-                    handleDialogContent(section, 'ul', false, 'copy', l[1344]);
+                    handleDialogContent(section, 'ul', false, 'copy', l[5631]);
                     break;
                 case 'conversations':
                     handleDialogContent(section, 'div', false, 'copy', l[1940], '.conversations-container');
@@ -8116,19 +8116,19 @@ function moveDialog()
     });
 
     $('.move-dialog-button').unbind('click');
-    $('.move-dialog-button').bind('click', function(e) {
+    $('.move-dialog-button').bind('click', function() {
+        
         var section = $(this).attr('class').split(" ")[1];
+        
         selectMoveDialogTabRoot(section);
-        if ($(this).attr('class').indexOf('active') == -1)
-        {
-            switch (section)
-            {
+        if ($(this).attr('class').indexOf('active') === -1) {
+            switch (section) {
                 case 'cloud-drive':
                 case 'folder-link':
                     handleDialogContent(section, 'ul', true, 'move', l[62]);
                     break;
                 case 'shared-with-me':
-                    handleDialogContent(section, 'ul', false, 'move', l[1344]);
+                    handleDialogContent(section, 'ul', false, 'move', l[5631]);
                     break;
                 case 'rubbish-bin':
                     handleDialogContent(section, 'ul', false, 'move', l[62]);

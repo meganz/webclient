@@ -48,7 +48,11 @@ CallFeedback.prototype.attachToChat = function(megaChat) {
                                     'type': 'primary',
                                     'text': __("Send Feedback"),
                                     'callback': function() {
-                                        var feedbackDialog = mega.ui.FeedbackDialog.singleton($(this));
+                                        var feedbackDialog = mega.ui.FeedbackDialog.singleton(
+                                            $(this),
+                                            undefined,
+                                            "call-ended"
+                                        );
                                         feedbackDialog._type = "call-ended";
                                         feedbackDialog.bind('onHide.callEnded', function() {
 

@@ -2114,10 +2114,10 @@ function fmremove() {
             $('#msgDialog').addClass('multiple');
             $('.fm-del-contacts-number').text($.selected.length);
             $('#msgDialog .fm-del-contact-avatar').attr('class', 'fm-del-contact-avatar');
-            $('#msgDialog .fm-del-contact-avatar span').empty()
+            $('#msgDialog .fm-del-contact-avatar span').empty();
         } else {
-            var user = M.d[$.selected[0]];
-            avatar = useravatar.contact(user);
+            var user = M.d[$.selected[0]],
+                avatar = useravatar.contact(user, 'avatar-remove-dialog');
 
             $('#msgDialog .fm-del-contact-avatar').html(avatar);
         }
@@ -2150,14 +2150,53 @@ function fmremove() {
                 M.moveNodes($.selected, M.RubbishID);
             }
         } else {
-            msgDialog('remove', l[1003], l[1004].replace('[X]', fm_contains(filecnt, foldercnt)), false, function(e) {
+            
+            var nodes = new mega.Nodes({}),
+                // Additional message in case that there's a shared node
+                delShareInfo,
+                // Contains complete directory structure of selected nodes, their ids
+                dirTree = [];
+            
+            for (var item in $.selected) {
+                if ($.selected.hasOwnProperty(item)) {
+                    dirTree = $.merge(dirTree, nodes.loopSubdirs($.selected[item], null));
+                }
+            }
+            
+            delShareInfo = nodes.isShareExist(dirTree) ? ' ' + l[1952] + ' ' + l[7410] : '';
+            
+            msgDialog('remove', l[1003], l[1004].replace('[X]', fm_contains(filecnt, foldercnt)) + delShareInfo, false, function(e) {
                 if (e) {
                     if (M.currentrootid === 'shares') {
                         M.copyNodes($.selected, M.RubbishID, true);
                     }
                     else {
+   
+                        // Remove all shares related to selected nodes
+                        for (var selection in dirTree) {
+                            if (dirTree.hasOwnProperty(selection)) {
+                                
+                                // Remove regular/full share
+                                for (var share in M.d[dirTree[selection]].shares) {
+                                    if (M.d[dirTree[selection]].shares.hasOwnProperty(share)) {
+                                        api_req({a: 's2', n:  dirTree[selection], s: [{ u: M.d[dirTree[selection]].shares[share].u, r: ''}], ha: '', i: requesti});
+                                        M.delNodeShare(dirTree[selection], M.d[dirTree[selection]].shares[share].u);
+                                        setLastInteractionWith(dirTree[selection], "0:" + unixtime());
+                                    }
+                                }
+                                
+                                // Remove pending share
+                                for (var pendingUserId in M.ps[dirTree[selection]]) {
+                                    if (M.ps[dirTree[selection]].hasOwnProperty(pendingUserId)) {
+                                        api_req({a: 's2', n:  dirTree[selection], s: [{ u: pendingUserId, r: ''}], ha: '', i: requesti});
+                                        M.deletePendingShare(dirTree[selection], pendingUserId);
+                                    }
+                                }
+                            }
+                        }
                         M.moveNodes($.selected, M.RubbishID);
                     }
+                    
                 }
             }, true);
         }
@@ -3910,14 +3949,14 @@ function accountUI()
         document.location.hash = 'fm/account/profile';
     });
 
+    // Cancel account button on main Account page
     $('.cancel-account').rebind('click', function() {
-        DEBUG('Cancel your account');
 
         // Ask for confirmation
-        msgDialog('confirmation', l[6181], l[1974], false, function(e) {
-            if (e) {
+        msgDialog('confirmation', l[6181], l[1974], false, function(event) {
+            if (event) {
                 loadingDialog.show();
-                api_req({a: 'erm', m: M.u[u_handle].m, t: 21}, {
+                api_req({ a: 'erm', m: M.u[u_handle].m, t: 21 }, {
                     callback: function(res) {
                         loadingDialog.hide();
                         if (res === ENOENT) {
@@ -3933,6 +3972,11 @@ function accountUI()
                 });
             }
         });
+    });
+    
+    // Button on main Account page to backup their master key
+    $('.backup-master-key').rebind('click', function() {
+        document.location.hash = 'backup';
     });
 
     $('.fm-account-button').unbind('click');
@@ -6711,14 +6755,21 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
     }
     if (type === 'delete-contact') {
         $('#msgDialog').addClass('delete-contact');
-        $('#msgDialog .fm-notifications-bottom').html('<div class="fm-dialog-button notification-button confirm"><span>' + l[78] + '</span></div><div class="fm-dialog-button notification-button cancel"><span>' + l[79] + '</span></div><div class="clear"></div>');
+        $('#msgDialog .fm-notifications-bottom')
+            .html('<div class="fm-dialog-button notification-button confirm"><span>'
+                + l[78] + '</span></div><div class="fm-dialog-button notification-button cancel"><span>'
+                + l[79] + '</span></div><div class="clear"></div>');
         $('#msgDialog .fm-dialog-button').eq(0).bind('click',function() {
             closeMsg();
-            if ($.warningCallback) $.warningCallback(true);
+            if ($.warningCallback) {
+                $.warningCallback(true);
+            }
         });
         $('#msgDialog .fm-dialog-button').eq(1).bind('click',function() {
             closeMsg();
-            if ($.warningCallback) $.warningCallback(false);
+            if ($.warningCallback) {
+                $.warningCallback(false);
+            }
         });
     }
     else if (type === 'warninga' || type === 'warningb' || type === 'info') {

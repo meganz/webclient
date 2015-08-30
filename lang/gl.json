@@ -220,6 +220,7 @@
     "499": "por ano",
     "501": "aforra 17%",
     "507": "Continuar",
+    "509": "A EMPRESA DA PRIVACIDADE",
     "511": "O teu par de claves 2048-bit RSA p\u00fablicos\/privados est\u00e1n sendo creados.",
     "514": "Saldo insuficiente, por favor, int\u00e9ntao de novo.",
     "516": "Obter axuda",
@@ -2355,5 +2356,8 @@
     "7402": "DOWNLOAD MEGAsync",
     "7403": "Drop your files here to start uploading",
     "7404": "Deleted one or more items.",
-    "7405": "One or more of your items were deleted by another user."
+    "7405": "One or more of your items were deleted by another user.",
+    "7410": "Any shared files or folders will no longer be accessible to other users.",
+    "7411": "Source Code",
+    "7412": "Backup master key"
 }

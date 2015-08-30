@@ -220,6 +220,7 @@
     "499": "na rok",
     "501": "oszcz\u0119dzasz 17%",
     "507": "Kontynuuj",
+    "509": "THE PRIVACY COMPANY",
     "511": "Tw\u00f3j publiczny\/prywatny klucz (2048-bit RSA) zosta\u0142 stworzony.",
     "514": "Niewystarczaj\u0105ce \u015brodki, prosimy spr\u00f3bowa\u0107 ponownie.",
     "516": "Pomoc",
@@ -2355,5 +2356,8 @@
     "7402": "POBIERZ MEGAsync",
     "7403": "Przenie\u015b swoje pliki tutaj i rozpocznij wgrywanie",
     "7404": "Usuni\u0119to jeden lub wi\u0119cej plik\u00f3w.",
-    "7405": "Jeden lub kilka plik\u00f3w zosta\u0142o usuni\u0119tych przez innego u\u017cytkownika."
+    "7405": "Jeden lub kilka plik\u00f3w zosta\u0142o usuni\u0119tych przez innego u\u017cytkownika.",
+    "7410": "Any shared files or folders will no longer be accessible to other users.",
+    "7411": "Source Code",
+    "7412": "Backup master key"
 }

@@ -220,6 +220,7 @@
     "499": "anual",
     "501": "ahorra un 17%",
     "507": "Continuar",
+    "509": "LA EMPRESA DE LA PRIVACIDAD",
     "511": "Tu par de claves p\u00fablica \/ privada RSA de 2048 bits est\u00e1n siendo generadas.",
     "514": "Saldo insuficiente, por favor, int\u00e9ntalo de nuevo.",
     "516": "Obt\u00e9n ayuda",
@@ -2355,5 +2356,8 @@
     "7402": "DESCARGAR MEGAsync",
     "7403": "Arrastra aqu\u00ed tus archivos para empezar a subir",
     "7404": "Elimin\u00f3 uno o m\u00e1s elementos.",
-    "7405": "Uno o m\u00e1s de tus elementos fue eliminado por otro usuario."
+    "7405": "Uno o m\u00e1s de tus elementos fue eliminado por otro usuario.",
+    "7410": "Any shared files or folders will no longer be accessible to other users.",
+    "7411": "Source Code",
+    "7412": "Backup master key"
 }

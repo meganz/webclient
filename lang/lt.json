@@ -220,6 +220,7 @@
     "499": "per metus",
     "501": "sutaupykite 17%",
     "507": "T\u0119sti",
+    "509": "PRIVATUMO KOMPANIJA",
     "511": "J\u016bs\u0173 2048-bit RSA vie\u0161a \/ privati rakt\u0173 pora yra kuriama.",
     "514": "Nepakankamas balansas, bandykite dar kart\u0105.",
     "516": "Gaukite pagalb\u0105",
@@ -2355,5 +2356,8 @@
     "7402": "DOWNLOAD MEGAsync",
     "7403": "Drop your files here to start uploading",
     "7404": "Deleted one or more items.",
-    "7405": "One or more of your items were deleted by another user."
+    "7405": "One or more of your items were deleted by another user.",
+    "7410": "Any shared files or folders will no longer be accessible to other users.",
+    "7411": "Source Code",
+    "7412": "Backup master key"
 }

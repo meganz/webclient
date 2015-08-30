@@ -220,6 +220,7 @@
     "499": "per year",
     "501": "save 17%",
     "507": "Continue",
+    "509": "THE PRIVACY COMPANY",
     "511": "Your 2048-bit RSA public \/ private key pair is now being created.",
     "514": "Insufficient balance, please try again.",
     "516": "Get support",
@@ -2355,5 +2356,8 @@
     "7402": "DOWNLOAD MEGAsync",
     "7403": "Drop your files here to start uploading",
     "7404": "Deleted one or more items.",
-    "7405": "One or more of your items were deleted by another user."
+    "7405": "One or more of your items were deleted by another user.",
+    "7410": "Any shared files or folders will no longer be accessible to other users.",
+    "7411": "Source Code",
+    "7412": "Backup master key"
 }

@@ -6012,10 +6012,6 @@ function loadfm_callback(res, ctx) {
 
         loadfm_done(pfkey, ctx.stackPointer);
 
-        if (!pfkey) {
-            notify.getInitialNotifications();
-        }
-
         if (res.cr) {
             crypto_procmcr(res.cr);
         }
@@ -6023,7 +6019,8 @@ function loadfm_callback(res, ctx) {
             crypto_procsr(res.sr);
         }
 
-        getsc();
+        // Pass true to indicate this is an fm load and that we want to fetch initial notifications afterwards
+        getsc(true);
 
         if (hasMissingKeys) {
             srvlog('Got missing keys processing gettree...', null, true);

@@ -45,7 +45,13 @@ var JinglePlugin = {
             if (info.e) {
                 var e = info.e;
                 if (e.stack) {
-                    info.e = e.stack;
+                    if (RTC && (RTC.browser === 'chrome' || RTC.browser === 'opera')) {
+                        info.e = e.stack.toString();
+                    } else {
+                        info.e = e.toString()+'\n'+e.stack.toString();
+                    }
+                } else {
+                    info.e = e.toString();
                 }
             }
             console.error("onInternalError:", msg, "\n"+(info.e||''));
@@ -224,7 +230,7 @@ var JinglePlugin = {
                     peerAnonId: ans.peerAnonId
                   }, "security", "Fingerprint verification failed");
                 } catch(e){
-                    console.error(e);
+                    self.onInternalError("Error calling onCallTerminated handler", {e:e});
                 }
                 return true;
             }
@@ -273,9 +279,8 @@ var JinglePlugin = {
                 });
              },
              function(e) {
-                    delete sess.inputQueue;
-                    self.terminate(sess, obj.reason, obj.text);
-                    return true;
+                delete sess.inputQueue; //onInternalError is already called by sess.setRemoteDecription()
+                return true;
              }
             );
             break;

@@ -220,6 +220,7 @@
     "499": "per \u00e5r",
     "501": "spara 17%",
     "507": "Forts\u00e4tt",
+    "509": "Det integritetsbejakande f\u00f6retaget",
     "511": "Ditt 2048-bit RSA publika \/ privata nyckelpar skapas. ",
     "514": "Otillr\u00e4cklig balans, f\u00f6rs\u00f6k igen.",
     "516": "F\u00e5 support",
@@ -2355,5 +2356,8 @@
     "7402": "DOWNLOAD MEGAsync",
     "7403": "Drop your files here to start uploading",
     "7404": "Deleted one or more items.",
-    "7405": "One or more of your items were deleted by another user."
+    "7405": "One or more of your items were deleted by another user.",
+    "7410": "Any shared files or folders will no longer be accessible to other users.",
+    "7411": "Source Code",
+    "7412": "Backup master key"
 }

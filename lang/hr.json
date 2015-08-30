@@ -220,6 +220,7 @@
     "499": "godi\u0161nje",
     "501": "u\u0161tedite 17%",
     "507": "Nastavak",
+    "509": "PRIVATNOST TVRTKE",
     "511": "Va\u0161 2048-bitni RSA privatni\/javni klju\u010d se upravo generira.",
     "514": "Nedovoljan iznos, molimo poku\u0161ajte ponovno.",
     "516": "Dobij podr\u0161ku",
@@ -2355,5 +2356,8 @@
     "7402": "DOWNLOAD MEGAsync",
     "7403": "Drop your files here to start uploading",
     "7404": "Deleted one or more items.",
-    "7405": "One or more of your items were deleted by another user."
+    "7405": "One or more of your items were deleted by another user.",
+    "7410": "Any shared files or folders will no longer be accessible to other users.",
+    "7411": "Source Code",
+    "7412": "Backup master key"
 }

@@ -220,6 +220,7 @@
     "499": "urtean",
     "501": "%17-a gorde",
     "507": "Jarraitu",
+    "509": "PRIBATUTASUN ELKARTEA",
     "511": "2048 bit-eko zure RSA gako pribatu \/ publiko bikotea sortzen ari da orain.",
     "514": "Saldoa ez da nahikoa, mesedez saiatu berriz.",
     "516": "Laguntza lortu",
@@ -2355,5 +2356,8 @@
     "7402": "DOWNLOAD MEGAsync",
     "7403": "Drop your files here to start uploading",
     "7404": "Deleted one or more items.",
-    "7405": "One or more of your items were deleted by another user."
+    "7405": "One or more of your items were deleted by another user.",
+    "7410": "Any shared files or folders will no longer be accessible to other users.",
+    "7411": "Source Code",
+    "7412": "Backup master key"
 }

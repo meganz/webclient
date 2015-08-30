@@ -220,6 +220,7 @@
     "499": "pr. \u00e5r",
     "501": "spar op til 17%",
     "507": "Forts\u00e6t",
+    "509": "PRIVATLIVS FIRMAET",
     "511": "Dit 2048-bit RSA offentlige\/private n\u00f8gles\u00e6t er ved at blive dannet.",
     "514": "Utilstr\u00e6kkelige midler p\u00e5 kontoen, pr\u00f8v venligst igen.",
     "516": "Support",
@@ -2355,5 +2356,8 @@
     "7402": "DOWNLOAD MEGAsync",
     "7403": "Drop your files here to start uploading",
     "7404": "Deleted one or more items.",
-    "7405": "One or more of your items were deleted by another user."
+    "7405": "One or more of your items were deleted by another user.",
+    "7410": "Any shared files or folders will no longer be accessible to other users.",
+    "7411": "Source Code",
+    "7412": "Backup master key"
 }

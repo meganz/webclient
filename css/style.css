@@ -1571,6 +1571,16 @@ a.blog-button:hover {
 	text-transform: uppercase;
 	font-family: 'source_sans_prolight';
 }
+.notification-item .avatar-wrapper.avatar {
+	width: 48px;
+	height: 48px;
+	line-height: 42px;
+	margin: 0;
+}
+.notification-item .avatar img {
+	width: 44px;
+	height: 44px;
+}
 .notification-request-buttons {
 	float: right;
 	padding: 4px 20px 0 8px;
@@ -1683,7 +1693,7 @@ a.blog-button:hover {
 }
 .notification-info {
 	display: block;
-	font-size: 14px;
+	font-size: 13px;
 	color: #666666;
 	padding: 0;
 	line-height: 16px;
@@ -10657,7 +10667,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	font-size: 30px;
 	font-family: 'source_sans_prosemibold', Arial;
 }
-.delete-contact .fm-del-contact-avatar img {
+.delete-contact .fm-del-contact-avatar img, .avatar-wrapper.avatar-remove-dialog {
 	width: 64px;
 	height: 64px;
 	-moz-border-radius: 100%;
@@ -11745,6 +11755,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
 }
 .membership-medium-txt.red-bg.editprofile, .membership-medium-txt.gray-bg.cancel-account {
 	margin-top: 7px;
+}
+.membership-medium-txt.red-bg.backup-master-key {
+    margin-left: 10px;
+    margin-top: 7px;
 }
 .membership-medium-txt.red-bg.vouchercreate {
 	margin: 25px 0 0 0;
@@ -14908,21 +14922,21 @@ h5.main-italic-header {
 	background-position: -444px -614px;
 }
 .duration-options-list {
-    -webkit-column-count: 2;
+	-webkit-column-count: 2;
 	-moz-column-count: 2;
 	column-count: 2;
 	-webkit-column-width: 200px;
 	-moz-column-width: 200px;
 	column-width: 200px;
-    padding-top: 5px;
+	padding-top: 5px;
 }
 .duration-options-list .payment-duration .membership-radio-label {
 	background: none;
-    font-family: 'source_sans_proregular';
+	font-family: 'source_sans_proregular';
 	padding-left: 0;
 }
 .duration-options-list .payment-duration.template {
-    display: none;
+	display: none;
 }
 .membership-bott-price {
 	font-size: 72px;
@@ -15894,9 +15908,10 @@ p.privacy-list {
 	background-repeat: no-repeat;
 }
 .team-person-block {
-	float: left;
-	margin: 30px 0 10px 100px;
-	width: 160px;
+    float: left;
+    height: 267px;
+    margin: 30px 0 10px 100px;
+    width: 160px;
 }
 .team-person-block.first {
 	margin-left: 0;
@@ -23195,13 +23210,13 @@ div.fm-dialog.feedback-dialog .checkboxOff {
 }
 .voucher-buy-now.sufficient-funds {
 	border-color: #3aaa5a;
-    color: #3aaa5a;
-    font-weight: bold;
+	color: #3aaa5a;
+	font-weight: bold;
 }
 .voucher-buy-now.sufficient-funds:hover {
-    background-color: #3aaa5a;
-    border-color: #3aaa5a;
-    color: white;
+	background-color: #3aaa5a;
+	border-color: #3aaa5a;
+	color: white;
 }
 .voucher-block {
 	-moz-box-sizing: border-box;

@@ -220,6 +220,7 @@
     "499": "y\u0131ll\u0131k",
     "501": "%17 indirimli",
     "507": "Devam",
+    "509": "B\u0130R G\u0130ZL\u0130L\u0130K KURULU\u015eU",
     "511": "2048 bit a\u00e7\u0131k ve gizli RSA anahtarlar\u0131n\u0131z \u015fu anda yarat\u0131lmakta.",
     "514": "Yetersiz bakiye, l\u00fctfen tekrar deneyin.",
     "516": "Destek al\u0131n",
@@ -2355,5 +2356,8 @@
     "7402": "MEGAsync \u0130ND\u0130R",
     "7403": "Y\u00fcklemeye ba\u015flamak i\u00e7in dosyalar\u0131n\u0131z\u0131 buraya b\u0131rak\u0131n",
     "7404": "Bir veya daha fazla \u00f6\u011fe silindi.",
-    "7405": "Bir ya da daha fazla \u00f6\u011feniz ba\u015fka bir kullan\u0131c\u0131 taraf\u0131ndan silindi."
+    "7405": "Bir ya da daha fazla \u00f6\u011feniz ba\u015fka bir kullan\u0131c\u0131 taraf\u0131ndan silindi.",
+    "7410": "Any shared files or folders will no longer be accessible to other users.",
+    "7411": "Source Code",
+    "7412": "Backup master key"
 }

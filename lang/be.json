@@ -220,6 +220,7 @@
     "499": "Dre bloaz",
     "501": "Savetei\u00f1 17%",
     "507": "Kendalc'hen",
+    "509": "KEVREDIGEZH AR PREVEZDED",
     "511": "Krouet eo bet hoc'h alc'hwez boutin\/privez RSA 2048-bit",
     "514": "N'eus ket trawalc'h a arc'hant. Klaskit adarre, mar plij ganeoc'h.",
     "516": "Goulenn skoazell",
@@ -2355,5 +2356,8 @@
     "7402": "DOWNLOAD MEGAsync",
     "7403": "Drop your files here to start uploading",
     "7404": "Deleted one or more items.",
-    "7405": "One or more of your items were deleted by another user."
+    "7405": "One or more of your items were deleted by another user.",
+    "7410": "Any shared files or folders will no longer be accessible to other users.",
+    "7411": "Source Code",
+    "7412": "Backup master key"
 }

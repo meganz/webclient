@@ -259,7 +259,7 @@ Karere.DEFAULTS = {
         "muc#roomconfig_passwordprotectedroom": 0,
         "muc#roomconfig_maxusers": 200,
         "muc#roomconfig_whois": "anyone",
-        "muc#roomconfig_membersonly": 1,
+        "muc#roomconfig_membersonly": 0,
         "muc#roomconfig_moderatedroom": 1,
         "members_by_default": 1,
         "muc#roomconfig_changesubject": 0,

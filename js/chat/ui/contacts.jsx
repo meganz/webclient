@@ -37,17 +37,21 @@ var Avatar = React.createClass({
     render: function() {
         var contact = this.props.contact;
 
-        var avatarMeta = generateAvatarMeta(contact.u);
+        var $avatar = $(useravatar.contact(contact));
 
-        var displayedAvatar = avatarMeta.shortName;
+        var classes = this.props.classesName ? this.props.classesName : 'nw-contact-avatar ' + contact.u;
 
-        if(avatarMeta.avatarUrl) {
-            displayedAvatar = <img src={avatarMeta.avatarUrl} />;
+        var displayedAvatar;
+
+        if($avatar.find("img").length > 0) {
+            displayedAvatar = <img src={$("img", $avatar).attr("src")} style={this.props.imgStyles}/>;
+        } else {
+            displayedAvatar = <span>{$(useravatar.contact(contact)).text()}</span>;
+
+            var tempClasses = $avatar.attr('class');
+            var colorNum = tempClasses.split("color")[1].split(" ")[0];
+            classes += " color" + colorNum;
         }
-
-        var classes = "nw-contact-avatar todo-green-tick";
-
-        classes += " color" + avatarMeta.color;
 
         return (
             <div className={classes}>

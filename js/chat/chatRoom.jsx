@@ -931,22 +931,22 @@ ChatRoom.prototype.appendMessage = function(message) {
         message
     );
 
-    var jid;
-    var contact;
-    if(message.getFromJid) {
-        jid = Karere.getNormalizedBareJid(message.getFromJid());
-        //var timestamp = message.getDelay() ? message.getDelay() : unixtime();
-
-        contact = self.megaChat.getContactFromJid(jid);
-    } else {
-        contact = message.authorContact;
-    }
-
-    if (!contact) {
-        self.logger.error("Missing contact/jid: ", jid, contact);
-        return false;
-    }
-
+    //var jid;
+    //var contact;
+    //if(message.getFromJid) {
+    //    jid = Karere.getNormalizedBareJid(message.getFromJid());
+    //    //var timestamp = message.getDelay() ? message.getDelay() : unixtime();
+    //
+    //    contact = self.megaChat.getContactFromJid(jid);
+    //} else {
+    //    contact = message.authorContact;
+    //}
+    //
+    //if (!contact) {
+    //    self.logger.error("Missing contact/jid: ", jid, contact);
+    //    return false;
+    //}
+    //
 
 
     //// TODO: Move this to the render method.

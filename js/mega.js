@@ -383,6 +383,9 @@ function MegaData()
                                 data: blob,
                                 url: myURL.createObjectURL(blob)
                             };
+
+                            // by updating the M.u[contact] this will trigger some parts in the Chat UI to re-render.
+                            M.u[ctx.u].avatar = true;
                         }
                         useravatar.loaded(ctx.u);
                     }

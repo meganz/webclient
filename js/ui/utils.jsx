@@ -69,14 +69,10 @@ var JScrollPane = React.createClass({
     componentDidUpdate: function() {
         this.onResize();
     },
-    componentWillUpdate: function(nextProps, nextState) {
-        nextProps.className = nextProps.className ? nextProps.className : "";
-        nextProps.className += " jScrollPaneContainer";
-    },
     render: function () {
 
         return (
-            <div className={this.props.className} {...this.props} onResize={this.onResize}>
+            <div className={this.props.classNames + " jScrollPaneContainer"} {...this.props} onResize={this.onResize}>
                 <div className="jspContainer">
                     <div className="jspPane">
                         {this.props.children}

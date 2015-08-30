@@ -528,89 +528,10 @@ var ConversationsApp = React.createClass({
                     <ConversationsMainListing {...this.props} conversations={this.props.megaChat.chats} />
 
                     <div className="fm-chat-block hidden">
-                        <div className="fm-chat-messages-block inline-dialog chat-notification template hidden">
-                            <div className="fm-chat-messages-pad">
-                                <div className="nw-chat-notification-icon"></div>
-
-                                <div className="nw-contact-avatar color1">
-                                    A
-                                </div>
-
-
-                                <div className="fm-chat-message">
-                                    <div className="chat-message-date">2:02 pm</div>
-                                    <div className="chat-message-txt"></div>
-
-                                    <div className="fm-chat-file-button primary-button"><span>Primary button</span></div>
-                                    <div className="fm-chat-file-button secondary-button"><span>Secondary button</span></div>
-
-                                    <div className="clear"></div>
-                                </div>
-                            </div>
-                        </div>
-
-
-                        <div className="message template hidden">
-
-                            <div className="fm-chat-messages-block">
-                                <div className="fm-chat-messages-pad">
-                                    <div className="nw-contact-avatar">
-                                        <img alt="" src="{staticpath}images/mega/default-small-avatar.png" />
-                                        </div>
-                                        <div className="fm-chat-message">
-                                            <span className="chat-username">[$86]</span>
-                                            <span className="clear"></span>
-                                            <div className="chat-message-date">2:02 pm</div>
-                                            <div className="chat-message-txt"><span>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</span>
-                                            </div>
-                                            <div className="clear"></div>
-                                        </div>
-                                        <div className="clear"></div>
-                                    </div>
-                                </div>
-                            </div>
-
-
-
                             <ConversationPanelUI.ConversationPanels
                                 {...this.props}
                                 conversations={this.props.megaChat.chats}
                                 />
-
-                            <div className="fm-chat-line-block">
-                                <div className="hiddendiv"></div>
-                                <div className="fm-chat-attach-file">
-                                    <div className="fm-chat-attach-arrow"></div>
-                                </div>
-
-                                <div className="fm-chat-emotions-icon">
-                                    <div className="fm-chat-emotion-arrow"></div>
-                                </div>
-                                <div className="fm-chat-emotion-popup hidden">
-                                    <div className="fm-chat-arrow"></div>
-                                    <div className="fm-chat-smile smile" data-text=":)"></div>
-                                    <div className="fm-chat-smile wink" data-text=";)"></div>
-                                    <div className="fm-chat-smile tongue" data-text=":P"></div>
-                                    <div className="fm-chat-smile grin" data-text=":D"></div>
-                                    <div className="fm-chat-smile confuse" data-text=":|"></div>
-                                    <div className="fm-chat-smile grasp" data-text=":O"></div>
-                                    <div className="fm-chat-smile sad" data-text=":("></div>
-                                    <div className="fm-chat-smile cry" data-text=";("></div>
-                                    <div className="fm-chat-smile angry" data-text="(angry)"></div>
-                                    <div className="fm-chat-smile mega" data-text="(mega)"></div>
-                                    <div className="clear"></div>
-                                </div>
-
-                                <div className="nw-chat-message-icon"></div>
-                                <div className="fm-chat-input-scroll hidden">
-                                    <div className="fm-chat-input-block">
-                                        <textarea className="message-textarea" placeholder="Write a message..."></textarea>
-                                    </div>
-                                </div>
-                                <div className="clear"></div>
-
-                            </div>
-
                         </div>
 
                         

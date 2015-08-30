@@ -8174,6 +8174,9 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 	top: -2px;
 	right: -2px;
 }
+.video-call-container {
+	display: block; /* bug in chrome, causing the <video> child elements to disapear */
+}
 .video-call-container img, .video-call-container video {
 	height: 100%;
 }
@@ -21930,11 +21933,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 	background-position: left top;
 	z-index: 10;
 }
-.full-mode .video-full-demo-ticket {
-	left: auto;
-	right: 0;
-	background-position: right top;
-}
 .video-full-logo {
 	position: absolute;
 	left: 50%;
@@ -21946,14 +21944,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 	background-repeat: no-repeat;
 	background-position: center -185px;
 	z-index: 10;
-}
-.full-mode .video-full-logo {
-	left: 20px;
-	top: 20px;
-	margin: 0;
-	width: 184px;
-	height: 64px;
-	background-position: 1px -90px;
 }
 .video-size-button {
 	position: absolute;
@@ -21991,9 +21981,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 	height: 32px;
 	left: 0;
 	top: 0;
-}
-.video-full-container.full-mode {
-	overflow: hidden;
 }
 .video-full-canvas-block {
 	position: absolute;
@@ -22325,7 +22312,7 @@ video.localViewport {
 }
 
 .conversations .fm-chat-message-pad {
-	padding: 2px 6px 6px 2px;
+	padding-right: 4px;
 }
 .conversations-block {
 	width: 25%;
@@ -25900,4 +25887,55 @@ body, body * {
 .section.conversations .nw-conversations-item {
     transition: all 500ms ease;
     box-sizing: border-box;
+}
+/**
+ * new full screen mode
+ */
+
+.fm-chat-block.fullscreen,
+	.fm-chat-block.fullscreen .chat-call-block {
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	width: 100% !important;
+	height: 100% !important;
+	z-index: 50;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;/*background: #4c4c4c;*/
+	margin: 0 !important;
+}
+.fm-chat-block.fullscreen .video-call-container {
+	display: block;
+	width: 100% !important;
+	height: 100% !important;
+}
+.fm-chat-block.fullscreen .rmtVideo {
+	object-fit: cover;
+	object-position: 50% 50%; /* default */
+	width: 100%;
+}
+.video-full-demo-ticket {
+	display: none;
+}
+.fm-chat-block.fullscreen .video-full-demo-ticket {
+	right: 0;
+	top: 0;
+	left: auto;
+	background-position: right top;
+	display: block;
+}
+.video-full-logo {
+	display: none;
+}
+.fm-chat-block.fullscreen .video-full-logo {
+	display: block;
+	left: 20px;
+	top: 20px;
+	margin: 0;
+	width: 184px;
+	height: 64px;
+	background-position: 1px -90px;
 }

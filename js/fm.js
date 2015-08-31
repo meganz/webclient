@@ -348,7 +348,7 @@ function treesearchUI()
                 case 'cloud-drive':
                 case 'shared-with-me':
                 case 'rubbish-bin':
-                    menu.find('.sorting-item-divider,*[data-by=size],*[data-by=name]').removeClass('hidden');
+                    menu.find('.sorting-item-divider,*[data-by=fav],*[data-by=created],*[data-by=name]').removeClass('hidden');
                     break;
             }
             var sortTreePanel = $.sortTreePanel[type];
@@ -448,7 +448,7 @@ function initializeTreePanelSorting()
     $.sortTreePanel = {};
     $.each(['folder-link', 'contacts', 'conversations', 'inbox', 'shared-with-me', 'cloud-drive', 'rubbish-bin'], function(key, type) {
         $.sortTreePanel[type] = {
-            by: anyOf(['name', 'status', 'last-interaction'], localStorage['sort' + type + 'By']) || (type == 'contacts' ? "status":"name"),
+            by: anyOf(['name', 'status', 'created', 'fav', 'last-interaction'], localStorage['sort' + type + 'By']) || (type == 'contacts' ? "status":"name"),
             dir: parseInt(anyOf(['-1', '1'], localStorage['sort' + type + 'Dir']) || '1')
         };
     });

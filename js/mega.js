@@ -1842,6 +1842,17 @@ function MegaData()
             // localCompare >=IE10, FF and Chrome OK
             // sort by name is default in the tree
             treePanelSortElements(stype, folders, {
+                created: function(a, b) {
+                    return a.ts - b.ts;
+                },
+                fav: function(a, b) {
+                    if (a.fav) {
+                        return -1;
+                    }
+                    if (b.fav) {
+                        return 1;
+                    }
+                },
                 name: function(a, b) {
                     if (a.name)
                         return a.name.localeCompare(b.name);

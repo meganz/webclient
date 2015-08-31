@@ -382,7 +382,7 @@ CallSession.prototype.onCallAnswered = function(e) {
 
     self.room.appendMessage(
         new ChatDialogMessage({
-            messageId: 'call-initialising-' + unixtime(),
+            messageId: 'call-initialising-' + self.sid,
             type: 'call-initialising',
             authorContact: self.room.megaChat.getContactFromJid(self.getPeer()),
             timestamp: unixtime(),
@@ -394,38 +394,6 @@ CallSession.prototype.onCallAnswered = function(e) {
 
 CallSession.prototype._renderInCallUI = function() {
     var self = this;
-
-    if (self.remotePlayer) {
-        if (self.remotePlayer.length && self.remotePlayer.length === 1) {
-            // api incompatibility ?
-            self.room._othersAvElement = self.remotePlayer[0];
-        } else {
-            self.room._othersAvElement = self.remotePlayer;
-        }
-    }
-
-    //$('.others-av-screen video', self.room.$header).remove();
-    //
-    //if (!$('.video-full-container').is(":visible")) {
-    //    $('.others-av-screen', self.room.$header).append(self.remotePlayer);
-    //} else {
-    //    $('.video-full-container .other-user .front').append(self.remotePlayer);
-    //}
-    //$('.others-av-screen', self.room.$header).attr('data-jid', self.getPeer());
-    //
-    //if (self.getMediaOptions().video === false) {
-    //    $('.others-av-screen .video-only', self.room.$header).hide();
-    //} else {
-    //    $('.others-av-screen .video-only', self.room.$header).show();
-    //}
-    //
-    //
-    //$('.btn-chat-call', self.room.$header).addClass('disabled');
-    //
-    //
-    //$('.nw-conversations-item.current-calling', $('.section.conversations')).rebind('click.megaChat', function() {
-    //    self.room.activateWindow();
-    //});
 
     self.room.megaChat._currentCallCounter = 0;
     if (self.room.megaChat._currentCallTimer) {
@@ -883,50 +851,10 @@ CallSession.prototype.getRemoteMediaOptions = function() {
 CallSession.prototype.renderCallStartedState = function() {
     var self = this;
 
-    //if (!self.getMediaOptions().audio) {
-    //    $('.audio-icon', self.room.$header).addClass("active");
-    //} else {
-    //    $('.audio-icon', self.room.$header).removeClass("active");
-    //}
-    //
-    //if (!self.getMediaOptions().video) {
-    //    $('.video-icon', self.room.$header).addClass("active");
-    //} else {
-    //    $('.video-icon', self.room.$header).removeClass("active");
-    //}
-    //
-    //self.room.$header.parent().addClass("video-call"); // adds video-call or audio-call class name
-    //
-    //// hide all elements
-    //$([
-    //    '.chat-header-indicator.muted-audio',
-    //    '.chat-header-indicator.muted-video',
-    //    '.others-av-screen',
-    //    '.my-av-screen'
-    //].join(","), self.room.$header.parent()).addClass("hidden");
-    //
-    //// configure elements - avatars
-    //var myAvatar = $(useravatar.contact(u_handle, 'nw-contact-avatar'));
-    //$('.my-avatar-text', self.room.$header)
-    //    .empty()
-    //    .append(myAvatar);
-    //$('.my-avatar', self.room.$header).hide();
-    //
-    //var otherUserContact = self.room.megaChat.getContactFromJid(self.room.getParticipantsExceptMe()[0]);
-    //var otherAvatar = $(useravatar.contact(otherUserContact, 'nw-contact-avatar', 'div'));
-    //otherAvatar.html("<span>" + otherAvatar.html() + "</span>");
-    //otherAvatar.find('img').addClass('nw-contact-avatar');
-    //$('.other-avatar-text', self.room.$header)
-    //    .empty()
-    //    .append(otherAvatar)
-    //    .show();
-    //$('.other-avatar', self.room.$header).hide();
-
-
     self.room.megaChat.activeCallSession = self;
 
 
-    self.room.trackDataChange();
+    //self.room.trackDataChange();
 
     self._removeTempMessages();
 };
@@ -941,23 +869,6 @@ CallSession.prototype.renderCallEndedState = function() {
     self.getCallManager().incomingCallDialog.hide();
 
 
-    $('.chat-header-indicator.muted-video', self.room.$header).addClass("hidden");
-    $('.chat-header-indicator.muted-audio', self.room.$header).addClass("hidden");
-
-    $('.btn-chat-call', self.room.$header).removeClass('hidden');
-    $('.btn-chat-call', self.room.$header).removeClass('disabled');
-    $('.fm-end-call', self.room.$header).addClass('hidden');
-
-
-    self.room.$header.parent()
-        .removeClass("video-call")
-        .removeClass("audio-call");
-
-
-    $('.nw-conversations-header.call-started, .nw-conversations-item.current-calling')
-        .addClass('hidden')
-        .removeClass('selected');
-
     self.room.getNavElement().show();
 
     if (self.room.megaChat._currentCallTimer) {
@@ -965,132 +876,7 @@ CallSession.prototype.renderCallEndedState = function() {
     }
 
     self._removeTempMessages();
-
-    $('.video-full-container').addClass("hidden");
-
-    $('.others-av-screen', self.room.$header).attr('data-jid', ''); // cleanup
-
-    $(document).fullScreen(false);
-
-    self.localPlayer = self.room._othersAvElement = null;
-
-    self.room.refreshScrollUI();
-
-    self.room.refreshUI();
-
-    $(window).trigger('resize');
-};
-
-CallSession.prototype.renderAudioVideoScreens = function() {
-    var self = this;
-
-    // mine
-    var mineMediaOpts = self.getMediaOptions();
-
-    $('.my-av-screen', self.room.$header).removeClass("hidden");
-
-    if (mineMediaOpts) {
-        self.renderSingleAudioVideoScreen(
-            $('.my-av-screen', self.room.$header),
-            mineMediaOpts,
-            'current-user-audio-container',
-            'current-user-video-container'
-
-        );
-    } else {
-        self.room.logger.error("no media opts");
-    }
-
-    // others
-    $('.others-av-screen', self.room.$header).removeClass("hidden");
-
-    $('.others-av-screen', self.room.$header).each(function() {
-        var otherUserJid = $(this).attr('data-jid');
-
-        if (!otherUserJid) {
-            // continue;
-            return;
-        }
-        var otherUserMediaOpts = self.getRemoteMediaOptions();
-
-        if (!otherUserMediaOpts) {
-            otherUserMediaOpts = {
-                video: false,
-                audio: false
-            };
-        }
-
-        self.renderSingleAudioVideoScreen(
-            $(this),
-            otherUserMediaOpts,
-            'audio-call-container',
-            'video-call-container'
-        );
-    });
-
-};
-
-CallSession.prototype.renderSingleAudioVideoScreen = function($screenElement, mediaOpts, audioCssClass, videoCssClass) {
-    var self = this;
-
-    assert($screenElement, 'media options missing');
-    assert(mediaOpts, 'media options missing');
-
-    if (!mediaOpts.video) {
-        $screenElement
-            .addClass(audioCssClass)
-            .removeClass(videoCssClass);
-
-        $('.my-avatar[src], .other-avatar[src]', $screenElement).show();
-        $('.video-only', $screenElement).hide();
-        $('video', $screenElement).hide();
-
-        if (videoCssClass === 'current-user-video-container') {
-            if ($('.my-avatar', $screenElement).attr('src') !== '') {
-                $('.my-avatar', $screenElement).show();
-                $('.my-avatar-text', $screenElement).hide();
-            } else {
-                $('.my-avatar', $screenElement).hide();
-                $('.my-avatar-text', $screenElement).show();
-            }
-        } else {
-            if ($('.other-avatar', $screenElement).attr('src') !== '') {
-                $('.other-avatar', $screenElement).show();
-                $('.other-avatar-text', $screenElement).hide();
-            } else {
-                $('.other-avatar', $screenElement).hide();
-                $('.other-avatar-text', $screenElement).show();
-            }
-        }
-
-        if ($('.video-full-container').is(":visible")) {
-            if (videoCssClass === 'current-user-video-container') {
-                // my video screen
-                $('.video-full-canvas-block.current-user').addClass("video-off");
-            } else {
-                $('.video-full-canvas-block.other-user').addClass("video-off");
-            }
-        }
-    } else {
-        $screenElement
-            .removeClass(audioCssClass)
-            .addClass(videoCssClass);
-
-        $('.my-avatar, .my-avatar-text, .other-avatar, .other-avatar-text', $screenElement).hide();
-        $('.video-only', $screenElement).show();
-        $('video', $screenElement).show();
-
-        if ($('.video-full-container').is(":visible")) {
-            if (videoCssClass === 'current-user-video-container') {
-                // my video screen
-                $('.video-full-canvas-block.current-user video').css('display', '');
-                $('.video-full-canvas-block.current-user').removeClass("video-off");
-            } else {
-                $('.video-full-canvas-block.other-user video').css('display', '');
-                $('.video-full-canvas-block.other-user').removeClass("video-off");
-            }
-        }
-    }
+    //self.room.trackDataChange();
 };
 
 CallSession.prototype.destroy = function() {
@@ -1460,8 +1246,6 @@ CallManager.prototype._detachFromChatRoom = function(megaChat, chatRoom) {
     chatRoom.unbind('call-ended.callManager');
     chatRoom.unbind('muted.callManager');
     chatRoom.unbind('unmuted.callManager');
-
-    // TODO: Hangup?
 };
 
 

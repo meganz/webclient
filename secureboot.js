@@ -1126,7 +1126,6 @@ else if (!b_u)
 
     jsl.push({f:'js/chat/karereEventObjects.js', n: 'keo_js', j:1,w:7});
     jsl.push({f:'js/chat/karere.js', n: 'karere_js', j:1,w:7});
-	jsl.push({f:'html/chat.html', n: 'chat', j:0});
     jsl.push({f:'bundle.js', n: 'chat_react_minified_js', j:1,w:10});
 
     // END OF MEGA CHAT

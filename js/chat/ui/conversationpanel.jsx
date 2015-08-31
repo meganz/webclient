@@ -188,12 +188,6 @@ var ConversationPanel = React.createClass({
 
         this.$header.attr("data-room-jid", room.roomJid.split("@")[0]);
 
-        if (this.$header.is(":visible")) {
-            this.$header.removeClass("hidden");
-            //$('.nw-conversations-item').removeClass("selected");
-            //$('.nw-conversations-item[data-room-jid="' + room.roomJid.split("@")[0] + '"]').addClass("selected");
-        }
-
         var $jsp = this.$messages.data("jsp");
         if($jsp) {
             $jsp.reinitialise();

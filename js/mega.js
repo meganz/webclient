@@ -1756,6 +1756,28 @@ function MegaData()
         return found;
     };
 
+    this.refreshTree = function() {
+        switch (treePanelType()) {
+            case 'contacts':
+                M.contacts();
+                break;
+            case 'shared-with-me':
+                M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
+                break;
+            case 'cloud-drive':
+            case 'folder-link':
+                M.buildtree(M.d[M.RootID], M.buildtree.FORCE_REBUILD);
+                break;
+            case 'inbox':
+                M.buildtree(M.d[M.InboxID], M.buildtree.FORCE_REBUILD);
+                break
+            case 'rubbish-bin':
+                M.buildtree({h: M.RubbishID}, M.buildtree.FORCE_REBUILD);
+                break;
+        }
+        treeUI(); // reattach events
+    };
+
     this.buildtree = function(n, dialog, stype) {
 
         if (!n) {
@@ -3217,6 +3239,12 @@ function MegaData()
                     }
                 }
             }
+        }
+
+        var type= treePanelType();
+
+        if (($.sortTreePanel[type]||{}).by == 'fav') {
+            M.refreshTree();
         }
     };
 

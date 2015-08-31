@@ -389,25 +389,7 @@ function treesearchUI()
                 localStorage['sort' + type + 'By'] = $.sortTreePanel[type].by = data.by;
             }
 
-            switch (type) {
-                case 'contacts':
-                    M.contacts();
-                    break;
-                case 'shared-with-me':
-                    M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
-                    break;
-                case 'cloud-drive':
-                case 'folder-link':
-                    M.buildtree(M.d[M.RootID], M.buildtree.FORCE_REBUILD);
-                    break;
-                case 'inbox':
-                    M.buildtree(M.d[M.InboxID], M.buildtree.FORCE_REBUILD);
-                    break
-                case 'rubbish-bin':
-                    M.buildtree({h: M.RubbishID}, M.buildtree.FORCE_REBUILD);
-                    break;
-            }
-            treeUI(); // reattach events
+            M.refreshTree();
         }
     });
 }
@@ -415,8 +397,8 @@ function treesearchUI()
 function treePanelType()
 {
     // is there an easy way of knowing it?
-    return $.trim($('.nw-fm-tree-header:visible').attr('class').replace(/[^ ]+ /, '')); 
-    return $.trim($('.nw-fm-left-icon.active').attr('class').replace(/(active|nw-fm-left-icon|ui-droppable|filled)/g, ''))
+    var panel = $.trim($('.nw-fm-tree-header:visible').attr('class'));
+    return panel ? panel.replace(/[^ ]+ /, '') : '';
 }
 
 function treePanelSortElements(type, elements, handlers, ifEq) {

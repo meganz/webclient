@@ -200,6 +200,16 @@ if (!b_u && is_extension)
             Cu.reportError(e);
             alert('Unable to initialize core functionality:\n\n' + e + '\n\n' + mozBrowserID);
         }
+        if (location.protocol === 'mega:') {
+            try {
+                var url = mObjectURL([""]);
+                myURL.revokeObjectURL(url);
+            }
+            catch (e) {
+                console.error('mObjectURL failed, is this TOR?', e);
+                document.location = bootstaticpath + urlrootfile + location.hash;
+            }
+        }
     }
     else /* Google Chrome */
     {
@@ -835,7 +845,7 @@ else if (!b_u)
             var dump = {
                 l: ln,
                 f: mTrim(url),
-                m: mTrim(msg).replace(/'(\w+:\/\/+[^/]+)[^']+(?:'|$)/, "'$1...'")
+                m: mTrim(msg).replace(/'(\w+:\/\/+[^/]+?)[^']+(?:'|$)/, "'$1...'")
                     .replace(/(Access to '\.\.).*(' from script denied)/, '$1$2')
                     .replace(/gfs\w+\.userstorage/, 'gfs...userstorage')
                     .replace(/^Uncaught\W*(?:exception\W*)?/i, ''),
@@ -1182,11 +1192,6 @@ else if (!b_u)
     jsl.push({f:'js/zip64.js', n: 'zip_js', j:1});
     jsl.push({f:'js/cms.js', n: 'cms_js', j:1});
     jsl.push({f:'js/megasync.js', n: 'megasync_js', j:1});
-
-    if (!is_chrome_firefox) {
-        // XXX: In Firefox this throws SecurityError: The operation is insecure.
-        jsl.push({f:'js/windowOpenerProtection.js', n: 'windowOpenerProtection', j:1, w:1});
-    }
 
     // only used on beta
     if (onBetaW) {

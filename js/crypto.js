@@ -4019,7 +4019,7 @@ function api_strerror(errno) {
             throw new Error('Invalid upload entry for fingerprint');
         }
         if (window.d) {
-            console.log('Generating fingerprint for ' + uq_entry.name);
+            ulmanager.logger.info('Generating fingerprint for ' + uq_entry.name);
         }
 
         var size = uq_entry.size;
@@ -4107,6 +4107,10 @@ function api_strerror(errno) {
                     if (blocks === j) {
                         tmp.push(i2s(crc));
                         return step(++i);
+                    }
+                    if (typeof uq_entry[sfn] !== 'function') {
+                        ulmanager.logger.error('"' + sfn + '" is not callable...');
+                        return callback(0xBADF);
                     }
                     onTimeout();
 

@@ -123,7 +123,7 @@
         if (item.isFile) {
             dir_inflight++;
             item.file(function(file) {
-                if (d) {
+                if (d > 1) {
                     console.log(file);
                 }
                 file.path = path;

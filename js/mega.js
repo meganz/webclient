@@ -3672,7 +3672,9 @@ function MegaData()
             return;
         }
 
-        if (dlMethod == MemoryIO && ~ua.indexOf(') gecko') && !localStorage.firefoxDialog && $.totalDL > 104857600) {
+        // If regular download using Firefox and the total download is over 1GB then show the dialog 
+        // to use the extension, but not if they've seen the dialog before and ticked the checkbox
+        if (dlMethod == MemoryIO && !localStorage.firefoxDialog && $.totalDL > 1048576000 && navigator.userAgent.indexOf('Firefox') > -1) {
             Later(firefoxDialog);
         }
 

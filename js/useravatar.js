@@ -167,6 +167,10 @@ var useravatar = (function() {
             $('.fm-avatar img,.fm-account-avatar img').attr('src', ns.imgUrl(user));
         }
 
+        if(M.u[user]) {
+            // by updating the M.u[contact] this will trigger some parts in the Chat UI to re-render.
+            M.u[user].avatar = true;
+        }
         var avatar = $(ns.contact(user)).html();
         $('.avatar-wrapper.' + user).empty().html(avatar);
         if ((M.u[user] || {}).m) {

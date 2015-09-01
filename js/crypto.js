@@ -1770,7 +1770,6 @@ function getsc(fm) {
                     if (ctx.fm) {
                         // mDBloaded = true;
                         loadfm_done();
-                        notify.getInitialNotifications();
                     }
                 }
                 if (res.w) {

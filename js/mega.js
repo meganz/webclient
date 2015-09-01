@@ -6026,8 +6026,7 @@ function loadfm_callback(res, ctx) {
             crypto_procsr(res.sr);
         }
 
-        // Pass true to indicate this is an fm load and that we want to fetch initial notifications afterwards
-        getsc(true);
+        getsc();
 
         if (hasMissingKeys) {
             srvlog('Got missing keys processing gettree...', null, true);
@@ -6050,6 +6049,10 @@ function loadfm_done(pfkey, stackPointer) {
 
     if (!CMS.isLoading()) {
         loadingDialog.hide();
+    }
+
+    if (!pfkey) {
+        notify.getInitialNotifications();
     }
 
     watchdog.notify('loadfm_done');

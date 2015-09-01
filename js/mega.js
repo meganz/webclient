@@ -5684,18 +5684,44 @@ function __process_f2(f, cb, tick)
  *
  */
 function processIPC(ipc, ignoreDB) {
+    
     DEBUG('processIPC');
+    
     for (var i in ipc) {
-        M.addIPC(ipc[i], ignoreDB);
-        if (ipc[i].dts) {
-            M.delIPC(ipc[i].p);
-            $('#ipc_' + ipc[i].p).remove();
-            delete M.ipc[ipc[i].p];
-            if ((Object.keys(M.ipc).length === 0) && (M.currentdirid === 'ipc')) {
-                $('.contact-requests-grid').addClass('hidden');
-                $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[6196]);
-                $('.fm-empty-contacts').removeClass('hidden');
+        if (ipc.hasOwnProperty(i)) {
+            
+            // Update ipc status
+            M.addIPC(ipc[i], ignoreDB);
+            
+            // Deletion of incomming pending contact request, user who sent request, canceled it
+            if (ipc[i].dts) {
+                M.delIPC(ipc[i].p);
+                $('#ipc_' + ipc[i].p).remove();
+                delete M.ipc[ipc[i].p];
+                if ((Object.keys(M.ipc).length === 0) && (M.currentdirid === 'ipc')) {
+                    $('.contact-requests-grid').addClass('hidden');
+                    $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[6196]);
+                    $('.fm-empty-contacts').removeClass('hidden');
+                }
+                
+                // Update tokenInput plugin
+                if ($('.add-contact-multiple-input')) {
+                    $('.add-contact-multiple-input').tokenInput("removeContact", {id: ipc[i].m}, '.add-contact-multiple-input');
+                }
+                if ($('.share-multiple-input')) {
+                    $('.share-multiple-input').tokenInput("removeContact", {id: ipc[i].m}, '.share-multiple-input');
+                }
             }
+            else {
+                
+                // Update tokenInput plugin
+                if ($('.add-contact-multiple-input')) {
+                    $('.add-contact-multiple-input').tokenInput("add", {id: ipc[i].m, name: ipc[i].m});
+                }
+                if ($('.share-multiple-input')) {
+                    $('.share-multiple-input').tokenInput("add", {id: ipc[i].m, name: ipc[i].m});
+                }
+            }            
         }
     }
 }
@@ -5707,7 +5733,9 @@ function processIPC(ipc, ignoreDB) {
  *
  */
 function processOPC(opc, ignoreDB) {
+    
     DEBUG('processOPC');
+    
     for (var i in opc) {
         M.addOPC(opc[i], ignoreDB);
         if (opc[i].dts) {
@@ -5717,7 +5745,11 @@ function processOPC(opc, ignoreDB) {
             if ($('.add-contact-multiple-input')) {
                 $('.add-contact-multiple-input').tokenInput("removeContact", {id: opc[i].m}, '.add-contact-multiple-input');
             }
-        } else {
+            if ($('.share-multiple-input')) {
+                $('.share-multiple-input').tokenInput("removeContact", {id: opc[i].m}, '.share-multiple-input');
+            }
+        }
+        else {
             // Search through M.opc to find duplicated e-mail with .dts
             // If found remove deleted opc
             // And update sent-request grid
@@ -5733,9 +5765,13 @@ function processOPC(opc, ignoreDB) {
                     break;
                 }
             }
+            
             // Update tokenInput plugin
             if ($('.add-contact-multiple-input')) {
                 $('.add-contact-multiple-input').tokenInput("add", {id: opc[i].m, name: opc[i].m});
+            }
+            if ($('.share-multiple-input')) {
+                $('.share-multiple-input').tokenInput("add", {id: opc[i].m, name: opc[i].m});
             }
         }
     }
@@ -5814,28 +5850,33 @@ function processUPCO(ap) {
     DEBUG('processUPCO');
     var psid = '';// pending id
     for (var i in ap) {
-        if (ap[i].s) {
-            psid = ap[i].p;
-            delete M.opc[psid];
-            delete M.ipc[psid];
-            M.delOPC(psid);
-            M.delIPC(psid);
+        if (ap.hawOwnProperty(i)) {
+            if (ap[i].s) {
+                psid = ap[i].p;
+                delete M.opc[psid];
+                delete M.ipc[psid];
+                M.delOPC(psid);
+                M.delIPC(psid);
 
-            for (var k in M.ps) {
-                if (M.ps.hasOwnProperty(k)) {
-                    M.delPS(psid, k);
+                for (var k in M.ps) {
+                    if (M.ps.hasOwnProperty(k)) {
+                        M.delPS(psid, k);
+                    }
                 }
-            }
 
-            // Update token.input plugin
-            if ($('.add-contact-multiple-input')) {
-                $('.add-contact-multiple-input').tokenInput("removeContact", {id: ap[i].m}, '.add-contact-multiple-input');
-            }
-            $('#opc_' + psid).remove();
-            if ((Object.keys(M.opc).length === 0) && (M.currentdirid === 'opc')) {
-                $('.sent-requests-grid').addClass('hidden');
-                $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[6196]);
-                $('.fm-empty-contacts').removeClass('hidden');
+                // Update token.input plugin
+                if ($('.add-contact-multiple-input')) {
+                    $('.add-contact-multiple-input').tokenInput("removeContact", {id: ap[i].m}, '.add-contact-multiple-input');
+                }
+                if ($('.share-multiple-input')) {
+                    $('.share-multiple-input').tokenInput("removeContact", {id: ap[i].m}, '.share-multiple-input');
+                }
+                $('#opc_' + psid).remove();
+                if ((Object.keys(M.opc).length === 0) && (M.currentdirid === 'opc')) {
+                    $('.sent-requests-grid').addClass('hidden');
+                    $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[6196]);
+                    $('.fm-empty-contacts').removeClass('hidden');
+                }
             }
         }
     }
@@ -5843,26 +5884,35 @@ function processUPCO(ap) {
 
 function process_u(u) {
     for (var i in u) {
-        if (u[i].c === 1) {
-            u[i].name = u[i].m;
-            u[i].h = u[i].u;
-            u[i].t = 1;
-            u[i].p = 'contacts';
-            M.addNode(u[i]);
+        if (u.hasOwnProperty(i)) {
+            if (u[i].c === 1) {
+                u[i].name = u[i].m;
+                u[i].h = u[i].u;
+                u[i].t = 1;
+                u[i].p = 'contacts';
+                M.addNode(u[i]);
 
-            // Update token.input plugin
-            if ($('.add-contact-multiple-input')) {
-                $('.add-contact-multiple-input').tokenInput("add", {id: u[i].m, name: u[i].m});
+                // Update token.input plugin
+                if ($('.add-contact-multiple-input')) {
+                    $('.add-contact-multiple-input').tokenInput("add", {id: u[i].m, name: u[i].m});
+                }
+                if ($('.share-multiple-input')) {
+                    $('.share-multiple-input').tokenInput("add", {id: u[i].m, name: u[i].m});
+                }
             }
-        } else if (M.d[u[i].u]) {
-            M.delNode(u[i].u);
+            else if (M.d[u[i].u]) {
+                M.delNode(u[i].u);
 
-            // Update token.input plugin
-            if ($('.add-contact-multiple-input')) {
-                $('.add-contact-multiple-input').tokenInput("removeContact", {id: u[i].m}, '.add-contact-multiple-input');
+                // Update token.input plugin
+                if ($('.add-contact-multiple-input')) {
+                    $('.add-contact-multiple-input').tokenInput("removeContact", {id: u[i].m}, '.add-contact-multiple-input');
+                }
+                if ($('.share-multiple-input')) {
+                    $('.share-multiple-input').tokenInput("removeContact", {id: u[i].m}, '.share-multiple-input');
+                }
             }
+            M.addUser(u[i]);
         }
-        M.addUser(u[i]);
     }
 
     //if (megaChat && megaChat.karere && megaChat.karere.getConnectionState() === Karere.CONNECTION_STATE.CONNECTED) {

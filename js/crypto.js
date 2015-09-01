@@ -1754,9 +1754,10 @@ function stopsc() {
 }
 
 // calls execsc() with server-client requests received
-function getsc(fm) {
+function getsc(fm, initialNotify) {
     api_req('sn=' + maxaction + '&ssl=1&e=' + cmsNotifHandler, {
         fm: fm,
+        initialNotify: initialNotify,
         callback: function __onGetSC(res, ctx) {
             if (typeof res === 'object') {
                 function getSCDone(sma) {
@@ -1769,7 +1770,10 @@ function getsc(fm) {
 
                     if (ctx.fm) {
                         // mDBloaded = true;
-                        loadfm_done();
+                        loadfm_done();                        
+                    }
+                    if (ctx.initialNotify) {
+                        notify.getInitialNotifications();
                     }
                 }
                 if (res.w) {

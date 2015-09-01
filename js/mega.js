@@ -6026,7 +6026,8 @@ function loadfm_callback(res, ctx) {
             crypto_procsr(res.sr);
         }
 
-        getsc();
+        // We want to fetch initial notifications afterwards, if this is not a logged out user on the public folder page.
+        getsc(false, !pfkey);
 
         if (hasMissingKeys) {
             srvlog('Got missing keys processing gettree...', null, true);
@@ -6049,10 +6050,6 @@ function loadfm_done(pfkey, stackPointer) {
 
     if (!CMS.isLoading()) {
         loadingDialog.hide();
-    }
-
-    if (!pfkey) {
-        notify.getInitialNotifications();
     }
 
     watchdog.notify('loadfm_done');

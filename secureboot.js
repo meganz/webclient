@@ -200,6 +200,16 @@ if (!b_u && is_extension)
             Cu.reportError(e);
             alert('Unable to initialize core functionality:\n\n' + e + '\n\n' + mozBrowserID);
         }
+        if (location.protocol === 'mega:') {
+            try {
+                var url = mObjectURL([""]);
+                myURL.revokeObjectURL(url);
+            }
+            catch (e) {
+                console.error('mObjectURL failed, is this TOR?', e);
+                document.location = bootstaticpath + urlrootfile + location.hash;
+            }
+        }
     }
     else /* Google Chrome */
     {
@@ -835,7 +845,7 @@ else if (!b_u)
             var dump = {
                 l: ln,
                 f: mTrim(url),
-                m: mTrim(msg).replace(/'(\w+:\/\/+[^/]+)[^']+(?:'|$)/, "'$1...'")
+                m: mTrim(msg).replace(/'(\w+:\/\/+[^/]+?)[^']+(?:'|$)/, "'$1...'")
                     .replace(/(Access to '\.\.).*(' from script denied)/, '$1$2')
                     .replace(/gfs\w+\.userstorage/, 'gfs...userstorage')
                     .replace(/^Uncaught\W*(?:exception\W*)?/i, ''),

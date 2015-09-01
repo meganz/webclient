@@ -8787,26 +8787,26 @@ function firefoxDialog(close)
     fm_showoverlay();
     $('.fm-dialog.firefox-dialog').removeClass('hidden');
     $.dialog = 'firefox';
-    $('.firefox-dialog .browsers-button,.firefox-dialog .fm-dialog-close,.firefox-dialog .close-button').unbind('click')
-    $('.firefox-dialog .browsers-button,.firefox-dialog .fm-dialog-close,.firefox-dialog .close-button').bind('click', function()
+    
+    $('.firefox-dialog .browsers-button,.firefox-dialog .fm-dialog-close,.firefox-dialog .close-button').rebind('click', function()
     {
         firefoxDialog(1);
     });
-    $('#firefox-checkbox').unbind('click');
-    $('#firefox-checkbox').bind('click', function()
+    
+    $('#firefox-checkbox').rebind('click', function()
     {
-        if ($(this).attr('class').indexOf('checkboxOn') == -1)
+        if ($(this).hasClass('checkboxOn') === false)
         {
             localStorage.firefoxDialog = 1;
-            $(this).attr('class', 'checkboxOn');
-            $(this).parent().attr('class', 'checkboxOn');
+            $(this).removeClass('checkboxOff').addClass('checkboxOn');
+            $(this).parent().removeClass('checkboxOff').addClass('checkboxOn');
             $(this).attr('checked', true);
         }
         else
         {
             delete localStorage.firefoxDialog;
-            $(this).attr('class', 'checkboxOff');
-            $(this).parent().attr('class', 'checkboxOff');
+            $(this).removeClass('checkboxOn').addClass('checkboxOff');
+            $(this).parent().removeClass('checkboxOn').addClass('checkboxOff');
             $(this).attr('checked', false);
         }
     });

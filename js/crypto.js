@@ -1767,12 +1767,12 @@ function getsc(fm, initialNotify) {
                             && typeof mDB !== 'undefined') {
                         localStorage[u_handle + '_maxaction'] = maxaction;
                     }
-
                     if (ctx.fm) {
                         // mDBloaded = true;
-                        loadfm_done();                        
+                        loadfm_done();
                     }
-                    if (ctx.initialNotify) {
+
+                    if (ctx.fm || ctx.initialNotify) {
                         notify.getInitialNotifications();
                     }
                 }

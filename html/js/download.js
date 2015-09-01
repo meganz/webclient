@@ -95,9 +95,11 @@ function dl_g(res) {
         
         $('.new-download-red-button, .regular-download').rebind('click', function() {
             
-            if (dlMethod == MemoryIO && !localStorage.megaSyncDialog && fdl_filesize > 1048576000 && navigator.userAgent.indexOf('Firefox') > -1)
+            // If regular download using Firefox and the total download is over 1GB then show the dialog 
+            // to use the extension, but not if they've seen the dialog before and ticked the checkbox
+            if (dlMethod == MemoryIO && !localStorage.firefoxDialog && fdl_filesize > 1048576000 && navigator.userAgent.indexOf('Firefox') > -1)
             {
-                megaSyncDialog();
+                firefoxDialog();
             }
             else if ((('-ms-scroll-limit' in document.documentElement.style && '-ms-ime-align' in document.documentElement.style)
             || (navigator.userAgent.indexOf('MSIE 10') > -1)

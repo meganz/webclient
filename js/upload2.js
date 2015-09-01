@@ -15,6 +15,7 @@ if (localStorage.ul_skipIdentical) {
 /* jshint -W003 */
 var ulmanager = {
     ulFaId: 0,
+    ulIDToNode: {},
     isUploading: false,
     ulStartingPhase: false,
     ulCompletingPhase: false,
@@ -42,7 +43,7 @@ var ulmanager = {
     },
 
     getGID: function UM_GetGID(ul) {
-        return 'ul_' + ul.id;
+        return 'ul_' + (ul && ul.id);
     },
 
     abort: function UM_abort(gid) {
@@ -146,6 +147,15 @@ var ulmanager = {
                 if (d) {
                     ulmanager.logger.error('Too many retries for ' + cid);
                 }
+                var errorstr = reason.match(/"([^"]+)"/);
+                if (errorstr) {
+                    errorstr = errorstr.pop();
+                }
+                else {
+                    errorstr = reason.substr(0, 50) + '...';
+                }
+                $('.transfer-table #ul_' + file.id + ' td:eq(5)')
+                    .html('<span class="transfer-status error">' + htmlentities(errorstr) + '</span>');
                 msgDialog('warninga', l[1309], l[1498] + ': ' + file.name, reason);
                 ulmanager.abort(file);
             }
@@ -293,10 +303,10 @@ var ulmanager = {
             });
     },
 
-    ulFileReader: function UM_ul_filereader(fs, file) {
+    ulFileReader: function UM_ul_filereader(file) {
         var handler;
         if (is_chrome_firefox && "u8" in file) {
-            if (d) {
+            if (d > 1) {
                 ulmanager.logger.info('Using Firefox ulReader');
             }
 
@@ -315,6 +325,8 @@ var ulmanager = {
             };
         }
         if (!handler) {
+            var fs = new FileReader();
+
             handler = function(task, done) {
                 var end = task.start + task.end;
                 var blob;
@@ -616,7 +628,6 @@ var ulmanager = {
         if (d) {
             ulmanager.logger.info("ul_completepending2", res, ctx);
         }
-        ASSERT(typeof res === 'object' && res.f, 'Unexpected UL Server Response.', res);
         if (typeof res === 'object' && res.f) {
             var n = res.f[0];
 
@@ -633,6 +644,7 @@ var ulmanager = {
             if (ctx.faid) {
                 api_attachfileattr(n.h, ctx.faid);
             }
+            ulmanager.ulIDToNode[ulmanager.getGID(ul_queue[ctx.ul_queue_num])] = n.h;
             onUploadSuccess(ul_queue[ctx.ul_queue_num], n.h, ctx.faid);
             ctx.file.ul_failed = false;
             ctx.file.retries = 0;
@@ -652,6 +664,10 @@ var ulmanager = {
                     msgDialog('warninga', l[1309], l[5760] + ' ' + fileName);
                 }
             });
+            if (res !== EOVERQUOTA) {
+                srvlog('Unexpected upload completion server response (' + res
+                    + ' @ ' + hostname(ctx.file.posturl) + ')');
+            }
         }
         if (ctx.file.owner) {
             ctx.file.owner.destroy();
@@ -821,7 +837,9 @@ ChunkUpload.prototype.updateprogress = function() {
 };
 
 ChunkUpload.prototype.abort = function() {
-    this.logger.info('Aborting', this.oet, Boolean(this.xhr));
+    if (d && this.logger) {
+        this.logger.info('Aborting', this.oet, Boolean(this.xhr));
+    }
 
     if (this.oet) {
         clearTimeout(this.oet);
@@ -832,7 +850,7 @@ ChunkUpload.prototype.abort = function() {
     if (GlobalProgress[this.gid]) {
         removeValue(GlobalProgress[this.gid].working, this, 1);
     }
-    else if (d) {
+    else if (d && this.logger) {
         this.logger.error('This should not be reached twice or after FileUpload destroy...', this);
     }
     delete this.xhr;
@@ -1051,6 +1069,9 @@ ChunkUpload.prototype.run = function(done) {
     }
     else {
         this.logger.info('.run');
+        if (!this.file.ul_reader) {
+            this.file.ul_reader = ulmanager.ulFileReader(this.file);
+        }
         this.file.ul_reader.push(this, this.io_ready, this);
     }
     removeValue(GlobalProgress[this.gid].working, this, 1);
@@ -1133,6 +1154,29 @@ FileUpload.prototype.run = function(done) {
         done();
     };
 
+    var readError = function(code) {
+        var errorstr;
+
+        if (code === 0x8052000e) {
+            // File is locked
+            errorstr = l[7399] || l[1517];
+        }
+        else if (code === 0x80520015) {
+            // "Access denied"
+            errorstr = l[1667];
+        }
+        else {
+            // "Read error"
+            errorstr = l[1677];
+        }
+
+        $('.transfer-table #ul_' + file.id + ' td:eq(5)')
+            .html('<span class="transfer-status error">' + htmlentities(errorstr) + '</span>');
+
+        ulmanager.abort(file);
+        this.destroy();
+    }.bind(this);
+
     try {
         if (file.hash && file.ts) {
             throw "The fingerprint exists already.";
@@ -1147,6 +1191,9 @@ FileUpload.prototype.run = function(done) {
                     ulmanager.logger.info('fingerprint', hash, 'UPLOAD CANCELED');
                 }
                 return;
+            }
+            if (hash === 0xBADF) {
+                return readError(ts);
             }
             file.hash = hash;
             file.ts = ts;
@@ -1176,12 +1223,14 @@ FileUpload.prototype.run = function(done) {
 
             if (!window['!ZeroByte']) {
                 window['!ZeroByte'] = true;
-                Later(megaSyncDialog);
+                Later(firefoxDialog);
                 msgDialog('warninga',
                     str_mtrunc(file.name, 40), msg, l[1677] + ': ' + (e.message || e.name || e));
             }
-            ulmanager.abort(file);
-            this.destroy();
+            readError(e.result);
+        }
+        else if (e.result === 0x8052000e /* NS_ERROR_FILE_IS_LOCKED */) {
+            readError(e.result);
         }
         else {
             ulmanager.ulStart(this);
@@ -1238,6 +1287,7 @@ ulQueue.poke = function(file, meth) {
         if (file.ul_reader) {
             file.ul_reader.filter(gid);
             file.ul_reader.destroy();
+            file.ul_reader = null;
         }
         if (!meth) {
             meth = 'pushFirst';
@@ -1252,7 +1302,6 @@ ulQueue.poke = function(file, meth) {
         file.progress = {};
         file.completion = [];
         file.owner = new FileUpload(file);
-        file.ul_reader = ulmanager.ulFileReader(new FileReader(), file);
         ulQueue[meth || 'push'](file.owner);
     }
 };

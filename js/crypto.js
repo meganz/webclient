@@ -1909,6 +1909,7 @@ function api_createuser(ctx, invitecode, invitename, uh) {
     }
 
     api_req(req, ctx);
+    watchdog.notify('createuser');
 }
 
 function api_checkconfirmcode(ctx, c) {
@@ -2178,7 +2179,7 @@ var u_nodekeys = {};
 // an error, and the whole operation gets repeated (exceedingly
 // rare race condition).
 function api_setshare(node, targets, sharenodes, ctx) {
-    
+
     // cache all targets' public keys
     var targetsPubKeys = [];
 
@@ -4018,7 +4019,7 @@ function api_strerror(errno) {
             throw new Error('Invalid upload entry for fingerprint');
         }
         if (window.d) {
-            console.log('Generating fingerprint for ' + uq_entry.name);
+            ulmanager.logger.info('Generating fingerprint for ' + uq_entry.name);
         }
 
         var size = uq_entry.size;
@@ -4032,9 +4033,24 @@ function api_strerror(errno) {
             throw new Error('Unexpected CRC32 Table...');
         }
 
+        var timer;
+        var onTimeout = function(abort) {
+            if (timer) {
+                clearTimeout(timer);
+            }
+            if (!abort) {
+                timer = setTimeout(function() {
+                    ulmanager.logger.warn('Fingerprint timed out, the file is locked or unreadable.');
+                    callback(0xBADF, 0x8052000e);
+                }, 6000);
+            }
+        };
+
         function Finish(crc) {
-            callback(base64urlencode(crc + serialize((uq_entry.lastModifiedDate
-                || 0) / 1000)), ((uq_entry.lastModifiedDate || 0) / 1000));
+            onTimeout(1);
+            var modtime = (uq_entry.lastModifiedDate || 0) / 1000;
+            callback(base64urlencode(crc + serialize(modtime)), modtime);
+            callback = null;
         }
 
         var sfn = uq_entry.slice ? 'slice' : (uq_entry.mozSlice ? 'mozSlice' : 'webkitSlice');
@@ -4092,6 +4108,11 @@ function api_strerror(errno) {
                         tmp.push(i2s(crc));
                         return step(++i);
                     }
+                    if (typeof uq_entry[sfn] !== 'function') {
+                        ulmanager.logger.error('"' + sfn + '" is not callable...');
+                        return callback(0xBADF);
+                    }
+                    onTimeout();
 
                     var offset = parseInt((size - BLOCK_SIZE) * (i * blocks + j) / (4 * blocks - 1));
                     var blob = uq_entry[sfn](offset, offset + BLOCK_SIZE);

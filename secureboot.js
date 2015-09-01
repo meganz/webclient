@@ -1,13 +1,16 @@
 var b_u = 0;
 var apipath;
 var maintenance = false;
+var androidsplash = false;
 var URL = window.URL || window.webkitURL;
+var seqno = Math.ceil(Math.random()*1000000000);
 var staticpath = 'https://eu.static.mega.co.nz/3/';
 var ua = window.navigator.userAgent.toLowerCase();
 var is_chrome_firefox = document.location.protocol === 'chrome:' && document.location.host === 'mega' || document.location.protocol === 'mega:';
 var is_extension = is_chrome_firefox || document.location.href.substr(0,19) == 'chrome-extension://';
 var storage_version = '1'; // clear localStorage when version doesn't match
 var page = document.location.hash, l, d = false;
+var m = isMobile();
 
 function isMobile()
 {
@@ -58,6 +61,44 @@ if (!String.trim) {
     String.trim = function(s) {
         return String(s).trim();
     };
+}
+
+if (!m) {
+    try {
+        // Browser compatibility
+        // Fx 4.0   Chrome 5   MSIE 9   Opera 11.60   Safari 5.1
+        Object.defineProperty(this, 'megaChatIsDisabled', (function() {
+            var status;
+            return {
+                set: function(val) {
+                    status = val;
+                    if (status) {
+                        $(document.body).addClass("megaChatDisabled");
+                    }
+                    else {
+                        $(document.body).removeClass("megaChatDisabled");
+                    }
+                },
+                get: function() {
+                    return status || localStorage.testChatDisabled
+                        || (localStorage.chatDisabled !== undefined
+                            && localStorage.chatDisabled !== "0");
+                }
+            };
+        })());
+        // Check whether Mega Chat is enabled *and* initialized
+        Object.defineProperty(this, 'megaChatIsReady', {
+            get: function() {
+                return !megaChatIsDisabled
+                    && typeof megaChat !== 'undefined'
+                    && megaChat.is_initialized;
+            }
+        });
+    }
+    catch (ex) {
+        console.error(ex);
+        b_u = true;
+    }
 }
 
 if (!b_u) try
@@ -124,7 +165,7 @@ if (!b_u) try
     }
 }
 catch(e) {
-    if (!isMobile() || e.message !== 'SecurityError: DOM Exception 18') {
+    if (!m || e.message !== 'SecurityError: DOM Exception 18') {
         alert(
             "Sorry, we were unable to initialize the browser's local storage, "+
             "either you're using an outdated browser or it's something from our side.\n"+
@@ -158,6 +199,16 @@ if (!b_u && is_extension)
             b_u = 1;
             Cu.reportError(e);
             alert('Unable to initialize core functionality:\n\n' + e + '\n\n' + mozBrowserID);
+        }
+        if (location.protocol === 'mega:') {
+            try {
+                var url = mObjectURL([""]);
+                myURL.revokeObjectURL(url);
+            }
+            catch (e) {
+                console.error('mObjectURL failed, is this TOR?', e);
+                document.location = bootstaticpath + urlrootfile + location.hash;
+            }
         }
     }
     else /* Google Chrome */
@@ -369,26 +420,7 @@ var mBroadcaster = {
             this.listen(setup);
             this.notify('ping');
 
-            // @TODO PERF: This should be optimised to <1s.
-            setTimeout(setup, 1000);
-
-            // if (typeof u_handle !== 'undefined') {
-                // if (+localStorage['mCrossTabRef_' + u_handle] + 14e3 > Date.now()) {
-                     // if (window.addEventListener) {
-                        // window.addEventListener('storage', this, false);
-                    // }
-                    // else if (window.attachEvent) {
-                        // window.attachEvent('onstorage', this.handleEvent.bind(this));
-                    // }
-                // }
-                // else {
-                    // this.setMaster();
-                // }
-                // if (d) {
-                    // console.log('CROSSTAB COMMUNICATION INITIALIZED AS '
-                        // + (this.master ? 'MASTER':'SLAVE'));
-                // }
-            // }
+            setTimeout(setup, !parseInt(localStorage.ctInstances) ? 0 : 2000);
         },
 
         listen: function crossTab_listen(aListener) {
@@ -417,16 +449,25 @@ var mBroadcaster = {
         },
 
         leave: function crossTab_leave() {
-            var wasMaster = this.master;
-            if (wasMaster) {
-                localStorage['mCrossTabRef_' + u_handle] = this.master;
-                delete this.master;
-            } else {
-                if (d) console.log('crossTab leaving');
+            if (this.ctID) {
+                var wasMaster = this.master;
+                if (wasMaster) {
+                    localStorage.ctInstances--;
+                    localStorage['mCrossTabRef_' + u_handle] = this.master;
+                    delete this.master;
+                } else if (d) {
+                    console.log('crossTab leaving');
+                }
+
+                this.unlisten();
+                this.notify('leaving', {
+                    wasMaster: wasMaster || -1,
+                    newMaster: this.slaves[0]
+                });
+
+                mBroadcaster.sendMessage('crossTab:leave', wasMaster);
+                this.ctID = 0;
             }
-            this.unlisten();
-            this.notify('leaving', wasMaster || -1);
-            mBroadcaster.sendMessage('crossTab:leave', wasMaster);
         },
 
         notify: function crossTab_notify(msg, data) {
@@ -438,6 +479,7 @@ var mBroadcaster = {
         setMaster: function crossTab_setMaster() {
             this.master = (Math.random() * Date.now()).toString(36);
 
+            localStorage.ctInstances = (this.slaves.length + 1);
             mBroadcaster.sendMessage('crossTab:master', this.master);
 
             // (function liveLoop(tag) {
@@ -474,19 +516,31 @@ var mBroadcaster = {
             switch (msg) {
                 case 'ping':
                     this.slaves.push(strg.origin);
+                    if (this.master) {
+                        localStorage.ctInstances = (this.slaves.length + 1);
+                    }
+
                     this.notify('pong');
                     break;
                 case 'leaving':
                     var idx = this.slaves.indexOf(strg.origin);
                     if (idx !== -1) {
                         this.slaves.splice(idx, 1);
+                        if (this.master) {
+                            localStorage.ctInstances = (this.slaves.length + 1);
+                        }
                     }
-                    if (localStorage['mCrossTabRef_' + u_handle] === strg.data) {
-                        if (d) console.log('Taking crossTab-master ownership');
-                        delete localStorage['mCrossTabRef_' + u_handle];
-                        this.setMaster();
-                        if (u_handle && window.indexedDB) {
-                            mDBstart(true);
+
+                    if (localStorage['mCrossTabRef_' + u_handle] === strg.data.wasMaster) {
+                        if (strg.data.newMaster === this.ctID) {
+                            if (d) {
+                                console.log('Taking crossTab-master ownership');
+                            }
+                            delete localStorage['mCrossTabRef_' + u_handle];
+                            this.setMaster();
+                            if (u_handle && window.indexedDB) {
+                                mDBstart(true);
+                            }
                         }
                     }
                     break;
@@ -499,6 +553,10 @@ var mBroadcaster = {
 if (typeof Object.freeze === 'function') {
     mBroadcaster = Object.freeze(mBroadcaster);
 }
+Object.defineProperty(this, 'mBroadcaster', {
+    value: mBroadcaster,
+    writable: false
+});
 
 var sh = [];
 
@@ -594,10 +652,7 @@ function getxhr() {
     return (typeof XDomainRequest !== 'undefined' && typeof ArrayBuffer === 'undefined') ? new XDomainRequest() : new XMLHttpRequest();
 }
 
-var androidsplash = false;
-var m = false;
-var seqno = Math.ceil(Math.random()*1000000000);
-if (isMobile() || (typeof localStorage !== 'undefined' && localStorage.mobile))
+if (m || (typeof localStorage !== 'undefined' && localStorage.mobile))
 {
     var tag=document.createElement('meta');
     tag.name = "viewport";
@@ -689,19 +744,44 @@ if (m)
     }
     if (window.location.hash.substr(1,1) == '!' || window.location.hash.substr(1,2) == 'F!')
     {
-        var i=0;
-        if (ua.indexOf('windows phone') > -1) i=1;
+        var i = 0;
+        var intent = false;
+        if (ua.indexOf('windows phone') > -1) {
+            i = 1;
+        }
+
+        if (android) {
+            var ver = ua.match(/android (\d+)\.(\d+)/);
+            if (ver) {
+                var rev = ver.pop();
+                ver = ver.pop();
+                // Check for Android 2.3+
+                if (ver > 2 || (ver === 2 && rev > 3)) {
+                    intent = 'intent://' + location.hash + '/#Intent;scheme=mega;package=nz.mega.android;end';
+                }
+            }
+            if (intent) {
+                document.location = intent;
+            }
+        }
 
         if (app) {
-            document.getElementById('m_title').innerHTML = 'Install the free MEGA app to access this file from your mobile';
+            document.getElementById('m_title').innerHTML = 'Install the free MEGA app to access this file from your mobile.';
             document.getElementById('m_appbtn').href += '&referrer=link';
         }
         if (ua.indexOf('chrome') > -1)
         {
-            setTimeout(function()
-            {
-                if (confirm('Do you already have the MEGA app installed?')) document.location = 'mega://' + window.location.hash;
-            },2500);
+            if (intent) {
+                document.getElementById('m_title').innerHTML
+                    += '<br/><em>If you already have it installed, <a href="' + intent + '">Click here!</a></em>';
+            }
+            else {
+                setTimeout(function() {
+                    if (confirm('Do you already have the MEGA app installed?')) {
+                        document.location = intent ? intent : 'mega://' + window.location.hash;
+                    }
+                }, 2500);
+            }
         }
         else document.getElementById('m_iframe').src = 'mega://' + window.location.hash.substr(i);
     }
@@ -744,7 +824,7 @@ else if (!b_u)
         };
     })(console);
 
-    Object.defineProperty(window, "__cd_v", { value : 14, writable : false });
+    Object.defineProperty(window, "__cd_v", { value : 16, writable : false });
     if (!d || onBetaW)
     {
         var __cdumps = [], __cd_t;
@@ -765,8 +845,9 @@ else if (!b_u)
             var dump = {
                 l: ln,
                 f: mTrim(url),
-                m: mTrim(msg).replace(/'(\w+:\/\/+[^/]+)[^']+'/, "'$1...'")
+                m: mTrim(msg).replace(/'(\w+:\/\/+[^/]+?)[^']+(?:'|$)/, "'$1...'")
                     .replace(/(Access to '\.\.).*(' from script denied)/, '$1$2')
+                    .replace(/gfs\w+\.userstorage/, 'gfs...userstorage')
                     .replace(/^Uncaught\W*(?:exception\W*)?/i, ''),
             }, cc;
             var sbid = +(''+(document.querySelector('script[src*="secureboot"]')||{}).src).split('=').pop()|0;
@@ -801,7 +882,16 @@ else if (!b_u)
                 if (errobj.udata) dump.d = errobj.udata;
                 if (errobj.stack)
                 {
-                    dump.s = ('' + errobj.stack).replace(''+msg,'')
+                    var omsg = String(msg).trim();
+                    var re = RegExp(
+                        omsg.substr(0, 70)
+                        .replace(/^\w+:\s/, '')
+                        .replace(/([^\w])/g, '\\$1')
+                        + '[^\r\n]+'
+                    );
+
+                    dump.s = String(errobj.stack)
+                        .replace(omsg, '').replace(re, '')
                         .split("\n").map(String.trim).filter(String)
                         .splice(0,15).map(mTrim).join("\n");
                 }
@@ -1103,11 +1193,6 @@ else if (!b_u)
     jsl.push({f:'js/cms.js', n: 'cms_js', j:1});
     jsl.push({f:'js/megasync.js', n: 'megasync_js', j:1});
 
-    if (!is_chrome_firefox) {
-        // XXX: In Firefox this throws SecurityError: The operation is insecure.
-        jsl.push({f:'js/windowOpenerProtection.js', n: 'windowOpenerProtection', j:1, w:1});
-    }
-
     // only used on beta
     if (onBetaW) {
         jsl.push({f: 'js/betacrashes.js', n: 'betacrashes_js', j: 1});
@@ -1191,12 +1276,12 @@ else if (!b_u)
         if (page.indexOf('%25') !== -1)
         {
             do {
-                page = page.replace('%25','%', 'g');
+                page = page.replace(/%25/g, '%');
             } while (~page.indexOf('%25'));
         }
         if (page.indexOf('%21') !== -1)
         {
-            page = page.replace('%21','!', 'g');
+            page = page.replace(/%21/g, '!');
             document.location.hash = page;
         }
 
@@ -1450,7 +1535,7 @@ else if (!b_u)
                     var hashHex = asmCryptoSha256.SHA256.hex(jsl[this.jsi].text);
 
                     // Compare the hash from the file and the correct hash determined at deployment time
-                    if (!compareHashes(hashHex, jsl[e.data.jsi].f))
+                    if (!compareHashes(hashHex, jsl[this.jsi].f))
                     {
                         alert('An error occurred while loading MEGA. The file ' + bootstaticpath + jsl[this.jsi].f + ' is corrupt. Please try again later. We apologize for the inconvenience.');
                         contenterror = 1;

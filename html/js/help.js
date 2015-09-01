@@ -1,3 +1,6 @@
+// We only want to log that they visited the help page once
+var helpAlreadyLogged = false;
+
 function init_help()
 {
 	var subpage='',search ='';	
@@ -17,7 +20,15 @@ function init_help()
         else document.location.hash = 'help/' + c;
 	});	
 	
-	
+	// Log that the help page has been viewed
+	if (!helpAlreadyLogged) {
+		helpAlreadyLogged = true;
+		api_req({
+		    a: 'log',
+		    e: 99332,
+		    m: 'web help viewed'
+		});
+	}
 	
 	$('.new-left-menu-link.home').addClass('active');
 	
@@ -86,6 +97,24 @@ function init_help()
 			id=6;
 			title = 'Android App';
 			$('.new-left-menu-link.android').addClass('active');
+		}
+		else if (subpage == 'mega-chat')
+		{
+			id=7;
+			title = 'MegaChat';
+			$('.new-left-menu-link.mega-chat').addClass('active');
+		}
+		else if (subpage == 'windows-phone')
+		{
+			id=8;
+			title = 'Windows Phone App';
+			$('.new-left-menu-link.windows-phone').addClass('active');
+		}
+		else if (subpage == 'blackberry')
+		{
+			id=9;
+			title = 'BlackBerry App';
+			$('.new-left-menu-link.blackberry').addClass('active');
 		}
 		$('.new-right-content-block.help-info-pages').removeClass('hidden');
 		$('.help-info-pages .sections').addClass('hidden');

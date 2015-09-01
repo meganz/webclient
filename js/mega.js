@@ -44,6 +44,7 @@ function MegaData()
     this.h = {};
     this.csortd = -1;
     this.csort = 'name';
+    this.tfsdomqueue = {};
 
     this.reset = function()
     {
@@ -64,7 +65,6 @@ function MegaData()
         this.RubbishID = undefined;
         this.InboxID = undefined;
         this.viewmode = 0; // 0 list view, 1 block view
-        this.tfsdomqueue = {};
     };
     this.reset();
 
@@ -191,7 +191,7 @@ function MegaData()
 
     this.getSortStatus = function(u)
     {
-        var status = typeof megaChat !== 'undefined' && megaChat.isReady && megaChat.karere.getPresence(megaChat.getJidFromNodeId(u));
+        var status = megaChatIsReady && megaChat.karere.getPresence(megaChat.getJidFromNodeId(u));
         if (status == 'chat')
             return 1;
         else if (status == 'dnd')
@@ -435,7 +435,7 @@ function MegaData()
 
     this.onlineStatusEvent = function(u, status)
     {
-        if (u && typeof megaChat !== 'undefined' && megaChat.isReady)
+        if (u && megaChatIsReady)
         {
             // this event is triggered for a specific resource/device (fullJid), so we need to get the presen for the
             // user's devices, which is aggregated by Karere already
@@ -766,6 +766,7 @@ function MegaData()
          * @param {} u
          *
          */
+        var chatIsReady = megaChatIsReady;
         function renderContactsLayout(u) {
             var u_h, contact, node, avatar, el, t, html, onlinestatus,
                 cs = M.contactstatus(u_h),
@@ -784,7 +785,7 @@ function MegaData()
                 contact = M.u[u_h];
 
                 // chat is enabled?
-                if (typeof megaChat !== 'undefined' && megaChat.isReady) {
+                if (chatIsReady) {
                     if (contact && contact.lastChatActivity > timems) {
                         interactionclass = 'conversations';
                         time = time2last(contact.lastChatActivity);
@@ -803,8 +804,7 @@ function MegaData()
                 avatar = useravatar.contact(u_h, "nw-contact-avatar");
 
                 onlinestatus = M.onlineStatusClass(
-                    typeof megaChat !== 'undefined' &&
-                    megaChat.isReady &&
+                    chatIsReady &&
                     megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h))
                 );
 
@@ -890,8 +890,7 @@ function MegaData()
                     rights = l[55],
                     rightsclass = ' read-only',
                     onlinestatus = M.onlineStatusClass(
-                        typeof megaChat !== 'undefined' &&
-                        megaChat.isReady &&
+                        chatIsReady &&
                         megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h))
                     );
 
@@ -1370,7 +1369,7 @@ function MegaData()
         this.contacts();
         this.renderInboxTree();
         treeUI();
-        if (!megaChatIsDisabled()) {
+        if (megaChatIsReady) {
             megaChat.renderContactTree();
         }
     };
@@ -1413,15 +1412,19 @@ function MegaData()
         else if (id === 'shares')
             id = 'shares';
         else if (id === 'chat') {
-            this.chat = true;
-            id = 'chat';
-
-            if (megaChat.renderListing() === true) {
-                window.location = megaChat.getCurrentRoom().getRoomUrl();
-                return;
+            if (!megaChatIsReady) {
+                id = this.RootID;
             }
-            megaChat.refreshConversations();
-            treeUI();
+            else {
+                this.chat = true;
+
+                if (megaChat.renderListing() === true) {
+                    window.location = megaChat.getCurrentRoom().getRoomUrl();
+                    return;
+                }
+                megaChat.refreshConversations();
+                treeUI();
+            }
         } else if (id && id.substr(0, 7) === 'account')
             accountUI();
         else if (id && id.substr(0, 13) === 'notifications')
@@ -1432,15 +1435,26 @@ function MegaData()
             this.chat = true;
             treeUI();
 
-            if (!megaChatIsDisabled()) {
-                chatui(id); // XX: using the old code...for now
+            if (!megaChatIsDisabled) {
+                if(typeof(megaChat) === 'undefined') {
+                    // queue for opening the megachat UI WHEN the pubEd keys are loaded
+                    // happens, often when the APIs are returning -3
+
+                    mBroadcaster.once('pubEd25519', function() {
+                        chatui(id);
+                    });
+                } else {
+                    // XX: using the old code...for now
+                    chatui(id);
+                }
+
             }
         }
         else if ((!id || !M.d[id]) && id !== 'transfers') {
             id = this.RootID;
         }
 
-        if (!megaChatIsDisabled()) {
+        if (megaChatIsReady) {
             if (!this.chat) {
                 if (megaChat.getCurrentRoom()) {
                     megaChat.getCurrentRoom().hide();
@@ -1592,7 +1606,7 @@ function MegaData()
             }
             var onlinestatus;
 
-            if (typeof megaChat !== 'undefined' && megaChat.isReady) {
+            if (megaChatIsReady) {
                 onlinestatus = M.onlineStatusClass(megaChat.karere.getPresence(megaChat.getJidFromNodeId(contacts[i].u)));
             } else {
                 onlinestatus = [l[5926], 'offline'];
@@ -1607,7 +1621,7 @@ function MegaData()
 
         $('.content-panel.contacts').html(html);
 
-        if (!megaChatIsDisabled()) {
+        if (megaChatIsReady) {
             megaChat.renderContactTree();
 
             $('.fm-tree-panel').undelegate('.start-chat-button', 'click.megaChat');
@@ -1947,7 +1961,7 @@ function MegaData()
             html = '';
 
         for (var h in M.c[M.RootID]) {
-            if (M.d[h].t) {
+            if (M.d[h] && M.d[h].t) {
                 cs = ' contains-submenu';
                 sm = '<span class="context-submenu" id="sm_' + this.RootID + '"><span id="csb_' + this.RootID + '"></span>' + arrow + '</span>';
                 break;
@@ -2902,37 +2916,39 @@ function MegaData()
 
         newnodes = [];
         var j = [];
-        for (var i in n)
-        {
+        for (var i in n) {
             var h = n[i];
-            if (this.rubNodes[this.d[h].h] && t != this.RubbishID)
-                delete this.rubNodes[this.d[h].h]
-            j.push(
-                {
-                    a: 'm',
-                    n: h,
-                    t: t,
-                    i: requesti
-                });
-            if (M.d[h] && M.d[h].p)
-            {
-                if (M.c[M.d[h].p] && M.c[M.d[h].p][h])
-                    delete M.c[M.d[h].p][h];
+            var node = M.d[h];
+            if (t !== this.RubbishID && node && this.rubNodes[node.h]) {
+                delete this.rubNodes[node.h];
+            }
+            j.push({
+                a: 'm',
+                n: h,
+                t: t,
+                i: requesti
+            });
+            if (node && node.p) {
+                if (M.c[node.p] && M.c[node.p][h]) {
+                    delete M.c[node.p][h];
+                }
                 // Update M.v it's used for slideshow preview at least
-                for (var k in M.v)
-                {
-                    if (M.v[k].h === h)
-                    {
+                for (var k in M.v) {
+                    if (M.v[k].h === h) {
                         M.v.splice(k, 1);
                         break;
                     }
                 }
-                if (typeof M.c[t] === 'undefined')
+                if (typeof M.c[t] === 'undefined') {
                     M.c[t] = [];
+                }
                 M.c[t][h] = 1;
                 removeUInode(h);
-                this.nodeAttr({h: h, p: t});
-                newnodes.push(M.d[h]);
+                this.nodeAttr({
+                        h: h,
+                        p: t
+                    });
+                newnodes.push(node);
             }
         }
         renderNew();
@@ -3508,6 +3524,7 @@ function MegaData()
     {
         delete $.dlhash;
         var path;
+        var added = 0;
         var nodes = [];
         var paths = {};
         var zipsize = 0;
@@ -3577,6 +3594,7 @@ function MegaData()
             pauseTxt = ' (' + l[1651] + ')';
         }
 
+        var ttl = this.getTransferTableLengths();
         for (var k in nodes) {
             /* jshint -W089 */
             if (!nodes.hasOwnProperty(k) || !(n = M.d[nodes[k]])) {
@@ -3585,61 +3603,89 @@ function MegaData()
             }
             path = paths[nodes[k]] || '';
             $.totalDL += n.s;
-            var li = $('.transfer-table #' + 'dl_'+htmlentities(n.h));
-            if (!li.length) {
-                dl_queue.push({
-                    id: n.h,
-                    key: n.key,
-                    n: n.name,
-                    t: n.ts,
-                    p: path,
-                    size: n.s,
-                    onDownloadProgress: this.dlprogress,
-                    onDownloadComplete: this.dlcomplete,
-                    onBeforeDownloadComplete: this.dlbeforecomplete,
-                    onDownloadError: this.dlerror,
-                    onDownloadStart: this.dlstart,
-                    zipid: z,
-                    zipname: zipname,
-                    preview: preview
-                });
-                zipsize += n.s;
-
-                var flashhtml = '';
-                if (dlMethod == FlashIO) {
-                    flashhtml = '<object width="1" height="1" id="dlswf_' + htmlentities(n.h) + '" type="application/x-shockwave-flash"><param name=FlashVars value="buttonclick=1" /><param name="movie" value="' + document.location.origin + '/downloader.swf"/><param value="always" name="allowscriptaccess"><param name="wmode" value="transparent"><param value="all" name="allowNetworking"></object>';
+            var tr = $('.transfer-table #dl_' + htmlentities(n.h));
+            if (tr.length) {
+                if (!tr.hasClass('completed')) {
+                    continue;
                 }
+                tr.remove();
+            }
+            dl_queue.push({
+                id: n.h,
+                key: n.key,
+                n: n.name,
+                t: n.ts,
+                p: path,
+                size: n.s,
+                onDownloadProgress: this.dlprogress,
+                onDownloadComplete: this.dlcomplete,
+                onBeforeDownloadComplete: this.dlbeforecomplete,
+                onDownloadError: this.dlerror,
+                onDownloadStart: this.dlstart,
+                zipid: z,
+                zipname: zipname,
+                preview: preview
+            });
+            added++;
+            zipsize += n.s;
 
-                if (!z) {
-                    this.addToTransferTable('<tr id="dl_' + htmlentities(n.h) + '">'
-                        + '<td><span class="transfer-type download ' + p + '">' + l[373] + '<span class="speed">' + pauseTxt + '</span></span>' + flashhtml + '</td>'
-                        + '<td><span class="transfer-filtype-icon ' + fileIcon(n) + '"></span><span class="tranfer-filetype-txt">' + htmlentities(n.name) + '</span></td>'
-                        + '<td></td>'
-                        + '<td>' + bytesToSize(n.s) + '</td>'
-                        + '<td>' + filetype(n.name) + '</td>'
-                        + '<td><span class="transfer-status queued">Queued</span></td>'
-                        + '<td class="grid-url-field"><a class="grid-url-arrow"><span></span></a><a class="clear-transfer-icon"><span></span></a></td>'
-                        + '<td><span class="row-number"></span></td>'
-                        + '</tr>');
+            var flashhtml = '';
+            if (dlMethod === FlashIO) {
+                flashhtml = '<object width="1" height="1" id="dlswf_'
+                    + htmlentities(n.h)
+                    + '" type="application/x-shockwave-flash">'
+                    + '<param name=FlashVars value="buttonclick=1" />'
+                    + '<param name="movie" value="' + location.origin + '/downloader.swf"/>'
+                    + '<param value="always" name="allowscriptaccess"/>'
+                    + '<param name="wmode" value="transparent"/>'
+                    + '<param value="all" name="allowNetworking">'
+                    + '</object>';
+            }
 
-                    if (uldl_hold) {
-                        fm_tfspause('dl_' + n.h);
-                    }
+            if (!z) {
+                this.addToTransferTable('dl_' + n.h, ttl,
+                    '<tr id="dl_' + htmlentities(n.h) + '">'
+                    + '<td><span class="transfer-type download ' + p + '">' + l[373]
+                    + '<span class="speed">' + pauseTxt + '</span></span>' + flashhtml + '</td>'
+                    + '<td><span class="transfer-filtype-icon ' + fileIcon(n)
+                    + '"></span><span class="tranfer-filetype-txt">' + htmlentities(n.name) + '</span></td>'
+                    + '<td></td>'
+                    + '<td>' + bytesToSize(n.s) + '</td>'
+                    + '<td>' + filetype(n.name) + '</td>'
+                    + '<td><span class="transfer-status queued">Queued</span></td>'
+                    + '<td class="grid-url-field"><a class="grid-url-arrow"><span></span></a>'
+                    + '<a class="clear-transfer-icon"><span></span></a></td>'
+                    + '<td><span class="row-number"></span></td>'
+                    + '</tr>');
+
+                if (uldl_hold) {
+                    fm_tfspause('dl_' + n.h);
                 }
+                ttl.left--;
             }
         }
 
-        if (dlMethod == MemoryIO && ~ua.indexOf(') gecko') && !localStorage.megaSyncDialog && $.totalDL > 104857600) {
-            Later(megaSyncDialog);
+        if (!added) {
+            if (d) {
+                dlmanager.logger.warn('Nothing to download.');
+            }
+            return;
+        }
+
+        // If regular download using Firefox and the total download is over 1GB then show the dialog 
+        // to use the extension, but not if they've seen the dialog before and ticked the checkbox
+        if (dlMethod == MemoryIO && !localStorage.firefoxDialog && $.totalDL > 1048576000 && navigator.userAgent.indexOf('Firefox') > -1) {
+            Later(firefoxDialog);
         }
 
         var flashhtml = '';
-        if (dlMethod == FlashIO) {
+        if (dlMethod === FlashIO) {
             flashhtml = '<object width="1" height="1" id="dlswf_zip_' + htmlentities(z) + '" type="application/x-shockwave-flash"><param name=FlashVars value="buttonclick=1" /><param name="movie" value="' + document.location.origin + '/downloader.swf"/><param value="always" name="allowscriptaccess"><param name="wmode" value="transparent"><param value="all" name="allowNetworking"></object>';
         }
 
         if (z && zipsize) {
-            this.addToTransferTable('<tr id="zip_' + z + '">'
+            this.addToTransferTable('zip_' + z, ttl,
+                '<tr id="zip_' + z + '">'
                 + '<td><span class="transfer-type download' + p + '">' + l[373] + '<span class="speed">' + pauseTxt + '</span></span>' + flashhtml + '</td>'
                 + '<td><span class="transfer-filtype-icon ' + fileIcon({name: 'archive.zip'}) + '"></span><span class="tranfer-filetype-txt">' + htmlentities(zipname) + '</span></td>'
                 + '<td></td>'
@@ -3655,6 +3701,9 @@ function MegaData()
             }
         }
 
+        if (!$.transferHeader) {
+            transferPanelUI();
+        }
         //$('.tranfer-view-icon').addClass('active');
         //$('.fmholder').addClass('transfer-panel-opened');
         $.transferHeader();
@@ -3662,13 +3711,14 @@ function MegaData()
         if (!preview)
         {
             if (!z || zipsize) {
-                showTransferToast('d', z ? 1 : nodes.length);
+                showTransferToast('d', z ? 1 : added);
             }
             openTransferpanel();
             initGridScrolling();
             initFileblocksScrolling();
             initTreeScroll();
             setupTransferAnalysis();
+            Soon(fm_tfsupdate);
             if ((dlmanager.isDownloading = Boolean(dl_queue.length))) {
                 $('.transfer-pause-icon').removeClass('disabled');
                 $('.transfer-clear-completed').removeClass('disabled');
@@ -3781,6 +3831,7 @@ function MegaData()
             id = 'zip_' + z;
         else
             id = 'dl_' + id;
+        $('.transfer-table #' + id).addClass('completed');
         $('.transfer-table #' + id + ' td:eq(5)').html('<span class="transfer-status completed">' + l[1418] + '</span>');
         $('.transfer-table #' + id + ' td:eq(2)').text('');
         $('.transfer-table #' + id + ' td:eq(0) span.transfer-type').addClass('done').html(l[1495]);
@@ -3881,7 +3932,8 @@ function MegaData()
         if (errorstr) {
             dl.failed = new Date;
             var id = (dl.zipid ? 'zip_' + dl.zipid : 'dl_' + fileid);
-            if (x != 233 || !(GlobalProgress[id] || {}).speed) {
+            var prog = GlobalProgress[id] || {};
+            if (x != 233 || !prog.speed || !(prog.working || []).length) {
                 /**
                  * a chunk may fail at any time, don't report a temporary error while
                  * there is network activity associated with the download, though.
@@ -3938,7 +3990,7 @@ function MegaData()
         var $tst = $('.transfer-scrolling-table');
         $tst.unbind('jsp-scroll-y.tfsdynlist');
 
-        if ($('#fmholder').hasClass('transfer-panel-opened'))
+        // if ($('#fmholder').hasClass('transfer-panel-opened'))
         {
             var T = M.getTransferTableLengths();
 
@@ -3994,12 +4046,11 @@ function MegaData()
             Soon(fm_tfsupdate);
         }
     }
-    this.addToTransferTable = function(elem)
+    this.addToTransferTable = function(gid, ttl, elem)
     {
-        var T = this.getTransferTableLengths();
-        var gid = String(elem.match(/id="([^"]+)"/).pop());
+        var T = ttl || this.getTransferTableLengths();
 
-        if (d) {
+        if (d > 1) {
             var logger = (gid[0] === 'u' ? ulmanager : dlmanager).logger;
             logger.info('Adding Transfer', gid, JSON.stringify(T));
         }
@@ -4012,7 +4063,7 @@ function MegaData()
 
         if (T.left > 0)
         {
-            addToTransferTable(gid, elem);
+            addToTransferTable(gid, elem, true);
             // In some cases UI is not yet initialized, nor transferHeader()
             $('.transfer-table-header').show(0);
         }
@@ -4055,8 +4106,9 @@ function MegaData()
         var onChat;
         var f;
         var ul_id;
-        var pause;
+        var pause = "";
         var pauseTxt = '';
+        var ttl = this.getTransferTableLengths();
 
         if ($.onDroppedTreeFolder) {
             target = $.onDroppedTreeFolder;
@@ -4092,8 +4144,9 @@ function MegaData()
             f.target = target;
             f.id = ul_id;
 
-            this.addToTransferTable(
-                '<tr id="ul_' + ul_id + '">'
+            var gid = 'ul_' + ul_id;
+            this.addToTransferTable(gid, ttl,
+                '<tr id="' + gid + '">'
                 + '<td><span class="transfer-type upload ' + pause + '">' + l[372] + '<span class="speed">' + pauseTxt + '</span></span></td>'
                 + '<td><span class="transfer-filtype-icon ' + fileIcon({name: f.name}) + '"></span><span class="tranfer-filetype-txt">' + htmlentities(f.name) + '</span></td>'
                 + '<td></td>'
@@ -4104,6 +4157,7 @@ function MegaData()
                 + '<td><span class="row-number"></span></td>'
                 + '</tr>');
             ul_queue.push(f);
+            ttl.left--;
 
             if (uldl_hold) {
                 fm_tfspause('ul_' + ul_id);
@@ -4113,14 +4167,18 @@ function MegaData()
                 $.ulBunch[M.currentdirid][ul_id] = 1;
             }
         }
+        if (!$.transferHeader) {
+            transferPanelUI();
+        }
         if (page == 'start') {
             ulQueue.pause();
-            uldl_hold = false; /* this isn't a pause generated by the UI */
+            uldl_hold = true;
         }
         else {
             showTransferToast('u', u.length);
             $.transferHeader();
             openTransferpanel();
+            Soon(fm_tfsupdate);
         }
 
         setupTransferAnalysis();
@@ -4222,6 +4280,7 @@ function MegaData()
             $('#uploadpopbtn').text(l[726]);
             $('#mobileupload_header').text(l[1418]);
         }
+        $('.transfer-table #ul_' + id).addClass('completed');
         $('.transfer-table #ul_' + id + ' td:eq(5)').html('<span class="transfer-status completed">' + l[1418] + '</span>');
         $('.transfer-table #ul_' + id + ' td:eq(2)').text('');
         $('.transfer-table #ul_' + id + ' td:eq(0) span.transfer-type').addClass('done').html(l[1501]);
@@ -4284,26 +4343,34 @@ function MegaData()
 
         if (urlParts) {
 
-            // Decode from Base64 and JSON
-            urlParts = JSON.parse(atob(urlParts[1]));
+            try {
+                // Decode from Base64 and JSON
+                urlParts = JSON.parse(atob(urlParts[1]));
+            }
+            catch (ex) {
+                console.error(ex);
+                window.location.hash = 'login';
+                return false;
+            }
 
             if (urlParts) {
                 // If the user is already logged in here with the same account
                 // we can avoid a lot and just take them to the correct page
-                if (JSON.stringify(u_k) === JSON.stringify(urlParts[0])){
+                if (JSON.stringify(u_k) === JSON.stringify(urlParts[0])) {
                     window.location.hash = urlParts[2];
-                    return;
+                    return false;
                 }
 
                 // If the user is already logged in but with a different account just load that account instead. The
                 // hash they came from e.g. a folder link may not be valid for this account so just load the file manager.
                 else if (u_k && (JSON.stringify(u_k) !== JSON.stringify(urlParts[0]))) {
-                    if ((urlParts[2]||"").match(/^fm/)) {
+                    if (!urlParts[2] || String(urlParts[2]).match(/^fm/)) {
                         window.location.hash = 'fm';
+                        return false;
                     } else {
                         window.location.hash = urlParts[2];
+                        return false;
                     }
-                    return;
                 }
 
                 // Likely that they have never logged in here before so we must set this
@@ -4320,11 +4387,16 @@ function MegaData()
 
                 // Get the page to load
                 var toPage = urlParts[2];
-				var toLang = urlParts[4];
+                var toLang = urlParts[4];
 
-                // initialize all account types and redirect to the FM:
-				if (toPage == '') toPage = 'fm';
-				this.performRegularLogin(toPage);                
+                // Initialize all account types and redirect to the FM
+                if (!toPage) {
+                    toPage = 'fm';
+                }
+                this.performRegularLogin(toPage);
+
+                // Successful transfer, continue load
+                return true;
             }
         }
     };
@@ -4352,11 +4424,13 @@ function MegaData()
                     // Set account type and redirect to the requested location
                     u_type = result;
                     window.location.hash = toPage;
+                    return false;
                 }
                 else {
                     // Must be an ephemeral account, attempt to initialize:
                     u_type=0;
-					window.location.hash = toPage;
+                    window.location.hash = toPage;
+                    return false;
                 }
             }
         };
@@ -4527,7 +4601,7 @@ function renderfm()
     }
 
     M.openFolder(M.currentdirid);
-    if (typeof megaChat !== 'undefined' && megaChat.isReady) {
+    if (megaChatIsReady) {
         megaChat.renderContactTree();
         megaChat.renderMyStatus();
     }
@@ -4601,7 +4675,7 @@ function renderNew() {
         M.contacts();
         treeUI();
 
-        if (!megaChatIsDisabled()) {
+        if (megaChatIsReady) {
             megaChat.renderContactTree();
             megaChat.renderMyStatus();
         }
@@ -4612,10 +4686,6 @@ function renderNew() {
     initContextUI();
     if (newpath) {
         M.renderPath();
-    }
-    newnodes = undefined;
-    if (d) {
-        console.timeEnd('rendernew');
     }
 
     // handle the Inbox section use cases
@@ -4629,6 +4699,15 @@ function renderNew() {
         }
     }
 
+    if (u_type === 0) {
+        // Show "ephemeral session warning"
+        topmenuUI();
+    }
+
+    newnodes = undefined;
+    if (d) {
+        console.timeEnd('rendernew');
+    }
 }
 
 /**
@@ -4671,7 +4750,7 @@ function execsc(actionPackets, callback) {
                     notify.notifyFromActionPacket(actionPacket);
                 }
 
-                if (typeof megaChat !== 'undefined' && megaChat.isReady) {
+                if (megaChatIsReady) {
                     $.each(actionPacket.u, function (k, v) {
                         megaChat[v.c == 0 ? "processRemovedUser" : "processNewUser"](v.u);
                     });
@@ -4980,7 +5059,7 @@ function execsc(actionPackets, callback) {
                 notify.notifyFromActionPacket(actionPacket);
             }
 
-            if (typeof megaChat !== 'undefined' && megaChat.isReady) {
+            if (megaChatIsReady) {
                 $.each(actionPacket.u, function(k, v) {
                     megaChat[v.c == 0 ? "processRemovedUser" : "processNewUser"](v.u);
                 });
@@ -5850,23 +5929,27 @@ function folderreqerr(c, e)
 
 function init_chat() {
     function __init_chat() {
-        if (u_type && (typeof megaChat === 'undefined' || !megaChat.is_initialized)) {
+        if (u_type && !megaChatIsReady) {
             if (d) console.log('Initializing the chat...');
-            window.megaChat = new Chat();
-            window.megaChat.init();
+            try {
+                window.megaChat = new Chat();
+                window.megaChat.init();
 
-            if (fminitialized) {
-                Soon(function() {
+                if (fminitialized) {
                     megaChat.renderContactTree();
                     megaChat.renderMyStatus();
-                });
+                }
+            }
+            catch (ex) {
+                console.error(ex);
+                megaChatIsDisabled = true;
             }
         }
     }
     if (folderlink) {
         if (d) console.log('Will not initializing chat [branch:1]');
     }
-    else if (!megaChatIsDisabled()) {
+    else if (!megaChatIsDisabled) {
         if (pubEd25519[u_handle]) {
             __init_chat();
         } else {
@@ -5936,10 +6019,6 @@ function loadfm_callback(res, ctx) {
 
         loadfm_done(pfkey, ctx.stackPointer);
 
-        if (!pfkey) {
-            notify.getInitialNotifications();
-        }
-
         if (res.cr) {
             crypto_procmcr(res.cr);
         }
@@ -5947,7 +6026,8 @@ function loadfm_callback(res, ctx) {
             crypto_procsr(res.sr);
         }
 
-        getsc();
+        // Pass true to indicate this is an fm load and that we want to fetch initial notifications afterwards
+        getsc(true);
 
         if (hasMissingKeys) {
             srvlog('Got missing keys processing gettree...', null, true);

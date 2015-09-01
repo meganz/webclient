@@ -358,18 +358,15 @@ function divscroll(el) {
 
 function removeHash() {
     var scrollV, scrollH, loc = window.location;
-    if ("pushState" in history) {
-        history.pushState("", document.title, loc.pathname + loc.search);
-    }
-    else {
-        // Prevent scrolling by storing the page's current scroll offset
-        scrollV = document.body.scrollTop;
-        scrollH = document.body.scrollLeft;
-        loc.hash = "";
-        // Restore the scroll offset, should be flicker free
-        document.body.scrollTop = scrollV;
-        document.body.scrollLeft = scrollH;
-    }
+    
+    // Prevent scrolling by storing the page's current scroll offset
+    scrollV = document.body.scrollTop;
+    scrollH = document.body.scrollLeft;
+    loc.hash = "";
+
+    // Restore the scroll offset, should be flicker free
+    document.body.scrollTop = scrollV;
+    document.body.scrollLeft = scrollH;
 }
 
 function browserdetails(useragent) {
@@ -1278,7 +1275,9 @@ function dlError(text) {
 function removeValue(array, value, can_fail) {
     var idx = array.indexOf(value);
     if (d) {
-        ASSERT(can_fail || idx !== -1, 'Unable to Remove Value ' + value);
+        if (!(can_fail || idx !== -1)) {
+            console.warn('Unable to Remove Value ' + value, value);
+        }
     }
     if (idx !== -1) {
         array.splice(idx, 1);
@@ -1321,7 +1320,7 @@ function dlFatalError(dl, error, ethrow) {
         msgDialog('warninga', l[1676], m, error);
     }
     else {
-        Later(megaSyncDialog);
+        Later(firefoxDialog);
     }
     setTransferStatus(dl, error, ethrow, true);
     dlmanager.abort(dl);
@@ -2519,7 +2518,7 @@ function generateAnonymousReport() {
     report.io = window.dlMethod && dlMethod.name;
     report.sb = +('' + $('script[src*="secureboot"]').attr('src')).split('=').pop();
     report.tp = $.transferprogress;
-    if (!megaChat.karere) {
+    if (!megaChatIsReady) {
         report.karereState = '#disabled#';
     }
     else {
@@ -2540,7 +2539,7 @@ function generateAnonymousReport() {
     var roomUniqueId = 0;
     var roomUniqueIdMap = {};
 
-    Object.keys(megaChat.chats).forEach(function(k) {
+    Object.keys(megaChatIsReady && megaChat.chats || {}).forEach(function(k) {
         var v = megaChat.chats[k];
 
         var participants = v.getParticipants();
@@ -2947,9 +2946,9 @@ mega.utils.reload = function megaUtilsReload() {
             u_storage.d = true;
             if (location.host !== 'mega.nz') {
                 u_storage.dd = true;
-            }
-            if (!is_extension) {
-                u_storage.jj = true;
+                if (!is_extension) {
+                    u_storage.jj = true;
+                }
             }
         }
 
@@ -3066,8 +3065,14 @@ mega.utils.logout = function megaUtilsLogout() {
             step++;
             mFileManagerDB.exec('drop').always(finishLogout);
         }
-        // Use the 'Session Management Logout' API call to kill the current session
-        api_req({ 'a': 'sml' }, { callback: finishLogout });
+        if (u_privk) {
+            // Use the 'Session Management Logout' API call to kill the current session
+            api_req({ 'a': 'sml' }, { callback: finishLogout });
+        }
+        else {
+            finishLogout();
+        }
+
     });
 }
 
@@ -3390,6 +3395,7 @@ var watchdog = Object.freeze({
                 break;
 
             case 'login':
+            case 'createuser':
                 loadingDialog.show();
                 this.Strg.login = strg.origin;
                 break;
@@ -3428,3 +3434,92 @@ if (typeof sjcl !== 'undefined') {
         this.stack = mega.utils.getStack();
     };
 }
+
+(function($, scope) {
+    /**
+     * Nodes related operations
+     *
+     * @param opts {Object}
+     * 
+     * @constructor
+     */
+    var Nodes = function(opts) {
+        
+        var self = this;
+        var defaultOptions = {
+        };
+
+        self.options = $.extend(true, {}, defaultOptions, opts);    };
+
+    /**
+     * isShareExists
+     * 
+     * checking if there's available shares for selected nodes
+     * 
+     * @param {array} nodes, holds array of ids from selected folders/files (nodes)
+     * 
+     * @returns {boolean}
+     */
+    Nodes.prototype.isShareExist = function(nodes) {
+
+        var self = this;
+        
+        for (var i in nodes) {
+            if (nodes.hasOwnProperty(i)) {
+                if (M.d[nodes[i]].shares && Object.keys(M.d[nodes[i]].shares).length) {
+                    return true;
+                }
+                if (M.ps && M.ps[nodes[i]] && Object.keys(M.ps[nodes[i]]).length) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    };
+
+    /**
+     * loopSubdirs
+     * 
+     * Loops through all subdirs of given node
+     * 
+     * @param {string} id: node id
+     * @param {array} nodesId
+     * 
+     * @returns child nodes id
+     */
+    Nodes.prototype.loopSubdirs = function(id, nodesId) {
+
+        var self = this;
+        
+        var subDirs = nodesId;
+
+        if (subDirs) {
+            if (subDirs.indexOf(id) === -1) {
+                subDirs.push(id);
+            }
+        }
+        else {
+            // Make subDirs an array
+            subDirs = [id];
+        }
+
+        for (var item in M.c[id]) {
+            if (M.c[id].hasOwnProperty(item)) {
+
+                // Prevent duplication
+                if (subDirs && subDirs.indexOf(item) === -1) {
+                    subDirs.push(item);
+                }
+
+                self.loopSubdirs(item, subDirs);
+            }
+        }
+
+        return subDirs;
+    };
+
+    // export
+    scope.mega = scope.mega || {};
+    scope.mega.Nodes = Nodes;
+})(jQuery, window);

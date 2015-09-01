@@ -91,9 +91,17 @@ function scrollMenu() {
 
 function init_page() {
 
+    /*if (page.substr(0, 8) == 'redirect') {
+        return location.hash = page.substr(8);
+    }*/
+
     // If they are transferring from mega.co.nz
     if (page.substr(0, 13) == 'sitetransfer!') {
-        M.transferFromMegaCoNz();
+
+        // If false, then the page is changing hash URL so don't continue past here
+        if (M.transferFromMegaCoNz() === false) {
+            return false;
+        }
     }
 
     if (!u_type) {
@@ -146,7 +154,7 @@ function init_page() {
         document.location.hash = 'signup' + localStorage.signupcode;
         return false;
     }
-    if (!page.match(/^(blog|corporate|page_)/)) {
+    if (!page.match(/^(blog|help|corporate|page_)/)) {
         $('.top-head').remove();
     }
     $('#loading').hide();
@@ -536,6 +544,10 @@ function init_page() {
         init_key();
     }
     else if (page == 'login') {
+        if (u_storage.sid) {
+            document.location.hash = '#fm';
+            return false;
+        }
         parsepage(pages['login']);
         init_login();
     }
@@ -544,6 +556,10 @@ function init_page() {
         return false;
     }
     else if (page == 'register') {
+        if (u_storage.sid && u_type !== 0) {
+            document.location.hash = '#fm';
+            return false;
+        }
         parsepage(pages['register']);
         init_register();
     }
@@ -567,12 +583,12 @@ function init_page() {
             });
             $('.chrome-app-scr').css('cursor', 'pointer');
         }
-        
+
         // On the manual download button click
         $('.chrome-download-button').rebind('click', function() {
-            
+
             var $this = $(this);
-            
+
             // Hide the button text and show the mega.co.nz and mega.nz links
             $this.css('cursor', 'default');
             $this.find('.initial-state').hide();
@@ -791,6 +807,38 @@ function init_page() {
         else if (!pfid && id && id !== M.currentdirid) {
             M.openFolder(id);
         }
+        else {
+            if (ul_queue.length > 0) {
+                openTransferpanel();
+            }
+
+            if (u_type === 0 && !u_attr.terms) {
+                $.termsAgree = function() {
+                    u_attr.terms = 1;
+                    api_req({a: 'up', terms: 'Mq'});
+                    // queued work is continued when user accept terms of service
+                    $('.transfer-pause-icon').removeClass('active');
+                    $('.nw-fm-left-icon.transfers').removeClass('paused');
+                    dlQueue.resume();
+                    ulQueue.resume();
+                    uldl_hold = false;
+                    if (ul_queue.length > 0) {
+                        showTransferToast('u', ul_queue.length);
+                    }
+                };
+
+                $.termsDeny = function() {
+                    u_logout();
+                    document.location.reload();
+                };
+
+                dlQueue.pause();
+                ulQueue.pause();
+                uldl_hold = true;
+
+                termsDialog();
+            }
+        }
         $('#topmenu').html(parsetopmenu());
 
         $('.feedback-button')
@@ -829,7 +877,7 @@ function init_page() {
             }
         }
 
-        if (megaChatIsDisabled() === true) {
+        if (megaChatIsDisabled) {
             $(document.body).addClass("megaChatDisabled");
         }
     }
@@ -1081,9 +1129,9 @@ function topmenuUI() {
         }
 
         // If the chat is disabled don't show the green status icon in the header
-        if (!megaChatIsDisabled()) {
+        if (!megaChatIsDisabled) {
             $('.activity-status-block, .activity-status').show();
-            if(typeof(megaChat) !== 'undefined') {
+            if (megaChatIsReady) {
                 megaChat.renderMyStatus();
             }
         }
@@ -1093,27 +1141,61 @@ function topmenuUI() {
 
             $('.top-menu-item.register').text(l[968]);
             $('.top-menu-item.clouddrive').show();
-            $('.warning-popup-icon').removeClass('hidden');
-            $('.warning-icon-area').rebind('click', function (e) {
 
-                var c = $('.top-warning-popup').attr('class');
+            if ($.len(M.c[M.RootID] || {})) {
+                var body;
+                var header;
+                var lstr = String(l[881]);
+                var dot = lstr.indexOf('.') + 1;
 
-                if (c && c.indexOf('active') > -1) {
-                    $('.top-warning-popup').removeClass('active');
+                // 881 is a long string of plain text, adapt it to the new warning layout
+                if (lang === 'en' || dot === 0) {
+                    header = 'You are using an ephemeral session.';
+                    body = lstr.substr(dot);
                 }
                 else {
-                    $('.top-warning-popup').addClass('active');
+                    header = lstr.substr(0, dot);
+                    body = lstr.substr(dot);
                 }
-            });
-            $('.top-warning-popup').rebind('click', function (e) {
-
-                if (isNonActivatedAccount()) {
-                    return;
+                // Look for "50 GB" to turn green the last sentence
+                var sep = body.split('50');
+                if (sep.length > 1) {
+                    var wrd = sep[0].split(/\s+/).filter(String);
+                    var green = wrd.pop() + ' 50' + sep[1];
+                    body = htmlentities(wrd.join(" ")) + ' <span class="green">' + htmlentities(green) + '</span>';
                 }
+                else {
+                    body = htmlentities(body);
+                }
+                header = htmlentities(header);
 
-                $('.top-warning-popup').removeClass('active');
-                document.location.hash = 'register';
-            });
+                $('.top-warning-popup .warning-popup-body').html(
+                    '<div class="warning-header">' + header.trim() + '</div>' + body.trim()
+                );
+                $('.top-warning-popup .warning-button span').text(l[779]);
+
+                $('.warning-popup-icon').removeClass('hidden');
+                $('.warning-icon-area').rebind('click', function (e) {
+
+                    var c = $('.top-warning-popup').attr('class');
+
+                    if (c && c.indexOf('active') > -1) {
+                        $('.top-warning-popup').removeClass('active');
+                    }
+                    else {
+                        $('.top-warning-popup').addClass('active');
+                    }
+                });
+                $('.top-warning-popup').rebind('click', function (e) {
+
+                    if (isNonActivatedAccount()) {
+                        return;
+                    }
+
+                    $('.top-warning-popup').removeClass('active');
+                    document.location.hash = 'register';
+                });
+            }
 
             if (isNonActivatedAccount()) {
                 showNonActivatedAccountDialog();
@@ -1629,7 +1711,7 @@ function topmenuUI() {
         $('.membership-popup-arrow').css('margin-right',
             $('.top-menu-icon').width() + $('.membership-status-block').width() / 2 + 57 + 'px');
     }
-    
+
     // Initialise notification popup and tooltip
     notify.init();
 }
@@ -1736,6 +1818,14 @@ window.onhashchange = function() {
     }
 
     if (page) {
+        if (page.indexOf('%25') !== -1) {
+            do {
+                page = page.replace(/%25/g, '%');
+            } while (page.indexOf('%25') !== -1);
+        }
+        if (page.indexOf('%21') !== -1) {
+            page = page.replace(/%21/g, '!');
+        }
         for (var p in subpages) {
             if (page && page.substr(0, p.length) == p) {
                 for (i in subpages[p]) {
@@ -1834,4 +1924,8 @@ window.onbeforeunload = function () {
     }
 
     mBroadcaster.crossTab.leave();
-}
+};
+
+window.onunload = function() {
+    mBroadcaster.crossTab.leave();
+};

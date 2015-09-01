@@ -182,10 +182,10 @@ function treeDroppable()
 function cacheselect()
 {
     $.selected = [];
-    $($.selectddUIgrid + ' ' + $.selectddUIitem).each(function(i, o)
-    {
-        if ($(o).attr('class').indexOf('ui-selected') > -1)
+    $($.selectddUIgrid + ' ' + $.selectddUIitem).each(function(i, o) {
+        if ($(o).hasClass('ui-selected')) {
             $.selected.push($(o).attr('id'));
+        }
     });
 }
 
@@ -446,6 +446,9 @@ function initializeTreePanelSorting()
 }
 
 function initUI() {
+    if (d) {
+        console.time('initUI');
+    }
     $('.not-logged .fm-not-logged-button.create-account').rebind('click', function()
     {
         document.location.hash = 'register';
@@ -841,35 +844,6 @@ function initUI() {
         folderlink = 0;
     }
 
-    if (ul_queue.length > 0) {
-        openTransferpanel();
-    }
-
-    if (u_type === 0 && !u_attr.terms) {
-        $.termsAgree = function() {
-
-            u_attr.terms = 1;
-            api_req({a: 'up', terms: 'Mq'});
-            // queued work is continued when user accept terms of service
-            $('.transfer-pause-icon').removeClass('active');
-            $('.nw-fm-left-icon.transfers').removeClass('paused');
-            dlQueue.resume();
-            ulQueue.resume();
-            uldl_hold = false;
-        };
-
-        $.termsDeny = function() {
-            u_logout();
-            document.location.reload();
-        };
-
-        dlQueue.pause();
-        ulQueue.pause();
-        uldl_hold = true;
-
-        termsDialog();
-    }
-
     M.avatars();
 
     if ((typeof dl_import !== 'undefined') && dl_import) {
@@ -996,6 +970,9 @@ function initUI() {
     });
 
     $(window).rebind('resize.fmrh hashchange.fmrh', fm_resize_handler);
+    if (d) {
+        console.timeEnd('initUI');
+    }
 }
 
 function transferPanelContextMenu(target)
@@ -1082,6 +1059,10 @@ function transferPanelContextMenu(target)
             menuitems.filter('.move-down').hide();
         }
     }
+
+    // XXX: Hide context-menu's menu-up/down items for now to check if that's the
+    // origin of some problems, users can still use the new d&d logic to move transfers
+    menuitems.filter('.move-up,.move-down').hide();
 
     var parent = menuitems.parent();
     parent
@@ -1309,7 +1290,8 @@ function showTransferToast(t_type, t_length) {
                 $('.slideshow-dialog').addClass('hidden');
                 $('.slideshow-overlay').addClass('hidden');
             }
-            M.openFolder('transfers', true);
+            // M.openFolder('transfers', true);
+            $('.nw-fm-left-icon.transfers').click();
         });
         $toast.rebind('mouseover', function(e)
         {
@@ -2075,15 +2057,19 @@ function fmremove() {
         foldercnt = 0,
         contactcnt = 0,
         removesharecnt = 0;
+
     for (var i in $.selected) {
         var n = M.d[$.selected[i]];
         if (n && n.p.length === 11) {
             removesharecnt++;
-        } else if ($.selected[i].length === 11) {
+        }
+        else if (String($.selected[i]).length === 11) {
             contactcnt++;
-        } else if (M.d[$.selected[i]].t) {
+        }
+        else if (n && n.t) {
             foldercnt++;
-        } else {
+        }
+        else {
             filecnt++;
         }
     }
@@ -2122,10 +2108,10 @@ function fmremove() {
             $('#msgDialog').addClass('multiple');
             $('.fm-del-contacts-number').text($.selected.length);
             $('#msgDialog .fm-del-contact-avatar').attr('class', 'fm-del-contact-avatar');
-            $('#msgDialog .fm-del-contact-avatar span').empty()
+            $('#msgDialog .fm-del-contact-avatar span').empty();
         } else {
-            var user = M.d[$.selected[0]];
-            avatar = useravatar.contact(user);
+            var user = M.d[$.selected[0]],
+                avatar = useravatar.contact(user, 'avatar-remove-dialog');
 
             $('#msgDialog .fm-del-contact-avatar').html(avatar);
         }
@@ -2158,14 +2144,53 @@ function fmremove() {
                 M.moveNodes($.selected, M.RubbishID);
             }
         } else {
-            msgDialog('remove', l[1003], l[1004].replace('[X]', fm_contains(filecnt, foldercnt)), false, function(e) {
+            
+            var nodes = new mega.Nodes({}),
+                // Additional message in case that there's a shared node
+                delShareInfo,
+                // Contains complete directory structure of selected nodes, their ids
+                dirTree = [];
+            
+            for (var item in $.selected) {
+                if ($.selected.hasOwnProperty(item)) {
+                    dirTree = $.merge(dirTree, nodes.loopSubdirs($.selected[item], null));
+                }
+            }
+            
+            delShareInfo = nodes.isShareExist(dirTree) ? ' ' + l[1952] + ' ' + l[7410] : '';
+            
+            msgDialog('remove', l[1003], l[1004].replace('[X]', fm_contains(filecnt, foldercnt)) + delShareInfo, false, function(e) {
                 if (e) {
                     if (M.currentrootid === 'shares') {
                         M.copyNodes($.selected, M.RubbishID, true);
                     }
                     else {
+   
+                        // Remove all shares related to selected nodes
+                        for (var selection in dirTree) {
+                            if (dirTree.hasOwnProperty(selection)) {
+                                
+                                // Remove regular/full share
+                                for (var share in M.d[dirTree[selection]].shares) {
+                                    if (M.d[dirTree[selection]].shares.hasOwnProperty(share)) {
+                                        api_req({a: 's2', n:  dirTree[selection], s: [{ u: M.d[dirTree[selection]].shares[share].u, r: ''}], ha: '', i: requesti});
+                                        M.delNodeShare(dirTree[selection], M.d[dirTree[selection]].shares[share].u);
+                                        setLastInteractionWith(dirTree[selection], "0:" + unixtime());
+                                    }
+                                }
+                                
+                                // Remove pending share
+                                for (var pendingUserId in M.ps[dirTree[selection]]) {
+                                    if (M.ps[dirTree[selection]].hasOwnProperty(pendingUserId)) {
+                                        api_req({a: 's2', n:  dirTree[selection], s: [{ u: pendingUserId, r: ''}], ha: '', i: requesti});
+                                        M.deletePendingShare(dirTree[selection], pendingUserId);
+                                    }
+                                }
+                            }
+                        }
                         M.moveNodes($.selected, M.RubbishID);
                     }
+                    
                 }
             }, true);
         }
@@ -3118,6 +3143,8 @@ function accountUI()
             var recent = l[483];
             if (!el[5])
                 recent = time2date(el[0]);
+            if (!country.icon || country.icon === '??.gif')
+                country.icon = 'ud.gif';
             html += '<tr><td><span class="fm-browsers-icon"><img alt="" src="' + staticpath + 'images/browser/' + browser.icon + '" /></span><span class="fm-browsers-txt">' + htmlentities(browser.name) + '</span></td><td>' + htmlentities(el[3]) + '</td><td><span class="fm-flags-icon"><img alt="" src="' + staticpath + 'images/flags/' + country.icon + '" style="margin-left: 0px;" /></span><span class="fm-flags-txt">' + htmlentities(country.name) + '</span></td><td>' + htmlentities(recent) + '</td></tr>';
         });
         $('.grid-table.sessions').html(html);
@@ -3915,14 +3942,14 @@ function accountUI()
         document.location.hash = 'fm/account/profile';
     });
 
+    // Cancel account button on main Account page
     $('.cancel-account').rebind('click', function() {
-        DEBUG('Cancel your account');
 
         // Ask for confirmation
-        msgDialog('confirmation', l[6181], l[1974], false, function(e) {
-            if (e) {
+        msgDialog('confirmation', l[6181], l[1974], false, function(event) {
+            if (event) {
                 loadingDialog.show();
-                api_req({a: 'erm', m: M.u[u_handle].m, t: 21}, {
+                api_req({ a: 'erm', m: M.u[u_handle].m, t: 21 }, {
                     callback: function(res) {
                         loadingDialog.hide();
                         if (res === ENOENT) {
@@ -3938,6 +3965,11 @@ function accountUI()
                 });
             }
         });
+    });
+    
+    // Button on main Account page to backup their master key
+    $('.backup-master-key').rebind('click', function() {
+        document.location.hash = 'backup';
     });
 
     $('.fm-account-button').unbind('click');
@@ -5457,6 +5489,27 @@ function transferPanelUI()
             }
         });
 
+        $('.transfer-table tr').rebind('dblclick', function(e) {
+            if ($(this).find('.transfer-status.completed').length) {
+                var id = String($(this).attr('id'));
+                if (id[0] === 'd') {
+                    id = id.split('_').pop();
+                }
+                else if (id[0] === 'u') {
+                    id = String(ulmanager.ulIDToNode[id]);
+                }
+                var path = M.getPath(id);
+                if (path.length > 1) {
+                    M.openFolder(path[1], true);
+                    if (!$('#' + id).length) {
+                        $(window).trigger('dynlist.flush');
+                    }
+                    $.selected = [id];
+                    reselect(1);
+                }
+            }
+        });
+
         $('.transfer-table tr').rebind('click contextmenu', function(e)
         {
             $('.ui-selected').filter(function() {
@@ -5550,6 +5603,29 @@ function transferPanelUI()
             $('.transfer-panel-empty-txt').removeClass('hidden');
             $('.transfer-panel-title').html(l[104]);
             $('.nw-fm-left-icon.transfers').removeClass('transfering').find('p').removeAttr('style');
+            fm_tfsupdate();
+            Soon(function() {
+                $(window).trigger('resize');
+            });
+        }
+    };
+
+    $.removeTransferItems = function($trs) {
+        if (!$trs) {
+            $trs = $('.transfer-table tr.completed');
+        }
+        var $len = $trs.length;
+        if ($len && $len < 100) {
+            $trs.fadeOut(function() {
+                $(this).remove();
+                if (!--$len) {
+                    $.clearTransferPanel();
+                }
+            });
+        }
+        else {
+            $trs.remove();
+            Soon($.clearTransferPanel);
         }
     };
 
@@ -5573,28 +5649,14 @@ function transferPanelUI()
                 dlmanager.abort(null);
                 ulmanager.abort(null);
 
-                $('.transfer-table tr').not('.clone-of-header').fadeOut(function() {
-                    $(this).remove();
-                    $.clearTransferPanel();
-                });
-
-                Soon(function() {
-                    $(window).trigger('resize');
-                });
+                $.removeTransferItems($('.transfer-table tr').not('.clone-of-header'));
             });
         }
     });
 
     $('.transfer-clear-completed').rebind('click', function() {
         if (!$(this).hasClass('disabled')) {
-            $('.transfer-table tr .transfer-status.completed').closest('tr').fadeOut(function() {
-                $(this).remove();
-                $.clearTransferPanel();
-                fm_tfsupdate();
-                Soon(function() {
-                    $(window).trigger('resize');
-                });
-            });
+            $.removeTransferItems();
         }
     });
 
@@ -6201,7 +6263,7 @@ function treeUI()
     // disabling right click, default contextmenu.
     $(document).unbind('contextmenu');
     $(document).bind('contextmenu', function(e) {
-        if($(e.target).parents('.fm-chat-block').length > 0) {
+        if($(e.target).parents('.fm-chat-block').length > 0 || $(e.target).parents('.export-link-item').length) {
             return;
         } else if (!localStorage.contextmenu) {
             $.hideContextMenu();
@@ -6439,7 +6501,9 @@ function sectionUIopen(id) {
 }
 
 function treeUIopen(id, event, ignoreScroll, dragOver, DragOpen) {
-    var id_s = id.split('/')[0], id_r = RootbyId(id);
+    id = String(id);
+    var id_r = RootbyId(id);
+    var id_s = id.split('/')[0];
     var e, scrollTo = false, stickToTop = false;
 
     //console.error("treeUIopen", id);
@@ -6661,14 +6725,21 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
     }
     if (type === 'delete-contact') {
         $('#msgDialog').addClass('delete-contact');
-        $('#msgDialog .fm-notifications-bottom').html('<div class="fm-dialog-button notification-button confirm"><span>' + l[78] + '</span></div><div class="fm-dialog-button notification-button cancel"><span>' + l[79] + '</span></div><div class="clear"></div>');
+        $('#msgDialog .fm-notifications-bottom')
+            .html('<div class="fm-dialog-button notification-button confirm"><span>'
+                + l[78] + '</span></div><div class="fm-dialog-button notification-button cancel"><span>'
+                + l[79] + '</span></div><div class="clear"></div>');
         $('#msgDialog .fm-dialog-button').eq(0).bind('click',function() {
             closeMsg();
-            if ($.warningCallback) $.warningCallback(true);
+            if ($.warningCallback) {
+                $.warningCallback(true);
+            }
         });
         $('#msgDialog .fm-dialog-button').eq(1).bind('click',function() {
             closeMsg();
-            if ($.warningCallback) $.warningCallback(false);
+            if ($.warningCallback) {
+                $.warningCallback(false);
+            }
         });
     }
     else if (type === 'warninga' || type === 'warningb' || type === 'info') {
@@ -8716,26 +8787,26 @@ function firefoxDialog(close)
     fm_showoverlay();
     $('.fm-dialog.firefox-dialog').removeClass('hidden');
     $.dialog = 'firefox';
-    $('.firefox-dialog .browsers-button,.firefox-dialog .fm-dialog-close,.firefox-dialog .close-button').unbind('click')
-    $('.firefox-dialog .browsers-button,.firefox-dialog .fm-dialog-close,.firefox-dialog .close-button').bind('click', function()
+    
+    $('.firefox-dialog .browsers-button,.firefox-dialog .fm-dialog-close,.firefox-dialog .close-button').rebind('click', function()
     {
         firefoxDialog(1);
     });
-    $('#firefox-checkbox').unbind('click');
-    $('#firefox-checkbox').bind('click', function()
+    
+    $('#firefox-checkbox').rebind('click', function()
     {
-        if ($(this).attr('class').indexOf('checkboxOn') == -1)
+        if ($(this).hasClass('checkboxOn') === false)
         {
             localStorage.firefoxDialog = 1;
-            $(this).attr('class', 'checkboxOn');
-            $(this).parent().attr('class', 'checkboxOn');
+            $(this).removeClass('checkboxOff').addClass('checkboxOn');
+            $(this).parent().removeClass('checkboxOff').addClass('checkboxOn');
             $(this).attr('checked', true);
         }
         else
         {
             delete localStorage.firefoxDialog;
-            $(this).attr('class', 'checkboxOff');
-            $(this).parent().attr('class', 'checkboxOff');
+            $(this).removeClass('checkboxOn').addClass('checkboxOff');
+            $(this).parent().removeClass('checkboxOn').addClass('checkboxOff');
             $(this).attr('checked', false);
         }
     });
@@ -8958,7 +9029,7 @@ function propertiesDialog(close)
                 for (var u in n.shares) {
                     if (M.u[u]) {
                         var u = M.u[u]
-                        var onlinestatus = M.onlineStatusClass(megaChat.isReady && megaChat.karere.getPresence(megaChat.getJidFromNodeId(u.u)));
+                        var onlinestatus = M.onlineStatusClass(megaChatIsReady && megaChat.karere.getPresence(megaChat.getJidFromNodeId(u.u)));
                         if (++total <= 5)
                             susers.append('<div class="properties-context-item ' + onlinestatus[1] + '">'
                                 + '<div class="properties-contact-status"></div>'
@@ -9744,7 +9815,7 @@ function fm_resize_handler() {
             initContactsGridScrolling();
     }
 
-    if (typeof(megaChat) !== 'undefined' && megaChat.isReady && megaChat.resized) {
+    if (megaChatIsReady && megaChat.resized) {
         megaChat.resized();
     }
 
@@ -9949,8 +10020,7 @@ function contactUI() {
         var avatar = $(useravatar.contact(u_h));
 
         var onlinestatus = M.onlineStatusClass(
-            typeof(megaChat) !== 'undefined' &&
-            megaChat.isReady &&
+            megaChatIsReady &&
             megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h))
         );
 
@@ -10038,7 +10108,7 @@ function contactUI() {
             showAuthenticityCredentials();
         });
 
-        if (!megaChatIsDisabled()) {
+        if (!megaChatIsDisabled) {
             if (onlinestatus[1] !== "offline" && u_h !== u_handle) {
                 // user is online, lets display the "Start chat" button
 

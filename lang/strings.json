@@ -7819,6 +7819,10 @@
         "text": "Upload File",
         "context": "Button text when uploading a file to a previously selected location in MEGA"
     },
+    "5533": {
+        "text": "Loading...",
+        "context": "state previous to import a file"
+    },
     "5534": {
         "text": "Importing\u2026",
         "context": "state while importing the file"

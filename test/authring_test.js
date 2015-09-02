@@ -16,6 +16,8 @@ describe("authring unit test", function() {
     // Some test data.
     var ED25519_PRIV_KEY = atob('nWGxne/9WmC6hEr0kuwsxERJxWl7MmkZcDusAxyuf2A=');
     var ED25519_PUB_KEY = atob('11qYAYKxCrfVS/7TyWQHOg7hcvPapiMlrwIaaPcHURo=');
+    var ED25519_PRIV_KEY_ARRAY = asmCrypto.string_to_bytes(ED25519_PRIV_KEY);
+    var ED25519_PUB_KEY_ARRAY = asmCrypto.string_to_bytes(ED25519_PUB_KEY);
     var ED25519_HEX_FINGERPRINT = '21fe31dfa154a261626bf854046fd2271b7bed4b';
     var ED25519_STRING_FINGERPRINT = base64urldecode('If4x36FUomFia/hUBG/SJxt77Us');
     var RSA_PUB_KEY = [atob('1XJHwX9WYEVk7KOack5nhOgzgnYWrVdt0UY2yn5Lw38mPzkVn'
@@ -605,8 +607,8 @@ describe("authring unit test", function() {
         describe('setUpAuthenticationSystem()', function() {
             it('all from scratch', function() {
                 sandbox.stub(ns._logger, '_log');
-                sandbox.stub(jodid25519.eddsa, 'generateKeySeed').returns('foo');
-                sandbox.stub(jodid25519.eddsa, 'publicKey').returns('bar');
+                sandbox.stub(nacl.sign, 'keyPair').returns({ publicKey: ED25519_PUB_KEY_ARRAY,
+                                                             secretKey: ED25519_PRIV_KEY_ARRAY });
                 sandbox.stub(window, 'u_attr', {});
                 sandbox.stub(window, 'setUserAttribute').returns(new MegaPromise());
                 sandbox.stub(window, 'crypto_decodepubkey');
@@ -616,8 +618,7 @@ describe("authring unit test", function() {
                 sandbox.stub(ns, 'setContacts');
                 sandbox.stub(MegaPromise, 'all').returns('blah');
                 var result = ns.setUpAuthenticationSystem();
-                assert.strictEqual(jodid25519.eddsa.generateKeySeed.callCount, 1);
-                assert.strictEqual(jodid25519.eddsa.publicKey.callCount, 1);
+                assert.strictEqual(nacl.sign.keyPair.callCount, 1);
                 assert.strictEqual(setUserAttribute.callCount, 3);
                 assert.strictEqual(setUserAttribute.callCount, 3);
                 assert.strictEqual(setUserAttribute.args[0][0], 'puEd255');
@@ -724,7 +725,8 @@ describe("authring unit test", function() {
                 sandbox.stub(window, 'u_pubEd25519', null);
                 sandbox.stub(window, 'pubEd25519', {});
                 sandbox.stub(ns, '_checkEd25519PubKey');
-                sandbox.stub(jodid25519.eddsa, 'publicKey').returns(ED25519_PUB_KEY);
+                sandbox.stub(nacl.sign.keyPair, 'fromSecretKey').returns({ publicKey: ED25519_PUB_KEY_ARRAY,
+                                                                           secretKey: ED25519_PRIV_KEY_ARRAY });
                 var getAttributePromise = { then: sinon.stub().returns('foo') };
                 sandbox.stub(window, 'getUserAttribute').returns(getAttributePromise);
                 var collectivePromise = ns.initAuthenticationSystem();
@@ -734,7 +736,7 @@ describe("authring unit test", function() {
                 var getCallback = getAttributePromise.then.args[0][0];
                 var getCallbackResult = getCallback({ prEd255: ED25519_PRIV_KEY });
                 assert.strictEqual(getCallbackResult, true);
-                assert.strictEqual(jodid25519.eddsa.publicKey.callCount, 1);
+                assert.strictEqual(nacl.sign.keyPair.fromSecretKey.callCount, 1);
                 assert.strictEqual(ns._checkEd25519PubKey.callCount, 1);
                 assert.deepEqual(u_keyring, { prEd255: ED25519_PRIV_KEY });
                 assert.deepEqual(u_attr.keyring, { prEd255: ED25519_PRIV_KEY });
@@ -755,7 +757,6 @@ describe("authring unit test", function() {
                 sandbox.stub(window, 'u_pubEd25519', null);
                 sandbox.stub(window, 'pubEd25519', {});
                 sandbox.stub(ns, '_checkEd25519PubKey');
-                sandbox.stub(jodid25519.eddsa, 'publicKey').returns(ED25519_PUB_KEY);
                 var setupAuthPromise = { then: sinon.stub().returns('bar') };
                 sandbox.stub(ns, 'setUpAuthenticationSystem').returns(setupAuthPromise);
                 var getAttributePromise = { then: sinon.stub().returns('foo') };
@@ -783,7 +784,6 @@ describe("authring unit test", function() {
                 sandbox.stub(window, 'u_pubEd25519', null);
                 sandbox.stub(window, 'pubEd25519', {});
                 sandbox.stub(ns, '_checkEd25519PubKey');
-                sandbox.stub(jodid25519.eddsa, 'publicKey').returns(ED25519_PUB_KEY);
                 var setupAuthPromise = { then: sinon.stub().returns('bar') };
                 sandbox.stub(ns, 'setUpAuthenticationSystem').returns(setupAuthPromise);
                 var getAttributePromise = { then: sinon.stub().returns('foo') };

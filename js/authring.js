@@ -409,7 +409,9 @@ var authring = (function () {
             value = pubKey[0] + pubKey[1];
         }
         var keyString = 'keyauth' + timeStamp + value;
-        return timeStamp + jodid25519.eddsa.sign(keyString, u_privEd25519, u_pubEd25519);
+        var detachedSignature = nacl.sign.detached(asmCrypto.string_to_bytes(keyString),
+                                                   asmCrypto.string_to_bytes(u_privEd25519 + u_pubEd25519));
+        return timeStamp + asmCrypto.bytes_to_string(detachedSignature);
     };
 
 
@@ -437,6 +439,7 @@ var authring = (function () {
             logger.error('Unsupporte key type: ' + keyType);
             throw new Error('Unsupporte key type.');
         }
+        var signatureValue = signature.substring(8);
         var timestamp = signature.substring(0, 8);
         var timestampValue = ns._byteStringToLong(timestamp);
         if (timestampValue > Math.round(Date.now() / 1000)) {
@@ -447,16 +450,9 @@ var authring = (function () {
             value = pubKey[0] + pubKey[1];
         }
         var keyString = 'keyauth' + timestamp + value;
-        var signatureValue = signature.substring(8);
-        try {
-            return jodid25519.eddsa.verify(signatureValue, keyString, signPubKey);
-        } catch(e){
-            if (e === "Point is not on curve") {
-                return false;
-            } else {
-                throw e;
-            }
-        }
+        return nacl.sign.detached.verify(asmCrypto.string_to_bytes(keyString),
+                                         asmCrypto.string_to_bytes(signatureValue),
+                                         asmCrypto.string_to_bytes(signPubKey));
     };
 
 
@@ -578,7 +574,7 @@ var authring = (function () {
                 u_keyring = result;
                 u_attr.keyring = u_keyring;
                 u_privEd25519 = u_keyring.prEd255;
-                u_pubEd25519 = jodid25519.eddsa.publicKey(u_privEd25519);
+                u_pubEd25519 = asmCrypto.bytes_to_string(nacl.sign.keyPair.fromSecretKey(asmCrypto.string_to_bytes(u_privEd25519)).publicKey);
                 u_attr.puEd255 = u_pubEd25519;
                 crypt.setPubEd25519(u_pubEd25519);
                 // Run on the side a sanity check on the stored pub key.
@@ -685,9 +681,12 @@ var authring = (function () {
         logger.debug('Setting up authentication system'
                      + ' (Ed25519 keys, RSA pub key signature).');
         // Make a new key pair.
-        u_privEd25519 = jodid25519.eddsa.generateKeySeed();
-        u_keyring = { prEd255: u_privEd25519 };
-        u_pubEd25519 = jodid25519.eddsa.publicKey(u_privEd25519);
+        var keyPair = nacl.sign.keyPair();
+        u_privEd25519 = asmCrypto.bytes_to_string(keyPair.secretKey.subarray(0, 32));
+        u_keyring = {
+            prEd255: u_privEd25519
+        };
+        u_pubEd25519 = asmCrypto.bytes_to_string(keyPair.publicKey);
 
         // Store the key pair.
         var pubkeyPromise = setUserAttribute('puEd255',

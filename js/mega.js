@@ -5934,6 +5934,27 @@ function init_chat() {
         if (u_type && !megaChatIsReady) {
             if (d) console.log('Initializing the chat...');
             try {
+                // Prevent known Strophe exceptions...
+                if (!Strophe.Websocket.prototype._unsafeOnIdle) {
+                    Strophe.Websocket.prototype._unsafeOnIdle = Strophe.Websocket.prototype._onIdle;
+                    Strophe.Websocket.prototype._onIdle = function() {
+                        try {
+                            this._unsafeOnIdle.apply(this, arguments);
+                        }
+                        catch (ex) {
+                            if (d) {
+                                console.error(ex);
+                            }
+                        }
+                    };
+                }
+            }
+            catch (ex) {
+                if (d) {
+                    console.error(ex);
+                }
+            }
+            try {
                 window.megaChat = new Chat();
                 window.megaChat.init();
 

@@ -351,6 +351,10 @@ ClassFile.prototype.abortTimers = function() {
             delete this.dl.retry_t;
         }
     }
+    if (this.hasQuotaTimer) {
+        clearTimeout(this.hasQuotaTimer);
+        delete this.hasQuotaTimer;
+    }
 };
 
 ClassFile.prototype.destroy = function() {
@@ -424,11 +428,12 @@ ClassFile.prototype.checkQuota = function(task_done) {
 
     dlmanager.hasQuota(this.dl.size, function(hasQuota) {
         that.hasQuota = hasQuota;
-        if (hasQuota) {
-            return that.run(task_done);
-        }
-        setTimeout(function() {
-            return that.run(task_done);
+        that.hasQuotaTimer = setTimeout(function() {
+            if (!oIsFrozen(that)) {
+                delete that.hasQuotaTimer;
+                that.run(task_done);
+            }
+            that = undefined;
         }, 1000);
     });
 

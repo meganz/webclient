@@ -21,6 +21,48 @@ function anyOf(arr, value) {
 }
 
 /**
+ * excludeIntersected
+ * 
+ * Loop through arrays excluding intersected items
+ * 
+ * @param {Array} array1
+ * @param {Array} array2
+ * 
+ * @returns {array}
+ */
+function excludeIntersected(array1, array2) {
+
+    var result = [],
+        tmpObj1 = array1,
+        tmpObj2 = array2;
+    
+    if (!array1) {
+        return array2;
+    }
+    else if (!array2) {
+        return array1;
+    }
+
+    for (var i in array1) {
+        if (array1.hasOwnProperty(i)) {
+            for (var k in array2) {
+                if (array2.hasOwnProperty(k)) {
+                    if (array1[i] === array2[k]) {
+//                        tmpObj1.splice(i, 1);
+                        tmpObj2.splice(k, 1);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    
+//    result = $.merge(tmpObj1, tmpObj2);
+    
+    return tmpObj2;
+}
+
+/**
  *  Cascade:
  *
  *  Tiny helper to queue related tasks, in which the output of one function
@@ -3466,9 +3508,13 @@ if (typeof sjcl !== 'undefined') {
         
         for (var i in nodes) {
             if (nodes.hasOwnProperty(i)) {
+                
+                // Checking full share
                 if (M.d[nodes[i]].shares && Object.keys(M.d[nodes[i]].shares).length) {
                     return true;
                 }
+                
+                // Checking pending share
                 if (M.ps && M.ps[nodes[i]] && Object.keys(M.ps[nodes[i]]).length) {
                     return true;
                 }

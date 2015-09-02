@@ -234,19 +234,53 @@
         },
         
         // Removes contact from dropdownlist, don't interfere with UI elements
-        removeContact: function(item, input) {
+        removeContact: function(item) {
             
-            var $settings = $(input).data("settings");
+            var $settings = $(this).data("settings");
+            
             if ($settings && $settings.local_data) {
                 var ld = $settings.local_data;
                 for (var n in ld) {
-                    if (ld[n].id === item.id) {
-                        $(input).data("settings").local_data.splice(n, 1);
+                    if (ld[n][$(this).data("settings").tokenValue] === item[$(this).data("settings").tokenValue]) {
+                        $(this).data("settings").local_data.splice(n, 1);
                         break;
                     }
                 }
             }
-        }        
+            
+            return false;
+        },
+        addToDDL: function(item) {
+
+            var localData = [],
+                found = false;
+            
+            if ($(this).data("settings")) {
+                
+                localData = $(this).data("settings").local_data;
+
+                for (var i in item) {
+                    if (item.hasOwnProperty(i)) {
+                        found = false;
+                        for (var n in localData) {
+                            if (localData.hasOwnProperty(n)) {
+                                if (localData[n][$(this).data("settings").tokenValue] === item[i]) {
+                                    found = true;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (!found) {
+                            $(this).data("settings").local_data.push({id: item[i], name: item[i]});
+                        }
+                    }
+                }
+                
+            }
+            
+            return false;
+        }
     };
 
     // Expose the .tokenInput function to jQuery as a plugin
@@ -1216,14 +1250,19 @@
 
         // Do the actual search
         function run_search(query) {
-            var cache_key = query + computeURL();
-            var cached_results = cache.get(cache_key);
+            
+            var cache_key = query + computeURL(),
+//                cached_results = cache.get(cache_key);
+                cached_results;
+            
             if (cached_results) {
                 if ($.isFunction($(input).data("settings").onCachedResult)) {
                     cached_results = $(input).data("settings").onCachedResult.call(hidden_input, cached_results);
                 }
                 populate_dropdown(query, cached_results);
-            } else {
+            }
+            else {
+                
                 // Are we doing an ajax search or local data search?
                 if ($(input).data("settings").url) {
                     var url = computeURL();
@@ -1285,13 +1324,16 @@
 
                     // Make the request
                     $.ajax(ajax_params);
-                } else if ($(input).data("settings").local_data) {
-                    // Do the search through local data
+                }
+                
+                // Do the search through local data
+                else if ($(input).data("settings").local_data) {
+                    
                     var results = $.grep($(input).data("settings").local_data, function(row) {
                         return row[$(input).data("settings").propertyToSearch].toLowerCase().indexOf(query.toLowerCase()) > -1;
                     });
 
-                    cache.add(cache_key, results);
+//                    cache.add(cache_key, results);
                     if ($.isFunction($(input).data("settings").onResult)) {
                         results = $(input).data("settings").onResult.call(hidden_input, results);
                     }

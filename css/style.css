@@ -24310,21 +24310,22 @@ body.pro:after {
 	display: block;
 }
 .opensource-top-icon {
-	background-image: url(../images/mega/opensource.png);
-	background-position: -30px 1px;
-	background-repeat: no-repeat;
-	float: left;
-	width: 44px;
-	height: 46px;
+    background-image: url("../images/mega/opensource.png");
+    background-position: -30px 1px;
+    background-repeat: no-repeat;
+    float: left;
+    height: 46px;
+    margin-left: -1px;
+    width: 44px;
 }
 .opensource hr {
-	float: left;
-	width: 1px;
-	height: 17px;
-	border: 0;
-	margin: 12px 0 0 11px;
-	padding: 0;
-	background-color: rgba(151,151,151,0.2);
+    background-color: rgba(151, 151, 151, 0.2);
+    border: 0 none;
+    float: left;
+    height: 17px;
+    margin: 12px 0 0 15px;
+    padding: 0;
+    width: 1px;
 }
 .opensource h1 {
 	color: rgba(34,34,34,0.75);

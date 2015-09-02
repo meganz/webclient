@@ -2,7 +2,7 @@ var IMAGE_PLACEHOLDER = staticpath + "/images/img_loader@2x.png";
 
 (function(window, asmCrypto) {
 
-var pubkey = ab_to_str(asmCrypto.base64_to_bytes('gVbVNtVJf210qJLe+GxWX8w9mC+WPnTPiUDjBCv9tr4='))
+var signPubKey = ab_to_str(asmCrypto.base64_to_bytes('gVbVNtVJf210qJLe+GxWX8w9mC+WPnTPiUDjBCv9tr4='))
 
 function verify_cms_content(content, signature) {
     var hash = asmCrypto.SHA256.hex(content);

@@ -1898,10 +1898,12 @@ function MegaData()
 
                     if (k) {
                         if (containsc) {
-                            $('#' + _li + folders[ii].h + ' .nw-fm-tree-item').addClass(containsc);
+                            $('#' + _li + folders[ii].h + ' .nw-fm-tree-item').addClass(containsc)
+                                .find('span').eq(0).addClass('nw-fm-arrow-icon');
                         }
                         else {
-                            $('#' + _li + folders[ii].h + ' .nw-fm-tree-item').removeClass('contains-folders');
+                            $('#' + _li + folders[ii].h + ' .nw-fm-tree-item').removeClass('contains-folders')
+                                .find('span').eq(0).removeClass('nw-fm-arrow-icon');
                         }
                     }
                     else {

@@ -1636,101 +1636,13 @@ function getContactsEMails() {
     return contacts;
 }
 
-function addContactUI()
-{
-    if (!u_type)
-        return; // not for ephemeral
 
-    $.shareTokens = [];
+/**
+ * initAddDialogInputPlugin
+ */
+function initAddDialogMultiInputPlugin() {
 
-    function iconSize(par)
-    {
-        if (par)// full size icon, popup at bottom of Add contact button
-        {
-            $('.add-user-size-icon')
-                .removeClass('short-size')
-                .addClass('full-size');
-        }
-        else// short size icon, centered dialog
-        {
-            $('.add-user-size-icon')
-                .removeClass('full-size')
-                .addClass('short-size');
-        }
-    };
-
-    function errorMsg(msg, u)
-    {
-        var $d = $('.add-user-popup');
-        var $s = $('.add-user-popup .multiple-input-warning span');
-        $s.text(msg);
-        $d.addClass('error');
-        setTimeout(function() {
-            $d.removeClass('error');
-        }, 3000);
-    }
-
-    function focusOnInput() {
-        var $tokenInput = $('#token-input-');
-
-        $tokenInput
-            .val('')
-            .focus();
-    }
-
-    // Contact request text filled scripts
-    $('.add-user-notification textarea').on('focus', function() {
-        var $this = $(this);
-        $this.parent().addClass('active');
-    });
-
-    $('.add-user-notification textarea').on('blur', function() {
-        $('.add-user-notification').removeClass('active');
-    });
-
-    function addContactAreaResizing() {
-
-        var txt = $('.add-user-notification textarea'),
-            txtHeight = txt.outerHeight(),
-            hiddenDiv = $('.add-contact-hidden'),
-            pane = $('.add-user-nt-scrolling'),
-            content = txt.val(),
-            api;
-
-        content = content.replace(/\n/g, '<br />');
-        hiddenDiv.html(encodeURI(content) + '<br/>');
-
-        if (txtHeight !== hiddenDiv.outerHeight()) {
-            txt.height(hiddenDiv.outerHeight());
-
-            if ($('.add-user-textarea').outerHeight() >= 50) {
-                pane.jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
-                api = pane.data('jsp');
-                txt.blur();
-                txt.focus();
-                api.scrollByY(0);
-            }
-            else {
-                api = pane.data('jsp');
-
-                if (api) {
-                    api.destroy();
-                    txt.blur();
-                    txt.focus();
-                }
-            }
-        }
-    }
-
-    $('.add-user-notification textarea').on('keyup', function() {
-        addContactAreaResizing();
-    });
-    //end of Contact request textfiled scripts
-
-    // Prevent double initialization of token input
-    if (!$('.add-contact-multiple-input').tokenInput("getSettings")) {
-
-        // Plugin configuration
+    // Plugin configuration
         var contacts = getContactsEMails();
 
         $('.add-contact-multiple-input').tokenInput(contacts, {
@@ -1833,8 +1745,104 @@ function addContactUI()
                     }
                 }
             }
-        });
+        }); 
+        
+    function errorMsg(msg, u) {
+        var $d = $('.add-user-popup');
+        var $s = $('.add-user-popup .multiple-input-warning span');
+        $s.text(msg);
+        $d.addClass('error');
+        setTimeout(function() {
+            $d.removeClass('error');
+        }, 3000);
     }
+}
+
+function addContactUI() {
+    
+    // not for ephemeral
+    if (!u_type) {
+        return; 
+    }
+
+    function iconSize(par) {
+        
+        // full size icon, popup at bottom of Add contact button
+        if (par) {
+            $('.add-user-size-icon')
+                .removeClass('short-size')
+                .addClass('full-size');
+        }
+        
+        // short size icon, centered dialog
+        else {
+            $('.add-user-size-icon')
+                .removeClass('full-size')
+                .addClass('short-size');
+        }
+    };
+
+    function focusOnInput() {
+        var $tokenInput = $('#token-input-');
+
+        $tokenInput
+            .val('')
+            .focus();
+    }
+
+    // Contact request text filled scripts
+    $('.add-user-notification textarea').on('focus', function() {
+        var $this = $(this);
+        $this.parent().addClass('active');
+    });
+
+    $('.add-user-notification textarea').on('blur', function() {
+        $('.add-user-notification').removeClass('active');
+    });
+
+    function addContactAreaResizing() {
+
+        var txt = $('.add-user-notification textarea'),
+            txtHeight = txt.outerHeight(),
+            hiddenDiv = $('.add-contact-hidden'),
+            pane = $('.add-user-nt-scrolling'),
+            content = txt.val(),
+            api;
+
+        content = content.replace(/\n/g, '<br />');
+        hiddenDiv.html(encodeURI(content) + '<br/>');
+
+        if (txtHeight !== hiddenDiv.outerHeight()) {
+            txt.height(hiddenDiv.outerHeight());
+
+            if ($('.add-user-textarea').outerHeight() >= 50) {
+                pane.jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
+                api = pane.data('jsp');
+                txt.blur();
+                txt.focus();
+                api.scrollByY(0);
+            }
+            else {
+                api = pane.data('jsp');
+
+                if (api) {
+                    api.destroy();
+                    txt.blur();
+                    txt.focus();
+                }
+            }
+        }
+    }
+
+    // Prevent double initialization of token input
+    if (!$('.add-contact-multiple-input').tokenInput("getSettings")) {
+        initAddDialogMultiInputPlugin();
+    }
+
+    $('.add-user-notification textarea').on('keyup', function() {
+        addContactAreaResizing();
+    });
+    //end of Contact request textfiled scripts
 
     $('.fm-empty-contacts .fm-empty-button').rebind('mouseover', function() {
         $('.fm-empty-contacts').addClass('hovered');
@@ -2192,8 +2200,8 @@ function fmremove() {
                             removeShare(sharenode, 1);
                         }
                     }
-                    $('.add-contact-multiple-input').tokenInput("removeContact", {id: M.u[$.selected[i]].m}, '.add-contact-multiple-input');
-                    $('.share-multiple-input').tokenInput("removeContact", {id: M.u[$.selected[i]].m}, '.share-multiple-input');
+                    $('.add-contact-multiple-input').tokenInput("removeContact", {id: M.u[$.selected[i]].m});
+                    $('.share-multiple-input').tokenInput("removeContact", {id: M.u[$.selected[i]].m});
                     M.delNode($.selected[i]);
                     api_req({a: 'ur2', u: $.selected[i], l: '0', i: requesti});
                     M.handleEmptyContactGrid();
@@ -2556,6 +2564,7 @@ function initContextUI() {
 
             fm_showoverlay();
             handleShareDialogContent();
+            
         }
     });
 
@@ -7088,32 +7097,33 @@ function handleDialogContent(s, m, c, n, t, i)
 }
 
 /**
- * Taking care about share dialog button 'Share' enabled/disabled and scroll
- *
+ * shareDialogContentCheck
+ * 
+ * Taking care about share dialog button 'Done'/share enabled/disabled and scroll
  *
  */
 function shareDialogContentCheck() {
 
     var dc = '.share-dialog',
-        iItemsNum = 0,
-        iNewItemsNum = 0,
+        itemsNum = 0,
+        newItemsNum = 0,
         $btn = $('.fm-dialog-button.dialog-share-button');
 
-    iNewItemsNum = $(dc + ' .token-input-token-mega').length;
-    iItemsNum = $(dc + ' .share-dialog-contacts .share-dialog-contact-bl').length;
+    newItemsNum = $(dc + ' .token-input-token-mega').length;
+    itemsNum = $(dc + ' .share-dialog-contacts .share-dialog-contact-bl').length;
 
-    if (iItemsNum) {
+    if (itemsNum) {
 
         $(dc + ' .share-dialog-img').addClass('hidden');
         $(dc + ' .share-dialog-contacts').removeClass('hidden');
-        handleDialogScroll(iItemsNum, dc);
+        handleDialogScroll(itemsNum, dc);
     }
     else {
         $(dc + ' .share-dialog-img').removeClass('hidden');
         $(dc + ' .share-dialog-contacts').addClass('hidden');
     }
 
-    if (iNewItemsNum) {
+    if (newItemsNum) {
         $btn.removeClass('disabled');
     }
     else {
@@ -7193,6 +7203,14 @@ function fillShareDialogWithContent() {
                     // ToDo: take care of name attribute once available
                     generateShareDialogRow(pendingContactRequest.m, pendingContactRequest.m, pendingShares[pcrHandle].r);
                 }
+                
+                // Because it's pending, we don't have user information in M.u so we have to look in the pending contact request
+//                if (M.ipc[pendingShares[pcrHandle].p]) {
+//                    var pendingContactRequest = M.ipc[pendingShares[pcrHandle].p];
+//
+//                    // ToDo: take care of name attribute once available
+//                    generateShareDialogRow(pendingContactRequest.m, pendingContactRequest.m, pendingShares[pcrHandle].r);
+//                }
             }
         }
     }
@@ -7229,7 +7247,7 @@ function generateShareDialogRow(displayNameOrEmail, email, shareRights, userHand
     // Add contact
     $.sharedTokens.push(email);
     
-    $('.share-multiple-input').tokenInput("removeContact", {id: email}, '.share-multiple-input');
+    $('.share-multiple-input').tokenInput("removeContact", {id: email});
 
     rowId = (userHandle) ? userHandle : email;
     html = addShareDialogContactToContent('', rowId, av, displayNameOrEmail, perm[0], perm[1]);
@@ -7259,9 +7277,12 @@ function handleShareDialogContent() {
 
     fillShareDialogWithContent();
 
-    // Taking care about share dialog button 'Share' and scroll
+    // Taking care about share dialog button 'Done'/share and scroll
     shareDialogContentCheck();
-
+    
+    // Maintain drop down list updated
+    updateDialogDDL('.share-multiple-input');
+    
     $('.share-dialog-icon.permissions-icon')
         .removeClass('active full-access read-and-write')
         .html('<span></span>' + l[55])
@@ -7272,6 +7293,27 @@ function handleShareDialogContent() {
     $(dc + ' .multiple-input .token-input-token-mega').remove();
     dialogPositioning('.fm-dialog.share-dialog');
     $(dc + ' .token-input-input-token-mega input').focus();
+}
+
+/**
+ * updateDialogDDL
+ */
+function updateDialogDDL(dialog) {
+    
+    var tmp = getContactsEMails(),
+        allEmails = [],
+        contacts;
+    
+    for (var i in tmp) {
+        if (tmp.hasOwnProperty(i)) {
+            allEmails.push(tmp[i].id);
+        }
+    }
+    
+    contacts = excludeIntersected($.sharedTokens, allEmails);
+    $(dialog).tokenInput("addToDDL", contacts);
+
+    return true;
 }
 
 function checkMultiInputPermission($this) {
@@ -7339,27 +7381,20 @@ function sharedPermissionLevel(value) {
     return iPerm;
 }
 
-function initShareDialog() {
-    if (!u_type) {
-        return; // not for ephemeral
-    }
-
-    $.shareTokens = [];
-    function errorMsg(msg) {
-        var $d = $('.share-dialog');
-        var $s = $('.share-dialog .multiple-input-warning span');
-        $s.text(msg);
-        $d.addClass('error');
-        setTimeout(function() {
-            $d.removeClass('error');
-        }, 3000);
-    }
-
-    // Prevents double initialization of token input
-    if (!$('.share-multiple-input').tokenInput("getSettings")) {
-
+function initShareDialogMultiInputPlugin() {
+    
         // Plugin configuration
         var contacts = getContactsEMails();
+
+        function errorMsg(msg) {
+            var $d = $('.share-dialog');
+            var $s = $('.share-dialog .multiple-input-warning span');
+            $s.text(msg);
+            $d.addClass('error');
+            setTimeout(function() {
+                $d.removeClass('error');
+            }, 3000);
+        }
 
         $('.share-multiple-input').tokenInput(contacts, {
             theme: "mega",
@@ -7455,8 +7490,22 @@ function initShareDialog() {
                 }
             }
         });
-    }
+}
 
+function initShareDialog() {
+
+    $.shareTokens = [];
+
+    if (!u_type) {
+        return; // not for ephemeral
+    }
+    
+    // Prevents double initialization of token input
+    if (!$('.share-multiple-input').tokenInput("getSettings")) {
+
+        initShareDialogMultiInputPlugin();
+    }
+    
     function menuPermissionState($this) {
 
         var mi = '.permissions-menu .permissions-menu-item',
@@ -7561,7 +7610,7 @@ function initShareDialog() {
         }
 
         shareDialogContentCheck();
-
+        
         num = $('.share-dialog .token-input-list-mega .token-input-token-mega').length;
         if (!num) {
             $('.dialog-share-button').addClass('disabled');

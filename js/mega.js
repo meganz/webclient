@@ -5706,20 +5706,22 @@ function processIPC(ipc, ignoreDB) {
                 
                 // Update tokenInput plugin
                 if ($('.add-contact-multiple-input')) {
-                    $('.add-contact-multiple-input').tokenInput("removeContact", {id: ipc[i].m}, '.add-contact-multiple-input');
+                    $('.add-contact-multiple-input').tokenInput("removeContact", {id: ipc[i].m});
                 }
                 if ($('.share-multiple-input')) {
-                    $('.share-multiple-input').tokenInput("removeContact", {id: ipc[i].m}, '.share-multiple-input');
+                    $('.share-multiple-input').tokenInput("removeContact", {id: ipc[i].m});
                 }
             }
             else {
                 
                 // Update tokenInput plugin
                 if ($('.add-contact-multiple-input')) {
-                    $('.add-contact-multiple-input').tokenInput("add", {id: ipc[i].m, name: ipc[i].m});
+//                    $('.add-contact-multiple-input').tokenInput("addToDDL", {id: ipc[i].m, name: ipc[i].m});
+                    $('.add-contact-multiple-input').tokenInput("addToDDL", ipc[i].m);
                 }
                 if ($('.share-multiple-input')) {
-                    $('.share-multiple-input').tokenInput("add", {id: ipc[i].m, name: ipc[i].m});
+//                    $('.share-multiple-input').tokenInput("addToDDL", {id: ipc[i].m, name: ipc[i].m});
+                    $('.share-multiple-input').tokenInput("addToDDL", ipc[i].m);
                 }
             }            
         }
@@ -5743,10 +5745,10 @@ function processOPC(opc, ignoreDB) {
 
             // Update tokenInput plugin
             if ($('.add-contact-multiple-input')) {
-                $('.add-contact-multiple-input').tokenInput("removeContact", {id: opc[i].m}, '.add-contact-multiple-input');
+                $('.add-contact-multiple-input').tokenInput("removeContact", {id: opc[i].m});
             }
             if ($('.share-multiple-input')) {
-                $('.share-multiple-input').tokenInput("removeContact", {id: opc[i].m}, '.share-multiple-input');
+                $('.share-multiple-input').tokenInput("removeContact", {id: opc[i].m});
             }
         }
         else {
@@ -5768,10 +5770,12 @@ function processOPC(opc, ignoreDB) {
             
             // Update tokenInput plugin
             if ($('.add-contact-multiple-input')) {
-                $('.add-contact-multiple-input').tokenInput("add", {id: opc[i].m, name: opc[i].m});
+//                $('.add-contact-multiple-input').tokenInput("add", {id: opc[i].m, name: opc[i].m});
+                $('.add-contact-multiple-input').tokenInput("addToDDL", opc[i].m);
             }
             if ($('.share-multiple-input')) {
-                $('.share-multiple-input').tokenInput("add", {id: opc[i].m, name: opc[i].m});
+//                $('.share-multiple-input').tokenInput("add", {id: opc[i].m, name: opc[i].m});
+                $('.share-multiple-input').tokenInput("addToDDL", opc[i].m);
             }
         }
     }
@@ -5783,20 +5787,25 @@ function processOPC(opc, ignoreDB) {
  * @param {array.<JSON_objects>} pending shares
  */
 function processPS(pendingShares, ignoreDB) {
+    
     DEBUG('processPS');
     var ps;
 
     for (var i in pendingShares) {
         if (pendingShares.hasOwnProperty(i)) {
             ps = pendingShares[i];
-            if (ps.h) {// From gettree
+            
+            // From gettree
+            if (ps.h) {
                 M.addPS(ps, ignoreDB);
             }
-            else {// Situation different from gettree, s2 from API response, doesn't have .h attr instead have .n
-                var nodeHandle = ps.n;
-                var pendingContactId = ps.p;
-                var shareRights = ps.r;
-                var timeStamp = ps.ts;
+            
+            // Situation different from gettree, s2 from API response, doesn't have .h attr instead have .n
+            else {
+                var nodeHandle = ps.n,
+                    pendingContactId = ps.p,
+                    shareRights = ps.r,
+                    timeStamp = ps.ts;
 
                 // shareRights is undefined when user denies pending contact request
                 // .op is available when user accepts pending contact request and
@@ -5805,7 +5814,7 @@ function processPS(pendingShares, ignoreDB) {
 
                     M.delPS(pendingContactId, nodeHandle);
 
-                    if (ps.op) {// Upgrade pending share to full share
+                    if (ps.op) {
                         M.nodeShare(nodeHandle, ps);
                     }
                 } else {
@@ -5866,10 +5875,10 @@ function processUPCO(ap) {
 
                 // Update token.input plugin
                 if ($('.add-contact-multiple-input')) {
-                    $('.add-contact-multiple-input').tokenInput("removeContact", {id: ap[i].m}, '.add-contact-multiple-input');
+                    $('.add-contact-multiple-input').tokenInput("removeContact", {id: ap[i].m});
                 }
                 if ($('.share-multiple-input')) {
-                    $('.share-multiple-input').tokenInput("removeContact", {id: ap[i].m}, '.share-multiple-input');
+                    $('.share-multiple-input').tokenInput("removeContact", {id: ap[i].m});
                 }
                 $('#opc_' + psid).remove();
                 if ((Object.keys(M.opc).length === 0) && (M.currentdirid === 'opc')) {
@@ -5894,10 +5903,12 @@ function process_u(u) {
 
                 // Update token.input plugin
                 if ($('.add-contact-multiple-input')) {
-                    $('.add-contact-multiple-input').tokenInput("add", {id: u[i].m, name: u[i].m});
+//                    $('.add-contact-multiple-input').tokenInput("add", {id: u[i].m, name: u[i].m});
+                    $('.add-contact-multiple-input').tokenInput("addToDDL", u[i].m);
                 }
                 if ($('.share-multiple-input')) {
-                    $('.share-multiple-input').tokenInput("add", {id: u[i].m, name: u[i].m});
+//                    $('.share-multiple-input').tokenInput("add", {id: u[i].m, name: u[i].m});
+                    $('.share-multiple-input').tokenInput("addToDDL", u[i].m);
                 }
             }
             else if (M.d[u[i].u]) {
@@ -5905,10 +5916,10 @@ function process_u(u) {
 
                 // Update token.input plugin
                 if ($('.add-contact-multiple-input')) {
-                    $('.add-contact-multiple-input').tokenInput("removeContact", {id: u[i].m}, '.add-contact-multiple-input');
+                    $('.add-contact-multiple-input').tokenInput("removeContact", {id: u[i].m});
                 }
                 if ($('.share-multiple-input')) {
-                    $('.share-multiple-input').tokenInput("removeContact", {id: u[i].m}, '.share-multiple-input');
+                    $('.share-multiple-input').tokenInput("removeContact", {id: u[i].m});
                 }
             }
             M.addUser(u[i]);

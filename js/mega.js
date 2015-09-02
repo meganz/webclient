@@ -347,7 +347,9 @@ function MegaData()
     {
         if (!M.c.contacts)
             M.c.contacts = {};
-        M.c.contacts[u_handle] = 1;
+        if (u_handle) {
+            M.c.contacts[u_handle] = 1;
+        }
 
         for (var u in M.c['contacts'])
             if (!avatars[u])
@@ -473,7 +475,7 @@ function MegaData()
 
         $('.files-grid-view.fm.shared-folder-content').addClass('hidden');
 
-        $(window).trigger('resize');
+        $.tresizer();
     };
     Object.defineProperty(this, 'fsViewSel', {
         value: '.files-grid-view.fm .grid-scrolling-table, .fm-blocks-view.fm .file-block-scrolling',
@@ -1062,7 +1064,7 @@ function MegaData()
         $(lSel).unbind('jsp-scroll-y.dynlist');
         $(window).unbind("resize.dynlist");
         sharedfolderUI();// ToDo: Check do we really need this here
-        $(window).trigger('resize');
+        $.tresizer();
 
         hideEmptyGrids();
 
@@ -1473,7 +1475,7 @@ function MegaData()
 
         if (this.chat) {
             sharedfolderUI(); // remove shares-specific UI
-            $(window).trigger('resize');
+            $.tresizer();
         }
         else if (id === undefined && folderlink) {
             // Error reading shared folder link! (Eg, server gave a -11 (EACCESS) error)
@@ -1896,10 +1898,12 @@ function MegaData()
 
                     if (k) {
                         if (containsc) {
-                            $('#' + _li + folders[ii].h + ' .nw-fm-tree-item').addClass(containsc);
+                            $('#' + _li + folders[ii].h + ' .nw-fm-tree-item').addClass(containsc)
+                                .find('span').eq(0).addClass('nw-fm-arrow-icon');
                         }
                         else {
-                            $('#' + _li + folders[ii].h + ' .nw-fm-tree-item').removeClass('contains-folders');
+                            $('#' + _li + folders[ii].h + ' .nw-fm-tree-item').removeClass('contains-folders')
+                                .find('span').eq(0).removeClass('nw-fm-arrow-icon');
                         }
                     }
                     else {
@@ -2954,9 +2958,7 @@ function MegaData()
         renderNew();
         this.rubbishIco();
         processmove(j);
-        Soon(function() {
-            $(window).trigger('resize');
-        });
+        $.tresizer();
     };
 
     this.accountData = function(cb, blockui)
@@ -3524,6 +3526,7 @@ function MegaData()
     {
         delete $.dlhash;
         var path;
+        var added = 0;
         var nodes = [];
         var paths = {};
         var zipsize = 0;
@@ -3593,6 +3596,7 @@ function MegaData()
             pauseTxt = ' (' + l[1651] + ')';
         }
 
+        var ttl = this.getTransferTableLengths();
         for (var k in nodes) {
             /* jshint -W089 */
             if (!nodes.hasOwnProperty(k) || !(n = M.d[nodes[k]])) {
@@ -3601,61 +3605,89 @@ function MegaData()
             }
             path = paths[nodes[k]] || '';
             $.totalDL += n.s;
-            var li = $('.transfer-table #' + 'dl_'+htmlentities(n.h));
-            if (!li.length) {
-                dl_queue.push({
-                    id: n.h,
-                    key: n.key,
-                    n: n.name,
-                    t: n.ts,
-                    p: path,
-                    size: n.s,
-                    onDownloadProgress: this.dlprogress,
-                    onDownloadComplete: this.dlcomplete,
-                    onBeforeDownloadComplete: this.dlbeforecomplete,
-                    onDownloadError: this.dlerror,
-                    onDownloadStart: this.dlstart,
-                    zipid: z,
-                    zipname: zipname,
-                    preview: preview
-                });
-                zipsize += n.s;
-
-                var flashhtml = '';
-                if (dlMethod == FlashIO) {
-                    flashhtml = '<object width="1" height="1" id="dlswf_' + htmlentities(n.h) + '" type="application/x-shockwave-flash"><param name=FlashVars value="buttonclick=1" /><param name="movie" value="' + document.location.origin + '/downloader.swf"/><param value="always" name="allowscriptaccess"><param name="wmode" value="transparent"><param value="all" name="allowNetworking"></object>';
+            var tr = $('.transfer-table #dl_' + htmlentities(n.h));
+            if (tr.length) {
+                if (!tr.hasClass('completed')) {
+                    continue;
                 }
+                tr.remove();
+            }
+            dl_queue.push({
+                id: n.h,
+                key: n.key,
+                n: n.name,
+                t: n.ts,
+                p: path,
+                size: n.s,
+                onDownloadProgress: this.dlprogress,
+                onDownloadComplete: this.dlcomplete,
+                onBeforeDownloadComplete: this.dlbeforecomplete,
+                onDownloadError: this.dlerror,
+                onDownloadStart: this.dlstart,
+                zipid: z,
+                zipname: zipname,
+                preview: preview
+            });
+            added++;
+            zipsize += n.s;
 
-                if (!z) {
-                    this.addToTransferTable('<tr id="dl_' + htmlentities(n.h) + '">'
-                        + '<td><span class="transfer-type download ' + p + '">' + l[373] + '<span class="speed">' + pauseTxt + '</span></span>' + flashhtml + '</td>'
-                        + '<td><span class="transfer-filtype-icon ' + fileIcon(n) + '"></span><span class="tranfer-filetype-txt">' + htmlentities(n.name) + '</span></td>'
-                        + '<td></td>'
-                        + '<td>' + bytesToSize(n.s) + '</td>'
-                        + '<td>' + filetype(n.name) + '</td>'
-                        + '<td><span class="transfer-status queued">Queued</span></td>'
-                        + '<td class="grid-url-field"><a class="grid-url-arrow"><span></span></a><a class="clear-transfer-icon"><span></span></a></td>'
-                        + '<td><span class="row-number"></span></td>'
-                        + '</tr>');
+            var flashhtml = '';
+            if (dlMethod === FlashIO) {
+                flashhtml = '<object width="1" height="1" id="dlswf_'
+                    + htmlentities(n.h)
+                    + '" type="application/x-shockwave-flash">'
+                    + '<param name=FlashVars value="buttonclick=1" />'
+                    + '<param name="movie" value="' + location.origin + '/downloader.swf"/>'
+                    + '<param value="always" name="allowscriptaccess"/>'
+                    + '<param name="wmode" value="transparent"/>'
+                    + '<param value="all" name="allowNetworking">'
+                    + '</object>';
+            }
 
-                    if (uldl_hold) {
-                        fm_tfspause('dl_' + n.h);
-                    }
+            if (!z) {
+                this.addToTransferTable('dl_' + n.h, ttl,
+                    '<tr id="dl_' + htmlentities(n.h) + '">'
+                    + '<td><span class="transfer-type download ' + p + '">' + l[373]
+                    + '<span class="speed">' + pauseTxt + '</span></span>' + flashhtml + '</td>'
+                    + '<td><span class="transfer-filtype-icon ' + fileIcon(n)
+                    + '"></span><span class="tranfer-filetype-txt">' + htmlentities(n.name) + '</span></td>'
+                    + '<td></td>'
+                    + '<td>' + bytesToSize(n.s) + '</td>'
+                    + '<td>' + filetype(n.name) + '</td>'
+                    + '<td><span class="transfer-status queued">Queued</span></td>'
+                    + '<td class="grid-url-field"><a class="grid-url-arrow"><span></span></a>'
+                    + '<a class="clear-transfer-icon"><span></span></a></td>'
+                    + '<td><span class="row-number"></span></td>'
+                    + '</tr>');
+
+                if (uldl_hold) {
+                    fm_tfspause('dl_' + n.h);
                 }
+                ttl.left--;
             }
         }
 
-        if (dlMethod == MemoryIO && ~ua.indexOf(') gecko') && !localStorage.firefoxDialog && $.totalDL > 104857600) {
+        if (!added) {
+            if (d) {
+                dlmanager.logger.warn('Nothing to download.');
+            }
+            return;
+        }
+
+        // If regular download using Firefox and the total download is over 1GB then show the dialog
+        // to use the extension, but not if they've seen the dialog before and ticked the checkbox
+        if (dlMethod == MemoryIO && !localStorage.firefoxDialog && $.totalDL > 1048576000 && navigator.userAgent.indexOf('Firefox') > -1) {
             Later(firefoxDialog);
         }
 
         var flashhtml = '';
-        if (dlMethod == FlashIO) {
+        if (dlMethod === FlashIO) {
             flashhtml = '<object width="1" height="1" id="dlswf_zip_' + htmlentities(z) + '" type="application/x-shockwave-flash"><param name=FlashVars value="buttonclick=1" /><param name="movie" value="' + document.location.origin + '/downloader.swf"/><param value="always" name="allowscriptaccess"><param name="wmode" value="transparent"><param value="all" name="allowNetworking"></object>';
         }
 
         if (z && zipsize) {
-            this.addToTransferTable('<tr id="zip_' + z + '">'
+            this.addToTransferTable('zip_' + z, ttl,
+                '<tr id="zip_' + z + '">'
                 + '<td><span class="transfer-type download' + p + '">' + l[373] + '<span class="speed">' + pauseTxt + '</span></span>' + flashhtml + '</td>'
                 + '<td><span class="transfer-filtype-icon ' + fileIcon({name: 'archive.zip'}) + '"></span><span class="tranfer-filetype-txt">' + htmlentities(zipname) + '</span></td>'
                 + '<td></td>'
@@ -3681,13 +3713,14 @@ function MegaData()
         if (!preview)
         {
             if (!z || zipsize) {
-                showTransferToast('d', z ? 1 : nodes.length);
+                showTransferToast('d', z ? 1 : added);
             }
             openTransferpanel();
             initGridScrolling();
             initFileblocksScrolling();
             initTreeScroll();
             setupTransferAnalysis();
+            Soon(fm_tfsupdate);
             if ((dlmanager.isDownloading = Boolean(dl_queue.length))) {
                 $('.transfer-pause-icon').removeClass('disabled');
                 $('.transfer-clear-completed').removeClass('disabled');
@@ -3800,6 +3833,7 @@ function MegaData()
             id = 'zip_' + z;
         else
             id = 'dl_' + id;
+        $('.transfer-table #' + id).addClass('completed');
         $('.transfer-table #' + id + ' td:eq(5)').html('<span class="transfer-status completed">' + l[1418] + '</span>');
         $('.transfer-table #' + id + ' td:eq(2)').text('');
         $('.transfer-table #' + id + ' td:eq(0) span.transfer-type').addClass('done').html(l[1495]);
@@ -3944,14 +3978,14 @@ function MegaData()
                     delete M.tfsdomqueue[i];
                 }
 
-                if (M._tfsDynlistR)
+                /*if (M._tfsDynlistR)
                     clearTimeout(M._tfsDynlistR);
                 M._tfsDynlistR = setTimeout(function()
                 {
                     delete M._tfsDynlistR;
                     Soon(transferPanelUI);
                     Soon(fm_tfsupdate);
-                }, 350);
+                }, 350);*/
                 $(window).trigger('resize');
             }
         }
@@ -4014,12 +4048,11 @@ function MegaData()
             Soon(fm_tfsupdate);
         }
     }
-    this.addToTransferTable = function(elem)
+    this.addToTransferTable = function(gid, ttl, elem)
     {
-        var T = this.getTransferTableLengths();
-        var gid = String(elem.match(/id="([^"]+)"/).pop());
+        var T = ttl || this.getTransferTableLengths();
 
-        if (d) {
+        if (d > 1) {
             var logger = (gid[0] === 'u' ? ulmanager : dlmanager).logger;
             logger.info('Adding Transfer', gid, JSON.stringify(T));
         }
@@ -4032,7 +4065,7 @@ function MegaData()
 
         if (T.left > 0)
         {
-            addToTransferTable(gid, elem);
+            addToTransferTable(gid, elem, true);
             // In some cases UI is not yet initialized, nor transferHeader()
             $('.transfer-table-header').show(0);
         }
@@ -4094,8 +4127,9 @@ function MegaData()
         var onChat;
         var f;
         var ul_id;
-        var pause;
+        var pause = "";
         var pauseTxt = '';
+        var ttl = this.getTransferTableLengths();
 
         if ($.onDroppedTreeFolder) {
             target = $.onDroppedTreeFolder;
@@ -4131,8 +4165,9 @@ function MegaData()
             f.target = target;
             f.id = ul_id;
 
-            this.addToTransferTable(
-                '<tr id="ul_' + ul_id + '">'
+            var gid = 'ul_' + ul_id;
+            this.addToTransferTable(gid, ttl,
+                '<tr id="' + gid + '">'
                 + '<td><span class="transfer-type upload ' + pause + '">' + l[372] + '<span class="speed">' + pauseTxt + '</span></span></td>'
                 + '<td><span class="transfer-filtype-icon ' + fileIcon({name: f.name}) + '"></span><span class="tranfer-filetype-txt">' + htmlentities(f.name) + '</span></td>'
                 + '<td></td>'
@@ -4143,6 +4178,7 @@ function MegaData()
                 + '<td><span class="row-number"></span></td>'
                 + '</tr>');
             ul_queue.push(f);
+            ttl.left--;
 
             if (uldl_hold) {
                 fm_tfspause('ul_' + ul_id);
@@ -4163,6 +4199,7 @@ function MegaData()
             showTransferToast('u', u.length);
             $.transferHeader();
             openTransferpanel();
+            Soon(fm_tfsupdate);
         }
 
         setupTransferAnalysis();
@@ -4264,6 +4301,7 @@ function MegaData()
             $('#uploadpopbtn').text(l[726]);
             $('#mobileupload_header').text(l[1418]);
         }
+        $('.transfer-table #ul_' + id).addClass('completed');
         $('.transfer-table #ul_' + id + ' td:eq(5)').html('<span class="transfer-status completed">' + l[1418] + '</span>');
         $('.transfer-table #ul_' + id + ' td:eq(2)').text('');
         $('.transfer-table #ul_' + id + ' td:eq(0) span.transfer-type').addClass('done').html(l[1501]);
@@ -4285,10 +4323,10 @@ function MegaData()
             $.transferprogress['ulc'] += $.transferprogress['ul_'+ id][1];
             delete $.transferprogress['ul_'+ id];
         }
-        $.transferHeader();
+        // $.transferHeader();
         Soon(function() {
             mega.utils.resetUploadDownload();
-            $(window).trigger('resize');
+            $.tresizer();
         });
     }
 
@@ -4640,7 +4678,7 @@ function renderNew() {
         M.sort();
         M.renderMain(true);
         M.renderPath();
-        $(window).trigger('resize');
+        $.tresizer();
     }
 
     if (UItree) {

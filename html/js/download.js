@@ -95,6 +95,8 @@ function dl_g(res) {
         
         $('.new-download-red-button, .regular-download').rebind('click', function() {
             
+            // If regular download using Firefox and the total download is over 1GB then show the dialog 
+            // to use the extension, but not if they've seen the dialog before and ticked the checkbox
             if (dlMethod == MemoryIO && !localStorage.firefoxDialog && fdl_filesize > 1048576000 && navigator.userAgent.indexOf('Firefox') > -1)
             {
                 firefoxDialog();

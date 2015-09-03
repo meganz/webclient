@@ -12,6 +12,9 @@ var inherits = (function() {
     }
 })();
 
+makeEnum(['MDBOPEN'], 'MEGAFLAG_', window);
+
+
 /**
  *  Check if value is contained in a array. If it is return value
  *  otherwise false

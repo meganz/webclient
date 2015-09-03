@@ -193,7 +193,7 @@ catch(e) {
     }
 }
 
-var mega = {ui: {}, utils: {}};
+var mega = {ui: {}, utils: {}, flags: 0};
 var bootstaticpath = staticpath;
 var urlrootfile = '';
 
@@ -871,6 +871,11 @@ else if (!b_u)
             var sbid = +(''+(document.querySelector('script[src*="secureboot"]')||{}).src).split('=').pop()|0;
 
             if (~dump.m.indexOf('[[:i]]')) {
+                return false;
+            }
+            if ((mega.flags & window.MEGAFLAG_MDBOPEN) && dump.m === 'InvalidStateError') {
+                // Prevent InvalidStateError exceptions from indexedDB.open
+                // caused while using Private Browser Mode on Firefox.
                 return false;
             }
 

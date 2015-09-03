@@ -1118,9 +1118,6 @@ else if (!b_u)
     jsl.push({f:'js/chat/plugins/callManager.js', n: 'callManager_js', j:1,w:7});
     jsl.push({f:'js/chat/plugins/urlFilter.js', n: 'urlFilter_js', j:1,w:7});
     jsl.push({f:'js/chat/plugins/emoticonsFilter.js', n: 'emoticonsFilter_js', j:1,w:7});
-    jsl.push({f:'js/chat/plugins/attachmentsFilter.js', n: 'attachmentsFilter_js', j:1,w:7});
-    jsl.push({f:'js/chat/plugins/encryptionFilter.js', n: 'encryptionFilter_js', j:1,w:7});
-    jsl.push({f:'js/chat/plugins/chatStore.js', n: 'chatstore_js', j:1,w:7});
     jsl.push({f:'js/chat/plugins/chatNotifications.js', n: 'chatnotifications_js', j:1,w:7});
     jsl.push({f:'js/chat/plugins/callFeedback.js', n: 'callfeedback_js', j:1,w:7});
 

@@ -8690,6 +8690,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	margin-right: 89px;
 	padding-right: 26px;
 	word-wrap: break-word;
+	white-space: pre;
 }
 .fm-chat-filename {
 	margin: 30px 0 0 15px;
@@ -9201,7 +9202,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 .fm-start-call-popup {
 	margin-right: 0;
 }
-.fm-add-contact-popup.active, .fm-chat-emotion-popup.active {
+.fm-add-contact-popup.active {
 	right: -10000px;
 }
 .fm-chat-emotion-popup {
@@ -9212,6 +9213,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
+}
+.fm-chat-emotion-popup.active {
+	right: 0;
 }
 .fm-send-files-popup.active {
 	left: 0;

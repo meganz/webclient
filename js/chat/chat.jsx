@@ -67,144 +67,8 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
         resp[1].show();
 
 
+        // since .fm-chat-block is out of the scope of the CovnersationsApp, this should be done manually :(
         $('.fm-chat-block').removeClass('hidden');
-
-
-        $('.fm-chat-emotions-icon').unbind('click.megaChat');
-        $('.fm-chat-emotions-icon').bind('click.megaChat', function()
-        {
-            if ($(this).attr('class').indexOf('active') === -1)
-            {
-                $(this).addClass('active');
-                $('.fm-chat-emotion-popup').addClass('active').removeClass('hidden');
-            }
-            else
-            {
-                $(this).removeClass('active');
-                $('.fm-chat-emotion-popup').removeClass('active').addClass('hidden');
-            }
-        });
-
-        $('.fm-chat-smile').unbind('click.megaChat');
-        $('.fm-chat-smile').bind('click.megaChat', function()
-        {
-            $('.fm-chat-emotions-icon').removeClass('active');
-            $('.fm-chat-emotion-popup').removeClass('active');
-            var c = $(this).data("text");
-            if (c)
-            {
-                c = c.replace('fm-chat-smile ','');
-                $('.message-textarea').val($('.message-textarea').val() + c);
-                setTimeout(function()
-                {
-                    moveCursortoToEnd($('.message-textarea')[0]);
-                },1);
-            }
-        });
-
-        var typingTimeout = null;
-        var stoppedTyping = function() {
-            if (typingTimeout) {
-                clearTimeout(typingTimeout);
-
-                var room = megaChat.getCurrentRoom();
-                if (room && room.state === ChatRoom.STATE.READY) {
-                    megaChat.karere.sendComposingPaused(megaChat.getCurrentRoomJid());
-                }
-                typingTimeout = null;
-            }
-        };
-
-        $(document.body).undelegate('.message-textarea', 'keyup.send');
-        $(document.body).delegate('.message-textarea', 'keyup.send', function(e) {
-            if ($(this).val().length > 0) {
-                if (!typingTimeout) {
-                    var room = megaChat.getCurrentRoom();
-                    if (room && room.state === ChatRoom.STATE.READY) {
-                        megaChat.karere.sendIsComposing(megaChat.getCurrentRoomJid());
-                    }
-                } else if (typingTimeout) {
-                    clearTimeout(typingTimeout);
-                }
-
-                typingTimeout = setTimeout(function() {
-                    stoppedTyping();
-                }, 2000);
-            } else if ($(this).val().length === 0) {
-                stoppedTyping();
-            }
-        });
-        $(document.body).undelegate('.message-textarea', 'keydown.send');
-        $(document.body).delegate('.message-textarea', 'keydown.send',function(e) {
-            var key = e.keyCode || e.which;
-            var msg = $(this).val();
-
-            if (key === 13 && !e.shiftKey && !e.ctrlKey && !e.altKey) {
-                if (msg.trim().length > 0) {
-                    stoppedTyping();
-
-                    megaChat.sendMessage(
-                        megaChat.getCurrentRoomJid(),
-                        msg
-                    );
-                    $(this).val('');
-
-                    messageAreaResizing();
-
-
-                    return false;
-                } else {
-                    e.preventDefault();
-                }
-            } else if (key === 13) {
-                if (msg.trim().length === 0) {
-                    e.preventDefault();
-                }
-            }
-
-        });
-        $('.message-textarea').unbind('blur.stoppedcomposing');
-        $('.message-textarea').bind('blur.stoppedcomposing',function(e) {
-            stoppedTyping();
-        });
-
-        // Textarea resizing
-        function messageAreaResizing() {
-            var txt = $('.message-textarea'),
-                txtHeight =  txt.outerHeight(),
-                hiddenDiv = $('.hiddendiv'),
-                pane = $('.fm-chat-input-scroll'),
-                content = txt.val(),
-                api;
-
-            content = content.replace(/\n/g, '<br />');
-            hiddenDiv.html(content + '<br />');
-
-            if (txtHeight != hiddenDiv.outerHeight() ) {
-                txt.height(hiddenDiv.outerHeight());
-
-                if ( $('.fm-chat-input-block').outerHeight()>=200) {
-                    pane.jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5});
-                    api = pane.data('jsp');
-                    txt.blur();
-                    txt.focus();
-                    api.scrollByY(0);
-                }
-                else {
-                    api = pane.data('jsp');
-                    if (api) {
-                        api.destroy();
-                        txt.blur();
-                        txt.focus();
-                    }
-                }
-            }
-        }
-
-        $(document.body).undelegate('.message-textarea', 'keyup.resize');
-        $(document.body).delegate('.message-textarea', 'keyup.resize', function() {
-            messageAreaResizing();
-        });
 
     };
 })();
@@ -339,7 +203,6 @@ var Chat = function() {
             'callManager': CallManager,
             'urlFilter': UrlFilter,
             'emoticonsFilter': EmoticonsFilter,
-            'attachmentsFilter': AttachmentsFilter,
             'callFeedback': CallFeedback,
             'karerePing': KarerePing
         },
@@ -415,7 +278,7 @@ var Chat = function() {
 makeObservable(Chat);
 
 Chat.prototype.renderConversationsApp = function () {
-    this.$conversationsAppInstance.forceUpdate();
+    //this.$conversationsAppInstance.forceUpdate();
 };
 
 /**
@@ -1894,9 +1757,6 @@ Chat.prototype.refreshConversations = function() {
     // move to the proper place if loaded before the FM
     if(self.$container.parent('.section.conversations .fm-right-files-block').size() == 0) {
         $('.section.conversations .fm-right-files-block').append(self.$container);
-        $('video', self.$container).each(function() {
-            this.play();
-        });
     }
 
     self.renderConversationsApp();

@@ -81,7 +81,27 @@ var ConversationMessage = React.createClass({
             (message instanceof KarereEventObjects.OutgoingMessage) ||
             (message instanceof KarereEventObjects.IncomingPrivateMessage)
         ) {
-            textMessage = message.getContents();
+            // Convert ot HTML and pass it to plugins to do their magic on styling the message if needed.
+            if (message.messageHtml) {
+                message.messageHtml = message.messageHtml;
+            } else {
+                message.messageHtml = htmlentities(
+                    message.getContents()
+                ).replace(/\n/gi, "<br/>");
+            }
+
+            var event = new $.Event("onBeforeRenderMessage");
+            megaChat.trigger(event, {
+                message: message,
+                room: chatRoom
+            });
+
+            if (event.isPropagationStopped()) {
+                self.logger.warn("Event propagation stopped receiving (rendering) of message: ", message);
+                return false;
+            }
+            textMessage = message.messageHtml;
+
             authorTextDiv = <span className="chat-username">{contact.m}</span>;
         }
         // if this is an inline dialog
@@ -89,7 +109,7 @@ var ConversationMessage = React.createClass({
             message.type
         ) {
             cssClasses += " inline-dialog chat-notification " + message.type;
-            textMessage = getMessageString(message.type);
+            textMessage = htmlentities(getMessageString(message.type));
             if(!textMessage) {
                 console.error("Message with type: ", message.type, "does not have a text string defined. Message: ", message);
                 debugger;
@@ -155,7 +175,7 @@ var ConversationMessage = React.createClass({
                         <div className="chat-message-date">{timestamp}</div>
                         {authorTextDiv}
                         <div className="chat-message-txt">
-                            {textMessage}
+                            <span dangerouslySetInnerHTML={{__html:textMessage}}></span>
                             {buttons}
                         </div>
                         <div className="clear"></div>
@@ -171,10 +191,12 @@ var ConversationPanel = React.createClass({
 
     getInitialState: function() {
         return {
-            'startCallPopupIsActive': false,
-            'localVideoIsMinimized': false,
-            'isFullscreenModeEnabled': false,
-            'mouseOverDuringCall': false
+            startCallPopupIsActive: false,
+            localVideoIsMinimized: false,
+            isFullscreenModeEnabled: false,
+            mouseOverDuringCall: false,
+            typedMessage: "",
+            emoticonsPopupIsActive: false,
         };
     },
 
@@ -186,10 +208,19 @@ var ConversationPanel = React.createClass({
             return;
         }
 
-        this.$header.attr("data-room-jid", room.roomJid.split("@")[0]);
+        self.$header.attr("data-room-jid", room.roomJid.split("@")[0]);
 
-        var $jsp = this.$messages.data("jsp");
-        if($jsp) {
+        if(!self.props.chatRoom.isCurrentlyActive) {
+            return;
+        }
+
+        var $jsp = self.$messages.data("jsp");
+        if ($jsp) {
+            if (scrollToBottom) {
+                self.$messages.one('jsp-initialised', function () {
+                    $jsp.scrollToBottom();
+                });
+            }
             $jsp.reinitialise();
         }
 
@@ -198,6 +229,52 @@ var ConversationPanel = React.createClass({
         room.megaChat.refreshConversations();
 
         room.trigger('RefreshUI');
+    },
+    onEmoticonsButtonClick: function(e) {
+        var self = this;
+        var $target = $(e.target);
+
+        if($target.parent().is(".disabled")) {
+            return;
+        }
+
+        var hidePopup = function() {
+            if(self.isMounted()) {
+                self.setState({
+                    emoticonsPopupIsActive: false
+                });
+                $(document).unbind('mouseup.emoticonsPopup');
+            }
+        };
+
+
+        if(self.state.emoticonsPopupIsActive === false) {
+            self.setState({
+                emoticonsPopupIsActive: true
+            });
+            $(document).rebind('mouseup.emoticonsPopup', function (e) {
+                if(!$(e.target).is($target)) {
+                    hidePopup();
+                }
+            });
+        } else {
+            hidePopup();
+        }
+
+    },
+    onEmoticonClicked: function(e) {
+        var self = this;
+        var $target = $(e.target);
+        var emoticonText = $target.data('text');
+
+        self.setState({
+            typedMessage: self.state.typedMessage + emoticonText
+        });
+
+        setTimeout(function()
+        {
+            moveCursortoToEnd($('.message-textarea:visible')[0]);
+        }, 100);
     },
     onStartCallClicked: function(e) {
         var self = this;
@@ -319,6 +396,74 @@ var ConversationPanel = React.createClass({
             self.setState({'mouseOverDuringCall': false});
         }, 2000);
     },
+    typing: function() {
+        var self = this;
+        var room = this.props.chatRoom;
+
+        if (!self.typingTimeout) {
+            if (room && room.state === ChatRoom.STATE.READY) {
+                room.megaChat.karere.sendIsComposing(room.roomJid);
+            }
+        } else if (self.typingTimeout) {
+            clearTimeout(self.typingTimeout);
+        }
+
+        self.typingTimeout = setTimeout(function() {
+            self.stoppedTyping();
+        }, 2000);
+    },
+    stoppedTyping: function() {
+        var self = this;
+        var room = this.props.chatRoom;
+
+        if (self.typingTimeout) {
+            clearTimeout(self.typingTimeout);
+            self.typingTimeout = null;
+        }
+        if (room && room.state === ChatRoom.STATE.READY) {
+            room.megaChat.karere.sendComposingPaused(room.roomJid);
+        }
+    },
+    onTypeAreaKeyDown: function(e) {
+        var self = this;
+        var key = e.keyCode || e.which;
+        var element = e.target;
+        var val = element.value;
+
+        if (key === 13 && !e.shiftKey && !e.ctrlKey && !e.altKey) {
+            if ($.trim(val).length > 0) {
+                self.props.chatRoom.sendMessage(val);
+                self.setState({typedMessage: ""});
+                self.stoppedTyping();
+                e.preventDefault();
+                return;
+            } else {
+                self.stoppedTyping();
+                e.preventDefault();
+            }
+        } else if (key === 13) {
+            if ($.trim(val).length === 0) {
+                self.stoppedTyping();
+                e.preventDefault();
+            }
+        }
+
+        this.setState({typedMessage: e.target.value});
+    },
+    onTypeAreaBlur: function(e) {
+        var self = this;
+
+        self.stoppedTyping();
+    },
+    onTypeAreaChange: function(e) {
+        var self = this;
+
+        self.setState({typedMessage: e.target.value});
+
+        if ($.trim(e.target.value).length) {
+            self.typing();
+        }
+    },
     componentDidMount: function() {
         var self = this;
         window.addEventListener('resize', self.handleWindowResize);
@@ -360,14 +505,13 @@ var ConversationPanel = React.createClass({
                     self.setState({isFullscreenModeEnabled: false});
                 }
             });
+        self.handleWindowResize();
     },
     componentWillUnmount: function() {
         window.removeEventListener('resize', this.handleWindowResize);
         $(document).unbind("fullscreenchange.megaChat_" + this.props.chatRoom.roomJid)
     },
     componentDidUpdate: function() {
-        this.handleWindowResize();
-
         var self = this;
         var room = this.props.chatRoom;
         var callIsActive = room.callSession && room.callSession.isActive();
@@ -408,21 +552,60 @@ var ConversationPanel = React.createClass({
         }
         // <video/> display change to trigger re-render hack.
         $('.rmtVideo:visible').css('display', '');
+
+        self.handleWindowResize();
     },
     handleWindowResize: function(e, scrollToBottom) {
         var $container = $(this.getDOMNode());
         var self = this;
 
+        if(!self.props.chatRoom.isCurrentlyActive) {
+            return;
+        }
+
+        // typeArea resizing
+        var $conversationPanelContainer = self.$messages.parent();
+        var $textarea = $('.message-textarea', $conversationPanelContainer);
+        var textareaHeight =  $textarea.outerHeight();
+        var $hiddenDiv = $('.hiddendiv', $conversationPanelContainer);
+        var $pane = $('.fm-chat-input-scroll', $conversationPanelContainer);
+        var $jsp;
+
+        if (textareaHeight != $hiddenDiv.outerHeight()) {
+            $textarea.css('height', $hiddenDiv.outerHeight());
+
+            if ($('.fm-chat-input-block', $conversationPanelContainer).outerHeight() >= 200) {
+                $pane.jScrollPane({
+                    enableKeyboardNavigation:false,
+                    showArrows:true,
+                    arrowSize:5
+                });
+                $jsp = $pane.data('jsp');
+                $textarea.blur();
+                $textarea.focus();
+                $jsp.scrollByY(0);
+            }
+            else {
+                $jsp = $pane.data('jsp');
+                if ($jsp) {
+                    $jsp.destroy();
+                    $textarea.blur();
+                    $textarea.focus();
+                }
+            }
+        }
+
         // Important. Please insure we have correct height detection for Chat messages block. We need to check ".fm-chat-input-scroll" instead of ".fm-chat-line-block" height
-        var scrollBlockHeight = $('.fm-chat-block').outerHeight() - $('.fm-chat-line-block').outerHeight() - self.$header.outerHeight() + 2;
-
-        if (scrollBlockHeight != self.$messages.outerHeight())
-        {
-            self.$messages.height(scrollBlockHeight);
-
-            self.refreshUI(scrollToBottom);
+        var scrollBlockHeight = (
+            $('.fm-chat-block').outerHeight() -
+            $('.fm-chat-line-block', $conversationPanelContainer).outerHeight() -
+            self.$header.outerHeight() + 2
+        );
+        if (scrollBlockHeight != self.$messages.outerHeight()) {
+            self.$messages.css('height', scrollBlockHeight);
+            self.refreshUI(true);
         } else {
-            self.refreshUI();
+            self.refreshUI(scrollToBottom);
         }
 
         // try to do a .scrollToBottom only once, to trigger the stickToBottom func. of JSP
@@ -455,8 +638,8 @@ var ConversationPanel = React.createClass({
         var videoControlClasses = "video-controls";
 
         if (!room.isCurrentlyActive) {
-            headerClasses += " hidden";
-            messagesClasses += " hidden";
+            //headerClasses += " hidden";
+            //messagesClasses += " hidden";
             conversationPanelClasses += " hidden";
         }
 
@@ -550,6 +733,8 @@ var ConversationPanel = React.createClass({
         var currentUserResizerClasses = "current-user-resizer";
         var videoMinimiseButtonClasses = "video-minimize-button small-video-reziser";
         var sizeIconClasses = "video-call-button size-icon";
+        var emoticonsPopupClasses = "fm-chat-emotion-popup";
+        var emoticonsPopupButtonClasses = "fm-chat-emotions-icon";
 
         // setup ONLY if there is an active call session
         if(room.callSession && callIsActive) {
@@ -627,6 +812,18 @@ var ConversationPanel = React.createClass({
             myContainerClasses += " minimized";
         } else {
 
+        }
+
+        // typing area
+        var typedMessage = htmlentities(self.state.typedMessage).replace(/\n/g, '<br />');
+        typedMessage = typedMessage + '<br />';
+
+
+        if (self.state.emoticonsPopupIsActive === true) {
+            emoticonsPopupButtonClasses += " active";
+            emoticonsPopupClasses += " active";
+        } else {
+            emoticonsPopupClasses += " hidden";
         }
 
         return (
@@ -740,33 +937,41 @@ var ConversationPanel = React.createClass({
                 </div>
 
                 <div className="fm-chat-line-block">
-                    <div className="hiddendiv"></div>
+                    <div className="hiddendiv" dangerouslySetInnerHTML={{__html: typedMessage}}></div>
                     <div className="fm-chat-attach-file">
                         <div className="fm-chat-attach-arrow"></div>
                     </div>
 
-                    <div className="fm-chat-emotions-icon">
+                    <div className={emoticonsPopupButtonClasses} onClick={this.onEmoticonsButtonClick}>
                         <div className="fm-chat-emotion-arrow"></div>
                     </div>
-                    <div className="fm-chat-emotion-popup hidden">
+                    <div className={emoticonsPopupClasses}>
                         <div className="fm-chat-arrow"></div>
-                        <div className="fm-chat-smile smile" data-text=":)"></div>
-                        <div className="fm-chat-smile wink" data-text=";)"></div>
-                        <div className="fm-chat-smile tongue" data-text=":P"></div>
-                        <div className="fm-chat-smile grin" data-text=":D"></div>
-                        <div className="fm-chat-smile confuse" data-text=":|"></div>
-                        <div className="fm-chat-smile grasp" data-text=":O"></div>
-                        <div className="fm-chat-smile sad" data-text=":("></div>
-                        <div className="fm-chat-smile cry" data-text=";("></div>
-                        <div className="fm-chat-smile angry" data-text="(angry)"></div>
-                        <div className="fm-chat-smile mega" data-text="(mega)"></div>
+                        <div className="fm-chat-smile smile" data-text=":)" onClick={this.onEmoticonClicked}></div>
+                        <div className="fm-chat-smile wink" data-text=";)" onClick={this.onEmoticonClicked}></div>
+                        <div className="fm-chat-smile tongue" data-text=":P" onClick={this.onEmoticonClicked}></div>
+                        <div className="fm-chat-smile grin" data-text=":D" onClick={this.onEmoticonClicked}></div>
+                        <div className="fm-chat-smile confuse" data-text=":|" onClick={this.onEmoticonClicked}></div>
+                        <div className="fm-chat-smile grasp" data-text=":O" onClick={this.onEmoticonClicked}></div>
+                        <div className="fm-chat-smile sad" data-text=":(" onClick={this.onEmoticonClicked}></div>
+                        <div className="fm-chat-smile cry" data-text=";(" onClick={this.onEmoticonClicked}></div>
+                        <div className="fm-chat-smile angry" data-text="(angry)" onClick={this.onEmoticonClicked}></div>
+                        <div className="fm-chat-smile mega" data-text="(mega)" onClick={this.onEmoticonClicked}></div>
                         <div className="clear"></div>
                     </div>
 
                     <div className="nw-chat-message-icon"></div>
                     <div className="fm-chat-input-scroll">
                         <div className="fm-chat-input-block">
-                            <textarea className="message-textarea" placeholder="Write a message..."></textarea>
+                            <textarea
+                                className="message-textarea"
+                                placeholder="Write a message..."
+                                onKeyDown={self.onTypeAreaKeyDown}
+                                onBlur={self.onTypeAreaBlur}
+                                onChange={self.onTypeAreaChange}
+                                value={self.state.typedMessage}
+                                ref="typearea"
+                                ></textarea>
                         </div>
                     </div>
                     <div className="clear"></div>

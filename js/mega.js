@@ -1761,8 +1761,7 @@ function MegaData()
 
         var found = false;
 
-        Object.keys(self.u).forEach(function(k) {
-            var v = self.u[k];
+        self.u.forEach(function(v, k) {
             if (v.t == 1 && v.name && v.m == email) {
                 found = v;
                 return false; // break

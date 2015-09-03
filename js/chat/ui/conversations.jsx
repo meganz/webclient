@@ -93,7 +93,7 @@ var ConversationsList = React.createClass({
         var $jsp = $container.data('jsp');
 
         $container.height(
-            $container.parent().parent().parent().height() - $('.transfer-panel').outerHeight()
+            $(window).outerHeight() -  $('#topmenu').outerHeight()
         );
 
         if($jsp) {
@@ -445,7 +445,7 @@ var ConversationsApp = React.createClass({
         var $container = $(this.getDOMNode());
 
         $container.height(
-            $container.parent().height()
+            $(window).outerHeight() -  $('#topmenu').outerHeight()
         );
     },
     render: function() {

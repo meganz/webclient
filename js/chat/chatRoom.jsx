@@ -930,60 +930,6 @@ ChatRoom.prototype.appendMessage = function(message) {
     self.messagesIndex[message.messageId] = self.messages.push(
         message
     );
-
-    //var jid;
-    //var contact;
-    //if(message.getFromJid) {
-    //    jid = Karere.getNormalizedBareJid(message.getFromJid());
-    //    //var timestamp = message.getDelay() ? message.getDelay() : unixtime();
-    //
-    //    contact = self.megaChat.getContactFromJid(jid);
-    //} else {
-    //    contact = message.authorContact;
-    //}
-    //
-    //if (!contact) {
-    //    self.logger.error("Missing contact/jid: ", jid, contact);
-    //    return false;
-    //}
-    //
-
-
-    //// TODO: Move this to the render method.
-    //if (!message.messageHtml) {
-    //    message.messageHtml = htmlentities(message.getContents()).replace(/\n/gi, "<br/>");
-    //}
-    //
-    //var event = new $.Event("onReceiveMessage");
-    //self.megaChat.trigger(event, message);
-    //
-    //if (event.isPropagationStopped()) {
-    //    self.logger.warn("Event propagation stopped receiving (rendering) of message: ", message)
-    //    return false;
-    //}
-    //
-    //
-    //
-    //// TODO: Move this to the render method.
-    //if (message.messageHtml) {
-    //    message.messageHtml = message.messageHtml.replace(/\s{2}/gi, "&nbsp;");
-    //} else {
-    //    message.messageHtml = htmlentities(message.getContents()).replace(/\n/gi, "<br/>").replace(/\s/gi, "&nbsp;");
-    //}
-    //
-    //
-    //
-    //// TODO: Move this to the render method.
-    //var event = new $.Event("onBeforeRenderMessage");
-    //self.megaChat.trigger(event, {
-    //    message: message,
-    //    room: self
-    //});
-    //
-    //if (event.isPropagationStopped()) {
-    //    self.logger.warn("Event propagation stopped receiving (rendering) of message: ", message);
-    //    return false;
-    //}
 };
 
 

@@ -10,16 +10,13 @@ var ContactsListItem = React.createClass({
 
         var contact = this.props.contact;
 
-        var contactJid = this.props.megaChat.getJidFromNodeId(contact.u);
-        var id = 'whatever'; //'contact_' + htmlentities(contact.u);
-
         classString += " " + this.props.megaChat.xmppPresenceToCssClass(
             contact.presence
         );
 
         return (
             <div>
-                <div className={classString} id={id} onClick={this.props.onContactClicked}>
+                <div className={classString} onClick={this.props.onContactClicked}>
                     <div className="nw-contact-status"></div>
                     <div className="nw-conversations-unread">0</div>
                     <div className="nw-conversations-name">

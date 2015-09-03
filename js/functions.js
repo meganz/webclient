@@ -2224,6 +2224,7 @@ function moveCursortoToEnd(el) {
         range.collapse(false);
         range.select();
     }
+    $(el).focus();
 }
 
 String.prototype.replaceAll = function(_f, _r, _c) {

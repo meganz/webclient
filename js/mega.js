@@ -347,7 +347,9 @@ function MegaData()
     {
         if (!M.c.contacts)
             M.c.contacts = {};
-        M.c.contacts[u_handle] = 1;
+        if (u_handle) {
+            M.c.contacts[u_handle] = 1;
+        }
 
         for (var u in M.c['contacts'])
             if (!avatars[u])
@@ -1896,10 +1898,12 @@ function MegaData()
 
                     if (k) {
                         if (containsc) {
-                            $('#' + _li + folders[ii].h + ' .nw-fm-tree-item').addClass(containsc);
+                            $('#' + _li + folders[ii].h + ' .nw-fm-tree-item').addClass(containsc)
+                                .find('span').eq(0).addClass('nw-fm-arrow-icon');
                         }
                         else {
-                            $('#' + _li + folders[ii].h + ' .nw-fm-tree-item').removeClass('contains-folders');
+                            $('#' + _li + folders[ii].h + ' .nw-fm-tree-item').removeClass('contains-folders')
+                                .find('span').eq(0).removeClass('nw-fm-arrow-icon');
                         }
                     }
                     else {
@@ -3672,7 +3676,7 @@ function MegaData()
             return;
         }
 
-        // If regular download using Firefox and the total download is over 1GB then show the dialog 
+        // If regular download using Firefox and the total download is over 1GB then show the dialog
         // to use the extension, but not if they've seen the dialog before and ticked the checkbox
         if (dlMethod == MemoryIO && !localStorage.firefoxDialog && $.totalDL > 1048576000 && navigator.userAgent.indexOf('Firefox') > -1) {
             Later(firefoxDialog);

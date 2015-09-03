@@ -468,6 +468,9 @@ function browserdetails(useragent) {
     else if (useragent.indexOf('safari') > 0) {
         browser = 'Safari';
     }
+    else if (useragent.indexOf('palemoon') > 0) {
+        browser = 'Palemoon';
+    }
     else if (useragent.indexOf('firefox') > 0) {
         browser = 'Firefox';
     }

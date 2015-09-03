@@ -8911,23 +8911,21 @@ function propertiesDialog(close)
     fm_showoverlay();
     pd.removeClass('hidden multiple folders-only two-elements shared shared-with-me read-only read-and-write full-access');
     $('.properties-elements-counter span').text('');
-    $('.fm-dialog.properties-dialog .properties-body').unbind('click');
-    $('.fm-dialog.properties-dialog .properties-body').bind('click', function()
+    $('.fm-dialog.properties-dialog .properties-body').rebind('click', function()
     {
         // Clicking anywhere in the dialog will close the context-menu, if open
         var e = $('.fm-dialog.properties-dialog .file-settings-icon');
         if (e.hasClass('active'))
             e.click();
     });
-    $('.fm-dialog.properties-dialog .fm-dialog-close').unbind('click');
-    $('.fm-dialog.properties-dialog .fm-dialog-close').bind('click', function()
+    $('.fm-dialog.properties-dialog .fm-dialog-close').rebind('click', function()
     {
         propertiesDialog(1);
     });
-    var filecnt = 0, foldercnt = 0, size = 0, sfilecnt = 0, sfoldercnt = 0;
+    var filecnt = 0, foldercnt = 0, size = 0, sfilecnt = 0, sfoldercnt = 0, n;
     for (var i in $.selected)
     {
-        var n = M.d[$.selected[i]];
+        n = M.d[$.selected[i]];
         if (!n) {
             console.error('propertiesDialog: invalid node', $.selected[i]);
         }
@@ -8948,6 +8946,10 @@ function propertiesDialog(close)
             filecnt++
             size += n.s;
         }
+    }
+    if (!n) {
+        // $.selected had no valid nodes!
+        return propertiesDialog(1);
     }
 
     var star = ''

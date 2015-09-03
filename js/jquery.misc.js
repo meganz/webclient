@@ -91,28 +91,9 @@ $.fn.removeClassWith = function(pfx)
     return this;
 };
 
-/**
- * Shortcut to count object keys
- */
 $.len = function(obj) {
     return Object.keys(obj).length;
 };
-
-/**
- * Helper to trigger resize once within a second
- */
-$.tresizer = function tresizer() {
-    if ($.tresizer.last !== -1
-            && (Date.now() - $.tresizer.last) > 700) {
-
-        setTimeout(function tresizer() {
-            $.tresizer.last = Date.now();
-            $(window).trigger('resize');
-        }, 280);
-        $.tresizer.last = -1;
-    }
-};
-$.tresizer.last = 0;
 
 /*
 // @crodas -- http://stackoverflow.com/a/2200886/1608408

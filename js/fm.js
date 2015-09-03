@@ -1660,7 +1660,9 @@ function initAddDialogMultiInputPlugin() {
             tokenValue: 'id',
             propertyToSearch: 'id',
             resultsLimit: 5,
-            minChars: 2,
+            // Prevent showing of drop down list with contacts email addresses
+            // Max allowed email address 254 chars
+            minChars: 255,
             accountHolder: (M.u[u_handle] || {}).m || '',
             scrollLocation: 'add',
             // Exclude from dropdownlist only emails/names which exists in multi-input (tokens)

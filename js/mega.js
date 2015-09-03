@@ -4771,6 +4771,7 @@ function execsc(actionPackets, callback) {
                     // Fill DDL with removed contact
                     if (actionPacket.u) {
                         addToMultiInputDDL('.share-multiple-input', [{id: M.u[actionPacket.u].m, name: M.u[actionPacket.u].m}]);
+                        addToMultiInputDDL('.add-contact-multiple-input', [{id: M.u[actionPacket.u].m, name: M.u[actionPacket.u].m}]);
                     }
                 }
             }
@@ -5855,7 +5856,7 @@ function processPS(pendingShares, ignoreDB) {
                     if (M.opc && M.opc[ps.p]) {
                         // Update tokenInput plugin
                         addToMultiInputDDL('.share-multiple-input', [{id: M.opc[ps.p].m, name: M.opc[ps.p].m}]);
-//                        addToMultiInputDDL('.add-contact-multiple-input', {id: M.opc[ps.p].m, name: M.opc[ps.p].m});
+                        addToMultiInputDDL('.add-contact-multiple-input', {id: M.opc[ps.p].m, name: M.opc[ps.p].m});
                     }
                 } else {
 

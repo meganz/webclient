@@ -1772,6 +1772,11 @@ function getsc(fm, initialNotify) {
                         loadfm_done();
                     }
 
+                    // After the first SC request all subsequent requests can generate notifications
+                    notify.initialLoadComplete = true;
+
+                    // If this was called from the initial fm load via gettree or db load, we should request the
+                    // latest notifications. These must be done after the first getSC call.
                     if (ctx.fm || ctx.initialNotify) {
                         notify.getInitialNotifications();
                     }

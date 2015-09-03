@@ -725,8 +725,8 @@ describe("authring unit test", function() {
                 sandbox.stub(window, 'u_pubEd25519', null);
                 sandbox.stub(window, 'pubEd25519', {});
                 sandbox.stub(ns, '_checkEd25519PubKey');
-                sandbox.stub(nacl.sign.keyPair, 'fromSecretKey').returns({ publicKey: ED25519_PUB_KEY_ARRAY,
-                                                                           secretKey: ED25519_PRIV_KEY_ARRAY });
+                sandbox.stub(nacl.sign.keyPair, 'fromSeed').returns({ publicKey: ED25519_PUB_KEY_ARRAY,
+                                                                      secretKey: ED25519_PRIV_KEY_ARRAY });
                 var getAttributePromise = { then: sinon.stub().returns('foo') };
                 sandbox.stub(window, 'getUserAttribute').returns(getAttributePromise);
                 var collectivePromise = ns.initAuthenticationSystem();
@@ -736,7 +736,7 @@ describe("authring unit test", function() {
                 var getCallback = getAttributePromise.then.args[0][0];
                 var getCallbackResult = getCallback({ prEd255: ED25519_PRIV_KEY });
                 assert.strictEqual(getCallbackResult, true);
-                assert.strictEqual(nacl.sign.keyPair.fromSecretKey.callCount, 1);
+                assert.strictEqual(nacl.sign.keyPair.fromSeed.callCount, 1);
                 assert.strictEqual(ns._checkEd25519PubKey.callCount, 1);
                 assert.deepEqual(u_keyring, { prEd255: ED25519_PRIV_KEY });
                 assert.deepEqual(u_attr.keyring, { prEd255: ED25519_PRIV_KEY });

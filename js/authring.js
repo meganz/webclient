@@ -574,7 +574,8 @@ var authring = (function () {
                 u_keyring = result;
                 u_attr.keyring = u_keyring;
                 u_privEd25519 = u_keyring.prEd255;
-                u_pubEd25519 = asmCrypto.bytes_to_string(nacl.sign.keyPair.fromSecretKey(asmCrypto.string_to_bytes(u_privEd25519)).publicKey);
+                u_pubEd25519 = asmCrypto.bytes_to_string(nacl.sign.keyPair.fromSeed(
+                    asmCrypto.string_to_bytes(u_privEd25519)).publicKey);
                 u_attr.puEd255 = u_pubEd25519;
                 crypt.setPubEd25519(u_pubEd25519);
                 // Run on the side a sanity check on the stored pub key.

@@ -753,8 +753,6 @@ var Chat = function() {
 
     self.filePicker = null; // initialized on a later stage when the DOM is fully available.
 
-    //logAllCallsOnObject(jodid25519.eddsa, console.error, true, 'jodid25519.eddsa');
-
     return this;
 };
 

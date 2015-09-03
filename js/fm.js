@@ -6250,7 +6250,7 @@ function treeUI()
      * Let's shoot two birds with a stone, when nodes are moved we need a resize
      * to let dynlist refresh - plus, we'll implicitly invoke initTreeScroll.
      */
-    $(window).trigger('resize');
+    $.tresizer();
 
     if (d) {
         console.timeEnd('treeUI');

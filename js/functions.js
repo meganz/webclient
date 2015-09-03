@@ -209,6 +209,8 @@ function translate(html) {
                 l[match] = String(l[localeNum]).replace(/"/g, '&quot;');
                 l[match] = l[match].replace(/'/g, "\\'");
             }
+
+            return l[match];
         }
         return String(l[localeNum]);
     };
@@ -361,7 +363,7 @@ function divscroll(el) {
 
 function removeHash() {
     var scrollV, scrollH, loc = window.location;
-    
+
     // Prevent scrolling by storing the page's current scroll offset
     scrollV = document.body.scrollTop;
     scrollH = document.body.scrollLeft;
@@ -3446,11 +3448,11 @@ if (typeof sjcl !== 'undefined') {
      * Nodes related operations
      *
      * @param opts {Object}
-     * 
+     *
      * @constructor
      */
     var Nodes = function(opts) {
-        
+
         var self = this;
         var defaultOptions = {
         };
@@ -3459,17 +3461,17 @@ if (typeof sjcl !== 'undefined') {
 
     /**
      * isShareExists
-     * 
+     *
      * checking if there's available shares for selected nodes
-     * 
+     *
      * @param {array} nodes, holds array of ids from selected folders/files (nodes)
-     * 
+     *
      * @returns {boolean}
      */
     Nodes.prototype.isShareExist = function(nodes) {
 
         var self = this;
-        
+
         for (var i in nodes) {
             if (nodes.hasOwnProperty(i)) {
                 if (M.d[nodes[i]].shares && Object.keys(M.d[nodes[i]].shares).length) {
@@ -3486,18 +3488,18 @@ if (typeof sjcl !== 'undefined') {
 
     /**
      * loopSubdirs
-     * 
+     *
      * Loops through all subdirs of given node
-     * 
+     *
      * @param {string} id: node id
      * @param {array} nodesId
-     * 
+     *
      * @returns child nodes id
      */
     Nodes.prototype.loopSubdirs = function(id, nodesId) {
 
         var self = this;
-        
+
         var subDirs = nodesId;
 
         if (subDirs) {

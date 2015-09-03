@@ -102,7 +102,8 @@ $.len = function(obj) {
  * Helper to trigger resize once within a second
  */
 $.tresizer = function tresizer() {
-    if ($.tresizer.last !== -1) {
+    if ($.tresizer.last !== -1
+            && (Date.now() - $.tresizer.last) > 700) {
 
         setTimeout(function tresizer() {
             $.tresizer.last = Date.now();

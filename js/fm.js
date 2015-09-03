@@ -9759,9 +9759,7 @@ function fm_resize_handler() {
             initContactsBlocksScrolling();
         }
         else {
-            if ($.contactGridHeader) {
-                $.contactGridHeader();
-            }
+            $.contactGridHeader();
             initContactsGridScrolling();
         }
     }
@@ -9771,9 +9769,7 @@ function fm_resize_handler() {
         }
         else {
             initGridScrolling();
-            if ($.sharedGridHeader) {
-                $.sharedGridHeader();
-            }
+            $.sharedGridHeader();
         }
     }
     else if (M.currentdirid === 'transfers') {
@@ -9785,10 +9781,8 @@ function fm_resize_handler() {
         }
         else {
             initGridScrolling();
-            if ($.gridHeader) {
-                $.gridHeader();
-                $.detailsGridHeader();
-            }
+            $.gridHeader();
+            $.detailsGridHeader();
         }
     }
 

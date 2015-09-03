@@ -23,12 +23,13 @@ function anyOf(arr, value) {
 /**
  * excludeIntersected
  * 
- * Loop through arrays excluding intersected items
+ * Loop through arrays excluding intersected items form array2
+ * and prepare result format for tokenInput plugin item format
  * 
  * @param {Array} array1
  * @param {Array} array2
  * 
- * @returns {array}
+ * @returns {Array of JSON_Objects} {id, name} 
  */
 function excludeIntersected(array1, array2) {
 
@@ -48,7 +49,6 @@ function excludeIntersected(array1, array2) {
             for (var k in array2) {
                 if (array2.hasOwnProperty(k)) {
                     if (array1[i] === array2[k]) {
-//                        tmpObj1.splice(i, 1);
                         tmpObj2.splice(k, 1);
                         break;
                     }
@@ -57,9 +57,14 @@ function excludeIntersected(array1, array2) {
         }
     }
     
-//    result = $.merge(tmpObj1, tmpObj2);
+    // Prepare for tokenInput plugin item format
+    for (var n in tmpObj2) {
+        if (tmpObj2.hasOwnProperty(n)) {
+            result.push({id: tmpObj2[n], name: tmpObj2[n]});
+        }
+    }
     
-    return tmpObj2;
+    return result;
 }
 
 /**

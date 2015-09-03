@@ -2200,8 +2200,7 @@ function fmremove() {
                             removeShare(sharenode, 1);
                         }
                     }
-                    $('.add-contact-multiple-input').tokenInput("removeContact", {id: M.u[$.selected[i]].m});
-                    $('.share-multiple-input').tokenInput("removeContact", {id: M.u[$.selected[i]].m});
+                    
                     M.delNode($.selected[i]);
                     api_req({a: 'ur2', u: $.selected[i], l: '0', i: requesti});
                     M.handleEmptyContactGrid();
@@ -7256,7 +7255,8 @@ function generateShareDialogRow(displayNameOrEmail, email, shareRights, userHand
     // Add contact
     $.sharedTokens.push(email);
     
-    $('.share-multiple-input').tokenInput("removeContact", {id: email});
+    // Update token.input plugin
+    removeFromMultiInputDDL('.share-multiple-input', {id: email, name: email});
 
     rowId = (userHandle) ? userHandle : email;
     html = addShareDialogContactToContent('', rowId, av, displayNameOrEmail, perm[0], perm[1]);
@@ -7320,7 +7320,7 @@ function updateDialogDDL(dialog) {
     }
     
     contacts = excludeIntersected($.sharedTokens, allEmails);
-    $(dialog).tokenInput("addToDDL", contacts);
+    addToMultiInputDDL(dialog, contacts);
 
     return true;
 }
@@ -10375,7 +10375,7 @@ function FMResizablePane(element, opts) {
 
         $element.resizable(resizable_opts);
 
-        $element.data('fmresizable', this)
+        $element.data('fmresizable', this);
     }
     return this;
 }
@@ -10524,3 +10524,35 @@ var cancelSubscriptionDialog = {
         });
     }
 };
+
+/**
+ * addToMultiInputDDL
+ * 
+ * add item from token.input plugin drop down list
+ * 
+ * @param {String} dialog
+ * @param {array of JSON_Objects} item {id, name}
+ * 
+ */
+function addToMultiInputDDL(dialog, item) {
+    
+    if (dialog) {
+        $(dialog).tokenInput("addToDDL", item);
+    }
+}
+
+/**
+ * removeFromMultiInputDDL
+ * 
+ * remove item from token.input plugin drop down list
+ * 
+ * @param {String} dialog
+ * @param {Array of JSON_Object} item {id, name}
+ * 
+ */
+function removeFromMultiInputDDL(dialog, item) {
+    
+    if (dialog) {
+        $(dialog).tokenInput("removeFromDDL", item);
+    }
+}

@@ -234,12 +234,14 @@
         },
         
         // Removes contact from dropdownlist, don't interfere with UI elements
-        removeContact: function(item) {
+        removeFromDDL: function(item) {
             
-            var $settings = $(this).data("settings");
+            var $settings = {},
+                ld;
             
-            if ($settings && $settings.local_data) {
-                var ld = $settings.local_data;
+            if ($(this).data("settings")) {
+                $settings = $(this).data("settings");
+                ld = $settings.local_data;
                 for (var n in ld) {
                     if (ld[n][$(this).data("settings").tokenValue] === item[$(this).data("settings").tokenValue]) {
                         $(this).data("settings").local_data.splice(n, 1);
@@ -250,7 +252,9 @@
             
             return false;
         },
-        addToDDL: function(item) {
+        
+        // Add contacts to drop down list, doesn't interfere with UI elements
+        addToDDL: function(items) {
 
             var localData = [],
                 found = false;
@@ -259,12 +263,12 @@
                 
                 localData = $(this).data("settings").local_data;
 
-                for (var i in item) {
-                    if (item.hasOwnProperty(i)) {
+                for (var i in items) {
+                    if (items.hasOwnProperty(i)) {
                         found = false;
                         for (var n in localData) {
                             if (localData.hasOwnProperty(n)) {
-                                if (localData[n][$(this).data("settings").tokenValue] === item[i]) {
+                                if (localData[n][$(this).data("settings").tokenValue] === items[i][$(this).data("settings").tokenValue]) {
                                     found = true;
                                     break;
                                 }
@@ -272,7 +276,7 @@
                         }
 
                         if (!found) {
-                            $(this).data("settings").local_data.push({id: item[i], name: item[i]});
+                            $(this).data("settings").local_data.push({id: items[i][$(this).data("settings").tokenValue], name: items[i][$(this).data("settings").tokenValue]});
                         }
                     }
                 }

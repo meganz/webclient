@@ -4757,6 +4757,20 @@ function execsc(actionPackets, callback) {
                 }
             }
 
+            // Full share
+            else if (actionPacket.a === 's') {
+                
+                // Used during share dialog removal of contact from share list
+                // Find out is this a full share delete
+                if (actionPacket.r === undefined) {
+                    
+                    // Fill DDL with removed contact
+                    if (actionPacket.u) {
+                        addToMultiInputDDL('.share-multiple-input', [{id: M.u[actionPacket.u].m, name: M.u[actionPacket.u].m}]);
+                    }
+                }
+            }
+            
             // Outgoing pending contact
             else if (actionPacket.a === 'opc') {
                 processOPC([actionPacket]);
@@ -4805,7 +4819,7 @@ function execsc(actionPackets, callback) {
                     }
                 }
             }
-        }
+        }// END own action packet
         else if (actionPacket.a === 'e') {
             var str = hex2bin(actionPacket.c || "");
             if (str.substr(0, 5) === ".cms.") {
@@ -5740,25 +5754,15 @@ function processIPC(ipc, ignoreDB) {
                     $('.fm-empty-contacts').removeClass('hidden');
                 }
                 
-                // Update tokenInput plugin
-                if ($('.add-contact-multiple-input')) {
-                    $('.add-contact-multiple-input').tokenInput("removeContact", {id: ipc[i].m});
-                }
-                if ($('.share-multiple-input')) {
-                    $('.share-multiple-input').tokenInput("removeContact", {id: ipc[i].m});
-                }
+                // Update token.input plugin
+                removeFromMultiInputDDL('.share-multiple-input', {id: ipc[i].m, name: ipc[i].m});
+                removeFromMultiInputDDL('.add-contact-multiple-input', {id: ipc[i].m, name: ipc[i].m});
             }
             else {
                 
-                // Update tokenInput plugin
-                if ($('.add-contact-multiple-input')) {
-//                    $('.add-contact-multiple-input').tokenInput("addToDDL", {id: ipc[i].m, name: ipc[i].m});
-                    $('.add-contact-multiple-input').tokenInput("addToDDL", ipc[i].m);
-                }
-                if ($('.share-multiple-input')) {
-//                    $('.share-multiple-input').tokenInput("addToDDL", {id: ipc[i].m, name: ipc[i].m});
-                    $('.share-multiple-input').tokenInput("addToDDL", ipc[i].m);
-                }
+                // Update token.input plugin
+                addToMultiInputDDL('.share-multiple-input', [{id: ipc[i].m, name: ipc[i].m}]);
+                addToMultiInputDDL('.add-contact-multiple-input', [{id: ipc[i].m, name: ipc[i].m}]);
             }            
         }
     }
@@ -5780,12 +5784,8 @@ function processOPC(opc, ignoreDB) {
             M.delOPC(opc[i].p);
 
             // Update tokenInput plugin
-            if ($('.add-contact-multiple-input')) {
-                $('.add-contact-multiple-input').tokenInput("removeContact", {id: opc[i].m});
-            }
-            if ($('.share-multiple-input')) {
-                $('.share-multiple-input').tokenInput("removeContact", {id: opc[i].m});
-            }
+            removeFromMultiInputDDL('.share-multiple-input', {id: opc[i].m, name: opc[i].m});
+            removeFromMultiInputDDL('.add-contact-multiple-input', {id: opc[i].m, name: opc[i].m});
         }
         else {
             // Search through M.opc to find duplicated e-mail with .dts
@@ -5805,14 +5805,8 @@ function processOPC(opc, ignoreDB) {
             }
             
             // Update tokenInput plugin
-            if ($('.add-contact-multiple-input')) {
-//                $('.add-contact-multiple-input').tokenInput("add", {id: opc[i].m, name: opc[i].m});
-                $('.add-contact-multiple-input').tokenInput("addToDDL", opc[i].m);
-            }
-            if ($('.share-multiple-input')) {
-//                $('.share-multiple-input').tokenInput("add", {id: opc[i].m, name: opc[i].m});
-                $('.share-multiple-input').tokenInput("addToDDL", opc[i].m);
-            }
+            addToMultiInputDDL('.share-multiple-input', [{id: opc[i].m, name: opc[i].m}]);
+            addToMultiInputDDL('.add-contact-multiple-input', [{id: opc[i].m, name: opc[i].m}]);
         }
     }
 }
@@ -5852,6 +5846,12 @@ function processPS(pendingShares, ignoreDB) {
 
                     if (ps.op) {
                         M.nodeShare(nodeHandle, ps);
+                    }
+                    
+                    if (M.opc && M.opc[ps.p]) {
+                        // Update tokenInput plugin
+                        addToMultiInputDDL('.share-multiple-input', [{id: M.opc[ps.p].m, name: M.opc[ps.p].m}]);
+//                        addToMultiInputDDL('.add-contact-multiple-input', {id: M.opc[ps.p].m, name: M.opc[ps.p].m});
                     }
                 } else {
 
@@ -5895,7 +5895,7 @@ function processUPCO(ap) {
     DEBUG('processUPCO');
     var psid = '';// pending id
     for (var i in ap) {
-        if (ap.hawOwnProperty(i)) {
+        if (ap.hasOwnProperty(i)) {
             if (ap[i].s) {
                 psid = ap[i].p;
                 delete M.opc[psid];
@@ -5909,13 +5909,9 @@ function processUPCO(ap) {
                     }
                 }
 
-                // Update token.input plugin
-                if ($('.add-contact-multiple-input')) {
-                    $('.add-contact-multiple-input').tokenInput("removeContact", {id: ap[i].m});
-                }
-                if ($('.share-multiple-input')) {
-                    $('.share-multiple-input').tokenInput("removeContact", {id: ap[i].m});
-                }
+                // Update tokenInput plugin
+                removeFromMultiInputDDL('.share-multiple-input', {id: ap[i].m, name: ap[i].m});
+                removeFromMultiInputDDL('.add-contact-multiple-input', {id: ap[i].m, name: ap[i].m});
                 $('#opc_' + psid).remove();
                 if ((Object.keys(M.opc).length === 0) && (M.currentdirid === 'opc')) {
                     $('.sent-requests-grid').addClass('hidden');
@@ -5938,26 +5934,17 @@ function process_u(u) {
                 M.addNode(u[i]);
 
                 // Update token.input plugin
-                if ($('.add-contact-multiple-input')) {
-//                    $('.add-contact-multiple-input').tokenInput("add", {id: u[i].m, name: u[i].m});
-                    $('.add-contact-multiple-input').tokenInput("addToDDL", u[i].m);
-                }
-                if ($('.share-multiple-input')) {
-//                    $('.share-multiple-input').tokenInput("add", {id: u[i].m, name: u[i].m});
-                    $('.share-multiple-input').tokenInput("addToDDL", u[i].m);
-                }
+                addToMultiInputDDL('.share-multiple-input', [{id: u[i].m, name: u[i].m}]);
+                addToMultiInputDDL('.add-contact-multiple-input', [{id: u[i].m, name: u[i].m}]);
             }
             else if (M.d[u[i].u]) {
                 M.delNode(u[i].u);
 
                 // Update token.input plugin
-                if ($('.add-contact-multiple-input')) {
-                    $('.add-contact-multiple-input').tokenInput("removeContact", {id: u[i].m});
-                }
-                if ($('.share-multiple-input')) {
-                    $('.share-multiple-input').tokenInput("removeContact", {id: u[i].m});
-                }
+                removeFromMultiInputDDL('.share-multiple-input', {id: u[i].m, name: u[i].m});
+                removeFromMultiInputDDL('.add-contact-multiple-input', {id: u[i].m, name: u[i].m});
             }
+            
             M.addUser(u[i]);
         }
     }

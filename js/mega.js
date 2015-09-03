@@ -907,6 +907,7 @@ function MegaData()
                         rightsclass = ' full-access';
                     }
 
+                    var contactName = M.d[u_h] ? htmlentities(M.d[u_h].name) : "N/a";
                     if (M.viewmode === 1) {
                         t = '.shared-blocks-scrolling';
                         avatar = useravatar.contact(u_h, 'nw-contact-avatar', 'span');
@@ -919,11 +920,10 @@ function MegaData()
                                  + avatar
                             + '<span class="shared-folder-info-block"><span class="shared-folder-name">'
                             + htmlentities(M.v[i].name) + '</span><span class="shared-folder-info">by '
-                            + htmlentities(M.d[u_h].name) + '</span></span></a>';
+                            + contactName + '</span></span></a>';
                     } else {
                         t = '.shared-grid-view .grid-table.shared-with-me';
                         el = 'tr';
-                        var contactName = M.d[u_h] ? htmlentities(M.d[u_h].name) : "N/a";
                         avatar = useravatar.contact(u_h, 'nw-contact-avatar');
 
                         html = '<tr id="' + htmlentities(M.v[i].h) + '"><td width="30"><span class="grid-status-icon ' + htmlentities(star)

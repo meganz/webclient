@@ -475,7 +475,7 @@ function MegaData()
 
         $('.files-grid-view.fm.shared-folder-content').addClass('hidden');
 
-        $.tresizer();
+        $(window).trigger('resize');
     };
     Object.defineProperty(this, 'fsViewSel', {
         value: '.files-grid-view.fm .grid-scrolling-table, .fm-blocks-view.fm .file-block-scrolling',
@@ -1064,7 +1064,7 @@ function MegaData()
         $(lSel).unbind('jsp-scroll-y.dynlist');
         $(window).unbind("resize.dynlist");
         sharedfolderUI();// ToDo: Check do we really need this here
-        $.tresizer();
+        $(window).trigger('resize');
 
         hideEmptyGrids();
 
@@ -1475,7 +1475,7 @@ function MegaData()
 
         if (this.chat) {
             sharedfolderUI(); // remove shares-specific UI
-            $.tresizer();
+            $(window).trigger('resize');
         }
         else if (id === undefined && folderlink) {
             // Error reading shared folder link! (Eg, server gave a -11 (EACCESS) error)
@@ -2958,7 +2958,9 @@ function MegaData()
         renderNew();
         this.rubbishIco();
         processmove(j);
-        $.tresizer();
+        Soon(function() {
+            $(window).trigger('resize');
+        });
     };
 
     this.accountData = function(cb, blockui)
@@ -3978,14 +3980,14 @@ function MegaData()
                     delete M.tfsdomqueue[i];
                 }
 
-                /*if (M._tfsDynlistR)
+                if (M._tfsDynlistR)
                     clearTimeout(M._tfsDynlistR);
                 M._tfsDynlistR = setTimeout(function()
                 {
                     delete M._tfsDynlistR;
                     Soon(transferPanelUI);
                     Soon(fm_tfsupdate);
-                }, 350);*/
+                }, 350);
                 $(window).trigger('resize');
             }
         }
@@ -4304,10 +4306,10 @@ function MegaData()
             $.transferprogress['ulc'] += $.transferprogress['ul_'+ id][1];
             delete $.transferprogress['ul_'+ id];
         }
-        // $.transferHeader();
+        $.transferHeader();
         Soon(function() {
             mega.utils.resetUploadDownload();
-            $.tresizer();
+            $(window).trigger('resize');
         });
     }
 
@@ -4659,7 +4661,7 @@ function renderNew() {
         M.sort();
         M.renderMain(true);
         M.renderPath();
-        $.tresizer();
+        $(window).trigger('resize');
     }
 
     if (UItree) {

@@ -4163,11 +4163,12 @@ function u_initAuthentication2(res, ctx) {
         u_keyring = res;
     }
     else {
-        u_privEd25519 = jodid25519.eddsa.generateKeySeed();
+        var keyPair = nacl.sign.keyPair();
+        u_privEd25519 = asmCrypto.bytes_to_string(keyPair.secretKey.subarray(0, 32));
         u_keyring = {
             prEd255: u_privEd25519
         };
-        u_pubEd25519 = jodid25519.eddsa.publicKey(u_privEd25519);
+        u_pubEd25519 = asmCrypto.bytes_to_string(keyPair.publicKey);
         // Keyring is a private attribute here, so no preprocessing required
         // (will be wrapped in a TLV store).
         setUserAttribute('keyring', u_keyring, false, false);
@@ -4175,7 +4176,9 @@ function u_initAuthentication2(res, ctx) {
     }
     u_attr.keyring = u_keyring;
     u_privEd25519 = u_keyring.prEd255;
-    u_pubEd25519 = u_pubEd25519 || jodid25519.eddsa.publicKey(u_privEd25519);
+    u_pubEd25519 = u_pubEd25519
+                 || asmCrypto.bytes_to_string(nacl.sign.keyPair.fromSeed(
+                                                  asmCrypto.string_to_bytes(u_privEd25519)).publicKey);
     u_attr.puEd255 = u_pubEd25519;
     crypt.setPubEd25519(u_pubEd25519);
 

@@ -198,16 +198,16 @@ function translate(html) {
 
             if (namespace === 'dq') {
                 // Replace double quotes to their html entities
-                l[match] = String(l[localeNum]).replace('"', '&quot;', 'g');
+                l[match] = String(l[localeNum]).replace(/"/g, '&quot;');
             }
             else if (namespace === 'q') {
                 // Escape single quotes
-                l[match] = String(l[localeNum]).replace("'", "\\'", 'g');
+                l[match] = String(l[localeNum]).replace(/'/g, "\\'");
             }
             else if (namespace === 'dqq') {
                 // Both of the above
-                l[match] = String(l[localeNum]).replace('"', '&quot;', 'g');
-                l[match] = l[match].replace("'", "\\'", 'g');
+                l[match] = String(l[localeNum]).replace(/"/g, '&quot;');
+                l[match] = l[match].replace(/'/g, "\\'");
             }
         }
         return String(l[localeNum]);
@@ -777,7 +777,7 @@ function makeid(len) {
 }
 
 function checkMail(email) {
-    email = email.replace('+', '', 'g');
+    email = email.replace(/\+/g, '');
     var filter = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
     if (filter.test(email)) {
         return false;

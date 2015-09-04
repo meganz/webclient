@@ -6030,8 +6030,8 @@ function loadfm_callback(res, ctx) {
             crypto_procsr(res.sr);
         }
 
-        // Pass true to indicate this is an fm load and that we want to fetch initial notifications afterwards
-        getsc(true);
+        // We want to fetch initial notifications afterwards, if this is not a logged out user on the public folder page.
+        getsc(false, !pfkey);
 
         if (hasMissingKeys) {
             srvlog('Got missing keys processing gettree...', null, true);

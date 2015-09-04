@@ -4,6 +4,7 @@
  */
 
 var u_authring = { 'Ed25519': undefined,
+                   'Cu25519': undefined,
                    'RSA': undefined };
 
 var authring = (function () {
@@ -17,7 +18,7 @@ var authring = (function () {
      * A container (key ring) that keeps information of the authentication state
      * for all authenticated contacts. Each record is indicated by the contact's
      * userhandle as an attribute. The associated value is an object containing
-     * the authenticated `fingerprint` of the Ed25519 public key, the authentication
+     * the authenticated `fingerprint` of the public key, the authentication
      * `method` (e. g. `authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON`)
      * and the key `confidence` (e. g. `authring.KEY_CONFIDENCE.UNSURE`).</p>
      *
@@ -67,6 +68,7 @@ var authring = (function () {
 
     // User property names used for different key types.
     ns._properties = { 'Ed25519': 'authring',
+                       'Cu25519': 'authCu255',
                        'RSA': 'authRSA' };
 
     /**
@@ -178,7 +180,8 @@ var authring = (function () {
      * Loads the ring for all authenticated contacts into `u_authring`.
      *
      * @param keyType {string}
-     *     Type of key for authentication records. Values are 'Ed25519' or 'RSA'.
+     *     Type of key for authentication records. Values are 'Ed25519',
+     *     'Cu25519'  or 'RSA'.
      * @return {MegaPromise}
      *     A promise that is resolved when the original asynch code is settled.
      * @throws
@@ -255,7 +258,8 @@ var authring = (function () {
      * Saves the ring for all authenticated contacts from `u_authring`.
      *
      * @param keyType {string}
-     *     Type of key for authentication records. Values are 'Ed25519' or 'RSA'.
+     *     Type of key for authentication records. Values are 'Ed25519',
+     *     'Cu25519' or 'RSA'.
      * @return {MegaPromise}
      *     A promise that is resolved when the original asynch code is settled.
      * @throws
@@ -279,7 +283,8 @@ var authring = (function () {
      * @param userhandle {string}
      *     Mega user handle.
      * @param keyType {string}
-     *     Type of key for authentication records. Values are 'Ed25519' or 'RSA'.
+     *     Type of key for authentication records. Values are 'Ed25519',
+     *     'Cu25519' or 'RSA'.
      * @return {object}
      *     An object describing the authenticated `fingerprint`, the
      *     authentication `method` and the key `confidence`. `false` in case
@@ -347,7 +352,8 @@ var authring = (function () {
      * @param key {string}
      *     Byte string of key.
      * @param keyType {string}
-     *     Type of key for authentication records. Values are 'Ed25519' or 'RSA'.
+     *     Type of key for authentication records. Values are 'Ed25519',
+     *     'Cu25519' or 'RSA'.
      * @param format {string}
      *     Format in which to return the fingerprint. Valid values: "string"
      *     and "hex" (default: "hex").
@@ -364,10 +370,11 @@ var authring = (function () {
         format = format || 'hex';
         keyType = keyType || 'Ed25519';
         var value = key;
-        if (keyType === 'Ed25519') {
+        if (keyType === 'Ed25519' || keyType === 'Cu25519') {
             if (key.length !== 32) {
-                logger.error('Unexpected Ed25519 key length: ' + key.length);
-                throw new Error('Unexpected Ed25519 key length.');
+                logger.error('Unexpected key length for type ' + keyType
+                             + ': ' + key.length);
+                throw new Error('Unexpected  key length.');
             }
         }
         else if (keyType === 'RSA') {
@@ -392,7 +399,8 @@ var authring = (function () {
      *     Array format of public key. Index 0 is the modulo, index 1 is the
      *     exponent, both in byte string format.
      * @param keyType {string}
-     *     Type of key for authentication records. Values are 'Ed25519' or 'RSA'.
+     *     Type of key for authentication records. Values are 'Ed25519',
+     *     'Cu25519' or 'RSA'.
      * @return {string}
      *     EdDSA signature of the key as a byte string.
      * @throws
@@ -425,7 +433,8 @@ var authring = (function () {
      *     Array format of public key. Index 0 is the modulo, index 1 is the
      *     exponent, both in byte string format.
      * @param keyType {string}
-     *     Type of key for authentication records. Values are 'Ed25519' or 'RSA'.
+     *     Type of key for authentication records. Values are 'Ed25519',
+     *     'Cu25519' or 'RSA'.
      * @param signPubKey {string}
      *     Contact's Ed25519 public key to verify the signature.
      * @return {bool}
@@ -540,6 +549,8 @@ var authring = (function () {
     ns.scrubAuthRing = function() {
         u_authring.Ed25519 = {};
         ns.setContacts('Ed25519');
+        u_authring.Cu25519 = {};
+        ns.setContacts('Cu25519');
         u_authring.RSA = {};
         ns.setContacts('RSA');
     };
@@ -551,9 +562,11 @@ var authring = (function () {
      */
     ns.resetFingerprintsForUser = function(userHandle) {
         delete u_authring.Ed25519[userHandle];
+        delete u_authring.Cu25519[userHandle];
         delete u_authring.RSA[userHandle];
 
         ns.setContacts('Ed25519');
+        ns.setContacts('Cu25519');
         ns.setContacts('RSA');
     };
 
@@ -573,13 +586,15 @@ var authring = (function () {
                 // Set local values.
                 u_keyring = result;
                 u_attr.keyring = u_keyring;
+
+                // Ed25519 signing/authentication key.
                 u_privEd25519 = u_keyring.prEd255;
                 u_pubEd25519 = asmCrypto.bytes_to_string(nacl.sign.keyPair.fromSeed(
                     asmCrypto.string_to_bytes(u_privEd25519)).publicKey);
                 u_attr.puEd255 = u_pubEd25519;
-                crypt.setPubEd25519(u_pubEd25519);
                 // Run on the side a sanity check on the stored pub key.
                 ns._checkEd25519PubKey();
+                crypt.setPubKey(u_pubEd25519, 'Ed25519');
 
                 return true;
             },
@@ -592,8 +607,7 @@ var authring = (function () {
                     return ns.setUpAuthenticationSystem();
                 }
                 else {
-                    var message = 'Error retrieving Ed25519 authentication ring: '
-                                + result;
+                    var message = 'Error retrieving key ring: ' + result;
                     logger.error(message);
                     // Let's pass a rejection upstream.
                     var rejectedPromise = new MegaPromise();
@@ -605,10 +619,12 @@ var authring = (function () {
         );
 
         // Load contacts' tracked authentication fingerprints.
-        var authringPromise = authring.getContacts('Ed25519');
+        var authEd25519Promise = authring.getContacts('Ed25519');
+        var authCu25519Promise = authring.getContacts('Cu25519');
         var authRsaPromise = authring.getContacts('RSA');
 
-        return MegaPromise.all([keyringPromise, authringPromise, authRsaPromise]);
+        return MegaPromise.all([keyringPromise, authEd25519Promise,
+                                authCu25519Promise, authRsaPromise]);
     };
 
 
@@ -672,15 +688,16 @@ var authring = (function () {
 
     /**
      * Sets up the authentication system by generating an Ed25519 key pair,
-     * signing the RSA public key and creating authentication rings.
-     * Current Ed25519 key pair and RSA pub key signature will be replaced.
+     * signing the Curve25519 and RSA public keys and creating authentication
+     * rings. Current Ed25519 key pair and all pub key signatures will be
+     * replaced.
      *
      * @return {MegaPromise}
      *     A promise that is resolved when the original asynch code is settled.
      */
     ns.setUpAuthenticationSystem = function() {
         logger.debug('Setting up authentication system'
-                     + ' (Ed25519 keys, RSA pub key signature).');
+                     + ' (Ed25519 keys, RSA/Curve25519 pub key signatures).');
         // Make a new key pair.
         var keyPair = nacl.sign.keyPair();
         u_privEd25519 = asmCrypto.bytes_to_string(keyPair.secretKey.subarray(0, 32));
@@ -701,20 +718,28 @@ var authring = (function () {
         // Set local values and make the authrings.
         u_attr.keyring = u_keyring;
         u_attr.puEd255 = u_pubEd25519;
-        crypt.setPubEd25519(u_pubEd25519);
-        u_authring = { Ed25519: {}, RSA: {}};
+        crypt.setPubKey(u_pubEd25519, 'Ed25519');
+        u_authring = { Ed25519: {}, Cu25519: {}, RSA: {} };
         var edAuthringPromise = ns.setContacts('Ed25519');
+        var cuAuthringPromise = ns.setContacts('Cu25519');
         var rsaAuthringPromise = ns.setContacts('RSA');
+
+        // Ensure a Cu25519 pub key signature.
+        var sigPubCu25519 = authring.signKey(u_pubCu25519, 'Cu25519');
+        var cuSigKeyPromise = setUserAttribute('sigCu255',
+                                               base64urlencode(sigPubCu25519), true,
+                                               false);
 
         // Ensure an RSA pub key signature.
         var sigPubk = authring.signKey(crypto_decodepubkey(base64urldecode(u_attr.pubk)),
-                                       'RSA');
+                                   'RSA');
         var rsaSigKeyPromise = setUserAttribute('sigPubk',
                                                 base64urlencode(sigPubk), true,
                                                 false);
 
-        return MegaPromise.all([pubkeyPromise, keyringPromise, rsaSigKeyPromise,
-                                edAuthringPromise, rsaAuthringPromise]);
+        return MegaPromise.all([pubkeyPromise, keyringPromise,
+                                cuSigKeyPromise, rsaSigKeyPromise,
+                                edAuthringPromise, cuAuthringPromise, rsaAuthringPromise]);
     };
 
 

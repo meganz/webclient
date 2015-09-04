@@ -10,6 +10,15 @@ var u_pubEd25519;
 /** Cache for contacts' public Ed25519 keys. */
 var pubEd25519 = {};
 
+/** Own private Curve25519 key. */
+var u_privCu25519;
+
+/** Own public Curve25519 key. */
+var u_pubCu25519;
+
+/** Cache for contacts' public Curve25519 keys. */
+var pubCu25519 = {};
+
 var crypt = (function () {
     "use strict";
 
@@ -488,12 +497,21 @@ var crypt = (function () {
      *
      * @param pubKey {string}
      *     Ed25519 public key in byte string form.
+     * @param keyType {string}
+     *     Key type to set. Allowed values: 'Ed25519', 'Cu25519'.
      */
-    ns.setPubEd25519 = function(pubKey) {
-        logger.debug('crypt.setPubEd25519', u_handle, pubKey);
-        pubEd25519[u_handle] = pubKey;
-        Soon(function __setPubEd25519() {
-            mBroadcaster.sendMessage('pubEd25519');
+    ns.setPubKey = function(pubKey, keyType) {
+        var keyCacheMapping = {
+            Ed25519: pubEd25519,
+            Cu25519: pubCu25519
+        };
+        if (typeof keyCacheMapping[keyType] === 'unknown') {
+            throw('Illegal key type to set: ' + keyType);
+        }
+        logger.debug('Setting ' + keyType + ' public key', u_handle, pubKey);
+        keyCacheMapping[keyType][u_handle] = pubKey;
+        Soon(function __setPubKey() {
+            mBroadcaster.sendMessage(keyType);
         });
     };
 
@@ -4145,6 +4163,7 @@ function u_initAuthentication() {
 
     // Load contacts' tracked authentication fingerprints.
     authring.getContacts('Ed25519');
+    authring.getContacts('Cu25519');
     authring.getContacts('RSA');
 
     // Load/initialise the authenticated contacts ring.
@@ -4154,16 +4173,17 @@ function u_initAuthentication() {
 }
 
 /**
- * Provide Ed25519 key pair and a signed RSA pub key.
+ * Provide Ed25519 key pair and a signed pub keys.
  */
 function u_initAuthentication2(res, ctx) {
+    var keyPair = null;
     if (typeof res !== 'number') {
         // Keyring is a private attribute, so it's been wrapped by a TLV store,
         // no further processing here.
         u_keyring = res;
     }
     else {
-        var keyPair = nacl.sign.keyPair();
+        keyPair = nacl.sign.keyPair();
         u_privEd25519 = asmCrypto.bytes_to_string(keyPair.secretKey.subarray(0, 32));
         u_keyring = {
             prEd255: u_privEd25519
@@ -4180,21 +4200,60 @@ function u_initAuthentication2(res, ctx) {
                  || asmCrypto.bytes_to_string(nacl.sign.keyPair.fromSeed(
                                                   asmCrypto.string_to_bytes(u_privEd25519)).publicKey);
     u_attr.puEd255 = u_pubEd25519;
-    crypt.setPubEd25519(u_pubEd25519);
+    crypt.setPubKey(u_pubEd25519, 'Ed25519');
 
-    getUserAttribute(u_handle, "puEd255", true, false, function (res) {
+    // Check for availability/consistency of public Ed25519 key.
+    getUserAttribute(u_handle, "puEd255", true, false, function __puEd255Success(res) {
         if (res !== base64urlencode(u_pubEd25519)) {
             setUserAttribute('puEd255', base64urlencode(u_pubEd25519), true, false);
         }
     });
 
+    // Check for Curve25519 private key.
+    if (typeof u_keyring.prCu255 !== 'undefined') {
+        u_privCu25519 = u_keyring.prCu255;
+        u_pubCu25519 = asmCrypto.bytes_to_string(
+            nacl.scalarMult.base(asmCrypto.string_to_bytes(u_privCu25519)));
+        u_attr.prCu255 = u_privCu25519;
+        u_attr.puCu255 = u_pubCu25519;
+
+        // Check for availability of the public Curve25519 key.
+        var __puCu255Callback = function(res) {
+            if (res !== base64urlencode(u_pubCu25519)) {
+                setUserAttribute('puCu255', base64urlencode(u_pubCu25519), true, false);
+            }
+        };
+        getUserAttribute(u_handle, 'puCu255', true, false, __puCu255Callback);
+
+        // Ensure a Curve25519 pub key signature.
+        var __sigCu255Callback = function(res) {
+            if (typeof res === 'number') {
+                var sigPubCu25519 = authring.signKey(u_pubCu25519, 'Cu25519');
+                setUserAttribute('sigCu255', base64urlencode(sigPubCu25519), true, false);
+            }
+        };
+        getUserAttribute(u_handle, 'sigCu255', true, false, __sigCu255Callback);
+    }
+    else {
+        keyPair = nacl.box.keyPair();
+        u_privCu25519 = asmCrypto.bytes_to_string(keyPair.secretKey);
+        u_pubCu25519 = asmCrypto.bytes_to_string(keyPair.publicKey);
+        u_keyring.prCu255 = u_privCu25519;
+        u_attr.prCu255 = u_privCu25519;
+        u_attr.puCu255 = u_pubCu25519;
+        var sigPubCu25519 = authring.signKey(u_pubCu25519, 'Cu25519');
+        setUserAttribute('keyring', u_keyring, false, false);
+        setUserAttribute('puCu255', base64urlencode(u_pubCu25519), true, false);
+        setUserAttribute('sigCu255', base64urlencode(sigPubCu25519), true, false);
+    }
+
     // Ensure an RSA pub key signature.
-    var storeSigPubkCallback = function (res, ctx) {
+    var __storeSigPubkCallback = function (res, ctx) {
         if (typeof res === 'number') {
             // No signed RSA pub key, store it.
             var sigPubk = authring.signKey(crypto_decodepubkey(base64urldecode(u_attr.pubk)), 'RSA');
             setUserAttribute('sigPubk', base64urlencode(sigPubk), true, false);
         }
     };
-    getUserAttribute(u_handle, 'sigPubk', true, false, storeSigPubkCallback);
+    getUserAttribute(u_handle, 'sigPubk', true, false, __storeSigPubkCallback);
 }

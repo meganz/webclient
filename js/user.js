@@ -143,7 +143,7 @@ function u_checklogin3a(res, ctx) {
             r = 0;      // Ephemeral account
         }
         else if (!u_attr.c) {
-            r = 1;      // Haven't confimed email yet
+            r = 1;      // Haven't confirmed email yet
         }
         else if (!u_attr.privk) {
             r = 2;      // Don't have a private key yet (maybe they quit before key generation completed)
@@ -175,6 +175,7 @@ function u_logout(logout) {
         a[i].removeItem('privk');
         a[i].removeItem('keyring');
         a[i].removeItem('puEd255');
+        a[i].removeItem('puCu255');
         a[i].removeItem('randseed');
     }
 

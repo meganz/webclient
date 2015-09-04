@@ -325,6 +325,19 @@ function treesearchUI()
             $(this).parent('.nw-fm-tree-header').removeClass('focused-input');
       });
     }
+    
+    
+    var type = treePanelType();
+    var sortTreePanel = ($.sortTreePanel || {})[type];
+    if (d && !sortTreePanel) {
+        console.error('No sortTreePanel', type);
+    }
+
+    var $o = $('.sorting-menu-item')
+        .removeClass('active');
+    if (sortTreePanel) {
+        $o.filter('*[data-by=' + sortTreePanel.by + '],*[data-dir=' + sortTreePanel.dir + ']').addClass('active');
+    }
 
     $('.nw-tree-panel-arrows').unbind('click');
     $('.nw-tree-panel-arrows').bind('click', function()
@@ -332,8 +345,7 @@ function treesearchUI()
         if ($(this).attr('class').indexOf('active') == -1)
         {
             $(this).addClass('active');
-            var menu = $('.nw-sorting-menu').removeClass('hidden')
-                , type = treePanelType()
+            var menu = $('.nw-sorting-menu').removeClass('hidden');
 
             // hide everything
             menu.find('.sorting-item-divider,.sort-by .sorting-menu-item').addClass('hidden');
@@ -350,16 +362,6 @@ function treesearchUI()
                 case 'rubbish-bin':
                     menu.find('.sorting-item-divider,*[data-by=fav],*[data-by=created],*[data-by=name]').removeClass('hidden');
                     break;
-            }
-            var sortTreePanel = $.sortTreePanel[type];
-            if (d && !sortTreePanel) {
-                console.error('No sortTreePanel', type);
-            }
-
-            var $o = $('.sorting-menu-item')
-                .removeClass('active');
-            if (sortTreePanel) {
-                $o.filter('*[data-by=' + sortTreePanel.by + '],*[data-dir=' + sortTreePanel.dir + ']').addClass('active');
             }
             return false;
         }

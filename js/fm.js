@@ -4714,7 +4714,10 @@ var SelectionManager = function($selectable) {
                 ".files-grid-view.contacts-view",
                 ".contacts-grid-view",
                 ".fm-contacts-blocks-view",
-                ".files-grid-view.contact-details-view"
+                ".files-grid-view.contact-details-view",
+                ".shared-grid-view",
+                ".shared-blocks-view",
+                ".shared-details-block"
             ].join(",")
             ).filter(":visible");
 

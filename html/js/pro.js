@@ -167,9 +167,6 @@ function init_pro()
 // Step2
 function pro_next_step() {
 
-    // Add history so the back button works to go back to choosing their plan
-    history.pushState('', 'MEGA - Choose plan', '#propay');
-
     // Preload loading/transferring/processing animation
     proPage.preloadAnimation();
 
@@ -572,9 +569,6 @@ var proPage = {
             var $selectedPlanHeader = $('.membership-step2 .main-italic-header.pro');
             var selectedPlanText = $selectedPlanHeader.html().replace('%1', proPlanName);
             $selectedPlanHeader.html(selectedPlanText);
-                        
-            // Add history so the back button goes back to #pro page
-            history.pushState('', 'MEGA - Choose plan', '#pro');
             
             // Continue to step 2
             pro_next_step();

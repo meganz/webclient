@@ -2,14 +2,16 @@ var IMAGE_PLACEHOLDER = staticpath + "/images/img_loader@2x.png";
 
 (function(window, asmCrypto) {
 
-var pubkey = ab_to_str(asmCrypto.base64_to_bytes('gVbVNtVJf210qJLe+GxWX8w9mC+WPnTPiUDjBCv9tr4='))
+var signPubKey = ab_to_str(asmCrypto.base64_to_bytes('gVbVNtVJf210qJLe+GxWX8w9mC+WPnTPiUDjBCv9tr4='))
 
 function verify_cms_content(content, signature) {
     var hash = asmCrypto.SHA256.hex(content);
     signature = ab_to_str(signature);
 
     try {
-        return jodid25519.eddsa.verify(signature, hash, pubkey);
+        return nacl.sign.detached.verify(asmCrypto.string_to_bytes(hash),
+                                         asmCrypto.string_to_bytes(signature),
+                                         asmCrypto.string_to_bytes(signPubKey))
     } catch (e) {
         /* rubbish data, invalid anyways */
         return false;
@@ -76,7 +78,7 @@ var is_img;
 
 /**
  *  Steps
- *  
+ *
  *  Call many things in parallel, buffer the results
  *  and give it back once everything is ready
  *
@@ -90,7 +92,7 @@ function steps(times, next) {
     var done = 0;
     function step_done(i, err, arg) {
         responses[0]   = responses[0] || err;
-        responses[i+1] = arg; 
+        responses[i+1] = arg;
         if (++done === times) {
             next.apply(null, responses);
         }
@@ -251,7 +253,7 @@ var CMS = {
             html = html.replace(new RegExp('([\'"])(i:(' + id + '))([\'"])', 'g'), img_placeholder);
             // replace download links
             html = html.replace(new RegExp('([\'"])(d:(' + id + '))([\'"])', 'g'), dl_placeholder);
-        
+
             if (is_img) {
                 this.get(id);
             }
@@ -277,7 +279,7 @@ CMS.on('corporate', function()
         $('.new-right-content-block').addClass('hidden');
         $('.new-right-content-block.' + ctype).removeClass('hidden');
         $('.new-left-menu-link').removeClass('active');
-        $('#' + ctype).addClass('active');            
+        $('#' + ctype).addClass('active');
         mainScroll();
     } else {
         $('.new-left-menu-link:first').trigger('click');

@@ -1754,9 +1754,10 @@ function stopsc() {
 }
 
 // calls execsc() with server-client requests received
-function getsc(fm) {
+function getsc(fm, initialNotify) {
     api_req('sn=' + maxaction + '&ssl=1&e=' + cmsNotifHandler, {
         fm: fm,
+        initialNotify: initialNotify,
         callback: function __onGetSC(res, ctx) {
             if (typeof res === 'object') {
                 function getSCDone(sma) {
@@ -1766,10 +1767,17 @@ function getsc(fm) {
                             && typeof mDB !== 'undefined') {
                         localStorage[u_handle + '_maxaction'] = maxaction;
                     }
-
                     if (ctx.fm) {
                         // mDBloaded = true;
                         loadfm_done();
+                    }
+
+                    // After the first SC request all subsequent requests can generate notifications
+                    notify.initialLoadComplete = true;
+
+                    // If this was called from the initial fm load via gettree or db load, we should request the
+                    // latest notifications. These must be done after the first getSC call.
+                    if (ctx.fm || ctx.initialNotify) {
                         notify.getInitialNotifications();
                     }
                 }
@@ -4019,7 +4027,7 @@ function api_strerror(errno) {
             throw new Error('Invalid upload entry for fingerprint');
         }
         if (window.d) {
-            console.log('Generating fingerprint for ' + uq_entry.name);
+            ulmanager.logger.info('Generating fingerprint for ' + uq_entry.name);
         }
 
         var size = uq_entry.size;
@@ -4108,6 +4116,10 @@ function api_strerror(errno) {
                         tmp.push(i2s(crc));
                         return step(++i);
                     }
+                    if (typeof uq_entry[sfn] !== 'function') {
+                        ulmanager.logger.error('"' + sfn + '" is not callable...');
+                        return callback(0xBADF);
+                    }
                     onTimeout();
 
                     var offset = parseInt((size - BLOCK_SIZE) * (i * blocks + j) / (4 * blocks - 1));
@@ -4159,11 +4171,12 @@ function u_initAuthentication2(res, ctx) {
         u_keyring = res;
     }
     else {
-        u_privEd25519 = jodid25519.eddsa.generateKeySeed();
+        var keyPair = nacl.sign.keyPair();
+        u_privEd25519 = asmCrypto.bytes_to_string(keyPair.secretKey.subarray(0, 32));
         u_keyring = {
             prEd255: u_privEd25519
         };
-        u_pubEd25519 = jodid25519.eddsa.publicKey(u_privEd25519);
+        u_pubEd25519 = asmCrypto.bytes_to_string(keyPair.publicKey);
         // Keyring is a private attribute here, so no preprocessing required
         // (will be wrapped in a TLV store).
         setUserAttribute('keyring', u_keyring, false, false);
@@ -4171,7 +4184,9 @@ function u_initAuthentication2(res, ctx) {
     }
     u_attr.keyring = u_keyring;
     u_privEd25519 = u_keyring.prEd255;
-    u_pubEd25519 = u_pubEd25519 || jodid25519.eddsa.publicKey(u_privEd25519);
+    u_pubEd25519 = u_pubEd25519
+                 || asmCrypto.bytes_to_string(nacl.sign.keyPair.fromSeed(
+                                                  asmCrypto.string_to_bytes(u_privEd25519)).publicKey);
     u_attr.puEd255 = u_pubEd25519;
     crypt.setPubEd25519(u_pubEd25519);
 

@@ -366,7 +366,9 @@ function MegaData()
     {
         if (!M.c.contacts)
             M.c.contacts = {};
-        M.c.contacts[u_handle] = 1;
+        if (u_handle) {
+            M.c.contacts[u_handle] = 1;
+        }
 
         for (var u in M.c['contacts'])
             if (!avatars[u])
@@ -924,6 +926,7 @@ function MegaData()
                         rightsclass = ' full-access';
                     }
 
+                    var contactName = M.d[u_h] ? htmlentities(M.d[u_h].name) : "N/a";
                     if (M.viewmode === 1) {
                         t = '.shared-blocks-scrolling';
                         avatar = useravatar.contact(u_h, 'nw-contact-avatar', 'span');
@@ -936,11 +939,10 @@ function MegaData()
                                  + avatar
                             + '<span class="shared-folder-info-block"><span class="shared-folder-name">'
                             + htmlentities(M.v[i].name) + '</span><span class="shared-folder-info">by '
-                            + htmlentities(M.d[u_h].name) + '</span></span></a>';
+                            + contactName + '</span></span></a>';
                     } else {
                         t = '.shared-grid-view .grid-table.shared-with-me';
                         el = 'tr';
-                        var contactName = M.d[u_h] ? htmlentities(M.d[u_h].name) : "N/a";
                         avatar = useravatar.contact(u_h, 'nw-contact-avatar');
 
                         html = '<tr id="' + htmlentities(M.v[i].h) + '"><td width="30"><span class="grid-status-icon ' + htmlentities(star)
@@ -1911,10 +1913,12 @@ function MegaData()
 
                     if (k) {
                         if (containsc) {
-                            $('#' + _li + folders[ii].h + ' .nw-fm-tree-item').addClass(containsc);
+                            $('#' + _li + folders[ii].h + ' .nw-fm-tree-item').addClass(containsc)
+                                .find('span').eq(0).addClass('nw-fm-arrow-icon');
                         }
                         else {
-                            $('#' + _li + folders[ii].h + ' .nw-fm-tree-item').removeClass('contains-folders');
+                            $('#' + _li + folders[ii].h + ' .nw-fm-tree-item').removeClass('contains-folders')
+                                .find('span').eq(0).removeClass('nw-fm-arrow-icon');
                         }
                     }
                     else {
@@ -3547,6 +3551,7 @@ function MegaData()
     {
         delete $.dlhash;
         var path;
+        var added = 0;
         var nodes = [];
         var paths = {};
         var zipsize = 0;
@@ -3616,6 +3621,7 @@ function MegaData()
             pauseTxt = ' (' + l[1651] + ')';
         }
 
+        var ttl = this.getTransferTableLengths();
         for (var k in nodes) {
             /* jshint -W089 */
             if (!nodes.hasOwnProperty(k) || !(n = M.d[nodes[k]])) {
@@ -3624,61 +3630,89 @@ function MegaData()
             }
             path = paths[nodes[k]] || '';
             $.totalDL += n.s;
-            var li = $('.transfer-table #' + 'dl_'+htmlentities(n.h));
-            if (!li.length) {
-                dl_queue.push({
-                    id: n.h,
-                    key: n.key,
-                    n: n.name,
-                    t: n.ts,
-                    p: path,
-                    size: n.s,
-                    onDownloadProgress: this.dlprogress,
-                    onDownloadComplete: this.dlcomplete,
-                    onBeforeDownloadComplete: this.dlbeforecomplete,
-                    onDownloadError: this.dlerror,
-                    onDownloadStart: this.dlstart,
-                    zipid: z,
-                    zipname: zipname,
-                    preview: preview
-                });
-                zipsize += n.s;
-
-                var flashhtml = '';
-                if (dlMethod == FlashIO) {
-                    flashhtml = '<object width="1" height="1" id="dlswf_' + htmlentities(n.h) + '" type="application/x-shockwave-flash"><param name=FlashVars value="buttonclick=1" /><param name="movie" value="' + document.location.origin + '/downloader.swf"/><param value="always" name="allowscriptaccess"><param name="wmode" value="transparent"><param value="all" name="allowNetworking"></object>';
+            var tr = $('.transfer-table #dl_' + htmlentities(n.h));
+            if (tr.length) {
+                if (!tr.hasClass('completed')) {
+                    continue;
                 }
+                tr.remove();
+            }
+            dl_queue.push({
+                id: n.h,
+                key: n.key,
+                n: n.name,
+                t: n.ts,
+                p: path,
+                size: n.s,
+                onDownloadProgress: this.dlprogress,
+                onDownloadComplete: this.dlcomplete,
+                onBeforeDownloadComplete: this.dlbeforecomplete,
+                onDownloadError: this.dlerror,
+                onDownloadStart: this.dlstart,
+                zipid: z,
+                zipname: zipname,
+                preview: preview
+            });
+            added++;
+            zipsize += n.s;
 
-                if (!z) {
-                    this.addToTransferTable('<tr id="dl_' + htmlentities(n.h) + '">'
-                        + '<td><span class="transfer-type download ' + p + '">' + l[373] + '<span class="speed">' + pauseTxt + '</span></span>' + flashhtml + '</td>'
-                        + '<td><span class="transfer-filtype-icon ' + fileIcon(n) + '"></span><span class="tranfer-filetype-txt">' + htmlentities(n.name) + '</span></td>'
-                        + '<td></td>'
-                        + '<td>' + bytesToSize(n.s) + '</td>'
-                        + '<td>' + filetype(n.name) + '</td>'
-                        + '<td><span class="transfer-status queued">Queued</span></td>'
-                        + '<td class="grid-url-field"><a class="grid-url-arrow"><span></span></a><a class="clear-transfer-icon"><span></span></a></td>'
-                        + '<td><span class="row-number"></span></td>'
-                        + '</tr>');
+            var flashhtml = '';
+            if (dlMethod === FlashIO) {
+                flashhtml = '<object width="1" height="1" id="dlswf_'
+                    + htmlentities(n.h)
+                    + '" type="application/x-shockwave-flash">'
+                    + '<param name=FlashVars value="buttonclick=1" />'
+                    + '<param name="movie" value="' + location.origin + '/downloader.swf"/>'
+                    + '<param value="always" name="allowscriptaccess"/>'
+                    + '<param name="wmode" value="transparent"/>'
+                    + '<param value="all" name="allowNetworking">'
+                    + '</object>';
+            }
 
-                    if (uldl_hold) {
-                        fm_tfspause('dl_' + n.h);
-                    }
+            if (!z) {
+                this.addToTransferTable('dl_' + n.h, ttl,
+                    '<tr id="dl_' + htmlentities(n.h) + '">'
+                    + '<td><span class="transfer-type download ' + p + '">' + l[373]
+                    + '<span class="speed">' + pauseTxt + '</span></span>' + flashhtml + '</td>'
+                    + '<td><span class="transfer-filtype-icon ' + fileIcon(n)
+                    + '"></span><span class="tranfer-filetype-txt">' + htmlentities(n.name) + '</span></td>'
+                    + '<td></td>'
+                    + '<td>' + bytesToSize(n.s) + '</td>'
+                    + '<td>' + filetype(n.name) + '</td>'
+                    + '<td><span class="transfer-status queued">Queued</span></td>'
+                    + '<td class="grid-url-field"><a class="grid-url-arrow"><span></span></a>'
+                    + '<a class="clear-transfer-icon"><span></span></a></td>'
+                    + '<td><span class="row-number"></span></td>'
+                    + '</tr>');
+
+                if (uldl_hold) {
+                    fm_tfspause('dl_' + n.h);
                 }
+                ttl.left--;
             }
         }
 
-        if (dlMethod == MemoryIO && ~ua.indexOf(') gecko') && !localStorage.firefoxDialog && $.totalDL > 104857600) {
+        if (!added) {
+            if (d) {
+                dlmanager.logger.warn('Nothing to download.');
+            }
+            return;
+        }
+
+        // If regular download using Firefox and the total download is over 1GB then show the dialog
+        // to use the extension, but not if they've seen the dialog before and ticked the checkbox
+        if (dlMethod == MemoryIO && !localStorage.firefoxDialog && $.totalDL > 1048576000 && navigator.userAgent.indexOf('Firefox') > -1) {
             Later(firefoxDialog);
         }
 
         var flashhtml = '';
-        if (dlMethod == FlashIO) {
+        if (dlMethod === FlashIO) {
             flashhtml = '<object width="1" height="1" id="dlswf_zip_' + htmlentities(z) + '" type="application/x-shockwave-flash"><param name=FlashVars value="buttonclick=1" /><param name="movie" value="' + document.location.origin + '/downloader.swf"/><param value="always" name="allowscriptaccess"><param name="wmode" value="transparent"><param value="all" name="allowNetworking"></object>';
         }
 
         if (z && zipsize) {
-            this.addToTransferTable('<tr id="zip_' + z + '">'
+            this.addToTransferTable('zip_' + z, ttl,
+                '<tr id="zip_' + z + '">'
                 + '<td><span class="transfer-type download' + p + '">' + l[373] + '<span class="speed">' + pauseTxt + '</span></span>' + flashhtml + '</td>'
                 + '<td><span class="transfer-filtype-icon ' + fileIcon({name: 'archive.zip'}) + '"></span><span class="tranfer-filetype-txt">' + htmlentities(zipname) + '</span></td>'
                 + '<td></td>'
@@ -3704,13 +3738,14 @@ function MegaData()
         if (!preview)
         {
             if (!z || zipsize) {
-                showTransferToast('d', z ? 1 : nodes.length);
+                showTransferToast('d', z ? 1 : added);
             }
             openTransferpanel();
             initGridScrolling();
             initFileblocksScrolling();
             initTreeScroll();
             setupTransferAnalysis();
+            Soon(fm_tfsupdate);
             if ((dlmanager.isDownloading = Boolean(dl_queue.length))) {
                 $('.transfer-pause-icon').removeClass('disabled');
                 $('.transfer-clear-completed').removeClass('disabled');
@@ -3823,6 +3858,7 @@ function MegaData()
             id = 'zip_' + z;
         else
             id = 'dl_' + id;
+        $('.transfer-table #' + id).addClass('completed');
         $('.transfer-table #' + id + ' td:eq(5)').html('<span class="transfer-status completed">' + l[1418] + '</span>');
         $('.transfer-table #' + id + ' td:eq(2)').text('');
         $('.transfer-table #' + id + ' td:eq(0) span.transfer-type').addClass('done').html(l[1495]);
@@ -4037,12 +4073,11 @@ function MegaData()
             Soon(fm_tfsupdate);
         }
     }
-    this.addToTransferTable = function(elem)
+    this.addToTransferTable = function(gid, ttl, elem)
     {
-        var T = this.getTransferTableLengths();
-        var gid = String(elem.match(/id="([^"]+)"/).pop());
+        var T = ttl || this.getTransferTableLengths();
 
-        if (d) {
+        if (d > 1) {
             var logger = (gid[0] === 'u' ? ulmanager : dlmanager).logger;
             logger.info('Adding Transfer', gid, JSON.stringify(T));
         }
@@ -4055,7 +4090,7 @@ function MegaData()
 
         if (T.left > 0)
         {
-            addToTransferTable(gid, elem);
+            addToTransferTable(gid, elem, true);
             // In some cases UI is not yet initialized, nor transferHeader()
             $('.transfer-table-header').show(0);
         }
@@ -4096,10 +4131,13 @@ function MegaData()
         }*/
         var target;
         var onChat;
+        var filesize;
+        var added = 0;
         var f;
         var ul_id;
-        var pause;
+        var pause = "";
         var pauseTxt = '';
+        var ttl = this.getTransferTableLengths();
 
         if ($.onDroppedTreeFolder) {
             target = $.onDroppedTreeFolder;
@@ -4128,6 +4166,14 @@ function MegaData()
 
         for (var i in u) {
             f = u[i];
+            try {
+                // this could throw NS_ERROR_FILE_NOT_FOUND
+                filesize = f.size;
+            }
+            catch (ex) {
+                ulmanager.logger.warn(f.name, ex);
+                continue;
+            }
             ul_id = ++__ul_id;
             if (!f.flashid) {
                 f.flashid = false;
@@ -4135,18 +4181,21 @@ function MegaData()
             f.target = target;
             f.id = ul_id;
 
-            this.addToTransferTable(
-                '<tr id="ul_' + ul_id + '">'
+            var gid = 'ul_' + ul_id;
+            this.addToTransferTable(gid, ttl,
+                '<tr id="' + gid + '">'
                 + '<td><span class="transfer-type upload ' + pause + '">' + l[372] + '<span class="speed">' + pauseTxt + '</span></span></td>'
                 + '<td><span class="transfer-filtype-icon ' + fileIcon({name: f.name}) + '"></span><span class="tranfer-filetype-txt">' + htmlentities(f.name) + '</span></td>'
                 + '<td></td>'
-                + '<td>' + bytesToSize(f.size) + '</td>'
+                + '<td>' + bytesToSize(filesize) + '</td>'
                 + '<td>' + filetype(f.name) + '</td>'
                 + '<td><span class="transfer-status queued">Queued</span></td>'
                 + '<td class="grid-url-field"><a class="grid-url-arrow"><span></span></a><a class="clear-transfer-icon"><span></span></a></td>'
                 + '<td><span class="row-number"></span></td>'
                 + '</tr>');
             ul_queue.push(f);
+            ttl.left--;
+            added++;
 
             if (uldl_hold) {
                 fm_tfspause('ul_' + ul_id);
@@ -4156,6 +4205,10 @@ function MegaData()
                 $.ulBunch[M.currentdirid][ul_id] = 1;
             }
         }
+        if (!added) {
+            ulmanager.logger.warn('Nothing added to upload.');
+            return;
+        }
         if (!$.transferHeader) {
             transferPanelUI();
         }
@@ -4164,9 +4217,10 @@ function MegaData()
             uldl_hold = true;
         }
         else {
-            showTransferToast('u', u.length);
+            showTransferToast('u', added);
             $.transferHeader();
             openTransferpanel();
+            Soon(fm_tfsupdate);
         }
 
         setupTransferAnalysis();
@@ -4268,6 +4322,7 @@ function MegaData()
             $('#uploadpopbtn').text(l[726]);
             $('#mobileupload_header').text(l[1418]);
         }
+        $('.transfer-table #ul_' + id).addClass('completed');
         $('.transfer-table #ul_' + id + ' td:eq(5)').html('<span class="transfer-status completed">' + l[1418] + '</span>');
         $('.transfer-table #ul_' + id + ' td:eq(2)').text('');
         $('.transfer-table #ul_' + id + ' td:eq(0) span.transfer-type').addClass('done').html(l[1501]);
@@ -5921,6 +5976,27 @@ function init_chat() {
         if (u_type && !megaChatIsReady) {
             if (d) console.log('Initializing the chat...');
             try {
+                // Prevent known Strophe exceptions...
+                if (!Strophe.Websocket.prototype._unsafeOnIdle) {
+                    Strophe.Websocket.prototype._unsafeOnIdle = Strophe.Websocket.prototype._onIdle;
+                    Strophe.Websocket.prototype._onIdle = function() {
+                        try {
+                            this._unsafeOnIdle.apply(this, arguments);
+                        }
+                        catch (ex) {
+                            if (d) {
+                                console.error(ex);
+                            }
+                        }
+                    };
+                }
+            }
+            catch (ex) {
+                if (d) {
+                    console.error(ex);
+                }
+            }
+            try {
                 window.megaChat = new Chat();
                 window.megaChat.init();
 
@@ -6015,8 +6091,8 @@ function loadfm_callback(res, ctx) {
             crypto_procsr(res.sr);
         }
 
-        // Pass true to indicate this is an fm load and that we want to fetch initial notifications afterwards
-        getsc(true);
+        // We want to fetch initial notifications afterwards, if this is not a logged out user on the public folder page.
+        getsc(false, !pfkey);
 
         if (hasMissingKeys) {
             srvlog('Got missing keys processing gettree...', null, true);

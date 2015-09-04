@@ -1247,7 +1247,7 @@ makeMetaAware(Karere);
 
 
         if (message.tagName.toLowerCase() === "message") {
-            self.logger.warn(self.getNickname(), "Message: ", _type);
+            // self.logger.warn(self.getNickname(), "Message: ", _type);
 
             var elems = message.getElementsByTagName('body');
 
@@ -1639,13 +1639,17 @@ makeMetaAware(Karere);
         else {
             eventDataObject = eventData;
             if ($.isPlainObject(eventDataObject)) {
-                self.logger.warn(
+/*          this warning is generated for every stanza handled by rtcSession, so
+            disable it to avoid flooding the log with warnings
+
+                  self.logger.warn(
                     "Karere will not handle incoming message type of type: ",
                     stanzaType,
                     ", with eventData:",
                     eventData,
                     ", so it should be handled by directly using Strophe.js's API."
                 );
+*/
             }
 
             // throw new Error("Don't know how to convert event of type: " + stanzaType + " to EventObject");

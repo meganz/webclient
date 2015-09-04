@@ -21,6 +21,7 @@ var dlmanager = {
     dlMaxChunkSize: 16 * 1048576,
     isDownloading: false,
     dlZipID: 0,
+    gotHSTS: false,
     logger: MegaLogger.getLogger('dlmanager'),
 
     newUrl: function DM_newUrl(dl, callback) {
@@ -65,7 +66,7 @@ var dlmanager = {
     },
 
     uChangePort: function DM_uChangePort(url, port) {
-        if (String(url).substr(0,5) === 'http:') {
+        if (!this.gotHSTS && String(url).substr(0,5) === 'http:') {
             var uri = document.createElement('a');
             uri.href = url;
 
@@ -78,6 +79,21 @@ var dlmanager = {
         }
 
         return url;
+    },
+
+    checkHSTS: function(xhr) {
+        if (!use_ssl && !this.gotHSTS) {
+            try {
+                if (String(xhr.responseURL).substr(0, 6) === 'https:') {
+                    this.gotHSTS = true;
+                }
+            }
+            catch (ex) {
+                if (d) {
+                    this.logger.error(ex);
+                }
+            }
+        }
     },
 
     cleanupUI: function DM_cleanupUI(gid) {
@@ -957,34 +973,39 @@ function fm_tfsupdate() {
     var u = 0;
 
     // Move completed transfers to the bottom
-    $('.transfer-table td .transfer-status.completed')
-        .closest('tr').remove()
+    var $completed = $('.transfer-table tr.completed');
+    var completedLen = $completed.length;
+    $completed.remove()
         .insertBefore($('.transfer-table tr.clone-of-header'));
 
     // Remove completed transfers filling the whole table
-    var trLen = M.getTransferTableLengths().size;
-    if ($('.transfer-table .transfer-status.completed').length >= trLen) {
-        // $('.transfer-table .transfer-status.completed')
-            // .slice(0, trLen)
-            // .closest('tr')
-            // .fadeOut(function() {
-                // $(this).remove();
-            // });
-        // Hm, rather just leave them at the bottom
-        $('.transfer-scrolling-table').trigger('jsp-scroll-y.tfsdynlist', [0, 0, 1]);
+    if ($('.transfer-table tr:first').hasClass('completed')) {
+        var trLen = M.getTransferTableLengths().size;
+        if (completedLen >= trLen) {
+            if (completedLen > 50) {
+                $('.transfer-table tr.completed')
+                    .slice(0, trLen)
+                    .fadeOut(function() {
+                        $(this).remove();
+                    });
+            }
+            $('.transfer-scrolling-table').trigger('jsp-scroll-y.tfsdynlist', [0, 0, 1]);
+        }
     }
     if ($.transferHeader) {
         $.transferHeader();
     }
 
-    $('.transfer-table span.row-number').each(function() {
+    /*$('.transfer-table span.row-number').each(function() {
         var $this = $(this);
         $this.text(++i);
         if ($this.closest('tr').find('.transfer-type.upload').length) {
             ++u;
         }
-    });
-    i -= u;
+    });*/
+    var $trs = $('.transfer-table tr').not('.completed');
+    u = $trs.find('.transfer-type.upload').length;
+    i = $trs.length - u - (1 /* tr.clone-of-header */);
     for (var k in M.tfsdomqueue) {
         if (k[0] === 'u') {
             ++u;

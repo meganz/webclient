@@ -6,11 +6,25 @@ var URL = window.URL || window.webkitURL;
 var seqno = Math.ceil(Math.random()*1000000000);
 var staticpath = 'https://eu.static.mega.co.nz/3/';
 var ua = window.navigator.userAgent.toLowerCase();
-var is_chrome_firefox = document.location.protocol === 'chrome:' && document.location.host === 'mega' || document.location.protocol === 'mega:';
-var is_extension = is_chrome_firefox || document.location.href.substr(0,19) == 'chrome-extension://';
 var storage_version = '1'; // clear localStorage when version doesn't match
 var page = document.location.hash, l, d = false;
 var m = isMobile();
+
+var is_electron = false;
+if (typeof process !== 'undefined') {
+    var mll = process.moduleLoadList || [];
+
+    if (mll.indexOf('NativeModule ATOM_SHELL_ASAR') !== -1) {
+        is_electron = module;
+        module = undefined; // prevent factory loaders from using the module
+
+        // localStorage.jj = 1;
+    }
+}
+var is_chrome_firefox = document.location.protocol === 'chrome:'
+    && document.location.host === 'mega' || document.location.protocol === 'mega:';
+var is_extension = is_chrome_firefox || is_electron || document.location.href.substr(0,19) == 'chrome-extension://';
+
 
 function isMobile()
 {
@@ -200,6 +214,20 @@ if (!b_u && is_extension)
             Cu.reportError(e);
             alert('Unable to initialize core functionality:\n\n' + e + '\n\n' + mozBrowserID);
         }
+        if (location.protocol === 'mega:') {
+            try {
+                var url = mObjectURL([""]);
+                myURL.revokeObjectURL(url);
+            }
+            catch (e) {
+                console.error('mObjectURL failed, is this TOR?', e);
+                document.location = bootstaticpath + urlrootfile + location.hash;
+            }
+        }
+    }
+    else if (is_electron) {
+        urlrootfile = 'index.html';
+        bootstaticpath = location.href.replace(urlrootfile, '');
     }
     else /* Google Chrome */
     {
@@ -835,7 +863,7 @@ else if (!b_u)
             var dump = {
                 l: ln,
                 f: mTrim(url),
-                m: mTrim(msg).replace(/'(\w+:\/\/+[^/]+)[^']+(?:'|$)/, "'$1...'")
+                m: mTrim(msg).replace(/'(\w+:\/\/+[^/]+?)[^']+(?:'|$)/, "'$1...'")
                     .replace(/(Access to '\.\.).*(' from script denied)/, '$1$2')
                     .replace(/gfs\w+\.userstorage/, 'gfs...userstorage')
                     .replace(/^Uncaught\W*(?:exception\W*)?/i, ''),
@@ -1042,7 +1070,7 @@ else if (!b_u)
     jsl.push({f:'js/crypto.js', n: 'crypto_js', j:1,w:5});
     jsl.push({f:'js/jsbn.js', n: 'jsbn_js', j:1,w:2});
     jsl.push({f:'js/jsbn2.js', n: 'jsbn2_js', j:1,w:2});
-    jsl.push({f:'js/jodid25519.js', n: 'jodid25519_js', j:1,w:7});
+    jsl.push({f:'js/vendor/nacl-fast.js', n: 'nacl_js', j:1,w:7});
     jsl.push({f:'js/megaPromise.js', n: 'megapromise_js', j:1,w:5});
     jsl.push({f:'js/user.js', n: 'user_js', j:1});
     jsl.push({f:'js/authring.js', n: 'authring_js', j:1});
@@ -1182,11 +1210,6 @@ else if (!b_u)
     jsl.push({f:'js/zip64.js', n: 'zip_js', j:1});
     jsl.push({f:'js/cms.js', n: 'cms_js', j:1});
     jsl.push({f:'js/megasync.js', n: 'megasync_js', j:1});
-
-    if (!is_chrome_firefox) {
-        // XXX: In Firefox this throws SecurityError: The operation is insecure.
-        jsl.push({f:'js/windowOpenerProtection.js', n: 'windowOpenerProtection', j:1, w:1});
-    }
 
     // only used on beta
     if (onBetaW) {

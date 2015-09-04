@@ -43,7 +43,7 @@ var ulmanager = {
     },
 
     getGID: function UM_GetGID(ul) {
-        return 'ul_' + ul.id;
+        return 'ul_' + (ul && ul.id);
     },
 
     abort: function UM_abort(gid) {
@@ -303,10 +303,10 @@ var ulmanager = {
             });
     },
 
-    ulFileReader: function UM_ul_filereader(fs, file) {
+    ulFileReader: function UM_ul_filereader(file) {
         var handler;
         if (is_chrome_firefox && "u8" in file) {
-            if (d) {
+            if (d > 1) {
                 ulmanager.logger.info('Using Firefox ulReader');
             }
 
@@ -325,6 +325,8 @@ var ulmanager = {
             };
         }
         if (!handler) {
+            var fs = new FileReader();
+
             handler = function(task, done) {
                 var end = task.start + task.end;
                 var blob;
@@ -1067,6 +1069,9 @@ ChunkUpload.prototype.run = function(done) {
     }
     else {
         this.logger.info('.run');
+        if (!this.file.ul_reader) {
+            this.file.ul_reader = ulmanager.ulFileReader(this.file);
+        }
         this.file.ul_reader.push(this, this.io_ready, this);
     }
     removeValue(GlobalProgress[this.gid].working, this, 1);
@@ -1282,6 +1287,7 @@ ulQueue.poke = function(file, meth) {
         if (file.ul_reader) {
             file.ul_reader.filter(gid);
             file.ul_reader.destroy();
+            file.ul_reader = null;
         }
         if (!meth) {
             meth = 'pushFirst';
@@ -1296,7 +1302,6 @@ ulQueue.poke = function(file, meth) {
         file.progress = {};
         file.completion = [];
         file.owner = new FileUpload(file);
-        file.ul_reader = ulmanager.ulFileReader(new FileReader(), file);
         ulQueue[meth || 'push'](file.owner);
     }
 };

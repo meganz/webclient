@@ -9,6 +9,7 @@ var JinglePlugin = {
     RtcOptions: {},
     init: function (conn) {
         this.sessions = {};
+        this.callRequests = {};
         this.ice_config = {iceServers: []};
         this.pc_constraints = {};
         this.media_constraints = {
@@ -22,11 +23,12 @@ var JinglePlugin = {
 // Timeout after which if an iq response is not received, an error is generated
         this.jingleTimeout = 50000;
         this.jingleAutoAcceptTimeout = 25000;
+        this.apiTimeout = 20000;
         this.eventHandler = this;
         this.ftManager = new FileTransferManager(this);
 // Callbacks called by the connection.jingle object
         this.onIncomingCallRequest = function(from, reqStillValid, ansFunc){};
-        this.onCallCanceled = function(from, info) {};
+        this.onCallCanceled = function(info) {};
         this.onCallRequestTimeout = function(from) {};
         this.onCallAnswered = function(info) {};
         this.onCallTerminated = function(sess, reason, text){};
@@ -35,11 +37,6 @@ var JinglePlugin = {
         this.onMuted = function(sess, affected){};
         this.onUnmuted = function(sess, affected){};
         this.onInternalError = function(msg, info)  {
-            if ((this.eventHandler !== this) && this.eventHandler.onInternalError) {
-                if (this.eventHandler.onInternalError(msg, info)) { //if handler returns true, means all handling is done by it, bail out
-                    return;
-                }
-            }
             if (!info)
                 info = {};
             if (info.e) {
@@ -55,10 +52,21 @@ var JinglePlugin = {
                 }
             }
             console.error("onInternalError:", msg, "\n"+(info.e||''));
-            if (info.sid) {
-                var sess = this.sessions[info.sid];
-                if (sess)
+            var hadCall = false;
+            var sid = info.sid;
+            if (sid) {
+                var sess = this.sessions[sid];
+                if (sess) {
+                    hadCall = true;
                     this.terminate(sess, "internal-error", msg, false, info);
+                } else {
+                    hadCall = this.cancelAutoAnswerEntry(sid, "internal-error", msg, info)
+                           || this.cancelCallRequest(sid, "internal-error", msg, info);
+                    }
+            }
+            info.hadCall = hadCall;
+            if ((this.eventHandler !== this) && this.eventHandler.onInternalError) {
+                this.eventHandler.onInternalError(msg, info);
             }
         };
 // Callbacks called by session objects
@@ -384,7 +392,8 @@ var JinglePlugin = {
 
             var by = $(msg).attr('by');
             if (by !== self.connection.jid)
-                self.onCallCanceled.call(self.eventHandler, from, {
+                self.onCallCanceled.call(self.eventHandler, {
+                    peer: from,
                     reason: 'handled-elsewhere',
                     by: by,
                     accepted:($(msg).attr('accepted')==='1'),
@@ -407,8 +416,14 @@ var JinglePlugin = {
             self.connection.deleteHandler(elsewhereHandler);
             elsewhereHandler = null;
 
-            self.onCallCanceled.call(self.eventHandler, from, {
-                reason: $(msg).attr('reason')||'canceled',
+            if (self.cancelAutoAnswerEntry(sid, 'peer-'+($(msg).attr('reason')||'canceled'),
+                $(msg).attr('text'))) {//we may have already accepted the call
+                return;
+            }
+            self.onCallCanceled.call(self.eventHandler, {
+                peer: from,
+                reason: 'peer-'+($(msg).attr('reason')||'canceled'),
+                text: $(msg).attr('text'),
                 isDataCall: !!files,
                 sid: sid
             });
@@ -422,9 +437,9 @@ var JinglePlugin = {
             elsewhereHandler = null;
             self.connection.deleteHandler(cancelHandler);
             cancelHandler = null;
-
-            self.onCallCanceled.call(self.eventHandler, from, {
-                  reason:'answer-timeout',
+            self.onCallCanceled.call(self.eventHandler, {
+                  peer: from,
+                  reason:'call-unanswered',
                   isDataCall:!!files,
                   sid: sid
             });
@@ -442,6 +457,14 @@ var JinglePlugin = {
         if (!files && (typeof strPeerMedia !== 'string'))
             throw new Error("'media' attribute missing from call request stanza");
         var peerMedia = self.peerMediaToObj(strPeerMedia);
+
+//initiate fetching crypto key from API, as early as possible (before user answers the call)
+        var cryptoPms = jQuery.Deferred(function(deferred) {
+            self.preloadCryptoKeyForJid(function() {
+                deferred.resolve();
+            }, bareJid);
+        });
+
 // Notify about incoming call
         self.onIncomingCallRequest.call(self.eventHandler, {
             peer:from,
@@ -486,8 +509,7 @@ var JinglePlugin = {
                     call.files = files;
                     call.fileTransferHandler = self.ftManager.createDownloadHandler(sid, from, files);
                 }
-// This timer is for the period from the megaCallAnswer to the jingle-initiate stanza
-                setTimeout(function() { //invalidate auto-answer after a timeout
+                function abortCall(reason, text) {
                     var call = self.acceptCallsFrom[sid];
                     if (!call || (call.tsTill !== tsTillJingle)) {
                         return; //entry was removed or updated by a new call request
@@ -501,10 +523,18 @@ var JinglePlugin = {
                         self.connection.deleteHandler(elsewhereHandler);
                         elsewhereHandler = null;
                     }
-                    self.cancelAutoAnswerEntry(sid, 'initiate-timeout', 'Timed out waiting for caller to start call');
-                }, self.jingleAutoAcceptTimeout);
+                    self.cancelAutoAnswerEntry(sid, reason, text);
+                };
+//add the api timeout timer here and not immediately after initiating the api request because
+//it is critical only after the user has answered the call, i.e. we can have some more 'uncounted'
+//time before that
+                setTimeout(function() {
+                    if(cryptoPms.state !== 'pending')
+                        return;
+                    cryptoPms.reject('timeout');
+                }, self.apiTimeout);
 
-                self.preloadCryptoKeyForJid(function() {
+                cryptoPms.then(function() {
                     self.connection.send($msg({
                         sid: sid,
                         to: from,
@@ -512,8 +542,18 @@ var JinglePlugin = {
                         fprmackey: self.encryptMessageForJid(ownFprMacKey, bareJid),
                         anonid: self.rtcSession.ownAnonId
                     }));
-                }, bareJid);
-            } else {
+                    setTimeout(function() {
+                        abortCall('initiate-timeout', 'Timed out waiting for caller to start call');
+                    }, self.jingleAutoAcceptTimeout);
+                })
+                .fail(function(err) {
+                    if (err === 'timeout') {
+                        abortCall('api-timeout', 'Timed out waiting for API to return crypto key');
+                    } else {
+                        abortCall('api-error', 'API error fetching the crypto key');
+                    }
+                });
+            } else { //accept == false
                 var msg = $msg({sid: sid, to: from, type: 'megaCallDecline', reason: obj.reason?obj.reason:'unknown'});
                 if (obj.text)
                     msg.c('body').t(obj.text);
@@ -526,13 +566,11 @@ var JinglePlugin = {
       }
       return true;
     },
-    cancelAutoAnswerEntry: function(aid, reason, text, type) {
+    cancelAutoAnswerEntry: function(aid, reason, text, errInfo) {
         var item = this.acceptCallsFrom[aid];
         if (!item)
             return false;
         if (item.fileTransferHandler) {
-            if (type && (type !== 'f'))
-                return false;
             item.fileTransferHandler.remove(reason, text);
             delete this.acceptCallsFrom[aid];
         } else {
@@ -544,13 +582,13 @@ var JinglePlugin = {
                 isInitiator: false,
                 peerAnonId: item.peerAnonId,
                 localStream: item.options.localStream
-            }, reason, text);
+            }, reason, text, errInfo);
         }
         return true;
     },
-    cancelAllAutoAnswerEntries: function(reason, text) {
+    cancelAllAutoAnswerEntries: function(reason, text, errInfo) {
         for (var aid in this.acceptCallsFrom)
-            this.cancelAutoAnswerEntry(aid, reason, text);
+            this.cancelAutoAnswerEntry(aid, reason, text, errInfo);
         this.acceptCallsFrom = {};
     },
     purgeOldAcceptCalls: function() {
@@ -559,8 +597,16 @@ var JinglePlugin = {
         for (var aid in self.acceptCallsFrom) {
             var call = self.acceptCallsFrom[aid];
             if (call.tsTill < now)
-                this.cancelAutoAnswerEntry(aid, 'initiate-timeout', 'timed out waiting for caller to start call');
+                this.cancelAutoAnswerEntry(aid, 'initiate-timeout', 'Timed out waiting for caller to start call');
         }
+    },
+    cancelCallRequest: function(sid, reason, msg, errInfo) {
+        var req = this.callRequests[sid];
+        if (!req) {
+            return false;
+        }
+        req.cancel('call-ended', reason, msg, errInfo);
+        return true;
     },
     processAndDeleteInputQueue: function(sess) {
         var queue = sess.inputQueue;
@@ -569,6 +615,7 @@ var JinglePlugin = {
             this.onJingle(queue[i]);
     },
     initiate: function (sid, peerjid, myjid, sessStream, mutedState, sessProps) { // initiate a new jinglesession to peerjid
+        delete this.callRequests[sid];
         var sess = this.createSession(myjid, peerjid, sid, sessStream, mutedState, sessProps);
         // configure session
         sess.media_constraints = this.media_constraints;

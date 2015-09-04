@@ -822,7 +822,9 @@ function init_page() {
                     dlQueue.resume();
                     ulQueue.resume();
                     uldl_hold = false;
-                    showTransferToast('u', ul_queue.length);
+                    if (ul_queue.length > 0) {
+                        showTransferToast('u', ul_queue.length);
+                    }
                 };
 
                 $.termsDeny = function() {

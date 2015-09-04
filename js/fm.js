@@ -5594,6 +5594,29 @@ function transferPanelUI()
             $('.transfer-panel-empty-txt').removeClass('hidden');
             $('.transfer-panel-title').html(l[104]);
             $('.nw-fm-left-icon.transfers').removeClass('transfering').find('p').removeAttr('style');
+            fm_tfsupdate();
+            Soon(function() {
+                $(window).trigger('resize');
+            });
+        }
+    };
+
+    $.removeTransferItems = function($trs) {
+        if (!$trs) {
+            $trs = $('.transfer-table tr.completed');
+        }
+        var $len = $trs.length;
+        if ($len && $len < 100) {
+            $trs.fadeOut(function() {
+                $(this).remove();
+                if (!--$len) {
+                    $.clearTransferPanel();
+                }
+            });
+        }
+        else {
+            $trs.remove();
+            Soon($.clearTransferPanel);
         }
     };
 
@@ -5617,28 +5640,14 @@ function transferPanelUI()
                 dlmanager.abort(null);
                 ulmanager.abort(null);
 
-                $('.transfer-table tr').not('.clone-of-header').fadeOut(function() {
-                    $(this).remove();
-                    $.clearTransferPanel();
-                });
-
-                Soon(function() {
-                    $(window).trigger('resize');
-                });
+                $.removeTransferItems($('.transfer-table tr').not('.clone-of-header'));
             });
         }
     });
 
     $('.transfer-clear-completed').rebind('click', function() {
         if (!$(this).hasClass('disabled')) {
-            $('.transfer-table tr .transfer-status.completed').closest('tr').fadeOut(function() {
-                $(this).remove();
-                $.clearTransferPanel();
-                fm_tfsupdate();
-                Soon(function() {
-                    $(window).trigger('resize');
-                });
-            });
+            $.removeTransferItems();
         }
     });
 
@@ -8769,26 +8778,26 @@ function firefoxDialog(close)
     fm_showoverlay();
     $('.fm-dialog.firefox-dialog').removeClass('hidden');
     $.dialog = 'firefox';
-    $('.firefox-dialog .browsers-button,.firefox-dialog .fm-dialog-close,.firefox-dialog .close-button').unbind('click')
-    $('.firefox-dialog .browsers-button,.firefox-dialog .fm-dialog-close,.firefox-dialog .close-button').bind('click', function()
+    
+    $('.firefox-dialog .browsers-button,.firefox-dialog .fm-dialog-close,.firefox-dialog .close-button').rebind('click', function()
     {
         firefoxDialog(1);
     });
-    $('#firefox-checkbox').unbind('click');
-    $('#firefox-checkbox').bind('click', function()
+    
+    $('#firefox-checkbox').rebind('click', function()
     {
-        if ($(this).attr('class').indexOf('checkboxOn') == -1)
+        if ($(this).hasClass('checkboxOn') === false)
         {
             localStorage.firefoxDialog = 1;
-            $(this).attr('class', 'checkboxOn');
-            $(this).parent().attr('class', 'checkboxOn');
+            $(this).removeClass('checkboxOff').addClass('checkboxOn');
+            $(this).parent().removeClass('checkboxOff').addClass('checkboxOn');
             $(this).attr('checked', true);
         }
         else
         {
             delete localStorage.firefoxDialog;
-            $(this).attr('class', 'checkboxOff');
-            $(this).parent().attr('class', 'checkboxOff');
+            $(this).removeClass('checkboxOn').addClass('checkboxOff');
+            $(this).parent().removeClass('checkboxOn').addClass('checkboxOff');
             $(this).attr('checked', false);
         }
     });

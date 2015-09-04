@@ -207,11 +207,8 @@ function RtcSession(stropheConn, options) {
     @property {string} [info.by]
         Only if event='handled-elsewhere'. The full JID that handled the call
   */
-    j.onCallCanceled = function(peer, info) {
-        self.trigger('call-canceled', {
-                         peer:peer,
-                         info:info
-                     });
+    j.onCallCanceled = function(info) {
+        self.trigger('call-canceled', info);
     };
     j.onCallAnswered = self.onCallAnswered.bind(self);
     j.onCallTerminated = self.onCallTerminated.bind(self);
@@ -418,6 +415,8 @@ RtcSession.prototype = {
       STATE_CALL_CANCELED_BY_US = 4; //call was canceled by us via the cancel() method of the returned object
   var state = STATE_NO_USERMEDIA_YET;
   var self = this;
+  var cancelCallRequest = null;
+  var callRequest = null;
   var isBroadcast = (!Strophe.getResourceFromJid(targetJid));
   var ownFprMacKey = self.jingle.generateMacKey();
   var sid = Math.random().toString(36).substr(2, 12); // random string
@@ -437,14 +436,17 @@ RtcSession.prototype = {
           return;
       }
       state = STATE_GOT_USERMEDIA_WAIT_PEER;
+      callRequest.fakeSession.localStream = sessStream;
 // Call accepted handler
       ansHandler = self.connection.addHandler(function(stanza) {
         try {
+//            throw new Error("test error message");
           if ($(stanza).attr('sid') !== sid)
                 return true;
           if (state !== STATE_GOT_USERMEDIA_WAIT_PEER)
               return;
           state = STATE_PEER_ANS_OR_TIMEOUT;
+          //call request will be deleted by self.jingle.initiate() - there may still be failure points from now till we reach there, so we avoid having the call not listed anywhere in that period
           self.connection.deleteHandler(declineHandler);
           declineHandler = null;
           ansHandler = null;
@@ -461,6 +463,8 @@ RtcSession.prototype = {
           var peerAnonId = $(stanza).attr('anonid');
           if (!peerAnonId)
               throw new Error("No anonId in peer's call answer stanza");
+          callRequest.fakeSession.peerAnonId = peerAnonId;
+
           var fullPeerJid = $(stanza).attr('from');
           if (isBroadcast)
               self.connection.send($msg({
@@ -515,6 +519,7 @@ RtcSession.prototype = {
                 return;
 
             state = STATE_PEER_ANS_OR_TIMEOUT;
+            delete self.jingle.callRequests[sid];
             self.connection.deleteHandler(ansHandler);
             ansHandler = null;
             declineHandler = null;
@@ -597,21 +602,6 @@ RtcSession.prototype = {
           setTimeout(function() {
               if (state !== STATE_GOT_USERMEDIA_WAIT_PEER)
                   return;
-
-              state = STATE_PEER_ANS_OR_TIMEOUT;
-              self.connection.deleteHandler(ansHandler);
-              ansHandler = null;
-              self.connection.deleteHandler(declineHandler);
-              declineHandler = null;
-              sessStream = null;
-              self._unrefLocalStream(options.video);
-
-              self.connection.send($msg({
-                  to:Strophe.getBareJidFromJid(targetJid),
-                  sid: sid,
-                  type: 'megaCallCancel',
-                  reason: 'answer-timeout'
-              }));
               /**
               A call that we initiated was not answered (neither accepted nor rejected)
               within the acceptable timeout.
@@ -619,10 +609,47 @@ RtcSession.prototype = {
               @type {object}
               @property {string} peer The JID of the callee
              */
-             self.trigger('call-answer-timeout', {peer: targetJid, info: { sid: sid }});
+              cancelCallRequest(STATE_PEER_ANS_OR_TIMEOUT, 'call-answer-timeout', 'call-unanswered');
           }, self.jingle.callAnswerTimeout);
       } //end set answer timeout
   } //end initiateCallback()
+
+  cancelCallRequest = function(newState, eventName, reason, text, errInfo) {
+      if ((state === STATE_PEER_ANS_OR_TIMEOUT) || (state === STATE_CALL_CANCELED_BY_US)) {
+          return false;
+      }
+
+      state = newState;
+      delete self.jingle.callRequests[sid];
+
+      if (state === STATE_GOT_USERMEDIA_WAIT_PEER) { //same as if (ansHandler)
+          self.connection.deleteHandler(ansHandler);
+          ansHandler = null;
+          self.connection.deleteHandler(declineHandler);
+          declineHandler = null;
+      }
+      self.connection.send($msg({
+              to:Strophe.getBareJidFromJid(targetJid),
+              sid: sid,
+              reason: reason,
+              text: text,
+              type: 'megaCallCancel'
+      }));
+      self.onCallTerminated(callRequest.fakeSession, reason, text, errInfo, eventName);
+  }
+
+  callRequest = self.jingle.callRequests[sid] = {
+         fakeSession: {
+            fake: true,
+            peerjid: targetJid,
+            sid: sid,
+            isInitiator: true //peerAnonId is set when it is received, but may never be received
+         },
+         cancel: function(eventName, reason, text, errInfo) {
+             return cancelCallRequest(STATE_CALL_CANCELED_BY_US, eventName, reason, text, errInfo);
+         }
+  }
+
   if (options.audio || options.video) {
       self._myGetUserMedia(options, initiateCallback, null, true, sid);
   } else {
@@ -631,41 +658,23 @@ RtcSession.prototype = {
   //return an object with a cancel() method
   return {
       sid: sid,
-      callOptions: options,
       cancel: function() {
-        if (state === STATE_PEER_ANS_OR_TIMEOUT)
-            return false;
-        if (state === STATE_GOT_USERMEDIA_WAIT_PEER) { //same as if (ansHandler)
-            state = STATE_CALL_CANCELED_BY_US;
-            self.connection.deleteHandler(ansHandler);
-            ansHandler = null;
-            self.connection.deleteHandler(declineHandler);
-            declineHandler = null;
-
-            self._unrefLocalStream(options.video);
-            self.connection.send($msg({
-                to:Strophe.getBareJidFromJid(targetJid),
-                sid: sid,
-                reason: 'caller',
-                type: 'megaCallCancel'
-            }));
-            self.trigger('call-canceled-caller', {peer: targetJid, info: { sid: sid, reason: 'caller' }, callOptions: options});
-            return true;
-        } else if (state === STATE_NO_USERMEDIA_YET) {
-            state = STATE_CALL_CANCELED_BY_US;
-            return true;
-        }
-        console.warn("RtcSession: BUG: cancel() called when state has an unexpected value of", state);
-        return false;
-  }};
+          return callRequest.cancel('call-canceled', 'user'); //TODO: verify compat with callManager
+      },
+      callOptions: options
+  };
  },
 
 /** Terminates all current calls and file transfers */
 hangupAll: function()
 {
-    this.jingle.terminateAll('hangup', '');
-    for (var asid in this.jingle.acceptCallsFrom) {
-        this.jingle.cancelAutoAnswerEntry(asid, 'hangup', '');
+    var jingle = this.jingle;
+    jingle.terminateAll('hangup', '');
+    for (var asid in jingle.acceptCallsFrom) {
+        jingle.cancelAutoAnswerEntry(asid, 'hangup', '');
+    }
+    for (var sid in jingle.callRequests) {
+        jingle.callRequests[sid].cancel();
     }
 },
  /**
@@ -675,18 +684,13 @@ hangupAll: function()
  */
  hangup: function(sid)
  {
-    var sess = this.jingle.sessions[sid];
+    var j = this.jingle;
+    var sess = j.sessions[sid];
     if (sess) {
-        this.jingle.terminateBySid(sid, 'hangup');
+        j.terminateBySid(sid, 'hangup');
         return true;
     }
-
-    var item = this.jingle.acceptCallsFrom[sid];
-    if (item) {
-        this.jingle.cancelAutoAnswerEntry(sid, 'hangup', '');
-        return true;
-    }
-    return false;
+    return (j.cancelAutoAnswerEntry(sid, 'hangup')) || (j.cancelCallRequest(sid, 'hangup'));
  },
 
  /**
@@ -970,7 +974,7 @@ hangupAll: function()
     sess.tsMediaStart = Date.now();
  },
 
- onCallTerminated: function(sess, reason, text, errInfo) {
+ onCallTerminated: function(sess, reason, text, errInfo, eventName) {
  try {
  //WARNING: sess may be a dummy object, only with peerjid property, in case something went
  //wrong before the actual session was created, e.g. if SRTP fingerprint verification failed
@@ -999,12 +1003,14 @@ hangupAll: function()
     var obj = {
         peer: sess.peerjid,
         sess: new SessWrapper(sess), //can be a dummy session but the wrapper will still work
-        reason:reason, text:text
+        reason:reason,
+        text:text
     };
+     var trsn = ((eventName === 'call-canceled')?'cancel-':'')+reason;
     if (sess.statsRecorder)  {
         var stats = obj.stats = sess.statsRecorder.terminate(this._makeCallId(sess));
         stats.isCaller = sess.isInitiator?1:0;
-        stats.termRsn = reason;
+        stats.termRsn = trsn;
         if (text) {
             stats.termMsg = text;
         }
@@ -1014,7 +1020,7 @@ hangupAll: function()
     } else { //no stats, but will still provide callId and duration
         var bstats = obj.basicStats = {
             isCaller: sess.isInitiator?1:0,
-            termRsn: reason,
+            termRsn: trsn,
             bws: stats_getBrowserVersion()
         };
         if (text) {
@@ -1040,7 +1046,12 @@ hangupAll: function()
             type: 'POST',
             data: JSON.stringify(obj.stats||obj.basicStats)
     });
-    this.trigger('call-ended', obj);
+
+    if (!eventName) {
+        eventName = 'call-ended';
+    }
+    this.trigger(eventName, obj);
+
 //release local video
     var videoUsed;
     if (sess.localStream) { //a fake session can also have a localStream, e.g. in case of initiate-timeout
@@ -1337,12 +1348,31 @@ hangupAll: function()
  },
 
  onInternalError: function(msg, info) {
-     if (srvlog) {
-         srvlog("WEBRTC: "+msg, info, true); //log to #jscrashes
+    info.msg = msg;
+    this.logMsg('e', JSON.stringify(info));
+ },
+
+ logMsg: function(type, data) {
+     var wait = 500;
+     var retryNo = 0;
+     var self = this;
+     function req() {
+         jQuery.ajax("https://stats.karere.mega.nz/msglog?aid="+self.ownAnonId+"&t="+type, {
+              type: 'POST',
+              data: data,
+              error: function(jqXHR, textStatus, errorThrown) {
+                  retryNo++;
+                  if(retryNo < 20) {
+                      wait *= 2;
+                      setTimeout(req, wait);
+                  }
+              },
+              dataType: 'json'
+          });
      }
+     req();
  }
 }
-
 
 RtcSession._maybeCreateVolMon = function() {
     if (RtcSession.gVolMon)

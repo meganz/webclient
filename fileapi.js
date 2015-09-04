@@ -972,6 +972,16 @@ function mozClearStartupCache() {
 	};
 	// XMLHttpRequest.prototype = Object.freeze(XMLHttpRequest.prototype);
 
+	mozRunAsync(function() {
+		var header = Ci.nsISiteSecurityService.HEADER_HSTS;
+		var flags = scope.Incognito ? Ci.nsISocketProvider.NO_PERMANENT_STORAGE : 0;
+		var hsts = mozSSService.isSecureHost(header, 'http://userstorage.mega.co.nz/', flags);
+		if (hsts) {
+			var uri = Services.io.newURI('https://mega.co.nz/', null, null);
+			mozSSService.removeState(header, uri, flags);
+		}
+	});
+
 })(self);
 
 (function __mozPreferences(scope) {
@@ -1062,6 +1072,7 @@ mozLazyGetService( "mozMIMEService",     "@mozilla.org/mime;1",                 
 mozLazyGetService( "mozAlertsService",   "@mozilla.org/alerts-service;1",            "nsIAlertsService"   );
 mozLazyGetService( "mozClipboardHelper", "@mozilla.org/widget/clipboardhelper;1",    "nsIClipboardHelper" );
 mozLazyGetService( "mozRandomGenerator", "@mozilla.org/security/random-generator;1", "nsIRandomGenerator" );
+mozLazyGetService( "mozSSService",       "@mozilla.org/ssservice;1",             "nsISiteSecurityService" );
 
 XPCOMUtils.defineLazyModuleGetter(this, "OS", "resource://gre/modules/osfile.jsm");
 const BrowserApp = Services.wm.getMostRecentWindow('navigator:browser').BrowserApp;

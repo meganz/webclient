@@ -15,8 +15,6 @@ var _arrayAliases = [
     'every',
     'fill',
     'filter',
-    'find',
-    'findIndex',
     'forEach',
     'includes',
     'indexOf',
@@ -276,6 +274,11 @@ _arrayAliases.forEach(function(methodName) {
         }
     }
 });
+
+
+MegaDataArray.prototype.getItem = function(idx) {
+    return this._data[idx];
+};
 
 /**
  * Plain Object-like container for storing data, with the following features:

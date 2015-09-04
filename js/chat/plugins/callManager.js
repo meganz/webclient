@@ -254,6 +254,26 @@ CallSession.prototype.onWaitingResponseIncoming = function(e, eventData) {
 
     var participants = self.room.getParticipantsExceptMe();
 
+    var dialogMessage = new ChatDialogMessage({
+        messageId: 'incoming-call-' + self.sid,
+        type: 'incoming-call',
+        authorContact: self.room.megaChat.getContactFromJid(self.getPeer()),
+        timestamp: unixtime(),
+        persist: false,
+        buttons: {
+            'answer': {
+                'type': 'primary',
+                'text': l[7205],
+                'callback': doAnswer
+            },
+            'reject': {
+                'type': 'secondary',
+                'text': l[1686],
+                'callback': doCancel
+            }
+        }
+    });
+
     if (self.room.type === "private") {
 
         assert(participants[0], "No participants found.");
@@ -281,7 +301,8 @@ CallSession.prototype.onWaitingResponseIncoming = function(e, eventData) {
                 avatar,
                 showVideoButton,
                 eventData.sid,
-                self
+                self,
+                dialogMessage
             ]);
 
 
@@ -315,25 +336,7 @@ CallSession.prototype.onWaitingResponseIncoming = function(e, eventData) {
     }
 
     self.room.appendMessage(
-        new ChatDialogMessage({
-            messageId: 'incoming-call-' + self.sid,
-            type: 'incoming-call',
-            authorContact: self.room.megaChat.getContactFromJid(self.getPeer()),
-            timestamp: unixtime(),
-            persist: false,
-            buttons: {
-                'answer': {
-                    'type': 'primary',
-                    'text': l[7205],
-                    'callback': doAnswer
-                },
-                'reject': {
-                    'type': 'secondary',
-                    'text': l[1686],
-                    'callback': doCancel
-                }
-            }
-        })
+        dialogMessage
     );
 };
 
@@ -486,7 +489,8 @@ CallSession.prototype.onCallEnded = function(e, reason) {
                 type: 'call-ended',
                 authorContact: self.room.megaChat.getContactFromJid(self.getPeer()),
                 timestamp: unixtime(),
-                cssClasses: ['fm-chat-call-reason-' + reason]
+                cssClasses: ['fm-chat-call-reason-' + reason],
+                currentCallCounter: self.room.megaChat._currentCallCounter
             })
         );
     }

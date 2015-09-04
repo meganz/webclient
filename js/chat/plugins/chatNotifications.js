@@ -15,17 +15,9 @@ var ChatNotifications = function(megaChat, options) {
 
     self.notifications = new MegaNotifications(options);
 
-    megaChat.unbind("onInit.chatNotifications");
-    megaChat.bind("onInit.chatNotifications", function(e) {
+    megaChat.rebind("onInit.chatNotifications", function(e) {
         self.attachToChat(megaChat)
     });
-
-
-    //self.notifications
-    //    .unbind('onCounterUpdated.chat')
-    //    .bind('onCounterUpdated.chat', function(megaNotifications, group, notifObj) {
-    //        megaChat.renderContactTree();
-    //    });
 
     return this;
 };
@@ -39,12 +31,27 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
     var self = this;
 
     megaChat
-        .unbind('onRoomCreated.chatNotifications')
-        .bind('onRoomCreated.chatNotifications', function(e, megaRoom) {
+        .rebind('onRoomCreated.chatNotifications', function(e, megaRoom) {
+            var resetChatNotificationCounters = function() {
+                if(megaRoom.isCurrentlyActive) {
+                    megaRoom.messages.forEach(function (v, k) {
+                        if (!v.seen) {
+                            v.seen = true;
+                        }
+                    });
+
+                    self.notifications.resetCounterGroup(megaRoom.roomJid);
+                }
+            };
+
             megaRoom
-                .unbind('onAfterRenderMessage.chatNotifications')
-                .bind('onAfterRenderMessage.chatNotifications', function(e, $message, message) {
-                    var icon = $('.nw-contact-avatar img', $message).attr('src');
+                .rebind('onAfterRenderMessage.chatNotifications', function(e, message) {
+                    var fromContact = message.authorContact ? message.authorContact : megaChat.getContactFromJid(
+                        message.getFromJid()
+                    );
+
+                    var avatarMeta = generateAvatarMeta(fromContact.u);
+                    var icon = avatarMeta.avatarUrl;
                     var n;
 
                     if(message.seen === true) { // halt if already seen.
@@ -52,40 +59,31 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
                     }
 
                     if(message instanceof KarereEventObjects.IncomingMessage && !message.isMyOwn(megaChat.karere)) {
+                        n = self.notifications.notify(
+                            'incoming-chat-message',
+                            {
+                                'sound': 'incoming_chat_message',
+                                'group': megaRoom.roomJid,
+                                'incrementCounter': true,
+                                'icon': icon,
+                                'params': {
+                                    'from': avatarMeta.fullName
+                                }
+                            },
+                            !message.seen
+                        );
 
-                        if(message.meta.attachments) {
-                            n = self.notifications.notify(
-                                'incoming-attachment',
-                                {
-                                    'sound': 'incoming_file_transfer',
-                                    'group': megaRoom.roomJid,
-                                    'incrementCounter': true,
-                                    'alwaysPlaySound': true,
-                                    'icon': icon,
-                                    'params': {
-                                        'from': $('.chat-username', $message).text(),
-                                        'attachments': message.meta.attachments,
-                                        'attachmentsCount': Object.keys(message.meta.attachments).length
-                                    }
-                                },
-                                $message.is('.unread')
-                            );
-                        } else {
-                            n = self.notifications.notify(
-                                'incoming-chat-message',
-                                {
-                                    'sound': 'incoming_chat_message',
-                                    'group': megaRoom.roomJid,
-                                    'incrementCounter': true,
-                                    'icon': icon,
-                                    'params': {
-                                        'from': $('.chat-username', $message).text()
-                                    }
-                                },
-                                $message.is('.unread')
-                            );
+                        $(message).rebind('onChange.chatNotif', function(e, msg, property) {
+                            if(property === "seen" && msg.seen === true) {
+                                n.setUnread(false);
+
+                                message.unbind('onChange.chatNotif');
+                            }
+                        });
+                    } else if(message.type && message.textMessage && !message.seen) {
+                        if(message.type === "incoming-call") {
+                            return; // already caught by the onIncomingCall...
                         }
-                    } else if($message.is(".inline-dialog") && $message.is('.unread')) {
                         n = self.notifications.notify(
                             'alert-info-message',
                             {
@@ -94,12 +92,22 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
                                 'incrementCounter': true,
                                 'icon': icon,
                                 'params': {
-                                    'from': $('.chat-username', $message).text(),
-                                    'messageText': $('.chat-message-txt', $message).text()
+                                    'from': avatarMeta.fullName,
+                                    'messageText': message.textMessage
                                 }
                             },
-                            $message.is('.unread')
+                            !message.seen
                         );
+
+                        var changeListener = function() {
+                            if(message.seen === true) {
+                                n.setUnread(false);
+
+                                message.removeChangeListener(changeListener);
+                            }
+                        };
+
+                        message.addChangeListener(changeListener);
                     }
                     if(n) {
                         // activate/show room when a notification is clicked
@@ -109,44 +117,24 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
                             megaRoom.show();
                             if(n.type == "incoming-text-message") {
                                 setTimeout(function() {
-                                    $('.message-textarea').trigger('focus');
+                                    $('.message-textarea:visible').trigger('focus');
                                 }, 1000);
                             }
                         });
                     }
                 })
-                .unbind('onChatShown.chatNotifications')
-                .bind('onChatShown.chatNotifications', function(e) {
-                    self.notifications.resetCounterGroup(megaRoom.roomJid);
+                .rebind('onChatShown.chatNotifications', function(e) {
+                    resetChatNotificationCounters();
                 })
-                .unbind('onIncomingDirectFileTransfer.chatNotifications')
-                .bind('onIncomingDirectFileTransfer.chatNotifications', function(e, megaRoom, contactName, attachments, $message) {
-                    var icon = $('.nw-contact-avatar img', $message).attr('src');
-                    var n = self.notifications.notify(
-                        'incoming-attachment',
-                        {
-                            'sound': 'incoming_file_transfer',
-                            'group': megaRoom.roomJid,
-                            'incrementCounter': true,
-                            'alwaysPlaySound': true,
-                            'icon': icon,
-                            'params': {
-                                'from': contactName,
-                                'attachments': attachments,
-                                'attachmentsCount': attachments.length
-                            }
-                        },
-                        $message.is('.unread')
-                    );
-
+                .rebind('onChatIsFocused.chatNotifications', function(e) {
+                    resetChatNotificationCounters()
                 })
-                .unbind('onOutgoingCall.chatNotifications')
-                .bind('onOutgoingCall.chatNotifications', function(e, eventData, mediaOptions, callSession) {
+                .rebind('onOutgoingCall.chatNotifications', function(e, eventData, mediaOptions, callSession) {
                     var sid = eventData.info && eventData.info.sid ? eventData.info.sid : eventData.sid;
                     var n = self.notifications.notify(
                         'outgoing-call',
                         {
-                            'sound': megaRoom.isActive() ? 'incoming_voice_video_call' : 'incoming_voice_video_call', // always play sound, when an outgoing call is in progress
+                            'sound': 'incoming_voice_video_call',
                             'soundLoop': true,
                             'alwaysPlaySound': true,
                             'group': megaRoom.roomJid,
@@ -177,12 +165,20 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
                     callSession.bind('StateChanged' + evtId, stopSound);
                 })
         })
-        .unbind('onIncomingCall.chatNotifications')
-        .bind('onIncomingCall.chatNotifications', function(e, room, contactName, avatar, isVideoCall, sid, callSession) {
+        .rebind('onIncomingCall.chatNotifications', function(e,
+             room,
+             contactName,
+             avatar,
+             isVideoCall,
+             sid,
+             callSession,
+             dialogMessage
+        ) {
+
             var n = self.notifications.notify(
                 'incoming-voice-video-call',
                 {
-                    'sound': room.isActive() ? undefined : 'incoming_voice_video_call',
+                    'sound': 'incoming_voice_video_call',
                     'soundLoop': true,
                     'alwaysPlaySound': true,
                     'group': room.roomJid,
@@ -202,6 +198,16 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
                 room.show();
             });
 
+            var changeListener = function() {
+                if(dialogMessage.seen === true) {
+                    n.setUnread(false);
+
+                    dialogMessage.removeChangeListener(changeListener);
+                }
+            };
+
+            dialogMessage.addChangeListener(changeListener);
+
             var evtId = generateEventSuffixFromArguments("", "chatNotifStopSound", rand(10000));
             var stopSound = function(e, session, oldState, newState) {
                 if(session.sid == sid) {
@@ -212,12 +218,18 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
 
             callSession.bind('StateChanged' + evtId, stopSound);
         })
-        .unbind('onCallTerminated.chatNotifications')
-        .bind('onCallTerminated', function(e, room) {
+        .rebind('onCallTerminated.chatNotifications', function(e, room) {
             self.notifications.resetCounterGroup(room.roomJid, "incoming-voice-video-call")
         })
-        .unbind('onCallAnswered.chatNotifications')
-        .bind('onCallAnswered', function(e, room) {
+        .rebind('onCallAnswered.chatNotifications', function(e, room) {
             self.notifications.resetCounterGroup(room.roomJid, "incoming-voice-video-call")
-        })
+        });
+
+        // link counters
+        self.notifications.rebind("onCounterUpdated.chatNotifications", function(e, notif, group, type) {
+            var room = megaChat.chats[group];
+            if(room) {
+                room.unreadCount = notif.getCounterGroup(group);
+            }
+        });
 };

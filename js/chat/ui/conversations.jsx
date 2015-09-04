@@ -13,14 +13,33 @@ var ConversationPanelUI = require("./../ui/conversationpanel.jsx");
 
 var ConversationsListItem = React.createClass({
     mixins: [MegaRenderMixin, RenderDebugger],
+    componentWillMount: function() {
+        var self = this;
+        self.chatRoomChangeListener = function() {
+            self.forceUpdate();
+        };
+        self.props.chatRoom.addChangeListener(self.chatRoomChangeListener);
+    },
+    componentWillUnmount: function() {
+        var self = this;
+        self.props.chatRoom.removeChangeListener(self.chatRoomChangeListener);
+    },
     render: function() {
-        var unreadClass = "";
-        var unreadCount = this.props.chatRoom.getUnreadCount();
-        if(unreadCount > 0) {
-            unreadClass = " unread ";
-        }
+        //console.error(
+        //    'rendering: ',
+        //    this.props.chatRoom.roomJid.split("@")[0],
+        //    this.props.chatRoom.unreadCount,
+        //    this.props.chatRoom.isCurrentlyActive
+        //);
 
         var classString = "nw-conversations-item";
+
+        var unreadCount = this.props.chatRoom.unreadCount;
+        if(unreadCount > 0) {
+            classString += " unread ";
+        }
+
+
 
 
         var contactJid = this.props.chatRoom.getParticipantsExceptMe()[0];
@@ -253,6 +272,27 @@ var ConversationsMainListing =  React.createClass({
         room.show();
     },
 
+    componentDidMount: function() {
+        window.addEventListener('resize', this.handleWindowResize);
+
+    },
+    componentWillUnmount: function() {
+        window.removeEventListener('resize', this.handleWindowResize);
+    },
+    componentDidUpdate: function() {
+        this.handleWindowResize();
+    },
+    handleWindowResize: function() {
+        var $container = $(this.getDOMNode());
+        var $listings = $('.fm-chat-message-scroll.conversations', $container);
+
+        $listings.height(
+            $(window).outerHeight() -
+            $('#topmenu').outerHeight() -
+            $('.fm-right-header.fm:visible', $container.parent()).outerHeight()
+        );
+    },
+
     render: function () {
         var self = this;
 
@@ -267,6 +307,9 @@ var ConversationsMainListing =  React.createClass({
             var contact = room.megaChat.getContactFromJid(contactJid);
             var contactAvatarMeta = generateAvatarMeta(contact.u);
             var presence = room.megaChat.karere.getPresence(contactJid);
+
+            var lastActionClasses = "conversations-call-info";
+            var lastActionText = "";
 
             var chatUserInfoClasses = "fm-chat-user-info ustatus " + contact.u + " " + room.megaChat.xmppPresenceToCssClass(
                 presence
@@ -290,6 +333,8 @@ var ConversationsMainListing =  React.createClass({
                 lastActivity = "about " + time2last(room.lastActivity);
             }
 
+
+
             var startCallButtons;
 
             if(presence !== undefined && presence != "offline") {
@@ -297,6 +342,33 @@ var ConversationsMainListing =  React.createClass({
                     <div key="startCallVideo" className="conversations-icon video" onClick={this.videoClicked.bind(this, room)}></div>,
                     <div key="startCallAudio" className="conversations-icon audio" onClick={this.audioClicked.bind(this, room)}></div>
                 ];
+            }
+
+            var lastAction;
+            if(room.messages.length > 0) {
+                var lastMessage = room.messages.getItem(room.messages.length - 1);
+
+                if(lastMessage.textMessage || lastMessage.getContents) {
+                    // notification?
+                    if (lastMessage.textMessage) {
+                        lastActionClasses += " " + lastMessage.cssClass;
+                        lastActionText += lastMessage.textMessage;
+                    } else {
+                        // text message
+                        lastActionClasses += " fm-chat-messages-pad";
+                        lastActionText = lastMessage.getContents();
+                    }
+
+                    lastAction = <div className={lastActionClasses}>
+                        <div className="nw-chat-notification-icon"></div>
+                        <div className="conversation-status">
+                                        <span>
+                                            {lastActionText}
+                                        </span>
+                        </div>
+                        <div className="conversations-time">{lastActivity}</div>
+                    </div>;
+                }
             }
 
             conversations.push(
@@ -316,15 +388,7 @@ var ConversationsMainListing =  React.createClass({
                             </div>
                             <div className="clear"></div>
 
-                            <div className="conversations-call-info missed-call">
-                                <div className="nw-chat-notification-icon"></div>
-                                <div className="conversation-status">
-                                    <span>
-                                        Missed call
-                                    </span>
-                                </div>
-                                <div className="conversations-time">{lastActivity}</div>
-                            </div>
+                            {lastAction}
 
                             {haventCommunicated}
 

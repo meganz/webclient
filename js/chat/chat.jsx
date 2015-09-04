@@ -293,6 +293,10 @@ Chat.prototype.init = function() {
 
     self.plugins['chatNotifications'] = new ChatNotifications(self, self.options.chatNotificationOptions);
 
+    self.plugins['chatNotifications'].notifications.rebind('onAfterNotificationCreated.megaChat', function() {
+        self.updateSectionUnreadCount();
+    });
+
     $.each(self.options.plugins, function(k, v) {
         self.plugins[k] = new v(self);
     });
@@ -661,55 +665,6 @@ Chat.prototype.init = function() {
         }
     });
 
-
-    this.karere.bind("onComposingMessage", function(e, eventObject) {
-        if (Karere.getNormalizedFullJid(eventObject.getFromJid()) === self.karere.getJid()) {
-            return;
-        }
-
-        var room = self.chats[eventObject.getRoomJid()];
-        if (room) {
-            var $element = $('.typing-template', room.$messages);
-
-            var contactHashFromJid = self.getContactFromJid(eventObject.getFromJid());
-
-            $('.nw-contact-avatar', $element).replaceWith(room._generateContactAvatarElement(eventObject.getFromJid()));
-
-            // move to the end of the messages
-            $element.insertAfter($('.fm-chat-message-container:last', room.$messages));
-
-            $element
-                .removeClass("hidden")
-                .removeClass("right-block");
-
-            if (contactHashFromJid.u != u_handle) {
-                $element.addClass("right-block");
-            }
-
-            $element.addClass("typing");
-
-
-
-            room.refreshScrollUI();
-
-        }
-    });
-
-    this.karere.bind("onPausedMessage", function(e, eventObject) {
-        if (Karere.getNormalizedFullJid(eventObject.getFromJid()) === self.karere.getJid()) {
-            return;
-        }
-
-        var room = self.chats[eventObject.getRoomJid()];
-
-        if (room) {
-            var $element = $('.typing-template', room.$messages);
-
-            $element.addClass("hidden").removeClass("typing");
-            room.refreshUI(true);
-        }
-    });
-
     // UI events
     $(document.body).undelegate('.top-user-status-item', 'mousedown.megachat');
 
@@ -795,40 +750,6 @@ Chat.prototype.init = function() {
                 self.renderConversationsApp();
             }
         });
-
-
-
-
-    //self.$header_tpl = $('.fm-right-header', self.$container).clone().removeClass("template");
-    //assert(self.$header_tpl.length > 0, "Header template not found.");
-    //
-    //self.$messages_tpl = $('.fm-chat-message-scroll', self.$container).clone().removeClass("template");
-    //assert(self.$messages_tpl.length > 0, "Messages template not found.");
-    //
-    //self.$message_tpl = $('.message.template', self.$container).clone();
-    //assert(self.$message_tpl.length > 0, "Message template not found.");
-    //
-    //self.$message_tpl
-    //    .removeClass("template")
-    //    .removeClass("message")
-    //    .removeClass("hidden");
-    //
-    //self.$inline_dialog_tpl = $('.fm-chat-messages-block.inline-dialog.template', self.$container).clone();
-    //assert(self.$inline_dialog_tpl.length > 0, "Inline dialog template not found.");
-    //
-    //self.$inline_dialog_tpl
-    //    .removeClass("template")
-    //    .removeClass("message")
-    //    .removeClass("hidden");
-    //
-    //
-    //// cleanup dom nodes that were used as templates
-    //$('.fm-right-header', self.$container).remove();
-    //$('.fm-chat-message-scroll', self.$container).remove();
-    //$('.fm-chat-messages-block.message.template', self.$container).remove();
-    //$('.fm-chat-messages-block.inline-dialog.template', self.$container).remove();
-
-
 
     if (self.is_initialized) {
         self.destroy()
@@ -970,82 +891,6 @@ Chat.prototype.connect = function() {
             });
 };
 
-Chat.prototype._generateIncomingRtcFileMessage = function(room, filesList, sessionId, cancelFunc, acceptFunc) {
-    var $message = megaChat.$message_tpl.clone().removeClass("template").addClass("fm-chat-message-container");
-    var jid = megaChat.karere.getBareJid();
-
-    var timestamp = unixtime();
-
-    $message.addClass("webrtc-transfer");
-
-    $message.attr("data-transfer-sid", sessionId);
-
-    $('.chat-message-date', $message).text(
-        unixtimeToTimeString(timestamp) //time2last is a too bad performance idea.
-    );
-    var name = megaChat.getContactNameFromJid(jid);
-    $('.nw-contact-avatar', $message).replaceWith(room._generateContactAvatarElement(jid));
-    $('.chat-username', $message).text(name);
-
-    $.each(filesList, function(k, v) {
-        var name = v.name ? v.name : k;
-
-        var $file = $('<div class="nw-chat-sharing-body main-body">' +
-            '<div class="nw-chat-icons-area">' +
-            '<span class="block-view-file-type ' + fileIcon({name: name})+ '"></span>' +
-            '</div>' +
-            '<div class="nw-chat-sharing-filename">' +
-            name +
-            '</div>' +
-            '<div class="nw-chat-sharing-filesize">' +
-            bytesToSize(v.size) +
-            '</div>' +
-            '<div class="nw-chat-sharing-filesize direct-progressbar hidden"><div class="progressbar"><div class="progressbarfill" style="width: 1%;"></div></div></div>' +
-            '<div class="clear"></div>' +
-            '</div>');
-        $file.attr('data-file-uniqueId', v.uniqueId);
-
-        $('.fm-chat-message', $message).append($file);
-    });
-
-
-    $('.chat-username', $message).after(
-        $('<span class="attachment-label"> shared ' + (
-            filesList.length === 1 ? " a file" : "files"
-            ) + ':</span>')
-    );
-
-    $('.chat-message-txt', $message).empty();
-
-    var $cancelButton = $('<div class="fm-chat-file-button secondary-button"><span>Cancel</span></div>');
-    $('.chat-message-txt', $message).append($cancelButton);
-    $cancelButton.on('click', function() {
-        var $p = $(this).parent();
-        $(this).replaceWith("<em>Canceled</em>");
-        $('.primary-button', $p).remove();
-
-        //room.refreshUI();
-        cancelFunc();
-    });
-
-    if (acceptFunc) {
-        var $acceptButton = $('<div class="fm-chat-file-button primary-button"><span>Accept</span></div>');
-
-        $cancelButton.before($acceptButton);
-
-        $acceptButton.on('click', function() {
-            $(this).remove();
-            //room.refreshUI();
-            acceptFunc();
-        });
-    }
-
-    if (!room.isActive()) {
-        $message.addClass('unread');
-    }
-
-    return $message;
-};
 
 /**
  * Incoming chat message handler
@@ -1079,7 +924,33 @@ Chat.prototype._onChatMessage = function(e, eventObject) {
     }
 };
 
+Chat.prototype.updateSectionUnreadCount = function() {
+    var self = this;
 
+    // update the "global" conversation tab unread counter
+    var unreadCount = 0;
+
+
+    self.chats.forEach(function(megaRoom, k) {
+        var c = parseInt(megaRoom.unreadCount, 10);
+        unreadCount += c;
+    });
+
+    // try NOT to touch the DOM if not needed...
+    if(self._lastUnreadCount != unreadCount) {
+        if (unreadCount > 0) {
+            $('.new-messages-indicator')
+                .text(
+                unreadCount
+            )
+                .removeClass('hidden');
+        } else {
+            $('.new-messages-indicator')
+                .addClass('hidden');
+        }
+        self._lastUnreadCount = unreadCount;
+    }
+};
 /**
  * Incoming Users Update handler
  *

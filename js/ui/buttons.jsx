@@ -94,9 +94,10 @@ var ButtonPopup = React.createClass({
         }
 
         var styles;
+
         // calculate and move the popup arrow to the correct position.
-        if(this.isMounted() && this._owner) {
-            var parentDomNode = this._owner.getDOMNode();
+        if(this.isMounted() && this.getOwnerElement()) {
+            var parentDomNode = this.getOwnerElement().getDOMNode();
             var $button = $(parentDomNode).children(1);
             var $buttonContainer = $(parentDomNode).children(0);
             var parentWidth = $buttonContainer.outerWidth();

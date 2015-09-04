@@ -27,19 +27,19 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
     MegaDataObject.attachToExistingJSObject(
         this,
         {
-            'state': null,
-            'users': [],
-            'roomJid': null,
-            'type': null,
-            'messages': [],
-            'messagesIndex': {},
-            'ctime': 0,
-            'lastActivity': 0,
-            'callRequest': null,
-            'callIsActive': false,
-            'isCurrentlyActive': false,
-            '_syncRequests': {},
-            '_messagesQueue': []
+            state: null,
+            users: [],
+            roomJid: null,
+            type: null,
+            messages: [],
+            messagesIndex: {},
+            ctime: 0,
+            lastActivity: 0,
+            callRequest: null,
+            callIsActive: false,
+            isCurrentlyActive: false,
+            _messagesQueue: [],
+            unreadCount: 0
         },
         true
     );
@@ -56,29 +56,11 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
     this.callIsActive = false;
 
     this.options = {
-        /**
-         * Maximum time for waiting a message sync, before trying to send a request to someone else in the room or
-         * failing the SYNC operation at all (if there are no other users to query for the sync op).
-         */
-        'requestMessagesSyncTimeout': 5500,
 
         /**
          * Send any queued messages if the room is not READY
          */
         'sendMessageQueueIfNotReadyTimeout': 6500, // XX: why is this so slow? optimise please.
-
-        /**
-         * Change the state of the room to READY in case there was no response in timely manner. (e.g. there were no
-         * users who responded for a sync call).
-         */
-        'messageSyncFailAfterTimeout': 45000, // XX: why is this so slow? optimise please.
-
-        /**
-         * Used to cleanup the memory from sent sync requests.
-         * This should be high enough, so that it will be enough for a response to be generated (message log to be
-         * encrypted), send and received.
-         */
-        'syncRequestCleanupTimeout': 50000,
 
         /**
          * The maximum time allowed for plugins to set the state of the room to PLUGINS_READY
@@ -187,57 +169,6 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
     });
 
 
-
-
-
-
-
-
-
-    $('.audio-icon', self.$header).bind('click.megaChat', function() {
-        if (!self.callSession) {
-            return;
-        }
-        if (self.callSession.getMediaOptions().audio === false) { // un mute
-            self.callSession.unmuteAudio();
-            $('.chat-header-indicator.muted-audio', self.$header).addClass('hidden');
-        } else { // mute
-            self.callSession.muteAudio();
-            $('.chat-header-indicator.muted-audio', self.$header).removeClass('hidden');
-        }
-
-
-
-
-        self.callSession.renderCallStartedState();
-    });
-
-    $('.video-icon', self.$header).bind('click.megaChat', function() {
-        if (!self.callSession) {
-            return;
-        }
-        if (self.callSession.getMediaOptions().video === false) { // un mute
-            self.callSession.unmuteVideo();
-            $('.chat-header-indicator.muted-video', self.$header).addClass('hidden');
-        } else { // mute
-            self.callSession.muteVideo();
-            $('.chat-header-indicator.muted-video', self.$header).removeClass('hidden');
-        }
-        if ($('.my-av-screen').attr('class').indexOf('minimized')==-1)
-           $('.my-av-screen').removeAttr('style');
-
-        if (self.callSession) {
-            self.callSession.renderCallStartedState();
-        }
-    });
-
-
-    var $avscreen = $('.my-av-screen', self.$header);
-    $avscreen.draggable({
-        'containment': $avscreen.parents('.chat-call-block'),
-        'scroll': false
-    });
-
     // activity on a specific room (show, hidden, got new message, etc)
     self.bind('activity', function(e) {
         self.lastActivity = unixtime();
@@ -272,6 +203,18 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
 
 
     self.megaChat.trigger('onRoomCreated', [self]);
+
+    $(window).rebind("focus." + self.roomJid, function() {
+        if(self.isCurrentlyActive) {
+            self.trigger("onChatShown");
+        }
+    });
+
+    self.megaChat.rebind("onRoomDestroy." + self.roomJid, function(e, room) {
+        if(room.roomJid == self.roomJid) {
+            $(window).rebind("unbind." + self.roomJid);
+        }
+    });
 
     return this;
 };
@@ -720,14 +663,6 @@ ChatRoom.prototype.destroy = function(notifyOtherDevices) {
 
     self.megaChat.trigger('onRoomDestroy', [self]);
 
-    // destroy any waiting sync requests
-    if (self._syncRequests) {
-        $.each(self._syncRequests, function(messageId, req) {
-
-            clearTimeout(req.timer);
-        });
-        self._syncRequests = {};
-    };
 
     self.leave(notifyOtherDevices);
 
@@ -859,7 +794,8 @@ var ChatDialogMessage = function(opts) {
             'buttons': true,
             'read': true,
             'persist': true,
-            'deleted': 0
+            'deleted': 0,
+            'seen': false
         },
         true,
         ChatDialogMessage.DEFAULT_OPTS
@@ -944,96 +880,7 @@ ChatRoom.prototype.refreshUI = function() {
     // TODO: remove me.
 };
 
-/**
- * Should be used to append messages in the message pane
- *
- * @param $message {*|jQuery} jQuery object containing the DOM Element that should be appended to the messages pane
- * @param messageObject {(KarereEventObjects.IncomingMessage|KarereEventObjects.OutgoingMessage)} contains message data
- */
-ChatRoom.prototype.appendDomMessage = function($message, messageObject) {
-    var self = this;
-
-    var $jsp = self.$messages.data('jsp');
-
-    assert($jsp, "JSP not available.");
-
-    var $before = null;
-    var $after = null;
-
-    if (!messageObject) {
-        messageObject = {};
-    }
-
-    var timestamp = unixtime();
-
-    if (messageObject.getDelay) {
-        timestamp = messageObject.getDelay();
-    }
-
-
-    $message.attr('data-timestamp', timestamp);
-
-    $('.jspContainer > .jspPane > .fm-chat-message-pad > .fm-chat-message-container', self.$messages).each(function() {
-        if (timestamp >= $(this).attr('data-timestamp')) {
-            $after = $(this);
-        } else if ($before === null && timestamp < $(this).attr('data-timestamp')) {
-            $before = $(this);
-        }
-    });
-
-    if (!$after && !$before) {
-//        self.logger.error("append: ", $message);
-        $('.jspContainer > .jspPane > .fm-chat-message-pad', self.$messages)
-            .append($message);
-    } else if ($before) {
-//        self.logger.error("before: ", $message, $before.text());
-        $message.insertBefore($before);
-    }  else if ($after) {
-//        self.logger.error("after: ", $message, $after.text());
-        $message.insertAfter($after);
-    }
-
-    self._regroupMessages();
-
-
-    // update unread messages count
-    if (self.megaChat.plugins.chatNotifications) {
-        if (self.roomJid != self.megaChat.getCurrentRoomJid() && $message.is('.unread')) {
-            var $navElement = self.getNavElement();
-            var $count = $('.nw-conversations-unread', $navElement);
-
-            var count = self.megaChat.plugins.chatNotifications.notifications.getCounterGroup(self.roomJid);
-
-            if (count > 0) {
-                $navElement.addClass("unread");
-            }
-
-            self.renderContactTree();
-        }
-    }
-
-    $(messageObject).bind("onStateChange", function(e, msgObj, oldVal, newVal) {
-        self._renderMessageState($message, msgObj)
-    });
-
-    self._renderMessageState($message, messageObject);
-
-    self.refreshScrollUI();
-    $jsp.scrollToBottom();
-
-    self.trigger('onAfterRenderMessage', [$message, messageObject]);
-
-    if (messageObject.getSeen && messageObject.getSeen() === false) { // mark as seen
-        messageObject.setSeen(true);
-    }
-
-    if ($message.is('.unread')) {
-        self.trigger('activity');
-    }
-
-};
-
-
+//TODO: move this out
 ChatRoom.prototype._renderMessageState = function($message, messageObject) {
     var self = this;
 
@@ -1084,371 +931,6 @@ ChatRoom.prototype._renderMessageState = function($message, messageObject) {
 
 
     self.refreshUI();
-};
-
-/**
- * Should take care of messages grouping (UI)
- *
- * @private
- */
-ChatRoom.prototype._regroupMessages = function() {
-    var self = this;
-    var $messages = self.$messages;
-    // group messages by hidding the author's name
-    $('.fm-chat-message-container', $messages).each(function() {
-        var $message = $(this);
-
-        var author = $message.data("from");
-
-        var $prevMessage = $message.prevAll('.fm-chat-message-container');
-        if (author && $prevMessage.is(".fm-chat-message-container")) {
-            if ($prevMessage.data("from") === author) {
-                $message.addClass('grouped-message');
-            } else {
-                $message.removeClass('grouped-message');
-            }
-        }
-
-    });
-
-}
-
-/**
- * Generates a DOM Element containing the required UI elements for an inline dialog (buttons, text message, icon, etc)
- *
- * @param type {string} used internally, if late access to the DOM element of the dialog is required (e.g. to remove it)
- * @param [user] {undefined|null|string} can be used to pass jid (full or bare jid) so that the .generateInlineDialog will add avatars to the actual message
- * @param iconCssClass {Array} css classes to be added to the .chat-notification element
- * @param messageContents {string} text that will be used as message content
- * @param cssClasses {Array} array of css class names to be added to the heading (used to append icons with css)
- * @param [buttons] {Array} Array of objects in the format of {type: "primary|seconday", text: "button 1", callback: fn(e)}
- * @param [read] {boolean} set to `true` if you want to mark only this message/dialog as ready (e.g. ignore the unread UI logic)
- * @returns {jQuery|HTMLElement}
- */
-ChatRoom.prototype.generateInlineDialog = function(type, user, iconCssClasses, messageContents, cssClasses, buttons, read) {
-    cssClasses = cssClasses || [];
-
-    var self = this;
-
-    var $inlineDialog = self.megaChat.$inline_dialog_tpl.clone();
-    $inlineDialog.attr('data-id', "idlg-" + rand(10000) + unixtime());
-
-    if (!read && !self.isActive()) {
-        $inlineDialog.addClass('unread');
-    }
-
-    $inlineDialog.data('dialog-meta', {
-        'type': type,
-        'user': user,
-        'iconCssClasses': iconCssClasses,
-        'messageContents': messageContents,
-        'cssClasses': cssClasses,
-        'buttons': buttons,
-        'read': !$inlineDialog.is(".unread")
-    });
-
-    if (user) {
-        var $element = self._generateContactAvatarElement(user);
-        $('.nw-contact-avatar', $inlineDialog).replaceWith($element);
-    } else {
-        $('.nw-contact-avatar', $inlineDialog).remove();
-    }
-    $inlineDialog.addClass(type + ' ' + iconCssClasses);
-
-    if ($.isArray(iconCssClasses)) {
-        $.each(iconCssClasses, function(k, v) {
-            $('.chat-notification', $inlineDialog).addClass(v);
-        });
-    } else if (iconCssClasses) {
-        // is string
-        $('.chat-notification', $inlineDialog).addClass(iconCssClasses);
-    }
-
-    $.each(cssClasses, function(k, v) {
-        $inlineDialog.addClass(v);
-    });
-
-    $('.chat-message-txt', $inlineDialog).text(messageContents ? messageContents : "");
-
-    var $pad = $('.fm-chat-messages-pad', $inlineDialog);
-
-    var timestamp = unixtime();
-
-    $pad.parent().attr('data-timestamp', timestamp);
-    $pad.parent().addClass("fm-chat-message-container");
-
-    $('.chat-message-date', $inlineDialog).text(
-        unixtimeToTimeString(timestamp) //time2last is a too bad performance idea.
-    );
-
-    var $primaryButton = $('.primary-button', $inlineDialog).detach();
-    var $secondaryButton = $('.secondary-button', $inlineDialog).detach();
-
-    if (buttons) {
-        $.each(buttons, function(k, v) {
-            var $button = v.type === "primary" ? $primaryButton.clone() : $secondaryButton.clone();
-            $button.addClass('fm-chat-inline-dialog-button-' + k);
-            $button.find('span').text(v.text);
-            $button.bind('click', function(e) {
-                v.callback(e);
-            });
-
-            $('.chat-message-txt', $inlineDialog).append($button);
-        });
-    }
-
-    return $inlineDialog;
-};
-
-
-/**
- * Request a messages sync for this room
- *
- * Note: This is a recursion-like function, which uses the `exceptFromUsers` argument to mark which users had failed to
- * respond with a message sync response.
- *
- * Second note: this function will halt if a request was already executed successfuly. (see this._syncDone)
- *
- * @param exceptFromUsers {Array} Array of FULL JIDs which should be skipped when asking for messages sync (e.g. they
- * had timed out in the past)
- */
-ChatRoom.prototype.requestMessageSync = function(exceptFromUsers) {
-    var self = this;
-    var megaChat = self.megaChat;
-    var karere = megaChat.karere;
-
-    self.logger.debug("will eventually sync:", self)
-
-    // sync only once
-    if (self._syncDone === true) {
-        return;
-    }
-    self._syncDone = true;
-
-    self.logger.debug("sync started:", self)
-
-    exceptFromUsers = exceptFromUsers || [];
-
-    var users = karere.getUsersInChat(self.roomJid);
-
-    // Pick from which user should i ask for sync.
-
-    if (Object.keys(users).length === 1) {
-        // empty room
-        self.logger.debug("Will not sync room: ", self.roomJid, ", because its empty (no participants).");
-        return false;
-    }
-
-    var ownUsers = [];
-    $.each(users, function(k, v) {
-        if (k === karere.getJid()) {
-            return; // continue;
-        } else if (exceptFromUsers.indexOf(k) != -1) {
-            return; //continue
-        } else { // only from mine users: if (k.split("/")[0] === karere.getBareJid())
-            if (k.split("/")[0] === karere.getBareJid()) {
-                ownUsers.push(k);
-            }
-        }
-    });
-
-    if (ownUsers.length === 0) {
-        self.logger.warn("No users to sync messages from for room: ", self.roomJid, "except list:", exceptFromUsers);
-        return false;
-    }
-    var userNum = Math.floor(Math.random() * ownUsers.length) + 0;
-    var userJid = ownUsers[userNum];
-
-    self.logger.debug("Potential message sync users: ", ownUsers);
-
-
-    var messageId = karere.sendAction(
-        userJid,
-        'sync',
-        {
-            'roomJid': self.roomJid
-        }
-    );
-
-    if (!self._syncRequests) {
-        self._syncRequests = {};
-    }
-
-    self._syncRequests[messageId] = {
-        'messageId': messageId,
-        'userJid': userJid,
-        'timeoutHandler': function() {
-            self.logger.warn(new Date(), "Sync request timed out from user: ", userJid, " for room: ", self.roomJid);
-
-            self._syncRequests[messageId] = {};
-
-            exceptFromUsers.push(userJid);
-            self.requestMessageSync(exceptFromUsers);
-        },
-        'timer': setTimeout(function() {
-            // timed out
-            self.logger.warn("Timeout waiting for", userJid, "to send sync message action. Will eventually, retry with some of the other users.");
-
-            self._syncRequests[messageId].timeoutHandler();
-        }, self.options.requestMessagesSyncTimeout)
-    };
-    self.logger.warn(new Date(), "Sent a sync request to user: ", userJid, " for room: ", self.roomJid);
-
-    return true;
-};
-
-/**
- * Send messages sync response
- *
- * @param request {KarereEventObjects.ActionMessage} with the `meta` from the actual request XMPP message
- * @returns {boolean}
- */
-ChatRoom.prototype.sendMessagesSyncResponse = function(request) {
-    var self = this;
-    var megaChat = self.megaChat;
-    var karere = megaChat.karere;
-
-    if (!karere.getUsersInChat(self.roomJid)[request.getFromJid()]) {
-        self.logger.error("Will not send message sync response to user who is not currently in the chat room for which he requested the sync.")
-        return false;
-    }
-
-    // Send messages as chunks (easier XML parsing?)
-
-    var messagesCount = self.messages.length;
-    var messagesChunkSize = 10;
-    for(var i = 0; i < messagesCount; i+=messagesChunkSize) {
-        var messages = self.messages.slice(i, i + messagesChunkSize);
-
-        // remove Non-Plain Objects from messages
-        $.each(messages, function(k, v) {
-            $.each(v, function(prop, val) {
-                if (typeof val === "object" && !$.isPlainObject(val)) {
-                    delete messages[k][prop];
-                }
-            });
-        });
-
-
-        // cleanup some non-needed data from the messages
-        $.each(messages, function(k, v) {
-            if (messages[k].messageHtml) {
-                delete messages[k].messageHtml;
-            }
-        });
-
-        karere.sendAction(
-            request.getFromJid(),
-            'syncResponse',
-            {
-                'inResponseTo': request.getMessageId(),
-                'roomJid': request.getMeta().roomJid,
-                'messages': messages,
-                'offset': i,
-                'chunkSize': messagesChunkSize,
-                'total': messagesCount
-            }
-        );
-    }
-};
-
-/**
- * This is a handler of message sync responses
- *
- * @param response {KarereEventObjects.ActionMessage} with the `meta` of the message sync response
- * @returns {boolean}
- */
-ChatRoom.prototype.handleSyncResponse = function(response) {
-    var self = this;
-    var megaChat = self.megaChat;
-    var karere = megaChat.karere;
-
-    var meta = response.getMeta();
-
-    if (!karere.getUsersInChat(self.roomJid)[response.getFromJid()]) {
-        self.logger.error("Will not accept message sync response from user who is currently not in the chat room for which I'd requested the sync.")
-        return false;
-    }
-    if (self._syncRequests) {
-        if (!self._syncRequests[meta.inResponseTo]) {
-            self.logger.error(
-                "Will not accept message sync response because inResponseTo, did not matched any cached messageIDs, " +
-                "got: ", meta.inResponseTo, ". Most likely they had sent the response too late. Requests " +
-                "currently active:", JSON.stringify(self._syncRequests)
-            );
-            return false;
-        }
-        clearTimeout(self._syncRequests[meta.inResponseTo].timer);
-    } else {
-        self.logger.error("Invalid sync response, room not found:", response);
-
-        return false;
-    }
-
-    // cleanup
-    $.each(self._syncRequests, function(messageId, request) {
-        clearTimeout(request.timer);
-    });
-
-    if (self._syncRequests.cleanupTimeout) {
-        clearTimeout(self._syncRequests.cleanupTimeout);
-    }
-    self._syncRequests.cleanupTimeout = setTimeout(function() {
-        self._syncRequests = {};
-    }, self.options.syncRequestCleanupTimeout);
-
-    $.each(meta.messages, function(k, msg) {
-        // msg is a plain javascript object, since it passed JSON serialization, so now we will convert it to propper
-        // {KarereEventObjects.IncomingMessage|KarereEventObjects.OutgoingMessage}
-        var msgObject = null;
-
-
-        // skip deleted messages
-        if (msg.meta && msg.meta.isDeleted) {
-            return;
-        }
-
-        if (Karere.getNormalizedBareJid(msg.fromJid) === self.megaChat.karere.getBareJid()) {
-            // Outgoing
-            //toJid, fromJid, type, messageId, contents, meta, delay, state
-            msgObject = new KarereEventObjects.OutgoingMessage(
-                msg.toJid,
-                msg.fromJid,
-                msg.type,
-                msg.messageId,
-                msg.contents,
-                msg.meta,
-                msg.delay,
-                msg.state,
-                msg.roomJid
-            )
-        } else {
-            // Incoming
-            // toJid, fromJid, type, rawType, messageId, rawMessage, roomJid, meta, contents, elements, delay
-            msgObject = new KarereEventObjects.IncomingMessage(
-                msg.toJid,
-                msg.fromJid,
-                msg.type,
-                msg.rawType,
-                msg.messageId,
-                undefined,
-                self.roomJid,
-                msg.meta,
-                msg.contents,
-                undefined,
-                msg.delay
-            )
-        }
-
-        self.appendMessage(msgObject);
-    });
-
-    if ((meta.chunkSize + meta.offset) >= meta.total) {
-        self.logger.warn("finished sync from: ", response.getFromJid(), self.roomJid, meta.total);
-    } else {
-        self.logger.debug("waiting for more messages from sync: ", meta.total - (meta.chunkSize + meta.offset));
-    }
-
 };
 
 /**
@@ -1801,7 +1283,6 @@ ChatRoom.prototype.recover = function() {
 
     self.logger.warn('recovering room: ', self.roomJid, self);
 
-    self._syncRequests = {};
     self.callRequest = null;
     self.setState(ChatRoom.STATE.JOINING, true);
     var $startChatPromise = self.megaChat.karere.startChat([], self.type, self.roomJid.split("@")[0], (self.type === "private" ? false : undefined));
@@ -1833,8 +1314,6 @@ ChatRoom.prototype._flushMessagesQueue = function() {
 
         self.megaChat.trigger('onMessageQueueFlushed', self);
     }
-
-    self.requestMessageSync();
 };
 
 ChatRoom.prototype._generateContactAvatarElement = function(fullJid) {
@@ -2013,6 +1492,10 @@ ChatRoom.prototype.removeMessageById = function(messageId) {
 
         if (v.messageId === messageId) {
             v.deleted = 1;
+            if(!v.seen) {
+                v.seen = true;
+            }
+
             // cleanup the messagesIndex
             delete self.messagesIndex[self.messages._data[0].messageId];
             return false; // break;

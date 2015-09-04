@@ -39,6 +39,27 @@ var getMessageString;
 
 var ConversationMessage = React.createClass({
     mixins: [MegaRenderMixin, RenderDebugger],
+    onAfterRenderWasTriggered: false,
+    componentWillMount: function() {
+        var self = this;
+        var chatRoom = self.props.chatRoom;
+        var megaChat = chatRoom.megaChat;
+        megaChat.chats.addChangeListener(function() {
+            if(self.isMounted()) {
+                self.forceUpdate();
+            }
+        });
+    },
+    componentDidUpdate: function() {
+        var self = this;
+        var chatRoom = self.props.chatRoom;
+        var megaChat = chatRoom.megaChat;
+
+        if(!self.onAfterRenderWasTriggered) {
+            chatRoom.trigger("onAfterRenderMessage", self.props.message);
+            self.onAfterRenderWasTriggered = true;
+        }
+    },
     render: function () {
         var self = this;
         var cssClasses = "fm-chat-messages-block fm-chat-message-container";
@@ -50,7 +71,8 @@ var ConversationMessage = React.createClass({
         var contact;
         var timestamp;
         var textMessage;
-        var authorTextDiv;
+        var authorTextDiv="";
+        var messageLabel="";
 
 
         if (message.authorContact) {
@@ -109,7 +131,7 @@ var ConversationMessage = React.createClass({
             message.type
         ) {
             cssClasses += " inline-dialog chat-notification " + message.type;
-            textMessage = htmlentities(getMessageString(message.type));
+            textMessage = getMessageString(message.type);
             if(!textMessage) {
                 console.error("Message with type: ", message.type, "does not have a text string defined. Message: ", message);
                 debugger;
@@ -119,33 +141,44 @@ var ConversationMessage = React.createClass({
             if(textMessage.splice) {
                 var tmpMsg = textMessage[0].replace("[X]", generateContactName(contact.u));
 
-                if(chatRoom.megaChat._currentCallCounter) {
-                    tmpMsg += textMessage[1].replace("[X]", secToDuration(chatRoom.megaChat._currentCallCounter)) + " "
+                if(message.currentCallCounter) {
+                    tmpMsg += " " + textMessage[1].replace("[X]", secToDuration(message.currentCallCounter)) + " "
                 }
                 textMessage = tmpMsg;
             } else {
                 textMessage = textMessage.replace("[X]", generateContactName(contact.u));
             }
 
+            textMessage = htmlentities(textMessage);
+
+            message.textMessage = textMessage;
+
             // mapping css icons to msg types
             if(message.type === "call-rejected") {
-                cssClasses += " rejected-call";
+                message.cssClass = "rejected-call";
             }
             else if (message.type === "call-missed") {
-                cssClasses += " missed-call";
+                message.cssClass = "missed-call"
             }
             else if (message.type === "call-handled-elsewhere") {
-                cssClasses += " call-from-different-device";
+                message.cssClass = "call-from-different-device";
             }
             else if (message.type === "call-failed") {
-                cssClasses += " rejected-call";
+                message.cssClass = "rejected-call";
             }
             else if (message.type === "call-failed-media") {
-                cssClasses += " call-canceled";
+                message.cssClass = "call-canceled";
             }
             else if (message.type === "call-canceled") {
-                cssClasses += " call-ended";
+                message.cssClass = "call-ended";
+            } else if (message.type === "incoming-call") {
+                message.cssClass = "incoming-call";
+            } else if (message.type === "outgoing-call") {
+                message.cssClass = "outgoing-call";
+            } else {
+                message.cssClass = message.type;
             }
+            cssClasses += " " + message.cssClass;
         }
 
 
@@ -165,6 +198,20 @@ var ConversationMessage = React.createClass({
             });
         }
 
+        if(message instanceof KarereEventObjects.OutgoingMessage) {
+            var labelClass = "label text-message";
+            var labelText;
+
+            if(message.getState() === KarereEventObjects.OutgoingMessage.STATE.NOT_SENT) {
+                labelClass += "not-sent";
+                labelText = "not sent"
+            }
+            else if(message.getState() === KarereEventObjects.OutgoingMessage.STATE.SENT) {
+                labelClass += "sent";
+                labelText = "sent";
+            }
+            messageLabel = <span className={labelClass}>{labelText}</span>
+        }
         return (
             <div className={cssClasses} data-id={"id" + message.messageId}>
                 <div className="fm-chat-messages-pad">
@@ -173,7 +220,8 @@ var ConversationMessage = React.createClass({
 
                     <div className="fm-chat-message">
                         <div className="chat-message-date">{timestamp}</div>
-                        {authorTextDiv}
+                        <span>{authorTextDiv}</span>
+                        <span>{messageLabel}</span>
                         <div className="chat-message-txt">
                             <span dangerouslySetInnerHTML={{__html:textMessage}}></span>
                             {buttons}
@@ -197,6 +245,7 @@ var ConversationPanel = React.createClass({
             mouseOverDuringCall: false,
             typedMessage: "",
             emoticonsPopupIsActive: false,
+            currentlyTyping: []
         };
     },
 
@@ -401,7 +450,8 @@ var ConversationPanel = React.createClass({
         var room = this.props.chatRoom;
 
         if (!self.typingTimeout) {
-            if (room && room.state === ChatRoom.STATE.READY) {
+            if (room && room.state === ChatRoom.STATE.READY && !self.iAmTyping) {
+                self.iAmTyping = true;
                 room.megaChat.karere.sendIsComposing(room.roomJid);
             }
         } else if (self.typingTimeout) {
@@ -420,8 +470,10 @@ var ConversationPanel = React.createClass({
             clearTimeout(self.typingTimeout);
             self.typingTimeout = null;
         }
-        if (room && room.state === ChatRoom.STATE.READY) {
+
+        if (room && room.state === ChatRoom.STATE.READY && self.iAmTyping === true) {
             room.megaChat.karere.sendComposingPaused(room.roomJid);
+            self.iAmTyping = false;
         }
     },
     onTypeAreaKeyDown: function(e) {
@@ -462,6 +514,13 @@ var ConversationPanel = React.createClass({
 
         if ($.trim(e.target.value).length) {
             self.typing();
+        }
+    },
+    onMouseMove: function(e) {
+        var self = this;
+        var chatRoom = self.props.chatRoom;
+        if(self.isMounted()) {
+            chatRoom.trigger("onChatIsFocused");
         }
     },
     componentDidMount: function() {
@@ -507,9 +566,65 @@ var ConversationPanel = React.createClass({
             });
         self.handleWindowResize();
     },
+    componentWillMount: function() {
+        var self = this;
+        var chatRoom = self.props.chatRoom;
+        var megaChat = self.props.chatRoom.megaChat;
+        megaChat.karere.bind("onComposingMessage." + chatRoom.roomJid, function(e, eventObject) {
+            if(!self.isMounted()) {
+                return;
+            }
+            if (Karere.getNormalizedFullJid(eventObject.getFromJid()) === megaChat.karere.getJid()) {
+                return;
+            }
+
+            var room = megaChat.chats[eventObject.getRoomJid()];
+            if (room.roomJid == chatRoom.roomJid) {
+                var currentlyTyping = self.state.currentlyTyping;
+                currentlyTyping.push(
+                    megaChat.getContactFromJid(Karere.getNormalizedBareJid(eventObject.getFromJid())).u
+                );
+                currentlyTyping = array_unique(currentlyTyping);
+                self.setState({
+                    currentlyTyping: currentlyTyping
+                });
+            }
+        });
+
+        megaChat.karere.rebind("onPausedMessage." + chatRoom.roomJid, function(e, eventObject) {
+            var room = megaChat.chats[eventObject.getRoomJid()];
+
+            if(!self.isMounted()) {
+                return;
+            }
+            if (Karere.getNormalizedFullJid(eventObject.getFromJid()) === megaChat.karere.getJid()) {
+                return;
+            }
+
+            if (room.roomJid === chatRoom.roomJid) {
+                var currentlyTyping = self.state.currentlyTyping;
+                var u_h = megaChat.getContactFromJid(Karere.getNormalizedBareJid(eventObject.getFromJid())).u;
+
+                if (currentlyTyping.indexOf(u_h) > -1) {
+                    removeValue(currentlyTyping, u_h);
+                    self.setState({
+                        currentlyTyping: currentlyTyping
+                    });
+                    self.forceUpdate();
+                }
+            }
+        });
+    },
     componentWillUnmount: function() {
-        window.removeEventListener('resize', this.handleWindowResize);
-        $(document).unbind("fullscreenchange.megaChat_" + this.props.chatRoom.roomJid)
+        var self = this;
+        var chatRoom = self.props.chatRoom;
+        var megaChat = chatRoom.megaChat;
+
+        window.removeEventListener('resize', self.handleWindowResize);
+        $(document).unbind("fullscreenchange.megaChat_" + chatRoom.roomJid);
+
+        megaChat.karere.bind("onComposingMessage." + chatRoom.roomJid);
+        megaChat.karere.unbind("onPausedMessage." + chatRoom.roomJid);
     },
     componentDidUpdate: function() {
         var self = this;
@@ -552,6 +667,8 @@ var ConversationPanel = React.createClass({
         }
         // <video/> display change to trigger re-render hack.
         $('.rmtVideo:visible').css('display', '');
+
+        room.megaChat.updateSectionUnreadCount();
 
         self.handleWindowResize();
     },
@@ -624,8 +741,6 @@ var ConversationPanel = React.createClass({
     },
     render: function() {
         var self = this;
-
-        //console.error('rendering: ', this.props.chatRoom.roomJid, this.props.chatRoom.isCurrentlyActive);
 
         var room = this.props.chatRoom;
         var contactJid = room.getParticipantsExceptMe()[0];
@@ -713,7 +828,7 @@ var ConversationPanel = React.createClass({
         self.props.messages.forEach(function(v, k) {
             if(v.deleted !== 1) {
                 messagesList.push(
-                    <ConversationMessage message={v} chatRoom={room} />
+                    <ConversationMessage message={v} chatRoom={room} key={v.messageId} />
                 );
             }
         });
@@ -735,6 +850,7 @@ var ConversationPanel = React.createClass({
         var sizeIconClasses = "video-call-button size-icon";
         var emoticonsPopupClasses = "fm-chat-emotion-popup";
         var emoticonsPopupButtonClasses = "fm-chat-emotions-icon";
+        var typingElement;
 
         // setup ONLY if there is an active call session
         if(room.callSession && callIsActive) {
@@ -826,8 +942,30 @@ var ConversationPanel = React.createClass({
             emoticonsPopupClasses += " hidden";
         }
 
+        if(self.state.currentlyTyping.length > 0) {
+            typingElement = <div className="fm-chat-messages-block typing" key="typingElement">
+                <div className="fm-chat-messages-pad">
+                    <span>
+                        {self.state.currentlyTyping.map((u_h) => {
+                            return <ContactsUI.Avatar key={u_h} contact={M.u[u_h]} />
+                        })}
+                    </span>
+                    <div className="fm-chat-message">
+                        <div className="circle" id="circleG">
+                            <div id="circleG_1" className="circleG"></div>
+                            <div id="circleG_2" className="circleG"></div>
+                            <div id="circleG_3" className="circleG"></div>
+                        </div>
+                    </div>
+                    <div className="clear"></div>
+                </div>
+            </div>;
+        } else {
+            // don't do anything.
+        }
+
         return (
-            <div className={conversationPanelClasses}>
+            <div className={conversationPanelClasses} onMouseMove={self.onMouseMove}>
                 <div className={headerClasses} data-room-jid={self.props.chatRoom.roomJid.split("@")[0]}>
                     <ContactsUI.Avatar contact={contact} />
                     <div className={contactClassString}>
@@ -917,21 +1055,7 @@ var ConversationPanel = React.createClass({
                         </div>
 
                         {messagesList}
-                        <div className="fm-chat-messages-block typing-template right-block">
-                            <div className="fm-chat-messages-pad">
-                                <div className="nw-contact-avatar">
-                                    <img alt="" src="" />
-                                </div>
-                                <div className="fm-chat-message">
-                                    <div className="circle" id="circleG">
-                                        <div id="circleG_1" className="circleG"></div>
-                                        <div id="circleG_2" className="circleG"></div>
-                                        <div id="circleG_3" className="circleG"></div>
-                                    </div>
-                                </div>
-                                <div className="clear"></div>
-                            </div>
-                        </div>
+                        {typingElement}
 
                     </div>
                 </div>
@@ -1017,5 +1141,5 @@ var ConversationPanels = React.createClass({
 
 module.exports = {
     ConversationPanel,
-    ConversationPanels,
+    ConversationPanels
 };

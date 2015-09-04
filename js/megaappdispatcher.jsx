@@ -1,4 +1,4 @@
-var MegaDispatcher = require('./megadispatcher.jsx');
+var MegaDispatcher = require('./megaDispatcher.jsx');
 var assign = require('object-assign');
 
 var MegaAppDispatcher = assign({}, MegaDispatcher.prototype, {

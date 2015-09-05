@@ -1754,9 +1754,10 @@ function stopsc() {
 }
 
 // calls execsc() with server-client requests received
-function getsc(fm) {
+function getsc(fm, initialNotify) {
     api_req('sn=' + maxaction + '&ssl=1&e=' + cmsNotifHandler, {
         fm: fm,
+        initialNotify: initialNotify,
         callback: function __onGetSC(res, ctx) {
             if (typeof res === 'object') {
                 function getSCDone(sma) {
@@ -1766,10 +1767,17 @@ function getsc(fm) {
                             && typeof mDB !== 'undefined') {
                         localStorage[u_handle + '_maxaction'] = maxaction;
                     }
-
                     if (ctx.fm) {
                         // mDBloaded = true;
                         loadfm_done();
+                    }
+
+                    // After the first SC request all subsequent requests can generate notifications
+                    notify.initialLoadComplete = true;
+
+                    // If this was called from the initial fm load via gettree or db load, we should request the
+                    // latest notifications. These must be done after the first getSC call.
+                    if (ctx.fm || ctx.initialNotify) {
                         notify.getInitialNotifications();
                     }
                 }

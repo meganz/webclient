@@ -263,7 +263,7 @@ MegaQueue.prototype.process = function(sp) {
                     if (this.stuck) {
                         this.stuck();
                     }
-                    srvlog('MegaQueue.getNextTask gave no tasks for too long... (' + this.qname + ')', sp);
+                    // srvlog('MegaQueue.getNextTask gave no tasks for too long... (' + this.qname + ')', sp);
                 }
             }
             if (this._queue) {

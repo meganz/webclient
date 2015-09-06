@@ -576,9 +576,16 @@ function init_page() {
             $('.chrome-download-button').css('font-size', '12px');
         }
 
-        if (!is_extension && typeof chrome !== 'undefined' && !chrome.app.isInstalled) {
-            $('.chrome-app-button,.chrome-app-scr').rebind('click', function () {
-                chrome.webstore.install();
+        if (!is_extension && typeof chrome !== 'undefined'
+                && chrome.app && !chrome.app.isInstalled) {
+
+            $('.chrome-app-button, .chrome-app-scr').rebind('click', function () {
+                try {
+                    chrome.webstore.install();
+                }
+                catch (ex) {
+                    alert(ex);
+                }
                 return false;
             });
             $('.chrome-app-scr').css('cursor', 'pointer');

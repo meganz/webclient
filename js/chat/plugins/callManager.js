@@ -1489,6 +1489,16 @@ CallManager.prototype._attachToChat = function(megaChat) {
 
 
 /**
+ * Suggested by Alex, a simple regexp to detect and find ALL 'reason's for a call failed reasons.
+ **/
+CallManager._isAFailedReason = function(reason) {
+    if(!reason || !reason.match) {
+        return false;
+    }
+    return reason.match(/.*(ice-disconnect|fail|error|security|timeout).*/) ? 1 : 0;
+}
+
+/**
  * This method will map RtcSession Events to Call Manager events and CallSession callbacks.
  * This method should NOT contain any UI logic.
  * The UI Logic will be embedded into the CallSession's callbacks.
@@ -1570,24 +1580,23 @@ CallManager.prototype._attachToChatRoom = function(megaChat, chatRoom) {
 
         delete self.incomingRequestJingleSessions[session.sid];
 
-        // wtf?
-        var reason = eventData.reason ?
-                            eventData.reason : (
-                                                    eventData.info && eventData.info.reason ?
-                                                                eventData.info.reason : undefined
-                                                );
-
-        if (reason === 'answer-timeout') {
+        var reason = eventData.reason;
+        if (reason === 'call-unanswered' || reason === 'peer-call-unanswered') {
             session.setState(CallSession.STATE.MISSED);
             self.trigger('CallMissed', [session, eventData]);
         } else if (reason === 'handled-elsewhere') {
             session.setState(CallSession.STATE.HANDLED_ELSEWHERE);
             self.trigger('CallHandledElsewhere', [session, eventData]);
-        } else if (reason === 'caller') {
+        } else if (reason === 'peer-user') {
             session.setState(CallSession.STATE.MISSED);
             self.trigger('CallMissed', [session, eventData]);
+        } else if (reason === 'user') {
+            //do nothing, we canceled it so we have that handled already, this is just a feedback event
+        } else if (reason.match(/.*error.*/)) {
+            session.setState(CallSession.STATE.FAILED);
+            self.trigger('CallFailed', [session, reason, eventData.text])
         } else {
-            assert(false, 'unknown call-canceled:eventData.info.reason found: ', reason);
+            assert(false, 'unknown call-canceled:eventData.reason found: '+ reason);
         }
     });
 
@@ -1631,31 +1640,36 @@ CallManager.prototype._attachToChatRoom = function(megaChat, chatRoom) {
             if (session.state === CallSession.STATE.STARTED) {
                 session.setState(CallSession.STATE.ENDED);
                 self.trigger('CallEnded', [session, reason]);
-            } else {
+            }
+            else {
                 session.setState(CallSession.STATE.REJECTED);
                 self.trigger('CallRejected', [session, reason]);
             }
-        } else if (reason === 'busy' || reason === 'hangup' || reason === 'peer-hangup') {
+        }
+        else if (reason === 'busy' || reason === 'hangup' || reason === 'peer-hangup') {
             session.setState(CallSession.STATE.REJECTED);
             self.trigger('CallRejected', [session, reason]);
-        } else if (
-            reason === 'peer-disconnected' ||
-            reason === 'ice-disconnect' ||
-            reason.indexOf('error') > -1 ||
-            reason === 'peer-xmpp-disconnect'
-        ) {
+        }
+        else if (reason === 'security') {
             session.setState(CallSession.STATE.FAILED);
             self.trigger('CallFailed', [session, reason, eventData.text]);
-        } else if (reason === 'security') {
+        }
+        else if (reason === 'failed') {
             session.setState(CallSession.STATE.FAILED);
             self.trigger('CallFailed', [session, reason, eventData.text]);
-        } else if (reason === 'failed') {
+        }
+        else if (reason === 'initiate-timeout') { // "timed out, while waiting for the caller to join the call"
             session.setState(CallSession.STATE.FAILED);
             self.trigger('CallFailed', [session, reason, eventData.text]);
-        } else if (reason === 'initiate-timeout') { // "timed out, while waiting for the caller to join the call"
-            session.setState(CallSession.STATE.FAILED);
-            self.trigger('CallFailed', [session, reason, eventData.text]);
-        } else {
+        }
+        else if (
+                CallManager._isAFailedReason(reason) ||
+                reason.indexOf('error') > -1
+            ) {
+                session.setState(CallSession.STATE.FAILED);
+                self.trigger('CallFailed', [session, reason, eventData.text]);
+        }
+        else {
             session.logger.error(
                 'Unknown call ended reason: ',
                 reason,

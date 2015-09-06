@@ -12,6 +12,9 @@ var inherits = (function() {
     }
 })();
 
+makeEnum(['MDBOPEN'], 'MEGAFLAG_', window);
+
+
 /**
  *  Check if value is contained in a array. If it is return value
  *  otherwise false
@@ -242,17 +245,19 @@ function translate(html) {
 
             if (namespace === 'dq') {
                 // Replace double quotes to their html entities
-                l[match] = String(l[localeNum]).replace('"', '&quot;', 'g');
+                l[match] = String(l[localeNum]).replace(/"/g, '&quot;');
             }
             else if (namespace === 'q') {
                 // Escape single quotes
-                l[match] = String(l[localeNum]).replace("'", "\\'", 'g');
+                l[match] = String(l[localeNum]).replace(/'/g, "\\'");
             }
             else if (namespace === 'dqq') {
                 // Both of the above
-                l[match] = String(l[localeNum]).replace('"', '&quot;', 'g');
-                l[match] = l[match].replace("'", "\\'", 'g');
+                l[match] = String(l[localeNum]).replace(/"/g, '&quot;');
+                l[match] = l[match].replace(/'/g, "\\'");
             }
+
+            return l[match];
         }
         return String(l[localeNum]);
     };
@@ -405,7 +410,7 @@ function divscroll(el) {
 
 function removeHash() {
     var scrollV, scrollH, loc = window.location;
-    
+
     // Prevent scrolling by storing the page's current scroll offset
     scrollV = document.body.scrollTop;
     scrollH = document.body.scrollLeft;
@@ -821,7 +826,7 @@ function makeid(len) {
 }
 
 function checkMail(email) {
-    email = email.replace('+', '', 'g');
+    email = email.replace(/\+/g, '');
     var filter = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
     if (filter.test(email)) {
         return false;
@@ -3490,11 +3495,11 @@ if (typeof sjcl !== 'undefined') {
      * Nodes related operations
      *
      * @param opts {Object}
-     * 
+     *
      * @constructor
      */
     var Nodes = function(opts) {
-        
+
         var self = this;
         var defaultOptions = {
         };
@@ -3503,17 +3508,17 @@ if (typeof sjcl !== 'undefined') {
 
     /**
      * isShareExists
-     * 
+     *
      * checking if there's available shares for selected nodes
-     * 
+     *
      * @param {array} nodes, holds array of ids from selected folders/files (nodes)
-     * 
+     *
      * @returns {boolean}
      */
     Nodes.prototype.isShareExist = function(nodes) {
 
         var self = this;
-        
+
         for (var i in nodes) {
             if (nodes.hasOwnProperty(i)) {
                 
@@ -3534,18 +3539,18 @@ if (typeof sjcl !== 'undefined') {
 
     /**
      * loopSubdirs
-     * 
+     *
      * Loops through all subdirs of given node
-     * 
+     *
      * @param {string} id: node id
      * @param {array} nodesId
-     * 
+     *
      * @returns child nodes id
      */
     Nodes.prototype.loopSubdirs = function(id, nodesId) {
 
         var self = this;
-        
+
         var subDirs = nodesId;
 
         if (subDirs) {

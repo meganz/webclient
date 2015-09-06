@@ -36,7 +36,7 @@ module.exports = function(config) {
         'js/asmcrypto.js',
         'js/jsbn.js',
         'js/jsbn2.js',
-        'js/jodid25519.js',
+        'js/vendor/nacl-fast.js',
         // For notifications.
         'js/vendor/ion.sound.js',
         'js/vendor/favico.js',

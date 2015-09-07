@@ -2144,32 +2144,32 @@ function fmremove() {
                 M.moveNodes($.selected, M.RubbishID);
             }
         } else {
-            
+
             var nodes = new mega.Nodes({}),
                 // Additional message in case that there's a shared node
                 delShareInfo,
                 // Contains complete directory structure of selected nodes, their ids
                 dirTree = [];
-            
+
             for (var item in $.selected) {
                 if ($.selected.hasOwnProperty(item)) {
                     dirTree = $.merge(dirTree, nodes.loopSubdirs($.selected[item], null));
                 }
             }
-            
+
             delShareInfo = nodes.isShareExist(dirTree) ? ' ' + l[1952] + ' ' + l[7410] : '';
-            
+
             msgDialog('remove', l[1003], l[1004].replace('[X]', fm_contains(filecnt, foldercnt)) + delShareInfo, false, function(e) {
                 if (e) {
                     if (M.currentrootid === 'shares') {
                         M.copyNodes($.selected, M.RubbishID, true);
                     }
                     else {
-   
+
                         // Remove all shares related to selected nodes
                         for (var selection in dirTree) {
                             if (dirTree.hasOwnProperty(selection)) {
-                                
+
                                 // Remove regular/full share
                                 for (var share in M.d[dirTree[selection]].shares) {
                                     if (M.d[dirTree[selection]].shares.hasOwnProperty(share)) {
@@ -2178,7 +2178,7 @@ function fmremove() {
                                         setLastInteractionWith(dirTree[selection], "0:" + unixtime());
                                     }
                                 }
-                                
+
                                 // Remove pending share
                                 for (var pendingUserId in M.ps[dirTree[selection]]) {
                                     if (M.ps[dirTree[selection]].hasOwnProperty(pendingUserId)) {
@@ -2190,7 +2190,7 @@ function fmremove() {
                         }
                         M.moveNodes($.selected, M.RubbishID);
                     }
-                    
+
                 }
             }, true);
         }
@@ -3017,6 +3017,7 @@ function accountUI()
         // Maximum bandwidth
         $('.bandwidth .nw-fm-percents span.pecents-txt').html(htmlentities(b2[0]));
         $('.bandwidth .nw-fm-percents span.gb-txt').html(htmlentities(b2[1]));
+        $('.bandwidth .nw-fm-percents span.perc-txt').html(perc_c + '%');
 
         // Used bandwidth
         $('.bandwidth .fm-bar-size.used').html(b1);
@@ -3067,6 +3068,7 @@ function accountUI()
         b2[0] = Math.round(b2[0]) + ' ';
         $('.storage .nw-fm-percents span.pecents-txt').html(htmlentities(b2[0]));
         $('.storage .nw-fm-percents span.gb-txt').html(htmlentities(b2[1]));
+        $('.storage .nw-fm-percents span.perc-txt').html(perc_c + '%');
 
         // Used space
         $('.storage .fm-bar-size.used').html(bytesToSize(account.space_used));
@@ -3077,6 +3079,7 @@ function accountUI()
         } else {
             b2 = bytesToSize(b2);
         }
+
         $('.storage .fm-bar-size.available').html(b2);
         // Cloud drive
         $('.storage .fm-bar-size.cloud-drive').html(bytesToSize(c[k[0]][0]));
@@ -3140,14 +3143,19 @@ function accountUI()
                 return false;
             var country = countrydetails(el[4]);
             var browser = browserdetails(el[2]);
-            var recent = l[483];
+            var recent = '<span class="active-seccion-txt">' + l[483] + '</span><span class="settings-logout">' + l[967] + '</span>';
             if (!el[5])
-                recent = time2date(el[0]);
+                recent = htmlentities(time2date(el[0]));
             if (!country.icon || country.icon === '??.gif')
                 country.icon = 'ud.gif';
-            html += '<tr><td><span class="fm-browsers-icon"><img alt="" src="' + staticpath + 'images/browser/' + browser.icon + '" /></span><span class="fm-browsers-txt">' + htmlentities(browser.name) + '</span></td><td>' + htmlentities(el[3]) + '</td><td><span class="fm-flags-icon"><img alt="" src="' + staticpath + 'images/flags/' + country.icon + '" style="margin-left: 0px;" /></span><span class="fm-flags-txt">' + htmlentities(country.name) + '</span></td><td>' + htmlentities(recent) + '</td></tr>';
+            html += '<tr><td><span class="fm-browsers-icon"><img alt="" src="' + staticpath + 'images/browser/' + browser.icon + '" /></span><span class="fm-browsers-txt">' + htmlentities(browser.name) + '</span></td><td>' + htmlentities(el[3]) + '</td><td><span class="fm-flags-icon"><img alt="" src="' + staticpath + 'images/flags/' + country.icon + '" style="margin-left: 0px;" /></span><span class="fm-flags-txt">' + htmlentities(country.name) + '</span></td><td>' + recent + '</td></tr>';
         });
         $('.grid-table.sessions').html(html);
+
+        $('.settings-logout').bind('click', function()
+        {
+			mLogout();
+        });
 
         $('.account-history-dropdown-button.purchases').text(l[469].replace('[X]', $.purchaselimit));
         $('.account-history-drop-items.purchase10-').text(l[469].replace('[X]', 10));
@@ -3909,7 +3917,7 @@ function accountUI()
         {
             avatarDialog();
         });
-        $('.fm-account-avatar img').attr('src', useravatar.mine())
+        $('.fm-account-avatar img').attr('src', useravatar.mine());
 
         $(window).unbind('resize.account');
         $(window).bind('resize.account', function()
@@ -3966,7 +3974,7 @@ function accountUI()
             }
         });
     });
-    
+
     // Button on main Account page to backup their master key
     $('.backup-master-key').rebind('click', function() {
         document.location.hash = 'backup';
@@ -4358,7 +4366,7 @@ function gridUI() {
  *
  * @constructor
  */
-var FMShortcuts = function() {
+function FMShortcuts() {
 
     var current_operation = null;
 
@@ -4441,8 +4449,6 @@ var FMShortcuts = function() {
 
     });
 }
-
-var fmShortcuts = new FMShortcuts();
 
 /**
  * Simple way for searching for nodes by their first letter.
@@ -4714,7 +4720,10 @@ var SelectionManager = function($selectable) {
                 ".files-grid-view.contacts-view",
                 ".contacts-grid-view",
                 ".fm-contacts-blocks-view",
-                ".files-grid-view.contact-details-view"
+                ".files-grid-view.contact-details-view",
+                ".shared-grid-view",
+                ".shared-blocks-view",
+                ".shared-details-block"
             ].join(",")
             ).filter(":visible");
 
@@ -5237,9 +5246,10 @@ function selectddUI() {
      * @type {SelectionManager}
      */
 
-    selectionManager = new SelectionManager(
-        $($.selectddUIgrid)
-        );
+    if (!window.fmShortcuts) {
+        window.fmShortcuts = new FMShortcuts();
+    }
+    selectionManager = new SelectionManager($($.selectddUIgrid));
 
     $($.selectddUIgrid + ' ' + $.selectddUIitem).unbind('contextmenu');
     $($.selectddUIgrid + ' ' + $.selectddUIitem).bind('contextmenu', function(e)
@@ -8787,12 +8797,12 @@ function firefoxDialog(close)
     fm_showoverlay();
     $('.fm-dialog.firefox-dialog').removeClass('hidden');
     $.dialog = 'firefox';
-    
+
     $('.firefox-dialog .browsers-button,.firefox-dialog .fm-dialog-close,.firefox-dialog .close-button').rebind('click', function()
     {
         firefoxDialog(1);
     });
-    
+
     $('#firefox-checkbox').rebind('click', function()
     {
         if ($(this).hasClass('checkboxOn') === false)
@@ -8912,23 +8922,21 @@ function propertiesDialog(close)
     fm_showoverlay();
     pd.removeClass('hidden multiple folders-only two-elements shared shared-with-me read-only read-and-write full-access');
     $('.properties-elements-counter span').text('');
-    $('.fm-dialog.properties-dialog .properties-body').unbind('click');
-    $('.fm-dialog.properties-dialog .properties-body').bind('click', function()
+    $('.fm-dialog.properties-dialog .properties-body').rebind('click', function()
     {
         // Clicking anywhere in the dialog will close the context-menu, if open
         var e = $('.fm-dialog.properties-dialog .file-settings-icon');
         if (e.hasClass('active'))
             e.click();
     });
-    $('.fm-dialog.properties-dialog .fm-dialog-close').unbind('click');
-    $('.fm-dialog.properties-dialog .fm-dialog-close').bind('click', function()
+    $('.fm-dialog.properties-dialog .fm-dialog-close').rebind('click', function()
     {
         propertiesDialog(1);
     });
-    var filecnt = 0, foldercnt = 0, size = 0, sfilecnt = 0, sfoldercnt = 0;
+    var filecnt = 0, foldercnt = 0, size = 0, sfilecnt = 0, sfoldercnt = 0, n;
     for (var i in $.selected)
     {
-        var n = M.d[$.selected[i]];
+        n = M.d[$.selected[i]];
         if (!n) {
             console.error('propertiesDialog: invalid node', $.selected[i]);
         }
@@ -8949,6 +8957,10 @@ function propertiesDialog(close)
             filecnt++
             size += n.s;
         }
+    }
+    if (!n) {
+        // $.selected had no valid nodes!
+        return propertiesDialog(1);
     }
 
     var star = ''

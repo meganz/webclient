@@ -606,7 +606,15 @@
                     };
 
                     request.onupgradeneeded = function ( e ) {
-                        createSchema( e , schema , e.target.result );
+                        try {
+                            createSchema( e, schema, e.target.result);
+                        }
+                        catch (ex) {
+                            if (reject) {
+                                reject({ 'reason': ex });
+                                reject = resolve = null;
+                            }
+                        }
                     };
                     request.onerror = function ( e ) {
                         if (reject) {

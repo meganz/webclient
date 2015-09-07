@@ -243,7 +243,7 @@
                 
                 $settings = $(this).data("settings");
                 ld = $settings.local_data;
-                tokenValue = $(this).data("settings").tokenValue;
+                tokenValue = $settings.tokenValue;
                 
                 // Loop through local data
                 for (var n in ld) {
@@ -842,7 +842,9 @@
             if ($(input).data("settings").preventDoublet) {
                 
                 var doubleEmail = $.grep($(input).data("settings").local_data, function(row) {
-                    return row[$(input).data("settings").propertyToSearch].toLowerCase().indexOf(item[$(input).data("settings").tokenValue].toLowerCase()) > -1;
+                    var property = $(input).data("settings").propertyToSearch,
+                        tokenValue = $(input).data("settings").tokenValue;
+                    return row[property].toLowerCase().indexOf(item[tokenValue].toLowerCase()) > -1;
                 });
                 
                 // Prevent further execution if email is duplicated

@@ -5805,8 +5805,8 @@ function processOPC(opc, ignoreDB) {
             M.delOPC(opc[i].p);
 
             // Update tokenInput plugin
-            removeFromMultiInputDDL('.share-multiple-input', {id: opc[i].m, name: opc[i].m});
-            removeFromMultiInputDDL('.add-contact-multiple-input', {id: opc[i].m, name: opc[i].m});
+            removeFromMultiInputDDL('.share-multiple-input', { id: opc[i].m, name: opc[i].m });
+            removeFromMultiInputDDL('.add-contact-multiple-input', { id: opc[i].m, name: opc[i].m });
         }
         else {
             // Search through M.opc to find duplicated e-mail with .dts
@@ -5826,8 +5826,8 @@ function processOPC(opc, ignoreDB) {
             }
             
             // Update tokenInput plugin
-            addToMultiInputDropDownList('.share-multiple-input', [{id: opc[i].m, name: opc[i].m}]);
-            addToMultiInputDropDownList('.add-contact-multiple-input', [{id: opc[i].m, name: opc[i].m}]);
+            addToMultiInputDropDownList('.share-multiple-input', [{ id: opc[i].m, name: opc[i].m }]);
+            addToMultiInputDropDownList('.add-contact-multiple-input', [{ id: opc[i].m, name: opc[i].m }]);
         }
     }
 }

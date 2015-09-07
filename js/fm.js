@@ -1444,12 +1444,13 @@ function addContactToFolderShare() {
     
     var targets = [],
         $shareDialog = $('.share-dialog'),
-        selectedNode = $.selected[0],
         $newContacts, customMsg, $txtArea,
-        permissionLevel, iconPermLvl, permissionClass;
+        permissionLevel, iconPermLvl, permissionClass, selectedNode;
     
     // Share button enabled
-    if ($.dialog === 'share' && !$shareDialog.find('.dialog-share-button').is('.disabled')) {
+    if (($.dialog === 'share') && !$shareDialog.find('.dialog-share-button').is('.disabled')) {
+        
+        selectedNode = $.selected[0];
         
         $newContacts = $shareDialog.find('.token-input-list-mega .token-input-token-mega');
         $txtArea = $shareDialog.find('.share-message-textarea textarea');
@@ -1526,7 +1527,7 @@ function addNewContact($addButton) {
                     email = $(value).contents().eq(1).text();
                     
                     // Make sure that API return positive value, otherwise we have API error
-                    if (!M.inviteContact(M.u[u_handle].m, email, emailText) < 0) {
+                    if (!M.inviteContact(M.u[u_handle].m, email, emailText)) {
                         
                         // Singular or plural
                         if (index === mailNum - 1) {
@@ -5165,10 +5166,10 @@ function UIkeyevents() {
                 }
             }
         }
-        else if (e.keyCode == 13 && $.dialog === 'share') {
+        else if ((e.keyCode === 13) && ($.dialog === 'share')) {
             addContactToFolderShare();
         }
-        else if (e.keyCode == 13 && $.dialog === 'add-contact-popup') {
+        else if ((e.keyCode === 13) && ($.dialog === 'add-contact-popup')) {
             addNewContact($('.add-user-popup-button.add'));
         }
 

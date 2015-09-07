@@ -2507,14 +2507,14 @@ function MegaData()
     };
 
     /**
-     * Invite contacts using email address, also known as ongoing pending contacts
+     * Invite contacts using email address, also known as ongoing pending contacts.
      * This uses API 2.0
      *
-     * @param {email} owner
-     * @param {email} target
-     * @param {string} msg
-     *
-     *
+     * @param {String} owner, account owner email address.
+     * @param {String} target, target email address.
+     * @param {String} msg, optional custom text message.
+     * @returns {Integer} proceed, API response code, if negative something is wrong
+     * look at API response code table.
      */
     this.inviteContact = function(owner, target, msg) {
         DEBUG('inviteContact');
@@ -4734,14 +4734,13 @@ function renderNew() {
  */
 function execsc(actionPackets, callback) {
 
-    var tparentid = false;
-    var trights = false;
-    var tmoveid = false;
-    var rootsharenodes = [];
-    var async_procnodes = [];
-    var async_treestate = [];
-
-    var loadavatars = false;
+    var tparentid = false,
+        trights = false,
+        tmoveid = false,
+        rootsharenodes = [],
+        async_procnodes = [],
+        async_treestate = [],
+        loadavatars = false;
 
     newnodes = [];
 
@@ -4785,8 +4784,10 @@ function execsc(actionPackets, callback) {
                     
                     // Fill DDL with removed contact
                     if (actionPacket.u) {
-                        addToMultiInputDDL('.share-multiple-input', [{id: M.u[actionPacket.u].m, name: M.u[actionPacket.u].m}]);
-                        addToMultiInputDDL('.add-contact-multiple-input', [{id: M.u[actionPacket.u].m, name: M.u[actionPacket.u].m}]);
+                        var email = M.u[actionPacket.u].m;
+                        
+                        addToMultiInputDropDownList('.share-multiple-input', [{id: email, name: email}]);
+                        addToMultiInputDropDownList('.add-contact-multiple-input', [{id: email, name: email}]);
                     }
                 }
             }
@@ -5781,8 +5782,8 @@ function processIPC(ipc, ignoreDB) {
             else {
                 
                 // Update token.input plugin
-                addToMultiInputDDL('.share-multiple-input', [{id: ipc[i].m, name: ipc[i].m}]);
-                addToMultiInputDDL('.add-contact-multiple-input', [{id: ipc[i].m, name: ipc[i].m}]);
+                addToMultiInputDropDownList('.share-multiple-input', [{id: ipc[i].m, name: ipc[i].m}]);
+                addToMultiInputDropDownList('.add-contact-multiple-input', [{id: ipc[i].m, name: ipc[i].m}]);
             }            
         }
     }
@@ -5825,8 +5826,8 @@ function processOPC(opc, ignoreDB) {
             }
             
             // Update tokenInput plugin
-            addToMultiInputDDL('.share-multiple-input', [{id: opc[i].m, name: opc[i].m}]);
-            addToMultiInputDDL('.add-contact-multiple-input', [{id: opc[i].m, name: opc[i].m}]);
+            addToMultiInputDropDownList('.share-multiple-input', [{id: opc[i].m, name: opc[i].m}]);
+            addToMultiInputDropDownList('.add-contact-multiple-input', [{id: opc[i].m, name: opc[i].m}]);
         }
     }
 }
@@ -5870,10 +5871,11 @@ function processPS(pendingShares, ignoreDB) {
                     
                     if (M.opc && M.opc[ps.p]) {
                         // Update tokenInput plugin
-                        addToMultiInputDDL('.share-multiple-input', [{id: M.opc[ps.p].m, name: M.opc[ps.p].m}]);
-                        addToMultiInputDDL('.add-contact-multiple-input', {id: M.opc[ps.p].m, name: M.opc[ps.p].m});
+                        addToMultiInputDropDownList('.share-multiple-input', [{id: M.opc[pendingContactId].m, name: M.opc[pendingContactId].m}]);
+                        addToMultiInputDropDownList('.add-contact-multiple-input', {id: M.opc[pendingContactId].m, name: M.opc[pendingContactId].m});
                     }
-                } else {
+                }
+                else {
 
                     // Add the pending share to state
                     M.addPS({'h':nodeHandle, 'p':pendingContactId, 'r':shareRights, 'ts':timeStamp}, ignoreDB);
@@ -5908,21 +5910,31 @@ function processUPCI(ap) {
 }
 
 /**
- * Handle upco response, upco, pending contact request updated (for whom it's outgoing)
- * @param {array.<JSON_objects>} ap (actionpackets)
+ * processUPCO
+ * 
+ * Handle upco response, upco, pending contact request updated (for whom it's outgoing).
+ * @param {Array} ap (actionpackets) <JSON_objects>.
  */
 function processUPCO(ap) {
+    
     DEBUG('processUPCO');
+    
     var psid = '';// pending id
+    
+    // Loop through action packets
     for (var i in ap) {
         if (ap.hasOwnProperty(i)) {
+            
+            // Have status of pending share
             if (ap[i].s) {
+                
                 psid = ap[i].p;
                 delete M.opc[psid];
                 delete M.ipc[psid];
                 M.delOPC(psid);
                 M.delIPC(psid);
 
+                // Delete all matching pending shares
                 for (var k in M.ps) {
                     if (M.ps.hasOwnProperty(k)) {
                         M.delPS(psid, k);
@@ -5930,12 +5942,14 @@ function processUPCO(ap) {
                 }
 
                 // Update tokenInput plugin
-                removeFromMultiInputDDL('.share-multiple-input', {id: ap[i].m, name: ap[i].m});
-                removeFromMultiInputDDL('.add-contact-multiple-input', {id: ap[i].m, name: ap[i].m});
+                removeFromMultiInputDDL('.share-multiple-input', { id: ap[i].m, name: ap[i].m });
+                removeFromMultiInputDDL('.add-contact-multiple-input', { id: ap[i].m, name: ap[i].m });
                 $('#opc_' + psid).remove();
+                
+                // Update sent contact request tab, set empty message with Add contact... button
                 if ((Object.keys(M.opc).length === 0) && (M.currentdirid === 'opc')) {
                     $('.sent-requests-grid').addClass('hidden');
-                    $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[6196]);
+                    $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[6196]); // No requests pending at this time
                     $('.fm-empty-contacts').removeClass('hidden');
                 }
             }
@@ -5954,8 +5968,8 @@ function process_u(u) {
                 M.addNode(u[i]);
 
                 // Update token.input plugin
-                addToMultiInputDDL('.share-multiple-input', [{id: u[i].m, name: u[i].m}]);
-                addToMultiInputDDL('.add-contact-multiple-input', [{id: u[i].m, name: u[i].m}]);
+                addToMultiInputDropDownList('.share-multiple-input', [{id: u[i].m, name: u[i].m}]);
+                addToMultiInputDropDownList('.add-contact-multiple-input', [{id: u[i].m, name: u[i].m}]);
             }
             else if (M.d[u[i].u]) {
                 M.delNode(u[i].u);

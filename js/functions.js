@@ -27,17 +27,16 @@ function anyOf(arr, value) {
  * excludeIntersected
  * 
  * Loop through arrays excluding intersected items form array2
- * and prepare result format for tokenInput plugin item format
+ * and prepare result format for tokenInput plugin item format.
  * 
- * @param {Array} array1
- * @param {Array} array2
+ * @param {Array} array1, emails used in share
+ * @param {Array} array2, list of all available emails
  * 
- * @returns {Array of JSON_Objects} {id, name} 
+ * @returns {Array} item An array of JSON objects e.g. { id, name }.
  */
 function excludeIntersected(array1, array2) {
 
     var result = [],
-        tmpObj1 = array1,
         tmpObj2 = array2;
     
     if (!array1) {
@@ -47,10 +46,15 @@ function excludeIntersected(array1, array2) {
         return array1;
     }
 
+    // Loop through emails used in share
     for (var i in array1) {
         if (array1.hasOwnProperty(i)) {
+            
+            // Loop through list of all emails
             for (var k in array2) {
                 if (array2.hasOwnProperty(k)) {
+                    
+                    // Remove matched email from result
                     if (array1[i] === array2[k]) {
                         tmpObj2.splice(k, 1);
                         break;
@@ -60,10 +64,10 @@ function excludeIntersected(array1, array2) {
         }
     }
     
-    // Prepare for tokenInput plugin item format
+    // Prepare for token.input plugin item format
     for (var n in tmpObj2) {
         if (tmpObj2.hasOwnProperty(n)) {
-            result.push({id: tmpObj2[n], name: tmpObj2[n]});
+            result.push({ id: tmpObj2[n], name: tmpObj2[n] });
         }
     }
     

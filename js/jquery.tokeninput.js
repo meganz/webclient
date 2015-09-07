@@ -52,10 +52,10 @@
 
             avatar = useravatar.contact(id || email, 'nw-contact-avatar', 'span');
             
-            return "<li class='share-search-result'>" + (this.addAvatar ? avatar : '')
-                    + "<span class='fm-chat-user-info'><span class='fm-chat-user'>"
+            return '<li class="share-search-result">' + (this.addAvatar ? avatar : '')
+                    + '<span class="fm-chat-user-info"><span class="fm-chat-user">'
                     + (this.enableHTML ? email : _escapeHTML(email))
-                    + "</span><span class='fm-chat-user-email'>email</span></span><span class='clear'></span></li>";
+                    + '</span><span class="fm-chat-user-email">email</span></span><span class="clear"></span></li>';
         },
         tokenFormatter: function (item) {
             
@@ -77,9 +77,9 @@
 
             avatar = useravatar.contact(id || email, 'search-avatar', 'span');
             
-            return "<li class='share-added-contact'>"
+            return '<li class="share-added-contact">'
                     + (this.addAvatar ? avatar : '')
-                    + (this.enableHTML ? email : _escapeHTML(email)) + "</li>";
+                    + (this.enableHTML ? email : _escapeHTML(email)) + '</li>';
         },
         // Tokenization settings
         tokenLimit: null,
@@ -237,13 +237,17 @@
         removeFromDDL: function(item) {
             
             var $settings = {},
-                ld;
+                ld, tokenValue;
             
             if ($(this).data("settings")) {
+                
                 $settings = $(this).data("settings");
                 ld = $settings.local_data;
+                tokenValue = $(this).data("settings").tokenValue;
+                
+                // Loop through local data
                 for (var n in ld) {
-                    if (ld[n][$(this).data("settings").tokenValue] === item[$(this).data("settings").tokenValue]) {
+                    if (ld[n][tokenValue] === item[tokenValue]) {
                         $(this).data("settings").local_data.splice(n, 1);
                         break;
                     }
@@ -257,30 +261,37 @@
         addToDDL: function(items) {
 
             var localData = [],
+                tokenValue,
                 found = false;
             
             if ($(this).data("settings")) {
                 
                 localData = $(this).data("settings").local_data;
+                tokenValue = $(this).data("settings").tokenValue;
 
+                // Loop through list of available items
                 for (var i in items) {
                     if (items.hasOwnProperty(i)) {
                         found = false;
+                        
+                        // Loop through list of item currently available in drop down box
                         for (var n in localData) {
                             if (localData.hasOwnProperty(n)) {
-                                if (localData[n][$(this).data("settings").tokenValue] === items[i][$(this).data("settings").tokenValue]) {
+                                
+                                // In case that we have item in drop down list, skip and continue search for missing one
+                                if (localData[n][tokenValue] === items[i][tokenValue]) {
                                     found = true;
                                     break;
                                 }
                             }
                         }
 
+                        // Add missing item to drop down list
                         if (!found) {
-                            $(this).data("settings").local_data.push({id: items[i][$(this).data("settings").tokenValue], name: items[i][$(this).data("settings").tokenValue]});
+                            $(this).data("settings").local_data.push({ id: items[i][tokenValue], name: items[i][tokenValue]});
                         }
                     }
                 }
-                
             }
             
             return false;

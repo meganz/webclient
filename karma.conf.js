@@ -188,7 +188,7 @@ module.exports = function(config) {
     browsers: ['PhantomJS2', 'PhantomJS2_custom', 'Firefox', 'Chrome'],
 
     customLaunchers: {
-        'PhantomJS_custom': {
+        'PhantomJS2_custom': {
             base: 'PhantomJS2',
             // Works with PhantomJS 1.9.8 (on Linux), but seems to need
             // PhantomJS 2.0 for Windows

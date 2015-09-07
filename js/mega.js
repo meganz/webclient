@@ -4104,13 +4104,20 @@ function MegaData()
 
         if (u.length > 99 && !ignoreWarning && !localStorage[flag]) {
             $('.megasync-upload-overlay').show();
-            $('.megasync-overlay-continue').rebind('click', function() {
+            $('.megasync-overlay-continue, .fm-dialog-close').rebind('click', function() {
                 $('.megasync-upload-overlay').hide();
                 M.addUpload(u, true);
+                $(document).unbind('keyup.megasync-upload');
+            });
+            $(document).rebind('keyup.megasync-upload', function(evt) {
+                $('.megasync-upload-overlay').hide();
+                M.addUpload(u, true);
+                $(document).unbind('keyup.megasync-upload');
             });
             $('.megasync-overlay-download').rebind('click', function() {
                 $('.megasync-upload-overlay').hide();
                 location.hash = '#sync';
+                $(document).unbind('keyup.megasync-upload');
             });
             var $chk = $('.megasync-upload-overlay .checkdiv');
             $chk.rebind('click.dialog', function() {

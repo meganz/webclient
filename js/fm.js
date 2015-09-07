@@ -1086,7 +1086,8 @@ function openTransferpanel()
         $('.transfer-pause-icon').removeClass('active').find('span').text(l[6993]);
         $('.nw-fm-left-icon.transfers').removeClass('paused');
     }*/
-    // $(window).trigger('resize'); // this will call initTreeScroll();
+    initTreeScroll();
+    $(window).trigger('resize');
 
     if ($('table.transfer-table tr').length > 1) {
         $('.transfer-clear-all-icon').removeClass('hidden');
@@ -2843,7 +2844,7 @@ function notificationsUI(close)
     $('.fm-main.notifications').removeClass('hidden');
     $('.notifications .nw-fm-left-icon').removeClass('active');
     $('.fm-main.default').addClass('hidden');
-    $.tresizer();
+    $(window).trigger('resize');
 }
 
 function accountUI()
@@ -3016,6 +3017,7 @@ function accountUI()
         // Maximum bandwidth
         $('.bandwidth .nw-fm-percents span.pecents-txt').html(htmlentities(b2[0]));
         $('.bandwidth .nw-fm-percents span.gb-txt').html(htmlentities(b2[1]));
+        $('.bandwidth .nw-fm-percents span.perc-txt').html(perc_c + '%');
 
         // Used bandwidth
         $('.bandwidth .fm-bar-size.used').html(b1);
@@ -3066,6 +3068,7 @@ function accountUI()
         b2[0] = Math.round(b2[0]) + ' ';
         $('.storage .nw-fm-percents span.pecents-txt').html(htmlentities(b2[0]));
         $('.storage .nw-fm-percents span.gb-txt').html(htmlentities(b2[1]));
+        $('.storage .nw-fm-percents span.perc-txt').html(perc_c + '%');
 
         // Used space
         $('.storage .fm-bar-size.used').html(bytesToSize(account.space_used));
@@ -3076,6 +3079,7 @@ function accountUI()
         } else {
             b2 = bytesToSize(b2);
         }
+
         $('.storage .fm-bar-size.available').html(b2);
         // Cloud drive
         $('.storage .fm-bar-size.cloud-drive').html(bytesToSize(c[k[0]][0]));
@@ -3139,14 +3143,19 @@ function accountUI()
                 return false;
             var country = countrydetails(el[4]);
             var browser = browserdetails(el[2]);
-            var recent = l[483];
+            var recent = '<span class="active-seccion-txt">' + l[483] + '</span><span class="settings-logout">' + l[967] + '</span>';
             if (!el[5])
-                recent = time2date(el[0]);
+                recent = htmlentities(time2date(el[0]));
             if (!country.icon || country.icon === '??.gif')
                 country.icon = 'ud.gif';
-            html += '<tr><td><span class="fm-browsers-icon"><img alt="" src="' + staticpath + 'images/browser/' + browser.icon + '" /></span><span class="fm-browsers-txt">' + htmlentities(browser.name) + '</span></td><td>' + htmlentities(el[3]) + '</td><td><span class="fm-flags-icon"><img alt="" src="' + staticpath + 'images/flags/' + country.icon + '" style="margin-left: 0px;" /></span><span class="fm-flags-txt">' + htmlentities(country.name) + '</span></td><td>' + htmlentities(recent) + '</td></tr>';
+            html += '<tr><td><span class="fm-browsers-icon"><img alt="" src="' + staticpath + 'images/browser/' + browser.icon + '" /></span><span class="fm-browsers-txt">' + htmlentities(browser.name) + '</span></td><td>' + htmlentities(el[3]) + '</td><td><span class="fm-flags-icon"><img alt="" src="' + staticpath + 'images/flags/' + country.icon + '" style="margin-left: 0px;" /></span><span class="fm-flags-txt">' + htmlentities(country.name) + '</span></td><td>' + recent + '</td></tr>';
         });
         $('.grid-table.sessions').html(html);
+
+        $('.settings-logout').bind('click', function()
+        {
+			mLogout();
+        });
 
         $('.account-history-dropdown-button.purchases').text(l[469].replace('[X]', $.purchaselimit));
         $('.account-history-drop-items.purchase10-').text(l[469].replace('[X]', 10));
@@ -3908,7 +3917,7 @@ function accountUI()
         {
             avatarDialog();
         });
-        $('.fm-account-avatar img').attr('src', useravatar.mine())
+        $('.fm-account-avatar img').attr('src', useravatar.mine());
 
         $(window).unbind('resize.account');
         $(window).bind('resize.account', function()
@@ -4225,6 +4234,23 @@ function gridUI() {
         initTransferScroll();
     };
 
+    $(window).unbind('resize.grid');
+    $(window).bind('resize.grid', function() {
+        if (M.viewmode === 0) {
+            if (M.currentdirid === 'contacts') {
+                $.contactGridHeader();
+                initContactsGridScrolling();
+            } else if (M.currentdirid === 'shares') {
+                initGridScrolling();
+                $.sharedGridHeader();
+            } else {
+                initGridScrolling();
+                $.gridHeader();
+                $.detailsGridHeader();
+            }
+        }
+    });
+
     $('.fm-blocks-view.fm').addClass('hidden');
     $('.fm-chat-block').addClass('hidden');
     $('.shared-blocks-view').addClass('hidden');
@@ -4340,7 +4366,7 @@ function gridUI() {
  *
  * @constructor
  */
-var FMShortcuts = function() {
+function FMShortcuts() {
 
     var current_operation = null;
 
@@ -4423,8 +4449,6 @@ var FMShortcuts = function() {
 
     });
 }
-
-var fmShortcuts = new FMShortcuts();
 
 /**
  * Simple way for searching for nodes by their first letter.
@@ -4696,7 +4720,10 @@ var SelectionManager = function($selectable) {
                 ".files-grid-view.contacts-view",
                 ".contacts-grid-view",
                 ".fm-contacts-blocks-view",
-                ".files-grid-view.contact-details-view"
+                ".files-grid-view.contact-details-view",
+                ".shared-grid-view",
+                ".shared-blocks-view",
+                ".shared-details-block"
             ].join(",")
             ).filter(":visible");
 
@@ -5219,9 +5246,10 @@ function selectddUI() {
      * @type {SelectionManager}
      */
 
-    selectionManager = new SelectionManager(
-        $($.selectddUIgrid)
-        );
+    if (!window.fmShortcuts) {
+        window.fmShortcuts = new FMShortcuts();
+    }
+    selectionManager = new SelectionManager($($.selectddUIgrid));
 
     $($.selectddUIgrid + ' ' + $.selectddUIitem).unbind('contextmenu');
     $($.selectddUIgrid + ' ' + $.selectddUIitem).bind('contextmenu', function(e)
@@ -5305,6 +5333,8 @@ function selectddUI() {
         else
             M.addDownload([h]);
     });
+    if (d)
+        console.timeEnd('selectddUI');
 
     if ($.rmInitJSP)
     {
@@ -5315,15 +5345,13 @@ function selectddUI() {
             console.log('jsp:!u', !!jsp);
         delete $.rmInitJSP;
     }
-    $.tresizer();
-    if (d) {
-        console.timeEnd('selectddUI');
-    }
+    $(window).trigger('resize');
 }
 
 function iconUI(aQuiet)
 {
     if (d) console.time('iconUI');
+    $(window).unbind('resize.icon');
 
     $('.fm-files-view-icon.block-view').addClass('active');
     $('.fm-files-view-icon.listing-view').removeClass('active');
@@ -5400,7 +5428,18 @@ function iconUI(aQuiet)
         $.selectddUIgrid = '.file-block-scrolling';
         $.selectddUIitem = 'a';
     }
-    selectddUI();
+    Soon(function iconLazyUI()
+    {
+        selectddUI();
+        $(window).bind('resize.icon', function iconUIonResize()
+        {
+            if (M.viewmode == 1) {
+                if (M.currentdirid == 'contacts') initContactsBlocksScrolling();
+                else if (M.currentdirid == 'shares') initShareBlocksScrolling();
+                else initFileblocksScrolling();
+            }
+        });
+    });
     if (d) console.timeEnd('iconUI');
 }
 
@@ -5408,6 +5447,8 @@ function transferPanelUI()
 {
     $.transferHeader = function()
     {
+        fm_resize_handler();
+
         var tth = $('.transfer-table-header');
 
         // Show/Hide header if there is no items in transfer list
@@ -5451,7 +5492,9 @@ function transferPanelUI()
                     $(this).remove();
                     $.clearTransferPanel();
                     fm_tfsupdate();
-                    $.tresizer();
+                    Soon(function() {
+                        $(window).trigger('resize');
+                    });
                 });
             }
         });
@@ -5531,11 +5574,24 @@ function transferPanelUI()
             }
         });
         initTransferScroll();
-    };
+    }
+
+    $(window).rebind('resize.transferpanel', function(e) {
+        $.transferHeader();
+    });
+
+    $(window).rebind('resize.slideshow', function(e) {
+        if (slideshowid && previews[slideshowid]) {
+            previewsrc(previews[slideshowid].src);
+        }
+    });
 
     $.transferClose = function() {
         $('.nw-fm-left-icon.transfers').removeClass('active');
         $('.fmholder').removeClass('transfer-panel-opened');
+        setTimeout(function() {
+            $(window).trigger('resize');
+        }, 200);
     };
 
     $.transferOpen = function(force) {
@@ -5544,7 +5600,7 @@ function transferPanelUI()
             $('.nw-fm-left-icon.transfers').addClass('active');
             notificationsUI(1);
             $('#fmholder').addClass('transfer-panel-opened');
-            fm_tfsupdate(); // this will call $.transferHeader();
+            $.transferHeader();
         }
     };
 
@@ -5557,10 +5613,10 @@ function transferPanelUI()
             $('.transfer-panel-empty-txt').removeClass('hidden');
             $('.transfer-panel-title').html(l[104]);
             $('.nw-fm-left-icon.transfers').removeClass('transfering').find('p').removeAttr('style');
-            if (M.currentdirid === 'transfers') {
-                fm_tfsupdate();
-                $.tresizer();
-            }
+            fm_tfsupdate();
+            Soon(function() {
+                $(window).trigger('resize');
+            });
         }
     };
 
@@ -6246,11 +6302,19 @@ function treeUI()
         return false;
     });
 
-    /**
-     * Let's shoot two birds with a stone, when nodes are moved we need a resize
-     * to let dynlist refresh - plus, we'll implicitly invoke initTreeScroll.
-     */
-    $(window).trigger('resize');
+    $(window).unbind('resize.tree');
+    $(window).bind('resize.tree', function() {
+        initTreeScroll();
+    });
+    // setTimeout(initTreeScroll,10);
+    Soon(function()
+    {
+       /**
+        * Let's shoot two birds with a stone, when nodes are moved we need a resize
+        * to let dynlist refresh - plus, we'll implicitly invoke initTreeScroll.
+        */
+        $(window).trigger('resize');
+    });
 
     if (d) {
         console.timeEnd('treeUI');
@@ -8858,23 +8922,21 @@ function propertiesDialog(close)
     fm_showoverlay();
     pd.removeClass('hidden multiple folders-only two-elements shared shared-with-me read-only read-and-write full-access');
     $('.properties-elements-counter span').text('');
-    $('.fm-dialog.properties-dialog .properties-body').unbind('click');
-    $('.fm-dialog.properties-dialog .properties-body').bind('click', function()
+    $('.fm-dialog.properties-dialog .properties-body').rebind('click', function()
     {
         // Clicking anywhere in the dialog will close the context-menu, if open
         var e = $('.fm-dialog.properties-dialog .file-settings-icon');
         if (e.hasClass('active'))
             e.click();
     });
-    $('.fm-dialog.properties-dialog .fm-dialog-close').unbind('click');
-    $('.fm-dialog.properties-dialog .fm-dialog-close').bind('click', function()
+    $('.fm-dialog.properties-dialog .fm-dialog-close').rebind('click', function()
     {
         propertiesDialog(1);
     });
-    var filecnt = 0, foldercnt = 0, size = 0, sfilecnt = 0, sfoldercnt = 0;
+    var filecnt = 0, foldercnt = 0, size = 0, sfilecnt = 0, sfoldercnt = 0, n;
     for (var i in $.selected)
     {
-        var n = M.d[$.selected[i]];
+        n = M.d[$.selected[i]];
         if (!n) {
             console.error('propertiesDialog: invalid node', $.selected[i]);
         }
@@ -8895,6 +8957,10 @@ function propertiesDialog(close)
             filecnt++
             size += n.s;
         }
+    }
+    if (!n) {
+        // $.selected had no valid nodes!
+        return propertiesDialog(1);
     }
 
     var star = ''
@@ -9714,14 +9780,10 @@ function savecomplete(id)
  * This is why we do a on('resize') handler which handles the resize of the generic layout of Mega's FM.
  */
 function fm_resize_handler() {
-    if ($.tresizer.last === -1) {
-        return;
-    }
-    if (d) {
-        console.time('fm_resize_handler');
-    }
     // transfer panel resize logic
-    var right_pane_height = $('#fmholder').outerHeight() - $('#topmenu').outerHeight();
+    var right_pane_height = (
+            $('#fmholder').outerHeight() - $('#topmenu').outerHeight()
+    );
 
     $('.fm-main.default, .fm-main.notifications').css({
         'height': right_pane_height + "px"
@@ -9736,8 +9798,10 @@ function fm_resize_handler() {
     });
 
     // left panel resize logic
-    /*
+
     var right_panel_margin = $('.fm-left-panel').outerWidth();
+
+    /*
      var resize_handle_width = $('.left-pane-drag-handle').outerWidth();
      $('.fm-main.default > div:not(.fm-left-panel)').each(function() {
 
@@ -9747,53 +9811,20 @@ function fm_resize_handler() {
      });
      */
 
-    $('.files-grid-view .grid-scrolling-table, .file-block-scrolling, .contacts-grid-view .contacts-grid-scrolling-table')
-        .css({
-            'width': $(document.body).outerWidth() - $('.fm-left-panel').outerWidth()
-        });
+    $(['.files-grid-view .grid-scrolling-table', '.file-block-scrolling', '.contacts-grid-view .contacts-grid-scrolling-table '].join(", ")).css({
+        'width': (
+            $(document.body).outerWidth() - (
+            $('.fm-left-panel').outerWidth()
+            )
+            )
+    });
 
-    initTreeScroll();
-
-    if (M.currentdirid === 'contacts') {
-        if (M.viewmode) {
+    if (M.currentdirid == 'contacts')
+    {
+        if (M.viewmode)
             initContactsBlocksScrolling();
-        }
-        else {
-            if ($.contactGridHeader) {
-                $.contactGridHeader();
-            }
+        else
             initContactsGridScrolling();
-        }
-    }
-    else if (M.currentdirid === 'shares') {
-        if (M.viewmode) {
-            initShareBlocksScrolling();
-        }
-        else {
-            initGridScrolling();
-            if ($.sharedGridHeader) {
-                $.sharedGridHeader();
-            }
-        }
-    }
-    else if (M.currentdirid === 'transfers') {
-        fm_tfsupdate(); // this will call $.transferHeader();
-    }
-    else {
-        if (M.viewmode) {
-            initFileblocksScrolling();
-        }
-        else {
-            initGridScrolling();
-            if ($.gridHeader) {
-                $.gridHeader();
-                $.detailsGridHeader();
-            }
-        }
-    }
-
-    if (slideshowid && previews[slideshowid]) {
-        previewsrc(previews[slideshowid].src);
     }
 
     if (megaChatIsReady && megaChat.resized) {
@@ -9801,24 +9832,24 @@ function fm_resize_handler() {
     }
 
     var right_blocks_height = right_pane_height - $('.fm-right-header.fm').outerHeight();
-    $('.fm-right-files-block > *:not(.fm-right-header)').css({
-        'height': right_blocks_height + "px",
-        'min-height': right_blocks_height + "px"
-    });
+    $('.fm-right-files-block > *:not(.fm-right-header)').css(
+        {
+            'height': right_blocks_height + "px",
+            'min-height': right_blocks_height + "px"
+        });
 
     $('.fm-right-files-block').css({
         'margin-left': ($('.fm-left-panel:visible').width() + $('.nw-fm-left-icons-panel').width()) + "px"
     });
 
     var shared_block_height = $('.shared-details-block').height() - $('.shared-top-details').height();
-    $('.shared-details-block .files-grid-view, .shared-details-block .fm-blocks-view').css({
-        'height': shared_block_height + "px",
-        'min-height': shared_block_height + "px"
-    });
+    var shared_block_height = $('.shared-details-block').height() - $('.shared-top-details').height();
+    $('.shared-details-block .files-grid-view, .shared-details-block .fm-blocks-view').css(
+        {
+            'height': shared_block_height + "px",
+            'min-height': shared_block_height + "px"
+        });
 
-    if (d) {
-        console.timeEnd('fm_resize_handler');
-    }
 }
 
 function sharedfolderUI() {

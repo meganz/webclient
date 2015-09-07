@@ -475,7 +475,7 @@ function MegaData()
 
         $('.files-grid-view.fm.shared-folder-content').addClass('hidden');
 
-        $.tresizer();
+        $(window).trigger('resize');
     };
     Object.defineProperty(this, 'fsViewSel', {
         value: '.files-grid-view.fm .grid-scrolling-table, .fm-blocks-view.fm .file-block-scrolling',
@@ -907,6 +907,7 @@ function MegaData()
                         rightsclass = ' full-access';
                     }
 
+                    var contactName = M.d[u_h] ? htmlentities(M.d[u_h].name) : "N/a";
                     if (M.viewmode === 1) {
                         t = '.shared-blocks-scrolling';
                         avatar = useravatar.contact(u_h, 'nw-contact-avatar', 'span');
@@ -919,11 +920,10 @@ function MegaData()
                                  + avatar
                             + '<span class="shared-folder-info-block"><span class="shared-folder-name">'
                             + htmlentities(M.v[i].name) + '</span><span class="shared-folder-info">by '
-                            + htmlentities(M.d[u_h].name) + '</span></span></a>';
+                            + contactName + '</span></span></a>';
                     } else {
                         t = '.shared-grid-view .grid-table.shared-with-me';
                         el = 'tr';
-                        var contactName = M.d[u_h] ? htmlentities(M.d[u_h].name) : "N/a";
                         avatar = useravatar.contact(u_h, 'nw-contact-avatar');
 
                         html = '<tr id="' + htmlentities(M.v[i].h) + '"><td width="30"><span class="grid-status-icon ' + htmlentities(star)
@@ -1064,7 +1064,7 @@ function MegaData()
         $(lSel).unbind('jsp-scroll-y.dynlist');
         $(window).unbind("resize.dynlist");
         sharedfolderUI();// ToDo: Check do we really need this here
-        $.tresizer();
+        $(window).trigger('resize');
 
         hideEmptyGrids();
 
@@ -1475,7 +1475,7 @@ function MegaData()
 
         if (this.chat) {
             sharedfolderUI(); // remove shares-specific UI
-            $.tresizer();
+            $(window).trigger('resize');
         }
         else if (id === undefined && folderlink) {
             // Error reading shared folder link! (Eg, server gave a -11 (EACCESS) error)
@@ -2958,7 +2958,9 @@ function MegaData()
         renderNew();
         this.rubbishIco();
         processmove(j);
-        $.tresizer();
+        Soon(function() {
+            $(window).trigger('resize');
+        });
     };
 
     this.accountData = function(cb, blockui)
@@ -3978,14 +3980,14 @@ function MegaData()
                     delete M.tfsdomqueue[i];
                 }
 
-                /*if (M._tfsDynlistR)
+                if (M._tfsDynlistR)
                     clearTimeout(M._tfsDynlistR);
                 M._tfsDynlistR = setTimeout(function()
                 {
                     delete M._tfsDynlistR;
                     Soon(transferPanelUI);
                     Soon(fm_tfsupdate);
-                }, 350);*/
+                }, 350);
                 $(window).trigger('resize');
             }
         }
@@ -4125,6 +4127,8 @@ function MegaData()
         }
         var target;
         var onChat;
+        var filesize;
+        var added = 0;
         var f;
         var ul_id;
         var pause = "";
@@ -4158,6 +4162,14 @@ function MegaData()
 
         for (var i in u) {
             f = u[i];
+            try {
+                // this could throw NS_ERROR_FILE_NOT_FOUND
+                filesize = f.size;
+            }
+            catch (ex) {
+                ulmanager.logger.warn(f.name, ex);
+                continue;
+            }
             ul_id = ++__ul_id;
             if (!f.flashid) {
                 f.flashid = false;
@@ -4171,7 +4183,7 @@ function MegaData()
                 + '<td><span class="transfer-type upload ' + pause + '">' + l[372] + '<span class="speed">' + pauseTxt + '</span></span></td>'
                 + '<td><span class="transfer-filtype-icon ' + fileIcon({name: f.name}) + '"></span><span class="tranfer-filetype-txt">' + htmlentities(f.name) + '</span></td>'
                 + '<td></td>'
-                + '<td>' + bytesToSize(f.size) + '</td>'
+                + '<td>' + bytesToSize(filesize) + '</td>'
                 + '<td>' + filetype(f.name) + '</td>'
                 + '<td><span class="transfer-status queued">Queued</span></td>'
                 + '<td class="grid-url-field"><a class="grid-url-arrow"><span></span></a><a class="clear-transfer-icon"><span></span></a></td>'
@@ -4179,6 +4191,7 @@ function MegaData()
                 + '</tr>');
             ul_queue.push(f);
             ttl.left--;
+            added++;
 
             if (uldl_hold) {
                 fm_tfspause('ul_' + ul_id);
@@ -4188,6 +4201,10 @@ function MegaData()
                 $.ulBunch[M.currentdirid][ul_id] = 1;
             }
         }
+        if (!added) {
+            ulmanager.logger.warn('Nothing added to upload.');
+            return;
+        }
         if (!$.transferHeader) {
             transferPanelUI();
         }
@@ -4196,7 +4213,7 @@ function MegaData()
             uldl_hold = true;
         }
         else {
-            showTransferToast('u', u.length);
+            showTransferToast('u', added);
             $.transferHeader();
             openTransferpanel();
             Soon(fm_tfsupdate);
@@ -4323,10 +4340,10 @@ function MegaData()
             $.transferprogress['ulc'] += $.transferprogress['ul_'+ id][1];
             delete $.transferprogress['ul_'+ id];
         }
-        // $.transferHeader();
+        $.transferHeader();
         Soon(function() {
             mega.utils.resetUploadDownload();
-            $.tresizer();
+            $(window).trigger('resize');
         });
     }
 
@@ -4678,7 +4695,7 @@ function renderNew() {
         M.sort();
         M.renderMain(true);
         M.renderPath();
-        $.tresizer();
+        $(window).trigger('resize');
     }
 
     if (UItree) {
@@ -5953,6 +5970,27 @@ function init_chat() {
         if (u_type && !megaChatIsReady) {
             if (d) console.log('Initializing the chat...');
             try {
+                // Prevent known Strophe exceptions...
+                if (!Strophe.Websocket.prototype._unsafeOnIdle) {
+                    Strophe.Websocket.prototype._unsafeOnIdle = Strophe.Websocket.prototype._onIdle;
+                    Strophe.Websocket.prototype._onIdle = function() {
+                        try {
+                            this._unsafeOnIdle.apply(this, arguments);
+                        }
+                        catch (ex) {
+                            if (d) {
+                                console.error(ex);
+                            }
+                        }
+                    };
+                }
+            }
+            catch (ex) {
+                if (d) {
+                    console.error(ex);
+                }
+            }
+            try {
                 window.megaChat = new Chat();
                 window.megaChat.init();
 
@@ -6047,8 +6085,8 @@ function loadfm_callback(res, ctx) {
             crypto_procsr(res.sr);
         }
 
-        // Pass true to indicate this is an fm load and that we want to fetch initial notifications afterwards
-        getsc(true);
+        // We want to fetch initial notifications afterwards, if this is not a logged out user on the public folder page.
+        getsc(false, !pfkey);
 
         if (hasMissingKeys) {
             srvlog('Got missing keys processing gettree...', null, true);

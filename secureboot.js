@@ -1130,6 +1130,7 @@ else if (!b_u)
     jsl.push({f:'js/gContacts.js', n: 'gcontacts_js', j:1,w:3});
 
     // MEGA CHAT
+    jsl.push({f:'js/chat/chatd.js', n: 'chatd_js', j:1,w:1});
     jsl.push({f:'js/chat/rtcStats.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/chat/rtcSession.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/chat/fileTransfer.js', n: 'mega_js', j:1,w:7});

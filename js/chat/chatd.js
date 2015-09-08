@@ -1,4 +1,6 @@
-var chat = false; // chat root
+var chatd = false; // chat root
+
+//TODO: LP: remove any global references to ^^^ chatd
 
 // chatd interface
 var Chatd = function() {
@@ -95,7 +97,7 @@ Chatd.Shard = function(chatd, shard) {
 };
 
 // is this chatd connection currently active?
-Chatd.Shard.prototype.isonline = function() {
+Chatd.Shard.prototype.isOnline = function() {
     return this.s.readyState == this.s.OPEN;
 };
 
@@ -132,7 +134,7 @@ Chatd.Shard.prototype.reconnect = function() {
 Chatd.Shard.prototype.cmd = function(opcode, cmd) {
     this.cmdq += String.fromCharCode(opcode)+cmd;
 
-    if (this.isonline()) {
+    if (this.isOnline()) {
         var a = new Uint8Array(this.cmdq.length);
         for (var i = this.cmdq.length; i--; ) {
             a[i] = this.cmdq.charCodeAt(i);
@@ -154,9 +156,9 @@ Chatd.Shard.prototype.rejoinexisting = function() {
 
 // resend all unconfirmed messages (this is mandatory)
 Chatd.Shard.prototype.resendpending = function() {
-    // TODO: LP: potential bug.
+    var self = this;
     for (var chatid in this.chatids) {
-        chat.chatidmessages[chatid].resend();
+        self.chatd.chatidmessages[chatid].resend();
     }
 };
 
@@ -340,7 +342,7 @@ Chatd.Messages = function(chatd, chatid) {
     // messages in buf are indexed by a numeric id
     this.buf = {};
 
-    // mapping of transactionids of messages being sent to the numeric index of this.buf 
+    // mapping of transactionids of messages being sent to the numeric index of this.buf
     this.sending = {};
 
     // msgnums of modified messages
@@ -360,20 +362,23 @@ Chatd.Messages.prototype.submit = function(message) {
     this.sending[msgxid] = this.highnum;
 
     // if we believe to be online, send immediately
-    if (this.chatd.chatidshard[this.chatid].isonline()) {
+    if (this.chatd.chatidshard[this.chatid].isOnline()) {
         this.chatd.chatidshard[this.chatid].msg(this.chatid, msgxid, timestamp, message);
     }
 };
 
 Chatd.Messages.prototype.modify = function(msgnum, message) {
+    var self = this;
+
+    // TODO: LP: Mathias: this variable is not used, why ?
     var mintimestamp = Math.floor(new Date().getTime()/1000)-600;
 
     // modify pending message so that a potential resend includes the change
     if (this.sending[this.buf[msgnum][Chatd.MsgField.MSGID]]) {
         this.buf[msgnum][Chatd.MsgField.MESSAGE] = message;
     }
-    else if (chat.chatidshard[this.chatid].isonline()) {
-        chat.chatidshard[this.chatid].msgupd(this.chatid, this.buf[msgnum][Chatd.MsgField.MSGID], message);
+    else if (self.chatd.chatidshard[this.chatid].isOnline()) {
+        self.chatd.chatidshard[this.chatid].msgupd(this.chatid, this.buf[msgnum][Chatd.MsgField.MSGID], message);
     }
 
     callback_msgupd(this.chatid, msgnum, 'EDITING', message);
@@ -386,9 +391,11 @@ Chatd.Messages.prototype.modify = function(msgnum, message) {
 };
 
 Chatd.Messages.prototype.resend = function() {
+    var self = this;
+
     // resend all pending new messages and modifications
     for (var msgxid in this.sending) {
-        chat.chatidshard[this.chatid].msg(
+        self.chatd.chatidshard[this.chatid].msg(
             this.chatid,
             msgxid,
             this.buf[this.sending[msgxid]][Chatd.MsgField.TIMESTAMP],
@@ -399,7 +406,7 @@ Chatd.Messages.prototype.resend = function() {
     // resend all pending modifications of completed messages
     for (var msgnum in this.modified) {
         if (!this.sending[this.buf[msgnum][Chatd.MsgField.MSGID]]) {
-            chat.msgupd(
+            self.chatd.msgupd(
                 this.chatid,
                 this.buf[msgnum][Chatd.MsgField.MSGID],
                 this.buf[msgnum][Chatd.MsgField.MESSAGE]
@@ -420,6 +427,7 @@ Chatd.prototype.msgconfirm = function(msgxid, msgid) {
 
 // msgid can be false in case of rejections
 Chatd.Messages.prototype.confirm = function(chatid, msgxid, msgid) {
+    var self = this;
     var num = this.sending[msgxid];
 
     delete this.sending[msgxid];
@@ -429,7 +437,7 @@ Chatd.Messages.prototype.confirm = function(chatid, msgxid, msgid) {
 
     // we now have a proper msgid, resend MSGUPD in case the edit crossed the execution of the command
     if (this.modified[num]) {
-        chat.msgupd(chatid, msgid, this.buf[num][Chatd.MsgField.MESSAGE]);
+        self.chatd.msgupd(chatid, msgid, this.buf[num][Chatd.MsgField.MESSAGE]);
     }
 };
 
@@ -468,8 +476,12 @@ Chatd.Messages.prototype.msgmodify = function(chatid, msgid, msg) {
             // if we modified the message, remove from this.modified.
             // if someone else did before us, resend the MSGUPD (might be redundant)
             if (this.modified[i]) {
-                if (this.buf[i][Chatd.MsgField.MESSAGE] === msg) delete this.modified[i];
-                else this.chatd.chatidshard[chatid].msgupd(chatid, msgid, msg);
+                if (this.buf[i][Chatd.MsgField.MESSAGE] === msg) {
+                    delete this.modified[i];
+                }
+                else {
+                    this.chatd.chatidshard[chatid].msgupd(chatid, msgid, msg);
+                }
             }
             else {
                 this.buf[i][Chatd.MsgField.MESSAGE] = msg;
@@ -489,7 +501,7 @@ Chatd.prototype.msgcheck = function(chatid, msgid) {
 Chatd.Messages.prototype.check = function(chatid, msgid) {
     // if the newest held message is not current, initiate a fetch, just in case
     if (this.buf[this.newmsg] && this.buf[this.newmsg][Chatd.MsgField.MSGID] !== msgid) {
-        this.cmd(Chatd.Opcode.HIST, chatid + chat.pack32le(255));
+        this.cmd(Chatd.Opcode.HIST, chatid + this.chatd.pack32le(255));
     }
 };
 
@@ -528,10 +540,8 @@ if(typeof('base64urldecode') === 'undefined') {
             } catch (e) {
                 return '';
             }
-            ;
         }
-        ;
-    };
+    }
 }
 
 if(typeof('base64urlencode') === 'undefined') {
@@ -539,8 +549,7 @@ if(typeof('base64urlencode') === 'undefined') {
         if (typeof btoa === 'function') {
             return btoa(data).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
         }
-        ;
-    };
+    }
 }
 
 // user-accessible demo code below
@@ -572,12 +581,12 @@ function join(c) {
             chatid = c;
 
             // instantiate Chat in case this is the first ever join
-            if (chat === false) {
-                chat = new Chat();
+            if (chatd === false) {
+                chatd = new Chatd();
             }
 
             // the chatid, shard and the URL will be supplied by the API
-            chat.join(chatid, 0, 'ws://31.216.147.155/' + base64urlencode(userid));
+            chatd.join(chatid, 0, 'ws://31.216.147.155/' + base64urlencode(userid));
         }
         else {
             console.log('Invalid chat handle - please try again');
@@ -594,7 +603,7 @@ function msg(message) {
     // resent until confirmation and then to the confirmed msgid)
     if (userid !== false) {
         if (chatid !== false) {
-            chat.submit(chatid, message);
+            chatd.submit(chatid, message);
         }
         else {
             console.log('Please join() first.');
@@ -611,7 +620,7 @@ function msgupd(num, newmessage) {
     {
         if (chatid !== false)
         {
-            chat.modify(chatid, num, newmessage);
+            chatd.modify(chatid, num, newmessage);
         }
         else {
             console.log('Please join() first.');
@@ -624,19 +633,19 @@ function msgupd(num, newmessage) {
 
 function hist(n) {
     console.log("Fetching " + n + " messages of backlog");
-    chat.hist(chatid, n);
+    chatd.hist(chatid, n);
 };
 
 function seen(msgid) {
-    chat.cmd(Chatd.Opcode.SEEN, chatid + CHAT_UNDEFINED + base64urldecode(msgid));
+    chatd.cmd(Chatd.Opcode.SEEN, chatid + CHAT_UNDEFINED + base64urldecode(msgid));
 };
 
 function received(msgid) {
-    chat.cmd(Chatd.Opcode.RECEIVED, chatid + base64urldecode(msgid));
+    chatd.cmd(Chatd.Opcode.RECEIVED, chatid + base64urldecode(msgid));
 };
 
 function retention(time) {
-    chat.cmd(Chatd.Opcode.RETENTION, chatid + CHAT_UNDEFINED + pack32le(time));
+    chatd.cmd(Chatd.Opcode.RETENTION, chatid + CHAT_UNDEFINED + pack32le(time));
 };
 
 function callback_msgupd(chatid, num, status, message) {

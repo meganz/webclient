@@ -133,7 +133,6 @@ ConnectionRetryManager.prototype.gotDisconnected = function(){
     if (self._$connectingPromise && self._$connectingPromise.state() === 'pending') {
         self._$connectingPromise.reject();
     }
-    clearTimeout(self._connectionRetryInProgress);
 
     //console.error("gotDisconnected: ", self.options.functions.isDisconnected());
     if (
@@ -154,7 +153,9 @@ ConnectionRetryManager.prototype.gotDisconnected = function(){
                 self.doConnectionRetry(true);
             }
         });
-        self.doConnectionRetry();
+        if(!self._connectionRetryInProgress) {
+            self.doConnectionRetry();
+        }
     }
 };
 
@@ -170,6 +171,7 @@ ConnectionRetryManager.prototype.gotConnected = function(){
     if (self._connectionRetryInProgress) {
         //console.error("clearTimeout(self._connectionRetryInProgress);");
         clearTimeout(self._connectionRetryInProgress);
+        self._connectionRetryInProgress = null;
     }
     //console.error("unbind mouse move");
     $(document).unbind("mousemove.megaChatRetry" + self._instanceIdx);
@@ -239,6 +241,7 @@ ConnectionRetryManager.prototype.doConnectionRetry = function(immediately){
             ) {
                 self.options.functions.reconnect(self);
             }
+            self._connectionRetryInProgress = null;
         }, self.options.restartConnectionRetryTimeout);
 
         self.logger.error(
@@ -271,6 +274,7 @@ ConnectionRetryManager.prototype.doConnectionRetry = function(immediately){
             clearTimeout(
                 self._connectionRetryInProgress
             );
+            self._connectionRetryInProgress = null;
         }
 
         self._connectionRetryInProgress = setTimeout(function() {

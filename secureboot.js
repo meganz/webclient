@@ -1155,6 +1155,7 @@ else if (!b_u)
     jsl.push({f:'js/chat/plugins/callFeedback.js', n: 'callfeedback_js', j:1,w:7});
 
     jsl.push({f:'js/chat/karereEventObjects.js', n: 'keo_js', j:1,w:7});
+    jsl.push({f:'js/connectionRetryManager.js', n: 'crm_js', j:1,w:7});
     jsl.push({f:'js/chat/karere.js', n: 'karere_js', j:1,w:7});
     jsl.push({f:'bundle.js', n: 'chat_react_minified_js', j:1,w:10});
 

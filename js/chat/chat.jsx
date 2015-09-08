@@ -684,10 +684,10 @@ Chat.prototype.init = function() {
         } else {
             if (presence === Karere.PRESENCE.OFFLINE) {
                 self.karere.setPresence(presence, undefined, localStorage.megaChatPresenceMtime);
-                self.karere.resetConnectionRetries();
+                self.karere.connectionRetryManager.resetConnectionRetries();
                 self.karere.disconnect();
             } else {
-                self.karere.resetConnectionRetries();
+                self.karere.connectionRetryManager.resetConnectionRetries();
                 self.karere.setPresence(presence, undefined, localStorage.megaChatPresenceMtime);
             }
         }
@@ -832,28 +832,6 @@ Chat.prototype.init = function() {
             }
         });
 
-    // trigger reconnect on mouse move
-    self.karere.unbind('onDisconnected.megaChatRetry');
-    self.karere.unbind('onConnfail.megaChatRetry');
-    self.karere.unbind('onConnectionClosed.megaChatRetry');
-
-    self.karere.bind(
-        'onDisconnected.megaChatRetry onConnfail.megaChatRetry onConnectionClosed.megaChatRetry',
-        function() {
-
-            if (
-                self.karere._connectionRetryInProgress &&
-                self.karere.getConnectionState() === Karere.CONNECTION_STATE.DISCONNECTED &&
-                localStorage.megaChatPresence !== "unavailable"
-            ) {
-
-                $(document).rebind("mousemove.megaChatRetry", function() {
-                    if (self.karere._connectionRetryUI() === true) {
-                        $(document).unbind("mousemove.megaChatRetry");
-                    }
-                });
-            }
-    });
 
     self.karere.rebind("onPresence.maintainUI", function(e, presenceEventData) {
         var contact = self.getContactFromJid(presenceEventData.getFromJid());
@@ -878,7 +856,7 @@ Chat.prototype.connect = function() {
         });
     }
 
-    self.karere.resetConnectionRetries();
+    self.karere.connectionRetryManager.resetConnectionRetries();
 
     return self.karere.connect(
                 self.getJidFromNodeId(u_handle),
@@ -1075,7 +1053,7 @@ Chat.prototype.destroy = function(isLogout) {
         self.chats.remove(roomJid);
     });
 
-    self.karere.resetConnectionRetries();
+    self.karere.connectionRetryManager.resetConnectionRetries();
 
     return self.karere.disconnect()
         .done(function() {

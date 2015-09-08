@@ -22484,6 +22484,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	z-index: 10;
 	margin: 2px 0 2px 8px;
 }
+.conversations-pad .conversations-call-info.fm-chat-messages-pad {
+	background: transparent;
+}
 .conversation-status {
 	height: 36px;
 	width: 100%;

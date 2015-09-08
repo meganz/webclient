@@ -121,7 +121,7 @@ var ConversationsList = React.createClass({
     },
     componentDidMount: function() {
         window.addEventListener('resize', this.handleWindowResize);
-
+        this.handleWindowResize();
     },
     componentWillUnmount: function() {
         window.removeEventListener('resize', this.handleWindowResize);
@@ -274,6 +274,7 @@ var ConversationsMainListing =  React.createClass({
 
     componentDidMount: function() {
         window.addEventListener('resize', this.handleWindowResize);
+        this.handleWindowResize();
 
     },
     componentWillUnmount: function() {
@@ -289,7 +290,7 @@ var ConversationsMainListing =  React.createClass({
         $listings.height(
             $(window).outerHeight() -
             $('#topmenu').outerHeight() -
-            $('.fm-right-header.fm:visible', $container.parent()).outerHeight()
+            $('.fm-right-header.fm:first', $container.parent()).outerHeight()
         );
     },
 
@@ -369,6 +370,15 @@ var ConversationsMainListing =  React.createClass({
                         <div className="conversations-time">{lastActivity}</div>
                     </div>;
                 }
+            } else {
+                lastAction = <div className={lastActionClasses}>
+                    <div className="conversation-status">
+                                        <span>
+
+                                        </span>
+                    </div>
+                    <div className="conversations-time">{lastActivity}</div>
+                </div>;
             }
 
             conversations.push(
@@ -497,6 +507,7 @@ var ConversationsApp = React.createClass({
     },
     componentDidMount: function() {
         window.addEventListener('resize', this.handleWindowResize);
+        this.handleWindowResize();
 
     },
     componentWillUnmount: function() {

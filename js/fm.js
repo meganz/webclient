@@ -339,7 +339,8 @@ function treesearchUI()
                     menu.find('.sorting-item-divider,.sorting-menu-item').removeClass('hidden');
                     break;
                 default:
-                    menu.find('.sorting-item-divider,*[data-by=name],*[data-by=status],*[data-by=last-interaction]').addClass('hidden');
+//                    menu.find('.sorting-item-divider,*[data-by=name],*[data-by=status],*[data-by=last-interaction]').addClass('hidden');
+                    menu.find('*[data-by=status],*[data-by=last-interaction]').addClass('hidden');
                     break;
             }
             
@@ -7890,27 +7891,20 @@ function copyDialog() {
 
     // Clears already selected sub-folders, and set selection to root
     function selectCopyDialogTabRoot(section) {
+        
+        var $btn = $('.dialog-copy-button');
+        
         $('.copy-dialog .nw-fm-tree-item').removeClass('selected');
-        switch (section) {
-            case 'cloud-drive':
-            case 'folder-link':
-                $.mcselected = M.RootID;
-                break;
-            case 'shared-with-me':
-                $.mcselected = undefined;
-                break;
-            case 'conversations':
-                $.mcselected = undefined;
-                break;
-            default:
-                $.mcseleced = undefined;
-                break;
+        
+        if ((section === 'cloud-drive') || (section === 'folder-link')) {
+            $.mcselected = M.RootID;
+        }
+        else {
+            $.mcselected = undefined;
         }
         
         // Disable/enable button
-        var $btn = $('.dialog-copy-button');
-        
-        if (typeof $.mcselected != 'undefined') {
+        if ($.mcselected) {
             $btn.removeClass('disabled');
         }
         else {
@@ -7925,22 +7919,23 @@ function copyDialog() {
     });
 
     $('.copy-dialog-button').rebind('click', function() {
+
+        var section;
         
-        var section = $(this).attr('class').split(" ")[1];
-        
-        selectCopyDialogTabRoot(section);
         if ($(this).attr('class').indexOf('active') === -1) {
-            switch (section) {
-                case 'cloud-drive':
-                case 'folder-link':
-                    handleDialogContent(section, 'ul', true, 'copy', $.mcImport ? l[236] : "Paste" /*l[63]*/); // Import
-                    break;
-                case 'shared-with-me':
-                    handleDialogContent(section, 'ul', false, 'copy', l[1344]); // Share
-                    break;
-                case 'conversations':
-                    handleDialogContent(section, 'div', false, 'copy', l[1940], '.conversations-container'); // Send
-                    break;
+
+            section = $(this).attr('class').split(" ")[1];
+
+            selectMoveDialogTabRoot(section);
+
+            if ((section === 'cloud-drive') || (section === 'folder-link')) {
+                handleDialogContent(section, 'ul', true, 'copy', $.mcImport ? l[236] : "Paste" /*l[63]*/); // Import
+            }
+            else if (section === 'shared-with-me') {
+                handleDialogContent(section, 'ul', false, 'copy', l[1344]); // Share
+            }
+            else if (section === 'rubbish-bin') {
+                handleDialogContent(section, 'div', false, 'copy', l[1940], '.conversations-container'); // Send
             }
         }
     });
@@ -7970,7 +7965,7 @@ function copyDialog() {
                 menu.find('*[data-by=status]').addClass('hidden');
             }
 
-            // @ToDo: Make sure by is hadeled properly once when we have chat available
+            // @ToDo: Make sure .by is hadeled properly once when we have chat available
 
             // Copy dialog type only
             type = 'Copy' + type;
@@ -8001,7 +7996,6 @@ function copyDialog() {
             $copyDialog.find('.dialog-sorting-menu').removeClass('hidden');
         }
         else {
-            
             $self.removeClass('active');
             $copyDialog.find('.dialog-sorting-menu').addClass('hidden');
         }
@@ -8027,21 +8021,16 @@ function copyDialog() {
                 localStorage['sort' + type + 'By'] = $.sortTreePanel[type].by = data.by;
             }
 
-            switch (type) {
-                //@ToDo: make this working when chat start functioning
-                // Sort contacts
-//                case 'contacts':
-//                    M.contacts();
-//                    break;
-                case 'shared-with-me':
-                    M.buildtree({ h: 'shares' }, 'copy-dialog');
-                    break;
-                case 'cloud-drive':
-                case 'folder-link':
-                    M.buildtree(M.d[M.RootID], 'copy-dialog');
-                    break;
+            if ((type === 'cloud-drive') || (type === 'folder-link')) {
+                M.buildtree(M.d[M.RootID], 'copy-dialog');
             }
-
+            else if (type === 'shared-with-me') {
+                M.buildtree({ h: 'shares' }, 'copy-dialog');
+            }
+            else if (type === 'contacts') {
+                //@ToDo: make this working when chat start functioning
+            }
+            
             // Disable previously selected
             $self.parent().find('.sorting-menu-item').removeClass('active');
             $self.addClass('active');
@@ -8193,28 +8182,22 @@ function moveDialog() {
     // Clears already selected sub-folders, and set selection to root
     function selectMoveDialogTabRoot(section) {
         
-        $('.move-dialog .nw-fm-tree-item').removeClass('selected');
-        
-        switch (section) {
-            case 'cloud-drive':
-            case 'folder-link':
-                $.mcselected = M.RootID;
-                break;
-            case 'shared-with-me':
-                $.mcselected = undefined;
-                break;
-            case 'rubbish-bin':
-                $.mcselected = M.RubbishID;
-                break;
-            default:
-                $.mcseleced = undefined;
-                break;
-        }
-        
-        // Disable/enable button
         var $btn = $('.dialog-move-button');
         
-        if (typeof $.mcselected != 'undefined') {
+        $('.move-dialog .nw-fm-tree-item').removeClass('selected');
+        
+        if ((section === 'cloud-drive') || (section === 'folder-link')) {
+            $.mcselected = M.RootID;
+        }
+        else if (section === 'rubbish-bin') {
+            $.mcselected = M.RubbishID;
+        }
+        else {
+            $.mcselected = undefined;
+        }
+
+        // Disable/enable button
+        if ($.mcselected) {
             $btn.removeClass('disabled');
         }
         else {
@@ -8229,22 +8212,22 @@ function moveDialog() {
 
     $('.move-dialog-button').rebind('click', function(e) {
         
-        var section = $(this).attr('class').split(" ")[1];
-        
-        selectMoveDialogTabRoot(section);
+        var section;
         
         if ($(this).attr('class').indexOf('active') === -1) {
-            switch (section) {
-                case 'cloud-drive':
-                case 'folder-link':
-                    handleDialogContent(section, 'ul', true, 'move', l[62]); // Move
-                    break;
-                case 'shared-with-me':
-                    handleDialogContent(section, 'ul', false, 'move', l[1344]); // Share
-                    break;
-                case 'rubbish-bin':
-                    handleDialogContent(section, 'ul', false, 'move', l[62]); // Mocw
-                    break;
+
+            section = $(this).attr('class').split(" ")[1];
+
+            selectMoveDialogTabRoot(section);
+
+            if ((section === 'cloud-drive') || (section === 'folder-link')) {
+                handleDialogContent(section, 'ul', true, 'move', l[62]); // Move
+            }
+            else if (section === 'shared-with-me') {
+                handleDialogContent(section, 'ul', false, 'move', l[1344]); // Share
+            }
+            else if (section === 'rubbish-bin') {
+                handleDialogContent(section, 'ul', false, 'move', l[62]); // Move
             }
         }
     });

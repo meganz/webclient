@@ -406,7 +406,6 @@ function sync_switchOS(os)
  */
 function ImgError(source) {
     source.src =  gifSlider.empty1x1png;
-    source.onerror = '';
     return true;
 }
 

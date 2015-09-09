@@ -112,16 +112,6 @@ function mozSetTimeout(f,n) {
 	return sTimer = t;
 }
 
-function mozPlaySound(n) {
-	if(0) try {
-		var snd = Cc["@mozilla.org/sound;1"].createInstance(Ci.nsISound);
-		snd.init();
-		snd.play(Services.io.newURI('chrome://mega/content/sounds/'+(n||'zap')+'.wav',null,null));
-		return true;
-	}catch(e){}
-	return false;
-}
-
 function mozDirtyGetAsEntry(aFile,aDataTransfer)
 {
 	aFile = aFile.clone();
@@ -1072,6 +1062,7 @@ mozLazyGetService( "mozMIMEService",     "@mozilla.org/mime;1",                 
 mozLazyGetService( "mozAlertsService",   "@mozilla.org/alerts-service;1",            "nsIAlertsService"   );
 mozLazyGetService( "mozClipboardHelper", "@mozilla.org/widget/clipboardhelper;1",    "nsIClipboardHelper" );
 mozLazyGetService( "mozRandomGenerator", "@mozilla.org/security/random-generator;1", "nsIRandomGenerator" );
+mozLazyGetService( "mozParserUtils",     "@mozilla.org/parserutils;1",               "nsIParserUtils"     );
 mozLazyGetService( "mozSSService",       "@mozilla.org/ssservice;1",             "nsISiteSecurityService" );
 
 XPCOMUtils.defineLazyModuleGetter(this, "OS", "resource://gre/modules/osfile.jsm");

@@ -967,8 +967,13 @@ ChunkUpload.prototype.on_ready = function(args, xhr) {
         }
     }
 
-    this.oet = setTimeout(this.on_error.bind(this, null, xhr, errstr),
-        1950 + Math.floor(Math.random() * 2e3));
+    var self = this;
+    this.oet = setTimeout(function() {
+        if (!oIsFrozen(self)) {
+            self.on_error(null, xhr, errstr);
+        }
+        self = undefined;
+    }, 1950 + Math.floor(Math.random() * 2e3));
 
     if (d) {
         this.logger.warn("Bad response from server",

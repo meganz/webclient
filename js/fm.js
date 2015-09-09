@@ -326,43 +326,44 @@ function treesearchUI()
       });
     }
 
-    $('.nw-tree-panel-arrows').unbind('click');
-    $('.nw-tree-panel-arrows').bind('click', function()
-    {
-        if ($(this).attr('class').indexOf('active') == -1)
-        {
+    $('.nw-tree-panel-arrows').rebind('click', function() {
+        
+        if ($(this).attr('class').indexOf('active') === -1) {
             $(this).addClass('active');
-            var menu = $('.nw-sorting-menu').removeClass('hidden')
-                , type = treePanelType()
+            
+            var menu = $('.nw-sorting-menu').removeClass('hidden'),
+                type = treePanelType();
+                
             switch (type) {
                 case 'contacts':
-                    // show all the options
                     menu.find('.sorting-item-divider,.sorting-menu-item').removeClass('hidden');
                     break;
                 default:
-                    // hide everything
                     menu.find('.sorting-item-divider,*[data-by=name],*[data-by=status],*[data-by=last-interaction]').addClass('hidden');
+                    break;
             }
+            
             var sortTreePanel = $.sortTreePanel[type];
+            
             if (d && !sortTreePanel) {
                 console.error('No sortTreePanel', type);
             }
 
-            var $o = $('.sorting-menu-item')
-                .removeClass('active');
+            var $o = $('.sorting-menu-item').removeClass('active');
+            
             if (sortTreePanel) {
                 $o.filter('*[data-by=' + sortTreePanel.by + '],*[data-dir=' + sortTreePanel.dir + ']').addClass('active');
             }
+            
             return false;
         }
-        else
-        {
+        else {
             $(this).removeClass('active');
             $('.nw-sorting-menu').addClass('hidden');
         }
     });
 
-    $('.sorting-menu-item').rebind('click', function() {
+    $('.fm-left-panel .sorting-menu-item').rebind('click', function() {
 
         var $this = $(this),
             data = $this.data(),
@@ -404,13 +405,13 @@ function treesearchUI()
     });
 }
 
-function treePanelType()
-{
-    // is there an easy way of knowing it?
-    return $.trim($('.nw-fm-left-icon.active').attr('class').replace(/(active|nw-fm-left-icon|ui-droppable)/g, ''))
+function treePanelType() {
+    
+    return $.trim($('.nw-fm-left-icon.active').attr('class').replace(/(active|nw-fm-left-icon|ui-droppable)/g, ''));
 }
 
 function treePanelSortElements(type, elements, handlers, ifEq) {
+    
     if (!$.sortTreePanel) {
        // XX: not yet initialised, initUI was not called yet, which means that most likely rendering/sorting should not be
        // triggered at the moment. Caused receiving action packets, BEFORE the ui was initialised, so this call can simply
@@ -418,29 +419,62 @@ function treePanelSortElements(type, elements, handlers, ifEq) {
 
        return;
     }
-    var settings = $.sortTreePanel[type]
-        , sort = handlers[settings.by]
+    
+    var settings = $.sortTreePanel[type],
+        sort = handlers[settings.by]
 
-    if (!sort)
+    if (!sort) {
         return;
+    }
 
     elements.sort(function(a, b) {
+        
         var d = sort(a, b);
 
         if (d == 0 && ifEq) {
             return ifEq(a, b);
         }
+        
         return d * settings.dir;
     });
 }
 
-function initializeTreePanelSorting()
-{
+function initializeTreePanelSorting() {
+    
     $.sortTreePanel = {};
+    
     $.each(['folder-link', 'contacts', 'conversations', 'inbox', 'shared-with-me', 'cloud-drive', 'rubbish-bin'], function(key, type) {
         $.sortTreePanel[type] = {
-            by: anyOf(['name', 'status', 'last-interaction'], localStorage['sort' + type + 'By']) || (type == 'contacts' ? "status":"name"),
+            by: anyOf(['name', 'status', 'last-interaction'], localStorage['sort' + type + 'By']) || (type === 'contacts' ? "status": "name"),
             dir: parseInt(anyOf(['-1', '1'], localStorage['sort' + type + 'Dir']) || '1')
+        };
+    });
+}
+
+/**
+ * initializeDialogTreePanelSorting
+ * 
+ * Initialize sorting menu in copy and move dialogs
+*/
+function initializeDialogTreePanelSorting() {
+    
+    var dlgKey;
+    
+    // Copy dialog
+    $.each(['folder-link', 'contacts', 'conversations', 'inbox', 'shared-with-me', 'cloud-drive', 'rubbish-bin'], function(key, type) {
+        dlgKey = 'Copy' + type;
+        $.sortTreePanel[dlgKey] = {
+            by: anyOf(['name', 'status', 'last-interaction'], localStorage['sort' + dlgKey + 'By']) || (type === 'contacts' ? "status": "name"),
+            dir: parseInt(anyOf(['-1', '1'], localStorage['sort' + dlgKey + 'Dir']) || '1')
+        };
+    });
+    
+    // Move dialog
+    $.each(['folder-link', 'contacts', 'conversations', 'inbox', 'shared-with-me', 'cloud-drive', 'rubbish-bin'], function(key, type) {
+        var dlgKey = 'Move' + type;
+        $.sortTreePanel[dlgKey] = {
+            by: anyOf(['name', 'status', 'last-interaction'], localStorage['sort' + dlgKey + 'By']) || (type === 'contacts' ? "status": "name"),
+            dir: parseInt(anyOf(['-1', '1'], localStorage['sort' + dlgKey + 'Dir']) || '1')
         };
     });
 }
@@ -479,8 +513,9 @@ function initUI() {
     }
 
     treesearchUI();
-    initializeTreePanelSorting()
-
+    initializeTreePanelSorting();
+    initializeDialogTreePanelSorting();
+    
     $.doDD = function(e, ui, a, type)
     {
 
@@ -7837,15 +7872,12 @@ function closeDialog() {
     delete $.mcImport;
 }
 
-function copyDialog()
-{
+function copyDialog() {
 
     // Clears already selected sub-folders, and set selection to root
-    function selectCopyDialogTabRoot(section)
-    {
+    function selectCopyDialogTabRoot(section) {
         $('.copy-dialog .nw-fm-tree-item').removeClass('selected');
-        switch (section)
-        {
+        switch (section) {
             case 'cloud-drive':
             case 'folder-link':
                 $.mcselected = M.RootID;
@@ -7860,81 +7892,131 @@ function copyDialog()
                 $.mcseleced = undefined;
                 break;
         }
+        
         // Disable/enable button
         var $btn = $('.dialog-copy-button');
-        if (typeof $.mcselected != 'undefined')
+        
+        if (typeof $.mcselected != 'undefined') {
             $btn.removeClass('disabled');
-        else
+        }
+        else {
             $btn.addClass('disabled');
+        }
+    };
 
-    }
-    ;
-
-    $('.copy-dialog .fm-dialog-close, .copy-dialog .dialog-cancel-button').unbind('click');
-    $('.copy-dialog .fm-dialog-close, .copy-dialog .dialog-cancel-button').bind('click', function()
-    {
+    $('.copy-dialog .fm-dialog-close, .copy-dialog .dialog-cancel-button').rebind('click', function() {
+        
         closeDialog();
         delete $.onImportCopyNodes;
     });
 
-    $('.copy-dialog-button').unbind('click');
-    $('.copy-dialog-button').bind('click', function() {
+    $('.copy-dialog-button').rebind('click', function() {
+        
         var section = $(this).attr('class').split(" ")[1];
+        
         selectCopyDialogTabRoot(section);
-        if ($(this).attr('class').indexOf('active') == -1)
-        {
-            switch (section)
-            {
+        if ($(this).attr('class').indexOf('active') === -1) {
+            switch (section) {
                 case 'cloud-drive':
                 case 'folder-link':
-                    handleDialogContent(section, 'ul', true, 'copy', $.mcImport ? l[236] : "Paste" /*l[63]*/);
+                    handleDialogContent(section, 'ul', true, 'copy', $.mcImport ? l[236] : "Paste" /*l[63]*/); // Import
                     break;
                 case 'shared-with-me':
-                    handleDialogContent(section, 'ul', false, 'copy', l[1344]);
+                    handleDialogContent(section, 'ul', false, 'copy', l[1344]); // Share
                     break;
                 case 'conversations':
-                    handleDialogContent(section, 'div', false, 'copy', l[1940], '.conversations-container');
+                    handleDialogContent(section, 'div', false, 'copy', l[1940], '.conversations-container'); // Send
                     break;
             }
         }
     });
 
-    $('.copy-dialog-panel-arrows').unbind('click');
-    $('.copy-dialog-panel-arrows').bind('click', function() {
-        if ($(this).attr('class').indexOf('active') == -1) {
-            var type = $('.fm-dialog-title .copy-dialog-txt.active').attr('class').split(" ")[1];
-            $('.copy-dialog .dialog-sorting-menu .sorting-menu-item')
+    /**
+     * On click, copy dialog, dialog-sorting-menu will be shown.
+     * Handles that valid informations about current sorting options
+     * for selected tab of copy dialog are up to date.
+     */
+    $('.copy-dialog-panel-arrows').rebind('click', function() {
+
+        var type, menu,
+            $copyDialog = $('.copy-dialog');
+
+        if ($(this).attr('class').indexOf('active') === -1) {
+
+            menu = $('.dialog-sorting-menu').removeClass('hidden');
+            type = $('.fm-dialog-title .copy-dialog-txt.active').attr('class').split(" ")[1];
+
+            switch (type) {
+                case 'contacts':
+                    menu.find('.sorting-item-divider,.sorting-menu-item').removeClass('hidden');
+                    break;
+                default:
+                    menu.find('.sorting-item-divider,*[data-by=name],*[data-by=status],*[data-by=last-interaction]').addClass('hidden');
+                    break;
+            }
+            
+            // Copy dialog type only
+            type = 'Copy' + type;
+            
+            // Check existance of previous sort options, direction (dir)
+            if (localStorage['sort' + type + 'Dir']) {
+                $.sortTreePanel[type].dir = localStorage['sort' + type + 'Dir'];
+            }
+            else {
+                $.sortTreePanel[type].dir = localStorage['sort' + type + 'Dir'];
+            }
+
+            // Check existance of previous sort option, ascending/descending (By)
+            if (localStorage['sort' + type + 'By']) {
+                $.sortTreePanel[type].by = localStorage['sort' + type + 'By'];
+            }
+            else {
+                $.sortTreePanel[type].dir = localStorage['sort' + type + 'By'];
+            }
+
+            // dir stands for direction i.e. [ascending, descending]
+            $copyDialog.find('.dialog-sorting-menu .sorting-menu-item')
                 .removeClass('active')
                 .filter('*[data-by=' + $.sortTreePanel[type].by + '],*[data-dir=' + $.sortTreePanel[type].dir + ']')
                 .addClass('active');
 
             $(this).addClass('active');
-            $('.copy-dialog .dialog-sorting-menu').removeClass('hidden');
-        } else {
+            $copyDialog.find('.dialog-sorting-menu').removeClass('hidden');
+        }
+        else {
+            
             $(this).removeClass('active');
-            $('.copy-dialog .dialog-sorting-menu').addClass('hidden');
+            $copyDialog.find('.dialog-sorting-menu').addClass('hidden');
         }
     });
 
-    $('.copy-dialog .dialog-sorting-menu .sorting-menu-item').unbind('click');
-    $('.copy-dialog .dialog-sorting-menu .sorting-menu-item').bind('click', function()
-    {
-        if ($(this).attr('class').indexOf('active') == -1)
-        {
-            var data = $(this).data();
-            var type = $('.fm-dialog-title .copy-dialog-txt.active').attr('class').split(" ")[1];
+    $('.copy-dialog .sorting-menu-item').rebind('click', function() {
+
+        var $self = $(this),
+            data, type;
+
+        if ($self.attr('class').indexOf('active') === -1) {
+
+            // Arbitrary element data
+            data = $self.data();
+            type = 'Copy' + $('.fm-dialog-title .copy-dialog-txt.active').attr('class').split(" ")[1];
+
+
+            // Check arbitrary data associated with current menu item
             if (data.dir) {
                 localStorage['sort' + type + 'Dir'] = $.sortTreePanel[type].dir = data.dir;
-            } else {
+            }
+            if (data.by) {
                 localStorage['sort' + type + 'By'] = $.sortTreePanel[type].by = data.by;
             }
+
             switch (type) {
                 // Sort contacts
 //                case 'contacts':
 //                    M.contacts();
 //                    break;
                 case 'shared-with-me':
-                    M.buildtree({h: 'shares'}, 'copy-dialog');
+                    M.buildtree({ h: 'shares' }, 'copy-dialog');
                     break;
                 case 'cloud-drive':
                 case 'folder-link':
@@ -7942,14 +8024,17 @@ function copyDialog()
                     break;
             }
 
-            $(this).parent().find('.sorting-menu-item').removeClass('active');
-            $(this).addClass('active');
         }
+
+        $self.parent().find('.sorting-menu-item').removeClass('active');
+        $self.addClass('active');
+        
         $('.copy-dialog .dialog-sorting-menu').addClass('hidden');
         $('.copy-dialog-panel-arrows.active').removeClass('active');
     });
 
     $('.copy-dialog .dialog-newfolder-button').rebind('click', function() {
+        
         $('.copy-dialog').addClass('arrange-to-back');
         createFolderDialog();
 
@@ -7957,72 +8042,78 @@ function copyDialog()
     });
 
     $('.copy-dialog').off('click', '.nw-fm-tree-item');
-    $('.copy-dialog').on('click', '.nw-fm-tree-item', function(e)
-    {
+    $('.copy-dialog').on('click', '.nw-fm-tree-item', function(e) {
+        
         var old = $.mcselected;
+        
         $.mcselected = $(this).attr('id').replace('mctreea_', '');
         M.buildtree(M.d[$.mcselected]);
+        
         var html = $('#treesub_' + $.mcselected).html();
-        if (html)
+        if (html) {
             $('#mctreesub_' + $.mcselected).html(html.replace(/treea_/ig, 'mctreea_').replace(/treesub_/ig, 'mctreesub_').replace(/treeli_/ig, 'mctreeli_'));
+        }
+        
         disableReadOnlySharedFolders('copy');
+        
         var $btn = $('.dialog-copy-button');
-
         var c = $(e.target).attr('class');
+        
         // Sub-folder exist?
-        if (c && c.indexOf('nw-fm-arrow-icon') > -1)
-        {
+        if (c && c.indexOf('nw-fm-arrow-icon') > -1) {
+            
             var c = $(this).attr('class');
+            
             // Sub-folder expanded
-            if (c && c.indexOf('expanded') > -1)
-            {
+            if (c && c.indexOf('expanded') > -1) {
                 $(this).removeClass('expanded');
                 $('#mctreesub_' + $.mcselected).removeClass('opened');
             }
-            else
-            {
+            else {
                 $(this).addClass('expanded');
                 $('#mctreesub_' + $.mcselected).addClass('opened');
             }
         }
-        else
-        {
+        else {
+            
             var c = $(this).attr('class');
-            if (c && c.indexOf('selected') > -1)
-            {
-                if (c && c.indexOf('expanded') > -1)
-                {
+            
+            if (c && c.indexOf('selected') > -1) {
+                if (c && c.indexOf('expanded') > -1) {
                     $(this).removeClass('expanded');
                     $('#mctreesub_' + $.mcselected).removeClass('opened');
                 }
-                else
-                {
+                else {
                     $(this).addClass('expanded');
                     $('#mctreesub_' + $.mcselected).addClass('opened');
                 }
             }
         }
-        if (!$(this).is('.disabled'))
-        {
+        
+        if (!$(this).is('.disabled')) {
+            
             // unselect previously selected item
             $('.copy-dialog .nw-fm-tree-item').removeClass('selected');
             $(this).addClass('selected');
             $btn.removeClass('disabled');
         }
-        else
+        else {
             $.mcselected = old;
+        }
 
         // dialogScroll('.copy-dialog-tree-panel .dialog-tree-panel-scroll');
         dialogScroll('.dialog-tree-panel-scroll');
+        
         // Disable action button if there is no selected items
-        if (typeof $.mcselected == 'undefined')
+        if (typeof $.mcselected == 'undefined') {
             $btn.addClass('disabled');
+        }
     });
 
     // Handle conversations tab item selection
     $('.copy-dialog').off('click', '.nw-conversations-item');
-    $('.copy-dialog').on('click', '.nw-conversations-item', function()
-    {
+    $('.copy-dialog').on('click', '.nw-conversations-item', function() {
+        
         $.mcselected = $(this).attr('id').replace('contact2_', '');
         var $btn = $('.dialog-copy-button');
 
@@ -8032,33 +8123,37 @@ function copyDialog()
         $btn.removeClass('disabled');
 
         // Disable action button if there is no selected items
-        if (typeof $.mcselected == 'undefined')
+        if (typeof $.mcselected == 'undefined') {
             $btn.addClass('disabled');
+        }
     });
 
-    $('.copy-dialog .dialog-copy-button').unbind('click');
-    $('.copy-dialog .dialog-copy-button').bind('click', function()
-    {
-        if (typeof $.mcselected != 'undefined')
-        {
-            var section = $('.fm-dialog-title .copy-dialog-txt.active').attr('class').split(" ")[1];// Get active tab
-            switch (section)
-            {
+    $('.copy-dialog .dialog-copy-button').rebind('click', function() {
+        
+        if (typeof $.mcselected != 'undefined') {
+            
+            // Get active tab
+            var section = $('.fm-dialog-title .copy-dialog-txt.active').attr('class').split(" ")[1];
+            switch (section) {
                 case 'cloud-drive':
                 case 'folder-link':
                     var n = [];
-                    for (var i in $.selected)
-                        if (!isCircular($.selected[i], $.mcselected))
+                    for (var i in $.selected) {
+                        if (!isCircular($.selected[i], $.mcselected)) {
                             n.push($.selected[i]);
+                        }
+                    }
                     closeDialog();
                     M.copyNodes(n, $.mcselected);
                     delete $.onImportCopyNodes;
                     break;
                 case 'shared-with-me':
                     var n = [];
-                    for (var i in $.selected)
-                        if (!isCircular($.selected[i], $.mcselected))
+                    for (var i in $.selected) {
+                        if (!isCircular($.selected[i], $.mcselected)) {
                             n.push($.selected[i]);
+                        }
+                    }
                     closeDialog();
                     M.copyNodes(n, $.mcselected);
                     break;
@@ -8074,15 +8169,14 @@ function copyDialog()
     });
 }
 
-function moveDialog()
-{
+function moveDialog() {
 
     // Clears already selected sub-folders, and set selection to root
-    function selectMoveDialogTabRoot(section)
-    {
+    function selectMoveDialogTabRoot(section) {
+        
         $('.move-dialog .nw-fm-tree-item').removeClass('selected');
-        switch (section)
-        {
+        
+        switch (section) {
             case 'cloud-drive':
             case 'folder-link':
                 $.mcselected = M.RootID;
@@ -8097,72 +8191,79 @@ function moveDialog()
                 $.mcseleced = undefined;
                 break;
         }
+        
         // Disable/enable button
         var $btn = $('.dialog-move-button');
-        if (typeof $.mcselected != 'undefined')
+        
+        if (typeof $.mcselected != 'undefined') {
             $btn.removeClass('disabled');
-        else
+        }
+        else {
             $btn.addClass('disabled');
-    }
-    ;
+        }
+    };
 
-    $('.move-dialog .fm-dialog-close, .move-dialog .dialog-cancel-button').unbind('click');
-    $('.move-dialog .fm-dialog-close, .move-dialog .dialog-cancel-button').bind('click', function()
-    {
+    $('.move-dialog .fm-dialog-close, .move-dialog .dialog-cancel-button').rebind('click', function() {
+        
         closeDialog();
     });
 
-    $('.move-dialog-button').unbind('click');
-    $('.move-dialog-button').bind('click', function(e) {
+    $('.move-dialog-button').rebind('click', function(e) {
+        
         var section = $(this).attr('class').split(" ")[1];
+        
         selectMoveDialogTabRoot(section);
-        if ($(this).attr('class').indexOf('active') == -1)
-        {
-            switch (section)
-            {
+        if ($(this).attr('class').indexOf('active') === -1) {
+            switch (section) {
                 case 'cloud-drive':
                 case 'folder-link':
-                    handleDialogContent(section, 'ul', true, 'move', l[62]);
+                    handleDialogContent(section, 'ul', true, 'move', l[62]); // Move
                     break;
                 case 'shared-with-me':
-                    handleDialogContent(section, 'ul', false, 'move', l[1344]);
+                    handleDialogContent(section, 'ul', false, 'move', l[1344]); // Share
                     break;
                 case 'rubbish-bin':
-                    handleDialogContent(section, 'ul', false, 'move', l[62]);
+                    handleDialogContent(section, 'ul', false, 'move', l[62]); // Mocw
                     break;
             }
         }
     });
 
-    $('.move-dialog-panel-arrows').unbind('click');
-    $('.move-dialog-panel-arrows').bind('click', function() {
-        if ($(this).attr('class').indexOf('active') == -1) {
+    $('.move-dialog-panel-arrows').rebind('click', function() {
+        
+        var $moveDialog = $('.move-dialog');
+        
+        if ($(this).attr('class').indexOf('active') === -1) {
+            
             var type = $('.fm-dialog-title .move-dialog-txt.active').attr('class').split(" ")[1];
-            $('.move-dialog .dialog-sorting-menu .sorting-menu-item')
+            $moveDialog.find('.dialog-sorting-menu .sorting-menu-item')
                 .removeClass('active')
                 .filter('*[data-by=' + $.sortTreePanel[type].by + '],*[data-dir=' + $.sortTreePanel[type].dir + ']')
                 .addClass('active');
 
             $(this).addClass('active');
-            $('.move-dialog .dialog-sorting-menu').removeClass('hidden');
-        } else {
+            $moveDialog.find('.dialog-sorting-menu').removeClass('hidden');
+        }
+        else {
             $(this).removeClass('active');
-            $('.move-dialog .dialog-sorting-menu').addClass('hidden');
+            $moveDialog.find('.dialog-sorting-menu').addClass('hidden');
         }
     });
 
-    $('.move-dialog .dialog-sorting-menu .sorting-menu-item').unbind('click');
-    $('.move-dialog .dialog-sorting-menu .sorting-menu-item').bind('click', function()
-    {
-        if ($(this).attr('class').indexOf('active') == -1)
-        {
-            var data = $(this).data()
-            var type = $('.fm-dialog-title .move-dialog-txt.active').attr('class').split(" ")[1];
+    $('.move-dialog .sorting-menu-item').rebind('click', function() {
+        
+        if ($(this).attr('class').indexOf('active') === -1) {
+            
+            var data = $(this).data(),
+                type = $('.fm-dialog-title .move-dialog-txt.active').attr('class').split(" ")[1];
+                
             if (data.dir) {
                 localStorage['sort' + type + 'Dir'] = $.sortTreePanel[type].dir = data.dir;
-            } else {
+            }
+            else {
                 localStorage['sort' + type + 'By'] = $.sortTreePanel[type].by = data.by;
             }
+            
             switch (type) {
                 case 'shared-with-me':
                     M.buildtree({h: 'shares'}, 'move-dialog');
@@ -8184,6 +8285,7 @@ function moveDialog()
     });
 
     $('.move-dialog .dialog-newfolder-button').rebind('click', function() {
+        
         $('.move-dialog').addClass('arrange-to-back');
         createFolderDialog();
 
@@ -8191,81 +8293,87 @@ function moveDialog()
     });
 
     $('.move-dialog').off('click', '.nw-fm-tree-item');
-    $('.move-dialog').on('click', '.nw-fm-tree-item', function(e)
-    {
+    $('.move-dialog').on('click', '.nw-fm-tree-item', function(e) {
+        
         var old = $.mcselected;
+        
         $.mcselected = $(this).attr('id').replace('mctreea_', '');
         M.buildtree(M.d[$.mcselected]);
+        
         var html = $('#treesub_' + $.mcselected).html();
-        if (html)
+        if (html) {
             $('#mctreesub_' + $.mcselected).html(html.replace(/treea_/ig, 'mctreea_').replace(/treesub_/ig, 'mctreesub_').replace(/treeli_/ig, 'mctreeli_'));
+        }
+        
         disableCircularTargets('#mctreea_');
-        var $btn = $('.dialog-move-button');
-
-        var c = $(e.target).attr('class');
+        
+        var $btn = $('.dialog-move-button'),
+            c = $(e.target).attr('class');
+            
         // Sub-folder exist?
-        if (c && c.indexOf('nw-fm-arrow-icon') > -1)
-        {
+        if (c && c.indexOf('nw-fm-arrow-icon') > -1) {
+            
             var c = $(this).attr('class');
+            
             // Sub-folder expanded
-            if (c && c.indexOf('expanded') > -1)
-            {
+            if (c && c.indexOf('expanded') > -1) {
                 $(this).removeClass('expanded');
                 $('#mctreesub_' + $.mcselected).removeClass('opened');
             }
-            else
-            {
+            else {
                 $(this).addClass('expanded');
                 $('#mctreesub_' + $.mcselected).addClass('opened');
             }
         }
-        else
-        {
+        else {
+            
             var c = $(this).attr('class');
-            if (c && c.indexOf('selected') > -1)
-            {
-                if (c && c.indexOf('expanded') > -1)
-                {
+            if (c && c.indexOf('selected') > -1) {
+                if (c && c.indexOf('expanded') > -1) {
                     $(this).removeClass('expanded');
                     $('#mctreesub_' + $.mcselected).removeClass('opened');
                 }
-                else
-                {
+                else {
                     $(this).addClass('expanded');
                     $('#mctreesub_' + $.mcselected).addClass('opened');
                 }
             }
         }
-        if (!$(this).is('.disabled'))
-        {
+        if (!$(this).is('.disabled')) {
+            
             // unselect previously selected item
             $('.move-dialog .nw-fm-tree-item').removeClass('selected');
             $(this).addClass('selected');
             $btn.removeClass('disabled');
         }
-        else
+        else {
             $.mcselected = old;
+        }
 
         // dialogScroll('.move-dialog-tree-panel .dialog-tree-panel-scroll');
         dialogScroll('.dialog-tree-panel-scroll');
+        
         // Disable action button if there is no selected items
-        if (typeof $.mcselected == 'undefined')
+        if (typeof $.mcselected == 'undefined') {
             $btn.addClass('disabled');
+        }
     });
 
-    $('.move-dialog .dialog-move-button').unbind('click');
-    $('.move-dialog .dialog-move-button').bind('click', function()
-    {
-        if (typeof $.mcselected != 'undefined')
-        {
+    $('.move-dialog .dialog-move-button').rebind('click', function() {
+        
+        if (typeof $.mcselected != 'undefined') {
+            
             var n = [];
-            for (var i in $.selected)
-                if (!isCircular($.selected[i], $.mcselected))
+            for (var i in $.selected) {
+                if (!isCircular($.selected[i], $.mcselected)) {
                     n.push($.selected[i]);
+                }
+            }
             closeDialog();
             if (RootbyId($.mcselected) === 'shares') {
                 M.copyNodes(n, $.mcselected, true);
-            } else {
+            }
+            else {
                 M.moveNodes(n, $.mcselected);
             }
         }

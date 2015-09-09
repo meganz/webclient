@@ -51,7 +51,7 @@
     "karma-jasmine": "~0.1.5",
     "karma-junit-reporter": "~0.2",
     "karma-mocha": "~0.1.1",
-    "karma-phantomjs-launcher": "~0.2.1",
+    "karma-phantomjs2-launcher": "~0.3.2",
     "karma-script-launcher": "~0.1.0",
     "karma-sinon": "~1.0.3",
     "indexeddbshim": "~2.0.4",

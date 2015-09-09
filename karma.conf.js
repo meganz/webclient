@@ -185,11 +185,11 @@ module.exports = function(config) {
     // - Safari (only Mac; has to be installed with `npm install karma-safari-launcher`)
     // - PhantomJS
     // - IE (only Windows; has to be installed with `npm install karma-ie-launcher`)
-    browsers: ['PhantomJS', 'PhantomJS_custom', 'Firefox', 'Chrome'],
+    browsers: ['PhantomJS2', 'PhantomJS2_custom', 'Firefox', 'Chrome'],
 
     customLaunchers: {
-        'PhantomJS_custom': {
-            base: 'PhantomJS',
+        'PhantomJS2_custom': {
+            base: 'PhantomJS2',
             // Works with PhantomJS 1.9.8 (on Linux), but seems to need
             // PhantomJS 2.0 for Windows
             flags: ['--local-storage-path=./test/phantomjs-storage']

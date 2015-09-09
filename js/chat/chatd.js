@@ -34,10 +34,9 @@ Chatd.Opcode = {
     'RECEIVED' : 6,
     'RETENTION' : 7,
     'HIST' : 8,
-    'ACTION' : 9,
+    'RANGE' : 9,
     'MSGID' : 10,
-    'CHATMSGID' : 11,
-    'REJECT' : 12
+    'REJECT' : 11
 };
 
 // privilege levels
@@ -64,7 +63,9 @@ Chatd.Const = {
 // add a new chatd shard
 Chatd.prototype.addshard = function(chatid, shard, url) {
     // instantiate Chatd.Shard object for this shard if needed
-    if (!this.shards[shard]) {
+    var newshard = !this.shards[shard];
+
+    if (newshard) {
         this.shards[shard] = new Chatd.Shard(this, shard);
     }
 
@@ -79,6 +80,8 @@ Chatd.prototype.addshard = function(chatid, shard, url) {
 
     // attempt a connection
     this.shards[shard].reconnect();
+
+    return newshard;
 };
 
 // Chatd.Shard - everything specific to a chatd instance
@@ -148,9 +151,9 @@ Chatd.Shard.prototype.cmd = function(opcode, cmd) {
 // rejoin all open chats after reconnection (this is mandatory)
 Chatd.Shard.prototype.rejoinexisting = function() {
     for (var c in this.chatids) {
-        // rejoin chat and immediately fetch a few screenfuls of backlog
+        // rejoin chat and immediately set the locally buffered message range
         this.join(c);
-        this.hist(c,-250);
+        this.chatd.range(c);
     };
 };
 
@@ -167,8 +170,17 @@ Chatd.Shard.prototype.join = function(chatid) {
     this.cmd(Chatd.Opcode.JOIN, chatid + userid + String.fromCharCode(Chatd.Priv.NOCHANGE));
 };
 
+Chatd.prototype.cmd = function(opcode, chatid, cmd) {
+    this.chatidshard[chatid].cmd(opcode, chatid + cmd);
+};
+
 Chatd.prototype.hist = function(chatid, count) {
     this.chatidshard[chatid].hist(chatid, count);
+};
+
+// send RANGE
+Chatd.prototype.range = function(chatid) {
+    this.chatidmessages[chatid].range(chatid);
 };
 
 // send HIST
@@ -229,11 +241,6 @@ Chatd.Shard.prototype.exec = function(a) {
                 len = 21;
                 break;
 
-            case Chatd.Opcode.ACTION:
-                console.log("New latest action handle received: '" + base64urlencode(cmd.substr(1,8)));
-                len = 9;
-                break;
-
             case Chatd.Opcode.MSGID:
                 console.log("Sent message ID confirmed: '" + base64urlencode(cmd.substr(9,8)) + "'");
 
@@ -242,12 +249,12 @@ Chatd.Shard.prototype.exec = function(a) {
                 len = 17;
                 break;
 
-            case Chatd.Opcode.CHATMSGID:
-                console.log("Newest chat message ID for chat '" + base64urlencode(cmd.substr(1,8)) + "' is '" + base64urlencode(cmd.substr(9,8)) + "'");
+            case Chatd.Opcode.RANGE:
+                console.log("Known chat message IDs - oldest: '" + base64urlencode(cmd.substr(9,8)) + "' newest: '" + base64urlencode(cmd.substr(17,8)) + "'");
 
-                this.chatd.msgcheck(cmd.substr(1,8), cmd.substr(9,8));
+                this.chatd.msgcheck(cmd.substr(1,8), cmd.substr(17,8));
 
-                len = 17;
+                len = 25;
                 break;
 
             case Chatd.Opcode.REJECT:
@@ -292,10 +299,12 @@ Chatd.prototype.nexttransactionid = function() {
 
 Chatd.prototype.join = function(chatid, shard, url) {
     if (!this.chatidshard[chatid]) {
-        this.addshard(chatid, shard, url);
+        var newshard = this.addshard(chatid, shard, url);
         this.chatidmessages[chatid] = new Chatd.Messages(this, chatid);
-        this.shards[shard].join(chatid);
-    };
+        if (!newshard) {
+            this.shards[shard].join(chatid);
+        }
+    }
 };
 
 // submit a new message to the chatid
@@ -415,6 +424,20 @@ Chatd.Messages.prototype.resend = function() {
     }
 };
 
+// after a reconnect, we tell the chatd the oldest and newest buffered message
+Chatd.Messages.prototype.range = function(chatid) {
+    var low, high;
+
+    for (low = this.lownum; low <= this.highnum; low++) {
+        if (this.buf[low] && !this.sending[this.buf[low][Chatd.MsgField.MSGID]]) {
+            for (high = this.highnum; high > low; high--) {
+                if (!this.sending[this.buf[high][Chatd.MsgField.MSGID]]) break;
+            }
+            this.chatd.cmd(Chatd.Opcode.RANGE, chatid, this.buf[low][Chatd.MsgField.MSGID] + this.buf[high][Chatd.MsgField.MSGID]);
+        }
+    }
+};
+
 Chatd.prototype.msgconfirm = function(msgxid, msgid) {
     // CHECK: is it more efficient to keep a separate mapping of msgxid to Chatd.Messages?
     for (var chatid in this.chatidmessages) if (this.chatidmessages[chatid].sending[msgxid]) {
@@ -499,9 +522,15 @@ Chatd.prototype.msgcheck = function(chatid, msgid) {
 };
 
 Chatd.Messages.prototype.check = function(chatid, msgid) {
-    // if the newest held message is not current, initiate a fetch, just in case
-    if (this.buf[this.newmsg] && this.buf[this.newmsg][Chatd.MsgField.MSGID] !== msgid) {
-        this.cmd(Chatd.Opcode.HIST, chatid + this.chatd.pack32le(255));
+    if (this.buf[this.newmsg]) {
+        // if the newest held message is not current, initiate a fetch of newer messages just in case
+        if (this.buf[this.newmsg][Chatd.MsgField.MSGID] !== msgid) {
+            this.chatd.cmd(Chatd.Opcode.HIST, chatid, this.chatd.pack32le(255));
+        }
+    }
+    else {
+        // we don't have any messages, just fetch the newest 255
+        this.chatd.cmd(Chatd.Opcode.HIST, chatid, this.chatd.pack32le(-255));        
     }
 };
 
@@ -637,15 +666,15 @@ function hist(n) {
 };
 
 function seen(msgid) {
-    chatd.cmd(Chatd.Opcode.SEEN, chatid + CHAT_UNDEFINED + base64urldecode(msgid));
+    chatd.cmd(Chatd.Opcode.SEEN, chatid, CHAT_UNDEFINED + base64urldecode(msgid));
 };
 
 function received(msgid) {
-    chatd.cmd(Chatd.Opcode.RECEIVED, chatid + base64urldecode(msgid));
+    chatd.cmd(Chatd.Opcode.RECEIVED, chatid, base64urldecode(msgid));
 };
 
 function retention(time) {
-    chatd.cmd(Chatd.Opcode.RETENTION, chatid + CHAT_UNDEFINED + pack32le(time));
+    chatd.cmd(Chatd.Opcode.RETENTION, chatid, CHAT_UNDEFINED + pack32le(time));
 };
 
 function callback_msgupd(chatid, num, status, message) {

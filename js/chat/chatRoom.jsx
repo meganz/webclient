@@ -39,7 +39,10 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
             callIsActive: false,
             isCurrentlyActive: false,
             _messagesQueue: [],
-            unreadCount: 0
+            unreadCount: 0,
+            chatId: false,
+            chatdUrl: false,
+            chatShard: false,
         },
         true
     );

@@ -21,6 +21,8 @@ var Chatd = function() {
     for (var i = 8; i--; ) {
         this.msgtransactionid += String.fromCharCode(Math.random()*256);
     }
+
+    this.logger = new MegaLogger("chatd");
 };
 
 // command opcodes
@@ -83,17 +85,86 @@ Chatd.prototype.addshard = function(chatid, shard, url) {
 
 // Chatd.Shard - everything specific to a chatd instance
 Chatd.Shard = function(chatd, shard) {
+    var self = this;
+
     // parent backlink
-    this.chatd = chatd;
+    self.chatd = chatd;
 
     // shard for this connection
-    this.shard = shard;
+    self.shard = shard;
 
     // active chats on this connection
-    this.chatids = {};
+    self.chatids = {};
 
     // queued commands
-    this.cmdq = '';
+    self.cmdq = '';
+
+    self.logger = new MegaLogger("shard-" + shard, {}, chatd.logger);
+
+    self.connectionRetryManager = new ConnectionRetryManager(
+        {
+            functions: {
+                reconnect: function(connectionRetryManager) {
+                    //console.error("reconnect was called");
+                    self.reconnect();
+                },
+                /**
+                 * A Callback that will trigger the 'forceDisconnect' procedure for this type of connection (Karere/Chatd/etc)
+                 * @param connectionRetryManager {ConnectionRetryManager}
+                 */
+                forceDisconnect: function(connectionRetryManager) {
+                    //console.error("forceDisconnect was called");
+                    self.disconnct();
+                },
+                /**
+                 * Should return true or false depending on the current state of this connection, e.g. (connected || connecting)
+                 * @param connectionRetryManager {ConnectionRetryManager}
+                 * @returns {bool}
+                 */
+                isConnectedOrConnecting: function(connectionRetryManager) {
+                    return (
+                        self.s && (
+                            self.s.readyState == self.s.CONNECTING ||
+                            self.s.readyState == self.s.OPEN
+                        )
+                    );
+                },
+                /**
+                 * Should return true/false if the current state === CONNECTED
+                 * @param connectionRetryManager {ConnectionRetryManager}
+                 * @returns {bool}
+                 */
+                isConnected: function(connectionRetryManager) {
+                    return (
+                        self.s && (
+                            self.s.readyState == self.s.OPEN
+                        )
+                    );
+                },
+                /**
+                 * Should return true/false if the current state === DISCONNECTED
+                 * @param connectionRetryManager {ConnectionRetryManager}
+                 * @returns {bool}
+                 */
+                isDisconnected: function(connectionRetryManager) {
+                    return (
+                        !self.s || self.s.readyState == self.s.CLOSED
+                    );
+                },
+                /**
+                 * Should return true IF the user had forced the connection to go offline
+                 * @param connectionRetryManager {ConnectionRetryManager}
+                 * @returns {bool}
+                 */
+                isUserForcedDisconnect: function(connectionRetryManager) {
+                    return (
+                        localStorage.megaChatPresence === "unavailable"
+                    );
+                }
+            }
+        },
+        self.logger
+    );
 };
 
 // is this chatd connection currently active?
@@ -108,14 +179,14 @@ Chatd.Shard.prototype.reconnect = function() {
     self.s.binaryType = "arraybuffer";
 
     self.s.onopen = function(e) {
-        console.log('chatd connection established');
+        self.logger.log('chatd connection established');
+        self.connectionRetryManager.gotConnected();
         self.rejoinexisting();
-        self.resendpending()
+        self.resendpending();
     };
 
     self.s.onerror = function(e) {
-        console.log('error');
-        console.log(e);
+        self.logger.error("WebSocket error:", e);
         // FIXME: reconnect?
     };
 
@@ -125,10 +196,19 @@ Chatd.Shard.prototype.reconnect = function() {
     };
 
     self.s.onclose = function(e) {
-        console.log('chatd connection lost, reconnecting...');
+        self.logger.log('chatd connection lost, reconnecting...');
         // FIXME: exponential back-off
-        self.reconnect();
+        self.connectionRetryManager.gotDisconnected();
     };
+};
+
+Chatd.Shard.prototype.disconnct = function() {
+    var self = this;
+
+    if(self.s) {
+        self.s.close();
+    }
+    self.s = null;
 };
 
 Chatd.Shard.prototype.cmd = function(opcode, cmd) {
@@ -142,7 +222,7 @@ Chatd.Shard.prototype.cmd = function(opcode, cmd) {
         this.s.send(a);
 
         this.cmdq = '';
-    };
+    }
 };
 
 // rejoin all open chats after reconnection (this is mandatory)
@@ -151,7 +231,7 @@ Chatd.Shard.prototype.rejoinexisting = function() {
         // rejoin chat and immediately fetch a few screenfuls of backlog
         this.join(c);
         this.hist(c,-250);
-    };
+    }
 };
 
 // resend all unconfirmed messages (this is mandatory)
@@ -180,6 +260,8 @@ Chatd.Shard.prototype.hist = function(chatid, count) {
 // multiple commands can appear as one WebSocket frame, but commands never cross frame boundaries
 // CHECK: is this assumption correct on all browsers and under all circumstances?
 Chatd.Shard.prototype.exec = function(a) {
+    var self = this;
+
     var cmd = String.fromCharCode.apply(null, a);
     var len;
     var newmsg;
@@ -187,12 +269,12 @@ Chatd.Shard.prototype.exec = function(a) {
     while (cmd.length) {
         switch (cmd.charCodeAt(0)) {
             case Chatd.Opcode.KEEPALIVE:
-                console.log("Server heartbeat received");
+                self.logger.log("Server heartbeat received");
                 len = 1;
                 break;
 
             case Chatd.Opcode.JOIN:
-                console.log("Join or privilege change - user '" + base64urlencode(cmd.substr(9,8)) + "' on '" + base64urlencode(cmd.substr(1,8)) + "' with privilege level " + cmd.charCodeAt(17) );
+                self.logger.log("Join or privilege change - user '" + base64urlencode(cmd.substr(9,8)) + "' on '" + base64urlencode(cmd.substr(1,8)) + "' with privilege level " + cmd.charCodeAt(17) );
                 len = 18;
                 break;
 
@@ -200,7 +282,7 @@ Chatd.Shard.prototype.exec = function(a) {
             case Chatd.Opcode.NEWMSG:
                 newmsg = cmd.charCodeAt(0) == Chatd.Opcode.NEWMSG;
                 len = this.chatd.unpack32le(cmd.substr(29,4));
-                console.log((newmsg ? 'New' : 'Old') + " message '" + base64urlencode(cmd.substr(17,8)) + "' from '" + base64urlencode(cmd.substr(9,8)) + "' on '" + base64urlencode(cmd.substr(1,8)) + "' at " + this.chatd.unpack32le(cmd.substr(25,4)) + ': ' + cmd.substr(33,len));
+                self.logger.log((newmsg ? 'New' : 'Old') + " message '" + base64urlencode(cmd.substr(17,8)) + "' from '" + base64urlencode(cmd.substr(9,8)) + "' on '" + base64urlencode(cmd.substr(1,8)) + "' at " + this.chatd.unpack32le(cmd.substr(25,4)) + ': ' + cmd.substr(33,len));
                 len += 33;
 
                 this.chatd.msgstore(newmsg, cmd.substr(1,8), cmd.substr(9,8), cmd.substr(17,8), this.chatd.unpack32le(cmd.substr(25,4)), cmd.substr(33,len));
@@ -208,34 +290,34 @@ Chatd.Shard.prototype.exec = function(a) {
 
             case Chatd.Opcode.MSGUPD:
                 len = this.chatd.unpack32le(cmd.substr(29,4));
-                console.log("Message '" + base64urlencode(cmd.substr(16,8)) + "' EDIT/DELETION: " + cmd.substr(33,len));
+                self.logger.log("Message '" + base64urlencode(cmd.substr(16,8)) + "' EDIT/DELETION: " + cmd.substr(33,len));
                 len += 33;
 
                 this.chatd.msgmodify(cmd.substr(1,8), cmd.substr(9,8), cmd.substr(33,len));
                 break;
 
             case Chatd.Opcode.SEEN:
-                console.log("Newest seen message on '" + base64urlencode(cmd.substr(1,8)) + "' for user '" + base64urlencode(cmd.substr(9,8)) + "': '" + base64urlencode(cmd.substr(17,8)) + "'");
+                self.logger.log("Newest seen message on '" + base64urlencode(cmd.substr(1,8)) + "' for user '" + base64urlencode(cmd.substr(9,8)) + "': '" + base64urlencode(cmd.substr(17,8)) + "'");
                 len = 25;
                 break;
 
             case Chatd.Opcode.RECEIVED:
-                console.log("Newest delivered message on '" + base64urlencode(cmd.substr(1,8)) + "': '" + base64urlencode(cmd.substr(9,8)) + "'");
+                self.logger.log("Newest delivered message on '" + base64urlencode(cmd.substr(1,8)) + "': '" + base64urlencode(cmd.substr(9,8)) + "'");
                 len = 17;
                 break;
 
             case Chatd.Opcode.RETENTION:
-                console.log("Retention policy change on '" + base64urlencode(cmd.substr(1,8)) + "' by '" + base64urlencode(cmd.substr(9,8)) + "': " + this.chatd.unpack32le(cmd.substr(17,4)) + " second(s)");
+                self.logger.log("Retention policy change on '" + base64urlencode(cmd.substr(1,8)) + "' by '" + base64urlencode(cmd.substr(9,8)) + "': " + this.chatd.unpack32le(cmd.substr(17,4)) + " second(s)");
                 len = 21;
                 break;
 
             case Chatd.Opcode.ACTION:
-                console.log("New latest action handle received: '" + base64urlencode(cmd.substr(1,8)));
+                self.logger.log("New latest action handle received: '" + base64urlencode(cmd.substr(1,8)));
                 len = 9;
                 break;
 
             case Chatd.Opcode.MSGID:
-                console.log("Sent message ID confirmed: '" + base64urlencode(cmd.substr(9,8)) + "'");
+                self.logger.log("Sent message ID confirmed: '" + base64urlencode(cmd.substr(9,8)) + "'");
 
                 this.chatd.msgconfirm(cmd.substr(1,8), cmd.substr(9,8));
 
@@ -243,7 +325,7 @@ Chatd.Shard.prototype.exec = function(a) {
                 break;
 
             case Chatd.Opcode.CHATMSGID:
-                console.log("Newest chat message ID for chat '" + base64urlencode(cmd.substr(1,8)) + "' is '" + base64urlencode(cmd.substr(9,8)) + "'");
+                self.logger.log("Newest chat message ID for chat '" + base64urlencode(cmd.substr(1,8)) + "' is '" + base64urlencode(cmd.substr(9,8)) + "'");
 
                 this.chatd.msgcheck(cmd.substr(1,8), cmd.substr(9,8));
 
@@ -251,27 +333,27 @@ Chatd.Shard.prototype.exec = function(a) {
                 break;
 
             case Chatd.Opcode.REJECT:
-                console.log("Command was rejected: " + this.chatd.unpack32le(cmd.substr(9,4)) + " / " + this.chatd.unpack32le(cmd.substr(13,4)));
+                self.logger.log("Command was rejected: " + this.chatd.unpack32le(cmd.substr(9,4)) + " / " + this.chatd.unpack32le(cmd.substr(13,4)));
 
                 if (this.chatd.unpack32le(cmd.substr(9,4)) == Chatd.Opcode.NEWMSG) {
                     // the message was rejected
                     this.chatd.msgconfirm(cmd.substr(1,8), false);
-                };
+                }
 
                 len = 17;
                 break;
 
             default:
-                console.error("FATAL: Unknown opcode " + cmd.charCodeAt(0));
-        };
+                self.logger.error("FATAL: Unknown opcode " + cmd.charCodeAt(0));
+        }
 
         if (cmd.length < len) {
-            console.error("FATAL: Short WebSocket frame - got " + cmd.length + ", expected " + len);
+            self.logger.error("FATAL: Short WebSocket frame - got " + cmd.length + ", expected " + len);
             break;
-        };
+        }
 
         cmd = cmd.substr(len);
-    };
+    }
 };
 
 // generate and return next msgtransactionid in sequence
@@ -285,7 +367,7 @@ Chatd.prototype.nexttransactionid = function() {
         if (c) {
             break;
         }
-    };
+    }
 
     return this.msgtransactionid;
 };
@@ -295,7 +377,7 @@ Chatd.prototype.join = function(chatid, shard, url) {
         this.addshard(chatid, shard, url);
         this.chatidmessages[chatid] = new Chatd.Messages(this, chatid);
         this.shards[shard].join(chatid);
-    };
+    }
 };
 
 // submit a new message to the chatid
@@ -319,7 +401,6 @@ Chatd.Shard.prototype.msg = function(chatid, msgxid, timestamp, message) {
 };
 
 Chatd.Shard.prototype.msgupd = function(chatid, msgid, message) {
-    console.log("MSGUPD");
     this.cmd(Chatd.Opcode.MSGUPD, chatid + Chatd.Const.UNDEFINED + msgid + this.chatd.pack32le(0) + this.chatd.pack32le(message.length) + message);
 };
 
@@ -422,7 +503,7 @@ Chatd.prototype.msgconfirm = function(msgxid, msgid) {
             this.chatidmessages[chatid].confirm(chatid, msgxid, msgid);
         }
         break;
-    };
+    }
 };
 
 // msgid can be false in case of rejections
@@ -489,7 +570,7 @@ Chatd.Messages.prototype.msgmodify = function(chatid, msgid, msg) {
 
             break;
         }
-    };
+    }
 };
 
 Chatd.prototype.msgcheck = function(chatid, msgid) {
@@ -512,7 +593,7 @@ Chatd.prototype.pack32le = function(x) {
     for (var i = 4; i--; ) {
         r += String.fromCharCode(x & 255);
         x >>= 8;
-    };
+    }
 
     return r;
 };

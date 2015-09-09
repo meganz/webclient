@@ -200,6 +200,7 @@ var Chat = function() {
          * Really simple plugin architecture
          */
         'plugins': {
+            'chatdIntegration': ChatdIntegration,
             'callManager': CallManager,
             'urlFilter': UrlFilter,
             'emoticonsFilter': EmoticonsFilter,

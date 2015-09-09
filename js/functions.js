@@ -2229,6 +2229,7 @@ function moveCursortoToEnd(el) {
         range.collapse(false);
         range.select();
     }
+    $(el).focus();
 }
 
 String.prototype.replaceAll = function(_f, _r, _c) {
@@ -2547,58 +2548,58 @@ function generateAnonymousReport() {
     var roomUniqueId = 0;
     var roomUniqueIdMap = {};
 
-    Object.keys(megaChatIsReady && megaChat.chats || {}).forEach(function(k) {
-        var v = megaChat.chats[k];
+    if(megaChatIsReady && megaChat.chats) {
+        megaChat.chats.forEach(function (v, k) {
+            var participants = v.getParticipants();
 
-        var participants = v.getParticipants();
-
-        participants.forEach(function(v, k) {
-            var cc = megaChat.getContactFromJid(v);
-            if (cc && cc.u && !userAnonMap[cc.u]) {
-                userAnonMap[cc.u] = {
-                    anonId: userAnonIdx++ + rand(1000),
-                    pres: megaChat.karere.getPresence(v)
-                };
-            }
-            participants[k] = cc && cc.u ? userAnonMap[cc.u] : v;
-        });
-
-        var r = {
-            'roomUniqueId': roomUniqueId,
-            'roomState': v.getStateAsText(),
-            'roomParticipants': participants
-        };
-
-        chatStates[roomUniqueId] = r;
-        roomUniqueIdMap[k] = roomUniqueId;
-        roomUniqueId++;
-    });
-
-    if (report.haveRtc) {
-        Object.keys(megaChat.plugins.callManager.callSessions).forEach(function(k) {
-            var v = megaChat.plugins.callManager.callSessions[k];
+            participants.forEach(function (v, k) {
+                var cc = megaChat.getContactFromJid(v);
+                if (cc && cc.u && !userAnonMap[cc.u]) {
+                    userAnonMap[cc.u] = {
+                        anonId: userAnonIdx++ + rand(1000),
+                        pres: megaChat.karere.getPresence(v)
+                    };
+                }
+                participants[k] = cc && cc.u ? userAnonMap[cc.u] : v;
+            });
 
             var r = {
-                'callStats': v.callStats,
-                'state': v.state
+                'roomUniqueId': roomUniqueId,
+                'roomState': v.getStateAsText(),
+                'roomParticipants': participants
             };
 
-            var roomIdx = roomUniqueIdMap[v.room.roomJid];
-            if(!roomIdx) {
-                roomUniqueId += 1; // room which was closed, create new tmp id;
-                roomIdx = roomUniqueId;
-            }
-            if(!chatStates[roomIdx]) {
-                chatStates[roomIdx] = {};
-            }
-            if(!chatStates[roomIdx].callSessions) {
-                chatStates[roomIdx].callSessions = [];
-            }
-            chatStates[roomIdx].callSessions.push(r);
+            chatStates[roomUniqueId] = r;
+            roomUniqueIdMap[k] = roomUniqueId;
+            roomUniqueId++;
         });
-    };
 
-    report.chatRoomState = chatStates;
+        if (report.haveRtc) {
+            Object.keys(megaChat.plugins.callManager.callSessions).forEach(function (k) {
+                var v = megaChat.plugins.callManager.callSessions[k];
+
+                var r = {
+                    'callStats': v.callStats,
+                    'state': v.state
+                };
+
+                var roomIdx = roomUniqueIdMap[v.room.roomJid];
+                if (!roomIdx) {
+                    roomUniqueId += 1; // room which was closed, create new tmp id;
+                    roomIdx = roomUniqueId;
+                }
+                if (!chatStates[roomIdx]) {
+                    chatStates[roomIdx] = {};
+                }
+                if (!chatStates[roomIdx].callSessions) {
+                    chatStates[roomIdx].callSessions = [];
+                }
+                chatStates[roomIdx].callSessions.push(r);
+            });
+        };
+
+        report.chatRoomState = chatStates;
+    };
 
     if (is_chrome_firefox) {
         report.mo = mozBrowserID + '::' + is_chrome_firefox + '::' + mozMEGAExtensionVersion;
@@ -2621,7 +2622,7 @@ function generateAnonymousReport() {
     report.totalScriptElements = $("script").length;
 
     report.totalD = Object.keys(M.d).length;
-    report.totalU = Object.keys(M.u).length;
+    report.totalU = M.u.size();
     report.totalC = Object.keys(M.c).length;
     report.totalIpc = Object.keys(M.ipc).length;
     report.totalOpc = Object.keys(M.opc).length;
@@ -2686,6 +2687,10 @@ function generateAnonymousReport() {
         });
 
     return $promise;
+}
+
+function __(s) { //TODO: waiting for @crodas to commit the real __ code.
+    return s;
 }
 
 function MegaEvents() {}

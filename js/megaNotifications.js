@@ -258,6 +258,8 @@
             self._showDesktopNotification();
         }
 
+        self.megaNotifications.trigger('onAfterNotificationCreated', self);
+
         return self;
     };
 

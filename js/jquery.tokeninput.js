@@ -37,7 +37,7 @@
             var email = item[this.propertyToSearch],
                 type = '';
 
-            $.each(M.u, function (ind, val) {
+            M.u.forEach( function (ind, val) {
                 if (val.m === email) {
                     id = ind;
                     return false;
@@ -59,7 +59,7 @@
             var id, av, avatar;
             var email = item[this.propertyToSearch],
                 type = '';
-            $.each(M.u, function (ind, val) {
+            M.u.forEach( function (ind, val) {
                 if (val.m === email) {
                     id = ind;
                     return false;

@@ -39,6 +39,22 @@ if (typeof loadingDialog === 'undefined')
     };
 }
 
+// data struct definitions
+var MEGA_USER_STRUCT = {
+    "u": undefined,
+    "c": undefined,
+    "m": undefined,
+    "m2": undefined,
+    "name": undefined,
+    "h": undefined,
+    "t": undefined,
+    "p": undefined,
+    "presence": undefined,
+    "presenceMtime": undefined,
+    "displayColor": undefined,
+    "shortName": undefined
+};
+
 function MegaData()
 {
     this.h = {};
@@ -51,7 +67,8 @@ function MegaData()
         this.d = {};
         this.v = [];
         this.c = {};
-        this.u = {};
+        this.u = new MegaDataMap();
+
         this.t = {};
         this.opc = {};
         this.ipc = {};
@@ -65,6 +82,8 @@ function MegaData()
         this.RubbishID = undefined;
         this.InboxID = undefined;
         this.viewmode = 0; // 0 list view, 1 block view
+
+        mBroadcaster.sendMessage("MegaDataReset");
     };
     this.reset();
 
@@ -559,12 +578,12 @@ function MegaData()
         // If focus is on contacts tab
         if (M.currentdirid === 'contacts') {
             var haveActiveContact = false;
-            for (var i in M.u) {
-                if (M.u[i].c !== 0 && M.u[i].c !== 2) {
+            M.u.forEach(function(v, k) {
+                if (v.c !== 0 && v.c !== 2) {
                     haveActiveContact = true;
-                    break;
+                    return false; // break
                 }
-            }
+            });
 
             // We do NOT have active contacts, set empty contacts grid
             if (!haveActiveContact) {
@@ -1372,7 +1391,7 @@ function MegaData()
         this.renderInboxTree();
         treeUI();
         if (megaChatIsReady) {
-            megaChat.renderContactTree();
+            // megaChat.renderContactTree();
         }
     };
 
@@ -1420,12 +1439,9 @@ function MegaData()
             else {
                 this.chat = true;
 
-                if (megaChat.renderListing() === true) {
-                    window.location = megaChat.getCurrentRoom().getRoomUrl();
-                    return;
-                }
                 megaChat.refreshConversations();
                 treeUI();
+                megaChat.renderListing();
             }
         } else if (id && id.substr(0, 7) === 'account')
             accountUI();
@@ -1475,7 +1491,7 @@ function MegaData()
 
         if (this.chat) {
             sharedfolderUI(); // remove shares-specific UI
-            $(window).trigger('resize');
+            //$(window).trigger('resize');
         }
         else if (id === undefined && folderlink) {
             // Error reading shared folder link! (Eg, server gave a -11 (EACCESS) error)
@@ -1624,7 +1640,7 @@ function MegaData()
         $('.content-panel.contacts').html(html);
 
         if (megaChatIsReady) {
-            megaChat.renderContactTree();
+            //megaChat.renderContactTree();
 
             $('.fm-tree-panel').undelegate('.start-chat-button', 'click.megaChat');
             $('.fm-tree-panel').delegate('.start-chat-button', 'click.megaChat', function() {
@@ -1747,8 +1763,7 @@ function MegaData()
 
         var found = false;
 
-        Object.keys(self.u).forEach(function(k) {
-            var v = self.u[k];
+        self.u.forEach(function(v, k) {
             if (v.t == 1 && v.name && v.m == email) {
                 found = v;
                 return false; // break
@@ -2342,7 +2357,12 @@ function MegaData()
             }
         }
         if (typeof mDB === 'object' && !ignoreDB && !pfkey) {
-            mDBadd('f', clone(n));
+            if (n instanceof MegaDataObject) {
+                mDBadd('f', clone(n.toJS()));
+            }
+            else {
+                mDBadd('f', clone(n));
+            }
         }
         if (n.p) {
             if (typeof this.c[n.p] === 'undefined') {
@@ -2398,12 +2418,13 @@ function MegaData()
         if (typeof newnodes !== 'undefined') {
             newnodes.push(n);
         }
+        $(window).trigger("megaNodeAdded", [n]);
     };
 
     this.delNode = function(h) {
 
         function ds(h) {
-
+            $(window).trigger("megaNodeRemoved", [h]);
             removeUInode(h);
             if (M.c[h] && h.length < 11) {
                 for (var h2 in M.c[h]) {
@@ -2497,13 +2518,15 @@ function MegaData()
 //        }
 
         // Check active contacts
-        var u = M.u;
-        for (var i in u) {
-            if ((M.u[i].m === email) && (M.u[i].c !== 0)) {
-                return -2;
+        var result = 0;
+        M.u.forEach(function(v, k) {
+            if (v.m === email && v.c !== 0) {
+                result = -2;
+                return false; // break;
             }
-        }
-        return 0;
+        });
+
+        return result;
     };
 
     /**
@@ -2739,7 +2762,7 @@ function MegaData()
                 }
                 u = this.u[userId];
             } else {
-                this.u[userId] = u;
+                this.u.set(userId, new MegaDataObject(MEGA_USER_STRUCT, true, u));
             }
             if (typeof mDB === 'object' && !ignoreDB && !pfkey) {
                 mDBadd('u', clone(u));
@@ -4621,7 +4644,7 @@ function renderfm()
 
     M.openFolder(M.currentdirid);
     if (megaChatIsReady) {
-        megaChat.renderContactTree();
+        //megaChat.renderContactTree();
         megaChat.renderMyStatus();
     }
 
@@ -4695,7 +4718,7 @@ function renderNew() {
         treeUI();
 
         if (megaChatIsReady) {
-            megaChat.renderContactTree();
+            //megaChat.renderContactTree();
             megaChat.renderMyStatus();
         }
     }
@@ -5522,15 +5545,17 @@ function createFolder(toid, name, ulparams) {
 }
 
 function getuid(email) {
+    var result = false;
 
-    for (var j in M.u) {
-        if (M.u[j].m === email) {
-            return j;
+    M.u.forEach(function(v, k) {
+        if (v.m == email) {
+            result = k;
+            return false; // break;
         }
-    }
+    });
 
-    return false;
-}
+    return result;
+};
 
 function doShare(h, targets, dontShowShareDialog) {
     var $promise = new MegaPromise();
@@ -5976,7 +6001,7 @@ function init_chat() {
                 window.megaChat.init();
 
                 if (fminitialized) {
-                    megaChat.renderContactTree();
+                    //megaChat.renderContactTree();
                     megaChat.renderMyStatus();
                 }
             }

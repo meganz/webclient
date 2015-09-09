@@ -497,8 +497,8 @@ function generateAvatarMeta(user_hash) {
         shortName = contact.shortName;
         color = contact.displayColor;
     }
-    else {
-        $.each(Object.keys(M.u), function (k, v) {
+	else {
+        M.u.forEach(function(k, v) {
             var c = M.u[v];
             var n = generateContactName(v);
 

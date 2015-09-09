@@ -191,7 +191,7 @@ function cacheselect()
 
 function hideEmptyGrids() {
     $('.fm-empty-trashbin,.fm-empty-contacts,.fm-empty-search,.fm-empty-cloud,.fm-invalid-folder').addClass('hidden');
-    $('.fm-empty-messages,.fm-empty-folder,.fm-empty-conversations,.fm-empty-incoming,.fm-empty-folder-link').addClass('hidden');
+    $('.fm-empty-folder,.fm-empty-incoming,.fm-empty-folder-link').addClass('hidden');
     $('.fm-empty-pad.fm-empty-sharef').remove();
 }
 
@@ -811,8 +811,14 @@ function initUI() {
         if ($.hideTopMenu)
             $.hideTopMenu(e);
         var c = $(e.target).attr('class');
-        if ($(e.target).attr('type') !== 'file' && (c && c.indexOf('upgradelink') == -1) && (c && c.indexOf('campaign-logo') == -1) && (c && c.indexOf('resellerbuy') == -1) && (c && c.indexOf('linkified') == -1))
+
+
+        if($(e.target).attr('data-reactid')) {
+            return; // never return false, if this is an event triggered by a React element....
+        }
+        if ($(e.target).attr('type') !== 'file' && (c && c.indexOf('upgradelink') == -1) && (c && c.indexOf('campaign-logo') == -1) && (c && c.indexOf('resellerbuy') == -1) && (c && c.indexOf('linkified') == -1)) {
             return false;
+        }
 
     });
 
@@ -2853,6 +2859,7 @@ function accountUI()
     $('.fm-account-button').removeClass('active');
     $('.fm-account-sections').addClass('hidden');
     $('.fm-right-files-block').addClass('hidden');
+    $('.section.conversations').addClass('hidden');
     $('.fm-right-account-block').removeClass('hidden');
     $('.nw-fm-left-icon').removeClass('active');
     $('.nw-fm-left-icon.settings').addClass('active');
@@ -6378,7 +6385,7 @@ function sectionUIopen(id) {
     $('.nw-fm-left-icon.' + tmpId).addClass('active');
     $('.content-panel.' + tmpId).addClass('active');
     $('.fm-left-menu').removeClass('cloud-drive folder-link shared-with-me rubbish-bin contacts conversations opc ipc inbox').addClass(tmpId);
-    $('.fm-right-header, .fm-import-to-cloudrive, .fm-download-as-zip').addClass('hidden');
+    $('.fm.fm-right-header, .fm-import-to-cloudrive, .fm-download-as-zip').addClass('hidden');
     $('.fm-import-to-cloudrive, .fm-download-as-zip').unbind('click');
 
     $('.fm-main').removeClass('active-folder-link');
@@ -6412,9 +6419,10 @@ function sectionUIopen(id) {
 
     if (id !== 'conversations') {
         $('.fm-right-header').removeClass('hidden');
-        $('.fm-chat-block').hide();
+        $('.fm-chat-block').addClass('hidden');
+        $('.section.conversations').addClass('hidden');
     } else {
-        $('.fm-chat-block').show();
+        $('.section.conversations').removeClass('hidden');
     }
 
     if (
@@ -6498,8 +6506,39 @@ function sectionUIopen(id) {
             break;
     }
 
-    if (!folderlink)
-        $('.nw-tree-panel-header span').text(headertxt);
+    if (!folderlink) {
+        $('.fm-tree-panel > .jspContainer > .jspPane > .nw-tree-panel-header span').text(headertxt);
+    }
+
+    {
+        // required tricks to make the conversations work with the old UI HTML/css structure
+        if(id == "conversations") { // moving the control of the headers in the tree panel to chat.js + ui/conversations.jsx
+            $('.fm-tree-panel > .jspContainer > .jspPane > .nw-tree-panel-header').hide();
+            $('.fm-main.default > .fm-left-panel').hide();
+        } else {
+            $('.fm-tree-panel > .jspContainer > .jspPane > .nw-tree-panel-header').show();
+            $('.fm-main.default > .fm-left-panel').show();
+        }
+
+        // new sections UI
+        $('.section').addClass('hidden');
+        var repos = function() {
+            $('.section.' + id)
+                .height(
+                $(window).outerHeight() - $('#topmenu').outerHeight() - $('.transfer-panel').outerHeight()
+            )
+        };
+
+        $(window)
+            .unbind('resize.section')
+            .bind('resize.section', function() {
+                repos();
+            });
+
+        repos();
+        $('.section.' + id).removeClass('hidden');
+    }
+
 
     if ($.fah_abort_timer) {
         clearTimeout($.fah_abort_timer);

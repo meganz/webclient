@@ -125,7 +125,6 @@ if (!b_u) try
         Cu['import']("resource://gre/modules/Services.jsm");
         XPCOMUtils.defineLazyModuleGetter(this, "NetUtil", "resource://gre/modules/NetUtil.jsm");
 
-        // d = true;
         (function(global) {
             global.loadSubScript = function(file,scope) {
                 if (global.d) {
@@ -382,7 +381,7 @@ var mBroadcaster = {
                 try {
                     rc = ev.callback.apply(ev.scope, args);
                 } catch (ex) {
-                    if (d) console.error(ex);
+                    if (d) console.error(ex, ex.stack ? ex.stack : null);
                 }
                 if (ev.once || rc === 0xDEAD)
                     idr.push(id);
@@ -1069,6 +1068,7 @@ else if (!b_u)
     jsl.push({f:'js/asmcrypto.js',n:'asmcrypto_js',j:1,w:1});
     jsl.push({f:'js/jquery-2.1.1.js', n: 'jquery', j:1,w:10});
     jsl.push({f:'js/functions.js', n: 'functions_js', j:1});
+    jsl.push({f:'js/datastructs.js', n: 'datastructs_js', j:1});
     jsl.push({f:'js/mega.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/vendor/megaLogger.js', n: 'megaLogger_js', j:1});
     jsl.push({f:'js/tlvstore.js', n: 'tlvstore_js', j:1});
@@ -1101,6 +1101,7 @@ else if (!b_u)
     jsl.push({f:'js/megaDb.js', n: 'megadb_js', j:1,w:5});
     jsl.push({f:'js/megaKvStorage.js', n: 'megakvstorage_js', j:1,w:5});
 
+
     jsl.push({f:'js/chat/mpenc.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/chat/opQueue.js', n: 'mega_js', j:1,w:7});
 
@@ -1129,6 +1130,7 @@ else if (!b_u)
     jsl.push({f:'js/gContacts.js', n: 'gcontacts_js', j:1,w:3});
 
     // MEGA CHAT
+    jsl.push({f:'js/chat/chatd.js', n: 'chatd_js', j:1,w:1});
     jsl.push({f:'js/chat/rtcStats.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/chat/rtcSession.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/chat/fileTransfer.js', n: 'mega_js', j:1,w:7});
@@ -1150,17 +1152,13 @@ else if (!b_u)
     jsl.push({f:'js/chat/plugins/callManager.js', n: 'callManager_js', j:1,w:7});
     jsl.push({f:'js/chat/plugins/urlFilter.js', n: 'urlFilter_js', j:1,w:7});
     jsl.push({f:'js/chat/plugins/emoticonsFilter.js', n: 'emoticonsFilter_js', j:1,w:7});
-    jsl.push({f:'js/chat/plugins/attachmentsFilter.js', n: 'attachmentsFilter_js', j:1,w:7});
-    jsl.push({f:'js/chat/plugins/encryptionFilter.js', n: 'encryptionFilter_js', j:1,w:7});
-    jsl.push({f:'js/chat/plugins/chatStore.js', n: 'chatstore_js', j:1,w:7});
     jsl.push({f:'js/chat/plugins/chatNotifications.js', n: 'chatnotifications_js', j:1,w:7});
     jsl.push({f:'js/chat/plugins/callFeedback.js', n: 'callfeedback_js', j:1,w:7});
 
     jsl.push({f:'js/chat/karereEventObjects.js', n: 'keo_js', j:1,w:7});
+    jsl.push({f:'js/connectionRetryManager.js', n: 'crm_js', j:1,w:7});
     jsl.push({f:'js/chat/karere.js', n: 'karere_js', j:1,w:7});
-    jsl.push({f:'html/chat.html', n: 'chat', j:0});
-    jsl.push({f:'js/chat/chat.js', n: 'chat_js', j:1,w:7});
-    jsl.push({f:'js/chat/chatRoom.js', n: 'chat_js', j:1,w:7});
+    jsl.push({f:'bundle.js', n: 'chat_react_minified_js', j:1,w:10});
 
     // END OF MEGA CHAT
 
@@ -1400,6 +1398,7 @@ else if (!b_u)
             headElement.appendChild(elem);
             return elem;
         };
+
         var createStyleTag = function(id, src) {
             var elem = document.createElement("link");
             elem.rel = "stylesheet";
@@ -1418,8 +1417,7 @@ else if (!b_u)
         {
             if (jsl[i].j === 1) {
                 createScriptTag("jsl" + i, bootstaticpath + jsl[i].f + r);
-            }
-            else if (jsl[i].j === 2)
+            }  else if (jsl[i].j === 2)
             {
                 if ((m && (jsl[i].m)) || ((!m) && (jsl[i].d))) {
                     createStyleTag("jsl" + i, bootstaticpath + jsl[i].f + r);

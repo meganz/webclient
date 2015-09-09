@@ -536,7 +536,7 @@ KarereEventObjects.IncomingMessage.prototype.setDelay = function(val) {
 /**
  * Getter for property `seen`
  *
- * @returns {(boolean|"")} used for notification to track whether we need to notify the message if it was not seen by the user
+ * @returns {(boolean|false)} used for notification to track whether we need to notify the message if it was not seen by the user
  */
 KarereEventObjects.IncomingMessage.prototype.getSeen = function() {
     return this.seen;
@@ -549,7 +549,7 @@ KarereEventObjects.IncomingMessage.prototype.getSeen = function() {
  */
 KarereEventObjects.IncomingMessage.prototype.setSeen = function(val) {
     var oldVal = this.seen;
-    this.seen = val || "";
+    this.seen = val || false;
     if (oldVal != this.seen) {
         jQuery(this).trigger("onChange", [this, "seen", oldVal, this.seen]);
     }

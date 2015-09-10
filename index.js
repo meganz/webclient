@@ -746,6 +746,7 @@ function init_page() {
             html += e.outerHTML;
         });
         $('.credits-main-pad').html(html + '<div class="clear"></div>');
+        mainScroll();
     }
     else if (page == 'firefox') {
         parsepage(pages['firefox']);

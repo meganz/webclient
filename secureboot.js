@@ -1073,7 +1073,7 @@ else if (!b_u)
     jsl.push({f:'sjcl.js', n: 'sjcl_js', j:1}); // Will be replaced with asmCrypto soon
     jsl.push({f:'js/mDB.js', n: 'mDB_js', j:1});
     jsl.push({f:'js/asmcrypto.js',n:'asmcrypto_js',j:1,w:1});
-    jsl.push({f:'js/jquery-2.1.1.js', n: 'jquery', j:1,w:10});
+    jsl.push({f:'js/vendor/jquery-2.1.4.js', n: 'jquery', j:1, w:10});
     jsl.push({f:'js/functions.js', n: 'functions_js', j:1});
     jsl.push({f:'js/mega.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/vendor/megaLogger.js', n: 'megaLogger_js', j:1});
@@ -1086,22 +1086,23 @@ else if (!b_u)
     jsl.push({f:'js/user.js', n: 'user_js', j:1});
     jsl.push({f:'js/authring.js', n: 'authring_js', j:1});
     jsl.push({f:'js/mouse.js', n: 'mouse_js', j:1});
-    jsl.push({f:'js/jquery-ui-1.11.2.js', n: 'jqueryui_js', j:1,w:10});
     jsl.push({f:'js/filedrag.js', n: 'filedrag_js', j:1});
-    jsl.push({f:'js/jquery.mousewheel.js', n: 'jquerymouse_js', j:1});
-    jsl.push({f:'js/jquery.jscrollpane.js', n: 'jscrollpane_js', j:1});
+    jsl.push({f:'js/vendor/jquery-ui-1.11.4.js', n: 'jqueryui_js', j:1, w:10});
+    jsl.push({f:'js/vendor/jquery.mousewheel.js', n: 'jquerymouse_js', j:1});
+    jsl.push({f:'js/vendor/jquery.jscrollpane.js', n: 'jscrollpane_js', j:1});
+    jsl.push({f:'js/vendor/jquery.fullscreen.js', n: 'jquery_fullscreen', j:1, w:10});
+    jsl.push({f:'js/vendor/jquery.window-active.js', n: 'jquery_windowactive', j:1, w:2});
     jsl.push({f:'js/jquery.tokeninput.js', n: 'jquerytokeninput_js', j:1});
+    jsl.push({f:'js/jquery.checkboxes.js', n: 'checkboxes_js', j:1});
     jsl.push({f:'js/jquery.misc.js', n: 'jquerymisc_js', j:1});
     jsl.push({f:'js/thumbnail.js', n: 'thumbnail_js', j:1});
     jsl.push({f:'js/exif.js', n: 'exif_js', j:1,w:3});
     jsl.push({f:'js/megapix.js', n: 'megapix_js', j:1});
     jsl.push({f:'js/smartcrop.js', n: 'smartcrop_js', j:1,w:7});
-    jsl.push({f:'js/jquery.fullscreen.js', n: 'jquery_fullscreen', j:1,w:10});
     jsl.push({f:'js/jquery.qrcode.js', n: 'jqueryqrcode', j:1});
     jsl.push({f:'js/vendor/qrcode.js', n: 'qrcode', j:1,w:2, g: 'vendor'});
     jsl.push({f:'js/bitcoin-math.js', n: 'bitcoinmath', j:1 });
     jsl.push({f:'js/paycrypt.js', n: 'paycrypt_js', j:1 });
-    jsl.push({f:'js/vendor/jquery.window-active.js', n: 'jquery_windowactive', j:1,w:2});
     jsl.push({f:'js/vendor/db.js', n: 'db_js', j:1,w:5});
     jsl.push({f:'js/megaDbEncryptionPlugin.js', n: 'megadbenc_js', j:1,w:5});
     jsl.push({f:'js/megaDb.js', n: 'megadb_js', j:1,w:5});
@@ -1110,7 +1111,7 @@ else if (!b_u)
     jsl.push({f:'js/chat/mpenc.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/chat/opQueue.js', n: 'mega_js', j:1,w:7});
 
-    jsl.push({f:'js/vendor/chat/strophe.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/vendor/chat/strophe.light.js', n: 'mega_js', j:1, w:7});
     jsl.push({f:'js/vendor/chat/strophe.disco.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/vendor/chat/strophe.jingle.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/vendor/chat/strophe.jingle.session.js', n: 'mega_js', j:1,w:7});
@@ -1216,7 +1217,6 @@ else if (!b_u)
     jsl.push({f:'js/countries.js', n: 'countries_js', j:1});
     jsl.push({f:'html/dialogs.html', n: 'dialogs', j:0,w:2});
     jsl.push({f:'html/transferwidget.html', n: 'transferwidget', j:0});
-    jsl.push({f:'js/jquery.checkboxes.js', n: 'checkboxes_js', j:1});
     jsl.push({f:'js/Int64.js', n: 'int64_js', j:1});
     jsl.push({f:'js/zip64.js', n: 'zip_js', j:1});
     jsl.push({f:'js/cms.js', n: 'cms_js', j:1});
@@ -1838,9 +1838,9 @@ else if (!b_u)
 
 /**
  * Determines whether to show an ad or not
- * @returns {Number} Returns a 0 for definitely no ads (e.g. I am using an extension). 1 will enable ads dependant on 
- *                   country. 2 ignores country limitations (for developers to always see ads regardless). 3 means I 
- *                   prefer not to see an ad because I am logged in, but it will send one if it is a trusted ad that we 
+ * @returns {number} Returns a 0 for definitely no ads (e.g. I am using an extension). 1 will enable ads dependant on
+ *                   country. 2 ignores country limitations (for developers to always see ads regardless). 3 means I
+ *                   prefer not to see an ad because I am logged in, but it will send one if it is a trusted ad that we
  *                   have vetted (we fully control the ad and host it ourselves) and ads are turned on in the API.
  */
 function showAd() {

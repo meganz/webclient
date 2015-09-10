@@ -2,7 +2,7 @@
  * @license MIT
  * @fileOverview Favico animations
  * @author Miroslav Magda, http://blog.ejci.net
- * @version 0.3.5
+ * @version 0.3.9
  */
 
 /**
@@ -18,11 +18,14 @@
  *    position : 'down',
  *    type : 'circle',
  *    animation : 'slide',
+ *    dataUrl: function(url){},
+ *    win: top
  * });
  */
 (function() {
 
-	var Favico = (function(opt) {'use strict';
+	var Favico = (function(opt) {
+		'use strict';
 		opt = (opt) ? opt : {};
 		var _def = {
 			bgColor : '#d00',
@@ -32,9 +35,11 @@
 			type : 'circle',
 			position : 'down', // down, up, left, leftup (upleft)
 			animation : 'slide',
-			elementId : false
+			elementId : false,
+			dataUrl : false,
+			win: window
 		};
-		var _opt, _orig, _h, _w, _canvas, _context, _img, _ready, _lastBadge, _running, _readyCb, _stop, _browser, _animTimeout, _drawTimeout;
+		var _opt, _orig, _h, _w, _canvas, _context, _img, _ready, _lastBadge, _running, _readyCb, _stop, _browser, _animTimeout, _drawTimeout, _doc;
 
 		_browser = {};
 		_browser.ff = typeof InstallTrigger != 'undefined';
@@ -58,6 +63,8 @@
 			_opt.textColor = hexToRgb(_opt.textColor);
 			_opt.position = _opt.position.toLowerCase();
 			_opt.animation = (animation.types['' + _opt.animation]) ? _opt.animation : _def.animation;
+
+			_doc = _opt.win.document;
 
 			var isUp = _opt.position.indexOf('up') > -1;
 			var isLeft = _opt.position.indexOf('left') > -1;
@@ -87,36 +94,34 @@
 				}
 			}
 			_opt.type = (type['' + _opt.type]) ? _opt.type : _def.type;
-			try {
-				_orig = link.getIcon();
-				//create temp canvas
-				_canvas = document.createElement('canvas');
-				//create temp image
-				_img = document.createElement('img');
-				if (_orig.hasAttribute('href')) {
-					_img.setAttribute('src', _orig.getAttribute('href'));
-					//get width/height
-					_img.onload = function() {
-						_h = (_img.height > 0) ? _img.height : 32;
-						_w = (_img.width > 0) ? _img.width : 32;
-						_canvas.height = _h;
-						_canvas.width = _w;
-						_context = _canvas.getContext('2d');
-						icon.ready();
-					};
-				} else {
-					_img.setAttribute('src', '');
-					_h = 32;
-					_w = 32;
-					_img.height = _h;
-					_img.width = _w;
+
+			_orig = link.getIcon();
+			//create temp canvas
+			_canvas = document.createElement('canvas');
+			//create temp image
+			_img = document.createElement('img');
+			if (_orig.hasAttribute('href')) {
+				_img.setAttribute('crossOrigin', 'anonymous');
+				_img.setAttribute('src', _orig.getAttribute('href'));
+				//get width/height
+				_img.onload = function() {
+					_h = (_img.height > 0) ? _img.height : 32;
+					_w = (_img.width > 0) ? _img.width : 32;
 					_canvas.height = _h;
 					_canvas.width = _w;
 					_context = _canvas.getContext('2d');
 					icon.ready();
-				}
-			} catch(e) {
-				throw 'Error initializing favico. Message: ' + e.message;
+				};
+			} else {
+				_img.setAttribute('src', '');
+				_h = 32;
+				_w = 32;
+				_img.height = _h;
+				_img.width = _w;
+				_canvas.height = _h;
+				_canvas.width = _w;
+				_context = _canvas.getContext('2d');
+				icon.ready();
 			}
 
 		};
@@ -142,6 +147,7 @@
 			}
 			_queue = [];
 			_lastBadge = false;
+			_running = false;
 			_context.clearRect(0, 0, _w, _h);
 			_context.drawImage(_img, 0, 0, _w, _h);
 			//_stop=true;
@@ -319,14 +325,14 @@
 						});
 						_queue.push(q);
 						if (_queue.length > 100) {
-							throw 'Too many badges requests in queue.';
+							throw new Error('Too many badges requests in queue.');
 						}
 						icon.start();
 					} else {
 						icon.reset();
 					}
 				} catch(e) {
-					throw 'Error setting badge. Message: ' + e.message;
+					throw new Error('Error setting badge. Message: ' + e.message);
 				}
 			};
 			if (_ready) {
@@ -344,6 +350,7 @@
 					var h = imageElement.height;
 					var newImg = document.createElement('img');
 					var ratio = (w / _w < h / _h) ? (w / _w) : (h / _h);
+					newImg.setAttribute('crossOrigin', 'anonymous');
 					newImg.setAttribute('src', imageElement.getAttribute('src'));
 					newImg.height = (h / ratio);
 					newImg.width = (w / ratio);
@@ -351,7 +358,7 @@
 					_context.drawImage(newImg, 0, 0, _w, _h);
 					link.setIcon(_canvas);
 				} catch(e) {
-					throw 'Error setting image. Message: ' + e.message;
+					throw new Error('Error setting image. Message: ' + e.message);
 				}
 			};
 			if (_ready) {
@@ -378,7 +385,7 @@
 					}, false);
 
 				} catch(e) {
-					throw 'Error setting video. Message: ' + e.message;
+					throw new Error('Error setting video. Message: ' + e.message);
 				}
 			};
 			if (_ready) {
@@ -420,7 +427,7 @@
 						}, function() {
 						});
 					} catch(e) {
-						throw 'Error setting webcam. Message: ' + e.message;
+						throw new Error('Error setting webcam. Message: ' + e.message);
 					}
 				};
 				if (_ready) {
@@ -437,14 +444,16 @@
 			if (video.paused || video.ended || _stop) {
 				return false;
 			}
-			//nasty hack for FF webcam (Thanks to Julian Cwirko, kontakt@redsunmedia.pl)
+			//nasty hack for FF webcam (Thanks to Julian Ćwirko, kontakt@redsunmedia.pl)
 			try {
 				_context.clearRect(0, 0, _w, _h);
 				_context.drawImage(video, 0, 0, _w, _h);
 			} catch(e) {
 
 			}
-			_drawTimeout = setTimeout(drawVideo, animation.duration, video);
+			_drawTimeout = setTimeout(function() {
+				drawVideo(video);
+			}, animation.duration);
 			link.setIcon(_canvas);
 		}
 
@@ -454,10 +463,9 @@
 		 */
 		link.getIcon = function() {
 			var elm = false;
-			var url = '';
 			//get link element
 			var getLink = function() {
-				var link = document.getElementsByTagName('head')[0].getElementsByTagName('link');
+				var link = _doc.getElementsByTagName('head')[0].getElementsByTagName('link');
 				for (var l = link.length, i = (l - 1); i >= 0; i--) {
 					if ((/(^|\s)icon(\s|$)/i).test(link[i].getAttribute('rel'))) {
 						return link[i];
@@ -465,46 +473,52 @@
 				}
 				return false;
 			};
-			if (_opt.elementId) {
+			if (_opt.element) {
+				elm = _opt.element;
+			} else if (_opt.elementId) {
 				//if img element identified by elementId
-				elm = document.getElementById(_opt.elementId);
+				elm = _doc.getElementById(_opt.elementId);
 				elm.setAttribute('href', elm.getAttribute('src'));
 			} else {
 				//if link element
 				elm = getLink();
 				if (elm === false) {
-					elm = document.createElement('link');
+					elm = _doc.createElement('link');
 					elm.setAttribute('rel', 'icon');
-					document.getElementsByTagName('head')[0].appendChild(elm);
+					_doc.getElementsByTagName('head')[0].appendChild(elm);
 				}
-			}
-			//check if image and link url is on same domain. if not raise error
-			url = (_opt.elementId) ? elm.src : elm.href;
-			if (url.substr(0, 5) !== 'data:' && url.indexOf(document.location.hostname) === -1) {
-				throw new Error('Error setting favicon. Favicon image is on different domain (Icon: ' + url + ', Domain: ' + document.location.hostname + ')');
 			}
 			elm.setAttribute('type', 'image/png');
 			return elm;
 		};
 		link.setIcon = function(canvas) {
 			var url = canvas.toDataURL('image/png');
-			if (_opt.elementId) {
+			if (_opt.dataUrl) {
+				//if using custom exporter
+				_opt.dataUrl(url);
+			}
+			if (_opt.element) {
+				_opt.element.setAttribute('href', url);
+				_opt.element.setAttribute('src', url);
+			} else if (_opt.elementId) {
 				//if is attached to element (image)
-				document.getElementById(_opt.elementId).setAttribute('src', url);
+				var elm = _doc.getElementById(_opt.elementId);
+				elm.setAttribute('href', url);
+				elm.setAttribute('src', url);
 			} else {
 				//if is attached to fav icon
 				if (_browser.ff || _browser.opera) {
 					//for FF we need to "recreate" element, atach to dom and remove old <link>
 					//var originalType = _orig.getAttribute('rel');
 					var old = _orig;
-					_orig = document.createElement('link');
+					_orig = _doc.createElement('link');
 					//_orig.setAttribute('rel', originalType);
 					if (_browser.opera) {
 						_orig.setAttribute('rel', 'icon');
 					}
 					_orig.setAttribute('rel', 'icon');
 					_orig.setAttribute('type', 'image/png');
-					document.getElementsByTagName('head')[0].appendChild(_orig);
+					_doc.getElementsByTagName('head')[0].appendChild(_orig);
 					_orig.setAttribute('href', url);
 					if (old.parentNode) {
 						old.parentNode.removeChild(old);
@@ -550,7 +564,7 @@
 		 * http://stackoverflow.com/questions/12536562/detect-whether-a-window-is-visible
 		 */
 		function isPageHidden() {
-			return document.hidden || document.msHidden || document.webkitHidden || document.mozHidden;
+			return _doc.hidden || _doc.msHidden || _doc.webkitHidden || _doc.mozHidden;
 		}
 
 		/**
@@ -837,4 +851,3 @@
 	}
 
 })();
-

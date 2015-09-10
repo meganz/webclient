@@ -747,61 +747,6 @@ describe("crypto unit test", function() {
             });
         });
 
-        describe('XXX', function() {
-
-            var sleep = function(milliseconds) {
-                var start = Date.now();
-                while (Date.now() - start < milliseconds) {
-                    // wait ...
-                }
-            };
-
-            var timeNow = function() {
-                return Date.now();
-            };
-
-            // it('recursive test', function() {
-                // var count = 0;
-                // var _console_log = console.log;
-                // sandbox.stub(console, 'log', function(value) {
-                    // count++;
-                    // if (count === 1) {
-                        // dump(count, value);
-                    // } else {
-                        // _console_log(count, value);
-                    // }
-                // });
-//
-                // console.log(11);
-                // console.log(22);
-            // });
-
-            // it('promise test', function() {
-                // var p1 = new MegaPromise();
-                // var p2 = new MegaPromise();
-//
-                // dump('do stuff 0', Date.now());
-//
-                // var p3 = MegaPromise.all([p1, p2]);
-                // p3.done(function p3d(result) {
-                    // dump('p3 done', timeNow(), result);
-                // });
-                // p2.done(function p2d(result) {
-                    // dump('p2 done', timeNow(), result);
-                    // return '### 2';
-                // });
-                // p1.done(function p1d(result) {
-                    // // sleep(1000);
-                    // dump('p1 done', timeNow(), result);
-                // });
-//
-                // dump('p1 state before', p1.state());
-                // p1.resolve('*** 1 ***');
-                // dump('p1 state after', p1.state());
-                // p2.resolve('*** 2 ***');
-            // });
-        });
-
         describe("convenience wrappers", function() {
             it('getPubRSA()', function() {
                 sandbox.stub(ns, 'getPubKey').returns('a promise');
@@ -812,13 +757,22 @@ describe("crypto unit test", function() {
                                  ['you456789xw', 'RSA', undefined]);
            });
 
-            it('getPubEd25519()', function() {
+           it('getPubEd25519()', function() {
                 sandbox.stub(ns, 'getPubKey').returns('a promise');
                 var result = ns.getPubEd25519('you456789xw');
                 assert.strictEqual(result, 'a promise');
                 assert.strictEqual(ns.getPubKey.callCount, 1);
                 assert.deepEqual(ns.getPubKey.args[0],
                                  ['you456789xw', 'Ed25519', undefined]);
+           });
+
+           it('getPubCu25519()', function() {
+                sandbox.stub(ns, 'getPubKey').returns('a promise');
+                var result = ns.getPubCu25519('you456789xw');
+                assert.strictEqual(result, 'a promise');
+                assert.strictEqual(ns.getPubKey.callCount, 1);
+                assert.deepEqual(ns.getPubKey.args[0],
+                                 ['you456789xw', 'Cu25519', undefined]);
            });
        });
 

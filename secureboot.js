@@ -1838,17 +1838,20 @@ else if (!b_u)
 
 /**
  * Determines whether to show an ad or not
- * @returns {Number} Returns a 0 for no ads, 1 will enable ads dependant on country, 2 will always show ads
+ * @returns {Number} Returns a 0 for definitely no ads (e.g. I am using an extension). 1 will enable ads dependant on 
+ *                   country. 2 ignores country limitations (for developers to always see ads regardless). 3 means I 
+ *                   prefer not to see an ad because I am logged in, but it will send one if it is a trusted ad that we 
+ *                   have vetted (we fully control the ad and host it ourselves) and ads are turned on in the API.
  */
 function showAd() {
 
-    // We need to tell the API we would like ad urls, but only if we are not logged in
-    var showAd = (typeof u_sid === 'undefined') ? 1 : 0;
+    // We need to tell the API we would like ad urls, but only show generic ads from providers if we are not logged in
+    var showAd = (typeof u_sid === 'undefined') ? 1 : 3;
 
-    // If using a browser extension, do not show ads
+    // If using a browser extension, do not show ads at all for our security conscious users
     showAd = (is_extension) ? 0 : showAd;
 
-    // Override for testing, 0 for no ads, 1 is normal (enabled dependant on country), 2 is ads always on
+    // Override for testing
     showAd = (typeof localStorage.testAds === 'undefined') ? showAd : parseInt(localStorage.testAds);
 
     return showAd;

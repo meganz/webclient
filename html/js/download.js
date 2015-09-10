@@ -46,8 +46,16 @@ function dlinfo(ph,key,next)
 function dl_g(res) {
     
     // Show ad if enabled
-    megaAds.ad = res.ad;
+    megaAds.ad = res.ad;    
     megaAds.popAd = res.popad;
+    
+    // Forcefully ignore the API if we really do not want to see ads. This prevents a malicious API response from 
+    // compromising the browser if an attacker MITM'd the HTTPS connection to the API and returned a malicious ad URL.
+    if (showAd() === 0) {
+        megaAds.ad = false;    
+        megaAds.popAd = false;
+    }
+    
     megaAds.showAds($('#ads-block-frame'));
 
     // If 'msd' (MegaSync download) flag is turned off via the API then hide the download with MEGAsync button.

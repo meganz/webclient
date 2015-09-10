@@ -1095,7 +1095,7 @@ function MegaData()
                 $('.fm-empty-trashbin').removeClass('hidden');
             }
             else if (M.currentdirid === 'contacts') {
-                $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[784]);
+                $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[6772]);
                 $('.fm-empty-contacts').removeClass('hidden');
             }
             else if (M.currentdirid === 'opc' || M.currentdirid === 'ipc') {

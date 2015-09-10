@@ -155,40 +155,6 @@ function registeraccount()
 	sendsignuplink(rv.name,rv.email,rv.password,ctx);
 }
 
-function register_checkpassword(pass)
-{
-	if (m) return false;
-
-	if ((pass == l[909]) || (pass == ''))
-	{
-		document.getElementById('register_pwstatus_text').innerHTML = '';
-		document.getElementById('register_pwstatus').className = 'register-pass-status-block';			
-		return false;
-	}
-	var strength = checkPassword(pass);	
-	if (strength <= 25)
-	{
-		document.getElementById('register_pwstatus_text').innerHTML = l[220];
-		document.getElementById('register_pwstatus').className = 'register-pass-status-block good1';	
-	}
-	else if (strength <= 50)
-	{
-		document.getElementById('register_pwstatus_text').innerHTML = l[221];
-		document.getElementById('register_pwstatus').className = 'register-pass-status-block good2';
-	}
-	else if (strength <= 75)
-	{
-		document.getElementById('register_pwstatus_text').innerHTML = l[222];
-		document.getElementById('register_pwstatus').className = 'register-pass-status-block good3';
-	}
-	else
-	{
-		document.getElementById('register_pwstatus_text').innerHTML = l[223];
-		document.getElementById('register_pwstatus').className = 'register-pass-status-block good1 good4';	
-	}
-}
-
-
 function pageregister()
 {
 	if (u_type > 0)

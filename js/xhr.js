@@ -18,7 +18,9 @@ var mXHRTimeoutMS = localStorage.xhrtimeout || 2 * 60 * 1000;
         };
         xhr.setup_timeout = function() {
             this.clear_timeout();
-            this.__timeout = setTimeout(this.mOnTimeout, this.__timeout_ms);
+            this.__timeout = setTimeout(function() {
+                xhr.mOnTimeout();
+            }, this.__timeout_ms);
         };
 
         xhr._abort = xhr.abort;

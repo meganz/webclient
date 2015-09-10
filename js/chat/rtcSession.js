@@ -848,7 +848,7 @@ hangupAll: function()
         @property {AnswerFunc} answer
             A function to answer or decline the call
     */
-    params.answer = 
+    params.answer =
     function(accept, obj) {
         if (!params.reqStillValid()) {//expired
             return false;
@@ -970,7 +970,7 @@ hangupAll: function()
         else
             console.warn("RTC stats requested, but stats API not available on this browser");
     }
-    
+
     sess.tsMediaStart = Date.now();
  },
 
@@ -1364,7 +1364,9 @@ hangupAll: function()
                   retryNo++;
                   if(retryNo < 20) {
                       wait *= 2;
-                      setTimeout(req, wait);
+                      setTimeout(function() {
+                          req();
+                      }, wait);
                   }
               },
               dataType: 'json'

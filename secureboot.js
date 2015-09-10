@@ -1083,7 +1083,7 @@ else if (!b_u)
     jsl.push({f:'js/jsbn2.js', n: 'jsbn2_js', j:1,w:2});
     jsl.push({f:'js/vendor/nacl-fast.js', n: 'nacl_js', j:1,w:7});
     jsl.push({f:'js/megaPromise.js', n: 'megapromise_js', j:1,w:5});
-    jsl.push({f:'js/user.js', n: 'user_js', j:1});
+    jsl.push({f:'js/account.js', n: 'user_js', j:1});
     jsl.push({f:'js/authring.js', n: 'authring_js', j:1});
     jsl.push({f:'js/mouse.js', n: 'mouse_js', j:1});
     jsl.push({f:'js/filedrag.js', n: 'filedrag_js', j:1});

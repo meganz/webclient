@@ -1045,7 +1045,7 @@ var dlQueue = new TransferQueue(function _downloader(task, done) {
     return task.run(done);
 }, dl_maxSlots, 'downloader');
 
-// chunk scheduler {{{
+// chunk scheduler
 dlQueue.validateTask = function(pzTask) {
     var r = pzTask instanceof ClassChunk || pzTask instanceof ClassEmptyChunk;
 
@@ -1072,7 +1072,6 @@ dlQueue.validateTask = function(pzTask) {
     }
     return r;
 };
-// }}}
 
 /**
  *  DownloadQueue

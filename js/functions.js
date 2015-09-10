@@ -14,6 +14,106 @@ var inherits = (function() {
 
 makeEnum(['MDBOPEN'], 'MEGAFLAG_', window);
 
+/**
+ * Safely parse an HTML fragment, removing any executable
+ * JavaScript, and return a document fragment.
+ *
+ * @param {string} markup The HTML fragment to parse.
+ * @param {boolean} forbidStyle If true, disallow <style> nodes and
+ *     style attributes in the parsed fragment. Gecko 14+ only.
+ * @param {Document} doc The document in which to create the
+ *     returned DOM tree.
+ * @param {nsIURI} baseURI The base URI relative to which resource
+ *     URLs should be processed. Note that this will not work for
+ *     XML fragments.
+ * @param {boolean} isXML If true, parse the fragment as XML.
+ */
+function parseHTML(markup, forbidStyle, doc, baseURI, isXML) {
+    if (!doc) {
+        doc = document;
+    }
+    if (is_chrome_firefox) {
+        try {
+            var flags = 0;
+            if (!forbidStyle) {
+                flags |= mozParserUtils.SanitizerAllowStyle;
+            }
+            if (!baseURI) {
+                var href = doc.location.href;
+                if (!parseHTML.baseURIs[href]) {
+                    parseHTML.baseURIs[href] =
+                        Services.io.newURI(href, null, null);
+                }
+                baseURI = parseHTML.baseURIs[href];
+            }
+            return mozParserUtils.parseFragment(markup, flags, Boolean(isXML),
+                                                baseURI, doc.documentElement);
+        }
+        catch (ex) {
+            mozError(ex);
+        }
+    }
+
+    // Either we are not running the Firefox extension or the above parser
+    // failed, in such case we try to mimic it using jQuery.parseHTML
+    return $.parseHTML(String(markup), doc);
+}
+parseHTML.baseURIs = {};
+
+/**
+ * Handy printf-style parseHTML to apply escapeHTML
+ * @param {string} markup The HTML fragment to parse.
+ * @param {...*} var_args
+ */
+function parseHTMLfmt(markup) {
+    if (arguments.length > 1) {
+        var args = toArray(arguments);
+        var replacer = function(match) {
+            return escapeHTML(args.shift());
+        };
+        args.shift();
+        markup = markup.replace(/@@/g, replacer);
+    }
+    return parseHTML(markup);
+}
+
+/**
+ * Safely inject an HTML fragment using parseHTML()
+ * @param {string} markup The HTML fragment to parse.
+ * @param {...*} var_args
+ * @see This should be used instead of jQuery.html()
+ * @example $(document.body).safeHTML('<script>alert("XSS");</script>It Works!');
+ * @todo Safer versions of append, insert, before, after, etc
+ */
+$.fn.safeHTML = function safeHTML(markup) {
+    var i = 0;
+    var l = this.length;
+    markup = parseHTMLfmt.apply(null, arguments);
+    while (l > i) {
+        $(this[i++]).html(markup);
+    }
+};
+$.fn.safeAppend = function safeAppend(markup) {
+    var i = 0;
+    var l = this.length;
+    markup = parseHTMLfmt.apply(null, arguments);
+    while (l > i) {
+        $(this[i++]).append(markup);
+    }
+};
+
+/**
+ * Escape HTML markup
+ * @param {string} str The HTML fragment to parse.
+ * NB: This should be the same than our legacy `htmlentities`
+ *     function, except that it's faster and deals with quotes
+ */
+function escapeHTML(str) {
+    return String(str).replace(/[&"'<>]/g, function(match) {
+        return escapeHTML.replacements[match];
+    });
+}
+escapeHTML.replacements = { "&": "&amp;", '"': "&quot;", "'": "&#39;", "<": "&lt;", ">": "&gt;" };
 
 /**
  *  Check if value is contained in a array. If it is return value
@@ -80,11 +180,23 @@ function asciionly(text) {
 }
 
 function Later(callback) {
-    return setTimeout(callback, 1000);
+    if (typeof callback !== 'function') {
+        throw new Error('Invalid function parameter.');
+    }
+
+    return setTimeout(function() {
+        callback();
+    }, 1000);
 }
 
 var Soon = is_chrome_firefox ? mozRunAsync : function(callback) {
-    setTimeout(callback, 17);
+    if (typeof callback !== 'function') {
+        throw new Error('Invalid function parameter.');
+    }
+
+    return setTimeout(function() {
+        callback();
+    }, 20);
 };
 
 function SoonFc(func, ms) {
@@ -317,14 +429,10 @@ function populate_l() {
     l[231] = l[231].replace('No thanks, I\'ll wait', 'I\'ll wait');
 
     l['year'] = new Date().getFullYear();
-    date_months = [l[408], l[409], l[410], l[411], l[412], l[413], l[414], l[415], l[416], l[417], l[418], l[419]];
-}
-
-function GetNextNode(labelid) {
-    var label = document.getElementById(labelid);
-    var select_id = document.getElementById(labelid + "_option");
-    label.innerHTML = select_id.options[select_id.selectedIndex].text;
-    return select_id.options[select_id.selectedIndex].value;
+    date_months = [
+        l[408], l[409], l[410], l[411], l[412], l[413],
+        l[414], l[415], l[416], l[417], l[418], l[419]
+    ].map(escapeHTML);
 }
 
 function showmoney(number) {
@@ -2163,15 +2271,6 @@ function hostname(url) {
     return url && url[1];
 }
 
-// Helper to manage time/sizes in a friendly way
-String.prototype.seconds = function() {
-    return parseInt(this) * 1000;
-}
-
-String.prototype.minutes = function() {
-    return parseInt(this) * 1000 * 60;
-}
-
 // Quick hack for sane average speed readings
 function bucketspeedometer(initialp) {
     return {
@@ -2230,32 +2329,6 @@ function moveCursortoToEnd(el) {
         range.select();
     }
 }
-
-String.prototype.replaceAll = function(_f, _r, _c) {
-    var o = this.toString();
-    var r = '';
-    var s = o;
-    var b = 0;
-    var e = -1;
-    if (_c) {
-        _f = _f.toLowerCase();
-        s = o.toLowerCase();
-    }
-
-    while ((e = s.indexOf(_f)) > -1) {
-        r += o.substring(b, b + e) + _r;
-        s = s.substring(e + _f.length, s.length);
-        b += e + _f.length;
-    }
-
-    // Add Leftover
-    if (s.length > 0) {
-        r += o.substring(o.length - s.length, o.length);
-    }
-
-    // Return New String
-    return r;
-};
 
 // Returns pixels position of element relative to document (top left corner)
 function getHtmlElemPos(elem, n) {
@@ -3021,7 +3094,9 @@ mega.utils.clearFileSystemStorage = function megaUtilsClearFileSystemStorage() {
         return MegaPromise.resolve();
     }
 
-    setTimeout(_done, 4000);
+    setTimeout(function() {
+        _done();
+    }, 4000);
 
     var promise = new MegaPromise();
 
@@ -3181,7 +3256,9 @@ mBroadcaster.addListener('crossTab:master', function _setup() {
 
         updId = mBroadcaster.addListener('fmconfig:rubsched', _update);
         if (fmconfig.rubsched) {
-            timer = setInterval(_proc, RUBSCHED_WAITPROC);
+            timer = setInterval(function() {
+                _proc();
+            }, RUBSCHED_WAITPROC);
         }
     }
 

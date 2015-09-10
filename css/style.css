@@ -1164,14 +1164,18 @@ input.radioOn, input.radioOff {
 	font-size: 15px;
 	line-height: 23px;
 }
-.terms-dialog .fm-dialog-button {
-	top: -6px;
-}
 .terms-dialog .terms-main {
-	padding: 5px 20px 20px 20px;
+	padding: 0 25px 0 25px;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
+}
+.terms-dialog .terms-main h1 {
+	font-size: 20px;
+	padding: 0;
+}
+.terms-dialog .terms-main h2 {
+	font-size: 15px;
 }
 .terms-top-txt {
 	padding: 12px 12px 12px 12px;
@@ -10407,19 +10411,16 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 }
 .terms-body {
 	height: 100%;
-	height: -webkit-calc(100% - 82px);
-	height: -moz-calc(100% - 82px);
-	height: calc(100% - 82px);
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
+	height: -webkit-calc(100% - 129px);
+	height: -moz-calc(100% - 129px);
+	height: calc(100% - 129px);
+	margin: 15px 0 20px 0;
 }
 .slingshot-body {
 	height: 100%;
 	height: -webkit-calc(100% - 82px);
 	height: -moz-calc(100% - 82px);
 	height: calc(100% - 82px);
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
 }
 .fm-share-empty {
 	background-image: url(../images/mega/share-folder.png?v=1);
@@ -16167,8 +16168,9 @@ span.browsers-update {
 	margin: 50px 47px 3px 3px;
 	width: 280px;
 	min-height: 200px;
-	float: left;
-	border: 2px solid #d9d9d9;
+	-webkit-box-shadow: 0px 0px 0px 2px #d9d9d9;
+	-moz-box-shadow: 0px 0px 0px 2px #d9d9d9;
+	box-shadow: 0px 0px 0px 2px #d9d9d9;
 	-moz-border-radius: 5px;
 	-webkit-border-radius: 5px;
 	border-radius: 5px;
@@ -16177,12 +16179,12 @@ span.browsers-update {
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
 	display: block;
+	float: left;
 }
 .credits-block:hover {
-	margin: 47px 44px 0 0;
-	width: 286px;
-	min-height: 206px;
-	border: 5px solid #d42400;
+	-webkit-box-shadow: 0px 0px 0px 5px #d42400;
+	-moz-box-shadow: 0px 0px 0px 5px #d42400;
+	box-shadow: 0px 0px 0px 5px #d42400;
 }
 .credits-logo-block {
 	height: 83px;

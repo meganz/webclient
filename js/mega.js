@@ -1758,6 +1758,13 @@ function MegaData()
         return found;
     };
 
+    /**
+     * buildtree
+     * 
+     * @param {type} n, node id.
+     * @param {type} dialog
+     * @param {type} stype, what to sort.
+     */
     this.buildtree = function(n, dialog, stype) {
 
         if (!n) {
@@ -1945,12 +1952,16 @@ function MegaData()
                         this.buildtree(folders[ii], dialog, stype);
                     }
 
-                    // @TODO PERF: the following call is not optimal. It will call the sharedUInode for non-shared folders
-                    sharedUInode(folders[ii].h);
+                    var nodeHandle = folders[ii].h;
+                    
+                    if ((M.d[nodeHandle] && M.d[nodeHandle].shares) || M.ps[nodeHandle]) {
+                        sharedUInode(nodeHandle);
+                    }
                 }
             }// END of for folders loop
         }
-    };
+    };// END buildtree()
+    
     this.buildtree.FORCE_REBUILD = 34675890009;
 
     var icon = '<span class="context-menu-icon"></span>';

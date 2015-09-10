@@ -1596,7 +1596,7 @@ CallManager.prototype._attachToChatRoom = function(megaChat, chatRoom) {
             session.setState(CallSession.STATE.FAILED);
             self.trigger('CallFailed', [session, reason, eventData.text])
         } else {
-            assert(false, 'unknown call-canceled:eventData.reason found: '+ reason);
+            assert(false, 'unknown call-canceled:eventData.reason found:', reason);
         }
     });
 
@@ -1794,7 +1794,7 @@ CallManager.prototype.getOrCreateSessionFromEventData = function(eventName, even
     }
     if (!sid) { debugger; }
 
-    assert(sid, 'no sid found in: ', eventData);
+    assert(sid, 'no sid found in:', eventData);
 
 
     if (!callSession) {
@@ -1929,7 +1929,7 @@ CallManager.prototype.startCall = function(chatRoom, mediaOptions) {
 
         assert(
             session instanceof CallSession,
-            'CallManager tried to relay event to a non-session argument: ' + typeof(session)
+            'CallManager tried to relay event to a non-session argument:', typeof(session)
         );
 
         if (typeof(session["on" + evtName]) !== 'undefined') { // proxy events to sessions

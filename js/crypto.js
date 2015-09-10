@@ -38,37 +38,334 @@ var crypt = (function () {
 
     // TODO: Eventually migrate all functionality into this name space.
 
+    // Mapping of public key types to their attribute names.
+    var _PUBKEY_ATTRIBUTE_MAPPING = {
+        Ed25519: 'puEd255',
+        Cu25519: 'puCu255',
+        RSA: null
+    };
+
+    // Mapping of public key types to their signature attribute names.
+    var _PUBKEY_SIGNATURE_MAPPING = {
+        Cu25519: 'sigCu255',
+        RSA: 'sigPubk'
+    };
 
     /**
-     * Checks the integrity (through the authring) of users' Ed25519 pub keys.
+     * Returns the cache variable for a public key type.
+     *
+     * @private
+     * @param keyType {string}
+     *     Key type of pub key. Can be one of 'Ed25519', 'Cu25519' or 'RSA'.
+     * @return {object}
+     *     The cache variable object.
+     */
+    var _getPubKeyCacheMapping = function(keyType) {
+        switch (keyType) {
+            case 'Ed25519':
+                return pubEd25519;
+            case 'Cu25519':
+                return pubCu25519;
+            case 'RSA':
+                return u_pubkeys;
+        }
+    };
+
+
+    /**
+     * Retrieves a users' pub keys through the Mega API.
      *
      * @private
      * @param userhandle {string}
      *     Mega user handle.
+     * @param keyType {string}
+     *     Key type of pub key. Can be one of 'Ed25519', 'Cu25519' or 'RSA'.
+     * @return {MegaPromise}
+     *     A promise that is resolved when the original asynch code is settled.
+     */
+    ns._getPubKeyAttribute = function(userhandle, keyType) {
+        if (typeof _PUBKEY_ATTRIBUTE_MAPPING[keyType] === 'unknown') {
+            throw new Error('Unsupported key type to retrieve: ' + keyType);
+        }
+
+        // Make the promise to execute the API code.
+        var pubKeyPromise;
+
+        if (keyType === 'RSA') {
+            pubKeyPromise = new MegaPromise();
+
+            var myCtx = {};
+            /** Function to settle the promise for the RSA pub key attribute. */
+            var __settleFunction = function(res) {
+                if (typeof res === 'object') {
+                    var pubKey = crypto_decodepubkey(base64urldecode(res.pubk));
+                    logger.debug('Got ' + keyType + ' pub key of user '
+                                 + userhandle + ': ' + JSON.stringify(pubKey));
+                    pubKeyPromise.resolve(pubKey);
+                }
+                else {
+                    logger.error(keyType + ' pub key for ' + userhandle
+                                 + ' could not be retrieved: ' + res);
+                    pubKeyPromise.reject(res);
+                }
+            };
+
+            // Assemble context for this async API request.
+            myCtx.u = userhandle;
+            myCtx.callback = __settleFunction;
+
+            // Fire it off.
+            api_req({ 'a': 'uk', 'u': userhandle }, myCtx);
+        }
+        else {
+            pubKeyPromise = getUserAttribute(userhandle,
+                                             _PUBKEY_ATTRIBUTE_MAPPING[keyType],
+                                             true, false);
+            pubKeyPromise.done(function(result) {
+                result = base64urldecode(result);
+                    _getPubKeyCacheMapping(keyType)[userhandle] = result;
+                logger.debug('Got ' + keyType + ' pub key of user ' + userhandle + '.');
+            });
+        }
+
+        return pubKeyPromise;
+    };
+
+
+    /**
+     * Checks the integrity (through the authring) of users' pub keys and
+     * returns the authentication method used for that key.
+     *
+     * @private
+     * @param userhandle {string}
+     *     Mega user handle.
+     * @param keyType {string}
+     *     Key type of pub key. Can be one of 'Ed25519', 'Cu25519' or 'RSA'.
+     * @return {int}
+     *     Authentication record, null if not recorded, and false
+     *     if fingerprint verification fails.
      * @throws {Error}
      *     In case the fingerprint of the public key differs from the one
      *     previously authenticated by the user.
      */
-    ns._checkAuthenticationEd25519 = function(userhandle) {
-        var recorded = authring.getContactAuthenticated(userhandle, 'Ed25519');
-        var fingerprint = authring.computeFingerprint(pubEd25519[userhandle],
-                                                      'Ed25519', 'string');
+    ns._getPubKeyAuthentication = function(userhandle, keyType) {
+        var recorded = authring.getContactAuthenticated(userhandle, keyType);
+        var pubKey = _getPubKeyCacheMapping(keyType)[userhandle];
+        var fingerprint = authring.computeFingerprint(pubKey, keyType, 'string');
         if (recorded === false) {
-            authring.setContactAuthenticated(userhandle, fingerprint, 'Ed25519',
-                                             authring.AUTHENTICATION_METHOD.SEEN,
-                                             authring.KEY_CONFIDENCE.UNSURE);
+            return null;
         }
-        else if (recorded && authring.equalFingerprints(recorded.fingerprint, fingerprint) === false) {
-            logger.error('Error verifying authenticity of Ed25519 pub key: '
+        else if (recorded
+                 && authring.equalFingerprints(recorded.fingerprint, fingerprint) === false) {
+            logger.error('Error verifying authenticity of ' + keyType +' pub key: '
                          + 'fingerprint does not match previously authenticated one!');
-            // This function handles what's required for the action, shows a
-            // warning dialogue and throws the exception.
-            ns.showFingerprintMismatchException('Ed25519', userhandle,
-                                                recorded.method,
-                                                recorded.fingerprint, fingerprint);
+            return false;
         }
+
+        return recorded.method;
     };
 
+
+    /**
+     * Verifies a public key signature.
+     *
+     * @private
+     * @param signature {string}
+     *     Signature string.
+     * @param pubKey {string}
+     *     Public key to verify.
+     * @param keyType {string}
+     *     Key type of pub key. Can be one of 'Cu25519' or 'RSA'.
+     * @param signingKey {string}
+     *     Ed25519 key needed to verify the signature.
+     * @return
+     *     The signature verification result. true for success, false for
+     *     failure and null for a missing signature.
+     */
+    ns._checkSignature = function(signature, pubKey, keyType, signingKey) {
+        if (signature === '') {
+            return null;
+        }
+
+        return authring.verifyKey(signature, pubKey, keyType, signingKey);
+    };
+
+
+    /**
+     * Caching public key retrieval utility.
+     *
+     * @param userhandle {string}
+     *     Mega user handle.
+     * @param keyType {string}
+     *     Key type of pub key. Can be one of 'Ed25519', 'Cu25519' or 'RSA'.
+     * @param callback {function}
+     *     Callback function to call upon completion of operation. The
+     *     callback requires two parameters: `value` (an object
+     *     containing the public in `pubkey` and its authencation
+     *     state in `authenticated`). `value` will be `false` upon a
+     *     failed request.
+     * @return {MegaPromise}
+     *     A promise that is resolved when the original asynch code is
+     *     settled.  Can be used to use promises instead of callbacks
+     *     for asynchronous dependencies.
+     * @throws {Error}
+     *     In case the fingerprint of the public key differs from the
+     *     one previously authenticated by the user. This more severe
+     *     condition warrants to throw an exception.
+     */
+    ns.getPubKey = function(userhandle, keyType, callback) {
+        // This promise will be the one which is going to be returned.
+        var masterPromise = new MegaPromise();
+
+        /** If a callback is passed in, ALWAYS call it when the master promise
+         * is resolved. */
+        var __callbackAttachAfterDone = function(aPromise) {
+            if (callback) {
+                aPromise.done(function __classicCallback(result) {
+                    logger.debug('Calling callback');
+                    callback(result);
+                });
+            }
+        };
+
+        if (typeof u_authring === 'undefined'
+                || typeof u_authring[keyType] === 'undefined') {
+            // Need to initialise the authentication system (authring).
+            logger.debug('First initialising the ' + keyType + ' authring.');
+            var authringLoadingPromise = authring.getContacts(keyType);
+            masterPromise.linkFailTo(authringLoadingPromise);
+            // Now, with the authring loaded, link recursively to getPubKey again.
+            authringLoadingPromise.done(function() {
+                masterPromise.linkDoneAndFailTo(ns.getPubKey(userhandle, keyType));
+            });
+            __callbackAttachAfterDone(masterPromise);
+
+            return masterPromise;
+        }
+
+        // Some things we need to progress.
+        var pubKeyCache = _getPubKeyCacheMapping(keyType);
+        var authMethod = ns._getPubKeyAuthentication(userhandle, keyType);
+        var newAuthMethod;
+
+        // Get out quickly if the key is cached.
+        if (pubKeyCache[userhandle]) {
+            masterPromise.resolve(pubKeyCache[userhandle]);
+            __callbackAttachAfterDone(masterPromise);
+
+            return masterPromise;
+        }
+
+        // And now for non-cached keys.
+
+        /** Persist potential changes in authentication, call callback and exit. */
+        var __finish = function(pubKey, authMethod, newAuthMethod) {
+            if (typeof newAuthMethod !== 'undefined' && newAuthMethod !== authMethod) {
+                var fingerprint = authring.computeFingerprint(pubKey, keyType, 'string');
+                authring.setContactAuthenticated(userhandle, fingerprint, keyType,
+                                                 newAuthMethod,
+                                                 authring.KEY_CONFIDENCE.UNSURE);
+            }
+            __callbackAttachAfterDone(masterPromise);
+
+            return masterPromise;
+        };
+
+        // Get the pub key and update local variable and the cache.
+        var getPubKeyPromise = ns._getPubKeyAttribute(userhandle, keyType);
+
+        getPubKeyPromise.done(function __resolvePubKey(result) {
+            var pubKey = result;
+            pubKeyCache[userhandle] = pubKey;
+            var fingerprint = authring.computeFingerprint(pubKey, keyType, 'string');
+            if (keyType === 'Ed25519') {
+                // Treat Ed25519 pub keys.
+                if (authMethod === false) {
+                    // Something is dodgy: Choke!
+                    var authRecord = authring.getContactAuthenticated(userhandle, keyType);
+                    ns._showFingerprintMismatchException(userhandle, keyType, authMethod,
+                                                         authRecord.fingerprint,
+                                                         fingerprint);
+                }
+                else {
+                    // Newly seen key, record it.
+                    if (authMethod === null) {
+                        newAuthMethod = authring.AUTHENTICATION_METHOD.SEEN;
+                    }
+                    masterPromise.resolve(pubKey);
+                }
+
+                // Finish off.
+                __finish(pubKey, authMethod, newAuthMethod);
+
+                return;
+            }
+        });
+
+        // Get Ed25519 key and signature to verify for all non-Ed25519 pub keys.
+
+        /** Verify signature of signed pub keys. */
+        var __resolveSignatureVerification = function(result) {
+            var pubKey = result[0];
+            var signingKey = result[1];
+            var signature = base64urldecode(result[2]);
+            var signatureVerification = ns._checkSignature(signature, pubKey,
+                                                           keyType, signingKey);
+            if (authMethod === false) {
+                // Authring check fails, but could be a new key.
+                if (signatureVerification === true) {
+                    // Record good (new) signature.
+                    newAuthMethod = authring.AUTHENTICATION_METHOD.SIGNATURE_VERIFIED;
+                    masterPromise.resolve(pubKey);
+                }
+                else {
+                    // Mismatch on authring, but no new signature,
+                    // or failed signature verification: Choke!
+                    ns._showKeySignatureFailureException(userhandle, keyType);
+                }
+            }
+            else {
+                // Not seen previously or not verified, yet.
+                if (signatureVerification === null) {
+                    // Can only record it seen.
+                    newAuthMethod = authring.AUTHENTICATION_METHOD.SEEN;
+                    masterPromise.resolve(pubKey);
+                }
+                else if (signatureVerification === true) {
+                    // Record good signature.
+                    newAuthMethod = authring.AUTHENTICATION_METHOD.SIGNATURE_VERIFIED;
+                    masterPromise.resolve(pubKey);
+                }
+                else {
+                    // Failed signature verification: Choke!
+                    ns._showKeySignatureFailureException(userhandle, keyType);
+                }
+            }
+
+            // Finish off.
+            __finish(pubKey, authMethod, newAuthMethod);
+        };
+
+        if (keyType === 'Ed25519') {
+            masterPromise.linkFailTo(getPubKeyPromise);
+        }
+        else {
+            var pubEd25519KeyPromise = ns.getPubKey(userhandle, 'Ed25519');
+            var signaturePromise = getUserAttribute(userhandle,
+                                                    _PUBKEY_SIGNATURE_MAPPING[keyType],
+                                                    true, false);
+
+            // Signing key and signature required for verification.
+            var signatureVerificationPromise = MegaPromise.all([getPubKeyPromise,
+                                                                pubEd25519KeyPromise,
+                                                                signaturePromise]);
+
+            signatureVerificationPromise.done(__resolveSignatureVerification);
+            masterPromise.linkFailTo(signatureVerificationPromise);
+        }
+
+        return masterPromise;
+    };
 
     /**
      * Cached Ed25519 public key retrieval utility.
@@ -91,265 +388,32 @@ var crypt = (function () {
      *     condition warrants to throw an exception.
      */
     ns.getPubEd25519 = function(userhandle, callback) {
-        // This promise will be the one which is going to be returned.
-        var masterPromise = new MegaPromise();
-
-        /** If a callback is passed in, ALWAYS call it when the master promise
-         * is resolved. */
-        var _callbackAttachAfterDone = function(aPromise) {
-            if (callback) {
-                aPromise.done(function(result) {
-                    logger.debug('Calling callback');
-                    callback(result);
-                });
-            }
-        };
-
-        if (typeof u_authring === 'undefined'
-                || typeof u_authring.Ed25519 === 'undefined') {
-            logger.debug('First initialising the Ed25519 authring.');
-            var ed25519LoadingPromise = authring.getContacts('Ed25519');
-            masterPromise.linkFailTo(ed25519LoadingPromise);
-            // Now, with the authring loaded, link recursively to getPubEd25519 again.
-            ed25519LoadingPromise.done(function() {
-                masterPromise.linkDoneAndFailTo(ns.getPubEd25519(userhandle));
-            });
-            _callbackAttachAfterDone(masterPromise);
-
-            return masterPromise;
-        }
-
-        if (pubEd25519[userhandle]) {
-            // It's cached: Only check the authenticity of the key.
-            crypt._checkAuthenticationEd25519(userhandle);
-            masterPromise.resolve(pubEd25519[userhandle]);
-            _callbackAttachAfterDone(masterPromise);
-
-            return masterPromise;
-        }
-        else {
-            // Non-cached value.
-            var getUserAttribPromise = getUserAttribute(userhandle, 'puEd255',
-                                                        true, false);
-            getUserAttribPromise.done(function(result) {
-                result = base64urldecode(result);
-                pubEd25519[userhandle] = result;
-                crypt._checkAuthenticationEd25519(userhandle);
-                logger.debug('Got Ed25519 pub key of user "' + userhandle + '".');
-                masterPromise.resolve(pubEd25519[userhandle]);
-            });
-
-            // Show error and call the 'callback', masterPromise will get
-            // rejected by the next .linkFailTo call...
-            getUserAttribPromise.fail(function(error) {
-                logger.error('Error getting Ed25519 pub key of user "'
-                             + userhandle + '": ' + error);
-                if (callback) {
-                    callback(error);
-                }
-            });
-
-            masterPromise.linkFailTo(getUserAttribPromise);
-            _callbackAttachAfterDone(masterPromise);
-
-            return masterPromise;
-        }
+        return ns.getPubKey(userhandle, 'Ed25519', callback);
     };
 
 
     /**
-     * Retrieves a users' RSA pub keys through the Mega API.
+     * Cached Curve25519 public key retrieval utility. If the key is cached, no API
+     * request will be performed. The key's authenticity is validated through
+     * the tracking in the authring and signature verification.
      *
-     * @private
      * @param userhandle {string}
      *     Mega user handle.
+     * @param [callback] {function}
+     *     (Optional) Callback function to call upon completion of operation. The callback
+     *     requires one parameter: the actual public Cu25519 key. The user handle is
+     *     passed as a second parameter, and may be obtained that way if the call
+     *     back supports it.
      * @return {MegaPromise}
      *     A promise that is resolved when the original asynch code is settled.
-     */
-    ns._getPubRSAattribute = function(userhandle) {
-        // Make the promise to execute the API code.
-        var thePromise = new MegaPromise();
-
-        var myCtx = {};
-        /** Function to settle the promise for the RSA pub key attribute. */
-        var settleFunction = function(res) {
-            if (typeof res === 'object') {
-                var pubKey = crypto_decodepubkey(base64urldecode(res.pubk));
-                logger.debug('Received RSA pub key for ' + userhandle
-                             + ': ' + JSON.stringify(pubKey));
-                thePromise.resolve(pubKey);
-            }
-            else {
-                logger.error('RSA pub key for ' + userhandle
-                                + ' could not be retrieved: ' + res);
-                thePromise.reject(res);
-            }
-        };
-
-        // Assemble context for this async API request.
-        myCtx.u = userhandle;
-        myCtx.callback = settleFunction;
-
-        // Fire it off.
-        api_req({ 'a': 'uk', 'u': userhandle }, myCtx);
-
-        return thePromise;
-    };
-
-
-    /**
-     * Determines for RSA public keys the authentication method, performs the
-     * check, and records the result.
-     *
-     * @private
-     * @param userhandle {string}
-     *     Mega user handle.
-     * @param signature {string}
-     *     Ed25519 signature of the RSA public key.
-     * @param fingerprint {string}
-     *     Fingerprint of the RSA public key.
-     * @return {Object}
-     *     The checked RSA public key.
+     *     The promise returns the Curve25519 public key.
      * @throws {Error}
      *     In case the fingerprint of the public key differs from the one previously
-     *     authenticated by the user, or the signature of the public key does
-     *     not verify.
+     *     authenticated by the user. This more severe condition warrants to throw
+     *     an exception.
      */
-    ns._trackRSAKeyAuthentication = function(userhandle, signature, fingerprint) {
-        // Find out the authentication method/outcome.
-        var method = undefined;
-        if (signature === '') {
-            // User doesn't have an RSA key signature.
-            method = authring.AUTHENTICATION_METHOD.SEEN;
-        }
-        else if (typeof signature === 'undefined') {
-            // Problem retrieving the RSA key signature.
-            logger.warn('Problem retrieving RSA pub key signature for ' + userhandle);
-            return u_pubkeys[userhandle];
-        }
-        else {
-            // Let's check the signature.
-            var check = authring.verifyKey(signature, u_pubkeys[userhandle],
-                                           'RSA', pubEd25519[userhandle]);
-            if (check === true) {
-                method = authring.AUTHENTICATION_METHOD.SIGNATURE_VERIFIED;
-            }
-            else {
-                var message = 'RSA public key signature for ' + M.u[userhandle].m + ' is invalid!';
-                var instructions = 'Please ask your contact to get in touch with Mega Support.';
-                logger.error(message);
-
-                // TODO: This should probably be changed to something like mega.ui.CredentialsWarningDialog.
-                msgDialog('warningb',
-                          'RSA Public Key Signature Verification Failed',
-                          message + '<br/>' + instructions);
-                throw new Error('RSA Public Key Signature Verification Failed');
-            }
-        }
-
-        // Record the authentication state of the key.
-        if (typeof method !== 'undefined') {
-            authring.setContactAuthenticated(userhandle, fingerprint,
-                                             'RSA', method,
-                                             authring.KEY_CONFIDENCE.UNSURE);
-            return u_pubkeys[userhandle];
-        }
-    };
-
-
-    /**
-     * Checks the authenticity (through a key signature) and integrity
-     * (through the authring) of users' RSA pub keys.
-     *
-     * @private
-     * @param userhandle {string}
-     *     Mega user handle.
-     * @param callback {function}
-     *     Async callback that may need calling.
-     * @return {MegaPromise}
-     *     A promise that is resolved when the original asynch code is settled.
-     *     The promise returns the RSA public key.
-     * @throws {Error}
-     *     In case the fingerprint of the public key differs from the one previously
-     *     authenticated by the user, or the signature of the public key does
-     *     not verify.
-     */
-    ns._asynchCheckAuthenticationRSA = function(userhandle, callback) {
-        // Make the promise to execute the API code.
-        var rootPromise = new MegaPromise();
-
-        var recorded = authring.getContactAuthenticated(userhandle, 'RSA');
-        var fingerprint = authring.computeFingerprint(u_pubkeys[userhandle],
-                                                      'RSA', 'string');
-        if ((recorded === false)
-                || (recorded.method !== authring.AUTHENTICATION_METHOD.SIGNATURE_VERIFIED)) {
-            // Check of a previously unseen key.
-            var signature = undefined;
-
-            // Get signature attribute.
-            var attributePromise = getUserAttribute(userhandle, 'sigPubk',
-                                                    true, false);
-
-            /** On resolve for retrieving the signature and public signing key. */
-            var attributePromiseResolve = function(result) {
-                signature = base64urldecode(result);
-                return signature;
-            };
-            /** On rejection for retrieving the signature and public signing key. */
-            var attributePromiseReject = function(result) {
-                if (result === ENOENT) {
-                    // No signature: Let's resolve with an empty signature.
-                    signature = '';
-                    var resolvePromise = new MegaPromise();
-                    resolvePromise.resolve('');
-
-                    return resolvePromise;
-                }
-                else {
-                    return result;
-                }
-            };
-
-            var signaturePromise = attributePromise.then(attributePromiseResolve,
-                                                         attributePromiseReject);
-
-            // Get public signing key.
-            var pubKeyPromise = crypt.getPubEd25519(userhandle);
-
-            // Compound promise for signature and signing key.
-            var compoundPromise = MegaPromise.all([signaturePromise,
-                                                   pubKeyPromise]);
-
-            // Do the check and track the outcome.
-            compoundPromise.then(function () {
-                rootPromise.resolve(ns._trackRSAKeyAuthentication(userhandle,
-                                                                  signature,
-                                                                  fingerprint));
-            }, function() {
-                rootPromise.reject();
-            });
-        }
-        else if (recorded && authring.equalFingerprints(recorded.fingerprint, fingerprint) === true) {
-            // All good, key matches previously seen fingerprint.
-            rootPromise.resolve(true);
-        }
-        else {
-            // Something is dodgy, previously seen fingerprint mitsmatches.
-            logger.error('RSA fingerprint does not match previously authenticated one!');
-            // This function handles what's required for the action, shows a
-            // warning dialogue and throws the exception.
-            ns.showFingerprintMismatchException('RSA', userhandle,
-                                                recorded.method,
-                                                recorded.fingerprint, fingerprint);
-
-            // XXX: shouldn't we reject the promise?
-        }
-
-        if (callback) {
-            callback(u_pubkeys[userhandle], userhandle);
-        }
-
-        return rootPromise;
+    ns.getPubCu25519 = function(userhandle, callback) {
+        return ns.getPubKey(userhandle, 'Cu25519', callback);
     };
 
 
@@ -374,70 +438,7 @@ var crypt = (function () {
      *     an exception.
      */
     ns.getPubRSA = function(userhandle, callback) {
-        /* This function does the following:
-         * 1. Check the authring, if empty: initialise.
-         * 2. If the key is cached: _asynchCheckAuthenticationRSA.
-         * 3. If not cached: _getPubRSAattribute + _asynchCheckAuthenticationRSA.
-         */
-
-        // This promise will be the one which is going to be returned.
-        var masterPromise = new MegaPromise();
-
-        /** If a callback is passed in, ALWAYS call it when the promise in the
-         * parameter is resolved (should be the masterPromise). */
-        var _callbackAttachAfterDone = function(aPromise) {
-            if (callback) {
-                aPromise.done(function(result) {
-                    logger.debug('Calling callback');
-                    callback(result);
-                });
-            }
-        };
-
-        if (!userhandle) {
-            masterPromise.reject('Invalid UserHandle');
-        }
-        else if (typeof u_authring === 'undefined'
-                || typeof u_authring.RSA === 'undefined') {
-            logger.debug('First initialising the RSA authring.');
-            var authringPromise = authring.getContacts('RSA');
-            // Fail the masterPromise if authring.getContacts() fails.
-            masterPromise.linkFailTo(authringPromise);
-
-            authringPromise.done(function() {
-                // Loading finished. Do a recursion now that we have the authring.
-                // (masterPromise will be resolved and callback called through
-                // new ns.getPubRSA() invocation.)
-                masterPromise.linkDoneAndFailTo(ns.getPubRSA(userhandle));
-            });
-        }
-        else if (u_pubkeys[userhandle]) {
-            // It's cached: Only check the authenticity of the key.
-            var checkAuthPromise = crypt._asynchCheckAuthenticationRSA(userhandle);
-
-            // Resolve/reject master promise depending on state of checkAuthPromise.
-            masterPromise.linkDoneAndFailTo(checkAuthPromise);
-        }
-        else {
-            // Non-cached value.
-            var keyLoadingPromise = crypt._getPubRSAattribute(userhandle);
-            masterPromise.linkFailTo(keyLoadingPromise);
-            keyLoadingPromise.done(function(result) {
-                // Cache the result.
-                u_pubkeys[userhandle] = result;
-
-                // Loading finished. Do a recursion now that we have the pub key.
-                // (masterPromise will be resolved and callback called through
-                // new ns.getPubRSA() invocation.)
-                var recursionPromise = ns.getPubRSA(userhandle);
-                masterPromise.linkDoneAndFailTo(recursionPromise);
-            });
-        }
-
-        // Attach the callback ONLY AFTER previous handlers are attached.
-        _callbackAttachAfterDone(masterPromise);
-
-        return masterPromise;
+        return ns.getPubKey(userhandle, 'RSA', callback);
     };
 
 
@@ -493,7 +494,7 @@ var crypt = (function () {
 
 
     /**
-     * Store public Ed25519 key for a contact and notify listeners.
+     * Stores a public key for a contact and notify listeners.
      *
      * @param pubKey {string}
      *     Ed25519 public key in byte string form.
@@ -501,15 +502,12 @@ var crypt = (function () {
      *     Key type to set. Allowed values: 'Ed25519', 'Cu25519'.
      */
     ns.setPubKey = function(pubKey, keyType) {
-        var keyCacheMapping = {
-            Ed25519: pubEd25519,
-            Cu25519: pubCu25519
-        };
-        if (typeof keyCacheMapping[keyType] === 'unknown') {
+        var keyCache = _getPubKeyCacheMapping(keyType);
+        if (typeof keyCache === 'unknown') {
             throw('Illegal key type to set: ' + keyType);
         }
         logger.debug('Setting ' + keyType + ' public key', u_handle, pubKey);
-        keyCacheMapping[keyType][u_handle] = pubKey;
+        keyCache[u_handle] = pubKey;
         Soon(function __setPubKey() {
             mBroadcaster.sendMessage(keyType);
         });
@@ -517,20 +515,29 @@ var crypt = (function () {
 
 
     /**
-     * Shows the fingerprint warning dialog
-     * @param {string} fingerprintType either Ed25519 or RSA
-     * @param {string} userHandle The user handle e.g. 3nnYu_071I3
-     * @param {number} method Whether seen or verified (authring.AUTHENTICATION_METHOD.SEEN or .FINGERPRINT_COMPARISON)
-     * @param {string} previousFingerprint The previously seen or verified fingerprint
-     * @param {string} newFingerprint The new fingerprint
+     * Shows the fingerprint warning dialog.
+     *
+     * @private
+     * @param {string} userHandle
+     *     The user handle e.g. 3nnYu_071I3.
+     * @param {string} keyType
+     *     Type of the public key the fingerprint results from. One of
+     *     'Ed25519', 'Cu25519' or 'RSA'.)
+     * @param {number} method
+     *     The key comparison method (any of the options in
+     *     authring.AUTHENTICATION_METHOD).
+     * @param {string} previousFingerprint
+     *     The previously seen or verified fingerprint.
+     * @param {string} newFingerprint
+     *     The new fingerprint.
      * @throws {Error}
-     *     In case the fingerprint of the public key differs from the one previously
-     *     authenticated by the user. This more severe condition warrants to throw
-     *     an exception.
+     *     In case the fingerprint of the public key differs from the one
+     *     previously authenticated by the user. This more severe condition
+     *     warrants to throw an exception.
      */
-    ns.showFingerprintMismatchException = function(fingerprintType, userHandle,
-                                                   method, previousFingerprint,
-                                                   newFingerprint) {
+    ns._showFingerprintMismatchException = function(userHandle, keyType,
+                                                    method, previousFingerprint,
+                                                    newFingerprint) {
         // Show warning dialog.
         mega.ui.CredentialsWarningDialog.singleton(userHandle, method,
                                                    previousFingerprint,
@@ -538,19 +545,41 @@ var crypt = (function () {
 
         // Remove the cached key, so the key will be fetched and checked against
         // the stored fingerprint again next time.
-        if (fingerprintType === 'RSA') {
-            delete u_pubkeys[userHandle];
-        }
-        else if (fingerprintType === 'Ed25519') {
-            delete pubEd25519[userHandle];
-        }
+        delete _getPubKeyCacheMapping(keyType)[userHandle];
 
         // Throw exception to stop whatever they were doing from progressing
         // e.g. initiating/accepting call, or sharing a file/folder
-        console.error(fingerprintType + ' fingerprint does not match the previously authenticated one! ' +
+        console.error(keyType + ' fingerprint does not match the previously authenticated one! ' +
               'Previous fingerprint: ' + previousFingerprint + '. ' +
               'New fingerprint: ' + newFingerprint + '. ');
-        throw new Error(fingerprintType + ' fingerprint does not match the previously authenticated one!');
+        throw new Error(keyType + ' fingerprint does not match the previously authenticated one!');
+    };
+
+
+    /**
+     * Shows the key signature failure warning dialog.
+     *
+     * @private
+     * @param {string} userhandle
+     *     The user handle e.g. 3nnYu_071I3.
+     * @param {string} keyType
+     *     Type of the public key the signature failed for. One of
+     *     'Cu25519' or 'RSA'.)
+     * @throws {Error}
+     *     In case the fingerprint of the public key differs from the one
+     *     previously authenticated by the user. This more severe condition
+     *     warrants to throw an exception.
+     */
+    ns._showKeySignatureFailureException = function(userhandle, keyType) {
+        // Show warning dialog.
+        mega.ui.KeySignatureWarningDialog.singleton(userhandle, keyType);
+
+        // Throw exception to stop whatever they were doing from progressing
+        // e.g. initiating/accepting call, or sharing a file/folder
+        var message = keyType + ' signature does not verify for user '
+                    + userhandle + '!'
+        console.error(message);
+        throw new Error(message);
     };
 
 
@@ -4211,11 +4240,13 @@ function u_initAuthentication2(res, ctx) {
     crypt.setPubKey(u_pubEd25519, 'Ed25519');
 
     // Check for availability/consistency of public Ed25519 key.
-    getUserAttribute(u_handle, "puEd255", true, false, function __puEd255Success(res) {
+    /** Callback on finishing. */
+    var __puEd255Success = function(res) {
         if (res !== base64urlencode(u_pubEd25519)) {
             setUserAttribute('puEd255', base64urlencode(u_pubEd25519), true, false);
         }
-    });
+    };
+    getUserAttribute(u_handle, "puEd255", true, false, __pubEd255Success);
 
     // Check for Curve25519 private key.
     if (typeof u_keyring.prCu255 !== 'undefined') {
@@ -4226,6 +4257,7 @@ function u_initAuthentication2(res, ctx) {
         u_attr.puCu255 = u_pubCu25519;
 
         // Check for availability of the public Curve25519 key.
+        /** Callback on finishing. */
         var __puCu255Callback = function(res) {
             if (res !== base64urlencode(u_pubCu25519)) {
                 setUserAttribute('puCu255', base64urlencode(u_pubCu25519), true, false);
@@ -4234,6 +4266,7 @@ function u_initAuthentication2(res, ctx) {
         getUserAttribute(u_handle, 'puCu255', true, false, __puCu255Callback);
 
         // Ensure a Curve25519 pub key signature.
+        /** Callback on finishing. */
         var __sigCu255Callback = function(res) {
             if (typeof res === 'number') {
                 var sigPubCu25519 = authring.signKey(u_pubCu25519, 'Cu25519');

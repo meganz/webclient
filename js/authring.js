@@ -59,7 +59,7 @@ var authring = (function () {
      * "Enumeration" of confidence in contact's key. The values in here must fit
      * into 4 bits of a byte.
      *
-     * @property FINGERPRINT_COMPARISON {integer}
+     * @property UNSURE {integer}
      *     Direct fingerprint comparison.
      */
     ns.KEY_CONFIDENCE = {
@@ -67,7 +67,7 @@ var authring = (function () {
     };
 
     // User property names used for different key types.
-    ns._properties = { 'Ed25519': 'authring',
+    ns._PROPERTIES = { 'Ed25519': 'authring',
                        'Cu25519': 'authCu255',
                        'RSA': 'authRSA' };
 
@@ -188,7 +188,7 @@ var authring = (function () {
      *     An error if an unsupported key type is requested.
      */
     ns.getContacts = function(keyType) {
-        if (ns._properties[keyType] === undefined) {
+        if (ns._PROPERTIES[keyType] === undefined) {
             logger.error('Unsupporte authentication key type: ' + keyType);
             throw new Error('Unsupporte authentication key type.');
         }
@@ -196,7 +196,7 @@ var authring = (function () {
         // This promise will be the one which is going to be returned.
         var masterPromise = new MegaPromise();
 
-        var attributePromise = getUserAttribute(u_handle, ns._properties[keyType],
+        var attributePromise = getUserAttribute(u_handle, ns._PROPERTIES[keyType],
                                                 false, true);
 
         /**
@@ -266,12 +266,12 @@ var authring = (function () {
      *     An error if an unsupported key type is requested.
      */
     ns.setContacts = function(keyType, callback) {
-        if (ns._properties[keyType] === undefined) {
+        if (ns._PROPERTIES[keyType] === undefined) {
             logger.error('Unsupporte authentication key type: ' + keyType);
             throw new Error('Unsupporte authentication key type.');
         }
 
-        return setUserAttribute(ns._properties[keyType],
+        return setUserAttribute(ns._PROPERTIES[keyType],
                                 { '': ns.serialise(u_authring[keyType]) },
                                 false, true);
     };
@@ -293,7 +293,7 @@ var authring = (function () {
      *     An error if an unsupported key type is requested.
      */
     ns.getContactAuthenticated = function(userhandle, keyType) {
-        if (ns._properties[keyType] === undefined) {
+        if (ns._PROPERTIES[keyType] === undefined) {
             logger.error('Unsupporte key type: ' + keyType);
             throw new Error('Unsupporte key type.');
         }
@@ -328,7 +328,7 @@ var authring = (function () {
      */
     ns.setContactAuthenticated = function(userhandle, fingerprint, keyType,
                                           method, confidence) {
-        if (ns._properties[keyType] === undefined) {
+        if (ns._PROPERTIES[keyType] === undefined) {
             logger.error('Unsupporte key type: ' + keyType);
             throw new Error('Unsupporte key type.');
         }
@@ -363,7 +363,7 @@ var authring = (function () {
      *     An error if an unsupported key type is requested.
      */
     ns.computeFingerprint = function(key, keyType, format) {
-        if (ns._properties[keyType] === undefined) {
+        if (ns._PROPERTIES[keyType] === undefined) {
             logger.error('Unsupporte key type: ' + keyType);
             throw new Error('Unsupporte key type.');
         }
@@ -407,7 +407,7 @@ var authring = (function () {
      *     An error if an unsupported key type is requested.
      */
     ns.signKey = function(pubKey, keyType) {
-        if (ns._properties[keyType] === undefined) {
+        if (ns._PROPERTIES[keyType] === undefined) {
             logger.error('Unsupporte key type: ' + keyType);
             throw new Error('Unsupporte key type.');
         }
@@ -444,7 +444,7 @@ var authring = (function () {
      *     unsupported key type is requested.
      */
     ns.verifyKey = function(signature, pubKey, keyType, signPubKey) {
-        if (ns._properties[keyType] === undefined) {
+        if (ns._PROPERTIES[keyType] === undefined) {
             logger.error('Unsupporte key type: ' + keyType);
             throw new Error('Unsupporte key type.');
         }
@@ -592,6 +592,8 @@ var authring = (function () {
                 u_pubEd25519 = asmCrypto.bytes_to_string(nacl.sign.keyPair.fromSeed(
                     asmCrypto.string_to_bytes(u_privEd25519)).publicKey);
                 u_attr.puEd255 = u_pubEd25519;
+                pubEd25519[u_handle] = u_pubEd25519;
+
                 // Run on the side a sanity check on the stored pub key.
                 ns._checkEd25519PubKey();
                 crypt.setPubKey(u_pubEd25519, 'Ed25519');

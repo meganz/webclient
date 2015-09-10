@@ -44,7 +44,7 @@ var _createObjectDataMethods = function(kls) {
 
     obj.forEach = function(cb) {
         var self = this;
-        Object.keys(self._data).forEach(function(k) {
+        self.keys().forEach(function(k) {
             cb(self._data[k], k);
         });
     };
@@ -52,8 +52,8 @@ var _createObjectDataMethods = function(kls) {
     obj.map = function(cb) {
         var self = this;
         var res = [];
-        Object.keys(self._data).forEach(function(k) {
-            var intermediateResult = cb(self._data[k], k);
+        self.forEach(function(v, k) {
+            var intermediateResult = cb(v, k);
             if(intermediateResult !== null && intermediateResult !== undefined) {
                 res.push(intermediateResult);
             }
@@ -66,7 +66,7 @@ var _createObjectDataMethods = function(kls) {
     };
 
     obj.size = function() {
-        return Object.keys(this._data).length
+        return self.keys().length
     };
 
     obj.hasOwnProperty = function() {
@@ -384,3 +384,118 @@ MegaDataMap.prototype.remove = function(k) {
 _createObjectDataMethods(MegaDataMap);
 
 MegaDataMap.prototype.toJS = _toJS;
+
+
+/**
+ * MegaDataSortedMap
+ */
+
+var MegaDataSortedMap = function(keyField, sortField, parent) {
+    MegaDataMap.apply(this, parent);
+
+    this._keyField = keyField;
+    this._sortField = sortField;
+
+    this._sortedVals = [];
+};
+
+Object.keys(MegaDataMap.prototype).forEach(function(k) {
+    MegaDataSortedMap.prototype[k] = MegaDataMap.prototype[k];
+});
+
+MegaDataSortedMap.prototype.push = function(v) {
+    var self = this;
+
+    var keyVal = v[self._keyField];
+
+    // if already exist, remove previously stored value (e.g. overwrite...)
+    if(self._data[keyVal]) {
+        removeValue(self._sortedVals, keyVal, false);
+    }
+
+    self._data[keyVal] = v;
+
+    self._sortedVals.push(
+        keyVal
+    );
+
+    self._reorder();
+
+    var ret = self._sortedVals.length;
+
+    self.trackDataChange([self._data, ret]);
+
+    return ret;
+};
+
+MegaDataSortedMap.prototype._reorder = function() {
+    var self = this;
+
+    self._sortedVals.sort(function(a, b) {
+        if (self._data[a][self._sortField] < self._data[b][self._sortField]) {
+            return -1;
+        }
+        else if (self._data[a][self._sortField] > self._data[b][self._sortField]) {
+            return 1;
+        }
+        else {
+            return 0;
+        }
+    });
+};
+
+
+MegaDataSortedMap.prototype.removeByKey = function(keyValue) {
+    var self = this;
+    if(self._data[keyValue]) {
+        removeValue(self._sortedVals, keyValue, false);
+        self._reorder();
+        return true;
+    } else {
+        return false;
+    }
+};
+
+MegaDataSortedMap.prototype.exists = function(keyValue) {
+    var self = this;
+    if(self._data[keyValue]) {
+        return true;
+    } else {
+        return false;
+    }
+};
+
+MegaDataSortedMap.prototype.keys = function() {
+    var self = this;
+    return self._sortedVals;
+};
+
+MegaDataSortedMap.prototype.getItem = function(num) {
+    var self = this;
+
+    var foundKeyVal = self._sortedVals[num];
+    if(foundKeyVal) {
+        return self._data[foundKeyVal];
+    } else {
+        return undefined;
+    }
+};
+
+testMegaDataSortedMap = function() {
+    var arr1 = new MegaDataSortedMap("id", "ts");
+    arr1.push({
+        'id': 321,
+        'ts': 123
+    });
+
+    arr1.push({
+        'id': 123,
+        'ts': 122
+    });
+
+    arr1.forEach(function(v, k) {
+        console.error(v, k);
+    });
+    return arr1;
+};
+

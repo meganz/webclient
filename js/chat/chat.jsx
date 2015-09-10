@@ -45,22 +45,12 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
 
         if (localStorage.megaChatPresence !== "unavailable") {
             if (megaChat.karere.getConnectionState() != Karere.CONNECTION_STATE.CONNECTED) {
-                megaChat.connect()
-                    .done(function() {
-
-
-                    });
-            } else {
+                megaChat.connect();
             }
-
-
-        } else {
-            // XX: I'm offline, should we show some kind of notification saying: hey, you can't send messages while you
-            // are offline?
         }
 
         chatJids.push(megaChat.karere.getBareJid());
-        var resp = megaChat.openChat(chatJids, chatJids.length === 2 ? "private" : "group");
+        var resp = megaChat.openChat(chatJids, chatJids.length === 2 ? "private" : "group", undefined, undefined, undefined, true);
 
         $promise = resp[2];
 
@@ -553,16 +543,10 @@ Chat.prototype.init = function() {
     });
     this.karere.bind("onUsersUpdatedDone", function(e, eventObject) {
         var room = self.chats[eventObject.getRoomJid()];
-        if(room && (room.state == ChatRoom.STATE.JOINING || room.state == ChatRoom.STATE.WAITING_FOR_PARTICIPANTS)) {
-            if(room._waitingForOtherParticipants() === false) {
-                room.setState(
-                    ChatRoom.STATE.PARTICIPANTS_HAD_JOINED
-                );
-            } else {
-                room.setState(
-                    ChatRoom.STATE.WAITING_FOR_PARTICIPANTS
-                );
-            }
+        if(room && (room.state == ChatRoom.STATE.JOINING)) {
+            room.setState(
+                ChatRoom.STATE.PLUGINS_PAUSED
+            );
         }
     });
 
@@ -612,7 +596,7 @@ Chat.prototype.init = function() {
             if (fromMyDevice) {
                 room = self.chats[meta.roomJid];
                 if (!room) {
-                    self.openChat(meta.participants, meta.type);
+                    self.openChat(meta.participants, meta.type, undefined, undefined, undefined, false);
                 }
             } else {
                 room = self.chats[meta.roomJid];
@@ -624,40 +608,6 @@ Chat.prototype.init = function() {
 
                 }
 
-            }
-        } else if (eventObject.getAction() === "delete-message" && fromMyDevice === true) {
-            room = self.chats[meta.roomJid];
-            if (!room) { return; };
-
-            var msgId = meta.messageId;
-            if (!msgId) { return; };
-
-            var msgObject = room.getMessageById(msgId);
-            if (!msgObject) { return; };
-
-
-            // policy required for deleting messages:
-            // 1. the delete-message action can only be allowed if the sender of
-            //    both the action message and target message to be the same
-            // 2. the sender === me (applied by using the helper flag:
-            //    fromMyDevice === true, in the previous if)
-            // 3. the message state is NOT_SENT
-            if (Karere.getNormalizedBareJid(eventObject.getFromJid())
-                        === Karere.getNormalizedBareJid(msgObject.getFromJid())
-                    && msgObject.getState && msgObject.getState()
-                        === KarereEventObjects.OutgoingMessage.STATE.NOT_SENT) {
-                var meta = clone(msgObject.getMeta());
-                meta['isDeleted'] = true;
-                msgObject.setMeta(meta); // trigger change event
-
-                $('.fm-chat-message-container[data-id="' + msgId + '"]', room.$messages).remove();
-                //room.refreshUI();
-
-                var msgIdx = room.messagesIndex[msgId];
-
-                removeValue(room.messagesIndex, msgIdx);
-                removeValue(room.messages, msgObject);
-                Object.freeze(msgObject);
             }
         } else {
             self.logger.error("Not sure how to handle action message: ", eventObject.getAction(), eventObject, e);
@@ -965,54 +915,18 @@ Chat.prototype._onUsersUpdate = function(type, e, eventObject) {
         } else { // i'd joined
             room = self.chats[eventObject.getRoomJid()];
             if (room) {
-                if (room._waitingForOtherParticipants() === false && (
-                        room.state === ChatRoom.STATE.WAITING_FOR_PARTICIPANTS || room.state === ChatRoom.STATE.JOINING
-                    )
-                ) {
-                    if (room._conv_ended === true || typeof room._conv_ended === 'undefined') {
-                        room._conversationStarted(room.getParticipantsExceptMe()[0]);
-                    }
+                if (room._conv_ended === true || typeof room._conv_ended === 'undefined') {
+                    room._conversationStarted(room.getParticipantsExceptMe()[0]);
                 }
             }
         }
     } else { //some one else had joined/left the room
         if (type !== "joined") { // they left the room
-            //XX: If this is a private room and the only user left count === 1, then destroy the room (an UI elements)
-
-            // this code should trigger timeout immediately if there is a request pending for a user who had left the
-            // room
-            if (self._syncRequests) {
-                $.each(self._syncRequests, function(k, v) {
-                    if (v.userJid === diffUsers[0]) {
-                        self.logger.log("Canceling sync request from ", v.userJid, ", because he had just left the room.");
-
-                        v.timeoutHandler();
-                        clearTimeout(v.timer);
-                        return false; // break;
-                    }
-                })
-            }
-
             room = self.chats[eventObject.getRoomJid()];
-            if (room && room.state === ChatRoom.STATE.READY && room._waitingForOtherParticipants()) {
-                // other party/ies had left the room
-                room.setState(ChatRoom.STATE.WAITING_FOR_PARTICIPANTS);
-            }
 
         } else {
             // they had joined
             room = self.chats[eventObject.getRoomJid()];
-            if (room) {
-                if (room._waitingForOtherParticipants() === false && room.state === ChatRoom.STATE.WAITING_FOR_PARTICIPANTS) {
-                    if (room._conv_ended === true || typeof room._conv_ended === 'undefined') {
-                        room._conversationStarted(eventObject.getFromJid());
-                    } else {
-                        if (room.state === ChatRoom.STATE.WAITING_FOR_PARTICIPANTS) {
-                            room.setState(ChatRoom.STATE.PARTICIPANTS_HAD_JOINED);
-                        }
-                    }
-                }
-            }
         }
         room = self.chats[eventObject.getRoomJid()];
 
@@ -1335,7 +1249,7 @@ Chat.prototype.getMyXMPPPassword = function() {
  * @param type {String} "private" or "group"
  * @returns [roomJid {string}, room {MegaChatRoom}, {Deferred}]
  */
-Chat.prototype.openChat = function(jids, type) {
+Chat.prototype.openChat = function(jids, type, chatId, chatShard, chatdUrl, setAsActive) {
     var self = this;
     type = type || "private";
 
@@ -1364,23 +1278,35 @@ Chat.prototype.openChat = function(jids, type) {
     var roomFullJid = roomJid + "@" + self.karere.options.mucDomain;
     if(self.chats[roomFullJid]) {
         var room = self.chats[roomFullJid];
-        room.show();
+        if(setAsActive) {
+            room.show();
+        }
         return [roomFullJid, room, (new $.Deferred()).resolve(roomFullJid, room)];
     }
-    if(self.currentlyOpenedChat && self.currentlyOpenedChat != roomJid) {
+    if(setAsActive && self.currentlyOpenedChat && self.currentlyOpenedChat != roomJid) {
         self.hideChat(self.currentlyOpenedChat);
         self.currentlyOpenedChat = null;
     }
 
 
-    var room = new ChatRoom(self, roomJid + "@" + self.karere.options.mucDomain, type, jids, unixtime());
+    var room = new ChatRoom(
+        self,
+        roomJid + "@" + self.karere.options.mucDomain,
+        type,
+        jids,
+        unixtime(),
+        undefined,
+        chatId,
+        chatShard,
+        chatdUrl
+    );
 
     self.chats.set(
         room.roomJid,
         room
     );
 
-    if(!self.currentlyOpenedChat) {
+    if(setAsActive && !self.currentlyOpenedChat) {
         room.show();
     }
 

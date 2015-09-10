@@ -1038,7 +1038,9 @@ KarereEventObjects.OutgoingMessage = function(toJid, fromJid, type, messageId, c
 KarereEventObjects.OutgoingMessage.STATE = {
     'SENT': 10,
     'NOT_SENT': 20,
-    'DELIVERED': 30
+    'DELIVERED': 30,
+    'SEEN': 40,
+    'REJECTED': 50
 };
 /**
  * Getter for property `toJid`
@@ -1250,7 +1252,7 @@ KarereEventObjects.OutgoingMessage.prototype.setRoomJid = function(val) {
 /**
  * Getter for property `seen`
  *
- * @returns {(boolean|"")} used for notification to track whether we need to notify the message if it was not seen by the user
+ * @returns {(boolean|false)} used for notification to track whether we need to notify the message if it was not seen by the user
  */
 KarereEventObjects.OutgoingMessage.prototype.getSeen = function() {
     return this.seen;
@@ -1265,7 +1267,7 @@ KarereEventObjects.OutgoingMessage.prototype.getSeen = function() {
  */
 KarereEventObjects.OutgoingMessage.prototype.setSeen = function(val) {
     var oldVal = this.seen;
-    this.seen = val || "";
+    this.seen = val || false;
     if (oldVal != this.seen) {
         jQuery(this).trigger("onSeenChange", [this, oldVal, this.seen]);
     }

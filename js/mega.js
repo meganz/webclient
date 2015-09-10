@@ -5154,6 +5154,10 @@ function execsc(actionPackets, callback) {
         else if (actionPacket.a === 'psts') {
             proPage.processPaymentReceived(actionPacket);
         }
+        // Action packet for the mcc
+        else if (actionPacket.a === 'mcc') {
+            $(window).trigger('onChatCreatedActionPacket', actionPacket);
+        }
         else {
             if (d) {
                 console.log('not processing this action packet', actionPacket);

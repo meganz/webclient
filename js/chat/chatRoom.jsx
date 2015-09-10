@@ -16,7 +16,7 @@ var ConversationPanelUI = require("./ui/conversationpanel.jsx");
  * @returns {ChatRoom}
  * @constructor
  */
-var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
+var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, chatId, chatShard, chatdUrl) {
     var self = this;
 
 
@@ -32,7 +32,6 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
             roomJid: null,
             type: null,
             messages: [],
-            messagesIndex: {},
             ctime: 0,
             lastActivity: 0,
             callRequest: null,
@@ -40,9 +39,9 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
             isCurrentlyActive: false,
             _messagesQueue: [],
             unreadCount: 0,
-            chatId: false,
-            chatdUrl: false,
-            chatShard: false,
+            chatId: undefined,
+            chatdUrl: undefined,
+            chatShard: undefined,
         },
         true
     );
@@ -50,10 +49,12 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
     this.users = users ? users : [];
     this.roomJid = roomJid;
     this.type = type;
-    this.messages = new MegaDataArray(this);
-    this.messagesIndex = {};
+    this.messages = new MegaDataSortedMap("messageId", "delay", this);
     this.ctime = ctime;
     this.lastActivity = lastActivity ? lastActivity : ctime;
+    this.chatId = chatId;
+    this.chatShard = chatShard;
+    this.chatdUrl = chatdUrl;
 
     this.callRequest = null;
     this.callIsActive = false;
@@ -101,8 +102,6 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
         if (newState === ChatRoom.STATE.PLUGINS_READY) {
             resetStateToReady();
         } else if (newState === ChatRoom.STATE.JOINED) {
-            self.setState(ChatRoom.STATE.WAITING_FOR_PARTICIPANTS);
-        } else if (newState === ChatRoom.STATE.PARTICIPANTS_HAD_JOINED) {
             self.setState(ChatRoom.STATE.PLUGINS_WAIT);
         } else if (newState === ChatRoom.STATE.PLUGINS_WAIT) {
             var $event = new $.Event("onPluginsWait");
@@ -237,16 +236,11 @@ ChatRoom.STATE = {
     'JOINING': 10,
     'JOINED': 20,
 
-    'WAITING_FOR_PARTICIPANTS': 24,
-    'PARTICIPANTS_HAD_JOINED': 27,
-
-    'PLUGINS_WAIT': 30,
-    'PLUGINS_READY': 40,
-
-
     'READY': 150,
 
     'PLUGINS_PAUSED': 175,
+
+    'ENDED': 190,
 
     'LEAVING': 200,
 
@@ -344,7 +338,6 @@ ChatRoom.prototype.setState = function(newState, isRecover) {
         assert(
             newState === ChatRoom.STATE.PLUGINS_PAUSED ||
             self.state === ChatRoom.STATE.PLUGINS_PAUSED ||
-            newState === ChatRoom.STATE.WAITING_FOR_PARTICIPANTS ||
             (newState === ChatRoom.STATE.JOINING && isRecover) ||
             (newState === ChatRoom.STATE.INITIALIZED && isRecover) ||
             newState > self.state,
@@ -860,13 +853,13 @@ ChatRoom.prototype.appendMessage = function(message) {
             message.roomJid
         );
     }
-    if (self.messagesIndex[message.messageId] !== undefined) {
+    if (self.messages.exists(message.messageId)) {
 
         //self.logger.debug(self.roomJid.split("@")[0], message.messageId, "This message is already added to the message list (and displayed).");
         return false;
     }
 
-    self.messagesIndex[message.messageId] = self.messages.push(
+    self.messages.push(
         message
     );
 };
@@ -989,6 +982,7 @@ ChatRoom.prototype.sendMessage = function(message, meta) {
         self._restartConversation();
     }
     var messageId = megaChat.karere.generateMessageId(self.roomJid, JSON.stringify([message, meta]));
+
     var eventObject = new KarereEventObjects.OutgoingMessage(
         self.roomJid,
         megaChat.karere.getJid(),
@@ -1026,8 +1020,11 @@ ChatRoom.prototype.sendMessage = function(message, meta) {
 
         self.appendMessage(eventObject);
     } else {
+        self._sendMessageToTransport(eventObject)
+            .done(function(internalId) {
+                eventObject.internalId = internalId;
+            });
         self.appendMessage(eventObject);
-        self._sendMessageToXmpp(eventObject);
     }
 };
 
@@ -1038,7 +1035,7 @@ ChatRoom.prototype.sendMessage = function(message, meta) {
  *
  * @param messageObject {KarereEventObjects.OutgoingMessage}
  */
-ChatRoom.prototype._sendMessageToXmpp = function(messageObject) {
+ChatRoom.prototype._sendMessageToTransport = function(messageObject) {
     var self = this;
     var megaChat = this.megaChat;
 
@@ -1048,19 +1045,13 @@ ChatRoom.prototype._sendMessageToXmpp = function(messageObject) {
     if (messageMeta.isDeleted && messageMeta.isDeleted === true) {
         return false;
     }
-    if (
-        megaChat.karere.getConnectionState() !== Karere.CONNECTION_STATE.CONNECTED ||
-        self.arePluginsForcingMessageQueue(messageObject) ||
-        (self.state != ChatRoom.STATE.READY && messageContents.indexOf("?mpENC:") !== 0)
-    ) {
-        messageObject.setState(KarereEventObjects.OutgoingMessage.STATE.NOT_SENT);
 
-        return false;
-    } else {
-        messageObject.setState(KarereEventObjects.OutgoingMessage.STATE.SENT);
+    return megaChat.plugins.chatdIntegration.sendMessage(
+        self,
+        messageObject.getContents()
+    );
 
-        return megaChat.karere.sendRawMessage(self.roomJid, "groupchat", messageObject.getContents(), messageObject.getMeta(), messageObject.getMessageId(), messageObject.getDelay());
-    }
+
 };
 
 /**
@@ -1311,7 +1302,7 @@ ChatRoom.prototype._flushMessagesQueue = function() {
                 return; //continue;
             }
 
-            self._sendMessageToXmpp(v);
+            self._sendMessageToTransport(v);
         });
         self._messagesQueue = [];
 
@@ -1373,7 +1364,7 @@ ChatRoom.prototype._restartConversation = function() {
         self._conv_ended = self._leaving = false;
 
         self.setState(
-            self._waitingForOtherParticipants() ? ChatRoom.STATE.WAITING_FOR_PARTICIPANTS : ChatRoom.STATE.PARTICIPANTS_HAD_JOINED
+            ChatRoom.STATE.PLUGINS_WAIT
         );
 
         self.trigger('onConversationStarted');
@@ -1409,10 +1400,7 @@ ChatRoom.prototype._conversationEnded = function(userFullJid) {
 
         self._conv_ended = true;
 
-        self.setState(ChatRoom.STATE.WAITING_FOR_PARTICIPANTS);
-
-        // force trigger event
-        self.trigger('onStateChange', [ChatRoom.STATE.WAITING_FOR_PARTICIPANTS, ChatRoom.STATE.WAITING_FOR_PARTICIPANTS]);
+        self.setState(ChatRoom.STATE.ENDED);
 
         [self.$header, self.$messages].forEach(function(k, v) {
             $(k).addClass("conv-end")
@@ -1450,7 +1438,7 @@ ChatRoom.prototype._conversationStarted = function(userBareJid) {
     }
 
 
-    self.setState(ChatRoom.STATE.PARTICIPANTS_HAD_JOINED);
+    self.setState(ChatRoom.STATE.READY);
 };
 ChatRoom.prototype.cancelAttachment = function(messageId, nodeId) {
     var self = this;
@@ -1500,7 +1488,7 @@ ChatRoom.prototype.removeMessageById = function(messageId) {
             }
 
             // cleanup the messagesIndex
-            delete self.messagesIndex[self.messages._data[0].messageId];
+            self.messages.removeByKey(v.messageId);
             return false; // break;
         }
     });

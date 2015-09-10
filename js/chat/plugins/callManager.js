@@ -945,7 +945,7 @@ CallManager.prototype._rtcEventProxyToRoom = function(e, eventData) {
         var chatJids = [fromBareJid];
         chatJids.push(megaChat.karere.getBareJid());
 
-        var resp = megaChat.openChat(chatJids, "private");
+        var resp = megaChat.openChat(chatJids, "private", undefined, undefined, undefined, false);
 
         resp[2].done(function(roomJid, room) {
             room.trigger(e, eventData);
@@ -1331,7 +1331,7 @@ CallManager.prototype.getOrCreateSessionFromEventData = function(eventName, even
                     var chatJids = [fromBareJid];
                     chatJids.push(megaChat.karere.getBareJid());
 
-                    var resp = megaChat.openChat(chatJids, "private");
+                    var resp = megaChat.openChat(chatJids, "private", undefined, undefined, undefined, false);
 
                     chatRoom = resp[1];
                 }

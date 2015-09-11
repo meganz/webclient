@@ -1263,11 +1263,11 @@ function assert(test) {
     }
     //assemble message from parameters
     var message = '';
-    var last = arguments.length-1;
-    for (var i=1; i <= last; i++) {
-        message+=arguments[i];
-        if (i<last) {
-            message+=' ';
+    var last = arguments.length - 1;
+    for (var i = 1; i <= last; i++) {
+        message += arguments[i];
+        if (i < last) {
+            message += ' ';
         }
     }
     if (MegaLogger && MegaLogger.rootLogger) {

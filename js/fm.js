@@ -416,6 +416,15 @@ function treePanelType() {
     return $.trim($('.nw-fm-left-icon.active').attr('class').replace(/(active|nw-fm-left-icon|ui-droppable)/g, ''));
 }
 
+/**
+ * treePanelSortElements
+ * 
+ * 
+ * @param {String} type, key value for global variable $.sortTreepanel, can bi prexied with Copy and Move for those dialogs.
+ * @param {Array} elements, elements that will be sorted
+ * @param {type} handlers
+ * @param {} ifEq
+ */
 function treePanelSortElements(type, elements, handlers, ifEq) {
     
     if (!$.sortTreePanel) {
@@ -427,7 +436,7 @@ function treePanelSortElements(type, elements, handlers, ifEq) {
     }
     
     var settings = $.sortTreePanel[type],
-        sort = handlers[settings.by]
+        sort = handlers[settings.by];
 
     if (!sort) {
         return;
@@ -5984,23 +5993,34 @@ function contextMenuUI(e, ll) {
     e.preventDefault();
 }
 
-function disableCircularTargets(pref)
-{
-    for (var s in $.selected)
-    {
-        var x = $.selected[s];
-        $(pref + x).addClass('disabled');
-        if (M.d[x]) {
-            // Disable parent dir
-            $(pref + M.d[x].p).addClass('disabled');
+/**
+ * disableCircularTargets
+ * 
+ * Disable parent tree DOM element and all children.
+ * @param {String} pref, id prefix i.e. { #fi_, #mctreea_ }
+ */
+function disableCircularTargets(pref) {
+    
+    var nodeId;
+    
+    for (var s in $.selected) {
+        if ($.selected.hasOwnProperty(s)) {
+            nodeId = $.selected[s];
+            $(pref + nodeId).addClass('disabled');
+
+            if (M.d[nodeId] && M.d[nodeId].p) {
+
+                // Disable parent dir
+                $(pref + M.d[nodeId].p).addClass('disabled');
+            }
+            else if (d) {
+                console.error('disableCircularTargets: Invalid node', nodeId, pref);
+            }
+
+            // Disable all children folders
+            disableDescendantFolders(nodeId, pref);
         }
-        else if (d) {
-            console.error('disableCircularTargets: Invalid node', x, pref);
-        }
-        // Disable all children folders
-        disableDescendantFolders(x, pref);
     }
-    return true;
 }
 
 function adjustContextMenuPosition(e, m)
@@ -6979,11 +6999,11 @@ function disableReadOnlySharedFolders(dialogName) {
  * @param {string} dialogPrefix, i.e. [copy, move].
  * @param {string} buttonLabel, action button label.
  * @param {string} convTab, in case of conversations tab.
- *
  */
 function handleDialogContent(dialogTabClass, parentTag, newFolderButton, dialogPrefix, buttonLabel, convTab) {
     
-    var html;
+    var html,
+        $btn = '';// Action button label
     
     if ($.onImportCopyNodes && (!newFolderButton || (dialogPrefix !== 'copy'))) {
         
@@ -6992,11 +7012,6 @@ function handleDialogContent(dialogTabClass, parentTag, newFolderButton, dialogP
         
         return;
     }
-
-//    if ($.propertiesDialog) {
-//        propertiesDialog(1);
-//    }
-
     $('.' + dialogPrefix + '-dialog-txt').removeClass('active');
     $('.' + dialogPrefix + '-dialog-empty').removeClass('active');
     $('.' + dialogPrefix + '-dialog-button').removeClass('active');
@@ -7004,9 +7019,10 @@ function handleDialogContent(dialogTabClass, parentTag, newFolderButton, dialogP
     $('.' + dialogPrefix + '-dialog-panel-arrows').removeClass('active');
     $('.' + dialogPrefix + '-dialog .dialog-sorting-menu').addClass('hidden');
     
-    // Action button label
-    var $btn = $('.dialog-' + dialogPrefix + '-button');
     $('.dialog-' + dialogPrefix + '-button span').text(buttonLabel);
+    
+    // Action button label
+    $btn = $('.dialog-' + dialogPrefix + '-button');
     
     // Disable/enable button
     if ($.mcselected) {
@@ -7015,28 +7031,6 @@ function handleDialogContent(dialogTabClass, parentTag, newFolderButton, dialogP
     else {
         $btn.addClass('disabled');
     }
-
-    // Sorting menu
-//    var $mnu = $('.' + dialogPrefix + '-dialog .dialog-sorting-menu .context-menu-section').eq(0);
-//        $mnu.removeClass('hidden');
-//    switch (dialogTabClass) {
-//        case 'cloud-drive':
-//        case 'folder-link':
-//            $mnu.removeClass('hidden');
-//            break;
-//        case 'shared-with-me':
-//            $mnu.removeClass('hidden');
-//            break;
-//        case 'conversations':
-//            $mnu.addClass('hidden');
-//            break;
-//        case 'rubbish-bin':
-//            $mnu.removeClass('hidden');
-//            break;
-//        default:
-//            $mnu.addClass('hidden');
-//            break;
-//    }
 
     // Activate proper tab
     $('.' + dialogPrefix + '-dialog-txt' + '.' + dialogTabClass).addClass('active');
@@ -7051,10 +7045,21 @@ function handleDialogContent(dialogTabClass, parentTag, newFolderButton, dialogP
 
     handleDialogTabContent(dialogTabClass, parentTag, dialogPrefix, html);
     
-    if (dialogTabClass === 'shared-with-me') {
+    // Make sure that dialog tab content is properly sorted
+    if ((dialogTabClass === 'cloud-drive') || (dialogTabClass === 'folder-link')) {
+        M.buildtree(M.d[M.RootID], dialogPrefix + '-dialog');
+    }
+    else if (dialogTabClass === 'shared-with-me') {
+        M.buildtree({ h: 'shares' }, dialogPrefix + '-dialog');
         disableReadOnlySharedFolders(dialogPrefix);
     }
-
+    else if (dialogTabClass === 'rubish-bin') {
+        M.buildtree({h: M.RubbishID}, dialogPrefix + '-dialog');
+    }
+    else if (dialogTabClass === 'conversations') {
+        //@ToDo: make this working when chat start functioning
+    }
+    
     // 'New Folder' button
     if (newFolderButton) {
         $('.dialog-newfolder-button').removeClass('hidden');
@@ -7933,6 +7938,9 @@ function copyDialog() {
         delete $.onImportCopyNodes;
     });
 
+    /**
+     * Copy dialog tab selection.
+     */
     $('.copy-dialog-button').rebind('click', function() {
 
         var section;
@@ -8041,11 +8049,13 @@ function copyDialog() {
 
             if ((type === 'cloud-drive') || (type === 'folder-link')) {
                 M.buildtree(M.d[M.RootID], 'copy-dialog');
+                disableCircularTargets('#mctreea_');
             }
             else if (type === 'shared-with-me') {
                 M.buildtree({ h: 'shares' }, 'copy-dialog');
+                disableReadOnlySharedFolders('copy');
             }
-            else if (type === 'contacts') {
+            else if (type === 'conversations') {
                 //@ToDo: make this working when chat start functioning
             }
             
@@ -8228,6 +8238,9 @@ function moveDialog() {
         closeDialog();
     });
 
+    /**
+     * Move dialog tab change.
+     */
     $('.move-dialog-button').rebind('click', function(e) {
         
         var section;
@@ -8325,17 +8338,16 @@ function moveDialog() {
                 localStorage['sort' + key + 'By'] = $.sortTreePanel[key].by = data.by;
             }
             
-            switch (type) {
-                case 'shared-with-me':
-                    M.buildtree({ h: 'shares' }, 'move-dialog');
-                    break;
-                case 'cloud-drive':
-                case 'folder-link':
-                    M.buildtree(M.d[M.RootID], 'move-dialog');
-                    break;
-                case 'rubbish-bin':
-                    M.buildtree({h: M.RubbishID}, 'move-dialog');
-                    break;
+            if ((type === 'cloud-drive') || (type === 'folder-link')) {
+                M.buildtree(M.d[M.RootID], 'move-dialog');
+                disableCircularTargets('#mctreea_');
+            }
+            else if (type === 'shared-with-me') {
+                M.buildtree({ h: 'shares' }, 'move-dialog');
+                disableReadOnlySharedFolders('copy');
+            }
+            else if (type === 'rubbish-bin') {
+                M.buildtree({h: M.RubbishID}, 'move-dialog');
             }
 
             $self.parent().find('.sorting-menu-item').removeClass('active');

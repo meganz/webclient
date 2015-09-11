@@ -1251,12 +1251,11 @@ AssertionFailed.prototype.name = 'AssertionFailed';
 /**
  * Assert a given test condition.
  *
- * Throws an AssertionFailed exception with the given `message` on failure.
+ * Throws an AssertionFailed exception with a given message, in case the condition is false.
+ * The message is assembled by the args following 'test', similar to console.log()
  *
  * @param test
  *     Test statement.
- * @param message
- *     Message for exception on failure.
  */
 function assert(test) {
     if (test) {
@@ -1265,7 +1264,7 @@ function assert(test) {
     //assemble message from parameters
     var message = '';
     var last = arguments.length-1;
-    for (var i=1; i<=last; i++) {
+    for (var i=1; i <= last; i++) {
         message+=arguments[i];
         if (i<last) {
             message+=' ';

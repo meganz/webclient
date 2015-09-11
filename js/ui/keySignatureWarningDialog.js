@@ -96,8 +96,8 @@
     /**
      * Initialises the Key Signature Warning Dialog.
      *
-     * @param {String} contactHandle The contact's user handle
-     * @param {String} keyType The type of key for authentication.
+     * @param {string} contactHandle The contact's user handle
+     * @param {string} keyType The type of key for authentication.
      * @returns {KeySignatureWarningDialog._instance}
      */
     KeySignatureWarningDialog.singleton = function(contactHandle, keyType) {

@@ -57,7 +57,7 @@ var crypt = (function () {
      * @private
      * @param keyType {string}
      *     Key type of pub key. Can be one of 'Ed25519', 'Cu25519' or 'RSA'.
-     * @return {object}
+     * @return {Object}
      *     The cache variable object.
      */
     var _getPubKeyCacheMapping = function(keyType) {
@@ -123,7 +123,7 @@ var crypt = (function () {
                                              true, false);
             pubKeyPromise.done(function(result) {
                 result = base64urldecode(result);
-                    _getPubKeyCacheMapping(keyType)[userhandle] = result;
+                _getPubKeyCacheMapping(keyType)[userhandle] = result;
                 logger.debug('Got ' + keyType + ' pub key of user ' + userhandle + '.');
             });
         }
@@ -577,7 +577,7 @@ var crypt = (function () {
         // Throw exception to stop whatever they were doing from progressing
         // e.g. initiating/accepting call, or sharing a file/folder
         var message = keyType + ' signature does not verify for user '
-                    + userhandle + '!'
+                    + userhandle + '!';
         console.error(message);
         throw new Error(message);
     };

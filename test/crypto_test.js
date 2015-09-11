@@ -755,26 +755,26 @@ describe("crypto unit test", function() {
                 assert.strictEqual(ns.getPubKey.callCount, 1);
                 assert.deepEqual(ns.getPubKey.args[0],
                                  ['you456789xw', 'RSA', undefined]);
-           });
+            });
 
-           it('getPubEd25519()', function() {
+            it('getPubEd25519()', function() {
                 sandbox.stub(ns, 'getPubKey').returns('a promise');
                 var result = ns.getPubEd25519('you456789xw');
                 assert.strictEqual(result, 'a promise');
                 assert.strictEqual(ns.getPubKey.callCount, 1);
                 assert.deepEqual(ns.getPubKey.args[0],
                                  ['you456789xw', 'Ed25519', undefined]);
-           });
+            });
 
-           it('getPubCu25519()', function() {
+            it('getPubCu25519()', function() {
                 sandbox.stub(ns, 'getPubKey').returns('a promise');
                 var result = ns.getPubCu25519('you456789xw');
                 assert.strictEqual(result, 'a promise');
                 assert.strictEqual(ns.getPubKey.callCount, 1);
                 assert.deepEqual(ns.getPubKey.args[0],
                                  ['you456789xw', 'Cu25519', undefined]);
-           });
-       });
+            });
+        });
 
         describe('getFingerprintEd25519', function() {
             it("cached key", function() {

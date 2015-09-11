@@ -1273,7 +1273,7 @@ hangupAll: function(reason, text)
 
     this._freeLocalStream(sid);
  },
- _freeLocalStream: function() {
+ _freeLocalStream: function(sid) {
     if (this.gLocalStreamRefcount > 0) {
         this.jingle.onInternalError("_freeLocalStream: gLocalStreamRefcount is > 0, wont free it, aborting");
         return;

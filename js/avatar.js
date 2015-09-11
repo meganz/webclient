@@ -7,7 +7,7 @@
 (function(window) {
 var _ = {
     bind: function _Bind(ctx) {
-        return Function.prototype.bind.apply(ctx, [].slice.call(arguments, 1));
+        return (function(){}).bind.apply(ctx, [].slice.call(arguments, 1));
     },
     bindAll: function _bindAll(obj) {
         [].slice.call(arguments, 1).forEach(function(f) {

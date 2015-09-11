@@ -21,16 +21,16 @@ module.exports = function(config) {
         'node_modules/indexeddbshim/dist/indexeddbshim.js',
 
         // == Basics ==
-        'js/jquery-2.1.1.js',
-        'js/jquery-ui-1.11.2.js',
-        'js/jquery.jscrollpane.js',
-        'js/jquery.mousewheel.js',
+        'js/vendor/jquery-2.1.4.js',
+        'js/vendor/jquery-ui-1.11.4.js',
+        'js/vendor/jquery.jscrollpane.js',
+        'js/vendor/jquery.mousewheel.js',
+        'js/vendor/jquery.fullscreen.js',
+        'js/vendor/jquery.window-active.js',
         'js/jquery.tokeninput.js',
         'js/jquery.misc.js',
-        'js/jquery.fullscreen.js',
         'js/jquery.qrcode.js',
         'js/jquery.checkboxes.js',
-        'js/vendor/jquery.window-active.js',
 
         // == Libraries ==
         'js/asmcrypto.js',
@@ -43,7 +43,7 @@ module.exports = function(config) {
         'js/vendor/notification.js',
         // Chat libraries.
         'js/chat/mpenc.js',
-        'js/vendor/chat/strophe.js',
+        'js/vendor/chat/strophe.light.js',
         'js/vendor/chat/strophe.disco.js',
         'js/vendor/chat/strophe.jingle.js',
         'js/vendor/chat/strophe.jingle.session.js',
@@ -79,7 +79,7 @@ module.exports = function(config) {
         'js/crypto.js',
         'js/megaPromise.js',
         'js/paycrypt.js',
-        'js/user.js',
+        'js/account.js',
         'js/authring.js',
         'js/fm.js',
         'js/mouse.js',

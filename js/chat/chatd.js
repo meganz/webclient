@@ -40,8 +40,11 @@ var Chatd = function(userid, options) {
         'onMessageModify',
         'onMessageStore',
         'onMessageSeen',
+        'onMessageLastSeen',
         'onMessageReceived',
+        'onMessageLastReceived',
         'onRetentionChanged',
+        'onMessagesHistoryInfo',
         'onMembersUpdated'
     ].forEach(function(evt) {
             self.rebind(evt + '.chatd', function(e) {
@@ -353,7 +356,7 @@ Chatd.Shard.prototype.exec = function(a) {
             case Chatd.Opcode.SEEN:
                 self.logger.log("Newest seen message on '" + base64urlencode(cmd.substr(1,8)) + "' for user '" + base64urlencode(cmd.substr(9,8)) + "': '" + base64urlencode(cmd.substr(17,8)) + "'");
 
-                this.chatd.trigger('onMessageSeen', {
+                this.chatd.trigger('onMessageLastSeen', {
                     chatId: base64urlencode(cmd.substr(1, 8)),
                     userId: base64urlencode(cmd.substr(9, 8)),
                     messageId: base64urlencode(cmd.substr(17, 8))
@@ -365,7 +368,7 @@ Chatd.Shard.prototype.exec = function(a) {
             case Chatd.Opcode.RECEIVED:
                 self.logger.log("Newest delivered message on '" + base64urlencode(cmd.substr(1,8)) + "': '" + base64urlencode(cmd.substr(9,8)) + "'");
 
-                this.chatd.trigger('onMessageReceived', {
+                this.chatd.trigger('onMessageLastReceived', {
                     chatId: base64urlencode(cmd.substr(1, 8)),
                     messageId: base64urlencode(cmd.substr(9, 8))
                 });
@@ -394,6 +397,12 @@ Chatd.Shard.prototype.exec = function(a) {
             
             case Chatd.Opcode.RANGE:
                 self.logger.log("Known chat message IDs - oldest: '" + base64urlencode(cmd.substr(9,8)) + "' newest: '" + base64urlencode(cmd.substr(17,8)) + "'");
+
+                this.chatd.trigger('onMessagesHistoryInfo', {
+                    chatId: base64urlencode(cmd.substr(1,8)),
+                    oldest: base64urlencode(cmd.substr(9,8)),
+                    newest: base64urlencode(cmd.substr(17,8))
+                });
 
                 this.chatd.msgcheck(cmd.substr(1,8), cmd.substr(17,8));
 
@@ -870,7 +879,7 @@ function hist(n) {
 };
 
 function seen(msgid) {
-    chatd.cmd(Chatd.Opcode.SEEN, chatid, CHAT_UNDEFINED + base64urldecode(msgid));
+    chatd.cmd(Chatd.Opcode.SEEN, chatid, base64urldecode(msgid));
 };
 
 function received(msgid) {
@@ -878,7 +887,7 @@ function received(msgid) {
 };
 
 function retention(time) {
-    chatd.cmd(Chatd.Opcode.RETENTION, chatid, CHAT_UNDEFINED + pack32le(time));
+    chatd.cmd(Chatd.Opcode.RETENTION, chatid, pack32le(time));
 };
 
 console.log("Active demo chathandles: 'j8_ix6_J4D4', 'W21oF18xQ5g'");

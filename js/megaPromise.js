@@ -254,6 +254,29 @@ MegaPromise.prototype.linkDoneAndFailTo = function(targetPromise) {
 };
 
 /**
+ * Link promise's state to a function's value. E.g. if the function returns a promise that promise's state will be linked
+ * to the current fn. If it returns a non-promise-like value it will resolve/reject the current promise's value.
+ *
+ * PS: This is a simple DSL-like helper to save us from duplicating code when using promises :)
+ *
+ * @returns {MegaPromise} current promise, helpful for js call chaining
+ */
+MegaPromise.prototype.linkDoneAndFailToResult = function(cb, context, args) {
+    var self = this;
+
+    var ret = cb.apply(context, args);
+
+    if(ret instanceof MegaPromise) {
+        self.linkDoneTo(ret);
+        self.linkFailTo(ret);
+    } else {
+        self.resolve(ret);
+    }
+
+    return self;
+};
+
+/**
  * Development helper, that will dump the result/state change of this promise to the console
  *
  * @param [msg] {String} optional msg

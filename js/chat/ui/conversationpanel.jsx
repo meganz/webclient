@@ -203,12 +203,24 @@ var ConversationMessage = React.createClass({
             var labelText;
 
             if(message.getState() === KarereEventObjects.OutgoingMessage.STATE.NOT_SENT) {
-                labelClass += "not-sent";
+                labelClass += " not-sent";
                 labelText = "not sent"
             }
             else if(message.getState() === KarereEventObjects.OutgoingMessage.STATE.SENT) {
-                labelClass += "sent";
+                labelClass += " sent";
                 labelText = "sent";
+            }
+            else if(message.getState() === KarereEventObjects.OutgoingMessage.STATE.DELIVERED) {
+                labelClass += " delivered";
+                labelText = "delivered";
+            }
+            else if(message.getState() === KarereEventObjects.OutgoingMessage.STATE.REJECTED) {
+                labelClass += " rejected";
+                labelText = "rejected";
+            }
+            else if(message.getState() === KarereEventObjects.OutgoingMessage.STATE.SEEN) {
+                labelClass += " seen";
+                labelText = "seen";
             }
             messageLabel = <span className={labelClass}>{labelText}</span>
         }

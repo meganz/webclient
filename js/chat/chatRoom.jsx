@@ -49,7 +49,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, cha
     this.users = users ? users : [];
     this.roomJid = roomJid;
     this.type = type;
-    this.messages = new MegaDataSortedMap("messageId", "delay", this);
+    this.messages = new MegaDataSortedMap("messageId", "orderValue", this);
     this.ctime = ctime;
     this.lastActivity = lastActivity ? lastActivity : ctime;
     this.chatId = chatId;
@@ -694,6 +694,13 @@ ChatRoom.prototype.show = function() {
     var self = this;
 
     self.megaChat.hideAllChats();
+
+    self.messages.forEach(function(v, k) {
+        if(v.seen === false) {
+            v.setSeen(true); // mark all unseen messages as seen
+        }
+    });
+
     self.isCurrentlyActive = true;
 
     self.$header = $('.fm-right-header[data-room-jid="' + this.roomJid.split("@")[0] + '"]');
@@ -859,6 +866,8 @@ ChatRoom.prototype.appendMessage = function(message) {
         return false;
     }
 
+    self.trigger('onMessageAppended', message);
+
     self.messages.push(
         message
     );
@@ -994,6 +1003,7 @@ ChatRoom.prototype.sendMessage = function(message, meta) {
         KarereEventObjects.OutgoingMessage.STATE.NOT_SENT,
         self.roomJid
     );
+    eventObject.orderValue = 99999999999;
 
 
     if (
@@ -1043,7 +1053,7 @@ ChatRoom.prototype._sendMessageToTransport = function(messageObject) {
 
     var messageMeta = messageObject.getMeta() ? messageObject.getMeta() : {};
     if (messageMeta.isDeleted && messageMeta.isDeleted === true) {
-        return false;
+        return MegaPromise.reject();
     }
 
     return megaChat.plugins.chatdIntegration.sendMessage(

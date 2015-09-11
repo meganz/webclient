@@ -327,7 +327,7 @@ var MegaDataMap = function(parent) {
 };
 
 
-MegaDataMap.prototype.set = function(k, v) {
+MegaDataMap.prototype.set = function(k, v, ignoreTrackDataChange) {
 
     if(!k) { debugger; }
 
@@ -359,7 +359,9 @@ MegaDataMap.prototype.set = function(k, v) {
         enumerable: true
     });
 
-    self.trackDataChange([self._data, k, v]);
+    if(!ignoreTrackDataChange) {
+        self.trackDataChange([self._data, k, v]);
+    }
 };
 
 MegaDataMap.prototype.remove = function(k) {
@@ -391,7 +393,7 @@ MegaDataMap.prototype.toJS = _toJS;
  */
 
 var MegaDataSortedMap = function(keyField, sortField, parent) {
-    MegaDataMap.apply(this, parent);
+    MegaDataMap.call(this, parent);
 
     this._keyField = keyField;
     this._sortField = sortField;
@@ -413,22 +415,18 @@ MegaDataSortedMap.prototype.push = function(v) {
         removeValue(self._sortedVals, keyVal, false);
     }
 
-    self._data[keyVal] = v;
+    self.set(keyVal, v, true);
 
     self._sortedVals.push(
         keyVal
     );
 
-    self._reorder();
+    self.reorder();
 
-    var ret = self._sortedVals.length;
-
-    self.trackDataChange([self._data, ret]);
-
-    return ret;
+    return self._sortedVals.length;
 };
 
-MegaDataSortedMap.prototype._reorder = function() {
+MegaDataSortedMap.prototype.reorder = function() {
     var self = this;
 
     self._sortedVals.sort(function(a, b) {
@@ -442,6 +440,8 @@ MegaDataSortedMap.prototype._reorder = function() {
             return 0;
         }
     });
+
+    self.trackDataChange([self._data]);
 };
 
 
@@ -449,7 +449,7 @@ MegaDataSortedMap.prototype.removeByKey = function(keyValue) {
     var self = this;
     if(self._data[keyValue]) {
         removeValue(self._sortedVals, keyValue, false);
-        self._reorder();
+        self.reorder();
         return true;
     } else {
         return false;
@@ -478,6 +478,15 @@ MegaDataSortedMap.prototype.getItem = function(num) {
         return self._data[foundKeyVal];
     } else {
         return undefined;
+    }
+};
+
+MegaDataSortedMap.prototype.remove = function(k) {
+    var self = this;
+    if(removeValue(self._sortedVals, k, false)) {
+        return MegaDataMap.prototype.remove.apply(self, arguments);
+    } else {
+        return false;
     }
 };
 

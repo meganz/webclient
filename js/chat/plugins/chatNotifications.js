@@ -16,7 +16,7 @@ var ChatNotifications = function(megaChat, options) {
     self.notifications = new MegaNotifications(options);
 
     megaChat.rebind("onInit.chatNotifications", function(e) {
-        self.attachToChat(megaChat)
+        self.attachToChat(megaChat);
     });
 
     return this;
@@ -77,7 +77,7 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
                             if(property === "seen" && msg.seen === true) {
                                 n.setUnread(false);
 
-                                message.unbind('onChange.chatNotif');
+                                $(message).unbind('onChange.chatNotif');
                             }
                         });
                     } else if(message.type && message.textMessage && !message.seen) {

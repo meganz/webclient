@@ -22,96 +22,6 @@
 (function (callback) {
 /* jshint ignore:end */
 
-// This code was written by Tyler Akins and has been placed in the
-// public domain.  It would be nice if you left this header intact.
-// Base64 code from Tyler Akins -- http://rumkin.com
-
-(function (root, factory) {
-    if (typeof define === 'function' && define.amd) {
-        define('strophe-base64', function () {
-            return factory();
-        });
-    } else {
-        // Browser globals
-        root.Base64 = factory();
-    }
-}(this, function () {
-    var keyStr = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
-
-    var obj = {
-        /**
-         * Encodes a string in base64
-         * @param {String} input The string to encode in base64.
-         */
-        encode: function (input) {
-            var output = "";
-            var chr1, chr2, chr3;
-            var enc1, enc2, enc3, enc4;
-            var i = 0;
-
-            do {
-                chr1 = input.charCodeAt(i++);
-                chr2 = input.charCodeAt(i++);
-                chr3 = input.charCodeAt(i++);
-
-                enc1 = chr1 >> 2;
-                enc2 = ((chr1 & 3) << 4) | (chr2 >> 4);
-                enc3 = ((chr2 & 15) << 2) | (chr3 >> 6);
-                enc4 = chr3 & 63;
-
-                if (isNaN(chr2)) {
-                    enc2 = ((chr1 & 3) << 4);
-                    enc3 = enc4 = 64;
-                } else if (isNaN(chr3)) {
-                    enc4 = 64;
-                }
-
-                output = output + keyStr.charAt(enc1) + keyStr.charAt(enc2) +
-                    keyStr.charAt(enc3) + keyStr.charAt(enc4);
-            } while (i < input.length);
-
-            return output;
-        },
-
-        /**
-         * Decodes a base64 string.
-         * @param {String} input The string to decode.
-         */
-        decode: function (input) {
-            var output = "";
-            var chr1, chr2, chr3;
-            var enc1, enc2, enc3, enc4;
-            var i = 0;
-
-            // remove all characters that are not A-Z, a-z, 0-9, +, /, or =
-            input = input.replace(/[^A-Za-z0-9\+\/\=]/g, "");
-
-            do {
-                enc1 = keyStr.indexOf(input.charAt(i++));
-                enc2 = keyStr.indexOf(input.charAt(i++));
-                enc3 = keyStr.indexOf(input.charAt(i++));
-                enc4 = keyStr.indexOf(input.charAt(i++));
-
-                chr1 = (enc1 << 2) | (enc2 >> 4);
-                chr2 = ((enc2 & 15) << 4) | (enc3 >> 2);
-                chr3 = ((enc3 & 3) << 6) | enc4;
-
-                output = output + String.fromCharCode(chr1);
-
-                if (enc3 != 64) {
-                    output = output + String.fromCharCode(chr2);
-                }
-                if (enc4 != 64) {
-                    output = output + String.fromCharCode(chr3);
-                }
-            } while (i < input.length);
-
-            return output;
-        }
-    };
-    return obj;
-}));
-
 /*
  * A JavaScript implementation of the Secure Hash Algorithm, SHA-1, as defined
  * in FIPS PUB 180-1
@@ -531,126 +441,32 @@ return {
 */
 
 /* jshint undef: true, unused: true:, noarg: true, latedef: true */
-
-/** PrivateFunction: Function.prototype.bind
- *  Bind a function to an instance.
- *
- *  This Function object extension method creates a bound method similar
- *  to those in Python.  This means that the 'this' object will point
- *  to the instance you want.  See
- *  <a href='https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Function/bind'>MDC's bind() documentation</a> and
- *  <a href='http://benjamin.smedbergs.us/blog/2007-01-03/bound-functions-and-function-imports-in-javascript/'>Bound Functions and Function Imports in JavaScript</a>
- *  for a complete explanation.
- *
- *  This extension already exists in some browsers (namely, Firefox 3), but
- *  we provide it to support those that don't.
- *
- *  Parameters:
- *    (Object) obj - The object that will become 'this' in the bound function.
- *    (Object) argN - An option argument that will be prepended to the
- *      arguments given for the function call
- *
- *  Returns:
- *    The bound function.
- */
-if (!Function.prototype.bind) {
-    Function.prototype.bind = function (obj /*, arg1, arg2, ... */)
-    {
-        var func = this;
-        var _slice = Array.prototype.slice;
-        var _concat = Array.prototype.concat;
-        var _args = _slice.call(arguments, 1);
-
-        return function () {
-            return func.apply(obj ? obj : this,
-                              _concat.call(_args,
-                                           _slice.call(arguments, 0)));
-        };
-    };
-}
-
-/** PrivateFunction: Array.isArray
- *  This is a polyfill for the ES5 Array.isArray method.
- */
-if (!Array.isArray) {
-    Array.isArray = function(arg) {
-        return Object.prototype.toString.call(arg) === '[object Array]';
-    };
-}
-
-/** PrivateFunction: Array.prototype.indexOf
- *  Return the index of an object in an array.
- *
- *  This function is not supplied by some JavaScript implementations, so
- *  we provide it if it is missing.  This code is from:
- *  http://developer.mozilla.org/En/Core_JavaScript_1.5_Reference:Objects:Array:indexOf
- *
- *  Parameters:
- *    (Object) elt - The object to look for.
- *    (Integer) from - The index from which to start looking. (optional).
- *
- *  Returns:
- *    The index of elt in the array or -1 if not found.
- */
-if (!Array.prototype.indexOf)
-    {
-        Array.prototype.indexOf = function(elt /*, from*/)
-        {
-            var len = this.length;
-
-            var from = Number(arguments[1]) || 0;
-            from = (from < 0) ? Math.ceil(from) : Math.floor(from);
-            if (from < 0) {
-                from += len;
-            }
-
-            for (; from < len; from++) {
-                if (from in this && this[from] === elt) {
-                    return from;
-                }
-            }
-
-            return -1;
-        };
-    }
-
-/*
-    This program is distributed under the terms of the MIT license.
-    Please see the LICENSE file for details.
-
-    Copyright 2006-2008, OGG, LLC
-*/
-
-/* jshint undef: true, unused: true:, noarg: true, latedef: true */
 /*global define, document, window, setTimeout, clearTimeout, console, ActiveXObject, DOMParser */
 
 (function (root, factory) {
     if (typeof define === 'function' && define.amd) {
         define('strophe-core', [
             'strophe-sha1',
-            'strophe-base64',
-            'strophe-md5',
-            "strophe-polyfill"
+            'strophe-md5'
         ], function () {
             return factory.apply(this, arguments);
         });
     } else {
         // Browser globals
-        var o = factory(root.SHA1, root.Base64, root.MD5);
+        var o = factory(root.SHA1, root.MD5);
         window.Strophe =        o.Strophe;
         window.$build =         o.$build;
         window.$iq =            o.$iq;
         window.$msg =           o.$msg;
         window.$pres =          o.$pres;
         window.SHA1 =           o.SHA1;
-        window.Base64 =         o.Base64;
         window.MD5 =            o.MD5;
         window.b64_hmac_sha1 =  o.SHA1.b64_hmac_sha1;
         window.b64_sha1 =       o.SHA1.b64_sha1;
         window.str_hmac_sha1 =  o.SHA1.str_hmac_sha1;
         window.str_sha1 =       o.SHA1.str_sha1;
     }
-}(this, function (SHA1, Base64, MD5) {
+}(this, function (SHA1, MD5) {
 
 var Strophe;
 
@@ -670,7 +486,7 @@ function $build(name, attrs) { return new Strophe.Builder(name, attrs); }
 /** Function: $msg
  *  Create a Strophe.Builder with a <message/> element as the root.
  *
- *  Parmaeters:
+ *  Parameters:
  *    (Object) attrs - The <message/> element attributes in object notation.
  *
  *  Returns:
@@ -712,7 +528,7 @@ Strophe = {
      *  The version of the Strophe library. Unreleased builds will have
      *  a version of head-HASH where HASH is a partial revision.
      */
-    VERSION: "1.2.2",
+    VERSION: "1.2.3",
 
     /** Constants: XMPP Namespace Constants
      *  Common namespace constants from the XMPP RFCs and XEPs.
@@ -1074,14 +890,16 @@ Strophe = {
                     var attr = arg[i];
                     if (typeof(attr) == "object" &&
                         typeof(attr.sort) == "function" &&
-                        attr[1] !== undefined) {
+                        attr[1] !== undefined &&
+                        attr[1] !== null) {
                         node.setAttribute(attr[0], attr[1]);
                     }
                 }
             } else if (typeof(arg) == "object") {
                 for (k in arg) {
                     if (arg.hasOwnProperty(k)) {
-                        if (arg[k] !== undefined) {
+                        if (arg[k] !== undefined &&
+                            arg[k] !== null) {
                             node.setAttribute(k, arg[k]);
                         }
                     }
@@ -1608,7 +1426,7 @@ Strophe = {
  *  XML DOM builder.
  *
  *  This object provides an interface similar to JQuery but for building
- *  DOM element easily and rapidly.  All the functions except for toString()
+ *  DOM elements easily and rapidly.  All the functions except for toString()
  *  and tree() return the object, so calls can be chained.  Here's an
  *  example using the $iq() builder helper.
  *  > $iq({to: 'you', from: 'me', type: 'get', id: '1'})
@@ -2197,7 +2015,9 @@ Strophe.Connection = function (service, options)
     this.maxRetries = 5;
 
     // setup onIdle callback every 1/10th of a second
-    this._idleTimeout = setTimeout(this._onIdle.bind(this), 100);
+    this._idleTimeout = setTimeout(function() {
+        this._onIdle();
+    }.bind(this), 100);
 
     // initialize plugins
     for (var k in Strophe._connectionPlugins) {
@@ -2292,12 +2112,16 @@ Strophe.Connection.prototype = {
      *  Returns:
      *    A unique string to be used for the id attribute.
      */
-    getUniqueId: function (suffix)
-    {
+    getUniqueId: function(suffix) {
+        var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            var r = Math.random() * 16 | 0,
+                v = c == 'x' ? r : r & 0x3 | 0x8;
+            return v.toString(16);
+        });
         if (typeof(suffix) == "string" || typeof(suffix) == "number") {
-            return ++this._uniqueId + ":" + suffix;
+            return uuid + ":" + suffix;
         } else {
-            return ++this._uniqueId + "";
+            return uuid + "";
         }
     },
 
@@ -2547,6 +2371,24 @@ Strophe.Connection.prototype = {
     },
     /* jshint unused:true */
 
+    /** Function: nextValidRid
+     *  User overrideable function that receives the new valid rid.
+     *
+     *  The default function does nothing. User code can override this with
+     *  > Strophe.Connection.nextValidRid = function (rid) {
+     *  >    (user code)
+     *  > };
+     *
+     *  Parameters:
+     *    (Number) rid - The next valid rid
+     */
+    /* jshint unused:false */
+    nextValidRid: function (rid)
+    {
+        return;
+    },
+    /* jshint unused:true */
+
     /** Function: send
      *  Send a stanza.
      *
@@ -2706,7 +2548,9 @@ Strophe.Connection.prototype = {
 
         this._proto._sendRestart();
 
-        this._idleTimeout = setTimeout(this._onIdle.bind(this), 100);
+        this._idleTimeout = setTimeout(function() {
+            this._onIdle();
+        }.bind(this), 100);
     },
 
     /** Function: addTimedHandler
@@ -3186,7 +3030,7 @@ Strophe.Connection.prototype = {
 
         if (this._sasl_mechanism.isClientFirst) {
           var response = this._sasl_mechanism.onChallenge(this, null);
-          request_auth_exchange.t(Base64.encode(response));
+          request_auth_exchange.t(btoa(response));
         }
 
         this.send(request_auth_exchange.tree());
@@ -3222,14 +3066,14 @@ Strophe.Connection.prototype = {
     },
 
     _sasl_challenge_cb: function(elem) {
-      var challenge = Base64.decode(Strophe.getText(elem));
+      var challenge = atob(Strophe.getText(elem));
       var response = this._sasl_mechanism.onChallenge(this, challenge);
 
       var stanza = $build('response', {
           xmlns: Strophe.NS.SASL
       });
       if (response !== "") {
-        stanza.t(Base64.encode(response));
+        stanza.t(btoa(response));
       }
       this.send(stanza.tree());
 
@@ -3290,7 +3134,7 @@ Strophe.Connection.prototype = {
     {
         if (this._sasl_data["server-signature"]) {
             var serverSignature;
-            var success = Base64.decode(Strophe.getText(elem));
+            var success = atob(Strophe.getText(elem));
             var attribMatch = /([a-z]+)=([^,]+)(,|$)/;
             var matches = success.match(attribMatch);
             if (matches[1] == "v") {
@@ -3635,7 +3479,9 @@ Strophe.Connection.prototype = {
 
         // reactivate the timer only if connected
         if (this.connected) {
-            this._idleTimeout = setTimeout(this._onIdle.bind(this), 100);
+            this._idleTimeout = setTimeout(function() {
+                this._onIdle();
+            }.bind(this), 100);
         }
     }
 };
@@ -3881,7 +3727,7 @@ Strophe.SASLSHA1.prototype.onChallenge = function(connection, challenge, test_cn
     responseText += "r=" + nonce;
     authMessage += responseText;
 
-    salt = Base64.decode(salt);
+    salt = atob(salt);
     salt += "\x00\x00\x00\x01";
 
     Hi = U_old = SHA1.core_hmac_sha1(connection.pass, salt);
@@ -3903,7 +3749,7 @@ Strophe.SASLSHA1.prototype.onChallenge = function(connection, challenge, test_cn
       clientKey[k] ^= clientSignature[k];
     }
 
-    responseText += ",p=" + Base64.encode(SHA1.binb2str(clientKey));
+    responseText += ",p=" + btoa(SHA1.binb2str(clientKey));
 
     return responseText;
   }.bind(this);
@@ -4011,7 +3857,6 @@ return {
     $iq:            $iq,
     $pres:          $pres,
     SHA1:           SHA1,
-    Base64:         Base64,
     MD5:            MD5,
 };
 }));
@@ -4235,6 +4080,8 @@ Strophe.Bosh.prototype = {
         this.sid = null;
         this.errors = 0;
         window.sessionStorage.removeItem('strophe-bosh-session');
+
+        this._conn.nextValidRid(this.rid);
     },
 
     /** PrivateFunction: _connect
@@ -4347,7 +4194,7 @@ Strophe.Bosh.prototype = {
                    session.rid &&
                    session.sid &&
                    session.jid &&
-                   (typeof jid === "undefined" || Strophe.getBareJidFromJid(session.jid) == Strophe.getBareJidFromJid(jid)))
+                   (typeof jid === "undefined" || jid === "null" || Strophe.getBareJidFromJid(session.jid) == Strophe.getBareJidFromJid(jid)))
         {
             this._conn.restored = true;
             this._attach(session.jid, session.sid, session.rid, callback, wait, hold, wind);
@@ -4440,6 +4287,8 @@ Strophe.Bosh.prototype = {
         this.sid = null;
         this.rid = Math.floor(Math.random() * 4294967295);
         window.sessionStorage.removeItem('strophe-bosh-session');
+
+        this._conn.nextValidRid(this.rid);
     },
 
     /** PrivateFunction: _emptyQueue
@@ -4650,6 +4499,9 @@ Strophe.Bosh.prototype = {
                      this._requests[0].age() > Math.floor(Strophe.SECONDARY_TIMEOUT * this.wait))) {
                     this._restartRequest(0);
                 }
+
+                this._conn.nextValidRid(Number(req.rid) + 1);
+
                 // call handler
                 Strophe.debug("request id " +
                               req.id + "." +
@@ -4778,7 +4630,9 @@ Strophe.Bosh.prototype = {
                 // expanding retry window
                 var backoff = Math.min(Math.floor(Strophe.TIMEOUT * this.wait),
                                        Math.pow(req.sends, 3)) * 1000;
-                setTimeout(sendFunc, backoff);
+                setTimeout(function() {
+                    sendFunc();
+                }, backoff);
             } else {
                 sendFunc();
             }
@@ -4897,7 +4751,9 @@ Strophe.Bosh.prototype = {
     _send: function () {
         clearTimeout(this._conn._idleTimeout);
         this._throttledRequestHandler();
-        this._conn._idleTimeout = setTimeout(this._conn._onIdle.bind(this._conn), 100);
+        this._conn._idleTimeout = setTimeout(function() {
+            this._onIdle();
+        }.bind(this._conn), 100);
     },
 
     /** PrivateFunction: _sendRestart
@@ -5233,7 +5089,7 @@ Strophe.Websocket.prototype = {
             if (pres) {
                 this._conn.send(pres);
             }
-            var close = $build("close", { "xmlns": Strophe.NS.FRAMING, });
+            var close = $build("close", { "xmlns": Strophe.NS.FRAMING });
             this._conn.xmlOutput(close);
             var closeString = Strophe.serialize(close);
             this._conn.rawOutput(closeString);

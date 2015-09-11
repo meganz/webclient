@@ -1,7 +1,7 @@
 
 var ul_maxSpeed = 0;
 var uldl_hold = false;
-var ul_skipIdentical = 0;
+var ul_skipIdentical = 1;
 var ul_maxSlots = readLocalStorage('ul_maxSlots', 'int', { min:1, max:6, def:4 });
 
 if (localStorage.ul_maxSpeed) {

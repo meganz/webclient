@@ -3203,7 +3203,7 @@ function accountUI()
 
         $('.settings-logout').bind('click', function()
         {
-			mLogout();
+            mLogout();
         });
 
         $('.account-history-dropdown-button.purchases').text(l[469].replace('[X]', $.purchaselimit));
@@ -4099,39 +4099,6 @@ function handleResetSuccessDialogs(dialog, txt, dlgString) {
     $.dialog = dlgString;
 }
 
-function acc_checkpassword(pass)
-{
-    if ((pass == 'Password') || (pass == ''))
-    {
-        document.getElementById('acc_pwstatus_text').innerHTML = '';
-        document.getElementById('acc_pwstatus').className = 'register-pass-status-block account';
-        return false;
-    }
-    var strength = checkPassword(pass);
-    if (strength <= 25)
-    {
-        document.getElementById('acc_pwstatus_text').innerHTML = l[220];
-        document.getElementById('acc_pwstatus').className = 'register-pass-status-block account good1';
-    }
-    else if (strength <= 50)
-    {
-        document.getElementById('acc_pwstatus_text').innerHTML = l[221];
-        document.getElementById('acc_pwstatus').className = 'register-pass-status-block account good2';
-    }
-    else if (strength <= 75)
-    {
-        document.getElementById('acc_pwstatus_text').innerHTML = l[222];
-        document.getElementById('acc_pwstatus').className = 'register-pass-status-block account good3';
-    }
-    else
-    {
-        document.getElementById('acc_pwstatus_text').innerHTML = l[223];
-        document.getElementById('acc_pwstatus').className = 'register-pass-status-block account good1 good4';
-    }
-}
-
-var imageCrop;
-
 function avatarDialog(close)
 {
     if (close)
@@ -4147,7 +4114,7 @@ function avatarDialog(close)
     $('.avatar-body').html('<div id="avatarcrop"><div class="image-upload-and-crop-container"><div class="image-explorer-container empty"><div class="image-explorer-image-view"><img class="image-explorer-source"><div class="avatar-white-bg"></div><div class="image-explorer-mask circle-mask"></div><div class="image-explorer-drag-delegate"></div></div><div class="image-explorer-scale-slider-wrapper"><input class="image-explorer-scale-slider disabled" type="range" min="0" max="100" step="1" value="0" disabled=""></div></div><div class="fm-notifications-bottom"><input type="file" id="image-upload-and-crop-upload-field" class="image-upload-field" accept="image/jpeg, image/gif, image/png"><label for="image-upload-and-crop-upload-field" class="image-upload-field-replacement fm-account-change-avatar"><span>' + l[1016] + '</span></label><div class="fm-account-change-avatar" id="fm-change-avatar"><span>' + l[1017] + '</span></div><div  class="fm-account-change-avatar" id="fm-cancel-avatar"><span>Cancel</span></div><div class="clear"></div></div></div></div>');
     $('#fm-change-avatar').hide();
     $('#fm-cancel-avatar').hide();
-    imageCrop = new ImageUploadAndCrop($("#avatarcrop").find('.image-upload-and-crop-container'),
+    var imageCrop = new ImageUploadAndCrop($("#avatarcrop").find('.image-upload-and-crop-container'),
         {
             cropButton: $('#fm-change-avatar'),
             dragDropUploadPrompt:l[1390],
@@ -6566,7 +6533,9 @@ function sectionUIopen(id) {
     }
 
     if (id === 'conversations') {
-        $.fah_abort_timer = setTimeout(fa_handler.abort, 2000);
+        $.fah_abort_timer = setTimeout(function() {
+            fa_handler.abort();
+        }, 2000);
     }
 }
 

@@ -46,11 +46,11 @@ function startMega() {
     }
 
     if (pages['dialogs']) {
-        $('body').append(translate(pages['dialogs'].replace(/{staticpath}/g, staticpath)));
+        $('body').safeAppend(translate(pages['dialogs'].replace(/{staticpath}/g, staticpath)));
         delete pages['dialogs'];
     }
     if (pages['chat']) {
-        $('body').append(translate(pages['chat'].replace(/{staticpath}/g, staticpath)));
+        $('body').safeAppend(translate(pages['chat'].replace(/{staticpath}/g, staticpath)));
         delete pages['chat'];
     }
     jsl = [];
@@ -746,6 +746,7 @@ function init_page() {
             html += e.outerHTML;
         });
         $('.credits-main-pad').html(html + '<div class="clear"></div>');
+        mainScroll();
     }
     else if (page == 'firefox') {
         parsepage(pages['firefox']);
@@ -802,7 +803,7 @@ function init_page() {
                 M.currentdirid = id;
             }
             if (!m && $('#fmholder').html() == '') {
-                $('#fmholder').html(translate(pages['fm'].replace(/{staticpath}/g, staticpath)));
+                $('#fmholder').safeHTML(translate(pages['fm'].replace(/{staticpath}/g, staticpath)));
             }
             if (pfid) {
                 $('.fm-left-menu .folderlink').removeClass('hidden');
@@ -846,7 +847,7 @@ function init_page() {
                 termsDialog();
             }
         }
-        $('#topmenu').html(parsetopmenu());
+        $('#topmenu').safeHTML(parsetopmenu());
 
         $('.feedback-button')
             .removeClass("hidden")
@@ -1015,7 +1016,8 @@ function tooltiplogin() {
         $('.top-login-input-block.password').addClass('incorrect');
     }
     else {
-        $('.top-dialog-login-button span').html('<img alt="" src="' + staticpath + 'images/mega/ajax-loader.gif">');
+        $('.top-dialog-login-button span')
+            .safeHTML('<img alt="" src="@@images/mega/ajax-loader.gif">', staticpath);
         $('.top-dialog-login-button').addClass('loading');
         if ($('.loginwarning-checkbox').attr('class').indexOf('checkboxOn') > -1) {
             localStorage.hideloginwarning = 1;
@@ -1025,7 +1027,7 @@ function tooltiplogin() {
             remember = 1;
         }
         postLogin($('#login-name').val(), $('#login-password').val(), remember, function (r) {
-            $('.top-dialog-login-button span').html(l[171]);
+            $('.top-dialog-login-button span').text(l[171]);
             $('.top-dialog-login-button').removeClass('loading');
             if (r == EBLOCKED) {
                 alert(l[730]);
@@ -1064,7 +1066,7 @@ function topmenuUI() {
     $('.top-menu-item.clouddrive,.top-menu-item.account').hide();
     $('.top-menu-item.refresh-item').addClass('hidden');
     $('.activity-status,.activity-status-block').hide();
-    $('.membership-status-block').html('<div class="membership-status free">' + l[435] + '</div>');
+    $('.membership-status-block').safeHTML('<div class="membership-status free">@@</div>', l[435]);
     $('.membership-status').hide();
     $('.top-head .user-name').hide();
 
@@ -1117,7 +1119,8 @@ function topmenuUI() {
 
             $('.membership-icon-pad .membership-big-txt.red').text(purchasedPlan);
             $('.membership-icon-pad .membership-icon').attr('class', 'membership-icon pro' + u_attr.p);
-            $('.membership-status-block').html('<div class="membership-status ' + cssClass + '">' + purchasedPlan + '</div>');
+            $('.membership-status-block')
+                .safeHTML('<div class="membership-status @@">@@</div>', cssClass, purchasedPlan);
             $('.context-menu-divider.upgrade-your-account').addClass('pro');
             $('.membership-popup.pro-popup');
         }
@@ -1126,7 +1129,7 @@ function topmenuUI() {
             $('.top-menu-item.upgrade-your-account,.context-menu-divider.upgrade-your-account').show();
             $('.context-menu-divider.upgrade-your-account').removeClass('pro lite');
             $('.membership-status').addClass('free');
-            $('.membership-status').html(l[435]);
+            $('.membership-status').text(l[435]);
         }
 
         $('.membership-status').show();
@@ -1176,7 +1179,7 @@ function topmenuUI() {
                 }
                 header = htmlentities(header);
 
-                $('.top-warning-popup .warning-popup-body').html(
+                $('.top-warning-popup .warning-popup-body').safeHTML(
                     '<div class="warning-header">' + header.trim() + '</div>' + body.trim()
                 );
                 $('.top-warning-popup .warning-button span').text(l[779]);
@@ -1367,9 +1370,11 @@ function topmenuUI() {
                     var planName = getProPlan(planNum);
 
                     $('.membership-popup.pro-popup .membership-icon').addClass('pro' + planNum);
-                    var p = account.stype == 'S' ? '' :
-                        (l[987] + ' <span class="red">' + time2date(account.expiry) + '</span>');
-                    $('.membership-popup.pro-popup .membership-icon-txt-bl .membership-medium-txt').html(p);
+                    var p = '';
+                    if (account.stype !== 'S') {
+                        p = escapeHTML(l[987]) + ' <span class="red">' + time2date(account.expiry) + '</span>';
+                    }
+                    $('.membership-popup.pro-popup .membership-icon-txt-bl .membership-medium-txt').safeHTML(p);
 
                     // Update current plan to PRO I, PRO II, PRO III or LITE in popup
                     $('.membership-icon-pad .membership-big-txt.red').text(planName);
@@ -1382,8 +1387,8 @@ function topmenuUI() {
                 if (account.balance
                         && account.balance[0]
                         && account.balance[0][0] > 0) {
-                    $('.membership-popup .membership-price-txt .membership-big-txt').html('&euro; ' +
-                        htmlentities(account.balance[0][0]));
+                    $('.membership-popup .membership-price-txt .membership-big-txt')
+                        .safeHTML('&euro; @@', account.balance[0][0]);
                 }
                 else {
                     $('.membership-popup .membership-price-txt .membership-big-txt').html('&euro; 0.00');
@@ -1395,7 +1400,8 @@ function topmenuUI() {
                 }
                 $('.membership-popup .membership-circle-bg.blue-circle').attr('class',
                     'membership-circle-bg blue-circle percents-' + perc_c);
-                $('.membership-popup .membership-circle-bg.blue-circle').html(perc + '<span class="membership-small-txt">%</span>');
+                $('.membership-popup .membership-circle-bg.blue-circle')
+                    .safeHTML(perc + '<span class="membership-small-txt">%</span>');
                 var b1 = bytesToSize(account.space_used);
                 b1 = b1.split(' ');
                 b1[0] = Math.round(b1[0]) + ' ';
@@ -1431,7 +1437,7 @@ function topmenuUI() {
                     usedspacetxt = l[799].charAt(0).toLowerCase() + l[799].slice(1);
                 }
 
-                $('.membership-usage-txt.storage').html('<div class="membership-big-txt">' +
+                $('.membership-usage-txt.storage').safeHTML('<div class="membership-big-txt">' +
                     usedspace + '</div><div class="membership-medium-txt">' + usedspacetxt +
                     warning + '</div>');
 
@@ -1448,7 +1454,8 @@ function topmenuUI() {
 
                 $('.membership-popup .membership-circle-bg.green-circle')
                     .attr('class', 'membership-circle-bg green-circle percents-' + perc_c);
-                $('.membership-popup .membership-circle-bg.green-circle').html(perc + '<span class="membership-small-txt">%</span>');
+                $('.membership-popup .membership-circle-bg.green-circle')
+                    .safeHTML(perc + '<span class="membership-small-txt">%</span>');
                 var b1 = bytesToSize(account.servbw_used + account.downbw_used);
                 b1 = b1.split(' ');
                 b1[0] = Math.round(b1[0]) + ' ';
@@ -1495,7 +1502,7 @@ function topmenuUI() {
                     usedbwtxt = l[973].charAt(0).toLowerCase() + l[973].slice(1);
                 }
 
-                $('.membership-usage-txt.bandwidth').html('<div class="membership-big-txt">' +
+                $('.membership-usage-txt.bandwidth').safeHTML('<div class="membership-big-txt">' +
                     usedbw + '</div><div class="membership-medium-txt">' + usedbwtxt + warning + '</div>');
 
                 if (perc > 80) {
@@ -1762,7 +1769,7 @@ function parsepage(pagehtml, pp) {
     pagehtml = pagehtml.replace("((MEGAINFO))", translate(pages['megainfo']).replace(/{staticpath}/g, staticpath));
     pagehtml = pagehtml.replace("((TOP))", top);
     pagehtml = pagehtml.replace("((BOTTOM))", translate(bmenu2));
-    $('#startholder').html(translate(pages['transferwidget']) + pagehtml);
+    $('#startholder').safeHTML(translate(pages['transferwidget']) + pagehtml);
     $('#startholder').show();
     mainScroll();
     $(window).rebind('resize.subpage', function (e) {
@@ -1898,7 +1905,7 @@ function languageDialog(close) {
         }
     }
     html += '</div><div class="clear"></div>';
-    $('.languages-dialog-body').html(html);
+    $('.languages-dialog-body').safeHTML(html);
     $('.fm-dialog.languages-dialog').removeClass('hidden');
     $('.fm-dialog-overlay').removeClass('hidden');
     $('body').addClass('overlayed');

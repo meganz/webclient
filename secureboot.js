@@ -205,8 +205,12 @@ if (!b_u && is_extension)
     {
         bootstaticpath = 'chrome://mega/content/';
         urlrootfile = 'secure.html';
-        if (d) staticpath = bootstaticpath;
-          else staticpath = 'https://eu.static.mega.co.nz/3/';
+        if (d > 1) {
+            staticpath = bootstaticpath;
+        }
+        else {
+            staticpath = 'https://eu.static.mega.co.nz/3/';
+        }
         try {
             loadSubScript(bootstaticpath + 'fileapi.js');
         } catch(e) {
@@ -438,7 +442,9 @@ var mBroadcaster = {
             this.listen(setup);
             this.notify('ping');
 
-            setTimeout(setup, !parseInt(localStorage.ctInstances) ? 0 : 2000);
+            setTimeout(function() {
+                setup();
+            }, !parseInt(localStorage.ctInstances) ? 0 : 2000);
         },
 
         listen: function crossTab_listen(aListener) {
@@ -720,6 +726,7 @@ if (m)
     link.type = 'text/css';
     link.href = staticpath + 'css/mobile-app.css';
     document.head.appendChild(link);
+    // AMO: Markup should not be passed to `innerHTML` dynamically. -- This isnt reached for the extension, anyway
     document.body.innerHTML = '<div class="main-scroll-block"> <div class="main-content-block"> <div class="free-green-tip"></div><div class="main-centered-bl"><div class="main-logo"></div><div class="main-head-txt" id="m_title"></div><div class="main-txt" id="m_desc"></div><a href="" class="main-button" id="m_appbtn"></a><div class="main-social hidden"><a href="https://www.facebook.com/MEGAprivacy" class="main-social-icon facebook"></a><a href="https://www.twitter.com/MEGAprivacy" class="main-social-icon twitter"></a><div class="clear"></div></div></div> </div><div class="scrolling-content"><div class="mid-logo"></div> <div class="mid-gray-block">MEGA provides free cloud storage with convenient and powerful always-on privacy </div> <div class="scrolling-block-icon encription"></div> <div class="scrolling-block-header"> End-to-end encryption </div> <div class="scrolling-block-txt">Unlike other cloud storage providers, your data is encrypted & decrypted during transfer by your client devices only and never by us. </div> <div class="scrolling-block-icon access"></div> <div class="scrolling-block-header"> Secure Global Access </div> <div class="scrolling-block-txt">Your data is accessible any time, from any device, anywhere. Only you control the keys to your files.</div> <div class="scrolling-block-icon colaboration"></div> <div class="scrolling-block-header"> Secure Collaboration </div> <div class="scrolling-block-txt">Share folders with your contacts and see their updates in real time. Online collaboration has never been more private and secure.</div> <div class="bottom-menu full-version"><div class="copyright-txt">Mega Limited ' + new Date().getFullYear() + '</div><div class="language-block"></div><div class="clear"></div><iframe src="" width="1" height="1" frameborder="0" style="width:1px; height:1px; border:none;" id="m_iframe"></iframe></div></div></div>';
     if (window.location.hash.substr(1,4) == 'blog') mobileblog=1;
     if (ua.indexOf('windows phone') > -1 /*&& ua.indexOf('iemobile') > -1*/)
@@ -813,10 +820,7 @@ if (m)
     if (mobileblog)
     {
         document.body.innerHTML = '';
-        var script = document.createElement('script');
-        script.type = "text/javascript";
-        document.head.appendChild(script);
-        script.src = '/blog.js';
+        mCreateElement('script', {type: 'text/javascript'}, 'head').src = '/blog.js';
     }
 }
 else if (page == '#android')
@@ -951,7 +955,7 @@ else if (!b_u)
 
             __cdumps.push(dump);
             if (__cd_t) clearTimeout(__cd_t);
-            __cd_t = setTimeout(safeCall(function()
+            var report = safeCall(function()
             {
                 function ctx(id)
                 {
@@ -1004,8 +1008,10 @@ else if (!b_u)
                 }
                 __cd_t = 0;
                 __cdumps = [];
-
-            }), 3000);
+            });
+            __cd_t = setTimeout(function() {
+                report();
+            }, 3000);
 
             return false;
         };
@@ -1378,7 +1384,6 @@ else if (!b_u)
 
     if (jj)
     {
-        var headElement = document.querySelector("head");
         var _queueWaitToBeLoaded = function(id, elem) {
             waitingToBeLoaded++;
             elem.onload = function() {
@@ -1386,27 +1391,23 @@ else if (!b_u)
                 if (--waitingToBeLoaded == 0) {
                     jj_done = true;
                     boot_done();
-                    _queueWaitToBeLoaded = headElement = undefined;
+                    _queueWaitToBeLoaded = createScriptTag = createStyleTag = undefined;
                 }
                 elem.onload = null;
             };
         };
 
         var createScriptTag = function(id, src) {
-            var elem = document.createElement("script");
-            _queueWaitToBeLoaded(id, elem);
+            var elem = mCreateElement('script', {type: 'text/javascript'}, 'head');
             elem.async = false;
+            _queueWaitToBeLoaded(id, elem);
             elem.src = src;
-            headElement.appendChild(elem);
             return elem;
         };
         var createStyleTag = function(id, src) {
-            var elem = document.createElement("link");
-            elem.rel = "stylesheet";
-            elem.type = "text/css";
+            var elem = mCreateElement('link', {type: 'text/css', rel: "stylesheet"}, 'head');
             _queueWaitToBeLoaded(id, elem);
             elem.href = src;
-            headElement.appendChild(elem);
             return elem;
         };
 
@@ -1714,6 +1715,7 @@ else if (!b_u)
         }
         else
         {
+            // AMO Warning: Use of `document.write` strongly discouraged -- This isnt reached for the extension, anyway
             document.write('<link rel="stylesheet" type="text/css" href="' + staticpath + 'css/mobile-android.css" /><div class="overlay"></div><div class="new-folder-popup" id="message"><div class="new-folder-popup-bg"><div class="new-folder-header">MEGA for Android</div><div class="new-folder-main-bg"><div class="new-folder-descr">Do you want to install the latest<br/> version of the MEGA app for Android?</div><a class="new-folder-input left-button" id="trashbinYes"> <span class="new-folder-bg1"> <span class="new-folder-bg2" id="android_yes"> Yes </span> </span></a><a class="new-folder-input right-button" id="trashbinNo"> <span class="new-folder-bg1"> <span class="new-folder-bg2" id="android_no">No </span> </span></a><div class="clear"></div></div></div></div></div>');
             document.getElementById('android_yes').addEventListener("click", function ()
             {
@@ -1836,17 +1838,20 @@ else if (!b_u)
 
 /**
  * Determines whether to show an ad or not
- * @returns {Number} Returns a 0 for no ads, 1 will enable ads dependant on country, 2 will always show ads
+ * @returns {Number} Returns a 0 for definitely no ads (e.g. I am using an extension). 1 will enable ads dependant on 
+ *                   country. 2 ignores country limitations (for developers to always see ads regardless). 3 means I 
+ *                   prefer not to see an ad because I am logged in, but it will send one if it is a trusted ad that we 
+ *                   have vetted (we fully control the ad and host it ourselves) and ads are turned on in the API.
  */
 function showAd() {
 
-    // We need to tell the API we would like ad urls, but only if we are not logged in
-    var showAd = (typeof u_sid === 'undefined') ? 1 : 0;
+    // We need to tell the API we would like ad urls, but only show generic ads from providers if we are not logged in
+    var showAd = (typeof u_sid === 'undefined') ? 1 : 3;
 
-    // If using a browser extension, do not show ads
+    // If using a browser extension, do not show ads at all for our security conscious users
     showAd = (is_extension) ? 0 : showAd;
 
-    // Override for testing, 0 for no ads, 1 is normal (enabled dependant on country), 2 is ads always on
+    // Override for testing
     showAd = (typeof localStorage.testAds === 'undefined') ? showAd : parseInt(localStorage.testAds);
 
     return showAd;

@@ -1119,8 +1119,6 @@ function chksum(buf) {
     return d;
 }
 
-/* moved from js/keygen.js {{{ */
-
 // random number between 0 .. n -- based on repeated calls to rc
 function rand(n) {
     var r = new Uint32Array(1);
@@ -3269,7 +3267,11 @@ function api_fareq(res, ctx, xhr) {
                         if (this.fart) {
                             clearTimeout(this.fart);
                         }
-                        this.fart = setTimeout(this.faeot.bind(this), this.fa_timeout);
+                        var xhr = this;
+                        this.fart = setTimeout(function() {
+                            xhr.faeot();
+                            xhr = undefined;
+                        }, this.fa_timeout);
                     }
 
                     if (this.fah.parse && this.response) {

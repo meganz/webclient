@@ -89,11 +89,9 @@ var crypt = (function () {
         }
 
         // Make the promise to execute the API code.
-        var pubKeyPromise;
+        var masterPromise = new MegaPromise();
 
         if (keyType === 'RSA') {
-            pubKeyPromise = new MegaPromise();
-
             var myCtx = {};
             /** Function to settle the promise for the RSA pub key attribute. */
             var __settleFunction = function(res) {
@@ -101,12 +99,12 @@ var crypt = (function () {
                     var pubKey = crypto_decodepubkey(base64urldecode(res.pubk));
                     logger.debug('Got ' + keyType + ' pub key of user '
                                  + userhandle + ': ' + JSON.stringify(pubKey));
-                    pubKeyPromise.resolve(pubKey);
+                    masterPromise.resolve(pubKey);
                 }
                 else {
                     logger.error(keyType + ' pub key for ' + userhandle
                                  + ' could not be retrieved: ' + res);
-                    pubKeyPromise.reject(res);
+                    masterPromise.reject(res);
                 }
             };
 
@@ -118,17 +116,18 @@ var crypt = (function () {
             api_req({ 'a': 'uk', 'u': userhandle }, myCtx);
         }
         else {
-            pubKeyPromise = getUserAttribute(userhandle,
+            var pubKeyPromise = getUserAttribute(userhandle,
                                              _PUBKEY_ATTRIBUTE_MAPPING[keyType],
                                              true, false);
             pubKeyPromise.done(function(result) {
                 result = base64urldecode(result);
                 _getPubKeyCacheMapping(keyType)[userhandle] = result;
                 logger.debug('Got ' + keyType + ' pub key of user ' + userhandle + '.');
+                masterPromise.resolve(result);
             });
         }
 
-        return pubKeyPromise;
+        return masterPromise;
     };
 
 
@@ -245,7 +244,7 @@ var crypt = (function () {
 
         // Some things we need to progress.
         var pubKeyCache = _getPubKeyCacheMapping(keyType);
-        var authMethod = ns._getPubKeyAuthentication(userhandle, keyType);
+        var authMethod;
         var newAuthMethod;
 
         // Get out quickly if the key is cached.
@@ -277,6 +276,7 @@ var crypt = (function () {
         getPubKeyPromise.done(function __resolvePubKey(result) {
             var pubKey = result;
             pubKeyCache[userhandle] = pubKey;
+            authMethod = ns._getPubKeyAuthentication(userhandle, keyType);
             var fingerprint = authring.computeFingerprint(pubKey, keyType, 'string');
             if (keyType === 'Ed25519') {
                 // Treat Ed25519 pub keys.
@@ -4248,7 +4248,7 @@ function u_initAuthentication2(res, ctx) {
             setUserAttribute('puEd255', base64urlencode(u_pubEd25519), true, false);
         }
     };
-    getUserAttribute(u_handle, "puEd255", true, false, __pubEd255Success);
+    getUserAttribute(u_handle, "puEd255", true, false, __puEd255Success);
 
     // Check for Curve25519 private key.
     if (typeof u_keyring.prCu255 !== 'undefined') {

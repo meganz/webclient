@@ -23172,7 +23172,8 @@ div.fm-dialog.feedback-dialog .checkboxOff {
 .credentials-warning-dialog .instruction .accept {
     color: #31B500;
     font-weight: bold;
-}/* Key signature mismatch warning dialog */
+}
+/* Key signature mismatch warning dialog */
 .key-signature-warning-button {
 	left: 50%;
 	position: absolute;
@@ -23219,6 +23220,9 @@ div.fm-dialog.feedback-dialog .checkboxOff {
 }
 .key-signature-warning-dialog .information .emailAddress {
 	color: #000;
+}
+.key-signature-warning-dialog .information .description {
+    color: #000000;
 }
 .key-signature-warning-dialog .userAvatar img {
 	height: 90px;

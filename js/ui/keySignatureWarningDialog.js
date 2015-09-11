@@ -72,12 +72,23 @@
 
         // Change wording to seen or verified
         var infoFirstLine = l[7585];
+        var contactEmail = KeySignatureWarningDialog.contactHandle;
+        if (M.u[KeySignatureWarningDialog.contactHandle]) {
+            contactEmail = M.u[KeySignatureWarningDialog.contactHandle].m;
+        }
         infoFirstLine = infoFirstLine.replace('%1', KeySignatureWarningDialog.keyType);
         infoFirstLine = infoFirstLine.replace('%2', '<span class="emailAddress">'
-                      + KeySignatureWarningDialog.contactEmail + '</span>');
+                      + contactEmail + '</span>');
 
         $dialog = $('.key-signature-warning-dialog');
         $dialog.find('.information .firstLine').html(infoFirstLine);
+
+        var description = l[7586];
+        description = description.replace('%1', '<span class="emailAddress">'
+                      + contactEmail + '</span>');
+        description = description.replace('[A]', '<a href="mailto:support@mega.nz">');
+        description = description.replace('[/A]', '</a>');
+        $dialog.find('.information .description').html(description);
 
         // If the avatar exists, show it
         if (typeof avatars[KeySignatureWarningDialog.contactHandle] !== 'undefined') {

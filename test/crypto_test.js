@@ -30,8 +30,7 @@ describe("crypto unit test", function() {
         describe('_getPubKeyAattribute()', function() {
             it("RSA key", function() {
                 sandbox.stub(ns._logger, '_log');
-                var rootPromise = { then: sinon.stub(),
-                                    resolve: sinon.stub() };
+                var rootPromise = { resolve: sinon.stub() };
                 sandbox.stub(window, 'MegaPromise').returns(rootPromise);
                 var pubKey = 'the key';
                 sandbox.stub(window, 'crypto_decodepubkey').returns(pubKey);
@@ -75,16 +74,18 @@ describe("crypto unit test", function() {
 
             it("Cu25519 key", function() {
                 sandbox.stub(ns._logger, '_log');
-                var rootPromise = { done: sinon.stub() };
-                sandbox.stub(window, 'getUserAttribute').returns(rootPromise);
+                var rootPromise = { resolve: sinon.stub() };
+                sandbox.stub(window, 'MegaPromise').returns(rootPromise);
+                var attributePromise = { done: sinon.stub() };
+                sandbox.stub(window, 'getUserAttribute').returns(attributePromise);
                 sandbox.stub(window, 'base64urldecode', _echo);
 
                 var result = ns._getPubKeyAttribute('you456789xw', 'Cu25519');
                 assert.strictEqual(result, rootPromise);
                 assert.strictEqual(getUserAttribute.callCount, 1);
-                assert.strictEqual(result.done.callCount, 1);
+                assert.strictEqual(attributePromise.done.callCount, 1);
 
-                var settleFunction = result.done.args[0][0];
+                var settleFunction = attributePromise.done.args[0][0];
                 settleFunction('the key');
                 assert.strictEqual(ns._logger._log.args[0][1][0],
                                    'Got Cu25519 pub key of user you456789xw.');
@@ -92,16 +93,18 @@ describe("crypto unit test", function() {
 
             it("Ed25519 key", function() {
                 sandbox.stub(ns._logger, '_log');
-                var rootPromise = { done: sinon.stub() };
-                sandbox.stub(window, 'getUserAttribute').returns(rootPromise);
+                var rootPromise = { resolve: sinon.stub() };
+                sandbox.stub(window, 'MegaPromise').returns(rootPromise);
+                var attributePromise = { done: sinon.stub() };
+                sandbox.stub(window, 'getUserAttribute').returns(attributePromise);
                 sandbox.stub(window, 'base64urldecode', _echo);
 
                 var result = ns._getPubKeyAttribute('you456789xw', 'Ed25519');
                 assert.strictEqual(result, rootPromise);
                 assert.strictEqual(getUserAttribute.callCount, 1);
-                assert.strictEqual(result.done.callCount, 1);
+                assert.strictEqual(attributePromise.done.callCount, 1);
 
-                var settleFunction = result.done.args[0][0];
+                var settleFunction = attributePromise.done.args[0][0];
                 settleFunction('the key');
                 assert.strictEqual(ns._logger._log.args[0][1][0],
                                    'Got Ed25519 pub key of user you456789xw.');
@@ -185,11 +188,9 @@ describe("crypto unit test", function() {
                 sandbox.stub(window, 'pubEd25519', { 'you456789xw': 'the key' });
                 var masterPromise = { resolve: sinon.stub() };
                 sandbox.stub(window, 'MegaPromise').returns(masterPromise);
-                sandbox.stub(ns, '_getPubKeyAuthentication').returns(authring.AUTHENTICATION_METHOD.SEEN);
 
                 var result = ns.getPubKey('you456789xw', 'Ed25519');
                 assert.strictEqual(result, masterPromise);
-                assert.strictEqual(ns._getPubKeyAuthentication.callCount, 1);
                 assert.strictEqual(masterPromise.resolve.callCount, 1);
                 assert.deepEqual(masterPromise.resolve.args[0], ['the key']);
                 assert.deepEqual(pubEd25519, { 'you456789xw': 'the key' });
@@ -203,11 +204,9 @@ describe("crypto unit test", function() {
                                       done: sinon.stub() };
                 sandbox.stub(window, 'MegaPromise').returns(masterPromise);
                 var callback = sinon.stub();
-                sandbox.stub(ns, '_getPubKeyAuthentication').returns(authring.AUTHENTICATION_METHOD.SEEN);
 
                 var result = ns.getPubKey('you456789xw', 'Ed25519', callback);
                 assert.strictEqual(result, masterPromise);
-                assert.strictEqual(ns._getPubKeyAuthentication.callCount, 1);
                 assert.strictEqual(masterPromise.resolve.callCount, 1);
                 assert.deepEqual(masterPromise.resolve.args[0], ['the key']);
                 assert.deepEqual(pubEd25519, { 'you456789xw': 'the key' });
@@ -258,11 +257,11 @@ describe("crypto unit test", function() {
 
                 var result = ns.getPubKey('you456789xw', 'Ed25519');
                 assert.strictEqual(result, masterPromise);
-                assert.strictEqual(ns._getPubKeyAuthentication.callCount, 1);
                 assert.strictEqual(pubKeyPromise.done.callCount, 1);
 
                 var pubKeyCallback = pubKeyPromise.done.args[0][0];
                 pubKeyCallback('the key');
+                assert.strictEqual(ns._getPubKeyAuthentication.callCount, 1);
                 assert.strictEqual(authring.computeFingerprint.callCount, 1);
                 assert.strictEqual(masterPromise.resolve.callCount, 1);
                 assert.deepEqual(masterPromise.resolve.args[0], ['the key']);
@@ -285,11 +284,11 @@ describe("crypto unit test", function() {
 
                 var result = ns.getPubKey('you456789xw', 'Ed25519');
                 assert.strictEqual(result, masterPromise);
-                assert.strictEqual(ns._getPubKeyAuthentication.callCount, 1);
                 assert.strictEqual(pubKeyPromise.done.callCount, 1);
 
                 var pubKeyCallback = pubKeyPromise.done.args[0][0];
                 pubKeyCallback('the key');
+                assert.strictEqual(ns._getPubKeyAuthentication.callCount, 1);
                 assert.strictEqual(authring.computeFingerprint.callCount, 2);
                 assert.strictEqual(masterPromise.resolve.callCount, 1);
                 assert.deepEqual(masterPromise.resolve.args[0], ['the key']);
@@ -312,11 +311,11 @@ describe("crypto unit test", function() {
 
                 var result = ns.getPubKey('you456789xw', 'Ed25519');
                 assert.strictEqual(result, masterPromise);
-                assert.strictEqual(ns._getPubKeyAuthentication.callCount, 1);
                 assert.strictEqual(pubKeyPromise.done.callCount, 1);
 
                 var pubKeyCallback = pubKeyPromise.done.args[0][0];
                 pubKeyCallback('the key');
+                assert.strictEqual(ns._getPubKeyAuthentication.callCount, 1);
                 assert.strictEqual(authring.computeFingerprint.callCount, 1);
                 assert.strictEqual(ns._showFingerprintMismatchException.callCount, 1);
                 assert.strictEqual(masterPromise.linkFailTo.callCount, 1);
@@ -358,7 +357,6 @@ describe("crypto unit test", function() {
 
                 var result = ns.getPubKey('you456789xw', 'Cu25519');
                 assert.strictEqual(result, masterPromise);
-                assert.strictEqual(ns._getPubKeyAuthentication.callCount, 1);
                 assert.strictEqual(ns._getPubKeyAttribute.callCount, 1);
                 assert.strictEqual(pubKeyPromise.done.callCount, 1);
                 assert.strictEqual(ns.getPubKey.callCount, 2);
@@ -372,6 +370,7 @@ describe("crypto unit test", function() {
                 var pubKeyPromiseCallback = pubKeyPromise.done.args[0][0];
                 pubKeyPromiseCallback('the key');
                 assert.deepEqual(pubCu25519, { 'you456789xw': 'the key' });
+                assert.strictEqual(ns._getPubKeyAuthentication.callCount, 1);
                 assert.strictEqual(authring.computeFingerprint.callCount, 1);
 
                 var signatureVerificationCallback = signatureVerificationPromise.done.args[0][0];
@@ -416,7 +415,6 @@ describe("crypto unit test", function() {
 
                 var result = ns.getPubKey('you456789xw', 'Cu25519');
                 assert.strictEqual(result, masterPromise);
-                assert.strictEqual(ns._getPubKeyAuthentication.callCount, 1);
                 assert.strictEqual(ns._getPubKeyAttribute.callCount, 1);
                 assert.strictEqual(pubKeyPromise.done.callCount, 1);
                 assert.strictEqual(ns.getPubKey.callCount, 2);
@@ -430,6 +428,7 @@ describe("crypto unit test", function() {
                 var pubKeyPromiseCallback = pubKeyPromise.done.args[0][0];
                 pubKeyPromiseCallback('the key');
                 assert.deepEqual(pubCu25519, { 'you456789xw': 'the key' });
+                assert.strictEqual(ns._getPubKeyAuthentication.callCount, 1);
                 assert.strictEqual(authring.computeFingerprint.callCount, 1);
 
                 var signatureVerificationCallback = signatureVerificationPromise.done.args[0][0];
@@ -475,7 +474,6 @@ describe("crypto unit test", function() {
 
                 var result = ns.getPubKey('you456789xw', 'Cu25519');
                 assert.strictEqual(result, masterPromise);
-                assert.strictEqual(ns._getPubKeyAuthentication.callCount, 1);
                 assert.strictEqual(ns._getPubKeyAttribute.callCount, 1);
                 assert.strictEqual(pubKeyPromise.done.callCount, 1);
                 assert.strictEqual(ns.getPubKey.callCount, 2);
@@ -489,6 +487,7 @@ describe("crypto unit test", function() {
                 var pubKeyPromiseCallback = pubKeyPromise.done.args[0][0];
                 pubKeyPromiseCallback('the key');
                 assert.deepEqual(pubCu25519, { 'you456789xw': 'the key' });
+                assert.strictEqual(ns._getPubKeyAuthentication.callCount, 1);
                 assert.strictEqual(authring.computeFingerprint.callCount, 1);
 
                 var signatureVerificationCallback = signatureVerificationPromise.done.args[0][0];
@@ -536,7 +535,6 @@ describe("crypto unit test", function() {
 
                 var result = ns.getPubKey('you456789xw', 'Cu25519');
                 assert.strictEqual(result, masterPromise);
-                assert.strictEqual(ns._getPubKeyAuthentication.callCount, 1);
                 assert.strictEqual(ns._getPubKeyAttribute.callCount, 1);
                 assert.strictEqual(pubKeyPromise.done.callCount, 1);
                 assert.strictEqual(ns.getPubKey.callCount, 2);
@@ -550,6 +548,7 @@ describe("crypto unit test", function() {
                 var pubKeyPromiseCallback = pubKeyPromise.done.args[0][0];
                 pubKeyPromiseCallback('the key');
                 assert.deepEqual(pubCu25519, { 'you456789xw': 'the key' });
+                assert.strictEqual(ns._getPubKeyAuthentication.callCount, 1);
                 assert.strictEqual(authring.computeFingerprint.callCount, 1);
 
                 var signatureVerificationCallback = signatureVerificationPromise.done.args[0][0];
@@ -598,7 +597,6 @@ describe("crypto unit test", function() {
 
                 var result = ns.getPubKey('you456789xw', 'Cu25519');
                 assert.strictEqual(result, masterPromise);
-                assert.strictEqual(ns._getPubKeyAuthentication.callCount, 1);
                 assert.strictEqual(ns._getPubKeyAttribute.callCount, 1);
                 assert.strictEqual(pubKeyPromise.done.callCount, 1);
                 assert.strictEqual(ns.getPubKey.callCount, 2);
@@ -612,6 +610,7 @@ describe("crypto unit test", function() {
                 var pubKeyPromiseCallback = pubKeyPromise.done.args[0][0];
                 pubKeyPromiseCallback('the key');
                 assert.deepEqual(pubCu25519, { 'you456789xw': 'the key' });
+                assert.strictEqual(ns._getPubKeyAuthentication.callCount, 1);
                 assert.strictEqual(authring.computeFingerprint.callCount, 1);
 
                 var signatureVerificationCallback = signatureVerificationPromise.done.args[0][0];
@@ -659,7 +658,6 @@ describe("crypto unit test", function() {
 
                 var result = ns.getPubKey('you456789xw', 'Cu25519');
                 assert.strictEqual(result, masterPromise);
-                assert.strictEqual(ns._getPubKeyAuthentication.callCount, 1);
                 assert.strictEqual(ns._getPubKeyAttribute.callCount, 1);
                 assert.strictEqual(pubKeyPromise.done.callCount, 1);
                 assert.strictEqual(ns.getPubKey.callCount, 2);
@@ -673,6 +671,7 @@ describe("crypto unit test", function() {
                 var pubKeyPromiseCallback = pubKeyPromise.done.args[0][0];
                 pubKeyPromiseCallback('the key');
                 assert.deepEqual(pubCu25519, { 'you456789xw': 'the key' });
+                assert.strictEqual(ns._getPubKeyAuthentication.callCount, 1);
                 assert.strictEqual(authring.computeFingerprint.callCount, 1);
 
                 var signatureVerificationCallback = signatureVerificationPromise.done.args[0][0];
@@ -720,7 +719,6 @@ describe("crypto unit test", function() {
 
                 var result = ns.getPubKey('you456789xw', 'Cu25519');
                 assert.strictEqual(result, masterPromise);
-                assert.strictEqual(ns._getPubKeyAuthentication.callCount, 1);
                 assert.strictEqual(ns._getPubKeyAttribute.callCount, 1);
                 assert.strictEqual(pubKeyPromise.done.callCount, 1);
                 assert.strictEqual(ns.getPubKey.callCount, 2);
@@ -734,6 +732,7 @@ describe("crypto unit test", function() {
                 var pubKeyPromiseCallback = pubKeyPromise.done.args[0][0];
                 pubKeyPromiseCallback('the key');
                 assert.deepEqual(pubCu25519, { 'you456789xw': 'the key' });
+                assert.strictEqual(ns._getPubKeyAuthentication.callCount, 1);
                 assert.strictEqual(authring.computeFingerprint.callCount, 1);
 
                 var signatureVerificationCallback = signatureVerificationPromise.done.args[0][0];

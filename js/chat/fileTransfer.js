@@ -27,8 +27,11 @@ FileTransferManager.prototype.createDownloadHandler = function(sid, peerJid, fil
     if (this.downloads[sid])
         throw new Error("Assertion failed: download with the specified sid already exists");
     var result = this.downloads[sid] = new DownloadHandler(this, sid, peerJid, files);
-    if (!this._timer)
-        this._timer = setInterval(this._onTimer.bind(this), 1000);
+    if (!this._timer) {
+        this._timer = setInterval(function() {
+            this._onTimer();
+        }.bind(this), 1000);
+    }
     return result;
 }
 
@@ -36,8 +39,11 @@ FileTransferManager.prototype.createUploadHandler = function(sid, peerJid, files
     if (this.uploads[sid])
         throw new Error("Assertion failed: upload with the specified sid already exists");
     var result = this.uploads[sid] = new UploadHandler(this, sid, peerJid, files);
-    if (!this._timer)
-        this._timer = setInterval(this._onTimer.bind(this), 1000);
+    if (!this._timer) {
+        this._timer = setInterval(function() {
+            this._onTimer();
+        }.bind(this), 1000);
+    }
     return result;
 }
 
@@ -346,7 +352,9 @@ UploadHandler.prototype.onopen = function() {
     if (!this._sess)
         this.error("Could not find session object after data channel connected");
     this._state = FTSTATE_READY_NEXT_FILE;
-    this._timer = setInterval(this.onTimer.bind(this), 1000);
+    this._timer = setInterval(function() {
+        this.onTimer();
+    }.bind(this), 1000);
     this.nextFile();
 }
 

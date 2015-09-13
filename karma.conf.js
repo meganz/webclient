@@ -190,9 +190,8 @@ module.exports = function(config) {
     customLaunchers: {
         'PhantomJS2_custom': {
             base: 'PhantomJS2',
-            // Works with PhantomJS 1.9.8 (on Linux), but seems to need
-            // PhantomJS 2.0 for Windows
-            flags: ['--local-storage-path=./test/phantomjs-storage']
+            // web-security is disabled to allow `Worker('data:...')`
+            flags: ['--local-storage-path=./test/phantomjs-storage', '--web-security=false']
         }
     },
 

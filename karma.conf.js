@@ -33,9 +33,9 @@ module.exports = function(config) {
         'js/jquery.checkboxes.js',
 
         // == Libraries ==
-        'js/asmcrypto.js',
-        'js/jsbn.js',
-        'js/jsbn2.js',
+        'js/vendor/asmcrypto.js',
+        'js/vendor/jsbn.js',
+        'js/vendor/jsbn2.js',
         'js/vendor/nacl-fast.js',
         // For notifications.
         'js/vendor/ion.sound.js',
@@ -62,7 +62,7 @@ module.exports = function(config) {
         // Other.
         'js/vendor/Autolinker.js',
         'js/vendor/qrcode.js',
-        'js/bitcoin-math.js',
+        'js/vendor/bitcoin-math.js',
         'js/vendor/db.js',
 
         // == Test helpers and test configuration ==
@@ -86,11 +86,11 @@ module.exports = function(config) {
         'js/filedrag.js',
         'js/mDB.js',
         'js/thumbnail.js',
-        'js/exif.js',
-        'js/megapix.js',
-        'js/smartcrop.js',
+        'js/vendor/exif.js',
+        'js/vendor/megapix.js',
+        'js/vendor/smartcrop.js',
         'js/filetypes.js',
-        'js/miniui.js',
+        'js/ui/miniui.js',
         'js/ui/filepicker.js',
         'js/ui/dialog.js',
         'js/ui/feedbackDialog.js',
@@ -98,12 +98,12 @@ module.exports = function(config) {
         'js/ui/loginRequiredDialog.js',
         'js/notify.js',
         'js/megaNotifications.js',
-        'js/avatar.js',
+        'js/vendor/avatar.js',
         'js/countries.js',
         'js/megaDbEncryptionPlugin.js',
         'js/megaDb.js',
         'js/megaKvStorage.js',
-        'js/Int64.js',
+        'js/vendor/Int64.js',
         'js/zip64.js',
         'js/cms.js',
         // Google Import Contacts

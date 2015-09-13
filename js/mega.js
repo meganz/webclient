@@ -4100,12 +4100,38 @@ function MegaData()
 
     var __ul_id = 8000;
     this.addUpload = function(u, ignoreWarning) {
+        var flag = 'ulMegaSyncAD';
 
-        /*if (u.length > 99 && !ignoreWarning) {
-            if (ulmanager.warning(M.addUpload.bind(M, u, true))) {
-                return;
-            }
-        }*/
+        if (u.length > 99 && !ignoreWarning && !localStorage[flag]) {
+            $('.megasync-upload-overlay').show();
+            $('.megasync-overlay-continue, .fm-dialog-close').rebind('click', function() {
+                $('.megasync-upload-overlay').hide();
+                M.addUpload(u, true);
+                $(document).unbind('keyup.megasync-upload');
+            });
+            $(document).rebind('keyup.megasync-upload', function(evt) {
+                $('.megasync-upload-overlay').hide();
+                M.addUpload(u, true);
+                $(document).unbind('keyup.megasync-upload');
+            });
+            $('.megasync-overlay-download').rebind('click', function() {
+                $('.megasync-upload-overlay').hide();
+                location.hash = '#sync';
+                $(document).unbind('keyup.megasync-upload');
+            });
+            var $chk = $('.megasync-upload-overlay .checkdiv');
+            $chk.rebind('click.dialog', function() {
+                if ($chk.hasClass('checkboxOff')) {
+                    $chk.removeClass('checkboxOff').addClass('checkboxOn');
+                    localStorage[flag] = 1;
+                }
+                else {
+                    $chk.removeClass('checkboxOn').addClass('checkboxOff');
+                    delete localStorage[flag];
+                }
+            });
+            return;
+        }
         var target;
         var onChat;
         var filesize;

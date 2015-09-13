@@ -2531,14 +2531,14 @@ function MegaData()
     };
 
     /**
-     * Invite contacts using email address, also known as ongoing pending contacts
+     * Invite contacts using email address, also known as ongoing pending contacts.
      * This uses API 2.0
      *
-     * @param {email} owner
-     * @param {email} target
-     * @param {string} msg
-     *
-     *
+     * @param {String} owner, account owner email address.
+     * @param {String} target, target email address.
+     * @param {String} msg, optional custom text message.
+     * @returns {Integer} proceed, API response code, if negative something is wrong
+     * look at API response code table.
      */
     this.inviteContact = function(owner, target, msg) {
         DEBUG('inviteContact');
@@ -4758,14 +4758,13 @@ function renderNew() {
  */
 function execsc(actionPackets, callback) {
 
-    var tparentid = false;
-    var trights = false;
-    var tmoveid = false;
-    var rootsharenodes = [];
-    var async_procnodes = [];
-    var async_treestate = [];
-
-    var loadavatars = false;
+    var tparentid = false,
+        trights = false,
+        tmoveid = false,
+        rootsharenodes = [],
+        async_procnodes = [],
+        async_treestate = [],
+        loadavatars = false;
 
     newnodes = [];
 
@@ -4800,6 +4799,23 @@ function execsc(actionPackets, callback) {
                 }
             }
 
+            // Full share
+            else if (actionPacket.a === 's') {
+                
+                // Used during share dialog removal of contact from share list
+                // Find out is this a full share delete
+                if (actionPacket.r === undefined) {
+                    
+                    // Fill DDL with removed contact
+                    if (actionPacket.u) {
+                        var email = M.u[actionPacket.u].m;
+                        
+                        addToMultiInputDropDownList('.share-multiple-input', [{id: email, name: email}]);
+                        addToMultiInputDropDownList('.add-contact-multiple-input', [{id: email, name: email}]);
+                    }
+                }
+            }
+            
             // Outgoing pending contact
             else if (actionPacket.a === 'opc') {
                 processOPC([actionPacket]);
@@ -4848,7 +4864,7 @@ function execsc(actionPackets, callback) {
                     }
                 }
             }
-        }
+        }// END own action packet
         else if (actionPacket.a === 'e') {
             var str = hex2bin(actionPacket.c || "");
             if (str.substr(0, 5) === ".cms.") {
@@ -5763,18 +5779,36 @@ function __process_f2(f, cb, tick)
  *
  */
 function processIPC(ipc, ignoreDB) {
+    
     DEBUG('processIPC');
+    
     for (var i in ipc) {
-        M.addIPC(ipc[i], ignoreDB);
-        if (ipc[i].dts) {
-            M.delIPC(ipc[i].p);
-            $('#ipc_' + ipc[i].p).remove();
-            delete M.ipc[ipc[i].p];
-            if ((Object.keys(M.ipc).length === 0) && (M.currentdirid === 'ipc')) {
-                $('.contact-requests-grid').addClass('hidden');
-                $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[6196]);
-                $('.fm-empty-contacts').removeClass('hidden');
+        if (ipc.hasOwnProperty(i)) {
+            
+            // Update ipc status
+            M.addIPC(ipc[i], ignoreDB);
+            
+            // Deletion of incomming pending contact request, user who sent request, canceled it
+            if (ipc[i].dts) {
+                M.delIPC(ipc[i].p);
+                $('#ipc_' + ipc[i].p).remove();
+                delete M.ipc[ipc[i].p];
+                if ((Object.keys(M.ipc).length === 0) && (M.currentdirid === 'ipc')) {
+                    $('.contact-requests-grid').addClass('hidden');
+                    $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[6196]);
+                    $('.fm-empty-contacts').removeClass('hidden');
+                }
+                
+                // Update token.input plugin
+                removeFromMultiInputDDL('.share-multiple-input', {id: ipc[i].m, name: ipc[i].m});
+                removeFromMultiInputDDL('.add-contact-multiple-input', {id: ipc[i].m, name: ipc[i].m});
             }
+            else {
+                
+                // Update token.input plugin
+                addToMultiInputDropDownList('.share-multiple-input', [{id: ipc[i].m, name: ipc[i].m}]);
+                addToMultiInputDropDownList('.add-contact-multiple-input', [{id: ipc[i].m, name: ipc[i].m}]);
+            }            
         }
     }
 }
@@ -5786,17 +5820,19 @@ function processIPC(ipc, ignoreDB) {
  *
  */
 function processOPC(opc, ignoreDB) {
+    
     DEBUG('processOPC');
+    
     for (var i in opc) {
         M.addOPC(opc[i], ignoreDB);
         if (opc[i].dts) {
             M.delOPC(opc[i].p);
 
             // Update tokenInput plugin
-            if ($('.add-contact-multiple-input')) {
-                $('.add-contact-multiple-input').tokenInput("removeContact", {id: opc[i].m}, '.add-contact-multiple-input');
-            }
-        } else {
+            removeFromMultiInputDDL('.share-multiple-input', { id: opc[i].m, name: opc[i].m });
+            removeFromMultiInputDDL('.add-contact-multiple-input', { id: opc[i].m, name: opc[i].m });
+        }
+        else {
             // Search through M.opc to find duplicated e-mail with .dts
             // If found remove deleted opc
             // And update sent-request grid
@@ -5812,10 +5848,10 @@ function processOPC(opc, ignoreDB) {
                     break;
                 }
             }
+            
             // Update tokenInput plugin
-            if ($('.add-contact-multiple-input')) {
-                $('.add-contact-multiple-input').tokenInput("add", {id: opc[i].m, name: opc[i].m});
-            }
+            addToMultiInputDropDownList('.share-multiple-input', [{ id: opc[i].m, name: opc[i].m }]);
+            addToMultiInputDropDownList('.add-contact-multiple-input', [{ id: opc[i].m, name: opc[i].m }]);
         }
     }
 }
@@ -5826,20 +5862,25 @@ function processOPC(opc, ignoreDB) {
  * @param {array.<JSON_objects>} pending shares
  */
 function processPS(pendingShares, ignoreDB) {
+    
     DEBUG('processPS');
     var ps;
 
     for (var i in pendingShares) {
         if (pendingShares.hasOwnProperty(i)) {
             ps = pendingShares[i];
-            if (ps.h) {// From gettree
+            
+            // From gettree
+            if (ps.h) {
                 M.addPS(ps, ignoreDB);
             }
-            else {// Situation different from gettree, s2 from API response, doesn't have .h attr instead have .n
-                var nodeHandle = ps.n;
-                var pendingContactId = ps.p;
-                var shareRights = ps.r;
-                var timeStamp = ps.ts;
+            
+            // Situation different from gettree, s2 from API response, doesn't have .h attr instead have .n
+            else {
+                var nodeHandle = ps.n,
+                    pendingContactId = ps.p,
+                    shareRights = ps.r,
+                    timeStamp = ps.ts;
 
                 // shareRights is undefined when user denies pending contact request
                 // .op is available when user accepts pending contact request and
@@ -5848,10 +5889,17 @@ function processPS(pendingShares, ignoreDB) {
 
                     M.delPS(pendingContactId, nodeHandle);
 
-                    if (ps.op) {// Upgrade pending share to full share
+                    if (ps.op) {
                         M.nodeShare(nodeHandle, ps);
                     }
-                } else {
+                    
+                    if (M.opc && M.opc[ps.p]) {
+                        // Update tokenInput plugin
+                        addToMultiInputDropDownList('.share-multiple-input', [{id: M.opc[pendingContactId].m, name: M.opc[pendingContactId].m}]);
+                        addToMultiInputDropDownList('.add-contact-multiple-input', {id: M.opc[pendingContactId].m, name: M.opc[pendingContactId].m});
+                    }
+                }
+                else {
 
                     // Add the pending share to state
                     M.addPS({'h':nodeHandle, 'p':pendingContactId, 'r':shareRights, 'ts':timeStamp}, ignoreDB);
@@ -5886,35 +5934,48 @@ function processUPCI(ap) {
 }
 
 /**
- * Handle upco response, upco, pending contact request updated (for whom it's outgoing)
- * @param {array.<JSON_objects>} ap (actionpackets)
+ * processUPCO
+ * 
+ * Handle upco response, upco, pending contact request updated (for whom it's outgoing).
+ * @param {Array} ap (actionpackets) <JSON_objects>.
  */
 function processUPCO(ap) {
+    
     DEBUG('processUPCO');
+    
     var psid = '';// pending id
+    
+    // Loop through action packets
     for (var i in ap) {
-        if (ap[i].s) {
-            psid = ap[i].p;
-            delete M.opc[psid];
-            delete M.ipc[psid];
-            M.delOPC(psid);
-            M.delIPC(psid);
+        if (ap.hasOwnProperty(i)) {
+            
+            // Have status of pending share
+            if (ap[i].s) {
+                
+                psid = ap[i].p;
+                delete M.opc[psid];
+                delete M.ipc[psid];
+                M.delOPC(psid);
+                M.delIPC(psid);
 
-            for (var k in M.ps) {
-                if (M.ps.hasOwnProperty(k)) {
-                    M.delPS(psid, k);
+                // Delete all matching pending shares
+                for (var k in M.ps) {
+                    if (M.ps.hasOwnProperty(k)) {
+                        M.delPS(psid, k);
+                    }
                 }
-            }
 
-            // Update token.input plugin
-            if ($('.add-contact-multiple-input')) {
-                $('.add-contact-multiple-input').tokenInput("removeContact", {id: ap[i].m}, '.add-contact-multiple-input');
-            }
-            $('#opc_' + psid).remove();
-            if ((Object.keys(M.opc).length === 0) && (M.currentdirid === 'opc')) {
-                $('.sent-requests-grid').addClass('hidden');
-                $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[6196]);
-                $('.fm-empty-contacts').removeClass('hidden');
+                // Update tokenInput plugin
+                removeFromMultiInputDDL('.share-multiple-input', { id: ap[i].m, name: ap[i].m });
+                removeFromMultiInputDDL('.add-contact-multiple-input', { id: ap[i].m, name: ap[i].m });
+                $('#opc_' + psid).remove();
+                
+                // Update sent contact request tab, set empty message with Add contact... button
+                if ((Object.keys(M.opc).length === 0) && (M.currentdirid === 'opc')) {
+                    $('.sent-requests-grid').addClass('hidden');
+                    $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[6196]); // No requests pending at this time
+                    $('.fm-empty-contacts').removeClass('hidden');
+                }
             }
         }
     }
@@ -5922,26 +5983,28 @@ function processUPCO(ap) {
 
 function process_u(u) {
     for (var i in u) {
-        if (u[i].c === 1) {
-            u[i].name = u[i].m;
-            u[i].h = u[i].u;
-            u[i].t = 1;
-            u[i].p = 'contacts';
-            M.addNode(u[i]);
+        if (u.hasOwnProperty(i)) {
+            if (u[i].c === 1) {
+                u[i].name = u[i].m;
+                u[i].h = u[i].u;
+                u[i].t = 1;
+                u[i].p = 'contacts';
+                M.addNode(u[i]);
 
-            // Update token.input plugin
-            if ($('.add-contact-multiple-input')) {
-                $('.add-contact-multiple-input').tokenInput("add", {id: u[i].m, name: u[i].m});
+                // Update token.input plugin
+                addToMultiInputDropDownList('.share-multiple-input', [{id: u[i].m, name: u[i].m}]);
+                addToMultiInputDropDownList('.add-contact-multiple-input', [{id: u[i].m, name: u[i].m}]);
             }
-        } else if (M.d[u[i].u]) {
-            M.delNode(u[i].u);
+            else if (M.d[u[i].u]) {
+                M.delNode(u[i].u);
 
-            // Update token.input plugin
-            if ($('.add-contact-multiple-input')) {
-                $('.add-contact-multiple-input').tokenInput("removeContact", {id: u[i].m}, '.add-contact-multiple-input');
+                // Update token.input plugin
+                removeFromMultiInputDDL('.share-multiple-input', {id: u[i].m, name: u[i].m});
+                removeFromMultiInputDDL('.add-contact-multiple-input', {id: u[i].m, name: u[i].m});
             }
+            
+            M.addUser(u[i]);
         }
-        M.addUser(u[i]);
     }
 
     //if (megaChat && megaChat.karere && megaChat.karere.getConnectionState() === Karere.CONNECTION_STATE.CONNECTED) {

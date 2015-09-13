@@ -1072,15 +1072,15 @@ else if (!b_u)
     jsl.push({f: langFilepath, n: 'lang', j:3});
     jsl.push({f:'sjcl.js', n: 'sjcl_js', j:1}); // Will be replaced with asmCrypto soon
     jsl.push({f:'js/mDB.js', n: 'mDB_js', j:1});
-    jsl.push({f:'js/asmcrypto.js',n:'asmcrypto_js',j:1,w:1});
+    jsl.push({f:'js/vendor/asmcrypto.js',n:'asmcrypto_js', j:1, w:1});
     jsl.push({f:'js/vendor/jquery-2.1.4.js', n: 'jquery', j:1, w:10});
     jsl.push({f:'js/functions.js', n: 'functions_js', j:1});
     jsl.push({f:'js/mega.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/vendor/megaLogger.js', n: 'megaLogger_js', j:1});
     jsl.push({f:'js/tlvstore.js', n: 'tlvstore_js', j:1});
     jsl.push({f:'js/crypto.js', n: 'crypto_js', j:1,w:5});
-    jsl.push({f:'js/jsbn.js', n: 'jsbn_js', j:1,w:2});
-    jsl.push({f:'js/jsbn2.js', n: 'jsbn2_js', j:1,w:2});
+    jsl.push({f:'js/vendor/jsbn.js', n: 'jsbn_js', j:1, w:2});
+    jsl.push({f:'js/vendor/jsbn2.js', n: 'jsbn2_js', j:1, w:2});
     jsl.push({f:'js/vendor/nacl-fast.js', n: 'nacl_js', j:1,w:7});
     jsl.push({f:'js/megaPromise.js', n: 'megapromise_js', j:1,w:5});
     jsl.push({f:'js/account.js', n: 'user_js', j:1});
@@ -1096,12 +1096,12 @@ else if (!b_u)
     jsl.push({f:'js/jquery.checkboxes.js', n: 'checkboxes_js', j:1});
     jsl.push({f:'js/jquery.misc.js', n: 'jquerymisc_js', j:1});
     jsl.push({f:'js/thumbnail.js', n: 'thumbnail_js', j:1});
-    jsl.push({f:'js/exif.js', n: 'exif_js', j:1,w:3});
-    jsl.push({f:'js/megapix.js', n: 'megapix_js', j:1});
-    jsl.push({f:'js/smartcrop.js', n: 'smartcrop_js', j:1,w:7});
+    jsl.push({f:'js/vendor/exif.js', n: 'exif_js', j:1, w:3});
+    jsl.push({f:'js/vendor/megapix.js', n: 'megapix_js', j:1});
+    jsl.push({f:'js/vendor/smartcrop.js', n: 'smartcrop_js', j:1, w:7});
     jsl.push({f:'js/jquery.qrcode.js', n: 'jqueryqrcode', j:1});
     jsl.push({f:'js/vendor/qrcode.js', n: 'qrcode', j:1,w:2, g: 'vendor'});
-    jsl.push({f:'js/bitcoin-math.js', n: 'bitcoinmath', j:1 });
+    jsl.push({f:'js/vendor/bitcoin-math.js', n: 'bitcoinmath', j:1 });
     jsl.push({f:'js/paycrypt.js', n: 'paycrypt_js', j:1 });
     jsl.push({f:'js/vendor/db.js', n: 'db_js', j:1,w:5});
     jsl.push({f:'js/megaDbEncryptionPlugin.js', n: 'megadbenc_js', j:1,w:5});
@@ -1173,10 +1173,10 @@ else if (!b_u)
 
     jsl.push({f:'js/fm.js', n: 'fm_js', j:1,w:12});
     jsl.push({f:'js/filetypes.js', n: 'filetypes_js', j:1});
-    jsl.push({f:'js/miniui.js', n: 'miniui_js', j:1});
+    jsl.push({f:'js/ui/miniui.js', n: 'miniui_js', j:1});
     if (is_extension)
     {
-        jsl.push({f:'js/dcraw.js', n: 'dcraw_js', j:1});
+        jsl.push({f:'js/vendor/dcraw.js', n: 'dcraw_js', j:1});
     }
     /* better download */
     jsl.push({f:'js/xhr.js', n: 'xhr_js', j:1});
@@ -1213,11 +1213,11 @@ else if (!b_u)
     jsl.push({f:'js/vendor/popunda.js', n: 'popunda_js', j:1});
     jsl.push({f:'css/style.css', n: 'style_css', j:2,w:30,c:1,d:1,cache:1});
     jsl.push({f:'js/useravatar.js', n: 'contact_avatar_js', j:1,w:3});
-    jsl.push({f:'js/avatar.js', n: 'avatar_js', j:1,w:3});
+    jsl.push({f:'js/vendor/avatar.js', n: 'avatar_js', j:1, w:3});
     jsl.push({f:'js/countries.js', n: 'countries_js', j:1});
     jsl.push({f:'html/dialogs.html', n: 'dialogs', j:0,w:2});
     jsl.push({f:'html/transferwidget.html', n: 'transferwidget', j:0});
-    jsl.push({f:'js/Int64.js', n: 'int64_js', j:1});
+    jsl.push({f:'js/vendor/Int64.js', n: 'int64_js', j:1});
     jsl.push({f:'js/zip64.js', n: 'zip_js', j:1});
     jsl.push({f:'js/cms.js', n: 'cms_js', j:1});
     jsl.push({f:'js/megasync.js', n: 'megasync_js', j:1});
@@ -1250,7 +1250,7 @@ else if (!b_u)
         'cancel_js': {f:'html/js/cancel.js', n: 'cancel_js', j:1},
         'reset': {f:'html/reset.html', n: 'reset', j:0},
         'reset_js': {f:'html/js/reset.js', n: 'reset_js', j:1},
-        'filesaver': {f:'js/filesaver.js', n: 'filesaver', j:1},
+        'filesaver': {f:'js/vendor/filesaver.js', n: 'filesaver', j:1},
         'recovery': {f:'html/recovery.html', n: 'recovery', j:0},
         'recovery_js': {f:'html/js/recovery.js', n: 'recovery_js', j:1},
         'credits': {f:'html/credits.html', n: 'credits', j:0},
@@ -1266,7 +1266,7 @@ else if (!b_u)
         'contact': {f:'html/contact.html', n: 'contact', j:0},
         'privacycompany': {f:'html/privacycompany.html', n: 'privacycompany', j:0},
         'chrome': {f:'html/chrome.html', n: 'chrome', j:0},
-        'zxcvbn_js': {f:'js/zxcvbn.js', n: 'zxcvbn_js', j:1}
+        'zxcvbn_js': {f:'js/vendor/zxcvbn.js', n: 'zxcvbn_js', j:1}
     };
 
     var subpages =

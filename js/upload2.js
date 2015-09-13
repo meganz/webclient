@@ -172,52 +172,6 @@ var ulmanager = {
         chunk.done(); /* release worker */
     },
 
-    warning: function UM_warning(success) {
-        var lsProp = 'umQWarning';
-        if (localStorage[lsProp]) {
-            return false;
-        }
-
-        mega.ui.Dialog.generic({
-            'title': 'Upload Warning',
-            'notAgainTag': lsProp,
-            'success': success
-        }, function($content, $title, dialog) {
-            dialog.$dialog.css('height', '560px');
-            var path = staticpath + 'images/products/';
-            var retina = /*(window.devicePixelRatio > 1) ? '-2x' :*/ '';
-            var msg = 'We strongly suggest using our sync client for vastly improved performance uploading hundred of files.';
-            var os_class = browserdetails(ua).os;
-            if (os_class === 'Apple') {
-                os_class = 'Mac';
-            }
-            var os_file = 'https://mega.nz/MEGAsyncSetup.exe';
-            if (os_class === 'Mac') {
-                os_file = 'https://mega.nz/MEGAsyncSetup.dmg';
-            }
-            else if (os_class === 'Linux') {
-                os_file = '/#sync';
-            }
-            var inlineStyle =
-                'background:#D9D8D8;padding:8px 14px;text-align:center;border-radius:4px;max-width:300px';
-            var syncButton =
-                '<div><a href="' + os_file + '" class="sync-button button0 ' + os_class.toLowerCase() + '">' +
-                    '<span class="sync-button-txt">' + l[1157] + '</span>' +
-                    '<span class="sync-button-txt small">' + l[1158].replace('Windows', os_class) + '</span>' +
-                '</a></div>';
-
-            $content.html(
-                '<div style="' + inlineStyle + '">' +
-                    '<div><b>' + msg + '</b></div>' +
-                    '<div><img src="' + path + 'sync-client' + retina + '.gif"/><br/>' + syncButton + '</div>' +
-                    '<hr/>' +
-                    '<div>Would you like to continue anyway?</div>' +
-                '</div>');
-        });
-
-        return true;
-    },
-
     isReady: function UM_isReady(Task) /* unused */ {
         return !Task.file.paused || Task.__retry;
     },

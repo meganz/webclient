@@ -9952,7 +9952,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	float: left;
 	width: 106px;
 	height: 75px;
-	background-image: url(../images/mega/download-sprite-v2.png);
+	background-image: url(../images/mega/download-sprite-v3.png);
 	background-position: -78px -998px;
 	background-repeat: no-repeat;
 }
@@ -9970,7 +9970,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	color: #7d7d7d;
 	margin-top: 8px;
 	cursor: pointer;
-	background-image: url(../images/mega/download-sprite-v2.png);
+	background-image: url(../images/mega/download-sprite-v3.png);
 	background-position: -243px -596px;
 	padding-left: 22px;
 	background-repeat: no-repeat;
@@ -13272,7 +13272,7 @@ table {
 	margin: -130px 0 0 -130px;
 }
 .st-main-button-icon, .st-main-button-icon-hovered {
-	background-image: url(../images/mega/new-startpage-spite1.png?v=1);
+	background-image: url(../images/mega/new-startpage-sprite-v2.png);
 	background-position: center 60px;
 	background-repeat: no-repeat;
 	width: 260px;
@@ -13296,7 +13296,7 @@ table {
 	width: 130px;
 	height: 100px;
 	position: absolute;
-	background-image: url(../images/mega/new-startpage-spite1.png?v=1);
+	background-image: url(../images/mega/new-startpage-sprite-v2.png);
 	background-position: center -545px;
 	background-repeat: no-repeat;
 	left: 285px;
@@ -13314,7 +13314,7 @@ table {
 }
 .st-main-logo {
 	height: 120px;
-	background-image: url(../images/mega/new-startpage-spite1.png?v=1);
+	background-image: url(../images/mega/new-startpage-sprite-v2.png);
 	background-position: center -786px;
 	background-repeat: no-repeat;
 	margin: 12px 0 25px 0;
@@ -13387,7 +13387,7 @@ table {
 	height: 29px;
 	width: 29px;
 	display: inline-block;
-	background-image: url(../images/mega/new-startpage-spite1.png?v=1);
+	background-image: url(../images/mega/new-startpage-sprite-v2.png);
 	background-repeat: no-repeat;
 	cursor: pointer;
 }
@@ -13424,7 +13424,7 @@ table {
 	border-radius: 12px;
 	font-size: 13px;
 	margin: 8px 0 0 0;
-	background-image: url(../images/mega/new-startpage-spite1.png?v=1);
+	background-image: url(../images/mega/new-startpage-sprite-v2.png);
 	background-position: center -1397px;
 	background-repeat: no-repeat;
 	cursor: pointer;
@@ -15532,7 +15532,7 @@ div.membership-bott-button {
 	width: 299px;
 	height: 190px;
 	float: left;
-	background-image: url(../images/mega/download-sprite-v2.png);
+	background-image: url(../images/mega/download-sprite-v3.png);
 	background-position: 33px -1110px;
 	background-repeat: no-repeat;
 	margin-top: 4px;
@@ -15604,7 +15604,7 @@ div.membership-bott-button {
 	background-color: rgba(217,0,7,1);
 }
 .new-download-sync-app, .new-download-red-button {
-	background-image: url(../images/mega/download-sprite-v2.png);
+	background-image: url(../images/mega/download-sprite-v3.png);
 	background-position: -2px -1321px;
 	background-repeat: no-repeat;
 	padding: 7px 13px 0 52px;
@@ -15680,7 +15680,7 @@ div.membership-bott-button {
 	font-size: 14px;
 	color: #999999;
 	padding: 0 35px 0 30px;
-	background-image: url(../images/mega/download-sprite-v2.png);
+	background-image: url(../images/mega/download-sprite-v3.png);
 	background-position: -118px -734px;
 	background-repeat: no-repeat;
 	min-height: 20px;
@@ -15688,7 +15688,7 @@ div.membership-bott-button {
 }
 .download-pause {
 	float: left;
-	background-image: url(../images/mega/download-sprite-v2.png);
+	background-image: url(../images/mega/download-sprite-v3.png);
 	background-position: -38px -694px;
 	background-repeat: no-repeat;
 	min-height: 20px;
@@ -15731,7 +15731,7 @@ div.membership-bott-button {
 	left: 38px;
 	z-index: 10;
 	margin-top: -2px;
-	background-image: url(../images/mega/download-sprite-v2.png);
+	background-image: url(../images/mega/download-sprite-v3.png);
 	background-position: -119px -646px;
 	background-repeat: no-repeat;
 	display: none;
@@ -15817,7 +15817,7 @@ div.membership-bott-button {
 	line-height: 21px;
 	color: #666666;
 	padding: 5px 0 5px 20px;
-	background-image: url(../images/mega/download-sprite-v2.png);
+	background-image: url(../images/mega/download-sprite-v3.png);
 	background-position: -118px -877px;
 	background-repeat: no-repeat;
 }
@@ -15826,7 +15826,7 @@ div.membership-bott-button {
 	line-height: 20px;
 	color: #666666;
 	padding: 11px 0 0 40px;
-	background-image: url(../images/mega/download-sprite-v2.png);
+	background-image: url(../images/mega/download-sprite-v3.png);
 	background-position: -118px -768px;
 	background-repeat: no-repeat;
 }
@@ -19839,7 +19839,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 	background-position: 0 -2000px;
 }
 .main-mid-pad.backup-recover.notification {
-	padding-bottom: 90px;
+	padding-bottom: 120px;
 }
 .backup-recover h3.main-italic-header {
 	padding: 30px 0 20px 0;
@@ -19959,7 +19959,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 	height: 90px;
 	width: 100%;
 	position: absolute;
-	bottom: 228px;
+	bottom: 258px;
 	background-color: rgba(16,16,16,0.8);
 	z-index: 10;
 }
@@ -22811,7 +22811,8 @@ a.top-login-forgot-pass {
 	height: 100%;
 	width: 100%;
 	left: 0;
-	top: 0;
+	top: 0 !important;
+	margin: 0 !important;
 	z-index: 1200;
 	border: 0;
 	background-color: rgba(34,34,34,0.95);
@@ -22947,21 +22948,21 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 	text-align: left;
 	padding: 15px 0 1px 0;
 }
-.feedback-dialog .radio-txt {
+.feedback-label-txt .radio-txt {
 	font-size: 14px;
 	color: #CCCCCC;
 	line-height: 18px;
 	float: none;
 	padding: 0;
 }
-.fm-dialog.feedback-dialog div.checkboxOn, div.fm-dialog.feedback-dialog .checkboxOff, .membership-arrow {
+.feedback-label-txt div.checkboxOn, .feedback-label-txt .checkboxOff, .membership-arrow {
 	background-image: url(../images/mega/dialogs-sprite_v4.svg);
 	background-position: 0 -4112px;
 	background-size: auto;
 	margin: -2px 0 1px -42px;
 	cursor: pointer;
 }
-div.fm-dialog.feedback-dialog .checkboxOff {
+.feedback-label-txt .checkboxOff {
 	background-position: 0 -4060px;
 }
 .feedback-dialog .membership-arrow {
@@ -23011,11 +23012,11 @@ div.fm-dialog.feedback-dialog .checkboxOff {
 	width: 100%;
 	padding-top: 41px;
 }
-.feedback-button-send, .feedback-button-cancel {
+.feedback-button-send, .feedback-button-cancel, .megasync-overlay-continue, .megasync-overlay-download {
 	display: table-cell;
 	height: 48px;
 }
-.feedback-button-send span, .feedback-button-cancel span {
+.feedback-button-send span, .feedback-button-cancel span, .feedback-button-cancel span, .megasync-overlay-continue span, .megasync-overlay-download span {
 	display: block;
 	-moz-border-radius: 8px;
 	-webkit-border-radius: 8px;
@@ -23039,8 +23040,9 @@ div.fm-dialog.feedback-dialog .checkboxOff {
 	-o-transition: all 200ms ease-in-out;
 	-ms-transition: all 200ms ease-in-out;
 	transition: all 200ms ease-in-out;
+	white-space: nowrap;
 }
-.feedback-button-cancel span:hover {
+.feedback-button-cancel span:hover, .megasync-overlay-continue span:hover {
 	border-color: rgba(255,255,255,0.7);
 	background-color: rgba(255,255,255,0.7);
 	color: rgba(34,34,34,1);
@@ -23918,7 +23920,7 @@ body.pro:after {
 .paused .transfer-bar-overlay div {
 	background-position: center -664px;
 }
-.megasync-overlay {
+.nw-dark-overlay {
 	background-color: rgba(34,34,34,0.95);
 	position: absolute;
 	left: 0;
@@ -23938,7 +23940,7 @@ body.pro:after {
 .megasync-logo {
 	width: 256px;
 	height: 67px;
-	background-image: url(../images/mega/download-sprite-v2.png);
+	background-image: url(../images/mega/download-sprite-v3.png);
 	background-size: 257px auto;
 	background-position: center -1479px;
 	margin: 0 0 0 28px;
@@ -24000,7 +24002,7 @@ body.pro:after {
 	line-height: 40px;
 	color: rgba(51,51,51,1);
 	padding: 0;
-	background-image: url(../images/mega/download-sprite-v2.png);
+	background-image: url(../images/mega/download-sprite-v3.png);
 	background-position: left 1000px;
 	display: inline-block;
 }
@@ -24053,7 +24055,7 @@ body.pro:after {
 }
 .megasync-dropdown span, .megasync-dropdown-link {
 	padding: 0 30px 0 11px;
-	background-image: url(../images/mega/download-sprite-v2.png);
+	background-image: url(../images/mega/download-sprite-v3.png);
 	background-position: right -1811px;
 	color: #666666;
 	background-repeat: no-repeat;
@@ -24175,7 +24177,7 @@ body.pro:after {
 }
 .megasync-list-arrow {
 	height: 23px;
-	background-image: url(../images/mega/download-sprite-v2.png);
+	background-image: url(../images/mega/download-sprite-v3.png);
 	background-position: center -2171px;
 	cursor: pointer;
 }
@@ -24436,8 +24438,148 @@ body.pro:after {
 	white-space: nowrap;
 	font-size: 13px;
 }
+.upload-overlay-body {
+	width: 100%;
+	position: absolute;
+	top: 50%;
+	margin: -146px 0 0 0;
+}
+.upload-overlay-icon {
+	background-image: url(../images/mega/new-startpage-sprite-v2.png);
+	background-position: center -940px;
+	background-repeat: no-repeat;
+	height: 210px;
+}
+.upload-overlay-txt {
+	text-align: center;
+	font-family: 'source_sans_proextralight';
+	padding: 34px 34px 0 34px;
+	font-size: 32px;
+	line-height: 48px;
+	color: #CCCCCC;
+}
+.megasync-upload-overlay .fm-mega-dialog-pad {
+	width: 540px;
+	margin: 0 auto;
+	padding: 0;
+}
+.megasync-overlay-continue, .megasync-overlay-download {
+	width: 50%;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+.megasync-overlay-continue {
+	padding-right: 10px;
+}
+.megasync-overlay-download {
+	padding-left: 10px;
+}
+.megasync-overlay-download span {
+	border-color: rgba(255,51,58,0.7);
+	color: rgba(255,51,58,1);
+}
+.megasync-overlay-download span:hover {
+	border-color: rgba(255,51,58,1);
+	background-color: rgba(255,51,58,1);
+	color: white;
+}
+.megasync-overlay-download span::before {
+	content: '\00a0';
+	display: inline-block;
+	width: 25px;
+	line-height: 44px;
+	background-image: url(../images/mega/download-sprite-v3.png);
+	background-position: center -2780px;
+	background-repeat: no-repeat;
+	margin-right: 10px;
+}
+.megasync-overlay-download span:hover::before {
+	background-position: center -2830px;
+}
+.megasync-upload-overlay .megasync-content {
+	margin: -163px 0 0 0;
+}
+.megasync-upload-overlay .megasync-info {
+	padding: 33px 0 34px 0;
+}
+.megasync-upload-overlay .feedback-label-txt {
+	display: inline-block;
+}
+.megasync-upload-overlay .feedback-dialog-bottom {
+	padding-top: 35px;
+}
+.megasync-info a {
+	color: #FF333A;
+	cursor: pointer;
+}
+.camera-access {
+	min-height: 700px;
+}
+.camera-access div {
+	font-size: 19px;
+	line-height: 24px;
+	color: white;
+	font-family: 'source_sans_prolight';
+	text-align: center;
+}
+.camera-top-block {
+	position: absolute;
+	width: 100%;
+	top: 25%;
+	margin: -105px 0 0 0;
+}
+.camera-top-icon {
+	width: 110px;
+	height: 110px;
+	background-image: url(../images/mega/download-sprite-v3.png);
+	background-position: center -3065px;
+	margin: 0 auto 53px auto;
+}
+.left-arrow .camera-top-icon {
+	background-position: center -2895px;
+}
+.camera-top-txt {
+	max-width: 800px;
+	margin: 0 auto;
+	padding: 0 30px;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+.camera-bottom-block {
+	position: absolute;
+	width: 100%;
+	height: 50%;
+	bottom: 0;
+	background-color: rgba(0,0,0,0.5);
+}
+.camera-bottom-pad {
+	position: absolute;
+	width: 100%;
+	top: 50%;
+	margin: -172px 0 0 0;
+}
+div.camera-bottom-txt {
+	font-size: 60px;
+	line-height: 75px;
+	color: rgba(255,255,255,0.3);
+	font-family: 'source_sans_proextralight';
+	padding: 0 0 67px 0;
+}
+.camera-bottom-icon {
+	display: inline-block;
+	min-width: 380px;
+	padding-top: 113px;
+	background-image: url(../images/mega/download-sprite-v3.png);
+	background-position: center -3260px;
+	background-repeat: no-repeat;
+}
+.camera-bottom-icon.pause {
+	background-position: center -3405px;
+}
 .fontsize1 .nw-fm-tree-header input {
-	margin: 12 0 0 0;
+	margin: 12px 0 0 0;
 }
 .fontsize1 .nw-fm-tree-folder, .fontsize1 .nw-conversations-name, .fontsize1 .fm-tree-panel .nw-contact-name, .fontsize1 .nw-conversations-header, .fontsize1 .nw-tree-panel-header, .fontsize1 .copy-dialog-panel-header, .fontsize1 .move-dialog-panel-header, .fontsize1 .share-dialog-panel-header, .fontsize1 .top-menu-item, .fontsize1 .top-user-status-item, .fontsize1 .context-menu-item, .fontsize1 .sorting-menu-item, .fontsize1 .permissions-menu-item, .fontsize1 .top-menu-popup, .fontsize1 .top-submenu-popup, .fontsize1 .top-user-status-popup, .fontsize1 .context-submenu, .fontsize1 .tranfer-filetype-txt, .fontsize1 .fm-browsers-txt, .fontsize1 .fm-flags-txt, .fontsize1 .fm-member-icon-txt, .fontsize1 .transfer-table td, .fontsize1 .grid-table td, .fontsize1 .grid-share-table td, .fontsize1 .contacts-grid-table td, .fontsize1 .file-block-title, .fontsize1 .contact-block-view-name, .fontsize1 .shared-folder-info-block, .fontsize1 .fm-chat-user, .fontsize1 .fm-chat-user-status, .fontsize1 .fm-chat-user-email, .fontsize1 .shared-folder-access, .fontsize1 .contacts-interation, .fontsize1 .transfer-table th, .fontsize1 .transfer-table td, .fontsize1 .transfer-table-header th, .fontsize1 .grid-table th, .fontsize1 .grid-table td, .fontsize1 .grid-share-table th, .fontsize1 .grid-share-table td, .fontsize1 .grid-table-header th, .fontsize1 .contacts-grid-header th, .fontsize1 .contacts-grid-table th, .fontsize1 .contacts-grid-table td, .fontsize1 .membership-status, .fontsize1 .new-notification-txt, .fontsize1 .nw-fm-left-tooltip, .fontsize1 .chat-time-txt, .fontsize1 .new-notification-info {
 	font-size: 12px;
@@ -24940,8 +25082,8 @@ top-login-spr .nlanguage-tooltip-bg, .nlanguage-bottom {
  background-image: url(../images/mega/language-sprite@2x.png);
  background-size: 18px auto;
 }
-.download-dialog-icon, .download-chrome-lnk, a.download-chrome-lnk, .new-download-icon, .downloading-txt, .download-pause, .download-message-icon, .download-complete-icon, .download-error-ul, .download-user-icon, .new-download-sync-app, .new-download-red-button, .megasync-list-arrow, .megasync-logo, .megasync-table table th span, .megasync-table table td span, .megasync-dropdown span, .megasync-dropdown-link {
- background-image: url(../images/mega/download-sprite-v2@2x.png);
+.download-dialog-icon, .download-chrome-lnk, a.download-chrome-lnk, .new-download-icon, .downloading-txt, .download-pause, .download-message-icon, .download-complete-icon, .download-error-ul, .download-user-icon, .new-download-sync-app, .new-download-red-button, .megasync-list-arrow, .megasync-logo, .megasync-table table th span, .megasync-table table td span, .megasync-dropdown span, .megasync-dropdown-link, .megasync-overlay-download span::before, .camera-bottom-icon, .camera-top-icon {
+ background-image: url(../images/mega/download-sprite-v3@2x.png);
  background-size: 257px auto;
 }
 .active.new-start-arrow-button, .st-red-header, .st-quote-left, .st-quote-right, .st-privacy-tool-icon, .st-membership-icon, .st-devices-icon, .st-os-icons, .st-cloud-icon, .st-mobile-apps-icon, .st-member-ship-right-bl, .st-apps-icon {
@@ -25020,8 +25162,8 @@ background-size: 217px auto;
  background-image: url(../images/mega/help-new-sprite-v1@2x.png);
  background-size: 886px auto;
 }
-.st-main-button-icon, .st-main-button-icon-hovered, .st-main-cursor, .st-main-logo, .st-bottom-button, .st-bottom-scroll-button {
- background-image: url(../images/mega/new-startpage-spite1@2x.png?v=1);
+.st-main-button-icon, .st-main-button-icon-hovered, .st-main-cursor, .st-main-logo, .st-bottom-button, .st-bottom-scroll-button, .upload-overlay-icon {
+ background-image: url(../images/mega/new-startpage-sprite-v2@2x.png);
  background-size: 356px auto;
 }
 .powered-logo, .powered-arrow {

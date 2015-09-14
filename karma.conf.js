@@ -21,21 +21,21 @@ module.exports = function(config) {
         'node_modules/indexeddbshim/dist/indexeddbshim.js',
 
         // == Basics ==
-        'js/jquery-2.1.1.js',
-        'js/jquery-ui-1.11.2.js',
-        'js/jquery.jscrollpane.js',
-        'js/jquery.mousewheel.js',
+        'js/vendor/jquery-2.1.4.js',
+        'js/vendor/jquery-ui-1.11.4.js',
+        'js/vendor/jquery.jscrollpane.js',
+        'js/vendor/jquery.mousewheel.js',
+        'js/vendor/jquery.fullscreen.js',
+        'js/vendor/jquery.window-active.js',
         'js/jquery.tokeninput.js',
         'js/jquery.misc.js',
-        'js/jquery.fullscreen.js',
         'js/jquery.qrcode.js',
         'js/jquery.checkboxes.js',
-        'js/vendor/jquery.window-active.js',
 
         // == Libraries ==
-        'js/asmcrypto.js',
-        'js/jsbn.js',
-        'js/jsbn2.js',
+        'js/vendor/asmcrypto.js',
+        'js/vendor/jsbn.js',
+        'js/vendor/jsbn2.js',
         'js/vendor/nacl-fast.js',
         // For notifications.
         'js/vendor/ion.sound.js',
@@ -43,7 +43,7 @@ module.exports = function(config) {
         'js/vendor/notification.js',
         // Chat libraries.
         'js/chat/mpenc.js',
-        'js/vendor/chat/strophe.js',
+        'js/vendor/chat/strophe.light.js',
         'js/vendor/chat/strophe.disco.js',
         'js/vendor/chat/strophe.jingle.js',
         'js/vendor/chat/strophe.jingle.session.js',
@@ -62,7 +62,7 @@ module.exports = function(config) {
         // Other.
         'js/vendor/Autolinker.js',
         'js/vendor/qrcode.js',
-        'js/bitcoin-math.js',
+        'js/vendor/bitcoin-math.js',
         'js/vendor/db.js',
 
         // == Test helpers and test configuration ==
@@ -79,18 +79,18 @@ module.exports = function(config) {
         'js/crypto.js',
         'js/megaPromise.js',
         'js/paycrypt.js',
-        'js/user.js',
+        'js/account.js',
         'js/authring.js',
         'js/fm.js',
         'js/mouse.js',
         'js/filedrag.js',
         'js/mDB.js',
         'js/thumbnail.js',
-        'js/exif.js',
-        'js/megapix.js',
-        'js/smartcrop.js',
+        'js/vendor/exif.js',
+        'js/vendor/megapix.js',
+        'js/vendor/smartcrop.js',
         'js/filetypes.js',
-        'js/miniui.js',
+        'js/ui/miniui.js',
         'js/ui/filepicker.js',
         'js/ui/dialog.js',
         'js/ui/feedbackDialog.js',
@@ -98,12 +98,12 @@ module.exports = function(config) {
         'js/ui/loginRequiredDialog.js',
         'js/notify.js',
         'js/megaNotifications.js',
-        'js/avatar.js',
+        'js/vendor/avatar.js',
         'js/countries.js',
         'js/megaDbEncryptionPlugin.js',
         'js/megaDb.js',
         'js/megaKvStorage.js',
-        'js/Int64.js',
+        'js/vendor/Int64.js',
         'js/zip64.js',
         'js/cms.js',
         // Google Import Contacts
@@ -190,9 +190,8 @@ module.exports = function(config) {
     customLaunchers: {
         'PhantomJS2_custom': {
             base: 'PhantomJS2',
-            // Works with PhantomJS 1.9.8 (on Linux), but seems to need
-            // PhantomJS 2.0 for Windows
-            flags: ['--local-storage-path=./test/phantomjs-storage']
+            // web-security is disabled to allow `Worker('data:...')`
+            flags: ['--local-storage-path=./test/phantomjs-storage', '--web-security=false']
         }
     },
 

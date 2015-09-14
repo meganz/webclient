@@ -4124,12 +4124,38 @@ function MegaData()
 
     var __ul_id = 8000;
     this.addUpload = function(u, ignoreWarning) {
+        var flag = 'ulMegaSyncAD';
 
-        /*if (u.length > 99 && !ignoreWarning) {
-            if (ulmanager.warning(M.addUpload.bind(M, u, true))) {
-                return;
-            }
-        }*/
+        if (u.length > 99 && !ignoreWarning && !localStorage[flag]) {
+            $('.megasync-upload-overlay').show();
+            $('.megasync-overlay-continue, .fm-dialog-close').rebind('click', function() {
+                $('.megasync-upload-overlay').hide();
+                M.addUpload(u, true);
+                $(document).unbind('keyup.megasync-upload');
+            });
+            $(document).rebind('keyup.megasync-upload', function(evt) {
+                $('.megasync-upload-overlay').hide();
+                M.addUpload(u, true);
+                $(document).unbind('keyup.megasync-upload');
+            });
+            $('.megasync-overlay-download').rebind('click', function() {
+                $('.megasync-upload-overlay').hide();
+                location.hash = '#sync';
+                $(document).unbind('keyup.megasync-upload');
+            });
+            var $chk = $('.megasync-upload-overlay .checkdiv');
+            $chk.rebind('click.dialog', function() {
+                if ($chk.hasClass('checkboxOff')) {
+                    $chk.removeClass('checkboxOff').addClass('checkboxOn');
+                    localStorage[flag] = 1;
+                }
+                else {
+                    $chk.removeClass('checkboxOn').addClass('checkboxOff');
+                    delete localStorage[flag];
+                }
+            });
+            return;
+        }
         var target;
         var onChat;
         var filesize;
@@ -5573,15 +5599,42 @@ function getuid(email) {
     return false;
 }
 
-function doShare(h, targets, dontShowShareDialog) {
+/**
+ * Gets the user handle of a contact if they already exist in M.u
+ * @param {String} emailAddress The email address to get the user handle for
+ * @returns {String|false} Returns either the user handle or false if it doesn't exist
+ */
+function getUserHandleFromEmail(emailAddress) {
+    
+    // Search known users for matching email address then get the handle of that contact
+    for (var userHandle in M.u) {
+        if (M.u.hasOwnProperty(userHandle) && (M.u[userHandle].m === emailAddress)) {
+            return userHandle;
+        }
+    };
+    
+    return false;
+}
+
+function doShare(handle, targets, dontShowShareDialog) {
     var $promise = new MegaPromise();
 
-    nodeids = fm_getnodes(h);
-    nodeids.push(h);
+    nodeids = fm_getnodes(handle);
+    nodeids.push(handle);
+    
+    // Search for user handles that match
+    for (var i = 0; i < targets.length; i++) {
+        
+        var emailAddress = targets[i].u;
+        var userHandle = getUserHandleFromEmail(emailAddress);
+        
+        // Use the target user's user handle if available, otherwise use the email address
+        targets[i].u = (userHandle !== false) ? userHandle : emailAddress;
+    }
 
-    api_setshare(h, targets, nodeids, {
+    api_setshare(handle, targets, nodeids, {
         t: targets,
-        h: h,
+        h: handle,
         done: function(res, ctx) {
 
             // Loose comparasion is important
@@ -5604,7 +5657,7 @@ function doShare(h, targets, dontShowShareDialog) {
                         // level (passive)
                         if (M.u[user] && M.u[user].c !== 0) {
                             M.nodeShare(ctx.h, {
-                                h: h,
+                                h: handle,
                                 r: rights,
                                 u: user,
                                 ts: unixtime()
@@ -5620,7 +5673,7 @@ function doShare(h, targets, dontShowShareDialog) {
                     $('.fm-dialog.share-dialog').removeClass('hidden');
                 }
                 loadingDialog.hide();
-                M.renderShare(h);
+                M.renderShare(handle);
 
                 if (dontShowShareDialog !== true) {
                     shareDialog();

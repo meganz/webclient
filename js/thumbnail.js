@@ -42,6 +42,14 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
         var t = new Date().getTime();
         var n = M.d[node];
         var fa = '' + (n && n.fa);
+        var dataURI;
+        var canvas;
+        var ctx;
+        var ab;
+        // XXX: In Firefox loading a ~100MB image might throw `Image corrupt or truncated.`
+        // and this .onload called back with a white image. Bug #941823 / #1045926
+        // This is the MurmurHash3 for such image's dataURI.
+        var MURMURHASH3RR = 0x59d73a69;
 
         // thumbnail:
         if (fa.indexOf(':0*') < 0) {
@@ -54,15 +62,21 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                 console.time('smartcrop');
             }
             var crop = SmartCrop.crop(this, options).topCrop;
-            var canvas = document.createElement('canvas');
-            var ctx = canvas.getContext("2d");
+            canvas = document.createElement('canvas');
+            ctx = canvas.getContext("2d");
             canvas.width = options.width;
             canvas.height = options.height;
             ctx.drawImage(this, crop.x, crop.y, crop.width, crop.height, 0, 0, canvas.width, canvas.height);
 
-            var ab = dataURLToAB(canvas.toDataURL('image/jpeg', 0.90));
-            api_storefileattr(this.id, 0,
-                this.aes._key[0].slice(0, 4), ab.buffer); // FIXME hack into cipher and extract key
+            dataURI = canvas.toDataURL('image/jpeg', 0.90);
+            // if (d) console.log('THUMBNAIL', dataURI);
+            if (MurmurHash3(dataURI, 0x7fee00aa) === MURMURHASH3RR) {
+                console.error('Error generating thumbnail, aborting...');
+                return;
+            }
+            ab = dataURLToAB(dataURI);
+            // FIXME hack into cipher and extract key
+            api_storefileattr(this.id, 0, this.aes._key[0].slice(0, 4), ab.buffer);
 
             if (d) {
                 console.timeEnd('smartcrop');
@@ -71,7 +85,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
 
         // preview image:
         if (fa.indexOf(':1*') < 0 || onPreviewRetry) {
-            var canvas2 = document.createElement('canvas');
+            canvas = document.createElement('canvas');
             var preview_x = this.width,
                 preview_y = this.height;
             if (preview_x > 1000) {
@@ -82,14 +96,15 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                 preview_x = Math.round(preview_x * 1000 / preview_y);
                 preview_y = 1000;
             }
-            var ctx2 = canvas2.getContext("2d");
-            canvas2.width = preview_x;
-            canvas2.height = preview_y;
-            ctx2.drawImage(this, 0, 0, preview_x, preview_y);
+            ctx = canvas.getContext("2d");
+            canvas.width = preview_x;
+            canvas.height = preview_y;
+            ctx.drawImage(this, 0, 0, preview_x, preview_y);
 
-            var dataURI2 = canvas2.toDataURL('image/jpeg', 0.85);
+            dataURI = canvas.toDataURL('image/jpeg', 0.75);
+            // if (d) console.log('PREVIEW', dataURI);
 
-            var ab2 = dataURLToAB(dataURI2);
+            ab = dataURLToAB(dataURI);
 
             // only store preview when the user is the file owner, and when it's not a retry (because then there is already a preview image, it's just unavailable:
 
@@ -97,12 +112,12 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                 if (d) {
                     console.log('Storing preview...', n);
                 }
-                api_storefileattr(this.id, 1, this.aes._key[0].slice(0, 4),
-                    ab2.buffer); // FIXME hack into cipher and extract key
+                // FIXME hack into cipher and extract key
+                api_storefileattr(this.id, 1, this.aes._key[0].slice(0, 4), ab.buffer);
             }
 
             if (node) {
-                previewimg(node, ab2);
+                previewimg(node, ab);
             }
 
             if (d) {
@@ -120,8 +135,8 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
             console.timeEnd('createthumbnail');
         }
     };
-    try {
-        if (typeof FileReader !== 'undefined') {
+    if (typeof FileReader !== 'undefined') {
+        setTimeout(function() {
             var ThumbFR = new FileReader();
             ThumbFR.onload = function(e) {
                 var u8 = new Uint8Array(ThumbFR.result),
@@ -230,6 +245,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                 }
 
                 __render_thumb(img, u8, orientation, file);
+                file = imagedata = undefined;
             };
             if (file) {
                 if (is_chrome_firefox && "blob" in file) {
@@ -239,6 +255,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                                 file = new Blob([u8], {
                                     type: file.type
                                 });
+                                mega.utils.neuterArrayBuffer(u8);
                                 ThumbFR.readAsArrayBuffer(file);
                             });
                         }
@@ -247,20 +264,16 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
 
                     file = file.blob();
                 }
-
             }
             else {
                 file = new Blob([new Uint8Array(imagedata)], {
                     type: 'image/jpeg'
                 });
+                mega.utils.neuterArrayBuffer(imagedata);
             }
             ThumbFR.readAsArrayBuffer(file);
-        }
+        }, 350 + Math.floor(Math.random() * 600));
     }
-    catch (e) {
-        console.log('thumbnail error', e)
-    }
-
 }
 
 function __render_thumb(img, u8, orientation, blob) {
@@ -280,6 +293,7 @@ function __render_thumb(img, u8, orientation, blob) {
             type: 'image/jpg'
         });
     }
+    mega.utils.neuterArrayBuffer(u8);
     var mpImg = new MegaPixImage(blob);
     mpImg.render(img, {
         maxWidth: 1000,

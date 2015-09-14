@@ -1238,6 +1238,24 @@ function topmenuUI() {
                 }
             }
         });
+        
+        var $topChangeLangButton = $('.top-change-language');
+        var languageName = ln2[lang];
+        
+        // Change language name in top title
+        $topChangeLangButton.find('.language-name').text(languageName);
+        
+        // Init the top header change language button
+        $topChangeLangButton.show();
+        $topChangeLangButton.rebind('click', function() {
+            languageDialog();
+        });
+        
+        // If they have changed the language from English, then show different style
+        if (lang !== 'en') {
+            $topChangeLangButton.addClass('other-language');
+            $topChangeLangButton.find('.language-text').hide();
+        }
 
         $('.top-menu-item.register,.context-menu-divider.register,.top-menu-item.login').show();
 

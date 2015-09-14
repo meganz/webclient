@@ -1443,6 +1443,38 @@ a.blog-button:hover {
 	-moz-border-radius-topleft: 8px;
 	border-top-left-radius: 8px;
 }
+
+/* Change top language button */
+.top-change-language {
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    float: right;
+    margin-right: 10px;
+    margin-top: 4px;
+}
+.top-change-language:hover {
+    color: #fff;
+}
+.top-change-language .icon {
+    background-image: url("../images/mega/lang-selection-sprite.png");
+    background-position: 0 0;
+    background-repeat: no-repeat;
+    display: inline-block;
+    height: 32px;
+    margin-bottom: -8px;
+    margin-right: 5px;
+    width: 46px;
+}
+.top-change-language.other-language {
+    margin-top: 11px;
+}
+.top-change-language.other-language .icon {
+    background-position: -80px -8px;
+    height: 26px;
+    margin-bottom: -9px;
+    width: 26px;
+}
+
 .top-login-button:hover, .top-login-button.active {
 	background-color: rgba(255,255,255,0.5);
 	color: rgba(255,255,255,0.8);

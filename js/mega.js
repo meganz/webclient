@@ -5574,42 +5574,15 @@ function getuid(email) {
     return false;
 }
 
-/**
- * Gets the user handle of a contact if they already exist in M.u
- * @param {String} emailAddress The email address to get the user handle for
- * @returns {String|false} Returns either the user handle or false if it doesn't exist
- */
-function getUserHandleFromEmail(emailAddress) {
-    
-    // Search known users for matching email address then get the handle of that contact
-    for (var userHandle in M.u) {
-        if (M.u.hasOwnProperty(userHandle) && (M.u[userHandle].m === emailAddress)) {
-            return userHandle;
-        }
-    };
-    
-    return false;
-}
-
-function doShare(handle, targets, dontShowShareDialog) {
+function doShare(h, targets, dontShowShareDialog) {
     var $promise = new MegaPromise();
 
-    nodeids = fm_getnodes(handle);
-    nodeids.push(handle);
-    
-    // Search for user handles that match
-    for (var i = 0; i < targets.length; i++) {
-        
-        var emailAddress = targets[i].u;
-        var userHandle = getUserHandleFromEmail(emailAddress);
-        
-        // Use the target user's user handle if available, otherwise use the email address
-        targets[i].u = (userHandle !== false) ? userHandle : emailAddress;
-    }
+    nodeids = fm_getnodes(h);
+    nodeids.push(h);
 
-    api_setshare(handle, targets, nodeids, {
+    api_setshare(h, targets, nodeids, {
         t: targets,
-        h: handle,
+        h: h,
         done: function(res, ctx) {
 
             // Loose comparasion is important
@@ -5632,7 +5605,7 @@ function doShare(handle, targets, dontShowShareDialog) {
                         // level (passive)
                         if (M.u[user] && M.u[user].c !== 0) {
                             M.nodeShare(ctx.h, {
-                                h: handle,
+                                h: h,
                                 r: rights,
                                 u: user,
                                 ts: unixtime()
@@ -5648,7 +5621,7 @@ function doShare(handle, targets, dontShowShareDialog) {
                     $('.fm-dialog.share-dialog').removeClass('hidden');
                 }
                 loadingDialog.hide();
-                M.renderShare(handle);
+                M.renderShare(h);
 
                 if (dontShowShareDialog !== true) {
                     shareDialog();

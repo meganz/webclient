@@ -95,6 +95,7 @@ Chatd.Const = {
     'UNDEFINED' : '\0\0\0\0\0\0\0\0'
 };
 
+
 // add a new chatd shard
 Chatd.prototype.addshard = function(chatid, shard, url) {
     // instantiate Chatd.Shard object for this shard if needed
@@ -251,7 +252,7 @@ Chatd.Shard.prototype.disconnect = function() {
 };
 
 Chatd.Shard.prototype.cmd = function(opcode, cmd) {
-    //console.error(opcode, cmd);
+    //console.error(constStateToText(Chatd.Opcode, opcode), cmd);
     this.cmdq += String.fromCharCode(opcode)+cmd;
 
     if (this.isOnline()) {
@@ -354,15 +355,34 @@ Chatd.Shard.prototype.exec = function(a) {
                 break;
 
             case Chatd.Opcode.SEEN:
-                self.logger.log("Newest seen message on '" + base64urlencode(cmd.substr(1,8)) + "' for user '" + base64urlencode(cmd.substr(9,8)) + "': '" + base64urlencode(cmd.substr(17,8)) + "'");
+                if(cmd.length === 25) {
+                    self.logger.log("Newest seen message on '" + base64urlencode(cmd.substr(1, 8)) + "' for user '" + base64urlencode(cmd.substr(9, 8)) + "': '" + base64urlencode(cmd.substr(17, 8)) + "'");
 
-                this.chatd.trigger('onMessageLastSeen', {
-                    chatId: base64urlencode(cmd.substr(1, 8)),
-                    userId: base64urlencode(cmd.substr(9, 8)),
-                    messageId: base64urlencode(cmd.substr(17, 8))
-                });
+                    this.chatd.trigger('onMessageLastSeen', {
+                        chatId: base64urlencode(cmd.substr(1, 8)),
+                        userId: base64urlencode(cmd.substr(9, 8)),
+                        messageId: base64urlencode(cmd.substr(17, 8))
+                    });
 
-                len = 25;
+                    len = 25;
+                } else if(cmd.length === 17) {
+                    self.logger.log(
+                        "Newest seen message on " + base64urlencode(cmd.substr(1, 8)) +
+                        " message id " + base64urlencode(cmd.substr(9, 8)) + ": " +
+                        " from me."
+                    );
+
+                    this.chatd.trigger('onMessageLastSeen', {
+                        chatId: base64urlencode(cmd.substr(1, 8)),
+                        userId: base64urlencode(self.chatd.userid),
+                        messageId: base64urlencode(cmd.substr(9, 8))
+                    });
+
+                    len = 17;
+                } else {
+                    self.logger.error("Received SEEN command, but the length of the message was not 17 or 25, so no " +
+                        "idea how to parse it...");
+                }
                 break;
 
             case Chatd.Opcode.RECEIVED:
@@ -606,6 +626,7 @@ Chatd.Messages.prototype.range = function(chatid) {
                 if (!this.sending[this.buf[high][Chatd.MsgField.MSGID]]) break;
             }
             this.chatd.cmd(Chatd.Opcode.RANGE, chatid, this.buf[low][Chatd.MsgField.MSGID] + this.buf[high][Chatd.MsgField.MSGID]);
+            break;
         }
     }
 };

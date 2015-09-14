@@ -258,7 +258,7 @@ CallSession.prototype.onWaitingResponseIncoming = function(e, eventData) {
         messageId: 'incoming-call-' + self.sid,
         type: 'incoming-call',
         authorContact: self.room.megaChat.getContactFromJid(self.getPeer()),
-        timestamp: unixtime(),
+        delay: unixtime(),
         persist: false,
         buttons: {
             'answer': {
@@ -371,7 +371,7 @@ CallSession.prototype.onCallStarting = function(e) {
             messageId: 'call-starting-' + self.sid,
             type: 'call-starting',
             authorContact: self.room.megaChat.getContactFromJid(self.getPeer()),
-            timestamp: unixtime(),
+            delay: unixtime(),
             persist: false
         })
     );
@@ -388,7 +388,7 @@ CallSession.prototype.onCallAnswered = function(e) {
             messageId: 'call-initialising-' + self.sid,
             type: 'call-initialising',
             authorContact: self.room.megaChat.getContactFromJid(self.getPeer()),
-            timestamp: unixtime(),
+            delay: unixtime(),
             persist: false
         })
     );
@@ -470,7 +470,7 @@ CallSession.prototype.onCallStarted = function(e, eventData) {
             messageId: 'call-started-' + self.sid,
             type: 'call-started',
             authorContact: self.room.megaChat.getContactFromJid(self.getPeer()),
-            timestamp: unixtime(),
+            delay: unixtime(),
             persist: false
         })
     );
@@ -488,7 +488,7 @@ CallSession.prototype.onCallEnded = function(e, reason) {
                 messageId: 'call-ended-' + self.sid,
                 type: 'call-ended',
                 authorContact: self.room.megaChat.getContactFromJid(self.getPeer()),
-                timestamp: unixtime(),
+                delay: unixtime(),
                 cssClasses: ['fm-chat-call-reason-' + reason],
                 currentCallCounter: self.room.megaChat._currentCallCounter
             })
@@ -509,7 +509,7 @@ CallSession.prototype.onCallRejected = function(e, reason) {
                 messageId: 'call-ended-' + self.sid,
                 type: 'call-canceled',
                 authorContact: self.room.megaChat.getContactFromJid(self.getPeer()),
-                timestamp: unixtime(),
+                delay: unixtime(),
             })
         );
     } else {
@@ -518,7 +518,7 @@ CallSession.prototype.onCallRejected = function(e, reason) {
                 messageId: 'call-rejected-' + self.sid,
                 type: 'call-rejected',
                 authorContact: self.room.megaChat.getContactFromJid(self.getPeer()),
-                timestamp: unixtime()
+                delay: unixtime()
             })
         );
     }
@@ -535,7 +535,7 @@ CallSession.prototype.onCallHandledElsewhere = function(e) {
             messageId: 'call-handled-elsewhere-' + self.sid,
             type: 'call-handled-elsewhere',
             authorContact: self.room.megaChat.getContactFromJid(peer),
-            timestamp: unixtime(),
+            delay: unixtime(),
             persist: false
         })
     );
@@ -553,7 +553,7 @@ CallSession.prototype.onCallFailed = function(e, reason, txt) {
             messageId: 'call-failed-' + self.sid,
             type: 'call-failed',
             authorContact: self.room.megaChat.getContactFromJid(peer),
-            timestamp: unixtime(),
+            delay: unixtime(),
             persist: false
         })
     );
@@ -571,7 +571,7 @@ CallSession.prototype.onCallMissed = function(e) {
             messageId: 'call-missed-' + self.sid,
             type: 'call-missed',
             authorContact: self.room.megaChat.getContactFromJid(peer),
-            timestamp: unixtime()
+            delay: unixtime()
         })
     );
 
@@ -587,7 +587,7 @@ CallSession.prototype.onCallTimeout = function(e) {
             messageId: 'call-timeout-' + self.sid,
             type: 'call-timeout',
             authorContact: self.room.megaChat.getContactFromJid(peer),
-            timestamp: unixtime()
+            delay: unixtime()
         })
     );
 
@@ -1243,7 +1243,7 @@ CallManager.prototype._attachToChatRoom = function(megaChat, chatRoom) {
                 messageId: 'call-failed-media-' + session.sid,
                 type: 'call-failed-media',
                 authorContact: chatRoom.megaChat.getContactFromJid(session.getPeer()),
-                timestamp: unixtime(),
+                delay: unixtime(),
                 persist: false
             })
         );
@@ -1405,7 +1405,7 @@ CallManager.prototype.startCall = function(chatRoom, mediaOptions) {
                 messageId: 'outgoing-call-' + session.sid,
                 type: 'outgoing-call',
                 authorContact: chatRoom.megaChat.getContactFromJid(participants[0]),
-                timestamp: unixtime(),
+                delay: unixtime(),
                 persist: false,
                 buttons: {
                     'reject': {

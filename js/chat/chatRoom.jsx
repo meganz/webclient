@@ -49,7 +49,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, cha
     this.users = users ? users : [];
     this.roomJid = roomJid;
     this.type = type;
-    this.messages = new MegaDataSortedMap("messageId", "orderValue", this);
+    this.messages = new MegaDataSortedMap("messageId", "orderValue,delay", this);
     this.ctime = ctime;
     this.lastActivity = lastActivity ? lastActivity : ctime;
     this.chatId = chatId;
@@ -697,7 +697,11 @@ ChatRoom.prototype.show = function() {
 
     self.messages.forEach(function(v, k) {
         if(v.seen === false) {
-            v.setSeen(true); // mark all unseen messages as seen
+            if(v.setSeen) {
+                v.setSeen(true); // mark all unseen messages as seen
+            } else {
+                v.seen = true;
+            }
         }
     });
 
@@ -793,7 +797,7 @@ var ChatDialogMessage = function(opts) {
             'messageId': true,
             'textMessage': true,
             'authorContact': true,
-            'timestamp': true,
+            'delay': true,
             'buttons': true,
             'read': true,
             'persist': true,
@@ -818,7 +822,7 @@ ChatDialogMessage.DEFAULT_OPTS = {
     'messageId': '',
     'textMessage': '',
     'authorContact': '',
-    'timestamp': 0,
+    'delay': 0,
     'buttons': {},
     'read': false,
     'persist': true
@@ -865,6 +869,20 @@ ChatRoom.prototype.appendMessage = function(message) {
         //self.logger.debug(self.roomJid.split("@")[0], message.messageId, "This message is already added to the message list (and displayed).");
         return false;
     }
+    if(!message.orderValue) {
+        // append at the bottom
+        if(self.messages.length > 0) {
+            var prevMsg = self.messages.getItem(self.messages.length - 1);
+            if(!prevMsg) {
+                self.logger.error(
+                    'self.messages got out of sync...maybe there are some previous JS exceptions that caused that? ' +
+                    'note that messages may be displayed OUT OF ORDER in the UI.'
+                );
+            } else {
+                message.orderValue = prevMsg.orderValue + 0.1;
+            }
+        }
+    }
 
     self.trigger('onMessageAppended', message);
 
@@ -885,58 +903,6 @@ ChatRoom.prototype.refreshUI = function() {
     // TODO: remove me.
 };
 
-//TODO: move this out
-ChatRoom.prototype._renderMessageState = function($message, messageObject) {
-    var self = this;
-
-
-    $message.removeClass("msg-state-sent msg-state-not-sent msg-state-delivered");
-
-    if (!(messageObject instanceof KarereEventObjects.OutgoingMessage)) {
-        return;
-    }
-
-    if (messageObject.getState() === KarereEventObjects.OutgoingMessage.STATE.SENT) {
-        $message.addClass("msg-state-sent");
-
-        if ($('.label.not-sent', $message).length > 0) {
-            $('.label.not-sent', $message).fadeOut(function() { $(this).remove(); });
-        }
-    } else if (messageObject.getState() === KarereEventObjects.OutgoingMessage.STATE.NOT_SENT) {
-        $message.addClass("msg-state-not-sent");
-
-        if ($('.label.not-sent.text-message', $message).length === 0) {
-            var $elem = $('<span class="label not-sent text-message">not sent</span>');
-            $elem.hide();
-            $('.chat-username', $message).after($elem);
-            $elem.fadeIn();
-        }
-        if ($('.label.not-sent.delete-button', $message).length === 0) {
-            var $elem = $('<a href="javascript:;" class="label not-sent delete-button">delete</a>');
-            $elem.hide();
-            $('.chat-username', $message).after($elem);
-            $elem.fadeIn();
-        }
-    } else if (messageObject.getState() === KarereEventObjects.OutgoingMessage.STATE.DELIVERED) {
-        $message.addClass("msg-state-delivered");
-
-        if ($('.label.not-sent', $message).length > 0) {
-            $('.label.not-sent', $message).fadeOut(function() { $(this).remove(); });
-        }
-    } else {
-        $message.addClass("msg-state-unknown");
-
-        if ($('.label.not-sent', $message).length > 0) {
-            $('.label.not-sent', $message).fadeOut(function() { $(this).remove(); });
-        }
-    }
-
-
-
-
-
-    self.refreshUI();
-};
 
 /**
  * Returns the actual DOM Element from the Mega's main navigation (tree) that is related to this chat room.
@@ -1003,7 +969,6 @@ ChatRoom.prototype.sendMessage = function(message, meta) {
         KarereEventObjects.OutgoingMessage.STATE.NOT_SENT,
         self.roomJid
     );
-    eventObject.orderValue = 99999999999;
 
 
     if (

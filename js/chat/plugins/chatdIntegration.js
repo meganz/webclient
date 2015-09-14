@@ -77,6 +77,14 @@ var ChatdIntegration = function(megaChat) {
         var chatRoom = _getChatRoomFromEventData(eventData);
 
         chatRoom.chatdLastSeen = eventData.messageId;
+        var msg = chatRoom.messages[eventData.messageId];
+        if(msg && eventData.userId === u_handle) {
+            if(msg.setSeen) {
+                msg.setSeen(true);
+            } else if (msg.seen) {
+                msg.seen = true;
+            }
+        }
     });
     self.chatd.rebind('onMessageLastReceived.chatdInt', function(e, eventData) {
         var chatRoom = _getChatRoomFromEventData(eventData);
@@ -197,8 +205,15 @@ var ChatdIntegration = function(megaChat) {
                     v.messageId = eventData.messageId;
                     v.orderValue = eventData.id;
                     v.setState(KarereEventObjects.OutgoingMessage.STATE.SENT);
-                    chatRoom.messages.remove(prevMessageId);
-                    chatRoom.messages.push(v);
+                    if(prevMessageId === eventData.messageId) {
+                        // same id, don't re-add, just update all properties.
+                        Object.keys(eventData).forEach(function(k) {
+                            v[k] = eventData[k]
+                        });
+                    } else {
+                        chatRoom.messages.removeByKey(prevMessageId);
+                        chatRoom.messages.push(v);
+                    }
                     found = true;
                     return false; // break
                 }

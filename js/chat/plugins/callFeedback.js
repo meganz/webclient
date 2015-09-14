@@ -42,7 +42,7 @@ CallFeedback.prototype.attachToChat = function(megaChat) {
                             messageId: msgId,
                             type: 'call-feedback',
                             authorContact: megaChat.getContactFromJid(eventData.peer),
-                            timestamp: unixtime(),
+                            delay: unixtime(),
                             buttons: {
                                 'sendFeedback': {
                                     'type': 'primary',

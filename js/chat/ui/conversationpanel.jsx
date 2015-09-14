@@ -88,8 +88,8 @@ var ConversationMessage = React.createClass({
         if (message.getDelay) {
             timestamp = message.getDelay()
         }
-        else if (message.timestamp) {
-            timestamp = message.timestamp;
+        else if (message.delay) {
+            timestamp = message.delay;
         }
         else {
             timestamp = unixtime();

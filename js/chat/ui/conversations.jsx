@@ -346,29 +346,30 @@ var ConversationsMainListing =  React.createClass({
             }
 
             var lastAction;
-            if(room.messages.length > 0) {
-                var lastMessage = room.messages.getItem(room.messages.length - 1);
+            var lastMessage = lastMessage = room.messages.getItem(room.messages.length - 1);
+            if(room.messages.length > 0 && lastMessage) {
+                if(lastMessage) {
+                    if (lastMessage.textMessage || lastMessage.getContents) {
+                        // notification?
+                        if (lastMessage.textMessage) {
+                            lastActionClasses += " " + lastMessage.cssClass;
+                            lastActionText += lastMessage.textMessage;
+                        } else {
+                            // text message
+                            lastActionClasses += " fm-chat-messages-pad";
+                            lastActionText = lastMessage.getContents();
+                        }
 
-                if(lastMessage.textMessage || lastMessage.getContents) {
-                    // notification?
-                    if (lastMessage.textMessage) {
-                        lastActionClasses += " " + lastMessage.cssClass;
-                        lastActionText += lastMessage.textMessage;
-                    } else {
-                        // text message
-                        lastActionClasses += " fm-chat-messages-pad";
-                        lastActionText = lastMessage.getContents();
+                        lastAction = <div className={lastActionClasses}>
+                            <div className="nw-chat-notification-icon"></div>
+                            <div className="conversation-status">
+                                            <span>
+                                                {lastActionText}
+                                            </span>
+                            </div>
+                            <div className="conversations-time">{lastActivity}</div>
+                        </div>;
                     }
-
-                    lastAction = <div className={lastActionClasses}>
-                        <div className="nw-chat-notification-icon"></div>
-                        <div className="conversation-status">
-                                        <span>
-                                            {lastActionText}
-                                        </span>
-                        </div>
-                        <div className="conversations-time">{lastActivity}</div>
-                    </div>;
                 }
             } else {
                 lastAction = <div className={lastActionClasses}>

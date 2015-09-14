@@ -720,7 +720,7 @@ var silent_loading=false;
 
 if (m)
 {
-    var app,mobileblog,android;
+    var app,mobileblog,android,intent;
     var link = document.createElement('link');
     link.setAttribute('rel', 'stylesheet');
     link.type = 'text/css';
@@ -740,6 +740,19 @@ if (m)
         app='https://play.google.com/store/apps/details?id=nz.mega.android&referrer=meganzsb';
         document.body.className = 'android full-mode supported';
         android=1;
+
+        var ver = ua.match(/android (\d+)\.(\d+)/);
+        if (ver) {
+            var rev = ver.pop();
+            ver = ver.pop();
+            // Check for Android 2.3+
+            if (ver > 2 || (ver === 2 && rev > 3)) {
+                intent = 'intent://' + location.hash + '/#Intent;scheme=mega;package=nz.mega.android;end';
+            }
+        }
+        if (intent) {
+            document.location = intent;
+        }
     }
     else if (ua.indexOf('bb10') > -1)
     {
@@ -770,24 +783,8 @@ if (m)
     if (window.location.hash.substr(1,1) == '!' || window.location.hash.substr(1,2) == 'F!')
     {
         var i = 0;
-        var intent = false;
         if (ua.indexOf('windows phone') > -1) {
             i = 1;
-        }
-
-        if (android) {
-            var ver = ua.match(/android (\d+)\.(\d+)/);
-            if (ver) {
-                var rev = ver.pop();
-                ver = ver.pop();
-                // Check for Android 2.3+
-                if (ver > 2 || (ver === 2 && rev > 3)) {
-                    intent = 'intent://' + location.hash + '/#Intent;scheme=mega;package=nz.mega.android;end';
-                }
-            }
-            if (intent) {
-                document.location = intent;
-            }
         }
 
         if (app) {
@@ -812,10 +809,21 @@ if (m)
     }
     else if (window.location.hash.substr(1,7) == 'confirm' || window.location.hash.substr(1,7) == 'account')
     {
-        var i=0;
-        if (ua.indexOf('windows phone') > -1) i=1;
-        if (ua.indexOf('chrome') > -1) window.location ='mega://' + window.location.hash.substr(i);
-        else document.getElementById('m_iframe').src = 'mega://' + window.location.hash.substr(i);
+        var i = 0;
+        if (ua.indexOf('windows phone') > -1) {
+            i = 1;
+        }
+        if (ua.indexOf('chrome') > -1) {
+            window.location = 'mega://' + window.location.hash.substr(i);
+        }
+        else {
+            document.getElementById('m_iframe').src = 'mega://' + window.location.hash.substr(i);
+        }
+
+        if (intent) {
+            document.getElementById('m_title').innerHTML
+                += '<br/><em>If you already have it installed, <a href="' + intent + '">Click here!</a></em>';
+        }
     }
     if (mobileblog)
     {

@@ -106,7 +106,7 @@ var ChatdIntegration = function(megaChat) {
             var state = KarereEventObjects.OutgoingMessage.STATE.SENT;
 
             if(chatRoom.chatdIsProcessingHistory === true && chatRoom.chatdHistoryDeliveredMsgRetrieved === true) {
-                console.error("Setting state to delivered (from history)", eventData);
+                //console.error("Setting state to delivered (from history)", eventData);
                 state = KarereEventObjects.OutgoingMessage.STATE.DELIVERED;
             }
 
@@ -130,13 +130,13 @@ var ChatdIntegration = function(megaChat) {
         } else {
             var seenState = chatRoom.isCurrentlyActive;
 
-            console.error(
-                chatRoom.chatdIsProcessingHistory === true,
-                chatRoom.chatdHistorySeenMsgRetrieved
-            );
+            //console.error(
+            //    chatRoom.chatdIsProcessingHistory === true,
+            //    chatRoom.chatdHistorySeenMsgRetrieved
+            //);
 
             if(chatRoom.chatdIsProcessingHistory === true && chatRoom.chatdHistorySeenMsgRetrieved === true) {
-                console.error("Marking as seen (from history)", eventData.messageId);
+                //console.error("Marking as seen (from history)", eventData.messageId);
                 seenState = true;
             }
 
@@ -160,12 +160,12 @@ var ChatdIntegration = function(megaChat) {
             );
 
             if(chatRoom.chatdIsProcessingHistory !== true) {
-                console.error("Marking as received: ", chatRoom, eventData.messageId);
+                //console.error("Marking as received: ", chatRoom, eventData.messageId);
                 self.markMessageAsReceived(chatRoom, eventData.messageId);
             }
 
             if(seenState && chatRoom.chatdIsProcessingHistory !== true) {
-                console.error("Marking as seen: ", chatRoom, eventData.messageId);
+                //console.error("Marking as seen: ", chatRoom, eventData.messageId);
                 self.markMessageAsSeen(chatRoom, eventData.messageId);
             }
         }
@@ -175,7 +175,7 @@ var ChatdIntegration = function(megaChat) {
             chatRoom.appendMessage(messageObject);
         }
         if(chatRoom.chatdOldest === eventData.messageId) {
-            console.error("Finished receiving messages history.");
+            //console.error("Finished receiving messages history.");
             self.finishedReceivingMessagesHistory(chatRoom);
         }
 
@@ -188,7 +188,7 @@ var ChatdIntegration = function(megaChat) {
             if(!eventData.id) {
                 debugger;
             }
-            console.error("Confirmed: ", eventData.id);
+            //console.error("Confirmed: ", eventData.id);
 
             var found = false;
             chatRoom.messages.forEach(function(v, k) {
@@ -213,7 +213,7 @@ var ChatdIntegration = function(megaChat) {
         var chatRoom = _getChatRoomFromEventData(eventData);
 
 
-        console.error("Received: ", eventData.messageId);
+        //console.error("Received: ", eventData.messageId);
 
         var found = false;
         var msg = chatRoom.messages[eventData.messageId];
@@ -234,11 +234,11 @@ var ChatdIntegration = function(megaChat) {
 ChatdIntegration.prototype.openChatFromApi = function(actionPacket) {
     var self = this;
 
-    console.error("Will open chat for action packet: ", actionPacket);
+    //console.error("Will open chat for action packet: ", actionPacket);
 
     var chatParticipants = actionPacket.u;
     if(!chatParticipants) {
-        console.error("actionPacket returned no chat participants: ", chatParticipants);
+        //console.error("actionPacket returned no chat participants: ", chatParticipants);
     }
     var chatJids = [];
     Object.keys(chatParticipants).forEach(function(k) {
@@ -264,7 +264,7 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket) {
 };
 
 ChatdIntegration.prototype.apiReq = function(data) {
-    console.error("Api req: ", data);
+    //console.error("Api req: ", data);
 
     var $promise = new MegaPromise();
     api_req(data, {
@@ -416,20 +416,20 @@ ChatdIntegration._waitForShardToBeAvailable = function(fn) {
 
         var chatIdDecoded = base64urldecode(chatRoom.chatId);
         if(!self.chatd.chatidshard[chatIdDecoded]) {
-            console.error('shard is NOT available, queueing fn exection', fn);
+            //console.error('shard is NOT available, queueing fn exection', fn);
             createTimeoutPromise(function() {
                 return !!self.chatd.chatidshard[chatIdDecoded]
             }, 100, 10000)
                 .done(function() {
-                    console.error('shard is NOW available, executing queued fn', fn);
+                    //console.error('shard is NOW available, executing queued fn', fn);
                     masterPromise.linkDoneAndFailToResult(fn, self, args);
                 })
                 .fail(function() {
-                    console.error('waiting for shard failed rejecting call to', fn);
+                    //console.error('waiting for shard failed rejecting call to', fn);
                     masterPromise.reject(arguments)
                 });
         } else {
-            console.error('shard is available, executing immediately.');
+            //console.error('shard is available, executing immediately.');
             masterPromise.linkDoneAndFailToResult(fn, self, args);
         }
         return masterPromise;
@@ -455,7 +455,7 @@ ChatdIntegration.prototype.join = function(chatRoom) {
         'missing chatId, chatShard or chadUrl in megaRoom. halting chatd join and code execution.'
     );
 
-    //console.error("JOINNNN: ", chatRoom.roomJid, chatRoom.chatId, chatRoom.chatShard, chatRoom.chatdUrl);
+    ////console.error("JOINNNN: ", chatRoom.roomJid, chatRoom.chatId, chatRoom.chatShard, chatRoom.chatdUrl);
     self.chatd.join(base64urldecode(chatRoom.chatId), chatRoom.chatShard, chatRoom.chatdUrl);
     self.chatIdToRoomJid[chatRoom.chatId] = chatRoom.roomJid;
 };
@@ -467,13 +467,13 @@ ChatdIntegration.prototype.retrieveHistory = function(chatRoom, numOfMessages) {
 
 ChatdIntegration.prototype.markMessageAsSeen = function(chatRoom, msgid) {
     var self = this;
-    console.error("markMessageAsSeen", chatRoom, msgid);
+    //console.error("markMessageAsSeen", chatRoom, msgid);
     self.chatd.cmd(Chatd.Opcode.SEEN, base64urldecode(chatRoom.chatId), Chatd.Const.UNDEFINED + base64urldecode(msgid));
 };
 
 ChatdIntegration.prototype.markMessageAsReceived = function(chatRoom, msgid) {
     var self = this;
-    console.error("markMessageAsReceived", chatRoom, msgid);
+    //console.error("markMessageAsReceived", chatRoom, msgid);
     self.chatd.cmd(Chatd.Opcode.RECEIVED, base64urldecode(chatRoom.chatId), base64urldecode(msgid));
 };
 

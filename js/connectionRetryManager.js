@@ -134,13 +134,13 @@ ConnectionRetryManager.prototype.gotDisconnected = function(){
         self._$connectingPromise.reject();
     }
 
-    console.error(self._instanceIdx, "gotDisconnected: ", self.options.functions.isDisconnected());
+    //console.error(self._instanceIdx, "gotDisconnected: ", self.options.functions.isDisconnected());
     if (
         self.options.functions.isDisconnected() === true &&
         self.options.functions.isUserForcedDisconnect() === false
     ) {
 
-        console.error(self._instanceIdx, "bind mouse move");
+        //console.error(self._instanceIdx, "bind mouse move");
         $(document).rebind("mousemove.megaChatRetry" + self._instanceIdx, function() {
             self._connectionRetryUI();
         });
@@ -169,11 +169,11 @@ ConnectionRetryManager.prototype.gotConnected = function(){
     // stop any timer which is running to try to reconnect (which should not happen, but since Karere is async...
     // race condition may trigger a .reconnect() by a timer)
     if (self._connectionRetryInProgress) {
-        console.error(self._instanceIdx, "clearTimeout(self._connectionRetryInProgress);");
+        //console.error(self._instanceIdx, "clearTimeout(self._connectionRetryInProgress);");
         clearTimeout(self._connectionRetryInProgress);
         self._connectionRetryInProgress = null;
     }
-    console.error(self._instanceIdx, "unbind mouse move");
+    //console.error(self._instanceIdx, "unbind mouse move");
     $(document).unbind("mousemove.megaChatRetry" + self._instanceIdx);
     $(window).unbind("online.megaChatRetry" + self._instanceIdx);
     $(window).rebind("offline.megaChatRetry" + self._instanceIdx, function() {
@@ -210,20 +210,20 @@ ConnectionRetryManager.prototype.startedConnecting = function(waitForPromise){
 ConnectionRetryManager.prototype.doConnectionRetry = function(immediately){
     var self = this;
 
-    console.error(self._instanceIdx, "doConnectionRetry", immediately);
+    //console.error(self._instanceIdx, "doConnectionRetry", immediately);
 
     if (self._$connectingPromise && self._connectionRetries >= self.options.maxConnectionRetries) {
-        console.error(self._instanceIdx, "self._$connectingPromise.reject", arguments);
+        //console.error(self._instanceIdx, "self._$connectingPromise.reject", arguments);
         self._$connectingPromise.reject(arguments);
     }
 
     if (self.options.functions.isUserForcedDisconnect()) {
-        console.error(self._instanceIdx, "self.options.functions.isUserForcedDisconnect() -> RETURN reject");
+        //console.error(self._instanceIdx, "self.options.functions.isUserForcedDisconnect() -> RETURN reject");
         return MegaPromise.reject();
     }
-    console.error("!B", self._connectionRetries);
+    //console.error("!B", self._connectionRetries);
     self._connectionRetries++;
-    console.error("!A", self._connectionRetries);
+    //console.error("!A", self._connectionRetries);
 
 
     if (self.logger) {
@@ -270,7 +270,7 @@ ConnectionRetryManager.prototype.doConnectionRetry = function(immediately){
         );
 
         if (self._connectionRetryInProgress) {
-            console.error(self._instanceIdx, "con ret. was already in progress", self._connectionRetryInProgress);
+            //console.error(self._instanceIdx, "con ret. was already in progress", self._connectionRetryInProgress);
             clearTimeout(
                 self._connectionRetryInProgress
             );
@@ -279,13 +279,13 @@ ConnectionRetryManager.prototype.doConnectionRetry = function(immediately){
 
         self._connectionRetryInProgress = setTimeout(function() {
             if (!self.options.functions.isConnected()) {
-                console.error(self._instanceIdx, "will try to reconnect NOW.");
+                //console.error(self._instanceIdx, "will try to reconnect NOW.");
                 self.options.functions.reconnect(self);
             } else {
-                console.error(self._instanceIdx, "isConnectedOrConnecting returned true?!");
+                //console.error(self._instanceIdx, "isConnectedOrConnecting returned true?!");
             }
         }, connectionRetryTimeout);
-        console.error(self._instanceIdx, "next retry in: ", connectionRetryTimeout, self._connectionRetries);
+        //console.error(self._instanceIdx, "next retry in: ", connectionRetryTimeout, self._connectionRetries);
 
 
         self._lastConnectionRetryTime = unixtime();
@@ -304,12 +304,12 @@ ConnectionRetryManager.prototype._connectionRetryUI = function(){
         !self.options.functions.isConnectedOrConnecting() &&
         (unixtime() - self._lastConnectionRetryTime) > (self.options.connectionRetryFloorVal / 1000)
     ) {
-        console.error(self._instanceIdx, "Will do a forced connection retry immediately because of UI interaction.");
+        //console.error(self._instanceIdx, "Will do a forced connection retry immediately because of UI interaction.");
         self.doConnectionRetry(true);
         return true;
     }
     else {
-        console.error(self._instanceIdx, "Will NOT do a forced connection retry immediately because of UI interaction.");
+        //console.error(self._instanceIdx, "Will NOT do a forced connection retry immediately because of UI interaction.");
         return false;
     }
 };
@@ -321,7 +321,7 @@ ConnectionRetryManager.prototype.resetConnectionRetries = function() {
     var self = this;
 
     self._connectionRetries = 0;
-    console.error(self._instanceIdx, "clearTimeout(self._connectionRetryInProgress);");
+    //console.error(self._instanceIdx, "clearTimeout(self._connectionRetryInProgress);");
     clearTimeout(self._connectionRetryInProgress);
     if (self._$connectingPromise) {
         self._$connectingPromise.reject();

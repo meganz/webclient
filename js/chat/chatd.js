@@ -48,7 +48,7 @@ var Chatd = function(userid, options) {
         'onMembersUpdated'
     ].forEach(function(evt) {
             self.rebind(evt + '.chatd', function(e) {
-                console.error(evt, JSON.stringify(arguments[1]));
+                //console.error(evt, JSON.stringify(arguments[1]));
             });
     });
 };
@@ -213,7 +213,7 @@ Chatd.Shard.prototype.isOnline = function() {
 Chatd.Shard.prototype.reconnect = function() {
     var self = this;
 
-    console.error("shard reconnect", this.url);
+    //console.error("shard reconnect", this.url);
 
     self.s = new WebSocket(this.url);
     self.s.binaryType = "arraybuffer";
@@ -251,7 +251,7 @@ Chatd.Shard.prototype.disconnect = function() {
 };
 
 Chatd.Shard.prototype.cmd = function(opcode, cmd) {
-    console.error(opcode, cmd);
+    //console.error(opcode, cmd);
     this.cmdq += String.fromCharCode(opcode)+cmd;
 
     if (this.isOnline()) {
@@ -691,7 +691,7 @@ Chatd.Messages.prototype.store = function(newmsg, userid, msgid, timestamp, msg)
 };
 
 Chatd.prototype.msgmodify = function(chatid, msgid, msg) {
-    console.error("msgmodify", chatid, msgid, msg);
+    //console.error("msgmodify", chatid, msgid, msg);
 
     // an existing message has been modified
     if (this.chatidmessages[chatid]) {

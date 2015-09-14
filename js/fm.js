@@ -7307,7 +7307,7 @@ function fillShareDialogWithContent() {
             // Additional check of 'c' grants that only active
             // contacts will be addded, this prevents contact
             //  duplication in share dialog contact list
-            if (M.u[userHandle] && M.u[userHandle].c && M.u[userHandle].c === 1) {
+            if (M.u[userHandle] && M.u[userHandle].c && (M.u[userHandle].c === 1)) {
                     user = M.u[userHandle];
                     email = user.m;
                     name = (user.name && user.name.length > 1) ? user.name : user.m;

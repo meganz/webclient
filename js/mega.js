@@ -4808,10 +4808,11 @@ function execsc(actionPackets, callback) {
                     
                     // Fill DDL with removed contact
                     if (actionPacket.u) {
+                        
                         var email = M.u[actionPacket.u].m;
                         
-                        addToMultiInputDropDownList('.share-multiple-input', [{id: email, name: email}]);
-                        addToMultiInputDropDownList('.add-contact-multiple-input', [{id: email, name: email}]);
+                        addToMultiInputDropDownList('.share-multiple-input', [{ id: email, name: email }]);
+                        addToMultiInputDropDownList('.add-contact-multiple-input', [{ id: email, name: email}]);
                     }
                 }
             }

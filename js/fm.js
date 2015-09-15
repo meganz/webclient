@@ -3323,7 +3323,6 @@ function accountUI()
             if (!el[5]) {
                 recent = htmlentities(time2date(el[0]));
             }
-            console.error(el);
             recent += '<span class="settings-logout">' + l[967] + '</span>';
             if (!country.icon || country.icon === '??.gif')
                 country.icon = 'ud.gif';

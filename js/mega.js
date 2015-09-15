@@ -3060,7 +3060,7 @@ function MegaData()
                 }
             });
 
-            api_req({a: 'usl'}, {
+            api_req({a: 'usl', x: 1}, {
                 account: account,
                 callback: function(res, ctx)
                 {

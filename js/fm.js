@@ -3311,24 +3311,45 @@ function accountUI()
         });
         $('.grid-table.sessions tr').remove();
         var html = '<tr><th>' + l[479] + '</th><th>' + l[480] + '</th><th>' + l[481] + '</th><th>' + l[482] + '</th></tr>';
-        $(account.sessions).each(function(i, el)
+        $(account.sessions).filter(function(i, el) {
+            return el[7];
+        }).each(function(i, el)
         {
             if (i == $.sessionlimit)
                 return false;
             var country = countrydetails(el[4]);
             var browser = browserdetails(el[2]);
-            var recent = '<span class="active-seccion-txt">' + l[483] + '</span><span class="settings-logout">' + l[967] + '</span>';
-            if (!el[5])
+            var recent = '<span class="active-seccion-txt">' + l[483] + '</span>';
+            if (!el[5]) {
                 recent = htmlentities(time2date(el[0]));
+            }
+            console.error(el);
+            recent += '<span class="settings-logout">' + l[967] + '</span>';
             if (!country.icon || country.icon === '??.gif')
                 country.icon = 'ud.gif';
-            html += '<tr><td><span class="fm-browsers-icon"><img alt="" src="' + staticpath + 'images/browser/' + browser.icon + '" /></span><span class="fm-browsers-txt">' + htmlentities(browser.name) + '</span></td><td>' + htmlentities(el[3]) + '</td><td><span class="fm-flags-icon"><img alt="" src="' + staticpath + 'images/flags/' + country.icon + '" style="margin-left: 0px;" /></span><span class="fm-flags-txt">' + htmlentities(country.name) + '</span></td><td>' + recent + '</td></tr>';
+            html += '<tr class="' + (el[5] ? "current" : el[6]) +  '">'
+                + '<td><span class="fm-browsers-icon"><img alt="" src="' + staticpath + 'images/browser/' + browser.icon + '" /></span><span class="fm-browsers-txt">' + htmlentities(browser.name) + '</span></td>'
+                + '<td>' + htmlentities(el[3]) + '</td>'
+                + '<td><span class="fm-flags-icon"><img alt="" src="' + staticpath + 'images/flags/' + country.icon + '" style="margin-left: 0px;" /></span><span class="fm-flags-txt">' + htmlentities(country.name) + '</span></td>'
+                + '<td>' + recent + '</td></tr>';
         });
         $('.grid-table.sessions').html(html);
 
-        $('.settings-logout').bind('click', function()
-        {
-            mLogout();
+        $('.settings-logout').bind('click', function() {
+            var $this = $(this).parents('tr');
+            var type = $this.attr('class');
+            if (type === 'current') {
+                mLogout();
+            } else {
+                loadingDialog.show();
+                api_req({ a: 'usr', s: [type]}, {
+                    callback: function(res, ctx) {
+                        console.error(res, type);
+                        $this.remove();
+                        loadingDialog.hide();
+                    }
+                });
+            }
         });
 
         $('.account-history-dropdown-button.purchases').text(l[469].replace('[X]', $.purchaselimit));

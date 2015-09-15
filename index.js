@@ -1239,22 +1239,22 @@ function topmenuUI() {
             }
         });
         
-        var $topChangeLangButton = $('.top-change-language');
-        var languageName = ln2[lang];
         
-        // Change language name in top title
-        $topChangeLangButton.find('.language-name').text(languageName);
+        var $topChangeLang = $('.top-change-language');
+        var $topChangeLangName = $topChangeLang.find('.top-change-language-name');
+        var $topChangeLangIcon = $topChangeLang.find('.top-change-language-icon');
+        var languageName = ln[lang];
         
         // Init the top header change language button
-        $topChangeLangButton.show();
-        $topChangeLangButton.rebind('click', function() {
+        $topChangeLangName.text(languageName);
+        $topChangeLang.removeClass('hidden');
+        $topChangeLang.rebind('click', function() {
             languageDialog();
         });
         
         // If they have changed the language from English, then show different style
         if (lang !== 'en') {
-            $topChangeLangButton.addClass('other-language');
-            $topChangeLangButton.find('.language-text').hide();
+            $topChangeLangIcon.addClass('other-language');
         }
 
         $('.top-menu-item.register,.context-menu-divider.register,.top-menu-item.login').show();

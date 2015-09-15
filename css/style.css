@@ -1446,33 +1446,35 @@ a.blog-button:hover {
 
 /* Change top language button */
 .top-change-language {
-    color: rgba(255, 255, 255, 0.7);
     cursor: pointer;
     float: right;
-    margin-right: 10px;
-    margin-top: 4px;
+    position: relative;
 }
-.top-change-language:hover {
+.top-change-language:hover .top-change-language-name {
     color: #fff;
 }
-.top-change-language .icon {
+.top-change-language-icon {
     background-image: url("../images/mega/lang-selection-sprite.png");
-    background-position: 0 0;
+    background-position: -8px 0;
     background-repeat: no-repeat;
+    border-radius: 2px;
     display: inline-block;
-    height: 32px;
-    margin-bottom: -8px;
-    margin-right: 5px;
-    width: 46px;
-}
-.top-change-language.other-language {
-    margin-top: 11px;
-}
-.top-change-language.other-language .icon {
-    background-position: -80px -8px;
     height: 26px;
-    margin-bottom: -9px;
+    left: -59px;
+    position: absolute;
+    top: 11px;
+    width: 48px;
+}
+.top-change-language-icon.other-language {
+    background-position: -119px 0;
+    height: 26px;
+    left: -35px;
     width: 26px;
+}
+.top-change-language-name {
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 48px;
+    margin-right: 10px;
 }
 
 .top-login-button:hover, .top-login-button.active {
@@ -24721,6 +24723,10 @@ body.pro:after {
 .pro-register-paypal-dialog .reg-success-icon, .payment-confirmation .icon, .bitcoin-invoice-dialog .qr-code-mega-icon, .bitcoin-invoice-dialog .clock-icon, .nt-payment-notification .notification-avatar-icon, .payment-result-icon, .payment-close-icon, .overlay-close-icon {
  background-image: url(../images/mega/bitcoin-v4@2x.png);
  background-size: 200px auto;
+}
+.top-change-language-icon {
+    background-image: url("../images/mega/lang-selection-sprite@2x.png");
+    background-size: 156px auto;
 }
 .fm-dialog.cancel-subscription-st2 .blue-success-icon {
  background-image: url(../images/mega/bitcoin-v4@2x.png);

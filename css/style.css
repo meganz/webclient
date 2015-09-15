@@ -1460,21 +1460,28 @@ a.blog-button:hover {
     border-radius: 2px;
     display: inline-block;
     height: 26px;
-    left: -59px;
-    position: absolute;
-    top: 11px;
+    margin-right: 10px;
+    margin-top: 11px;
     width: 48px;
-}
-.top-change-language-icon.other-language {
-    background-position: -119px 0;
-    height: 26px;
-    left: -35px;
-    width: 26px;
 }
 .top-change-language-name {
     color: rgba(255, 255, 255, 0.7);
+    display: block;
     line-height: 48px;
-    margin-right: 10px;
+    overflow: hidden;
+    position: absolute;
+    right: 67px;
+    text-align: right;
+    top: 0;
+    white-space: nowrap;
+}
+.top-change-language.other-language .top-change-language-name {
+    right: 45px;
+}
+.top-change-language.other-language .top-change-language-icon {
+    background-position: -119px 0;
+    height: 26px;
+    width: 26px;
 }
 
 .top-login-button:hover, .top-login-button.active {

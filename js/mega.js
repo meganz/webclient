@@ -3062,7 +3062,7 @@ function MegaData()
 
             /* x: 1, load the session ids
                useful to expire the session from the session manager */
-            api_req({a: 'usl', x: 1 }, {
+            api_req({ a: 'usl', x: 1 }, {
                 account: account,
                 callback: function(res, ctx)
                 {

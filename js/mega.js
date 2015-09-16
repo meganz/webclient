@@ -1558,7 +1558,10 @@ function MegaData()
             window.location.hash = '#fm/' + M.currentdirid;
         }
         searchPath();
-        treesearchUI();
+        
+        var sortMenu = new mega.SortMenu();
+        sortMenu.treeSearchUI;
+        
         $(document).trigger('MegaOpenFolder');
     };
 
@@ -1777,7 +1780,10 @@ function MegaData()
             _a = 'treea_',
             rebuild = false,
             sharedfolder, openedc, arrowIcon,
-            ulc, expandedc, buildnode, containsc, cns, html, sExportLink, sLinkIcon;
+            ulc, expandedc, buildnode, containsc, cns, html, sExportLink, sLinkIcon,
+            prefix;
+        
+        var nodes = new mega.Nodes({});
 
         if (!n) {
             console.error('Invalid node passed to M.buildtree');
@@ -1838,14 +1844,15 @@ function MegaData()
             stype = "folder-link";
         }
 
+        prefix = stype;
         // Detect copy and move dialogs, make sure that right DOMtree will be sorted.
         // copy and move dialogs have their own trees and sorting is done independently
         if (dialog) {
             if (dialog.indexOf('copy-dialog') !== -1) {
-                stype = 'Copy' + stype;
+                prefix = 'Copy' + stype;
             }
             else if (dialog.indexOf('move-dialog') !== -1) {
-                stype = 'Move' + stype;
+                prefix = 'Move' + stype;
             }
         }
         
@@ -1861,7 +1868,7 @@ function MegaData()
 
             // localCompare >=IE10, FF and Chrome OK
             // sort by name is default in the tree
-            treePanelSortElements(stype, folders, {
+            treePanelSortElements(prefix, folders, {
                 name: function(a, b) {
                     if (a.name)
                         return a.name.localeCompare(b.name);
@@ -1904,7 +1911,9 @@ function MegaData()
                         fmtreenode(folders[ii].h, false);
                     }
                     sharedfolder = '';
-                    if (M.d[folders[ii].h].shares) {
+                    
+                    // Check is there a full and pending share available, exclude link shares i.e. 'EXP'
+                    if (nodes.isShareExist([folders[ii].h], true, true, false)) {
                         sharedfolder = ' shared-folder';
                     }
 

@@ -253,164 +253,6 @@ function treeredraw()
     treeUI();
 }
 
-function treesearchUI()
-{
-    $('.nw-fm-tree-header').unbind('click');
-    $('.nw-fm-search-icon').unbind('click');
-    $('.nw-fm-tree-header input').unbind('keyup');
-    $('.nw-fm-tree-header input').unbind('blur');
-
-    if (!$('.fm-tree-panel .content-panel.active').find('ul li, .nw-contact-item').length) {
-      $('.nw-fm-tree-header input').prop('readonly', true);
-      $('.nw-fm-search-icon').hide();
-    } else {
-      $('.nw-fm-search-icon').show();
-      $('.nw-fm-tree-header input').prop('readonly', false);
-      $('.nw-fm-tree-header').bind('click', function(e)
-      {
-        var c = $(e.target).attr('class');
-        if (c && c.indexOf('nw-fm-search-icon') > -1)
-        {
-            var c = $(this).attr('class');
-            if (c && c.indexOf('filled-input') > -1)
-            {
-                $(this).removeClass('filled-input');
-                return;
-            }
-        }
-        var i = $(this).find('input');
-        $(this).addClass('focused-input');
-        if (i.val() == i.attr('placeholder'))
-        {
-            i.val('');
-            i.focus();
-        }
-      });
-      $('.nw-fm-search-icon').bind('click', function()
-      {
-        treesearch = false;
-        treeredraw();
-        $(this).prev().val('');
-        $(this).parent().find('input').blur();
-      });
-
-      $('.nw-fm-tree-header input').bind('keyup', function(e)
-      {
-        var h = $(this).parent();
-        if (e.keyCode == 27)
-        {
-            h.removeClass('filled-input');
-            $(this).val('');
-            $(this).blur();
-            treesearch = false;
-        }
-        else
-        {
-            h.addClass('filled-input');
-            treesearch = $(this).val();
-        }
-        if ($(this).val() == '')
-            h.removeClass('filled-input');
-        treeredraw()
-      });
-
-      $('.nw-fm-tree-header input').bind('blur', function()
-      {
-        if ($(this).val() == $(this).attr('placeholder') || $(this).val() == '')
-        {
-            $(this).parent('.nw-fm-tree-header').removeClass('focused-input filled-input');
-            $(this).val($(this).attr('placeholder'));
-        }
-        else
-            $(this).parent('.nw-fm-tree-header').removeClass('focused-input');
-      });
-    }
-
-    $('.nw-tree-panel-arrows').rebind('click', function() {
-        
-        var menu, type, sortTreePanel;
-        
-        // Show sort menu
-        if ($(this).attr('class').indexOf('active') === -1) {
-            
-            $.hideContextMenu();
-            
-            $(this).addClass('active');
-            
-            menu = $('.nw-sorting-menu').removeClass('hidden');
-            type = treePanelType();
-            
-            if (type === 'contacts') {
-                menu.find('.sorting-item-divider,.sorting-menu-item').removeClass('hidden');
-            }
-            else {
-                menu.find('*[data-by=status],*[data-by=last-interaction]').addClass('hidden');
-            }
-            
-            sortTreePanel = $.sortTreePanel[type];
-            
-            if (d && !sortTreePanel) {
-                console.error('No sortTreePanel', type);
-            }
-
-            var $o = $('.sorting-menu-item').removeClass('active');
-            
-            if (sortTreePanel) {
-                $o.filter('*[data-by=' + sortTreePanel.by + '],*[data-dir=' + sortTreePanel.dir + ']').addClass('active');
-            }
-            
-            return false;
-        }
-        
-        // Hide sort menu
-        else {
-            $(this).removeClass('active');
-            $('.nw-sorting-menu').addClass('hidden');
-        }
-    });
-
-    $('.fm-left-panel .sorting-menu-item').rebind('click', function() {
-
-        var $this = $(this),
-            data = $this.data(),
-            type = treePanelType();
-
-        if ($this.attr('class').indexOf('active') === -1) {
-            $this.parent().find('.sorting-menu-item').removeClass('active');
-            $this.addClass('active');
-            $('.nw-sorting-menu').addClass('hidden');
-            $('.nw-tree-panel-arrows').removeClass('active');
-
-            if (data.dir) {
-                localStorage['sort' + type + 'Dir'] = $.sortTreePanel[type].dir = data.dir;
-            }
-            else {
-                localStorage['sort' + type + 'By'] = $.sortTreePanel[type].by = data.by;
-            }
-
-            switch (type) {
-                case 'contacts':
-                    M.contacts();
-                    break;
-                case 'shared-with-me':
-                    M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
-                    break;
-                case 'cloud-drive':
-                case 'folder-link':
-                    M.buildtree(M.d[M.RootID], M.buildtree.FORCE_REBUILD);
-                    break;
-                case 'inbox':
-                    M.buildtree(M.d[M.InboxID], M.buildtree.FORCE_REBUILD);
-                    break
-                case 'rubbish-bin':
-                    M.buildtree({h: M.RubbishID}, M.buildtree.FORCE_REBUILD);
-                    break;
-            }
-            treeUI(); // reattach events
-        }
-    });
-}
-
 function treePanelType() {
     
     return $.trim($('.nw-fm-left-icon.active').attr('class').replace(/(active|nw-fm-left-icon|ui-droppable)/g, ''));
@@ -454,47 +296,6 @@ function treePanelSortElements(type, elements, handlers, ifEq) {
     });
 }
 
-function initializeTreePanelSorting() {
-    
-    $.sortTreePanel = {};
-    
-    $.each(['folder-link', 'contacts', 'conversations', 'inbox', 'shared-with-me', 'cloud-drive', 'rubbish-bin'], function(key, type) {
-        $.sortTreePanel[type] = {
-            by: anyOf(['name', 'status', 'last-interaction'], localStorage['sort' + type + 'By']) || (type === 'contacts' ? "status": "name"),
-            dir: parseInt(anyOf(['-1', '1'], localStorage['sort' + type + 'Dir']) || '1')
-        };
-    });
-}
-
-/**
- * initializeDialogTreePanelSorting
- * 
- * Initialize sorting menu in copy and move dialogs
-*/
-function initializeDialogTreePanelSorting() {
-    
-    var dlgKey;
-    
-    // Copy dialog
-    $.each(['folder-link', 'contacts', 'conversations', 'inbox', 'shared-with-me', 'cloud-drive', 'rubbish-bin'], function(key, type) {
-        dlgKey = 'Copy' + type;
-        
-        $.sortTreePanel[dlgKey] = {
-            by: anyOf(['name', 'status', 'last-interaction'], localStorage['sort' + dlgKey + 'By']) || (type === 'contacts' ? "status": "name"),
-            dir: parseInt(anyOf(['-1', '1'], localStorage['sort' + dlgKey + 'Dir']) || '1')
-        };
-    });
-    
-    // Move dialog
-    $.each(['folder-link', 'contacts', 'conversations', 'inbox', 'shared-with-me', 'cloud-drive', 'rubbish-bin'], function(key, type) {
-        var dlgKey = 'Move' + type;
-        $.sortTreePanel[dlgKey] = {
-            by: anyOf(['name', 'status', 'last-interaction'], localStorage['sort' + dlgKey + 'By']) || (type === 'contacts' ? "status": "name"),
-            dir: parseInt(anyOf(['-1', '1'], localStorage['sort' + dlgKey + 'Dir']) || '1')
-        };
-    });
-}
-
 function initUI() {
     if (d) {
         console.time('initUI');
@@ -528,9 +329,11 @@ function initUI() {
         $('.fm-main').removeClass('active-folder-link');
     }
 
-    treesearchUI();
-    initializeTreePanelSorting();
-    initializeDialogTreePanelSorting();
+    var sortMenu = new mega.SortMenu();
+    
+    sortMenu.treeSearchUI();
+    sortMenu.initializeTreePanelSorting();
+    sortMenu.initializeDialogTreePanelSorting();
     
     $.doDD = function(e, ui, a, type)
     {
@@ -2381,7 +2184,7 @@ function fmremove() {
                 }
             }
 
-            delShareInfo = nodes.isShareExist(dirTree) ? ' ' + l[1952] + ' ' + l[7410] : '';
+            delShareInfo = nodes.isShareExist(dirTree, true, true, true) ? ' ' + l[1952] + ' ' + l[7410] : '';
 
             msgDialog('remove', l[1003], l[1004].replace('[X]', fm_contains(filecnt, foldercnt)) + delShareInfo, false, function(e) {
                 if (e) {
@@ -8116,24 +7919,23 @@ function copyDialog() {
         delete $.onImportCopyNodes;
     });
 
-    $('.copy-dialog-button').unbind('click');
-    $('.copy-dialog-button').bind('click', function() {
-        var section = $(this).attr('class').split(" ")[1];
-        selectCopyDialogTabRoot(section);
-        if ($(this).attr('class').indexOf('active') == -1)
-        {
-            switch (section)
-            {
-                case 'cloud-drive':
-                case 'folder-link':
-                    handleDialogContent(section, 'ul', true, 'copy', $.mcImport ? l[236] : "Paste" /*l[63]*/);
-                    break;
-                case 'shared-with-me':
-                    handleDialogContent(section, 'ul', false, 'copy', l[5631]);
-                    break;
-                case 'conversations':
-                    handleDialogContent(section, 'div', false, 'copy', l[1940], '.conversations-container');
-                    break;
+    $('.copy-dialog-button').rebind('click', function() {
+
+        var section;
+        
+        if ($(this).attr('class').indexOf('active') === -1) {
+
+            section = $(this).attr('class').split(" ")[1];
+            selectCopyDialogTabRoot(section);
+
+            if ((section === 'cloud-drive') || (section === 'folder-link')) {
+                handleDialogContent(section, 'ul', true, 'copy', $.mcImport ? l[236] : "Paste" /*l[63]*/); // Import
+            }
+            else if (section === 'shared-with-me') {
+                handleDialogContent(section, 'ul', false, 'copy', l[1344]); // Share
+            }
+            else if (section === 'conversations') {
+                handleDialogContent(section, 'div', false, 'copy', l[1940], '.conversations-container'); // Send
             }
         }
     });
@@ -8149,11 +7951,10 @@ function copyDialog() {
             $copyDialog = $('.copy-dialog'),
             type, menu, key;
             
-
         if ($self.attr('class').indexOf('active') === -1) {
 
             menu = $('.dialog-sorting-menu').removeClass('hidden');
-            type = $('.fm-dialog-title .copy-dialog-txt.active').attr('class').split(" ")[1];
+            type = $('.fm-dialog-title .copy-dialog-txt.active').attr('class').split(' ')[1];
             
             // Enable all menu items
             if (type === 'contacts') {
@@ -8204,16 +8005,15 @@ function copyDialog() {
     $('.copy-dialog .sorting-menu-item').rebind('click', function() {
 
         var $self = $(this),
-            data, type;
+            data, type, key;
 
         if ($self.attr('class').indexOf('active') === -1) {
 
             // Arbitrary element data
             data = $self.data();
-            type = $('.fm-dialog-title .copy-dialog-txt.active').attr('class').split(" ")[1];
+            type = $('.fm-dialog-title .copy-dialog-txt.active').attr('class').split(' ')[1];
             key = 'Copy' + type;
             
-
             // Check arbitrary data associated with current menu item
             if (data.dir) {
                 localStorage['sort' + key + 'Dir'] = $.sortTreePanel[key].dir = data.dir;
@@ -8224,7 +8024,6 @@ function copyDialog() {
 
             if ((type === 'cloud-drive') || (type === 'folder-link')) {
                 M.buildtree(M.d[M.RootID], 'copy-dialog');
-                disableCircularTargets('#mctreea_');
             }
             else if (type === 'shared-with-me') {
                 M.buildtree({ h: 'shares' }, 'copy-dialog');
@@ -8408,53 +8207,79 @@ function moveDialog() {
         }
     };
 
-    $('.move-dialog .fm-dialog-close, .move-dialog .dialog-cancel-button').unbind('click');
-    $('.move-dialog .fm-dialog-close, .move-dialog .dialog-cancel-button').bind('click', function() {
+    $('.move-dialog .fm-dialog-close, .move-dialog .dialog-cancel-button').rebind('click', function() {
         
         closeDialog();
     });
 
-    $('.move-dialog-button').unbind('click');
-    $('.move-dialog-button').bind('click', function() {
+    $('.move-dialog-button').rebind('click', function(e) {
         
-        var section = $(this).attr('class').split(' ')[1];
-        
-        selectMoveDialogTabRoot(section);
+        var section;
         
         if ($(this).attr('class').indexOf('active') === -1) {
-            switch (section) {
-                case 'cloud-drive':
-                case 'folder-link':
+
+            section = $(this).attr('class').split(" ")[1];
+            selectMoveDialogTabRoot(section);
+        
+            if ((section === 'cloud-drive') || (section === 'folder-link')) {
                     handleDialogContent(section, 'ul', true, 'move', l[62]); // Move
-                    break;
-                case 'shared-with-me':
-                    handleDialogContent(section, 'ul', false, 'move', l[5631]); // Share folder
-                    break;
-                case 'rubbish-bin':
-                    handleDialogContent(section, 'ul', false, 'move', l[62]); // Copy
-                    break;
+            }
+            else if (section === 'shared-with-me') {
+                handleDialogContent(section, 'ul', false, 'move', l[1344]); // Share
+            }
+            else if (section === 'rubbish-bin') {
+                handleDialogContent(section, 'ul', false, 'move', l[62]); // Move
             }
         }
     });
 
-    $('.move-dialog-panel-arrows').unbind('click');
-    $('.move-dialog-panel-arrows').bind('click', function() {
+    $('.move-dialog-panel-arrows').rebind('click', function() {
         
-        if ($(this).attr('class').indexOf('active') === -1) {
+        var $self = $(this),
+            $moveDialog = $('.move-dialog'),
+            menu, type, key;
             
-            var type = $('.fm-dialog-title .move-dialog-txt.active').attr('class').split(" ")[1];
+        if ($self.attr('class').indexOf('active') === -1) {
             
-            $('.move-dialog .dialog-sorting-menu .sorting-menu-item')
+            menu = $('.dialog-sorting-menu').removeClass('hidden'),
+            type = $('.fm-dialog-title .move-dialog-txt.active').attr('class').split(' ')[1];
+
+            // Enable all menu items
+            menu.find('.sorting-item-divider,.sorting-menu-item').removeClass('hidden');
+            
+            // Hide sort by status and last-interaction items from menu
+            menu.find('*[data-by=status],*[data-by=last-interaction]').addClass('hidden');
+
+            // Move dialog key only
+            key = 'Move' + type;
+            
+            // Check existance of previous sort options, direction (dir)
+            if (localStorage['sort' + key + 'Dir']) {
+                $.sortTreePanel[key].dir = localStorage['sort' + key + 'Dir'];
+            }
+            else {
+                $.sortTreePanel[key].dir = 1;
+            }
+
+            // Check existance of previous sort option, ascending/descending (By)
+            if (localStorage['sort' + key + 'By']) {
+                $.sortTreePanel[key].by = localStorage['sort' + key + 'By'];
+            }
+            else {
+                $.sortTreePanel[key].by = 'name';
+            }
+            
+            $moveDialog.find('.dialog-sorting-menu .sorting-menu-item')
                 .removeClass('active')
-                .filter('*[data-by=' + $.sortTreePanel[type].by + '],*[data-dir=' + $.sortTreePanel[type].dir + ']')
+                .filter('*[data-by=' + $.sortTreePanel[key].by + '],*[data-dir=' + $.sortTreePanel[key].dir + ']')
                 .addClass('active');
 
-            $(this).addClass('active');
-            $('.move-dialog .dialog-sorting-menu').removeClass('hidden');
+            $self.addClass('active');
+            $moveDialog.find('.dialog-sorting-menu').removeClass('hidden');
         }
         else {
-            $(this).removeClass('active');
-            $('.move-dialog .dialog-sorting-menu').addClass('hidden');
+            $self.removeClass('active');
+            $moveDialog.find('.dialog-sorting-menu').addClass('hidden');
         }
     });
 
@@ -8468,10 +8293,12 @@ function moveDialog() {
 
         if ($self.attr('class').indexOf('active') === -1) {
             
+            // Arbitrary element data
             data = $self.data();
-            type = $('.fm-dialog-title .move-dialog-txt.active').attr('class').split(" ")[1];
+            type = $('.fm-dialog-title .move-dialog-txt.active').attr('class').split(' ')[1];
             key = 'Move' + type;
-                
+
+            // Check arbitrary data associated with current menu item
             if (data.dir) {
                 localStorage['sort' + key + 'Dir'] = $.sortTreePanel[key].dir = data.dir;
             }
@@ -8485,10 +8312,10 @@ function moveDialog() {
             }
             else if (type === 'shared-with-me') {
                 M.buildtree({ h: 'shares' }, 'move-dialog');
-                disableReadOnlySharedFolders('copy');
+                disableReadOnlySharedFolders('move');
             }
             else if (type === 'rubbish-bin') {
-                M.buildtree({h: M.RubbishID}, 'move-dialog');
+                M.buildtree({ h: M.RubbishID }, 'move-dialog');
             }
 
             $self.parent().find('.sorting-menu-item').removeClass('active');
@@ -10780,3 +10607,269 @@ function removeFromMultiInputDDL(dialog, item) {
         $(dialog).tokenInput("removeFromDDL", item);
     }
 }
+
+(function($, scope) {
+    /**
+     * Sort dialogs, dialogs used for sorting content in left panels, copy and move dialogs.
+     *
+     * @param opts {Object}
+     *
+     * @constructor
+     */
+    var SortMenu = function(opts) {
+
+        var self = this;
+        var defaultOptions = {
+        };
+
+        self.options = $.extend(true, {}, defaultOptions, opts);
+    };
+
+    /**
+     * treesearchUI
+     */
+    SortMenu.prototype.treeSearchUI = function() {
+
+        $('.nw-fm-tree-header').unbind('click');
+        $('.nw-fm-search-icon').unbind('click');
+        $('.nw-fm-tree-header input').unbind('keyup');
+        $('.nw-fm-tree-header input').unbind('blur');
+
+        // Items are NOT available in left panel, hide search
+        if (!$('.fm-tree-panel .content-panel.active').find('ul li, .nw-contact-item').length) {
+            $('.nw-fm-tree-header input').prop('readonly', true);
+            $('.nw-fm-search-icon').hide();
+        }
+        else { // There's items available 
+            $('.nw-fm-search-icon').show();
+            $('.nw-fm-tree-header input').prop('readonly', false);
+          
+            // Left panel header click, show search input box
+            $('.nw-fm-tree-header').bind('click', function(e) {
+            
+                var $self = $(this);
+              
+                var targetClass = $(e.target).attr('class'),
+                    filledInput = $self.attr('class'),
+                    $input = $self.find('input');
+              
+                // Search icon visible
+                if (targetClass && (targetClass.indexOf('nw-fm-search-icon') > -1)) {
+                  
+                    // Remove previous search text
+                    if (filledInput && (filledInput.indexOf('filled-input') > -1)) {
+                        $self.removeClass('filled-input');
+                    }
+                }
+                else {
+                    $self.addClass('focused-input');
+                    if ($input.val() === $input.attr('placeholder')) {
+                        $input.val('');
+                        $input.focus();
+                    }
+                }
+            }); // END left panel header click
+            
+            // Make a search
+            $('.nw-fm-search-icon').bind('click', function() {
+                
+                var $self = $(this);
+                
+                treesearch = false;
+                treeredraw();
+                $self.prev().val('');
+                $self.parent().find('input').blur();
+            });
+  
+            $('.nw-fm-tree-header input').bind('keyup', function(e) {
+                
+                var $self = $(this);
+                
+                var $parentElem = $self.parent();
+                
+                if (e.keyCode === 27) {
+                    $parentElem.removeClass('filled-input');
+                    $self.val('');
+                    $self.blur();
+                    treesearch = false;
+                }
+                else {
+                    $parentElem.addClass('filled-input');
+                    treesearch = $self.val();
+                }
+                
+                if ($self.val() === '') {
+                    $parentElem.removeClass('filled-input');
+                }
+                
+                treeredraw();
+            });
+  
+            $('.nw-fm-tree-header input').bind('blur', function() {
+                
+                var $self = $(this);
+                
+                if (($self.val() === $self.attr('placeholder')) || ($self.val() === '')) {
+                    $self.parent('.nw-fm-tree-header').removeClass('focused-input filled-input');
+                    $self.val($self.attr('placeholder'));
+                }
+                else {
+                    $self.parent('.nw-fm-tree-header').removeClass('focused-input');
+                }
+            });
+        }
+
+        /**
+         * Show/hide sort dialog in left panel
+         */
+        $('.nw-tree-panel-arrows').rebind('click', function() {
+
+            var $self = $(this);
+            
+            var menu, type, sortTreePanel, $sortMenuItems;
+
+            // Show sort menu
+            if ($self.attr('class').indexOf('active') === -1) {
+
+                $.hideContextMenu();
+
+                $self.addClass('active');
+
+                menu = $('.nw-sorting-menu').removeClass('hidden');
+                type = treePanelType();
+
+                // Show all items in sort dialog in case contacts tab is choosen
+                if (type === 'contacts') {
+                    menu.find('.sorting-item-divider,.sorting-menu-item').removeClass('hidden');
+                }
+                else { // Hide status and last-interaction sorting options in sort dialog
+                    menu.find('*[data-by=status],*[data-by=last-interaction]').addClass('hidden');
+                }
+
+                sortTreePanel = $.sortTreePanel[type];
+
+                if (d && !sortTreePanel) {
+                    console.error('No sortTreePanel', type);
+                }
+
+                $sortMenuItems = $('.sorting-menu-item').removeClass('active');
+
+                if (sortTreePanel) {
+                    $sortMenuItems.filter('*[data-by=' + sortTreePanel.by + '],*[data-dir=' + sortTreePanel.dir + ']').addClass('active');
+                }
+                
+                return false; // Prevent bubbling
+            }
+
+            // Hide sort menu
+            else {
+                $self.removeClass('active');
+                $('.nw-sorting-menu').addClass('hidden');
+            }
+        });
+
+        /**
+         * React on user input when new sorting criteria is picked
+         */
+        $('.fm-left-panel .sorting-menu-item').rebind('click', function() {
+
+            var $self = $(this),
+                data = $self.data(),
+                type = treePanelType();
+
+            if ($self.attr('class').indexOf('active') === -1) {
+                $self.parent().find('.sorting-menu-item').removeClass('active');
+                $self.addClass('active');
+                $('.nw-sorting-menu').addClass('hidden');
+                $('.nw-tree-panel-arrows').removeClass('active');
+
+                if (data.dir) {
+                    localStorage['sort' + type + 'Dir'] = $.sortTreePanel[type].dir = data.dir;
+                }
+                if (data.by) {
+                    localStorage['sort' + type + 'By'] = $.sortTreePanel[type].by = data.by;
+                }
+
+                if (type === 'contacts') {
+                    M.contacts();
+                }
+                else if (type === 'shared-with-me') {
+                    M.buildtree({ h: 'shares' }, M.buildtree.FORCE_REBUILD);
+                }
+                else if (type === 'inbox') {
+                    M.buildtree(M.d[M.InboxID], M.buildtree.FORCE_REBUILD);
+                }
+                else if (type === 'rubbsih-bin') {
+                    M.buildtree({ h: M.RubbishID }, M.buildtree.FORCE_REBUILD);
+                }
+                else if ((type === 'cloud-drive') || (type === 'folder-link')) {
+                    M.buildtree(M.d[M.RootID], M.buildtree.FORCE_REBUILD);
+                }
+
+                treeUI(); // reattach events
+            }
+        });
+
+    };
+    
+    SortMenu.prototype.initializeTreePanelSorting = function() {
+        
+        var self = this;
+
+        $.sortTreePanel = {};
+
+        $.each(['folder-link', 'contacts', 'conversations', 'inbox', 'shared-with-me', 'cloud-drive', 'rubbish-bin'], function(key, type) {
+            $.sortTreePanel[type] = {
+                by: anyOf(['name', 'status', 'last-interaction'], localStorage['sort' + type + 'By']) || (type === 'contacts' ? "status": "name"),
+                dir: parseInt(anyOf(['-1', '1'], localStorage['sort' + type + 'Dir']) || '1')
+            };
+        });
+    };
+
+    /**
+     * initializeDialogTreePanelSorting
+     * 
+     * Initialize sorting menu in copy and move dialogs
+    */
+    SortMenu.prototype.initializeDialogTreePanelSorting = function() {
+
+        var dlgKey;
+
+        // Copy dialog
+        $.each(['folder-link', 'contacts', 'conversations', 'inbox', 'shared-with-me', 'cloud-drive', 'rubbish-bin'], function(key, type) {
+            dlgKey = 'Copy' + type;
+            $.sortTreePanel[dlgKey] = {
+                by: anyOf(['name', 'status', 'last-interaction'], localStorage['sort' + dlgKey + 'By']) || (type === 'contacts' ? "status": "name"),
+                dir: parseInt(anyOf(['-1', '1'], localStorage['sort' + dlgKey + 'Dir']) || '1')
+            };
+        });
+
+        // Move dialog
+        $.each(['folder-link', 'contacts', 'conversations', 'inbox', 'shared-with-me', 'cloud-drive', 'rubbish-bin'], function(key, type) {
+            dlgKey = 'Move' + type;
+            $.sortTreePanel[dlgKey] = {
+                by: anyOf(['name', 'status', 'last-interaction'], localStorage['sort' + dlgKey + 'By']) || (type === 'contacts' ? "status": "name"),
+                dir: parseInt(anyOf(['-1', '1'], localStorage['sort' + dlgKey + 'Dir']) || '1')
+            };
+        });
+    };
+
+    /**
+     * xxx
+     *
+     * @param {String} id: node id
+     * @param {Array} nodesId
+     *
+     * @returns child nodes id
+     */
+    SortMenu.prototype.xxx = function(id, nodesId) {
+
+        var self = this;
+
+        return 'something';
+    };
+
+    // export
+    scope.mega = scope.mega || {};
+    scope.mega.SortMenu = SortMenu;
+})(jQuery, window);

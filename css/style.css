@@ -1454,34 +1454,34 @@ a.blog-button:hover {
     color: #fff;
 }
 .top-change-language-icon {
-    background-image: url("../images/mega/lang-selection-sprite.png");
-    background-position: -8px 0;
-    background-repeat: no-repeat;
-    border-radius: 2px;
-    display: inline-block;
-    height: 26px;
-    margin-right: 10px;
-    margin-top: 11px;
-    width: 48px;
+  background-image: url("../images/mega/lang-selection-sprite.png");
+  background-position: 0 0;
+  background-repeat: no-repeat;
+  border-radius: 2px;
+  display: inline-block;
+  height: 24px;
+  margin-right: 10px;
+  margin-top: 12px;
+  width: 44px;
 }
 .top-change-language-name {
-    color: rgba(255, 255, 255, 0.7);
-    display: block;
-    line-height: 48px;
-    overflow: hidden;
-    position: absolute;
-    right: 67px;
-    text-align: right;
-    top: 0;
-    white-space: nowrap;
+  color: rgba(255, 255, 255, 0.7);
+  display: block;
+  line-height: 48px;
+  overflow: hidden;
+  position: absolute;
+  right: 63px;
+  text-align: right;
+  top: 0;
+  white-space: nowrap;
 }
 .top-change-language.other-language .top-change-language-name {
-    right: 45px;
+    right: 43px;
 }
 .top-change-language.other-language .top-change-language-icon {
-    background-position: -119px 0;
-    height: 26px;
-    width: 26px;
+    background-position: -111px 0;
+    height: 24px;
+    width: 24px;
 }
 
 .top-login-button:hover, .top-login-button.active {
@@ -24733,7 +24733,7 @@ body.pro:after {
 }
 .top-change-language-icon {
     background-image: url("../images/mega/lang-selection-sprite@2x.png");
-    background-size: 156px auto;
+    background-size: 135px auto;
 }
 .fm-dialog.cancel-subscription-st2 .blue-success-icon {
  background-image: url(../images/mega/bitcoin-v4@2x.png);

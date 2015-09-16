@@ -13140,6 +13140,10 @@ table {
 	-ms-transition: background-color 200ms ease-in-out;
 	transition: background-color 200ms
 }
+.fm-close-all-sessions {
+    float: right;
+    margin: -7px 0 0 0;
+}
 .settings-logout {
 	cursor: pointer;
 	background-color: #CCCCCC;

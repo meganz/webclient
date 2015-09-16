@@ -3311,7 +3311,7 @@ function accountUI()
         });
         $('.grid-table.sessions tr').remove();
         var html = '<tr><th>' + l[479] + '</th><th>' + l[480] + '</th><th>' + l[481] + '</th><th>' + l[482] + '</th></tr>';
-        $(account.sessions).filter(function(i, el) {
+        var sessions = $(account.sessions).filter(function(i, el) {
             return el[7];
         }).each(function(i, el)
         {
@@ -3334,7 +3334,24 @@ function accountUI()
         });
         $('.grid-table.sessions').html(html);
 
-        $('.settings-logout').bind('click', function() {
+        if (sessions.length === 1) {
+            $('.fm-close-all-sessions').hide();
+        }
+
+        $('.fm-close-all-sessions').rebind('click', function() {
+            loadingDialog.show();
+            // expire all sessions but not the current one
+            api_req({ a: 'usr', ko: 1 }, {
+                callback: function() {
+                    M.accountSessions(function() {
+                        loadingDialog.hide();
+                        accountUI();
+                    });
+                }
+            });
+        });
+
+        $('.settings-logout').rebind('click', function() {
             var $this = $(this).parents('tr');
             var sessionId = $this.attr('class');
             if (sessionId === 'current') {
@@ -3347,8 +3364,10 @@ function accountUI()
                  */
                 api_req({ a: 'usr', s: [sessionId] }, {
                     callback: function(res, ctx) {
-                        $this.remove();
-                        loadingDialog.hide();
+                        M.accountSessions(function() {
+                            loadingDialog.hide();
+                            accountUI();
+                        });
                     }
                 });
             }

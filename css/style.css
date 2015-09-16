@@ -1443,6 +1443,47 @@ a.blog-button:hover {
 	-moz-border-radius-topleft: 8px;
 	border-top-left-radius: 8px;
 }
+
+/* Change top language button */
+.top-change-language {
+    cursor: pointer;
+    float: right;
+    position: relative;
+}
+.top-change-language:hover .top-change-language-name {
+    color: #fff;
+}
+.top-change-language-icon {
+    background-image: url("../images/mega/lang-selection-sprite.png");
+    background-position: -8px 0;
+    background-repeat: no-repeat;
+    border-radius: 2px;
+    display: inline-block;
+    height: 26px;
+    margin-right: 10px;
+    margin-top: 11px;
+    width: 48px;
+}
+.top-change-language-name {
+    color: rgba(255, 255, 255, 0.7);
+    display: block;
+    line-height: 48px;
+    overflow: hidden;
+    position: absolute;
+    right: 67px;
+    text-align: right;
+    top: 0;
+    white-space: nowrap;
+}
+.top-change-language.other-language .top-change-language-name {
+    right: 45px;
+}
+.top-change-language.other-language .top-change-language-icon {
+    background-position: -119px 0;
+    height: 26px;
+    width: 26px;
+}
+
 .top-login-button:hover, .top-login-button.active {
 	background-color: rgba(255,255,255,0.5);
 	color: rgba(255,255,255,0.8);
@@ -24689,6 +24730,10 @@ body.pro:after {
 .pro-register-paypal-dialog .reg-success-icon, .payment-confirmation .icon, .bitcoin-invoice-dialog .qr-code-mega-icon, .bitcoin-invoice-dialog .clock-icon, .nt-payment-notification .notification-avatar-icon, .payment-result-icon, .payment-close-icon, .overlay-close-icon {
  background-image: url(../images/mega/bitcoin-v4@2x.png);
  background-size: 200px auto;
+}
+.top-change-language-icon {
+    background-image: url("../images/mega/lang-selection-sprite@2x.png");
+    background-size: 156px auto;
 }
 .fm-dialog.cancel-subscription-st2 .blue-success-icon {
  background-image: url(../images/mega/bitcoin-v4@2x.png);

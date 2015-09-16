@@ -720,7 +720,7 @@ var silent_loading=false;
 
 if (m)
 {
-    var app,mobileblog,android,intent;
+    var app,mobileblog,android,intent, ios9;
     var link = document.createElement('link');
     link.setAttribute('rel', 'stylesheet');
     link.type = 'text/css';
@@ -767,6 +767,14 @@ if (m)
         app='https://itunes.apple.com/app/mega/id706857885';
         document.body.className = 'ios full-mode supported';
         document.getElementById('m_desc').innerHTML = 'Free 50 GB - End-to-end encryption';
+
+        var ver = ua.match(/iphone os (\d+)[\._](\d+)/);
+        if (ver) {
+            var rev = ver.pop();
+            ver = ver.pop();
+            // Check for iOS 9.0+
+            ios9 = (ver > 8);
+        }
     }
     else document.body.className = 'another-os full-mode unsupported';
 
@@ -805,7 +813,16 @@ if (m)
                 }, 2500);
             }
         }
-        else document.getElementById('m_iframe').src = 'mega://' + window.location.hash.substr(i);
+        else if (ios9) {
+            setTimeout(function() {
+                if (confirm('Do you already have the MEGA app installed?')) {
+                    document.location = 'mega://' + window.location.hash;
+                }
+            }, 1500);
+        }
+        else {
+            document.getElementById('m_iframe').src = 'mega://' + window.location.hash.substr(i);
+        }
     }
     else if (window.location.hash.substr(1,7) == 'confirm' || window.location.hash.substr(1,7) == 'account')
     {
@@ -815,6 +832,13 @@ if (m)
         }
         if (ua.indexOf('chrome') > -1) {
             window.location = 'mega://' + window.location.hash.substr(i);
+        }
+        else if (ios9) {
+            setTimeout(function() {
+                if (confirm('Do you already have the MEGA app installed?')) {
+                    document.location = 'mega://' + window.location.hash;
+                }
+            }, 1500);
         }
         else {
             document.getElementById('m_iframe').src = 'mega://' + window.location.hash.substr(i);

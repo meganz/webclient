@@ -1601,12 +1601,23 @@ function logAllCallsOnObject(ctx, loggerFn, recursive, textPrefix, parentLogger)
     });
 }
 
+/**
+ * Get an array with unique values
+ * @param {Array} arr Array
+ */
 function array_unique(arr) {
-    return $.grep(arr, function(v, k) {
-        return $.inArray(v, arr) === k;
-    });
+    return arr.reduce(function(out, value) {
+        if (out.indexOf(value) < 0) {
+            out.push(value);
+        }
+        return out;
+    }, []);
 }
 
+/**
+ * Get a random value from an array
+ * @param {Array} arr Array
+ */
 function array_random(arr) {
     return arr[rand(arr.length)];
 }

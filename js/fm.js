@@ -10103,8 +10103,11 @@ function userFingerprint(userid, next) {
     });
 }
 
-function fingerprintDialog(userid)
-{
+function fingerprintDialog(userid) {
+    
+    // Add log to see how often they open the verify dialog
+    api_req({ a: 'log', e: 99601, m: 'Fingerprint verify dialog opened' });
+    
     userid = userid.u || userid;
     var user = M.u[userid];
     if (!user || !user.u) {
@@ -10128,11 +10131,11 @@ function fingerprintDialog(userid)
         .text(user.name || user.m) // escape HTML things
         .end()
         .find('.contact-details-email')
-        .text(user.m) // escape HTML things
+        .text(user.m); // escape HTML things
 
-    $this.find('.fingerprint-txt').empty()
+    $this.find('.fingerprint-txt').empty();
     userFingerprint(u_handle, function(fprint) {
-        var target = $('.fingerprint-bott-txt .fingerprint-txt')
+        var target = $('.fingerprint-bott-txt .fingerprint-txt');
         fprint.forEach(function(v) {
             $('<span>').text(v).appendTo(target);
         });
@@ -10141,19 +10144,23 @@ function fingerprintDialog(userid)
     userFingerprint(user, function(fprint) {
         var offset = 0;
         $this.find('.fingerprint-code .fingerprint-txt').each(function() {
-            var that = $(this)
+            var that = $(this);
             fprint.slice(offset, offset + 5).forEach(function(v) {
-                $('<span>').text(v).appendTo(that)
+                $('<span>').text(v).appendTo(that);
                 offset++;
             });
         });
-    })
+    });
 
     $('.fm-dialog-close').rebind('click', function() {
         closeFngrPrntDialog();
     });
 
     $('.dialog-approve-button').rebind('click', function() {
+        
+        // Add log to see how often they verify the fingerprints
+        api_req({ a: 'log', e: 99602, m: 'Fingerprint verification approved' });
+        
         userFingerprint(user, function(fprint, fprintraw) {
             authring.setContactAuthenticated(userid, fprintraw, 'Ed25519', authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON);
             $('.fm-verify').unbind('click').find('span').text('Verified');

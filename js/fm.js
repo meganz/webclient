@@ -3336,14 +3336,17 @@ function accountUI()
 
         $('.settings-logout').bind('click', function() {
             var $this = $(this).parents('tr');
-            var type = $this.attr('class');
-            if (type === 'current') {
+            var sessionId = $this.attr('class');
+            if (sessionId === 'current') {
                 mLogout();
             } else {
                 loadingDialog.show();
-                api_req({ a: 'usr', s: [type]}, {
+                /* usr - user session remove
+                 * remove a session Id from the current user, 
+                 * usually other than the current session
+                 */
+                api_req({ a: 'usr', s: [sessionId] }, {
                     callback: function(res, ctx) {
-                        console.error(res, type);
                         $this.remove();
                         loadingDialog.hide();
                     }

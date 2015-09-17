@@ -3630,11 +3630,11 @@ if (typeof sjcl !== 'undefined') {
     /**
      * isShareExists
      *
-     * checking if there's available shares for selected nodes.
-     * @param {Array} nodes, holds array of ids from selected folders/files (nodes).
-     * @param {Boolean} fullShare, do we need info about full share.
-     * @param {Boolean} pendingShare, do we need info about pending share .
-     * @param {Boolean} linkShare, do we need info about link share 'EXP'.
+     * Checking if there's available shares for selected nodes.
+     * @param {Array} nodes Holds array of ids from selected folders/files (nodes).
+     * @param {Boolean} fullShare Do we need info about full share.
+     * @param {Boolean} pendingShare Do we need info about pending share .
+     * @param {Boolean} linkShare Do we need info about link share 'EXP'.
      * @returns {Boolean} result.
      */
     Nodes.prototype.isShareExist = function(nodes, fullShare, pendingShare, linkShare) {
@@ -3653,7 +3653,6 @@ if (typeof sjcl !== 'undefined') {
                     // Look for link share
                     if (linkShare) {
                         if (shares && Object.keys(shares).length) {
-//                            result = true;
                             return true;
                         }
                     }
@@ -3662,7 +3661,6 @@ if (typeof sjcl !== 'undefined') {
                             length = Object.keys(shares).length;
                             if (length) {
                                 if (!shares.EXP || (shares.EXP && length > 1)) {
-//                                    result = true;
                                     return true;
                                 }
                             }
@@ -3677,13 +3675,11 @@ if (typeof sjcl !== 'undefined') {
 
                     if (M.ps && shares && Object.keys(shares).length) {
                         return true;
-//                        result = true;
                     }
                 }
             }
         }
 
-//        return result;
         return false;
     };
 
@@ -3691,11 +3687,11 @@ if (typeof sjcl !== 'undefined') {
      * getShares
      *
      * Is there available share for nodes.
-     * @param {String} node, node id.
-     * @param {Boolean} fullShare, inclde results for full shares.
-     * @param {Boolean} pendingShare, include results for pending shares.
-     * @param {Boolean} linkShare, include results for foder/file links.
-     * @returns {Array} result, array of user ids.
+     * @param {String} node Node id.
+     * @param {Boolean} fullShare Inclde results for full shares.
+     * @param {Boolean} pendingShare Include results for pending shares.
+     * @param {Boolean} linkShare Include results for foder/file links.
+     * @returns {Array} result Array of user ids.
      */
     Nodes.prototype.getShares = function(nodes, fullShare, pendingShare, linkShare) {
 
@@ -3748,7 +3744,7 @@ if (typeof sjcl !== 'undefined') {
      *
      * Loops through all shares.
      * @param {Object} shares.
-     * @param {Boolean} linkShare, do we need info about link share.
+     * @param {Boolean} linkShare Do we need info about link share.
      * @returns {Array} user id.
      */
     Nodes.prototype.loopShares = function(shares, linkShare) {

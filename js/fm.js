@@ -261,7 +261,6 @@ function treePanelType() {
 /**
  * treePanelSortElements
  * 
- * 
  * @param {String} type, key value for global variable $.sortTreepanel, can bi prexied with Copy and Move for those dialogs.
  * @param {Array} elements, elements that will be sorted
  * @param {type} handlers
@@ -6919,7 +6918,7 @@ function handleDialogTabContent(dialogTabClass, parentTag, dialogPrefix, htmlCon
  * disableReadOnlySharedFolders
  * 
  * Find shared folders marked read-only and disable it in dialog.
- * @param {String} dialogName, dialog name i.e. { copy, move }.
+ * @param {String} dialogName Dialog name i.e. { copy, move }.
  */
 function disableReadOnlySharedFolders(dialogName) {
     
@@ -6940,12 +6939,12 @@ function disableReadOnlySharedFolders(dialogName) {
  * handleDialogContent
  * 
  * Copy|Move dialogs content  handler
- * @param {string} dialogTabClass, dialog tab class name.
- * @param {string} parentTag, tag that contains one menu-item.
- * @param {boolean} newFolderButton, should we show new folder button.
- * @param {string} dialogPrefix, i.e. [copy, move].
- * @param {string} buttonLabel, action button label.
- * @param {string} convTab, in case of conversations tab.
+ * @param {String} dialogTabClass Dialog tab class name.
+ * @param {String} parentTag Tag that contains one menu-item.
+ * @param {Boolean} newFolderButton Should we show new folder button.
+ * @param {String} dialogPrefix i.e. [copy, move].
+ * @param {String} buttonLabel Action button label.
+ * @param {String} convTab In case of conversations tab.
  */
 function handleDialogContent(dialogTabClass, parentTag, newFolderButton, dialogPrefix, buttonLabel, convTab) {
     
@@ -7106,7 +7105,7 @@ function fillShareDialogWithContent() {
     for (var userHandle in shares) {
         if (shares.hasOwnProperty(userHandle)) {
 
-            // Don't add removed contacts from contact list
+            // ToDo: Don't add removed contacts from contact list
             // Additional check of 'c' grants that only active
             // contacts will be addded, this prevents contact
             //  duplication in share dialog contact list
@@ -7134,14 +7133,6 @@ function fillShareDialogWithContent() {
                     // ToDo: take care of name attribute once available
                     generateShareDialogRow(pendingContactRequest.m, pendingContactRequest.m, pendingShares[pcrHandle].r);
                 }
-                
-                // Because it's pending, we don't have user information in M.u so we have to look in the pending contact request
-//                if (M.ipc[pendingShares[pcrHandle].p]) {
-//                    var pendingContactRequest = M.ipc[pendingShares[pcrHandle].p];
-//
-//                    // ToDo: take care of name attribute once available
-//                    generateShareDialogRow(pendingContactRequest.m, pendingContactRequest.m, pendingShares[pcrHandle].r);
-//                }
             }
         }
     }
@@ -8327,7 +8318,7 @@ function moveDialog() {
     });
 
     /**
-     * Craete new foler button clicket inside move-dialog
+     * Create new foler button clicket inside move-dialog
      */
     $('.move-dialog .dialog-newfolder-button').rebind('click', function() {
         
@@ -10859,21 +10850,6 @@ function removeFromMultiInputDDL(dialog, item) {
                 dir: parseInt(anyOf(['-1', '1'], localStorage['sort' + dlgKey + 'Dir']) || '1')
             };
         });
-    };
-
-    /**
-     * xxx
-     *
-     * @param {String} id: node id
-     * @param {Array} nodesId
-     *
-     * @returns child nodes id
-     */
-    SortMenu.prototype.xxx = function(id, nodesId) {
-
-        var self = this;
-
-        return 'something';
     };
 
     // export

@@ -3401,10 +3401,8 @@ function MegaData()
                     callback: function(res, ctx) {
 
                         if (typeof res !== 'number') {
-                            nodeHandle = M.d[ctx.node].h
+                            nodeHandle = M.d[ctx.node].h;
                             M.nodeAttr({h: nodeHandle, ph: res});
-                            
-                            // Make sure that file node attributes are updated and available in db
                             M.nodeShare(nodeHandle, {h: nodeHandle, r: 0, u: 'EXP', ts: unixtime()});
                         }
 
@@ -3439,7 +3437,6 @@ function MegaData()
                                 fln: node.h,
                                 done: function(res, ctx) {
                                     if (res.r && res.r[0] === 0) {
-
                                         M.nodeShare(ctx.fln, {h: ctx.fln, r: 0, u: 'EXP', ts: unixtime()});
                                     }
                                     getFolderLinks();

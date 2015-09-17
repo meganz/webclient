@@ -1607,12 +1607,16 @@ function sharedUInode(nodeHandle) {
             bAvailShares = true;
         }
     }
-
-    // Update right panel selected node with appropriate icon for list view
-    $('.grid-table.fm #' + nodeHandle + ' .transfer-filtype-icon').addClass(fileIcon({t: 1, share: bAvailShares}));
     
-    // Update right panel selected node with appropriate icon for block view
-    $('#' + nodeHandle + '.file-block .block-view-file-type').addClass(fileIcon({t: 1, share: bAvailShares}));
+    // t === 1, folder
+    if (M.d[nodeHandle].t) {
+        
+        // Update right panel selected node with appropriate icon for list view
+        $('.grid-table.fm #' + nodeHandle + ' .transfer-filtype-icon').addClass(fileIcon({t: 1, share: bAvailShares}));
+
+        // Update right panel selected node with appropriate icon for block view
+        $('#' + nodeHandle + '.file-block .block-view-file-type').addClass(fileIcon({t: 1, share: bAvailShares}));
+    }
 
     // If no shares are available, remove share icon from left panel, right panel (list and block view) 
     if (!bAvailShares) {
@@ -2513,9 +2517,6 @@ function initContextUI() {
             M.moveNodes(n, t);
         }
     });
-
-    // Not sure if this will work
-//    $(c + '.folder-item.disabled, ' + c + '.cloud-item.disabled').off('click');
 
     $(c + '.download-item').rebind('click', function(event) {
         var c = $(event.target).attr('class');

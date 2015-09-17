@@ -962,15 +962,17 @@ function mozClearStartupCache() {
 	};
 	// XMLHttpRequest.prototype = Object.freeze(XMLHttpRequest.prototype);
 
-	mozRunAsync(function() {
-		var header = Ci.nsISiteSecurityService.HEADER_HSTS;
-		var flags = scope.Incognito ? Ci.nsISocketProvider.NO_PERMANENT_STORAGE : 0;
-		var hsts = mozSSService.isSecureHost(header, 'http://userstorage.mega.co.nz/', flags);
-		if (hsts) {
-			var uri = Services.io.newURI('https://mega.co.nz/', null, null);
-			mozSSService.removeState(header, uri, flags);
-		}
-	});
+	if ("nsISiteSecurityService" in Ci) {
+		mozRunAsync(function() {
+			var header = Ci.nsISiteSecurityService.HEADER_HSTS;
+			var flags = scope.Incognito ? Ci.nsISocketProvider.NO_PERMANENT_STORAGE : 0;
+			var hsts = mozSSService.isSecureHost(header, 'http://userstorage.mega.co.nz/', flags);
+			if (hsts) {
+				var uri = Services.io.newURI('https://mega.co.nz/', null, null);
+				mozSSService.removeState(header, uri, flags);
+			}
+		});
+	}
 
 })(self);
 

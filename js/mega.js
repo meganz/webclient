@@ -4803,21 +4803,21 @@ function execsc(actionPackets, callback) {
 
             // Full share
             else if (actionPacket.a === 's') {
-                
+
                 // Used during share dialog removal of contact from share list
                 // Find out is this a full share delete
                 if (actionPacket.r === undefined) {
-                    
+
                     // Fill DDL with removed contact
-                    if (actionPacket.u) {
+                    if (M.u[actionPacket.u]) {
                         var email = M.u[actionPacket.u].m;
-                        
+
                         addToMultiInputDropDownList('.share-multiple-input', [{id: email, name: email}]);
                         addToMultiInputDropDownList('.add-contact-multiple-input', [{id: email, name: email}]);
                     }
                 }
             }
-            
+
             // Outgoing pending contact
             else if (actionPacket.a === 'opc') {
                 processOPC([actionPacket]);
@@ -5781,15 +5781,15 @@ function __process_f2(f, cb, tick)
  *
  */
 function processIPC(ipc, ignoreDB) {
-    
+
     DEBUG('processIPC');
-    
+
     for (var i in ipc) {
         if (ipc.hasOwnProperty(i)) {
-            
+
             // Update ipc status
             M.addIPC(ipc[i], ignoreDB);
-            
+
             // Deletion of incomming pending contact request, user who sent request, canceled it
             if (ipc[i].dts) {
                 M.delIPC(ipc[i].p);
@@ -5800,17 +5800,17 @@ function processIPC(ipc, ignoreDB) {
                     $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[6196]);
                     $('.fm-empty-contacts').removeClass('hidden');
                 }
-                
+
                 // Update token.input plugin
                 removeFromMultiInputDDL('.share-multiple-input', {id: ipc[i].m, name: ipc[i].m});
                 removeFromMultiInputDDL('.add-contact-multiple-input', {id: ipc[i].m, name: ipc[i].m});
             }
             else {
-                
+
                 // Update token.input plugin
                 addToMultiInputDropDownList('.share-multiple-input', [{id: ipc[i].m, name: ipc[i].m}]);
                 addToMultiInputDropDownList('.add-contact-multiple-input', [{id: ipc[i].m, name: ipc[i].m}]);
-            }            
+            }
         }
     }
 }
@@ -5822,9 +5822,9 @@ function processIPC(ipc, ignoreDB) {
  *
  */
 function processOPC(opc, ignoreDB) {
-    
+
     DEBUG('processOPC');
-    
+
     for (var i in opc) {
         M.addOPC(opc[i], ignoreDB);
         if (opc[i].dts) {
@@ -5850,7 +5850,7 @@ function processOPC(opc, ignoreDB) {
                     break;
                 }
             }
-            
+
             // Update tokenInput plugin
             addToMultiInputDropDownList('.share-multiple-input', [{ id: opc[i].m, name: opc[i].m }]);
             addToMultiInputDropDownList('.add-contact-multiple-input', [{ id: opc[i].m, name: opc[i].m }]);
@@ -5864,19 +5864,19 @@ function processOPC(opc, ignoreDB) {
  * @param {array.<JSON_objects>} pending shares
  */
 function processPS(pendingShares, ignoreDB) {
-    
+
     DEBUG('processPS');
     var ps;
 
     for (var i in pendingShares) {
         if (pendingShares.hasOwnProperty(i)) {
             ps = pendingShares[i];
-            
+
             // From gettree
             if (ps.h) {
                 M.addPS(ps, ignoreDB);
             }
-            
+
             // Situation different from gettree, s2 from API response, doesn't have .h attr instead have .n
             else {
                 var nodeHandle = ps.n,
@@ -5894,7 +5894,7 @@ function processPS(pendingShares, ignoreDB) {
                     if (ps.op) {
                         M.nodeShare(nodeHandle, ps);
                     }
-                    
+
                     if (M.opc && M.opc[ps.p]) {
                         // Update tokenInput plugin
                         addToMultiInputDropDownList('.share-multiple-input', [{id: M.opc[pendingContactId].m, name: M.opc[pendingContactId].m}]);
@@ -5937,23 +5937,23 @@ function processUPCI(ap) {
 
 /**
  * processUPCO
- * 
+ *
  * Handle upco response, upco, pending contact request updated (for whom it's outgoing).
  * @param {Array} ap (actionpackets) <JSON_objects>.
  */
 function processUPCO(ap) {
-    
+
     DEBUG('processUPCO');
-    
+
     var psid = '';// pending id
-    
+
     // Loop through action packets
     for (var i in ap) {
         if (ap.hasOwnProperty(i)) {
-            
+
             // Have status of pending share
             if (ap[i].s) {
-                
+
                 psid = ap[i].p;
                 delete M.opc[psid];
                 delete M.ipc[psid];
@@ -5971,7 +5971,7 @@ function processUPCO(ap) {
                 removeFromMultiInputDDL('.share-multiple-input', { id: ap[i].m, name: ap[i].m });
                 removeFromMultiInputDDL('.add-contact-multiple-input', { id: ap[i].m, name: ap[i].m });
                 $('#opc_' + psid).remove();
-                
+
                 // Update sent contact request tab, set empty message with Add contact... button
                 if ((Object.keys(M.opc).length === 0) && (M.currentdirid === 'opc')) {
                     $('.sent-requests-grid').addClass('hidden');
@@ -6004,7 +6004,7 @@ function process_u(u) {
                 removeFromMultiInputDDL('.share-multiple-input', {id: u[i].m, name: u[i].m});
                 removeFromMultiInputDDL('.add-contact-multiple-input', {id: u[i].m, name: u[i].m});
             }
-            
+
             M.addUser(u[i]);
         }
     }

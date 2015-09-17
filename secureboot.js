@@ -350,7 +350,7 @@ var mBroadcaster = {
         var id = Math.random().toString(26);
         this._topics[topic][id] = options;
 
-        if (d) console.log('Adding broadcast listener', topic, id, options);
+        //if (d) console.log('Adding broadcast listener', topic, id, options);
 
         return id;
     },

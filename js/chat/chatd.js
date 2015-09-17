@@ -48,7 +48,7 @@ var Chatd = function(userid, options) {
         'onMembersUpdated'
     ].forEach(function(evt) {
             self.rebind(evt + '.chatd', function(e) {
-                //console.error(evt, JSON.stringify(arguments[1]));
+                console.debug(evt, JSON.stringify(arguments[1]));
             });
     });
 };
@@ -71,7 +71,8 @@ Chatd.Opcode = {
     'HIST' : 8,
     'RANGE' : 9,
     'MSGID' : 10,
-    'REJECT' : 11
+    'REJECT' : 11,
+    'HISTDONE' : 13
 };
 
 // privilege levels
@@ -252,7 +253,7 @@ Chatd.Shard.prototype.disconnect = function() {
 };
 
 Chatd.Shard.prototype.cmd = function(opcode, cmd) {
-    //console.error(constStateToText(Chatd.Opcode, opcode), cmd);
+    console.error("CMD SENT: ", constStateToText(Chatd.Opcode, opcode), cmd);
     this.cmdq += String.fromCharCode(opcode)+cmd;
 
     if (this.isOnline()) {
@@ -320,6 +321,7 @@ Chatd.Shard.prototype.exec = function(a) {
         switch (cmd.charCodeAt(0)) {
             case Chatd.Opcode.KEEPALIVE:
                 self.logger.log("Server heartbeat received");
+                self.cmd(Chatd.Opcode.KEEPALIVE, "");
                 len = 1;
                 break;
 
@@ -440,12 +442,35 @@ Chatd.Shard.prototype.exec = function(a) {
                 len = 17;
                 break;
 
+            case Chatd.Opcode.HISTDONE:
+                self.logger.log("History retrieval finished: " + base64urlencode(cmd.substr(1,8)));
+
+                this.chatd.trigger('onMessagesHistoryDone',
+                    {
+                        chatId: base64urlencode(cmd.substr(1,8))
+                    }
+                );
+
+                len = 9;
+                break;
+
             default:
-                self.logger.error("FATAL: Unknown opcode " + cmd.charCodeAt(0));
+                self.logger.error(
+                    "FATAL: Unknown opcode " + cmd.charCodeAt(0) +
+                    ". To stop potential loop-forever case, the next commands in the buffer were rejected!"
+                );
+                // remove the command from the queue, its already processed, if this is not done, the code will loop forever
+                cmd = "";
         }
 
         if (cmd.length < len) {
-            self.logger.error("FATAL: Short WebSocket frame - got " + cmd.length + ", expected " + len);
+            self.logger.error(
+                "FATAL: Short WebSocket frame - got " + cmd.length + ", expected " + len +
+                ". To stop potential loop-forever case, the next commands in the buffer were rejected!"
+            );
+
+            // remove the command from the queue, its already processed, if this is not done, the code will loop forever
+            cmd = "";
             break;
         }
 

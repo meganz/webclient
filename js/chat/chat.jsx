@@ -1698,6 +1698,32 @@ Chat.prototype.createAndShowPrivateRoomFor = function(h) {
     return this.getPrivateRoom(h);
 };
 
+/**
+ * Debug/dev/testing function
+ *
+ * @private
+ */
+Chat.prototype._destroyAllChatsFromChatd = function() {
+    var self = this;
+    self.chats.forEach(function(v, k) {
+        if(v.chatId) {
+            v.getParticipantsExceptMe().forEach(function(jid) {
+                api_req({
+                    a: 'mcr',
+                    id: v.chatId,
+                    u: self.getContactFromJid(jid).u
+                });
+            });
+            // finally, remove myself from the chat
+            api_req({
+                a: 'mcr',
+                id: v.chatId,
+                u: u_handle
+            });
+        }
+    });
+};
+
 
 window.Chat = Chat;
 window.chatui = chatui;

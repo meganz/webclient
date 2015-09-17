@@ -136,7 +136,7 @@ var ChatdIntegration = function(megaChat) {
                 /* seen */ true
             );
         } else {
-            var seenState = chatRoom.isCurrentlyActive;
+            var seenState = chatRoom.isCurrentlyActive && $.windowActive;
 
             //console.error(
             //    chatRoom.chatdIsProcessingHistory === true,
@@ -182,11 +182,12 @@ var ChatdIntegration = function(megaChat) {
             messageObject.orderValue = eventData.id;
             chatRoom.appendMessage(messageObject);
         }
-        if(chatRoom.chatdOldest === eventData.messageId) {
-            //console.error("Finished receiving messages history.");
-            self.finishedReceivingMessagesHistory(chatRoom);
-        }
 
+    });
+
+    self.chatd.rebind('onMessagesHistoryDone.chatdInt', function(e, eventData) {
+        var chatRoom = _getChatRoomFromEventData(eventData);
+        self.finishedReceivingMessagesHistory(chatRoom);
     });
 
     self.chatd.rebind('onMessageUpdated.chatdInt', function(e, eventData) {
@@ -253,7 +254,7 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket) {
 
     var chatParticipants = actionPacket.u;
     if(!chatParticipants) {
-        //console.error("actionPacket returned no chat participants: ", chatParticipants);
+        self.logger.error("actionPacket returned no chat participants: ", chatParticipants);
     }
     var chatJids = [];
     Object.keys(chatParticipants).forEach(function(k) {
@@ -262,24 +263,45 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket) {
             megaChat.getJidFromNodeId(v.u)
         );
     });
+    if(chatJids.length < 2) {
+        self.logger.warn("Will ignore chatd room: ", actionPacket.id, "since it only have 1 user (me).");
+        return;
+    }
 
     var roomJid = self.megaChat.generatePrivateRoomName(chatJids) + "@conference." + megaChat.options.xmppDomain;
 
     var chatRoom = self.megaChat.chats[roomJid];
-    if(!chatRoom) {
-        self.megaChat.openChat(chatJids, "private", actionPacket.id, actionPacket.cs, actionPacket.url, false);
+    var finishProcess = function() {
+        if(!chatRoom) {
+            self.megaChat.openChat(chatJids, "private", actionPacket.id, actionPacket.cs, actionPacket.url, false);
 
-    } else {
-        if(!chatRoom.chatId) {
-            chatRoom.chatId = actionPacket.id;
-            chatRoom.chatShard = actionPacket.cs;
-            chatRoom.chatdUrl = actionPacket.url;
+        } else {
+            if(!chatRoom.chatId) {
+                chatRoom.chatId = actionPacket.id;
+                chatRoom.chatShard = actionPacket.cs;
+                chatRoom.chatdUrl = actionPacket.url;
+            }
         }
+    };
+
+    if (!actionPacket.url) {
+        self.apiReq({
+            a: 'mcurl',
+            id: actionPacket.id
+        })
+        .done(function(mcurl) {
+                actionPacket.url = mcurl;
+                finishProcess();
+            });
     }
+    else {
+        finishProcess();
+    }
+
 };
 
 ChatdIntegration.prototype.apiReq = function(data) {
-    //console.error("Api req: ", data);
+    console.error("Api req: ", data);
 
     var $promise = new MegaPromise();
     api_req(data, {

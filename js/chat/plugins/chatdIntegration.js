@@ -493,7 +493,13 @@ ChatdIntegration.prototype.join = function(chatRoom) {
     );
 
     ////console.error("JOINNNN: ", chatRoom.roomJid, chatRoom.chatId, chatRoom.chatShard, chatRoom.chatdUrl);
-    self.chatd.join(base64urldecode(chatRoom.chatId), chatRoom.chatShard, chatRoom.chatdUrl.replace("ws:", "wss:"));
+    self.chatd.join(
+        base64urldecode(chatRoom.chatId),
+        chatRoom.chatShard,
+        chatRoom.chatdUrl
+            .replace("ws:", "wss:")
+            .replace("31.216.147.155", "chattest.userstorage.mega.co.nz")
+    );
     self.chatIdToRoomJid[chatRoom.chatId] = chatRoom.roomJid;
 };
 

@@ -3357,7 +3357,43 @@ function MegaData()
 
     this.getLinks = function(h) {
 
+        var node,
+            folderLinks = [], links = [],
+            $getLinkPromise = new MegaPromise();
+
+        loadingDialog.show();
+
+        for (var i in h) {
+            node = M.d[h[i]];
+            if (node) {
+                if (node.t) {
+                    folderLinks.push(node.h);
+                }
+                links.push(node.h);
+            }
+        }
+        if (d) {
+            console.log('getLinks', links);
+        }
+        
+        if (folderLinks.length > 0) {
+            getFolderLinks();
+        }
+        else {
+            getLinksDone();
+        }
+
+        this.links = links;
+        
+        return $getLinkPromise;
+        
+        /**
+         * getLinksDone
+         */
         function getLinksDone() {
+            
+            var nodeHandle;
+            
             for (var i in links) {
                 api_req({a: 'l', n: links[i]}, {
                     node: links[i],
@@ -3365,7 +3401,11 @@ function MegaData()
                     callback: function(res, ctx) {
 
                         if (typeof res !== 'number') {
-                            M.nodeAttr({h: M.d[ctx.node].h, ph: res});
+                            nodeHandle = M.d[ctx.node].h
+                            M.nodeAttr({h: nodeHandle, ph: res});
+                            
+                            // Make sure that file node attributes are updated and available in db
+                            M.nodeShare(nodeHandle, {h: nodeHandle, r: 0, u: 'EXP', ts: unixtime()});
                         }
 
                         if (ctx.last) {
@@ -3377,6 +3417,9 @@ function MegaData()
             }
         }
 
+        /**
+         * getFolderLinks
+         */
         function getFolderLinks() {
 
             if (folderLinks.length > 0) {
@@ -3413,32 +3456,6 @@ function MegaData()
                 getLinksDone();
             }
         }
-        var $getLinkPromise = new MegaPromise();
-        var folderLinks = [], links = [];
-
-        loadingDialog.show();
-
-        for (var i in h) {
-            var node = M.d[h[i]];
-            if (node) {
-                if (node.t) {
-                    folderLinks.push(node.h);
-                }
-                links.push(node.h);
-            }
-        }
-        if (d) {
-            console.log('getLinks', links);
-        }
-        if (folderLinks.length > 0) {
-            getFolderLinks();
-        }
-        else {
-            getLinksDone();
-        }
-
-        this.links = links;
-        return $getLinkPromise;
     };
 
     this.makeDir = function(n)

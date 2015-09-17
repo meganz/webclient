@@ -2535,9 +2535,6 @@ function initContextUI() {
 
         var selectedNodeHandle;
 
-        if ($.propertiesDialog) {
-            propertiesDialog(1);
-        }
         if (u_type === 0) {
             ephemeralDialog(l[1005]);
         }
@@ -2582,7 +2579,7 @@ function initContextUI() {
             for (index = selected.length; index--;) {
                 if (selected.hasOwnProperty(index)) {
                     selectedNodeHandle = selected[index];
-                    api_req({a: 's2', n:  selectedNodeHandle, s: [{ u: 'EXP', r: ''}], ha: '', i: requesti});
+                    api_req({ a: 's2', n:  selectedNodeHandle, s: [{ u: 'EXP', r: ''}], ha: '', i: requesti });
 
                     M.delNodeShare(selectedNodeHandle, 'EXP');
                     M.deleteExportLinkShare(selectedNodeHandle);
@@ -2595,7 +2592,7 @@ function initContextUI() {
                     $('#' + selectedNodeHandle + '.file-block').removeClass('linked');
                     $('#' + selectedNodeHandle + '.file-block span').removeClass('link-icon');
 
-                    // Revemo link icon from left panel
+                    // Remove link icon from left panel
                     $('#treeli_' + selectedNodeHandle + ' span').removeClass('linked link-icon');
                 }
             }

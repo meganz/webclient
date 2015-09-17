@@ -878,7 +878,7 @@ else if (!b_u)
         };
     })(console);
 
-    Object.defineProperty(window, "__cd_v", { value : 17, writable : false });
+    Object.defineProperty(window, "__cd_v", { value : 18, writable : false });
     if (!d || onBetaW)
     {
         var __cdumps = [], __cd_t;
@@ -899,7 +899,17 @@ else if (!b_u)
             var dump = {
                 l: ln,
                 f: mTrim(url),
-                m: mTrim(msg).replace(/'(\w+:\/\/+[^/]+?)[^']+(?:'|$)/, "'$1...'")
+                m: mTrim(msg)
+                    .replace(/'[a-z]+:\/+[^']+(?:'|$)/gi, function(url) {
+                        url = url.substr(1);
+                        if (url[url.length - 1] === "'") {
+                            url = url.substr(0, url.length - 1);
+                        }
+                        var a = document.createElement('a');
+                        a.href = url;
+                        return "'" + (a.origin !== 'null' && a.origin
+                            || (a.protocol + '//' + a.hostname)) + "...'";
+                    })
                     .replace(/(Access to '\.\.).*(' from script denied)/, '$1$2')
                     .replace(/gfs\w+\.userstorage/, 'gfs...userstorage')
                     .replace(/^Uncaught\W*(?:exception\W*)?/i, ''),

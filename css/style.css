@@ -2770,10 +2770,6 @@ a.blog-new-archive-lnk {
 	margin: 0;
 	padding: 7px 0 33px 0;
 }
-.new-bottom-pages .blog-new-full ul {
-	margin: 0;
-	padding: 20px 0 15px 0;
-}
 .sync ul {
 	margin: 0;
 	padding: 43px 0 25px 0;
@@ -26145,3 +26141,13 @@ body, body * {
 	float: left !important;
 	margin-right: 4px !important;
 }
+
+.blog-new-full ul {
+    padding: 0px;
+    margin: 0px;
+}
+
+.blog-new-full ul li {
+    padding: 0 0 0px 15px;
+}
+

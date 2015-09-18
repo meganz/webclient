@@ -4464,7 +4464,9 @@ function gridUI() {
             d = -1;
         if (c && c.indexOf('name') > -1)
             M.doSort('name', d);
-        else if (c && c.indexOf('size') > -1)
+        else if (c && c.indexOf('fav') > -1) {
+            M.doSort('fav', d);
+        } else if (c && c.indexOf('size') > -1)
             M.doSort('size', d);
         else if (c && c.indexOf('type') > -1)
             M.doSort('type', d);

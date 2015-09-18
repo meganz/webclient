@@ -3613,7 +3613,7 @@ if (typeof sjcl !== 'undefined') {
 
 (function($, scope) {
     /**
-     * Nodes related operations
+     * Nodes related operations.
      *
      * @param opts {Object}
      *
@@ -3630,27 +3630,52 @@ if (typeof sjcl !== 'undefined') {
     /**
      * isShareExists
      *
-     * checking if there's available shares for selected nodes
-     *
-     * @param {array} nodes, holds array of ids from selected folders/files (nodes)
-     *
-     * @returns {boolean}
+     * Checking if there's available shares for selected nodes.
+     * @param {Array} nodes Holds array of ids from selected folders/files (nodes).
+     * @param {Boolean} fullShare Do we need info about full share.
+     * @param {Boolean} pendingShare Do we need info about pending share .
+     * @param {Boolean} linkShare Do we need info about link share 'EXP'.
+     * @returns {Boolean} result.
      */
-    Nodes.prototype.isShareExist = function(nodes) {
+    Nodes.prototype.isShareExist = function(nodes, fullShare, pendingShare, linkShare) {
 
         var self = this;
 
+        var shares = {}, length;
+        
         for (var i in nodes) {
             if (nodes.hasOwnProperty(i)) {
 
-                // Checking full share
-                if (M.d[nodes[i]].shares && Object.keys(M.d[nodes[i]].shares).length) {
-                    return true;
+                // Look for full share
+                if (fullShare) {
+                    shares = M.d[nodes[i]].shares;
+                    
+                    // Look for link share
+                    if (linkShare) {
+                        if (shares && Object.keys(shares).length) {
+                            return true;
+                        }
+                    }
+                    else { // Exclude folder/file links, 
+                        if (shares) {
+                            length = Object.keys(shares).length;
+                            if (length) {
+                                if (!shares.EXP || (shares.EXP && length > 1)) {
+                                    return true;
+                                }
+                            }
+
+                        }
+                    }
                 }
 
-                // Checking pending share
-                if (M.ps && M.ps[nodes[i]] && Object.keys(M.ps[nodes[i]]).length) {
-                    return true;
+                // Look for pending share
+                if (pendingShare) {
+                    shares = M.ps[nodes[i]];
+
+                    if (M.ps && shares && Object.keys(shares).length) {
+                        return true;
+                    }
                 }
             }
         }
@@ -3659,14 +3684,102 @@ if (typeof sjcl !== 'undefined') {
     };
 
     /**
+     * getShares
+     *
+     * Is there available share for nodes.
+     * @param {String} node Node id.
+     * @param {Boolean} fullShare Inclde results for full shares.
+     * @param {Boolean} pendingShare Include results for pending shares.
+     * @param {Boolean} linkShare Include results for foder/file links.
+     * @returns {Array} result Array of user ids.
+     */
+    Nodes.prototype.getShares = function(nodes, fullShare, pendingShare, linkShare) {
+
+        var self = this;
+        
+        var result, shares, length;
+
+        for (var i in nodes) {
+            if (nodes.hasOwnProperty(i)) {
+                result = [];
+                
+                // Look for full share
+                if (fullShare) {
+                    shares = M.d[nodes[i]].shares; 
+                    
+                    // Look for link share
+                    if (linkShare) {
+                        if (shares && Object.keys(shares).length) {
+                            result.push(self.loopShares(shares), linkShare);
+                        }
+                    }
+                    else { // Exclude folder/file links, 
+                        if (shares) {
+                            length = Object.keys(shares).length;
+                            if (length) {
+                                if (!shares.EXP || (shares.EXP && length > 1)) {
+                                    result.push(self.loopShares(shares), linkShare);
+                                }
+                            }
+
+                        }
+                    }
+                }
+
+                // Look for pending share
+                if (pendingShare) {
+                    shares = M.ps[nodes[i]];
+                    if (M.ps && shares && Object.keys(shares).length) {
+                        result.push(self.loopShares(shares), linkShare);
+                    }
+                }
+            }
+        }
+
+        return result;
+    };
+
+    /**
+     * loopShares
+     *
+     * Loops through all shares.
+     * @param {Object} shares.
+     * @param {Boolean} linkShare Do we need info about link share.
+     * @returns {Array} user id.
+     */
+    Nodes.prototype.loopShares = function(shares, linkShare) {
+
+        var self = this;
+        
+        var result = [],
+            exclude = 'EXP',
+            index;
+
+        for (var item in shares) {
+            if (shares.hasOwnProperty(item)) {
+                result.push(item);
+            }
+        }
+
+        // Remove 'EXP'
+        if (!linkShare) {
+            index = result.indexOf(exclude);
+            
+            if (index !== -1) {
+                result = result.splice(index, 1);
+            }
+        }
+        
+        return result;
+    };
+
+    /**
      * loopSubdirs
      *
-     * Loops through all subdirs of given node
-     *
-     * @param {string} id: node id
-     * @param {array} nodesId
-     *
-     * @returns child nodes id
+     * Loops through all subdirs of given node.
+     * @param {string} id: node id.
+     * @param {array} nodesId.
+     * @returns child nodes id.
      */
     Nodes.prototype.loopSubdirs = function(id, nodesId) {
 

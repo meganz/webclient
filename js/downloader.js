@@ -424,10 +424,8 @@ ClassFile.prototype.checkQuota = function(task_done) {
     dlmanager.hasQuota(this.dl.size, function(hasQuota) {
         that.hasQuota = hasQuota;
         that.hasQuotaTimer = setTimeout(function() {
-            if (!oIsFrozen(that)) {
-                delete that.hasQuotaTimer;
-                that.run(task_done);
-            }
+            that.hasQuotaTimer = null;
+            that.run(task_done);
             that = undefined;
         }, 1000);
     });
@@ -436,13 +434,16 @@ ClassFile.prototype.checkQuota = function(task_done) {
 };
 
 ClassFile.prototype.run = function(task_done) {
+    var cancelled = oIsFrozen(this) || !this.dl || this.dl.cancelled;
 
-    ASSERT(this.gid
-        && GlobalProgress[this.gid],
-        'Invalid ClassFile state (' + Boolean(this.gid) + ', ' + (this.dl && this.dl.cancelled) + ')');
-
-    if (!this.gid || !GlobalProgress[this.gid]) {
-        return task_done(); // Hmm..
+    if (cancelled || !this.gid || !GlobalProgress[this.gid]) {
+        if (dlmanager.fetchingFile) {
+            dlmanager.fetchingFile = 0;
+        }
+        if (!cancelled) {
+            dlmanager.logger.warn('Invalid %s state.', this, this);
+        }
+        return task_done();
     }
 
     dlmanager.fetchingFile = 1; /* Block the fetchingFile state */

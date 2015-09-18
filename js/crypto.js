@@ -38,29 +38,49 @@ var crypt = (function () {
 
     // TODO: Eventually migrate all functionality into this name space.
 
-    // Mapping of public key types to their attribute names.
-    var _PUBKEY_ATTRIBUTE_MAPPING = {
+    /** Mapping of public key types to their attribute names. */
+    ns.PUBKEY_ATTRIBUTE_MAPPING = {
         Ed25519: 'puEd255',
         Cu25519: 'puCu255',
         RSA: null
     };
 
-    // Mapping of public key types to their signature attribute names.
-    var _PUBKEY_SIGNATURE_MAPPING = {
+    /** Mapping of private key types to their attribute names in the keyring. */
+    ns.PRIVKEY_ATTRIBUTE_MAPPING = {
+        Ed25519: 'prEd255',
+        Cu25519: 'prCu255',
+        RSA: null
+    };
+
+    /** Mapping of public key types to their signature attribute names. */
+    ns.PUBKEY_SIGNATURE_MAPPING = {
         Cu25519: 'sigCu255',
         RSA: 'sigPubk'
+    };
+
+    /** Maps the storage variable for a public key type. */
+    ns.PUBKEY_VARIABLE_MAPPING  = {
+        Ed25519: 'u_pubEd25519',
+        Cu25519: 'u_pubCu25519',
+        RSA: null
+    };
+
+    /** Maps the storage variable for a private key type. */
+    ns.PRIVKEY_VARIABLE_MAPPING  = {
+        Ed25519: 'u_privEd25519',
+        Cu25519: 'u_privCu25519',
+        RSA: 'u_privk'
     };
 
     /**
      * Returns the cache variable for a public key type.
      *
-     * @private
      * @param keyType {string}
      *     Key type of pub key. Can be one of 'Ed25519', 'Cu25519' or 'RSA'.
      * @return {Object}
      *     The cache variable object.
      */
-    var _getPubKeyCacheMapping = function(keyType) {
+    ns.getPubKeyCacheMapping = function(keyType) {
         switch (keyType) {
             case 'Ed25519':
                 return pubEd25519;
@@ -75,7 +95,6 @@ var crypt = (function () {
     /**
      * Retrieves a users' pub keys through the Mega API.
      *
-     * @private
      * @param userhandle {string}
      *     Mega user handle.
      * @param keyType {string}
@@ -83,8 +102,8 @@ var crypt = (function () {
      * @return {MegaPromise}
      *     A promise that is resolved when the original asynch code is settled.
      */
-    ns._getPubKeyAttribute = function(userhandle, keyType) {
-        if (typeof _PUBKEY_ATTRIBUTE_MAPPING[keyType] === 'unknown') {
+    ns.getPubKeyAttribute = function(userhandle, keyType) {
+        if (typeof ns.PUBKEY_ATTRIBUTE_MAPPING[keyType] === 'unknown') {
             throw new Error('Unsupported key type to retrieve: ' + keyType);
         }
 
@@ -117,11 +136,11 @@ var crypt = (function () {
         }
         else {
             var pubKeyPromise = getUserAttribute(userhandle,
-                                             _PUBKEY_ATTRIBUTE_MAPPING[keyType],
+                                             ns.PUBKEY_ATTRIBUTE_MAPPING[keyType],
                                              true, false);
             pubKeyPromise.done(function(result) {
                 result = base64urldecode(result);
-                _getPubKeyCacheMapping(keyType)[userhandle] = result;
+                ns.getPubKeyCacheMapping(keyType)[userhandle] = result;
                 logger.debug('Got ' + keyType + ' pub key of user ' + userhandle + '.');
                 masterPromise.resolve(result);
             });
@@ -149,7 +168,7 @@ var crypt = (function () {
      */
     ns._getPubKeyAuthentication = function(userhandle, keyType) {
         var recorded = authring.getContactAuthenticated(userhandle, keyType);
-        var pubKey = _getPubKeyCacheMapping(keyType)[userhandle];
+        var pubKey = ns.getPubKeyCacheMapping(keyType)[userhandle];
         var fingerprint = authring.computeFingerprint(pubKey, keyType, 'string');
         if (recorded === false) {
             return null;
@@ -243,7 +262,7 @@ var crypt = (function () {
         }
 
         // Some things we need to progress.
-        var pubKeyCache = _getPubKeyCacheMapping(keyType);
+        var pubKeyCache = ns.getPubKeyCacheMapping(keyType);
         var authMethod;
         var newAuthMethod;
 
@@ -271,7 +290,7 @@ var crypt = (function () {
         };
 
         // Get the pub key and update local variable and the cache.
-        var getPubKeyPromise = ns._getPubKeyAttribute(userhandle, keyType);
+        var getPubKeyPromise = ns.getPubKeyAttribute(userhandle, keyType);
 
         getPubKeyPromise.done(function __resolvePubKey(result) {
             var pubKey = result;
@@ -352,7 +371,7 @@ var crypt = (function () {
         else {
             var pubEd25519KeyPromise = ns.getPubKey(userhandle, 'Ed25519');
             var signaturePromise = getUserAttribute(userhandle,
-                                                    _PUBKEY_SIGNATURE_MAPPING[keyType],
+                                                    ns.PUBKEY_SIGNATURE_MAPPING[keyType],
                                                     true, false);
 
             // Signing key and signature required for verification.
@@ -497,12 +516,12 @@ var crypt = (function () {
      * Stores a public key for a contact and notify listeners.
      *
      * @param pubKey {string}
-     *     Ed25519 public key in byte string form.
+     *     Public key in byte string form.
      * @param keyType {string}
      *     Key type to set. Allowed values: 'Ed25519', 'Cu25519'.
      */
     ns.setPubKey = function(pubKey, keyType) {
-        var keyCache = _getPubKeyCacheMapping(keyType);
+        var keyCache = ns.getPubKeyCacheMapping(keyType);
         if (typeof keyCache === 'unknown') {
             throw('Illegal key type to set: ' + keyType);
         }
@@ -511,6 +530,38 @@ var crypt = (function () {
         Soon(function __setPubKey() {
             mBroadcaster.sendMessage(keyType);
         });
+    };
+
+
+    /**
+     * Derives the public key from a private key.
+     *
+     * @param privKey {string}
+     *     Private key in byte string form.
+     * @param keyType {string}
+     *     Key type to set. Allowed values: 'Ed25519', 'Cu25519'.
+     * @return {string}
+     *     Corresponding public key in byte string form. `undefined` for
+     *     unsupported key types.
+     */
+    ns.getPubKeyFromPrivKey = function(privKey, keyType) {
+        if (keyType === 'Ed25519') {
+            var result = nacl.sign.keyPair.fromSeed(
+                asmCrypto.string_to_bytes(privKey)).publicKey;
+
+            return asmCrypto.bytes_to_string(result);
+        }
+        else if (keyType === 'Cu25519') {
+            var result = nacl.scalarMult.base(
+                asmCrypto.string_to_bytes(privKey));
+
+            return asmCrypto.bytes_to_string(result);
+        }
+
+        // Fall through if we don't know how to treat a key (yet).
+        logger.error('Unsupported key type for deriving a public from a private key: ' + keyType);
+
+        return;
     };
 
 
@@ -545,7 +596,7 @@ var crypt = (function () {
 
         // Remove the cached key, so the key will be fetched and checked against
         // the stored fingerprint again next time.
-        delete _getPubKeyCacheMapping(keyType)[userHandle];
+        delete ns.getPubKeyCacheMapping(keyType)[userHandle];
 
         // Throw exception to stop whatever they were doing from progressing
         // e.g. initiating/accepting call, or sharing a file/folder
@@ -4193,110 +4244,3 @@ function api_strerror(errno) {
         }
     };
 })(this);
-
-
-/**
- * Initialises the authentication system.
- */
-function u_initAuthentication() {
-
-    // Load contacts' tracked authentication fingerprints.
-    authring.getContacts('Ed25519');
-    authring.getContacts('Cu25519');
-    authring.getContacts('RSA');
-
-    // Load/initialise the authenticated contacts ring.
-    getUserAttribute(u_handle, 'keyring', false, false, function(res, ctx) {
-        u_initAuthentication2(res, ctx);
-    });
-}
-
-/**
- * Provide Ed25519 key pair and a signed pub keys.
- */
-function u_initAuthentication2(res, ctx) {
-    var keyPair = null;
-    if (typeof res !== 'number') {
-        // Keyring is a private attribute, so it's been wrapped by a TLV store,
-        // no further processing here.
-        u_keyring = res;
-    }
-    else {
-        keyPair = nacl.sign.keyPair();
-        u_privEd25519 = asmCrypto.bytes_to_string(keyPair.secretKey.subarray(0, 32));
-        u_keyring = {
-            prEd255: u_privEd25519
-        };
-        u_pubEd25519 = asmCrypto.bytes_to_string(keyPair.publicKey);
-        // Keyring is a private attribute here, so no preprocessing required
-        // (will be wrapped in a TLV store).
-        setUserAttribute('keyring', u_keyring, false, false);
-        setUserAttribute('puEd255', base64urlencode(u_pubEd25519), true, false);
-    }
-    u_attr.keyring = u_keyring;
-    u_privEd25519 = u_keyring.prEd255;
-    u_pubEd25519 = u_pubEd25519
-                 || asmCrypto.bytes_to_string(nacl.sign.keyPair.fromSeed(
-                                                  asmCrypto.string_to_bytes(u_privEd25519)).publicKey);
-    u_attr.puEd255 = u_pubEd25519;
-    crypt.setPubKey(u_pubEd25519, 'Ed25519');
-
-    // Check for availability/consistency of public Ed25519 key.
-    /** Callback on finishing. */
-    var __puEd255Success = function(res) {
-        if (res !== base64urlencode(u_pubEd25519)) {
-            setUserAttribute('puEd255', base64urlencode(u_pubEd25519), true, false);
-        }
-    };
-    getUserAttribute(u_handle, "puEd255", true, false, __puEd255Success);
-
-    // Check for Curve25519 private key.
-    if (typeof u_keyring.prCu255 !== 'undefined') {
-        u_privCu25519 = u_keyring.prCu255;
-        u_pubCu25519 = asmCrypto.bytes_to_string(
-            nacl.scalarMult.base(asmCrypto.string_to_bytes(u_privCu25519)));
-        u_attr.prCu255 = u_privCu25519;
-        u_attr.puCu255 = u_pubCu25519;
-
-        // Check for availability of the public Curve25519 key.
-        /** Callback on finishing. */
-        var __puCu255Callback = function(res) {
-            if (res !== base64urlencode(u_pubCu25519)) {
-                setUserAttribute('puCu255', base64urlencode(u_pubCu25519), true, false);
-            }
-        };
-        getUserAttribute(u_handle, 'puCu255', true, false, __puCu255Callback);
-
-        // Ensure a Curve25519 pub key signature.
-        /** Callback on finishing. */
-        var __sigCu255Callback = function(res) {
-            if (typeof res === 'number') {
-                var sigPubCu25519 = authring.signKey(u_pubCu25519, 'Cu25519');
-                setUserAttribute('sigCu255', base64urlencode(sigPubCu25519), true, false);
-            }
-        };
-        getUserAttribute(u_handle, 'sigCu255', true, false, __sigCu255Callback);
-    }
-    else {
-        keyPair = nacl.box.keyPair();
-        u_privCu25519 = asmCrypto.bytes_to_string(keyPair.secretKey);
-        u_pubCu25519 = asmCrypto.bytes_to_string(keyPair.publicKey);
-        u_keyring.prCu255 = u_privCu25519;
-        u_attr.prCu255 = u_privCu25519;
-        u_attr.puCu255 = u_pubCu25519;
-        var sigPubCu25519 = authring.signKey(u_pubCu25519, 'Cu25519');
-        setUserAttribute('keyring', u_keyring, false, false);
-        setUserAttribute('puCu255', base64urlencode(u_pubCu25519), true, false);
-        setUserAttribute('sigCu255', base64urlencode(sigPubCu25519), true, false);
-    }
-
-    // Ensure an RSA pub key signature.
-    var __storeSigPubkCallback = function (res, ctx) {
-        if (typeof res === 'number') {
-            // No signed RSA pub key, store it.
-            var sigPubk = authring.signKey(crypto_decodepubkey(base64urldecode(u_attr.pubk)), 'RSA');
-            setUserAttribute('sigPubk', base64urlencode(sigPubk), true, false);
-        }
-    };
-    getUserAttribute(u_handle, 'sigPubk', true, false, __storeSigPubkCallback);
-}

@@ -26,8 +26,8 @@ describe("crypto unit test", function() {
         sandbox.restore();
     });
 
-    describe('user attributes', function() {
-        describe('_getPubKeyAattribute()', function() {
+    describe('crypt namespace', function() {
+        describe('getPubKeyAattribute()', function() {
             it("RSA key", function() {
                 sandbox.stub(ns._logger, '_log');
                 var rootPromise = { resolve: sinon.stub() };
@@ -37,7 +37,7 @@ describe("crypto unit test", function() {
                 sandbox.stub(window, 'base64urldecode');
                 sandbox.stub(window, 'api_req');
 
-                var result = ns._getPubKeyAttribute('you456789xw', 'RSA');
+                var result = ns.getPubKeyAttribute('you456789xw', 'RSA');
                 assert.strictEqual(result, rootPromise);
                 assert.strictEqual(api_req.callCount, 1);
                 assert.deepEqual(api_req.args[0][0], { a: 'uk', u: 'you456789xw' });
@@ -58,7 +58,7 @@ describe("crypto unit test", function() {
                 sandbox.stub(window, 'MegaPromise').returns(rootPromise);
                 sandbox.stub(window, 'api_req');
 
-                var result = ns._getPubKeyAttribute('you456789xw', 'RSA');
+                var result = ns.getPubKeyAttribute('you456789xw', 'RSA');
                 assert.strictEqual(result, rootPromise);
                 assert.strictEqual(api_req.callCount, 1);
                 assert.deepEqual(api_req.args[0][0], { a: 'uk', u: 'you456789xw' });
@@ -80,7 +80,7 @@ describe("crypto unit test", function() {
                 sandbox.stub(window, 'getUserAttribute').returns(attributePromise);
                 sandbox.stub(window, 'base64urldecode', _echo);
 
-                var result = ns._getPubKeyAttribute('you456789xw', 'Cu25519');
+                var result = ns.getPubKeyAttribute('you456789xw', 'Cu25519');
                 assert.strictEqual(result, rootPromise);
                 assert.strictEqual(getUserAttribute.callCount, 1);
                 assert.strictEqual(attributePromise.done.callCount, 1);
@@ -99,7 +99,7 @@ describe("crypto unit test", function() {
                 sandbox.stub(window, 'getUserAttribute').returns(attributePromise);
                 sandbox.stub(window, 'base64urldecode', _echo);
 
-                var result = ns._getPubKeyAttribute('you456789xw', 'Ed25519');
+                var result = ns.getPubKeyAttribute('you456789xw', 'Ed25519');
                 assert.strictEqual(result, rootPromise);
                 assert.strictEqual(getUserAttribute.callCount, 1);
                 assert.strictEqual(attributePromise.done.callCount, 1);
@@ -251,7 +251,7 @@ describe("crypto unit test", function() {
                                       linkFailTo: sinon.stub() };
                 sandbox.stub(window, 'MegaPromise').returns(masterPromise);
                 var pubKeyPromise = { done: sinon.stub() };
-                sandbox.stub(ns, '_getPubKeyAttribute').returns(pubKeyPromise);
+                sandbox.stub(ns, 'getPubKeyAttribute').returns(pubKeyPromise);
                 sandbox.stub(ns, '_getPubKeyAuthentication').returns(authring.AUTHENTICATION_METHOD.SEEN);
                 sandbox.stub(authring, 'computeFingerprint').returns('smudge');
 
@@ -277,7 +277,7 @@ describe("crypto unit test", function() {
                                       linkFailTo: sinon.stub() };
                 sandbox.stub(window, 'MegaPromise').returns(masterPromise);
                 var pubKeyPromise = { done: sinon.stub() };
-                sandbox.stub(ns, '_getPubKeyAttribute').returns(pubKeyPromise);
+                sandbox.stub(ns, 'getPubKeyAttribute').returns(pubKeyPromise);
                 sandbox.stub(ns, '_getPubKeyAuthentication').returns(null);
                 sandbox.stub(authring, 'computeFingerprint').returns('smudge');
                 sandbox.stub(authring, 'setContactAuthenticated');
@@ -304,7 +304,7 @@ describe("crypto unit test", function() {
                 var masterPromise = { linkFailTo: sinon.stub() };
                 sandbox.stub(window, 'MegaPromise').returns(masterPromise);
                 var pubKeyPromise = { done: sinon.stub() };
-                sandbox.stub(ns, '_getPubKeyAttribute').returns(pubKeyPromise);
+                sandbox.stub(ns, 'getPubKeyAttribute').returns(pubKeyPromise);
                 sandbox.stub(ns, '_getPubKeyAuthentication').returns(false);
                 sandbox.stub(authring, 'computeFingerprint').returns('smudge');
                 sandbox.stub(ns, '_showFingerprintMismatchException');
@@ -336,7 +336,7 @@ describe("crypto unit test", function() {
                 _MegaPromise.all = sinon.stub().returns(signatureVerificationPromise);
                 sandbox.stub(window, 'MegaPromise', _MegaPromise);
                 var pubKeyPromise = { done: sinon.stub() };
-                sandbox.stub(ns, '_getPubKeyAttribute').returns(pubKeyPromise);
+                sandbox.stub(ns, 'getPubKeyAttribute').returns(pubKeyPromise);
                 sandbox.stub(ns, '_getPubKeyAuthentication').returns(authring.AUTHENTICATION_METHOD.SIGNATURE_VERIFIED);
                 sandbox.stub(window, 'getUserAttribute').returns('squiggle');
                 sandbox.stub(authring, 'computeFingerprint').returns('smudge');
@@ -357,7 +357,7 @@ describe("crypto unit test", function() {
 
                 var result = ns.getPubKey('you456789xw', 'Cu25519');
                 assert.strictEqual(result, masterPromise);
-                assert.strictEqual(ns._getPubKeyAttribute.callCount, 1);
+                assert.strictEqual(ns.getPubKeyAttribute.callCount, 1);
                 assert.strictEqual(pubKeyPromise.done.callCount, 1);
                 assert.strictEqual(ns.getPubKey.callCount, 2);
                 assert.strictEqual(getUserAttribute.callCount, 1);
@@ -394,7 +394,7 @@ describe("crypto unit test", function() {
                 _MegaPromise.all = sinon.stub().returns(signatureVerificationPromise);
                 sandbox.stub(window, 'MegaPromise', _MegaPromise);
                 var pubKeyPromise = { done: sinon.stub() };
-                sandbox.stub(ns, '_getPubKeyAttribute').returns(pubKeyPromise);
+                sandbox.stub(ns, 'getPubKeyAttribute').returns(pubKeyPromise);
                 sandbox.stub(ns, '_getPubKeyAuthentication').returns(authring.AUTHENTICATION_METHOD.SIGNATURE_VERIFIED);
                 sandbox.stub(window, 'getUserAttribute').returns('squiggle');
                 sandbox.stub(authring, 'computeFingerprint').returns('smudge');
@@ -415,7 +415,7 @@ describe("crypto unit test", function() {
 
                 var result = ns.getPubKey('you456789xw', 'Cu25519');
                 assert.strictEqual(result, masterPromise);
-                assert.strictEqual(ns._getPubKeyAttribute.callCount, 1);
+                assert.strictEqual(ns.getPubKeyAttribute.callCount, 1);
                 assert.strictEqual(pubKeyPromise.done.callCount, 1);
                 assert.strictEqual(ns.getPubKey.callCount, 2);
                 assert.strictEqual(getUserAttribute.callCount, 1);
@@ -452,7 +452,7 @@ describe("crypto unit test", function() {
                 _MegaPromise.all = sinon.stub().returns(signatureVerificationPromise);
                 sandbox.stub(window, 'MegaPromise', _MegaPromise);
                 var pubKeyPromise = { done: sinon.stub() };
-                sandbox.stub(ns, '_getPubKeyAttribute').returns(pubKeyPromise);
+                sandbox.stub(ns, 'getPubKeyAttribute').returns(pubKeyPromise);
                 sandbox.stub(ns, '_getPubKeyAuthentication').returns(false);
                 sandbox.stub(window, 'getUserAttribute').returns('squiggle');
                 sandbox.stub(authring, 'computeFingerprint').returns('smudge');
@@ -474,7 +474,7 @@ describe("crypto unit test", function() {
 
                 var result = ns.getPubKey('you456789xw', 'Cu25519');
                 assert.strictEqual(result, masterPromise);
-                assert.strictEqual(ns._getPubKeyAttribute.callCount, 1);
+                assert.strictEqual(ns.getPubKeyAttribute.callCount, 1);
                 assert.strictEqual(pubKeyPromise.done.callCount, 1);
                 assert.strictEqual(ns.getPubKey.callCount, 2);
                 assert.strictEqual(getUserAttribute.callCount, 1);
@@ -512,7 +512,7 @@ describe("crypto unit test", function() {
                 _MegaPromise.all = sinon.stub().returns(signatureVerificationPromise);
                 sandbox.stub(window, 'MegaPromise', _MegaPromise);
                 var pubKeyPromise = { done: sinon.stub() };
-                sandbox.stub(ns, '_getPubKeyAttribute').returns(pubKeyPromise);
+                sandbox.stub(ns, 'getPubKeyAttribute').returns(pubKeyPromise);
                 sandbox.stub(ns, '_getPubKeyAuthentication').returns(false);
                 sandbox.stub(window, 'getUserAttribute').returns('squiggle');
                 sandbox.stub(authring, 'computeFingerprint').returns('smudge');
@@ -535,7 +535,7 @@ describe("crypto unit test", function() {
 
                 var result = ns.getPubKey('you456789xw', 'Cu25519');
                 assert.strictEqual(result, masterPromise);
-                assert.strictEqual(ns._getPubKeyAttribute.callCount, 1);
+                assert.strictEqual(ns.getPubKeyAttribute.callCount, 1);
                 assert.strictEqual(pubKeyPromise.done.callCount, 1);
                 assert.strictEqual(ns.getPubKey.callCount, 2);
                 assert.strictEqual(getUserAttribute.callCount, 1);
@@ -575,7 +575,7 @@ describe("crypto unit test", function() {
                 _MegaPromise.all = sinon.stub().returns(signatureVerificationPromise);
                 sandbox.stub(window, 'MegaPromise', _MegaPromise);
                 var pubKeyPromise = { done: sinon.stub() };
-                sandbox.stub(ns, '_getPubKeyAttribute').returns(pubKeyPromise);
+                sandbox.stub(ns, 'getPubKeyAttribute').returns(pubKeyPromise);
                 sandbox.stub(ns, '_getPubKeyAuthentication').returns(authring.AUTHENTICATION_METHOD.SEEN);
                 sandbox.stub(window, 'getUserAttribute').returns('');
                 sandbox.stub(authring, 'computeFingerprint').returns('smudge');
@@ -597,7 +597,7 @@ describe("crypto unit test", function() {
 
                 var result = ns.getPubKey('you456789xw', 'Cu25519');
                 assert.strictEqual(result, masterPromise);
-                assert.strictEqual(ns._getPubKeyAttribute.callCount, 1);
+                assert.strictEqual(ns.getPubKeyAttribute.callCount, 1);
                 assert.strictEqual(pubKeyPromise.done.callCount, 1);
                 assert.strictEqual(ns.getPubKey.callCount, 2);
                 assert.strictEqual(getUserAttribute.callCount, 1);
@@ -636,7 +636,7 @@ describe("crypto unit test", function() {
                 _MegaPromise.all = sinon.stub().returns(signatureVerificationPromise);
                 sandbox.stub(window, 'MegaPromise', _MegaPromise);
                 var pubKeyPromise = { done: sinon.stub() };
-                sandbox.stub(ns, '_getPubKeyAttribute').returns(pubKeyPromise);
+                sandbox.stub(ns, 'getPubKeyAttribute').returns(pubKeyPromise);
                 sandbox.stub(ns, '_getPubKeyAuthentication').returns(true);
                 sandbox.stub(window, 'getUserAttribute').returns('');
                 sandbox.stub(authring, 'computeFingerprint').returns('smudge');
@@ -658,7 +658,7 @@ describe("crypto unit test", function() {
 
                 var result = ns.getPubKey('you456789xw', 'Cu25519');
                 assert.strictEqual(result, masterPromise);
-                assert.strictEqual(ns._getPubKeyAttribute.callCount, 1);
+                assert.strictEqual(ns.getPubKeyAttribute.callCount, 1);
                 assert.strictEqual(pubKeyPromise.done.callCount, 1);
                 assert.strictEqual(ns.getPubKey.callCount, 2);
                 assert.strictEqual(getUserAttribute.callCount, 1);
@@ -697,7 +697,7 @@ describe("crypto unit test", function() {
                 _MegaPromise.all = sinon.stub().returns(signatureVerificationPromise);
                 sandbox.stub(window, 'MegaPromise', _MegaPromise);
                 var pubKeyPromise = { done: sinon.stub() };
-                sandbox.stub(ns, '_getPubKeyAttribute').returns(pubKeyPromise);
+                sandbox.stub(ns, 'getPubKeyAttribute').returns(pubKeyPromise);
                 sandbox.stub(ns, '_getPubKeyAuthentication').returns(authring.AUTHENTICATION_METHOD.SEEN);
                 sandbox.stub(window, 'getUserAttribute').returns('squiggle');
                 sandbox.stub(authring, 'computeFingerprint').returns('smudge');
@@ -719,7 +719,7 @@ describe("crypto unit test", function() {
 
                 var result = ns.getPubKey('you456789xw', 'Cu25519');
                 assert.strictEqual(result, masterPromise);
-                assert.strictEqual(ns._getPubKeyAttribute.callCount, 1);
+                assert.strictEqual(ns.getPubKeyAttribute.callCount, 1);
                 assert.strictEqual(pubKeyPromise.done.callCount, 1);
                 assert.strictEqual(ns.getPubKey.callCount, 2);
                 assert.strictEqual(getUserAttribute.callCount, 1);

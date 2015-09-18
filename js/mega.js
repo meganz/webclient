@@ -3264,7 +3264,7 @@ function MegaData()
                 shareDialog();
             }
             if (typeof mDB === 'object' && !pfkey) {
-                mDBadd('ok', {h: h, k: a32_to_base64(encrypt_key(u_k_aes, u_sharekeys[h])), ha: crypto_handleauth(h)});
+                mDBadd('ok', { h: h, k: a32_to_base64(encrypt_key(u_k_aes, u_sharekeys[h])), ha: crypto_handleauth(h) });
             }
         }
         else if (d) {
@@ -3374,6 +3374,7 @@ function MegaData()
                 && M.d[selectedNodeHandle].shares;
 
             if (shares) {
+                
                 // Loop through selected items and search for export link share
                 for (var userHandle in shares) {
                     if (shares.hasOwnProperty(userHandle)) {
@@ -3386,106 +3387,6 @@ function MegaData()
         }
 
         return false;
-    };
-
-    this.getLinks = function(h) {
-
-        var node,
-            folderLinks = [], links = [],
-            $getLinkPromise = new MegaPromise();
-
-        loadingDialog.show();
-
-        for (var i in h) {
-            node = M.d[h[i]];
-            if (node) {
-                if (node.t) {
-                    folderLinks.push(node.h);
-                }
-                links.push(node.h);
-            }
-        }
-        if (d) {
-            console.log('getLinks', links);
-        }
-        
-        if (folderLinks.length > 0) {
-            getFolderLinks();
-        }
-        else {
-            getLinksDone();
-        }
-
-        this.links = links;
-        
-        return $getLinkPromise;
-        
-        /**
-         * getLinksDone
-         */
-        function getLinksDone() {
-            
-            var nodeHandle;
-            
-            for (var i in links) {
-                api_req({a: 'l', n: links[i]}, {
-                    node: links[i],
-                    last: i == links.length - 1,
-                    callback: function(res, ctx) {
-
-                        if (typeof res !== 'number') {
-                            nodeHandle = M.d[ctx.node].h;
-                            M.nodeAttr({h: nodeHandle, ph: res});
-                            M.nodeShare(nodeHandle, {h: nodeHandle, r: 0, u: 'EXP', ts: unixtime()});
-                        }
-
-                        if (ctx.last) {
-                            $getLinkPromise.resolve();
-                            loadingDialog.hide();
-                        }
-                    }
-                });
-            }
-        }
-
-        /**
-         * getFolderLinks
-         */
-        function getFolderLinks() {
-
-            if (folderLinks.length > 0) {
-                var node = M.d[folderLinks.shift()];
-
-                if (node) {
-                    if (node.shares
-                            && node.shares['EXP']) {
-                        getFolderLinks();
-                    }
-                    else {
-                        var childNodes = fm_getnodes(node.h);
-                        childNodes.push(node.h);
-
-                        api_setshare(node.h, [{u: 'EXP', r: 0}],
-                            childNodes, {
-                                fln: node.h,
-                                done: function(res, ctx) {
-                                    if (res.r && res.r[0] === 0) {
-                                        M.nodeShare(ctx.fln, {h: ctx.fln, r: 0, u: 'EXP', ts: unixtime()});
-                                    }
-                                    getFolderLinks();
-                                }
-                            }
-                        );
-                    }
-                }
-                else {
-                    getFolderLinks();
-                }
-            }
-            else {
-                getLinksDone();
-            }
-        }
     };
 
     this.makeDir = function(n)
@@ -4969,7 +4870,9 @@ function execsc(actionPackets, callback) {
                 }
 
                 if (actionPacket && actionPacket.u === 'EXP') {
-                    M.getLinks([actionPacket.h]);
+                    var publicLink = new mega.Share.PublicLink();
+                    publicLink.getPublicLink([actionPacket.h]);
+//                    M.getLinks([actionPacket.h]);
                 }
 
                 if (typeof actionPacket.o !== 'undefined') {
@@ -5451,19 +5354,29 @@ function ddtype(ids, toid, alt)
     return r;
 }
 
-function fm_getnodes(h, ignore)
+/**
+ * fm_getnodes
+ * 
+ * Search for a subfolders.
+ * @param {String} nodeId.
+ * @param {Boolean} ignore Ignore .
+ * @returns {Array|fm_getnodes.nodes} Array of subfolders ids. Root folder included.
+ */
+function fm_getnodes(nodeId, ignore)
 {
     var nodes = [];
-    function procnode(h) {
-        if (M.c[h]) {
-            for (var n in M.c[h]) {
-                if (M.c[h].hasOwnProperty(n)) {
+    
+    function procnode(nodeId) {
+        if (M.c[nodeId]) {
+            for (var n in M.c[nodeId]) {
+                if (M.c[nodeId].hasOwnProperty(n)) {
                     if (!M.d[n]) {
                         if (d) {
-                            console.warn('Invalid node: ' + n, h, M.c[h][n]);
+                            console.warn('Invalid node: ' + n, nodeId, M.c[nodeId][n]);
                         }
                         continue;
                     }
+                    // ToDo: check this condition
                     if (M.d[n].name || ignore) {
                         nodes.push(n);
                     }
@@ -5474,7 +5387,8 @@ function fm_getnodes(h, ignore)
             }
         }
     }
-    procnode(h);
+    procnode(nodeId);
+    
     return nodes;
 }
 
@@ -6184,7 +6098,9 @@ function loadfm_callback(res, ctx) {
                 }
             }
             if (sharedNodes.length) {
-                M.getLinks(sharedNodes);
+                var publicLink = new mega.Share.PublicLink();
+                publicLink.getPublicLink(sharedNodes);
+//                M.getLinks(sharedNodes);
             }
         }
 
@@ -6407,3 +6323,505 @@ function balance2pro(callback)
         }
     });
 }
+
+(function($, scope) {
+    /**
+     * Public Link Dialog
+     *
+     * @param opts {Object}
+     *
+     * @constructor
+     */
+    var PublicLinkDialog = function(opts) {
+
+        var self = this;
+        
+        var defaultOptions = {
+        };
+
+        self.options = $.extend(true, {}, defaultOptions, opts);
+        
+        self.logger = MegaLogger.getLogger('DialogPublicLink');
+    };
+
+    /**
+     * linksDialog
+     * 
+     * Render public link dialog and handle events
+     * @param {Boolean} close To close or to show public link dialog
+     */
+    PublicLinkDialog.prototype.linksDialog = function(close) {
+        
+        var self = this;
+        
+        var html = '', phf = {},
+            scroll = '.export-link-body';
+
+        deleteScrollPanel(scroll, 'jsp');
+        if (close) {
+            $.dialog = false;
+            fm_hideoverlay();
+            $('.fm-dialog.export-links-dialog').addClass('hidden');
+            $('.export-links-warning').addClass('hidden');
+            if (window.onCopyEventHandler) {
+                document.removeEventListener('copy', window.onCopyEventHandler, false);
+                delete window.onCopyEventHandler;
+            }
+            return true;
+        }
+
+        $.dialog = 'links';
+
+        html = itemExportLink(phf);
+
+        $('.export-links-warning-close').rebind('click', function() {
+            $('.export-links-warning').addClass('hidden');
+        });
+
+        $('.export-links-dialog .fm-dialog-close').rebind('click', function() {
+            self.linksDialog(1);
+        });
+
+        // Setup the copy to clipboard buttons
+        if (is_extension) {
+            if (!is_chrome_firefox) {
+                $('.fm-dialog-chrome-clipboard').removeClass('hidden');
+                $("#chromeclipboard").fadeTo(1, 0.01);
+            }
+            // chrome & firefox extension:
+            $("#clipboardbtn1").unbind('click');
+            $("#clipboardbtn1").bind('click', function() {
+
+                if (is_chrome_firefox) {
+                    mozSetClipboard(getclipboardlinks());
+                }
+                else {
+                    $('#chromeclipboard')[0].value = getclipboardlinks();
+                    $('#chromeclipboard').select();
+                    document.execCommand('copy');
+                }
+            });
+
+            $('#clipboardbtn2').unbind('click');
+            $('#clipboardbtn2').bind('click', function() {
+
+                if (is_chrome_firefox) {
+                    mozSetClipboard(getclipboardkeys());
+                }
+                else {
+                    $('#chromeclipboard')[0].value = getclipboardkeys();
+                    $('#chromeclipboard').select();
+                    document.execCommand('copy');
+                }
+            });
+            $('#clipboardbtn1 span').text(l[370]);
+            $('#clipboardbtn2 span').text(l[1033]);
+        }
+        else if (flashIsEnabled()) {
+            $('#clipboardbtn1 span').html(htmlentities(l[370]) + '<object data="OneClipboard.swf" id="clipboardswf1" type="application/x-shockwave-flash"  width="100%" height="32" allowscriptaccess="always"><param name="wmode" value="transparent"><param value="always" name="allowscriptaccess"><param value="all" name="allowNetworkin"><param name=FlashVars value="buttonclick=1" /></object>');
+            $('#clipboardbtn2 span').html(htmlentities(l[1033]) + '<object data="OneClipboard.swf" id="clipboardswf2" type="application/x-shockwave-flash"  width="100%" height="32" allowscriptaccess="always"><param name="wmode" value="transparent"><param value="always" name="allowscriptaccess"><param value="all" name="allowNetworkin"><param name=FlashVars value="buttonclick=1" /></object>');
+
+            $('#clipboardbtn1').unbind('mouseover');
+            $('#clipboardbtn1').bind('mouseover', function() {
+
+                var e = $('#clipboardswf1')[0];
+                if (e && e.setclipboardtext) {
+                    e.setclipboardtext(getclipboardlinks());
+                }
+            });
+
+            $('#clipboardbtn2').unbind('mouseover');
+            $('#clipboardbtn2').bind('mouseover', function() {
+
+                var e = $('#clipboardswf2')[0];
+                if (e && e.setclipboardtext) {
+                    e.setclipboardtext(getclipboardkeys());
+                }
+            });
+        }
+        else {
+            var uad = browserdetails(ua);
+
+            if (uad.icon === 'ie.png' && window.clipboardData) {
+                $('#clipboardbtn1').rebind('click', function() {
+                    var links = $.trim(getclipboardlinks());
+                    var mode = links.indexOf("\n") !== -1 ? 'Text' : 'URL';
+                    window.clipboardData.setData(mode, links);
+                });
+                $('#clipboardbtn2').rebind('click', function() {
+                    window.clipboardData.setData('Text', getclipboardkeys());
+                });
+            }
+            else {
+                Later(function() {
+                    $('input.export-link-url').focus().click();
+                });
+
+                if (window.ClipboardEvent) {
+                    $('#clipboardbtn1, #clipboardbtn2').rebind('click', function() {
+                        var doLinks = ($(this).attr('id') === 'clipboardbtn1');
+                        var links = $.trim(doLinks ? getclipboardlinks() : getclipboardkeys());
+                        var $span = $(this).find('span');
+
+                        window.onCopyEventHandler = function onCopyEvent(ev) {
+                            if (d) console.log('onCopyEvent', arguments);
+                            ev.clipboardData.setData('text/plain', links);
+                            if (doLinks) {
+                                ev.clipboardData.setData('text/html', links.split("\n").map(function(link) {
+                                    return '<a href="' + link + '">'
+                                        + phf.value[link.match(/#F?!([\w-]{8})/).pop()]
+                                        + '</a>';
+                                }).join("<br/>\n"));
+                            }
+                            ev.preventDefault();
+                            $span.text(l[726]); // Done
+                        };
+                        document.addEventListener('copy', window.onCopyEventHandler, false);
+                        Soon(function() {
+                            $('input.export-link-url').focus().click();
+                            // var ev = new ClipboardEvent('copy', { dataType: 'text/plain', data: links });
+                            // document.dispatchEvent(ev);
+                            $span.text('Hit ' + (uad.os === 'Apple' ? 'cmd':'ctrl') + '-c');
+                        });
+                    });
+                }
+                else {
+                    // Hide the clipboard buttons if not using the extension and Flash is disabled
+                    $('#clipboardbtn1').addClass('hidden');
+                    $('#clipboardbtn2').addClass('hidden');
+                }
+            }
+
+            $('#clipboardbtn1 span').text(l[370]);
+            $('#clipboardbtn2 span').text(l[1033]);
+        }
+
+        // On Export File Links and Decryption Keys dialog
+        $('.export-checkbox :checkbox').iphoneStyle({
+            resizeContainer: false,
+            resizeHandle: false,
+            onChange: function(elem, data) {
+                var selclass;
+
+                if (data) {
+                    $(elem).closest('.on_off').removeClass('off').addClass('on');
+                    selclass = '.file-link-with-key';
+                }
+                else {
+                    $(elem).closest('.on_off').removeClass('on').addClass('off');
+                    selclass = '.file-link-without-key';
+                }
+                $('.export-link-url').each(function(idx, elm) {
+                    elm = $(elm);
+                    var parent = elm.closest('.export-link-text-pad');
+                    elm.val($(selclass, parent).text());
+                });
+                window.getLinkState = !!data;
+            }
+        });
+
+        if (typeof window.getLinkState === 'undefined') {
+            $('.export-checkbox').removeClass('off').addClass('on');
+        }
+
+        $('.export-links-dialog').addClass('file-keys-view');
+        $('.export-links-dialog .export-link-body').html(html);
+
+        fm_showoverlay();
+
+        $('.export-links-warning').removeClass('hidden');
+        $('.fm-dialog.export-links-dialog').removeClass('hidden');
+        $('.export-link-body').removeAttr('style');
+
+        if ($('.export-link-body').outerHeight() === 384) {// ToDo: How did I find this integer?
+            $('.export-link-body').jScrollPane({showArrows: true, arrowSize: 5});
+            jScrollFade('.export-link-body');
+        }
+        $('.fm-dialog.export-links-dialog').css('margin-top', $('.fm-dialog.export-links-dialog').outerHeight() / 2 * - 1);
+
+        setTimeout(function() {
+            $('input.export-link-url').rebind('click', function() {
+                $(this).select();
+            });
+        }, 300);
+    };
+        
+    // export
+    scope.mega = scope.mega || {};
+    scope.mega.Dialog = scope.mega.Dialog || {};
+    scope.mega.Dialog.PublicLink = PublicLinkDialog;
+})(jQuery, window);
+
+(function($, scope) {
+    /**
+     * PublicLink related operations.
+     *
+     * @param opts {Object}
+     *
+     * @constructor
+     */
+    var PublicLink = function(opts) {
+
+        var self = this;
+
+        var defaultOptions = {
+            'showPublicLinkDialog': false,
+            'updateUI': false
+        };
+
+        self.options = $.extend(true, {}, defaultOptions, opts);
+
+        self.logger = MegaLogger.getLogger('PublicLink');
+    };
+
+    /**
+     * getPublicLink
+     * 
+     * Get public link for file or folder.
+     * @param {Array} nodeIds Array of nodes handle id.
+     */
+    PublicLink.prototype.getPublicLink = function(nodesId) {
+
+        var self = this;
+
+        var isLastNode = false,
+            length = nodesId.length;
+
+        if (length) {
+            loadingDialog.show();
+            self.logger.debug('getPublicLink');
+
+            $.each(nodesId, function(index, nodeId) {
+                isLastNode = (index === (length - 1)) ? true : false;
+                if (M.d[nodeId] && M.d[nodeId].t === 1) {// Folder
+                    self._getFolderPublicLinkRequest(nodeId, isLastNode);
+                }
+                else if (M.d[nodeId] && M.d[nodeId].t === 0) {// File
+                    self._getPublicLinkRequest(nodeId, isLastNode);
+                }
+            });
+        }
+    };
+
+    /**
+     * removePublicLink
+     * 
+     * Removes public link for file or folder.
+     * @param {Array} nodeHandle Array of node handles id.
+     */
+    PublicLink.prototype.removePublicLink = function(nodesId) {
+        
+        var self = this;
+        
+        var isLastNode = false,
+            length = nodesId.length;
+
+        if (length) {
+            loadingDialog.show();
+            self.logger.debug('removePublicLink');
+
+            $.each(nodesId, function(index, nodeId) {
+                isLastNode = (index === (length - 1)) ? true : false;
+                self._removePublicLinkRequest(nodeId, isLastNode);
+            });
+        }
+    };
+    
+    /**
+     * _getFolderPublicLinkRequest
+     * 
+     * 'Private' function, send folder public link delete request.
+     * @param {String} nodeId.
+     * @param {Boolean} isLastNode.
+     */
+    PublicLink.prototype._getFolderPublicLinkRequest = function(nodeId, isLastNode) {
+
+        var self = this;
+
+        var childNodes = [];
+
+        // Get all child nodes of root folder with nodeId
+        childNodes = fm_getnodes(nodeId);
+        childNodes.push(nodeId);
+
+        api_setshare(nodeId, [{ u: 'EXP', r: 0 }],
+            childNodes, {
+                nodeId: nodeId,
+                isLastNode: isLastNode,
+                done: function(result) {
+                    if (result.r && result.r[0] === 0) {
+                        M.nodeShare(this.nodeId, { h: this.nodeId, r: 0, u: 'EXP', ts: unixtime() });
+                        self._getPublicLinkRequest(this.nodeId, this.isLastNode);
+                        if (this.isLastNode) {
+                            loadingDialog.hide();
+                        }
+                    }
+                    else {
+                        self.logger.warn('_getFolderPublicLinkRequest', this.nodeId, 'Error code: ', result);
+                        loadingDialog.hide();
+                    }
+                }
+            }
+        );
+    };
+
+    /**
+     * _getPublicLinkRequest
+     * 
+     * 'Private' function, send public link delete request.
+     * @param {String} nodeId.
+     * @param {Boolean} isLastNode.
+     */
+    PublicLink.prototype._getPublicLinkRequest = function(nodeId, isLastNode) {
+
+        var self = this;
+
+        api_req({ a: 'l', n: nodeId }, {
+            nodeId: nodeId,
+            isLastNode: isLastNode,
+            callback: function(result) {
+
+                if (typeof result !== 'number') {
+                    M.nodeAttr({ h: this.nodeId, ph: result });
+                    M.nodeShare(this.nodeId, { h: this.nodeId, r: 0, u: 'EXP', ts: unixtime() });
+
+                    if (self.options.updateUI) {
+                        var UiPublicLink = new mega.UI.Share.PublicLink();
+                        UiPublicLink.addPublicLinkIcon(this.nodeId);
+                    }
+                    if (this.isLastNode) {
+                        loadingDialog.hide();
+                        if (self.options.showPublicLinkDialog) {
+                            var publicLinkDialog = new mega.Dialog.PublicLink();
+                            publicLinkDialog.linksDialog();
+                        }
+                    }
+                }
+                else {// Error
+                    self.logger.warn('_getPublicLinkRequest:', this.nodeId, 'Error code: ', result);
+                    loadingDialog.hide();
+                }
+
+            }
+        });
+    };
+
+    /**
+     * _removePublicLinkRequest
+     * 
+     * 'Private' function, send folder delete public link request.
+     * @param {String} nodeId.
+     * @param {Boolean} isLastNode.
+     */
+    PublicLink.prototype._removePublicLinkRequest = function(nodeId, isLastNode) {
+
+        var self = this;
+
+        api_req({ a: 'l', n: nodeId, d: 1 }, {
+            nodeId: nodeId,
+            isLastNode: isLastNode,
+            callback: function(result) {
+                if (result === 0) {
+                    M.delNodeShare(this.nodeId, 'EXP');
+                    M.deleteExportLinkShare(this.nodeId);
+
+                    if (self.options.updateUI) {
+                        var UiPublicLink = new mega.UI.Share.PublicLink();
+                        UiPublicLink.removePublicLinkIcon(this.nodeId);
+                    }
+                    if (this.isLastNode) {
+                        loadingDialog.hide();
+                    }
+                }
+                else {// Error
+                    self.logger.warn('_removePublicLinkRequest failed for node:', this.nodeId, 'Error code: ', result);
+                    loadingDialog.hide();
+                }
+            }
+        });
+    };
+
+    // export
+    scope.mega = scope.mega || {};
+    scope.mega.Share = scope.mega.Share || {};
+    scope.mega.Share.PublicLink = PublicLink;
+})(jQuery, window);
+
+(function($, scope) {
+    /**
+     * UI Public Link Icon related operations.
+     *
+     * @param opts {Object}
+     *
+     * @constructor
+     */
+    var UiPublicLink = function(opts) {
+
+        var self = this;
+        
+        var defaultOptions = {
+        };
+
+        self.options = $.extend(true, {}, defaultOptions, opts);
+        
+        self.logger = MegaLogger.getLogger('UiPublicLink');
+    };
+
+    /**
+     * addPublicLinkIcon
+     * 
+     * Add public link icon to file or folder
+     * @param {String} nodeId
+     */
+    UiPublicLink.prototype.addPublicLinkIcon = function(nodeId) {
+        
+        var self = this;
+        
+        // Add link-icon to list view
+        $('#' + nodeId + ' .own-data').addClass('linked');
+
+        // Add class to the second from the list, prevent failure of the arrow icon
+        $('#' + nodeId + ' .own-data span').eq(1).addClass('link-icon');
+
+        // Add link-icon to grid view
+        $('#' + nodeId + '.file-block').addClass('linked');
+        $('#' + nodeId + '.file-block span').eq(1).addClass('link-icon');
+
+        // Add link-icon to left panel
+        $('#treea_' + nodeId).addClass('linked');
+
+        // Add class to the third from the list
+        $('#treea_' + nodeId + ' span').eq(2).addClass('link-icon');
+    };
+        
+    /**
+     * removePublicLinkIcon
+     * 
+     * Remove public link icon to file or folder
+     * @param {String} nodeId
+     */
+    UiPublicLink.prototype.removePublicLinkIcon = function(nodeId) {
+        
+        var self = this;
+
+        M.delNodeShare(nodeId, 'EXP');
+        M.deleteExportLinkShare(nodeId);
+
+        // Remove link icon from list view
+        $('#' + nodeId + ' .own-data').removeClass('linked');
+        $('#' + nodeId + ' .own-data span').removeClass('link-icon');
+
+        // Remove link icon from grid view
+        $('#' + nodeId + '.file-block').removeClass('linked');
+        $('#' + nodeId + '.file-block span').removeClass('link-icon');
+
+        // Remove link icon from left panel
+        $('#treeli_' + nodeId + ' span').removeClass('linked link-icon');
+    };
+
+    // export
+    scope.mega = scope.mega || {};
+    scope.mega.UI = scope.mega.UI || {};
+    scope.mega.UI.Share = scope.mega.UI.Share || {};
+    scope.mega.UI.Share.PublicLink = UiPublicLink;
+})(jQuery, window);

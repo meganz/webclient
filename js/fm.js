@@ -8482,24 +8482,25 @@ function itemExportLinkHtml(item) {
 /**
  * generates file url for shared item
  *
- * @returns {string}
+ * @returns {String} html
  */
-function itemExportLink(out) {
+function itemExportLink() {
 
-    var n, html = '', phf = {};
+    var node,
+//        phf = {},
+        html = '';
 
-    for (var i in M.links) {
-        n = M.d[M.links[i]];
-
-        if (n && n.ph) {
-            html += itemExportLinkHtml(n);
-            phf[n.ph] = n.name;
+    $.each($.selected, function(index, value) {
+        node = M.d[value];
+        if (node && node.ph) {
+            html += itemExportLinkHtml(node);
+//            phf[node.ph] = node.name;
         }
-    }
+    });
 
-    if (out) {
-        out.value = phf;
-    }
+//    if (out) {
+//        out.value = phf;
+//    }
 
     return html;
 }

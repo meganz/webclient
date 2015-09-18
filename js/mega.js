@@ -6341,7 +6341,7 @@ function balance2pro(callback)
 
         self.options = $.extend(true, {}, defaultOptions, opts);
         
-        self.logger = MegaLogger.getLogger('DialogPublicLink');
+        self.logger = MegaLogger.getLogger('PublicLinkDialog');
     };
 
     /**
@@ -6354,7 +6354,8 @@ function balance2pro(callback)
         
         var self = this;
         
-        var html = '', phf = {},
+        var html = '',
+//            phf = {},
             scroll = '.export-link-body';
 
         deleteScrollPanel(scroll, 'jsp');
@@ -6372,7 +6373,7 @@ function balance2pro(callback)
 
         $.dialog = 'links';
 
-        html = itemExportLink(phf);
+        html = itemExportLink();
 
         $('.export-links-warning-close').rebind('click', function() {
             $('.export-links-warning').addClass('hidden');
@@ -6469,7 +6470,7 @@ function balance2pro(callback)
                             if (doLinks) {
                                 ev.clipboardData.setData('text/html', links.split("\n").map(function(link) {
                                     return '<a href="' + link + '">'
-                                        + phf.value[link.match(/#F?!([\w-]{8})/).pop()]
+//                                        + phf.value[link.match(/#F?!([\w-]{8})/).pop()]
                                         + '</a>';
                                 }).join("<br/>\n"));
                             }

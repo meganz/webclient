@@ -48,7 +48,7 @@ var Chatd = function(userid, options) {
         'onMembersUpdated'
     ].forEach(function(evt) {
             self.rebind(evt + '.chatd', function(e) {
-                console.debug(evt, JSON.stringify(arguments[1]));
+                console.error(evt, JSON.stringify(arguments[1]));
             });
     });
 };
@@ -222,7 +222,6 @@ Chatd.Shard.prototype.reconnect = function() {
 
     self.s.onopen = function(e) {
         self.logger.log('chatd connection established');
-        self.connectionRetryManager.gotConnected();
         self.rejoinexisting();
         self.resendpending();
     };
@@ -328,8 +327,9 @@ Chatd.Shard.prototype.exec = function(a) {
             case Chatd.Opcode.JOIN:
                 self.logger.log("Join or privilege change - user '" + base64urlencode(cmd.substr(9,8)) + "' on '" + base64urlencode(cmd.substr(1,8)) + "' with privilege level " + cmd.charCodeAt(17) );
 
+                self.connectionRetryManager.gotConnected();
 
-                this.chatd.trigger('onMembersUpdated', {
+                self.chatd.trigger('onMembersUpdated', {
                     userId: base64urlencode(cmd.substr(9, 8)),
                     chatId: base64urlencode(cmd.substr(1, 8)),
                     priv: cmd.charCodeAt(17)
@@ -341,26 +341,26 @@ Chatd.Shard.prototype.exec = function(a) {
             case Chatd.Opcode.OLDMSG:
             case Chatd.Opcode.NEWMSG:
                 newmsg = cmd.charCodeAt(0) == Chatd.Opcode.NEWMSG;
-                len = this.chatd.unpack32le(cmd.substr(29,4));
-                self.logger.log((newmsg ? 'New' : 'Old') + " message '" + base64urlencode(cmd.substr(17,8)) + "' from '" + base64urlencode(cmd.substr(9,8)) + "' on '" + base64urlencode(cmd.substr(1,8)) + "' at " + this.chatd.unpack32le(cmd.substr(25,4)) + ': ' + cmd.substr(33,len));
+                len = self.chatd.unpack32le(cmd.substr(29,4));
+                self.logger.log((newmsg ? 'New' : 'Old') + " message '" + base64urlencode(cmd.substr(17,8)) + "' from '" + base64urlencode(cmd.substr(9,8)) + "' on '" + base64urlencode(cmd.substr(1,8)) + "' at " + self.chatd.unpack32le(cmd.substr(25,4)) + ': ' + cmd.substr(33,len));
                 len += 33;
 
-                this.chatd.msgstore(newmsg, cmd.substr(1,8), cmd.substr(9,8), cmd.substr(17,8), this.chatd.unpack32le(cmd.substr(25,4)), cmd.substr(33,len));
+                self.chatd.msgstore(newmsg, cmd.substr(1,8), cmd.substr(9,8), cmd.substr(17,8), self.chatd.unpack32le(cmd.substr(25,4)), cmd.substr(33,len));
                 break;
 
             case Chatd.Opcode.MSGUPD:
-                len = this.chatd.unpack32le(cmd.substr(29,4));
+                len = self.chatd.unpack32le(cmd.substr(29,4));
                 self.logger.log("Message '" + base64urlencode(cmd.substr(16,8)) + "' EDIT/DELETION: " + cmd.substr(33,len));
                 len += 33;
 
-                this.chatd.msgmodify(cmd.substr(1,8), cmd.substr(9,8), cmd.substr(33,len));
+                self.chatd.msgmodify(cmd.substr(1,8), cmd.substr(9,8), cmd.substr(33,len));
                 break;
 
             case Chatd.Opcode.SEEN:
                 if(cmd.length === 25) {
                     self.logger.log("Newest seen message on '" + base64urlencode(cmd.substr(1, 8)) + "' for user '" + base64urlencode(cmd.substr(9, 8)) + "': '" + base64urlencode(cmd.substr(17, 8)) + "'");
 
-                    this.chatd.trigger('onMessageLastSeen', {
+                    self.chatd.trigger('onMessageLastSeen', {
                         chatId: base64urlencode(cmd.substr(1, 8)),
                         userId: base64urlencode(cmd.substr(9, 8)),
                         messageId: base64urlencode(cmd.substr(17, 8))
@@ -374,7 +374,7 @@ Chatd.Shard.prototype.exec = function(a) {
                         " from me."
                     );
 
-                    this.chatd.trigger('onMessageLastSeen', {
+                    self.chatd.trigger('onMessageLastSeen', {
                         chatId: base64urlencode(cmd.substr(1, 8)),
                         userId: base64urlencode(self.chatd.userid),
                         messageId: base64urlencode(cmd.substr(9, 8))
@@ -390,7 +390,7 @@ Chatd.Shard.prototype.exec = function(a) {
             case Chatd.Opcode.RECEIVED:
                 self.logger.log("Newest delivered message on '" + base64urlencode(cmd.substr(1,8)) + "': '" + base64urlencode(cmd.substr(9,8)) + "'");
 
-                this.chatd.trigger('onMessageLastReceived', {
+                self.chatd.trigger('onMessageLastReceived', {
                     chatId: base64urlencode(cmd.substr(1, 8)),
                     messageId: base64urlencode(cmd.substr(9, 8))
                 });
@@ -399,11 +399,11 @@ Chatd.Shard.prototype.exec = function(a) {
                 break;
 
             case Chatd.Opcode.RETENTION:
-                self.logger.log("Retention policy change on '" + base64urlencode(cmd.substr(1,8)) + "' by '" + base64urlencode(cmd.substr(9,8)) + "': " + this.chatd.unpack32le(cmd.substr(17,4)) + " second(s)");
-                this.chatd.trigger('onRetentionChanged', {
+                self.logger.log("Retention policy change on '" + base64urlencode(cmd.substr(1,8)) + "' by '" + base64urlencode(cmd.substr(9,8)) + "': " + self.chatd.unpack32le(cmd.substr(17,4)) + " second(s)");
+                self.chatd.trigger('onRetentionChanged', {
                     chatId: base64urlencode(cmd.substr(1, 8)),
                     userId: base64urlencode(cmd.substr(9, 8)),
-                    retention: this.chatd.unpack32le(cmd.substr(17, 4))
+                    retention: self.chatd.unpack32le(cmd.substr(17, 4))
                 });
 
                 len = 21;
@@ -412,7 +412,7 @@ Chatd.Shard.prototype.exec = function(a) {
             case Chatd.Opcode.MSGID:
                 self.logger.log("Sent message ID confirmed: '" + base64urlencode(cmd.substr(9,8)) + "'");
 
-                this.chatd.msgconfirm(cmd.substr(1,8), cmd.substr(9,8));
+                self.chatd.msgconfirm(cmd.substr(1,8), cmd.substr(9,8));
 
                 len = 17;
                 break;
@@ -420,23 +420,23 @@ Chatd.Shard.prototype.exec = function(a) {
             case Chatd.Opcode.RANGE:
                 self.logger.log("Known chat message IDs - oldest: '" + base64urlencode(cmd.substr(9,8)) + "' newest: '" + base64urlencode(cmd.substr(17,8)) + "'");
 
-                this.chatd.trigger('onMessagesHistoryInfo', {
+                self.chatd.trigger('onMessagesHistoryInfo', {
                     chatId: base64urlencode(cmd.substr(1,8)),
                     oldest: base64urlencode(cmd.substr(9,8)),
                     newest: base64urlencode(cmd.substr(17,8))
                 });
 
-                this.chatd.msgcheck(cmd.substr(1,8), cmd.substr(17,8));
+                self.chatd.msgcheck(cmd.substr(1,8), cmd.substr(17,8));
 
                 len = 25;
                 break;
 
             case Chatd.Opcode.REJECT:
-                self.logger.log("Command was rejected: " + this.chatd.unpack32le(cmd.substr(9,4)) + " / " + this.chatd.unpack32le(cmd.substr(13,4)));
+                self.logger.log("Command was rejected: " + self.chatd.unpack32le(cmd.substr(9,4)) + " / " + self.chatd.unpack32le(cmd.substr(13,4)));
 
-                if (this.chatd.unpack32le(cmd.substr(9,4)) == Chatd.Opcode.NEWMSG) {
+                if (self.chatd.unpack32le(cmd.substr(9,4)) == Chatd.Opcode.NEWMSG) {
                     // the message was rejected
-                    this.chatd.msgconfirm(cmd.substr(1,8), false);
+                    self.chatd.msgconfirm(cmd.substr(1,8), false);
                 }
 
                 len = 17;
@@ -445,7 +445,7 @@ Chatd.Shard.prototype.exec = function(a) {
             case Chatd.Opcode.HISTDONE:
                 self.logger.log("History retrieval finished: " + base64urlencode(cmd.substr(1,8)));
 
-                this.chatd.trigger('onMessagesHistoryDone',
+                self.chatd.trigger('onMessagesHistoryDone',
                     {
                         chatId: base64urlencode(cmd.substr(1,8))
                     }
@@ -789,7 +789,7 @@ Chatd.Messages.prototype.check = function(chatid, msgid) {
     }
     else {
         // we don't have any messages, just fetch the newest 255
-        this.chatd.cmd(Chatd.Opcode.HIST, chatid, this.chatd.pack32le(-255));        
+        this.chatd.cmd(Chatd.Opcode.HIST, chatid, this.chatd.pack32le(-255));
     }
 };
 

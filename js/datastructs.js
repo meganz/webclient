@@ -501,6 +501,13 @@ MegaDataSortedMap.prototype.getItem = function(num) {
     }
 };
 
+
+MegaDataSortedMap.prototype.indexOfKey = function(value) {
+    var self = this;
+    return self._sortedVals.indexOf(value);
+};
+
+
 /**
  * Alias of .removeByKey
  *

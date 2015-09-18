@@ -77,12 +77,19 @@ var ChatdIntegration = function(megaChat) {
         var chatRoom = _getChatRoomFromEventData(eventData);
 
         chatRoom.chatdLastSeen = eventData.messageId;
-        var msg = chatRoom.messages[eventData.messageId];
-        if(msg && eventData.userId === u_handle) {
-            if(msg.setSeen) {
-                msg.setSeen(true);
-            } else if (msg.seen) {
-                msg.seen = true;
+        var keyIndex = chatRoom.messages.indexOfKey(eventData.messageId);
+        if(keyIndex > -1 && eventData.userId === u_handle) {
+            for(var i = 0; i <= keyIndex; i++) {
+                var msg = chatRoom.messages.getItem(i);
+
+                if(msg) {
+                    if (msg.setSeen) {
+                        msg.setSeen(true);
+                    } else if (msg.seen) {
+                        debugger;
+                        msg.seen = true;
+                    }
+                }
             }
         }
     });
@@ -90,12 +97,21 @@ var ChatdIntegration = function(megaChat) {
         var chatRoom = _getChatRoomFromEventData(eventData);
 
         chatRoom.chatdLastReceived = eventData.messageId;
-        var msg = chatRoom.messages[eventData.messageId];
-        if(msg && msg instanceof KarereEventObjects.OutgoingMessage) {
-            msg.setState(
-                KarereEventObjects.OutgoingMessage.STATE.DELIVERED
-            );
+
+        var keyIndex = chatRoom.messages.indexOfKey(eventData.messageId);
+        if(keyIndex > -1) {
+            for(var i = 0; i <= keyIndex; i++) {
+                var msg = chatRoom.messages.getItem(i);
+
+                if(msg && msg instanceof KarereEventObjects.OutgoingMessage) {
+                    msg.setState(
+                        KarereEventObjects.OutgoingMessage.STATE.DELIVERED
+                    );
+                }
+            }
         }
+
+
     });
 
     // handle data from chatd
@@ -135,6 +151,12 @@ var ChatdIntegration = function(megaChat) {
                 /* roomJid, */ chatRoom.roomJid,
                 /* seen */ true
             );
+
+            chatRoom.messages.forEach(function(msg, k) {
+                if(msg.seen && msg.seen === false) {
+                    self.markMessageAsSeen(chatRoom, msg.messageId);
+                }
+            });
         } else {
             var seenState = chatRoom.isCurrentlyActive && $.windowActive;
 
@@ -215,6 +237,8 @@ var ChatdIntegration = function(megaChat) {
                         chatRoom.messages.removeByKey(prevMessageId);
                         chatRoom.messages.push(v);
                     }
+
+                    chatRoom.chatdNewest = chatRoom.messages.getItem(chatRoom.messages.length - 1).messageId;
                     found = true;
                     return false; // break
                 }
@@ -327,8 +351,6 @@ ChatdIntegration.prototype.finishedReceivingMessagesHistory = function(chatRoom)
 
     delete chatRoom.chatdLastSeen;
     delete chatRoom.chatdLastReceived;
-    delete chatRoom.chatdOldest;
-    delete chatRoom.chatdNewest;
 };
 ChatdIntegration._waitUntilChatIdIsAvailable = function(fn) {
     return function() {

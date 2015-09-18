@@ -36,7 +36,11 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
                 if(megaRoom.isCurrentlyActive) {
                     megaRoom.messages.forEach(function (v, k) {
                         if (!v.seen) {
-                            v.seen = true;
+                            if(v.setSeen) {
+                                v.setSeen(true);
+                            } else {
+                                v.seen = true;
+                            }
                         }
                     });
 

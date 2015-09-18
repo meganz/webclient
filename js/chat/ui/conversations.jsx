@@ -260,10 +260,14 @@ var ConversationsMainListing =  React.createClass({
     mixins: [MegaRenderMixin],
     audioClicked: function(room, e) {
         e.stopPropagation();
+        room.activateWindow();
+        room.show();
         room.startAudioCall();
     },
     videoClicked: function(room, e) {
         e.stopPropagation();
+        room.activateWindow();
+        room.show();
         room.startVideoCall();
     },
     dblClicked: function(room, e) {
@@ -385,7 +389,7 @@ var ConversationsMainListing =  React.createClass({
             conversations.push(
                 <div className="conversations-block" key={roomJid}>
                     <div className="conversations-border">
-                        <div className="conversations-pad" onDoubleClick={this.dblClicked.bind(this, room)}>
+                        <div className="conversations-pad" onClick={this.dblClicked.bind(this, room)}>
                             {startCallButtons}
 
                             <ContactsUI.Avatar contact={contact} />

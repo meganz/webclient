@@ -1395,7 +1395,9 @@ hangupAll: function(reason, text)
                   retryNo++;
                   if(retryNo < 20) {
                       wait *= 2;
-                      setTimeout(req, wait);
+                      setTimeout(function() {
+                          req();
+                      }, wait);
                   }
               },
               dataType: 'json'
@@ -1403,7 +1405,7 @@ hangupAll: function(reason, text)
      }
      req();
  }
-}
+};
 
 RtcSession._maybeCreateVolMon = function() {
     if (RtcSession.gVolMon)

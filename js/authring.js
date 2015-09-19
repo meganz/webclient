@@ -661,7 +661,7 @@ var authring = (function () {
 
                 var comboPromise = MegaPromise.all([keyringPromise,
                                                     pubkeyPromise,
-                                                    authringPromise])
+                                                    authringPromise]);
                 masterPromise.linkDoneAndFailTo(comboPromise);
             }
             else {

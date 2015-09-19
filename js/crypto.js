@@ -545,14 +545,15 @@ var crypt = (function () {
      *     unsupported key types.
      */
     ns.getPubKeyFromPrivKey = function(privKey, keyType) {
+        var result;
         if (keyType === 'Ed25519') {
-            var result = nacl.sign.keyPair.fromSeed(
+            result = nacl.sign.keyPair.fromSeed(
                 asmCrypto.string_to_bytes(privKey)).publicKey;
 
             return asmCrypto.bytes_to_string(result);
         }
         else if (keyType === 'Cu25519') {
-            var result = nacl.scalarMult.base(
+            result = nacl.scalarMult.base(
                 asmCrypto.string_to_bytes(privKey));
 
             return asmCrypto.bytes_to_string(result);

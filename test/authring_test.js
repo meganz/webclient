@@ -538,7 +538,7 @@ describe("authring unit test", function() {
         it("uninitialised", function() {
             sandbox.stub(ns._logger, '_log');
             sandbox.stub(u_authring, 'Ed25519', undefined);
-            var result =ns.getContactAuthenticated('you456789xw', 'Ed25519');
+            var result = ns.getContactAuthenticated('you456789xw', 'Ed25519');
             assert.strictEqual(result, undefined);
             assert.strictEqual(ns._logger._log.args[0][1][0],
                           'First initialise u_authring by calling authring.getContacts()');
@@ -746,7 +746,7 @@ describe("authring unit test", function() {
                 sandbox.stub(window, 'MegaPromise').returns(masterPromise);
                 sandbox.stub(MegaPromise, 'all').returns('combo');
                 var keyringPromise = { done: sinon.stub(),
-                                       fail: sinon.stub()}
+                                       fail: sinon.stub() };
                 sandbox.stub(ns, '_initKeyringAndEd25519').returns(keyringPromise);
                 sandbox.stub(ns, '_initKeyPair');
                 ns._initKeyPair.onCall(0).returns('RSA');
@@ -774,7 +774,7 @@ describe("authring unit test", function() {
                 sandbox.stub(window, 'MegaPromise').returns(masterPromise);
                 sandbox.stub(MegaPromise, 'all').returns('combo');
                 var keyringPromise = { done: sinon.stub(),
-                                       fail: sinon.stub()}
+                                       fail: sinon.stub() };
                 sandbox.stub(ns, '_initKeyringAndEd25519').returns(keyringPromise);
 
                 var result = ns.initAuthenticationSystem();
@@ -1063,7 +1063,7 @@ describe("authring unit test", function() {
                 assert.strictEqual(signatureGoodPromise.resolve.callCount, 1);
                 assert.strictEqual(signatureGoodPromise.resolve.args[0][0], 'squiggle');
 
-                var callback = signatureGoodPromise.done.args[0][0];
+                callback = signatureGoodPromise.done.args[0][0];
                 callback('squiggle');
                 assert.strictEqual(ns.verifyKey.callCount, 1);
                 assert.strictEqual(masterPromise.resolve.callCount, 1);
@@ -1115,7 +1115,7 @@ describe("authring unit test", function() {
                 assert.strictEqual(signatureGoodPromise.resolve.callCount, 1);
                 assert.strictEqual(signatureGoodPromise.resolve.args[0][0], 'squiggle');
 
-                var callback = signatureGoodPromise.done.args[0][0];
+                callback = signatureGoodPromise.done.args[0][0];
                 callback('squiggle');
                 assert.strictEqual(ns.verifyKey.callCount, 1);
                 assert.strictEqual(masterPromise.resolve.callCount, 1);
@@ -1207,7 +1207,7 @@ describe("authring unit test", function() {
                 assert.strictEqual(signatureGoodPromise.resolve.callCount, 1);
                 assert.strictEqual(signatureGoodPromise.resolve.args[0][0], 'bad squiggle');
 
-                var callback = signatureGoodPromise.done.args[0][0];
+                callback = signatureGoodPromise.done.args[0][0];
                 callback('squiggle');
                 assert.strictEqual(ns.verifyKey.callCount, 1);
                 assert.strictEqual(ns.signKey.callCount, 1);

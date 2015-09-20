@@ -417,7 +417,9 @@ RtcSession.prototype = {
   var callRequest = null;
   var isBroadcast = (!Strophe.getResourceFromJid(targetJid));
   var ownFprMacKey = self.jingle.generateMacKey();
-  var sid = Math.random().toString(36).substr(2, 12); // random string
+  var bin = new Uint32Array(10);
+  window.crypto.getRandomValues(bin);
+  var sid = self.ownAnonId+':'+btoa(bin).substr(0, 16);
   var fileArr;
   var initiateCallback = function(sessStream) {
       var actualAv = getStreamAv(sessStream);
@@ -1013,6 +1015,7 @@ hangupAll: function(reason, text)
         The duration of actual media in seconds (ms rounded via Math.ceil()) that
         the stats engine would have provided
    */
+    var self = this;
     var obj = {
         peer: sess.peerjid,
         sess: new SessWrapper(sess), //can be a dummy session but the wrapper will still work
@@ -1021,8 +1024,17 @@ hangupAll: function(reason, text)
     };
      var trsn = ((eventName === 'call-canceled')?'cancel-':'')+reason;
     if (sess.statsRecorder)  {
-        var stats = obj.stats = sess.statsRecorder.terminate(this._makeCallId(sess));
-        stats.isCaller = sess.isInitiator?1:0;
+        var stats = obj.stats = sess.statsRecorder.terminate(sess.sid);
+        if (sess.isInitiator) {
+            stats.isCaller = 1;
+            stats.caid = self.ownAnonId;
+            stats.aaid = sess.peerAnonId;
+        } else {
+            stats.isCaller = 0;
+            stats.caid = sess.peerAnonId;
+            stats.aaid = self.ownAnonId;
+        }
+
         stats.termRsn = trsn;
         if (text) {
             stats.termMsg = text;
@@ -1032,10 +1044,20 @@ hangupAll: function(reason, text)
         }
     } else { //no stats, but will still provide callId and duration
         var bstats = obj.basicStats = {
-            isCaller: sess.isInitiator?1:0,
+            cid: sess.sid,
             termRsn: trsn,
             bws: stats_getBrowserVersion()
         };
+        if (sess.isInitiator) {
+            bstats.isCaller = 1;
+            bstats.caid = self.ownAnonId;
+            bstats.aaid = sess.peerAnonId;
+        } else {
+            bstats.isCaller = 0;
+            bstats.caid = sess.peerAnonId;
+            bstats.aaid = self.ownAnonId;
+        }
+
         if (text) {
             bstats.termMsg = text;
         }
@@ -1045,10 +1067,7 @@ hangupAll: function(reason, text)
 
         if (sess.fake) {
             sess.me = this.jid; //just in case someone wants to access the own jid of the fake session
-            if (!sess.peerAnonId)
-                sess.peerAnonId = "_unknown";
         }
-        bstats.cid = this._makeCallId(sess);
         if (sess.tsMediaStart) {
             bstats.ts = Math.round(sess.tsMediaStart/1000);
             bstats.dur = Math.ceil((Date.now()-sess.tsMediaStart)/1000);
@@ -1405,7 +1424,7 @@ hangupAll: function(reason, text)
      }
      req();
  }
-};
+}
 
 RtcSession._maybeCreateVolMon = function() {
     if (RtcSession.gVolMon)
@@ -1448,17 +1467,6 @@ RtcSession.xmlUnescape = function(text) {
                .replace(/\&quot;/g, '"');
 }
 
-/**
- Creates a unique string identifying the call,
- that is independent of whether the
- caller or callee generates it. Used only for sending stats
-*/
-RtcSession.prototype._makeCallId = function(sess) {
-    if (sess.isInitiator)
-        return this.ownAnonId+':'+sess.peerAnonId+':'+sess.sid;
-      else
-        return sess.peerAnonId+':'+this.ownAnonId+':'+sess.sid;
-}
 /**
  Anonymizes a JID
 */

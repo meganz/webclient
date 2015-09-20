@@ -303,6 +303,8 @@ function MegaData()
             break;
         }
 
+        M.sortingBy = [n, d];
+
         if (fmconfig.uisorting) {
             storefmconfig('sorting', {n: n, d: d});
         } else {
@@ -3273,6 +3275,11 @@ function MegaData()
                     }
                 }
             }
+        }
+
+        if (M.sortingBy[0] === 'fav') {
+            M.doSort('fav', M.sortingBy[1]);
+            M.renderMain();
         }
     };
 

@@ -4836,8 +4836,8 @@ function execsc(actionPackets, callback) {
                 }
 
                 if (actionPacket && actionPacket.u === 'EXP') {
-                    var publicLink = new mega.Share.PublicLink({ 'nodesToProcess': [actionPacket.h] });
-                    publicLink.getPublicLink();
+                    var exportLink = new mega.Share.ExportLink({ 'nodesToProcess': [actionPacket.h] });
+                    exportLink.getExportLink();
                 }
 
                 if (typeof actionPacket.o !== 'undefined') {
@@ -6063,8 +6063,8 @@ function loadfm_callback(res, ctx) {
                 }
             }
             if (sharedNodes.length) {
-                var publicLink = new mega.Share.PublicLink({ 'nodesToProcess': sharedNodes });
-                publicLink.getPublicLink();
+                var exportLink = new mega.Share.ExportLink({ 'nodesToProcess': sharedNodes });
+                exportLink.getExportLink();
             }
         }
 
@@ -6296,7 +6296,7 @@ function balance2pro(callback)
      *
      * @constructor
      */
-    var PublicLinkDialog = function(opts) {
+    var ExportLinkDialog = function(opts) {
 
         var self = this;
         
@@ -6305,7 +6305,7 @@ function balance2pro(callback)
 
         self.options = $.extend(true, {}, defaultOptions, opts);
         
-        self.logger = MegaLogger.getLogger('PublicLinkDialog');
+        self.logger = MegaLogger.getLogger('ExportLinkDialog');
     };
 
     /**
@@ -6314,7 +6314,7 @@ function balance2pro(callback)
      * Render public link dialog and handle events
      * @param {Boolean} close To close or to show public link dialog
      */
-    PublicLinkDialog.prototype.linksDialog = function(close) {
+    ExportLinkDialog.prototype.linksDialog = function(close) {
         
         var self = this;
         
@@ -6513,86 +6513,91 @@ function balance2pro(callback)
     // export
     scope.mega = scope.mega || {};
     scope.mega.Dialog = scope.mega.Dialog || {};
-    scope.mega.Dialog.PublicLink = PublicLinkDialog;
+    scope.mega.Dialog.ExportLink = ExportLinkDialog;
 })(jQuery, window);
 
 (function($, scope) {
     /**
-     * PublicLink related operations.
+     * ExportLink related operations.
      *
      * @param opts {Object}
      *
      * @constructor
      */
-    var PublicLink = function(opts) {
+    var ExportLink = function(opts) {
 
         var self = this;
 
         var defaultOptions = {
             'updateUI': false,
             'nodesToProcess': [],
-            'showPublicLinkDialog': false
+            'showExportLinkDialog': false
         };
 
         self.options = $.extend(true, {}, defaultOptions, opts);
 
         // Number of nodes left to process
         self.nodesLeft = self.options.nodesToProcess.length;
-        self.logger = MegaLogger.getLogger('PublicLink');
+        self.logger = MegaLogger.getLogger('ExportLink');
     };
 
     /**
-     * getPublicLink
+     * getExportLink
      * 
      * Get public link for file or folder.
      * @param {Array} nodeIds Array of nodes handle id.
      */
-    PublicLink.prototype.getPublicLink = function() {
+    ExportLink.prototype.getExportLink = function() {
 
         var self = this;
 
         if (self.options.nodesToProcess.length) {
             loadingDialog.show();
-            self.logger.debug('getPublicLink');
+            self.logger.debug('getExportLink');
 
             $.each(self.options.nodesToProcess, function(index, nodeId) {
                 if (M.d[nodeId] && M.d[nodeId].t === 1) {// Folder
-                    self._getFolderPublicLinkRequest(nodeId);
+                    self._getFolderExportLinkRequest(nodeId);
                 }
                 else if (M.d[nodeId] && M.d[nodeId].t === 0) {// File
-                    self._getPublicLinkRequest(nodeId);
+                    self._getExportLinkRequest(nodeId);
                 }
             });
         }
     };
 
     /**
-     * removePublicLink
+     * removeExportLink
      * 
      * Removes public link for file or folder.
      * @param {Array} nodeHandle Array of node handles id.
      */
-    PublicLink.prototype.removePublicLink = function() {
+    ExportLink.prototype.removeExportLink = function() {
         
         var self = this;
         
         if (self.options.nodesToProcess.length) {
             loadingDialog.show();
-            self.logger.debug('removePublicLink');
+            self.logger.debug('removeExportLink');
 
             $.each(self.options.nodesToProcess, function(index, nodeId) {
-                self._removePublicLinkRequest(nodeId);
+                if (M.d[nodeId] && M.d[nodeId].t === 1) {// Folder
+                    self._removeFolderExportLinkRequest(nodeId);
+                }
+                else if (M.d[nodeId] && M.d[nodeId].t === 0) {// File
+                    self._removeFileExportLinkRequest(nodeId);
+                }
             });
         }
     };
     
     /**
-     * _getFolderPublicLinkRequest
+     * _getFolderExportLinkRequest
      * 
      * 'Private' function, send folder public link delete request.
      * @param {String} nodeId.
      */
-    PublicLink.prototype._getFolderPublicLinkRequest = function(nodeId) {
+    ExportLink.prototype._getFolderExportLinkRequest = function(nodeId) {
 
         var self = this;
 
@@ -6608,13 +6613,13 @@ function balance2pro(callback)
                 done: function(result) {
                     if (result.r && result.r[0] === 0) {
                         M.nodeShare(this.nodeId, { h: this.nodeId, r: 0, u: 'EXP', ts: unixtime() });
-                        self._getPublicLinkRequest(this.nodeId);
+                        self._getExportLinkRequest(this.nodeId);
                         if (!self.nodesLeft) {
                             loadingDialog.hide();
                         }
                     }
                     else {
-                        self.logger.warn('_getFolderPublicLinkRequest', this.nodeId, 'Error code: ', result);
+                        self.logger.warn('_getFolderExportLinkRequest', this.nodeId, 'Error code: ', result);
                         loadingDialog.hide();
                     }
                 }
@@ -6623,12 +6628,12 @@ function balance2pro(callback)
     };
 
     /**
-     * _getPublicLinkRequest
+     * _getExportLinkRequest
      * 
      * 'Private' function, send public link delete request.
      * @param {String} nodeId.
      */
-    PublicLink.prototype._getPublicLinkRequest = function(nodeId) {
+    ExportLink.prototype._getExportLinkRequest = function(nodeId) {
 
         var self = this;
 
@@ -6641,19 +6646,19 @@ function balance2pro(callback)
                     M.nodeShare(this.nodeId, { h: this.nodeId, r: 0, u: 'EXP', ts: unixtime() });
 
                     if (self.options.updateUI) {
-                        var UiPublicLink = new mega.UI.Share.PublicLink();
-                        UiPublicLink.addPublicLinkIcon(this.nodeId);
+                        var UiExportLink = new mega.UI.Share.ExportLink();
+                        UiExportLink.addExportLinkIcon(this.nodeId);
                     }
                     if (!self.nodesLeft) {
                         loadingDialog.hide();
-                        if (self.options.showPublicLinkDialog) {
-                            var publicLinkDialog = new mega.Dialog.PublicLink();
-                            publicLinkDialog.linksDialog();
+                        if (self.options.showExportLinkDialog) {
+                            var exportLinkDialog = new mega.Dialog.ExportLink();
+                            exportLinkDialog.linksDialog();
                         }
                     }
                 }
                 else {// Error
-                    self.logger.warn('_getPublicLinkRequest:', this.nodeId, 'Error code: ', result);
+                    self.logger.warn('_getExportLinkRequest:', this.nodeId, 'Error code: ', result);
                     loadingDialog.hide();
                 }
 
@@ -6662,12 +6667,46 @@ function balance2pro(callback)
     };
 
     /**
-     * _removePublicLinkRequest
+     * _removeFolderExportLinkRequest
      * 
      * 'Private' function, send folder delete public link request.
+     * @param {String} nodeId..
+     */
+    ExportLink.prototype._removeFolderExportLinkRequest = function(nodeId) {
+
+        var self = this;
+
+        api_req({ a: 's2', n:  nodeId, s: [{ u: 'EXP', r: ''}], ha: '', i: requesti }, {
+            nodeId: nodeId,
+            callback: function(result) {
+                self.nodesLeft--;
+                if (result.r && (result.r[0] === 0)) {
+                    M.delNodeShare(this.nodeId, 'EXP');
+                    M.deleteExportLinkShare(this.nodeId);
+                    
+                    if (self.options.updateUI) {
+                        var UiExportLink = new mega.UI.Share.ExportLink();
+                        UiExportLink.removeExportLinkIcon(this.nodeId);
+                    }
+                    if (!self.nodesLeft) {
+                        loadingDialog.hide();
+                    }
+                }
+                else {// Error
+                    self.logger.warn('_removeFolerExportLinkRequest failed for node:', this.nodeId, 'Error code: ', result);
+                    loadingDialog.hide();
+                }
+            }
+        });
+    };
+
+    /**
+     * _removeFileExportLinkRequest
+     * 
+     * 'Private' function, send file delete public link request.
      * @param {String} nodeId.
      */
-    PublicLink.prototype._removePublicLinkRequest = function(nodeId) {
+    ExportLink.prototype._removeFileExportLinkRequest = function(nodeId) {
 
         var self = this;
 
@@ -6680,15 +6719,15 @@ function balance2pro(callback)
                     M.deleteExportLinkShare(this.nodeId);
 
                     if (self.options.updateUI) {
-                        var UiPublicLink = new mega.UI.Share.PublicLink();
-                        UiPublicLink.removePublicLinkIcon(this.nodeId);
+                        var UiExportLink = new mega.UI.Share.ExportLink();
+                        UiExportLink.removeExportLinkIcon(this.nodeId);
                     }
                     if (!self.nodesLeft) {
                         loadingDialog.hide();
                     }
                 }
                 else {// Error
-                    self.logger.warn('_removePublicLinkRequest failed for node:', this.nodeId, 'Error code: ', result);
+                    self.logger.warn('_removeFileExportLinkRequest failed for node:', this.nodeId, 'Error code: ', result);
                     loadingDialog.hide();
                 }
             }
@@ -6698,7 +6737,7 @@ function balance2pro(callback)
     // export
     scope.mega = scope.mega || {};
     scope.mega.Share = scope.mega.Share || {};
-    scope.mega.Share.PublicLink = PublicLink;
+    scope.mega.Share.ExportLink = ExportLink;
 })(jQuery, window);
 
 (function($, scope) {
@@ -6709,7 +6748,7 @@ function balance2pro(callback)
      *
      * @constructor
      */
-    var UiPublicLink = function(opts) {
+    var UiExportLink = function(opts) {
 
         var self = this;
         
@@ -6718,21 +6757,21 @@ function balance2pro(callback)
 
         self.options = $.extend(true, {}, defaultOptions, opts);
         
-        self.logger = MegaLogger.getLogger('UiPublicLink');
+        self.logger = MegaLogger.getLogger('UiExportLink');
     };
 
     /**
-     * addPublicLinkIcon
+     * addExportLinkIcon
      * 
      * Add public link icon to file or folder
      * @param {String} nodeId
      */
-    UiPublicLink.prototype.addPublicLinkIcon = function(nodeId) {
+    UiExportLink.prototype.addExportLinkIcon = function(nodeId) {
         
         var self = this;
         
         var share = new mega.Share();
-        if (share.hasPublicLink([nodeId])) {
+        if (share.hasExportLink([nodeId])) {
             // Add link-icon to list view
             $('#' + nodeId + ' .own-data').addClass('linked');
 
@@ -6752,12 +6791,12 @@ function balance2pro(callback)
     };
         
     /**
-     * removePublicLinkIcon
+     * removeExportLinkIcon
      * 
      * Remove public link icon to file or folder
      * @param {String} nodeId
      */
-    UiPublicLink.prototype.removePublicLinkIcon = function(nodeId) {
+    UiExportLink.prototype.removeExportLinkIcon = function(nodeId) {
         
         var self = this;
 
@@ -6780,5 +6819,5 @@ function balance2pro(callback)
     scope.mega = scope.mega || {};
     scope.mega.UI = scope.mega.UI || {};
     scope.mega.UI.Share = scope.mega.UI.Share || {};
-    scope.mega.UI.Share.PublicLink = UiPublicLink;
+    scope.mega.UI.Share.ExportLink = UiExportLink;
 })(jQuery, window);

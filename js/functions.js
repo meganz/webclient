@@ -3684,12 +3684,12 @@ if (typeof sjcl !== 'undefined') {
     };
 
     /**
-     * hasPublicLink, check if at least one selected item have public link.
+     * hasExportLink, check if at least one selected item have public link.
      *
      * @param {String|Array} nodes Node id or array of nodes string
      * @returns {Boolean}
      */
-    Share.prototype.hasPublicLink = function(nodes) {
+    Share.prototype.hasExportLink = function(nodes) {
 
         var result = false,
             node;

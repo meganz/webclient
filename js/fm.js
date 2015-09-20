@@ -2392,8 +2392,8 @@ function initContextUI() {
             ephemeralDialog(l[1005]);
         }
         else {
-            var publicLink = new mega.Share.PublicLink({ 'showPublicLinkDialog': true, 'updateUI': true, 'nodesToProcess': $.selected });
-            publicLink.getPublicLink();
+            var exportLink = new mega.Share.ExportLink({ 'showExportLinkDialog': true, 'updateUI': true, 'nodesToProcess': $.selected });
+            exportLink.getExportLink();
         }
     });
 
@@ -2403,8 +2403,8 @@ function initContextUI() {
             ephemeralDialog(l[1005]);
         }
         else {
-            var publicLink = new mega.Share.PublicLink({ 'updateUI': true, 'nodesToProcess': $.selected });
-            publicLink.removePublicLink();
+            var exportLink = new mega.Share.ExportLink({ 'updateUI': true, 'nodesToProcess': $.selected });
+            exportLink.removeExportLink();
         }
     });
 
@@ -5721,7 +5721,7 @@ function menuItems() {
         items['move'] = 1;
         items['getlink'] = 1;
         var share = new mega.Share();
-        if (share.hasPublicLink($.selected)) {
+        if (share.hasExportLink($.selected)) {
             items['removelink'] = true;
         }
     }
@@ -9357,8 +9357,8 @@ function slideshow(id, close)
             ephemeralDialog(l[1005]);
         }
         else {
-            var publicLink = new mega.Share.PublicLink({ 'showPublicLinkDialog': true, 'updateUI': true, 'nodesToProcess': [slideshowid] });
-            publicLink.getPublicLink();
+            var exportLink = new mega.Share.ExportLink({ 'showExportLinkDialog': true, 'updateUI': true, 'nodesToProcess': [slideshowid] });
+            exportLink.getExportLink();
         }
     });
 

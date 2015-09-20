@@ -973,7 +973,7 @@ function loginDialog(close) {
     });
 
     $('.top-login-warning-close').rebind('click', function (e) {
-        if ($('.loginwarning-checkbox').attr('class').indexOf('checkboxOn') > -1) {
+        if ($('.loginwarning-checkbox').hasClass('checkboxOn')) {
             localStorage.hideloginwarning = 1;
         }
         $('.top-login-warning').removeClass('active');
@@ -1017,7 +1017,7 @@ function tooltiplogin() {
     }
     else {
         $('.top-dialog-login-button').addClass('loading');
-        if ($('.loginwarning-checkbox').attr('class').indexOf('checkboxOn') > -1) {
+        if ($('.loginwarning-checkbox').hasClass('checkboxOn')) {
             localStorage.hideloginwarning = 1;
         }
         var remember;

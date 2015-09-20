@@ -39,13 +39,15 @@ function parseHTML(markup, forbidStyle, doc, baseURI, isXML) {
                 flags |= mozParserUtils.SanitizerAllowStyle;
             }
             if (!baseURI) {
-                var href = doc.location.href;
+                var href = getAppBaseUrl();
                 if (!parseHTML.baseURIs[href]) {
                     parseHTML.baseURIs[href] =
                         Services.io.newURI(href, null, null);
                 }
                 baseURI = parseHTML.baseURIs[href];
             }
+            // XXX: parseFragment() removes href attributes with a hash mask
+            markup = String(markup).replace(/\shref="#/g, ' data-fxhref="#');
             return mozParserUtils.parseFragment(markup, flags, Boolean(isXML),
                                                 baseURI, doc.documentElement);
         }
@@ -85,22 +87,36 @@ function parseHTMLfmt(markup) {
  * @example $(document.body).safeHTML('<script>alert("XSS");</script>It Works!');
  * @todo Safer versions of append, insert, before, after, etc
  */
-$.fn.safeHTML = function safeHTML(markup) {
-    var i = 0;
-    var l = this.length;
-    markup = parseHTMLfmt.apply(null, arguments);
-    while (l > i) {
-        $(this[i++]).html(markup);
+(function($fn, obj) {
+    for (var fn in obj) {
+        if (obj.hasOwnProperty(fn)) {
+            /* jshint -W083 */
+            (function(origFunc, safeFunc) {
+                Object.defineProperty($fn, safeFunc, {
+                    value: function $afeCall(markup) {
+                        var i = 0;
+                        var l = this.length;
+                        markup = parseHTMLfmt.apply(null, arguments);
+                        while (l > i) {
+                            $(this[i++])[origFunc](markup);
+                        }
+                        if (is_chrome_firefox) {
+                            $('a[data-fxhref]').rebind('click', function() {
+                                location.hash = $(this).data('fxhref');
+                            });
+                        }
+                        return this;
+                    }
+                });
+                safeFunc = undefined;
+            })(fn, obj[fn]);
+        }
     }
-};
-$.fn.safeAppend = function safeAppend(markup) {
-    var i = 0;
-    var l = this.length;
-    markup = parseHTMLfmt.apply(null, arguments);
-    while (l > i) {
-        $(this[i++]).append(markup);
-    }
-};
+    $fn = obj = undefined;
+})($.fn, {
+    'html': 'safeHTML',
+    'append': 'safeAppend'
+});
 
 /**
  * Escape HTML markup
@@ -2593,6 +2609,17 @@ function getBaseUrl() {
 }
 
 /**
+ * Like getBaseUrl(), but suitable for extensions to point to internal resources.
+ * This should be the same than `bootstaticpath + urlrootfile` except that may differ
+ * from a public entry point (Such as the Firefox extension and its mega: protocol)
+ * @returns {string}
+ */
+function getAppBaseUrl() {
+    var l = location;
+    return (l.origin !== 'null' && l.origin || (l.protocol + '//' + l.hostname)) + l.pathname;
+}
+
+/**
  * http://stackoverflow.com/a/16344621/402133
  *
  * @param ms
@@ -3642,21 +3669,21 @@ if (typeof sjcl !== 'undefined') {
         var self = this;
 
         var shares = {}, length;
-        
+
         for (var i in nodes) {
             if (nodes.hasOwnProperty(i)) {
 
                 // Look for full share
                 if (fullShare) {
                     shares = M.d[nodes[i]].shares;
-                    
+
                     // Look for link share
                     if (linkShare) {
                         if (shares && Object.keys(shares).length) {
                             return true;
                         }
                     }
-                    else { // Exclude folder/file links, 
+                    else { // Exclude folder/file links,
                         if (shares) {
                             length = Object.keys(shares).length;
                             if (length) {
@@ -3696,24 +3723,24 @@ if (typeof sjcl !== 'undefined') {
     Nodes.prototype.getShares = function(nodes, fullShare, pendingShare, linkShare) {
 
         var self = this;
-        
+
         var result, shares, length;
 
         for (var i in nodes) {
             if (nodes.hasOwnProperty(i)) {
                 result = [];
-                
+
                 // Look for full share
                 if (fullShare) {
-                    shares = M.d[nodes[i]].shares; 
-                    
+                    shares = M.d[nodes[i]].shares;
+
                     // Look for link share
                     if (linkShare) {
                         if (shares && Object.keys(shares).length) {
                             result.push(self.loopShares(shares), linkShare);
                         }
                     }
-                    else { // Exclude folder/file links, 
+                    else { // Exclude folder/file links,
                         if (shares) {
                             length = Object.keys(shares).length;
                             if (length) {
@@ -3750,7 +3777,7 @@ if (typeof sjcl !== 'undefined') {
     Nodes.prototype.loopShares = function(shares, linkShare) {
 
         var self = this;
-        
+
         var result = [],
             exclude = 'EXP',
             index;
@@ -3764,12 +3791,12 @@ if (typeof sjcl !== 'undefined') {
         // Remove 'EXP'
         if (!linkShare) {
             index = result.indexOf(exclude);
-            
+
             if (index !== -1) {
                 result = result.splice(index, 1);
             }
         }
-        
+
         return result;
     };
 

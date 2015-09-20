@@ -1783,7 +1783,7 @@ function MegaData()
             ulc, expandedc, buildnode, containsc, cns, html, sExportLink, sLinkIcon,
             prefix;
         
-        var nodes = new mega.Nodes({});
+        var share = new mega.Share({});
 
         if (!n) {
             console.error('Invalid node passed to M.buildtree');
@@ -1912,8 +1912,8 @@ function MegaData()
                     }
                     sharedfolder = '';
                     
-                    // Check is there a full and pending share available, exclude link shares i.e. 'EXP'
-                    if (nodes.isShareExist([folders[ii].h], true, true, false)) {
+                    // Check is there a full and pending share available, exclude public link shares i.e. 'EXP'
+                    if (share.isShareExist([folders[ii].h], true, true, false)) {
                         sharedfolder = ' shared-folder';
                     }
 
@@ -3353,40 +3353,6 @@ function MegaData()
         if (M.d[handle] && M.d[handle].ph) {
             delete M.d[handle].ph;
         }
-    };
-
-    /**
-     * hasExportLink, check if at least one selected
-     * item have export link already generated
-     *
-     * @param {array} selected
-     * @returns {boolean}
-     */
-    this.hasExportLink = function(selected) {
-
-        var i, shares, selectedNodeHandle;
-
-        // Loop through all selected items
-        for (i = selected.length; i--;) {
-
-            selectedNodeHandle = selected[i];
-            shares = M.d[selectedNodeHandle]
-                && M.d[selectedNodeHandle].shares;
-
-            if (shares) {
-                
-                // Loop through selected items and search for export link share
-                for (var userHandle in shares) {
-                    if (shares.hasOwnProperty(userHandle)) {
-                        if (userHandle === 'EXP' && M.d[selectedNodeHandle].ph) {
-                            return true;
-                        }
-                    }
-                }
-            }
-        }
-
-        return false;
     };
 
     this.makeDir = function(n)
@@ -4870,9 +4836,8 @@ function execsc(actionPackets, callback) {
                 }
 
                 if (actionPacket && actionPacket.u === 'EXP') {
-                    var publicLink = new mega.Share.PublicLink();
-                    publicLink.getPublicLink([actionPacket.h]);
-//                    M.getLinks([actionPacket.h]);
+                    var publicLink = new mega.Share.PublicLink({ 'nodesToProcess': [actionPacket.h] });
+                    publicLink.getPublicLink();
                 }
 
                 if (typeof actionPacket.o !== 'undefined') {
@@ -6098,9 +6063,8 @@ function loadfm_callback(res, ctx) {
                 }
             }
             if (sharedNodes.length) {
-                var publicLink = new mega.Share.PublicLink();
-                publicLink.getPublicLink(sharedNodes);
-//                M.getLinks(sharedNodes);
+                var publicLink = new mega.Share.PublicLink({ 'nodesToProcess': sharedNodes });
+                publicLink.getPublicLink();
             }
         }
 
@@ -6355,7 +6319,6 @@ function balance2pro(callback)
         var self = this;
         
         var html = '',
-//            phf = {},
             scroll = '.export-link-body';
 
         deleteScrollPanel(scroll, 'jsp');
@@ -6566,12 +6529,15 @@ function balance2pro(callback)
         var self = this;
 
         var defaultOptions = {
-            'showPublicLinkDialog': false,
-            'updateUI': false
+            'updateUI': false,
+            'nodesToProcess': [],
+            'showPublicLinkDialog': false
         };
 
         self.options = $.extend(true, {}, defaultOptions, opts);
 
+        // Number of nodes left to process
+        self.nodesLeft = self.options.nodesToProcess.length;
         self.logger = MegaLogger.getLogger('PublicLink');
     };
 
@@ -6581,24 +6547,20 @@ function balance2pro(callback)
      * Get public link for file or folder.
      * @param {Array} nodeIds Array of nodes handle id.
      */
-    PublicLink.prototype.getPublicLink = function(nodesId) {
+    PublicLink.prototype.getPublicLink = function() {
 
         var self = this;
 
-        var isLastNode = false,
-            length = nodesId.length;
-
-        if (length) {
+        if (self.options.nodesToProcess.length) {
             loadingDialog.show();
             self.logger.debug('getPublicLink');
 
-            $.each(nodesId, function(index, nodeId) {
-                isLastNode = (index === (length - 1)) ? true : false;
+            $.each(self.options.nodesToProcess, function(index, nodeId) {
                 if (M.d[nodeId] && M.d[nodeId].t === 1) {// Folder
-                    self._getFolderPublicLinkRequest(nodeId, isLastNode);
+                    self._getFolderPublicLinkRequest(nodeId);
                 }
                 else if (M.d[nodeId] && M.d[nodeId].t === 0) {// File
-                    self._getPublicLinkRequest(nodeId, isLastNode);
+                    self._getPublicLinkRequest(nodeId);
                 }
             });
         }
@@ -6610,20 +6572,16 @@ function balance2pro(callback)
      * Removes public link for file or folder.
      * @param {Array} nodeHandle Array of node handles id.
      */
-    PublicLink.prototype.removePublicLink = function(nodesId) {
+    PublicLink.prototype.removePublicLink = function() {
         
         var self = this;
         
-        var isLastNode = false,
-            length = nodesId.length;
-
-        if (length) {
+        if (self.options.nodesToProcess.length) {
             loadingDialog.show();
             self.logger.debug('removePublicLink');
 
-            $.each(nodesId, function(index, nodeId) {
-                isLastNode = (index === (length - 1)) ? true : false;
-                self._removePublicLinkRequest(nodeId, isLastNode);
+            $.each(self.options.nodesToProcess, function(index, nodeId) {
+                self._removePublicLinkRequest(nodeId);
             });
         }
     };
@@ -6633,9 +6591,8 @@ function balance2pro(callback)
      * 
      * 'Private' function, send folder public link delete request.
      * @param {String} nodeId.
-     * @param {Boolean} isLastNode.
      */
-    PublicLink.prototype._getFolderPublicLinkRequest = function(nodeId, isLastNode) {
+    PublicLink.prototype._getFolderPublicLinkRequest = function(nodeId) {
 
         var self = this;
 
@@ -6648,12 +6605,11 @@ function balance2pro(callback)
         api_setshare(nodeId, [{ u: 'EXP', r: 0 }],
             childNodes, {
                 nodeId: nodeId,
-                isLastNode: isLastNode,
                 done: function(result) {
                     if (result.r && result.r[0] === 0) {
                         M.nodeShare(this.nodeId, { h: this.nodeId, r: 0, u: 'EXP', ts: unixtime() });
-                        self._getPublicLinkRequest(this.nodeId, this.isLastNode);
-                        if (this.isLastNode) {
+                        self._getPublicLinkRequest(this.nodeId);
+                        if (!self.nodesLeft) {
                             loadingDialog.hide();
                         }
                     }
@@ -6671,17 +6627,15 @@ function balance2pro(callback)
      * 
      * 'Private' function, send public link delete request.
      * @param {String} nodeId.
-     * @param {Boolean} isLastNode.
      */
-    PublicLink.prototype._getPublicLinkRequest = function(nodeId, isLastNode) {
+    PublicLink.prototype._getPublicLinkRequest = function(nodeId) {
 
         var self = this;
 
         api_req({ a: 'l', n: nodeId }, {
             nodeId: nodeId,
-            isLastNode: isLastNode,
             callback: function(result) {
-
+                self.nodesLeft--;
                 if (typeof result !== 'number') {
                     M.nodeAttr({ h: this.nodeId, ph: result });
                     M.nodeShare(this.nodeId, { h: this.nodeId, r: 0, u: 'EXP', ts: unixtime() });
@@ -6690,7 +6644,7 @@ function balance2pro(callback)
                         var UiPublicLink = new mega.UI.Share.PublicLink();
                         UiPublicLink.addPublicLinkIcon(this.nodeId);
                     }
-                    if (this.isLastNode) {
+                    if (!self.nodesLeft) {
                         loadingDialog.hide();
                         if (self.options.showPublicLinkDialog) {
                             var publicLinkDialog = new mega.Dialog.PublicLink();
@@ -6712,16 +6666,15 @@ function balance2pro(callback)
      * 
      * 'Private' function, send folder delete public link request.
      * @param {String} nodeId.
-     * @param {Boolean} isLastNode.
      */
-    PublicLink.prototype._removePublicLinkRequest = function(nodeId, isLastNode) {
+    PublicLink.prototype._removePublicLinkRequest = function(nodeId) {
 
         var self = this;
 
         api_req({ a: 'l', n: nodeId, d: 1 }, {
             nodeId: nodeId,
-            isLastNode: isLastNode,
             callback: function(result) {
+                self.nodesLeft--;
                 if (result === 0) {
                     M.delNodeShare(this.nodeId, 'EXP');
                     M.deleteExportLinkShare(this.nodeId);
@@ -6730,7 +6683,7 @@ function balance2pro(callback)
                         var UiPublicLink = new mega.UI.Share.PublicLink();
                         UiPublicLink.removePublicLinkIcon(this.nodeId);
                     }
-                    if (this.isLastNode) {
+                    if (!self.nodesLeft) {
                         loadingDialog.hide();
                     }
                 }
@@ -6778,21 +6731,24 @@ function balance2pro(callback)
         
         var self = this;
         
-        // Add link-icon to list view
-        $('#' + nodeId + ' .own-data').addClass('linked');
+        var share = new mega.Share();
+        if (share.hasPublicLink([nodeId])) {
+            // Add link-icon to list view
+            $('#' + nodeId + ' .own-data').addClass('linked');
 
-        // Add class to the second from the list, prevent failure of the arrow icon
-        $('#' + nodeId + ' .own-data span').eq(1).addClass('link-icon');
+            // Add class to the second from the list, prevent failure of the arrow icon
+            $('#' + nodeId + ' .own-data span').eq(1).addClass('link-icon');
 
-        // Add link-icon to grid view
-        $('#' + nodeId + '.file-block').addClass('linked');
-        $('#' + nodeId + '.file-block span').eq(1).addClass('link-icon');
+            // Add link-icon to grid view
+            $('#' + nodeId + '.file-block').addClass('linked');
+            $('#' + nodeId + '.file-block span').eq(1).addClass('link-icon');
 
-        // Add link-icon to left panel
-        $('#treea_' + nodeId).addClass('linked');
+            // Add link-icon to left panel
+            $('#treea_' + nodeId).addClass('linked');
 
-        // Add class to the third from the list
-        $('#treea_' + nodeId + ' span').eq(2).addClass('link-icon');
+            // Add class to the third from the list
+            $('#treea_' + nodeId + ' span').eq(2).addClass('link-icon');
+        }
     };
         
     /**

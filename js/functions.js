@@ -3613,13 +3613,13 @@ if (typeof sjcl !== 'undefined') {
 
 (function($, scope) {
     /**
-     * Nodes related operations.
+     * Share related operations.
      *
      * @param opts {Object}
      *
      * @constructor
      */
-    var Nodes = function(opts) {
+    var Share = function(opts) {
 
         var self = this;
         var defaultOptions = {
@@ -3637,7 +3637,7 @@ if (typeof sjcl !== 'undefined') {
      * @param {Boolean} linkShare Do we need info about link share 'EXP'.
      * @returns {Boolean} result.
      */
-    Nodes.prototype.isShareExist = function(nodes, fullShare, pendingShare, linkShare) {
+    Share.prototype.isShareExist = function(nodes, fullShare, pendingShare, linkShare) {
 
         var self = this;
 
@@ -3684,6 +3684,30 @@ if (typeof sjcl !== 'undefined') {
     };
 
     /**
+     * hasPublicLink, check if at least one selected item have public link.
+     *
+     * @param {String|Array} nodes Node id or array of nodes string
+     * @returns {Boolean}
+     */
+    Share.prototype.hasPublicLink = function(nodes) {
+
+        var result = false,
+            node;
+        
+        // Loop through all selected items
+        $.each(nodes, function(index, value) {
+            node = M.d[value];
+            if (node.ph && node.shares && node.shares.EXP) {
+                result = true;
+                return false;// Stop further $.each loop execution
+                
+            }
+        });
+
+        return result;
+    };
+
+    /**
      * getShares
      *
      * Is there available share for nodes.
@@ -3693,16 +3717,16 @@ if (typeof sjcl !== 'undefined') {
      * @param {Boolean} linkShare Include results for foder/file links.
      * @returns {Array} result Array of user ids.
      */
-    Nodes.prototype.getShares = function(nodes, fullShare, pendingShare, linkShare) {
+    Share.prototype.getShares = function(nodes, fullShare, pendingShare, linkShare) {
 
         var self = this;
-        
+
         var result, shares, length;
 
         for (var i in nodes) {
             if (nodes.hasOwnProperty(i)) {
                 result = [];
-                
+
                 // Look for full share
                 if (fullShare) {
                     shares = M.d[nodes[i]].shares; 
@@ -3742,12 +3766,12 @@ if (typeof sjcl !== 'undefined') {
     /**
      * loopShares
      *
-     * Loops through all shares.
+     * Loops through all shares and returns users id.
      * @param {Object} shares.
      * @param {Boolean} linkShare Do we need info about link share.
      * @returns {Array} user id.
      */
-    Nodes.prototype.loopShares = function(shares, linkShare) {
+    Share.prototype.loopShares = function(shares, linkShare) {
 
         var self = this;
         
@@ -3755,11 +3779,9 @@ if (typeof sjcl !== 'undefined') {
             exclude = 'EXP',
             index;
 
-        for (var item in shares) {
-            if (shares.hasOwnProperty(item)) {
-                result.push(item);
-            }
-        }
+        $.each(shares, function(index, value) {
+           result.push(index); 
+        });
 
         // Remove 'EXP'
         if (!linkShare) {
@@ -3773,15 +3795,36 @@ if (typeof sjcl !== 'undefined') {
         return result;
     };
 
+    // export
+    scope.mega = scope.mega || {};
+    scope.mega.Share = Share;
+})(jQuery, window);
+
+(function($, scope) {
     /**
-     * loopSubdirs
+     * Nodes related operations.
      *
-     * Loops through all subdirs of given node.
-     * @param {string} id: node id.
-     * @param {array} nodesId.
-     * @returns child nodes id.
+     * @param opts {Object}
+     *
+     * @constructor
      */
-    Nodes.prototype.loopSubdirs = function(id, nodesId) {
+    var Nodes = function(opts) {
+
+        var self = this;
+        var defaultOptions = {
+        };
+
+        self.options = $.extend(true, {}, defaultOptions, opts);    };
+
+    /**
+     * getChildNodes
+     *
+     * Loops through all subdirs of given node, as result gives array of subdir nodes.
+     * @param {String} id: node id.
+     * @param {Array} nodesId.
+     * @returns {Array} Child nodes id.
+     */
+    Nodes.prototype.getChildNodes = function(id, nodesId) {
 
         var self = this;
 
@@ -3805,7 +3848,7 @@ if (typeof sjcl !== 'undefined') {
                     subDirs.push(item);
                 }
 
-                self.loopSubdirs(item, subDirs);
+                self.getChildNodes(item, subDirs);
             }
         }
 

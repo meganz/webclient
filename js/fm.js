@@ -2175,19 +2175,18 @@ function fmremove() {
             }
         } else {
 
-            var nodes = new mega.Nodes({}),
                 // Additional message in case that there's a shared node
-                delShareInfo,
+            var delShareInfo,
                 // Contains complete directory structure of selected nodes, their ids
                 dirTree = [];
 
-            for (var item in $.selected) {
-                if ($.selected.hasOwnProperty(item)) {
-                    dirTree = $.merge(dirTree, nodes.loopSubdirs($.selected[item], null));
-                }
-            }
+            var nodes = new mega.Nodes({});
+            $.each($.selected, function(index, value){
+                dirTree = $.merge(dirTree, nodes.getChildNodes(value, null));
+            });
 
-            delShareInfo = nodes.isShareExist(dirTree, true, true, true) ? ' ' + l[1952] + ' ' + l[7410] : '';
+            var share = new mega.Share({});
+            delShareInfo = share.isShareExist(dirTree, true, true, true) ? ' ' + l[1952] + ' ' + l[7410] : '';
 
             msgDialog('remove', l[1003], l[1004].replace('[X]', fm_contains(filecnt, foldercnt)) + delShareInfo, false, function(e) {
                 if (e) {
@@ -2393,8 +2392,8 @@ function initContextUI() {
             ephemeralDialog(l[1005]);
         }
         else {
-            var publicLink = new mega.Share.PublicLink({ 'showPublicLinkDialog': true, 'updateUI': true });
-            publicLink.getPublicLink($.selected);
+            var publicLink = new mega.Share.PublicLink({ 'showPublicLinkDialog': true, 'updateUI': true, 'nodesToProcess': $.selected });
+            publicLink.getPublicLink();
         }
     });
 
@@ -2404,8 +2403,8 @@ function initContextUI() {
             ephemeralDialog(l[1005]);
         }
         else {
-            var publicLink = new mega.Share.PublicLink({'updateUI': true});
-            publicLink.removePublicLink($.selected);
+            var publicLink = new mega.Share.PublicLink({ 'updateUI': true, 'nodesToProcess': $.selected });
+            publicLink.removePublicLink();
         }
     });
 
@@ -5721,7 +5720,8 @@ function menuItems() {
     if (sourceRoot === M.RootID && !folderlink) {
         items['move'] = 1;
         items['getlink'] = 1;
-        if (M.hasExportLink($.selected)) {
+        var share = new mega.Share();
+        if (share.hasPublicLink($.selected)) {
             items['removelink'] = true;
         }
     }
@@ -7781,7 +7781,10 @@ function clearScrollPanel(from) {
 }
 
 function closeDialog() {
-    if (d) console.log('closeDialog', $.dialog);
+    
+    var logger = MegaLogger.getLogger('closeDialog');
+    
+    logger.debug($.dialog);
     if($('.fm-dialog.incoming-call-dialog').is(':visible') === true) {
         // managing dialogs should be done properly in the future, so that we won't need ^^ bad stuff like this one
         return false;
@@ -7789,10 +7792,12 @@ function closeDialog() {
     if ($.dialog === 'createfolder' && ($.copyDialog || $.moveDialog)) {
         $('.fm-dialog.create-folder-dialog').addClass('hidden');
         $('.fm-dialog.create-folder-dialog .create-folder-size-icon').removeClass('hidden');
-    } else {
+    }
+    else {
         if ($.dialog === 'properties') {
             propertiesDialog(1);
-        } else {
+        }
+        else {
             fm_hideoverlay();
         }
         if (!$.propertiesDialog) {
@@ -7826,8 +7831,9 @@ function closeDialog() {
     $('.fm-dialog').removeClass('arrange-to-back');
 
     $('.export-links-warning').addClass('hidden');
-    if ($.dialog == 'terms' && $.termsAgree)
+    if ($.dialog == 'terms' && $.termsAgree) {
         delete $.termsAgree;
+    }
 
     delete $.dialog;
     delete $.mcImport;
@@ -8487,20 +8493,14 @@ function itemExportLinkHtml(item) {
 function itemExportLink() {
 
     var node,
-//        phf = {},
         html = '';
 
     $.each($.selected, function(index, value) {
         node = M.d[value];
         if (node && node.ph) {
             html += itemExportLinkHtml(node);
-//            phf[node.ph] = node.name;
         }
     });
-
-//    if (out) {
-//        out.value = phf;
-//    }
 
     return html;
 }
@@ -9357,8 +9357,8 @@ function slideshow(id, close)
             ephemeralDialog(l[1005]);
         }
         else {
-            var publicLink = new mega.Share.PublicLink({ 'showPublicLinkDialog': true, 'updateUI': true });
-            publicLink.getPublicLink([slideshowid]);
+            var publicLink = new mega.Share.PublicLink({ 'showPublicLinkDialog': true, 'updateUI': true, 'nodesToProcess': [slideshowid] });
+            publicLink.getPublicLink();
         }
     });
 

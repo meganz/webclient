@@ -768,7 +768,7 @@ if (m)
         document.body.className = 'ios full-mode supported';
         document.getElementById('m_desc').innerHTML = 'Free 50 GB - End-to-end encryption';
 
-        var ver = ua.match(/(?:iphone:cpu) os (\d+)[\._](\d+)/);
+        var ver = ua.match(/(?:iphone|cpu) os (\d+)[\._](\d+)/);
         if (ver) {
             var rev = ver.pop();
             ver = ver.pop();

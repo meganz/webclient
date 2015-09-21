@@ -754,65 +754,71 @@ var authring = (function () {
                                                     crypt.PUBKEY_SIGNATURE_MAPPING[keyType],
                                                     true, false);
 
-            var sigKeyPromises = [signaturePromise];
-
             // Get the public key to the private key.
             var pubKey;
+            var pubkeyPromise;
             if (keyType === 'RSA') {
-                var rsaPubkeyPromise = crypt.getPubKeyAttribute(u_handle, 'RSA');
-                sigKeyPromises.push(rsaPubkeyPromise);
+                pubkeyPromise = crypt.getPubKeyAttribute(u_handle, 'RSA');
             }
             else {
                 pubKey = crypt.getPubKeyFromPrivKey(privKey, keyType);
+                pubkeyPromise = new MegaPromise();
+                pubkeyPromise.resolve(pubKey);
             }
 
-            // Get signature, or make if not there, yet.
-            var signatureGoodPromise = new MegaPromise();
-            var sigKeyComboPromise = MegaPromise.allDone(sigKeyPromises);
-            sigKeyComboPromise.done(function __signatureResolve(result) {
+            pubkeyPromise.done(function __pubkeyResolve(result) {
                 if (keyType === 'RSA') {
                     // Still need to fetch the RSA pub key.
-                    pubKey = result[1][0];
+                    pubKey = result;
                 }
-                signatureGoodPromise.resolve(base64urldecode(result[0][0]));
             });
-            sigKeyComboPromise.fail(function __signatureReject(result) {
-                if ((result[0] === ENOENT) && typeof (result[1] !== 'number')) {
-                    // Signature undefined.
-                    if (keyType === 'RSA') {
-                        // Still need to fetch the RSA pub key.
-                        pubKey = result[1][0];
+            masterPromise.linkFailTo(pubkeyPromise);
+
+            // Make sure we've got a signature.
+            var gotSignaturePromise = new MegaPromise();
+            signaturePromise.done(function __signatureResolve(result) {
+                gotSignaturePromise.resolve(base64urldecode(result));
+            });
+            signaturePromise.fail(function __signatureReject(result) {
+                if (result === ENOENT) {
+                    // Signature undefined, let's pass to make one in the next step.
+                    gotSignaturePromise.resolve(null);
+                }
+                else {
+                    gotSignaturePromise.reject(result);
+                }
+            });
+
+            // Check the signature, make one if we don't ahve one or it's inconsistent.
+            var sigKeyComboPromise = MegaPromise.all([gotSignaturePromise,
+                                                      pubkeyPromise]);
+            sigKeyComboPromise.done(function __signatureComboResolve(result) {
+                var signature = result[0];
+                if (signature) {
+                    // Now check the key's signature.
+                    var isVerified = ns.verifyKey(signature, pubKey, keyType,
+                                                  u_pubEd25519);
+                    if (isVerified) {
+                        masterPromise.resolve();
                     }
-                    var pubKeySignature = authring.signKey(pubKey, keyType);
-                    var setSignaturePromise = setUserAttribute(crypt.PUBKEY_SIGNATURE_MAPPING[keyType],
-                                                               base64urlencode(pubKeySignature),
-                                                               true, false);
-                    signatureGoodPromise.resolve(pubKeySignature);
+                    else {
+                        // Signature fails, make a good one and save it.
+                        var pubKeySignature = authring.signKey(pubKey, keyType);
+                        var setSignaturePromise = setUserAttribute(crypt.PUBKEY_SIGNATURE_MAPPING[keyType],
+                                                                   base64urlencode(pubKeySignature),
+                                                                   true, false);
+                        var comboPromise = MegaPromise.all([authringPromise,
+                                                            setSignaturePromise]);
+                        masterPromise.linkDoneAndFailTo(comboPromise);
+                    }
                 }
                 else {
-                    signatureGoodPromise.reject(result);
-                }
-            });
-
-            // Set values for keys.
-            signatureGoodPromise.done(function __keysResolve(result) {
-                var signature = result;
-
-                // Now check the key's signature.
-                var isVerified = ns.verifyKey(signature, pubKey, keyType,
-                                              u_pubEd25519);
-                if (isVerified) {
+                    // Signature undefined.
+                    var signature = authring.signKey(pubKey, keyType);
+                    var setSignaturePromise = setUserAttribute(crypt.PUBKEY_SIGNATURE_MAPPING[keyType],
+                                                               base64urlencode(signature),
+                                                               true, false);
                     masterPromise.resolve();
-                }
-                else {
-                    // Signature fails, make a good one and save it.
-                    var pubKeySignature = authring.signKey(pubKey, keyType);
-                    var setSignaturePromise = setUserAttribute(crypt.PUBKEY_SIGNATURE_MAPPING[keyType],
-                                                               base64urlencode(pubKeySignature),
-                                                               true, false);
-                    var comboPromise = MegaPromise.all([authringPromise,
-                                                        setSignaturePromise]);
-                    masterPromise.linkDoneAndFailTo(comboPromise);
                 }
 
                 if (keyType === 'RSA') {
@@ -833,7 +839,7 @@ var authring = (function () {
                 ns._checkPubKey(pubKey, keyType);
                 crypt.setPubKey(pubKey, keyType);
             });
-            masterPromise.linkFailTo(signatureGoodPromise);
+            masterPromise.linkFailTo(sigKeyComboPromise);
         }
         else {
             // Set up what's needed for the key type.

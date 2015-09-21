@@ -966,17 +966,22 @@ describe("authring unit test", function() {
             it('Curve25519 key', function() {
                 var masterPromise = { resolve: sinon.stub(),
                                       linkFailTo: sinon.stub() };
-                var signatureGoodPromise = { resolve: sinon.stub(),
-                                             done: sinon.stub() };
+                var pubkeyPromise = { done: sinon.stub(),
+                                      resolve: sinon.stub() };
                 sandbox.stub(window, 'MegaPromise');
                 MegaPromise.onCall(0).returns(masterPromise);
-                MegaPromise.onCall(1).returns(signatureGoodPromise);
-                MegaPromise.allDone = sinon.stub();
+                MegaPromise.onCall(1).returns(pubkeyPromise);
+                var gotSignaturePromise = { resolve: sinon.stub() };
+                MegaPromise.onCall(2).returns(gotSignaturePromise);
                 var sigKeyComboPromise = { done: sinon.stub(),
                                            fail: sinon.stub() };
-                MegaPromise.allDone.returns(sigKeyComboPromise);
+                MegaPromise.all = sinon.stub();
+                MegaPromise.all.onCall(0).returns(sigKeyComboPromise);
+                MegaPromise.all.onCall(1).returns('combo promise');
                 sandbox.stub(ns, 'getContacts').returns('contacts');
-                sandbox.stub(window, 'getUserAttribute');
+                var signaturePromise = { done: sinon.stub(),
+                                         fail: sinon.stub() };
+                sandbox.stub(window, 'getUserAttribute').returns(signaturePromise);
                 sandbox.stub(window, 'u_keyring', { prCu255: 'private key' });
                 sandbox.stub(window, 'u_attr', { keyring: {}});
                 sandbox.stub(window, 'u_privCu25519', undefined);
@@ -993,24 +998,31 @@ describe("authring unit test", function() {
 
                 var result = ns._initKeyPair('Cu25519');
                 assert.strictEqual(result, masterPromise);
-                assert.strictEqual(MegaPromise.callCount, 2);
                 assert.strictEqual(ns.getContacts.callCount, 1);
                 assert.strictEqual(getUserAttribute.callCount, 1);
                 assert.strictEqual(crypt.getPubKeyFromPrivKey.callCount, 1);
-                assert.strictEqual(MegaPromise.allDone.callCount, 1);
+                assert.strictEqual(MegaPromise.callCount, 3);
+                assert.strictEqual(pubkeyPromise.resolve.callCount, 1);
+                assert.strictEqual(pubkeyPromise.done.callCount, 1);
+                assert.strictEqual(masterPromise.linkFailTo.callCount, 2);
+                assert.strictEqual(masterPromise.linkFailTo.args[0][0], pubkeyPromise);
+                assert.strictEqual(signaturePromise.done.callCount, 1);
+                assert.strictEqual(signaturePromise.done.callCount, 1);
+                assert.strictEqual(MegaPromise.all.callCount, 1);
                 assert.strictEqual(sigKeyComboPromise.done.callCount, 1);
-                assert.strictEqual(sigKeyComboPromise.fail.callCount, 1);
-                assert.strictEqual(masterPromise.linkFailTo.callCount, 1);
-                assert.strictEqual(masterPromise.linkFailTo.args[0][0], signatureGoodPromise);
+                assert.strictEqual(masterPromise.linkFailTo.args[1][0], sigKeyComboPromise);
 
-                var callback = sigKeyComboPromise.done.args[0][0];
-                callback([{'0': 'squiggle'}, 'Cu25519 pubkey']);
-                assert.strictEqual(base64urldecode.callCount, 1);
-                assert.strictEqual(signatureGoodPromise.resolve.callCount, 1);
-                assert.strictEqual(signatureGoodPromise.resolve.args[0][0], 'squiggle');
+                var callback = pubkeyPromise.done.args[0][0];
+                // Nothing happens here for a Cu25519 key pair.
 
-                callback = signatureGoodPromise.done.args[0][0];
+                callback = signaturePromise.done.args[0][0];
                 callback('squiggle');
+                assert.strictEqual(base64urldecode.callCount, 1);
+                assert.strictEqual(gotSignaturePromise.resolve.callCount, 1);
+                assert.strictEqual(gotSignaturePromise.resolve.args[0][0], 'squiggle');
+
+                callback = sigKeyComboPromise.done.args[0][0];
+                callback(['squiggle', 'Cu25519 pubkey']);
                 assert.strictEqual(ns.verifyKey.callCount, 1);
                 assert.strictEqual(masterPromise.resolve.callCount, 1);
                 assert.strictEqual(ns._checkPubKey.callCount, 1);
@@ -1026,23 +1038,27 @@ describe("authring unit test", function() {
             it('RSA key', function() {
                 var masterPromise = { resolve: sinon.stub(),
                                       linkFailTo: sinon.stub() };
-                var signatureGoodPromise = { resolve: sinon.stub(),
-                                             done: sinon.stub() };
                 sandbox.stub(window, 'MegaPromise');
                 MegaPromise.onCall(0).returns(masterPromise);
-                MegaPromise.onCall(1).returns(signatureGoodPromise);
-                MegaPromise.allDone = sinon.stub();
+                var gotSignaturePromise = { resolve: sinon.stub() };
+                MegaPromise.onCall(1).returns(gotSignaturePromise);
                 var sigKeyComboPromise = { done: sinon.stub(),
                                            fail: sinon.stub() };
-                MegaPromise.allDone.returns(sigKeyComboPromise);
+                MegaPromise.all = sinon.stub();
+                MegaPromise.all.onCall(0).returns(sigKeyComboPromise);
+                MegaPromise.all.onCall(1).returns('combo promise');
                 sandbox.stub(ns, 'getContacts').returns('contacts');
-                sandbox.stub(window, 'getUserAttribute');
+                var signaturePromise = { done: sinon.stub(),
+                                         fail: sinon.stub() };
+                sandbox.stub(window, 'getUserAttribute').returns(signaturePromise);
                 sandbox.stub(window, 'u_privk', 'private key');
                 sandbox.stub(window, 'u_handle', 'me3456789xw');
                 sandbox.stub(window, 'u_privEd25519', 'my private Eddie');
                 sandbox.stub(window, 'u_pubEd25519', 'my public Eddie');
                 sandbox.stub(window, 'base64urldecode', _echo);
-                sandbox.stub(crypt, 'getPubKeyAttribute');
+                var pubkeyPromise = { done: sinon.stub(),
+                                      resolve: sinon.stub() };
+                sandbox.stub(crypt, 'getPubKeyAttribute').returns(pubkeyPromise);
                 sandbox.stub(ns, 'verifyKey').returns(true);
 
                 var result = ns._initKeyPair('RSA');
@@ -1051,20 +1067,26 @@ describe("authring unit test", function() {
                 assert.strictEqual(ns.getContacts.callCount, 1);
                 assert.strictEqual(getUserAttribute.callCount, 1);
                 assert.strictEqual(crypt.getPubKeyAttribute.callCount, 1);
-                assert.strictEqual(MegaPromise.allDone.callCount, 1);
+                assert.strictEqual(pubkeyPromise.done.callCount, 1);
+                assert.strictEqual(masterPromise.linkFailTo.callCount, 2);
+                assert.strictEqual(masterPromise.linkFailTo.args[0][0], pubkeyPromise);
+                assert.strictEqual(signaturePromise.done.callCount, 1);
+                assert.strictEqual(signaturePromise.done.callCount, 1);
+                assert.strictEqual(MegaPromise.all.callCount, 1);
                 assert.strictEqual(sigKeyComboPromise.done.callCount, 1);
-                assert.strictEqual(sigKeyComboPromise.fail.callCount, 1);
-                assert.strictEqual(masterPromise.linkFailTo.callCount, 1);
-                assert.strictEqual(masterPromise.linkFailTo.args[0][0], signatureGoodPromise);
+                assert.strictEqual(masterPromise.linkFailTo.args[1][0], sigKeyComboPromise);
 
-                var callback = sigKeyComboPromise.done.args[0][0];
-                callback([{'0': 'squiggle'}, {'0': 'RSA pubkey'}]);
-                assert.strictEqual(base64urldecode.callCount, 1);
-                assert.strictEqual(signatureGoodPromise.resolve.callCount, 1);
-                assert.strictEqual(signatureGoodPromise.resolve.args[0][0], 'squiggle');
+                var callback = pubkeyPromise.done.args[0][0];
+                // Nothing testable happens here for an RSA key pair.
 
-                callback = signatureGoodPromise.done.args[0][0];
+                callback = signaturePromise.done.args[0][0];
                 callback('squiggle');
+                assert.strictEqual(base64urldecode.callCount, 1);
+                assert.strictEqual(gotSignaturePromise.resolve.callCount, 1);
+                assert.strictEqual(gotSignaturePromise.resolve.args[0][0], 'squiggle');
+
+                callback = sigKeyComboPromise.done.args[0][0];
+                callback(['squiggle', 'RSA pubkey']);
                 assert.strictEqual(ns.verifyKey.callCount, 1);
                 assert.strictEqual(masterPromise.resolve.callCount, 1);
             });
@@ -1072,27 +1094,29 @@ describe("authring unit test", function() {
             it('RSA key, no signature', function() {
                 var masterPromise = { resolve: sinon.stub(),
                                       linkFailTo: sinon.stub() };
-                var signatureGoodPromise = { resolve: sinon.stub(),
-                                             done: sinon.stub() };
                 sandbox.stub(window, 'MegaPromise');
                 MegaPromise.onCall(0).returns(masterPromise);
-                MegaPromise.onCall(1).returns(signatureGoodPromise);
-                MegaPromise.allDone = sinon.stub();
+                var gotSignaturePromise = { resolve: sinon.stub() };
+                MegaPromise.onCall(1).returns(gotSignaturePromise);
                 var sigKeyComboPromise = { done: sinon.stub(),
                                            fail: sinon.stub() };
-                MegaPromise.allDone.returns(sigKeyComboPromise);
+                MegaPromise.all = sinon.stub();
+                MegaPromise.all.onCall(0).returns(sigKeyComboPromise);
+                MegaPromise.all.onCall(1).returns('combo promise');
                 sandbox.stub(ns, 'getContacts').returns('contacts');
-                sandbox.stub(window, 'getUserAttribute');
+                var signaturePromise = { done: sinon.stub(),
+                                         fail: sinon.stub() };
+                sandbox.stub(window, 'getUserAttribute').returns(signaturePromise);
                 sandbox.stub(window, 'u_privk', 'private key');
                 sandbox.stub(window, 'u_handle', 'me3456789xw');
                 sandbox.stub(window, 'u_privEd25519', 'my private Eddie');
                 sandbox.stub(window, 'u_pubEd25519', 'my public Eddie');
-                sandbox.stub(window, 'base64urldecode', _echo);
-                sandbox.stub(crypt, 'getPubKeyAttribute');
+                var pubkeyPromise = { done: sinon.stub(),
+                                      resolve: sinon.stub() };
+                sandbox.stub(crypt, 'getPubKeyAttribute').returns(pubkeyPromise);
                 sandbox.stub(window, 'setUserAttribute');
                 sandbox.stub(ns, 'signKey').returns('squiggle');
                 sandbox.stub(window, 'base64urlencode', _echo);
-                sandbox.stub(ns, 'verifyKey').returns(true);
 
                 var result = ns._initKeyPair('RSA');
                 assert.strictEqual(result, masterPromise);
@@ -1100,51 +1124,55 @@ describe("authring unit test", function() {
                 assert.strictEqual(ns.getContacts.callCount, 1);
                 assert.strictEqual(getUserAttribute.callCount, 1);
                 assert.strictEqual(crypt.getPubKeyAttribute.callCount, 1);
-                assert.strictEqual(MegaPromise.allDone.callCount, 1);
+                assert.strictEqual(pubkeyPromise.done.callCount, 1);
+                assert.strictEqual(masterPromise.linkFailTo.callCount, 2);
+                assert.strictEqual(masterPromise.linkFailTo.args[0][0], pubkeyPromise);
+                assert.strictEqual(signaturePromise.done.callCount, 1);
+                assert.strictEqual(signaturePromise.done.callCount, 1);
+                assert.strictEqual(MegaPromise.all.callCount, 1);
                 assert.strictEqual(sigKeyComboPromise.done.callCount, 1);
-                assert.strictEqual(sigKeyComboPromise.fail.callCount, 1);
-                assert.strictEqual(masterPromise.linkFailTo.callCount, 1);
-                assert.strictEqual(masterPromise.linkFailTo.args[0][0], signatureGoodPromise);
+                assert.strictEqual(masterPromise.linkFailTo.args[1][0], sigKeyComboPromise);
 
-                var callback = sigKeyComboPromise.fail.args[0][0];
-                callback([ENOENT, {'0': 'RSA pubkey'}]);
+                var callback = pubkeyPromise.done.args[0][0];
+                // Nothing testable happens here for an RSA key pair.
+
+                callback = signaturePromise.fail.args[0][0];
+                callback(ENOENT);
+                assert.strictEqual(gotSignaturePromise.resolve.callCount, 1);
+                assert.strictEqual(gotSignaturePromise.resolve.args[0][0], null);
+
+                callback = sigKeyComboPromise.done.args[0][0];
+                callback([null, 'RSA pubkey']);
                 assert.strictEqual(ns.signKey.callCount, 1);
                 assert.strictEqual(base64urlencode.callCount, 1);
                 assert.strictEqual(setUserAttribute.callCount, 1);
                 assert.strictEqual(setUserAttribute.args[0][1], 'squiggle');
-                assert.strictEqual(signatureGoodPromise.resolve.callCount, 1);
-                assert.strictEqual(signatureGoodPromise.resolve.args[0][0], 'squiggle');
-
-                callback = signatureGoodPromise.done.args[0][0];
-                callback('squiggle');
-                assert.strictEqual(ns.verifyKey.callCount, 1);
                 assert.strictEqual(masterPromise.resolve.callCount, 1);
             });
 
             it('RSA key, signature API error', function() {
                 var masterPromise = { resolve: sinon.stub(),
                                       linkFailTo: sinon.stub() };
-                var signatureGoodPromise = { reject: sinon.stub(),
-                                             done: sinon.stub() };
                 sandbox.stub(window, 'MegaPromise');
                 MegaPromise.onCall(0).returns(masterPromise);
-                MegaPromise.onCall(1).returns(signatureGoodPromise);
-                MegaPromise.allDone = sinon.stub();
+                var gotSignaturePromise = { reject: sinon.stub() };
+                MegaPromise.onCall(1).returns(gotSignaturePromise);
                 var sigKeyComboPromise = { done: sinon.stub(),
                                            fail: sinon.stub() };
-                MegaPromise.allDone.returns(sigKeyComboPromise);
+                MegaPromise.all = sinon.stub();
+                MegaPromise.all.onCall(0).returns(sigKeyComboPromise);
+                MegaPromise.all.onCall(1).returns('combo promise');
                 sandbox.stub(ns, 'getContacts').returns('contacts');
-                sandbox.stub(window, 'getUserAttribute');
+                var signaturePromise = { done: sinon.stub(),
+                                         fail: sinon.stub() };
+                sandbox.stub(window, 'getUserAttribute').returns(signaturePromise);
                 sandbox.stub(window, 'u_privk', 'private key');
                 sandbox.stub(window, 'u_handle', 'me3456789xw');
                 sandbox.stub(window, 'u_privEd25519', 'my private Eddie');
                 sandbox.stub(window, 'u_pubEd25519', 'my public Eddie');
-                sandbox.stub(window, 'base64urldecode', _echo);
-                sandbox.stub(crypt, 'getPubKeyAttribute');
-                sandbox.stub(window, 'setUserAttribute');
-                sandbox.stub(ns, 'signKey').returns('squiggle');
-                sandbox.stub(window, 'base64urlencode', _echo);
-                sandbox.stub(ns, 'verifyKey').returns(true);
+                var pubkeyPromise = { done: sinon.stub(),
+                                      resolve: sinon.stub() };
+                sandbox.stub(crypt, 'getPubKeyAttribute').returns(pubkeyPromise);
 
                 var result = ns._initKeyPair('RSA');
                 assert.strictEqual(result, masterPromise);
@@ -1152,42 +1180,52 @@ describe("authring unit test", function() {
                 assert.strictEqual(ns.getContacts.callCount, 1);
                 assert.strictEqual(getUserAttribute.callCount, 1);
                 assert.strictEqual(crypt.getPubKeyAttribute.callCount, 1);
-                assert.strictEqual(MegaPromise.allDone.callCount, 1);
+                assert.strictEqual(pubkeyPromise.done.callCount, 1);
+                assert.strictEqual(masterPromise.linkFailTo.callCount, 2);
+                assert.strictEqual(masterPromise.linkFailTo.args[0][0], pubkeyPromise);
+                assert.strictEqual(signaturePromise.done.callCount, 1);
+                assert.strictEqual(signaturePromise.done.callCount, 1);
+                assert.strictEqual(MegaPromise.all.callCount, 1);
                 assert.strictEqual(sigKeyComboPromise.done.callCount, 1);
-                assert.strictEqual(sigKeyComboPromise.fail.callCount, 1);
-                assert.strictEqual(masterPromise.linkFailTo.callCount, 1);
-                assert.strictEqual(masterPromise.linkFailTo.args[0][0], signatureGoodPromise);
+                assert.strictEqual(masterPromise.linkFailTo.args[1][0], sigKeyComboPromise);
 
-                var callback = sigKeyComboPromise.fail.args[0][0];
-                callback([EFAILED, {'0': 'RSA pubkey'}]);
-                assert.strictEqual(signatureGoodPromise.reject.callCount, 1);
+                var callback = pubkeyPromise.done.args[0][0];
+                // Nothing testable happens here for an RSA key pair.
+
+                callback = signaturePromise.fail.args[0][0];
+                callback(EFAILED);
+                assert.strictEqual(gotSignaturePromise.reject.callCount, 1);
+                assert.strictEqual(gotSignaturePromise.reject.args[0][0], EFAILED);
             });
 
             it('RSA key, invalid signature', function() {
                 var masterPromise = { linkDoneAndFailTo: sinon.stub(),
                                       linkFailTo: sinon.stub() };
-                var signatureGoodPromise = { resolve: sinon.stub(),
-                                             done: sinon.stub() };
                 sandbox.stub(window, 'MegaPromise');
                 MegaPromise.onCall(0).returns(masterPromise);
-                MegaPromise.onCall(1).returns(signatureGoodPromise);
-                MegaPromise.allDone = sinon.stub();
+                var gotSignaturePromise = { resolve: sinon.stub() };
+                MegaPromise.onCall(1).returns(gotSignaturePromise);
                 var sigKeyComboPromise = { done: sinon.stub(),
                                            fail: sinon.stub() };
-                MegaPromise.allDone.returns(sigKeyComboPromise);
                 MegaPromise.all = sinon.stub();
+                MegaPromise.all.onCall(0).returns(sigKeyComboPromise);
+                MegaPromise.all.onCall(1).returns('combo promise');
                 sandbox.stub(ns, 'getContacts').returns('contacts');
-                sandbox.stub(window, 'getUserAttribute');
+                var signaturePromise = { done: sinon.stub(),
+                                         fail: sinon.stub() };
+                sandbox.stub(window, 'getUserAttribute').returns(signaturePromise);
                 sandbox.stub(window, 'u_privk', 'private key');
                 sandbox.stub(window, 'u_handle', 'me3456789xw');
                 sandbox.stub(window, 'u_privEd25519', 'my private Eddie');
                 sandbox.stub(window, 'u_pubEd25519', 'my public Eddie');
                 sandbox.stub(window, 'base64urldecode', _echo);
-                sandbox.stub(crypt, 'getPubKeyAttribute');
+                var pubkeyPromise = { done: sinon.stub(),
+                                      resolve: sinon.stub() };
+                sandbox.stub(crypt, 'getPubKeyAttribute').returns(pubkeyPromise);
+                sandbox.stub(ns, 'verifyKey').returns(false);
                 sandbox.stub(window, 'setUserAttribute');
                 sandbox.stub(ns, 'signKey').returns('squiggle');
                 sandbox.stub(window, 'base64urlencode', _echo);
-                sandbox.stub(ns, 'verifyKey').returns(false);
 
                 var result = ns._initKeyPair('RSA');
                 assert.strictEqual(result, masterPromise);
@@ -1195,20 +1233,26 @@ describe("authring unit test", function() {
                 assert.strictEqual(ns.getContacts.callCount, 1);
                 assert.strictEqual(getUserAttribute.callCount, 1);
                 assert.strictEqual(crypt.getPubKeyAttribute.callCount, 1);
-                assert.strictEqual(MegaPromise.allDone.callCount, 1);
+                assert.strictEqual(pubkeyPromise.done.callCount, 1);
+                assert.strictEqual(masterPromise.linkFailTo.callCount, 2);
+                assert.strictEqual(masterPromise.linkFailTo.args[0][0], pubkeyPromise);
+                assert.strictEqual(signaturePromise.done.callCount, 1);
+                assert.strictEqual(signaturePromise.done.callCount, 1);
+                assert.strictEqual(MegaPromise.all.callCount, 1);
                 assert.strictEqual(sigKeyComboPromise.done.callCount, 1);
-                assert.strictEqual(sigKeyComboPromise.fail.callCount, 1);
-                assert.strictEqual(masterPromise.linkFailTo.callCount, 1);
-                assert.strictEqual(masterPromise.linkFailTo.args[0][0], signatureGoodPromise);
+                assert.strictEqual(masterPromise.linkFailTo.args[1][0], sigKeyComboPromise);
 
-                var callback = sigKeyComboPromise.done.args[0][0];
-                callback([{'0': 'bad squiggle'}, {'0': 'RSA pubkey'}]);
-                assert.strictEqual(base64urldecode.callCount, 1);
-                assert.strictEqual(signatureGoodPromise.resolve.callCount, 1);
-                assert.strictEqual(signatureGoodPromise.resolve.args[0][0], 'bad squiggle');
+                var callback = pubkeyPromise.done.args[0][0];
+                // Nothing testable happens here for an RSA key pair.
 
-                callback = signatureGoodPromise.done.args[0][0];
+                callback = signaturePromise.done.args[0][0];
                 callback('squiggle');
+                assert.strictEqual(base64urldecode.callCount, 1);
+                assert.strictEqual(gotSignaturePromise.resolve.callCount, 1);
+                assert.strictEqual(gotSignaturePromise.resolve.args[0][0], 'squiggle');
+
+                callback = sigKeyComboPromise.done.args[0][0];
+                callback(['squiggle', 'RSA pubkey']);
                 assert.strictEqual(ns.verifyKey.callCount, 1);
                 assert.strictEqual(ns.signKey.callCount, 1);
                 assert.strictEqual(base64urlencode.callCount, 1);

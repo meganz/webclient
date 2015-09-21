@@ -103,6 +103,7 @@ var crypt = (function () {
      *     A promise that is resolved when the original asynch code is settled.
      */
     ns.getPubKeyAttribute = function(userhandle, keyType) {
+        assertUserHandle(userhandle);
         if (typeof ns.PUBKEY_ATTRIBUTE_MAPPING[keyType] === 'unknown') {
             throw new Error('Unsupported key type to retrieve: ' + keyType);
         }
@@ -232,6 +233,7 @@ var crypt = (function () {
      *     condition warrants to throw an exception.
      */
     ns.getPubKey = function(userhandle, keyType, callback) {
+        assertUserHandle(userhandle);
         // This promise will be the one which is going to be returned.
         var masterPromise = new MegaPromise();
 
@@ -407,6 +409,7 @@ var crypt = (function () {
      *     condition warrants to throw an exception.
      */
     ns.getPubEd25519 = function(userhandle, callback) {
+        assertUserHandle(userhandle);
         return ns.getPubKey(userhandle, 'Ed25519', callback);
     };
 
@@ -432,6 +435,7 @@ var crypt = (function () {
      *     an exception.
      */
     ns.getPubCu25519 = function(userhandle, callback) {
+        assertUserHandle(userhandle);
         return ns.getPubKey(userhandle, 'Cu25519', callback);
     };
 
@@ -457,6 +461,7 @@ var crypt = (function () {
      *     an exception.
      */
     ns.getPubRSA = function(userhandle, callback) {
+        assertUserHandle(userhandle);
         return ns.getPubKey(userhandle, 'RSA', callback);
     };
 
@@ -475,6 +480,7 @@ var crypt = (function () {
      *     settled.
      */
     ns.getFingerprintEd25519 = function(userhandle, format) {
+        assertUserHandle(userhandle);
         // This promise will be the one which is going to be returned.
         var masterPromise = new MegaPromise();
 

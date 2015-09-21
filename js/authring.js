@@ -276,6 +276,7 @@ var authring = (function () {
      *     of an unauthorised contact.
      */
     ns.getContactAuthenticated = function(userhandle, keyType) {
+        assertUserHandle(userhandle);
         if (ns._PROPERTIES[keyType] === undefined) {
             logger.error('Unsupporte key type: ' + keyType);
 
@@ -312,6 +313,7 @@ var authring = (function () {
      */
     ns.setContactAuthenticated = function(userhandle, fingerprint, keyType,
                                           method, confidence) {
+        assertUserHandle(userhandle);
         if (ns._PROPERTIES[keyType] === undefined) {
             logger.error('Unsupporte key type: ' + keyType);
 
@@ -562,6 +564,7 @@ var authring = (function () {
      * @param {string} userHandle The user handle e.g. EWh7LzU3Zf0
      */
     ns.resetFingerprintsForUser = function(userHandle) {
+        assertUserHandle(userHandle);
         delete u_authring.Ed25519[userHandle];
         delete u_authring.Cu25519[userHandle];
         delete u_authring.RSA[userHandle];

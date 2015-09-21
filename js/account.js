@@ -562,6 +562,7 @@ function generateAvatarMeta(user_hash) {
  */
 function getUserAttribute(userhandle, attribute, pub, nonHistoric,
                           callback, ctx) {
+    assertUserHandle(userhandle);
     var myCtx = ctx || {};
 
     // Assemble property name on Mega API.

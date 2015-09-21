@@ -36,6 +36,7 @@ describe("crypto unit test", function() {
                 sandbox.stub(window, 'crypto_decodepubkey').returns(pubKey);
                 sandbox.stub(window, 'base64urldecode');
                 sandbox.stub(window, 'api_req');
+                sandbox.stub(window, 'assertUserHandle');
 
                 var result = ns.getPubKeyAttribute('you456789xw', 'RSA');
                 assert.strictEqual(result, rootPromise);
@@ -79,6 +80,7 @@ describe("crypto unit test", function() {
                 var attributePromise = { done: sinon.stub() };
                 sandbox.stub(window, 'getUserAttribute').returns(attributePromise);
                 sandbox.stub(window, 'base64urldecode', _echo);
+                sandbox.stub(window, 'assertUserHandle');
 
                 var result = ns.getPubKeyAttribute('you456789xw', 'Cu25519');
                 assert.strictEqual(result, rootPromise);
@@ -98,6 +100,7 @@ describe("crypto unit test", function() {
                 var attributePromise = { done: sinon.stub() };
                 sandbox.stub(window, 'getUserAttribute').returns(attributePromise);
                 sandbox.stub(window, 'base64urldecode', _echo);
+                sandbox.stub(window, 'assertUserHandle');
 
                 var result = ns.getPubKeyAttribute('you456789xw', 'Ed25519');
                 assert.strictEqual(result, rootPromise);
@@ -341,6 +344,7 @@ describe("crypto unit test", function() {
                 sandbox.stub(window, 'getUserAttribute').returns('squiggle');
                 sandbox.stub(authring, 'computeFingerprint').returns('smudge');
                 sandbox.stub(window, 'base64urldecode', _echo);
+                sandbox.stub(window, 'assertUserHandle');
                 sandbox.stub(ns, '_checkSignature').returns(true);
 
                 // This is to pass through the first call directly, then stub on subsequent ones.
@@ -399,6 +403,7 @@ describe("crypto unit test", function() {
                 sandbox.stub(window, 'getUserAttribute').returns('squiggle');
                 sandbox.stub(authring, 'computeFingerprint').returns('smudge');
                 sandbox.stub(window, 'base64urldecode', _echo);
+                sandbox.stub(window, 'assertUserHandle');
                 sandbox.stub(ns, '_checkSignature').returns(true);
 
                 // This is to pass through the first call directly, then stub on subsequent ones.
@@ -457,6 +462,7 @@ describe("crypto unit test", function() {
                 sandbox.stub(window, 'getUserAttribute').returns('squiggle');
                 sandbox.stub(authring, 'computeFingerprint').returns('smudge');
                 sandbox.stub(window, 'base64urldecode', _echo);
+                sandbox.stub(window, 'assertUserHandle');
                 sandbox.stub(ns, '_checkSignature').returns(true);
                 sandbox.stub(authring, 'setContactAuthenticated');
 
@@ -517,6 +523,7 @@ describe("crypto unit test", function() {
                 sandbox.stub(window, 'getUserAttribute').returns('squiggle');
                 sandbox.stub(authring, 'computeFingerprint').returns('smudge');
                 sandbox.stub(window, 'base64urldecode', _echo);
+                sandbox.stub(window, 'assertUserHandle');
                 sandbox.stub(ns, '_checkSignature').returns(false);
                 sandbox.stub(authring, 'setContactAuthenticated');
                 sandbox.stub(ns, '_showKeySignatureFailureException');
@@ -580,6 +587,7 @@ describe("crypto unit test", function() {
                 sandbox.stub(window, 'getUserAttribute').returns('');
                 sandbox.stub(authring, 'computeFingerprint').returns('smudge');
                 sandbox.stub(window, 'base64urldecode', _echo);
+                sandbox.stub(window, 'assertUserHandle');
                 sandbox.stub(ns, '_checkSignature').returns(null);
                 sandbox.stub(authring, 'setContactAuthenticated');
 
@@ -641,6 +649,7 @@ describe("crypto unit test", function() {
                 sandbox.stub(window, 'getUserAttribute').returns('');
                 sandbox.stub(authring, 'computeFingerprint').returns('smudge');
                 sandbox.stub(window, 'base64urldecode', _echo);
+                sandbox.stub(window, 'assertUserHandle');
                 sandbox.stub(ns, '_checkSignature').returns(null);
                 sandbox.stub(authring, 'setContactAuthenticated');
 
@@ -702,6 +711,7 @@ describe("crypto unit test", function() {
                 sandbox.stub(window, 'getUserAttribute').returns('squiggle');
                 sandbox.stub(authring, 'computeFingerprint').returns('smudge');
                 sandbox.stub(window, 'base64urldecode', _echo);
+                sandbox.stub(window, 'assertUserHandle');
                 sandbox.stub(ns, '_checkSignature').returns(true);
                 sandbox.stub(authring, 'setContactAuthenticated');
 

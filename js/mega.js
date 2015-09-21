@@ -5073,6 +5073,9 @@ function execsc(actionPackets, callback) {
         else if (actionPacket.a === 's2') {
             processPS([actionPacket]);
         }
+        else if (actionPacket.a === 'ph') {// Export link (public handle)
+            processPH([actionPacket]);
+        }
         else if (actionPacket.a === 'upci') {
             processUPCI([actionPacket]);
         }
@@ -5785,6 +5788,42 @@ function processOPC(opc, ignoreDB) {
 }
 
 /**
+ * processPH
+ * 
+ * Process export link (public handle) action packet.
+ * @param {Object} actionPacket a: 'ph'.
+ */
+function processPH(publicHandles) {
+    
+    var logger = MegaLogger.getLogger('processPH'),
+        publicHandleId, nodeId,
+        action;
+    
+    logger.debug();
+    
+    $.each(publicHandles, function(index, value) {
+        nodeId = value.h;
+        publicHandleId = value.ph;
+
+        // Remove export link, d: 1
+        if (value.d) {
+            M.delNodeShare(nodeId, 'EXP');
+            M.deleteExportLinkShare(nodeId);
+
+            var UiExportLink = new mega.UI.Share.ExportLink();
+            UiExportLink.removeExportLinkIcon(nodeId);
+        }
+        else {// Get export link, without d attribute in response
+            M.nodeAttr({ h: nodeId, ph: publicHandleId });
+            M.nodeShare(value.h, { h: nodeId, r: 0, u: 'EXP', ts: unixtime() });
+
+            var UiExportLink = new mega.UI.Share.ExportLink();
+            UiExportLink.addExportLinkIcon(nodeId);
+        }
+    });
+}
+
+/**
  * Handle pending shares
  *
  * @param {array.<JSON_objects>} pending shares
@@ -6044,6 +6083,9 @@ function loadfm_callback(res, ctx) {
     }
     if (res.ps) {
         processPS(res.ps);
+    }
+    if (res.ph) {
+        processPH(res.ph);
     }
 
     process_f(res.f, function onLoadFMDone(hasMissingKeys) {
@@ -6637,7 +6679,7 @@ function balance2pro(callback)
 
         var self = this;
 
-        api_req({ a: 'l', n: nodeId }, {
+        api_req({ a: 'l', n: nodeId, i:requesti }, {
             nodeId: nodeId,
             callback: function(result) {
                 self.nodesLeft--;
@@ -6710,7 +6752,7 @@ function balance2pro(callback)
 
         var self = this;
 
-        api_req({ a: 'l', n: nodeId, d: 1 }, {
+        api_req({ a: 'l', n: nodeId, d: 1, i:requesti }, {
             nodeId: nodeId,
             callback: function(result) {
                 self.nodesLeft--;
@@ -6771,23 +6813,22 @@ function balance2pro(callback)
         var self = this;
         
         var share = new mega.Share();
-        if (share.hasExportLink([nodeId])) {
-            // Add link-icon to list view
-            $('#' + nodeId + ' .own-data').addClass('linked');
+        
+        // Add link-icon to list view
+        $('#' + nodeId + ' .own-data').addClass('linked');
 
-            // Add class to the second from the list, prevent failure of the arrow icon
-            $('#' + nodeId + ' .own-data span').eq(1).addClass('link-icon');
+        // Add class to the second from the list, prevent failure of the arrow icon
+        $('#' + nodeId + ' .own-data span').eq(1).addClass('link-icon');
 
-            // Add link-icon to grid view
-            $('#' + nodeId + '.file-block').addClass('linked');
-            $('#' + nodeId + '.file-block span').eq(1).addClass('link-icon');
+        // Add link-icon to grid view
+        $('#' + nodeId + '.file-block').addClass('linked');
+        $('#' + nodeId + '.file-block span').eq(1).addClass('link-icon');
 
-            // Add link-icon to left panel
-            $('#treea_' + nodeId).addClass('linked');
+        // Add link-icon to left panel
+        $('#treea_' + nodeId).addClass('linked');
 
-            // Add class to the third from the list
-            $('#treea_' + nodeId + ' span').eq(2).addClass('link-icon');
-        }
+        // Add class to the third from the list
+        $('#treea_' + nodeId + ' span').eq(2).addClass('link-icon');
     };
         
     /**
@@ -6799,9 +6840,6 @@ function balance2pro(callback)
     UiExportLink.prototype.removeExportLinkIcon = function(nodeId) {
         
         var self = this;
-
-        M.delNodeShare(nodeId, 'EXP');
-        M.deleteExportLinkShare(nodeId);
 
         // Remove link icon from list view
         $('#' + nodeId + ' .own-data').removeClass('linked');

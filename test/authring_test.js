@@ -425,7 +425,10 @@ describe("authring unit test", function() {
                 sandbox.stub(window, 'u_privEd25519', ED25519_PRIV_KEY);
                 sandbox.stub(window, 'u_pubEd25519', ED25519_PUB_KEY);
                 var buffer = new Uint8Array(256);
-                var p1, p2, pubKey, signature;
+                var p1;
+                var p2;
+                var pubKey;
+                var signature;
                 for (var i = 0; i < 16; i++) {
                     asmCrypto.getRandomValues(buffer);
                     p1 = asmCrypto.bytes_to_string(buffer);

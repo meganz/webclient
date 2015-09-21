@@ -687,7 +687,9 @@ var authring = (function () {
      *     A promise that is resolved when the original asynch code is settled.
      */
     ns._setupKeyPair = function(keyType) {
-        var keyPair,  privKey, pubKey;
+        var keyPair;
+        var privKey;
+        var pubKey;
 
         if (keyType === 'Cu25519') {
             keyPair = nacl.box.keyPair();
@@ -814,10 +816,10 @@ var authring = (function () {
                 }
                 else {
                     // Signature undefined.
-                    var signature = authring.signKey(pubKey, keyType);
-                    var setSignaturePromise = setUserAttribute(crypt.PUBKEY_SIGNATURE_MAPPING[keyType],
-                                                               base64urlencode(signature),
-                                                               true, false);
+                    signature = authring.signKey(pubKey, keyType);
+                    setUserAttribute(crypt.PUBKEY_SIGNATURE_MAPPING[keyType],
+                                     base64urlencode(signature),
+                                     true, false);
                     masterPromise.resolve();
                 }
 

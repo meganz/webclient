@@ -5627,25 +5627,79 @@ function getUserHandleFromEmail(emailAddress) {
 /**
  * doShare
  * 
- * Recrate target list and call appropricate api_setshare function
- * @param {String} h User handle
- * @param {Array} targets List of JSON_Object i.e. { u: <user_email>, r: <access_permission> }
- * @param {Boolean} dontShowShareDialog
+ * Recreate target/users list and call appropriate api_setshare function.
+ * @param {String} nodeId Selected node id
+ * @param {Array} targets List of JSON_Object containing user email and access permission
+ *     i.e. { u: <user_email>, r: <access_permission> }.
+ * @param {Boolean} dontShowShareDialog.
  * @returns {doShare.$promise|MegaPromise}
  */
-function doShare(h, targets, dontShowShareDialog) {
+function doShare(nodeId, targets, dontShowShareDialog) {
     
     var $promise = new MegaPromise(),
-        nodeids = [],
+        logger = MegaLogger.getLogger('doShare'),
+        childNodesId = [],// Holds complete directory tree starting from nodeId
         usersWithHandle = [],
         usersWithoutHandle = [],
         tmpValue, userHandle;
 
-    // Get complete children directory structure for node with id === h 
-    nodeids = fm_getnodes(h);
-    nodeids.push(h);
+    this._done = function(result, ctx) {
 
-    // Create new lists of users, active (with user handle) and non existing (pending share)
+        // Loose comparasion is important
+        if (result.r && result.r[0] == '0') {
+            for (var i in result.u) {
+                M.addUser(result.u[i]);
+            }
+
+            for (var k in result.r) {
+                if (result.r[k] === 0) {
+                    var rights = ctx.t[k].r;
+                    var user = ctx.t[k].u;
+
+                    if (user.indexOf('@') >= 0) {
+                        user = getuid(ctx.t[k].u);
+                    }
+
+                    // A pending share may not have a corresponding user and should not be added
+                    // A pending share can also be identified by a user who is only a '0' contact
+                    // level (passive)
+                    if (M.u[user] && M.u[user].c !== 0) {
+                        M.nodeShare(ctx.h, {
+                            h: nodeId,
+                            r: rights,
+                            u: user,
+                            ts: unixtime()
+                        });
+                        setLastInteractionWith(user, "0:" + unixtime());
+                    }
+                    else {
+                        logger.debug('invalid user:', user, M.u[user], ctx.t[k]);
+                    }
+                }
+            }
+            if (dontShowShareDialog !== true) {
+                $('.fm-dialog.share-dialog').removeClass('hidden');
+            }
+            loadingDialog.hide();
+            M.renderShare(nodeId);
+
+            if (dontShowShareDialog !== true) {
+                shareDialog();
+            }
+            $promise.resolve();
+        }
+        else {
+            $('.fm-dialog.share-dialog').removeClass('hidden');
+            loadingDialog.hide();
+            $promise.reject(result);
+        }
+    };
+    
+    // Get complete children directory structure for root node with id === nodeId 
+    childNodesId = fm_getnodes(nodeId);
+    childNodesId.push(nodeId);
+
+    // Create new lists of users, active (with user handle) and non existing (pending)
     for (var index in targets) {
         if (targets.hasOwnProperty(index)) {
             userHandle = getUserHandleFromEmail(targets[index].u);
@@ -5660,120 +5714,25 @@ function doShare(h, targets, dontShowShareDialog) {
         }
     }
     
-    // Process users with handle, known ones
+    // Process users with handle === known ones
     if (usersWithHandle.length) {
-        api_setshare(h, usersWithHandle, nodeids, {
-            t: targets,
-            h: h,
-            done: function(result, ctx) {
-
-                // Loose comparasion is important
-                if (result.r && result.r[0] === 0) {
-                    for (var i in result.u) {
-                        M.addUser(result.u[i]);
-                    }
-
-                    for (var k in result.r) {
-                        if (result.r[k] === 0) {
-                            var rights = ctx.t[k].r;
-                            var user = ctx.t[k].u;
-
-                            if (user.indexOf('@') >= 0) {
-                                user = getuid(ctx.t[k].u);
-                            }
-
-                            // A pending share may not have a corresponding user and should not be added
-                            // A pending share can also be identified by a user who is only a '0' contact
-                            // level (passive)
-                            if (M.u[user] && M.u[user].c !== 0) {
-                                M.nodeShare(ctx.h, {
-                                    h: h,
-                                    r: rights,
-                                    u: user,
-                                    ts: unixtime()
-                                });
-                                setLastInteractionWith(user, "0:" + unixtime());
-                            }
-                            else if (d) {
-                                console.log('doshare: invalid user', user, M.u[user], ctx.t[k]);
-                            }
-                        }
-                    }
-                    if (dontShowShareDialog !== true) {
-                        $('.fm-dialog.share-dialog').removeClass('hidden');
-                    }
-                    loadingDialog.hide();
-                    M.renderShare(h);
-
-                    if (dontShowShareDialog !== true) {
-                        shareDialog();
-                    }
-                    $promise.resolve();
-                }
-                else {
-                    $('.fm-dialog.share-dialog').removeClass('hidden');
-                    loadingDialog.hide();
-                    $promise.reject(result);
-                }
-            }
+        api_setshare(nodeId, usersWithHandle, childNodesId, {
+            t: usersWithHandle,
+            h: nodeId,
+            done: this._done
         });
     }
     
-    // Process all targets (users) without handle, unknown ones
+    // Process targets (users) without handle === unknown ones
     if (usersWithoutHandle.length) {
-        api_setshare1(h, usersWithoutHandle, nodeids, {
-            t: targets,
-            h: h,
-            done: function(result, ctx) {
-
-                // Loose comparasion is important
-                if (result.r && result.r[0] === 0) {
-                    for (var i in result.u) {
-                        M.addUser(result.u[i]);
-                    }
-
-                    for (var k in result.r) {
-                        if (result.r[k] === 0) {
-                            var rights = ctx.t[k].r;
-                            var user = ctx.t[k].u;
-
-                            if (user.indexOf('@') >= 0) {
-                                user = getuid(ctx.t[k].u);
-                            }
-
-                            // A pending share may not have a corresponding user and should not be added
-                            // A pending share can also be identified by a user who is only a '0' contact
-                            // level (passive)
-                            if (M.u[user] && M.u[user].c !== 0) {
-                                M.nodeShare(ctx.h, {
-                                    h: h,
-                                    r: rights,
-                                    u: user,
-                                    ts: unixtime()
-                                });
-                                setLastInteractionWith(user, "0:" + unixtime());
-                            }
-                            else if (d) {
-                                console.log('doshare: invalid user', user, M.u[user], ctx.t[k]);
-                            }
-                        }
-                    }
-                    if (dontShowShareDialog !== true) {
-                        $('.fm-dialog.share-dialog').removeClass('hidden');
-                    }
-                    loadingDialog.hide();
-                    M.renderShare(h);
-
-                    if (dontShowShareDialog !== true) {
-                        shareDialog();
-                    }
-                    $promise.resolve();
-                }
-                else {
-                    $('.fm-dialog.share-dialog').removeClass('hidden');
-                    loadingDialog.hide();
-                    $promise.reject(result);
-                }
+        api_setshare1({
+            node: nodeId,
+            targets: usersWithoutHandle,
+            sharenodes: childNodesId,
+            ctx: {
+                t: usersWithoutHandle,
+                h: nodeId,
+                done: this._done
             }
         });
     }

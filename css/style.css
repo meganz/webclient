@@ -13174,14 +13174,20 @@ table {
 .fm-close-all-sessions {
     float: right;
     margin: -7px 0 0 0;
+    height: 32px;
 }
+
+.fm-close-all-sessions span {
+    background: none;
+	background-image: url(../images/mega/nw-fm-sprite_v8.svg);
+	background-repeat: no-repeat;
+	background-position: 5px -8423px;
+}
+
 .settings-logout {
 	cursor: pointer;
 	background-color: #CCCCCC;
 	float: right;
-	background-image: url(../images/mega/nw-fm-sprite_v8.svg);
-	background-repeat: no-repeat;
-	background-position: 5px -8423px;
 	padding-left: 19px;
     margin-right: 13px;
 }

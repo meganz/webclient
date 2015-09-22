@@ -5616,7 +5616,14 @@ function getUserHandleFromEmail(emailAddress) {
     
     // Search known users for matching email address then get the handle of that contact
     for (var userHandle in M.u) {
-        if (M.u.hasOwnProperty(userHandle) && (M.u[userHandle].m === emailAddress)) {
+        if (
+            M.u.hasOwnProperty(userHandle)
+            && M.u[userHandle]
+            && M.u[userHandle].c
+            && (M.u[userHandle].c !== 0)
+            && (M.u[userHandle].m === emailAddress)
+            ) {
+            
             return userHandle;
         }
     };
@@ -5636,7 +5643,7 @@ function getUserHandleFromEmail(emailAddress) {
  */
 function doShare(nodeId, targets, dontShowShareDialog) {
     
-    var $promise = new MegaPromise(),
+    var promise = new MegaPromise(),
         logger = MegaLogger.getLogger('doShare'),
         childNodesId = [],// Holds complete directory tree starting from nodeId
         usersWithHandle = [],
@@ -5686,12 +5693,12 @@ function doShare(nodeId, targets, dontShowShareDialog) {
             if (dontShowShareDialog !== true) {
                 shareDialog();
             }
-            $promise.resolve();
+            promise.resolve();
         }
         else {
             $('.fm-dialog.share-dialog').removeClass('hidden');
             loadingDialog.hide();
-            $promise.reject(result);
+            promise.reject(result);
         }
     };
     
@@ -5737,7 +5744,7 @@ function doShare(nodeId, targets, dontShowShareDialog) {
         });
     }
 
-    return $promise;
+    return promise;
 }
 
 function processmove(jsonmove)

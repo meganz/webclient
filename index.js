@@ -1016,8 +1016,6 @@ function tooltiplogin() {
         $('.top-login-input-block.password').addClass('incorrect');
     }
     else {
-        $('.top-dialog-login-button span')
-            .safeHTML('<img alt="" src="@@images/mega/ajax-loader.gif">', staticpath);
         $('.top-dialog-login-button').addClass('loading');
         if ($('.loginwarning-checkbox').attr('class').indexOf('checkboxOn') > -1) {
             localStorage.hideloginwarning = 1;
@@ -1027,7 +1025,6 @@ function tooltiplogin() {
             remember = 1;
         }
         postLogin($('#login-name').val(), $('#login-password').val(), remember, function (r) {
-            $('.top-dialog-login-button span').text(l[171]);
             $('.top-dialog-login-button').removeClass('loading');
             if (r == EBLOCKED) {
                 alert(l[730]);
@@ -1237,6 +1234,27 @@ function topmenuUI() {
                     loginDialog();
                 }
             }
+        });
+        
+        var $topChangeLang = $('.top-change-language');
+        var $topChangeLangName = $topChangeLang.find('.top-change-language-name');
+        var languageName = ln[lang];
+        
+        // If they have changed the language from English, then show different style
+        if (lang !== 'en') {
+            $topChangeLang.addClass('other-language');
+        }
+        
+        // Init the top header change language button
+        $topChangeLangName.text(languageName);
+        $topChangeLang.removeClass('hidden');
+        $topChangeLang.rebind('click', function() {
+            
+            // Add log to see how often they click to change language
+            api_req({ a: 'log', e: 99600, m: 'Language menu opened from top header' });
+            
+            // Open the language dialog
+            languageDialog();
         });
 
         $('.top-menu-item.register,.context-menu-divider.register,.top-menu-item.login').show();

@@ -1390,13 +1390,15 @@ var CallManager = function(megaChat) {
     megaChat.bind("onInit.callManager", function(e) {
         try {
             megaChat.rtc = megaChat.karere.connection.rtc = new RtcSession(megaChat.karere.connection, megaChat.options.rtcSession);
-            
             self._attachToChat(megaChat);
-
         }
         catch (e) {
             // no RTC support.
-            self.logger.error("No rtc support: ", e);
+            if (e instanceof RtcSession.NotSupportedError) {
+                self.logger.warn("This browser does not support webRTC");
+            } else {
+                self.logger.error("Error initializing webRTC support:", e);
+            }
         }
     });
 
@@ -1592,7 +1594,7 @@ CallManager.prototype._attachToChatRoom = function(megaChat, chatRoom) {
             self.trigger('CallMissed', [session, eventData]);
         } else if (reason === 'user') {
             //do nothing, we canceled it so we have that handled already, this is just a feedback event
-        } else if (reason.match(/.*error.*/)) {
+        } else if (reason.match(/.*(error|timeout).*/)) {
             session.setState(CallSession.STATE.FAILED);
             self.trigger('CallFailed', [session, reason, eventData.text])
         } else {

@@ -74,7 +74,7 @@
 
 function RtcSession(stropheConn, options) {
     if (!RTC)
-        throw new Error('This browser does not support webRTC');
+        throw new RtcSession.NotSupportedError('This browser does not support webRTC');
 
     var self = this;
 
@@ -1608,6 +1608,11 @@ function getStreamAv(stream) {
     result.video = (stream.getVideoTracks().length > 0);
     return result;
 }
+
+RtcSession.NotSupportedError = function() {
+    Error.apply(this, arguments);
+}
+RtcSession.NotSupportedError.prototype = new Error();
 
 RtcSession.xorEnc = function(str, key) {
   var int2hex = ['0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'];

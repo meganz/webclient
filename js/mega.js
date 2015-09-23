@@ -5607,69 +5607,144 @@ function getuid(email) {
     return false;
 }
 
-function doShare(h, targets, dontShowShareDialog) {
-    var $promise = new MegaPromise();
+/**
+ * Gets the user handle of a contact if they already exist in M.u
+ * @param {String} emailAddress The email address to get the user handle for
+ * @returns {String|false} Returns either the user handle or false if it doesn't exist
+ */
+function getUserHandleFromEmail(emailAddress) {
+    
+    // Search known users for matching email address then get the handle of that contact
+    for (var userHandle in M.u) {
+        if (
+            M.u.hasOwnProperty(userHandle)
+            && M.u[userHandle]
+            && M.u[userHandle].c
+            && (M.u[userHandle].c !== 0)
+            && (M.u[userHandle].m === emailAddress)
+            ) {
+            
+            return userHandle;
+        }
+    };
+    
+    return false;
+}
+        
+/**
+ * doShare
+ * 
+ * Recreate target/users list and call appropriate api_setshare function.
+ * @param {String} nodeId Selected node id
+ * @param {Array} targets List of JSON_Object containing user email and access permission
+ *     i.e. { u: <user_email>, r: <access_permission> }.
+ * @param {Boolean} dontShowShareDialog.
+ * @returns {doShare.$promise|MegaPromise}
+ */
+function doShare(nodeId, targets, dontShowShareDialog) {
+    
+    var promise = new MegaPromise(),
+        logger = MegaLogger.getLogger('doShare'),
+        childNodesId = [],// Holds complete directory tree starting from nodeId
+        usersWithHandle = [],
+        usersWithoutHandle = [],
+        tmpValue, userHandle;
 
-    nodeids = fm_getnodes(h);
-    nodeids.push(h);
+    this._done = function(result, ctx) {
 
-    api_setshare(h, targets, nodeids, {
-        t: targets,
-        h: h,
-        done: function(res, ctx) {
+        // Loose comparasion is important
+        if (result.r && result.r[0] == '0') {
+            for (var i in result.u) {
+                M.addUser(result.u[i]);
+            }
 
-            // Loose comparasion is important
-            if (res.r && res.r[0] == '0') {
-                for (var i in res.u) {
-                    M.addUser(res.u[i]);
-                }
+            for (var k in result.r) {
+                if (result.r[k] === 0) {
+                    var rights = ctx.t[k].r;
+                    var user = ctx.t[k].u;
 
-                for (var k in res.r) {
-                    if (res.r[k] === 0) {
-                        var rights = ctx.t[k].r;
-                        var user = ctx.t[k].u;
+                    if (user.indexOf('@') >= 0) {
+                        user = getuid(ctx.t[k].u);
+                    }
 
-                        if (user.indexOf('@') >= 0) {
-                            user = getuid(ctx.t[k].u);
-                        }
-
-                        // A pending share may not have a corresponding user and should not be added
-                        // A pending share can also be identified by a user who is only a '0' contact
-                        // level (passive)
-                        if (M.u[user] && M.u[user].c !== 0) {
-                            M.nodeShare(ctx.h, {
-                                h: h,
-                                r: rights,
-                                u: user,
-                                ts: unixtime()
-                            });
-                            setLastInteractionWith(user, "0:" + unixtime());
-                        }
-                        else if (d) {
-                            console.log('doshare: invalid user', user, M.u[user], ctx.t[k]);
-                        }
+                    // A pending share may not have a corresponding user and should not be added
+                    // A pending share can also be identified by a user who is only a '0' contact
+                    // level (passive)
+                    if (M.u[user] && M.u[user].c !== 0) {
+                        M.nodeShare(ctx.h, {
+                            h: nodeId,
+                            r: rights,
+                            u: user,
+                            ts: unixtime()
+                        });
+                        setLastInteractionWith(user, "0:" + unixtime());
+                    }
+                    else {
+                        logger.debug('invalid user:', user, M.u[user], ctx.t[k]);
                     }
                 }
-                if (dontShowShareDialog !== true) {
-                    $('.fm-dialog.share-dialog').removeClass('hidden');
-                }
-                loadingDialog.hide();
-                M.renderShare(h);
+            }
+            if (dontShowShareDialog !== true) {
+                $('.fm-dialog.share-dialog').removeClass('hidden');
+            }
+            loadingDialog.hide();
+            M.renderShare(nodeId);
 
-                if (dontShowShareDialog !== true) {
-                    shareDialog();
-                }
-                $promise.resolve();
+            if (dontShowShareDialog !== true) {
+                shareDialog();
+            }
+            promise.resolve();
+        }
+        else {
+            $('.fm-dialog.share-dialog').removeClass('hidden');
+            loadingDialog.hide();
+            promise.reject(result);
+        }
+    };
+    
+    // Get complete children directory structure for root node with id === nodeId 
+    childNodesId = fm_getnodes(nodeId);
+    childNodesId.push(nodeId);
+
+    // Create new lists of users, active (with user handle) and non existing (pending)
+    for (var index in targets) {
+        if (targets.hasOwnProperty(index)) {
+            userHandle = getUserHandleFromEmail(targets[index].u);
+            if (userHandle !== false) {
+                tmpValue = targets[index];
+                tmpValue.u = userHandle;// Switch from email to user handle
+                usersWithHandle.push(tmpValue);
             }
             else {
-                $('.fm-dialog.share-dialog').removeClass('hidden');
-                loadingDialog.hide();
-                $promise.reject(res);
+                usersWithoutHandle.push(targets[index]);
             }
         }
-    });
+    }
+    
+    // Process users with handle === known ones
+    if (usersWithHandle.length) {
+        api_setshare(nodeId, usersWithHandle, childNodesId, {
+            t: usersWithHandle,
+            h: nodeId,
+            done: this._done
+        });
+    }
+    
+    // Process targets (users) without handle === unknown ones
+    if (usersWithoutHandle.length) {
+        api_setshare1({
+            node: nodeId,
+            targets: usersWithoutHandle,
+            sharenodes: childNodesId,
+            ctx: {
+                t: usersWithoutHandle,
+                h: nodeId,
+                done: this._done
+            }
+        });
+    }
 
-    return $promise;
+    return promise;
 }
 
 function processmove(jsonmove)

@@ -7105,18 +7105,17 @@ function fillShareDialogWithContent() {
     for (var userHandle in shares) {
         if (shares.hasOwnProperty(userHandle)) {
 
-            // ToDo: Don't add removed contacts from contact list
+            // Don't add removed contacts from contact list
             // Additional check of 'c' grants that only active
             // contacts will be addded, this prevents contact
-            //  duplication in share dialog contact list
-//            if (M.u[userHandle] && M.u[userHandle].c && (M.u[userHandle].c === 1)) {
-            if (M.u[userHandle]) {
-                    user = M.u[userHandle];
-                    email = user.m;
-                    name = (user.name && user.name.length > 1) ? user.name : user.m;
-                    shareRights = M.d[selectedNodeHandle].shares[userHandle].r;
+            // duplication in share dialog contact list
+            if (M.u[userHandle] && M.u[userHandle].c && (M.u[userHandle].c === 1)) {
+                user = M.u[userHandle];
+                email = user.m;
+                name = (user.name && user.name.length > 1) ? user.name : user.m;
+                shareRights = M.d[selectedNodeHandle].shares[userHandle].r;
 
-                    generateShareDialogRow(name, email, shareRights, userHandle);
+                generateShareDialogRow(name, email, shareRights, userHandle);
             }
         }
     }

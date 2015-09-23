@@ -1335,6 +1335,21 @@ function assert(test) {
     throw new AssertionFailed(message);
 }
 
+
+/**
+ * Assert that a user handle is potentially valid (e. g. not an email address).
+ *
+ * @param userHandle {string}
+ *     The user handle to check.
+ * @throws
+ *     Throws an exception on something that does not seem to be a user handle.
+ */
+var assertUserHandle = function(userHandle) {
+    assert(base64urldecode(userHandle).length === 8,
+       'This seems not to be a user handle: ' + userHandle);
+};
+
+
 /**
  * Pad/prepend `val` with "0" (zeros) until the length is === `length`
  *
@@ -3651,21 +3666,21 @@ if (typeof sjcl !== 'undefined') {
         var self = this;
 
         var shares = {}, length;
-        
+
         for (var i in nodes) {
             if (nodes.hasOwnProperty(i)) {
 
                 // Look for full share
                 if (fullShare) {
                     shares = M.d[nodes[i]].shares;
-                    
+
                     // Look for link share
                     if (linkShare) {
                         if (shares && Object.keys(shares).length) {
                             return true;
                         }
                     }
-                    else { // Exclude folder/file links, 
+                    else { // Exclude folder/file links,
                         if (shares) {
                             length = Object.keys(shares).length;
                             if (length) {
@@ -3705,24 +3720,24 @@ if (typeof sjcl !== 'undefined') {
     Nodes.prototype.getShares = function(nodes, fullShare, pendingShare, linkShare) {
 
         var self = this;
-        
+
         var result, shares, length;
 
         for (var i in nodes) {
             if (nodes.hasOwnProperty(i)) {
                 result = [];
-                
+
                 // Look for full share
                 if (fullShare) {
-                    shares = M.d[nodes[i]].shares; 
-                    
+                    shares = M.d[nodes[i]].shares;
+
                     // Look for link share
                     if (linkShare) {
                         if (shares && Object.keys(shares).length) {
                             result.push(self.loopShares(shares), linkShare);
                         }
                     }
-                    else { // Exclude folder/file links, 
+                    else { // Exclude folder/file links,
                         if (shares) {
                             length = Object.keys(shares).length;
                             if (length) {
@@ -3759,7 +3774,7 @@ if (typeof sjcl !== 'undefined') {
     Nodes.prototype.loopShares = function(shares, linkShare) {
 
         var self = this;
-        
+
         var result = [],
             exclude = 'EXP',
             index;
@@ -3773,12 +3788,12 @@ if (typeof sjcl !== 'undefined') {
         // Remove 'EXP'
         if (!linkShare) {
             index = result.indexOf(exclude);
-            
+
             if (index !== -1) {
                 result = result.splice(index, 1);
             }
         }
-        
+
         return result;
     };
 

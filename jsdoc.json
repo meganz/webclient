@@ -4,7 +4,9 @@
 
         "exclude": ["test/", "node_modules/",
                     "js/tests/", "js/vendor/",
-                    "coverage/", "dont-deploy/", "doc/",
+                    "coverage/", "dont-deploy/", "doc/",	
+                    "aesasm.js",
+                    "e10s.js",
                     "strg.js",
                     "sjcl.js",
                     "fileapi.js",

@@ -2969,6 +2969,80 @@ function assertStateChange(currentState, newState, allowedStatesMap, enumMap) {
 }
 
 /**
+ * Promise-based XHR request
+ * @param {Mixed} aURLOrOptions URL or options
+ * @param {Mixed} aData         data to send, optional
+ */
+mega.utils.xhr = function megaUtilsXHR(aURLOrOptions, aData) {
+    /* jshint -W074 */
+    var xhr;
+    var url;
+    var method;
+    var options;
+    var promise = new MegaPromise();
+
+    if (typeof aURLOrOptions === 'object') {
+        options = aURLOrOptions;
+        url = options.url;
+    }
+    else {
+        options = {};
+        url = aURLOrOptions;
+    }
+    aURLOrOptions = undefined;
+
+    aData = options.data || aData;
+    method = options.method || (aData && 'POST') || 'GET';
+
+    xhr = getxhr();
+
+    if (typeof options.prepare === 'function') {
+        options.prepare(xhr);
+    }
+
+    xhr.onloadend = function(ev) {
+        if (this.status === 200) {
+            promise.resolve(ev, this.response);
+        }
+        else {
+            promise.reject(ev);
+        }
+    };
+
+    try {
+        if (d) {
+            MegaLogger.getLogger('muXHR').info(method + 'ing', url, options, aData);
+        }
+        xhr.open(method, url);
+
+        if (options.type) {
+            xhr.responseType = options.type;
+            if (xhr.responseType !== options.type) {
+                xhr.abort();
+                throw new Error('Unsupported responseType');
+            }
+        }
+
+        if (typeof options.beforeSend === 'function') {
+            options.beforeSend(xhr);
+        }
+
+        if (is_chrome_firefox) {
+            xhr.setRequestHeader('Origin', getBaseUrl(), false);
+        }
+
+        xhr.send(aData);
+    }
+    catch (ex) {
+        promise.reject(ex);
+    }
+
+    xhr = options = undefined;
+
+    return promise;
+};
+
+/**
  *  Retrieve a call stack
  *  @return {String}
  */

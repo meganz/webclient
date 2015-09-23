@@ -919,7 +919,9 @@ else if (!b_u)
             if (~dump.m.indexOf('[[:i]]')) {
                 return false;
             }
-            if ((mega.flags & window.MEGAFLAG_MDBOPEN) && dump.m === 'InvalidStateError') {
+            if ((mega.flags & window.MEGAFLAG_MDBOPEN)
+                    && (dump.m === 'InvalidStateError'
+                        || (dump.m === 'UnknownError'))) {
                 // Prevent InvalidStateError exceptions from indexedDB.open
                 // caused while using Private Browser Mode on Firefox.
                 return false;

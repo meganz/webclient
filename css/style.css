@@ -1443,47 +1443,45 @@ a.blog-button:hover {
 	-moz-border-radius-topleft: 8px;
 	border-top-left-radius: 8px;
 }
-
 /* Change top language button */
 .top-change-language {
-    cursor: pointer;
-    float: right;
-    position: relative;
+	cursor: pointer;
+	float: right;
+	position: relative;
 }
 .top-change-language:hover .top-change-language-name {
-    color: #fff;
+	color: #fff;
 }
 .top-change-language-icon {
-    background-image: url("../images/mega/lang-selection-sprite.png");
-    background-position: -8px 0;
-    background-repeat: no-repeat;
-    border-radius: 2px;
-    display: inline-block;
-    height: 26px;
-    margin-right: 10px;
-    margin-top: 11px;
-    width: 48px;
+	background-image: url("../images/mega/lang-selection-sprite.png");
+	background-position: -8px 0;
+	background-repeat: no-repeat;
+	border-radius: 2px;
+	display: inline-block;
+	height: 26px;
+	margin-right: 10px;
+	margin-top: 11px;
+	width: 48px;
 }
 .top-change-language-name {
-    color: rgba(255, 255, 255, 0.7);
-    display: block;
-    line-height: 48px;
-    overflow: hidden;
-    position: absolute;
-    right: 67px;
-    text-align: right;
-    top: 0;
-    white-space: nowrap;
+	color: rgba(255, 255, 255, 0.7);
+	display: block;
+	line-height: 48px;
+	overflow: hidden;
+	position: absolute;
+	right: 67px;
+	text-align: right;
+	top: 0;
+	white-space: nowrap;
 }
 .top-change-language.other-language .top-change-language-name {
-    right: 45px;
+	right: 45px;
 }
 .top-change-language.other-language .top-change-language-icon {
-    background-position: -119px 0;
-    height: 26px;
-    width: 26px;
+	background-position: -119px 0;
+	height: 26px;
+	width: 26px;
 }
-
 .top-login-button:hover, .top-login-button.active {
 	background-color: rgba(255,255,255,0.5);
 	color: rgba(255,255,255,0.8);
@@ -3462,7 +3460,7 @@ img.blog-new-logos {
 	-moz-border-radius: 100%;
 	-webkit-border-radius: 100%;
 	border-radius: 100%;
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-position: 2px -496px;
 	background-repeat: no-repeat;
 	-webkit-transition: background-color 200ms ease-in-out;
@@ -3526,7 +3524,7 @@ img.blog-new-logos {
 	bottom: -16px;
 	left: 50%;
 	margin: 0 0 0 -8px;
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-position: -5px -2117px;
 	background-repeat: no-repeat;
 }
@@ -3565,7 +3563,7 @@ img.blog-new-logos {
 	height: 18px;
 	left: 11px;
 	top: 6px;
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-position: -132px -3180px;
 	background-repeat: no-repeat;
 	-webkit-transition: all 200ms ease-in-out;
@@ -5868,7 +5866,7 @@ table {
 	background-position: -14px -7566px;
 }
 .rename-input-bl .transfer-filtype-icon.folder, .rename-input-bl .transfer-filtype-icon.folder-shared {
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-position: -7px -1974px;
 }
 .focused .rename-input-bl .transfer-filtype-icon.folder {
@@ -6200,7 +6198,7 @@ table {
 	background-position: center -4614px;
 }
 .export-icon.folder-shared, .export-icon.folder {
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-position: -10px -2680px;
 }
 .dragger-icon.flash, .export-icon.flash, .new-download-file-icon.flash, .share-folder-icon div.flash {
@@ -6909,9 +6907,9 @@ table {
 	transition: background-color 200ms ease-in-out;
 	cursor: pointer;
 	position: relative;
-	-moz-border-radius: 12px;
-	-webkit-border-radius: 12px;
-	border-radius: 12px;
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	border-radius: 8px;
 }
 .fm-add-user span, .fm-start-video-call span, .fm-clearbin-button span, .fm-send-files span, .fm-start-call span, .fm-leave-share span, .fm-share-copy span, .fm-share-download span, .contact-send-files span, .fm-start-conversation span, .fm-share-folders span, .fm-verify span, .fm-reset-stored-fingerprint span, .fm-question span, .fm-chat-end span, .fm-end-call span, .fm-download-as-zip span, .fm-import-to-cloudrive span, .fm-chat-file-button span, .fm-dialog-button span, .fm-account-button span, .avatar-dialog .fm-account-change-avatar span, .top-dialog-login-button span, .nw-chat-button span, .multiple-sharing.expanded .main-body .nw-chat-button span, .fm-chat-attach-button span, .fm-chat-contact-button span, .fm-new-folder span, .search-files-result span, .search-messages-result span, .fm-file-upload span, .search-messages-result span, .fm-folder-upload span, .fm-notification-settings span, .create-folder-button span, .add-user-popup-button span, .create-folder-button-cancel span, .fm-dialog-new-folder-button span, .rename-dialog-button span, .contact-request-button span, .transfer-clear-all-icon span, .transfer-clear-completed span, .transfer-pause-icon span {
 	-webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
@@ -6920,10 +6918,10 @@ table {
 	box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
 	display: block;
 	font-size: 14px;
-	-moz-border-radius: 8px;
-	-webkit-border-radius: 8px;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
 	height: 24px;
-	border-radius: 8px;
+	border-radius: 4px;
 	line-height: 23px;
 	color: #777777;
 	padding: 0 10px 0 30px;
@@ -7721,7 +7719,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	color: #666666;
 	padding: 0 10px 0 42px;
 	margin: 0;
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-position: 3px -1890px;
 	background-repeat: no-repeat;
 	background-color: transparent;
@@ -7742,7 +7740,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	border-radius: 5px;
 	background-color: rgba(0,0,0,0.05);
 	height: 50px;
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-position: -3px -3527px;
 	background-repeat: no-repeat;
 	padding: 0 0 0 31px;
@@ -10384,10 +10382,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .nw-chat-expand-arrow::before {
 	content: '\00a0';
 }
-.top-dialog-login-button span {
-	min-width: 40px;
-	position: relative;
-}
 .fm-dialog-button.dialog-newfolder-button {
 	float: left;
 	margin-left: -4px;
@@ -10562,33 +10556,28 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	background-image: url(../images/mega/nw-fm-sprite_v8.svg);
 	background-repeat: no-repeat;
 }
-.fm-share-dropdown, .account-history-dropdown-button {
-	height: 30px;
+.fm-share-dropdown, .account-history-dropdown-button, .share-dialog-permissions, .share-dialog-icon.permissions-icon {
 	float: right;
-	margin: 10px 10px 0 0;
-	background-color: white;
-	border-radius: 6px;
-	-moz-border-radius: 6px;
-	-webkit-border-radius: 6px;
-	min-width: 120px;
+	padding: 0 30px 0 10px;
+	color: gray;
+	cursor: pointer;
+	margin: -7px 0 0 0;
+	border: 0;
+	height: 32px;
+	line-height: 32px;
+	min-width: 150px;
+	background-color: rgba(255,255,255,1);
+	-moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
+	box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
+	border-radius: 4px;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	background-image: url(../images/mega/nw-fm-sprite_v8.svg);
+	background-repeat: no-repeat;
+	background-position: right -8359px;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	position: relative;
-	font-size: 13px;
-	line-height: 25px;
-	padding: 0 25px 0 10px;
-	color: gray;
-	background-position: right -6596px;
-	background-image: url(../images/mega/main-sprite.png?v=7);
-	background-repeat: no-repeat;
-	cursor: pointer;
-	user-select: none;
-	-moz-user-select: none;
-	-khtml-user-select: none;
-	border: 2px solid rgba(0,0,0,0.15);
-	-webkit-background-clip: padding-box;
-	background-clip: padding-box;
 }
 .fm-share-dropdown {
 	margin: 10px -20px 0 0;
@@ -10597,12 +10586,12 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	position: absolute;
 	top: 5px;
 	right: 10px;
-	border: 2px solid #d9d9d9;
+	border: 4px solid rgba(0,0,0,0.15);
 	background-color: white;
-	border-radius: 6px;
-	-moz-border-radius: 6px;
-	-webkit-border-radius: 6px;
-	min-width: 147px;
+	border-radius: 8px;
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	min-width: 185px;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
@@ -10611,6 +10600,19 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	background-repeat: no-repeat;
 	min-height: 50px;
 	z-index: 10;
+	padding: 5px 0;
+}
+.fm-share-permissions-block::after, .account-history-dropdown::after {
+	content: '';
+	top: 0;
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	border-radius: 4px;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	-moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
+	box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
 }
 .fm-share-permissions-block.bottom {
 	top: auto;
@@ -10618,18 +10620,28 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	background-position: right -9918px;
 }
 .fm-share-permissions, .account-history-drop-items {
-	height: 30px;
+	height: 32px;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	font-size: 13px;
-	line-height: 28px;
+	line-height: 32px;
 	padding: 0 10px 0 37px;
-	color: #363b3b;
+	color: #666666;
 	background-position: left -4848px;
 	background-repeat: no-repeat;
-	margin: 3px 0;
+	margin: 0;
 	cursor: pointer;
+	position: relative;
+	z-index: 10;
+	-webkit-transition: background-color 200ms ease-in-out;
+	-moz-transition: background-color 200ms ease-in-out;
+	-o-transition: background-color 200ms ease-in-out;
+	-ms-transition: background-color 200ms ease-in-out;
+	transition: background-color 200ms ease-in-out;
+}
+.fm-share-permissions:hover, .account-history-drop-items:hover {
+	background-color: rgba(0,0,0,0.05);
 }
 .account-history-drop-items {
 	padding: 0 25px 0 37px;
@@ -10648,7 +10660,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	float: left;
 	width: 106px;
 	height: 75px;
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-repeat: no-repeat;
 }
 .notification-dialog .fm-notification-icon {
@@ -10732,7 +10744,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	display: inline;
 }
 .delete-contact.multiple .fm-del-contact-avatar {
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-repeat: no-repeat;
 	background-position: -5px -3080px;
 	background-color: rgba(0,0,0,0.2);
@@ -10755,7 +10767,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	line-height: 21px;
 	color: #999999;
 	padding: 15px 0 0 23px;
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-position: -1px -1829px;
 	background-repeat: no-repeat;
 }
@@ -10784,7 +10796,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	width: 100%;
 	position: absolute;
 	left: 0;
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-position: left -2771px;
 	background-repeat: repeat-x;
 	z-index: 100;
@@ -11013,7 +11025,7 @@ label.radio-txt {
 }
 .export-warning-content {
 	max-width: 947px;
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-position: left -2880px;
 	background-repeat: no-repeat;
 	margin: 0 auto;
@@ -11306,20 +11318,20 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
 }
 .shared-with-me.read-only .properties-elements-counter span {
 	background-color: #61D2FF;
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-position: -81px -238px;
 	background-repeat: no-repeat;
 }
 .shared-with-me.read-and-write .properties-elements-counter span {
 	background-color: #FFD300;
 	background-position: -81px -207px;
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-repeat: no-repeat;
 }
 .shared-with-me.full-access .properties-elements-counter span {
 	background-color: #00E22C;
 	background-position: -81px -174px;
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-repeat: no-repeat;
 }
 .multiple .properties-file-icon div:nth-child(2) {
@@ -12448,7 +12460,7 @@ table {
 	background-position: 5px -3716px;
 }
 .full-access .context-menu-icon, .read-and-write .context-menu-icon, .read-only .context-menu-icon {
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-repeat: no-repeat;
 }
 .full-access .context-menu-icon {
@@ -13139,18 +13151,15 @@ table {
 	box-sizing: border-box;
 }
 .account-history-dropdown {
-	margin: 7px 12px 0 0;
-	border: 2px solid rgba(0,0,0,0.15);
+	margin: 3px 10px 0 0;
 	background-image: none;
-	-webkit-background-clip: padding-box;
-	background-clip: padding-box;
 }
 .account-history-dropdown::before {
 	content: '';
 	width: 14px;
 	position: absolute;
 	z-index: 10;
-	top: 13px;
+	top: 17px;
 	right: 10px;
 	height: 8px;
 	background-image: url(../images/mega/nw-fm-sprite_v8.svg);
@@ -13191,24 +13200,6 @@ table {
 }
 .account-history-drop-items {
 	line-height: 30px;
-}
-.account-history-dropdown-button {
-	margin: -7px 0 0 0;
-	border: 0;
-	height: 32px;
-	line-height: 32px;
-	-webkit-background-clip: padding-box;
-	background-clip: padding-box;
-	min-width: 145px;
-	background-color: rgba(255,255,255,1);
-	-moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
-	box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
-	border-radius: 4px;
-	-moz-border-radius: 4px;
-	-webkit-border-radius: 4px;
-	background-image: url(../images/mega/nw-fm-sprite_v8.svg);
-	background-repeat: no-repeat;
-	background-position: right -8360px;
 }
 .top-head.startpage, .top-head.download-page, .top-head.browsers-page {
 	background-color: white;
@@ -14245,18 +14236,24 @@ h5.main-italic-header {
 }
 .top-dialog-login-button span {
 	position: relative;
+	overflow: hidden;
 }
-.top-dialog-login-button img {
+.top-dialog-login-button i {
 	display: none;
 }
-.top-dialog-login-button.loading img {
+.top-dialog-login-button.loading i {
 	display: block;
-	width: 16px;
+	background-color: white;
 	position: absolute;
-	left: 50%;
-	margin-left: -8px;
-	top: 7px;
-	padding: 0 0 0 0;
+	width: 100%;
+	height: 100%;
+	left: 0;
+	top: 0;
+	text-align: center;
+}
+.top-dialog-login-button.loading img {
+	width: 16px;
+	margin: 7px 0 0 0;
 }
 .login-register-input input {
 	border: 0;
@@ -14903,7 +14900,7 @@ h5.main-italic-header {
 .membership-payment-pad {
 	padding: 0;
 }
-/* Positioned absolute because payment options can be dynamic e.g. they may or may not have account 
+/* Positioned absolute because payment options can be dynamic e.g. they may or may not have account
    balance and we want the bottom of the date box to line up with the bottom of the plan box on the left */
 .payment-period {
 	position: absolute;
@@ -18265,7 +18262,7 @@ code, c {
 }
 .notification-empty-icon {
 	height: 225px;
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-position: center -3245px;
 	background-repeat: no-repeat;
 }
@@ -20555,7 +20552,7 @@ span.incoming-call-name {
 	top: 4px;
 	width: 32px;
 	height: 16px;
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-position: -2px -3669px;
 	background-repeat: no-repeat;
 	cursor: pointer;
@@ -20584,7 +20581,7 @@ span.incoming-call-name {
 	display: block;
 	width: 32px;
 	height: 16px;
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-position: -122px -3719px;
 	background-repeat: no-repeat;
 }
@@ -21192,7 +21189,7 @@ ul.token-input-list-mega {
 }
 .multiple-input-warning .arrow {
 	height: 32px;
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-repeat: no-repeat;
 	background-position: right -2009px;
 	position: absolute;
@@ -21248,7 +21245,7 @@ li.token-input-token-mega p {
 li.token-input-token-mega .input-close {
 	height: 20px;
 	width: 10px;
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-position: -94px -460px;
 	background-repeat: no-repeat;
 	display: block;
@@ -21423,7 +21420,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
 	left: 50%;
 	margin-left: -9px;
 	width: 18px;
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-repeat: no-repeat;
 	background-position: left -3831px;
 }
@@ -21452,7 +21449,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
 	-moz-border-radius: 0;
 	-webkit-border-radius: 0;
 	border-radius: 0;
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-repeat: no-repeat;
 	background-position: center -535px;
 }
@@ -21492,13 +21489,13 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
 	cursor: pointer;
 }
 .share-search-result.selected {
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-repeat: no-repeat;
 	background-position: right -748px;
 }
 .share-dialog-img {
 	height: 90px;
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-repeat: no-repeat;
 	background-position: center 8px;
 }
@@ -21507,7 +21504,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
 	width: 25px;
 	height: 25px;
 	z-index: 10;
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-position: -81px -84px;
 	background-repeat: no-repeat;
 }
@@ -21554,7 +21551,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
 	width: 25px;
 	height: 25px;
 	left: 0;
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-position: -89px -134px;
 	background-repeat: no-repeat;
 	-webkit-transition: opacity 200ms ease-in-out;
@@ -21621,83 +21618,47 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 }
 .share-dialog-permissions, .share-dialog-icon.permissions-icon {
 	float: left;
-	line-height: 27px;
-	height: 32px;
 	margin-top: 8px;
-	min-width: 157px;
-	color: #666666;
-	border: 2px solid rgba(0,0,0,0.05);
-	-webkit-background-clip: padding-box;
-	background-clip: padding-box;
-	-moz-border-radius: 5px;
-	-webkit-border-radius: 5px;
-	border-radius: 5px;
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	box-sizing: padding-box;
-	background-color: white;
-	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
-	overflow: hidden;
 	max-width: 140px;
-	font-size: 14px;
-	padding: 0 20px 0 35px;
-	position: relative;
-	cursor: pointer;
-	-webkit-transition: border-color 200ms ease-in-out;
-	-moz-transition: border-color 200ms ease-in-out;
-	-o-transition: border-color 200ms ease-in-out;
-	-ms-transition: border-color 200ms ease-in-out;
-	transition: border-color 200ms ease-in-out;
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
-	background-repeat: no-repeat;
-	background-position: right -3714px;
+	padding-left: 43px;
 }
 .share-dialog-icon.permissions-icon {
 	margin: 12px 12px 12px 0;
-}
-.share-dialog-permissions:hover, .share-dialog-permissions.active, .share-dialog-icon.permissions-icon:hover, .share-dialog-icon.permissions-icon.active {
-	border: 2px solid rgba(0,0,0,0.3);
 }
 .share-dialog-permissions span, .share-dialog-icon.permissions-icon span {
 	width: 24px;
 	height: 24px;
 	position: absolute;
-	top: 2px;
-	left: 8px;
+	top: 3px;
+	left: 12px;
 	display: block;
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-repeat: no-repeat;
-	background-position: -87px -278px;
+	background-position: -87px -277px;
 	-webkit-transition: opacity 200ms ease-in-out;
 	-moz-transition: opacity 200ms ease-in-out;
 	-o-transition: opacity 200ms ease-in-out;
 	-ms-transition: opacity 200ms ease-in-out;
 	transition: opacity 200ms ease-in-out;
-filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
-	-moz-opacity: 0.3;
-	-khtml-opacity: 0.3;
-	opacity: 0.3;
-}
-.share-dialog-permissions.full-access span, .share-dialog-icon.permissions-icon.full-access span {
-	background-position: -87px -358px;
-}
-.share-dialog-permissions.read-and-write span, .share-dialog-icon.permissions-icon.read-and-write span {
-	background-position: -87px -396px;
-}
-.share-dialog-permissions:hover span, .share-dialog-permissions.active span, .share-dialog-icon.permissions-icon:hover span, .share-dialog-icon.permissions-icon.active span {
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
+filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 	-moz-opacity: 0.5;
 	-khtml-opacity: 0.5;
 	opacity: 0.5;
+}
+.share-dialog-permissions.full-access span, .share-dialog-icon.permissions-icon.full-access span {
+	background-position: -87px -357px;
+}
+.share-dialog-permissions.read-and-write span, .share-dialog-icon.permissions-icon.read-and-write span {
+	background-position: -87px -396px;
 }
 .share-dialog-remove-button {
 	width: 20px;
 	height: 20px;
 	float: right;
 	margin: 13px 7px 0 0;
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-repeat: no-repeat;
 	background-position: -91px -826px;
 	-webkit-transition: opacity 200ms ease-in-out;
@@ -21763,7 +21724,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	cursor: pointer;
 }
 .import-contacts-service.imported {
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-position: right -2163px;
 	background-repeat: no-repeat;
 }
@@ -21775,7 +21736,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	float: left;
 	margin: 12px 0 0 10px;
 	font-family: 'source_sans_prosemibold', Arial;
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-position: -11px -2074px;
 	background-repeat: no-repeat;
 }
@@ -21789,7 +21750,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	-webkit-border-radius: 100%;
 	border-radius: 100%;
 	background-color: rgba(0,0,0,0.2);
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-position: 1px -2137px;
 	background-repeat: no-repeat;
 	-webkit-transition: background-color 200ms ease-in-out;
@@ -21825,7 +21786,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	position: absolute;
 	bottom: -6px;
 	right: 12px;
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-position: -5px -2117px;
 	background-repeat: no-repeat;
 }
@@ -21835,7 +21796,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	top: 5px;
 	width: 20px;
 	height: 20px;
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-position: -2px -3178px;
 	background-repeat: no-repeat;
 	-webkit-transition: opacity 200ms ease-in-out;
@@ -21917,7 +21878,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 }
 .copy-dialog-empty-icon, .move-dialog-empty-icon {
 	height: 166px;
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-position: center -867px;
 	background-repeat: no-repeat;
 }
@@ -22966,7 +22927,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 	float: left;
 	width: 60px;
 	height: 60px;
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-repeat: no-repeat;
 	background-position: 0 -3927px;
 	margin-left: 20px;
@@ -22993,7 +22954,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 	padding: 0;
 }
 .feedback-label-txt div.checkboxOn, .feedback-label-txt .checkboxOff, .membership-arrow {
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-position: 0 -4112px;
 	background-size: auto;
 	margin: -2px 0 1px -42px;
@@ -23035,7 +22996,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 	font-size: 14px;
 	line-height: 18px;
 	font-family: 'source_sans_proregular', Arial;
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-repeat: no-repeat;
 	background-position: 2px -4011px;
 	margin: 0 0 0 12px;
@@ -23209,6 +23170,72 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 	font-weight: bold;
 }
 .credentials-warning-dialog .instruction .accept {
+	color: #31B500;
+	font-weight: bold;
+}
+/* Key signature mismatch warning dialog */
+.key-signature-warning-button {
+	left: 50%;
+	position: absolute;
+	top: 15px;
+}
+.key-signature-warning-dialog .fm-dialog-close {
+	visibility: hidden;
+}
+.key-signature-warning-dialog .fm-mega-dialog-pad {
+	margin: 12px 0;
+}
+.key-signature-warning-dialog .fm-mega-dialog-bottom {
+	margin: 12px 0 -12px;
+}
+.key-signature-warning-dialog {
+	background-color: #fff;
+	width: 600px;
+}
+.key-signature-warning-dialog .content {
+	color: #999999;
+	font-size: 13px;
+	line-height: 20px;
+	padding-bottom: 10px;
+}
+.key-signature-warning-dialog .avatarAndWarningMessage {
+	margin: 0 20px;
+	overflow: hidden;
+}
+.key-signature-warning-dialog .userAvatar {
+	float: left;
+}
+.key-signature-warning-dialog .information {
+	float: left;
+	margin-left: 20px;
+	width: 442px;
+}
+.key-signature-warning-dialog .information.noAvatar {
+	margin-left: 0;
+	width: auto;
+}
+.key-signature-warning-dialog .information .firstLine {
+	color: #d90007;
+	font-weight: bold;
+}
+.key-signature-warning-dialog .information .emailAddress {
+	color: #000;
+}
+.key-signature-warning-dialog .information .description {
+	color: #000000;
+}
+.key-signature-warning-dialog .userAvatar img {
+	height: 90px;
+	width: 90px;
+}
+.key-signature-warning-dialog .instruction {
+	padding: 3px 20px;
+}
+.key-signature-warning-dialog .instruction .reject {
+	color: #D90007;
+	font-weight: bold;
+}
+.key-signature-warning-dialog .instruction .accept {
 	color: #31B500;
 	font-weight: bold;
 }
@@ -24169,7 +24196,7 @@ body.pro:after {
 }
 .nw-fm-dialog-title span, .bandwidth-text-bl .star {
 	width: 15px;
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-position: -50px -1551px;
 	background-repeat: no-repeat;
 	display: inline-block;
@@ -24271,7 +24298,7 @@ body.pro:after {
 	padding-top: 9px;
 }
 .bandwidth-back-button {
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-position: -95px -1551px;
 	background-repeat: no-repeat;
 	font-size: 14px;
@@ -24728,8 +24755,8 @@ body.pro:after {
  background-size: 200px auto;
 }
 .top-change-language-icon {
-    background-image: url("../images/mega/lang-selection-sprite@2x.png");
-    background-size: 156px auto;
+ background-image: url("../images/mega/lang-selection-sprite@2x.png");
+ background-size: 156px auto;
 }
 .fm-dialog.cancel-subscription-st2 .blue-success-icon {
  background-image: url(../images/mega/bitcoin-v4@2x.png);
@@ -26141,13 +26168,10 @@ body, body * {
 	float: left !important;
 	margin-right: 4px !important;
 }
-
 .blog-new-full ul {
-    padding: 0px;
-    margin: 0px;
+	padding: 0px;
+	margin: 0px;
 }
-
 .blog-new-full ul li {
-    padding: 0 0 0px 15px;
+	padding: 0 0 0px 15px;
 }
-

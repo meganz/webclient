@@ -1,9 +1,9 @@
 /**
  * @fileOverview
- * User operations unit tests for account.
+ * Account operations unit tests.
  */
 
-describe("ccount unit test", function() {
+describe("account unit test", function() {
     "use strict";
 
     var assert = chai.assert;

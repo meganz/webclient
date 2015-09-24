@@ -335,7 +335,9 @@ function mObjectURL(data, type)
     return blob && URL.createObjectURL(blob);
 }
 
-var mBroadcaster = {
+Object.defineProperty(this, 'mBroadcaster', {
+    writable: false,
+    value: Object.freeze({
     _topics : {},
 
     addListener: function mBroadcaster_addListener(topic, options) {
@@ -573,14 +575,8 @@ var mBroadcaster = {
             delete localStorage[ev.key];
         }
     }
-};
-if (typeof Object.freeze === 'function') {
-    mBroadcaster = Object.freeze(mBroadcaster);
-}
-Object.defineProperty(this, 'mBroadcaster', {
-    value: mBroadcaster,
-    writable: false
-});
+})});
+
 
 var sh = [];
 

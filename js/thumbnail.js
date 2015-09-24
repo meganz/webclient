@@ -9,6 +9,7 @@ function createnodethumbnail(node, aes, id, imagedata, opt) {
 function createthumbnail(file, aes, id, imagedata, node, opt) {
 
     var onPreviewRetry, isRawImage, thumbHandler;
+
     if (typeof opt === 'object') {
         isRawImage = opt.raw;
         onPreviewRetry = opt.onPreviewRetry;
@@ -149,6 +150,18 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                     });
                 }
 
+                img.dataSize = u8.byteLength;
+                img.is64bit = browserdetails(ua).is64bit;
+
+                // Deal with huge images...
+                if (!img.is64bit && img.dataSize > (36 * 1024 * 1024)) {
+                    // Let dcraw try to extract a thumbnail
+                    if (typeof dcraw !== 'undefined') {
+                        isRawImage = isRawImage || 'not-really';
+                    }
+                    img.huge = true;
+                }
+
                 if (isRawImage) {
                     var FS = dcraw.FS,
                         run = dcraw.run,
@@ -257,12 +270,25 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                                 });
                                 mega.utils.neuterArrayBuffer(u8);
                                 ThumbFR.readAsArrayBuffer(file);
+                            }, function(ex) {
+                                if (d) {
+                                    console.error(String(ex), ex);
+                                }
+                                __render_thumb(img);
                             });
                         }
                         catch (e) {}
                     }
 
-                    file = file.blob();
+                    try {
+                        file = file.blob();
+                    }
+                    catch (ex) {
+                        if (d) {
+                            console.error(ex);
+                        }
+                        __render_thumb(img);
+                    }
                 }
             }
             else {
@@ -277,30 +303,40 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
 }
 
 function __render_thumb(img, u8, orientation, blob) {
-    if (undefined == orientation || orientation < 1 || orientation > 8) {
-        if (d) {
-            console.time('exif');
+    if (u8) {
+        if (orientation === undefined || orientation < 1 || orientation > 8) {
+            if (d) {
+                console.time('exif');
+            }
+            var exif = EXIF.getImageData(new BinaryFile(u8), true);
+            orientation = parseInt(exif.Orientation) || 1;
+            if (d) {
+                console.timeEnd('exif');
+                console.debug('EXIF', exif, orientation);
+            }
         }
-        var exif = EXIF.getImageData(new BinaryFile(u8), true);
-        orientation = +exif.Orientation || 1;
-        if (d) {
-            console.timeEnd('exif');
-            console.debug('EXIF', exif, orientation);
+        if (!blob) {
+            blob = new Blob([u8], {
+                type: 'image/jpg'
+            });
         }
+        mega.utils.neuterArrayBuffer(u8);
     }
-    if (!blob) {
-        blob = new Blob([u8], {
-            type: 'image/jpg'
+    if (!u8 || (img.huge && img.dataSize === blob.size)) {
+        if (d) {
+            console.warn('Unable to generate thumbnail...');
+        }
+        img.src = noThumbURI;
+    }
+    else {
+        var mpImg = new MegaPixImage(blob);
+        mpImg.render(img, {
+            maxWidth: 1000,
+            maxHeight: 1000,
+            quality: 0.96,
+            orientation: orientation
         });
     }
-    mega.utils.neuterArrayBuffer(u8);
-    var mpImg = new MegaPixImage(blob);
-    mpImg.render(img, {
-        maxWidth: 1000,
-        maxHeight: 1000,
-        quality: 0.96,
-        orientation: orientation
-    });
 }
 
 function ppmtojpeg(ppm) {
@@ -458,3 +494,6 @@ function benchmarkireq() {
     }
 
 }
+
+
+var noThumbURI = "";

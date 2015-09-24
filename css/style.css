@@ -5363,7 +5363,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 .files-grid-view th.grid-url-header, .files-grid-view th:nth-child(5), .contacts-grid-view th.grid-url-header, .grid-table-header th.grid-url-header, .transfer-table-header th:nth-child(7), .transfer-table-header th:nth-child(8), .files-grid-view.shared-view th:nth-child(4), .files-grid-view.shared-view th:nth-child(5), .shared-grid-view th:nth-child(4), .shared-grid-view th:nth-child(5), .files-grid-view.contacts-view th:nth-child(3), .files-grid-view.contacts-view th:nth-child(3), .contacts-grid-view th:nth-child(3), .contacts-grid-view th:nth-child(3), .contacts-grid-view th:nth-child(4), .sent-requests-grid th:first-child, .contact-requests-grid th:nth-child(2), .sent-requests-grid th:nth-child(2) {
 	background-image: none;
 }
-.grid-header-star {
+.arrow.desc.grid-header-star, .arrow.asc.grid-header-star, .grid-header-star {
 	height: 24px;
 	width: 30px;
 	display: block;

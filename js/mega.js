@@ -136,6 +136,24 @@ function MegaData()
         this.sort();
     };
 
+    this.sortByFav = function(d)
+    {
+        this.sortfn = function(a, b, d)
+        {
+            if (a.fav) {
+                return -1 * d;
+            }
+
+            if (b.fav) {
+                return d;
+            }
+
+            return 0;
+        }
+        this.sortd = d;
+        this.sort();
+    };
+
     this.sortBySize = function(d)
     {
         this.sortfn = function(a, b, d)
@@ -255,23 +273,37 @@ function MegaData()
         } else {
             $('.arrow.' + n).addClass('asc');
         }
-        if (n === 'name') {
+        switch (n) {
+        case 'name':
             M.sortByName(d);
-        } else if (n == 'size') {
+            break;
+        case 'size':
             M.sortBySize(d);
-        } else if (n == 'type') {
+            break;
+        case 'type':
             M.sortByType(d);
-        } else if (n == 'date') {
+            break;
+        case 'date':
             M.sortByDateTime(d);
-        } else if (n == 'owner') {
+            break;
+        case 'owner':
             M.sortByOwner(d);
-        } else if (n == 'access') {
+            break;
+        case 'access':
             M.sortByAccess(d);
-        } else if (n == 'interaction') {
+            break;
+        case 'interaction':
             M.sortByInteraction(d);
-        } else if (n == 'status') {
+            break;
+        case 'status':
             M.sortByStatus(d);
+            break;
+        case 'fav':
+            M.sortByFav(d);
+            break;
         }
+
+        M.sortingBy = [n, d];
 
         if (fmconfig.uisorting) {
             storefmconfig('sorting', {n: n, d: d});
@@ -3243,6 +3275,11 @@ function MegaData()
                     }
                 }
             }
+        }
+
+        if (M.sortingBy[0] === 'fav') {
+            M.doSort('fav', M.sortingBy[1]);
+            M.renderMain();
         }
     };
 

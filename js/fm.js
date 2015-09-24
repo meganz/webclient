@@ -4829,10 +4829,9 @@ function UIkeyevents() {
             return true;
         }
 
-        if (!is_fm()) {
+        if (!is_fm() && (page !== 'login')) {
             return true;
         }
-
         /**
          * Because of te .unbind, this can only be here... it would be better if its moved to iconUI(), but maybe some
          * other day :)
@@ -5006,7 +5005,11 @@ function UIkeyevents() {
                 $.warningCallback(false);
             }
         }
-        else if ((e.keyCode == 13 && $.msgDialog == 'confirmation') || (e.keyCode == 13 && $.msgDialog == 'remove')) {
+        else if (e.keyCode === 13
+                && ($.msgDialog === 'confirmation'
+                    || ($.msgDialog === 'warninga'
+                        && $('.login-register-input:visible').hasClass('incorrect'))
+                    || $.msgDialog === 'remove')) {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback(true);

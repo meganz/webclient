@@ -67,6 +67,10 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
             ctx = canvas.getContext("2d");
             canvas.width = options.width;
             canvas.height = options.height;
+            if (img.src === noThumbURI) {
+                ctx.fillStyle = '#fff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
             ctx.drawImage(this, crop.x, crop.y, crop.width, crop.height, 0, 0, canvas.width, canvas.height);
 
             dataURI = canvas.toDataURL('image/jpeg', 0.90);
@@ -496,4 +500,4 @@ function benchmarkireq() {
 }
 
 
-var noThumbURI = "";
+var noThumbURI = "data:image/svg+xml;charset-utf-8,%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22UTF-8%22%20standalone%3D%22no%22%3F%3E%3Csvg%20width%3D%22120px%22%20height%3D%22120px%22%20viewBox%3D%220%200%20120%20120%22%20version%3D%221.1%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%20xmlns%3Asketch%3D%22http%3A%2F%2Fwww.bohemiancoding.com%2Fsketch%2Fns%22%3E%3Cdefs%3E%3C%2Fdefs%3E%3Cg%20id%3D%22Page-1%22%20stroke%3D%22none%22%20stroke-width%3D%221%22%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%20sketch%3Atype%3D%22MSPage%22%3E%3Cg%20id%3D%22no-thumb%22%20sketch%3Atype%3D%22MSArtboardGroup%22%20fill%3D%22%23CCCBCB%22%3E%3Cpath%20d%3D%22M60%2C66%20C63.315%2C66%2066%2C63.315%2066%2C60%20C66%2C58.856%2065.674%2C57.791%2065.119%2C56.881%20L56.881%2C65.119%20C57.791%2C65.674%2058.856%2C66%2060%2C66%20Z%20M49.153%2C68.847%20C47.183%2C66.436%2046%2C63.357%2046%2C60%20C46%2C52.266%2052.267%2C46%2060%2C46%20C63.357%2C46%2066.436%2C47.183%2068.847%2C49.153%20L74.092%2C43.908%20C70.002%2C41.587%2065.325%2C40%2060%2C40%20C44%2C40%2033.817%2C54.285%2028%2C60%20C31.48%2C63.419%2036.524%2C69.902%2043.438%2C74.562%20L49.153%2C68.847%20Z%20M76.562%2C45.438%20L70.848%2C51.153%20C72.817%2C53.564%2074%2C56.643%2074%2C60%20C74%2C67.734%2067.733%2C74%2060%2C74%20C56.643%2C74%2053.564%2C72.817%2051.153%2C70.847%20L45.909%2C76.091%20C49.998%2C78.413%2054.675%2C80%2060%2C80%20C76.001%2C80%2086.183%2C65.715%2092%2C60%20C88.52%2C56.581%2083.477%2C50.098%2076.562%2C45.438%20Z%20M60%2C54%20C56.686%2C54%2054%2C56.685%2054%2C60%20C54%2C61.144%2054.326%2C62.209%2054.881%2C63.119%20L63.119%2C54.881%20C62.209%2C54.326%2061.144%2C54%2060%2C54%20Z%22%20id%3D%22Fill-1%22%20sketch%3Atype%3D%22MSShapeGroup%22%3E%3C%2Fpath%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E";

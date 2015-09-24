@@ -7065,7 +7065,7 @@ table {
 	line-height: 31px;
 }
 .fm-dialog-button span, .fm-account-button span, .avatar-dialog .fm-account-change-avatar span, .top-dialog-login-button span, .nw-chat-button span, .multiple-sharing.expanded .main-body .nw-chat-button span, .fm-chat-attach-button span, .fm-chat-contact-button span, .create-folder-button span, .add-user-popup-button span, .create-folder-button-cancel span, .fm-dialog-new-folder-button span, .rename-dialog-button span, .contact-request-button span {
-	padding: 0 10px;
+	padding: 0 15px;
 }
 .nw-chat-button, .multiple-sharing.expanded .main-body .nw-chat-button {
 	float: left;
@@ -7544,7 +7544,7 @@ table {
 .contacts-sorting-by.active:hover, .contacts-sorting-type.active:hover {
 	background-position: 0 -4912px;
 }
-.context-menu, .nw-sorting-menu, .dialog-sorting-menu, .permissions-menu {
+.context-menu, .nw-sorting-menu, .dialog-sorting-menu {
 	min-width: 160px;
 	position: absolute;
 	background-color: #333333;
@@ -7902,7 +7902,7 @@ color: white;
 	-ms-user-select: none !important;
 	user-select: none !important;
 }
-.fm-chat-message span, div.nw-chat-sharing-filename, div.nw-chat-sharing-filesize, .nw-chat-date-txt, .fm-chat-smile, .properties-file-link, .contact-fingerprint-txt, .contact-fingerprint-txt span, .fingerprint-txt, .contact-details-user-name, .contact-details-email, .nw-contact-name, .fm-breadcrumbs.contact .right-arrow-bg span, div.new-download-file-title, .dev-nw *, .fmholder .dev-nw div, .fmholder div.new-affiliate-bg1 *, .fmholder div.main-mid-pad.new-bottom-pages *, .collected-data li {
+.fm-chat-message span, div.nw-chat-sharing-filename, div.nw-chat-sharing-filesize, .nw-chat-date-txt, .fm-chat-smile, .properties-file-link, .contact-fingerprint-txt, .contact-fingerprint-txt span, .fingerprint-txt, .contact-details-user-name, .contact-details-email, .nw-contact-name, .fm-breadcrumbs.contact .right-arrow-bg span, div.new-download-file-title, .dev-nw *, .fmholder .dev-nw div, .fmholder div.new-affiliate-bg1 *, .fmholder div.main-mid-pad.new-bottom-pages *, .collected-data li, .export-item-title {
 	-webkit-touch-callout: text !important;
 	-webkit-user-select: text !important;
 	-khtml-user-select: text !important;
@@ -9846,8 +9846,8 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
 	position: relative;
 }
 .fm-dialog.export-links-dialog {
-	width: 634px;
-	margin: -96px 0 0 -317px;
+	width: 640px;
+	margin: -151px 0 0 -320px;
 	overflow: hidden;
 }
 .fm-dialog.browsers-dialog {
@@ -10556,7 +10556,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	background-image: url(../images/mega/nw-fm-sprite_v8.svg);
 	background-repeat: no-repeat;
 }
-.fm-share-dropdown, .account-history-dropdown-button, .share-dialog-permissions, .share-dialog-icon.permissions-icon {
+.fm-share-dropdown, .account-history-dropdown-button, .share-dialog-permissions, .share-dialog-icon.permissions-icon, .fm-dialogs-select {
 	float: right;
 	padding: 0 30px 0 10px;
 	color: gray;
@@ -10578,11 +10578,12 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
+	position: relative;
 }
 .fm-share-dropdown {
 	margin: 10px -20px 0 0;
 }
-.fm-share-permissions-block, .account-history-dropdown {
+.fm-share-permissions-block, .account-history-dropdown, .permissions-menu, .fm-dialogs-dropdown {
 	position: absolute;
 	top: 5px;
 	right: 10px;
@@ -10601,8 +10602,21 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	min-height: 50px;
 	z-index: 10;
 	padding: 5px 0;
+	-webkit-background-clip: padding-box;
+	background-clip: padding-box;
 }
-.fm-share-permissions-block::after, .account-history-dropdown::after {
+.permissions-menu, .fm-dialogs-dropdown {
+	background-image: none;
+	right: auto;
+	z-index: 100;
+	min-width: 170px;
+}
+.fm-dialogs-dropdown {
+	top: auto;
+	left: auto;
+	margin: -1px 0 0 -4px;
+}
+.fm-share-permissions-block::after, .account-history-dropdown::after, .permissions-menu::after, .fm-dialogs-dropdown::after {
 	content: '';
 	top: 0;
 	position: absolute;
@@ -10619,7 +10633,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	bottom: 7px;
 	background-position: right -9918px;
 }
-.fm-share-permissions, .account-history-drop-items {
+.fm-share-permissions, .account-history-drop-items, .permissions-menu-item, .fm-dialogs-dropdown-item {
 	height: 32px;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
@@ -10640,7 +10654,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	-ms-transition: background-color 200ms ease-in-out;
 	transition: background-color 200ms ease-in-out;
 }
-.fm-share-permissions:hover, .account-history-drop-items:hover {
+.permissions-menu-item, .fm-dialogs-dropdown-item {
+	padding-left: 43px;
+}
+.fm-share-permissions:hover, .account-history-drop-items:hover, .permissions-menu-item:hover, .fm-dialogs-dropdown-item:hover {
 	background-color: rgba(0,0,0,0.05);
 }
 .account-history-drop-items {
@@ -10781,11 +10798,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	padding: 7px 0 0 0;
 }
 .export-link-body {
-	padding: 0 0 7px 0 !important;
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	box-sizing: border-box;
-	max-height: 384px;
+	max-height: 318px;
 	overflow: hidden;
 }
 .export-link-body .jspPane {
@@ -10815,53 +10828,76 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	-khtml-user-select: none;
 	-moz-user-select: none;
 	-ms-user-select: none;
-	padding: 3px 0 0 0;
+}
+.export-link-item:nth-child(odd) {
+	background-color: rgba(0,0,0,0.02);
 }
 .export-icon {
 	height: 60px;
 	width: 60px;
 	float: left;
-	margin: 5px 12px;
+	margin: 24px 19px 0 19px;
 	background-repeat: no-repeat;
 	background-image: url(../images/mega/files-icons_v2.svg);
 	background-position: 0 0;
 }
 .export-link-text-pad {
 	display: table-cell;
-	height: 56px;
+	height: 106px;
 	vertical-align: middle;
 	width: 100%;
 }
 .export-link-txt {
-	font-size: 13px;
-	line-height: 19px;
-	color: #D90007;
-	white-space: nowrap;
-	-webkit-user-select: text;
-	-khtml-user-select: text;
-	-moz-user-select: text;
-	-ms-user-select: text;
-}
-.export-link-txt:first-child {
+	font-size: 14px;
+	line-height: 24px;
 	color: #666666;
-	font-size: 13px;
+	vertical-align: top;
+	padding-bottom: 5px;
 }
-.export-link-url {
-	border: 0 none;
-	color: #d90007;
+.file-link-info {
+	color: #333333;
 	font-size: 13px;
-	line-height: 19px;
-	width: 100%;
-	background-color: transparent;
-	overflow: hidden;
-	text-overflow: ellipsis;
+	line-height: 21px;
+	padding: 0 5px 0 0;
+	display: inline;
+	position: relative;
+	z-index: 10;
+}
+.file-link-block {
+	padding: 15px 0 5px 0;
+}
+.file-link-info[data-pseudo-content]::before {
+	content: attr(data-pseudo-content);
+	position: absolute;
+	display: block;
+	font-size: 12px;
+	line-height: 15px;
+	color: #999999;
+	left: 0;
+	top: -15px;
+}
+.key.file-link-info {
+	color: #D90007;
+}
+.export-item-title {
+	display: inline-block;
+	max-width: 450px;
 	white-space: nowrap;
+	-o-text-overflow: ellipsis;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	vertical-align: top;
 }
 .export-link-gray-txt {
 	color: #999999;
-	display: block;
-	font-size: 13px;
-	line-height: 16px;
+	display: inline-block;
+	font-size: 14px;
+	line-height: 24px;
+	border-left: 2px solid rgba(0,0,0,0.05);
+	padding: 0 0 0 10px;
+	margin: 0 0 0 10px;
+	height: 24px;
+	vertical-align: top;
 }
 .copy-keys-button {
 	display: block;
@@ -12184,7 +12220,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 .top-user-status-arrow {
 	margin-right: 83px;
 }
-.top-menu-item, .top-user-status-item, .context-menu-item, .sorting-menu-item, .permissions-menu-item {
+.top-menu-item, .top-user-status-item, .context-menu-item, .sorting-menu-item {
 	display: block;
 	height: 32px;
 	line-height: 31px;
@@ -12228,7 +12264,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 	background-image: url(../images/mega/nw-fm-sprite_v8.svg);
 	color: rgba(255,255,255,1);
 }
-.sorting-menu-arrow, .permissions-menu-arrow {
+.sorting-menu-arrow {
 	background-image: url(../images/mega/nw-fm-sprite_v8.svg);
 	background-repeat: no-repeat;
 	background-position: left -7998px;
@@ -12238,28 +12274,13 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 	left: -7px;
 	top: 10px;
 }
-.permissions-menu-arrow {
-	top: 14px;
-}
-.context-menu-item, .permissions-menu-item {
+.context-menu-item {
 	padding: 0 10px 0 42px;
 	color: rgba(204,204,204,1);
-}
-.permissions-menu-item {
-	font-size: 13px;
 }
 .context-menu-item:hover, .context-menu-item.active, .context-menu-item.opened {
 	background-color: rgba(153,153,153,1);
 	color: rgba(255,255,255,1);
-}
-.permissions-menu-item:hover {
-	background-color: rgba(255,255,255,0.1);
-}
-.permissions-menu-item.active {
-	color: rgba(255,255,255,1);
-	background-image: url(../images/mega/nw-fm-sprite_v8.svg);
-	background-repeat: no-repeat;
-	background-position: right -7963px;
 }
 .context-menu-item.download-item:hover, .context-menu-item.download-standart-item:hover, .context-menu-item.zipdownload-item:hover, .context-menu-item.download-item.opened {
 	background-color: rgba(220,0,0,1);
@@ -12298,7 +12319,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 .context-menu-item.opened {
 	background-color: rgba(49,181,0,1);
 }
-.context-menu-item:hover > .context-menu-icon, .context-menu-item.opened > .context-menu-icon, .permissions-menu-item.active .context-menu-icon {
+.context-menu-item:hover > .context-menu-icon, .context-menu-item.opened > .context-menu-icon {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
 	-moz-opacity: 1;
 	-khtml-opacity: 1;
@@ -13154,7 +13175,7 @@ table {
 	margin: 3px 10px 0 0;
 	background-image: none;
 }
-.account-history-dropdown::before {
+.account-history-dropdown::before, .permissions-menu::before {
 	content: '';
 	width: 14px;
 	position: absolute;
@@ -18689,7 +18710,7 @@ h1.help-home-header {
 .new-bottom-pages .blog-new-full p.strong-paragraph.new-blog-icon {
 	color: #737477;
 }
-.blog-new-full, .blog-new-full div, .blog-new-full p, .blog-new-full h1, .blog-new-full h2, .blog-new-full h3, div div.new-download-file-title, div div.nt-info-txt, div div.nt-main-date, .new-right-content-block div, .new-right-content-block p, .new-right-content-block h1, .new-right-content-block h2, .new-right-content-block h3, .new-right-content-block span, .fm-chat-messages-block div, .fm-chat-messages-block span, .fm-chat-messages-block a, div.new-bottom-pages div, div.new-bottom-pages h1, div.new-bottom-pages h2, div.new-bottom-pages h3, div.new-bottom-pages h4, div.new-bottom-pages h5, div.new-bottom-pages ul, div.new-bottom-pages span, div.new-bottom-pages p, div.new-bottom-pages a, .ff-right-block div, .ff-right-block p, .ff-right-block h1, .ff-right-block h2, .ff-right-block h3, .pro-gray-block div, .pro-gray-block p, .pro-gray-block h1, .pro-gray-block h2, .pro-gray-block h3, .sync-white-bl div, .sync-white-bl p, .sync-white-bl h1, .sync-white-bl h2, .sync-white-bl h3, .sync-top-txt, .sync-top-txt-block div, .sync-top-txt-block p, .sync-top-txt-block h1, .sync-top-txt-block h2, .blog-new-full td {
+.blog-new-full, .blog-new-full div, .blog-new-full p, .blog-new-full h1, .blog-new-full h2, .blog-new-full h3, div div.new-download-file-title, div div.nt-info-txt, div div.nt-main-date, .new-right-content-block div, .new-right-content-block p, .new-right-content-block h1, .new-right-content-block h2, .new-right-content-block h3, .new-right-content-block span, .fm-chat-messages-block div, .fm-chat-messages-block span, .fm-chat-messages-block a, div.new-bottom-pages div, div.new-bottom-pages h1, div.new-bottom-pages h2, div.new-bottom-pages h3, div.new-bottom-pages h4, div.new-bottom-pages h5, div.new-bottom-pages ul, div.new-bottom-pages span, div.new-bottom-pages p, div.new-bottom-pages a, .ff-right-block div, .ff-right-block p, .ff-right-block h1, .ff-right-block h2, .ff-right-block h3, .pro-gray-block div, .pro-gray-block p, .pro-gray-block h1, .pro-gray-block h2, .pro-gray-block h3, .sync-white-bl div, .sync-white-bl p, .sync-white-bl h1, .sync-white-bl h2, .sync-white-bl h3, .sync-top-txt, .sync-top-txt-block div, .sync-top-txt-block p, .sync-top-txt-block h1, .sync-top-txt-block h2, .blog-new-full td, .file-link-info {
 	-webkit-touch-callout: text;
 	-webkit-user-select: text;
 	-khtml-user-select: text;
@@ -21616,18 +21637,28 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	text-overflow: ellipsis;
 	overflow: hidden;
 }
-.share-dialog-permissions, .share-dialog-icon.permissions-icon {
+.share-dialog-permissions, .share-dialog-icon.permissions-icon, .fm-dialogs-select {
 	float: left;
 	margin-top: 8px;
 	overflow: hidden;
 	text-overflow: ellipsis;
-	max-width: 140px;
+	min-width: 162px;
 	padding-left: 43px;
+}
+.fm-links-dropdown {
+	padding: 15px 24px 24px 24px;
+	float: left;
+}
+.fm-link-select-label {
+	font-size: 13px;
+	line-height: 17px;
+	color: #666666;
+	padding: 0 0 0 0;
 }
 .share-dialog-icon.permissions-icon {
 	margin: 12px 12px 12px 0;
 }
-.share-dialog-permissions span, .share-dialog-icon.permissions-icon span {
+.share-dialog-permissions span, .share-dialog-icon.permissions-icon span, .permissions-menu span, .fm-dialogs-select span, .fm-dialogs-dropdown span {
 	width: 24px;
 	height: 24px;
 	position: absolute;
@@ -21647,10 +21678,23 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 	-khtml-opacity: 0.5;
 	opacity: 0.5;
 }
-.share-dialog-permissions.full-access span, .share-dialog-icon.permissions-icon.full-access span {
+.fm-dialogs-select span, .fm-dialogs-dropdown span {
+	background-position: -37px -4417px;
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+	-moz-opacity: 1;
+	-khtml-opacity: 1;
+	opacity: 1;
+}
+.fm-dialogs-select.public-handle span, .fm-dialogs-dropdown .public-handle span {
+	background-position: -37px -4352px;
+}
+.fm-dialogs-select.decription-key span, .fm-dialogs-dropdown .decription-key span {
+	background-position: -37px -4383px;
+}
+.share-dialog-permissions.full-access span, .share-dialog-icon.permissions-icon.full-access span, .permissions-menu .full-access span {
 	background-position: -87px -357px;
 }
-.share-dialog-permissions.read-and-write span, .share-dialog-icon.permissions-icon.read-and-write span {
+.share-dialog-permissions.read-and-write span, .share-dialog-icon.permissions-icon.read-and-write span, .permissions-menu .read-and-write span {
 	background-position: -87px -396px;
 }
 .share-dialog-remove-button {

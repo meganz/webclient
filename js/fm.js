@@ -7541,8 +7541,8 @@ function initShareDialog() {
             $('.share-dialog-permissions').removeClass('active');
             $('.permissions-icon').removeClass('active');
             closeImportContactNotification('.share-dialog');
-            var x = $this.position().left + 50;
-            var y = $this.position().top + 14 + scrollPos;
+            var x = $this.position().left + 10;
+            var y = $this.position().top + 13 + scrollPos;
             handlePermissionMenu($this, $m, x, y);
         }
 
@@ -7564,8 +7564,8 @@ function initShareDialog() {
             $('.permissions-icon').removeClass('active');
             $m.addClass('search-permissions');
             closeImportContactNotification('.share-dialog');
-            var x = $this.position().left;
-            var y = $this.position().top + 8;
+            var x = $this.position().left - 4;
+            var y = $this.position().top - 35;
             handlePermissionMenu($this, $m, x, y);
         }
 
@@ -8440,7 +8440,7 @@ function getclipboardkeys() {
  */
 function itemExportLinkHtml(item) {
 
-    var fileUrlWithoutKey, fileUrlWithKey, fileUrl, key, type, fileSize,
+    var fileUrlWithoutKey, fileUrlKey, fileUrl, key, type, fileSize,
         html = '';
 
     // Shared item type is folder
@@ -8458,26 +8458,18 @@ function itemExportLinkHtml(item) {
     }
 
     fileUrlWithoutKey = getBaseUrl() + '/#' + type + '!' + htmlentities(item.ph);
-    fileUrlWithKey = fileUrlWithoutKey + (key ? '!' + a32_to_base64(key) : '');
-
-    if (window.getLinkState !== false) {
-        fileUrl = fileUrlWithKey;
-    }
-    else {
-        fileUrl = fileUrlWithoutKey;
-    }
+    fileUrlKey = key ? '!' + a32_to_base64(key) : '';
 
     html = '<div class="export-link-item">'
          +      '<div class="export-icon ' + fileIcon(item) + '" ></div>'
          +      '<div class="export-link-text-pad">'
          +          '<div class="export-link-txt">'
-         +               htmlentities(item.name) + ' <span class="export-link-gray-txt">' + fileSize + '</span>'
+         +               '<span class="export-item-title">' + htmlentities(item.name) + '</span><span class="export-link-gray-txt">' + fileSize + '</span>'
          +          '</div>'
-         +          '<div>'
-         +              '<input class="export-link-url" type="text" readonly="readonly" value="' + fileUrl + '">'
+         +          '<div class="file-link-block">'
+         +              '<span class="file-link-info url" data-pseudo-content="public handle:">' + fileUrlWithoutKey + '</span>'
+         +          	'<span class="file-link-info key" data-pseudo-content="decryption key:">' + fileUrlKey + '</span>'
          +          '</div>'
-         +          '<span class="file-link-without-key hidden">' + fileUrlWithoutKey + '</span>'
-         +          '<span class="file-link-with-key hidden">' + fileUrlWithKey + '</span>'
          +      '</div>'
          +  '</div>';
 

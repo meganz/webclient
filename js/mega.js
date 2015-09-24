@@ -388,14 +388,14 @@ function MegaData()
         });
     }
 
-    this.contactstatus = function(h)
+    this.contactstatus = function(h, wantTimeStamp)
     {
         var folders = 0;
         var files = 0;
         var ts = 0;
         if (M.d[h])
         {
-            if(!M.d[h].ts) {
+            if (!wantTimeStamp || !M.d[h].ts) {
                 var a = fm_getnodes(h);
                 for (var i in a) {
                     if (!a.hasOwnProperty(i)) {
@@ -414,7 +414,9 @@ function MegaData()
                         }
                     }
                 }
-                M.d[h].ts = ts;
+                if (!M.d[h].ts) {
+                    M.d[h].ts = ts;
+                }
             } else {
                 ts = M.d[h].ts;
             }
@@ -886,11 +888,11 @@ function MegaData()
                 star = M.v[i].fav ? ' star' : '';
 
                 if (M.currentdirid === 'shares') {// render shares tab
-                    cs = M.contactstatus(M.v[i].h),
-                    contains = fm_contains(cs.files, cs.folders),
-                    u_h = M.v[i].p,
-                    rights = l[55],
-                    rightsclass = ' read-only',
+                    cs = M.contactstatus(M.v[i].h);
+                    contains = fm_contains(cs.files, cs.folders);
+                    u_h = M.v[i].p;
+                    rights = l[55];
+                    rightsclass = ' read-only';
                     onlinestatus = M.onlineStatusClass(
                         chatIsReady &&
                         megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h))
@@ -1558,10 +1560,10 @@ function MegaData()
             window.location.hash = '#fm/' + M.currentdirid;
         }
         searchPath();
-        
+
         var sortMenu = new mega.SortMenu();
         sortMenu.treeSearchUI;
-        
+
         $(document).trigger('MegaOpenFolder');
     };
 
@@ -1581,14 +1583,14 @@ function MegaData()
 
         treePanelSortElements('contacts', contacts, {
             'last-interaction': function(a, b) {
-                var cs = M.contactstatus(a.u);
+                var cs = M.contactstatus(a.u, true);
                 if (cs.ts === 0) {
                     cs.ts = -1;
                 }
                 M.i_cache[a.u] = cs.ts;
 
 
-                cs = M.contactstatus(b.u);
+                cs = M.contactstatus(b.u, true);
                 if (cs.ts === 0) {
                     cs.ts = -1;
                 }
@@ -1763,7 +1765,7 @@ function MegaData()
 
     /**
      * buildtree
-     * 
+     *
      * Re-creates tree DOM elements in given order i.e. { ascending, descending }
      * for given parameters i.e. { name, [last interaction, status] },
      * Sorting for status and last interaction are available only for contacts.
@@ -1772,7 +1774,7 @@ function MegaData()
      * @param {type} stype, what to sort.
      */
     this.buildtree = function(n, dialog, stype) {
-        
+
         var folders = [],
             _ts_l = treesearch && treesearch.toLowerCase(),
             _li = 'treeli_',
@@ -1782,7 +1784,7 @@ function MegaData()
             sharedfolder, openedc, arrowIcon,
             ulc, expandedc, buildnode, containsc, cns, html, sExportLink, sLinkIcon,
             prefix;
-        
+
         var nodes = new mega.Nodes({});
 
         if (!n) {
@@ -1855,9 +1857,9 @@ function MegaData()
                 prefix = 'Move' + stype;
             }
         }
-        
+
         if (this.c[n.h]) {
-            
+
             folders = [];
 
             for (var i in this.c[n.h]) {
@@ -1884,13 +1886,13 @@ function MegaData()
 
             for (var ii in folders) {
                 if (folders.hasOwnProperty(ii)) {
-                    
+
                     ulc = '';
                     expandedc = '';
                     buildnode = false;
                     containsc = '';
                     cns = M.c[folders[ii].h];
-                    
+
                     if (cns) {
                         for (var cn in cns) {
                             /* jshint -W073 */
@@ -1911,7 +1913,7 @@ function MegaData()
                         fmtreenode(folders[ii].h, false);
                     }
                     sharedfolder = '';
-                    
+
                     // Check is there a full and pending share available, exclude link shares i.e. 'EXP'
                     if (nodes.isShareExist([folders[ii].h], true, true, false)) {
                         sharedfolder = ' shared-folder';
@@ -1975,7 +1977,7 @@ function MegaData()
                     }
 
                     var nodeHandle = folders[ii].h;
-                    
+
                     if ((M.d[nodeHandle] && M.d[nodeHandle].shares) || M.ps[nodeHandle]) {
                         sharedUInode(nodeHandle);
                     }
@@ -4844,7 +4846,7 @@ function execsc(actionPackets, callback) {
                     // Fill DDL with removed contact
                     if (actionPacket.u && M.u[actionPacket.u] && M.u[actionPacket.u].m) {
                         var email = M.u[actionPacket.u].m;
-                        
+
                         addToMultiInputDropDownList('.share-multiple-input', [{ id: email, name: email }]);
                         addToMultiInputDropDownList('.add-contact-multiple-input', [{ id: email, name: email}]);
                     }
@@ -5613,7 +5615,7 @@ function getuid(email) {
  * @returns {String|false} Returns either the user handle or false if it doesn't exist
  */
 function getUserHandleFromEmail(emailAddress) {
-    
+
     // Search known users for matching email address then get the handle of that contact
     for (var userHandle in M.u) {
         if (
@@ -5623,17 +5625,17 @@ function getUserHandleFromEmail(emailAddress) {
             && (M.u[userHandle].c !== 0)
             && (M.u[userHandle].m === emailAddress)
             ) {
-            
+
             return userHandle;
         }
     };
-    
+
     return false;
 }
-        
+
 /**
  * doShare
- * 
+ *
  * Recreate target/users list and call appropriate api_setshare function.
  * @param {String} nodeId Selected node id
  * @param {Array} targets List of JSON_Object containing user email and access permission
@@ -5642,7 +5644,7 @@ function getUserHandleFromEmail(emailAddress) {
  * @returns {doShare.$promise|MegaPromise}
  */
 function doShare(nodeId, targets, dontShowShareDialog) {
-    
+
     var promise = new MegaPromise(),
         logger = MegaLogger.getLogger('doShare'),
         childNodesId = [],// Holds complete directory tree starting from nodeId
@@ -5701,8 +5703,8 @@ function doShare(nodeId, targets, dontShowShareDialog) {
             promise.reject(result);
         }
     };
-    
-    // Get complete children directory structure for root node with id === nodeId 
+
+    // Get complete children directory structure for root node with id === nodeId
     childNodesId = fm_getnodes(nodeId);
     childNodesId.push(nodeId);
 
@@ -5720,7 +5722,7 @@ function doShare(nodeId, targets, dontShowShareDialog) {
             }
         }
     }
-    
+
     // Process users with handle === known ones
     if (usersWithHandle.length) {
         api_setshare(nodeId, usersWithHandle, childNodesId, {
@@ -5729,7 +5731,7 @@ function doShare(nodeId, targets, dontShowShareDialog) {
             done: this._done
         });
     }
-    
+
     // Process targets (users) without handle === unknown ones
     if (usersWithoutHandle.length) {
         api_setshare1({

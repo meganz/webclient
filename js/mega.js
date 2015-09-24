@@ -4359,9 +4359,10 @@ function MegaData()
             $('#mobileupload_header').text(l[1418]);
         }
         $('.transfer-table #ul_' + id).addClass('completed');
-        $('.transfer-table #ul_' + id + ' td:eq(5)').html('<span class="transfer-status completed">' + l[1418] + '</span>');
+        $('.transfer-table #ul_' + id + ' td:eq(5)')
+            .safeHTML('<span class="transfer-status completed">@@</span>', ul.skipfile ? l[1668] : l[1418]);
         $('.transfer-table #ul_' + id + ' td:eq(2)').text('');
-        $('.transfer-table #ul_' + id + ' td:eq(0) span.transfer-type').addClass('done').html(l[1501]);
+        $('.transfer-table #ul_' + id + ' td:eq(0) span.transfer-type').addClass('done').text(l[1501]);
         ul_queue[ul.pos] = Object.freeze({});
         var a=ul_queue.filter(isQueueActive).length;
         if (a < 2 && !ulmanager.isUploading)

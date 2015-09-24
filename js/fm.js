@@ -6630,7 +6630,7 @@ function renameDialog() {
         $('.rename-dialog').addClass('active');
         fm_showoverlay();
 
-        $('.rename-dialog .fm-dialog-close').rebind('click', function() {
+        $('.rename-dialog .fm-dialog-close, .rename-dialog-button.cancel').rebind('click', function() {
             $.dialog = false;
             $('.rename-dialog').addClass('hidden');
             fm_hideoverlay();
@@ -6640,11 +6640,6 @@ function renameDialog() {
             var c = $('.rename-dialog').attr('class');
             if (c && c.indexOf('active') > -1)
                 dorename();
-        });
-
-        $('.rename-dialog-button.cancel').rebind('click', function() {
-            $('.rename-dialog').addClass('hidden');
-            fm_hideoverlay();
         });
 
         var n = M.d[$.selected[0]];

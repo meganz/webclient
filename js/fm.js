@@ -5006,7 +5006,7 @@ function UIkeyevents() {
                 $.warningCallback(false);
             }
         }
-        else if ((e.keyCode == 13 && $.msgDialog == 'confirmation') && (e.keyCode == 13 && $.msgDialog == 'remove')) {
+        else if ((e.keyCode == 13 && $.msgDialog == 'confirmation') || (e.keyCode == 13 && $.msgDialog == 'remove')) {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback(true);

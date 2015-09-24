@@ -3328,7 +3328,7 @@ function mCleanestLogout(aUserHandle) {
 // Initialize Rubbish-Bin Cleaning Scheduler
 mBroadcaster.addListener('crossTab:master', function _setup() {
     var RUBSCHED_WAITPROC = 120 * 1000;
-    var RUBSCHED_IDLETIME =  25 * 1000;
+    var RUBSCHED_IDLETIME =   4 * 1000;
     var timer, updId;
 
     mBroadcaster.once('crossTab:leave', _exit);

@@ -224,27 +224,68 @@ a, a:link, a:visited, a:hover, a:active, a:focus img, a:focus img {
 	float: left
 }
 .nlanguage-lnk, a.nlanguage-lnk, a.nlanguage-lnk:link, a.nlanguage-lnk:visited, a.nlanguage-lnk:hover, a.nlanguage-lnk:active {
-	display: block;
-	height: 28px;
-	-moz-box-sizing: border-box;
-	-webkit-box-sizing: border-box;
-	box-sizing: border-box;
-	font-size: 14px;
-	line-height: 23px;
-	color: #605F5D;
-	padding: 0 10px 0 10px;
-	position: relative;
-	-moz-border-radius: 4px;
-	-webkit-border-radius: 4px;
-	border-radius: 4px;
-	float: left;
-	border: 2px solid transparent;
-	margin: 2px 0;
+    border: 2px solid transparent;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    color: #605f5d;
+    display: block;
+    font-size: 14px;
+    line-height: 23px;
+    margin: 2px 0;
+    padding: 0 10px;
+    position: relative;
 }
 a.nlanguage-lnk:hover {
 	border: 2px solid #D31A00;
 	color: #D31A00;
 }
+a.nlanguage-lnk.language-template {
+    display: none;
+}
+.languages-dialog .tier-one-languages,
+.languages-dialog .tier-two-languages {
+    -webkit-column-count: 3;
+	-moz-column-count: 3;
+	column-count: 3;
+	-webkit-column-width: 100px;
+	-moz-column-width: 100px;
+	column-width: 100px;
+}
+.languages-dialog .tier-two-languages {
+    display: none;
+}
+.languages-dialog .show-more-languages {
+    display: table;
+    margin-top: 30px;
+    width: 100%;
+}
+.languages-dialog .show-more-languages .show-more-text {
+    cursor: pointer;
+    display: table-cell;
+    font-size: 15px;
+    padding-left: 12px;
+    white-space: nowrap;
+}
+.languages-dialog .show-more-languages .bar {
+    display: table-cell;
+    padding-left: 15px;
+    width: 100%;
+}
+.languages-dialog .show-more-languages .bar div {
+    border-bottom: 1px solid #777;
+    margin-bottom: 3px;
+}
+.languages-dialog .fm-notifications-bottom {
+    bottom: 0;
+    left: 0;
+    position: absolute;
+    right: 0;
+}
+
 .nlanguage-lnk.selected, a.nlanguage-lnk.selected, a.nlanguage-lnk.selected:link, a.nlanguage-lnk.selected:visited, a.nlanguage-lnk.selected:hover, a.nlanguage-lnk.selected:active {
 	color: white;
 	background: #D31A00;

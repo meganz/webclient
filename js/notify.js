@@ -357,7 +357,7 @@ var notify = {
             $notificationHtml = notify.updateTemplate($notificationHtml, notification);
             
             // Build the html
-            allNotificationsHtml += notify.getOuterHtml($notificationHtml);
+            allNotificationsHtml += $notificationHtml.prop('outerHTML');
         }
         
         // Update the list of notifications
@@ -443,16 +443,6 @@ var notify = {
             // Mark all notifications as seen (because they clicked on a notification within the popup)
             notify.markAllNotificationsAsSeen();
         });
-    },
-    
-    /**
-     * Gets the outer HTML of an element
-     * @param {Object} $element The jQuery element $('<div class="notification-item">...</div>')
-     * @returns {String} Returns just the outer HTML '<div class="notification-item">...</div>'
-     */
-    getOuterHtml: function($element)
-    {
-        return $element.clone().wrap('<div>').parent().html();
     },
     
     /**

@@ -1789,18 +1789,30 @@ function api_reqfailed(c, e) {
 
     // If suspended account
     else if (e === EBLOCKED) {
+        var queue = apixs[c];
+        queue.rawreq = false;
+        queue.cmds = [[], []];
+        queue.ctxs = [[], []];
+        queue.setimmediate = false;
+        console.error("hear", queue);
+        api_req({a: 'whyamiblocked'}, { callback: function whyAmIBlocked(reason) {
+            u_logout(true);
 
-        // On clicking OK, log the user out and redirect to contact page
-        msgDialog('warninga', 'Suspended account',
-            'You have been suspended due to excess data usage.\n\
-            Please contact support@mega.nz to get your account reinstated.',
-            false,
-            function() {
-                var redirectUrl = window.location.origin + window.location.pathname + '#contact';
-                u_logout(true);
-                window.location.replace(redirectUrl);
-            }
-        );
+            var text = reason === 100 ? 'You have been suspended due to excess data usage.\n Please contact support@mega.nz to get your account reinstated.'
+                : 'You have been suspended due to repeated copyright infringement.';
+
+
+            // On clicking OK, log the user out and redirect to contact page
+            loadingDialog.hide();
+            msgDialog('warninga', 'Suspended account',
+                text,
+                false,
+                function() {
+                    var redirectUrl = window.location.origin + window.location.pathname + '#contact';
+                    window.location.replace(redirectUrl);
+                }
+            );
+        }});
     }
 }
 

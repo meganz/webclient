@@ -223,9 +223,10 @@ var JinglePlugin = {
                 throw new Error("No ans.ownFprMacKey present, there is a bug");
 
             if (!self.verifyMac(self.getFingerprintsFromJingle(j), ans.ownFprMacKey, j.attr('fprmac'))) {
+                self.rtcSession.logMsg("w", "Fingerprint verification failed. Possible forge attempt, dropping call!");
                 console.warn("Fingerprint verification failed. Possible forge attempt, dropping call!");
                 try {
-                  self.sendTerminateNoSession(sid, peerjid, "security", "Fingerprint verification failed");
+                    self.sendTerminateNoSession(sid, peerjid, "security", "Fingerprint verification failed");
                 } catch(e) {
                     console.error(e);
                 }
@@ -235,9 +236,10 @@ var JinglePlugin = {
                     peerjid: peerjid,
                     isInitiator: false,
                     sid: sid,
-                    peerAnonId: ans.peerAnonId
+                    peerAnonId: ans.peerAnonId,
+                    localStream: ans.options.localStream
                   }, "security", "Fingerprint verification failed");
-                } catch(e){
+                } catch(e) {
                     self.onInternalError("Error calling onCallTerminated handler", {e:e});
                 }
                 return true;
@@ -302,6 +304,7 @@ var JinglePlugin = {
             var j = $(iq).find('>jingle');
             if (!self.verifyMac(self.getFingerprintsFromJingle(j), sess.ownFprMacKey, j.attr('fprmac'))) {
                 console.warn("Fingerprint verification failed. Possible forge attempt, dropping call!");
+                self.rtcSession.logMsg("w", "Fingerprint verification failed. Possible forge attempt, dropping call!");
                 self.terminate(sess, 'security', "Fingerprint verification failed");
                 return true;
             }

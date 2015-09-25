@@ -109,7 +109,7 @@ function RtcSession(stropheConn, options) {
         };
         self.scrambleJid = function(jid) {
             //dummy scrambling uses our bare jid as a key
-            return MD5.hexdigest(Strophe.getBareJidFromJid(jid));
+            return "_fake"+MD5.hexdigest(Strophe.getBareJidFromJid(jid));
         }
     } else {
         var cr = options.crypto;
@@ -260,37 +260,42 @@ RtcSession.prototype = {
     {
         var sessStream = RTC.cloneMediaStream(self.gLocalStream, {audio:true, video:true});
         self._refLocalStream(options.video);
-        successCallback.call(self, sessStream);
+        try {
+            successCallback.call(self, sessStream);
+        } catch(e) {
+            self.onInternalError("_myGetUserMedia: exception in successCb()", {e:e});
+        }
         return;
     }
 //self.gLocalStream is null
-    if (self.gLocalStreamRefcount !== 0) {
-        console.error("_myGetUserMedia: gLocalStream is null, but gLocalStreamRefcount is", this.gLocalStreamRefcount,"(!= 0)");
-        self.gLocalStreamRefcount = 0;
-    }
-
-    if (self.gLocalVid !== null) {
-        console.error("_myGetUserMedia: gLocalStream is null, but gLocalVid is != null");
-        self.gLocalVid = null;
-    }
-
-    if (self.gLocalVidRefcount !== 0) {
-        console.error("_myGetUserMedia: gLocalStream is null, but gLocalVidRefcount is",self.gLocalVidRefcount,"(!= 0)");
-        self.gLocalVidRefcount = 0;
-    }
 
     RTC.getUserMediaWithConstraintsAndCallback({audio: true, video: true}, self,
       function(stream) {
-          self.softAssert(stream, "getUserMedia returned null stream");
-          self.gLocalStream = stream;
-          self.softAssert(self.gLocalStreamRefcount === 0, "gLocalStreamRefcount not 0 when obtaining user media");
-          self.softAssert(self.gLocalVidRefcount === 0, "gLocalVidRefcount not 0 when obtaining user media");
+          try {
+              self.softAssert(stream, "getUserMedia returned null stream");
+              self.gLocalStream = stream;
+              if (self.gLocalStreamRefcount !== 0) {
+                  self.softAssert(false, "_myGetUserMedia: gLocalStream was null, but gLocalStreamRefcount is", this.gLocalStreamRefcount,"(!= 0)");
+                  self.gLocalStreamRefcount = 0;
+              }
 
-          var sessStream = RTC.cloneMediaStream(self.gLocalStream,
-                                                {audio:true, video:true});
-          self._onMediaReady(self.gLocalStream);
-          self._refLocalStream(options.video); //we must call this after onMediaReady because it will enable the local video display, and that is created in onMediaReady
-          successCallback.call(self, sessStream);
+              if (self.gLocalVid !== null) {
+                  self.softAssert(false, "_myGetUserMedia: gLocalStream was null, but gLocalVid is != null");
+                  self.gLocalVid = null;
+              }
+
+              if (self.gLocalVidRefcount !== 0) {
+                  self.softAssert(false, "_myGetUserMedia: gLocalStream was null, but gLocalVidRefcount is",self.gLocalVidRefcount,"(!= 0)");
+                  self.gLocalVidRefcount = 0;
+              }
+
+              var sessStream = RTC.cloneMediaStream(self.gLocalStream, {audio:true, video:true});
+              self._onMediaReady(self.gLocalStream);
+              self._refLocalStream(options.video); //we must call this after onMediaReady because it will enable the local video display, and that is created in onMediaReady
+              successCallback.call(self, sessStream);
+          } catch(e) {
+              self.onInternalError("_myGetUserMedia: Exception in stream obtained callback", {e:e});
+          }
       },
       function(error, e) {
         var msg;
@@ -332,7 +337,7 @@ RtcSession.prototype = {
                     self.gLocalStream = null;
                     self.gLocalStreamRefcount = 0;
                     self.gLocalVidRefcount = 0;
-                    self.softAssert(self.gLocalVid, "Could not get local stream, but local video element is not null");
+                    self.softAssert(!self.gLocalVid, "Could not get local stream, but local video element is not null");
                     successCallback.call(self, null);
                 }
             }
@@ -417,9 +422,9 @@ RtcSession.prototype = {
   var callRequest = null;
   var isBroadcast = (!Strophe.getResourceFromJid(targetJid));
   var ownFprMacKey = self.jingle.generateMacKey();
-  var bin = new Uint32Array(10);
+  var bin = new Uint8Array(40);
   window.crypto.getRandomValues(bin);
-  var sid = self.ownAnonId+':'+btoa(bin).substr(0, 16);
+  var sid = self.ownAnonId+':'+btoa(String.fromCharCode.apply(null, bin)).substr(0, 16); //Forefox' btoa(bin) seems to always return the same string
   var fileArr;
   var initiateCallback = function(sessStream) {
       var actualAv = getStreamAv(sessStream);
@@ -647,6 +652,7 @@ RtcSession.prototype = {
               type: 'megaCallCancel'
       }));
       self.onCallTerminated(callRequest.fakeSession, reason, text, errInfo, eventName);
+      return true;
   }
 
   callRequest = self.jingle.callRequests[sid] = {
@@ -942,7 +948,7 @@ hangupAll: function(reason, text)
         @property {string} peer The full jid of the peer
         @property {SessWrapper} sess
     */
-    this.trigger('remote-player-remove', {id: '#remotevideo_'+sess.sid, peer: sess.peerjid, sess:new SessWrapper(sess)});
+    this.trigger('remote-player-remove', {id: '#'+this.vidIdFromSid(sess.sid), peer: sess.peerjid, sess:new SessWrapper(sess)});
  },
 
  onMediaRecv: function(playerElem, sess, stream) {
@@ -1116,7 +1122,7 @@ hangupAll: function(reason, text)
  },
 //onRemoteStreamAdded -> waitForRemoteMedia (waits till time>0) -> onMediaRecv() -> addVideo()
  onRemoteStreamAdded: function(sess, event) {
-    if ($(document).find('#remotevideo_'+sess.sid).length !== 0) {
+    if ($(document).find('#'+this.vidIdFromSid(sess.sid)).length !== 0) {
         console.warn('Ignoring duplicate onRemoteStreamAdded for session', sess.sid); // FF 20
         return;
     }
@@ -1138,7 +1144,7 @@ hangupAll: function(reason, text)
     this._attachRemoteStreamHandlers(event.stream);
     // after remote stream has been added, wait for ice to become connected
     // old code for compat with FF22 beta
-    var elem = $("<video autoplay='autoplay' class='"+elemClass+"' id='remotevideo_" + sess.sid+"' />");
+    var elem = $("<video autoplay='autoplay' class='"+elemClass+"' id='" + this.vidIdFromSid(sess.sid)+"' />");
     RTC.attachMediaStream(elem, event.stream);
     this.waitForRemoteMedia(elem, sess); //also attaches media stream once time > 0
 
@@ -1268,6 +1274,7 @@ hangupAll: function(reason, text)
     this.trigger('local-stream-connect', {player: this.gLocalVid});
  },
  _unrefLocalStream: function(video, sid) {
+    var self = this;
      if (!this.gLocalStream) {
          console.warn('_unrefLocalStream: gLocalStream is null. This is normal if access to camera was denined. refcount= ',
              this.gLocalStreamRefcount, 'vidRefCount=', this.gLocalVidRefcount);
@@ -1276,17 +1283,21 @@ hangupAll: function(reason, text)
          return;
      }
 
-     this.softAssert(this.gLocalStreamRefcount > 0, "unrefLocalStream: gLocalStream is non-null, but gLocalStreamRefcount is already <= 0");
-     this.softAssert(!video || (this.gLocalVidRefcount > 0), "unrefLocalStream: unreferencing video, but its refcount is already <= 0");
-
 //localStream is not null
+     this.softAssert(this.gLocalStreamRefcount > 0, "unrefLocalStream: gLocalStream is non-null, but gLocalStreamRefcount is already <= 0");
+     this.softAssert(!(video && (this.gLocalVidRefcount <= 0)), "unrefLocalStream: unreferencing video, but its refcount is already <= 0, and gLocalVid ", (this.gLocalVid?"is non-null":"is null"));
+
     if (video) {
-        if (--this.gLocalVidRefcount <= 0) {
-            this.softAssert(this.gLocalVid);
+        var cnt = --this.gLocalVidRefcount;
+        this.softAssert(cnt >= 0, "_unrefLocalStream: unreferencing video: negative gLocalVidRefcount detected:", cnt);
+        if (cnt <= 0) {
+            this.softAssert(this._localVidEnabled, "unrefLocalStream: unreferencing video, video refcount reached 0, but local video was already disabled");
             this._disableLocalVid(sid);
         }
     }
-    if (--this.gLocalStreamRefcount > 0) {
+    var cnt = --this.gLocalStreamRefcount;
+    this.softAssert(cnt >=0, "_unrefLocalStream: Negative gLocalStreamRefcount detected:", cnt);
+    if (cnt > 0) {
         return;
     }
 
@@ -1373,7 +1384,8 @@ hangupAll: function(reason, text)
          }
      }
      debugger;
-     this.jingle.onInternalError("Soft Assertion failed: "+ msg);
+     var e = new Error(msg); //we need the stack
+     this.jingle.onInternalError("Soft Assertion failed", {e:e});
  },
  /**
     Releases any global resources referenced by this instance, such as the reference
@@ -1382,6 +1394,10 @@ hangupAll: function(reason, text)
  */
  destroy: function() {
     this.hangup();
+ },
+    /** generates a dom id for a remote video element for given session id */
+ vidIdFromSid: function(sid) {
+     return +"remotevideo_"+sid.substring(0, 10);
  },
 
 /** Returns whether the call or file transfer with the given
@@ -1399,17 +1415,30 @@ hangupAll: function(reason, text)
 
  onInternalError: function(msg, info) {
     info.msg = msg;
-    this.logMsg('e', JSON.stringify(info));
+    this.logMsg('e', info);
  },
 
  logMsg: function(type, data) {
+     if (window._testing) {
+         var confunc;
+         if (type === 'e') {
+             confunc = 'error';
+         } else if (type === 'w') {
+             confunc = 'warn';
+         } else {
+             confunc = 'log';
+         }
+         console[confunc].call(console, "logMsg:", JSON.stringify(data));
+         return;
+     }
+
      var wait = 500;
      var retryNo = 0;
      var self = this;
      function req() {
          jQuery.ajax("https://stats.karere.mega.nz/msglog?aid="+self.ownAnonId+"&t="+type, {
               type: 'POST',
-              data: data,
+              data: JSON.stringify(data),
               error: function(jqXHR, textStatus, errorThrown) {
                   retryNo++;
                   if(retryNo < 20) {

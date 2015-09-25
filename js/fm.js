@@ -5875,7 +5875,7 @@ function contextMenuUI(e, ll) {
             if (folderlink) {
                 flt += ',.import-item';
                 if (M.v.length) {
-                    flt += ',.zipdownload-item';
+                    flt += ',.zipdownload-item,.download-item';
                 }
             }
             $.selected = [M.RootID];

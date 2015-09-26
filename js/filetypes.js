@@ -241,7 +241,7 @@ function filetype(n) {
 }
 
 function fileIcon(nodeInfo) {
-    
+
     var icon;
 
     // (Is folder && have share) || (if r attribute?) || (is pending share)
@@ -262,17 +262,17 @@ function fileIcon(nodeInfo) {
 }
 
 function fileext(name) {
-    
+
     var ext;
-    
+
     if (!name) {
         name = 'unknown';
     }
-    
+
     ext = name.substr(name.lastIndexOf('.') + 1);
     if (ext === name) {
         ext = '';
     }
-    
+
     return ext.toLowerCase();
 }

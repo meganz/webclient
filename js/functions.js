@@ -3717,14 +3717,14 @@ if (typeof sjcl !== 'undefined') {
 
         var result = false,
             node;
-        
+
         // Loop through all selected items
         $.each(nodes, function(index, value) {
             node = M.d[value];
             if (node.ph && node.shares && node.shares.EXP) {
                 result = true;
                 return false;// Stop further $.each loop execution
-                
+
             }
         });
 
@@ -3804,7 +3804,7 @@ if (typeof sjcl !== 'undefined') {
             index;
 
         $.each(shares, function(index, value) {
-           result.push(index); 
+           result.push(index);
         });
 
         // Remove 'EXP'

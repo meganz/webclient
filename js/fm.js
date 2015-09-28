@@ -1124,7 +1124,7 @@ function showTransferToast(t_type, t_length) {
             }
         }
 
-        $toast.find('.toast-transfer-col:first-child').html(nt_txt);
+        $toast.find('.transfer .toast-col:first-child').html(nt_txt);
 
         if ($second_toast.hasClass('visible')) {
             $second_toast.addClass('second');
@@ -1136,7 +1136,7 @@ function showTransferToast(t_type, t_length) {
             hideTransferToast($toast,interval);
         }, 5000);
 
-        $('.toast-transfer-button').rebind('click', function(e)
+        $('.transfer .toast-button').rebind('click', function(e)
         {
             $('.toast-notification').removeClass('visible second');
             if (!$('.slideshow-dialog').hasClass('hidden')) {
@@ -8440,7 +8440,7 @@ function getclipboardkeys() {
  */
 function itemExportLinkHtml(item) {
 
-    var fileUrlWithoutKey, fileUrlKey, fileUrl, key, type, fileSize,
+    var fileUrlWithoutKey, fileUrlKey, fileUrl, key, type, fileSize, folderClass,
         html = '';
 
     // Shared item type is folder
@@ -8448,6 +8448,7 @@ function itemExportLinkHtml(item) {
         type = 'F';
         key = u_sharekeys[item.h];
         fileSize = '';
+		folderClass = 'folder-item';
     }
 
     // Shared item type is file
@@ -8460,15 +8461,15 @@ function itemExportLinkHtml(item) {
     fileUrlWithoutKey = getBaseUrl() + '/#' + type + '!' + htmlentities(item.ph);
     fileUrlKey = key ? '!' + a32_to_base64(key) : '';
 
-    html = '<div class="export-link-item">'
+    html = '<div class="export-link-item ' + folderClass + '">'
          +      '<div class="export-icon ' + fileIcon(item) + '" ></div>'
          +      '<div class="export-link-text-pad">'
          +          '<div class="export-link-txt">'
          +               '<span class="export-item-title">' + htmlentities(item.name) + '</span><span class="export-link-gray-txt">' + fileSize + '</span>'
          +          '</div>'
          +          '<div class="file-link-block">'
-         +              '<span class="file-link-info url" data-pseudo-content="public handle:">' + fileUrlWithoutKey + '</span>'
-         +          	'<span class="file-link-info key" data-pseudo-content="decryption key:">' + fileUrlKey + '</span>'
+         +              '<span class="file-link-info url export-link-url" data-pseudo-content="public handle:">' + fileUrlWithoutKey + '</span>'
+         +          	'<span class="file-link-info key export-link-url" data-pseudo-content="decryption key:">' + fileUrlKey + '</span>'
          +          '</div>'
          +      '</div>'
          +  '</div>';

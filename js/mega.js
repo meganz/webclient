@@ -6577,33 +6577,17 @@ function balance2pro(callback)
             $('#clipboardbtn2 span').text(l[1033]);
         }
 
-        // On Export File Links and Decryption Keys dialog
-        $('.export-checkbox :checkbox').iphoneStyle({
-            resizeContainer: false,
-            resizeHandle: false,
-            onChange: function(elem, data) {
-                var selclass;
-
-                if (data) {
-                    $(elem).closest('.on_off').removeClass('off').addClass('on');
-                    selclass = '.file-link-with-key';
-                }
-                else {
-                    $(elem).closest('.on_off').removeClass('on').addClass('off');
-                    selclass = '.file-link-without-key';
-                }
-                $('.export-link-url').each(function(idx, elm) {
-                    elm = $(elm);
-                    var parent = elm.closest('.export-link-text-pad');
-                    elm.val($(selclass, parent).text());
-                });
-                window.getLinkState = !!data;
-            }
-        });
-
-        if (typeof window.getLinkState === 'undefined') {
-            $('.export-checkbox').removeClass('off').addClass('on');
-        }
+		$('.export-link-select').rebind('click', function() {
+			$('.export-link-dropdown').fadeIn(200);
+		});
+		
+		// On Export File Links and Decryption Keys dropdown
+		$('.export-link-dropdown div').rebind('click', function() {
+			var keyOption = $(this).attr('data-keyoptions');
+			$('.export-link-select, .export-content-block').removeClass('public-handle decription-key full-link').addClass(keyOption);
+			$('.export-link-select').html($(this).html());
+			$('.export-link-dropdown').fadeOut(200);
+		});
 
         $('.export-links-dialog').addClass('file-keys-view');
         $('.export-links-dialog .export-link-body').html(html);
@@ -6614,15 +6598,15 @@ function balance2pro(callback)
         $('.fm-dialog.export-links-dialog').removeClass('hidden');
         $('.export-link-body').removeAttr('style');
 
-        if ($('.export-link-body').outerHeight() === 384) {// ToDo: How did I find this integer?
+        if ($('.export-link-body').outerHeight() === 318) {// ToDo: How did I find this integer?
             $('.export-link-body').jScrollPane({showArrows: true, arrowSize: 5});
             jScrollFade('.export-link-body');
         }
         $('.fm-dialog.export-links-dialog').css('margin-top', $('.fm-dialog.export-links-dialog').outerHeight() / 2 * - 1);
 
         setTimeout(function() {
-            $('input.export-link-url').rebind('click', function() {
-                $(this).select();
+            $('.file-link-info').rebind('click', function() {
+                $('.file-link-info').select();
             });
         }, 300);
     };

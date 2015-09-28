@@ -48,13 +48,13 @@ var langDialog = {
             if ($arrowIcon.hasClass('opened')) {
                 
                 $arrowIcon.removeClass('opened');
-                $showHideText.html('Show more languages');
+                $showHideText.html(l[7657]);        // Show more languages
                 $tierTwoLanguages.show();
                 langDialog.centerDialog();
             }
             else {
                 $arrowIcon.addClass('opened');
-                $showHideText.html('Hide languages');
+                $showHideText.html(l[7658]);        // Hide languages
                 $tierTwoLanguages.show();
                 langDialog.centerDialog();
             }

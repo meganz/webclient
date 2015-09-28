@@ -234,7 +234,7 @@ a, a:link, a:visited, a:hover, a:active, a:focus img, a:focus img {
     color: #605f5d;
     display: block;
     font-size: 14px;
-    line-height: 23px;
+    line-height: 24px;
     margin: 2px 0;
     padding: 0 10px;
     position: relative;
@@ -246,46 +246,6 @@ a.nlanguage-lnk:hover {
 a.nlanguage-lnk.language-template {
     display: none;
 }
-.languages-dialog .tier-one-languages,
-.languages-dialog .tier-two-languages {
-    -webkit-column-count: 3;
-	-moz-column-count: 3;
-	column-count: 3;
-	-webkit-column-width: 100px;
-	-moz-column-width: 100px;
-	column-width: 100px;
-}
-.languages-dialog .tier-two-languages {
-    display: none;
-}
-.languages-dialog .show-more-languages {
-    display: table;
-    margin-top: 30px;
-    width: 100%;
-}
-.languages-dialog .show-more-languages .show-more-text {
-    cursor: pointer;
-    display: table-cell;
-    font-size: 15px;
-    padding-left: 12px;
-    white-space: nowrap;
-}
-.languages-dialog .show-more-languages .bar {
-    display: table-cell;
-    padding-left: 15px;
-    width: 100%;
-}
-.languages-dialog .show-more-languages .bar div {
-    border-bottom: 1px solid #777;
-    margin-bottom: 3px;
-}
-.languages-dialog .fm-notifications-bottom {
-    bottom: 0;
-    left: 0;
-    position: absolute;
-    right: 0;
-}
-
 .nlanguage-lnk.selected, a.nlanguage-lnk.selected, a.nlanguage-lnk.selected:link, a.nlanguage-lnk.selected:visited, a.nlanguage-lnk.selected:hover, a.nlanguage-lnk.selected:active {
 	color: white;
 	background: #D31A00;
@@ -349,9 +309,95 @@ a.nlanguage-lnk:hover .nlanguage-tooltip {
 	color: #BF1900;
 }
 .languages-dialog-body {
-	min-height: 200px;
-	padding: 10px;
+    padding: 10px 20px 10px 10px;
 }
+.languages-dialog .tier-one-languages,
+.languages-dialog .tier-two-languages {
+    -webkit-column-count: 4;
+	-moz-column-count: 4;
+	column-count: 4;
+	-webkit-column-width: 163px;
+	-moz-column-width: 163px;
+	column-width: 163px;
+}
+.languages-dialog .tier-one-languages {
+    margin-top: 15px;
+}
+.languages-dialog .tier-two-languages {
+    display: none;
+    margin-bottom: 15px;
+    margin-top: 20px;
+    min-height: 270px;
+}
+.languages-dialog .show-more-languages {
+    cursor: pointer;
+    display: table;
+    margin-top: 30px;
+    width: 100%;
+}
+.languages-dialog .show-more-languages .show-more-text {
+    color: #999;
+    display: table-cell;
+    font-size: 16px;
+    font-family: "source_sans_proregular", Arial;
+    padding-left: 12px;
+    white-space: nowrap;
+}
+.languages-dialog .show-more-languages .bar {
+    display: table-cell;
+    padding-left: 15px;
+    width: 100%;
+}
+.languages-dialog .show-more-languages .bar div {
+    border-bottom: 1px solid #999;
+    margin-bottom: 3px;
+}
+.languages-dialog .show-more-languages .round-arrow {
+    display: table-cell;
+    padding-left: 14px;
+    vertical-align: middle;
+}
+.languages-dialog .show-more-languages .round-arrow span {
+    background-image: url("../images/mega/lang-selection-sprite.png");
+    background-position: -223px -2px;
+    background-repeat: no-repeat;
+    display: inline-block;
+    height: 19px;
+    width: 19px;
+}
+.languages-dialog .show-more-languages .round-arrow.opened span {
+    -webkit-transform: rotate(180deg);
+    -moz-transform: rotate(180deg);
+    -o-transform: rotate(180deg);
+    -ms-transform: rotate(180deg);
+    transform: rotate(180deg);
+}
+.languages-dialog .fm-notifications-bottom {
+    bottom: 0;
+    left: 0;
+    position: absolute;
+    right: 0;
+}
+.languages-dialog .nlanguage-lnk .beta {
+    border: 1px solid rgba(192, 199, 203, 0.4);
+    border-radius: 7px;
+    box-sizing: border-box;
+    color: #c0c7cd;
+    font-size: 10px;
+    font-style: normal;
+    margin-left: 2px;
+    padding: 1px 5px;
+    text-align: center;
+    text-transform: uppercase;
+}
+.languages-dialog .nlanguage-lnk.selected .beta {
+    border-color: #fff;
+    color: #fff;
+}
+.fm-dialog-button.fm-languages-save {
+    margin: 8px 4px 0;
+}
+
 .relative {
 	position: relative;
 }
@@ -9880,8 +9926,8 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
 }
 .fm-dialog.languages-dialog {
 	min-width: 664px;
-	min-height: 416px;
-	margin: -229px 0 0 -332px;
+	min-height: 345px;
+	margin: -167px 0 0 -332px;
 }
 .fm-dialog.share-dialog, .fm-dialog.share-with-contact-dialog {
 	width: 480px;
@@ -24772,9 +24818,9 @@ body.pro:after {
  background-image: url(../images/mega/bitcoin-v4@2x.png);
  background-size: 200px auto;
 }
-.top-change-language-icon {
+.top-change-language-icon, .languages-dialog .show-more-languages .round-arrow span {
     background-image: url("../images/mega/lang-selection-sprite@2x.png");
-    background-size: 135px auto;
+    background-size: 244px auto;
 }
 .fm-dialog.cancel-subscription-st2 .blue-success-icon {
  background-image: url(../images/mega/bitcoin-v4@2x.png);

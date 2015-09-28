@@ -1881,7 +1881,13 @@ window.onhashchange = function() {
     }
 };
 
-function renderLanguages(langCodes) {
+/**
+ * Create the language HTML from a list of language codes
+ * @param {Array} langCodes Array of language codes e.g. ['en', 'es', ...]
+ * @param {Boolean} tierTwo If this is a tier two / beta language
+ * @returns {String} Returns the HTML to be rendered
+ */
+function renderLanguages(langCodes, tierTwo) {
     
     var $template = $('.languages-dialog .language-template').clone();
     var html = '';
@@ -1889,7 +1895,7 @@ function renderLanguages(langCodes) {
     // Remove template class
     $template.removeClass('language-template');
     
-    // Sort languages by code (which is reasonably ordered anyway)
+    // Sort languages by ISO 639-1 two letter language code (which is reasonably ordered anyway)
     langCodes.sort(function(codeA, codeB) {
         return codeA.localeCompare(codeB);
     });
@@ -1905,13 +1911,18 @@ function renderLanguages(langCodes) {
         var $langHtml = $template.clone();
         
         // Update the template details
-        $langHtml.attr('data-attr-lang-code', langCode);
+        $langHtml.attr('data-lang-code', langCode);
         $langHtml.find('.nlanguage-tooltip-main').text(englishName);
         $langHtml.find('.native-language-name').text(nativeName);
         
         // If they have already chosen a language show it as selected
         if (langCode === lang) {
             $langHtml.addClass('selected');
+        }
+        
+        // If the beta language, show the beta icon
+        if (tierTwo) {
+            $langHtml.find('.beta').removeClass('hidden');
         }
         
         // Build up the HTML to be rendered
@@ -1930,8 +1941,8 @@ function languageDialog(close) {
         return false;
     }
     
-    // Main tier 1 languages that we support
-    var tierOneLangCodes = ['es', 'en', 'br', 'ct', 'fr', 'de', 'ru', 'tr', 'it', 'pl', 'ar', 'nl', 'hu', 'cn', 'jp', 'kr', 'ro', 'he'];
+    // Main tier 1 languages that we support (based on usage analysis)
+    var tierOneLangCodes = ['es', 'en', 'br', 'ct', 'fr', 'de', 'ru', 'tr', 'it', 'pl', 'ar', 'nl', 'hu', 'cn', 'jp', 'kr', 'ro', 'he', 'se', 'id'];
     
     // Remove all the tier 1 languages and we have only the tier 2 languages remaining
     var allLangCodes = Object.keys(ln);
@@ -1939,83 +1950,73 @@ function languageDialog(close) {
         return (tierOneLangCodes.indexOf(langCode) < 0);
     });
     
-    var tierOneHtml = renderLanguages(tierOneLangCodes);
-    var tierTwoHtml = renderLanguages(tierTwoLangCodes);
+    // Generate the HTML for tier one and tier two languages (second param set to true shows beta icon) 
+    var tierOneHtml = renderLanguages(tierOneLangCodes, false);
+    var tierTwoHtml = renderLanguages(tierTwoLangCodes, true);
     
+    // Display the HTML
     $('.languages-dialog .tier-one-languages').html(tierOneHtml);
     $('.languages-dialog .tier-two-languages').html(tierTwoHtml);
     
-    // Print into two separate sections on language dialog.
-    // Auto hide if a language is not selected.
-    // If a language is selected in the other section, then show it and select it.
-    
-    /*
-    var html = '<div class="nlanguage-txt-block">';
-    var languagesArray = [];
-    for (var la in languages) {
-        if (ln2[la]) {
-            languagesArray.push({
-                l: ln[la],
-                l2: ln2[la],
-                c: la
+    // When the user clicks on 'Show more languages', show the Tier 2 languages
+    $('.show-more-languages').rebind('click', function() {
+        
+        // If the extra languages section is already open
+        if ($('.show-more-languages .round-arrow').hasClass('opened')) {
+            
+            $('.show-more-languages .round-arrow').removeClass('opened');
+            $('.show-more-languages .show-more-text').html('Show more languages');
+            $('.tier-two-languages').hide(0, function() {
+                
+                // Re-center vertically
+                var currentHeight = $('.fm-dialog.languages-dialog').outerHeight();
+                $('.fm-dialog.languages-dialog').css('margin-top', (currentHeight / 2) * -1);
             });
         }
-    }
-    
-    console.log('zzzz larray', languagesArray);
-    
-    languagesArray.sort(function (a, b) {
-            return a.l.localeCompare(b.l);
-        });
-    var i = 1,
-        a = 0,
-        sel = '';
-    for (var j in languagesArray) {
-        var la = languagesArray[j].c;
-        if (ln2[la]) {
-            if (la == lang) {
-                sel = ' selected';
-            }
-            else {
-                sel = '';
-            }
-            html += '<a href="#" id="nlanguagelnk_' + la + '" class="nlanguage-lnk' + sel + '"><span class="nlanguage-tooltip"> <span class="nlanguage-tooltip-bg"> <span class="nlanguage-tooltip-main"> '
-                + ln2[la] + '</span></span></span>' + ln[la] + '</a><div class="clear"></div>';
-            if (i == Math.ceil(languagesArray.length / 4) && a + 1 < languagesArray.length) {
-                html += '</div><div class="nlanguage-txt-block">';
-                i = 0;
-            }
-            i++;
-            a++;
+        else {
+            $('.show-more-languages .round-arrow').addClass('opened');
+            $('.show-more-languages .show-more-text').html('Hide languages');
+            $('.tier-two-languages').show(0, function() {
+                
+                // Re-center vertically
+                var currentHeight = $('.fm-dialog.languages-dialog').outerHeight();
+                $('.fm-dialog.languages-dialog').css('margin-top', (currentHeight / 2) * -1);
+            });
         }
+    });
+    
+    // Show tier two languages if a language is already selected from that list
+    if (tierTwoLangCodes.indexOf(lang) > -1) {
+        
+        $('.tier-two-languages').show();
+        
+        // Re-center vertically
+        var currentHeight = $('.fm-dialog.languages-dialog').outerHeight();
+        $('.fm-dialog.languages-dialog').css('margin-top', (currentHeight / 2) * -1);
     }
-    
-    html += '</div><div class="clear"></div>';
-    
-    $('.languages-dialog-body').safeHTML(html);
-    */
     
     $('.fm-dialog.languages-dialog').removeClass('hidden');
     $('.fm-dialog-overlay').removeClass('hidden');
     $('body').addClass('overlayed');
     $.dialog = 'languages';
     
-    $('.fm-dialog.languages-dialog .fm-dialog-close').rebind('click', function (e) {
+    $('.fm-dialog.languages-dialog .fm-dialog-close').rebind('click', function() {
         languageDialog(1);
     });
 
-    $('.fm-languages-save').rebind('click', function () {
+    $('.fm-languages-save').rebind('click', function() {
         languageDialog(1);
         setTimeout(function() {
-            var lng = $('.nlanguage-lnk.selected').attr('id');
-            lng = lng.replace('nlanguagelnk_', '');
-            if (lng !== lang) {
-                localStorage.lang = lng;
+            var selectedLangCode = $('.nlanguage-lnk.selected').attr('data-lang-code');
+            
+            if (selectedLangCode !== lang) {
+                localStorage.lang = selectedLangCode;
                 document.location.reload();
             }
         }, 100);
     });
-    $('.nlanguage-lnk').rebind('click', function () {
+    
+    $('.nlanguage-lnk').rebind('click', function() {
         $('.nlanguage-lnk').removeClass('selected');
         $(this).addClass('selected');
         return false;

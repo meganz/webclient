@@ -1257,7 +1257,7 @@ function topmenuUI() {
             api_req({ a: 'log', e: 99600, m: 'Language menu opened from top header' });
             
             // Open the language dialog
-            languageDialog();
+            langDialog.show();
         });
 
         $('.top-menu-item.register,.context-menu-divider.register,.top-menu-item.login').show();
@@ -1632,7 +1632,7 @@ function topmenuUI() {
             mega.utils.reload();
         }
         else if (className.indexOf('languages') > -1) {
-            languageDialog();
+            langDialog.show();
         }
         else if (className.indexOf('clouddrive') > -1) {
             document.location.hash = 'fm';
@@ -1880,148 +1880,6 @@ window.onhashchange = function() {
         init_page();
     }
 };
-
-/**
- * Create the language HTML from a list of language codes
- * @param {Array} langCodes Array of language codes e.g. ['en', 'es', ...]
- * @param {Boolean} tierTwo If this is a tier two / beta language
- * @returns {String} Returns the HTML to be rendered
- */
-function renderLanguages(langCodes, tierTwo) {
-    
-    var $template = $('.languages-dialog .language-template').clone();
-    var html = '';
-    
-    // Remove template class
-    $template.removeClass('language-template');
-    
-    // Sort languages by ISO 639-1 two letter language code (which is reasonably ordered anyway)
-    langCodes.sort(function(codeA, codeB) {
-        return codeA.localeCompare(codeB);
-    });
-    
-    // Make single array with code, native lang name, and english lang name
-    for (var i = 0, length = langCodes.length; i < length; i++) {
-        
-        var langCode = langCodes[i];            // Two letter language code e.g. de
-        var nativeName = ln[langCode];          // Deutsch
-        var englishName = ln2[langCode];        // German
-        
-        // Clone the template
-        var $langHtml = $template.clone();
-        
-        // Update the template details
-        $langHtml.attr('data-lang-code', langCode);
-        $langHtml.find('.nlanguage-tooltip-main').text(englishName);
-        $langHtml.find('.native-language-name').text(nativeName);
-        
-        // If they have already chosen a language show it as selected
-        if (langCode === lang) {
-            $langHtml.addClass('selected');
-        }
-        
-        // If the beta language, show the beta icon
-        if (tierTwo) {
-            $langHtml.find('.beta').removeClass('hidden');
-        }
-        
-        // Build up the HTML to be rendered
-        html += $langHtml.prop('outerHTML');
-    }
-    
-    return html;
-}
-
-function languageDialog(close) {
-    if (close) {
-        $('.fm-dialog.languages-dialog').addClass('hidden');
-        $('.fm-dialog-overlay').addClass('hidden');
-        $('body').removeClass('overlayed');
-        $.dialog = false;
-        return false;
-    }
-    
-    // Main tier 1 languages that we support (based on usage analysis)
-    var tierOneLangCodes = ['es', 'en', 'br', 'ct', 'fr', 'de', 'ru', 'tr', 'it', 'pl', 'ar', 'nl', 'hu', 'cn', 'jp', 'kr', 'ro', 'he', 'se', 'id'];
-    
-    // Remove all the tier 1 languages and we have only the tier 2 languages remaining
-    var allLangCodes = Object.keys(ln);
-    var tierTwoLangCodes = allLangCodes.filter(function(langCode) {
-        return (tierOneLangCodes.indexOf(langCode) < 0);
-    });
-    
-    // Generate the HTML for tier one and tier two languages (second param set to true shows beta icon) 
-    var tierOneHtml = renderLanguages(tierOneLangCodes, false);
-    var tierTwoHtml = renderLanguages(tierTwoLangCodes, true);
-    
-    // Display the HTML
-    $('.languages-dialog .tier-one-languages').html(tierOneHtml);
-    $('.languages-dialog .tier-two-languages').html(tierTwoHtml);
-    
-    // When the user clicks on 'Show more languages', show the Tier 2 languages
-    $('.show-more-languages').rebind('click', function() {
-        
-        // If the extra languages section is already open
-        if ($('.show-more-languages .round-arrow').hasClass('opened')) {
-            
-            $('.show-more-languages .round-arrow').removeClass('opened');
-            $('.show-more-languages .show-more-text').html('Show more languages');
-            $('.tier-two-languages').hide(0, function() {
-                
-                // Re-center vertically
-                var currentHeight = $('.fm-dialog.languages-dialog').outerHeight();
-                $('.fm-dialog.languages-dialog').css('margin-top', (currentHeight / 2) * -1);
-            });
-        }
-        else {
-            $('.show-more-languages .round-arrow').addClass('opened');
-            $('.show-more-languages .show-more-text').html('Hide languages');
-            $('.tier-two-languages').show(0, function() {
-                
-                // Re-center vertically
-                var currentHeight = $('.fm-dialog.languages-dialog').outerHeight();
-                $('.fm-dialog.languages-dialog').css('margin-top', (currentHeight / 2) * -1);
-            });
-        }
-    });
-    
-    // Show tier two languages if a language is already selected from that list
-    if (tierTwoLangCodes.indexOf(lang) > -1) {
-        
-        $('.tier-two-languages').show();
-        
-        // Re-center vertically
-        var currentHeight = $('.fm-dialog.languages-dialog').outerHeight();
-        $('.fm-dialog.languages-dialog').css('margin-top', (currentHeight / 2) * -1);
-    }
-    
-    $('.fm-dialog.languages-dialog').removeClass('hidden');
-    $('.fm-dialog-overlay').removeClass('hidden');
-    $('body').addClass('overlayed');
-    $.dialog = 'languages';
-    
-    $('.fm-dialog.languages-dialog .fm-dialog-close').rebind('click', function() {
-        languageDialog(1);
-    });
-
-    $('.fm-languages-save').rebind('click', function() {
-        languageDialog(1);
-        setTimeout(function() {
-            var selectedLangCode = $('.nlanguage-lnk.selected').attr('data-lang-code');
-            
-            if (selectedLangCode !== lang) {
-                localStorage.lang = selectedLangCode;
-                document.location.reload();
-            }
-        }, 100);
-    });
-    
-    $('.nlanguage-lnk').rebind('click', function() {
-        $('.nlanguage-lnk').removeClass('selected');
-        $(this).addClass('selected');
-        return false;
-    });
-}
 
 window.onbeforeunload = function () {
     if (dlmanager.isDownloading || ulmanager.isUploading) {

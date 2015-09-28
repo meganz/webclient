@@ -35,9 +35,9 @@ var notify = {
     init: function() {
 
         // Cache lookups
-        this.$popup = $('.top-head .notification-popup');
-        this.$popupIcon = $('.top-head .cloud-popup-icon');
-        this.$popupNum = $('.top-head .notification-num');
+        notify.$popup = $('.top-head .notification-popup');
+        notify.$popupIcon = $('.top-head .cloud-popup-icon');
+        notify.$popupNum = $('.top-head .notification-num');
         
         // Init event handler to open popup
         notify.initNotifyIconClickHandler();

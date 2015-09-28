@@ -8,7 +8,7 @@
  * <p>Simplistic, group capable encryption module for chat messages.</p>
  *
  * <p>
- * Encrypts a chat message using Salsa20 with a symmetric key derived
+ * Encrypts a chat message using AES with a symmetric key derived
  * using Curve25519. Messages are signed using Ed25519. Messages are encoded
  * in a binary TLV transport format,</p>
  */

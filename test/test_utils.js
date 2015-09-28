@@ -19,20 +19,22 @@ var testutils = {};
      */
     ns.clone = function(obj) {
         // Handle the 3 simple types, and null or undefined.
-        if (null === obj || "object" !== typeof obj) {
+        if (obj === null || typeof obj !== "object") {
             return obj;
         }
 
+        var copy;
+
         // Handle date.
         if (obj instanceof Date) {
-            var copy = new Date();
+            copy = new Date();
             copy.setTime(obj.getTime());
             return copy;
         }
 
         // Handle array.
         if (obj instanceof Array) {
-            var copy = [];
+            copy = [];
             for (var i = 0, len = obj.length; i < len; i++) {
                 copy[i] = ns.clone(obj[i]);
             }
@@ -41,7 +43,7 @@ var testutils = {};
 
         // Handle object.
         if (obj instanceof Object) {
-            var copy = {};
+            copy = {};
             for (var attr in obj) {
                 if (obj.hasOwnProperty(attr)) {
                     copy[attr] = ns.clone(obj[attr]);

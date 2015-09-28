@@ -48,27 +48,27 @@ var strongvelope = {};
      *       within, but single record types may be skipped. `RECIPIENT` and
      *       `KEYS` are the only types that may (concurrently) be repeated.
      *
-     * @property _UNUSED_SEPARATOR_ {integer}
+     * @property _UNUSED_SEPARATOR_ {Number}
      *     NULL is used as a terminator for the record type. Don't use!
-     * @property SIGNATURE {integer}
+     * @property SIGNATURE {Number}
      *     Payload signature for all following bytes.
-     * @property MESSAG_TYPE {integer}
+     * @property MESSAGE_TYPE {Number}
      *     Type of message sent.
-     * @property NONCE {integer}
+     * @property NONCE {Number}
      *     "Base nonce" used for encryption (individual nonces are derived from
      *     it).
-     * @property RECIPIENT {integer}
+     * @property RECIPIENT {Number}
      *     Recipient of message. This record can be repeated for all recipients
      *     of message.
-     * @property KEYS {integer}
+     * @property KEYS {Number}
      *     Message encryption keys, encrypted to a particular recipient. This
      *     may contain two (concatenated) keys. The second one (if present) is
      *     the previous sender key (key ID one less). Requires
      *     the sane number of records in the same order as `RECIPIENT`.
-     * @property KEY_ID {integer}
+     * @property KEY_ID {Number}
      *     Sender encryption key ID used (or set) in this message. Must be an
      *     integer incremented for every new key used.
-     * @property PAYLOAD {integer}
+     * @property PAYLOAD {Number}
      *     Encrypted payload of message.
      */
     var TLV_TYPES = {
@@ -84,6 +84,8 @@ var strongvelope = {};
     strongvelope.TLV_TYPES = TLV_TYPES;
 
 
+    // Mapping of TLV_TYPES to object attribute names (used in message parser.)
+    // Note: These must be manually updated to reflect TLV_TYPES.
     var _TLV_MAPPING = {
         0x01: 'signature',
         0x02: 'type',
@@ -98,11 +100,11 @@ var strongvelope = {};
     /**
      * "Enumeration" of message types used for the chat message transport.
      *
-     * @property GROUP_KEY {integer}
+     * @property GROUP_KEY {Number}
      *     Data message containing a new sender key (initial or key rotation).
-     * @property GROUP_CONTINUE {integer}
+     * @property GROUP_CONTINUE {Number}
      *     Data message using an existing sender key for encryption.
-     * @property SIMPLE_TWO_PARTY {integer}
+     * @property SIMPLE_TWO_PARTY {Number}
      *     Data message without transfer of a symmetric encryption key (using
      *     shared DH secret and nonce only).
      */
@@ -426,7 +428,7 @@ var strongvelope = {};
      * @typedef {Object} StrongvelopeMessage
      * @property {String} sender
      *     Sender user handle.
-     * @property {Integer} type
+     * @property {Number} type
      *     Type of message.
      * @property {String} payload
      *     Message content/payload.
@@ -438,7 +440,7 @@ var strongvelope = {};
      *
      * @constructor
      *
-     * @property {Integer} kyeId
+     * @property {Number} kyeId
      *     ID of our current sender key.
      * @property {Array.<String>} senderKeys
      *     Array containing all our used sender keys, indexed by keyId.

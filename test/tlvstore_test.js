@@ -25,7 +25,7 @@ describe("tlvstore unit test", function() {
     });
 
     describe('TLV en-/decoding', function() {
-        it("_toTlvRecord", function() {
+        it("toTlvRecord", function() {
             var tests = [['foo', 'bar',
                           'foo\u0000\u0000\u0003bar'],
                          ['puEd255', ED25519_PUB_KEY,
@@ -35,7 +35,7 @@ describe("tlvstore unit test", function() {
                 var key = tests[i][0];
                 var value = tests[i][1];
                 var expected = tests[i][2];
-                assert.strictEqual(ns._toTlvRecord(key, value), expected);
+                assert.strictEqual(ns.toTlvRecord(key, value), expected);
             }
         });
 
@@ -51,10 +51,10 @@ describe("tlvstore unit test", function() {
             }
         });
 
-        it('_splitSingleTlvRecord', function() {
+        it('splitSingleTlvRecord', function() {
             var tests = 'foo\u0000\u0000\u0003bar'
                       + 'puEd255\u0000\u0000\u0020' + ED25519_PUB_KEY;
-            var result = ns._splitSingleTlvRecord(tests);
+            var result = ns.splitSingleTlvRecord(tests);
             assert.strictEqual(result.record[0], 'foo');
             assert.strictEqual(result.record[1], 'bar');
             assert.strictEqual(result.rest, 'puEd255\u0000\u0000\u0020' + ED25519_PUB_KEY);

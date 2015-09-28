@@ -68,9 +68,13 @@ var ChatdIntegration = function(megaChat) {
 
         chatRoom.chatdOldest = eventData.oldest;
         chatRoom.chatdNewest = eventData.newest;
-        chatRoom.chatdIsProcessingHistory = true;
         chatRoom.chatdHistorySeenMsgRetrieved = false;
         chatRoom.chatdHistoryDeliveredMsgRetrieved = false;
+    });
+
+    self.chatd.rebind('onMessageCheck.chatdInt', function(e, eventData) {
+        var chatRoom = _getChatRoomFromEventData(eventData);
+        chatRoom.retrieveChatHistory();
     });
 
     self.chatd.rebind('onMessageLastSeen.chatdInt', function(e, eventData) {
@@ -86,7 +90,6 @@ var ChatdIntegration = function(megaChat) {
                     if (msg.setSeen) {
                         msg.setSeen(true);
                     } else if (msg.seen) {
-                        debugger;
                         msg.seen = true;
                     }
                 }

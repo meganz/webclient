@@ -45,7 +45,8 @@ var Chatd = function(userid, options) {
         'onMessageLastReceived',
         'onRetentionChanged',
         'onMessagesHistoryInfo',
-        'onMembersUpdated'
+        'onMembersUpdated',
+        'onMessagesHistoryDone'
     ].forEach(function(evt) {
             self.rebind(evt + '.chatd', function(e) {
                 console.error(evt, JSON.stringify(arguments[1]));
@@ -784,12 +785,8 @@ Chatd.Messages.prototype.check = function(chatid, msgid) {
     if (this.buf[this.newmsg]) {
         // if the newest held message is not current, initiate a fetch of newer messages just in case
         if (this.buf[this.newmsg][Chatd.MsgField.MSGID] !== msgid) {
-            this.chatd.cmd(Chatd.Opcode.HIST, chatid, this.chatd.pack32le(255));
+            this.chatd.cmd(Chatd.Opcode.HIST, chatid, this.chatd.pack32le(32));
         }
-    }
-    else {
-        // we don't have any messages, just fetch the newest 255
-        this.chatd.cmd(Chatd.Opcode.HIST, chatid, this.chatd.pack32le(-255));
     }
 };
 

@@ -59,6 +59,9 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, cha
     this.callRequest = null;
     this.callIsActive = false;
 
+    this._currentHistoryPointer = 0;
+    this.$msgsHistoryLoading = null;
+
     this.options = {
 
         /**
@@ -1489,6 +1492,70 @@ ChatRoom.prototype.removeMessageByType = function(type) {
 };
 
 
+ChatRoom.prototype.messagesHistoryIsLoading = function() {
+    var self = this;
+    return (
+        self.$msgsHistoryLoading && self.$msgsHistoryLoading.state() === 'pending'
+    ) || self.chatdIsProcessingHistory;
+};
+ChatRoom.prototype.retrieveChatHistory = function() {
+    var self = this;
+
+    if(self.messagesHistoryIsLoading()) {
+        return self.$msgsHistoryLoading;
+    } else {
+        self.chatdIsProcessingHistory = true;
+        self._currentHistoryPointer -= 32;
+        self.$msgsHistoryLoading = new MegaPromise();
+        self.megaChat.plugins.chatdIntegration.retrieveHistory(
+            self,
+            self._currentHistoryPointer
+        );
+
+        var eventKey = "onMessagesHistoryDone." + self.roomJid;
+        console.error(eventKey, self._currentHistoryPointer);
+
+        var timeoutPromise = createTimeoutPromise(function() {
+            return self.$msgsHistoryLoading.state() !== 'pending'
+        }, 100, 10000)
+            .always(function() {
+                self.chatdIsProcessingHistory = false;
+            })
+            .fail(function() {
+                self.$msgsHistoryLoading.reject();
+            });
+
+
+        self.megaChat.plugins.chatdIntegration.chatd.rebind(
+            eventKey,
+            function(e, eventData) {
+                if (eventData.chatId === self.chatId) {
+                    console.error("HIST DONE: ", eventKey, arguments);
+                    self.$msgsHistoryLoading.resolve();
+                    timeoutPromise.verify();
+                }
+            }
+        );
+
+        self.$msgsHistoryLoading.fail(function() {
+            console.error("HIST FAILED: ", arguments);
+            self._currentHistoryPointer += 32;
+        });
+
+
+        return self.$msgsHistoryLoading;
+    }
+};
+
+ChatRoom.prototype.haveMoreHistory = function() {
+    var self = this;
+
+    if (!self.chatdOldest || !self.messages[self.chatdOldest]) {
+        return true;
+    } else {
+        return false;
+    }
+}
 window.ChatDialogMessage = ChatDialogMessage; //TODO: remove me, debug
 
 window.ChatRoom = ChatRoom;

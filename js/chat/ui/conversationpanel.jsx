@@ -277,9 +277,16 @@ var ConversationPanel = React.createClass({
 
         var $jsp = self.$messages.data("jsp");
         if ($jsp) {
+            var perc = $jsp.getPercentScrolledY();
+
+
             if (scrollToBottom) {
                 self.$messages.one('jsp-initialised', function () {
                     $jsp.scrollToBottom();
+                });
+            } else {
+                self.$messages.one('jsp-initialised', function () {
+                    $jsp.scrollToPercentY($jsp.getPercentScrolledY(perc));
                 });
             }
             $jsp.reinitialise();
@@ -565,9 +572,68 @@ var ConversationPanel = React.createClass({
         self.$messages.droppable(droppableConfig);
         self.$header.droppable(droppableConfig);
 
-        self.$messages.jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5, animateDuration: 70, maintainPosition: true, stickToBottom: true});
+        self.lastScrollPosition = null;
+        self.lastScrolledToBottom = true;
+        self.lastScrollHeight = 0;
+        self.lastUpdatedScrollHeight = 0;
+
+        self.$messages.jScrollPane({
+            enableKeyboardNavigation:false,
+            showArrows:true,
+            arrowSize:5,
+            animateDuration: 70,
+            maintainPosition: false
+        });
+
+        self.$messages.rebind('jsp-user-scroll-y.conversationsPanel', function(e, scrollPositionY, isAtTop, isAtBottom) {
+            var $jsp = self.$messages.data("jsp");
+
+            if (self.lastScrollPosition === scrollPositionY || self.scrolledToBottom !== 1) {
+                return;
+            }
+
+            if (scrollPositionY < 350 && !isAtBottom && self.$messages.is(":visible")) {
+
+                if (
+                    self.lastUpdatedScrollHeight !== $jsp.getContentHeight() &&
+                    !self.props.chatRoom.messagesHistoryIsLoading() &&
+                    self.props.chatRoom.haveMoreHistory()
+                ) {
+                    self.props.chatRoom.retrieveChatHistory();
+                    self.lastUpdatedScrollHeight = $jsp.getContentHeight();
+                }
+            }
+
+            if (isAtBottom) {
+                self.lastScrolledToBottom = true;
+            }
+            else {
+                self.lastScrolledToBottom = false;
+            }
+
+            self.lastScrollHeight = $jsp.getContentHeight();
+            self.lastScrollPosition = scrollPositionY;
+        });
+
+        self.$messages.rebind('jsp-initialised.conversationsPanel', function(e) {
+            var $jsp = self.$messages.data("jsp");
+
+            if(self.lastScrolledToBottom === true) {
+                $jsp.scrollToBottom();
+            } else {
+                var prevPosY = (
+                        $jsp.getContentHeight() - self.lastScrollHeight
+                    ) + self.lastScrollPosition;
+                console.error("onMessagesHistoryDone scroll prevposY", prevPosY);
+
+                $jsp.scrollToY(
+                    prevPosY
+                );
+            }
+        });
 
         var room = self.props.chatRoom;
+
         // collapse on ESC pressed (exited fullscreen)
         $(document)
             .unbind("fullscreenchange.megaChat_" + room.roomJid)

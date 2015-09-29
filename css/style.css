@@ -326,7 +326,7 @@ a.nlanguage-lnk:hover .nlanguage-tooltip {
 .languages-dialog .tier-two-languages {
     display: none;
     margin-top: 20px;
-    min-height: 270px;
+    padding-bottom: 65px;
 }
 .languages-dialog .show-more-languages {
     cursor: pointer;

@@ -7894,7 +7894,7 @@ color: white;
 	top: 0;
 	cursor: pointer;
 }
-.nw-contact-avatar, .nw-contact-avatar img, div.nw-chat-sharing-body, div.fm-chat-messages-pad, .block-view-file-type, .nw-chat-expand-arrow, .fm-chat-message, .nw-chat-sharing-body, .nw-chat-sharing-body div, .nw-contact-avatar img, .create-folder-button, a.create-folder-button, .add-user-popup-button, a.add-user-popup-button, .create-folder-button-cancel, .fm-dialog-new-folder-button, .fm-dialog, .fmholder div, .fmholder a, .fmholder span, .fmholder td, div.new-bottom-pages div.new-left-menu-link, div.new-bottom-pages a.dev-new-button, .fm-subfolders, .add-contact-item, .share-folder-info, .fm-dialog-header, .fm-share-body, .share-dialog div, .fm-chat-file-button, .reg-st3-membership-bl, .megasync-overlay, .collected-data li::before, .collected-data {
+.nw-contact-avatar, .nw-contact-avatar img, div.nw-chat-sharing-body, div.fm-chat-messages-pad, .block-view-file-type, .nw-chat-expand-arrow, .fm-chat-message, .nw-chat-sharing-body, .nw-chat-sharing-body div, .nw-contact-avatar img, .create-folder-button, a.create-folder-button, .add-user-popup-button, a.add-user-popup-button, .create-folder-button-cancel, .fm-dialog-new-folder-button, .fm-dialog, .fmholder div, .fmholder a, .fmholder span, .fmholder td, div.new-bottom-pages div.new-left-menu-link, div.new-bottom-pages a.dev-new-button, .fm-subfolders, .add-contact-item, .share-folder-info, .fm-dialog-header, .fm-share-body, .share-dialog div, .fm-chat-file-button, .reg-st3-membership-bl, .megasync-overlay, .collected-data li::before, .collected-data, .ui-datepicker * {
 	-webkit-touch-callout: none !important;
 	-webkit-user-select: none !important;
 	-khtml-user-select: none !important;
@@ -24745,7 +24745,7 @@ div.camera-bottom-txt {
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	width: 340px;
-	height: 296px;
+	padding-bottom: 25px;
 	text-align: center;
 	margin: -36px 0 0 -4px;
 	display: none;

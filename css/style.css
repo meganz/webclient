@@ -1547,6 +1547,8 @@ a.blog-button:hover {
     cursor: pointer;
     float: right;
     font-size: 14px;
+    height: 24px;
+    line-height: 23px;
     margin: 12px 10px 0 0;
     padding: 0 12px 0 8px;
     transition: all 200ms ease-in-out 0s;
@@ -1562,13 +1564,12 @@ a.blog-button:hover {
     display: inline-block;
     height: 16px;
     position: relative;
-    top: 3px;
+    top: 4px;
     width: 16px;
 }
 .top-change-language-name {
     color: rgba(255, 255, 255, 0.7);
     display: inline-block;
-    line-height: 24px;
     margin-left: 4px;
     padding-left: 0;
     padding-top: 0;

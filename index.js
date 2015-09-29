@@ -1244,11 +1244,6 @@ function topmenuUI() {
             var $topChangeLangName = $topChangeLang.find('.top-change-language-name');
             var languageName = ln[lang];
 
-            // If they have changed the language from English, then show different style
-            if (lang !== 'en') {
-                $topChangeLang.addClass('other-language');
-            }
-
             // Init the top header change language button
             $topChangeLangName.text(languageName);
             $topChangeLang.removeClass('hidden');

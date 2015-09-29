@@ -1211,6 +1211,7 @@ else if (!b_u)
     jsl.push({f:'js/ui/loginRequiredDialog.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/chat/ui/incomingCallDialog.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/ui/feedbackDialog.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/ui/languageDialog.js', n: 'mega_js', j:1,w:7});
 
     jsl.push({f:'js/fm.js', n: 'fm_js', j:1,w:12});
     jsl.push({f:'js/filetypes.js', n: 'filetypes_js', j:1});

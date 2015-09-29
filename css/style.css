@@ -338,7 +338,7 @@ a.nlanguage-lnk:hover .nlanguage-tooltip {
 .languages-dialog .show-more-languages .show-more-text {
     color: #999;
     display: table-cell;
-    font-size: 16px;
+    font-size: 14px;
     font-family: "source_sans_proregular", Arial;
     padding-left: 12px;
     white-space: nowrap;
@@ -379,20 +379,19 @@ a.nlanguage-lnk:hover .nlanguage-tooltip {
     right: 0;
 }
 .languages-dialog .nlanguage-lnk .beta {
-    border: 1px solid rgba(192, 199, 203, 0.4);
+    border: 1px solid rgba(192, 199, 203, 0.3);
     border-radius: 7px;
     box-sizing: border-box;
     color: #c0c7cd;
     font-size: 10px;
     font-style: normal;
-    margin-left: 2px;
-    padding: 1px 5px;
+    margin-left: 5px;
+    padding: 0 4px;
     text-align: center;
     text-transform: uppercase;
 }
 .languages-dialog .nlanguage-lnk.selected .beta {
-    border-color: #fff;
-    color: #fff;
+    visibility: hidden;
 }
 .fm-dialog-button.fm-languages-save {
     margin: 8px 4px 0;
@@ -25206,9 +25205,9 @@ background-size:120px auto;
 background-image: url(../images/mega/main-sprite@2x.png?v=7);
 background-size: 50px auto;
 }
-top-login-spr .nlanguage-tooltip-bg, .nlanguage-bottom {
- background-image: url(../images/mega/language-sprite@2x.png);
- background-size: 18px auto;
+.nlanguage-tooltip-bg, .nlanguage-bottom {
+  background-image: url("../images/mega/language-sprite@2x.png");
+  background-size: 18px auto;
 }
 .download-dialog-icon, .download-chrome-lnk, a.download-chrome-lnk, .new-download-icon, .downloading-txt, .download-pause, .download-message-icon, .download-complete-icon, .download-error-ul, .download-user-icon, .new-download-sync-app, .new-download-red-button, .megasync-list-arrow, .megasync-logo, .megasync-table table th span, .megasync-table table td span, .megasync-dropdown span, .megasync-dropdown-link, .megasync-overlay-download span::before, .camera-bottom-icon, .camera-top-icon {
  background-image: url(../images/mega/download-sprite-v3@2x.png);

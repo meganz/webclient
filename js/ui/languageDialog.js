@@ -64,6 +64,8 @@ var langDialog = {
 
         // Show tier two languages if a language is already selected from that list
         if (tierTwoLangCodes.indexOf(lang) > -1) {
+            $arrowIcon.addClass('opened');
+            $showHideText.safeHTML(l[7658]);        // Hide languages
             $tierTwoLanguages.show();
             langDialog.centerDialog();
         }

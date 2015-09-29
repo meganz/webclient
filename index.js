@@ -1236,26 +1236,31 @@ function topmenuUI() {
             }
         });
         
-        var $topChangeLang = $('.top-change-language');
-        var $topChangeLangName = $topChangeLang.find('.top-change-language-name');
-        var languageName = ln[lang];
-        
-        // If they have changed the language from English, then show different style
-        if (lang !== 'en') {
-            $topChangeLang.addClass('other-language');
+        // Only show top language change icon if not logged in
+        if (u_type === false) {
+            
+            // Get current language
+            var $topChangeLang = $('.top-change-language');
+            var $topChangeLangName = $topChangeLang.find('.top-change-language-name');
+            var languageName = ln[lang];
+
+            // If they have changed the language from English, then show different style
+            if (lang !== 'en') {
+                $topChangeLang.addClass('other-language');
+            }
+
+            // Init the top header change language button
+            $topChangeLangName.text(languageName);
+            $topChangeLang.removeClass('hidden');
+            $topChangeLang.rebind('click', function() {
+
+                // Add log to see how often they click to change language
+                api_req({ a: 'log', e: 99600, m: 'Language menu opened from top header' });
+
+                // Open the language dialog
+                langDialog.show();
+            });
         }
-        
-        // Init the top header change language button
-        $topChangeLangName.text(languageName);
-        $topChangeLang.removeClass('hidden');
-        $topChangeLang.rebind('click', function() {
-            
-            // Add log to see how often they click to change language
-            api_req({ a: 'log', e: 99600, m: 'Language menu opened from top header' });
-            
-            // Open the language dialog
-            languageDialog();
-        });
 
         $('.top-menu-item.register,.context-menu-divider.register,.top-menu-item.login').show();
 
@@ -1629,7 +1634,7 @@ function topmenuUI() {
             mega.utils.reload();
         }
         else if (className.indexOf('languages') > -1) {
-            languageDialog();
+            langDialog.show();
         }
         else if (className.indexOf('clouddrive') > -1) {
             document.location.hash = 'fm';
@@ -1877,78 +1882,6 @@ window.onhashchange = function() {
         init_page();
     }
 };
-
-function languageDialog(close) {
-    if (close) {
-        $('.fm-dialog.languages-dialog').addClass('hidden');
-        $('.fm-dialog-overlay').addClass('hidden');
-        $('body').removeClass('overlayed');
-        $.dialog = false;
-        return false;
-    }
-    var html = '<div class="nlanguage-txt-block">';
-    var larray = [];
-    for (var la in languages) {
-        if (ln2[la]) {
-            larray.push({
-                l: ln[la],
-                l2: ln2[la],
-                c: la
-            });
-        }
-    }
-    larray.sort(function (a, b) {
-            return a.l.localeCompare(b.l);
-        });
-    var i = 1,
-        a = 0,
-        sel = '';
-    for (var j in larray) {
-        var la = larray[j].c;
-        if (ln2[la]) {
-            if (la == lang) {
-                sel = ' selected';
-            }
-            else {
-                sel = '';
-            }
-            html += '<a href="#" id="nlanguagelnk_' + la + '" class="nlanguage-lnk' + sel + '"><span class="nlanguage-tooltip"> <span class="nlanguage-tooltip-bg"> <span class="nlanguage-tooltip-main"> '
-                + ln2[la] + '</span></span></span>' + ln[la] + '</a><div class="clear"></div>';
-            if (i == Math.ceil(larray.length / 4) && a + 1 < larray.length) {
-                html += '</div><div class="nlanguage-txt-block">';
-                i = 0;
-            }
-            i++;
-            a++;
-        }
-    }
-    html += '</div><div class="clear"></div>';
-    $('.languages-dialog-body').safeHTML(html);
-    $('.fm-dialog.languages-dialog').removeClass('hidden');
-    $('.fm-dialog-overlay').removeClass('hidden');
-    $('body').addClass('overlayed');
-    $.dialog = 'languages';
-    $('.fm-dialog.languages-dialog .fm-dialog-close').rebind('click', function (e) {
-            languageDialog(1);
-        });
-
-    $('.fm-languages-save').rebind('click', function (e) {
-            languageDialog(1);
-            setTimeout(function () {
-                var lng = $('.nlanguage-lnk.selected').attr('id');
-                lng = lng.replace('nlanguagelnk_', '');
-                if (lng !== lang) {
-                    localStorage.lang = lng;
-                    document.location.reload();
-                }
-            }, 100);
-        });
-    $('.nlanguage-lnk').rebind('click', function (e) {
-            $('.nlanguage-lnk').removeClass('selected');
-            $(this).addClass('selected');
-            return false;
-        });
-}
 
 window.onbeforeunload = function () {
     if (dlmanager.isDownloading || ulmanager.isUploading) {

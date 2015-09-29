@@ -328,6 +328,21 @@ function init_page() {
         parsepage(pages['blogarticle']);
         init_blog();
     }
+    else if (page.substr(0, 6) == 'verify') {
+        api_req({
+            a: 'sec',
+            c: page.substr(6),
+            e: 'newemail',
+            uh: stringhash(localStorage.new_email.toLowerCase(), pw_aes)
+            r:1,
+            i: requesti
+        }, { 
+            callback: function(res) {
+                console.error("verify", res, page.substr(6));
+            }
+        });
+        return;
+    }
     else if (page.substr(0, 9) == 'corporate') {
         function doRenderCorpPage() {
             if (window.corpTemplate) {

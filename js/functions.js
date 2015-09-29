@@ -1302,29 +1302,53 @@ AssertionFailed.prototype.name = 'AssertionFailed';
 /**
  * Assert a given test condition.
  *
- * Throws an AssertionFailed exception with the given `message` on failure.
+ * Throws an AssertionFailed exception with a given message, in case the condition is false.
+ * The message is assembled by the args following 'test', similar to console.log()
  *
  * @param test
  *     Test statement.
- * @param message
- *     Message for exception on failure.
  */
-function assert(test, message) {
-    if (!test) {
-        if (MegaLogger && MegaLogger.rootLogger) {
-            MegaLogger.rootLogger.error("assertion failed: ", message);
-        }
-        else if (window.d) {
-            console.error(message);
-        }
-
-        if (localStorage.stopOnAssertFail) {
-            debugger;
-        }
-
-        throw new AssertionFailed(message);
+function assert(test) {
+    if (test) {
+        return;
     }
+    //assemble message from parameters
+    var message = '';
+    var last = arguments.length - 1;
+    for (var i = 1; i <= last; i++) {
+        message += arguments[i];
+        if (i < last) {
+            message += ' ';
+        }
+    }
+    if (MegaLogger && MegaLogger.rootLogger) {
+        MegaLogger.rootLogger.error("assertion failed: ", message);
+    }
+    else if (window.d) {
+        console.error(message);
+    }
+
+    if (localStorage.stopOnAssertFail) {
+        debugger;
+    }
+
+    throw new AssertionFailed(message);
 }
+
+
+/**
+ * Assert that a user handle is potentially valid (e. g. not an email address).
+ *
+ * @param userHandle {string}
+ *     The user handle to check.
+ * @throws
+ *     Throws an exception on something that does not seem to be a user handle.
+ */
+var assertUserHandle = function(userHandle) {
+    assert(base64urldecode(userHandle).length === 8,
+       'This seems not to be a user handle: ' + userHandle);
+};
+
 
 /**
  * Pad/prepend `val` with "0" (zeros) until the length is === `length`
@@ -1601,12 +1625,23 @@ function logAllCallsOnObject(ctx, loggerFn, recursive, textPrefix, parentLogger)
     });
 }
 
+/**
+ * Get an array with unique values
+ * @param {Array} arr Array
+ */
 function array_unique(arr) {
-    return $.grep(arr, function(v, k) {
-        return $.inArray(v, arr) === k;
-    });
+    return arr.reduce(function(out, value) {
+        if (out.indexOf(value) < 0) {
+            out.push(value);
+        }
+        return out;
+    }, []);
 }
 
+/**
+ * Get a random value from an array
+ * @param {Array} arr Array
+ */
 function array_random(arr) {
     return arr[rand(arr.length)];
 }
@@ -2934,6 +2969,80 @@ function assertStateChange(currentState, newState, allowedStatesMap, enumMap) {
 }
 
 /**
+ * Promise-based XHR request
+ * @param {Mixed} aURLOrOptions URL or options
+ * @param {Mixed} aData         data to send, optional
+ */
+mega.utils.xhr = function megaUtilsXHR(aURLOrOptions, aData) {
+    /* jshint -W074 */
+    var xhr;
+    var url;
+    var method;
+    var options;
+    var promise = new MegaPromise();
+
+    if (typeof aURLOrOptions === 'object') {
+        options = aURLOrOptions;
+        url = options.url;
+    }
+    else {
+        options = {};
+        url = aURLOrOptions;
+    }
+    aURLOrOptions = undefined;
+
+    aData = options.data || aData;
+    method = options.method || (aData && 'POST') || 'GET';
+
+    xhr = getxhr();
+
+    if (typeof options.prepare === 'function') {
+        options.prepare(xhr);
+    }
+
+    xhr.onloadend = function(ev) {
+        if (this.status === 200) {
+            promise.resolve(ev, this.response);
+        }
+        else {
+            promise.reject(ev);
+        }
+    };
+
+    try {
+        if (d) {
+            MegaLogger.getLogger('muXHR').info(method + 'ing', url, options, aData);
+        }
+        xhr.open(method, url);
+
+        if (options.type) {
+            xhr.responseType = options.type;
+            if (xhr.responseType !== options.type) {
+                xhr.abort();
+                throw new Error('Unsupported responseType');
+            }
+        }
+
+        if (typeof options.beforeSend === 'function') {
+            options.beforeSend(xhr);
+        }
+
+        if (is_chrome_firefox) {
+            xhr.setRequestHeader('Origin', getBaseUrl(), false);
+        }
+
+        xhr.send(aData);
+    }
+    catch (ex) {
+        promise.reject(ex);
+    }
+
+    xhr = options = undefined;
+
+    return promise;
+};
+
+/**
  *  Retrieve a call stack
  *  @return {String}
  */
@@ -3293,7 +3402,7 @@ function mCleanestLogout(aUserHandle) {
 // Initialize Rubbish-Bin Cleaning Scheduler
 mBroadcaster.addListener('crossTab:master', function _setup() {
     var RUBSCHED_WAITPROC = 120 * 1000;
-    var RUBSCHED_IDLETIME =  25 * 1000;
+    var RUBSCHED_IDLETIME =   4 * 1000;
     var timer, updId;
 
     mBroadcaster.once('crossTab:leave', _exit);
@@ -3602,7 +3711,7 @@ if (typeof sjcl !== 'undefined') {
 
 (function($, scope) {
     /**
-     * Nodes related operations
+     * Nodes related operations.
      *
      * @param opts {Object}
      *
@@ -3619,27 +3728,52 @@ if (typeof sjcl !== 'undefined') {
     /**
      * isShareExists
      *
-     * checking if there's available shares for selected nodes
-     *
-     * @param {array} nodes, holds array of ids from selected folders/files (nodes)
-     *
-     * @returns {boolean}
+     * Checking if there's available shares for selected nodes.
+     * @param {Array} nodes Holds array of ids from selected folders/files (nodes).
+     * @param {Boolean} fullShare Do we need info about full share.
+     * @param {Boolean} pendingShare Do we need info about pending share .
+     * @param {Boolean} linkShare Do we need info about link share 'EXP'.
+     * @returns {Boolean} result.
      */
-    Nodes.prototype.isShareExist = function(nodes) {
+    Nodes.prototype.isShareExist = function(nodes, fullShare, pendingShare, linkShare) {
 
         var self = this;
+
+        var shares = {}, length;
 
         for (var i in nodes) {
             if (nodes.hasOwnProperty(i)) {
 
-                // Checking full share
-                if (M.d[nodes[i]].shares && Object.keys(M.d[nodes[i]].shares).length) {
-                    return true;
+                // Look for full share
+                if (fullShare) {
+                    shares = M.d[nodes[i]].shares;
+
+                    // Look for link share
+                    if (linkShare) {
+                        if (shares && Object.keys(shares).length) {
+                            return true;
+                        }
+                    }
+                    else { // Exclude folder/file links,
+                        if (shares) {
+                            length = Object.keys(shares).length;
+                            if (length) {
+                                if (!shares.EXP || (shares.EXP && length > 1)) {
+                                    return true;
+                                }
+                            }
+
+                        }
+                    }
                 }
 
-                // Checking pending share
-                if (M.ps && M.ps[nodes[i]] && Object.keys(M.ps[nodes[i]]).length) {
-                    return true;
+                // Look for pending share
+                if (pendingShare) {
+                    shares = M.ps[nodes[i]];
+
+                    if (M.ps && shares && Object.keys(shares).length) {
+                        return true;
+                    }
                 }
             }
         }
@@ -3648,14 +3782,102 @@ if (typeof sjcl !== 'undefined') {
     };
 
     /**
+     * getShares
+     *
+     * Is there available share for nodes.
+     * @param {String} node Node id.
+     * @param {Boolean} fullShare Inclde results for full shares.
+     * @param {Boolean} pendingShare Include results for pending shares.
+     * @param {Boolean} linkShare Include results for foder/file links.
+     * @returns {Array} result Array of user ids.
+     */
+    Nodes.prototype.getShares = function(nodes, fullShare, pendingShare, linkShare) {
+
+        var self = this;
+
+        var result, shares, length;
+
+        for (var i in nodes) {
+            if (nodes.hasOwnProperty(i)) {
+                result = [];
+
+                // Look for full share
+                if (fullShare) {
+                    shares = M.d[nodes[i]].shares;
+
+                    // Look for link share
+                    if (linkShare) {
+                        if (shares && Object.keys(shares).length) {
+                            result.push(self.loopShares(shares), linkShare);
+                        }
+                    }
+                    else { // Exclude folder/file links,
+                        if (shares) {
+                            length = Object.keys(shares).length;
+                            if (length) {
+                                if (!shares.EXP || (shares.EXP && length > 1)) {
+                                    result.push(self.loopShares(shares), linkShare);
+                                }
+                            }
+
+                        }
+                    }
+                }
+
+                // Look for pending share
+                if (pendingShare) {
+                    shares = M.ps[nodes[i]];
+                    if (M.ps && shares && Object.keys(shares).length) {
+                        result.push(self.loopShares(shares), linkShare);
+                    }
+                }
+            }
+        }
+
+        return result;
+    };
+
+    /**
+     * loopShares
+     *
+     * Loops through all shares.
+     * @param {Object} shares.
+     * @param {Boolean} linkShare Do we need info about link share.
+     * @returns {Array} user id.
+     */
+    Nodes.prototype.loopShares = function(shares, linkShare) {
+
+        var self = this;
+
+        var result = [],
+            exclude = 'EXP',
+            index;
+
+        for (var item in shares) {
+            if (shares.hasOwnProperty(item)) {
+                result.push(item);
+            }
+        }
+
+        // Remove 'EXP'
+        if (!linkShare) {
+            index = result.indexOf(exclude);
+
+            if (index !== -1) {
+                result = result.splice(index, 1);
+            }
+        }
+
+        return result;
+    };
+
+    /**
      * loopSubdirs
      *
-     * Loops through all subdirs of given node
-     *
-     * @param {string} id: node id
-     * @param {array} nodesId
-     *
-     * @returns child nodes id
+     * Loops through all subdirs of given node.
+     * @param {string} id: node id.
+     * @param {array} nodesId.
+     * @returns child nodes id.
      */
     Nodes.prototype.loopSubdirs = function(id, nodesId) {
 

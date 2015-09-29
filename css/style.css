@@ -1530,15 +1530,14 @@ a.blog-button:hover {
 	-moz-border-radius-topleft: 8px;
 	border-top-left-radius: 8px;
 }
-
 /* Change top language button */
 .top-change-language {
-    cursor: pointer;
-    float: right;
-    position: relative;
+	cursor: pointer;
+	float: right;
+	position: relative;
 }
 .top-change-language:hover .top-change-language-name {
-    color: #fff;
+	color: #fff;
 }
 .top-change-language-icon {
   background-image: url("../images/mega/lang-selection-sprite.png");
@@ -1570,7 +1569,6 @@ a.blog-button:hover {
     height: 24px;
     width: 24px;
 }
-
 .top-login-button:hover, .top-login-button.active {
 	background-color: rgba(255,255,255,0.5);
 	color: rgba(255,255,255,0.8);
@@ -2856,10 +2854,6 @@ a.blog-new-archive-lnk {
 .new-bottom-pages .blog-new-full p.conclusion {
 	margin: 0;
 	padding: 7px 0 33px 0;
-}
-.new-bottom-pages .blog-new-full ul {
-	margin: 0;
-	padding: 20px 0 15px 0;
 }
 .sync ul {
 	margin: 0;
@@ -5456,7 +5450,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 .files-grid-view th.grid-url-header, .files-grid-view th:nth-child(5), .contacts-grid-view th.grid-url-header, .grid-table-header th.grid-url-header, .transfer-table-header th:nth-child(7), .transfer-table-header th:nth-child(8), .files-grid-view.shared-view th:nth-child(4), .files-grid-view.shared-view th:nth-child(5), .shared-grid-view th:nth-child(4), .shared-grid-view th:nth-child(5), .files-grid-view.contacts-view th:nth-child(3), .files-grid-view.contacts-view th:nth-child(3), .contacts-grid-view th:nth-child(3), .contacts-grid-view th:nth-child(3), .contacts-grid-view th:nth-child(4), .sent-requests-grid th:first-child, .contact-requests-grid th:nth-child(2), .sent-requests-grid th:nth-child(2) {
 	background-image: none;
 }
-.grid-header-star {
+.arrow.desc.grid-header-star, .arrow.asc.grid-header-star, .grid-header-star {
 	height: 24px;
 	width: 30px;
 	display: block;
@@ -10475,10 +10469,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .nw-chat-expand-arrow::before {
 	content: '\00a0';
 }
-.top-dialog-login-button span {
-	min-width: 40px;
-	position: relative;
-}
 .fm-dialog-button.dialog-newfolder-button {
 	float: left;
 	margin-left: -4px;
@@ -14336,18 +14326,24 @@ h5.main-italic-header {
 }
 .top-dialog-login-button span {
 	position: relative;
+	overflow: hidden;
 }
-.top-dialog-login-button img {
+.top-dialog-login-button i {
 	display: none;
 }
-.top-dialog-login-button.loading img {
+.top-dialog-login-button.loading i {
 	display: block;
-	width: 16px;
+	background-color: white;
 	position: absolute;
-	left: 50%;
-	margin-left: -8px;
-	top: 7px;
-	padding: 0 0 0 0;
+	width: 100%;
+	height: 100%;
+	left: 0;
+    top: 0;
+	text-align: center;
+}
+.top-dialog-login-button.loading img {
+	width: 16px;
+	margin: 7px 0 0 0;
 }
 .login-register-input input {
 	border: 0;
@@ -14994,7 +14990,7 @@ h5.main-italic-header {
 .membership-payment-pad {
 	padding: 0;
 }
-/* Positioned absolute because payment options can be dynamic e.g. they may or may not have account 
+/* Positioned absolute because payment options can be dynamic e.g. they may or may not have account
    balance and we want the bottom of the date box to line up with the bottom of the plan box on the left */
 .payment-period {
 	position: absolute;
@@ -23205,101 +23201,167 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 }
 /* Credentials / Fingerprint warning dialog */
 .credential-warning-button {
+    left: 50%;
+    position: absolute;
+    top: 15px;
+}
+.credentials-warning-dialog .fm-dialog-close {
+    visibility: hidden;
+}
+.credentials-warning-dialog .fm-mega-dialog-pad {
+    margin: 12px 0;
+}
+.credentials-warning-dialog .fm-mega-dialog-bottom {
+    margin: 12px 0 -12px;
+}
+.credentials-warning-dialog {
+    background-color: #fff;
+    width: 600px;
+}
+.credentials-warning-dialog .content {
+    color: #999999;
+    font-size: 13px;
+    line-height: 20px;
+    padding-bottom: 10px;
+}
+.credentials-warning-dialog .avatarAndWarningMessage {
+    margin: 0 20px;
+    overflow: hidden;
+}
+.credentials-warning-dialog .userAvatar {
+    float: left;
+}
+.credentials-warning-dialog .information {
+    float: left;
+    margin-left: 20px;
+    width: 442px;
+}
+.credentials-warning-dialog .information.noAvatar {
+    margin-left: 0;
+    width: auto;
+}
+.credentials-warning-dialog .information .firstLine {
+    color: #d90007;
+    font-weight: bold;
+}
+.credentials-warning-dialog .information .emailAddress {
+    color: #000;
+}
+.credentials-warning-dialog .userAvatar img {
+    height: 90px;
+    width: 90px;
+}
+.credentials-warning-dialog .previousCredentials {
+    background-color: #f2f2f2;
+    margin-top: 20px;
+    padding: 20px;
+}
+.credentials-warning-dialog .previousCredentials .title {
+    color: #000;
+    font-weight: bold;
+}
+.credentials-warning-dialog .previousCredentials .fingerprint, .credentials-warning-dialog .newCredentials .fingerprint {
+    font-family: monospace;
+    font-size: 14px;
+    margin-left: -6px;
+    margin-top: 10px;
+    text-transform: uppercase;
+}
+.credentials-warning-dialog .previousCredentials .fingerprint > span, .credentials-warning-dialog .newCredentials .fingerprint > span {
+    display: inline-block;
+    text-align: center;
+    width: 44px;
+    -webkit-touch-callout: text !important;
+    -webkit-user-select: text !important;
+    -khtml-user-select: text !important;
+    -moz-user-select: text !important;
+    -ms-user-select: text !important;
+    user-select: text !important;
+}
+.credentials-warning-dialog .newCredentials span.mismatch {
+    color: #D90007;
+}
+.credentials-warning-dialog .newCredentials {
+    padding: 20px 20px 35px 20px;
+}
+.credentials-warning-dialog .newCredentials .title {
+    color: #D90007;
+    font-weight: bold;
+}
+.credentials-warning-dialog .instruction {
+    padding: 3px 20px;
+}
+.credentials-warning-dialog .instruction .reject {
+    color: #D90007;
+    font-weight: bold;
+}
+.credentials-warning-dialog .instruction .accept {
+    color: #31B500;
+    font-weight: bold;
+}
+/* Key signature mismatch warning dialog */
+.key-signature-warning-button {
 	left: 50%;
 	position: absolute;
 	top: 15px;
 }
-.credentials-warning-dialog .fm-dialog-close {
+.key-signature-warning-dialog .fm-dialog-close {
 	visibility: hidden;
 }
-.credentials-warning-dialog .fm-mega-dialog-pad {
+.key-signature-warning-dialog .fm-mega-dialog-pad {
 	margin: 12px 0;
 }
-.credentials-warning-dialog .fm-mega-dialog-bottom {
+.key-signature-warning-dialog .fm-mega-dialog-bottom {
 	margin: 12px 0 -12px;
 }
-.credentials-warning-dialog {
+.key-signature-warning-dialog {
 	background-color: #fff;
 	width: 600px;
 }
-.credentials-warning-dialog .content {
+.key-signature-warning-dialog .content {
 	color: #999999;
 	font-size: 13px;
 	line-height: 20px;
 	padding-bottom: 10px;
 }
-.credentials-warning-dialog .avatarAndWarningMessage {
+.key-signature-warning-dialog .avatarAndWarningMessage {
 	margin: 0 20px;
 	overflow: hidden;
 }
-.credentials-warning-dialog .userAvatar {
+.key-signature-warning-dialog .userAvatar {
 	float: left;
 }
-.credentials-warning-dialog .information {
+.key-signature-warning-dialog .information {
 	float: left;
 	margin-left: 20px;
 	width: 442px;
 }
-.credentials-warning-dialog .information.noAvatar {
+.key-signature-warning-dialog .information.noAvatar {
 	margin-left: 0;
 	width: auto;
 }
-.credentials-warning-dialog .information .firstLine {
+.key-signature-warning-dialog .information .firstLine {
 	color: #d90007;
 	font-weight: bold;
 }
-.credentials-warning-dialog .information .emailAddress {
+.key-signature-warning-dialog .information .emailAddress {
 	color: #000;
 }
-.credentials-warning-dialog .userAvatar img {
+.key-signature-warning-dialog .information .description {
+    color: #000000;
+}
+.key-signature-warning-dialog .userAvatar img {
 	height: 90px;
 	width: 90px;
 }
-.credentials-warning-dialog .previousCredentials {
-	background-color: #f2f2f2;
-	margin-top: 20px;
-	padding: 20px;
-}
-.credentials-warning-dialog .previousCredentials .title {
-	color: #000;
-	font-weight: bold;
-}
-.credentials-warning-dialog .previousCredentials .fingerprint, .credentials-warning-dialog .newCredentials .fingerprint {
-	font-family: monospace;
-	font-size: 14px;
-	margin-left: -6px;
-	margin-top: 10px;
-	text-transform: uppercase;
-}
-.credentials-warning-dialog .previousCredentials .fingerprint > span, .credentials-warning-dialog .newCredentials .fingerprint > span {
-	display: inline-block;
-	text-align: center;
-	width: 44px;
-	-webkit-touch-callout: text !important;
-	-webkit-user-select: text !important;
-	-khtml-user-select: text !important;
-	-moz-user-select: text !important;
-	-ms-user-select: text !important;
-	user-select: text !important;
-}
-.credentials-warning-dialog .newCredentials span.mismatch {
-	color: #D90007;
-}
-.credentials-warning-dialog .newCredentials {
-	padding: 20px 20px 35px 20px;
-}
-.credentials-warning-dialog .newCredentials .title {
-	color: #D90007;
-	font-weight: bold;
-}
-.credentials-warning-dialog .instruction {
+.key-signature-warning-dialog .instruction {
 	padding: 3px 20px;
 }
-.credentials-warning-dialog .instruction .reject {
+.key-signature-warning-dialog .instruction .reject {
 	color: #D90007;
 	font-weight: bold;
 }
-.credentials-warning-dialog .instruction .accept {
+.key-signature-warning-dialog .instruction .accept {
 	color: #31B500;
 	font-weight: bold;
 }
@@ -26231,4 +26293,11 @@ body, body * {
 	width: 12px !important;
 	float: left !important;
 	margin-right: 4px !important;
+}
+.blog-new-full ul {
+	padding: 0px;
+	margin: 0px;
+}
+.blog-new-full ul li {
+	padding: 0 0 0px 15px;
 }

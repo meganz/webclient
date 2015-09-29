@@ -668,6 +668,8 @@ var ulmanager = {
                     ulmanager.ulStart(File);
                 }
                 else if (ctx.skipfile) {
+                    uq.skipfile = true;
+                    ulmanager.ulIDToNode[ulmanager.getGID(uq)] = ctx.n.h;
                     onUploadSuccess(uq);
                     File.file.ul_failed = false;
                     File.file.retries = 0;

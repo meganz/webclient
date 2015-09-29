@@ -335,7 +335,9 @@ function mObjectURL(data, type)
     return blob && URL.createObjectURL(blob);
 }
 
-var mBroadcaster = {
+Object.defineProperty(this, 'mBroadcaster', {
+    writable: false,
+    value: Object.freeze({
     _topics : {},
 
     addListener: function mBroadcaster_addListener(topic, options) {
@@ -573,14 +575,8 @@ var mBroadcaster = {
             delete localStorage[ev.key];
         }
     }
-};
-if (typeof Object.freeze === 'function') {
-    mBroadcaster = Object.freeze(mBroadcaster);
-}
-Object.defineProperty(this, 'mBroadcaster', {
-    value: mBroadcaster,
-    writable: false
-});
+})});
+
 
 var sh = [];
 
@@ -720,7 +716,7 @@ var silent_loading=false;
 
 if (m)
 {
-    var app,mobileblog,android,intent;
+    var app,mobileblog,android,intent, ios9;
     var link = document.createElement('link');
     link.setAttribute('rel', 'stylesheet');
     link.type = 'text/css';
@@ -767,6 +763,14 @@ if (m)
         app='https://itunes.apple.com/app/mega/id706857885';
         document.body.className = 'ios full-mode supported';
         document.getElementById('m_desc').innerHTML = 'Free 50 GB - End-to-end encryption';
+
+        var ver = ua.match(/(?:iphone|cpu) os (\d+)[\._](\d+)/);
+        if (ver) {
+            var rev = ver.pop();
+            ver = ver.pop();
+            // Check for iOS 9.0+
+            ios9 = (ver > 8);
+        }
     }
     else document.body.className = 'another-os full-mode unsupported';
 
@@ -805,7 +809,16 @@ if (m)
                 }, 2500);
             }
         }
-        else document.getElementById('m_iframe').src = 'mega://' + window.location.hash.substr(i);
+        else if (ios9) {
+            setTimeout(function() {
+                if (confirm('Do you already have the MEGA app installed?')) {
+                    document.location = 'mega://' + window.location.hash;
+                }
+            }, 1500);
+        }
+        else {
+            document.getElementById('m_iframe').src = 'mega://' + window.location.hash.substr(i);
+        }
     }
     else if (window.location.hash.substr(1,7) == 'confirm' || window.location.hash.substr(1,7) == 'account')
     {
@@ -815,6 +828,13 @@ if (m)
         }
         if (ua.indexOf('chrome') > -1) {
             window.location = 'mega://' + window.location.hash.substr(i);
+        }
+        else if (ios9) {
+            setTimeout(function() {
+                if (confirm('Do you already have the MEGA app installed?')) {
+                    document.location = 'mega://' + window.location.hash;
+                }
+            }, 1500);
         }
         else {
             document.getElementById('m_iframe').src = 'mega://' + window.location.hash.substr(i);
@@ -854,7 +874,7 @@ else if (!b_u)
         };
     })(console);
 
-    Object.defineProperty(window, "__cd_v", { value : 17, writable : false });
+    Object.defineProperty(window, "__cd_v", { value : 18, writable : false });
     if (!d || onBetaW)
     {
         var __cdumps = [], __cd_t;
@@ -875,7 +895,17 @@ else if (!b_u)
             var dump = {
                 l: ln,
                 f: mTrim(url),
-                m: mTrim(msg).replace(/'(\w+:\/\/+[^/]+?)[^']+(?:'|$)/, "'$1...'")
+                m: mTrim(msg)
+                    .replace(/'[a-z]+:\/+[^']+(?:'|$)/gi, function(url) {
+                        url = url.substr(1);
+                        if (url[url.length - 1] === "'") {
+                            url = url.substr(0, url.length - 1);
+                        }
+                        var a = document.createElement('a');
+                        a.href = url;
+                        return "'" + (a.origin !== 'null' && a.origin
+                            || (a.protocol + '//' + a.hostname)) + "...'";
+                    })
                     .replace(/(Access to '\.\.).*(' from script denied)/, '$1$2')
                     .replace(/gfs\w+\.userstorage/, 'gfs...userstorage')
                     .replace(/^Uncaught\W*(?:exception\W*)?/i, ''),
@@ -885,7 +915,9 @@ else if (!b_u)
             if (~dump.m.indexOf('[[:i]]')) {
                 return false;
             }
-            if ((mega.flags & window.MEGAFLAG_MDBOPEN) && dump.m === 'InvalidStateError') {
+            if ((mega.flags & window.MEGAFLAG_MDBOPEN)
+                    && (dump.m === 'InvalidStateError'
+                        || (dump.m === 'UnknownError'))) {
                 // Prevent InvalidStateError exceptions from indexedDB.open
                 // caused while using Private Browser Mode on Firefox.
                 return false;
@@ -1115,8 +1147,24 @@ else if (!b_u)
     jsl.push({f:'js/megaDb.js', n: 'megadb_js', j:1,w:5});
     jsl.push({f:'js/megaKvStorage.js', n: 'megakvstorage_js', j:1,w:5});
 
+    // notifications
+    jsl.push({f:'js/megaNotifications.js', n: 'meganotifications_js', j:1,w:7});
+    jsl.push({f:'js/vendor/ion.sound.js', n: 'ionsound_js', j:1,w:7});
+    jsl.push({f:'js/vendor/favico.js', n: 'favico_js', j:1,w:7});
+    jsl.push({f:'js/vendor/notification.js', n: 'notification_js', j:1,w:7});
+
+    // Other
+    jsl.push({f:'js/vendor/Autolinker.js', n: 'mega_js', j:1,w:7});
+
+    // Google Import Contacts
+    jsl.push({f:'js/gContacts.js', n: 'gcontacts_js', j:1,w:3});
+
+    // MEGA CHAT
     jsl.push({f:'js/chat/mpenc.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/chat/opQueue.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/chat/rtcStats.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/chat/rtcSession.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/chat/fileTransfer.js', n: 'mega_js', j:1,w:7});
 
     jsl.push({f:'js/vendor/chat/strophe.light.js', n: 'mega_js', j:1, w:7});
     jsl.push({f:'js/vendor/chat/strophe.disco.js', n: 'mega_js', j:1,w:7});
@@ -1136,31 +1184,6 @@ else if (!b_u)
     jsl.push({f:'js/vendor/chat/cryptojs-hmac.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/vendor/chat/cryptojs-lib-typedarrays.js', n: 'mega_js', j:1,w:7});
 
-    // Other
-    jsl.push({f:'js/vendor/Autolinker.js', n: 'mega_js', j:1,w:7});
-
-    // Google Import Contacts
-    jsl.push({f:'js/gContacts.js', n: 'gcontacts_js', j:1,w:3});
-
-    // MEGA CHAT
-    jsl.push({f:'js/chat/rtcStats.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/chat/rtcSession.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/chat/fileTransfer.js', n: 'mega_js', j:1,w:7});
-
-    jsl.push({f:'js/ui/filepicker.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/ui/dialog.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/ui/feedbackDialog.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/ui/credentialsWarningDialog.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/ui/loginRequiredDialog.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/chat/ui/incomingCallDialog.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/ui/languageDialog.js', n: 'mega_js', j:1,w:7});
-
-    // notifications
-    jsl.push({f:'js/megaNotifications.js', n: 'meganotifications_js', j:1,w:7});
-    jsl.push({f:'js/vendor/ion.sound.js', n: 'ionsound_js', j:1,w:7});
-    jsl.push({f:'js/vendor/favico.js', n: 'favico_js', j:1,w:7});
-    jsl.push({f:'js/vendor/notification.js', n: 'notification_js', j:1,w:7});
-
     jsl.push({f:'js/chat/plugins/karerePing.js', n: 'karerePing_js', j:1,w:7});
     jsl.push({f:'js/chat/plugins/callManager.js', n: 'callManager_js', j:1,w:7});
     jsl.push({f:'js/chat/plugins/urlFilter.js', n: 'urlFilter_js', j:1,w:7});
@@ -1178,6 +1201,16 @@ else if (!b_u)
     jsl.push({f:'js/chat/chatRoom.js', n: 'chat_js', j:1,w:7});
 
     // END OF MEGA CHAT
+
+    // UI Elements
+    jsl.push({f:'js/ui/filepicker.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/ui/dialog.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/ui/feedbackDialog.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/ui/credentialsWarningDialog.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/ui/keySignatureWarningDialog.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/ui/loginRequiredDialog.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/chat/ui/incomingCallDialog.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/ui/feedbackDialog.js', n: 'mega_js', j:1,w:7});
 
     jsl.push({f:'js/fm.js', n: 'fm_js', j:1,w:12});
     jsl.push({f:'js/filetypes.js', n: 'filetypes_js', j:1});
@@ -1846,7 +1879,7 @@ else if (!b_u)
 
 /**
  * Determines whether to show an ad or not
- * @returns {number} Returns a 0 for definitely no ads (e.g. I am using an extension). 1 will enable ads dependant on
+ * @returns {number} Returns a 0 for definitely no ads (e.g. I am using an extension). 1 will enable ads dependent on
  *                   country. 2 ignores country limitations (for developers to always see ads regardless). 3 means I
  *                   prefer not to see an ad because I am logged in, but it will send one if it is a trusted ad that we
  *                   have vetted (we fully control the ad and host it ourselves) and ads are turned on in the API.

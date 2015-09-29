@@ -262,7 +262,7 @@
         <div class="copy-dialog-empty conversations">
             <div class="copy-dialog-empty-icon"></div>
             <div class="copy-dialog-empty-header">
-                [$784]
+                [$6772]
             </div>
             <div class="copy-dialog-empty-txt">
                 [$981]
@@ -1185,7 +1185,7 @@
           <div class="checkboxOn login-checkbox"></div>
           <label class="radio-txt">[$192]</label>
 
-          <div class="top-dialog-login-button"><span>[$171] <img alt="" src="{staticpath}images/mega/ajax-loader.gif"></span></div>
+          <div class="top-dialog-login-button"><span>[$171] <i><img alt="" src="{staticpath}images/mega/ajax-loader.gif"></i></span></div>
           <div class="clear"></div>
         </div>
     </div>
@@ -1411,7 +1411,7 @@
     </div>
 </div>
 
-<!-- Dialog is shown when user is being MITM'd -->
+<!-- Dialog is shown when user's Ed25519 public key fingerprint mismatches. -->
 <div class="fm-dialog fm-mega-dialog credentials-warning-dialog filled-input hidden">
     <div class="fm-dialog-close"></div>
     <div class="nw-fm-dialog-title"></div>
@@ -1437,6 +1437,31 @@
                 <div class="newCredentials">
                     <div class="title">[$6858]</div>
                     <div class="fingerprint"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Dialog is shown when user's public key signature fails validation. -->
+<div class="fm-dialog fm-mega-dialog key-signature-warning-dialog filled-input hidden">
+    <div class="fm-dialog-close"></div>
+    <div class="nw-fm-dialog-title"></div>
+    <div class="fm-mega-dialog-pad">
+        <div class="fm-dialog-contents">
+            <div class="content">
+                <div class="avatarAndWarningMessage">
+                    <div class="userAvatar">
+                        <img alt="avatar" src="" />
+                    </div>
+                    <div class="information">
+                        <span class="firstLine">
+                            [$7585]
+                        </span>
+                        <span class="description">
+                            [$7586]
+                        </span>
+                    </div>
                 </div>
             </div>
         </div>

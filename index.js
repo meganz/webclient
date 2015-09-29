@@ -1016,8 +1016,6 @@ function tooltiplogin() {
         $('.top-login-input-block.password').addClass('incorrect');
     }
     else {
-        $('.top-dialog-login-button span')
-            .safeHTML('<img alt="" src="@@images/mega/ajax-loader.gif">', staticpath);
         $('.top-dialog-login-button').addClass('loading');
         if ($('.loginwarning-checkbox').attr('class').indexOf('checkboxOn') > -1) {
             localStorage.hideloginwarning = 1;
@@ -1027,7 +1025,6 @@ function tooltiplogin() {
             remember = 1;
         }
         postLogin($('#login-name').val(), $('#login-password').val(), remember, function (r) {
-            $('.top-dialog-login-button span').text(l[171]);
             $('.top-dialog-login-button').removeClass('loading');
             if (r == EBLOCKED) {
                 alert(l[730]);

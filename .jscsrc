@@ -102,7 +102,7 @@
         "checkParamNames": true,
         "checkRedundantParams": true,
         "checkRedundantReturns": true,
-        "checkTypes": "strictNativeCase"
+        "checkTypes": "capitalizedNativeCase"
     },
 
     "excludeFiles": [

@@ -234,8 +234,8 @@ a, a:link, a:visited, a:hover, a:active, a:focus img, a:focus img {
     color: #605f5d;
     display: block;
     font-size: 14px;
-    line-height: 24px;
-    margin: 2px 0;
+    height: 28px;
+    line-height: 23px;
     padding: 0 10px;
     position: relative;
 }
@@ -325,7 +325,6 @@ a.nlanguage-lnk:hover .nlanguage-tooltip {
 }
 .languages-dialog .tier-two-languages {
     display: none;
-    margin-bottom: 15px;
     margin-top: 20px;
     min-height: 270px;
 }

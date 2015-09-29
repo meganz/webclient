@@ -440,7 +440,7 @@ var strongvelope = {};
      *
      * @constructor
      *
-     * @property {Number} kyeId
+     * @property {Number} keyId
      *     ID of our current sender key.
      * @property {Array.<String>} senderKeys
      *     Array containing all our used sender keys, indexed by keyId.

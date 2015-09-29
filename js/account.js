@@ -563,6 +563,7 @@ function generateAvatarMeta(user_hash) {
 function getUserAttribute(userhandle, attribute, pub, nonHistoric,
                           callback, ctx) {
     assertUserHandle(userhandle);
+    var logger = MegaLogger.getLogger('account');
     var myCtx = ctx || {};
 
     // Assemble property name on Mega API.
@@ -589,19 +590,15 @@ function getUserAttribute(userhandle, attribute, pub, nonHistoric,
                                                            u_k);
                 res = tlvstore.tlvRecordsToContainer(clearContainer);
             }
-            if (window.d) {
-                console.log('Attribute "' + attribute + '" for user "'
-                            + userhandle + '" is "' + res + '".');
-            }
+            logger.info('Attribute "' + attribute + '" for user "'
+                        + userhandle + '" is "' + res + '".');
             thePromise.resolve(res);
         }
         else {
             // Got back an error (a number).
-            if (window.d) {
-                console.log('Warning, attribute "' + attribute
-                            + '" for user "' + userhandle
-                            + '" could not be retrieved: ' + res + '!');
-            }
+            logger.warn('Warning, attribute "' + attribute
+                        + '" for user "' + userhandle
+                        + '" could not be retrieved: ' + res + '!');
             thePromise.reject(res);
         }
 
@@ -656,6 +653,7 @@ function getUserAttribute(userhandle, attribute, pub, nonHistoric,
  */
 function setUserAttribute(attribute, value, pub, nonHistoric, callback, ctx,
                           mode) {
+    var logger = MegaLogger.getLogger('account');
     var myCtx = ctx || {};
 
     // Prepare all data needed for the call on the Mega API.
@@ -681,12 +679,12 @@ function setUserAttribute(attribute, value, pub, nonHistoric, callback, ctx,
 
     function settleFunction(res) {
         if (typeof res !== 'number') {
-            console.log('Setting user attribute "'
+            logger.info('Setting user attribute "'
                         + attribute + '", result: ' + res);
             thePromise.resolve(res);
         }
         else {
-            console.log('Error setting user attribute "'
+            logger.warn('Error setting user attribute "'
                         + attribute + '", result: ' + res + '!');
             thePromise.reject(res);
         }

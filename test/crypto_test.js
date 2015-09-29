@@ -304,7 +304,8 @@ describe("crypto unit test", function() {
             it("uncached Ed25519 key, bad fingerprint", function() {
                 sandbox.stub(window, 'u_authring', { Ed25519: {} });
                 sandbox.stub(window, 'pubEd25519', {});
-                var masterPromise = { linkFailTo: sinon.stub() };
+                var masterPromise = { reject: sinon.stub(),
+                                      linkFailTo: sinon.stub() };
                 sandbox.stub(window, 'MegaPromise').returns(masterPromise);
                 var pubKeyPromise = { done: sinon.stub() };
                 sandbox.stub(ns, 'getPubKeyAttribute').returns(pubKeyPromise);
@@ -321,6 +322,8 @@ describe("crypto unit test", function() {
                 assert.strictEqual(ns._getPubKeyAuthentication.callCount, 1);
                 assert.strictEqual(authring.computeFingerprint.callCount, 1);
                 assert.strictEqual(ns._showFingerprintMismatchException.callCount, 1);
+                assert.strictEqual(masterPromise.reject.callCount, 1);
+                assert.strictEqual(masterPromise.reject.args[0][0], EINTERNAL);
                 assert.strictEqual(masterPromise.linkFailTo.callCount, 1);
                 assert.strictEqual(masterPromise.linkFailTo.args[0][0], pubKeyPromise);
                 assert.deepEqual(pubEd25519, { 'you456789xw': 'the key' });
@@ -509,7 +512,7 @@ describe("crypto unit test", function() {
             it("uncached Cu25519 key, bad signature", function() {sandbox.stub(window, 'u_authring', { Cu25519: {} });
                 sandbox.stub(window, 'pubEd25519', { 'you456789xw': 'the key' });
                 sandbox.stub(window, 'pubCu25519', {});
-                var masterPromise = { resolve: sinon.stub(),
+                var masterPromise = { reject: sinon.stub(),
                                       linkFailTo: sinon.stub() };
                 var signatureVerificationPromise = { done: sinon.stub() };
                 var _MegaPromise = function() {
@@ -525,7 +528,6 @@ describe("crypto unit test", function() {
                 sandbox.stub(window, 'base64urldecode', _echo);
                 sandbox.stub(window, 'assertUserHandle');
                 sandbox.stub(ns, '_checkSignature').returns(false);
-                sandbox.stub(authring, 'setContactAuthenticated');
                 sandbox.stub(ns, '_showKeySignatureFailureException');
 
                 // This is to pass through the first call directly, then stub on subsequent ones.
@@ -563,9 +565,9 @@ describe("crypto unit test", function() {
                 assert.strictEqual(base64urldecode.callCount, 1);
                 assert.strictEqual(ns._checkSignature.callCount, 1);
                 assert.strictEqual(ns._showKeySignatureFailureException.callCount, 1);
-                assert.strictEqual(masterPromise.resolve.callCount, 0);
+                assert.strictEqual(masterPromise.reject.callCount, 1);
+                assert.strictEqual(masterPromise.reject.args[0][0], EINTERNAL);
                 assert.strictEqual(authring.computeFingerprint.callCount, 1);
-                assert.strictEqual(authring.setContactAuthenticated.callCount, 0);
                 assert.deepEqual(pubEd25519, { 'you456789xw': 'the key' });
             });
 
@@ -589,7 +591,6 @@ describe("crypto unit test", function() {
                 sandbox.stub(window, 'base64urldecode', _echo);
                 sandbox.stub(window, 'assertUserHandle');
                 sandbox.stub(ns, '_checkSignature').returns(null);
-                sandbox.stub(authring, 'setContactAuthenticated');
 
                 // This is to pass through the first call directly, then stub on subsequent ones.
                 var _getPubKey = ns.getPubKey;
@@ -627,7 +628,6 @@ describe("crypto unit test", function() {
                 assert.strictEqual(ns._checkSignature.callCount, 1);
                 assert.strictEqual(masterPromise.resolve.callCount, 1);
                 assert.strictEqual(authring.computeFingerprint.callCount, 1);
-                assert.strictEqual(authring.setContactAuthenticated.callCount, 0);
                 assert.deepEqual(pubEd25519, { 'you456789xw': 'the key' });
             });
 

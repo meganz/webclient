@@ -361,7 +361,7 @@ a.nlanguage-lnk:hover .nlanguage-tooltip {
     vertical-align: middle;
 }
 .languages-dialog .show-more-languages .round-arrow span {
-    background-image: url("../images/mega/lang-selection-sprite.png");
+    background-image: url("../images/mega/lang-selection-sprite-v2.png");
     background-position: -235px 0;
     background-repeat: no-repeat;
     display: inline-block;
@@ -1549,7 +1549,7 @@ a.blog-button:hover {
 	color: #fff;
 }
 .top-change-language-icon {
-  background-image: url("../images/mega/lang-selection-sprite.png");
+  background-image: url("../images/mega/lang-selection-sprite-v2.png");
   background-position: 0 0;
   background-repeat: no-repeat;
   border-radius: 2px;
@@ -24890,7 +24890,7 @@ body.pro:after {
  background-size: 200px auto;
 }
 .top-change-language-icon, .languages-dialog .show-more-languages .round-arrow span {
-    background-image: url("../images/mega/lang-selection-sprite@2x.png");
+    background-image: url("../images/mega/lang-selection-sprite-v2@2x.png");
     background-size: 244px auto;
 }
 .fm-dialog.cancel-subscription-st2 .blue-success-icon {

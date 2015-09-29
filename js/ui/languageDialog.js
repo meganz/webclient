@@ -32,8 +32,8 @@ var langDialog = {
         var tierTwoHtml = langDialog.renderLanguages(tierTwoLangCodes, true);
 
         // Display the HTML
-        $tierOneLanguages.html(tierOneHtml);
-        $tierTwoLanguages.html(tierTwoHtml);
+        $tierOneLanguages.safeHTML(tierOneHtml);
+        $tierTwoLanguages.safeHTML(tierTwoHtml);
         
         // Cache some selectors for performance
         var $languageLinks = langDialog.$dialog.find('.nlanguage-lnk');
@@ -47,14 +47,16 @@ var langDialog = {
             // If the extra languages section is already open
             if ($arrowIcon.hasClass('opened')) {
                 
+                // Extra languages hidden
                 $arrowIcon.removeClass('opened');
-                $showHideText.html(l[7657]);        // Show more languages
-                $tierTwoLanguages.show();
+                $showHideText.safeHTML(l[7657]);        // Show more languages
+                $tierTwoLanguages.hide();
                 langDialog.centerDialog();
             }
             else {
+                // Extra languages visible
                 $arrowIcon.addClass('opened');
-                $showHideText.html(l[7658]);        // Hide languages
+                $showHideText.safeHTML(l[7658]);        // Hide languages
                 $tierTwoLanguages.show();
                 langDialog.centerDialog();
             }

@@ -485,7 +485,6 @@ var strongvelope = {};
      */
     strongvelope.ProtocolHandler.prototype.encryptTo = function(message, destination) {
 
-        var encryptedMessage = ns._symmetricEncryptMessage(message, senderKey);
         var content = '';
         var encryptedKeys;
         var messageType;
@@ -501,6 +500,7 @@ var strongvelope = {};
         }
 
         var senderKey = this.senderKeys[this.keyId];
+        var encryptedMessage = ns._symmetricEncryptMessage(message, senderKey);
 
         // Use a (leaner) followup message if the sender key's been sent already.
         if (this._sentKeyId === this.keyId) {
@@ -595,7 +595,7 @@ var strongvelope = {};
             // Decrypt message key(s) and update their local cache.
             parsedMessage.keys[0] = ns._decryptKeysFrom(parsedMessage.keys[0],
                                                         parsedMessage.nonce, sender);
-            var senderKey = parsedMessage.keys[0][0];
+            senderKey = parsedMessage.keys[0][0];
             if (!this.participantKeys[sender]) {
                 this.participantKeys[sender] = {};
             }

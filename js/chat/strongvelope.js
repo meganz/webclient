@@ -34,6 +34,9 @@ var strongvelope = {};
     var PROTOCOL_VERSION = 0x00;
     strongvelope.PROTOCOL_VERSION = PROTOCOL_VERSION;
 
+    /** After how many messages our symmetric sender key is rotated. */
+    strongvelope.ROTATE_KEY_EVERY = 16;
+
 
     /** Size (in bytes) of the secret/symmetric encryption key. */
     var SECRET_KEY_SIZE = 16;
@@ -100,7 +103,7 @@ var strongvelope = {};
     /**
      * "Enumeration" of message types used for the chat message transport.
      *
-     * @property GROUP_KEY {Number}
+     * @property GROUP_KEYED {Number}
      *     Data message containing a new sender key (initial or key rotation).
      * @property GROUP_CONTINUE {Number}
      *     Data message using an existing sender key for encryption.
@@ -109,8 +112,8 @@ var strongvelope = {};
      *     shared DH secret and nonce only).
      */
     var MESSAGE_TYPES = {
-        GROUP_KEY:          0x00,
-        GROUP_CONTINUE:     0x01,
+        GROUP_KEYED:        0x00,
+        GROUP_FOLLOWUP:     0x01,
         SIMPLE_TWO_PARTY:   0x02,
     };
     strongvelope.MESSAGE_TYPES = MESSAGE_TYPES;
@@ -439,8 +442,13 @@ var strongvelope = {};
      * Manages keys, encryption and message encoding.
      *
      * @constructor
+     * @param {Number} [rotateKeyEvery=16]
+     *     The number of messages our sender key is used for before rotating
+     *     (default: strongvelope.ROTATE_KEY_EVERY).
      *
-     * @property {Number} kyeId
+     * @property {Number} rotateKeyEvery
+     *     The number of messages our sender key is used for before rotating.
+     * @property {Number} keyId
      *     ID of our current sender key.
      * @property {Array.<String>} senderKeys
      *     Array containing all our used sender keys, indexed by keyId.
@@ -451,9 +459,12 @@ var strongvelope = {};
      *     Collection of participant specific key information
      *     (@see ParticipantKey) for all (past and present) participants.
      */
-    strongvelope.ProtocolHandler = function() {
+    strongvelope.ProtocolHandler = function(rotateKeyEvery) {
 
+        this.rotateKeyEvery = rotateKeyEvery || strongvelope.ROTATE_KEY_EVERY;
+        this._keyEncryptionCount = 0;
         this.keyId = 0;
+        this._sentKeyId = null;
         var secretKey = new Uint8Array(SECRET_KEY_SIZE);
         asmCrypto.getRandomValues(secretKey);
         this.senderKeys = [asmCrypto.bytes_to_string(secretKey)];
@@ -474,21 +485,50 @@ var strongvelope = {};
      */
     strongvelope.ProtocolHandler.prototype.encryptTo = function(message, destination) {
 
-        var senderKey = this.senderKeys[this.keyId];
         var encryptedMessage = ns._symmetricEncryptMessage(message, senderKey);
-        var encryptedKey = ns._encryptKeysTo([senderKey], encryptedMessage.nonce,
-                                             destination);
         var content = '';
+        var encryptedKeys;
+        var messageType;
+        var previousKeyId = this.keyId;
+
+        // Check and rotate key if due.
+        if (this._keyEncryptionCount >= this.rotateKeyEvery) {
+            var newSecretKey = new Uint8Array(SECRET_KEY_SIZE);
+            asmCrypto.getRandomValues(newSecretKey);
+            this.keyId = (this.keyId + 1) & 0xff;
+            this.senderKeys[this.keyId] = asmCrypto.bytes_to_string(newSecretKey);
+            this._keyEncryptionCount = 0;
+        }
+
+        var senderKey = this.senderKeys[this.keyId];
+
+        // Use a (leaner) followup message if the sender key's been sent already.
+        if (this._sentKeyId === this.keyId) {
+            messageType = MESSAGE_TYPES.GROUP_FOLLOWUP;
+        }
+        else {
+            var keysIncluded = [senderKey];
+            if (previousKeyId !== this.keyId) {
+                keysIncluded.push(this.senderKeys[previousKeyId]);
+            }
+            encryptedKeys = ns._encryptKeysTo(keysIncluded, encryptedMessage.nonce,
+                                             destination);
+            messageType = MESSAGE_TYPES.GROUP_KEYED;
+        }
 
         // Assemble message content.
         content += tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.MESSAGE_TYPE),
-                                        String.fromCharCode(MESSAGE_TYPES.GROUP_KEY));
+                                        String.fromCharCode(messageType));
         content += tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.NONCE),
                                         encryptedMessage.nonce);
-        content += tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.RECIPIENT),
-                                        base64urldecode(destination));
-        content += tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.KEYS),
-                                        encryptedKey);
+        if (encryptedKeys) {
+            // Include recipient(s) and sender key(s).
+            content += tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.RECIPIENT),
+                                            base64urldecode(destination));
+            content += tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.KEYS),
+                                            encryptedKeys);
+            this._sentKeyId = this.keyId;
+        }
         content += tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.KEY_ID),
                                         String.fromCharCode(this.keyId));
         content += tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.PAYLOAD),
@@ -497,10 +537,11 @@ var strongvelope = {};
         // Sign message.
         var signature = ns._signMessage(content,
                                         u_privEd25519, u_pubEd25519);
-
         content = tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.SIGNATURE),
                                        signature)
-                      + content;
+                + content;
+
+        this._keyEncryptionCount++;
 
         // Return assembled total message.
         return String.fromCharCode(PROTOCOL_VERSION) + content;
@@ -545,25 +586,42 @@ var strongvelope = {};
             return false;
         }
 
-        // Decrypt message key(s) and update their local cache.
-        parsedMessage.keys = ns._decryptKeysFrom(parsedMessage.keys,
-                                                 parsedMessage.nonce, sender);
-        var senderKey = parsedMessage.keys[0];
+        // Sanitise keyId to an 8-bit value.
         var keyId = parsedMessage.keyId & 0xff;
-        if (!this.participantKeys[sender]) {
-            this.participantKeys[sender] = {};
+
+        // Get sender key.
+        var senderKey;
+        if (parsedMessage.keys.length  > 0) {
+            // Decrypt message key(s) and update their local cache.
+            parsedMessage.keys[0] = ns._decryptKeysFrom(parsedMessage.keys[0],
+                                                        parsedMessage.nonce, sender);
+            var senderKey = parsedMessage.keys[0][0];
+            if (!this.participantKeys[sender]) {
+                this.participantKeys[sender] = {};
+            }
+            this.participantKeys[sender][keyId] = senderKey;
+            if (parsedMessage.keys[0].length > 1) {
+                var previousKeyId = (parsedMessage.keyId - 1) & 0xff;
+                // Bail out on inconsistent information.
+                if (this.participantKeys[sender][previousKeyId]
+                        && (this.participantKeys[sender][previousKeyId] !== parsedMessage.keys[1])) {
+                    logger.error("Mismatching statement on sender's previous key.");
+
+                    return false;
+                }
+                this.participantKeys[sender][previousKeyId] = parsedMessage.keys[0][1];
+            }
         }
-        this.participantKeys[sender][keyId] = senderKey;
-        if (parsedMessage.keys.length > 1) {
-            var previousKeyId = (parsedMessage.keyId - 1) & 0xff;
-            // Bail out on inconsistent information.
-            if (this.participantKeys[sender][previousKeyId]
-                    && (this.participantKeys[sender][previousKeyId] !== parsedMessage.keys[1])) {
-                logger.error("Mismatching statement on sender's previous key.");
+        else {
+            if (this.participantKeys[sender] && this.participantKeys[sender][keyId]) {
+                senderKey = this.participantKeys[sender][keyId];
+            }
+            else {
+                logger.error('Encryption key for message from ' + sender
+                             + ' with ID ' + keyId + ' unavailable.');
 
                 return false;
             }
-            this.participantKeys[sender][previousKeyId] = parsedMessage.keys[1];
         }
 
         // Decrypt message payload.

@@ -1905,6 +1905,7 @@
     "6783": "\uc790\uaca9\uc99d\uba85 \uc2b9\uc778",
     "6787": "\ub2f9\uc2e0\uacfc \uacf5\uc720\ub41c \ud3f4\ub354\uac00 \uc5c6\uc2b5\ub2c8\ub2e4",
     "6788": "\uac1c\uc6d4",
+    "6789": "\uc815\uc9c0\ub41c \uacc4\uc815",
     "6793": "\ud734\uc9c0\ud1b5\uc744 \ube44\uc6cc\uc11c \uacf5\uac04\uc744 \ud68c\ubcf5\ud558\uc138\uc694",
     "6794": "\ud734\uc9c0\ud1b5 \ube44\uc6b0\uae30",
     "6795": "\ud734\uc9c0\ud1b5\uc5d0 \uc788\ub294 \ubaa8\ub4e0 \ud56d\ubaa9\uc774 \uc81c\uac70\ud558\uc2dc\uaca0\uc2b5\ub2c8\uae4c? \uc774 \ud589\ub3d9\uc740 \ub418\ub3cc\ub9b4 \uc218 \uc5c6\uc2b5\ub2c8\ub2e4!",
@@ -2704,5 +2705,7 @@
     "7653": "\uc720\ud6a8\uae30\uac04:",
     "7656": "\ubcf5\uc0ac\ub428",
     "7657": "\ub354 \ub9ce\uc740 \uc5b8\uc5b4 \ubcf4\uae30",
-    "7658": "\uc5b8\uc5b4 \uc228\uae30\uae30"
+    "7658": "\uc5b8\uc5b4 \uc228\uae30\uae30",
+    "7659": "You have been suspended due to excess data usage.Please contact support@mega.nz to get your account reinstated.",
+    "7660": "You have been suspended due to repeated copyright infringement."
 }

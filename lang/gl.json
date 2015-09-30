@@ -1905,6 +1905,7 @@
     "6783": "Aprobar credenciais",
     "6787": "Non hai cartafoles compartidos con vostede",
     "6788": "meses",
+    "6789": "Conta suspendida",
     "6793": "Recupere espacio vaciando o Lixo",
     "6794": "Tirar o Lixo",
     "6795": "Estas seguro de querer borrar permanentemente todos os teus elementos do Lixo?Non podes desfacer esta acci\u00f3n!",
@@ -2704,5 +2705,7 @@
     "7653": "Available until:",
     "7656": "Copied",
     "7657": "Show more languages",
-    "7658": "Hide languages"
+    "7658": "Hide languages",
+    "7659": "You have been suspended due to excess data usage.Please contact support@mega.nz to get your account reinstated.",
+    "7660": "You have been suspended due to repeated copyright infringement."
 }

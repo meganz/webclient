@@ -1905,6 +1905,7 @@
     "6783": "Schv\u00e1lit p\u0159ihla\u0161ovac\u00ed \u00fadaje",
     "6787": "\u017d\u00e1dn\u00e9 sd\u00edlen\u00e9 slo\u017eky s v\u00e1mi",
     "6788": "m\u011bs\u00edc\u016f",
+    "6789": "Pozastaven\u00fd \u00fa\u010det",
     "6793": "Obnovit m\u00edsto vysyp\u00e1n\u00edm ko\u0161e",
     "6794": "Vysypat ko\u0161",
     "6795": "Opravdu chcete trvale odebrat v\u0161echny polo\u017eky z ko\u0161e?Tuto akci nelze vr\u00e1tit zp\u011bt!",
@@ -2704,5 +2705,7 @@
     "7653": "Dostupn\u00e9 do:",
     "7656": "Zkop\u00edrov\u00e1no",
     "7657": "Zobrazit v\u00edce jazyk\u016f",
-    "7658": "Skr\u00fdt jazyky"
+    "7658": "Skr\u00fdt jazyky",
+    "7659": "You have been suspended due to excess data usage.Please contact support@mega.nz to get your account reinstated.",
+    "7660": "You have been suspended due to repeated copyright infringement."
 }

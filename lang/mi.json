@@ -1905,6 +1905,7 @@
     "6783": "Approve credentials",
     "6787": "Kahore he kopaki tahi me koe",
     "6788": "months",
+    "6789": "Suspended account",
     "6793": "Recover space by emptying the rubbish bin",
     "6794": "Empty the rubbish bin",
     "6795": "Are you sure you want to permanently remove all items from your rubbish bin?You cannot undo this action!",
@@ -2704,5 +2705,7 @@
     "7653": "Available until:",
     "7656": "Copied",
     "7657": "Show more languages",
-    "7658": "Hide languages"
+    "7658": "Hide languages",
+    "7659": "You have been suspended due to excess data usage.Please contact support@mega.nz to get your account reinstated.",
+    "7660": "You have been suspended due to repeated copyright infringement."
 }

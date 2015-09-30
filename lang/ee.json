@@ -1905,6 +1905,7 @@
     "6783": "Kirjutatuga n\u00f5ustumine",
     "6787": "Teiega pole \u00fchtegi kausta jagatud",
     "6788": "kuuks",
+    "6789": "Sellist kontot enam pole",
     "6793": "Pr\u00fcgikasti t\u00fchjendades saate mahtu suurendada",
     "6794": "T\u00fchjenda pr\u00fcgikast",
     "6795": "Olete Pr\u00fcgikastist failide eemaldamisega n\u00f5us? Seda ei saa tagasi v\u00f5tta!",
@@ -2704,5 +2705,7 @@
     "7653": "Saadaval kuni:",
     "7656": "Kopeeritud",
     "7657": "Kuva rohkem keeli",
-    "7658": "Peida keeled"
+    "7658": "Peida keeled",
+    "7659": "You have been suspended due to excess data usage.Please contact support@mega.nz to get your account reinstated.",
+    "7660": "You have been suspended due to repeated copyright infringement."
 }

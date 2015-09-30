@@ -1905,6 +1905,7 @@
     "6783": "Aceptar las credenciales",
     "6787": "o hay carpetas compartidas contigo",
     "6788": "meses",
+    "6789": "Cuenta suspendida",
     "6793": "Recupera espacio vaciando la papelera",
     "6794": "Vac\u00eda la Papelera",
     "6795": "\u00bfEst\u00e1 seguro de querer eliminar de forma permanente todos los archivos de su Papelera? \u00a1Esta acci\u00f3n no se puede deshacer!",
@@ -2704,5 +2705,7 @@
     "7653": "Disponible hasta:",
     "7656": "Copiado",
     "7657": "Mostrar m\u00e1s idiomas",
-    "7658": "Ocultar idiomas"
+    "7658": "Ocultar idiomas",
+    "7659": "You have been suspended due to excess data usage.Please contact support@mega.nz to get your account reinstated.",
+    "7660": "You have been suspended due to repeated copyright infringement."
 }

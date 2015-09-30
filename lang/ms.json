@@ -1905,6 +1905,7 @@
     "6783": "Luluskan tauliah",
     "6787": "Tiada folder dikongsi dengan anda",
     "6788": "bulan",
+    "6789": "Akaun digantung",
     "6793": "Pulihkan ruang dengan mengosongkan Tong Sampah",
     "6794": "Kosongkan Tong Sampah",
     "6795": "Adakah anda pasti ingin mengeluarkan semua item daripada Tong Sampah anda selama-lamanya?Anda tidak boleh mengembalikan tindakan ini!",
@@ -2704,5 +2705,7 @@
     "7653": "Available until:",
     "7656": "Disalin",
     "7657": "Show more languages",
-    "7658": "Hide languages"
+    "7658": "Hide languages",
+    "7659": "You have been suspended due to excess data usage.Please contact support@mega.nz to get your account reinstated.",
+    "7660": "You have been suspended due to repeated copyright infringement."
 }

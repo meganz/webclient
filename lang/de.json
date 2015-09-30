@@ -1905,6 +1905,7 @@
     "6783": "Approve credentials",
     "6787": "No shared folders with you",
     "6788": "Monate",
+    "6789": "Suspended account",
     "6793": "Schaffen Sie Platz, indem Sie Ihren Papierkorb leeren",
     "6794": "Papierkorb leeren",
     "6795": "Sind Sie sicher, dass Sie Ihren Papierkorb komplett leeren m\u00f6chten? Dies kann nicht r\u00fcckg\u00e4ngig gemacht werden!",
@@ -2704,5 +2705,7 @@
     "7653": "Available until:",
     "7656": "Copied",
     "7657": "Show more languages",
-    "7658": "Hide languages"
+    "7658": "Hide languages",
+    "7659": "You have been suspended due to excess data usage.Please contact support@mega.nz to get your account reinstated.",
+    "7660": "You have been suspended due to repeated copyright infringement."
 }

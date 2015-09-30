@@ -10861,7 +10861,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	position: relative;
 	z-index: 10;
 }
-.decription-key .file-link-info.url, .public-handle .file-link-info.key {
+.decryption-key .file-link-info.url, .public-handle .file-link-info.key {
 	display: none;
 }
 .file-link-block {
@@ -21764,7 +21764,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 .fm-dialogs-select.public-handle span, .fm-dialogs-dropdown .public-handle span {
 	background-position: -37px -4352px;
 }
-.fm-dialogs-select.decription-key span, .fm-dialogs-dropdown .decription-key span {
+.fm-dialogs-select.decryption-key span, .fm-dialogs-dropdown .decryption-key span {
 	background-position: -37px -4383px;
 }
 .share-dialog-permissions.full-access span, .share-dialog-icon.permissions-icon.full-access span, .permissions-menu .full-access span {

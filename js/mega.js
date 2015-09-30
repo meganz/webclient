@@ -6580,11 +6580,11 @@ function balance2pro(callback)
 		$('.export-link-select').rebind('click', function() {
 			$('.export-link-dropdown').fadeIn(200);
 		});
-		
+
 		// On Export File Links and Decryption Keys dropdown
 		$('.export-link-dropdown div').rebind('click', function() {
 			var keyOption = $(this).attr('data-keyoptions');
-			$('.export-link-select, .export-content-block').removeClass('public-handle decription-key full-link').addClass(keyOption);
+			$('.export-link-select, .export-content-block').removeClass('public-handle decryption-key full-link').addClass(keyOption);
 			$('.export-link-select').html($(this).html());
 			$('.export-link-dropdown').fadeOut(200);
 		});
@@ -6652,6 +6652,7 @@ function balance2pro(callback)
 
         var self = this;
 
+        // Prompt copyright dialog and if accepted get link, otherwise stall
         if (self.options.nodesToProcess.length) {
             loadingDialog.show();
             self.logger.debug('getExportLink');

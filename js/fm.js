@@ -2392,8 +2392,9 @@ function initContextUI() {
             ephemeralDialog(l[1005]);
         }
         else {
-            var exportLink = new mega.Share.ExportLink({ 'showExportLinkDialog': true, 'updateUI': true, 'nodesToProcess': $.selected });
-            exportLink.getExportLink();
+            fm_showoverlay();
+            initCopyrightsDialog($.selected);
+            $('.copyrights-dialog').show();
         }
     });
 
@@ -4947,7 +4948,7 @@ function UIkeyevents() {
         else if (e.keyCode == 13 && $.dialog == 'rename') {
             dorename();
         }
-        else if (e.keyCode == 27 && ($.copyDialog || $.moveDialog)) {
+        else if (e.keyCode == 27 && ($.copyDialog || $.moveDialog || $.copyrightsDialog)) {
             closeDialog();
         }
         else if (e.keyCode == 27 && $.dialog) {
@@ -7392,6 +7393,32 @@ function initShareDialogMultiInputPlugin() {
         });
 }
 
+/**
+ * initCopyrightsDialog
+ *
+ * @param {Array} nodesToProcess Array of strings, nodes ids
+ */
+function initCopyrightsDialog(nodesToProcess) {
+
+    $.copyrightsDialog = 'copyrights';
+
+    $('.copyrights-dialog .fm-dialog-button').rebind('click', function() {
+        if (this.className.indexOf('cancel') !== -1) {
+            closeDialog();
+        }
+        else {
+            closeDialog();
+            var exportLink = new mega.Share.ExportLink({ 'showExportLinkDialog': true, 'updateUI': true, 'nodesToProcess': nodesToProcess });
+            exportLink.getExportLink();
+        }
+
+    });
+
+    $('.copyrights-dialog .fm-dialog-close').rebind('click', function() {
+        closeDialog();
+    });
+}
+
 function initShareDialog() {
 
     $.shareTokens = [];
@@ -7792,6 +7819,11 @@ function closeDialog() {
         $('.fm-dialog.create-folder-dialog').addClass('hidden');
         $('.fm-dialog.create-folder-dialog .create-folder-size-icon').removeClass('hidden');
     }
+    else if (($.dialog === 'slideshow') && $.copyrightsDialog) {
+        $('.copyrights-dialog').hide();
+
+        delete $.copyrightsDialog;
+    }
     else {
         if ($.dialog === 'properties') {
             propertiesDialog(1);
@@ -7824,8 +7856,11 @@ function closeDialog() {
         closeImportContactNotification('.share-dialog');
         closeImportContactNotification('.add-user-popup');
 
+        $('.copyrights-dialog').hide();
+
         delete $.copyDialog;
         delete $.moveDialog;
+        delete $.copyrightsDialog;
     }
     $('.fm-dialog').removeClass('arrange-to-back');
 
@@ -9349,8 +9384,9 @@ function slideshow(id, close)
             ephemeralDialog(l[1005]);
         }
         else {
-            var exportLink = new mega.Share.ExportLink({ 'showExportLinkDialog': true, 'updateUI': true, 'nodesToProcess': [slideshowid] });
-            exportLink.getExportLink();
+            fm_showoverlay();
+            initCopyrightsDialog([slideshowid]);
+            $('.copyrights-dialog').show();
         }
     });
 

@@ -7623,6 +7623,10 @@
         "text": "months",
         "context": "Used to display the number of months a plan was purchased for e.g. 3 months, 6 months."
     },
+    "6789": {
+        "text": "Suspended account",
+        "context": "During login, if account is suspended."
+    },
     "6793": {
         "text": "Recover space by emptying the rubbish bin",
         "context": "Explain the user that he can recover space by emptying the Rubbish Bin"

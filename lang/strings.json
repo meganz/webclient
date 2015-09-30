@@ -5245,7 +5245,7 @@
     },
     "5585": {
         "text": "Already have an account?",
-        "context": "Does the user already have a MEGA account"
+        "context": "Question to focus the user to the zone of the app where he\/she can go to login"
     },
     "5586": {
         "text": "You have to accept our Terms of Service.",
@@ -9445,7 +9445,7 @@
     },
     "7298": {
         "text": "Z5dGhQhL",
-        "context": "Each MEGA client application needs a valid key to access the API. Please use a separate key for each of your applications."
+        "context": "DO NOT NEED TRANSLATION , JUST USE THE ORIGINAL TEXT AS TRANSLATION.\r\n\r\nEach MEGA client application needs a valid key to access the API. Please use a separate key for each of your applications."
     },
     "7299": {
         "text": "MEGAWindowsPhone\/1.0.0",
@@ -9489,7 +9489,7 @@
     },
     "7310": {
         "text": "{048D1075-3EC2-40F1-A8CF-874656BBB212}",
-        "context": ""
+        "context": "DO NOT NEED TRANSLATION , JUST USE THE ORIGINAL TEXT AS TRANSLATION."
     },
     "7311": {
         "text": "{42A8FBE1-08A0-4E48-82C2-C90AFDAB2551}",
@@ -10416,8 +10416,8 @@
         "context": "Success message shown when {1+} files have been removed from MEGA"
     },
     "7553": {
-        "text": "The new and the old password can not match.",
-        "context": "Error message shown when the users tryes to change his\/her password and writes the current one as if it's new"
+        "text": "The new and the old password must not match.",
+        "context": "Error message shown when the users tryes to change his\/her password and writes the current one as the new one."
     },
     "7554": {
         "text": "Simple passcode",
@@ -10634,5 +10634,193 @@
     "7607": {
         "text": "Start\/resume all",
         "context": "Label for any 'Start\/resume all' button, link, text, title, etc. - (String as short as possible)."
+    },
+    "7608": {
+        "text": "Server's SSL key can't be verified. You could be affected by a man-in-the-middle attack.",
+        "context": "Alert title shown when the app detects that the Secure Sockets Layer (SSL) key of MEGA can't be verified."
+    },
+    "7609": {
+        "text": "Don't have an account?",
+        "context": "Question to focus the user to the zone of the app where he\/she can go to the section to create an account"
+    },
+    "7610": {
+        "text": "Create one",
+        "context": "Button that brings you to a section where you can create an account."
+    },
+    "7611": {
+        "text": "1 file moved to the Rubbish Bin",
+        "context": "Success message shown when you have moved 1 file to the rubbish bin"
+    },
+    "7612": {
+        "text": "%d files moved to the Rubbish Bin",
+        "context": "Success message shown when you have moved {1+} files to the rubbish bin"
+    },
+    "7613": {
+        "text": "1 folder moved to the Rubbish Bin",
+        "context": "Success message shown when you have moved 1 folder to the rubbish bin"
+    },
+    "7614": {
+        "text": "%d folders moved to the Rubbish Bin",
+        "context": "Success message shown when you have moved {1+} folders to the rubbish bin"
+    },
+    "7615": {
+        "text": "1 file and 1 folder moved to the Rubbish Bin",
+        "context": "Success message shown when you have moved 1 file and 1 folder to the rubbish bin"
+    },
+    "7616": {
+        "text": "1 file and %d folders moved to the Rubbish Bin",
+        "context": "Success message shown when you have moved 1 file and {1+} folders to the rubbish bin"
+    },
+    "7617": {
+        "text": "%d files and 1 folder moved to the Rubbish Bin",
+        "context": "Success message shown when you have moved {1+} files and 1 folder to the rubbish bin"
+    },
+    "7618": {
+        "text": "[A] files and [B] folders moved to the Rubbish Bin",
+        "context": "Success message shown when you have moved [A] = {1+} files and [B] = {1+} folders to the rubbish bin"
+    },
+    "7619": {
+        "text": "1 file removed from MEGA",
+        "context": "Success message shown when 1 file has been removed from MEGA."
+    },
+    "7620": {
+        "text": "%d files removed from MEGA",
+        "context": "Success message shown when 1 or more files have been removed from MEGA."
+    },
+    "7621": {
+        "text": "1 folder removed from MEGA",
+        "context": "Success message shown when 1 folder has been removed from MEGA."
+    },
+    "7622": {
+        "text": "%d folders removed from MEGA",
+        "context": "Success message shown when {1+} folders have been removed from MEGA"
+    },
+    "7623": {
+        "text": "1 file and 1 folder removed from MEGA",
+        "context": "Success message shown when 1 file and 1 folder have been removed from MEGA"
+    },
+    "7624": {
+        "text": "1 file and %d folders removed from MEGA",
+        "context": "Success message shown when 1 file and {1+} folders have been removed from MEGA"
+    },
+    "7625": {
+        "text": "%d files and 1 folder removed from MEGA",
+        "context": "Success message shown when {1+} files and 1 folder have been removed from MEGA"
+    },
+    "7626": {
+        "text": "[A] files and [B] folders removed from MEGA",
+        "context": "Success message shown when [A] = {1+} files and [B] = {1+} folders have been removed from MEGA"
+    },
+    "7627": {
+        "text": "Choose one of the plans from below:",
+        "context": "Header that help you with the upgrade process explaining that you have to choose one of the plans below  to continue"
+    },
+    "7628": {
+        "text": "Get two months free if you subscribe to a one-year PRO plan",
+        "context": "Text shown under the yearly plan to explain that if you select this kind of membership you will save two months' money"
+    },
+    "7629": {
+        "text": "Select membership:",
+        "context": "Header shown to help during the purchasing process."
+    },
+    "7630": {
+        "text": "Save 17%",
+        "context": "Footer shown to remember that if you select a yearly plan you will save up to 17%."
+    },
+    "7631": {
+        "text": "WRONG PURCHASE %@ (%ld)",
+        "context": "Error message shown when the purchase has failed,please keep %@ (%ld)."
+    },
+    "7632": {
+        "text": "In-App Purchase is disabled, please enable it in the settings",
+        "context": "Error message shown the In-App Purchase is disabled in the device Settings"
+    },
+    "7633": {
+        "text": "Product %@ is not found, please contact ios@mega.nz",
+        "context": "Error message shown when the selected product doesn't exist"
+    },
+    "7634": {
+        "text": "Allow purchases",
+        "context": "Alert title to remind the user that they need to enable purchases."
+    },
+    "7635": {
+        "text": "You must enable In-App Purchases in your iOS Settings before restoring a purchase.",
+        "context": "Alert message to remind the user that needs to enable purchases before continue"
+    },
+    "7636": {
+        "text": "This In-App Purchase item is not available in the App Store at this time. Please try again later.",
+        "context": "Alert title shown when a selected plan is not available at that moment in the App Store"
+    },
+    "7637": {
+        "text": "Thank you",
+        "context": "Alert title shown when the user has correctly purchased  some plan."
+    },
+    "7638": {
+        "text": "Your purchase was restored",
+        "context": "Alert message shown when a purchase was restored succesfully"
+    },
+    "7639": {
+        "text": "Purchase stopped",
+        "context": "Alert title shown when a purchase has stopped because some error between the process."
+    },
+    "7640": {
+        "text": "Either you cancelled the request or Apple reported a transaction error. Please try again later, or contact ios@mega.nz.",
+        "context": "Alert message shown when a purchase has stopped because of some error in the middle of the process."
+    },
+    "7641": {
+        "text": "Restore issue",
+        "context": "Alert title shown when a restore hasn't been completed correctly."
+    },
+    "7642": {
+        "text": "The previous purchase could not be found. Please select the previously purchased product to restore. You will NOT be charged again.",
+        "context": "Alert message shown when a restore hasn't been completed correctly.\r\nThat happens when the restore queue does not include any transaction, which can be caused by either that the user has not yet made a purchase or the user's prior purchase is not available. This message is to notify user to make a purchase in the app. If the user already purchased the item, he will NOT be charged again to restore his purchase."
+    },
+    "7643": {
+        "text": "Restore stopped",
+        "context": "Alert title shown when the restoring process has stopped for some reason."
+    },
+    "7644": {
+        "text": "Either the request was cancelled or the prior purchase could not be restored. Please try again later, or contact  ios@mega.nz.",
+        "context": "Alert message shown when the restoring process has stopped for some reason"
+    },
+    "7645": {
+        "text": "I agree",
+        "context": "Button label for \"I agree to the terms and conditions\"."
+    },
+    "7646": {
+        "text": "I disagree",
+        "context": "Button label for \"I disagree to the terms and conditions\"."
+    },
+    "7649": {
+        "text": "Export:",
+        "context": "Dropdown label for exporting file\/folder links.\r\nExport:\r\nPublic Handle\r\nDecryption Key\r\nFull link"
+    },
+    "7650": {
+        "text": "Public Handle",
+        "context": "Dropdown item for exporting file\/folder links.\r\nExport:\r\nPublic Handle\r\nDecryption Key\r\nFull link"
+    },
+    "7651": {
+        "text": "Full link",
+        "context": "Dropdown item for exporting file\/folder links.\r\nExport:\r\nPublic Handle\r\nDecryption Key\r\nFull link"
+    },
+    "7652": {
+        "text": "Available until [A](PRO ONLY)[\/A]:",
+        "context": "Dropdown label for selecting date.\r\nExported Link(s) is(are) Available until:\r\n20 Sep. 2015\r\n\r\nplease leave <a>, <\/a> as it is"
+    },
+    "7653": {
+        "text": "Available until:",
+        "context": "Dropdown label for selecting date.\r\nExported Link(s) is(are) Available until:\r\n20 Sep. 2015"
+    },
+    "7656": {
+        "text": "Copied",
+        "context": "Success message when copying link(s)."
+    },
+    "7657": {
+        "text": "Show more languages",
+        "context": "Button text to show other languages that are available in the language selection dialog."
+    },
+    "7658": {
+        "text": "Hide languages",
+        "context": "Button text to hide the less popular languages that are available in the language selection dialog."
     }
 }

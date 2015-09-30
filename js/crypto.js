@@ -542,11 +542,11 @@ var crypt = (function () {
     /**
      * Derives the public key from a private key.
      *
-     * @param privKey {string}
+     * @param privKey {String}
      *     Private key in byte string form.
-     * @param keyType {string}
+     * @param keyType {String}
      *     Key type to set. Allowed values: 'Ed25519', 'Cu25519'.
-     * @return {string}
+     * @return {String}
      *     Corresponding public key in byte string form. `undefined` for
      *     unsupported key types.
      */
@@ -576,17 +576,17 @@ var crypt = (function () {
      * Shows the fingerprint warning dialog.
      *
      * @private
-     * @param {string} userHandle
+     * @param {String} userHandle
      *     The user handle e.g. 3nnYu_071I3.
-     * @param {string} keyType
+     * @param {String} keyType
      *     Type of the public key the fingerprint results from. One of
      *     'Ed25519', 'Cu25519' or 'RSA'.)
-     * @param {number} method
+     * @param {Number} method
      *     The key comparison method (any of the options in
      *     authring.AUTHENTICATION_METHOD).
-     * @param {string} previousFingerprint
+     * @param {String} previousFingerprint
      *     The previously seen or verified fingerprint.
-     * @param {string} newFingerprint
+     * @param {String} newFingerprint
      *     The new fingerprint.
      * @throws {Error}
      *     In case the fingerprint of the public key differs from the one
@@ -618,9 +618,9 @@ var crypt = (function () {
      * Shows the key signature failure warning dialog.
      *
      * @private
-     * @param {string} userhandle
+     * @param {String} userhandle
      *     The user handle e.g. 3nnYu_071I3.
-     * @param {string} keyType
+     * @param {String} keyType
      *     Type of the public key the signature failed for. One of
      *     'Cu25519' or 'RSA'.)
      * @throws {Error}

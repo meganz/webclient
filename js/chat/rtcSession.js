@@ -612,14 +612,15 @@ RtcSession.prototype = {
 
       if (!options.files) { //set answer timeout
           setTimeout(function() {
-              if (state !== STATE_GOT_USERMEDIA_WAIT_PEER)
+              if (state !== STATE_GOT_USERMEDIA_WAIT_PEER) {
                   return;
+              }
               /**
-              A call that we initiated was not answered (neither accepted nor rejected)
-              within the acceptable timeout.
-              @event "call-answer-timeout"
-              @type {object} Same as the event data object of call-ended, including stats
-             */
+               * A call that we initiated was not answered (neither accepted nor rejected)
+               * within the acceptable timeout.
+               * @event "call-answer-timeout"
+               * @type {Object}
+               */
               cancelCallRequest(STATE_PEER_ANS_OR_TIMEOUT, 'call-answer-timeout', 'call-unanswered');
           }, self.jingle.callAnswerTimeout);
       } //end set answer timeout

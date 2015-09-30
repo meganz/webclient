@@ -362,7 +362,7 @@ a.nlanguage-lnk:hover .nlanguage-tooltip {
 }
 .languages-dialog .show-more-languages .round-arrow span {
     background-image: url("../images/mega/lang-selection-sprite-v2.png");
-    background-position: -235px 0;
+    background-position: -83px 0;
     background-repeat: no-repeat;
     display: inline-block;
     height: 6px;
@@ -1541,42 +1541,39 @@ a.blog-button:hover {
 }
 /* Change top language button */
 .top-change-language {
-	cursor: pointer;
-	float: right;
-	position: relative;
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    float: right;
+    font-size: 14px;
+    height: 24px;
+    line-height: 23px;
+    margin: 12px 10px 0 0;
+    padding: 0 12px 0 8px;
+    transition: all 200ms ease-in-out 0s;
 }
-.top-change-language:hover .top-change-language-name {
-	color: #fff;
+.top-change-language:hover {
+    background-color: rgba(255, 255, 255, 0.5);
+    color: rgba(255, 255, 255, 0.8);
 }
 .top-change-language-icon {
-  background-image: url("../images/mega/lang-selection-sprite-v2.png");
-  background-position: 0 0;
-  background-repeat: no-repeat;
-  border-radius: 2px;
-  display: inline-block;
-  height: 24px;
-  margin-right: 10px;
-  margin-top: 12px;
-  width: 44px;
+    background-image: url("../images/mega/lang-selection-sprite-v2.png");
+    background-position: 0 0;
+    background-repeat: no-repeat;
+    display: inline-block;
+    height: 16px;
+    position: relative;
+    top: 4px;
+    width: 16px;
 }
 .top-change-language-name {
-  color: rgba(255, 255, 255, 0.7);
-  display: block;
-  line-height: 48px;
-  overflow: hidden;
-  position: absolute;
-  right: 63px;
-  text-align: right;
-  top: 0;
-  white-space: nowrap;
-}
-.top-change-language.other-language .top-change-language-name {
-    right: 43px;
-}
-.top-change-language.other-language .top-change-language-icon {
-    background-position: -111px 0;
-    height: 24px;
-    width: 24px;
+    color: rgba(255, 255, 255, 0.7);
+    display: inline-block;
+    margin-left: 4px;
+    padding-left: 0;
+    padding-top: 0;
+    white-space: nowrap;
 }
 .top-login-button:hover, .top-login-button.active {
 	background-color: rgba(255,255,255,0.5);
@@ -24891,7 +24888,7 @@ body.pro:after {
 }
 .top-change-language-icon, .languages-dialog .show-more-languages .round-arrow span {
     background-image: url("../images/mega/lang-selection-sprite-v2@2x.png");
-    background-size: 244px auto;
+    background-size: 92px auto;
 }
 .fm-dialog.cancel-subscription-st2 .blue-success-icon {
  background-image: url(../images/mega/bitcoin-v4@2x.png);

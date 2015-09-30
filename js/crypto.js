@@ -1794,18 +1794,16 @@ function api_reqfailed(c, e) {
         queue.cmds = [[], []];
         queue.ctxs = [[], []];
         queue.setimmediate = false;
-        console.error("hear", queue);
         api_req({a: 'whyamiblocked'}, { callback: function whyAmIBlocked(reason) {
             u_logout(true);
 
-            var text = reason === 100 ? 'You have been suspended due to excess data usage.\n Please contact support@mega.nz to get your account reinstated.'
-                : 'You have been suspended due to repeated copyright infringement.';
+            var text = (reason === 100) ? l[7659] : l[7660];
 
 
             // On clicking OK, log the user out and redirect to contact page
             loadingDialog.hide();
-            msgDialog('warninga', 'Suspended account',
-                text,
+            msgDialog('warninga', l[6789],
+                (reason === 100) ? l[7659] : l[7660],
                 false,
                 function() {
                     var redirectUrl = window.location.origin + window.location.pathname + '#contact';

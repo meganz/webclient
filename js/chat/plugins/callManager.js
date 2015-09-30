@@ -636,7 +636,7 @@ CallSession.prototype.onCallFailed = function(e, reason, txt) {
     // Substitute email into language string
     var msg = l[7209].replace('[X]', self.room.megaChat.getContactNameFromJid(peer));
     if (self.room.megaChat._currentCallCounter) {
-        msg += " " + l[7208] + ".".replace("[X]", secToDuration(
+        msg += (" " + l[7208] + ".").replace("[X]", secToDuration(
                 self.room.megaChat._currentCallCounter ? self.room.megaChat._currentCallCounter : 0
             ));
     }

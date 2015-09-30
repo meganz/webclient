@@ -7857,6 +7857,7 @@ function closeDialog() {
         closeImportContactNotification('.add-user-popup');
 
         $('.copyrights-dialog').hide();
+        $('.export-link-dropdown').hide();
 
         delete $.copyDialog;
         delete $.moveDialog;

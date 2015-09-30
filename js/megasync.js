@@ -319,8 +319,23 @@ MegaSync.prototype.handle = function(next, response) {
 };
 
 MegaSync.prototype._api = function(args, next) {
-    $.post(this._url, JSON.stringify(args), this.handle.bind(this, next), "json")
-        .fail(this._onError.bind(this, next));
+    var self = this;
+    if (this._pending) {
+        return;
+    }
+    // this._pending = true;
+    mega.utils.xhr({
+        url: this._url,
+        data: JSON.stringify(args),
+        type: 'json'
+    }).done(function(ev, response) {
+        self.handle(next, response);
+    }).fail(function(ev) {
+        self._onError(next, ev);
+    }).always(function() {
+        self._pending = false;
+        self = undefined;
+    });
 };
 
 MegaSync.prototype.isInstalled = function(next) {

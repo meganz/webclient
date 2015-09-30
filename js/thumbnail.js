@@ -9,6 +9,7 @@ function createnodethumbnail(node, aes, id, imagedata, opt) {
 function createthumbnail(file, aes, id, imagedata, node, opt) {
 
     var onPreviewRetry, isRawImage, thumbHandler;
+
     if (typeof opt === 'object') {
         isRawImage = opt.raw;
         onPreviewRetry = opt.onPreviewRetry;
@@ -42,6 +43,14 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
         var t = new Date().getTime();
         var n = M.d[node];
         var fa = '' + (n && n.fa);
+        var dataURI;
+        var canvas;
+        var ctx;
+        var ab;
+        // XXX: In Firefox loading a ~100MB image might throw `Image corrupt or truncated.`
+        // and this .onload called back with a white image. Bug #941823 / #1045926
+        // This is the MurmurHash3 for such image's dataURI.
+        var MURMURHASH3RR = 0x59d73a69;
 
         // thumbnail:
         if (fa.indexOf(':0*') < 0) {
@@ -54,15 +63,25 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                 console.time('smartcrop');
             }
             var crop = SmartCrop.crop(this, options).topCrop;
-            var canvas = document.createElement('canvas');
-            var ctx = canvas.getContext("2d");
+            canvas = document.createElement('canvas');
+            ctx = canvas.getContext("2d");
             canvas.width = options.width;
             canvas.height = options.height;
+            if (img.src === noThumbURI) {
+                ctx.fillStyle = '#fff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
             ctx.drawImage(this, crop.x, crop.y, crop.width, crop.height, 0, 0, canvas.width, canvas.height);
 
-            var ab = dataURLToAB(canvas.toDataURL('image/jpeg', 0.90));
-            api_storefileattr(this.id, 0,
-                this.aes._key[0].slice(0, 4), ab.buffer); // FIXME hack into cipher and extract key
+            dataURI = canvas.toDataURL('image/jpeg', 0.90);
+            // if (d) console.log('THUMBNAIL', dataURI);
+            if (MurmurHash3(dataURI, 0x7fee00aa) === MURMURHASH3RR) {
+                console.error('Error generating thumbnail, aborting...');
+                return;
+            }
+            ab = dataURLToAB(dataURI);
+            // FIXME hack into cipher and extract key
+            api_storefileattr(this.id, 0, this.aes._key[0].slice(0, 4), ab.buffer);
 
             if (d) {
                 console.timeEnd('smartcrop');
@@ -71,7 +90,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
 
         // preview image:
         if (fa.indexOf(':1*') < 0 || onPreviewRetry) {
-            var canvas2 = document.createElement('canvas');
+            canvas = document.createElement('canvas');
             var preview_x = this.width,
                 preview_y = this.height;
             if (preview_x > 1000) {
@@ -82,14 +101,15 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                 preview_x = Math.round(preview_x * 1000 / preview_y);
                 preview_y = 1000;
             }
-            var ctx2 = canvas2.getContext("2d");
-            canvas2.width = preview_x;
-            canvas2.height = preview_y;
-            ctx2.drawImage(this, 0, 0, preview_x, preview_y);
+            ctx = canvas.getContext("2d");
+            canvas.width = preview_x;
+            canvas.height = preview_y;
+            ctx.drawImage(this, 0, 0, preview_x, preview_y);
 
-            var dataURI2 = canvas2.toDataURL('image/jpeg', 0.85);
+            dataURI = canvas.toDataURL('image/jpeg', 0.75);
+            // if (d) console.log('PREVIEW', dataURI);
 
-            var ab2 = dataURLToAB(dataURI2);
+            ab = dataURLToAB(dataURI);
 
             // only store preview when the user is the file owner, and when it's not a retry (because then there is already a preview image, it's just unavailable:
 
@@ -97,12 +117,12 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                 if (d) {
                     console.log('Storing preview...', n);
                 }
-                api_storefileattr(this.id, 1, this.aes._key[0].slice(0, 4),
-                    ab2.buffer); // FIXME hack into cipher and extract key
+                // FIXME hack into cipher and extract key
+                api_storefileattr(this.id, 1, this.aes._key[0].slice(0, 4), ab.buffer);
             }
 
             if (node) {
-                previewimg(node, ab2);
+                previewimg(node, ab);
             }
 
             if (d) {
@@ -120,8 +140,8 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
             console.timeEnd('createthumbnail');
         }
     };
-    try {
-        if (typeof FileReader !== 'undefined') {
+    if (typeof FileReader !== 'undefined') {
+        setTimeout(function() {
             var ThumbFR = new FileReader();
             ThumbFR.onload = function(e) {
                 var u8 = new Uint8Array(ThumbFR.result),
@@ -132,6 +152,18 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                             __render_thumb(img, ab);
                         }
                     });
+                }
+
+                img.dataSize = u8.byteLength;
+                img.is64bit = browserdetails(ua).is64bit;
+
+                // Deal with huge images...
+                if (!img.is64bit && img.dataSize > (36 * 1024 * 1024)) {
+                    // Let dcraw try to extract a thumbnail
+                    if (typeof dcraw !== 'undefined') {
+                        isRawImage = isRawImage || 'not-really';
+                    }
+                    img.huge = true;
                 }
 
                 if (isRawImage) {
@@ -230,6 +262,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                 }
 
                 __render_thumb(img, u8, orientation, file);
+                file = imagedata = undefined;
             };
             if (file) {
                 if (is_chrome_firefox && "blob" in file) {
@@ -239,54 +272,75 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                                 file = new Blob([u8], {
                                     type: file.type
                                 });
+                                mega.utils.neuterArrayBuffer(u8);
                                 ThumbFR.readAsArrayBuffer(file);
+                            }, function(ex) {
+                                if (d) {
+                                    console.error(String(ex), ex);
+                                }
+                                __render_thumb(img);
                             });
                         }
                         catch (e) {}
                     }
 
-                    file = file.blob();
+                    try {
+                        file = file.blob();
+                    }
+                    catch (ex) {
+                        if (d) {
+                            console.error(ex);
+                        }
+                        __render_thumb(img);
+                    }
                 }
-
             }
             else {
                 file = new Blob([new Uint8Array(imagedata)], {
                     type: 'image/jpeg'
                 });
+                mega.utils.neuterArrayBuffer(imagedata);
             }
             ThumbFR.readAsArrayBuffer(file);
-        }
+        }, 350 + Math.floor(Math.random() * 600));
     }
-    catch (e) {
-        console.log('thumbnail error', e)
-    }
-
 }
 
 function __render_thumb(img, u8, orientation, blob) {
-    if (undefined == orientation || orientation < 1 || orientation > 8) {
-        if (d) {
-            console.time('exif');
+    if (u8) {
+        if (orientation === undefined || orientation < 1 || orientation > 8) {
+            if (d) {
+                console.time('exif');
+            }
+            var exif = EXIF.getImageData(new BinaryFile(u8), true);
+            orientation = parseInt(exif.Orientation) || 1;
+            if (d) {
+                console.timeEnd('exif');
+                console.debug('EXIF', exif, orientation);
+            }
         }
-        var exif = EXIF.getImageData(new BinaryFile(u8), true);
-        orientation = +exif.Orientation || 1;
-        if (d) {
-            console.timeEnd('exif');
-            console.debug('EXIF', exif, orientation);
+        if (!blob) {
+            blob = new Blob([u8], {
+                type: 'image/jpg'
+            });
         }
+        mega.utils.neuterArrayBuffer(u8);
     }
-    if (!blob) {
-        blob = new Blob([u8], {
-            type: 'image/jpg'
+    if (!u8 || (img.huge && img.dataSize === blob.size)) {
+        if (d) {
+            console.warn('Unable to generate thumbnail...');
+        }
+        img.src = noThumbURI;
+    }
+    else {
+        var mpImg = new MegaPixImage(blob);
+        mpImg.render(img, {
+            maxWidth: 1000,
+            maxHeight: 1000,
+            quality: 0.96,
+            orientation: orientation
         });
     }
-    var mpImg = new MegaPixImage(blob);
-    mpImg.render(img, {
-        maxWidth: 1000,
-        maxHeight: 1000,
-        quality: 0.96,
-        orientation: orientation
-    });
 }
 
 function ppmtojpeg(ppm) {
@@ -444,3 +498,6 @@ function benchmarkireq() {
     }
 
 }
+
+
+var noThumbURI = "data:image/svg+xml;charset-utf-8,%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22UTF-8%22%20standalone%3D%22no%22%3F%3E%3Csvg%20width%3D%22120px%22%20height%3D%22120px%22%20viewBox%3D%220%200%20120%20120%22%20version%3D%221.1%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%20xmlns%3Asketch%3D%22http%3A%2F%2Fwww.bohemiancoding.com%2Fsketch%2Fns%22%3E%3Cdefs%3E%3C%2Fdefs%3E%3Cg%20id%3D%22Page-1%22%20stroke%3D%22none%22%20stroke-width%3D%221%22%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%20sketch%3Atype%3D%22MSPage%22%3E%3Cg%20id%3D%22no-thumb%22%20sketch%3Atype%3D%22MSArtboardGroup%22%20fill%3D%22%23CCCBCB%22%3E%3Cpath%20d%3D%22M60%2C66%20C63.315%2C66%2066%2C63.315%2066%2C60%20C66%2C58.856%2065.674%2C57.791%2065.119%2C56.881%20L56.881%2C65.119%20C57.791%2C65.674%2058.856%2C66%2060%2C66%20Z%20M49.153%2C68.847%20C47.183%2C66.436%2046%2C63.357%2046%2C60%20C46%2C52.266%2052.267%2C46%2060%2C46%20C63.357%2C46%2066.436%2C47.183%2068.847%2C49.153%20L74.092%2C43.908%20C70.002%2C41.587%2065.325%2C40%2060%2C40%20C44%2C40%2033.817%2C54.285%2028%2C60%20C31.48%2C63.419%2036.524%2C69.902%2043.438%2C74.562%20L49.153%2C68.847%20Z%20M76.562%2C45.438%20L70.848%2C51.153%20C72.817%2C53.564%2074%2C56.643%2074%2C60%20C74%2C67.734%2067.733%2C74%2060%2C74%20C56.643%2C74%2053.564%2C72.817%2051.153%2C70.847%20L45.909%2C76.091%20C49.998%2C78.413%2054.675%2C80%2060%2C80%20C76.001%2C80%2086.183%2C65.715%2092%2C60%20C88.52%2C56.581%2083.477%2C50.098%2076.562%2C45.438%20Z%20M60%2C54%20C56.686%2C54%2054%2C56.685%2054%2C60%20C54%2C61.144%2054.326%2C62.209%2054.881%2C63.119%20L63.119%2C54.881%20C62.209%2C54.326%2061.144%2C54%2060%2C54%20Z%22%20id%3D%22Fill-1%22%20sketch%3Atype%3D%22MSShapeGroup%22%3E%3C%2Fpath%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E";

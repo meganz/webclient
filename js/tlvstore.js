@@ -34,7 +34,7 @@ var tlvstore = (function () {
      *     Single binary encoded TLV record.
      * @private
      */
-    ns._toTlvRecord = function(key, value) {
+    ns.toTlvRecord = function(key, value) {
         var length = String.fromCharCode(value.length >>> 8)
                    + String.fromCharCode(value.length & 0xff);
         return key + '\u0000' + length + value;
@@ -54,7 +54,9 @@ var tlvstore = (function () {
     ns.containerToTlvRecords = function(container) {
         var result = '';
         for (var key in container) {
-            result += ns._toTlvRecord(key, container[key]);
+            if (container.hasOwnProperty(key)) {
+                result += ns.toTlvRecord(key, container[key]);
+            }
         }
         return result;
     };
@@ -70,9 +72,8 @@ var tlvstore = (function () {
      *     Object containing two elements: `record` contains an array of two
      *     elements (key and value of the decoded TLV record) and `rest` containing
      *     the remainder of the tlvContainer still to decode.
-     * @private
      */
-    ns._splitSingleTlvRecord = function(tlvContainer) {
+    ns.splitSingleTlvRecord = function(tlvContainer) {
         var keyLength = tlvContainer.indexOf('\u0000');
         var key = tlvContainer.substring(0, keyLength);
         var valueLength = (tlvContainer.charCodeAt(keyLength + 1)) << 8
@@ -96,7 +97,7 @@ var tlvstore = (function () {
         var rest = tlvContainer;
         var container = {};
         while (rest.length > 0) {
-            var result = ns._splitSingleTlvRecord(rest);
+            var result = ns.splitSingleTlvRecord(rest);
             container[result.record[0]] = result.record[1];
             rest = result.rest;
         }

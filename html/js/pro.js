@@ -737,6 +737,7 @@ var proPage = {
                 // Get their plan price from the currently selected duration radio button
                 var selectedPlanIndex = $('.duration-options-list .membership-radio.checked').parent().attr('data-plan-index');
                 var selectedPlan = membershipPlans[selectedPlanIndex];
+                var selectedPlanNum = selectedPlan[1];
                 var selectedPlanPrice = selectedPlan[5];
                 
                 // Convert to float for numeric comparisons
@@ -766,7 +767,7 @@ var proPage = {
                     var disabledTitleText = '';
                     
                     // Add disabled class if this payment method is not supported for this plan
-                    if ((gatewayOption.supportsExpensivePlans === false) && (selectedPlan != 4)) {
+                    if ((gatewayOption.supportsExpensivePlans === false) && (selectedPlanNum != 4)) {
                         disabledClass = ' disabled';
                         disabledTitleText = ' title="' + l[7162] + '"';
                     }
@@ -1508,7 +1509,7 @@ var paysafecard = {
 
     /**
      * Redirect to the site
-     * @param {String} utcResult, containing the url to redirect to
+     * @param {String} utcResult containing the url to redirect to
      */
     redirectToSite: function(utcResult) {
         var url = utcResult.EUR['url'];

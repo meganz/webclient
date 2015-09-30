@@ -22,6 +22,12 @@
     "disallowKeywords": [
         "with"
     ],
+    "disallowIdentifierNames": [
+        "html",
+        "append",
+        "innerHTML",
+        "outerHTML"
+    ],
 
     "disallowSpaceAfterPrefixUnaryOperators": true,
     "disallowSpaceBeforePostfixUnaryOperators": [
@@ -85,7 +91,6 @@
     "disallowMixedSpacesAndTabs": true,
     "disallowTrailingWhitespace": true,
     "validateIndentation": 4,
-    "validateLineBreaks": "LF",
 
     "requireSemicolons": true,
 
@@ -97,9 +102,9 @@
         "checkParamNames": true,
         "checkRedundantParams": true,
         "checkRedundantReturns": true,
-        "checkTypes": "strictNativeCase"
+        "checkTypes": "capitalizedNativeCase"
     },
-    
+
     "excludeFiles": [
         "node_modules/**",
         "test/node_modules/**",

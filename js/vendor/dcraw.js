@@ -1467,13 +1467,9 @@
  Module.ALLOC_NORMAL = ALLOC_NORMAL, Module.ALLOC_STACK = ALLOC_STACK, Module.ALLOC_STATIC = ALLOC_STATIC, Module.ALLOC_DYNAMIC = ALLOC_DYNAMIC, Module.ALLOC_NONE = ALLOC_NONE, Module.allocate = allocate, Module.getMemory = getMemory, Module.Pointer_stringify = Pointer_stringify, Module.AsciiToString = AsciiToString, Module.stringToAscii = stringToAscii, Module.UTF8ArrayToString = UTF8ArrayToString, Module.UTF8ToString = UTF8ToString, Module.stringToUTF8Array = stringToUTF8Array, Module.stringToUTF8 = stringToUTF8, Module.lengthBytesUTF8 = lengthBytesUTF8, Module.UTF16ToString = UTF16ToString, Module.stringToUTF16 = stringToUTF16, Module.lengthBytesUTF16 = lengthBytesUTF16, Module.UTF32ToString = UTF32ToString, Module.stringToUTF32 = stringToUTF32, Module.lengthBytesUTF32 = lengthBytesUTF32;
  Module.stackTrace = stackTrace;
  var HEAP, HEAP8, HEAPU8, HEAP16, HEAPU16, HEAP32, HEAPU32, HEAPF32, HEAPF64, byteLength, PAGE_SIZE = 4096, STATIC_BASE = 0, STATICTOP = 0, staticSealed = !1, STACK_BASE = 0, STACKTOP = 0, STACK_MAX = 0, DYNAMIC_BASE = 0, DYNAMICTOP = 0;
- try {
-  byteLength = Function.prototype.call.bind(Object.getOwnPropertyDescriptor(ArrayBuffer.prototype, "byteLength").get), byteLength(new ArrayBuffer(4));
- } catch (e) {
-  byteLength = function(buffer) {
-   return buffer.byteLength;
-  };
- }
+ byteLength = function(buffer) {
+  return buffer.byteLength;
+ };
  for (var TOTAL_STACK = Module.TOTAL_STACK || 5242880, TOTAL_MEMORY = Module.TOTAL_MEMORY || 16777216, totalMemory = 65536; TOTAL_MEMORY > totalMemory || 2 * TOTAL_STACK > totalMemory; ) 16777216 > totalMemory ? totalMemory *= 2 : totalMemory += 16777216;
  totalMemory = Math.max(totalMemory, 16777216), totalMemory !== TOTAL_MEMORY && (Module.printErr("increasing TOTAL_MEMORY to " + totalMemory + " to be compliant with the asm.js spec (and given that TOTAL_STACK=" + TOTAL_STACK + ")"), TOTAL_MEMORY = totalMemory), assert("undefined" != typeof Int32Array && "undefined" != typeof Float64Array && !!new Int32Array(1).subarray && !!new Int32Array(1).set, "JS engine does not provide full typed array support");
  var buffer;

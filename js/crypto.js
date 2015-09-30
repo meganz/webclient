@@ -1797,9 +1797,6 @@ function api_reqfailed(c, e) {
         api_req({a: 'whyamiblocked'}, { callback: function whyAmIBlocked(reason) {
             u_logout(true);
 
-            var text = (reason === 100) ? l[7659] : l[7660];
-
-
             // On clicking OK, log the user out and redirect to contact page
             loadingDialog.hide();
             msgDialog('warninga', l[6789],

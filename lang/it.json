@@ -1905,6 +1905,7 @@
     "6783": "Approva credenziali",
     "6787": "Nessuna cartella condivisa con te",
     "6788": "mesi",
+    "6789": "Account sospeso",
     "6793": "Recover space by emptying the rubbish bin",
     "6794": "Svuota il cestino",
     "6795": "Sei sicuro di voler rimuovere definitivamente tutti gli elementi dal cestino?Non \u00e8 possibile annullare questa azione!",
@@ -2704,5 +2705,7 @@
     "7653": "Available until:",
     "7656": "Copied",
     "7657": "Show more languages",
-    "7658": "Hide languages"
+    "7658": "Hide languages",
+    "7659": "You have been suspended due to excess data usage.Please contact support@mega.nz to get your account reinstated.",
+    "7660": "You have been suspended due to repeated copyright infringement."
 }

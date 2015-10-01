@@ -1905,6 +1905,7 @@
     "6783": "Gegevens goedkeuren",
     "6787": "Geen gedeelde mappen met u",
     "6788": "maanden",
+    "6789": "Opgeheven account",
     "6793": "Herstel ruimte door het legen van de prullenbak",
     "6794": "Leeg de prullenbak",
     "6795": "Bent u zeker dat u alle bestanden permanent uit uw prullenbak wilt verwijderen? U kunt deze actie niet ongedaan maken!",
@@ -2704,5 +2705,7 @@
     "7653": "Available until:",
     "7656": "Copied",
     "7657": "Show more languages",
-    "7658": "Hide languages"
+    "7658": "Hide languages",
+    "7659": "You have been suspended due to excess data usage.Please contact support@mega.nz to get your account reinstated.",
+    "7660": "You have been suspended due to repeated copyright infringement."
 }

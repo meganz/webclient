@@ -1905,6 +1905,7 @@
     "6783": "Odobri vjerodajnice",
     "6787": "Nema dijeljenih mapa sa tobom",
     "6788": "mjeseci",
+    "6789": "Suspendiraj ra\u010dun",
     "6793": "Oslobodite prostor tako da ispraznite Ko\u0161 za sme\u0107e",
     "6794": "Isprazni Ko\u0161 za sme\u0107e",
     "6795": "Da li ste sigurni da \u017eelite trajno ukloniti sve stavke iz Ko\u0161a za sme\u0107e?Ovo se ne mo\u017ee povratiti!",
@@ -2704,5 +2705,7 @@
     "7653": "Available until:",
     "7656": "Copied",
     "7657": "Show more languages",
-    "7658": "Hide languages"
+    "7658": "Hide languages",
+    "7659": "You have been suspended due to excess data usage.Please contact support@mega.nz to get your account reinstated.",
+    "7660": "You have been suspended due to repeated copyright infringement."
 }

@@ -1905,6 +1905,7 @@
     "6783": "Ch\u1ea5p nh\u1eadn c\u00e1c x\u00e1c th\u1ef1c",
     "6787": "Ch\u01b0a c\u00f3 ai chia s\u1ebb th\u01b0 m\u1ee5c cho qu\u00fd kh\u00e1ch ",
     "6788": "th\u00e1ng",
+    "6789": "T\u00e0i kho\u1ea3n b\u1ecb \u0111\u00ecnh ch\u1ec9",
     "6793": "D\u1ecdn d\u1eb9p c\u00e1c d\u1eef li\u1ec7u trong Th\u00f9ng R\u00e1c \u0111\u1ec3 l\u1ea5y th\u00eam dung l\u01b0\u1ee3ng tr\u1ed1ng",
     "6794": "D\u1ecdn Th\u00f9ng R\u00e1c",
     "6795": "B\u1ea1n c\u00f3 ch\u1eafc mu\u1ed1n x\u00f3a b\u1ecf v\u0129nh vi\u1ec5n nh\u1eefng m\u1ee5c n\u00e0y hay kh\u00f4ng?M\u1ed9t khi th\u1ef1c hi\u1ec7n s\u1ebd kh\u00f4ng th\u1ec3 l\u1ea5y l\u1ea1i \u0111\u01b0\u1ee3c!",
@@ -2704,5 +2705,7 @@
     "7653": "Available until:",
     "7656": "Copied",
     "7657": "Show more languages",
-    "7658": "Hide languages"
+    "7658": "Hide languages",
+    "7659": "You have been suspended due to excess data usage.Please contact support@mega.nz to get your account reinstated.",
+    "7660": "You have been suspended due to repeated copyright infringement."
 }

@@ -1905,6 +1905,7 @@
     "6783": "Approuver les informations d'identification",
     "6787": "Aucun dossier n'est partag\u00e9 avec vous",
     "6788": "mois",
+    "6789": "Compte d\u00e9sactiv\u00e9",
     "6793": "R\u00e9cup\u00e9rer de l'espace libre en vidant la Corbeille",
     "6794": "Vider la Corbeille",
     "6795": "\u00cates-vous s\u00fbr de vouloir supprimer de fa\u00e7on permanente tous les \u00e9l\u00e9ments  de votre Corbeille ?Cette action ne peut pas \u00eatre annul\u00e9e !",
@@ -2704,5 +2705,7 @@
     "7653": "Available until:",
     "7656": "Copied",
     "7657": "Show more languages",
-    "7658": "Hide languages"
+    "7658": "Hide languages",
+    "7659": "You have been suspended due to excess data usage.Please contact support@mega.nz to get your account reinstated.",
+    "7660": "You have been suspended due to repeated copyright infringement."
 }

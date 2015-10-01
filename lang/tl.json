@@ -1905,6 +1905,7 @@
     "6783": "Payagan ang credentials",
     "6787": "Walang binahaging folders sa iyo",
     "6788": "buwan",
+    "6789": "Suspendidong account",
     "6793": "Makakuha pa ng higit na espasyo sa pamamagitan ng paglinis ng Basurahan",
     "6794": "Linisin ang Basurahan",
     "6795": "Gusto mo bang pahiin lahat ng items sa inyong Basurahan? Hindi na ito pwedeng baguhin pa!",
@@ -2704,5 +2705,7 @@
     "7653": "Hanggang:",
     "7656": "Nakopya na",
     "7657": "Magpakita pa ng higit pang mga lenggwahe",
-    "7658": "Itago ang mga lenggwahe"
+    "7658": "Itago ang mga lenggwahe",
+    "7659": "You have been suspended due to excess data usage.Please contact support@mega.nz to get your account reinstated.",
+    "7660": "You have been suspended due to repeated copyright infringement."
 }

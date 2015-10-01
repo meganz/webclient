@@ -1905,6 +1905,7 @@
     "6783": "Todennusvaltuutus",
     "6787": "Ei kanssasi jaettuja kansioita",
     "6788": "kuukausia",
+    "6789": "J\u00e4\u00e4dytetty k\u00e4ytt\u00e4j\u00e4tili",
     "6793": "Vapauta tilaa tyhjent\u00e4m\u00e4ll\u00e4 Roskakori",
     "6794": "Tyhjenn\u00e4 Roskakori",
     "6795": "Haluatko varmasti tyhjent\u00e4\u00e4 Roskakorin lopullisesti? Toimintoa ei voi perua!",
@@ -2704,5 +2705,7 @@
     "7653": "Available until:",
     "7656": "Copied",
     "7657": "Show more languages",
-    "7658": "Hide languages"
+    "7658": "Hide languages",
+    "7659": "You have been suspended due to excess data usage.Please contact support@mega.nz to get your account reinstated.",
+    "7660": "You have been suspended due to repeated copyright infringement."
 }

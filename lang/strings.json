@@ -10826,5 +10826,13 @@
     "7658": {
         "text": "Hide languages",
         "context": "Button text to hide the less popular languages that are available in the language selection dialog."
+    },
+    "7659": {
+        "text": "You have been suspended due to excess data usage.\r\nPlease contact support@mega.nz to get your account reinstated.",
+        "context": "Error message when a given user with a suspended account tries to login. The user is suspended due excess of data usage. "
+    },
+    "7660": {
+        "text": "You have been suspended due to repeated copyright infringement.",
+        "context": "Error message when a given user with a suspended account tries to login. "
     }
 }

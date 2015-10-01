@@ -98,40 +98,6 @@ describe("chat.strongvelope unit test", function() {
     });
 
     describe('en-/decryption', function() {
-        describe('_computeSymmetricKey', function() {
-            it("normal operation", function() {
-                sandbox.stub(window, 'pubCu25519', { 'you456789xw': 'your key' });
-                sandbox.stub(asmCrypto, 'string_to_bytes', _echo);
-                sandbox.stub(nacl, 'scalarMult').returns('shared secret');
-                sandbox.stub(asmCrypto, 'bytes_to_string', _echo);
-                sandbox.stub(asmCrypto.SHA256, 'bytes', _echo);
-
-                var result = ns._computeSymmetricKey('you456789xw');
-                assert.strictEqual(result, 'shared secret');
-                assert.strictEqual(asmCrypto.string_to_bytes.callCount, 2);
-                assert.strictEqual(nacl.scalarMult.callCount, 1);
-                assert.strictEqual(asmCrypto.SHA256.bytes.callCount, 1);
-                assert.strictEqual(asmCrypto.bytes_to_string.callCount, 1);
-            });
-
-            it("no mocks", function() {
-                sandbox.stub(window, 'pubCu25519', { 'you456789xw': CU25519_PUB_KEY });
-                sandbox.stub(window, 'u_privCu25519', CU25519_PRIV_KEY);
-                var result = ns._computeSymmetricKey('you456789xw');
-                assert.strictEqual(btoa(result),
-                    'X2O2IQoAqzPvr2F4XWjCuwP17tYHoJwB5KhyhlHb/mM=');
-            });
-
-            it("missing recipient pubkey", function() {
-                sandbox.stub(ns._logger, '_log');
-                sandbox.stub(window, 'pubCu25519', {});
-                assert.throws(function() { ns._computeSymmetricKey('you456789xw'); },
-                              'No cached chat key for user!');
-                assert.strictEqual(ns._logger._log.args[0][1][0],
-                                   'No cached chat key for user: you456789xw');
-            });
-        });
-
         describe('_symmetricEncryptMessage', function() {
             it("all parameters given", function() {
                 sandbox.stub(window, 'encodeURIComponent', _echo);
@@ -298,108 +264,6 @@ describe("chat.strongvelope unit test", function() {
             });
         });
 
-        describe('_encryptKeysTo', function() {
-            it("single key", function() {
-                sandbox.stub(asmCrypto, 'string_to_bytes', _echo);
-                sandbox.stub(window, 'base64urldecode', _echo);
-                var iv = { subarray: sinon.stub().returns('IV') };
-                sandbox.stub(asmCrypto.SHA256, 'bytes').returns(iv);
-                sandbox.stub(ns, '_computeSymmetricKey').returns(
-                    { substring: sinon.stub().returns('the key') });
-                sandbox.stub(asmCrypto.AES_CBC, 'encrypt').returns('ciphertext');
-                sandbox.stub(asmCrypto, 'bytes_to_string', _echo);
-
-                var result = ns._encryptKeysTo(['a key'], 'gooniegoogoo', 'you456789xw');
-                assert.strictEqual(result, 'ciphertext');
-                assert.strictEqual(asmCrypto.AES_CBC.encrypt.callCount, 1);
-                assert.deepEqual(asmCrypto.AES_CBC.encrypt.args[0],
-                    ['a key', 'the key', false, 'IV']);
-            });
-
-            it("two keys", function() {
-                sandbox.stub(asmCrypto, 'string_to_bytes', _echo);
-                sandbox.stub(window, 'base64urldecode', _echo);
-                var iv = { subarray: sinon.stub().returns('IV') };
-                sandbox.stub(asmCrypto.SHA256, 'bytes').returns(iv);
-                sandbox.stub(ns, '_computeSymmetricKey').returns(
-                    { substring: sinon.stub().returns('the key') });
-                sandbox.stub(asmCrypto.AES_CBC, 'encrypt').returns('ciphertext');
-                sandbox.stub(asmCrypto, 'bytes_to_string', _echo);
-
-                var result = ns._encryptKeysTo(['key one', 'key two'], 'gooniegoogoo', 'you456789xw');
-                assert.strictEqual(result, 'ciphertext');
-                assert.strictEqual(asmCrypto.AES_CBC.encrypt.callCount, 1);
-                assert.deepEqual(asmCrypto.AES_CBC.encrypt.args[0],
-                    ['key onekey two', 'the key', false, 'IV']);
-            });
-
-            it("no mocks, one key", function() {
-                sandbox.stub(window, 'u_privCu25519', CU25519_PRIV_KEY);
-                sandbox.stub(window, 'pubCu25519', { 'you456789xw': CU25519_PUB_KEY });
-                sandbox.stub(ns, '_computeSymmetricKey').returns(
-                    atob('X2O2IQoAqzPvr2F4XWjCuwP17tYHoJwB5KhyhlHb/mM='));
-
-                var result = ns._encryptKeysTo([KEY], NONCE, 'you456789xw');
-                assert.strictEqual(btoa(result), 'cYNQ28YygmVqaPddZsjlXA==');
-            });
-        });
-
-        describe('_decryptKeysFrom', function() {
-            it("single key", function() {
-                sandbox.stub(asmCrypto, 'string_to_bytes', _echo);
-                sandbox.stub(window, 'base64urldecode', _echo);
-                var iv = { subarray: sinon.stub().returns('IV') };
-                sandbox.stub(asmCrypto.SHA256, 'bytes').returns(iv);
-                sandbox.stub(ns, '_computeSymmetricKey').returns(
-                    { substring: sinon.stub().returns('the key') });
-                sandbox.stub(asmCrypto.AES_CBC, 'decrypt').returns('a key67890123456');
-                sandbox.stub(asmCrypto, 'bytes_to_string', _echo);
-
-                var result = ns._decryptKeysFrom('an encrypted key', 'gooniegoogoo', 'you456789xw');
-                assert.deepEqual(result, ['a key67890123456']);
-                assert.strictEqual(asmCrypto.AES_CBC.decrypt.callCount, 1);
-                assert.deepEqual(asmCrypto.AES_CBC.decrypt.args[0],
-                    ['an encrypted key', 'the key', false, 'IV']);
-            });
-
-            it("two keys", function() {
-                sandbox.stub(asmCrypto, 'string_to_bytes', _echo);
-                sandbox.stub(window, 'base64urldecode', _echo);
-                var iv = { subarray: sinon.stub().returns('IV') };
-                sandbox.stub(asmCrypto.SHA256, 'bytes').returns(iv);
-                sandbox.stub(ns, '_computeSymmetricKey').returns(
-                    { substring: sinon.stub().returns('the key') });
-                sandbox.stub(asmCrypto.AES_CBC, 'decrypt').returns('a key67890123456another key23456');
-                sandbox.stub(asmCrypto, 'bytes_to_string', _echo);
-
-                var result = ns._decryptKeysFrom('two encrypted keys', 'gooniegoogoo', 'you456789xw');
-                assert.deepEqual(result, ['a key67890123456', 'another key23456']);
-                assert.strictEqual(asmCrypto.AES_CBC.decrypt.callCount, 1);
-                assert.deepEqual(asmCrypto.AES_CBC.decrypt.args[0],
-                    ['two encrypted keys', 'the key', false, 'IV']);
-            });
-
-            it("no mocks, one key", function() {
-                sandbox.stub(window, 'u_handle', 'you456789xw');
-                sandbox.stub(window, 'u_privCu25519', CU25519_PRIV_KEY);
-                sandbox.stub(ns, '_computeSymmetricKey').returns(
-                    atob('X2O2IQoAqzPvr2F4XWjCuwP17tYHoJwB5KhyhlHb/mM='));
-
-                var result = ns._decryptKeysFrom(atob('cYNQ28YygmVqaPddZsjlXA=='), NONCE, '');
-                assert.deepEqual(result, [KEY]);
-            });
-
-            it("no mocks, two kes", function() {
-                sandbox.stub(window, 'u_handle', 'you456789xw');
-                sandbox.stub(window, 'u_privCu25519', CU25519_PRIV_KEY);
-                sandbox.stub(ns, '_computeSymmetricKey').returns(
-                    atob('X2O2IQoAqzPvr2F4XWjCuwP17tYHoJwB5KhyhlHb/mM='));
-
-                var result = ns._decryptKeysFrom(atob('PhbRKOvBhdKiKHGqdYpCuAqtulpr/nqV92QGc4gPHrg='), NONCE, '');
-                assert.deepEqual(result, [ROTATED_KEY, KEY]);
-            });
-        });
-
         describe('_parseMessageContent', function() {
             it("keyed message", function() {
                 var result = ns._parseMessageContent(INITIAL_MESSAGE_BIN);
@@ -419,17 +283,159 @@ describe("chat.strongvelope unit test", function() {
     });
 
     describe('ProtocolHandler class', function() {
+        describe('_computeSymmetricKey', function() {
+            it("normal operation", function() {
+                var handler = new ns.ProtocolHandler('me3456789xw', CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
+                sandbox.stub(window, 'pubCu25519', { 'you456789xw': 'your key' });
+                sandbox.stub(asmCrypto, 'string_to_bytes', _echo);
+                sandbox.stub(nacl, 'scalarMult').returns('shared secret');
+                sandbox.stub(asmCrypto, 'bytes_to_string', _echo);
+                sandbox.stub(asmCrypto.SHA256, 'bytes', _echo);
+
+                var result = handler._computeSymmetricKey('you456789xw');
+                assert.strictEqual(result, 'shared secret');
+                assert.strictEqual(asmCrypto.string_to_bytes.callCount, 2);
+                assert.strictEqual(nacl.scalarMult.callCount, 1);
+                assert.strictEqual(asmCrypto.SHA256.bytes.callCount, 1);
+                assert.strictEqual(asmCrypto.bytes_to_string.callCount, 1);
+            });
+
+            it("no mocks", function() {
+                var handler = new ns.ProtocolHandler('me3456789xw', CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
+                sandbox.stub(window, 'pubCu25519', { 'you456789xw': CU25519_PUB_KEY });
+                sandbox.stub(window, 'u_privCu25519', CU25519_PRIV_KEY);
+                var result = handler._computeSymmetricKey('you456789xw');
+                assert.strictEqual(btoa(result),
+                    'X2O2IQoAqzPvr2F4XWjCuwP17tYHoJwB5KhyhlHb/mM=');
+            });
+
+            it("missing recipient pubkey", function() {
+                var handler = new ns.ProtocolHandler('me3456789xw', CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
+                sandbox.stub(ns._logger, '_log');
+                sandbox.stub(window, 'pubCu25519', {});
+                assert.throws(function() { handler._computeSymmetricKey('you456789xw'); },
+                              'No cached chat key for user!');
+                assert.strictEqual(ns._logger._log.args[0][1][0],
+                                   'No cached chat key for user: you456789xw');
+            });
+        });
+
+        describe('_encryptKeysTo', function() {
+            it("single key", function() {
+                var handler = new ns.ProtocolHandler('me3456789xw', CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
+                sandbox.stub(asmCrypto, 'string_to_bytes', _echo);
+                sandbox.stub(window, 'base64urldecode', _echo);
+                var iv = { subarray: sinon.stub().returns('IV') };
+                sandbox.stub(asmCrypto.SHA256, 'bytes').returns(iv);
+                sandbox.stub(handler, '_computeSymmetricKey').returns(
+                    { substring: sinon.stub().returns('the key') });
+                sandbox.stub(asmCrypto.AES_CBC, 'encrypt').returns('ciphertext');
+                sandbox.stub(asmCrypto, 'bytes_to_string', _echo);
+
+                var result = handler._encryptKeysTo(['a key'], 'gooniegoogoo', 'you456789xw');
+                assert.strictEqual(result, 'ciphertext');
+                assert.strictEqual(asmCrypto.AES_CBC.encrypt.callCount, 1);
+                assert.deepEqual(asmCrypto.AES_CBC.encrypt.args[0],
+                    ['a key', 'the key', false, 'IV']);
+            });
+
+            it("two keys", function() {
+                var handler = new ns.ProtocolHandler('me3456789xw', CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
+                sandbox.stub(asmCrypto, 'string_to_bytes', _echo);
+                sandbox.stub(window, 'base64urldecode', _echo);
+                var iv = { subarray: sinon.stub().returns('IV') };
+                sandbox.stub(asmCrypto.SHA256, 'bytes').returns(iv);
+                sandbox.stub(handler, '_computeSymmetricKey').returns(
+                    { substring: sinon.stub().returns('the key') });
+                sandbox.stub(asmCrypto.AES_CBC, 'encrypt').returns('ciphertext');
+                sandbox.stub(asmCrypto, 'bytes_to_string', _echo);
+
+                var result = handler._encryptKeysTo(['key one', 'key two'], 'gooniegoogoo', 'you456789xw');
+                assert.strictEqual(result, 'ciphertext');
+                assert.strictEqual(asmCrypto.AES_CBC.encrypt.callCount, 1);
+                assert.deepEqual(asmCrypto.AES_CBC.encrypt.args[0],
+                    ['key onekey two', 'the key', false, 'IV']);
+            });
+
+            it("no mocks, one key", function() {
+                var handler = new ns.ProtocolHandler('me3456789xw', CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
+                sandbox.stub(window, 'u_privCu25519', CU25519_PRIV_KEY);
+                sandbox.stub(window, 'pubCu25519', { 'you456789xw': CU25519_PUB_KEY });
+                sandbox.stub(handler, '_computeSymmetricKey').returns(
+                    atob('X2O2IQoAqzPvr2F4XWjCuwP17tYHoJwB5KhyhlHb/mM='));
+
+                var result = handler._encryptKeysTo([KEY], NONCE, 'you456789xw');
+                assert.strictEqual(btoa(result), 'cYNQ28YygmVqaPddZsjlXA==');
+            });
+        });
+
+        describe('_decryptKeysFrom', function() {
+            it("single key", function() {
+                var handler = new ns.ProtocolHandler('me3456789xw', CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
+                sandbox.stub(asmCrypto, 'string_to_bytes', _echo);
+                sandbox.stub(window, 'base64urldecode', _echo);
+                var iv = { subarray: sinon.stub().returns('IV') };
+                sandbox.stub(asmCrypto.SHA256, 'bytes').returns(iv);
+                sandbox.stub(handler, '_computeSymmetricKey').returns(
+                    { substring: sinon.stub().returns('the key') });
+                sandbox.stub(asmCrypto.AES_CBC, 'decrypt').returns('a key67890123456');
+                sandbox.stub(asmCrypto, 'bytes_to_string', _echo);
+
+                var result = handler._decryptKeysFrom('an encrypted key', 'gooniegoogoo', 'you456789xw');
+                assert.deepEqual(result, ['a key67890123456']);
+                assert.strictEqual(asmCrypto.AES_CBC.decrypt.callCount, 1);
+                assert.deepEqual(asmCrypto.AES_CBC.decrypt.args[0],
+                    ['an encrypted key', 'the key', false, 'IV']);
+            });
+
+            it("two keys", function() {
+                var handler = new ns.ProtocolHandler('me3456789xw', CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
+                sandbox.stub(asmCrypto, 'string_to_bytes', _echo);
+                sandbox.stub(window, 'base64urldecode', _echo);
+                var iv = { subarray: sinon.stub().returns('IV') };
+                sandbox.stub(asmCrypto.SHA256, 'bytes').returns(iv);
+                sandbox.stub(handler, '_computeSymmetricKey').returns(
+                    { substring: sinon.stub().returns('the key') });
+                sandbox.stub(asmCrypto.AES_CBC, 'decrypt').returns('a key67890123456another key23456');
+                sandbox.stub(asmCrypto, 'bytes_to_string', _echo);
+
+                var result = handler._decryptKeysFrom('two encrypted keys', 'gooniegoogoo', 'you456789xw');
+                assert.deepEqual(result, ['a key67890123456', 'another key23456']);
+                assert.strictEqual(asmCrypto.AES_CBC.decrypt.callCount, 1);
+                assert.deepEqual(asmCrypto.AES_CBC.decrypt.args[0],
+                    ['two encrypted keys', 'the key', false, 'IV']);
+            });
+
+            it("no mocks, one key", function() {
+                var handler = new ns.ProtocolHandler('you456789xw', CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
+                sandbox.stub(handler, '_computeSymmetricKey').returns(
+                    atob('X2O2IQoAqzPvr2F4XWjCuwP17tYHoJwB5KhyhlHb/mM='));
+
+                var result = handler._decryptKeysFrom(atob('cYNQ28YygmVqaPddZsjlXA=='), NONCE, '');
+                assert.deepEqual(result, [KEY]);
+            });
+
+            it("no mocks, two kes", function() {
+                var handler = new ns.ProtocolHandler('you456789xw', CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
+                sandbox.stub(handler, '_computeSymmetricKey').returns(
+                    atob('X2O2IQoAqzPvr2F4XWjCuwP17tYHoJwB5KhyhlHb/mM='));
+
+                var result = handler._decryptKeysFrom(atob('PhbRKOvBhdKiKHGqdYpCuAqtulpr/nqV92QGc4gPHrg='), NONCE, '');
+                assert.deepEqual(result, [ROTATED_KEY, KEY]);
+            });
+        });
+
         describe('encryptTo', function() {
             it("keyed message", function() {
-                var protocolHandler = new ns.ProtocolHandler();
-                protocolHandler.senderKeys = ['sender key'];
+                var handler = new ns.ProtocolHandler('me3456789xw', CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
+                handler.senderKeys = ['sender key'];
                 sandbox.stub(window, 'u_handle', 'me3456789xw');
                 sandbox.stub(window, 'u_privEd25519', 'private Ed');
                 sandbox.stub(window, 'u_pubEd25519', 'public Ed');
                 sandbox.stub(window, 'base64urldecode', _echo);
                 sandbox.stub(ns, '_symmetricEncryptMessage').returns(
                     { key: 'sender key', nonce: 'gooniegoogoo', ciphertext: 'ciphertext' });
-                sandbox.stub(ns, '_encryptKeysTo').returns(atob('PqG4NXmumTUS'));
+                sandbox.stub(handler, '_encryptKeysTo').returns(atob('PqG4NXmumTUS'));
                 sandbox.stub(ns, '_signMessage').returns('squiggle');
                 sandbox.stub(tlvstore, 'toTlvRecord');
                 tlvstore.toTlvRecord.withArgs('\u0001').returns('|squiggle');
@@ -439,22 +445,22 @@ describe("chat.strongvelope unit test", function() {
                 tlvstore.toTlvRecord.withArgs('\u0005').returns('|encrypted key');
                 tlvstore.toTlvRecord.withArgs('\u0006').returns('|0');
                 tlvstore.toTlvRecord.withArgs('\u0007').returns('|ciphertext');
-                assert.strictEqual(protocolHandler._sentKeyId, null);
+                assert.strictEqual(handler._sentKeyId, null);
 
-                var result = protocolHandler.encryptTo('Hello!', 'you456789xw');
+                var result = handler.encryptTo('Hello!', 'you456789xw');
                 assert.strictEqual(result,
                     '\u0000|squiggle|0x00|gooniegoogoo|you456789xw|encrypted key|0|ciphertext');
                 assert.strictEqual(ns._symmetricEncryptMessage.callCount, 1);
-                assert.strictEqual(ns._encryptKeysTo.callCount, 1);
+                assert.strictEqual(handler._encryptKeysTo.callCount, 1);
                 assert.strictEqual(tlvstore.toTlvRecord.callCount, 7);
                 assert.strictEqual(ns._signMessage.callCount, 1);
-                assert.strictEqual(protocolHandler._sentKeyId, protocolHandler.keyId);
-                assert.strictEqual(protocolHandler._keyEncryptionCount, 1);
+                assert.strictEqual(handler._sentKeyId, handler.keyId);
+                assert.strictEqual(handler._keyEncryptionCount, 1);
             });
 
             it("keyed, no mocks", function() {
-                var protocolHandler = new ns.ProtocolHandler();
-                protocolHandler.senderKeys = [KEY];
+                var handler = new ns.ProtocolHandler('me3456789xw', CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
+                handler.senderKeys = [KEY];
                 sandbox.stub(window, 'u_handle', 'me3456789xw');
                 sandbox.stub(window, 'u_privEd25519', ED25519_PRIV_KEY);
                 sandbox.stub(window, 'u_pubEd25519', ED25519_PUB_KEY);
@@ -463,20 +469,20 @@ describe("chat.strongvelope unit test", function() {
                 sandbox.stub(ns, '_symmetricEncryptMessage').returns(
                     { key: KEY, nonce: atob('71BrlkBJXmR5xRtM'),
                       ciphertext: atob('67lptSuY') });
-                sandbox.stub(ns, '_encryptKeysTo').returns(atob('yJrGOPeYvAg4iTeYqW7New=='));
+                sandbox.stub(handler, '_encryptKeysTo').returns(atob('yJrGOPeYvAg4iTeYqW7New=='));
                 sandbox.stub(ns, '_signMessage').returns(INITIAL_MESSAGE.signature);
 
-                var result = protocolHandler.encryptTo('Hello!', 'you456789xw');
+                var result = handler.encryptTo('Hello!', 'you456789xw');
                 assert.strictEqual(btoa(result), btoa(INITIAL_MESSAGE_BIN));
                 assert.strictEqual(result.length, 137);
-                assert.strictEqual(protocolHandler._keyEncryptionCount, 1);
+                assert.strictEqual(handler._keyEncryptionCount, 1);
             });
 
             it("followup message", function() {
-                var protocolHandler = new ns.ProtocolHandler();
-                protocolHandler.senderKeys = ['sender key'];
-                protocolHandler._sentKeyId = 0;
-                protocolHandler._keyEncryptionCount = 1;
+                var handler = new ns.ProtocolHandler('me3456789xw', CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
+                handler.senderKeys = ['sender key'];
+                handler._sentKeyId = 0;
+                handler._keyEncryptionCount = 1;
                 sandbox.stub(window, 'u_handle', 'me3456789xw');
                 sandbox.stub(window, 'u_privEd25519', 'private Ed');
                 sandbox.stub(window, 'u_pubEd25519', 'public Ed');
@@ -491,21 +497,21 @@ describe("chat.strongvelope unit test", function() {
                 tlvstore.toTlvRecord.withArgs('\u0006').returns('|0');
                 tlvstore.toTlvRecord.withArgs('\u0007').returns('|ciphertext');
 
-                var result = protocolHandler.encryptTo('Hello!', 'you456789xw');
+                var result = handler.encryptTo('Hello!', 'you456789xw');
                 assert.strictEqual(result,
                     '\u0000|squiggle|0x01|gooniegoogoo|0|ciphertext');
                 assert.strictEqual(ns._symmetricEncryptMessage.callCount, 1);
                 assert.strictEqual(tlvstore.toTlvRecord.callCount, 5);
                 assert.strictEqual(ns._signMessage.callCount, 1);
-                assert.strictEqual(protocolHandler._sentKeyId, protocolHandler.keyId);
-                assert.strictEqual(protocolHandler._keyEncryptionCount, 2);
+                assert.strictEqual(handler._sentKeyId, handler.keyId);
+                assert.strictEqual(handler._keyEncryptionCount, 2);
             });
 
             it("followup, no mocks", function() {
-                var protocolHandler = new ns.ProtocolHandler();
-                protocolHandler.senderKeys = [KEY];
-                protocolHandler._sentKeyId = 0;
-                protocolHandler._keyEncryptionCount = 1;
+                var handler = new ns.ProtocolHandler('me3456789xw', CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
+                handler.senderKeys = [KEY];
+                handler._sentKeyId = 0;
+                handler._keyEncryptionCount = 1;
                 sandbox.stub(window, 'u_handle', 'me3456789xw');
                 sandbox.stub(window, 'u_privEd25519', ED25519_PRIV_KEY);
                 sandbox.stub(window, 'u_pubEd25519', ED25519_PUB_KEY);
@@ -516,17 +522,17 @@ describe("chat.strongvelope unit test", function() {
                       ciphertext: atob('67lptSuY') });
                 sandbox.stub(ns, '_signMessage').returns(FOLLOWUP_MESSAGE.signature);
 
-                var result = protocolHandler.encryptTo('Hello!', 'you456789xw');
+                var result = handler.encryptTo('Hello!', 'you456789xw');
                 assert.strictEqual(btoa(result), btoa(FOLLOWUP_MESSAGE_BIN));
                 assert.strictEqual(result.length, 105);
-                assert.strictEqual(protocolHandler._keyEncryptionCount, 2);
+                assert.strictEqual(handler._keyEncryptionCount, 2);
             });
 
             it("rotate keys, no mocks", function() {
-                var protocolHandler = new ns.ProtocolHandler(3);
-                protocolHandler.senderKeys = [KEY];
-                protocolHandler._sentKeyId = 0;
-                protocolHandler._keyEncryptionCount = 3;
+                var handler = new ns.ProtocolHandler('me3456789xw', CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY, 3);
+                handler.senderKeys = [KEY];
+                handler._sentKeyId = 0;
+                handler._keyEncryptionCount = 3;
                 sandbox.stub(window, 'u_handle', 'me3456789xw');
                 sandbox.stub(window, 'u_privEd25519', ED25519_PRIV_KEY);
                 sandbox.stub(window, 'u_pubEd25519', ED25519_PUB_KEY);
@@ -538,27 +544,27 @@ describe("chat.strongvelope unit test", function() {
                       ciphertext: atob('H78adfMY') });
                 sandbox.stub(ns, '_signMessage').returns(ROTATION_MESSAGE.signature);
 
-                var result = protocolHandler.encryptTo('Hello!', 'you456789xw');
+                var result = handler.encryptTo('Hello!', 'you456789xw');
                 assert.strictEqual(btoa(result), btoa(ROTATION_MESSAGE_BIN));
                 assert.strictEqual(result.length, 153);
-                assert.strictEqual(protocolHandler.keyId, 1);
-                assert.deepEqual(protocolHandler.senderKeys,
+                assert.strictEqual(handler.keyId, 1);
+                assert.deepEqual(handler.senderKeys,
                     [KEY, ROTATED_KEY]);
-                assert.strictEqual(protocolHandler._sentKeyId, 1);
-                assert.strictEqual(protocolHandler._keyEncryptionCount, 1);
+                assert.strictEqual(handler._sentKeyId, 1);
+                assert.strictEqual(handler._keyEncryptionCount, 1);
             });
         });
 
-        describe('decrypt', function() {
+        describe('decryptFrom', function() {
             it("keyed message", function() {
-                var protocolHandler = new ns.ProtocolHandler();
+                var handler = new ns.ProtocolHandler('me3456789xw', CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
                 sandbox.stub(window, 'pubEd25519', { 'me3456789xw': ED25519_PUB_KEY });
                 sandbox.stub(window, 'u_handle', 'you456789xw');
                 sandbox.stub(ns, '_parseMessageContent').returns(INITIAL_MESSAGE);
                 sandbox.stub(ns, '_verifyMessage').returns(true);
-                sandbox.stub(ns, '_decryptKeysFrom').returns([KEY]);
+                sandbox.stub(handler, '_decryptKeysFrom').returns([KEY]);
 
-                var result = protocolHandler.decrypt(INITIAL_MESSAGE_BIN, 'me3456789xw');
+                var result = handler.decryptFrom(INITIAL_MESSAGE_BIN, 'me3456789xw');
                 assert.deepEqual(result, {
                     sender: 'me3456789xw',
                     type: 0,
@@ -566,17 +572,17 @@ describe("chat.strongvelope unit test", function() {
                 });
                 assert.strictEqual(ns._parseMessageContent.callCount, 1);
                 assert.strictEqual(ns._verifyMessage.callCount, 1);
-                assert.strictEqual(ns._decryptKeysFrom.callCount, 1);
-                assert.deepEqual(protocolHandler.participantKeys, { 'me3456789xw': { 0: KEY } });
+                assert.strictEqual(handler._decryptKeysFrom.callCount, 1);
+                assert.deepEqual(handler.participantKeys, { 'me3456789xw': { 0: KEY } });
             });
 
             it("bad parsing", function() {
                 sandbox.stub(ns._logger, '_log');
-                var protocolHandler = new ns.ProtocolHandler();
+                var handler = new ns.ProtocolHandler('me3456789xw', CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
                 sandbox.stub(window, 'pubEd25519', { 'me3456789xw': ED25519_PUB_KEY });
                 sandbox.stub(ns, '_parseMessageContent').returns(false);
 
-                var result = protocolHandler.decrypt(INITIAL_MESSAGE_BIN, 'me3456789xw');
+                var result = handler.decryptFrom(INITIAL_MESSAGE_BIN, 'me3456789xw');
                 assert.strictEqual(result, false);
                 assert.strictEqual(ns._parseMessageContent.callCount, 1);
                 assert.strictEqual(ns._logger._log.args[0][1][0],
@@ -588,9 +594,9 @@ describe("chat.strongvelope unit test", function() {
                 var parsedMessage = testutils.clone(INITIAL_MESSAGE);
                 parsedMessage.protocolVersion = 254;
                 sandbox.stub(ns, '_parseMessageContent').returns(parsedMessage);
-                var protocolHandler = new ns.ProtocolHandler();
+                var handler = new ns.ProtocolHandler('me3456789xw', CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
 
-                var result = protocolHandler.decrypt(INITIAL_MESSAGE_BIN, 'me3456789xw');
+                var result = handler.decryptFrom(INITIAL_MESSAGE_BIN, 'me3456789xw');
                 assert.strictEqual(result, false);
                 assert.strictEqual(ns._parseMessageContent.callCount, 1);
                 assert.strictEqual(ns._logger._log.args[0][1][0],
@@ -599,13 +605,13 @@ describe("chat.strongvelope unit test", function() {
 
             it("bad signature", function() {
                 sandbox.stub(ns._logger, '_log');
-                var protocolHandler = new ns.ProtocolHandler();
+                var handler = new ns.ProtocolHandler('me3456789xw', CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
                 sandbox.stub(window, 'pubEd25519', { 'me3456789xw': ED25519_PUB_KEY });
                 sandbox.stub(window, 'u_handle', 'you456789xw');
                 sandbox.stub(ns, '_parseMessageContent').returns(INITIAL_MESSAGE);
                 sandbox.stub(ns, '_verifyMessage').returns(false);
 
-                var result = protocolHandler.decrypt(INITIAL_MESSAGE_BIN, 'me3456789xw');
+                var result = handler.decryptFrom(INITIAL_MESSAGE_BIN, 'me3456789xw');
                 assert.strictEqual(result, false);
                 assert.strictEqual(ns._parseMessageContent.callCount, 1);
                 assert.strictEqual(ns._verifyMessage.callCount, 1);
@@ -614,14 +620,14 @@ describe("chat.strongvelope unit test", function() {
             });
 
             it("followup message", function() {
-                var protocolHandler = new ns.ProtocolHandler();
-                protocolHandler.participantKeys = { 'me3456789xw': { 0: KEY } };
+                var handler = new ns.ProtocolHandler('me3456789xw', CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
+                handler.participantKeys = { 'me3456789xw': { 0: KEY } };
                 sandbox.stub(window, 'pubEd25519', { 'me3456789xw': ED25519_PUB_KEY });
                 sandbox.stub(window, 'u_handle', 'you456789xw');
                 sandbox.stub(ns, '_parseMessageContent').returns(FOLLOWUP_MESSAGE);
                 sandbox.stub(ns, '_verifyMessage').returns(true);
 
-                var result = protocolHandler.decrypt(INITIAL_MESSAGE_BIN, 'me3456789xw');
+                var result = handler.decryptFrom(INITIAL_MESSAGE_BIN, 'me3456789xw');
                 assert.deepEqual(result, {
                     sender: 'me3456789xw',
                     type: 1,
@@ -633,13 +639,13 @@ describe("chat.strongvelope unit test", function() {
 
             it("followup message, missing sender key", function() {
                 sandbox.stub(ns._logger, '_log');
-                var protocolHandler = new ns.ProtocolHandler();
+                var handler = new ns.ProtocolHandler('me3456789xw', CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
                 sandbox.stub(window, 'pubEd25519', { 'me3456789xw': ED25519_PUB_KEY });
                 sandbox.stub(window, 'u_handle', 'you456789xw');
                 sandbox.stub(ns, '_parseMessageContent').returns(FOLLOWUP_MESSAGE);
                 sandbox.stub(ns, '_verifyMessage').returns(true);
 
-                var result = protocolHandler.decrypt(INITIAL_MESSAGE_BIN, 'me3456789xw');
+                var result = handler.decryptFrom(INITIAL_MESSAGE_BIN, 'me3456789xw');
                 assert.deepEqual(result, false);
                 assert.strictEqual(ns._parseMessageContent.callCount, 1);
                 assert.strictEqual(ns._verifyMessage.callCount, 1);
@@ -648,13 +654,13 @@ describe("chat.strongvelope unit test", function() {
             });
 
             it("rotation message, old and new sender key", function() {
-                var protocolHandler = new ns.ProtocolHandler();
+                var handler = new ns.ProtocolHandler('me3456789xw', CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
                 sandbox.stub(window, 'pubEd25519', { 'me3456789xw': ED25519_PUB_KEY });
                 sandbox.stub(window, 'u_handle', 'you456789xw');
                 sandbox.stub(ns, '_parseMessageContent').returns(ROTATION_MESSAGE);
                 sandbox.stub(ns, '_verifyMessage').returns(true);
-                sandbox.stub(ns, '_decryptKeysFrom').returns([ROTATED_KEY, KEY]);
-                var result = protocolHandler.decrypt(ROTATION_MESSAGE_BIN, 'me3456789xw');
+                sandbox.stub(handler, '_decryptKeysFrom').returns([ROTATED_KEY, KEY]);
+                var result = handler.decryptFrom(ROTATION_MESSAGE_BIN, 'me3456789xw');
                 assert.deepEqual(result, {
                     sender: 'me3456789xw',
                     type: 0,
@@ -662,8 +668,8 @@ describe("chat.strongvelope unit test", function() {
                 });
                 assert.strictEqual(ns._parseMessageContent.callCount, 1);
                 assert.strictEqual(ns._verifyMessage.callCount, 1);
-                assert.strictEqual(ns._decryptKeysFrom.callCount, 1);
-                assert.deepEqual(protocolHandler.participantKeys,
+                assert.strictEqual(handler._decryptKeysFrom.callCount, 1);
+                assert.deepEqual(handler.participantKeys,
                     { 'me3456789xw': { 0: KEY, 1: ROTATED_KEY } });
             });
         });

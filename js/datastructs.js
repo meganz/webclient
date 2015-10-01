@@ -517,6 +517,11 @@ MegaDataSortedMap.prototype.remove = function(k) {
     return this.removeByKey(k);
 };
 
+MegaDataSortedMap.prototype.clear = function() {
+    this._data = {};
+    this._sortedVals = [];
+};
+
 testMegaDataSortedMap = function() {
     var arr1 = new MegaDataSortedMap("id", "orderValue,ts");
     arr1.push({

@@ -113,6 +113,7 @@ var ChatdIntegration = function(megaChat) {
                 }
             }
         }
+        chatRoom.trackDataChange();
 
 
     });
@@ -128,6 +129,30 @@ var ChatdIntegration = function(megaChat) {
             chatRoom.chatdHistoryDeliveredMsgRetrieved = true;
         }
 
+        //if(eventData.chatId == "RPi-pJ4yfts") { debugger; }
+
+        var msgContents;
+        try {
+            msgContents = msgContents = chatRoom.protocolHandler.decrypt(
+                base64urldecode(eventData.message),
+                eventData.userId
+            );
+            if (msgContents && msgContents.payload) {
+                msgContents = msgContents.payload;
+            }
+            else {
+                msgContents = eventData.message; // fallback to plaintext?
+            }
+        } catch(e) {
+            if (e instanceof URIError) {
+                debugger;
+                msgContents = eventData.message; // fallback to plaintext?
+            }
+            else {
+                throw e;
+            }
+        }
+
         var messageObject;
         if(!eventData.userId || eventData.userId === u_handle) {
             var state = KarereEventObjects.OutgoingMessage.STATE.SENT;
@@ -136,6 +161,7 @@ var ChatdIntegration = function(megaChat) {
                 //console.error("Setting state to delivered (from history)", eventData);
                 state = KarereEventObjects.OutgoingMessage.STATE.DELIVERED;
             }
+
 
             /**
              * toJid, fromJid, type, messageId, contents, meta, delay, state, roomJid, seen
@@ -147,7 +173,7 @@ var ChatdIntegration = function(megaChat) {
                 /* fromJid,  */ self.megaChat.getJidFromNodeId(eventData.userId),
                 /* type,  */ "groupchat",
                 /* messageId,  */ eventData.messageId,
-                /* contents, */ eventData.message,
+                /* contents, */ msgContents,
                 /* meta,  */ {},
                 /* delay,  */ eventData.ts,
                 /* state,  */ state,
@@ -186,7 +212,7 @@ var ChatdIntegration = function(megaChat) {
                 /* rawMessage, */ undefined,
                 /* roomJid, */ chatRoom.roomJid,
                 /* meta,  */ {},
-                /* contents, */ eventData.message,
+                /* contents, */ msgContents,
                 /* elements, */ undefined,
                 /* delay,  */ eventData.ts,
                 /* seen */ seenState
@@ -500,6 +526,16 @@ ChatdIntegration._waitForShardToBeAvailable = function(fn) {
 
 ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
     var self = this;
+    chatRoom.protocolHandler = new strongvelope.ProtocolHandler();
+
+    // retrieve all other user's Cu25519 keys IF needed
+    chatRoom.getParticipants().forEach(function(jid) {
+        var contact = chatRoom.megaChat.getContactFromJid(jid);
+        if(contact && contact.u && !pubCu25519[contact.u]) {
+            crypt.getPubCu25519(contact.u);
+        }
+    });
+
     self._retrieveChatdIdIfRequired(chatRoom)
         .done(function() {
             self.join(chatRoom);
@@ -556,7 +592,11 @@ ChatdIntegration.prototype.sendMessage = function(chatRoom, message) {
     // edits and cancellations at that stage must be applied to the locally queued version that gets
     // resent until confirmation and then to the confirmed msgid)
     var self = this;
-    return self.chatd.submit(base64urldecode(chatRoom.chatId), message);
+    var destinationUser = chatRoom.megaChat.getContactFromJid(chatRoom.getParticipantsExceptMe()[0]);
+    assert(destinationUser, 'user/contact not found!');
+    var ciphertext = chatRoom.protocolHandler.encryptTo(message, destinationUser.u);
+
+    return self.chatd.submit(base64urldecode(chatRoom.chatId), base64urlencode(ciphertext));
 };
 
 ChatdIntegration.prototype.updateMessage = function(chatRoom, num, newMessage) {

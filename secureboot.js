@@ -1154,49 +1154,39 @@ else if (!b_u)
     jsl.push({f:'js/vendor/notification.js', n: 'notification_js', j:1,w:7});
 
     // Other
-    jsl.push({f:'js/vendor/Autolinker.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/vendor/Autolinker.js', n: 'autolinker_js', j:1,w:1});
 
     // Google Import Contacts
     jsl.push({f:'js/gContacts.js', n: 'gcontacts_js', j:1,w:3});
 
     // MEGA CHAT
-    jsl.push({f:'js/chat/mpenc.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/chat/opQueue.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/chat/rtcStats.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/chat/rtcSession.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/chat/strongvelope.js', n: 'strongvelope_js', j:1,w:1});
+    jsl.push({f:'js/chat/rtcStats.js', n: 'rtcstats_js', j:1,w:1});
+    jsl.push({f:'js/chat/rtcSession.js', n: 'rtcsession_js', j:1,w:1});
     jsl.push({f:'js/chat/fileTransfer.js', n: 'mega_js', j:1,w:7});
 
-    jsl.push({f:'js/vendor/chat/strophe.light.js', n: 'mega_js', j:1, w:7});
-    jsl.push({f:'js/vendor/chat/strophe.disco.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/vendor/chat/strophe.jingle.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/vendor/chat/strophe.jingle.session.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/vendor/chat/strophe.jingle.sdp.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/vendor/chat/strophe.jingle.adapter.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/vendor/chat/strophe.muc.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/vendor/chat/strophe.roster.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/vendor/chat/wildemitter.patched.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/vendor/chat/hark.patched.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/vendor/chat/base32.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/vendor/chat/strophe.light.js', n: 'stropheligh_js', j:1, w:4});
+    jsl.push({f:'js/vendor/chat/strophe.disco.js', n: 'strophedisco_js', j:1,w:1});
+    jsl.push({f:'js/vendor/chat/strophe.jingle.js', n: 'strophejingle_js', j:1,w:3});
+    jsl.push({f:'js/vendor/chat/strophe.jingle.session.js', n: 'strophejinglesess_js', j:1,w:2});
+    jsl.push({f:'js/vendor/chat/strophe.jingle.sdp.js', n: 'strophejinglesdp_js', j:1,w:2});
+    jsl.push({f:'js/vendor/chat/strophe.jingle.adapter.js', n: 'strophejingleadapt_js', j:1,w:2});
+    jsl.push({f:'js/vendor/chat/strophe.muc.js', n: 'strophemuc_js', j:1,w:1});
+    jsl.push({f:'js/vendor/chat/strophe.roster.js', n: 'stropheroster_js', j:1,w:1});
+    jsl.push({f:'js/vendor/chat/wildemitter.patched.js', n: 'wildemitter_js', j:1,w:1});
+    jsl.push({f:'js/vendor/chat/hark.patched.js', n: 'hark_js', j:1,w:1});
+    jsl.push({f:'js/vendor/chat/base32.js', n: 'base32_js', j:1,w:1});
 
-    // direct transfer deps.
-    jsl.push({f:'js/vendor/chat/cryptojs-core.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/vendor/chat/cryptojs-sha1.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/vendor/chat/cryptojs-hmac.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/vendor/chat/cryptojs-lib-typedarrays.js', n: 'mega_js', j:1,w:7});
 
-  
     // MEGA CHAT
     jsl.push({f:'js/chat/chatd.js', n: 'chatd_js', j:1,w:1});
-    jsl.push({f:'js/chat/rtcStats.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/chat/rtcSession.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/chat/fileTransfer.js', n: 'mega_js', j:1,w:7});
 
-    jsl.push({f:'js/ui/filepicker.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/ui/dialog.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/ui/feedbackDialog.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/ui/credentialsWarningDialog.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/ui/loginRequiredDialog.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/chat/ui/incomingCallDialog.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/ui/filepicker.js', n: 'filepickerui_js', j:1,w:1});
+    jsl.push({f:'js/ui/dialog.js', n: 'dialogui_js', j:1,w:1});
+    jsl.push({f:'js/ui/feedbackDialog.js', n: 'feedbackdialogui_js', j:1,w:1});
+    jsl.push({f:'js/ui/credentialsWarningDialog.js', n: 'creddialogui_js', j:1,w:1});
+    jsl.push({f:'js/ui/loginRequiredDialog.js', n: 'loginrequireddialog_js', j:1,w:1});
+    jsl.push({f:'js/chat/ui/incomingCallDialog.js', n: 'incomingcalldialog_js', j:1,w:1});
     
     jsl.push({f:'js/chat/plugins/chatdIntegration.js', n: 'chatdInt_js', j:1,w:2});
     jsl.push({f:'js/chat/plugins/karerePing.js', n: 'karerePing_js', j:1,w:7});
@@ -1214,13 +1204,7 @@ else if (!b_u)
     // END OF MEGA CHAT
 
     // UI Elements
-    jsl.push({f:'js/ui/filepicker.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/ui/dialog.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/ui/feedbackDialog.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/ui/credentialsWarningDialog.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/ui/keySignatureWarningDialog.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/ui/loginRequiredDialog.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/chat/ui/incomingCallDialog.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/ui/feedbackDialog.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/ui/languageDialog.js', n: 'mega_js', j:1,w:7});
 

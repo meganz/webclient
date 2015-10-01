@@ -133,7 +133,7 @@ var ChatdIntegration = function(megaChat) {
 
         var msgContents;
         try {
-            msgContents = msgContents = chatRoom.protocolHandler.decrypt(
+            msgContents = msgContents = chatRoom.protocolHandler.decryptFrom(
                 base64urldecode(eventData.message),
                 eventData.userId
             );
@@ -145,7 +145,11 @@ var ChatdIntegration = function(megaChat) {
             }
         } catch(e) {
             if (e instanceof URIError) {
-                debugger;
+                self.logger.error(
+                    "Failed to decrypt message: ", eventData.messageId,
+                    "with length:", eventData.message.length
+                );
+
                 msgContents = eventData.message; // fallback to plaintext?
             }
             else {
@@ -526,7 +530,14 @@ ChatdIntegration._waitForShardToBeAvailable = function(fn) {
 
 ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
     var self = this;
-    chatRoom.protocolHandler = new strongvelope.ProtocolHandler();
+
+
+    assert(u_handle, 'u_handle is not loaded, null or undefined!');
+    assert(u_privCu25519, 'u_handle is not loaded, null or undefined!');
+    assert(u_privEd25519, 'u_handle is not loaded, null or undefined!');
+    assert(u_pubEd25519, 'u_handle is not loaded, null or undefined!');
+
+
 
     // retrieve all other user's Cu25519 keys IF needed
     chatRoom.getParticipants().forEach(function(jid) {
@@ -535,6 +546,15 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
             crypt.getPubCu25519(contact.u);
         }
     });
+
+    chatRoom.protocolHandler = new strongvelope.ProtocolHandler(
+        u_handle,
+        u_privCu25519,
+        u_privEd25519,
+        u_pubEd25519
+    );
+
+
 
     self._retrieveChatdIdIfRequired(chatRoom)
         .done(function() {

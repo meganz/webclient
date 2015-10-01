@@ -72,7 +72,9 @@ describe("chat.strongvelope workflow test", function() {
                                                            BOB_ED25519_PUB,
                                                            3);
 
-                var message, sent, received;
+                var message;
+                var sent;
+                var received;
 
                 for (var i = 0; i < tests.length; i++) {
                     message = tests[i];

@@ -6470,21 +6470,19 @@ function balance2pro(callback)
                 $("#chromeclipboard").fadeTo(1, 0.01);
             }
             // chrome & firefox extension:
-            $("#clipboardbtn1").unbind('click');
-            $("#clipboardbtn1").bind('click', function() {
+            $("#clipboardbtn1").rebind('click', function() {
 
                 if (is_chrome_firefox) {
-                    mozSetClipboard(getclipboardlinks());
+                    mozSetClipboard(getClipboardLinks());
                 }
                 else {
-                    $('#chromeclipboard')[0].value = getclipboardlinks();
+                    $('#chromeclipboard')[0].value = getClipboardLinks();
                     $('#chromeclipboard').select();
                     document.execCommand('copy');
                 }
             });
 
-            $('#clipboardbtn2').unbind('click');
-            $('#clipboardbtn2').bind('click', function() {
+            $('#clipboardbtn2').rebind('click', function() {
 
                 if (is_chrome_firefox) {
                     mozSetClipboard(getclipboardkeys());
@@ -6502,17 +6500,15 @@ function balance2pro(callback)
             $('#clipboardbtn1 span').html(htmlentities(l[370]) + '<object data="OneClipboard.swf" id="clipboardswf1" type="application/x-shockwave-flash"  width="100%" height="32" allowscriptaccess="always"><param name="wmode" value="transparent"><param value="always" name="allowscriptaccess"><param value="all" name="allowNetworkin"><param name=FlashVars value="buttonclick=1" /></object>');
             $('#clipboardbtn2 span').html(htmlentities(l[1033]) + '<object data="OneClipboard.swf" id="clipboardswf2" type="application/x-shockwave-flash"  width="100%" height="32" allowscriptaccess="always"><param name="wmode" value="transparent"><param value="always" name="allowscriptaccess"><param value="all" name="allowNetworkin"><param name=FlashVars value="buttonclick=1" /></object>');
 
-            $('#clipboardbtn1').unbind('mouseover');
-            $('#clipboardbtn1').bind('mouseover', function() {
+            $('#clipboardbtn1').rebind('mouseover', function() {
 
                 var e = $('#clipboardswf1')[0];
                 if (e && e.setclipboardtext) {
-                    e.setclipboardtext(getclipboardlinks());
+                    e.setclipboardtext(getClipboardLinks());
                 }
             });
 
-            $('#clipboardbtn2').unbind('mouseover');
-            $('#clipboardbtn2').bind('mouseover', function() {
+            $('#clipboardbtn2').rebind('mouseover', function() {
 
                 var e = $('#clipboardswf2')[0];
                 if (e && e.setclipboardtext) {
@@ -6525,7 +6521,7 @@ function balance2pro(callback)
 
             if (uad.icon === 'ie.png' && window.clipboardData) {
                 $('#clipboardbtn1').rebind('click', function() {
-                    var links = $.trim(getclipboardlinks());
+                    var links = $.trim(getClipboardLinks());
                     var mode = links.indexOf("\n") !== -1 ? 'Text' : 'URL';
                     window.clipboardData.setData(mode, links);
                 });
@@ -6541,7 +6537,7 @@ function balance2pro(callback)
                 if (window.ClipboardEvent) {
                     $('#clipboardbtn1, #clipboardbtn2').rebind('click', function() {
                         var doLinks = ($(this).attr('id') === 'clipboardbtn1');
-                        var links = $.trim(doLinks ? getclipboardlinks() : getclipboardkeys());
+                        var links = $.trim(doLinks ? getClipboardLinks() : getclipboardkeys());
                         var $span = $(this).find('span');
 
                         window.onCopyEventHandler = function onCopyEvent(ev) {

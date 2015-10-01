@@ -8411,39 +8411,54 @@ function moveDialog() {
     });
 }
 
-function getclipboardlinks()
-{
-    var link ='';
-    for (var i in M.links)
-    {
-        var n = M.d[M.links[i]];
-        var key, s;
-        if (n.t)
-        {
-            key = u_sharekeys[n.h];
-            s = '';
-        }
-        else
-        {
-            key = n.key;
-            s = htmlentities(bytesToSize(n.s));
-        }
-        if (n && n.ph)
-        {
-            var F = '';
-            if (n.t) F = 'F';
-            if (i > 0) link += '\n';
+/**
+ * getClipboardLinks
+ *
+ * Gether all available public links for selected items (files/folders).
+ * @returns {String} links URLs or decryption keys for selected items separated with newline '\n'.
+ */
+function getClipboardLinks() {
 
-            // Add the link to the file e.g. https://mega.nz/#!qRN33YbK
-            link += getBaseUrl() + '/#' + F + '!' + htmlentities(n.ph);
+    var nodeUrlWithPublicHandle, nodeDecryptionKey,
+        key, type, fileSize, folderClass, currNode,
+        $dialog = $('.export-links-dialog .export-link-select'),
+        nodesIds = $.selected,
+        links = '';
 
-            // If they want the file key as well, add it e.g. https://mega.nz/#!qRN33YbK!o4Z76qDqP...
-            if (key && $('#export-checkbox').is(':checked')) {
-                link += '!' + a32_to_base64(key);
+    for (var i in nodesIds) {
+        currNode = M.d[nodesIds[i]];
+        if (currNode.ph) {// Only nodes with public handle
+            if (currNode.t) {// Folder
+                type = 'F';
+                key = u_sharekeys[currNode.h];
+                fileSize = '';
+                folderClass = 'folder-item';
             }
+            else {// File
+                type = '';
+                key = currNode.key;
+                fileSize = htmlentities(bytesToSize(currNode.s));
+            }
+
+            nodeUrlWithPublicHandle = getBaseUrl() + '/#' + type + '!' + htmlentities(currNode.ph);
+            nodeDecryptionKey = key ? '!' + a32_to_base64(key) : '';
+
+            // Check export/public link dialog drop down list selected option
+            if ($dialog.hasClass('full-link')) {
+                links += nodeUrlWithPublicHandle + nodeDecryptionKey;
+            }
+            else if ($dialog.hasClass('public-handle')) {
+                links += nodeUrlWithPublicHandle;
+            }
+            else if ($dialog.hasClass('decryption-key')) {
+                links += nodeDecryptionKey;
+            }
+
+            links += '\n';
         }
     }
-    return link;
+
+    return links;
 }
 
 function getclipboardkeys() {

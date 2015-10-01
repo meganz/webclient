@@ -1905,6 +1905,7 @@
     "6783": "Cymeradwyo'r manylion",
     "6787": "Ni rennir unrhyw blygellau gyda chi",
     "6788": "mis",
+    "6789": "Cyfrif wedi'i atal",
     "6793": "Gallwch adennill lle drwy glirio'r bin sbwriel",
     "6794": "Clirio'r bin sbwriel",
     "6795": "Ydych chi'n si\u0175r eich bod am ddileu pob eitem o'ch bin sbwriel?Ni allwch ddadwneud y weithred hon!",
@@ -2704,5 +2705,7 @@
     "7653": "Available until:",
     "7656": "Copied",
     "7657": "Show more languages",
-    "7658": "Hide languages"
+    "7658": "Hide languages",
+    "7659": "You have been suspended due to excess data usage.Please contact support@mega.nz to get your account reinstated.",
+    "7660": "You have been suspended due to repeated copyright infringement."
 }

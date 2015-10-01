@@ -1905,6 +1905,7 @@
     "6783": "Aprova les credencials",
     "6787": "No hi ha carpetes compartides amb tu",
     "6788": "mesos",
+    "6789": "Compte susp\u00e8s",
     "6793": "Recupera espai buidant la Paperera",
     "6794": "Buida la Paperera",
     "6795": "Est\u00e0s segur de que vols eliminar tots els elements que tens a la Paperera?No podr\u00e0s desfer aquesta acci\u00f3!",
@@ -2704,5 +2705,7 @@
     "7653": "Disponible fins el:",
     "7656": "Copiat",
     "7657": "Mostra m\u00e9s idiomes",
-    "7658": "Amaga els idiomes"
+    "7658": "Amaga els idiomes",
+    "7659": "You have been suspended due to excess data usage.Please contact support@mega.nz to get your account reinstated.",
+    "7660": "You have been suspended due to repeated copyright infringement."
 }

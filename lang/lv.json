@@ -1905,6 +1905,7 @@
     "6783": "Apstiprin\u0101t pilnvaras",
     "6787": "Nav koplietotas mapes ar Jums. ",
     "6788": "m\u0113ne\u0161i",
+    "6789": "Iesald\u0113t profilu",
     "6793": "Atbr\u012bvot papildus vietu varat izt\u012brot savu Miskasti",
     "6794": "Izt\u012br\u012bt Miskasti",
     "6795": "Vai esi p\u0101rliecin\u0101ts, ka v\u0113lies neatgriezeniski izdz\u0113st visas vien\u012bbas no savas miskastes?Tu nevari atsaukt izmai\u0146as!",
@@ -2704,5 +2705,7 @@
     "7653": "Available until:",
     "7656": "Copied",
     "7657": "Show more languages",
-    "7658": "Hide languages"
+    "7658": "Hide languages",
+    "7659": "You have been suspended due to excess data usage.Please contact support@mega.nz to get your account reinstated.",
+    "7660": "You have been suspended due to repeated copyright infringement."
 }

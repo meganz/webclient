@@ -1905,6 +1905,7 @@
     "6783": "Aprob\u0103 datele de autentificare",
     "6787": "Niciun folder partajat cu tine",
     "6788": "luni",
+    "6789": "Cont suspendat",
     "6793": "Recupereaz\u0103 spa\u0163iu golind co\u015ful de gunoi",
     "6794": "Gole\u015fte co\u015ful de gunoi",
     "6795": "Sigur dore\u015fti s\u0103 elimini permanent toate elementele din co\u015ful de gunoi?Nu po\u0163i anula aceast\u0103 ac\u0163iune!",
@@ -2704,5 +2705,7 @@
     "7653": "Available until:",
     "7656": "Copied",
     "7657": "Show more languages",
-    "7658": "Hide languages"
+    "7658": "Hide languages",
+    "7659": "You have been suspended due to excess data usage.Please contact support@mega.nz to get your account reinstated.",
+    "7660": "You have been suspended due to repeated copyright infringement."
 }

@@ -3376,7 +3376,7 @@ function accountUI()
         $('.fm-account-save').unbind('click');
         $('.fm-account-save').bind('click', function(e)
         {
-            var email = $('#account-email').val().trim();
+            var email = $('#account-email').val().trim().toLowerCase();
             if (u_attr.email !== email) {
                 api_req({
                     a:'se',

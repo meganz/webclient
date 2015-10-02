@@ -23130,6 +23130,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 .credentials-warning-dialog {
     background-color: #fff;
     width: 600px;
+    z-index: 1101;
 }
 .credentials-warning-dialog .content {
     color: #999999;
@@ -23161,11 +23162,12 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
     color: #000;
 }
 .credentials-warning-dialog .userAvatar img {
+    border-radius: 50%;
     height: 90px;
     width: 90px;
 }
 .credentials-warning-dialog .previousCredentials {
-    background-color: #f2f2f2;
+    background-color: #fafafa;
     margin-top: 20px;
     padding: 20px;
 }
@@ -23176,7 +23178,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 .credentials-warning-dialog .previousCredentials .fingerprint, .credentials-warning-dialog .newCredentials .fingerprint {
     font-family: monospace;
     font-size: 14px;
-    margin-left: -6px;
+    margin-left: -4px;
     margin-top: 10px;
     text-transform: uppercase;
 }
@@ -23195,11 +23197,48 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
     color: #D90007;
 }
 .credentials-warning-dialog .newCredentials {
-    padding: 20px 20px 35px 20px;
+    padding: 20px;
 }
 .credentials-warning-dialog .newCredentials .title {
     color: #D90007;
     font-weight: bold;
+}
+.credentials-warning-dialog .newCredentials .title.reset {
+    color: #000;
+}
+.credentials-warning-dialog .resetCredentials {
+    padding: 20px 20px 0;
+}
+.credentials-warning-dialog .resetCredentials .title {
+    color: #000;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+.credentials-warning-dialog .resetCredentials .reset-credentials-button {
+    display: inline-block;
+    float: none;
+    margin-left: -3px;
+}
+.credentials-warning-dialog .resetCredentials .reset-credentials-button span {
+    background-image: url("../images/mega/shared-sprite_v3.svg");
+    background-position: -34px -1506px;
+    text-indent: 17px;
+}
+.credentials-warning-dialog .resetCredentials .reset-credentials-button.hidden {
+    display: none;
+}
+.credentials-warning-dialog .resetCredentials .verify-contact-button {
+    display: inline-block;
+    float: none;
+    margin-left: -3px;
+}
+.credentials-warning-dialog .resetCredentials .verify-contact-button span {
+    background-image: url("../images/mega/shared-sprite_v3.svg");
+    background-position: -4px -739px;
+    text-indent: 19px;
+}
+.credentials-warning-dialog .resetCredentials .verify-contact-button.hidden {
+    display: none;
 }
 .credentials-warning-dialog .instruction {
     padding: 3px 20px;

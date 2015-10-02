@@ -23,7 +23,7 @@
             'focusable': true,
             'closable': false,
             'expandable': true,
-            'requiresOverlay': false,
+            'requiresOverlay': true,
 
             /**
              * css class names
@@ -76,10 +76,10 @@
             infoFirstLine = infoFirstLine.replace('%1', '<span class="emailAddress">' + CredentialsWarningDialog.contactEmail + '</span>');
         var title = (CredentialsWarningDialog.seenOrVerified === 'seen') ? l[6883] : l[6884];
         
-        $dialog = $('.credentials-warning-dialog');
+        var $dialog = $('.credentials-warning-dialog');
         $dialog.find('.information .firstLine').html(infoFirstLine);
         $dialog.find('.previousCredentials .title').html(title);
-                
+                   
         // If the avatar exists, show it
         if (typeof avatars[CredentialsWarningDialog.contactHandle] !== 'undefined') {
             $dialog.find('.userAvatar img').attr('src', avatars[CredentialsWarningDialog.contactHandle].url);
@@ -89,6 +89,43 @@
             $dialog.find('.userAvatar').hide();
             $dialog.find('.information').addClass('noAvatar');
         }
+        
+        // Reset the contact's credentials
+        $dialog.find('.reset-credentials-button').rebind('click', function() {
+            
+            // Reset the authring for the user and show the success message
+            authring.resetFingerprintsForUser(CredentialsWarningDialog.contactHandle);
+            
+            // If they're already on the contact's page, reload the fingerprint info
+            if (location.hash === '#fm/' + CredentialsWarningDialog.contactHandle) {
+                
+                // Get the user
+                var user = M.u[CredentialsWarningDialog.contactHandle];
+                
+                showAuthenticityCredentials(user);
+                enableVerifyFingerprintsButton();
+            }
+            
+            // 
+            $dialog.find('.previousCredentials').hide();
+            $dialog.find('.newCredentials .title').addClass('reset').html('New credentials');
+            $dialog.find('.newCredentials .fingerprint span').removeClass('mismatch');
+            $dialog.find('.resetCredentials .title').html('Verify credentials');
+            $dialog.find('.resetCredentials .description').html('Use the verify button below to confirm the credentials for this contact.');
+            
+            
+            // Hide the current Reset button and show the Verify contact one
+            $(this).addClass('hidden');
+            $dialog.find('.verify-contact-button').removeClass('hidden');
+        });
+        
+        // Button to view the verification dialog
+        $dialog.find('.verify-contact-button').rebind('click', function() {
+            
+            // Hide the dialog and show the regular fingerprint dialog
+            $dialog.hide();
+            fingerprintDialog(CredentialsWarningDialog.contactHandle);
+        });
     };
     
     /**
@@ -145,7 +182,7 @@
         }
         
         // Render new fingerprints
-        $dialog = $('.credentials-warning-dialog');
+        var $dialog = $('.credentials-warning-dialog');
         $dialog.find('.previousCredentials .fingerprint').html(previousFingerprintHtml);
         $dialog.find('.newCredentials .fingerprint').html(newFingerprintHtml);
     };

@@ -1406,10 +1406,11 @@
                         <span class="firstLine">
                             [$6881]
                         </span>
-                        [$6880]
+                        There may be a man-in-the-middle attack in progress. Please reset the stored 
+                        identification credentials for this contact then and verify that they are 
+                        correct with your contact through an existing secure channel or in person.
                     </div>
                 </div>
-
                 <div class="previousCredentials">
                     <div class="title">[$6883]:</div>
                     <div class="fingerprint"></div>
@@ -1417,6 +1418,25 @@
                 <div class="newCredentials">
                     <div class="title">[$6858]</div>
                     <div class="fingerprint"></div>
+                </div>
+                <div class="resetCredentials">
+                    <div class="title">Reset credentials</div>
+                    <div class="description">
+                        Use the reset button below to reset the credentials for this contact.
+                    </div>
+                    <div class="fm-dialog-button fm-dialog-button-green reset-credentials-button">
+                        <span>Reset</span>
+                    </div>
+                    <div class="fm-dialog-button fm-dialog-button-green verify-contact-button hidden">
+                        <span>[$1960]</span>
+                    </div>
+                    <!--
+                    
+                        and click Verify. After attempting to verify and you still cannot verify 
+                        the identification credentials for your contact you should not share 
+                        files or call this person or you risk an attacker intercepting your private 
+                        files or conversation.
+                    -->
                 </div>
             </div>
         </div>

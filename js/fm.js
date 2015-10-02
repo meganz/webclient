@@ -10100,6 +10100,33 @@ function userFingerprint(userid, next) {
     });
 }
 
+/**
+ * Get and display the fingerprint
+ * @param {Object} user The user object e.g. same as M.u[userHandle]
+ */
+function showAuthenticityCredentials(user) {
+    
+    var fprint = $('.contact-fingerprint-txt').empty();
+    userFingerprint(user, function (fprints) {
+        $.each(fprints, function (k, value) {
+            $('<span>').text(value).appendTo(
+                fprint.filter(k <= 4 ? ':first' : ':last')
+            );
+        });
+    });
+}
+
+/**
+ * Enables the Verify button
+ */
+function enableVerifyFingerprintsButton(user) {
+    $('.fm-verify').removeClass('disabled');
+    $('.fm-verify').find('span').text(l[1960] + '...');
+    $('.fm-verify').rebind('click', function() {
+        fingerprintDialog(user);
+    });
+}
+
 function fingerprintDialog(userid) {
 
     // Add log to see how often they open the verify dialog
@@ -10212,33 +10239,8 @@ function contactUI() {
             contextMenuUI(e, 4);
         });
 
-        /**
-         * Get and display the fingerprint
-         */
-        var showAuthenticityCredentials = function() {
-            var fprint = $('.contact-fingerprint-txt').empty();
-            userFingerprint(user, function (fprints) {
-                $.each(fprints, function (k, value) {
-                    $('<span>').text(value).appendTo(
-                        fprint.filter(k <= 4 ? ':first' : ':last')
-                    );
-                });
-            });
-        };
-
-        /**
-         * Enables the Verify button
-         */
-        var enableVerifyFingerprintsButton = function() {
-            $('.fm-verify').removeClass('disabled');
-            $('.fm-verify').find('span').text(l[1960] + '...');
-            $('.fm-verify').rebind('click', function() {
-                fingerprintDialog(user);
-            });
-        };
-
         // Display the current fingerpring
-        showAuthenticityCredentials();
+        showAuthenticityCredentials(user);
 
         // Set authentication state of contact from authring.
         var authringPromise = new MegaPromise();
@@ -10263,7 +10265,7 @@ function contactUI() {
             }
             else {
                 // Otherwise show the Verify button.
-                enableVerifyFingerprintsButton();
+                enableVerifyFingerprintsButton(user);
             }
         };
         authringPromise.done(_setVerifiedState);
@@ -10271,10 +10273,10 @@ function contactUI() {
         // Reset seen or verified fingerprints and re-enable the Verify button
         $('.fm-reset-stored-fingerprint').rebind('click', function() {
             authring.resetFingerprintsForUser(user.u);
-            enableVerifyFingerprintsButton();
+            enableVerifyFingerprintsButton(user);
 
             // Refetch the key
-            showAuthenticityCredentials();
+            showAuthenticityCredentials(user);
         });
 
         if (!megaChatIsDisabled) {

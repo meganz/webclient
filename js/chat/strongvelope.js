@@ -677,18 +677,22 @@ var strongvelope = {};
         }
 
         // Decrypt message payload.
-        parsedMessage.payload = ns._symmetricDecryptMessage(parsedMessage.payload,
-                                                            senderKey,
-                                                            parsedMessage.nonce);
+        var cleartext = ns._symmetricDecryptMessage(parsedMessage.payload,
+                                                    senderKey,
+                                                    parsedMessage.nonce);
+
+        // Bail out if decryption failed.
+        if (cleartext === false) {
+            return false;
+        }
 
         var result = {
             sender: sender,
             type: parsedMessage.type,
-            payload: parsedMessage.payload
+            payload: cleartext
         };
 
         return result;
     };
-
 
 }());

@@ -690,7 +690,25 @@ describe("chat.strongvelope unit test", function() {
                 sandbox.stub(ns, '_parseMessageContent').returns(testutils.clone(FOLLOWUP_MESSAGE));
                 sandbox.stub(ns, '_verifyMessage').returns(true);
 
-                var result = handler.decryptFrom(INITIAL_MESSAGE_BIN, 'me3456789xw');
+                var result = handler.decryptFrom(FOLLOWUP_MESSAGE_BIN, 'me3456789xw');
+                assert.deepEqual(result, {
+                    sender: 'me3456789xw',
+                    type: 1,
+                    payload: 'Hello!'
+                });
+                assert.strictEqual(ns._parseMessageContent.callCount, 1);
+                assert.strictEqual(ns._verifyMessage.callCount, 1);
+            });
+
+            it("own followup message", function() {
+                var handler = new ns.ProtocolHandler('me3456789xw',
+                    CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
+                handler.participantKeys = { 'me3456789xw': { 0: KEY } };
+                sandbox.stub(window, 'pubEd25519', { 'me3456789xw': ED25519_PUB_KEY });
+                sandbox.stub(ns, '_parseMessageContent').returns(testutils.clone(FOLLOWUP_MESSAGE));
+                sandbox.stub(ns, '_verifyMessage').returns(true);
+
+                var result = handler.decryptFrom(FOLLOWUP_MESSAGE_BIN, 'me3456789xw');
                 assert.deepEqual(result, {
                     sender: 'me3456789xw',
                     type: 1,
@@ -708,7 +726,25 @@ describe("chat.strongvelope unit test", function() {
                 sandbox.stub(ns, '_parseMessageContent').returns(testutils.clone(FOLLOWUP_MESSAGE));
                 sandbox.stub(ns, '_verifyMessage').returns(true);
 
-                var result = handler.decryptFrom(INITIAL_MESSAGE_BIN, 'me3456789xw');
+                var result = handler.decryptFrom(FOLLOWUP_MESSAGE_BIN, 'me3456789xw');
+                assert.deepEqual(result, false);
+                assert.strictEqual(ns._parseMessageContent.callCount, 1);
+                assert.strictEqual(ns._verifyMessage.callCount, 1);
+                assert.strictEqual(ns._logger._log.args[0][1][0],
+                                   'Encryption key for message from me3456789xw with ID 0 unavailable.');
+            });
+
+            it("own followup message, missing sender key", function() {
+                sandbox.stub(ns._logger, '_log');
+                var handler = new ns.ProtocolHandler('me3456789xw',
+                    CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
+                handler.participantKeys['me3456789xw'][0] = undefined;
+                handler.participantKeys['me3456789xw'][1] = 'foo';
+                sandbox.stub(window, 'pubEd25519', { 'me3456789xw': ED25519_PUB_KEY });
+                sandbox.stub(ns, '_parseMessageContent').returns(testutils.clone(FOLLOWUP_MESSAGE));
+                sandbox.stub(ns, '_verifyMessage').returns(true);
+
+                var result = handler.decryptFrom(FOLLOWUP_MESSAGE_BIN, 'me3456789xw');
                 assert.deepEqual(result, false);
                 assert.strictEqual(ns._parseMessageContent.callCount, 1);
                 assert.strictEqual(ns._verifyMessage.callCount, 1);
@@ -723,6 +759,7 @@ describe("chat.strongvelope unit test", function() {
                 sandbox.stub(ns, '_parseMessageContent').returns(testutils.clone(ROTATION_MESSAGE));
                 sandbox.stub(ns, '_verifyMessage').returns(true);
                 sandbox.stub(handler, '_decryptKeysFor').returns([ROTATED_KEY, KEY]);
+
                 var result = handler.decryptFrom(ROTATION_MESSAGE_BIN, 'me3456789xw');
                 assert.deepEqual(result, {
                     sender: 'me3456789xw',

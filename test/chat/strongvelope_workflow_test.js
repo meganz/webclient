@@ -82,12 +82,20 @@ describe("chat.strongvelope workflow test", function() {
                     // Alice encrypts a message to send to Bob.
                     sent = alice.encryptTo(message, 'bob45678900');
 
+                    // Alice receives her own message.
+                    received = alice.decryptFrom(sent, 'alice678900');
+                    assert.strictEqual(received.payload, message);
+
                     // Bob receives it.
                     received = bob.decryptFrom(sent, 'alice678900');
                     assert.strictEqual(received.payload, message);
 
                     // Bob echoes it.
                     sent = bob.encryptTo(received.payload, 'alice678900');
+
+                    // Bob receives hhis own message.
+                    received = bob.decryptFrom(sent, 'bob45678900');
+                    assert.strictEqual(received.payload, message);
 
                     // Alice gets it back.
                     received = alice.decryptFrom(sent, 'bob45678900');

@@ -573,6 +573,10 @@ function browserdetails(useragent) {
     else if (useragent.indexOf('opera') > 0 || useragent.indexOf(' opr/') > 0) {
         browser = 'Opera';
     }
+    else if (useragent.indexOf(' dragon/') > 0) {
+        icon = 'dragon.png';
+        browser = 'Comodo Dragon';
+    }
     else if (useragent.indexOf('vivaldi') > 0) {
         browser = 'Vivaldi';
     }

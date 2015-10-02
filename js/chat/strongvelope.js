@@ -676,7 +676,7 @@ var strongvelope = {};
             }
         }
 
-        debugger;
+
         // Decrypt message payload.
         var cleartext = ns._symmetricDecryptMessage(parsedMessage.payload,
                                                     senderKey,

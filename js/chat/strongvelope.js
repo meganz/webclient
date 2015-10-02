@@ -192,9 +192,24 @@ var strongvelope = {};
         var nonceBytes = asmCrypto.string_to_bytes(nonce.substring(0, NONCE_SIZE));
         var cipherBytes = asmCrypto.string_to_bytes(cipher);
         var clearBytes = asmCrypto.AES_CTR.decrypt(cipherBytes, keyBytes, nonceBytes);
-        var cleartext = asmCrypto.bytes_to_string(clearBytes);
+        var clearBytes = asmCrypto.bytes_to_string(clearBytes);
 
-        return decodeURIComponent(escape(cleartext));
+        var clearText;
+        try {
+            clearText = decodeURIComponent(escape(clearBytes));
+        }
+        catch (e) {
+            if (e instanceof URIError) {
+                logger.error('Could not decrypt message, probably a wrong key/nonce.');
+
+                return false;
+            }
+            else {
+                throw e;
+            }
+        }
+
+        return clearText;
     };
 
 
@@ -366,14 +381,12 @@ var strongvelope = {};
      *     The number of messages our sender key is used for before rotating.
      * @property {Number} keyId
      *     ID of our current sender key.
-     * @property {Array.<String>} senderKeys
-     *     Array containing all our used sender keys, indexed by keyId.
      * @property {Array.<String>} participants
      *     Array of user handles of current participants of the chat, sorted
      *     by user handle.
      * @property {Object.<handle, ParticipantKeys>} participantKeys
-     *     Collection of participant specific key information
-     *     (@see ParticipantKey) for all (past and present) participants.
+     *     Collection of participant specific key information (including our own,
+     *     @see {@link ParticipantKey} for all (past and present) participants.
      */
     strongvelope.ProtocolHandler = function(ownHandle, privCu25519, privEd25519,
             pubEd25519, rotateKeyEvery) {
@@ -391,9 +404,9 @@ var strongvelope = {};
         this._sentKeyId = null;
         var secretKey = new Uint8Array(SECRET_KEY_SIZE);
         asmCrypto.getRandomValues(secretKey);
-        this.senderKeys = [asmCrypto.bytes_to_string(secretKey)];
         this.participants = [];
         this.participantKeys = {};
+        this.participantKeys[this.ownHandle] = { 0: asmCrypto.bytes_to_string(secretKey) };
     };
 
 
@@ -427,7 +440,7 @@ var strongvelope = {};
 
 
     /**
-     * Encrypts symmetric encryption keys to a particular recipient.
+     * Encrypts symmetric encryption keys for a particular recipient.
      *
      * Note: This function requires the Cu25519 public key for the destination
      *       to be loaded already.
@@ -442,7 +455,7 @@ var strongvelope = {};
      *     User handle of the recipient.
      * @returns {String}
      */
-    strongvelope.ProtocolHandler.prototype._encryptKeysTo = function(keys, nonce, destination) {
+    strongvelope.ProtocolHandler.prototype._encryptKeysFor = function(keys, nonce, destination) {
 
         assert(keys.length > 0, 'No keys to encrypt.');
 
@@ -463,7 +476,7 @@ var strongvelope = {};
 
 
     /**
-     * Decrypts symmetric encryption keys from a particular sender.
+     * Decrypts symmetric encryption keys for a particular sender.
      *
      * Note: This function requires the Cu25519 public key for the destination
      *       to be loaded already.
@@ -474,18 +487,22 @@ var strongvelope = {};
      * @param {String} nonce
      *     "Master nonce" used for encrypting the message. Will be used to
      *     derive an IV for the key decryption.
-     * @param {String} sender
-     *     User handle of the sender.
+     * @param {String} otherParty
+     *     User handle of the other party.
+     * @param {Boolean} [iAmSender]
+     *     If true, the message was sent by us (default: false).
      * @returns {Array.<String>}
      *     All symmetric keys in an array.
      */
-    strongvelope.ProtocolHandler.prototype._decryptKeysFrom = function(encryptedKeys, nonce, sender) {
+    strongvelope.ProtocolHandler.prototype._decryptKeysFor = function(
+            encryptedKeys, nonce, otherParty, iAmSender) {
 
+        var receiver = iAmSender ? otherParty : this.ownHandle;
         var cipherBytes = asmCrypto.string_to_bytes(encryptedKeys);
-        var ivBytes = asmCrypto.SHA256.bytes(base64urldecode(this.ownHandle)
+        var ivBytes = asmCrypto.SHA256.bytes(base64urldecode(receiver)
                                              + nonce).subarray(0, IV_SIZE);
         var keyBytes = asmCrypto.string_to_bytes(
-            this._computeSymmetricKey(sender).substring(0, KEY_SIZE));
+            this._computeSymmetricKey(otherParty).substring(0, KEY_SIZE));
         var clearBytes = asmCrypto.AES_CBC.decrypt(cipherBytes, keyBytes,
                                                    false, ivBytes);
         var clear = asmCrypto.bytes_to_string(clearBytes);
@@ -525,11 +542,11 @@ var strongvelope = {};
             var newSecretKey = new Uint8Array(SECRET_KEY_SIZE);
             asmCrypto.getRandomValues(newSecretKey);
             this.keyId = (this.keyId + 1) & 0xff;
-            this.senderKeys[this.keyId] = asmCrypto.bytes_to_string(newSecretKey);
+            this.participantKeys[this.ownHandle][this.keyId] = asmCrypto.bytes_to_string(newSecretKey);
             this._keyEncryptionCount = 0;
         }
 
-        var senderKey = this.senderKeys[this.keyId];
+        var senderKey = this.participantKeys[this.ownHandle][this.keyId];
         var encryptedMessage = ns._symmetricEncryptMessage(message, senderKey);
 
         // Use a (leaner) followup message if the sender key's been sent already.
@@ -539,10 +556,10 @@ var strongvelope = {};
         else {
             var keysIncluded = [senderKey];
             if (previousKeyId !== this.keyId) {
-                keysIncluded.push(this.senderKeys[previousKeyId]);
+                keysIncluded.push(this.participantKeys[this.ownHandle][previousKeyId]);
             }
-            encryptedKeys = this._encryptKeysTo(keysIncluded, encryptedMessage.nonce,
-                                                destination);
+            encryptedKeys = this._encryptKeysFor(keysIncluded, encryptedMessage.nonce,
+                                                 destination);
             messageType = MESSAGE_TYPES.GROUP_KEYED;
         }
 
@@ -622,9 +639,13 @@ var strongvelope = {};
         // Get sender key.
         var senderKey;
         if (parsedMessage.keys.length  > 0) {
+            var isOwnMessage = (sender === this.ownHandle);
+            var otherHandle = isOwnMessage ? parsedMessage.recipients[0] : sender;
             // Decrypt message key(s) and update their local cache.
-            parsedMessage.keys[0] = this._decryptKeysFrom(parsedMessage.keys[0],
-                                                          parsedMessage.nonce, sender);
+            parsedMessage.keys[0] = this._decryptKeysFor(parsedMessage.keys[0],
+                                                         parsedMessage.nonce,
+                                                         otherHandle,
+                                                         isOwnMessage);
             senderKey = parsedMessage.keys[0][0];
 
             if (!this.participantKeys[sender]) {

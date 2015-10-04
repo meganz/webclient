@@ -6439,6 +6439,7 @@ function balance2pro(callback)
             scroll = '.export-link-body';
 
         deleteScrollPanel(scroll, 'jsp');
+
         if (close) {
             $.dialog = false;
             fm_hideoverlay();
@@ -6453,15 +6454,35 @@ function balance2pro(callback)
 
         $.dialog = 'links';
 
+        $('.export-links-dialog').addClass('file-keys-view');
+
+        // Generate content
         html = itemExportLink();
 
-        $('.export-links-warning-close').rebind('click', function() {
-            $('.export-links-warning').addClass('hidden');
-        });
+        // Fill with content
+        $('.export-links-dialog .export-link-body').html(html);
 
-        $('.export-links-dialog .fm-dialog-close').rebind('click', function() {
-            self.linksDialog(1);
-        });
+        // Default export option is
+		$('.export-link-select, .export-content-block').removeClass('public-handle decryption-key full-link').addClass('public-handle');
+		$('.export-link-select').html($('.export-link-dropdown div.public-handle').html());
+
+        fm_showoverlay();
+
+        $('.export-links-warning').removeClass('hidden');
+        $('.fm-dialog.export-links-dialog').removeClass('hidden');
+        $('.export-link-body').removeAttr('style');
+
+        if ($('.export-link-body').outerHeight() === 318) {// ToDo: How did I find this integer?
+            $('.export-link-body').jScrollPane({ showArrows: true, arrowSize: 5 });
+            jScrollFade('.export-link-body');
+        }
+        $('.fm-dialog.export-links-dialog').css('margin-top', $('.fm-dialog.export-links-dialog').outerHeight() / 2 * - 1);
+
+        setTimeout(function() {
+            $('.file-link-info').rebind('click', function() {
+                $('.file-link-info').select();
+            });
+        }, 300);
 
         // Setup the copy to clipboard buttons
         if (is_extension) {
@@ -6573,38 +6594,41 @@ function balance2pro(callback)
             $('#clipboardbtn2 span').text(l[1033]);
         }
 
+        // Click anywhere on export link dialog will hide export link dropdown
+        $('.export-links-dialog').rebind('click', function() {
+            $('.export-link-dropdown').fadeOut(200);
+        });
+
+        $('.export-links-warning-close').rebind('click', function() {
+            $('.export-links-warning').addClass('hidden');
+
+            // Stop propagation
+            return false;
+        });
+
+        $('.export-links-dialog .fm-dialog-close').rebind('click', function() {
+            self.linksDialog(1);
+        });
+
 		$('.export-link-select').rebind('click', function() {
 			$('.export-link-dropdown').fadeIn(200);
+
+            // Stop propagation
+            return false;
 		});
 
 		// On Export File Links and Decryption Keys dropdown
 		$('.export-link-dropdown div').rebind('click', function() {
+
 			var keyOption = $(this).attr('data-keyoptions');
+
 			$('.export-link-select, .export-content-block').removeClass('public-handle decryption-key full-link').addClass(keyOption);
 			$('.export-link-select').html($(this).html());
 			$('.export-link-dropdown').fadeOut(200);
+
+            // Stop propagation
+            return false;
 		});
-
-        $('.export-links-dialog').addClass('file-keys-view');
-        $('.export-links-dialog .export-link-body').html(html);
-
-        fm_showoverlay();
-
-        $('.export-links-warning').removeClass('hidden');
-        $('.fm-dialog.export-links-dialog').removeClass('hidden');
-        $('.export-link-body').removeAttr('style');
-
-        if ($('.export-link-body').outerHeight() === 318) {// ToDo: How did I find this integer?
-            $('.export-link-body').jScrollPane({showArrows: true, arrowSize: 5});
-            jScrollFade('.export-link-body');
-        }
-        $('.fm-dialog.export-links-dialog').css('margin-top', $('.fm-dialog.export-links-dialog').outerHeight() / 2 * - 1);
-
-        setTimeout(function() {
-            $('.file-link-info').rebind('click', function() {
-                $('.file-link-info').select();
-            });
-        }, 300);
     };
 
     // export

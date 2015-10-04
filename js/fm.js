@@ -6289,7 +6289,7 @@ function treeUI()
     // disabling right click, default contextmenu.
     $(document).unbind('contextmenu');
     $(document).bind('contextmenu', function(e) {
-        if($(e.target).parents('.fm-chat-block').length > 0 || $(e.target).parents('.export-link-item').length) {
+        if($(e.target).parents('.fm-chat-block').length > 0 || $(e.target).parents('.fm-account-main').length > 0 || $(e.target).parents('.export-link-item').length || $(e.target).parents('.contact-fingerprint-txt').length || $(e.target).parents('.fm-breadcrumbs').length || $(e.target).hasClass('contact-details-user-name') || $(e.target).hasClass('contact-details-email') || $(e.target).hasClass('nw-conversations-name') || ($(e.target).hasClass('nw-contact-name') && $(e.target).parents('.fm-tree-panel').length)) {
             return;
         } else if (!localStorage.contextmenu) {
             $.hideContextMenu();

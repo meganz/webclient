@@ -192,9 +192,10 @@ function init_page() {
             u_n = pfid;
         }
         else {
-            $(document).one('MegaOpenFolder', SoonFc(function () {
-                mKeyDialog(pfid, true);
-            }));
+            return mKeyDialog(pfid, true)
+                .fail(function() {
+                    location.hash = 'start';
+                });
         }
         page = 'fm';
     }
@@ -1235,10 +1236,10 @@ function topmenuUI() {
                 }
             }
         });
-        
+
         // Only show top language change icon if not logged in
         if (u_type === false) {
-            
+
             // Get current language
             var $topChangeLang = $('.top-change-language');
             var $topChangeLangName = $topChangeLang.find('.top-change-language-name');

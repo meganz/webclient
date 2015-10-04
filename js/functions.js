@@ -1863,6 +1863,8 @@ function CreateWorkers(url, message, size) {
 }
 
 function mKeyDialog(ph, fl) {
+    var promise = new MegaPromise();
+
     $('.new-download-buttons').addClass('hidden');
     $('.new-download-file-title').text(l[1199]);
     $('.new-download-file-icon').addClass(fileIcon({
@@ -1891,15 +1893,22 @@ function mKeyDialog(ph, fl) {
         var key = $('.fm-dialog.dlkey-dialog input').val();
 
         if (key && key !== l[1028]) {
+            promise.resolve(key);
             $('.fm-dialog.dlkey-dialog').addClass('hidden');
             $('.fm-dialog-overlay').addClass('hidden');
             document.location.hash = (fl ? '#F!' : '#!') + ph + '!' + key;
+        }
+        else {
+            promise.reject();
         }
     });
     $('.fm-dialog.dlkey-dialog .fm-dialog-close').rebind('click', function(e) {
         $('.fm-dialog.dlkey-dialog').addClass('hidden');
         $('.fm-dialog-overlay').addClass('hidden');
+        promise.reject();
     });
+
+    return promise;
 }
 
 function dcTracer(ctr) {

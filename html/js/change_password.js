@@ -32,10 +32,12 @@ function verify_email_passwd() {
                     loadingDialog.hide();
                     if (res === 0) {
                         u_attr.email = newEmail;
-                    } else {
-                        msgDialog('warninga', 'Error', 'The verification code expired, please send another one');
-                    }
-                    document.location.href = "#fm/account/profile";
+                        document.location.href = "#fm/account/profile";
+                        return;
+                    } 
+                    msgDialog('warninga', 'Error', 'The verification code expired, please send another one', false, function() {
+                        document.location.href = "#fm/account/profile";
+                    });
                 }
             });
         }

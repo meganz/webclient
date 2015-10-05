@@ -3,7 +3,7 @@ function verify_email_passwd() {
     var passwordaes = new sjcl.cipher.aes(prepare_key_pw(password));
     var email = u_attr.email.toLowerCase();
     var uh = stringhash(email, passwordaes);
-    $('.login-register-input.password').addClass('loading');
+    $('.login-register-input.password').addClass('loading').removeClass('incorrect');
     $('#verify-password').val('');
     api_req({
         a: 'us',
@@ -13,7 +13,8 @@ function verify_email_passwd() {
         callback: function(res) {
             $('.login-register-input.password').removeClass('loading');
             if (typeof res === "number") {
-                return alert("Invalid password");
+		        $('.login-register-input.password').addClass('incorrect').focus();
+                return;
             }
             loadingDialog.show();
             var newEmail = localStorage.new_email;
@@ -28,8 +29,13 @@ function verify_email_passwd() {
             };
             api_req(args, { 
                 callback: function(res) {
-                    console.error("verify", res, args);
                     loadingDialog.hide();
+                    if (res === 0) {
+                        u_attr.email = newEmail;
+                    } else {
+                        msgDialog('warninga', 'Error', 'The verification code expired, please send another one');
+                    }
+                    document.location.href = "#fm/account/profile";
                 }
             });
         }
@@ -64,5 +70,5 @@ function verify_email() {
             verify_email_passwd();
         }
     });    
-    $('#restore-verify-button').rebind('click', verify_email_passwd);
+    $('.restore-verify-button').rebind('click', verify_email_passwd);
 }

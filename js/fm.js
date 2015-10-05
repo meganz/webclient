@@ -3357,7 +3357,9 @@ function accountUI()
                 $('.fm-account-main').addClass('save');
                 initAccountScroll();
             }
-            $(this).parent().find('.account-select-txt').text(val);
+            if (val !== l[6875]) {
+                $(this).parent().find('.account-select-txt').text(val);
+            }
         });
         $('#account-firstname,#account-lastname').unbind('keyup');
         $('#account-firstname,#account-lastname').bind('keyup', function(e)
@@ -3888,7 +3890,7 @@ function accountUI()
             prices.sort(function(a, b) {
                 return (a - b)
             })
-            var voucheroptions = '';
+            var voucheroptions = '<option value="">' + escapeHTML(l[6875]) + '</option>';
             for (var i in prices)
                 voucheroptions += '<option value="' + htmlentities(prices[i]) + '">&euro;' + htmlentities(prices[i]) + ' voucher</option>';
             $('.fm-account-select.vouchertype select').html(voucheroptions);

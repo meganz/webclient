@@ -3621,6 +3621,24 @@ mBroadcaster.addListener('crossTab:master', function _setup() {
     }
 });
 
+/** document.hasFocus polyfill */
+mBroadcaster.addListener('startMega', function() {
+    if (typeof document.hasFocus !== 'function') {
+        var hasFocus = true;
+
+        $(window)
+            .bind('focus', function() {
+                hasFocus = true;
+            })
+            .bind('blur', function() {
+                hasFocus = false;
+            });
+
+        document.hasFocus = function() {
+            return hasFocus;
+        };
+    }
+});
 
 /**
  * Cross-tab communication using WebStorage

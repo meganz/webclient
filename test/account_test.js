@@ -93,6 +93,24 @@ describe("account unit test", function() {
                 assert.ok(tlvstore.blockDecrypt.calledWith('fortytwo', 'foo'));
             });
 
+            it("private attribute, failed data integrity check", function() {
+                sandbox.stub(window, 'api_req');
+                var masterPromise = { reject: sinon.stub() };
+                sandbox.stub(window, 'MegaPromise').returns(masterPromise);
+                sandbox.stub(tlvstore, 'blockDecrypt').throws('SecurityError');
+                sandbox.stub(window, 'u_k', 'foo');
+                var result = getUserAttribute('me3456789xw', 'keyring', false, false);
+                assert.strictEqual(result, masterPromise);
+                assert.strictEqual(api_req.callCount, 1);
+
+                var callback = api_req.args[0][1].callback;
+                var theCtx = api_req.args[0][1];
+                callback('Zm9ydHl0d28=', theCtx);
+                assert.ok(tlvstore.blockDecrypt.calledWith('fortytwo', 'foo'));
+                assert.strictEqual(masterPromise.reject.callCount, 1);
+                assert.strictEqual(masterPromise.reject.args[0][0], EINTERNAL);
+            });
+
             it("private attribute, internal callback OK, custom callback", function() {
                 sandbox.stub(window, 'api_req');
                 var myCallback = sinon.spy();

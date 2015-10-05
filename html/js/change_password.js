@@ -13,7 +13,7 @@ function verify_email_passwd() {
         callback: function(res) {
             $('.login-register-input.password').removeClass('loading');
             if (typeof res === "number") {
-		        $('.login-register-input.password').addClass('incorrect').focus();
+                $('.login-register-input.password').addClass('incorrect').focus();
                 return;
             }
             loadingDialog.show();

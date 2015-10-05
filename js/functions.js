@@ -39,13 +39,15 @@ function parseHTML(markup, forbidStyle, doc, baseURI, isXML) {
                 flags |= mozParserUtils.SanitizerAllowStyle;
             }
             if (!baseURI) {
-                var href = doc.location.href;
+                var href = getAppBaseUrl();
                 if (!parseHTML.baseURIs[href]) {
                     parseHTML.baseURIs[href] =
                         Services.io.newURI(href, null, null);
                 }
                 baseURI = parseHTML.baseURIs[href];
             }
+            // XXX: parseFragment() removes href attributes with a hash mask
+            markup = String(markup).replace(/\shref="#/g, ' data-fxhref="#');
             return mozParserUtils.parseFragment(markup, flags, Boolean(isXML),
                                                 baseURI, doc.documentElement);
         }
@@ -85,22 +87,36 @@ function parseHTMLfmt(markup) {
  * @example $(document.body).safeHTML('<script>alert("XSS");</script>It Works!');
  * @todo Safer versions of append, insert, before, after, etc
  */
-$.fn.safeHTML = function safeHTML(markup) {
-    var i = 0;
-    var l = this.length;
-    markup = parseHTMLfmt.apply(null, arguments);
-    while (l > i) {
-        $(this[i++]).html(markup);
+(function($fn, obj) {
+    for (var fn in obj) {
+        if (obj.hasOwnProperty(fn)) {
+            /* jshint -W083 */
+            (function(origFunc, safeFunc) {
+                Object.defineProperty($fn, safeFunc, {
+                    value: function $afeCall(markup) {
+                        var i = 0;
+                        var l = this.length;
+                        markup = parseHTMLfmt.apply(null, arguments);
+                        while (l > i) {
+                            $(this[i++])[origFunc](markup);
+                        }
+                        if (is_chrome_firefox) {
+                            $('a[data-fxhref]').rebind('click', function() {
+                                location.hash = $(this).data('fxhref');
+                            });
+                        }
+                        return this;
+                    }
+                });
+                safeFunc = undefined;
+            })(fn, obj[fn]);
+        }
     }
-};
-$.fn.safeAppend = function safeAppend(markup) {
-    var i = 0;
-    var l = this.length;
-    markup = parseHTMLfmt.apply(null, arguments);
-    while (l > i) {
-        $(this[i++]).append(markup);
-    }
-};
+    $fn = obj = undefined;
+})($.fn, {
+    'html': 'safeHTML',
+    'append': 'safeAppend'
+});
 
 /**
  * Escape HTML markup
@@ -572,6 +588,10 @@ function browserdetails(useragent) {
     }
     else if (useragent.indexOf('opera') > 0 || useragent.indexOf(' opr/') > 0) {
         browser = 'Opera';
+    }
+    else if (useragent.indexOf(' dragon/') > 0) {
+        icon = 'dragon.png';
+        browser = 'Comodo Dragon';
     }
     else if (useragent.indexOf('vivaldi') > 0) {
         browser = 'Vivaldi';
@@ -1863,6 +1883,8 @@ function CreateWorkers(url, message, size) {
 }
 
 function mKeyDialog(ph, fl) {
+    var promise = new MegaPromise();
+
     $('.new-download-buttons').addClass('hidden');
     $('.new-download-file-title').text(l[1199]);
     $('.new-download-file-icon').addClass(fileIcon({
@@ -1891,15 +1913,22 @@ function mKeyDialog(ph, fl) {
         var key = $('.fm-dialog.dlkey-dialog input').val();
 
         if (key && key !== l[1028]) {
+            promise.resolve(key);
             $('.fm-dialog.dlkey-dialog').addClass('hidden');
             $('.fm-dialog-overlay').addClass('hidden');
             document.location.hash = (fl ? '#F!' : '#!') + ph + '!' + key;
+        }
+        else {
+            promise.reject();
         }
     });
     $('.fm-dialog.dlkey-dialog .fm-dialog-close').rebind('click', function(e) {
         $('.fm-dialog.dlkey-dialog').addClass('hidden');
         $('.fm-dialog-overlay').addClass('hidden');
+        promise.reject();
     });
+
+    return promise;
 }
 
 function dcTracer(ctr) {
@@ -2614,6 +2643,17 @@ function flashIsEnabled() {
  */
 function getBaseUrl() {
     return 'https://' + (((location.protocol === 'https:') && location.host) || 'mega.nz');
+}
+
+/**
+ * Like getBaseUrl(), but suitable for extensions to point to internal resources.
+ * This should be the same than `bootstaticpath + urlrootfile` except that may differ
+ * from a public entry point (Such as the Firefox extension and its mega: protocol)
+ * @returns {string}
+ */
+function getAppBaseUrl() {
+    var l = location;
+    return (l.origin !== 'null' && l.origin || (l.protocol + '//' + l.hostname)) + l.pathname;
 }
 
 /**
@@ -3608,6 +3648,24 @@ mBroadcaster.addListener('crossTab:master', function _setup() {
     }
 });
 
+/** document.hasFocus polyfill */
+mBroadcaster.addListener('startMega', function() {
+    if (typeof document.hasFocus !== 'function') {
+        var hasFocus = true;
+
+        $(window)
+            .bind('focus', function() {
+                hasFocus = true;
+            })
+            .bind('blur', function() {
+                hasFocus = false;
+            });
+
+        document.hasFocus = function() {
+            return hasFocus;
+        };
+    }
+});
 
 /**
  * Cross-tab communication using WebStorage

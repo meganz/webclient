@@ -11,7 +11,12 @@ function dlinfo(ph,key,next)
     if ((lang == 'en') || (lang !== 'en' && l[1388] !== '[B]Download[/B] [A]to your computer[/A]'))
     {
         //$('.new-download-red-button').html(l[1388].replace('[B]','').replace('[/B]','').replace('[A]','').replace('[/A]',''));
-        $('.new-download-gray-button').html(l[1389].replace('[B]','<div class="new-download-button-txt1">').replace('[/B]','</div>').replace('[A]','<div class="new-download-button-txt2">').replace('[/A]','</div>'));
+        $('.new-download-gray-button')
+            .safeHTML(escapeHTML(l[1389])
+                .replace('[B]', '<div class="new-download-button-txt1">')
+                .replace('[/B]', '</div>')
+                .replace('[A]', '<div class="new-download-button-txt2">')
+                .replace('[/A]', '</div>'));
     }
 
     $('.widget-block').addClass('hidden');
@@ -248,7 +253,7 @@ function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
         $('.download-mid-centered-block').addClass('downloading');
         $('.download-mid-centered-block').removeClass('not-available-temporary');
         $('.downloading-progress-bar').width(perc + '%');
-        $('.new-download-icon').html('<div>'+perc+'<span>%</span></div>');
+        $('.new-download-icon').safeHTML('<div>@@<span>%</span></div>', perc);
         megatitle(' ' + perc + '%');
     }
     if (fdl_starttime) var eltime = (new Date().getTime()-fdl_starttime)/1000;
@@ -709,8 +714,12 @@ var gifSlider = {
             .css({ width: '260px', height: '300px'}).fadeIn(gifSlider.fadeInSpeed);
 
         // Set title and description
-        $('.ads-' + side + '-block .products-top-txt .red').html(slideTitle).fadeIn(gifSlider.fadeInSpeed);
-        $('.ads-' + side + '-block .products-top-txt .description').text(slideDescription).fadeIn(gifSlider.fadeInSpeed);
+        $('.ads-' + side + '-block .products-top-txt .red')
+            .safeHTML(slideTitle)
+            .fadeIn(gifSlider.fadeInSpeed);
+        $('.ads-' + side + '-block .products-top-txt .description')
+            .text(slideDescription)
+            .fadeIn(gifSlider.fadeInSpeed);
 
         // Display corresponding image in bottom right corner
         if (typeof bottomImage === 'string') {

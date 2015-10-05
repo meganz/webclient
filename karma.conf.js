@@ -13,6 +13,7 @@ module.exports = function(config) {
     files: [
         // == Basic test setup ==
         'test/test_main.js',
+        'test/test_utils.js',
         // == Test utilities ==
         'node_modules/mocha/mocha.js',
         'node_modules/chai/chai.js',
@@ -110,6 +111,7 @@ module.exports = function(config) {
         'js/gContacts.js',
 
         // Our chat code.
+        'js/chat/strongvelope.js',
         'js/chat/opQueue.js',
         'js/chat/rtcStats.js',
         'js/chat/rtcSession.js',

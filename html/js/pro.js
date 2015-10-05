@@ -1509,7 +1509,7 @@ var paysafecard = {
 
     /**
      * Redirect to the site
-     * @param {String} utcResult, containing the url to redirect to
+     * @param {String} utcResult containing the url to redirect to
      */
     redirectToSite: function(utcResult) {
         var url = utcResult.EUR['url'];

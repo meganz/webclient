@@ -136,6 +136,24 @@ function MegaData()
         this.sort();
     };
 
+    this.sortByFav = function(d)
+    {
+        this.sortfn = function(a, b, d)
+        {
+            if (a.fav) {
+                return -1 * d;
+            }
+
+            if (b.fav) {
+                return d;
+            }
+
+            return 0;
+        }
+        this.sortd = d;
+        this.sort();
+    };
+
     this.sortBySize = function(d)
     {
         this.sortfn = function(a, b, d)
@@ -257,21 +275,33 @@ function MegaData()
         }
         if (n === 'name') {
             M.sortByName(d);
-        } else if (n == 'size') {
+        }
+        else if (n === 'size') {
             M.sortBySize(d);
-        } else if (n == 'type') {
+        }
+        else if (n === 'type') {
             M.sortByType(d);
-        } else if (n == 'date') {
+        }
+        else if (n === 'date') {
             M.sortByDateTime(d);
-        } else if (n == 'owner') {
+        }
+        else if (n === 'owner') {
             M.sortByOwner(d);
-        } else if (n == 'access') {
+        }
+        else if (n === 'access') {
             M.sortByAccess(d);
-        } else if (n == 'interaction') {
+        }
+        else if (n === 'interaction') {
             M.sortByInteraction(d);
-        } else if (n == 'status') {
+        }
+        else if (n === 'status') {
             M.sortByStatus(d);
         }
+	else if (n === 'fav') {
+            M.sortByFav(d);
+        }
+
+        M.sortingBy = [n, d];
 
         if (fmconfig.uisorting) {
             storefmconfig('sorting', {n: n, d: d});
@@ -388,14 +418,14 @@ function MegaData()
         });
     }
 
-    this.contactstatus = function(h)
+    this.contactstatus = function(h, wantTimeStamp)
     {
         var folders = 0;
         var files = 0;
         var ts = 0;
         if (M.d[h])
         {
-            if(!M.d[h].ts) {
+            if (!wantTimeStamp || !M.d[h].ts) {
                 var a = fm_getnodes(h);
                 for (var i in a) {
                     if (!a.hasOwnProperty(i)) {
@@ -414,7 +444,9 @@ function MegaData()
                         }
                     }
                 }
-                M.d[h].ts = ts;
+                if (!M.d[h].ts) {
+                    M.d[h].ts = ts;
+                }
             } else {
                 ts = M.d[h].ts;
             }
@@ -886,11 +918,11 @@ function MegaData()
                 star = M.v[i].fav ? ' star' : '';
 
                 if (M.currentdirid === 'shares') {// render shares tab
-                    cs = M.contactstatus(M.v[i].h),
-                    contains = fm_contains(cs.files, cs.folders),
-                    u_h = M.v[i].p,
-                    rights = l[55],
-                    rightsclass = ' read-only',
+                    cs = M.contactstatus(M.v[i].h);
+                    contains = fm_contains(cs.files, cs.folders);
+                    u_h = M.v[i].p;
+                    rights = l[55];
+                    rightsclass = ' read-only';
                     onlinestatus = M.onlineStatusClass(
                         chatIsReady &&
                         megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h))
@@ -1581,14 +1613,14 @@ function MegaData()
 
         treePanelSortElements('contacts', contacts, {
             'last-interaction': function(a, b) {
-                var cs = M.contactstatus(a.u);
+                var cs = M.contactstatus(a.u, true);
                 if (cs.ts === 0) {
                     cs.ts = -1;
                 }
                 M.i_cache[a.u] = cs.ts;
 
 
-                cs = M.contactstatus(b.u);
+                cs = M.contactstatus(b.u, true);
                 if (cs.ts === 0) {
                     cs.ts = -1;
                 }
@@ -3244,6 +3276,11 @@ function MegaData()
                 }
             }
         }
+
+        if (M.sortingBy[0] === 'fav') {
+            M.doSort('fav', M.sortingBy[1]);
+            M.renderMain();
+        }
     };
 
     this.nodeShare = function(h, s, ignoreDB) {
@@ -3532,7 +3569,7 @@ function MegaData()
                 id: n.h,
                 key: n.key,
                 n: n.name,
-                t: n.ts,
+                t: n.mtime || n.ts,
                 p: path,
                 size: n.s,
                 onDownloadProgress: this.dlprogress,
@@ -4240,9 +4277,10 @@ function MegaData()
             $('#mobileupload_header').text(l[1418]);
         }
         $('.transfer-table #ul_' + id).addClass('completed');
-        $('.transfer-table #ul_' + id + ' td:eq(5)').html('<span class="transfer-status completed">' + l[1418] + '</span>');
+        $('.transfer-table #ul_' + id + ' td:eq(5)')
+            .safeHTML('<span class="transfer-status completed">@@</span>', ul.skipfile ? l[1668] : l[1418]);
         $('.transfer-table #ul_' + id + ' td:eq(2)').text('');
-        $('.transfer-table #ul_' + id + ' td:eq(0) span.transfer-type').addClass('done').html(l[1501]);
+        $('.transfer-table #ul_' + id + ' td:eq(0) span.transfer-type').addClass('done').text(l[1501]);
         ul_queue[ul.pos] = Object.freeze({});
         var a=ul_queue.filter(isQueueActive).length;
         if (a < 2 && !ulmanager.isUploading)

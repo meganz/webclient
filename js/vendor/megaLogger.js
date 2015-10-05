@@ -14,6 +14,37 @@
 }(this, /** @lends MegaLogger */ function () {
 
     /**
+     * Internal/private dict to store the session/localStorage values, so that we can improve the performance of
+     * .log (.debug, .error, .info, .log, etc) calls without the need of always hitting the local/sessionStorage
+     *
+     * @private
+     * @type {{}}
+     */
+    var storageCache = {};
+
+    /**
+     * Lazy loader of local/sessionStorage values that will be cached in memory so that no more local/sessionStorage
+     * queries will be done in the next calls.
+     *
+     * @param k
+     * @returns {*}
+     */
+    var getStorageCacheValue = function(k) {
+        if (!storageCache.hasOwnProperty(k)) {
+            if (typeof(sessionStorage[k]) !== 'undefined') {
+                storageCache[k] = sessionStorage[k];
+            }
+            else if (typeof(localStorage[k]) !== 'undefined') {
+                storageCache[k] = localStorage[k];
+            }
+            else {
+                storageCache[k] = undefined;
+            }
+        }
+        return storageCache[k];
+    };
+
+    /**
      * Simple .toArray method to be used to convert `arguments` to a normal JavaScript Array
      *
      * @private
@@ -44,7 +75,7 @@
         }
         if (typeof(MegaLogger.rootLogger) === "undefined" && parentLogger !== false) {
             MegaLogger.rootLogger = new MegaLogger("", {
-                isEnabled: true
+                isEnabled: getStorageCacheValue('d') == 1
             }, false);
         }
         this.options = options || {};
@@ -52,7 +83,7 @@
 
         for (var key in MegaLogger.DEFAULT_OPTIONS) {
             if (MegaLogger.DEFAULT_OPTIONS.hasOwnProperty(key)
-                    && !this.options.hasOwnProperty(key)) {
+                && !this.options.hasOwnProperty(key)) {
                 this.options[key] = MegaLogger.DEFAULT_OPTIONS[key];
             }
         }
@@ -157,20 +188,20 @@
             return MegaLogger.rootLogger.isEnabled(); // alias
         },
         'muteList': function() {
-            if (typeof(sessionStorage) !== 'undefined' && sessionStorage.muteList) {
-                return JSON.parse(sessionStorage.muteList);
-            } else if (typeof(localStorage) !== 'undefined' && localStorage.muteList) {
-                return JSON.parse(localStorage.muteList);
-            } else {
+            var cached = getStorageCacheValue("muteList");
+            if(cached) {
+                return JSON.parse(cached);
+            }
+            else {
                 return [];
             }
         },
         'minLogLevel': function() {
-            if (typeof(sessionStorage) !== 'undefined' && sessionStorage.minLogLevel) {
-                return JSON.parse(sessionStorage.minLogLevel);
-            } else if (typeof(sessionStorage) !== 'undefined' && localStorage.minLogLevel) {
-                return JSON.parse(localStorage.minLogLevel);
-            } else {
+            var cached = getStorageCacheValue("minLogLevel");
+            if(cached) {
+                return JSON.parse(cached);
+            }
+            else {
                 return MegaLogger.LEVELS.INFO;
             }
         },

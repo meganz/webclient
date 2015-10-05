@@ -132,11 +132,10 @@ MegaPromise.prototype.then = function(res, rej) {
  * Alias of .done
  *
  * @param res
- * @param [rej]
  * @returns {MegaPromise}
  */
-MegaPromise.prototype.done = function(res, rej) {
-    this._internalPromise.done(res, rej);
+MegaPromise.prototype.done = function(res) {
+    this._internalPromise.done(res);
     return this;
 };
 
@@ -306,7 +305,11 @@ MegaPromise.all = function(promisesList) {
 
 /**
  * Implementation of Promise.all/$.when, with a little bit more flexible way of handling different type of promises
- * passed in the `promisesList`
+ * passed in the `promisesList`.
+ *
+ * Warning: This method will return a "master promise" which will only get resolved when ALL promises had finished
+ * processing (e.g. changed their state to either resolved or rejected). The only case when the master promise will get,
+ * rejected is if there are still 'pending' promises in the `promisesList` after the `timeout`
  *
  * @param promisesList {Array}
  * @param [timeout] {Integer} max ms to way for the master promise to be resolved before rejecting it

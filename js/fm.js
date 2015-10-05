@@ -4269,7 +4269,9 @@ function gridUI() {
             d = -1;
         if (c && c.indexOf('name') > -1)
             M.doSort('name', d);
-        else if (c && c.indexOf('size') > -1)
+        else if (c && c.indexOf('fav') > -1) {
+            M.doSort('fav', d);
+        } else if (c && c.indexOf('size') > -1)
             M.doSort('size', d);
         else if (c && c.indexOf('type') > -1)
             M.doSort('type', d);
@@ -4783,7 +4785,7 @@ function UIkeyevents() {
             return true;
         }
 
-        if (!is_fm()) {
+        if (!is_fm() && (page !== 'login')) {
             return true;
         }
 
@@ -4965,6 +4967,13 @@ function UIkeyevents() {
             if ($.warningCallback) {
                 $.warningCallback(true);
             }
+        }
+        else if ((e.keyCode === 113 /* F2 */) && (s.length > 0) && !$.dialog && RightsbyID(M.currentdirid) > 1) {
+            $.selected = [];
+            s.each(function(i, e) {
+                $.selected.push($(e).attr('id'));
+            });
+            renameDialog();
         }
         else if (e.keyCode == 65 && e.ctrlKey && !$.dialog) {
             $('.grid-table.fm tr').addClass('ui-selected');
@@ -5828,7 +5837,7 @@ function contextMenuUI(e, ll) {
             if (folderlink) {
                 flt += ',.import-item';
                 if (M.v.length) {
-                    flt += ',.zipdownload-item';
+                    flt += ',.zipdownload-item,.download-item';
                 }
             }
             $.selected = [M.RootID];
@@ -6232,7 +6241,7 @@ function treeUI()
     // disabling right click, default contextmenu.
     $(document).unbind('contextmenu');
     $(document).bind('contextmenu', function(e) {
-        if($(e.target).parents('.fm-chat-block').length > 0 || $(e.target).parents('.export-link-item').length) {
+        if($(e.target).parents('.fm-chat-block').length > 0 || $(e.target).parents('.fm-account-main').length > 0 || $(e.target).parents('.export-link-item').length || $(e.target).parents('.contact-fingerprint-txt').length || $(e.target).parents('.fm-breadcrumbs').length || $(e.target).hasClass('contact-details-user-name') || $(e.target).hasClass('contact-details-email') || $(e.target).hasClass('nw-conversations-name') || ($(e.target).hasClass('nw-contact-name') && $(e.target).parents('.fm-tree-panel').length)) {
             return;
         } else if (!localStorage.contextmenu) {
             $.hideContextMenu();
@@ -6575,7 +6584,7 @@ function renameDialog() {
         $('.rename-dialog').addClass('active');
         fm_showoverlay();
 
-        $('.rename-dialog .fm-dialog-close').rebind('click', function() {
+        $('.rename-dialog .fm-dialog-close, .rename-dialog-button.cancel').rebind('click', function() {
             $.dialog = false;
             $('.rename-dialog').addClass('hidden');
             fm_hideoverlay();
@@ -6585,11 +6594,6 @@ function renameDialog() {
             var c = $('.rename-dialog').attr('class');
             if (c && c.indexOf('active') > -1)
                 dorename();
-        });
-
-        $('.rename-dialog-button.cancel').rebind('click', function() {
-            $('.rename-dialog').addClass('hidden');
-            fm_hideoverlay();
         });
 
         var n = M.d[$.selected[0]];
@@ -6677,36 +6681,48 @@ function dorename()
 
 function msgDialog(type, title, msg, submsg, callback, checkbox) {
     $.msgDialog = type;
-    $('#msgDialog').removeClass('clear-bin-dialog confirmation-dialog warning-dialog-b warning-dialog-a notification-dialog remove-dialog delete-contact loginrequired-dialog multiple');
+    $.warningCallback = callback;
+
+    $('#msgDialog').removeClass('clear-bin-dialog confirmation-dialog warning-dialog-b warning-dialog-a ' +
+        'notification-dialog remove-dialog delete-contact loginrequired-dialog multiple');
     $('#msgDialog .icon').removeClass('fm-bin-clear-icon .fm-notification-icon');
     $('#msgDialog .confirmation-checkbox').addClass('hidden');
-    $.warningCallback = callback;
+
     if (type === 'clear-bin') {
         $('#msgDialog').addClass('clear-bin-dialog');
         $('#msgDialog .icon').addClass('fm-bin-clear-icon');
-        $('#msgDialog .fm-notifications-bottom').html('<div class="fm-dialog-button notification-button confirm"><span>' + l[1018] + '</span></div><div class="fm-dialog-button notification-button cancel"><span>' + l[82] + '</span></div><div class="clear"></div>');
-        $('#msgDialog .fm-dialog-button').eq(0).bind('click',function() {
-            closeMsg();
-            if ($.warningCallback) $.warningCallback(true);
-        });
-        $('#msgDialog .fm-dialog-button').eq(1).bind('click',function() {
-            closeMsg();
-            if ($.warningCallback) $.warningCallback(false);
-        });
-    }
-    if (type === 'delete-contact') {
-        $('#msgDialog').addClass('delete-contact');
         $('#msgDialog .fm-notifications-bottom')
-            .html('<div class="fm-dialog-button notification-button confirm"><span>'
-                + l[78] + '</span></div><div class="fm-dialog-button notification-button cancel"><span>'
-                + l[79] + '</span></div><div class="clear"></div>');
-        $('#msgDialog .fm-dialog-button').eq(0).bind('click',function() {
+            .safeHTML('<div class="fm-dialog-button notification-button confirm"><span>@@</span></div>' +
+                '<div class="fm-dialog-button notification-button cancel"><span>@@</span></div>' +
+                '<div class="clear"></div>', l[1018], l[82]);
+
+        $('#msgDialog .fm-dialog-button').eq(0).bind('click', function() {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback(true);
             }
         });
-        $('#msgDialog .fm-dialog-button').eq(1).bind('click',function() {
+        $('#msgDialog .fm-dialog-button').eq(1).bind('click', function() {
+            closeMsg();
+            if ($.warningCallback) {
+                $.warningCallback(false);
+            }
+        });
+    }
+    if (type === 'delete-contact') {
+        $('#msgDialog').addClass('delete-contact');
+        $('#msgDialog .fm-notifications-bottom')
+            .safeHTML('<div class="fm-dialog-button notification-button confirm"><span>@@</span></div>' +
+                '<div class="fm-dialog-button notification-button cancel"><span>@@</span></div>' +
+                '<div class="clear"></div>', l[78], l[79]);
+
+        $('#msgDialog .fm-dialog-button').eq(0).bind('click', function() {
+            closeMsg();
+            if ($.warningCallback) {
+                $.warningCallback(true);
+            }
+        });
+        $('#msgDialog .fm-dialog-button').eq(1).bind('click', function() {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback(false);
@@ -6714,48 +6730,73 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
         });
     }
     else if (type === 'warninga' || type === 'warningb' || type === 'info') {
-        $('#msgDialog .fm-notifications-bottom').html('<div class="fm-dialog-button notification-button"><span>' + l[81] + '</span></div><div class="clear"></div>');
-        $('#msgDialog .fm-dialog-button').bind('click',function() {
+        $('#msgDialog .fm-notifications-bottom')
+            .safeHTML('<div class="fm-dialog-button notification-button"><span>@@</span></div>' +
+                '<div class="clear"></div>', l[81]);
+
+        $('#msgDialog .fm-dialog-button').bind('click', function() {
             closeMsg();
-            if ($.warningCallback) $.warningCallback(true);
+            if ($.warningCallback) {
+                $.warningCallback(true);
+            }
         });
         $('#msgDialog .icon').addClass('fm-notification-icon');
-        if (type === 'warninga') $('#msgDialog').addClass('warning-dialog-a');
-        else if (type === 'warningb') $('#msgDialog').addClass('warning-dialog-b');
-        else if (type === 'info') $('#msgDialog').addClass('notification-dialog');
+        if (type === 'warninga') {
+            $('#msgDialog').addClass('warning-dialog-a');
+        }
+        else if (type === 'warningb') {
+            $('#msgDialog').addClass('warning-dialog-b');
+        }
+        else if (type === 'info') {
+            $('#msgDialog').addClass('notification-dialog');
+        }
     }
     else if (type === 'confirmation' || type === 'remove') {
-        $('#msgDialog .fm-notifications-bottom').html('<div class="left checkbox-block hidden"><div class="checkdiv checkboxOff"> <input type="checkbox" name="confirmation-checkbox" id="confirmation-checkbox" class="checkboxOff"> </div> <label for="export-checkbox" class="radio-txt">' + l[229] + '</label></div><div class="fm-dialog-button notification-button confirm"><span>' + l[78] + '</span></div><div class="fm-dialog-button notification-button cancel"><span>' + l[79] + '</span></div><div class="clear"></div>');
+        $('#msgDialog .fm-notifications-bottom')
+            .safeHTML('<div class="left checkbox-block hidden">' +
+                '<div class="checkdiv checkboxOff">' +
+                    '<input type="checkbox" name="confirmation-checkbox" ' +
+                        'id="confirmation-checkbox" class="checkboxOff">' +
+                '</div>' +
+                '<label for="export-checkbox" class="radio-txt">@@</label></div>' +
+                '<div class="fm-dialog-button notification-button confirm"><span>@@</span></div>' +
+                '<div class="fm-dialog-button notification-button cancel"><span>@@</span></div>' +
+                '<div class="clear"></div>', l[229], l[78], l[79]);
 
-        $('#msgDialog .fm-dialog-button').eq(0).bind('click', function () {
+        $('#msgDialog .fm-dialog-button').eq(0).bind('click', function() {
             closeMsg();
-            if ($.warningCallback)
+            if ($.warningCallback) {
                 $.warningCallback(true);
+            }
         });
 
-        $('#msgDialog .fm-dialog-button').eq(1).bind('click', function () {
+        $('#msgDialog .fm-dialog-button').eq(1).bind('click', function() {
             closeMsg();
-            if ($.warningCallback)
+            if ($.warningCallback) {
                 $.warningCallback(false);
+            }
         });
         $('#msgDialog .icon').addClass('fm-notification-icon');
         $('#msgDialog').addClass('confirmation-dialog');
-        if (type === 'remove')
+        if (type === 'remove') {
             $('#msgDialog').addClass('remove-dialog');
+        }
 
         if (checkbox) {
-            $('#msgDialog .left.checkbox-block .checkdiv, #msgDialog .left.checkbox-block input').removeClass('checkboxOn').addClass('checkboxOff');
+            $('#msgDialog .left.checkbox-block .checkdiv,' +
+                '#msgDialog .left.checkbox-block input')
+                    .removeClass('checkboxOn').addClass('checkboxOff');
+
             $.warningCheckbox = false;
             $('#msgDialog .left.checkbox-block').removeClass('hidden');
-            $('#msgDialog .left.checkbox-block').unbind('click');
-            $('#msgDialog .left.checkbox-block').bind('click', function (e) {
-                var c = $('#msgDialog .left.checkbox-block input').attr('class');
-                if (c && c.indexOf('checkboxOff') > -1) {
-                    $('#msgDialog .left.checkbox-block .checkdiv, #msgDialog .left.checkbox-block input').removeClass('checkboxOff').addClass('checkboxOn');
+            $('#msgDialog .left.checkbox-block').rebind('click', function(e) {
+                var $o = $('#msgDialog .left.checkbox-block .checkdiv, #msgDialog .left.checkbox-block input');
+                if ($('#msgDialog .left.checkbox-block input').hasClass('checkboxOff')) {
+                    $o.removeClass('checkboxOff').addClass('checkboxOn');
                     localStorage.skipDelWarning = 1;
                 }
                 else {
-                    $('#msgDialog .left.checkbox-block .checkdiv, #msgDialog .left.checkbox-block input').removeClass('checkboxOn').addClass('checkboxOff');
+                    $o.removeClass('checkboxOn').addClass('checkboxOff');
                     delete localStorage.skipDelWarning;
                 }
             });
@@ -6769,15 +6810,17 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
             .addClass('hidden')
             .html('');
 
-        $('#msgDialog .fm-dialog-button').bind('click',function() {
+        $('#msgDialog .fm-dialog-button').bind('click', function() {
             closeMsg();
-            if ($.warningCallback) $.warningCallback(true);
+            if ($.warningCallback) {
+                $.warningCallback(true);
+            }
         });
         $('#msgDialog').addClass('notification-dialog');
         title = l[5841];
-        msg = '<p>' + l[5842] + '</p>\n' +
-        '<a class="top-login-button" href="#login">' + l[171] + '</a>\n' +
-        '<a class="create-account-button" href="#register">' + l[1076] + '</a><br/>';
+        msg = '<p>' + escapeHTML(l[5842]) + '</p>\n' +
+            '<a class="top-login-button" href="#login">' + escapeHTML(l[171]) + '</a>\n' +
+            '<a class="create-account-button" href="#register">' + escapeHTML(l[1076]) + '</a><br/>';
 
         var $selectedPlan = $('.reg-st3-membership-bl.selected');
         var plan = 1;
@@ -6796,7 +6839,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
 
     $('#msgDialog .fm-dialog-title span').text(title);
 
-    $('#msgDialog .fm-notification-info p').html(msg);
+    $('#msgDialog .fm-notification-info p').safeHTML(msg);
     if (submsg) {
         $('#msgDialog .fm-notification-warning').text(submsg);
         $('#msgDialog .fm-notification-warning').show();
@@ -6805,11 +6848,11 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
         $('#msgDialog .fm-notification-warning').hide();
     }
 
-    $('#msgDialog .fm-dialog-close').unbind('click');
-    $('#msgDialog .fm-dialog-close').bind('click', function() {
+    $('#msgDialog .fm-dialog-close').rebind('click', function() {
         closeMsg();
-        if ($.warningCallback)
+        if ($.warningCallback) {
             $.warningCallback(false);
+        }
     });
     $('#msgDialog').removeClass('hidden');
     fm_showoverlay();
@@ -7568,8 +7611,8 @@ function initShareDialog() {
             $('.share-dialog-permissions').removeClass('active');
             $('.permissions-icon').removeClass('active');
             closeImportContactNotification('.share-dialog');
-            var x = $this.position().left + 10;
-            var y = $this.position().top + 13 + scrollPos;
+            var x = $this.position().left + 50;
+            var y = $this.position().top + 14 + scrollPos;
             handlePermissionMenu($this, $m, x, y);
         }
 
@@ -7591,8 +7634,8 @@ function initShareDialog() {
             $('.permissions-icon').removeClass('active');
             $m.addClass('search-permissions');
             closeImportContactNotification('.share-dialog');
-            var x = $this.position().left - 4;
-            var y = $this.position().top - 35;
+            var x = $this.position().left;
+            var y = $this.position().top + 8;
             handlePermissionMenu($this, $m, x, y);
         }
 

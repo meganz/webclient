@@ -658,7 +658,7 @@ var ulmanager = {
         }, {
             uq: uq,
             n: n,
-            skipfile: (ul_skipIdentical && identical),
+            // skipfile: (ul_skipIdentical && identical),
             callback: function(res, ctx) {
                 if (res.e === ETEMPUNAVAIL && ctx.skipfile) {
                     ctx.uq.repair = ctx.n.key;
@@ -668,6 +668,8 @@ var ulmanager = {
                     ulmanager.ulStart(File);
                 }
                 else if (ctx.skipfile) {
+                    uq.skipfile = true;
+                    ulmanager.ulIDToNode[ulmanager.getGID(uq)] = ctx.n.h;
                     onUploadSuccess(uq);
                     File.file.ul_failed = false;
                     File.file.retries = 0;

@@ -662,10 +662,16 @@ function init_page() {
         parsepage(pages['backup']);
         init_backup();
     }
-    else if (page.substr(0, 6) === 'cancel' && page.length > 24 && u_type) {
+    else if (page.substr(0, 6) === 'cancel' && page.length > 24) {
 
-        var ac = new mega.AccountClosure();
-        ac.initAccountClosure();
+        if (u_type) {
+            var ac = new mega.AccountClosure();
+            ac.initAccountClosure();
+        }
+        else {
+            // Unable to cancel, not logged in
+            msgDialog('warningb', l[882], l[6186], l[5841]);
+        }
     }
     else if (page === 'recovery') {
         parsepage(pages['recovery']);

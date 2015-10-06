@@ -67,7 +67,7 @@ ClassChunk.prototype.abort = function() {
     delete this.xhr;
 };
 
-// destroy {{{
+// destroy
 ClassChunk.prototype.destroy = function() {
     if (d) {
         dlmanager.logger.info('Destroying ' + this);
@@ -75,9 +75,8 @@ ClassChunk.prototype.destroy = function() {
     this.abort();
     oDestroy(this);
 };
-// }}}
 
-// shouldIReportDone {{{
+// shouldIReportDone
 ClassChunk.prototype.shouldIReportDone = function(report_done) {
     var pbx = this.Progress.data[this.xid];
     if (!pbx) {
@@ -99,9 +98,8 @@ ClassChunk.prototype.shouldIReportDone = function(report_done) {
 
     return report_done;
 };
-// }}}
 
-// updateProgress {{{
+// updateProgress
 ClassChunk.prototype.updateProgress = function(force) {
     if (uldl_hold) {
         // do not update the UI
@@ -138,9 +136,8 @@ ClassChunk.prototype.updateProgress = function(force) {
 
     return r;
 };
-// }}}
 
-// isCancelled {{{
+// isCancelled
 ClassChunk.prototype.isCancelled = function() {
     if (!this.dl) {
         return true;
@@ -163,9 +160,8 @@ ClassChunk.prototype.isCancelled = function() {
     }
     return is_cancelled;
 };
-// }}}
 
-// finish_download {{{
+// finish_download
 ClassChunk.prototype.finish_download = function() {
     if (d) {
         ASSERT(this.xhr || !this.dl || this.dl.cancelled, "Don't call me twice!");
@@ -175,9 +171,8 @@ ClassChunk.prototype.finish_download = function() {
         this.task_done.apply(this, arguments);
     }
 };
-// }}}
 
-// XHR::on_progress {{{
+// XHR::on_progress
 ClassChunk.prototype.on_progress = function(args) {
     if (!this.Progress.data[this.xid] || this.isCancelled()) {
         return;
@@ -187,9 +182,8 @@ ClassChunk.prototype.on_progress = function(args) {
     this.Progress.data[this.xid][0] = args[0].loaded;
     this.updateProgress();
 };
-// }}}
 
-// XHR::on_error {{{
+// XHR::on_error
 ClassChunk.prototype.on_error = function(args, xhr) {
     if (d) {
         dlmanager.logger.error('ClassChunk.on_error', this.task && this.task.chunk_id, args, xhr, this);
@@ -202,12 +196,15 @@ ClassChunk.prototype.on_error = function(args, xhr) {
     this.Progress.data[this.xid][0] = 0; /* reset progress */
     this.updateProgress(2);
 
-    this.oet = setTimeout(this.finish_download.bind(this,
-        false, xhr.readyState > 1 && xhr.status), 3950 + Math.floor(Math.random() * 2e3));
+    var chunk = this;
+    var status = xhr.readyState > 1 && xhr.status;
+    this.oet = setTimeout(function() {
+        chunk.finish_download(false, status);
+        chunk = undefined;
+    }, 3950 + Math.floor(Math.random() * 2e3));
 };
-// }}}
 
-// XHR::on_ready {{{
+// XHR::on_ready
 ClassChunk.prototype.on_ready = function(args, xhr) {
     var r;
     if (this.isCancelled()) {
@@ -254,7 +251,6 @@ ClassChunk.prototype.on_ready = function(args, xhr) {
         return 0xDEAD;
     }
 };
-// }}}
 
 ClassChunk.prototype.run = function(task_done) {
     if (this.isCancelled()) {
@@ -289,9 +285,8 @@ ClassChunk.prototype.run = function(task_done) {
     this.xhr.responseType = have_ab ? 'arraybuffer' : 'text';
     this.xhr.send();
 };
-// }}}
 
-// ClassFile {{{
+// ClassFile
 function ClassEmptyChunk(dl) {
     this.task = {
         zipid: dl.zipid,
@@ -429,10 +424,8 @@ ClassFile.prototype.checkQuota = function(task_done) {
     dlmanager.hasQuota(this.dl.size, function(hasQuota) {
         that.hasQuota = hasQuota;
         that.hasQuotaTimer = setTimeout(function() {
-            if (!oIsFrozen(that)) {
-                delete that.hasQuotaTimer;
-                that.run(task_done);
-            }
+            that.hasQuotaTimer = null;
+            that.run(task_done);
             that = undefined;
         }, 1000);
     });
@@ -441,13 +434,16 @@ ClassFile.prototype.checkQuota = function(task_done) {
 };
 
 ClassFile.prototype.run = function(task_done) {
+    var cancelled = oIsFrozen(this) || !this.dl || this.dl.cancelled;
 
-    ASSERT(this.gid
-        && GlobalProgress[this.gid],
-        'Invalid ClassFile state (' + Boolean(this.gid) + ', ' + (this.dl && this.dl.cancelled) + ')');
-
-    if (!this.gid || !GlobalProgress[this.gid]) {
-        return task_done(); // Hmm..
+    if (cancelled || !this.gid || !GlobalProgress[this.gid]) {
+        if (dlmanager.fetchingFile) {
+            dlmanager.fetchingFile = 0;
+        }
+        if (!cancelled) {
+            dlmanager.logger.warn('Invalid %s state.', this, this);
+        }
+        return task_done();
     }
 
     dlmanager.fetchingFile = 1; /* Block the fetchingFile state */
@@ -599,7 +595,6 @@ ClassFile.prototype.run = function(task_done) {
         }
     }.bind(this));
 };
-// }}}
 
 mBroadcaster.once('startMega', function _setupDecrypter() {
     var decrypter = CreateWorkers('decrypter.js', function(context, e, done) {

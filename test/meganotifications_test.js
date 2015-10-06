@@ -24,19 +24,20 @@ describe("MegaNotifications Unit Test", function() {
             }
         });
         sandbox.stub(window, 'bootstaticpath', './');
-        sandbox.stub(window, 'Notification', function() {
+
+        var _notification = function() {
             this.close = function() {};
             sinon.spy(this, 'close');
             return this;
-        });
+        };
+        _notification.requestPermission = sinon.stub();
+        _notification.permission = 'granted';
+        sandbox.stub(window, 'Notification', _notification);
         sandbox.stub(window, 'Favico', function() {
             this.badge = function() {};
             sinon.spy(this, 'badge');
             return this;
         });
-
-        sinon.spy(Notification, 'requestPermission', function() {});
-        Notification.permission = 'granted';
 
         megaNotifications = new MegaNotifications({
             textMessages: {

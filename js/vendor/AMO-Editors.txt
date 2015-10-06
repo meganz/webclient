@@ -1,0 +1,30 @@
+
+The following vendor files were modified just as a mean to pass automated signing requirements.
+
+
+- js/vendor/favico.js -- Warning: `setTimeout` called in potentially dangerous manner
+
+Source: https://github.com/ejci/favico.js/blob/743814829d5e8a5e71bac092aa1f46428de04c8b/favico.js
+
+
+- js/vendor/jquery.jscrollpane.js -- Warning: `setTimeout` called in potentially dangerous manner
+
+Source: https://github.com/diegocr/jScrollPane/blob/4c9ecdfbcdd73fb64a7c367c79279a99f66ad836/script/jquery.jscrollpane.js
+
+
+- js/vendor/jquery.mousewheel.js -- Warning: `setTimeout` called in potentially dangerous manner
+
+Source: https://github.com/diegocr/jquery-mousewheel/blob/f0bf2bcd66c3210ef1088903b86e847fe940e16d/jquery.mousewheel.js
+
+
+- js/vendor/chat/strophe.light.js -- Warning: `setTimeout` called in potentially dangerous manner
+                                  -- Warning: Access to the `Function` global
+                                  -- Warning: JS prototype extension
+
+Source: https://github.com/diegocr/strophejs (clone it and do `make strophe.light.js`)
+
+
+
+FWIW, We've sent patches to their respective repositories fixing these issues,
+but not all of them were merged and/or releases made with these changes at
+the time of this extension build.

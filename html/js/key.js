@@ -5,8 +5,7 @@ function init_key() {
     $('.key2').removeClass('hidden');
 
     if (typeof u_privk === 'undefined') {
-        crypto_rsagenkey()
-            .done(authring.setUpAuthenticationSystem);
+        crypto_rsagenkey();
     }
     else {
         ui_keycomplete();

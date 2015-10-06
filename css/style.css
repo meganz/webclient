@@ -129,7 +129,7 @@ body {
  background: #d22000;
  color: white;
 }
-.div, span, input {
+.div, span, input, object {
 	outline: none;
 }
 .bottom-pages.developers #pageholder {

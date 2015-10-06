@@ -6476,6 +6476,11 @@ function balance2pro(callback)
         var html = '',
             scroll = '.export-link-body';
 
+        var links = $.trim(getClipboardLinks()),
+            toastTxt,
+            linksNum,
+			$span = $('.copy-to-clipboard span');
+
         deleteScrollPanel(scroll, 'jsp');
 
         if (close) {
@@ -6520,8 +6525,16 @@ function balance2pro(callback)
             });
         }, 300);
 
+        // Setup toast notification
+        toastTxt = '1 link was copied to the clipboard'
+        linksNum = links.replace(/\s+/gi, ' ').split(' ').length;
+        if (linksNum > 1)
+        {
+            toastTxt = '%d links were copied to the clipboard'.replace('%d', linksNum)
+        }    
+
         // Setup the copy to clipboard buttons
-        $('#clipboardbtn1 span').text(l[1990]);
+        $span.text(l[1990]);
 
         if (is_extension) {
             if (!is_chrome_firefox) {
@@ -6530,7 +6543,7 @@ function balance2pro(callback)
             }
 
             // chrome & firefox extension:
-            $("#clipboardbtn1").rebind('click', function() {
+            $(".copy-to-clipboard").rebind('click', function() {
                 if (is_chrome_firefox) {
                     mozSetClipboard(getClipboardLinks());
                 }
@@ -6539,35 +6552,39 @@ function balance2pro(callback)
                     $('#chromeclipboard').select();
                     document.execCommand('copy');
                 }
+                showToast('clipboard', toastTxt, $span, l[7656]);
             });
         }
         else if (flashIsEnabled()) {
-            $('#clipboardbtn1').html('<span>' + htmlentities(l[1990]) + '</span><object data="OneClipboard.swf" id="clipboardswf1" type="application/x-shockwave-flash"  width="100%" height="32" allowscriptaccess="always"><param name="wmode" value="transparent"><param value="always" name="allowscriptaccess"><param value="all" name="allowNetworkin"><param name=FlashVars value="buttonclick=1" /></object>');
+            $('.copy-to-clipboard').html('<span>' + htmlentities(l[1990]) + '</span><object data="OneClipboard.swf" id="clipboardswf1" type="application/x-shockwave-flash"  width="100%" height="32" allowscriptaccess="always"><param name="wmode" value="transparent"><param value="always" name="allowscriptaccess"><param value="all" name="allowNetworkin"><param name=FlashVars value="buttonclick=1" /></object>');
 
-            $('#clipboardbtn1').rebind('mouseover', function() {
+            $('.copy-to-clipboard').rebind('mouseover', function() {
                 var e = $('#clipboardswf1')[0];
                 if (e && e.setclipboardtext) {
                     e.setclipboardtext(getClipboardLinks());
                 }
+            });
+            $('.copy-to-clipboard').rebind('mousedown', function() {
+                showToast('clipboard', toastTxt, $span, l[7656]);
             });
         }
         else {
             var uad = browserdetails(ua);
 
             if (uad.icon === 'ie.png' && window.clipboardData) {
-                $('#clipboardbtn1').rebind('click', function() {
-                    var links = $.trim(getClipboardLinks());
+                $('.copy-to-clipboard').rebind('click', function() {
+                    links = $.trim(getClipboardLinks());
                     var mode = links.indexOf("\n") !== -1 ? 'Text' : 'URL';
                     window.clipboardData.setData(mode, links);
+                    showToast('clipboard', toastTxt, $span, l[7656]);
                 });
             }
             else {
 
                 if (window.ClipboardEvent) {
-                    $('#clipboardbtn1').rebind('click', function() {
+                    $('.copy-to-clipboard').rebind('click', function() {
                         var doLinks = ($(this).attr('id') === 'clipboardbtn1');
-                        var links = $.trim(doLinks ? getClipboardLinks() : getclipboardkeys());
-                        var $span = $(this).find('span');
+                        links = $.trim(doLinks ? getClipboardLinks() : getclipboardkeys());
 
                         window.onCopyEventHandler = function onCopyEvent(ev) {
                             if (d) console.log('onCopyEvent', arguments);
@@ -6580,7 +6597,7 @@ function balance2pro(callback)
                                 }).join("<br/>\n"));
                             }
                             ev.preventDefault();
-                            $span.text(l[7656]); // Done
+                            showToast('clipboard', toastTxt, $span, l[7656]); // Done
                         };
                         document.addEventListener('copy', window.onCopyEventHandler, false);
                         Soon(function() {
@@ -6592,16 +6609,11 @@ function balance2pro(callback)
                 }
                 else {
                     // Hide the clipboard buttons if not using the extension and Flash is disabled
-                    $('#clipboardbtn1').addClass('hidden');
+                    $('.copy-to-clipboard').addClass('hidden');
                 }
             }
 
         }
-
-        $('#clipboardbtn1').rebind('mousedown', function() {
-            showToast('clipboard', l[7655]);
-            $(this).find('span').text(l[7656]);
-        });
 
         // Click anywhere on export link dialog will hide export link dropdown
         $('.export-links-dialog').rebind('click', function() {
@@ -6627,6 +6639,7 @@ function balance2pro(callback)
             $('.export-link-select, .export-content-block').removeClass('public-handle decryption-key full-link').addClass(keyOption);
             $('.export-link-select').html($(this).html());
             $('.export-link-dropdown').fadeOut(200);
+            $('.copy-to-clipboard span').text(l[1990]);
 
             // Stop propagation
             return false;

@@ -8528,7 +8528,7 @@ function getclipboardkeys() {
 /** 
  * Show toast notification
 */
-function showToast (toastClass, notification) {
+function showToast (toastClass, notification, successBlock, successTxt) {
     var $toast,
         interval;
 
@@ -8558,6 +8558,10 @@ function showToast (toastClass, notification) {
             hideToast(interval);
         }, 5000);
     });
+
+	if (successBlock && successTxt) {
+		successBlock.text(successTxt);
+	}
 }
 
 function hideToast (int) {

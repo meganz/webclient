@@ -27,7 +27,6 @@ module.exports = function(config) {
         'js/vendor/jquery.jscrollpane.js',
         'js/vendor/jquery.mousewheel.js',
         'js/vendor/jquery.fullscreen.js',
-        'js/vendor/jquery.window-active.js',
         'js/jquery.tokeninput.js',
         'js/jquery.misc.js',
         'js/jquery.qrcode.js',

@@ -55,7 +55,12 @@ describe("account unit test", function() {
             it("internal callback OK, no custom callback", function() {
                 sandbox.stub(window, 'api_req');
                 var aPromise = getUserAttribute('me3456789xw', 'puEd255', true, false, undefined);
-                assert.strictEqual(aPromise.constructor.name, 'MegaPromise');
+                var constructor = aPromise.constructor.name;
+                if (constructor === undefined) {
+                    // Workaround for MSIE
+                    constructor = (String(aPromise.constructor).match(/^\s*function (\w+)/)||[]).pop();
+                }
+                assert.strictEqual(constructor, 'MegaPromise');
                 assert.strictEqual(api_req.callCount, 1);
                 var callback = api_req.args[0][1].callback;
                 var theCtx = api_req.args[0][1];

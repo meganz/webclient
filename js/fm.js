@@ -3162,8 +3162,10 @@ function accountUI()
         });
         
         $('.grid-table.sessions tr').remove();
-        var html = '<tr><th>' + l[479] + '</th><th>' + l[480] + '</th><th>' + l[481] + '</th><th class="no-border">' + l[482] + '</th><th class="no-border session-status">Status</th><th class="logout-column">Action</th></tr>';
-        var sessions = $(account.sessions).each(function(i, el) {
+        var html = '<tr><th>' + l[479] + '</th><th>' + l[480] + '</th><th>' + l[481] + '</th><th>' + l[482] + '</th><th class="no-border session-status">Status</th><th class="no-border logout-column">&nbsp;</th></tr>';
+        var numActiveSessions = 0;
+        
+        $(account.sessions).each(function(i, el) {
             
             if (i == $.sessionlimit) {
                 return false;
@@ -3175,16 +3177,16 @@ function accountUI()
             var country = countrydetails(el[4]);
             var currentSession = el[5];
             var sessionId = el[6];
-            var active = el[7];
-            var status = '<span class="current-session-txt">' + l[483] + '</span>';
+            var activeSession = el[7];
+            var status = '<span class="current-session-txt">' + 'Current' + '</span>';
             
             // If not the current session
             if (!currentSession) {
-                if (active) {
-                    status = '<span class="active-session-txt">' + 'Active session' + '</span>';
+                if (activeSession) {
+                    status = '<span class="active-session-txt">' + 'Active' + '</span>';
                 }
                 else {
-                    status = 'Expired session';
+                    status = '<span class="expired-session-txt">' + 'Expired' + '</span>';
                 }
             }
             
@@ -3192,6 +3194,7 @@ function accountUI()
                 country.icon = 'ud.gif';
             }
             
+            // Generate row html
             html += '<tr class="' + (currentSession ? "current" : sessionId) +  '">'
                 + '<td><span class="fm-browsers-icon"><img alt="" src="' + staticpath + 'images/browser/' + browser.icon + '" /></span><span class="fm-browsers-txt">' + htmlentities(browser.name) + '</span></td>'
                 + '<td>' + ipAddress + '</td>'
@@ -3200,22 +3203,30 @@ function accountUI()
                 + '<td>' + status + '</td>';
         
             // If the session is active show logout button
-            if (active) {
+            if (activeSession) {
                 html += '<td>' + '<span class="settings-logout">' + l[967] + '</span>' + '</td></tr>';
             }
             else {
                 html += '<td>&nbsp;</td>';
             }
+            
+            // If the current session or active then increment count
+            if (currentSession || activeSession) {
+                numActiveSessions++;
+            }
         });
         $('.grid-table.sessions').html(html);
 
-        if (sessions.length === 1) {
+        // Don't show button to close other sessions if there's only the current session
+        if (numActiveSessions === 1) {
             $('.fm-close-all-sessions').hide();
         }
-
+        
         $('.fm-close-all-sessions').rebind('click', function() {
+            
             loadingDialog.show();
-            // expire all sessions but not the current one
+            
+            // Expire all sessions but not the current one
             api_req({ a: 'usr', ko: 1 }, {
                 callback: function() {
                     M.accountSessions(function() {

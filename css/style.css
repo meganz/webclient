@@ -13151,7 +13151,7 @@ table {
 	background-repeat: no-repeat;
 	background-position: -24px -8072px;
 }
-.active-session-txt, .current-session-txt, .settings-logout {
+.active-session-txt, .current-session-txt, .expired-session-txt, .settings-logout {
 	display: block;
 	float: left;
 	height: 16px;
@@ -13171,12 +13171,18 @@ table {
 	-ms-transition: background-color 200ms ease-in-out;
 	transition: background-color 200ms
 }
-.active-session-txt, .current-session-txt {
-    min-width: 100px;
+.active-session-txt, .current-session-txt, .expired-session-txt {
     text-align: center;
 }
 .active-session-txt {
     background-color: #2BA6DE;
+}
+.expired-session-txt {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    color: #bbb;
+    padding-left: 5px;
+    padding-right: 5px;
 }
 .grid-table.sessions th.session-status {
     width: 149px;
@@ -13184,18 +13190,21 @@ table {
 .grid-table.sessions th.logout-column {
     width: 10%;
 }
+.grid-table.sessions th.no-border {
+    background: none;
+}
 .fm-account-history .grey-bar {
     background-color: #eeeeee;
     border: 0 none;
     clear: both;
     margin: 0;
+    min-height: 28px;
     overflow: auto;
-    padding: 9px 19px;
     text-align: right;
 }
 .fm-close-all-sessions {
     height: 32px;
-    margin: 0;
+    margin: 9px 19px;
     text-align: left;
 }
 .fm-close-all-sessions span {

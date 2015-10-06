@@ -312,12 +312,13 @@ function __render_thumb(img, u8, orientation, blob) {
             if (d) {
                 console.time('exif');
             }
-            var exif = EXIF.getImageData(new BinaryFile(u8), true);
+            var exif = EXIF.readFromArrayBuffer(u8, true);
             orientation = parseInt(exif.Orientation) || 1;
             if (d) {
                 console.timeEnd('exif');
                 console.debug('EXIF', exif, orientation);
             }
+            exif = undefined;
         }
         if (!blob) {
             blob = new Blob([u8], {

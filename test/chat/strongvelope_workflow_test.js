@@ -52,7 +52,7 @@ describe("chat.strongvelope workflow test", function() {
     if (!window.__SKIP_WORKFLOWS) {
         describe('1-on-1 chat', function() {
             it("normal operation", function() {
-                var tests = ['42', "Don't panic!", 'Flying Spaghetti Monster',
+                var tests = ['', '42', "Don't panic!", 'Flying Spaghetti Monster',
                              "Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn",
                              'Tēnā koe', 'Hänsel & Gretel', 'Слартибартфаст'];
 
@@ -64,17 +64,21 @@ describe("chat.strongvelope workflow test", function() {
                 var alice = new strongvelope.ProtocolHandler('alice678900',
                                                              ALICE_CU25519_PRIV,
                                                              ALICE_ED25519_PRIV,
-                                                             ALICE_ED25519_PUB,
-                                                             3);
+                                                             ALICE_ED25519_PUB);
+                alice.rotateKeyEvery = 3;
+                alice._updateSenderKey();
                 var bob = new strongvelope.ProtocolHandler('bob45678900',
                                                            BOB_CU25519_PRIV,
                                                            BOB_ED25519_PRIV,
-                                                           BOB_ED25519_PUB,
-                                                           3);
+                                                           BOB_ED25519_PUB);
+                bob.rotateKeyEvery = 3;
+                bob._updateSenderKey();
 
                 var message;
                 var sent;
                 var received;
+
+                var start = Date.now();
 
                 for (var i = 0; i < tests.length; i++) {
                     message = tests[i];
@@ -101,6 +105,11 @@ describe("chat.strongvelope workflow test", function() {
                     received = alice.decryptFrom(sent, 'bob45678900');
                     assert.strictEqual(received.payload, message);
                 }
+
+                dump('Total time taken: ' + (Date.now() - start) + ' ms');
+                dump('  ' + tests.length + ' messages:'
+                     + ' 2 times encrypting/signing each,'
+                     + ' 4 times decrypting/verifying each.');
             });
         });
     }

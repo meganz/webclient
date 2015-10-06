@@ -19,9 +19,11 @@ test-no-workflows:
 	SKIP_WORKFLOWS=true $(MAKE) test
 
 test: $(KARMA)
+	rm -rf test/phantomjs-storag
 	$(NODE) $(KARMA) start --preprocessors= karma.conf.js --browsers PhantomJS2_custom
 
 test-ci: $(KARMA)
+	rm -rf test/phantomjs-storag
 	$(NODE) $(KARMA) start --singleRun=true --no-colors karma.conf.js --browsers PhantomJS2_custom
 
 api-doc: $(JSDOC)

@@ -29,6 +29,11 @@ var strongvelope = {};
     var IV_SIZE = 16;
     strongvelope.IV_SIZE = IV_SIZE;
 
+    // Epoch time stamp granularity from Date.now().
+    var _ONE_DAY = 1000 * 24 * 60 * 60;
+
+    // Size in bytes of a key ID.
+    var _KEY_ID_SIZE = 4;
 
     /** Version of the protocol implemented. */
     var PROTOCOL_VERSION = 0x00;
@@ -37,6 +42,8 @@ var strongvelope = {};
     /** After how many messages our symmetric sender key is rotated. */
     strongvelope.ROTATE_KEY_EVERY = 16;
 
+    /** After how many messages our symmetric sender key is rotated. */
+    strongvelope.SEND_KEY_EVERY_RECEIVED = 24;
 
     /** Size (in bytes) of the secret/symmetric encryption key. */
     var SECRET_KEY_SIZE = 16;
@@ -68,9 +75,8 @@ var strongvelope = {};
      *     may contain two (concatenated) keys. The second one (if present) is
      *     the previous sender key (key ID one less). Requires
      *     the sane number of records in the same order as `RECIPIENT`.
-     * @property KEY_ID {Number}
-     *     Sender encryption key ID used (or set) in this message. Must be an
-     *     integer incremented for every new key used.
+     * @property KEY_IDS {Number}
+     *     Sender encryption key IDs used (or set) in this message.
      * @property PAYLOAD {Number}
      *     Encrypted payload of message.
      */
@@ -81,7 +87,7 @@ var strongvelope = {};
         NONCE:              0x03,
         RECIPIENT:          0x04,
         KEYS:               0x05,
-        KEY_ID:             0x06,
+        KEY_IDS:            0x06,
         PAYLOAD:            0x07,
     };
     strongvelope.TLV_TYPES = TLV_TYPES;
@@ -95,7 +101,7 @@ var strongvelope = {};
         0x03: 'nonce',
         0x04: 'recipients',
         0x05: 'keys',
-        0x06: 'keyId',
+        0x06: 'keyIds',
         0x07: 'payload',
     };
 
@@ -117,6 +123,56 @@ var strongvelope = {};
         SIMPLE_TWO_PARTY:   0x02,
     };
     strongvelope.MESSAGE_TYPES = MESSAGE_TYPES;
+
+
+    /**
+     * Determines a new 16-bit date stamp (based on Epoch time stamp).
+     *
+     * @return {Number}
+     * @private
+     */
+    strongvelope._dateStampNow = function() {
+
+        return Math.floor(Date.now() / _ONE_DAY);
+    };
+
+
+    /**
+     * Splits the keyId into the date stamp and counter portion.
+     *
+     * @ param {String} keyId
+     *     The key ID.
+     * @return {Array.<Number>}
+     *     Two elements in the array, the first being the date stamp, the
+     *     second being the counter value.
+     * @private
+     */
+    strongvelope._splitKeyId = function(keyId) {
+
+        var keyIdNumber = str_to_a32(keyId)[0];
+        var dateStamp = keyIdNumber >>> 16;
+        var counter = keyIdNumber & 0xffff;
+
+        return [dateStamp, counter];
+    };
+
+
+    /**
+     * Encodes a numeric date stamp and counter component into a key ID.
+     *
+     * @return {Number}
+     *     Date stamp value.
+     * @return {Number}
+     *     Counter value.
+     * @return {String}
+     *     The key ID.
+     * @private
+     */
+    strongvelope._encodeKeyId = function(dateStamp, counter) {
+
+        var keyIdNumber = (dateStamp << 16) | counter;
+        return a32_to_str([keyIdNumber]);
+    };
 
 
     /**
@@ -271,7 +327,7 @@ var strongvelope = {};
      */
     strongvelope._parseMessageContent = function(binaryMessage) {
 
-        var parsedContent = { keys: [], recipients: [] };
+        var parsedContent = { recipients: [], keys: [], keyIds: [] };
         var currentTlvType = null;
         var part;
         var tlvType;
@@ -307,8 +363,12 @@ var strongvelope = {};
                 case TLV_TYPES.KEYS:
                     parsedContent[tlvVariable].push(part.record[1]);
                     break;
-                case TLV_TYPES.KEY_ID:
-                    parsedContent[tlvVariable] = part.record[1].charCodeAt(0);
+                case TLV_TYPES.KEY_IDS:
+                    var keyIds = part.record[1];
+                    while (keyIds.length > 0) {
+                        parsedContent[tlvVariable].push(keyIds.substring(0, _KEY_ID_SIZE));
+                        keyIds = keyIds.substring(_KEY_ID_SIZE);
+                    }
                     break;
                 default:
                     parsedContent[tlvVariable] = part.record[1];
@@ -365,9 +425,6 @@ var strongvelope = {};
      * @param {String} [pubEd25519]
      *     Our public signing key (Ed25519, optional, can be derived upon
      *     instantiation from private key).
-     * @param {Number} [rotateKeyEvery=16]
-     *     The number of messages our sender key is used for before rotating
-     *     (default: strongvelope.ROTATE_KEY_EVERY).
      *
      * @param {String} ownHandle
      *     Our own user handle (u_handle).
@@ -379,8 +436,13 @@ var strongvelope = {};
      *     Our public signing key (Ed25519).
      * @property {Number} rotateKeyEvery
      *     The number of messages our sender key is used for before rotating.
-     * @property {Number} keyId
+     * @property {Number} sendKeyEveryReceived
+     *     The number of messages to receive before a keyed message is to be
+     *     sent.
+     * @property {String} keyId
      *     ID of our current sender key.
+     * @property {String} previousKeyId
+     *     ID of our previous sender key.
      * @property {Array.<String>} participants
      *     Array of user handles of current participants of the chat, sorted
      *     by user handle.
@@ -389,7 +451,7 @@ var strongvelope = {};
      *     @see {@link ParticipantKey} for all (past and present) participants.
      */
     strongvelope.ProtocolHandler = function(ownHandle, privCu25519, privEd25519,
-            pubEd25519, rotateKeyEvery) {
+            pubEd25519) {
 
         this.ownHandle = ownHandle || u_handle;
         this.privCu25519 = privCu25519 || u_privCu25519;
@@ -398,15 +460,61 @@ var strongvelope = {};
         if (!this.pubEd25519) {
             this.pubEd25519 = crypt.getPubKeyFromPrivKey(this.privEd25519, 'Ed25519');
         }
-        this.rotateKeyEvery = rotateKeyEvery || strongvelope.ROTATE_KEY_EVERY;
+        this.rotateKeyEvery = strongvelope.ROTATE_KEY_EVERY;
+        this.sendKeyEveryReceived = strongvelope.SEND_KEY_EVERY_RECEIVED;
         this._keyEncryptionCount = 0;
-        this.keyId = 0;
+        this.keyId = null;
+        this.previousKeyId = null;
         this._sentKeyId = null;
-        var secretKey = new Uint8Array(SECRET_KEY_SIZE);
-        asmCrypto.getRandomValues(secretKey);
         this.participants = [];
         this.participantKeys = {};
-        this.participantKeys[this.ownHandle] = { 0: asmCrypto.bytes_to_string(secretKey) };
+        this.participantKeys[this.ownHandle] = {};
+    };
+
+
+    /**
+     * Refreshes our own sender key.
+     *
+     * @method
+     * @param userhandle {String}
+     *     Mega user handle for user to send to or receive from.
+     * @return {String}
+     *     Binary string containing a 256 bit symmetric encryption key.
+     * @private
+     */
+    strongvelope.ProtocolHandler.prototype._updateSenderKey = function(userhandle) {
+
+        var dateStamp;
+        var counter;
+
+        if (this.keyId) {
+            // Juggle the key IDs.
+            this.previousKeyId = this.keyId;
+            var keyIdComponents = ns._splitKeyId(this.keyId);
+            dateStamp = keyIdComponents[0];
+            counter = keyIdComponents[1];
+
+            var newDateStamp = ns._dateStampNow();
+            if (newDateStamp !== dateStamp) {
+                dateStamp = newDateStamp;
+                counter = 0;
+            }
+            else {
+                counter = (counter + 1) & 0xffff;
+            }
+        }
+        else {
+            dateStamp  = ns._dateStampNow();
+            counter = 0;
+        }
+        this.keyId = ns._encodeKeyId(dateStamp, counter);
+
+        // Now the new sender key.
+        var secretKey = new Uint8Array(SECRET_KEY_SIZE);
+        asmCrypto.getRandomValues(secretKey);
+        this.participantKeys[this.ownHandle][this.keyId] = asmCrypto.bytes_to_string(secretKey);
+
+        this._keyEncryptionCount = 0;
     };
 
 
@@ -535,28 +643,26 @@ var strongvelope = {};
         var content = '';
         var encryptedKeys;
         var messageType;
-        var previousKeyId = this.keyId;
 
         // Check and rotate key if due.
         if (this._keyEncryptionCount >= this.rotateKeyEvery) {
-            var newSecretKey = new Uint8Array(SECRET_KEY_SIZE);
-            asmCrypto.getRandomValues(newSecretKey);
-            this.keyId = (this.keyId + 1) & 0xff;
-            this.participantKeys[this.ownHandle][this.keyId] = asmCrypto.bytes_to_string(newSecretKey);
-            this._keyEncryptionCount = 0;
+            this._updateSenderKey();
         }
 
         var senderKey = this.participantKeys[this.ownHandle][this.keyId];
         var encryptedMessage = ns._symmetricEncryptMessage(message, senderKey);
 
-        // Use a (leaner) followup message if the sender key's been sent already.
+        var keyIds = this.keyId;
         if (this._sentKeyId === this.keyId) {
+            // Use a (leaner) followup message if the sender key's been sent already.
             messageType = MESSAGE_TYPES.GROUP_FOLLOWUP;
         }
         else {
+            // Default keyed message.
             var keysIncluded = [senderKey];
-            if (previousKeyId !== this.keyId) {
-                keysIncluded.push(this.participantKeys[this.ownHandle][previousKeyId]);
+            if (this.previousKeyId) {
+                keysIncluded.push(this.participantKeys[this.ownHandle][this.previousKeyId]);
+                keyIds += this.previousKeyId;
             }
             encryptedKeys = this._encryptKeysFor(keysIncluded, encryptedMessage.nonce,
                                                  destination);
@@ -575,9 +681,14 @@ var strongvelope = {};
             content += tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.KEYS),
                                             encryptedKeys);
             this._sentKeyId = this.keyId;
+            content += tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.KEY_IDS),
+                                            keyIds);
+
         }
-        content += tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.KEY_ID),
-                                        String.fromCharCode(this.keyId));
+        else {
+            content += tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.KEY_IDS),
+                                            this.keyId);
+        }
         content += tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.PAYLOAD),
                                         encryptedMessage.ciphertext);
 
@@ -587,7 +698,6 @@ var strongvelope = {};
         content = tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.SIGNATURE),
                                        signature)
                 + content;
-
         this._keyEncryptionCount++;
 
         // Return assembled total message.
@@ -633,36 +743,39 @@ var strongvelope = {};
             return false;
         }
 
-        // Sanitise keyId to an 8-bit value.
-        var keyId = parsedMessage.keyId & 0xff;
-
         // Get sender key.
         var senderKey;
+        var keyId = parsedMessage.keyIds[0];
         if (parsedMessage.keys.length  > 0) {
             var isOwnMessage = (sender === this.ownHandle);
             var otherHandle = isOwnMessage ? parsedMessage.recipients[0] : sender;
-            // Decrypt message key(s) and update their local cache.
-            parsedMessage.keys[0] = this._decryptKeysFor(parsedMessage.keys[0],
-                                                         parsedMessage.nonce,
-                                                         otherHandle,
-                                                         isOwnMessage);
-            senderKey = parsedMessage.keys[0][0];
+            // Decrypt message key(s).
+            var decryptedKeys = this._decryptKeysFor(parsedMessage.keys[0],
+                                                     parsedMessage.nonce,
+                                                     otherHandle,
+                                                     isOwnMessage);
+            parsedMessage.keys[0] = decryptedKeys;
+            senderKey = decryptedKeys[0];
 
+            // Update local sender key cache.
             if (!this.participantKeys[sender]) {
                 this.participantKeys[sender] = {};
             }
-            this.participantKeys[sender][keyId] = senderKey;
-            if (parsedMessage.keys[0].length > 1) {
-                var previousKeyId = (parsedMessage.keyId - 1) & 0xff;
-                // Bail out on inconsistent information.
-                if (this.participantKeys[sender][previousKeyId]
-                        && (this.participantKeys[sender][previousKeyId] !== parsedMessage.keys[0][1])) {
+            var previousSenderKey;
+            var id;
+            for (var i = 0; i < decryptedKeys.length; i++) {
+                id = parsedMessage.keyIds[i];
+                previousSenderKey = this.participantKeys[sender][id];
+                if (previousSenderKey
+                        && (previousSenderKey !== parsedMessage.keys[0][i])) {
+                    // Bail out on inconsistent information.
                     logger.error("Mismatching statement on sender's previous key.");
 
                     return false;
                 }
-                this.participantKeys[sender][previousKeyId] = parsedMessage.keys[0][1];
+                this.participantKeys[sender][id] = parsedMessage.keys[0][i];
             }
+            this.participantKeys[sender][keyId] = senderKey;
         }
         else {
             if (this.participantKeys[sender] && this.participantKeys[sender][keyId]) {
@@ -670,7 +783,7 @@ var strongvelope = {};
             }
             else {
                 logger.error('Encryption key for message from ' + sender
-                             + ' with ID ' + keyId + ' unavailable.');
+                             + ' with ID ' + base64urlencode(keyId) + ' unavailable.');
 
                 return false;
             }

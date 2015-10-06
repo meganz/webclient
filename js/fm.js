@@ -9249,9 +9249,16 @@ function propertiesDialog(close)
         +'<span class="propreties-dark-txt">' + p.t7 + '</span></div><div class="properties-float-bl">'
         +'<div class="properties-small-gray">' + p.t8 + '</div><div class="propreties-dark-txt contact-list">' + p.t9
         +'<div class="contact-list-icon"></div></div></div>'
-        +'<div class="properties-float-bl"><div class="properties-small-gray">' + p.t10 + '</div>'
-        +'<div class="propreties-dark-txt">' + p.t11 + '</div></div></div>';
+        +'<div class="properties-float-bl"><div class="properties-small-gray t10">' + p.t10 + '</div>'
+        +'<div class="propreties-dark-txt t11">' + p.t11 + '</div></div></div>';
     $('.properties-txt-pad').html(html);
+	
+	if (typeof(p.t10) == 'undefined' && typeof(p.t11) == 'undefined')
+	{
+		$('.properties-small-gray.t10').addClass('hidden');
+		$('.propreties-dark-txt.t11').addClass('hidden');
+	}
+	
     pd.find('.file-settings-icon').rebind('click context', function(e) {
         if ($(this).attr('class').indexOf('active') == -1) {
             e.preventDefault();

@@ -8562,8 +8562,8 @@ function itemExportLinkHtml(item) {
          +               '<span class="export-item-title">' + htmlentities(item.name) + '</span><span class="export-link-gray-txt">' + fileSize + '</span>'
          +          '</div>'
          +          '<div class="file-link-block">'
-         +              '<span class="file-link-info url" data-pseudo-content="Public handle":">' + fileUrlWithoutKey + '</span>'
-         +          	'<span class="file-link-info key" data-pseudo-content="Decryption key:">' + fileUrlKey + '</span>'
+         +              '<span class="file-link-info url" data-pseudo-content="' + l[7650] +'":">' + fileUrlWithoutKey + '</span>'
+         +          	'<span class="file-link-info key" data-pseudo-content="' + l[1028] +':">' + fileUrlKey + '</span>'
          +          '</div>'
          +      '</div>'
          +  '</div>';

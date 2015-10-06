@@ -192,8 +192,7 @@ module.exports = function(config) {
     customLaunchers: {
         'PhantomJS2_custom': {
             base: 'PhantomJS2',
-            // web-security is disabled to allow `Worker('data:...')`
-            flags: ['--local-storage-path=./test/phantomjs-storage', '--web-security=false']
+            flags: ['--local-storage-path=./test/phantomjs-storage']
         }
     },
 

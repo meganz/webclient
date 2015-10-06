@@ -6639,7 +6639,7 @@ function balance2pro(callback)
             $('.export-link-select, .export-content-block').removeClass('public-handle decryption-key full-link').addClass(keyOption);
             $('.export-link-select').html($(this).html());
             $('.export-link-dropdown').fadeOut(200);
-            $('.copy-to-clipboard span').text(l[1990]);
+            $span.text(l[1990]);
 
             // Stop propagation
             return false;

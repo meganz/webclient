@@ -13199,11 +13199,11 @@ table {
     text-align: left;
 }
 .fm-close-all-sessions span {
-    background: rgba(255, 255, 255, 1) url("../images/mega/nw-fm-sprite_v9.svg") no-repeat scroll -32px -8419px;
+    background: rgba(255, 255, 255, 1) url("../images/mega/nw-fm-sprite_v9.svg") no-repeat scroll -31px -8404px;
     text-indent: 11px;
 }
 .settings-logout {
-    background: #ccc url("../images/mega/nw-fm-sprite_v9.svg") no-repeat scroll 5px -8423px;
+    background: #ccc url("../images/mega/nw-fm-sprite_v9.svg") no-repeat scroll 5px -8422px;
     cursor: pointer;
     float: right;
     margin-right: 13px;

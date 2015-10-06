@@ -3162,7 +3162,7 @@ function accountUI()
         });
         
         $('.grid-table.sessions tr').remove();
-        var html = '<tr><th>' + l[479] + '</th><th>' + l[480] + '</th><th>' + l[481] + '</th><th class="no-border">' + l[482] + '</th><th>&nbsp;</th></tr>';
+        var html = '<tr><th>' + l[479] + '</th><th>' + l[480] + '</th><th>' + l[481] + '</th><th class="no-border">' + l[482] + '</th><th class="no-border session-status">Status</th><th class="logout-column">Action</th></tr>';
         var sessions = $(account.sessions).each(function(i, el) {
             
             if (i == $.sessionlimit) {
@@ -3170,6 +3170,7 @@ function accountUI()
             }
             var country = countrydetails(el[4]);
             var browser = browserdetails(el[2]);
+            var dateTime = htmlentities(time2date(el[0]));
             var recent = '<span class="current-session-txt">' + l[483] + '</span>';
             
             // If not the current session
@@ -3177,11 +3178,11 @@ function accountUI()
                 
                 // If active
                 if (el[7]) {
-                    recent = '<span class="active-session-txt">' + 'Active session since ' + htmlentities(time2date(el[0])) + '</span>';
+                    recent = '<span class="active-session-txt">' + 'Active session' + '</span>';
                 }
                 else {
                     // If not active
-                    recent = 'Expired session created on ' + htmlentities(time2date(el[0])) + '</span>';
+                    recent = 'Expired session';
                 }
             }
             
@@ -3193,6 +3194,7 @@ function accountUI()
                 + '<td><span class="fm-browsers-icon"><img alt="" src="' + staticpath + 'images/browser/' + browser.icon + '" /></span><span class="fm-browsers-txt">' + htmlentities(browser.name) + '</span></td>'
                 + '<td>' + htmlentities(el[3]) + '</td>'
                 + '<td><span class="fm-flags-icon"><img alt="" src="' + staticpath + 'images/flags/' + country.icon + '" style="margin-left: 0px;" /></span><span class="fm-flags-txt">' + htmlentities(country.name) + '</span></td>'
+                + '<td>' + dateTime + '</td>'
                 + '<td>' + recent + '</td>';
         
             // If the session is active

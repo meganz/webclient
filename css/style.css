@@ -5357,9 +5357,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	background-repeat: no-repeat;
 	background-position: right -1529px;
 }
-.grid-table th.no-border {
-    background: none;
-}
 .files-grid-view.contacts-view th:first-child, .files-grid-view.contacts-view td:first-child, .contact-requests-grid th:first-child, .contact-requests-grid td:first-child, .grid-table.contact-requests tr td:first-child, .sent-requests-grid .grid-table tr td:first-child, .sent-requests-grid tr th:first-child {
 	padding-left: 16px;
 }
@@ -13174,20 +13171,27 @@ table {
 	-ms-transition: background-color 200ms ease-in-out;
 	transition: background-color 200ms
 }
+.active-session-txt, .current-session-txt {
+    min-width: 100px;
+    text-align: center;
+}
 .active-session-txt {
-    background-color: #ccc;
+    background-color: #2BA6DE;
+}
+.grid-table.sessions th.session-status {
+    width: 149px;
+}
+.grid-table.sessions th.logout-column {
+    width: 10%;
 }
 .fm-close-all-sessions {
     float: right;
-    margin: -7px 0 0 0;
     height: 32px;
+    margin: -7px 5px 0 0;
 }
-
 .fm-close-all-sessions span {
-    background: none;
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
-	background-repeat: no-repeat;
-	background-position: 5px -8423px;
+    background: rgba(255, 255, 255, 1) url("../images/mega/nw-fm-sprite_v9.svg") no-repeat scroll 2px -10081px;
+    text-indent: 5px;
 }
 .settings-logout {
     background: #ccc url("../images/mega/nw-fm-sprite_v9.svg") no-repeat scroll 5px -8422px;

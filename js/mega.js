@@ -6482,7 +6482,6 @@ function balance2pro(callback)
             $.dialog = false;
             fm_hideoverlay();
             $('.fm-dialog.export-links-dialog').addClass('hidden');
-            $('.export-links-warning').addClass('hidden');
             if (window.onCopyEventHandler) {
                 document.removeEventListener('copy', window.onCopyEventHandler, false);
                 delete window.onCopyEventHandler;
@@ -6506,7 +6505,6 @@ function balance2pro(callback)
 
         fm_showoverlay();
 
-        $('.export-links-warning').removeClass('hidden');
         $('.fm-dialog.export-links-dialog').removeClass('hidden');
         $('.export-link-body').removeAttr('style');
 

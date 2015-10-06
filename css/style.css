@@ -7944,25 +7944,6 @@ color: white;
 	top: 0;
 	cursor: pointer;
 }
-<<<<<<< HEAD
-.nw-contact-avatar, .nw-contact-avatar img, div.nw-chat-sharing-body, div.fm-chat-messages-pad, .block-view-file-type, .nw-chat-expand-arrow, .fm-chat-message, .nw-chat-sharing-body, .nw-chat-sharing-body div, .nw-contact-avatar img, .create-folder-button, a.create-folder-button, .add-user-popup-button, a.add-user-popup-button, .create-folder-button-cancel, .fm-dialog-new-folder-button, .fm-dialog, .fmholder div, .fmholder a, .fmholder span, .fmholder td, div.new-bottom-pages div.new-left-menu-link, div.new-bottom-pages a.dev-new-button, .fm-subfolders, .add-contact-item, .share-folder-info, .fm-dialog-header, .fm-share-body, .share-dialog div, .fm-chat-file-button, .reg-st3-membership-bl, .megasync-overlay, .collected-data li::before, .collected-data, .ui-datepicker * {
-	-webkit-touch-callout: none !important;
-	-webkit-user-select: none !important;
-	-khtml-user-select: none !important;
-	-moz-user-select: none !important;
-	-ms-user-select: none !important;
-	user-select: none !important;
-}
-.fm-chat-message span, div.nw-chat-sharing-filename, div.nw-chat-sharing-filesize, .nw-chat-date-txt, .fm-chat-smile, .properties-file-link, .contact-fingerprint-txt, .contact-fingerprint-txt span, .fingerprint-txt, .contact-details-user-name, .contact-details-email, .nw-contact-name, .fm-breadcrumbs.contact .right-arrow-bg span, div.new-download-file-title, .dev-nw *, .fmholder .dev-nw div, .fmholder div.new-affiliate-bg1 *, .fmholder div.main-mid-pad.new-bottom-pages *, .collected-data li, .export-item-title {
-	-webkit-touch-callout: text !important;
-	-webkit-user-select: text !important;
-	-khtml-user-select: text !important;
-	-moz-user-select: text !important;
-	-ms-user-select: text !important;
-	user-select: text !important;
-}
-=======
->>>>>>> develop
 .fmholder td {
 	cursor: default;
 }
@@ -10633,20 +10614,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	position: relative;
-<<<<<<< HEAD
-=======
-	font-size: 13px;
-	line-height: 25px;
-	padding: 0 25px 0 10px;
-	color: gray;
-	background-position: right -6596px;
-	background-image: url(../images/mega/main-sprite.png?v=7);
-	background-repeat: no-repeat;
-	cursor: pointer;
-	border: 2px solid rgba(0,0,0,0.15);
-	-webkit-background-clip: padding-box;
-	background-clip: padding-box;
->>>>>>> develop
 }
 .fm-share-dropdown {
 	margin: 10px -20px 0 0;
@@ -10889,17 +10856,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	display: table;
-<<<<<<< HEAD
-	-webkit-user-select: none;
-	-khtml-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
 }
 .export-link-item:nth-child(odd) {
 	background-color: rgba(0,0,0,0.02);
-=======
-	padding: 3px 0 0 0;
->>>>>>> develop
 }
 .export-icon {
 	height: 60px;
@@ -10917,17 +10876,8 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	width: 100%;
 }
 .export-link-txt {
-<<<<<<< HEAD
 	font-size: 14px;
 	line-height: 24px;
-=======
-	font-size: 13px;
-	line-height: 19px;
-	color: #D90007;
-	white-space: nowrap;
-}
-.export-link-txt:first-child {
->>>>>>> develop
 	color: #666666;
 	vertical-align: top;
 	padding-bottom: 5px;
@@ -10936,7 +10886,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	color: #333333;
 	font-size: 13px;
 	line-height: 21px;
-	padding: 0 0 0 0;
+	padding: 0 5px 0 0;
 	display: inline;
 	position: relative;
 	z-index: 10;
@@ -10961,22 +10911,22 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	color: #D90007;
 }
 .export-item-title {
-	display: inline-block;
+	display: table-cell;
 	max-width: 450px;
 	white-space: nowrap;
 	-o-text-overflow: ellipsis;
 	text-overflow: ellipsis;
 	overflow: hidden;
 	vertical-align: top;
+	padding-right: 10px;
 }
 .export-link-gray-txt {
 	color: #999999;
-	display: inline-block;
+	display: table-cell;
 	font-size: 14px;
 	line-height: 24px;
 	border-left: 2px solid rgba(0,0,0,0.05);
-	padding: 0 0 0 10px;
-	margin: 0 0 0 10px;
+	padding-left: 10px;
 	height: 24px;
 	vertical-align: top;
 }
@@ -18768,17 +18718,6 @@ h1.help-home-header {
 .new-bottom-pages .blog-new-full p.strong-paragraph.new-blog-icon {
 	color: #737477;
 }
-<<<<<<< HEAD
-.blog-new-full, .blog-new-full div, .blog-new-full p, .blog-new-full h1, .blog-new-full h2, .blog-new-full h3, div div.new-download-file-title, div div.nt-info-txt, div div.nt-main-date, .new-right-content-block div, .new-right-content-block p, .new-right-content-block h1, .new-right-content-block h2, .new-right-content-block h3, .new-right-content-block span, .fm-chat-messages-block div, .fm-chat-messages-block span, .fm-chat-messages-block a, div.new-bottom-pages div, div.new-bottom-pages h1, div.new-bottom-pages h2, div.new-bottom-pages h3, div.new-bottom-pages h4, div.new-bottom-pages h5, div.new-bottom-pages ul, div.new-bottom-pages span, div.new-bottom-pages p, div.new-bottom-pages a, .ff-right-block div, .ff-right-block p, .ff-right-block h1, .ff-right-block h2, .ff-right-block h3, .pro-gray-block div, .pro-gray-block p, .pro-gray-block h1, .pro-gray-block h2, .pro-gray-block h3, .sync-white-bl div, .sync-white-bl p, .sync-white-bl h1, .sync-white-bl h2, .sync-white-bl h3, .sync-top-txt, .sync-top-txt-block div, .sync-top-txt-block p, .sync-top-txt-block h1, .sync-top-txt-block h2, .blog-new-full td, .file-link-info {
-	-webkit-touch-callout: text;
-	-webkit-user-select: text;
-	-khtml-user-select: text;
-	-moz-user-select: text;
-	-ms-user-select: text;
-	user-select: text;
-}
-=======
->>>>>>> develop
 div.new-bottom-pages li, div.new-bottom-pages p {
 	text-align: justify;
 }
@@ -23332,15 +23271,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 	display: inline-block;
 	text-align: center;
 	width: 44px;
-<<<<<<< HEAD
-	-webkit-touch-callout: text !important;
-	-webkit-user-select: text !important;
-	-khtml-user-select: text !important;
-	-moz-user-select: text !important;
-	-ms-user-select: text !important;
-	user-select: text !important;
-=======
->>>>>>> develop
 }
 .credentials-warning-dialog .newCredentials span.mismatch {
 	color: #D90007;
@@ -24778,7 +24708,6 @@ div.camera-bottom-txt {
 .camera-bottom-icon.pause {
 	background-position: center -3405px;
 }
-<<<<<<< HEAD
 .copyrights-dialog-icon {
 	width: 100px;
 	height: 100px;
@@ -24898,9 +24827,7 @@ a.ui-datepicker-next {
 	-moz-appearance: none;
 	top: 10px;
 }
-=======
 /* Small font-size settings option */
->>>>>>> develop
 .fontsize1 .nw-fm-tree-header input {
 	margin: 12px 0 0 0;
 }
@@ -24914,7 +24841,7 @@ a.ui-datepicker-next {
 	font-size: 16px;
 }
 /* User select */
-.selectable, .selectable *, .fm-chat-message span, div.nw-chat-sharing-filename, div.nw-chat-sharing-filesize, .nw-chat-date-txt, .fm-chat-smile, .properties-file-link, .contact-fingerprint-txt *, .fingerprint-txt, .contact-details-user-name, .contact-details-email, .nw-contact-name, .fm-breadcrumbs.contact .right-arrow-bg span, div.new-download-file-title, .dev-nw *, .fmholder .dev-nw div, .fmholder div.new-affiliate-bg1 *, .fmholder div.main-mid-pad.new-bottom-pages *, .collected-data li, .export-item-title, .grid-table.vouchers *, .export-link-txt, .properties-file-txt, .wire-transfer-details *, .blog-new-ful *, div div.new-download-file-title, div div.nt-info-txt, div div.nt-main-date, .new-right-content-block *, .fm-chat-messages-block *, .ff-right-block *, .pro-gray-block *, .sync-white-bl *, .sync-top-txt, .sync-top-txt-block *, .blog-new-full *, .fingerprint > span, .fm-account-main *, .new-bottom-pages *, .export-link-url, .file-link-info, .nw-conversations-name, .active-folder-link .tranfer-filetype-txt, .active-folder-link .nw-fm-tree-folder, .active-folder-link .file-block-title, .fm-breadcrumbs span span {
+.selectable, .selectable *, .fm-chat-message span, div.nw-chat-sharing-filename, div.nw-chat-sharing-filesize, .nw-chat-date-txt, .fm-chat-smile, .properties-file-link, .contact-fingerprint-txt *, .fingerprint-txt, .contact-details-user-name, .contact-details-email, .nw-contact-name, .fm-breadcrumbs.contact .right-arrow-bg span, div.new-download-file-title, .dev-nw *, .fmholder .dev-nw div, .fmholder div.new-affiliate-bg1 *, .fmholder div.main-mid-pad.new-bottom-pages *, .collected-data li, .export-item-title, .grid-table.vouchers *, .export-item-title, .properties-file-txt, .wire-transfer-details *, .blog-new-ful *, div div.new-download-file-title, div div.nt-info-txt, div div.nt-main-date, .new-right-content-block *, .fm-chat-messages-block *, .ff-right-block *, .pro-gray-block *, .sync-white-bl *, .sync-top-txt, .sync-top-txt-block *, .blog-new-full *, .fingerprint > span, .fm-account-main *, .new-bottom-pages *, .export-link-url, .file-link-info, .nw-conversations-name, .active-folder-link .tranfer-filetype-txt, .active-folder-link .nw-fm-tree-folder, .active-folder-link .file-block-title, .fm-breadcrumbs span span, .export-link-text-pad * {
 	-webkit-touch-callout: text !important;
 	-webkit-user-select: text !important;
 	-khtml-user-select: text !important;

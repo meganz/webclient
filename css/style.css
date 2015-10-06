@@ -13200,7 +13200,7 @@ table {
 }
 .fm-close-all-sessions span {
     background: rgba(255, 255, 255, 1) url("../images/mega/nw-fm-sprite_v9.svg") no-repeat scroll -32px -8419px;
-    text-indent: 5px;
+    text-indent: 11px;
 }
 .settings-logout {
     background: #ccc url("../images/mega/nw-fm-sprite_v9.svg") no-repeat scroll 5px -8423px;

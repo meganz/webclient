@@ -3168,21 +3168,23 @@ function accountUI()
             if (i == $.sessionlimit) {
                 return false;
             }
-            var country = countrydetails(el[4]);
-            var browser = browserdetails(el[2]);
+            
             var dateTime = htmlentities(time2date(el[0]));
-            var recent = '<span class="current-session-txt">' + l[483] + '</span>';
+            var browser = browserdetails(el[2]);
+            var ipAddress = htmlentities(el[3]);
+            var country = countrydetails(el[4]);
+            var currentSession = el[5];
+            var sessionId = el[6];
+            var active = el[7];
+            var status = '<span class="current-session-txt">' + l[483] + '</span>';
             
             // If not the current session
-            if (!el[5]) {
-                
-                // If active
-                if (el[7]) {
-                    recent = '<span class="active-session-txt">' + 'Active session' + '</span>';
+            if (!currentSession) {
+                if (active) {
+                    status = '<span class="active-session-txt">' + 'Active session' + '</span>';
                 }
                 else {
-                    // If not active
-                    recent = 'Expired session';
+                    status = 'Expired session';
                 }
             }
             
@@ -3190,15 +3192,15 @@ function accountUI()
                 country.icon = 'ud.gif';
             }
             
-            html += '<tr class="' + (el[5] ? "current" : el[6]) +  '">'
+            html += '<tr class="' + (currentSession ? "current" : sessionId) +  '">'
                 + '<td><span class="fm-browsers-icon"><img alt="" src="' + staticpath + 'images/browser/' + browser.icon + '" /></span><span class="fm-browsers-txt">' + htmlentities(browser.name) + '</span></td>'
-                + '<td>' + htmlentities(el[3]) + '</td>'
+                + '<td>' + ipAddress + '</td>'
                 + '<td><span class="fm-flags-icon"><img alt="" src="' + staticpath + 'images/flags/' + country.icon + '" style="margin-left: 0px;" /></span><span class="fm-flags-txt">' + htmlentities(country.name) + '</span></td>'
                 + '<td>' + dateTime + '</td>'
-                + '<td>' + recent + '</td>';
+                + '<td>' + status + '</td>';
         
-            // If the session is active
-            if (el[7]) {
+            // If the session is active show logout button
+            if (active) {
                 html += '<td>' + '<span class="settings-logout">' + l[967] + '</span>' + '</td></tr>';
             }
             else {

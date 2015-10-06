@@ -13184,17 +13184,26 @@ table {
 .grid-table.sessions th.logout-column {
     width: 10%;
 }
+.fm-account-history .grey-bar {
+    background-color: #eeeeee;
+    border: 0 none;
+    clear: both;
+    margin: 0;
+    overflow: auto;
+    padding: 9px 19px;
+    text-align: right;
+}
 .fm-close-all-sessions {
-    float: right;
     height: 32px;
-    margin: -7px 5px 0 0;
+    margin: 0;
+    text-align: left;
 }
 .fm-close-all-sessions span {
-    background: rgba(255, 255, 255, 1) url("../images/mega/nw-fm-sprite_v9.svg") no-repeat scroll 2px -10081px;
+    background: rgba(255, 255, 255, 1) url("../images/mega/nw-fm-sprite_v9.svg") no-repeat scroll -32px -8419px;
     text-indent: 5px;
 }
 .settings-logout {
-    background: #ccc url("../images/mega/nw-fm-sprite_v9.svg") no-repeat scroll 5px -8422px;
+    background: #ccc url("../images/mega/nw-fm-sprite_v9.svg") no-repeat scroll 5px -8423px;
     cursor: pointer;
     float: right;
     margin-right: 13px;

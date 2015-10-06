@@ -3161,27 +3161,32 @@ function accountUI()
                 return -1;
         });
         $('.grid-table.sessions tr').remove();
-        var html = '<tr><th>' + l[479] + '</th><th>' + l[480] + '</th><th>' + l[481] + '</th><th>' + l[482] + '</th></tr>';
+        var html = '<tr><th>' + l[479] + '</th><th>' + l[480] + '</th><th>' + l[481] + '</th><th class="no-border">' + l[482] + '</th><th>&nbsp;</th></tr>';
         var sessions = $(account.sessions).filter(function(i, el) {
             return el[7];
-        }).each(function(i, el)
-        {
-            if (i == $.sessionlimit)
+        }).each(function(i, el) {
+            
+            if (i == $.sessionlimit) {
                 return false;
+            }
             var country = countrydetails(el[4]);
             var browser = browserdetails(el[2]);
-            var recent = '<span class="active-seccion-txt">' + l[483] + '</span>';
+            var recent = '<span class="current-session-txt">' + l[483] + '</span>';
+            
             if (!el[5]) {
-                recent = htmlentities(time2date(el[0]));
+                recent = '<span class="active-session-txt">' + 'Active session since ' + htmlentities(time2date(el[0])) + '</span>';
             }
-            recent += '<span class="settings-logout">' + l[967] + '</span>';
-            if (!country.icon || country.icon === '??.gif')
+            
+            if (!country.icon || country.icon === '??.gif') {
                 country.icon = 'ud.gif';
+            }
+            
             html += '<tr class="' + (el[5] ? "current" : el[6]) +  '">'
                 + '<td><span class="fm-browsers-icon"><img alt="" src="' + staticpath + 'images/browser/' + browser.icon + '" /></span><span class="fm-browsers-txt">' + htmlentities(browser.name) + '</span></td>'
                 + '<td>' + htmlentities(el[3]) + '</td>'
                 + '<td><span class="fm-flags-icon"><img alt="" src="' + staticpath + 'images/flags/' + country.icon + '" style="margin-left: 0px;" /></span><span class="fm-flags-txt">' + htmlentities(country.name) + '</span></td>'
-                + '<td>' + recent + '</td></tr>';
+                + '<td>' + recent + '</td>'
+                + '<td>' + '<span class="settings-logout">' + l[967] + '</span>' + '</td></tr>';
         });
         $('.grid-table.sessions').html(html);
 

@@ -330,7 +330,7 @@ function init_page() {
         init_blog();
     }
     else if (page.substr(0, 6) == 'verify') {
-        parsepage(pages['changepw']);
+        parsepage(pages['change_email']);
         verify_email();
     }
     else if (page.substr(0, 9) == 'corporate') {

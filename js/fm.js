@@ -3359,7 +3359,34 @@ function accountUI()
             }
             $(this).parent().find('.account-select-txt').text(val);
         });
-        $('#account-firstname,#account-lastname,#account-email').rebind('keyup', function(e)
+        $('.fm-account-change-email').rebind('click', function(e) {
+            var email = $('#account-email').val().trim().toLowerCase();
+            if (u_attr.email !== email) {
+                api_req({
+                    a:'se',
+                    aa:'a', 
+                    e: email,
+                    i: requesti,
+                },  {
+                    callback : function(res) {
+                        if (res === -12) {
+                            return msgDialog('warninga', 'Error', 'That email address already exists'); 
+                        }
+
+                        msgDialog('warninga', 'Email', "We've send you a link to your email address. Please open it to verify your account");
+                        localStorage.new_email = email;
+                    }
+                });
+            }
+        });
+        $('#account-email').rebind('keyup', function(e) {
+            if ($('#account-email').val() !== u_attr.email) {
+                $('.fm-account-change-email').addClass('active');
+            } else {
+                $('.fm-account-change-email').removeClass('active');
+            }
+        });
+        $('#account-firstname,#account-lastname').rebind('keyup', function(e)
         {
             $('.fm-account-save-block').removeClass('hidden');
             $('.fm-account-main').addClass('save');
@@ -3376,20 +3403,6 @@ function accountUI()
         $('.fm-account-save').unbind('click');
         $('.fm-account-save').bind('click', function(e)
         {
-            var email = $('#account-email').val().trim().toLowerCase();
-            if (u_attr.email !== email) {
-                api_req({
-                    a:'se',
-                    aa:'a', 
-                    e: email,
-                    i: requesti,
-                },  {
-                    callback : function(res) {
-                        localStorage.new_email = email;
-                    }
-                });
-            }
-            u_attr.email = email;
             u_attr.firstname = $('#account-firstname').val().trim();
             u_attr.lastname = $('#account-lastname').val().trim()||' ';
             u_attr.birthday = $('.fm-account-select.day select').val();

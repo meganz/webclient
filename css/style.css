@@ -12973,7 +12973,7 @@ table {
 .fm-account-profile .fm-account-info-block {
 	margin-left: 120px;
 }
-.fm-account-remove-avatar, .fm-account-change-avatar, .fm-account-save, .fm-account-cancel {
+.fm-account-remove-avatar, .fm-account-change-email, .fm-account-change-avatar, .fm-account-save, .fm-account-cancel {
 	height: 28px;
 	font-size: 14px;
 	line-height: 27px;
@@ -12995,12 +12995,19 @@ table {
 	-ms-transition: background-color 200ms ease-in-out;
 	transition: background-color 200ms
 }
+
+.fm-account-change-email.active:hover,
 .fm-account-change-avatar:hover, .fm-account-save:hover, .fm-account-cancel:hover {
 	background-color: rgba(213,38,0,1);
 }
 .fm-account-change-avatar {
 	padding: 0 10px;
 	margin: 37px 0 15px 0;
+}
+.fm-account-change-email {
+	padding: 0 10px;
+	margin: 11px 0 15px 15px;
+	background-color: #4c4c4c;
 }
 .fm-account-remove-avatar {
 	padding: 0 10px;
@@ -13009,6 +13016,9 @@ table {
 }
 .fm-account-remove-avatar:hover {
 	background-color: black;
+}
+.fm-account-change-email.active {
+	background-color: rgba(213,38,0,0.9);
 }
 .fm-account-save, .fm-account-cancel {
 	float: right;

@@ -3160,11 +3160,10 @@ function accountUI()
             else
                 return -1;
         });
+        
         $('.grid-table.sessions tr').remove();
         var html = '<tr><th>' + l[479] + '</th><th>' + l[480] + '</th><th>' + l[481] + '</th><th class="no-border">' + l[482] + '</th><th>&nbsp;</th></tr>';
-        var sessions = $(account.sessions).filter(function(i, el) {
-            return el[7];
-        }).each(function(i, el) {
+        var sessions = $(account.sessions).each(function(i, el) {
             
             if (i == $.sessionlimit) {
                 return false;
@@ -3173,8 +3172,17 @@ function accountUI()
             var browser = browserdetails(el[2]);
             var recent = '<span class="current-session-txt">' + l[483] + '</span>';
             
+            // If not the current session
             if (!el[5]) {
-                recent = '<span class="active-session-txt">' + 'Active session since ' + htmlentities(time2date(el[0])) + '</span>';
+                
+                // If active
+                if (el[7]) {
+                    recent = '<span class="active-session-txt">' + 'Active session since ' + htmlentities(time2date(el[0])) + '</span>';
+                }
+                else {
+                    // If not active
+                    recent = 'Expired session created on ' + htmlentities(time2date(el[0])) + '</span>';
+                }
             }
             
             if (!country.icon || country.icon === '??.gif') {
@@ -3185,8 +3193,15 @@ function accountUI()
                 + '<td><span class="fm-browsers-icon"><img alt="" src="' + staticpath + 'images/browser/' + browser.icon + '" /></span><span class="fm-browsers-txt">' + htmlentities(browser.name) + '</span></td>'
                 + '<td>' + htmlentities(el[3]) + '</td>'
                 + '<td><span class="fm-flags-icon"><img alt="" src="' + staticpath + 'images/flags/' + country.icon + '" style="margin-left: 0px;" /></span><span class="fm-flags-txt">' + htmlentities(country.name) + '</span></td>'
-                + '<td>' + recent + '</td>'
-                + '<td>' + '<span class="settings-logout">' + l[967] + '</span>' + '</td></tr>';
+                + '<td>' + recent + '</td>';
+        
+            // If the session is active
+            if (el[7]) {
+                html += '<td>' + '<span class="settings-logout">' + l[967] + '</span>' + '</td></tr>';
+            }
+            else {
+                html += '<td>&nbsp;</td>';
+            }
         });
         $('.grid-table.sessions').html(html);
 

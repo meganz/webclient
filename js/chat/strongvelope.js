@@ -248,11 +248,10 @@ var strongvelope = {};
         var nonceBytes = asmCrypto.string_to_bytes(nonce.substring(0, NONCE_SIZE));
         var cipherBytes = asmCrypto.string_to_bytes(cipher);
         var clearBytes = asmCrypto.AES_CTR.decrypt(cipherBytes, keyBytes, nonceBytes);
-        var clearBytes = asmCrypto.bytes_to_string(clearBytes);
+        var clearText = asmCrypto.bytes_to_string(clearBytes);
 
-        var clearText;
         try {
-            clearText = decodeURIComponent(escape(clearBytes));
+            clearText = decodeURIComponent(escape(clearText));
         }
         catch (e) {
             if (e instanceof URIError) {
@@ -478,8 +477,6 @@ var strongvelope = {};
      * @method
      * @param userhandle {String}
      *     Mega user handle for user to send to or receive from.
-     * @return {String}
-     *     Binary string containing a 256 bit symmetric encryption key.
      * @private
      */
     strongvelope.ProtocolHandler.prototype._updateSenderKey = function(userhandle) {

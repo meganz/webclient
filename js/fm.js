@@ -8525,6 +8525,46 @@ function getclipboardkeys() {
     return l;
 }
 
+/** 
+ * Show toast notification
+*/
+function showToast (toastClass, notification) {
+    var $toast,
+        interval;
+
+    $toast = $('.toast-notification.common-toast');
+    $toast.attr('class', 'toast-notification common-toast ' + toastClass).find('.toast-col:first-child').html(notification); 
+
+    clearInterval(interval);
+    $toast.addClass('visible');
+
+    interval = setInterval(function() {
+        hideToast(interval);
+    }, 5000);
+
+    $('.common-toast .toast-button').rebind('click', function(e)
+    {
+        $('.toast-notification').removeClass('visible');
+    });
+
+    $toast.rebind('mouseover', function(e)
+    {
+        clearInterval(interval);
+    });
+
+    $toast.rebind('mouseout', function(e)
+    {
+        interval = setInterval(function() {
+            hideToast(interval);
+        }, 5000);
+    });
+}
+
+function hideToast (int) {
+    $('.toast-notification.common-toast').removeClass('visible');
+    clearInterval(int);
+}
+
 /**
  * itemExportLinkHtml
  *
@@ -8542,7 +8582,7 @@ function itemExportLinkHtml(item) {
         type = 'F';
         key = u_sharekeys[item.h];
         fileSize = '';
-		folderClass = 'folder-item';
+        folderClass = 'folder-item';
     }
 
     // Shared item type is file
@@ -8563,7 +8603,7 @@ function itemExportLinkHtml(item) {
          +          '</div>'
          +          '<div class="file-link-block">'
          +              '<span class="file-link-info url" data-pseudo-content="' + l[7650] +'":">' + fileUrlWithoutKey + '</span>'
-         +          	'<span class="file-link-info key" data-pseudo-content="' + l[1028] +':">' + fileUrlKey + '</span>'
+         +              '<span class="file-link-info key" data-pseudo-content="' + l[1028] +':">' + fileUrlKey + '</span>'
          +          '</div>'
          +      '</div>'
          +  '</div>';

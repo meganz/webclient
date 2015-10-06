@@ -297,7 +297,7 @@ function MegaData()
         else if (n === 'status') {
             M.sortByStatus(d);
         }
-	else if (n === 'fav') {
+    else if (n === 'fav') {
             M.sortByFav(d);
         }
 
@@ -6500,8 +6500,8 @@ function balance2pro(callback)
         $('.export-links-dialog .export-link-body').html(html);
 
         // Default export option is
-		$('.export-link-select, .export-content-block').removeClass('public-handle decryption-key full-link').addClass('public-handle');
-		$('.export-link-select').html($('.export-link-dropdown div.public-handle').html());
+        $('.export-link-select, .export-content-block').removeClass('public-handle decryption-key full-link').addClass('public-handle');
+        $('.export-link-select').html($('.export-link-dropdown div.public-handle').html());
 
         fm_showoverlay();
 
@@ -6521,14 +6521,16 @@ function balance2pro(callback)
         }, 300);
 
         // Setup the copy to clipboard buttons
+        $('#clipboardbtn1 span').text(l[1990]);
+
         if (is_extension) {
             if (!is_chrome_firefox) {
                 $('.fm-dialog-chrome-clipboard').removeClass('hidden');
                 $("#chromeclipboard").fadeTo(1, 0.01);
             }
+
             // chrome & firefox extension:
             $("#clipboardbtn1").rebind('click', function() {
-
                 if (is_chrome_firefox) {
                     mozSetClipboard(getClipboardLinks());
                 }
@@ -6538,38 +6540,14 @@ function balance2pro(callback)
                     document.execCommand('copy');
                 }
             });
-
-            $('#clipboardbtn2').rebind('click', function() {
-
-                if (is_chrome_firefox) {
-                    mozSetClipboard(getclipboardkeys());
-                }
-                else {
-                    $('#chromeclipboard')[0].value = getclipboardkeys();
-                    $('#chromeclipboard').select();
-                    document.execCommand('copy');
-                }
-            });
-            $('#clipboardbtn1 span').text(l[370]);
-            $('#clipboardbtn2 span').text(l[1033]);
         }
         else if (flashIsEnabled()) {
-            $('#clipboardbtn1 span').html(htmlentities(l[370]) + '<object data="OneClipboard.swf" id="clipboardswf1" type="application/x-shockwave-flash"  width="100%" height="32" allowscriptaccess="always"><param name="wmode" value="transparent"><param value="always" name="allowscriptaccess"><param value="all" name="allowNetworkin"><param name=FlashVars value="buttonclick=1" /></object>');
-            $('#clipboardbtn2 span').html(htmlentities(l[1033]) + '<object data="OneClipboard.swf" id="clipboardswf2" type="application/x-shockwave-flash"  width="100%" height="32" allowscriptaccess="always"><param name="wmode" value="transparent"><param value="always" name="allowscriptaccess"><param value="all" name="allowNetworkin"><param name=FlashVars value="buttonclick=1" /></object>');
+            $('#clipboardbtn1').html('<span>' + htmlentities(l[1990]) + '</span><object data="OneClipboard.swf" id="clipboardswf1" type="application/x-shockwave-flash"  width="100%" height="32" allowscriptaccess="always"><param name="wmode" value="transparent"><param value="always" name="allowscriptaccess"><param value="all" name="allowNetworkin"><param name=FlashVars value="buttonclick=1" /></object>');
 
             $('#clipboardbtn1').rebind('mouseover', function() {
-
                 var e = $('#clipboardswf1')[0];
                 if (e && e.setclipboardtext) {
                     e.setclipboardtext(getClipboardLinks());
-                }
-            });
-
-            $('#clipboardbtn2').rebind('mouseover', function() {
-
-                var e = $('#clipboardswf2')[0];
-                if (e && e.setclipboardtext) {
-                    e.setclipboardtext(getclipboardkeys());
                 }
             });
         }
@@ -6582,17 +6560,11 @@ function balance2pro(callback)
                     var mode = links.indexOf("\n") !== -1 ? 'Text' : 'URL';
                     window.clipboardData.setData(mode, links);
                 });
-                $('#clipboardbtn2').rebind('click', function() {
-                    window.clipboardData.setData('Text', getclipboardkeys());
-                });
             }
             else {
-                Later(function() {
-                    $('input.export-link-url').focus().click();
-                });
 
                 if (window.ClipboardEvent) {
-                    $('#clipboardbtn1, #clipboardbtn2').rebind('click', function() {
+                    $('#clipboardbtn1').rebind('click', function() {
                         var doLinks = ($(this).attr('id') === 'clipboardbtn1');
                         var links = $.trim(doLinks ? getClipboardLinks() : getclipboardkeys());
                         var $span = $(this).find('span');
@@ -6608,11 +6580,10 @@ function balance2pro(callback)
                                 }).join("<br/>\n"));
                             }
                             ev.preventDefault();
-                            $span.text(l[726]); // Done
+                            $span.text(l[7656]); // Done
                         };
                         document.addEventListener('copy', window.onCopyEventHandler, false);
                         Soon(function() {
-                            $('input.export-link-url').focus().click();
                             // var ev = new ClipboardEvent('copy', { dataType: 'text/plain', data: links });
                             // document.dispatchEvent(ev);
                             $span.text('Hit ' + (uad.os === 'Apple' ? 'cmd':'ctrl') + '-c');
@@ -6622,49 +6593,44 @@ function balance2pro(callback)
                 else {
                     // Hide the clipboard buttons if not using the extension and Flash is disabled
                     $('#clipboardbtn1').addClass('hidden');
-                    $('#clipboardbtn2').addClass('hidden');
                 }
             }
 
-            $('#clipboardbtn1 span').text(l[370]);
-            $('#clipboardbtn2 span').text(l[1033]);
         }
+
+        $('#clipboardbtn1').rebind('mousedown', function() {
+            showToast('clipboard', l[7655]);
+            $(this).find('span').text(l[7656]);
+        });
 
         // Click anywhere on export link dialog will hide export link dropdown
         $('.export-links-dialog').rebind('click', function() {
             $('.export-link-dropdown').fadeOut(200);
         });
 
-        $('.export-links-warning-close').rebind('click', function() {
-            $('.export-links-warning').addClass('hidden');
-
-            // Stop propagation
-            return false;
-        });
-
         $('.export-links-dialog .fm-dialog-close').rebind('click', function() {
             self.linksDialog(1);
         });
 
-		$('.export-link-select').rebind('click', function() {
-			$('.export-link-dropdown').fadeIn(200);
+        $('.export-link-select').rebind('click', function() {
+            $('.export-link-dropdown').fadeIn(200);
 
             // Stop propagation
             return false;
-		});
+        });
 
-		// On Export File Links and Decryption Keys dropdown
-		$('.export-link-dropdown div').rebind('click', function() {
+        // On Export File Links and Decryption Keys dropdown
+        $('.export-link-dropdown div').rebind('click', function() {
 
-			var keyOption = $(this).attr('data-keyoptions');
+            var keyOption = $(this).attr('data-keyoptions');
 
-			$('.export-link-select, .export-content-block').removeClass('public-handle decryption-key full-link').addClass(keyOption);
-			$('.export-link-select').html($(this).html());
-			$('.export-link-dropdown').fadeOut(200);
+            $('.export-link-select, .export-content-block').removeClass('public-handle decryption-key full-link').addClass(keyOption);
+            $('.export-link-select').html($(this).html());
+            $('.export-link-dropdown').fadeOut(200);
 
             // Stop propagation
             return false;
-		});
+        });
     };
 
     // export

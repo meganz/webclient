@@ -12996,6 +12996,10 @@ table {
 	transition: background-color 200ms
 }
 
+.fm-account-change-email.active {
+	cursor: pointer;
+}
+
 .fm-account-change-email.active:hover,
 .fm-account-change-avatar:hover, .fm-account-save:hover, .fm-account-cancel:hover {
 	background-color: rgba(213,38,0,1);
@@ -13005,9 +13009,10 @@ table {
 	margin: 37px 0 15px 0;
 }
 .fm-account-change-email {
+	cursor: default;
 	padding: 0 10px;
 	margin: 11px 0 15px 15px;
-	background-color: #4c4c4c;
+	background-color: #c3c3c0;
 }
 .fm-account-remove-avatar {
 	padding: 0 10px;

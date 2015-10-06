@@ -4586,9 +4586,9 @@ function voucherData(arr)
             redeemed = tindex[varr[i].rdm][1];
             redeemed_email = tindex[varr[i].rdm][2];
         }
-        if (varr[i].xl)
+        if (varr[i].xl && tindex[varr[i].xl])
             cancelled = tindex[varr[i].xl][1];
-        if (varr[i].rvk)
+        if (varr[i].rvk && tindex[varr[i].rvk])
             revoked = tindex[varr[i].rvk][1];
         vouchers.push({
             id: varr[i].id,

@@ -6255,7 +6255,7 @@ table {
 }
 .export-icon.folder-shared, .export-icon.folder {
 	background-image: url(../images/mega/dialogs-sprite_v5.svg);
-	background-position: -10px -2680px;
+	background-position: -7px -2680px;
 }
 .dragger-icon.flash, .export-icon.flash, .new-download-file-icon.flash, .share-folder-icon div.flash {
 	background-position: center -4694px;

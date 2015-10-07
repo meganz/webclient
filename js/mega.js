@@ -5285,6 +5285,10 @@ function execsc(actionPackets, callback) {
                             $('#' + n.h + '.file-block .file-block-title').text(f.name);
                             $('#treea_' + n.h + ' .nw-fm-tree-folder').text(f.name);
 
+                            if (M.currentdirid === 'shares') {
+                                $('#' + n.h + ' .shared-folder-name').text(f.name);
+                            }
+
                             //@@@Todo: reposition elements according to sorting (if sorted by name)
                             if ($('#path_' + n.h).length > 0) {
                                 newpath = 1;

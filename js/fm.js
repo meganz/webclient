@@ -3160,26 +3160,103 @@ function accountUI()
             else
                 return -1;
         });
+        
         $('.grid-table.sessions tr').remove();
-        var html = '<tr><th>' + l[479] + '</th><th>' + l[480] + '</th><th>' + l[481] + '</th><th>' + l[482] + '</th></tr>';
-        $(account.sessions).each(function(i, el)
-        {
-            if (i == $.sessionlimit)
+        var html = '<tr><th>' + l[479] + '</th><th>' + l[480] + '</th><th>' + l[481] + '</th><th>' + l[482] + '</th><th class="no-border session-status">' + l[7664] + '</th><th class="no-border logout-column">&nbsp;</th></tr>';
+        var numActiveSessions = 0;
+        
+        $(account.sessions).each(function(i, el) {
+            
+            if (i == $.sessionlimit) {
                 return false;
-            var country = countrydetails(el[4]);
+            }
+            
+            var dateTime = htmlentities(time2date(el[0]));
             var browser = browserdetails(el[2]);
-            var recent = '<span class="active-seccion-txt">' + l[483] + '</span><span class="settings-logout">' + l[967] + '</span>';
-            if (!el[5])
-                recent = htmlentities(time2date(el[0]));
-            if (!country.icon || country.icon === '??.gif')
+            var ipAddress = htmlentities(el[3]);
+            var country = countrydetails(el[4]);
+            var currentSession = el[5];
+            var sessionId = el[6];
+            var activeSession = el[7];
+            var status = '<span class="current-session-txt">' + l[7665] + '</span>';    // Current
+            
+            // If not the current session
+            if (!currentSession) {
+                if (activeSession) {
+                    status = '<span class="active-session-txt">' + l[7666] + '</span>';     // Active
+                }
+                else {
+                    status = '<span class="expired-session-txt">' + l[1664] + '</span>';    // Expired
+                }
+            }
+            
+            if (!country.icon || country.icon === '??.gif') {
                 country.icon = 'ud.gif';
-            html += '<tr><td><span class="fm-browsers-icon"><img alt="" src="' + staticpath + 'images/browser/' + browser.icon + '" /></span><span class="fm-browsers-txt">' + htmlentities(browser.name) + '</span></td><td>' + htmlentities(el[3]) + '</td><td><span class="fm-flags-icon"><img alt="" src="' + staticpath + 'images/flags/' + country.icon + '" style="margin-left: 0px;" /></span><span class="fm-flags-txt">' + htmlentities(country.name) + '</span></td><td>' + recent + '</td></tr>';
+            }
+            
+            // Generate row html
+            html += '<tr class="' + (currentSession ? "current" : sessionId) +  '">'
+                + '<td><span class="fm-browsers-icon"><img alt="" src="' + staticpath + 'images/browser/' + browser.icon + '" /></span><span class="fm-browsers-txt">' + htmlentities(browser.name) + '</span></td>'
+                + '<td>' + ipAddress + '</td>'
+                + '<td><span class="fm-flags-icon"><img alt="" src="' + staticpath + 'images/flags/' + country.icon + '" style="margin-left: 0px;" /></span><span class="fm-flags-txt">' + htmlentities(country.name) + '</span></td>'
+                + '<td>' + dateTime + '</td>'
+                + '<td>' + status + '</td>';
+        
+            // If the session is active show logout button
+            if (activeSession) {
+                html += '<td>' + '<span class="settings-logout">' + l[967] + '</span>' + '</td></tr>';
+            }
+            else {
+                html += '<td>&nbsp;</td>';
+            }
+            
+            // If the current session or active then increment count
+            if (currentSession || activeSession) {
+                numActiveSessions++;
+            }
         });
         $('.grid-table.sessions').html(html);
 
-        $('.settings-logout').bind('click', function()
-        {
-            mLogout();
+        // Don't show button to close other sessions if there's only the current session
+        if (numActiveSessions === 1) {
+            $('.fm-close-all-sessions').hide();
+        }
+        
+        $('.fm-close-all-sessions').rebind('click', function() {
+            
+            loadingDialog.show();
+            
+            // Expire all sessions but not the current one
+            api_req({ a: 'usr', ko: 1 }, {
+                callback: function() {
+                    M.accountSessions(function() {
+                        loadingDialog.hide();
+                        accountUI();
+                    });
+                }
+            });
+        });
+
+        $('.settings-logout').rebind('click', function() {
+            var $this = $(this).parents('tr');
+            var sessionId = $this.attr('class');
+            if (sessionId === 'current') {
+                mLogout();
+            } else {
+                loadingDialog.show();
+                /* usr - user session remove
+                 * remove a session Id from the current user, 
+                 * usually other than the current session
+                 */
+                api_req({ a: 'usr', s: [sessionId] }, {
+                    callback: function(res, ctx) {
+                        M.accountSessions(function() {
+                            loadingDialog.hide();
+                            accountUI();
+                        });
+                    }
+                });
+            }
         });
 
         $('.account-history-dropdown-button.purchases').text(l[469].replace('[X]', $.purchaselimit));
@@ -9290,9 +9367,16 @@ function propertiesDialog(close)
         +'<span class="propreties-dark-txt">' + p.t7 + '</span></div><div class="properties-float-bl">'
         +'<div class="properties-small-gray">' + p.t8 + '</div><div class="propreties-dark-txt contact-list">' + p.t9
         +'<div class="contact-list-icon"></div></div></div>'
-        +'<div class="properties-float-bl"><div class="properties-small-gray">' + p.t10 + '</div>'
-        +'<div class="propreties-dark-txt">' + p.t11 + '</div></div></div>';
+        +'<div class="properties-float-bl"><div class="properties-small-gray t10">' + p.t10 + '</div>'
+        +'<div class="propreties-dark-txt t11">' + p.t11 + '</div></div></div>';
     $('.properties-txt-pad').html(html);
+	
+	if (typeof(p.t10) == 'undefined' && typeof(p.t11) == 'undefined')
+	{
+		$('.properties-small-gray.t10').addClass('hidden');
+		$('.propreties-dark-txt.t11').addClass('hidden');
+	}
+	
     pd.find('.file-settings-icon').rebind('click context', function(e) {
         if ($(this).attr('class').indexOf('active') == -1) {
             e.preventDefault();

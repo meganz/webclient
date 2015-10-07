@@ -3375,15 +3375,20 @@ function accountUI()
 
                         msgDialog('warninga', 'Email', "We've send you a link to your email address. Please open it to verify your account");
                         localStorage.new_email = email;
+                        $('.fm-account-change-email').removeClass('active');
                     }
                 });
             }
         });
         $('#account-email').rebind('keyup', function(e) {
-            if ($('#account-email').val() !== u_attr.email) {
-                $('.fm-account-change-email').addClass('active');
-            } else {
-                $('.fm-account-change-email').removeClass('active');
+            var $button = $('.fm-account-change-email');
+            var mail = $('#account-email').val();
+            $button.removeClass('active');
+            if (checkMail(mail)) {
+                return;
+            }
+            if (mail !== u_attr.email) {
+                $button.addClass('active');
             }
         });
         $('#account-firstname,#account-lastname').rebind('keyup', function(e)
@@ -3531,7 +3536,7 @@ function accountUI()
                 $('#account-confirm-password,#account-password,#account-new-password').val('');
             accountUI();
         });
-        $('#account-email').val(u_attr.email);
+        $('#account-email').attr('placeholder', u_attr.email);
         $('#account-firstname').val(u_attr.firstname);
         $('#account-lastname').val(u_attr.lastname);
         $('.account-history-dropdown-button').unbind('click');

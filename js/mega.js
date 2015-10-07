@@ -3699,7 +3699,7 @@ function MegaData()
                 id: n.h,
                 key: n.key,
                 n: n.name,
-                t: n.ts,
+                t: n.mtime || n.ts,
                 p: path,
                 size: n.s,
                 onDownloadProgress: this.dlprogress,

@@ -416,12 +416,32 @@ var strongvelope = {};
 
 
     /**
+     * An object containing a chat message as received from chatd.
+     *
+     * @typedef {Object} ChatdMessage
+     * @property {String} chatId
+     *     Unique ID of the chat. (Base64 URL encoded 64-bit value.)
+     * @property {Number} id
+     *     XXX What ID is this?
+     * @property {String} messageId
+     *     Unique ID of the individual message within the chat. (Base64 URL
+     *     encoded 64-bit value.)
+     * @property {String} userId
+     *     User handle of the sender.
+     * @property {Number} ts
+     *     UNIX epoch time stamp as an integer in seconds.
+     * @property {String} message
+     *     Message payload (encrypted).
+     */
+
+
+    /**
      * Manages keys, encryption and message encoding.
      *
      * Note: A new ProtocolHandler instance needs to be initialised. This can
-     *       either be done via seeding it with chat messages of the same chat's
-     *       history, or by calling the `#updateSenderKey()` method on newly
-     *       created or fresh chats.
+     *       either be done via seeding it with chat messages (calling #seed) of the same chat's
+     *       history, or by calling #updateSenderKey method on newly created or
+     *       fresh chats.
      *
      * @constructor
      * @param {String} [ownHandle]
@@ -451,9 +471,6 @@ var strongvelope = {};
      *     ID of our current sender key.
      * @property {String} previousKeyId
      *     ID of our previous sender key.
-     * @property {Array.<String>} participants
-     *     Array of user handles of current participants of the chat, sorted
-     *     by user handle.
      * @property {Object.<handle, ParticipantKeys>} participantKeys
      *     Collection of participant specific key information (including our own,
      *     @see {@link ParticipantKey} for all (past and present) participants.
@@ -475,9 +492,87 @@ var strongvelope = {};
         this.keyId = null;
         this.previousKeyId = null;
         this._sentKeyId = null;
-        this.participants = [];
         this.participantKeys = {};
         this.participantKeys[this.ownHandle] = {};
+    };
+
+
+    /**
+     * Seeds the handler with an array of historic messages to resume an
+     * existing chat session.  The messages for seeding must be contiguous and
+     * contain the most recent messages.  The order of the messages is not
+     * important.
+     *
+     * @method
+     * @param messages {Array.<ChatdMessage>}
+     *     Mega user handle for user to send to or receive from.
+     * @return {Boolean}
+     *     `true` on successful seeding, `false` on failure.
+     */
+    strongvelope.ProtocolHandler.prototype.seed = function(messages) {
+
+        var message;
+        var parsedMessage;
+        var isOwnMessage;
+        var otherHandle;
+        var decryptedKeys;
+
+        // Iterate over all messages to extract keys (if present).
+        for (var i = 0; i < messages.length; i++) {
+            message = messages[i];
+            parsedMessage = ns._parseMessageContent(message);
+            if (parsedMessage
+                    && (parsedMessage.type === MESSAGE_TYPES.GROUP_KEYED)) {
+                if (ns._verifyMessage(parsedMessage.signedContent,
+                                      parsedMessage.signature,
+                                      pubEd25519[message.userId])) {
+                    isOwnMessage = (message.userId === this.ownHandle);
+                    otherHandle = isOwnMessage
+                                ? parsedMessage.recipients[0]
+                                : message.userId;
+                    // Decrypt message key(s).
+                    decryptedKeys = this._decryptKeysFor(parsedMessage.keys[0],
+                                                         parsedMessage.nonce,
+                                                         otherHandle,
+                                                         isOwnMessage);
+                    if (!this.participantKeys[message.userId]) {
+                        this.participantKeys[message.userId] = {};
+                    }
+                    for (var j = 0; j < parsedMessage.keyIds.length; j++) {
+                        this.participantKeys[message.userId][parsedMessage.keyIds[j]] = decryptedKeys[j];
+                    }
+                }
+                else {
+                    logger.error('Signature invalid for message from '
+                                 + message.userId + ' on ' + message.ts);
+                }
+            }
+        }
+
+        // Find our own most recent (highest) sender key ID.
+        var highestKeyId = '';
+        var secondHighestKeyId = '';
+        var ownKeys = this.participantKeys[this.ownHandle];
+        for (var keyId in ownKeys) {
+            if (ownKeys.hasOwnProperty(keyId)) {
+                if (keyId > highestKeyId) {
+                    secondHighestKeyId = highestKeyId;
+                    highestKeyId = keyId;
+                }
+            }
+        }
+
+        if (highestKeyId === '') {
+            return false;
+        }
+
+        this.keyId = highestKeyId;
+
+        if (secondHighestKeyId) {
+            this.previousKeyId = secondHighestKeyId;
+        }
+
+        return true;
     };
 
 
@@ -508,6 +603,9 @@ var strongvelope = {};
                 counter = 0;
             }
             else {
+                if (counter >= 0xffff) {
+                    throw new Error('This should hardly happen, but 2^16 keys were used for the day. Bailing out!');
+                }
                 counter = (counter + 1) & 0xffff;
             }
         }

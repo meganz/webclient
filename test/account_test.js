@@ -58,7 +58,7 @@ describe("account unit test", function() {
                 var constructor = aPromise.constructor.name;
                 if (constructor === undefined) {
                     // Workaround for MSIE
-                    constructor = (String(aPromise.constructor).match(/^\s*function (\w+)/)||[]).pop();
+                    constructor = (String(aPromise.constructor).match(/^\s*function (\w+)/) || []).pop();
                 }
                 assert.strictEqual(constructor, 'MegaPromise');
                 assert.strictEqual(api_req.callCount, 1);

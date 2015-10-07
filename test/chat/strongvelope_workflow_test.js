@@ -66,13 +66,13 @@ describe("chat.strongvelope workflow test", function() {
                                                              ALICE_ED25519_PRIV,
                                                              ALICE_ED25519_PUB);
                 alice.rotateKeyEvery = 3;
-                alice._updateSenderKey();
+                alice.updateSenderKey();
                 var bob = new strongvelope.ProtocolHandler('bob45678900',
                                                            BOB_CU25519_PRIV,
                                                            BOB_ED25519_PRIV,
                                                            BOB_ED25519_PUB);
                 bob.rotateKeyEvery = 3;
-                bob._updateSenderKey();
+                bob.updateSenderKey();
 
                 var message;
                 var sent;

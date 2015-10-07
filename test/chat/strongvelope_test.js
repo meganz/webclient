@@ -70,6 +70,17 @@ describe("chat.strongvelope unit test", function() {
         keyIds: [ROTATED_KEY_ID, KEY_ID],
         payload: atob('H78adfMY')
     };
+    var REMINDER_MESSAGE_BIN = atob('AAEAAECWWeq2AssT4zlybDfddKrp2g8Latu5VmXWmJBFjiD9nF5iLjxrCeUgKhxmK34vigrsJc42oQj6v0pjiolrGGYPAgAAAQADAAAM71BrlkBJXmR5xRtMBAAACMqLuOeu/PccBQAAEFk7mB4YHHMOQdLukN+74uoGAAAEQUkAAQ==');
+    var REMINDER_MESSAGE = {
+        protocolVersion: 0,
+        signature:  atob('llnqtgLLE+M5cmw33XSq6doPC2rbuVZl1piQRY4g/ZxeYi48awnlICocZit+L4oK7CXONqEI+r9KY4qJaxhmDw=='),
+        signedContent: atob('AgAAAQADAAAM71BrlkBJXmR5xRtMBAAACMqLuOeu/PccBQAAEFk7mB4YHHMOQdLukN+74uoGAAAEQUkAAQ=='),
+        type: 0x00,
+        nonce: atob('71BrlkBJXmR5xRtM'),
+        recipients: ['you456789xw'],
+        keys: [atob('WTuYHhgccw5B0u6Q37vi6g==')],
+        keyIds: [ROTATED_KEY_ID]
+    };
 
     // Create/restore Sinon stub/spy/mock sandboxes.
     var sandbox = null;
@@ -153,13 +164,7 @@ describe("chat.strongvelope unit test", function() {
                 var counter = 0;
                 var _getRandomValues = function(x) {
                     counter++;
-                    var value;
-                    if (counter === 1) {
-                        value = 'a new secret key';
-                    }
-                    else {
-                        value = 'gooniegoogoo';
-                    }
+                    var value = (counter === 1) ? 'a new secret key' : 'gooniegoogoo';
                     return _copy(value)(x);
                 };
                 sandbox.stub(asmCrypto, 'getRandomValues', _getRandomValues);
@@ -176,6 +181,26 @@ describe("chat.strongvelope unit test", function() {
                 assert.strictEqual(unescape.callCount, 1);
                 assert.strictEqual(asmCrypto.AES_CTR.encrypt.callCount, 1);
                 assert.strictEqual(asmCrypto.bytes_to_string.callCount, 3);
+            });
+
+            it("no message conten", function() {
+                var counter = 0;
+                var _getRandomValues = function(x) {
+                    counter++;
+                    var value = (counter % 2 === 1) ? KEY : NONCE;
+                    return _copy(value)(x);
+                };
+                sandbox.stub(asmCrypto, 'getRandomValues', _getRandomValues);
+                var tests = [null, undefined];
+                var result;
+
+                for (var i = 0; i < tests.length; i++) {
+                    result = ns._symmetricEncryptMessage(tests[i]);
+                    assert.deepEqual(result, { ciphertext: null,
+                                               key: KEY,
+                                               nonce: atob('MTHgl79y+1FFnmno') });
+                    assert.strictEqual(asmCrypto.getRandomValues.callCount, 2 * (i + 1));
+                }
             });
         });
 
@@ -201,6 +226,11 @@ describe("chat.strongvelope unit test", function() {
             it("no mocks", function() {
                 var result = ns._symmetricDecryptMessage(atob('PqG4NXmumTUS'), KEY, NONCE);
                 assert.strictEqual(result, 'forty two');
+            });
+
+            it("no mocks, empty message", function() {
+                var result = ns._symmetricDecryptMessage('', KEY, NONCE);
+                assert.strictEqual(result, '');
             });
 
             it("decryption fails", function() {
@@ -290,10 +320,66 @@ describe("chat.strongvelope unit test", function() {
                 var result = ns._parseMessageContent(ROTATION_MESSAGE_BIN);
                 assert.deepEqual(result, ROTATION_MESSAGE);
             });
+
+            it("reminder message", function() {
+                var result = ns._parseMessageContent(REMINDER_MESSAGE_BIN);
+                assert.deepEqual(result, REMINDER_MESSAGE);
+            });
         });
     });
 
     describe('ProtocolHandler class', function() {
+        describe('updateSenderKey', function() {
+            it("initial usage", function() {
+                var handler = new ns.ProtocolHandler('me3456789xw',
+                    CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
+                sandbox.stub(window, 'pubCu25519', { 'you456789xw': 'your key' });
+                sandbox.stub(ns, '_dateStampNow').returns(16713);
+                sandbox.stub(asmCrypto, 'getRandomValues', _copy(KEY));
+                handler.updateSenderKey();
+                assert.strictEqual(handler.keyId, KEY_ID);
+                assert.strictEqual(handler.previousKeyId, null);
+                assert.deepEqual(handler.participantKeys['me3456789xw'],
+                    { 'AI\u0000\u0000': KEY });
+                assert.strictEqual(handler._keyEncryptionCount, 0);
+            });
+
+            it("key rotation", function() {
+                var handler = new ns.ProtocolHandler('me3456789xw',
+                    CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
+                handler.keyId = KEY_ID;
+                handler.participantKeys = { 'me3456789xw': { 'AI\u0000\u0000': KEY} };
+                handler._keyEncryptionCount = 16;
+                sandbox.stub(window, 'pubCu25519', { 'you456789xw': 'your key' });
+                sandbox.stub(ns, '_dateStampNow').returns(16713);
+                sandbox.stub(asmCrypto, 'getRandomValues', _copy(ROTATED_KEY));
+                handler.updateSenderKey();
+                assert.strictEqual(handler.keyId, ROTATED_KEY_ID);
+                assert.strictEqual(handler.previousKeyId, KEY_ID);
+                assert.deepEqual(handler.participantKeys['me3456789xw'],
+                    { 'AI\u0000\u0000': KEY, 'AI\u0000\u0001': ROTATED_KEY });
+                assert.strictEqual(handler._keyEncryptionCount, 0);
+            });
+
+            it("key rotation with new day", function() {
+
+                var handler = new ns.ProtocolHandler('me3456789xw',
+                    CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
+                handler.keyId = KEY_ID;
+                handler.participantKeys = { 'me3456789xw': { 'AI\u0000\u0000': KEY} };
+                handler._keyEncryptionCount = 16;
+                sandbox.stub(window, 'pubCu25519', { 'you456789xw': 'your key' });
+                sandbox.stub(ns, '_dateStampNow').returns(16714);
+                sandbox.stub(asmCrypto, 'getRandomValues', _copy(ROTATED_KEY));
+                handler.updateSenderKey();
+                assert.strictEqual(handler.keyId, 'AJ\u0000\u0000');
+                assert.strictEqual(handler.previousKeyId, KEY_ID);
+                assert.deepEqual(handler.participantKeys['me3456789xw'],
+                    { 'AI\u0000\u0000': KEY, 'AJ\u0000\u0000': ROTATED_KEY });
+                assert.strictEqual(handler._keyEncryptionCount, 0);
+            });
+        });
+
         describe('_computeSymmetricKey', function() {
             it("normal operation", function() {
                 var handler = new ns.ProtocolHandler('me3456789xw',
@@ -519,6 +605,66 @@ describe("chat.strongvelope unit test", function() {
                 assert.strictEqual(handler._keyEncryptionCount, 1);
             });
 
+            it("keyed, key reminder on reaching total message count, no mocks", function() {
+                var handler = new ns.ProtocolHandler('me3456789xw',
+                    CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
+                handler.keyId = ROTATED_KEY_ID;
+                handler.participantKeys = { 'me3456789xw':
+                    { 'AI\u0000\u0000': KEY, 'AI\u0000\u0001': ROTATED_KEY } }
+                handler._sentKeyId = ROTATED_KEY_ID;
+                handler._keyEncryptionCount = 5;
+                handler._totalMessagesWithoutSendKey = 30;
+                sandbox.stub(window, 'u_handle', 'me3456789xw');
+                sandbox.stub(window, 'u_privEd25519', ED25519_PRIV_KEY);
+                sandbox.stub(window, 'u_pubEd25519', ED25519_PUB_KEY);
+                sandbox.stub(window, 'u_privCu25519', CU25519_PRIV_KEY);
+                sandbox.stub(window, 'pubCu25519', { 'you456789xw': CU25519_PUB_KEY });
+                sandbox.stub(ns, '_symmetricEncryptMessage').returns(
+                    { key: ROTATED_KEY, nonce: atob('71BrlkBJXmR5xRtM'),
+                      ciphertext: atob('H78adfMY') });
+
+                var result = handler.encryptTo('Hello!', 'you456789xw');
+                assert.strictEqual(result.length, 140);
+                assert.strictEqual(handler.keyId, ROTATED_KEY_ID);
+                assert.strictEqual(handler._sentKeyId, ROTATED_KEY_ID);
+                assert.deepEqual(handler.participantKeys,
+                    { 'me3456789xw': { 'AI\u0000\u0000': KEY,
+                                       'AI\u0000\u0001': ROTATED_KEY } });
+                assert.strictEqual(handler._keyEncryptionCount, 6);
+                assert.strictEqual(handler._totalMessagesWithoutSendKey, 1);
+            });
+
+            it("keyed, key reminder on reaching total message count, no content, no mocks", function() {
+                var handler = new ns.ProtocolHandler('me3456789xw',
+                    CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
+                handler.keyId = ROTATED_KEY_ID;
+                handler.participantKeys = { 'me3456789xw':
+                    { 'AI\u0000\u0000': KEY, 'AI\u0000\u0001': ROTATED_KEY } }
+                handler._sentKeyId = ROTATED_KEY_ID;
+                handler._keyEncryptionCount = 5;
+                handler._totalMessagesWithoutSendKey = 30;
+                sandbox.stub(window, 'u_handle', 'me3456789xw');
+                sandbox.stub(window, 'u_privEd25519', ED25519_PRIV_KEY);
+                sandbox.stub(window, 'u_pubEd25519', ED25519_PUB_KEY);
+                sandbox.stub(window, 'u_privCu25519', CU25519_PRIV_KEY);
+                sandbox.stub(window, 'pubCu25519', { 'you456789xw': CU25519_PUB_KEY });
+                sandbox.stub(ns, '_symmetricEncryptMessage').returns(
+                    { key: ROTATED_KEY, nonce: atob('71BrlkBJXmR5xRtM'),
+                      ciphertext: null });
+              sandbox.stub(ns, '_signMessage').returns(REMINDER_MESSAGE.signature);
+
+                var result = handler.encryptTo(null, 'you456789xw');
+                assert.strictEqual(btoa(result), btoa(REMINDER_MESSAGE_BIN));
+                assert.strictEqual(result.length, 130);
+                assert.strictEqual(handler.keyId, ROTATED_KEY_ID);
+                assert.strictEqual(handler._sentKeyId, ROTATED_KEY_ID);
+                assert.deepEqual(handler.participantKeys,
+                    { 'me3456789xw': { 'AI\u0000\u0000': KEY,
+                                       'AI\u0000\u0001': ROTATED_KEY } });
+                assert.strictEqual(handler._keyEncryptionCount, 5);
+                assert.strictEqual(handler._totalMessagesWithoutSendKey, 1);
+            });
+
             it("followup message", function() {
                 var handler = new ns.ProtocolHandler('me3456789xw',
                     CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
@@ -586,7 +732,7 @@ describe("chat.strongvelope unit test", function() {
                 sandbox.stub(window, 'u_pubEd25519', ED25519_PUB_KEY);
                 sandbox.stub(window, 'u_privCu25519', CU25519_PRIV_KEY);
                 sandbox.stub(window, 'pubCu25519', { 'you456789xw': CU25519_PUB_KEY });
-                sandbox.stub(handler, '_updateSenderKey', function() {
+                sandbox.stub(handler, 'updateSenderKey', function() {
                     handler.keyId = ROTATED_KEY_ID;
                     handler.participantKeys['me3456789xw'][ROTATED_KEY_ID] = ROTATED_KEY;
                     handler.previousKeyId = KEY_ID;
@@ -595,7 +741,7 @@ describe("chat.strongvelope unit test", function() {
                 sandbox.stub(ns, '_symmetricEncryptMessage').returns(
                     { key: ROTATED_KEY, nonce: atob('71BrlkBJXmR5xRtM'),
                       ciphertext: atob('H78adfMY') });
-                // sandbox.stub(ns, '_signMessage').returns(ROTATION_MESSAGE.signature);
+                sandbox.stub(ns, '_signMessage').returns(ROTATION_MESSAGE.signature);
 
                 var result = handler.encryptTo('Hello!', 'you456789xw');
                 assert.strictEqual(btoa(result), btoa(ROTATION_MESSAGE_BIN));
@@ -787,6 +933,56 @@ describe("chat.strongvelope unit test", function() {
                 assert.strictEqual(handler._decryptKeysFor.callCount, 1);
                 assert.deepEqual(handler.participantKeys['me3456789xw'],
                     { 'AI\u0000\u0000': KEY, 'AI\u0000\u0001': ROTATED_KEY });
+            });
+
+            it("produces key reminder on total count", function() {
+                var handler = new ns.ProtocolHandler('you456789xw',
+                    CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
+                handler._keyEncryptionCount = 5;
+                handler._totalMessagesWithoutSendKey = 30;
+                handler.encryptTo = sinon.stub().returns('key reminder message');
+                sandbox.stub(window, 'pubEd25519', { 'me3456789xw': ED25519_PUB_KEY });
+                sandbox.stub(ns, '_parseMessageContent').returns(testutils.clone(ROTATION_MESSAGE));
+                sandbox.stub(ns, '_verifyMessage').returns(true);
+                sandbox.stub(handler, '_decryptKeysFor').returns([ROTATED_KEY, KEY]);
+
+                var result = handler.decryptFrom(ROTATION_MESSAGE_BIN, 'me3456789xw');
+                assert.deepEqual(result, {
+                    sender: 'me3456789xw',
+                    type: 0,
+                    payload: 'Hello!',
+                    toSend: 'key reminder message'
+                });
+                assert.strictEqual(ns._parseMessageContent.callCount, 1);
+                assert.strictEqual(ns._verifyMessage.callCount, 1);
+                assert.strictEqual(handler._decryptKeysFor.callCount, 1);
+                assert.deepEqual(handler.participantKeys['me3456789xw'],
+                    { 'AI\u0000\u0000': KEY, 'AI\u0000\u0001': ROTATED_KEY });
+            });
+
+            it("key reminder message", function() {
+                var handler = new ns.ProtocolHandler('you456789xw',
+                    CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
+                handler.participantKeys = {'me3456789xw':
+                    { 'AI\u0000\u0000': KEY, 'AI\u0000\u0001': ROTATED_KEY } };
+                handler._totalMessagesWithoutSendKey = 5;
+                sandbox.stub(window, 'pubEd25519', { 'me3456789xw': ED25519_PUB_KEY });
+                sandbox.stub(ns, '_parseMessageContent').returns(testutils.clone(REMINDER_MESSAGE));
+                sandbox.stub(ns, '_verifyMessage').returns(true);
+                sandbox.stub(handler, '_decryptKeysFor').returns([ROTATED_KEY]);
+
+                var result = handler.decryptFrom(REMINDER_MESSAGE_BIN, 'me3456789xw');
+                assert.deepEqual(result, {
+                    sender: 'me3456789xw',
+                    type: 0,
+                    payload: null
+                });
+                assert.strictEqual(ns._parseMessageContent.callCount, 1);
+                assert.strictEqual(ns._verifyMessage.callCount, 1);
+                assert.strictEqual(handler._decryptKeysFor.callCount, 1);
+                assert.deepEqual(handler.participantKeys['me3456789xw'],
+                    { 'AI\u0000\u0000': KEY, 'AI\u0000\u0001': ROTATED_KEY });
+                assert.strictEqual(handler._totalMessagesWithoutSendKey, 6);
             });
         });
     });

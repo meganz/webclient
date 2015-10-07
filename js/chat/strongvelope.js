@@ -42,8 +42,8 @@ var strongvelope = {};
     /** After how many messages our symmetric sender key is rotated. */
     strongvelope.ROTATE_KEY_EVERY = 16;
 
-    /** After how many messages our symmetric sender key is rotated. */
-    strongvelope.SEND_KEY_EVERY_RECEIVED = 24;
+    /** How many messages our handler should "see" before re-sending our sender key. */
+    strongvelope.TOTAL_MESSAGES_BEFORE_SEND_KEY = 30;
 
     /** Size (in bytes) of the secret/symmetric encryption key. */
     var SECRET_KEY_SIZE = 16;
@@ -113,14 +113,10 @@ var strongvelope = {};
      *     Data message containing a new sender key (initial or key rotation).
      * @property GROUP_CONTINUE {Number}
      *     Data message using an existing sender key for encryption.
-     * @property SIMPLE_TWO_PARTY {Number}
-     *     Data message without transfer of a symmetric encryption key (using
-     *     shared DH secret and nonce only).
      */
     var MESSAGE_TYPES = {
         GROUP_KEYED:        0x00,
-        GROUP_FOLLOWUP:     0x01,
-        SIMPLE_TWO_PARTY:   0x02,
+        GROUP_FOLLOWUP:     0x01
     };
     strongvelope.MESSAGE_TYPES = MESSAGE_TYPES;
 
@@ -182,7 +178,8 @@ var strongvelope = {};
      * Note: Nonces longer than the used NONCE_SIZE bytes are truncated.
      *
      * @param message {String}
-     *     Plain text message.
+     *     Plain text message. If `null` or `undefined` the ciphertext will be
+     *     `null`.
      * @param key {String}
      *     Symmetric encryption key in a binary string. If omitted, a fresh
      *     key will be generated.
@@ -216,10 +213,12 @@ var strongvelope = {};
             asmCrypto.getRandomValues(nonceBytes);
         }
 
-        var clearBytes = asmCrypto.string_to_bytes(unescape(encodeURIComponent(message)));
-        var cipherBytes = asmCrypto.AES_CTR.encrypt(clearBytes, keyBytes, nonceBytes);
+        if ((message !== null) && (typeof message !== 'undefined')) {
+            var clearBytes = asmCrypto.string_to_bytes(unescape(encodeURIComponent(message)));
+            var cipherBytes = asmCrypto.AES_CTR.encrypt(clearBytes, keyBytes, nonceBytes);
+            result.ciphertext = asmCrypto.bytes_to_string(cipherBytes);
+        }
 
-        result.ciphertext = asmCrypto.bytes_to_string(cipherBytes);
         result.key = asmCrypto.bytes_to_string(keyBytes);
         result.nonce = asmCrypto.bytes_to_string(nonceBytes);
 
@@ -408,11 +407,21 @@ var strongvelope = {};
      *     Type of message.
      * @property {String} payload
      *     Message content/payload.
+     * @property {String} toSend
+     *     An optional element, containing a "blind" management message (no
+     *     payload) to a recipient containing our current sender key. This
+     *     message will contain the current sender key only (as it may leak a
+     *     previous key to new group chat participants).
      */
 
 
     /**
      * Manages keys, encryption and message encoding.
+     *
+     * Note: A new ProtocolHandler instance needs to be initialised. This can
+     *       either be done via seeding it with chat messages of the same chat's
+     *       history, or by calling the `#updateSenderKey()` method on newly
+     *       created or fresh chats.
      *
      * @constructor
      * @param {String} [ownHandle]
@@ -460,8 +469,9 @@ var strongvelope = {};
             this.pubEd25519 = crypt.getPubKeyFromPrivKey(this.privEd25519, 'Ed25519');
         }
         this.rotateKeyEvery = strongvelope.ROTATE_KEY_EVERY;
-        this.sendKeyEveryReceived = strongvelope.SEND_KEY_EVERY_RECEIVED;
+        this.totalMessagesBeforeSendKey = strongvelope.TOTAL_MESSAGES_BEFORE_SEND_KEY;
         this._keyEncryptionCount = 0;
+        this._totalMessagesWithoutSendKey = 0;
         this.keyId = null;
         this.previousKeyId = null;
         this._sentKeyId = null;
@@ -472,14 +482,15 @@ var strongvelope = {};
 
 
     /**
-     * Refreshes our own sender key.
+     * Refreshes our own sender key. This method is also to be used to
+     * initialise a new ProtocolHandler for a new chat session that is *not*
+     * primed via historic messages.
      *
      * @method
      * @param userhandle {String}
      *     Mega user handle for user to send to or receive from.
-     * @private
      */
-    strongvelope.ProtocolHandler.prototype._updateSenderKey = function(userhandle) {
+    strongvelope.ProtocolHandler.prototype.updateSenderKey = function(userhandle) {
 
         var dateStamp;
         var counter;
@@ -512,6 +523,7 @@ var strongvelope = {};
         this.participantKeys[this.ownHandle][this.keyId] = asmCrypto.bytes_to_string(secretKey);
 
         this._keyEncryptionCount = 0;
+        this._totalMessagesWithoutSendKey = 0;
     };
 
 
@@ -630,7 +642,8 @@ var strongvelope = {};
      *
      * @method
      * @param {String} message
-     *     Data message to encrypt.
+     *     Data message to encrypt. If `null` or `undefined`, no message payload
+     *     will be encoded (i. e. it's a "blind" management message).
      * @param {String} destination
      *     User handle of the recipient.
      * @returns {String}
@@ -643,27 +656,30 @@ var strongvelope = {};
 
         // Check and rotate key if due.
         if (this._keyEncryptionCount >= this.rotateKeyEvery) {
-            this._updateSenderKey();
+            this.updateSenderKey();
         }
 
         var senderKey = this.participantKeys[this.ownHandle][this.keyId];
         var encryptedMessage = ns._symmetricEncryptMessage(message, senderKey);
 
         var keyIds = this.keyId;
-        if (this._sentKeyId === this.keyId) {
-            // Use a (leaner) followup message if the sender key's been sent already.
-            messageType = MESSAGE_TYPES.GROUP_FOLLOWUP;
-        }
-        else {
-            // Default keyed message.
+        var repeatKey = (this._totalMessagesWithoutSendKey >= this.totalMessagesBeforeSendKey);
+        if (repeatKey || (this._sentKeyId !== this.keyId)) {
+            // Default: Keyed message.
             var keysIncluded = [senderKey];
-            if (this.previousKeyId) {
+            if (this.previousKeyId && !repeatKey) {
+                // Include previous sender key on key rotation only.
                 keysIncluded.push(this.participantKeys[this.ownHandle][this.previousKeyId]);
                 keyIds += this.previousKeyId;
             }
             encryptedKeys = this._encryptKeysFor(keysIncluded, encryptedMessage.nonce,
                                                  destination);
             messageType = MESSAGE_TYPES.GROUP_KEYED;
+            this._totalMessagesWithoutSendKey = 0;
+        }
+        else {
+            // Use a (leaner) followup message and avoid re-sending key(s).
+            messageType = MESSAGE_TYPES.GROUP_FOLLOWUP;
         }
 
         // Assemble message content.
@@ -686,8 +702,13 @@ var strongvelope = {};
             content += tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.KEY_IDS),
                                             this.keyId);
         }
-        content += tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.PAYLOAD),
-                                        encryptedMessage.ciphertext);
+
+        // Only include ciphertext if it's not empty (non-blind message).
+        if (encryptedMessage.ciphertext !== null) {
+            content += tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.PAYLOAD),
+                                            encryptedMessage.ciphertext);
+            this._keyEncryptionCount++;
+        }
 
         // Sign message.
         var signature = ns._signMessage(content,
@@ -695,7 +716,9 @@ var strongvelope = {};
         content = tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.SIGNATURE),
                                        signature)
                 + content;
-        this._keyEncryptionCount++;
+
+        // Update message counters.
+        this._totalMessagesWithoutSendKey++;
 
         // Return assembled total message.
         return String.fromCharCode(PROTOCOL_VERSION) + content;
@@ -710,10 +733,13 @@ var strongvelope = {};
      *     Data message to encrypt.
      * @param {String} sender
      *     User handle of the message sender.
+     * @param {Boolean} [historicMessage=false]
+     *     Whether the message passed in for decryption is a from the history.
      * @returns {(StrongvelopeMessage|Boolean)}
      *     The message content on success, `false` in case of errors.
      */
-    strongvelope.ProtocolHandler.prototype.decryptFrom = function(message, sender) {
+    strongvelope.ProtocolHandler.prototype.decryptFrom = function(message,
+            sender, historicMessage) {
 
         var parsedMessage = ns._parseMessageContent(message);
 
@@ -743,7 +769,7 @@ var strongvelope = {};
         // Get sender key.
         var senderKey;
         var keyId = parsedMessage.keyIds[0];
-        if (parsedMessage.keys.length  > 0) {
+        if (parsedMessage.keys.length > 0) {
             var isOwnMessage = (sender === this.ownHandle);
             var otherHandle = isOwnMessage ? parsedMessage.recipients[0] : sender;
             // Decrypt message key(s).
@@ -787,9 +813,15 @@ var strongvelope = {};
         }
 
         // Decrypt message payload.
-        var cleartext = ns._symmetricDecryptMessage(parsedMessage.payload,
+        var cleartext;
+        if (typeof parsedMessage.payload !== 'undefined') {
+            cleartext = ns._symmetricDecryptMessage(parsedMessage.payload,
                                                     senderKey,
                                                     parsedMessage.nonce);
+        }
+        else {
+            cleartext = null;
+        }
 
         // Bail out if decryption failed.
         if (cleartext === false) {
@@ -801,6 +833,15 @@ var strongvelope = {};
             type: parsedMessage.type,
             payload: cleartext
         };
+
+        if (this._totalMessagesWithoutSendKey >= this.totalMessagesBeforeSendKey) {
+            result.toSend = this.encryptTo(null, sender);
+        }
+
+        // Update counter.
+        if (!historicMessage) {
+            this._totalMessagesWithoutSendKey++;
+        }
 
         return result;
     };

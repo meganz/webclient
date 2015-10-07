@@ -13183,51 +13183,51 @@ table {
 	transition: background-color 200ms
 }
 .active-session-txt, .current-session-txt, .expired-session-txt {
-    text-align: center;
+	text-align: center;
 }
 .active-session-txt {
-    background-color: #2BA6DE;
+	background-color: #2BA6DE;
 }
 .expired-session-txt {
-    background-color: #fff;
-    border: 1px solid #ddd;
-    color: #bbb;
-    padding-left: 5px;
-    padding-right: 5px;
+	background-color: #fff;
+	border: 1px solid #ddd;
+	color: #bbb;
+	padding-left: 5px;
+	padding-right: 5px;
 }
 .grid-table.sessions th.session-status {
-    width: 149px;
+	width: 149px;
 }
 .grid-table.sessions th.logout-column {
-    width: 10%;
+	width: 10%;
 }
 .grid-table.sessions th.no-border {
-    background: none;
+	background: none;
 }
 .fm-account-history .grey-bar {
-    background-color: #eeeeee;
-    border: 0 none;
-    clear: both;
-    margin: 0;
-    min-height: 28px;
-    overflow: auto;
-    text-align: right;
+	background-color: #eeeeee;
+	border: 0 none;
+	clear: both;
+	margin: 0;
+	min-height: 28px;
+	overflow: auto;
+	text-align: right;
 }
 .fm-close-all-sessions {
-    height: 32px;
-    margin: 9px 19px;
-    text-align: left;
+	height: 32px;
+	margin: 9px 19px;
+	text-align: left;
 }
 .fm-close-all-sessions span {
-    background: rgba(255, 255, 255, 1) url("../images/mega/nw-fm-sprite_v9.svg") no-repeat scroll -30px -8404px;
-    text-indent: 13px;
+	background: rgba(255, 255, 255, 1) url("http://test/webclient/images/mega/nw-fm-sprite_v9.svg") no-repeat scroll -9px -5466px;
+	text-indent: 18px;
 }
 .settings-logout {
-    background: #ccc url("../images/mega/nw-fm-sprite_v9.svg") no-repeat scroll 5px -8422px;
-    cursor: pointer;
-    float: right;
-    margin-right: 13px;
-    padding-left: 19px;
+	background: #ccc url("http://test/webclient/images/mega/nw-fm-sprite_v9.svg") no-repeat scroll 5px -8423px;
+	cursor: pointer;
+	float: right;
+	margin-right: 13px;
+	padding-left: 19px;
 }
 .settings-logout:hover {
 	background-color: #999999;

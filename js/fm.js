@@ -3162,7 +3162,7 @@ function accountUI()
         });
         
         $('.grid-table.sessions tr').remove();
-        var html = '<tr><th>' + l[479] + '</th><th>' + l[480] + '</th><th>' + l[481] + '</th><th>' + l[482] + '</th><th class="no-border session-status">Status</th><th class="no-border logout-column">&nbsp;</th></tr>';
+        var html = '<tr><th>' + l[479] + '</th><th>' + l[480] + '</th><th>' + l[481] + '</th><th>' + l[482] + '</th><th class="no-border session-status">' + l[7664] + '</th><th class="no-border logout-column">&nbsp;</th></tr>';
         var numActiveSessions = 0;
         
         $(account.sessions).each(function(i, el) {
@@ -3178,15 +3178,15 @@ function accountUI()
             var currentSession = el[5];
             var sessionId = el[6];
             var activeSession = el[7];
-            var status = '<span class="current-session-txt">' + 'Current' + '</span>';
+            var status = '<span class="current-session-txt">' + l[7665] + '</span>';    // Current
             
             // If not the current session
             if (!currentSession) {
                 if (activeSession) {
-                    status = '<span class="active-session-txt">' + 'Active' + '</span>';
+                    status = '<span class="active-session-txt">' + l[7666] + '</span>';     // Active
                 }
                 else {
-                    status = '<span class="expired-session-txt">' + 'Expired' + '</span>';
+                    status = '<span class="expired-session-txt">' + l[1664] + '</span>';    // Expired
                 }
             }
             

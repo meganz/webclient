@@ -2711,5 +2711,10 @@
     "7658": "\u1ea8n \u0111i b\u1edbt",
     "7659": "You have been suspended due to excess data usage. Please contact support@mega.nz to get your account reinstated.",
     "7660": "You have been suspended due to repeated copyright infringement.",
-    "7661": "MEGA recommends sending the 'Encryption Key' separately from the 'Public Base Link'."
+    "7661": "MEGA recommends sending the 'Encryption Key' separately from the 'Public Base Link'.",
+    "7663": "Press",
+    "7664": "Session status",
+    "7665": "Current",
+    "7666": "Active",
+    "7667": "Close other sessions"
 }

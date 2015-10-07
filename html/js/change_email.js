@@ -22,7 +22,6 @@ function verify_email_passwd() {
                 a: 'sec',
                 c: page.substr(6),
                 e: newEmail,
-                user: email,
                 uh: stringhash(newEmail, passwordaes),
                 r:1,
                 i: requesti
@@ -30,14 +29,20 @@ function verify_email_passwd() {
             api_req(args, { 
                 callback: function(res) {
                     loadingDialog.hide();
+                    $('.fm-account-change-email.disabled')
+                        .removeClass('disabled')
+                        .find('span').text('Request email change')
                     if (res === 0) {
                         u_attr.email = newEmail;
-                        document.location.href = "#fm/account/profile";
-                        return;
-                    } 
-                    msgDialog('warninga', 'Error', 'The verification code expired, please send another one', false, function() {
-                        document.location.href = "#fm/account/profile";
-                    });
+                        $('#account-email').val('').attr('placeholder', newEmail);
+                        msgDialog('warninga', 'Congratulations', 'Congratulations, your new email address for this mega account is ' + newEmail, false, function() {
+                            document.location.href = "#fm/account/profile";
+                        });
+                    } else { 
+                        msgDialog('warninga', 'Error', 'The verification code expired, please send another one', false, function() {
+                            document.location.href = "#fm/account/profile";
+                        });
+                    }
                 }
             });
         }

@@ -3452,7 +3452,7 @@ function accountUI()
                             return msgDialog('warninga', 'Error', 'That email address already exists'); 
                         }
 
-                        msgDialog('warninga', 'Email', "We've send you a link to your email address. Please open it to verify your account");
+                        msgDialog('warninga', 'Email', "We've send you a link to your email address. Please open it to verify your email");
                         localStorage.new_email = email;
                         $('.fm-account-change-email')
                             .removeClass('active')

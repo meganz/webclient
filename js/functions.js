@@ -1335,6 +1335,21 @@ function assert(test) {
     throw new AssertionFailed(message);
 }
 
+
+/**
+ * Assert that a user handle is potentially valid (e. g. not an email address).
+ *
+ * @param userHandle {string}
+ *     The user handle to check.
+ * @throws
+ *     Throws an exception on something that does not seem to be a user handle.
+ */
+var assertUserHandle = function(userHandle) {
+    assert(base64urldecode(userHandle).length === 8,
+       'This seems not to be a user handle: ' + userHandle);
+};
+
+
 /**
  * Pad/prepend `val` with "0" (zeros) until the length is === `length`
  *
@@ -2954,6 +2969,80 @@ function assertStateChange(currentState, newState, allowedStatesMap, enumMap) {
 }
 
 /**
+ * Promise-based XHR request
+ * @param {Mixed} aURLOrOptions URL or options
+ * @param {Mixed} aData         data to send, optional
+ */
+mega.utils.xhr = function megaUtilsXHR(aURLOrOptions, aData) {
+    /* jshint -W074 */
+    var xhr;
+    var url;
+    var method;
+    var options;
+    var promise = new MegaPromise();
+
+    if (typeof aURLOrOptions === 'object') {
+        options = aURLOrOptions;
+        url = options.url;
+    }
+    else {
+        options = {};
+        url = aURLOrOptions;
+    }
+    aURLOrOptions = undefined;
+
+    aData = options.data || aData;
+    method = options.method || (aData && 'POST') || 'GET';
+
+    xhr = getxhr();
+
+    if (typeof options.prepare === 'function') {
+        options.prepare(xhr);
+    }
+
+    xhr.onloadend = function(ev) {
+        if (this.status === 200) {
+            promise.resolve(ev, this.response);
+        }
+        else {
+            promise.reject(ev);
+        }
+    };
+
+    try {
+        if (d) {
+            MegaLogger.getLogger('muXHR').info(method + 'ing', url, options, aData);
+        }
+        xhr.open(method, url);
+
+        if (options.type) {
+            xhr.responseType = options.type;
+            if (xhr.responseType !== options.type) {
+                xhr.abort();
+                throw new Error('Unsupported responseType');
+            }
+        }
+
+        if (typeof options.beforeSend === 'function') {
+            options.beforeSend(xhr);
+        }
+
+        if (is_chrome_firefox) {
+            xhr.setRequestHeader('Origin', getBaseUrl(), false);
+        }
+
+        xhr.send(aData);
+    }
+    catch (ex) {
+        promise.reject(ex);
+    }
+
+    xhr = options = undefined;
+
+    return promise;
+};
+
+/**
  *  Retrieve a call stack
  *  @return {String}
  */
@@ -3313,7 +3402,7 @@ function mCleanestLogout(aUserHandle) {
 // Initialize Rubbish-Bin Cleaning Scheduler
 mBroadcaster.addListener('crossTab:master', function _setup() {
     var RUBSCHED_WAITPROC = 120 * 1000;
-    var RUBSCHED_IDLETIME =  25 * 1000;
+    var RUBSCHED_IDLETIME =   4 * 1000;
     var timer, updId;
 
     mBroadcaster.once('crossTab:leave', _exit);
@@ -3651,21 +3740,21 @@ if (typeof sjcl !== 'undefined') {
         var self = this;
 
         var shares = {}, length;
-        
+
         for (var i in nodes) {
             if (nodes.hasOwnProperty(i)) {
 
                 // Look for full share
                 if (fullShare) {
                     shares = M.d[nodes[i]].shares;
-                    
+
                     // Look for link share
                     if (linkShare) {
                         if (shares && Object.keys(shares).length) {
                             return true;
                         }
                     }
-                    else { // Exclude folder/file links, 
+                    else { // Exclude folder/file links,
                         if (shares) {
                             length = Object.keys(shares).length;
                             if (length) {
@@ -3705,24 +3794,24 @@ if (typeof sjcl !== 'undefined') {
     Nodes.prototype.getShares = function(nodes, fullShare, pendingShare, linkShare) {
 
         var self = this;
-        
+
         var result, shares, length;
 
         for (var i in nodes) {
             if (nodes.hasOwnProperty(i)) {
                 result = [];
-                
+
                 // Look for full share
                 if (fullShare) {
-                    shares = M.d[nodes[i]].shares; 
-                    
+                    shares = M.d[nodes[i]].shares;
+
                     // Look for link share
                     if (linkShare) {
                         if (shares && Object.keys(shares).length) {
                             result.push(self.loopShares(shares), linkShare);
                         }
                     }
-                    else { // Exclude folder/file links, 
+                    else { // Exclude folder/file links,
                         if (shares) {
                             length = Object.keys(shares).length;
                             if (length) {
@@ -3759,7 +3848,7 @@ if (typeof sjcl !== 'undefined') {
     Nodes.prototype.loopShares = function(shares, linkShare) {
 
         var self = this;
-        
+
         var result = [],
             exclude = 'EXP',
             index;
@@ -3773,12 +3862,12 @@ if (typeof sjcl !== 'undefined') {
         // Remove 'EXP'
         if (!linkShare) {
             index = result.indexOf(exclude);
-            
+
             if (index !== -1) {
                 result = result.splice(index, 1);
             }
         }
-        
+
         return result;
     };
 

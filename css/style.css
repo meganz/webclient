@@ -224,26 +224,27 @@ a, a:link, a:visited, a:hover, a:active, a:focus img, a:focus img {
 	float: left
 }
 .nlanguage-lnk, a.nlanguage-lnk, a.nlanguage-lnk:link, a.nlanguage-lnk:visited, a.nlanguage-lnk:hover, a.nlanguage-lnk:active {
-	display: block;
-	height: 28px;
-	-moz-box-sizing: border-box;
-	-webkit-box-sizing: border-box;
-	box-sizing: border-box;
-	font-size: 14px;
-	line-height: 23px;
-	color: #605F5D;
-	padding: 0 10px 0 10px;
-	position: relative;
-	-moz-border-radius: 4px;
-	-webkit-border-radius: 4px;
-	border-radius: 4px;
-	float: left;
-	border: 2px solid transparent;
-	margin: 2px 0;
+    border: 2px solid transparent;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    color: #605f5d;
+    display: block;
+    font-size: 14px;
+    height: 28px;
+    line-height: 23px;
+    padding: 0 10px;
+    position: relative;
 }
 a.nlanguage-lnk:hover {
 	border: 2px solid #D31A00;
 	color: #D31A00;
+}
+a.nlanguage-lnk.language-template {
+    display: none;
 }
 .nlanguage-lnk.selected, a.nlanguage-lnk.selected, a.nlanguage-lnk.selected:link, a.nlanguage-lnk.selected:visited, a.nlanguage-lnk.selected:hover, a.nlanguage-lnk.selected:active {
 	color: white;
@@ -257,6 +258,7 @@ a.nlanguage-lnk:hover {
 	top: 0;
 	width: 1px;
 	margin-top: -1px;
+    z-index: 1;
 }
 a.nlanguage-lnk:hover .nlanguage-tooltip {
 	display: block;
@@ -308,9 +310,103 @@ a.nlanguage-lnk:hover .nlanguage-tooltip {
 	color: #BF1900;
 }
 .languages-dialog-body {
-	min-height: 200px;
-	padding: 10px;
+    padding: 10px 20px 10px 10px;
 }
+.languages-dialog .tier-one-languages,
+.languages-dialog .tier-two-languages {
+    -webkit-column-count: 4;
+	-moz-column-count: 4;
+	column-count: 4;
+	-webkit-column-width: 163px;
+	-moz-column-width: 163px;
+	column-width: 163px;
+}
+.languages-dialog .tier-one-languages {
+    margin-top: 15px;
+}
+.languages-dialog .tier-two-languages {
+    display: none;
+    margin-top: 20px;
+    padding-bottom: 65px;
+}
+.languages-dialog .show-more-languages {
+    cursor: pointer;
+    display: table;
+    margin-top: 30px;
+    width: 100%;
+}
+.languages-dialog .show-more-languages .show-more-text {
+    color: #999;
+    display: table-cell;
+    font-size: 14px;
+    font-family: "source_sans_proregular", Arial;
+    padding-left: 12px;
+    white-space: nowrap;
+}
+.languages-dialog .show-more-languages:hover .show-more-text {
+    color: #555;
+}
+.languages-dialog .show-more-languages .bar {
+    display: table-cell;
+    padding-left: 15px;
+    width: 100%;
+}
+.languages-dialog .show-more-languages .bar div {
+    border-bottom: 1px solid #f2f2f2;
+    margin-bottom: 3px;
+}
+.languages-dialog .show-more-languages .round-arrow {
+    display: table-cell;
+    padding-left: 14px;
+    vertical-align: middle;
+}
+.languages-dialog .show-more-languages .round-arrow span {
+    background-image: url("../images/mega/lang-selection-sprite.png");
+    background-position: -235px 0;
+    background-repeat: no-repeat;
+    display: inline-block;
+    height: 6px;
+    opacity: 0.6;
+    position: relative;
+    top: 1px;
+    vertical-align: middle;
+    width: 9px;
+}
+.languages-dialog .show-more-languages .round-arrow.opened span {
+    -webkit-transform: rotate(180deg);
+    -moz-transform: rotate(180deg);
+    -o-transform: rotate(180deg);
+    -ms-transform: rotate(180deg);
+    transform: rotate(180deg);
+}
+.languages-dialog .show-more-languages:hover .round-arrow span {
+    opacity: 1;
+}
+.languages-dialog .fm-notifications-bottom {
+    bottom: 0;
+    left: 0;
+    position: absolute;
+    right: 0;
+}
+.languages-dialog .nlanguage-lnk .beta {
+    border: 1px solid rgba(192, 199, 203, 0.3);
+    border-radius: 7px;
+    box-sizing: border-box;
+    color: #c0c7cd;
+    font-size: 10px;
+    font-style: normal;
+    margin-left: 5px;
+    padding: 0 4px;
+    text-align: center;
+    text-transform: uppercase;
+}
+.languages-dialog .nlanguage-lnk.selected .beta {
+    visibility: hidden;
+}
+.fm-dialog-button.fm-languages-save {
+    margin: 8px 4px 0;
+}
+
 .relative {
 	position: relative;
 }
@@ -1453,34 +1549,34 @@ a.blog-button:hover {
 	color: #fff;
 }
 .top-change-language-icon {
-	background-image: url("../images/mega/lang-selection-sprite.png");
-	background-position: -8px 0;
-	background-repeat: no-repeat;
-	border-radius: 2px;
-	display: inline-block;
-	height: 26px;
-	margin-right: 10px;
-	margin-top: 11px;
-	width: 48px;
+  background-image: url("../images/mega/lang-selection-sprite.png");
+  background-position: 0 0;
+  background-repeat: no-repeat;
+  border-radius: 2px;
+  display: inline-block;
+  height: 24px;
+  margin-right: 10px;
+  margin-top: 12px;
+  width: 44px;
 }
 .top-change-language-name {
-	color: rgba(255, 255, 255, 0.7);
-	display: block;
-	line-height: 48px;
-	overflow: hidden;
-	position: absolute;
-	right: 67px;
-	text-align: right;
-	top: 0;
-	white-space: nowrap;
+  color: rgba(255, 255, 255, 0.7);
+  display: block;
+  line-height: 48px;
+  overflow: hidden;
+  position: absolute;
+  right: 63px;
+  text-align: right;
+  top: 0;
+  white-space: nowrap;
 }
 .top-change-language.other-language .top-change-language-name {
-	right: 45px;
+    right: 43px;
 }
 .top-change-language.other-language .top-change-language-icon {
-	background-position: -119px 0;
-	height: 26px;
-	width: 26px;
+    background-position: -111px 0;
+    height: 24px;
+    width: 24px;
 }
 .top-login-button:hover, .top-login-button.active {
 	background-color: rgba(255,255,255,0.5);
@@ -5363,7 +5459,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 .files-grid-view th.grid-url-header, .files-grid-view th:nth-child(5), .contacts-grid-view th.grid-url-header, .grid-table-header th.grid-url-header, .transfer-table-header th:nth-child(7), .transfer-table-header th:nth-child(8), .files-grid-view.shared-view th:nth-child(4), .files-grid-view.shared-view th:nth-child(5), .shared-grid-view th:nth-child(4), .shared-grid-view th:nth-child(5), .files-grid-view.contacts-view th:nth-child(3), .files-grid-view.contacts-view th:nth-child(3), .contacts-grid-view th:nth-child(3), .contacts-grid-view th:nth-child(3), .contacts-grid-view th:nth-child(4), .sent-requests-grid th:first-child, .contact-requests-grid th:nth-child(2), .sent-requests-grid th:nth-child(2) {
 	background-image: none;
 }
-.grid-header-star {
+.arrow.desc.grid-header-star, .arrow.asc.grid-header-star, .grid-header-star {
 	height: 24px;
 	width: 30px;
 	display: block;
@@ -9832,9 +9928,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
 	margin-top: 15px;
 }
 .fm-dialog.languages-dialog {
-	min-width: 664px;
-	min-height: 416px;
-	margin: -229px 0 0 -332px;
+	margin: -167px 0 0 -365px;
+    min-height: 345px;
+    width: 730px;
 }
 .fm-dialog.share-dialog, .fm-dialog.share-with-contact-dialog {
 	width: 480px;
@@ -14941,7 +15037,7 @@ h5.main-italic-header {
 .membership-payment-pad {
 	padding: 0;
 }
-/* Positioned absolute because payment options can be dynamic e.g. they may or may not have account 
+/* Positioned absolute because payment options can be dynamic e.g. they may or may not have account
    balance and we want the bottom of the date box to line up with the bottom of the plan box on the left */
 .payment-period {
 	position: absolute;
@@ -23152,101 +23248,167 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 }
 /* Credentials / Fingerprint warning dialog */
 .credential-warning-button {
+    left: 50%;
+    position: absolute;
+    top: 15px;
+}
+.credentials-warning-dialog .fm-dialog-close {
+    visibility: hidden;
+}
+.credentials-warning-dialog .fm-mega-dialog-pad {
+    margin: 12px 0;
+}
+.credentials-warning-dialog .fm-mega-dialog-bottom {
+    margin: 12px 0 -12px;
+}
+.credentials-warning-dialog {
+    background-color: #fff;
+    width: 600px;
+}
+.credentials-warning-dialog .content {
+    color: #999999;
+    font-size: 13px;
+    line-height: 20px;
+    padding-bottom: 10px;
+}
+.credentials-warning-dialog .avatarAndWarningMessage {
+    margin: 0 20px;
+    overflow: hidden;
+}
+.credentials-warning-dialog .userAvatar {
+    float: left;
+}
+.credentials-warning-dialog .information {
+    float: left;
+    margin-left: 20px;
+    width: 442px;
+}
+.credentials-warning-dialog .information.noAvatar {
+    margin-left: 0;
+    width: auto;
+}
+.credentials-warning-dialog .information .firstLine {
+    color: #d90007;
+    font-weight: bold;
+}
+.credentials-warning-dialog .information .emailAddress {
+    color: #000;
+}
+.credentials-warning-dialog .userAvatar img {
+    height: 90px;
+    width: 90px;
+}
+.credentials-warning-dialog .previousCredentials {
+    background-color: #f2f2f2;
+    margin-top: 20px;
+    padding: 20px;
+}
+.credentials-warning-dialog .previousCredentials .title {
+    color: #000;
+    font-weight: bold;
+}
+.credentials-warning-dialog .previousCredentials .fingerprint, .credentials-warning-dialog .newCredentials .fingerprint {
+    font-family: monospace;
+    font-size: 14px;
+    margin-left: -6px;
+    margin-top: 10px;
+    text-transform: uppercase;
+}
+.credentials-warning-dialog .previousCredentials .fingerprint > span, .credentials-warning-dialog .newCredentials .fingerprint > span {
+    display: inline-block;
+    text-align: center;
+    width: 44px;
+    -webkit-touch-callout: text !important;
+    -webkit-user-select: text !important;
+    -khtml-user-select: text !important;
+    -moz-user-select: text !important;
+    -ms-user-select: text !important;
+    user-select: text !important;
+}
+.credentials-warning-dialog .newCredentials span.mismatch {
+    color: #D90007;
+}
+.credentials-warning-dialog .newCredentials {
+    padding: 20px 20px 35px 20px;
+}
+.credentials-warning-dialog .newCredentials .title {
+    color: #D90007;
+    font-weight: bold;
+}
+.credentials-warning-dialog .instruction {
+    padding: 3px 20px;
+}
+.credentials-warning-dialog .instruction .reject {
+    color: #D90007;
+    font-weight: bold;
+}
+.credentials-warning-dialog .instruction .accept {
+    color: #31B500;
+    font-weight: bold;
+}
+/* Key signature mismatch warning dialog */
+.key-signature-warning-button {
 	left: 50%;
 	position: absolute;
 	top: 15px;
 }
-.credentials-warning-dialog .fm-dialog-close {
+.key-signature-warning-dialog .fm-dialog-close {
 	visibility: hidden;
 }
-.credentials-warning-dialog .fm-mega-dialog-pad {
+.key-signature-warning-dialog .fm-mega-dialog-pad {
 	margin: 12px 0;
 }
-.credentials-warning-dialog .fm-mega-dialog-bottom {
+.key-signature-warning-dialog .fm-mega-dialog-bottom {
 	margin: 12px 0 -12px;
 }
-.credentials-warning-dialog {
+.key-signature-warning-dialog {
 	background-color: #fff;
 	width: 600px;
 }
-.credentials-warning-dialog .content {
+.key-signature-warning-dialog .content {
 	color: #999999;
 	font-size: 13px;
 	line-height: 20px;
 	padding-bottom: 10px;
 }
-.credentials-warning-dialog .avatarAndWarningMessage {
+.key-signature-warning-dialog .avatarAndWarningMessage {
 	margin: 0 20px;
 	overflow: hidden;
 }
-.credentials-warning-dialog .userAvatar {
+.key-signature-warning-dialog .userAvatar {
 	float: left;
 }
-.credentials-warning-dialog .information {
+.key-signature-warning-dialog .information {
 	float: left;
 	margin-left: 20px;
 	width: 442px;
 }
-.credentials-warning-dialog .information.noAvatar {
+.key-signature-warning-dialog .information.noAvatar {
 	margin-left: 0;
 	width: auto;
 }
-.credentials-warning-dialog .information .firstLine {
+.key-signature-warning-dialog .information .firstLine {
 	color: #d90007;
 	font-weight: bold;
 }
-.credentials-warning-dialog .information .emailAddress {
+.key-signature-warning-dialog .information .emailAddress {
 	color: #000;
 }
-.credentials-warning-dialog .userAvatar img {
+.key-signature-warning-dialog .information .description {
+    color: #000000;
+}
+.key-signature-warning-dialog .userAvatar img {
 	height: 90px;
 	width: 90px;
 }
-.credentials-warning-dialog .previousCredentials {
-	background-color: #f2f2f2;
-	margin-top: 20px;
-	padding: 20px;
-}
-.credentials-warning-dialog .previousCredentials .title {
-	color: #000;
-	font-weight: bold;
-}
-.credentials-warning-dialog .previousCredentials .fingerprint, .credentials-warning-dialog .newCredentials .fingerprint {
-	font-family: monospace;
-	font-size: 14px;
-	margin-left: -6px;
-	margin-top: 10px;
-	text-transform: uppercase;
-}
-.credentials-warning-dialog .previousCredentials .fingerprint > span, .credentials-warning-dialog .newCredentials .fingerprint > span {
-	display: inline-block;
-	text-align: center;
-	width: 44px;
-	-webkit-touch-callout: text !important;
-	-webkit-user-select: text !important;
-	-khtml-user-select: text !important;
-	-moz-user-select: text !important;
-	-ms-user-select: text !important;
-	user-select: text !important;
-}
-.credentials-warning-dialog .newCredentials span.mismatch {
-	color: #D90007;
-}
-.credentials-warning-dialog .newCredentials {
-	padding: 20px 20px 35px 20px;
-}
-.credentials-warning-dialog .newCredentials .title {
-	color: #D90007;
-	font-weight: bold;
-}
-.credentials-warning-dialog .instruction {
+.key-signature-warning-dialog .instruction {
 	padding: 3px 20px;
 }
-.credentials-warning-dialog .instruction .reject {
+.key-signature-warning-dialog .instruction .reject {
 	color: #D90007;
 	font-weight: bold;
 }
-.credentials-warning-dialog .instruction .accept {
+.key-signature-warning-dialog .instruction .accept {
 	color: #31B500;
 	font-weight: bold;
 }
@@ -24765,9 +24927,9 @@ body.pro:after {
  background-image: url(../images/mega/bitcoin-v4@2x.png);
  background-size: 200px auto;
 }
-.top-change-language-icon {
- background-image: url("../images/mega/lang-selection-sprite@2x.png");
- background-size: 156px auto;
+.top-change-language-icon, .languages-dialog .show-more-languages .round-arrow span {
+    background-image: url("../images/mega/lang-selection-sprite@2x.png");
+    background-size: 244px auto;
 }
 .fm-dialog.cancel-subscription-st2 .blue-success-icon {
  background-image: url(../images/mega/bitcoin-v4@2x.png);
@@ -25091,9 +25253,9 @@ background-size:120px auto;
 background-image: url(../images/mega/main-sprite@2x.png?v=7);
 background-size: 50px auto;
 }
-top-login-spr .nlanguage-tooltip-bg, .nlanguage-bottom {
- background-image: url(../images/mega/language-sprite@2x.png);
- background-size: 18px auto;
+.nlanguage-tooltip-bg, .nlanguage-bottom {
+  background-image: url("../images/mega/language-sprite@2x.png");
+  background-size: 18px auto;
 }
 .download-dialog-icon, .download-chrome-lnk, a.download-chrome-lnk, .new-download-icon, .downloading-txt, .download-pause, .download-message-icon, .download-complete-icon, .download-error-ul, .download-user-icon, .new-download-sync-app, .new-download-red-button, .megasync-list-arrow, .megasync-logo, .megasync-table table th span, .megasync-table table td span, .megasync-dropdown span, .megasync-dropdown-link, .megasync-overlay-download span::before, .camera-bottom-icon, .camera-top-icon {
  background-image: url(../images/mega/download-sprite-v3@2x.png);

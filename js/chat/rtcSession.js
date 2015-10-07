@@ -424,7 +424,7 @@ RtcSession.prototype = {
   var ownFprMacKey = self.jingle.generateMacKey();
   var bin = new Uint8Array(40);
   window.crypto.getRandomValues(bin);
-  var sid = self.ownAnonId+':'+btoa(String.fromCharCode.apply(null, bin)).substr(0, 16); //Forefox' btoa(bin) seems to always return the same string
+  var sid = self.ownAnonId+':'+btoa(String.fromCharCode.apply(null, bin)).substr(0, 16).replace('+', '-').replace('/', '_'); //Firefox's btoa(bin) seems to always return the same string
   var fileArr;
   var initiateCallback = function(sessStream) {
       var actualAv = getStreamAv(sessStream);
@@ -815,9 +815,9 @@ hangupAll: function(reason, text)
     if (localStream.getVideoTracks().length < 1) {
         elemClass +=" localNoVideo";
     }
-    if (this.gLocalVid) {
-        throw new Error("Local stream just obtained, but localVid was not null");
-    }
+    this.softAssert(!this.gLocalVid, "Local stream just obtained, but gLocalVid was not null");
+    this.softAssert(this.gLocalVidRefcount <= 0, "Creating gLocalVid, but its refcount is already > 0");
+
     var vid = $('<video class="'+elemClass+'" autoplay="autoplay" defaultMuted="true" muted="true" volume="0"/>');
     if (vid.length < 1) {
         throw new Error("Failed to create local video element");
@@ -1285,7 +1285,7 @@ hangupAll: function(reason, text)
 
 //localStream is not null
      this.softAssert(this.gLocalStreamRefcount > 0, "unrefLocalStream: gLocalStream is non-null, but gLocalStreamRefcount is already <= 0");
-     this.softAssert(!(video && (this.gLocalVidRefcount <= 0)), "unrefLocalStream: unreferencing video, but its refcount is already <= 0, and gLocalVid ", (this.gLocalVid?"is non-null":"is null"));
+     this.softAssert(!(video && (this.gLocalVidRefcount <= 0)), "unrefLocalStream: unreferencing video, but its refcount is already <= 0, and gLocalVid is ", (this.gLocalVid?"non-null":"null"));
 
     if (video) {
         var cnt = --this.gLocalVidRefcount;
@@ -1431,7 +1431,10 @@ hangupAll: function(reason, text)
          console[confunc].call(console, "logMsg:", JSON.stringify(data));
          return;
      }
-
+     if (typeof data !== 'object') {
+         data = {data: data};
+     }
+     data.client = RTC.browser;
      var wait = 500;
      var retryNo = 0;
      var self = this;

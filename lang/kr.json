@@ -2711,5 +2711,10 @@
     "7658": "\uc5b8\uc5b4 \uc228\uae30\uae30",
     "7659": "\ub370\uc774\ud130 \uc774\uc6a9\ub7c9 \ucd08\uacfc\ub85c \uacc4\uc815\uc774 \uc815\uc9c0\ub418\uc5c8\uc2b5\ub2c8\ub2e4. \uacc4\uc815\uc744 \ubcf5\uad6c\ud558\ub824\uba74 support@mega.nz\ub85c \uc5f0\ub77d\ud558\uc138\uc694.",
     "7660": "\ubc18\ubcf5\ub41c \uc800\uc791\uad8c \uce68\ud574\ub85c \uacc4\uc815\uc774 \uc815\uc9c0\ub418\uc5c8\uc2b5\ub2c8\ub2e4",
-    "7661": "MEGA recommends sending the 'Encryption Key' separately from the 'Public Base Link'."
+    "7661": "MEGA recommends sending the 'Encryption Key' separately from the 'Public Base Link'.",
+    "7663": "Press",
+    "7664": "Session status",
+    "7665": "Current",
+    "7666": "Active",
+    "7667": "Close other sessions"
 }

@@ -10850,5 +10850,25 @@
     "7661": {
         "text": "MEGA recommends sending the 'Encryption Key' separately from the 'Public Base Link'.",
         "context": "This is used in the Export\/Get Link dialog as a recommendation for the user."
+    },
+    "7663": {
+        "text": "Press",
+        "context": "Button label e.g. 'Press CTRL+C' to copy a link to the clipboard."
+    },
+    "7664": {
+        "text": "Session status",
+        "context": "Title for a table column. This is used to tell the user whether the particular login session is the current session, active or expired."
+    },
+    "7665": {
+        "text": "Current",
+        "context": "The current login session."
+    },
+    "7666": {
+        "text": "Active",
+        "context": "An active login session. Most likely the user has logged in from another device and not logged out yet from that device.\r\nIt should not imply the session is currently being used at the same time by another device, merely that it hasn't been logged out."
+    },
+    "7667": {
+        "text": "Close other sessions",
+        "context": "Button text to close other login sessions except the current session in use. This will log out other devices which have an active login session."
     }
 }

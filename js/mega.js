@@ -4586,9 +4586,9 @@ function voucherData(arr)
             redeemed = tindex[varr[i].rdm][1];
             redeemed_email = tindex[varr[i].rdm][2];
         }
-        if (varr[i].xl)
+        if (varr[i].xl && tindex[varr[i].xl])
             cancelled = tindex[varr[i].xl][1];
-        if (varr[i].rvk)
+        if (varr[i].rvk && tindex[varr[i].rvk])
             revoked = tindex[varr[i].rvk][1];
         vouchers.push({
             id: varr[i].id,
@@ -5284,6 +5284,10 @@ function execsc(actionPackets, callback) {
                             $('.grid-table.fm #' + n.h + ' .tranfer-filetype-txt').text(f.name);
                             $('#' + n.h + '.file-block .file-block-title').text(f.name);
                             $('#treea_' + n.h + ' .nw-fm-tree-folder').text(f.name);
+
+                            if (M.currentdirid === 'shares') {
+                                $('#' + n.h + ' .shared-folder-name').text(f.name);
+                            }
 
                             //@@@Todo: reposition elements according to sorting (if sorted by name)
                             if ($('#path_' + n.h).length > 0) {

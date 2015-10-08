@@ -3225,14 +3225,15 @@ function accountUI()
         $('.fm-close-all-sessions').rebind('click', function() {
             
             loadingDialog.show();
+            var trs = $('.active-session-txt').parents('tr');
             
             // Expire all sessions but not the current one
             api_req({ a: 'usr', ko: 1 }, {
                 callback: function() {
-                    M.accountSessions(function() {
-                        loadingDialog.hide();
-                        accountUI();
-                    });
+                    trs.find('.settings-logout').remove();
+                    trs.find('.active-session-txt').removeClass('active-session-txt')
+                        .addClass('expired-session-txt').text(l[1664]);
+                    loadingDialog.hide();
                 }
             });
         });
@@ -3251,8 +3252,8 @@ function accountUI()
                 api_req({ a: 'usr', s: [sessionId] }, {
                     callback: function(res, ctx) {
                         $this.find('.settings-logout').remove();
-                        $this.find('.active-session-txt').attr('class', 'expired-session-txt')
-                            .text(l[1664]);
+                        $this.find('.active-session-txt').removeClass('active-session-txt')
+                            .addClass('expired-session-txt').text(l[1664]);
                         loadingDialog.hide();
                     }
                 });

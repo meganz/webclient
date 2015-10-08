@@ -6210,9 +6210,6 @@ function loadfm_callback(res, ctx) {
     if (res.ps) {
         processPS(res.ps);
     }
-    if (res.ph) {
-        processPH(res.ph);
-    }
 
     process_f(res.f, function onLoadFMDone(hasMissingKeys) {
 
@@ -6257,6 +6254,10 @@ function loadfm_callback(res, ctx) {
             srvlog('Got missing keys processing gettree...', null, true);
         }
     });
+
+    if (res.ph) {
+        processPH(res.ph);
+    }
 }
 
 function loadfm_done(pfkey, stackPointer) {

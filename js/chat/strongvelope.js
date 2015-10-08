@@ -498,21 +498,21 @@ var strongvelope = {};
 
 
     /**
-     * Seeds the handler with an array of historic messages to resume an
-     * existing chat session.  The messages for seeding must be contiguous and
-     * contain the most recent messages.  The order of the messages is not
-     * important.
+     * Extracts sender keys from a batch of messages into the cache of the
+     * handler
      *
      * @method
      * @param messages {Array.<ChatdMessage>}
-     *     Mega user handle for user to send to or receive from.
-     * @return {Boolean}
-     *     `true` on successful seeding, `false` on failure.
+     *     Array of (most recent) batch of chat message history.
+     * @return {Array.{Object}}
+     *     An array of all the parsed messages' content.
+     * @private
      */
-    strongvelope.ProtocolHandler.prototype.seed = function(messages) {
+    strongvelope.ProtocolHandler.prototype._extractKeys = function(messages) {
 
         var message;
         var parsedMessage;
+        var parsedMessages = [];
         var isOwnMessage;
         var otherHandle;
         var decryptedKeys;
@@ -521,6 +521,7 @@ var strongvelope = {};
         for (var i = 0; i < messages.length; i++) {
             message = messages[i];
             parsedMessage = ns._parseMessageContent(message);
+            parsedMessages.push(parsedMessage);
             if (parsedMessage
                     && (parsedMessage.type === MESSAGE_TYPES.GROUP_KEYED)) {
                 if (ns._verifyMessage(parsedMessage.signedContent,
@@ -549,16 +550,37 @@ var strongvelope = {};
             }
         }
 
+        return parsedMessages;
+    };
+
+
+    /**
+     * Seeds the handler with an array of historic messages to resume an
+     * existing chat session.  The messages for seeding must be contiguous and
+     * contain the most recent messages.  The order of the messages is not
+     * important.  If this operatin fails to be successful (returns `false`),
+     * grab another batch of earlier chat messages and pass them into this
+     * method (does not need to include the already processed first batch, but
+     * the batches must be directly adjoining).
+     *
+     * @method
+     * @param messages {Array.<ChatdMessage>}
+     *     Array of (most recent) batch of chat message history.
+     * @return {Boolean}
+     *     `true` on successful seeding, `false` on failure.
+     */
+    strongvelope.ProtocolHandler.prototype.seed = function(messages) {
+
+        this._extractKeys(messages);
+
         // Find our own most recent (highest) sender key ID.
         var highestKeyId = '';
         var secondHighestKeyId = '';
         var ownKeys = this.participantKeys[this.ownHandle];
         for (var keyId in ownKeys) {
-            if (ownKeys.hasOwnProperty(keyId)) {
-                if (keyId > highestKeyId) {
-                    secondHighestKeyId = highestKeyId;
-                    highestKeyId = keyId;
-                }
+            if (ownKeys.hasOwnProperty(keyId) && (keyId > highestKeyId)) {
+                secondHighestKeyId = highestKeyId;
+                highestKeyId = keyId;
             }
         }
 
@@ -573,6 +595,54 @@ var strongvelope = {};
         }
 
         return true;
+    };
+
+
+    /**
+     * Checks whether messages passed in in an array are decryptable.
+     *
+     * @method
+     * @param messages {Array.<ChatdMessage>}
+     *     Array of (most recent) batch of chat message history.
+     * @return {Object}
+     *     An object containing a boolean array attribute `messages` flagging
+     *     each element of the input array parameter as decryptable (`null`
+     *     if it can't be parsed).  An attribute `participants` is an object
+     *     giving for each sender of the batch (as key) the earliest time stamp
+     *     of decryptability, `null` if not.
+     */
+    strongvelope.ProtocolHandler.prototype.areMessagesDecryptable = function(messages) {
+
+        var parsedMessages = this._extractKeys(messages);
+
+        var decryptable = [];
+        var participants = {};
+
+        // Iterate over all messages to extract keys (if present).
+        var message;
+        var keyId;
+        var haveKey;
+        for (var i = 0; i < parsedMessages.length; i++) {
+            message = parsedMessages[i];
+            if (message) {
+                keyId = message.keyIds[0];
+                haveKey = ((typeof this.participantKeys[message.userId] !== 'undefined')
+                           && (typeof this.participantKeys[message.userId][keyId] !== 'undefined'));
+                decryptable.push(haveKey);
+                // Track for the smallest time stamp that we've got a key for on the sender.
+                if (!participants[message.userId]) {
+                    participants[message.userId] = null;
+                }
+                if (haveKey && (!participants[message.userId] || (participants[message.userId] > message.ts))) {
+                    participants[message.userId] = message.ts;
+                }
+            }
+            else {
+                decryptable.push(null);
+            }
+        }
+
+        return { messages: decryptable, participants: participants };
     };
 
 

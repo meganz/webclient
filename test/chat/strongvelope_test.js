@@ -333,7 +333,7 @@ describe("chat.strongvelope unit test", function() {
     });
 
     describe('ProtocolHandler class', function() {
-        describe('seed', function() {
+        describe('_extractKeys', function() {
             it("all bases covered", function() {
                 // This mock-history contains chatd as well as parsed data in one object.
                 // The attribute `keys` just needs to be there to avoid an exception.
@@ -358,16 +358,109 @@ describe("chat.strongvelope unit test", function() {
                 var handler = new ns.ProtocolHandler('me3456789xw',
                     CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
                 handler._decryptKeysFor = sinon.stub().returns(['foo', 'bar']);
-                var result = handler.seed(history);
-                assert.strictEqual(result, true);
-                assert.strictEqual(handler.keyId, 'AI02');
-                assert.strictEqual(handler.previousKeyId, 'AI01');
+                var result = handler._extractKeys(history);
+                assert.deepEqual(result, history);
                 assert.ok(handler.participantKeys['me3456789xw'].hasOwnProperty('AI01'));
                 assert.ok(handler.participantKeys['me3456789xw'].hasOwnProperty('AI02'));
                 assert.ok(handler.participantKeys['you456789xw'].hasOwnProperty('AIf1'));
                 assert.ok(handler.participantKeys['you456789xw'].hasOwnProperty('AIf2'));
+            });
+        });
+
+        describe('seed', function() {
+            it("all bases covered", function() {
+                var handler = new ns.ProtocolHandler('me3456789xw',
+                    CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
+                var participantKeys = {
+                    'me3456789xw': { 'AI01': 'my key 1', 'AI02': 'my key 2' },
+                    'you456789xw': { 'AIf1': 'your key 1', 'AIf2': 'your key 2' }
+                };
+                sandbox.stub(handler, '_extractKeys', function() {
+                    handler.participantKeys = participantKeys;
+                });
+
+                var result = handler.seed(history);
+                assert.strictEqual(result, true);
+                assert.strictEqual(handler.keyId, 'AI02');
+                assert.strictEqual(handler.previousKeyId, 'AI01');
+                assert.deepEqual(handler.participantKeys, participantKeys);
                 assert.strictEqual(handler._totalMessagesWithoutSendKey, 0);
                 assert.strictEqual(handler._sentKeyId, null);
+            });
+
+            it("missing keys other party", function() {
+                var handler = new ns.ProtocolHandler('me3456789xw',
+                    CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
+                var participantKeys = {
+                    'me3456789xw': { 'AI01': 'my key 1', 'AI02': 'my key 2' }
+                };
+                sandbox.stub(handler, '_extractKeys', function() {
+                    handler.participantKeys = participantKeys;
+                });
+
+                var result = handler.seed(history);
+                assert.strictEqual(result, true);
+                assert.strictEqual(handler.keyId, 'AI02');
+                assert.strictEqual(handler.previousKeyId, 'AI01');
+                assert.deepEqual(handler.participantKeys, participantKeys);
+            });
+
+            it("no own keys", function() {
+                var handler = new ns.ProtocolHandler('me3456789xw',
+                    CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
+                var participantKeys = {
+                    'you456789xw': { 'AIf1': 'your key 1', 'AIf2': 'your key 2' }
+                };
+                sandbox.stub(handler, '_extractKeys', function() {
+                    handler.participantKeys = participantKeys;
+                });
+
+                var result = handler.seed(history);
+                assert.strictEqual(result, false);
+                assert.strictEqual(handler.keyId, null);
+                assert.strictEqual(handler.previousKeyId, null);
+                assert.deepEqual(handler.participantKeys, participantKeys);
+                assert.strictEqual(handler._totalMessagesWithoutSendKey, 0);
+                assert.strictEqual(handler._sentKeyId, null);
+            });
+        });
+
+        describe('areMessagesDecryptable', function() {
+            it("all good", function() {
+                // This mock-history contains chatd as well as parsed data in one object.
+                // The attribute `keys` just needs to be there to avoid an exception.
+                var history = [
+                    { userId: 'me3456789xw', ts: 1444255633, type: ns.MESSAGE_TYPES.GROUP_KEYED,
+                      recipients: ['you456789xw'], keyIds: ['AI01'] },
+                    { userId: 'me3456789xw', ts: 1444255634, type: ns.MESSAGE_TYPES.GROUP_FOLLOWUP,
+                      keyIds: ['AI01'] },
+                    { userId: 'you456789xw', ts: 1444255635, type: ns.MESSAGE_TYPES.GROUP_FOLLOWUP,
+                      keyIds: ['AIf1'] },
+                    { userId: 'me3456789xw', ts: 1444255636, type: ns.MESSAGE_TYPES.GROUP_KEYED,
+                      recipients: ['you456789xw'], keyIds: ['AI02', 'AI01'] },
+                    { userId: 'you456789xw', ts: 1444255637, type: ns.MESSAGE_TYPES.GROUP_FOLLOWUP,
+                      keyIds: ['AIf1'] },
+                    { userId: 'you456789xw', ts: 1444255638, type: ns.MESSAGE_TYPES.GROUP_FOLLOWUP,
+                      keyIds: ['AIf1'] },
+                    { userId: 'you456789xw', ts: 1444255639, type: ns.MESSAGE_TYPES.GROUP_KEYED,
+                      recipients: ['me3456789xw'], keyIds: ['AIf2', 'AIf1'] },
+                ];
+                var handler = new ns.ProtocolHandler('me3456789xw',
+                    CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
+                var participantKeys = {
+                    'me3456789xw': { 'AI01': 'my key 1', 'AI02': 'my key 2' },
+                    'you456789xw': { 'AIf1': 'your key 1', 'AIf2': 'your key 2' }
+                };
+                sandbox.stub(handler, '_extractKeys', function() {
+                    handler.participantKeys = participantKeys;
+                    return history;
+                });
+
+                var result = handler.areMessagesDecryptable(history);
+                assert.deepEqual(result.messages,
+                    [true, true, true, true, true, true, true]);
+                assert.deepEqual(result.participants,
+                    { 'me3456789xw': 1444255633, 'you456789xw': 1444255635 });
             });
 
             it("missing keys other party", function() {
@@ -375,33 +468,36 @@ describe("chat.strongvelope unit test", function() {
                 // The attribute `keys` just needs to be there to avoid an exception.
                 var history = [
                     { userId: 'me3456789xw', ts: 1444255633, type: ns.MESSAGE_TYPES.GROUP_KEYED,
-                      recipients: ['you456789xw'], keyIds: ['AI01'], keys: [] },
+                      recipients: ['you456789xw'], keyIds: ['AI01'] },
                     { userId: 'me3456789xw', ts: 1444255634, type: ns.MESSAGE_TYPES.GROUP_FOLLOWUP,
                       keyIds: ['AI01'] },
                     { userId: 'you456789xw', ts: 1444255635, type: ns.MESSAGE_TYPES.GROUP_FOLLOWUP,
                       keyIds: ['AIf1'] },
                     { userId: 'me3456789xw', ts: 1444255636, type: ns.MESSAGE_TYPES.GROUP_KEYED,
-                      recipients: ['you456789xw'], keyIds: ['AI02', 'AI01'], keys: [] },
+                      recipients: ['you456789xw'], keyIds: ['AI02', 'AI01'] },
                     { userId: 'you456789xw', ts: 1444255637, type: ns.MESSAGE_TYPES.GROUP_FOLLOWUP,
                       keyIds: ['AIf1'] },
                     { userId: 'you456789xw', ts: 1444255638, type: ns.MESSAGE_TYPES.GROUP_FOLLOWUP,
                       keyIds: ['AIf1'] },
                 ];
-                sandbox.stub(ns, '_verifyMessage').returns(true);
-                sandbox.stub(ns, '_parseMessageContent', _echo);
                 var handler = new ns.ProtocolHandler('me3456789xw',
                     CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
-                handler._decryptKeysFor = sinon.stub().returns(['foo', 'bar']);
-                var result = handler.seed(history);
-                assert.strictEqual(result, true);
-                assert.strictEqual(handler.keyId, 'AI02');
-                assert.strictEqual(handler.previousKeyId, 'AI01');
-                assert.ok(handler.participantKeys['me3456789xw'].hasOwnProperty('AI01'));
-                assert.ok(handler.participantKeys['me3456789xw'].hasOwnProperty('AI02'));
-                assert.strictEqual(handler.participantKeys['you456789xw'], undefined);
+                var participantKeys = {
+                    'me3456789xw': { 'AI01': 'my key 1', 'AI02': 'my key 2' }
+                };
+                sandbox.stub(handler, '_extractKeys', function() {
+                    handler.participantKeys = participantKeys;
+                    return history;
+                });
+
+                var result = handler.areMessagesDecryptable(history);
+                assert.deepEqual(result.messages,
+                    [true, true, false, true, false, false]);
+                assert.deepEqual(result.participants,
+                    { 'me3456789xw': 1444255633, 'you456789xw': null });
             });
 
-            it("no own keys", function() {
+            it("some key missing", function() {
                 // This mock-history contains chatd as well as parsed data in one object.
                 // The attribute `keys` just needs to be there to avoid an exception.
                 var history = [
@@ -409,20 +505,31 @@ describe("chat.strongvelope unit test", function() {
                       keyIds: ['AI01'] },
                     { userId: 'you456789xw', ts: 1444255635, type: ns.MESSAGE_TYPES.GROUP_FOLLOWUP,
                       keyIds: ['AIf1'] },
+                    { userId: 'me3456789xw', ts: 1444255636, type: ns.MESSAGE_TYPES.GROUP_KEYED,
+                      recipients: ['you456789xw'], keyIds: ['AI02'] },
                     { userId: 'you456789xw', ts: 1444255637, type: ns.MESSAGE_TYPES.GROUP_FOLLOWUP,
                       keyIds: ['AIf1'] },
                     { userId: 'you456789xw', ts: 1444255638, type: ns.MESSAGE_TYPES.GROUP_FOLLOWUP,
                       keyIds: ['AIf1'] },
                     { userId: 'you456789xw', ts: 1444255639, type: ns.MESSAGE_TYPES.GROUP_KEYED,
-                      recipients: ['me3456789xw'], keyIds: ['AIf2', 'AIf1'], keys: [] },
+                      recipients: ['me3456789xw'], keyIds: ['AIf2', 'AIf1'] },
                 ];
-                sandbox.stub(ns, '_verifyMessage').returns(true);
-                sandbox.stub(ns, '_parseMessageContent', _echo);
                 var handler = new ns.ProtocolHandler('me3456789xw',
                     CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
-                handler._decryptKeysFor = sinon.stub().returns(['foo', 'bar']);
-                var result = handler.seed(history);
-                assert.strictEqual(result, false);
+                var participantKeys = {
+                    'me3456789xw': { 'AI02': 'my key 2' },
+                    'you456789xw': { 'AIf1': 'your key 1', 'AIf2': 'your key 2' }
+                };
+                sandbox.stub(handler, '_extractKeys', function() {
+                    handler.participantKeys = participantKeys;
+                    return history;
+                });
+
+                var result = handler.areMessagesDecryptable(history);
+                assert.deepEqual(result.messages,
+                    [false, true, true, true, true, true]);
+                assert.deepEqual(result.participants,
+                    { 'me3456789xw': 1444255636, 'you456789xw': 1444255635 });
             });
         });
 

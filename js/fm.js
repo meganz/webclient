@@ -3114,17 +3114,17 @@ function accountUI()
             else
                 return -1;
         });
-        
+
         $('.grid-table.sessions tr').remove();
         var html = '<tr><th>' + l[479] + '</th><th>' + l[480] + '</th><th>' + l[481] + '</th><th>' + l[482] + '</th><th class="no-border session-status">' + l[7664] + '</th><th class="no-border logout-column">&nbsp;</th></tr>';
         var numActiveSessions = 0;
-        
+
         $(account.sessions).each(function(i, el) {
-            
+
             if (i == $.sessionlimit) {
                 return false;
             }
-            
+
             var dateTime = htmlentities(time2date(el[0]));
             var browser = browserdetails(el[2]);
             var ipAddress = htmlentities(el[3]);
@@ -3133,7 +3133,7 @@ function accountUI()
             var sessionId = el[6];
             var activeSession = el[7];
             var status = '<span class="current-session-txt">' + l[7665] + '</span>';    // Current
-            
+
             // If not the current session
             if (!currentSession) {
                 if (activeSession) {
@@ -3143,11 +3143,11 @@ function accountUI()
                     status = '<span class="expired-session-txt">' + l[1664] + '</span>';    // Expired
                 }
             }
-            
+
             if (!country.icon || country.icon === '??.gif') {
                 country.icon = 'ud.gif';
             }
-            
+
             // Generate row html
             html += '<tr class="' + (currentSession ? "current" : sessionId) +  '">'
                 + '<td><span class="fm-browsers-icon"><img alt="" src="' + staticpath + 'images/browser/' + browser.icon + '" /></span><span class="fm-browsers-txt">' + htmlentities(browser.name) + '</span></td>'
@@ -3155,7 +3155,7 @@ function accountUI()
                 + '<td><span class="fm-flags-icon"><img alt="" src="' + staticpath + 'images/flags/' + country.icon + '" style="margin-left: 0px;" /></span><span class="fm-flags-txt">' + htmlentities(country.name) + '</span></td>'
                 + '<td>' + dateTime + '</td>'
                 + '<td>' + status + '</td>';
-        
+
             // If the session is active show logout button
             if (activeSession) {
                 html += '<td>' + '<span class="settings-logout">' + l[967] + '</span>' + '</td></tr>';
@@ -3163,7 +3163,7 @@ function accountUI()
             else {
                 html += '<td>&nbsp;</td>';
             }
-            
+
             // If the current session or active then increment count
             if (currentSession || activeSession) {
                 numActiveSessions++;
@@ -3175,12 +3175,12 @@ function accountUI()
         if (numActiveSessions === 1) {
             $('.fm-close-all-sessions').hide();
         }
-        
+
         $('.fm-close-all-sessions').rebind('click', function() {
-            
+
             loadingDialog.show();
             var $activeSessionsRows = $('.active-session-txt').parents('tr');
-            
+
             // Expire all sessions but not the current one
             api_req({ a: 'usr', ko: 1 }, {
                 callback: function() {
@@ -3200,7 +3200,7 @@ function accountUI()
             } else {
                 loadingDialog.show();
                 /* usr - user session remove
-                 * remove a session Id from the current user, 
+                 * remove a session Id from the current user,
                  * usually other than the current session
                  */
                 api_req({ a: 'usr', s: [sessionId] }, {
@@ -8605,7 +8605,7 @@ function getclipboardkeys() {
     return l;
 }
 
-/** 
+/**
  * Show toast notification
 */
 function showToast (toastClass, notification, successBlock, successTxt) {
@@ -8613,7 +8613,7 @@ function showToast (toastClass, notification, successBlock, successTxt) {
         interval;
 
     $toast = $('.toast-notification.common-toast');
-    $toast.attr('class', 'toast-notification common-toast ' + toastClass).find('.toast-col:first-child').html(notification); 
+    $toast.attr('class', 'toast-notification common-toast ' + toastClass).find('.toast-col:first-child').html(notification);
 
     clearInterval(interval);
     $toast.addClass('visible');
@@ -8676,7 +8676,8 @@ function itemExportLinkHtml(item) {
         fileSize = htmlentities(bytesToSize(item.s));
     }
 
-    fileUrlWithoutKey = getBaseUrl() + '/#' + type + '!' + htmlentities(item.ph);
+//    fileUrlWithoutKey = getBaseUrl() + '/#' + type + '!' + htmlentities(item.ph);
+    fileUrlWithoutKey = 'https://mega.nz/#' + type + '!' + htmlentities(item.ph);
     fileUrlKey = key ? '!' + a32_to_base64(key) : '';
 
     html = '<div class="export-link-item ' + folderClass + '">'
@@ -9217,13 +9218,13 @@ function propertiesDialog(close)
         +'<div class="properties-float-bl"><div class="properties-small-gray t10">' + p.t10 + '</div>'
         +'<div class="propreties-dark-txt t11">' + p.t11 + '</div></div></div>';
     $('.properties-txt-pad').html(html);
-	
+
 	if (typeof(p.t10) == 'undefined' && typeof(p.t11) == 'undefined')
 	{
 		$('.properties-small-gray.t10').addClass('hidden');
 		$('.propreties-dark-txt.t11').addClass('hidden');
 	}
-	
+
     pd.find('.file-settings-icon').rebind('click context', function(e) {
         if ($(this).attr('class').indexOf('active') == -1) {
             e.preventDefault();

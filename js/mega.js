@@ -6490,9 +6490,27 @@ function balance2pro(callback)
             scroll = '.export-link-body';
 
         var links = $.trim(getClipboardLinks()),
-            toastTxt,
-            linksNum,
-			$span = $('.copy-to-clipboard span');
+			$span = $('.copy-to-clipboard span'),
+            toastTxt, doLinks, linksNum, success;
+
+        /**
+         * execCommandUsable
+         *
+         * Native browser 'copy' command using execCommand('copy).
+         * Supported by Chrome42+, FF41+, IE9+, Opera29+
+         * @returns {Boolean}
+         */
+        ExportLinkDialog.prototype.execCommandUsable = function() {
+
+            var result;
+
+            try {
+                result = document.execCommand('copy');
+            }
+            catch (ex) {}
+
+            return result === false;
+        };
 
         deleteScrollPanel(scroll, 'jsp');
 
@@ -6500,6 +6518,7 @@ function balance2pro(callback)
             $.dialog = false;
             fm_hideoverlay();
             $('.fm-dialog.export-links-dialog').addClass('hidden');
+            $('.export-links-warning').addClass('hidden');
             if (window.onCopyEventHandler) {
                 document.removeEventListener('copy', window.onCopyEventHandler, false);
                 delete window.onCopyEventHandler;
@@ -6526,6 +6545,8 @@ function balance2pro(callback)
         $('.fm-dialog.export-links-dialog').removeClass('hidden');
         $('.export-link-body').removeAttr('style');
 
+        $('.export-links-warning').removeClass('hidden');
+
         if ($('.export-link-body').outerHeight() === 318) {// ToDo: How did I find this integer?
             $('.export-link-body').jScrollPane({ showArrows: true, arrowSize: 5 });
             jScrollFade('.export-link-body');
@@ -6541,30 +6562,39 @@ function balance2pro(callback)
         // Setup toast notification
         toastTxt = l[7654];
         linksNum = links.replace(/\s+/gi, ' ').split(' ').length;
-        if (linksNum > 1)
-        {
-            toastTxt = l[7655].replace('%d', linksNum)
-        }    
+
+        if (linksNum > 1) {
+            toastTxt = l[7655].replace('%d', linksNum);
+        }
 
         // Setup the copy to clipboard buttons
         $span.text(l[1990]);
 
-        if (is_extension) {
+        if (is_extension || self.execCommandUsable()) {
             if (!is_chrome_firefox) {
                 $('.fm-dialog-chrome-clipboard').removeClass('hidden');
                 $("#chromeclipboard").fadeTo(1, 0.01);
             }
 
-            // chrome & firefox extension:
+            // chrome & firefox
             $(".copy-to-clipboard").rebind('click', function() {
+                success = true;
+                doLinks = ($(this).attr('id') === 'clipboardbtn1');
+                links = $.trim(doLinks ? getClipboardLinks() : getclipboardkeys());
+
                 if (is_chrome_firefox) {
-                    mozSetClipboard(getClipboardLinks());
+                    mozSetClipboard(links);
                 }
                 else {
-                    $('#chromeclipboard')[0].value = getClipboardLinks();
+                    $('#chromeclipboard')[0].value = links;
                     $('#chromeclipboard').select();
-                    document.execCommand('copy');
+                    success = document.execCommand('copy');
                 }
+
+                if (success) {
+                    $span.text(l[7656]);// Copied
+                }
+
                 showToast('clipboard', toastTxt, $span, l[7656]);
             });
         }
@@ -6635,6 +6665,10 @@ function balance2pro(callback)
 
         $('.export-links-dialog .fm-dialog-close').rebind('click', function() {
             self.linksDialog(1);
+        });
+
+        $('.export-links-warning-close').rebind('click', function() {
+            $('.export-links-warning').addClass('hidden');
         });
 
         $('.export-link-select').rebind('click', function() {
@@ -6919,8 +6953,6 @@ function balance2pro(callback)
     UiExportLink.prototype.addExportLinkIcon = function(nodeId) {
 
         var self = this;
-
-        var share = new mega.Share();
 
         // Add link-icon to list view
         $('#' + nodeId + ' .own-data').addClass('linked');

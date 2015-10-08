@@ -3225,13 +3225,13 @@ function accountUI()
         $('.fm-close-all-sessions').rebind('click', function() {
             
             loadingDialog.show();
-            var trs = $('.active-session-txt').parents('tr');
+            var $activeSessionsRows = $('.active-session-txt').parents('tr');
             
             // Expire all sessions but not the current one
             api_req({ a: 'usr', ko: 1 }, {
                 callback: function() {
-                    trs.find('.settings-logout').remove();
-                    trs.find('.active-session-txt').removeClass('active-session-txt')
+                    $activeSessionsRows.find('.settings-logout').remove();
+                    $activeSessionsRows.find('.active-session-txt').removeClass('active-session-txt')
                         .addClass('expired-session-txt').text(l[1664]);
                     loadingDialog.hide();
                 }

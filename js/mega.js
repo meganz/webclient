@@ -5922,8 +5922,7 @@ function processOPC(opc, ignoreDB) {
 function processPH(publicHandles) {
 
     var logger = MegaLogger.getLogger('processPH'),
-        publicHandleId, nodeId,
-        action;
+        publicHandleId, nodeId;
 
     logger.debug();
 
@@ -6227,10 +6226,11 @@ function loadfm_callback(res, ctx) {
                     }
                 }
             }
-            if (sharedNodes.length) {
-                var exportLink = new mega.Share.ExportLink({ 'nodesToProcess': sharedNodes });
-                exportLink.getExportLink();
-            }
+        }
+
+        // Handle public/export links. Why here? Make sure that M.d already exist
+        if (res.ph) {
+            processPH(res.ph);
         }
 
         maxaction = res.sn;
@@ -6255,9 +6255,6 @@ function loadfm_callback(res, ctx) {
         }
     });
 
-    if (res.ph) {
-        processPH(res.ph);
-    }
 }
 
 function loadfm_done(pfkey, stackPointer) {
@@ -6827,8 +6824,8 @@ function balance2pro(callback)
             callback: function(result) {
                 self.nodesLeft--;
                 if (typeof result !== 'number') {
-                    M.nodeAttr({ h: this.nodeId, ph: result });
                     M.nodeShare(this.nodeId, { h: this.nodeId, r: 0, u: 'EXP', ts: unixtime() });
+                    M.nodeAttr({ h: this.nodeId, ph: result });
 
                     if (self.options.updateUI) {
                         var UiExportLink = new mega.UI.Share.ExportLink();

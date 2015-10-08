@@ -7691,8 +7691,8 @@ function initShareDialog() {
             $('.share-dialog-permissions').removeClass('active');
             $('.permissions-icon').removeClass('active');
             closeImportContactNotification('.share-dialog');
-            var x = $this.position().left + 50;
-            var y = $this.position().top + 14 + scrollPos;
+            var x = $this.position().left + 10;
+            var y = $this.position().top + 13 + scrollPos;
             handlePermissionMenu($this, $m, x, y);
         }
 
@@ -7714,8 +7714,8 @@ function initShareDialog() {
             $('.permissions-icon').removeClass('active');
             $m.addClass('search-permissions');
             closeImportContactNotification('.share-dialog');
-            var x = $this.position().left;
-            var y = $this.position().top + 8;
+            var x = $this.position().left - 4;
+            var y = $this.position().top - 35;
             handlePermissionMenu($this, $m, x, y);
         }
 

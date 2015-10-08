@@ -21690,6 +21690,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	min-width: 162px;
 	padding-left: 43px;
 }
+.share-dialog-permissions {
+	float: right;
+}
 .expiry-date-select {
 	padding-left: 10px;
 	width: 162px;

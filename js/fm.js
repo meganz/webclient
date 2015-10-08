@@ -7158,13 +7158,13 @@ function addShareDialogContactToContent(type, id, av, name, permClass, permText,
 
     html = '<div class="share-dialog-contact-bl ' + exportClass + ' ' + type + '" id="sdcbl_' + id + '">'
            +   item
+           +   '<div class="share-dialog-remove-button"></div>'
            +   '<div class="share-dialog-permissions ' + permClass + '">'
            +       '<span></span>' + permText
            +   '</div>';
 
 
-    htmlEnd = '     <div class="share-dialog-remove-button"></div>'
-              + '   <div class="clear"></div>'
+    htmlEnd = '   <div class="clear"></div>'
               + '</div>';
 
     return html + htmlEnd;

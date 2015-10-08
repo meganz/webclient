@@ -190,7 +190,7 @@ WebrtcApi.prototype.getUserMediaWithConstraintsAndCallback = function(um, self, 
 WebrtcApi.prototype.stopMediaStream = function(stream) {
     if (!stream.stop) {
         var tracks = stream.getTracks();
-        for (var i = 0; i < tracks.length(); i++) {
+        for (var i = 0; i < tracks.length; i++) {
             tracks[i].stop();
         }
     } else {

@@ -10608,7 +10608,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	border-radius: 4px;
 	-moz-border-radius: 4px;
 	-webkit-border-radius: 4px;
-	background-image: url(../images/mega/nw-fm-sprite_v8.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v10.svg);
 	background-repeat: no-repeat;
 	background-position: right -8359px;
 	-webkit-box-sizing: border-box;
@@ -21667,7 +21667,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	background-color: rgba(0,0,0,0.05);
 }
 .share-dialog-contact-bl .fm-chat-user-info {
-	width: 203px;
+	width: 187px;
 	padding-right: 10px;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
@@ -21824,7 +21824,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 	width: 20px;
 	height: 20px;
 	float: right;
-	margin: 13px 7px 0 0;
+	margin: 13px 7px 0 7px;
 	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-repeat: no-repeat;
 	background-position: -91px -826px;

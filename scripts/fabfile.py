@@ -47,13 +47,23 @@ def dev(branchName = ''):
     remoteBranchPath = env.target_dir + '/' + branchName
 
     # Clone the repo into /var/www/xxx-branch-name
+    # but not the full git history to save on storage space
     with cd(env.target_dir):
-        run('git clone --depth 1 git@code.developers.mega.co.nz:web/webclient.git ' + branchName + ' -b ' + branchName)
-        run('cd ' + remoteBranchPath + ' && git log -1') 
+        result = run('git clone --depth 1 git@code.developers.mega.co.nz:web/webclient.git ' + branchName + ' -b ' + branchName, warn_only=True)
+        
+        # If successful
+        if result.return_code == 0:
+            
+            # Show last commit from the branch
+            run('cd ' + remoteBranchPath + ' && git log -1') 
 
-    # Output beta server test link
-    print '\nCloned branch ' + branchName + ' to ' + remoteBranchPath
-    print 'Test link: https://beta.developers.mega.co.nz/' + branchName + '/dont-deploy/sandbox3.html?apipath=prod'
+            # Output beta server test link
+            print '\nCloned branch ' + branchName + ' to ' + remoteBranchPath
+            print 'Test link: https://beta.developers.mega.co.nz/' + branchName + '/dont-deploy/sandbox3.html?apipath=prod'
+
+        else:
+            print 'Branch already exists on beta, updating instead.\n'
+            devupdate(branchName)
 
 
 """

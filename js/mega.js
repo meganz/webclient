@@ -6539,11 +6539,11 @@ function balance2pro(callback)
         }, 300);
 
         // Setup toast notification
-        toastTxt = '1 link was copied to the clipboard'
+        toastTxt = l[7654];
         linksNum = links.replace(/\s+/gi, ' ').split(' ').length;
         if (linksNum > 1)
         {
-            toastTxt = '%d links were copied to the clipboard'.replace('%d', linksNum)
+            toastTxt = l[7655].replace('%d', linksNum)
         }    
 
         // Setup the copy to clipboard buttons

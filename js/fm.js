@@ -3250,10 +3250,10 @@ function accountUI()
                  */
                 api_req({ a: 'usr', s: [sessionId] }, {
                     callback: function(res, ctx) {
-                        M.accountSessions(function() {
-                            loadingDialog.hide();
-                            accountUI();
-                        });
+                        $this.find('.settings-logout').remove();
+                        $this.find('.active-session-txt').attr('class', 'expired-session-txt')
+                            .text(l[1664]);
+                        loadingDialog.hide();
                     }
                 });
             }

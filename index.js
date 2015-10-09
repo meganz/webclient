@@ -670,7 +670,17 @@ function init_page() {
         }
         else {
             // Unable to cancel, not logged in
-            msgDialog('warningb', l[882], l[6186], l[5841]);
+            mega.ui.showLoginRequiredDialog({
+                title: l[6186],
+                textContent: l[5841]
+            })
+            .done(init_page)
+            .fail(function(aError) {
+                if (aError) {
+                    alert(aError);
+                }
+                location.hash = 'start';
+            });
         }
     }
     else if (page === 'recovery') {

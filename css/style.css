@@ -11079,7 +11079,7 @@ label.radio-txt {
 	position: absolute;
 	left: 0;
 	bottom: 0;
-	padding: 20px;
+	padding: 24px;
 	z-index: 1200;
 	width: 100%;
 	-moz-box-sizing: border-box;
@@ -11088,16 +11088,13 @@ label.radio-txt {
 }
 .export-links-warning p {
 	margin: 0;
-	padding: 3px 0 3px 148px;
+	padding: 3px 0 3px 0;
 	font-size: 13px;
 	line-height: 21px;
 	color: #CCCCCC;
 }
 .export-warning-content {
 	max-width: 947px;
-	background-image: url(../images/mega/dialogs-sprite_v5.svg);
-	background-position: left -2880px;
-	background-repeat: no-repeat;
 	margin: 0 auto;
 	min-height: 138px;
 }

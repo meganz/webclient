@@ -1951,9 +1951,7 @@
     "6847": "MEGA ni v celoti izpolnila obljub",
     "6848": "Pustite komentar",
     "6849": "Mo\u017enosti deljenja",
-    "6850": "Izgleda kot slabo oblikovana e-po\u0161ta",
     "6851": "Stike iz Gmail-a ste \u017ee uvozili",
-    "6852": "Izgleda, kot da je tu narobe oblikovana e-po\u0161ta",
     "6853": "Vklju\u010dite osebno sporo\u010dilo za nove stike",
     "6854": "Delite mapo s stiki",
     "6855": "Izberite mapo za dejenje",
@@ -2642,7 +2640,6 @@
     "7589": "Move item to rubbish bin?",
     "7590": "Move items to rubbish bin?",
     "7591": "You have selected over {0} items ({0}) to download. Do you want to proceed?",
-    "7592": "The subscription has not been canceled correctly. Please contact support@mega.co.nz to cancel your subscription.",
     "7593": "https:\/\/mega.co.nz\/mobile_terms.html",
     "7594": "windowsphone@mega.co.nz",
     "7595": "Fetching files and folders... [{0}]",
@@ -2716,5 +2713,10 @@
     "7664": "Session status",
     "7665": "Current",
     "7666": "Active",
-    "7667": "Close other sessions"
+    "7667": "Close other sessions",
+    "7677": "Link copied",
+    "7679": "You need to have a MEGA account in order to continue.",
+    "7680": "MEGA's cryptographic model depends on the keys displayed above. We recommend sending the decryption keys separately from the folder\/file link, through a secure channel.",
+    "7681": "Folder\/File Link",
+    "7682": "MEGA recommends sending the 'Decryption Key' separately from the 'Folder\/File Link'."
 }

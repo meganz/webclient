@@ -1951,9 +1951,7 @@
     "6847": "MEGA nesplnilo svoj slub",
     "6848": "Zanecha\u0165 koment\u00e1r",
     "6849": "Mo\u017enosti zdie\u013eania",
-    "6850": "Vyzer\u00e1 to tak, \u017ee email je v zlom form\u00e1te",
     "6851": "Kontakty z Gmailu ste u\u017e importovali",
-    "6852": "Vyzer\u00e1 to na zl\u00fd form\u00e1t emailu",
     "6853": "Pripojte osobn\u00fa spr\u00e1vu pre nov\u00e9 kontakty",
     "6854": "Zdie\u013ea\u0165 prie\u010dinok s kontaktmi",
     "6855": "Vyberte prie\u010dinok pre zdie\u013eanie",
@@ -2642,7 +2640,6 @@
     "7589": "Presun\u00fa\u0165 polo\u017eku do Ko\u0161a?",
     "7590": "Presun\u00fa\u0165 polo\u017eky do Ko\u0161a?",
     "7591": "You have selected over {0} items ({0}) to download. Do you want to proceed?",
-    "7592": "The subscription has not been canceled correctly. Please contact support@mega.co.nz to cancel your subscription.",
     "7593": "https:\/\/mega.co.nz\/mobile_terms.html",
     "7594": "windowsphone@mega.co.nz",
     "7595": "Z\u00edskavanie s\u00faborov a prie\u010dinkov... [{0}]",
@@ -2716,5 +2713,10 @@
     "7664": "Session status",
     "7665": "Current",
     "7666": "Active",
-    "7667": "Close other sessions"
+    "7667": "Close other sessions",
+    "7677": "Link copied",
+    "7679": "You need to have a MEGA account in order to continue.",
+    "7680": "MEGA's cryptographic model depends on the keys displayed above. We recommend sending the decryption keys separately from the folder\/file link, through a secure channel.",
+    "7681": "Folder\/File Link",
+    "7682": "MEGA recommends sending the 'Decryption Key' separately from the 'Folder\/File Link'."
 }

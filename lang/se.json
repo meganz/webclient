@@ -1951,9 +1951,7 @@
     "6847": "MEGA har under levereras p\u00e5 sitt l\u00f6fte",
     "6848": "L\u00e4mna en kommentar",
     "6849": "Dela m\u00f6jligheter",
-    "6850": "Ser ut som det \u00e4r ett felaktigt email",
     "6851": "Du har redan importerat kontakter fr\u00e5n Gmail",
-    "6852": "Ser ut som det \u00e4r ett felaktigt email d\u00e4r",
     "6853": "Inkludera personligt meddelande f\u00f6r nya kontakter",
     "6854": "Dela mapp med kontakter",
     "6855": "V\u00e4lj en mapp att dela",
@@ -2642,7 +2640,6 @@
     "7589": "Move item to rubbish bin?",
     "7590": "Move items to rubbish bin?",
     "7591": "You have selected over {0} items ({0}) to download. Do you want to proceed?",
-    "7592": "The subscription has not been canceled correctly. Please contact support@mega.co.nz to cancel your subscription.",
     "7593": "https:\/\/mega.co.nz\/mobile_terms.html",
     "7594": "windowsphone@mega.co.nz",
     "7595": "Fetching files and folders... [{0}]",
@@ -2716,5 +2713,10 @@
     "7664": "Session status",
     "7665": "Current",
     "7666": "Active",
-    "7667": "Close other sessions"
+    "7667": "Close other sessions",
+    "7677": "Link copied",
+    "7679": "You need to have a MEGA account in order to continue.",
+    "7680": "MEGA's cryptographic model depends on the keys displayed above. We recommend sending the decryption keys separately from the folder\/file link, through a secure channel.",
+    "7681": "Folder\/File Link",
+    "7682": "MEGA recommends sending the 'Decryption Key' separately from the 'Folder\/File Link'."
 }

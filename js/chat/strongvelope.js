@@ -652,10 +652,8 @@ var strongvelope = {};
      * primed via historic messages.
      *
      * @method
-     * @param userhandle {String}
-     *     Mega user handle for user to send to or receive from.
      */
-    strongvelope.ProtocolHandler.prototype.updateSenderKey = function(userhandle) {
+    strongvelope.ProtocolHandler.prototype.updateSenderKey = function() {
 
         var dateStamp;
         var counter;
@@ -902,7 +900,7 @@ var strongvelope = {};
      * @param {String} sender
      *     User handle of the message sender.
      * @param {Boolean} [historicMessage=false]
-     *     Whether the message passed in for decryption is a from the history.
+     *     Whether the message passed in for decryption is from the history.
      * @returns {(StrongvelopeMessage|Boolean)}
      *     The message content on success, `false` in case of errors.
      */
@@ -1012,6 +1010,40 @@ var strongvelope = {};
         }
 
         return result;
+    };
+
+
+    /**
+     * Checks whether messages passed in in an array are decryptable.
+     *
+     * @method
+     * @param messages {Array.<ChatdMessage>}
+     *     Array containing a batch of chat messages.
+     * @param {Boolean} [historicMessages=true]
+     *     Whether the messages passed in for decryption are from the history.
+     * @returns {Array.<(StrongvelopeMessage|Boolean)>}
+     *     Array of objects with message contents on success, `false` in case of
+     *     errors.
+     */
+    strongvelope.ProtocolHandler.prototype.batchDecrypt = function(messages, historicMessages) {
+
+        // First extract all keys.
+        this._extractKeys(messages);
+
+        // Now attempt to decrypt all messages.
+        var decryptedMessages = [];
+        historicMessages = (typeof historicMessages === 'undefined') || (historicMessages === true)
+                         ? true : false;
+
+        var message;
+        for (var i = 0; i < messages.length; i++) {
+            message = messages[i];
+            decryptedMessages.push(this.decryptFrom(message.message,
+                                                    message.userId,
+                                                    historicMessages));
+        }
+
+        return decryptedMessages;
     };
 
 }());

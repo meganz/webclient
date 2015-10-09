@@ -1201,5 +1201,110 @@ describe("chat.strongvelope unit test", function() {
                 assert.strictEqual(handler._totalMessagesWithoutSendKey, 6);
             });
         });
+
+        describe('batchDecrypt', function() {
+            it("keyed message", function() {
+                // This mock-history contains chatd as well as parsed data in one object.
+                // The attribute `keys` just needs to be there to avoid an exception.
+                var history = [
+                    { userId: 'me3456789xw', ts: 1444255633, type: ns.MESSAGE_TYPES.GROUP_KEYED,
+                      message: 'AI01readable', recipients: ['you456789xw'], keyIds: ['AI01'] },
+                    { userId: 'me3456789xw', ts: 1444255634, type: ns.MESSAGE_TYPES.GROUP_FOLLOWUP,
+                      message: 'AI01readable', keyIds: ['AI01'] },
+                    { userId: 'you456789xw', ts: 1444255635, type: ns.MESSAGE_TYPES.GROUP_FOLLOWUP,
+                      message: 'AIf1not readable', keyIds: ['AIf1'] },
+                    { userId: 'me3456789xw', ts: 1444255636, type: ns.MESSAGE_TYPES.GROUP_KEYED,
+                      message: 'AI02readable', recipients: ['you456789xw'], keyIds: ['AI02', 'AI01'] },
+                    { userId: 'you456789xw', ts: 1444255637, type: ns.MESSAGE_TYPES.GROUP_FOLLOWUP,
+                      message: 'AIf1not readable', keyIds: ['AIf1'] },
+                    { userId: 'you456789xw', ts: 1444255638, type: ns.MESSAGE_TYPES.GROUP_FOLLOWUP,
+                      message: 'AIf2not readable', keyIds: ['AIf2', 'AIf1'] },
+                ];
+                var handler = new ns.ProtocolHandler('me3456789xw',
+                    CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
+                handler.participantKeys = {
+                    'me3456789xw': { 'AI01': 'my key 1', 'AI02': 'my key 2' }
+                };
+                sandbox.stub(handler, '_extractKeys');
+                sandbox.stub(handler, 'decryptFrom', function(message, sender) {
+                    var keyId = message.substring(0, 4);
+                    message = message.substring(4);
+                    var result;
+                    if (this.participantKeys[sender] && this.participantKeys[sender][keyId]) {
+                        result = { sender: sender, type: 42, payload: message };
+                    }
+                    else {
+                        result = false;
+                    }
+
+                    return result;
+                });
+
+                var result = handler.batchDecrypt(history);
+                assert.strictEqual(handler._extractKeys.callCount, 1);
+                assert.strictEqual(handler._totalMessagesWithoutSendKey, 0);
+                for (var i = 0; i < history.length; i++) {
+                    assert.strictEqual(handler.decryptFrom.args[i][2], true);
+                    if (history[i].message.substring(4) === 'readable') {
+                        assert.deepEqual(result[i],
+                            { sender: 'me3456789xw', type: 42, payload: 'readable' });
+                    }
+                    else {
+                        assert.strictEqual(result[i], false);
+                    }
+                }
+            });
+
+            it("keyed message, non-historic", function() {
+                // This mock-history contains chatd as well as parsed data in one object.
+                // The attribute `keys` just needs to be there to avoid an exception.
+                var history = [
+                    { userId: 'me3456789xw', ts: 1444255633, type: ns.MESSAGE_TYPES.GROUP_KEYED,
+                      message: 'AI01readable', recipients: ['you456789xw'], keyIds: ['AI01'] },
+                    { userId: 'me3456789xw', ts: 1444255634, type: ns.MESSAGE_TYPES.GROUP_FOLLOWUP,
+                      message: 'AI01readable', keyIds: ['AI01'] },
+                    { userId: 'you456789xw', ts: 1444255635, type: ns.MESSAGE_TYPES.GROUP_FOLLOWUP,
+                      message: 'AIf1not readable', keyIds: ['AIf1'] },
+                    { userId: 'me3456789xw', ts: 1444255636, type: ns.MESSAGE_TYPES.GROUP_KEYED,
+                      message: 'AI02readable', recipients: ['you456789xw'], keyIds: ['AI02', 'AI01'] },
+                    { userId: 'you456789xw', ts: 1444255637, type: ns.MESSAGE_TYPES.GROUP_FOLLOWUP,
+                      message: 'AIf1not readable', keyIds: ['AIf1'] },
+                    { userId: 'you456789xw', ts: 1444255638, type: ns.MESSAGE_TYPES.GROUP_FOLLOWUP,
+                      message: 'AIf2not readable', keyIds: ['AIf2', 'AIf1'] },
+                ];
+                var handler = new ns.ProtocolHandler('me3456789xw',
+                    CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
+                handler.participantKeys = {
+                    'me3456789xw': { 'AI01': 'my key 1', 'AI02': 'my key 2' }
+                };
+                sandbox.stub(handler, '_extractKeys');
+                sandbox.stub(handler, 'decryptFrom', function(message, sender) {
+                    var keyId = message.substring(0, 4);
+                    message = message.substring(4);
+                    var result;
+                    if (this.participantKeys[sender] && this.participantKeys[sender][keyId]) {
+                        result = { sender: sender, type: 42, payload: message };
+                    }
+                    else {
+                        result = false;
+                    }
+
+                    return result;
+                });
+
+                var result = handler.batchDecrypt(history, false);
+                assert.strictEqual(handler._extractKeys.callCount, 1);
+                for (var i = 0; i < history.length; i++) {
+                    assert.strictEqual(handler.decryptFrom.args[i][2], false);
+                    if (history[i].message.substring(4) === 'readable') {
+                        assert.deepEqual(result[i],
+                            { sender: 'me3456789xw', type: 42, payload: 'readable' });
+                    }
+                    else {
+                        assert.strictEqual(result[i], false);
+                    }
+                }
+            });
+        });
     });
 });

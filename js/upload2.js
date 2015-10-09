@@ -642,7 +642,7 @@ var ulmanager = {
         }
         else if (M.h[uq.hash]) {
             n = M.d[M.h[uq.hash][0]];
-            identical = n;
+            // identical = n;
         }
         if (!n) {
             return ulmanager.ulStart(File);
@@ -658,7 +658,7 @@ var ulmanager = {
         }, {
             uq: uq,
             n: n,
-            // skipfile: (ul_skipIdentical && identical),
+            skipfile: (ul_skipIdentical && identical),
             callback: function(res, ctx) {
                 if (res.e === ETEMPUNAVAIL && ctx.skipfile) {
                     ctx.uq.repair = ctx.n.key;

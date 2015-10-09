@@ -139,7 +139,9 @@
     <div class="fm-dialog-body">
         <div class="fm-dialog-new-folder-input">
             <div class="fm-dialog-input-clear"></div>
-            <div class="fm-dialog-new-folder-pad"><input name="dialog-new-folder" type="text" value="[$1028]" /></div>
+            <div class="fm-dialog-new-folder-pad">
+                <input name="dialog-new-folder" type="text" placeholder="[$1028]" value="" />
+            </div>
         </div>
         <div class="default-dialog-bottom">
             <div class="fm-dialog-new-folder-button"><span>[$1027]</span></div>
@@ -430,7 +432,9 @@
 <div class="fm-dialog export-links-dialog hidden">
     <div class="fm-dialog-header">
         <div class="fm-dialog-title">[$1031]</div>
-        <div class="fm-dialog-chrome-clipboard hidden"><textarea id="chromeclipboard" style="width:10px; height:20px;"></textarea></div>
+        <div class="fm-dialog-chrome-clipboard hidden">
+            <div id="chromeclipboard" class="selectable"></div>
+        </div>
         <div class="fm-dialog-close"></div>
         <div class="clear"></div>
     </div>
@@ -457,7 +461,7 @@
             </div>
         </div>
         <div class="clear"></div>
-        <div class="export-link-body">
+        <div id="export-link-body" class="export-link-body">
         </div>
     </div>
     <div class="fm-notifications-bottom">

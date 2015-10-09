@@ -9985,6 +9985,12 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
 	left: 0px;
 	top: 0px;
 }
+.fm-dialog-chrome-clipboard div {
+    font-size: 1px;
+    height: 20px;
+    opacity: 0.01; 
+    width: 10px;
+}
 .fm-dialog-close, .btn-close-dialog, .ui-datepicker-close {
 	cursor: pointer;
 	height: 30px;
@@ -10837,6 +10843,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	max-height: 318px;
 	overflow: hidden;
 }
+
 .export-gradient {
 	height: 16px;
 	width: 100%;

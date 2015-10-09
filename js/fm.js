@@ -8652,9 +8652,8 @@ function hideToast (int) {
 /**
  * itemExportLinkHtml
  *
- * @param {object} item
- *
- * @returns {string}
+ * @param {Object} item
+ * @returns {String}
  */
 function itemExportLinkHtml(item) {
 
@@ -8676,7 +8675,6 @@ function itemExportLinkHtml(item) {
         fileSize = htmlentities(bytesToSize(item.s));
     }
 
-//    fileUrlWithoutKey = getBaseUrl() + '/#' + type + '!' + htmlentities(item.ph);
     fileUrlWithoutKey = 'https://mega.nz/#' + type + '!' + htmlentities(item.ph);
     fileUrlKey = key ? '!' + a32_to_base64(key) : '';
 
@@ -8686,9 +8684,9 @@ function itemExportLinkHtml(item) {
          +          '<div class="export-link-txt">'
          +               '<span class="export-item-title">' + htmlentities(item.name) + '</span><span class="export-link-gray-txt">' + fileSize + '</span>'
          +          '</div>'
-         +          '<div class="file-link-block">'
-         +              '<span class="file-link-info url" data-pseudo-content="' + l[7650] +'":">' + fileUrlWithoutKey + '</span>'
-         +              '<span class="file-link-info key" data-pseudo-content="' + l[1028] +':">' + fileUrlKey + '</span>'
+         +          '<div id="file-link-block" class="file-link-block">'
+         +              '<span class="file-link-info url" data-pseudo-content="' + l[7650] +'">' + fileUrlWithoutKey + '</span>'
+         +              '<span class="file-link-info key" data-pseudo-content="' + l[1028] +'">' + fileUrlKey + '</span>'
          +          '</div>'
          +      '</div>'
          +  '</div>';
@@ -10411,18 +10409,20 @@ function FMResizablePane(element, opts) {
 /**
  * Highlights some text inside an element as if you had selected it with the mouse
  * From http://stackoverflow.com/a/987376
- * @param {String} elementId
+ * @param {String} elementId The name of the id
  */
 function selectText(elementId) {
-    var doc = document, text = doc.getElementById(element), range, selection;
-
-    if (doc.body.createTextRange) {
+    
+    var range, selection;
+    var text = document.getElementById(elementId);
+    
+    if (document.body.createTextRange) {
         range = document.body.createTextRange();
         range.moveToElementText(text);
         range.select();
     }
     else if (window.getSelection) {
-        selection = window.getSelection();
+        selection = window.getSelection();        
         range = document.createRange();
         range.selectNodeContents(text);
         selection.removeAllRanges();

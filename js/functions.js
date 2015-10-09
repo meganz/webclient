@@ -9,7 +9,7 @@ var inherits = (function() {
         var proto = destination.prototype = createObject(source.prototype);
         proto.constructor = destination;
         proto._super = source.prototype;
-    }
+    };
 })();
 
 makeEnum(['MDBOPEN'], 'MEGAFLAG_', window);
@@ -1893,16 +1893,7 @@ function mKeyDialog(ph, fl) {
     $('.fm-dialog.dlkey-dialog').removeClass('hidden');
     $('.fm-dialog-overlay').removeClass('hidden');
     $('body').addClass('overlayed');
-    $('.fm-dialog.dlkey-dialog input').rebind('focus', function(e) {
-        if ($(this).val() === l[1028]) {
-            $(this).val('');
-        }
-    });
-    $('.fm-dialog.dlkey-dialog input').rebind('blur', function(e) {
-        if ($(this).val() === '') {
-            $(this).val(l[1028]);
-        }
-    });
+    
     $('.fm-dialog.dlkey-dialog input').rebind('keydown', function(e) {
         $('.fm-dialog.dlkey-dialog .fm-dialog-new-folder-button').addClass('active');
         if (e.keyCode === 13) {
@@ -1912,8 +1903,11 @@ function mKeyDialog(ph, fl) {
     $('.fm-dialog.dlkey-dialog .fm-dialog-new-folder-button').rebind('click', function(e) {
         var key = $('.fm-dialog.dlkey-dialog input').val();
 
-        if (key && key !== l[1028]) {
+        if (key) {
+            // Remove the ! from the key which is exported from the export dialog
+            key = key.replace('!', '');
             promise.resolve(key);
+            
             $('.fm-dialog.dlkey-dialog').addClass('hidden');
             $('.fm-dialog-overlay').addClass('hidden');
             document.location.hash = (fl ? '#F!' : '#!') + ph + '!' + key;

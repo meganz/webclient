@@ -6571,7 +6571,6 @@ function balance2pro(callback)
         if (is_extension || self.execCommandUsable()) {
             if (!is_chrome_firefox) {
                 $('.fm-dialog-chrome-clipboard').removeClass('hidden');
-                $("#chromeclipboard").fadeTo(1, 0.01);
             }
 
             // chrome & firefox
@@ -6584,16 +6583,14 @@ function balance2pro(callback)
                     mozSetClipboard(links);
                 }
                 else {
-                    $('#chromeclipboard')[0].value = links;
-                    $('#chromeclipboard').select();
+                    $('#chromeclipboard').html(links);
+                    selectText('chromeclipboard');
                     success = document.execCommand('copy');
                 }
 
                 if (success) {
-                    $span.text(l[7656]);// Copied
+                    showToast('clipboard', toastTxt, $span, l[7656]);
                 }
-
-                showToast('clipboard', toastTxt, $span, l[7656]);
             });
         }
         else if (flashIsEnabled()) {

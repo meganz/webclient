@@ -10859,6 +10859,10 @@
         "text": "Close other sessions",
         "context": "Button text to close other login sessions except the current session in use. This will log out other devices which have an active login session."
     },
+    "7677": {
+        "text": "Link copied",
+        "context": "Message shown when the link has been copied to the clipboard."
+    },
     "7679": {
         "text": "You need to have a MEGA account in order to continue.",
         "context": "Prompted through a dialog when a certain action requires a MEGA account in order to continue.\r\n"
@@ -10866,5 +10870,13 @@
     "7680": {
         "text": "MEGA's cryptographic model depends on the keys displayed above. We recommend sending the decryption keys separately from the folder\/file link, through a secure channel.",
         "context": "An explanation about what the two parts of a public link are for. The first sentence explains why both parts are required, but the second sentence recommends they be sent to other people separately, in two different messages.\r\n\r\nOne part of the link is the 'folder\/file link'. The other part is the 'decryption key'."
+    },
+    "7681": {
+        "text": "Folder\/File Link",
+        "context": "This is a label for part of a url - a link that refers to a file or folder."
+    },
+    "7682": {
+        "text": "MEGA recommends sending the 'Decryption Key' separately from the 'Folder\/File Link'.",
+        "context": "This is used in the Export\/Get Link menu option to explain the best method for sending the two separate parts of the full link."
     }
 }

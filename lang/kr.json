@@ -2714,6 +2714,9 @@
     "7665": "\ud604\uc7ac",
     "7666": "\ud65c\uc131",
     "7667": "\ub2e4\ub978 \uc138\uc158 \ub2eb\uae30",
+    "7677": "Link copied",
     "7679": "\uc9c4\ud589\ud558\ub824\uba74 MEGA \uacc4\uc815\uc774 \ud544\uc694\ud569\ub2c8\ub2e4.",
-    "7680": "MEGA's cryptographic model depends on the keys displayed above. We recommend sending the decryption keys separately from the folder\/file link, through a secure channel."
+    "7680": "MEGA's cryptographic model depends on the keys displayed above. We recommend sending the decryption keys separately from the folder\/file link, through a secure channel.",
+    "7681": "Folder\/File Link",
+    "7682": "MEGA recommends sending the 'Decryption Key' separately from the 'Folder\/File Link'."
 }

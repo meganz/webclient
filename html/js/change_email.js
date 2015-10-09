@@ -85,7 +85,9 @@ function verify_email_passwd(passaes) {
 function verify_email() {
     verifyEmail = {code: page.substr(6)};
     if (!u_type) {
-        return document.location.href = "#login";
+        return msgDialog('warninga', 'Information', "You need to be logged in to complete your email change. Please log in again with your current email address and then click on your confirmation link again.",  false, function() {
+            document.location.href = "#login";
+        });
     }
     $('#verify-password').rebind('focus',function(e)
     {

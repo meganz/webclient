@@ -3450,7 +3450,7 @@ function accountUI()
                 },  {
                     callback : function(res) {
                         if (res === -12) {
-                            return msgDialog('warninga', 'Error', 'That email address already exists'); 
+                            return msgDialog('warninga', 'Error', "You have already sent a confirm link to that address."); 
                         }
 
                         msgDialog('warninga', 'Email', "We've send you a link to your email address. Please open it to verify your email");

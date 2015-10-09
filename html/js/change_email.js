@@ -1,55 +1,92 @@
-function verify_email_passwd() {
-    var password = $('#verify-password').val();
-    var passwordaes = new sjcl.cipher.aes(prepare_key_pw(password));
-    var email = u_attr.email.toLowerCase();
-    var uh = stringhash(email, passwordaes);
-    $('.login-register-input.password').addClass('loading').removeClass('incorrect');
-    $('#verify-password').val('');
-    api_req({
-        a: 'us',
-        user: email,
-        uh: uh
-    }, {
+var verifyEmail = null;
+
+function verify_email_err(errcode) {
+    if (typeof errcode != "number") {
+        return false;
+    }
+
+    switch (errcode) {
+    case 0:
+        return false;
+
+    case EEXIST:
+        title   = "Error";
+        errbody = "This email address has already been taken. Please contact MEGA support for more information.";
+        break;
+    case EEXPIRED:
+    default:
+        title   = "Error";
+        msgbody = "Your confirmation link for this email has expired. Please click ok to restart the process.";
+    }
+    
+    verifyEmail = null; /* wipe variable */
+    msgDialog('warninga', title, msgbody, false, function() {
+        document.location.href = "#fm/account/profile";
+    });
+
+    return true;
+}
+
+function verify_email_callback(passaes) {
+    var k1 = verifyEmail.k1 || u_attr.k;
+    var k2 = verifyEmail.k2 || u_k;
+    if (decrypt_key(passaes, base64_to_a32(k1)).join(",")  !== (k2).join(",")) {
+        $('.login-register-input.password').addClass('loading').removeClass('incorrect');
+        return;
+    }
+
+    verifyEmail.u_k = null;
+    
+    loadingDialog.show();
+    var args = {
+        a: 'sec',
+        c: verifyEmail.code,
+        e: verifyEmail.email,
+        uh: stringhash(verifyEmail.email, passaes),
+        r:1,
+        i: requesti
+    };
+    api_req(args, { 
         callback: function(res) {
-            $('.login-register-input.password').removeClass('loading');
-            if (typeof res === "number") {
-                $('.login-register-input.password').addClass('incorrect').focus();
+            loadingDialog.hide();
+            $('.fm-account-change-email.disabled')
+                .removeClass('disabled')
+                .find('span').text('Request email change')
+            if (verify_email_err(res)) {
                 return;
             }
-            loadingDialog.show();
-            var newEmail = localStorage.new_email;
-            var args = {
-                a: 'sec',
-                c: page.substr(6),
-                e: newEmail,
-                uh: stringhash(newEmail, passwordaes),
-                r:1,
-                i: requesti
-            };
-            api_req(args, { 
-                callback: function(res) {
-                    loadingDialog.hide();
-                    $('.fm-account-change-email.disabled')
-                        .removeClass('disabled')
-                        .find('span').text('Request email change')
-                    if (res === 0) {
-                        u_attr.email = newEmail;
-                        $('#account-email').val('').attr('placeholder', newEmail);
-                        msgDialog('warninga', 'Congratulations', 'Congratulations, your new email address for this mega account is ' + newEmail, false, function() {
-                            document.location.href = "#fm/account/profile";
-                        });
-                    } else { 
-                        msgDialog('warninga', 'Error', 'The verification code expired, please send another one', false, function() {
-                            document.location.href = "#fm/account/profile";
-                        });
-                    }
-                }
+
+            u_attr.email = verifyEmail.code;
+            $('#account-email').val('').attr('placeholder', verifyEmail.email);
+            title   = 'Congratulations';
+            msgbody = 'Congratulations, your new email address for this mega account is ' + verifyEmail.email;
+            verifyEmail = null; /* wipe variable */
+            msgDialog('warninga', title, msgbody, false, function() {
+                document.location.href = "#fm/account/profile";
             });
         }
     });
 }
 
+function verify_email_passwd(passaes) {
+    passaes = passaes || new sjcl.cipher.aes(prepare_key_pw($('#verify-password').val()));
+    $('.login-register-input.password').addClass('loading').removeClass('incorrect');
+    $('#verify-password').val('');
+    api_req({"a":"ersv", "c": verifyEmail.code}, { callback: function(res) {
+        if (verify_email_err(res)) {
+            return;
+        }
+
+        verifyEmail.email = res[1];
+        verify_email_callback(passaes);
+    }});
+}
+
 function verify_email() {
+    verifyEmail = {code: page.substr(6)};
+    if (!u_type) {
+        return document.location.href = "#login";
+    }
     $('#verify-password').rebind('focus',function(e)
     {
         $('.login-register-input.password.first').removeClass('incorrect');

@@ -6542,7 +6542,6 @@ function balance2pro(callback)
 
         $('.fm-dialog.export-links-dialog').removeClass('hidden');
         $('.export-link-body').removeAttr('style');
-
         $('.export-links-warning').removeClass('hidden');
 
         if ($('.export-link-body').outerHeight() === 318) {// ToDo: How did I find this integer?
@@ -6568,28 +6567,30 @@ function balance2pro(callback)
         // Setup the copy to clipboard buttons
         $span.text(l[1990]);
 
+        // If a browser extension or the new HTML5 native copy/paste is available (Chrome & Firefox)
         if (is_extension || self.execCommandUsable()) {
             if (!is_chrome_firefox) {
                 $('.fm-dialog-chrome-clipboard').removeClass('hidden');
             }
 
-            // chrome & firefox
-            $(".copy-to-clipboard").rebind('click', function() {
+            $('.copy-to-clipboard').rebind('click', function() {
                 success = true;
                 doLinks = ($(this).attr('id') === 'clipboardbtn1');
                 links = $.trim(doLinks ? getClipboardLinks() : getclipboardkeys());
 
+                // If extension, use the native extension method
                 if (is_chrome_firefox) {
                     mozSetClipboard(links);
                 }
                 else {
+                    // Put the link/s in an invisible div, highlight the link/s then copy to clipboard using HTML5
                     $('#chromeclipboard').html(links);
                     selectText('chromeclipboard');
                     success = document.execCommand('copy');
                 }
 
                 if (success) {
-                    showToast('clipboard', toastTxt, $span, l[7656]);
+                    showToast('clipboard', toastTxt);
                 }
             });
         }
@@ -6603,7 +6604,7 @@ function balance2pro(callback)
                 }
             });
             $('.copy-to-clipboard').rebind('mousedown', function() {
-                showToast('clipboard', toastTxt, $span, l[7656]);
+                showToast('clipboard', toastTxt);
             });
         }
         else {
@@ -6614,11 +6615,10 @@ function balance2pro(callback)
                     links = $.trim(getClipboardLinks());
                     var mode = links.indexOf("\n") !== -1 ? 'Text' : 'URL';
                     window.clipboardData.setData(mode, links);
-                    showToast('clipboard', toastTxt, $span, l[7656]);
+                    showToast('clipboard', toastTxt);
                 });
             }
             else {
-
                 if (window.ClipboardEvent) {
                     $('.copy-to-clipboard').rebind('click', function() {
                         var doLinks = ($(this).attr('id') === 'clipboardbtn1');
@@ -6629,19 +6629,15 @@ function balance2pro(callback)
                             ev.clipboardData.setData('text/plain', links);
                             if (doLinks) {
                                 ev.clipboardData.setData('text/html', links.split("\n").map(function(link) {
-                                    return '<a href="' + link + '">'
-//                                        + phf.value[link.match(/#F?!([\w-]{8})/).pop()]
-                                        + '</a>';
+                                    return '<a href="' + link + '"></a>';
                                 }).join("<br/>\n"));
                             }
                             ev.preventDefault();
-                            showToast('clipboard', toastTxt, $span, l[7656]); // Done
+                            showToast('clipboard', toastTxt); // Done
                         };
                         document.addEventListener('copy', window.onCopyEventHandler, false);
                         Soon(function() {
-                            // var ev = new ClipboardEvent('copy', { dataType: 'text/plain', data: links });
-                            // document.dispatchEvent(ev);
-                            $span.text('Hit ' + (uad.os === 'Apple' ? 'cmd':'ctrl') + '-c');
+                            $span.text(l[7663] + ' ' + (uad.os === 'Apple' ? 'command' : 'ctrl') + ' + C');
                         });
                     });
                 }
@@ -6650,7 +6646,6 @@ function balance2pro(callback)
                     $('.copy-to-clipboard').addClass('hidden');
                 }
             }
-
         }
 
         // Click anywhere on export link dialog will hide export link dropdown

@@ -8607,10 +8607,10 @@ function getclipboardkeys() {
 
 /**
  * Show toast notification
-*/
-function showToast (toastClass, notification, successBlock, successTxt) {
-    var $toast,
-        interval;
+ */
+function showToast(toastClass, notification, successBlock, successTxt) {
+    
+    var $toast, interval;
 
     $toast = $('.toast-notification.common-toast');
     $toast.attr('class', 'toast-notification common-toast ' + toastClass).find('.toast-col:first-child').html(notification);
@@ -8622,7 +8622,7 @@ function showToast (toastClass, notification, successBlock, successTxt) {
         hideToast(interval);
     }, 5000);
 
-    $('.common-toast .toast-button').rebind('click', function(e)
+    $('.common-toast .toast-button').rebind('click', function()
     {
         $('.toast-notification').removeClass('visible');
     });

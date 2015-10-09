@@ -2714,5 +2714,6 @@
     "7665": "Semasa",
     "7666": "Aktif",
     "7667": "Tutup sesi yang lain",
-    "7679": "Anda perlu memiliki akaun MEGA untuk meneruskan."
+    "7679": "Anda perlu memiliki akaun MEGA untuk meneruskan.",
+    "7680": "MEGA's cryptographic model depends on the keys displayed above. We recommend sending the decryption keys separately from the folder\/file link, through a secure channel."
 }

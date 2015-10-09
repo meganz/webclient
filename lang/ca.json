@@ -2714,5 +2714,6 @@
     "7665": "Actual",
     "7666": "Activa",
     "7667": "Tanca les altres sessions",
-    "7679": "You need to have a MEGA account in order to continue."
+    "7679": "You need to have a MEGA account in order to continue.",
+    "7680": "MEGA's cryptographic model depends on the keys displayed above. We recommend sending the decryption keys separately from the folder\/file link, through a secure channel."
 }

@@ -2714,5 +2714,6 @@
     "7665": "\u10d0\u10db\u10df\u10d0\u10db\u10d8\u10dc\u10d3\u10d4\u10da\u10d8",
     "7666": "\u10d0\u10e5\u10e2\u10d8\u10e3\u10e0\u10d8",
     "7667": "Close other sessions",
-    "7679": "You need to have a MEGA account in order to continue."
+    "7679": "You need to have a MEGA account in order to continue.",
+    "7680": "MEGA's cryptographic model depends on the keys displayed above. We recommend sending the decryption keys separately from the folder\/file link, through a secure channel."
 }

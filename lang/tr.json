@@ -2714,5 +2714,6 @@
     "7665": "Mevcut",
     "7666": "Aktif",
     "7667": "Di\u011fer oturumlar\u0131 kapat",
-    "7679": "You need to have a MEGA account in order to continue."
+    "7679": "You need to have a MEGA account in order to continue.",
+    "7680": "MEGA's cryptographic model depends on the keys displayed above. We recommend sending the decryption keys separately from the folder\/file link, through a secure channel."
 }

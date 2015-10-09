@@ -10862,5 +10862,9 @@
     "7679": {
         "text": "You need to have a MEGA account in order to continue.",
         "context": "Prompted through a dialog when a certain action requires a MEGA account in order to continue.\r\n"
+    },
+    "7680": {
+        "text": "MEGA's cryptographic model depends on the keys displayed above. We recommend sending the decryption keys separately from the folder\/file link, through a secure channel.",
+        "context": "An explanation about what the two parts of a public link are for. The first sentence explains why both parts are required, but the second sentence recommends they be sent to other people separately, in two different messages.\r\n\r\nOne part of the link is the 'folder\/file link'. The other part is the 'decryption key'."
     }
 }

@@ -7807,16 +7807,8 @@
         "text": "Share options",
         "context": ""
     },
-    "6850": {
-        "text": "Looks like there's a malformed email.",
-        "context": ""
-    },
     "6851": {
         "text": "You have already imported contacts from Gmail.",
-        "context": ""
-    },
-    "6852": {
-        "text": "Looks like there s a malformed email there",
         "context": ""
     },
     "6853": {
@@ -10571,10 +10563,6 @@
         "text": "You have selected over {0} items ({0}) to download. Do you want to proceed?",
         "context": "Message of the dialog displayed when a user would try to download at the same time more nodes than the reliable number of simultaneous downloads for a good app performance. This dialog ask confirmation to start the download process.\nPreserve the ({0}) codes because is for include the maximum reliable download number and the precise number of nodes to be downloaded in runtime."
     },
-    "7592": {
-        "text": "The subscription has not been canceled correctly. Please contact support@mega.co.nz to cancel your subscription.",
-        "context": "Message of the dialog displayed when the process\/request to cancel a subscription failed."
-    },
     "7593": {
         "text": "https:\/\/mega.co.nz\/mobile_terms.html",
         "context": ""
@@ -10870,5 +10858,9 @@
     "7667": {
         "text": "Close other sessions",
         "context": "Button text to close other login sessions except the current session in use. This will log out other devices which have an active login session."
+    },
+    "7679": {
+        "text": "You need to have a MEGA account in order to continue.",
+        "context": "Prompted through a dialog when a certain action requires a MEGA account in order to continue.\r\n"
     }
 }

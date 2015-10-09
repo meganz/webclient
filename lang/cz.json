@@ -1951,9 +1951,7 @@
     "6847": "MEGA nesplnilo sv\u00e9 sliby",
     "6848": "Napi\u0161te koment\u00e1\u0159",
     "6849": "Mo\u017enosti sd\u00edlen\u00ed",
-    "6850": "Vypad\u00e1 to, \u017ee je zde po\u0161kozen\u00fd e-mail",
     "6851": "Ji\u017e jste importovali kontakty z Gmailu",
-    "6852": "Vypad\u00e1 to, \u017ee je zde po\u0161kozen\u00fd e-mail",
     "6853": "Zahrnout osobn\u00ed zpr\u00e1vu pro nov\u00e9 kontakty",
     "6854": "Sd\u00edlet slo\u017eku s kontakty",
     "6855": "Vyberte slo\u017eku pro sd\u00edlen\u00ed",
@@ -2642,7 +2640,6 @@
     "7589": "P\u0159esunout polo\u017eku do ko\u0161e?",
     "7590": "P\u0159esunout polo\u017eky do ko\u0161e?",
     "7591": "M\u00e1te vybr\u00e1no v\u00edce ne\u017e {0} polo\u017eek ({0}) ke sta\u017een\u00ed. Chcete pokra\u010dovat?",
-    "7592": "P\u0159edplatn\u00e9 nebylo spr\u00e1vn\u011b  zru\u0161eno. Obra\u0165te se na support@mega.co.nz pro zru\u0161en\u00ed va\u0161eho p\u0159edplatn\u00e9ho.",
     "7593": "https:\/\/mega.co.nz\/mobile_terms.html",
     "7594": "windowsphone@mega.co.nz",
     "7595": "Na\u010d\u00edt\u00e1n\u00ed soubor\u016f a slo\u017eek... [{0}]",
@@ -2712,9 +2709,10 @@
     "7659": "V\u00e1\u0161 \u00fa\u010det byl pozastaven kv\u016fli p\u0159ekro\u010den\u00ed vyu\u017eit\u00ed dat. Obra\u0165te se na support@mega.nz pro obnoven\u00ed va\u0161eho \u00fa\u010dtu.",
     "7660": "V\u00e1\u0161 \u00fa\u010det byl pozastaven kv\u016fli opakovan\u00e9mu poru\u0161en\u00ed autorsk\u00fdch pr\u00e1v.",
     "7661": "MEGA doporu\u010duje pos\u00edlat '\u0161ifrovac\u00ed kl\u00ed\u010d' odd\u011blen\u011b od 've\u0159ejn\u00e9ho z\u00e1kladn\u00edho odkazu'.",
-    "7663": "Press",
-    "7664": "Session status",
-    "7665": "Current",
-    "7666": "Active",
-    "7667": "Close other sessions"
+    "7663": "Stiskn\u011bte",
+    "7664": "Stav relace",
+    "7665": "Aktu\u00e1ln\u00ed",
+    "7666": "Aktivn\u00ed",
+    "7667": "Zav\u0159ete ostatn\u00ed relace",
+    "7679": "You need to have a MEGA account in order to continue."
 }

@@ -1951,9 +1951,7 @@
     "6847": "Mae MEGA wedi tangyflawni ei addewid",
     "6848": "Gadael sylw",
     "6849": "Dewisiadau rhannu",
-    "6850": "Mae'n ymddangos bod yna e-bost annilys",
     "6851": "Rydych eisoes wedi mewnforio cysylltiadau o Gmail",
-    "6852": "Mae'n ymddangos bod yna e-bost annilys yna",
     "6853": "Cynnwys neges bersonol i gysylltiadau newydd",
     "6854": "Rhannu'r blygell gyda'm cysylltiadau",
     "6855": "Dewiswch blygell i'w rhannu",
@@ -2642,7 +2640,6 @@
     "7589": "Move item to rubbish bin?",
     "7590": "Move items to rubbish bin?",
     "7591": "You have selected over {0} items ({0}) to download. Do you want to proceed?",
-    "7592": "The subscription has not been canceled correctly. Please contact support@mega.co.nz to cancel your subscription.",
     "7593": "https:\/\/mega.co.nz\/mobile_terms.html",
     "7594": "windowsphone@mega.co.nz",
     "7595": "Fetching files and folders... [{0}]",
@@ -2716,5 +2713,6 @@
     "7664": "Session status",
     "7665": "Current",
     "7666": "Active",
-    "7667": "Close other sessions"
+    "7667": "Close other sessions",
+    "7679": "You need to have a MEGA account in order to continue."
 }

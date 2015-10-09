@@ -1951,9 +1951,7 @@
     "6847": "MEGA ei ole t\u00e4ytt\u00e4nyt lupauksiaan",
     "6848": "J\u00e4t\u00e4 kommentti",
     "6849": "Jaon valinnat",
-    "6850": "N\u00e4ytt\u00e4\u00e4 virheelliselt\u00e4 s\u00e4hk\u00f6postiviestilt\u00e4",
     "6851": "Olet jo tuonut kontaktit Gmailista",
-    "6852": "N\u00e4ytt\u00e4\u00e4 virheelliselt\u00e4 s\u00e4hk\u00f6postilta",
     "6853": "Liit\u00e4 mukaan henkil\u00f6kohtainen viesti kontakteille",
     "6854": "Jaa kansioita kontakteille",
     "6855": "Valitse jaettava kansio",
@@ -2642,7 +2640,6 @@
     "7589": "Move item to rubbish bin?",
     "7590": "Move items to rubbish bin?",
     "7591": "You have selected over {0} items ({0}) to download. Do you want to proceed?",
-    "7592": "The subscription has not been canceled correctly. Please contact support@mega.co.nz to cancel your subscription.",
     "7593": "https:\/\/mega.co.nz\/mobile_terms.html",
     "7594": "windowsphone@mega.co.nz",
     "7595": "Fetching files and folders... [{0}]",
@@ -2716,5 +2713,6 @@
     "7664": "Session status",
     "7665": "Current",
     "7666": "Active",
-    "7667": "Close other sessions"
+    "7667": "Close other sessions",
+    "7679": "You need to have a MEGA account in order to continue."
 }

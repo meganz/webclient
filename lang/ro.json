@@ -1951,9 +1951,7 @@
     "6847": "MEGA a oferit mai pu\u0163in fa\u0163\u0103 de promisiuni",
     "6848": "Las\u0103 un comentariu",
     "6849": "Op\u0163iuni de partajare",
-    "6850": "Se pare c\u0103 este un e-mail incorect",
     "6851": "Ai importat deja contacte din Gmail",
-    "6852": "Se pare c\u0103 exist\u0103 un e-mail incorect acolo",
     "6853": "Include mesaj personal pentru contactele noi",
     "6854": "Partajeaz\u0103 folderul cu contacte",
     "6855": "Selecteaz\u0103 folderul de partajat",
@@ -2642,7 +2640,6 @@
     "7589": "Mu\u0163i elementul la co\u015ful de gunoi?",
     "7590": "Mu\u0163i elementele la co\u015ful de gunoi?",
     "7591": "Ai selectat peste {0} elemente ({0}) pentru desc\u0103rcare. Dore\u015fti s\u0103 continui?",
-    "7592": "Abonamentul nu a fost anulat corect. Te rug\u0103m s\u0103 contactezi support@mega.nz pentru a anula abonamentul.",
     "7593": "https:\/\/mega.co.nz\/mobile_terms.html",
     "7594": "windowsphone@mega.co.nz",
     "7595": "Se preiau fi\u015fierele \u015fi folderele... [{0}]",
@@ -2716,5 +2713,6 @@
     "7664": "Session status",
     "7665": "Current",
     "7666": "Active",
-    "7667": "Close other sessions"
+    "7667": "Close other sessions",
+    "7679": "You need to have a MEGA account in order to continue."
 }

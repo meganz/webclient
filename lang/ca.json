@@ -1951,9 +1951,7 @@
     "6847": "MEGA no ha complert el que prometia",
     "6848": "Deixa un comentari",
     "6849": "Opcions de compartici\u00f3",
-    "6850": "Sembla que hi ha un correu electr\u00f2nic mal escrit",
     "6851": "Ja has importat contactes des de Gmail",
-    "6852": "Sembla que hi ha una adre\u00e7a de correu electr\u00f2nic mal escrita",
     "6853": "Inclou un missatge personal per als nous contactes",
     "6854": "Comparteix la carpeta amb contactes",
     "6855": "Selecciona la carpeta que vols compartir",
@@ -2642,7 +2640,6 @@
     "7589": "Ho vols moure a la paperera?",
     "7590": "Els vols moure a la paperera?",
     "7591": "Has seleccionat descarregar m\u00e9s de {0} items ({0}). Vols seguir endavant? ",
-    "7592": "La subscripci\u00f3 no s'ha pogut cancel\u00b7lar correctament.Si us plau, posa't en contacte amb support@mega.co.nz per cancel\u00b7lar la teva subscripci\u00f3.",
     "7593": "https:\/\/mega.co.nz\/mobile_terms.html",
     "7594": "windowsphone@mega.co.nz",
     "7595": "Rebent fitxers i carpetes... [{0}]",
@@ -2712,9 +2709,10 @@
     "7659": "Has estat susp\u00e8s per sobrepassar l'espai d'emmagatzematge. Si us plau, posa't en contacte amb support@mega.nz per recuperar el teu compte.",
     "7660": "Has estat susp\u00e8s per infringir de forma reiterada els drets de copyright.",
     "7661": "MEGA recomana enviar la 'clau de xifratge' separada de 'l'enlla\u00e7 p\u00fablic'.",
-    "7663": "Press",
-    "7664": "Session status",
-    "7665": "Current",
-    "7666": "Active",
-    "7667": "Close other sessions"
+    "7663": "Prem",
+    "7664": "Estat de la sessi\u00f3",
+    "7665": "Actual",
+    "7666": "Activa",
+    "7667": "Tanca les altres sessions",
+    "7679": "You need to have a MEGA account in order to continue."
 }

@@ -1298,11 +1298,11 @@ makeMetaAware(Karere);
             else if (_type === "groupchat") {
                 stanzaType = "ChatMessage";
 
-                //TODO: remove $
+                // TODO: remove $
 
                 eventData['message'] = $('messageContents', elems[0]).text();
 
-                //TODO: remove $
+                // TODO: remove $
                 // is this a forwarded message? if yes, trigger event only for that
                 if ($('forwarded', message).size() > 0) {
                     $('forwarded', message).each(function(k, v) {

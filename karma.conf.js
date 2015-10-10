@@ -130,6 +130,9 @@ module.exports = function(config) {
         'js/chat/ui/incomingCallDialog.js',
 
         // == Tests ==
+        (process.env.SKIP_WORKFLOWS)
+            ? 'test/config/test_workflows_off.js'
+            : 'test/config/test_workflows.js',
         {pattern: 'test/**/*_test.js', included: true}
     ],
 

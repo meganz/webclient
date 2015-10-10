@@ -129,7 +129,7 @@ body {
  background: #d22000;
  color: white;
 }
-.div, span, input {
+.div, span, input, object {
 	outline: none;
 }
 .bottom-pages.developers #pageholder {
@@ -3529,7 +3529,7 @@ img.blog-new-logos {
 	-moz-border-radius: 100%;
 	-webkit-border-radius: 100%;
 	border-radius: 100%;
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-position: 2px -496px;
 	background-repeat: no-repeat;
 	-webkit-transition: background-color 200ms ease-in-out;
@@ -3593,7 +3593,7 @@ img.blog-new-logos {
 	bottom: -16px;
 	left: 50%;
 	margin: 0 0 0 -8px;
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-position: -5px -2117px;
 	background-repeat: no-repeat;
 }
@@ -3632,7 +3632,7 @@ img.blog-new-logos {
 	height: 18px;
 	left: 11px;
 	top: 6px;
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-position: -132px -3180px;
 	background-repeat: no-repeat;
 	-webkit-transition: all 200ms ease-in-out;
@@ -3828,7 +3828,7 @@ label.iPhoneCheckLabelOff span {
 	height: 24px;
 	left: 10px;
 	top: 10px;
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v10.svg);
 	background-position: -1px -3035px;
 	background-repeat: no-repeat;
 }
@@ -4035,7 +4035,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 	cursor: default;
 }
 .nw-fm-tree-item.contains-folders .nw-fm-arrow-icon {
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v10.svg);
 	background-repeat: no-repeat;
 	background-position: center -845px;
 	cursor: pointer;
@@ -4059,7 +4059,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 	line-height: 23px;
 	color: #666666;
 	height: 24px;
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v10.svg);
 	background-position: -15px -7465px;
 	background-repeat: no-repeat;
 	-o-text-overflow: ellipsis;
@@ -4153,7 +4153,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 }
 .fm-add-user-scrolling .nw-contact-item {
 	padding-right: 32px;
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v10.svg);
 	background-position: right -2907px;
 	background-repeat: no-repeat;
 }
@@ -4178,7 +4178,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 	margin: 12px;
 	border: 2px solid #d9d9d9;
 	padding: 0 10px 0 32px;
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v10.svg);
 	background-position: -10px -2969px;
 	background-repeat: no-repeat;
 	-moz-border-radius: 5px;
@@ -4195,7 +4195,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 	color: #868686;
 }
 .verified .nw-contact-verified-icon {
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v10.svg);
 	background-position: -19px -2827px;
 	background-repeat: no-repeat;
 	position: absolute;
@@ -4297,7 +4297,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 	position: absolute;
 	width: 16px;
 	height: 16px;
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v10.svg);
 	z-index: 10;
 	background-position: -11px -2244px;
 	-webkit-box-sizing: border-box;
@@ -4376,7 +4376,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 	position: absolute;
 	right: 2px;
 	top: 0;
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v10.svg);
 	background-repeat: no-repeat;
 	background-position: -12px -752px;
 	cursor: pointer;
@@ -5004,7 +5004,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	display: block;
 }
 .nw-fm-search-icon {
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v10.svg);
 	background-repeat: no-repeat;
 	background-position: -11px -7881px;
 	position: absolute;
@@ -5039,7 +5039,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 .nw-fm-left-icon {
 	width: 48px;
 	height: 48px;
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v10.svg);
 	background-repeat: no-repeat;
 	cursor: pointer;
 	-webkit-box-sizing: border-box;
@@ -5156,7 +5156,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	position: absolute;
 	top: 49px;
 	width: 36px;
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v10.svg);
 	background-repeat: no-repeat;
 	background-position: center -10008px;
 }
@@ -5252,7 +5252,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 .rubbish-bin-icon, .settings-icon {
 	height: 48px;
 	width: 48px;
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v10.svg);
 	background-repeat: no-repeat;
 	background-position: 0 -188px;
 	cursor: pointer;
@@ -5417,7 +5417,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	height: calc(100% - 303px);
 }
 .files-grid-view th, .contacts-grid-view th, .grid-table-header th, .transfer-table-header th, .grid-table th, .files-grid-view.shared-view th, .files-grid-view.contacts-view th, .shared-grid-view th {
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v10.svg);
 	background-repeat: no-repeat;
 	background-position: right -1529px;
 }
@@ -5431,7 +5431,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	height: 24px;
 	width: 30px;
 	display: block;
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v10.svg);
 	background-repeat: no-repeat;
 	background-position: -7px -1469px;
 }
@@ -5481,7 +5481,7 @@ th.grid-first-th {
 	height: 24px;
 	width: 25px;
 	display: block;
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v10.svg);
 	background-repeat: no-repeat;
 	background-position: -7px -1494px;
 }
@@ -5721,7 +5721,7 @@ table .grid-status-icon.star {
 	z-index: 10;
 }
 .grid-url-arrow span, .file-settings-icon span, .clear-transfer-icon span {
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v10.svg);
 	background-repeat: no-repeat;
 	background-position: -18px -7788px;
 	-webkit-transition: opacity 200ms ease-in-out;
@@ -5914,7 +5914,7 @@ table {
 	background-position: -61px -1196px;
 }
 .transfer-filtype-icon.folder, .search-path-icon-span.folder, .transfer-filtype-icon.folder-shared, .search-path-icon-span.folder-shared {
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v10.svg);
 	background-position: -14px -7465px;
 	background-repeat: no-repeat;
 }
@@ -5922,7 +5922,7 @@ table {
 	background-position: -14px -7566px;
 }
 .rename-input-bl .transfer-filtype-icon.folder, .rename-input-bl .transfer-filtype-icon.folder-shared {
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-position: -7px -1974px;
 }
 .focused .rename-input-bl .transfer-filtype-icon.folder {
@@ -6254,8 +6254,8 @@ table {
 	background-position: center -4614px;
 }
 .export-icon.folder-shared, .export-icon.folder {
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
-	background-position: -10px -2680px;
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
+	background-position: -7px -2680px;
 }
 .dragger-icon.flash, .export-icon.flash, .new-download-file-icon.flash, .share-folder-icon div.flash {
 	background-position: center -4694px;
@@ -6644,7 +6644,7 @@ table {
 	line-height: 23px;
 	padding: 0 0 0 24px;
 	white-space: nowrap;
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v10.svg);
 	background-repeat: no-repeat;
 	display: block;
 }
@@ -6742,7 +6742,7 @@ table {
 	-moz-opacity: 0.5;
 	-khtml-opacity: 0.5;
 	opacity: 0.5;
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v10.svg);
 	background-repeat: no-repeat;
 	background-position: 5px -1003px;
 	cursor: pointer;
@@ -6789,7 +6789,7 @@ table {
 	opacity: 0.7;
 }
 .fm-breadcrumbs.has-next-button, a.fm-breadcrumbs.has-next-button, .fm-share-breadcrumbs.has-next-button, a.fm-share-breadcrumbs.has-next-button {
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v10.svg);
 	background-repeat: no-repeat;
 	background-position: right -1433px;
 }
@@ -6797,7 +6797,7 @@ table {
 	line-height: 23px;
 	color: #777777;
 	font-size: 14px;
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v10.svg);
 	background-repeat: no-repeat;
 	background-position: 5px -1003px;
 	cursor: pointer;
@@ -6840,7 +6840,7 @@ table {
 	font-size: 13px;
 	color: #333333;
 	padding: 0 20px 0 22px;
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v10.svg);
 	background-repeat: no-repeat;
 	background-position: -2px -3304px;
 	float: right;
@@ -6946,7 +6946,7 @@ table {
 	cursor: pointer;
 	top: 0;
 }
-.fm-add-user, .fm-start-video-call, .fm-clearbin-button, .fm-send-files, .fm-start-call, .fm-leave-share, .fm-share-copy, .fm-share-download, .contact-send-files, .fm-start-conversation, .fm-share-folders, .fm-verify, .fm-reset-stored-fingerprint, .fm-question, .fm-chat-end, .fm-end-call, .fm-download-as-zip, .fm-import-to-cloudrive, .fm-dialog-button, .fm-account-button, .avatar-dialog .fm-account-change-avatar, .top-dialog-login-button, .nw-chat-button, .multiple-sharing.expanded .main-body .nw-chat-button, .fm-chat-attach-button, .fm-chat-contact-button, .fm-new-folder, .search-files-result, .search-messages-result, .fm-file-upload, .search-messages-result, .fm-folder-upload, .fm-notification-settings, .create-folder-button, .add-user-popup-button, .create-folder-button-cancel, .fm-dialog-new-folder-button, .rename-dialog-button, .contact-request-button, .transfer-clear-all-icon, .transfer-clear-completed, .transfer-pause-icon {
+.fm-add-user, .fm-start-video-call, .fm-clearbin-button, .fm-send-files, .fm-start-call, .fm-leave-share, .fm-share-copy, .fm-share-download, .contact-send-files, .fm-start-conversation, .fm-share-folders, .fm-verify, .fm-reset-stored-fingerprint, .fm-question, .fm-chat-end, .fm-end-call, .fm-download-as-zip, .fm-import-to-cloudrive, .fm-dialog-button, .fm-close-all-sessions, .fm-account-button, .avatar-dialog .fm-account-change-avatar, .top-dialog-login-button, .nw-chat-button, .multiple-sharing.expanded .main-body .nw-chat-button, .fm-chat-attach-button, .fm-chat-contact-button, .fm-new-folder, .search-files-result, .search-messages-result, .fm-file-upload, .search-messages-result, .fm-folder-upload, .fm-notification-settings, .create-folder-button, .add-user-popup-button, .create-folder-button-cancel, .fm-dialog-new-folder-button, .rename-dialog-button, .contact-request-button, .transfer-clear-all-icon, .transfer-clear-completed, .transfer-pause-icon {
 	height: 32px;
 	float: right;
 	-webkit-box-sizing: border-box;
@@ -6963,25 +6963,25 @@ table {
 	transition: background-color 200ms ease-in-out;
 	cursor: pointer;
 	position: relative;
-	-moz-border-radius: 12px;
-	-webkit-border-radius: 12px;
-	border-radius: 12px;
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	border-radius: 8px;
 }
-.fm-add-user span, .fm-start-video-call span, .fm-clearbin-button span, .fm-send-files span, .fm-start-call span, .fm-leave-share span, .fm-share-copy span, .fm-share-download span, .contact-send-files span, .fm-start-conversation span, .fm-share-folders span, .fm-verify span, .fm-reset-stored-fingerprint span, .fm-question span, .fm-chat-end span, .fm-end-call span, .fm-download-as-zip span, .fm-import-to-cloudrive span, .fm-chat-file-button span, .fm-dialog-button span, .fm-account-button span, .avatar-dialog .fm-account-change-avatar span, .top-dialog-login-button span, .nw-chat-button span, .multiple-sharing.expanded .main-body .nw-chat-button span, .fm-chat-attach-button span, .fm-chat-contact-button span, .fm-new-folder span, .search-files-result span, .search-messages-result span, .fm-file-upload span, .search-messages-result span, .fm-folder-upload span, .fm-notification-settings span, .create-folder-button span, .add-user-popup-button span, .create-folder-button-cancel span, .fm-dialog-new-folder-button span, .rename-dialog-button span, .contact-request-button span, .transfer-clear-all-icon span, .transfer-clear-completed span, .transfer-pause-icon span {
+.fm-add-user span, .fm-start-video-call span, .fm-clearbin-button span, .fm-send-files span, .fm-start-call span, .fm-leave-share span, .fm-share-copy span, .fm-share-download span, .contact-send-files span, .fm-start-conversation span, .fm-share-folders span, .fm-verify span, .fm-reset-stored-fingerprint span, .fm-question span, .fm-chat-end span, .fm-end-call span, .fm-download-as-zip span, .fm-import-to-cloudrive span, .fm-chat-file-button span, .fm-dialog-button span, .fm-close-all-sessions span, .fm-account-button span, .avatar-dialog .fm-account-change-avatar span, .top-dialog-login-button span, .nw-chat-button span, .multiple-sharing.expanded .main-body .nw-chat-button span, .fm-chat-attach-button span, .fm-chat-contact-button span, .fm-new-folder span, .search-files-result span, .search-messages-result span, .fm-file-upload span, .search-messages-result span, .fm-folder-upload span, .fm-notification-settings span, .create-folder-button span, .add-user-popup-button span, .create-folder-button-cancel span, .fm-dialog-new-folder-button span, .rename-dialog-button span, .contact-request-button span, .transfer-clear-all-icon span, .transfer-clear-completed span, .transfer-pause-icon span {
 	-webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
 	background-color: rgba(255,255,255,1);
 	-moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
 	box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
 	display: block;
 	font-size: 14px;
-	-moz-border-radius: 8px;
-	-webkit-border-radius: 8px;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
 	height: 24px;
-	border-radius: 8px;
+	border-radius: 4px;
 	line-height: 23px;
 	color: #777777;
 	padding: 0 10px 0 30px;
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v10.svg);
 	background-repeat: no-repeat;
 	background-position: -1px -8510px;
 	text-align: center;
@@ -7100,7 +7100,7 @@ table {
 	float: left;
 	display: block;
 }
-.fm-dialog-button, .fm-account-button, .avatar-dialog .fm-account-change-avatar, .top-dialog-login-button, .nw-chat-button, .multiple-sharing.expanded .main-body .nw-chat-button, .fm-chat-attach-button, .fm-chat-contact-button {
+.fm-dialog-button, .fm-close-all-sessions, .fm-account-button, .avatar-dialog .fm-account-change-avatar, .top-dialog-login-button, .nw-chat-button, .multiple-sharing.expanded .main-body .nw-chat-button, .fm-chat-attach-button, .fm-chat-contact-button {
 	margin: 11px -4px 0 4px;
 }
 .fm-dialog-button, .avatar-dialog .fm-account-change-avatar, .top-dialog-login-button, .create-folder-button, .add-user-popup-button, .create-folder-button-cancel, .fm-dialog-new-folder-button, .rename-dialog-button {
@@ -7114,8 +7114,8 @@ table {
 	height: 32px;
 	line-height: 31px;
 }
-.fm-dialog-button span, .fm-account-button span, .avatar-dialog .fm-account-change-avatar span, .top-dialog-login-button span, .nw-chat-button span, .multiple-sharing.expanded .main-body .nw-chat-button span, .fm-chat-attach-button span, .fm-chat-contact-button span, .create-folder-button span, .add-user-popup-button span, .create-folder-button-cancel span, .fm-dialog-new-folder-button span, .rename-dialog-button span, .contact-request-button span {
-	padding: 0 10px;
+.fm-dialog-button span, .fm-close-all-sessions span, .fm-account-button span, .avatar-dialog .fm-account-change-avatar span, .top-dialog-login-button span, .nw-chat-button span, .multiple-sharing.expanded .main-body .nw-chat-button span, .fm-chat-attach-button span, .fm-chat-contact-button span, .create-folder-button span, .add-user-popup-button span, .create-folder-button-cancel span, .fm-dialog-new-folder-button span, .rename-dialog-button span, .contact-request-button span {
+	padding: 0 15px;
 }
 .nw-chat-button, .multiple-sharing.expanded .main-body .nw-chat-button {
 	float: left;
@@ -7138,7 +7138,7 @@ table {
 	background-position: -7px -9561px;
 }
 /* gray border */
-.fm-add-user:hover, .fm-start-video-call:hover, .fm-clearbin-button:hover, .fm-send-files:hover, .fm-start-call:hover, .fm-leave-share:hover, .fm-share-copy:hover, .fm-share-download:hover, .contact-send-files:hover, .fm-start-conversation:hover, .fm-share-folders:hover, .fm-verify:hover, .fm-reset-stored-fingerprint:hover, .fm-question:hover, .fm-chat-end:hover, .fm-end-call:hover, .fm-download-as-zip:hover, .fm-import-to-cloudrive:hover, .fm-dialog-button:hover, .fm-account-button:hover, .avatar-dialog .fm-account-change-avatar:hover, .top-dialog-login-button:hover, .nw-chat-button:hover, .multiple-sharing.expanded .main-body .nw-chat-button:hover, .fm-chat-attach-button:hover, .fm-chat-contact-button:hover, .fm-add-user.active, .fm-start-video-call.active, .fm-clearbin-button.active, .fm-send-files.active, .fm-start-call.active, .fm-leave-share.active, .fm-share-copy.active, .fm-share-download.active, .contact-send-files.active, .fm-start-conversation.active, .fm-share-folders.active, .fm-verify.active, .fm-reset-stored-fingerprint.active, .fm-question.active, .fm-chat-end.active, .fm-end-call.active, .fm-download-as-zip.active, .fm-import-to-cloudrive.active, .fm-dialog-button.active, .fm-account-button.active, .avatar-dialog .fm-account-change-avatar.active, .top-dialog-login-button.active, .nw-chat-button.active, .multiple-sharing.expanded .main-body .nw-chat-button.active, .fm-chat-attach-button.active, .fm-chat-contact-button.active, .add-user-popup-button:hover, .add-user-popup-button.active, .create-folder-button-cancel:hover, .create-folder-button-cancel.active, .fm-dialog-new-folder-button:hover, .fm-dialog-new-folder-button.active, .rename-dialog-button:hover, .rename-dialog-button.active, .contact-request-button:hover, .contact-request-button.active {
+.fm-add-user:hover, .fm-start-video-call:hover, .fm-clearbin-button:hover, .fm-send-files:hover, .fm-start-call:hover, .fm-leave-share:hover, .fm-share-copy:hover, .fm-share-download:hover, .contact-send-files:hover, .fm-start-conversation:hover, .fm-share-folders:hover, .fm-verify:hover, .fm-reset-stored-fingerprint:hover, .fm-question:hover, .fm-chat-end:hover, .fm-end-call:hover, .fm-download-as-zip:hover, .fm-import-to-cloudrive:hover, .fm-dialog-button:hover, .fm-close-all-sessions:hover, .fm-account-button:hover, .avatar-dialog .fm-account-change-avatar:hover, .top-dialog-login-button:hover, .nw-chat-button:hover, .multiple-sharing.expanded .main-body .nw-chat-button:hover, .fm-chat-attach-button:hover, .fm-chat-contact-button:hover, .fm-add-user.active, .fm-start-video-call.active, .fm-clearbin-button.active, .fm-send-files.active, .fm-start-call.active, .fm-leave-share.active, .fm-share-copy.active, .fm-share-download.active, .contact-send-files.active, .fm-start-conversation.active, .fm-share-folders.active, .fm-verify.active, .fm-reset-stored-fingerprint.active, .fm-question.active, .fm-chat-end.active, .fm-end-call.active, .fm-download-as-zip.active, .fm-import-to-cloudrive.active, .fm-dialog-button.active, .fm-account-button.active, .avatar-dialog .fm-account-change-avatar.active, .top-dialog-login-button.active, .nw-chat-button.active, .multiple-sharing.expanded .main-body .nw-chat-button.active, .fm-chat-attach-button.active, .fm-chat-contact-button.active, .add-user-popup-button:hover, .add-user-popup-button.active, .create-folder-button-cancel:hover, .create-folder-button-cancel.active, .fm-dialog-new-folder-button:hover, .fm-dialog-new-folder-button.active, .rename-dialog-button:hover, .rename-dialog-button.active, .contact-request-button:hover, .contact-request-button.active {
 	background-color: rgba(0,0,0,0.15);
 }
 .fm-add-user:hover span, .fm-start-video-call:hover span, .fm-clearbin-button:hover span, .fm-send-files:hover span, .fm-start-call:hover span, .fm-leave-share:hover span, .fm-share-copy:hover span, .fm-share-download:hover span, .contact-send-files:hover span, .fm-start-conversation:hover span, .fm-share-folders:hover span, .fm-verify:hover span, .fm-reset-stored-fingerprint:hover span, .fm-question:hover span, .fm-chat-end:hover span, .fm-end-call:hover span, .fm-download-as-zip:hover span, .fm-import-to-cloudrive:hover span, .fm-chat-file-button:hover span, .fm-dialog-button:hover span, .fm-account-button:hover span, .avatar-dialog .fm-account-change-avatar:hover span, .top-dialog-login-button:hover span, .nw-chat-button:hover span, .multiple-sharing.expanded .main-body .nw-chat-button:hover span, .fm-chat-attach-button:hover span, .fm-chat-contact-button:hover span, .fm-add-user.active span, .fm-start-video-call.active span, .fm-clearbin-button.active span, .fm-send-files.active span, .fm-start-call.active span, .fm-leave-share.active span, .fm-share-copy.active span, .fm-share-download.active span, .contact-send-files.active span, .fm-start-conversation.active span, .fm-share-folders.active span, .fm-verify.active span, .fm-reset-stored-fingerprint.active span, .fm-question.active span, .fm-chat-end.active span, .fm-end-call.active span, .fm-download-as-zip.active span, .fm-import-to-cloudrive.active span, .fm-chat-file-button.active span, .fm-dialog-button.active span, .fm-account-button.active span, .avatar-dialog .fm-account-change-avatar.active span, .top-dialog-login-button.active span, .nw-chat-button.active span, .multiple-sharing.expanded .main-body .nw-chat-button.active span, .fm-chat-attach-button.active span, .fm-chat-contact-button.active span, .add-user-popup-button:hover span, .add-user-popup-button.active span, .create-folder-button-cancel:hover span, .create-folder-button-cancel.active span, .fm-dialog-new-folder-button:hover span, .fm-dialog-new-folder-button.active span, .rename-dialog-button:hover span, .rename-dialog-button.active span, .contact-request-button:hover span, .contact-request-button.active span {
@@ -7320,7 +7320,7 @@ table {
 	display: block;
 	float: right;
 	margin: 15px 10px 0 23px;
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v10.svg);
 	background-repeat: no-repeat;
 	-webkit-transition: opacity 200ms ease-in-out;
 	-moz-transition: opacity 200ms ease-in-out;
@@ -7570,7 +7570,7 @@ table {
 	cursor: pointer;
 }
 .context-menu-item.contains-submenu {
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v10.svg);
 	background-position: right -4593px;
 	background-repeat: no-repeat;
 }
@@ -7594,7 +7594,7 @@ table {
 .contacts-sorting-by.active:hover, .contacts-sorting-type.active:hover {
 	background-position: 0 -4912px;
 }
-.context-menu, .nw-sorting-menu, .dialog-sorting-menu, .permissions-menu {
+.context-menu, .nw-sorting-menu, .dialog-sorting-menu {
 	min-width: 160px;
 	position: absolute;
 	background-color: #333333;
@@ -7668,7 +7668,7 @@ table {
 	width: 25px;
 	height: 13px;
 	position: absolute;
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v10.svg);
 	background-position: center -5891px;
 	background-repeat: no-repeat;
 	margin: 25px 0 0 -12px;
@@ -7705,7 +7705,7 @@ table {
 	display: block !important;
 }
 .create-folder-size-icon, .add-user-size-icon {
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v10.svg);
 	background-position: center -5509px;
 	background-repeat: no-repeat;
 	width: 20px;
@@ -7769,7 +7769,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	color: #666666;
 	padding: 0 10px 0 42px;
 	margin: 0;
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-position: 3px -1890px;
 	background-repeat: no-repeat;
 	background-color: transparent;
@@ -7790,7 +7790,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	border-radius: 5px;
 	background-color: rgba(0,0,0,0.05);
 	height: 50px;
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-position: -3px -3527px;
 	background-repeat: no-repeat;
 	padding: 0 0 0 31px;
@@ -7981,7 +7981,7 @@ color: white;
 	width: 18px;
 	height: 18px;
 	position: absolute;
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v10.svg);
 	background-repeat: no-repeat;
 	margin: 20px 0 0 -22px;
 }
@@ -8148,7 +8148,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 	width: 16px;
 	height: 16px;
 	float: right;
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v10.svg);
 	background-repeat: no-repeat;
 	background-position: -13px -6439px;
 	margin: 16px -3px 0 0;
@@ -8304,7 +8304,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
 	height: 16px;
 	width: 16px;
 	margin: 0 auto;
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v10.svg);
 	background-repeat: no-repeat;
 	background-position: center -6763px;
 	-webkit-transition: all 200ms ease-in-out;
@@ -8426,7 +8426,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	height: 25px;
 	float: left;
 	margin: 12px 0 0 9px;
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v10.svg);
 	background-repeat: no-repeat;
 	background-position: -13px -6484px;
 }
@@ -8445,7 +8445,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	width: 16px;
 	height: 8px;
 	position: absolute;
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v10.svg);
 	background-repeat: no-repeat;
 	background-position: center -7239px;
 	left: -8px;
@@ -8541,7 +8541,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	right: 50%;
 	top: -12px;
 	margin-right: -13px;
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v10.svg);
 	background-position: center -5890px;
 	background-repeat: no-repeat;
 }
@@ -8578,7 +8578,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	float: right;
 }
 .star .fm-chat-user-star {
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v10.svg);
 	background-position: -7px -2205px;
 	background-repeat: no-repeat;
 }
@@ -8898,7 +8898,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	height: 27px;
 	margin: 10px 12px 0 10px;
 	background-position: 1px -2417px;
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v10.svg);
 	background-repeat: no-repeat;
 	cursor: pointer;
 	-webkit-transition: all 200ms ease-in-out;
@@ -8927,7 +8927,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	position: relative;
 }
 .nw-chat-message-icon {
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v10.svg);
 	background-position: 0 -2460px;
 	background-repeat: no-repeat;
 	width: 26px;
@@ -9099,7 +9099,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	position: absolute;
 	right: 12px;
 	top: 14px;
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v10.svg);
 	background-repeat: no-repeat;
 	background-position: 6px -2771px;
 	cursor: pointer;
@@ -9122,7 +9122,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
 .fm-chat-arrow {
 	width: 8px;
 	height: 20px;
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v10.svg);
 	background-repeat: no-repeat;
 	background-position: left -2719px;
 	position: absolute;
@@ -9295,7 +9295,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	width: 44px;
 	height: 8px;
 	position: absolute;
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v10.svg);
 	background-position: center -2516px;
 	background-repeat: no-repeat;
 	margin: 0 0 0 -22px;
@@ -9344,7 +9344,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	-o-transition: background-color 200ms ease-in-out;
 	-ms-transition: background-color 200ms ease-in-out;
 	transition: background-color 200ms ease-in-out;
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v10.svg);
 	background-position: 0 -2516px;
 	background-repeat: no-repeat;
 }
@@ -9880,9 +9880,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
 	position: relative;
 }
 .fm-dialog.export-links-dialog {
-	width: 634px;
-	margin: -96px 0 0 -317px;
-	overflow: hidden;
+	width: 640px;
+	margin: -151px 0 0 -320px;
+	overflow: visible;
 }
 .fm-dialog.browsers-dialog {
 	width: 624px;
@@ -9985,12 +9985,18 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
 	left: 0px;
 	top: 0px;
 }
-.fm-dialog-close, .btn-close-dialog {
+.fm-dialog-chrome-clipboard div {
+    font-size: 1px;
+    height: 20px;
+    opacity: 0.01; 
+    width: 10px;
+}
+.fm-dialog-close, .btn-close-dialog, .ui-datepicker-close {
 	cursor: pointer;
 	height: 30px;
 	width: 30px;
 	background-position: 9px -5961px;
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v10.svg);
 	background-repeat: no-repeat;
 	position: absolute;
 	right: 10px;
@@ -10248,7 +10254,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.1);
 	background-position: -6px -9302px;
 	background-repeat: no-repeat;
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v10.svg);
 	display: none;
 	display: none;
 }
@@ -10373,7 +10379,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	line-height: 21px;
 	color: #333333;
 	padding-left: 32px;
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v10.svg);
 	background-position: 0 -2317px;
 	background-repeat: no-repeat;
 	float: left;
@@ -10384,7 +10390,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	line-height: 21px;
 	color: #999999;
 	padding-left: 20px;
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v10.svg);
 	background-position: -5px -2368px;
 	background-repeat: no-repeat;
 	float: left;
@@ -10403,7 +10409,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	cursor: pointer;
 	width: 24px;
 	line-height: 21px;
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v10.svg);
 	background-position: -22px -2586px;
 	background-repeat: no-repeat;
 }
@@ -10420,6 +10426,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	float: left;
 	margin-left: -4px;
 }
+.fm-close-all-sessions,
 .fm-account-button {
 	cursor: pointer;
 	display: inline-block;
@@ -10466,7 +10473,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	width: 22px;
 	height: 12px;
 	background-position: center -6062px;
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v10.svg);
 	background-repeat: no-repeat;
 	margin: -12px 0 0 5px;
 }
@@ -10587,47 +10594,47 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 }
 .fm-share-contacts-body .ui-selected .add-contact-pad {
 	background-position: right -2860px;
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v10.svg);
 	background-repeat: no-repeat;
 }
-.fm-share-dropdown, .account-history-dropdown-button {
-	height: 30px;
+.fm-share-dropdown, .account-history-dropdown-button, .share-dialog-permissions, .share-dialog-icon.permissions-icon, .fm-dialogs-select {
 	float: right;
-	margin: 10px 10px 0 0;
-	background-color: white;
-	border-radius: 6px;
-	-moz-border-radius: 6px;
-	-webkit-border-radius: 6px;
-	min-width: 120px;
+	padding: 0 30px 0 10px;
+	color: gray;
+	cursor: pointer;
+	margin: -7px 0 0 0;
+	border: 0;
+	height: 32px;
+	font-size: 13px;
+	line-height: 32px;
+	min-width: 150px;
+	background-color: rgba(255,255,255,1);
+	-moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
+	box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
+	border-radius: 4px;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	background-image: url(../images/mega/nw-fm-sprite_v10.svg);
+	background-repeat: no-repeat;
+	background-position: right -8359px;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	position: relative;
-	font-size: 13px;
-	line-height: 25px;
-	padding: 0 25px 0 10px;
-	color: gray;
-	background-position: right -6596px;
-	background-image: url(../images/mega/main-sprite.png?v=7);
-	background-repeat: no-repeat;
-	cursor: pointer;
-	border: 2px solid rgba(0,0,0,0.15);
-	-webkit-background-clip: padding-box;
-	background-clip: padding-box;
 }
 .fm-share-dropdown {
 	margin: 10px -20px 0 0;
 }
-.fm-share-permissions-block, .account-history-dropdown {
+.fm-share-permissions-block, .account-history-dropdown, .permissions-menu, .fm-dialogs-dropdown {
 	position: absolute;
 	top: 5px;
 	right: 10px;
-	border: 2px solid #d9d9d9;
+	border: 4px solid rgba(0,0,0,0.15);
 	background-color: white;
-	border-radius: 6px;
-	-moz-border-radius: 6px;
-	-webkit-border-radius: 6px;
-	min-width: 147px;
+	border-radius: 8px;
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	min-width: 185px;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
@@ -10636,25 +10643,64 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	background-repeat: no-repeat;
 	min-height: 50px;
 	z-index: 10;
+	padding: 5px 0;
+	-webkit-background-clip: padding-box;
+	background-clip: padding-box;
+}
+.permissions-menu, .fm-dialogs-dropdown {
+	background-image: none;
+	right: auto;
+	z-index: 100;
+	min-width: 170px;
+}
+.fm-dialogs-dropdown {
+	top: auto;
+	left: auto;
+	margin: -1px 0 0 -4px;
+}
+.fm-share-permissions-block::after, .account-history-dropdown::after, .permissions-menu::after, .fm-dialogs-dropdown::after {
+	content: '';
+	top: 0;
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	border-radius: 4px;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	-moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
+	box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
 }
 .fm-share-permissions-block.bottom {
 	top: auto;
 	bottom: 7px;
 	background-position: right -9918px;
 }
-.fm-share-permissions, .account-history-drop-items {
-	height: 30px;
+.fm-share-permissions, .account-history-drop-items, .permissions-menu-item, .fm-dialogs-dropdown-item {
+	height: 32px;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	font-size: 13px;
-	line-height: 28px;
-	padding: 0 10px 0 37px;
-	color: #363b3b;
+	line-height: 32px;
+	padding: 0 30px 0 37px;
+	color: #666666;
 	background-position: left -4848px;
 	background-repeat: no-repeat;
-	margin: 3px 0;
+	margin: 0;
 	cursor: pointer;
+	position: relative;
+	z-index: 10;
+	-webkit-transition: background-color 200ms ease-in-out;
+	-moz-transition: background-color 200ms ease-in-out;
+	-o-transition: background-color 200ms ease-in-out;
+	-ms-transition: background-color 200ms ease-in-out;
+	transition: background-color 200ms ease-in-out;
+}
+.permissions-menu-item, .fm-dialogs-dropdown-item {
+	padding-left: 43px;
+}
+.fm-share-permissions:hover, .account-history-drop-items:hover, .permissions-menu-item:hover, .fm-dialogs-dropdown-item:hover {
+	background-color: rgba(0,0,0,0.05);
 }
 .account-history-drop-items {
 	padding: 0 25px 0 37px;
@@ -10673,8 +10719,15 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	float: left;
 	width: 106px;
 	height: 75px;
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-repeat: no-repeat;
+}
+.warning-dialog-ai .fm-notification-icon {
+	width: 106px !important;
+	min-height: 75px !important;
+	background-position: 9px -2553px !important;
+	background-image: url(../images/mega/dialogs-sprite_v4.svg) !important;
+	background-repeat: no-repeat !important;
 }
 .notification-dialog .fm-notification-icon {
 	background-position: 10px -2333px;
@@ -10757,7 +10810,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	display: inline;
 }
 .delete-contact.multiple .fm-del-contact-avatar {
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-repeat: no-repeat;
 	background-position: -5px -3080px;
 	background-color: rgba(0,0,0,0.2);
@@ -10780,7 +10833,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	line-height: 21px;
 	color: #999999;
 	padding: 15px 0 0 23px;
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-position: -1px -1829px;
 	background-repeat: no-repeat;
 }
@@ -10794,22 +10847,16 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	padding: 7px 0 0 0;
 }
 .export-link-body {
-	padding: 0 0 7px 0 !important;
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	box-sizing: border-box;
-	max-height: 384px;
+	max-height: 318px;
 	overflow: hidden;
 }
-.export-link-body .jspPane {
-	padding: 0 0 7px 0 !important;
-}
+
 .export-gradient {
 	height: 16px;
 	width: 100%;
 	position: absolute;
 	left: 0;
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-position: left -2771px;
 	background-repeat: repeat-x;
 	z-index: 100;
@@ -10824,57 +10871,89 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	display: table;
-	padding: 3px 0 0 0;
+}
+.export-link-item:nth-child(odd) {
+	background-color: rgba(0,0,0,0.02);
+}
+.export-description {
+	float:left; 
+	padding: 20px 0 0 12px;     
+	color: #666666;
 }
 .export-icon {
 	height: 60px;
 	width: 60px;
 	float: left;
-	margin: 5px 12px;
+	margin: 24px 19px 0 19px;
 	background-repeat: no-repeat;
 	background-image: url(../images/mega/files-icons_v2.svg);
 	background-position: 0 0;
 }
 .export-link-text-pad {
 	display: table-cell;
-	height: 56px;
+	height: 106px;
 	vertical-align: middle;
 	width: 100%;
 }
 .export-link-txt {
-	font-size: 13px;
-	line-height: 19px;
-	color: #D90007;
-	white-space: nowrap;
-}
-.export-link-txt:first-child {
+	font-size: 14px;
+	line-height: 24px;
 	color: #666666;
-	font-size: 13px;
+	vertical-align: top;
+	padding-bottom: 5px;
 }
-.export-link-url {
-	border: 0 none;
-	color: #d90007;
+.file-link-info {
+	color: #333333;
 	font-size: 13px;
-	line-height: 19px;
-	width: 100%;
-	background-color: transparent;
-	overflow: hidden;
-	text-overflow: ellipsis;
+	line-height: 21px;
+	padding: 0 2px 0 0;
+	display: inline;
+	position: relative;
+	z-index: 10;
+}
+.decryption-key .file-link-info.url, .public-handle .file-link-info.key {
+	display: none;
+}
+.file-link-block {
+	padding: 15px 0 5px 0;
+}
+.file-link-info[data-pseudo-content]::before {
+	content: attr(data-pseudo-content);
+	position: absolute;
+	display: block;
+	font-size: 12px;
+	line-height: 15px;
+	color: #999999;
+	left: 0;
+	top: -15px;
+}
+.key.file-link-info {
+	color: #D90007;
+}
+.export-item-title {
+	display: table-cell;
+	max-width: 450px;
 	white-space: nowrap;
+	-o-text-overflow: ellipsis;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	vertical-align: top;
+	padding-right: 10px;
 }
 .export-link-gray-txt {
 	color: #999999;
-	display: block;
-	font-size: 13px;
-	line-height: 16px;
+	display: table-cell;
+	font-size: 14px;
+	line-height: 24px;
+	border-left: 2px solid rgba(0,0,0,0.05);
+	padding-left: 10px;
+	height: 24px;
+	vertical-align: top;
 }
 .copy-keys-button {
 	display: block;
 }
-.file-keys-view .copy-keys-button {
-	display: none;
-}
-.file-key {
+.file-keys-view .copy-keys-button, .folder-item .export-link-gray-txt, .file-key {
 	display: none;
 }
 .file-keys-view .file-key {
@@ -11014,7 +11093,7 @@ label.radio-txt {
 	position: absolute;
 	left: 0;
 	bottom: 0;
-	padding: 20px;
+	padding: 24px;
 	z-index: 1200;
 	width: 100%;
 	-moz-box-sizing: border-box;
@@ -11023,18 +11102,15 @@ label.radio-txt {
 }
 .export-links-warning p {
 	margin: 0;
-	padding: 3px 0 3px 148px;
+	padding: 3px 0 3px 0;
 	font-size: 13px;
 	line-height: 21px;
 	color: #CCCCCC;
 }
 .export-warning-content {
 	max-width: 947px;
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
-	background-position: left -2880px;
-	background-repeat: no-repeat;
 	margin: 0 auto;
-	min-height: 138px;
+	min-height: 48px;
 }
 span.orange {
 	color: #FFD300;
@@ -11323,20 +11399,20 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
 }
 .shared-with-me.read-only .properties-elements-counter span {
 	background-color: #61D2FF;
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-position: -81px -238px;
 	background-repeat: no-repeat;
 }
 .shared-with-me.read-and-write .properties-elements-counter span {
 	background-color: #FFD300;
 	background-position: -81px -207px;
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-repeat: no-repeat;
 }
 .shared-with-me.full-access .properties-elements-counter span {
 	background-color: #00E22C;
 	background-position: -81px -174px;
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-repeat: no-repeat;
 }
 .multiple .properties-file-icon div:nth-child(2) {
@@ -12051,7 +12127,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
 	width: 100%;
 	position: absolute;
 	top: 6px;
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v10.svg);
 	background-position: center -8343px;
 	background-repeat: no-repeat;
 	display: none;
@@ -12177,7 +12253,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 .top-user-status-arrow {
 	margin-right: 83px;
 }
-.top-menu-item, .top-user-status-item, .context-menu-item, .sorting-menu-item, .permissions-menu-item {
+.top-menu-item, .top-user-status-item, .context-menu-item, .sorting-menu-item {
 	display: block;
 	height: 32px;
 	line-height: 31px;
@@ -12218,11 +12294,11 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 	background-color: rgba(255,255,255,0.1);
 }
 .sorting-menu-item.active, .sorting-menu-item.selected {
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v10.svg);
 	color: rgba(255,255,255,1);
 }
-.sorting-menu-arrow, .permissions-menu-arrow {
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
+.sorting-menu-arrow {
+	background-image: url(../images/mega/nw-fm-sprite_v10.svg);
 	background-repeat: no-repeat;
 	background-position: left -7998px;
 	position: absolute;
@@ -12231,28 +12307,13 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 	left: -7px;
 	top: 10px;
 }
-.permissions-menu-arrow {
-	top: 14px;
-}
-.context-menu-item, .permissions-menu-item {
+.context-menu-item {
 	padding: 0 10px 0 42px;
 	color: rgba(204,204,204,1);
-}
-.permissions-menu-item {
-	font-size: 13px;
 }
 .context-menu-item:hover, .context-menu-item.active, .context-menu-item.opened {
 	background-color: rgba(153,153,153,1);
 	color: rgba(255,255,255,1);
-}
-.permissions-menu-item:hover {
-	background-color: rgba(255,255,255,0.1);
-}
-.permissions-menu-item.active {
-	color: rgba(255,255,255,1);
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
-	background-repeat: no-repeat;
-	background-position: right -7963px;
 }
 .context-menu-item.download-item:hover, .context-menu-item.download-standart-item:hover, .context-menu-item.zipdownload-item:hover, .context-menu-item.download-item.opened {
 	background-color: rgba(220,0,0,1);
@@ -12264,7 +12325,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 	background-color: rgba(49,181,0,1);
 }
 .context-menu-icon, .context-menu-points {
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v10.svg);
 	background-position: left top;
 	background-repeat: no-repeat;
 	height: 32px;
@@ -12291,7 +12352,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 .context-menu-item.opened {
 	background-color: rgba(49,181,0,1);
 }
-.context-menu-item:hover > .context-menu-icon, .context-menu-item.opened > .context-menu-icon, .permissions-menu-item.active .context-menu-icon {
+.context-menu-item:hover > .context-menu-icon, .context-menu-item.opened > .context-menu-icon {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
 	-moz-opacity: 1;
 	-khtml-opacity: 1;
@@ -12316,7 +12377,7 @@ table {
 }
 .transfer-table-header th:first-child span {
 	display: block;
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v10.svg);
 	background-repeat: no-repeat;
 	background-position: -6px -4019px;
 	height: 24px;
@@ -12453,7 +12514,7 @@ table {
 	background-position: 5px -3716px;
 }
 .full-access .context-menu-icon, .read-and-write .context-menu-icon, .read-only .context-menu-icon {
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-repeat: no-repeat;
 }
 .full-access .context-menu-icon {
@@ -12897,7 +12958,7 @@ table {
 	width: 25px;
 	height: 13px;
 	position: absolute;
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v10.svg);
 	background-position: center -5890px;
 	background-repeat: no-repeat;
 	margin: 16px 0 0 -12px;
@@ -13144,21 +13205,18 @@ table {
 	box-sizing: border-box;
 }
 .account-history-dropdown {
-	margin: 7px 12px 0 0;
-	border: 2px solid rgba(0,0,0,0.15);
+	margin: 3px 10px 0 0;
 	background-image: none;
-	-webkit-background-clip: padding-box;
-	background-clip: padding-box;
 }
-.account-history-dropdown::before {
+.account-history-dropdown::before, .permissions-menu::before, .fm-share-permissions-block::before, .fm-dialogs-dropdown::before {
 	content: '';
 	width: 14px;
 	position: absolute;
 	z-index: 10;
-	top: 13px;
+	top: 17px;
 	right: 10px;
 	height: 8px;
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v10.svg);
 	background-repeat: no-repeat;
 	background-position: -24px -8072px;
 }
@@ -13183,75 +13241,57 @@ table {
 	transition: background-color 200ms
 }
 .active-session-txt, .current-session-txt, .expired-session-txt {
-    text-align: center;
+	text-align: center;
 }
 .active-session-txt {
-    background-color: #2BA6DE;
+	background-color: #2BA6DE;
 }
 .expired-session-txt {
-    background-color: #fff;
-    border: 1px solid #ddd;
-    color: #bbb;
-    padding-left: 5px;
-    padding-right: 5px;
+	background-color: #fff;
+	border: 1px solid #ddd;
+	color: #bbb;
+	padding-left: 5px;
+	padding-right: 5px;
 }
 .grid-table.sessions th.session-status {
-    width: 149px;
+	width: 149px;
 }
 .grid-table.sessions th.logout-column {
-    width: 10%;
+	width: 10%;
 }
 .grid-table.sessions th.no-border {
-    background: none;
+	background: none;
 }
 .fm-account-history .grey-bar {
-    background-color: #eeeeee;
-    border: 0 none;
-    clear: both;
-    margin: 0;
-    min-height: 28px;
-    overflow: auto;
-    text-align: right;
+	background-color: #eeeeee;
+	border: 0 none;
+	clear: both;
+	margin: 0;
+	min-height: 28px;
+	overflow: auto;
+	text-align: right;
 }
 .fm-close-all-sessions {
-    height: 32px;
-    margin: 9px 19px;
-    text-align: left;
+	height: 32px;
+	margin: 9px 19px;
+	text-align: left;
 }
 .fm-close-all-sessions span {
-    background: rgba(255, 255, 255, 1) url("../images/mega/nw-fm-sprite_v9.svg") no-repeat scroll -30px -8404px;
-    text-indent: 13px;
+	background: rgba(255, 255, 255, 1) url("../images/mega/nw-fm-sprite_v10.svg") no-repeat scroll -9px -5466px;
+	text-indent: 18px;
 }
 .settings-logout {
-    background: #ccc url("../images/mega/nw-fm-sprite_v9.svg") no-repeat scroll 5px -8422px;
-    cursor: pointer;
-    float: right;
-    margin-right: 13px;
-    padding-left: 19px;
+	background: #ccc url("../images/mega/nw-fm-sprite_v10.svg") no-repeat scroll 5px -8423px;
+	cursor: pointer;
+	float: right;
+	margin-right: 13px;
+	padding-left: 19px;
 }
 .settings-logout:hover {
 	background-color: #999999;
 }
 .account-history-drop-items {
 	line-height: 30px;
-}
-.account-history-dropdown-button {
-	margin: -7px 0 0 0;
-	border: 0;
-	height: 32px;
-	line-height: 32px;
-	-webkit-background-clip: padding-box;
-	background-clip: padding-box;
-	min-width: 145px;
-	background-color: rgba(255,255,255,1);
-	-moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
-	box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
-	border-radius: 4px;
-	-moz-border-radius: 4px;
-	-webkit-border-radius: 4px;
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
-	background-repeat: no-repeat;
-	background-position: right -8360px;
 }
 .top-head.startpage, .top-head.download-page, .top-head.browsers-page {
 	background-color: white;
@@ -18306,7 +18346,7 @@ code, c {
 }
 .notification-empty-icon {
 	height: 225px;
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-position: center -3245px;
 	background-repeat: no-repeat;
 }
@@ -19198,7 +19238,7 @@ div.new-bottom-pages li, div.new-bottom-pages p {
 .arrow {
 	cursor: pointer;
 	background-position: right top;
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v10.svg);
 	background-repeat: no-repeat;
 	padding: 0 35px 0 0;
 }
@@ -20508,7 +20548,7 @@ span.incoming-call-name {
 	display: inline-block;
 }
 .star .incoming-contact-info span.incoming-call-name {
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v10.svg);
 	background-position: right -6265px;
 	background-repeat: no-repeat;
 	padding-right: 25px;
@@ -20589,7 +20629,7 @@ span.incoming-call-name {
 	top: 4px;
 	width: 32px;
 	height: 16px;
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-position: -2px -3669px;
 	background-repeat: no-repeat;
 	cursor: pointer;
@@ -20618,7 +20658,7 @@ span.incoming-call-name {
 	display: block;
 	width: 32px;
 	height: 16px;
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-position: -122px -3719px;
 	background-repeat: no-repeat;
 }
@@ -21226,7 +21266,7 @@ ul.token-input-list-mega {
 }
 .multiple-input-warning .arrow {
 	height: 32px;
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-repeat: no-repeat;
 	background-position: right -2009px;
 	position: absolute;
@@ -21282,7 +21322,7 @@ li.token-input-token-mega p {
 li.token-input-token-mega .input-close {
 	height: 20px;
 	width: 10px;
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-position: -94px -460px;
 	background-repeat: no-repeat;
 	display: block;
@@ -21457,7 +21497,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
 	left: 50%;
 	margin-left: -9px;
 	width: 18px;
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-repeat: no-repeat;
 	background-position: left -3831px;
 }
@@ -21486,7 +21526,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
 	-moz-border-radius: 0;
 	-webkit-border-radius: 0;
 	border-radius: 0;
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-repeat: no-repeat;
 	background-position: center -535px;
 }
@@ -21526,13 +21566,13 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
 	cursor: pointer;
 }
 .share-search-result.selected {
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-repeat: no-repeat;
 	background-position: right -748px;
 }
 .share-dialog-img {
 	height: 90px;
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-repeat: no-repeat;
 	background-position: center 8px;
 }
@@ -21541,7 +21581,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
 	width: 25px;
 	height: 25px;
 	z-index: 10;
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-position: -81px -84px;
 	background-repeat: no-repeat;
 }
@@ -21588,7 +21628,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
 	width: 25px;
 	height: 25px;
 	left: 0;
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-position: -89px -134px;
 	background-repeat: no-repeat;
 	-webkit-transition: opacity 200ms ease-in-out;
@@ -21638,7 +21678,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	background-color: rgba(0,0,0,0.05);
 }
 .share-dialog-contact-bl .fm-chat-user-info {
-	width: 203px;
+	width: 187px;
 	padding-right: 10px;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
@@ -21653,85 +21693,153 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	text-overflow: ellipsis;
 	overflow: hidden;
 }
-.share-dialog-permissions, .share-dialog-icon.permissions-icon {
+.share-dialog-permissions, .share-dialog-icon.permissions-icon, .fm-dialogs-select {
 	float: left;
-	line-height: 27px;
-	height: 32px;
 	margin-top: 8px;
-	min-width: 157px;
-	color: #666666;
-	border: 2px solid rgba(0,0,0,0.05);
-	-webkit-background-clip: padding-box;
-	background-clip: padding-box;
-	-moz-border-radius: 5px;
-	-webkit-border-radius: 5px;
-	border-radius: 5px;
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	box-sizing: padding-box;
-	background-color: white;
-	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
-	overflow: hidden;
-	max-width: 140px;
-	font-size: 14px;
-	padding: 0 20px 0 35px;
-	position: relative;
-	cursor: pointer;
-	-webkit-transition: border-color 200ms ease-in-out;
-	-moz-transition: border-color 200ms ease-in-out;
-	-o-transition: border-color 200ms ease-in-out;
-	-ms-transition: border-color 200ms ease-in-out;
-	transition: border-color 200ms ease-in-out;
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	min-width: 162px;
+	padding-left: 43px;
+}
+.share-dialog-permissions {
+	float: right;
+}
+.expiry-date-select {
+	padding-left: 10px;
+	width: 162px;
+}
+.pro-only .expiry-date-select {
+	cursor: default;
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
+	-moz-opacity: 0.3;
+	-khtml-opacity: 0.3;
+	opacity: 0.3;
+	-moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.5);
+	box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.5);
+}
+.fm-links-dropdown, .fm-expiry-dropdown {
+	padding: 15px 24px 24px 24px;
+	float: left;
+}
+.fm-expiry-dropdown {
+	display: none;
+}
+.expiry-date .fm-links-dropdown {
+	float: right;
+}
+.expiry-date .fm-expiry-dropdown {
+	display: block;
+}
+.fm-link-select-label {
+	font-size: 13px;
+	line-height: 17px;
+	color: #666666;
+	padding: 0 0 0 0;
+}
+.fm-link-select-label a {
+	color: #D90007;
+	display: none;
+}
+.information-icon {
+	width: 18px;
+	height: 18px;
+	background-color: rgba(0,0,0,0.3);
+	-moz-border-radius: 100%;
+	-webkit-border-radius: 100%;
+	border-radius: 100%;
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
+	background-position: center -5194px;
 	background-repeat: no-repeat;
-	background-position: right -3714px;
+	position: absolute;
+	margin: -1px 0 0 7px;
+	display: none;
+}
+.pro-only .fm-link-select-label a, .pro-only .information-icon {
+	display: inline-block;
+}
+.information-icon div {
+	display: none;
+	width: 312px;
+	background-color: #333333;
+	bottom: 26px;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	-moz-border-radius: 6px;
+	-webkit-border-radius: 6px;
+	border-radius: 6px;
+	padding: 16px 16px 18px 16px;
+	font-size: 14px;
+	color: white;
+	line-height: 18px;
+	position: absolute;
+	left: 50%;
+	margin: 0 0 0 -156px;
+	text-align: center;
+}
+.information-icon:hover div {
+	display: block;
+}
+.information-icon div span {
+	position: absolute;
+	width: 24px;
+	height: 8px;
+	bottom: -8px;
+	display: block;
+	left: 50%;
+	margin-left: -12px;
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
+	background-position: center -5028px;
+	background-repeat: no-repeat;
 }
 .share-dialog-icon.permissions-icon {
 	margin: 12px 12px 12px 0;
 }
-.share-dialog-permissions:hover, .share-dialog-permissions.active, .share-dialog-icon.permissions-icon:hover, .share-dialog-icon.permissions-icon.active {
-	border: 2px solid rgba(0,0,0,0.3);
-}
-.share-dialog-permissions span, .share-dialog-icon.permissions-icon span {
+.share-dialog-permissions span, .share-dialog-icon.permissions-icon span, .permissions-menu span, .fm-dialogs-select span, .fm-dialogs-dropdown span {
 	width: 24px;
 	height: 24px;
 	position: absolute;
-	top: 2px;
-	left: 8px;
+	top: 3px;
+	left: 12px;
 	display: block;
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-repeat: no-repeat;
-	background-position: -87px -278px;
+	background-position: -87px -277px;
 	-webkit-transition: opacity 200ms ease-in-out;
 	-moz-transition: opacity 200ms ease-in-out;
 	-o-transition: opacity 200ms ease-in-out;
 	-ms-transition: opacity 200ms ease-in-out;
 	transition: opacity 200ms ease-in-out;
-filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
-	-moz-opacity: 0.3;
-	-khtml-opacity: 0.3;
-	opacity: 0.3;
-}
-.share-dialog-permissions.full-access span, .share-dialog-icon.permissions-icon.full-access span {
-	background-position: -87px -358px;
-}
-.share-dialog-permissions.read-and-write span, .share-dialog-icon.permissions-icon.read-and-write span {
-	background-position: -87px -396px;
-}
-.share-dialog-permissions:hover span, .share-dialog-permissions.active span, .share-dialog-icon.permissions-icon:hover span, .share-dialog-icon.permissions-icon.active span {
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
+filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 	-moz-opacity: 0.5;
 	-khtml-opacity: 0.5;
 	opacity: 0.5;
+}
+.fm-dialogs-select span, .fm-dialogs-dropdown span {
+	background-position: -37px -4416px;
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+	-moz-opacity: 1;
+	-khtml-opacity: 1;
+	opacity: 1;
+}
+.fm-dialogs-select.public-handle span, .fm-dialogs-dropdown .public-handle span {
+	background-position: -37px -4352px;
+}
+.fm-dialogs-select.decryption-key span, .fm-dialogs-dropdown .decryption-key span {
+	background-position: -37px -4383px;
+}
+.share-dialog-permissions.full-access span, .share-dialog-icon.permissions-icon.full-access span, .permissions-menu .full-access span {
+	background-position: -87px -357px;
+}
+.share-dialog-permissions.read-and-write span, .share-dialog-icon.permissions-icon.read-and-write span, .permissions-menu .read-and-write span {
+	background-position: -87px -396px;
 }
 .share-dialog-remove-button {
 	width: 20px;
 	height: 20px;
 	float: right;
-	margin: 13px 7px 0 0;
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	margin: 13px 7px 0 7px;
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-repeat: no-repeat;
 	background-position: -91px -826px;
 	-webkit-transition: opacity 200ms ease-in-out;
@@ -21757,7 +21865,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	-khtml-opacity: 0.5;
 	opacity: 0.5;
 }
-.share-dialog-contacts .jspDrag, .multiple-input .jspDrag, .fm-dialog-body .jspDrag, .export-content-block .jspDrag, .fm-call-dialog .jspDrag {
+.share-dialog-contacts .jspDrag, .multiple-input .jspDrag, .fm-dialog-body .jspDrag, .fm-call-dialog .jspDrag {
 	width: 4px;
 	background-color: black;
 }
@@ -21776,6 +21884,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	margin: 8px 0 0 8px;
+}
+.export-content-block .jspVerticalBar {
+	width: 10px;
 }
 .import-contacts-header {
 	height: 36px;
@@ -21797,7 +21908,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	cursor: pointer;
 }
 .import-contacts-service.imported {
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-position: right -2163px;
 	background-repeat: no-repeat;
 }
@@ -21809,7 +21920,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	float: left;
 	margin: 12px 0 0 10px;
 	font-family: 'source_sans_prosemibold', Arial;
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-position: -11px -2074px;
 	background-repeat: no-repeat;
 }
@@ -21823,7 +21934,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	-webkit-border-radius: 100%;
 	border-radius: 100%;
 	background-color: rgba(0,0,0,0.2);
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-position: 1px -2137px;
 	background-repeat: no-repeat;
 	-webkit-transition: background-color 200ms ease-in-out;
@@ -21859,7 +21970,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	position: absolute;
 	bottom: -6px;
 	right: 12px;
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-position: -5px -2117px;
 	background-repeat: no-repeat;
 }
@@ -21869,7 +21980,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	top: 5px;
 	width: 20px;
 	height: 20px;
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-position: -2px -3178px;
 	background-repeat: no-repeat;
 	-webkit-transition: opacity 200ms ease-in-out;
@@ -21916,7 +22027,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 	width: 159px;
 	float: left;
 	background-color: rgba(0,0,0,0.15);
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v10.svg);
 	background-repeat: no-repeat;
 	cursor: pointer;
 }
@@ -21951,7 +22062,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 }
 .copy-dialog-empty-icon, .move-dialog-empty-icon {
 	height: 166px;
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-position: center -867px;
 	background-repeat: no-repeat;
 }
@@ -22195,7 +22306,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 	height: 32px;
 	display: block;
 	position: absolute;
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v10.svg);
 	background-repeat: no-repeat;
 	z-index: 10;
 }
@@ -22351,7 +22462,7 @@ fm-right-header .video-controls {
 	right: 4px;
 	background-color: rgba(255,255,255,0.9);
 	z-index: 10;
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v10.svg);
 	background-repeat: no-repeat;
 	background-position: -1px -9474px;
 	cursor: pointer;
@@ -22507,7 +22618,7 @@ video.localViewport {
 	height: 25px;
 	float: right;
 	margin: 18px 17px 0 0;
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v10.svg);
 	background-position: -12px -8137px;
 	background-repeat: no-repeat;
 	-webkit-transition: opacity 200ms ease-in-out;
@@ -22672,7 +22783,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	margin: 12px 12px 12px 12px
 }
 .fm-mega-dialog-size-icon {
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v10.svg);
 	background-position: center -5509px;
 	background-repeat: no-repeat;
 	width: 20px;
@@ -22972,7 +23083,7 @@ a.top-login-forgot-pass {
 	display: inline-block;
 	border-radius: 12px;
 	text-transform: uppercase;
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v10.svg);
 	background-repeat: no-repeat;
 	background-position: 4px -630px;
 	color: rgba(255,255,255,0.7) !important;
@@ -23000,7 +23111,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 	float: left;
 	width: 60px;
 	height: 60px;
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-repeat: no-repeat;
 	background-position: 0 -3927px;
 	margin-left: 20px;
@@ -23027,7 +23138,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 	padding: 0;
 }
 .feedback-label-txt div.checkboxOn, .feedback-label-txt .checkboxOff, .membership-arrow {
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-position: 0 -4112px;
 	background-size: auto;
 	margin: -2px 0 1px -42px;
@@ -23069,7 +23180,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 	font-size: 14px;
 	line-height: 18px;
 	font-family: 'source_sans_proregular', Arial;
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-repeat: no-repeat;
 	background-position: 2px -4011px;
 	margin: 0 0 0 12px;
@@ -23364,6 +23475,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 	border-radius: 14px;
 	margin: -176px 0 0 -240px;
 	width: 480px;
+}
+.fm-dialog.copyrights-dialog {
+	width: 644px;
+	margin: -240px 0 0 -322px;
 }
 .voucher-dialog-body {
 	padding: 30px;
@@ -23968,7 +24083,7 @@ body.pro:after {
 }
 .transfer-bar-overlay div {
 	display: block;
-	background-image: url(../images/mega/nw-fm-sprite_v9.svg);
+	background-image: url(../images/mega/nw-fm-sprite_v10.svg);
 	background-repeat: no-repeat;
 	background-position: center -594px;
 	background-color: rgba(255,255,255,0.5);
@@ -24263,7 +24378,7 @@ body.pro:after {
 }
 .nw-fm-dialog-title span, .bandwidth-text-bl .star {
 	width: 15px;
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-position: -50px -1551px;
 	background-repeat: no-repeat;
 	display: inline-block;
@@ -24365,7 +24480,7 @@ body.pro:after {
 	padding-top: 9px;
 }
 .bandwidth-back-button {
-	background-image: url(../images/mega/dialogs-sprite_v4.svg);
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
 	background-position: -95px -1551px;
 	background-repeat: no-repeat;
 	font-size: 14px;
@@ -24409,7 +24524,7 @@ body.pro:after {
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	padding: 4px 4px 4px 52px;
-	z-index: 1000;
+	z-index: 2000;
 	color: white;
 	font-size: 14px;
 	line-height: 18px;
@@ -24424,9 +24539,12 @@ body.pro:after {
 	-khtml-opacity: 0;
 	opacity: 0;
 }
+.toast-notification.clipboard, .toast-notification.clipboard:hover {
+    background-color: #777;
+}
 .toast-notification.visible {
 	margin-bottom: 0;
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
 	-moz-opacity: 1;
 	-khtml-opacity: 1;
 	opacity: 1;
@@ -24438,7 +24556,7 @@ body.pro:after {
 .toast-notification:hover {
 	background-color: #666666;
 }
-.toast-transfer-icon {
+.toast-icon {
 	width: 30px;
 	height: 30px;
 	position: absolute;
@@ -24448,26 +24566,31 @@ body.pro:after {
 	background-image: url(../images/mega/register-big-sprite-v4.png);
 	background-position: -85px -860px;
 }
-.upload .toast-transfer-icon {
+.clipboard .toast-icon {
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
+	background-repeat: no-repeat;
+	background-position: -4px -5279px;
+}
+.upload .toast-icon {
 	background-position: -85px -900px;
 }
-.toast-transfer-body {
+.toast-body {
 	display: table;
 	width: 100%;
 }
-.toast-transfer-col {
+.toast-col {
 	display: table-cell;
 	vertical-align: middle;
 	font-family: 'source_sans_proregular';
 }
-.toast-transfer-col:nth-child(1) {
-	padding: 0px 16px 2px 0;
+.toast-nth-child(1) {
+ padding: 0px 16px 2px 0;
 }
-.toast-transfer-col:nth-child(2) {
+.toast-col:nth-child(2) {
 	width: 50px;
 	height: 40px;
 }
-.toast-transfer-button {
+.toast-button {
 	-moz-border-radius: 8px;
 	-webkit-border-radius: 8px;
 	border-radius: 8px;
@@ -24481,11 +24604,11 @@ body.pro:after {
 	padding: 4px;
 	background-color: rgba(0,0,0,0);
 }
-.toast-transfer-button:hover {
+.toast-button:hover {
 	color: #666666;
 	background-color: rgba(0,0,0,0.3);
 }
-.toast-transfer-button span {
+.toast-button span {
 	background-color: white;
 	-moz-border-radius: 4px;
 	-webkit-border-radius: 4px;
@@ -24643,6 +24766,125 @@ div.camera-bottom-txt {
 .camera-bottom-icon.pause {
 	background-position: center -3405px;
 }
+.copyrights-dialog-icon {
+	width: 100px;
+	height: 100px;
+	margin: 8px auto 31px auto;
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
+	background-position: -29px -4228px;
+	background-repeat: no-repeat;
+}
+.copyrights-dialog-head {
+	font-family: 'source_sans_prolight', Arial;
+	font-size: 30px;
+	line-height: 38px;
+	text-align: center;
+	color: #999999;
+}
+.copyrights-dialog p {
+	font-size: 14px;
+	line-height: 24px;
+	color: #666666;
+	padding: 20px 0 0 0;
+	margin: 0;
+}
+.ui-datepicker {
+	border: 4px solid rgba(0,0,0,0.15);
+	background-color: white;
+	border-radius: 8px;
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	-webkit-background-clip: padding-box;
+	background-clip: padding-box;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	width: 340px;
+	padding-bottom: 25px;
+	text-align: center;
+	margin: -36px 0 0 -4px;
+	display: none;
+}
+.ui-datepicker-header {
+	display: inline-block;
+	position: relative;
+	padding: 14px 0 29px 0;
+}
+.ui-datepicker a, .ui-datepicker span, .ui-datepicker td, .ui-datepicker th {
+	font-family: 'source_sans_prolight';
+	text-transform: uppercase;
+	font-weight: normal;
+	font-size: 14px;
+	line-height: 24px;
+	color: #666666;
+	cursor: default;
+	padding: 0;
+}
+.ui-datepicker th {
+	padding-bottom: 12px;
+}
+.ui-datepicker td {
+	height: 32px;
+}
+.ui-datepicker-header span {
+	padding: 0 2px;
+}
+a.ui-datepicker-prev, a.ui-datepicker-next {
+	position: absolute;
+	width: 24px;
+	height: 24px;
+	left: -34px;
+	background-image: url(../images/mega/dialogs-sprite_v5.svg);
+	background-position: -30px -4180px;
+	background-repeat: no-repeat;
+	cursor: pointer;
+}
+a.ui-datepicker-next {
+	left: auto;
+	right: -34px;
+	background-position: -108px -4180px;
+}
+.ui-datepicker-prev span, .ui-datepicker-next span, .ui-datepicker-current {
+	display: none;
+}
+.ui-datepicker-calendar {
+	width: 100%;
+}
+.ui-datepicker td a {
+	display: inline-block;
+	width: 43px;
+	height: 32px;
+	line-height: 32px;
+	color: #666666;
+	font-family: 'source_sans_proregular';
+	-webkit-transition: all 200ms ease-in-out;
+	-moz-transition: all 200ms ease-in-out;
+	-o-transition: all 200ms ease-in-out;
+	-ms-transition: all 200ms ease-in-out;
+	transition: all 200ms ease-in-out;
+	border-radius: 4px;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	cursor: pointer;
+}
+.ui-datepicker td a:hover {
+	background-color: rgba(119,119,119,0.1);
+}
+.ui-datepicker td a.ui-state-active {
+	background-color: #777777;
+	color: white;
+}
+.ui-datepicker td span {
+	color: #999999;
+	font-size: 12px;
+}
+.ui-datepicker-close {
+	border: 0;
+	background-color: white;
+	padding: 0;
+	-moz-appearance: none;
+	top: 10px;
+}
 /* Small font-size settings option */
 .fontsize1 .nw-fm-tree-header input {
 	margin: 12px 0 0 0;
@@ -24650,14 +24892,14 @@ div.camera-bottom-txt {
 .fontsize1 .nw-fm-tree-folder, .fontsize1 .nw-conversations-name, .fontsize1 .fm-tree-panel .nw-contact-name, .fontsize1 .nw-conversations-header, .fontsize1 .nw-tree-panel-header, .fontsize1 .copy-dialog-panel-header, .fontsize1 .move-dialog-panel-header, .fontsize1 .share-dialog-panel-header, .fontsize1 .top-menu-item, .fontsize1 .top-user-status-item, .fontsize1 .context-menu-item, .fontsize1 .sorting-menu-item, .fontsize1 .permissions-menu-item, .fontsize1 .top-menu-popup, .fontsize1 .top-submenu-popup, .fontsize1 .top-user-status-popup, .fontsize1 .context-submenu, .fontsize1 .tranfer-filetype-txt, .fontsize1 .fm-browsers-txt, .fontsize1 .fm-flags-txt, .fontsize1 .fm-member-icon-txt, .fontsize1 .transfer-table td, .fontsize1 .grid-table td, .fontsize1 .grid-share-table td, .fontsize1 .contacts-grid-table td, .fontsize1 .file-block-title, .fontsize1 .contact-block-view-name, .fontsize1 .shared-folder-info-block, .fontsize1 .fm-chat-user, .fontsize1 .fm-chat-user-status, .fontsize1 .fm-chat-user-email, .fontsize1 .shared-folder-access, .fontsize1 .contacts-interation, .fontsize1 .transfer-table th, .fontsize1 .transfer-table td, .fontsize1 .transfer-table-header th, .fontsize1 .grid-table th, .fontsize1 .grid-table td, .fontsize1 .grid-share-table th, .fontsize1 .grid-share-table td, .fontsize1 .grid-table-header th, .fontsize1 .contacts-grid-header th, .fontsize1 .contacts-grid-table th, .fontsize1 .contacts-grid-table td, .fontsize1 .membership-status, .fontsize1 .new-notification-txt, .fontsize1 .nw-fm-left-tooltip, .fontsize1 .chat-time-txt, .fontsize1 .new-notification-info {
 	font-size: 12px;
 }
-.fontsize1 .fm-add-user span, .fontsize1 .fm-start-video-call span, .fontsize1 .fm-clearbin-button span, .fontsize1 .fm-send-files span, .fontsize1 .fm-start-call span, .fontsize1 .fm-leave-share span, .fontsize1 .fm-share-copy span, .fontsize1 .fm-share-download span, .fontsize1 .contact-send-files span, .fontsize1 .fm-start-conversation span, .fontsize1 .fm-share-folders span, .fontsize1 .fm-verify span, .fontsize1 .fm-reset-stored-fingerprint span, .fontsize1 .fm-question span, .fontsize1 .fm-chat-end span, .fontsize1 .fm-end-call span, .fontsize1 .fm-download-as-zip span, .fontsize1 .fm-import-to-cloudrive span, .fontsize1 .fm-chat-file-button span, .fontsize1 .fm-dialog-button span, .fontsize1 .fm-account-button span, .fontsize1 .avatar-dialog .fm-account-change-avatar span, .fontsize1 .top-dialog-login-button span, .fontsize1 .nw-chat-button span, .fontsize1 .multiple-sharing.expanded .main-body .nw-chat-button span, .fontsize1 .fm-chat-attach-button span, .fontsize1 .fm-chat-contact-button span, .fontsize1 .fm-new-folder span, .fontsize1 .search-files-result span, .fontsize1 .search-messages-result span, .fontsize1 .fm-file-upload span, .fontsize1 .search-messages-result span, .fontsize1 .fm-folder-upload span, .fontsize1 .fm-notification-settings span, .fontsize1 .create-folder-button span, .fontsize1 .add-user-popup-button span, .fontsize1 .create-folder-button-cancel span, .fontsize1 .fm-dialog-new-folder-button span, .fontsize1 .rename-dialog-button span, .fontsize1 .contact-request-button span, .fontsize1 .transfer-clear-all-icon span, .fontsize1 .transfer-clear-completed span, .fontsize1 .transfer-pause-icon span, .fontsize1 .user-name, .fontsize1 a.user-name, .fontsize1 .top-menu-icon, .fontsize1 .create-account-button, .fontsize1 .top-login-button, .fontsize1 .top-search-input, .fontsize1 .nw-fm-tree-header input, .fontsize1 .notification-info, .fontsize1 .notification-username, .fontsize1 .fm-account-remove-avatar, .fm-account-change-avatar, .fontsize1 .fm-account-save, .fontsize1 .fm-account-cancel, .fontsize1 .nlanguage-bottom, .fontsize1 .nlanguage-lnk, .fontsize1 a.nlanguage-lnk, .fontsize1 a.nlanguage-lnk:link, .fontsize1 a.nlanguage-lnk:visited, .fontsize1 a.nlanguage-lnk:hover, .fontsize1 a.nlanguage-lnk:active, .fontsize1 .share-dialog-permissions, .fontsize1 .share-dialog-icon.permissions-icon, .fontsize1 .transfer-panel-title, .fontsize1 .fm-breadcrumbs .right-arrow-bg, .fontsize1 .fm-share-breadcrumbs .right-arrow-bg, .fontsize1 .toast-notification, .fontsize1 .fm-notification-info p {
+.fontsize1 .fm-add-user span, .fontsize1 .fm-start-video-call span, .fontsize1 .fm-clearbin-button span, .fontsize1 .fm-send-files span, .fontsize1 .fm-start-call span, .fontsize1 .fm-leave-share span, .fontsize1 .fm-share-copy span, .fontsize1 .fm-share-download span, .fontsize1 .contact-send-files span, .fontsize1 .fm-start-conversation span, .fontsize1 .fm-share-folders span, .fontsize1 .fm-verify span, .fontsize1 .fm-reset-stored-fingerprint span, .fontsize1 .fm-question span, .fontsize1 .fm-chat-end span, .fontsize1 .fm-end-call span, .fontsize1 .fm-download-as-zip span, .fontsize1 .fm-import-to-cloudrive span, .fontsize1 .fm-chat-file-button span, .fontsize1 .fm-dialog-button span, .fontsize1 .fm-close-all-sessions span, .fm-account-button span, .fontsize1 .avatar-dialog .fm-account-change-avatar span, .fontsize1 .top-dialog-login-button span, .fontsize1 .nw-chat-button span, .fontsize1 .multiple-sharing.expanded .main-body .nw-chat-button span, .fontsize1 .fm-chat-attach-button span, .fontsize1 .fm-chat-contact-button span, .fontsize1 .fm-new-folder span, .fontsize1 .search-files-result span, .fontsize1 .search-messages-result span, .fontsize1 .fm-file-upload span, .fontsize1 .search-messages-result span, .fontsize1 .fm-folder-upload span, .fontsize1 .fm-notification-settings span, .fontsize1 .create-folder-button span, .fontsize1 .add-user-popup-button span, .fontsize1 .create-folder-button-cancel span, .fontsize1 .fm-dialog-new-folder-button span, .fontsize1 .rename-dialog-button span, .fontsize1 .contact-request-button span, .fontsize1 .transfer-clear-all-icon span, .fontsize1 .transfer-clear-completed span, .fontsize1 .transfer-pause-icon span, .fontsize1 .user-name, .fontsize1 a.user-name, .fontsize1 .top-menu-icon, .fontsize1 .create-account-button, .fontsize1 .top-login-button, .fontsize1 .top-search-input, .fontsize1 .nw-fm-tree-header input, .fontsize1 .notification-info, .fontsize1 .notification-username, .fontsize1 .fm-account-remove-avatar, .fm-account-change-avatar, .fontsize1 .fm-account-save, .fontsize1 .fm-account-cancel, .fontsize1 .nlanguage-bottom, .fontsize1 .nlanguage-lnk, .fontsize1 a.nlanguage-lnk, .fontsize1 a.nlanguage-lnk:link, .fontsize1 a.nlanguage-lnk:visited, .fontsize1 a.nlanguage-lnk:hover, .fontsize1 a.nlanguage-lnk:active, .fontsize1 .share-dialog-permissions, .fontsize1 .share-dialog-icon.permissions-icon, .fontsize1 .transfer-panel-title, .fontsize1 .fm-breadcrumbs .right-arrow-bg, .fontsize1 .fm-share-breadcrumbs .right-arrow-bg, .fontsize1 .toast-notification, .fontsize1 .fm-notification-info p {
 	font-size: 13px;
 }
 .fontsize1 .nw-fm-dialog-title, .fm-dialog-title {
 	font-size: 16px;
 }
 /* User select */
-.selectable, .selectable *, .fm-chat-message span, div.nw-chat-sharing-filename, div.nw-chat-sharing-filesize, .nw-chat-date-txt, .fm-chat-smile, .properties-file-link, .contact-fingerprint-txt *, .fingerprint-txt, .contact-details-user-name, .contact-details-email, .nw-contact-name, .fm-breadcrumbs.contact .right-arrow-bg span, div.new-download-file-title, .dev-nw *, .fmholder .dev-nw div, .fmholder div.new-affiliate-bg1 *, .fmholder div.main-mid-pad.new-bottom-pages *, .collected-data li, .export-item-title, .grid-table.vouchers *, .export-link-txt, .properties-file-txt, .wire-transfer-details *, .blog-new-ful *, div div.new-download-file-title, div div.nt-info-txt, div div.nt-main-date, .new-right-content-block *, .fm-chat-messages-block *, .ff-right-block *, .pro-gray-block *, .sync-white-bl *, .sync-top-txt, .sync-top-txt-block *, .blog-new-full *, .fingerprint > span, .fm-account-main *, .new-bottom-pages *, .export-link-url, .file-link-info, .nw-conversations-name, .active-folder-link .tranfer-filetype-txt, .active-folder-link .nw-fm-tree-folder, .active-folder-link .file-block-title, .fm-breadcrumbs span span {
+.selectable, .selectable *, .fm-chat-message span, div.nw-chat-sharing-filename, div.nw-chat-sharing-filesize, .nw-chat-date-txt, .fm-chat-smile, .properties-file-link, .contact-fingerprint-txt *, .fingerprint-txt, .contact-details-user-name, .contact-details-email, .nw-contact-name, .fm-breadcrumbs.contact .right-arrow-bg span, div.new-download-file-title, .dev-nw *, .fmholder .dev-nw div, .fmholder div.new-affiliate-bg1 *, .fmholder div.main-mid-pad.new-bottom-pages *, .collected-data li, .export-item-title, .grid-table.vouchers *, .export-item-title, .properties-file-txt, .wire-transfer-details *, .blog-new-ful *, div div.new-download-file-title, div div.nt-info-txt, div div.nt-main-date, .new-right-content-block *, .fm-chat-messages-block *, .ff-right-block *, .pro-gray-block *, .sync-white-bl *, .sync-top-txt, .sync-top-txt-block *, .blog-new-full *, .fingerprint > span, .fm-account-main *, .new-bottom-pages *, .file-link-info, .nw-conversations-name, .active-folder-link .tranfer-filetype-txt, .active-folder-link .nw-fm-tree-folder, .active-folder-link .file-block-title, .fm-breadcrumbs span span, .export-item-title, .export-link-gray-txt {
 	-webkit-touch-callout: text !important;
 	-webkit-user-select: text !important;
 	-khtml-user-select: text !important;
@@ -25177,7 +25419,7 @@ background-size: 50px auto;
  background-image: url(../images/mega/top-login-sprite@2x_v4.png);
  background-size:48px auto;
 }
- .reg-success-icon, .reg-st3-save-icon, .reg-st3-membership-icon, .membership-icon, .loginrequired-dialog .fm-notification-icon, .file-status-icon.star, .contact-status-icon.star, .grid-status-icon.star, .link-icon, .toast-transfer-icon {
+ .reg-success-icon, .reg-st3-save-icon, .reg-st3-membership-icon, .membership-icon, .loginrequired-dialog .fm-notification-icon, .file-status-icon.star, .contact-status-icon.star, .grid-status-icon.star, .link-icon, .transfer .toast-icon {
  background-image: url(../images/mega/register-big-sprite-v4@2x.png);
  background-size: 200px auto;
 }

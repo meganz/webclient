@@ -8607,8 +8607,10 @@ function getclipboardkeys() {
 
 /**
  * Show toast notification
+ * @param {String} toastClass Custom style for the notification
+ * @param {String} notification The text for the toast notification
  */
-function showToast(toastClass, notification, successBlock, successTxt) {
+function showToast(toastClass, notification) {
     
     var $toast, interval;
 
@@ -8627,12 +8629,12 @@ function showToast(toastClass, notification, successBlock, successTxt) {
         $('.toast-notification').removeClass('visible');
     });
 
-    $toast.rebind('mouseover', function(e)
+    $toast.rebind('mouseover', function()
     {
         clearInterval(interval);
     });
 
-    $toast.rebind('mouseout', function(e)
+    $toast.rebind('mouseout', function()
     {
         interval = setInterval(function() {
             hideToast(interval);

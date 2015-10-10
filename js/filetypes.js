@@ -241,8 +241,10 @@ function filetype(n) {
 }
 
 function fileIcon(nodeInfo) {
+
     var icon;
 
+    // (Is folder && have share) || (if r attribute?) || (is pending share)
     if ((nodeInfo.t && nodeInfo.share) || (typeof nodeInfo.r === "number") || (nodeInfo.h && M.ps[nodeInfo.h])) {
         icon = 'folder-shared';
     }
@@ -260,12 +262,17 @@ function fileIcon(nodeInfo) {
 }
 
 function fileext(name) {
+
+    var ext;
+
     if (!name) {
         name = 'unknown';
     }
-    var ext = name.substr(name.lastIndexOf('.') + 1);
-    if (ext == name) {
+
+    ext = name.substr(name.lastIndexOf('.') + 1);
+    if (ext === name) {
         ext = '';
     }
+
     return ext.toLowerCase();
 }

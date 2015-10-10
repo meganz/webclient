@@ -7807,16 +7807,8 @@
         "text": "Share options",
         "context": ""
     },
-    "6850": {
-        "text": "Looks like there's a malformed email.",
-        "context": ""
-    },
     "6851": {
         "text": "You have already imported contacts from Gmail.",
-        "context": ""
-    },
-    "6852": {
-        "text": "Looks like there s a malformed email there",
         "context": ""
     },
     "6853": {
@@ -10571,10 +10563,6 @@
         "text": "You have selected over {0} items ({0}) to download. Do you want to proceed?",
         "context": "Message of the dialog displayed when a user would try to download at the same time more nodes than the reliable number of simultaneous downloads for a good app performance. This dialog ask confirmation to start the download process.\nPreserve the ({0}) codes because is for include the maximum reliable download number and the precise number of nodes to be downloaded in runtime."
     },
-    "7592": {
-        "text": "The subscription has not been canceled correctly. Please contact support@mega.co.nz to cancel your subscription.",
-        "context": "Message of the dialog displayed when the process\/request to cancel a subscription failed."
-    },
     "7593": {
         "text": "https:\/\/mega.co.nz\/mobile_terms.html",
         "context": ""
@@ -10870,5 +10858,65 @@
     "7667": {
         "text": "Close other sessions",
         "context": "Button text to close other login sessions except the current session in use. This will log out other devices which have an active login session."
+    },
+    "7668": {
+        "text": "This file was already uploaded with the name %@",
+        "context": "Message shown when you try to upload one photo or video that is already uploaded in the current folder. \u201cThis file was already uploaded with the name {File name}"
+    },
+    "7669": {
+        "text": "%d files selected were already uploaded into this folder.",
+        "context": "Message shown when you try to upload some photos or\/and videos that are already uploaded in the current folder"
+    },
+    "7670": {
+        "text": "This file has been moved to the Rubbish Bin",
+        "context": "Alert title shown when you are seeing the details of a file and you moved it to the Rubbish Bin from another location"
+    },
+    "7671": {
+        "text": "This folder has been moved to the Rubbish Bin",
+        "context": "Alert title shown when you are seeing the details of a folder and you moved it to the Rubbish Bin from another location"
+    },
+    "7672": {
+        "text": "This file has been moved",
+        "context": "Alert title shown when you are seeing the details of a file and you moved it from another location"
+    },
+    "7673": {
+        "text": "This folder has been moved",
+        "context": "Alert title shown when you are seeing the details of a folder and you moved it from another location"
+    },
+    "7674": {
+        "text": "You no longer have access to this file",
+        "context": "Alert title shown when you are seeing the details of a file and you are not able to access it anymore because it has been removed or moved from the shared folder where it used to be"
+    },
+    "7675": {
+        "text": "You no longer have access to this folder",
+        "context": "Alert title shown when you are seeing the details of a folder and you are not able to access it anymore because it has been removed or moved from the shared folder where it used to be"
+    },
+    "7676": {
+        "text": "The Inbox label is reserved for use by Apple.",
+        "context": "Error message shown when a user tries to download a folder with the name Inbox on the main directory of the offline section"
+    },
+    "7677": {
+        "text": "Link copied",
+        "context": "Message shown when the link has been copied to the clipboard."
+    },
+    "7678": {
+        "text": "Open in...",
+        "context": "Title shown under the action that allows you to open a file in another app."
+    },
+    "7679": {
+        "text": "You need to have a MEGA account in order to continue.",
+        "context": "Prompted through a dialog when a certain action requires a MEGA account in order to continue.\r\n"
+    },
+    "7680": {
+        "text": "MEGA's cryptographic model depends on the keys displayed above. We recommend sending the decryption keys separately from the folder\/file link, through a secure channel.",
+        "context": "An explanation about what the two parts of a public link are for. The first sentence explains why both parts are required, but the second sentence recommends they be sent to other people separately, in two different messages.\r\n\r\nOne part of the link is the 'folder\/file link'. The other part is the 'decryption key'."
+    },
+    "7681": {
+        "text": "Folder\/File Link",
+        "context": "This is a label for part of a url - a link that refers to a file or folder."
+    },
+    "7682": {
+        "text": "MEGA recommends sending the 'Decryption Key' separately from the 'Folder\/File Link'.",
+        "context": "This is used in the Export\/Get Link menu option to explain the best method for sending the two separate parts of the full link."
     }
 }

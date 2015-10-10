@@ -2714,9 +2714,19 @@
     "7665": "Semasa",
     "7666": "Aktif",
     "7667": "Tutup sesi yang lain",
-    "7677": "Link copied",
+    "7668": "Fail ini sudah dimuat naik dengan nama %@",
+    "7669": "%d fail yang dipilih sudah dimuat naik ke folder ini.",
+    "7670": "Fail telah dipindah ke Tong Sampah",
+    "7671": "Folder ini telah dipindah ke Tong Sampah",
+    "7672": "Fail telah dipindah",
+    "7673": "Folder telah dipindah",
+    "7674": "Anda tidak lagi mempunyai akses ke fail ini",
+    "7675": "Anda tidak lagi mempunyai akses ke folder ini",
+    "7676": "Label Peti Masuk dikhaskan untuk diguna oleh Apple.",
+    "7677": "Pautan disalin",
+    "7678": "Open in...",
     "7679": "Anda perlu memiliki akaun MEGA untuk meneruskan.",
     "7680": "Model kriptografi MEGA bergantung kepada kekunci yang dipaparkan di atas. Kami mengesyorkan untuk menghantar kekunci berasingan daripada pautan folder\/fail, melalui rangkaian yang selamat.",
-    "7681": "Folder\/File Link",
-    "7682": "MEGA recommends sending the 'Decryption Key' separately from the 'Folder\/File Link'."
+    "7681": "Pautan Folder\/Fail",
+    "7682": "MEGA mengesyorkan menghantar 'Kekunci Penyahsulitan' berasingan daripada 'Pautan Folder\/Fail'."
 }

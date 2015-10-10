@@ -10859,9 +10859,49 @@
         "text": "Close other sessions",
         "context": "Button text to close other login sessions except the current session in use. This will log out other devices which have an active login session."
     },
+    "7668": {
+        "text": "This file was already uploaded with the name %@",
+        "context": "Message shown when you try to upload one photo or video that is already uploaded in the current folder. \u201cThis file was already uploaded with the name {File name}"
+    },
+    "7669": {
+        "text": "%d files selected were already uploaded into this folder.",
+        "context": "Message shown when you try to upload some photos or\/and videos that are already uploaded in the current folder"
+    },
+    "7670": {
+        "text": "This file has been moved to the Rubbish Bin",
+        "context": "Alert title shown when you are seeing the details of a file and you moved it to the Rubbish Bin from another location"
+    },
+    "7671": {
+        "text": "This folder has been moved to the Rubbish Bin",
+        "context": "Alert title shown when you are seeing the details of a folder and you moved it to the Rubbish Bin from another location"
+    },
+    "7672": {
+        "text": "This file has been moved",
+        "context": "Alert title shown when you are seeing the details of a file and you moved it from another location"
+    },
+    "7673": {
+        "text": "This folder has been moved",
+        "context": "Alert title shown when you are seeing the details of a folder and you moved it from another location"
+    },
+    "7674": {
+        "text": "You no longer have access to this file",
+        "context": "Alert title shown when you are seeing the details of a file and you are not able to access it anymore because it has been removed or moved from the shared folder where it used to be"
+    },
+    "7675": {
+        "text": "You no longer have access to this folder",
+        "context": "Alert title shown when you are seeing the details of a folder and you are not able to access it anymore because it has been removed or moved from the shared folder where it used to be"
+    },
+    "7676": {
+        "text": "The Inbox label is reserved for use by Apple.",
+        "context": "Error message shown when a user tries to download a folder with the name Inbox on the main directory of the offline section"
+    },
     "7677": {
         "text": "Link copied",
         "context": "Message shown when the link has been copied to the clipboard."
+    },
+    "7678": {
+        "text": "Open in...",
+        "context": "Title shown under the action that allows you to open a file in another app."
     },
     "7679": {
         "text": "You need to have a MEGA account in order to continue.",

@@ -1124,7 +1124,7 @@ function showTransferToast(t_type, t_length) {
             }
         }
 
-        $toast.find('.transfer .toast-col:first-child').html(nt_txt);
+        $toast.find('.toast-col:first-child').html(nt_txt);
 
         if ($second_toast.hasClass('visible')) {
             $second_toast.addClass('second');

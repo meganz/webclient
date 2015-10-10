@@ -21678,7 +21678,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	background-color: rgba(0,0,0,0.05);
 }
 .share-dialog-contact-bl .fm-chat-user-info {
-	width: 187px;
+	width: 177px;
 	padding-right: 10px;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
@@ -21700,6 +21700,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	text-overflow: ellipsis;
 	min-width: 162px;
 	padding-left: 43px;
+	width:auto;
 }
 .share-dialog-permissions {
 	float: right;

@@ -10677,6 +10677,13 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	background-image: url(../images/mega/dialogs-sprite_v4.svg);
 	background-repeat: no-repeat;
 }
+.warning-dialog-ai .fm-notification-icon {
+	width: 106px !important;
+	min-height: 75px !important;
+	background-position: 9px -2553px !important;
+	background-image: url(../images/mega/dialogs-sprite_v4.svg) !important;
+	background-repeat: no-repeat !important;
+}
 .notification-dialog .fm-notification-icon {
 	background-position: 10px -2333px;
 }

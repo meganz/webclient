@@ -8640,10 +8640,6 @@ function showToast(toastClass, notification) {
             hideToast(interval);
         }, 5000);
     });
-
-	if (successBlock && successTxt) {
-		successBlock.text(successTxt);
-	}
 }
 
 function hideToast (int) {

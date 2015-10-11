@@ -27,7 +27,6 @@ module.exports = function(config) {
         'js/vendor/jquery.jscrollpane.js',
         'js/vendor/jquery.mousewheel.js',
         'js/vendor/jquery.fullscreen.js',
-        'js/vendor/jquery.window-active.js',
         'js/jquery.tokeninput.js',
         'js/jquery.misc.js',
         'js/jquery.qrcode.js',
@@ -131,6 +130,9 @@ module.exports = function(config) {
         'js/chat/ui/incomingCallDialog.js',
 
         // == Tests ==
+        (process.env.SKIP_WORKFLOWS)
+            ? 'test/config/test_workflows_off.js'
+            : 'test/config/test_workflows.js',
         {pattern: 'test/**/*_test.js', included: true}
     ],
 
@@ -192,8 +194,7 @@ module.exports = function(config) {
     customLaunchers: {
         'PhantomJS2_custom': {
             base: 'PhantomJS2',
-            // web-security is disabled to allow `Worker('data:...')`
-            flags: ['--local-storage-path=./test/phantomjs-storage', '--web-security=false']
+            flags: ['--local-storage-path=./test/phantomjs-storage']
         }
     },
 

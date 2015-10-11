@@ -586,9 +586,20 @@ function getUserAttribute(userhandle, attribute, pub, nonHistoric,
         if (typeof res !== 'number') {
             // Decrypt if it's a private attribute container.
             if (attribute.charAt(0) === '*') {
-                var clearContainer = tlvstore.blockDecrypt(base64urldecode(res),
-                                                           u_k);
-                res = tlvstore.tlvRecordsToContainer(clearContainer);
+                try {
+                    var clearContainer = tlvstore.blockDecrypt(base64urldecode(res),
+                                                               u_k);
+                    res = tlvstore.tlvRecordsToContainer(clearContainer);
+                    thePromise.resolve(res);
+                }
+                catch (e) {
+                    if (e instanceof SecurityError) {
+                        logger.error('Could not decrypt private user attribute '
+                                     + attribute + ': ' + e.message);
+                    }
+                    res = EINTERNAL;
+                    thePromise.reject(res);
+                }
             }
             logger.info('Attribute "' + attribute + '" for user "'
                         + userhandle + '" is "' + res + '".');

@@ -16786,12 +16786,14 @@ span.browsers-update {
 	background-repeat: no-repeat;
 }
 .chrome-app-scr {
-	width: 700px;
-	height: 418px;
-	margin: 30px auto -26px auto;
-	background-image: url(../images/mega/chrome-app1.png);
+    background-image: url(../images/mega/chrome-app1.png);
 	background-position: center -155px;
 	background-repeat: no-repeat;
+    cursor: pointer;
+    display: block;
+    height: 418px;
+    margin: 30px auto -26px auto;
+	width: 700px;
 }
 .chrome-app-button.new-app {
 	background-image: url(../images/mega/chrome-app1.png);

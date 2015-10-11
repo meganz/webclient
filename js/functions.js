@@ -813,53 +813,6 @@ function bytesToSize(bytes, precision) {
     }
 }
 
-function checkPassword(strPassword) {
-    var m_strUpperCase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    var m_strLowerCase = "abcdefghijklmnopqrstuvwxyz";
-    var m_strNumber = "0123456789";
-    var m_strCharacters = "!@#$%^&*?_~";
-    var nScore = 0;
-    nScore += countDif(strPassword) * 2;
-    var extra = countDif(strPassword) * strPassword.length / 3;
-    if (extra > 25) {
-        extra = 25;
-    }
-    nScore += extra;
-    var nUpperCount = countContain(strPassword, m_strUpperCase);
-    var nLowerCount = countContain(strPassword, m_strLowerCase);
-    var nLowerUpperCount = nUpperCount + nLowerCount;
-    if (nUpperCount === 0 && nLowerCount !== 0) {
-        nScore += 10;
-    }
-    else if (nUpperCount !== 0 && nLowerCount !== 0) {
-        nScore += 10;
-    }
-    var nNumberCount = countContain(strPassword, m_strNumber);
-    if (nNumberCount === 1) {
-        nScore += 10;
-    }
-    if (nNumberCount >= 3) {
-        nScore += 15;
-    }
-    var nCharacterCount = countContain(strPassword, m_strCharacters);
-    if (nCharacterCount === 1) {
-        nScore += 10;
-    }
-    if (nCharacterCount > 1) {
-        nScore += 10;
-    }
-    if (nNumberCount !== 0 && nLowerUpperCount !== 0) {
-        nScore += 2;
-    }
-    if (nNumberCount !== 0 && nLowerUpperCount !== 0 && nCharacterCount !== 0) {
-        nScore += 3;
-    }
-    if (nNumberCount !== 0 && nUpperCount !== 0 && nLowerCount !== 0 && nCharacterCount !== 0) {
-        nScore += 5;
-    }
-    return nScore;
-}
-
 function showNonActivatedAccountDialog(log) {
     if (log) {
         megaAnalytics.log("pro", "showNonActivatedAccountDialog");
@@ -914,28 +867,6 @@ function showOverQuotaDialog() {
     $('.warning-button').click(function() {
         document.location.hash = 'pro';
     });
-}
-
-function countDif(strPassword) {
-    var chararr = [];
-    var nCount = 0;
-    for (i = 0; i < strPassword.length; i++) {
-        if (!chararr[strPassword.charAt(i)]) {
-            chararr[strPassword.charAt(i)] = true;
-            nCount++;
-        }
-    }
-    return nCount;
-}
-
-function countContain(strPassword, strCheck) {
-    var nCount = 0;
-    for (i = 0; i < strPassword.length; i++) {
-        if (strCheck.indexOf(strPassword.charAt(i)) > -1) {
-            nCount++;
-        }
-    }
-    return nCount;
 }
 
 function logincheckboxCheck(ch_id) {

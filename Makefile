@@ -13,18 +13,30 @@ BUILD_DEP_ALL_NAMES = karma jsdoc
 
 ASMCRYPTO_MODULES = utils,aes-cbc,aes-ccm,sha1,sha256,sha512,hmac-sha1,hmac-sha256,hmac-sha512,pbkdf2-hmac-sha1,pbkdf2-hmac-sha256,pbkdf2-hmac-sha512,rng,bn,rsa-pkcs1,globals-rng,globals
 
+ifeq ($(BROWSER),)
+	BROWSER = PhantomJS2_custom
+endif
+
+TESTALL_BROWSERS = PhantomJS2_custom,Chrome,Firefox
+ifeq ($(OS), Windows_NT)
+	TESTALL_BROWSERS := $(TESTALL_BROWSERS),IE,FirefoxNightly,FirefoxDeveloper
+endif
+
 all: test api-doc dist test-shared
 
 test-no-workflows:
 	SKIP_WORKFLOWS=true $(MAKE) test
 
 test: $(KARMA)
-	rm -rf test/phantomjs-storag
-	$(NODE) $(KARMA) start --preprocessors= karma.conf.js --browsers PhantomJS2_custom
+	@rm -rf test/phantomjs-storage
+	$(NODE) $(KARMA) start --preprocessors= karma.conf.js --browsers $(BROWSER) $(OPTIONS)
 
 test-ci: $(KARMA)
-	rm -rf test/phantomjs-storag
-	$(NODE) $(KARMA) start --singleRun=true --no-colors karma.conf.js --browsers PhantomJS2_custom
+	@rm -rf test/phantomjs-storage
+	$(NODE) $(KARMA) start --singleRun=true --no-colors karma.conf.js --browsers $(BROWSER) $(OPTIONS)
+
+test-all:
+	OPTIONS="--singleRun=true" BROWSER=$(TESTALL_BROWSERS) $(MAKE) -s test
 
 api-doc: $(JSDOC)
 	$(NODE) $(JSDOC) --destination doc/api/ --private \
@@ -37,6 +49,10 @@ jshint: $(JSHINT)
 jscs: $(JSCS)
 	@-$(NODE) $(JSCS) --verbose .
 
+pkg-upgrade:
+	@npm outdated --depth=0
+	@npm outdated --depth=0 | grep -v Package | awk '{print $$1}' | xargs -I% npm install %@latest $(OPTIONS)
+
 checks: jshint jscs
 
 clean:
@@ -46,5 +62,5 @@ clean-all: clean
 	rm -f $(BUILD_DEP_ALL)
 	rm -rf $(BUILD_DEP_ALL_NAMES:%=$(NODE_PATH)/%) $(DEP_ALL_NAMES:%=$(NODE_PATH)/%)
 
-.PHONY: all test test-no-workflows test-ci api-doc jshint jscs checks
-.PHONY: clean clean-all
+.PHONY: all test test-no-workflows test-all test-ci api-doc jshint jscs checks
+.PHONY: clean clean-all pkg-upgrade

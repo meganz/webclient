@@ -504,7 +504,7 @@ var strongvelope = {};
      * @method
      * @param messages {Array.<ChatdMessage>}
      *     Array of (most recent) batch of chat message history.
-     * @return {Array.{Object}}
+     * @return {Array.<Object>}
      *     An array of all the parsed messages' content.
      * @private
      */

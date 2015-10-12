@@ -116,5 +116,7 @@ function verify_email() {
             verify_email_passwd();
         }
     });    
-    $('.restore-verify-button').rebind('click', verify_email_passwd);
+    $('.restore-verify-button').rebind('click', function() {
+            verify_email_passwd();
+    });
 }

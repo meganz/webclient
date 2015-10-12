@@ -1716,7 +1716,12 @@ function api_proc(q) {
     };
 
     if (q.rawreq === false) {
-        q.url = apipath + q.service + '?id=' + (q.seqno++) + '&' + q.sid + '&domain=meganz&lang=' + lang;
+        q.url = apipath + q.service
+              + '?id=' + (q.seqno++)
+              + '&' + q.sid
+              + '&domain=meganz'                    // Coming from mega.nz or mega.co.nz
+              + '&lang=' + lang                     // Their selected language
+              + '&ext=' + (is_extension ? 1 : 0);   // Using browser extension or not
 
         if (typeof q.cmds[q.i][0] === 'string') {
             q.url += '&' + q.cmds[q.i][0];

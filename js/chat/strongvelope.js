@@ -61,7 +61,7 @@ var strongvelope = {};
      * @property _UNUSED_SEPARATOR_ {Number}
      *     NULL is used as a terminator for the record type. Don't use!
      * @property SIGNATURE {Number}
-     *     Payload signature for all following bytes.
+     *     Signature for all following bytes.
      * @property MESSAGE_TYPE {Number}
      *     Type of message sent.
      * @property NONCE {Number}
@@ -73,8 +73,8 @@ var strongvelope = {};
      * @property KEYS {Number}
      *     Message encryption keys, encrypted to a particular recipient. This
      *     may contain two (concatenated) keys. The second one (if present) is
-     *     the previous sender key (key ID one less). Requires
-     *     the sane number of records in the same order as `RECIPIENT`.
+     *     the previous sender key. Requires the same number of records in the
+     *     same order as `RECIPIENT`.
      * @property KEY_IDS {Number}
      *     Sender encryption key IDs used (or set) in this message.
      * @property PAYLOAD {Number}
@@ -110,9 +110,9 @@ var strongvelope = {};
      * "Enumeration" of message types used for the chat message transport.
      *
      * @property GROUP_KEYED {Number}
-     *     Data message containing a new sender key (initial or key rotation).
+     *     Message containing a sender key (initial, key rotation, key re-send).
      * @property GROUP_CONTINUE {Number}
-     *     Data message using an existing sender key for encryption.
+     *     Message using an existing sender key for encryption.
      */
     var MESSAGE_TYPES = {
         GROUP_KEYED:        0x00,
@@ -283,7 +283,7 @@ var strongvelope = {};
     strongvelope._signMessage = function(message, privKey, pubKey) {
 
         var keyBytes = asmCrypto.string_to_bytes(privKey + pubKey);
-        var messageBytes = asmCrypto.string_to_bytes(message);
+        var messageBytes = asmCrypto.string_to_bytes('datamsgsig' + message);
         var signature = nacl.sign.detached(messageBytes, keyBytes);
 
         return asmCrypto.bytes_to_string(signature);
@@ -305,7 +305,7 @@ var strongvelope = {};
      */
     strongvelope._verifyMessage = function(message, signature, pubKey) {
 
-        var messageBytes = asmCrypto.string_to_bytes(message);
+        var messageBytes = asmCrypto.string_to_bytes('datamsgsig' + message);
         var signatureBytes = asmCrypto.string_to_bytes(signature);
         var keyBytes = asmCrypto.string_to_bytes(pubKey);
 

@@ -34,35 +34,44 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
         .rebind('onRoomCreated.chatNotifications', function(e, megaRoom) {
             var resetChatNotificationCounters = function() {
                 if(megaRoom.isCurrentlyActive) {
-                    megaRoom.messages.forEach(function (v, k) {
-                        if (!v.seen) {
-                            if(v.setSeen) {
-                                v.setSeen(true);
-                            } else {
-                                v.seen = true;
-                            }
+                    var lastSeen = null;
+                    megaRoom.messagesBuff.messages.forEach(function (v, k) {
+                        if (v.getState && v.getState() === Message.STATE.NOT_SEEN) {
+                            lastSeen = v;
                         }
                     });
 
+                    if(lastSeen) {
+                        megaRoom.messagesBuff.setLastSeen(lastSeen.messageId);
+                    }
                     self.notifications.resetCounterGroup(megaRoom.roomJid);
                 }
             };
 
             megaRoom
                 .rebind('onAfterRenderMessage.chatNotifications', function(e, message) {
-                    var fromContact = message.authorContact ? message.authorContact : megaChat.getContactFromJid(
-                        message.getFromJid()
-                    );
+                    var fromContact = null;
+                    if (message.userId) {
+                        fromContact = M.u[message.userId];
+                    }
+                    else if (message.authorContact) {
+                        fromContact = message.authorContact;
+                    }
+                    else if(message.getFromJid) {
+                        fromContact = megaChat.getContactFromJid(
+                            message.getFromJid()
+                        );
+                    }
 
                     var avatarMeta = generateAvatarMeta(fromContact.u);
                     var icon = avatarMeta.avatarUrl;
                     var n;
 
-                    if(message.seen === true) { // halt if already seen.
+                    if(!message.getState || message.getState() === Message.STATE.SEEN) { // halt if already seen.
                         return;
                     }
 
-                    if(message instanceof KarereEventObjects.IncomingMessage && !message.isMyOwn(megaChat.karere)) {
+                    if(message.userId !== u_handle) {
                         n = self.notifications.notify(
                             'incoming-chat-message',
                             {
@@ -74,14 +83,14 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
                                     'from': avatarMeta.fullName
                                 }
                             },
-                            !message.seen
+                            message.getState() === Message.STATE.NOT_SEEN && !$.windowActive
                         );
 
-                        $(message).rebind('onChange.chatNotif', function(e, msg, property) {
-                            if(property === "seen" && msg.seen === true) {
+                        var changeListenerId = megaRoom.messagesBuff.addChangeListener(function() {
+                            if (message.getState() === Message.STATE.SEEN) {
                                 n.setUnread(false);
 
-                                $(message).unbind('onChange.chatNotif');
+                                megaRoom.messagesBuff.removeChangeListener(changeListenerId);
                             }
                         });
                     } else if(message.type && message.textMessage && !message.seen) {
@@ -229,11 +238,11 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
             self.notifications.resetCounterGroup(room.roomJid, "incoming-voice-video-call")
         });
 
-        // link counters
-        self.notifications.rebind("onCounterUpdated.chatNotifications", function(e, notif, group, type) {
-            var room = megaChat.chats[group];
-            if(room) {
-                room.unreadCount = notif.getCounterGroup(group);
-            }
-        });
+        //// link counters
+        //self.notifications.rebind("onCounterUpdated.chatNotifications", function(e, notif, group, type) {
+        //    var room = megaChat.chats[group];
+        //    if(room) {
+        //        room.unreadCount = notif.getCounterGroup(group);
+        //    }
+        //});
 };

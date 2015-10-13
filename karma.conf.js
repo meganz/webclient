@@ -74,6 +74,7 @@ module.exports = function(config) {
         'secureboot.js',
         'index.js',
         'js/functions.js',
+        'js/datastructs.js',
         'js/mega.js',
         'js/vendor/megaLogger.js',
         'js/tlvstore.js',
@@ -126,8 +127,9 @@ module.exports = function(config) {
         'js/chat/plugins/callManager.js',
         'js/chat/karereEventObjects.js',
         'js/chat/karere.js',
-        'js/chat/chat.js',
-        'js/chat/chatRoom.js',
+        //'js/chat/chat.js',
+        //'js/chat/chatRoom.js',
+        'js/chat/messages.js',
         'js/chat/ui/incomingCallDialog.js',
 
         // == Tests ==
@@ -135,6 +137,7 @@ module.exports = function(config) {
             ? 'test/config/test_workflows_off.js'
             : 'test/config/test_workflows.js',
         {pattern: 'test/**/*_test.js', included: true}
+        //'test/chat/messages_test.js'
     ],
 
     // List of files to exclude.

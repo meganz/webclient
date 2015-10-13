@@ -15,7 +15,7 @@ var getMessageString;
 (function() {
     var MESSAGE_STRINGS;
     getMessageString = function(type) {
-        if(!MESSAGE_STRINGS) {
+        if (!MESSAGE_STRINGS) {
             MESSAGE_STRINGS = {
                 'outgoing-call': l[5891],
                 'incoming-call': "Incoming call from [X]",
@@ -45,7 +45,7 @@ var ConversationMessage = React.createClass({
         var chatRoom = self.props.chatRoom;
         var megaChat = chatRoom.megaChat;
         megaChat.chats.addChangeListener(function() {
-            if(self.isMounted()) {
+            if (self.isMounted()) {
                 self.forceUpdate();
             }
         });
@@ -55,7 +55,7 @@ var ConversationMessage = React.createClass({
         var chatRoom = self.props.chatRoom;
         var megaChat = chatRoom.megaChat;
 
-        if(!self.onAfterRenderWasTriggered) {
+        if (!self.onAfterRenderWasTriggered) {
             chatRoom.trigger("onAfterRenderMessage", self.props.message);
             self.onAfterRenderWasTriggered = true;
         }
@@ -78,6 +78,9 @@ var ConversationMessage = React.createClass({
         if (message.authorContact) {
             contact = message.authorContact;
         }
+        else if (message.userId) {
+            contact = M.u[message.userId];
+        }
         else if (message.getFromJid) {
             contact = megaChat.getContactFromJid(message.getFromJid());
         }
@@ -98,17 +101,19 @@ var ConversationMessage = React.createClass({
         timestamp = unixtimeToTimeString(timestamp);
 
         // if this is a text msg.
-        if(
+        if (
             (message instanceof KarereEventObjects.IncomingMessage) ||
             (message instanceof KarereEventObjects.OutgoingMessage) ||
-            (message instanceof KarereEventObjects.IncomingPrivateMessage)
+            (message instanceof KarereEventObjects.IncomingPrivateMessage) ||
+            (message instanceof Message)
+
         ) {
             // Convert ot HTML and pass it to plugins to do their magic on styling the message if needed.
             if (message.messageHtml) {
                 message.messageHtml = message.messageHtml;
             } else {
                 message.messageHtml = htmlentities(
-                    message.getContents()
+                    message.getContents ? message.getContents() : message.textContents
                 ).replace(/\n/gi, "<br/>");
             }
 
@@ -127,21 +132,21 @@ var ConversationMessage = React.createClass({
             authorTextDiv = <span className="chat-username">{contact.m}</span>;
         }
         // if this is an inline dialog
-        else if(
+        else if (
             message.type
         ) {
             cssClasses += " inline-dialog chat-notification " + message.type;
             textMessage = getMessageString(message.type);
-            if(!textMessage) {
+            if (!textMessage) {
                 console.error("Message with type: ", message.type, "does not have a text string defined. Message: ", message);
                 debugger;
                 throw new Error("boom");
             }
             // if is an array.
-            if(textMessage.splice) {
+            if (textMessage.splice) {
                 var tmpMsg = textMessage[0].replace("[X]", generateContactName(contact.u));
 
-                if(message.currentCallCounter) {
+                if (message.currentCallCounter) {
                     tmpMsg += " " + textMessage[1].replace("[X]", secToDuration(message.currentCallCounter)) + " "
                 }
                 textMessage = tmpMsg;
@@ -154,7 +159,7 @@ var ConversationMessage = React.createClass({
             message.textMessage = textMessage;
 
             // mapping css icons to msg types
-            if(message.type === "call-rejected") {
+            if (message.type === "call-rejected") {
                 message.cssClass = "rejected-call";
             }
             else if (message.type === "call-missed") {
@@ -182,11 +187,11 @@ var ConversationMessage = React.createClass({
         }
 
 
-        if(message.cssClasses) {
+        if (message.cssClasses) {
             cssClasses += " " + message.cssClasses.join(" ");
         }
 
-        if(message.buttons) {
+        if (message.buttons) {
             Object.keys(message.buttons).forEach(function(k) {
                 var button = message.buttons[k];
                 var classes = "fm-chat-file-button " + button.type + "-button fm-chat-inline-dialog-button-" + k;
@@ -198,30 +203,46 @@ var ConversationMessage = React.createClass({
             });
         }
 
-        if(message instanceof KarereEventObjects.OutgoingMessage) {
+        if (
+            message instanceof Message ||
+            (typeof(message.userId) !== 'undefined' && message.userId === u_handle)
+        ) {
             var labelClass = "label text-message";
             var labelText;
 
-            if(message.getState() === KarereEventObjects.OutgoingMessage.STATE.NOT_SENT) {
+            if (
+                message.getState() === Message.STATE.NULL
+            ) {
+                labelClass += " error";
+                labelText = "error"
+            }
+            else if (
+                message.getState() === Message.STATE.NOT_SENT
+            ) {
                 labelClass += " not-sent";
                 labelText = "not sent"
             }
-            else if(message.getState() === KarereEventObjects.OutgoingMessage.STATE.SENT) {
+            else if (message.getState() === Message.STATE.SENT) {
                 labelClass += " sent";
                 labelText = "sent";
             }
-            else if(message.getState() === KarereEventObjects.OutgoingMessage.STATE.DELIVERED) {
+            else if (message.getState() === Message.STATE.DELIVERED) {
                 labelClass += " delivered";
                 labelText = "delivered";
             }
-            else if(message.getState() === KarereEventObjects.OutgoingMessage.STATE.REJECTED) {
-                labelClass += " rejected";
-                labelText = "rejected";
+            else if (message.getState() === Message.STATE.NOT_SEEN) {
+                labelClass += " unread";
+                labelText = "unread";
             }
-            else if(message.getState() === KarereEventObjects.OutgoingMessage.STATE.SEEN) {
+            else if (message.getState() === Message.STATE.SEEN) {
                 labelClass += " seen";
                 labelText = "seen";
             }
+            else if (message.getState() === Message.STATE.DELETED) {
+                labelClass += " deleted";
+                labelText = "deleted";
+            }
+
             messageLabel = <span className={labelClass}>{labelText}</span>
         }
         return (
@@ -271,7 +292,7 @@ var ConversationPanel = React.createClass({
 
         self.$header.attr("data-room-jid", room.roomJid.split("@")[0]);
 
-        if(!self.props.chatRoom.isCurrentlyActive) {
+        if (!self.props.chatRoom.isCurrentlyActive) {
             return;
         }
 
@@ -302,12 +323,12 @@ var ConversationPanel = React.createClass({
         var self = this;
         var $target = $(e.target);
 
-        if($target.parent().is(".disabled")) {
+        if ($target.parent().is(".disabled")) {
             return;
         }
 
         var hidePopup = function() {
-            if(self.isMounted()) {
+            if (self.isMounted()) {
                 self.setState({
                     emoticonsPopupIsActive: false
                 });
@@ -316,12 +337,12 @@ var ConversationPanel = React.createClass({
         };
 
 
-        if(self.state.emoticonsPopupIsActive === false) {
+        if (self.state.emoticonsPopupIsActive === false) {
             self.setState({
                 emoticonsPopupIsActive: true
             });
             $(document).rebind('mouseup.emoticonsPopup', function (e) {
-                if(!$(e.target).is($target)) {
+                if (!$(e.target).is($target)) {
                     hidePopup();
                 }
             });
@@ -347,12 +368,12 @@ var ConversationPanel = React.createClass({
     onStartCallClicked: function(e) {
         var self = this;
 
-        if($(e.target).parent().is(".disabled")) {
+        if ($(e.target).parent().is(".disabled")) {
             return;
         }
 
         var hidePopup = function() {
-            if(self.isMounted()) {
+            if (self.isMounted()) {
                 self.setState({
                     startCallPopupIsActive: false
                 });
@@ -360,8 +381,8 @@ var ConversationPanel = React.createClass({
             }
         };
 
-        if(self.props.contact.presence) {
-            if(self.state.startCallPopupIsActive === false) {
+        if (self.props.contact.presence) {
+            if (self.state.startCallPopupIsActive === false) {
                 self.setState({
                     startCallPopupIsActive: true
                 });
@@ -375,7 +396,7 @@ var ConversationPanel = React.createClass({
     },
     onEndCallClicked: function(e) {
         var room = this.props.chatRoom;
-        if(room.callSession) {
+        if (room.callSession) {
             room.callSession.endCall('hangup');
         }
         // this must be triggered when a call had finished, e.g. from an event from the currently
@@ -388,8 +409,8 @@ var ConversationPanel = React.createClass({
     onVideoToggleClicked: function(e) {
         var self = this;
         var room = this.props.chatRoom;
-        if(room.callSession) {
-            if(room.callSession.getMediaOptions().video) {
+        if (room.callSession) {
+            if (room.callSession.getMediaOptions().video) {
                 room.callSession.muteVideo();
             } else {
                 room.callSession.unmuteVideo();
@@ -399,8 +420,8 @@ var ConversationPanel = React.createClass({
     onAudioToggleClicked: function(e) {
         var self = this;
         var room = this.props.chatRoom;
-        if(room.callSession) {
-            if(room.callSession.getMediaOptions().audio) {
+        if (room.callSession) {
+            if (room.callSession.getMediaOptions().audio) {
                 room.callSession.muteAudio();
             } else {
                 room.callSession.unmuteAudio();
@@ -443,7 +464,7 @@ var ConversationPanel = React.createClass({
         var room = this.props.chatRoom;
         var $target = e && e.target ? $(e.target) : null;
 
-        if(this.state.isFullscreenModeEnabled) {
+        if (this.state.isFullscreenModeEnabled) {
             this.setState({isFullscreenModeEnabled: false});
             $(document).fullScreen(false);
         } else {
@@ -454,10 +475,10 @@ var ConversationPanel = React.createClass({
     onMouseMoveDuringCall: function(e) {
         var self = this;
 
-        if(self.state.mouseOverDuringCall === false) {
+        if (self.state.mouseOverDuringCall === false) {
             self.setState({'mouseOverDuringCall': true});
         }
-        if(self._mouseMoveDelay) {
+        if (self._mouseMoveDelay) {
             clearTimeout(self._mouseMoveDelay);
         }
         self._mouseMoveDelay = setTimeout(function() {
@@ -538,7 +559,7 @@ var ConversationPanel = React.createClass({
     onMouseMove: function(e) {
         var self = this;
         var chatRoom = self.props.chatRoom;
-        if(self.isMounted()) {
+        if (self.isMounted()) {
             chatRoom.trigger("onChatIsFocused");
         }
     },
@@ -596,10 +617,10 @@ var ConversationPanel = React.createClass({
 
                 if (
                     self.lastUpdatedScrollHeight !== $jsp.getContentHeight() &&
-                    !self.props.chatRoom.messagesHistoryIsLoading() &&
-                    self.props.chatRoom.haveMoreHistory()
+                    !self.props.chatRoom.messagesBuff.messagesHistoryIsLoading() &&
+                    self.props.chatRoom.messagesBuff.haveMoreHistory()
                 ) {
-                    self.props.chatRoom.retrieveChatHistory();
+                    self.props.chatRoom.messagesBuff.retrieveChatHistory();
                     self.lastUpdatedScrollHeight = $jsp.getContentHeight();
                 }
             }
@@ -618,7 +639,7 @@ var ConversationPanel = React.createClass({
         self.$messages.rebind('jsp-initialised.conversationsPanel', function(e) {
             var $jsp = self.$messages.data("jsp");
 
-            if(self.lastScrolledToBottom === true) {
+            if (self.lastScrolledToBottom === true) {
                 $jsp.scrollToBottom();
             } else {
                 var prevPosY = (
@@ -649,7 +670,7 @@ var ConversationPanel = React.createClass({
         var chatRoom = self.props.chatRoom;
         var megaChat = self.props.chatRoom.megaChat;
         megaChat.karere.bind("onComposingMessage." + chatRoom.roomJid, function(e, eventObject) {
-            if(!self.isMounted()) {
+            if (!self.isMounted()) {
                 return;
             }
             if (Karere.getNormalizedFullJid(eventObject.getFromJid()) === megaChat.karere.getJid()) {
@@ -672,7 +693,7 @@ var ConversationPanel = React.createClass({
         megaChat.karere.rebind("onPausedMessage." + chatRoom.roomJid, function(e, eventObject) {
             var room = megaChat.chats[eventObject.getRoomJid()];
 
-            if(!self.isMounted()) {
+            if (!self.isMounted()) {
                 return;
             }
             if (Karere.getNormalizedFullJid(eventObject.getFromJid()) === megaChat.karere.getJid()) {
@@ -709,26 +730,26 @@ var ConversationPanel = React.createClass({
         var room = this.props.chatRoom;
         var callIsActive = room.callSession && room.callSession.isActive();
 
-        if(callIsActive && room.isCurrentlyActive) {
+        if (callIsActive && room.isCurrentlyActive) {
             $('.fm-chat-block').addClass('video-call');
 
-            if(self.state.isFullscreenModeEnabled) {
+            if (self.state.isFullscreenModeEnabled) {
                 $('.fm-chat-block').addClass('fullscreen');
 
             } else {
                 $('.fm-chat-block').removeClass('fullscreen');
             }
             var $videoElem = $("video#remotevideo_" + room.callSession.sid);
-            if($videoElem.length > 0) {
+            if ($videoElem.length > 0) {
                 $videoElem[0].play();
             }
             var $videoElemLocal = $("video#localvideo_" + room.callSession.sid);
-            if($videoElemLocal.length > 0) {
+            if ($videoElemLocal.length > 0) {
                 $videoElemLocal[0].play();
             }
 
             var $avscreen = $('.my-av-screen', self.$header);
-            if(!$avscreen.data('isDraggable')) {
+            if (!$avscreen.data('isDraggable')) {
                 $avscreen.draggable({
                     'containment': $avscreen.parents('.chat-call-block'),
                     'scroll': false
@@ -738,7 +759,7 @@ var ConversationPanel = React.createClass({
 
         } else {
             // only rmeove the video-call class IF the updated room is the one which was updated
-            if(megaChat.currentlyOpenedChat === room.roomJid) {
+            if (megaChat.currentlyOpenedChat === room.roomJid) {
                 $('.fm-chat-block').removeClass('video-call');
                 $('.fm-chat-block').removeClass('fullscreen');
             }
@@ -754,7 +775,7 @@ var ConversationPanel = React.createClass({
         var $container = $(this.getDOMNode());
         var self = this;
 
-        if(!self.props.chatRoom.isCurrentlyActive) {
+        if (!self.props.chatRoom.isCurrentlyActive) {
             return;
         }
 
@@ -804,9 +825,9 @@ var ConversationPanel = React.createClass({
         }
 
         // try to do a .scrollToBottom only once, to trigger the stickToBottom func. of JSP
-        if(!self.scrolledToBottom) {
+        if (!self.scrolledToBottom) {
             var $messagesPad = $('.fm-chat-message-pad', self.$messages);
-            if(
+            if (
                 $messagesPad.outerHeight() - 1 > $messagesPad.parent().parent().parent().outerHeight()
             ) {
                 self.scrolledToBottom = 1;
@@ -836,14 +857,14 @@ var ConversationPanel = React.createClass({
             conversationPanelClasses += " hidden";
         }
 
-        if(room._conv_ended === true) {
+        if (room._conv_ended === true) {
             headerClasses += " conv-ended";
         } else {
             headerClasses += " conv-start";
         }
 
         var callIsActive = room.callSession && room.callSession.isActive();
-        if(!callIsActive) {
+        if (!callIsActive) {
             endCallClasses += " hidden";
         }
 
@@ -856,10 +877,10 @@ var ConversationPanel = React.createClass({
 
         var startCallButtonClasses = "chat-button btn-chat-call fm-start-call";
 
-        if(callIsActive) {
+        if (callIsActive) {
             startCallButtonClasses += " hidden";
         } else {
-            if(room.callSession && (
+            if (room.callSession && (
                 room.callSession.state === CallSession.STATE.WAITING_RESPONSE_OUTGOING ||
                 room.callSession.state === CallSession.STATE.WAITING_RESPONSE_INCOMING
                 )
@@ -868,7 +889,7 @@ var ConversationPanel = React.createClass({
             }
         }
 
-        if(!contact.presence) {
+        if (!contact.presence) {
             startCallButtonClasses += " disabled";
         }
 
@@ -903,8 +924,8 @@ var ConversationPanel = React.createClass({
         }
         var messagesList = [];
 
-        self.props.messages.forEach(function(v, k) {
-            if(v.deleted !== 1) {
+        self.props.messagesBuff.messages.forEach(function(v, k) {
+            if (v.deleted !== 1) {
                 messagesList.push(
                     <ConversationMessage message={v} chatRoom={room} key={v.messageId} />
                 );
@@ -931,17 +952,17 @@ var ConversationPanel = React.createClass({
         var typingElement;
 
         // setup ONLY if there is an active call session
-        if(room.callSession && callIsActive) {
-            if(self.state.isFullscreenModeEnabled) {
+        if (room.callSession && callIsActive) {
+            if (self.state.isFullscreenModeEnabled) {
                 headerClasses += " fullscreen";
                 sizeIconClasses += " active";
-                if(self.state.mouseOverDuringCall !== true) {
+                if (self.state.mouseOverDuringCall !== true) {
                     videoControlClasses += " hidden-controls";
                 }
             }
 
             // setup, related to my local a/v settings
-            if(room.callSession.getMediaOptions().video) {
+            if (room.callSession.getMediaOptions().video) {
                 headerIndicatorVideo += " hidden";
                 myAvatar = <div className="localVideoWrapper">
                     <video
@@ -964,14 +985,14 @@ var ConversationPanel = React.createClass({
                 currentUserResizerClasses += " hidden";
             }
 
-            if(room.callSession.getMediaOptions().audio) {
+            if (room.callSession.getMediaOptions().audio) {
                 headerIndicatorAudio += " hidden";
             } else {
                 ctrlAudioButtonClasses += " active";
             }
 
             // setup, based on remote user's a/v settings
-            if(room.callSession.getRemoteMediaOptions().video && room.callSession.remotePlayer) {
+            if (room.callSession.getRemoteMediaOptions().video && room.callSession.remotePlayer) {
                 var remotePlayer = room.callSession.remotePlayer[0];
 
                 otherUsersAvatar = <video
@@ -991,7 +1012,7 @@ var ConversationPanel = React.createClass({
                 otherUserContainerClasses += " audio-call-container";
             }
 
-            if(room.callSession.getRemoteMediaOptions().audio) {
+            if (room.callSession.getRemoteMediaOptions().audio) {
 
             } else {
 
@@ -1001,7 +1022,7 @@ var ConversationPanel = React.createClass({
             headerIndicatorVideo += " hidden";
         }
 
-        if(self.state.localVideoIsMinimized === true) {
+        if (self.state.localVideoIsMinimized === true) {
             videoMinimiseButtonClasses += " active";
             myContainerClasses += " minimized";
         } else {
@@ -1020,7 +1041,7 @@ var ConversationPanel = React.createClass({
             emoticonsPopupClasses += " hidden";
         }
 
-        if(self.state.currentlyTyping.length > 0) {
+        if (self.state.currentlyTyping.length > 0) {
             typingElement = <div className="fm-chat-messages-block typing" key="typingElement">
                 <div className="fm-chat-messages-pad">
                     <span>
@@ -1200,7 +1221,7 @@ var ConversationPanels = React.createClass({
                     chatRoom={chatRoom}
                     contacts={M.u}
                     contact={contact}
-                    messages={chatRoom.messages}
+                    messagesBuff={chatRoom.messagesBuff}
                     key={chatRoom.roomJid}
                     chat={self.props.megaChat}
                     />

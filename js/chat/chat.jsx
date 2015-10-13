@@ -859,7 +859,7 @@ Chat.prototype.updateSectionUnreadCount = function() {
 
 
     self.chats.forEach(function(megaRoom, k) {
-        var c = parseInt(megaRoom.unreadCount, 10);
+        var c = parseInt(megaRoom.messagesBuff.getUnreadCount(), 10);
         unreadCount += c;
     });
 

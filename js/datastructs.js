@@ -39,12 +39,32 @@ var _arrayAliases = [
     'values'
 ];
 
+
+
+/**
+ * Helper Exception to be used for "break"-ing .forEach calls
+ */
+if(typeof StopIteration == "undefined") {
+    StopIteration = new Error("StopIteration");
+}
+
+function breakableForEach(arr, cb) {
+    try {
+        return Array.prototype.forEach.call(arr, cb);
+    }
+    catch(e) {
+        if(e !== StopIteration) {
+            throw e;
+        }
+    }
+};
+
 var _createObjectDataMethods = function(kls) {
     var obj = kls.prototype ? kls.prototype : kls;
 
     obj.forEach = function(cb) {
         var self = this;
-        self.keys().forEach(function(k) {
+        breakableForEach(self.keys(), function(k) {
             cb(self._data[k], k);
         });
     };
@@ -186,9 +206,16 @@ var manualTrackChangesOnStructure = function(obj, implementChangeListener) {
             return cb._changeListenerId;
         };
         obj.removeChangeListener = function(cb) {
-            assert(typeof(cb._changeListenerId) != 'undefined', 'this method/cb was not used as a change listener');
+            assert(
+                typeof(cb) === 'string' || typeof(cb._changeListenerId) != 'undefined',
+                'this method/cb was not used as a change listener'
+            );
 
-            mBroadcaster.removeListener(cb._changeListenerId);
+            if(typeof(cb) === 'string') {
+                mBroadcaster.removeListener(cb);
+            } else {
+                mBroadcaster.removeListener(cb._changeListenerId);
+            }
         };
     }
 };
@@ -264,7 +291,12 @@ _arrayAliases.forEach(function(methodName) {
                     arguments[0]._parent = this;
                 }
             }
-            ret = this._data[methodName].apply(this._data, arguments);
+            if(methodName == "forEach") {
+                return breakableForEach(this._data, arguments[0]);
+            } else {
+                ret = this._data[methodName].apply(this._data, arguments);
+            }
+
             if(_arrayMethodsThatAltersData.indexOf(methodName) >= 0) {
                 this.trackDataChange([this._data, ret]);
             }
@@ -278,6 +310,10 @@ _arrayAliases.forEach(function(methodName) {
 
 MegaDataArray.prototype.getItem = function(idx) {
     return this._data[idx];
+};
+
+MegaDataArray.prototype.keys = function() {
+    return Object.keys(this._data);
 };
 
 /**
@@ -433,31 +469,33 @@ MegaDataSortedMap.prototype.push = function(v) {
 MegaDataSortedMap.prototype.reorder = function() {
     var self = this;
 
-    var sortFields = self._sortField.split(",");
+    if(self._sortField) {
+        var sortFields = self._sortField.split(",");
 
-    self._sortedVals.sort(function(a, b) {
-        for(var i = 0; i < sortFields.length; i++ ) {
-            var sortField = sortFields[i];
-            var ascOrDesc = 1;
-            if(sortField.substr(0,1) === "-") {
-                ascOrDesc = -1;
-                sortField = sortField.substr(1);
-            }
+        self._sortedVals.sort(function (a, b) {
+            for (var i = 0; i < sortFields.length; i++) {
+                var sortField = sortFields[i];
+                var ascOrDesc = 1;
+                if (sortField.substr(0, 1) === "-") {
+                    ascOrDesc = -1;
+                    sortField = sortField.substr(1);
+                }
 
-            if (self._data[a][sortField] && self._data[b][sortField]) {
-                if (self._data[a][sortField] < self._data[b][sortField]) {
-                    return -1 * ascOrDesc;
-                }
-                else if (self._data[a][sortField] > self._data[b][sortField]) {
-                    return 1 * ascOrDesc;
-                }
-                else {
-                    return 0;
+                if (self._data[a][sortField] && self._data[b][sortField]) {
+                    if (self._data[a][sortField] < self._data[b][sortField]) {
+                        return -1 * ascOrDesc;
+                    }
+                    else if (self._data[a][sortField] > self._data[b][sortField]) {
+                        return 1 * ascOrDesc;
+                    }
+                    else {
+                        return 0;
+                    }
                 }
             }
-        }
-        return 0;
-    });
+            return 0;
+        });
+    }
 
     self.trackDataChange([self._data]);
 };
@@ -545,4 +583,5 @@ testMegaDataSortedMap = function() {
     });
     return arr1;
 };
+
 

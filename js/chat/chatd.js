@@ -46,7 +46,8 @@ var Chatd = function(userid, options) {
         'onRetentionChanged',
         'onMessagesHistoryInfo',
         'onMembersUpdated',
-        'onMessagesHistoryDone'
+        'onMessagesHistoryDone',
+        'onMessagesHistoryRequest',
     ].forEach(function(evt) {
             self.rebind(evt + '.chatd', function(e) {
                 console.error(evt, JSON.stringify(arguments[1]));
@@ -304,6 +305,11 @@ Chatd.prototype.range = function(chatid) {
 
 // send HIST
 Chatd.Shard.prototype.hist = function(chatid, count) {
+    this.chatd.trigger('onMessagesHistoryRequest', {
+        count: count,
+        chatId: base64urlencode(chatid)
+    });
+
     this.cmd(Chatd.Opcode.HIST, chatid + this.chatd.pack32le(count));
 };
 
@@ -733,7 +739,8 @@ Chatd.Messages.prototype.store = function(newmsg, userid, msgid, timestamp, msg)
         messageId: base64urlencode(msgid),
         userId: base64urlencode(userid),
         ts: timestamp,
-        message: msg
+        message: msg,
+        isNew: newmsg
     });
 };
 

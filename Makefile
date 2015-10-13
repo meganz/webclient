@@ -10,6 +10,7 @@ JSHINT = $(NODE_PATH)/.bin/jshint
 JSCS = $(NODE_PATH)/.bin/jscs
 BUILD_DEP_ALL = $(KARMA) $(JSDOC)
 BUILD_DEP_ALL_NAMES = karma jsdoc
+BROWSER ?= PhantomJS2_custom
 
 ASMCRYPTO_MODULES = utils,aes-cbc,aes-ccm,sha1,sha256,sha512,hmac-sha1,hmac-sha256,hmac-sha512,pbkdf2-hmac-sha1,pbkdf2-hmac-sha256,pbkdf2-hmac-sha512,rng,bn,rsa-pkcs1,globals-rng,globals
 
@@ -19,10 +20,10 @@ test-no-workflows:
 	SKIP_WORKFLOWS=true $(MAKE) test
 
 test: $(KARMA)
-	$(NODE) $(KARMA) start --preprocessors= karma.conf.js --browsers PhantomJS2_custom
+	$(NODE) $(KARMA) start --preprocessors= karma.conf.js --browsers $(BROWSER)
 
 test-ci: $(KARMA)
-	$(NODE) $(KARMA) start --singleRun=true --no-colors karma.conf.js --browsers PhantomJS2_custom
+	$(NODE) $(KARMA) start --singleRun=true --no-colors karma.conf.js --browsers $(BROWSER)
 
 api-doc: $(JSDOC)
 	$(NODE) $(JSDOC) --destination doc/api/ --private \

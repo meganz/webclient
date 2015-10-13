@@ -56,7 +56,7 @@ CallFeedback.prototype.attachToChat = function(megaChat) {
                                         feedbackDialog._type = "call-ended";
                                         feedbackDialog.bind('onHide.callEnded', function() {
 
-                                            megaRoom.removeMessageById(msgId);
+                                            megaRoom.messagesBuff.removeMessageById(msgId);
                                             megaRoom.trigger('resize');
 
                                             feedbackDialog.unbind('onHide.callEnded');
@@ -67,7 +67,7 @@ CallFeedback.prototype.attachToChat = function(megaChat) {
                                     'type': 'secondary',
                                     'text': __("No thanks"),
                                     'callback': function() {
-                                        megaRoom.removeMessageById(msgId);
+                                        megaRoom.messagesBuff.removeMessageById(msgId);
                                         megaRoom.trigger('resize');
                                     }
                                 }

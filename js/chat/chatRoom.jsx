@@ -49,7 +49,6 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, cha
     this.users = users ? users : [];
     this.roomJid = roomJid;
     this.type = type;
-    this.messages = new MegaDataSortedMap("messageId", "orderValue,delay", this);
     this.ctime = ctime;
     this.lastActivity = lastActivity ? lastActivity : ctime;
     this.chatId = chatId;
@@ -58,9 +57,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, cha
 
     this.callRequest = null;
     this.callIsActive = false;
-
-    this._currentHistoryPointer = 0;
-    this.$msgsHistoryLoading = null;
+    this.shownMessages = {};
 
     this.options = {
 
@@ -203,6 +200,8 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, cha
 //        if (M.csort === "chat-activity") {
 //            M.renderContacts();
 //        };
+
+        self.messagesBuff.markAllAsSeen();
     });
 
 
@@ -698,16 +697,6 @@ ChatRoom.prototype.show = function() {
 
     self.megaChat.hideAllChats();
 
-    self.messages.forEach(function(v, k) {
-        if(v.seen === false) {
-            if(v.setSeen) {
-                v.setSeen(true); // mark all unseen messages as seen
-            } else {
-                v.seen = true;
-            }
-        }
-    });
-
     self.isCurrentlyActive = true;
 
     self.$header = $('.fm-right-header[data-room-jid="' + this.roomJid.split("@")[0] + '"]');
@@ -785,53 +774,6 @@ ChatRoom.prototype.hide = function() {
 };
 
 /**
- * Simple interface/structure wrapper for inline dialogs
- * @param opts
- * @constructor
- */
-var ChatDialogMessage = function(opts) {
-    assert(opts.messageId, 'missing messageId');
-    assert(opts.type, 'missing type');
-
-    MegaDataObject.attachToExistingJSObject(
-        this,
-        {
-            'type': true,
-            'messageId': true,
-            'textMessage': true,
-            'authorContact': true,
-            'delay': true,
-            'buttons': true,
-            'read': true,
-            'persist': true,
-            'deleted': 0,
-            'seen': false
-        },
-        true,
-        ChatDialogMessage.DEFAULT_OPTS
-    );
-    $.extend(true, this, opts);
-
-    return this;
-};
-
-/**
- * Default values for the ChatDialogMessage interface/datastruct.
- *
- * @type {Object}
- */
-ChatDialogMessage.DEFAULT_OPTS = {
-    'type': '',
-    'messageId': '',
-    'textMessage': '',
-    'authorContact': '',
-    'delay': 0,
-    'buttons': {},
-    'read': false,
-    'persist': true
-};
-
-/**
  * Append message to the UI of this room.
  * Note: This method will also log the message, so that later when someone asks for message sync this log will be used.
  *
@@ -867,7 +809,7 @@ ChatRoom.prototype.appendMessage = function(message) {
             message.roomJid
         );
     }
-    if (self.messages.exists(message.messageId)) {
+    if (self.shownMessages[message.messageId]) {
 
         //self.logger.debug(self.roomJid.split("@")[0], message.messageId, "This message is already added to the message list (and displayed).");
         return false;
@@ -875,7 +817,7 @@ ChatRoom.prototype.appendMessage = function(message) {
     if(!message.orderValue) {
         // append at the bottom
         if(self.messages.length > 0) {
-            var prevMsg = self.messages.getItem(self.messages.length - 1);
+            var prevMsg = self.messagesBuff.messages.getItem(self.messages.length - 1);
             if(!prevMsg) {
                 self.logger.error(
                     'self.messages got out of sync...maybe there are some previous JS exceptions that caused that? ' +
@@ -888,10 +830,11 @@ ChatRoom.prototype.appendMessage = function(message) {
     }
 
     self.trigger('onMessageAppended', message);
+    self.messagesBuff.messages.push(message);
 
-    self.messages.push(
-        message
-    );
+    self.shownMessages[message.messageId] = true;
+
+    self.trackDataChange();
 };
 
 
@@ -1199,7 +1142,7 @@ ChatRoom.prototype.attachNodes = function(ids, message) {
 ChatRoom.prototype.getMessageById = function(messageId) {
     var self = this;
     var found = false;
-    $.each(self.messages, function(k, v) {
+    $.each(self.messagesBuff.messages, function(k, v) {
         if (v.messageId === messageId) {
             found = v;
             return false; //break;
@@ -1220,16 +1163,15 @@ ChatRoom.prototype.renderContactTree = function() {
 
     var $count = $('.nw-conversations-unread', $navElement);
 
-    if (self.megaChat.plugins.chatNotifications) {
-        var count = self.megaChat.plugins.chatNotifications.notifications.getCounterGroup(self.roomJid);
 
-        if (count > 0) {
-            $count.text(count);
-            $navElement.addClass("unread");
-        } else if (count === 0) {
-            $count.text("");
-            $navElement.removeClass("unread");
-        }
+    var count = self.messagesBuff.getUnreadCount();
+
+    if (count > 0) {
+        $count.text(count);
+        $navElement.addClass("unread");
+    } else if (count === 0) {
+        $count.text("");
+        $navElement.removeClass("unread");
     }
 
     $navElement.data('chatroom', self);
@@ -1242,8 +1184,7 @@ ChatRoom.prototype.renderContactTree = function() {
  */
 ChatRoom.prototype.getUnreadCount = function() {
     var self = this;
-    var count = self.megaChat.plugins.chatNotifications.notifications.getCounterGroup(self.roomJid);
-    return count;
+    return self.messagesBuff.getUnreadCount();
 };
 
 
@@ -1421,7 +1362,7 @@ ChatRoom.prototype._conversationStarted = function(userBareJid) {
 ChatRoom.prototype.cancelAttachment = function(messageId, nodeId) {
     var self = this;
 
-    var msg = self.getMessageById(messageId);
+    var msg = self.messagesBuff.getMessageById(messageId);
 
     if (msg && msg.meta && msg.meta.attachments && msg.meta.attachments[nodeId]) {
         var meta = clone(msg.getMeta());
@@ -1452,111 +1393,6 @@ ChatRoom.prototype.startVideoCall = function() {
 ChatRoom.prototype.stateIsLeftOrLeaving = function() {
     return (this.state == ChatRoom.STATE.LEFT || this.state == ChatRoom.STATE.LEAVING);
 };
-ChatRoom.prototype.removeMessageById = function(messageId) {
-    var self = this;
-    self.messages.forEach((v, k) => {
-        if(v.deleted === 1) {
-            return; // skip
-        }
-
-        if (v.messageId === messageId) {
-            v.deleted = 1;
-            if(!v.seen) {
-                v.seen = true;
-            }
-
-            // cleanup the messagesIndex
-            self.messages.removeByKey(v.messageId);
-            return false; // break;
-        }
-    });
-};
-ChatRoom.prototype.removeMessageBy = function(cb) {
-    var self = this;
-    self.messages.forEach((v, k) => {
-        if(cb(v, k) === true) {
-            self.removeMessageById(v.messageId);
-        }
-    });
-};
-ChatRoom.prototype.removeMessageByType = function(type) {
-    var self = this;
-    self.removeMessageBy((v, k) => {
-        if(v.type === type) {
-            return true;
-        }
-        else {
-            return false;
-        }
-    })
-};
-
-
-ChatRoom.prototype.messagesHistoryIsLoading = function() {
-    var self = this;
-    return (
-        self.$msgsHistoryLoading && self.$msgsHistoryLoading.state() === 'pending'
-    ) || self.chatdIsProcessingHistory;
-};
-ChatRoom.prototype.retrieveChatHistory = function() {
-    var self = this;
-
-    if(self.messagesHistoryIsLoading()) {
-        return self.$msgsHistoryLoading;
-    } else {
-        self.chatdIsProcessingHistory = true;
-        self._currentHistoryPointer -= 32;
-        self.$msgsHistoryLoading = new MegaPromise();
-        self.megaChat.plugins.chatdIntegration.retrieveHistory(
-            self,
-            self._currentHistoryPointer
-        );
-
-        var eventKey = "onMessagesHistoryDone." + self.roomJid;
-        console.error(eventKey, self._currentHistoryPointer);
-
-        var timeoutPromise = createTimeoutPromise(function() {
-            return self.$msgsHistoryLoading.state() !== 'pending'
-        }, 100, 10000)
-            .always(function() {
-                self.chatdIsProcessingHistory = false;
-            })
-            .fail(function() {
-                self.$msgsHistoryLoading.reject();
-            });
-
-
-        self.megaChat.plugins.chatdIntegration.chatd.rebind(
-            eventKey,
-            function(e, eventData) {
-                if (eventData.chatId === self.chatId) {
-                    console.error("HIST DONE: ", eventKey, arguments);
-                    self.$msgsHistoryLoading.resolve();
-                    timeoutPromise.verify();
-                }
-            }
-        );
-
-        self.$msgsHistoryLoading.fail(function() {
-            console.error("HIST FAILED: ", arguments);
-            self._currentHistoryPointer += 32;
-        });
-
-
-        return self.$msgsHistoryLoading;
-    }
-};
-
-ChatRoom.prototype.haveMoreHistory = function() {
-    var self = this;
-
-    if (!self.chatdOldest || !self.messages[self.chatdOldest]) {
-        return true;
-    } else {
-        return false;
-    }
-}
-window.ChatDialogMessage = ChatDialogMessage; //TODO: remove me, debug
 
 window.ChatRoom = ChatRoom;
 module.exports = ChatRoom;

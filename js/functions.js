@@ -2932,7 +2932,7 @@ MegaEvents.prototype.on = function(name, callback) {
 
 
 function constStateToText(enumMap, state) {
-    var txt = null;
+    var txt = false;
     $.each(enumMap, function(k, v) {
         if(state == v) {
             txt = k;
@@ -2941,7 +2941,7 @@ function constStateToText(enumMap, state) {
         }
     });
 
-    return txt;
+    return txt === false ? "(not found: " + state + ")" : txt;
 };
 
 /**

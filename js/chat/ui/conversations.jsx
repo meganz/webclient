@@ -34,7 +34,7 @@ var ConversationsListItem = React.createClass({
 
         var classString = "nw-conversations-item";
 
-        var unreadCount = this.props.chatRoom.unreadCount;
+        var unreadCount = this.props.chatRoom.messagesBuff.getUnreadCount();
         if(unreadCount > 0) {
             classString += " unread ";
         }
@@ -350,14 +350,14 @@ var ConversationsMainListing =  React.createClass({
             }
 
             var lastAction;
-            var lastMessage = lastMessage = room.messages.getItem(room.messages.length - 1);
-            if(room.messages.length > 0 && lastMessage) {
+            var lastMessage = lastMessage = room.messagesBuff.messages.getItem(room.messagesBuff.messages.length - 1);
+            if(room.messagesBuff.messages.length > 0 && lastMessage) {
                 if(lastMessage) {
-                    if (lastMessage.textMessage || lastMessage.getContents) {
+                    if (lastMessage.textContents || lastMessage.getContents) {
                         // notification?
-                        if (lastMessage.textMessage) {
+                        if (lastMessage.textContents) {
                             lastActionClasses += " " + lastMessage.cssClass;
-                            lastActionText += lastMessage.textMessage;
+                            lastActionText += lastMessage.textContents;
                         } else {
                             // text message
                             lastActionClasses += " fm-chat-messages-pad";

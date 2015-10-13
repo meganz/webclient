@@ -350,16 +350,16 @@ CallSession.prototype._removeTempMessages = function() {
         'outgoing-call',
     ];
 
-    self.room.removeMessageBy(function(v) {
+    self.room.messagesBuff.removeMessageBy(function(v) {
         if (toBeRemovedTypes.indexOf(v.type) >= 0 && v.messageId === v.type+"-"+self.sid) {
             return true;
         }
     });
 
-    self.room.removeMessageByType("call-initialising-" + self.sid);
-    self.room.removeMessageByType("incoming-call-" + self.sid);
-    self.room.removeMessageByType("outgoing-call-" + self.sid);
-    self.room.removeMessageByType("call-starting-" + self.sid);
+    self.room.messagesBuff.removeMessageByType("call-initialising-" + self.sid);
+    self.room.messagesBuff.removeMessageByType("incoming-call-" + self.sid);
+    self.room.messagesBuff.removeMessageByType("outgoing-call-" + self.sid);
+    self.room.messagesBuff.removeMessageByType("call-starting-" + self.sid);
 };
 CallSession.prototype.onCallStarting = function(e) {
     var self = this;

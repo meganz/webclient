@@ -20,13 +20,6 @@ var ChatdIntegration = function(megaChat) {
     megaChat.rebind("onInit.chatdInt", function(e) {
         megaChat.rebind("onRoomCreated.chatdInt", function(e, chatRoom) {
             assert(chatRoom.type, 'missing room type');
-            chatRoom.rebind('onMessageAppended.chatdInt', function(e, messageObj) {
-                $(messageObj).rebind("onChange.chatdInt", function(e, messageObj, propertyName, oldVal, newVal) {
-                    if(propertyName === "seen" && newVal === true) {
-                        self.markMessageAsSeen(chatRoom, messageObj.messageId);
-                    }
-                });
-            });
             self._attachToChatRoom(chatRoom);
         });
         megaChat.rebind("onRoomDestroy.chatdInt", function(e, chatRoom) {
@@ -39,13 +32,14 @@ var ChatdIntegration = function(megaChat) {
         self.apiReq({a: "mcf"})
             .done(function(r) {
                 // reopen chats from the MCF response.
-                if(r.c) {
+                if (r.c) {
                     r.c.forEach(function (actionPacket) {
                         self.openChatFromApi(actionPacket);
                     });
 
                     self.mcfHasFinishedPromise.resolve();
-                } else {
+                }
+                else {
                     self.mcfHasFinishedPromise.reject(r);
                 }
             })
@@ -56,252 +50,94 @@ var ChatdIntegration = function(megaChat) {
         self.openChatFromApi(actionPacket);
     });
 
-
-    var _getChatRoomFromEventData = function(eventData) {
-        var chatRoomJid = self.chatIdToRoomJid[eventData.chatId];
-        assert(chatRoomJid, 'chat room not found for chat id: ' + eventData.chatId);
-        return self.megaChat.chats[chatRoomJid];
-    };
-
-    self.chatd.rebind('onMessagesHistoryInfo.chatdInt', function(e, eventData) {
-        var chatRoom = _getChatRoomFromEventData(eventData);
-
-        chatRoom.chatdOldest = eventData.oldest;
-        chatRoom.chatdNewest = eventData.newest;
-        chatRoom.chatdHistorySeenMsgRetrieved = false;
-        chatRoom.chatdHistoryDeliveredMsgRetrieved = false;
-    });
-
-    self.chatd.rebind('onMessageCheck.chatdInt', function(e, eventData) {
-        var chatRoom = _getChatRoomFromEventData(eventData);
-        chatRoom.retrieveChatHistory();
-    });
-
-    self.chatd.rebind('onMessageLastSeen.chatdInt', function(e, eventData) {
-        var chatRoom = _getChatRoomFromEventData(eventData);
-
-        chatRoom.chatdLastSeen = eventData.messageId;
-        var keyIndex = chatRoom.messages.indexOfKey(eventData.messageId);
-        if(keyIndex > -1 && eventData.userId === u_handle) {
-            for(var i = 0; i <= keyIndex; i++) {
-                var msg = chatRoom.messages.getItem(i);
-
-                if(msg) {
-                    if (msg.setSeen) {
-                        msg.setSeen(true);
-                    } else if (msg.seen) {
-                        msg.seen = true;
-                    }
-                }
-            }
-        }
-    });
-    self.chatd.rebind('onMessageLastReceived.chatdInt', function(e, eventData) {
-        var chatRoom = _getChatRoomFromEventData(eventData);
-
-        chatRoom.chatdLastReceived = eventData.messageId;
-
-        var keyIndex = chatRoom.messages.indexOfKey(eventData.messageId);
-        if(keyIndex > -1) {
-            for(var i = 0; i <= keyIndex; i++) {
-                var msg = chatRoom.messages.getItem(i);
-
-                if(msg && msg instanceof KarereEventObjects.OutgoingMessage) {
-                    msg.setState(
-                        KarereEventObjects.OutgoingMessage.STATE.DELIVERED
-                    );
-                }
-            }
-        }
-        chatRoom.trackDataChange();
-
-
-    });
-
-    // handle data from chatd
-    self.chatd.rebind('onMessageStore.chatdInt', function(e, eventData) {
-        var chatRoom = _getChatRoomFromEventData(eventData);
-
-        if(eventData.messageId === chatRoom.chatdLastSeen) {
-            chatRoom.chatdHistorySeenMsgRetrieved = true;
-        }
-        if(eventData.messageId === chatRoom.chatdLastReceived) {
-            chatRoom.chatdHistoryDeliveredMsgRetrieved = true;
-        }
-
-        //if(eventData.chatId == "RPi-pJ4yfts") { debugger; }
-
-        var msgContents;
-        try {
-            msgContents = msgContents = chatRoom.protocolHandler.decryptFrom(
-                base64urldecode(eventData.message),
-                eventData.userId
-            );
-            if (msgContents && msgContents.payload) {
-                msgContents = msgContents.payload;
-            }
-            else {
-                msgContents = eventData.message; // fallback to plaintext?
-            }
-        } catch(e) {
-            if (e instanceof URIError) {
-                self.logger.error(
-                    "Failed to decrypt message: ", eventData.messageId,
-                    "with length:", eventData.message.length
-                );
-
-                msgContents = eventData.message; // fallback to plaintext?
-            }
-            else {
-                throw e;
-            }
-        }
-
-        var messageObject;
-        if(!eventData.userId || eventData.userId === u_handle) {
-            var state = KarereEventObjects.OutgoingMessage.STATE.SENT;
-
-            if(chatRoom.chatdIsProcessingHistory === true && chatRoom.chatdHistoryDeliveredMsgRetrieved === true) {
-                //console.error("Setting state to delivered (from history)", eventData);
-                state = KarereEventObjects.OutgoingMessage.STATE.DELIVERED;
-            }
-
-
-            /**
-             * toJid, fromJid, type, messageId, contents, meta, delay, state, roomJid, seen
-             *
-             * @type {KarereEventObjects.OutgoingMessage}
-             */
-            messageObject = new KarereEventObjects.OutgoingMessage(
-                /* toJid,  */ chatRoom.roomJid,
-                /* fromJid,  */ self.megaChat.getJidFromNodeId(eventData.userId),
-                /* type,  */ "groupchat",
-                /* messageId,  */ eventData.messageId,
-                /* contents, */ msgContents,
-                /* meta,  */ {},
-                /* delay,  */ eventData.ts,
-                /* state,  */ state,
-                /* roomJid, */ chatRoom.roomJid,
-                /* seen */ true
-            );
-
-            chatRoom.messages.forEach(function(msg, k) {
-                if(msg.seen && msg.seen === false) {
-                    self.markMessageAsSeen(chatRoom, msg.messageId);
-                }
-            });
-        } else {
-            var seenState = chatRoom.isCurrentlyActive && $.windowActive;
-
-            //console.error(
-            //    chatRoom.chatdIsProcessingHistory === true,
-            //    chatRoom.chatdHistorySeenMsgRetrieved
-            //);
-
-            if(chatRoom.chatdIsProcessingHistory === true && chatRoom.chatdHistorySeenMsgRetrieved === true) {
-                //console.error("Marking as seen (from history)", eventData.messageId);
-                seenState = true;
-            }
-
-            /**
-             * toJid, fromJid, type, rawType, messageId, rawMessage, roomJid, meta, contents, elements, delay, seen
-             * @type {KarereEventObjects.IncomingMessage}
-             */
-            messageObject = new KarereEventObjects.IncomingMessage(
-                /* toJid,  */ chatRoom.roomJid,
-                /* fromJid,  */ self.megaChat.getJidFromNodeId(eventData.userId),
-                /* type,  */ "groupchat",
-                /* rawType, */ "groupchat",
-                /* messageId,  */ eventData.messageId,
-                /* rawMessage, */ undefined,
-                /* roomJid, */ chatRoom.roomJid,
-                /* meta,  */ {},
-                /* contents, */ msgContents,
-                /* elements, */ undefined,
-                /* delay,  */ eventData.ts,
-                /* seen */ seenState
-            );
-
-            if(chatRoom.chatdIsProcessingHistory !== true) {
-                //console.error("Marking as received: ", chatRoom, eventData.messageId);
-                self.markMessageAsReceived(chatRoom, eventData.messageId);
-            }
-
-            if(seenState && chatRoom.chatdIsProcessingHistory !== true) {
-                //console.error("Marking as seen: ", chatRoom, eventData.messageId);
-                self.markMessageAsSeen(chatRoom, eventData.messageId);
-            }
-        }
-
-        if(messageObject) {
-            messageObject.orderValue = eventData.id;
-            chatRoom.appendMessage(messageObject);
-        }
-
-    });
-
-    self.chatd.rebind('onMessagesHistoryDone.chatdInt', function(e, eventData) {
-        var chatRoom = _getChatRoomFromEventData(eventData);
-        self.finishedReceivingMessagesHistory(chatRoom);
-    });
-
-    self.chatd.rebind('onMessageUpdated.chatdInt', function(e, eventData) {
-        var chatRoom = _getChatRoomFromEventData(eventData);
-
-        if(eventData.state === "CONFIRMED") {
-            if(!eventData.id) {
-                debugger;
-            }
-            //console.error("Confirmed: ", eventData.id);
-
-            var found = false;
-            chatRoom.messages.forEach(function(v, k) {
-                if(v.internalId === eventData.id) {
-                    var prevMessageId = v.messageId;
-                    v.messageId = eventData.messageId;
-                    v.orderValue = eventData.id;
-                    v.setState(KarereEventObjects.OutgoingMessage.STATE.SENT);
-                    if(prevMessageId === eventData.messageId) {
-                        // same id, don't re-add, just update all properties.
-                        Object.keys(eventData).forEach(function(k) {
-                            v[k] = eventData[k]
-                        });
-                    } else {
-                        chatRoom.messages.removeByKey(prevMessageId);
-                        chatRoom.messages.push(v);
-                    }
-
-                    chatRoom.chatdNewest = chatRoom.messages.getItem(chatRoom.messages.length - 1).messageId;
-                    found = true;
-                    return false; // break
-                }
-            });
-            if(!found) {
-                self.logger.error("Message that was confirmed not found: ", eventData);
-            }
-        }
-    });
-
-    self.chatd.rebind('onMessageReceived.chatdInt', function(e, eventData) {
-        var chatRoom = _getChatRoomFromEventData(eventData);
-
-
-        //console.error("Received: ", eventData.messageId);
-
-        var found = false;
-        var msg = chatRoom.messages[eventData.messageId];
-        if(msg) {
-            if (msg instanceof KarereEventObjects.OutgoingMessage) {
-                msg.setState(KarereEventObjects.OutgoingMessage.STATE.DELIVERED);
-            } else {
-                // its ok, don't change the state of any incoming messages.
-            }
-        } else {
-            self.logger.error("Message received state was not changed, since message was not found:", eventData);
-        }
-    });
-
     return self;
+};
+
+ChatdIntegration.prototype._getChatRoomFromEventData = function(eventData) {
+    var self = this;
+    var chatRoomJid = self.chatIdToRoomJid[eventData.chatId];
+    assert(chatRoomJid, 'chat room not found for chat id: ' + eventData.chatId);
+    return self.megaChat.chats[chatRoomJid];
+};
+
+ChatdIntegration.prototype._getKarereObjFromChatdObj = function(chatdEventObj) {
+    var self = this;
+    var chatRoom = self._getChatRoomFromEventData(chatdEventObj);
+
+    var msgContents;
+    //try {
+    //    msgContents = msgContents = chatRoom.protocolHandler.decryptFrom(
+    //        base64urldecode(chatdEventObj.message),
+    //        chatdEventObj.userId
+    //    );
+    //    if (msgContents && msgContents.payload) {
+    //        msgContents = msgContents.payload;
+    //    }
+    //    else if (msgContents === false) {
+    //        return false;
+    //    }
+    //    else {
+    //        msgContents = chatdEventObj.message; // fallback to plaintext?
+    //    }
+    //} catch (e) {
+    //    if (e instanceof URIError) {
+    //        self.logger.error(
+    //            "Failed to decrypt message: ", chatdEventObj.messageId,
+    //            "with length:", chatdEventObj.message.length
+    //        );
+    //
+    //        msgContents = chatdEventObj.message; // fallback to plaintext?
+    //    }
+    //    else {
+    //        throw e;
+    //    }
+    //}
+
+    msgContents = chatdEventObj.message;
+
+    var messageObject;
+    if (!chatdEventObj.userId || chatdEventObj.userId === u_handle) {
+        var state = KarereEventObjects.OutgoingMessage.STATE.SENT;
+
+        /**
+         * toJid, fromJid, type, messageId, contents, meta, delay, state, roomJid, seen
+         *
+         * @type {KarereEventObjects.OutgoingMessage}
+         */
+        messageObject = new KarereEventObjects.OutgoingMessage(
+            /* toJid,  */ chatRoom.roomJid,
+            /* fromJid,  */ self.megaChat.getJidFromNodeId(chatdEventObj.userId),
+            /* type,  */ "groupchat",
+            /* messageId,  */ chatdEventObj.messageId,
+            /* contents, */ msgContents,
+            /* meta,  */ {},
+            /* delay,  */ chatdEventObj.ts,
+            /* state,  */ state,
+            /* roomJid, */ chatRoom.roomJid,
+            /* seen */ chatdEventObj.seen
+        );
+    }
+    else {
+        /**
+         * toJid, fromJid, type, rawType, messageId, rawMessage, roomJid, meta, contents, elements, delay, seen
+         * @type {KarereEventObjects.IncomingMessage}
+         */
+        messageObject = new KarereEventObjects.IncomingMessage(
+            /* toJid,  */ chatRoom.roomJid,
+            /* fromJid,  */ self.megaChat.getJidFromNodeId(chatdEventObj.userId),
+            /* type,  */ "groupchat",
+            /* rawType, */ "groupchat",
+            /* messageId,  */ chatdEventObj.messageId,
+            /* rawMessage, */ undefined,
+            /* roomJid, */ chatRoom.roomJid,
+            /* meta,  */ {},
+            /* contents, */ msgContents,
+            /* elements, */ undefined,
+            /* delay,  */ chatdEventObj.ts,
+            /* seen */ chatdEventObj.seen
+        );
+    }
+    return messageObject;
 };
 
 ChatdIntegration.prototype.openChatFromApi = function(actionPacket) {
@@ -310,7 +146,7 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket) {
     //console.error("Will open chat for action packet: ", actionPacket);
 
     var chatParticipants = actionPacket.u;
-    if(!chatParticipants) {
+    if (!chatParticipants) {
         self.logger.error("actionPacket returned no chat participants: ", chatParticipants);
     }
     var chatJids = [];
@@ -320,7 +156,7 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket) {
             megaChat.getJidFromNodeId(v.u)
         );
     });
-    if(chatJids.length < 2) {
+    if (chatJids.length < 2) {
         self.logger.warn("Will ignore chatd room: ", actionPacket.id, "since it only have 1 user (me).");
         return;
     }
@@ -329,11 +165,12 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket) {
 
     var chatRoom = self.megaChat.chats[roomJid];
     var finishProcess = function() {
-        if(!chatRoom) {
+        if (!chatRoom) {
             self.megaChat.openChat(chatJids, "private", actionPacket.id, actionPacket.cs, actionPacket.url, false);
 
-        } else {
-            if(!chatRoom.chatId) {
+        }
+        else {
+            if (!chatRoom.chatId) {
                 chatRoom.chatId = actionPacket.id;
                 chatRoom.chatShard = actionPacket.cs;
                 chatRoom.chatdUrl = actionPacket.url;
@@ -365,7 +202,8 @@ ChatdIntegration.prototype.apiReq = function(data) {
         callback: function(r) {
             if (typeof(r) === 'number') {
                 $promise.reject.apply($promise, arguments);
-            } else {
+            }
+            else {
                 $promise.resolve.apply($promise, arguments);
             }
         }
@@ -377,14 +215,7 @@ ChatdIntegration.prototype.apiReq = function(data) {
 };
 
 
-ChatdIntegration.prototype.finishedReceivingMessagesHistory = function(chatRoom) {
-    var self = this;
 
-    chatRoom.chatdIsProcessingHistory = false;
-
-    delete chatRoom.chatdLastSeen;
-    delete chatRoom.chatdLastReceived;
-};
 ChatdIntegration._waitUntilChatIdIsAvailable = function(fn) {
     return function() {
         var self = this;
@@ -395,9 +226,10 @@ ChatdIntegration._waitUntilChatIdIsAvailable = function(fn) {
         self.mcfHasFinishedPromise.done(function() {
             self._retrieveChatdIdIfRequired(chatRoom)
                 .done(function() {
-                    if(chatRoom.chatId) {
+                    if (chatRoom.chatId) {
                         masterPromise.linkDoneAndFailToResult(fn, self, args);
-                    } else {
+                    }
+                    else {
                         createTimeoutPromise(
                             function() {
                                 return !!chatRoom.chatId
@@ -433,7 +265,7 @@ ChatdIntegration.prototype._retrieveChatdIdIfRequired = function(chatRoom) {
     var masterPromise = new MegaPromise();
 
     self.mcfHasFinishedPromise.done(function() {
-        if(!chatRoom.chatId) {
+        if (!chatRoom.chatId) {
             // already sent an API request?
             if (
                 self.waitingChatIdPromises[chatRoom.roomJid] &&
@@ -465,7 +297,8 @@ ChatdIntegration.prototype._retrieveChatdIdIfRequired = function(chatRoom) {
                 }
                 else if (a.u > b.u) {
                     return 1;
-                } else {
+                }
+                else {
                     return 0;
                 }
             });
@@ -491,7 +324,8 @@ ChatdIntegration.prototype._retrieveChatdIdIfRequired = function(chatRoom) {
             return masterPromise.linkDoneAndFailTo(
                 self.waitingChatIdPromises[chatRoom.roomJid]
             );
-        } else {
+        }
+        else {
             masterPromise.resolve();
             return masterPromise;
         }
@@ -507,7 +341,7 @@ ChatdIntegration._waitForShardToBeAvailable = function(fn) {
         var args = arguments;
 
         var chatIdDecoded = base64urldecode(chatRoom.chatId);
-        if(!self.chatd.chatidshard[chatIdDecoded]) {
+        if (!self.chatd.chatidshard[chatIdDecoded]) {
             //console.error('shard is NOT available, queueing fn exection', fn);
             createTimeoutPromise(function() {
                 return !!self.chatd.chatidshard[chatIdDecoded]
@@ -520,7 +354,8 @@ ChatdIntegration._waitForShardToBeAvailable = function(fn) {
                     //console.error('waiting for shard failed rejecting call to', fn);
                     masterPromise.reject(arguments)
                 });
-        } else {
+        }
+        else {
             //console.error('shard is available, executing immediately.');
             masterPromise.linkDoneAndFailToResult(fn, self, args);
         }
@@ -531,35 +366,52 @@ ChatdIntegration._waitForShardToBeAvailable = function(fn) {
 ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
     var self = this;
 
+    if (!chatRoom.messagesBuff) {
+        var strongvelopeInitPromise = createTimeoutPromise(function() {
+            return !!u_handle && !!u_privCu25519 && !!u_privEd25519 && !!u_pubEd25519
+        }, 50, 5000)
+            .done(function() {
+                // after all dependencies (data) is initialised, lets init the protocol handler
+                assert(u_handle, 'u_handle is not loaded, null or undefined!');
+                assert(u_privCu25519, 'u_privCu25519 is not loaded, null or undefined!');
+                assert(u_privEd25519, 'u_privEd25519 is not loaded, null or undefined!');
+                assert(u_pubEd25519, 'u_pubEd25519 is not loaded, null or undefined!');
 
-    assert(u_handle, 'u_handle is not loaded, null or undefined!');
-    assert(u_privCu25519, 'u_handle is not loaded, null or undefined!');
-    assert(u_privEd25519, 'u_handle is not loaded, null or undefined!');
-    assert(u_pubEd25519, 'u_handle is not loaded, null or undefined!');
+                // retrieve all other user's Cu25519 keys IF needed
+                chatRoom.getParticipants().forEach(function(jid) {
+                    var contact = chatRoom.megaChat.getContactFromJid(jid);
+                    if (contact && contact.u && !pubCu25519[contact.u]) {
+                        crypt.getPubCu25519(contact.u);
+                    }
+                });
+
+                chatRoom.protocolHandler = new strongvelope.ProtocolHandler(
+                    u_handle,
+                    u_privCu25519,
+                    u_privEd25519,
+                    u_pubEd25519
+                );
+            })
+            .fail(function() {
+                self.logger.error(
+                    "Failed to initialise strongvelope protocol handler, because u_* vars were not available in a" +
+                    " timely manner."
+                );
+            });
+
+        // try to init immediately
+        strongvelopeInitPromise.verify();
+
+        chatRoom.messagesBuff = new MessagesBuff(chatRoom, self);
+        console.error("New MessagesBuff: ", chatRoom);
+
+        self._retrieveChatdIdIfRequired(chatRoom)
+            .done(function () {
+                self.join(chatRoom);
+            });
+    }
 
 
-
-    // retrieve all other user's Cu25519 keys IF needed
-    chatRoom.getParticipants().forEach(function(jid) {
-        var contact = chatRoom.megaChat.getContactFromJid(jid);
-        if(contact && contact.u && !pubCu25519[contact.u]) {
-            crypt.getPubCu25519(contact.u);
-        }
-    });
-
-    chatRoom.protocolHandler = new strongvelope.ProtocolHandler(
-        u_handle,
-        u_privCu25519,
-        u_privEd25519,
-        u_pubEd25519
-    );
-
-
-
-    self._retrieveChatdIdIfRequired(chatRoom)
-        .done(function() {
-            self.join(chatRoom);
-        });
 
 };
 
@@ -612,11 +464,13 @@ ChatdIntegration.prototype.sendMessage = function(chatRoom, message) {
     // edits and cancellations at that stage must be applied to the locally queued version that gets
     // resent until confirmation and then to the confirmed msgid)
     var self = this;
-    var destinationUser = chatRoom.megaChat.getContactFromJid(chatRoom.getParticipantsExceptMe()[0]);
-    assert(destinationUser, 'user/contact not found!');
-    var ciphertext = chatRoom.protocolHandler.encryptTo(message, destinationUser.u);
+    //var destinationUser = chatRoom.megaChat.getContactFromJid(chatRoom.getParticipantsExceptMe()[0]);
+    //assert(destinationUser, 'user/contact not found!');
+    //var ciphertext = base64urlencode(chatRoom.protocolHandler.encryptTo(message, destinationUser.u));
 
-    return self.chatd.submit(base64urldecode(chatRoom.chatId), base64urlencode(ciphertext));
+    var ciphertext = message; // TODO: introduce back encryption
+
+    return self.chatd.submit(base64urldecode(chatRoom.chatId), ciphertext);
 };
 
 ChatdIntegration.prototype.updateMessage = function(chatRoom, num, newMessage) {

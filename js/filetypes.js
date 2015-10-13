@@ -111,7 +111,6 @@ var extdesc = {
     'gz': 'Gnu Compressed',
     'h': 'Header',
     'hpp': 'Header',
-    'hpp': 'Header',
     'htm': 'HTML Document',
     'html': 'HTML Document',
     'iff': 'Interchange',
@@ -124,7 +123,6 @@ var extdesc = {
     'jpg': 'JPEG Image',
     'js': 'JavaScript',
     'kml': 'Keyhole Markup',
-    'kml': 'Google Earth',
     'log': 'Log',
     'm3u': 'Media Playlist',
     'm4a': 'MPEG-4 Audio',
@@ -233,7 +231,7 @@ function filetype(n) {
         return ext[fext][1];
     }
     else if (fext && fext.length > 1) {
-        return fext.toUpperCase() + ' File';
+        return htmlentities(fext.toUpperCase()) + ' File';
     }
     else {
         return 'File';
@@ -241,8 +239,10 @@ function filetype(n) {
 }
 
 function fileIcon(nodeInfo) {
+
     var icon;
 
+    // (Is folder && have share) || (if r attribute?) || (is pending share)
     if ((nodeInfo.t && nodeInfo.share) || (typeof nodeInfo.r === "number") || (nodeInfo.h && M.ps[nodeInfo.h])) {
         icon = 'folder-shared';
     }
@@ -260,12 +260,17 @@ function fileIcon(nodeInfo) {
 }
 
 function fileext(name) {
+
+    var ext;
+
     if (!name) {
         name = 'unknown';
     }
-    var ext = name.substr(name.lastIndexOf('.') + 1);
-    if (ext == name) {
+
+    ext = name.substr(name.lastIndexOf('.') + 1);
+    if (ext === name) {
         ext = '';
     }
+
     return ext.toLowerCase();
 }

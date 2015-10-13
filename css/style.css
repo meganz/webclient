@@ -97,7 +97,7 @@ body.dndc-to-rubbish * {
 body.dndc-sort * {
 	cursor: url(../images/mega/cursor9.png), auto !important
 }
-body * {
+body *:not(input):not(textarea) {
 	-webkit-touch-callout: none;
 	-webkit-user-select: none;
 	-khtml-user-select: none;

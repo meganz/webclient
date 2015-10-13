@@ -836,7 +836,7 @@ var ConversationPanel = React.createClass({
         }
     },
     isActive: function() {
-        return $.windowActive && this.$header && this.$header.is(":visible");
+        return document.hasFocus() && this.$header && this.$header.is(":visible");
     },
     render: function() {
         var self = this;

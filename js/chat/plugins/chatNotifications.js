@@ -83,7 +83,7 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
                                     'from': avatarMeta.fullName
                                 }
                             },
-                            message.getState() === Message.STATE.NOT_SEEN && !$.windowActive
+                            message.getState() === Message.STATE.NOT_SEEN && !document.hasFocus()
                         );
 
                         var changeListenerId = megaRoom.messagesBuff.addChangeListener(function() {

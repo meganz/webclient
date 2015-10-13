@@ -734,7 +734,7 @@ ChatRoom.prototype.show = function() {
  * Returns true/false if the current room is currently active (e.g. visible)
  */
 ChatRoom.prototype.isActive = function() {
-    return $.windowActive && this.$header.is(":visible");
+    return document.hasFocus() && this.$header.is(":visible");
 };
 
 

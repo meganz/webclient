@@ -439,7 +439,6 @@ MessagesBuff.prototype.setLastReceived = function(msgId) {
 
         self.trackDataChange();
     } else {
-        debugger;
         console.error("Would not set last recv: ", lastMsg.messageId, targetMsg.messageId, self.lastDelivered);
     }
 };

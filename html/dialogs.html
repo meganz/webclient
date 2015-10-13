@@ -139,7 +139,9 @@
     <div class="fm-dialog-body">
         <div class="fm-dialog-new-folder-input">
             <div class="fm-dialog-input-clear"></div>
-            <div class="fm-dialog-new-folder-pad"><input name="dialog-new-folder" type="text" value="[$1028]" /></div>
+            <div class="fm-dialog-new-folder-pad">
+                <input name="dialog-new-folder" type="text" placeholder="[$1028]" value="" />
+            </div>
         </div>
         <div class="default-dialog-bottom">
             <div class="fm-dialog-new-folder-button"><span>[$1027]</span></div>
@@ -430,30 +432,44 @@
 <div class="fm-dialog export-links-dialog hidden">
     <div class="fm-dialog-header">
         <div class="fm-dialog-title">[$1031]</div>
-        <div class="fm-dialog-chrome-clipboard hidden"><textarea id="chromeclipboard" style="width:10px; height:20px;"></textarea></div>
+        <div class="fm-dialog-chrome-clipboard hidden">
+            <div id="chromeclipboard" class="selectable"></div>
+        </div>
         <div class="fm-dialog-close"></div>
         <div class="clear"></div>
     </div>
+    <!-- Please add "expiry-date" class to show new features. Please add "pro-only" class for free accounts !-->
     <div class="export-content-block">
-        <div class="export-gradient top"></div>
-        <div class="export-gradient bottom"></div>
-        <div class="export-link-body">
+    	<div class="fm-expiry-dropdown">
+        	<div class="fm-link-select-label">[$7652]
+            	<div class="information-icon">	
+    				<div>
+                    	Lorem ipsium dolor sit a met Lorem ipsium dolor sit a met Lorem ipsium dolor sit a met
+    					<span></span>
+                    </div>
+    			</div>
+            </div>
+    		<input type="text" id="datepicker" class="fm-dialogs-select expiry-date-select" value="Select date" />
+        </div>
+    	<div class="fm-links-dropdown">
+        	<div class="fm-link-select-label">[$7649]</div>
+    		<div class="fm-dialogs-select export-link-select full-link"><span></span>[$7651]</div>
+            <div class="fm-dialogs-dropdown export-link-dropdown">
+            	<div class="fm-dialogs-dropdown-item public-handle" data-keyoptions="public-handle"><span></span>[$7681]</div>
+                <div class="fm-dialogs-dropdown-item decryption-key" data-keyoptions="decryption-key"><span></span>[$1028]</div>
+                <div class="fm-dialogs-dropdown-item full-link" data-keyoptions="full-link"><span></span>[$7651]</div>
+            </div>
+        </div>
+        <div class="clear"></div>
+        <div id="export-link-body" class="export-link-body">
         </div>
     </div>
     <div class="fm-notifications-bottom">
-        <!--<div class="checkboxOff"> <input type="checkbox" name="export-checkbox" id="export-checkbox" class="checkboxOff"> </div>
-        <label for="export-checkbox" class="radio-txt">[$1032]</label> !-->
-        <div class="on_off export-checkbox">
-            <input type="checkbox" name="export-checkbox" id="export-checkbox" checked="checked"  />
-        </div>
-        <div class="export-checkbox-label">
-            Include key
+    	<div class="export-description hidden">
+        	MEGA recommends sending the 'Encryption Key' separately from the 'Public Handle'
+            <!-- [$7682] !-->
         </div>
         <div class="fm-dialog-button links-button copy-to-clipboard" id="clipboardbtn1">
-          <span></span>
-        </div>
-
-        <div class="fm-dialog-button links-button copy-keys-button" id="clipboardbtn2">
           <span></span>
         </div>
         <div class="clear"></div>
@@ -466,10 +482,7 @@
     <div class="export-links-warning-close"></div>
     <div class="export-warning-content">
         <p>
-            <span class="orange">[$368]</span> [$369]
-        </p>
-        <p>
-            <span class="red">[$366]</span> [$367]
+            <span class="orange">[$368]</span> [$7680]
         </p>
     </div>
 </div>
@@ -854,7 +867,7 @@
         <div class="add-user-icon">
             <div class="multiple-input-warning">
                 <div class="arrow"></div>
-                <span>[$6850]</span>
+                <span>[$5918]</span>
             </div>
         </div>
         <div class="multiple-input">
@@ -911,9 +924,9 @@
     <div class="fm-dialog-body">
         <div class="permissions-menu hidden">
             <div class="permissions-menu-arrow"></div>
-            <div class="permissions-menu-item read-only"><div class="context-menu-icon"></div>[$55]</div>
-            <div class="permissions-menu-item read-and-write"><div class="context-menu-icon"></div>[$56]</div>
-            <div class="permissions-menu-item full-access"><div class="context-menu-icon"></div>[$57]</div>
+            <div class="permissions-menu-item read-only"><span></span>[$55]</div>
+            <div class="permissions-menu-item read-and-write"><span></span>[$56]</div>
+            <div class="permissions-menu-item full-access"><span></span>[$57]</div>
         </div>
         <!-- Please hide "share-dialog-img" if contacts list is not empty !-->
         <div class="share-dialog-img hidden"></div>
@@ -924,7 +937,7 @@
         <div class="share-dialog-icon">
             <div class="multiple-input-warning">
                 <div class="arrow"></div>
-                <span>[$6852]</span>
+                <span>[$5918]</span>
             </div>
         </div>
         <div class="multiple-input">
@@ -1978,6 +1991,39 @@
                 <div class="voucher-redeem-now">[$7160]</div>
             </div>
         </div>
+        <div class="clear"></div>
+    </div>
+</div>
+
+<div class="toast-notification common-toast">
+    <div class="toast-icon"></div>
+  	<div class="toast-body">
+        <div class="toast-col"></div>
+        <div class="toast-col">
+            <div class="toast-button">
+                <span>[$726]</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="fm-dialog copyrights-dialog hidden">
+	<div class="fm-dialog-close"></div>
+    <div class="voucher-dialog-body">
+    	<div class="copyrights-dialog-icon"></div>
+    	<div class="copyrights-dialog-head">
+        	[$366]
+        </div> 
+        <p>
+        	[$7647] 
+        </p>
+        <p>
+        	[$7648]
+        </p>
+    </div>
+    <div class="fm-notifications-bottom">
+        <div class="fm-dialog-button accept"><span>[$7645]</span></div>
+        <div class="fm-dialog-button cancel"><span>[$7646]</span></div>
         <div class="clear"></div>
     </div>
 </div>

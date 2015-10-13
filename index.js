@@ -192,9 +192,10 @@ function init_page() {
             u_n = pfid;
         }
         else {
-            $(document).one('MegaOpenFolder', SoonFc(function () {
-                mKeyDialog(pfid, true);
-            }));
+            return mKeyDialog(pfid, true)
+                .fail(function() {
+                    location.hash = 'start';
+                });
         }
         page = 'fm';
     }
@@ -576,21 +577,6 @@ function init_page() {
             $('.chrome-download-button').css('font-size', '12px');
         }
 
-        if (!is_extension && typeof chrome !== 'undefined'
-                && chrome.app && !chrome.app.isInstalled) {
-
-            $('.chrome-app-button, .chrome-app-scr').rebind('click', function () {
-                try {
-                    chrome.webstore.install();
-                }
-                catch (ex) {
-                    alert(ex);
-                }
-                return false;
-            });
-            $('.chrome-app-scr').css('cursor', 'pointer');
-        }
-
         // On the manual download button click
         $('.chrome-download-button').rebind('click', function() {
 
@@ -661,10 +647,26 @@ function init_page() {
         parsepage(pages['backup']);
         init_backup();
     }
-    else if (page.substr(0, 6) === 'cancel' && page.length > 24 && u_type) {
+    else if (page.substr(0, 6) === 'cancel' && page.length > 24) {
 
-        var ac = new mega.AccountClosure();
-        ac.initAccountClosure();
+        if (u_type) {
+            var ac = new mega.AccountClosure();
+            ac.initAccountClosure();
+        }
+        else {
+            // Unable to cancel, not logged in
+            mega.ui.showLoginRequiredDialog({
+                title: l[6186],
+                textContent: l[5841]
+            })
+            .done(init_page)
+            .fail(function(aError) {
+                if (aError) {
+                    alert(aError);
+                }
+                location.hash = 'start';
+            });
+        }
     }
     else if (page === 'recovery') {
         parsepage(pages['recovery']);
@@ -973,7 +975,7 @@ function loginDialog(close) {
     });
 
     $('.top-login-warning-close').rebind('click', function (e) {
-        if ($('.loginwarning-checkbox').attr('class').indexOf('checkboxOn') > -1) {
+        if ($('.loginwarning-checkbox').hasClass('checkboxOn')) {
             localStorage.hideloginwarning = 1;
         }
         $('.top-login-warning').removeClass('active');
@@ -1017,7 +1019,7 @@ function tooltiplogin() {
     }
     else {
         $('.top-dialog-login-button').addClass('loading');
-        if ($('.loginwarning-checkbox').attr('class').indexOf('checkboxOn') > -1) {
+        if ($('.loginwarning-checkbox').hasClass('checkboxOn')) {
             localStorage.hideloginwarning = 1;
         }
         var remember;
@@ -1235,10 +1237,10 @@ function topmenuUI() {
                 }
             }
         });
-        
+
         // Only show top language change icon if not logged in
         if (u_type === false) {
-            
+
             // Get current language
             var $topChangeLang = $('.top-change-language');
             var $topChangeLangName = $topChangeLang.find('.top-change-language-name');

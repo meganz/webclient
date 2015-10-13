@@ -563,6 +563,7 @@ function generateAvatarMeta(user_hash) {
 function getUserAttribute(userhandle, attribute, pub, nonHistoric,
                           callback, ctx) {
     assertUserHandle(userhandle);
+    var logger = MegaLogger.getLogger('account');
     var myCtx = ctx || {};
 
     // Assemble property name on Mega API.
@@ -585,15 +586,25 @@ function getUserAttribute(userhandle, attribute, pub, nonHistoric,
         if (typeof res !== 'number') {
             // Decrypt if it's a private attribute container.
             if (attribute.charAt(0) === '*') {
-                var clearContainer = tlvstore.blockDecrypt(base64urldecode(res),
-                                                           u_k);
-                res = tlvstore.tlvRecordsToContainer(clearContainer);
+                try {
+                    var clearContainer = tlvstore.blockDecrypt(base64urldecode(res),
+                                                               u_k);
+                    res = tlvstore.tlvRecordsToContainer(clearContainer);
+                    thePromise.resolve(res);
+                }
+                catch (e) {
+                    if (e instanceof SecurityError) {
+                        logger.error('Could not decrypt private user attribute '
+                                     + attribute + ': ' + e.message);
+                    }
+                    res = EINTERNAL;
+                    thePromise.reject(res);
+                }
             }
             if (window.d) {
                 console.log('Attribute "' + attribute + '" for user "'
                             + userhandle + '" is "' + res + '".');
             }
-            thePromise.resolve(res);
         }
         else {
             // Got back an error (a number).

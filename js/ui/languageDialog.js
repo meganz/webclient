@@ -165,6 +165,11 @@ var langDialog = {
             $langHtml.find('.nlanguage-tooltip-main').text(englishName);
             $langHtml.find('.native-language-name').text(nativeName);
 
+            // Chrome/Safari not showing tooltip so use title text
+            if ('WebkitAppearance' in document.documentElement.style) {
+                $langHtml.attr('title', englishName);
+            }
+
             // If they have already chosen a language show it as selected
             if (langCode === lang) {
                 $langHtml.addClass('selected');

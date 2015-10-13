@@ -29,6 +29,11 @@ var strongvelope = {};
     var IV_SIZE = 16;
     strongvelope.IV_SIZE = IV_SIZE;
 
+    // Epoch time stamp granularity from Date.now().
+    var _ONE_DAY = 1000 * 24 * 60 * 60;
+
+    // Size in bytes of a key ID.
+    var _KEY_ID_SIZE = 4;
 
     /** Version of the protocol implemented. */
     var PROTOCOL_VERSION = 0x00;
@@ -37,6 +42,8 @@ var strongvelope = {};
     /** After how many messages our symmetric sender key is rotated. */
     strongvelope.ROTATE_KEY_EVERY = 16;
 
+    /** How many messages our handler should "see" before re-sending our sender key. */
+    strongvelope.TOTAL_MESSAGES_BEFORE_SEND_KEY = 30;
 
     /** Size (in bytes) of the secret/symmetric encryption key. */
     var SECRET_KEY_SIZE = 16;
@@ -68,9 +75,8 @@ var strongvelope = {};
      *     may contain two (concatenated) keys. The second one (if present) is
      *     the previous sender key (key ID one less). Requires
      *     the sane number of records in the same order as `RECIPIENT`.
-     * @property KEY_ID {Number}
-     *     Sender encryption key ID used (or set) in this message. Must be an
-     *     integer incremented for every new key used.
+     * @property KEY_IDS {Number}
+     *     Sender encryption key IDs used (or set) in this message.
      * @property PAYLOAD {Number}
      *     Encrypted payload of message.
      */
@@ -81,7 +87,7 @@ var strongvelope = {};
         NONCE:              0x03,
         RECIPIENT:          0x04,
         KEYS:               0x05,
-        KEY_ID:             0x06,
+        KEY_IDS:            0x06,
         PAYLOAD:            0x07,
     };
     strongvelope.TLV_TYPES = TLV_TYPES;
@@ -95,7 +101,7 @@ var strongvelope = {};
         0x03: 'nonce',
         0x04: 'recipients',
         0x05: 'keys',
-        0x06: 'keyId',
+        0x06: 'keyIds',
         0x07: 'payload',
     };
 
@@ -107,16 +113,62 @@ var strongvelope = {};
      *     Data message containing a new sender key (initial or key rotation).
      * @property GROUP_CONTINUE {Number}
      *     Data message using an existing sender key for encryption.
-     * @property SIMPLE_TWO_PARTY {Number}
-     *     Data message without transfer of a symmetric encryption key (using
-     *     shared DH secret and nonce only).
      */
     var MESSAGE_TYPES = {
         GROUP_KEYED:        0x00,
-        GROUP_FOLLOWUP:     0x01,
-        SIMPLE_TWO_PARTY:   0x02,
+        GROUP_FOLLOWUP:     0x01
     };
     strongvelope.MESSAGE_TYPES = MESSAGE_TYPES;
+
+
+    /**
+     * Determines a new 16-bit date stamp (based on Epoch time stamp).
+     *
+     * @return {Number}
+     * @private
+     */
+    strongvelope._dateStampNow = function() {
+
+        return Math.floor(Date.now() / _ONE_DAY);
+    };
+
+
+    /**
+     * Splits the keyId into the date stamp and counter portion.
+     *
+     * @ param {String} keyId
+     *     The key ID.
+     * @return {Array.<Number>}
+     *     Two elements in the array, the first being the date stamp, the
+     *     second being the counter value.
+     * @private
+     */
+    strongvelope._splitKeyId = function(keyId) {
+
+        var keyIdNumber = str_to_a32(keyId)[0];
+        var dateStamp = keyIdNumber >>> 16;
+        var counter = keyIdNumber & 0xffff;
+
+        return [dateStamp, counter];
+    };
+
+
+    /**
+     * Encodes a numeric date stamp and counter component into a key ID.
+     *
+     * @return {Number}
+     *     Date stamp value.
+     * @return {Number}
+     *     Counter value.
+     * @return {String}
+     *     The key ID.
+     * @private
+     */
+    strongvelope._encodeKeyId = function(dateStamp, counter) {
+
+        var keyIdNumber = (dateStamp << 16) | counter;
+        return a32_to_str([keyIdNumber]);
+    };
 
 
     /**
@@ -126,7 +178,8 @@ var strongvelope = {};
      * Note: Nonces longer than the used NONCE_SIZE bytes are truncated.
      *
      * @param message {String}
-     *     Plain text message.
+     *     Plain text message. If `null` or `undefined` the ciphertext will be
+     *     `null`.
      * @param key {String}
      *     Symmetric encryption key in a binary string. If omitted, a fresh
      *     key will be generated.
@@ -160,10 +213,12 @@ var strongvelope = {};
             asmCrypto.getRandomValues(nonceBytes);
         }
 
-        var clearBytes = asmCrypto.string_to_bytes(unescape(encodeURIComponent(message)));
-        var cipherBytes = asmCrypto.AES_CTR.encrypt(clearBytes, keyBytes, nonceBytes);
+        if ((message !== null) && (typeof message !== 'undefined')) {
+            var clearBytes = asmCrypto.string_to_bytes(unescape(encodeURIComponent(message)));
+            var cipherBytes = asmCrypto.AES_CTR.encrypt(clearBytes, keyBytes, nonceBytes);
+            result.ciphertext = asmCrypto.bytes_to_string(cipherBytes);
+        }
 
-        result.ciphertext = asmCrypto.bytes_to_string(cipherBytes);
         result.key = asmCrypto.bytes_to_string(keyBytes);
         result.nonce = asmCrypto.bytes_to_string(nonceBytes);
 
@@ -192,11 +247,10 @@ var strongvelope = {};
         var nonceBytes = asmCrypto.string_to_bytes(nonce.substring(0, NONCE_SIZE));
         var cipherBytes = asmCrypto.string_to_bytes(cipher);
         var clearBytes = asmCrypto.AES_CTR.decrypt(cipherBytes, keyBytes, nonceBytes);
-        var clearBytes = asmCrypto.bytes_to_string(clearBytes);
+        var clearText = asmCrypto.bytes_to_string(clearBytes);
 
-        var clearText;
         try {
-            clearText = decodeURIComponent(escape(clearBytes));
+            clearText = decodeURIComponent(escape(clearText));
         }
         catch (e) {
             if (e instanceof URIError) {
@@ -271,7 +325,7 @@ var strongvelope = {};
      */
     strongvelope._parseMessageContent = function(binaryMessage) {
 
-        var parsedContent = { keys: [], recipients: [] };
+        var parsedContent = { recipients: [], keys: [], keyIds: [] };
         var currentTlvType = null;
         var part;
         var tlvType;
@@ -307,8 +361,12 @@ var strongvelope = {};
                 case TLV_TYPES.KEYS:
                     parsedContent[tlvVariable].push(part.record[1]);
                     break;
-                case TLV_TYPES.KEY_ID:
-                    parsedContent[tlvVariable] = part.record[1].charCodeAt(0);
+                case TLV_TYPES.KEY_IDS:
+                    var keyIds = part.record[1];
+                    while (keyIds.length > 0) {
+                        parsedContent[tlvVariable].push(keyIds.substring(0, _KEY_ID_SIZE));
+                        keyIds = keyIds.substring(_KEY_ID_SIZE);
+                    }
                     break;
                 default:
                     parsedContent[tlvVariable] = part.record[1];
@@ -349,11 +407,41 @@ var strongvelope = {};
      *     Type of message.
      * @property {String} payload
      *     Message content/payload.
+     * @property {String} toSend
+     *     An optional element, containing a "blind" management message (no
+     *     payload) to a recipient containing our current sender key. This
+     *     message will contain the current sender key only (as it may leak a
+     *     previous key to new group chat participants).
+     */
+
+
+    /**
+     * An object containing a chat message as received from chatd.
+     *
+     * @typedef {Object} ChatdMessage
+     * @property {String} chatId
+     *     Unique ID of the chat. (Base64 URL encoded 64-bit value.)
+     * @property {Number} id
+     *     XXX What ID is this?
+     * @property {String} messageId
+     *     Unique ID of the individual message within the chat. (Base64 URL
+     *     encoded 64-bit value.)
+     * @property {String} userId
+     *     User handle of the sender.
+     * @property {Number} ts
+     *     UNIX epoch time stamp as an integer in seconds.
+     * @property {String} message
+     *     Message payload (encrypted).
      */
 
 
     /**
      * Manages keys, encryption and message encoding.
+     *
+     * Note: A new ProtocolHandler instance needs to be initialised. This can
+     *       either be done via seeding it with chat messages (calling #seed) of the same chat's
+     *       history, or by calling #updateSenderKey method on newly created or
+     *       fresh chats.
      *
      * @constructor
      * @param {String} [ownHandle]
@@ -365,9 +453,6 @@ var strongvelope = {};
      * @param {String} [pubEd25519]
      *     Our public signing key (Ed25519, optional, can be derived upon
      *     instantiation from private key).
-     * @param {Number} [rotateKeyEvery=16]
-     *     The number of messages our sender key is used for before rotating
-     *     (default: strongvelope.ROTATE_KEY_EVERY).
      *
      * @param {String} ownHandle
      *     Our own user handle (u_handle).
@@ -379,17 +464,19 @@ var strongvelope = {};
      *     Our public signing key (Ed25519).
      * @property {Number} rotateKeyEvery
      *     The number of messages our sender key is used for before rotating.
-     * @property {Number} keyId
+     * @property {Number} sendKeyEveryReceived
+     *     The number of messages to receive before a keyed message is to be
+     *     sent.
+     * @property {String} keyId
      *     ID of our current sender key.
-     * @property {Array.<String>} participants
-     *     Array of user handles of current participants of the chat, sorted
-     *     by user handle.
+     * @property {String} previousKeyId
+     *     ID of our previous sender key.
      * @property {Object.<handle, ParticipantKeys>} participantKeys
      *     Collection of participant specific key information (including our own,
      *     @see {@link ParticipantKey} for all (past and present) participants.
      */
     strongvelope.ProtocolHandler = function(ownHandle, privCu25519, privEd25519,
-            pubEd25519, rotateKeyEvery) {
+            pubEd25519) {
 
         this.ownHandle = ownHandle || u_handle;
         this.privCu25519 = privCu25519 || u_privCu25519;
@@ -398,15 +485,211 @@ var strongvelope = {};
         if (!this.pubEd25519) {
             this.pubEd25519 = crypt.getPubKeyFromPrivKey(this.privEd25519, 'Ed25519');
         }
-        this.rotateKeyEvery = rotateKeyEvery || strongvelope.ROTATE_KEY_EVERY;
+        this.rotateKeyEvery = strongvelope.ROTATE_KEY_EVERY;
+        this.totalMessagesBeforeSendKey = strongvelope.TOTAL_MESSAGES_BEFORE_SEND_KEY;
         this._keyEncryptionCount = 0;
-        this.keyId = 0;
+        this._totalMessagesWithoutSendKey = 0;
+        this.keyId = null;
+        this.previousKeyId = null;
         this._sentKeyId = null;
+        this.participantKeys = {};
+        this.participantKeys[this.ownHandle] = {};
+    };
+
+
+    /**
+     * Extracts sender keys from a batch of messages into the cache of the
+     * handler
+     *
+     * @method
+     * @param messages {Array.<ChatdMessage>}
+     *     Array of (most recent) batch of chat message history.
+     * @return {Array.<Object>}
+     *     An array of all the parsed messages' content.
+     * @private
+     */
+    strongvelope.ProtocolHandler.prototype._extractKeys = function(messages) {
+
+        var message;
+        var parsedMessage;
+        var parsedMessages = [];
+        var isOwnMessage;
+        var otherHandle;
+        var decryptedKeys;
+
+        // Iterate over all messages to extract keys (if present).
+        for (var i = 0; i < messages.length; i++) {
+            message = messages[i];
+            parsedMessage = ns._parseMessageContent(message);
+            parsedMessages.push(parsedMessage);
+            if (parsedMessage
+                    && (parsedMessage.type === MESSAGE_TYPES.GROUP_KEYED)) {
+                if (ns._verifyMessage(parsedMessage.signedContent,
+                                      parsedMessage.signature,
+                                      pubEd25519[message.userId])) {
+                    isOwnMessage = (message.userId === this.ownHandle);
+                    otherHandle = isOwnMessage
+                                ? parsedMessage.recipients[0]
+                                : message.userId;
+                    // Decrypt message key(s).
+                    decryptedKeys = this._decryptKeysFor(parsedMessage.keys[0],
+                                                         parsedMessage.nonce,
+                                                         otherHandle,
+                                                         isOwnMessage);
+                    if (!this.participantKeys[message.userId]) {
+                        this.participantKeys[message.userId] = {};
+                    }
+                    for (var j = 0; j < parsedMessage.keyIds.length; j++) {
+                        this.participantKeys[message.userId][parsedMessage.keyIds[j]] = decryptedKeys[j];
+                    }
+                }
+                else {
+                    logger.error('Signature invalid for message from '
+                                 + message.userId + ' on ' + message.ts);
+                }
+            }
+        }
+
+        return parsedMessages;
+    };
+
+
+    /**
+     * Seeds the handler with an array of historic messages to resume an
+     * existing chat session.  The messages for seeding must be contiguous and
+     * contain the most recent messages.  The order of the messages is not
+     * important.  If this operatin fails to be successful (returns `false`),
+     * grab another batch of earlier chat messages and pass them into this
+     * method (does not need to include the already processed first batch, but
+     * the batches must be directly adjoining).
+     *
+     * @method
+     * @param messages {Array.<ChatdMessage>}
+     *     Array of (most recent) batch of chat message history.
+     * @return {Boolean}
+     *     `true` on successful seeding, `false` on failure.
+     */
+    strongvelope.ProtocolHandler.prototype.seed = function(messages) {
+
+        this._extractKeys(messages);
+
+        // Find our own most recent (highest) sender key ID.
+        var highestKeyId = '';
+        var secondHighestKeyId = '';
+        var ownKeys = this.participantKeys[this.ownHandle];
+        for (var keyId in ownKeys) {
+            if (ownKeys.hasOwnProperty(keyId) && (keyId > highestKeyId)) {
+                secondHighestKeyId = highestKeyId;
+                highestKeyId = keyId;
+            }
+        }
+
+        if (highestKeyId === '') {
+            return false;
+        }
+
+        this.keyId = highestKeyId;
+
+        if (secondHighestKeyId) {
+            this.previousKeyId = secondHighestKeyId;
+        }
+
+        return true;
+    };
+
+
+    /**
+     * Checks whether messages passed in in an array are decryptable.
+     *
+     * @method
+     * @param messages {Array.<ChatdMessage>}
+     *     Array of (most recent) batch of chat message history.
+     * @return {Object}
+     *     An object containing a boolean array attribute `messages` flagging
+     *     each element of the input array parameter as decryptable (`null`
+     *     if it can't be parsed).  An attribute `participants` is an object
+     *     giving for each sender of the batch (as key) the earliest time stamp
+     *     of decryptability, `null` if not.
+     */
+    strongvelope.ProtocolHandler.prototype.areMessagesDecryptable = function(messages) {
+
+        var parsedMessages = this._extractKeys(messages);
+
+        var decryptable = [];
+        var participants = {};
+
+        // Iterate over all messages to extract keys (if present).
+        var message;
+        var keyId;
+        var haveKey;
+        for (var i = 0; i < parsedMessages.length; i++) {
+            message = parsedMessages[i];
+            if (message) {
+                keyId = message.keyIds[0];
+                haveKey = ((typeof this.participantKeys[message.userId] !== 'undefined')
+                           && (typeof this.participantKeys[message.userId][keyId] !== 'undefined'));
+                decryptable.push(haveKey);
+                // Track for the smallest time stamp that we've got a key for on the sender.
+                if (!participants[message.userId]) {
+                    participants[message.userId] = null;
+                }
+                if (haveKey && (!participants[message.userId] || (participants[message.userId] > message.ts))) {
+                    participants[message.userId] = message.ts;
+                }
+            }
+            else {
+                decryptable.push(null);
+            }
+        }
+
+        return { messages: decryptable, participants: participants };
+    };
+
+
+    /**
+     * Refreshes our own sender key. This method is also to be used to
+     * initialise a new ProtocolHandler for a new chat session that is *not*
+     * primed via historic messages.
+     *
+     * @method
+     */
+    strongvelope.ProtocolHandler.prototype.updateSenderKey = function() {
+
+        var dateStamp;
+        var counter;
+
+        if (this.keyId) {
+            // Juggle the key IDs.
+            this.previousKeyId = this.keyId;
+            var keyIdComponents = ns._splitKeyId(this.keyId);
+            dateStamp = keyIdComponents[0];
+            counter = keyIdComponents[1];
+
+            var newDateStamp = ns._dateStampNow();
+            if (newDateStamp !== dateStamp) {
+                dateStamp = newDateStamp;
+                counter = 0;
+            }
+            else {
+                if (counter >= 0xffff) {
+                    throw new Error('This should hardly happen, but 2^16 keys were used for the day. Bailing out!');
+                }
+                counter = (counter + 1) & 0xffff;
+            }
+        }
+        else {
+            dateStamp  = ns._dateStampNow();
+            counter = 0;
+        }
+        this.keyId = ns._encodeKeyId(dateStamp, counter);
+
+        // Now the new sender key.
         var secretKey = new Uint8Array(SECRET_KEY_SIZE);
         asmCrypto.getRandomValues(secretKey);
-        this.participants = [];
-        this.participantKeys = {};
-        this.participantKeys[this.ownHandle] = { 0: asmCrypto.bytes_to_string(secretKey) };
+        this.participantKeys[this.ownHandle][this.keyId] = asmCrypto.bytes_to_string(secretKey);
+
+        this._keyEncryptionCount = 0;
+        this._totalMessagesWithoutSendKey = 0;
     };
 
 
@@ -525,7 +808,8 @@ var strongvelope = {};
      *
      * @method
      * @param {String} message
-     *     Data message to encrypt.
+     *     Data message to encrypt. If `null` or `undefined`, no message payload
+     *     will be encoded (i. e. it's a "blind" management message).
      * @param {String} destination
      *     User handle of the recipient.
      * @returns {String}
@@ -535,32 +819,33 @@ var strongvelope = {};
         var content = '';
         var encryptedKeys;
         var messageType;
-        var previousKeyId = this.keyId;
 
         // Check and rotate key if due.
         if (this._keyEncryptionCount >= this.rotateKeyEvery) {
-            var newSecretKey = new Uint8Array(SECRET_KEY_SIZE);
-            asmCrypto.getRandomValues(newSecretKey);
-            this.keyId = (this.keyId + 1) & 0xff;
-            this.participantKeys[this.ownHandle][this.keyId] = asmCrypto.bytes_to_string(newSecretKey);
-            this._keyEncryptionCount = 0;
+            this.updateSenderKey();
         }
 
         var senderKey = this.participantKeys[this.ownHandle][this.keyId];
         var encryptedMessage = ns._symmetricEncryptMessage(message, senderKey);
 
-        // Use a (leaner) followup message if the sender key's been sent already.
-        if (this._sentKeyId === this.keyId) {
-            messageType = MESSAGE_TYPES.GROUP_FOLLOWUP;
-        }
-        else {
+        var keyIds = this.keyId;
+        var repeatKey = (this._totalMessagesWithoutSendKey >= this.totalMessagesBeforeSendKey);
+        if (repeatKey || (this._sentKeyId !== this.keyId)) {
+            // Default: Keyed message.
             var keysIncluded = [senderKey];
-            if (previousKeyId !== this.keyId) {
-                keysIncluded.push(this.participantKeys[this.ownHandle][previousKeyId]);
+            if (this.previousKeyId && !repeatKey) {
+                // Include previous sender key on key rotation only.
+                keysIncluded.push(this.participantKeys[this.ownHandle][this.previousKeyId]);
+                keyIds += this.previousKeyId;
             }
             encryptedKeys = this._encryptKeysFor(keysIncluded, encryptedMessage.nonce,
                                                  destination);
             messageType = MESSAGE_TYPES.GROUP_KEYED;
+            this._totalMessagesWithoutSendKey = 0;
+        }
+        else {
+            // Use a (leaner) followup message and avoid re-sending key(s).
+            messageType = MESSAGE_TYPES.GROUP_FOLLOWUP;
         }
 
         // Assemble message content.
@@ -575,11 +860,21 @@ var strongvelope = {};
             content += tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.KEYS),
                                             encryptedKeys);
             this._sentKeyId = this.keyId;
+            content += tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.KEY_IDS),
+                                            keyIds);
+
         }
-        content += tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.KEY_ID),
-                                        String.fromCharCode(this.keyId));
-        content += tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.PAYLOAD),
-                                        encryptedMessage.ciphertext);
+        else {
+            content += tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.KEY_IDS),
+                                            this.keyId);
+        }
+
+        // Only include ciphertext if it's not empty (non-blind message).
+        if (encryptedMessage.ciphertext !== null) {
+            content += tlvstore.toTlvRecord(String.fromCharCode(TLV_TYPES.PAYLOAD),
+                                            encryptedMessage.ciphertext);
+            this._keyEncryptionCount++;
+        }
 
         // Sign message.
         var signature = ns._signMessage(content,
@@ -588,7 +883,8 @@ var strongvelope = {};
                                        signature)
                 + content;
 
-        this._keyEncryptionCount++;
+        // Update message counters.
+        this._totalMessagesWithoutSendKey++;
 
         // Return assembled total message.
         return String.fromCharCode(PROTOCOL_VERSION) + content;
@@ -603,10 +899,13 @@ var strongvelope = {};
      *     Data message to encrypt.
      * @param {String} sender
      *     User handle of the message sender.
+     * @param {Boolean} [historicMessage=false]
+     *     Whether the message passed in for decryption is from the history.
      * @returns {(StrongvelopeMessage|Boolean)}
      *     The message content on success, `false` in case of errors.
      */
-    strongvelope.ProtocolHandler.prototype.decryptFrom = function(message, sender) {
+    strongvelope.ProtocolHandler.prototype.decryptFrom = function(message,
+            sender, historicMessage) {
 
         var parsedMessage = ns._parseMessageContent(message);
 
@@ -633,36 +932,39 @@ var strongvelope = {};
             return false;
         }
 
-        // Sanitise keyId to an 8-bit value.
-        var keyId = parsedMessage.keyId & 0xff;
-
         // Get sender key.
         var senderKey;
-        if (parsedMessage.keys.length  > 0) {
+        var keyId = parsedMessage.keyIds[0];
+        if (parsedMessage.keys.length > 0) {
             var isOwnMessage = (sender === this.ownHandle);
             var otherHandle = isOwnMessage ? parsedMessage.recipients[0] : sender;
-            // Decrypt message key(s) and update their local cache.
-            parsedMessage.keys[0] = this._decryptKeysFor(parsedMessage.keys[0],
-                                                         parsedMessage.nonce,
-                                                         otherHandle,
-                                                         isOwnMessage);
-            senderKey = parsedMessage.keys[0][0];
+            // Decrypt message key(s).
+            var decryptedKeys = this._decryptKeysFor(parsedMessage.keys[0],
+                                                     parsedMessage.nonce,
+                                                     otherHandle,
+                                                     isOwnMessage);
+            parsedMessage.keys[0] = decryptedKeys;
+            senderKey = decryptedKeys[0];
 
+            // Update local sender key cache.
             if (!this.participantKeys[sender]) {
                 this.participantKeys[sender] = {};
             }
-            this.participantKeys[sender][keyId] = senderKey;
-            if (parsedMessage.keys[0].length > 1) {
-                var previousKeyId = (parsedMessage.keyId - 1) & 0xff;
-                // Bail out on inconsistent information.
-                if (this.participantKeys[sender][previousKeyId]
-                        && (this.participantKeys[sender][previousKeyId] !== parsedMessage.keys[0][1])) {
+            var previousSenderKey;
+            var id;
+            for (var i = 0; i < decryptedKeys.length; i++) {
+                id = parsedMessage.keyIds[i];
+                previousSenderKey = this.participantKeys[sender][id];
+                if (previousSenderKey
+                        && (previousSenderKey !== parsedMessage.keys[0][i])) {
+                    // Bail out on inconsistent information.
                     logger.error("Mismatching statement on sender's previous key.");
 
                     return false;
                 }
-                this.participantKeys[sender][previousKeyId] = parsedMessage.keys[0][1];
+                this.participantKeys[sender][id] = parsedMessage.keys[0][i];
             }
+            this.participantKeys[sender][keyId] = senderKey;
         }
         else {
             if (this.participantKeys[sender] && this.participantKeys[sender][keyId]) {
@@ -670,7 +972,7 @@ var strongvelope = {};
             }
             else {
                 logger.error('Encryption key for message from ' + sender
-                             + ' with ID ' + keyId + ' unavailable.');
+                             + ' with ID ' + base64urlencode(keyId) + ' unavailable.');
 
                 return false;
             }
@@ -678,9 +980,15 @@ var strongvelope = {};
 
 
         // Decrypt message payload.
-        var cleartext = ns._symmetricDecryptMessage(parsedMessage.payload,
+        var cleartext;
+        if (typeof parsedMessage.payload !== 'undefined') {
+            cleartext = ns._symmetricDecryptMessage(parsedMessage.payload,
                                                     senderKey,
                                                     parsedMessage.nonce);
+        }
+        else {
+            cleartext = null;
+        }
 
         // Bail out if decryption failed.
         if (cleartext === false) {
@@ -693,7 +1001,50 @@ var strongvelope = {};
             payload: cleartext
         };
 
+        if (this._totalMessagesWithoutSendKey >= this.totalMessagesBeforeSendKey) {
+            result.toSend = this.encryptTo(null, sender);
+        }
+
+        // Update counter.
+        if (!historicMessage) {
+            this._totalMessagesWithoutSendKey++;
+        }
+
         return result;
+    };
+
+
+    /**
+     * Checks whether messages passed in in an array are decryptable.
+     *
+     * @method
+     * @param messages {Array.<ChatdMessage>}
+     *     Array containing a batch of chat messages.
+     * @param {Boolean} [historicMessages=true]
+     *     Whether the messages passed in for decryption are from the history.
+     * @returns {Array.<(StrongvelopeMessage|Boolean)>}
+     *     Array of objects with message contents on success, `false` in case of
+     *     errors.
+     */
+    strongvelope.ProtocolHandler.prototype.batchDecrypt = function(messages, historicMessages) {
+
+        // First extract all keys.
+        this._extractKeys(messages);
+
+        // Now attempt to decrypt all messages.
+        var decryptedMessages = [];
+        historicMessages = (typeof historicMessages === 'undefined') || (historicMessages === true)
+                         ? true : false;
+
+        var message;
+        for (var i = 0; i < messages.length; i++) {
+            message = messages[i];
+            decryptedMessages.push(this.decryptFrom(message.message,
+                                                    message.userId,
+                                                    historicMessages));
+        }
+
+        return decryptedMessages;
     };
 
 }());

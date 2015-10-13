@@ -18,16 +18,11 @@ describe("chat.strongvelope unit test", function() {
     var KEY = atob('/+fPkTwBddDWDSA2M1hluA==');
     var NONCE = atob('MTHgl79y+1FFnmnopp4UNA==');
     var KEY_ID = atob('QUkAAA==');
-    var INITIAL_MESSAGE_BIN = atob('AAEAAECWjjWMs+avYi7y4B2ilHHxjlCKUQEzOyjwP'
-        + 'CZA1PKyMDkSDEnmpaN23+WtP9OKgBJpOs3FKv4x635SNMWtO5QFAgAAAQADAAAM71B'
-        + 'rlkBJXmR5xRtMBAAACMqLuOeu/PccBQAAEMiaxjj3mLwIOIk3mKluzXsGAAAEQUkAA'
-        + 'AcAAAbruWm1K5g=');
+    var INITIAL_MESSAGE_BIN = atob('AAEAAECuKE3arE92KkMXAdaUtbZ1riLfiLezTBFtBkZMNqNYsV402eiU2T8UN8AZPthbKkIsx7DwnhBJ2aBrvjnoF4UDAgAAAQADAAAM71BrlkBJXmR5xRtMBAAACMqLuOeu/PccBQAAEMiaxjj3mLwIOIk3mKluzXsGAAAEQUkAAAcAAAbruWm1K5g=');
     var INITIAL_MESSAGE = {
         protocolVersion: 0,
-        signature:  atob('lo41jLPmr2Iu8uAdopRx8Y5QilEBMzso8DwmQNTysjA5EgxJ5qW'
-        + 'jdt/lrT/TioASaTrNxSr+Met+UjTFrTuUBQ=='),
-        signedContent: atob('AgAAAQADAAAM71BrlkBJXmR5xRtMBAAACMqLuOeu/PccBQAA'
-        + 'EMiaxjj3mLwIOIk3mKluzXsGAAAEQUkAAAcAAAbruWm1K5g='),
+        signature:  atob('rihN2qxPdipDFwHWlLW2da4i34i3s0wRbQZGTDajWLFeNNnolNk/FDfAGT7YWypCLMew8J4QSdmga7456BeFAw=='),
+        signedContent: atob('AgAAAQADAAAM71BrlkBJXmR5xRtMBAAACMqLuOeu/PccBQAAEMiaxjj3mLwIOIk3mKluzXsGAAAEQUkAAAcAAAbruWm1K5g='),
         type: 0x00,
         nonce: atob('71BrlkBJXmR5xRtM'),
         recipients: ['you456789xw'],
@@ -35,13 +30,10 @@ describe("chat.strongvelope unit test", function() {
         keyIds: [KEY_ID],
         payload: atob('67lptSuY')
     };
-    var FOLLOWUP_MESSAGE_BIN = atob('AAEAAEAUrDxmdixK1JDmUMpe7Kl04xwN7GIZYpYS1'
-        + '7FJiXjPGWLn4OARJRl7+o4+m8Sa1vSgdBEjIE+H/AvjLjDjqhcCAgAAAQEDAAAM71Br'
-        + 'lkBJXmR5xRtMBgAABEFJAAAHAAAG67lptSuY');
+    var FOLLOWUP_MESSAGE_BIN = atob('AAEAAECXRUab/B0G4OStZoUk3fmgbSmaKptYdbbTKZh4GVmbB14Rn/xSR9zYypOXD7MgNRJCAFjDZ/3scsGNZTqAewgDAgAAAQEDAAAM71BrlkBJXmR5xRtMBgAABEFJAAAHAAAG67lptSuY');
     var FOLLOWUP_MESSAGE = {
         protocolVersion: 0,
-        signature:  atob('FKw8ZnYsStSQ5lDKXuypdOMcDexiGWKWEtexSYl4zxli5+DgESUZ'
-            + 'e/qOPpvEmtb0oHQRIyBPh/wL4y4w46oXAg=='),
+        signature:  atob('l0VGm/wdBuDkrWaFJN35oG0pmiqbWHW20ymYeBlZmwdeEZ/8Ukfc2MqTlw+zIDUSQgBYw2f97HLBjWU6gHsIAw=='),
         signedContent: atob('AgAAAQEDAAAM71BrlkBJXmR5xRtMBgAABEFJAAAHAAAG67lptSuY'),
         type: 0x01,
         nonce: atob('71BrlkBJXmR5xRtM'),
@@ -52,16 +44,11 @@ describe("chat.strongvelope unit test", function() {
     };
     var ROTATED_KEY = atob('D/1apgnOpfzZqrYi95t5pw==');
     var ROTATED_KEY_ID = atob('QUkAAQ==');
-    var ROTATION_MESSAGE_BIN = atob('AAEAAEBmxxi35hZroboPblJMod+Ux2YEE6oL5BM5J'
-        + 'ovhbKfEd4Cn3QbX8SZS1EiVRyJBGdI6bqnPVaiWVu1jK2l4eaUOAgAAAQADAAAM71Br'
-        + 'lkBJXmR5xRtMBAAACMqLuOeu/PccBQAAIFk7mB4YHHMOQdLukN+74uq79XrRhAqxMb0'
-        + 'cVGLUtIcDBgAACEFJAAFBSQAABwAABh+/GnXzGA==');
+    var ROTATION_MESSAGE_BIN = atob('AAEAAEA2j/8PiMgV9/sZtAUqAWiqOAbkJrut5FxEEvEc6Q+BaVmRSiH377ma6awQORvtMyvE0JAnptwQzW4KRQ9MyukHAgAAAQADAAAM71BrlkBJXmR5xRtMBAAACMqLuOeu/PccBQAAIFk7mB4YHHMOQdLukN+74uq79XrRhAqxMb0cVGLUtIcDBgAACEFJAAFBSQAABwAABh+/GnXzGA==');
     var ROTATION_MESSAGE = {
         protocolVersion: 0,
-        signature:  atob('ZscYt+YWa6G6D25STKHflMdmBBOqC+QTOSaL4WynxHeAp90G1/EmU'
-        + 'tRIlUciQRnSOm6pz1WollbtYytpeHmlDg=='),
-        signedContent: atob('AgAAAQADAAAM71BrlkBJXmR5xRtMBAAACMqLuOeu/PccBQAAIF'
-        + 'k7mB4YHHMOQdLukN+74uq79XrRhAqxMb0cVGLUtIcDBgAACEFJAAFBSQAABwAABh+/GnXzGA=='),
+        signature:  atob('No//D4jIFff7GbQFKgFoqjgG5Ca7reRcRBLxHOkPgWlZkUoh9++5mumsEDkb7TMrxNCQJ6bcEM1uCkUPTMrpBw=='),
+        signedContent: atob('AgAAAQADAAAM71BrlkBJXmR5xRtMBAAACMqLuOeu/PccBQAAIFk7mB4YHHMOQdLukN+74uq79XrRhAqxMb0cVGLUtIcDBgAACEFJAAFBSQAABwAABh+/GnXzGA=='),
         type: 0x00,
         nonce: atob('71BrlkBJXmR5xRtM'),
         recipients: ['you456789xw'],
@@ -69,15 +56,11 @@ describe("chat.strongvelope unit test", function() {
         keyIds: [ROTATED_KEY_ID, KEY_ID],
         payload: atob('H78adfMY')
     };
-    var REMINDER_MESSAGE_BIN = atob('AAEAAEDh9M5Y+PLhlbAfGqhsI5XVX88VtpC5oeRQr'
-        + 'zIrKT19896yICJvaQ/0aZh5dREQQKAAssQiG4Y9qiNsk2bXsz4LAgAAAQADAAAM71Br'
-        + 'lkBJXmR5xRtMBAAACMqLuOeu/PccBQAAEFk7mB4YHHMOQdLukN+74uoGAAAEQUkAAQ==');
+    var REMINDER_MESSAGE_BIN = atob('AAEAAEA6gXqd8w67gwlmKZEiDD3KwqBX8W8qnngKsml05w1N/ziuc3W/1de3+iPz7kNw3bGSrqzBf+aZJPgSf1KHVZ0AAgAAAQADAAAM71BrlkBJXmR5xRtMBAAACMqLuOeu/PccBQAAEFk7mB4YHHMOQdLukN+74uoGAAAEQUkAAQ==');
     var REMINDER_MESSAGE = {
         protocolVersion: 0,
-        signature:  atob('4fTOWPjy4ZWwHxqobCOV1V/PFbaQuaHkUK8yKyk9ffPesiAib2kP'
-        + '9GmYeXUREECgALLEIhuGPaojbJNm17M+Cw=='),
-        signedContent: atob('AgAAAQADAAAM71BrlkBJXmR5xRtMBAAACMqLuOeu/PccBQAAE'
-        + 'Fk7mB4YHHMOQdLukN+74uoGAAAEQUkAAQ=='),
+        signature:  atob('OoF6nfMOu4MJZimRIgw9ysKgV/FvKp54CrJpdOcNTf84rnN1v9XXt/oj8+5DcN2xkq6swX/mmST4En9Sh1WdAA=='),
+        signedContent: atob('AgAAAQADAAAM71BrlkBJXmR5xRtMBAAACMqLuOeu/PccBQAAEFk7mB4YHHMOQdLukN+74uoGAAAEQUkAAQ=='),
         type: 0x00,
         nonce: atob('71BrlkBJXmR5xRtM'),
         recipients: ['you456789xw'],
@@ -275,14 +258,14 @@ describe("chat.strongvelope unit test", function() {
                 assert.strictEqual(asmCrypto.string_to_bytes.callCount, 2);
                 assert.strictEqual(nacl.sign.detached.callCount, 1);
                 assert.deepEqual(nacl.sign.detached.args[0],
-                    ['datamsgsigforty two', 'private keypublic key']);
+                    ['strongvelopesigforty two', 'private keypublic key']);
                 assert.strictEqual(asmCrypto.bytes_to_string.callCount, 1);
             });
 
             it("no mocks", function() {
                 var result = ns._signMessage('forty two', ED25519_PRIV_KEY, ED25519_PUB_KEY);
                 assert.strictEqual(btoa(result),
-                    '5ib9G+UE3iVI5ywOUoYtUzjz533bNZYG5x/YMjunqYjXm9+otOIlqix0px6D5yrDaOFwtviFb3Cg+WfilcA5Cw==');
+                    'WlGvF9zODTQOA+lTrb2jRe8bCz7Azhh2/9hze54SPWJpbfZ41SUZswe3b8KjpO0o3id9FVpNFI63ToXjw+iRCQ==');
             });
         });
 
@@ -296,12 +279,12 @@ describe("chat.strongvelope unit test", function() {
                 assert.strictEqual(asmCrypto.string_to_bytes.callCount, 3);
                 assert.strictEqual(nacl.sign.detached.verify.callCount, 1);
                 assert.deepEqual(nacl.sign.detached.verify.args[0],
-                    ['datamsgsigforty two', 'squiggle', 'public key']);
+                    ['strongvelopesigforty two', 'squiggle', 'public key']);
             });
 
             it("no mocks", function() {
-                var signature = atob('5ib9G+UE3iVI5ywOUoYtUzjz533bNZYG5x/YMjun'
-                    + 'qYjXm9+otOIlqix0px6D5yrDaOFwtviFb3Cg+WfilcA5Cw==');
+                var signature = atob('WlGvF9zODTQOA+lTrb2jRe8bCz7Azhh2/9hze54S'
+                    + 'PWJpbfZ41SUZswe3b8KjpO0o3id9FVpNFI63ToXjw+iRCQ==');
                 var result = ns._verifyMessage('forty two', signature, ED25519_PUB_KEY);
                 assert.deepEqual(result, true);
             });

@@ -283,7 +283,7 @@ var strongvelope = {};
     strongvelope._signMessage = function(message, privKey, pubKey) {
 
         var keyBytes = asmCrypto.string_to_bytes(privKey + pubKey);
-        var messageBytes = asmCrypto.string_to_bytes('datamsgsig' + message);
+        var messageBytes = asmCrypto.string_to_bytes('strongvelopesig' + message);
         var signature = nacl.sign.detached(messageBytes, keyBytes);
 
         return asmCrypto.bytes_to_string(signature);
@@ -305,7 +305,7 @@ var strongvelope = {};
      */
     strongvelope._verifyMessage = function(message, signature, pubKey) {
 
-        var messageBytes = asmCrypto.string_to_bytes('datamsgsig' + message);
+        var messageBytes = asmCrypto.string_to_bytes('strongvelopesig' + message);
         var signatureBytes = asmCrypto.string_to_bytes(signature);
         var keyBytes = asmCrypto.string_to_bytes(pubKey);
 

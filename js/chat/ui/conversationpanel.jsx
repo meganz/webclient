@@ -967,9 +967,10 @@ var ConversationPanel = React.createClass({
                 myAvatar = <div className="localVideoWrapper">
                     <video
                         className="localViewport"
-                        defaultmuted="true"
+                        defaultMuted="true"
                         muted=""
                         volume="0"
+                        autoPlay="true"
                         id={"localvideo_" + room.callSession.sid}
                         src={room.callSession.localPlayer.src}
                     />

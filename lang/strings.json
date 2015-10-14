@@ -9175,6 +9175,10 @@
         "text": "One upload was added to the transfers queue",
         "context": ""
     },
+    "7224": {
+        "text": "Show me",
+        "context": "Transfers notification button, which opens current notification"
+    },
     "7225": {
         "text": "Are you sure you want to clear all transfers?",
         "context": ""

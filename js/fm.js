@@ -1422,7 +1422,8 @@ function sharedUInode(nodeHandle) {
     var oShares,
         iShareNum = 0,
         bExportLink = false,
-        bAvailShares = false;
+        bAvailShares = false,
+        UiExportLink = new mega.UI.Share.ExportLink();
 
     // Is there a full share or pending share available
     if ((M.d[nodeHandle] && M.d[nodeHandle].shares) || M.ps[nodeHandle]) {
@@ -1438,11 +1439,12 @@ function sharedUInode(nodeHandle) {
         // Do we have export link for selected node?
         if (oShares && oShares.EXP) {
 
-            // List view
-            $('.grid-table.fm #' + nodeHandle + ' .grid-url-field').addClass('linked');
+            UiExportLink.addExportLinkIcon(nodeHandle);
 
-            // Grid view
-            $('#' + nodeHandle + '.file-block').addClass('linked');
+            // Item is taken down, make sure that user is informed
+            if (oShares.EXP.down === 1) {
+                UiExportLink.addTakenDownIcon(nodeHandle);
+            }
 
             bExportLink = true;
         }
@@ -1455,7 +1457,6 @@ function sharedUInode(nodeHandle) {
 
             // Left panel
             $('#treea_' + nodeHandle + ' .nw-fm-tree-folder').addClass('shared-folder');
-            $('#treea_' + nodeHandle).addClass('linked');
 
             bAvailShares = true;
         }
@@ -1480,9 +1481,7 @@ function sharedUInode(nodeHandle) {
 
     // If no export link is available, remove export link from left and right panels (list and block view)
     if (!bExportLink) {
-        $('.grid-table.fm #' + nodeHandle + ' .grid-url-field').removeClass('linked'); // Rigth panel list view
-        $('#' + nodeHandle + '.file-block').removeClass('linked'); // Right panel block view
-        $('#treea_' + nodeHandle).removeClass('linked'); // Left panel
+        UiExportLink.removeExportLinkIcon(nodeHandle);
     }
 }
 
@@ -8611,7 +8610,7 @@ function getclipboardkeys() {
  * @param {String} notification The text for the toast notification
  */
 function showToast(toastClass, notification) {
-    
+
     var $toast, interval;
 
     $toast = $('.toast-notification.common-toast');
@@ -10410,17 +10409,17 @@ function FMResizablePane(element, opts) {
  * @param {String} elementId The name of the id
  */
 function selectText(elementId) {
-    
+
     var range, selection;
     var text = document.getElementById(elementId);
-    
+
     if (document.body.createTextRange) {
         range = document.body.createTextRange();
         range.moveToElementText(text);
         range.select();
     }
     else if (window.getSelection) {
-        selection = window.getSelection();        
+        selection = window.getSelection();
         range = document.createRange();
         range.selectNodeContents(text);
         selection.removeAllRanges();

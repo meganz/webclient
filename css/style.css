@@ -7066,7 +7066,7 @@ table {
 	-webkit-border-radius: 8px;
 	border-radius: 8px;
 }
-.fm-new-folder, .search-files-result, .search-messages-result, .fm-file-upload, .search-messages-result, .fm-folder-upload, .fm-notification-settings {
+.search-files-result, .search-messages-result, .fm-file-upload, .search-messages-result, .fm-folder-upload, .fm-notification-settings {
 	position: relative;
 	overflow: hidden;
 }

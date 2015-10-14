@@ -2729,5 +2729,7 @@
     "7679": "Kailangan mo ng MEGA account upang magpatuloy.",
     "7680": "Ang cryptographic model ng MEGA ay dumedepende sa mga naka-display na keys sa taas. Ipinapayo namin na ipadala ang decrpytion keys ng magkabukod sa folder o file link, sa pamamagitan ng secure channel.",
     "7681": "Link ng File\/Folder",
-    "7682": "Ipinapayo nang MEGA na ipadala ng bukod ang 'Decryption Key' sa 'Folder\/File Link'."
+    "7682": "Ipinapayo nang MEGA na ipadala ng bukod ang 'Decryption Key' sa 'Folder\/File Link'.",
+    "7683": "Extension",
+    "7684": "%1 on %2"
 }

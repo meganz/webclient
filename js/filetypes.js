@@ -111,7 +111,6 @@ var extdesc = {
     'gz': 'Gnu Compressed',
     'h': 'Header',
     'hpp': 'Header',
-    'hpp': 'Header',
     'htm': 'HTML Document',
     'html': 'HTML Document',
     'iff': 'Interchange',
@@ -124,7 +123,6 @@ var extdesc = {
     'jpg': 'JPEG Image',
     'js': 'JavaScript',
     'kml': 'Keyhole Markup',
-    'kml': 'Google Earth',
     'log': 'Log',
     'm3u': 'Media Playlist',
     'm4a': 'MPEG-4 Audio',
@@ -233,7 +231,7 @@ function filetype(n) {
         return ext[fext][1];
     }
     else if (fext && fext.length > 1) {
-        return fext.toUpperCase() + ' File';
+        return htmlentities(fext.toUpperCase()) + ' File';
     }
     else {
         return 'File';

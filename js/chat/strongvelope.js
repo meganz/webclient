@@ -520,7 +520,7 @@ var strongvelope = {};
         // Iterate over all messages to extract keys (if present).
         for (var i = 0; i < messages.length; i++) {
             message = messages[i];
-            parsedMessage = ns._parseMessageContent(message);
+            parsedMessage = ns._parseMessageContent(message.message);
             parsedMessages.push(parsedMessage);
             if (parsedMessage
                     && (parsedMessage.type === MESSAGE_TYPES.GROUP_KEYED)) {

@@ -114,7 +114,7 @@ var ChatDialogMessage = function(opts) {
         {
             'type': true,
             'messageId': true,
-            'textMessage': true,
+            'textContents': true,
             'authorContact': true,
             'delay': true,
             'buttons': true,
@@ -139,7 +139,7 @@ var ChatDialogMessage = function(opts) {
 ChatDialogMessage.DEFAULT_OPTS = {
     'type': '',
     'messageId': '',
-    'textMessage': '',
+    'textContents': '',
     'authorContact': '',
     'delay': 0,
     'buttons': {},

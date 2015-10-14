@@ -350,30 +350,29 @@ var ConversationsMainListing =  React.createClass({
             }
 
             var lastAction;
-            var lastMessage = lastMessage = room.messagesBuff.messages.getItem(room.messagesBuff.messages.length - 1);
-            if(room.messagesBuff.messages.length > 0 && lastMessage) {
-                if(lastMessage) {
-                    if (lastMessage.textContents || lastMessage.getContents) {
-                        // notification?
-                        if (lastMessage.textContents) {
-                            lastActionClasses += " " + lastMessage.cssClass;
-                            lastActionText += lastMessage.textContents;
-                        } else {
-                            // text message
-                            lastActionClasses += " fm-chat-messages-pad";
-                            lastActionText = lastMessage.getContents();
-                        }
+            var lastMessage = room.messagesBuff.messages.getItem(room.messagesBuff.messages.length - 1);
 
-                        lastAction = <div className={lastActionClasses}>
-                            <div className="nw-chat-notification-icon"></div>
-                            <div className="conversation-status">
-                                            <span>
-                                                {lastActionText}
-                                            </span>
-                            </div>
-                            <div className="conversations-time">{lastActivity}</div>
-                        </div>;
+            if(room.messagesBuff.messages.length > 0 && lastMessage) {
+                if (lastMessage.textContents || lastMessage.getContents) {
+                    // notification?
+                    if (lastMessage.textContents) {
+                        lastActionClasses += " " + (lastMessage.cssClass ? lastMessage.cssClass : " fm-chat-messages-pad");
+                        lastActionText += lastMessage.textContents;
+                    } else {
+                        // text message
+                        lastActionClasses += " fm-chat-messages-pad";
+                        lastActionText = lastMessage.getContents();
                     }
+
+                    lastAction = <div className={lastActionClasses}>
+                        <div className="nw-chat-notification-icon"></div>
+                        <div className="conversation-status">
+                                        <span>
+                                            {lastActionText}
+                                        </span>
+                        </div>
+                        <div className="conversations-time">{lastActivity}</div>
+                    </div>;
                 }
             } else {
                 lastAction = <div className={lastActionClasses}>
@@ -403,7 +402,7 @@ var ConversationsMainListing =  React.createClass({
                             </div>
                             <div className="clear"></div>
 
-                            {lastAction}
+                            <div>{lastAction}</div>
 
                             {haventCommunicated}
 

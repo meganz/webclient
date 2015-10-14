@@ -93,7 +93,7 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
                                 megaRoom.messagesBuff.removeChangeListener(changeListenerId);
                             }
                         });
-                    } else if(message.type && message.textMessage && !message.seen) {
+                    } else if(message.type && message.textContents && !message.seen) {
                         if(message.type === "incoming-call") {
                             return; // already caught by the onIncomingCall...
                         }
@@ -106,7 +106,7 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
                                 'icon': icon,
                                 'params': {
                                     'from': avatarMeta.fullName,
-                                    'messageText': message.textMessage
+                                    'messageText': message.textContents
                                 }
                             },
                             !message.seen

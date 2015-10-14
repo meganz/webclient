@@ -156,7 +156,7 @@ var ConversationMessage = React.createClass({
 
             textMessage = htmlentities(textMessage);
 
-            message.textMessage = textMessage;
+            message.textContents = textMessage;
 
             // mapping css icons to msg types
             if (message.type === "call-rejected") {

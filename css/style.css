@@ -7678,12 +7678,13 @@ table {
 	max-width: 90%;
 	z-index: 100;
 	margin: 94px 0 0 0;
+	width: 400px;
 }
 .add-user-popup.dialog {
 	z-index: 1200;
 	left: 50%;
 	top: 50%;
-	margin: -108px 0 0 -180px;
+	margin: -108px 0 0 -200px;
 }
 .create-folder-dialog {
 	min-width: 334px;

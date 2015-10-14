@@ -847,7 +847,7 @@ function MegaData()
                     t = '.contacts-blocks-scrolling';
                     html = '<a class="file-block ustatus ' + htmlentities(u_h) + ' ' + onlinestatus[1] + '" id="' + htmlentities(M.v[i].h) + '">\n\
                                 <span class="nw-contact-status"></span>\n\
-								<span class="file-settings-icon">\n\
+                                <span class="file-settings-icon">\n\
                                     <span></span>\n\
                                 </span>\n\
                                 ' + avatar + ' \
@@ -876,6 +876,11 @@ function MegaData()
                                 </td>\n\
                                 <td width="270">\n\
                                     <div class="contacts-interation li_' + u_h + '"></div>\n\
+                                </td>\n\
+                                <td class="grid-url-header-nw">\n\
+                                    <a class="grid-url-arrow">\n\
+                                            <span></span>\n\
+                                    </a>\n\
                                 </td>\n\
                             </tr>';
                 }
@@ -950,7 +955,7 @@ function MegaData()
                         html = '<a class="file-block folder" id="'
                             + htmlentities(M.v[i].h) + '"><span class="file-status-icon '
                             + htmlentities(star) + '"></span><span class="shared-folder-access '
-                            + htmlentities(rightsclass) + '"></span><span class="file-icon-area">'
+                            + htmlentities(rightsclass) + '"></span><span class="file-settings-icon"><span></span></span><span class="file-icon-area">'
                             + '<span class="block-view-file-type folder"></span></span>'
                                  + avatar
                             + '<span class="shared-folder-info-block"><span class="shared-folder-name">'
@@ -970,7 +975,7 @@ function MegaData()
                             + htmlentities(onlinestatus[1]) + '"><div class="todo-fm-chat-user-star"></div><div class="fm-chat-user">'
                             + contactName + '</div><div class="nw-contact-status"></div><div class="fm-chat-user-status ' + htmlentities(htmlentities(u_h)) + '">' + htmlentities(onlinestatus[0])
                             + '</div><div class="clear"></div></div></td><td width="270"><div class="shared-folder-access'
-                            + htmlentities(rightsclass) + '">' + htmlentities(rights) + '</div></td></tr>';
+                            + htmlentities(rightsclass) + '">' + htmlentities(rights) + '</div></td><td class="grid-url-header-nw"><a class="grid-url-arrow"><span></span></a></td></tr>';
                     }
                 }
 
@@ -1020,6 +1025,11 @@ function MegaData()
                                     </td>\n\
                                     <td width="270">\n\
                                         <div class="shared-folder-access ' + rightsclass + '">' + rights + '</div>\n\
+                                    </td>\n\
+                                    <td class="grid-url-header-nw">\n\
+                                        <a class="grid-url-arrow">\n\
+                                            <span></span>\n\
+                                        </a>\n\
                                     </td>\n\
                                 </tr>';
                     }
@@ -6491,7 +6501,7 @@ function balance2pro(callback)
             scroll = '.export-link-body';
 
         var links = $.trim(getClipboardLinks()),
-			$span = $('.copy-to-clipboard span'),
+            $span = $('.copy-to-clipboard span'),
             toastTxt, doLinks, linksNum, success;
 
         /**

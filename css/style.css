@@ -5726,6 +5726,12 @@ table .grid-status-icon.star {
 	-khtml-opacity: 0;
 	opacity: 0;
 }
+.grid-url-header-nw {
+	width:42px;
+}
+.grid-url-header-nw .grid-url-arrow {
+	top: 16px;
+}
 .clear-transfer-icon {
 	left: 36px;
 }
@@ -5739,7 +5745,7 @@ table .grid-status-icon.star {
 	bottom: 31px;
 	z-index: 10;
 }
-.contacts-blocks-scrolling .file-settings-icon {
+.contacts-blocks-scrolling .file-settings-icon, .shared-blocks-scrolling .file-settings-icon {
 	bottom: 55px;
 }
 .grid-url-arrow span, .file-settings-icon span, .clear-transfer-icon span {
@@ -21141,10 +21147,10 @@ span.incoming-call-name {
 	-webkit-border-radius: 0;
 	border-radius: 0;
 }
-.file-block .avatar-wrapper {
+.contacts-view .file-block .avatar-wrapper {
 	border:0;
 }
-.file-block .avatar-wrapper img, .file-block .nw-contact-avatar img {
+.contacts-view .file-block .nw-contact-avatar img {
 	width: 160px;
 	height: 160px;
 }

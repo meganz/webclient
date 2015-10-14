@@ -556,6 +556,7 @@ function browserdetails(useragent) {
     var browser = false;
     var icon = '';
     var name = '';
+    
     if (useragent.indexOf('android') > 0) {
         os = 'Android';
     }
@@ -601,6 +602,7 @@ function browserdetails(useragent) {
     }
     else if (useragent.indexOf('chrome') > 0) {
         browser = 'Chrome';
+        icon = 'chrome.png';
     }
     else if (useragent.indexOf('safari') > 0) {
         browser = 'Safari';
@@ -610,6 +612,7 @@ function browserdetails(useragent) {
     }
     else if (useragent.indexOf('firefox') > 0) {
         browser = 'Firefox';
+        icon = 'firefox.png';
     }
     else if (useragent.indexOf('thunderbird') > 0) {
         browser = 'Thunderbird';
@@ -621,8 +624,14 @@ function browserdetails(useragent) {
             || "ActiveXObject" in window) {
         browser = 'Internet Explorer';
     }
+    
+    // Detect if extension
+    if (useragent.indexOf('megext') > 0) {
+        browser += ' ' + l[7683];           // Chrome Extension / Firefox Extension
+    }
+    
     if ((os) && (browser)) {
-        name = browser + ' on ' + os;
+        name = l[7684].replace('%1', browser).replace('%2', os);    // E.g. Chrome on Windows
     }
     else if (os) {
         name = os;

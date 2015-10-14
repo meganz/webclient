@@ -1586,9 +1586,10 @@ function MegaData()
                 M.renderPath();
             });
         }
-        if (!n_h) {
+        // !n_h formely disallowed URL changes while viewing a folderlink
+        // if (!n_h) {
             window.location.hash = '#fm/' + M.currentdirid;
-        }
+        // }
         searchPath();
 
         var sortMenu = new mega.SortMenu();
@@ -6488,7 +6489,7 @@ function balance2pro(callback)
             scroll = '.export-link-body';
 
         var links = $.trim(getClipboardLinks()),
-			$span = $('.copy-to-clipboard span'),
+            $span = $('.copy-to-clipboard span'),
             toastTxt, doLinks, linksNum, success;
 
         /**

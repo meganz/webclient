@@ -29,6 +29,7 @@ var account = false;
 var register_txt = false;
 var login_next = false;
 var loggedout = false;
+var flhashchange = false;
 
 var pro_json = '[[["N02zLAiWqRU",1,500,1024,1,"9.99","EUR"],["zqdkqTtOtGc",1,500,1024,12,"99.99","EUR"],["j-r9sea9qW4",2,2048,4096,1,"19.99","EUR"],["990PKO93JQU",2,2048,4096,12,"199.99","EUR"],["bG-i_SoVUd0",3,4096,8182,1,"29.99","EUR"],["e4dkakbTRWQ",3,4096,8182,12,"299.99","EUR"]]]';
 
@@ -235,7 +236,7 @@ function init_page() {
     }
 
     var fmwasinitialized = !!fminitialized;
-    if ((u_type === 0 || u_type === 3) || pfid || folderlink) {
+    if (((u_type === 0 || u_type === 3) || pfid || folderlink) && !flhashchange) {
 
         if (is_fm()) {
             // switch between FM & folderlinks (completely reinitialize)
@@ -1823,6 +1824,10 @@ window.onhashchange = function() {
         return false;
     }
 
+    if (folderlink) {
+        flhashchange = true;
+    }
+
     if (tpage == '#info' && page == 'start') {
         if (!$.infoscroll) {
             startpageScroll();
@@ -1878,6 +1883,7 @@ window.onhashchange = function() {
     else {
         init_page();
     }
+    flhashchange = false;
 };
 
 window.onbeforeunload = function () {

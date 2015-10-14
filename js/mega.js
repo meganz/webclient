@@ -847,6 +847,9 @@ function MegaData()
                     t = '.contacts-blocks-scrolling';
                     html = '<a class="file-block ustatus ' + htmlentities(u_h) + ' ' + onlinestatus[1] + '" id="' + htmlentities(M.v[i].h) + '">\n\
                                 <span class="nw-contact-status"></span>\n\
+								<span class="file-settings-icon">\n\
+                                    <span></span>\n\
+                                </span>\n\
                                 ' + avatar + ' \
                                 <span class="shared-folder-info-block">\n\
                                     <span class="shared-folder-name">' + htmlentities(node.name) + '</span>\n\

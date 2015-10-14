@@ -1592,7 +1592,7 @@ function MegaData()
         searchPath();
 
         var sortMenu = new mega.SortMenu();
-        sortMenu.treeSearchUI;
+        sortMenu.treeSearchUI();
 
         $(document).trigger('MegaOpenFolder');
     };

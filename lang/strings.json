@@ -10934,5 +10934,9 @@
     "7685": {
         "text": "I hereby state that I have a good faith belief that the use of copyrighted material in the manner complained of and located at the location above is not authorized by the copyright owner, its agent, or the law (e.g., as a fair use).",
         "context": "A legal statement on the copyright notice page when a takedown complaint is being created. This is a revision of the existing string id 635.\r\n\r\nThe user has just entered details of their complaint, including mentioning the specific file link that they want to be taken down, and are having to confirm that they truly believe this is illegal use of the material, and not allowed by the law or fair use."
+    },
+    "7686": {
+        "text": "One of the links you have provided is not a valid MEGA link.",
+        "context": "This appears within an error dialog. The user has typed or copied & pasted a link into our takedown system, but the link has not passed our validation and does not look like a MEGA link."
     }
 }

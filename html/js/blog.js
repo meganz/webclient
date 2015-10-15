@@ -18,7 +18,7 @@ if (!m) {
 var blogposts = null;
 
 function unsigned_blogposts(ready) {
-    var xhr = getxhr()
+    var xhr = getxhr();
     xhr.open("GET", "https://cms.mega.nz/unsigned/blog.json");
     xhr.onreadystatechange = function() {
         if (this.readyState === 4) {

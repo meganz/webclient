@@ -1696,7 +1696,12 @@ function api_proc(q) {
     };
 
     if (q.rawreq === false) {
-        q.url = apipath + q.service + '?id=' + (q.seqno++) + '&' + q.sid + '&domain=meganz&lang=' + lang;
+        q.url = apipath + q.service
+              + '?id=' + (q.seqno++)
+              + '&' + q.sid
+              + '&domain=meganz'                    // Coming from mega.nz
+              + '&lang=' + lang                     // Their selected language
+              + (is_extension ? '&ext=1' : '');     // Using browser extension
 
         if (typeof q.cmds[q.i][0] === 'string') {
             q.url += '&' + q.cmds[q.i][0];
@@ -1768,18 +1773,25 @@ function api_reqfailed(c, e) {
 
     // If suspended account
     else if (e === EBLOCKED) {
+        var queue = apixs[c];
+        queue.rawreq = false;
+        queue.cmds = [[], []];
+        queue.ctxs = [[], []];
+        queue.setimmediate = false;
+        api_req({a: 'whyamiblocked'}, { callback: function whyAmIBlocked(reason) {
+            u_logout(true);
 
-        // On clicking OK, log the user out and redirect to contact page
-        msgDialog('warninga', 'Suspended account',
-            'You have been suspended due to excess data usage.\n\
-            Please contact support@mega.nz to get your account reinstated.',
-            false,
-            function() {
-                var redirectUrl = window.location.origin + window.location.pathname + '#contact';
-                u_logout(true);
-                window.location.replace(redirectUrl);
-            }
-        );
+            // On clicking OK, log the user out and redirect to contact page
+            loadingDialog.hide();
+            msgDialog('warninga', l[6789],
+                (reason === 100) ? l[7659] : l[7660],
+                false,
+                function() {
+                    var redirectUrl = window.location.origin + window.location.pathname + '#contact';
+                    window.location.replace(redirectUrl);
+                }
+            );
+        }});
     }
 }
 

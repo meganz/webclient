@@ -4,23 +4,19 @@ var syncsel = false;
 var linuxsync = megasync.getLinuxReleases();
 
 function init_sync() {
-    $('.st-apps-icon.mobile').unbind('click');
-    $('.st-apps-icon.mobile').bind('click', function() {
+    $('.st-apps-icon.mobile').rebind('click', function() {
         document.location.hash = 'mobile';
     });
 
-    $('.st-apps-icon.browser').unbind('click');
-    $('.st-apps-icon.browser').bind('click', function() {
+    $('.st-apps-icon.browser').rebind('click', function() {
         document.location.hash = 'plugin';
     });
 
-    $('.sync-help-center').unbind('click');
-    $('.sync-help-center').bind('click', function(e) {
+    $('.sync-help-center').rebind('click', function(e) {
         document.location.hash = 'help/sync';
     });
     setTimeout(function() {
-        $('#syncanim').unbind('click');
-        $('#syncanim').bind('click', function(e) {
+        $('#syncanim').rebind('click', function(e) {
             if (syncurl) {
                 document.location.href = syncurl;
             }
@@ -50,7 +46,7 @@ function sync_switchOS(os) {
     syncurl = megasync.getMegaSyncUrl(os);
     if (os === 'windows') {
         $('.sync-button-txt.small').text(l[1158]);
-        $('.sync-bottom-txt.button-txt').html(l[2025]);
+        $('.sync-bottom-txt.button-txt').safeHTML(l[2025]);
         $('.sync-button').removeClass('mac linux');
         $('.sync-button').attr('href', syncurl);
         $('.sync-button').unbind('click');
@@ -64,7 +60,7 @@ function sync_switchOS(os) {
             ostxt = l[1158].replace('Linux', 'Mac');
         }
         $('.sync-button-txt.small').text(ostxt);
-        $('.sync-bottom-txt.button-txt').html(l[2026]);
+        $('.sync-bottom-txt.button-txt').safeHTML(l[2026]);
         $('.sync-button').removeClass('windows linux').addClass('mac');
         $('.sync-button').attr('href', syncurl);
         $('.sync-button').unbind('click');
@@ -80,11 +76,10 @@ function sync_switchOS(os) {
             ostxt = l[1158].replace('Mac', 'Linux');
         }
         $('.sync-button-txt.small').text(ostxt);
-        $('.sync-bottom-txt.button-txt').html(l[2027]);
+        $('.sync-bottom-txt.button-txt').safeHTML(l[2027]);
         $('.sync-bottom-txt.linux-txt')
-            .html('<span class="nautilus-lnk">'
-                + 'MEGA <a href="" class="red">Nautilus extension</a> ('
-                + l[2028] + ')</span>');
+            .safeHTML('<span class="nautilus-lnk">' +
+                'MEGA <a href="" class="red">Nautilus extension</a> (@@)</span>', l[2028]);
         $('.sync-button').removeClass('mac linux').addClass('linux');
         $('.sync-button-block.linux').removeClass('hidden');
         $('.architecture-checkbox input').bind('click', function() {
@@ -98,13 +93,13 @@ function sync_switchOS(os) {
         });
         $('.sync-button.linux').addClass('disabled');
         $('.sync-bottom-txt.linux-txt').css('opacity', '0.3');
-        $('.version-select-txt').html(l[2029]);
+        $('.version-select-txt').text(l[2029]);
         var ua = navigator.userAgent.toLowerCase();
         if (ua.indexOf('i686') > -1
                 || ua.indexOf('i386') > -1 || ua.indexOf('i586') > -1) {
             $('.sync-radio-buttons #rad1').click();
         }
-        var options = '<option id="-1">' + l[2029] + '</option>';
+        var options = '<option id="-1">' + escapeHTML(l[2029]) + '</option>';
         for (var i in linuxsync) {
             if (linuxsync.hasOwnProperty(i)) {
                 var selected = '';
@@ -115,33 +110,30 @@ function sync_switchOS(os) {
                     selected = 'selected';
                     changeLinux(i);
                 }
-                options += '<option value="' + i + '" ' + selected + '>' + linuxsync[i].name + '</option>';
+                options += '<option value="' + escapeHTML(i) + '" ' +
+                    escapeHTML(selected) + '>' + escapeHTML(linuxsync[i].name) + '</option>';
             }
         }
-        $('.fm-version-select.sync select').html(options);
+        $('.fm-version-select.sync select').safeHTML(options);
 
-        $('.fm-version-select.sync select').unbind('change');
-        $('.fm-version-select.sync select').bind('change', function(e) {
+        $('.fm-version-select.sync select').rebind('change', function(e) {
                 changeLinux($(this).val());
             });
 
-        $('.sync-bottom-txt.linux-txt a').unbind('click');
-        $('.sync-bottom-txt.linux-txt a').bind('click', function(e) {
+        $('.sync-bottom-txt.linux-txt a').rebind('click', function(e) {
                 if (!nautilusurl) {
                     return false;
                 }
             });
 
-        $('.sync-button').unbind('click');
-        $('.sync-button').bind('click', function(e) {
+        $('.sync-button').rebind('click', function(e) {
                 if (!syncurl) {
                     msgDialog('info', l[2029], l[2030]);
                     return false;
                 }
             });
 
-        $('.sync-radio-buttons input').unbind('change');
-        $('.sync-radio-buttons input').bind('change', function(e) {
+        $('.sync-radio-buttons input').rebind('change', function(e) {
                 if (syncsel) {
                     setTimeout(function() {
                         changeLinux(syncsel);
@@ -149,16 +141,14 @@ function sync_switchOS(os) {
                 }
             });
     }
-    $('.sync-bottom-txt.button-txt a').unbind('click');
-    $('.sync-bottom-txt.button-txt a').bind('click', function(e) {
-        var c = $(this).attr('class');
-        if (c && c.indexOf('windows') > -1) {
+    $('.sync-bottom-txt.button-txt a').rebind('click', function(e) {
+        if ($(this).hasClass('windows')) {
             sync_switchOS('windows');
         }
-        else if (c && c.indexOf('mac') > -1) {
+        else if ($(this).hasClass('mac')) {
             sync_switchOS('mac');
         }
-        else if (c && c.indexOf('linux') > -1) {
+        else if ($(this).hasClass('linux')) {
             sync_switchOS('linux');
         }
         return false;
@@ -189,8 +179,8 @@ function changeLinux(i) {
         var filename = syncurl.split('/').pop();
         $('.sync-button').attr('href', syncurl);
         $('.sync-bottom-txt.linux-txt a').attr('href', nautilusurl);
-        $('.linuxhint').html('*' + l[1909] + ': <font style="font-family:courier;">' + linuxsync[i].c + ' ' +
-            filename + '</font>');
+        $('.linuxhint').safeHTML('*@@: <font style="font-family:courier;">@@ @@</font>',
+                                 l[1909], linuxsync[i].c, filename);
         $('.linuxhint').show();
         syncsel = i;
     }
@@ -200,6 +190,6 @@ function changeLinux(i) {
         $('.linuxhint').hide();
         $('.sync-button.linux').addClass('disabled');
         $('.sync-bottom-txt.linux-txt').css('opacity', '0.3');
-        $('.version-select-txt').html(l[2029]);
+        $('.version-select-txt').text(l[2029]);
     }
 }

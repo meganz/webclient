@@ -198,6 +198,20 @@ describe("tlvstore unit test", function() {
             }
         });
 
+        it("blockDecrypt, failed integrity", function() {
+            var key = asmCrypto.bytes_to_string(asmCrypto.hex_to_bytes('0f0e0d0c0b0a09080706050403020100'));
+            var tests = [
+                atob('AAABAgMEBQYHCAkKC1jj/Y+ZHFFbO3UUng4na9OXvdc4jSVHIfN7ZqX='),
+                atob('AQABAgMEBQYHCAkcT6pYBDGA0fD0WxB4YOqtkAhkd2VnxJpePwdK'),
+                atob('AgABAgMEBQYHCAkcT6pYBDGA0fD0WxDEk30ne8m70a=='),
+                atob('AwABAgMEBQYHCAkKC1jj/Y+ZHFFbO3UUng4na9OXvdc4jSVHIfN7ZqX='),
+            ];
+            for (var i = 0; i < tests.length; i++) {
+                assert.throws(function() { ns.blockDecrypt(tests[i], key); },
+                              'data integrity check failed');
+            }
+        });
+
         it("blockEncrypt/blockDecrypt round trip", function() {
             var key = asmCrypto.bytes_to_string(asmCrypto.hex_to_bytes('0f0e0d0c0b0a09080706050403020100'));
             var modes = [[ns.BLOCK_ENCRYPTION_SCHEME.AES_CCM_12_16, 12],

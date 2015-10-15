@@ -916,6 +916,7 @@ ChatRoom.prototype.sendMessage = function(message, meta) {
         self.roomJid
     );
 
+    eventObject.textContents = message;
 
     if (
         megaChat.karere.getConnectionState() !== Karere.CONNECTION_STATE.CONNECTED ||
@@ -1032,11 +1033,6 @@ ChatRoom.prototype._sendNodes = function(nodeids, users) {
         }
     }
 
-
-    // TODO: implement API call to grant access to the root nodes, pass following data in API call:
-    // - apinodes
-    // - users
-    // for now simulate a random API call:
 
     this.logger.debug("sendNodes: ", apinodes, apinodes);
 

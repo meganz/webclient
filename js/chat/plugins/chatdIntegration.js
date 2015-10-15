@@ -28,7 +28,6 @@ var ChatdIntegration = function(megaChat) {
             self._detachFromChatRoom(chatRoom);
         });
 
-        //TODO: trigger mcf and open all chats returned by the server
         self.apiReq({a: "mcf"})
             .done(function(r) {
                 // reopen chats from the MCF response.
@@ -65,33 +64,6 @@ ChatdIntegration.prototype._getKarereObjFromChatdObj = function(chatdEventObj) {
     var chatRoom = self._getChatRoomFromEventData(chatdEventObj);
 
     var msgContents;
-    //try {
-    //    msgContents = msgContents = chatRoom.protocolHandler.decryptFrom(
-    //        base64urldecode(chatdEventObj.message),
-    //        chatdEventObj.userId
-    //    );
-    //    if (msgContents && msgContents.payload) {
-    //        msgContents = msgContents.payload;
-    //    }
-    //    else if (msgContents === false) {
-    //        return false;
-    //    }
-    //    else {
-    //        msgContents = chatdEventObj.message; // fallback to plaintext?
-    //    }
-    //} catch (e) {
-    //    if (e instanceof URIError) {
-    //        self.logger.error(
-    //            "Failed to decrypt message: ", chatdEventObj.messageId,
-    //            "with length:", chatdEventObj.message.length
-    //        );
-    //
-    //        msgContents = chatdEventObj.message; // fallback to plaintext?
-    //    }
-    //    else {
-    //        throw e;
-    //    }
-    //}
 
     msgContents = chatdEventObj.message;
 
@@ -143,8 +115,6 @@ ChatdIntegration.prototype._getKarereObjFromChatdObj = function(chatdEventObj) {
 ChatdIntegration.prototype.openChatFromApi = function(actionPacket) {
     var self = this;
 
-    //console.error("Will open chat for action packet: ", actionPacket);
-
     var chatParticipants = actionPacket.u;
     if (!chatParticipants) {
         self.logger.error("actionPacket returned no chat participants: ", chatParticipants);
@@ -195,8 +165,6 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket) {
 };
 
 ChatdIntegration.prototype.apiReq = function(data) {
-    console.error("Api req: ", data);
-
     var $promise = new MegaPromise();
     api_req(data, {
         callback: function(r) {
@@ -342,21 +310,17 @@ ChatdIntegration._waitForShardToBeAvailable = function(fn) {
 
         var chatIdDecoded = base64urldecode(chatRoom.chatId);
         if (!self.chatd.chatidshard[chatIdDecoded]) {
-            //console.error('shard is NOT available, queueing fn exection', fn);
             createTimeoutPromise(function() {
                 return !!self.chatd.chatidshard[chatIdDecoded]
             }, 100, 10000)
                 .done(function() {
-                    //console.error('shard is NOW available, executing queued fn', fn);
                     masterPromise.linkDoneAndFailToResult(fn, self, args);
                 })
                 .fail(function() {
-                    //console.error('waiting for shard failed rejecting call to', fn);
                     masterPromise.reject(arguments)
                 });
         }
         else {
-            //console.error('shard is available, executing immediately.');
             masterPromise.linkDoneAndFailToResult(fn, self, args);
         }
         return masterPromise;
@@ -367,31 +331,21 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
     var self = this;
 
     if (!chatRoom.messagesBuff) {
+        var waitingForPromises = [];
+
+        // retrieve all other user's Cu25519 keys IF needed
+        chatRoom.getParticipants().forEach(function(jid) {
+            var contact = chatRoom.megaChat.getContactFromJid(jid);
+            if (contact && contact.u && !pubCu25519[contact.u]) {
+                waitingForPromises.push(
+                    crypt.getPubCu25519(contact.u)
+                );
+            }
+        });
+
         var strongvelopeInitPromise = createTimeoutPromise(function() {
             return !!u_handle && !!u_privCu25519 && !!u_privEd25519 && !!u_pubEd25519
         }, 50, 5000)
-            .done(function() {
-                // after all dependencies (data) is initialised, lets init the protocol handler
-                assert(u_handle, 'u_handle is not loaded, null or undefined!');
-                assert(u_privCu25519, 'u_privCu25519 is not loaded, null or undefined!');
-                assert(u_privEd25519, 'u_privEd25519 is not loaded, null or undefined!');
-                assert(u_pubEd25519, 'u_pubEd25519 is not loaded, null or undefined!');
-
-                // retrieve all other user's Cu25519 keys IF needed
-                chatRoom.getParticipants().forEach(function(jid) {
-                    var contact = chatRoom.megaChat.getContactFromJid(jid);
-                    if (contact && contact.u && !pubCu25519[contact.u]) {
-                        crypt.getPubCu25519(contact.u);
-                    }
-                });
-
-                chatRoom.protocolHandler = new strongvelope.ProtocolHandler(
-                    u_handle,
-                    u_privCu25519,
-                    u_privEd25519,
-                    u_pubEd25519
-                );
-            })
             .fail(function() {
                 self.logger.error(
                     "Failed to initialise strongvelope protocol handler, because u_* vars were not available in a" +
@@ -399,14 +353,99 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                 );
             });
 
+        waitingForPromises.push(
+            strongvelopeInitPromise
+        );
+
         // try to init immediately
         strongvelopeInitPromise.verify();
 
-        chatRoom.messagesBuff = new MessagesBuff(chatRoom, self);
-        console.error("New MessagesBuff: ", chatRoom);
+        chatRoom.notDecryptedBuffer = {};
 
-        self._retrieveChatdIdIfRequired(chatRoom)
+        chatRoom.messagesBuff = new MessagesBuff(chatRoom, self);
+        $(chatRoom.messagesBuff).rebind('onHistoryFinished.chatd', function() {
+            chatRoom.messagesBuff.messages.forEach(function(v, k) {
+                if(v.userId) {
+                    var msg = v.getContents ? v.getContents() : v.message;
+                    if(msg && msg.length && msg.length > 0) {
+                        msg = base64urldecode(msg);
+                    }
+
+                    chatRoom.notDecryptedBuffer[k] = {
+                        'message': msg,
+                        'userId': v.userId,
+                        'ts': v.delay,
+                        'k': k
+                    };
+                }
+            });
+
+            var hist = [];
+            Object.keys(chatRoom.notDecryptedBuffer).forEach(function(k) {
+                var v = chatRoom.notDecryptedBuffer[k];
+
+                if (v) {
+                    hist.push(v);
+                }
+            });
+            // .seed result is not used in here, since it returns false, even when some messages can be decrypted
+            // which in the current case (of tons of cached non encrypted txt msgs in chatd) is bad
+            chatRoom.protocolHandler.seed(hist);
+
+            var decryptedMsgs = chatRoom.protocolHandler.batchDecrypt(hist, true);
+            decryptedMsgs.forEach(function(v, k) {
+                if (typeof(v) === undefined) {
+                   return; // skip already decrypted messages
+                }
+
+                if(v && v.payload) {
+                    chatRoom.messagesBuff.messages[hist[k]['k']].textContents = v.payload;
+                    delete chatRoom.notDecryptedBuffer[k];
+                } else if(v && !v.payload) {
+                    self.logger.error("Could not decrypt: ", v)
+                }
+            });
+        });
+
+        $(chatRoom.messagesBuff).rebind('onNewMessageReceived.chatdStrongvelope', function(e, msgObject) {
+            if(msgObject.message && msgObject.message.length && msgObject.message.length > 0) {
+                var decrypted = chatRoom.protocolHandler.decryptFrom(
+                    base64urldecode(msgObject.message),
+                    msgObject.userId,
+                    false
+                );
+
+                if (decrypted && decrypted.payload) {
+                    chatRoom.messagesBuff.messages[msgObject.messageId].textContents = decrypted.payload;
+                } else if(decrypted && !decrypted.payload) {
+                    debugger;
+                }
+            }
+        });
+
+        waitingForPromises.push(
+            self._retrieveChatdIdIfRequired(chatRoom)
+        );
+
+        MegaPromise.allDone(
+            waitingForPromises,
+            10000
+        )
             .done(function () {
+                // after all dependencies (data) is initialised, lets init the protocol handler
+                assert(u_handle, 'u_handle is not loaded, null or undefined!');
+                assert(u_privCu25519, 'u_privCu25519 is not loaded, null or undefined!');
+                assert(u_privEd25519, 'u_privEd25519 is not loaded, null or undefined!');
+                assert(u_pubEd25519, 'u_pubEd25519 is not loaded, null or undefined!');
+
+
+                chatRoom.protocolHandler = new strongvelope.ProtocolHandler(
+                    u_handle,
+                    u_privCu25519,
+                    u_privEd25519,
+                    u_pubEd25519
+                );
+
                 self.join(chatRoom);
             });
     }
@@ -425,7 +464,6 @@ ChatdIntegration.prototype.join = function(chatRoom) {
         'missing chatId, chatShard or chadUrl in megaRoom. halting chatd join and code execution.'
     );
 
-    ////console.error("JOINNNN: ", chatRoom.roomJid, chatRoom.chatId, chatRoom.chatShard, chatRoom.chatdUrl);
     self.chatd.join(
         base64urldecode(chatRoom.chatId),
         chatRoom.chatShard,
@@ -443,13 +481,11 @@ ChatdIntegration.prototype.retrieveHistory = function(chatRoom, numOfMessages) {
 
 ChatdIntegration.prototype.markMessageAsSeen = function(chatRoom, msgid) {
     var self = this;
-    //console.error("markMessageAsSeen", chatRoom, msgid);
     self.chatd.cmd(Chatd.Opcode.SEEN, base64urldecode(chatRoom.chatId), Chatd.Const.UNDEFINED + base64urldecode(msgid));
 };
 
 ChatdIntegration.prototype.markMessageAsReceived = function(chatRoom, msgid) {
     var self = this;
-    //console.error("markMessageAsReceived", chatRoom, msgid);
     self.chatd.cmd(Chatd.Opcode.RECEIVED, base64urldecode(chatRoom.chatId), base64urldecode(msgid));
 };
 
@@ -464,11 +500,22 @@ ChatdIntegration.prototype.sendMessage = function(chatRoom, message) {
     // edits and cancellations at that stage must be applied to the locally queued version that gets
     // resent until confirmation and then to the confirmed msgid)
     var self = this;
-    //var destinationUser = chatRoom.megaChat.getContactFromJid(chatRoom.getParticipantsExceptMe()[0]);
-    //assert(destinationUser, 'user/contact not found!');
-    //var ciphertext = base64urlencode(chatRoom.protocolHandler.encryptTo(message, destinationUser.u));
 
-    var ciphertext = message; // TODO: introduce back encryption
+    var destinationUser = chatRoom.megaChat.getContactFromJid(chatRoom.getParticipantsExceptMe()[0]);
+    assert(destinationUser, 'user/contact not found!');
+
+    // is this a new (empty) chat?
+    if (
+        chatRoom.protocolHandler.previousKeyId === null &&
+        chatRoom.protocolHandler.keyId === null
+    ) {
+        // new session, gen key!
+        chatRoom.protocolHandler.updateSenderKey();
+    }
+
+    var result = chatRoom.protocolHandler.encryptTo(message, destinationUser.u);
+
+    var ciphertext = base64urlencode(result);
 
     return self.chatd.submit(base64urldecode(chatRoom.chatId), ciphertext);
 };
@@ -478,10 +525,6 @@ ChatdIntegration.prototype.updateMessage = function(chatRoom, num, newMessage) {
     var self = this;
     self.chatd.modify(base64urldecode(chatRoom.chatId), num, newMessage);
 };
-
-//TODO: msg updated callback
-
-
 
 // decorate ALL functions which require shard to be available before executing
 [
@@ -496,6 +539,7 @@ ChatdIntegration.prototype.updateMessage = function(chatRoom, num, newMessage) {
             ChatdIntegration.prototype[fnName]
         );
     });
+
 
 // decorate ALL functions which require a valid chat ID
 [

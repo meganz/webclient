@@ -11,7 +11,6 @@ var Message = function(chatRoom, messagesBuff, vals) {
         {
             'userId': true,
             'messageId': true,
-            'orderValue': false,
 
             'message': true,
             'textContents': false,
@@ -234,6 +233,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
             //    }
             //});
 
+            $(self).trigger('onHistoryFinished');
             self.trackDataChange();
         }
     });
@@ -262,16 +262,12 @@ var MessagesBuff = function(chatRoom, chatdInt) {
         var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
 
         if (chatRoom.roomJid === self.chatRoom.roomJid) {
-            //console.error("onMessageStore.messagesBuff", self.chatRoom.roomJid, self.isRetrievingHistory, eventData);
-
-
             var msgObject = new Message(chatRoom,
                 self,
                 {
                     'messageId': eventData.messageId,
                     'userId': eventData.userId,
                     'message': eventData.message,
-                    'textContents': eventData.message, // TODO: use encryption to prefill this value!
                     'delay': eventData.ts,
                     'orderValue': eventData.id
                 }
@@ -295,8 +291,6 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                 }
             }
 
-            //console.error(msgObject.messageId, msgObject.userId, constStateToText(Message.STATE, msgObject.state));
-
             self.messages.push(msgObject);
 
             if(!eventData.isNew) {
@@ -314,6 +308,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                 if (eventData.userId !== u_handle) {
                     self.setLastReceived(eventData.messageId);
                 }
+                $(self).trigger('onNewMessageReceived', msgObject);
             }
         }
     });
@@ -336,7 +331,6 @@ var MessagesBuff = function(chatRoom, chatdInt) {
             if (!eventData.id) {
                 debugger;
             }
-            //console.error("Confirmed: ", eventData.id);
 
             var found = false;
 
@@ -349,7 +343,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                             'messageId': eventData.messageId,
                             'userId': u_handle,
                             'message': eventData.message,
-                            'textContents': eventData.message, // TODO: use encryption to prefill this property
+                            'textContents': v.textContents ? v.textContents : "",
                             'delay': v.delay,
                             'orderValue': eventData.id,
                             'sent': true
@@ -427,10 +421,8 @@ MessagesBuff.prototype.setLastReceived = function(msgId) {
     var self = this;
     var targetMsg = Message._mockupNonLoadedMessage(msgId, self.messages[msgId], 0);
     var lastMsg = Message._mockupNonLoadedMessage(self.lastDelivered, self.messages[self.lastDelivered], 999999999);
-    console.error("set last received", msgId);
 
     if (!self.lastDelivered || lastMsg.orderValue < targetMsg.orderValue) {
-        console.error("Would SET last recv: ", lastMsg ? lastMsg.messageId : undefined, targetMsg ? targetMsg.messageId : undefined, msgId, self.lastDelivered);
 
         self.lastDelivered = msgId;
         if (!self.isRetrievingHistory) {
@@ -439,7 +431,7 @@ MessagesBuff.prototype.setLastReceived = function(msgId) {
 
         self.trackDataChange();
     } else {
-        console.error("Would not set last recv: ", lastMsg.messageId, targetMsg.messageId, self.lastDelivered);
+        // its totally normal if this branch of code is executed, just don't do nothing
     }
 };
 
@@ -462,7 +454,7 @@ MessagesBuff.prototype.retrieveChatHistory = function() {
         self.$msgsHistoryLoading = new MegaPromise();
         self.chatdInt.retrieveHistory(
             self.chatRoom,
-            self._currentHistoryPointer
+            -32
         );
 
 

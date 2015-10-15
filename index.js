@@ -4,6 +4,7 @@ var cn_url = false;
 var init_l = true;
 var pfkey = false;
 var pfid = false;
+var pfhandle = false;
 var n_h = false;
 var u_n = false;
 var n_k_aes = false;
@@ -169,23 +170,30 @@ function init_page() {
         dlkey = false;
         var ar = page.substr(1, page.length - 1).split('!');
         if (ar[0]) {
-            dlid = ar[0].replace(/[^a-z^A-Z^0-9^_^-]/g, "");
+            dlid = ar[0].replace(/[^\w-]+/g, "");
         }
         if (ar[1]) {
-            dlkey = ar[1].replace(/[^a-z^A-Z^0-9^_^-]/g, "");
+            dlkey = ar[1].replace(/[^\w-]+/g, "");
         }
     }
 
     if (page.substr(0, 2) == 'F!' && page.length > 2) {
         var ar = page.substr(2, page.length - 1).split('!');
         if (ar[0]) {
-            pfid = ar[0].replace(/[^a-z^A-Z^0-9^_^-]/g, "");
+            pfid = ar[0].replace(/[^\w-]+/g, "");
         }
         if (ar[1]) {
-            pfkey = ar[1].replace(/[^a-z^A-Z^0-9^_^-]/g, "");
+            pfkey = ar[1].replace(/[^\w-]+/g, "");
+        }
+        // TODO: Rename pfid, pfkey, and pfhandle around our codebase
+        if (ar[2]) {
+            pfhandle = ar[2].replace(/[^\w-]+/g, "");
         }
         n_h = pfid;
-        if (pfkey) {
+        if (flhashchange) {
+            // Do nothing.
+        }
+        else if (pfkey) {
             api_setfolder(n_h);
             if (waitxhr) {
                 waitsc();
@@ -198,7 +206,12 @@ function init_page() {
                     location.hash = 'start';
                 });
         }
-        page = 'fm';
+        if (pfhandle) {
+            page = 'fm/' + pfhandle;
+        }
+        else {
+            page = 'fm';
+        }
     }
     else if (!flhashchange) {
         n_h = false;
@@ -211,6 +224,7 @@ function init_page() {
         u_n = false;
         pfkey = false;
         pfid = false;
+        pfhandle = false;
     }
     confirmcode = false;
     pwchangecode = false;

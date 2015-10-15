@@ -1586,10 +1586,13 @@ function MegaData()
                 M.renderPath();
             });
         }
-        // !n_h formely disallowed URL changes while viewing a folderlink
-        // if (!n_h) {
+        // If a folderlink, and entering a new folder.
+        if (pfid && this.currentrootid === this.RootID) {
+            window.location.hash = '#F!' + pfid + '!' + pfkey + '!' + M.currentdirid;
+        }
+        else {
             window.location.hash = '#fm/' + M.currentdirid;
-        // }
+        }
         searchPath();
 
         var sortMenu = new mega.SortMenu();

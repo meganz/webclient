@@ -14,7 +14,7 @@ copyright.updateUI = function() {
 copyright.validateEmail = function(email) {
     var re = /[a-z0-9!#$%&'*+\/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+\/=?^_`{|}~-]+)*@([a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/
     var match = re.exec(email);
-    if (match==null) return false;
+    if (match === null) return false;
 
     return true;
 }
@@ -35,6 +35,7 @@ copyright.getHandles = function(data) {
     {
         if (!handles[id]) handles[id] = 1;
     });
+
     return handles;
 }
 
@@ -48,8 +49,11 @@ copyright.decodeURIm = function(data) {
             break;
         }
     }
-    while (~data.indexOf('%25'))
+
+    while (~data.indexOf('%25')) {
         data = data.replace('%25','%','g');
+    }
+
     return data.replace('%21','!','g');
 }
 

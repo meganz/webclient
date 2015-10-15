@@ -630,8 +630,9 @@ function browserdetails(useragent) {
         browser += ' ' + l[7683];           // Chrome Extension / Firefox Extension
     }
     
+    // Translate "%1 on %2" to "Chrome on Windows"
     if ((os) && (browser)) {
-        name = l[7684].replace('%1', browser).replace('%2', os);    // E.g. Chrome on Windows
+        name = String(l[7684]).replace('%1', browser).replace('%2', os);
     }
     else if (os) {
         name = os;

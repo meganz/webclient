@@ -3287,7 +3287,7 @@ function MegaData()
             }
         }
 
-        if (M.sortingBy[0] === 'fav') {
+        if (M.sortingBy && (M.sortingBy[0] === 'fav')) {
             M.doSort('fav', M.sortingBy[1]);
             M.renderMain();
         }
@@ -5948,7 +5948,7 @@ function processPH(publicHandles) {
             UiExportLink.addExportLinkIcon(nodeId);
         }
 
-        if (!!value.down) {
+        if (value.down !== undefined) {
             UiExportLink.updateTakenDownItem(nodeId, value.down);
         }
     });
@@ -7006,7 +7006,7 @@ function balance2pro(callback)
             if (M.d[nodeId].fav === 1) {
 
                 // Remove favourite (star)
-                M.favourite(nodeId, true);
+                M.favourite([nodeId], true);
             }
             self.addTakenDownIcon(nodeId);
         }
@@ -7049,7 +7049,7 @@ function balance2pro(callback)
         $('.grid-table.fm #' + nodeId).removeClass('taken-down');
 
         // Add taken-down to block view
-        $('#' + nodeId + '.file-block').removelass('taken-down');
+        $('#' + nodeId + '.file-block').removeClass('taken-down');
 
         // Add taken-down to left panel
         $('#treea_' + nodeId).removeClass('taken-down');

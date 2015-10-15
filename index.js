@@ -200,7 +200,7 @@ function init_page() {
         }
         page = 'fm';
     }
-    else {
+    else if (!flhashchange) {
         n_h = false;
         if (u_sid) {
             api_setsid(u_sid);
@@ -815,7 +815,7 @@ function init_page() {
                 $('.fm-menu-item').hide();
             }
         }
-        else if (!pfid && id && id !== M.currentdirid) {
+        else if ((!pfid || flhashchange) && id && id !== M.currentdirid) {
             M.openFolder(id);
         }
         else {
@@ -908,6 +908,7 @@ function init_page() {
     }
     topmenuUI();
     loggedout = false;
+    flhashchange = false;
 }
 
 var avatars = {};
@@ -1883,7 +1884,6 @@ window.onhashchange = function() {
     else {
         init_page();
     }
-    flhashchange = false;
 };
 
 window.onbeforeunload = function () {

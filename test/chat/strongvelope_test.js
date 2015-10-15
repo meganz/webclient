@@ -320,22 +320,25 @@ describe("chat.strongvelope unit test", function() {
                 // The attribute `keys` just needs to be there to avoid an exception.
                 var history = [
                     { userId: 'me3456789xw', ts: 1444255633, type: ns.MESSAGE_TYPES.GROUP_KEYED,
-                      recipients: ['you456789xw'], keyIds: ['AI01'], keys: [] },
+                      recipients: ['you456789xw'], keyIds: ['AI01'], keys: [], message: 'payload 0' },
                     { userId: 'me3456789xw', ts: 1444255634, type: ns.MESSAGE_TYPES.GROUP_FOLLOWUP,
-                      keyIds: ['AI01'] },
+                      keyIds: ['AI01'], message: 'payload 1' },
                     { userId: 'you456789xw', ts: 1444255635, type: ns.MESSAGE_TYPES.GROUP_FOLLOWUP,
-                      keyIds: ['AIf1'] },
+                      keyIds: ['AIf1'], message: 'payload 2' },
                     { userId: 'me3456789xw', ts: 1444255636, type: ns.MESSAGE_TYPES.GROUP_KEYED,
-                      recipients: ['you456789xw'], keyIds: ['AI02', 'AI01'], keys: [] },
+                      recipients: ['you456789xw'], keyIds: ['AI02', 'AI01'], keys: [], message: 'payload 3' },
                     { userId: 'you456789xw', ts: 1444255637, type: ns.MESSAGE_TYPES.GROUP_FOLLOWUP,
-                      keyIds: ['AIf1'] },
+                      keyIds: ['AIf1'], message: 'payload 4' },
                     { userId: 'you456789xw', ts: 1444255638, type: ns.MESSAGE_TYPES.GROUP_FOLLOWUP,
-                      keyIds: ['AIf1'] },
+                      keyIds: ['AIf1'], message: 'payload 5' },
                     { userId: 'you456789xw', ts: 1444255639, type: ns.MESSAGE_TYPES.GROUP_KEYED,
-                      recipients: ['me3456789xw'], keyIds: ['AIf2', 'AIf1'], keys: [] },
+                      recipients: ['me3456789xw'], keyIds: ['AIf2', 'AIf1'], keys: [], message: 'payload 6' },
                 ];
                 sandbox.stub(ns, '_verifyMessage').returns(true);
-                sandbox.stub(ns, '_parseMessageContent', _echo);
+                sandbox.stub(ns, '_parseMessageContent', function(payload) {
+                    // Wedge the message from the history back in there.
+                    return history[payload.substring(8)];
+                });
                 var handler = new ns.ProtocolHandler('me3456789xw',
                     CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
                 handler._decryptKeysFor = sinon.stub().returns(['foo', 'bar']);
@@ -345,6 +348,7 @@ describe("chat.strongvelope unit test", function() {
                 assert.ok(handler.participantKeys['me3456789xw'].hasOwnProperty('AI02'));
                 assert.ok(handler.participantKeys['you456789xw'].hasOwnProperty('AIf1'));
                 assert.ok(handler.participantKeys['you456789xw'].hasOwnProperty('AIf2'));
+                assert.typeOf(ns._parseMessageContent.args[0][0], 'string');
             });
         });
 
@@ -360,7 +364,7 @@ describe("chat.strongvelope unit test", function() {
                     handler.participantKeys = participantKeys;
                 });
 
-                var result = handler.seed(history);
+                var result = handler.seed(['dummy']);
                 assert.strictEqual(result, true);
                 assert.strictEqual(handler.keyId, 'AI02');
                 assert.strictEqual(handler.previousKeyId, 'AI01');

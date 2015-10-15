@@ -19,6 +19,40 @@ copyright.validateEmail = function(email) {
     return true;
 }
 
+// Validate that the user has entered a link that is, or can be easily turned into, a valid MEGA link
+copyright.validateUrl = function(url) {
+    url = copyright.decodeURIm(url);
+    handles = copyright.getHandles(url);
+    return Object.keys(handles).length;
+}
+
+// Find any valid or semi-valid MEGA link handles from the data
+copyright.getHandles = function(data) {
+    var handles = {};
+    var p = /.(?:F?!|\w+\=)([\w-]{8})(?:!([\w-]+))?\b/gi;
+
+    (data.replace(/<\/?\w[^>]+>/g,'').replace(/\s+/g,'')+data).replace(p,function(a,id,key)
+    {
+        if (!handles[id]) handles[id] = 1;
+    });
+    return handles;
+}
+
+// Iteratively remove any %% stuff from the data
+copyright.decodeURIm = function(data) {
+    for (var lmt = 7 ; --lmt && /%[a-f\d]{2}/i.test(data) ; )
+    {
+        try {
+            data = decodeURIComponent(data);
+        } catch(e) {
+            break;
+        }
+    }
+    while (~data.indexOf('%25'))
+        data = data.replace('%25','%','g');
+    return data.replace('%21','!','g');
+}
+
 // Store the complainant details so they don't have to type them in next time
 copyright.saveCopyrightOwnerValues = function()
 {
@@ -67,7 +101,7 @@ copyright.init_cn = function() {
             '<div class="new-affiliate-star"></div>@@</div>' +
             '<div class="clear"></div>' +
             '<div class="affiliate-input-block">' +
-                '<input type="text" class="contenturl" value="https://">' +
+                '<input type="text" class="contenturl" value="">' +
             '</div>' +
             '<div class="new-affiliate-label">' +
                 '<div class="new-affiliate-star"></div>@@' +
@@ -102,6 +136,17 @@ copyright.init_cn = function() {
                     msgDialog('warninga', l[135], escapeHTML(l[659]));
                     return false;
                 }
+
+                if (!copyright.validateUrl($(e).val())) {
+                    proceed = false;
+                    msgDialog('warninga', l[135], escapeHTML(l[7686]));
+                    $(e).css("color", "red");
+                    $(e).click(function(){$(e).css("color", "#858585");});
+                    return false;
+                }
+
+                $(e).css("color", "#858585");
+
             });
             if (proceed && !$('.cn_check1 .checkinput').attr('checked')) {
                 msgDialog('warninga', l[135], escapeHTML(l[665]));

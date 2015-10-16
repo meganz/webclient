@@ -63,7 +63,9 @@
         
         localStorage.allowBreakpointsOnReload = 1;
         
-        window.location = '../';        
+        // Retain current hash on redirect so you can give a test link to the direct page e.g.
+        // https://beta.developers.mega.co.nz/updated-credentials-dialog/dont-deploy/sandbox3.html?apipath=prod#pro
+        window.location = '../' + location.hash;          
     </script>
 </head>
 <body>

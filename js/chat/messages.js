@@ -284,11 +284,9 @@ var MessagesBuff = function(chatRoom, chatdInt) {
             }
 
             // is my own message?
-            if (!eventData.isNew) {
-                // mark as sent, since the msg was echoed from the server
-                if (eventData.userId === u_handle) {
-                    msgObject.sent = true;
-                }
+            // mark as sent, since the msg was echoed from the server
+            if (eventData.userId === u_handle) {
+                msgObject.sent = true;
             }
 
             self.messages.push(msgObject);
@@ -317,7 +315,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
         var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
 
         if (chatRoom.roomJid === self.chatRoom.roomJid) {
-            self.retrieveChatHistory();
+            self.retrieveChatHistory(true);
         }
     });
 
@@ -443,14 +441,17 @@ MessagesBuff.prototype.messagesHistoryIsLoading = function() {
         ) || self.chatdIsProcessingHistory;
 };
 
-MessagesBuff.prototype.retrieveChatHistory = function() {
+MessagesBuff.prototype.retrieveChatHistory = function(isInitialRetrivalCall) {
     var self = this;
 
     if (self.messagesHistoryIsLoading()) {
         return self.$msgsHistoryLoading;
     } else {
         self.chatdIsProcessingHistory = true;
-        self._currentHistoryPointer -= 32;
+        if (!isInitialRetrivalCall) {
+            self._currentHistoryPointer -= 32;
+        }
+
         self.$msgsHistoryLoading = new MegaPromise();
         self.chatdInt.retrieveHistory(
             self.chatRoom,
@@ -470,7 +471,9 @@ MessagesBuff.prototype.retrieveChatHistory = function() {
 
         self.$msgsHistoryLoading.fail(function() {
             console.error("HIST FAILED: ", arguments);
-            self._currentHistoryPointer += 32;
+            if (!isInitialRetrivalCall) {
+                self._currentHistoryPointer += 32;
+            }
         });
 
 

@@ -160,13 +160,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, cha
                     }
                 });
         } else if (newState === ChatRoom.STATE.READY) {
-            if (self.encryptionHandler && self.encryptionHandler.state === mpenc.handler.STATE.READY) {
-                if (self._mpencFailedDialog) {
-                    self._mpencFailedDialog.remove();
-                    delete self._mpencFailedDialog;
-                }
-                self._flushMessagesQueue();
-            }
+            self._flushMessagesQueue();
         }
     });
 
@@ -1217,7 +1211,10 @@ ChatRoom.prototype._flushMessagesQueue = function() {
                 return; //continue;
             }
 
-            self._sendMessageToTransport(v);
+            self._sendMessageToTransport(v)
+                .done(function(internalId) {
+                    v.internalId = internalId;
+                });
         });
         self._messagesQueue = [];
 

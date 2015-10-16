@@ -1,7 +1,3 @@
-var chatd = false; // chat root
-
-//TODO: LP: remove any global references to ^^^ chatd
-
 // chatd interface
 var Chatd = function(userid, options) {
     var self = this;
@@ -29,30 +25,28 @@ var Chatd = function(userid, options) {
 
     self.options = $.extend({}, Chatd.DEFAULT_OPTIONS, options);
 
-
-    var self = this;
-    // debug mode
-    [
-        'onMessageUpdated',
-        'onMessageConfirm',
-        'onMessageReject',
-        'onMessageCheck',
-        'onMessageModify',
-        'onMessageStore',
-        'onMessageSeen',
-        'onMessageLastSeen',
-        'onMessageReceived',
-        'onMessageLastReceived',
-        'onRetentionChanged',
-        'onMessagesHistoryInfo',
-        'onMembersUpdated',
-        'onMessagesHistoryDone',
-        'onMessagesHistoryRequest',
-    ].forEach(function(evt) {
-            self.rebind(evt + '.chatd', function(e) {
-                console.error(evt, JSON.stringify(arguments[1]));
-            });
-    });
+    //// debug mode
+    //[
+    //    'onMessageUpdated',
+    //    'onMessageConfirm',
+    //    'onMessageReject',
+    //    'onMessageCheck',
+    //    'onMessageModify',
+    //    'onMessageStore',
+    //    'onMessageSeen',
+    //    'onMessageLastSeen',
+    //    'onMessageReceived',
+    //    'onMessageLastReceived',
+    //    'onRetentionChanged',
+    //    'onMessagesHistoryInfo',
+    //    'onMembersUpdated',
+    //    'onMessagesHistoryDone',
+    //    'onMessagesHistoryRequest',
+    //].forEach(function(evt) {
+    //        self.rebind(evt + '.chatd', function(e) {
+    //            console.error(evt, JSON.stringify(arguments[1]));
+    //        });
+    //});
 };
 
 makeObservable(Chatd);
@@ -254,7 +248,8 @@ Chatd.Shard.prototype.disconnect = function() {
 };
 
 Chatd.Shard.prototype.cmd = function(opcode, cmd) {
-    console.error("CMD SENT: ", constStateToText(Chatd.Opcode, opcode), cmd);
+    //console.error("CMD SENT: ", constStateToText(Chatd.Opcode, opcode), cmd);
+
     this.cmdq += String.fromCharCode(opcode)+cmd;
 
     if (this.isOnline()) {

@@ -241,6 +241,9 @@ var ConversationMessage = React.createClass({
             else if (message.getState() === Message.STATE.DELETED) {
                 labelClass += " deleted";
                 labelText = "deleted";
+            } else {
+                labelClass += " not-sent";
+                labelText = "not sent"
             }
 
             messageLabel = <span className={labelClass}>{labelText}</span>

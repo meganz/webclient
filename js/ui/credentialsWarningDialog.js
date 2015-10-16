@@ -106,17 +106,24 @@
                 enableVerifyFingerprintsButton();
             }
             
-            // 
+            // Change to verify details
             $dialog.find('.previousCredentials').hide();
-            $dialog.find('.newCredentials .title').addClass('reset').html('New credentials');
-            $dialog.find('.newCredentials .fingerprint span').removeClass('mismatch');
-            $dialog.find('.resetCredentials .title').html('Verify credentials');
-            $dialog.find('.resetCredentials .description').html('Use the verify button below to confirm the credentials for this contact.');
+            $dialog.find('.newCredentials').hide();
+            $dialog.find('.resetCredentials').hide();
             
+            // Show verify details
+            $dialog.find('.postResetCredentials').show();
+            $dialog.find('.verifyCredentials').show();
+            
+            var $newCredentials = $dialog.find('.newCredentials .fingerprint').clone().removeClass('mismatch');            
+            $dialog.find('.postResetCredentials .fingerprint').html($newCredentials.html());
             
             // Hide the current Reset button and show the Verify contact one
             $(this).addClass('hidden');
             $dialog.find('.verify-contact-button').removeClass('hidden');
+            
+            // Reposition dialog
+            CredentialsWarningDialog._instance.reposition();
         });
         
         // Button to view the verification dialog

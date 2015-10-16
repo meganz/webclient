@@ -23272,7 +23272,8 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 	margin: 12px 0;
 }
 .credentials-warning-dialog .fm-mega-dialog-bottom {
-	margin: 12px 0 -12px;
+    background-color: #eee;
+    margin: 0 0 -12px;
 }
 .credentials-warning-dialog {
     background-color: #fff;
@@ -23280,10 +23281,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
     z-index: 1101;
 }
 .credentials-warning-dialog .content {
-	color: #999999;
-	font-size: 13px;
-	line-height: 20px;
-	padding-bottom: 10px;
+    color: #999999;
+    font-size: 13px;
+    line-height: 20px;
 }
 .credentials-warning-dialog .avatarAndWarningMessage {
 	margin: 0 20px;
@@ -23322,14 +23322,18 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 	color: #000;
 	font-weight: bold;
 }
-.credentials-warning-dialog .previousCredentials .fingerprint, .credentials-warning-dialog .newCredentials .fingerprint {
+.credentials-warning-dialog .previousCredentials .fingerprint,
+.credentials-warning-dialog .newCredentials .fingerprint,
+.credentials-warning-dialog .postResetCredentials .fingerprint {
     font-family: monospace;
     font-size: 14px;
     margin-left: -4px;
     margin-top: 10px;
     text-transform: uppercase;
 }
-.credentials-warning-dialog .previousCredentials .fingerprint > span, .credentials-warning-dialog .newCredentials .fingerprint > span {
+.credentials-warning-dialog .previousCredentials .fingerprint > span,
+.credentials-warning-dialog .newCredentials .fingerprint > span,
+.credentials-warning-dialog .postResetCredentials .fingerprint > span {
 	display: inline-block;
 	text-align: center;
 	width: 44px;
@@ -23338,6 +23342,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 	color: #D90007;
 }
 .credentials-warning-dialog .newCredentials {
+    background-color: #fafafa;
     padding: 20px;
 }
 .credentials-warning-dialog .newCredentials .title {
@@ -23348,7 +23353,8 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
     color: #000;
 }
 .credentials-warning-dialog .resetCredentials {
-    padding: 20px 20px 0;
+    background-color: #fafafa;
+    padding: 20px;
 }
 .credentials-warning-dialog .resetCredentials .title {
     color: #000;
@@ -23368,18 +23374,26 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 .credentials-warning-dialog .resetCredentials .reset-credentials-button.hidden {
     display: none;
 }
-.credentials-warning-dialog .resetCredentials .verify-contact-button {
+.credentials-warning-dialog .verifyCredentials {
+    background-color: #fafafa;
+    padding: 20px;
+}
+.credentials-warning-dialog .verifyCredentials .verify-contact-button {
     display: inline-block;
     float: none;
     margin-left: -3px;
 }
-.credentials-warning-dialog .resetCredentials .verify-contact-button span {
+.credentials-warning-dialog .verifyCredentials .verify-contact-button span {
     background-image: url("../images/mega/shared-sprite_v3.svg");
     background-position: -4px -739px;
     text-indent: 19px;
 }
-.credentials-warning-dialog .resetCredentials .verify-contact-button.hidden {
+.credentials-warning-dialog .verifyCredentials .verify-contact-button.hidden {
     display: none;
+}
+.credentials-warning-dialog .postResetCredentials {
+    background-color: #fafafa;
+    padding: 20px;
 }
 .credentials-warning-dialog .instruction {
 	padding: 3px 20px;

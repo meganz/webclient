@@ -1444,12 +1444,14 @@
                         correct with your contact through an existing secure channel or in person.
                     </div>
                 </div>
+                
+                <!-- Step 1 -->
                 <div class="previousCredentials">
                     <div class="title">[$6883]:</div>
                     <div class="fingerprint"></div>
                 </div>
                 <div class="newCredentials">
-                    <div class="title">[$6858]</div>
+                    <div class="title">[$6858]:</div>
                     <div class="fingerprint"></div>
                 </div>
                 <div class="resetCredentials">
@@ -1460,16 +1462,21 @@
                     <div class="fm-dialog-button fm-dialog-button-green reset-credentials-button">
                         <span>Reset</span>
                     </div>
-                    <div class="fm-dialog-button fm-dialog-button-green verify-contact-button hidden">
+                </div>
+                
+                <!-- Step 2 -->
+                <div class="postResetCredentials hidden">
+                    <div class="title">New credentials:</div>
+                    <div class="fingerprint"></div>
+                </div>
+                <div class="verifyCredentials hidden">
+                    <div class="title">Verify credentials</div>
+                    <div class="description">
+                        Use the verify button below to confirm the credentials for this contact.
+                    </div>
+                    <div class="fm-dialog-button fm-dialog-button-green verify-contact-button">
                         <span>[$1960]</span>
                     </div>
-                    <!--
-                    
-                        and click Verify. After attempting to verify and you still cannot verify 
-                        the identification credentials for your contact you should not share 
-                        files or call this person or you risk an attacker intercepting your private 
-                        files or conversation.
-                    -->
                 </div>
             </div>
         </div>

@@ -13280,12 +13280,6 @@ table {
 	padding-left: 5px;
 	padding-right: 5px;
 }
-.grid-table.sessions th.session-status {
-	width: 149px;
-}
-.grid-table.sessions th.logout-column {
-	width: 10%;
-}
 .grid-table.sessions th.no-border {
 	background: none;
 }

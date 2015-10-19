@@ -552,12 +552,15 @@ function removeHash() {
 }
 
 function browserdetails(useragent) {
+    
     useragent = useragent || navigator.userAgent;
     useragent = (' ' + useragent).toLowerCase();
+    
     var os = false;
     var browser = false;
     var icon = '';
     var name = '';
+    
     if (useragent.indexOf('android') > 0) {
         os = 'Android';
     }
@@ -603,6 +606,7 @@ function browserdetails(useragent) {
     }
     else if (useragent.indexOf('chrome') > 0) {
         browser = 'Chrome';
+        icon = 'chrome.png';
     }
     else if (useragent.indexOf('safari') > 0) {
         browser = 'Safari';
@@ -612,6 +616,7 @@ function browserdetails(useragent) {
     }
     else if (useragent.indexOf('firefox') > 0) {
         browser = 'Firefox';
+        icon = 'firefox.png';
     }
     else if (useragent.indexOf('thunderbird') > 0) {
         browser = 'Thunderbird';
@@ -623,8 +628,10 @@ function browserdetails(useragent) {
             || "ActiveXObject" in window) {
         browser = 'Internet Explorer';
     }
+    
+    // Translate "%1 on %2" to "Chrome on Windows"
     if ((os) && (browser)) {
-        name = browser + ' on ' + os;
+        name = String(l[7684]).replace('%1', browser).replace('%2', os);
     }
     else if (os) {
         name = os;
@@ -645,14 +652,20 @@ function browserdetails(useragent) {
             icon = browser.toLowerCase() + '.png';
         }
     }
-    var browserdetails = {};
-    browserdetails.name = name;
-    browserdetails.icon = icon;
-    browserdetails.os = os || '';
-    browserdetails.browser = browser;
+    
+    var browserDetails = {};
+    browserDetails.name = name;
+    browserDetails.icon = icon;
+    browserDetails.os = os || '';
+    browserDetails.browser = browser;
+    
     // Determine if the OS is 64bit
-    browserdetails.is64bit = /\b(WOW64|x86_64|Win64|intel mac os x 10.(9|\d{2,}))/i.test(useragent);
-    return browserdetails;
+    browserDetails.is64bit = /\b(WOW64|x86_64|Win64|intel mac os x 10.(9|\d{2,}))/i.test(useragent);
+    
+    // Determine if using a browser extension
+    browserDetails.isExtension = (useragent.indexOf('megext') > -1) ? true : false;
+    
+    return browserDetails;
 }
 
 function countrydetails(isocode) {

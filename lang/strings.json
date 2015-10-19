@@ -10922,5 +10922,13 @@
     "7682": {
         "text": "MEGA recommends sending the 'Decryption Key' separately from the 'Folder\/File Link'.",
         "context": "This is used in the Export\/Get Link menu option to explain the best method for sending the two separate parts of the full link."
+    },
+    "7683": {
+        "text": "Extension",
+        "context": "This refers to either our Firefox Extension or Chrome Extension."
+    },
+    "7684": {
+        "text": "%1 on %2",
+        "context": "This is used as a session description to show a browser on an operating system platform, e.g. 'Firefox on Windows' or 'Chrome on Linux\". Only the word 'on' needs translation, please keep %1 and %2.\r\n"
     }
 }

@@ -2729,5 +2729,7 @@
     "7679": "Devam etmek i\u00e7in bir MEGA hesab\u0131n\u0131z olmas\u0131 gerekir.",
     "7680": "MEGA's cryptographic model depends on the keys displayed above. We recommend sending the decryption keys separately from the folder\/file link, through a secure channel.",
     "7681": "Klas\u00f6r\/Dosya Ba\u011flant\u0131s\u0131",
-    "7682": "MEGA recommends sending the 'Decryption Key' separately from the 'Folder\/File Link'."
+    "7682": "MEGA recommends sending the 'Decryption Key' separately from the 'Folder\/File Link'.",
+    "7683": "Extension",
+    "7684": "%1 on %2"
 }

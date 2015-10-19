@@ -23429,8 +23429,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 	margin: 12px 0 -12px;
 }
 .key-signature-warning-dialog {
-	background-color: #fff;
-	width: 600px;
+    background-color: #fff;
+    width: 600px;
+    z-index: 1101;
 }
 .key-signature-warning-dialog .content {
 	color: #999999;

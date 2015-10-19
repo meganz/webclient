@@ -163,9 +163,6 @@ var crypt = (function () {
      * @return {int}
      *     Authentication record, null if not recorded, and false
      *     if fingerprint verification fails.
-     * @throws {Error}
-     *     In case the fingerprint of the public key differs from the one
-     *     previously authenticated by the user.
      */
     ns._getPubKeyAuthentication = function(userhandle, keyType) {
         var recorded = authring.getContactAuthenticated(userhandle, keyType);

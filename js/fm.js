@@ -728,6 +728,7 @@ function initUI() {
                 'conversations':  { root: 'chat',      prev: null },
                 'contacts':       { root: 'contacts',  prev: null },
                 'transfers':      { root: 'transfers', prev: null },
+                'settings':       { root: 'settings',  prev: null },
                 'inbox':          { root: M.InboxID,   prev: null },
                 'rubbish-bin':    { root: M.RubbishID, prev: null }
             };
@@ -742,10 +743,23 @@ function initUI() {
         if (activeTab) {
             if (activeTab.root === M.currentrootid) {
                 activeTab.prev = M.currentdirid;
+                M.lastActiveTab = activeClass;
             }
             else if (d) {
                 console.warn('Root mismatch', M.currentrootid, M.currentdirid, activeTab);
             }
+        }
+
+        if ($(this).hasClass('settings')) {
+            if (u_type === 0) {
+                ephemeralDialog(l[7687]);
+            }
+            else {
+                $('.nw-fm-left-icon').removeClass('active');
+                $('.nw-fm-left-icon.settings').addClass('active');
+                document.location.hash = 'fm/account/settings';
+            }
+            return false;
         }
 
         for (var tab in fmTabState) {
@@ -5682,16 +5696,6 @@ function transferPanelUI()
         }
     };
 
-    $('.nw-fm-left-icon.settings .settings-icon').rebind('click', function() {
-        if (u_type === 0) {
-            ephemeralDialog('Transfer settings are for registered users only.');
-        }
-        else {
-            $('.nw-fm-left-icon').removeClass('active');
-            $('.nw-fm-left-icon.settings').addClass('active');
-            document.location.hash = 'fm/account/settings';
-        }
-    });
     $('.transfer-clear-all-icon').rebind('click', function() {
         if (!$(this).hasClass('disabled')) {
             msgDialog('confirmation', 'clear all transfers', l[7225], '', function(e) {
@@ -8618,7 +8622,7 @@ function getclipboardkeys() {
  * @param {String} notification The text for the toast notification
  */
 function showToast(toastClass, notification) {
-    
+
     var $toast, interval;
 
     $toast = $('.toast-notification.common-toast');
@@ -9222,11 +9226,10 @@ function propertiesDialog(close)
         +'<div class="propreties-dark-txt t11">' + p.t11 + '</div></div></div>';
     $('.properties-txt-pad').html(html);
 
-	if (typeof(p.t10) == 'undefined' && typeof(p.t11) == 'undefined')
-	{
-		$('.properties-small-gray.t10').addClass('hidden');
-		$('.propreties-dark-txt.t11').addClass('hidden');
-	}
+    if (typeof(p.t10) === 'undefined' && typeof(p.t11) === 'undefined') {
+        $('.properties-small-gray.t10').addClass('hidden');
+        $('.propreties-dark-txt.t11').addClass('hidden');
+    }
 
     pd.find('.file-settings-icon').rebind('click context', function(e) {
         if ($(this).attr('class').indexOf('active') == -1) {
@@ -10417,17 +10420,17 @@ function FMResizablePane(element, opts) {
  * @param {String} elementId The name of the id
  */
 function selectText(elementId) {
-    
+
     var range, selection;
     var text = document.getElementById(elementId);
-    
+
     if (document.body.createTextRange) {
         range = document.body.createTextRange();
         range.moveToElementText(text);
         range.select();
     }
     else if (window.getSelection) {
-        selection = window.getSelection();        
+        selection = window.getSelection();
         range = document.createRange();
         range.selectNodeContents(text);
         selection.removeAllRanges();
@@ -10720,6 +10723,10 @@ function removeFromMultiInputDDL(dialog, item) {
                 menu = $('.nw-sorting-menu').removeClass('hidden');
                 type = treePanelType();
 
+                if (type === 'settings') {
+                    type = M.lastActiveTab || 'cloud-drive';
+                }
+
                 // Show all items in sort dialog in case contacts tab is choosen
                 if (type === 'contacts') {
                     menu.find('.sorting-item-divider,.sorting-menu-item').removeClass('hidden');
@@ -10759,7 +10766,11 @@ function removeFromMultiInputDDL(dialog, item) {
                 data = $self.data(),
                 type = treePanelType();
 
-            if ($self.attr('class').indexOf('active') === -1) {
+            if (type === 'settings') {
+                type = M.lastActiveTab || 'cloud-drive';
+            }
+
+            if (!$self.hasClass('active') && $.sortTreePanel[type]) {
                 $self.parent().find('.sorting-menu-item').removeClass('active');
                 $self.addClass('active');
                 $('.nw-sorting-menu').addClass('hidden');

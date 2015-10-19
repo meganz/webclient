@@ -339,6 +339,7 @@
     "738": "\u05d1\u05e7\u05e9",
     "739": "\u05e9\u05db\u05d7\u05ea \u05d0\u05ea \u05e1\u05d9\u05e1\u05de\u05ea\u05da?",
     "741": "\u05d0\u05e0\u05d0 \u05d1\u05d7\u05e8 \u05e1\u05d9\u05e1\u05de\u05d4 \u05d1\u05d8\u05d5\u05d7\u05d4 \u05d7\u05d3\u05e9\u05d4.",
+    "742": "\u05d0\u05e4\u05e1",
     "746": "\u05e1\u05d5\u05d2 \u05d7\u05d1\u05e8\u05d5\u05ea",
     "748": "\u05d7\u05d5\u05d3\u05e9\u05d9",
     "749": "\u05e9\u05e0\u05ea\u05d9",
@@ -2732,6 +2733,13 @@
     "7682": "MEGA \u05de\u05de\u05dc\u05d9\u05e6\u05d4 \u05dc\u05e9\u05dc\u05d5\u05d7 \u05d0\u05ea '\u05de\u05e4\u05ea\u05d7 \u05d4\u05e4\u05e2\u05e0\u05d5\u05d7' \u05d1\u05e0\u05e4\u05e8\u05d3 \u05de-'\u05e7\u05d9\u05e9\u05d5\u05e8 \u05e7\u05d5\u05d1\u05e5\/\u05ea\u05d9\u05e7\u05d9\u05d9\u05d4'.",
     "7683": "\u05d4\u05e8\u05d7\u05d1\u05d4",
     "7684": "%1 \u05d1-%2",
-    "7685": "I hereby state that I have a good faith belief that the use of copyrighted material in the manner complained of and located at the location above is not authorized by the copyright owner, its agent, or the law (e.g., as a fair use).",
-    "7686": "One of the links you have provided is not a valid MEGA link."
+    "7685": "\u05d0\u05e0\u05d9 \u05de\u05db\u05e8\u05d9\u05d6 \u05d1\u05d9\u05d3\u05d9\u05e2\u05d4 \u05e9\u05dc\u05de\u05d4, \u05db\u05d9 \u05d4\u05e9\u05d9\u05de\u05d5\u05e9 \u05d1\u05d7\u05d5\u05de\u05e8 \u05d4\u05e9\u05de\u05d5\u05e8 \u05e2\u05dc \u05d9\u05d3\u05d9 \u05d6\u05db\u05d5\u05d9\u05d5\u05ea \u05d4\u05d9\u05d5\u05e6\u05e8\u05d9\u05dd \u05d1\u05de\u05e7\u05d5\u05dd \u05d1\u05d5 \u05de\u05e6\u05d5\u05d9\u05df \u05dc\u05e2\u05d9\u05dc, \u05d0\u05d9\u05e0\u05e0\u05d5 \u05de\u05d0\u05d5\u05e9\u05e8 \u05e2\u05dc \u05d9\u05d3\u05d9 \u05d1\u05e2\u05dc \u05d6\u05db\u05d5\u05d9\u05d5\u05ea \u05d4\u05d9\u05d5\u05e6\u05e8\u05d9\u05dd, \u05e1\u05d5\u05db\u05e0\u05d5 \u05d0\u05d5 \u05d4\u05d7\u05d5\u05e7. ",
+    "7686": "\u05d0\u05d7\u05d3 \u05de\u05d4\u05e7\u05d9\u05e9\u05d5\u05e8\u05d9\u05dd \u05e9\u05d4\u05d1\u05d0\u05ea \u05d0\u05d9\u05e0\u05d5 \u05e7\u05d9\u05e9\u05d5\u05e8 \u05ea\u05e7\u05d9\u05df \u05e9\u05dc MEGA. ",
+    "7687": "\u05d4\u05d2\u05d3\u05e8\u05d5\u05ea \u05d4\u05e2\u05d1\u05e8\u05d4 \u05d4\u05df \u05e2\u05d1\u05d5\u05e8 \u05de\u05e9\u05ea\u05de\u05e9\u05d9\u05dd \u05e8\u05e9\u05d5\u05de\u05d9\u05dd \u05d1\u05dc\u05d1\u05d3.",
+    "7688": "There may be a man-in-the-middle attack in progress. Please reset the stored identification credentials for this contact and then verify that they are correct with your contact through an existing secure channel or in person.",
+    "7689": "Reset contact credentials",
+    "7690": "Use the reset button below to reset the credentials for this contact.",
+    "7691": "New contact credentials",
+    "7692": "Verify credentials",
+    "7693": "Use the Verify button below to confirm the credentials for this contact."
 }

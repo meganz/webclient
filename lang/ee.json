@@ -339,6 +339,7 @@
     "738": "N\u00f5uan",
     "739": "unustasite oma parooli?",
     "741": "Palun valige uus turvaline parool.",
+    "742": "L\u00e4htesta",
     "746": "Liikme t\u00fc\u00fcp",
     "748": "Iga kuu",
     "749": "Iga aasta",
@@ -2732,6 +2733,13 @@
     "7682": "MEGA soovitab saatmisel eraldada 'Dekr\u00fcptimise v\u00f5tme' 'Kausta\/faili lingist'.",
     "7683": "Laiendus",
     "7684": "%1 %2il",
-    "7685": "I hereby state that I have a good faith belief that the use of copyrighted material in the manner complained of and located at the location above is not authorized by the copyright owner, its agent, or the law (e.g., as a fair use).",
-    "7686": "One of the links you have provided is not a valid MEGA link."
+    "7685": "Siinkohal kinnitan, et kaebuses ja \u00fclalmainitud asukohas oleva autori\u00f5igustega materjali omanik, esindaja v\u00f5i seadus (nt lubatud kasutada) pole lubanud  selle avaldamist siin keskkonnas.",
+    "7686": "\u00dcks linkidest ei \u00fchti MEGA formaadiga.",
+    "7687": "Edastuse seadeid n\u00e4evad vaid registreeritud kasutajad.",
+    "7688": "There may be a man-in-the-middle attack in progress. Please reset the stored identification credentials for this contact and then verify that they are correct with your contact through an existing secure channel or in person.",
+    "7689": "Reset contact credentials",
+    "7690": "Use the reset button below to reset the credentials for this contact.",
+    "7691": "New contact credentials",
+    "7692": "Verify credentials",
+    "7693": "Use the Verify button below to confirm the credentials for this contact."
 }

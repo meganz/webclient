@@ -339,6 +339,7 @@
     "738": "Y\u00eau c\u1ea7u",
     "739": "qu\u00ean m\u1eadt kh\u1ea9u?",
     "741": "Xin ch\u1ecdn m\u1ed9t m\u1eadt kh\u1ea9u an to\u00e0n m\u1edbi.",
+    "742": "Kh\u00f4i ph\u1ee5c",
     "746": "Lo\u1ea1i th\u00e0nh vi\u00ean",
     "748": "H\u00e0ng th\u00e1ng",
     "749": "H\u00e0ng n\u0103m",
@@ -2733,5 +2734,12 @@
     "7683": "Extension",
     "7684": "%1 cho %2",
     "7685": "I hereby state that I have a good faith belief that the use of copyrighted material in the manner complained of and located at the location above is not authorized by the copyright owner, its agent, or the law (e.g., as a fair use).",
-    "7686": "One of the links you have provided is not a valid MEGA link."
+    "7686": "One of the links you have provided is not a valid MEGA link.",
+    "7687": "Transfer settings are for registered users only.",
+    "7688": "There may be a man-in-the-middle attack in progress. Please reset the stored identification credentials for this contact and then verify that they are correct with your contact through an existing secure channel or in person.",
+    "7689": "Reset contact credentials",
+    "7690": "Use the reset button below to reset the credentials for this contact.",
+    "7691": "New contact credentials",
+    "7692": "Verify credentials",
+    "7693": "Use the Verify button below to confirm the credentials for this contact."
 }

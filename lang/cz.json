@@ -339,6 +339,7 @@
     "738": "Po\u017e\u00e1dat",
     "739": "zapomn\u011bli jste sv\u00e9 heslo?",
     "741": "Zvolte nov\u00e9 bezpe\u010dn\u00e9 heslo.",
+    "742": "Vynulovat",
     "746": "Typ \u010dlenstv\u00ed",
     "748": "M\u011bs\u00ed\u010dn\u011b",
     "749": "Ro\u010dn\u011b",
@@ -2732,6 +2733,13 @@
     "7682": "MEGA doporu\u010duje pos\u00edlat 'de\u0161ifrovac\u00ed kl\u00ed\u010d' odd\u011blen\u011b od 'odkazu na slo\u017eku nebo soubor'.",
     "7683": "Roz\u0161\u00ed\u0159en\u00ed",
     "7684": "%1 na %2",
-    "7685": "I hereby state that I have a good faith belief that the use of copyrighted material in the manner complained of and located at the location above is not authorized by the copyright owner, its agent, or the law (e.g., as a fair use).",
-    "7686": "One of the links you have provided is not a valid MEGA link."
+    "7685": "T\u00edmto prohla\u0161uji, \u017ee v dobr\u00e9 v\u00ed\u0159e v\u011b\u0159\u00edm, \u017ee pou\u017eit\u00ed materi\u00e1lu chr\u00e1n\u011bn\u00e9ho autorsk\u00fdmi pr\u00e1vy sporn\u00fdm zp\u016fsobem a nach\u00e1zej\u00edc\u00edm se ve v\u00fd\u0161e uveden\u00e9m um\u00edst\u011bn\u00ed nen\u00ed povoleno majitelem autorsk\u00fdch pr\u00e1v, jeho z\u00e1stupcem nebo z\u00e1konem (nap\u0159. jako voln\u00e9ho u\u017eit\u00ed).",
+    "7686": "Jeden z odkaz\u016f, kter\u00fd jste zadali, nen\u00ed platn\u00fd odkaz MEGA.",
+    "7687": "Nastaven\u00ed p\u0159enosu jsou pouze pro registrovan\u00e9 u\u017eivatele.",
+    "7688": "There may be a man-in-the-middle attack in progress. Please reset the stored identification credentials for this contact and then verify that they are correct with your contact through an existing secure channel or in person.",
+    "7689": "Reset contact credentials",
+    "7690": "Use the reset button below to reset the credentials for this contact.",
+    "7691": "New contact credentials",
+    "7692": "Verify credentials",
+    "7693": "Use the Verify button below to confirm the credentials for this contact."
 }

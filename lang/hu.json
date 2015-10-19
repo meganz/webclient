@@ -339,6 +339,7 @@
     "738": "K\u00e9r\u00e9s",
     "739": "elfelejtetted jelszavad?",
     "741": "K\u00e9rlek v\u00e1lassz egy \u00faj biztons\u00e1gos jelsz\u00f3t.",
+    "742": "Jelsz\u00f3 t\u00f6rl\u00e9se",
     "746": "Tags\u00e1g t\u00edpusa",
     "748": "Havonk\u00e9nt",
     "749": "\u00c9venk\u00e9nt",
@@ -2733,5 +2734,12 @@
     "7683": "B\u0151v\u00edtm\u00e9ny",
     "7684": "%1 %2 rendszeren",
     "7685": "I hereby state that I have a good faith belief that the use of copyrighted material in the manner complained of and located at the location above is not authorized by the copyright owner, its agent, or the law (e.g., as a fair use).",
-    "7686": "One of the links you have provided is not a valid MEGA link."
+    "7686": "One of the links you have provided is not a valid MEGA link.",
+    "7687": "Transfer settings are for registered users only.",
+    "7688": "There may be a man-in-the-middle attack in progress. Please reset the stored identification credentials for this contact and then verify that they are correct with your contact through an existing secure channel or in person.",
+    "7689": "Reset contact credentials",
+    "7690": "Use the reset button below to reset the credentials for this contact.",
+    "7691": "New contact credentials",
+    "7692": "Verify credentials",
+    "7693": "Use the Verify button below to confirm the credentials for this contact."
 }

@@ -8928,6 +8928,9 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	-khtml-opacity: 0.5;
 	opacity: 0.5;
 }
+.fm-chat-emotions-icon.disabled {
+	opacity: 0.2 !important;
+}
 .fm-chat-input-block {
 	margin: 0;
 	-webkit-box-sizing: border-box;
@@ -9008,6 +9011,9 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 }
 .message-textarea:-ms-input-placeholder {
  color: #666666;
+}
+.message-textarea[disabled] {
+	opacity: 0.2;
 }
 .hiddendiv {
 	display: none;

@@ -31,6 +31,7 @@ var getMessageString;
                 'call-rejected': l[5892],
                 'call-canceled': l[5894],
                 'call-started': l[5888],
+                'missing-keys': "User [X] had not logged in recently, so important crypto keys are not yet available. Secure text chat with this user would be enabled as soon as he logs in MEGA again.",
             };
         }
         return MESSAGE_STRINGS[type];
@@ -169,6 +170,9 @@ var ConversationMessage = React.createClass({
                 message.cssClass = "call-from-different-device";
             }
             else if (message.type === "call-failed") {
+                message.cssClass = "rejected-call";
+            }
+            else if (message.type === "missing-keys") {
                 message.cssClass = "rejected-call";
             }
             else if (message.type === "call-failed-media") {
@@ -327,6 +331,9 @@ var ConversationPanel = React.createClass({
         var $target = $(e.target);
 
         if ($target.parent().is(".disabled")) {
+            return;
+        }
+        if ($target.is(".disabled")) {
             return;
         }
 
@@ -952,6 +959,7 @@ var ConversationPanel = React.createClass({
         var sizeIconClasses = "video-call-button size-icon";
         var emoticonsPopupClasses = "fm-chat-emotion-popup";
         var emoticonsPopupButtonClasses = "fm-chat-emotions-icon";
+        var messageTextAreaClasses = "message-textarea";
         var typingElement;
 
         // setup ONLY if there is an active call session
@@ -1043,6 +1051,10 @@ var ConversationPanel = React.createClass({
             emoticonsPopupClasses += " active";
         } else {
             emoticonsPopupClasses += " hidden";
+
+            if(room.pubCu25519KeyIsMissing === true) {
+                emoticonsPopupButtonClasses += " disabled";
+            }
         }
 
         if (self.state.currentlyTyping.length > 0) {
@@ -1191,13 +1203,15 @@ var ConversationPanel = React.createClass({
                     <div className="fm-chat-input-scroll">
                         <div className="fm-chat-input-block">
                             <textarea
-                                className="message-textarea"
+                                className={messageTextAreaClasses}
                                 placeholder="Write a message..."
                                 onKeyDown={self.onTypeAreaKeyDown}
                                 onBlur={self.onTypeAreaBlur}
                                 onChange={self.onTypeAreaChange}
                                 value={self.state.typedMessage}
                                 ref="typearea"
+                                disabled={room.pubCu25519KeyIsMissing === true ? true : false}
+                                readOnly={room.pubCu25519KeyIsMissing === true ? true : false}
                                 ></textarea>
                         </div>
                     </div>

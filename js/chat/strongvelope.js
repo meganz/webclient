@@ -1001,6 +1001,11 @@ var strongvelope = {};
             payload: cleartext
         };
 
+        console.error(
+            this._totalMessagesWithoutSendKey,
+            this.totalMessagesBeforeSendKey
+        );
+
         if (this._totalMessagesWithoutSendKey >= this.totalMessagesBeforeSendKey) {
             result.toSend = this.encryptTo(null, sender);
         }

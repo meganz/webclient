@@ -331,14 +331,33 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
     var self = this;
 
     if (!chatRoom.messagesBuff) {
+        chatRoom.pubCu25519KeyIsMissing = false;
+
         var waitingForPromises = [];
 
         // retrieve all other user's Cu25519 keys IF needed
         chatRoom.getParticipants().forEach(function(jid) {
             var contact = chatRoom.megaChat.getContactFromJid(jid);
             if (contact && contact.u && !pubCu25519[contact.u]) {
+                var keyRetrievalPromise = crypt.getPubCu25519(contact.u);
+                keyRetrievalPromise.fail(function(r) {
+                    if(r === -9) {
+                        chatRoom.pubCu25519KeyIsMissing = true;
+
+                        chatRoom.appendMessage(
+                            new ChatDialogMessage({
+                                messageId: 'key-missing-' + contact.u,
+                                type: 'missing-keys',
+                                authorContact: contact,
+                                delay: unixtime(),
+                                persist: false
+                            })
+                        );
+                    }
+                });
+
                 waitingForPromises.push(
-                    crypt.getPubCu25519(contact.u)
+                    keyRetrievalPromise
                 );
             }
         });
@@ -390,7 +409,8 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
             });
             // .seed result is not used in here, since it returns false, even when some messages can be decrypted
             // which in the current case (of tons of cached non encrypted txt msgs in chatd) is bad
-            chatRoom.protocolHandler.seed(hist);
+            var seedResult = chatRoom.protocolHandler.seed(hist);
+            //console.error(chatRoom.roomJid, seedResult);
 
             var decryptedMsgs = chatRoom.protocolHandler.batchDecrypt(hist, true);
             decryptedMsgs.forEach(function(v, k) {
@@ -405,6 +425,10 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                     self.logger.error("Could not decrypt: ", v)
                 }
             });
+
+            if (seedResult === false && chatRoom.messagesBuff.haveMoreHistory() === true) {
+                chatRoom.messagesBuff.retrieveChatHistory();
+            }
         });
 
         $(chatRoom.messagesBuff).rebind('onNewMessageReceived.chatdStrongvelope', function(e, msgObject) {
@@ -415,10 +439,11 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                     false
                 );
 
+                if(decrypted && decrypted.toSend) {
+                    self.chatd.submit(base64urldecode(chatRoom.chatId), decrypted.toSend);
+                }
                 if (decrypted && decrypted.payload) {
                     chatRoom.messagesBuff.messages[msgObject.messageId].textContents = decrypted.payload;
-                } else if(decrypted && !decrypted.payload) {
-                    debugger;
                 }
             }
         });
@@ -437,7 +462,6 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                 assert(u_privCu25519, 'u_privCu25519 is not loaded, null or undefined!');
                 assert(u_privEd25519, 'u_privEd25519 is not loaded, null or undefined!');
                 assert(u_pubEd25519, 'u_pubEd25519 is not loaded, null or undefined!');
-
 
                 chatRoom.protocolHandler = new strongvelope.ProtocolHandler(
                     u_handle,

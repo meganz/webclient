@@ -42,6 +42,7 @@
                     'className': "fm-dialog-button-red",
                     'callback': function() {
                         this.hide();
+                        this._hideOverlay();
                     }
                 }
             ]
@@ -199,17 +200,18 @@
     /**
      * Initialises the Credentials Warning Dialog
      * @param {String} contactHandle The contact's user handle
-     * @param {Number} authMethod Whether the fingerprint is seen or verified, use authring.AUTHENTICATION_METHOD.SEEN or .FINGERPRINT_COMPARISON
+     * @param {String} keyType The key type e.g. Ed25519, RSA
      * @param {String} prevFingerprint The previous fingerprint as a hexadecimal string
      * @param {String} newFingerprint The current fingerprint as a hexadecimal string
      * @returns {CredentialsWarningDialog._instance}
      */
-    CredentialsWarningDialog.singleton = function(contactHandle, authMethod, prevFingerprint, newFingerprint) {
+    CredentialsWarningDialog.singleton = function(contactHandle, keyType, prevFingerprint, newFingerprint) {
         
         // Set to object so can be used later
         CredentialsWarningDialog.contactHandle = contactHandle;
         CredentialsWarningDialog.contactEmail = M.u[contactHandle].m;
-        CredentialsWarningDialog.seenOrVerified = (authMethod === authring.AUTHENTICATION_METHOD.SEEN) ? 'seen' : 'verified';
+        CredentialsWarningDialog.seenOrVerified = u_authring[keyType][contactHandle].method;
+        CredentialsWarningDialog.seenOrVerified = (CredentialsWarningDialog.seenOrVerified === authring.AUTHENTICATION_METHOD.SEEN) ? 'seen' : 'verified';
         CredentialsWarningDialog.previousFingerprint = prevFingerprint;
         CredentialsWarningDialog.newFingerprint = newFingerprint;
         

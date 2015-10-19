@@ -23314,7 +23314,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
     width: 90px;
 }
 .credentials-warning-dialog .previousCredentials {
-    background-color: #fafafa;
     margin-top: 20px;
     padding: 20px;
 }
@@ -23392,8 +23391,12 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
     display: none;
 }
 .credentials-warning-dialog .postResetCredentials {
-    background-color: #fafafa;
     padding: 20px;
+}
+.credentials-warning-dialog .postResetCredentials .title,
+.credentials-warning-dialog .verifyCredentials .title {
+    color: #000;
+    font-weight: bold;
 }
 .credentials-warning-dialog .instruction {
 	padding: 3px 20px;

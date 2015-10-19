@@ -176,7 +176,7 @@ var crypt = (function () {
         }
         else if (recorded
                  && authring.equalFingerprints(recorded.fingerprint, fingerprint) === false) {
-            logger.error('Error verifying authenticity of ' + keyType +' pub key: '
+            logger.warn('Error verifying authenticity of ' + keyType +' pub key: '
                          + 'fingerprint does not match previously authenticated one!');
             return false;
         }
@@ -595,7 +595,7 @@ var crypt = (function () {
                                                     method, previousFingerprint,
                                                     newFingerprint) {
         // Show warning dialog.
-        mega.ui.CredentialsWarningDialog.singleton(userHandle, method,
+        mega.ui.CredentialsWarningDialog.singleton(userHandle, keyType,
                                                    previousFingerprint,
                                                    newFingerprint);
 
@@ -603,9 +603,9 @@ var crypt = (function () {
         // the stored fingerprint again next time.
         delete ns.getPubKeyCacheMapping(keyType)[userHandle];
 
-        logger.error(keyType + ' fingerprint does not match the previously authenticated one! ' +
-              'Previous fingerprint: ' + previousFingerprint + '. ' +
-              'New fingerprint: ' + newFingerprint + '. ');
+        logger.warn(keyType + ' fingerprint does not match the previously authenticated one!\n' +
+              'Previous fingerprint: ' + asmCrypto.bytes_to_hex(asmCrypto.string_to_bytes(previousFingerprint)) + '.\n' +
+              'New fingerprint: ' + asmCrypto.bytes_to_hex(asmCrypto.string_to_bytes(newFingerprint)) + '.');
     };
 
 

@@ -900,7 +900,7 @@ function MegaData()
         function renderLayout(u, n_cache) {
             var html, cs, contains, u_h, t, el, time, bShare,
                 avatar, rights, rightsclass, onlinestatus, html,
-                sExportLink, sLinkIcon,
+                sExportLink, sLinkIcon, takenDown,
                 iShareNum = 0,
                 s, ftype, c, cc, star;
 
@@ -1040,12 +1040,13 @@ function MegaData()
                         ? true : false;
                     sExportLink = (M.v[i].shares && M.v[i].shares.EXP) ? 'linked' : '';
                     sLinkIcon = (sExportLink === '') ? '' : 'link-icon';
+                    takenDown = (M.v[i] && M.v[i].shares && M.v[i].shares.EXP && M.v[i].shares.EXP.down) ? 'taken-down' : '';
 
                     // Block view
                     if (M.viewmode === 1) {
                         t = '.fm-blocks-view.fm .file-block-scrolling';
                         el = 'a';
-                        html = '<a id="' + htmlentities(M.v[i].h) + '" class="file-block' + c + ' ' + sExportLink + '">\n\
+                        html = '<a id="' + htmlentities(M.v[i].h) + '" class="file-block' + c + ' ' + sExportLink + ' ' + takenDown +  '">\n\
                                     <span class="file-status-icon' + star + '"></span>\n\
                                     <span class="' + sLinkIcon + '"></span>\n\
                                     <span class="file-settings-icon"></span>\n\
@@ -1061,7 +1062,7 @@ function MegaData()
                         time = time2date(M.v[i].ts || (M.v[i].p === 'contacts' && M.contactstatus(M.v[i].h).ts));
                         t = '.grid-table.fm';
                         el = 'tr';
-                        html = '<tr id="' + htmlentities(M.v[i].h) + '" class="' + c + '">\n\
+                        html = '<tr id="' + htmlentities(M.v[i].h) + '" class="' + c + ' ' + takenDown +  '">\n\
                                     <td width="30">\n\
                                         <span class="grid-status-icon' + star + '"></span>\n\
                                     </td>\n\
@@ -3287,7 +3288,7 @@ function MegaData()
             }
         }
 
-        if (M.sortingBy[0] === 'fav') {
+        if (M.sortingBy && (M.sortingBy[0] === 'fav')) {
             M.doSort('fav', M.sortingBy[1]);
             M.renderMain();
         }
@@ -5923,9 +5924,12 @@ function processOPC(opc, ignoreDB) {
 function processPH(publicHandles) {
 
     var logger = MegaLogger.getLogger('processPH'),
-        publicHandleId, nodeId;
+        publicHandleId, nodeId,
+        hasStar = false;
 
     logger.debug();
+
+    var UiExportLink = new mega.UI.Share.ExportLink();
 
     $.each(publicHandles, function(index, value) {
         nodeId = value.h;
@@ -5936,15 +5940,17 @@ function processPH(publicHandles) {
             M.delNodeShare(nodeId, 'EXP');
             M.deleteExportLinkShare(nodeId);
 
-            var UiExportLink = new mega.UI.Share.ExportLink();
             UiExportLink.removeExportLinkIcon(nodeId);
         }
-        else {// Get export link, without d attribute in response
+        else {
             M.nodeAttr({ h: nodeId, ph: publicHandleId });
-            M.nodeShare(value.h, { h: nodeId, r: 0, u: 'EXP', ts: unixtime() });
+            M.nodeShare(value.h, { h: nodeId, r: 0, u: 'EXP', down: value.down, ets: value.ets, ts: unixtime() });
 
-            var UiExportLink = new mega.UI.Share.ExportLink();
             UiExportLink.addExportLinkIcon(nodeId);
+        }
+
+        if (value.down !== undefined) {
+            UiExportLink.updateTakenDownItem(nodeId, value.down);
         }
     });
 }
@@ -6982,6 +6988,72 @@ function balance2pro(callback)
 
         // Remove link icon from left panel
         $('#treeli_' + nodeId + ' span').removeClass('linked link-icon');
+    };
+
+    /**
+     * updateTakenDownItems
+     *
+     * Updates grid and block (file) view, removes favorite icon if exists and adds .taken-down class.
+     * @param {String} nodeId
+     * @param {Boolean} isTakenDown
+     */
+    UiExportLink.prototype.updateTakenDownItem = function(nodeId, isTakenDown) {
+
+        var self = this;
+
+        var hasStar = false;
+
+        if (isTakenDown) {
+            if (M.d[nodeId].fav === 1) {
+
+                // Remove favourite (star)
+                M.favourite([nodeId], true);
+            }
+            self.addTakenDownIcon(nodeId);
+        }
+        else {
+            self.removeTakenDownIcon(nodeId);
+        }
+    };
+
+    /**
+     * addTakenDownIcon
+     *
+     * Add taken-down icon to file or folder
+     * @param {String} nodeId
+     */
+    UiExportLink.prototype.addTakenDownIcon = function(nodeId) {
+
+        var self = this;
+
+        // Add taken-down to list view
+        $('.grid-table.fm #' + nodeId).addClass('taken-down');
+
+        // Add taken-down to block view
+        $('#' + nodeId + '.file-block').addClass('taken-down');
+
+        // Add taken-down to left panel
+        $('#treea_' + nodeId).addClass('taken-down');
+    };
+
+    /**
+     * removeTakenDownIcon
+     *
+     * Remove taken-down icon from file or folder
+     * @param {String} nodeId
+     */
+    UiExportLink.prototype.removeTakenDownIcon = function(nodeId) {
+
+        var self = this;
+
+        // Add taken-down to list view
+        $('.grid-table.fm #' + nodeId).removeClass('taken-down');
+
+        // Add taken-down to block view
+        $('#' + nodeId + '.file-block').removeClass('taken-down');
+
+        // Add taken-down to left panel
+        $('#treea_' + nodeId).removeClass('taken-down');
     };
 
     // export

@@ -8,6 +8,9 @@ describe("MegaPromise Unit Test", function() {
         done();
     });
 
+    var fail = function(message) {
+        assert(false, message);
+    };
 
     it("resolve - 1 arg", function(done) {
         var p;

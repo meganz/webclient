@@ -728,6 +728,7 @@ function initUI() {
                 'conversations':  { root: 'chat',      prev: null },
                 'contacts':       { root: 'contacts',  prev: null },
                 'transfers':      { root: 'transfers', prev: null },
+                'settings':       { root: 'settings',  prev: null },
                 'inbox':          { root: M.InboxID,   prev: null },
                 'rubbish-bin':    { root: M.RubbishID, prev: null }
             };
@@ -742,10 +743,23 @@ function initUI() {
         if (activeTab) {
             if (activeTab.root === M.currentrootid) {
                 activeTab.prev = M.currentdirid;
+                M.lastActiveTab = activeClass;
             }
             else if (d) {
                 console.warn('Root mismatch', M.currentrootid, M.currentdirid, activeTab);
             }
+        }
+
+        if ($(this).hasClass('settings')) {
+            if (u_type === 0) {
+                ephemeralDialog(l[7687]);
+            }
+            else {
+                $('.nw-fm-left-icon').removeClass('active');
+                $('.nw-fm-left-icon.settings').addClass('active');
+                document.location.hash = 'fm/account/settings';
+            }
+            return false;
         }
 
         for (var tab in fmTabState) {
@@ -3126,12 +3140,19 @@ function accountUI()
 
             var dateTime = htmlentities(time2date(el[0]));
             var browser = browserdetails(el[2]);
+            var browserName = browser.name;
             var ipAddress = htmlentities(el[3]);
             var country = countrydetails(el[4]);
             var currentSession = el[5];
             var sessionId = el[6];
             var activeSession = el[7];
             var status = '<span class="current-session-txt">' + l[7665] + '</span>';    // Current
+
+            // Show if using an extension e.g. "Chrome Extension on Windows" or "Firefox Extension on Linux"
+            if (browser.isExtension) {
+                browserName = browserName.replace('Firefox', 'Firefox ' + l[7683]);
+                browserName = browserName.replace('Chrome', 'Chrome ' + l[7683]);
+            }
 
             // If not the current session
             if (!currentSession) {
@@ -3149,7 +3170,7 @@ function accountUI()
 
             // Generate row html
             html += '<tr class="' + (currentSession ? "current" : sessionId) +  '">'
-                + '<td><span class="fm-browsers-icon"><img alt="" src="' + staticpath + 'images/browser/' + browser.icon + '" /></span><span class="fm-browsers-txt">' + htmlentities(browser.name) + '</span></td>'
+                + '<td><span class="fm-browsers-icon"><img alt="" src="' + staticpath + 'images/browser/' + browser.icon + '" /></span><span class="fm-browsers-txt">' + htmlentities(browserName) + '</span></td>'
                 + '<td>' + ipAddress + '</td>'
                 + '<td><span class="fm-flags-icon"><img alt="" src="' + staticpath + 'images/flags/' + country.icon + '" style="margin-left: 0px;" /></span><span class="fm-flags-txt">' + htmlentities(country.name) + '</span></td>'
                 + '<td>' + dateTime + '</td>'
@@ -5674,16 +5695,6 @@ function transferPanelUI()
         }
     };
 
-    $('.nw-fm-left-icon.settings .settings-icon').rebind('click', function() {
-        if (u_type === 0) {
-            ephemeralDialog('Transfer settings are for registered users only.');
-        }
-        else {
-            $('.nw-fm-left-icon').removeClass('active');
-            $('.nw-fm-left-icon.settings').addClass('active');
-            document.location.hash = 'fm/account/settings';
-        }
-    });
     $('.transfer-clear-all-icon').rebind('click', function() {
         if (!$(this).hasClass('disabled')) {
             msgDialog('confirmation', 'clear all transfers', l[7225], '', function(e) {
@@ -9214,11 +9225,10 @@ function propertiesDialog(close)
         +'<div class="propreties-dark-txt t11">' + p.t11 + '</div></div></div>';
     $('.properties-txt-pad').html(html);
 
-	if (typeof(p.t10) == 'undefined' && typeof(p.t11) == 'undefined')
-	{
-		$('.properties-small-gray.t10').addClass('hidden');
-		$('.propreties-dark-txt.t11').addClass('hidden');
-	}
+    if (typeof(p.t10) === 'undefined' && typeof(p.t11) === 'undefined') {
+        $('.properties-small-gray.t10').addClass('hidden');
+        $('.propreties-dark-txt.t11').addClass('hidden');
+    }
 
     pd.find('.file-settings-icon').rebind('click context', function(e) {
         if ($(this).attr('class').indexOf('active') == -1) {
@@ -10024,7 +10034,7 @@ function sharedfolderUI() {
                 +'<div class="shared-details-info-block">'
                     +'<div class="shared-details-pad">'
                         +'<div class="shared-details-folder-name">'+ htmlentities((c||n).name) +'</div>'
-                        +'<a href="javascript:;" class="grid-url-arrow"><span></span></a>'
+                        +'<a href="javascript:;" class="grid-url-arrow"></a>'
                         +'<div class="shared-folder-access'+ rightsclass + '">' + rights + '</div>'
                         +'<div class="clear"></div>'
                         + avatar
@@ -10712,6 +10722,10 @@ function removeFromMultiInputDDL(dialog, item) {
                 menu = $('.nw-sorting-menu').removeClass('hidden');
                 type = treePanelType();
 
+                if (type === 'settings') {
+                    type = M.lastActiveTab || 'cloud-drive';
+                }
+
                 // Show all items in sort dialog in case contacts tab is choosen
                 if (type === 'contacts') {
                     menu.find('.sorting-item-divider,.sorting-menu-item').removeClass('hidden');
@@ -10751,7 +10765,11 @@ function removeFromMultiInputDDL(dialog, item) {
                 data = $self.data(),
                 type = treePanelType();
 
-            if ($self.attr('class').indexOf('active') === -1) {
+            if (type === 'settings') {
+                type = M.lastActiveTab || 'cloud-drive';
+            }
+
+            if (!$self.hasClass('active') && $.sortTreePanel[type]) {
                 $self.parent().find('.sorting-menu-item').removeClass('active');
                 $self.addClass('active');
                 $('.nw-sorting-menu').addClass('hidden');

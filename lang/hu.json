@@ -2729,5 +2729,7 @@
     "7679": "A folytat\u00e1shoz rendelkeznie kell egy MEGA fi\u00f3kkal.",
     "7680": "A MEGA kriptografikus modellje a fent megjelen\u00edtett kulcsokt\u00f3l f\u00fcgg. Azt javasoljuk, hogy a visszafejt\u00e9si kulcsokat a mappa\/f\u00e1jl linkt\u0151l k\u00fcl\u00f6n k\u00fcldje el, biztons\u00e1gos csatorn\u00e1n kereszt\u00fcl.",
     "7681": "Mappa\/F\u00e1jl link",
-    "7682": "A MEGA a \"Vissazfejt\u00e9si kulcs\" 'Mappa\/F\u00e1jl linkt\u0151l\" k\u00fcl\u00f6n val\u00f3 k\u00fcld\u00e9s\u00e9t javasolja."
+    "7682": "A MEGA a \"Vissazfejt\u00e9si kulcs\" 'Mappa\/F\u00e1jl linkt\u0151l\" k\u00fcl\u00f6n val\u00f3 k\u00fcld\u00e9s\u00e9t javasolja.",
+    "7683": "Extension",
+    "7684": "%1 on %2"
 }

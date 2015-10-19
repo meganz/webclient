@@ -102,7 +102,9 @@ function parseHTMLfmt(markup) {
                         }
                         if (is_chrome_firefox) {
                             $('a[data-fxhref]').rebind('click', function() {
-                                location.hash = $(this).data('fxhref');
+                                if (!$(this).attr('href')) {
+                                    location.hash = $(this).data('fxhref');
+                                }
                             });
                         }
                         return this;
@@ -1893,7 +1895,7 @@ function mKeyDialog(ph, fl) {
     $('.fm-dialog.dlkey-dialog').removeClass('hidden');
     $('.fm-dialog-overlay').removeClass('hidden');
     $('body').addClass('overlayed');
-    
+
     $('.fm-dialog.dlkey-dialog input').rebind('keydown', function(e) {
         $('.fm-dialog.dlkey-dialog .fm-dialog-new-folder-button').addClass('active');
         if (e.keyCode === 13) {
@@ -1907,7 +1909,7 @@ function mKeyDialog(ph, fl) {
             // Remove the ! from the key which is exported from the export dialog
             key = key.replace('!', '');
             promise.resolve(key);
-            
+
             $('.fm-dialog.dlkey-dialog').addClass('hidden');
             $('.fm-dialog-overlay').addClass('hidden');
             document.location.hash = (fl ? '#F!' : '#!') + ph + '!' + key;

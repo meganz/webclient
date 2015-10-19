@@ -7181,6 +7181,10 @@ table {
 	-khtml-opacity: 0.5;
 	opacity: 0.5;
 }
+.fm-verify.verified {
+    background-color: rgba(255,255,255,0);
+    cursor: default;
+}
 .fm-add-user.disabled span, .fm-start-video-call.disabled span, .fm-clearbin-button.disabled span, .fm-send-files.disabled span, .fm-start-call.disabled span, .fm-leave-share.disabled span, .fm-share-copy.disabled span, .fm-share-download.disabled span, .contact-send-files.disabled span, .fm-start-conversation.disabled span, .fm-share-folders.disabled span, .fm-verify.disabled span, .fm-reset-stored-fingerprint.disabled span, .fm-question.disabled span, .fm-chat-end.disabled span, .fm-end-call.disabled span, .fm-download-as-zip.disabled span, .fm-import-to-cloudrive.disabled span, .fm-dialog-button.disabled span, .fm-account-button.disabled span, .avatar-dialog .fm-account-change-avatar.disabled span, .top-dialog-login-button.disabled span, .nw-chat-button.disabled span, .multiple-sharing.expanded .main-body .nw-chat-button.disabled span, .fm-chat-attach-button.disabled span, .fm-chat-contact-button.disabled span, .fm-new-folder.disabled span, .search-files-result.disabled span, .search-messages-result.disabled span, .fm-file-upload.disabled span, .search-messages-result.disabled span, .fm-folder-upload.disabled span, .fm-notification-settings.disabled span, .create-folder-button.disabled span, .add-user-popup-button.disabled span, .create-folder-button-cancel.disabled span, .fm-dialog-new-folder-button.disabled span, .rename-dialog-button.disabled span, .fm-dialog-button.disabled span, .add-user-popup-button.disabled span, .contact-request-button.disabled span, .transfer-clear-all-icon.disabled span, .transfer-clear-completed.disabled span, .transfer-pause-icon.disabled span {
 	cursor: default !important;
 	color: #777777 !important;

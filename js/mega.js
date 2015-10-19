@@ -847,6 +847,7 @@ function MegaData()
                     t = '.contacts-blocks-scrolling';
                     html = '<a class="file-block ustatus ' + htmlentities(u_h) + ' ' + onlinestatus[1] + '" id="' + htmlentities(M.v[i].h) + '">\n\
                                 <span class="nw-contact-status"></span>\n\
+                                <span class="file-settings-icon"></span>\n\
                                 ' + avatar + ' \
                                 <span class="shared-folder-info-block">\n\
                                     <span class="shared-folder-name">' + htmlentities(node.name) + '</span>\n\
@@ -873,6 +874,9 @@ function MegaData()
                                 </td>\n\
                                 <td width="270">\n\
                                     <div class="contacts-interation li_' + u_h + '"></div>\n\
+                                </td>\n\
+                                <td class="grid-url-header-nw">\n\
+                                    <a class="grid-url-arrow"></a>\n\
                                 </td>\n\
                             </tr>';
                 }
@@ -947,7 +951,7 @@ function MegaData()
                         html = '<a class="file-block folder" id="'
                             + htmlentities(M.v[i].h) + '"><span class="file-status-icon '
                             + htmlentities(star) + '"></span><span class="shared-folder-access '
-                            + htmlentities(rightsclass) + '"></span><span class="file-icon-area">'
+                            + htmlentities(rightsclass) + '"></span><span class="file-settings-icon"></span><span class="file-icon-area">'
                             + '<span class="block-view-file-type folder"></span></span>'
                                  + avatar
                             + '<span class="shared-folder-info-block"><span class="shared-folder-name">'
@@ -967,7 +971,7 @@ function MegaData()
                             + htmlentities(onlinestatus[1]) + '"><div class="todo-fm-chat-user-star"></div><div class="fm-chat-user">'
                             + contactName + '</div><div class="nw-contact-status"></div><div class="fm-chat-user-status ' + htmlentities(htmlentities(u_h)) + '">' + htmlentities(onlinestatus[0])
                             + '</div><div class="clear"></div></div></td><td width="270"><div class="shared-folder-access'
-                            + htmlentities(rightsclass) + '">' + htmlentities(rights) + '</div></td></tr>';
+                            + htmlentities(rightsclass) + '">' + htmlentities(rights) + '</div></td><td class="grid-url-header-nw"><a class="grid-url-arrow"></a></td></tr>';
                     }
                 }
 
@@ -992,9 +996,7 @@ function MegaData()
                         el = 'a';
                         html = '<a id="' + htmlentities(M.v[i].h) + '" class="file-block folder">\n\
                                     <span class="file-status-icon"></span>\n\
-                                    <span class="file-settings-icon">\n\
-                                        <span></span>\n\
-                                    </span>\n\
+                                    <span class="file-settings-icon"></span>\n\
                                     <span class="shared-folder-access ' + rightsclass + '"></span>\n\
                                     <span class="file-icon-area">\n\
                                         <span class="block-view-file-type folder-shared"><img alt=""></span>\n\
@@ -1017,6 +1019,9 @@ function MegaData()
                                     </td>\n\
                                     <td width="270">\n\
                                         <div class="shared-folder-access ' + rightsclass + '">' + rights + '</div>\n\
+                                    </td>\n\
+                                    <td class="grid-url-header-nw">\n\
+                                        <a class="grid-url-arrow"></a>\n\
                                     </td>\n\
                                 </tr>';
                     }
@@ -1043,9 +1048,7 @@ function MegaData()
                         html = '<a id="' + htmlentities(M.v[i].h) + '" class="file-block' + c + ' ' + sExportLink + '">\n\
                                     <span class="file-status-icon' + star + '"></span>\n\
                                     <span class="' + sLinkIcon + '"></span>\n\
-                                    <span class="file-settings-icon">\n\
-                                        <span></span>\n\
-                                    </span>\n\
+                                    <span class="file-settings-icon"></span>\n\
                                     <span class="file-icon-area">\n\
                                         <span class="block-view-file-type ' + fileIcon({t: M.v[i].t, share: bShare, name: M.v[i].name}) + '"><img alt="" /></span>\n\
                                     </span>\n\
@@ -1070,9 +1073,7 @@ function MegaData()
                                     <td width="130">' + ftype + '</td>\n\
                                     <td width="120">' + time + '</td>\n\
                                     <td width="62" class="grid-url-field own-data ' + sExportLink + '">\n\
-                                        <a class="grid-url-arrow">\n\
-                                            <span></span>\n\
-                                        </a>\n\
+                                        <a class="grid-url-arrow"></a>\n\
                                         <span class="' + sLinkIcon + '"></span>\n\
                                     </td>\n\
                                 </tr>';
@@ -3617,8 +3618,8 @@ function MegaData()
                     + '<td>' + bytesToSize(n.s) + '</td>'
                     + '<td>' + filetype(n.name) + '</td>'
                     + '<td><span class="transfer-status queued">Queued</span></td>'
-                    + '<td class="grid-url-field"><a class="grid-url-arrow"><span></span></a>'
-                    + '<a class="clear-transfer-icon"><span></span></a></td>'
+                    + '<td class="grid-url-field"><a class="grid-url-arrow"></a>'
+                    + '<a class="clear-transfer-icon"></a></td>'
                     + '<td><span class="row-number"></span></td>'
                     + '</tr>');
 
@@ -3656,7 +3657,7 @@ function MegaData()
                 + '<td>' + bytesToSize(zipsize) + '</td>'
                 + '<td>' + filetype({name: 'archive.zip'}) + '</td>'
                 + '<td><span class="transfer-status queued">Queued</span></td>'
-                + '<td class="grid-url-field"><a class="grid-url-arrow"><span></span></a><a class="clear-transfer-icon"><span></span></a></td>'
+                + '<td class="grid-url-field"><a class="grid-url-arrow"></a><a class="clear-transfer-icon"></a></td>'
                 + '<td><span class="row-number"></span></td>'
                 + '</tr>');
 
@@ -4153,7 +4154,7 @@ function MegaData()
                 + '<td>' + bytesToSize(filesize) + '</td>'
                 + '<td>' + filetype(f.name) + '</td>'
                 + '<td><span class="transfer-status queued">Queued</span></td>'
-                + '<td class="grid-url-field"><a class="grid-url-arrow"><span></span></a><a class="clear-transfer-icon"><span></span></a></td>'
+                + '<td class="grid-url-field"><a class="grid-url-arrow"></a><a class="clear-transfer-icon"></a></td>'
                 + '<td><span class="row-number"></span></td>'
                 + '</tr>');
             ul_queue.push(f);
@@ -6488,7 +6489,7 @@ function balance2pro(callback)
             scroll = '.export-link-body';
 
         var links = $.trim(getClipboardLinks()),
-			$span = $('.copy-to-clipboard span'),
+            $span = $('.copy-to-clipboard span'),
             toastTxt, doLinks, linksNum, success;
 
         /**

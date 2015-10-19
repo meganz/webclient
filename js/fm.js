@@ -10089,7 +10089,7 @@ function showAuthenticityCredentials(user) {
  * Enables the Verify button
  */
 function enableVerifyFingerprintsButton(user) {
-    $('.fm-verify').removeClass('disabled');
+    $('.fm-verify').removeClass('verified');
     $('.fm-verify').find('span').text(l[1960] + '...');
     $('.fm-verify').rebind('click', function() {
         fingerprintDialog(user);
@@ -10154,9 +10154,15 @@ function fingerprintDialog(userid) {
         // Add log to see how often they verify the fingerprints
         api_req({ a: 'log', e: 99602, m: 'Fingerprint verification approved' });
 
+        // Generate fingerprint
         userFingerprint(user, function(fprint, fprintraw) {
+            
+            // Authenticate the contact
             authring.setContactAuthenticated(userid, fprintraw, 'Ed25519', authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON);
-            $('.fm-verify').unbind('click').find('span').text('Verified');
+            
+            // Change button state to 'Verified'
+            $('.fm-verify').unbind('click').addClass('verified').find('span').text(l[6776]);
+            
             closeFngrPrntDialog();
         });
     });
@@ -10223,18 +10229,20 @@ function contactUI() {
         }
         /** To be called on settled authring promise. */
         var _setVerifiedState = function() {
+            
             var handle = user.u || user;
             var verificationState = u_authring.Ed25519[handle] || {};
             var isVerified = (verificationState.method
                               >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON);
+            
+            // Show the user is verified
             if (isVerified) {
-                // Show the user is verified.
-                $('.fm-verify').addClass('disabled');
+                $('.fm-verify').addClass('verified');
                 $('.fm-verify').find('span').text(l[6776]);
             }
             else {
-                // Otherwise show the Verify button.
-                enableVerifyFingerprintsButton(user);
+                // Otherwise show the Verify... button.
+                enableVerifyFingerprintsButton(handle);
             }
         };
         authringPromise.done(_setVerifiedState);
@@ -10242,7 +10250,7 @@ function contactUI() {
         // Reset seen or verified fingerprints and re-enable the Verify button
         $('.fm-reset-stored-fingerprint').rebind('click', function() {
             authring.resetFingerprintsForUser(user.u);
-            enableVerifyFingerprintsButton(user);
+            enableVerifyFingerprintsButton(user.u);
 
             // Refetch the key
             showAuthenticityCredentials(user);

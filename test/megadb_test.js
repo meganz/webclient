@@ -6,17 +6,15 @@
 describe("MegaDB unit test", function() {
     "use strict";
 
-    var _isPhantomJS = false;
-    if (typeof(window) !== 'undefined' && /PhantomJS/.test(window.navigator.userAgent)) {
-        _isPhantomJS = true;
-    }
-
     // Create/restore Sinon stub/spy/mock sandboxes.
     var sandbox = null;
 
     var mdb = null;
     var msdb = null;
     var testCount = 0;
+    var fail = function(message) {
+        assert(false, message);
+    };
 
     beforeEach(function(done) {
         sandbox = sinon.sandbox.create();

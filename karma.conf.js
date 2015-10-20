@@ -130,6 +130,9 @@ module.exports = function(config) {
         'js/chat/ui/incomingCallDialog.js',
 
         // == Tests ==
+        (process.env.SKIP_WORKFLOWS)
+            ? 'test/config/test_workflows_off.js'
+            : 'test/config/test_workflows.js',
         {pattern: 'test/**/*_test.js', included: true}
     ],
 
@@ -186,12 +189,19 @@ module.exports = function(config) {
     // - Safari (only Mac; has to be installed with `npm install karma-safari-launcher`)
     // - PhantomJS
     // - IE (only Windows; has to be installed with `npm install karma-ie-launcher`)
-    browsers: ['PhantomJS2', 'PhantomJS2_custom', 'Firefox', 'Chrome'],
+    browsers: ['PhantomJS2', 'PhantomJS2_custom', 'Firefox', 'Firefox_Extension', 'Chrome'],
 
     customLaunchers: {
         'PhantomJS2_custom': {
             base: 'PhantomJS2',
             flags: ['--local-storage-path=./test/phantomjs-storage']
+        },
+        'Firefox_Extension': {
+            base: (process.env.FXEXTBASE || 'FirefoxDeveloper'),
+            prefs: {
+                'xpinstall.signatures.required': false
+            },
+            extensions: [process.env.FXEXTFILE || '/fxextest@mega.co.nz.xpi']
         }
     },
 

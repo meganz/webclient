@@ -1,7 +1,8 @@
 (function($, scope) {
 
-    function showLoginRequiredDialog() {
+    function showLoginRequiredDialog(options) {
         var promise = new MegaPromise();
+        options = options || {};
 
         // Already logged-in, even on ephemeral?
         if (u_type !== false) {
@@ -9,15 +10,27 @@
                 promise.resolve();
             });
         }
+        else if (options.skipInitialDialog) {
+            showLoginDialog(promise);
+        }
         else {
+            var icon;
             var loginRequiredDialog = new mega.ui.Dialog({
                 'className': 'loginrequired-dialog',
                 'closable': true,
                 'focusable': false,
                 'expandable': false,
                 'requiresOverlay': true,
-                'title': l[5841],
+                'title': options.title || l[5841],
                 'buttons': []
+            });
+            loginRequiredDialog.bind('onHide', function() {
+                Soon(function() {
+                    if (promise) {
+                        promise.reject();
+                        promise = undefined;
+                    }
+                });
             });
             loginRequiredDialog.bind('onBeforeShow', function() {
                 $('.fm-dialog-title', this.$dialog)
@@ -25,12 +38,16 @@
 
                 // custom buttons, because of the styling
                 $('.fm-notification-info', this.$dialog)
-                    .html('<p>' + "You need to have a MEGA account in order to continue." + '</p>');
+                    .safeHTML('<p>@@</p>', options.textContent || l[7679]);
+
+                icon = $(this.$dialog)
+                    .addClass('warning-dialog-ai');
 
                 $('.fm-dialog-button.pro-login', this.$dialog)
                     .rebind('click.loginrequired', function() {
                         loginRequiredDialog.hide();
                         showLoginDialog(promise);
+                        promise = undefined;
                         return false;
                     });
 
@@ -46,6 +63,10 @@
             promise.always(function __lrdAlways() {
                 loginRequiredDialog.hide();
                 loginRequiredDialog = undefined;
+                if (icon) {
+                    icon.removeClass('warning-dialog-ai');
+                    icon = undefined;
+                }
                 closeDialog();
                 promise = undefined;
             });
@@ -100,8 +121,8 @@
         });
 
         $('.top-login-forgot-pass', $dialog).rebind('click', function(e) {
-            document.location.hash = 'recovery';
             aPromise.reject();
+            document.location.hash = 'recovery';
         });
 
         $('.top-dialog-login-button', $dialog).rebind('click', function(e) {

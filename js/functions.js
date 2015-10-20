@@ -9,7 +9,7 @@ var inherits = (function() {
         var proto = destination.prototype = createObject(source.prototype);
         proto.constructor = destination;
         proto._super = source.prototype;
-    }
+    };
 })();
 
 makeEnum(['MDBOPEN'], 'MEGAFLAG_', window);
@@ -102,7 +102,9 @@ function parseHTMLfmt(markup) {
                         }
                         if (is_chrome_firefox) {
                             $('a[data-fxhref]').rebind('click', function() {
-                                location.hash = $(this).data('fxhref');
+                                if (!$(this).attr('href')) {
+                                    location.hash = $(this).data('fxhref');
+                                }
                             });
                         }
                         return this;
@@ -550,12 +552,15 @@ function removeHash() {
 }
 
 function browserdetails(useragent) {
+    
     useragent = useragent || navigator.userAgent;
     useragent = (' ' + useragent).toLowerCase();
+    
     var os = false;
     var browser = false;
     var icon = '';
     var name = '';
+    
     if (useragent.indexOf('android') > 0) {
         os = 'Android';
     }
@@ -601,6 +606,7 @@ function browserdetails(useragent) {
     }
     else if (useragent.indexOf('chrome') > 0) {
         browser = 'Chrome';
+        icon = 'chrome.png';
     }
     else if (useragent.indexOf('safari') > 0) {
         browser = 'Safari';
@@ -610,6 +616,7 @@ function browserdetails(useragent) {
     }
     else if (useragent.indexOf('firefox') > 0) {
         browser = 'Firefox';
+        icon = 'firefox.png';
     }
     else if (useragent.indexOf('thunderbird') > 0) {
         browser = 'Thunderbird';
@@ -621,8 +628,10 @@ function browserdetails(useragent) {
             || "ActiveXObject" in window) {
         browser = 'Internet Explorer';
     }
+    
+    // Translate "%1 on %2" to "Chrome on Windows"
     if ((os) && (browser)) {
-        name = browser + ' on ' + os;
+        name = String(l[7684]).replace('%1', browser).replace('%2', os);
     }
     else if (os) {
         name = os;
@@ -643,14 +652,20 @@ function browserdetails(useragent) {
             icon = browser.toLowerCase() + '.png';
         }
     }
-    var browserdetails = {};
-    browserdetails.name = name;
-    browserdetails.icon = icon;
-    browserdetails.os = os || '';
-    browserdetails.browser = browser;
+    
+    var browserDetails = {};
+    browserDetails.name = name;
+    browserDetails.icon = icon;
+    browserDetails.os = os || '';
+    browserDetails.browser = browser;
+    
     // Determine if the OS is 64bit
-    browserdetails.is64bit = /\b(WOW64|x86_64|Win64|intel mac os x 10.(9|\d{2,}))/i.test(useragent);
-    return browserdetails;
+    browserDetails.is64bit = /\b(WOW64|x86_64|Win64|intel mac os x 10.(9|\d{2,}))/i.test(useragent);
+    
+    // Determine if using a browser extension
+    browserDetails.isExtension = (useragent.indexOf('megext') > -1) ? true : false;
+    
+    return browserDetails;
 }
 
 function countrydetails(isocode) {
@@ -1893,16 +1908,7 @@ function mKeyDialog(ph, fl) {
     $('.fm-dialog.dlkey-dialog').removeClass('hidden');
     $('.fm-dialog-overlay').removeClass('hidden');
     $('body').addClass('overlayed');
-    $('.fm-dialog.dlkey-dialog input').rebind('focus', function(e) {
-        if ($(this).val() === l[1028]) {
-            $(this).val('');
-        }
-    });
-    $('.fm-dialog.dlkey-dialog input').rebind('blur', function(e) {
-        if ($(this).val() === '') {
-            $(this).val(l[1028]);
-        }
-    });
+
     $('.fm-dialog.dlkey-dialog input').rebind('keydown', function(e) {
         $('.fm-dialog.dlkey-dialog .fm-dialog-new-folder-button').addClass('active');
         if (e.keyCode === 13) {
@@ -1912,8 +1918,11 @@ function mKeyDialog(ph, fl) {
     $('.fm-dialog.dlkey-dialog .fm-dialog-new-folder-button').rebind('click', function(e) {
         var key = $('.fm-dialog.dlkey-dialog input').val();
 
-        if (key && key !== l[1028]) {
+        if (key) {
+            // Remove the ! from the key which is exported from the export dialog
+            key = key.replace('!', '');
             promise.resolve(key);
+
             $('.fm-dialog.dlkey-dialog').addClass('hidden');
             $('.fm-dialog-overlay').addClass('hidden');
             document.location.hash = (fl ? '#F!' : '#!') + ph + '!' + key;
@@ -3769,13 +3778,13 @@ if (typeof sjcl !== 'undefined') {
 
 (function($, scope) {
     /**
-     * Nodes related operations.
+     * Share related operations.
      *
      * @param opts {Object}
      *
      * @constructor
      */
-    var Nodes = function(opts) {
+    var Share = function(opts) {
 
         var self = this;
         var defaultOptions = {
@@ -3793,7 +3802,7 @@ if (typeof sjcl !== 'undefined') {
      * @param {Boolean} linkShare Do we need info about link share 'EXP'.
      * @returns {Boolean} result.
      */
-    Nodes.prototype.isShareExist = function(nodes, fullShare, pendingShare, linkShare) {
+    Share.prototype.isShareExist = function(nodes, fullShare, pendingShare, linkShare) {
 
         var self = this;
 
@@ -3840,6 +3849,30 @@ if (typeof sjcl !== 'undefined') {
     };
 
     /**
+     * hasExportLink, check if at least one selected item have public link.
+     *
+     * @param {String|Array} nodes Node id or array of nodes string
+     * @returns {Boolean}
+     */
+    Share.prototype.hasExportLink = function(nodes) {
+
+        var result = false,
+            node;
+
+        // Loop through all selected items
+        $.each(nodes, function(index, value) {
+            node = M.d[value];
+            if (node.ph && node.shares && node.shares.EXP) {
+                result = true;
+                return false;// Stop further $.each loop execution
+
+            }
+        });
+
+        return result;
+    };
+
+    /**
      * getShares
      *
      * Is there available share for nodes.
@@ -3849,7 +3882,7 @@ if (typeof sjcl !== 'undefined') {
      * @param {Boolean} linkShare Include results for foder/file links.
      * @returns {Array} result Array of user ids.
      */
-    Nodes.prototype.getShares = function(nodes, fullShare, pendingShare, linkShare) {
+    Share.prototype.getShares = function(nodes, fullShare, pendingShare, linkShare) {
 
         var self = this;
 
@@ -3898,12 +3931,12 @@ if (typeof sjcl !== 'undefined') {
     /**
      * loopShares
      *
-     * Loops through all shares.
+     * Loops through all shares and returns users id.
      * @param {Object} shares.
      * @param {Boolean} linkShare Do we need info about link share.
      * @returns {Array} user id.
      */
-    Nodes.prototype.loopShares = function(shares, linkShare) {
+    Share.prototype.loopShares = function(shares, linkShare) {
 
         var self = this;
 
@@ -3911,11 +3944,9 @@ if (typeof sjcl !== 'undefined') {
             exclude = 'EXP',
             index;
 
-        for (var item in shares) {
-            if (shares.hasOwnProperty(item)) {
-                result.push(item);
-            }
-        }
+        $.each(shares, function(index, value) {
+           result.push(index);
+        });
 
         // Remove 'EXP'
         if (!linkShare) {
@@ -3929,15 +3960,36 @@ if (typeof sjcl !== 'undefined') {
         return result;
     };
 
+    // export
+    scope.mega = scope.mega || {};
+    scope.mega.Share = Share;
+})(jQuery, window);
+
+(function($, scope) {
     /**
-     * loopSubdirs
+     * Nodes related operations.
      *
-     * Loops through all subdirs of given node.
-     * @param {string} id: node id.
-     * @param {array} nodesId.
-     * @returns child nodes id.
+     * @param opts {Object}
+     *
+     * @constructor
      */
-    Nodes.prototype.loopSubdirs = function(id, nodesId) {
+    var Nodes = function(opts) {
+
+        var self = this;
+        var defaultOptions = {
+        };
+
+        self.options = $.extend(true, {}, defaultOptions, opts);    };
+
+    /**
+     * getChildNodes
+     *
+     * Loops through all subdirs of given node, as result gives array of subdir nodes.
+     * @param {String} id: node id.
+     * @param {Array} nodesId.
+     * @returns {Array} Child nodes id.
+     */
+    Nodes.prototype.getChildNodes = function(id, nodesId) {
 
         var self = this;
 
@@ -3961,7 +4013,7 @@ if (typeof sjcl !== 'undefined') {
                     subDirs.push(item);
                 }
 
-                self.loopSubdirs(item, subDirs);
+                self.getChildNodes(item, subDirs);
             }
         }
 

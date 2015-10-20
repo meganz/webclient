@@ -2913,6 +2913,7 @@ function accountUI()
             $('.fm-account-overview').removeClass('hidden');
         }
         $('.fm-account-blocks .membership-icon.type').removeClass('free pro1 pro2 pro3 pro4');
+
         if (u_attr.p)
         {
             // LITE/PRO account
@@ -2973,7 +2974,10 @@ function accountUI()
                 // one-time or cancelled subscription
                 $('.fm-account-header.typetitle').text(l[746]+':');
                 $('.membership-big-txt.type').text(l[751]);
-                $('.membership-medium-txt.expiry').html(l[987] + ' <span class="red">' + time2date(account.expiry) + '</span>');
+                $('.membership-medium-txt.expiry a').rebind('click', function() {
+                    document.location = $(this).attr('href');
+                });
+                $('.membership-medium-txt.expiry a').html(l[987] + ' <span class="red">' + time2date(account.expiry) + '</span>');
                 $('.fm-account-blocks .btn-cancel').hide();
             }
         }

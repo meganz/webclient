@@ -3257,7 +3257,6 @@ function MegaData()
      * Handles item favourite status
      * @param {Array} nodesId
      * @param {Boolean} del User action i.e. true - delete from favorites, false - add to favorite
-     * @returns {undefined}
      */
     this.favourite = function(nodesId, del) {
 
@@ -3325,7 +3324,8 @@ function MegaData()
             if (M.d[value].fav) {
                 result = true;
                 return false;// Break each loop
-}        });
+            }
+        });
 
         return result;
     };

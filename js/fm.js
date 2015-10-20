@@ -9044,7 +9044,8 @@ function propertiesDialog(close)
     $.propertiesDialog = $.dialog = 'properties';
     fm_showoverlay();
 
-    pd.removeClass('hidden multiple folders-only two-elements shared shared-with-me read-only read-and-write full-access taken-down');
+    pd.removeClass('hidden multiple folders-only two-elements shared shared-with-me');
+    pd.removeClass('read-only read-and-write full-access taken-down');
 
     var exportLink = new mega.Share.ExportLink({});
     var isTakenDown = exportLink.isTakenDown($.selected);

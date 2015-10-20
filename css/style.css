@@ -5498,7 +5498,7 @@ th.grid-first-th {
 	background-repeat: no-repeat;
 	background-position: -69px -963px;
 }
-table .grid-status-icon.star {
+.grid-status-icon.star {
 	background-position: -64px -961px;
 }
 .file-block .file-status-icon, .contact-status-icon, .properties-body .file-status-icon, .link-icon {
@@ -5519,7 +5519,7 @@ table .grid-status-icon.star {
 .taken-down .link-icon {
 	background-position: -146px -963px;
 }
-.taken-down .grid-status-icon {
+.taken-down .grid-status-icon, .taken-down .grid-status-icon.star {
 	background-position: -176px -961px;
 }
 .taken-down .file-status-icon {

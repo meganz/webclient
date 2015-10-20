@@ -12165,11 +12165,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 	color: rgba(153,153,153,1);
 	background-repeat: no-repeat;
 	background-position: right -7966px;
-	-webkit-transition: color 200ms ease-in-out, color 200ms ease-in-out;
-	-moz-transition: color 200ms ease-in-out, color 200ms ease-in-out;
-	-o-transition: color 200ms ease-in-out, color 200ms ease-in-out;
-	-ms-transition: color 200ms ease-in-out, color 200ms ease-in-out;
-	transition: color 200ms ease-in-out, color 200ms ease-in-out;
 }
 .sorting-menu-item:hover {
 	background-color: rgba(255,255,255,0.1);

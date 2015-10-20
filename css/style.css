@@ -4066,10 +4066,10 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 	text-overflow: ellipsis;
 	overflow: hidden;
 	-webkit-transition: color 150ms ease-in-out;
-    -moz-transition: color 150ms ease-in-out;
-    -o-transition: color 150ms ease-in-out;
-    -ms-transition: color 150ms ease-in-out;
-    transition: color 150ms ease-in-out;
+	-moz-transition: color 150ms ease-in-out;
+	-o-transition: color 150ms ease-in-out;
+	-ms-transition: color 150ms ease-in-out;
+	transition: color 150ms ease-in-out;
 }
 .rubbish-bin .nw-fm-tree-folder {
 	background-position: -15px -7595px;
@@ -5514,6 +5514,7 @@ table .grid-status-icon.star {
 	right: 6px;
 	background-position: -106px -963px;
 	display: none;
+	cursor: pointer;
 }
 .taken-down .link-icon {
 	background-position: -146px -963px;
@@ -5524,8 +5525,8 @@ table .grid-status-icon.star {
 .taken-down .file-status-icon {
 	background-position: -180px -963px;
 }
-.grid-table .taken-down td, .taken-down .file-block-title, .taken-down .nw-fm-tree-folder, .taken-down .tranfer-filetype-txt {
-	color:#D90007
+.grid-table .taken-down td, .taken-down .file-block-title, .taken-down .nw-fm-tree-folder, .taken-down .tranfer-filetype-txt, .taken-down .propreties-dark-txt {
+	color: #D90007
 }
 .own-data .link-icon {
 	left: 3px;
@@ -11369,7 +11370,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 	background-color: rgba(0,0,0,0.05);
 }
 .properties-file-icon div {
-	width: 240px;
+	width: 242px;
 	height: 240px;
 	position: absolute;
 	top: 0px;
@@ -11379,6 +11380,14 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 	background-position: 0 0;
 	background-repeat: no-repeat;
 	margin: 8px;
+}
+.properties-dialog .file-status-icon {
+	left: 13px;
+	top: 13px;
+}
+.properties-dialog .link-icon {
+	left: 225px;
+	top: 13px;
 }
 .properties-file-icon div:nth-child(1) {
 	display: block;

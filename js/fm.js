@@ -2509,7 +2509,11 @@ function initContextUI() {
     });
 
     $(c + '.add-star-item').rebind('click', function() {
-        M.favourite($.selected, $.delfav);
+
+        var delFavourite = M.isFavourite($.selected);
+
+        M.favourite($.selected, delFavourite);
+
         if (M.viewmode) {
             $('.file-block').removeClass('ui-selected');
         }
@@ -5768,7 +5772,7 @@ function getDDhelper()
 
 function menuItems() {
 
-    var selItem,
+    var selItem, favourite, node,
         items = [],
         sourceRoot = RootbyId($.selected[0]);
 
@@ -5777,22 +5781,15 @@ function menuItems() {
     }
 
     if (RightsbyID($.selected[0]) > 0) {
+
         items['add-star'] = 1;
-        $.delfav = 1;
 
-        for (var i in $.selected) {
-            var n = M.d[$.selected[i]];
-            if (n && !n.fav) {
-                $.delfav = 0;
-                break;
-            }
-        }
-
-        if ($.delfav) {
+        if (M.isFavourite($.selected)) {
             $('.add-star-item').html('<span class="context-menu-icon"></span>' + l[5872]);
         }
         else {
             $('.add-star-item').html('<span class="context-menu-icon"/></span>' + l[5871]);
+
         }
     }
 
@@ -9042,7 +9039,16 @@ function propertiesDialog(close)
     }
     $.propertiesDialog = $.dialog = 'properties';
     fm_showoverlay();
-    pd.removeClass('hidden multiple folders-only two-elements shared shared-with-me read-only read-and-write full-access');
+
+    pd.removeClass('hidden multiple folders-only two-elements shared shared-with-me read-only read-and-write full-access taken-down');
+
+    var exportLink = new mega.Share.ExportLink({});
+    var isTakenDown = exportLink.isTakenDown($.selected);
+    if (isTakenDown) {
+        pd.addClass('taken-down');
+        showToast('clipboard', 'This file/folder has been subjected to a takedown notice.');
+    }
+
     $('.properties-elements-counter span').text('');
     $('.fm-dialog.properties-dialog .properties-body').rebind('click', function()
     {

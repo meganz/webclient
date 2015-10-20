@@ -9,8 +9,129 @@ var inherits = (function() {
         var proto = destination.prototype = createObject(source.prototype);
         proto.constructor = destination;
         proto._super = source.prototype;
-    }
+    };
 })();
+
+makeEnum(['MDBOPEN'], 'MEGAFLAG_', window);
+
+/**
+ * Safely parse an HTML fragment, removing any executable
+ * JavaScript, and return a document fragment.
+ *
+ * @param {string} markup The HTML fragment to parse.
+ * @param {boolean} forbidStyle If true, disallow <style> nodes and
+ *     style attributes in the parsed fragment. Gecko 14+ only.
+ * @param {Document} doc The document in which to create the
+ *     returned DOM tree.
+ * @param {nsIURI} baseURI The base URI relative to which resource
+ *     URLs should be processed. Note that this will not work for
+ *     XML fragments.
+ * @param {boolean} isXML If true, parse the fragment as XML.
+ */
+function parseHTML(markup, forbidStyle, doc, baseURI, isXML) {
+    if (!doc) {
+        doc = document;
+    }
+    if (is_chrome_firefox) {
+        try {
+            var flags = 0;
+            if (!forbidStyle) {
+                flags |= mozParserUtils.SanitizerAllowStyle;
+            }
+            if (!baseURI) {
+                var href = getAppBaseUrl();
+                if (!parseHTML.baseURIs[href]) {
+                    parseHTML.baseURIs[href] =
+                        Services.io.newURI(href, null, null);
+                }
+                baseURI = parseHTML.baseURIs[href];
+            }
+            // XXX: parseFragment() removes href attributes with a hash mask
+            markup = String(markup).replace(/\shref="#/g, ' data-fxhref="#');
+            return mozParserUtils.parseFragment(markup, flags, Boolean(isXML),
+                                                baseURI, doc.documentElement);
+        }
+        catch (ex) {
+            mozError(ex);
+        }
+    }
+
+    // Either we are not running the Firefox extension or the above parser
+    // failed, in such case we try to mimic it using jQuery.parseHTML
+    return $.parseHTML(String(markup), doc);
+}
+parseHTML.baseURIs = {};
+
+/**
+ * Handy printf-style parseHTML to apply escapeHTML
+ * @param {string} markup The HTML fragment to parse.
+ * @param {...*} var_args
+ */
+function parseHTMLfmt(markup) {
+    if (arguments.length > 1) {
+        var args = toArray(arguments);
+        var replacer = function(match) {
+            return escapeHTML(args.shift());
+        };
+        args.shift();
+        markup = markup.replace(/@@/g, replacer);
+    }
+    return parseHTML(markup);
+}
+
+/**
+ * Safely inject an HTML fragment using parseHTML()
+ * @param {string} markup The HTML fragment to parse.
+ * @param {...*} var_args
+ * @see This should be used instead of jQuery.html()
+ * @example $(document.body).safeHTML('<script>alert("XSS");</script>It Works!');
+ * @todo Safer versions of append, insert, before, after, etc
+ */
+(function($fn, obj) {
+    for (var fn in obj) {
+        if (obj.hasOwnProperty(fn)) {
+            /* jshint -W083 */
+            (function(origFunc, safeFunc) {
+                Object.defineProperty($fn, safeFunc, {
+                    value: function $afeCall(markup) {
+                        var i = 0;
+                        var l = this.length;
+                        markup = parseHTMLfmt.apply(null, arguments);
+                        while (l > i) {
+                            $(this[i++])[origFunc](markup);
+                        }
+                        if (is_chrome_firefox) {
+                            $('a[data-fxhref]').rebind('click', function() {
+                                if (!$(this).attr('href')) {
+                                    location.hash = $(this).data('fxhref');
+                                }
+                            });
+                        }
+                        return this;
+                    }
+                });
+                safeFunc = undefined;
+            })(fn, obj[fn]);
+        }
+    }
+    $fn = obj = undefined;
+})($.fn, {
+    'html': 'safeHTML',
+    'append': 'safeAppend'
+});
+
+/**
+ * Escape HTML markup
+ * @param {string} str The HTML fragment to parse.
+ * NB: This should be the same than our legacy `htmlentities`
+ *     function, except that it's faster and deals with quotes
+ */
+function escapeHTML(str) {
+    return String(str).replace(/[&"'<>]/g, function(match) {
+        return escapeHTML.replacements[match];
+    });
+}
+escapeHTML.replacements = { "&": "&amp;", '"': "&quot;", "'": "&#39;", "<": "&lt;", ">": "&gt;" };
 
 /**
  *  Check if value is contained in a array. If it is return value
@@ -18,6 +139,57 @@ var inherits = (function() {
  */
 function anyOf(arr, value) {
     return $.inArray(value, arr) === -1 ? false : value;
+}
+
+/**
+ * excludeIntersected
+ *
+ * Loop through arrays excluding intersected items form array2
+ * and prepare result format for tokenInput plugin item format.
+ *
+ * @param {Array} array1, emails used in share
+ * @param {Array} array2, list of all available emails
+ *
+ * @returns {Array} item An array of JSON objects e.g. { id, name }.
+ */
+function excludeIntersected(array1, array2) {
+
+    var result = [],
+        tmpObj2 = array2;
+
+    if (!array1) {
+        return array2;
+    }
+    else if (!array2) {
+        return array1;
+    }
+
+    // Loop through emails used in share
+    for (var i in array1) {
+        if (array1.hasOwnProperty(i)) {
+
+            // Loop through list of all emails
+            for (var k in array2) {
+                if (array2.hasOwnProperty(k)) {
+
+                    // Remove matched email from result
+                    if (array1[i] === array2[k]) {
+                        tmpObj2.splice(k, 1);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    // Prepare for token.input plugin item format
+    for (var n in tmpObj2) {
+        if (tmpObj2.hasOwnProperty(n)) {
+            result.push({ id: tmpObj2[n], name: tmpObj2[n] });
+        }
+    }
+
+    return result;
 }
 
 /**
@@ -77,11 +249,23 @@ function asciionly(text) {
 }
 
 function Later(callback) {
-    return setTimeout(callback, 1000);
+    if (typeof callback !== 'function') {
+        throw new Error('Invalid function parameter.');
+    }
+
+    return setTimeout(function() {
+        callback();
+    }, 1000);
 }
 
 var Soon = is_chrome_firefox ? mozRunAsync : function(callback) {
-    setTimeout(callback, 17);
+    if (typeof callback !== 'function') {
+        throw new Error('Invalid function parameter.');
+    }
+
+    return setTimeout(function() {
+        callback();
+    }, 20);
 };
 
 function SoonFc(func, ms) {
@@ -195,17 +379,19 @@ function translate(html) {
 
             if (namespace === 'dq') {
                 // Replace double quotes to their html entities
-                l[match] = String(l[localeNum]).replace('"', '&quot;', 'g');
+                l[match] = String(l[localeNum]).replace(/"/g, '&quot;');
             }
             else if (namespace === 'q') {
                 // Escape single quotes
-                l[match] = String(l[localeNum]).replace("'", "\\'", 'g');
+                l[match] = String(l[localeNum]).replace(/'/g, "\\'");
             }
             else if (namespace === 'dqq') {
                 // Both of the above
-                l[match] = String(l[localeNum]).replace('"', '&quot;', 'g');
-                l[match] = l[match].replace("'", "\\'", 'g');
+                l[match] = String(l[localeNum]).replace(/"/g, '&quot;');
+                l[match] = l[match].replace(/'/g, "\\'");
             }
+
+            return l[match];
         }
         return String(l[localeNum]);
     };
@@ -312,14 +498,10 @@ function populate_l() {
     l[231] = l[231].replace('No thanks, I\'ll wait', 'I\'ll wait');
 
     l['year'] = new Date().getFullYear();
-    date_months = [l[408], l[409], l[410], l[411], l[412], l[413], l[414], l[415], l[416], l[417], l[418], l[419]];
-}
-
-function GetNextNode(labelid) {
-    var label = document.getElementById(labelid);
-    var select_id = document.getElementById(labelid + "_option");
-    label.innerHTML = select_id.options[select_id.selectedIndex].text;
-    return select_id.options[select_id.selectedIndex].value;
+    date_months = [
+        l[408], l[409], l[410], l[411], l[412], l[413],
+        l[414], l[415], l[416], l[417], l[418], l[419]
+    ].map(escapeHTML);
 }
 
 function showmoney(number) {
@@ -358,27 +540,27 @@ function divscroll(el) {
 
 function removeHash() {
     var scrollV, scrollH, loc = window.location;
-    if ("pushState" in history) {
-        history.pushState("", document.title, loc.pathname + loc.search);
-    }
-    else {
-        // Prevent scrolling by storing the page's current scroll offset
-        scrollV = document.body.scrollTop;
-        scrollH = document.body.scrollLeft;
-        loc.hash = "";
-        // Restore the scroll offset, should be flicker free
-        document.body.scrollTop = scrollV;
-        document.body.scrollLeft = scrollH;
-    }
+
+    // Prevent scrolling by storing the page's current scroll offset
+    scrollV = document.body.scrollTop;
+    scrollH = document.body.scrollLeft;
+    loc.hash = "";
+
+    // Restore the scroll offset, should be flicker free
+    document.body.scrollTop = scrollV;
+    document.body.scrollLeft = scrollH;
 }
 
 function browserdetails(useragent) {
+    
     useragent = useragent || navigator.userAgent;
     useragent = (' ' + useragent).toLowerCase();
+    
     var os = false;
     var browser = false;
     var icon = '';
     var name = '';
+    
     if (useragent.indexOf('android') > 0) {
         os = 'Android';
     }
@@ -412,6 +594,10 @@ function browserdetails(useragent) {
     else if (useragent.indexOf('opera') > 0 || useragent.indexOf(' opr/') > 0) {
         browser = 'Opera';
     }
+    else if (useragent.indexOf(' dragon/') > 0) {
+        icon = 'dragon.png';
+        browser = 'Comodo Dragon';
+    }
     else if (useragent.indexOf('vivaldi') > 0) {
         browser = 'Vivaldi';
     }
@@ -420,12 +606,17 @@ function browserdetails(useragent) {
     }
     else if (useragent.indexOf('chrome') > 0) {
         browser = 'Chrome';
+        icon = 'chrome.png';
     }
     else if (useragent.indexOf('safari') > 0) {
         browser = 'Safari';
     }
+    else if (useragent.indexOf('palemoon') > 0) {
+        browser = 'Palemoon';
+    }
     else if (useragent.indexOf('firefox') > 0) {
         browser = 'Firefox';
+        icon = 'firefox.png';
     }
     else if (useragent.indexOf('thunderbird') > 0) {
         browser = 'Thunderbird';
@@ -437,8 +628,10 @@ function browserdetails(useragent) {
             || "ActiveXObject" in window) {
         browser = 'Internet Explorer';
     }
+    
+    // Translate "%1 on %2" to "Chrome on Windows"
     if ((os) && (browser)) {
-        name = browser + ' on ' + os;
+        name = String(l[7684]).replace('%1', browser).replace('%2', os);
     }
     else if (os) {
         name = os;
@@ -459,14 +652,20 @@ function browserdetails(useragent) {
             icon = browser.toLowerCase() + '.png';
         }
     }
-    var browserdetails = {};
-    browserdetails.name = name;
-    browserdetails.icon = icon;
-    browserdetails.os = os || '';
-    browserdetails.browser = browser;
+    
+    var browserDetails = {};
+    browserDetails.name = name;
+    browserDetails.icon = icon;
+    browserDetails.os = os || '';
+    browserDetails.browser = browser;
+    
     // Determine if the OS is 64bit
-    browserdetails.is64bit = /\b(WOW64|x86_64|Win64|intel mac os x 10.(9|\d{2,}))/i.test(useragent);
-    return browserdetails;
+    browserDetails.is64bit = /\b(WOW64|x86_64|Win64|intel mac os x 10.(9|\d{2,}))/i.test(useragent);
+    
+    // Determine if using a browser extension
+    browserDetails.isExtension = (useragent.indexOf('megext') > -1) ? true : false;
+    
+    return browserDetails;
 }
 
 function countrydetails(isocode) {
@@ -774,7 +973,7 @@ function makeid(len) {
 }
 
 function checkMail(email) {
-    email = email.replace('+', '', 'g');
+    email = email.replace(/\+/g, '');
     var filter = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
     if (filter.test(email)) {
         return false;
@@ -1138,29 +1337,53 @@ AssertionFailed.prototype.name = 'AssertionFailed';
 /**
  * Assert a given test condition.
  *
- * Throws an AssertionFailed exception with the given `message` on failure.
+ * Throws an AssertionFailed exception with a given message, in case the condition is false.
+ * The message is assembled by the args following 'test', similar to console.log()
  *
  * @param test
  *     Test statement.
- * @param message
- *     Message for exception on failure.
  */
-function assert(test, message) {
-    if (!test) {
-        if (MegaLogger && MegaLogger.rootLogger) {
-            MegaLogger.rootLogger.error("assertion failed: ", message);
-        }
-        else if (window.d) {
-            console.error(message);
-        }
-
-        if (localStorage.stopOnAssertFail) {
-            debugger;
-        }
-
-        throw new AssertionFailed(message);
+function assert(test) {
+    if (test) {
+        return;
     }
+    //assemble message from parameters
+    var message = '';
+    var last = arguments.length - 1;
+    for (var i = 1; i <= last; i++) {
+        message += arguments[i];
+        if (i < last) {
+            message += ' ';
+        }
+    }
+    if (MegaLogger && MegaLogger.rootLogger) {
+        MegaLogger.rootLogger.error("assertion failed: ", message);
+    }
+    else if (window.d) {
+        console.error(message);
+    }
+
+    if (localStorage.stopOnAssertFail) {
+        debugger;
+    }
+
+    throw new AssertionFailed(message);
 }
+
+
+/**
+ * Assert that a user handle is potentially valid (e. g. not an email address).
+ *
+ * @param userHandle {string}
+ *     The user handle to check.
+ * @throws
+ *     Throws an exception on something that does not seem to be a user handle.
+ */
+var assertUserHandle = function(userHandle) {
+    assert(base64urldecode(userHandle).length === 8,
+       'This seems not to be a user handle: ' + userHandle);
+};
+
 
 /**
  * Pad/prepend `val` with "0" (zeros) until the length is === `length`
@@ -1437,12 +1660,23 @@ function logAllCallsOnObject(ctx, loggerFn, recursive, textPrefix, parentLogger)
     });
 }
 
+/**
+ * Get an array with unique values
+ * @param {Array} arr Array
+ */
 function array_unique(arr) {
-    return $.grep(arr, function(v, k) {
-        return $.inArray(v, arr) === k;
-    });
+    return arr.reduce(function(out, value) {
+        if (out.indexOf(value) < 0) {
+            out.push(value);
+        }
+        return out;
+    }, []);
 }
 
+/**
+ * Get a random value from an array
+ * @param {Array} arr Array
+ */
 function array_random(arr) {
     return arr[rand(arr.length)];
 }
@@ -1664,6 +1898,8 @@ function CreateWorkers(url, message, size) {
 }
 
 function mKeyDialog(ph, fl) {
+    var promise = new MegaPromise();
+
     $('.new-download-buttons').addClass('hidden');
     $('.new-download-file-title').text(l[1199]);
     $('.new-download-file-icon').addClass(fileIcon({
@@ -1672,16 +1908,7 @@ function mKeyDialog(ph, fl) {
     $('.fm-dialog.dlkey-dialog').removeClass('hidden');
     $('.fm-dialog-overlay').removeClass('hidden');
     $('body').addClass('overlayed');
-    $('.fm-dialog.dlkey-dialog input').rebind('focus', function(e) {
-        if ($(this).val() === l[1028]) {
-            $(this).val('');
-        }
-    });
-    $('.fm-dialog.dlkey-dialog input').rebind('blur', function(e) {
-        if ($(this).val() === '') {
-            $(this).val(l[1028]);
-        }
-    });
+
     $('.fm-dialog.dlkey-dialog input').rebind('keydown', function(e) {
         $('.fm-dialog.dlkey-dialog .fm-dialog-new-folder-button').addClass('active');
         if (e.keyCode === 13) {
@@ -1691,16 +1918,26 @@ function mKeyDialog(ph, fl) {
     $('.fm-dialog.dlkey-dialog .fm-dialog-new-folder-button').rebind('click', function(e) {
         var key = $('.fm-dialog.dlkey-dialog input').val();
 
-        if (key && key !== l[1028]) {
+        if (key) {
+            // Remove the ! from the key which is exported from the export dialog
+            key = key.replace('!', '');
+            promise.resolve(key);
+
             $('.fm-dialog.dlkey-dialog').addClass('hidden');
             $('.fm-dialog-overlay').addClass('hidden');
             document.location.hash = (fl ? '#F!' : '#!') + ph + '!' + key;
+        }
+        else {
+            promise.reject();
         }
     });
     $('.fm-dialog.dlkey-dialog .fm-dialog-close').rebind('click', function(e) {
         $('.fm-dialog.dlkey-dialog').addClass('hidden');
         $('.fm-dialog-overlay').addClass('hidden');
+        promise.reject();
     });
+
+    return promise;
 }
 
 function dcTracer(ctr) {
@@ -2158,15 +2395,6 @@ function hostname(url) {
     return url && url[1];
 }
 
-// Helper to manage time/sizes in a friendly way
-String.prototype.seconds = function() {
-    return parseInt(this) * 1000;
-}
-
-String.prototype.minutes = function() {
-    return parseInt(this) * 1000 * 60;
-}
-
 // Quick hack for sane average speed readings
 function bucketspeedometer(initialp) {
     return {
@@ -2225,32 +2453,6 @@ function moveCursortoToEnd(el) {
         range.select();
     }
 }
-
-String.prototype.replaceAll = function(_f, _r, _c) {
-    var o = this.toString();
-    var r = '';
-    var s = o;
-    var b = 0;
-    var e = -1;
-    if (_c) {
-        _f = _f.toLowerCase();
-        s = o.toLowerCase();
-    }
-
-    while ((e = s.indexOf(_f)) > -1) {
-        r += o.substring(b, b + e) + _r;
-        s = s.substring(e + _f.length, s.length);
-        b += e + _f.length;
-    }
-
-    // Add Leftover
-    if (s.length > 0) {
-        r += o.substring(o.length - s.length, o.length);
-    }
-
-    // Return New String
-    return r;
-};
 
 // Returns pixels position of element relative to document (top left corner)
 function getHtmlElemPos(elem, n) {
@@ -2450,6 +2652,17 @@ function flashIsEnabled() {
  */
 function getBaseUrl() {
     return 'https://' + (((location.protocol === 'https:') && location.host) || 'mega.nz');
+}
+
+/**
+ * Like getBaseUrl(), but suitable for extensions to point to internal resources.
+ * This should be the same than `bootstaticpath + urlrootfile` except that may differ
+ * from a public entry point (Such as the Firefox extension and its mega: protocol)
+ * @returns {string}
+ */
+function getAppBaseUrl() {
+    var l = location;
+    return (l.origin !== 'null' && l.origin || (l.protocol + '//' + l.hostname)) + l.pathname;
 }
 
 /**
@@ -2805,6 +3018,80 @@ function assertStateChange(currentState, newState, allowedStatesMap, enumMap) {
 }
 
 /**
+ * Promise-based XHR request
+ * @param {Mixed} aURLOrOptions URL or options
+ * @param {Mixed} aData         data to send, optional
+ */
+mega.utils.xhr = function megaUtilsXHR(aURLOrOptions, aData) {
+    /* jshint -W074 */
+    var xhr;
+    var url;
+    var method;
+    var options;
+    var promise = new MegaPromise();
+
+    if (typeof aURLOrOptions === 'object') {
+        options = aURLOrOptions;
+        url = options.url;
+    }
+    else {
+        options = {};
+        url = aURLOrOptions;
+    }
+    aURLOrOptions = undefined;
+
+    aData = options.data || aData;
+    method = options.method || (aData && 'POST') || 'GET';
+
+    xhr = getxhr();
+
+    if (typeof options.prepare === 'function') {
+        options.prepare(xhr);
+    }
+
+    xhr.onloadend = function(ev) {
+        if (this.status === 200) {
+            promise.resolve(ev, this.response);
+        }
+        else {
+            promise.reject(ev);
+        }
+    };
+
+    try {
+        if (d) {
+            MegaLogger.getLogger('muXHR').info(method + 'ing', url, options, aData);
+        }
+        xhr.open(method, url);
+
+        if (options.type) {
+            xhr.responseType = options.type;
+            if (xhr.responseType !== options.type) {
+                xhr.abort();
+                throw new Error('Unsupported responseType');
+            }
+        }
+
+        if (typeof options.beforeSend === 'function') {
+            options.beforeSend(xhr);
+        }
+
+        if (is_chrome_firefox) {
+            xhr.setRequestHeader('Origin', getBaseUrl(), false);
+        }
+
+        xhr.send(aData);
+    }
+    catch (ex) {
+        promise.reject(ex);
+    }
+
+    xhr = options = undefined;
+
+    return promise;
+};
+
+/**
  *  Retrieve a call stack
  *  @return {String}
  */
@@ -3016,7 +3303,9 @@ mega.utils.clearFileSystemStorage = function megaUtilsClearFileSystemStorage() {
         return MegaPromise.resolve();
     }
 
-    setTimeout(_done, 4000);
+    setTimeout(function() {
+        _done();
+    }, 4000);
 
     var promise = new MegaPromise();
 
@@ -3048,6 +3337,35 @@ mega.utils.clearFileSystemStorage = function megaUtilsClearFileSystemStorage() {
 };
 
 /**
+ * Neuter an ArrayBuffer
+ * @param {Mixed} ab ArrayBuffer/TypedArray
+ */
+mega.utils.neuterArrayBuffer = function neuter(ab) {
+    if (!(ab instanceof ArrayBuffer)) {
+        ab = ab && ab.buffer;
+    }
+    try {
+        if (typeof ArrayBuffer.transfer === 'function') {
+            ArrayBuffer.transfer(ab, 0); // ES7
+        }
+        else {
+            if (!neuter.dataWorker) {
+                neuter.dataWorker = new Worker("data:application/javascript,var%20d%3B");
+            }
+            neuter.dataWorker.postMessage(ab, [ab]);
+        }
+        if (ab.byteLength !== 0) {
+            throw new Error('Silently failed! -- ' + ua);
+        }
+    }
+    catch (ex) {
+        if (d) {
+            console.warn('Cannot neuter ArrayBuffer', ab, ex);
+        }
+    }
+};
+
+/**
  *  Kill session and Logout
  */
 mega.utils.logout = function megaUtilsLogout() {
@@ -3068,8 +3386,14 @@ mega.utils.logout = function megaUtilsLogout() {
             step++;
             mFileManagerDB.exec('drop').always(finishLogout);
         }
-        // Use the 'Session Management Logout' API call to kill the current session
-        api_req({ 'a': 'sml' }, { callback: finishLogout });
+        if (u_privk) {
+            // Use the 'Session Management Logout' API call to kill the current session
+            api_req({ 'a': 'sml' }, { callback: finishLogout });
+        }
+        else {
+            finishLogout();
+        }
+
     });
 }
 
@@ -3127,7 +3451,7 @@ function mCleanestLogout(aUserHandle) {
 // Initialize Rubbish-Bin Cleaning Scheduler
 mBroadcaster.addListener('crossTab:master', function _setup() {
     var RUBSCHED_WAITPROC = 120 * 1000;
-    var RUBSCHED_IDLETIME =  25 * 1000;
+    var RUBSCHED_IDLETIME =   4 * 1000;
     var timer, updId;
 
     mBroadcaster.once('crossTab:leave', _exit);
@@ -3170,7 +3494,9 @@ mBroadcaster.addListener('crossTab:master', function _setup() {
 
         updId = mBroadcaster.addListener('fmconfig:rubsched', _update);
         if (fmconfig.rubsched) {
-            timer = setInterval(_proc, RUBSCHED_WAITPROC);
+            timer = setInterval(function() {
+                _proc();
+            }, RUBSCHED_WAITPROC);
         }
     }
 
@@ -3331,6 +3657,24 @@ mBroadcaster.addListener('crossTab:master', function _setup() {
     }
 });
 
+/** document.hasFocus polyfill */
+mBroadcaster.addListener('startMega', function() {
+    if (typeof document.hasFocus !== 'function') {
+        var hasFocus = true;
+
+        $(window)
+            .bind('focus', function() {
+                hasFocus = true;
+            })
+            .bind('blur', function() {
+                hasFocus = false;
+            });
+
+        document.hasFocus = function() {
+            return hasFocus;
+        };
+    }
+});
 
 /**
  * Cross-tab communication using WebStorage
@@ -3431,3 +3775,252 @@ if (typeof sjcl !== 'undefined') {
         this.stack = mega.utils.getStack();
     };
 }
+
+(function($, scope) {
+    /**
+     * Share related operations.
+     *
+     * @param opts {Object}
+     *
+     * @constructor
+     */
+    var Share = function(opts) {
+
+        var self = this;
+        var defaultOptions = {
+        };
+
+        self.options = $.extend(true, {}, defaultOptions, opts);    };
+
+    /**
+     * isShareExists
+     *
+     * Checking if there's available shares for selected nodes.
+     * @param {Array} nodes Holds array of ids from selected folders/files (nodes).
+     * @param {Boolean} fullShare Do we need info about full share.
+     * @param {Boolean} pendingShare Do we need info about pending share .
+     * @param {Boolean} linkShare Do we need info about link share 'EXP'.
+     * @returns {Boolean} result.
+     */
+    Share.prototype.isShareExist = function(nodes, fullShare, pendingShare, linkShare) {
+
+        var self = this;
+
+        var shares = {}, length;
+
+        for (var i in nodes) {
+            if (nodes.hasOwnProperty(i)) {
+
+                // Look for full share
+                if (fullShare) {
+                    shares = M.d[nodes[i]].shares;
+
+                    // Look for link share
+                    if (linkShare) {
+                        if (shares && Object.keys(shares).length) {
+                            return true;
+                        }
+                    }
+                    else { // Exclude folder/file links,
+                        if (shares) {
+                            length = Object.keys(shares).length;
+                            if (length) {
+                                if (!shares.EXP || (shares.EXP && length > 1)) {
+                                    return true;
+                                }
+                            }
+
+                        }
+                    }
+                }
+
+                // Look for pending share
+                if (pendingShare) {
+                    shares = M.ps[nodes[i]];
+
+                    if (M.ps && shares && Object.keys(shares).length) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    };
+
+    /**
+     * hasExportLink, check if at least one selected item have public link.
+     *
+     * @param {String|Array} nodes Node id or array of nodes string
+     * @returns {Boolean}
+     */
+    Share.prototype.hasExportLink = function(nodes) {
+
+        var result = false,
+            node;
+
+        // Loop through all selected items
+        $.each(nodes, function(index, value) {
+            node = M.d[value];
+            if (node.ph && node.shares && node.shares.EXP) {
+                result = true;
+                return false;// Stop further $.each loop execution
+
+            }
+        });
+
+        return result;
+    };
+
+    /**
+     * getShares
+     *
+     * Is there available share for nodes.
+     * @param {String} node Node id.
+     * @param {Boolean} fullShare Inclde results for full shares.
+     * @param {Boolean} pendingShare Include results for pending shares.
+     * @param {Boolean} linkShare Include results for foder/file links.
+     * @returns {Array} result Array of user ids.
+     */
+    Share.prototype.getShares = function(nodes, fullShare, pendingShare, linkShare) {
+
+        var self = this;
+
+        var result, shares, length;
+
+        for (var i in nodes) {
+            if (nodes.hasOwnProperty(i)) {
+                result = [];
+
+                // Look for full share
+                if (fullShare) {
+                    shares = M.d[nodes[i]].shares;
+
+                    // Look for link share
+                    if (linkShare) {
+                        if (shares && Object.keys(shares).length) {
+                            result.push(self.loopShares(shares), linkShare);
+                        }
+                    }
+                    else { // Exclude folder/file links,
+                        if (shares) {
+                            length = Object.keys(shares).length;
+                            if (length) {
+                                if (!shares.EXP || (shares.EXP && length > 1)) {
+                                    result.push(self.loopShares(shares), linkShare);
+                                }
+                            }
+
+                        }
+                    }
+                }
+
+                // Look for pending share
+                if (pendingShare) {
+                    shares = M.ps[nodes[i]];
+                    if (M.ps && shares && Object.keys(shares).length) {
+                        result.push(self.loopShares(shares), linkShare);
+                    }
+                }
+            }
+        }
+
+        return result;
+    };
+
+    /**
+     * loopShares
+     *
+     * Loops through all shares and returns users id.
+     * @param {Object} shares.
+     * @param {Boolean} linkShare Do we need info about link share.
+     * @returns {Array} user id.
+     */
+    Share.prototype.loopShares = function(shares, linkShare) {
+
+        var self = this;
+
+        var result = [],
+            exclude = 'EXP',
+            index;
+
+        $.each(shares, function(index, value) {
+           result.push(index);
+        });
+
+        // Remove 'EXP'
+        if (!linkShare) {
+            index = result.indexOf(exclude);
+
+            if (index !== -1) {
+                result = result.splice(index, 1);
+            }
+        }
+
+        return result;
+    };
+
+    // export
+    scope.mega = scope.mega || {};
+    scope.mega.Share = Share;
+})(jQuery, window);
+
+(function($, scope) {
+    /**
+     * Nodes related operations.
+     *
+     * @param opts {Object}
+     *
+     * @constructor
+     */
+    var Nodes = function(opts) {
+
+        var self = this;
+        var defaultOptions = {
+        };
+
+        self.options = $.extend(true, {}, defaultOptions, opts);    };
+
+    /**
+     * getChildNodes
+     *
+     * Loops through all subdirs of given node, as result gives array of subdir nodes.
+     * @param {String} id: node id.
+     * @param {Array} nodesId.
+     * @returns {Array} Child nodes id.
+     */
+    Nodes.prototype.getChildNodes = function(id, nodesId) {
+
+        var self = this;
+
+        var subDirs = nodesId;
+
+        if (subDirs) {
+            if (subDirs.indexOf(id) === -1) {
+                subDirs.push(id);
+            }
+        }
+        else {
+            // Make subDirs an array
+            subDirs = [id];
+        }
+
+        for (var item in M.c[id]) {
+            if (M.c[id].hasOwnProperty(item)) {
+
+                // Prevent duplication
+                if (subDirs && subDirs.indexOf(item) === -1) {
+                    subDirs.push(item);
+                }
+
+                self.getChildNodes(item, subDirs);
+            }
+        }
+
+        return subDirs;
+    };
+
+    // export
+    scope.mega = scope.mega || {};
+    scope.mega.Nodes = Nodes;
+})(jQuery, window);

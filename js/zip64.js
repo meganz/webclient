@@ -1,4 +1,4 @@
-/* ezBuffer {{{ */
+/* ezBuffer */
 /**
  *  Your best friend when dealing with buffers
  *
@@ -82,7 +82,6 @@ function ezBuffer(size) {
         }
     };
 }
-/* }}} */
 
 var Zips = {};
 
@@ -120,7 +119,7 @@ var ZIPClass = function(totalSize) {
         , dataDescriptor64Len       = 24
         , directoryHeaderLen        = 46
 
-    /* ZipHeader  {{{ */
+    /* ZipHeader  */
     /**
      *  ZipHeader struct
      */
@@ -152,9 +151,8 @@ var ZIPClass = function(totalSize) {
                 return buf.getBytes();
             }
         }
-        /** }}} */
 
-    // ZipCentralDirectory {{{
+    // ZipCentralDirectory
     function ZipCentralDirectory() {
         this.creatorVersion = zipVersion;
         this.readerVersion = zipVersion;
@@ -204,9 +202,8 @@ var ZIPClass = function(totalSize) {
             return buf.getBytes();
         }
     }
-    // }}}
 
-    // ZipDataDescriptor {{{
+    // ZipDataDescriptor
     function ZipDataDescriptor() {
         this.crc32 = 0;
         this.size = 0;
@@ -227,9 +224,8 @@ var ZIPClass = function(totalSize) {
             return buf.getBytes();
         };
     }
-    // }}}
 
-    // DosDateTime {{{
+    // DosDateTime
     /**
      *  Set an unix time (or now if missing) in the zip
      *  expected format
@@ -257,8 +253,7 @@ var ZIPClass = function(totalSize) {
         buf.i16(dosTime);
         buf.i16(dosDate);
     }
-    // }}}
-
+    
     self.writeCentralDir = function(filename, size, time, crc32, directory, headerpos) {
         filename = to8(filename)
         var dirRecord = new ZipCentralDirectory();
@@ -712,7 +707,7 @@ function CacheIO(dl_id, dl) {
 
 
 
-// crc32 {{{
+// crc32
 var crc32table = [
     0x00000000, 0x77073096, 0xEE0E612C, 0x990951BA,
     0x076DC419, 0x706AF48F, 0xE963A535, 0x9E6495A3,
@@ -803,4 +798,3 @@ function crc32(data, crc, len) {
 
     return crc ^ -1;
 }
-// }}}

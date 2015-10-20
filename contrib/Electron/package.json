@@ -1,0 +1,15 @@
+{
+  "name": "megawebapp",
+  "version": "0.1.0",
+  "main": "./main.js",
+  "scripts": {
+    "start": "electron .",
+    "package": "electron-packager . megawebapp --all --out ~/megawebapp --ignore=node_modules/.* --ignore=./*.sh --version 0.31.1 --overwrite --icon=./app/favicon.ico"
+  },
+  "devDependencies": {
+    "electron-packager": "^5.0.2",
+    "electron-prebuilt": "^0.31.1"
+  },
+  "dependencies": {
+  }
+}

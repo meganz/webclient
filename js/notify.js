@@ -23,6 +23,8 @@ var notify = {
     $popup: null,
     $popupIcon: null,
     $popupNum: null,
+
+    initialLoadComplete: false,
     
     // A list of already rendered pending contact request IDs (multiple can exist with reminders)
     renderedContactRequests: [],
@@ -31,11 +33,11 @@ var notify = {
      * Initialise the notifications system
      */
     init: function() {
-        
+
         // Cache lookups
-        this.$popup = $('.top-head .notification-popup');
-        this.$popupIcon = $('.top-head .cloud-popup-icon');
-        this.$popupNum = $('.top-head .notification-num');
+        notify.$popup = $('.top-head .notification-popup');
+        notify.$popupIcon = $('.top-head .cloud-popup-icon');
+        notify.$popupNum = $('.top-head .notification-num');
         
         // Init event handler to open popup
         notify.initNotifyIconClickHandler();
@@ -48,14 +50,14 @@ var notify = {
      * Get the most recent 100 notifications from the API
      */
     getInitialNotifications: function() {
-        
+
         // Clear notifications before fetching (sometimes this needs to be done if re-logging in)
         notify.notifications = [];
         
         // Call API to fetch the most recent notifications
         api_req('c=' + notify.numOfNotifications, {
             callback: function(result) {
-                
+
                 // Check it wasn't a negative number error response
                 if (typeof result !== 'object') {
                     return false;
@@ -104,7 +106,12 @@ var notify = {
      * @param {Object} actionPacket The action packet object
      */
     notifyFromActionPacket: function(actionPacket) {
-        
+
+        // We should not show notifications if we haven't yet done the initial notifications load yet
+        if (!notify.initialLoadComplete) {
+            return false;
+        }
+
         var notification = actionPacket;                // The action packet
         var id = makeid(10);                            // Make random ID
         var type = notification.a;                      // Type of notification e.g. share
@@ -350,7 +357,7 @@ var notify = {
             $notificationHtml = notify.updateTemplate($notificationHtml, notification);
             
             // Build the html
-            allNotificationsHtml += notify.getOuterHtml($notificationHtml);
+            allNotificationsHtml += $notificationHtml.prop('outerHTML');
         }
         
         // Update the list of notifications
@@ -436,16 +443,6 @@ var notify = {
             // Mark all notifications as seen (because they clicked on a notification within the popup)
             notify.markAllNotificationsAsSeen();
         });
-    },
-    
-    /**
-     * Gets the outer HTML of an element
-     * @param {Object} $element The jQuery element $('<div class="notification-item">...</div>')
-     * @returns {String} Returns just the outer HTML '<div class="notification-item">...</div>'
-     */
-    getOuterHtml: function($element)
-    {
-        return $element.clone().wrap('<div>').parent().html();
     },
     
     /**

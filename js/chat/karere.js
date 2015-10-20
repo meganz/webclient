@@ -1150,6 +1150,7 @@ makeMetaAware(Karere);
         eventData['from'] = from;
         eventData['id'] = eventId;
 
+        //TODO: remove $
         var jsonData = $('json', message);
         if (jsonData.size() > 0) {
             eventData['meta'] = JSON.parse(jsonData[0].childNodes[0].data);
@@ -1221,6 +1222,7 @@ makeMetaAware(Karere);
                 ));
             }
 
+            // TODO: remove $
             if ($('status[code="110"]', x).size() === 1) {
                 self._triggerEvent("UsersUpdatedDone", new KarereEventObjects.UsersUpdated(
                     eventData.from,
@@ -1236,7 +1238,7 @@ makeMetaAware(Karere);
 
 
         if (message.tagName.toLowerCase() === "message") {
-            self.logger.warn(self.getNickname(), "Message: ", _type);
+            // self.logger.warn(self.getNickname(), "Message: ", _type);
 
             var elems = message.getElementsByTagName('body');
 
@@ -1268,11 +1270,15 @@ makeMetaAware(Karere);
                  */
 
                 // if not...set the message property
+                //TODO: remove $
                 eventData['message'] = $('messageContents', elems[0]).text();
 
                 // is this a forwarded message? if yes, trigger event only for that
+                //TODO: remove $
                 if ($('forwarded', message).size() > 0) {
+                    //TODO: remove $
                     $('forwarded', message).each(function(k, v) {
+                        //TODO: remove $
                         self._onIncomingStanza($('message', v)[0], {
                             'isForwarded': true,
                             'delay': $('delay', v).attr('stamp') ?
@@ -1292,8 +1298,11 @@ makeMetaAware(Karere);
             else if (_type === "groupchat") {
                 stanzaType = "ChatMessage";
 
+                // TODO: remove $
+
                 eventData['message'] = $('messageContents', elems[0]).text();
 
+                // TODO: remove $
                 // is this a forwarded message? if yes, trigger event only for that
                 if ($('forwarded', message).size() > 0) {
                     $('forwarded', message).each(function(k, v) {
@@ -1369,6 +1378,7 @@ makeMetaAware(Karere);
 
             var show = message.getElementsByTagName("show");
             if (show.length > 0) {
+                // TODO: remove $
                 eventData['show'] = $(show[0]).text();
             }
             else if (show.length === 0 && message.getAttribute('type')) {
@@ -1377,6 +1387,7 @@ makeMetaAware(Karere);
 
             var status = message.getElementsByTagName("status");
             if (status.length > 0) {
+                // TODO: remove $
                 eventData['status'] = $(status[0]).text();
             }
 
@@ -1390,6 +1401,7 @@ makeMetaAware(Karere);
                 var d = Date.parse(stamp);
                 eventData.delay = d / 1000;
 
+                //TODO: remove $
                 eventData['sent-stamp'] = $('delay', message).attr('sent-stamp') ?
                                             Date.parse($('delay', message).attr('sent-stamp')) / 1000 :
                                             undefined;
@@ -1439,6 +1451,7 @@ makeMetaAware(Karere);
      */
     Karere.prototype._onIncomingIq = function(message) {
         var self = this;
+        //TODO: remove $
         var $message = $(message);
 
         if ($message.attr("type") === "result") {
@@ -1453,6 +1466,7 @@ makeMetaAware(Karere);
             }
         }
         else if ($message.attr("type") === "get") {
+            // TODO: remove $
             if ($('ping', $message).size() > 0) {
                 self._triggerEvent("PingRequest", {
                     fromJid: $message.attr('from'),
@@ -1628,13 +1642,17 @@ makeMetaAware(Karere);
         else {
             eventDataObject = eventData;
             if ($.isPlainObject(eventDataObject)) {
-                self.logger.warn(
+/*          this warning is generated for every stanza handled by rtcSession, so
+            disable it to avoid flooding the log with warnings
+
+                  self.logger.warn(
                     "Karere will not handle incoming message type of type: ",
                     stanzaType,
                     ", with eventData:",
                     eventData,
                     ", so it should be handled by directly using Strophe.js's API."
                 );
+*/
             }
 
             // throw new Error("Don't know how to convert event of type: " + stanzaType + " to EventObject");
@@ -1887,6 +1905,7 @@ makeMetaAware(Karere);
             var json = Strophe.xmlHtmlNode("<json><\/json>").childNodes[0];
             json.textContent = JSON.stringify(outgoingMessage.getMeta());
 
+            // TODO: remove $
             var $body = $('body', message.nodeTree);
             if ($body[0]) {
                 $body[0].appendChild(
@@ -1899,6 +1918,7 @@ makeMetaAware(Karere);
         }
 
         if (outgoingMessage.getDelay() && outgoingMessage.getDelay() > 0) {
+            // TODO: remove $
             var $delay = $("<delay><\/delay>");
             $delay.attr('xmlns', 'urn:xmpp:delay');
             $delay.attr('from', self.getJid());
@@ -2512,6 +2532,7 @@ makeMetaAware(Karere);
         var meta = $.extend({}, self.options.defaultCapabilities);
 
         self.connection.disco.info(fullJid, function(response) {
+            //TODO: remove $
             meta['audio'] = $('feature[var="urn:xmpp:jingle:apps:rtp:audio"]', response).size() > 0;
             meta['video'] = $('feature[var="urn:xmpp:jingle:apps:rtp:video"]', response).size() > 0;
             meta['karere'] = $('feature[var="karere"]', response).size() > 0;

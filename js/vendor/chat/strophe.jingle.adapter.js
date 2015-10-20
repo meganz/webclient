@@ -187,6 +187,32 @@ WebrtcApi.prototype.getUserMediaWithConstraintsAndCallback = function(um, self, 
     }
 }		
 
+WebrtcApi.prototype.stopMediaStream = function(stream) {
+    if (!stream.stop) {
+        var tracks = stream.getTracks();
+        for (var i = 0; i < tracks.length; i++) {
+            tracks[i].stop();
+        }
+    } else {
+        stream.stop();
+    }
+}
+
+WebrtcApi.prototype._getBrowserVersion = function() {
+    var ua = navigator.userAgent;
+    if ((this.browser === 'chrome') || (this.browser === 'opera')) {
+        var m = ua.match(/Chrome\/(\d+)\./);
+        if(m && (m.length >= 2))
+            return m[1];
+    } else if (b === "firefox") {
+        var m = ua.match(/Firefox\/(\d+)\./);
+        if (m && (m.length >= 2))
+            return m[1];
+    } else {
+        return null;
+    }
+}
+
 var RTC = null;
 
 try {

@@ -25,7 +25,7 @@ describe("tlvstore unit test", function() {
     });
 
     describe('TLV en-/decoding', function() {
-        it("_toTlvRecord", function() {
+        it("toTlvRecord", function() {
             var tests = [['foo', 'bar',
                           'foo\u0000\u0000\u0003bar'],
                          ['puEd255', ED25519_PUB_KEY,
@@ -35,7 +35,7 @@ describe("tlvstore unit test", function() {
                 var key = tests[i][0];
                 var value = tests[i][1];
                 var expected = tests[i][2];
-                assert.strictEqual(ns._toTlvRecord(key, value), expected);
+                assert.strictEqual(ns.toTlvRecord(key, value), expected);
             }
         });
 
@@ -51,10 +51,10 @@ describe("tlvstore unit test", function() {
             }
         });
 
-        it('_splitSingleTlvRecord', function() {
+        it('splitSingleTlvRecord', function() {
             var tests = 'foo\u0000\u0000\u0003bar'
                       + 'puEd255\u0000\u0000\u0020' + ED25519_PUB_KEY;
-            var result = ns._splitSingleTlvRecord(tests);
+            var result = ns.splitSingleTlvRecord(tests);
             assert.strictEqual(result.record[0], 'foo');
             assert.strictEqual(result.record[1], 'bar');
             assert.strictEqual(result.rest, 'puEd255\u0000\u0000\u0020' + ED25519_PUB_KEY);
@@ -195,6 +195,20 @@ describe("tlvstore unit test", function() {
                     var cipher = atob(tests[i * expected.length + j]);
                     assert.strictEqual(ns.blockDecrypt(cipher, key), expected[j]);
                 }
+            }
+        });
+
+        it("blockDecrypt, failed integrity", function() {
+            var key = asmCrypto.bytes_to_string(asmCrypto.hex_to_bytes('0f0e0d0c0b0a09080706050403020100'));
+            var tests = [
+                atob('AAABAgMEBQYHCAkKC1jj/Y+ZHFFbO3UUng4na9OXvdc4jSVHIfN7ZqX='),
+                atob('AQABAgMEBQYHCAkcT6pYBDGA0fD0WxB4YOqtkAhkd2VnxJpePwdK'),
+                atob('AgABAgMEBQYHCAkcT6pYBDGA0fD0WxDEk30ne8m70a=='),
+                atob('AwABAgMEBQYHCAkKC1jj/Y+ZHFFbO3UUng4na9OXvdc4jSVHIfN7ZqX='),
+            ];
+            for (var i = 0; i < tests.length; i++) {
+                assert.throws(function() { ns.blockDecrypt(tests[i], key); },
+                              'data integrity check failed');
             }
         });
 

@@ -8,6 +8,9 @@ describe("MegaPromise Unit Test", function() {
         done();
     });
 
+    var fail = function(message) {
+        assert(false, message);
+    };
 
     it("resolve - 1 arg", function(done) {
         var p;
@@ -330,6 +333,54 @@ describe("MegaPromise Unit Test", function() {
         ]).always(function() {
             expect(resolved).to.deep.eql([1, 2, 5]);
             expect(rejected).to.deep.eql([3, 4, 6]);
+            done();
+        });
+    });
+
+    it(".allDone with both reject and resolve being called on the passed promises", function(done) {
+        var resolved = [];
+        var rejected = [];
+
+        var _trackPromise = function(p) {
+            return p
+                .done(function(a) {
+                    resolved.push(a);
+                })
+                .fail(function(a) {
+                    rejected.push(a);
+                });
+        };
+
+        var minOffset = 100;
+        var dummyTimedPromise = function(r, type) {
+            minOffset += rand(1, 100);
+            var p = (new MegaPromise());
+            setTimeout(function() {
+                p[type](r);
+            }, minOffset);
+
+            return p;
+        };
+
+        var masterPromise = MegaPromise.allDone([
+            _trackPromise(dummyTimedPromise(1, 'resolve')),
+            _trackPromise(dummyTimedPromise(2, 'resolve')),
+            _trackPromise(dummyTimedPromise(3, 'reject')),
+            _trackPromise(dummyTimedPromise(4, 'reject')),
+            _trackPromise(dummyTimedPromise(5, 'resolve')),
+            _trackPromise(dummyTimedPromise(6, 'reject'))
+        ]);
+        var resolvedSpy = sinon.stub();
+        var rejectedSpy = sinon.stub();
+        masterPromise.done(resolvedSpy);
+        masterPromise.fail(rejectedSpy);
+
+        masterPromise.always(function() {
+            expect(resolved).to.deep.eql([1, 2, 5]);
+            expect(rejected).to.deep.eql([3, 4, 6]);
+            expect(rejectedSpy.callCount).to.eql(0);
+            expect(resolvedSpy.callCount).to.eql(1);
+
             done();
         });
     });

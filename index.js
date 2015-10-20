@@ -46,11 +46,11 @@ function startMega() {
     }
 
     if (pages['dialogs']) {
-        $('body').append(translate(pages['dialogs'].replace(/{staticpath}/g, staticpath)));
+        $('body').safeAppend(translate(pages['dialogs'].replace(/{staticpath}/g, staticpath)));
         delete pages['dialogs'];
     }
     if (pages['chat']) {
-        $('body').append(translate(pages['chat'].replace(/{staticpath}/g, staticpath)));
+        $('body').safeAppend(translate(pages['chat'].replace(/{staticpath}/g, staticpath)));
         delete pages['chat'];
     }
     jsl = [];
@@ -192,9 +192,10 @@ function init_page() {
             u_n = pfid;
         }
         else {
-            $(document).one('MegaOpenFolder', SoonFc(function () {
-                mKeyDialog(pfid, true);
-            }));
+            return mKeyDialog(pfid, true)
+                .fail(function() {
+                    location.hash = 'start';
+                });
         }
         page = 'fm';
     }
@@ -576,14 +577,6 @@ function init_page() {
             $('.chrome-download-button').css('font-size', '12px');
         }
 
-        if (!is_extension && typeof chrome !== 'undefined' && !chrome.app.isInstalled) {
-            $('.chrome-app-button,.chrome-app-scr').rebind('click', function () {
-                chrome.webstore.install();
-                return false;
-            });
-            $('.chrome-app-scr').css('cursor', 'pointer');
-        }
-
         // On the manual download button click
         $('.chrome-download-button').rebind('click', function() {
 
@@ -654,10 +647,26 @@ function init_page() {
         parsepage(pages['backup']);
         init_backup();
     }
-    else if (page.substr(0, 6) === 'cancel' && page.length > 24 && u_type) {
+    else if (page.substr(0, 6) === 'cancel' && page.length > 24) {
 
-        var ac = new mega.AccountClosure();
-        ac.initAccountClosure();
+        if (u_type) {
+            var ac = new mega.AccountClosure();
+            ac.initAccountClosure();
+        }
+        else {
+            // Unable to cancel, not logged in
+            mega.ui.showLoginRequiredDialog({
+                title: l[6186],
+                textContent: l[5841]
+            })
+            .done(init_page)
+            .fail(function(aError) {
+                if (aError) {
+                    alert(aError);
+                }
+                location.hash = 'start';
+            });
+        }
     }
     else if (page === 'recovery') {
         parsepage(pages['recovery']);
@@ -742,6 +751,7 @@ function init_page() {
             html += e.outerHTML;
         });
         $('.credits-main-pad').html(html + '<div class="clear"></div>');
+        mainScroll();
     }
     else if (page == 'firefox') {
         parsepage(pages['firefox']);
@@ -798,7 +808,7 @@ function init_page() {
                 M.currentdirid = id;
             }
             if (!m && $('#fmholder').html() == '') {
-                $('#fmholder').html(translate(pages['fm'].replace(/{staticpath}/g, staticpath)));
+                $('#fmholder').safeHTML(translate(pages['fm'].replace(/{staticpath}/g, staticpath)));
             }
             if (pfid) {
                 $('.fm-left-menu .folderlink').removeClass('hidden');
@@ -825,7 +835,9 @@ function init_page() {
                     dlQueue.resume();
                     ulQueue.resume();
                     uldl_hold = false;
-                    showTransferToast('u', ul_queue.length);
+                    if (ul_queue.length > 0) {
+                        showTransferToast('u', ul_queue.length);
+                    }
                 };
 
                 $.termsDeny = function() {
@@ -840,7 +852,7 @@ function init_page() {
                 termsDialog();
             }
         }
-        $('#topmenu').html(parsetopmenu());
+        $('#topmenu').safeHTML(parsetopmenu());
 
         $('.feedback-button')
             .removeClass("hidden")
@@ -966,7 +978,7 @@ function loginDialog(close) {
     });
 
     $('.top-login-warning-close').rebind('click', function (e) {
-        if ($('.loginwarning-checkbox').attr('class').indexOf('checkboxOn') > -1) {
+        if ($('.loginwarning-checkbox').hasClass('checkboxOn')) {
             localStorage.hideloginwarning = 1;
         }
         $('.top-login-warning').removeClass('active');
@@ -1009,9 +1021,8 @@ function tooltiplogin() {
         $('.top-login-input-block.password').addClass('incorrect');
     }
     else {
-        $('.top-dialog-login-button span').html('<img alt="" src="' + staticpath + 'images/mega/ajax-loader.gif">');
         $('.top-dialog-login-button').addClass('loading');
-        if ($('.loginwarning-checkbox').attr('class').indexOf('checkboxOn') > -1) {
+        if ($('.loginwarning-checkbox').hasClass('checkboxOn')) {
             localStorage.hideloginwarning = 1;
         }
         var remember;
@@ -1019,7 +1030,6 @@ function tooltiplogin() {
             remember = 1;
         }
         postLogin($('#login-name').val(), $('#login-password').val(), remember, function (r) {
-            $('.top-dialog-login-button span').html(l[171]);
             $('.top-dialog-login-button').removeClass('loading');
             if (r == EBLOCKED) {
                 alert(l[730]);
@@ -1058,7 +1068,7 @@ function topmenuUI() {
     $('.top-menu-item.clouddrive,.top-menu-item.account').hide();
     $('.top-menu-item.refresh-item').addClass('hidden');
     $('.activity-status,.activity-status-block').hide();
-    $('.membership-status-block').html('<div class="membership-status free">' + l[435] + '</div>');
+    $('.membership-status-block').safeHTML('<div class="membership-status free">@@</div>', l[435]);
     $('.membership-status').hide();
     $('.top-head .user-name').hide();
 
@@ -1111,7 +1121,8 @@ function topmenuUI() {
 
             $('.membership-icon-pad .membership-big-txt.red').text(purchasedPlan);
             $('.membership-icon-pad .membership-icon').attr('class', 'membership-icon pro' + u_attr.p);
-            $('.membership-status-block').html('<div class="membership-status ' + cssClass + '">' + purchasedPlan + '</div>');
+            $('.membership-status-block')
+                .safeHTML('<div class="membership-status @@">@@</div>', cssClass, purchasedPlan);
             $('.context-menu-divider.upgrade-your-account').addClass('pro');
             $('.membership-popup.pro-popup');
         }
@@ -1120,7 +1131,7 @@ function topmenuUI() {
             $('.top-menu-item.upgrade-your-account,.context-menu-divider.upgrade-your-account').show();
             $('.context-menu-divider.upgrade-your-account').removeClass('pro lite');
             $('.membership-status').addClass('free');
-            $('.membership-status').html(l[435]);
+            $('.membership-status').text(l[435]);
         }
 
         $('.membership-status').show();
@@ -1170,7 +1181,7 @@ function topmenuUI() {
                 }
                 header = htmlentities(header);
 
-                $('.top-warning-popup .warning-popup-body').html(
+                $('.top-warning-popup .warning-popup-body').safeHTML(
                     '<div class="warning-header">' + header.trim() + '</div>' + body.trim()
                 );
                 $('.top-warning-popup .warning-button span').text(l[779]);
@@ -1229,6 +1240,27 @@ function topmenuUI() {
                 }
             }
         });
+
+        // Only show top language change icon if not logged in
+        if (u_type === false) {
+
+            // Get current language
+            var $topChangeLang = $('.top-change-language');
+            var $topChangeLangName = $topChangeLang.find('.top-change-language-name');
+            var languageName = ln[lang];
+
+            // Init the top header change language button
+            $topChangeLangName.text(languageName);
+            $topChangeLang.removeClass('hidden');
+            $topChangeLang.rebind('click', function() {
+
+                // Add log to see how often they click to change language
+                api_req({ a: 'log', e: 99600, m: 'Language menu opened from top header' });
+
+                // Open the language dialog
+                langDialog.show();
+            });
+        }
 
         $('.top-menu-item.register,.context-menu-divider.register,.top-menu-item.login').show();
 
@@ -1361,9 +1393,11 @@ function topmenuUI() {
                     var planName = getProPlan(planNum);
 
                     $('.membership-popup.pro-popup .membership-icon').addClass('pro' + planNum);
-                    var p = account.stype == 'S' ? '' :
-                        (l[987] + ' <span class="red">' + time2date(account.expiry) + '</span>');
-                    $('.membership-popup.pro-popup .membership-icon-txt-bl .membership-medium-txt').html(p);
+                    var p = '';
+                    if (account.stype !== 'S') {
+                        p = escapeHTML(l[987]) + ' <span class="red">' + time2date(account.expiry) + '</span>';
+                    }
+                    $('.membership-popup.pro-popup .membership-icon-txt-bl .membership-medium-txt').safeHTML(p);
 
                     // Update current plan to PRO I, PRO II, PRO III or LITE in popup
                     $('.membership-icon-pad .membership-big-txt.red').text(planName);
@@ -1376,8 +1410,8 @@ function topmenuUI() {
                 if (account.balance
                         && account.balance[0]
                         && account.balance[0][0] > 0) {
-                    $('.membership-popup .membership-price-txt .membership-big-txt').html('&euro; ' +
-                        htmlentities(account.balance[0][0]));
+                    $('.membership-popup .membership-price-txt .membership-big-txt')
+                        .safeHTML('&euro; @@', account.balance[0][0]);
                 }
                 else {
                     $('.membership-popup .membership-price-txt .membership-big-txt').html('&euro; 0.00');
@@ -1389,7 +1423,8 @@ function topmenuUI() {
                 }
                 $('.membership-popup .membership-circle-bg.blue-circle').attr('class',
                     'membership-circle-bg blue-circle percents-' + perc_c);
-                $('.membership-popup .membership-circle-bg.blue-circle').html(perc + '<span class="membership-small-txt">%</span>');
+                $('.membership-popup .membership-circle-bg.blue-circle')
+                    .safeHTML(perc + '<span class="membership-small-txt">%</span>');
                 var b1 = bytesToSize(account.space_used);
                 b1 = b1.split(' ');
                 b1[0] = Math.round(b1[0]) + ' ';
@@ -1425,7 +1460,7 @@ function topmenuUI() {
                     usedspacetxt = l[799].charAt(0).toLowerCase() + l[799].slice(1);
                 }
 
-                $('.membership-usage-txt.storage').html('<div class="membership-big-txt">' +
+                $('.membership-usage-txt.storage').safeHTML('<div class="membership-big-txt">' +
                     usedspace + '</div><div class="membership-medium-txt">' + usedspacetxt +
                     warning + '</div>');
 
@@ -1442,7 +1477,8 @@ function topmenuUI() {
 
                 $('.membership-popup .membership-circle-bg.green-circle')
                     .attr('class', 'membership-circle-bg green-circle percents-' + perc_c);
-                $('.membership-popup .membership-circle-bg.green-circle').html(perc + '<span class="membership-small-txt">%</span>');
+                $('.membership-popup .membership-circle-bg.green-circle')
+                    .safeHTML(perc + '<span class="membership-small-txt">%</span>');
                 var b1 = bytesToSize(account.servbw_used + account.downbw_used);
                 b1 = b1.split(' ');
                 b1[0] = Math.round(b1[0]) + ' ';
@@ -1489,7 +1525,7 @@ function topmenuUI() {
                     usedbwtxt = l[973].charAt(0).toLowerCase() + l[973].slice(1);
                 }
 
-                $('.membership-usage-txt.bandwidth').html('<div class="membership-big-txt">' +
+                $('.membership-usage-txt.bandwidth').safeHTML('<div class="membership-big-txt">' +
                     usedbw + '</div><div class="membership-medium-txt">' + usedbwtxt + warning + '</div>');
 
                 if (perc > 80) {
@@ -1601,7 +1637,7 @@ function topmenuUI() {
             mega.utils.reload();
         }
         else if (className.indexOf('languages') > -1) {
-            languageDialog();
+            langDialog.show();
         }
         else if (className.indexOf('clouddrive') > -1) {
             document.location.hash = 'fm';
@@ -1759,7 +1795,7 @@ function parsepage(pagehtml, pp) {
     pagehtml = pagehtml.replace("((MEGAINFO))", translate(pages['megainfo']).replace(/{staticpath}/g, staticpath));
     pagehtml = pagehtml.replace("((TOP))", top);
     pagehtml = pagehtml.replace("((BOTTOM))", translate(bmenu2));
-    $('#startholder').html(translate(pages['transferwidget']) + pagehtml);
+    $('#startholder').safeHTML(translate(pages['transferwidget']) + pagehtml);
     $('#startholder').show();
     mainScroll();
     $(window).rebind('resize.subpage', function (e) {
@@ -1849,78 +1885,6 @@ window.onhashchange = function() {
         init_page();
     }
 };
-
-function languageDialog(close) {
-    if (close) {
-        $('.fm-dialog.languages-dialog').addClass('hidden');
-        $('.fm-dialog-overlay').addClass('hidden');
-        $('body').removeClass('overlayed');
-        $.dialog = false;
-        return false;
-    }
-    var html = '<div class="nlanguage-txt-block">';
-    var larray = [];
-    for (var la in languages) {
-        if (ln2[la]) {
-            larray.push({
-                l: ln[la],
-                l2: ln2[la],
-                c: la
-            });
-        }
-    }
-    larray.sort(function (a, b) {
-            return a.l.localeCompare(b.l);
-        });
-    var i = 1,
-        a = 0,
-        sel = '';
-    for (var j in larray) {
-        var la = larray[j].c;
-        if (ln2[la]) {
-            if (la == lang) {
-                sel = ' selected';
-            }
-            else {
-                sel = '';
-            }
-            html += '<a href="#" id="nlanguagelnk_' + la + '" class="nlanguage-lnk' + sel + '"><span class="nlanguage-tooltip"> <span class="nlanguage-tooltip-bg"> <span class="nlanguage-tooltip-main"> '
-                + ln2[la] + '</span></span></span>' + ln[la] + '</a><div class="clear"></div>';
-            if (i == Math.ceil(larray.length / 4) && a + 1 < larray.length) {
-                html += '</div><div class="nlanguage-txt-block">';
-                i = 0;
-            }
-            i++;
-            a++;
-        }
-    }
-    html += '</div><div class="clear"></div>';
-    $('.languages-dialog-body').html(html);
-    $('.fm-dialog.languages-dialog').removeClass('hidden');
-    $('.fm-dialog-overlay').removeClass('hidden');
-    $('body').addClass('overlayed');
-    $.dialog = 'languages';
-    $('.fm-dialog.languages-dialog .fm-dialog-close').rebind('click', function (e) {
-            languageDialog(1);
-        });
-
-    $('.fm-languages-save').rebind('click', function (e) {
-            languageDialog(1);
-            setTimeout(function () {
-                var lng = $('.nlanguage-lnk.selected').attr('id');
-                lng = lng.replace('nlanguagelnk_', '');
-                if (lng !== lang) {
-                    localStorage.lang = lng;
-                    document.location.reload();
-                }
-            }, 100);
-        });
-    $('.nlanguage-lnk').rebind('click', function (e) {
-            $('.nlanguage-lnk').removeClass('selected');
-            $(this).addClass('selected');
-            return false;
-        });
-}
 
 window.onbeforeunload = function () {
     if (dlmanager.isDownloading || ulmanager.isUploading) {

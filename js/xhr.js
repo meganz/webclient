@@ -18,7 +18,9 @@ var mXHRTimeoutMS = localStorage.xhrtimeout || 2 * 60 * 1000;
         };
         xhr.setup_timeout = function() {
             this.clear_timeout();
-            this.__timeout = setTimeout(this.mOnTimeout, this.__timeout_ms);
+            this.__timeout = setTimeout(function() {
+                xhr.mOnTimeout();
+            }, this.__timeout_ms);
         };
 
         xhr._abort = xhr.abort;
@@ -66,6 +68,9 @@ var mXHRTimeoutMS = localStorage.xhrtimeout || 2 * 60 * 1000;
                     }
                     break;
                 case 4:
+                    if (!use_ssl) {
+                        dlmanager.checkHSTS(this);
+                    }
                     if (this.listener.on_ready) {
                         this.clear_timeout();
                         if (0xDEAD === this.listener.on_ready(arguments, this)) {
@@ -103,6 +108,9 @@ var mXHRTimeoutMS = localStorage.xhrtimeout || 2 * 60 * 1000;
                 return this.nolistener();
             }
             this.clear_timeout();
+            if (!use_ssl) {
+                dlmanager.checkHSTS(this);
+            }
             if (this.listener.on_error && !this.__failed) {
                 var l = this.listener;
                 this.listener = null; /* release */

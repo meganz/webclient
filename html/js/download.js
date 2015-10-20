@@ -11,7 +11,12 @@ function dlinfo(ph,key,next)
     if ((lang == 'en') || (lang !== 'en' && l[1388] !== '[B]Download[/B] [A]to your computer[/A]'))
     {
         //$('.new-download-red-button').html(l[1388].replace('[B]','').replace('[/B]','').replace('[A]','').replace('[/A]',''));
-        $('.new-download-gray-button').html(l[1389].replace('[B]','<div class="new-download-button-txt1">').replace('[/B]','</div>').replace('[A]','<div class="new-download-button-txt2">').replace('[/A]','</div>'));
+        $('.new-download-gray-button')
+            .safeHTML(escapeHTML(l[1389])
+                .replace('[B]', '<div class="new-download-button-txt1">')
+                .replace('[/B]', '</div>')
+                .replace('[A]', '<div class="new-download-button-txt2">')
+                .replace('[/A]', '</div>'));
     }
 
     $('.widget-block').addClass('hidden');
@@ -44,10 +49,18 @@ function dlinfo(ph,key,next)
 }
 
 function dl_g(res) {
-    
+
     // Show ad if enabled
     megaAds.ad = res.ad;
     megaAds.popAd = res.popad;
+
+    // Forcefully ignore the API if we really do not want to see ads. This prevents a malicious API response from
+    // compromising the browser if an attacker MITM'd the HTTPS connection to the API and returned a malicious ad URL.
+    if (showAd() === 0) {
+        megaAds.ad = false;
+        megaAds.popAd = false;
+    }
+
     megaAds.showAds($('#ads-block-frame'));
 
     // If 'msd' (MegaSync download) flag is turned off via the API then hide the download with MEGAsync button.
@@ -92,9 +105,11 @@ function dl_g(res) {
             $('.megasync-overlay').removeClass('downloading');
             megasync.download(dlpage_ph, dlpage_key);
         });
-        
+
         $('.new-download-red-button, .regular-download').rebind('click', function() {
-            
+
+            // If regular download using Firefox and the total download is over 1GB then show the dialog
+            // to use the extension, but not if they've seen the dialog before and ticked the checkbox
             if (dlMethod == MemoryIO && !localStorage.firefoxDialog && fdl_filesize > 1048576000 && navigator.userAgent.indexOf('Firefox') > -1)
             {
                 firefoxDialog();
@@ -238,7 +253,7 @@ function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
         $('.download-mid-centered-block').addClass('downloading');
         $('.download-mid-centered-block').removeClass('not-available-temporary');
         $('.downloading-progress-bar').width(perc + '%');
-        $('.new-download-icon').html('<div>'+perc+'<span>%</span></div>');
+        $('.new-download-icon').safeHTML('<div>@@<span>%</span></div>', perc);
         megatitle(' ' + perc + '%');
     }
     if (fdl_starttime) var eltime = (new Date().getTime()-fdl_starttime)/1000;
@@ -404,7 +419,6 @@ function sync_switchOS(os)
  */
 function ImgError(source) {
     source.src =  gifSlider.empty1x1png;
-    source.onerror = '';
     return true;
 }
 
@@ -424,7 +438,7 @@ var megaAds = {
      * Initialise the HTML for ads
      */
     init: function() {
-        
+
         if (this.popAd) {
             popunda.megaPopunder.popurls = this.popAd;
             popunda.megaPopunder.init($(".new-download-buttons"));
@@ -432,19 +446,21 @@ var megaAds = {
 
         // Remove any previous ad containers
         $('#ads-block-frame, ads-block-header').remove();
-        
+
         // Add the ad html into download page
         var $adContainer = $('<div id="ads-block-frame"></div>');
-        var $iframe = $('<iframe></iframe>');
+
+        // Inject header html to alert users that this is advertisement content and not directly from mega
+        $adContainer.safeAppend('<div class="ads-block-header">@@</div>', l[7212]);
+
+        // Create the iframe element, with type:content so that it won't
+        // inherit the privileged chrome context in the firefox extension.
+        var $iframe = mCreateElement('iframe', {type: 'content', style: 'border: none'});
         $adContainer.append($iframe);
-        $iframe.css('border', 'none');
 
         // Fill with an ad if we already have one
         megaAds.showAds($adContainer);
 
-        // Inject header html to alert users that this is advertisement content and not directly from mega
-        var $header = $('<div class="ads-block-header">' + l[7212] + '</div>');
-        $adContainer.prepend($header);
         $('.ads-left-block').prepend($adContainer);
     },
 
@@ -453,12 +469,12 @@ var megaAds = {
      * @param {Object} $adContainer jQuery object of the ads-block-frame
      */
     showAds: function($adContainer) {
-        
+
         var $iframe = $adContainer.find('iframe');
-        
+
         // Only show ads if we successfully fetched an ad
         if (this.ad) {
-            
+
             // The init ads method injected this iframe into the DOM, we make it visible, the correct size, set its src to show the ad
             $adContainer.css('visibility', 'visible');
             $iframe.css('height', this.ad.height + 'px');
@@ -475,7 +491,7 @@ var megaAds = {
             $iframe.css('height', '0px');
             $iframe.css('width', '0px');
             $iframe.removeAttr('src');
-            
+
             // Hide ad block
             $('.animations-left-container').show();
             $('.ads-left-block').removeClass('ads-enabled');
@@ -698,8 +714,12 @@ var gifSlider = {
             .css({ width: '260px', height: '300px'}).fadeIn(gifSlider.fadeInSpeed);
 
         // Set title and description
-        $('.ads-' + side + '-block .products-top-txt .red').html(slideTitle).fadeIn(gifSlider.fadeInSpeed);
-        $('.ads-' + side + '-block .products-top-txt .description').text(slideDescription).fadeIn(gifSlider.fadeInSpeed);
+        $('.ads-' + side + '-block .products-top-txt .red')
+            .safeHTML(slideTitle)
+            .fadeIn(gifSlider.fadeInSpeed);
+        $('.ads-' + side + '-block .products-top-txt .description')
+            .text(slideDescription)
+            .fadeIn(gifSlider.fadeInSpeed);
 
         // Display corresponding image in bottom right corner
         if (typeof bottomImage === 'string') {

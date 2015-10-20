@@ -123,7 +123,7 @@
         if (item.isFile) {
             dir_inflight++;
             item.file(function(file) {
-                if (d) {
+                if (d > 1) {
                     console.log(file);
                 }
                 file.path = path;
@@ -313,7 +313,7 @@
         document.getElementById("startholder").addEventListener("drop", FileSelectHandler, false);
 
         if (is_chrome_firefox) {
-            $('input[webkitdirectory]').click(function(e) {
+            $('input[webkitdirectory], .fm-folder-upload input').click(function(e) {
                 var file = mozFilePicker(0, 2, { /*gfp:1,*/
                     title: l[98]
                 });

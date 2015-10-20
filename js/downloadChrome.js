@@ -171,7 +171,9 @@
                 }
 
                 if (callback) {
-                    setTimeout(callback, ms || 2600);
+                    setTimeout(function() {
+                        callback();
+                    }, ms || 2600);
                 }
             });
         });
@@ -409,7 +411,10 @@
                             'Your available browser storage for MEGA cannot ' +
                             'handle this download size, please free up some disk space.');
                     }
-                    return wTimer = setTimeout(this.fsInitOp.bind(this), 2801);
+                    wTimer = setTimeout(function() {
+                        this.fsInitOp();
+                    }.bind(this), 2801);
+                    return wTimer;
                 }
                 dl_storagetype = aStorageType !== 1 ? 0 : 1;
 

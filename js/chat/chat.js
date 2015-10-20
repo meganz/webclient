@@ -639,7 +639,7 @@ var Chat = function() {
 
                 scrambleJid: function(bareJid) {
                     var H = asmCrypto.SHA256.base64;
-                    return H(bareJid + H(u_privk + "webrtc stats collection"));
+                    return H(bareJid + H(u_privk + "webrtc stats collection")).substr(0, 16);
                 }
             },
             iceServers:[
@@ -752,8 +752,6 @@ var Chat = function() {
     }
 
     self.filePicker = null; // initialized on a later stage when the DOM is fully available.
-
-    //logAllCallsOnObject(jodid25519.eddsa, console.error, true, 'jodid25519.eddsa');
 
     return this;
 };

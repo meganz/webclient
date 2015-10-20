@@ -12491,6 +12491,12 @@ table {
 .canceltransfer-item .context-menu-icon {
 	background-position: 4px -3716px;
 }
+
+.do-sort .context-menu-icon {
+	background-position: -100px -5290px;
+}
+
+.do-sort.selected .context-menu-icon,
 .select-all .context-menu-icon {
 	background-position: -3px -5290px;
 }

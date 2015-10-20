@@ -123,6 +123,14 @@ function MegaData()
         this.sort();
     };
 
+    this.sortByModTime = function(d) {
+        this.sortfn = function(a, b, d) {
+            return (a.mtime < b.mtime) ? -1 * d : d;
+        };
+        this.sortd = d;
+        this.sort();
+    };
+
     this.sortByDateTime = function(d)
     {
         this.sortfn = function(a, b, d)
@@ -268,10 +276,12 @@ function MegaData()
 
     this.doSort = function(n, d) {
         $('.grid-table-header .arrow').removeClass('asc desc');
+        $('.context-menu-item.do-sort').removeClass('selected');
         if (d > 0) {
             $('.arrow.' + n).addClass('desc');
         } else {
             $('.arrow.' + n).addClass('asc');
+            $('.do-sort[data-by="' + n + '"]').addClass('selected');
         }
         if (n === 'name') {
             M.sortByName(d);
@@ -281,6 +291,9 @@ function MegaData()
         }
         else if (n === 'type') {
             M.sortByType(d);
+        }
+        else if (n === 'modified') {
+            M.sortByModTime(d);
         }
         else if (n === 'date') {
             M.sortByDateTime(d);
@@ -297,7 +310,7 @@ function MegaData()
         else if (n === 'status') {
             M.sortByStatus(d);
         }
-    else if (n === 'fav') {
+        else if (n === 'fav') {
             M.sortByFav(d);
         }
 

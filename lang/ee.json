@@ -2736,10 +2736,12 @@
     "7685": "Siinkohal kinnitan, et kaebuses ja \u00fclalmainitud asukohas oleva autori\u00f5igustega materjali omanik, esindaja v\u00f5i seadus (nt lubatud kasutada) pole lubanud  selle avaldamist siin keskkonnas.",
     "7686": "\u00dcks linkidest ei \u00fchti MEGA formaadiga.",
     "7687": "Edastuse seadeid n\u00e4evad vaid registreeritud kasutajad.",
-    "7688": "There may be a man-in-the-middle attack in progress. Please reset the stored identification credentials for this contact and then verify that they are correct with your contact through an existing secure channel or in person.",
-    "7689": "Reset contact credentials",
-    "7690": "Use the reset button below to reset the credentials for this contact.",
-    "7691": "New contact credentials",
-    "7692": "Verify credentials",
-    "7693": "Use the Verify button below to confirm the credentials for this contact."
+    "7688": "Vahelep\u00f5ike r\u00fcnnak v\u00f5is aset leida. Palun muutke selle kontakti andmeid ja kontrollige turvaliste kanalite kaudu v\u00f5i kontaktiga isiklikult \u00fchendust v\u00f5ttes andmete \u00f5igsust.",
+    "7689": "Muuda kontakti andmeid",
+    "7690": "Selle kontakti andmete muutmiseks vajutage k\u00f5rvalolevat nuppu ,,muuda\".",
+    "7691": "Kontakti uued andmed",
+    "7692": "Kinnita andmed",
+    "7693": "Selle kontakti andmete kinnitamiseks vajutage k\u00f5rvalolevat nuppu ,,Kinnita\".",
+    "7694": "See fail on eemaldatud mahav\u00f5tmise teate t\u00f5ttu.",
+    "7695": "See kaust on eemaldatud mahav\u00f5tmise teate t\u00f5ttu."
 }

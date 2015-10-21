@@ -3501,6 +3501,60 @@ mega.utils.neuterArrayBuffer = function neuter(ab) {
 };
 
 /**
+ * Resources loader through our secureboot mechanism
+ * @param {...*} var_args  Resources to load, either plain filenames or jsl2 members
+ * @return {MegaPromise}
+ */
+mega.utils.require = function megaUtilsRequire() {
+    var files = [];
+
+    toArray(arguments).forEach(function(file) {
+
+        // If a plain filename, inject it into jsl2
+        // XXX: Likely this will have a conflict with our current build script
+        if (!jsl2[file]) {
+            var filename = file.replace(/^.*\//, '');
+            var extension = filename.split('.').pop().toLowerCase();
+            var name = filename.replace(/\./g, '_');
+            var type;
+            var result;
+
+            if (extension === 'html') {
+                type = 0;
+            }
+            else if (extension === 'js') {
+                type = 1;
+            }
+            else if (extension === 'css') {
+                type = 2;
+            }
+
+            jsl2[name] = { f: file, n: name, j: type };
+            file = name;
+        }
+
+        if (!jsl_loaded[jsl2[file].n]) {
+            files.push(jsl2[file]);
+        }
+    });
+
+    if (files.length === 0) {
+        // Everything is already loaded
+        return MegaPromise.resolve();
+    }
+
+    Array.prototype.push.apply(jsl, files);
+
+    var promise = new MegaPromise();
+    silent_loading = function() {
+        promise.resolve();
+    };
+    jsl_start();
+
+    return promise;
+};
+
+/**
  *  Kill session and Logout
  */
 mega.utils.logout = function megaUtilsLogout() {

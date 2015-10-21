@@ -900,7 +900,7 @@ function MegaData()
         function renderLayout(u, n_cache) {
             var html, cs, contains, u_h, t, el, time, bShare,
                 avatar, rights, rightsclass, onlinestatus, html,
-                sExportLink, sLinkIcon, takenDown,
+                sExportLink, sLinkIcon, takenDown, takenDownTitle,
                 iShareNum = 0,
                 s, ftype, c, cc, star;
 
@@ -1041,12 +1041,13 @@ function MegaData()
                     sExportLink = (M.v[i].shares && M.v[i].shares.EXP) ? 'linked' : '';
                     sLinkIcon = (sExportLink === '') ? '' : 'link-icon';
                     takenDown = (M.v[i] && M.v[i].shares && M.v[i].shares.EXP && M.v[i].shares.EXP.down) ? 'taken-down' : '';
+                    takenDownTitle = (M.v[i].t === 1) ? l[7695] : l[7694];
 
                     // Block view
                     if (M.viewmode === 1) {
                         t = '.fm-blocks-view.fm .file-block-scrolling';
                         el = 'a';
-                        html = '<a id="' + htmlentities(M.v[i].h) + '" class="file-block' + c + ' ' + sExportLink + ' ' + takenDown +  '">\n\
+                        html = '<a id="' + htmlentities(M.v[i].h) + '" class="file-block' + c + ' ' + sExportLink + ' ' + takenDown +  '" title="' + takenDownTitle + '">\n\
                                     <span class="file-status-icon' + star + '"></span>\n\
                                     <span class="' + sLinkIcon + '"></span>\n\
                                     <span class="file-settings-icon"></span>\n\
@@ -1062,7 +1063,7 @@ function MegaData()
                         time = time2date(M.v[i].ts || (M.v[i].p === 'contacts' && M.contactstatus(M.v[i].h).ts));
                         t = '.grid-table.fm';
                         el = 'tr';
-                        html = '<tr id="' + htmlentities(M.v[i].h) + '" class="' + c + ' ' + takenDown +  '">\n\
+                        html = '<tr id="' + htmlentities(M.v[i].h) + '" class="' + c + ' ' + takenDown +  '" title="' + takenDownTitle + '">\n\
                                     <td width="30">\n\
                                         <span class="grid-status-icon' + star + '"></span>\n\
                                     </td>\n\
@@ -7097,12 +7098,12 @@ function balance2pro(callback)
 
         // Add title, mouse popup
         if (M.d[nodeId].t === 1) {// Item is folder
-            $('.grid-table.fm #' + nodeId).attr('title', 'This folder has been subjected to a takedown notice.');
-            $('#' + nodeId + '.file-block').attr('title', 'This folder has been subjected to a takedown notice.');
+            $('.grid-table.fm #' + nodeId).attr('title', l[7695]);
+            $('#' + nodeId + '.file-block').attr('title', l[7695]);
         }
         else {// Item is file
-            $('.grid-table.fm #' + nodeId).attr('title', 'This file has been subjected to a takedown notice.');
-            $('#' + nodeId + '.file-block').attr('title', 'This file has been subjected to a takedown notice.');
+            $('.grid-table.fm #' + nodeId).attr('title', l[7694]);
+            $('#' + nodeId + '.file-block').attr('title', l[7694]);
         }
     };
 

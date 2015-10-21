@@ -29,13 +29,11 @@ describe("account unit test", function() {
     describe('user attributes', function() {
         describe('getUserAttribute', function() {
             it("internal callback error, no custom callback", function() {
-                var _logger = { warn: sinon.stub() };
-                sandbox.stub(MegaLogger, 'getLogger').returns(_logger);
+                var logger = { warn: sinon.stub() };
+                sandbox.stub(MegaLogger, 'getLogger').returns(logger);
                 sandbox.stub(window, 'api_req');
                 var masterPromise = { reject: sinon.stub() };
                 sandbox.stub(window, 'MegaPromise').returns(masterPromise);
-                var logger = { warn: sinon.stub() };
-                sandbox.stub(MegaLogger, 'getLogger').returns(logger);
                 var aPromise = getUserAttribute('me3456789xw', 'puEd255', true, false, undefined);
                 assert.strictEqual(aPromise, masterPromise);
                 assert.strictEqual(api_req.callCount, 1);
@@ -168,8 +166,8 @@ describe("account unit test", function() {
                 assert.strictEqual(aPromise.resolve.callCount, 1);
                 assert.deepEqual(myCallback.callCount, 1);
                 assert.deepEqual(myCallback.args[0][0], expected);
-                assert.strictEqual(_logger.info.args[0][0],
-                                   'Attribute "*keyring" for user "me3456789xw" is "[object Object]".');
+                assert.match(_logger.info.args[0][0],
+                             /Attribute "\*keyring" for user "me3456789xw" is {"/);
             });
 
             it("public attribute", function() {

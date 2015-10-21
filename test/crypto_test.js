@@ -292,7 +292,7 @@ describe("crypto unit test", function() {
                 var pubKeyCallback = pubKeyPromise.done.args[0][0];
                 pubKeyCallback('the key');
                 assert.strictEqual(ns._getPubKeyAuthentication.callCount, 1);
-                assert.strictEqual(authring.computeFingerprint.callCount, 2);
+                assert.strictEqual(authring.computeFingerprint.callCount, 1);
                 assert.strictEqual(masterPromise.resolve.callCount, 1);
                 assert.deepEqual(masterPromise.resolve.args[0], ['the key']);
                 assert.strictEqual(authring.setContactAuthenticated.callCount, 1);
@@ -326,7 +326,7 @@ describe("crypto unit test", function() {
                 assert.strictEqual(masterPromise.reject.args[0][0], EINTERNAL);
                 assert.strictEqual(masterPromise.linkFailTo.callCount, 1);
                 assert.strictEqual(masterPromise.linkFailTo.args[0][0], pubKeyPromise);
-                assert.deepEqual(pubEd25519, { 'you456789xw': 'the key' });
+                assert.strictEqual(pubEd25519['you456789xw'], undefined);
             });
 
             it("uncached Cu25519 key", function() {
@@ -357,7 +357,8 @@ describe("crypto unit test", function() {
                     callCount++;
                     if (callCount === 1) {
                         return _getPubKey(userhandle, keyType, callback);
-                    } else {
+                    }
+                    else {
                         return 'Ed placebo';
                     }
                 });
@@ -376,7 +377,6 @@ describe("crypto unit test", function() {
 
                 var pubKeyPromiseCallback = pubKeyPromise.done.args[0][0];
                 pubKeyPromiseCallback('the key');
-                assert.deepEqual(pubCu25519, { 'you456789xw': 'the key' });
                 assert.strictEqual(ns._getPubKeyAuthentication.callCount, 1);
                 assert.strictEqual(authring.computeFingerprint.callCount, 1);
 
@@ -416,7 +416,8 @@ describe("crypto unit test", function() {
                     callCount++;
                     if (callCount === 1) {
                         return _getPubKey(userhandle, keyType, callback);
-                    } else {
+                    }
+                    else {
                         return 'Ed placebo';
                     }
                 });
@@ -435,7 +436,6 @@ describe("crypto unit test", function() {
 
                 var pubKeyPromiseCallback = pubKeyPromise.done.args[0][0];
                 pubKeyPromiseCallback('the key');
-                assert.deepEqual(pubCu25519, { 'you456789xw': 'the key' });
                 assert.strictEqual(ns._getPubKeyAuthentication.callCount, 1);
                 assert.strictEqual(authring.computeFingerprint.callCount, 1);
 
@@ -476,7 +476,8 @@ describe("crypto unit test", function() {
                     callCount++;
                     if (callCount === 1) {
                         return _getPubKey(userhandle, keyType, callback);
-                    } else {
+                    }
+                    else {
                         return 'Ed placebo';
                     }
                 });
@@ -495,7 +496,6 @@ describe("crypto unit test", function() {
 
                 var pubKeyPromiseCallback = pubKeyPromise.done.args[0][0];
                 pubKeyPromiseCallback('the key');
-                assert.deepEqual(pubCu25519, { 'you456789xw': 'the key' });
                 assert.strictEqual(ns._getPubKeyAuthentication.callCount, 1);
                 assert.strictEqual(authring.computeFingerprint.callCount, 1);
 
@@ -504,12 +504,78 @@ describe("crypto unit test", function() {
                 assert.strictEqual(base64urldecode.callCount, 1);
                 assert.strictEqual(ns._checkSignature.callCount, 1);
                 assert.strictEqual(masterPromise.resolve.callCount, 1);
-                assert.strictEqual(authring.computeFingerprint.callCount, 2);
                 assert.strictEqual(authring.setContactAuthenticated.callCount, 1);
+                assert.deepEqual(pubCu25519, { 'you456789xw': 'the key' });
                 assert.deepEqual(pubEd25519, { 'you456789xw': 'the key' });
             });
 
-            it("uncached Cu25519 key, bad signature", function() {sandbox.stub(window, 'u_authring', { Cu25519: {} });
+            it("uncached Cu25519 key, new key, no signature", function() {
+                sandbox.stub(window, 'u_authring',
+                    { Cu25519: { 'you456789xw': 'different stuff' } });
+                sandbox.stub(window, 'pubEd25519', { 'you456789xw': 'the key' });
+                sandbox.stub(window, 'pubCu25519', {});
+                var masterPromise = { reject: sinon.stub(),
+                                      linkFailTo: sinon.stub() };
+                var signatureVerificationPromise = { done: sinon.stub() };
+                var _MegaPromise = function() {
+                    return masterPromise;
+                };
+                _MegaPromise.all = sinon.stub().returns(signatureVerificationPromise);
+                sandbox.stub(window, 'MegaPromise', _MegaPromise);
+                var pubKeyPromise = { done: sinon.stub() };
+                sandbox.stub(ns, 'getPubKeyAttribute').returns(pubKeyPromise);
+                sandbox.stub(ns, '_getPubKeyAuthentication').returns(authring.AUTHENTICATION_METHOD.SEEN);
+                sandbox.stub(authring, 'getContactAuthenticated').returns({ fingerprint: 'bad smudge' });
+                sandbox.stub(ns, '_showFingerprintMismatchException');
+                sandbox.stub(window, 'getUserAttribute').returns('');
+                sandbox.stub(authring, 'computeFingerprint').returns('smudge');
+                sandbox.stub(window, 'base64urldecode', _echo);
+                sandbox.stub(window, 'assertUserHandle');
+                sandbox.stub(ns, '_checkSignature').returns(null);
+
+                // This is to pass through the first call directly, then stub on subsequent ones.
+                var _getPubKey = ns.getPubKey;
+                var callCount = 0;
+                sandbox.stub(ns, 'getPubKey', function __getPubKey(userhandle, keyType, callback) {
+                    callCount++;
+                    if (callCount === 1) {
+                        return _getPubKey(userhandle, keyType, callback);
+                    }
+                    else {
+                        return 'Ed placebo';
+                    }
+                });
+
+                var result = ns.getPubKey('you456789xw', 'Cu25519');
+                assert.strictEqual(result, masterPromise);
+                assert.strictEqual(ns.getPubKeyAttribute.callCount, 1);
+                assert.strictEqual(pubKeyPromise.done.callCount, 1);
+                assert.strictEqual(ns.getPubKey.callCount, 2);
+                assert.strictEqual(getUserAttribute.callCount, 1);
+                assert.strictEqual(MegaPromise.all.callCount, 1);
+                assert.strictEqual(signatureVerificationPromise.done.callCount, 1);
+                assert.strictEqual(masterPromise.linkFailTo.callCount, 1);
+                assert.strictEqual(masterPromise.linkFailTo.callCount, 1);
+                assert.strictEqual(masterPromise.linkFailTo.args[0][0], signatureVerificationPromise);
+
+                var pubKeyPromiseCallback = pubKeyPromise.done.args[0][0];
+                pubKeyPromiseCallback('the key');
+                assert.strictEqual(ns._getPubKeyAuthentication.callCount, 1);
+                assert.strictEqual(authring.computeFingerprint.callCount, 1);
+
+                var signatureVerificationCallback = signatureVerificationPromise.done.args[0][0];
+                signatureVerificationCallback(['the key', 'Ed placebo', '']);
+                assert.strictEqual(base64urldecode.callCount, 1);
+                assert.strictEqual(ns._checkSignature.callCount, 1);
+                assert.strictEqual(authring.getContactAuthenticated.callCount, 1);
+                assert.strictEqual(ns._showFingerprintMismatchException.callCount, 1);
+                assert.strictEqual(masterPromise.reject.callCount, 1);
+                assert.strictEqual(masterPromise.reject.args[0][0], EINTERNAL);
+                assert.strictEqual(pubCu25519['you456789xw'], undefined);
+            });
+
+            it("uncached Cu25519 key, bad signature", function() {
+                sandbox.stub(window, 'u_authring', { Cu25519: {} });
                 sandbox.stub(window, 'pubEd25519', { 'you456789xw': 'the key' });
                 sandbox.stub(window, 'pubCu25519', {});
                 var masterPromise = { reject: sinon.stub(),
@@ -537,7 +603,8 @@ describe("crypto unit test", function() {
                     callCount++;
                     if (callCount === 1) {
                         return _getPubKey(userhandle, keyType, callback);
-                    } else {
+                    }
+                    else {
                         return 'Ed placebo';
                     }
                 });
@@ -556,7 +623,6 @@ describe("crypto unit test", function() {
 
                 var pubKeyPromiseCallback = pubKeyPromise.done.args[0][0];
                 pubKeyPromiseCallback('the key');
-                assert.deepEqual(pubCu25519, { 'you456789xw': 'the key' });
                 assert.strictEqual(ns._getPubKeyAuthentication.callCount, 1);
                 assert.strictEqual(authring.computeFingerprint.callCount, 1);
 
@@ -567,7 +633,7 @@ describe("crypto unit test", function() {
                 assert.strictEqual(ns._showKeySignatureFailureException.callCount, 1);
                 assert.strictEqual(masterPromise.reject.callCount, 1);
                 assert.strictEqual(masterPromise.reject.args[0][0], EINTERNAL);
-                assert.strictEqual(authring.computeFingerprint.callCount, 1);
+                assert.strictEqual(pubCu25519['you456789xw'], undefined);
                 assert.deepEqual(pubEd25519, { 'you456789xw': 'the key' });
             });
 
@@ -586,6 +652,7 @@ describe("crypto unit test", function() {
                 var pubKeyPromise = { done: sinon.stub() };
                 sandbox.stub(ns, 'getPubKeyAttribute').returns(pubKeyPromise);
                 sandbox.stub(ns, '_getPubKeyAuthentication').returns(authring.AUTHENTICATION_METHOD.SEEN);
+                sandbox.stub(authring, 'getContactAuthenticated').returns({ fingerprint: 'smudge' });
                 sandbox.stub(window, 'getUserAttribute').returns('');
                 sandbox.stub(authring, 'computeFingerprint').returns('smudge');
                 sandbox.stub(window, 'base64urldecode', _echo);
@@ -599,7 +666,8 @@ describe("crypto unit test", function() {
                     callCount++;
                     if (callCount === 1) {
                         return _getPubKey(userhandle, keyType, callback);
-                    } else {
+                    }
+                    else {
                         return 'Ed placebo';
                     }
                 });
@@ -618,7 +686,6 @@ describe("crypto unit test", function() {
 
                 var pubKeyPromiseCallback = pubKeyPromise.done.args[0][0];
                 pubKeyPromiseCallback('the key');
-                assert.deepEqual(pubCu25519, { 'you456789xw': 'the key' });
                 assert.strictEqual(ns._getPubKeyAuthentication.callCount, 1);
                 assert.strictEqual(authring.computeFingerprint.callCount, 1);
 
@@ -627,7 +694,7 @@ describe("crypto unit test", function() {
                 assert.strictEqual(base64urldecode.callCount, 1);
                 assert.strictEqual(ns._checkSignature.callCount, 1);
                 assert.strictEqual(masterPromise.resolve.callCount, 1);
-                assert.strictEqual(authring.computeFingerprint.callCount, 1);
+                assert.deepEqual(pubCu25519, { 'you456789xw': 'the key' });
                 assert.deepEqual(pubEd25519, { 'you456789xw': 'the key' });
             });
 
@@ -645,7 +712,8 @@ describe("crypto unit test", function() {
                 sandbox.stub(window, 'MegaPromise', _MegaPromise);
                 var pubKeyPromise = { done: sinon.stub() };
                 sandbox.stub(ns, 'getPubKeyAttribute').returns(pubKeyPromise);
-                sandbox.stub(ns, '_getPubKeyAuthentication').returns(true);
+                sandbox.stub(ns, '_getPubKeyAuthentication').returns(null);
+                sandbox.stub(authring, 'getContactAuthenticated').returns(false);
                 sandbox.stub(window, 'getUserAttribute').returns('');
                 sandbox.stub(authring, 'computeFingerprint').returns('smudge');
                 sandbox.stub(window, 'base64urldecode', _echo);
@@ -660,7 +728,8 @@ describe("crypto unit test", function() {
                     callCount++;
                     if (callCount === 1) {
                         return _getPubKey(userhandle, keyType, callback);
-                    } else {
+                    }
+                    else {
                         return 'Ed placebo';
                     }
                 });
@@ -679,7 +748,6 @@ describe("crypto unit test", function() {
 
                 var pubKeyPromiseCallback = pubKeyPromise.done.args[0][0];
                 pubKeyPromiseCallback('the key');
-                assert.deepEqual(pubCu25519, { 'you456789xw': 'the key' });
                 assert.strictEqual(ns._getPubKeyAuthentication.callCount, 1);
                 assert.strictEqual(authring.computeFingerprint.callCount, 1);
 
@@ -688,8 +756,8 @@ describe("crypto unit test", function() {
                 assert.strictEqual(base64urldecode.callCount, 1);
                 assert.strictEqual(ns._checkSignature.callCount, 1);
                 assert.strictEqual(masterPromise.resolve.callCount, 1);
-                assert.strictEqual(authring.computeFingerprint.callCount, 2);
                 assert.strictEqual(authring.setContactAuthenticated.callCount, 1);
+                assert.deepEqual(pubCu25519, { 'you456789xw': 'the key' });
                 assert.deepEqual(pubEd25519, { 'you456789xw': 'the key' });
             });
 
@@ -722,7 +790,8 @@ describe("crypto unit test", function() {
                     callCount++;
                     if (callCount === 1) {
                         return _getPubKey(userhandle, keyType, callback);
-                    } else {
+                    }
+                    else {
                         return 'Ed placebo';
                     }
                 });
@@ -741,7 +810,6 @@ describe("crypto unit test", function() {
 
                 var pubKeyPromiseCallback = pubKeyPromise.done.args[0][0];
                 pubKeyPromiseCallback('the key');
-                assert.deepEqual(pubCu25519, { 'you456789xw': 'the key' });
                 assert.strictEqual(ns._getPubKeyAuthentication.callCount, 1);
                 assert.strictEqual(authring.computeFingerprint.callCount, 1);
 
@@ -750,8 +818,8 @@ describe("crypto unit test", function() {
                 assert.strictEqual(base64urldecode.callCount, 1);
                 assert.strictEqual(ns._checkSignature.callCount, 1);
                 assert.strictEqual(masterPromise.resolve.callCount, 1);
-                assert.strictEqual(authring.computeFingerprint.callCount, 2);
                 assert.strictEqual(authring.setContactAuthenticated.callCount, 1);
+                assert.deepEqual(pubCu25519, { 'you456789xw': 'the key' });
                 assert.deepEqual(pubEd25519, { 'you456789xw': 'the key' });
             });
         });

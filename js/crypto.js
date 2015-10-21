@@ -156,16 +156,13 @@ var crypt = (function () {
      * returns the authentication method used for that key.
      *
      * @private
-     * @param userhandle {string}
+     * @param userhandle {String}
      *     Mega user handle.
-     * @param keyType {string}
+     * @param keyType {String}
      *     Key type of pub key. Can be one of 'Ed25519', 'Cu25519' or 'RSA'.
-     * @return {int}
-     *     Authentication record, null if not recorded, and false
+     * @return {Number}
+     *     Authentication record, `null` if not recorded, and `false`
      *     if fingerprint verification fails.
-     * @throws {Error}
-     *     In case the fingerprint of the public key differs from the one
-     *     previously authenticated by the user.
      */
     ns._getPubKeyAuthentication = function(userhandle, keyType) {
         var recorded = authring.getContactAuthenticated(userhandle, keyType);
@@ -267,6 +264,7 @@ var crypt = (function () {
         var pubKeyCache = ns.getPubKeyCacheMapping(keyType);
         var authMethod;
         var newAuthMethod;
+        var fingerprint;
 
         // Get out quickly if the key is cached.
         if (pubKeyCache[userhandle]) {
@@ -281,7 +279,6 @@ var crypt = (function () {
         /** Persist potential changes in authentication, call callback and exit. */
         var __finish = function(pubKey, authMethod, newAuthMethod) {
             if (typeof newAuthMethod !== 'undefined' && newAuthMethod !== authMethod) {
-                var fingerprint = authring.computeFingerprint(pubKey, keyType, 'string');
                 authring.setContactAuthenticated(userhandle, fingerprint, keyType,
                                                  newAuthMethod,
                                                  authring.KEY_CONFIDENCE.UNSURE);
@@ -296,9 +293,8 @@ var crypt = (function () {
 
         getPubKeyPromise.done(function __resolvePubKey(result) {
             var pubKey = result;
-            pubKeyCache[userhandle] = pubKey;
             authMethod = ns._getPubKeyAuthentication(userhandle, keyType);
-            var fingerprint = authring.computeFingerprint(pubKey, keyType, 'string');
+            fingerprint = authring.computeFingerprint(pubKey, keyType, 'string');
             if (keyType === 'Ed25519') {
                 // Treat Ed25519 pub keys.
                 if (authMethod === false) {
@@ -314,6 +310,7 @@ var crypt = (function () {
                     if (authMethod === null) {
                         newAuthMethod = authring.AUTHENTICATION_METHOD.SEEN;
                     }
+                    pubKeyCache[userhandle] = pubKey;
                     masterPromise.resolve(pubKey);
                 }
 
@@ -338,6 +335,7 @@ var crypt = (function () {
                 if (signatureVerification === true) {
                     // Record good (new) signature.
                     newAuthMethod = authring.AUTHENTICATION_METHOD.SIGNATURE_VERIFIED;
+                    pubKeyCache[userhandle] = pubKey;
                     masterPromise.resolve(pubKey);
                 }
                 else {
@@ -350,13 +348,24 @@ var crypt = (function () {
             else {
                 // Not seen previously or not verified, yet.
                 if (signatureVerification === null) {
-                    // Can only record it seen.
-                    newAuthMethod = authring.AUTHENTICATION_METHOD.SEEN;
-                    masterPromise.resolve(pubKey);
+                    var authRecord = authring.getContactAuthenticated(userhandle, keyType);
+                    if ((authRecord === false) || (fingerprint === authRecord.fingerprint)) {
+                        // Can only record it seen.
+                        newAuthMethod = authring.AUTHENTICATION_METHOD.SEEN;
+                        pubKeyCache[userhandle] = pubKey;
+                        masterPromise.resolve(pubKey);
+                    }
+                    else {
+                        ns._showFingerprintMismatchException(userhandle, keyType, authMethod,
+                                                             authRecord.fingerprint,
+                                                             fingerprint);
+                        masterPromise.reject(EINTERNAL);
+                    }
                 }
                 else if (signatureVerification === true) {
                     // Record good signature.
                     newAuthMethod = authring.AUTHENTICATION_METHOD.SIGNATURE_VERIFIED;
+                    pubKeyCache[userhandle] = pubKey;
                     masterPromise.resolve(pubKey);
                 }
                 else {
@@ -603,9 +612,9 @@ var crypt = (function () {
         // the stored fingerprint again next time.
         delete ns.getPubKeyCacheMapping(keyType)[userHandle];
 
-        logger.warn(keyType + ' fingerprint does not match the previously authenticated one!\n' +
-              'Previous fingerprint: ' + asmCrypto.bytes_to_hex(asmCrypto.string_to_bytes(previousFingerprint)) + '.\n' +
-              'New fingerprint: ' + asmCrypto.bytes_to_hex(asmCrypto.string_to_bytes(newFingerprint)) + '.');
+        logger.warn(keyType + ' fingerprint does not match the previously authenticated one!\n'
+            + 'Previous fingerprint: ' + asmCrypto.bytes_to_hex(asmCrypto.string_to_bytes(previousFingerprint))
+            + '.\nNew fingerprint: ' + asmCrypto.bytes_to_hex(asmCrypto.string_to_bytes(newFingerprint)) + '.');
     };
 
 

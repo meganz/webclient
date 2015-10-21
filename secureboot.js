@@ -162,7 +162,7 @@ if (!b_u) try
     }
     catch (ex) {
         cookiesDisabled = ex.code && ex.code === DOMException.SECURITY_ERR
-            || e.message === 'SecurityError: DOM Exception 18';
+            || ex.message === 'SecurityError: DOM Exception 18';
 
         if (!cookiesDisabled) {
             throw ex;

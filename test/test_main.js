@@ -1,4 +1,5 @@
 // Set up the testing environment.
+var cookiesDisabled = false;
 var devhost = window.location.host;
 var pathSuffix = window.location.pathname;
 pathSuffix = pathSuffix.split("/").slice(0, -2).join("/");
@@ -8,7 +9,7 @@ try {
 }
 catch (ex) {
     cookiesDisabled = ex.code && ex.code === DOMException.SECURITY_ERR
-        || e.message === 'SecurityError: DOM Exception 18';
+        || ex.message === 'SecurityError: DOM Exception 18';
 
     if (!cookiesDisabled) {
         throw ex;

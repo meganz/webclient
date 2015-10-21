@@ -224,10 +224,6 @@ var crypt = (function () {
      *     A promise that is resolved when the original asynch code is
      *     settled.  Can be used to use promises instead of callbacks
      *     for asynchronous dependencies.
-     * @throws {Error}
-     *     In case the fingerprint of the public key differs from the
-     *     one previously authenticated by the user. This more severe
-     *     condition warrants to throw an exception.
      */
     ns.getPubKey = function(userhandle, keyType, callback) {
         assertUserHandle(userhandle);
@@ -414,10 +410,6 @@ var crypt = (function () {
      *     A promise that is resolved when the original asynch code is
      *     settled.  Can be used to use promises instead of callbacks
      *     for asynchronous dependencies.
-     * @throws {Error}
-     *     In case the fingerprint of the public key differs from the
-     *     one previously authenticated by the user. This more severe
-     *     condition warrants to throw an exception.
      */
     ns.getPubEd25519 = function(userhandle, callback) {
         assertUserHandle(userhandle);
@@ -440,10 +432,6 @@ var crypt = (function () {
      * @return {MegaPromise}
      *     A promise that is resolved when the original asynch code is settled.
      *     The promise returns the Curve25519 public key.
-     * @throws {Error}
-     *     In case the fingerprint of the public key differs from the one previously
-     *     authenticated by the user. This more severe condition warrants to throw
-     *     an exception.
      */
     ns.getPubCu25519 = function(userhandle, callback) {
         assertUserHandle(userhandle);
@@ -466,10 +454,6 @@ var crypt = (function () {
      * @return {MegaPromise}
      *     A promise that is resolved when the original asynch code is settled.
      *     The promise returns the RSA public key.
-     * @throws {Error}
-     *     In case the fingerprint of the public key differs from the one previously
-     *     authenticated by the user. This more severe condition warrants to throw
-     *     an exception.
      */
     ns.getPubRSA = function(userhandle, callback) {
         assertUserHandle(userhandle);

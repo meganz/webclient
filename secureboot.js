@@ -171,7 +171,7 @@ if (!b_u) try
         // Cookies are disabled, therefore we can't use localStorage.
         // We could either show the user a message about the issue and let him
         // enable cookies, or rather setup a tiny polyfill so that they can use
-        // the site even in such case, even though this solution has side effects
+        // the site even in such case, even though this solution has side effects.
         Object.defineProperty(window, 'localStorage', {
             value: Object.create({}, {
                 length:     { get: function() { return Object.keys(this).length; }},

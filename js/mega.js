@@ -6091,17 +6091,18 @@ function process_u(u) {
                 M.addNode(u[i]);
 
                 // Update token.input plugin
-                addToMultiInputDropDownList('.share-multiple-input', [{id: u[i].m, name: u[i].m}]);
-                addToMultiInputDropDownList('.add-contact-multiple-input', [{id: u[i].m, name: u[i].m}]);
+                addToMultiInputDropDownList('.share-multiple-input', [{ id: u[i].m, name: u[i].m }]);
+                addToMultiInputDropDownList('.add-contact-multiple-input', [{ id: u[i].m, name: u[i].m }]);
             }
             else if (M.d[u[i].u]) {
                 M.delNode(u[i].u);
 
                 // Update token.input plugin
-                removeFromMultiInputDDL('.share-multiple-input', {id: u[i].m, name: u[i].m});
-                removeFromMultiInputDDL('.add-contact-multiple-input', {id: u[i].m, name: u[i].m});
+                removeFromMultiInputDDL('.share-multiple-input', { id: u[i].m, name: u[i].m });
+                removeFromMultiInputDDL('.add-contact-multiple-input', { id: u[i].m, name: u[i].m });
             }
 
+            // Update user attributes M.u
             M.addUser(u[i]);
         }
     }

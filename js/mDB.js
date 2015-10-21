@@ -711,5 +711,10 @@ function mDBcls() {
     if (typeof mDB === 'object' && mDB.close) {
         mFileManagerDB.exec('close');
     }
-    mDB = indexedDB ? 0x9e : undefined;
+    try {
+        mDB = indexedDB ? 0x9e : undefined;
+    }
+    catch (e) {
+        mDB = undefined;
+    }
 }

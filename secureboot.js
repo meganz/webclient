@@ -1816,13 +1816,17 @@ else if (!b_u)
                 catch (e) {}
             }
             boot_done();
-        }
+        };
         lxhr.onerror = function()
         {
             loginresponse= false;
             boot_done();
-        }
-        lxhr.open("POST", apipath + 'cs?id=0&sid='+u_storage.sid, true);
+        };
+        
+        // If using extension this is passed through to the API for the helpdesk tool
+        var usingExtension = (is_extension) ? '&ext=1' : '';
+        
+        lxhr.open('POST', apipath + 'cs?id=0&sid=' + u_storage.sid + usingExtension, true);
         lxhr.send(JSON.stringify([{'a':'ug'}]));
     }
     function boot_auth(u_ctx,r)
@@ -1872,7 +1876,11 @@ else if (!b_u)
             dl_res= false;
             boot_done();
         };
-        dlxhr.open("POST", apipath + 'cs?id=0&domain=meganz', true);
+        
+        // If using extension this is passed through to the API for the helpdesk tool
+        var usingExtension = (is_extension) ? '&ext=1' : '';
+        
+        dlxhr.open("POST", apipath + 'cs?id=0&domain=meganz' + usingExtension, true);
         dlxhr.send(JSON.stringify([{ 'a': 'g', p: page.substr(1,8), 'ad': showAd() }]));
     }
 }

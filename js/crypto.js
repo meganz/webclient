@@ -299,6 +299,7 @@ var crypt = (function () {
                     ns._showFingerprintMismatchException(userhandle, keyType, authMethod,
                                                          authRecord.fingerprint,
                                                          fingerprint);
+                    newAuthMethod = undefined;
                     masterPromise.reject(EINTERNAL);
                 }
                 else {
@@ -337,6 +338,7 @@ var crypt = (function () {
                 else {
                     // Mismatch on authring, but no new signature,
                     // or failed signature verification: Choke!
+                    newAuthMethod = undefined;
                     ns._showKeySignatureFailureException(userhandle, keyType);
                     masterPromise.reject(EINTERNAL);
                 }
@@ -352,6 +354,7 @@ var crypt = (function () {
                         masterPromise.resolve(pubKey);
                     }
                     else {
+                        newAuthMethod = undefined;
                         ns._showFingerprintMismatchException(userhandle, keyType, authMethod,
                                                              authRecord.fingerprint,
                                                              fingerprint);

@@ -26,7 +26,7 @@ endif
 # All browsers to test with on the test-all target.
 TESTALL_BROWSERS = PhantomJS2_custom,Chrome,Firefox
 ifeq ($(OS), Windows_NT)
-    TESTALL_BROWSERS := $(TESTALL_BROWSERS),IE,FirefoxNightly,FirefoxDeveloper
+    TESTALL_BROWSERS := $(TESTALL_BROWSERS),IE,FirefoxNightly,FirefoxDeveloper,Firefox_NoCookies
 endif
 
 all: test-ci api-doc dist test-shared

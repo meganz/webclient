@@ -177,6 +177,7 @@ function init_page() {
         }
     }
 
+    var wasFolderlink = pfid;
     if (page.substr(0, 2) == 'F!' && page.length > 2) {
         var ar = page.substr(2, page.length - 1).split('!');
         if (ar[0]) {
@@ -190,21 +191,20 @@ function init_page() {
             pfhandle = ar[2].replace(/[^\w-]+/g, "");
         }
         n_h = pfid;
-        if (flhashchange) {
-            // Do nothing.
-        }
-        else if (pfkey) {
-            api_setfolder(n_h);
-            if (waitxhr) {
-                waitsc();
+        if (!flhashchange) {
+            if (pfkey) {
+                api_setfolder(n_h);
+                if (waitxhr) {
+                    waitsc();
+                }
+                u_n = pfid;
             }
-            u_n = pfid;
-        }
-        else {
-            return mKeyDialog(pfid, true)
-                .fail(function() {
-                    location.hash = 'start';
-                });
+            else {
+                return mKeyDialog(pfid, true)
+                    .fail(function() {
+                        location.hash = 'start';
+                    });
+            }
         }
         if (pfhandle) {
             page = 'fm/' + pfhandle;
@@ -213,7 +213,7 @@ function init_page() {
             page = 'fm';
         }
     }
-    else if (!flhashchange) {
+    else if (!flhashchange || page !== 'fm/transfers') {
         n_h = false;
         if (u_sid) {
             api_setsid(u_sid);
@@ -250,7 +250,7 @@ function init_page() {
     }
 
     var fmwasinitialized = !!fminitialized;
-    if (((u_type === 0 || u_type === 3) || pfid || folderlink) && !flhashchange) {
+    if (((u_type === 0 || u_type === 3) || pfid || folderlink) && (!flhashchange || !pfid)) {
 
         if (is_fm()) {
             // switch between FM & folderlinks (completely reinitialize)
@@ -259,6 +259,10 @@ function init_page() {
                 folderlink = 0;
                 fminitialized = false;
                 loadfm.loaded = false;
+                if (loadfm.loading) {
+                    api_init(wasFolderlink ? 1 : 0, 'cs');
+                    loadfm.loading = false;
+                }
                 if (typeof mDBcls === 'function') {
                     mDBcls();
                 }
@@ -266,7 +270,7 @@ function init_page() {
         }
 
         if (!fminitialized) {
-            if (typeof mDB !== 'undefined' && !pfid) {
+            if (typeof mDB !== 'undefined' && !pfid && !flhashchange) {
                 mDBstart();
             }
             else {
@@ -1402,7 +1406,7 @@ function topmenuUI() {
                     space: Math.min(100, Math.round(account.space_used / account.space * 100)),
                     bw: Math.round((account.servbw_used + account.downbw_used) / account.bw * 100)
                 };
-               
+
 
                 $('.membership-popup .membership-loading').hide();
                 $('.membership-popup .membership-main-block').show();

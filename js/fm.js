@@ -50,6 +50,13 @@ function initGridScrolling()
     $('.grid-scrolling-table').jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
     jScrollFade('.grid-scrolling-table');
 }
+
+function initSelectScrolling()
+{
+    $('.default-select-scroll').jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
+    jScrollFade($('.default-select-scroll'));
+}
+
 function initFileblocksScrolling()
 {
     $('.file-block-scrolling').jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
@@ -2834,9 +2841,9 @@ function notificationsUI(close)
 
 function accountUI()
 {
-	var sectionTitle,
-		sectionClass;
-		
+    var sectionTitle,
+        sectionClass;
+        
     $('.fm-account-overview').removeClass('hidden');
     $('.fm-account-button').removeClass('active');
     $('.fm-account-sections').addClass('hidden');
@@ -2844,11 +2851,11 @@ function accountUI()
     $('.fm-right-account-block').removeClass('hidden');
     $('.nw-fm-left-icon').removeClass('active');
     $('.nw-fm-left-icon.settings').addClass('active');
-	$('.fm-account-main').removeClass('white-bg');
+    $('.fm-account-main').removeClass('white-bg');
     if ($('.fmholder').hasClass('transfer-panel-opened')) {
         $.transferClose();
     }
-	sectionUIopen('account');
+    sectionUIopen('account');
     M.accountData(function(account)
     {
         var perc, warning, perc_c;
@@ -2856,8 +2863,8 @@ function accountUI()
         if (id == '#fm/account/settings')
         {
             $('.fm-account-settings').removeClass('hidden');
-			sectionTitle = l[823];
-			sectionClass = 'settings';
+            sectionTitle = l[823];
+            sectionClass = 'settings';
 
             if (is_chrome_firefox)
             {
@@ -2885,22 +2892,22 @@ function accountUI()
         else if (id == '#fm/account/profile')
         {
             $('.fm-account-main').addClass('white-bg');
-			$('.fm-account-profile').removeClass('hidden');
-			sectionTitle = l[984];
-			sectionClass = 'profile';
+            $('.fm-account-profile').removeClass('hidden');
+            sectionTitle = l[984];
+            sectionClass = 'profile';
         }
         else if (id == '#fm/account/history')
         {
-			$('.fm-account-main').addClass('white-bg');
+            $('.fm-account-main').addClass('white-bg');
             $('.fm-account-history').removeClass('hidden');
-			sectionTitle = l[985];
-			sectionClass = 'history';
+            sectionTitle = l[985];
+            sectionClass = 'history';
         }
         else if (id == '#fm/account/reseller' && M.account.reseller)
         {
             $('.fm-account-reseller').removeClass('hidden');
-			sectionTitle = l[6873];
-			sectionClass = 'reseller';
+            sectionTitle = l[6873];
+            sectionClass = 'reseller';
         }
         else
         {
@@ -2910,13 +2917,13 @@ function accountUI()
             }
 
             $('.fm-account-overview').removeClass('hidden');
-			sectionTitle = l[983];
-			sectionClass = 'overview';
+            sectionTitle = l[983];
+            sectionClass = 'overview';
         }
 
-		$('.fm-account-button.' + sectionClass).addClass('active');
-		$('.fm-breadcrumbs.account').addClass('has-next-button');
-		$('.fm-breadcrumbs.next').attr('class', 'fm-breadcrumbs next ' + sectionClass).find('span').text(sectionTitle);
+        $('.fm-account-button.' + sectionClass).addClass('active');
+        $('.fm-breadcrumbs.account').addClass('has-next-button');
+        $('.fm-breadcrumbs.next').attr('class', 'fm-breadcrumbs next ' + sectionClass).find('span').text(sectionTitle);
 
         $('.fm-account-blocks .membership-icon.type').removeClass('free pro1 pro2 pro3 pro4');
 
@@ -3334,123 +3341,123 @@ function accountUI()
             html += '<tr><td>' + time2date(el[1]) + '</td><td>' + htmlentities(el[0]) + '</td><td>' + credit + '</td><td>' + debit + '</td></tr>';
         });
         $('.grid-table.transactions').html(html);
-        var i = new Date().getFullYear() - 10, html = '<option value="">YYYY</option>';
-        $('.fm-account-select.year .account-select-txt').text('YYYY');
+        var i = new Date().getFullYear() - 10, html = '', sel = '';
+        $('.default-select.year span').text('YYYY');
         while (i >= 1900)
         {
             if (u_attr.birthyear && i == u_attr.birthyear)
             {
-                sel = ' selected';
-                $('.fm-account-select.year .account-select-txt').text(u_attr.birthyear);
+                sel = 'active';
+                $('.default-select.year span').text(u_attr.birthyear);
             }
             else
                 sel = '';
-            html += '<option value="' + i + '"' + sel + '>' + i + '</option>';
+            html += '<div class="default-dropdown-item ' + sel + '" data-value="' + i + '">' + i + '</div>';
             i--;
         }
-        $('.fm-account-select.year select').html(html);
-        var i = 1, html = '<option value="">DD</option>', sel = '';
-        $('.fm-account-select.day .account-select-txt').text('DD');
+        $('.default-select.year .default-select-scroll').html(html); 
+        var i = 1, html = '', sel = '';
+        $('.default-select.day span').text('DD');
         while (i < 32)
         {
             if (u_attr.birthday && i == u_attr.birthday)
             {
-                sel = ' selected';
-                $('.fm-account-select.day .account-select-txt').text(u_attr.birthday);
+                sel = 'active';
+                $('.default-select.day span').text(u_attr.birthday);
             }
             else
                 sel = '';
-            html += '<option value="' + i + '"' + sel + '>' + i + '</option>';
+            html += '<div class="default-dropdown-item ' + sel + '" data-value="' + i + '">' + i + '</div>';
             i++;
         }
-        $('.fm-account-select.day select').html(html);
-        var i = 1, html = '<option value="">MM</option>', sel = '';
-        $('.fm-account-select.month .account-select-txt').text('MM');
+        $('.default-select.day .default-select-scroll').html(html);
+        var i = 1, html = '', sel = '';
+        $('.default-select.month span').text('MM');
         while (i < 13)
         {
             if (u_attr.birthmonth && i == u_attr.birthmonth)
             {
-                sel = ' selected';
-                $('.fm-account-select.month .account-select-txt').text(u_attr.birthmonth);
+                sel = 'active';
+                $('.default-select.month span').text(u_attr.birthmonth);
             }
             else
                 sel = '';
-            html += '<option value="' + i + '"' + sel + '>' + i + '</option>';
+            html += '<div class="default-dropdown-item ' + sel + '" data-value="' + i + '">' + i + '</div>';
             i++;
         }
-        $('.fm-account-select.month select').html(html);
-        var html = '<option value="">' + l[996] + '</option>', sel = '';
-        $('.fm-account-select.country .account-select-txt').text(l[996]);
+        $('.default-select.month .default-select-scroll').html(html);
+        var html = '', sel = '';
+        $('.default-select.country span').text(l[996]);
         for (var country in isocountries)
         {
             if (u_attr.country && country == u_attr.country)
             {
-                sel = ' selected';
-                $('.fm-account-select.country .account-select-txt').text(isocountries[country]);
+                sel = 'active';
+                $('.default-select.country span').text(isocountries[country]);
             }
             else
                 sel = '';
-            html += '<option value="' + country + '"' + sel + '>' + isocountries[country] + '</option>';
+            html += '<div class="default-dropdown-item ' + sel + '" data-value="' + country + '">' + isocountries[country] + '</div>';
         }
-        $('.fm-account-select.country select').html(html);
-        $('.fm-account-select select').unbind('change');
-        $('.fm-account-select select').bind('change', function(e)
+        $('.default-select.country .default-select-scroll').html(html);
+        $('.default-select').rebind('click', function(e)
         {
-            var val = $(this).val();
-            if ($(this).attr('name') == 'account-vouchertype')
-            {
-                $(this).find('option').each(function(i, e)
-                {
-                    if (val == $(e).val())
-                        val = $(e).text();
+            if (!$(this).hasClass('active')) {
+                $('.default-select-dropdown').fadeOut(200);
+                $(this).find('.default-select-dropdown').fadeIn(200, function() {
+                    //$(this).find('.default-select-scroll').scrollTo('.default-dropdown-item.active');
                 });
-            }
-            else
-            {
-                if ($(this).attr('name') == 'account-country')
-                    val = isocountries[val];
+                $(this).addClass('active');
+                $(this).find('.default-select-scroll').jScrollPane({enableKeyboardNavigation: false, showArrows: false, arrowSize: 5});
+            } 
+        });
+        $('.default-dropdown-item').rebind('click', function(e)
+        {
+            var $select = $(this).closest('.default-select');
+            e.stopPropagation();
+            if (!$(this).hasClass('active')) {
+                $('.default-dropdown-item').removeClass('active');
+                $(this).addClass('active');
+                $select.find('span').text($(this).text());
                 $('.fm-account-save-block').removeClass('hidden');
-                $('.fm-account-main').addClass('save');
-                initAccountScroll();
-            }
-            if (val !== l[6875]) {
-                $(this).parent().find('.account-select-txt').text(val);
+                $select.removeClass('active');
+                $select.find('.default-select-dropdown').fadeOut(200);
             }
         });
         $('.fm-account-change-email').rebind('click', function(e) {
-            var email = $('#account-email').val().trim().toLowerCase();
-            if (u_attr.email !== email) {
-                api_req({
-                    a:'se',
-                    aa:'a', 
-                    e: email,
-                    i: requesti,
-                },  {
-                    callback : function(res) {
-                        if (res === -12) {
-                            return msgDialog('warninga', 'Error', "You have already sent a confirm link to that address."); 
+            if (!$(this).hasClass('disabled')) {
+                var email = $('#account-email').val().trim().toLowerCase();
+                if (u_attr.email !== email) {
+                    api_req({
+                        a:'se',
+                        aa:'a', 
+                        e: email,
+                        i: requesti,
+                    },  {
+                        callback : function(res) {
+                            if (res === -12) {
+                                return msgDialog('warninga', 'Error', "You have already sent a confirm link to that address."); 
+                            }
+    
+                            msgDialog('warninga', 'Email', "We've send you a link to your email address. Please open it to verify your email");
+                            localStorage.new_email = email;
+                            $('.fm-account-change-email')
+                                .addClass('disabled')
+                                .find('span')
+                                .text('Awaiting confirmation');
                         }
-
-                        msgDialog('warninga', 'Email', "We've send you a link to your email address. Please open it to verify your email");
-                        localStorage.new_email = email;
-                        $('.fm-account-change-email')
-                            .removeClass('active')
-                            .addClass('disabled')
-                            .find('span')
-                            .text('Awaiting confirmation');
-                    }
-                });
+                    });
+                }
             }
         });
         $('#account-email').rebind('keyup', function(e) {
             var $button = $('.fm-account-change-email');
             var mail = $('#account-email').val();
-            $button.removeClass('active');
-            if (checkMail(mail) || $button.is('.disabled')) {
+            if (checkMail(mail)) {
                 return;
             }
             if (mail !== u_attr.email) {
-                $button.addClass('active');
+                $button.removeClass('disabled');
             }
         });
         $('#account-firstname,#account-lastname').rebind('keyup', function(e)
@@ -3472,10 +3479,10 @@ function accountUI()
         {
             u_attr.firstname = $('#account-firstname').val().trim();
             u_attr.lastname = $('#account-lastname').val().trim()||' ';
-            u_attr.birthday = $('.fm-account-select.day select').val();
-            u_attr.birthmonth = $('.fm-account-select.month select').val();
-            u_attr.birthyear = $('.fm-account-select.year select').val();
-            u_attr.country = $('.fm-account-select.country select').val();
+            u_attr.birthday = $('.default-select.day select').val();
+            u_attr.birthmonth = $('.default-select.month select').val();
+            u_attr.birthyear = $('.default-select.year select').val();
+            u_attr.country = $('.default-select.country select').val();
 
             api_req({
                 a : 'up',
@@ -3598,7 +3605,7 @@ function accountUI()
                 $('#account-confirm-password,#account-password,#account-new-password').val('');
             accountUI();
         });
-        $('#account-email').attr('placeholder', u_attr.email);
+        $('#account-email').val(u_attr.email);
         $('#account-firstname').val(u_attr.firstname);
         $('#account-lastname').val(u_attr.lastname);
         $('.account-history-dropdown-button').unbind('click');
@@ -3912,7 +3919,7 @@ function accountUI()
         $('.vouchercreate').unbind('click');
         $('.vouchercreate').bind('click', function(e)
         {
-            var vouchertype = $('.fm-account-select.vouchertype select').val();
+            var vouchertype = $('.default-select.vouchertype select').val();
             var voucheramount = parseInt($('#account-voucheramount').val());
             var proceed = false;
             for (var i in M.account.prices)
@@ -3971,7 +3978,7 @@ function accountUI()
                 html += '<tr><td>' + time2date(el.date) + '</td><td class="selectable">' + htmlentities(el.code) + '</td><td>&euro; ' + htmlentities(el.amount) + '</td><td>' + status + '</td></tr>';
             });
             $('.grid-table.vouchers').html(html);
-            $('.fm-account-select.vouchertype select option').remove();
+            $('.default-select.vouchertype select option').remove();
             var prices = [];
             for (var i in M.account.prices)
                 prices.push(M.account.prices[i][0]);
@@ -3981,7 +3988,7 @@ function accountUI()
             var voucheroptions = '<option value="">' + escapeHTML(l[6875]) + '</option>';
             for (var i in prices)
                 voucheroptions += '<option value="' + htmlentities(prices[i]) + '">&euro;' + htmlentities(prices[i]) + ' voucher</option>';
-            $('.fm-account-select.vouchertype select').html(voucheroptions);
+            $('.default-select.vouchertype select').html(voucheroptions);
         }
 
         $('.fm-purchase-voucher,.membership-medium-txt.topup').unbind('click');
@@ -4032,24 +4039,24 @@ function accountUI()
         {
             avatarDialog();
         });
-		$('.fm-account-avatar img').attr('src', useravatar.mine());
+        $('.fm-account-avatar img').attr('src', useravatar.mine());
 
-		function accountWidth() {
-			var $mainBlock = $('.fm-account-main');
+        function accountWidth() {
+            var $mainBlock = $('.fm-account-main');
 
-			if ($mainBlock.width() < 920) {
-				$mainBlock.addClass('low-width');
-			} else {
-				$mainBlock.removeClass('low-width');
-			}
-		}
+            if ($mainBlock.width() < 920) {
+                $mainBlock.addClass('low-width');
+            } else {
+                $mainBlock.removeClass('low-width');
+            }
+        }
 
-		accountWidth();
+        accountWidth();
 
         $(window).unbind('resize.account');
         $(window).bind('resize.account', function()
         {
-			accountWidth();
+            accountWidth();
             if (M.currentdirid && M.currentdirid.substr(0, 7) == 'account')
                 initAccountScroll();
         });

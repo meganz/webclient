@@ -23,12 +23,7 @@ function voucherCentering(button)
     var popupBlock = $('.fm-voucher-popup');
     var rigthPosition = $('.fm-account-main').outerWidth() - $(popupBlock).outerWidth();
     var buttonMid = button.width() / 2;
-    popupBlock.css('top', button.position().top + 30);
-    popupBlock.css('left', button.position().left + buttonMid + 20 - popupBlock.width() / 2);
-    if (rigthPosition - 20 < popupBlock.position().left)
-    {
-        popupBlock.css('left', rigthPosition - 20);
-    }
+    popupBlock.css('top', button.position().top - 121);
 }
 
 function deleteScrollPanel(from, data) {
@@ -3115,16 +3110,6 @@ function accountUI()
             for (var i in M.c['contacts'])
                 a++;
         }
-        if (a == 1)
-            $('.membership-big-txt.contacts').text(l[990]);
-        else
-            $('.membership-big-txt.contacts').text(l[989].replace('[X]', a));
-        $('.membership-medium-txt.contacts').unbind('click');
-        $('.membership-medium-txt.contacts').bind('click', function(e)
-        {
-            M.openFolder('contacts');
-            return false;
-        });
         if (!$.sessionlimit)
             $.sessionlimit = 10;
         if (!$.purchaselimit)
@@ -3869,10 +3854,6 @@ function accountUI()
                 $(this).addClass('active');
                 $('.fm-voucher-popup').removeClass('hidden');
                 voucherCentering($(this));
-                $(window).bind('resize', function()
-                {
-                    voucherCentering($('.redeem-voucher'));
-                });
             }
             else
             {
@@ -4053,9 +4034,22 @@ function accountUI()
         });
 		$('.fm-account-avatar img').attr('src', useravatar.mine());
 
+		function accountWidth() {
+			var $mainBlock = $('.fm-account-main');
+
+			if ($mainBlock.width() < 920) {
+				$mainBlock.addClass('low-width');
+			} else {
+				$mainBlock.removeClass('low-width');
+			}
+		}
+
+		accountWidth();
+
         $(window).unbind('resize.account');
         $(window).bind('resize.account', function()
         {
+			accountWidth();
             if (M.currentdirid && M.currentdirid.substr(0, 7) == 'account')
                 initAccountScroll();
         });

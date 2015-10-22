@@ -1323,7 +1323,7 @@
     "5596": "%1$s von %2$s",
     "5597": "EINGEHEND",
     "5598": "AUSGEHEND",
-    "5599": "Papierkorb leeren",
+    "5599": "Der Papierkorb ist leer",
     "5600": "Keine freigegebenen Dateien eingehend",
     "5601": "Keine freigegebenen Dateien ausgehend",
     "5602": "Offline verf\u00fcgbar",
@@ -2730,6 +2730,8 @@
     "7680": "MEGAs kryptographisches Sicherheitsmodell h\u00e4ngt von der Vertraulichkeit der oben angezeigten Schl\u00fcssel ab. Bitte versenden Sie diese getrennt von den Links und auf sicherem Wege.",
     "7681": "Ordner-\/Dateilink",
     "7682": "MEGA empfiehlt den Schl\u00fcssel getrennt vom Link zu verschicken.",
-    "7683": "Extension",
-    "7684": "%1 on %2"
+    "7683": "\u63d2\u4ef6",
+    "7684": "%1 \u5728 %2",
+    "7685": "I hereby state that I have a good faith belief that the use of copyrighted material in the manner complained of and located at the location above is not authorized by the copyright owner, its agent, or the law (e.g., as a fair use).",
+    "7686": "One of the links you have provided is not a valid MEGA link."
 }

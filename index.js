@@ -778,7 +778,7 @@ function init_page() {
     }
     else if (page == 'copyrightnotice') {
         parsepage(pages['copyrightnotice']);
-        init_cn();
+        copyright.init_cn();
     }
     else if (dlid) {
         page = 'download';

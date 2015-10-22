@@ -728,7 +728,7 @@ function initUI() {
                 'conversations':  { root: 'chat',      prev: null },
                 'contacts':       { root: 'contacts',  prev: null },
                 'transfers':      { root: 'transfers', prev: null },
-                'settings':       { root: 'settings',  prev: null },
+                'account':        { root: 'account',  prev: null },
                 'inbox':          { root: M.InboxID,   prev: null },
                 'rubbish-bin':    { root: M.RubbishID, prev: null }
             };
@@ -750,13 +750,11 @@ function initUI() {
             }
         }
 
-        if ($(this).hasClass('settings')) {
+        if ($(this).hasClass('account')) {
             if (u_type === 0) {
                 ephemeralDialog(l[7687]);
             }
             else {
-                $('.nw-fm-left-icon').removeClass('active');
-                $('.nw-fm-left-icon.settings').addClass('active');
                 document.location.hash = 'fm/account/settings';
             }
             return false;
@@ -2841,6 +2839,9 @@ function notificationsUI(close)
 
 function accountUI()
 {
+	var sectionTitle,
+		sectionClass;
+		
     $('.fm-account-overview').removeClass('hidden');
     $('.fm-account-button').removeClass('active');
     $('.fm-account-sections').addClass('hidden');
@@ -2848,17 +2849,20 @@ function accountUI()
     $('.fm-right-account-block').removeClass('hidden');
     $('.nw-fm-left-icon').removeClass('active');
     $('.nw-fm-left-icon.settings').addClass('active');
+	$('.fm-account-main').removeClass('white-bg');
     if ($('.fmholder').hasClass('transfer-panel-opened')) {
         $.transferClose();
     }
+	sectionUIopen('account');
     M.accountData(function(account)
     {
         var perc, warning, perc_c;
         var id = document.location.hash;
         if (id == '#fm/account/settings')
         {
-            $('.fm-account-settings-button').addClass('active');
             $('.fm-account-settings').removeClass('hidden');
+			sectionTitle = l[823];
+			sectionClass = 'settings';
 
             if (is_chrome_firefox)
             {
@@ -2885,18 +2889,23 @@ function accountUI()
         }
         else if (id == '#fm/account/profile')
         {
-            $('.fm-account-profile-button').addClass('active');
-            $('.fm-account-profile').removeClass('hidden');
+            $('.fm-account-main').addClass('white-bg');
+			$('.fm-account-profile').removeClass('hidden');
+			sectionTitle = l[984];
+			sectionClass = 'profile';
         }
         else if (id == '#fm/account/history')
         {
-            $('.fm-account-history-button').addClass('active');
+			$('.fm-account-main').addClass('white-bg');
             $('.fm-account-history').removeClass('hidden');
+			sectionTitle = l[985];
+			sectionClass = 'history';
         }
         else if (id == '#fm/account/reseller' && M.account.reseller)
         {
-            $('.fm-account-reseller-button').addClass('active');
             $('.fm-account-reseller').removeClass('hidden');
+			sectionTitle = l[6873];
+			sectionClass = 'reseller';
         }
         else
         {
@@ -2905,9 +2914,15 @@ function accountUI()
                 showNonActivatedAccountDialog(true);
             }
 
-            $('.fm-account-overview-button').addClass('active');
             $('.fm-account-overview').removeClass('hidden');
+			sectionTitle = l[983];
+			sectionClass = 'overview';
         }
+
+		$('.fm-account-button.' + sectionClass).addClass('active');
+		$('.fm-breadcrumbs.account').addClass('has-next-button');
+		$('.fm-breadcrumbs.next').attr('class', 'fm-breadcrumbs next ' + sectionClass).find('span').text(sectionTitle);
+
         $('.fm-account-blocks .membership-icon.type').removeClass('free pro1 pro2 pro3 pro4');
 
         if (u_attr.p)
@@ -4036,7 +4051,7 @@ function accountUI()
         {
             avatarDialog();
         });
-        $('.fm-account-avatar img').attr('src', useravatar.mine());
+		$('.fm-account-avatar img').attr('src', useravatar.mine());
 
         $(window).unbind('resize.account');
         $(window).bind('resize.account', function()
@@ -4103,19 +4118,19 @@ function accountUI()
     $('.fm-account-button').bind('click', function() {
         if ($(this).attr('class').indexOf('active') == -1) {
             switch (true) {
-                case ($(this).attr('class').indexOf('fm-account-overview-button') >= 0):
+                case ($(this).attr('class').indexOf('overview') >= 0):
                     document.location.hash = 'fm/account';
                     break;
-                case ($(this).attr('class').indexOf('fm-account-profile-button') >= 0):
+                case ($(this).attr('class').indexOf('profile') >= 0):
                     document.location.hash = 'fm/account/profile';
                     break;
-                case ($(this).attr('class').indexOf('fm-account-settings-button') >= 0):
+                case ($(this).attr('class').indexOf('settings') >= 0):
                     document.location.hash = 'fm/account/settings';
                     break;
-                case ($(this).attr('class').indexOf('fm-account-history-button') >= 0):
+                case ($(this).attr('class').indexOf('history') >= 0):
                     document.location.hash = 'fm/account/history';
                     break;
-                case ($(this).attr('class').indexOf('fm-account-reseller-button') >= 0):
+                case ($(this).attr('class').indexOf('reseller') >= 0):
                     document.location.hash = 'fm/account/reseller';
                     break;
             }
@@ -4198,7 +4213,7 @@ function avatarDialog(close)
                         data: blob,
                         url: myURL.createObjectURL(blob)
                     }
-                $('.fm-account-avatar img').attr('src', useravatar.mine());
+                    $('.fm-account-avatar img').attr('src', useravatar.mine());
                 $('.fm-avatar img').attr('src', useravatar.mine());
                 avatarDialog(1);
             },
@@ -6466,16 +6481,16 @@ function sectionUIopen(id) {
 
     $('.content-panel').removeClass('active');
 
-
-
     if (id === 'opc' || id === 'ipc') {
         tmpId = 'contacts';
+    } else if (id === 'account') {
+        tmpId = 'account';
     } else {
         tmpId = id;
     }
     $('.nw-fm-left-icon.' + tmpId).addClass('active');
     $('.content-panel.' + tmpId).addClass('active');
-    $('.fm-left-menu').removeClass('cloud-drive folder-link shared-with-me rubbish-bin contacts conversations opc ipc inbox').addClass(tmpId);
+    $('.fm-left-menu').removeClass('cloud-drive folder-link shared-with-me rubbish-bin contacts conversations opc ipc inbox account').addClass(tmpId);
     $('.fm-right-header, .fm-import-to-cloudrive, .fm-download-as-zip').addClass('hidden');
     $('.fm-import-to-cloudrive, .fm-download-as-zip').unbind('click');
 
@@ -6632,10 +6647,11 @@ function treeUIopen(id, event, ignoreScroll, dragOver, DragOpen) {
         sectionUIopen('ipc');
     } else if (id_r === 'opc') {
         sectionUIopen('opc');
+    } else if (id_r === 'account') {
+        sectionUIopen('account');
     } else if (M.RubbishID && id_r === M.RubbishID) {
         sectionUIopen('rubbish-bin');
-    }
-    else if (id_s === 'transfers') {
+    } else if (id_s === 'transfers') {
         sectionUIopen('transfers');
     }
 
@@ -10006,7 +10022,7 @@ function fm_resize_handler() {
             'min-height': right_blocks_height + "px"
         });
 
-    $('.fm-right-files-block').css({
+    $('.fm-right-files-block, .fm-right-account-block').css({
         'margin-left': ($('.fm-left-panel:visible').width() + $('.nw-fm-left-icons-panel').width()) + "px"
     });
 

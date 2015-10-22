@@ -2729,5 +2729,9 @@
     "7679": "Anda harus memiliki akun MEGA untuk melanjutkan.",
     "7680": "Model kriptografi MEGA berdasarkan pada keys yang ditampilkan diatas. Kami menyarankan untuk mengirim decryption keys terpisah dari link folder\/file, melalui channel yang aman.",
     "7681": "Link folder\/file",
-    "7682": "MEGA menyarankan untuk mengirim 'Decryption Key' terpisah dari 'Link Folder\/File'"
+    "7682": "MEGA menyarankan untuk mengirim 'Decryption Key' terpisah dari 'Link Folder\/File'",
+    "7683": "Extension",
+    "7684": "%1 di %2",
+    "7685": "Saya dengan ini menyatakan bahwa saya percaya penggunaan material dengan pelanggaran hak cipta seperti yang dikatakan diatas bukan dinyatakan oleh sang pemilik hak cipta, agennya, atau hukum.",
+    "7686": "One of the links you have provided is not a valid MEGA link."
 }

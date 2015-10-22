@@ -1,18 +1,136 @@
-function cn_UI() {
+var copyright = copyright || {};
+
+copyright.updateUI = function() {
     $('#cn_urls .contenturl').rebind('click', function(e) {
-        if ($(this).val() === 'http://') {
+        if ($(this).val() === '') {
             $(this).select();
         }
     });
-}
+};
 
-function init_cn() {
+/**
+ * Validate the email address, as without a valid email we can not contact the complainant if there is a counter-notice,
+ * or to report stats on their complaints.
+ * Further email validation may occur in the API
+ * @param {String} email The email to validate
+ * @return {Boolean} True if passing validation, false otherwise
+ */
+copyright.validateEmail = function(email) {
+    var re = /[a-z0-9!#$%&'*+\/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+\/=?^_`{|}~-]+)*@([a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
+    var match = re.exec(email);
+    if (match === null) {
+        return false;
+    }
+
+    return true;
+};
+
+/**
+ * Validate that the user has entered a link that is, or can be easily turned into, a valid MEGA link
+ * @param {String} url The url to validate as a mega public link
+ * @return {Number} The (integer) number of handles found
+ */
+copyright.validateUrl = function(url) {
+    url = copyright.decodeURIm(url);
+    handles = copyright.getHandles(url);
+    return Object.keys(handles).length;
+};
+
+/**
+ * Find any valid or semi-valid MEGA link handles from the data
+ * @param {String} data The data to scan for handles
+ * @return {Object} hashset of handles
+ */
+copyright.getHandles = function(data) {
+    var handles = {};
+    var p = /.(?:F?!|\w+\=)([\w-]{8})(?:!([\w-]+))?\b/gi;
+
+    (data.replace(/<\/?\w[^>]+>/g,'').replace(/\s+/g,'')+data).replace(p,function(a,id,key) {
+        if (!handles[id]) {
+            handles[id] = 1;
+        }
+    });
+
+    return handles;
+};
+
+/**
+ * Iteratively remove any %% stuff from the data
+ * @param {String} data The data string to decode
+ * @return {String} the decoded data
+ */ 
+copyright.decodeURIm = function(data) {
+    for (var lmt = 7 ; --lmt && /%[a-f\d]{2}/i.test(data) ; )
+    {
+        try {
+            data = decodeURIComponent(data);
+        } catch(e) {
+            break;
+        }
+    }
+
+    while (~data.indexOf('%25')) {
+        data = data.replace('%25','%','g');
+    }
+
+    return data.replace('%21','!','g');
+};
+
+/**
+ * Store the complainant details so they don't have to type them in next time
+ * Puts them into localStorage.copyrightOwnerDetails
+ */
+copyright.saveCopyrightOwnerValues = function() {
+    var details = {
+        owner: $('input.copyrightowner').val(),
+        jobtitle: $('input.jobtitle').val(),
+        email: $('input.email').val(),
+        fax: $('input.fax').val(),
+        city: $('input.city').val(),
+        postalcode: $('input.zip').val(),
+        name: $('input.agent').val(),
+        company: $('input.company').val(),
+        phone: $('input.phone').val(),
+        address: $('input.address').val(),
+        province: $('input.state').val(),
+        country: $('.select.country select').val()
+    };
+
+    localStorage.setItem('copyrightOwnerDetails', JSON.stringify(details));
+};
+
+/**
+ * Load the complainant details directly into the html elements so they don't have to type them in again
+ */
+copyright.loadCopyrightOwnerValues = function() {
+    if (localStorage.copyrightOwnerDetails) {
+        var details = JSON.parse(localStorage.copyrightOwnerDetails);
+        $('input.copyrightowner').val(details.owner);
+        $('input.jobtitle').val(details.jobtitle);
+        $('input.email').val(details.email);
+        $('input.fax').val(details.fax);
+        $('input.city').val(details.city);
+        $('input.zip').val(details.postalcode);
+        $('input.agent').val(details.name);
+        $('input.company').val(details.company);
+        $('input.phone').val(details.phone);
+        $('input.address').val(details.address);
+        $('input.state').val(details.province);
+        $('.select.country select').val(details.country).change();
+    }
+};
+
+/**
+ * Initialises the copyright form page, binding the events the form requires
+ */
+copyright.init_cn = function() {
+
     $('.addurlbtn').rebind('click', function(e) {
         $('#cn_urls').safeAppend('<div class="new-affiliate-label">' +
             '<div class="new-affiliate-star"></div>@@</div>' +
             '<div class="clear"></div>' +
             '<div class="affiliate-input-block">' +
-                '<input type="text" class="contenturl" value="https://">' +
+                '<input type="text" class="contenturl" value="">' +
             '</div>' +
             '<div class="new-affiliate-label">' +
                 '<div class="new-affiliate-star"></div>@@' +
@@ -22,9 +140,9 @@ function init_cn() {
                 '<input type="text" class="copyrightwork" value="">' +
             '</div>', l[641], l[648]);
         mainScroll();
-        cn_UI();
+        copyright.updateUI();
     });
-    cn_UI();
+    copyright.updateUI();
     $('.step2btn').rebind('click', function(e) {
         if (!$('.select.content').hasClass('selected')) {
             msgDialog('warninga', l[135], escapeHTML(l[657]));
@@ -37,23 +155,40 @@ function init_cn() {
             var proceed = false;
             $('.contenturl').each(function(i, e) {
                 proceed = true;
-                if ($(e).val() !== 'https://' && $(copyrightwork[i]).val() === '') {
+                var eval = $(e).val();
+                var cval = $(copyrightwork[i]).val();
+                if (eval !== ''  && cval === '' || cval === 'asd' || cval === 'asdf') {
                     proceed = false;
                     msgDialog('warninga', l[135], escapeHTML(l[660]));
                     return false;
                 }
-                if ($(e).val() === 'https://' || $(copyrightwork[i]).val() === '') {
+                if (eval === '' || cval === '') {
                     proceed = false;
                     msgDialog('warninga', l[135], escapeHTML(l[659]));
                     return false;
                 }
+
+                if (!copyright.validateUrl(eval)) {
+                    proceed = false;
+                    msgDialog('warninga', l[135], escapeHTML(l[7686]));
+                    $(e).addClass("red");
+                    $(e).click(function(){$(e).removeClass("red")});
+                    return false;
+                }
+
+                $(e).removeClass("red");
+
             });
+
             if (proceed && !$('.cn_check1 .checkinput').attr('checked')) {
                 msgDialog('warninga', l[135], escapeHTML(l[665]));
             }
             else if (proceed) {
                 $('.cn.step1').addClass('hidden');
                 $('.cn.step2').removeClass('hidden');
+
+                 // Reload values from local storage if the user has previously been here
+                copyright.loadCopyrightOwnerValues();
             }
         }
     });
@@ -115,6 +250,11 @@ function init_cn() {
                 $('input.email').focus();
             });
         }
+        else if (!copyright.validateEmail($('input.email').val())) {
+             msgDialog('warninga', l[135], escapeHTML(l[198]), false, function() {
+                $('input.email').focus();
+            });
+        }
         else if ($('input.city').val() === '') {
             msgDialog('warninga', l[135], escapeHTML(l[1262]), false, function() {
                 $('input.city').focus();
@@ -130,6 +270,10 @@ function init_cn() {
             msgDialog('warninga', l[135], escapeHTML(l[667]));
         }
         else {
+
+            // Save the entered values into local storage so the user doesn't have to re-enter them next time
+            copyright.saveCopyrightOwnerValues();
+
             var cn_post_urls = [];
             var cn_post_works = [];
             $('.contenturl').each(function(a, b) {
@@ -155,7 +299,7 @@ function init_cn() {
                 company: $('input.company').val(),
                 phone: $('input.phone').val(),
                 address: $('input.address').val(),
-                province: $('input.province').val(),
+                province: $('input.state').val(),
                 country: $('.select.country select').val()
             }, {
                 callback: function() {
@@ -177,4 +321,4 @@ function init_cn() {
         }
     }
     $('.select.country select').safeHTML(markup);
-}
+};

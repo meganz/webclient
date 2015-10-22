@@ -2729,5 +2729,9 @@
     "7679": "Anda perlu memiliki akaun MEGA untuk meneruskan.",
     "7680": "Model kriptografi MEGA bergantung kepada kekunci yang dipaparkan di atas. Kami mengesyorkan untuk menghantar kekunci berasingan daripada pautan folder\/fail, melalui rangkaian yang selamat.",
     "7681": "Pautan Folder\/Fail",
-    "7682": "MEGA mengesyorkan menghantar 'Kekunci Penyahsulitan' berasingan daripada 'Pautan Folder\/Fail'."
+    "7682": "MEGA mengesyorkan menghantar 'Kekunci Penyahsulitan' berasingan daripada 'Pautan Folder\/Fail'.",
+    "7683": "Extension",
+    "7684": "%1 on %2",
+    "7685": "I hereby state that I have a good faith belief that the use of copyrighted material in the manner complained of and located at the location above is not authorized by the copyright owner, its agent, or the law (e.g., as a fair use).",
+    "7686": "One of the links you have provided is not a valid MEGA link."
 }

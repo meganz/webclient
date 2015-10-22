@@ -728,6 +728,7 @@ function initUI() {
                 'conversations':  { root: 'chat',      prev: null },
                 'contacts':       { root: 'contacts',  prev: null },
                 'transfers':      { root: 'transfers', prev: null },
+                'settings':       { root: 'settings',  prev: null },
                 'inbox':          { root: M.InboxID,   prev: null },
                 'rubbish-bin':    { root: M.RubbishID, prev: null }
             };
@@ -742,10 +743,23 @@ function initUI() {
         if (activeTab) {
             if (activeTab.root === M.currentrootid) {
                 activeTab.prev = M.currentdirid;
+                M.lastActiveTab = activeClass;
             }
             else if (d) {
                 console.warn('Root mismatch', M.currentrootid, M.currentdirid, activeTab);
             }
+        }
+
+        if ($(this).hasClass('settings')) {
+            if (u_type === 0) {
+                ephemeralDialog(l[7687]);
+            }
+            else {
+                $('.nw-fm-left-icon').removeClass('active');
+                $('.nw-fm-left-icon.settings').addClass('active');
+                document.location.hash = 'fm/account/settings';
+            }
+            return false;
         }
 
         for (var tab in fmTabState) {
@@ -1422,7 +1436,8 @@ function sharedUInode(nodeHandle) {
     var oShares,
         iShareNum = 0,
         bExportLink = false,
-        bAvailShares = false;
+        bAvailShares = false,
+        UiExportLink = new mega.UI.Share.ExportLink();
 
     // Is there a full share or pending share available
     if ((M.d[nodeHandle] && M.d[nodeHandle].shares) || M.ps[nodeHandle]) {
@@ -1438,11 +1453,12 @@ function sharedUInode(nodeHandle) {
         // Do we have export link for selected node?
         if (oShares && oShares.EXP) {
 
-            // List view
-            $('.grid-table.fm #' + nodeHandle + ' .grid-url-field').addClass('linked');
+            UiExportLink.addExportLinkIcon(nodeHandle);
 
-            // Grid view
-            $('#' + nodeHandle + '.file-block').addClass('linked');
+            // Item is taken down, make sure that user is informed
+            if (oShares.EXP.down === 1) {
+                UiExportLink.addTakenDownIcon(nodeHandle);
+            }
 
             bExportLink = true;
         }
@@ -1455,7 +1471,6 @@ function sharedUInode(nodeHandle) {
 
             // Left panel
             $('#treea_' + nodeHandle + ' .nw-fm-tree-folder').addClass('shared-folder');
-            $('#treea_' + nodeHandle).addClass('linked');
 
             bAvailShares = true;
         }
@@ -1480,9 +1495,7 @@ function sharedUInode(nodeHandle) {
 
     // If no export link is available, remove export link from left and right panels (list and block view)
     if (!bExportLink) {
-        $('.grid-table.fm #' + nodeHandle + ' .grid-url-field').removeClass('linked'); // Rigth panel list view
-        $('#' + nodeHandle + '.file-block').removeClass('linked'); // Right panel block view
-        $('#treea_' + nodeHandle).removeClass('linked'); // Left panel
+        UiExportLink.removeExportLinkIcon(nodeHandle);
     }
 }
 
@@ -2088,17 +2101,26 @@ function fmremove() {
         contactcnt = 0,
         removesharecnt = 0;
 
+    // Loop throught selected items
     for (var i in $.selected) {
         var n = M.d[$.selected[i]];
+
+        // ToDo: Not clear what this represents
         if (n && n.p.length === 11) {
             removesharecnt++;
         }
+
+        // ToDo: Replace counting contact id chars with something more reliable
         else if (String($.selected[i]).length === 11) {
             contactcnt++;
         }
+
+        // Folder
         else if (n && n.t) {
             foldercnt++;
         }
+
+        // File
         else {
             filecnt++;
         }
@@ -2109,13 +2131,16 @@ function fmremove() {
             removeShare($.selected[i]);
         }
         M.openFolder('shares', true);
-    } else if (contactcnt) {
+    }
+
+    // Remove contacts from list
+    else if (contactcnt) {
         var t, c = $.selected.length;
 
-        // TODO: Need translation "delete N (users)"
         if (c > 1) {
             t = c + ' ' + l[5569];
-        } else {
+        }
+        else {
             t = '<strong>' + M.d[$.selected[0]].name + '</strong>';
         }
 
@@ -2128,8 +2153,7 @@ function fmremove() {
                         }
                     }
 
-                    M.delNode($.selected[i]);
-                    api_req({a: 'ur2', u: $.selected[i], l: '0', i: requesti});
+                    api_req({ a: 'ur2', u: $.selected[i], l: '0', i: requesti });
                     M.handleEmptyContactGrid();
                 }
             }
@@ -2139,13 +2163,16 @@ function fmremove() {
             $('.fm-del-contacts-number').text($.selected.length);
             $('#msgDialog .fm-del-contact-avatar').attr('class', 'fm-del-contact-avatar');
             $('#msgDialog .fm-del-contact-avatar span').empty();
-        } else {
+        }
+        else {
             var user = M.d[$.selected[0]],
                 avatar = useravatar.contact(user, 'avatar-remove-dialog');
 
             $('#msgDialog .fm-del-contact-avatar').html(avatar);
         }
-    } else if (RootbyId($.selected[0]) === M.RubbishID) {
+    }
+    // Remove/Clean rubbih bin
+    else if (RootbyId($.selected[0]) === M.RubbishID) {
         msgDialog('clear-bin', l[1003], l[76].replace('[X]', (filecnt + foldercnt)) + ' ' + l[77], l[1007], function(e) {
             if (e) {
                 M.clearRubbish(1);
@@ -2155,7 +2182,10 @@ function fmremove() {
             if ($(e).text() === l[1018])
                 $(e).html('<span>'+l[83]+'</span>');
         });
-    } else if (RootbyId($.selected[0]) === 'contacts') {
+    }
+
+    // Remove contacts
+    else if (RootbyId($.selected[0]) === 'contacts') {
         if (localStorage.skipDelWarning) {
             M.copyNodes($.selected, M.RubbishID, 1);
         } else {
@@ -2165,7 +2195,8 @@ function fmremove() {
                 }
             }, true);
         }
-    } else {
+    }
+    else {
         if (localStorage.skipDelWarning) {
             if (M.currentrootid === 'shares') {
                 M.copyNodes($.selected, M.RubbishID, true);
@@ -2173,12 +2204,14 @@ function fmremove() {
             else {
                 M.moveNodes($.selected, M.RubbishID);
             }
-        } else {
+        }
+        else {
 
-                // Additional message in case that there's a shared node
+            // Additional message in case that there's a shared node
             var delShareInfo,
-                // Contains complete directory structure of selected nodes, their ids
-                dirTree = [];
+
+            // Contains complete directory structure of selected nodes, their ids
+            dirTree = [];
 
             var nodes = new mega.Nodes({});
             $.each($.selected, function(index, value){
@@ -2202,7 +2235,7 @@ function fmremove() {
                                 // Remove regular/full share
                                 for (var share in M.d[dirTree[selection]].shares) {
                                     if (M.d[dirTree[selection]].shares.hasOwnProperty(share)) {
-                                        api_req({a: 's2', n:  dirTree[selection], s: [{ u: M.d[dirTree[selection]].shares[share].u, r: ''}], ha: '', i: requesti});
+                                        api_req({ a: 's2', n:  dirTree[selection], s: [{ u: M.d[dirTree[selection]].shares[share].u, r: ''}], ha: '', i: requesti });
                                         M.delNodeShare(dirTree[selection], M.d[dirTree[selection]].shares[share].u);
                                         setLastInteractionWith(dirTree[selection], "0:" + unixtime());
                                     }
@@ -2211,7 +2244,7 @@ function fmremove() {
                                 // Remove pending share
                                 for (var pendingUserId in M.ps[dirTree[selection]]) {
                                     if (M.ps[dirTree[selection]].hasOwnProperty(pendingUserId)) {
-                                        api_req({a: 's2', n:  dirTree[selection], s: [{ u: pendingUserId, r: ''}], ha: '', i: requesti});
+                                        api_req({ a: 's2', n:  dirTree[selection], s: [{ u: pendingUserId, r: ''}], ha: '', i: requesti });
                                         M.deletePendingShare(dirTree[selection], pendingUserId);
                                     }
                                 }
@@ -2896,6 +2929,7 @@ function accountUI()
             $('.fm-account-overview').removeClass('hidden');
         }
         $('.fm-account-blocks .membership-icon.type').removeClass('free pro1 pro2 pro3 pro4');
+
         if (u_attr.p)
         {
             // LITE/PRO account
@@ -2956,7 +2990,10 @@ function accountUI()
                 // one-time or cancelled subscription
                 $('.fm-account-header.typetitle').text(l[746]+':');
                 $('.membership-big-txt.type').text(l[751]);
-                $('.membership-medium-txt.expiry').html(l[987] + ' <span class="red">' + time2date(account.expiry) + '</span>');
+                $('.membership-medium-txt.expiry a').rebind('click', function() {
+                    document.location = $(this).attr('href');
+                });
+                $('.membership-medium-txt.expiry a').html(l[987] + ' <span class="red">' + time2date(account.expiry) + '</span>');
                 $('.fm-account-blocks .btn-cancel').hide();
             }
         }
@@ -3127,12 +3164,19 @@ function accountUI()
 
             var dateTime = htmlentities(time2date(el[0]));
             var browser = browserdetails(el[2]);
+            var browserName = browser.name;
             var ipAddress = htmlentities(el[3]);
             var country = countrydetails(el[4]);
             var currentSession = el[5];
             var sessionId = el[6];
             var activeSession = el[7];
             var status = '<span class="current-session-txt">' + l[7665] + '</span>';    // Current
+
+            // Show if using an extension e.g. "Chrome Extension on Windows" or "Firefox Extension on Linux"
+            if (browser.isExtension) {
+                browserName = browserName.replace('Firefox', 'Firefox ' + l[7683]);
+                browserName = browserName.replace('Chrome', 'Chrome ' + l[7683]);
+            }
 
             // If not the current session
             if (!currentSession) {
@@ -3150,7 +3194,7 @@ function accountUI()
 
             // Generate row html
             html += '<tr class="' + (currentSession ? "current" : sessionId) +  '">'
-                + '<td><span class="fm-browsers-icon"><img alt="" src="' + staticpath + 'images/browser/' + browser.icon + '" /></span><span class="fm-browsers-txt">' + htmlentities(browser.name) + '</span></td>'
+                + '<td><span class="fm-browsers-icon"><img alt="" src="' + staticpath + 'images/browser/' + browser.icon + '" /></span><span class="fm-browsers-txt">' + htmlentities(browserName) + '</span></td>'
                 + '<td>' + ipAddress + '</td>'
                 + '<td><span class="fm-flags-icon"><img alt="" src="' + staticpath + 'images/flags/' + country.icon + '" style="margin-left: 0px;" /></span><span class="fm-flags-txt">' + htmlentities(country.name) + '</span></td>'
                 + '<td>' + dateTime + '</td>'
@@ -5675,16 +5719,6 @@ function transferPanelUI()
         }
     };
 
-    $('.nw-fm-left-icon.settings .settings-icon').rebind('click', function() {
-        if (u_type === 0) {
-            ephemeralDialog('Transfer settings are for registered users only.');
-        }
-        else {
-            $('.nw-fm-left-icon').removeClass('active');
-            $('.nw-fm-left-icon.settings').addClass('active');
-            document.location.hash = 'fm/account/settings';
-        }
-    });
     $('.transfer-clear-all-icon').rebind('click', function() {
         if (!$(this).hasClass('disabled')) {
             msgDialog('confirmation', 'clear all transfers', l[7225], '', function(e) {
@@ -8611,7 +8645,7 @@ function getclipboardkeys() {
  * @param {String} notification The text for the toast notification
  */
 function showToast(toastClass, notification) {
-    
+
     var $toast, interval;
 
     $toast = $('.toast-notification.common-toast');
@@ -9215,11 +9249,10 @@ function propertiesDialog(close)
         +'<div class="propreties-dark-txt t11">' + p.t11 + '</div></div></div>';
     $('.properties-txt-pad').html(html);
 
-	if (typeof(p.t10) == 'undefined' && typeof(p.t11) == 'undefined')
-	{
-		$('.properties-small-gray.t10').addClass('hidden');
-		$('.propreties-dark-txt.t11').addClass('hidden');
-	}
+    if (typeof(p.t10) === 'undefined' && typeof(p.t11) === 'undefined') {
+        $('.properties-small-gray.t10').addClass('hidden');
+        $('.propreties-dark-txt.t11').addClass('hidden');
+    }
 
     pd.find('.file-settings-icon').rebind('click context', function(e) {
         if ($(this).attr('class').indexOf('active') == -1) {
@@ -10025,7 +10058,7 @@ function sharedfolderUI() {
                 +'<div class="shared-details-info-block">'
                     +'<div class="shared-details-pad">'
                         +'<div class="shared-details-folder-name">'+ htmlentities((c||n).name) +'</div>'
-                        +'<a href="javascript:;" class="grid-url-arrow"><span></span></a>'
+                        +'<a href="javascript:;" class="grid-url-arrow"></a>'
                         +'<div class="shared-folder-access'+ rightsclass + '">' + rights + '</div>'
                         +'<div class="clear"></div>'
                         + avatar
@@ -10410,17 +10443,17 @@ function FMResizablePane(element, opts) {
  * @param {String} elementId The name of the id
  */
 function selectText(elementId) {
-    
+
     var range, selection;
     var text = document.getElementById(elementId);
-    
+
     if (document.body.createTextRange) {
         range = document.body.createTextRange();
         range.moveToElementText(text);
         range.select();
     }
     else if (window.getSelection) {
-        selection = window.getSelection();        
+        selection = window.getSelection();
         range = document.createRange();
         range.selectNodeContents(text);
         selection.removeAllRanges();
@@ -10713,6 +10746,10 @@ function removeFromMultiInputDDL(dialog, item) {
                 menu = $('.nw-sorting-menu').removeClass('hidden');
                 type = treePanelType();
 
+                if (type === 'settings') {
+                    type = M.lastActiveTab || 'cloud-drive';
+                }
+
                 // Show all items in sort dialog in case contacts tab is choosen
                 if (type === 'contacts') {
                     menu.find('.sorting-item-divider,.sorting-menu-item').removeClass('hidden');
@@ -10752,7 +10789,11 @@ function removeFromMultiInputDDL(dialog, item) {
                 data = $self.data(),
                 type = treePanelType();
 
-            if ($self.attr('class').indexOf('active') === -1) {
+            if (type === 'settings') {
+                type = M.lastActiveTab || 'cloud-drive';
+            }
+
+            if (!$self.hasClass('active') && $.sortTreePanel[type]) {
                 $self.parent().find('.sorting-menu-item').removeClass('active');
                 $self.addClass('active');
                 $('.nw-sorting-menu').addClass('hidden');

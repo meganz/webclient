@@ -115,6 +115,7 @@
         "doc/**",
         "contrib/**",
         "scripts/**",
+        "rsaasm.js",
         "sjcl.js",
         "fileapi.js",
         "aesasm.js",

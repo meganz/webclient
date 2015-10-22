@@ -1555,8 +1555,10 @@ function initAddDialogMultiInputPlugin() {
 
     // Plugin configuration
     var contacts = getContactsEMails();
+    var $this  = $('.add-contact-multiple-input');
+    var $scope = $this.parents('.add-user-popup');
 
-    $('.add-contact-multiple-input').tokenInput(contacts, {
+    $this.tokenInput(contacts, {
         theme: 'mega',
         hintText: l[5908],
         //hintText: '',
@@ -1578,7 +1580,6 @@ function initAddDialogMultiInputPlugin() {
         scrollLocation: 'add',
         // Exclude from dropdownlist only emails/names which exists in multi-input (tokens)
         excludeCurrent: false,
-        idPrefix: "add-contact-multiple-temp",
         onEmailCheck: function() {
             errorMsg(l[7415]);
         },
@@ -1589,13 +1590,13 @@ function initAddDialogMultiInputPlugin() {
             errorMsg(l[7414]);
         },
         onReady: function() {
-            var $this = $('#add-contact-multiple-temp');
-            $this.rebind('keyup', function() {
-                var value = $.trim($this.val());
-                if (checkMail(value) === false) {
-                    $('.add-user-popup-button.add').removeClass('disabled');
+            var $input = $this.parent().find('li input').eq(0);
+            $input.rebind('keyup', function() {
+                var value = $.trim($input.val());
+                if ($scope.find('li.token-input-token-mega').length > 0 || checkMail(value) === false) {
+                    $scope.find('.add-user-popup-button.add').removeClass('disabled');
                 } else {
-                    $('.add-user-popup-button.add').addClass('disabled');
+                    $scope.find('.add-user-popup-button.add').addClass('disabled');
                 }
             });
         },

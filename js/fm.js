@@ -1578,6 +1578,7 @@ function initAddDialogMultiInputPlugin() {
         scrollLocation: 'add',
         // Exclude from dropdownlist only emails/names which exists in multi-input (tokens)
         excludeCurrent: false,
+        idPrefix: "add-contact-multiple-temp",
         onEmailCheck: function() {
             errorMsg(l[7415]);
         },
@@ -1586,6 +1587,17 @@ function initAddDialogMultiInputPlugin() {
         },
         onHolder: function() {
             errorMsg(l[7414]);
+        },
+        onReady: function() {
+            var $this = $('#add-contact-multiple-temp');
+            $this.rebind('keyup', function() {
+                var value = $.trim($this.val());
+                if (checkMail(value) === false) {
+                    $('.add-user-popup-button.add').removeClass('disabled');
+                } else {
+                    $('.add-user-popup-button.add').addClass('disabled');
+                }
+            });
         },
         onAdd: function() {
 

@@ -1382,12 +1382,20 @@ function topmenuUI() {
             M.accountData(function (account) {
 
                 var perc, warning, perc_c;
+                var percent = {
+                    space: Math.min(100, Math.round(account.space_used / account.space * 100)),
+                    bw: Math.round((account.servbw_used + account.downbw_used) / account.bw * 100)
+                };
+               
+
                 $('.membership-popup .membership-loading').hide();
                 $('.membership-popup .membership-main-block').show();
+                var $parent = $('.membership-popup.free-popup');
 
                 if (u_attr.p) {
                     var planNum = u_attr.p;
                     var planName = getProPlan(planNum);
+                    $parent = $('.membership-popup.pro-popup');
 
                     $('.membership-popup.pro-popup .membership-icon').addClass('pro' + planNum);
                     var p = '';
@@ -1407,21 +1415,17 @@ function topmenuUI() {
                 if (account.balance
                         && account.balance[0]
                         && account.balance[0][0] > 0) {
-                    $('.membership-popup .membership-price-txt .membership-big-txt')
+                    $parent.find('.membership-price-txt .membership-big-txt')
                         .safeHTML('&euro; @@', account.balance[0][0]);
                 }
                 else {
-                    $('.membership-popup .membership-price-txt .membership-big-txt').html('&euro; 0.00');
+                    $parent.find('.membership-price-txt .membership-big-txt').html('&euro; 0.00');
                 }
-                perc = Math.round(account.space_used / account.space * 100);
-                perc_c = perc;
-                if (perc_c > 100) {
-                    perc_c = 100;
-                }
-                $('.membership-popup .membership-circle-bg.blue-circle').attr('class',
-                    'membership-circle-bg blue-circle percents-' + perc_c);
-                $('.membership-popup .membership-circle-bg.blue-circle')
-                    .safeHTML(perc + '<span class="membership-small-txt">%</span>');
+
+                $parent.find('.storage .membership-circle-bg.blue-circle').attr('class',
+                    'membership-circle-bg blue-circle percents-' + percent.space);
+                $parent.find('.storage .membership-circle-bg.blue-circle')
+                    .safeHTML(percent.space  + '<span class="membership-small-txt">%</span>');
                 var b1 = bytesToSize(account.space_used);
                 b1 = b1.split(' ');
                 b1[0] = Math.round(b1[0]) + ' ';
@@ -1430,14 +1434,14 @@ function topmenuUI() {
                 b2[0] = Math.round(b2[0]) + ' ';
 
                 warning = '';
-                if (perc > 99) {
+                if (percent.space > 99) {
                     warning =
                         '<div class="account-warning-icon"><span class="membership-notification"><span><span class="yellow">'
                         + l[34] + '</span> '
                         + l[1010] + '. ' + l[1011] + ' <a href="#pro" class="upgradelink">'
                         + l[920] + '</a></span><span class="membership-arrow"></span></span>&nbsp;</div>';
                 }
-                else if (perc > 80) {
+                else if (percent.space > 80) {
                     warning =
                         '<div class="account-warning-icon"><span class="membership-notification"><span><span class="yellow">'
                         + l[34] + '</span> '
@@ -1457,25 +1461,18 @@ function topmenuUI() {
                     usedspacetxt = l[799].charAt(0).toLowerCase() + l[799].slice(1);
                 }
 
-                $('.membership-usage-txt.storage').safeHTML('<div class="membership-big-txt">' +
+                $parent.find('.storage .membership-usage-txt').safeHTML('<div class="membership-big-txt">' +
                     usedspace + '</div><div class="membership-medium-txt">' + usedspacetxt +
                     warning + '</div>');
 
-                if (perc > 80) {
-                    $('.membership-usage-txt.storage').addClass('exceeded');
+                if (percent.space > 80) {
+                    $parent.find('.storage .membership-usage-txt').addClass('exceeded');
                 }
 
-                perc = Math.round((account.servbw_used + account.downbw_used) / account.bw * 100);
-
-                perc_c = perc;
-                if (perc_c > 100) {
-                    perc_c = 100;
-                }
-
-                $('.membership-popup .membership-circle-bg.green-circle')
-                    .attr('class', 'membership-circle-bg green-circle percents-' + perc_c);
-                $('.membership-popup .membership-circle-bg.green-circle')
-                    .safeHTML(perc + '<span class="membership-small-txt">%</span>');
+                $parent.find('.bandwidth  .membership-circle-bg.green-circle')
+                    .attr('class', 'membership-circle-bg green-circle percents-' + percent.bw);
+                $parent.find('.bandwidth  .membership-circle-bg.green-circle')
+                    .safeHTML(percent.bw + '<span class="membership-small-txt">%</span>');
                 var b1 = bytesToSize(account.servbw_used + account.downbw_used);
                 b1 = b1.split(' ');
                 b1[0] = Math.round(b1[0]) + ' ';
@@ -1486,7 +1483,7 @@ function topmenuUI() {
                 var waittime = '30 minutes';
 
                 warning = '';
-                if (perc > 99 && !u_attr.p) {
+                if (percent.bw > 99 && !u_attr.p) {
                     warning =
                         '<div class="account-warning-icon"><span class="membership-notification"><span><span class="yellow">'
                         + l[34] + '</span> <span class="red">'
@@ -1496,14 +1493,14 @@ function topmenuUI() {
                         + ' ' + l[1055] + ' <a href="#pro"  class="upgradelink">'
                         + l[920] + '</a></span><span class="membership-arrow"></span></span>&nbsp;</div>';
                 }
-                else if (perc > 99 && u_attr.p) {
+                else if (percent.bw > 99 && u_attr.p) {
                     warning =
                         '<div class="account-warning-icon"><span class="membership-notification"><span><span class="yellow">'
                         + l[34] + '</span> '
                         + l[1008] + ' ' + l[1009] + ' <a href="#pro" class="upgradelink">'
                         + l[920] + '</a></span><span class="membership-arrow"></span></span>&nbsp;</div>';
                 }
-                else if (perc > 80) {
+                else if (percent.bw > 80) {
                     warning =
                         '<div class="account-warning-icon"><span class="membership-notification"><span><span class="yellow">'
                         + l[34] + '</span> '
@@ -1522,11 +1519,11 @@ function topmenuUI() {
                     usedbwtxt = l[973].charAt(0).toLowerCase() + l[973].slice(1);
                 }
 
-                $('.membership-usage-txt.bandwidth').safeHTML('<div class="membership-big-txt">' +
+                $parent.find('.bandwidth .membership-usage-txt').safeHTML('<div class="membership-big-txt">' +
                     usedbw + '</div><div class="membership-medium-txt">' + usedbwtxt + warning + '</div>');
 
-                if (perc > 80) {
-                    $('.membership-usage-txt.bandwidth').addClass('exceeded');
+                if (percent.bw > 80) {
+                    $parent.find('.bandwidth .membership-usage-txt').addClass('exceeded');
                 }
 
                 $('.membership-popup .mem-button').rebind('click', function (e) {

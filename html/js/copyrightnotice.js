@@ -6,40 +6,59 @@ copyright.updateUI = function() {
             $(this).select();
         }
     });
-}
+};
 
-// Validate the email address, as without a valid email we can not contact the complainant if there is a counter-notice,
-// or to report stats on their complaints.
-// Further email validation may occur in the API
+/**
+ * Validate the email address, as without a valid email we can not contact the complainant if there is a counter-notice,
+ * or to report stats on their complaints.
+ * Further email validation may occur in the API
+ * @param {String} email The email to validate
+ * @return {Boolean} True if passing validation, false otherwise
+ */
 copyright.validateEmail = function(email) {
-    var re = /[a-z0-9!#$%&'*+\/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+\/=?^_`{|}~-]+)*@([a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/
+    var re = /[a-z0-9!#$%&'*+\/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+\/=?^_`{|}~-]+)*@([a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
     var match = re.exec(email);
-    if (match === null) return false;
+    if (match === null) {
+        return false;
+    }
 
     return true;
-}
+};
 
-// Validate that the user has entered a link that is, or can be easily turned into, a valid MEGA link
+/**
+ * Validate that the user has entered a link that is, or can be easily turned into, a valid MEGA link
+ * @param {String} url The url to validate as a mega public link
+ * @return {Number} The (integer) number of handles found
+ */
 copyright.validateUrl = function(url) {
     url = copyright.decodeURIm(url);
     handles = copyright.getHandles(url);
     return Object.keys(handles).length;
-}
+};
 
-// Find any valid or semi-valid MEGA link handles from the data
+/**
+ * Find any valid or semi-valid MEGA link handles from the data
+ * @param {String} data The data to scan for handles
+ * @return {Object} hashset of handles
+ */
 copyright.getHandles = function(data) {
     var handles = {};
     var p = /.(?:F?!|\w+\=)([\w-]{8})(?:!([\w-]+))?\b/gi;
 
-    (data.replace(/<\/?\w[^>]+>/g,'').replace(/\s+/g,'')+data).replace(p,function(a,id,key)
-    {
-        if (!handles[id]) handles[id] = 1;
+    (data.replace(/<\/?\w[^>]+>/g,'').replace(/\s+/g,'')+data).replace(p,function(a,id,key) {
+        if (!handles[id]) {
+            handles[id] = 1;
+        }
     });
 
     return handles;
-}
+};
 
-// Iteratively remove any %% stuff from the data
+/**
+ * Iteratively remove any %% stuff from the data
+ * @param {String} data The data string to decode
+ * @return {String} the decoded data
+ */ 
 copyright.decodeURIm = function(data) {
     for (var lmt = 7 ; --lmt && /%[a-f\d]{2}/i.test(data) ; )
     {
@@ -55,11 +74,13 @@ copyright.decodeURIm = function(data) {
     }
 
     return data.replace('%21','!','g');
-}
+};
 
-// Store the complainant details so they don't have to type them in next time
-copyright.saveCopyrightOwnerValues = function()
-{
+/**
+ * Store the complainant details so they don't have to type them in next time
+ * Puts them into localStorage.copyrightOwnerDetails
+ */
+copyright.saveCopyrightOwnerValues = function() {
     var details = {
         owner: $('input.copyrightowner').val(),
         jobtitle: $('input.jobtitle').val(),
@@ -76,11 +97,12 @@ copyright.saveCopyrightOwnerValues = function()
     };
 
     localStorage.setItem('copyrightOwnerDetails', JSON.stringify(details));
-}
+};
 
-// Load the complainant details so they don't have to type them in again
-copyright.loadCopyrightOwnerValues = function()
-{
+/**
+ * Load the complainant details directly into the html elements so they don't have to type them in again
+ */
+copyright.loadCopyrightOwnerValues = function() {
     if (localStorage.copyrightOwnerDetails) {
         var details = JSON.parse(localStorage.copyrightOwnerDetails);
         $('input.copyrightowner').val(details.owner);
@@ -96,8 +118,11 @@ copyright.loadCopyrightOwnerValues = function()
         $('input.state').val(details.province);
         $('.select.country select').val(details.country).change();
     }
-}
+};
 
+/**
+ * Initialises the copyright form page, binding the events the form requires
+ */
 copyright.init_cn = function() {
 
     $('.addurlbtn').rebind('click', function(e) {
@@ -130,28 +155,31 @@ copyright.init_cn = function() {
             var proceed = false;
             $('.contenturl').each(function(i, e) {
                 proceed = true;
-                if ($(e).val() !== '' && $(copyrightwork[i]).val() === '' || $(copyrightwork[i]).val() === 'asd' || $(copyrightwork[i]).val() === 'asdf') {
+                var eval = $(e).val();
+                var cval = $(copyrightwork[i]).val();
+                if (eval !== ''  && cval === '' || cval === 'asd' || cval === 'asdf') {
                     proceed = false;
                     msgDialog('warninga', l[135], escapeHTML(l[660]));
                     return false;
                 }
-                if ($(e).val() === '' || $(copyrightwork[i]).val() === '') {
+                if (eval === '' || cval === '') {
                     proceed = false;
                     msgDialog('warninga', l[135], escapeHTML(l[659]));
                     return false;
                 }
 
-                if (!copyright.validateUrl($(e).val())) {
+                if (!copyright.validateUrl(eval)) {
                     proceed = false;
                     msgDialog('warninga', l[135], escapeHTML(l[7686]));
-                    $(e).css("color", "red");
-                    $(e).click(function(){$(e).css("color", "#858585");});
+                    $(e).addClass("red");
+                    $(e).click(function(){$(e).removeClass("red")});
                     return false;
                 }
 
-                $(e).css("color", "#858585");
+                $(e).removeClass("red");
 
             });
+
             if (proceed && !$('.cn_check1 .checkinput').attr('checked')) {
                 msgDialog('warninga', l[135], escapeHTML(l[665]));
             }
@@ -293,4 +321,4 @@ copyright.init_cn = function() {
         }
     }
     $('.select.country select').safeHTML(markup);
-}
+};

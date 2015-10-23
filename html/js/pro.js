@@ -733,15 +733,14 @@ var proPage = {
                 if ((typeof validGatewayIds === 'number') && (validGatewayIds < 0)) {
                     return false;
                 }
-                    
-                /* Enable CCs for testing
-                if (d) {
-                    validGatewayIds.push(8);
-                }//*/
                 
-                // Get their currently selected plan
-                var selectedPlan = $('.membership-step2 .reg-st3-membership-bl.selected').attr('data-payment');
-                var selectedPlanPrice = $('.membership-dropdown-item.selected strong').html();
+                // Get their plan price from the currently selected duration radio button
+                var selectedPlanIndex = $('.duration-options-list .membership-radio.checked').parent().attr('data-plan-index');
+                var selectedPlan = membershipPlans[selectedPlanIndex];
+                var selectedPlanNum = selectedPlan[1];
+                var selectedPlanPrice = selectedPlan[5];
+                
+                // Convert to float for numeric comparisons
                 var planPriceFloat = parseFloat(selectedPlanPrice);
                 var balanceFloat = parseFloat(pro_balance);
                 var html = '';
@@ -768,7 +767,7 @@ var proPage = {
                     var disabledTitleText = '';
                     
                     // Add disabled class if this payment method is not supported for this plan
-                    if ((gatewayOption.supportsExpensivePlans === false) && (selectedPlan != 4)) {
+                    if ((gatewayOption.supportsExpensivePlans === false) && (selectedPlanNum != 4)) {
                         disabledClass = ' disabled';
                         disabledTitleText = ' title="' + l[7162] + '"';
                     }
@@ -782,7 +781,7 @@ var proPage = {
                     else if ((gatewayOption.apiGatewayId === 0) && (balanceFloat >= planPriceFloat)) {
                         gatewayOption.displayName = l[7108] + ' (' + balanceFloat.toFixed(2) + ' &euro;)';  // Balance (x.xx)
                     }
-
+                    
                     // Create a radio button with icon for each payment gateway
                     html += '<div class="payment-method' + disabledClass + '"' + disabledTitleText + '>'
                          +      '<div class="membership-radio' + classChecked + '">'
@@ -1510,7 +1509,7 @@ var paysafecard = {
 
     /**
      * Redirect to the site
-     * @param {String} utcResult, containing the url to redirect to
+     * @param {String} utcResult containing the url to redirect to
      */
     redirectToSite: function(utcResult) {
         var url = utcResult.EUR['url'];

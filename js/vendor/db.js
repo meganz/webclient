@@ -1,7 +1,7 @@
 (function ( window , undefined ) {
     'use strict';
 
-    var indexedDB = window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB || window.oIndexedDB || window.msIndexedDB,
+    var indexedDB,
         IDBKeyRange = window.IDBKeyRange || window.webkitIDBKeyRange,
         transactionModes = {
             readonly: 'readonly',
@@ -9,6 +9,17 @@
         };
 
     var hasOwn = Object.prototype.hasOwnProperty;
+
+    var getIndexedDB = function() {
+      if ( !indexedDB ) {
+        indexedDB = window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB || window.oIndexedDB || window.msIndexedDB || ((window.indexedDB === null && window.shimIndexedDB) ? window.shimIndexedDB : undefined);
+
+        if ( !indexedDB ) {
+          throw 'IndexedDB required';
+        }
+      }
+      return indexedDB;
+    };
 
     var defaultMapper = function (value) {
         return value;
@@ -110,40 +121,41 @@
                 store = transaction.objectStore( table );
 
             return new Promise(function(resolve, reject){
-                records.forEach( function ( record ) {
-                    var req;
-                    if ( record.item && record.key ) {
-                        var key = record.key;
-                        record = record.item;
-                        req = store.add( record , key );
-                    } else {
-                        req = store.add( record );
-                    }
+              records.forEach( function ( record ) {
+                  var req;
+                  if ( record.item && record.key ) {
+                      var key = record.key;
+                      record = record.item;
+                      req = store.add( record , key );
+                  } else {
+                      req = store.add( record );
+                  }
 
-                    req.onsuccess = function ( e ) {
-                        var target = e.target;
-                        var keyPath = target.source.keyPath;
-                        if ( keyPath === null ) {
-                            keyPath = '__id__';
-                        }
-                        Object.defineProperty( record , keyPath , {
-                            value: target.result,
-                            enumerable: true
-                        });
-                    };
-                } );
+                  req.onsuccess = function ( e ) {
+                      var target = e.target;
+                      var keyPath = target.source.keyPath;
+                      if ( keyPath === null ) {
+                          keyPath = '__id__';
+                      }
+                      Object.defineProperty( record , keyPath , {
+                          value: target.result,
+                          enumerable: true
+                      });
+                  };
+              } );
 
-                transaction.oncomplete = function () {
-                    resolve( records , that );
-                };
-                //https://bugzilla.mozilla.org/show_bug.cgi?id=872873
-                transaction.onerror = function ( e ) {
-                    e.preventDefault();
-                    reject({ 'records': records , 'reason': e });
-                };
-                transaction.onabort = function ( e ) {
-                    reject({ 'records': records , 'reason': e });
-                };
+              transaction.oncomplete = function () {
+                  resolve( records , that );
+              };
+              transaction.onerror = function ( e ) {
+                  // prevent Firefox from throwing a ConstraintError and aborting (hard)
+                  // https://bugzilla.mozilla.org/show_bug.cgi?id=872873
+                  e.preventDefault();
+                  reject({ 'records': records , 'reason': e });
+              };
+              transaction.onabort = function ( e ) {
+                  reject({ 'records': records , 'reason': e });
+              };
 
             });
         };
@@ -162,31 +174,31 @@
                 keyPath = store.keyPath;
 
             return new Promise(function(resolve, reject){
-                records.forEach( function ( record ) {
-                    var req;
-                    var count;
-                    if ( record.item && record.key ) {
-                        var key = record.key;
-                        record = record.item;
-                        req = store.put( record , key );
-                    } else {
-                        req = store.put( record );
-                    }
+              records.forEach( function ( record ) {
+                  var req;
+                  var count;
+                  if ( record.item && record.key ) {
+                      var key = record.key;
+                      record = record.item;
+                      req = store.put( record , key );
+                  } else {
+                      req = store.put( record );
+                  }
 
-                    req.onsuccess = function ( e ) {
-                        // deferred.notify(); es6 promise can't notify
-                    };
-                } );
+                  req.onsuccess = function ( e ) {
+                      // deferred.notify(); es6 promise can't notify
+                  };
+              } );
 
-                transaction.oncomplete = function () {
-                    resolve( records , that );
-                };
-                transaction.onerror = function ( e ) {
-                    reject({ 'records': records , 'reason': e });
-                };
-                transaction.onabort = function ( e ) {
-                    reject({ 'records': records , 'reason': e });
-                };
+              transaction.oncomplete = function () {
+                  resolve( records , that );
+              };
+              transaction.onerror = function ( e ) {
+                  reject({ 'records': records , 'reason': e });
+              };
+              transaction.onabort = function ( e ) {
+                  reject({ 'records': records , 'reason': e });
+              };
             });
 
         };
@@ -199,13 +211,13 @@
                 store = transaction.objectStore( table );
 
             return new Promise(function(resolve, reject){
-                var req = store.delete( key );
-                transaction.oncomplete = function ( ) {
-                    resolve( key );
-                };
-                transaction.onerror = function ( e ) {
-                    reject({'reason': e });
-                };
+              var req = store['delete']( key );
+              transaction.oncomplete = function ( ) {
+                  resolve( key );
+              };
+              transaction.onerror = function ( e ) {
+                  reject({'reason': e });
+              };
             });
         };
 
@@ -259,6 +271,14 @@
                 throw 'Database has been closed';
             }
             return new IndexQuery( table , db , index );
+        };
+
+        this.count = function (table , key) {
+            if ( closed ) {
+                throw 'Database has been closed';
+            }
+            var transaction = db.transaction( table ),
+                store = transaction.objectStore( table );
         };
 
         this.destroy = function() {
@@ -361,7 +381,7 @@
                                 cursor.update(result);
                             }
                         }
-                        cursor.continue();
+                        cursor['continue']();
                     }
                 }
             };
@@ -521,12 +541,12 @@
             }
 
             for ( var indexKey in table.indexes ) {
-                if (store.indexNames.contains(indexKey)) {
-                    continue;
-                }
-
                 var index = table.indexes[ indexKey ];
-                store.createIndex( indexKey , index.key || indexKey , Object.keys(index).length ? index : { unique: false } );
+                try {
+                    store.index(indexKey)
+                } catch (e) {
+                    store.createIndex( indexKey , index.key || indexKey , Object.keys(index).length ? index : { unique: false } );
+                }
             }
         }
     };
@@ -553,7 +573,7 @@
     var dbCache = {};
 
     var db = {
-        version: '0.9.2-modified',
+        version: '0.10.2',
         open: function ( options ) {
             var request;
 
@@ -567,7 +587,7 @@
                         .then(resolve, reject)
                 } else {
                     try {
-                        request = indexedDB.open( options.server , options.version );
+                        request = getIndexedDB().open( options.server , options.version );
                     } catch (e) {
                         console.error("indexedDB.open('"+ options.server +"', "+ options.version +"); FAILED", e);
                         reject({ 'reason': e });
@@ -606,7 +626,15 @@
                     };
 
                     request.onupgradeneeded = function ( e ) {
-                        createSchema( e , schema , e.target.result );
+                        try {
+                            createSchema( e, schema, e.target.result);
+                        }
+                        catch (ex) {
+                            if (reject) {
+                                reject({ 'reason': ex });
+                                reject = resolve = null;
+                            }
+                        }
                     };
                     request.onerror = function ( e ) {
                         if (reject) {

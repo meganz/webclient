@@ -6,8 +6,8 @@
  * @constructor
  */
 var CallSession = function(chatRoom, sid) {
-    assert(chatRoom, 'missing chatRoom for CallSession');
-    assert(sid, 'missing sid for CallSession');
+    CallManager.assert(chatRoom, 'missing chatRoom for CallSession');
+    CallManager.assert(sid, 'missing sid for CallSession');
 
     this.sid = sid;
     this.room = chatRoom;
@@ -251,7 +251,7 @@ CallSession.prototype.onWaitingResponseIncoming = function(e, eventData) {
 
     if (self.room.type === "private") {
 
-        assert(participants[0], "No participants found.");
+        CallManager.assert(participants[0], "No participants found.");
 
 
         var contact = self.room.megaChat.getContactFromJid(participants[0]);
@@ -636,7 +636,7 @@ CallSession.prototype.onCallFailed = function(e, reason, txt) {
     // Substitute email into language string
     var msg = l[7209].replace('[X]', self.room.megaChat.getContactNameFromJid(peer));
     if (self.room.megaChat._currentCallCounter) {
-        msg += " " + l[7208] + ".".replace("[X]", secToDuration(
+        msg += (" " + l[7208] + ".").replace("[X]", secToDuration(
                 self.room.megaChat._currentCallCounter ? self.room.megaChat._currentCallCounter : 0
             ));
     }
@@ -908,7 +908,7 @@ CallSession.prototype.getJingleSession = function() {
             }
         }
     }
-    assert(session, 'jingle session not found.');
+    CallManager.assert(session, 'jingle session not found.');
 
     return session;
 };
@@ -922,10 +922,10 @@ CallSession.prototype.getPeer = function() {
         if (this.room) {
             return this.room.getParticipantsExceptMe()[0];
         } else {
-            assert(false, "Failed to get peerJid [1]");
+            CallManager.assert(false, "Failed to get peerJid [1]");
         }
     } else {
-        assert(false, "Failed to get peerJid [2]");
+        CallManager.assert(false, "Failed to get peerJid [2]");
     }
 };
 
@@ -1301,8 +1301,8 @@ CallSession.prototype.renderAudioVideoScreens = function() {
 CallSession.prototype.renderSingleAudioVideoScreen = function($screenElement, mediaOpts, audioCssClass, videoCssClass) {
     var self = this;
 
-    assert($screenElement, 'media options missing');
-    assert(mediaOpts, 'media options missing');
+    CallManager.assert($screenElement, 'media options missing');
+    CallManager.assert(mediaOpts, 'media options missing');
 
     if (!mediaOpts.video) {
         $screenElement
@@ -1390,13 +1390,15 @@ var CallManager = function(megaChat) {
     megaChat.bind("onInit.callManager", function(e) {
         try {
             megaChat.rtc = megaChat.karere.connection.rtc = new RtcSession(megaChat.karere.connection, megaChat.options.rtcSession);
-            
             self._attachToChat(megaChat);
-
         }
         catch (e) {
             // no RTC support.
-            self.logger.error("No rtc support: ", e);
+            if (e instanceof RtcSession.NotSupportedError) {
+                self.logger.warn("This browser does not support webRTC");
+            } else {
+                self.logger.error("Error initializing webRTC support:", e);
+            }
         }
     });
 
@@ -1474,14 +1476,14 @@ CallManager.prototype._attachToChat = function(megaChat) {
 
     megaChat.unbind("onRoomDestroy.callManager");
     megaChat.bind("onRoomDestroy.callManager", function(e, chatRoom) {
-        assert(chatRoom.type, 'missing room type');
+        CallManager.assert(chatRoom.type, 'missing room type');
 
         self._detachFromChatRoom(megaChat, chatRoom);
     });
 
     megaChat.unbind("onRoomCreated.chatStore");
     megaChat.bind("onRoomCreated.chatStore", function(e, chatRoom) {
-        assert(chatRoom.type, 'missing room type');
+        CallManager.assert(chatRoom.type, 'missing room type');
 
         self._attachToChatRoom(megaChat, chatRoom);
     });
@@ -1592,11 +1594,11 @@ CallManager.prototype._attachToChatRoom = function(megaChat, chatRoom) {
             self.trigger('CallMissed', [session, eventData]);
         } else if (reason === 'user') {
             //do nothing, we canceled it so we have that handled already, this is just a feedback event
-        } else if (reason.match(/.*error.*/)) {
+        } else if (reason.match(/.*(error|timeout).*/)) {
             session.setState(CallSession.STATE.FAILED);
             self.trigger('CallFailed', [session, reason, eventData.text])
         } else {
-            assert(false, 'unknown call-canceled:eventData.reason found: '+ reason);
+            CallManager.assert(false, 'unknown call-canceled:eventData.reason found:', reason);
         }
     });
 
@@ -1754,12 +1756,10 @@ CallManager.prototype.getOrCreateSessionFromEventData = function(eventName, even
     var sid;
     var callSession;
 
-    if (eventData.sid) {
+    if (eventData.sid) { //no jingle session yet
         sid = eventData.sid;
-    } else if (eventData.sess && eventData.sess._sess && eventData.sess._sess.sid) {
-        sid = eventData.sess._sess.sid;
-    } else if (eventData.info && eventData.info.sid) {
-        sid = eventData.info.sid;
+    } else if (eventData.sess) { //there is a jingle session created for this sid
+        sid = eventData.sess.sid();
     } else {
         // handle the eventData{player: .., id: ...} use case for local-stream-* and remove stream etc
         if (chatRoom.callSession) {
@@ -1769,8 +1769,7 @@ CallManager.prototype.getOrCreateSessionFromEventData = function(eventName, even
 
     // the only allowed case, when the sid can not be found and the code should continue its execution is when the
     // local-stream-connect || local-player-remove is triggered, in that case, the active session is the one for the
-    // currently active/visible
-    // room
+    // currently active/visible room
     // ---
     // this is a local-stream-connect OR
     // local-player-remove
@@ -1780,7 +1779,7 @@ CallManager.prototype.getOrCreateSessionFromEventData = function(eventName, even
         }
 
         if (eventName === "local-stream-connect") {
-            assert(
+            CallManager.assert(
                 chatRoom.callSession.isNotStarted() ||
                 chatRoom.callSession.isTerminated() ||
                 chatRoom.callSession.isStarting(),
@@ -1794,8 +1793,7 @@ CallManager.prototype.getOrCreateSessionFromEventData = function(eventName, even
     }
     if (!sid) { debugger; }
 
-    assert(sid, 'no sid found in: ', eventData);
-
+    CallManager.assert(sid, 'No sid found in event', eventName, 'event data:', eventData);
 
     if (!callSession) {
         if (self.callSessions[sid] !== undefined) { // session found
@@ -1820,7 +1818,7 @@ CallManager.prototype.getOrCreateSessionFromEventData = function(eventName, even
                 }
             }
 
-            assert(chatRoom, 'chatRoom not found for session with evData: ', eventData);
+            CallManager.assert(chatRoom, 'chatRoom not found for session with evData: ', eventData);
         }
     }
 
@@ -1847,7 +1845,7 @@ CallManager.prototype.startCall = function(chatRoom, mediaOptions) {
     chatRoom.megaChat.closeChatPopups();
 
     var participants = chatRoom.getParticipantsExceptMe();
-    assert(participants.length > 0, "No participants.");
+    CallManager.assert(participants.length > 0, "No participants.");
 
     if (!chatRoom.megaChat.rtc) {
         msgDialog('warninga', 'Error', l[7211]);
@@ -1927,9 +1925,9 @@ CallManager.prototype.startCall = function(chatRoom, mediaOptions) {
             return;
         }
 
-        assert(
+        CallManager.assert(
             session instanceof CallSession,
-            'CallManager tried to relay event to a non-session argument: ' + typeof(session)
+            'CallManager tried to relay event to a non-session argument:', typeof(session)
         );
 
         if (typeof(session["on" + evtName]) !== 'undefined') { // proxy events to sessions
@@ -1962,3 +1960,23 @@ CallManager.prototype.forEachCallSession = function(cb) {
         return cb(self.callSessions[sid], sid);
     });
 };
+
+CallManager.assert = function(cond) {
+    if (cond) {
+        return;
+    }
+    var msg = '';
+    var last = arguments.length - 1;
+    for (var i = 1; i <= last; i++) {
+        msg += arguments[i];
+        if (i < last) {
+            msg += ' ';
+        }
+    }
+    var stack = (new Error()).stack;
+
+    //log error to call stat server
+    megaChat.rtc.logMsg('e', "CallManager assertion failed: "+msg+"\nStack:\n"+stack);
+
+    assert(false, msg);
+}

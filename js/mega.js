@@ -136,6 +136,24 @@ function MegaData()
         this.sort();
     };
 
+    this.sortByFav = function(d)
+    {
+        this.sortfn = function(a, b, d)
+        {
+            if (a.fav) {
+                return -1 * d;
+            }
+
+            if (b.fav) {
+                return d;
+            }
+
+            return 0;
+        }
+        this.sortd = d;
+        this.sort();
+    };
+
     this.sortBySize = function(d)
     {
         this.sortfn = function(a, b, d)
@@ -257,21 +275,33 @@ function MegaData()
         }
         if (n === 'name') {
             M.sortByName(d);
-        } else if (n == 'size') {
+        }
+        else if (n === 'size') {
             M.sortBySize(d);
-        } else if (n == 'type') {
+        }
+        else if (n === 'type') {
             M.sortByType(d);
-        } else if (n == 'date') {
+        }
+        else if (n === 'date') {
             M.sortByDateTime(d);
-        } else if (n == 'owner') {
+        }
+        else if (n === 'owner') {
             M.sortByOwner(d);
-        } else if (n == 'access') {
+        }
+        else if (n === 'access') {
             M.sortByAccess(d);
-        } else if (n == 'interaction') {
+        }
+        else if (n === 'interaction') {
             M.sortByInteraction(d);
-        } else if (n == 'status') {
+        }
+        else if (n === 'status') {
             M.sortByStatus(d);
         }
+    else if (n === 'fav') {
+            M.sortByFav(d);
+        }
+
+        M.sortingBy = [n, d];
 
         if (fmconfig.uisorting) {
             storefmconfig('sorting', {n: n, d: d});
@@ -388,14 +418,14 @@ function MegaData()
         });
     }
 
-    this.contactstatus = function(h)
+    this.contactstatus = function(h, wantTimeStamp)
     {
         var folders = 0;
         var files = 0;
         var ts = 0;
         if (M.d[h])
         {
-            if(!M.d[h].ts) {
+            if (!wantTimeStamp || !M.d[h].ts) {
                 var a = fm_getnodes(h);
                 for (var i in a) {
                     if (!a.hasOwnProperty(i)) {
@@ -414,7 +444,9 @@ function MegaData()
                         }
                     }
                 }
-                M.d[h].ts = ts;
+                if (!M.d[h].ts) {
+                    M.d[h].ts = ts;
+                }
             } else {
                 ts = M.d[h].ts;
             }
@@ -815,6 +847,7 @@ function MegaData()
                     t = '.contacts-blocks-scrolling';
                     html = '<a class="file-block ustatus ' + htmlentities(u_h) + ' ' + onlinestatus[1] + '" id="' + htmlentities(M.v[i].h) + '">\n\
                                 <span class="nw-contact-status"></span>\n\
+                                <span class="file-settings-icon"></span>\n\
                                 ' + avatar + ' \
                                 <span class="shared-folder-info-block">\n\
                                     <span class="shared-folder-name">' + htmlentities(node.name) + '</span>\n\
@@ -842,6 +875,9 @@ function MegaData()
                                 <td width="270">\n\
                                     <div class="contacts-interation li_' + u_h + '"></div>\n\
                                 </td>\n\
+                                <td class="grid-url-header-nw">\n\
+                                    <a class="grid-url-arrow"></a>\n\
+                                </td>\n\
                             </tr>';
                 }
                 mInsertNode(M.v[i], M.v[i-1], M.v[i+1], t, el, html, u);
@@ -864,7 +900,7 @@ function MegaData()
         function renderLayout(u, n_cache) {
             var html, cs, contains, u_h, t, el, time, bShare,
                 avatar, rights, rightsclass, onlinestatus, html,
-                sExportLink, sLinkIcon,
+                sExportLink, sLinkIcon, takenDown,
                 iShareNum = 0,
                 s, ftype, c, cc, star;
 
@@ -886,11 +922,11 @@ function MegaData()
                 star = M.v[i].fav ? ' star' : '';
 
                 if (M.currentdirid === 'shares') {// render shares tab
-                    cs = M.contactstatus(M.v[i].h),
-                    contains = fm_contains(cs.files, cs.folders),
-                    u_h = M.v[i].p,
-                    rights = l[55],
-                    rightsclass = ' read-only',
+                    cs = M.contactstatus(M.v[i].h);
+                    contains = fm_contains(cs.files, cs.folders);
+                    u_h = M.v[i].p;
+                    rights = l[55];
+                    rightsclass = ' read-only';
                     onlinestatus = M.onlineStatusClass(
                         chatIsReady &&
                         megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h))
@@ -907,6 +943,7 @@ function MegaData()
                         rightsclass = ' full-access';
                     }
 
+                    var contactName = M.d[u_h] ? htmlentities(M.d[u_h].name) : "N/a";
                     if (M.viewmode === 1) {
                         t = '.shared-blocks-scrolling';
                         avatar = useravatar.contact(u_h, 'nw-contact-avatar', 'span');
@@ -914,16 +951,15 @@ function MegaData()
                         html = '<a class="file-block folder" id="'
                             + htmlentities(M.v[i].h) + '"><span class="file-status-icon '
                             + htmlentities(star) + '"></span><span class="shared-folder-access '
-                            + htmlentities(rightsclass) + '"></span><span class="file-icon-area">'
+                            + htmlentities(rightsclass) + '"></span><span class="file-settings-icon"></span><span class="file-icon-area">'
                             + '<span class="block-view-file-type folder"></span></span>'
                                  + avatar
                             + '<span class="shared-folder-info-block"><span class="shared-folder-name">'
                             + htmlentities(M.v[i].name) + '</span><span class="shared-folder-info">by '
-                            + htmlentities(M.d[u_h].name) + '</span></span></a>';
+                            + contactName + '</span></span></a>';
                     } else {
                         t = '.shared-grid-view .grid-table.shared-with-me';
                         el = 'tr';
-                        var contactName = M.d[u_h] ? htmlentities(M.d[u_h].name) : "N/a";
                         avatar = useravatar.contact(u_h, 'nw-contact-avatar');
 
                         html = '<tr id="' + htmlentities(M.v[i].h) + '"><td width="30"><span class="grid-status-icon ' + htmlentities(star)
@@ -935,7 +971,7 @@ function MegaData()
                             + htmlentities(onlinestatus[1]) + '"><div class="todo-fm-chat-user-star"></div><div class="fm-chat-user">'
                             + contactName + '</div><div class="nw-contact-status"></div><div class="fm-chat-user-status ' + htmlentities(htmlentities(u_h)) + '">' + htmlentities(onlinestatus[0])
                             + '</div><div class="clear"></div></div></td><td width="270"><div class="shared-folder-access'
-                            + htmlentities(rightsclass) + '">' + htmlentities(rights) + '</div></td></tr>';
+                            + htmlentities(rightsclass) + '">' + htmlentities(rights) + '</div></td><td class="grid-url-header-nw"><a class="grid-url-arrow"></a></td></tr>';
                     }
                 }
 
@@ -960,9 +996,7 @@ function MegaData()
                         el = 'a';
                         html = '<a id="' + htmlentities(M.v[i].h) + '" class="file-block folder">\n\
                                     <span class="file-status-icon"></span>\n\
-                                    <span class="file-settings-icon">\n\
-                                        <span></span>\n\
-                                    </span>\n\
+                                    <span class="file-settings-icon"></span>\n\
                                     <span class="shared-folder-access ' + rightsclass + '"></span>\n\
                                     <span class="file-icon-area">\n\
                                         <span class="block-view-file-type folder-shared"><img alt=""></span>\n\
@@ -986,6 +1020,9 @@ function MegaData()
                                     <td width="270">\n\
                                         <div class="shared-folder-access ' + rightsclass + '">' + rights + '</div>\n\
                                     </td>\n\
+                                    <td class="grid-url-header-nw">\n\
+                                        <a class="grid-url-arrow"></a>\n\
+                                    </td>\n\
                                 </tr>';
                     }
                 } else {
@@ -1003,17 +1040,16 @@ function MegaData()
                         ? true : false;
                     sExportLink = (M.v[i].shares && M.v[i].shares.EXP) ? 'linked' : '';
                     sLinkIcon = (sExportLink === '') ? '' : 'link-icon';
+                    takenDown = (M.v[i] && M.v[i].shares && M.v[i].shares.EXP && M.v[i].shares.EXP.down) ? 'taken-down' : '';
 
                     // Block view
                     if (M.viewmode === 1) {
                         t = '.fm-blocks-view.fm .file-block-scrolling';
                         el = 'a';
-                        html = '<a id="' + htmlentities(M.v[i].h) + '" class="file-block' + c + ' ' + sExportLink + '">\n\
+                        html = '<a id="' + htmlentities(M.v[i].h) + '" class="file-block' + c + ' ' + sExportLink + ' ' + takenDown +  '">\n\
                                     <span class="file-status-icon' + star + '"></span>\n\
                                     <span class="' + sLinkIcon + '"></span>\n\
-                                    <span class="file-settings-icon">\n\
-                                        <span></span>\n\
-                                    </span>\n\
+                                    <span class="file-settings-icon"></span>\n\
                                     <span class="file-icon-area">\n\
                                         <span class="block-view-file-type ' + fileIcon({t: M.v[i].t, share: bShare, name: M.v[i].name}) + '"><img alt="" /></span>\n\
                                     </span>\n\
@@ -1026,7 +1062,7 @@ function MegaData()
                         time = time2date(M.v[i].ts || (M.v[i].p === 'contacts' && M.contactstatus(M.v[i].h).ts));
                         t = '.grid-table.fm';
                         el = 'tr';
-                        html = '<tr id="' + htmlentities(M.v[i].h) + '" class="' + c + '">\n\
+                        html = '<tr id="' + htmlentities(M.v[i].h) + '" class="' + c + ' ' + takenDown +  '">\n\
                                     <td width="30">\n\
                                         <span class="grid-status-icon' + star + '"></span>\n\
                                     </td>\n\
@@ -1038,9 +1074,7 @@ function MegaData()
                                     <td width="130">' + ftype + '</td>\n\
                                     <td width="120">' + time + '</td>\n\
                                     <td width="62" class="grid-url-field own-data ' + sExportLink + '">\n\
-                                        <a class="grid-url-arrow">\n\
-                                            <span></span>\n\
-                                        </a>\n\
+                                        <a class="grid-url-arrow"></a>\n\
                                         <span class="' + sLinkIcon + '"></span>\n\
                                     </td>\n\
                                 </tr>';
@@ -1095,7 +1129,7 @@ function MegaData()
                 $('.fm-empty-trashbin').removeClass('hidden');
             }
             else if (M.currentdirid === 'contacts') {
-                $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[784]);
+                $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[6772]);
                 $('.fm-empty-contacts').removeClass('hidden');
             }
             else if (M.currentdirid === 'opc' || M.currentdirid === 'ipc') {
@@ -1558,7 +1592,10 @@ function MegaData()
             window.location.hash = '#fm/' + M.currentdirid;
         }
         searchPath();
-        treesearchUI();
+
+        var sortMenu = new mega.SortMenu();
+        sortMenu.treeSearchUI();
+
         $(document).trigger('MegaOpenFolder');
     };
 
@@ -1578,14 +1615,14 @@ function MegaData()
 
         treePanelSortElements('contacts', contacts, {
             'last-interaction': function(a, b) {
-                var cs = M.contactstatus(a.u);
+                var cs = M.contactstatus(a.u, true);
                 if (cs.ts === 0) {
                     cs.ts = -1;
                 }
                 M.i_cache[a.u] = cs.ts;
 
 
-                cs = M.contactstatus(b.u);
+                cs = M.contactstatus(b.u, true);
                 if (cs.ts === 0) {
                     cs.ts = -1;
                 }
@@ -1758,29 +1795,29 @@ function MegaData()
         return found;
     };
 
-    this.refreshTree = function() {
-        switch (treePanelType()) {
-            case 'contacts':
-                M.contacts();
-                break;
-            case 'shared-with-me':
-                M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
-                break;
-            case 'cloud-drive':
-            case 'folder-link':
-                M.buildtree(M.d[M.RootID], M.buildtree.FORCE_REBUILD);
-                break;
-            case 'inbox':
-                M.buildtree(M.d[M.InboxID], M.buildtree.FORCE_REBUILD);
-                break
-            case 'rubbish-bin':
-                M.buildtree({h: M.RubbishID}, M.buildtree.FORCE_REBUILD);
-                break;
-        }
-        treeUI(); // reattach events
-    };
-
+    /**
+     * buildtree
+     *
+     * Re-creates tree DOM elements in given order i.e. { ascending, descending }
+     * for given parameters i.e. { name, [last interaction, status] },
+     * Sorting for status and last interaction are available only for contacts.
+     * @param {String} n, node id.
+     * @param {String} dialog, dialog identifier or force rebuild constant.
+     * @param {type} stype, what to sort.
+     */
     this.buildtree = function(n, dialog, stype) {
+
+        var folders = [],
+            _ts_l = treesearch && treesearch.toLowerCase(),
+            _li = 'treeli_',
+            _sub = 'treesub_',
+            _a = 'treea_',
+            rebuild = false,
+            sharedfolder, openedc, arrowIcon,
+            ulc, expandedc, buildnode, containsc, cns, html, sExportLink, sLinkIcon,
+            prefix;
+
+        var share = new mega.Share({});
 
         if (!n) {
             console.error('Invalid node passed to M.buildtree');
@@ -1795,7 +1832,6 @@ function MegaData()
          * with the assumption the tree panels are recreated always.
          */
 
-        var rebuild = false;
         if (dialog === this.buildtree.FORCE_REBUILD) {
             rebuild = true;
             dialog = undefined;
@@ -1803,60 +1839,61 @@ function MegaData()
         stype = stype || "cloud-drive";
         if (n.h === M.RootID) {
             if (typeof dialog === 'undefined') {
-                if (rebuild || $('.content-panel.cloud-drive ul').length == 0) {
+                if (rebuild || $('.content-panel.cloud-drive ul').length === 0) {
                     $('.content-panel.cloud-drive').html('<ul id="treesub_' + htmlentities(M.RootID) + '"></ul>');
                 }
             }
             else {
-                // if ($('.' + dialog + ' .cloud-drive .dialog-content-block ul').length == 0) {
-                    $('.' + dialog + ' .cloud-drive .dialog-content-block').html('<ul id="mctreesub_' + htmlentities(M.RootID) + '"></ul>');
-                // }
+                $('.' + dialog + ' .cloud-drive .dialog-content-block').html('<ul id="mctreesub_' + htmlentities(M.RootID) + '"></ul>');
             }
         }
         else if (n.h === 'shares') {
             if (typeof dialog === 'undefined') {
-                // if ($('.content-panel.shared-with-me ul').length == 0) {
-                    $('.content-panel.shared-with-me').html('<ul id="treesub_shares"></ul>');
-                // }
+                $('.content-panel.shared-with-me').html('<ul id="treesub_shares"></ul>');
             }
             else {
-                // if ($('.' + dialog + ' .shared-with-me .dialog-content-block ul').length == 0) {
-                    $('.' + dialog + ' .shared-with-me .dialog-content-block').html('<ul id="mctreesub_shares"></ul>');
-                // }
+                $('.' + dialog + ' .shared-with-me .dialog-content-block').html('<ul id="mctreesub_shares"></ul>');
             }
             stype = "shared-with-me";
         }
         else if (n.h === M.InboxID) {
             if (typeof dialog === 'undefined') {
-                // if ($('.content-panel.inbox ul').length == 0) {
-                    $('.content-panel.inbox').html('<ul id="treesub_' + htmlentities(M.InboxID) + '"></ul>');
-                // }
+                $('.content-panel.inbox').html('<ul id="treesub_' + htmlentities(M.InboxID) + '"></ul>');
             }
             else {
-                // if ($('.' + dialog + ' .inbox .dialog-content-block ul').length == 0) {
-                    $('.' + dialog + ' .inbox .dialog-content-block').html('<ul id="mctreesub_' + htmlentities(M.InboxID) + '"></ul>');
-                // }
+                $('.' + dialog + ' .inbox .dialog-content-block').html('<ul id="mctreesub_' + htmlentities(M.InboxID) + '"></ul>');
             }
             stype = "inbox";
         }
         else if (n.h === M.RubbishID) {
             if (typeof dialog === 'undefined') {
-                // if ($('.content-panel.rubbish-bin ul').length == 0) {
-                    $('.content-panel.rubbish-bin').html('<ul id="treesub_' + htmlentities(M.RubbishID) + '"></ul>');
-                // }
+                $('.content-panel.rubbish-bin').html('<ul id="treesub_' + htmlentities(M.RubbishID) + '"></ul>');
             }
             else {
-                // if ($('.' + dialog + ' .rubbish-bin .dialog-content-block ul').length == 0) {
-                    $('.' + dialog + ' .rubbish-bin .dialog-content-block').html('<ul id="mctreesub_' + htmlentities(M.RubbishID) + '"></ul>');
-                // }
+                $('.' + dialog + ' .rubbish-bin .dialog-content-block').html('<ul id="mctreesub_' + htmlentities(M.RubbishID) + '"></ul>');
             }
             stype = "rubbish-bin";
-        } else if (folderlink) {
+        }
+        else if (folderlink) {
             stype = "folder-link";
         }
 
+        prefix = stype;
+        // Detect copy and move dialogs, make sure that right DOMtree will be sorted.
+        // copy and move dialogs have their own trees and sorting is done independently
+        if (dialog) {
+            if (dialog.indexOf('copy-dialog') !== -1) {
+                prefix = 'Copy' + stype;
+            }
+            else if (dialog.indexOf('move-dialog') !== -1) {
+                prefix = 'Move' + stype;
+            }
+        }
+
         if (this.c[n.h]) {
-            var folders = [];
+
+            folders = [];
+
             for (var i in this.c[n.h]) {
                 if (this.d[i] && this.d[i].t === 1 && this.d[i].name) {
                     folders.push(this.d[i]);
@@ -1865,26 +1902,14 @@ function MegaData()
 
             // localCompare >=IE10, FF and Chrome OK
             // sort by name is default in the tree
-            treePanelSortElements(stype, folders, {
-                created: function(a, b) {
-                    return a.ts - b.ts;
-                },
-                fav: function(a, b) {
-                    if (a.fav) {
-                        return -1;
-                    }
-                    if (b.fav) {
-                        return 1;
-                    }
-                },
+            treePanelSortElements(prefix, folders, {
                 name: function(a, b) {
                     if (a.name)
                         return a.name.localeCompare(b.name);
                 }
             });
 
-            var _ts_l = treesearch && treesearch.toLowerCase();
-            var _li = 'treeli_', _sub = 'treesub_', _a = 'treea_';
+            // In case of copy and move dialogs
             if (typeof dialog !== 'undefined') {
                  _a = 'mctreea_';
                  _li = 'mctreeli_';
@@ -1893,11 +1918,13 @@ function MegaData()
 
             for (var ii in folders) {
                 if (folders.hasOwnProperty(ii)) {
-                    var ulc = '';
-                    var expandedc = '';
-                    var buildnode = false;
-                    var containsc = '';
-                    var cns = M.c[folders[ii].h];
+
+                    ulc = '';
+                    expandedc = '';
+                    buildnode = false;
+                    containsc = '';
+                    cns = M.c[folders[ii].h];
+
                     if (cns) {
                         for (var cn in cns) {
                             /* jshint -W073 */
@@ -1917,12 +1944,14 @@ function MegaData()
                     else if (fmconfig && fmconfig.treenodes && fmconfig.treenodes[folders[ii].h]) {
                         fmtreenode(folders[ii].h, false);
                     }
-                    var sharedfolder = '';
-                    if (M.d[folders[ii].h].shares) {
+                    sharedfolder = '';
+
+                    // Check is there a full and pending share available, exclude public link shares i.e. 'EXP'
+                    if (share.isShareExist([folders[ii].h], true, true, false)) {
                         sharedfolder = ' shared-folder';
                     }
 
-                    var openedc = '';
+                    openedc = '';
                     if (M.currentdirid === folders[ii].h) {
                         openedc = 'opened';
                     }
@@ -1940,13 +1969,14 @@ function MegaData()
                         }
                     }
                     else {
-                        var sExportLink = (M.d[folders[ii].h].shares && M.d[folders[ii].h].shares.EXP) ? 'linked' : '';
-                        var sLinkIcon = (sExportLink === '') ? '' : 'link-icon';
-                        var arrowIcon = '';
+                        sExportLink = (M.d[folders[ii].h].shares && M.d[folders[ii].h].shares.EXP) ? 'linked' : '';
+                        sLinkIcon = (sExportLink === '') ? '' : 'link-icon';
+                        arrowIcon = '';
+
                         if (containsc) {
                             arrowIcon = 'class="nw-fm-arrow-icon"';
                         }
-                        var html = '<li id="' + _li + folders[ii].h + '">\n\
+                        html = '<li id="' + _li + folders[ii].h + '">\n\
                                         <span  id="' + _a + htmlentities(folders[ii].h) + '" class="nw-fm-tree-item ' + containsc + ' ' + expandedc + ' ' + openedc + ' ' + sExportLink + '">\n\
                                             <span ' + arrowIcon + '></span>\n\
                                             <span class="nw-fm-tree-folder' + sharedfolder + '">' + htmlentities(folders[ii].name) + '</span>\n\
@@ -1978,12 +2008,16 @@ function MegaData()
                         this.buildtree(folders[ii], dialog, stype);
                     }
 
-                    // @TODO PERF: the following call is not optimal. It will call the sharedUInode for non-shared folders
-                    sharedUInode(folders[ii].h);
+                    var nodeHandle = folders[ii].h;
+
+                    if ((M.d[nodeHandle] && M.d[nodeHandle].shares) || M.ps[nodeHandle]) {
+                        sharedUInode(nodeHandle);
+                    }
                 }
             }// END of for folders loop
         }
-    };
+    };// END buildtree()
+
     this.buildtree.FORCE_REBUILD = 34675890009;
 
     var icon = '<span class="context-menu-icon"></span>';
@@ -2540,14 +2574,14 @@ function MegaData()
     };
 
     /**
-     * Invite contacts using email address, also known as ongoing pending contacts
+     * Invite contacts using email address, also known as ongoing pending contacts.
      * This uses API 2.0
      *
-     * @param {email} owner
-     * @param {email} target
-     * @param {string} msg
-     *
-     *
+     * @param {String} owner, account owner email address.
+     * @param {String} target, target email address.
+     * @param {String} msg, optional custom text message.
+     * @returns {Integer} proceed, API response code, if negative something is wrong
+     * look at API response code table.
      */
     this.inviteContact = function(owner, target, msg) {
         DEBUG('inviteContact');
@@ -2996,6 +3030,23 @@ function MegaData()
         });
     };
 
+    this.accountSessions = function(cb) {
+        /* x: 1, load the session ids
+           useful to expire the session from the session manager */
+        api_req({ a: 'usl', x: 1 }, {
+            account: account,
+            callback: function(res, ctx)
+            {
+                if (typeof res != 'object')
+                    res = [];
+                ctx.account.sessions = res;
+                if (typeof cb === "function") {
+                    cb();
+                }
+            }
+        });
+    };
+
     this.accountData = function(cb, blockui)
     {
         if (this.account && this.account.lastupdate > new Date().getTime() - 300000 && cb)
@@ -3093,15 +3144,7 @@ function MegaData()
                 }
             });
 
-            api_req({a: 'usl'}, {
-                account: account,
-                callback: function(res, ctx)
-                {
-                    if (typeof res != 'object')
-                        res = [];
-                    ctx.account.sessions = res;
-                }
-            });
+            this.accountSessions();
 
             api_req({a: 'ug'}, {
                 cb: cb,
@@ -3245,10 +3288,9 @@ function MegaData()
             }
         }
 
-        var type= treePanelType();
-
-        if (($.sortTreePanel[type]||{}).by == 'fav') {
-            M.refreshTree();
+        if (M.sortingBy && (M.sortingBy[0] === 'fav')) {
+            M.doSort('fav', M.sortingBy[1]);
+            M.renderMain();
         }
     };
 
@@ -3270,7 +3312,7 @@ function MegaData()
                 shareDialog();
             }
             if (typeof mDB === 'object' && !pfkey) {
-                mDBadd('ok', {h: h, k: a32_to_base64(encrypt_key(u_k_aes, u_sharekeys[h])), ha: crypto_handleauth(h)});
+                mDBadd('ok', { h: h, k: a32_to_base64(encrypt_key(u_k_aes, u_sharekeys[h])), ha: crypto_handleauth(h) });
             }
         }
         else if (d) {
@@ -3359,125 +3401,6 @@ function MegaData()
         if (M.d[handle] && M.d[handle].ph) {
             delete M.d[handle].ph;
         }
-    };
-
-    /**
-     * hasExportLink, check if at least one selected
-     * item have export link already generated
-     *
-     * @param {array} selected
-     * @returns {boolean}
-     */
-    this.hasExportLink = function(selected) {
-
-        var i, shares, selectedNodeHandle;
-
-        // Loop through all selected items
-        for (i = selected.length; i--;) {
-
-            selectedNodeHandle = selected[i];
-            shares = M.d[selectedNodeHandle]
-                && M.d[selectedNodeHandle].shares;
-
-            if (shares) {
-                // Loop through selected items and search for export link share
-                for (var userHandle in shares) {
-                    if (shares.hasOwnProperty(userHandle)) {
-                        if (userHandle === 'EXP' && M.d[selectedNodeHandle].ph) {
-                            return true;
-                        }
-                    }
-                }
-            }
-        }
-
-        return false;
-    };
-
-    this.getLinks = function(h) {
-
-        function getLinksDone() {
-            for (var i in links) {
-                api_req({a: 'l', n: links[i]}, {
-                    node: links[i],
-                    last: i == links.length - 1,
-                    callback: function(res, ctx) {
-
-                        if (typeof res !== 'number') {
-                            M.nodeAttr({h: M.d[ctx.node].h, ph: res});
-                        }
-
-                        if (ctx.last) {
-                            $getLinkPromise.resolve();
-                            loadingDialog.hide();
-                        }
-                    }
-                });
-            }
-        }
-
-        function getFolderLinks() {
-
-            if (folderLinks.length > 0) {
-                var node = M.d[folderLinks.shift()];
-
-                if (node) {
-                    if (node.shares
-                            && node.shares['EXP']) {
-                        getFolderLinks();
-                    }
-                    else {
-                        var childNodes = fm_getnodes(node.h);
-                        childNodes.push(node.h);
-
-                        api_setshare(node.h, [{u: 'EXP', r: 0}],
-                            childNodes, {
-                                fln: node.h,
-                                done: function(res, ctx) {
-                                    if (res.r && res.r[0] === 0) {
-
-                                        M.nodeShare(ctx.fln, {h: ctx.fln, r: 0, u: 'EXP', ts: unixtime()});
-                                    }
-                                    getFolderLinks();
-                                }
-                            }
-                        );
-                    }
-                }
-                else {
-                    getFolderLinks();
-                }
-            }
-            else {
-                getLinksDone();
-            }
-        }
-        var $getLinkPromise = new MegaPromise();
-        var folderLinks = [], links = [];
-
-        loadingDialog.show();
-
-        for (var i in h) {
-            var node = M.d[h[i]];
-            if (node) {
-                if (node.t) {
-                    folderLinks.push(node.h);
-                }
-                links.push(node.h);
-            }
-        }
-        if (d) {
-            console.log('getLinks', links);
-        }
-        if (folderLinks.length > 0) {
-            getFolderLinks();
-        }
-        else {
-            getLinksDone();
-        }
-
-        this.links = links;
-        return $getLinkPromise;
     };
 
     this.makeDir = function(n)
@@ -3657,7 +3580,7 @@ function MegaData()
                 id: n.h,
                 key: n.key,
                 n: n.name,
-                t: n.ts,
+                t: n.mtime || n.ts,
                 p: path,
                 size: n.s,
                 onDownloadProgress: this.dlprogress,
@@ -3696,8 +3619,8 @@ function MegaData()
                     + '<td>' + bytesToSize(n.s) + '</td>'
                     + '<td>' + filetype(n.name) + '</td>'
                     + '<td><span class="transfer-status queued">Queued</span></td>'
-                    + '<td class="grid-url-field"><a class="grid-url-arrow"><span></span></a>'
-                    + '<a class="clear-transfer-icon"><span></span></a></td>'
+                    + '<td class="grid-url-field"><a class="grid-url-arrow"></a>'
+                    + '<a class="clear-transfer-icon"></a></td>'
                     + '<td><span class="row-number"></span></td>'
                     + '</tr>');
 
@@ -3735,7 +3658,7 @@ function MegaData()
                 + '<td>' + bytesToSize(zipsize) + '</td>'
                 + '<td>' + filetype({name: 'archive.zip'}) + '</td>'
                 + '<td><span class="transfer-status queued">Queued</span></td>'
-                + '<td class="grid-url-field"><a class="grid-url-arrow"><span></span></a><a class="clear-transfer-icon"><span></span></a></td>'
+                + '<td class="grid-url-field"><a class="grid-url-arrow"></a><a class="clear-transfer-icon"></a></td>'
                 + '<td><span class="row-number"></span></td>'
                 + '</tr>');
 
@@ -4139,14 +4062,42 @@ function MegaData()
 
     var __ul_id = 8000;
     this.addUpload = function(u, ignoreWarning) {
+        var flag = 'ulMegaSyncAD';
 
-        /*if (u.length > 99 && !ignoreWarning) {
-            if (ulmanager.warning(M.addUpload.bind(M, u, true))) {
-                return;
-            }
-        }*/
+        if (u.length > 99 && !ignoreWarning && !localStorage[flag]) {
+            $('.megasync-upload-overlay').show();
+            $('.megasync-overlay-continue, .fm-dialog-close').rebind('click', function() {
+                $('.megasync-upload-overlay').hide();
+                M.addUpload(u, true);
+                $(document).unbind('keyup.megasync-upload');
+            });
+            $(document).rebind('keyup.megasync-upload', function(evt) {
+                $('.megasync-upload-overlay').hide();
+                M.addUpload(u, true);
+                $(document).unbind('keyup.megasync-upload');
+            });
+            $('.megasync-overlay-download').rebind('click', function() {
+                $('.megasync-upload-overlay').hide();
+                location.hash = '#sync';
+                $(document).unbind('keyup.megasync-upload');
+            });
+            var $chk = $('.megasync-upload-overlay .checkdiv');
+            $chk.rebind('click.dialog', function() {
+                if ($chk.hasClass('checkboxOff')) {
+                    $chk.removeClass('checkboxOff').addClass('checkboxOn');
+                    localStorage[flag] = 1;
+                }
+                else {
+                    $chk.removeClass('checkboxOn').addClass('checkboxOff');
+                    delete localStorage[flag];
+                }
+            });
+            return;
+        }
         var target;
         var onChat;
+        var filesize;
+        var added = 0;
         var f;
         var ul_id;
         var pause = "";
@@ -4180,6 +4131,14 @@ function MegaData()
 
         for (var i in u) {
             f = u[i];
+            try {
+                // this could throw NS_ERROR_FILE_NOT_FOUND
+                filesize = f.size;
+            }
+            catch (ex) {
+                ulmanager.logger.warn(f.name, ex);
+                continue;
+            }
             ul_id = ++__ul_id;
             if (!f.flashid) {
                 f.flashid = false;
@@ -4193,14 +4152,15 @@ function MegaData()
                 + '<td><span class="transfer-type upload ' + pause + '">' + l[372] + '<span class="speed">' + pauseTxt + '</span></span></td>'
                 + '<td><span class="transfer-filtype-icon ' + fileIcon({name: f.name}) + '"></span><span class="tranfer-filetype-txt">' + htmlentities(f.name) + '</span></td>'
                 + '<td></td>'
-                + '<td>' + bytesToSize(f.size) + '</td>'
+                + '<td>' + bytesToSize(filesize) + '</td>'
                 + '<td>' + filetype(f.name) + '</td>'
                 + '<td><span class="transfer-status queued">Queued</span></td>'
-                + '<td class="grid-url-field"><a class="grid-url-arrow"><span></span></a><a class="clear-transfer-icon"><span></span></a></td>'
+                + '<td class="grid-url-field"><a class="grid-url-arrow"></a><a class="clear-transfer-icon"></a></td>'
                 + '<td><span class="row-number"></span></td>'
                 + '</tr>');
             ul_queue.push(f);
             ttl.left--;
+            added++;
 
             if (uldl_hold) {
                 fm_tfspause('ul_' + ul_id);
@@ -4210,6 +4170,10 @@ function MegaData()
                 $.ulBunch[M.currentdirid][ul_id] = 1;
             }
         }
+        if (!added) {
+            ulmanager.logger.warn('Nothing added to upload.');
+            return;
+        }
         if (!$.transferHeader) {
             transferPanelUI();
         }
@@ -4218,7 +4182,7 @@ function MegaData()
             uldl_hold = true;
         }
         else {
-            showTransferToast('u', u.length);
+            showTransferToast('u', added);
             $.transferHeader();
             openTransferpanel();
             Soon(fm_tfsupdate);
@@ -4324,9 +4288,10 @@ function MegaData()
             $('#mobileupload_header').text(l[1418]);
         }
         $('.transfer-table #ul_' + id).addClass('completed');
-        $('.transfer-table #ul_' + id + ' td:eq(5)').html('<span class="transfer-status completed">' + l[1418] + '</span>');
+        $('.transfer-table #ul_' + id + ' td:eq(5)')
+            .safeHTML('<span class="transfer-status completed">@@</span>', ul.skipfile ? l[1668] : l[1418]);
         $('.transfer-table #ul_' + id + ' td:eq(2)').text('');
-        $('.transfer-table #ul_' + id + ' td:eq(0) span.transfer-type').addClass('done').html(l[1501]);
+        $('.transfer-table #ul_' + id + ' td:eq(0) span.transfer-type').addClass('done').text(l[1501]);
         ul_queue[ul.pos] = Object.freeze({});
         var a=ul_queue.filter(isQueueActive).length;
         if (a < 2 && !ulmanager.isUploading)
@@ -4502,9 +4467,9 @@ function voucherData(arr)
             redeemed = tindex[varr[i].rdm][1];
             redeemed_email = tindex[varr[i].rdm][2];
         }
-        if (varr[i].xl)
+        if (varr[i].xl && tindex[varr[i].xl])
             cancelled = tindex[varr[i].xl][1];
-        if (varr[i].rvk)
+        if (varr[i].rvk && tindex[varr[i].rvk])
             revoked = tindex[varr[i].rvk][1];
         vouchers.push({
             id: varr[i].id,
@@ -4758,14 +4723,13 @@ function renderNew() {
  */
 function execsc(actionPackets, callback) {
 
-    var tparentid = false;
-    var trights = false;
-    var tmoveid = false;
-    var rootsharenodes = [];
-    var async_procnodes = [];
-    var async_treestate = [];
-
-    var loadavatars = false;
+    var tparentid = false,
+        trights = false,
+        tmoveid = false,
+        rootsharenodes = [],
+        async_procnodes = [],
+        async_treestate = [],
+        loadavatars = false;
 
     newnodes = [];
 
@@ -4797,6 +4761,23 @@ function execsc(actionPackets, callback) {
                     $.each(actionPacket.u, function (k, v) {
                         megaChat[v.c == 0 ? "processRemovedUser" : "processNewUser"](v.u);
                     });
+                }
+            }
+
+            // Full share
+            else if (actionPacket.a === 's') {
+
+                // Used during share dialog removal of contact from share list
+                // Find out is this a full share delete
+                if (actionPacket.r === undefined) {
+
+                    // Fill DDL with removed contact
+                    if (actionPacket.u && M.u[actionPacket.u] && M.u[actionPacket.u].m) {
+                        var email = M.u[actionPacket.u].m;
+
+                        addToMultiInputDropDownList('.share-multiple-input', [{ id: email, name: email }]);
+                        addToMultiInputDropDownList('.add-contact-multiple-input', [{ id: email, name: email}]);
+                    }
                 }
             }
 
@@ -4848,7 +4829,7 @@ function execsc(actionPackets, callback) {
                     }
                 }
             }
-        }
+        }// END own action packet
         else if (actionPacket.a === 'e') {
             var str = hex2bin(actionPacket.c || "");
             if (str.substr(0, 5) === ".cms.") {
@@ -4904,7 +4885,8 @@ function execsc(actionPackets, callback) {
                 }
 
                 if (actionPacket && actionPacket.u === 'EXP') {
-                    M.getLinks([actionPacket.h]);
+                    var exportLink = new mega.Share.ExportLink({ 'nodesToProcess': [actionPacket.h] });
+                    exportLink.getExportLink();
                 }
 
                 if (typeof actionPacket.o !== 'undefined') {
@@ -5140,6 +5122,9 @@ function execsc(actionPackets, callback) {
         else if (actionPacket.a === 's2') {
             processPS([actionPacket]);
         }
+        else if (actionPacket.a === 'ph') {// Export link (public handle)
+            processPH([actionPacket]);
+        }
         else if (actionPacket.a === 'upci') {
             processUPCI([actionPacket]);
         }
@@ -5184,6 +5169,10 @@ function execsc(actionPackets, callback) {
                             $('.grid-table.fm #' + n.h + ' .tranfer-filetype-txt').text(f.name);
                             $('#' + n.h + '.file-block .file-block-title').text(f.name);
                             $('#treea_' + n.h + ' .nw-fm-tree-folder').text(f.name);
+
+                            if (M.currentdirid === 'shares') {
+                                $('#' + n.h + ' .shared-folder-name').text(f.name);
+                            }
 
                             //@@@Todo: reposition elements according to sorting (if sorted by name)
                             if ($('#path_' + n.h).length > 0) {
@@ -5386,19 +5375,29 @@ function ddtype(ids, toid, alt)
     return r;
 }
 
-function fm_getnodes(h, ignore)
+/**
+ * fm_getnodes
+ *
+ * Search for a subfolders.
+ * @param {String} nodeId.
+ * @param {Boolean} ignore Ignore .
+ * @returns {Array|fm_getnodes.nodes} Array of subfolders ids. Root folder included.
+ */
+function fm_getnodes(nodeId, ignore)
 {
     var nodes = [];
-    function procnode(h) {
-        if (M.c[h]) {
-            for (var n in M.c[h]) {
-                if (M.c[h].hasOwnProperty(n)) {
+
+    function procnode(nodeId) {
+        if (M.c[nodeId]) {
+            for (var n in M.c[nodeId]) {
+                if (M.c[nodeId].hasOwnProperty(n)) {
                     if (!M.d[n]) {
                         if (d) {
-                            console.warn('Invalid node: ' + n, h, M.c[h][n]);
+                            console.warn('Invalid node: ' + n, nodeId, M.c[nodeId][n]);
                         }
                         continue;
                     }
+                    // ToDo: check this condition
                     if (M.d[n].name || ignore) {
                         nodes.push(n);
                     }
@@ -5409,7 +5408,8 @@ function fm_getnodes(h, ignore)
             }
         }
     }
-    procnode(h);
+    procnode(nodeId);
+
     return nodes;
 }
 
@@ -5556,69 +5556,144 @@ function getuid(email) {
     return false;
 }
 
-function doShare(h, targets, dontShowShareDialog) {
-    var $promise = new MegaPromise();
+/**
+ * Gets the user handle of a contact if they already exist in M.u
+ * @param {String} emailAddress The email address to get the user handle for
+ * @returns {String|false} Returns either the user handle or false if it doesn't exist
+ */
+function getUserHandleFromEmail(emailAddress) {
 
-    nodeids = fm_getnodes(h);
-    nodeids.push(h);
+    // Search known users for matching email address then get the handle of that contact
+    for (var userHandle in M.u) {
+        if (
+            M.u.hasOwnProperty(userHandle)
+            && M.u[userHandle]
+            && M.u[userHandle].c
+            && (M.u[userHandle].c !== 0)
+            && (M.u[userHandle].m === emailAddress)
+            ) {
 
-    api_setshare(h, targets, nodeids, {
-        t: targets,
-        h: h,
-        done: function(res, ctx) {
+            return userHandle;
+        }
+    };
 
-            // Loose comparasion is important
-            if (res.r && res.r[0] == '0') {
-                for (var i in res.u) {
-                    M.addUser(res.u[i]);
-                }
+    return false;
+}
 
-                for (var k in res.r) {
-                    if (res.r[k] === 0) {
-                        var rights = ctx.t[k].r;
-                        var user = ctx.t[k].u;
+/**
+ * doShare
+ *
+ * Recreate target/users list and call appropriate api_setshare function.
+ * @param {String} nodeId Selected node id
+ * @param {Array} targets List of JSON_Object containing user email and access permission
+ *     i.e. { u: <user_email>, r: <access_permission> }.
+ * @param {Boolean} dontShowShareDialog.
+ * @returns {doShare.$promise|MegaPromise}
+ */
+function doShare(nodeId, targets, dontShowShareDialog) {
 
-                        if (user.indexOf('@') >= 0) {
-                            user = getuid(ctx.t[k].u);
-                        }
+    var promise = new MegaPromise(),
+        logger = MegaLogger.getLogger('doShare'),
+        childNodesId = [],// Holds complete directory tree starting from nodeId
+        usersWithHandle = [],
+        usersWithoutHandle = [],
+        tmpValue, userHandle;
 
-                        // A pending share may not have a corresponding user and should not be added
-                        // A pending share can also be identified by a user who is only a '0' contact
-                        // level (passive)
-                        if (M.u[user] && M.u[user].c !== 0) {
-                            M.nodeShare(ctx.h, {
-                                h: h,
-                                r: rights,
-                                u: user,
-                                ts: unixtime()
-                            });
-                            setLastInteractionWith(user, "0:" + unixtime());
-                        }
-                        else if (d) {
-                            console.log('doshare: invalid user', user, M.u[user], ctx.t[k]);
-                        }
+    this._done = function(result, ctx) {
+
+        // Loose comparasion is important
+        if (result.r && result.r[0] == '0') {
+            for (var i in result.u) {
+                M.addUser(result.u[i]);
+            }
+
+            for (var k in result.r) {
+                if (result.r[k] === 0) {
+                    var rights = ctx.t[k].r;
+                    var user = ctx.t[k].u;
+
+                    if (user.indexOf('@') >= 0) {
+                        user = getuid(ctx.t[k].u);
+                    }
+
+                    // A pending share may not have a corresponding user and should not be added
+                    // A pending share can also be identified by a user who is only a '0' contact
+                    // level (passive)
+                    if (M.u[user] && M.u[user].c !== 0) {
+                        M.nodeShare(ctx.h, {
+                            h: nodeId,
+                            r: rights,
+                            u: user,
+                            ts: unixtime()
+                        });
+                        setLastInteractionWith(user, "0:" + unixtime());
+                    }
+                    else {
+                        logger.debug('invalid user:', user, M.u[user], ctx.t[k]);
                     }
                 }
-                if (dontShowShareDialog !== true) {
-                    $('.fm-dialog.share-dialog').removeClass('hidden');
-                }
-                loadingDialog.hide();
-                M.renderShare(h);
+            }
+            if (dontShowShareDialog !== true) {
+                $('.fm-dialog.share-dialog').removeClass('hidden');
+            }
+            loadingDialog.hide();
+            M.renderShare(nodeId);
 
-                if (dontShowShareDialog !== true) {
-                    shareDialog();
-                }
-                $promise.resolve();
+            if (dontShowShareDialog !== true) {
+                shareDialog();
+            }
+            promise.resolve();
+        }
+        else {
+            $('.fm-dialog.share-dialog').removeClass('hidden');
+            loadingDialog.hide();
+            promise.reject(result);
+        }
+    };
+
+    // Get complete children directory structure for root node with id === nodeId
+    childNodesId = fm_getnodes(nodeId);
+    childNodesId.push(nodeId);
+
+    // Create new lists of users, active (with user handle) and non existing (pending)
+    for (var index in targets) {
+        if (targets.hasOwnProperty(index)) {
+            userHandle = getUserHandleFromEmail(targets[index].u);
+            if (userHandle !== false) {
+                tmpValue = targets[index];
+                tmpValue.u = userHandle;// Switch from email to user handle
+                usersWithHandle.push(tmpValue);
             }
             else {
-                $('.fm-dialog.share-dialog').removeClass('hidden');
-                loadingDialog.hide();
-                $promise.reject(res);
+                usersWithoutHandle.push(targets[index]);
             }
         }
-    });
+    }
 
-    return $promise;
+    // Process users with handle === known ones
+    if (usersWithHandle.length) {
+        api_setshare(nodeId, usersWithHandle, childNodesId, {
+            t: usersWithHandle,
+            h: nodeId,
+            done: this._done
+        });
+    }
+
+    // Process targets (users) without handle === unknown ones
+    if (usersWithoutHandle.length) {
+        api_setshare1({
+            node: nodeId,
+            targets: usersWithoutHandle,
+            sharenodes: childNodesId,
+            ctx: {
+                t: usersWithoutHandle,
+                h: nodeId,
+                done: this._done
+            }
+        });
+    }
+
+    return promise;
 }
 
 function processmove(jsonmove)
@@ -5763,17 +5838,35 @@ function __process_f2(f, cb, tick)
  *
  */
 function processIPC(ipc, ignoreDB) {
+
     DEBUG('processIPC');
+
     for (var i in ipc) {
-        M.addIPC(ipc[i], ignoreDB);
-        if (ipc[i].dts) {
-            M.delIPC(ipc[i].p);
-            $('#ipc_' + ipc[i].p).remove();
-            delete M.ipc[ipc[i].p];
-            if ((Object.keys(M.ipc).length === 0) && (M.currentdirid === 'ipc')) {
-                $('.contact-requests-grid').addClass('hidden');
-                $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[6196]);
-                $('.fm-empty-contacts').removeClass('hidden');
+        if (ipc.hasOwnProperty(i)) {
+
+            // Update ipc status
+            M.addIPC(ipc[i], ignoreDB);
+
+            // Deletion of incomming pending contact request, user who sent request, canceled it
+            if (ipc[i].dts) {
+                M.delIPC(ipc[i].p);
+                $('#ipc_' + ipc[i].p).remove();
+                delete M.ipc[ipc[i].p];
+                if ((Object.keys(M.ipc).length === 0) && (M.currentdirid === 'ipc')) {
+                    $('.contact-requests-grid').addClass('hidden');
+                    $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[6196]);
+                    $('.fm-empty-contacts').removeClass('hidden');
+                }
+
+                // Update token.input plugin
+                removeFromMultiInputDDL('.share-multiple-input', {id: ipc[i].m, name: ipc[i].m});
+                removeFromMultiInputDDL('.add-contact-multiple-input', {id: ipc[i].m, name: ipc[i].m});
+            }
+            else {
+
+                // Update token.input plugin
+                addToMultiInputDropDownList('.share-multiple-input', [{id: ipc[i].m, name: ipc[i].m}]);
+                addToMultiInputDropDownList('.add-contact-multiple-input', [{id: ipc[i].m, name: ipc[i].m}]);
             }
         }
     }
@@ -5786,17 +5879,19 @@ function processIPC(ipc, ignoreDB) {
  *
  */
 function processOPC(opc, ignoreDB) {
+
     DEBUG('processOPC');
+
     for (var i in opc) {
         M.addOPC(opc[i], ignoreDB);
         if (opc[i].dts) {
             M.delOPC(opc[i].p);
 
             // Update tokenInput plugin
-            if ($('.add-contact-multiple-input')) {
-                $('.add-contact-multiple-input').tokenInput("removeContact", {id: opc[i].m}, '.add-contact-multiple-input');
-            }
-        } else {
+            removeFromMultiInputDDL('.share-multiple-input', { id: opc[i].m, name: opc[i].m });
+            removeFromMultiInputDDL('.add-contact-multiple-input', { id: opc[i].m, name: opc[i].m });
+        }
+        else {
             // Search through M.opc to find duplicated e-mail with .dts
             // If found remove deleted opc
             // And update sent-request grid
@@ -5812,12 +5907,52 @@ function processOPC(opc, ignoreDB) {
                     break;
                 }
             }
+
             // Update tokenInput plugin
-            if ($('.add-contact-multiple-input')) {
-                $('.add-contact-multiple-input').tokenInput("add", {id: opc[i].m, name: opc[i].m});
-            }
+            addToMultiInputDropDownList('.share-multiple-input', [{ id: opc[i].m, name: opc[i].m }]);
+            addToMultiInputDropDownList('.add-contact-multiple-input', [{ id: opc[i].m, name: opc[i].m }]);
         }
     }
+}
+
+/**
+ * processPH
+ *
+ * Process export link (public handle) action packet.
+ * @param {Object} actionPacket a: 'ph'.
+ */
+function processPH(publicHandles) {
+
+    var logger = MegaLogger.getLogger('processPH'),
+        publicHandleId, nodeId,
+        hasStar = false;
+
+    logger.debug();
+
+    var UiExportLink = new mega.UI.Share.ExportLink();
+
+    $.each(publicHandles, function(index, value) {
+        nodeId = value.h;
+        publicHandleId = value.ph;
+
+        // Remove export link, d: 1
+        if (value.d) {
+            M.delNodeShare(nodeId, 'EXP');
+            M.deleteExportLinkShare(nodeId);
+
+            UiExportLink.removeExportLinkIcon(nodeId);
+        }
+        else {
+            M.nodeAttr({ h: nodeId, ph: publicHandleId });
+            M.nodeShare(value.h, { h: nodeId, r: 0, u: 'EXP', down: value.down, ets: value.ets, ts: unixtime() });
+
+            UiExportLink.addExportLinkIcon(nodeId);
+        }
+
+        if (value.down !== undefined) {
+            UiExportLink.updateTakenDownItem(nodeId, value.down);
+        }
+    });
 }
 
 /**
@@ -5826,20 +5961,25 @@ function processOPC(opc, ignoreDB) {
  * @param {array.<JSON_objects>} pending shares
  */
 function processPS(pendingShares, ignoreDB) {
+
     DEBUG('processPS');
     var ps;
 
     for (var i in pendingShares) {
         if (pendingShares.hasOwnProperty(i)) {
             ps = pendingShares[i];
-            if (ps.h) {// From gettree
+
+            // From gettree
+            if (ps.h) {
                 M.addPS(ps, ignoreDB);
             }
-            else {// Situation different from gettree, s2 from API response, doesn't have .h attr instead have .n
-                var nodeHandle = ps.n;
-                var pendingContactId = ps.p;
-                var shareRights = ps.r;
-                var timeStamp = ps.ts;
+
+            // Situation different from gettree, s2 from API response, doesn't have .h attr instead have .n
+            else {
+                var nodeHandle = ps.n,
+                    pendingContactId = ps.p,
+                    shareRights = ps.r,
+                    timeStamp = ps.ts;
 
                 // shareRights is undefined when user denies pending contact request
                 // .op is available when user accepts pending contact request and
@@ -5848,10 +5988,17 @@ function processPS(pendingShares, ignoreDB) {
 
                     M.delPS(pendingContactId, nodeHandle);
 
-                    if (ps.op) {// Upgrade pending share to full share
+                    if (ps.op) {
                         M.nodeShare(nodeHandle, ps);
                     }
-                } else {
+
+                    if (M.opc && M.opc[ps.p]) {
+                        // Update tokenInput plugin
+                        addToMultiInputDropDownList('.share-multiple-input', [{id: M.opc[pendingContactId].m, name: M.opc[pendingContactId].m}]);
+                        addToMultiInputDropDownList('.add-contact-multiple-input', {id: M.opc[pendingContactId].m, name: M.opc[pendingContactId].m});
+                    }
+                }
+                else {
 
                     // Add the pending share to state
                     M.addPS({'h':nodeHandle, 'p':pendingContactId, 'r':shareRights, 'ts':timeStamp}, ignoreDB);
@@ -5886,35 +6033,48 @@ function processUPCI(ap) {
 }
 
 /**
- * Handle upco response, upco, pending contact request updated (for whom it's outgoing)
- * @param {array.<JSON_objects>} ap (actionpackets)
+ * processUPCO
+ *
+ * Handle upco response, upco, pending contact request updated (for whom it's outgoing).
+ * @param {Array} ap (actionpackets) <JSON_objects>.
  */
 function processUPCO(ap) {
+
     DEBUG('processUPCO');
+
     var psid = '';// pending id
+
+    // Loop through action packets
     for (var i in ap) {
-        if (ap[i].s) {
-            psid = ap[i].p;
-            delete M.opc[psid];
-            delete M.ipc[psid];
-            M.delOPC(psid);
-            M.delIPC(psid);
+        if (ap.hasOwnProperty(i)) {
 
-            for (var k in M.ps) {
-                if (M.ps.hasOwnProperty(k)) {
-                    M.delPS(psid, k);
+            // Have status of pending share
+            if (ap[i].s) {
+
+                psid = ap[i].p;
+                delete M.opc[psid];
+                delete M.ipc[psid];
+                M.delOPC(psid);
+                M.delIPC(psid);
+
+                // Delete all matching pending shares
+                for (var k in M.ps) {
+                    if (M.ps.hasOwnProperty(k)) {
+                        M.delPS(psid, k);
+                    }
                 }
-            }
 
-            // Update token.input plugin
-            if ($('.add-contact-multiple-input')) {
-                $('.add-contact-multiple-input').tokenInput("removeContact", {id: ap[i].m}, '.add-contact-multiple-input');
-            }
-            $('#opc_' + psid).remove();
-            if ((Object.keys(M.opc).length === 0) && (M.currentdirid === 'opc')) {
-                $('.sent-requests-grid').addClass('hidden');
-                $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[6196]);
-                $('.fm-empty-contacts').removeClass('hidden');
+                // Update tokenInput plugin
+                removeFromMultiInputDDL('.share-multiple-input', { id: ap[i].m, name: ap[i].m });
+                removeFromMultiInputDDL('.add-contact-multiple-input', { id: ap[i].m, name: ap[i].m });
+                $('#opc_' + psid).remove();
+
+                // Update sent contact request tab, set empty message with Add contact... button
+                if ((Object.keys(M.opc).length === 0) && (M.currentdirid === 'opc')) {
+                    $('.sent-requests-grid').addClass('hidden');
+                    $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[6196]); // No requests pending at this time
+                    $('.fm-empty-contacts').removeClass('hidden');
+                }
             }
         }
     }
@@ -5922,26 +6082,29 @@ function processUPCO(ap) {
 
 function process_u(u) {
     for (var i in u) {
-        if (u[i].c === 1) {
-            u[i].name = u[i].m;
-            u[i].h = u[i].u;
-            u[i].t = 1;
-            u[i].p = 'contacts';
-            M.addNode(u[i]);
+        if (u.hasOwnProperty(i)) {
+            if (u[i].c === 1) {
+                u[i].name = u[i].m;
+                u[i].h = u[i].u;
+                u[i].t = 1;
+                u[i].p = 'contacts';
+                M.addNode(u[i]);
 
-            // Update token.input plugin
-            if ($('.add-contact-multiple-input')) {
-                $('.add-contact-multiple-input').tokenInput("add", {id: u[i].m, name: u[i].m});
+                // Update token.input plugin
+                addToMultiInputDropDownList('.share-multiple-input', [{ id: u[i].m, name: u[i].m }]);
+                addToMultiInputDropDownList('.add-contact-multiple-input', [{ id: u[i].m, name: u[i].m }]);
             }
-        } else if (M.d[u[i].u]) {
-            M.delNode(u[i].u);
+            else if (M.d[u[i].u]) {
+                M.delNode(u[i].u);
 
-            // Update token.input plugin
-            if ($('.add-contact-multiple-input')) {
-                $('.add-contact-multiple-input').tokenInput("removeContact", {id: u[i].m}, '.add-contact-multiple-input');
+                // Update token.input plugin
+                removeFromMultiInputDDL('.share-multiple-input', { id: u[i].m, name: u[i].m });
+                removeFromMultiInputDDL('.add-contact-multiple-input', { id: u[i].m, name: u[i].m });
             }
+
+            // Update user attributes M.u
+            M.addUser(u[i]);
         }
-        M.addUser(u[i]);
     }
 
     //if (megaChat && megaChat.karere && megaChat.karere.getConnectionState() === Karere.CONNECTION_STATE.CONNECTED) {
@@ -5974,6 +6137,27 @@ function init_chat() {
     function __init_chat() {
         if (u_type && !megaChatIsReady) {
             if (d) console.log('Initializing the chat...');
+            try {
+                // Prevent known Strophe exceptions...
+                if (!Strophe.Websocket.prototype._unsafeOnIdle) {
+                    Strophe.Websocket.prototype._unsafeOnIdle = Strophe.Websocket.prototype._onIdle;
+                    Strophe.Websocket.prototype._onIdle = function() {
+                        try {
+                            this._unsafeOnIdle.apply(this, arguments);
+                        }
+                        catch (ex) {
+                            if (d) {
+                                console.error(ex);
+                            }
+                        }
+                    };
+                }
+            }
+            catch (ex) {
+                if (d) {
+                    console.error(ex);
+                }
+            }
             try {
                 window.megaChat = new Chat();
                 window.megaChat.init();
@@ -6050,9 +6234,11 @@ function loadfm_callback(res, ctx) {
                     }
                 }
             }
-            if (sharedNodes.length) {
-                M.getLinks(sharedNodes);
-            }
+        }
+
+        // Handle public/export links. Why here? Make sure that M.d already exist
+        if (res.ph) {
+            processPH(res.ph);
         }
 
         maxaction = res.sn;
@@ -6069,13 +6255,14 @@ function loadfm_callback(res, ctx) {
             crypto_procsr(res.sr);
         }
 
-        // Pass true to indicate this is an fm load and that we want to fetch initial notifications afterwards
-        getsc(true);
+        // We want to fetch initial notifications afterwards, if this is not a logged out user on the public folder page.
+        getsc(false, !pfkey);
 
         if (hasMissingKeys) {
             srvlog('Got missing keys processing gettree...', null, true);
         }
     });
+
 }
 
 function loadfm_done(pfkey, stackPointer) {
@@ -6274,3 +6461,605 @@ function balance2pro(callback)
         }
     });
 }
+
+(function($, scope) {
+    /**
+     * Public Link Dialog
+     *
+     * @param opts {Object}
+     *
+     * @constructor
+     */
+    var ExportLinkDialog = function(opts) {
+
+        var self = this;
+
+        var defaultOptions = {
+        };
+
+        self.options = $.extend(true, {}, defaultOptions, opts);
+
+        self.logger = MegaLogger.getLogger('ExportLinkDialog');
+    };
+
+    /**
+     * linksDialog
+     *
+     * Render public link dialog and handle events
+     * @param {Boolean} close To close or to show public link dialog
+     */
+    ExportLinkDialog.prototype.linksDialog = function(close) {
+
+        var self = this;
+
+        var html = '',
+            scroll = '.export-link-body';
+
+        var links = $.trim(getClipboardLinks()),
+            $span = $('.copy-to-clipboard span'),
+            toastTxt, doLinks, linksNum, success;
+
+        /**
+         * execCommandUsable
+         *
+         * Native browser 'copy' command using execCommand('copy).
+         * Supported by Chrome42+, FF41+, IE9+, Opera29+
+         * @returns {Boolean}
+         */
+        ExportLinkDialog.prototype.execCommandUsable = function() {
+
+            var result;
+
+            try {
+                result = document.execCommand('copy');
+            }
+            catch (ex) {}
+
+            return result === false;
+        };
+
+        deleteScrollPanel(scroll, 'jsp');
+
+        if (close) {
+            $.dialog = false;
+            fm_hideoverlay();
+            $('.fm-dialog.export-links-dialog').addClass('hidden');
+            $('.export-links-warning').addClass('hidden');
+            if (window.onCopyEventHandler) {
+                document.removeEventListener('copy', window.onCopyEventHandler, false);
+                delete window.onCopyEventHandler;
+            }
+            return true;
+        }
+
+        $.dialog = 'links';
+
+        $('.export-links-dialog').addClass('file-keys-view');
+
+        // Generate content
+        html = itemExportLink();
+
+        // Fill with content
+        $('.export-links-dialog .export-link-body').html(html);
+
+        // Default export option is
+        $('.export-link-select, .export-content-block').removeClass('public-handle decryption-key full-link').addClass('public-handle');
+        $('.export-link-select').html($('.export-link-dropdown div.public-handle').html());
+
+        fm_showoverlay();
+
+        $('.fm-dialog.export-links-dialog').removeClass('hidden');
+        $('.export-link-body').removeAttr('style');
+        $('.export-links-warning').removeClass('hidden');
+
+        if ($('.export-link-body').outerHeight() === 318) {// ToDo: How did I find this integer?
+            $('.export-link-body').jScrollPane({ showArrows: true, arrowSize: 5 });
+            jScrollFade('.export-link-body');
+        }
+        $('.fm-dialog.export-links-dialog').css('margin-top', $('.fm-dialog.export-links-dialog').outerHeight() / 2 * - 1);
+
+        setTimeout(function() {
+            $('.file-link-info').rebind('click', function() {
+                $('.file-link-info').select();
+            });
+        }, 300);
+
+        // Setup toast notification
+        toastTxt = l[7654];
+        linksNum = links.replace(/\s+/gi, ' ').split(' ').length;
+
+        if (linksNum > 1) {
+            toastTxt = l[7655].replace('%d', linksNum);
+        }
+
+        // Setup the copy to clipboard buttons
+        $span.text(l[1990]);
+
+        // If a browser extension or the new HTML5 native copy/paste is available (Chrome & Firefox)
+        if (is_extension || self.execCommandUsable()) {
+            if (!is_chrome_firefox) {
+                $('.fm-dialog-chrome-clipboard').removeClass('hidden');
+            }
+
+            $('.copy-to-clipboard').rebind('click', function() {
+                success = true;
+                doLinks = ($(this).attr('id') === 'clipboardbtn1');
+                links = $.trim(doLinks ? getClipboardLinks() : getclipboardkeys());
+
+                // If extension, use the native extension method
+                if (is_chrome_firefox) {
+                    mozSetClipboard(links);
+                }
+                else {
+                    // Put the link/s in an invisible div, highlight the link/s then copy to clipboard using HTML5
+                    $('#chromeclipboard').html(links);
+                    selectText('chromeclipboard');
+                    success = document.execCommand('copy');
+                }
+
+                if (success) {
+                    showToast('clipboard', toastTxt);
+                }
+            });
+        }
+        else if (flashIsEnabled()) {
+            $('.copy-to-clipboard').html('<span>' + htmlentities(l[1990]) + '</span><object data="OneClipboard.swf" id="clipboardswf1" type="application/x-shockwave-flash"  width="100%" height="32" allowscriptaccess="always"><param name="wmode" value="transparent"><param value="always" name="allowscriptaccess"><param value="all" name="allowNetworkin"><param name=FlashVars value="buttonclick=1" /></object>');
+
+            $('.copy-to-clipboard').rebind('mouseover', function() {
+                var e = $('#clipboardswf1')[0];
+                if (e && e.setclipboardtext) {
+                    e.setclipboardtext(getClipboardLinks());
+                }
+            });
+            $('.copy-to-clipboard').rebind('mousedown', function() {
+                showToast('clipboard', toastTxt);
+            });
+        }
+        else {
+            var uad = browserdetails(ua);
+
+            if (uad.icon === 'ie.png' && window.clipboardData) {
+                $('.copy-to-clipboard').rebind('click', function() {
+                    links = $.trim(getClipboardLinks());
+                    var mode = links.indexOf("\n") !== -1 ? 'Text' : 'URL';
+                    window.clipboardData.setData(mode, links);
+                    showToast('clipboard', toastTxt);
+                });
+            }
+            else {
+                if (window.ClipboardEvent) {
+                    $('.copy-to-clipboard').rebind('click', function() {
+                        var doLinks = ($(this).attr('id') === 'clipboardbtn1');
+                        links = $.trim(doLinks ? getClipboardLinks() : getclipboardkeys());
+
+                        window.onCopyEventHandler = function onCopyEvent(ev) {
+                            if (d) console.log('onCopyEvent', arguments);
+                            ev.clipboardData.setData('text/plain', links);
+                            if (doLinks) {
+                                ev.clipboardData.setData('text/html', links.split("\n").map(function(link) {
+                                    return '<a href="' + link + '"></a>';
+                                }).join("<br/>\n"));
+                            }
+                            ev.preventDefault();
+                            showToast('clipboard', toastTxt); // Done
+                        };
+                        document.addEventListener('copy', window.onCopyEventHandler, false);
+                        Soon(function() {
+                            $span.text(l[7663] + ' ' + (uad.os === 'Apple' ? 'command' : 'ctrl') + ' + C');
+                        });
+                    });
+                }
+                else {
+                    // Hide the clipboard buttons if not using the extension and Flash is disabled
+                    $('.copy-to-clipboard').addClass('hidden');
+                }
+            }
+        }
+
+        // Click anywhere on export link dialog will hide export link dropdown
+        $('.export-links-dialog').rebind('click', function() {
+            $('.export-link-dropdown').fadeOut(200);
+        });
+
+        $('.export-links-dialog .fm-dialog-close').rebind('click', function() {
+            self.linksDialog(1);
+        });
+
+        $('.export-links-warning-close').rebind('click', function() {
+            $('.export-links-warning').addClass('hidden');
+        });
+
+        $('.export-link-select').rebind('click', function() {
+            $('.export-link-dropdown').fadeIn(200);
+
+            // Stop propagation
+            return false;
+        });
+
+        // On Export File Links and Decryption Keys dropdown
+        $('.export-link-dropdown div').rebind('click', function() {
+
+            var keyOption = $(this).attr('data-keyoptions');
+
+            $('.export-link-select, .export-content-block').removeClass('public-handle decryption-key full-link').addClass(keyOption);
+            $('.export-link-select').html($(this).html());
+            $('.export-link-dropdown').fadeOut(200);
+            $span.text(l[1990]);
+
+            // Stop propagation
+            return false;
+        });
+    };
+
+    // export
+    scope.mega = scope.mega || {};
+    scope.mega.Dialog = scope.mega.Dialog || {};
+    scope.mega.Dialog.ExportLink = ExportLinkDialog;
+})(jQuery, window);
+
+(function($, scope) {
+    /**
+     * ExportLink related operations.
+     *
+     * @param opts {Object}
+     *
+     * @constructor
+     */
+    var ExportLink = function(opts) {
+
+        var self = this;
+
+        var defaultOptions = {
+            'updateUI': false,
+            'nodesToProcess': [],
+            'showExportLinkDialog': false
+        };
+
+        self.options = $.extend(true, {}, defaultOptions, opts);
+
+        // Number of nodes left to process
+        self.nodesLeft = self.options.nodesToProcess.length;
+        self.logger = MegaLogger.getLogger('ExportLink');
+    };
+
+    /**
+     * getExportLink
+     *
+     * Get public link for file or folder.
+     * @param {Array} nodeIds Array of nodes handle id.
+     */
+    ExportLink.prototype.getExportLink = function() {
+
+        var self = this;
+
+        // Prompt copyright dialog and if accepted get link, otherwise stall
+        if (self.options.nodesToProcess.length) {
+            loadingDialog.show();
+            self.logger.debug('getExportLink');
+
+            $.each(self.options.nodesToProcess, function(index, nodeId) {
+                if (M.d[nodeId] && M.d[nodeId].t === 1) {// Folder
+                    self._getFolderExportLinkRequest(nodeId);
+                }
+                else if (M.d[nodeId] && M.d[nodeId].t === 0) {// File
+                    self._getExportLinkRequest(nodeId);
+                }
+            });
+        }
+    };
+
+    /**
+     * removeExportLink
+     *
+     * Removes public link for file or folder.
+     * @param {Array} nodeHandle Array of node handles id.
+     */
+    ExportLink.prototype.removeExportLink = function() {
+
+        var self = this;
+
+        if (self.options.nodesToProcess.length) {
+            loadingDialog.show();
+            self.logger.debug('removeExportLink');
+
+            $.each(self.options.nodesToProcess, function(index, nodeId) {
+                if (M.d[nodeId] && M.d[nodeId].t === 1) {// Folder
+                    self._removeFolderExportLinkRequest(nodeId);
+                }
+                else if (M.d[nodeId] && M.d[nodeId].t === 0) {// File
+                    self._removeFileExportLinkRequest(nodeId);
+                }
+            });
+        }
+    };
+
+    /**
+     * _getFolderExportLinkRequest
+     *
+     * 'Private' function, send folder public link delete request.
+     * @param {String} nodeId.
+     */
+    ExportLink.prototype._getFolderExportLinkRequest = function(nodeId) {
+
+        var self = this;
+
+        var childNodes = [];
+
+        // Get all child nodes of root folder with nodeId
+        childNodes = fm_getnodes(nodeId);
+        childNodes.push(nodeId);
+
+        api_setshare(nodeId, [{ u: 'EXP', r: 0 }],
+            childNodes, {
+                nodeId: nodeId,
+                done: function(result) {
+                    if (result.r && result.r[0] === 0) {
+                        M.nodeShare(this.nodeId, { h: this.nodeId, r: 0, u: 'EXP', ts: unixtime() });
+                        self._getExportLinkRequest(this.nodeId);
+                        if (!self.nodesLeft) {
+                            loadingDialog.hide();
+                        }
+                    }
+                    else {
+                        self.logger.warn('_getFolderExportLinkRequest', this.nodeId, 'Error code: ', result);
+                        loadingDialog.hide();
+                    }
+                }
+            }
+        );
+    };
+
+    /**
+     * _getExportLinkRequest
+     *
+     * 'Private' function, send public link delete request.
+     * @param {String} nodeId.
+     */
+    ExportLink.prototype._getExportLinkRequest = function(nodeId) {
+
+        var self = this;
+
+        api_req({ a: 'l', n: nodeId, i:requesti }, {
+            nodeId: nodeId,
+            callback: function(result) {
+                self.nodesLeft--;
+                if (typeof result !== 'number') {
+                    M.nodeShare(this.nodeId, { h: this.nodeId, r: 0, u: 'EXP', ts: unixtime() });
+                    M.nodeAttr({ h: this.nodeId, ph: result });
+
+                    if (self.options.updateUI) {
+                        var UiExportLink = new mega.UI.Share.ExportLink();
+                        UiExportLink.addExportLinkIcon(this.nodeId);
+                    }
+                    if (!self.nodesLeft) {
+                        loadingDialog.hide();
+                        if (self.options.showExportLinkDialog) {
+                            var exportLinkDialog = new mega.Dialog.ExportLink();
+                            exportLinkDialog.linksDialog();
+                        }
+                    }
+                }
+                else {// Error
+                    self.logger.warn('_getExportLinkRequest:', this.nodeId, 'Error code: ', result);
+                    loadingDialog.hide();
+                }
+
+            }
+        });
+    };
+
+    /**
+     * _removeFolderExportLinkRequest
+     *
+     * 'Private' function, send folder delete public link request.
+     * @param {String} nodeId..
+     */
+    ExportLink.prototype._removeFolderExportLinkRequest = function(nodeId) {
+
+        var self = this;
+
+        api_req({ a: 's2', n:  nodeId, s: [{ u: 'EXP', r: ''}], ha: '', i: requesti }, {
+            nodeId: nodeId,
+            callback: function(result) {
+                self.nodesLeft--;
+                if (result.r && (result.r[0] === 0)) {
+                    M.delNodeShare(this.nodeId, 'EXP');
+                    M.deleteExportLinkShare(this.nodeId);
+
+                    if (self.options.updateUI) {
+                        var UiExportLink = new mega.UI.Share.ExportLink();
+                        UiExportLink.removeExportLinkIcon(this.nodeId);
+                    }
+                    if (!self.nodesLeft) {
+                        loadingDialog.hide();
+                    }
+                }
+                else {// Error
+                    self.logger.warn('_removeFolerExportLinkRequest failed for node:', this.nodeId, 'Error code: ', result);
+                    loadingDialog.hide();
+                }
+            }
+        });
+    };
+
+    /**
+     * _removeFileExportLinkRequest
+     *
+     * 'Private' function, send file delete public link request.
+     * @param {String} nodeId.
+     */
+    ExportLink.prototype._removeFileExportLinkRequest = function(nodeId) {
+
+        var self = this;
+
+        api_req({ a: 'l', n: nodeId, d: 1, i:requesti }, {
+            nodeId: nodeId,
+            callback: function(result) {
+                self.nodesLeft--;
+                if (result === 0) {
+                    M.delNodeShare(this.nodeId, 'EXP');
+                    M.deleteExportLinkShare(this.nodeId);
+
+                    if (self.options.updateUI) {
+                        var UiExportLink = new mega.UI.Share.ExportLink();
+                        UiExportLink.removeExportLinkIcon(this.nodeId);
+                    }
+                    if (!self.nodesLeft) {
+                        loadingDialog.hide();
+                    }
+                }
+                else {// Error
+                    self.logger.warn('_removeFileExportLinkRequest failed for node:', this.nodeId, 'Error code: ', result);
+                    loadingDialog.hide();
+                }
+            }
+        });
+    };
+
+    // export
+    scope.mega = scope.mega || {};
+    scope.mega.Share = scope.mega.Share || {};
+    scope.mega.Share.ExportLink = ExportLink;
+})(jQuery, window);
+
+(function($, scope) {
+    /**
+     * UI Public Link Icon related operations.
+     *
+     * @param opts {Object}
+     *
+     * @constructor
+     */
+    var UiExportLink = function(opts) {
+
+        var self = this;
+
+        var defaultOptions = {
+        };
+
+        self.options = $.extend(true, {}, defaultOptions, opts);
+
+        self.logger = MegaLogger.getLogger('UiExportLink');
+    };
+
+    /**
+     * addExportLinkIcon
+     *
+     * Add public link icon to file or folder
+     * @param {String} nodeId
+     */
+    UiExportLink.prototype.addExportLinkIcon = function(nodeId) {
+
+        var self = this;
+
+        // Add link-icon to list view
+        $('#' + nodeId + ' .own-data').addClass('linked');
+
+        // Add class to the second from the list, prevent failure of the arrow icon
+        $('#' + nodeId + ' .own-data span').eq(1).addClass('link-icon');
+
+        // Add link-icon to grid view
+        $('#' + nodeId + '.file-block').addClass('linked');
+        $('#' + nodeId + '.file-block span').eq(1).addClass('link-icon');
+
+        // Add link-icon to left panel
+        $('#treea_' + nodeId).addClass('linked');
+
+        // Add class to the third from the list
+        $('#treea_' + nodeId + ' span').eq(2).addClass('link-icon');
+    };
+
+    /**
+     * removeExportLinkIcon
+     *
+     * Remove public link icon to file or folder
+     * @param {String} nodeId
+     */
+    UiExportLink.prototype.removeExportLinkIcon = function(nodeId) {
+
+        var self = this;
+
+        // Remove link icon from list view
+        $('#' + nodeId + ' .own-data').removeClass('linked');
+        $('#' + nodeId + ' .own-data span').removeClass('link-icon');
+
+        // Remove link icon from grid view
+        $('#' + nodeId + '.file-block').removeClass('linked');
+        $('#' + nodeId + '.file-block span').removeClass('link-icon');
+
+        // Remove link icon from left panel
+        $('#treeli_' + nodeId + ' span').removeClass('linked link-icon');
+    };
+
+    /**
+     * updateTakenDownItems
+     *
+     * Updates grid and block (file) view, removes favorite icon if exists and adds .taken-down class.
+     * @param {String} nodeId
+     * @param {Boolean} isTakenDown
+     */
+    UiExportLink.prototype.updateTakenDownItem = function(nodeId, isTakenDown) {
+
+        var self = this;
+
+        var hasStar = false;
+
+        if (isTakenDown) {
+            if (M.d[nodeId].fav === 1) {
+
+                // Remove favourite (star)
+                M.favourite([nodeId], true);
+            }
+            self.addTakenDownIcon(nodeId);
+        }
+        else {
+            self.removeTakenDownIcon(nodeId);
+        }
+    };
+
+    /**
+     * addTakenDownIcon
+     *
+     * Add taken-down icon to file or folder
+     * @param {String} nodeId
+     */
+    UiExportLink.prototype.addTakenDownIcon = function(nodeId) {
+
+        var self = this;
+
+        // Add taken-down to list view
+        $('.grid-table.fm #' + nodeId).addClass('taken-down');
+
+        // Add taken-down to block view
+        $('#' + nodeId + '.file-block').addClass('taken-down');
+
+        // Add taken-down to left panel
+        $('#treea_' + nodeId).addClass('taken-down');
+    };
+
+    /**
+     * removeTakenDownIcon
+     *
+     * Remove taken-down icon from file or folder
+     * @param {String} nodeId
+     */
+    UiExportLink.prototype.removeTakenDownIcon = function(nodeId) {
+
+        var self = this;
+
+        // Add taken-down to list view
+        $('.grid-table.fm #' + nodeId).removeClass('taken-down');
+
+        // Add taken-down to block view
+        $('#' + nodeId + '.file-block').removeClass('taken-down');
+
+        // Add taken-down to left panel
+        $('#treea_' + nodeId).removeClass('taken-down');
+    };
+
+    // export
+    scope.mega = scope.mega || {};
+    scope.mega.UI = scope.mega.UI || {};
+    scope.mega.UI.Share = scope.mega.UI.Share || {};
+    scope.mega.UI.Share.ExportLink = UiExportLink;
+})(jQuery, window);

@@ -495,10 +495,17 @@ var mFileManagerDB = {
 
             if (d) console.log('fmdb query', aCommand, aTable, aData, l);
 
-            if (aCommand === 'add') {
-                promise = this.db.server.update(aTable, aData);
-            } else {
-                promise = this.db.server.remove(aTable, aData);
+            try {
+                if (aCommand === 'add') {
+                    promise = this.db.server.update(aTable, aData);
+                }
+                else {
+                    promise = this.db.server.remove(aTable, aData);
+                }
+            }
+            catch (ex) {
+                console.warn(u_handle, ex);
+                return;
             }
 
             promise.then(function() {
@@ -704,5 +711,10 @@ function mDBcls() {
     if (typeof mDB === 'object' && mDB.close) {
         mFileManagerDB.exec('close');
     }
-    mDB = indexedDB ? 0x9e : undefined;
+    try {
+        mDB = indexedDB ? 0x9e : undefined;
+    }
+    catch (e) {
+        mDB = undefined;
+    }
 }

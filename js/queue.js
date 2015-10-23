@@ -263,7 +263,7 @@ MegaQueue.prototype.process = function(sp) {
                     if (this.stuck) {
                         this.stuck();
                     }
-                    srvlog('MegaQueue.getNextTask gave no tasks for too long... (' + this.qname + ')', sp);
+                    // srvlog('MegaQueue.getNextTask gave no tasks for too long... (' + this.qname + ')', sp);
                 }
             }
             if (this._queue) {
@@ -340,7 +340,11 @@ MegaQueue.prototype._process = function(ms, sp) {
     if (!sp) {
         sp = new Error(this.qname + ' stack pointer');
     }
-    this._later = setTimeout(this.process.bind(this, sp), ms || 300);
+    var queue = this;
+    this._later = setTimeout(function() {
+        queue.process(sp);
+        queue = undefined;
+    }, ms || 300);
 };
 
 MegaQueue.prototype.push = function(arg, next, self) {

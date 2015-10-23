@@ -1,7 +1,7 @@
 
 var ul_maxSpeed = 0;
 var uldl_hold = false;
-var ul_skipIdentical = 0;
+var ul_skipIdentical = 1;
 var ul_maxSlots = readLocalStorage('ul_maxSlots', 'int', { min:1, max:6, def:4 });
 
 if (localStorage.ul_maxSpeed) {
@@ -170,52 +170,6 @@ var ulmanager = {
             xhr);
 
         chunk.done(); /* release worker */
-    },
-
-    warning: function UM_warning(success) {
-        var lsProp = 'umQWarning';
-        if (localStorage[lsProp]) {
-            return false;
-        }
-
-        mega.ui.Dialog.generic({
-            'title': 'Upload Warning',
-            'notAgainTag': lsProp,
-            'success': success
-        }, function($content, $title, dialog) {
-            dialog.$dialog.css('height', '560px');
-            var path = staticpath + 'images/products/';
-            var retina = /*(window.devicePixelRatio > 1) ? '-2x' :*/ '';
-            var msg = 'We strongly suggest using our sync client for vastly improved performance uploading hundred of files.';
-            var os_class = browserdetails(ua).os;
-            if (os_class === 'Apple') {
-                os_class = 'Mac';
-            }
-            var os_file = 'https://mega.nz/MEGAsyncSetup.exe';
-            if (os_class === 'Mac') {
-                os_file = 'https://mega.nz/MEGAsyncSetup.dmg';
-            }
-            else if (os_class === 'Linux') {
-                os_file = '/#sync';
-            }
-            var inlineStyle =
-                'background:#D9D8D8;padding:8px 14px;text-align:center;border-radius:4px;max-width:300px';
-            var syncButton =
-                '<div><a href="' + os_file + '" class="sync-button button0 ' + os_class.toLowerCase() + '">' +
-                    '<span class="sync-button-txt">' + l[1157] + '</span>' +
-                    '<span class="sync-button-txt small">' + l[1158].replace('Windows', os_class) + '</span>' +
-                '</a></div>';
-
-            $content.html(
-                '<div style="' + inlineStyle + '">' +
-                    '<div><b>' + msg + '</b></div>' +
-                    '<div><img src="' + path + 'sync-client' + retina + '.gif"/><br/>' + syncButton + '</div>' +
-                    '<hr/>' +
-                    '<div>Would you like to continue anyway?</div>' +
-                '</div>');
-        });
-
-        return true;
     },
 
     isReady: function UM_isReady(Task) /* unused */ {
@@ -688,7 +642,7 @@ var ulmanager = {
         }
         else if (M.h[uq.hash]) {
             n = M.d[M.h[uq.hash][0]];
-            identical = n;
+            // identical = n;
         }
         if (!n) {
             return ulmanager.ulStart(File);
@@ -714,6 +668,8 @@ var ulmanager = {
                     ulmanager.ulStart(File);
                 }
                 else if (ctx.skipfile) {
+                    uq.skipfile = true;
+                    ulmanager.ulIDToNode[ulmanager.getGID(uq)] = ctx.n.h;
                     onUploadSuccess(uq);
                     File.file.ul_failed = false;
                     File.file.retries = 0;
@@ -967,8 +923,13 @@ ChunkUpload.prototype.on_ready = function(args, xhr) {
         }
     }
 
-    this.oet = setTimeout(this.on_error.bind(this, null, xhr, errstr),
-        1950 + Math.floor(Math.random() * 2e3));
+    var self = this;
+    this.oet = setTimeout(function() {
+        if (!oIsFrozen(self)) {
+            self.on_error(null, xhr, errstr);
+        }
+        self = undefined;
+    }, 1950 + Math.floor(Math.random() * 2e3));
 
     if (d) {
         this.logger.warn("Bad response from server",

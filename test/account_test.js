@@ -1,9 +1,9 @@
 /**
  * @fileOverview
- * User operations unit tests.
+ * Account operations unit tests.
  */
 
-describe("user unit test", function() {
+describe("account unit test", function() {
     "use strict";
 
     var assert = chai.assert;
@@ -30,50 +30,68 @@ describe("user unit test", function() {
         describe('getUserAttribute', function() {
             it("internal callback error, no custom callback", function() {
                 sandbox.stub(window, 'api_req');
-                getUserAttribute('me', 'puEd255', true, false, undefined);
+                var masterPromise = { reject: sinon.stub() };
+                sandbox.stub(window, 'MegaPromise').returns(masterPromise);
+                var logger = { warn: sinon.stub() };
+                sandbox.stub(MegaLogger, 'getLogger').returns(logger);
+                var aPromise = getUserAttribute('me3456789xw', 'puEd255', true, false, undefined);
+                assert.strictEqual(aPromise, masterPromise);
                 assert.strictEqual(api_req.callCount, 1);
                 var callback = api_req.args[0][1].callback;
                 var theCtx = api_req.args[0][1];
-                sandbox.stub(window.console, 'log');
-                sandbox.stub(window, 'd', true);
                 callback(EFAILED, theCtx);
-                assert.strictEqual(console.log.args[0][0],
-                                   'Warning, attribute "+puEd255" for user "me" could not be retrieved: -5!');
+                assert.strictEqual(aPromise.reject.callCount, 1);
+                assert.strictEqual(logger.warn.args[0][0],
+                    'Warning, attribute "+puEd255" for user "me3456789xw" could not be retrieved: -5!');
             });
 
             it("internal callback error, custom callback", function() {
                 sandbox.stub(window, 'api_req');
                 var myCallback = sinon.spy();
-                getUserAttribute('me', 'puEd255', true, false, myCallback);
+                var masterPromise = { reject: sinon.stub() };
+                sandbox.stub(window, 'MegaPromise').returns(masterPromise);
+                var aPromise = getUserAttribute('me3456789xw', 'puEd255', true, false, myCallback);
+                assert.strictEqual(aPromise, masterPromise);
                 assert.strictEqual(api_req.callCount, 1);
                 var callback = api_req.args[0][1].callback;
                 var theCtx = api_req.args[0][1];
                 callback(EFAILED, theCtx);
+                assert.strictEqual(aPromise.reject.callCount, 1);
                 assert.strictEqual(myCallback.args[0][0], EFAILED);
             });
 
             it("internal callback OK, no custom callback", function() {
+                var logger = { info: sinon.stub() };
+                sandbox.stub(MegaLogger, 'getLogger').returns(logger);
                 sandbox.stub(window, 'api_req');
-                var aPromise = getUserAttribute('me', 'puEd255', true, false, undefined);
-                assert.strictEqual(aPromise.constructor.name, 'MegaPromise');
+                var masterPromise = { resolve: sinon.stub() };
+                sandbox.stub(window, 'MegaPromise').returns(masterPromise);
+                var aPromise = getUserAttribute('me3456789xw', 'puEd255', true, false, undefined);
+                assert.strictEqual(aPromise, masterPromise);
                 assert.strictEqual(api_req.callCount, 1);
                 var callback = api_req.args[0][1].callback;
                 var theCtx = api_req.args[0][1];
                 sandbox.stub(window.console, 'log');
                 sandbox.stub(window, 'd', true);
                 callback('fortytwo', theCtx);
-                assert.strictEqual(console.log.args[0][0],
-                                   'Attribute "+puEd255" for user "me" is "fortytwo".');
+                assert.strictEqual(masterPromise.resolve.callCount, 1);
+                assert.strictEqual(masterPromise.resolve.args[0][0], 'fortytwo');
+                assert.strictEqual(logger.info.args[0][0],
+                                   'Attribute "+puEd255" for user "me3456789xw" is "fortytwo".');
             });
 
             it("internal callback OK, custom callback", function() {
                 sandbox.stub(window, 'api_req');
                 var myCallback = sinon.spy();
-                getUserAttribute('me', 'puEd255', true, false, myCallback);
+                var masterPromise = { resolve: sinon.stub() };
+                sandbox.stub(window, 'MegaPromise').returns(masterPromise);
+                var aPromise = getUserAttribute('me3456789xw', 'puEd255', true, false, myCallback);
+                assert.strictEqual(aPromise, masterPromise);
                 assert.strictEqual(api_req.callCount, 1);
                 var callback = api_req.args[0][1].callback;
                 var theCtx = api_req.args[0][1];
                 callback('fortytwo', theCtx);
+                assert.strictEqual(aPromise.resolve.callCount, 1);
                 assert.strictEqual(myCallback.args[0][0], 'fortytwo');
             });
 
@@ -83,63 +101,93 @@ describe("user unit test", function() {
                 sandbox.stub(tlvstore, 'blockDecrypt', _echo);
                 sandbox.stub(tlvstore, 'tlvRecordsToContainer', _echo);
                 sandbox.stub(window, 'u_k', 'foo');
-                getUserAttribute('me', 'keyring', false, false, myCallback);
+                var masterPromise = { resolve: sinon.stub() };
+                sandbox.stub(window, 'MegaPromise').returns(masterPromise);
+                var aPromise = getUserAttribute('me3456789xw', 'keyring', false, false, myCallback);
+                assert.strictEqual(aPromise, masterPromise);
                 assert.strictEqual(api_req.callCount, 1);
                 var callback = api_req.args[0][1].callback;
                 var theCtx = api_req.args[0][1];
                 callback('Zm9ydHl0d28=', theCtx);
+                assert.strictEqual(aPromise.resolve.callCount, 1);
                 assert.strictEqual(myCallback.args[0][0], 'fortytwo');
                 assert.ok(tlvstore.tlvRecordsToContainer.calledWith('fortytwo'));
                 assert.ok(tlvstore.blockDecrypt.calledWith('fortytwo', 'foo'));
             });
 
+            it("private attribute, failed data integrity check", function() {
+                sandbox.stub(window, 'api_req');
+                var masterPromise = { reject: sinon.stub() };
+                sandbox.stub(window, 'MegaPromise').returns(masterPromise);
+                sandbox.stub(tlvstore, 'blockDecrypt').throws('SecurityError');
+                sandbox.stub(window, 'u_k', 'foo');
+                var result = getUserAttribute('me3456789xw', 'keyring', false, false);
+                assert.strictEqual(result, masterPromise);
+                assert.strictEqual(api_req.callCount, 1);
+
+                var callback = api_req.args[0][1].callback;
+                var theCtx = api_req.args[0][1];
+                callback('Zm9ydHl0d28=', theCtx);
+                assert.ok(tlvstore.blockDecrypt.calledWith('fortytwo', 'foo'));
+                assert.strictEqual(masterPromise.reject.callCount, 1);
+                assert.strictEqual(masterPromise.reject.args[0][0], EINTERNAL);
+            });
+
             it("private attribute, internal callback OK, custom callback", function() {
                 sandbox.stub(window, 'api_req');
+                sandbox.stub(window, 'assertUserHandle');
+                sandbox.stub(window, 'base64urldecode', _echo);
+                sandbox.stub(tlvstore, 'blockDecrypt', _echo);
+                sandbox.stub(tlvstore, 'tlvRecordsToContainer' , _echo);
                 var myCallback = sinon.spy();
-                sandbox.stub(window, 'u_k', asmCrypto.bytes_to_string(asmCrypto.hex_to_bytes('0f0e0d0c0b0a09080706050403020100')));
-                getUserAttribute('me', 'keyring', false, false, myCallback);
+                var masterPromise = { resolve: sinon.stub() };
+                sandbox.stub(window, 'MegaPromise').returns(masterPromise);
+
+                var aPromise = getUserAttribute('me3456789xw', 'keyring', false, false, myCallback);
+                assert.strictEqual(aPromise, masterPromise);
                 assert.strictEqual(api_req.callCount, 1);
                 var callback = api_req.args[0][1].callback;
                 var theCtx = api_req.args[0][1];
-                var res = 'AgABAgMEBQYHCAk+T6t/cBKS0eztTXRFa2qd9jFfycQmUC5dJJurGUm99XOLMSTw00I3LtHJ7HtLuKdAauFIGc5oCegTnlHVaAFIahGfgp845h0GDQ==';
-                var expected = {'foo': 'bar', 'puEd255': ED25519_PUB_KEY};
-                callback(res, theCtx);
+                var expected = { 'foo': 'bar', 'puEd255': ED25519_PUB_KEY };
+                callback(expected, theCtx);
+                assert.strictEqual(aPromise.resolve.callCount, 1);
+                assert.deepEqual(myCallback.callCount, 1);
                 assert.deepEqual(myCallback.args[0][0], expected);
             });
 
             it("public attribute", function() {
                 sandbox.stub(window, 'api_req');
-                getUserAttribute('me', 'puEd255', undefined, undefined, undefined);
+                getUserAttribute('me3456789xw', 'puEd255', undefined, undefined, undefined);
                 assert.strictEqual(api_req.callCount, 1);
-                assert.deepEqual(api_req.args[0][0], {a: 'uga', u: 'me', ua: '+puEd255'});
+                assert.deepEqual(api_req.args[0][0], {a: 'uga', u: 'me3456789xw', ua: '+puEd255'});
             });
 
             it("public, non-historic attribute", function() {
                 sandbox.stub(window, 'api_req');
-                getUserAttribute('me', 'puEd255', true, true, undefined);
+                getUserAttribute('me3456789xw', 'puEd255', true, true, undefined);
                 assert.strictEqual(api_req.callCount, 1);
-                assert.deepEqual(api_req.args[0][0], {a: 'uga', u: 'me', ua: '+!puEd255'});
+                assert.deepEqual(api_req.args[0][0], {a: 'uga', u: 'me3456789xw', ua: '+!puEd255'});
             });
 
             it("public attribute, two params", function() {
                 sandbox.stub(window, 'api_req');
-                getUserAttribute('me', 'puEd255');
+                getUserAttribute('me3456789xw', 'puEd255');
                 assert.strictEqual(api_req.callCount, 1);
-                assert.deepEqual(api_req.args[0][0], {a: 'uga', u: 'me', ua: '+puEd255'});
+                assert.deepEqual(api_req.args[0][0], {a: 'uga', u: 'me3456789xw', ua: '+puEd255'});
             });
 
             it("private attribute", function() {
                 sandbox.stub(window, 'api_req');
-                getUserAttribute('me', 'keyring', false, false, undefined);
+                getUserAttribute('me3456789xw', 'keyring', false, false, undefined);
                 assert.strictEqual(api_req.callCount, 1);
-                assert.deepEqual(api_req.args[0][0], {a: 'uga', u: 'me', ua: '*keyring'});
+                assert.deepEqual(api_req.args[0][0], {a: 'uga', u: 'me3456789xw', ua: '*keyring'});
             });
 
             it("private, non-historic attribute", function() {
                 sandbox.stub(window, 'api_req');
-                getUserAttribute('me', 'keyring', false, true, undefined);
+                getUserAttribute('me3456789xw', 'keyring', false, true, undefined);
                 assert.strictEqual(api_req.callCount, 1);
-                assert.deepEqual(api_req.args[0][0], {a: 'uga', u: 'me', ua: '*!keyring'});
+                assert.deepEqual(api_req.args[0][0], {a: 'uga', u: 'me3456789xw', ua: '*!keyring'});
             });
         });
 
@@ -169,7 +217,7 @@ describe("user unit test", function() {
                 assert.strictEqual(myCallback.args[0][0], EFAILED);
                 assert.strictEqual(console.log.args[0][0],
                                    'Error setting user attribute "+puEd255", result: -5!');
-                });
+            });
 
             it("internal callback OK, no custom callback", function() {
                 sandbox.stub(window.console, 'log');
@@ -206,7 +254,8 @@ describe("user unit test", function() {
                 sandbox.stub(tlvstore, 'containerToTlvRecords', _echo);
                 sandbox.stub(window, 'u_k', 'foo');
                 setUserAttribute('keyring', 'fortytwo', false, false, myCallback);
-                assert.ok(tlvstore.blockEncrypt.calledWith('fortytwo', 'foo', tlvstore.BLOCK_ENCRYPTION_SCHEME. AES_GCM_12_16));
+                assert.ok(tlvstore.blockEncrypt.calledWith('fortytwo', 'foo',
+                    tlvstore.BLOCK_ENCRYPTION_SCHEME. AES_GCM_12_16));
                 assert.ok(tlvstore.containerToTlvRecords.calledWith('fortytwo'));
                 assert.strictEqual(api_req.callCount, 1);
                 var callback = api_req.args[0][1].callback;
@@ -219,10 +268,16 @@ describe("user unit test", function() {
 
             it("private attribute, internal callback OK, no custom callback", function() {
                 sandbox.stub(window, 'api_req');
-                sandbox.stub(window, 'u_k', asmCrypto.bytes_to_string(asmCrypto.hex_to_bytes('0f0e0d0c0b0a09080706050403020100')));
-                setUserAttribute('keyring', {'foo': 'bar', 'puEd255': ED25519_PUB_KEY}, false, false, undefined);
+                sandbox.stub(window, 'u_k',
+                             asmCrypto.bytes_to_string(asmCrypto.hex_to_bytes(
+                                 '0f0e0d0c0b0a09080706050403020100')));
+                setUserAttribute('keyring', {'foo': 'bar',
+                                             'puEd255': ED25519_PUB_KEY},
+                                 false, false, undefined);
                 assert.strictEqual(api_req.callCount, 1);
-                var decoded = tlvstore.tlvRecordsToContainer(tlvstore.blockDecrypt(base64urldecode(api_req.args[0][0]['*keyring']), window.u_k));
+                var decoded = tlvstore.tlvRecordsToContainer(
+                    tlvstore.blockDecrypt(base64urldecode(
+                        api_req.args[0][0]['*keyring']), window.u_k));
                 assert.strictEqual(api_req.args[0][0].a, 'up');
                 assert.strictEqual(decoded.puEd255, ED25519_PUB_KEY);
                 assert.strictEqual(decoded.foo, 'bar');
@@ -244,10 +299,15 @@ describe("user unit test", function() {
 
             it("private attribute", function() {
                 sandbox.stub(window, 'api_req');
-                sandbox.stub(window, 'u_k', asmCrypto.bytes_to_string(asmCrypto.hex_to_bytes('0f0e0d0c0b0a09080706050403020100')));
-                setUserAttribute('keyring', {'foo': 'bar', 'puEd255': ED25519_PUB_KEY}, false, false, undefined);
+                sandbox.stub(window, 'u_k', asmCrypto.bytes_to_string(
+                    asmCrypto.hex_to_bytes('0f0e0d0c0b0a09080706050403020100')));
+                setUserAttribute('keyring', {'foo': 'bar',
+                                             'puEd255': ED25519_PUB_KEY},
+                                 false, false, undefined);
                 assert.strictEqual(api_req.callCount, 1);
-                var decoded = tlvstore.tlvRecordsToContainer(tlvstore.blockDecrypt(base64urldecode(api_req.args[0][0]['*keyring']), window.u_k));
+                var decoded = tlvstore.tlvRecordsToContainer(
+                    tlvstore.blockDecrypt(base64urldecode(
+                        api_req.args[0][0]['*keyring']), window.u_k));
                 assert.strictEqual(api_req.args[0][0].a, 'up');
                 assert.strictEqual(decoded.puEd255, ED25519_PUB_KEY);
                 assert.strictEqual(decoded.foo, 'bar');
@@ -256,11 +316,16 @@ describe("user unit test", function() {
 
             it("private attribute, compact crypto mode", function() {
                 sandbox.stub(window, 'api_req');
-                sandbox.stub(window, 'u_k', asmCrypto.bytes_to_string(asmCrypto.hex_to_bytes('0f0e0d0c0b0a09080706050403020100')));
-                setUserAttribute('keyring', {'foo': 'bar', 'puEd255': ED25519_PUB_KEY},
-                                 false, false, undefined, undefined, tlvstore.BLOCK_ENCRYPTION_SCHEME.AES_CCM_10_08);
+                sandbox.stub(window, 'u_k', asmCrypto.bytes_to_string(
+                    asmCrypto.hex_to_bytes('0f0e0d0c0b0a09080706050403020100')));
+                setUserAttribute('keyring', {'foo': 'bar',
+                                             'puEd255': ED25519_PUB_KEY},
+                                 false, false, undefined, undefined,
+                                 tlvstore.BLOCK_ENCRYPTION_SCHEME.AES_CCM_10_08);
                 assert.strictEqual(api_req.callCount, 1);
-                var decoded = tlvstore.tlvRecordsToContainer(tlvstore.blockDecrypt(base64urldecode(api_req.args[0][0]['*keyring']), window.u_k));
+                var decoded = tlvstore.tlvRecordsToContainer(
+                    tlvstore.blockDecrypt(base64urldecode(
+                        api_req.args[0][0]['*keyring']), window.u_k));
                 assert.strictEqual(api_req.args[0][0].a, 'up');
                 assert.strictEqual(decoded.puEd255, ED25519_PUB_KEY);
                 assert.strictEqual(decoded.foo, 'bar');

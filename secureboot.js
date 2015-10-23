@@ -2,6 +2,7 @@ var b_u = 0;
 var apipath;
 var maintenance = false;
 var androidsplash = false;
+var cookiesDisabled = false;
 var URL = window.URL || window.webkitURL;
 var seqno = Math.ceil(Math.random()*1000000000);
 var staticpath = 'https://eu.static.mega.co.nz/3/';
@@ -155,11 +156,59 @@ if (!b_u) try
         if (!(localStorage instanceof Ci.nsIDOMStorage)) {
             throw new Error('Invalid DOM Storage instance.');
         }
+    }
+    try {
         d = !!localStorage.d;
     }
-    if (typeof localStorage == 'undefined') b_u = 1;
-    else
-    {
+    catch (ex) {
+        cookiesDisabled = ex.code && ex.code === DOMException.SECURITY_ERR
+            || ex.message === 'SecurityError: DOM Exception 18';
+
+        if (!cookiesDisabled) {
+            throw ex;
+        }
+
+        // Cookies are disabled, therefore we can't use localStorage.
+        // We could either show the user a message about the issue and let him
+        // enable cookies, or rather setup a tiny polyfill so that they can use
+        // the site even in such case, even though this solution has side effects.
+        Object.defineProperty(window, 'localStorage', {
+            value: Object.create({}, {
+                length:     { get: function() { return Object.keys(this).length; }},
+                key:        { value: function(pos) { return Object.keys(this)[pos]; }},
+                removeItem: { value: function(key) { delete this[key]; }},
+                setItem:    { value: function(key, value) { this[key] = String(value); }},
+                getItem:    { value: function(key) {
+                    if (this.hasOwnProperty(key)) {
+                        return this[key];
+                    }
+                    return null;
+                }},
+                clear: {
+                    value: function() {
+                        var obj = this;
+                        Object.keys(obj).forEach(function(memb) {
+                            if (obj.hasOwnProperty(memb)) {
+                                delete obj[memb];
+                            }
+                        });
+                    }
+                }
+            })
+        });
+        Object.defineProperty(window, 'sessionStorage', {
+            value: localStorage
+        });
+        if (location.host !== 'mega.nz') {
+            localStorage.jj = localStorage.dd = localStorage.d = 1;
+        }
+        setTimeout(function() {
+            console.warn('Apparently you have Cookies disabled, ' +
+                'please note this session is temporal, ' +
+                'it will die once you close/reload the browser/tab.');
+        }, 4000);
+    }
+    if (typeof localStorage !== 'undefined') {
         var contenterror = 0;
         var nocontentcheck = !!localStorage.dd;
         if (localStorage.dd) {
@@ -179,21 +228,28 @@ if (!b_u) try
     }
 }
 catch(e) {
-    if (!m || e.message !== 'SecurityError: DOM Exception 18') {
+    if (!m || !cookiesDisabled) {
+        var extraInfo = '';
+        if (cookiesDisabled) {
+            extraInfo = "\n\nTip: We've detected this issue is likely related to " +
+                "having Cookies disabled, please check your browser settings.";
+        }
         alert(
-            "Sorry, we were unable to initialize the browser's local storage, "+
-            "either you're using an outdated browser or it's something from our side.\n"+
+            "Sorry, we were unable to initialize the browser's local storage, " +
+            "either you're using an outdated/misconfigured browser or " +
+            "it's something from our side.\n" +
             "\n"+
-            "If you think it's our fault, please report the issue back to us.\n"+
-            "\n"+
-            "Reason: " + (e.message || e)+
+            "If you think it's our fault, please report the issue back to us.\n" +
+            "\n" +
+            "Reason: " + (e.message || e) +
             "\nBrowser: " + (typeof mozBrowserID !== 'undefined' ? mozBrowserID : ua)
+            + extraInfo
         );
         b_u = 1;
     }
 }
 
-var mega = {ui: {}, utils: {}};
+var mega = {ui: {}, utils: {}, flags: 0};
 var bootstaticpath = staticpath;
 var urlrootfile = '';
 
@@ -205,8 +261,12 @@ if (!b_u && is_extension)
     {
         bootstaticpath = 'chrome://mega/content/';
         urlrootfile = 'secure.html';
-        if (d) staticpath = bootstaticpath;
-          else staticpath = 'https://eu.static.mega.co.nz/3/';
+        if (d > 1) {
+            staticpath = bootstaticpath;
+        }
+        else {
+            staticpath = 'https://eu.static.mega.co.nz/3/';
+        }
         try {
             loadSubScript(bootstaticpath + 'fileapi.js');
         } catch(e) {
@@ -231,7 +291,7 @@ if (!b_u && is_extension)
     }
     else /* Google Chrome */
     {
-        bootstaticpath = chrome.extension.getURL("mega/");
+        bootstaticpath = chrome.extension.getURL('mega/');
         urlrootfile = 'mega/secure.html';
     }
 
@@ -244,8 +304,8 @@ if (!b_u && is_extension)
 
 if (b_u) document.location = 'update.html';
 
-var ln ={}; ln.en = 'English'; ln.cn = '简体中文';  ln.ct = '中文繁體'; ln.ru = 'Pусский'; ln.es = 'Español'; ln.fr = 'Français'; ln.de = 'Deutsch'; ln.it = 'Italiano'; ln.br = 'Português Brasil'; ln.mi = 'Māori'; ln.vn = 'Tiếng Việt'; ln.nl = 'Nederlands'; ln.kr = '한국어';   ln.ar = 'العربية'; ln.jp = '日本語'; ln.pt = 'Português'; ln.he = 'עברית'; ln.pl = 'Polski'; ln.ca = 'Català'; ln.eu = 'Euskara'; ln.sk = 'Slovenský'; ln.af = 'Afrikaans'; ln.cz = 'Čeština'; ln.ro = 'Română'; ln.fi = 'Suomi'; ln.no = 'Norsk'; ln.se = 'Svenska'; ln.bs = 'Bosanski'; ln.hu = 'Magyar'; ln.sr = 'српски'; ln.dk = 'Dansk'; ln.sl = 'Slovenščina'; ln.tr = 'Türkçe';  ln.id = 'Bahasa Indonesia';  ln.hr = 'Hrvatski';  ln.el = 'ελληνικά'; ln.uk = 'Українська'; ln.gl = 'Galego'; ln.sr = 'српски'; ln.lt = 'Lietuvos'; ln.th = 'ภาษาไทย'; ln.lv = 'Latviešu'; ln.bg = 'български';  ln.mk = 'македонски'; ln.hi = 'हिंदी'; ln.fa = 'فارسی '; ln.ee = 'Eesti'; ln.ms = 'Bahasa Malaysia'; ln.cy = 'Cymraeg'; ln.be = 'Breton'; ln.tl = 'Tagalog'; ln.ka = 'ქართული';
-var ln2 ={}; ln2.en = 'English'; ln2.cn = 'Chinese';  ln2.ct = 'Traditional Chinese'; ln2.ru = 'Russian'; ln2.es = 'Spanish'; ln2.fr = 'French'; ln2.de = 'German'; ln2.it = 'Italian'; ln2.br = 'Brazilian Portuguese'; ln2.mi = 'Maori'; ln2.vn = 'Vietnamese'; ln2.nl = 'Dutch'; ln2.kr = 'Korean';   ln2.ar = 'Arabic'; ln2.jp = 'Japanese'; ln2.pt = 'Portuguese'; ln2.he = 'Hebrew'; ln2.pl = 'Polish'; ln2.ca = 'Catalan'; ln2.eu = 'Basque'; ln2.sk = 'Slovak'; ln2.af = 'Afrikaans'; ln2.cz = 'Czech'; ln2.ro = 'Romanian'; ln2.fi = 'Finnish'; ln2.no = 'Norwegian'; ln2.se = 'Swedish'; ln2.bs = 'Bosnian'; ln2.hu = 'Hungarian'; ln2.sr = 'Serbian'; ln2.dk = 'Danish'; ln2.sl = 'Slovenian'; ln2.tr = 'Turkish'; ln2.id = 'Indonesian'; ln2.hr = 'Croatian'; ln2.el = 'Greek'; ln2.uk = 'Ukrainian'; ln2.gl = 'Galician'; ln2.sr = 'Serbian'; ln2.lt = 'Lithuanian'; ln2.th = 'Thai'; ln2.lv = 'Latvian'; ln2.bg = 'Bulgarian'; ln2.mk = 'Macedonian'; ln2.hi = 'Hindi'; ln2.fa = 'Farsi'; ln2.ee = 'Estonian';  ln2.ms = 'Malaysian'; ln2.cy = 'Welsh'; ln2.be = 'Breton'; ln2.tl = 'Tagalog'; ln2.ka = 'Georgian';
+var ln = {}; ln.en = 'English'; ln.cn = '简体中文';  ln.ct = '中文繁體'; ln.ru = 'Pусский'; ln.es = 'Español'; ln.fr = 'Français'; ln.de = 'Deutsch'; ln.it = 'Italiano'; ln.br = 'Português Brasil'; ln.vi = 'Tiếng Việt'; ln.nl = 'Nederlands'; ln.kr = '한국어';   ln.ar = 'العربية'; ln.jp = '日本語'; ln.pt = 'Português'; ln.he = 'עברית'; ln.pl = 'Polski'; ln.sk = 'Slovenský'; ln.cz = 'Čeština'; ln.ro = 'Română'; ln.fi = 'Suomi'; ln.se = 'Svenska'; ln.hu = 'Magyar'; ln.sr = 'српски'; ln.dk = 'Dansk'; ln.sl = 'Slovenščina'; ln.tr = 'Türkçe';  ln.id = 'Bahasa Indonesia';  ln.hr = 'Hrvatski'; ln.uk = 'Українська'; ln.sr = 'српски'; ln.th = 'ภาษาไทย'; ln.bg = 'български'; ln.fa = 'فارسی '; ln.ee = 'Eesti'; ln.tl = 'Tagalog'; ln.ka = 'ქართული';
+var ln2 = {}; ln2.en = 'English'; ln2.cn = 'Chinese';  ln2.ct = 'Traditional Chinese'; ln2.ru = 'Russian'; ln2.es = 'Spanish'; ln2.fr = 'French'; ln2.de = 'German'; ln2.it = 'Italian'; ln2.br = 'Brazilian Portuguese'; ln2.vi = 'Vietnamese'; ln2.nl = 'Dutch'; ln2.kr = 'Korean';   ln2.ar = 'Arabic'; ln2.jp = 'Japanese'; ln2.pt = 'Portuguese'; ln2.he = 'Hebrew'; ln2.pl = 'Polish'; ln2.sk = 'Slovak'; ln2.cz = 'Czech'; ln2.ro = 'Romanian'; ln2.fi = 'Finnish'; ln2.se = 'Swedish'; ln2.hu = 'Hungarian'; ln2.sr = 'Serbian'; ln2.dk = 'Danish'; ln2.sl = 'Slovenian'; ln2.tr = 'Turkish'; ln2.id = 'Indonesian'; ln2.hr = 'Croatian'; ln2.uk = 'Ukrainian'; ln2.sr = 'Serbian'; ln2.th = 'Thai'; ln2.bg = 'Bulgarian'; ln2.fa = 'Farsi'; ln2.ee = 'Estonian'; ln2.tl = 'Tagalog'; ln2.ka = 'Georgian';
 
 /**
  * Below is the asmCrypto SHA-256 library which was converted to a string so it can be run by the web worker which
@@ -331,7 +391,9 @@ function mObjectURL(data, type)
     return blob && URL.createObjectURL(blob);
 }
 
-var mBroadcaster = {
+Object.defineProperty(this, 'mBroadcaster', {
+    writable: false,
+    value: Object.freeze({
     _topics : {},
 
     addListener: function mBroadcaster_addListener(topic, options) {
@@ -438,7 +500,9 @@ var mBroadcaster = {
             this.listen(setup);
             this.notify('ping');
 
-            setTimeout(setup, !parseInt(localStorage.ctInstances) ? 0 : 2000);
+            setTimeout(function() {
+                setup();
+            }, !parseInt(localStorage.ctInstances) ? 0 : 2000);
         },
 
         listen: function crossTab_listen(aListener) {
@@ -567,14 +631,8 @@ var mBroadcaster = {
             delete localStorage[ev.key];
         }
     }
-};
-if (typeof Object.freeze === 'function') {
-    mBroadcaster = Object.freeze(mBroadcaster);
-}
-Object.defineProperty(this, 'mBroadcaster', {
-    value: mBroadcaster,
-    writable: false
-});
+})});
+
 
 var sh = [];
 
@@ -714,12 +772,13 @@ var silent_loading=false;
 
 if (m)
 {
-    var app,mobileblog,android;
+    var app,mobileblog,android,intent, ios9;
     var link = document.createElement('link');
     link.setAttribute('rel', 'stylesheet');
     link.type = 'text/css';
     link.href = staticpath + 'css/mobile-app.css';
     document.head.appendChild(link);
+    // AMO: Markup should not be passed to `innerHTML` dynamically. -- This isnt reached for the extension, anyway
     document.body.innerHTML = '<div class="main-scroll-block"> <div class="main-content-block"> <div class="free-green-tip"></div><div class="main-centered-bl"><div class="main-logo"></div><div class="main-head-txt" id="m_title"></div><div class="main-txt" id="m_desc"></div><a href="" class="main-button" id="m_appbtn"></a><div class="main-social hidden"><a href="https://www.facebook.com/MEGAprivacy" class="main-social-icon facebook"></a><a href="https://www.twitter.com/MEGAprivacy" class="main-social-icon twitter"></a><div class="clear"></div></div></div> </div><div class="scrolling-content"><div class="mid-logo"></div> <div class="mid-gray-block">MEGA provides free cloud storage with convenient and powerful always-on privacy </div> <div class="scrolling-block-icon encription"></div> <div class="scrolling-block-header"> End-to-end encryption </div> <div class="scrolling-block-txt">Unlike other cloud storage providers, your data is encrypted & decrypted during transfer by your client devices only and never by us. </div> <div class="scrolling-block-icon access"></div> <div class="scrolling-block-header"> Secure Global Access </div> <div class="scrolling-block-txt">Your data is accessible any time, from any device, anywhere. Only you control the keys to your files.</div> <div class="scrolling-block-icon colaboration"></div> <div class="scrolling-block-header"> Secure Collaboration </div> <div class="scrolling-block-txt">Share folders with your contacts and see their updates in real time. Online collaboration has never been more private and secure.</div> <div class="bottom-menu full-version"><div class="copyright-txt">Mega Limited ' + new Date().getFullYear() + '</div><div class="language-block"></div><div class="clear"></div><iframe src="" width="1" height="1" frameborder="0" style="width:1px; height:1px; border:none;" id="m_iframe"></iframe></div></div></div>';
     if (window.location.hash.substr(1,4) == 'blog') mobileblog=1;
     if (ua.indexOf('windows phone') > -1 /*&& ua.indexOf('iemobile') > -1*/)
@@ -733,6 +792,19 @@ if (m)
         app='https://play.google.com/store/apps/details?id=nz.mega.android&referrer=meganzsb';
         document.body.className = 'android full-mode supported';
         android=1;
+
+        var ver = ua.match(/android (\d+)\.(\d+)/);
+        if (ver) {
+            var rev = ver.pop();
+            ver = ver.pop();
+            // Check for Android 2.3+
+            if (ver > 2 || (ver === 2 && rev > 3)) {
+                intent = 'intent://' + location.hash + '/#Intent;scheme=mega;package=nz.mega.android;end';
+            }
+        }
+        if (intent) {
+            document.location = intent;
+        }
     }
     else if (ua.indexOf('bb10') > -1)
     {
@@ -747,6 +819,14 @@ if (m)
         app='https://itunes.apple.com/app/mega/id706857885';
         document.body.className = 'ios full-mode supported';
         document.getElementById('m_desc').innerHTML = 'Free 50 GB - End-to-end encryption';
+
+        var ver = ua.match(/(?:iphone|cpu) os (\d+)[\._](\d+)/);
+        if (ver) {
+            var rev = ver.pop();
+            ver = ver.pop();
+            // Check for iOS 9.0+
+            ios9 = (ver > 8);
+        }
     }
     else document.body.className = 'another-os full-mode unsupported';
 
@@ -763,24 +843,8 @@ if (m)
     if (window.location.hash.substr(1,1) == '!' || window.location.hash.substr(1,2) == 'F!')
     {
         var i = 0;
-        var intent = false;
         if (ua.indexOf('windows phone') > -1) {
             i = 1;
-        }
-
-        if (android) {
-            var ver = ua.match(/android (\d+)\.(\d+)/);
-            if (ver) {
-                var rev = ver.pop();
-                ver = ver.pop();
-                // Check for Android 2.3+
-                if (ver > 2 || (ver === 2 && rev > 3)) {
-                    intent = 'intent://' + location.hash + '/#Intent;scheme=mega;package=nz.mega.android;end';
-                }
-            }
-            if (intent) {
-                document.location = intent;
-            }
         }
 
         if (app) {
@@ -801,22 +865,46 @@ if (m)
                 }, 2500);
             }
         }
-        else document.getElementById('m_iframe').src = 'mega://' + window.location.hash.substr(i);
+        else if (ios9) {
+            setTimeout(function() {
+                if (confirm('Do you already have the MEGA app installed?')) {
+                    document.location = 'mega://' + window.location.hash;
+                }
+            }, 1500);
+        }
+        else {
+            document.getElementById('m_iframe').src = 'mega://' + window.location.hash.substr(i);
+        }
     }
     else if (window.location.hash.substr(1,7) == 'confirm' || window.location.hash.substr(1,7) == 'account')
     {
-        var i=0;
-        if (ua.indexOf('windows phone') > -1) i=1;
-        if (ua.indexOf('chrome') > -1) window.location ='mega://' + window.location.hash.substr(i);
-        else document.getElementById('m_iframe').src = 'mega://' + window.location.hash.substr(i);
+        var i = 0;
+        if (ua.indexOf('windows phone') > -1) {
+            i = 1;
+        }
+        if (ua.indexOf('chrome') > -1) {
+            window.location = 'mega://' + window.location.hash.substr(i);
+        }
+        else if (ios9) {
+            setTimeout(function() {
+                if (confirm('Do you already have the MEGA app installed?')) {
+                    document.location = 'mega://' + window.location.hash;
+                }
+            }, 1500);
+        }
+        else {
+            document.getElementById('m_iframe').src = 'mega://' + window.location.hash.substr(i);
+        }
+
+        if (intent) {
+            document.getElementById('m_title').innerHTML
+                += '<br/><em>If you already have it installed, <a href="' + intent + '">Click here!</a></em>';
+        }
     }
     if (mobileblog)
     {
         document.body.innerHTML = '';
-        var script = document.createElement('script');
-        script.type = "text/javascript";
-        document.head.appendChild(script);
-        script.src = '/blog.js';
+        mCreateElement('script', {type: 'text/javascript'}, 'head').src = '/blog.js';
     }
 }
 else if (page == '#android')
@@ -828,7 +916,7 @@ else if (!b_u)
     d = localStorage.d || 0;
     var jj = localStorage.jj || 0;
     var onBetaW = location.hostname === 'beta.mega.nz' || location.hostname.indexOf("developers.") === 0;
-    var languages = {'en':['en','en-'],'es':['es','es-'],'fr':['fr','fr-'],'de':['de','de-'],'it':['it','it-'],'nl':['nl','nl-'],'pt':['pt'],'br':['pt-br'],'dk':['da'],'se':['sv'],'fi':['fi'],'no':['no'],'pl':['pl'],'cz':['cz','cz-'],'sk':['sk','sk-'],'sl':['sl','sl-'],'hu':['hu','hu-'],'jp':['ja'],'cn':['zh','zh-cn'],'ct':['zh-hk','zh-sg','zh-tw'],'kr':['ko'],'ru':['ru','ru-mo'],'ar':['ar','ar-'],'he':['he'],'id':['id'],'ca':['ca','ca-'],'eu':['eu','eu-'],'af':['af','af-'],'bs':['bs','bs-'],'sg':[],'tr':['tr','tr-'],'mk':[],'hi':[],'hr':['hr'],'ro':['ro','ro-'],'uk':['||'],'gl':['||'],'sr':['||'],'lt':['||'],'th':['||'],'lv':['||'],'fa':['||'],'ee':['et'],'ms':['ms'],'cy':['cy'],'bg':['bg'],'be':['br'],'tl':['en-ph'],'ka':['||']};
+    var languages = {'en':['en','en-'],'es':['es','es-'],'fr':['fr','fr-'],'de':['de','de-'],'it':['it','it-'],'nl':['nl','nl-'],'pt':['pt'],'br':['pt-br'],'dk':['da'],'se':['sv'],'fi':['fi'],'pl':['pl'],'cz':['cz','cz-'],'sk':['sk','sk-'],'sl':['sl','sl-'],'hu':['hu','hu-'],'jp':['ja'],'cn':['zh','zh-cn'],'ct':['zh-hk','zh-sg','zh-tw'],'kr':['ko'],'ru':['ru','ru-mo'],'ar':['ar','ar-'],'he':['he'],'id':['id'],'sg':[],'tr':['tr','tr-'],'hr':['hr'],'ro':['ro','ro-'],'uk':['||'],'sr':['||'],'th':['||'],'fa':['||'],'ee':['et'],'bg':['bg'],'tl':['en-ph'],'ka':['||'],'vi':['vn', 'vi']};
     if (typeof console == "undefined") { this.console = { log: function() {}, error: function() {}}}
     if (d && !console.time) (function(c)
     {
@@ -842,7 +930,7 @@ else if (!b_u)
         };
     })(console);
 
-    Object.defineProperty(window, "__cd_v", { value : 16, writable : false });
+    Object.defineProperty(window, "__cd_v", { value : 18, writable : false });
     if (!d || onBetaW)
     {
         var __cdumps = [], __cd_t;
@@ -863,7 +951,17 @@ else if (!b_u)
             var dump = {
                 l: ln,
                 f: mTrim(url),
-                m: mTrim(msg).replace(/'(\w+:\/\/+[^/]+?)[^']+(?:'|$)/, "'$1...'")
+                m: mTrim(msg)
+                    .replace(/'[a-z]+:\/+[^']+(?:'|$)/gi, function(url) {
+                        url = url.substr(1);
+                        if (url[url.length - 1] === "'") {
+                            url = url.substr(0, url.length - 1);
+                        }
+                        var a = document.createElement('a');
+                        a.href = url;
+                        return "'" + (a.origin !== 'null' && a.origin
+                            || (a.protocol + '//' + a.hostname)) + "...'";
+                    })
                     .replace(/(Access to '\.\.).*(' from script denied)/, '$1$2')
                     .replace(/gfs\w+\.userstorage/, 'gfs...userstorage')
                     .replace(/^Uncaught\W*(?:exception\W*)?/i, ''),
@@ -871,6 +969,13 @@ else if (!b_u)
             var sbid = +(''+(document.querySelector('script[src*="secureboot"]')||{}).src).split('=').pop()|0;
 
             if (~dump.m.indexOf('[[:i]]')) {
+                return false;
+            }
+            if ((mega.flags & window.MEGAFLAG_MDBOPEN)
+                    && (dump.m === 'InvalidStateError'
+                        || (dump.m === 'UnknownError'))) {
+                // Prevent InvalidStateError exceptions from indexedDB.open
+                // caused while using Private Browser Mode on Firefox.
                 return false;
             }
 
@@ -946,7 +1051,7 @@ else if (!b_u)
 
             __cdumps.push(dump);
             if (__cd_t) clearTimeout(__cd_t);
-            __cd_t = setTimeout(safeCall(function()
+            var report = safeCall(function()
             {
                 function ctx(id)
                 {
@@ -999,8 +1104,10 @@ else if (!b_u)
                 }
                 __cd_t = 0;
                 __cdumps = [];
-
-            }), 3000);
+            });
+            __cd_t = setTimeout(function() {
+                report();
+            }, 3000);
 
             return false;
         };
@@ -1021,20 +1128,19 @@ else if (!b_u)
      * @param {String} language
      * @returns {String}
      */
-    function getLanguageFilePath(language)
-    {
+    function getLanguageFilePath(language) {
+
         // If the sh1 (filename with hashes) array has been created from deploy script
         if (typeof sh1 !== 'undefined') {
 
             // Search the array
-            for (var i = 0, length = sh1.length; i < length; i++)
-            {
+            for (var i = 0, length = sh1.length; i < length; i++) {
+
                 var filePath = sh1[i];
 
                 // If the language e.g. 'en' matches part of the filename from the deploy script e.g.
                 // 'lang/en_0a8e1591149050ef1884b0c4abfbbeb759bbe9eaf062fa54e5b856fdb78e1eb3.json'
-                if (filePath.indexOf('lang/' + language) > -1)
-                {
+                if (filePath.indexOf('lang/' + language) > -1) {
                     return filePath;
                 }
             }
@@ -1061,45 +1167,61 @@ else if (!b_u)
     jsl.push({f: langFilepath, n: 'lang', j:3});
     jsl.push({f:'sjcl.js', n: 'sjcl_js', j:1}); // Will be replaced with asmCrypto soon
     jsl.push({f:'js/mDB.js', n: 'mDB_js', j:1});
-    jsl.push({f:'js/asmcrypto.js',n:'asmcrypto_js',j:1,w:1});
-    jsl.push({f:'js/jquery-2.1.1.js', n: 'jquery', j:1,w:10});
+    jsl.push({f:'js/vendor/asmcrypto.js',n:'asmcrypto_js', j:1, w:1});
+    jsl.push({f:'js/vendor/jquery-2.1.4.js', n: 'jquery', j:1, w:10});
     jsl.push({f:'js/functions.js', n: 'functions_js', j:1});
     jsl.push({f:'js/mega.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/vendor/megaLogger.js', n: 'megaLogger_js', j:1});
     jsl.push({f:'js/tlvstore.js', n: 'tlvstore_js', j:1});
     jsl.push({f:'js/crypto.js', n: 'crypto_js', j:1,w:5});
-    jsl.push({f:'js/jsbn.js', n: 'jsbn_js', j:1,w:2});
-    jsl.push({f:'js/jsbn2.js', n: 'jsbn2_js', j:1,w:2});
+    jsl.push({f:'js/vendor/jsbn.js', n: 'jsbn_js', j:1, w:2});
+    jsl.push({f:'js/vendor/jsbn2.js', n: 'jsbn2_js', j:1, w:2});
     jsl.push({f:'js/vendor/nacl-fast.js', n: 'nacl_js', j:1,w:7});
     jsl.push({f:'js/megaPromise.js', n: 'megapromise_js', j:1,w:5});
-    jsl.push({f:'js/user.js', n: 'user_js', j:1});
+    jsl.push({f:'js/account.js', n: 'user_js', j:1});
     jsl.push({f:'js/authring.js', n: 'authring_js', j:1});
     jsl.push({f:'js/mouse.js', n: 'mouse_js', j:1});
-    jsl.push({f:'js/jquery-ui-1.11.2.js', n: 'jqueryui_js', j:1,w:10});
     jsl.push({f:'js/filedrag.js', n: 'filedrag_js', j:1});
-    jsl.push({f:'js/jquery.mousewheel.js', n: 'jquerymouse_js', j:1});
-    jsl.push({f:'js/jquery.jscrollpane.js', n: 'jscrollpane_js', j:1});
+    jsl.push({f:'js/vendor/jquery-ui-1.11.4.js', n: 'jqueryui_js', j:1, w:10});
+    jsl.push({f:'js/vendor/jquery.mousewheel.js', n: 'jquerymouse_js', j:1});
+    jsl.push({f:'js/vendor/jquery.jscrollpane.js', n: 'jscrollpane_js', j:1});
+    jsl.push({f:'js/vendor/jquery.fullscreen.js', n: 'jquery_fullscreen', j:1, w:10});
     jsl.push({f:'js/jquery.tokeninput.js', n: 'jquerytokeninput_js', j:1});
+    jsl.push({f:'js/jquery.checkboxes.js', n: 'checkboxes_js', j:1});
     jsl.push({f:'js/jquery.misc.js', n: 'jquerymisc_js', j:1});
     jsl.push({f:'js/thumbnail.js', n: 'thumbnail_js', j:1});
-    jsl.push({f:'js/exif.js', n: 'exif_js', j:1,w:3});
-    jsl.push({f:'js/megapix.js', n: 'megapix_js', j:1});
-    jsl.push({f:'js/smartcrop.js', n: 'smartcrop_js', j:1,w:7});
-    jsl.push({f:'js/jquery.fullscreen.js', n: 'jquery_fullscreen', j:1,w:10});
+    jsl.push({f:'js/vendor/exif.js', n: 'exif_js', j:1, w:3});
+    jsl.push({f:'js/vendor/megapix.js', n: 'megapix_js', j:1});
+    jsl.push({f:'js/vendor/smartcrop.js', n: 'smartcrop_js', j:1, w:7});
     jsl.push({f:'js/jquery.qrcode.js', n: 'jqueryqrcode', j:1});
     jsl.push({f:'js/vendor/qrcode.js', n: 'qrcode', j:1,w:2, g: 'vendor'});
-    jsl.push({f:'js/bitcoin-math.js', n: 'bitcoinmath', j:1 });
+    jsl.push({f:'js/vendor/bitcoin-math.js', n: 'bitcoinmath', j:1 });
     jsl.push({f:'js/paycrypt.js', n: 'paycrypt_js', j:1 });
-    jsl.push({f:'js/vendor/jquery.window-active.js', n: 'jquery_windowactive', j:1,w:2});
     jsl.push({f:'js/vendor/db.js', n: 'db_js', j:1,w:5});
     jsl.push({f:'js/megaDbEncryptionPlugin.js', n: 'megadbenc_js', j:1,w:5});
     jsl.push({f:'js/megaDb.js', n: 'megadb_js', j:1,w:5});
     jsl.push({f:'js/megaKvStorage.js', n: 'megakvstorage_js', j:1,w:5});
 
+    // notifications
+    jsl.push({f:'js/megaNotifications.js', n: 'meganotifications_js', j:1,w:7});
+    jsl.push({f:'js/vendor/ion.sound.js', n: 'ionsound_js', j:1,w:7});
+    jsl.push({f:'js/vendor/favico.js', n: 'favico_js', j:1,w:7});
+    jsl.push({f:'js/vendor/notification.js', n: 'notification_js', j:1,w:7});
+
+    // Other
+    jsl.push({f:'js/vendor/Autolinker.js', n: 'mega_js', j:1,w:7});
+
+    // Google Import Contacts
+    jsl.push({f:'js/gContacts.js', n: 'gcontacts_js', j:1,w:3});
+
+    // MEGA CHAT
     jsl.push({f:'js/chat/mpenc.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/chat/opQueue.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/chat/rtcStats.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/chat/rtcSession.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/chat/fileTransfer.js', n: 'mega_js', j:1,w:7});
 
-    jsl.push({f:'js/vendor/chat/strophe.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/vendor/chat/strophe.light.js', n: 'mega_js', j:1, w:7});
     jsl.push({f:'js/vendor/chat/strophe.disco.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/vendor/chat/strophe.jingle.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/vendor/chat/strophe.jingle.session.js', n: 'mega_js', j:1,w:7});
@@ -1116,30 +1238,6 @@ else if (!b_u)
     jsl.push({f:'js/vendor/chat/cryptojs-sha1.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/vendor/chat/cryptojs-hmac.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/vendor/chat/cryptojs-lib-typedarrays.js', n: 'mega_js', j:1,w:7});
-
-    // Other
-    jsl.push({f:'js/vendor/Autolinker.js', n: 'mega_js', j:1,w:7});
-
-    // Google Import Contacts
-    jsl.push({f:'js/gContacts.js', n: 'gcontacts_js', j:1,w:3});
-
-    // MEGA CHAT
-    jsl.push({f:'js/chat/rtcStats.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/chat/rtcSession.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/chat/fileTransfer.js', n: 'mega_js', j:1,w:7});
-
-    jsl.push({f:'js/ui/filepicker.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/ui/dialog.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/ui/feedbackDialog.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/ui/credentialsWarningDialog.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/ui/loginRequiredDialog.js', n: 'mega_js', j:1,w:7});
-    jsl.push({f:'js/chat/ui/incomingCallDialog.js', n: 'mega_js', j:1,w:7});
-
-    // notifications
-    jsl.push({f:'js/megaNotifications.js', n: 'meganotifications_js', j:1,w:7});
-    jsl.push({f:'js/vendor/ion.sound.js', n: 'ionsound_js', j:1,w:7});
-    jsl.push({f:'js/vendor/favico.js', n: 'favico_js', j:1,w:7});
-    jsl.push({f:'js/vendor/notification.js', n: 'notification_js', j:1,w:7});
 
     jsl.push({f:'js/chat/plugins/karerePing.js', n: 'karerePing_js', j:1,w:7});
     jsl.push({f:'js/chat/plugins/callManager.js', n: 'callManager_js', j:1,w:7});
@@ -1159,12 +1257,23 @@ else if (!b_u)
 
     // END OF MEGA CHAT
 
+    // UI Elements
+    jsl.push({f:'js/ui/filepicker.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/ui/dialog.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/ui/feedbackDialog.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/ui/credentialsWarningDialog.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/ui/keySignatureWarningDialog.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/ui/loginRequiredDialog.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/chat/ui/incomingCallDialog.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/ui/feedbackDialog.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/ui/languageDialog.js', n: 'mega_js', j:1,w:7});
+
     jsl.push({f:'js/fm.js', n: 'fm_js', j:1,w:12});
     jsl.push({f:'js/filetypes.js', n: 'filetypes_js', j:1});
-    jsl.push({f:'js/miniui.js', n: 'miniui_js', j:1});
+    jsl.push({f:'js/ui/miniui.js', n: 'miniui_js', j:1});
     if (is_extension)
     {
-        jsl.push({f:'js/dcraw.js', n: 'dcraw_js', j:1});
+        jsl.push({f:'js/vendor/dcraw.js', n: 'dcraw_js', j:1});
     }
     /* better download */
     jsl.push({f:'js/xhr.js', n: 'xhr_js', j:1});
@@ -1201,12 +1310,11 @@ else if (!b_u)
     jsl.push({f:'js/vendor/popunda.js', n: 'popunda_js', j:1});
     jsl.push({f:'css/style.css', n: 'style_css', j:2,w:30,c:1,d:1,cache:1});
     jsl.push({f:'js/useravatar.js', n: 'contact_avatar_js', j:1,w:3});
-    jsl.push({f:'js/avatar.js', n: 'avatar_js', j:1,w:3});
+    jsl.push({f:'js/vendor/avatar.js', n: 'avatar_js', j:1, w:3});
     jsl.push({f:'js/countries.js', n: 'countries_js', j:1});
     jsl.push({f:'html/dialogs.html', n: 'dialogs', j:0,w:2});
     jsl.push({f:'html/transferwidget.html', n: 'transferwidget', j:0});
-    jsl.push({f:'js/jquery.checkboxes.js', n: 'checkboxes_js', j:1});
-    jsl.push({f:'js/Int64.js', n: 'int64_js', j:1});
+    jsl.push({f:'js/vendor/Int64.js', n: 'int64_js', j:1});
     jsl.push({f:'js/zip64.js', n: 'zip_js', j:1});
     jsl.push({f:'js/cms.js', n: 'cms_js', j:1});
     jsl.push({f:'js/megasync.js', n: 'megasync_js', j:1});
@@ -1239,7 +1347,7 @@ else if (!b_u)
         'cancel_js': {f:'html/js/cancel.js', n: 'cancel_js', j:1},
         'reset': {f:'html/reset.html', n: 'reset', j:0},
         'reset_js': {f:'html/js/reset.js', n: 'reset_js', j:1},
-        'filesaver': {f:'js/filesaver.js', n: 'filesaver', j:1},
+        'filesaver': {f:'js/vendor/filesaver.js', n: 'filesaver', j:1},
         'recovery': {f:'html/recovery.html', n: 'recovery', j:0},
         'recovery_js': {f:'html/js/recovery.js', n: 'recovery_js', j:1},
         'credits': {f:'html/credits.html', n: 'credits', j:0},
@@ -1255,7 +1363,7 @@ else if (!b_u)
         'contact': {f:'html/contact.html', n: 'contact', j:0},
         'privacycompany': {f:'html/privacycompany.html', n: 'privacycompany', j:0},
         'chrome': {f:'html/chrome.html', n: 'chrome', j:0},
-        'zxcvbn_js': {f:'js/zxcvbn.js', n: 'zxcvbn_js', j:1}
+        'zxcvbn_js': {f:'js/vendor/zxcvbn.js', n: 'zxcvbn_js', j:1}
     };
 
     var subpages =
@@ -1373,7 +1481,6 @@ else if (!b_u)
 
     if (jj)
     {
-        var headElement = document.querySelector("head");
         var _queueWaitToBeLoaded = function(id, elem) {
             waitingToBeLoaded++;
             elem.onload = function() {
@@ -1381,27 +1488,23 @@ else if (!b_u)
                 if (--waitingToBeLoaded == 0) {
                     jj_done = true;
                     boot_done();
-                    _queueWaitToBeLoaded = headElement = undefined;
+                    _queueWaitToBeLoaded = createScriptTag = createStyleTag = undefined;
                 }
                 elem.onload = null;
             };
         };
 
         var createScriptTag = function(id, src) {
-            var elem = document.createElement("script");
-            _queueWaitToBeLoaded(id, elem);
+            var elem = mCreateElement('script', {type: 'text/javascript'}, 'head');
             elem.async = false;
+            _queueWaitToBeLoaded(id, elem);
             elem.src = src;
-            headElement.appendChild(elem);
             return elem;
         };
         var createStyleTag = function(id, src) {
-            var elem = document.createElement("link");
-            elem.rel = "stylesheet";
-            elem.type = "text/css";
+            var elem = mCreateElement('link', {type: 'text/css', rel: "stylesheet"}, 'head');
             _queueWaitToBeLoaded(id, elem);
             elem.href = src;
-            headElement.appendChild(elem);
             return elem;
         };
 
@@ -1709,6 +1812,7 @@ else if (!b_u)
         }
         else
         {
+            // AMO Warning: Use of `document.write` strongly discouraged -- This isnt reached for the extension, anyway
             document.write('<link rel="stylesheet" type="text/css" href="' + staticpath + 'css/mobile-android.css" /><div class="overlay"></div><div class="new-folder-popup" id="message"><div class="new-folder-popup-bg"><div class="new-folder-header">MEGA for Android</div><div class="new-folder-main-bg"><div class="new-folder-descr">Do you want to install the latest<br/> version of the MEGA app for Android?</div><a class="new-folder-input left-button" id="trashbinYes"> <span class="new-folder-bg1"> <span class="new-folder-bg2" id="android_yes"> Yes </span> </span></a><a class="new-folder-input right-button" id="trashbinNo"> <span class="new-folder-bg1"> <span class="new-folder-bg2" id="android_no">No </span> </span></a><div class="clear"></div></div></div></div></div>');
             document.getElementById('android_yes').addEventListener("click", function ()
             {
@@ -1728,7 +1832,7 @@ else if (!b_u)
         if (document.location.href.substr(0,19) == 'chrome-extension://')  istaticpath = '../';
         else if (is_chrome_firefox) istaticpath = 'chrome://mega/content/';
 
-        mCreateElement('style', {type: 'text/css'}, 'body').textContent = '.div, span, input {outline: none;}.hidden {display: none;}.clear {clear: both;margin: 0px;padding: 0px;display: block;}.loading-main-block {width: 100%;height: 100%;overflow: auto;font-family:Arial, Helvetica, sans-serif;}.loading-mid-white-block {height: 100%;width:100%;}.mid-centered-block {position: absolute;width: 494px;min-height: 158px;top: 50%;left: 50%;margin: -95px 0 0 -247px;}.loading-main-bottom {max-width: 940px;width: 100%;position: absolute;bottom: 20px;left: 50%;margin: 0 0 0 -470px;text-align: center;}.loading-bottom-button {height: 29px;width: 29px;float: left;background-image: url(' + istaticpath + 'images/mega/loading-sprite1.png);background-repeat: no-repeat;cursor: pointer;}.st-social-block-load {position: absolute;bottom: 20px;left: 0;width: 100%;height: 43px;text-align: center;}.st-bottom-button {height: 29px;width: 29px;display: inline-block;background-image: url(' + istaticpath + 'images/mega/new-startpage-spite1.png?v=1);background-repeat: no-repeat;cursor: pointer;}.st-bottom-button.st-google-button {background-position: -93px -1233px;position: relative;margin: 0 5px;}.st-bottom-button.st-google-button:hover {background-position: -93px -1173px;}.st-bottom-button.st-facebook-button {background-position: -49px -1233px;margin: 0 5px;}.st-bottom-button.st-facebook-button:hover {background-position: -49px -1173px;}.st-bottom-button.st-twitter-button {background-position: left -1233px;margin: 0 5px;}.st-bottom-button.st-twitter-button:hover {background-position: left -1173px;}.loading-cloud {width: 222px;height: 158px;background-image: url(' + istaticpath + 'images/mega/loading-sprite1.png);background-repeat: no-repeat;background-position: 0 -2128px;margin: 0 auto;-webkit-box-sizing: border-box;-moz-box-sizing: border-box;-ms-box-sizing: border-box;box-sizing: border-box;padding-top: 55px;}.loading-progress-bar, .loading-progress-bar div {width: 80px;height: 80px;margin: 0 0 0 71px;background-image: url(' + istaticpath + 'images/mega/loading-sprite1.png);background-repeat: no-repeat;background-position: 0 top;}.loading-progress-bar div {background-position: -71px -2183px;margin: 0;}.maintance-block {position: absolute;width: 484px;min-height: 94px;border: 2px solid #d9d9d9;-moz-border-radius: 7px;-webkit-border-radius: 7px;border-radius: 7px;padding: 10px;color: #333333;font-size: 13px;line-height: 30px;padding: 15px 15px 15px 102px;-webkit-box-sizing: border-box;-moz-box-sizing: border-box;-ms-box-sizing: border-box;box-sizing: border-box;background-image: url(' + istaticpath + 'images/mega/loading-sprite1.png);background-repeat: no-repeat;background-position: -60px -2428px;margin-top: 45px;}.loading-progress-bar.percents-0 {background-position: 0 0;}.loading-progress-bar.percents-1, .loading-progress-bar.percents-2, .loading-progress-bar.percents-3 {background-position: -130px 0;}.loading-progress-bar.percents-4, .loading-progress-bar.percents-5, .loading-progress-bar.percents-6 {background-position: 0 -100px;}.loading-progress-bar.percents-7, .loading-progress-bar.percents-8, .loading-progress-bar.percents-9 {background-position: -130px -100px;}.loading-progress-bar.percents-10, .loading-progress-bar.percents-11, .loading-progress-bar.percents-12 {background-position: 0 -200px;}.loading-progress-bar.percents-13, .loading-progress-bar.percents-14, .loading-progress-bar.percents-15 {background-position: -130px -200px;}.loading-progress-bar.percents-16, .loading-progress-bar.percents-17, .loading-progress-bar.percents-18 {background-position: 0 -300px;}.loading-progress-bar.percents-19, .loading-progress-bar.percents-20, .loading-progress-bar.percents-21 {background-position: -130px -300px;}.loading-progress-bar.percents-22, .loading-progress-bar.percents-23, .loading-progress-bar.percents-24 {background-position: 0 -400px;}.loading-progress-bar.percents-25, .loading-progress-bar.percents-26, .loading-progress-bar.percents-27 {background-position: -130px -400px;}.loading-progress-bar.percents-28, .loading-progress-bar.percents-29, .loading-progress-bar.percents-30 {background-position: 0 -500px;}.loading-progress-bar.percents-31, .loading-progress-bar.percents-32, .loading-progress-bar.percents-33 {background-position: -130px -500px;}.loading-progress-bar.percents-34, .loading-progress-bar.percents-35 {background-position: 0 -600px;}.loading-progress-bar.percents-36, .loading-progress-bar.percents-37 {background-position: -130px -600px;}.loading-progress-bar.percents-38, .loading-progress-bar.percents-39 {background-position: 0 -700px;}.loading-progress-bar.percents-40, .loading-progress-bar.percents-41 {background-position: -130px -700px;}.loading-progress-bar.percents-42, .loading-progress-bar.percents-43 {background-position: 0 -800px;}.loading-progress-bar.percents-44, .loading-progress-bar.percents-45 {background-position: -130px -800px;}.loading-progress-bar.percents-46, .loading-progress-bar.percents-47 {background-position: 0 -900px;}.loading-progress-bar.percents-48, .loading-progress-bar.percents-49 {background-position: -130px -900px;}.loading-progress-bar.percents-50 {background-position: 0 -1000px;}.loading-progress-bar.percents-51, .loading-progress-bar.percents-52, .loading-progress-bar.percents-53 {background-position: -130px -1000px;}.loading-progress-bar.percents-54, .loading-progress-bar.percents-55, .loading-progress-bar.percents-56 {background-position: 0 -1100px;}.loading-progress-bar.percents-57, .loading-progress-bar.percents-58, .loading-progress-bar.percents-59 {background-position: -130px -1100px;}.loading-progress-bar.percents-60, .loading-progress-bar.percents-61, .loading-progress-bar.percents-62 {background-position: 0 -1200px;}.loading-progress-bar.percents-63, .loading-progress-bar.percents-64, .loading-progress-bar.percents-65 {background-position: -130px -1200px;}.loading-progress-bar.percents-66, .loading-progress-bar.percents-67, .loading-progress-bar.percents-68 {background-position: 0 -1300px;}.loading-progress-bar.percents-69, .loading-progress-bar.percents-70, .loading-progress-bar.percents-71 {background-position: -130px -1300px;}.loading-progress-bar.percents-72, .loading-progress-bar.percents-73, .loading-progress-bar.percents-74 {background-position: 0 -1400px;}.loading-progress-bar.percents-75, .loading-progress-bar.percents-76, .loading-progress-bar.percents-77 {background-position: -130px -1400px;}.loading-progress-bar.percents-78, .loading-progress-bar.percents-79, .loading-progress-bar.percents-80 {background-position: 0 -1500px;}.loading-progress-bar.percents-81, .loading-progress-bar.percents-82, .loading-progress-bar.percents-83 {background-position: -130px -1500px;}.loading-progress-bar.percents-84, .loading-progress-bar.percents-85, .loading-progress-bar.percents-86 {background-position: 0 -1600px;}.loading-progress-bar.percents-87, .loading-progress-bar.percents-88, .loading-progress-bar.percents-89 {background-position: -130px -1600px;}.loading-progress-bar.percents-90, .loading-progress-bar.percents-91, .loading-progress-bar.percents-92 {background-position: 0 -1800px;}.loading-progress-bar.percents-93, .loading-progress-bar.percents-94, .loading-progress-bar.percents-95 {background-position: -130px -1800px;}.loading-progress-bar.percents-96, .loading-progress-bar.percents-97 {background-position: 0 -1900px;}.loading-progress-bar.percents-98, .loading-progress-bar.percents-99 {background-position: -130px -1900px;}.loading-progress-bar.percents-100 {background-position: 0 -2000px;}.follow-txt {text-decoration:none; line-height: 28px; float:right; color:#666666; font-size:12px;}@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {.maintance-block, .loading-progress-bar, .loading-progress-bar div, .loading-cloud, .loading-bottom-button {background-image: url(' + istaticpath + 'images/mega/loading-sprite1@2x.png);    background-size: 222px auto;}.st-bottom-button, .st-bottom-scroll-button {background-image: url(' + istaticpath + 'images/mega/new-startpage-spite1@2x.png?v=1);background-size: 356px auto;}}';
+        mCreateElement('style', {type: 'text/css'}, 'body').textContent = '.div, span, input {outline: none;}.hidden {display: none;}.clear {clear: both;margin: 0px;padding: 0px;display: block;}.loading-main-block {width: 100%;height: 100%;overflow: auto;font-family:Arial, Helvetica, sans-serif;}.loading-mid-white-block {height: 100%;width:100%;}.mid-centered-block {position: absolute;width: 494px;min-height: 158px;top: 50%;left: 50%;margin: -95px 0 0 -247px;}.loading-main-bottom {max-width: 940px;width: 100%;position: absolute;bottom: 20px;left: 50%;margin: 0 0 0 -470px;text-align: center;}.loading-bottom-button {height: 29px;width: 29px;float: left;background-image: url(' + istaticpath + 'images/mega/loading-sprite1.png);background-repeat: no-repeat;cursor: pointer;}.st-social-block-load {position: absolute;bottom: 20px;left: 0;width: 100%;height: 43px;text-align: center;}.st-bottom-button {height: 29px;width: 29px;display: inline-block;background-image: url(' + istaticpath + 'images/mega/new-startpage-sprite-v2.png);background-repeat: no-repeat;cursor: pointer;}.st-bottom-button.st-google-button {background-position: -93px -1233px;position: relative;margin: 0 5px;}.st-bottom-button.st-google-button:hover {background-position: -93px -1173px;}.st-bottom-button.st-facebook-button {background-position: -49px -1233px;margin: 0 5px;}.st-bottom-button.st-facebook-button:hover {background-position: -49px -1173px;}.st-bottom-button.st-twitter-button {background-position: left -1233px;margin: 0 5px;}.st-bottom-button.st-twitter-button:hover {background-position: left -1173px;}.loading-cloud {width: 222px;height: 158px;background-image: url(' + istaticpath + 'images/mega/loading-sprite1.png);background-repeat: no-repeat;background-position: 0 -2128px;margin: 0 auto;-webkit-box-sizing: border-box;-moz-box-sizing: border-box;-ms-box-sizing: border-box;box-sizing: border-box;padding-top: 55px;}.loading-progress-bar, .loading-progress-bar div {width: 80px;height: 80px;margin: 0 0 0 71px;background-image: url(' + istaticpath + 'images/mega/loading-sprite1.png);background-repeat: no-repeat;background-position: 0 top;}.loading-progress-bar div {background-position: -71px -2183px;margin: 0;}.maintance-block {position: absolute;width: 484px;min-height: 94px;border: 2px solid #d9d9d9;-moz-border-radius: 7px;-webkit-border-radius: 7px;border-radius: 7px;padding: 10px;color: #333333;font-size: 13px;line-height: 30px;padding: 15px 15px 15px 102px;-webkit-box-sizing: border-box;-moz-box-sizing: border-box;-ms-box-sizing: border-box;box-sizing: border-box;background-image: url(' + istaticpath + 'images/mega/loading-sprite1.png);background-repeat: no-repeat;background-position: -60px -2428px;margin-top: 45px;}.loading-progress-bar.percents-0 {background-position: 0 0;}.loading-progress-bar.percents-1, .loading-progress-bar.percents-2, .loading-progress-bar.percents-3 {background-position: -130px 0;}.loading-progress-bar.percents-4, .loading-progress-bar.percents-5, .loading-progress-bar.percents-6 {background-position: 0 -100px;}.loading-progress-bar.percents-7, .loading-progress-bar.percents-8, .loading-progress-bar.percents-9 {background-position: -130px -100px;}.loading-progress-bar.percents-10, .loading-progress-bar.percents-11, .loading-progress-bar.percents-12 {background-position: 0 -200px;}.loading-progress-bar.percents-13, .loading-progress-bar.percents-14, .loading-progress-bar.percents-15 {background-position: -130px -200px;}.loading-progress-bar.percents-16, .loading-progress-bar.percents-17, .loading-progress-bar.percents-18 {background-position: 0 -300px;}.loading-progress-bar.percents-19, .loading-progress-bar.percents-20, .loading-progress-bar.percents-21 {background-position: -130px -300px;}.loading-progress-bar.percents-22, .loading-progress-bar.percents-23, .loading-progress-bar.percents-24 {background-position: 0 -400px;}.loading-progress-bar.percents-25, .loading-progress-bar.percents-26, .loading-progress-bar.percents-27 {background-position: -130px -400px;}.loading-progress-bar.percents-28, .loading-progress-bar.percents-29, .loading-progress-bar.percents-30 {background-position: 0 -500px;}.loading-progress-bar.percents-31, .loading-progress-bar.percents-32, .loading-progress-bar.percents-33 {background-position: -130px -500px;}.loading-progress-bar.percents-34, .loading-progress-bar.percents-35 {background-position: 0 -600px;}.loading-progress-bar.percents-36, .loading-progress-bar.percents-37 {background-position: -130px -600px;}.loading-progress-bar.percents-38, .loading-progress-bar.percents-39 {background-position: 0 -700px;}.loading-progress-bar.percents-40, .loading-progress-bar.percents-41 {background-position: -130px -700px;}.loading-progress-bar.percents-42, .loading-progress-bar.percents-43 {background-position: 0 -800px;}.loading-progress-bar.percents-44, .loading-progress-bar.percents-45 {background-position: -130px -800px;}.loading-progress-bar.percents-46, .loading-progress-bar.percents-47 {background-position: 0 -900px;}.loading-progress-bar.percents-48, .loading-progress-bar.percents-49 {background-position: -130px -900px;}.loading-progress-bar.percents-50 {background-position: 0 -1000px;}.loading-progress-bar.percents-51, .loading-progress-bar.percents-52, .loading-progress-bar.percents-53 {background-position: -130px -1000px;}.loading-progress-bar.percents-54, .loading-progress-bar.percents-55, .loading-progress-bar.percents-56 {background-position: 0 -1100px;}.loading-progress-bar.percents-57, .loading-progress-bar.percents-58, .loading-progress-bar.percents-59 {background-position: -130px -1100px;}.loading-progress-bar.percents-60, .loading-progress-bar.percents-61, .loading-progress-bar.percents-62 {background-position: 0 -1200px;}.loading-progress-bar.percents-63, .loading-progress-bar.percents-64, .loading-progress-bar.percents-65 {background-position: -130px -1200px;}.loading-progress-bar.percents-66, .loading-progress-bar.percents-67, .loading-progress-bar.percents-68 {background-position: 0 -1300px;}.loading-progress-bar.percents-69, .loading-progress-bar.percents-70, .loading-progress-bar.percents-71 {background-position: -130px -1300px;}.loading-progress-bar.percents-72, .loading-progress-bar.percents-73, .loading-progress-bar.percents-74 {background-position: 0 -1400px;}.loading-progress-bar.percents-75, .loading-progress-bar.percents-76, .loading-progress-bar.percents-77 {background-position: -130px -1400px;}.loading-progress-bar.percents-78, .loading-progress-bar.percents-79, .loading-progress-bar.percents-80 {background-position: 0 -1500px;}.loading-progress-bar.percents-81, .loading-progress-bar.percents-82, .loading-progress-bar.percents-83 {background-position: -130px -1500px;}.loading-progress-bar.percents-84, .loading-progress-bar.percents-85, .loading-progress-bar.percents-86 {background-position: 0 -1600px;}.loading-progress-bar.percents-87, .loading-progress-bar.percents-88, .loading-progress-bar.percents-89 {background-position: -130px -1600px;}.loading-progress-bar.percents-90, .loading-progress-bar.percents-91, .loading-progress-bar.percents-92 {background-position: 0 -1800px;}.loading-progress-bar.percents-93, .loading-progress-bar.percents-94, .loading-progress-bar.percents-95 {background-position: -130px -1800px;}.loading-progress-bar.percents-96, .loading-progress-bar.percents-97 {background-position: 0 -1900px;}.loading-progress-bar.percents-98, .loading-progress-bar.percents-99 {background-position: -130px -1900px;}.loading-progress-bar.percents-100 {background-position: 0 -2000px;}.follow-txt {text-decoration:none; line-height: 28px; float:right; color:#666666; font-size:12px;}@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {.maintance-block, .loading-progress-bar, .loading-progress-bar div, .loading-cloud, .loading-bottom-button {background-image: url(' + istaticpath + 'images/mega/loading-sprite1@2x.png);    background-size: 222px auto;}.st-bottom-button, .st-bottom-scroll-button {background-image: url(' + istaticpath + 'images/mega/new-startpage-sprite-v2@2x.png);background-size: 356px auto;}}';
 
         mCreateElement('div', { "class": "loading-main-block", id: "loading"}, 'body')
             .innerHTML =
@@ -1768,13 +1872,17 @@ else if (!b_u)
                 catch (e) {}
             }
             boot_done();
-        }
+        };
         lxhr.onerror = function()
         {
             loginresponse= false;
             boot_done();
-        }
-        lxhr.open("POST", apipath + 'cs?id=0&sid='+u_storage.sid, true);
+        };
+
+        // If using extension this is passed through to the API for the helpdesk tool
+        var usingExtension = (is_extension) ? '&ext=1' : '';
+
+        lxhr.open('POST', apipath + 'cs?id=0&sid=' + u_storage.sid + usingExtension, true);
         lxhr.send(JSON.stringify([{'a':'ug'}]));
     }
     function boot_auth(u_ctx,r)
@@ -1824,24 +1932,31 @@ else if (!b_u)
             dl_res= false;
             boot_done();
         };
-        dlxhr.open("POST", apipath + 'cs?id=0&domain=meganz', true);
+
+        // If using extension this is passed through to the API for the helpdesk tool
+        var usingExtension = (is_extension) ? '&ext=1' : '';
+
+        dlxhr.open("POST", apipath + 'cs?id=0&domain=meganz' + usingExtension, true);
         dlxhr.send(JSON.stringify([{ 'a': 'g', p: page.substr(1,8), 'ad': showAd() }]));
     }
 }
 
 /**
  * Determines whether to show an ad or not
- * @returns {Number} Returns a 0 for no ads, 1 will enable ads dependant on country, 2 will always show ads
+ * @returns {number} Returns a 0 for definitely no ads (e.g. I am using an extension). 1 will enable ads dependent on
+ *                   country. 2 ignores country limitations (for developers to always see ads regardless). 3 means I
+ *                   prefer not to see an ad because I am logged in, but it will send one if it is a trusted ad that we
+ *                   have vetted (we fully control the ad and host it ourselves) and ads are turned on in the API.
  */
 function showAd() {
 
-    // We need to tell the API we would like ad urls, but only if we are not logged in
-    var showAd = (typeof u_sid === 'undefined') ? 1 : 0;
+    // We need to tell the API we would like ad urls, but only show generic ads from providers if we are not logged in
+    var showAd = (typeof u_sid === 'undefined') ? 1 : 3;
 
-    // If using a browser extension, do not show ads
+    // If using a browser extension, do not show ads at all for our security conscious users
     showAd = (is_extension) ? 0 : showAd;
 
-    // Override for testing, 0 for no ads, 1 is normal (enabled dependant on country), 2 is ads always on
+    // Override for testing
     showAd = (typeof localStorage.testAds === 'undefined') ? showAd : parseInt(localStorage.testAds);
 
     return showAd;

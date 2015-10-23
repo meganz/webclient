@@ -34,12 +34,10 @@ var notify = {
      */
     init: function() {
 
-        notify.initialLoadComplete = false;
-
         // Cache lookups
-        this.$popup = $('.top-head .notification-popup');
-        this.$popupIcon = $('.top-head .cloud-popup-icon');
-        this.$popupNum = $('.top-head .notification-num');
+        notify.$popup = $('.top-head .notification-popup');
+        notify.$popupIcon = $('.top-head .cloud-popup-icon');
+        notify.$popupNum = $('.top-head .notification-num');
         
         // Init event handler to open popup
         notify.initNotifyIconClickHandler();
@@ -59,7 +57,7 @@ var notify = {
         // Call API to fetch the most recent notifications
         api_req('c=' + notify.numOfNotifications, {
             callback: function(result) {
-                
+
                 // Check it wasn't a negative number error response
                 if (typeof result !== 'object') {
                     return false;
@@ -99,9 +97,6 @@ var notify = {
                 
                 // Show the notifications
                 notify.countAndShowNewNotifications();
-
-                // Mark the initial load complete so that incoming actionpackets after this time generate notifications
-                notify.initialLoadComplete = true;
             }
         }, 3);  // Channel 3
     },
@@ -362,7 +357,7 @@ var notify = {
             $notificationHtml = notify.updateTemplate($notificationHtml, notification);
             
             // Build the html
-            allNotificationsHtml += notify.getOuterHtml($notificationHtml);
+            allNotificationsHtml += $notificationHtml.prop('outerHTML');
         }
         
         // Update the list of notifications
@@ -448,16 +443,6 @@ var notify = {
             // Mark all notifications as seen (because they clicked on a notification within the popup)
             notify.markAllNotificationsAsSeen();
         });
-    },
-    
-    /**
-     * Gets the outer HTML of an element
-     * @param {Object} $element The jQuery element $('<div class="notification-item">...</div>')
-     * @returns {String} Returns just the outer HTML '<div class="notification-item">...</div>'
-     */
-    getOuterHtml: function($element)
-    {
-        return $element.clone().wrap('<div>').parent().html();
     },
     
     /**

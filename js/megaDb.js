@@ -54,6 +54,7 @@ function MegaDB(name, suffix, schema, options) {
     __dbOpen();
 
     function __dbOpenFailed(dbError) {
+        mega.flags &= ~MEGAFLAG_MDBOPEN;
         self.dbState = MegaDB.DB_STATE.FAILED_TO_INITIALIZE;
         self.logger.error("Could not initialise MegaDB: ", arguments, name, version, schema);
         self.trigger('onDbStateFailed', dbError);
@@ -63,6 +64,7 @@ function MegaDB(name, suffix, schema, options) {
         self.currentVersion = version;
         self.dbName = dbName;
         self.dbState = MegaDB.DB_STATE.INITIALIZED;
+        mega.flags &= ~MEGAFLAG_MDBOPEN;
         self.trigger('onDbStateReady');
         self.initialize();
     }
@@ -78,6 +80,7 @@ function MegaDB(name, suffix, schema, options) {
             });
     }
     function __dbOpen() {
+        mega.flags = MEGAFLAG_MDBOPEN;
         dbOpenOptions.version = version;
 
         self.logger.debug('Opening DB', version, dbOpenOptions);

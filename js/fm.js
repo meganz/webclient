@@ -7462,7 +7462,10 @@ function initShareDialogMultiInputPlugin() {
             }, 3000);
         }
 
-        $('.share-multiple-input').tokenInput(contacts, {
+        var $input = $('.share-multiple-input');
+        var $scope = $input.parents('.share-dialog');
+
+        $input.tokenInput(contacts, {
             theme: "mega",
             hintText: l[5908],
             // placeholder: "Type in an email or contact",
@@ -7481,8 +7484,20 @@ function initShareDialogMultiInputPlugin() {
             scrollLocation: 'share',
             // Exclude from dropdownlist only emails/names which exists in multi-input (tokens)
             excludeCurrent: true,
+
             onEmailCheck: function() {
                 errorMsg(l[7415]); // Looks like there's a malformed email
+            },
+            onReady: function() {
+                var $this = $scope.find('li input');
+                $this.rebind('keyup', function() {
+                    var value = $.trim($this.val());
+                    if ($scope.find('li.token-input-token-mega').length > 0 || checkMail(value) === false) {
+                        $scope.find('.dialog-share-button').removeClass('disabled');
+                    } else {
+                        $scope.find('.dialog-share-button').addClass('disabled');
+                    }
+                });
             },
             onDoublet: function(u) {
                 errorMsg(l[7413]); // You already have a contact with that email

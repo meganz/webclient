@@ -3241,6 +3241,7 @@ function accountUI()
             // Expire all sessions but not the current one
             api_req({ a: 'usr', ko: 1 }, {
                 callback: function() {
+                    M.account = null; /* clear account cache */
                     $activeSessionsRows.find('.settings-logout').remove();
                     $activeSessionsRows.find('.active-session-txt').removeClass('active-session-txt')
                         .addClass('expired-session-txt').text(l[1664]);
@@ -3262,6 +3263,7 @@ function accountUI()
                  */
                 api_req({ a: 'usr', s: [sessionId] }, {
                     callback: function(res, ctx) {
+                        M.account = null; /* clear account cache */
                         $this.find('.settings-logout').remove();
                         $this.find('.active-session-txt').removeClass('active-session-txt')
                             .addClass('expired-session-txt').text(l[1664]);

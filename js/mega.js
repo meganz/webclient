@@ -1590,7 +1590,11 @@ function MegaData()
         }
         // If a folderlink, and entering a new folder.
         if (pfid && this.currentrootid === this.RootID) {
-            window.location.hash = '#F!' + pfid + '!' + pfkey + '!' + M.currentdirid;
+            var target = '';
+            if (this.currentdirid !== this.RootID) {
+                target = '!' +  this.currentdirid;
+            }
+            window.location.hash = '#F!' + pfid + '!' + pfkey + target;
         }
         else {
             window.location.hash = '#fm/' + M.currentdirid;

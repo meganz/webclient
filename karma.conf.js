@@ -189,12 +189,25 @@ module.exports = function(config) {
     // - Safari (only Mac; has to be installed with `npm install karma-safari-launcher`)
     // - PhantomJS
     // - IE (only Windows; has to be installed with `npm install karma-ie-launcher`)
-    browsers: ['PhantomJS2', 'PhantomJS2_custom', 'Firefox', 'Firefox_Extension', 'Chrome'],
+    browsers: [
+        'PhantomJS2',
+        'PhantomJS2_custom',
+        'Firefox',
+        'Firefox_Extension',
+        'Firefox_NoCookies',
+        'Chrome'
+    ],
 
     customLaunchers: {
         'PhantomJS2_custom': {
             base: 'PhantomJS2',
             flags: ['--local-storage-path=./test/phantomjs-storage']
+        },
+        'Firefox_NoCookies': {
+            base: 'Firefox',
+            prefs: {
+                'network.cookie.cookieBehavior': 2
+            }
         },
         'Firefox_Extension': {
             base: (process.env.FXEXTBASE || 'FirefoxDeveloper'),

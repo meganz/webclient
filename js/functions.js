@@ -27,6 +27,7 @@ makeEnum(['MDBOPEN'], 'MEGAFLAG_', window);
  *     URLs should be processed. Note that this will not work for
  *     XML fragments.
  * @param {boolean} isXML If true, parse the fragment as XML.
+ * @returns {DocumentFragment}
  */
 function parseHTML(markup, forbidStyle, doc, baseURI, isXML) {
     if (!doc) {
@@ -58,7 +59,12 @@ function parseHTML(markup, forbidStyle, doc, baseURI, isXML) {
 
     // Either we are not running the Firefox extension or the above parser
     // failed, in such case we try to mimic it using jQuery.parseHTML
-    return $.parseHTML(String(markup), doc);
+    var fragment = doc.createDocumentFragment();
+    $.parseHTML(String(markup), doc)
+        .forEach(function(node) {
+            fragment.appendChild(node);
+        });
+    return fragment;
 }
 parseHTML.baseURIs = {};
 
@@ -98,7 +104,7 @@ function parseHTMLfmt(markup) {
                         var l = this.length;
                         markup = parseHTMLfmt.apply(null, arguments);
                         while (l > i) {
-                            $(this[i++])[origFunc](markup);
+                            $(this[i++])[origFunc](markup.cloneNode(true));
                         }
                         if (is_chrome_firefox) {
                             $('a[data-fxhref]').rebind('click', function() {
@@ -552,15 +558,15 @@ function removeHash() {
 }
 
 function browserdetails(useragent) {
-    
+
     useragent = useragent || navigator.userAgent;
     useragent = (' ' + useragent).toLowerCase();
-    
+
     var os = false;
     var browser = false;
     var icon = '';
     var name = '';
-    
+
     if (useragent.indexOf('android') > 0) {
         os = 'Android';
     }
@@ -628,7 +634,7 @@ function browserdetails(useragent) {
             || "ActiveXObject" in window) {
         browser = 'Internet Explorer';
     }
-    
+
     // Translate "%1 on %2" to "Chrome on Windows"
     if ((os) && (browser)) {
         name = String(l[7684]).replace('%1', browser).replace('%2', os);
@@ -652,19 +658,19 @@ function browserdetails(useragent) {
             icon = browser.toLowerCase() + '.png';
         }
     }
-    
+
     var browserDetails = {};
     browserDetails.name = name;
     browserDetails.icon = icon;
     browserDetails.os = os || '';
     browserDetails.browser = browser;
-    
+
     // Determine if the OS is 64bit
     browserDetails.is64bit = /\b(WOW64|x86_64|Win64|intel mac os x 10.(9|\d{2,}))/i.test(useragent);
-    
+
     // Determine if using a browser extension
     browserDetails.isExtension = (useragent.indexOf('megext') > -1) ? true : false;
-    
+
     return browserDetails;
 }
 

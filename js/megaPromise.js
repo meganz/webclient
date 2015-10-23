@@ -211,7 +211,7 @@ MegaPromise.prototype.always = function() {
  */
 MegaPromise.prototype.linkDoneTo = function(targetPromise) {
     var self = this;
-    targetPromise.done(function() {
+    targetPromise.then(function() {
         self.resolve.apply(self, arguments);
     });
 
@@ -229,7 +229,7 @@ MegaPromise.prototype.linkDoneTo = function(targetPromise) {
  */
 MegaPromise.prototype.linkFailTo = function(targetPromise) {
     var self = this;
-    targetPromise.fail(function() {
+    targetPromise.then(undefined, function() {
         self.reject.apply(self, arguments);
     });
 
@@ -262,12 +262,13 @@ MegaPromise.prototype.dumpToConsole = function(msg) {
     var self = this;
 
     if (d) {
-        self.done(function () {
-            console.log("success: ", msg ? msg : arguments, !msg ? null : arguments);
-        });
-        self.fail(function () {
-            console.error("error: ", msg ? msg : arguments, !msg ? null : arguments);
-        });
+        self.then(
+            function () {
+                console.log("success: ", msg ? msg : arguments, !msg ? null : arguments);
+            }, function () {
+                console.error("error: ", msg ? msg : arguments, !msg ? null : arguments);
+            }
+        );
     }
 
     return self;

@@ -1178,6 +1178,11 @@ else if (!b_u)
     jsl.push({f:'js/vendor/jsbn2.js', n: 'jsbn2_js', j:1, w:2});
     jsl.push({f:'js/vendor/nacl-fast.js', n: 'nacl_js', j:1,w:7});
     jsl.push({f:'js/megaPromise.js', n: 'megapromise_js', j:1,w:5});
+    jsl.push({f:'js/vendor/db.js', n: 'db_js', j:1,w:5});
+    jsl.push({f:'js/megaDbEncryptionPlugin.js', n: 'megadbenc_js', j:1,w:5});
+    jsl.push({f:'js/megaDb.js', n: 'megadb_js', j:1,w:5});
+    jsl.push({f:'js/idbkvstorage.js', n: 'idbkvstorage_js', j:1,w:5});
+
     jsl.push({f:'js/account.js', n: 'user_js', j:1});
     jsl.push({f:'js/authring.js', n: 'authring_js', j:1});
     jsl.push({f:'js/mouse.js', n: 'mouse_js', j:1});
@@ -1197,9 +1202,6 @@ else if (!b_u)
     jsl.push({f:'js/vendor/qrcode.js', n: 'qrcode', j:1,w:2, g: 'vendor'});
     jsl.push({f:'js/vendor/bitcoin-math.js', n: 'bitcoinmath', j:1 });
     jsl.push({f:'js/paycrypt.js', n: 'paycrypt_js', j:1 });
-    jsl.push({f:'js/vendor/db.js', n: 'db_js', j:1,w:5});
-    jsl.push({f:'js/megaDbEncryptionPlugin.js', n: 'megadbenc_js', j:1,w:5});
-    jsl.push({f:'js/megaDb.js', n: 'megadb_js', j:1,w:5});
     jsl.push({f:'js/megaKvStorage.js', n: 'megakvstorage_js', j:1,w:5});
 
     // notifications

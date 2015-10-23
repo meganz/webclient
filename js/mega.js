@@ -381,26 +381,20 @@ function MegaData()
             M.c.contacts[u_handle] = 1;
         }
 
-        for (var u in M.c['contacts'])
-            if (!avatars[u])
-            {
-                api_req({a: 'uga', u: u, ua: '+a'},
-                {
-                    u: u,
-                    callback: function(res, ctx)
-                    {
-                        if (typeof res !== 'number' && res.length > 5)
-                        {
-                            var blob = new Blob([str_to_ab(base64urldecode(res))], {type: 'image/jpeg'});
-                            avatars[ctx.u] = {
-                                data: blob,
-                                url: myURL.createObjectURL(blob)
-                            };
-                        }
-                        useravatar.loaded(ctx.u);
+        Object.keys(M.c['contacts']).forEach(function(u) {
+            if (!avatars[u]) {
+                getUserAttribute(u, 'a', true, false, function (res) {
+                    if (typeof res !== 'number' && res.length > 5) {
+                        var blob = new Blob([str_to_ab(base64urldecode(res))], {type: 'image/jpeg'});
+                        avatars[u] = {
+                            data: blob,
+                            url: myURL.createObjectURL(blob)
+                        };
                     }
+                    useravatar.loaded(u);
                 });
             }
+        });
 
         delete M.c.contacts[u_handle];
     }
@@ -5095,6 +5089,39 @@ function execsc(actionPackets, callback) {
         }
         else if (actionPacket.a === 'ua' && fminitialized) {
             for (var i in actionPacket.ua) {
+                if (d) {
+                    console.log(
+                        "Invalidating cache, because of update from action packet:",
+                        actionPacket.u,
+                        actionPacket.ua[i]
+                    );
+                }
+
+                debugger;
+                AttribCache.removeItem(
+                    actionPacket.u + "_" + actionPacket.ua[i]
+                );
+                var attr = actionPacket.ua[i];
+                var pub = true;
+                var nonHistoric = false;
+
+                if (attr.indexOf("+") === 0) {
+                    attr = attr.substr(1);
+                    pub = true;
+                }
+                else if (attr.indexOf("*") === 0) {
+                    attr = attr.substr(1);
+                    pub = false;
+                }
+
+                if (attr.indexOf("!") === 0) {
+                    attr = attr.substr(1);
+                    nonHistoric = true;
+                }
+
+                // refill cache
+                getUserAttribute(actionPacket.u, attr, pub, nonHistoric);
+
                 if (actionPacket.ua[i] === '+a') {
                     avatars[actionPacket.u] = undefined;
                     loadavatars = true;

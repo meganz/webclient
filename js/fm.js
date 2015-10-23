@@ -51,10 +51,10 @@ function initGridScrolling()
     jScrollFade('.grid-scrolling-table');
 }
 
-function initSelectScrolling()
-{
-    $('.default-select-scroll').jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
-    jScrollFade($('.default-select-scroll'));
+function initSelectScrolling(scrollBlock)
+{    
+    $(scrollBlock).jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
+    jScrollFade(scrollBlock);
 }
 
 function initFileblocksScrolling()
@@ -2855,6 +2855,13 @@ function accountUI()
     if ($('.fmholder').hasClass('transfer-panel-opened')) {
         $.transferClose();
     }
+
+    //Destroy jScrollings in select dropdowns 
+    $('.fm-account-main .default-select-scroll').each(function(i, e) {
+        $(e).parent().fadeOut(200).parent().removeClass('active');
+        deleteScrollPanel(e, 'jsp');
+    });
+
     sectionUIopen('account');
     M.accountData(function(account)
     {
@@ -3400,30 +3407,10 @@ function accountUI()
             html += '<div class="default-dropdown-item ' + sel + '" data-value="' + country + '">' + isocountries[country] + '</div>';
         }
         $('.default-select.country .default-select-scroll').html(html);
-        $('.default-select').rebind('click', function(e)
-        {
-            if (!$(this).hasClass('active')) {
-                $('.default-select-dropdown').fadeOut(200);
-                $(this).find('.default-select-dropdown').fadeIn(200, function() {
-                    //$(this).find('.default-select-scroll').scrollTo('.default-dropdown-item.active');
-                });
-                $(this).addClass('active');
-                $(this).find('.default-select-scroll').jScrollPane({enableKeyboardNavigation: false, showArrows: false, arrowSize: 5});
-            } 
-        });
-        $('.default-dropdown-item').rebind('click', function(e)
-        {
-            var $select = $(this).closest('.default-select');
-            e.stopPropagation();
-            if (!$(this).hasClass('active')) {
-                $('.default-dropdown-item').removeClass('active');
-                $(this).addClass('active');
-                $select.find('span').text($(this).text());
-                $('.fm-account-save-block').removeClass('hidden');
-                $select.removeClass('active');
-                $select.find('.default-select-dropdown').fadeOut(200);
-            }
-        });
+
+        //Bind Dropdowns events
+        bindDropdownEvents($('.fm-account-main .default-select'), 1);
+
         $('.fm-account-change-email').rebind('click', function(e) {
             if (!$(this).hasClass('disabled')) {
                 var email = $('#account-email').val().trim().toLowerCase();
@@ -3463,15 +3450,11 @@ function accountUI()
         $('#account-firstname,#account-lastname').rebind('keyup', function(e)
         {
             $('.fm-account-save-block').removeClass('hidden');
-            $('.fm-account-main').addClass('save');
-            initAccountScroll();
         });
         $('.fm-account-cancel').unbind('click');
         $('.fm-account-cancel').bind('click', function(e)
         {
             $('.fm-account-save-block').addClass('hidden');
-            $('.fm-account-main').removeClass('save');
-            initAccountScroll();
             accountUI();
         });
         $('.fm-account-save').unbind('click');
@@ -3479,10 +3462,10 @@ function accountUI()
         {
             u_attr.firstname = $('#account-firstname').val().trim();
             u_attr.lastname = $('#account-lastname').val().trim()||' ';
-            u_attr.birthday = $('.default-select.day select').val();
-            u_attr.birthmonth = $('.default-select.month select').val();
-            u_attr.birthyear = $('.default-select.year select').val();
-            u_attr.country = $('.default-select.country select').val();
+            u_attr.birthday = $('.default-select.day .default-dropdown-item.active').attr('data-value');
+            u_attr.birthmonth = $('.default-select.month .default-dropdown-item.active').attr('data-value');
+            u_attr.birthyear = $('.default-select.year .default-dropdown-item.active').attr('data-value');
+            u_attr.country = $('.default-select.country .default-dropdown-item.active').attr('data-value');
 
             api_req({
                 a : 'up',
@@ -3500,8 +3483,6 @@ function accountUI()
                 }
             });
             $('.fm-account-save-block').addClass('hidden');
-            $('.fm-account-main').removeClass('save');
-            initAccountScroll();
 
             if (M.account.dl_maxSlots)
             {
@@ -3551,8 +3532,6 @@ function accountUI()
                     $('#account-password').focus();
                     $('#account-password').bind('keyup.accpwd', function() {
                         $('.fm-account-save-block').removeClass('hidden');
-                        $('.fm-account-main').addClass('save');
-                        initAccountScroll();
                         $('#account-password').unbind('keyup.accpwd');
                     });
                 });
@@ -3581,8 +3560,6 @@ function accountUI()
                                 $('#account-password').focus();
                                 $('#account-password').bind('keyup.accpwd', function() {
                                     $('.fm-account-save-block').removeClass('hidden');
-                                    $('.fm-account-main').addClass('save');
-                                    initAccountScroll();
                                     $('#account-password').unbind('keyup.accpwd');
                                 });
                             });
@@ -3658,8 +3635,6 @@ function accountUI()
             {
                 M.account.dl_maxSlots = ui.value;
                 $('.fm-account-save-block').removeClass('hidden');
-                $('.fm-account-main').addClass('save');
-                initAccountScroll();
             }
         });
         $("#slider-range-max2").slider({
@@ -3667,8 +3642,6 @@ function accountUI()
             {
                 M.account.ul_maxSlots = ui.value;
                 $('.fm-account-save-block').removeClass('hidden');
-                $('.fm-account-main').addClass('save');
-                initAccountScroll();
             }
         });
         $('.ulspeedradio').removeClass('radioOn').addClass('radioOff');
@@ -3704,8 +3677,6 @@ function accountUI()
             $(this).addClass('radioOn').removeClass('radioOff');
             $(this).parent().addClass('radioOn').removeClass('radioOff');
             $('.fm-account-save-block').removeClass('hidden');
-            $('.fm-account-main').addClass('save');
-            initAccountScroll();
         });
         $('.uifontsize input').unbind('click');
         $('.uifontsize input').bind('click', function(e)
@@ -3715,8 +3686,6 @@ function accountUI()
             $(this).removeClass('radioOff').addClass('radioOn').parent().removeClass('radioOff').addClass('radioOn');
             M.account.font_size = $(this).val();
             $('.fm-account-save-block').removeClass('hidden');
-            $('.fm-account-main').addClass('save');
-            initAccountScroll();
         });
         $('#ulspeedvalue').unbind('click keyup');
         $('#ulspeedvalue').bind('click keyup', function(e)
@@ -3728,8 +3697,6 @@ function accountUI()
             else
                 M.account.ul_maxSpeed = 100 * 1024;
             $('.fm-account-save-block').removeClass('hidden');
-            $('.fm-account-main').addClass('save');
-            initAccountScroll();
         });
 
         $('.ulskip').removeClass('radioOn').addClass('radioOff');
@@ -3750,8 +3717,6 @@ function accountUI()
             $(this).addClass('radioOn').removeClass('radioOff');
             $(this).parent().addClass('radioOn').removeClass('radioOff');
             $('.fm-account-save-block').removeClass('hidden');
-            $('.fm-account-main').addClass('save');
-            initAccountScroll();
         });
 
         $('.uisorting').removeClass('radioOn').addClass('radioOff');
@@ -3772,8 +3737,6 @@ function accountUI()
             $(this).addClass('radioOn').removeClass('radioOff');
             $(this).parent().addClass('radioOn').removeClass('radioOff');
             $('.fm-account-save-block').removeClass('hidden');
-            $('.fm-account-main').addClass('save');
-            initAccountScroll();
         });
 
         $('.uiviewmode').removeClass('radioOn').addClass('radioOff');
@@ -3794,8 +3757,6 @@ function accountUI()
             $(this).addClass('radioOn').removeClass('radioOff');
             $(this).parent().addClass('radioOn').removeClass('radioOff');
             $('.fm-account-save-block').removeClass('hidden');
-            $('.fm-account-main').addClass('save');
-            initAccountScroll();
         });
 
         $('.rubsched, .rubschedopt').removeClass('radioOn').addClass('radioOff');
@@ -3818,8 +3779,6 @@ function accountUI()
             $(this).addClass('radioOn').removeClass('radioOff');
             $(this).parent().addClass('radioOn').removeClass('radioOff');
             $('.fm-account-save-block').removeClass('hidden');
-            $('.fm-account-main').addClass('save');
-            initAccountScroll(1);
         });
         $('.rubsched_textopt').rebind('click keyup', function(e) {
             var id = String($(this).attr('id')).split('_')[0];
@@ -3827,8 +3786,6 @@ function accountUI()
             $('#'+id+',#'+id+'_div').addClass('radioOn').removeClass('radioOff');
             M.account.rubsched = id.substr(3) + ':' + $(this).val();
             $('.fm-account-save-block').removeClass('hidden');
-            $('.fm-account-main').addClass('save');
-            initAccountScroll(1);
         });
         $('.rubsched input').rebind('click', function(e) {
             var id = $(this).attr('id');
@@ -3849,8 +3806,6 @@ function accountUI()
             $(this).addClass('radioOn').removeClass('radioOff');
             $(this).parent().addClass('radioOn').removeClass('radioOff');
             $('.fm-account-save-block').removeClass('hidden');
-            $('.fm-account-main').addClass('save');
-            initAccountScroll(1);
         });
 
         $('.redeem-voucher').unbind('click');
@@ -4018,8 +3973,6 @@ function accountUI()
             $(this).addClass('radioOn').removeClass('radioOff');
             $(this).parent().addClass('radioOn').removeClass('radioOff');
             $('.fm-account-save-block').removeClass('hidden');
-            $('.fm-account-main').addClass('save');
-            initAccountScroll();
         });
 
         $('.fm-account-remove-avatar,.fm-account-avatar').rebind('click', function() {
@@ -4162,8 +4115,6 @@ function accountUI()
     {
         if ($(this).val() == $('#account-new-password').val())
             $('.fm-account-save-block').removeClass('hidden');
-            $('.fm-account-main').addClass('save');
-            initAccountScroll();
     });
 }
 
@@ -10468,6 +10419,71 @@ function FMResizablePane(element, opts) {
         $element.data('fmresizable', this);
     }
     return this;
+}
+
+/**
+ * bindDropdownEvents
+ *
+ * Bind Custom select event
+ *
+ * @param {Selector} dropdowns, elements selector.
+ * @param {String} addition option for account page only. Allows to show "Show changes" notification
+ *
+ */
+function bindDropdownEvents($dropdown, saveOption) {
+
+    var $dropdownsItem = $dropdown.find('.default-dropdown-item');
+
+    $($dropdown).rebind('click', function(e)
+    {    
+        var $this = $(this);
+        if (!$this.hasClass('active')) {
+            var bottPos, jsp,
+                scrollBlock = '#' + $this.attr('id') + ' .default-select-scroll',
+                $dropdown = $this.find('.default-select-dropdown'),
+                $activeDropdownItem = $this.find('.default-dropdown-item.active');
+
+            //Show Select dropdown
+            $('.active .default-select-dropdown').fadeOut(200);
+            $this.addClass('active');
+            $dropdown.css('margin-top', '0px');    
+            $dropdown.fadeIn(200);
+
+            //Dropdown position relative to the window
+            bottPos = $(window).height() - ($dropdown.offset().top + $dropdown.outerHeight());
+            if (bottPos < 50) { 
+                $dropdown.css('margin-top', '-' + (60 - bottPos) + 'px');
+            }
+
+            //Dropdown scrolling initialization
+            initSelectScrolling(scrollBlock);
+            jsp = $(scrollBlock).data('jsp');
+            if (jsp && $activeDropdownItem.length) {
+                jsp.scrollToElement($activeDropdownItem)
+            }
+        } else {
+            $this.find('.default-select-dropdown').fadeOut(200);
+            $this.removeClass('active');
+        }
+    });
+
+    $dropdownsItem.rebind('click', function(e)
+    {
+        var $this = $(this);
+        if (!$this.hasClass('active')) {
+            var $select = $(this).closest('.default-select');
+
+            //Select dropdown item
+            $select.find('.default-dropdown-item').removeClass('active');
+            $this.addClass('active');
+            $select.find('span').text($this.text());
+
+            //Save changes for account page
+            if (saveOption) {
+                $('.fm-account-save-block').removeClass('hidden');
+            }
+        }
+    });
 }
 
 /**

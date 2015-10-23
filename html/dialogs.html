@@ -1510,10 +1510,9 @@
             <div class="fm-account-input">
                 <input class="state-province" type="text" value="" placeholder="[$653]">
             </div>
-            <div class="default-select">
-                <span class="account-select-txt">[$481]</span>
-                <select class="countries">
-                </select>
+            <div class="default-select countries" id="countries">
+                <span>[$481]</span>
+                <div class="default-select-dropdown hidden"><div class="default-select-scroll"></div></div>
             </div>
             <div class="fm-account-input code">
                 <input class="post-code" type="text" value="" placeholder="Postal Code">
@@ -1545,15 +1544,15 @@
                 <input class="credit-card-number" type="text" value="" placeholder="Credit Card Number" >
             </div>
             <div class="payment-short-bl triplex first">
-                <div class="default-select"> <span class="account-select-txt">[$913]</span>
-                    <select class="expiry-date-month">
-                    </select>
+                <div class="default-select expiry-date-month" id="expiry-date-month">
+                	<span>[$913]</span>
+                	<div class="default-select-dropdown hidden"><div class="default-select-scroll"></div></div>
                 </div>
             </div>
             <div class="payment-short-bl triplex second">
-                <div class="default-select"> <span class="account-select-txt">[$932]</span>
-                    <select class="expiry-date-year">
-                    </select>
+                <div class="default-select expiry-date-year" id="expiry-date-year">
+                	<span>[$932]</span>
+                	<div class="default-select-dropdown hidden"><div class="default-select-scroll"></div></div>
                 </div>
             </div>
             <div class="payment-short-bl triplex third">

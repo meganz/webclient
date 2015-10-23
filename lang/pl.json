@@ -339,6 +339,7 @@
     "738": "Zg\u0142o\u015b",
     "739": "zapomnia\u0142e\u015b has\u0142a?",
     "741": "Wybierz nowe bezpieczne has\u0142o.",
+    "742": "Zresetuj",
     "746": "Rodzaj konta",
     "748": "Miesi\u0119cznie",
     "749": "Rocznie",
@@ -2729,5 +2730,18 @@
     "7679": "Musisz posiada\u0107 konto MEGA aby kontynuowa\u0107.",
     "7680": "Mechanizm szyfrowania uzale\u017cniony jest od kluczy wy\u015bwietlonych powy\u017cej. Zalecamy wysy\u0142anie kluczy i link\u00f3w osobnymi kana\u0142ami.",
     "7681": "Katalog\/Plik link",
-    "7682": "MEGA zaleca wysy\u0142anie klucza i plik osobno."
+    "7682": "MEGA zaleca wysy\u0142anie klucza i plik osobno.",
+    "7683": "Dodatki",
+    "7684": "%1 na %2",
+    "7685": "O\u015bwiadczam, \u017ce dzia\u0142aj\u0105c w dobrej wierze, mam przekonanie, \u017ce korzystanie z materia\u0142\u00f3w chronionych prawem autorskim, a znajduj\u0105cych si\u0119 w miejscu powy\u017cej nie posiada zgody w\u0142a\u015bciciela praw autorskich, jego agenta lub prawa (np. jako dozwolony u\u017cytek).",
+    "7686": "Jeden z podanych link\u00f3w, nie jest linkiem MEGA.",
+    "7687": "Przenoszenie ustawie\u0144 jest dost\u0119pne tylko dla zarejestrowanych u\u017cytkownik\u00f3w.",
+    "7688": "Prawdopodobnie wyst\u0105pi\u0142o w\u0142amanie na Twoje konto. Zresetuj uprawnienia dla tego kontaktu i upewnij si\u0119, \u017ce podane dane s\u0105 prawid\u0142owe.",
+    "7689": "Zresetuj uprawnienia dla kontaktu",
+    "7690": "Kliknij w przycisk poni\u017cej aby zresetowa\u0107 uprawnienia dla kontaktu.",
+    "7691": "Uprawnienia dla nowego kontaktu",
+    "7692": "Weryfikacja uprawnie\u0144",
+    "7693": "Kliknij w przycisk Zweryfikuj poni\u017cej aby potwierdzi\u0107 uprawnienia dla kontaktu.",
+    "7694": "Ten plik zosta\u0142 obj\u0119ty procedur\u0105 usuni\u0119cia.",
+    "7695": "Ten katalog zosta\u0142 obj\u0119ty procedur\u0105 usuni\u0119cia."
 }

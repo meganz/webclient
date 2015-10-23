@@ -87,5 +87,8 @@ def devupdate(branchName = ''):
 
     # Update the repo with latest code in branch
     with cd(remoteBranchPath):
-        run('git pull')
+        run('git pull --update-shallow')
         run('git log -1')
+
+    # Output beta server test link
+    print '\nTest link: https://beta.developers.mega.co.nz/' + branchName + '/dont-deploy/sandbox3.html?apipath=prod'

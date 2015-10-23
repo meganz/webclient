@@ -339,6 +339,7 @@
     "738": "Solicitar",
     "739": "\u00bfHas olvidado tu contrase\u00f1a?",
     "741": "Por favor, selecciona una nueva contrase\u00f1a segura.",
+    "742": "Restablecer",
     "746": "Tipo de suscripci\u00f3n",
     "748": "Mensual",
     "749": "Anual",
@@ -2729,5 +2730,18 @@
     "7679": "Necesitas una cuenta MEGA para continuar",
     "7680": "El modelo criptogr\u00e1fico de MEGA depende de las claves mostradas arriba. Recomendamos enviar las claves de descifrado de forma separada del enlace de carpeta\/archivo, por medio de un canal seguro.",
     "7681": "Enlace de Carpeta\/Fichero",
-    "7682": "MEGA recomienda enviar la 'Clave de Descifrado' de forma separada al 'Enlace de Carpeta\/Archivo'."
+    "7682": "MEGA recomienda enviar la 'Clave de Descifrado' de forma separada al 'Enlace de Carpeta\/Archivo'.",
+    "7683": "Extensi\u00f3n",
+    "7684": "%1 bajo %2",
+    "7685": "Declaro que considero de buena f\u00e9 que el uso de material con copyright en la forma descrita y situada en la localizaci\u00f3n indicada no est\u00e1 autorizado por el propietario del copyright, su agente, o la ley (p.e. como uso justo).",
+    "7686": "Uno de los enlaces suministrados no es un enlace MEGA v\u00e1lido.",
+    "7687": "Los ajustes de transferencia son solo para usuarios registrados.",
+    "7688": "Podr\u00eda estar sufriendo un ataque man-in-the-middle. Por favor resetea las credenciales de identificaci\u00f3n almacenadas para este contacto y verifica que son correctas con tu contacto por medio de un canal seguro o en persona.",
+    "7689": "Resetear credenciales de contacto",
+    "7690": "Usa el bot\u00f3n de reseteo a continuaci\u00f3n para resetear las credenciales de este contacto.",
+    "7691": "Nuevas credenciales de contacto",
+    "7692": "Verificar credenciales",
+    "7693": "Usa el bot\u00f3n de verificaci\u00f3n a continuaci\u00f3n para verificar las credenciales de este contacto.",
+    "7694": "El archivo est\u00e1 sujeto a un aviso de eliminaci\u00f3n.",
+    "7695": "La carpeta est\u00e1 sujeta a un aviso de eliminaci\u00f3n."
 }

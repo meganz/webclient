@@ -3177,7 +3177,7 @@ function accountUI()
 
             var dateTime = htmlentities(time2date(el[0]));
             var browser = browserdetails(el[2]);
-            var browserName = browser.name;
+            var browserName = browser.nameTrans;
             var ipAddress = htmlentities(el[3]);
             var country = countrydetails(el[4]);
             var currentSession = el[5];

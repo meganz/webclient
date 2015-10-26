@@ -5090,14 +5090,13 @@ function execsc(actionPackets, callback) {
         else if (actionPacket.a === 'ua' && fminitialized) {
             for (var i in actionPacket.ua) {
                 if (d) {
-                    console.log(
+                    console.debug(
                         "Invalidating cache, because of update from action packet:",
                         actionPacket.u,
                         actionPacket.ua[i]
                     );
                 }
 
-                debugger;
                 AttribCache.removeItem(
                     actionPacket.u + "_" + actionPacket.ua[i]
                 );

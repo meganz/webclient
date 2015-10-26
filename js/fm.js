@@ -3907,7 +3907,7 @@ function accountUI()
         $('.vouchercreate').unbind('click');
         $('.vouchercreate').bind('click', function(e)
         {
-            var vouchertype = $('.default-select.vouchertype select').val();
+            var vouchertype = $('.default-select.vouchertype .default-dropdown-item.active').attr('data-value');
             var voucheramount = parseInt($('#account-voucheramount').val());
             var proceed = false;
             for (var i in M.account.prices)
@@ -3966,21 +3966,22 @@ function accountUI()
                 html += '<tr><td>' + time2date(el.date) + '</td><td class="selectable">' + htmlentities(el.code) + '</td><td>&euro; ' + htmlentities(el.amount) + '</td><td>' + status + '</td></tr>';
             });
             $('.grid-table.vouchers').html(html);
-            $('.default-select.vouchertype select option').remove();
+            $('.default-select.vouchertype .default-select-scroll').html('');
             var prices = [];
             for (var i in M.account.prices)
                 prices.push(M.account.prices[i][0]);
             prices.sort(function(a, b) {
                 return (a - b)
             })
-            var voucheroptions = '<option value="">' + escapeHTML(l[6875]) + '</option>';
+            var voucheroptions = '';
             for (var i in prices)
-                voucheroptions += '<option value="' + htmlentities(prices[i]) + '">&euro;' + htmlentities(prices[i]) + ' voucher</option>';
-            $('.default-select.vouchertype select').html(voucheroptions);
+                voucheroptions += '<div class="default-dropdown-item" data-value="' + htmlentities(prices[i]) + '">&euro;' + htmlentities(prices[i]) + ' voucher</div>';
+            $('.default-select.vouchertype .default-select-scroll').html(voucheroptions);
+			bindDropdownEvents($('.default-select.vouchertype'));
         }
 
-        $('.fm-purchase-voucher,.membership-medium-txt.topup').unbind('click');
-        $('.fm-purchase-voucher,.membership-medium-txt.topup').bind('click', function(e)
+        $('.fm-purchase-voucher,.default-big-button.topup').unbind('click');
+        $('.fm-purchase-voucher,.default-big-button.topup').bind('click', function(e)
         {
             document.location.hash = 'resellers';
         });

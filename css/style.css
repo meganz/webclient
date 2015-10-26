@@ -1240,8 +1240,17 @@ input.radioOn, input.radioOff {
 	padding-right: 25px;
 	padding-top: 7px;
 }
-.fm-account-overview {
-	padding: 0 48px 36px 12px;
+.fm-account-overview, .fm-account-reseller {
+	padding: 0 20px 36px 12px;
+}
+.resellers-content {
+	margin: 0 -20px 36px -12px;
+}
+.resellers-voucher-bl {
+	padding: 18px 0 14px 0;
+}
+.fm-account-reseller .fm-account-bg {
+	margin-bottom: 0;
 }
 .reset-pass .radio-txt {
 	display: block;
@@ -6865,7 +6874,7 @@ table {
 	background-position: 0px -10429px;
 }
 .fm-breadcrumbs.reseller .right-arrow-bg {
-	background-position: 0px -10339px;
+	background-position: 0px -10539px;
 }
 .fm-breadcrumbs.hidden {
 	display: none;
@@ -13018,7 +13027,7 @@ table {
 }
 .fm-account-input.voucheramount {
 	float: left;
-	min-width: 50px;
+	max-width: 50px;
 	padding: 0;
 	margin: 0;
 }
@@ -24809,6 +24818,12 @@ a.ui-datepicker-next {
 .fm-account-button.settings.active::before {
 	background-position: -11px -10309px;
 }
+.fm-account-button.reseller::before {
+	background-position: -11px -10509px;
+}
+.fm-account-button.reseller.active::before {
+	background-position: -11px -10569px;
+}
 .fm-breadcrumbs.account .right-arrow-bg {
 	padding: 0 0 0 38px;
 	background-position: -3px -10473px;
@@ -24816,6 +24831,7 @@ a.ui-datepicker-next {
 	cursor: default;
 }
 .default-big-button {
+	display: block;
 	font-size: 14px;
 	line-height: 47px;
 	height: 48px;
@@ -24854,7 +24870,7 @@ a.ui-datepicker-next {
 	box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.1);
 	background-color: rgba(0,0,0,0.1);
 }
-.pro-upgrade {
+.pro-upgrade, .resellerbuy, .vouchercreate {
 	margin: 19px -12px -12px -12px;
 }
 .topup {

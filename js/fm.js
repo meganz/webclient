@@ -1555,8 +1555,10 @@ function initAddDialogMultiInputPlugin() {
 
     // Plugin configuration
     var contacts = getContactsEMails();
+    var $this  = $('.add-contact-multiple-input');
+    var $scope = $this.parents('.add-user-popup');
 
-    $('.add-contact-multiple-input').tokenInput(contacts, {
+    $this.tokenInput(contacts, {
         theme: 'mega',
         hintText: l[5908],
         //hintText: '',
@@ -1586,6 +1588,17 @@ function initAddDialogMultiInputPlugin() {
         },
         onHolder: function() {
             errorMsg(l[7414]);
+        },
+        onReady: function() {
+            var $input = $this.parent().find('li input').eq(0);
+            $input.rebind('keyup', function() {
+                var value = $.trim($input.val());
+                if ($scope.find('li.token-input-token-mega').length > 0 || checkMail(value) === false) {
+                    $scope.find('.add-user-popup-button.add').removeClass('disabled');
+                } else {
+                    $scope.find('.add-user-popup-button.add').addClass('disabled');
+                }
+            });
         },
         onAdd: function() {
 
@@ -2101,17 +2114,26 @@ function fmremove() {
         contactcnt = 0,
         removesharecnt = 0;
 
+    // Loop throught selected items
     for (var i in $.selected) {
         var n = M.d[$.selected[i]];
+
+        // ToDo: Not clear what this represents
         if (n && n.p.length === 11) {
             removesharecnt++;
         }
+
+        // ToDo: Replace counting contact id chars with something more reliable
         else if (String($.selected[i]).length === 11) {
             contactcnt++;
         }
+
+        // Folder
         else if (n && n.t) {
             foldercnt++;
         }
+
+        // File
         else {
             filecnt++;
         }
@@ -2122,13 +2144,16 @@ function fmremove() {
             removeShare($.selected[i]);
         }
         M.openFolder('shares', true);
-    } else if (contactcnt) {
+    }
+
+    // Remove contacts from list
+    else if (contactcnt) {
         var t, c = $.selected.length;
 
-        // TODO: Need translation "delete N (users)"
         if (c > 1) {
             t = c + ' ' + l[5569];
-        } else {
+        }
+        else {
             t = '<strong>' + M.d[$.selected[0]].name + '</strong>';
         }
 
@@ -2141,8 +2166,7 @@ function fmremove() {
                         }
                     }
 
-                    M.delNode($.selected[i]);
-                    api_req({a: 'ur2', u: $.selected[i], l: '0', i: requesti});
+                    api_req({ a: 'ur2', u: $.selected[i], l: '0', i: requesti });
                     M.handleEmptyContactGrid();
                 }
             }
@@ -2152,13 +2176,16 @@ function fmremove() {
             $('.fm-del-contacts-number').text($.selected.length);
             $('#msgDialog .fm-del-contact-avatar').attr('class', 'fm-del-contact-avatar');
             $('#msgDialog .fm-del-contact-avatar span').empty();
-        } else {
+        }
+        else {
             var user = M.d[$.selected[0]],
                 avatar = useravatar.contact(user, 'avatar-remove-dialog');
 
             $('#msgDialog .fm-del-contact-avatar').html(avatar);
         }
-    } else if (RootbyId($.selected[0]) === M.RubbishID) {
+    }
+    // Remove/Clean rubbih bin
+    else if (RootbyId($.selected[0]) === M.RubbishID) {
         msgDialog('clear-bin', l[1003], l[76].replace('[X]', (filecnt + foldercnt)) + ' ' + l[77], l[1007], function(e) {
             if (e) {
                 M.clearRubbish(1);
@@ -2168,7 +2195,10 @@ function fmremove() {
             if ($(e).text() === l[1018])
                 $(e).html('<span>'+l[83]+'</span>');
         });
-    } else if (RootbyId($.selected[0]) === 'contacts') {
+    }
+
+    // Remove contacts
+    else if (RootbyId($.selected[0]) === 'contacts') {
         if (localStorage.skipDelWarning) {
             M.copyNodes($.selected, M.RubbishID, 1);
         } else {
@@ -2178,7 +2208,8 @@ function fmremove() {
                 }
             }, true);
         }
-    } else {
+    }
+    else {
         if (localStorage.skipDelWarning) {
             if (M.currentrootid === 'shares') {
                 M.copyNodes($.selected, M.RubbishID, true);
@@ -2186,12 +2217,14 @@ function fmremove() {
             else {
                 M.moveNodes($.selected, M.RubbishID);
             }
-        } else {
+        }
+        else {
 
-                // Additional message in case that there's a shared node
+            // Additional message in case that there's a shared node
             var delShareInfo,
-                // Contains complete directory structure of selected nodes, their ids
-                dirTree = [];
+
+            // Contains complete directory structure of selected nodes, their ids
+            dirTree = [];
 
             var nodes = new mega.Nodes({});
             $.each($.selected, function(index, value){
@@ -2215,7 +2248,7 @@ function fmremove() {
                                 // Remove regular/full share
                                 for (var share in M.d[dirTree[selection]].shares) {
                                     if (M.d[dirTree[selection]].shares.hasOwnProperty(share)) {
-                                        api_req({a: 's2', n:  dirTree[selection], s: [{ u: M.d[dirTree[selection]].shares[share].u, r: ''}], ha: '', i: requesti});
+                                        api_req({ a: 's2', n:  dirTree[selection], s: [{ u: M.d[dirTree[selection]].shares[share].u, r: ''}], ha: '', i: requesti });
                                         M.delNodeShare(dirTree[selection], M.d[dirTree[selection]].shares[share].u);
                                         setLastInteractionWith(dirTree[selection], "0:" + unixtime());
                                     }
@@ -2224,7 +2257,7 @@ function fmremove() {
                                 // Remove pending share
                                 for (var pendingUserId in M.ps[dirTree[selection]]) {
                                     if (M.ps[dirTree[selection]].hasOwnProperty(pendingUserId)) {
-                                        api_req({a: 's2', n:  dirTree[selection], s: [{ u: pendingUserId, r: ''}], ha: '', i: requesti});
+                                        api_req({ a: 's2', n:  dirTree[selection], s: [{ u: pendingUserId, r: ''}], ha: '', i: requesti });
                                         M.deletePendingShare(dirTree[selection], pendingUserId);
                                     }
                                 }
@@ -7433,7 +7466,10 @@ function initShareDialogMultiInputPlugin() {
             }, 3000);
         }
 
-        $('.share-multiple-input').tokenInput(contacts, {
+        var $input = $('.share-multiple-input');
+        var $scope = $input.parents('.share-dialog');
+
+        $input.tokenInput(contacts, {
             theme: "mega",
             hintText: l[5908],
             // placeholder: "Type in an email or contact",
@@ -7452,8 +7488,20 @@ function initShareDialogMultiInputPlugin() {
             scrollLocation: 'share',
             // Exclude from dropdownlist only emails/names which exists in multi-input (tokens)
             excludeCurrent: true,
+
             onEmailCheck: function() {
                 errorMsg(l[7415]); // Looks like there's a malformed email
+            },
+            onReady: function() {
+                var $this = $scope.find('li input');
+                $this.rebind('keyup', function() {
+                    var value = $.trim($this.val());
+                    if ($scope.find('li.token-input-token-mega').length > 0 || checkMail(value) === false) {
+                        $scope.find('.dialog-share-button').removeClass('disabled');
+                    } else {
+                        $scope.find('.dialog-share-button').addClass('disabled');
+                    }
+                });
             },
             onDoublet: function(u) {
                 errorMsg(l[7413]); // You already have a contact with that email

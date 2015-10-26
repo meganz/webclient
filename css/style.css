@@ -586,7 +586,7 @@ label span.black {
 	color: #1DA1E9;
 	display: block;
 }
-.red, a.red, a.red:link, a.red:visited, a.red:hover, a.red:active, h1 span.red, h2 span.red, p span.red {
+.red, a.red, a.red:link, a.red:visited, a.red:hover, a.red:active, h1 span.red, h2 span.red, p span.red, .affiliate-input-block input.red {
 	color: #BF1900;
 }
 .progressbar {

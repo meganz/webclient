@@ -1240,7 +1240,10 @@ input.radioOn, input.radioOff {
 	padding-right: 25px;
 	padding-top: 7px;
 }
-.fm-account-overview, .fm-account-reseller {
+.fm-account-overview {
+	padding: 0 48px 36px 12px;
+}
+.fm-account-reseller {
 	padding: 0 20px 36px 12px;
 }
 .resellers-content {
@@ -4306,7 +4309,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 	-moz-border-radius: 100%;
 	-webkit-border-radius: 100%;
 	border-radius: 100%;
-	background-color: #FF6A19;
+	background-color: white;
 	position: relative;
 	display: block;
 	font-size: 19px;
@@ -12728,6 +12731,13 @@ table {
 	position: relative;
 	text-align: center;
 }
+.fm-account-avatar div {
+	border: 0;
+	margin: 0;
+	-webkit-box-shadow: none;
+	-moz-box-shadow: none;
+	box-shadow: none;
+}
 .fm-account-avatar div span {
 	background-color: white;
 	display: block;
@@ -12744,8 +12754,35 @@ table {
 	font-family: 'source_sans_prolight';
 	line-height: 94px;
 }
-.fm-account-avatar div.color6 {
+.fm-account-avatar .color1 {
+	color: #FF6A19;
+}
+.fm-account-avatar .color2 {
+	color: #5856d6;
+}
+.fm-account-avatar .color3 {
+	color: #007aff;
+}
+.fm-account-avatar .color4 {
+	color: #34aadc;
+}
+.fm-account-avatar .color5 {
+	color: #5ac8fa;
+}
+.fm-account-avatar .color6 {
 	color: #4cd964;
+}
+.fm-account-avatar .color7 {
+	color: #ff1a53;
+}
+.fm-account-avatar .color8 {
+	color: #d90007;
+}
+.fm-account-avatar .color9 {
+	color: #ff9500;
+}
+.fm-account-avatar .color10 {
+	color: #ffcc00;
 }
 .fm-account-bg {
 	background-color: rgba(255,255,255,1);

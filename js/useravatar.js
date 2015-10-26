@@ -94,9 +94,9 @@ var useravatar = (function() {
             _watching[id] = {};
         }
         _watching[id][className] = true;
-        return '<' + element + ' class="avatar-wrapper ' + className + ' ' + id +  ' color' + s.colorIndex + '">'
+        return '<' + element + ' class="avatar-wrapper ' + className + ' ' + id +  ' color' + s.colorIndex + '"><span>'
                     + s.letters
-                + '</' + element + '>';
+                + '</span></' + element + '>';
     };
 
     /**

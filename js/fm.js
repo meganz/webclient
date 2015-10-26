@@ -4017,7 +4017,7 @@ function accountUI()
                 if (e) {
                     api_req({'a': 'up', '+a':'none'});
                     delete avatars[u_handle];
-                    $('.fm-account-avatar img').attr('src', useravatar.mine());
+                    $('.fm-account-avatar').html(useravatar.contact(u_handle));
                     $('.fm-avatar img').attr('src', useravatar.mine());
                     $('.fm-account-remove-avatar').hide();
                 }
@@ -4029,7 +4029,7 @@ function accountUI()
         {
             avatarDialog();
         });
-        $('.fm-account-avatar img').attr('src', useravatar.mine());
+        $('.fm-account-avatar').html(useravatar.contact(u_handle));
 
         function accountWidth() {
             var $mainBlock = $('.fm-account-main');
@@ -4202,7 +4202,7 @@ function avatarDialog(close)
                         data: blob,
                         url: myURL.createObjectURL(blob)
                     }
-                    $('.fm-account-avatar img').attr('src', useravatar.mine());
+                    $('.fm-account-avatar').html(useravatar.contact(u_handle));
                 $('.fm-avatar img').attr('src', useravatar.mine());
                 avatarDialog(1);
             },

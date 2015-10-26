@@ -9939,7 +9939,8 @@ function fm_resize_handler() {
      });
      */
 
-    $('.files-grid-view .grid-scrolling-table, .file-block-scrolling, .contacts-grid-view .contacts-grid-scrolling-table')
+    $('.files-grid-view .grid-scrolling-table, .file-block-scrolling,' +
+        ' .contacts-grid-view .contacts-grid-scrolling-table')
         .css({
             'width': $(document.body).outerWidth() - $('.fm-left-panel').outerWidth()
         });

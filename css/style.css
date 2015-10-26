@@ -24873,13 +24873,13 @@ a.ui-datepicker-next {
 .pro-upgrade, .resellerbuy, .vouchercreate {
 	margin: 19px -12px -12px -12px;
 }
-.topup {
+.topup, .active-subscription .pro-upgrade {
 	margin: 19px 8px -12px -12px;
 }
-.redeem-voucher {
+.redeem-voucher, .active-subscription .btn-cancel {
 	margin: 19px -12px -12px 8px;
 }
-.half-sized {
+.half-sized, .active-subscription .subscription-button {
 	float: left;
 	width: 50%;
 }

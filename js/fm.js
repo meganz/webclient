@@ -3018,6 +3018,7 @@ function accountUI()
                             $('.fm-account-blocks .btn-cancel').show().rebind('click', function() {
                                 cancelSubscriptionDialog.init();
                             });
+							$('.subscription-bl').addClass('active-subscription');
                         }
                     }
                 });
@@ -3030,8 +3031,9 @@ function accountUI()
                 $('.membership-medium-txt.expiry a').rebind('click', function() {
                     document.location = $(this).attr('href');
                 });
-                $('.membership-medium-txt.expiry a').html(l[987] + ' <span class="red">' + time2date(account.expiry) + '</span>');
+                $('.membership-medium-txt.expiry a').html(l[987] + ' ' + time2date(account.expiry));
                 $('.fm-account-blocks .btn-cancel').hide();
+				$('.subscription-bl').removeClass('active-subscription');
             }
         }
         else
@@ -3042,6 +3044,7 @@ function accountUI()
             $('.membership-big-txt.accounttype').text(l[435]);
             $('.membership-medium-txt.expiry').text(l[436]);
             $('.btn-cancel').hide();
+			$('.subscription-bl').removeClass('active-subscription');
         }
 
         perc = Math.round((account.servbw_used+account.downbw_used)/account.bw*100);
@@ -10568,6 +10571,7 @@ var cancelSubscriptionDialog = {
     $dialog: null,
     $dialogSuccess: null,
     $accountPageCancelButton: null,
+	$accountPageSubscriptionBlock: null,
     $continueButton: null,
     $cancelReason: null,
 
@@ -10579,6 +10583,7 @@ var cancelSubscriptionDialog = {
         this.$continueButton = this.$dialog.find('.continue-cancel-subscription');
         this.$cancelReason = this.$dialog.find('.cancel-textarea textarea');
         this.$backgroundOverlay = $('.fm-dialog-overlay');
+		this.$accountPageSubscriptionBlock = $('.subscription-bl');
 
         // Show the dialog
         this.$dialog.removeClass('hidden');
@@ -10668,6 +10673,7 @@ var cancelSubscriptionDialog = {
                         // Hide loading dialog and cancel subscription button on account page
                         loadingDialog.hide();
                         cancelSubscriptionDialog.$accountPageCancelButton.hide();
+						cancelSubscriptionDialog.$accountPageSubscriptionBlock.removeClass('active-subscription');
 
                         // Show success dialog and refresh UI
                         cancelSubscriptionDialog.$dialogSuccess.removeClass('hidden');

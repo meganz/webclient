@@ -196,12 +196,12 @@ var useravatar = (function() {
         if (typeof user === "string" && user.length > 0) {
             if (isEmail(user)) {
                 return emailAvatar(user, className, element);
-            }
-            else if (M.u[user]) {
+            } else if (user === u_handle) {
+                user = u_attr;
+            } else if (M.u[user]) {
                 // It's an user ID
                 user = M.u[user];
-            }
-            else {
+            } else {
                 return _letters(user, user, className, element);
             }
         }

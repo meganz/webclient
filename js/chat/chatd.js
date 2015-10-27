@@ -359,34 +359,15 @@ Chatd.Shard.prototype.exec = function(a) {
                 break;
 
             case Chatd.Opcode.SEEN:
-                if(cmd.length === 25) {
-                    self.logger.log("Newest seen message on '" + base64urlencode(cmd.substr(1, 8)) + "' for user '" + base64urlencode(cmd.substr(9, 8)) + "': '" + base64urlencode(cmd.substr(17, 8)) + "'");
+                self.logger.log("Newest seen message on '" + base64urlencode(cmd.substr(1, 8)) + "' for user '" + base64urlencode(cmd.substr(9, 8)) + "': '" + base64urlencode(cmd.substr(17, 8)) + "'");
 
-                    self.chatd.trigger('onMessageLastSeen', {
-                        chatId: base64urlencode(cmd.substr(1, 8)),
-                        userId: base64urlencode(cmd.substr(9, 8)),
-                        messageId: base64urlencode(cmd.substr(17, 8))
-                    });
+                self.chatd.trigger('onMessageLastSeen', {
+                    chatId: base64urlencode(cmd.substr(1, 8)),
+                    userId: base64urlencode(cmd.substr(9, 8)),
+                    messageId: base64urlencode(cmd.substr(17, 8))
+                });
 
-                    len = 25;
-                } else if(cmd.length === 17) {
-                    self.logger.log(
-                        "Newest seen message on " + base64urlencode(cmd.substr(1, 8)) +
-                        " message id " + base64urlencode(cmd.substr(9, 8)) + ": " +
-                        " from me."
-                    );
-
-                    self.chatd.trigger('onMessageLastSeen', {
-                        chatId: base64urlencode(cmd.substr(1, 8)),
-                        userId: base64urlencode(self.chatd.userid),
-                        messageId: base64urlencode(cmd.substr(9, 8))
-                    });
-
-                    len = 17;
-                } else {
-                    self.logger.error("Received SEEN command, but the length of the message was not 17 or 25, so no " +
-                        "idea how to parse it...");
-                }
+                len = 25;
                 break;
 
             case Chatd.Opcode.RECEIVED:

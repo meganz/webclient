@@ -64,6 +64,7 @@ function verify_email_callback(passaes) {
             verifyEmail = null; /* wipe variable */
             msgDialog('warninga', title, msgbody, false, function() {
                 document.location.href = "#fm/account/profile";
+				accountUI();
                 showToast('settings', 'You have successfully changed your profile.');
             });
         }

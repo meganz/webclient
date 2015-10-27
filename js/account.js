@@ -612,8 +612,6 @@ function getUserAttribute(userhandle, attribute, pub, nonHistoric,
         if (typeof res !== 'number') {
             AttribCache.setItem(cacheKey, res);
 
-            if(userhandle === "p0hh0WDWsbo") { debugger; }
-
             thePromise.resolve(res);
             logger.info('Attribute "' + attribute + '" for user "'
                         + userhandle + '" is ' + JSON.stringify(res) + '.');

@@ -214,7 +214,7 @@ var useravatar = (function() {
             return _image(avatars[user.u].url, user.u, className, element);
         }
 
-        return _letters(user.name || user.m, user.u, className, element);
+        return _letters(user.firstname || user.name || user.m, user.u, className, element);
     };
 
     registerCssColors();

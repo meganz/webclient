@@ -31,7 +31,7 @@ function verify_email_callback(passaes) {
     var k1 = verifyEmail.k1 || u_attr.k;
     var k2 = verifyEmail.k2 || u_k;
     if (decrypt_key(passaes, base64_to_a32(k1)).join(",")  !== (k2).join(",")) {
-        $('.login-register-input.password').addClass('loading').removeClass('incorrect');
+        $('.login-register-input.password').removeClass('loading').addClass('incorrect');
         return;
     }
 
@@ -61,10 +61,11 @@ function verify_email_callback(passaes) {
             $('.profile-form.first').removeClass('email-confirm');
             title   = 'Congratulations';
             msgbody = 'Congratulations, your new email address for this mega account is ' + verifyEmail.email;
+            u_attr.email = verifyEmail.email;
             verifyEmail = null; /* wipe variable */
             msgDialog('warninga', title, msgbody, false, function() {
                 document.location.href = "#fm/account/profile";
-				accountUI();
+                accountUI();
                 showToast('settings', 'You have successfully changed your profile.');
             });
         }

@@ -566,6 +566,7 @@ function browserdetails(useragent) {
     var browser = false;
     var icon = '';
     var name = '';
+    var nameTrans = '';
 
     if (useragent.indexOf('android') > 0) {
         os = 'Android';
@@ -612,7 +613,6 @@ function browserdetails(useragent) {
     }
     else if (useragent.indexOf('chrome') > 0) {
         browser = 'Chrome';
-        icon = 'chrome.png';
     }
     else if (useragent.indexOf('safari') > 0) {
         browser = 'Safari';
@@ -622,7 +622,6 @@ function browserdetails(useragent) {
     }
     else if (useragent.indexOf('firefox') > 0) {
         browser = 'Firefox';
-        icon = 'firefox.png';
     }
     else if (useragent.indexOf('thunderbird') > 0) {
         browser = 'Thunderbird';
@@ -637,7 +636,8 @@ function browserdetails(useragent) {
 
     // Translate "%1 on %2" to "Chrome on Windows"
     if ((os) && (browser)) {
-        name = String(l[7684]).replace('%1', browser).replace('%2', os);
+        name = browser + ' on ' + os;
+        nameTrans = String(l[7684]).replace('%1', browser).replace('%2', os);
     }
     else if (os) {
         name = os;
@@ -661,6 +661,7 @@ function browserdetails(useragent) {
 
     var browserDetails = {};
     browserDetails.name = name;
+    browserDetails.nameTrans = nameTrans || name;
     browserDetails.icon = icon;
     browserDetails.os = os || '';
     browserDetails.browser = browser;

@@ -3018,7 +3018,7 @@ function accountUI()
                             $('.fm-account-blocks .btn-cancel').show().rebind('click', function() {
                                 cancelSubscriptionDialog.init();
                             });
-							$('.subscription-bl').addClass('active-subscription');
+                            $('.subscription-bl').addClass('active-subscription');
                         }
                     }
                 });
@@ -3033,7 +3033,7 @@ function accountUI()
                 });
                 $('.membership-medium-txt.expiry a').html(l[987] + ' ' + time2date(account.expiry));
                 $('.fm-account-blocks .btn-cancel').hide();
-				$('.subscription-bl').removeClass('active-subscription');
+                $('.subscription-bl').removeClass('active-subscription');
             }
         }
         else
@@ -3044,7 +3044,7 @@ function accountUI()
             $('.membership-big-txt.accounttype').text(l[435]);
             $('.membership-medium-txt.expiry').text(l[436]);
             $('.btn-cancel').hide();
-			$('.subscription-bl').removeClass('active-subscription');
+            $('.subscription-bl').removeClass('active-subscription');
         }
 
         perc = Math.round((account.servbw_used+account.downbw_used)/account.bw*100);
@@ -3980,7 +3980,7 @@ function accountUI()
             for (var i in prices)
                 voucheroptions += '<div class="default-dropdown-item" data-value="' + htmlentities(prices[i]) + '">&euro;' + htmlentities(prices[i]) + ' voucher</div>';
             $('.default-select.vouchertype .default-select-scroll').html(voucheroptions);
-			bindDropdownEvents($('.default-select.vouchertype'));
+            bindDropdownEvents($('.default-select.vouchertype'));
         }
 
         $('.fm-purchase-voucher,.default-big-button.topup').unbind('click');
@@ -5099,6 +5099,11 @@ function UIkeyevents() {
         }
         else if (e.keyCode == 27 && $.dialog) {
             closeDialog();
+        }
+        else if (e.keyCode == 27 && $('.default-select.active').length) {
+            var $selectBlock = $('.default-select.active');
+            $selectBlock.find('.default-select-dropdown').fadeOut(200);
+            $selectBlock.removeClass('active');
         }
         else if (e.keyCode == 27 && $.msgDialog) {
             closeMsg();
@@ -10536,6 +10541,15 @@ function bindDropdownEvents($dropdown, saveOption) {
             }
         }
     });
+        
+    $('#fmholder, .fm-dialog').rebind('click.defaultselect', function(e)
+    {
+        if (!$(e.target).hasClass('default-select')) {
+            $selectBlock = $('.default-select.active');
+            $selectBlock.find('.default-select-dropdown').fadeOut(200);
+            $selectBlock.removeClass('active');
+        }
+    });
 }
 
 /**
@@ -10571,7 +10585,7 @@ var cancelSubscriptionDialog = {
     $dialog: null,
     $dialogSuccess: null,
     $accountPageCancelButton: null,
-	$accountPageSubscriptionBlock: null,
+    $accountPageSubscriptionBlock: null,
     $continueButton: null,
     $cancelReason: null,
 
@@ -10583,7 +10597,7 @@ var cancelSubscriptionDialog = {
         this.$continueButton = this.$dialog.find('.continue-cancel-subscription');
         this.$cancelReason = this.$dialog.find('.cancel-textarea textarea');
         this.$backgroundOverlay = $('.fm-dialog-overlay');
-		this.$accountPageSubscriptionBlock = $('.subscription-bl');
+        this.$accountPageSubscriptionBlock = $('.subscription-bl');
 
         // Show the dialog
         this.$dialog.removeClass('hidden');
@@ -10673,7 +10687,7 @@ var cancelSubscriptionDialog = {
                         // Hide loading dialog and cancel subscription button on account page
                         loadingDialog.hide();
                         cancelSubscriptionDialog.$accountPageCancelButton.hide();
-						cancelSubscriptionDialog.$accountPageSubscriptionBlock.removeClass('active-subscription');
+                        cancelSubscriptionDialog.$accountPageSubscriptionBlock.removeClass('active-subscription');
 
                         // Show success dialog and refresh UI
                         cancelSubscriptionDialog.$dialogSuccess.removeClass('hidden');

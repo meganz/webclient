@@ -2194,4 +2194,18 @@
 		c-0.497-0.455-0.813-1.086-0.836-1.785c-0.069-0.006-0.137-0.012-0.207-0.012h-1.867c-1.552,0-2.816,1.203-2.816,2.68v2.174
 		l0.005,0.031l0.158,0.049c1.188,0.352,2.25,0.516,3.17,0.566v-0.656C18.835,10583.088,19.844,10581.873,21.225,10581.48z"/>
 </g>
+<g id="Page-1_11_" sketch:type="MSPage">
+	<g id="Group-Copy-2" transform="translate(1.000000, 0.000000)" sketch:type="MSLayerGroup">
+		<path id="Rectangle-67" sketch:type="MSShapeGroup" fill="none" stroke="#777777" d="M15.97,10621.416l9.584-9.584
+			c0.782-0.783,2.053-0.779,2.828-0.004l0.176,0.176c0.779,0.779,0.773,2.051-0.004,2.828l-9.584,9.584l-5,2L15.97,10621.416z"/>
+		<path id="Path-280" sketch:type="MSShapeGroup" fill="none" stroke="#777777" d="M23.939,10613.385l3.062,3"/>
+		<path id="Path-280-Copy" sketch:type="MSShapeGroup" fill="none" stroke="#777777" d="M16.939,10620.385l3.062,3"/>
+		<rect id="Rectangle-68-Copy" x="22.97" y="10625.416" sketch:type="MSShapeGroup" fill="#777777" width="4" height="1">
+		</rect>
+		<rect id="Rectangle-68-Copy-2" x="28.97" y="10625.416" sketch:type="MSShapeGroup" fill="#777777" width="2" height="1">
+		</rect>
+		<rect id="Rectangle-68-Copy-3" x="18.97" y="10625.416" sketch:type="MSShapeGroup" fill="#777777" width="2" height="1">
+		</rect>
+	</g>
+</g>
 </svg>

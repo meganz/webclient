@@ -12854,6 +12854,19 @@ table {
 .low-width .fm-account-labels {
 	width: 200px;
 }
+.low-width .fm-account-blocks.storage, .low-width .fm-account-blocks.bandwidth {
+	width: 100%;
+	float: none;
+}
+.low-width .fm-account-blocks.bandwidth {
+	padding-top: 30px;
+}
+.low-width .bandwidth .nw-fm-bar-info {
+	display: table;
+}
+.low-width .clear.account {
+	display: none;
+}
 .fm-account-avatar img, .fm-account-avatar div {
 	width: 156px;
 	height: 156px;
@@ -25069,18 +25082,6 @@ a.ui-datepicker-next {
 	width: -webkit-calc(100% -870px);
 	width: -moz-calc(100% - 870px);
 	width: calc(100% - 870px);
-}
-}
-@media only screen and (max-width: 1165px) {
-.fm-account-blocks.storage, .fm-account-blocks.bandwidth {
-	width: 100%;
-	float: none;
-}
-.bandwidth .nw-fm-bar-info {
-	display: table;
-}
-.clear.account {
-	display: none;
 }
 }
 @media only screen and (max-width: 1133px) {

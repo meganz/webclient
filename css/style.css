@@ -7824,6 +7824,32 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	border-radius: 4px;
 	position: relative;
 }
+.fm-account-input::before {
+	    content: '';
+    position: absolute;
+    width: 19px;
+    height: 18px;
+    background-image: url(../images/mega/nw-fm-sprite_v12.svg);
+    background-repeat: no-repeat;
+    background-position: -14px -10610px;
+    right: 6px;
+    top: 7px;
+	-webkit-transition: opacity 200ms ease-in-out;
+    -moz-transition: opacity 200ms ease-in-out;
+    -o-transition: opacity 200ms ease-in-out;
+    -ms-transition: opacity 200ms ease-in-out;
+    transition: opacity 200ms ease-in-out;
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+    -moz-opacity: 0;
+    -khtml-opacity: 0;
+    opacity: 0;
+}
+.fm-account-input:hover::before {
+	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+    -moz-opacity: 1;
+    -khtml-opacity: 1;
+    opacity: 1;
+}
 .create-folder-input-bl, .add-user-popup-input-bl, .rename-input-bl {
 	width: 100%;
 	float: none;
@@ -7851,11 +7877,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 }
 .error .fm-account-input {
 	background-color: rgba(217,0,7,0.5);
-}
-.fm-account-input input {
-	font-size: 14px;
-	line-height: 32px;
-	color: #333333;
 }
 .active .fm-account-input input, .error .fm-account-input input {
 	color: white;
@@ -8001,6 +8022,9 @@ color: white;
 .fm-account-input input {
 	padding: 0 10px 0 10px;
 	background-image: none;
+	font-size: 14px;
+	line-height: 32px;
+	color: #333333;
 }
 .fm-version-select {
 	background-position: right -6593px;

@@ -7243,7 +7243,7 @@ table {
 	color: rgba(49,181,0,1);
 }
 /* disabled */
-.fm-add-user.disabled, .fm-start-video-call.disabled, .fm-clearbin-button.disabled, .fm-send-files.disabled, .fm-start-call.disabled, .fm-leave-share.disabled, .fm-share-copy.disabled, .fm-share-download.disabled, .contact-send-files.disabled, .fm-start-conversation.disabled, .fm-share-folders.disabled, .fm-verify.disabled, .fm-reset-stored-fingerprint.disabled, .fm-question.disabled, .fm-chat-end.disabled, .fm-end-call.disabled, .fm-download-as-zip.disabled, .fm-import-to-cloudrive.disabled, .fm-dialog-button.disabled, .avatar-dialog .fm-account-change-avatar.disabled, .top-dialog-login-button.disabled, .nw-chat-button.disabled, .multiple-sharing.expanded .main-body .nw-chat-button.disabled, .fm-chat-attach-button.disabled, .fm-chat-contact-button.disabled, .fm-new-folder.disabled, .search-files-result.disabled, .search-messages-result.disabled, .fm-file-upload.disabled, .search-messages-result.disabled, .fm-folder-upload.disabled, .fm-notification-settings.disabled, .create-folder-button.disabled, .add-user-popup-button.disabled, .create-folder-button-cancel.disabled, .fm-dialog-new-folder-button.disabled, .rename-dialog-button.disabled, .fm-dialog-button.disabled, .add-user-popup-button.disabled, .contact-request-button.disabled, .transfer-clear-all-icon.disabled, .transfer-clear-completed.disabled, .transfer-pause-icon.disabled, .fm-account-change-email.disabled {
+.fm-add-user.disabled, .fm-start-video-call.disabled, .fm-clearbin-button.disabled, .fm-send-files.disabled, .fm-start-call.disabled, .fm-leave-share.disabled, .fm-share-copy.disabled, .fm-share-download.disabled, .contact-send-files.disabled, .fm-start-conversation.disabled, .fm-share-folders.disabled, .fm-verify.disabled, .fm-reset-stored-fingerprint.disabled, .fm-question.disabled, .fm-chat-end.disabled, .fm-end-call.disabled, .fm-download-as-zip.disabled, .fm-import-to-cloudrive.disabled, .fm-dialog-button.disabled, .avatar-dialog .fm-account-change-avatar.disabled, .top-dialog-login-button.disabled, .nw-chat-button.disabled, .multiple-sharing.expanded .main-body .nw-chat-button.disabled, .fm-chat-attach-button.disabled, .fm-chat-contact-button.disabled, .fm-new-folder.disabled, .search-files-result.disabled, .search-messages-result.disabled, .fm-file-upload.disabled, .search-messages-result.disabled, .fm-folder-upload.disabled, .fm-notification-settings.disabled, .create-folder-button.disabled, .add-user-popup-button.disabled, .create-folder-button-cancel.disabled, .fm-dialog-new-folder-button.disabled, .rename-dialog-button.disabled, .fm-dialog-button.disabled, .add-user-popup-button.disabled, .contact-request-button.disabled, .transfer-clear-all-icon.disabled, .transfer-clear-completed.disabled, .transfer-pause-icon.disabled {
 	cursor: default !important;
 	background-color: rgba(255,255,255,0) !important;
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
@@ -7825,30 +7825,30 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	position: relative;
 }
 .fm-account-input::before {
-	    content: '';
-    position: absolute;
-    width: 19px;
-    height: 18px;
-    background-image: url(../images/mega/nw-fm-sprite_v12.svg);
-    background-repeat: no-repeat;
-    background-position: -14px -10610px;
-    right: 6px;
-    top: 7px;
+	content: '';
+	position: absolute;
+	width: 19px;
+	height: 18px;
+	background-image: url(../images/mega/nw-fm-sprite_v12.svg);
+	background-repeat: no-repeat;
+	background-position: -14px -10610px;
+	right: 6px;
+	top: 7px;
 	-webkit-transition: opacity 200ms ease-in-out;
-    -moz-transition: opacity 200ms ease-in-out;
-    -o-transition: opacity 200ms ease-in-out;
-    -ms-transition: opacity 200ms ease-in-out;
-    transition: opacity 200ms ease-in-out;
-    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
-    -moz-opacity: 0;
-    -khtml-opacity: 0;
-    opacity: 0;
+	-moz-transition: opacity 200ms ease-in-out;
+	-o-transition: opacity 200ms ease-in-out;
+	-ms-transition: opacity 200ms ease-in-out;
+	transition: opacity 200ms ease-in-out;
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+	-moz-opacity: 0;
+	-khtml-opacity: 0;
+	opacity: 0;
 }
 .fm-account-input:hover::before {
-	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
-    -moz-opacity: 1;
-    -khtml-opacity: 1;
-    opacity: 1;
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+	-moz-opacity: 1;
+	-khtml-opacity: 1;
+	opacity: 1;
 }
 .create-folder-input-bl, .add-user-popup-input-bl, .rename-input-bl {
 	width: 100%;
@@ -8046,16 +8046,20 @@ color: white;
 }
 .fm-account-change-email {
 	font-size: 12px;
-	cursor: pointer;
 	color: #E54C51;
 	padding: 4px 0 0 10px;
 	height: 18px;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
+	display: none;
 }
-.email-confirm {
+.email-confirm-txt {
 	height: 18px;
+	display: none;
+}
+.email-confirm .fm-account-change-email, .email-confirm .email-confirm-txt {
+	display: block;
 }
 .fmholder td {
 	cursor: default;
@@ -9646,7 +9650,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
 	min-height: 100px;
 	margin: -187px 0 0 -310px;
 }
-.fm-dialog.registration-success, .fm-dialog.reset-success, .fm-dialog.reset-success-st2 {
+.fm-dialog.registration-success, .fm-dialog.reset-success, .fm-dialog.reset-success-st2, .fm-dialog.awaiting-confirmation {
 	width: 393px;
 	min-height: 254px;
 	margin: -178px 0 0 -196px
@@ -9685,6 +9689,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
 }
 .payment-confirmation .reg-success-icon.success {
 	background-position: center -400px;
+}
+.awaiting-confirmation .reg-success-icon {
+	background-position: center -1021px;
+	height: 151px;
 }
 .payment-confirmation .reg-success-icon.failure {
 	background-position: center -200px;
@@ -14484,17 +14492,20 @@ h5.main-italic-header {
 	letter-spacing: -0.1px;
 	text-align: center;
 	color: #78B240;
-	font-family: 'Open Sans Semibold Italic', Arial;
+	font-family: 'source_sans_prolight';
+}
+.reg-success-header {
+	color: #666666;
 }
 .reg-success-txt {
 	font-size: 14px;
-	color: #333333;
+	color: #666666;
 	text-align: center;
-	padding: 4px 30px 30px 30px;
+	padding: 18px 30px 45px 30px;
 	line-height: 18px;
 }
 .reset-success .reg-success-txt {
-	padding: 0 30px 18px 30px;
+	padding: 10px 30px 20px 30px;
 }
 .fm-dialog-top-text {
 	padding: 0 8px;
@@ -14546,7 +14557,7 @@ h5.main-italic-header {
 	font-size: 13px;
 	color: #999999;
 	text-align: center;
-	padding: 0 30px 26px 30px;
+	padding: 0 30px 30px 30px;
 	line-height: 15px;
 }
 .reset-description-txt a {
@@ -24511,7 +24522,7 @@ body.pro:after {
 	background-position: -85px -900px;
 }
 .settings .toast-button {
-	display:none;
+	display: none;
 }
 .toast-body {
 	display: table;

@@ -3447,40 +3447,15 @@ function accountUI()
         //Bind Dropdowns events
         bindDropdownEvents($('.fm-account-main .default-select'), 1);
 
-        $('.fm-account-change-email').rebind('click', function(e) {
-            if (!$(this).hasClass('disabled')) {
-                var email = $('#account-email').val().trim().toLowerCase();
-                if (u_attr.email !== email) {
-                    api_req({
-                        a:'se',
-                        aa:'a', 
-                        e: email,
-                        i: requesti,
-                    },  {
-                        callback : function(res) {
-                            if (res === -12) {
-                                return msgDialog('warninga', 'Error', "You have already sent a confirm link to that address."); 
-                            }
-    
-                            msgDialog('warninga', 'Email', "We've send you a link to your email address. Please open it to verify your email");
-                            localStorage.new_email = email;
-                            $('.fm-account-change-email')
-                                .addClass('disabled')
-                                .find('span')
-                                .text('Awaiting confirmation');
-                        }
-                    });
-                }
-            }
-        });
         $('#account-email').rebind('keyup', function(e) {
-            var $button = $('.fm-account-change-email');
+            var $emailBlock = $('.profile-form.first');
             var mail = $('#account-email').val();
             if (checkMail(mail)) {
                 return;
             }
             if (mail !== u_attr.email) {
-                $button.removeClass('disabled');
+                $emailBlock.addClass('email-confirm');
+                $('.fm-account-save-block').removeClass('hidden');
             }
         });
         $('#account-firstname,#account-lastname').rebind('keyup', function(e)
@@ -3491,6 +3466,7 @@ function accountUI()
         $('.fm-account-cancel').bind('click', function(e)
         {
             $('.fm-account-save-block').addClass('hidden');
+            $('.profile-form.first').removeClass('email-confirm')
             accountUI();
         });
         $('.fm-account-save').unbind('click');
@@ -3518,8 +3494,6 @@ function accountUI()
                     }
                 }
             });
-            $('.fm-account-save-block').addClass('hidden');
-			showToast('settings', 'You have successfully changed your profile.');
 
             if (M.account.dl_maxSlots)
             {
@@ -3617,6 +3591,32 @@ function accountUI()
             }
             else
                 $('#account-confirm-password,#account-password,#account-new-password').val('');
+
+            var email = $('#account-email').val().trim().toLowerCase();
+            if (u_attr.email !== email) {
+                api_req({
+                a:'se',
+                aa:'a', 
+                e: email,
+                i: requesti,
+                },  {
+                    callback : function(res) {
+                        if (res === -12) {
+                            return msgDialog('warninga', 'Error', "You have already sent a confirm link to that address."); 
+                        }
+
+                        fm_showoverlay();
+                        dialogPositioning('.awaiting-confirmation');
+                        $('.awaiting-confirmation').removeClass('hidden');
+                        $('.fm-account-save-block').addClass('hidden');
+                        localStorage.new_email = email;
+                    }
+                   });
+                return;
+            }
+
+            $('.fm-account-save-block').addClass('hidden');
+            showToast('settings', 'You have successfully changed your profile.');
             accountUI();
         });
         $('#account-email').val(u_attr.email);
@@ -8703,7 +8703,7 @@ function showToast(toastClass, notification) {
     $('.common-toast .toast-button').rebind('click', function()
     {
         $('.toast-notification').removeClass('visible');
-		clearInterval(interval);
+        clearInterval(interval);
     });
 
     $toast.rebind('mouseover', function()

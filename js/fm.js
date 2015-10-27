@@ -2438,9 +2438,7 @@ function initContextUI() {
             ephemeralDialog(l[1005]);
         }
         else {
-            fm_showoverlay();
             initCopyrightsDialog($.selected);
-            $('.copyrights-dialog').show();
         }
     });
 
@@ -7582,27 +7580,50 @@ function initShareDialogMultiInputPlugin() {
 }
 
 /**
- * initCopyrightsDialog
+ * Shows the copyright warning dialog.
  *
- * @param {Array} nodesToProcess Array of strings, nodes ids
+ * @param {Array} nodesToProcess Array of strings, node ids
  */
 function initCopyrightsDialog(nodesToProcess) {
 
-    $.copyrightsDialog = 'copyrights';
+    // If they've already agreed to the copyright warning this session
+    if (localStorage.getItem('agreedToCopyrightWarning') !== null) {
+        
+        // Go straight to Get Link dialog
+        var exportLink = new mega.Share.ExportLink({ 'showExportLinkDialog': true, 'updateUI': true, 'nodesToProcess': nodesToProcess });
+        exportLink.getExportLink();
+        
+        return false;
+    }
 
-    $('.copyrights-dialog .fm-dialog-button').rebind('click', function() {
-        if (this.className.indexOf('cancel') !== -1) {
+    // Cache selector
+    var $copyrightDialog = $('.copyrights-dialog');
+
+    // Otherwise show the copyright warning dialog
+    fm_showoverlay();
+    $.copyrightsDialog = 'copyrights';
+    $copyrightDialog.show();
+    
+    // Init click handler for 'I agree' / 'I disagree' buttons
+    $copyrightDialog.find('.fm-dialog-button').rebind('click', function() {
+        
+        // User disagrees with copyright warning
+        if ($(this).hasClass('cancel')) {
             closeDialog();
         }
         else {
+            // User agrees, store flag in localStorage so they don't see it again for this session
+            localStorage.setItem('agreedToCopyrightWarning', '1');
+            
+            // Go straight to Get Link dialog
             closeDialog();
             var exportLink = new mega.Share.ExportLink({ 'showExportLinkDialog': true, 'updateUI': true, 'nodesToProcess': nodesToProcess });
             exportLink.getExportLink();
         }
-
     });
-
-    $('.copyrights-dialog .fm-dialog-close').rebind('click', function() {
+    
+    // Init click handler for 'Close' button
+    $copyrightDialog.find('.fm-dialog-close').rebind('click', function() {
         closeDialog();
     });
 }

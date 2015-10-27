@@ -10978,5 +10978,9 @@
     "7695": {
         "text": "This folder has been subject to a takedown notice.",
         "context": "A warning label on a dialog, informing the user that their folder has been taken down (made inaccessible). This usually occurs when there is copyright infringement."
+    },
+    "7696": {
+        "text": "Copyright warning to all users",
+        "context": "A title for the Copyright Warning dialog. Designed to make the user feel as though this is not targeting them, but is a warning for everybody who uses our service."
     }
 }

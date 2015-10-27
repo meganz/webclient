@@ -757,7 +757,7 @@ function initUI() {
                 ephemeralDialog(l[7687]);
             }
             else {
-                document.location.hash = 'fm/account/settings';
+                document.location.hash = 'fm/account';
             }
             return false;
         }

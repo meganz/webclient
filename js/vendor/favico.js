@@ -2,7 +2,7 @@
  * @license MIT
  * @fileOverview Favico animations
  * @author Miroslav Magda, http://blog.ejci.net
- * @version 0.3.9
+ * @version 0.3.10
  */
 
 /**
@@ -22,21 +22,21 @@
  *    win: top
  * });
  */
-(function() {
+(function () {
 
-	var Favico = (function(opt) {
+	var Favico = (function (opt) {
 		'use strict';
 		opt = (opt) ? opt : {};
 		var _def = {
-			bgColor : '#d00',
-			textColor : '#fff',
-			fontFamily : 'sans-serif', //Arial,Verdana,Times New Roman,serif,sans-serif,...
-			fontStyle : 'bold', //normal,italic,oblique,bold,bolder,lighter,100,200,300,400,500,600,700,800,900
-			type : 'circle',
-			position : 'down', // down, up, left, leftup (upleft)
-			animation : 'slide',
-			elementId : false,
-			dataUrl : false,
+			bgColor: '#d00',
+			textColor: '#fff',
+			fontFamily: 'sans-serif', //Arial,Verdana,Times New Roman,serif,sans-serif,...
+			fontStyle: 'bold', //normal,italic,oblique,bold,bolder,lighter,100,200,300,400,500,600,700,800,900
+			type: 'circle',
+			position: 'down', // down, up, left, leftup (upleft)
+			animation: 'slide',
+			elementId: false,
+			dataUrl: false,
 			win: window
 		};
 		var _opt, _orig, _h, _w, _canvas, _context, _img, _ready, _lastBadge, _running, _readyCb, _stop, _browser, _animTimeout, _drawTimeout, _doc;
@@ -50,13 +50,13 @@
 		_browser.supported = (_browser.chrome || _browser.ff || _browser.opera);
 
 		var _queue = [];
-		_readyCb = function() {
+		_readyCb = function () {
 		};
 		_ready = _stop = false;
 		/**
 		 * Initialize favico
 		 */
-		var init = function() {
+		var init = function () {
 			//merge initial options
 			_opt = merge(_def, opt);
 			_opt.bgColor = hexToRgb(_opt.bgColor);
@@ -102,9 +102,8 @@
 			_img = document.createElement('img');
 			if (_orig.hasAttribute('href')) {
 				_img.setAttribute('crossOrigin', 'anonymous');
-				_img.setAttribute('src', _orig.getAttribute('href'));
 				//get width/height
-				_img.onload = function() {
+				_img.onload = function () {
 					_h = (_img.height > 0) ? _img.height : 32;
 					_w = (_img.width > 0) ? _img.width : 32;
 					_canvas.height = _h;
@@ -112,16 +111,19 @@
 					_context = _canvas.getContext('2d');
 					icon.ready();
 				};
+				_img.setAttribute('src', _orig.getAttribute('href'));
 			} else {
+				_img.onload = function () {
+					_h = 32;
+					_w = 32;
+					_img.height = _h;
+					_img.width = _w;
+					_canvas.height = _h;
+					_canvas.width = _w;
+					_context = _canvas.getContext('2d');
+					icon.ready();
+				};
 				_img.setAttribute('src', '');
-				_h = 32;
-				_w = 32;
-				_img.height = _h;
-				_img.width = _w;
-				_canvas.height = _h;
-				_canvas.width = _w;
-				_context = _canvas.getContext('2d');
-				icon.ready();
 			}
 
 		};
@@ -132,7 +134,7 @@
 		/**
 		 * Icon is ready (reset icon) and start animation (if ther is any)
 		 */
-		icon.ready = function() {
+		icon.ready = function () {
 			_ready = true;
 			icon.reset();
 			_readyCb();
@@ -140,7 +142,7 @@
 		/**
 		 * Reset icon to default state
 		 */
-		icon.reset = function() {
+		icon.reset = function () {
 			//reset
 			if (!_ready) {
 				return;
@@ -160,11 +162,11 @@
 		/**
 		 * Start animation
 		 */
-		icon.start = function() {
+		icon.start = function () {
 			if (!_ready || _running) {
 				return;
 			}
-			var finished = function() {
+			var finished = function () {
 				_lastBadge = _queue[0];
 				_running = false;
 				if (_queue.length > 0) {
@@ -176,19 +178,19 @@
 			};
 			if (_queue.length > 0) {
 				_running = true;
-				var run = function() {
+				var run = function () {
 					// apply options for this animation
-					['type', 'animation', 'bgColor', 'textColor', 'fontFamily', 'fontStyle'].forEach(function(a) {
-						if ( a in _queue[0].options) {
+					['type', 'animation', 'bgColor', 'textColor', 'fontFamily', 'fontStyle'].forEach(function (a) {
+						if (a in _queue[0].options) {
 							_opt[a] = _queue[0].options[a];
 						}
 					});
-					animation.run(_queue[0].options, function() {
+					animation.run(_queue[0].options, function () {
 						finished();
 					}, false);
 				};
 				if (_lastBadge) {
-					animation.run(_lastBadge.options, function() {
+					animation.run(_lastBadge.options, function () {
 						run();
 					}, true);
 				} else {
@@ -201,8 +203,8 @@
 		 * Badge types
 		 */
 		var type = {};
-		var options = function(opt) {
-			opt.n = (( typeof opt.n) === 'number') ? Math.abs(opt.n | 0) : opt.n;
+		var options = function (opt) {
+			opt.n = ((typeof opt.n) === 'number') ? Math.abs(opt.n | 0) : opt.n;
 			opt.x = _w * opt.x;
 			opt.y = _h * opt.y;
 			opt.w = _w * opt.w;
@@ -214,7 +216,7 @@
 		 * Generate circle
 		 * @param {Object} opt Badge options
 		 */
-		type.circle = function(opt) {
+		type.circle = function (opt) {
 			opt = options(opt);
 			var more = false;
 			if (opt.len === 2) {
@@ -251,8 +253,8 @@
 			_context.stroke();
 			_context.fillStyle = 'rgba(' + _opt.textColor.r + ',' + _opt.textColor.g + ',' + _opt.textColor.b + ',' + opt.o + ')';
 			//_context.fillText((more) ? '9+' : opt.n, Math.floor(opt.x + opt.w / 2), Math.floor(opt.y + opt.h - opt.h * 0.15));
-			if (( typeof opt.n) === 'number' && opt.n > 999) {
-				_context.fillText(((opt.n > 9999) ? 9 : Math.floor(opt.n / 1000) ) + 'k+', Math.floor(opt.x + opt.w / 2), Math.floor(opt.y + opt.h - opt.h * 0.2));
+			if ((typeof opt.n) === 'number' && opt.n > 999) {
+				_context.fillText(((opt.n > 9999) ? 9 : Math.floor(opt.n / 1000)) + 'k+', Math.floor(opt.x + opt.w / 2), Math.floor(opt.y + opt.h - opt.h * 0.2));
 			} else {
 				_context.fillText(opt.n, Math.floor(opt.x + opt.w / 2), Math.floor(opt.y + opt.h - opt.h * 0.15));
 			}
@@ -262,7 +264,7 @@
 		 * Generate rectangle
 		 * @param {Object} opt Badge options
 		 */
-		type.rectangle = function(opt) {
+		type.rectangle = function (opt) {
 			opt = options(opt);
 			var more = false;
 			if (opt.len === 2) {
@@ -283,8 +285,8 @@
 			_context.fillRect(opt.x, opt.y, opt.w, opt.h);
 			_context.fillStyle = 'rgba(' + _opt.textColor.r + ',' + _opt.textColor.g + ',' + _opt.textColor.b + ',' + opt.o + ')';
 			//_context.fillText((more) ? '9+' : opt.n, Math.floor(opt.x + opt.w / 2), Math.floor(opt.y + opt.h - opt.h * 0.15));
-			if (( typeof opt.n) === 'number' && opt.n > 999) {
-				_context.fillText(((opt.n > 9999) ? 9 : Math.floor(opt.n / 1000) ) + 'k+', Math.floor(opt.x + opt.w / 2), Math.floor(opt.y + opt.h - opt.h * 0.2));
+			if ((typeof opt.n) === 'number' && opt.n > 999) {
+				_context.fillText(((opt.n > 9999) ? 9 : Math.floor(opt.n / 1000)) + 'k+', Math.floor(opt.x + opt.w / 2), Math.floor(opt.y + opt.h - opt.h * 0.2));
 			} else {
 				_context.fillText(opt.n, Math.floor(opt.x + opt.w / 2), Math.floor(opt.y + opt.h - opt.h * 0.15));
 			}
@@ -294,17 +296,17 @@
 		/**
 		 * Set badge
 		 */
-		var badge = function(number, opts) {
-			opts = (( typeof opts) === 'string' ? {
-				animation : opts
+		var badge = function (number, opts) {
+			opts = ((typeof opts) === 'string' ? {
+				animation: opts
 			} : opts) || {};
-			_readyCb = function() {
+			_readyCb = function () {
 				try {
-					if ( typeof (number) === 'number' ? (number > 0) : (number !== '')) {
+					if (typeof (number) === 'number' ? (number > 0) : (number !== '')) {
 						var q = {
-							type : 'badge',
-							options : {
-								n : number
+							type: 'badge',
+							options: {
+								n: number
 							}
 						};
 						if ('animation' in opts && animation.types['' + opts.animation]) {
@@ -313,13 +315,13 @@
 						if ('type' in opts && type['' + opts.type]) {
 							q.options.type = '' + opts.type;
 						}
-						['bgColor', 'textColor'].forEach(function(o) {
-							if ( o in opts) {
+						['bgColor', 'textColor'].forEach(function (o) {
+							if (o in opts) {
 								q.options[o] = hexToRgb(opts[o]);
 							}
 						});
-						['fontStyle', 'fontFamily'].forEach(function(o) {
-							if ( o in opts) {
+						['fontStyle', 'fontFamily'].forEach(function (o) {
+							if (o in opts) {
 								q.options[o] = opts[o];
 							}
 						});
@@ -331,7 +333,7 @@
 					} else {
 						icon.reset();
 					}
-				} catch(e) {
+				} catch (e) {
 					throw new Error('Error setting badge. Message: ' + e.message);
 				}
 			};
@@ -343,21 +345,23 @@
 		/**
 		 * Set image as icon
 		 */
-		var image = function(imageElement) {
-			_readyCb = function() {
+		var image = function (imageElement) {
+			_readyCb = function () {
 				try {
 					var w = imageElement.width;
 					var h = imageElement.height;
 					var newImg = document.createElement('img');
 					var ratio = (w / _w < h / _h) ? (w / _w) : (h / _h);
 					newImg.setAttribute('crossOrigin', 'anonymous');
+					newImg.onload=function(){
+						_context.clearRect(0, 0, _w, _h);
+						_context.drawImage(newImg, 0, 0, _w, _h);
+						link.setIcon(_canvas);
+					};
 					newImg.setAttribute('src', imageElement.getAttribute('src'));
 					newImg.height = (h / ratio);
 					newImg.width = (w / ratio);
-					_context.clearRect(0, 0, _w, _h);
-					_context.drawImage(newImg, 0, 0, _w, _h);
-					link.setIcon(_canvas);
-				} catch(e) {
+				} catch (e) {
 					throw new Error('Error setting image. Message: ' + e.message);
 				}
 			};
@@ -368,8 +372,8 @@
 		/**
 		 * Set video as icon
 		 */
-		var video = function(videoElement) {
-			_readyCb = function() {
+		var video = function (videoElement) {
+			_readyCb = function () {
 				try {
 					if (videoElement === 'stop') {
 						_stop = true;
@@ -380,11 +384,11 @@
 					//var w = videoElement.width;
 					//var h = videoElement.height;
 					//var ratio = (w / _w < h / _h) ? (w / _w) : (h / _h);
-					videoElement.addEventListener('play', function() {
+					videoElement.addEventListener('play', function () {
 						drawVideo(this);
 					}, false);
 
-				} catch(e) {
+				} catch (e) {
 					throw new Error('Error setting video. Message: ' + e.message);
 				}
 			};
@@ -395,18 +399,18 @@
 		/**
 		 * Set video as icon
 		 */
-		var webcam = function(action) {
+		var webcam = function (action) {
 			//UR
 			if (!window.URL || !window.URL.createObjectURL) {
 				window.URL = window.URL || {};
-				window.URL.createObjectURL = function(obj) {
+				window.URL.createObjectURL = function (obj) {
 					return obj;
 				};
 			}
 			if (_browser.supported) {
 				var newVideo = false;
 				navigator.getUserMedia = navigator.getUserMedia || navigator.oGetUserMedia || navigator.msGetUserMedia || navigator.mozGetUserMedia || navigator.webkitGetUserMedia;
-				_readyCb = function() {
+				_readyCb = function () {
 					try {
 						if (action === 'stop') {
 							_stop = true;
@@ -418,15 +422,15 @@
 						newVideo.width = _w;
 						newVideo.height = _h;
 						navigator.getUserMedia({
-							video : true,
-							audio : false
-						}, function(stream) {
+							video: true,
+							audio: false
+						}, function (stream) {
 							newVideo.src = URL.createObjectURL(stream);
 							newVideo.play();
 							drawVideo(newVideo);
-						}, function() {
+						}, function () {
 						});
-					} catch(e) {
+					} catch (e) {
 						throw new Error('Error setting webcam. Message: ' + e.message);
 					}
 				};
@@ -444,14 +448,14 @@
 			if (video.paused || video.ended || _stop) {
 				return false;
 			}
-			//nasty hack for FF webcam (Thanks to Julian Cwirko, kontakt@redsunmedia.pl)
+			//nasty hack for FF webcam (Thanks to Julian Ćwirko, kontakt@redsunmedia.pl)
 			try {
 				_context.clearRect(0, 0, _w, _h);
 				_context.drawImage(video, 0, 0, _w, _h);
-			} catch(e) {
+			} catch (e) {
 
 			}
-			_drawTimeout = setTimeout(function() {
+			_drawTimeout = setTimeout(function () {
 				drawVideo(video);
 			}, animation.duration);
 			link.setIcon(_canvas);
@@ -461,10 +465,10 @@
 		/**
 		 * Get icon from HEAD tag or create a new <link> element
 		 */
-		link.getIcon = function() {
+		link.getIcon = function () {
 			var elm = false;
 			//get link element
-			var getLink = function() {
+			var getLink = function () {
 				var link = _doc.getElementsByTagName('head')[0].getElementsByTagName('link');
 				for (var l = link.length, i = (l - 1); i >= 0; i--) {
 					if ((/(^|\s)icon(\s|$)/i).test(link[i].getAttribute('rel'))) {
@@ -491,7 +495,7 @@
 			elm.setAttribute('type', 'image/png');
 			return elm;
 		};
-		link.setIcon = function(canvas) {
+		link.setIcon = function (canvas) {
 			var url = canvas.toDataURL('image/png');
 			if (_opt.dataUrl) {
 				//if using custom exporter
@@ -533,14 +537,14 @@
 		//HEX to RGB convertor
 		function hexToRgb(hex) {
 			var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
-			hex = hex.replace(shorthandRegex, function(m, r, g, b) {
+			hex = hex.replace(shorthandRegex, function (m, r, g, b) {
 				return r + r + g + g + b + b;
 			});
 			var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
 			return result ? {
-				r : parseInt(result[1], 16),
-				g : parseInt(result[2], 16),
-				b : parseInt(result[3], 16)
+				r: parseInt(result[1], 16),
+				g: parseInt(result[2], 16),
+				b: parseInt(result[3], 16)
 			} : false;
 		}
 
@@ -580,214 +584,214 @@
 		 */
 		animation.types = {};
 		animation.types.fade = [{
-			x : 0.4,
-			y : 0.4,
-			w : 0.6,
-			h : 0.6,
-			o : 0.0
+			x: 0.4,
+			y: 0.4,
+			w: 0.6,
+			h: 0.6,
+			o: 0.0
 		}, {
-			x : 0.4,
-			y : 0.4,
-			w : 0.6,
-			h : 0.6,
-			o : 0.1
-		}, {
-			x : 0.4,
-			y : 0.4,
-			w : 0.6,
-			h : 0.6,
-			o : 0.2
-		}, {
-			x : 0.4,
-			y : 0.4,
-			w : 0.6,
-			h : 0.6,
-			o : 0.3
-		}, {
-			x : 0.4,
-			y : 0.4,
-			w : 0.6,
-			h : 0.6,
-			o : 0.4
-		}, {
-			x : 0.4,
-			y : 0.4,
-			w : 0.6,
-			h : 0.6,
-			o : 0.5
-		}, {
-			x : 0.4,
-			y : 0.4,
-			w : 0.6,
-			h : 0.6,
-			o : 0.6
-		}, {
-			x : 0.4,
-			y : 0.4,
-			w : 0.6,
-			h : 0.6,
-			o : 0.7
-		}, {
-			x : 0.4,
-			y : 0.4,
-			w : 0.6,
-			h : 0.6,
-			o : 0.8
-		}, {
-			x : 0.4,
-			y : 0.4,
-			w : 0.6,
-			h : 0.6,
-			o : 0.9
-		}, {
-			x : 0.4,
-			y : 0.4,
-			w : 0.6,
-			h : 0.6,
-			o : 1.0
-		}];
+				x: 0.4,
+				y: 0.4,
+				w: 0.6,
+				h: 0.6,
+				o: 0.1
+			}, {
+				x: 0.4,
+				y: 0.4,
+				w: 0.6,
+				h: 0.6,
+				o: 0.2
+			}, {
+				x: 0.4,
+				y: 0.4,
+				w: 0.6,
+				h: 0.6,
+				o: 0.3
+			}, {
+				x: 0.4,
+				y: 0.4,
+				w: 0.6,
+				h: 0.6,
+				o: 0.4
+			}, {
+				x: 0.4,
+				y: 0.4,
+				w: 0.6,
+				h: 0.6,
+				o: 0.5
+			}, {
+				x: 0.4,
+				y: 0.4,
+				w: 0.6,
+				h: 0.6,
+				o: 0.6
+			}, {
+				x: 0.4,
+				y: 0.4,
+				w: 0.6,
+				h: 0.6,
+				o: 0.7
+			}, {
+				x: 0.4,
+				y: 0.4,
+				w: 0.6,
+				h: 0.6,
+				o: 0.8
+			}, {
+				x: 0.4,
+				y: 0.4,
+				w: 0.6,
+				h: 0.6,
+				o: 0.9
+			}, {
+				x: 0.4,
+				y: 0.4,
+				w: 0.6,
+				h: 0.6,
+				o: 1.0
+			}];
 		animation.types.none = [{
-			x : 0.4,
-			y : 0.4,
-			w : 0.6,
-			h : 0.6,
-			o : 1
+			x: 0.4,
+			y: 0.4,
+			w: 0.6,
+			h: 0.6,
+			o: 1
 		}];
 		animation.types.pop = [{
-			x : 1,
-			y : 1,
-			w : 0,
-			h : 0,
-			o : 1
+			x: 1,
+			y: 1,
+			w: 0,
+			h: 0,
+			o: 1
 		}, {
-			x : 0.9,
-			y : 0.9,
-			w : 0.1,
-			h : 0.1,
-			o : 1
-		}, {
-			x : 0.8,
-			y : 0.8,
-			w : 0.2,
-			h : 0.2,
-			o : 1
-		}, {
-			x : 0.7,
-			y : 0.7,
-			w : 0.3,
-			h : 0.3,
-			o : 1
-		}, {
-			x : 0.6,
-			y : 0.6,
-			w : 0.4,
-			h : 0.4,
-			o : 1
-		}, {
-			x : 0.5,
-			y : 0.5,
-			w : 0.5,
-			h : 0.5,
-			o : 1
-		}, {
-			x : 0.4,
-			y : 0.4,
-			w : 0.6,
-			h : 0.6,
-			o : 1
-		}];
+				x: 0.9,
+				y: 0.9,
+				w: 0.1,
+				h: 0.1,
+				o: 1
+			}, {
+				x: 0.8,
+				y: 0.8,
+				w: 0.2,
+				h: 0.2,
+				o: 1
+			}, {
+				x: 0.7,
+				y: 0.7,
+				w: 0.3,
+				h: 0.3,
+				o: 1
+			}, {
+				x: 0.6,
+				y: 0.6,
+				w: 0.4,
+				h: 0.4,
+				o: 1
+			}, {
+				x: 0.5,
+				y: 0.5,
+				w: 0.5,
+				h: 0.5,
+				o: 1
+			}, {
+				x: 0.4,
+				y: 0.4,
+				w: 0.6,
+				h: 0.6,
+				o: 1
+			}];
 		animation.types.popFade = [{
-			x : 0.75,
-			y : 0.75,
-			w : 0,
-			h : 0,
-			o : 0
+			x: 0.75,
+			y: 0.75,
+			w: 0,
+			h: 0,
+			o: 0
 		}, {
-			x : 0.65,
-			y : 0.65,
-			w : 0.1,
-			h : 0.1,
-			o : 0.2
-		}, {
-			x : 0.6,
-			y : 0.6,
-			w : 0.2,
-			h : 0.2,
-			o : 0.4
-		}, {
-			x : 0.55,
-			y : 0.55,
-			w : 0.3,
-			h : 0.3,
-			o : 0.6
-		}, {
-			x : 0.50,
-			y : 0.50,
-			w : 0.4,
-			h : 0.4,
-			o : 0.8
-		}, {
-			x : 0.45,
-			y : 0.45,
-			w : 0.5,
-			h : 0.5,
-			o : 0.9
-		}, {
-			x : 0.4,
-			y : 0.4,
-			w : 0.6,
-			h : 0.6,
-			o : 1
-		}];
+				x: 0.65,
+				y: 0.65,
+				w: 0.1,
+				h: 0.1,
+				o: 0.2
+			}, {
+				x: 0.6,
+				y: 0.6,
+				w: 0.2,
+				h: 0.2,
+				o: 0.4
+			}, {
+				x: 0.55,
+				y: 0.55,
+				w: 0.3,
+				h: 0.3,
+				o: 0.6
+			}, {
+				x: 0.50,
+				y: 0.50,
+				w: 0.4,
+				h: 0.4,
+				o: 0.8
+			}, {
+				x: 0.45,
+				y: 0.45,
+				w: 0.5,
+				h: 0.5,
+				o: 0.9
+			}, {
+				x: 0.4,
+				y: 0.4,
+				w: 0.6,
+				h: 0.6,
+				o: 1
+			}];
 		animation.types.slide = [{
-			x : 0.4,
-			y : 1,
-			w : 0.6,
-			h : 0.6,
-			o : 1
+			x: 0.4,
+			y: 1,
+			w: 0.6,
+			h: 0.6,
+			o: 1
 		}, {
-			x : 0.4,
-			y : 0.9,
-			w : 0.6,
-			h : 0.6,
-			o : 1
-		}, {
-			x : 0.4,
-			y : 0.9,
-			w : 0.6,
-			h : 0.6,
-			o : 1
-		}, {
-			x : 0.4,
-			y : 0.8,
-			w : 0.6,
-			h : 0.6,
-			o : 1
-		}, {
-			x : 0.4,
-			y : 0.7,
-			w : 0.6,
-			h : 0.6,
-			o : 1
-		}, {
-			x : 0.4,
-			y : 0.6,
-			w : 0.6,
-			h : 0.6,
-			o : 1
-		}, {
-			x : 0.4,
-			y : 0.5,
-			w : 0.6,
-			h : 0.6,
-			o : 1
-		}, {
-			x : 0.4,
-			y : 0.4,
-			w : 0.6,
-			h : 0.6,
-			o : 1
-		}];
+				x: 0.4,
+				y: 0.9,
+				w: 0.6,
+				h: 0.6,
+				o: 1
+			}, {
+				x: 0.4,
+				y: 0.9,
+				w: 0.6,
+				h: 0.6,
+				o: 1
+			}, {
+				x: 0.4,
+				y: 0.8,
+				w: 0.6,
+				h: 0.6,
+				o: 1
+			}, {
+				x: 0.4,
+				y: 0.7,
+				w: 0.6,
+				h: 0.6,
+				o: 1
+			}, {
+				x: 0.4,
+				y: 0.6,
+				w: 0.6,
+				h: 0.6,
+				o: 1
+			}, {
+				x: 0.4,
+				y: 0.5,
+				w: 0.6,
+				h: 0.6,
+				o: 1
+			}, {
+				x: 0.4,
+				y: 0.4,
+				w: 0.6,
+				h: 0.6,
+				o: 1
+			}];
 		/**
 		 * Run animation
 		 * @param {Object} opt Animation options
@@ -795,18 +799,18 @@
 		 * @param {Object} revert Reverse order? true|false
 		 * @param {Object} step Optional step number (frame bumber)
 		 */
-		animation.run = function(opt, cb, revert, step) {
+		animation.run = function (opt, cb, revert, step) {
 			var animationType = animation.types[isPageHidden() ? 'none' : _opt.animation];
 			if (revert === true) {
-				step = ( typeof step !== 'undefined') ? step : animationType.length - 1;
+				step = (typeof step !== 'undefined') ? step : animationType.length - 1;
 			} else {
-				step = ( typeof step !== 'undefined') ? step : 0;
+				step = (typeof step !== 'undefined') ? step : 0;
 			}
-			cb = (cb) ? cb : function() {
+			cb = (cb) ? cb : function () {
 			};
 			if ((step < animationType.length) && (step >= 0)) {
 				type[_opt.type](merge(opt, animationType[step]));
-				_animTimeout = setTimeout(function() {
+				_animTimeout = setTimeout(function () {
 					if (revert) {
 						step = step - 1;
 					} else {
@@ -824,25 +828,25 @@
 		//auto init
 		init();
 		return {
-			badge : badge,
-			video : video,
-			image : image,
-			webcam : webcam,
-			reset : icon.reset,
-			browser : {
-				supported : _browser.supported
+			badge: badge,
+			video: video,
+			image: image,
+			webcam: webcam,
+			reset: icon.reset,
+			browser: {
+				supported: _browser.supported
 			}
 		};
 	});
 
 	// AMD / RequireJS
-	if ( typeof define !== 'undefined' && define.amd) {
-		define([], function() {
+	if (typeof define !== 'undefined' && define.amd) {
+		define([], function () {
 			return Favico;
 		});
 	}
 	// CommonJS
-	else if ( typeof module !== 'undefined' && module.exports) {
+	else if (typeof module !== 'undefined' && module.exports) {
 		module.exports = Favico;
 	}
 	// included directly via <script> tag

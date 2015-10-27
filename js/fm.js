@@ -3519,6 +3519,7 @@ function accountUI()
                 }
             });
             $('.fm-account-save-block').addClass('hidden');
+			showToast('settings', 'You have successfully changed your profile.');
 
             if (M.account.dl_maxSlots)
             {
@@ -8702,6 +8703,7 @@ function showToast(toastClass, notification) {
     $('.common-toast .toast-button').rebind('click', function()
     {
         $('.toast-notification').removeClass('visible');
+		clearInterval(interval);
     });
 
     $toast.rebind('mouseover', function()

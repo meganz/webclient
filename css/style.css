@@ -5532,7 +5532,7 @@ th.grid-first-th {
 	background-image: none;
 }
 .file-status-icon.star, .contact-status-icon.star, .grid-status-icon.star, .link-icon, .taken-down .file-status-icon, .taken-down .grid-status-icon {
-	background-image: url(../images/mega/register-big-sprite-v5.png);
+	background-image: url(../images/mega/register-big-sprite-v6.png);
 	background-repeat: no-repeat;
 	background-position: -69px -963px;
 }
@@ -14470,7 +14470,7 @@ h5.main-italic-header {
 .reg-success-icon, .payment-confirmation .icon {
 	width: 200px;
 	height: 192px;
-	background-image: url(../images/mega/register-big-sprite-v5.png);
+	background-image: url(../images/mega/register-big-sprite-v6.png);
 	background-position: left top;
 	background-repeat: no-repeat;
 	margin: 30px auto 4px auto;
@@ -14705,7 +14705,7 @@ h5.main-italic-header {
 .reg-st3-membership-icon, .membership-icon {
 	width: 70px;
 	height: 70px;
-	background-image: url(../images/mega/register-big-sprite-v5.png);
+	background-image: url(../images/mega/register-big-sprite-v6.png);
 	background-position: center -210px;
 	background-repeat: no-repeat;
 	margin: 0 0 0 -35px;
@@ -15320,7 +15320,7 @@ div.membership-bott-button {
 	height: 82px;
 	width: 82px;
 	float: left;
-	background-image: url(../images/mega/register-big-sprite-v5.png);
+	background-image: url(../images/mega/register-big-sprite-v6.png);
 	background-position: center -960px;
 	background-repeat: no-repeat;
 	margin-top: 28px;
@@ -22806,7 +22806,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .loginrequired-dialog .fm-notification-icon {
 	width: 70px;
 	height: 70px;
-	background-image: url(../images/mega/register-big-sprite-v5.png);
+	background-image: url(../images/mega/register-big-sprite-v6.png);
 	background-position: center -210px;
 	background-repeat: no-repeat;
 	margin: 4px 16px 0 0px;
@@ -24498,16 +24498,20 @@ body.pro:after {
 	left: 9px;
 	top: 50%;
 	margin: -15px 0 0 0;
-	background-image: url(../images/mega/register-big-sprite-v5.png);
+	background-image: url(../images/mega/register-big-sprite-v6.png);
 	background-position: -85px -860px;
 }
 .clipboard .toast-icon {
-	background-image: url(../images/mega/dialogs-sprite_v5.svg);
-	background-repeat: no-repeat;
-	background-position: -4px -5279px;
+	background-position: -85px -1162px;
+}
+.settings .toast-icon {
+	background-position: -85px -1212px;
 }
 .upload .toast-icon {
 	background-position: -85px -900px;
+}
+.settings .toast-button {
+	display:none;
 }
 .toast-body {
 	display: table;
@@ -25485,8 +25489,8 @@ background-size: 50px auto;
  background-image: url(../images/mega/top-login-sprite@2x_v4.png);
  background-size:48px auto;
 }
- .reg-success-icon, .reg-st3-save-icon, .reg-st3-membership-icon, .membership-icon, .loginrequired-dialog .fm-notification-icon, .file-status-icon.star, .taken-down .file-status-icon, .taken-down .grid-status-icon, .contact-status-icon.star, .grid-status-icon.star, .link-icon, .transfer .toast-icon {
- background-image: url(../images/mega/register-big-sprite-v5@2x.png);
+ .reg-success-icon, .reg-st3-save-icon, .reg-st3-membership-icon, .membership-icon, .loginrequired-dialog .fm-notification-icon, .file-status-icon.star, .taken-down .file-status-icon, .taken-down .grid-status-icon, .contact-status-icon.star, .grid-status-icon.star, .link-icon, .toast-icon {
+ background-image: url(../images/mega/register-big-sprite-v6@2x.png);
  background-size: 200px auto;
 }
 .reg-st5-key-gen, .reg-st5-info-icon {

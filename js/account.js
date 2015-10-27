@@ -196,8 +196,10 @@ function u_logout(logout) {
             }
         }
 
-        delete localStorage.signupcode;
-        delete localStorage.registeremail;
+        localStorage.removeItem('signupcode');
+        localStorage.removeItem('registeremail');
+        localStorage.removeItem('agreedToCopyrightWarning');
+        
         if (mDBact) {
             mDBact = false;
             delete localStorage[u_handle + '_mDBactive'];
@@ -590,30 +592,32 @@ function getUserAttribute(userhandle, attribute, pub, nonHistoric,
                     var clearContainer = tlvstore.blockDecrypt(base64urldecode(res),
                                                                u_k);
                     res = tlvstore.tlvRecordsToContainer(clearContainer);
-                    thePromise.resolve(res);
                 }
                 catch (e) {
-                    if (e instanceof SecurityError) {
+                    if (e.name === 'SecurityError') {
                         logger.error('Could not decrypt private user attribute '
                                      + attribute + ': ' + e.message);
+                        res = EINTERNAL;
                     }
-                    res = EINTERNAL;
-                    thePromise.reject(res);
+                    else {
+                        throw e;
+                    }
                 }
             }
-            if (window.d) {
-                console.log('Attribute "' + attribute + '" for user "'
-                            + userhandle + '" is "' + res + '".');
-            }
+        }
+
+        // Another conditional, the result value may have been changed.
+        if (typeof res !== 'number') {
+            thePromise.resolve(res);
+            logger.info('Attribute "' + attribute + '" for user "'
+                        + userhandle + '" is ' + JSON.stringify(res) + '.');
         }
         else {
             // Got back an error (a number).
-            if (window.d) {
-                console.log('Warning, attribute "' + attribute
-                            + '" for user "' + userhandle
-                            + '" could not be retrieved: ' + res + '!');
-            }
             thePromise.reject(res);
+            logger.warn('Warning, attribute "' + attribute
+                        + '" for user "' + userhandle
+                        + '" could not be retrieved: ' + res + '!');
         }
 
         // Finish off if we have a callback.

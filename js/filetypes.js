@@ -111,7 +111,6 @@ var extdesc = {
     'gz': 'Gnu Compressed',
     'h': 'Header',
     'hpp': 'Header',
-    'hpp': 'Header',
     'htm': 'HTML Document',
     'html': 'HTML Document',
     'iff': 'Interchange',
@@ -124,7 +123,6 @@ var extdesc = {
     'jpg': 'JPEG Image',
     'js': 'JavaScript',
     'kml': 'Keyhole Markup',
-    'kml': 'Google Earth',
     'log': 'Log',
     'm3u': 'Media Playlist',
     'm4a': 'MPEG-4 Audio',
@@ -272,6 +270,15 @@ function fileext(name) {
     ext = name.substr(name.lastIndexOf('.') + 1);
     if (ext === name) {
         ext = '';
+    }
+    else {
+        ext = ext
+            .replace(/<[^>]*>/g, '')
+            .replace(/\W+/g, '');
+
+        if (ext.length > 9) {
+            ext = ext.substr(0, 9);
+        }
     }
 
     return ext.toLowerCase();

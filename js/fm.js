@@ -6451,7 +6451,7 @@ function treeUIexpand(id, force, moveDialog)
 function sectionUIopen(id) {
     var tmpId;
     if (d) {
-        console.log('sectionUIopen', id);
+        console.log('sectionUIopen', id, folderlink);
     }
 
     $('.nw-fm-left-icon').removeClass('active');
@@ -6481,9 +6481,10 @@ function sectionUIopen(id) {
     $('.nw-fm-left-icon.folder-link').removeClass('active');
 
     if (folderlink) {
-        if (!isValidShareLink()) {
+        // XXX: isValidShareLink won't work properly when navigating from/to a folderlink
+        /*if (!isValidShareLink()) {
             $('.fm-breadcrumbs.folder-link .right-arrow-bg').text('Invalid folder');
-        } else if (id === 'cloud-drive' || id === 'transfers') {
+        } else*/ if (id === 'cloud-drive' || id === 'transfers') {
             $('.fm-main').addClass('active-folder-link');
             $('.fm-right-header').addClass('folder-link');
             $('.nw-fm-left-icon.folder-link').addClass('active');

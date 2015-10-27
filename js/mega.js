@@ -1040,8 +1040,13 @@ function MegaData()
                         ? true : false;
                     sExportLink = (M.v[i].shares && M.v[i].shares.EXP) ? 'linked' : '';
                     sLinkIcon = (sExportLink === '') ? '' : 'link-icon';
-                    takenDown = (M.v[i] && M.v[i].shares && M.v[i].shares.EXP && M.v[i].shares.EXP.down) ? 'taken-down' : '';
-                    takenDownTitle = (M.v[i].t === 1) ? l[7695] : l[7694];
+                    takenDown = '';
+                    takenDownTitle = '';
+
+                    if (M.v[i] && M.v[i].shares && M.v[i].shares.EXP && M.v[i].shares.EXP.down) {
+                        takenDown = 'taken-down';
+                        takenDownTitle = (M.v[i].t === 1) ? l[7695] : l[7694];
+                    }
 
                     // Block view
                     if (M.viewmode === 1) {

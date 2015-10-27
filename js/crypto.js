@@ -1789,7 +1789,7 @@ function api_reqfailed(c, e) {
                 (reason === 100) ? l[7659] : l[7660],
                 false,
                 function() {
-                    var redirectUrl = window.location.origin + window.location.pathname + '#contact';
+                    var redirectUrl = getAppBaseUrl() + '#contact';
                     window.location.replace(redirectUrl);
                 }
             );

@@ -57,12 +57,14 @@ function verify_email_callback(passaes) {
             }
 
             u_attr.email = verifyEmail.code;
-            $('#account-email').val('').attr('placeholder', verifyEmail.email);
+            $('#account-email').val(verifyEmail.email);
+            $('.profile-form.first').removeClass('email-confirm');
             title   = 'Congratulations';
             msgbody = 'Congratulations, your new email address for this mega account is ' + verifyEmail.email;
             verifyEmail = null; /* wipe variable */
             msgDialog('warninga', title, msgbody, false, function() {
                 document.location.href = "#fm/account/profile";
+                showToast('settings', 'You have successfully changed your profile.');
             });
         }
     });

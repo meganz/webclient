@@ -3466,7 +3466,7 @@ function accountUI()
         $('.fm-account-cancel').bind('click', function(e)
         {
             $('.fm-account-save-block').addClass('hidden');
-            $('.profile-form.first').removeClass('email-confirm')
+            $('.profile-form.first').removeClass('email-confirm');
             accountUI();
         });
         $('.fm-account-save').unbind('click');

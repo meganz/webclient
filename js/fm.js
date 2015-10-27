@@ -3478,6 +3478,9 @@ function accountUI()
             u_attr.birthmonth = $('.default-select.month .default-dropdown-item.active').attr('data-value');
             u_attr.birthyear = $('.default-select.year .default-dropdown-item.active').attr('data-value');
             u_attr.country = $('.default-select.country .default-dropdown-item.active').attr('data-value');
+            
+            $('.fm-account-avatar').html(useravatar.contact(u_handle));
+            $('.fm-avatar img').attr('src', useravatar.mine());
 
             api_req({
                 a : 'up',

@@ -4769,6 +4769,9 @@ function execsc(actionPackets, callback) {
 
                 if (megaChatIsReady) {
                     $.each(actionPacket.u, function (k, v) {
+                        if (v.c !== 0) {
+                            crypt.getPubRSA(v.u);
+                        }
                         megaChat[v.c == 0 ? "processRemovedUser" : "processNewUser"](v.u);
                     });
                 }
@@ -5096,6 +5099,9 @@ function execsc(actionPackets, callback) {
 
             if (megaChatIsReady) {
                 $.each(actionPacket.u, function(k, v) {
+                    if (v.c !== 0) {
+                        crypt.getPubRSA(v.u);
+                    }
                     megaChat[v.c == 0 ? "processRemovedUser" : "processNewUser"](v.u);
                 });
             }

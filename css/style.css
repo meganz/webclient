@@ -1247,7 +1247,7 @@ input.radioOn, input.radioOff {
 	padding: 0 20px 36px 12px;
 }
 .resellers-content {
-	margin: 0 -20px 36px -12px;
+	margin: 3px -20px 36px -12px;
 }
 .resellers-voucher-bl {
 	padding: 18px 0 14px 0;
@@ -8020,7 +8020,7 @@ color: white;
 	margin: 14px 0 0 0;
 }
 .fm-account-input input {
-	padding: 0 10px 0 10px;
+	padding: 0 35px 0 10px;
 	background-image: none;
 	font-size: 14px;
 	line-height: 32px;
@@ -13109,8 +13109,8 @@ table {
 }
 .fm-account-input.voucheramount {
 	float: left;
-	max-width: 50px;
-	padding: 0;
+    min-width: 50px;
+    width: auto;
 	margin: 0;
 }
 .default-select.month {

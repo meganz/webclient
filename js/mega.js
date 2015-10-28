@@ -1588,7 +1588,15 @@ function MegaData()
                 M.renderPath();
             });
         }
-        if (!n_h) {
+        // If a folderlink, and entering a new folder.
+        if (pfid && this.currentrootid === this.RootID) {
+            var target = '';
+            if (this.currentdirid !== this.RootID) {
+                target = '!' +  this.currentdirid;
+            }
+            window.location.hash = '#F!' + pfid + '!' + pfkey + target;
+        }
+        else {
             window.location.hash = '#fm/' + M.currentdirid;
         }
         searchPath();
@@ -4385,67 +4393,72 @@ function MegaData()
                 localStorage.wasloggedin = true;
                 u_logout();
 
+                // Get the page to load
+                var toPage = String(urlParts[2] || 'fm').replace('#', '');
+
                 // Set master key, session ID and RSA private key
                 u_storage = init_storage(sessionStorage);
                 u_k = urlParts[0];
                 u_sid = urlParts[1];
-                u_storage.k = JSON.stringify(u_k);
-                u_storage.sid = u_sid;
-                api_setsid(u_sid);
-
-                // Get the page to load
-                var toPage = urlParts[2];
-                var toLang = urlParts[4];
-
-                // Initialize all account types and redirect to the FM
-                if (!toPage) {
-                    toPage = 'fm';
+                if (u_k) {
+                    u_storage.k = JSON.stringify(u_k);
                 }
-                this.performRegularLogin(toPage);
+
+                loadingDialog.show();
+
+                var _goToPage = function() {
+                    loadingDialog.hide();
+                    window.location.hash = toPage;
+                }
+
+                var _rawXHR = function(url, data, callback) {
+                    mega.utils.xhr(url, JSON.stringify([data]))
+                        .always(function(ev, data) {
+                            var resp;
+                            if (typeof data === 'string' && data[0] === '[') {
+                                try {
+                                    resp = JSON.parse(data)[0];
+                                }
+                                catch (ex) {}
+                            }
+                            callback(resp);
+                        });
+                }
+
+                // Performs a regular login as part of the transfer from mega.co.nz
+                _rawXHR(apipath + 'cs?id=0&sid=' + u_sid, {'a': 'ug'}, function(data) {
+                        var ctx = {
+                            checkloginresult: function(ctx, result) {
+                                u_type = result;
+                                if (toPage.substr(0, 1) === '!' && toPage.length > 7) {
+                                    _rawXHR(apipath + 'cs?id=0&domain=meganz',
+                                        { 'a': 'g', 'p': toPage.substr(1, 8)},
+                                        function(data) {
+                                            if (data) {
+                                                dl_res = data;
+                                            }
+                                            _goToPage();
+                                        });
+                                }
+                                else {
+                                    _goToPage();
+                                }
+                            }
+                        };
+                        if (data) {
+                            api_setsid(u_sid);
+                            u_storage.sid = u_sid;
+                            u_checklogin3a(data, ctx);
+                        }
+                        else {
+                            u_checklogin(ctx, false);
+                        }
+                    });
 
                 // Successful transfer, continue load
-                return true;
+                return false;
             }
         }
-    };
-
-    /**
-     * Performs a regular login as part of the transfer from mega.co.nz
-     * @param {String} toPage The page to load e.g. 'fm', 'pro' etc
-     */
-    this.performRegularLogin = function(toPage) {
-
-        var ctx = {
-            checkloginresult: function(ctx, result) {
-                if (m) {
-                    loadingDialog.hide();
-                }
-                else {
-                    document.getElementById('overlay').style.display = 'none';
-                }
-
-                // Check for suspended account
-                if (result === EBLOCKED) {
-                    alert(l[730]);
-                }
-                else if (result) {
-                    // Set account type and redirect to the requested location
-                    u_type = result;
-                    window.location.hash = toPage;
-                    return false;
-                }
-                else {
-                    // Must be an ephemeral account, attempt to initialize:
-                    u_type=0;
-                    window.location.hash = toPage;
-                    return false;
-                }
-            }
-        };
-
-        // Continue through the log in flow from approximately the correct
-        // place given that we have the master key, session ID and private RSA key
-        u_checklogin3(ctx);
     };
 }
 

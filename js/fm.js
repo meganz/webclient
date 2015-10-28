@@ -2438,9 +2438,7 @@ function initContextUI() {
             ephemeralDialog(l[1005]);
         }
         else {
-            fm_showoverlay();
             initCopyrightsDialog($.selected);
-            $('.copyrights-dialog').show();
         }
     });
 
@@ -3177,7 +3175,7 @@ function accountUI()
 
             var dateTime = htmlentities(time2date(el[0]));
             var browser = browserdetails(el[2]);
-            var browserName = browser.name;
+            var browserName = browser.nameTrans;
             var ipAddress = htmlentities(el[3]);
             var country = countrydetails(el[4]);
             var currentSession = el[5];
@@ -3241,6 +3239,7 @@ function accountUI()
             // Expire all sessions but not the current one
             api_req({ a: 'usr', ko: 1 }, {
                 callback: function() {
+                    M.account = null; /* clear account cache */
                     $activeSessionsRows.find('.settings-logout').remove();
                     $activeSessionsRows.find('.active-session-txt').removeClass('active-session-txt')
                         .addClass('expired-session-txt').text(l[1664]);
@@ -3262,6 +3261,7 @@ function accountUI()
                  */
                 api_req({ a: 'usr', s: [sessionId] }, {
                     callback: function(res, ctx) {
+                        M.account = null; /* clear account cache */
                         $this.find('.settings-logout').remove();
                         $this.find('.active-session-txt').removeClass('active-session-txt')
                             .addClass('expired-session-txt').text(l[1664]);
@@ -6451,7 +6451,7 @@ function treeUIexpand(id, force, moveDialog)
 function sectionUIopen(id) {
     var tmpId;
     if (d) {
-        console.log('sectionUIopen', id);
+        console.log('sectionUIopen', id, folderlink);
     }
 
     $('.nw-fm-left-icon').removeClass('active');
@@ -6481,9 +6481,10 @@ function sectionUIopen(id) {
     $('.nw-fm-left-icon.folder-link').removeClass('active');
 
     if (folderlink) {
-        if (!isValidShareLink()) {
+        // XXX: isValidShareLink won't work properly when navigating from/to a folderlink
+        /*if (!isValidShareLink()) {
             $('.fm-breadcrumbs.folder-link .right-arrow-bg').text('Invalid folder');
-        } else if (id === 'cloud-drive' || id === 'transfers') {
+        } else*/ if (id === 'cloud-drive' || id === 'transfers') {
             $('.fm-main').addClass('active-folder-link');
             $('.fm-right-header').addClass('folder-link');
             $('.nw-fm-left-icon.folder-link').addClass('active');
@@ -7579,27 +7580,50 @@ function initShareDialogMultiInputPlugin() {
 }
 
 /**
- * initCopyrightsDialog
+ * Shows the copyright warning dialog.
  *
- * @param {Array} nodesToProcess Array of strings, nodes ids
+ * @param {Array} nodesToProcess Array of strings, node ids
  */
 function initCopyrightsDialog(nodesToProcess) {
 
-    $.copyrightsDialog = 'copyrights';
+    // If they've already agreed to the copyright warning this session
+    if (localStorage.getItem('agreedToCopyrightWarning') !== null) {
+        
+        // Go straight to Get Link dialog
+        var exportLink = new mega.Share.ExportLink({ 'showExportLinkDialog': true, 'updateUI': true, 'nodesToProcess': nodesToProcess });
+        exportLink.getExportLink();
+        
+        return false;
+    }
 
-    $('.copyrights-dialog .fm-dialog-button').rebind('click', function() {
-        if (this.className.indexOf('cancel') !== -1) {
+    // Cache selector
+    var $copyrightDialog = $('.copyrights-dialog');
+
+    // Otherwise show the copyright warning dialog
+    fm_showoverlay();
+    $.copyrightsDialog = 'copyrights';
+    $copyrightDialog.show();
+    
+    // Init click handler for 'I agree' / 'I disagree' buttons
+    $copyrightDialog.find('.fm-dialog-button').rebind('click', function() {
+        
+        // User disagrees with copyright warning
+        if ($(this).hasClass('cancel')) {
             closeDialog();
         }
         else {
+            // User agrees, store flag in localStorage so they don't see it again for this session
+            localStorage.setItem('agreedToCopyrightWarning', '1');
+            
+            // Go straight to Get Link dialog
             closeDialog();
             var exportLink = new mega.Share.ExportLink({ 'showExportLinkDialog': true, 'updateUI': true, 'nodesToProcess': nodesToProcess });
             exportLink.getExportLink();
         }
-
     });
-
-    $('.copyrights-dialog .fm-dialog-close').rebind('click', function() {
+    
+    // Init click handler for 'Close' button
+    $copyrightDialog.find('.fm-dialog-close').rebind('click', function() {
         closeDialog();
     });
 }

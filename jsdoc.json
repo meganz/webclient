@@ -16,7 +16,8 @@
                     "js/jquery.checkboxes.js",
                     "js/jquery.misc.js",
                     "js/jquery.qrcode.js",
-                    "js/jquery.tokeninput.js"
+                    "js/jquery.tokeninput.js",
+                    "js/popunda.js"
                    ],
         "includePattern": ".+\\.js(doc)?$",
         "excludePattern": "(^|\\/|\\\\)_"

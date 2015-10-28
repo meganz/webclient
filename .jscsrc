@@ -120,6 +120,7 @@
         "aesasm.js",
         "keygen.js",
         "karma.conf.js",
-        "js/chat/mpenc.js"
+        "js/chat/mpenc.js",
+        "js/popunda.js"
     ]
 }

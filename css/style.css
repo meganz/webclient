@@ -8054,11 +8054,11 @@ color: white;
 	box-sizing: border-box;
 	display: none;
 }
-.email-confirm-txt {
+.fm-account-labels .labels-block.email-confirm-txt {
 	height: 18px;
 	display: none;
 }
-.email-confirm .fm-account-change-email, .email-confirm .email-confirm-txt {
+.email-confirm .fm-account-change-email, .email-confirm .fm-account-labels .labels-block.email-confirm-txt {
 	display: block;
 }
 .fmholder td {

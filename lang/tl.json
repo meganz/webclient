@@ -339,6 +339,7 @@
     "738": "Request",
     "739": "nalimutan ang password?",
     "741": "Pakiusap na pumili ng bagong mas secure na password.",
+    "742": "I-reset",
     "746": "Tip ng pagpapamyembro",
     "748": "Buwanan",
     "749": "Taunan",
@@ -2733,5 +2734,15 @@
     "7683": "Extension",
     "7684": "%1 sa %2",
     "7685": "I hereby state that I have a good faith belief that the use of copyrighted material in the manner complained of and located at the location above is not authorized by the copyright owner, its agent, or the law (e.g., as a fair use).",
-    "7686": "One of the links you have provided is not a valid MEGA link."
+    "7686": "Isa sa mga binigay mong link ay hindi valid na MEGA link.",
+    "7687": "Ang settings sa paglilipat ay para sa mga rehistradong users lamang.",
+    "7688": "There may be a man-in-the-middle attack in progress. Please reset the stored identification credentials for this contact and then verify that they are correct with your contact through an existing secure channel or in person.",
+    "7689": "Ireset ang contact credentials",
+    "7690": "Gamitin ang reset button sa ibaba para ireset ang credentials ng contact na ito.",
+    "7691": "Bagong contact credentials",
+    "7692": "Patunayan ang credentials",
+    "7693": "Use the Verify button below to confirm the credentials for this contact.",
+    "7694": "Ang file na ito ay napasailalim ng isang takedown notice.",
+    "7695": "This folder has been subject to a takedown notice.",
+    "7696": "Copyright warning to all users"
 }

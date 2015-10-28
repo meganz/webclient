@@ -1359,6 +1359,10 @@
         "text": "Please choose a new secure password.",
         "context": ""
     },
+    "742": {
+        "text": "Reset",
+        "context": "button to reset the password"
+    },
     "746": {
         "text": "Membership type",
         "context": ""
@@ -5297,7 +5301,7 @@
     },
     "5599": {
         "text": "Empty Rubbish Bin",
-        "context": "message when there are no files in the Rubbish Bin"
+        "context": "message when there are no files in the Rubbish Bin."
     },
     "5600": {
         "text": "No incoming shared folders",
@@ -8948,7 +8952,7 @@
         "context": "success message when the subscription has been canceled correctly"
     },
     "7167": {
-        "text": "The subscription has not been canceled correctly. Please contact support@mega.nz to cancel your subscription",
+        "text": "We were unable to cancel your subscription. Please contact support@mega.nz for assistance.",
         "context": "error message when the subscription has not been canceled correctly"
     },
     "7168": {
@@ -9076,7 +9080,7 @@
         "context": "Message shown when the payment of an upgrade has been correct"
     },
     "7199": {
-        "text": "The operation has not finished correctly. The credit card will not be charged.",
+        "text": "The operation failed. Your credit card has not been charged.",
         "context": "Message shown when the payment of an upgrade has not been correct"
     },
     "7200": {
@@ -9573,7 +9577,7 @@
     },
     "7332": {
         "text": "Empty rubbish bin",
-        "context": "Label for any 'Empty rubbish' button, link, text, etc. - (String as short as possible)."
+        "context": "Label for any 'Empty rubbish' button, link, text, etc. - (String as short as possible).This indicates an action to clear rubbish bin."
     },
     "7333": {
         "text": "Ok",
@@ -10938,5 +10942,45 @@
     "7686": {
         "text": "One of the links you have provided is not a valid MEGA link.",
         "context": "This appears within an error dialog. The user has typed or copied & pasted a link into our takedown system, but the link has not passed our validation and does not look like a MEGA link."
+    },
+    "7687": {
+        "text": "Transfer settings are for registered users only.",
+        "context": "Message shown when unregistered users try to access the transfer settings."
+    },
+    "7688": {
+        "text": "There may be a man-in-the-middle attack in progress. Please reset the stored identification credentials for this contact and then verify that they are correct with your contact through an existing secure channel or in person.",
+        "context": "Warning text on the fingerprint warning dialog. The user should reset their fingerprint credentials and verify them properly.\r\nThis involves comparing the numbers they can see on their own screen, with the numbers their contact can see on their screen."
+    },
+    "7689": {
+        "text": "Reset contact credentials",
+        "context": "Title text on the fingerprint warning dialog. This will reset the contact's fingerprint credentials to what is currently loaded.\r\nA credential in this case is a stored piece of information representing the identity of the contact. Giving anybody presenting the same information the authenticity of that contact."
+    },
+    "7690": {
+        "text": "Use the reset button below to reset the credentials for this contact.",
+        "context": "Button text on the fingerprint warning dialog. This instructs the user to reset the contact's fingerprint credentials."
+    },
+    "7691": {
+        "text": "New contact credentials",
+        "context": "Title text for the fingerprint warning dialog after a reset has occurred. This is the new fingerprint credentials for the contact, following a reset."
+    },
+    "7692": {
+        "text": "Verify credentials",
+        "context": "Title for a section on the fingerprint warning dialog. Below it is a button which will allow the user to verify their contact's fingerprint credentials."
+    },
+    "7693": {
+        "text": "Use the Verify button below to confirm the credentials for this contact.",
+        "context": "Description for a section on the fingerprint warning dialog. This tells the user to click a button labelled 'Verify' to verify their contact's fingerprint credentials."
+    },
+    "7694": {
+        "text": "This file has been subject to a takedown notice.",
+        "context": "Appears as a warning label, to inform the user about their file (which has been taken down)"
+    },
+    "7695": {
+        "text": "This folder has been subject to a takedown notice.",
+        "context": "A warning label on a dialog, informing the user that their folder has been taken down (made inaccessible). This usually occurs when there is copyright infringement."
+    },
+    "7696": {
+        "text": "Copyright warning to all users",
+        "context": "A title for the Copyright Warning dialog. Designed to make the user feel as though this is not targeting them, but is a warning for everybody who uses our service."
     }
 }

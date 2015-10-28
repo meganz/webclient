@@ -930,7 +930,7 @@ else if (!b_u)
         };
     })(console);
 
-    Object.defineProperty(window, "__cd_v", { value : 18, writable : false });
+    Object.defineProperty(window, "__cd_v", { value : 19, writable : false });
     if (!d || onBetaW)
     {
         var __cdumps = [], __cd_t;
@@ -1867,6 +1867,9 @@ else if (!b_u)
                 {
                     loginresponse = this.response || this.responseText;
                     if (loginresponse && loginresponse[0] == '[') loginresponse = JSON.parse(loginresponse);
+                    else if (parseInt(loginresponse) === -15 /* ESID */) {
+                        loginresponse = -15;
+                    }
                     else loginresponse = false;
                 }
                 catch (e) {}
@@ -1900,6 +1903,10 @@ else if (!b_u)
         if (loginresponse === true || dl_res === true || !jsl_done || !jj_done) return;
 
         if (u_checked) startMega();
+        else if (loginresponse === -15) {
+            u_logout(true);
+            boot_auth(null, false);
+        }
         else if (loginresponse)
         {
             api_setsid(u_sid);

@@ -339,6 +339,7 @@
     "738": "Talep",
     "739": "\u015eifreni mi unuttun?",
     "741": "L\u00fctfen yeni bir g\u00fcvenlik \u015fifresi se\u00e7iniz.",
+    "742": "S\u0131f\u0131rla",
     "746": "\u00dcyelik t\u00fcr\u00fc",
     "748": "Ayl\u0131k",
     "749": "Y\u0131ll\u0131k",
@@ -2733,5 +2734,15 @@
     "7683": "Eklenti",
     "7684": "%2 \u00fczerinde %1",
     "7685": "I hereby state that I have a good faith belief that the use of copyrighted material in the manner complained of and located at the location above is not authorized by the copyright owner, its agent, or the law (e.g., as a fair use).",
-    "7686": "One of the links you have provided is not a valid MEGA link."
+    "7686": "One of the links you have provided is not a valid MEGA link.",
+    "7687": "Transfer settings are for registered users only.",
+    "7688": "There may be a man-in-the-middle attack in progress. Please reset the stored identification credentials for this contact and then verify that they are correct with your contact through an existing secure channel or in person.",
+    "7689": "Reset contact credentials",
+    "7690": "Use the reset button below to reset the credentials for this contact.",
+    "7691": "Yeni ki\u015fi kimlik bilgileri",
+    "7692": "Kimlik do\u011frulama",
+    "7693": "Use the Verify button below to confirm the credentials for this contact.",
+    "7694": "This file has been subject to a takedown notice.",
+    "7695": "This folder has been subject to a takedown notice.",
+    "7696": "Copyright warning to all users"
 }

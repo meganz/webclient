@@ -339,6 +339,7 @@
     "738": "\u0905\u0928\u0941\u0930\u094b\u0927",
     "739": "\u0905\u092a\u0928\u093e \u092a\u093e\u0938\u0935\u0930\u094d\u0921 \u092d\u0942\u0932 \u0917\u090f?",
     "741": "\u090f\u0915 \u0928\u092f\u093e \u0938\u0941\u0930\u0915\u094d\u0937\u093f\u0924 \u092a\u093e\u0938\u0935\u0930\u094d\u0921 \u091a\u0941\u0928\u0947\u0902.",
+    "742": "\u0930\u0940\u0938\u0947\u091f \u0915\u0930\u0947\u0902",
     "746": "\u0938\u0926\u0938\u094d\u092f\u0924\u093e \u092a\u094d\u0930\u0915\u093e\u0930",
     "748": "\u092e\u093e\u0938\u093f\u0915",
     "749": "\u0935\u093e\u0930\u094d\u0937\u093f\u0915",
@@ -2733,5 +2734,15 @@
     "7683": "Extension",
     "7684": "%1 on %2",
     "7685": "I hereby state that I have a good faith belief that the use of copyrighted material in the manner complained of and located at the location above is not authorized by the copyright owner, its agent, or the law (e.g., as a fair use).",
-    "7686": "One of the links you have provided is not a valid MEGA link."
+    "7686": "One of the links you have provided is not a valid MEGA link.",
+    "7687": "Transfer settings are for registered users only.",
+    "7688": "There may be a man-in-the-middle attack in progress. Please reset the stored identification credentials for this contact and then verify that they are correct with your contact through an existing secure channel or in person.",
+    "7689": "Reset contact credentials",
+    "7690": "Use the reset button below to reset the credentials for this contact.",
+    "7691": "New contact credentials",
+    "7692": "Verify credentials",
+    "7693": "Use the Verify button below to confirm the credentials for this contact.",
+    "7694": "This file has been subject to a takedown notice.",
+    "7695": "This folder has been subject to a takedown notice.",
+    "7696": "Copyright warning to all users"
 }

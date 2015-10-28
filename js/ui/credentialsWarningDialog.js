@@ -104,7 +104,7 @@
                 var user = M.u[CredentialsWarningDialog.contactHandle];
 
                 showAuthenticityCredentials(user);
-                enableVerifyFingerprintsButton();
+                enableVerifyFingerprintsButton(CredentialsWarningDialog.contactHandle);
             }
 
             // Change to verify details

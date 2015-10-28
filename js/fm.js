@@ -10173,11 +10173,11 @@ function showAuthenticityCredentials(user) {
 /**
  * Enables the Verify button
  */
-function enableVerifyFingerprintsButton(user) {
+function enableVerifyFingerprintsButton(userId) {
     $('.fm-verify').removeClass('verified');
     $('.fm-verify').find('span').text(l[1960] + '...');
     $('.fm-verify').rebind('click', function() {
-        fingerprintDialog(user);
+        fingerprintDialog(userId);
     });
 }
 

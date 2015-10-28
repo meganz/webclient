@@ -2736,10 +2736,13 @@
     "7685": "Declaro que considero de buena f\u00e9 que el uso de material con copyright en la forma descrita y situada en la localizaci\u00f3n indicada no est\u00e1 autorizado por el propietario del copyright, su agente, o la ley (p.e. como uso justo).",
     "7686": "Uno de los enlaces suministrados no es un enlace MEGA v\u00e1lido.",
     "7687": "Los ajustes de transferencia son solo para usuarios registrados.",
-    "7688": "There may be a man-in-the-middle attack in progress. Please reset the stored identification credentials for this contact and then verify that they are correct with your contact through an existing secure channel or in person.",
-    "7689": "Reset contact credentials",
-    "7690": "Use the reset button below to reset the credentials for this contact.",
-    "7691": "New contact credentials",
-    "7692": "Verify credentials",
-    "7693": "Use the Verify button below to confirm the credentials for this contact."
+    "7688": "Podr\u00eda estar sufriendo un ataque man-in-the-middle. Por favor resetea las credenciales de identificaci\u00f3n almacenadas para este contacto y verifica que son correctas con tu contacto por medio de un canal seguro o en persona.",
+    "7689": "Resetear credenciales de contacto",
+    "7690": "Usa el bot\u00f3n de reseteo a continuaci\u00f3n para resetear las credenciales de este contacto.",
+    "7691": "Nuevas credenciales de contacto",
+    "7692": "Verificar credenciales",
+    "7693": "Usa el bot\u00f3n de verificaci\u00f3n a continuaci\u00f3n para verificar las credenciales de este contacto.",
+    "7694": "El archivo est\u00e1 sujeto a un aviso de eliminaci\u00f3n.",
+    "7695": "La carpeta est\u00e1 sujeta a un aviso de eliminaci\u00f3n.",
+    "7696": "Copyright warning to all users"
 }

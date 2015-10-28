@@ -1555,8 +1555,10 @@ function initAddDialogMultiInputPlugin() {
 
     // Plugin configuration
     var contacts = getContactsEMails();
+    var $this  = $('.add-contact-multiple-input');
+    var $scope = $this.parents('.add-user-popup');
 
-    $('.add-contact-multiple-input').tokenInput(contacts, {
+    $this.tokenInput(contacts, {
         theme: 'mega',
         hintText: l[5908],
         //hintText: '',
@@ -1586,6 +1588,17 @@ function initAddDialogMultiInputPlugin() {
         },
         onHolder: function() {
             errorMsg(l[7414]);
+        },
+        onReady: function() {
+            var $input = $this.parent().find('li input').eq(0);
+            $input.rebind('keyup', function() {
+                var value = $.trim($input.val());
+                if ($scope.find('li.token-input-token-mega').length > 0 || checkMail(value) === false) {
+                    $scope.find('.add-user-popup-button.add').removeClass('disabled');
+                } else {
+                    $scope.find('.add-user-popup-button.add').addClass('disabled');
+                }
+            });
         },
         onAdd: function() {
 
@@ -2425,9 +2438,7 @@ function initContextUI() {
             ephemeralDialog(l[1005]);
         }
         else {
-            fm_showoverlay();
             initCopyrightsDialog($.selected);
-            $('.copyrights-dialog').show();
         }
     });
 
@@ -3164,7 +3175,7 @@ function accountUI()
 
             var dateTime = htmlentities(time2date(el[0]));
             var browser = browserdetails(el[2]);
-            var browserName = browser.name;
+            var browserName = browser.nameTrans;
             var ipAddress = htmlentities(el[3]);
             var country = countrydetails(el[4]);
             var currentSession = el[5];
@@ -3228,6 +3239,7 @@ function accountUI()
             // Expire all sessions but not the current one
             api_req({ a: 'usr', ko: 1 }, {
                 callback: function() {
+                    M.account = null; /* clear account cache */
                     $activeSessionsRows.find('.settings-logout').remove();
                     $activeSessionsRows.find('.active-session-txt').removeClass('active-session-txt')
                         .addClass('expired-session-txt').text(l[1664]);
@@ -3249,6 +3261,7 @@ function accountUI()
                  */
                 api_req({ a: 'usr', s: [sessionId] }, {
                     callback: function(res, ctx) {
+                        M.account = null; /* clear account cache */
                         $this.find('.settings-logout').remove();
                         $this.find('.active-session-txt').removeClass('active-session-txt')
                             .addClass('expired-session-txt').text(l[1664]);
@@ -6438,7 +6451,7 @@ function treeUIexpand(id, force, moveDialog)
 function sectionUIopen(id) {
     var tmpId;
     if (d) {
-        console.log('sectionUIopen', id);
+        console.log('sectionUIopen', id, folderlink);
     }
 
     $('.nw-fm-left-icon').removeClass('active');
@@ -6468,9 +6481,10 @@ function sectionUIopen(id) {
     $('.nw-fm-left-icon.folder-link').removeClass('active');
 
     if (folderlink) {
-        if (!isValidShareLink()) {
+        // XXX: isValidShareLink won't work properly when navigating from/to a folderlink
+        /*if (!isValidShareLink()) {
             $('.fm-breadcrumbs.folder-link .right-arrow-bg').text('Invalid folder');
-        } else if (id === 'cloud-drive' || id === 'transfers') {
+        } else*/ if (id === 'cloud-drive' || id === 'transfers') {
             $('.fm-main').addClass('active-folder-link');
             $('.fm-right-header').addClass('folder-link');
             $('.nw-fm-left-icon.folder-link').addClass('active');
@@ -7449,7 +7463,10 @@ function initShareDialogMultiInputPlugin() {
             }, 3000);
         }
 
-        $('.share-multiple-input').tokenInput(contacts, {
+        var $input = $('.share-multiple-input');
+        var $scope = $input.parents('.share-dialog');
+
+        $input.tokenInput(contacts, {
             theme: "mega",
             hintText: l[5908],
             // placeholder: "Type in an email or contact",
@@ -7468,8 +7485,20 @@ function initShareDialogMultiInputPlugin() {
             scrollLocation: 'share',
             // Exclude from dropdownlist only emails/names which exists in multi-input (tokens)
             excludeCurrent: true,
+
             onEmailCheck: function() {
                 errorMsg(l[7415]); // Looks like there's a malformed email
+            },
+            onReady: function() {
+                var $this = $scope.find('li input');
+                $this.rebind('keyup', function() {
+                    var value = $.trim($this.val());
+                    if ($scope.find('li.token-input-token-mega').length > 0 || checkMail(value) === false) {
+                        $scope.find('.dialog-share-button').removeClass('disabled');
+                    } else {
+                        $scope.find('.dialog-share-button').addClass('disabled');
+                    }
+                });
             },
             onDoublet: function(u) {
                 errorMsg(l[7413]); // You already have a contact with that email
@@ -7551,27 +7580,50 @@ function initShareDialogMultiInputPlugin() {
 }
 
 /**
- * initCopyrightsDialog
+ * Shows the copyright warning dialog.
  *
- * @param {Array} nodesToProcess Array of strings, nodes ids
+ * @param {Array} nodesToProcess Array of strings, node ids
  */
 function initCopyrightsDialog(nodesToProcess) {
 
-    $.copyrightsDialog = 'copyrights';
+    // If they've already agreed to the copyright warning this session
+    if (localStorage.getItem('agreedToCopyrightWarning') !== null) {
+        
+        // Go straight to Get Link dialog
+        var exportLink = new mega.Share.ExportLink({ 'showExportLinkDialog': true, 'updateUI': true, 'nodesToProcess': nodesToProcess });
+        exportLink.getExportLink();
+        
+        return false;
+    }
 
-    $('.copyrights-dialog .fm-dialog-button').rebind('click', function() {
-        if (this.className.indexOf('cancel') !== -1) {
+    // Cache selector
+    var $copyrightDialog = $('.copyrights-dialog');
+
+    // Otherwise show the copyright warning dialog
+    fm_showoverlay();
+    $.copyrightsDialog = 'copyrights';
+    $copyrightDialog.show();
+    
+    // Init click handler for 'I agree' / 'I disagree' buttons
+    $copyrightDialog.find('.fm-dialog-button').rebind('click', function() {
+        
+        // User disagrees with copyright warning
+        if ($(this).hasClass('cancel')) {
             closeDialog();
         }
         else {
+            // User agrees, store flag in localStorage so they don't see it again for this session
+            localStorage.setItem('agreedToCopyrightWarning', '1');
+            
+            // Go straight to Get Link dialog
             closeDialog();
             var exportLink = new mega.Share.ExportLink({ 'showExportLinkDialog': true, 'updateUI': true, 'nodesToProcess': nodesToProcess });
             exportLink.getExportLink();
         }
-
     });
-
-    $('.copyrights-dialog .fm-dialog-close').rebind('click', function() {
+    
+    // Init click handler for 'Close' button
+    $copyrightDialog.find('.fm-dialog-close').rebind('click', function() {
         closeDialog();
     });
 }

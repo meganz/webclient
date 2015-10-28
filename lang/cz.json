@@ -29,7 +29,7 @@
     "68": "Nov\u00e1 slo\u017eka",
     "70": "Vysypat ko\u0161",
     "71": "P\u0159idat kontakt",
-    "76": "Chyst\u00e1te se trvale odebrat [X] soubor\u016f z Ko\u0161e.",
+    "76": "Chyst\u00e1te se trvale odebrat [X] soubor\u016f z ko\u0161e.",
     "77": "Chcete pokra\u010dovat?",
     "78": "Ano",
     "79": "Ne",
@@ -2736,10 +2736,13 @@
     "7685": "T\u00edmto prohla\u0161uji, \u017ee v dobr\u00e9 v\u00ed\u0159e v\u011b\u0159\u00edm, \u017ee pou\u017eit\u00ed materi\u00e1lu chr\u00e1n\u011bn\u00e9ho autorsk\u00fdmi pr\u00e1vy sporn\u00fdm zp\u016fsobem a nach\u00e1zej\u00edc\u00edm se ve v\u00fd\u0161e uveden\u00e9m um\u00edst\u011bn\u00ed nen\u00ed povoleno majitelem autorsk\u00fdch pr\u00e1v, jeho z\u00e1stupcem nebo z\u00e1konem (nap\u0159. jako voln\u00e9ho u\u017eit\u00ed).",
     "7686": "Jeden z odkaz\u016f, kter\u00fd jste zadali, nen\u00ed platn\u00fd odkaz MEGA.",
     "7687": "Nastaven\u00ed p\u0159enosu jsou pouze pro registrovan\u00e9 u\u017eivatele.",
-    "7688": "There may be a man-in-the-middle attack in progress. Please reset the stored identification credentials for this contact and then verify that they are correct with your contact through an existing secure channel or in person.",
-    "7689": "Reset contact credentials",
-    "7690": "Use the reset button below to reset the credentials for this contact.",
-    "7691": "New contact credentials",
-    "7692": "Verify credentials",
-    "7693": "Use the Verify button below to confirm the credentials for this contact."
+    "7688": "Mo\u017en\u00e1 prob\u00edh\u00e1 \u00fatok \"\u010dlov\u011bkem uprost\u0159ed\". Obnovte ulo\u017een\u00e9 identifika\u010dn\u00ed p\u0159ihla\u0161ovac\u00ed \u00fadaje pro tento kontakt a ov\u011b\u0159te u sv\u00e9ho kontaktu, \u017ee jsou spr\u00e1vn\u00e9,  prost\u0159ednictv\u00edm existuj\u00edc\u00edho zabezpe\u010den\u00e9ho kan\u00e1lu nebo osobn\u011b.",
+    "7689": "Obnovit p\u0159ihla\u0161ovac\u00ed \u00fadaje kontaktu",
+    "7690": "Pou\u017eijte n\u00ed\u017ee uveden\u00e9 tla\u010d\u00edtko Obnovit k obnoven\u00ed p\u0159ihla\u0161ovac\u00edch \u00fadaj\u016f pro tento kontakt.",
+    "7691": "Nov\u00e9 p\u0159ihla\u0161ovac\u00ed \u00fadaje kontaktu",
+    "7692": "Ov\u011b\u0159it p\u0159ihla\u0161ovac\u00ed \u00fadaje",
+    "7693": "Pou\u017eijte n\u00ed\u017ee uveden\u00e9 tla\u010d\u00edtko Ov\u011b\u0159it k potvrzen\u00ed p\u0159ihla\u0161ovac\u00edch \u00fadaj\u016f pro tento kontakt.",
+    "7694": "Tento soubor byl p\u0159edm\u011btem ozn\u00e1men\u00ed o zastaven\u00ed \u0161\u00ed\u0159en\u00ed.",
+    "7695": "Tato slo\u017eka byla p\u0159edm\u011btem ozn\u00e1men\u00ed o zastaven\u00ed \u0161\u00ed\u0159en\u00ed.",
+    "7696": "Copyright warning to all users"
 }

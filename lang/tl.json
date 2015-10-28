@@ -2737,9 +2737,12 @@
     "7686": "Isa sa mga binigay mong link ay hindi valid na MEGA link.",
     "7687": "Ang settings sa paglilipat ay para sa mga rehistradong users lamang.",
     "7688": "There may be a man-in-the-middle attack in progress. Please reset the stored identification credentials for this contact and then verify that they are correct with your contact through an existing secure channel or in person.",
-    "7689": "Reset contact credentials",
-    "7690": "Use the reset button below to reset the credentials for this contact.",
-    "7691": "New contact credentials",
-    "7692": "Verify credentials",
-    "7693": "Use the Verify button below to confirm the credentials for this contact."
+    "7689": "Ireset ang contact credentials",
+    "7690": "Gamitin ang reset button sa ibaba para ireset ang credentials ng contact na ito.",
+    "7691": "Bagong contact credentials",
+    "7692": "Patunayan ang credentials",
+    "7693": "Use the Verify button below to confirm the credentials for this contact.",
+    "7694": "Ang file na ito ay napasailalim ng isang takedown notice.",
+    "7695": "This folder has been subject to a takedown notice.",
+    "7696": "Copyright warning to all users"
 }

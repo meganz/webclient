@@ -24941,7 +24941,7 @@ a.ui-datepicker-next {
 	box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
 	left: 0;
 }
-.default-big-button:hover {
+.default-big-button:hover, .default-big-button.active {
 	-webkit-box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.1);
 	-moz-box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.1);
 	box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.1);

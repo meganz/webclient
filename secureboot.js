@@ -1870,6 +1870,9 @@ else if (!b_u)
                 {
                     loginresponse = this.response || this.responseText;
                     if (loginresponse && loginresponse[0] == '[') loginresponse = JSON.parse(loginresponse);
+                    else if (parseInt(loginresponse) === -15 /* ESID */) {
+                        loginresponse = -15;
+                    }
                     else loginresponse = false;
                 }
                 catch (e) {}
@@ -1903,6 +1906,10 @@ else if (!b_u)
         if (loginresponse === true || dl_res === true || !jsl_done || !jj_done) return;
 
         if (u_checked) startMega();
+        else if (loginresponse === -15) {
+            u_logout(true);
+            boot_auth(null, false);
+        }
         else if (loginresponse)
         {
             api_setsid(u_sid);

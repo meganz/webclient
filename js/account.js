@@ -638,8 +638,6 @@ function getUserAttribute(userhandle, attribute, pub, nonHistoric,
     // check the cache first!
     AttribCache.getItem(cacheKey)
         .done(function(v) {
-            //console.error("HOTCACHE: ", userhandle, attribute, v);
-
             thePromise.resolve(v);
             if (callback) {
                 callback(v, myCtx);
@@ -647,7 +645,6 @@ function getUserAttribute(userhandle, attribute, pub, nonHistoric,
         })
         .fail(function() {
             // Fire it off.
-            //console.error("RETR: ", userhandle, attribute, arguments);
             api_req({'a': 'uga', 'u': userhandle, 'ua': attribute}, myCtx);
         });
 

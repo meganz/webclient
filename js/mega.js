@@ -381,23 +381,39 @@ function MegaData()
             M.c.contacts[u_handle] = 1;
         }
 
+        var waitingPromises = [];
         Object.keys(M.c['contacts']).forEach(function(u) {
             if (!avatars[u]) {
-                getUserAttribute(u, 'a', true, false, function (res) {
-                    if (typeof res !== 'number' && res.length > 5) {
-                        var blob = new Blob([str_to_ab(base64urldecode(res))], {type: 'image/jpeg'});
-                        avatars[u] = {
-                            data: blob,
-                            url: myURL.createObjectURL(blob)
-                        };
-                    }
-                    useravatar.loaded(u);
-                });
+                waitingPromises.push(
+                    getUserAttribute(u, 'a', true, false, function (res) {
+                        if (typeof res !== 'number' && res.length > 5) {
+                            var blob = new Blob([str_to_ab(base64urldecode(res))], {type: 'image/jpeg'});
+                            avatars[u] = {
+                                data: blob,
+                                url: myURL.createObjectURL(blob)
+                            };
+                        }
+                        useravatar.loaded(u);
+                    })
+                    .fail(function() {
+                        delete avatars[u];
+                        useravatar.loaded(u);
+                    })
+                );
             }
         });
 
+        MegaPromise
+            .allDone(
+                waitingPromises
+            ).always(function() {
+                // trigger UI refresh
+                M.renderAvatars();
+            });
+
+
         delete M.c.contacts[u_handle];
-    }
+    };
 
     this.renderAvatars = function()
     {
@@ -5097,33 +5113,16 @@ function execsc(actionPackets, callback) {
                     );
                 }
 
-                AttribCache.removeItem(
+                var removeItemPromise = AttribCache.removeItem(
                     actionPacket.u + "_" + actionPacket.ua[i]
                 );
-                var attr = actionPacket.ua[i];
-                var pub = true;
-                var nonHistoric = false;
-
-                if (attr.indexOf("+") === 0) {
-                    attr = attr.substr(1);
-                    pub = true;
-                }
-                else if (attr.indexOf("*") === 0) {
-                    attr = attr.substr(1);
-                    pub = false;
-                }
-
-                if (attr.indexOf("!") === 0) {
-                    attr = attr.substr(1);
-                    nonHistoric = true;
-                }
-
-                // refill cache
-                getUserAttribute(actionPacket.u, attr, pub, nonHistoric);
 
                 if (actionPacket.ua[i] === '+a') {
                     avatars[actionPacket.u] = undefined;
-                    loadavatars = true;
+
+                    removeItemPromise.done(function() {
+                        M.avatars();
+                    });
 
                 } else if (actionPacket.ua[i] == '+puEd255') {
                     // pubEd25519 key was updated!

@@ -263,7 +263,7 @@ RtcSession.prototype = {
         try {
             successCallback.call(self, sessStream);
         } catch(e) {
-            self.onInternalError("_myGetUserMedia: exception in successCb()", {e:e});
+            self.jingle.onInternalError("_myGetUserMedia: exception in successCb()", {e:e});
         }
         return;
     }
@@ -294,7 +294,7 @@ RtcSession.prototype = {
               self._refLocalStream(options.video); //we must call this after onMediaReady because it will enable the local video display, and that is created in onMediaReady
               successCallback.call(self, sessStream);
           } catch(e) {
-              self.onInternalError("_myGetUserMedia: Exception in stream obtained callback", {e:e});
+              self.jingle.onInternalError("_myGetUserMedia: Exception in stream obtained callback", {e:e});
           }
       },
       function(error, e) {
@@ -426,6 +426,8 @@ RtcSession.prototype = {
   window.crypto.getRandomValues(bin);
   var sid = self.ownAnonId+':'+btoa(String.fromCharCode.apply(null, bin)).substr(0, 16).replace('+', '-').replace('/', '_'); //Firefox's btoa(bin) seems to always return the same string
   var fileArr;
+  var apiResponded = false;
+
   var initiateCallback = function(sessStream) {
       var actualAv = getStreamAv(sessStream);
       if ((options.audio && !actualAv.audio) || (options.video && !actualAv.video)) {
@@ -445,7 +447,6 @@ RtcSession.prototype = {
 // Call accepted handler
       ansHandler = self.connection.addHandler(function(stanza) {
         try {
-//            throw new Error("test error message");
           if ($(stanza).attr('sid') !== sid)
                 return true;
           if (state !== STATE_GOT_USERMEDIA_WAIT_PEER)
@@ -574,7 +575,6 @@ RtcSession.prototype = {
       },
       null, 'message', 'megaCallDecline', null, targetJid, {matchBare: true});
 
-      var apiResponded = false;
       setTimeout(function() {
           if (!apiResponded) {
               cancelCallRequest(STATE_CALL_CANCELED_BY_US, "call-canceled", "api-timeout", "API request to load peer crypto pubkey timed out");
@@ -652,6 +652,9 @@ RtcSession.prototype = {
               text: text,
               type: 'megaCallCancel'
       }));
+//temporary stats
+      callRequest.fakeSession.apiResponded = apiResponded;
+//===
       self.onCallTerminated(callRequest.fakeSession, reason, text, errInfo, eventName);
       return true;
   }
@@ -661,13 +664,13 @@ RtcSession.prototype = {
             fake: true,
             peerjid: targetJid,
             sid: sid,
+            callOptions: options,
             isInitiator: true //peerAnonId is set when it is received, but may never be received
          },
          cancel: function(eventName, reason, text, errInfo) {
              return cancelCallRequest(STATE_CALL_CANCELED_BY_US, eventName, reason, text, errInfo);
          }
   }
-
   if (options.audio || options.video) {
       self._myGetUserMedia(options, initiateCallback, null, true, sid);
   } else {
@@ -1030,8 +1033,23 @@ hangupAll: function(reason, text)
         text:text
     };
      var trsn = ((eventName === 'call-canceled')?'cancel-':'')+reason;
-    if (sess.statsRecorder)  {
-        var stats = obj.stats = sess.statsRecorder.terminate(sess.sid);
+     var stats;
+     if (sess.statsRecorder)  {
+        stats = obj.stats = sess.statsRecorder.terminate(sess.sid);
+        if (sess.isInitiator) {
+            stats.isCaller = 1;
+            stats.caid = self.ownAnonId;
+            stats.aaid = sess.peerAnonId;
+        } else {
+            stats.isCaller = 0;
+            stats.caid = sess.peerAnonId;
+            stats.aaid = self.ownAnonId;
+        }
+    } else { //no stats, but will still provide callId and duration
+        stats = obj.basicStats = {
+            cid: sess.sid,
+            bws: stats_getBrowserVersion()
+        };
         if (sess.isInitiator) {
             stats.isCaller = 1;
             stats.caid = self.ownAnonId;
@@ -1042,48 +1060,29 @@ hangupAll: function(reason, text)
             stats.aaid = self.ownAnonId;
         }
 
-        stats.termRsn = trsn;
-        if (text) {
-            stats.termMsg = text;
-        }
-        if (errInfo) {
-            stats.errInfo = errInfo;
-        }
-    } else { //no stats, but will still provide callId and duration
-        var bstats = obj.basicStats = {
-            cid: sess.sid,
-            termRsn: trsn,
-            bws: stats_getBrowserVersion()
-        };
-        if (sess.isInitiator) {
-            bstats.isCaller = 1;
-            bstats.caid = self.ownAnonId;
-            bstats.aaid = sess.peerAnonId;
-        } else {
-            bstats.isCaller = 0;
-            bstats.caid = sess.peerAnonId;
-            bstats.aaid = self.ownAnonId;
-        }
-
-        if (text) {
-            bstats.termMsg = text;
-        }
-        if (errInfo) {
-            bstats.errInfo = errInfo;
-        }
-
         if (sess.fake) {
             sess.me = this.jid; //just in case someone wants to access the own jid of the fake session
         }
         if (sess.tsMediaStart) {
-            bstats.ts = Math.round(sess.tsMediaStart/1000);
-            bstats.dur = Math.ceil((Date.now()-sess.tsMediaStart)/1000);
+            stats.ts = Math.round(sess.tsMediaStart/1000);
+            stats.dur = Math.ceil((Date.now()-sess.tsMediaStart)/1000);
         }
     }
+    stats.termRsn = trsn;
+    if (text) {
+         stats.termMsg = text;
+    }
+    if (errInfo) {
+        stats.errInfo = errInfo;
+    }
+    if (sess.apiResponded !== undefined) {
+        stats.apiresp = sess.apiResponded;
+    }
+
     if (this.statsUrl)
        jQuery.ajax(this.statsUrl, {
             type: 'POST',
-            data: JSON.stringify(obj.stats||obj.basicStats)
+            data: JSON.stringify(stats)
     });
 
     if (!eventName) {
@@ -1093,9 +1092,13 @@ hangupAll: function(reason, text)
 
 //release local video
     var videoUsed;
-    if (sess.localStream) { //a fake session can also have a localStream, e.g. in case of initiate-timeout
+    if (sess.fake) { //this is a fake session of a call request or auto-answer item
+        this.softAssert(sess.callOptions, "onCallTerminated: Fake session without 'callOptions'");
+        videoUsed = sess.callOptions.video;
+    } else if (sess.localStream) {
+        this.softAssert(sess.mutedState, "onCallTerminated: session with local stream must have a mutedState");
         var vt = sess.localStream.getVideoTracks();
-        videoUsed = ((vt.length > 0) && vt[0].enabled);
+        videoUsed = (vt.length > 0) && !sess.mutedState.videoMuted;
         delete sess.localStream;
     } else {
         videoUsed = false;

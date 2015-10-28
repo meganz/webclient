@@ -1247,13 +1247,10 @@ input.radioOn, input.radioOff {
 	padding: 0 20px 36px 12px;
 }
 .resellers-content {
-	margin: 3px -20px 36px -12px;
+	margin: 0 -20px 36px -12px;
 }
 .resellers-voucher-bl {
 	padding: 18px 0 14px 0;
-}
-.fm-account-reseller .fm-account-bg {
-	margin-bottom: 0;
 }
 .reset-pass .radio-txt {
 	display: block;

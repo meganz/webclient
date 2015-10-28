@@ -3665,7 +3665,7 @@ mBroadcaster.addListener('crossTab:master', function _setup() {
 });
 
 /** document.hasFocus polyfill */
-mBroadcaster.addListener('startMega', function() {
+mBroadcaster.once('startMega', function() {
     if (typeof document.hasFocus !== 'function') {
         var hasFocus = true;
 

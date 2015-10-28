@@ -3553,9 +3553,18 @@ function accountUI()
                         $('#account-password').unbind('keyup.accpwd');
                     });
                 });
-            }
-            else if ($('#account-new-password').val() !== $('#account-confirm-password').val())
-            {
+            } else if (!checkMyPassword($('#account-password').val())) {
+                msgDialog('warninga', l[135], l[724], false, function() {
+                    $('#account-password').val('');
+                    $('#account-password').focus();
+                    $('#account-password').bind('keyup.accpwd', function() {
+                        $('.fm-account-save-block').removeClass('hidden');
+                        $('.fm-account-main').addClass('save');
+                        initAccountScroll();
+                        $('#account-password').unbind('keyup.accpwd');
+                    });
+                });
+            } else if ($('#account-new-password').val() !== $('#account-confirm-password').val()) {
                 msgDialog('warninga', 'Error', l[715], false, function()
                 {
                     $('#account-new-password').val('');

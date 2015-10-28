@@ -24531,6 +24531,9 @@ body.pro:after {
 .upload .toast-icon {
 	background-position: -85px -900px;
 }
+.warning .toast-icon {
+	background-position: -85px -1260px;
+}
 .settings .toast-button {
 	display: none;
 }

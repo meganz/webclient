@@ -119,7 +119,7 @@ describe("crypto unit test", function() {
                 sandbox.stub(window, 'pubEd25519', { 'you456789xw': ED25519_PUB_KEY });
                 sandbox.stub(authring, 'getContactAuthenticated').returns(false);
                 sandbox.stub(authring, 'equalFingerprints').returns(undefined);
-                var result = ns._getPubKeyAuthentication('you456789xw', 'Ed25519');
+                var result = ns._getPubKeyAuthentication('you456789xw', ED25519_PUB_KEY, 'Ed25519');
                 assert.strictEqual(result, null);
             });
 
@@ -130,7 +130,7 @@ describe("crypto unit test", function() {
                                       confidence: authring.KEY_CONFIDENCE.UNSURE };
                 sandbox.stub(authring, 'getContactAuthenticated').returns(authenticated);
                 sandbox.stub(authring, 'equalFingerprints').returns(true);
-                var result = ns._getPubKeyAuthentication('you456789xw', 'Ed25519');
+                var result = ns._getPubKeyAuthentication('you456789xw', ED25519_PUB_KEY, 'Ed25519');
                 assert.strictEqual(result, authring.AUTHENTICATION_METHOD.SEEN);
             });
 
@@ -141,7 +141,7 @@ describe("crypto unit test", function() {
                                       confidence: authring.KEY_CONFIDENCE.UNSURE };
                 sandbox.stub(authring, 'getContactAuthenticated').returns(authenticated);
                 sandbox.stub(authring, 'equalFingerprints').returns(true);
-                var result = ns._getPubKeyAuthentication('you456789xw', 'Ed25519');
+                var result = ns._getPubKeyAuthentication('you456789xw', ED25519_PUB_KEY, 'Ed25519');
                 assert.strictEqual(result, authring.AUTHENTICATION_METHOD.SIGNATURE_VERIFIED);
             });
 
@@ -153,7 +153,7 @@ describe("crypto unit test", function() {
                                       confidence: authring.KEY_CONFIDENCE.UNSURE };
                 sandbox.stub(authring, 'getContactAuthenticated').returns(authenticated);
                 sandbox.stub(authring, 'equalFingerprints').returns(false);
-                var result = ns._getPubKeyAuthentication('you456789xw', 'Ed25519');
+                var result = ns._getPubKeyAuthentication('you456789xw', ED25519_PUB_KEY, 'Ed25519');
                 assert.strictEqual(result, false);
             });
         });

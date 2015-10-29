@@ -158,15 +158,16 @@ var crypt = (function () {
      * @private
      * @param userhandle {String}
      *     Mega user handle.
+     * @param key {(String|Array)}
+     *     Public key in the form of a byte string or array (RSA keys).
      * @param keyType {String}
      *     Key type of pub key. Can be one of 'Ed25519', 'Cu25519' or 'RSA'.
      * @return {Number}
      *     Authentication record, `null` if not recorded, and `false`
      *     if fingerprint verification fails.
      */
-    ns._getPubKeyAuthentication = function(userhandle, keyType) {
+    ns._getPubKeyAuthentication = function(userhandle, pubKey, keyType) {
         var recorded = authring.getContactAuthenticated(userhandle, keyType);
-        var pubKey = ns.getPubKeyCacheMapping(keyType)[userhandle];
         var fingerprint = authring.computeFingerprint(pubKey, keyType, 'string');
         if (recorded === false) {
             return null;
@@ -289,7 +290,7 @@ var crypt = (function () {
 
         getPubKeyPromise.done(function __resolvePubKey(result) {
             var pubKey = result;
-            authMethod = ns._getPubKeyAuthentication(userhandle, keyType);
+            authMethod = ns._getPubKeyAuthentication(userhandle, pubKey, keyType);
             fingerprint = authring.computeFingerprint(pubKey, keyType, 'string');
             if (keyType === 'Ed25519') {
                 // Treat Ed25519 pub keys.

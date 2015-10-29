@@ -274,6 +274,19 @@ function MegaData()
         this.sort();
     };
 
+    this.sortRules = {
+        'name': this.sortByName.bind(this),
+        'size': this.sortBySize.bind(this),
+        'type': this.sortByType.bind(this),
+        'date': this.sortByDateTime.bind(this),
+        'owner': this.sortByOwner.bind(this),
+        'modified': this.sortByModTime.bind(this),
+        'interaction': this.sortByInteraction.bind(this),
+        'access': this.sortByAccess.bind(this),
+        'status': this.sortByStatus.bind(this),
+        'fav': this.sortByFav.bind(this),
+    };
+
     this.doSort = function(n, d) {
         $('.grid-table-header .arrow').removeClass('asc desc');
         $('.context-menu-item.do-sort').removeClass('selected');
@@ -283,36 +296,24 @@ function MegaData()
             $('.arrow.' + n).addClass('asc');
             $('.do-sort[data-by="' + n + '"]').addClass('selected');
         }
-        if (n === 'name') {
-            M.sortByName(d);
+        this.extraColumn = null;
+        if ($('.do-sort[data-by="' + n + '"]').length > 0) {
+            // sort by a column which isn't visible
+            // we make it visible and swap its value
+            $('.grid-url-header').prev().find('div')
+                .removeClass().addClass('arrow ' + n + ' asc')
+                .text($('.do-sort[data-by="' + n + '"]').text())
+            switch (n) {
+            case 'modified':
+                this.extraColumn = 'mtime';
+                break;
+            }
         }
-        else if (n === 'size') {
-            M.sortBySize(d);
+
+        if (!M.sortRules[n]) {
+            throw new Error("Cannot sort by " + n);
         }
-        else if (n === 'type') {
-            M.sortByType(d);
-        }
-        else if (n === 'modified') {
-            M.sortByModTime(d);
-        }
-        else if (n === 'date') {
-            M.sortByDateTime(d);
-        }
-        else if (n === 'owner') {
-            M.sortByOwner(d);
-        }
-        else if (n === 'access') {
-            M.sortByAccess(d);
-        }
-        else if (n === 'interaction') {
-            M.sortByInteraction(d);
-        }
-        else if (n === 'status') {
-            M.sortByStatus(d);
-        }
-        else if (n === 'fav') {
-            M.sortByFav(d);
-        }
+        M.sortRules[n](d);
 
         M.sortingBy = [n, d];
 
@@ -1072,7 +1073,11 @@ function MegaData()
 
                     // List view
                     else {
-                        time = time2date(M.v[i].ts || (M.v[i].p === 'contacts' && M.contactstatus(M.v[i].h).ts));
+                        if (M.extraColumn && M.v[i].p !== "contacts") {
+                            time = time2date(M.v[i][M.extraColumn] || M.v[i].ts);
+                        } else {
+                            time = time2date(M.v[i].ts || (M.v[i].p === 'contacts' && M.contactstatus(M.v[i].h).ts));
+                        }
                         t = '.grid-table.fm';
                         el = 'tr';
                         html = '<tr id="' + htmlentities(M.v[i].h) + '" class="' + c + ' ' + takenDown +  '">\n\

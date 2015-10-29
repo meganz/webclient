@@ -4383,7 +4383,7 @@ function gridUI() {
         $('.grid-url-header').text('');
     }
 
-    $('.grid-table-header th').rebind('contextmenu', function(e) {
+    $('.fm .grid-table-header th').rebind('contextmenu', function(e) {
         $('.file-block').removeClass('ui-selected');
         $.selected = [];
         $.hideTopMenu();
@@ -4414,26 +4414,14 @@ function gridUI() {
         var d = 1;
         if (c && c.indexOf('desc') > -1)
             d = -1;
-        if (c && c.indexOf('name') > -1)
-            M.doSort('name', d);
-        else if (c && c.indexOf('fav') > -1) {
-            M.doSort('fav', d);
-        } else if (c && c.indexOf('size') > -1)
-            M.doSort('size', d);
-        else if (c && c.indexOf('type') > -1)
-            M.doSort('type', d);
-        else if (c && c.indexOf('date') > -1)
-            M.doSort('date', d);
-        else if (c && c.indexOf('owner') > -1)
-            M.doSort('owner', d);
-        else if (c && c.indexOf('access') > -1)
-            M.doSort('access', d);
-        else if (c && c.indexOf('status') > -1)
-            M.doSort('status', d);
-        else if (c && c.indexOf('interaction') > -1)
-            M.doSort('interaction', d);
-        if (c)
-            M.renderMain();
+
+        for (var e in M.sortRules) {
+            if (c && c.indexOf(e) > -1) {
+                M.doSort(e, d);
+                M.renderMain();
+                break;
+            }
+        }
     });
 
     if (M.currentdirid === 'shares')

@@ -158,7 +158,7 @@ var crypt = (function () {
      * @private
      * @param userhandle {String}
      *     Mega user handle.
-     * @param key {(String|Array)}
+     * @param pubKey {(String|Array)}
      *     Public key in the form of a byte string or array (RSA keys).
      * @param keyType {String}
      *     Key type of pub key. Can be one of 'Ed25519', 'Cu25519' or 'RSA'.

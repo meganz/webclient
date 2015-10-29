@@ -9576,7 +9576,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
 	-khtml-opacity: 1;
 	opacity: 1;
 }
-.fm-dialog-overlay {
+.fm-dialog-overlay, .fm-account-overlay {
 	width: 100%;
 	height: 100%;
 	position: absolute;
@@ -12940,7 +12940,10 @@ table {
 	position: absolute;
 	right: 58px;
 	top: 70px;
-	z-index: 400;
+	z-index: 2000;
+}
+.redeem-voucher.active {
+	z-index: 2100;
 }
 .redeem-voucher .notification-arrow {
 	display: none;
@@ -12976,7 +12979,7 @@ table {
 	cursor: pointer;
 }
 .fm-voucher-bottom {
-	padding: 10px 20px;
+	padding: 20px;
 	background-color: #F6F6F6;
 	-webkit-border-bottom-left-radius: 6px;
 	-moz-border-radius-bottomleft: 6px;

@@ -23,7 +23,7 @@ function voucherCentering(button)
     var popupBlock = $('.fm-voucher-popup');
     var rigthPosition = $('.fm-account-main').outerWidth() - $(popupBlock).outerWidth();
     var buttonMid = button.width() / 2;
-    popupBlock.css('top', button.position().top - 121);
+    popupBlock.css('top', button.position().top - 141);
 }
 
 function deleteScrollPanel(from, data) {
@@ -3851,15 +3851,24 @@ function accountUI()
         $('.redeem-voucher').unbind('click');
         $('.redeem-voucher').bind('click', function(event)
         {
-            if ($(this).attr('class').indexOf('active') == -1)
+			var $this = $(this);
+            if ($this.attr('class').indexOf('active') == -1)
             {
-                $(this).addClass('active');
+				$('.fm-account-overlay').fadeIn(100);
+				$this.addClass('active');
                 $('.fm-voucher-popup').removeClass('hidden');
-                voucherCentering($(this));
+                voucherCentering($this);
+
+				$('.fm-account-overlay, .fm-purchase-voucher, .fm-voucher-button').rebind('click.closeDialog', function() {
+					$('.fm-account-overlay').fadeOut(100);
+                	$('.redeem-voucher').removeClass('active');
+                	$('.fm-voucher-popup').addClass('hidden');
+				});
             }
             else
             {
-                $(this).removeClass('active');
+				$('.fm-account-overlay').fadeOut(200);
+                $this.removeClass('active');
                 $('.fm-voucher-popup').addClass('hidden');
             }
         });

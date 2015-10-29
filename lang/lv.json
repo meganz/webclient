@@ -339,6 +339,7 @@
     "738": "Piepras\u012bt",
     "739": "aizmirsi savu paroli?",
     "741": "L\u016bdzu, izv\u0113lieties jaunu dro\u0161u paroli.",
+    "742": "Nomain\u012bt",
     "746": "Abonementa veids",
     "748": "M\u0113ne\u0161a",
     "749": "Gada",
@@ -2729,5 +2730,19 @@
     "7679": "You need to have a MEGA account in order to continue.",
     "7680": "MEGA's cryptographic model depends on the keys displayed above. We recommend sending the decryption keys separately from the folder\/file link, through a secure channel.",
     "7681": "Folder\/File Link",
-    "7682": "MEGA recommends sending the 'Decryption Key' separately from the 'Folder\/File Link'."
+    "7682": "MEGA recommends sending the 'Decryption Key' separately from the 'Folder\/File Link'.",
+    "7683": "Extension",
+    "7684": "%1 on %2",
+    "7685": "I hereby state that I have a good faith belief that the use of copyrighted material in the manner complained of and located at the location above is not authorized by the copyright owner, its agent, or the law (e.g., as a fair use).",
+    "7686": "One of the links you have provided is not a valid MEGA link.",
+    "7687": "Transfer settings are for registered users only.",
+    "7688": "There may be a man-in-the-middle attack in progress. Please reset the stored identification credentials for this contact and then verify that they are correct with your contact through an existing secure channel or in person.",
+    "7689": "Reset contact credentials",
+    "7690": "Use the reset button below to reset the credentials for this contact.",
+    "7691": "New contact credentials",
+    "7692": "Verify credentials",
+    "7693": "Use the Verify button below to confirm the credentials for this contact.",
+    "7694": "This file has been subject to a takedown notice.",
+    "7695": "This folder has been subject to a takedown notice.",
+    "7696": "Copyright warning to all users"
 }

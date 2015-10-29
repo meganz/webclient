@@ -239,6 +239,14 @@ MegaSync.prototype._prepareDownloadUrls = function() {
         '64':'xUbuntu_15.04/amd64/megasync-xUbuntu_15.04_amd64.deb',
         '64n':'xUbuntu_15.04/amd64/nautilus-megasync-xUbuntu_15.04_amd64.deb',
         'c':'sudo gdebi'
+    },
+    {
+        'name':'Ubuntu 15.10',
+        '32':'xUbuntu_15.10/i386/megasync-xUbuntu_15.10_i386.deb',
+        '32n':'xUbuntu_15.10/i386/nautilus-megasync-xUbuntu_15.10_i386.deb',
+        '64':'xUbuntu_15.10/amd64/megasync-xUbuntu_15.10_amd64.deb',
+        '64n':'xUbuntu_15.10/amd64/nautilus-megasync-xUbuntu_15.10_amd64.deb',
+        'c':'sudo gdebi'
     }];
 
     var clients = {

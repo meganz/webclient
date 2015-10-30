@@ -237,7 +237,8 @@ var JinglePlugin = {
                     isInitiator: false,
                     sid: sid,
                     peerAnonId: ans.peerAnonId,
-                    localStream: ans.options.localStream
+                    localStream: ans.options.localStream,
+                    callOptions: ans.options
                   }, "security", "Fingerprint verification failed");
                 } catch(e) {
                     self.onInternalError("Error calling onCallTerminated handler", {e:e});
@@ -584,7 +585,8 @@ var JinglePlugin = {
                 peerjid: item.from,
                 isInitiator: false,
                 peerAnonId: item.peerAnonId,
-                localStream: item.options.localStream
+                localStream: item.options.localStream,
+                callOptions: item.options
             }, reason, text, errInfo);
         }
         return true;

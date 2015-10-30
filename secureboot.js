@@ -22,7 +22,7 @@ if (typeof process !== 'undefined') {
         // localStorage.jj = 1;
     }
 }
-var is_karma = window.top.location.host === "localhost:9876";
+var is_karma = /^localhost:987[6-9]/.test(window.top.location.host);
 var is_chrome_firefox = document.location.protocol === 'chrome:'
     && document.location.host === 'mega' || document.location.protocol === 'mega:';
 var is_extension = is_chrome_firefox || is_electron || document.location.href.substr(0,19) == 'chrome-extension://';

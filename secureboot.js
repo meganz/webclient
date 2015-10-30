@@ -2,6 +2,7 @@ var b_u = 0;
 var apipath;
 var maintenance = false;
 var androidsplash = false;
+var cookiesDisabled = false;
 var URL = window.URL || window.webkitURL;
 var seqno = Math.ceil(Math.random()*1000000000);
 var staticpath = 'https://eu.static.mega.co.nz/3/';
@@ -154,11 +155,59 @@ if (!b_u) try
         if (!(localStorage instanceof Ci.nsIDOMStorage)) {
             throw new Error('Invalid DOM Storage instance.');
         }
+    }
+    try {
         d = !!localStorage.d;
     }
-    if (typeof localStorage == 'undefined') b_u = 1;
-    else
-    {
+    catch (ex) {
+        cookiesDisabled = ex.code && ex.code === DOMException.SECURITY_ERR
+            || ex.message === 'SecurityError: DOM Exception 18';
+
+        if (!cookiesDisabled) {
+            throw ex;
+        }
+
+        // Cookies are disabled, therefore we can't use localStorage.
+        // We could either show the user a message about the issue and let him
+        // enable cookies, or rather setup a tiny polyfill so that they can use
+        // the site even in such case, even though this solution has side effects.
+        Object.defineProperty(window, 'localStorage', {
+            value: Object.create({}, {
+                length:     { get: function() { return Object.keys(this).length; }},
+                key:        { value: function(pos) { return Object.keys(this)[pos]; }},
+                removeItem: { value: function(key) { delete this[key]; }},
+                setItem:    { value: function(key, value) { this[key] = String(value); }},
+                getItem:    { value: function(key) {
+                    if (this.hasOwnProperty(key)) {
+                        return this[key];
+                    }
+                    return null;
+                }},
+                clear: {
+                    value: function() {
+                        var obj = this;
+                        Object.keys(obj).forEach(function(memb) {
+                            if (obj.hasOwnProperty(memb)) {
+                                delete obj[memb];
+                            }
+                        });
+                    }
+                }
+            })
+        });
+        Object.defineProperty(window, 'sessionStorage', {
+            value: localStorage
+        });
+        if (location.host !== 'mega.nz') {
+            localStorage.jj = localStorage.dd = localStorage.d = 1;
+        }
+        setTimeout(function() {
+            console.warn('Apparently you have Cookies disabled, ' +
+                'please note this session is temporal, ' +
+                'it will die once you close/reload the browser/tab.');
+        }, 4000);
+    }
+    if (typeof localStorage !== 'undefined') {
         var contenterror = 0;
         var nocontentcheck = !!localStorage.dd;
         if (localStorage.dd) {
@@ -178,15 +227,22 @@ if (!b_u) try
     }
 }
 catch(e) {
-    if (!m || e.message !== 'SecurityError: DOM Exception 18') {
+    if (!m || !cookiesDisabled) {
+        var extraInfo = '';
+        if (cookiesDisabled) {
+            extraInfo = "\n\nTip: We've detected this issue is likely related to " +
+                "having Cookies disabled, please check your browser settings.";
+        }
         alert(
-            "Sorry, we were unable to initialize the browser's local storage, "+
-            "either you're using an outdated browser or it's something from our side.\n"+
+            "Sorry, we were unable to initialize the browser's local storage, " +
+            "either you're using an outdated/misconfigured browser or " +
+            "it's something from our side.\n" +
             "\n"+
-            "If you think it's our fault, please report the issue back to us.\n"+
-            "\n"+
-            "Reason: " + (e.message || e)+
+            "If you think it's our fault, please report the issue back to us.\n" +
+            "\n" +
+            "Reason: " + (e.message || e) +
             "\nBrowser: " + (typeof mozBrowserID !== 'undefined' ? mozBrowserID : ua)
+            + extraInfo
         );
         b_u = 1;
     }
@@ -873,7 +929,7 @@ else if (!b_u)
         };
     })(console);
 
-    Object.defineProperty(window, "__cd_v", { value : 18, writable : false });
+    Object.defineProperty(window, "__cd_v", { value : 19, writable : false });
     if (!d || onBetaW)
     {
         var __cdumps = [], __cd_t;
@@ -1072,13 +1128,13 @@ else if (!b_u)
      * @returns {String}
      */
     function getLanguageFilePath(language) {
-        
+
         // If the sh1 (filename with hashes) array has been created from deploy script
         if (typeof sh1 !== 'undefined') {
 
             // Search the array
             for (var i = 0, length = sh1.length; i < length; i++) {
-                
+
                 var filePath = sh1[i];
 
                 // If the language e.g. 'en' matches part of the filename from the deploy script e.g.
@@ -1807,18 +1863,25 @@ else if (!b_u)
                 {
                     loginresponse = this.response || this.responseText;
                     if (loginresponse && loginresponse[0] == '[') loginresponse = JSON.parse(loginresponse);
+                    else if (parseInt(loginresponse) === -15 /* ESID */) {
+                        loginresponse = -15;
+                    }
                     else loginresponse = false;
                 }
                 catch (e) {}
             }
             boot_done();
-        }
+        };
         lxhr.onerror = function()
         {
             loginresponse= false;
             boot_done();
-        }
-        lxhr.open("POST", apipath + 'cs?id=0&sid='+u_storage.sid, true);
+        };
+
+        // If using extension this is passed through to the API for the helpdesk tool
+        var usingExtension = (is_extension) ? '&ext=1' : '';
+
+        lxhr.open('POST', apipath + 'cs?id=0&sid=' + u_storage.sid + usingExtension, true);
         lxhr.send(JSON.stringify([{'a':'ug'}]));
     }
     function boot_auth(u_ctx,r)
@@ -1836,6 +1899,10 @@ else if (!b_u)
         if (loginresponse === true || dl_res === true || !jsl_done || !jj_done) return;
 
         if (u_checked) startMega();
+        else if (loginresponse === -15) {
+            u_logout(true);
+            boot_auth(null, false);
+        }
         else if (loginresponse)
         {
             api_setsid(u_sid);
@@ -1868,7 +1935,11 @@ else if (!b_u)
             dl_res= false;
             boot_done();
         };
-        dlxhr.open("POST", apipath + 'cs?id=0&domain=meganz', true);
+
+        // If using extension this is passed through to the API for the helpdesk tool
+        var usingExtension = (is_extension) ? '&ext=1' : '';
+
+        dlxhr.open("POST", apipath + 'cs?id=0&domain=meganz' + usingExtension, true);
         dlxhr.send(JSON.stringify([{ 'a': 'g', p: page.substr(1,8), 'ad': showAd() }]));
     }
 }

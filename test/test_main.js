@@ -1,47 +1,46 @@
 // Set up the testing environment.
-var cookiesDisabled = false;
-var devhost = window.location.host;
-var pathSuffix = window.location.pathname;
-pathSuffix = pathSuffix.split("/").slice(0, -2).join("/");
+// XXX: This must be the first test we run
 
-try {
-    localStorage.clear();
-}
-catch (ex) {
-    cookiesDisabled = ex.code && ex.code === DOMException.SECURITY_ERR
-        || ex.message === 'SecurityError: DOM Exception 18';
+describe("Initialization Unit Tests", function() {
+    "use strict";
 
-    if (!cookiesDisabled) {
-        throw ex;
-    }
+    // Create/restore Sinon stub/spy/mock sandboxes.
+    var sandbox = null;
 
-    Object.defineProperty(window, 'localStorage', {
-        value: Object.create({}, {
-            length:     { get: function() { return Object.keys(this).length; }},
-            key:        { value: function(pos) { return Object.keys(this)[pos]; }},
-            removeItem: { value: function(key) { delete this[key]; }},
-            setItem:    { value: function(key, value) { this[key] = String(value); }},
-            getItem:    { value: function(key) {
-                if (this.hasOwnProperty(key)) {
-                    return this[key];
-                }
-                return null;
-            }},
-            clear: {
-                value: function() {
-                    var obj = this;
-                    Object.keys(obj).forEach(function(memb) {
-                        if (obj.hasOwnProperty(memb)) {
-                            delete obj[memb];
-                        }
-                    });
-                }
-            }
-        })
+    beforeEach(function() {
+        sandbox = sinon.sandbox.create();
     });
-    Object.defineProperty(window, 'sessionStorage', {
-        value: localStorage
+    afterEach(function() {
+        sandbox.restore();
     });
-}
-localStorage.staticpath = window.location.protocol + "//"
-                        + devhost + pathSuffix + "/";
+    var assert = chai.assert;
+
+    it("did not called jsl_start()", function() {
+        // There is no reason to let secureboot's onload handler invoke jsl_start() because:
+        // 1) We load the files through Karma already.
+        // 2) If jsl_start() fails, we won't notice since that is not behind a test.
+        // 3) It'll slow the testing process since that will be running on the background.
+
+        // XXX: jsl_start will initialize xhr_progress to an array, so check it's undefined.
+        assert.strictEqual(xhr_progress, undefined);
+    });
+
+    it("can invoke mBroadcaster", function() {
+        // The secureboot's loading process is:
+        // jsl_start -> initall -> boot_done -> boot_auth -> startMega
+        // So, lets invoke mBroadcaster's startMega to initialize any required stuff
+
+        _showDebug(sandbox, ['console.log', 'console.error']);
+
+        mBroadcaster.sendMessage('startMega');
+
+        _hideDebug();
+        expect(console.log.callCount).to.be.at.least(1);
+        expect(console.error.callCount).to.eql(0);
+
+        // Check mDB.js's startMega was called
+        expect(window.mDB).to.eql(0x7f);
+        expect(indexedDB.getDatabaseNames).to.be.a('function');
+
+    });
+});

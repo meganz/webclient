@@ -106,6 +106,9 @@ describe("chat.strongvelope workflow test", function() {
                         // See if Alice can handle the key re-send.
                         toSendReceived = alice.decryptFrom(received.toSend, 'bob45678900');
                         assert.strictEqual(toSendReceived.payload, null);
+                        // See if Bob can handle his own key re-send.
+                        toSendReceived = bob.decryptFrom(received.toSend, 'bob45678900');
+                        assert.strictEqual(toSendReceived.payload, null);
                     }
 
                     // Bob echoes it.
@@ -122,6 +125,9 @@ describe("chat.strongvelope workflow test", function() {
                     if (typeof received.toSend !== 'undefined') {
                         // See if Bob can handle the key re-send.
                         toSendReceived = bob.decryptFrom(received.toSend, 'alice678900');
+                        assert.strictEqual(toSendReceived.payload, null);
+                        // See if Alice can handle her own key re-send.
+                        toSendReceived = alice.decryptFrom(received.toSend, 'alice678900');
                         assert.strictEqual(toSendReceived.payload, null);
                     }
                 }

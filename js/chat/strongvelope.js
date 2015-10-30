@@ -558,7 +558,7 @@ var strongvelope = {};
      * Seeds the handler with an array of historic messages to resume an
      * existing chat session.  The messages for seeding must be contiguous and
      * contain the most recent messages.  The order of the messages is not
-     * important.  If this operatin fails to be successful (returns `false`),
+     * important.  If this operation fails to be successful (returns `false`),
      * grab another batch of earlier chat messages and pass them into this
      * method (does not need to include the already processed first batch, but
      * the batches must be directly adjoining).
@@ -1000,12 +1000,13 @@ var strongvelope = {};
             payload: cleartext
         };
 
-        if (this._totalMessagesWithoutSendKey >= this.totalMessagesBeforeSendKey) {
+        if ((this._totalMessagesWithoutSendKey >= this.totalMessagesBeforeSendKey)
+                && (result.sender !== this.ownHandle)) {
             result.toSend = this.encryptTo(null, sender);
         }
 
         // Update counter.
-        if (!historicMessage) {
+        if (!historicMessage && (result.sender !== this.ownHandle)) {
             this._totalMessagesWithoutSendKey++;
         }
 

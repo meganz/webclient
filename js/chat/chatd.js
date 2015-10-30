@@ -615,7 +615,7 @@ Chatd.Messages.prototype.resend = function() {
     // resend all pending modifications of completed messages
     for (var msgnum in this.modified) {
         if (!this.sending[this.buf[msgnum][Chatd.MsgField.MSGID]]) {
-            self.chatd.msgupd(
+            self.chatd.chatidshard[this.chatid].msgupd(
                 this.chatid,
                 this.buf[msgnum][Chatd.MsgField.MSGID],
                 this.buf[msgnum][Chatd.MsgField.MESSAGE]
@@ -765,7 +765,7 @@ Chatd.Messages.prototype.check = function(chatid, msgid) {
         messageId: base64urlencode(msgid)
     });
 
-    if (this.buf[this.newmsg]) {
+    if (this.buf[this.highnum]) {
         // if the newest held message is not current, initiate a fetch of newer messages just in case
         if (this.buf[this.newmsg][Chatd.MsgField.MSGID] !== msgid) {
             this.chatd.cmd(Chatd.Opcode.HIST, chatid, this.chatd.pack32le(32));

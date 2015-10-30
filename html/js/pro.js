@@ -11,6 +11,12 @@ var pro_package,
 
 function init_pro()
 {
+    // Inititalise a dialog to let them redeem and purchase immediately from a voucher URL e.g. 
+    // https://mega.nz/#voucherZUSA63A8WEYTPSXU4985
+    if (localStorage.getItem('voucher') !== null) {
+        voucherRedeemDialog.init();
+    }
+    
     // Detect if there exists a verify get parameter
     var verifyUrlParam = proPage.getUrlParam("verify");
     if (typeof verifyUrlParam !== 'undefined')
@@ -1101,7 +1107,125 @@ var proPage = {
 };
 
 /**
- * Code for the voucher dialog
+ * Code for the direct voucher redeem dialog when users come from 
+ * a direct link e.g. https://mega.nz/#voucher8RNU1PYPYDQWBE04J67F
+ */
+var voucherRedeemDialog = {
+    
+    $dialog: null,
+    $backgroundOverlay: null,
+    
+    /**
+     * Initialisation of the dialog
+     */
+    init: function() {
+        
+        // Cache DOM reference for lookup in other functions
+        this.$dialog = $('.voucher-redeem-dialog');
+        this.$backgroundOverlay = $('.fm-dialog-overlay');
+        
+        // Init functions
+        this.addVoucher();
+    },
+    
+    /**
+     * Redeems the voucher code
+     */
+    addVoucher: function() {
+
+        // Get the voucher code
+        var voucherCode = localStorage.getItem('voucher');
+        
+        // No longer needed in localStorage
+        localStorage.removeItem('voucher');
+        
+        //voucherRedeemDialog.displayDialog();
+        
+        // Make API call to redeem voucher
+        api_req({ a: 'uavr', v: voucherCode }, {
+            callback: function(result) {
+                
+                if (typeof result === 'number') {
+                    
+                    // This voucher has already been redeemed
+                    if (result === -11) {
+                        loadingDialog.hide();
+                        msgDialog('warninga', l[135], l[714], '', function() {
+                            voucherRedeemDialog.showBackgroundOverlay();
+                        });
+                    }
+
+                    // Not a valid voucher code
+                    else if (result < 0) {
+                        loadingDialog.hide();
+                        msgDialog('warninga', l[135], l[473], '', function() {
+                            voucherRedeemDialog.showBackgroundOverlay();
+                        });
+                    }
+                    
+                    else {
+                        // Get the latest account balance and update the dialog
+                        voucherRedeemDialog.displayDialog();
+                        //voucherRedeemDialog.getLatestBalance();
+                    }
+                }
+            }
+        });
+    },
+    
+    /**
+     * Shows the background overlay
+     */
+    showBackgroundOverlay: function() {
+
+        voucherRedeemDialog.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+    },
+    
+    /**
+     * Gets the latest Pro balance from the API
+     */
+    getLatestBalance: function() {
+        
+        // Flag 'pro: 1' includes pro balance in the response
+        api_req({ a: 'uq', pro: 1 }, {
+            callback : function (result) {
+                
+                // Hide loading dialog
+                loadingDialog.hide();
+                
+                // If successful result
+                if (typeof result == 'object' && result.balance && result.balance[0]) {
+                    
+                    // Update the balance
+                    var balance = parseFloat(result.balance[0][0]);
+                    var balanceString = balance.toFixed(2);
+                    
+                    // Update for pro_pay
+                    /*pro_balance = balance;
+                    
+                    // Update dialog details
+                    voucherDialog.$dialog.find('.voucher-account-balance .balance').text(balanceString);
+                    voucherDialog.changeColourIfSufficientBalance();
+                    
+                    // Hide voucher input
+                    voucherDialog.$dialog.find('.voucher-redeem-container').show();
+                    voucherDialog.$dialog.find('.purchase-now-container').show();
+                    voucherDialog.$dialog.find('.voucher-input-container').hide();
+                    */
+                }
+            }
+        });
+    },
+    
+    displayDialog: function() {
+        
+        voucherRedeemDialog.showBackgroundOverlay();
+        voucherRedeemDialog.$dialog.removeClass('hidden');
+    }
+};
+
+/**
+ * Code for the voucher dialog on the second step of the Pro page
  */
 var voucherDialog = {
     
@@ -1296,7 +1420,7 @@ var voucherDialog = {
                     // Not a valid voucher code
                     else if (result < 0) {
                         loadingDialog.hide();
-                        msgDialog('warninga', l[135], l[714], '', function() {
+                        msgDialog('warninga', l[135], l[473], '', function() {
                             voucherDialog.showBackgroundOverlay();
                         });
                     }

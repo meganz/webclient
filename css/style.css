@@ -23888,6 +23888,58 @@ a.voucher-reseller-link {
  color: #E5E5E5;
 }
 /* end of CC payment dialog */
+
+/* Voucher direct redeem from hyperlink dialog */
+.voucher-redeem-dialog .account-information {
+    left: 50%;
+    margin: -145px 0 0 -316px;
+    position: absolute;
+    text-align: left;
+    top: 50%;
+    width: 700px;
+    z-index: 2200;
+}
+.voucher-redeem-dialog .left-information {
+    color: #fff;
+    float: left;
+    padding-right: 30px;
+    width: 50%;
+}
+.voucher-redeem-dialog .title-text {
+    font-size: 24px;
+    line-height: 36px;
+}
+.voucher-redeem-dialog .balance-text {
+    color: #ccc;
+    font-size: 14px;
+    letter-spacing: 0.2px;
+    margin-top: 40px;
+}
+.voucher-redeem-dialog .complete-upgrade-text {
+    color: #ccc;
+    font-size: 14px;
+    letter-spacing: 0.2px;
+    line-height: 20px;
+    margin-top: 20px;
+}
+.voucher-redeem-dialog .complete-text {
+    color: rgba(19, 224, 60, 1);
+}
+.voucher-redeem-dialog .click-here-text {
+    font-weight: bold;
+}
+.voucher-redeem-dialog .complete-upgrade-button {
+    margin: 40px 0 0;
+    text-align: center;
+}
+.voucher-redeem-dialog .right-information {
+    float: left;
+    padding-top: 20px;
+}
+.voucher-redeem-dialog .membership-pad-bl {
+    height: 255px;
+}
+
 .payment-animation-pad {
 	width: 100%;
 	position: absolute;
@@ -23948,7 +24000,7 @@ a.voucher-reseller-link {
 	width: 150px;
 	margin-bottom: 43px;
 }
-.payment-result-button, .feedback-result-button {
+.payment-result-button, .feedback-result-button, .complete-upgrade-button {
 	display: inline-block;
 	min-width: 240px;
 	font-size: 16px;
@@ -23971,7 +24023,7 @@ a.voucher-reseller-link {
 	cursor: pointer;
 	text-transform: uppercase;
 }
-.payment-result-button:hover, .feedback-result-button:hover {
+.payment-result-button:hover, .feedback-result-button:hover, .complete-upgrade-button:hover {
 	color: #2e2e2e;
 	background-color: rgba(19,224,60,1);
 	border-color: rgba(19,224,60,1);

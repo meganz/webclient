@@ -279,9 +279,32 @@ function init_page() {
         }
     }
 
+    /**
+     * If voucher code from url e.g. https://mega.nz/#voucherZUSA63A8WEYTPSXU4985
+     */
     if (page.substr(0, 7) == 'voucher') {
-        loadingDialog.show();
-        var vouchercode = page.substr(7, page.length - 7);
+        
+        // Get the voucher code from the URL which is 20 characters in length
+        var voucherCode = page.substr(7, 20);
+        
+        // Store in localStorage to be used by the Pro page or when returning from login
+        localStorage.voucher = voucherCode;
+        
+        // If not logged in, direct them to login or register first
+        if (!u_type) {
+            login_txt = 'Please log in or register to redeem your voucher.';
+            document.location.hash = 'login';
+        }
+        else {
+            // Otherwise go to the Pro page which will detect the voucher code and show a dialog
+            document.location.hash = 'pro';
+        }
+        
+        return false;
+        
+        //loadingDialog.show();
+        //var vouchercode = page.substr(7, page.length - 7);
+        /*
         api_req({
             a: 'uavq',
             v: vouchercode
@@ -319,13 +342,16 @@ function init_page() {
                     document.location.hash = 'fm/account';
                 }
             }
-        });
-
-        return false;
+        });*/
     }
 
+    // If they have recently tried to redeem their voucher but were not logged in or registered first 
+    // then direct them to the Pro page to complete their purchase which will show an immediate dialog.
     if (localStorage.voucher && u_type !== false) {
-        api_req({
+        document.location.hash = 'pro';
+        //return false;
+        
+        /*api_req({
             a: 'uavr',
             v: localStorage.voucher
         }, {
@@ -336,7 +362,7 @@ function init_page() {
             }
         });
 
-        delete localStorage.voucher;
+        delete localStorage.voucher;*/
     }
 
     if (page.substr(0, 10) == 'blogsearch') {

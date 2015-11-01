@@ -22,6 +22,7 @@ if (typeof process !== 'undefined') {
         // localStorage.jj = 1;
     }
 }
+var is_karma = /^localhost:987[6-9]/.test(window.top.location.host);
 var is_chrome_firefox = document.location.protocol === 'chrome:'
     && document.location.host === 'mega' || document.location.protocol === 'mega:';
 var is_extension = is_chrome_firefox || is_electron || document.location.href.substr(0,19) == 'chrome-extension://';
@@ -158,6 +159,9 @@ if (!b_u) try
         }
     }
     try {
+        if (typeof localStorage === 'undefined' || localStorage === null) {
+            throw new Error('SecurityError: DOM Exception 18');
+        }
         d = !!localStorage.d;
     }
     catch (ex) {
@@ -199,7 +203,7 @@ if (!b_u) try
         Object.defineProperty(window, 'sessionStorage', {
             value: localStorage
         });
-        if (location.host !== 'mega.nz') {
+        if (location.host !== 'mega.nz' && !is_karma) {
             localStorage.jj = localStorage.dd = localStorage.d = 1;
         }
         setTimeout(function() {
@@ -208,24 +212,24 @@ if (!b_u) try
                 'it will die once you close/reload the browser/tab.');
         }, 4000);
     }
-    if (typeof localStorage !== 'undefined') {
-        var contenterror = 0;
-        var nocontentcheck = !!localStorage.dd;
-        if (localStorage.dd) {
-             var devhost = window.location.host;
-            // handle subdirs
-            var pathSuffix = window.location.pathname;
-            pathSuffix = pathSuffix.split("/").slice(0,-1).join("/");
-            // set the staticpath for debug mode
-            localStorage.staticpath = window.location.protocol + "//" + devhost + pathSuffix + "/";
-            // localStorage.staticpath = location.protocol + "//" + location.host + location.pathname.replace(/[^/]+$/,'');
-            if (localStorage.d) {
-                console.debug('StaticPath set to "' + localStorage.staticpath + '"');
-            }
+
+    var contenterror = 0;
+    var nocontentcheck = false;
+    if (localStorage.dd || is_karma) {
+        nocontentcheck = true;
+        var devhost = window.location.host;
+        // handle subdirs
+        var pathSuffix = window.location.pathname;
+        pathSuffix = pathSuffix.split("/").slice(0, -1).join("/");
+        // set the staticpath for debug mode
+        localStorage.staticpath = window.location.protocol + "//" + devhost + pathSuffix + "/";
+        // localStorage.staticpath = location.protocol + "//" + location.host + location.pathname.replace(/[^/]+$/,'');
+        if (localStorage.d) {
+            console.debug('StaticPath set to "' + localStorage.staticpath + '"');
         }
-        staticpath = localStorage.staticpath || geoStaticpath();
-        apipath = localStorage.apipath || 'https://eu.api.mega.co.nz/';
     }
+    staticpath = localStorage.staticpath || geoStaticpath();
+    apipath = localStorage.apipath || 'https://eu.api.mega.co.nz/';
 }
 catch(e) {
     if (!m || !cookiesDisabled) {
@@ -1704,7 +1708,9 @@ else if (!b_u)
     }
     window.onload = function ()
     {
-        if (!maintenance && !androidsplash) jsl_start();
+        if (!maintenance && !androidsplash && !is_karma) {
+            jsl_start();
+        }
     };
     function jsl_load(xhri)
     {

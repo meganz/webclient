@@ -290,12 +290,7 @@ function MegaData()
     this.doSort = function(n, d) {
         $('.grid-table-header .arrow').removeClass('asc desc');
         $('.context-menu-item.do-sort').removeClass('selected');
-        if (d > 0) {
-            $('.arrow.' + n).addClass('desc');
-        } else {
-            $('.arrow.' + n).addClass('asc');
-            $('.do-sort[data-by="' + n + '"]').addClass('selected');
-        }
+
         this.extraColumn = null;
         if ($('.do-sort[data-by="' + n + '"]').length > 0) {
             // sort by a column which isn't visible
@@ -309,6 +304,14 @@ function MegaData()
                 break;
             }
         }
+
+        if (d > 0) {
+            $('.arrow.' + n).addClass('desc');
+        } else {
+            $('.arrow.' + n).addClass('asc');
+            $('.do-sort[data-by="' + n + '"]').addClass('selected');
+        }
+
 
         if (!M.sortRules[n]) {
             throw new Error("Cannot sort by " + n);

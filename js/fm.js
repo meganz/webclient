@@ -10160,11 +10160,18 @@ function userFingerprint(userid, next) {
  */
 function showAuthenticityCredentials(user) {
     
-    var fprint = $('.contact-fingerprint-txt').empty();
-    userFingerprint(user, function (fprints) {
-        $.each(fprints, function (k, value) {
+    var $fingerprintContainer = $('.contact-fingerprint-txt');
+    
+    // Compute the fingerprint
+    userFingerprint(user, function (fingerprints) {
+        
+        // Clear old values immediately
+        $fingerprintContainer.empty();
+        
+        // Render the fingerprint into 10 groups of 4 hex digits
+        $.each(fingerprints, function (k, value) {
             $('<span>').text(value).appendTo(
-                fprint.filter(k <= 4 ? ':first' : ':last')
+                $fingerprintContainer.filter(k <= 4 ? ':first' : ':last')
             );
         });
     });
@@ -10172,12 +10179,13 @@ function showAuthenticityCredentials(user) {
 
 /**
  * Enables the Verify button
+ * @param {String} userHandle The user handle
  */
-function enableVerifyFingerprintsButton(userId) {
+function enableVerifyFingerprintsButton(userHandle) {
     $('.fm-verify').removeClass('verified');
     $('.fm-verify').find('span').text(l[1960] + '...');
     $('.fm-verify').rebind('click', function() {
-        fingerprintDialog(userId);
+        fingerprintDialog(userHandle);
     });
 }
 

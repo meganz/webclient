@@ -109,6 +109,17 @@ module.exports = function(config) {
         // Google Import Contacts
         'js/gContacts.js',
 
+        // Transfers
+        'js/downloadChrome.js',
+        'js/downloadMemory.js',
+        'js/queue.js',
+        'js/downloader.js',
+        'js/download2.js',
+        'js/upload2.js',
+        'js/zip64.js',
+        {pattern: 'aesasm.js', included: false},
+        {pattern: 'encrypter.js', included: false},
+
         // Our chat code.
         'js/chat/strongvelope.js',
         'js/chat/opQueue.js',
@@ -195,7 +206,11 @@ module.exports = function(config) {
         'Firefox',
         'Firefox_Extension',
         'Firefox_NoCookies',
-        'Chrome'
+        'Firefox_Incognito',
+        'Chrome',
+        'Chrome_Incognito',
+        'Chrome_Unlimited',
+        'Chrome_NoCookies'
     ],
 
     customLaunchers: {
@@ -208,6 +223,22 @@ module.exports = function(config) {
             prefs: {
                 'network.cookie.cookieBehavior': 2
             }
+        },
+        'Firefox_Incognito': {
+            base: 'Firefox',
+            flags: ['-private']
+        },
+        'Chrome_NoCookies': {
+            base: 'Chrome',
+            flags: ['--disable-local-storage', '--disable-databases', '--unlimited-storage']
+        },
+        'Chrome_Incognito': {
+            base: 'Chrome',
+            flags: ['--incognito']
+        },
+        'Chrome_Unlimited': {
+            base: 'Chrome',
+            flags: ['--unlimited-storage']
         },
         'Firefox_Extension': {
             base: (process.env.FXEXTBASE || 'FirefoxDeveloper'),

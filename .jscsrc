@@ -89,7 +89,7 @@
     "requireSpaceAfterLineComment": true,
     "requireLineFeedAtFileEnd": true,
     "disallowMixedSpacesAndTabs": true,
-    "disallowTrailingWhitespace": true,
+    "disallowTrailingWhitespace": false,
     "validateIndentation": 4,
 
     "requireSemicolons": true,

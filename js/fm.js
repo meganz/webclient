@@ -7585,11 +7585,11 @@ function initCopyrightsDialog(nodesToProcess) {
 
     // If they've already agreed to the copyright warning this session
     if (localStorage.getItem('agreedToCopyrightWarning') !== null) {
-        
+
         // Go straight to Get Link dialog
         var exportLink = new mega.Share.ExportLink({ 'showExportLinkDialog': true, 'updateUI': true, 'nodesToProcess': nodesToProcess });
         exportLink.getExportLink();
-        
+
         return false;
     }
 
@@ -7600,10 +7600,10 @@ function initCopyrightsDialog(nodesToProcess) {
     fm_showoverlay();
     $.copyrightsDialog = 'copyrights';
     $copyrightDialog.show();
-    
+
     // Init click handler for 'I agree' / 'I disagree' buttons
     $copyrightDialog.find('.fm-dialog-button').rebind('click', function() {
-        
+
         // User disagrees with copyright warning
         if ($(this).hasClass('cancel')) {
             closeDialog();
@@ -7611,14 +7611,14 @@ function initCopyrightsDialog(nodesToProcess) {
         else {
             // User agrees, store flag in localStorage so they don't see it again for this session
             localStorage.setItem('agreedToCopyrightWarning', '1');
-            
+
             // Go straight to Get Link dialog
             closeDialog();
             var exportLink = new mega.Share.ExportLink({ 'showExportLinkDialog': true, 'updateUI': true, 'nodesToProcess': nodesToProcess });
             exportLink.getExportLink();
         }
     });
-    
+
     // Init click handler for 'Close' button
     $copyrightDialog.find('.fm-dialog-close').rebind('click', function() {
         closeDialog();
@@ -9123,7 +9123,7 @@ function propertiesDialog(close)
     var isTakenDown = exportLink.isTakenDown($.selected);
     if (isTakenDown) {
         pd.addClass('taken-down');
-        showToast('clipboard', 'This file/folder has been subjected to a takedown notice.');
+        showToast('clipboard', 'One or more items have been subjected to a takedown notice.');
     }
 
     $('.properties-elements-counter span').text('');

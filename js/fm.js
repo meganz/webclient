@@ -10159,7 +10159,7 @@ function userFingerprint(userid, next) {
  * @param {Object} user The user object e.g. same as M.u[userHandle]
  */
 function showAuthenticityCredentials(user) {
-    
+
     var $fingerprintContainer = $('.contact-fingerprint-txt');
     
     // Compute the fingerprint

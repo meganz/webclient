@@ -131,6 +131,7 @@
             $dialog.find('.postResetCredentials').show();
             $dialog.find('.verifyCredentials').show();
 
+            // Copy the new credentials to the section to be shown after reset
             var $newCredentials = $dialog.find('.newCredentials .fingerprint').clone().removeClass('mismatch');
             $dialog.find('.postResetCredentials .fingerprint').html($newCredentials.html());
 
@@ -161,14 +162,6 @@
         var previousFingerprintHtml = '';
         var newFingerprintHtml = '';
         
-        // Normalise fingerprints to display in hexadecimal for the dialog
-        if (previousFingerprint.length === 20) {
-            previousFingerprint = asmCrypto.bytes_to_hex(asmCrypto.string_to_bytes(previousFingerprint));
-        }
-        if (newFingerprint.length === 20) {
-            newFingerprint = asmCrypto.bytes_to_hex(asmCrypto.string_to_bytes(newFingerprint));
-        }
-
         // Build up the fingerprint HTML
         for (var i = 0, groupCount = 0, length = previousFingerprint.length;  i < length;  i++) {
 

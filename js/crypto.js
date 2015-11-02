@@ -569,6 +569,20 @@ var crypt = (function () {
 
         return;
     };
+    
+    
+    /**
+     * Converts a string to a hexadecimal string
+     * @param {String} text The string to convert
+     * @returns {String} Returns the string as hexadecimal string e.g. ac9da63...
+     */
+    ns.stringToHex = function(text) {
+        
+        var bytes = asmCrypto.string_to_bytes(text);
+        var hex = asmCrypto.bytes_to_hex(bytes);
+        
+        return hex;        
+    };
 
 
     /**
@@ -583,30 +597,28 @@ var crypt = (function () {
      * @param {Number} method
      *     The key comparison method (any of the options in
      *     authring.AUTHENTICATION_METHOD).
-     * @param {String} previousFingerprint
+     * @param {String} prevFingerprint
      *     The previously seen or verified fingerprint.
      * @param {String} newFingerprint
      *     The new fingerprint.
      */
     ns._showFingerprintMismatchException = function(userHandle, keyType,
-                                                    method, previousFingerprint,
+                                                    method, prevFingerprint,
                                                     newFingerprint) {
-                                                        
+        
         // Keep format consistent
-        previousFingerprint = (previousFingerprint.length === 40) ? previousFingerprint : asmCrypto.bytes_to_hex(asmCrypto.string_to_bytes(previousFingerprint));
-        newFingerprint = (newFingerprint.length === 40) ? newFingerprint : asmCrypto.bytes_to_hex(asmCrypto.string_to_bytes(newFingerprint));
-                
+        prevFingerprint = (prevFingerprint.length === 40) ? prevFingerprint : ns.stringToHex(prevFingerprint);
+        newFingerprint = (newFingerprint.length === 40) ? newFingerprint : ns.stringToHex(newFingerprint);
+        
         // Show warning dialog
-        mega.ui.CredentialsWarningDialog.singleton(userHandle, keyType,
-                                                   previousFingerprint,
-                                                   newFingerprint);
-
+        mega.ui.CredentialsWarningDialog.singleton(userHandle, keyType, prevFingerprint, newFingerprint);
+        
         // Remove the cached key, so the key will be fetched and checked against
         // the stored fingerprint again next time.
         delete ns.getPubKeyCacheMapping(keyType)[userHandle];
         
         logger.warn(keyType + ' fingerprint does not match the previously authenticated one!\n'
-            + 'Previous fingerprint: ' + previousFingerprint
+            + 'Previous fingerprint: ' + prevFingerprint
             + '.\nNew fingerprint: ' + newFingerprint + '.');
     };
 

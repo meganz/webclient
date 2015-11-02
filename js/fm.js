@@ -10163,15 +10163,15 @@ function showAuthenticityCredentials(user) {
     var $fingerprintContainer = $('.contact-fingerprint-txt');
     
     // Compute the fingerprint
-    userFingerprint(user, function (fingerprints) {
+    userFingerprint(user, function(fingerprints) {
         
         // Clear old values immediately
         $fingerprintContainer.empty();
         
         // Render the fingerprint into 10 groups of 4 hex digits
-        $.each(fingerprints, function (k, value) {
+        $.each(fingerprints, function(key, value) {
             $('<span>').text(value).appendTo(
-                $fingerprintContainer.filter(k <= 4 ? ':first' : ':last')
+                $fingerprintContainer.filter(key <= 4 ? ':first' : ':last')
             );
         });
     });

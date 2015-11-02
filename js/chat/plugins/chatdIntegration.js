@@ -386,9 +386,9 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
             chatRoom.messagesBuff.messages.forEach(function(v, k) {
                 if(v.userId) {
                     var msg = v.getContents ? v.getContents() : v.message;
-                    if(msg && msg.length && msg.length > 0) {
-                        msg = base64urldecode(msg);
-                    }
+                    //if(msg && msg.length && msg.length > 0) {
+                    //    msg = base64urldecode(msg);
+                    //}
 
                     chatRoom.notDecryptedBuffer[k] = {
                         'message': msg,
@@ -434,7 +434,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
         $(chatRoom.messagesBuff).rebind('onNewMessageReceived.chatdStrongvelope', function(e, msgObject) {
             if(msgObject.message && msgObject.message.length && msgObject.message.length > 0) {
                 var decrypted = chatRoom.protocolHandler.decryptFrom(
-                    base64urldecode(msgObject.message),
+                    msgObject.message,
                     msgObject.userId,
                     false
                 );
@@ -538,10 +538,7 @@ ChatdIntegration.prototype.sendMessage = function(chatRoom, message) {
     }
 
     var result = chatRoom.protocolHandler.encryptTo(message, destinationUser.u);
-
-    var ciphertext = base64urlencode(result);
-
-    return self.chatd.submit(base64urldecode(chatRoom.chatId), ciphertext);
+    return self.chatd.submit(base64urldecode(chatRoom.chatId), result);
 };
 
 ChatdIntegration.prototype.updateMessage = function(chatRoom, num, newMessage) {

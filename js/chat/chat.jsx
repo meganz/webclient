@@ -968,6 +968,7 @@ Chat.prototype.destroy = function(isLogout) {
         self.chats.remove(roomJid);
     });
 
+
     self.karere.connectionRetryManager.resetConnectionRetries();
 
     return self.karere.disconnect()

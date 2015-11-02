@@ -6200,7 +6200,7 @@ function init_chat() {
                     console.error(ex);
                 }
             }
-            try {
+            //try {
                 window.megaChat = new Chat();
                 window.megaChat.init();
 
@@ -6208,11 +6208,11 @@ function init_chat() {
                     //megaChat.renderContactTree();
                     megaChat.renderMyStatus();
                 }
-            }
-            catch (ex) {
-                console.error(ex);
-                megaChatIsDisabled = true;
-            }
+            //}
+            //catch (ex) {
+            //    console.error(ex);
+            //    megaChatIsDisabled = true;
+            //}
         }
     }
     if (folderlink) {

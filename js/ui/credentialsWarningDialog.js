@@ -146,7 +146,7 @@
         $dialog.find('.verify-contact-button').rebind('click', function() {
 
             // Hide the dialog and show the regular fingerprint dialog
-            $dialog.hide();
+            CredentialsWarningDialog._instance.hide();
             fingerprintDialog(CredentialsWarningDialog.contactHandle);
         });
     };
@@ -160,7 +160,7 @@
         var newFingerprint = CredentialsWarningDialog.newFingerprint;
         var previousFingerprintHtml = '';
         var newFingerprintHtml = '';
-
+        
         // Normalise fingerprints to display in hexadecimal for the dialog
         if (previousFingerprint.length === 20) {
             previousFingerprint = asmCrypto.bytes_to_hex(asmCrypto.string_to_bytes(previousFingerprint));

@@ -591,7 +591,12 @@ var crypt = (function () {
     ns._showFingerprintMismatchException = function(userHandle, keyType,
                                                     method, previousFingerprint,
                                                     newFingerprint) {
-        // Show warning dialog.
+                                                        
+        // Keep format consistent
+        previousFingerprint = (previousFingerprint.length === 40) ? previousFingerprint : asmCrypto.bytes_to_hex(asmCrypto.string_to_bytes(previousFingerprint));
+        newFingerprint = (newFingerprint.length === 40) ? newFingerprint : asmCrypto.bytes_to_hex(asmCrypto.string_to_bytes(newFingerprint));
+                
+        // Show warning dialog
         mega.ui.CredentialsWarningDialog.singleton(userHandle, keyType,
                                                    previousFingerprint,
                                                    newFingerprint);
@@ -599,10 +604,10 @@ var crypt = (function () {
         // Remove the cached key, so the key will be fetched and checked against
         // the stored fingerprint again next time.
         delete ns.getPubKeyCacheMapping(keyType)[userHandle];
-
+        
         logger.warn(keyType + ' fingerprint does not match the previously authenticated one!\n'
-            + 'Previous fingerprint: ' + asmCrypto.bytes_to_hex(asmCrypto.string_to_bytes(previousFingerprint))
-            + '.\nNew fingerprint: ' + asmCrypto.bytes_to_hex(asmCrypto.string_to_bytes(newFingerprint)) + '.');
+            + 'Previous fingerprint: ' + previousFingerprint
+            + '.\nNew fingerprint: ' + newFingerprint + '.');
     };
 
 

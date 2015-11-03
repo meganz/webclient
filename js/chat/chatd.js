@@ -767,7 +767,7 @@ Chatd.Messages.prototype.check = function(chatid, msgid) {
 
     if (this.buf[this.highnum]) {
         // if the newest held message is not current, initiate a fetch of newer messages just in case
-        if (this.buf[this.newmsg][Chatd.MsgField.MSGID] !== msgid) {
+        if (this.buf[this.highnum][Chatd.MsgField.MSGID] !== msgid) {
             this.chatd.cmd(Chatd.Opcode.HIST, chatid, this.chatd.pack32le(32));
         }
     }

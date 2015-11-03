@@ -1137,9 +1137,10 @@ var voucherRedeemDialog = {
         var voucherCode = localStorage.getItem('voucher');
         
         // No longer needed in localStorage
-        localStorage.removeItem('voucher');
+        //localStorage.removeItem('voucher');
         
-        //voucherRedeemDialog.displayDialog();
+        voucherRedeemDialog.displayDialog();
+        return false;
         
         // Make API call to redeem voucher
         api_req({ a: 'uavr', v: voucherCode }, {

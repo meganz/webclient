@@ -196,8 +196,10 @@ function u_logout(logout) {
             }
         }
 
-        delete localStorage.signupcode;
-        delete localStorage.registeremail;
+        localStorage.removeItem('signupcode');
+        localStorage.removeItem('registeremail');
+        localStorage.removeItem('agreedToCopyrightWarning');
+        
         if (mDBact) {
             mDBact = false;
             delete localStorage[u_handle + '_mDBactive'];

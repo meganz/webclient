@@ -7,6 +7,10 @@
 describe("chat.strongvelope workflow test", function() {
     "use strict";
 
+    if (window.__SKIP_WORKFLOWS) {
+        return;
+    }
+
     var assert = chai.assert;
 
     var ns = strongvelope;
@@ -49,42 +53,47 @@ describe("chat.strongvelope workflow test", function() {
         sandbox.restore();
     });
 
-    if (!window.__SKIP_WORKFLOWS) {
-        describe('1-on-1 chat', function() {
-            it("normal operation", function() {
-                var tests = ['', '42', "Don't panic!", 'Flying Spaghetti Monster',
-                             "Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn",
-                             'Tēnā koe', 'Hänsel & Gretel', 'Слартибартфаст'];
+    describe('1-on-1 chat', function() {
+        it("normal operation", function() {
+            var tests = ['', '42', "Don't panic!", 'Flying Spaghetti Monster',
+                         "Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn",
+                         'Tēnā koe', 'Hänsel & Gretel', 'Слартибартфаст'];
 
-                sandbox.stub(window, 'pubCu25519', { 'alice678900': ALICE_CU25519_PUB,
-                                                     'bob45678900': BOB_CU25519_PUB });
-                sandbox.stub(window, 'pubEd25519', { 'alice678900': ALICE_ED25519_PUB,
-                                                     'bob45678900': BOB_ED25519_PUB });
+            sandbox.stub(window, 'pubCu25519', { 'alice678900': ALICE_CU25519_PUB,
+                                                 'bob45678900': BOB_CU25519_PUB });
+            sandbox.stub(window, 'pubEd25519', { 'alice678900': ALICE_ED25519_PUB,
+                                                 'bob45678900': BOB_ED25519_PUB });
 
-                var alice = new strongvelope.ProtocolHandler('alice678900',
-                                                             ALICE_CU25519_PRIV,
-                                                             ALICE_ED25519_PRIV,
-                                                             ALICE_ED25519_PUB);
-                alice.rotateKeyEvery = 3;
-                alice.updateSenderKey();
-                var bob = new strongvelope.ProtocolHandler('bob45678900',
-                                                           BOB_CU25519_PRIV,
-                                                           BOB_ED25519_PRIV,
-                                                           BOB_ED25519_PUB);
-                bob.rotateKeyEvery = 3;
-                bob.updateSenderKey();
+            var alice = new strongvelope.ProtocolHandler('alice678900',
+                                                         ALICE_CU25519_PRIV,
+                                                         ALICE_ED25519_PRIV,
+                                                         ALICE_ED25519_PUB);
+            alice.rotateKeyEvery = 5;
+            alice.totalMessagesBeforeSendKey = 10;
+            alice.updateSenderKey();
+            var bob = new strongvelope.ProtocolHandler('bob45678900',
+                                                       BOB_CU25519_PRIV,
+                                                       BOB_ED25519_PRIV,
+                                                       BOB_ED25519_PUB);
+            bob.rotateKeyEvery = 10;
+            bob.totalMessagesBeforeSendKey = 5;
+            bob.updateSenderKey();
 
-                var message;
-                var sent;
-                var received;
+            var message;
+            var sent;
+            var received;
+            var toSendReceived;
 
-                var start = Date.now();
+            var start = Date.now();
+            var messagesProcessedAlice = 0;
 
+            while (messagesProcessedAlice < 50) {
                 for (var i = 0; i < tests.length; i++) {
                     message = tests[i];
 
                     // Alice encrypts a message to send to Bob.
                     sent = alice.encryptTo(message, 'bob45678900');
+                    messagesProcessedAlice++;
 
                     // Alice receives her own message.
                     received = alice.decryptFrom(sent, 'alice678900');
@@ -93,24 +102,41 @@ describe("chat.strongvelope workflow test", function() {
                     // Bob receives it.
                     received = bob.decryptFrom(sent, 'alice678900');
                     assert.strictEqual(received.payload, message);
+                    if (typeof received.toSend !== 'undefined') {
+                        // See if Alice can handle the key re-send.
+                        toSendReceived = alice.decryptFrom(received.toSend, 'bob45678900');
+                        assert.strictEqual(toSendReceived.payload, null);
+                        // See if Bob can handle his own key re-send.
+                        toSendReceived = bob.decryptFrom(received.toSend, 'bob45678900');
+                        assert.strictEqual(toSendReceived.payload, null);
+                    }
 
                     // Bob echoes it.
                     sent = bob.encryptTo(received.payload, 'alice678900');
 
-                    // Bob receives hhis own message.
+                    // Bob receives his own message.
                     received = bob.decryptFrom(sent, 'bob45678900');
                     assert.strictEqual(received.payload, message);
 
                     // Alice gets it back.
                     received = alice.decryptFrom(sent, 'bob45678900');
                     assert.strictEqual(received.payload, message);
+                    messagesProcessedAlice++;
+                    if (typeof received.toSend !== 'undefined') {
+                        // See if Bob can handle the key re-send.
+                        toSendReceived = bob.decryptFrom(received.toSend, 'alice678900');
+                        assert.strictEqual(toSendReceived.payload, null);
+                        // See if Alice can handle her own key re-send.
+                        toSendReceived = alice.decryptFrom(received.toSend, 'alice678900');
+                        assert.strictEqual(toSendReceived.payload, null);
+                    }
                 }
+            }
 
-                dump('Total time taken: ' + (Date.now() - start) + ' ms');
-                dump('  ' + tests.length + ' messages:'
-                     + ' 2 times encrypting/signing each,'
-                     + ' 4 times decrypting/verifying each.');
-            });
+            dump('Total time taken: ' + (Date.now() - start) + ' ms');
+            dump('  ' + tests.length + ' messages:'
+                 + ' 2 times encrypting/signing each,'
+                 + ' 4 times decrypting/verifying each.');
         });
-    }
+    });
 });

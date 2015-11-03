@@ -383,7 +383,7 @@ describe("chat.strongvelope unit test", function() {
                     handler.participantKeys = participantKeys;
                 });
 
-                var result = handler.seed(history);
+                var result = handler.seed(['dummy']);
                 assert.strictEqual(result, true);
                 assert.strictEqual(handler.keyId, 'AI02');
                 assert.strictEqual(handler.previousKeyId, 'AI01');
@@ -400,7 +400,7 @@ describe("chat.strongvelope unit test", function() {
                     handler.participantKeys = participantKeys;
                 });
 
-                var result = handler.seed(history);
+                var result = handler.seed(['dummy']);
                 assert.strictEqual(result, false);
                 assert.strictEqual(handler.keyId, null);
                 assert.strictEqual(handler.previousKeyId, null);

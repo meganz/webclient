@@ -339,6 +339,7 @@
     "738": "Solicita",
     "739": "has oblidat la teva contrasenya?",
     "741": "Si us plau, escull una nova contrasenya segura.",
+    "742": "Reinicia",
     "746": "Tipus de subscripci\u00f3",
     "748": "Mensual",
     "749": "Anual",
@@ -2729,5 +2730,19 @@
     "7679": "Necessites tenir un compte a MEGA per poder continuar.",
     "7680": "El model criptogr\u00e0fic de MEGA dep\u00e8n de les claus que es mostren a dalt. Et recomanem que envi\u00efs les claus de desxifratge mitjan\u00e7ant un canal segur i separades dels enlla\u00e7os de fitxer\/carpeta.",
     "7681": "Enlla\u00e7 de Carpeta\/Fitxer",
-    "7682": "MEGA recomana enviar la 'Clau de desxifratge' separada de 'L'enlla\u00e7 de Carpeta\/Fitxer'."
+    "7682": "MEGA recomana enviar la 'Clau de desxifratge' separada de 'L'enlla\u00e7 de Carpeta\/Fitxer'.",
+    "7683": "Extension",
+    "7684": "%1 on %2",
+    "7685": "I hereby state that I have a good faith belief that the use of copyrighted material in the manner complained of and located at the location above is not authorized by the copyright owner, its agent, or the law (e.g., as a fair use).",
+    "7686": "One of the links you have provided is not a valid MEGA link.",
+    "7687": "Transfer settings are for registered users only.",
+    "7688": "There may be a man-in-the-middle attack in progress. Please reset the stored identification credentials for this contact and then verify that they are correct with your contact through an existing secure channel or in person.",
+    "7689": "Reset contact credentials",
+    "7690": "Use the reset button below to reset the credentials for this contact.",
+    "7691": "New contact credentials",
+    "7692": "Verify credentials",
+    "7693": "Use the Verify button below to confirm the credentials for this contact.",
+    "7694": "This file has been subject to a takedown notice.",
+    "7695": "This folder has been subject to a takedown notice.",
+    "7696": "Copyright warning to all users"
 }

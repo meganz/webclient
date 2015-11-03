@@ -231,7 +231,7 @@ function filetype(n) {
         return ext[fext][1];
     }
     else if (fext && fext.length > 1) {
-        return htmlentities(fext.toUpperCase()) + ' File';
+        return fext.toUpperCase() + ' File';
     }
     else {
         return 'File';
@@ -270,6 +270,15 @@ function fileext(name) {
     ext = name.substr(name.lastIndexOf('.') + 1);
     if (ext === name) {
         ext = '';
+    }
+    else {
+        ext = ext
+            .replace(/<[^>]*>/g, '')
+            .replace(/\W+/g, '');
+
+        if (ext.length > 9) {
+            ext = ext.substr(0, 9);
+        }
     }
 
     return ext.toLowerCase();

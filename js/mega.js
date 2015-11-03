@@ -310,6 +310,7 @@ function MegaData()
 
         if ($('.do-sort[data-by="' + col + '"]').length > 0) {
             // swap the column label
+            $('.context-menu-item.do-sort').removeClass('selected');
             $('.grid-url-header').prev().find('div')
                 .removeClass().addClass('arrow ' + col)
                 .text($('.do-sort[data-by="' + col + '"]').text())

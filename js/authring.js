@@ -340,15 +340,15 @@ var authring = (function () {
      * the modulo (index 0 of key array) and exponent (index 1) are first
      * concatenated.
      *
-     * @param key {string}
-     *     Byte string of key.
-     * @param keyType {string}
+     * @param key {(String|Array)}
+     *     Public key in the form of a byte string or array (RSA keys).
+     * @param keyType {String}
      *     Type of key for authentication records. Values are 'Ed25519',
      *     'Cu25519' or 'RSA'.
-     * @param format {string}
+     * @param format {String}
      *     Format in which to return the fingerprint. Valid values: "string"
      *     and "hex" (default: "hex").
-     * @return {string}
+     * @return {String}
      *     Fingerprint value in the requested format.
      */
     ns.computeFingerprint = function(key, keyType, format) {

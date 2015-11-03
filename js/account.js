@@ -671,6 +671,7 @@ function getUserAttribute(userhandle, attribute, pub, nonHistoric,
  */
 function setUserAttribute(attribute, value, pub, nonHistoric, callback, ctx,
                           mode) {
+    var logger = MegaLogger.getLogger('account');
     var myCtx = ctx || {};
 
     // Prepare all data needed for the call on the Mega API.
@@ -696,12 +697,12 @@ function setUserAttribute(attribute, value, pub, nonHistoric, callback, ctx,
 
     function settleFunction(res) {
         if (typeof res !== 'number') {
-            console.log('Setting user attribute "'
+            logger.info('Setting user attribute "'
                         + attribute + '", result: ' + res);
             thePromise.resolve(res);
         }
         else {
-            console.log('Error setting user attribute "'
+            logger.warn('Error setting user attribute "'
                         + attribute + '", result: ' + res + '!');
             thePromise.reject(res);
         }

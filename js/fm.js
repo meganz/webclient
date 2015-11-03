@@ -9656,9 +9656,7 @@ function slideshow(id, close)
             ephemeralDialog(l[1005]);
         }
         else {
-            fm_showoverlay();
             initCopyrightsDialog([slideshowid]);
-            $('.copyrights-dialog').show();
         }
     });
 

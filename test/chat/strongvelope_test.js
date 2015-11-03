@@ -44,27 +44,27 @@ describe("chat.strongvelope unit test", function() {
     };
     var ROTATED_KEY = atob('D/1apgnOpfzZqrYi95t5pw==');
     var ROTATED_KEY_ID = atob('QUkAAQ==');
-    var ROTATION_MESSAGE_BIN = atob('AAEAAEA2j/8PiMgV9/sZtAUqAWiqOAbkJrut5FxEEvEc6Q+BaVmRSiH377ma6awQORvtMyvE0JAnptwQzW4KRQ9MyukHAgAAAQADAAAM71BrlkBJXmR5xRtMBAAACMqLuOeu/PccBQAAIFk7mB4YHHMOQdLukN+74uq79XrRhAqxMb0cVGLUtIcDBgAACEFJAAFBSQAABwAABh+/GnXzGA==');
+    var ROTATION_MESSAGE_BIN = atob('AAEAAEDXYAmI4Y/N7Qr/QiJGzbY1moi7xb9unMx771OZ7A+4J90GHdiKNQawdmO2Y3ryqi2audWix6c2RLwIG/tanXYFAgAAAQADAAAM71BrlkBJXmR5xRtMBAAACMqLuOeu/PccBQAAICbsn8bFAy0Q8CndW4gMjKPfiqN1yIvKpZGs9okAQ0s3BgAACEFJAAFBSQAABwAABh+/GnXzGA==');
     var ROTATION_MESSAGE = {
         protocolVersion: 0,
-        signature:  atob('No//D4jIFff7GbQFKgFoqjgG5Ca7reRcRBLxHOkPgWlZkUoh9++5mumsEDkb7TMrxNCQJ6bcEM1uCkUPTMrpBw=='),
-        signedContent: atob('AgAAAQADAAAM71BrlkBJXmR5xRtMBAAACMqLuOeu/PccBQAAIFk7mB4YHHMOQdLukN+74uq79XrRhAqxMb0cVGLUtIcDBgAACEFJAAFBSQAABwAABh+/GnXzGA=='),
+        signature:  atob('12AJiOGPze0K/0IiRs22NZqIu8W/bpzMe+9TmewPuCfdBh3YijUGsHZjtmN68qotmrnVosenNkS8CBv7Wp12BQ=='),
+        signedContent: atob('AgAAAQADAAAM71BrlkBJXmR5xRtMBAAACMqLuOeu/PccBQAAICbsn8bFAy0Q8CndW4gMjKPfiqN1yIvKpZGs9okAQ0s3BgAACEFJAAFBSQAABwAABh+/GnXzGA=='),
         type: 0x00,
         nonce: atob('71BrlkBJXmR5xRtM'),
         recipients: ['you456789xw'],
-        keys: [atob('WTuYHhgccw5B0u6Q37vi6rv1etGECrExvRxUYtS0hwM=')],
+        keys: [atob('JuyfxsUDLRDwKd1biAyMo9+Ko3XIi8qlkaz2iQBDSzc=')],
         keyIds: [ROTATED_KEY_ID, KEY_ID],
         payload: atob('H78adfMY')
     };
-    var REMINDER_MESSAGE_BIN = atob('AAEAAEA6gXqd8w67gwlmKZEiDD3KwqBX8W8qnngKsml05w1N/ziuc3W/1de3+iPz7kNw3bGSrqzBf+aZJPgSf1KHVZ0AAgAAAQADAAAM71BrlkBJXmR5xRtMBAAACMqLuOeu/PccBQAAEFk7mB4YHHMOQdLukN+74uoGAAAEQUkAAQ==');
+    var REMINDER_MESSAGE_BIN = atob('AAEAAEDDaTeLajnEpld1cOPdWmObsKI8R3ARLvVZny0u2GbEeQxPoFV0tfeXNhYv9GM8LgFTlY7xayR7VCYsK7y6+NoDAgAAAQADAAAM71BrlkBJXmR5xRtMBAAACMqLuOeu/PccBQAAECbsn8bFAy0Q8CndW4gMjKMGAAAEQUkAAQ==');
     var REMINDER_MESSAGE = {
         protocolVersion: 0,
-        signature:  atob('OoF6nfMOu4MJZimRIgw9ysKgV/FvKp54CrJpdOcNTf84rnN1v9XXt/oj8+5DcN2xkq6swX/mmST4En9Sh1WdAA=='),
-        signedContent: atob('AgAAAQADAAAM71BrlkBJXmR5xRtMBAAACMqLuOeu/PccBQAAEFk7mB4YHHMOQdLukN+74uoGAAAEQUkAAQ=='),
+        signature:  atob('w2k3i2o5xKZXdXDj3Vpjm7CiPEdwES71WZ8tLthmxHkMT6BVdLX3lzYWL/RjPC4BU5WO8Wske1QmLCu8uvjaAw=='),
+        signedContent: atob('AgAAAQADAAAM71BrlkBJXmR5xRtMBAAACMqLuOeu/PccBQAAECbsn8bFAy0Q8CndW4gMjKMGAAAEQUkAAQ=='),
         type: 0x00,
         nonce: atob('71BrlkBJXmR5xRtM'),
         recipients: ['you456789xw'],
-        keys: [atob('WTuYHhgccw5B0u6Q37vi6g==')],
+        keys: [atob('JuyfxsUDLRDwKd1biAyMow==')],
         keyIds: [ROTATED_KEY_ID]
     };
 
@@ -287,6 +287,29 @@ describe("chat.strongvelope unit test", function() {
                     + 'PWJpbfZ41SUZswe3b8KjpO0o3id9FVpNFI63ToXjw+iRCQ==');
                 var result = ns._verifyMessage('forty two', signature, ED25519_PUB_KEY);
                 assert.deepEqual(result, true);
+            });
+        });
+
+        describe('deriveSharedKey()', function() {
+            var baseCase = "\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b" +
+                           "\x0b\x0b\x0b\x0b\x0b\x0b";
+
+            it("sanity check", function() {
+                // Test Case 3 from RFC 5869.
+                assert.strictEqual(btoa(ns.deriveSharedKey(baseCase, '')),
+                    btoa('\x8d\xa4\xe7\x75\xa5\x63\xc1\x8f\x71\x5f\x80\x2a\x06\x3c\x5a\x31' +
+                         '\xb8\xa1\x1f\x5c\x5e\xe1\x87\x9e\xc3\x45\x4e\x5f\x3c\x73\x8d\x2d'));
+            });
+
+            it("base case", function() {
+                // Test against Python:
+                // >>> from hmac import HMAC; from hashlib import sha256
+                // >>> hmac = lambda *args: HMAC(*args, digestmod=sha256)
+                // >>> hmac(hmac(b'', b'\x0b'*22).digest(), b'mpenc group key\x01').hexdigest()
+                // 'c9cc6b03feceadd360859a46932477ca924cc646be0d6f07dc8c4e2d49bd6301'
+                assert.strictEqual(btoa(ns.deriveSharedKey(baseCase, 'mpenc group key')),
+                    btoa('\xc9\xcc\x6b\x03\xfe\xce\xad\xd3\x60\x85\x9a\x46\x93\x24\x77\xca' +
+                         '\x92\x4c\xc6\x46\xbe\x0d\x6f\x07\xdc\x8c\x4e\x2d\x49\xbd\x63\x01'));
             });
         });
 
@@ -588,15 +611,13 @@ describe("chat.strongvelope unit test", function() {
                 sandbox.stub(window, 'pubCu25519', { 'you456789xw': 'your key' });
                 sandbox.stub(asmCrypto, 'string_to_bytes', _echo);
                 sandbox.stub(nacl, 'scalarMult').returns('shared secret');
-                sandbox.stub(asmCrypto, 'bytes_to_string', _echo);
-                sandbox.stub(asmCrypto.SHA256, 'bytes', _echo);
+                sandbox.stub(ns, 'deriveSharedKey', _echo);
 
                 var result = handler._computeSymmetricKey('you456789xw');
                 assert.strictEqual(result, 'shared secret');
                 assert.strictEqual(asmCrypto.string_to_bytes.callCount, 2);
                 assert.strictEqual(nacl.scalarMult.callCount, 1);
-                assert.strictEqual(asmCrypto.SHA256.bytes.callCount, 1);
-                assert.strictEqual(asmCrypto.bytes_to_string.callCount, 1);
+                assert.strictEqual(ns.deriveSharedKey.callCount, 1);
             });
 
             it("no mocks", function() {
@@ -606,7 +627,7 @@ describe("chat.strongvelope unit test", function() {
                 sandbox.stub(window, 'u_privCu25519', CU25519_PRIV_KEY);
                 var result = handler._computeSymmetricKey('you456789xw');
                 assert.strictEqual(btoa(result),
-                    'X2O2IQoAqzPvr2F4XWjCuwP17tYHoJwB5KhyhlHb/mM=');
+                    'vb4//1yAvz0AHQnUUrrL0mcNr4xN9rRu7+6YMFQQf6U=');
             });
 
             it("missing recipient pubkey", function() {

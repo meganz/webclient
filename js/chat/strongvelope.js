@@ -314,6 +314,32 @@ var strongvelope = {};
 
 
     /**
+     * Derive the shared confidentiality group key.
+     *
+     * The group key is a 32-byte string, half of which is later used for
+     * AES-128. It is derived from the Diffie-Hellman shared secret, a x25519
+     * public value, using HKDF-SHA256.
+     *
+     * @param sharedCardinalKey {string}
+     *     Input IKM for the HKDF. In mpENC, this is the x25519 public key
+     *     result of the group key agreement.
+     * @param [context] {string}
+     *     Info string for the HKDF. In strongvelope, this is set to the
+     *     constant "strongvelope pairwise key".
+     */
+    strongvelope.deriveSharedKey = function(sharedSecret, context) {
+
+        // Equivalent to first block of HKDF, see RFC 5869.
+        context = (typeof context === 'undefined')
+                ? 'strongvelope pairwise key' : context;
+        var hmac = asmCrypto.HMAC_SHA256.bytes;
+
+        return asmCrypto.bytes_to_string(hmac(context + "\x01",
+                                              hmac(sharedSecret, '')));
+    };
+
+
+    /**
      * Parses the binary content of a message into an object. Content will not
      * be decrypted or signatures verified.
      *
@@ -716,9 +742,8 @@ var strongvelope = {};
         var sharedSecret = nacl.scalarMult(
             asmCrypto.string_to_bytes(this.privCu25519),
             asmCrypto.string_to_bytes(pubKey));
-        var key = asmCrypto.SHA256.bytes(sharedSecret);
 
-        return asmCrypto.bytes_to_string(key);
+        return strongvelope.deriveSharedKey(sharedSecret);
     };
 
 

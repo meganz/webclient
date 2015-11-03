@@ -2741,8 +2741,9 @@
     "7690": "Gamitin ang reset button sa ibaba para ireset ang credentials ng contact na ito.",
     "7691": "Bagong contact credentials",
     "7692": "Patunayan ang credentials",
-    "7693": "Use the Verify button below to confirm the credentials for this contact.",
+    "7693": "Gamitin ang Verify button sa ibaba upang ikumpirma ang credentials ng contact na ito.",
     "7694": "Ang file na ito ay napasailalim ng isang takedown notice.",
-    "7695": "This folder has been subject to a takedown notice.",
-    "7696": "Babalang karapatang pagmamay-ari sa lahat ng gumagamit"
+    "7695": "Ang folder ay hindi na maaari pang mabuklat dahil sa paglabag sa karapatang pagmamay-ari",
+    "7696": "Babalang karapatang pagmamay-ari sa lahat ng gumagamit",
+    "7702": "One or more items have been subjected to a takedown notice."
 }

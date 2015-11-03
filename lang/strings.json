@@ -10982,5 +10982,9 @@
     "7696": {
         "text": "Copyright warning to all users",
         "context": "A title for the Copyright Warning dialog. Designed to make the user feel as though this is not targeting them, but is a warning for everybody who uses our service."
+    },
+    "7702": {
+        "text": "One or more items have been subjected to a takedown notice.",
+        "context": "Toast notification text when info\/property dialog is shown for taken down item(s). The user has clicked on a file or folder and wants to view its information, and because it has been taken down the user sees this message in a toast notification."
     }
 }

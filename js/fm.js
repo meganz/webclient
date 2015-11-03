@@ -9123,7 +9123,7 @@ function propertiesDialog(close)
     var isTakenDown = exportLink.isTakenDown($.selected);
     if (isTakenDown) {
         pd.addClass('taken-down');
-        showToast('clipboard', 'One or more items have been the subject of a takedown notice.');
+        showToast('clipboard', l[7703]);
     }
 
     $('.properties-elements-counter span').text('');
@@ -10168,13 +10168,13 @@ function userFingerprint(userid, next) {
 function showAuthenticityCredentials(user) {
 
     var $fingerprintContainer = $('.contact-fingerprint-txt');
-    
+
     // Compute the fingerprint
     userFingerprint(user, function(fingerprints) {
-        
+
         // Clear old values immediately
         $fingerprintContainer.empty();
-        
+
         // Render the fingerprint into 10 groups of 4 hex digits
         $.each(fingerprints, function(key, value) {
             $('<span>').text(value).appendTo(
@@ -10256,13 +10256,13 @@ function fingerprintDialog(userid) {
 
         // Generate fingerprint
         userFingerprint(user, function(fprint, fprintraw) {
-            
+
             // Authenticate the contact
             authring.setContactAuthenticated(userid, fprintraw, 'Ed25519', authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON);
-            
+
             // Change button state to 'Verified'
             $('.fm-verify').unbind('click').addClass('verified').find('span').text(l[6776]);
-            
+
             closeFngrPrntDialog();
         });
     });
@@ -10329,12 +10329,12 @@ function contactUI() {
         }
         /** To be called on settled authring promise. */
         var _setVerifiedState = function() {
-            
+
             var handle = user.u || user;
             var verificationState = u_authring.Ed25519[handle] || {};
             var isVerified = (verificationState.method
                               >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON);
-            
+
             // Show the user is verified
             if (isVerified) {
                 $('.fm-verify').addClass('verified');

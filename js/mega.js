@@ -1045,7 +1045,7 @@ function MegaData()
 
                     if (M.v[i] && M.v[i].shares && M.v[i].shares.EXP && M.v[i].shares.EXP.down) {
                         takenDown = 'taken-down';
-                        takenDownTitle = (M.v[i].t === 1) ? l[7695] : l[7694];
+                        takenDownTitle = (M.v[i].t === 1) ? l[7705] : l[7704];
                     }
 
                     // Block view
@@ -7118,12 +7118,12 @@ function balance2pro(callback)
 
         // Add title, mouse popup
         if (M.d[nodeId].t === 1) {// Item is folder
-            $('.grid-table.fm #' + nodeId).attr('title', l[7695]);
-            $('#' + nodeId + '.file-block').attr('title', l[7695]);
+            $('.grid-table.fm #' + nodeId).attr('title', l[7705]);
+            $('#' + nodeId + '.file-block').attr('title', l[7705]);
         }
         else {// Item is file
-            $('.grid-table.fm #' + nodeId).attr('title', l[7694]);
-            $('#' + nodeId + '.file-block').attr('title', l[7694]);
+            $('.grid-table.fm #' + nodeId).attr('title', l[7704]);
+            $('#' + nodeId + '.file-block').attr('title', l[7704]);
         }
     };
 

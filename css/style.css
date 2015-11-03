@@ -7215,7 +7215,7 @@ table {
 .fm-add-user:hover, .fm-add-user.active, .fm-chat-file-button.primary-button:hover, .fm-chat-file-button.primary-button.active, .fm-verify:hover, .fm-reset-stored-fingerprint:hover, .fm-verify.active, .fm-share-copy:hover, .fm-share-copy.active, .fm-new-folder:hover, .fm-new-folder.active, .create-folder-button:hover, .create-folder-button.active, .add-user-popup-button.add:hover, .add-user-popup-button.add.active, .fm-dialog-new-folder-button:hover, .fm-dialog-new-folder-button.active, .rename-dialog-button.rename:hover, .rename-dialog-button.rename.active, .fm-dialog-button.notifications-button:hover, .fm-dialog-button.notifications-button.active, .fm-dialog-button.links-button:hover, .fm-dialog-button.links-button.active, .fm-dialog-button.dialog-move-button:hover, .fm-dialog-button.dialog-move-button.active, .fm-dialog-button.dialog-newfolder-button:hover, .fm-dialog-button.dialog-newfolder-button.active, .fm-dialog-button.dialog-copy-button:hover, .fm-dialog-button.dialog-copy-button.active, .fm-dialog-button.notification-button.confirm:hover, .fm-dialog-button.notification-button.confirm.active, .contact-request-button.accept:hover, .contact-request-button.accept.active, .fm-dialog-button.fm-dialog-button-green:hover, .fm-dialog-button.fm-dialog-button-green.active, .transfer-pause-icon:hover {
 	background-color: rgba(49,181,0,0.2);
 }
-.fm-add-user:hover span, .fm-add-user.active span, .fm-chat-file-button.primary-button:hover span, .fm-chat-file-button.primary-button.active span, .fm-verify:hover span, .fm-verify.active span, .fm-reset-stored-fingerprint:hover span, .fm-reset-stored-fingerprint.active span, .fm-share-copy:hover span, .fm-share-copy.active span, .fm-new-folder:hover span, .fm-new-folder.active span, .create-folder-button:hover span, .create-folder-button.active span, .add-user-popup-button.add:hover span, .add-user-popup-button.add.active span, .fm-dialog-new-folder-button:hover span, .fm-dialog-new-folder-button.active span, .rename-dialog-button.rename:hover span, .rename-dialog-button.rename.active span, .fm-dialog-button.notifications-button:hover span, .fm-dialog-button.notifications-button.active span, .fm-dialog-button.links-button:hover span, .fm-dialog-button.links-button.active span, .fm-dialog-button.dialog-move-button:hover span, .fm-dialog-button.dialog-move-button.active span, .fm-dialog-button.dialog-newfolder-button:hover span, .fm-dialog-button.dialog-newfolder-button.active span, .fm-dialog-button.dialog-copy-button:hover span, .fm-dialog-button.dialog-copy-button.active span, .fm-dialog-button.notification-button.confirm:hover span, .fm-dialog-button.notification-button.confirm.active span, .contact-request-button.accept:hover span, .contact-request-button.accept.active span, .fm-dialog-button.fm-dialog-button-green:hover span, .fm-dialog-button.fm-dialog-button-green.active span, .transfer-pause-icon:hover span {
+.fm-add-user:hover span, .fm-add-user.active span, .fm-chat-file-button.primary-button:hover span, .fm-chat-file-button.primary-button.active span, .fm-verify:hover span, .fm-verify.active span, .fm-reset-stored-fingerprint:hover span, .fm-reset-stored-fingerprint.active span, .fm-share-copy:hover span, .fm-share-copy.active span, .fm-new-folder:hover span, .fm-new-folder.active span, .create-folder-button:hover span, .create-folder-button.active span, .add-user-popup-button.add:hover span, .add-user-popup-button.add.active span, .fm-dialog-new-folder-button:hover span, .fm-dialog-new-folder-button.active span, .rename-dialog-button.rename:hover span, .rename-dialog-button.rename.active span, .fm-dialog-button.notifications-button:hover span, .fm-dialog-button.notifications-button.active span, .fm-dialog-button.links-button:hover span, .fm-dialog-button.links-button.active span, .fm-dialog-button.dialog-move-button:hover span, .fm-dialog-button.dialog-move-button.active span, .fm-dialog-button.dialog-newfolder-button:hover span, .fm-dialog-button.dialog-newfolder-button.active span, .fm-dialog-button.dialog-copy-button:hover span, .fm-dialog-button.dialog-copy-button.active span, .fm-dialog-button.notification-button.confirm:hover span, .fm-dialog-button.notification-button.confirm.active span, .contact-request-button.accept:hover span, .contact-request-button.accept.active span, .fm-dialog-button.fm-dialog-button-green:hover span, .fm-dialog-button.fm-dialog-button-green.active span, .transfer-pause-icon:hover span, .fm-verify.verified span {
 	color: rgba(49,181,0,1);
 }
 /* disabled */
@@ -7226,6 +7226,10 @@ table {
 	-moz-opacity: 0.5;
 	-khtml-opacity: 0.5;
 	opacity: 0.5;
+}
+.fm-verify.verified {
+    background-color: rgba(255,255,255,0);
+    cursor: default;
 }
 .fm-add-user.disabled span, .fm-start-video-call.disabled span, .fm-clearbin-button.disabled span, .fm-send-files.disabled span, .fm-start-call.disabled span, .fm-leave-share.disabled span, .fm-share-copy.disabled span, .fm-share-download.disabled span, .contact-send-files.disabled span, .fm-start-conversation.disabled span, .fm-share-folders.disabled span, .fm-verify.disabled span, .fm-reset-stored-fingerprint.disabled span, .fm-question.disabled span, .fm-chat-end.disabled span, .fm-end-call.disabled span, .fm-download-as-zip.disabled span, .fm-import-to-cloudrive.disabled span, .fm-dialog-button.disabled span, .fm-account-button.disabled span, .avatar-dialog .fm-account-change-avatar.disabled span, .top-dialog-login-button.disabled span, .nw-chat-button.disabled span, .multiple-sharing.expanded .main-body .nw-chat-button.disabled span, .fm-chat-attach-button.disabled span, .fm-chat-contact-button.disabled span, .fm-new-folder.disabled span, .search-files-result.disabled span, .search-messages-result.disabled span, .fm-file-upload.disabled span, .search-messages-result.disabled span, .fm-folder-upload.disabled span, .fm-notification-settings.disabled span, .create-folder-button.disabled span, .add-user-popup-button.disabled span, .create-folder-button-cancel.disabled span, .fm-dialog-new-folder-button.disabled span, .rename-dialog-button.disabled span, .fm-dialog-button.disabled span, .add-user-popup-button.disabled span, .contact-request-button.disabled span, .transfer-clear-all-icon.disabled span, .transfer-clear-completed.disabled span, .transfer-pause-icon.disabled span {
 	cursor: default !important;
@@ -7285,7 +7289,7 @@ table {
 .fm-verify span, .fm-verify.disabled span {
 	background-position: -4px -743px;
 }
-.fm-verify:hover span, .fm-verify.active span {
+.fm-verify:hover span, .fm-verify.active, .fm-verify.verified span {
 	background-position: -4px -773px;
 }
 .fm-reset-stored-fingerprint span, .fm-reset-stored-fingerprint.disabled span {
@@ -23325,17 +23329,18 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 	margin: 12px 0;
 }
 .credentials-warning-dialog .fm-mega-dialog-bottom {
-	margin: 12px 0 -12px;
+    background-color: #eee;
+    margin: 0 0 -12px;
 }
 .credentials-warning-dialog {
-	background-color: #fff;
-	width: 600px;
+    background-color: #fff;
+    width: 600px;
+    z-index: 1101;
 }
 .credentials-warning-dialog .content {
-	color: #999999;
-	font-size: 13px;
-	line-height: 20px;
-	padding-bottom: 10px;
+    color: #999999;
+    font-size: 13px;
+    line-height: 20px;
 }
 .credentials-warning-dialog .avatarAndWarningMessage {
 	margin: 0 20px;
@@ -23361,26 +23366,30 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 	color: #000;
 }
 .credentials-warning-dialog .userAvatar img {
-	height: 90px;
-	width: 90px;
+    border-radius: 50%;
+    height: 90px;
+    width: 90px;
 }
 .credentials-warning-dialog .previousCredentials {
-	background-color: #f2f2f2;
-	margin-top: 20px;
-	padding: 20px;
+    margin-top: 20px;
+    padding: 20px;
 }
 .credentials-warning-dialog .previousCredentials .title {
 	color: #000;
 	font-weight: bold;
 }
-.credentials-warning-dialog .previousCredentials .fingerprint, .credentials-warning-dialog .newCredentials .fingerprint {
-	font-family: monospace;
-	font-size: 14px;
-	margin-left: -6px;
-	margin-top: 10px;
-	text-transform: uppercase;
+.credentials-warning-dialog .previousCredentials .fingerprint,
+.credentials-warning-dialog .newCredentials .fingerprint,
+.credentials-warning-dialog .postResetCredentials .fingerprint {
+    font-family: monospace;
+    font-size: 14px;
+    margin-left: -4px;
+    margin-top: 10px;
+    text-transform: uppercase;
 }
-.credentials-warning-dialog .previousCredentials .fingerprint > span, .credentials-warning-dialog .newCredentials .fingerprint > span {
+.credentials-warning-dialog .previousCredentials .fingerprint > span,
+.credentials-warning-dialog .newCredentials .fingerprint > span,
+.credentials-warning-dialog .postResetCredentials .fingerprint > span {
 	display: inline-block;
 	text-align: center;
 	width: 44px;
@@ -23389,11 +23398,62 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 	color: #D90007;
 }
 .credentials-warning-dialog .newCredentials {
-	padding: 20px 20px 35px 20px;
+    background-color: #fafafa;
+    padding: 20px;
 }
 .credentials-warning-dialog .newCredentials .title {
 	color: #D90007;
 	font-weight: bold;
+}
+.credentials-warning-dialog .newCredentials .title.reset {
+    color: #000;
+}
+.credentials-warning-dialog .resetCredentials {
+    background-color: #fafafa;
+    padding: 20px;
+}
+.credentials-warning-dialog .resetCredentials .title {
+    color: #000;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+.credentials-warning-dialog .resetCredentials .reset-credentials-button {
+    display: inline-block;
+    float: none;
+    margin-left: -3px;
+}
+.credentials-warning-dialog .resetCredentials .reset-credentials-button span {
+    background-image: url("../images/mega/shared-sprite_v3.svg");
+    background-position: -34px -1506px;
+    text-indent: 17px;
+}
+.credentials-warning-dialog .resetCredentials .reset-credentials-button.hidden {
+    display: none;
+}
+.credentials-warning-dialog .verifyCredentials {
+    background-color: #fafafa;
+    padding: 20px;
+}
+.credentials-warning-dialog .verifyCredentials .verify-contact-button {
+    display: inline-block;
+    float: none;
+    margin-left: -3px;
+}
+.credentials-warning-dialog .verifyCredentials .verify-contact-button span {
+    background-image: url("../images/mega/shared-sprite_v3.svg");
+    background-position: -4px -739px;
+    text-indent: 19px;
+}
+.credentials-warning-dialog .verifyCredentials .verify-contact-button.hidden {
+    display: none;
+}
+.credentials-warning-dialog .postResetCredentials {
+    padding: 20px;
+}
+.credentials-warning-dialog .postResetCredentials .title,
+.credentials-warning-dialog .verifyCredentials .title {
+    color: #000;
+    font-weight: bold;
 }
 .credentials-warning-dialog .instruction {
 	padding: 3px 20px;
@@ -23422,8 +23482,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 	margin: 12px 0 -12px;
 }
 .key-signature-warning-dialog {
-	background-color: #fff;
-	width: 600px;
+    background-color: #fff;
+    width: 600px;
+    z-index: 1101;
 }
 .key-signature-warning-dialog .content {
 	color: #999999;

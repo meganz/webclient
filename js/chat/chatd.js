@@ -25,28 +25,28 @@ var Chatd = function(userid, options) {
 
     self.options = $.extend({}, Chatd.DEFAULT_OPTIONS, options);
 
-    //// debug mode
-    //[
-    //    'onMessageUpdated',
-    //    'onMessageConfirm',
-    //    'onMessageReject',
-    //    'onMessageCheck',
-    //    'onMessageModify',
-    //    'onMessageStore',
-    //    'onMessageSeen',
-    //    'onMessageLastSeen',
-    //    'onMessageReceived',
-    //    'onMessageLastReceived',
-    //    'onRetentionChanged',
-    //    'onMessagesHistoryInfo',
-    //    'onMembersUpdated',
-    //    'onMessagesHistoryDone',
-    //    'onMessagesHistoryRequest',
-    //].forEach(function(evt) {
-    //        self.rebind(evt + '.chatd', function(e) {
-    //            console.error(evt, JSON.stringify(arguments[1]));
-    //        });
-    //});
+    // debug mode
+    [
+        'onMessageUpdated',
+        'onMessageConfirm',
+        'onMessageReject',
+        'onMessageCheck',
+        'onMessageModify',
+        'onMessageStore',
+        'onMessageSeen',
+        'onMessageLastSeen',
+        'onMessageReceived',
+        'onMessageLastReceived',
+        'onRetentionChanged',
+        'onMessagesHistoryInfo',
+        'onMembersUpdated',
+        'onMessagesHistoryDone',
+        'onMessagesHistoryRequest',
+    ].forEach(function(evt) {
+            self.rebind(evt + '.chatd', function(e) {
+                console.error(evt, JSON.stringify(arguments[1]));
+            });
+    });
 };
 
 makeObservable(Chatd);

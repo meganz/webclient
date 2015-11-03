@@ -4405,6 +4405,7 @@ function gridUI() {
     });
 
     $('.context-menu-item.do-sort').rebind('click', function() {
+        M.setLastColumn($(this).data('by'));
         M.doSort($(this).data('by'), -1);
         M.renderMain();
     });

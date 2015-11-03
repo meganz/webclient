@@ -279,38 +279,49 @@ function MegaData()
         'size': this.sortBySize.bind(this),
         'type': this.sortByType.bind(this),
         'date': this.sortByDateTime.bind(this),
+        'ts': this.sortByDateTime.bind(this),
         'owner': this.sortByOwner.bind(this),
         'modified': this.sortByModTime.bind(this),
+        'mtime': this.sortByModTime.bind(this),
         'interaction': this.sortByInteraction.bind(this),
         'access': this.sortByAccess.bind(this),
         'status': this.sortByStatus.bind(this),
         'fav': this.sortByFav.bind(this),
     };
 
+    this.setLastColumn = function(col) {
+        if (col === this.lastColumn) {
+            return;
+        }
+        switch (col) {
+        case 'ts':
+        case 'mtime':
+            this.lastColumn = col;
+            localStorage._lastColumn = this.lastColumn;
+            break;
+        }
+
+        if ($('.do-sort[data-by="' + col + '"]').length > 0) {
+            // swap the column label
+            $('.grid-url-header').prev().find('div')
+                .removeClass().addClass('arrow ' + col)
+                .text($('.do-sort[data-by="' + col + '"]').text())
+            $('.do-sort[data-by="' + col + '"]').addClass('selected');
+        }
+
+    }
+
+    this.lastColumn = null;
+
     this.doSort = function(n, d) {
         $('.grid-table-header .arrow').removeClass('asc desc');
         $('.context-menu-item.do-sort').removeClass('selected');
-
-        this.extraColumn = null;
-        if ($('.do-sort[data-by="' + n + '"]').length > 0) {
-            // sort by a column which isn't visible
-            // we make it visible and swap its value
-            $('.grid-url-header').prev().find('div')
-                .removeClass().addClass('arrow ' + n + ' asc')
-                .text($('.do-sort[data-by="' + n + '"]').text())
-            switch (n) {
-            case 'modified':
-                this.extraColumn = 'mtime';
-                break;
-            }
-        }
 
         if (d > 0) {
             $('.arrow.' + n).addClass('desc');
         } else {
             $('.arrow.' + n).addClass('asc');
         }
-        $('.do-sort[data-by="' + n + '"]').addClass('selected');
 
 
         if (!M.sortRules[n]) {
@@ -1076,8 +1087,8 @@ function MegaData()
 
                     // List view
                     else {
-                        if (M.extraColumn && M.v[i].p !== "contacts") {
-                            time = time2date(M.v[i][M.extraColumn] || M.v[i].ts);
+                        if (M.lastColumn && M.v[i].p !== "contacts") {
+                            time = time2date(M.v[i][M.lastColumn] || M.v[i].ts);
                         } else {
                             time = time2date(M.v[i].ts || (M.v[i].p === 'contacts' && M.contactstatus(M.v[i].h).ts));
                         }
@@ -1207,6 +1218,7 @@ function MegaData()
 
         delete this.cRenderMainN;
 
+
         if (this.currentdirid === 'opc') {
             DEBUG('RenderMain() opc');
             this.drawSentContactRequests(this.v, 'clearGrid');
@@ -1219,6 +1231,7 @@ function MegaData()
             renderContactsLayout(u);
         }
         else {
+            M.setLastColumn(localStorage._lastColumn);
             renderLayout(u, n_cache);
         }
 

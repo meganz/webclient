@@ -10986,5 +10986,17 @@
     "7702": {
         "text": "One or more items have been subjected to a takedown notice.",
         "context": "Toast notification text when info\/property dialog is shown for taken down item(s). The user has clicked on a file or folder and wants to view its information, and because it has been taken down the user sees this message in a toast notification."
+    },
+    "7703": {
+        "text": "One or more items have been the subject of a takedown notice.",
+        "context": "Toast notification text when info\/property dialog is shown for taken down item\/s."
+    },
+    "7704": {
+        "text": "This file has been the subject of a takedown notice.",
+        "context": "Popup notification text on mouse-over of taken down file."
+    },
+    "7705": {
+        "text": "This folder has been the subject of a takedown notice.",
+        "context": "Popup notification text on mouse-over taken down folder."
     }
 }

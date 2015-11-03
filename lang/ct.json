@@ -2745,5 +2745,8 @@
     "7694": "\u6b64\u6a94\u6848\u5df2\u88ab\u522a\u9664\u4e0b\u67b6\u3002",
     "7695": "\u6b64\u8cc7\u6599\u593e\u5df2\u88ab\u522a\u9664\u4e0b\u67b6\u3002",
     "7696": "\u81f4\u6240\u6709\u4f7f\u7528\u8005\u4e4b\u8457\u4f5c\u6b0a\u8b66\u544a",
-    "7702": "One or more items have been subjected to a takedown notice."
+    "7702": "One or more items have been subjected to a takedown notice.",
+    "7703": "One or more items have been the subject of a takedown notice.",
+    "7704": "This file has been the subject of a takedown notice.",
+    "7705": "This folder has been the subject of a takedown notice."
 }

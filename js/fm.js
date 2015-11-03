@@ -9123,7 +9123,7 @@ function propertiesDialog(close)
     var isTakenDown = exportLink.isTakenDown($.selected);
     if (isTakenDown) {
         pd.addClass('taken-down');
-        showToast('clipboard', 'One or more items have been subjected to a takedown notice.');
+        showToast('clipboard', 'One or more items have been the subject of a takedown notice.');
     }
 
     $('.properties-elements-counter span').text('');

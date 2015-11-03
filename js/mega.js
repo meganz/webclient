@@ -309,8 +309,8 @@ function MegaData()
             $('.arrow.' + n).addClass('desc');
         } else {
             $('.arrow.' + n).addClass('asc');
-            $('.do-sort[data-by="' + n + '"]').addClass('selected');
         }
+        $('.do-sort[data-by="' + n + '"]').addClass('selected');
 
 
         if (!M.sortRules[n]) {

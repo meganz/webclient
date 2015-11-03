@@ -290,16 +290,23 @@ function MegaData()
     };
 
     this.setLastColumn = function(col) {
-        if (col === this.lastColumn) {
-            return;
-        }
         switch (col) {
         case 'ts':
         case 'mtime':
-            this.lastColumn = col;
-            localStorage._lastColumn = this.lastColumn;
+            // It's valid
+            break;
+        default:
+            // Default value
+            col = "ts";
             break;
         }
+
+        if (col === this.lastColumn) {
+            return;
+        }
+        
+        this.lastColumn = col;
+        localStorage._lastColumn = this.lastColumn;
 
         if ($('.do-sort[data-by="' + col + '"]').length > 0) {
             // swap the column label
@@ -315,7 +322,6 @@ function MegaData()
 
     this.doSort = function(n, d) {
         $('.grid-table-header .arrow').removeClass('asc desc');
-        $('.context-menu-item.do-sort').removeClass('selected');
 
         if (d > 0) {
             $('.arrow.' + n).addClass('desc');

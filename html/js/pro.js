@@ -1115,6 +1115,11 @@ var voucherRedeemDialog = {
     $dialog: null,
     $backgroundOverlay: null,
     
+    voucherCode: '',
+    accountBalance: 0,
+    voucherAmount: 0,
+    bestPlan: null,        
+    
     /**
      * Initialisation of the dialog
      */
@@ -1127,23 +1132,20 @@ var voucherRedeemDialog = {
         // Init functions
         this.addVoucher();
     },
-    
+        
     /**
      * Redeems the voucher code
      */
     addVoucher: function() {
 
         // Get the voucher code
-        var voucherCode = localStorage.getItem('voucher');
+        voucherRedeemDialog.voucherCode = localStorage.getItem('voucher');
         
         // No longer needed in localStorage
-        //localStorage.removeItem('voucher');
-        
-        voucherRedeemDialog.displayDialog();
-        return false;
-        
+        localStorage.removeItem('voucher');
+                
         // Make API call to redeem voucher
-        api_req({ a: 'uavr', v: voucherCode }, {
+        api_req({ a: 'uavr', v: voucherRedeemDialog.voucherCode }, {
             callback: function(result) {
                 
                 if (typeof result === 'number') {
@@ -1152,7 +1154,7 @@ var voucherRedeemDialog = {
                     if (result === -11) {
                         loadingDialog.hide();
                         msgDialog('warninga', l[135], l[714], '', function() {
-                            voucherRedeemDialog.showBackgroundOverlay();
+                            voucherRedeemDialog.hideBackgroundOverlay();
                         });
                     }
 
@@ -1160,14 +1162,13 @@ var voucherRedeemDialog = {
                     else if (result < 0) {
                         loadingDialog.hide();
                         msgDialog('warninga', l[135], l[473], '', function() {
-                            voucherRedeemDialog.showBackgroundOverlay();
+                            voucherRedeemDialog.hideBackgroundOverlay();
                         });
                     }
                     
                     else {
                         // Get the latest account balance and update the dialog
-                        voucherRedeemDialog.displayDialog();
-                        //voucherRedeemDialog.getLatestBalance();
+                        voucherRedeemDialog.getVoucherValue();
                     }
                 }
             }
@@ -1175,11 +1176,23 @@ var voucherRedeemDialog = {
     },
     
     /**
-     * Shows the background overlay
+     * Gets the amount of the voucher e.g. 4.99 EUR
      */
-    showBackgroundOverlay: function() {
+    getVoucherValue: function() {
+        
+        api_req({ a: 'uavq', v: voucherRedeemDialog.voucherCode }, {
+            callback: function(result) {
+                
+                if (typeof result !== 'number') {
+                
+                    // Remember voucher amount for later
+                    voucherRedeemDialog.voucherAmount = result[1];
 
-        voucherRedeemDialog.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+                    // Get the latest balance
+                    voucherRedeemDialog.getLatestBalance();
+                }
+            }
+        });
     },
     
     /**
@@ -1198,30 +1211,105 @@ var voucherRedeemDialog = {
                 if (typeof result == 'object' && result.balance && result.balance[0]) {
                     
                     // Update the balance
-                    var balance = parseFloat(result.balance[0][0]);
-                    var balanceString = balance.toFixed(2);
+                    voucherRedeemDialog.accountBalance = parseFloat(result.balance[0][0]);
                     
-                    // Update for pro_pay
-                    /*pro_balance = balance;
-                    
-                    // Update dialog details
-                    voucherDialog.$dialog.find('.voucher-account-balance .balance').text(balanceString);
-                    voucherDialog.changeColourIfSufficientBalance();
-                    
-                    // Hide voucher input
-                    voucherDialog.$dialog.find('.voucher-redeem-container').show();
-                    voucherDialog.$dialog.find('.purchase-now-container').show();
-                    voucherDialog.$dialog.find('.voucher-input-container').hide();
-                    */
+                    // Get all the available pro plans
+                    voucherRedeemDialog.getProPlans();
                 }
             }
         });
     },
     
+    /**
+     * Get the Pro membership plans
+     */
+    getProPlans: function() {
+        
+        // This call will return an array of arrays. Each array contains this data:
+        // [api_id, account_level, storage, transfer, months, price, currency, description, ios_id, google_id]
+        // More data can be retrieved with 'f : 1'
+        api_req({ a : 'utqa' }, {
+            callback: function (result) {
+                
+                // Update the list of plans
+                voucherRedeemDialog.membershipPlans = result;
+                
+                // Get all the available pro plans
+                voucherRedeemDialog.calculateBestProPlan();
+            }
+        });
+    },
+    
+    /**
+     * Calculates the best plan for
+     */
+    calculateBestProPlan: function() {
+        
+        // Sort plans by lowest price first
+        voucherRedeemDialog.membershipPlans.sort(function(planA, planB) {
+
+            var pricePlanA = planA[5];
+            var pricePlanB = planB[5];
+
+            if (pricePlanA < pricePlanB) {
+                return -1;
+            }
+            if (pricePlanA > pricePlanB) {
+                return 1;
+            }
+
+            return 0;
+        });
+        
+        // Find the most expensive plan that they can purchase with their current account balance
+        for (var i = 0, selectedPlanIndex = 0; i < voucherRedeemDialog.membershipPlans.length; i++) {
+            
+            var planPrice = voucherRedeemDialog.membershipPlans[i][5];
+            
+            // If their account balance is equal or more than the plan price, update
+            if (voucherRedeemDialog.accountBalance >= planPrice) {
+                selectedPlanIndex = i;
+            }        
+        }
+        
+        // Set the best plan for the user
+        voucherRedeemDialog.bestPlan = voucherRedeemDialog.membershipPlans[selectedPlanIndex];
+        
+        // Display the dialog
+        voucherRedeemDialog.displayDialog();
+    },
+    
+    /**
+     * Displays the details on the dialog
+     */
     displayDialog: function() {
+        
+        var balanceString = voucherRedeemDialog.accountBalance.toFixed(2);
+        var planPrice = voucherRedeemDialog.bestPlan[5];
+        
+        console.info('best plan price' + planPrice, voucherRedeemDialog.bestPlan);
+                    
+        voucherRedeemDialog.$dialog.find('.balance').text(balanceString);
+        voucherRedeemDialog.$dialog.find('.voucher-amount').text(voucherRedeemDialog.voucherAmount);        
         
         voucherRedeemDialog.showBackgroundOverlay();
         voucherRedeemDialog.$dialog.removeClass('hidden');
+    },    
+    
+    /**
+     * Shows the background overlay
+     */
+    showBackgroundOverlay: function() {
+
+        voucherRedeemDialog.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+    },
+    
+    /**
+     * Hides the background overlay
+     */
+    hideBackgroundOverlay: function() {
+
+        voucherRedeemDialog.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
     }
 };
 

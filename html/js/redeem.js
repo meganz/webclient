@@ -49,6 +49,7 @@ var voucherRedeemDialog = {
                         loadingDialog.hide();
                         msgDialog('warninga', l[135], l[714], '', function() {
                             voucherRedeemDialog.hideBackgroundOverlay();
+                            document.location.hash = 'contact';
                         });
                     }
 
@@ -57,6 +58,7 @@ var voucherRedeemDialog = {
                         loadingDialog.hide();
                         msgDialog('warninga', l[135], l[473], '', function() {
                             voucherRedeemDialog.hideBackgroundOverlay();
+                            document.location.hash = 'contact';
                         });
                     }
                     

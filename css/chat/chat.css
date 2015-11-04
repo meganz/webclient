@@ -1,4 +1,4 @@
-/* User-card */
+/* User-card component*/
 .user-card-presence {
 	width: 8px;
     height: 8px;
@@ -67,14 +67,14 @@
 	font-size:12px;
     line-height: 14px;
 }
-/* end of User-card */
+/* end of User-card component */
 
 
 
 
 
 
-/* Avatar */
+/* Avatars component */
 .small-rounded-avatar {
 	width: 36px;
     height: 36px;
@@ -110,12 +110,12 @@
     -khtml-opacity: 0.5;
     opacity: 0.5;
 }
-/* end of Avatar */
+/* end of Avatar component */
 
 
 
 
-/* Icons */
+/* Icons component */
 .tiny-icon, .small-icon, .medium-icon {
 	width:20px;
 	height:20px;
@@ -265,12 +265,12 @@
 	bottom: -9px;
 	background-position: 0px -1418px;
 }
-/* End of Icons */
+/* End of Icons component */
 
 
 
 
-/* Buttons */
+/* Buttons component */
 .button {
 	display:block;
 	cursor: pointer;
@@ -421,7 +421,7 @@
 .red {
 	color: #D90007
 }
-/* Button */
+/* Button component */
 
 
 
@@ -580,7 +580,7 @@
 
 
 
-/* Chat textarea block */
+/* Chat textarea block component */
 .chat-textarea-block {
 	position:absolute;
 	width: 100%;
@@ -648,7 +648,7 @@
 .chat-textarea-scroll textarea:-ms-input-placeholder {
 	color:#CCCCCC;
 }
-/* End of Chat textarea block */
+/* End of Chat textarea block component */
 
 
 
@@ -713,7 +713,7 @@
 /* End of Typing component */
 
 
-/* Conversations Left Pane */
+/* Conversations Left Pane component */
 .conversations-pane {
 	margin:0;
 	padding:0;
@@ -790,11 +790,11 @@
 	color: #2BA6DE;
 	padding: 0 6px 0 5px;
 }
-/* End of Conversations Left Pane */
+/* End of Conversations Left Pane component */
 
 
 
-/*Feedback component */
+/* Feedback component */
 .feedback.round-icon-block {
 	margin: 2px 0 0 0;
 	float:left;

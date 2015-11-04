@@ -421,6 +421,9 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                 if(v && v.payload) {
                     chatRoom.messagesBuff.messages[hist[k]['k']].textContents = v.payload;
                     delete chatRoom.notDecryptedBuffer[k];
+                } else if(v && v.type === 0) {
+                    // this is a system message
+                    chatRoom.messagesBuff.messages[hist[k]['k']].protocol = true;
                 } else if(v && !v.payload) {
                     self.logger.error("Could not decrypt: ", v)
                 }
@@ -444,6 +447,8 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                 }
                 if (decrypted && decrypted.payload) {
                     chatRoom.messagesBuff.messages[msgObject.messageId].textContents = decrypted.payload;
+                }  else if (decrypted && !decrypted.payload && decrypted.type === 0) {
+                    chatRoom.messagesBuff.messages[msgObject.messageId].protocol = true;
                 }
             }
         });

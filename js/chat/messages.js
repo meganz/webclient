@@ -118,6 +118,7 @@ var ChatDialogMessage = function(opts) {
             'delay': true,
             'buttons': true,
             'read': true,
+            'protocol': false,
             'persist': true,
             'deleted': 0,
             'seen': false
@@ -360,7 +361,8 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                 }
             });
             if (!found) {
-                self.logger.error("Message that was confirmed not found: ", eventData);
+                // its ok, this happens when a system/protocol message was sent
+                return;
             }
         }
     });

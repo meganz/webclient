@@ -935,7 +935,7 @@ var ConversationPanel = React.createClass({
         var messagesList = [];
 
         self.props.messagesBuff.messages.forEach(function(v, k) {
-            if (v.deleted !== 1) {
+            if (v.deleted !== 1 && !v.protocol) {
                 messagesList.push(
                     <ConversationMessage message={v} chatRoom={room} key={v.messageId} />
                 );

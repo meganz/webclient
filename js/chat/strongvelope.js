@@ -194,7 +194,6 @@ var strongvelope = {};
     strongvelope._symmetricEncryptMessage = function(message, key, nonce) {
 
         var result = { ciphertext: null, key: null, nonce: null };
-        var nonceBytes;
         var keyBytes;
 
         if (key) {
@@ -205,13 +204,14 @@ var strongvelope = {};
             asmCrypto.getRandomValues(keyBytes);
         }
 
-        if (nonce) {
-            nonceBytes = asmCrypto.string_to_bytes(nonce.substring(0, NONCE_SIZE));
+        if (!nonce) {
+            nonce = new Uint8Array(NONCE_SIZE);
+            asmCrypto.getRandomValues(nonce);
+            nonce = asmCrypto.bytes_to_string(nonce);
         }
-        else {
-            nonceBytes = new Uint8Array(NONCE_SIZE);
-            asmCrypto.getRandomValues(nonceBytes);
-        }
+
+        var nonceBytes = asmCrypto.string_to_bytes(
+            strongvelope.deriveNonceSecret(nonce).substring(0, NONCE_SIZE));
 
         if ((message !== null) && (typeof message !== 'undefined')) {
             var clearBytes = asmCrypto.string_to_bytes(unescape(encodeURIComponent(message)));
@@ -220,7 +220,7 @@ var strongvelope = {};
         }
 
         result.key = asmCrypto.bytes_to_string(keyBytes);
-        result.nonce = asmCrypto.bytes_to_string(nonceBytes);
+        result.nonce = nonce;
 
         return result;
     };
@@ -244,7 +244,8 @@ var strongvelope = {};
     strongvelope._symmetricDecryptMessage = function(cipher, key, nonce) {
 
         var keyBytes = asmCrypto.string_to_bytes(key);
-        var nonceBytes = asmCrypto.string_to_bytes(nonce.substring(0, NONCE_SIZE));
+        var nonceBytes = asmCrypto.string_to_bytes(
+            strongvelope.deriveNonceSecret(nonce).substring(0, NONCE_SIZE));
         var cipherBytes = asmCrypto.string_to_bytes(cipher);
         var clearBytes = asmCrypto.AES_CTR.decrypt(cipherBytes, keyBytes, nonceBytes);
         var clearText = asmCrypto.bytes_to_string(clearBytes);
@@ -314,18 +315,20 @@ var strongvelope = {};
 
 
     /**
-     * Derive the shared confidentiality group key.
+     * Derive the shared confidentiality key.
      *
-     * The group key is a 32-byte string, half of which is later used for
+     * The key is a 32-byte string, half of which is later used for
      * AES-128. It is derived from the Diffie-Hellman shared secret, a x25519
      * public value, using HKDF-SHA256.
      *
-     * @param sharedCardinalKey {string}
+     * @param {String} sharedCardinalKey
      *     Input IKM for the HKDF. In mpENC, this is the x25519 public key
      *     result of the group key agreement.
-     * @param [context] {string}
+     * @param {String} [context]
      *     Info string for the HKDF. In strongvelope, this is set to the
      *     constant "strongvelope pairwise key".
+     * @returns {String}
+     *     Derived key as a binary string.
      */
     strongvelope.deriveSharedKey = function(sharedSecret, context) {
 
@@ -336,6 +339,33 @@ var strongvelope = {};
 
         return asmCrypto.bytes_to_string(hmac(context + "\x01",
                                               hmac(sharedSecret, '')));
+    };
+
+
+    /**
+     * Derive the nonce to use for an encryption for a particular recipient
+     * or message payload encryption.
+     *
+     * The returned nonce is a 32-byte string, of which a suitable slice is
+     * later used for encryption. It is derived from message's master nonce.
+     *
+     * @param {String} masterNonce
+     *     Master nonce as transmitted in the message, used as a base to derive
+     *     a nonce secret from.
+     * @param {String} [recipient]
+     *     Recipient's user handle. If not set, using the string "payload" for
+     *     message payload encryption.
+     * @returns {String}
+     *     Derived nonce as a binary string.
+     */
+    strongvelope.deriveNonceSecret = function(masterNonce, recipient) {
+
+        // Equivalent to first block of HKDF, see RFC 5869.
+        recipient = (typeof recipient === 'undefined')
+                  ? 'payload' : base64urldecode(recipient);
+
+        return asmCrypto.bytes_to_string(asmCrypto.HMAC_SHA256.bytes(
+            recipient, masterNonce));
     };
 
 
@@ -772,8 +802,8 @@ var strongvelope = {};
             clearText += keys[i];
         }
         var clearBytes = asmCrypto.string_to_bytes(clearText);
-        var ivBytes = asmCrypto.SHA256.bytes(base64urldecode(destination)
-                                             + nonce).subarray(0, IV_SIZE);
+        var ivBytes = asmCrypto.string_to_bytes(
+            strongvelope.deriveNonceSecret(nonce, destination).substring(0, IV_SIZE));
         var keyBytes = asmCrypto.string_to_bytes(
             this._computeSymmetricKey(destination).substring(0, KEY_SIZE));
         var cipherBytes = asmCrypto.AES_CBC.encrypt(clearBytes, keyBytes,
@@ -807,8 +837,8 @@ var strongvelope = {};
 
         var receiver = iAmSender ? otherParty : this.ownHandle;
         var cipherBytes = asmCrypto.string_to_bytes(encryptedKeys);
-        var ivBytes = asmCrypto.SHA256.bytes(base64urldecode(receiver)
-                                             + nonce).subarray(0, IV_SIZE);
+        var ivBytes = asmCrypto.string_to_bytes(
+            strongvelope.deriveNonceSecret(nonce, receiver).substring(0, IV_SIZE));
         var keyBytes = asmCrypto.string_to_bytes(
             this._computeSymmetricKey(otherParty).substring(0, KEY_SIZE));
         var clearBytes = asmCrypto.AES_CBC.decrypt(cipherBytes, keyBytes,

@@ -18,11 +18,16 @@ describe("chat.strongvelope unit test", function() {
     var KEY = atob('/+fPkTwBddDWDSA2M1hluA==');
     var NONCE = atob('MTHgl79y+1FFnmnopp4UNA==');
     var KEY_ID = atob('QUkAAA==');
-    var INITIAL_MESSAGE_BIN = atob('AAEAAECuKE3arE92KkMXAdaUtbZ1riLfiLezTBFtBkZMNqNYsV402eiU2T8UN8AZPthbKkIsx7DwnhBJ2aBrvjnoF4UDAgAAAQADAAAM71BrlkBJXmR5xRtMBAAACMqLuOeu/PccBQAAEMiaxjj3mLwIOIk3mKluzXsGAAAEQUkAAAcAAAbruWm1K5g=');
+    var INITIAL_MESSAGE_BIN = atob('AAEAAECuKE3arE92KkMXAdaUtbZ1riLfiLezTBFtB'
+        + 'kZMNqNYsV402eiU2T8UN8AZPthbKkIsx7DwnhBJ2aBrvjnoF4UDAgAAAQADAAAM71B'
+        + 'rlkBJXmR5xRtMBAAACMqLuOeu/PccBQAAEMiaxjj3mLwIOIk3mKluzXsGAAAEQUkAA'
+        + 'AcAAAbruWm1K5g=');
     var INITIAL_MESSAGE = {
         protocolVersion: 0,
-        signature:  atob('rihN2qxPdipDFwHWlLW2da4i34i3s0wRbQZGTDajWLFeNNnolNk/FDfAGT7YWypCLMew8J4QSdmga7456BeFAw=='),
-        signedContent: atob('AgAAAQADAAAM71BrlkBJXmR5xRtMBAAACMqLuOeu/PccBQAAEMiaxjj3mLwIOIk3mKluzXsGAAAEQUkAAAcAAAbruWm1K5g='),
+        signature:  atob('rihN2qxPdipDFwHWlLW2da4i34i3s0wRbQZGTDajWLFeNNnolNk'
+            + '/FDfAGT7YWypCLMew8J4QSdmga7456BeFAw=='),
+        signedContent: atob('AgAAAQADAAAM71BrlkBJXmR5xRtMBAAACMqLuOeu/PccBQAA'
+            + 'EMiaxjj3mLwIOIk3mKluzXsGAAAEQUkAAAcAAAbruWm1K5g='),
         type: 0x00,
         nonce: atob('71BrlkBJXmR5xRtM'),
         recipients: ['you456789xw'],
@@ -30,10 +35,13 @@ describe("chat.strongvelope unit test", function() {
         keyIds: [KEY_ID],
         payload: atob('67lptSuY')
     };
-    var FOLLOWUP_MESSAGE_BIN = atob('AAEAAECXRUab/B0G4OStZoUk3fmgbSmaKptYdbbTKZh4GVmbB14Rn/xSR9zYypOXD7MgNRJCAFjDZ/3scsGNZTqAewgDAgAAAQEDAAAM71BrlkBJXmR5xRtMBgAABEFJAAAHAAAG67lptSuY');
+    var FOLLOWUP_MESSAGE_BIN = atob('AAEAAECXRUab/B0G4OStZoUk3fmgbSmaKptYdbbTK'
+        + 'Zh4GVmbB14Rn/xSR9zYypOXD7MgNRJCAFjDZ/3scsGNZTqAewgDAgAAAQEDAAAM71Br'
+        + 'lkBJXmR5xRtMBgAABEFJAAAHAAAG67lptSuY');
     var FOLLOWUP_MESSAGE = {
         protocolVersion: 0,
-        signature:  atob('l0VGm/wdBuDkrWaFJN35oG0pmiqbWHW20ymYeBlZmwdeEZ/8Ukfc2MqTlw+zIDUSQgBYw2f97HLBjWU6gHsIAw=='),
+        signature:  atob('l0VGm/wdBuDkrWaFJN35oG0pmiqbWHW20ymYeBlZmwdeEZ/8Ukfc'
+            + '2MqTlw+zIDUSQgBYw2f97HLBjWU6gHsIAw=='),
         signedContent: atob('AgAAAQEDAAAM71BrlkBJXmR5xRtMBgAABEFJAAAHAAAG67lptSuY'),
         type: 0x01,
         nonce: atob('71BrlkBJXmR5xRtM'),
@@ -44,27 +52,37 @@ describe("chat.strongvelope unit test", function() {
     };
     var ROTATED_KEY = atob('D/1apgnOpfzZqrYi95t5pw==');
     var ROTATED_KEY_ID = atob('QUkAAQ==');
-    var ROTATION_MESSAGE_BIN = atob('AAEAAEDXYAmI4Y/N7Qr/QiJGzbY1moi7xb9unMx771OZ7A+4J90GHdiKNQawdmO2Y3ryqi2audWix6c2RLwIG/tanXYFAgAAAQADAAAM71BrlkBJXmR5xRtMBAAACMqLuOeu/PccBQAAICbsn8bFAy0Q8CndW4gMjKPfiqN1yIvKpZGs9okAQ0s3BgAACEFJAAFBSQAABwAABh+/GnXzGA==');
+    var ROTATION_MESSAGE_BIN = atob('AAEAAEB6MqjdQi8U2RiFyLdeX6hONPNJVugKL8Jjt'
+        + 'NBEH1+elTgItQqv+/pE6gb8zqchv59I6tMhM5e+BI45/djWY7APAgAAAQADAAAM71Br'
+        + 'lkBJXmR5xRtMBAAACMqLuOeu/PccBQAAIIHgbD1AGIFO6HIagNL3pjHAGnKW+WwMuh2'
+        + 'eweVCfnY6BgAACEFJAAFBSQAABwAABh+/GnXzGA==');
     var ROTATION_MESSAGE = {
         protocolVersion: 0,
-        signature:  atob('12AJiOGPze0K/0IiRs22NZqIu8W/bpzMe+9TmewPuCfdBh3YijUGsHZjtmN68qotmrnVosenNkS8CBv7Wp12BQ=='),
-        signedContent: atob('AgAAAQADAAAM71BrlkBJXmR5xRtMBAAACMqLuOeu/PccBQAAICbsn8bFAy0Q8CndW4gMjKPfiqN1yIvKpZGs9okAQ0s3BgAACEFJAAFBSQAABwAABh+/GnXzGA=='),
+        signature:  atob('ejKo3UIvFNkYhci3Xl+oTjTzSVboCi/CY7TQRB9fnpU4CLUKr/v6R'
+            + 'OoG/M6nIb+fSOrTITOXvgSOOf3Y1mOwDw=='),
+        signedContent: atob('AgAAAQADAAAM71BrlkBJXmR5xRtMBAAACMqLuOeu/PccBQAAII'
+            + 'HgbD1AGIFO6HIagNL3pjHAGnKW+WwMuh2eweVCfnY6BgAACEFJAAFBSQAABwAABh'
+            + '+/GnXzGA=='),
         type: 0x00,
         nonce: atob('71BrlkBJXmR5xRtM'),
         recipients: ['you456789xw'],
-        keys: [atob('JuyfxsUDLRDwKd1biAyMo9+Ko3XIi8qlkaz2iQBDSzc=')],
+        keys: [atob('geBsPUAYgU7ochqA0vemMcAacpb5bAy6HZ7B5UJ+djo=')],
         keyIds: [ROTATED_KEY_ID, KEY_ID],
         payload: atob('H78adfMY')
     };
-    var REMINDER_MESSAGE_BIN = atob('AAEAAEDDaTeLajnEpld1cOPdWmObsKI8R3ARLvVZny0u2GbEeQxPoFV0tfeXNhYv9GM8LgFTlY7xayR7VCYsK7y6+NoDAgAAAQADAAAM71BrlkBJXmR5xRtMBAAACMqLuOeu/PccBQAAECbsn8bFAy0Q8CndW4gMjKMGAAAEQUkAAQ==');
+    var REMINDER_MESSAGE_BIN = atob('AAEAAEDct7zij9MwC0VFxLSQ+wWe+aG83Rv9NoP1V'
+        + 'bGW/tFy9jmPxL9Y0UgvFeazKlCh9maWzjJ3rhHUj1BfQ5nq5MECAgAAAQADAAAM71Br'
+        + 'lkBJXmR5xRtMBAAACMqLuOeu/PccBQAAEIHgbD1AGIFO6HIagNL3pjEGAAAEQUkAAQ==');
     var REMINDER_MESSAGE = {
         protocolVersion: 0,
-        signature:  atob('w2k3i2o5xKZXdXDj3Vpjm7CiPEdwES71WZ8tLthmxHkMT6BVdLX3lzYWL/RjPC4BU5WO8Wske1QmLCu8uvjaAw=='),
-        signedContent: atob('AgAAAQADAAAM71BrlkBJXmR5xRtMBAAACMqLuOeu/PccBQAAECbsn8bFAy0Q8CndW4gMjKMGAAAEQUkAAQ=='),
+        signature:  atob('3Le84o/TMAtFRcS0kPsFnvmhvN0b/TaD9VWxlv7RcvY5j8S/WNFIL'
+            + 'xXmsypQofZmls4yd64R1I9QX0OZ6uTBAg=='),
+        signedContent: atob('AgAAAQADAAAM71BrlkBJXmR5xRtMBAAACMqLuOeu/PccBQAAEI'
+            + 'HgbD1AGIFO6HIagNL3pjEGAAAEQUkAAQ=='),
         type: 0x00,
         nonce: atob('71BrlkBJXmR5xRtM'),
         recipients: ['you456789xw'],
-        keys: [atob('JuyfxsUDLRDwKd1biAyMow==')],
+        keys: [atob('geBsPUAYgU7ochqA0vemMQ==')],
         keyIds: [ROTATED_KEY_ID]
     };
 
@@ -104,24 +122,26 @@ describe("chat.strongvelope unit test", function() {
                 sandbox.stub(asmCrypto, 'string_to_bytes', _echo);
                 sandbox.stub(asmCrypto.AES_CTR, 'encrypt').returns('cipher text');
                 sandbox.stub(asmCrypto, 'bytes_to_string', _echo);
+                sandbox.stub(ns, 'deriveNonceSecret', _echo);
 
                 var result = ns._symmetricEncryptMessage('forty two', 'the key', 'gooniegoogoo');
                 assert.deepEqual(result,
                     { ciphertext: 'cipher text', key: 'the key', nonce: 'gooniegoogoo' });
                 assert.strictEqual(asmCrypto.string_to_bytes.callCount, 3);
+                assert.strictEqual(ns.deriveNonceSecret.callCount, 1);
                 assert.strictEqual(encodeURIComponent.callCount, 1);
                 assert.strictEqual(unescape.callCount, 1);
                 assert.strictEqual(asmCrypto.AES_CTR.encrypt.callCount, 1);
                 assert.deepEqual(asmCrypto.AES_CTR.encrypt.args[0],
                     ['forty two', 'the key', 'gooniegoogoo']);
-                assert.strictEqual(asmCrypto.bytes_to_string.callCount, 3);
+                assert.strictEqual(asmCrypto.bytes_to_string.callCount, 2);
             });
 
             it("no mocks", function() {
                 var result = ns._symmetricEncryptMessage('forty two', KEY, NONCE);
-                assert.strictEqual(btoa(result.ciphertext), 'PqG4NXmumTUS');
+                assert.strictEqual(btoa(result.ciphertext), 'J+79wd1gGVjQ');
                 assert.strictEqual(btoa(result.key), btoa(KEY));
-                assert.strictEqual(btoa(result.nonce), btoa(NONCE.substring(0, 12)));
+                assert.strictEqual(btoa(result.nonce), btoa(NONCE));
             });
 
             it("missing nonce", function() {
@@ -131,11 +151,13 @@ describe("chat.strongvelope unit test", function() {
                 sandbox.stub(asmCrypto, 'getRandomValues', _copy('gooniegoogoo'));
                 sandbox.stub(asmCrypto.AES_CTR, 'encrypt').returns('cipher text');
                 sandbox.stub(asmCrypto, 'bytes_to_string', _echo);
+                sandbox.stub(ns, 'deriveNonceSecret').returns('gooniegoogoo');
 
                 var result = ns._symmetricEncryptMessage('forty two', 'the key');
                 assert.deepEqual(result, { ciphertext: 'cipher text', key: 'the key',
                                            nonce: _bytesOfString('gooniegoogoo') });
-                assert.strictEqual(asmCrypto.string_to_bytes.callCount, 2);
+                assert.strictEqual(asmCrypto.string_to_bytes.callCount, 3);
+                assert.strictEqual(ns.deriveNonceSecret.callCount, 1);
                 assert.strictEqual(asmCrypto.getRandomValues.callCount, 1);
                 assert.strictEqual(encodeURIComponent.callCount, 1);
                 assert.strictEqual(unescape.callCount, 1);
@@ -156,13 +178,15 @@ describe("chat.strongvelope unit test", function() {
                 sandbox.stub(asmCrypto, 'getRandomValues', _getRandomValues);
                 sandbox.stub(asmCrypto.AES_CTR, 'encrypt').returns('cipher text');
                 sandbox.stub(asmCrypto, 'bytes_to_string', _echo);
+                sandbox.stub(ns, 'deriveNonceSecret').returns('gooniegoogoo');
 
                 var result = ns._symmetricEncryptMessage('forty two');
                 assert.deepEqual(result, { ciphertext: 'cipher text',
                                            key: _bytesOfString('a new secret key'),
                                            nonce: _bytesOfString('gooniegoogoo') });
-                assert.strictEqual(asmCrypto.string_to_bytes.callCount, 1);
+                assert.strictEqual(asmCrypto.string_to_bytes.callCount, 2);
                 assert.strictEqual(asmCrypto.getRandomValues.callCount, 2);
+                assert.strictEqual(ns.deriveNonceSecret.callCount, 1);
                 assert.strictEqual(encodeURIComponent.callCount, 1);
                 assert.strictEqual(unescape.callCount, 1);
                 assert.strictEqual(asmCrypto.AES_CTR.encrypt.callCount, 1);
@@ -197,10 +221,12 @@ describe("chat.strongvelope unit test", function() {
                 sandbox.stub(asmCrypto, 'string_to_bytes', _echo);
                 sandbox.stub(asmCrypto.AES_CTR, 'decrypt').returns('forty two');
                 sandbox.stub(asmCrypto, 'bytes_to_string', _echo);
+                sandbox.stub(ns, 'deriveNonceSecret').returns('gooniegoogoo');
 
                 var result = ns._symmetricDecryptMessage('cipher text', 'the key', 'gooniegoogoo');
                 assert.deepEqual(result, 'forty two');
                 assert.strictEqual(asmCrypto.string_to_bytes.callCount, 3);
+                assert.strictEqual(ns.deriveNonceSecret.callCount, 1);
                 assert.strictEqual(asmCrypto.AES_CTR.decrypt.callCount, 1);
                 assert.deepEqual(asmCrypto.AES_CTR.decrypt.args[0],
                     ['cipher text', 'the key', 'gooniegoogoo']);
@@ -210,7 +236,7 @@ describe("chat.strongvelope unit test", function() {
             });
 
             it("no mocks", function() {
-                var result = ns._symmetricDecryptMessage(atob('PqG4NXmumTUS'), KEY, NONCE);
+                var result = ns._symmetricDecryptMessage(atob('J+79wd1gGVjQ'), KEY, NONCE);
                 assert.strictEqual(result, 'forty two');
             });
 
@@ -221,7 +247,7 @@ describe("chat.strongvelope unit test", function() {
 
             it("decryption fails", function() {
                 sandbox.stub(ns._logger, '_log');
-                var result = ns._symmetricDecryptMessage(atob('PqG4NXmumTUS'), KEY,
+                var result = ns._symmetricDecryptMessage(atob('J+79wd1gGVjQ'), KEY,
                     atob('NTHgl79y+1FFnmnopp4UNA=='));
                 assert.strictEqual(result, false);
                 assert.strictEqual(ns._logger._log.args[0][1][0],
@@ -304,12 +330,36 @@ describe("chat.strongvelope unit test", function() {
             it("base case", function() {
                 // Test against Python:
                 // >>> from hmac import HMAC; from hashlib import sha256
+                // >>> import base64
                 // >>> hmac = lambda *args: HMAC(*args, digestmod=sha256)
-                // >>> hmac(hmac(b'', b'\x0b'*22).digest(), b'mpenc group key\x01').hexdigest()
+                // >>> base64.b64encode(hmac(hmac(b'', b'\x0b'*22).digest(), b'mpenc group key\x01').digest())
                 // 'c9cc6b03feceadd360859a46932477ca924cc646be0d6f07dc8c4e2d49bd6301'
                 assert.strictEqual(btoa(ns.deriveSharedKey(baseCase, 'mpenc group key')),
-                    btoa('\xc9\xcc\x6b\x03\xfe\xce\xad\xd3\x60\x85\x9a\x46\x93\x24\x77\xca' +
-                         '\x92\x4c\xc6\x46\xbe\x0d\x6f\x07\xdc\x8c\x4e\x2d\x49\xbd\x63\x01'));
+                    'ycxrA/7OrdNghZpGkyR3ypJMxka+DW8H3IxOLUm9YwE=');
+            });
+        });
+
+        describe('deriveNonceSecret()', function() {
+            var baseCase = "\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b" +
+                           "\x0b\x0b\x0b\x0b\x0b\x0b";
+
+            it("base case", function() {
+                // Test against Python:
+                // >>> from hmac import HMAC; from hashlib import sha256
+                // >>> import base64
+                // >>> hmac = lambda *args: HMAC(*args, digestmod=sha256)
+                // >>> base64.b64encode(hmac(b'\x0b' * 22, b'payload').digest())
+                // 'g4i49V8v6SjBNlg5dBTfvoxbrFjvLLY9NIu0ax/IW0Y='
+                assert.strictEqual(btoa(ns.deriveNonceSecret(baseCase)),
+                    'g4i49V8v6SjBNlg5dBTfvoxbrFjvLLY9NIu0ax/IW0Y=');
+            });
+
+            it("empty master nonce", function() {
+                // Test against Python:
+                // >>> base64.b64encode(hmac(b'', b'payload').digest())
+                // '+BqVrzgYecM/lkxYn6CW+hM6B2BumXblRwYOeg6g9fM='
+                assert.strictEqual(btoa(ns.deriveNonceSecret('')),
+                    '+BqVrzgYecM/lkxYn6CW+hM6B2BumXblRwYOeg6g9fM=');
             });
         });
 
@@ -647,9 +697,7 @@ describe("chat.strongvelope unit test", function() {
                 var handler = new ns.ProtocolHandler('me3456789xw',
                     CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
                 sandbox.stub(asmCrypto, 'string_to_bytes', _echo);
-                sandbox.stub(window, 'base64urldecode', _echo);
-                var iv = { subarray: sinon.stub().returns('IV') };
-                sandbox.stub(asmCrypto.SHA256, 'bytes').returns(iv);
+                sandbox.stub(ns, 'deriveNonceSecret').returns('IV');
                 sandbox.stub(handler, '_computeSymmetricKey').returns(
                     { substring: sinon.stub().returns('the key') });
                 sandbox.stub(asmCrypto.AES_CBC, 'encrypt').returns('ciphertext');
@@ -666,9 +714,7 @@ describe("chat.strongvelope unit test", function() {
                 var handler = new ns.ProtocolHandler('me3456789xw',
                     CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
                 sandbox.stub(asmCrypto, 'string_to_bytes', _echo);
-                sandbox.stub(window, 'base64urldecode', _echo);
-                var iv = { subarray: sinon.stub().returns('IV') };
-                sandbox.stub(asmCrypto.SHA256, 'bytes').returns(iv);
+                sandbox.stub(ns, 'deriveNonceSecret').returns('IV');
                 sandbox.stub(handler, '_computeSymmetricKey').returns(
                     { substring: sinon.stub().returns('the key') });
                 sandbox.stub(asmCrypto.AES_CBC, 'encrypt').returns('ciphertext');
@@ -690,7 +736,19 @@ describe("chat.strongvelope unit test", function() {
                     atob('X2O2IQoAqzPvr2F4XWjCuwP17tYHoJwB5KhyhlHb/mM='));
 
                 var result = handler._encryptKeysFor([KEY], NONCE, 'you456789xw');
-                assert.strictEqual(btoa(result), 'cYNQ28YygmVqaPddZsjlXA==');
+                assert.strictEqual(btoa(result), 'OvYk3sSnXIRPOZLV6C71pw==');
+            });
+
+            it("no mocks, two keys", function() {
+                var handler = new ns.ProtocolHandler('me3456789xw',
+                    CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
+                sandbox.stub(window, 'u_privCu25519', CU25519_PRIV_KEY);
+                sandbox.stub(window, 'pubCu25519', { 'you456789xw': CU25519_PUB_KEY });
+                sandbox.stub(handler, '_computeSymmetricKey').returns(
+                    atob('X2O2IQoAqzPvr2F4XWjCuwP17tYHoJwB5KhyhlHb/mM='));
+
+                var result = handler._encryptKeysFor([ROTATED_KEY, KEY], NONCE, 'you456789xw');
+                assert.strictEqual(btoa(result), 'jQSMirQJ2JMwR15lsUf1gXvJWaOX1/CtIYTgNocf7Y8=');
             });
         });
 
@@ -699,9 +757,7 @@ describe("chat.strongvelope unit test", function() {
                 var handler = new ns.ProtocolHandler('me3456789xw',
                     CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
                 sandbox.stub(asmCrypto, 'string_to_bytes', _echo);
-                sandbox.stub(window, 'base64urldecode', _echo);
-                var iv = { subarray: sinon.stub().returns('IV') };
-                sandbox.stub(asmCrypto.SHA256, 'bytes').returns(iv);
+                sandbox.stub(ns, 'deriveNonceSecret').returns('IV');
                 sandbox.stub(handler, '_computeSymmetricKey').returns(
                     { substring: sinon.stub().returns('the key') });
                 sandbox.stub(asmCrypto.AES_CBC, 'decrypt').returns('a key67890123456');
@@ -718,9 +774,7 @@ describe("chat.strongvelope unit test", function() {
                 var handler = new ns.ProtocolHandler('me3456789xw',
                     CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
                 sandbox.stub(asmCrypto, 'string_to_bytes', _echo);
-                sandbox.stub(window, 'base64urldecode', _echo);
-                var iv = { subarray: sinon.stub().returns('IV') };
-                sandbox.stub(asmCrypto.SHA256, 'bytes').returns(iv);
+                sandbox.stub(ns, 'deriveNonceSecret').returns('IV');
                 sandbox.stub(handler, '_computeSymmetricKey').returns(
                     { substring: sinon.stub().returns('the key') });
                 sandbox.stub(asmCrypto.AES_CBC, 'decrypt').returns('a key67890123456another key23456');
@@ -739,7 +793,7 @@ describe("chat.strongvelope unit test", function() {
                 sandbox.stub(handler, '_computeSymmetricKey').returns(
                     atob('X2O2IQoAqzPvr2F4XWjCuwP17tYHoJwB5KhyhlHb/mM='));
 
-                var result = handler._decryptKeysFor(atob('cYNQ28YygmVqaPddZsjlXA=='),
+                var result = handler._decryptKeysFor(atob('OvYk3sSnXIRPOZLV6C71pw=='),
                                                      NONCE, 'me3456789xw');
                 assert.deepEqual(result, [KEY]);
                 assert.strictEqual(handler._computeSymmetricKey.args[0][0], 'me3456789xw');
@@ -751,7 +805,7 @@ describe("chat.strongvelope unit test", function() {
                 sandbox.stub(handler, '_computeSymmetricKey').returns(
                     atob('X2O2IQoAqzPvr2F4XWjCuwP17tYHoJwB5KhyhlHb/mM='));
 
-                var result = handler._decryptKeysFor(atob('cYNQ28YygmVqaPddZsjlXA=='),
+                var result = handler._decryptKeysFor(atob('OvYk3sSnXIRPOZLV6C71pw=='),
                                                      NONCE, 'you456789xw', true);
                 assert.deepEqual(result, [KEY]);
                 assert.strictEqual(handler._computeSymmetricKey.args[0][0], 'you456789xw');
@@ -764,7 +818,7 @@ describe("chat.strongvelope unit test", function() {
                     atob('X2O2IQoAqzPvr2F4XWjCuwP17tYHoJwB5KhyhlHb/mM='));
 
                 var result = handler._decryptKeysFor(
-                    atob('PhbRKOvBhdKiKHGqdYpCuAqtulpr/nqV92QGc4gPHrg='), NONCE, 'me3456789xw');
+                    atob('jQSMirQJ2JMwR15lsUf1gXvJWaOX1/CtIYTgNocf7Y8='), NONCE, 'me3456789xw');
                 assert.deepEqual(result, [ROTATED_KEY, KEY]);
                 assert.strictEqual(handler._computeSymmetricKey.args[0][0], 'me3456789xw');
             });
@@ -979,11 +1033,13 @@ describe("chat.strongvelope unit test", function() {
 
         describe('decryptFrom', function() {
             it("keyed message", function() {
+sandbox.stub(ns._logger, '_log');
                 var handler = new ns.ProtocolHandler('you456789xw',
                     CU25519_PRIV_KEY, ED25519_PRIV_KEY, ED25519_PUB_KEY);
                 sandbox.stub(window, 'pubEd25519', { 'me3456789xw': ED25519_PUB_KEY });
                 sandbox.stub(ns, '_parseMessageContent').returns(testutils.clone(INITIAL_MESSAGE));
                 sandbox.stub(ns, '_verifyMessage').returns(true);
+                sandbox.stub(ns, '_symmetricDecryptMessage').returns('Hello!');
                 sandbox.stub(handler, '_decryptKeysFor').returns([KEY]);
 
                 var result = handler.decryptFrom(INITIAL_MESSAGE_BIN, 'me3456789xw');
@@ -995,6 +1051,7 @@ describe("chat.strongvelope unit test", function() {
                 assert.strictEqual(ns._parseMessageContent.callCount, 1);
                 assert.strictEqual(ns._verifyMessage.callCount, 1);
                 assert.strictEqual(handler._decryptKeysFor.callCount, 1);
+                assert.strictEqual(ns._symmetricDecryptMessage.callCount, 1);
                 assert.deepEqual(handler.participantKeys['me3456789xw'],
                     { 'AI\u0000\u0000': KEY });
             });
@@ -1007,6 +1064,7 @@ describe("chat.strongvelope unit test", function() {
                 sandbox.stub(ns, '_parseMessageContent').returns(testutils.clone(INITIAL_MESSAGE));
                 sandbox.stub(ns, '_verifyMessage').returns(true);
                 sandbox.stub(handler, '_decryptKeysFor').returns([KEY]);
+                sandbox.stub(ns, '_symmetricDecryptMessage').returns('Hello!');
 
                 var result = handler.decryptFrom(INITIAL_MESSAGE_BIN, 'me3456789xw');
                 assert.deepEqual(result, {
@@ -1017,6 +1075,7 @@ describe("chat.strongvelope unit test", function() {
                 assert.strictEqual(ns._parseMessageContent.callCount, 1);
                 assert.strictEqual(ns._verifyMessage.callCount, 1);
                 assert.strictEqual(handler._decryptKeysFor.callCount, 1);
+                assert.strictEqual(ns._symmetricDecryptMessage.callCount, 1);
                 assert.deepEqual(handler.participantKeys['me3456789xw'],
                     { 'AI\u0000\u0000': KEY });
             });
@@ -1073,6 +1132,7 @@ describe("chat.strongvelope unit test", function() {
                 sandbox.stub(window, 'pubEd25519', { 'me3456789xw': ED25519_PUB_KEY });
                 sandbox.stub(ns, '_parseMessageContent').returns(testutils.clone(FOLLOWUP_MESSAGE));
                 sandbox.stub(ns, '_verifyMessage').returns(true);
+                sandbox.stub(ns, '_symmetricDecryptMessage').returns('Hello!');
 
                 var result = handler.decryptFrom(FOLLOWUP_MESSAGE_BIN, 'me3456789xw');
                 assert.deepEqual(result, {
@@ -1082,6 +1142,7 @@ describe("chat.strongvelope unit test", function() {
                 });
                 assert.strictEqual(ns._parseMessageContent.callCount, 1);
                 assert.strictEqual(ns._verifyMessage.callCount, 1);
+                assert.strictEqual(ns._symmetricDecryptMessage.callCount, 1);
             });
 
             it("own followup message", function() {
@@ -1091,6 +1152,7 @@ describe("chat.strongvelope unit test", function() {
                 sandbox.stub(window, 'pubEd25519', { 'me3456789xw': ED25519_PUB_KEY });
                 sandbox.stub(ns, '_parseMessageContent').returns(testutils.clone(FOLLOWUP_MESSAGE));
                 sandbox.stub(ns, '_verifyMessage').returns(true);
+                sandbox.stub(ns, '_symmetricDecryptMessage').returns('Hello!');
 
                 var result = handler.decryptFrom(FOLLOWUP_MESSAGE_BIN, 'me3456789xw');
                 assert.deepEqual(result, {
@@ -1100,6 +1162,7 @@ describe("chat.strongvelope unit test", function() {
                 });
                 assert.strictEqual(ns._parseMessageContent.callCount, 1);
                 assert.strictEqual(ns._verifyMessage.callCount, 1);
+                assert.strictEqual(ns._symmetricDecryptMessage.callCount, 1);
             });
 
             it("followup message, missing sender key", function() {
@@ -1143,6 +1206,7 @@ describe("chat.strongvelope unit test", function() {
                 sandbox.stub(ns, '_parseMessageContent').returns(testutils.clone(ROTATION_MESSAGE));
                 sandbox.stub(ns, '_verifyMessage').returns(true);
                 sandbox.stub(handler, '_decryptKeysFor').returns([ROTATED_KEY, KEY]);
+                sandbox.stub(ns, '_symmetricDecryptMessage').returns('Hello!');
 
                 var result = handler.decryptFrom(ROTATION_MESSAGE_BIN, 'me3456789xw');
                 assert.deepEqual(result, {
@@ -1153,6 +1217,7 @@ describe("chat.strongvelope unit test", function() {
                 assert.strictEqual(ns._parseMessageContent.callCount, 1);
                 assert.strictEqual(ns._verifyMessage.callCount, 1);
                 assert.strictEqual(handler._decryptKeysFor.callCount, 1);
+                assert.strictEqual(ns._symmetricDecryptMessage.callCount, 1);
                 assert.deepEqual(handler.participantKeys['me3456789xw'],
                     { 'AI\u0000\u0000': KEY, 'AI\u0000\u0001': ROTATED_KEY });
             });
@@ -1167,6 +1232,7 @@ describe("chat.strongvelope unit test", function() {
                 sandbox.stub(ns, '_parseMessageContent').returns(testutils.clone(ROTATION_MESSAGE));
                 sandbox.stub(ns, '_verifyMessage').returns(true);
                 sandbox.stub(handler, '_decryptKeysFor').returns([ROTATED_KEY, KEY]);
+                sandbox.stub(ns, '_symmetricDecryptMessage').returns('Hello!');
 
                 var result = handler.decryptFrom(ROTATION_MESSAGE_BIN, 'me3456789xw');
                 assert.deepEqual(result, {
@@ -1178,6 +1244,7 @@ describe("chat.strongvelope unit test", function() {
                 assert.strictEqual(ns._parseMessageContent.callCount, 1);
                 assert.strictEqual(ns._verifyMessage.callCount, 1);
                 assert.strictEqual(handler._decryptKeysFor.callCount, 1);
+                assert.strictEqual(ns._symmetricDecryptMessage.callCount, 1);
                 assert.deepEqual(handler.participantKeys['me3456789xw'],
                     { 'AI\u0000\u0000': KEY, 'AI\u0000\u0001': ROTATED_KEY });
             });

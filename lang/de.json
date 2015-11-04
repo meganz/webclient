@@ -2736,13 +2736,13 @@
     "7685": "Ich versichere nach bestem Wissen und Gewissen, dass die Nutzung des obengenannten Materials in diesem Kontext nicht durch den Urheber, einen seiner Vertreter oder durch gesetzliche Regelungen (z.B. fair use) autorisiert wurde.",
     "7686": "Einer der Links ist ung\u00fcltig.",
     "7687": "Transfereinstellungen erfordern einen Benutzeraccount.",
-    "7688": "There may be a man-in-the-middle attack in progress. Please reset the stored identification credentials for this contact and then verify that they are correct with your contact through an existing secure channel or in person.",
+    "7688": "Sie k\u00f6nnten gerade Opfer eines Man-in-the-middle-Angriffs geworden sein. Bitte reinitialisieren Sie die gespeicherten Kontaktidentit\u00e4ten. Pr\u00fcfen Sie dann ihre Korrektheit durch einen sicheren Kommunikationskanal oder ein pers\u00f6nliches Treffen.",
     "7689": "Reset contact credentials",
-    "7690": "Use the reset button below to reset the credentials for this contact.",
-    "7691": "New contact credentials",
+    "7690": "Das Dialogfeld \"Zur\u00fccksetzen\" reinitialisiert die Kontaktidentit\u00e4t.",
+    "7691": "Neue Kontaktidentit\u00e4t",
     "7692": "Verify credentials",
-    "7693": "Use the Verify button below to confirm the credentials for this contact.",
-    "7694": "This file has been subject to a takedown notice.",
-    "7695": "This folder has been subject to a takedown notice.",
-    "7696": "Copyright warning to all users"
+    "7693": "Das Dialogfeld \"Pr\u00fcfen\" best\u00e4tigt die Kontaktidentit\u00e4t.",
+    "7694": "Diese Datei wurde wegen einer Beschwerde entfernt.",
+    "7695": "Dieser Ordner wurde wegen einer Beschwerde entfernt.",
+    "7696": "Ermahnung bez\u00fcglich der Wahrung von Urheberrechten"
 }

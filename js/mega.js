@@ -2923,18 +2923,17 @@ function MegaData()
         }
         loadingDialog.show();
         if (t.length === 11 && !u_pubkeys[t]) {
-            api_cachepubkeys({
-                cachepubkeyscomplete: function(ctx) {
-                    if (u_pubkeys[ctx.t]) {
-                        M.copyNodes(ctx.cn, ctx.t);
-                    } else {
-                        loadingDialog.hide();
-                        alert(l[200]);
-                    }
-                },
-                cn: cn,
-                t: t
-            }, [t]);
+            var keyCachePromise = api_cachepubkeys({}, [t]);
+            keyCachePromise.done(function _cachepubkeyscomplete() {
+                if (u_pubkeys[t]) {
+                    M.copyNodes(cn, t);
+                }
+                else {
+                    loadingDialog.hide();
+                    alert(l[200]);
+                }
+            });
+
             return false;
         }
 
@@ -5594,27 +5593,31 @@ function getUserHandleFromEmail(emailAddress) {
 }
 
 /**
- * doShare
+ * Share a node with other users.
  *
  * Recreate target/users list and call appropriate api_setshare function.
- * @param {String} nodeId Selected node id
- * @param {Array} targets List of JSON_Object containing user email and access permission
- *     i.e. { u: <user_email>, r: <access_permission> }.
- * @param {Boolean} dontShowShareDialog.
+ * @param {String} nodeId
+ *     Selected node id
+ * @param {Array} targets
+ *     List of JSON_Object containing user email or user handle and access permission,
+ *     i.e. `{ u: <user_email>, r: <access_permission> }`.
+ * @param {Boolean} dontShowShareDialog
+ *     If set to `true`, don't show the share dialogue.
  * @returns {doShare.$promise|MegaPromise}
  */
 function doShare(nodeId, targets, dontShowShareDialog) {
 
-    var promise = new MegaPromise(),
+    var masterPromise = new MegaPromise(),
         logger = MegaLogger.getLogger('doShare'),
         childNodesId = [],// Holds complete directory tree starting from nodeId
         usersWithHandle = [],
         usersWithoutHandle = [],
         tmpValue, userHandle;
 
-    this._done = function(result, ctx) {
+    /** Settle function for API set share command. */
+    var _shareDone = function(result, users) {
 
-        // Loose comparasion is important
+        // Loose comparison is important (incoming JSON).
         if (result.r && result.r[0] == '0') {
             for (var i in result.u) {
                 M.addUser(result.u[i]);
@@ -5622,18 +5625,18 @@ function doShare(nodeId, targets, dontShowShareDialog) {
 
             for (var k in result.r) {
                 if (result.r[k] === 0) {
-                    var rights = ctx.t[k].r;
-                    var user = ctx.t[k].u;
+                    var rights = users[k].r;
+                    var user = users[k].u;
 
                     if (user.indexOf('@') >= 0) {
-                        user = getuid(ctx.t[k].u);
+                        user = getuid(users[k].u);
                     }
 
                     // A pending share may not have a corresponding user and should not be added
                     // A pending share can also be identified by a user who is only a '0' contact
                     // level (passive)
                     if (M.u[user] && M.u[user].c !== 0) {
-                        M.nodeShare(ctx.h, {
+                        M.nodeShare(nodeId, {
                             h: nodeId,
                             r: rights,
                             u: user,
@@ -5642,7 +5645,7 @@ function doShare(nodeId, targets, dontShowShareDialog) {
                         setLastInteractionWith(user, "0:" + unixtime());
                     }
                     else {
-                        logger.debug('invalid user:', user, M.u[user], ctx.t[k]);
+                        logger.debug('invalid user:', user, M.u[user], users[k]);
                     }
                 }
             }
@@ -5655,12 +5658,12 @@ function doShare(nodeId, targets, dontShowShareDialog) {
             if (dontShowShareDialog !== true) {
                 shareDialog();
             }
-            promise.resolve();
+            masterPromise.resolve();
         }
         else {
             $('.fm-dialog.share-dialog').removeClass('hidden');
             loadingDialog.hide();
-            promise.reject(result);
+            masterPromise.reject(result);
         }
     };
 
@@ -5674,7 +5677,7 @@ function doShare(nodeId, targets, dontShowShareDialog) {
             userHandle = getUserHandleFromEmail(targets[index].u);
             if (userHandle !== false) {
                 tmpValue = targets[index];
-                tmpValue.u = userHandle;// Switch from email to user handle
+                tmpValue.u = userHandle; // Switch from email to user handle
                 usersWithHandle.push(tmpValue);
             }
             else {
@@ -5685,28 +5688,27 @@ function doShare(nodeId, targets, dontShowShareDialog) {
 
     // Process users with handle === known ones
     if (usersWithHandle.length) {
-        api_setshare(nodeId, usersWithHandle, childNodesId, {
-            t: usersWithHandle,
-            h: nodeId,
-            done: this._done
+        var sharePromise = api_setshare(nodeId, usersWithHandle, childNodesId);
+        sharePromise.done(function _sharePromiseWithHandleDone(result) {
+            _shareDone(result, usersWithHandle);
         });
+        masterPromise.linkFailTo(sharePromise);
     }
 
     // Process targets (users) without handle === unknown ones
     if (usersWithoutHandle.length) {
-        api_setshare1({
+        var sharePromise = api_setshare1({
             node: nodeId,
             targets: usersWithoutHandle,
             sharenodes: childNodesId,
-            ctx: {
-                t: usersWithoutHandle,
-                h: nodeId,
-                done: this._done
-            }
         });
+        sharePromise.done(function _sharePromiseWithoutHandleDone(result) {
+            _shareDone(result, usersWithoutHandle);
+        });
+        masterPromise.linkFailTo(sharePromise);
     }
 
-    return promise;
+    return masterPromise;
 }
 
 function processmove(jsonmove)
@@ -5889,7 +5891,6 @@ function processIPC(ipc, ignoreDB) {
  * Handle outgoing pending contacts
  *
  * @param {array.<JSON_objects>} pending contacts
- *
  */
 function processOPC(opc, ignoreDB) {
 

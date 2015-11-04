@@ -313,11 +313,11 @@ function MegaData()
             $('.context-menu-item.do-sort').removeClass('selected');
             $('.grid-url-header').prev().find('div')
                 .removeClass().addClass('arrow ' + col)
-                .text($('.do-sort[data-by="' + col + '"]').text())
+                .text($('.do-sort[data-by="' + col + '"]').text());
             $('.do-sort[data-by="' + col + '"]').addClass('selected');
         }
 
-    }
+    };
 
     this.lastColumn = null;
 

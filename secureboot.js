@@ -1363,7 +1363,9 @@ else if (!b_u)
         'contact': {f:'html/contact.html', n: 'contact', j:0},
         'privacycompany': {f:'html/privacycompany.html', n: 'privacycompany', j:0},
         'chrome': {f:'html/chrome.html', n: 'chrome', j:0},
-        'zxcvbn_js': {f:'js/vendor/zxcvbn.js', n: 'zxcvbn_js', j:1}
+        'zxcvbn_js': {f:'js/vendor/zxcvbn.js', n: 'zxcvbn_js', j:1},        
+        'redeem': {f:'html/redeem.html', n: 'redeem', j:0},
+        'redeem_js': {f:'html/js/redeem.js', n: 'redeem_js', j:1}
     };
 
     var subpages =
@@ -1394,7 +1396,8 @@ else if (!b_u)
         'help': ['help_js'],
         'chrome': ['chrome'],
         'plugin': ['chrome','firefox'],
-        'recover': ['reset','reset_js']
+        'recover': ['reset','reset_js'],
+        'redeem': ['redeem','redeem_js']
     };
 
     if (page)

@@ -280,7 +280,7 @@ function init_page() {
     }
 
     /**
-     * If voucher code from url e.g. https://mega.nz/#voucherZUSA63A8WEYTPSXU4985
+     * If voucher code from url e.g. #voucherZUSA63A8WEYTPSXU4985
      */
     if (page.substr(0, 7) == 'voucher') {
         
@@ -288,83 +288,27 @@ function init_page() {
         var voucherCode = page.substr(7, 20);
         
         // Store in localStorage to be used by the Pro page or when returning from login
-        localStorage.voucher = voucherCode;
+        localStorage.setItem('voucher', voucherCode);
         
         // If not logged in, direct them to login or register first
         if (!u_type) {
             login_txt = 'Please log in or register to redeem your voucher.';
             document.location.hash = 'login';
+            return false;
         }
         else {
-            // Otherwise go to the Pro page which will detect the voucher code and show a dialog
-            document.location.hash = 'pro';
+            // Otherwise go to the Redeem page which will detect the voucher code and show a dialog
+            document.location.hash = 'redeem';
+            return false;
         }
-        
-        return false;
-        
-        //loadingDialog.show();
-        //var vouchercode = page.substr(7, page.length - 7);
-        /*
-        api_req({
-            a: 'uavq',
-            v: vouchercode
-        }, {
-            callback: function (res) {
-                if (typeof res == 'number') {
-                    document.location.hash = '';
-                    return false;
-                }
-                else if (res && !res[3]) {
-                    msgDialog('warninga',
-                        'Invalid URL',
-                        'Did you already activate your Pro membership? Please log in to your account.',
-                        false,
-                        function () {
-                            document.location.hash = 'login';
-                        });
-                    return false;
-                }
-                else if (res[0] == 'vGuzSLMU7WA') {
-                    slingshotDialog();
-                }
-                localStorage.voucher = page.replace("voucher", "");
-                if (!u_type) {
-                    if (u_wasloggedin()) {
-                        login_txt = l[1040];
-                        document.location.hash = 'login';
-                    }
-                    else {
-                        register_txt = l[1041];
-                        document.location.hash = 'register';
-                    }
-                }
-                else {
-                    document.location.hash = 'fm/account';
-                }
-            }
-        });*/
     }
 
     // If they have recently tried to redeem their voucher but were not logged in or registered first 
     // then direct them to the Pro page to complete their purchase which will show an immediate dialog.
-    if (localStorage.voucher && u_type !== false) {
-        document.location.hash = 'pro';
-        //return false;
-        
-        /*api_req({
-            a: 'uavr',
-            v: localStorage.voucher
-        }, {
-            callback: function (res) {
-                if (typeof res != 'number' || res >= 0) {
-                    balance2pro();
-                }
-            }
-        });
-
-        delete localStorage.voucher;*/
+    if ((localStorage.getItem('voucher') !== null) && u_type !== false) {
+        document.location.hash = 'redeem';
     }
-
+    
     if (page.substr(0, 10) == 'blogsearch') {
         blogsearch = decodeURIComponent(page.substr(11, page.length - 2));
         if (!blogsearch) {
@@ -374,13 +318,20 @@ function init_page() {
         parsepage(pages['blogarticle']);
         init_blog();
     }
+    
+    // Load the direct voucher redeem page
+    else if (page.substr(0, 6) == 'redeem') {
+        parsepage(pages['redeem']);
+        voucherRedeemDialog.init();
+    }
+    
     else if (page.substr(0, 9) == 'corporate') {
         function doRenderCorpPage() {
             if (window.corpTemplate) {
-                parsepage(window.corpTemplate)
+                parsepage(window.corpTemplate);
                 topmenuUI();
                 loadingDialog.hide();
-                CMS.loaded('corporate')
+                CMS.loaded('corporate');
                 mainScroll();
                 return;
             }

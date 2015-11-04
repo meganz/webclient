@@ -134,9 +134,9 @@ describe("chat.strongvelope workflow test", function() {
             }
 
             dump('Total time taken: ' + (Date.now() - start) + ' ms');
-            dump('  ' + tests.length + ' messages:'
-                 + ' 2 times encrypting/signing each,'
-                 + ' 4 times decrypting/verifying each.');
+            dump('  ' + messagesProcessedAlice
+                 + ' messages between two participants'
+                 + ' (incl. signing/verifying, key reminders, key refreshs).');
         });
     });
 });

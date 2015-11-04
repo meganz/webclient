@@ -278,36 +278,6 @@ function init_page() {
             }
         }
     }
-
-    /**
-     * If voucher code from url e.g. #voucherZUSA63A8WEYTPSXU4985
-     */
-    if (page.substr(0, 7) == 'voucher') {
-        
-        // Get the voucher code from the URL which is 20 characters in length
-        var voucherCode = page.substr(7, 20);
-        
-        // Store in localStorage to be used by the Pro page or when returning from login
-        localStorage.setItem('voucher', voucherCode);
-        
-        // If not logged in, direct them to login or register first
-        if (!u_type) {
-            login_txt = 'Please log in or register to redeem your voucher.';
-            document.location.hash = 'login';
-            return false;
-        }
-        else {
-            // Otherwise go to the Redeem page which will detect the voucher code and show a dialog
-            document.location.hash = 'redeem';
-            return false;
-        }
-    }
-
-    // If they have recently tried to redeem their voucher but were not logged in or registered first 
-    // then direct them to the Pro page to complete their purchase which will show an immediate dialog.
-    if ((localStorage.getItem('voucher') !== null) && u_type !== false) {
-        document.location.hash = 'redeem';
-    }
     
     if (page.substr(0, 10) == 'blogsearch') {
         blogsearch = decodeURIComponent(page.substr(11, page.length - 2));
@@ -318,13 +288,6 @@ function init_page() {
         parsepage(pages['blogarticle']);
         init_blog();
     }
-    
-    // Load the direct voucher redeem page
-    else if (page.substr(0, 6) == 'redeem') {
-        parsepage(pages['redeem']);
-        voucherRedeemDialog.init();
-    }
-    
     else if (page.substr(0, 9) == 'corporate') {
         function doRenderCorpPage() {
             if (window.corpTemplate) {
@@ -781,6 +744,44 @@ function init_page() {
         parsepage(pages['download'], 'download');
         dlinfo(dlid, dlkey, false);
     }
+    
+    /**
+     * If voucher code from url e.g. #voucherZUSA63A8WEYTPSXU4985
+     */
+    else if (page.substr(0, 7) == 'voucher') {
+
+        // Get the voucher code from the URL which is 20 characters in length
+        var voucherCode = page.substr(7, 20);
+        
+        // Store in localStorage to be used by the Pro page or when returning from login
+        localStorage.setItem('voucher', voucherCode);
+        
+        // If not logged in, direct them to login or register first
+        if (!u_type) {
+            login_txt = 'Please log in or register to redeem your voucher.';
+            document.location.hash = 'login';
+            return false;
+        }
+        else {
+            // Otherwise go to the Redeem page which will detect the voucher code and show a dialog
+            document.location.hash = 'redeem';
+            return false;
+        }
+    }
+
+    // Load the direct voucher redeem page
+    else if (page.substr(0, 6) == 'redeem') {
+        parsepage(pages['redeem']);
+        voucherRedeemDialog.init();
+    }
+    
+    // If they have recently tried to redeem their voucher but were not logged in or registered first 
+    // then direct them to the Pro page to complete their purchase which will show an immediate dialog.
+    else if ((localStorage.getItem('voucher') !== null) && u_type !== false) {
+        document.location.hash = 'redeem';
+        return false;
+    }
+    
     else if (is_fm()) {
         var id = false;
         if (page.substr(0, 2) === 'fm') {

@@ -355,7 +355,9 @@ var voucherRedeemDialog = {
             if (M.account) {
                 M.account.lastupdate = 0;
             }
-            window.location.hash = 'fm/account/history';
+            
+            document.location.hash = 'fm/account/history';
+            return false;
         });
     },
     

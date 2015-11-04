@@ -7586,6 +7586,7 @@ function initShareDialogMultiInputPlugin() {
  */
 function initCopyrightsDialog(nodesToProcess) {
 
+    $.itemExport = nodesToProcess;
     // If they've already agreed to the copyright warning this session
     if (localStorage.getItem('agreedToCopyrightWarning') !== null) {
         
@@ -8788,7 +8789,7 @@ function itemExportLink() {
     var node,
         html = '';
 
-    $.each($.selected, function(index, value) {
+    $.each($.itemExport, function(index, value) {
         node = M.d[value];
         if (node && node.ph) {
             html += itemExportLinkHtml(node);

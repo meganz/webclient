@@ -176,6 +176,12 @@ function init_page() {
             dlkey = ar[1].replace(/[^\w-]+/g, "");
         }
     }
+    
+    // If they recently tried to redeem their voucher but were not logged in or registered then direct them to the 
+    // #redeem page to complete their purchase. For newly registered users this happens after key creation is complete.
+    if ((localStorage.getItem('voucher') !== null) && (u_type === 3)) {
+        document.location.hash = 'redeem';
+    }
 
     var wasFolderlink = pfid;
     if (page.substr(0, 2) == 'F!' && page.length > 2) {
@@ -773,13 +779,6 @@ function init_page() {
     else if (page.substr(0, 6) == 'redeem') {
         parsepage(pages['redeem']);
         voucherRedeemDialog.init();
-    }
-    
-    // If they have recently tried to redeem their voucher but were not logged in or registered first 
-    // then direct them to the Pro page to complete their purchase which will show an immediate dialog.
-    else if ((localStorage.getItem('voucher') !== null) && u_type !== false) {
-        document.location.hash = 'redeem';
-        return false;
     }
     
     else if (is_fm()) {

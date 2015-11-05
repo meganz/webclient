@@ -1,0 +1,69 @@
+.user-card-presence {
+	width: 8px;
+    height: 8px;
+	float:left;
+	margin: 14px 14px 0 6px;
+    -moz-border-radius: 100%;
+    -webkit-border-radius: 100%;
+    border-radius: 100%;
+	background-color:#666666;
+	-webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.error.user-card-presence {
+	background-color: transparent !important;
+	border: 2px solid white;
+}
+.online.user-card-presence {
+	background-color: #13E03C;
+	border-color: #13E03C;
+}
+.away.user-card-presence {
+	background-color: #FFD200;
+	border-color: #FFD200;
+}
+.busy.user-card-presence {
+	background-color: #FFA500;
+	border-color: #FFA500;
+}
+.offline.user-card-presence {
+	background-color: #666666;
+	border-color: #666666;
+}
+.user-card-data {
+	padding: 0 30px 0 74px;
+}
+.user-card-name {
+	font-size: 14px;
+    line-height: 18px;
+    color: #666666;
+    font-family: 'source_sans_prosemibold';
+    white-space: nowrap;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    overflow: hidden;
+	max-width: 100%;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    position: relative;
+}
+.user-card-email {
+	font-size:13px;
+    line-height: 16px;
+	color: #999999;
+    white-space: nowrap;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+.user-card-name.small {
+	font-size: 13px;
+    line-height: 19px;
+}
+.user-card.small {
+	font-size:12px;
+    line-height: 14px;
+}
+

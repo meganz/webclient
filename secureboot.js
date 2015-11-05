@@ -1308,7 +1308,21 @@ else if (!b_u)
     jsl.push({f:'html/top.html', n: 'top', j:0});
     jsl.push({f:'js/notify.js', n: 'notify_js', j:1});
     jsl.push({f:'js/vendor/popunda.js', n: 'popunda_js', j:1});
+
     jsl.push({f:'css/style.css', n: 'style_css', j:2,w:30,c:1,d:1,cache:1});
+    jsl.push({f:'css/user-card.css', n: 'user_card_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/avatars.css', n: 'avatars_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/icons.css', n: 'icons_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/buttons.css', n: 'buttons_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/dropdowns.css', n: 'dropdowns_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/popups.css', n: 'popups_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/chat-messages.css', n: 'chat_messages_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/chat-textarea.css', n: 'chat_textarea_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/chat-typing.css', n: 'chat_typing_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/chat-left-pane.css', n: 'chat_left_pane_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/chat-feedback.css', n: 'chat_feedback_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/chat-common.css', n: 'chat_common_css', j:2,w:5,c:1,d:1,cache:1});
+
     jsl.push({f:'js/useravatar.js', n: 'contact_avatar_js', j:1,w:3});
     jsl.push({f:'js/vendor/avatar.js', n: 'avatar_js', j:1, w:3});
     jsl.push({f:'js/countries.js', n: 'countries_js', j:1});
@@ -1363,7 +1377,9 @@ else if (!b_u)
         'contact': {f:'html/contact.html', n: 'contact', j:0},
         'privacycompany': {f:'html/privacycompany.html', n: 'privacycompany', j:0},
         'chrome': {f:'html/chrome.html', n: 'chrome', j:0},
-        'zxcvbn_js': {f:'js/vendor/zxcvbn.js', n: 'zxcvbn_js', j:1}
+        'zxcvbn_js': {f:'js/vendor/zxcvbn.js', n: 'zxcvbn_js', j:1},        
+        'redeem': {f:'html/redeem.html', n: 'redeem', j:0},
+        'redeem_js': {f:'html/js/redeem.js', n: 'redeem_js', j:1}
     };
 
     var subpages =
@@ -1394,7 +1410,8 @@ else if (!b_u)
         'help': ['help_js'],
         'chrome': ['chrome'],
         'plugin': ['chrome','firefox'],
-        'recover': ['reset','reset_js']
+        'recover': ['reset','reset_js'],
+        'redeem': ['redeem','redeem_js']
     };
 
     if (page)

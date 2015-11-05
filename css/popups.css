@@ -1,0 +1,38 @@
+.popup.dropdown.body {
+	padding: 0;
+}
+.popup.dropdown.body.contacts-search {
+	width: 360px;
+	padding:0 0 7px 0;
+}
+.contacts-search-header {
+	text-align:center;
+	line-height: 48px;
+	height: 48px;
+	font-size: 14px;
+	color: #666666;
+}
+.contacts-search-header i {
+	vertical-align:middle;
+	margin: 0 7px 1px 0;
+}
+.contacts-search-scroll {
+	max-height: 288px;
+	overflow: hidden;
+}
+.contacts-info.body.contacts-search {
+	height: 48px;
+	cursor: pointer;
+}
+.contacts-info.body.contacts-search:nth-child(odd) {
+	background-color:#fafafa;
+}
+.contacts-search .user-card-presence {
+	margin: 14px 10px 0 14px;
+}
+.contacts-search .user-card-presence {
+	margin: 14px 10px 0 14px;
+}
+.contacts-search .user-card-data {
+	padding: 0 30px 0 79px;
+}

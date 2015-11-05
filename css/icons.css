@@ -1,0 +1,198 @@
+.tiny-icon, .small-icon, .medium-icon {
+	width:20px;
+	height:20px;
+	background-image: url(../images/mega/new-chat-sprite.svg);
+    background-repeat: no-repeat;
+	background-position: -2px -1446px;
+	display: inline-block;
+	vertical-align: top;
+}
+.huge-grey-warning {
+	width:220px;
+	height: 184px;
+	margin:21px auto;
+	display: block;
+	background-image: url(../images/mega/new-chat-sprite.svg);
+    background-repeat: no-repeat;
+	background-position: center -1838px;
+}
+.link-button .small-icon {
+	margin:0 6px 0 0;
+	-webkit-transition: opacity 100ms ease-in-out;
+    -moz-transition: opacity 100ms ease-in-out;
+    -o-transition: opacity 100ms ease-in-out;
+    -ms-transition: opacity 100ms ease-in-out;
+    transition: opacity 100ms ease-in-out;
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
+    -moz-opacity: 0.6;
+    -khtml-opacity: 0.6;
+    opacity: 0.6;
+}
+.link-button:not(.disabled):hover .small-icon, .link-button.active .small-icon, .red .small-icon {
+	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+    -moz-opacity: 1;
+    -khtml-opacity: 1;
+    opacity: 1;
+}
+.tiny-icon {
+	width: 12px;
+	height: 16px;
+}
+.medium-icon {
+	width: 28px;
+	height: 28px;
+}
+.white-medium-plus {
+	background-position: -2px -1447px;
+}
+.grey-medium-plus {
+	background-position: -2px -1474px;
+}
+.smiling-face {
+	background-position: -3px -1546px;
+}
+.tiny-icon.blue-handset {
+	background-position: -6px -2217px;
+}
+.tiny-icon.grey-down-arrow {
+	background-position: -8px 4px;
+}
+.small-icon.audio-call {
+	background-position: -4px -38px;
+}
+.small-icon.video-call {
+	background-position: -4px -74px;
+}
+.small-icon.rounded-grey-plus {
+    background-position: -4px -110px;
+}
+.small-icon.rounded-grey-up-arrow {
+    background-position: -4px -146px;
+}
+.small-icon.shared-grey-folder {
+    background-position: -4px -182px;
+}
+.small-icon.rounded-stop {
+    background-position: -4px -218px;
+}
+.small-icon.grey-letter {
+    background-position: -4px -2154px;
+}
+.small-icon.conversations {
+    background-position: -5px -1743px;
+}
+.small-icon.refresh-circle {
+    background-position: -4px -2074px;
+}
+.small-icon.grey-cloud {
+    background-position: -4px -263px;
+}
+.small-icon.grey-computer {
+	background-position: -4px -305px;
+}
+.small-icon.red-cross {
+	background-position: -3px -462px;
+}
+.small-icon.writing-pen {
+	background-position: -3px -347px;
+}
+.small-icon.quotes {
+	background-position: -3px -389px;
+}
+.small-icon.human-profile {
+	background-position: -3px -496px;
+}
+.small-icon.dashed-conversation {
+	background-position: -3px -533px;
+}
+.small-icon.rounded-up-arrow {
+	    background-position: -3px -620px;
+}
+.small-icon.square-profile {
+	background-position: -3px -663px;
+}
+.small-icon.play-icon {
+	background-position: -3px -736px;
+}
+.small-icon.search-icon {
+    background-position: -5px -1287px;
+}
+.dropdown-item .small-icon.grey-cloud {
+    background-position: -3px -579px;
+}
+.dropdown-item .small-icon.grey-computer {
+	background-position: -3px -2501px;
+}
+
+.dropdown-item:hover .small-icon.grey-cloud {
+    background-position: -4px -773px;
+}
+.dropdown-item:hover .small-icon.grey-computer {
+	background-position: -4px -815px;
+}
+
+.dropdown-item:hover .small-icon.red-cross {
+	background-position: -3px -926px;
+}
+.dropdown-item:hover .small-icon.writing-pen {
+	    background-position: -3px -857px;
+}
+.dropdown-item:hover .small-icon.quotes {
+	background-position: -3px -899px;
+}
+.dropdown-item:hover .small-icon.human-profile {
+	background-position: -3px -986px;
+}
+.dropdown-item:hover .small-icon.dashed-conversation {
+	background-position: -3px -1023px;
+}
+.dropdown-item:hover .small-icon.rounded-up-arrow {
+	    background-position: -3px -1130px;
+}
+.dropdown-item:hover .small-icon.square-profile {
+	background-position: -3px -1173px;
+}
+.dropdown-item:hover .small-icon.play-icon {
+	background-position: -3px -1246px;
+}
+
+.dashed-conversation {
+	background-position: 1px -1644px;
+}
+.round-icon {
+	width: 32px;
+	height: 32px;
+	display:block;
+	background-image: url(../images/mega/new-chat-sprite.svg);
+    background-repeat: no-repeat;
+	-moz-border-radius: 100%;
+    -webkit-border-radius: 100%;
+    border-radius: 100%;
+}
+.round-icon.diagonal-handset {
+	background-position: 2px -2264px;
+}
+.round-icon.horizontal-handset {
+	background-position: 2px -2314px;
+}
+.round-icon.handset-with-arrow {
+	background-position: 2px -2362px;
+}
+.round-icon.crossed-handset {
+	background-position: 2px -2422px;
+}
+.round-icon.blue {
+	background-color:#61D2FF;
+}
+.round-icon.green {
+	background-color:#13E03C;
+}
+.round-icon.yellow {
+	background-color:#FFD300;
+}
+.round-icon.grey {
+	background-color:#777777;
+}
+.round-icon.red {
+	background-color:#FF1A53;
+}

@@ -25082,7 +25082,7 @@ a.ui-datepicker-next {
 
 /* New Common components */
 .disabled {
-	cursor: default;
+	cursor: default !important;
 }
 .visible {
 	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100) !important;

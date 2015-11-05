@@ -2,7 +2,7 @@
  * Code for the direct voucher redeem dialog when users come from 
  * a direct link e.g. https://mega.nz/#voucher8RNU1PYPYDQWBE04J67F
  */
-var voucherRedeemDialog = {
+var redeem = {
     
     $dialog: null,
     $backgroundOverlay: null,
@@ -33,13 +33,13 @@ var voucherRedeemDialog = {
     addVoucher: function() {
 
         // Get the voucher code
-        voucherRedeemDialog.voucherCode = localStorage.getItem('voucher');
+        redeem.voucherCode = localStorage.getItem('voucher');
         
         // No longer needed in localStorage
         localStorage.removeItem('voucher');
                 
         // Make API call to redeem voucher
-        api_req({ a: 'uavr', v: voucherRedeemDialog.voucherCode }, {
+        api_req({ a: 'uavr', v: redeem.voucherCode }, {
             callback: function(result) {
                 
                 if (typeof result === 'number') {
@@ -48,7 +48,7 @@ var voucherRedeemDialog = {
                     if (result === -11) {
                         loadingDialog.hide();
                         msgDialog('warninga', l[135], l[714], '', function() {
-                            voucherRedeemDialog.hideBackgroundOverlay();
+                            redeem.hideBackgroundOverlay();
                             document.location.hash = 'contact';
                         });
                     }
@@ -57,14 +57,14 @@ var voucherRedeemDialog = {
                     else if (result < 0) {
                         loadingDialog.hide();
                         msgDialog('warninga', l[135], l[473], '', function() {
-                            voucherRedeemDialog.hideBackgroundOverlay();
+                            redeem.hideBackgroundOverlay();
                             document.location.hash = 'contact';
                         });
                     }
                     
                     else {
                         // Get the latest account balance and update the dialog
-                        voucherRedeemDialog.getVoucherValue();
+                        redeem.getVoucherValue();
                     }
                 }
             }
@@ -76,16 +76,16 @@ var voucherRedeemDialog = {
      */
     getVoucherValue: function() {
         
-        api_req({ a: 'uavq', v: voucherRedeemDialog.voucherCode }, {
+        api_req({ a: 'uavq', v: redeem.voucherCode }, {
             callback: function(result) {
                 
                 if (typeof result !== 'number') {
                 
                     // Remember voucher amount for later
-                    voucherRedeemDialog.voucherAmount = result[1];
+                    redeem.voucherAmount = result[1];
 
                     // Get the latest balance
-                    voucherRedeemDialog.getLatestBalance();
+                    redeem.getLatestBalance();
                 }
             }
         });
@@ -107,10 +107,10 @@ var voucherRedeemDialog = {
                 if (typeof result == 'object' && result.balance && result.balance[0]) {
                     
                     // Update the balance
-                    voucherRedeemDialog.accountBalance = parseFloat(result.balance[0][0]);
+                    redeem.accountBalance = parseFloat(result.balance[0][0]);
                     
                     // Get all the available pro plans
-                    voucherRedeemDialog.getProPlans();
+                    redeem.getProPlans();
                 }
             }
         });
@@ -128,10 +128,10 @@ var voucherRedeemDialog = {
             callback: function (result) {
                 
                 // Update the list of plans
-                voucherRedeemDialog.membershipPlans = result;
+                redeem.membershipPlans = result;
                 
                 // Get all the available pro plans
-                voucherRedeemDialog.calculateBestProPlan();
+                redeem.calculateBestProPlan();
             }
         });
     },
@@ -142,7 +142,7 @@ var voucherRedeemDialog = {
     calculateBestProPlan: function() {
         
         // Sort plans by lowest price first
-        voucherRedeemDialog.membershipPlans.sort(function(planA, planB) {
+        redeem.membershipPlans.sort(function(planA, planB) {
 
             // Convert from string for proper comparison
             var pricePlanA = parseFloat(planA[5]);
@@ -161,14 +161,14 @@ var voucherRedeemDialog = {
         var selectedPlanIndex = 0;
         
         // Find the most expensive plan that they can purchase with their current account balance
-        for (var i = 0; i < voucherRedeemDialog.membershipPlans.length; i++) {
+        for (var i = 0; i < redeem.membershipPlans.length; i++) {
             
             // Convert string price to float for correct comparison
-            var planPrice = voucherRedeemDialog.membershipPlans[i][5];
+            var planPrice = redeem.membershipPlans[i][5];
                 planPrice = parseFloat(planPrice);
             
             // If their account balance is equal or more than the plan price, update
-            if (planPrice <= voucherRedeemDialog.accountBalance) {
+            if (planPrice <= redeem.accountBalance) {
                 selectedPlanIndex = i;
             }
             else {
@@ -178,10 +178,10 @@ var voucherRedeemDialog = {
         }
         
         // Set the best plan for the user
-        voucherRedeemDialog.bestPlan = voucherRedeemDialog.membershipPlans[selectedPlanIndex];
+        redeem.bestPlan = redeem.membershipPlans[selectedPlanIndex];
         
         // Display the dialog
-        voucherRedeemDialog.displayDialog();
+        redeem.displayDialog();
     },
     
     /**
@@ -189,13 +189,13 @@ var voucherRedeemDialog = {
      */
     displayDialog: function() {
         
-        var balance2dp = voucherRedeemDialog.accountBalance.toFixed(2);
-        var planId = voucherRedeemDialog.bestPlan[0];
-        var proNum = voucherRedeemDialog.bestPlan[1];
-        var storage = voucherRedeemDialog.bestPlan[2];
-        var bandwidth = voucherRedeemDialog.bestPlan[3];
-        var numOfMonths = voucherRedeemDialog.bestPlan[4];
-        var planPrice = voucherRedeemDialog.bestPlan[5].split('.');
+        var balance2dp = redeem.accountBalance.toFixed(2);
+        var planId = redeem.bestPlan[0];
+        var proNum = redeem.bestPlan[1];
+        var storage = redeem.bestPlan[2];
+        var bandwidth = redeem.bestPlan[3];
+        var numOfMonths = redeem.bestPlan[4];
+        var planPrice = redeem.bestPlan[5].split('.');
         var proName = getProPlan(proNum);
         
         // Get dollars and cents
@@ -212,43 +212,43 @@ var voucherRedeemDialog = {
         var bandwidthUnit = (bandwidth < 1024) ? 'GB' : 'TB';
         
         // "Your MEGA voucher for 4.99 &euro; was redeemed successfully"
-        var titleText = voucherRedeemDialog.$dialog.find('.title-text').html();
-            titleText = titleText.replace('%1', voucherRedeemDialog.voucherAmount);
+        var titleText = redeem.$dialog.find('.title-text').html();
+            titleText = titleText.replace('%1', redeem.voucherAmount);
             
         // "Your balance is now 18.00 &euro;."
-        var balanceText = voucherRedeemDialog.$dialog.find('.balance-text').html();
+        var balanceText = redeem.$dialog.find('.balance-text').html();
             balanceText = balanceText.replace('%1', balance2dp);
             
         // "We suggest the PRO Lite plan based on your account balance."
         // "Click COMPLETE UPGRADE and enjoy your new PRO Lite plan."
-        var upgradeText = voucherRedeemDialog.$dialog.find('.complete-upgrade-text').html();
+        var upgradeText = redeem.$dialog.find('.complete-upgrade-text').html();
             upgradeText = upgradeText.replace(/%1/g, proName);
             upgradeText = upgradeText.replace('[S]', '<span class="complete-text">').replace('[/S]', '</span>');
         
         // Update information
-        voucherRedeemDialog.$dialog.find('.reg-st3-membership-bl').removeClass('pro1 pro2 pro3 pro4');
-        voucherRedeemDialog.$dialog.find('.reg-st3-membership-bl').addClass('pro' + proNum);
-        voucherRedeemDialog.$dialog.find('.plan-name').html(proName);
-        voucherRedeemDialog.$dialog.find('.price .dollars').text(planPriceDollars);
-        voucherRedeemDialog.$dialog.find('.price .cents').text('.' + planPriceCents);
-        voucherRedeemDialog.$dialog.find('.price .period').text('/' + monthOrYearText);
-        voucherRedeemDialog.$dialog.find('.reg-st3-storage .quota-amount').text(storageAmount);
-        voucherRedeemDialog.$dialog.find('.reg-st3-storage .quota-unit').text(storageUnit);
-        voucherRedeemDialog.$dialog.find('.reg-st3-bandwidth .quota-amount').text(bandwidthAmount);
-        voucherRedeemDialog.$dialog.find('.reg-st3-bandwidth .quota-unit').text(bandwidthUnit);
-        voucherRedeemDialog.$dialog.find('.title-text').html(titleText);
-        voucherRedeemDialog.$dialog.find('.balance-text').html(balanceText);
-        voucherRedeemDialog.$dialog.find('.complete-upgrade-text').html(upgradeText);
-        voucherRedeemDialog.$dialog.find('.pro-plan').text(proName);
-        voucherRedeemDialog.$dialog.find('.complete-upgrade-button').attr('data-plan-id', planId);
+        redeem.$dialog.find('.reg-st3-membership-bl').removeClass('pro1 pro2 pro3 pro4');
+        redeem.$dialog.find('.reg-st3-membership-bl').addClass('pro' + proNum);
+        redeem.$dialog.find('.plan-name').html(proName);
+        redeem.$dialog.find('.price .dollars').text(planPriceDollars);
+        redeem.$dialog.find('.price .cents').text('.' + planPriceCents);
+        redeem.$dialog.find('.price .period').text('/' + monthOrYearText);
+        redeem.$dialog.find('.reg-st3-storage .quota-amount').text(storageAmount);
+        redeem.$dialog.find('.reg-st3-storage .quota-unit').text(storageUnit);
+        redeem.$dialog.find('.reg-st3-bandwidth .quota-amount').text(bandwidthAmount);
+        redeem.$dialog.find('.reg-st3-bandwidth .quota-unit').text(bandwidthUnit);
+        redeem.$dialog.find('.title-text').html(titleText);
+        redeem.$dialog.find('.balance-text').html(balanceText);
+        redeem.$dialog.find('.complete-upgrade-text').html(upgradeText);
+        redeem.$dialog.find('.pro-plan').text(proName);
+        redeem.$dialog.find('.complete-upgrade-button').attr('data-plan-id', planId);
         
         // Show the dialog
-        voucherRedeemDialog.showBackgroundOverlay();
-        voucherRedeemDialog.$dialog.removeClass('hidden');
+        redeem.showBackgroundOverlay();
+        redeem.$dialog.removeClass('hidden');
         
         // Button functionality
-        voucherRedeemDialog.initCloseButton();
-        voucherRedeemDialog.initUpgradeButton();
+        redeem.initCloseButton();
+        redeem.initUpgradeButton();
     },
     
     /**
@@ -256,11 +256,11 @@ var voucherRedeemDialog = {
      */
     initCloseButton: function() {
         
-        voucherRedeemDialog.$dialog.find('.payment-close-icon, .choose-plan-button').rebind('click', function() {
+        redeem.$dialog.find('.payment-close-icon, .choose-plan-button').rebind('click', function() {
             
             // Hide the dialog
-            voucherRedeemDialog.hideBackgroundOverlay();
-            voucherRedeemDialog.$dialog.addClass('hidden');
+            redeem.hideBackgroundOverlay();
+            redeem.$dialog.addClass('hidden');
             
             // Go to the #pro page
             document.location.hash = 'pro';
@@ -277,10 +277,10 @@ var voucherRedeemDialog = {
      */
     initUpgradeButton: function() {
         
-        voucherRedeemDialog.$dialog.find('.complete-upgrade-button').rebind('click', function() {
+        redeem.$dialog.find('.complete-upgrade-button').rebind('click', function() {
             
-            voucherRedeemDialog.$dialog.addClass('hidden');
-            voucherRedeemDialog.processProPurchaseWithBalance();            
+            redeem.$dialog.addClass('hidden');
+            redeem.processProPurchaseWithBalance();            
         });        
     },
     
@@ -290,9 +290,9 @@ var voucherRedeemDialog = {
     processProPurchaseWithBalance: function() {
         
         // Data for API request
-        var apiId = voucherRedeemDialog.bestPlan[0];
-        var price = voucherRedeemDialog.bestPlan[5];
-        var currency = voucherRedeemDialog.bestPlan[6];
+        var apiId = redeem.bestPlan[0];
+        var price = redeem.bestPlan[5];
+        var currency = redeem.bestPlan[6];
         var gatewayId = 0;                                  // Prepay / account balance
         
         // Start loading spinner
@@ -335,7 +335,7 @@ var voucherRedeemDialog = {
                         }
                         else {
                             // Show success dialog
-                            voucherRedeemDialog.showSuccessfulPayment();
+                            redeem.showSuccessfulPayment();
                         }
                     }
                 });
@@ -349,23 +349,23 @@ var voucherRedeemDialog = {
     showSuccessfulPayment: function() {
         
         // Get the selected Pro plan details
-        var proNum = voucherRedeemDialog.bestPlan[1];
+        var proNum = redeem.bestPlan[1];
         var proPlan = getProPlan(proNum);
         
         // "You successfully upgraded your account to PRO Lite."
         var successMessage = l[6962].replace('%1', '<span>' + proPlan + '</span>');
         
         // Show the success
-        voucherRedeemDialog.showBackgroundOverlay();
-        voucherRedeemDialog.$successOverlay.removeClass('hidden');
-        voucherRedeemDialog.$successOverlay.find('.payment-result-txt').html(successMessage);
+        redeem.showBackgroundOverlay();
+        redeem.$successOverlay.removeClass('hidden');
+        redeem.$successOverlay.find('.payment-result-txt').html(successMessage);
         
         // Add click handlers for 'Go to my account' and Close buttons
-        voucherRedeemDialog.$successOverlay.find('.payment-result-button, .payment-close').rebind('click', function() {
+        redeem.$successOverlay.find('.payment-result-button, .payment-close').rebind('click', function() {
             
             // Hide the overlay
-            voucherRedeemDialog.hideBackgroundOverlay();
-            voucherRedeemDialog.$successOverlay.addClass('hidden');
+            redeem.hideBackgroundOverlay();
+            redeem.$successOverlay.addClass('hidden');
             
             // Make sure it fetches new account data on reload
             // and redirect to account page to show purchase
@@ -383,7 +383,7 @@ var voucherRedeemDialog = {
      */
     showBackgroundOverlay: function() {
 
-        voucherRedeemDialog.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+        redeem.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
     },
     
     /**
@@ -391,6 +391,6 @@ var voucherRedeemDialog = {
      */
     hideBackgroundOverlay: function() {
 
-        voucherRedeemDialog.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+        redeem.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
     }
 };

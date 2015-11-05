@@ -778,7 +778,7 @@ function init_page() {
     // Load the direct voucher redeem page
     else if (page.substr(0, 6) == 'redeem') {
         parsepage(pages['redeem']);
-        voucherRedeemDialog.init();
+        redeem.init();
     }
     
     else if (is_fm()) {

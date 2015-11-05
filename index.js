@@ -777,6 +777,7 @@ function init_page() {
 
     // Load the direct voucher redeem page
     else if (page.substr(0, 6) == 'redeem') {
+        loadingDialog.show();
         parsepage(pages['redeem']);
         redeem.init();
     }

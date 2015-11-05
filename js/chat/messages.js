@@ -587,3 +587,18 @@ MessagesBuff.prototype.removeMessageByType = function(type) {
         }
     })
 };
+
+MessagesBuff.prototype.getLatestTextMessage = function() {
+    if(this.messages.length > 0) {
+        var msgs = this.messages;
+        for(var i = msgs.length - 1; i >= 0; i--) {
+            if(msgs.getItem(i) && msgs.getItem(i).textContents && msgs.getItem(i).textContents.length > 0) {
+                return msgs.getItem(i);
+            }
+        }
+        // no renderable msgs found
+        return false;
+    } else {
+        return false;
+    }
+};

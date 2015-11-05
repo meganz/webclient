@@ -63,7 +63,7 @@ var ConversationMessage = React.createClass({
     },
     render: function () {
         var self = this;
-        var cssClasses = "fm-chat-messages-block fm-chat-message-container";
+        var cssClasses = "message body";
 
         var message = this.props.message;
         var megaChat = this.props.chatRoom.megaChat;
@@ -252,21 +252,21 @@ var ConversationMessage = React.createClass({
 
             messageLabel = <span className={labelClass}>{labelText}</span>
         }
-        return (
-            <div className={cssClasses} data-id={"id" + message.messageId}>
-                <div className="fm-chat-messages-pad">
-                    <div className="nw-chat-notification-icon"></div>
-                    <ContactsUI.Avatar contact={contact} />
 
-                    <div className="fm-chat-message">
-                        <div className="chat-message-date">{timestamp}</div>
-                        <span>{authorTextDiv}</span>
-                        <span>{messageLabel}</span>
-                        <div className="chat-message-txt">
-                            <span dangerouslySetInnerHTML={{__html:textMessage}}></span>
-                            {buttons}
-                        </div>
-                        <div className="clear"></div>
+        var displayName = contact.u === u_handle ? __("Me") : generateAvatarMeta(contact.u).fullName;
+
+        return (
+            <div className="message body" data-id={"id" + message.messageId}>
+                <ContactsUI.Avatar contact={contact} />
+                <div className="message content-area">
+                    <div className="message user-card-name">{displayName}</div>
+                    <div className="message date-time">{timestamp}</div>
+
+                    <div className="default-white-button tiny-button">
+                        <i className="tiny-icon grey-down-arrow"></i>
+                    </div>
+
+                    <div className="message text-block" dangerouslySetInnerHTML={{__html:textMessage}}>
                     </div>
                 </div>
             </div>
@@ -274,6 +274,69 @@ var ConversationMessage = React.createClass({
     }
 });
 
+
+var ConversationRightArea = React.createClass({
+    mixins: [MegaRenderMixin, RenderDebugger],
+    render: function() {
+
+        var room = this.props.chatRoom;
+        var contactJid = room.getParticipantsExceptMe()[0];
+        var contact = room.megaChat.getContactFromJid(contactJid);
+
+
+        return <div className="chat-right-area">
+            <div className="chat-right-area conversation-details-scroll">
+                <div className="chat-right-pad">
+
+                    <div className="contacts-info body">
+                        <div
+                            className={"user-card-presence " + room.megaChat.xmppPresenceToCssClass(contact.presence)}
+                            >
+                        </div>
+                        <ContactsUI.Avatar contact={contact} />
+
+                        <div className="default-white-button tiny-button">
+                            <i className="tiny-icon grey-down-arrow"></i>
+                        </div>
+
+                        <div className="user-card-data">
+                            <div className="user-card-name">{generateAvatarMeta(contact.u).fullName}</div>
+                            <div className="user-card-email">{contact.m}</div>
+                        </div>
+                    </div>
+
+                    <div className="buttons-block">
+                        <div className={"link-button" + (!contact.presence? " disabled" : "")}>
+                            <i className="small-icon audio-call"></i>
+                            Start Audio Call
+                        </div>
+                        <div className={"link-button" + (!contact.presence? " disabled" : "")}>
+                            <i className="small-icon video-call"></i>
+                            Start Video Call
+                        </div>
+                        <div className="link-button">
+                            <i className="small-icon rounded-grey-plus"></i>
+                            Add participant…
+                        </div>
+                        <div className="link-button">
+                            <i className="small-icon rounded-grey-up-arrow"></i>
+                            Send Files…
+                        </div>
+                        <div className="link-button">
+                            <i className="small-icon shared-grey-folder"></i>
+                            Share Folders
+                        </div>
+                        <div className="link-button red">
+                            <i className="small-icon rounded-stop"></i>
+                            Leave Chat
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    }
+})
 var ConversationPanel = React.createClass({
     mixins: [MegaRenderMixin, RenderDebugger],
 
@@ -821,21 +884,21 @@ var ConversationPanel = React.createClass({
             }
         }
 
-        // Important. Please insure we have correct height detection for Chat messages block. We need to check ".fm-chat-input-scroll" instead of ".fm-chat-line-block" height
-        var scrollBlockHeight = (
-            $('.fm-chat-block').outerHeight() -
-            $('.fm-chat-line-block', $conversationPanelContainer).outerHeight() -
-            self.$header.outerHeight() + 2
-        );
-        if (scrollBlockHeight != self.$messages.outerHeight()) {
-            self.$messages.css('height', scrollBlockHeight);
-            self.refreshUI(true);
-        } else {
-            self.refreshUI(scrollToBottom);
-        }
+        //// Important. Please insure we have correct height detection for Chat messages block. We need to check ".fm-chat-input-scroll" instead of ".fm-chat-line-block" height
+        //var scrollBlockHeight = (
+        //    $('.chat-content-block').outerHeight() -
+        //    $('.fm-chat-line-block', $conversationPanelContainer).outerHeight()
+        //);
+        //if (scrollBlockHeight != self.$messages.outerHeight()) {
+        //    self.$messages.css('height', scrollBlockHeight);
+        //    self.refreshUI(true);
+        //} else {
+        //    self.refreshUI(scrollToBottom);
+        //}
 
         // try to do a .scrollToBottom only once, to trigger the stickToBottom func. of JSP
         if (!self.scrolledToBottom) {
+            //TODO: fixme
             var $messagesPad = $('.fm-chat-message-pad', self.$messages);
             if (
                 $messagesPad.outerHeight() - 1 > $messagesPad.parent().parent().parent().outerHeight()
@@ -856,22 +919,19 @@ var ConversationPanel = React.createClass({
         var contact = room.megaChat.getContactFromJid(contactJid);
 
         var conversationPanelClasses = "conversation-panel";
-        var headerClasses = "fm-right-header";
         var messagesClasses = "fm-chat-message-scroll";
         var endCallClasses = "chat-button fm-end-call";
         var videoControlClasses = "video-controls";
 
         if (!room.isCurrentlyActive) {
-            //headerClasses += " hidden";
-            //messagesClasses += " hidden";
             conversationPanelClasses += " hidden";
         }
 
-        if (room._conv_ended === true) {
-            headerClasses += " conv-ended";
-        } else {
-            headerClasses += " conv-start";
-        }
+        //if (room._conv_ended === true) {
+        //    headerClasses += " conv-ended";
+        //} else {
+        //    headerClasses += " conv-start";
+        //}
 
         var callIsActive = room.callSession && room.callSession.isActive();
         if (!callIsActive) {
@@ -959,13 +1019,13 @@ var ConversationPanel = React.createClass({
         var sizeIconClasses = "video-call-button size-icon";
         var emoticonsPopupClasses = "fm-chat-emotion-popup";
         var emoticonsPopupButtonClasses = "fm-chat-emotions-icon";
-        var messageTextAreaClasses = "message-textarea";
+        var messageTextAreaClasses = "messages-textarea";
         var typingElement;
 
         // setup ONLY if there is an active call session
         if (room.callSession && callIsActive) {
             if (self.state.isFullscreenModeEnabled) {
-                headerClasses += " fullscreen";
+                //headerClasses += " fullscreen";
                 sizeIconClasses += " active";
                 if (self.state.mouseOverDuringCall !== true) {
                     videoControlClasses += " hidden-controls";
@@ -1080,149 +1140,55 @@ var ConversationPanel = React.createClass({
         }
 
         return (
-            <div className={conversationPanelClasses} onMouseMove={self.onMouseMove}>
-                <div className={headerClasses} data-room-jid={self.props.chatRoom.roomJid.split("@")[0]}>
-                    <ContactsUI.Avatar contact={contact} />
-                    <div className={contactClassString}>
-                        <div className="todo-fm-chat-user-star"></div>
+            <div className={conversationPanelClasses} onMouseMove={self.onMouseMove} data-room-jid={self.props.chatRoom.roomJid.split("@")[0]}>
+                <ConversationRightArea chatRoom={this.props.chatRoom} />
 
-                        <div className="fm-chat-user">{generateContactName(contact.u)}</div>
-                        <div className="nw-contact-status"></div>
-                        <div className="fm-chat-user-status">{' ' + room.megaChat.xmppPresenceToText(contact.presence) + ' '}</div>
-                        <div className="clear"></div>
-                    </div>
-
-
-                    <div className={headerIndicatorAudio}></div>
-                    <div className={headerIndicatorVideo}></div>
-
-                    <div className={endCallClasses} onClick={this.onEndCallClicked}><span className="fm-chatbutton">{l[5884]}</span></div>
-                    <div className="chat-button fm-chat-end end-chat hidden" onClick={(() => function() {
-                        room.destroy(true);
-                    })}> <span className="fm-chatbutton">{l[6833]}</span> </div>
-
-                    <div className={startCallButtonClasses} onClick={this.onStartCallClicked}><span className="fm-chatbutton-arrow">{l[5883]}</span></div>
-
-                    <div className={startCallPopupClasses} style={startCallPopupCss}>
-                        <div className="fm-send-files-arrow" style={startCallArrowCss}></div>
-                        <div className="fm-chat-popup-button start-audio" onClick={(() => { room.startAudioCall(); })}>{l[5896]}</div>
-                        <div className="fm-chat-popup-button start-video" onClick={(() => { room.startVideoCall(); })}>{l[5897]}</div>
-                    </div>
-                    <div className="clear"></div>
-
-
-                    <div className="chat-call-block" onMouseMove={this.onMouseMoveDuringCall}>
-                        <div className="video-full-demo-ticket"></div>
-                        <div className="video-full-logo"></div>
-
-                        <div className={videoControlClasses}>
-                            <div className="video-full-buttons">
-                                <div className={ctrlAudioButtonClasses} onClick={self.onAudioToggleClicked}>
-                                    <span></span><div className="video-call-border"></div>
+                <div className="chat-content-block">
+                    <div className="messages-block">
+                        <div className="messages scroll-area">
+                            <utils.JScrollPane>
+                                <div className="messages main-pad">
+                                    <div className="messages content-area">
+                                        {messagesList}
+                                    </div>
                                 </div>
-                                <div className={ctrlVideoButtonClasses} onClick={self.onVideoToggleClicked}>
-                                    <span></span><div className="video-call-border"></div>
+                            </utils.JScrollPane>
+                        </div>
+
+                        <div className="chat-textarea-block">
+                            {typingElement}
+                            <div className="chat-textarea">
+                                <i className="small-icon conversations"></i>
+                                <div className="chat-textarea-buttons">
+                                    <div className="button pupup-button" onClick={this.onEmoticonsButtonClick}>
+                                        <i className="small-icon smiling-face"></i>
+                                    </div>
+                                    <div className="button pupup-button">
+                                        <i className="small-icon grey-medium-plus"></i>
+                                    </div>
                                 </div>
-                                <div className="video-call-button hang-up-icon" onClick={self.onEndCallClicked}>
-                                    <span></span><div className="video-call-border"></div>
-                                </div>
-                            </div>
-                            <div className="video-size-button">
-                                <div className={sizeIconClasses} onClick={this.onToggleFullScreenClicked}>
-                                    <span></span><div className="video-call-border"></div>
+                                <div className="chat-textarea-scroll">
+                                <textarea
+                                    className={messageTextAreaClasses}
+                                    placeholder="Write a message..."
+                                    onKeyDown={self.onTypeAreaKeyDown}
+                                    onBlur={self.onTypeAreaBlur}
+                                    onChange={self.onTypeAreaChange}
+                                    value={self.state.typedMessage}
+                                    ref="typearea"
+                                    disabled={room.pubCu25519KeyIsMissing === true ? true : false}
+                                    readOnly={room.pubCu25519KeyIsMissing === true ? true : false}
+                                    ></textarea>
+                                    <div className="hidden" dangerouslySetInnerHTML={{__html: typedMessage}}></div>
                                 </div>
                             </div>
                         </div>
-                        <div className={otherUserContainerClasses}>
-                            {otherUsersAvatar}
-                        </div>
-
-                        <div className={myContainerClasses}>
-                            <div className={currentUserResizerClasses}><div></div></div>
-                            <div className={videoMinimiseButtonClasses} onClick={this.onLocalVideoResizerClicked}></div>
-                            {myAvatar}
-                        </div>
-
                     </div>
-
-                    <div className="video-resizer"></div>
-                    <div className="drag-handle"></div>
-
-                </div>
-
-
-
-                <div className={messagesClasses} data-roomjid={self.props.chatRoom.roomJid}>
-                    <div className="fm-chat-message-pad">
-                        <div className="chat-date-divider">
-                        </div>
-                        <div className="fm-chat-download-popup chat-popup">
-                            <div className="fm-chat-download-arrow"></div>
-                            <div className="fm-chat-download-button to-cloud">
-                                <span>{l[6839]}</span>
-                            </div>
-                            <div className="fm-chat-download-button as-zip">
-                                <span>{l[864]}</span>
-                            </div>
-                            <div className="fm-chat-download-button to-computer">
-                                <span>{l[6840]}</span>
-                            </div>
-                        </div>
-
-                        {messagesList}
-                        {typingElement}
-
-                    </div>
-                </div>
-
-                <div className="fm-chat-line-block">
-                    <div className="hiddendiv" dangerouslySetInnerHTML={{__html: typedMessage}}></div>
-                    <div className="fm-chat-attach-file">
-                        <div className="fm-chat-attach-arrow"></div>
-                    </div>
-
-                    <div className={emoticonsPopupButtonClasses} onClick={this.onEmoticonsButtonClick}>
-                        <div className="fm-chat-emotion-arrow"></div>
-                    </div>
-                    <div className={emoticonsPopupClasses}>
-                        <div className="fm-chat-arrow"></div>
-                        <div className="fm-chat-smile smile" data-text=":)" onClick={this.onEmoticonClicked}></div>
-                        <div className="fm-chat-smile wink" data-text=";)" onClick={this.onEmoticonClicked}></div>
-                        <div className="fm-chat-smile tongue" data-text=":P" onClick={this.onEmoticonClicked}></div>
-                        <div className="fm-chat-smile grin" data-text=":D" onClick={this.onEmoticonClicked}></div>
-                        <div className="fm-chat-smile confuse" data-text=":|" onClick={this.onEmoticonClicked}></div>
-                        <div className="fm-chat-smile grasp" data-text=":O" onClick={this.onEmoticonClicked}></div>
-                        <div className="fm-chat-smile sad" data-text=":(" onClick={this.onEmoticonClicked}></div>
-                        <div className="fm-chat-smile cry" data-text=";(" onClick={this.onEmoticonClicked}></div>
-                        <div className="fm-chat-smile angry" data-text="(angry)" onClick={this.onEmoticonClicked}></div>
-                        <div className="fm-chat-smile mega" data-text="(mega)" onClick={this.onEmoticonClicked}></div>
-                        <div className="clear"></div>
-                    </div>
-
-                    <div className="nw-chat-message-icon"></div>
-                    <div className="fm-chat-input-scroll">
-                        <div className="fm-chat-input-block">
-                            <textarea
-                                className={messageTextAreaClasses}
-                                placeholder="Write a message..."
-                                onKeyDown={self.onTypeAreaKeyDown}
-                                onBlur={self.onTypeAreaBlur}
-                                onChange={self.onTypeAreaChange}
-                                value={self.state.typedMessage}
-                                ref="typearea"
-                                disabled={room.pubCu25519KeyIsMissing === true ? true : false}
-                                readOnly={room.pubCu25519KeyIsMissing === true ? true : false}
-                                ></textarea>
-                        </div>
-                    </div>
-                    <div className="clear"></div>
-
                 </div>
             </div>
         );
     }
 });
-
 
 var ConversationPanels = React.createClass({
     mixins: [MegaRenderMixin, RenderDebugger],

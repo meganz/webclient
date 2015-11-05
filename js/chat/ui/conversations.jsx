@@ -32,14 +32,7 @@ var ConversationsListItem = React.createClass({
         //    this.props.chatRoom.isCurrentlyActive
         //);
 
-        var classString = "nw-conversations-item";
-
-        var unreadCount = this.props.chatRoom.messagesBuff.getUnreadCount();
-        if(unreadCount > 0) {
-            classString += " unread ";
-        }
-
-
+        var classString = "";
 
 
         var contactJid = this.props.chatRoom.getParticipantsExceptMe()[0];
@@ -59,23 +52,45 @@ var ConversationsListItem = React.createClass({
 
         // selected
         if(this.props.chatRoom.isCurrentlyActive) {
-            classString += " selected";
+            classString += " active";
         }
 
-        classString += " " + this.props.chatRoom.megaChat.xmppPresenceToCssClass(
+        var presenceClass = this.props.chatRoom.megaChat.xmppPresenceToCssClass(
             contact.presence
         );
 
-        return (
-            <div>
-                <div className={classString} id={id} data-room-jid={roomShortJid} data-jid={contactJid} onClick={this.props.onConversationClicked}>
-                    <div className="nw-contact-status"></div>
-                    <div className="nw-conversations-unread">{unreadCount}</div>
-                    <div className="nw-conversations-name">
-                        {this.props.chatRoom.getRoomTitle()}
+        var unreadCount = this.props.chatRoom.messagesBuff.getUnreadCount();
+        var unreadDiv = "";
+        var isUnread = false;
+        if(unreadCount > 0) {
+            unreadDiv = <div className="unread-messages">{unreadCount}</div>;
+            isUnread = true;
+        }
+
+        var lastMessageDiv = "";
+        var lastMessage = this.props.chatRoom.messagesBuff.getLatestTextMessage();
+        if(lastMessage) {
+            var lastMsgDivClasses = "conversation-message" + (isUnread ? " unread" : "");
+            lastMessageDiv =
+                <div>
+                    <div className={lastMsgDivClasses}>
+                        {lastMessage.textContents}
                     </div>
+                    <div className="date-time">{unixtimeToTimeString(lastMessage.delay)}</div>
+                </div>;
+        }
+
+        var avatarMeta = generateAvatarMeta(contact.u);
+
+        return (
+            <li className={classString} id={id} data-room-jid={roomShortJid} data-jid={contactJid} onClick={this.props.onConversationClicked}>
+                <div className="user-card-name conversation-name">
+                    {avatarMeta.fullName}
+                    <span className={"user-card-presence " + presenceClass}></span>
                 </div>
-            </div>
+                {unreadDiv}
+                {lastMessageDiv}
+            </li>
         );
     }
 });
@@ -193,63 +208,11 @@ var ConversationsList = React.createClass({
         });
 
 
-        var currentConversations = [(
-            <div key="headerConversations">
-                <div className={currentCallingHeaderClasses}>{__("CURRENT CALLING")}</div>
-                <div {...currentCallingContactStatusProps}  onClick={this.currentCallClicked}>
-                    <div className="nw-contact-status"></div>
-                    <div className="chat-cancel-icon" onClick={this.endCurrentCall}></div>
-                    <div className="chat-time-txt"></div>
-                    <div className="nw-conversations-name">{callName}</div>
-                </div>
-                {
-                    currConvsList.length > 0 ? (
-                        <div className="nw-tree-panel-header">
-                            <span>{__("Current Conversations")}</span>
-                            <div className="nw-tree-panel-arrows"></div>
-                        </div>
-                    ) : null
-                }
-            </div>
-        ), currConvsList];
-
-
-        // current contacts
-        var currentContacts = [(
-            <div className="nw-tree-panel-header" key="headerContacts">
-                <span>{__("Mega contacts")}</span>
-                <div className="nw-tree-panel-arrows"></div>
-            </div>
-        )];
-
-
-        this.props.contacts.forEach(((v, k) => {
-            var roomFound = megaChat.getPrivateRoom(k);
-
-            if(
-                k != u_handle &&
-                (
-                    roomFound === false ||
-                    roomFound.stateIsLeftOrLeaving() ||
-                    roomFound._leaving
-                ) &&
-                (v.c == 2 || v.c == 1)
-            ) {
-                currentContacts.push(
-                    <ContactsUI.ContactsListItem
-                        key={k}
-                        contact={v}
-                        megaChat={this.props.megaChat}
-                        onContactClicked={this.contactClicked.bind(this, v)}
-                    />
-                );
-            }
-        }).bind(this));
-
         return (
             <div className="conversationsList">
-                {currentConversations.length > 1 ? currentConversations : ""}
-                {currentContacts.length > 1 ? currentContacts : ""}
+                <ul className="conversations-pane">
+                    {currConvsList}
+                </ul>
             </div>
         );
     }
@@ -544,8 +507,8 @@ var ConversationsApp = React.createClass({
 
                     <div className="fm-left-menu conversations">
                         <div className="nw-fm-tree-header conversations">
-                            <input type="text" defaultValue={l[5902]} placeholder={l[5902]} />
-                            <div className="nw-fm-search-icon"></div>
+                            <span>{__("Chat")}</span>
+                            <div className="button"><i className="small-icon white-medium-plus"></i></div>
                         </div>
                     </div>
 
@@ -606,14 +569,10 @@ var ConversationsApp = React.createClass({
 
                     <ConversationsMainListing {...this.props} conversations={this.props.megaChat.chats} />
 
-                    <div className="fm-chat-block hidden">
-                            <ConversationPanelUI.ConversationPanels
-                                {...this.props}
-                                conversations={this.props.megaChat.chats}
-                                />
-                        </div>
-
-                        
+                    <ConversationPanelUI.ConversationPanels
+                        {...this.props}
+                        conversations={this.props.megaChat.chats}
+                        />
                         
                 </div>
             </div>

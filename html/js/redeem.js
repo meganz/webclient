@@ -19,12 +19,12 @@ var redeem = {
     init: function() {
         
         // Cache DOM reference for lookup in other functions
-        this.$dialog = $('.voucher-redeem-dialog');
-        this.$backgroundOverlay = $('.fm-dialog-overlay');
-        this.$successOverlay = $('.payment-result.success');
+        redeem.$dialog = $('.voucher-redeem-dialog');
+        redeem.$backgroundOverlay = $('.fm-dialog-overlay');
+        redeem.$successOverlay = $('.payment-result.success');
         
         // Init functions
-        this.addVoucher();
+        redeem.addVoucher();
     },
         
     /**
@@ -37,7 +37,7 @@ var redeem = {
         
         // No longer needed in localStorage
         localStorage.removeItem('voucher');
-                
+                        
         // Make API call to redeem voucher
         api_req({ a: 'uavr', v: redeem.voucherCode }, {
             callback: function(result) {
@@ -99,9 +99,6 @@ var redeem = {
         // Flag 'pro: 1' includes pro balance in the response
         api_req({ a: 'uq', pro: 1 }, {
             callback : function (result) {
-                
-                // Hide loading dialog
-                loadingDialog.hide();
                 
                 // If successful result
                 if (typeof result == 'object' && result.balance && result.balance[0]) {
@@ -242,13 +239,14 @@ var redeem = {
         redeem.$dialog.find('.pro-plan').text(proName);
         redeem.$dialog.find('.complete-upgrade-button').attr('data-plan-id', planId);
         
-        // Show the dialog
-        redeem.showBackgroundOverlay();
-        redeem.$dialog.removeClass('hidden');
-        
         // Button functionality
         redeem.initCloseButton();
         redeem.initUpgradeButton();
+        
+        // Show the dialog
+        loadingDialog.hide();
+        redeem.showBackgroundOverlay();
+        redeem.$dialog.removeClass('hidden');
     },
     
     /**

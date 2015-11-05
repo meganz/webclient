@@ -10,7 +10,7 @@ var pro_package,
     pro_do_next = null;
 
 function init_pro()
-{
+{    
     // Detect if there exists a verify get parameter
     var verifyUrlParam = proPage.getUrlParam("verify");
     if (typeof verifyUrlParam !== 'undefined')
@@ -1100,8 +1100,9 @@ var proPage = {
     }
 };
 
+
 /**
- * Code for the voucher dialog
+ * Code for the voucher dialog on the second step of the Pro page
  */
 var voucherDialog = {
     
@@ -1296,7 +1297,7 @@ var voucherDialog = {
                     // Not a valid voucher code
                     else if (result < 0) {
                         loadingDialog.hide();
-                        msgDialog('warninga', l[135], l[714], '', function() {
+                        msgDialog('warninga', l[135], l[473], '', function() {
                             voucherDialog.showBackgroundOverlay();
                         });
                     }

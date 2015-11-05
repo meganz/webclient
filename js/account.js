@@ -315,6 +315,20 @@ function setpwset(confstring, ctx) {
     }, ctx);
 }
 
+/**
+ *  checkMyPassword
+ *
+ *  Check if the password is the user's password without doing
+ *  any API call, it tries to decrypt the user's private key.
+ *
+ *  @return bool
+ */
+function checkMyPassword(password) {
+    var pwaes = new sjcl.cipher.aes(prepare_key_pw(password));
+
+    return decrypt_key(pwaes, base64_to_a32(u_attr.k)).join(",")  === u_k.join(",");
+}
+
 function changepw(currentpw, newpw, ctx) {
     var pw_aes = new sjcl.cipher.aes(prepare_key_pw(newpw));
 
@@ -671,6 +685,7 @@ function getUserAttribute(userhandle, attribute, pub, nonHistoric,
  */
 function setUserAttribute(attribute, value, pub, nonHistoric, callback, ctx,
                           mode) {
+    var logger = MegaLogger.getLogger('account');
     var myCtx = ctx || {};
 
     // Prepare all data needed for the call on the Mega API.
@@ -696,12 +711,12 @@ function setUserAttribute(attribute, value, pub, nonHistoric, callback, ctx,
 
     function settleFunction(res) {
         if (typeof res !== 'number') {
-            console.log('Setting user attribute "'
+            logger.info('Setting user attribute "'
                         + attribute + '", result: ' + res);
             thePromise.resolve(res);
         }
         else {
-            console.log('Error setting user attribute "'
+            logger.warn('Error setting user attribute "'
                         + attribute + '", result: ' + res + '!');
             thePromise.reject(res);
         }

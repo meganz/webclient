@@ -4385,8 +4385,14 @@ function gridUI() {
         $('.grid-url-header').text('');
     }
 
-    $('.files-grid-view,.fm-empty-cloud').unbind('contextmenu');
-    $('.files-grid-view,.fm-empty-cloud').bind('contextmenu', function(e) {
+    $('.fm .grid-table-header th').rebind('contextmenu', function(e) {
+        $('.file-block').removeClass('ui-selected');
+        $.selected = [];
+        $.hideTopMenu();
+        return !!contextMenuUI(e, 6);
+    });
+
+    $('.files-grid-view,.fm-empty-cloud').rebind('contextmenu', function(e) {
         $('.file-block').removeClass('ui-selected');
         $.selected = [];
         $.hideTopMenu();
@@ -4400,32 +4406,25 @@ function gridUI() {
         M.favourite(id, $('.grid-table.fm #' + id[0] + ' .grid-status-icon').hasClass('star'));
     });
 
-    $('.grid-table-header .arrow').unbind('click');
-    $('.grid-table-header .arrow').bind('click', function() {
+    $('.context-menu-item.do-sort').rebind('click', function() {
+        M.setLastColumn($(this).data('by'));
+        M.doSort($(this).data('by'), -1);
+        M.renderMain();
+    });
+
+    $('.grid-table-header .arrow').rebind('click', function() {
         var c = $(this).attr('class');
         var d = 1;
         if (c && c.indexOf('desc') > -1)
             d = -1;
-        if (c && c.indexOf('name') > -1)
-            M.doSort('name', d);
-        else if (c && c.indexOf('fav') > -1) {
-            M.doSort('fav', d);
-        } else if (c && c.indexOf('size') > -1)
-            M.doSort('size', d);
-        else if (c && c.indexOf('type') > -1)
-            M.doSort('type', d);
-        else if (c && c.indexOf('date') > -1)
-            M.doSort('date', d);
-        else if (c && c.indexOf('owner') > -1)
-            M.doSort('owner', d);
-        else if (c && c.indexOf('access') > -1)
-            M.doSort('access', d);
-        else if (c && c.indexOf('status') > -1)
-            M.doSort('status', d);
-        else if (c && c.indexOf('interaction') > -1)
-            M.doSort('interaction', d);
-        if (c)
-            M.renderMain();
+
+        for (var e in M.sortRules) {
+            if (c && c.indexOf(e) > -1) {
+                M.doSort(e, d);
+                M.renderMain();
+                break;
+            }
+        }
     });
 
     if (M.currentdirid === 'shares')
@@ -5934,6 +5933,10 @@ function contextMenuUI(e, ll) {
         for (var item in items) {
             $(menuCMI).filter('.' + item + '-item').show();
         }
+    }
+    else if (ll === 6) { // sort menu
+        $('.context-menu-item').hide();
+        $('.context-menu-item.do-sort').show();
     }
     else if (ll) {// Click on item
 

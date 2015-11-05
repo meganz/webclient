@@ -1312,7 +1312,21 @@ else if (!b_u)
     jsl.push({f:'html/top.html', n: 'top', j:0});
     jsl.push({f:'js/notify.js', n: 'notify_js', j:1});
     jsl.push({f:'js/vendor/popunda.js', n: 'popunda_js', j:1});
+
     jsl.push({f:'css/style.css', n: 'style_css', j:2,w:30,c:1,d:1,cache:1});
+    jsl.push({f:'css/user-card.css', n: 'style_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/avatars.css', n: 'style_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/icons.css', n: 'style_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/buttons.css', n: 'style_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/dropdowns.css', n: 'style_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/popups.css', n: 'style_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/chat-messages.css', n: 'style_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/chat-textarea.css', n: 'style_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/chat-typing.css', n: 'style_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/chat-left-pane.css', n: 'style_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/chat-feedback.css', n: 'style_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/chat-common.css', n: 'style_css', j:2,w:5,c:1,d:1,cache:1});
+
     jsl.push({f:'js/useravatar.js', n: 'contact_avatar_js', j:1,w:3});
     jsl.push({f:'js/vendor/avatar.js', n: 'avatar_js', j:1, w:3});
     jsl.push({f:'js/countries.js', n: 'countries_js', j:1});

@@ -2880,6 +2880,11 @@ function accountUI()
     if ($('.fmholder').hasClass('transfer-panel-opened')) {
         $.transferClose();
     }
+    if (typeof zxcvbn === 'undefined' && !silent_loading) {
+        silent_loading = accountUI;
+        jsl.push(jsl2['zxcvbn_js']);
+        return jsl_start();
+    }
     M.accountData(function(account)
     {
         var perc, warning, perc_c;
@@ -3491,6 +3496,7 @@ function accountUI()
             $('.fm-account-save-block').addClass('hidden');
             $('.fm-account-main').removeClass('save');
             initAccountScroll();
+            var pws = zxcvbn($('#account-new-password').val());
 
             if (M.account.dl_maxSlots)
             {
@@ -3545,9 +3551,18 @@ function accountUI()
                         $('#account-password').unbind('keyup.accpwd');
                     });
                 });
-            }
-            else if ($('#account-new-password').val() !== $('#account-confirm-password').val())
-            {
+            } else if (!checkMyPassword($('#account-password').val())) {
+                msgDialog('warninga', l[135], l[724], false, function() {
+                    $('#account-password').val('');
+                    $('#account-password').focus();
+                    $('#account-password').bind('keyup.accpwd', function() {
+                        $('.fm-account-save-block').removeClass('hidden');
+                        $('.fm-account-main').addClass('save');
+                        initAccountScroll();
+                        $('#account-password').unbind('keyup.accpwd');
+                    });
+                });
+            } else if ($('#account-new-password').val() !== $('#account-confirm-password').val()) {
                 msgDialog('warninga', 'Error', l[715], false, function()
                 {
                     $('#account-new-password').val('');
@@ -3555,7 +3570,13 @@ function accountUI()
                     $('#account-new-password').focus();
                 });
             }
-            else if ($('#account-confirm-password').val() !== '' && $('#account-password').val() !== ''
+            else if (pws.score === 0 || pws.entropy < 16) {
+                msgDialog('warninga', 'Error', l[1129], false, function() {
+                    $('#account-new-password').val('');
+                    $('#account-confirm-password').val('');
+                    $('#account-new-password').focus();
+                });
+            } else if ($('#account-confirm-password').val() !== '' && $('#account-password').val() !== ''
                 && $('#account-confirm-password').val() !== $('#account-password').val())
             {
                 loadingDialog.show();
@@ -4127,17 +4148,19 @@ function accountUI()
     $('#account-new-password').bind('keyup', function(el)
     {
         $('.account-pass-lines').attr('class', 'account-pass-lines');
-        if ($(this).val() !== '')
-        {
-            var pws = checkPassword($(this).val());
-            if (pws <= 25)
-                $('.account-pass-lines').addClass('good1');
-            else if (pws <= 50)
-                $('.account-pass-lines').addClass('good2');
-            else if (pws <= 75)
-                $('.account-pass-lines').addClass('good3');
-            else
+        if ($(this).val() !== '') {
+            var pws = zxcvbn($(this).val());
+            if (pws.score > 3 && pws.entropy > 75) {
                 $('.account-pass-lines').addClass('good4');
+            } else if (pws.score > 2 && pws.entropy > 50) {
+                $('.account-pass-lines').addClass('good3');
+            } else if (pws.score > 1 && pws.entropy > 40) {
+                $('.account-pass-lines').addClass('good2');
+            } else if (pws.score > 0 && pws.entropy > 15) {
+                $('.account-pass-lines').addClass('good1');
+            } else {
+                $('.account-pass-lines').addClass('weak-password');
+            }
         }
     });
 

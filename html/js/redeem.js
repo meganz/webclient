@@ -189,7 +189,7 @@ var voucherRedeemDialog = {
      */
     displayDialog: function() {
         
-        var balanceString = voucherRedeemDialog.accountBalance.toFixed(2);
+        var balance2dp = voucherRedeemDialog.accountBalance.toFixed(2);
         var planId = voucherRedeemDialog.bestPlan[0];
         var proNum = voucherRedeemDialog.bestPlan[1];
         var storage = voucherRedeemDialog.bestPlan[2];
@@ -210,11 +210,20 @@ var voucherRedeemDialog = {
         var bandwidthAmount = (bandwidth < 1024) ? bandwidth : (bandwidth / 1024);
         var storageUnit = (storage < 1024) ? 'GB' : 'TB';
         var bandwidthUnit = (bandwidth < 1024) ? 'GB' : 'TB';
-                            
+        
+        // Translations
+        var titleText = voucherRedeemDialog.$dialog.find('.title-text').html();
+            titleText = titleText.replace('%1', voucherRedeemDialog.voucherAmount);
+        var balanceText = voucherRedeemDialog.$dialog.find('.balance-text').html();
+            balanceText = balanceText.replace('%1', balance2dp);
+        var upgradeText = voucherRedeemDialog.$dialog.find('.complete-upgrade-text');
+            upgradeText = upgradeText.replace('%1', proName);
+            upgradeText = upgradeText.replace('[S]', '<span class="complete-text">').replace('[/S]', '</span>');
+        
         // Update information
         voucherRedeemDialog.$dialog.find('.reg-st3-membership-bl').removeClass('pro1 pro2 pro3 pro4');
         voucherRedeemDialog.$dialog.find('.reg-st3-membership-bl').addClass('pro' + proNum);
-        voucherRedeemDialog.$dialog.find('.title').html(proName);
+        voucherRedeemDialog.$dialog.find('.plan-name').html(proName);
         voucherRedeemDialog.$dialog.find('.price .dollars').text(planPriceDollars);
         voucherRedeemDialog.$dialog.find('.price .cents').text('.' + planPriceCents);
         voucherRedeemDialog.$dialog.find('.price .period').text('/' + monthOrYearText);
@@ -222,8 +231,9 @@ var voucherRedeemDialog = {
         voucherRedeemDialog.$dialog.find('.reg-st3-storage .quota-unit').text(storageUnit);
         voucherRedeemDialog.$dialog.find('.reg-st3-bandwidth .quota-amount').text(bandwidthAmount);
         voucherRedeemDialog.$dialog.find('.reg-st3-bandwidth .quota-unit').text(bandwidthUnit);
-        voucherRedeemDialog.$dialog.find('.balance').text(balanceString);
-        voucherRedeemDialog.$dialog.find('.voucher-amount').text(voucherRedeemDialog.voucherAmount);
+        voucherRedeemDialog.$dialog.find('.title-text').html(titleText);
+        voucherRedeemDialog.$dialog.find('.balance-text').html(balanceText);
+        voucherRedeemDialog.$dialog.find('.complete-upgrade-text').html(upgradeText);
         voucherRedeemDialog.$dialog.find('.pro-plan').text(proName);
         voucherRedeemDialog.$dialog.find('.complete-upgrade-button').attr('data-plan-id', planId);
         

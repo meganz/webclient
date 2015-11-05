@@ -23955,6 +23955,9 @@ a.voucher-reseller-link {
 .voucher-redeem-dialog .membership-pad-bl {
     height: 255px;
 }
+.voucher-redeem-dialog .reg-st3-bott-title .period {
+    font-weight: bold;
+}
 
 .payment-animation-pad {
 	width: 100%;

@@ -764,7 +764,7 @@ function init_page() {
         
         // If not logged in, direct them to login or register first
         if (!u_type) {
-            login_txt = 'Please log in or register to redeem your voucher.';
+            login_txt = l[7712];
             document.location.hash = 'login';
             return false;
         }

@@ -2745,8 +2745,20 @@
     "7694": "T\u1ec7p tin n\u00e0y c\u1ea7n ph\u1ea3i x\u00f3a b\u1ecf v\u00ec x\u00e1c \u0111\u1ecbnh l\u00e0 vi ph\u1ea1m b\u1ea3n quy\u1ec1n.",
     "7695": "Th\u01b0 m\u1ee5c n\u00e0y c\u1ea7n ph\u1ea3i x\u00f3a b\u1ecf v\u00ec x\u00e1c \u0111\u1ecbnh l\u00e0 vi ph\u1ea1m b\u1ea3n quy\u1ec1n.",
     "7696": "Th\u00f4ng b\u00e1o m\u1edbi v\u1ec1 lu\u1eadt b\u1ea3n quy\u1ec1n",
+    "7697": "E-mail change requires confirmation",
+    "7698": "You have successfully changed your profile.",
+    "7699": "Awaiting e-mail confirmation.",
+    "7700": "Please go to your inbox and click the link to confirm your new e-mail address.",
+    "7701": "Congratulations, your new e-mail address for this MEGA account is: [X]",
     "7702": "One or more items have been subjected to a takedown notice.",
     "7703": "One or more items have been the subject of a takedown notice.",
     "7704": "This file has been the subject of a takedown notice.",
-    "7705": "This folder has been the subject of a takedown notice."
+    "7705": "This folder has been the subject of a takedown notice.",
+    "7706": "Your MEGA voucher for %1 &euro; was redeemed successfully",
+    "7707": "Your balance is now %1 &euro;.",
+    "7708": "We suggest the %1 plan based on your account balance.",
+    "7709": "Click [S]COMPLETE UPGRADE[\/S] and enjoy your new %1 plan.",
+    "7710": "COMPLETE UPGRADE",
+    "7711": "Choose other plan",
+    "7712": "Please log in or register to redeem your voucher."
 }

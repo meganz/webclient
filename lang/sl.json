@@ -2745,8 +2745,20 @@
     "7694": "Ta datoteka je bila odstranjena zaradi zahteve po odstranitvi.",
     "7695": "Ta mapa je bila odstranjena zaradi zahteve po odstranitvi.",
     "7696": "Opozorilo o avtorskih pravicah za vse uporabnike",
+    "7697": "E-mail change requires confirmation",
+    "7698": "You have successfully changed your profile.",
+    "7699": "Awaiting e-mail confirmation.",
+    "7700": "Please go to your inbox and click the link to confirm your new e-mail address.",
+    "7701": "Congratulations, your new e-mail address for this MEGA account is: [X]",
     "7702": "En ali ve\u010d predmetov so bili podvr\u017eeni zahtevi za odstranitev.",
     "7703": "One or more items have been the subject of a takedown notice.",
     "7704": "This file has been the subject of a takedown notice.",
-    "7705": "This folder has been the subject of a takedown notice."
+    "7705": "This folder has been the subject of a takedown notice.",
+    "7706": "Your MEGA voucher for %1 &euro; was redeemed successfully",
+    "7707": "Your balance is now %1 &euro;.",
+    "7708": "We suggest the %1 plan based on your account balance.",
+    "7709": "Click [S]COMPLETE UPGRADE[\/S] and enjoy your new %1 plan.",
+    "7710": "COMPLETE UPGRADE",
+    "7711": "Choose other plan",
+    "7712": "Please log in or register to redeem your voucher."
 }

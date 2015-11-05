@@ -10983,6 +10983,26 @@
         "text": "Copyright warning to all users",
         "context": "A title for the Copyright Warning dialog. Designed to make the user feel as though this is not targeting them, but is a warning for everybody who uses our service."
     },
+    "7697": {
+        "text": "E-mail change requires confirmation",
+        "context": "Notification that the user should confirm their email address after changing it."
+    },
+    "7698": {
+        "text": "You have successfully changed your profile.",
+        "context": "Success message when changing profile information."
+    },
+    "7699": {
+        "text": "Awaiting e-mail confirmation.",
+        "context": "Message shown when changing email address. User should confirm the new email address via a link in their email account."
+    },
+    "7700": {
+        "text": "Please go to your inbox and click the link to confirm your new e-mail address.",
+        "context": "Message with instructions after changing e-mail address. The user should check their e-mail and click the link to confirm the new email address."
+    },
+    "7701": {
+        "text": "Congratulations, your new e-mail address for this MEGA account is: [X]",
+        "context": "The [X] will be replaced with the e-mail address."
+    },
     "7702": {
         "text": "One or more items have been subjected to a takedown notice.",
         "context": "Toast notification text when info\/property dialog is shown for taken down item(s). The user has clicked on a file or folder and wants to view its information, and because it has been taken down the user sees this message in a toast notification."
@@ -10998,5 +11018,33 @@
     "7705": {
         "text": "This folder has been the subject of a takedown notice.",
         "context": "Popup notification text on mouse-over taken down folder."
+    },
+    "7706": {
+        "text": "Your MEGA voucher for %1 &euro; was redeemed successfully",
+        "context": "Title for the redeem voucher dialog. The %1 will be replaced with a number e.g. 4.99 or 9.99 so please do not remove it. Do not remove the &euro; symbol either."
+    },
+    "7707": {
+        "text": "Your balance is now %1 &euro;.",
+        "context": "Text on the redeem voucher dialog explaining what the user's account balance is. The %1 will be replaced with a number e.g. 9.99 so please do not remove it. Do not remove the &euro; symbol either."
+    },
+    "7708": {
+        "text": "We suggest the %1 plan based on your account balance.",
+        "context": "Text on the voucher redeem dialog. This suggests which plan the user should purchase based on their current account balance. The %1 will be replaced with the name of the Pro plan e.g. PRO II or PRO III so please do not remove it."
+    },
+    "7709": {
+        "text": "Click [S]COMPLETE UPGRADE[\/S] and enjoy your new %1 plan.",
+        "context": "Text on the voucher redeem dialog. This tells the user to click the COMPLETE UPGRADE button which will upgrade their account to the recommended Pro plan. Do not remove the [S] or [\/S] tags which will be replaced with stylized content. \r\nDo however translate the words \"COMPLETE UPGRADE\". \r\nThe %1 will be replaced with the name of the Pro plan e.g. PRO II or PRO III so please do not remove it either."
+    },
+    "7710": {
+        "text": "COMPLETE UPGRADE",
+        "context": "Button text on the voucher redeem dialog. This will complete their account upgrade to the recommended Pro plan.\r\nThis is capitalised on purpose."
+    },
+    "7711": {
+        "text": "Choose other plan",
+        "context": "Button text on the voucher redeem dialog. This will let the user choose a different Pro plan from the one that was recommended."
+    },
+    "7712": {
+        "text": "Please log in or register to redeem your voucher.",
+        "context": "Text on the Login page telling the user they need to log in or register first to be able to redeem their voucher."
     }
 }

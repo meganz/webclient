@@ -3967,16 +3967,21 @@ function accountUI()
                     status = l[491] + ' ' + time2date(el.revoked);
                 else if (el.cancelled > 0)
                     status = l[492] + ' ' + time2date(el.cancelled);
-                html += '<tr><td>' + time2date(el.date) + '</td><td class="selectable">' + htmlentities(el.code) + '</td><td>&euro; ' + htmlentities(el.amount) + '</td><td>' + status + '</td></tr>';
+                
+                var voucherLink = 'https://mega.nz/#voucher' + htmlentities(el.code);
+                    voucherLink = '<a href="' + voucherLink + '">' + voucherLink + '</a>';
+                
+                html += '<tr><td>' + time2date(el.date) + '</td><td class="selectable">' + voucherLink + '</td><td>&euro; ' + htmlentities(el.amount) + '</td><td>' + status + '</td></tr>';
             });
             $('.grid-table.vouchers').html(html);
             $('.fm-account-select.vouchertype select option').remove();
             var prices = [];
-            for (var i in M.account.prices)
+            for (var i in M.account.prices) {
                 prices.push(M.account.prices[i][0]);
+            }
             prices.sort(function(a, b) {
-                return (a - b)
-            })
+                return (a - b);
+            });
             var voucheroptions = '<option value="">' + escapeHTML(l[6875]) + '</option>';
             for (var i in prices)
                 voucheroptions += '<option value="' + htmlentities(prices[i]) + '">&euro;' + htmlentities(prices[i]) + ' voucher</option>';

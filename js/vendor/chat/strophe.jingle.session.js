@@ -538,7 +538,7 @@ sendAnswer: function (cb, provisional) {
         function (e) {
             self.reportError('createAnswer() returned error', {e: e});
         },
-        self.media_constraints
+        self.media_constraints //TODO: Firefox seems to not like when remote doesn't send anything and we set here OfferToReceiveXXX
     );
 },
 

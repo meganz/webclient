@@ -11,9 +11,9 @@
  *
  * 2^^53 <= N <= 2^53
  *
- * Int64 objects wrap a node Uint8Array that holds the 8-bytes of int64 data.  These
+ * Int64 objects wrap a node Buffer that holds the 8-bytes of int64 data.  These
  * objects operate directly on the buffer which means that if they are created
- * using an existing buffer then setting the value will modify the Uint8Array, and
+ * using an existing buffer then setting the value will modify the Buffer, and
  * vice-versa.
  *
  * Internal Representation
@@ -27,6 +27,18 @@
  * http://en.wikipedia.org/wiki/Double_precision_floating-point_format
  */
 
+;(function (root, factory) {
+    if (typeof define === "function" && define.amd) {
+        define(factory);
+    }
+    else if (typeof module !== 'undefined' && module.exports) {
+        module.exports = factory();
+    }
+    else {
+        root.Int64 = factory();
+    }
+}(this, function() {
+
 // Useful masks and values for bit twiddling
 var MASK31 =  0x7fffffff, VAL31 = 0x80000000;
 var MASK32 =  0xffffffff, VAL32 = 0x100000000;
@@ -37,6 +49,8 @@ for (var i = 0; i < 256; i++) {
   _HEX[i] = (i > 0xF ? '' : '0') + i.toString(16);
 }
 
+var hasBuffer = typeof Buffer !== 'undefined';
+
 //
 // Int64
 //
@@ -44,17 +58,26 @@ for (var i = 0; i < 256; i++) {
 /**
  * Constructor accepts any of the following argument types:
  *
- * new Int64(buffer[, offset=0]) - Existing Uint8Array with byte offset
+ * new Int64(buffer[, offset=0]) - Existing Buffer with byte offset
+ * new Int64(Uint8Array[, offset=0]) - Existing Uint8Array with a byte offset
  * new Int64(string)             - Hex string (throws if n is outside int64 range)
  * new Int64(number)             - Number (throws if n is outside int64 range)
  * new Int64(hi, lo)             - Raw bits as two 32-bit values
  */
 var Int64 = function(a1, a2) {
-  if (a1 instanceof Uint8Array) {
+  var asIs = hasBuffer ? (a1 instanceof Buffer) : (a1 instanceof Uint8Array);
+  if (asIs) {
     this.buffer = a1;
     this.offset = a2 || 0;
+  } else if (Object.prototype.toString.call(a1) == '[object Uint8Array]') {
+    // Under Browserify, Buffers can extend Uint8Arrays rather than an
+    // instance of Buffer. We could assume the passed in Uint8Array is actually
+    // a buffer but that won't handle the case where a raw Uint8Array is passed
+    // in. We construct a new Buffer just in case.
+    this.buffer = new Buffer(a1);
+    this.offset = a2 || 0;
   } else {
-    this.buffer = this.buffer || new Uint8Array(8);
+    this.buffer = this.buffer || (hasBuffer ? new Buffer(8) : new Uint8Array(8));
     this.offset = 0;
     this.setValue.apply(this, arguments);
   }
@@ -68,6 +91,9 @@ Int64.MAX_INT = Math.pow(2, 53);
 Int64.MIN_INT = -Math.pow(2, 53);
 
 Int64.prototype = {
+
+  constructor: Int64,
+
   /**
    * Do in-place 2's compliment.  See
    * http://en.wikipedia.org/wiki/Two's_complement
@@ -140,7 +166,7 @@ Int64.prototype = {
     var b = this.buffer, o = this.offset;
 
     // Running sum of octets, doing a 2's complement
-    var negate = b[0] & 0x80, x = 0, carry = 1;
+    var negate = b[o] & 0x80, x = 0, carry = 1;
     for (var i = 7, m = 1; i >= 0; i--, m *= 256) {
       var v = b[o+i];
 
@@ -194,9 +220,67 @@ Int64.prototype = {
   },
 
   /**
+   * Returns the int64's 8 bytes in a buffer.
+   *
+   * @param {bool} [rawBuffer=false]  If no offset and this is true, return the internal buffer.  Should only be used if
+   *                                  you're discarding the Int64 afterwards, as it breaks encapsulation.
+   */
+  toBuffer: function(rawBuffer) {
+    if (rawBuffer && this.offset === 0) return this.buffer;
+
+    var out = new Buffer(8);
+    this.buffer.copy(out, 0, this.offset, this.offset + 8);
+    return out;
+  },
+
+  /**
+   * Copy 8 bytes of int64 into target buffer at target offset.
+   *
+   * @param {Buffer} targetBuffer       Buffer to copy into.
+   * @param {number} [targetOffset=0]   Offset into target buffer.
+   */
+  copy: function(targetBuffer, targetOffset) {
+    this.buffer.copy(targetBuffer, targetOffset || 0, this.offset, this.offset + 8);
+  },
+
+  /**
+   * Returns a number indicating whether this comes before or after or is the
+   * same as the other in sort order.
+   *
+   * @param {Int64} other  Other Int64 to compare.
+   */
+  compare: function(other) {
+
+    // If sign bits differ ...
+    if ((this.buffer[this.offset] & 0x80) != (other.buffer[other.offset] & 0x80)) {
+      return other.buffer[other.offset] - this.buffer[this.offset];
+    }
+
+    // otherwise, compare bytes lexicographically
+    for (var i = 0; i < 8; i++) {
+      if (this.buffer[this.offset+i] !== other.buffer[other.offset+i]) {
+        return this.buffer[this.offset+i] - other.buffer[other.offset+i];
+      }
+    }
+    return 0;
+  },
+
+  /**
+   * Returns a boolean indicating if this integer is equal to other.
+   *
+   * @param {Int64} other  Other Int64 to compare.
+   */
+  equals: function(other) {
+    return this.compare(other) === 0;
+  },
+
+  /**
    * Pretty output in console.log
    */
   inspect: function() {
     return '[Int64 value:' + this + ' octets:' + this.toOctetString(' ') + ']';
   }
 };
+
+return Int64;
+}));

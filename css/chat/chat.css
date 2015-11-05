@@ -232,7 +232,9 @@
 .small-icon.play-icon {
 	background-position: -3px -736px;
 }
-
+.small-icon.search-icon {
+    background-position: -5px -1287px;
+}
 .dropdown-item .small-icon.grey-cloud {
     background-position: -3px -579px;
 }
@@ -514,7 +516,6 @@
 }
 .dropdown.body.wide-dropdown {
 	min-width:234px;
-	margin: -2px -11px 0 -11px;
 }
 .dropdown.body div {
 	position: relative;
@@ -938,6 +939,47 @@
 
 
 
+/* Popups component */
+.popup.dropdown.body {
+	padding: 0;
+}
+.popup.dropdown.body.contacts-search {
+	width: 360px;
+	padding:0 0 7px 0;
+}
+.contacts-search-header {
+	text-align:center;
+	line-height: 48px;
+	height: 48px;
+	font-size: 14px;
+	color: #666666;
+}
+.contacts-search-header i {
+	vertical-align:middle;
+	margin: 0 7px 1px 0;
+}
+.contacts-search-scroll {
+	max-height: 288px;
+	overflow: hidden;
+}
+.contacts-info.body.contacts-search {
+	height: 48px;
+	cursor: pointer;
+}
+.contacts-info.body.contacts-search:nth-child(odd) {
+	background-color:#fafafa;
+}
+.contacts-search .user-card-presence {
+	margin: 14px 10px 0 14px;
+}
+.contacts-search .user-card-presence {
+	margin: 14px 10px 0 14px;
+}
+.contacts-search .user-card-data {
+	padding: 0 30px 0 79px;
+}
+/* End of Popups component */
+
 
 
 /* Common */
@@ -986,6 +1028,9 @@
 	padding: 6px 0;
 	position:relative;
 	clear: both;
+	-webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
 }
 .contacts-info .tiny-button {
 	margin-top: 10px;
@@ -1001,7 +1046,7 @@
 	margin: 25px 23px 0 23px;
 }
 .chat-right-area .dropdown.body {
-	margin: 0 -11px 0 -11px;
+	margin: -2px -11px 0 -11px;
 	    padding: 8px 0;
 }
 .chat-right-area .dropdown-item {

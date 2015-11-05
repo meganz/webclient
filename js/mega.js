@@ -123,6 +123,14 @@ function MegaData()
         this.sort();
     };
 
+    this.sortByModTime = function(d) {
+        this.sortfn = function(a, b, d) {
+            return (a.mtime < b.mtime) ? -1 * d : d;
+        };
+        this.sortd = d;
+        this.sort();
+    };
+
     this.sortByDateTime = function(d)
     {
         this.sortfn = function(a, b, d)
@@ -266,40 +274,67 @@ function MegaData()
         this.sort();
     };
 
+    this.sortRules = {
+        'name': this.sortByName.bind(this),
+        'size': this.sortBySize.bind(this),
+        'type': this.sortByType.bind(this),
+        'date': this.sortByDateTime.bind(this),
+        'ts': this.sortByDateTime.bind(this),
+        'owner': this.sortByOwner.bind(this),
+        'modified': this.sortByModTime.bind(this),
+        'mtime': this.sortByModTime.bind(this),
+        'interaction': this.sortByInteraction.bind(this),
+        'access': this.sortByAccess.bind(this),
+        'status': this.sortByStatus.bind(this),
+        'fav': this.sortByFav.bind(this),
+    };
+
+    this.setLastColumn = function(col) {
+        switch (col) {
+        case 'ts':
+        case 'mtime':
+            // It's valid
+            break;
+        default:
+            // Default value
+            col = "ts";
+            break;
+        }
+
+        if (col === this.lastColumn) {
+            return;
+        }
+        
+        this.lastColumn = col;
+        localStorage._lastColumn = this.lastColumn;
+
+        if ($('.do-sort[data-by="' + col + '"]').length > 0) {
+            // swap the column label
+            $('.context-menu-item.do-sort').removeClass('selected');
+            $('.grid-url-header').prev().find('div')
+                .removeClass().addClass('arrow ' + col)
+                .text($('.do-sort[data-by="' + col + '"]').text());
+            $('.do-sort[data-by="' + col + '"]').addClass('selected');
+        }
+
+    };
+
+    this.lastColumn = null;
+
     this.doSort = function(n, d) {
         $('.grid-table-header .arrow').removeClass('asc desc');
+
         if (d > 0) {
             $('.arrow.' + n).addClass('desc');
         } else {
             $('.arrow.' + n).addClass('asc');
         }
-        if (n === 'name') {
-            M.sortByName(d);
+
+
+        if (!M.sortRules[n]) {
+            throw new Error("Cannot sort by " + n);
         }
-        else if (n === 'size') {
-            M.sortBySize(d);
-        }
-        else if (n === 'type') {
-            M.sortByType(d);
-        }
-        else if (n === 'date') {
-            M.sortByDateTime(d);
-        }
-        else if (n === 'owner') {
-            M.sortByOwner(d);
-        }
-        else if (n === 'access') {
-            M.sortByAccess(d);
-        }
-        else if (n === 'interaction') {
-            M.sortByInteraction(d);
-        }
-        else if (n === 'status') {
-            M.sortByStatus(d);
-        }
-    else if (n === 'fav') {
-            M.sortByFav(d);
-        }
+        M.sortRules[n](d);
 
         M.sortingBy = [n, d];
 
@@ -1059,7 +1094,11 @@ function MegaData()
 
                     // List view
                     else {
-                        time = time2date(M.v[i].ts || (M.v[i].p === 'contacts' && M.contactstatus(M.v[i].h).ts));
+                        if (M.lastColumn && M.v[i].p !== "contacts") {
+                            time = time2date(M.v[i][M.lastColumn] || M.v[i].ts);
+                        } else {
+                            time = time2date(M.v[i].ts || (M.v[i].p === 'contacts' && M.contactstatus(M.v[i].h).ts));
+                        }
                         t = '.grid-table.fm';
                         el = 'tr';
                         html = '<tr id="' + htmlentities(M.v[i].h) + '" class="' + c + ' ' + takenDown +  '">\n\
@@ -1186,6 +1225,7 @@ function MegaData()
 
         delete this.cRenderMainN;
 
+
         if (this.currentdirid === 'opc') {
             DEBUG('RenderMain() opc');
             this.drawSentContactRequests(this.v, 'clearGrid');
@@ -1198,6 +1238,7 @@ function MegaData()
             renderContactsLayout(u);
         }
         else {
+            M.setLastColumn(localStorage._lastColumn);
             renderLayout(u, n_cache);
         }
 

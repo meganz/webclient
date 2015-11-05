@@ -254,7 +254,6 @@ function treeredraw()
 }
 
 function treePanelType() {
-
     return $.trim($('.nw-fm-left-icon.active').attr('class').replace(/(active|nw-fm-left-icon|ui-droppable)/g, ''));
 }
 
@@ -290,7 +289,6 @@ function treePanelSortElements(type, elements, handlers, ifEq) {
         if (d == 0 && ifEq) {
             return ifEq(a, b);
         }
-
         return d * settings.dir;
     });
 }
@@ -2882,6 +2880,11 @@ function accountUI()
     if ($('.fmholder').hasClass('transfer-panel-opened')) {
         $.transferClose();
     }
+    if (typeof zxcvbn === 'undefined' && !silent_loading) {
+        silent_loading = accountUI;
+        jsl.push(jsl2['zxcvbn_js']);
+        return jsl_start();
+    }
     M.accountData(function(account)
     {
         var perc, warning, perc_c;
@@ -3493,6 +3496,7 @@ function accountUI()
             $('.fm-account-save-block').addClass('hidden');
             $('.fm-account-main').removeClass('save');
             initAccountScroll();
+            var pws = zxcvbn($('#account-new-password').val());
 
             if (M.account.dl_maxSlots)
             {
@@ -3547,9 +3551,18 @@ function accountUI()
                         $('#account-password').unbind('keyup.accpwd');
                     });
                 });
-            }
-            else if ($('#account-new-password').val() !== $('#account-confirm-password').val())
-            {
+            } else if (!checkMyPassword($('#account-password').val())) {
+                msgDialog('warninga', l[135], l[724], false, function() {
+                    $('#account-password').val('');
+                    $('#account-password').focus();
+                    $('#account-password').bind('keyup.accpwd', function() {
+                        $('.fm-account-save-block').removeClass('hidden');
+                        $('.fm-account-main').addClass('save');
+                        initAccountScroll();
+                        $('#account-password').unbind('keyup.accpwd');
+                    });
+                });
+            } else if ($('#account-new-password').val() !== $('#account-confirm-password').val()) {
                 msgDialog('warninga', 'Error', l[715], false, function()
                 {
                     $('#account-new-password').val('');
@@ -3557,7 +3570,13 @@ function accountUI()
                     $('#account-new-password').focus();
                 });
             }
-            else if ($('#account-confirm-password').val() !== '' && $('#account-password').val() !== ''
+            else if (pws.score === 0 || pws.entropy < 16) {
+                msgDialog('warninga', 'Error', l[1129], false, function() {
+                    $('#account-new-password').val('');
+                    $('#account-confirm-password').val('');
+                    $('#account-new-password').focus();
+                });
+            } else if ($('#account-confirm-password').val() !== '' && $('#account-password').val() !== ''
                 && $('#account-confirm-password').val() !== $('#account-password').val())
             {
                 loadingDialog.show();
@@ -3969,16 +3988,21 @@ function accountUI()
                     status = l[491] + ' ' + time2date(el.revoked);
                 else if (el.cancelled > 0)
                     status = l[492] + ' ' + time2date(el.cancelled);
-                html += '<tr><td>' + time2date(el.date) + '</td><td class="selectable">' + htmlentities(el.code) + '</td><td>&euro; ' + htmlentities(el.amount) + '</td><td>' + status + '</td></tr>';
+                
+                var voucherLink = 'https://mega.nz/#voucher' + htmlentities(el.code);
+                    voucherLink = '<a href="' + voucherLink + '">' + voucherLink + '</a>';
+                
+                html += '<tr><td>' + time2date(el.date) + '</td><td class="selectable">' + voucherLink + '</td><td>&euro; ' + htmlentities(el.amount) + '</td><td>' + status + '</td></tr>';
             });
             $('.grid-table.vouchers').html(html);
             $('.fm-account-select.vouchertype select option').remove();
             var prices = [];
-            for (var i in M.account.prices)
+            for (var i in M.account.prices) {
                 prices.push(M.account.prices[i][0]);
+            }
             prices.sort(function(a, b) {
-                return (a - b)
-            })
+                return (a - b);
+            });
             var voucheroptions = '<option value="">' + escapeHTML(l[6875]) + '</option>';
             for (var i in prices)
                 voucheroptions += '<option value="' + htmlentities(prices[i]) + '">&euro;' + htmlentities(prices[i]) + ' voucher</option>';
@@ -4124,17 +4148,19 @@ function accountUI()
     $('#account-new-password').bind('keyup', function(el)
     {
         $('.account-pass-lines').attr('class', 'account-pass-lines');
-        if ($(this).val() !== '')
-        {
-            var pws = checkPassword($(this).val());
-            if (pws <= 25)
-                $('.account-pass-lines').addClass('good1');
-            else if (pws <= 50)
-                $('.account-pass-lines').addClass('good2');
-            else if (pws <= 75)
-                $('.account-pass-lines').addClass('good3');
-            else
+        if ($(this).val() !== '') {
+            var pws = zxcvbn($(this).val());
+            if (pws.score > 3 && pws.entropy > 75) {
                 $('.account-pass-lines').addClass('good4');
+            } else if (pws.score > 2 && pws.entropy > 50) {
+                $('.account-pass-lines').addClass('good3');
+            } else if (pws.score > 1 && pws.entropy > 40) {
+                $('.account-pass-lines').addClass('good2');
+            } else if (pws.score > 0 && pws.entropy > 15) {
+                $('.account-pass-lines').addClass('good1');
+            } else {
+                $('.account-pass-lines').addClass('weak-password');
+            }
         }
     });
 
@@ -4383,8 +4409,14 @@ function gridUI() {
         $('.grid-url-header').text('');
     }
 
-    $('.files-grid-view,.fm-empty-cloud').unbind('contextmenu');
-    $('.files-grid-view,.fm-empty-cloud').bind('contextmenu', function(e) {
+    $('.fm .grid-table-header th').rebind('contextmenu', function(e) {
+        $('.file-block').removeClass('ui-selected');
+        $.selected = [];
+        $.hideTopMenu();
+        return !!contextMenuUI(e, 6);
+    });
+
+    $('.files-grid-view,.fm-empty-cloud').rebind('contextmenu', function(e) {
         $('.file-block').removeClass('ui-selected');
         $.selected = [];
         $.hideTopMenu();
@@ -4398,32 +4430,25 @@ function gridUI() {
         M.favourite(id, $('.grid-table.fm #' + id[0] + ' .grid-status-icon').hasClass('star'));
     });
 
-    $('.grid-table-header .arrow').unbind('click');
-    $('.grid-table-header .arrow').bind('click', function() {
+    $('.context-menu-item.do-sort').rebind('click', function() {
+        M.setLastColumn($(this).data('by'));
+        M.doSort($(this).data('by'), -1);
+        M.renderMain();
+    });
+
+    $('.grid-table-header .arrow').rebind('click', function() {
         var c = $(this).attr('class');
         var d = 1;
         if (c && c.indexOf('desc') > -1)
             d = -1;
-        if (c && c.indexOf('name') > -1)
-            M.doSort('name', d);
-        else if (c && c.indexOf('fav') > -1) {
-            M.doSort('fav', d);
-        } else if (c && c.indexOf('size') > -1)
-            M.doSort('size', d);
-        else if (c && c.indexOf('type') > -1)
-            M.doSort('type', d);
-        else if (c && c.indexOf('date') > -1)
-            M.doSort('date', d);
-        else if (c && c.indexOf('owner') > -1)
-            M.doSort('owner', d);
-        else if (c && c.indexOf('access') > -1)
-            M.doSort('access', d);
-        else if (c && c.indexOf('status') > -1)
-            M.doSort('status', d);
-        else if (c && c.indexOf('interaction') > -1)
-            M.doSort('interaction', d);
-        if (c)
-            M.renderMain();
+
+        for (var e in M.sortRules) {
+            if (c && c.indexOf(e) > -1) {
+                M.doSort(e, d);
+                M.renderMain();
+                break;
+            }
+        }
     });
 
     if (M.currentdirid === 'shares')
@@ -5939,6 +5964,10 @@ function contextMenuUI(e, ll) {
         for (var item in items) {
             $(menuCMI).filter('.' + item + '-item').show();
         }
+    }
+    else if (ll === 6) { // sort menu
+        $('.context-menu-item').hide();
+        $('.context-menu-item.do-sort').show();
     }
     else if (ll) {// Click on item
 
@@ -7586,6 +7615,7 @@ function initShareDialogMultiInputPlugin() {
  */
 function initCopyrightsDialog(nodesToProcess) {
 
+    $.itemExport = nodesToProcess;
     // If they've already agreed to the copyright warning this session
     if (localStorage.getItem('agreedToCopyrightWarning') !== null) {
         
@@ -8788,7 +8818,7 @@ function itemExportLink() {
     var node,
         html = '';
 
-    $.each($.selected, function(index, value) {
+    $.each($.itemExport, function(index, value) {
         node = M.d[value];
         if (node && node.ph) {
             html += itemExportLinkHtml(node);
@@ -9656,9 +9686,7 @@ function slideshow(id, close)
             ephemeralDialog(l[1005]);
         }
         else {
-            fm_showoverlay();
             initCopyrightsDialog([slideshowid]);
-            $('.copyrights-dialog').show();
         }
     });
 
@@ -10154,6 +10182,41 @@ function userFingerprint(userid, next) {
     });
 }
 
+/**
+ * Get and display the fingerprint
+ * @param {Object} user The user object e.g. same as M.u[userHandle]
+ */
+function showAuthenticityCredentials(user) {
+
+    var $fingerprintContainer = $('.contact-fingerprint-txt');
+    
+    // Compute the fingerprint
+    userFingerprint(user, function(fingerprints) {
+        
+        // Clear old values immediately
+        $fingerprintContainer.empty();
+        
+        // Render the fingerprint into 10 groups of 4 hex digits
+        $.each(fingerprints, function(key, value) {
+            $('<span>').text(value).appendTo(
+                $fingerprintContainer.filter(key <= 4 ? ':first' : ':last')
+            );
+        });
+    });
+}
+
+/**
+ * Enables the Verify button
+ * @param {String} userHandle The user handle
+ */
+function enableVerifyFingerprintsButton(userHandle) {
+    $('.fm-verify').removeClass('verified');
+    $('.fm-verify').find('span').text(l[1960] + '...');
+    $('.fm-verify').rebind('click', function() {
+        fingerprintDialog(userHandle);
+    });
+}
+
 function fingerprintDialog(userid) {
 
     // Add log to see how often they open the verify dialog
@@ -10212,9 +10275,15 @@ function fingerprintDialog(userid) {
         // Add log to see how often they verify the fingerprints
         api_req({ a: 'log', e: 99602, m: 'Fingerprint verification approved' });
 
+        // Generate fingerprint
         userFingerprint(user, function(fprint, fprintraw) {
+            
+            // Authenticate the contact
             authring.setContactAuthenticated(userid, fprintraw, 'Ed25519', authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON);
-            $('.fm-verify').unbind('click').find('span').text('Verified');
+            
+            // Change button state to 'Verified'
+            $('.fm-verify').unbind('click').addClass('verified').find('span').text(l[6776]);
+            
             closeFngrPrntDialog();
         });
     });
@@ -10266,33 +10335,8 @@ function contactUI() {
             contextMenuUI(e, 4);
         });
 
-        /**
-         * Get and display the fingerprint
-         */
-        var showAuthenticityCredentials = function() {
-            var fprint = $('.contact-fingerprint-txt').empty();
-            userFingerprint(user, function (fprints) {
-                $.each(fprints, function (k, value) {
-                    $('<span>').text(value).appendTo(
-                        fprint.filter(k <= 4 ? ':first' : ':last')
-                    );
-                });
-            });
-        };
-
-        /**
-         * Enables the Verify button
-         */
-        var enableVerifyFingerprintsButton = function() {
-            $('.fm-verify').removeClass('disabled');
-            $('.fm-verify').find('span').text(l[1960] + '...');
-            $('.fm-verify').rebind('click', function() {
-                fingerprintDialog(user);
-            });
-        };
-
         // Display the current fingerpring
-        showAuthenticityCredentials();
+        showAuthenticityCredentials(user);
 
         // Set authentication state of contact from authring.
         var authringPromise = new MegaPromise();
@@ -10306,18 +10350,20 @@ function contactUI() {
         }
         /** To be called on settled authring promise. */
         var _setVerifiedState = function() {
+            
             var handle = user.u || user;
             var verificationState = u_authring.Ed25519[handle] || {};
             var isVerified = (verificationState.method
                               >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON);
+            
+            // Show the user is verified
             if (isVerified) {
-                // Show the user is verified.
-                $('.fm-verify').addClass('disabled');
+                $('.fm-verify').addClass('verified');
                 $('.fm-verify').find('span').text(l[6776]);
             }
             else {
-                // Otherwise show the Verify button.
-                enableVerifyFingerprintsButton();
+                // Otherwise show the Verify... button.
+                enableVerifyFingerprintsButton(handle);
             }
         };
         authringPromise.done(_setVerifiedState);
@@ -10325,10 +10371,10 @@ function contactUI() {
         // Reset seen or verified fingerprints and re-enable the Verify button
         $('.fm-reset-stored-fingerprint').rebind('click', function() {
             authring.resetFingerprintsForUser(user.u);
-            enableVerifyFingerprintsButton();
+            enableVerifyFingerprintsButton(user.u);
 
             // Refetch the key
-            showAuthenticityCredentials();
+            showAuthenticityCredentials(user);
         });
 
         if (!megaChatIsDisabled) {

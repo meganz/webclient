@@ -23,7 +23,7 @@
             'focusable': true,
             'closable': false,
             'expandable': true,
-            'requiresOverlay': false,
+            'requiresOverlay': true,
 
             /**
              * css class names
@@ -42,6 +42,7 @@
                     'className': "fm-dialog-button-red",
                     'callback': function() {
                         this.hide();
+                        this._hideOverlay();
                     }
                 }
             ]

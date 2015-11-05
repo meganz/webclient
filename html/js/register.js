@@ -404,10 +404,6 @@ function init_register() {
 }
 
 
-
-
-
-
 function registerpwcheck() {
     $('.login-register-input.password').removeClass('weak-password strong-password');
     $('.new-registration').removeClass('good1 good2 good3 good4 good5');
@@ -456,74 +452,4 @@ function register_signup(email) {
     document.getElementById('register_email').value = email;
     document.getElementById('register_email').readOnly = true;
     document.getElementById('register_password_confirm_div').style.display = '';
-}
-
-function checkPassword(strPassword) {
-    /* jshint -W074 */
-    var m_strUpperCase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    var m_strLowerCase = "abcdefghijklmnopqrstuvwxyz";
-    var m_strNumber = "0123456789";
-    var m_strCharacters = "!@#$%^&*?_~";
-    var nScore = 0;
-    nScore += countDif(strPassword) * 2;
-    var extra = countDif(strPassword) * strPassword.length / 3;
-    if (extra > 25) {
-        extra = 25;
-    }
-    nScore += extra;
-    var nUpperCount = countContain(strPassword, m_strUpperCase);
-    var nLowerCount = countContain(strPassword, m_strLowerCase);
-    var nLowerUpperCount = nUpperCount + nLowerCount;
-    if (nUpperCount === 0 && nLowerCount !== 0) {
-        nScore += 10;
-    }
-    else if (nUpperCount !== 0 && nLowerCount !== 0) {
-        nScore += 10;
-    }
-    var nNumberCount = countContain(strPassword, m_strNumber);
-    if (nNumberCount === 1) {
-        nScore += 10;
-    }
-    if (nNumberCount >= 3) {
-        nScore += 15;
-    }
-    var nCharacterCount = countContain(strPassword, m_strCharacters);
-    if (nCharacterCount === 1) {
-        nScore += 10;
-    }
-    if (nCharacterCount > 1) {
-        nScore += 10;
-    }
-    if (nNumberCount !== 0 && nLowerUpperCount !== 0) {
-        nScore += 2;
-    }
-    if (nNumberCount !== 0 && nLowerUpperCount !== 0 && nCharacterCount !== 0) {
-        nScore += 3;
-    }
-    if (nNumberCount !== 0 && nUpperCount !== 0 && nLowerCount !== 0 && nCharacterCount !== 0) {
-        nScore += 5;
-    }
-    return nScore;
-}
-
-function countContain(strPassword, strCheck) {
-    var nCount = 0;
-    for (i = 0; i < strPassword.length; i++) {
-        if (strCheck.indexOf(strPassword.charAt(i)) > -1) {
-            nCount++;
-        }
-    }
-    return nCount;
-}
-
-function countDif(strPassword) {
-    var chararr = [];
-    var nCount = 0;
-    for (i = 0; i < strPassword.length; i++) {
-        if (!chararr[strPassword.charAt(i)]) {
-            chararr[strPassword.charAt(i)] = true;
-            nCount++;
-        }
-    }
-    return nCount;
 }

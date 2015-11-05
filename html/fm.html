@@ -15,6 +15,10 @@
 </div>
 <div class="context-menu files-menu hidden">
     <div class="context-menu-section">
+        <a class="context-menu-item do-sort" data-by="ts"><span class="context-menu-icon"></span>Date Created</a>
+        <a class="context-menu-item do-sort" data-by="mtime"><span class="context-menu-icon"></span>Date Modified</a>
+    </div>
+    <div class="context-menu-section">
         <a class="context-menu-item preview-item"><span class="context-menu-icon"></span>[$1899]</a>
         <a class="context-menu-item open-item"><span class="context-menu-icon"></span>[$865]</a>
         <a class="context-menu-item properties-item"><span class="context-menu-icon"></span>[$6859]</a>
@@ -198,11 +202,13 @@
 
             <!--Sorting menu for each section. !-->
             <div class="nw-sorting-menu hidden">
-                <div class="context-menu-section">
+                <div class="context-menu-section sort-by">
                     <div class="sorting-menu-arrow"></div>
                     <div data-by="name" class="sorting-menu-item active">[$86]</div>
                     <div data-by="status" class="sorting-menu-item">[$89]</div>
+                    <div data-by="created" class="sorting-menu-item">[$896]</div>
                     <div data-by="last-interaction" class="sorting-menu-item">[$5904]</div>
+                    <div data-by="fav" class="sorting-menu-item">[$5871]</div>
                     <div class="sorting-item-divider"></div>
                 </div>
                 <div class="context-menu-section">

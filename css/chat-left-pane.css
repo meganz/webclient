@@ -1,0 +1,76 @@
+.conversations-pane {
+	margin:0;
+	padding:0;
+	list-style-type: none;
+}
+.conversations-pane li {
+	padding:8px 12px;
+	display:block;
+	height: 72px;
+	-webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+	cursor: pointer;
+}
+.user-card-name.conversation-name {
+	padding: 0 26px 0 0;
+	display: inline-block;
+}
+.conversation-name .user-card-presence {
+	margin: 6px 0 0 0;
+	position:absolute;
+	right: 8px;
+}
+.conversation-message {
+	font-size: 13px;
+	line-height: 21px;
+	color:#777777;
+	-o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    margin: 0 50px 0 0;
+}
+.conversation-message.unread {
+	color:#2BA6DE;
+}
+.conversations-pane li.active {
+	background-color:#65bbe2;
+}
+.conversations-pane li.active .user-card-name {
+	color: white;
+}
+.conversations-pane li.active .conversation-message {
+	color: rgba(255,255,255,0.8);
+}
+.conversations-pane li.active .date-time {
+	color: rgba(255,255,255,0.6);
+}
+.conversations-pane li.active .user-card-presence {
+	background-color: white;
+	border-color: white;
+}
+.unread-messages, .call-duration {
+	position: absolute;
+    right: 12px;
+    text-align: center;
+    min-width: 18px;
+    height: 16px;
+    font-size: 11px;
+    line-height: 16px;
+    padding: 0 6px;
+    background-color: #2BA6DE;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    color: white;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    margin: 2px 0 0 0;
+}
+.call-duration {
+	background-color: white;
+	text-align:left;
+	color: #2BA6DE;
+	padding: 0 6px 0 5px;
+}

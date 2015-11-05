@@ -254,7 +254,6 @@ function treeredraw()
 }
 
 function treePanelType() {
-
     return $.trim($('.nw-fm-left-icon.active').attr('class').replace(/(active|nw-fm-left-icon|ui-droppable)/g, ''));
 }
 
@@ -290,7 +289,6 @@ function treePanelSortElements(type, elements, handlers, ifEq) {
         if (d == 0 && ifEq) {
             return ifEq(a, b);
         }
-
         return d * settings.dir;
     });
 }

@@ -2744,5 +2744,21 @@
     "7693": "Use the Verify button below to confirm the credentials for this contact.",
     "7694": "\u8be5\u6587\u4ef6\u88ab\u901a\u77e5\u5220\u9664.",
     "7695": "\u8be5\u6587\u4ef6\u5939\u88ab\u901a\u77e5\u5220\u9664.",
-    "7696": "\u81f4\u6240\u6709\u4f7f\u7528\u8005\u7684\u8457\u4f5c\u6743\u8b66\u544a"
+    "7696": "\u81f4\u6240\u6709\u4f7f\u7528\u8005\u7684\u8457\u4f5c\u6743\u8b66\u544a",
+    "7697": "E-mail change requires confirmation",
+    "7698": "You have successfully changed your profile.",
+    "7699": "Awaiting e-mail confirmation.",
+    "7700": "Please go to your inbox and click the link to confirm your new e-mail address.",
+    "7701": "Congratulations, your new e-mail address for this MEGA account is: [X]",
+    "7702": "One or more items have been subjected to a takedown notice.",
+    "7703": "One or more items have been the subject of a takedown notice.",
+    "7704": "This file has been the subject of a takedown notice.",
+    "7705": "This folder has been the subject of a takedown notice.",
+    "7706": "Your MEGA voucher for %1 &euro; was redeemed successfully",
+    "7707": "Your balance is now %1 &euro;.",
+    "7708": "We suggest the %1 plan based on your account balance.",
+    "7709": "Click [S]COMPLETE UPGRADE[\/S] and enjoy your new %1 plan.",
+    "7710": "COMPLETE UPGRADE",
+    "7711": "Choose other plan",
+    "7712": "Please log in or register to redeem your voucher."
 }

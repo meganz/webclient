@@ -24631,11 +24631,11 @@ body.pro:after {
 	display: block;
 }
 .toast-notification {
-	width: 480px;
+	width: 500px;
 	position: absolute;
 	bottom: 8px;
 	left: 50%;
-	margin: 0 0 -48px -240px;
+	margin: 0 0 -48px -250px;
 	background-color: #777777;
 	-moz-border-radius: 8px;
 	-webkit-border-radius: 8px;
@@ -24654,7 +24654,7 @@ body.pro:after {
 	-ms-transition: all 500ms ease-in-out;
 	transition: all 500ms ease-in-out;
 	cursor: default;
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	-moz-opacity: 0;
 	-khtml-opacity: 0;
 	opacity: 0;

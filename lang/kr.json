@@ -2744,5 +2744,21 @@
     "7693": "\uc774 \uc5f0\ub77d\ucc98\uc5d0 \ub300\ud55c \uc790\uaca9\uc99d\uba85\uc744 \uc778\uc99d\ud558\ub824\uba74 \uc544\ub798 \uc778\uc99d \ubc84\ud2bc\uc744 \uc774\uc6a9\ud558\uc138\uc694.",
     "7694": "\uc774 \ud30c\uc77c\uc740 \uac8c\uc2dc\uc911\ub2e8 \uc694\uccad\ub418\uc5c8\uc2b5\ub2c8\ub2e4.",
     "7695": "\uc774 \ud3f4\ub354\ub294 \uac8c\uc2dc\uc911\ub2e8 \uc694\uccad\ub418\uc5c8\uc2b5\ub2c8\ub2e4.",
-    "7696": "\ubaa8\ub4e0 \uc0ac\uc6a9\uc790\uc5d0\uac8c \uc800\uc791\uad8c \uacbd\uace0"
+    "7696": "\ubaa8\ub4e0 \uc0ac\uc6a9\uc790\uc5d0\uac8c \uc800\uc791\uad8c \uacbd\uace0",
+    "7697": "E-mail change requires confirmation",
+    "7698": "You have successfully changed your profile.",
+    "7699": "Awaiting e-mail confirmation.",
+    "7700": "Please go to your inbox and click the link to confirm your new e-mail address.",
+    "7701": "Congratulations, your new e-mail address for this MEGA account is: [X]",
+    "7702": "One or more items have been subjected to a takedown notice.",
+    "7703": "One or more items have been the subject of a takedown notice.",
+    "7704": "This file has been the subject of a takedown notice.",
+    "7705": "This folder has been the subject of a takedown notice.",
+    "7706": "Your MEGA voucher for %1 &euro; was redeemed successfully",
+    "7707": "Your balance is now %1 &euro;.",
+    "7708": "We suggest the %1 plan based on your account balance.",
+    "7709": "Click [S]COMPLETE UPGRADE[\/S] and enjoy your new %1 plan.",
+    "7710": "COMPLETE UPGRADE",
+    "7711": "Choose other plan",
+    "7712": "Please log in or register to redeem your voucher."
 }

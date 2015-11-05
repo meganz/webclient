@@ -2538,7 +2538,11 @@ function initContextUI() {
     });
 
     $(c + '.add-star-item').rebind('click', function() {
-        M.favourite($.selected, $.delfav);
+
+        var delFavourite = M.isFavourite($.selected);
+
+        M.favourite($.selected, delFavourite);
+
         if (M.viewmode) {
             $('.file-block').removeClass('ui-selected');
         }
@@ -5802,7 +5806,7 @@ function getDDhelper()
 
 function menuItems() {
 
-    var selItem,
+    var selItem, favourite, node,
         items = [],
         sourceRoot = RootbyId($.selected[0]);
 
@@ -5811,22 +5815,15 @@ function menuItems() {
     }
 
     if (RightsbyID($.selected[0]) > 0) {
+
         items['add-star'] = 1;
-        $.delfav = 1;
 
-        for (var i in $.selected) {
-            var n = M.d[$.selected[i]];
-            if (n && !n.fav) {
-                $.delfav = 0;
-                break;
-            }
-        }
-
-        if ($.delfav) {
+        if (M.isFavourite($.selected)) {
             $('.add-star-item').html('<span class="context-menu-icon"></span>' + l[5872]);
         }
         else {
             $('.add-star-item').html('<span class="context-menu-icon"/></span>' + l[5871]);
+
         }
     }
 
@@ -7589,11 +7586,11 @@ function initCopyrightsDialog(nodesToProcess) {
 
     // If they've already agreed to the copyright warning this session
     if (localStorage.getItem('agreedToCopyrightWarning') !== null) {
-        
+
         // Go straight to Get Link dialog
         var exportLink = new mega.Share.ExportLink({ 'showExportLinkDialog': true, 'updateUI': true, 'nodesToProcess': nodesToProcess });
         exportLink.getExportLink();
-        
+
         return false;
     }
 
@@ -7604,10 +7601,10 @@ function initCopyrightsDialog(nodesToProcess) {
     fm_showoverlay();
     $.copyrightsDialog = 'copyrights';
     $copyrightDialog.show();
-    
+
     // Init click handler for 'I agree' / 'I disagree' buttons
     $copyrightDialog.find('.fm-dialog-button').rebind('click', function() {
-        
+
         // User disagrees with copyright warning
         if ($(this).hasClass('cancel')) {
             closeDialog();
@@ -7615,14 +7612,14 @@ function initCopyrightsDialog(nodesToProcess) {
         else {
             // User agrees, store flag in localStorage so they don't see it again for this session
             localStorage.setItem('agreedToCopyrightWarning', '1');
-            
+
             // Go straight to Get Link dialog
             closeDialog();
             var exportLink = new mega.Share.ExportLink({ 'showExportLinkDialog': true, 'updateUI': true, 'nodesToProcess': nodesToProcess });
             exportLink.getExportLink();
         }
     });
-    
+
     // Init click handler for 'Close' button
     $copyrightDialog.find('.fm-dialog-close').rebind('click', function() {
         closeDialog();
@@ -9119,7 +9116,17 @@ function propertiesDialog(close)
     }
     $.propertiesDialog = $.dialog = 'properties';
     fm_showoverlay();
-    pd.removeClass('hidden multiple folders-only two-elements shared shared-with-me read-only read-and-write full-access');
+
+    pd.removeClass('hidden multiple folders-only two-elements shared shared-with-me');
+    pd.removeClass('read-only read-and-write full-access taken-down');
+
+    var exportLink = new mega.Share.ExportLink({});
+    var isTakenDown = exportLink.isTakenDown($.selected);
+    if (isTakenDown) {
+        pd.addClass('taken-down');
+        showToast('clipboard', l[7703]);
+    }
+
     $('.properties-elements-counter span').text('');
     $('.fm-dialog.properties-dialog .properties-body').rebind('click', function()
     {
@@ -10162,13 +10169,13 @@ function userFingerprint(userid, next) {
 function showAuthenticityCredentials(user) {
 
     var $fingerprintContainer = $('.contact-fingerprint-txt');
-    
+
     // Compute the fingerprint
     userFingerprint(user, function(fingerprints) {
-        
+
         // Clear old values immediately
         $fingerprintContainer.empty();
-        
+
         // Render the fingerprint into 10 groups of 4 hex digits
         $.each(fingerprints, function(key, value) {
             $('<span>').text(value).appendTo(
@@ -10250,13 +10257,13 @@ function fingerprintDialog(userid) {
 
         // Generate fingerprint
         userFingerprint(user, function(fprint, fprintraw) {
-            
+
             // Authenticate the contact
             authring.setContactAuthenticated(userid, fprintraw, 'Ed25519', authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON);
-            
+
             // Change button state to 'Verified'
             $('.fm-verify').unbind('click').addClass('verified').find('span').text(l[6776]);
-            
+
             closeFngrPrntDialog();
         });
     });
@@ -10323,12 +10330,12 @@ function contactUI() {
         }
         /** To be called on settled authring promise. */
         var _setVerifiedState = function() {
-            
+
             var handle = user.u || user;
             var verificationState = u_authring.Ed25519[handle] || {};
             var isVerified = (verificationState.method
                               >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON);
-            
+
             // Show the user is verified
             if (isVerified) {
                 $('.fm-verify').addClass('verified');

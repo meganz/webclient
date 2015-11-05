@@ -211,13 +211,18 @@ var voucherRedeemDialog = {
         var storageUnit = (storage < 1024) ? 'GB' : 'TB';
         var bandwidthUnit = (bandwidth < 1024) ? 'GB' : 'TB';
         
-        // Translations
+        // "Your MEGA voucher for 4.99 &euro; was redeemed successfully"
         var titleText = voucherRedeemDialog.$dialog.find('.title-text').html();
             titleText = titleText.replace('%1', voucherRedeemDialog.voucherAmount);
+            
+        // "Your balance is now 18.00 &euro;."
         var balanceText = voucherRedeemDialog.$dialog.find('.balance-text').html();
             balanceText = balanceText.replace('%1', balance2dp);
-        var upgradeText = voucherRedeemDialog.$dialog.find('.complete-upgrade-text');
-            upgradeText = upgradeText.replace('%1', proName);
+            
+        // "We suggest the PRO Lite plan based on your account balance."
+        // "Click COMPLETE UPGRADE and enjoy your new PRO Lite plan."
+        var upgradeText = voucherRedeemDialog.$dialog.find('.complete-upgrade-text').html();
+            upgradeText = upgradeText.replace(/%1/g, proName);
             upgradeText = upgradeText.replace('[S]', '<span class="complete-text">').replace('[/S]', '</span>');
         
         // Update information
@@ -346,6 +351,8 @@ var voucherRedeemDialog = {
         // Get the selected Pro plan details
         var proNum = voucherRedeemDialog.bestPlan[1];
         var proPlan = getProPlan(proNum);
+        
+        // "You successfully upgraded your account to PRO Lite."
         var successMessage = l[6962].replace('%1', '<span>' + proPlan + '</span>');
         
         // Show the success

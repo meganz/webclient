@@ -5558,6 +5558,67 @@ function fm_getcopynodes(cn, t)
 
 function createFolder(toid, name, ulparams) {
 
+    var resolve = function(folderHandle) {
+        if (ulparams) {
+            if (ulparams instanceof MegaPromise) {
+                ulparams.resolve(folderHandle);
+            }
+            else {
+                ulparams.callback(ulparams, folderHandle);
+            }
+        }
+        return ulparams;
+    };
+
+    var reject = function(error) {
+        if (ulparams instanceof MegaPromise) {
+            ulparams.reject(error);
+        }
+        else {
+            msgDialog('warninga', l[135], l[47], api_strerror(error));
+        }
+    };
+
+    toid = toid || M.RootID;
+
+    if (Array.isArray(name)) {
+        name = name.map(String.trim).filter(String).slice(0);
+
+        if (!name.length) {
+            name = undefined;
+        }
+        else {
+            var stub = function(target, folderName) {
+                createFolder(target, folderName, new MegaPromise())
+                    .done(function(folderHandle) {
+                        if (!name.length) {
+                            resolve(folderHandle);
+                        }
+                        else {
+                            stub(folderHandle, name.shift());
+                        }
+                    })
+                    .fail(function(error) {
+                        reject(error);
+                    });
+            };
+            stub(toid, name.shift());
+            return ulparams;
+        }
+    }
+
+    if (!name) {
+        return resolve(toid);
+    }
+
+    if (M.c[toid]) {
+        for (var n in M.c[toid]) {
+            if (M.d[n] && M.d[n].t && M.d[n].name === name) {
+                return resolve(M.d[n].h);
+            }
+        }
+    }
+
     var mkat = enc_attr({n: name}, []),
         attr = ab_to_base64(mkat[0]),
         key = a32_to_base64(encrypt_key(u_k_aes, mkat[1])),
@@ -5586,16 +5647,16 @@ function createFolder(toid, name, ulparams) {
                 refreshDialogContent();
                 loadingDialog.hide();
 
-                if (ctx.ulparams) {
-                    ulparams.callback(ctx.ulparams, res.f[0].h);
-                }
+                resolve(res.f[0].h);
             }
             else {
                 loadingDialog.hide();
-                msgDialog('warninga', l[135], l[47], api_strerror(res));
+                reject(res);
             }
         }
     });
+
+    return ulparams;
 }
 
 function getuid(email) {
@@ -6400,20 +6461,7 @@ function fmviewmode(id, e)
 
 function fm_requestfolderid(h, name, ulparams)
 {
-    if (!h)
-        h = M.RootID;
-    if (M.c[h])
-    {
-        for (var n in M.c[h])
-        {
-            if (M.d[n] && M.d[n].t && M.d[n].name == name)
-            {
-                ulparams.callback(ulparams, M.d[n].h);
-                return true;
-            }
-        }
-    }
-    createFolder(h, name, ulparams);
+    return createFolder(h, name, ulparams);
 }
 
 var isNativeObject = function(obj) {

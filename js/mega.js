@@ -3360,7 +3360,16 @@ function MegaData()
                 shareDialog();
             }
             if (typeof mDB === 'object' && !pfkey) {
-                mDBadd('ok', { h: h, k: a32_to_base64(encrypt_key(u_k_aes, u_sharekeys[h])), ha: crypto_handleauth(h) });
+                if (!u_sharekeys[h]) {
+                    console.error('INVALID OPERATION -- No share key for handle "%s"', h);
+                }
+                else {
+                    mDBadd('ok', {
+                        h: h,
+                        k: a32_to_base64(encrypt_key(u_k_aes, u_sharekeys[h])),
+                        ha: crypto_handleauth(h)
+                    });
+                }
             }
         }
         else if (d) {

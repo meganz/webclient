@@ -23959,6 +23959,77 @@ a.voucher-reseller-link {
  color: #E5E5E5;
 }
 /* end of CC payment dialog */
+
+/* Voucher direct redeem dialog */
+.voucher-redeem-dialog .account-information {
+    left: 50%;
+    margin: -145px 0 0 -393px;
+    position: absolute;
+    text-align: left;
+    top: 50%;
+    z-index: 2200;
+}
+.voucher-redeem-dialog .left-information {
+    float: left;
+    padding-right: 50px;
+    padding-top: 20px;
+}
+.voucher-redeem-dialog .right-information {
+    color: #fff;
+    float: left;
+    width: 500px;
+}
+.voucher-redeem-dialog .title-text {
+    font-size: 24px;
+    line-height: 36px;
+    max-width: 400px;
+}
+.voucher-redeem-dialog .balance-text {
+    color: #ccc;
+    font-size: 14px;
+    letter-spacing: 0.2px;
+    margin-top: 40px;
+}
+.voucher-redeem-dialog .complete-upgrade-text {
+    color: #ccc;
+    font-size: 14px;
+    letter-spacing: 0.2px;
+    line-height: 20px;
+    margin-top: 20px;
+}
+.voucher-redeem-dialog .complete-text {
+    color: rgba(19, 224, 60, 1);
+}
+.voucher-redeem-dialog .click-here-text {
+    font-weight: bold;
+}
+.voucher-redeem-dialog .buttons {
+    margin-top: 50px;
+}
+.voucher-redeem-dialog .complete-upgrade-button {
+    text-align: center;
+}
+.voucher-redeem-dialog .choose-plan-button {
+    border: 2px solid #ccc;
+    color: #ccc;
+    margin-left: 10px;
+    min-width: initial;
+    padding: 0 30px;
+    text-align: center;
+    text-transform: none;
+}
+.voucher-redeem-dialog .choose-plan-button:hover {
+    background-color: #ccc;
+    border-color: #ccc;
+    color: #2e2e2e;
+}
+.voucher-redeem-dialog .membership-pad-bl {
+    height: 255px;
+}
+.voucher-redeem-dialog .reg-st3-bott-title .period {
+    font-weight: bold;
+}
+
 .payment-animation-pad {
 	width: 100%;
 	position: absolute;
@@ -24019,7 +24090,7 @@ a.voucher-reseller-link {
 	width: 150px;
 	margin-bottom: 43px;
 }
-.payment-result-button, .feedback-result-button {
+.payment-result-button, .feedback-result-button, .complete-upgrade-button, .choose-plan-button {
 	display: inline-block;
 	min-width: 240px;
 	font-size: 16px;
@@ -24042,7 +24113,7 @@ a.voucher-reseller-link {
 	cursor: pointer;
 	text-transform: uppercase;
 }
-.payment-result-button:hover, .feedback-result-button:hover {
+.payment-result-button:hover, .feedback-result-button:hover, .complete-upgrade-button:hover, .choose-plan-button:hover {
 	color: #2e2e2e;
 	background-color: rgba(19,224,60,1);
 	border-color: rgba(19,224,60,1);

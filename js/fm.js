@@ -3975,7 +3975,7 @@ function accountUI()
 
         if (M.account.reseller)
         {
-            $('.fm-account-reseller-button').removeClass('hidden');
+            $('.fm-account-button.reseller').removeClass('hidden');
             $('.account-history-dropdown-button.vouchers').text(l['466a'].replace('[X]', $.voucherlimit));
             $('.account-history-drop-items.voucher10-').text(l['466a'].replace('[X]', 10));
             $('.account-history-drop-items.voucher100-').text(l['466a'].replace('[X]', 100));

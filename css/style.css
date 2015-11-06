@@ -5494,7 +5494,7 @@ th.grid-first-th {
 .grid-table tr:nth-child(odd) td, .fm-account-main .grid-table tr:nth-child(even) td, .grid-share-table tr:nth-child(odd) td, .contacts-grid-table tr:nth-child(odd) td, .transfer-table tr:nth-child(odd) td, .contact-requests-grid tr:nth-child(odd) td, .sent-requests-grid tr:nth-child(odd) td {
 	background-color: rgba(250,250,250,1);
 }
-.fm-account-main .grid-table tr:nth-child(odd) td {
+.fm-account-main .grid-table tr:nth-child(odd) td, .fm-account-main .grid-table {
 	background-color: white;
 }
 .grid-table tr:hover td, .grid-share-table tr:hover td, .contacts-grid-table tr:hover td, .grid-table tr:hover:nth-child(odd) td, .grid-share-table tr:hover:nth-child(odd) td, .contacts-grid-table tr:hover:nth-child(odd) td, .transfer-table tr:hover:nth-child(odd) td, .transfer-table tr:hover td, .contact-requests-grid tr:hover td, .sent-requests-grid tr:hover td {
@@ -10549,12 +10549,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	float: left;
 	margin-left: -4px;
 }
-.fm-close-all-sessions {
-	cursor: pointer;
-	display: inline-block;
-	margin: 8px 0 0 0;
-	float: none;
-}
 .fm-dialog-button.links-button {
 	position: relative;
 }
@@ -13155,8 +13149,8 @@ table {
 .account-checkboxes-pad {
 	padding-bottom: 10px;
 }
-.fm-account-history .grid-table tr th:first-child, .fm-account-history .grid-table tr td:first-child {
-	padding-left: 24px;
+.fm-account-main .grid-table tr th:first-child, .fm-account-main .grid-table tr td:first-child {
+	padding-left: 20px;
 }
 .fm-account-history hr {
 	height: 28px;
@@ -13211,22 +13205,13 @@ table {
 	padding-left: 5px;
 	padding-right: 5px;
 }
-.grid-table.sessions th.no-border {
-	background: none;
-}
-.fm-account-history .grey-bar {
-	background-color: #eeeeee;
-	border: 0 none;
-	clear: both;
-	margin: 0;
-	min-height: 28px;
-	overflow: auto;
-	text-align: right;
-}
 .fm-close-all-sessions {
+	cursor: pointer;
+	display: inline-block;
 	height: 32px;
-	margin: 9px 19px;
-	text-align: left;
+    margin: 9px 16px;
+    text-align: left;
+	float: none;
 }
 .fm-close-all-sessions span {
 	background: rgba(255, 255, 255, 1) url("../images/mega/nw-fm-sprite_v12.svg") no-repeat scroll -9px -5466px;
@@ -13241,6 +13226,18 @@ table {
 }
 .settings-logout:hover {
 	background-color: #999999;
+}
+.grid-table.sessions th.no-border {
+	background: none;
+}
+.fm-account-history .grey-bar {
+	background-color: #eeeeee;
+	border: 0 none;
+	clear: both;
+	margin: 0;
+	min-height: 28px;
+	overflow: auto;
+	text-align: right;
 }
 .account-history-drop-items {
 	line-height: 30px;

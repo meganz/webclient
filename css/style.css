@@ -26676,3 +26676,18 @@ body, body * {
 .blog-new-full ul li {
 	padding: 0 0 0px 15px;
 }
+
+.avatar-wrapper.verified.square div.verified_icon {
+    right: 0px;
+    top: 0px;
+}
+
+.avatar-wrapper.verified div.verified_icon {
+    background-image: url(../images/verified.svg);
+    width: 14px;
+    height: 14px;
+    position: absolute;
+    right: -4px;
+    top: -4px;
+    float: right;
+}

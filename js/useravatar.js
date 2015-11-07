@@ -95,6 +95,7 @@ var useravatar = (function() {
         }
         _watching[id][className] = true;
         return '<' + element + ' class="avatar-wrapper ' + className + ' ' + id +  ' color' + s.colorIndex + '">'
+                    + '<div class="verified_icon"></div>'
                     + s.letters
                 + '</' + element + '>';
     };
@@ -108,9 +109,51 @@ var useravatar = (function() {
      */
     var _image = function(url, id, className, type) {
         return '<' + type + ' class="avatar-wrapper ' + id + ' ' + className + '">'
+                + '<div class="verified_icon"></div>'
                 + '<img src="' + url + '">'
          + '</' + type + '>';
     };
+
+    function emailAvatar(user, className, element) {
+        // User is an email, we should look if the user
+        // exists, if it does exists we use the user Object.
+        for (var u in M.u) {
+            if (M.u[u].m === user) {
+                // found the user object
+                return ns.contact(M.u[u], className, element);
+            }
+        }
+        return _letters(user.substr(0, 2), user, className, element);
+    }
+
+    var authringPromise;
+
+    function isUserVerified(user) {
+        if (!authringPromise) {
+            authringPromise = new MegaPromise();
+            if (u_authring.Ed25519) {
+                authringPromise.resolve();
+            } else {
+                // First load the authentication system.
+                var authSystemPromise = authring.initAuthenticationSystem();
+                authringPromise.linkDoneAndFailTo(authSystemPromise);
+            }
+        }
+
+        function isUserVerified() {
+            var verificationState = u_authring.Ed25519[user.h] || {};
+            var isVerified = (verificationState.method
+                              >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON);
+            if (isVerified) {
+                $('.avatar-wrapper.' + user.h).addClass('verified');
+            }
+        }
+
+        Later(function() {
+            authringPromise.done(isUserVerified);
+        });
+    }
+
 
     /**
      *  Check if the input is an email address or not.
@@ -174,19 +217,6 @@ var useravatar = (function() {
         }
     };
 
-    function emailAvatar(user, className, element)
-    {
-        // User is an email, we should look if the user
-        // exists, if it does exists we use the user Object.
-        for (var u in M.u) {
-            if (M.u[u].m === user) {
-                // found the user object
-                return ns.contact(M.u[u], className, element);
-            }
-        }
-        return _letters(user.substr(0, 2), user, className, element);
-    }
-
     ns.contact = function(user, className, element) {
         
         if (!className) {
@@ -209,6 +239,8 @@ var useravatar = (function() {
         if (typeof user !== "object" || !(user||{}).u) {
             return "";
         }
+
+        isUserVerified(user);
 
         if (avatars[user.u]) {
             return _image(avatars[user.u].url, user.u, className, element);

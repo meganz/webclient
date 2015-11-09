@@ -11046,5 +11046,13 @@
     "7712": {
         "text": "Please log in or register to redeem your voucher.",
         "context": "Text on the Login page telling the user they need to log in or register first to be able to redeem their voucher."
+    },
+    "7713": {
+        "text": "This operation will clear all MEGA data from your browser cache and reload your account from our servers. This may take a few minutes.",
+        "context": "A dialog message to be shown before a user performs a full account reload using the website reload tool in the menu."
+    },
+    "7714": {
+        "text": "Voucher redemption link",
+        "context": "A table column heading on the #resellers page. It describes a link to be given to users who purchase a voucher, then it can be used to redeem the voucher directly. For example: https:\/\/mega.nz\/#voucher6E0U4QA7SFM5DM6RMEJ5."
     }
 }

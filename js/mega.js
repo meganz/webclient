@@ -304,7 +304,7 @@ function MegaData()
         if (col === this.lastColumn) {
             return;
         }
-        
+
         this.lastColumn = col;
         localStorage._lastColumn = this.lastColumn;
 
@@ -1873,7 +1873,7 @@ function MegaData()
             return;
         }
 
-        /**
+        /*
          * XXX: Initially this function was designed to render new nodes only,
          * but due to a bug the entire tree was being rendered/created from
          * scratch every time. Trying to fix this now is a pain because a lot
@@ -3360,7 +3360,16 @@ function MegaData()
                 shareDialog();
             }
             if (typeof mDB === 'object' && !pfkey) {
-                mDBadd('ok', { h: h, k: a32_to_base64(encrypt_key(u_k_aes, u_sharekeys[h])), ha: crypto_handleauth(h) });
+                if (!u_sharekeys[h]) {
+                    console.error('INVALID OPERATION -- No share key for handle "%s"', h);
+                }
+                else {
+                    mDBadd('ok', {
+                        h: h,
+                        k: a32_to_base64(encrypt_key(u_k_aes, u_sharekeys[h])),
+                        ha: crypto_handleauth(h)
+                    });
+                }
             }
         }
         else if (d) {
@@ -6844,24 +6853,23 @@ function balance2pro(callback)
         childNodes = fm_getnodes(nodeId);
         childNodes.push(nodeId);
 
-        api_setshare(nodeId, [{ u: 'EXP', r: 0 }],
-            childNodes, {
-                nodeId: nodeId,
-                done: function(result) {
-                    if (result.r && result.r[0] === 0) {
-                        M.nodeShare(this.nodeId, { h: this.nodeId, r: 0, u: 'EXP', ts: unixtime() });
-                        self._getExportLinkRequest(this.nodeId);
-                        if (!self.nodesLeft) {
-                            loadingDialog.hide();
-                        }
-                    }
-                    else {
-                        self.logger.warn('_getFolderExportLinkRequest', this.nodeId, 'Error code: ', result);
-                        loadingDialog.hide();
-                    }
+        var sharePromise = api_setshare(nodeId, [{ u: 'EXP', r: 0 }], childNodes);
+        sharePromise.done(function _sharePromiseDone(result) {
+            if (result.r && result.r[0] === 0) {
+                M.nodeShare(nodeId, { h: nodeId, r: 0, u: 'EXP', ts: unixtime() });
+                self._getExportLinkRequest(nodeId);
+                if (!self.nodesLeft) {
+                    loadingDialog.hide();
                 }
             }
-        );
+            else {
+                self.logger.warn('_getFolderExportLinkRequest', nodeId, 'Error code: ', result);
+                loadingDialog.hide();
+            }
+        });
+        sharePromise.fail(function _sharePromiseFailed(result) {
+            self.logger.warn('Get folder link failed: ' + result);
+        });
     };
 
     /**
@@ -6894,7 +6902,7 @@ function balance2pro(callback)
                         }
                     }
                 }
-                else {// Error
+                else { // Error
                     self.logger.warn('_getExportLinkRequest:', this.nodeId, 'Error code: ', result);
                     loadingDialog.hide();
                 }

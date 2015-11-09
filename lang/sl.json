@@ -2760,5 +2760,7 @@
     "7709": "Kliknite [S]ZAKLJU\u010cI NADGRADNJO[\/S] in u\u017eivajte v novem %1 planu.",
     "7710": "ZAKLJU\u010cI NADGRADNJO",
     "7711": "Izberite drugi paket",
-    "7712": "Prosim, prijavite se, da izkoristite svoj kupon."
+    "7712": "Prosim, prijavite se, da izkoristite svoj kupon.",
+    "7713": "This operation will clear all MEGA data from your browser cache and reload your account from our servers. This may take a few minutes.",
+    "7714": "Voucher redemption link"
 }

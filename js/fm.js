@@ -3687,6 +3687,9 @@ function accountUI()
                 $.voucherlimit = 100;
             else if (c.indexOf('voucher250-') > -1)
                 $.voucherlimit = 250;
+            else if (c.indexOf('voucherAll-') > -1) {
+                $.voucherlimit = 'all';
+            }
             $(this).addClass('active');
             $(this).closest('.account-history-dropdown').addClass('hidden');
             accountUI();
@@ -3973,26 +3976,38 @@ function accountUI()
             });
         });
 
-        if (M.account.reseller)
-        {
-            $('.fm-account-button.reseller').removeClass('hidden');
-            $('.account-history-dropdown-button.vouchers').text(l['466a'].replace('[X]', $.voucherlimit));
+        if (M.account.reseller) {
+            
+            // Use 'All' or 'Last 10/100/250' for the dropdown text
+            var buttonText = ($.voucherlimit === 'all') ? l[7557] : l['466a'].replace('[X]', $.voucherlimit);
+            
+            $('.fm-account-reseller-button').removeClass('hidden');
+            $('.account-history-dropdown-button.vouchers').text(buttonText);
             $('.account-history-drop-items.voucher10-').text(l['466a'].replace('[X]', 10));
             $('.account-history-drop-items.voucher100-').text(l['466a'].replace('[X]', 100));
             $('.account-history-drop-items.voucher250-').text(l['466a'].replace('[X]', 250));
-            M.account.vouchers.sort(function(a, b)
-            {
-                if (a['date'] < b['date'])
+            
+            // Sort vouchers by most recently created at the top
+            M.account.vouchers.sort(function(a, b) {
+                
+                if (a['date'] < b['date']) {
                     return 1;
-                else
+                }
+                else {
                     return -1;
+                }
             });
+            
             $('.grid-table.vouchers tr').remove();
-            var html = '<tr><th>' + l[475] + '</th><th>' + l[487] + '</th><th>' + l[477] + '</th><th>' + l[488] + '</th></tr>';
-            $(account.vouchers).each(function(i, el)
-            {
-                if (i > $.voucherlimit)
+            var html = '<tr><th>' + l[475] + '</th><th>' + l[7714] + '</th><th>' + l[477] + '</th><th>' + l[488] + '</th></tr>';
+            
+            $(account.vouchers).each(function(i, el) {
+                
+                // Only show the last 10, 100, 250 or if the limit is not set show all vouchers
+                if (($.voucherlimit !== 'all') && (i >= $.voucherlimit)) {
                     return false;
+                }
+                
                 var status = l[489];
                 if (el.redeemed > 0 && el.cancelled == 0 && el.revoked == 0)
                     status = l[490] + ' ' + time2date(el.redeemed);
@@ -4002,7 +4017,6 @@ function accountUI()
                     status = l[492] + ' ' + time2date(el.cancelled);
                 
                 var voucherLink = 'https://mega.nz/#voucher' + htmlentities(el.code);
-                    voucherLink = '<a href="' + voucherLink + '">' + voucherLink + '</a>';
                 
                 html += '<tr><td>' + time2date(el.date) + '</td><td class="selectable">' + voucherLink + '</td><td>&euro; ' + htmlentities(el.amount) + '</td><td>' + status + '</td></tr>';
             });

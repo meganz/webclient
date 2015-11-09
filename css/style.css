@@ -26678,8 +26678,8 @@ body, body * {
 }
 
 .avatar-wrapper.verified.square div.verified_icon {
-    right: 0px;
-    top: 0px;
+    right: -1px;
+    top: -1px;
 }
 
 .avatar-wrapper.verified div.verified_icon {

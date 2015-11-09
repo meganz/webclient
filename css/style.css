@@ -26677,7 +26677,8 @@ body, body * {
 	padding: 0 0 0px 15px;
 }
 
-.avatar-wrapper.verified.square div.verified_icon {
+.avatar-wrapper.verified.square div.verified_icon,
+.fm-blocks-view .avatar-wrapper.verified div.verified_icon {
     right: 3px;
     top: 3px;
 }

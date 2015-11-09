@@ -3640,7 +3640,7 @@ function accountUI()
             }
 
             $('.fm-account-save-block').addClass('hidden');
-            showToast('settings', 'You have successfully changed your profile.');
+            showToast('settings', l[7698]);
             accountUI();
         });
         $('#account-email').val(u_attr.email);

@@ -3555,14 +3555,12 @@ function accountUI()
                         $('#account-password').unbind('keyup.accpwd');
                     });
                 });
-            } else if (!checkMyPassword($('#account-password').val())) {
+            } else if ($('#account-password').val() !== '' && !checkMyPassword($('#account-password').val())) {
                 msgDialog('warninga', l[135], l[724], false, function() {
                     $('#account-password').val('');
                     $('#account-password').focus();
                     $('#account-password').bind('keyup.accpwd', function() {
                         $('.fm-account-save-block').removeClass('hidden');
-                        $('.fm-account-main').addClass('save');
-                        initAccountScroll();
                         $('#account-password').unbind('keyup.accpwd');
                     });
                 });
@@ -3574,7 +3572,7 @@ function accountUI()
                     $('#account-new-password').focus();
                 });
             }
-            else if (pws.score === 0 || pws.entropy < 16) {
+            else if ($('#account-password').val() !== '' && (pws.score === 0 || pws.entropy < 16)) {
                 msgDialog('warninga', 'Error', l[1129], false, function() {
                     $('#account-new-password').val('');
                     $('#account-confirm-password').val('');
@@ -3875,23 +3873,23 @@ function accountUI()
         $('.redeem-voucher').unbind('click');
         $('.redeem-voucher').bind('click', function(event)
         {
-			var $this = $(this);
+            var $this = $(this);
             if ($this.attr('class').indexOf('active') == -1)
             {
-				$('.fm-account-overlay').fadeIn(100);
-				$this.addClass('active');
+                $('.fm-account-overlay').fadeIn(100);
+                $this.addClass('active');
                 $('.fm-voucher-popup').removeClass('hidden');
                 voucherCentering($this);
 
-				$('.fm-account-overlay, .fm-purchase-voucher, .fm-voucher-button').rebind('click.closeDialog', function() {
-					$('.fm-account-overlay').fadeOut(100);
-                	$('.redeem-voucher').removeClass('active');
-                	$('.fm-voucher-popup').addClass('hidden');
-				});
+                $('.fm-account-overlay, .fm-purchase-voucher, .fm-voucher-button').rebind('click.closeDialog', function() {
+                    $('.fm-account-overlay').fadeOut(100);
+                    $('.redeem-voucher').removeClass('active');
+                    $('.fm-voucher-popup').addClass('hidden');
+                });
             }
             else
             {
-				$('.fm-account-overlay').fadeOut(200);
+                $('.fm-account-overlay').fadeOut(200);
                 $this.removeClass('active');
                 $('.fm-voucher-popup').addClass('hidden');
             }

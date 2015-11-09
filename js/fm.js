@@ -3992,10 +3992,10 @@ function accountUI()
                     status = l[491] + ' ' + time2date(el.revoked);
                 else if (el.cancelled > 0)
                     status = l[492] + ' ' + time2date(el.cancelled);
-                
+
                 var voucherLink = 'https://mega.nz/#voucher' + htmlentities(el.code);
                     voucherLink = '<a href="' + voucherLink + '">' + voucherLink + '</a>';
-                
+
                 html += '<tr><td>' + time2date(el.date) + '</td><td class="selectable">' + voucherLink + '</td><td>&euro; ' + htmlentities(el.amount) + '</td><td>' + status + '</td></tr>';
             });
             $('.grid-table.vouchers').html(html);
@@ -5832,19 +5832,30 @@ function getDDhelper()
     return $('.dragger-block')[0];
 }
 
+
+/**
+ * menuItems
+ *
+ * Selecte what in context menu will be shown of actions and what not, depends on selected item/s
+ * @returns {menuItems.items|Array}
+ */
 function menuItems() {
 
-    var selItem, favourite, node,
+    var selItem,
         items = [],
+        share = {},
+        exportLink = {},
+        isTakenDown = false,
+        hasExportLink = false,
         sourceRoot = RootbyId($.selected[0]);
 
     if ($.selected.length === 1 && RightsbyID($.selected[0]) > 1) {
-        items['rename'] = 1;
+        items['.rename-item'] = 1;
     }
 
     if (RightsbyID($.selected[0]) > 0) {
 
-        items['add-star'] = 1;
+        items['.add-star-item'] = 1;
 
         if (M.isFavourite($.selected)) {
             $('.add-star-item').html('<span class="context-menu-icon"></span>' + l[5872]);
@@ -5858,49 +5869,63 @@ function menuItems() {
     selItem = M.d[$.selected[0]];
 
     if (selItem && selItem.p.length === 11) {
-        items['removeshare'] = 1;
+        items['.removeshare-item'] = 1;
     }
     else if (RightsbyID($.selected[0]) > 1) {
-        items['remove'] = 1;
+        items['.remove-item'] = 1;
     }
 
     if (selItem && $.selected.length === 1 && selItem.t) {
-        items['open'] = 1;
+        items['.open-item'] = 1;
     }
 
     if (selItem && $.selected.length === 1 && is_image(selItem)) {
-        items['preview'] = 1;
+        items['.preview-item'] = 1;
     }
 
     if (selItem && sourceRoot === M.RootID && $.selected.length === 1 && selItem.t && !folderlink) {
-        items['sh4r1ng'] = 1;
+        items['.sh4r1ng-item'] = 1;
     }
 
     if (sourceRoot === M.RootID && !folderlink) {
-        items['move'] = 1;
-        items['getlink'] = 1;
-        var share = new mega.Share();
-        if (share.hasExportLink($.selected)) {
-            items['removelink'] = true;
+        items['.move-item'] = 1;
+        items['.getlink-item'] = 1;
+
+        share = new mega.Share();
+        hasExportLink = share.hasExportLink($.selected);
+
+        if (hasExportLink) {
+            items['.removelink-item'] = true;
+        }
+
+        exportLink = new mega.Share.ExportLink();
+        isTakenDown = exportLink.isTakenDown($.selected);
+
+        // If any of selected items is taken donw remove actions from context menu
+        if (isTakenDown) {
+            delete items['.getlink-item'];
+            delete items['.removelink-item'];
+            delete items['.sh4r1ng-item'];
+            delete items['.add-star-item'];
         }
     }
 
     else if (sourceRoot === M.RubbishID && !folderlink) {
-        items['move'] = 1;
+        items['.move-item'] = 1;
     }
 
-    items['download'] = 1;
-    items['zipdownload'] = 1;
-    items['copy'] = 1;
-    items['properties'] = 1;
-    items['refresh'] = 1;
+    items['.download-item'] = 1;
+    items['.zipdownload-item'] = 1;
+    items['.copy-item'] = 1;
+    items['.properties-item'] = 1;
+    items['.refresh-item'] = 1;
 
     if (folderlink) {
-        delete items['properties'];
-        delete items['copy'];
-        delete items['add-star'];
+        delete items['.properties-item'];
+        delete items['.copy-item'];
+        delete items['.add-star-item'];
         if (u_type) {
-            items['import'] = 1;
+            items['.import-item'] = 1;
         }
     }
 
@@ -5949,17 +5974,17 @@ function contextMenuUI(e, ll) {
     else if (ll === 4 || ll === 5) {// contactUI
         $(menuCMI).hide();
         items = menuItems();
-        delete items['download'];
-        delete items['zipdownload'];
-        delete items['copy'];
-        delete items['open'];
+        delete items['.download-item'];
+        delete items['.zipdownload-item-item'];
+        delete items['.copy-item'];
+        delete items['.open-item'];
 
         if (ll === 5) {
-            delete items['properties'];
+            delete items['.properties-item'];
         }
 
         for (var item in items) {
-            $(menuCMI).filter('.' + item + '-item').show();
+            $(menuCMI).filter(item).show();
         }
     }
     else if (ll === 6) { // sort menu
@@ -6021,7 +6046,7 @@ function contextMenuUI(e, ll) {
             || id) {
             items = menuItems();
             for (var item in items) {
-                $(menuCMI).filter('.' + item + '-item').show();
+                $(menuCMI).filter(item).show();
             }
         }
         else {

@@ -6032,7 +6032,7 @@ function processPH(publicHandles) {
         nodeId = value.h;
         publicHandleId = value.ph;
 
-        // Remove export link, d: 1
+        // Remove export link, down: 1
         if (value.d) {
             M.delNodeShare(nodeId, 'EXP');
             M.deleteExportLinkShare(nodeId);

@@ -13112,7 +13112,7 @@ table {
 .fm-account-input.voucheramount {
 	float: left;
     min-width: 50px;
-    width: auto;
+    width: 80px;
 	margin: 0;
 }
 .default-select.month {

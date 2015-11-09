@@ -3572,7 +3572,7 @@ function accountUI()
                     $('#account-new-password').focus();
                 });
             }
-            else if ($('#account-password').val() !== '' && (pws.score === 0 || pws.entropy < 16)) {
+            else if ($('#account-password').val() !== '' && $('#account-confirm-password').val() !== '' && $('#account-new-password').val() !== '' &&  (pws.score === 0 || pws.entropy < 16)) {
                 msgDialog('warninga', 'Error', l[1129], false, function() {
                     $('#account-new-password').val('');
                     $('#account-confirm-password').val('');

@@ -26678,8 +26678,8 @@ body, body * {
 }
 
 .avatar-wrapper.verified.square div.verified_icon {
-    right: -1px;
-    top: -1px;
+    right: 3px;
+    top: 3px;
 }
 
 .avatar-wrapper.verified div.verified_icon {
@@ -26687,7 +26687,7 @@ body, body * {
     width: 14px;
     height: 14px;
     position: absolute;
-    right: -4px;
-    top: -4px;
+    right: -3px;
+    top: -3px;
     float: right;
 }

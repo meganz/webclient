@@ -1,3 +1,6 @@
+// Release version information is replaced by the build scripts
+var buildVersion = { website: '', chrome: '', firefox: '', commit: '', timestamp: '', dateTime: '' };
+
 var b_u = 0;
 var apipath;
 var maintenance = false;

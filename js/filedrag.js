@@ -86,7 +86,6 @@
 
             if (t.attr('class') == "nw-fm-tree-folder") {
                 t.css('background-color', 'rgba(222,222,10,0.3)');
-                $.onDroppedTreeFolder = t.parent().attr('id').split('_').pop();
             }
         }
     }
@@ -214,6 +213,12 @@
         }
         else {
             $('span.nw-fm-tree-folder').css('background-color', '');
+
+            var target = $(e.target);
+            if (target.hasClass("nw-fm-tree-folder")) {
+                var handle = target.parent().attr('id').split('_').pop();
+                $.onDroppedTreeFolder = M.d[handle] && handle;
+            }
         }
 
         var dataTransfer = e.dataTransfer;

@@ -3967,7 +3967,7 @@ function accountUI()
         if (M.account.reseller) {
             
             // Use 'All' or 'Last 10/100/250' for the dropdown text
-            var buttonText = ($.voucherlimit === 'all') ? l[7714] : l['466a'].replace('[X]', $.voucherlimit);
+            var buttonText = ($.voucherlimit === 'all') ? l[7557] : l['466a'].replace('[X]', $.voucherlimit);
             
             $('.fm-account-reseller-button').removeClass('hidden');
             $('.account-history-dropdown-button.vouchers').text(buttonText);

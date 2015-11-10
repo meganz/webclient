@@ -10330,7 +10330,7 @@ function contactUI() {
             megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h))
         );
 
-        $('.contact-top-details .nw-contact-block-avatar').empty().append( avatar.removeClass('avatar').addClass('square') )
+        $('.contact-top-details .nw-contact-block-avatar').empty().append( avatar.removeClass('avatar').addClass('square') );
         $('.contact-top-details .onlinestatus').removeClass('away offline online busy');
         $('.contact-top-details .onlinestatus').addClass(onlinestatus[1]);
         $('.contact-top-details .fm-chat-user-status').text(onlinestatus[0]);

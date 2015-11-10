@@ -31,7 +31,7 @@ var useravatar = (function() {
     /**
      *  Take the class colors and create a inject as a CSS.
      */
-    var registerCssColors = function() {
+    function registerCssColors() {
         var css = "";
         for (var i in _colors) {
             if (!_colors.hasOwnProperty(i)) {
@@ -48,7 +48,7 @@ var useravatar = (function() {
      * Return a SVG image representing the TWO-Letters avatar
      * @private
      */
-    var _lettersImg = function(letters) {
+    function _lettersImg(letters) {
         var s = _lettersSettings(letters);
         var tpl = $('#avatar-svg').clone().removeClass('hidden')
             .find('svg').css('background-color', s.color).end()
@@ -64,7 +64,7 @@ var useravatar = (function() {
      * @return {string}
      * @private
      */
-    var _lettersSettings = function(word) {
+    function _lettersSettings(word) {
         var letters = "";
         var color   = 1;
         if (word && word !== u_handle) {
@@ -85,7 +85,7 @@ var useravatar = (function() {
      *
      *  @return HTML
      */
-    var _letters = function(letters, id, className, element) {
+    function _letters(letters, id, className, element) {
         if (element === 'ximg') {
             return _lettersImg(letters);
         }
@@ -107,27 +107,44 @@ var useravatar = (function() {
      *  @param id           ID associate with the avatar (uid)
      *  @param className Any extra CSS classes that we want to append to the HTML
      */
-    var _image = function(url, id, className, type) {
+    function _image(url, id, className, type) {
         return '<' + type + ' class="avatar-wrapper ' + id + ' ' + className + '">'
                 + '<div class="verified_icon"></div>'
                 + '<img src="' + url + '">'
          + '</' + type + '>';
     };
 
-    function emailAvatar(user, className, element) {
+    /**
+     *  Render an avatar based on given email. We try to find
+     *  the contact object by their email, if we cannot, we render
+     *  the first two letters of the email address
+     *
+     *  @param email        Email address
+     *  @param className    Any extra class attribute to inject
+     *  @param element      Wrap the output with `element`
+     *
+     *  @return HTML
+     */
+    function emailAvatar(eail, className, element) {
         // User is an email, we should look if the user
         // exists, if it does exists we use the user Object.
         for (var u in M.u) {
-            if (M.u[u].m === user) {
+            if (M.u[u].m === email) {
                 // found the user object
                 return ns.contact(M.u[u], className, element);
             }
         }
-        return _letters(user.substr(0, 2), user, className, element);
+        return _letters(email.substr(0, 2), email, className, element);
     }
 
     var authringPromise;
 
+    /**
+     *  isUserVerified
+     *
+     *  Check if the current user is verified by the current user. It
+     *  is asynchronous and waits for `u_authring.Ed25519` is ready.
+     */
     function isUserVerified(user) {
         if (!authringPromise) {
             authringPromise = new MegaPromise();
@@ -140,7 +157,7 @@ var useravatar = (function() {
             }
         }
 
-        function isUserVerified() {
+        function isUserVerified_Callback() {
             var verificationState = u_authring.Ed25519[user.h] || {};
             var isVerified = (verificationState.method
                               >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON);
@@ -149,8 +166,8 @@ var useravatar = (function() {
             }
         }
 
-        Later(function() {
-            authringPromise.done(isUserVerified);
+        setTimeout(function() {
+            authringPromise.done(isUserVerified_Callback);
         });
     }
 

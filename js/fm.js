@@ -2538,7 +2538,11 @@ function initContextUI() {
     });
 
     $(c + '.add-star-item').rebind('click', function() {
-        M.favourite($.selected, $.delfav);
+
+        var delFavourite = M.isFavourite($.selected);
+
+        M.favourite($.selected, delFavourite);
+
         if (M.viewmode) {
             $('.file-block').removeClass('ui-selected');
         }
@@ -3975,7 +3979,7 @@ function accountUI()
         });
 
         if (M.account.reseller) {
-            
+
             // Use 'All' or 'Last 10/100/250' for the dropdown text
             var buttonText = ($.voucherlimit === 'all') ? l[7557] : l['466a'].replace('[X]', $.voucherlimit);
             
@@ -3984,10 +3988,10 @@ function accountUI()
             $('.account-history-drop-items.voucher10-').text(l['466a'].replace('[X]', 10));
             $('.account-history-drop-items.voucher100-').text(l['466a'].replace('[X]', 100));
             $('.account-history-drop-items.voucher250-').text(l['466a'].replace('[X]', 250));
-            
+
             // Sort vouchers by most recently created at the top
             M.account.vouchers.sort(function(a, b) {
-                
+
                 if (a['date'] < b['date']) {
                     return 1;
                 }
@@ -3995,17 +3999,17 @@ function accountUI()
                     return -1;
                 }
             });
-            
+
             $('.grid-table.vouchers tr').remove();
             var html = '<tr><th>' + l[475] + '</th><th>' + l[7714] + '</th><th>' + l[477] + '</th><th>' + l[488] + '</th></tr>';
             
             $(account.vouchers).each(function(i, el) {
-                
+
                 // Only show the last 10, 100, 250 or if the limit is not set show all vouchers
                 if (($.voucherlimit !== 'all') && (i >= $.voucherlimit)) {
                     return false;
                 }
-                
+
                 var status = l[489];
                 if (el.redeemed > 0 && el.cancelled == 0 && el.revoked == 0)
                     status = l[490] + ' ' + time2date(el.redeemed);
@@ -4013,9 +4017,9 @@ function accountUI()
                     status = l[491] + ' ' + time2date(el.revoked);
                 else if (el.cancelled > 0)
                     status = l[492] + ' ' + time2date(el.cancelled);
-                
+
                 var voucherLink = 'https://mega.nz/#voucher' + htmlentities(el.code);
-                
+
                 html += '<tr><td>' + time2date(el.date) + '</td><td class="selectable">' + voucherLink + '</td><td>&euro; ' + htmlentities(el.amount) + '</td><td>' + status + '</td></tr>';
             });
             $('.grid-table.vouchers').html(html);
@@ -5868,82 +5872,100 @@ function getDDhelper()
     return $('.dragger-block')[0];
 }
 
+
+/**
+ * menuItems
+ *
+ * Selecte what in context menu will be shown of actions and what not, depends on selected item/s
+ * @returns {menuItems.items|Array}
+ */
 function menuItems() {
 
     var selItem,
         items = [],
+        share = {},
+        exportLink = {},
+        isTakenDown = false,
+        hasExportLink = false,
         sourceRoot = RootbyId($.selected[0]);
 
     if ($.selected.length === 1 && RightsbyID($.selected[0]) > 1) {
-        items['rename'] = 1;
+        items['.rename-item'] = 1;
     }
 
     if (RightsbyID($.selected[0]) > 0) {
-        items['add-star'] = 1;
-        $.delfav = 1;
 
-        for (var i in $.selected) {
-            var n = M.d[$.selected[i]];
-            if (n && !n.fav) {
-                $.delfav = 0;
-                break;
-            }
-        }
+        items['.add-star-item'] = 1;
 
-        if ($.delfav) {
+        if (M.isFavourite($.selected)) {
             $('.add-star-item').html('<span class="context-menu-icon"></span>' + l[5872]);
         }
         else {
             $('.add-star-item').html('<span class="context-menu-icon"/></span>' + l[5871]);
+
         }
     }
 
     selItem = M.d[$.selected[0]];
 
     if (selItem && selItem.p.length === 11) {
-        items['removeshare'] = 1;
+        items['.removeshare-item'] = 1;
     }
     else if (RightsbyID($.selected[0]) > 1) {
-        items['remove'] = 1;
+        items['.remove-item'] = 1;
     }
 
     if (selItem && $.selected.length === 1 && selItem.t) {
-        items['open'] = 1;
+        items['.open-item'] = 1;
     }
 
     if (selItem && $.selected.length === 1 && is_image(selItem)) {
-        items['preview'] = 1;
+        items['.preview-item'] = 1;
     }
 
     if (selItem && sourceRoot === M.RootID && $.selected.length === 1 && selItem.t && !folderlink) {
-        items['sh4r1ng'] = 1;
+        items['.sh4r1ng-item'] = 1;
     }
 
     if (sourceRoot === M.RootID && !folderlink) {
-        items['move'] = 1;
-        items['getlink'] = 1;
-        var share = new mega.Share();
-        if (share.hasExportLink($.selected)) {
-            items['removelink'] = true;
+        items['.move-item'] = 1;
+        items['.getlink-item'] = 1;
+
+        share = new mega.Share();
+        hasExportLink = share.hasExportLink($.selected);
+
+        if (hasExportLink) {
+            items['.removelink-item'] = true;
+        }
+
+        exportLink = new mega.Share.ExportLink();
+        isTakenDown = exportLink.isTakenDown($.selected);
+
+        // If any of selected items is taken donw remove actions from context menu
+        if (isTakenDown) {
+            delete items['.getlink-item'];
+            delete items['.removelink-item'];
+            delete items['.sh4r1ng-item'];
+            delete items['.add-star-item'];
         }
     }
 
     else if (sourceRoot === M.RubbishID && !folderlink) {
-        items['move'] = 1;
+        items['.move-item'] = 1;
     }
 
-    items['download'] = 1;
-    items['zipdownload'] = 1;
-    items['copy'] = 1;
-    items['properties'] = 1;
-    items['refresh'] = 1;
+    items['.download-item'] = 1;
+    items['.zipdownload-item'] = 1;
+    items['.copy-item'] = 1;
+    items['.properties-item'] = 1;
+    items['.refresh-item'] = 1;
 
     if (folderlink) {
-        delete items['properties'];
-        delete items['copy'];
-        delete items['add-star'];
+        delete items['.properties-item'];
+        delete items['.copy-item'];
+        delete items['.add-star-item'];
         if (u_type) {
-            items['import'] = 1;
+            items['.import-item'] = 1;
         }
     }
 
@@ -5992,17 +6014,17 @@ function contextMenuUI(e, ll) {
     else if (ll === 4 || ll === 5) {// contactUI
         $(menuCMI).hide();
         items = menuItems();
-        delete items['download'];
-        delete items['zipdownload'];
-        delete items['copy'];
-        delete items['open'];
+        delete items['.download-item'];
+        delete items['.zipdownload-item-item'];
+        delete items['.copy-item'];
+        delete items['.open-item'];
 
         if (ll === 5) {
-            delete items['properties'];
+            delete items['.properties-item'];
         }
 
         for (var item in items) {
-            $(menuCMI).filter('.' + item + '-item').show();
+            $(menuCMI).filter(item).show();
         }
     }
     else if (ll === 6) { // sort menu
@@ -6064,7 +6086,7 @@ function contextMenuUI(e, ll) {
             || id) {
             items = menuItems();
             for (var item in items) {
-                $(menuCMI).filter('.' + item + '-item').show();
+                $(menuCMI).filter(item).show();
             }
         }
         else {
@@ -7659,11 +7681,11 @@ function initCopyrightsDialog(nodesToProcess) {
     $.itemExport = nodesToProcess;
     // If they've already agreed to the copyright warning this session
     if (localStorage.getItem('agreedToCopyrightWarning') !== null) {
-        
+
         // Go straight to Get Link dialog
         var exportLink = new mega.Share.ExportLink({ 'showExportLinkDialog': true, 'updateUI': true, 'nodesToProcess': nodesToProcess });
         exportLink.getExportLink();
-        
+
         return false;
     }
 
@@ -7674,10 +7696,10 @@ function initCopyrightsDialog(nodesToProcess) {
     fm_showoverlay();
     $.copyrightsDialog = 'copyrights';
     $copyrightDialog.show();
-    
+
     // Init click handler for 'I agree' / 'I disagree' buttons
     $copyrightDialog.find('.fm-dialog-button').rebind('click', function() {
-        
+
         // User disagrees with copyright warning
         if ($(this).hasClass('cancel')) {
             closeDialog();
@@ -7685,14 +7707,14 @@ function initCopyrightsDialog(nodesToProcess) {
         else {
             // User agrees, store flag in localStorage so they don't see it again for this session
             localStorage.setItem('agreedToCopyrightWarning', '1');
-            
+
             // Go straight to Get Link dialog
             closeDialog();
             var exportLink = new mega.Share.ExportLink({ 'showExportLinkDialog': true, 'updateUI': true, 'nodesToProcess': nodesToProcess });
             exportLink.getExportLink();
         }
     });
-    
+
     // Init click handler for 'Close' button
     $copyrightDialog.find('.fm-dialog-close').rebind('click', function() {
         closeDialog();
@@ -9190,7 +9212,17 @@ function propertiesDialog(close)
     }
     $.propertiesDialog = $.dialog = 'properties';
     fm_showoverlay();
-    pd.removeClass('hidden multiple folders-only two-elements shared shared-with-me read-only read-and-write full-access');
+
+    pd.removeClass('hidden multiple folders-only two-elements shared shared-with-me');
+    pd.removeClass('read-only read-and-write full-access taken-down');
+
+    var exportLink = new mega.Share.ExportLink({});
+    var isTakenDown = exportLink.isTakenDown($.selected);
+    if (isTakenDown) {
+        pd.addClass('taken-down');
+        showToast('clipboard', l[7703]);
+    }
+
     $('.properties-elements-counter span').text('');
     $('.fm-dialog.properties-dialog .properties-body').rebind('click', function()
     {
@@ -10231,13 +10263,13 @@ function userFingerprint(userid, next) {
 function showAuthenticityCredentials(user) {
 
     var $fingerprintContainer = $('.contact-fingerprint-txt');
-    
+
     // Compute the fingerprint
     userFingerprint(user, function(fingerprints) {
-        
+
         // Clear old values immediately
         $fingerprintContainer.empty();
-        
+
         // Render the fingerprint into 10 groups of 4 hex digits
         $.each(fingerprints, function(key, value) {
             $('<span>').text(value).appendTo(
@@ -10319,13 +10351,13 @@ function fingerprintDialog(userid) {
 
         // Generate fingerprint
         userFingerprint(user, function(fprint, fprintraw) {
-            
+
             // Authenticate the contact
             authring.setContactAuthenticated(userid, fprintraw, 'Ed25519', authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON);
-            
+
             // Change button state to 'Verified'
             $('.fm-verify').unbind('click').addClass('verified').find('span').text(l[6776]);
-            
+
             closeFngrPrntDialog();
         });
     });
@@ -10392,12 +10424,12 @@ function contactUI() {
         }
         /** To be called on settled authring promise. */
         var _setVerifiedState = function() {
-            
+
             var handle = user.u || user;
             var verificationState = u_authring.Ed25519[handle] || {};
             var isVerified = (verificationState.method
                               >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON);
-            
+
             // Show the user is verified
             if (isVerified) {
                 $('.fm-verify').addClass('verified');

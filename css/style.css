@@ -5533,7 +5533,7 @@ th.grid-first-th {
 	background-repeat: no-repeat;
 	background-position: -69px -963px;
 }
-table .grid-status-icon.star {
+.grid-status-icon.star {
 	background-position: -64px -961px;
 }
 .file-block .file-status-icon, .contact-status-icon, .properties-body .file-status-icon, .link-icon {
@@ -5549,17 +5549,18 @@ table .grid-status-icon.star {
 	right: 6px;
 	background-position: -106px -963px;
 	display: none;
+	cursor: pointer;
 }
 .taken-down .link-icon {
 	background-position: -146px -963px;
 }
-.taken-down .grid-status-icon {
+.taken-down .grid-status-icon, .taken-down .grid-status-icon.star {
 	background-position: -176px -961px;
 }
 .taken-down .file-status-icon {
 	background-position: -180px -963px;
 }
-.grid-table .taken-down td, .taken-down .file-block-title, .taken-down .nw-fm-tree-folder, .taken-down .tranfer-filetype-txt {
+.grid-table .taken-down td, .taken-down .file-block-title, .taken-down .nw-fm-tree-folder, .taken-down .tranfer-filetype-txt, .taken-down .propreties-dark-txt {
 	color: #D90007
 }
 .own-data .link-icon {
@@ -11325,7 +11326,7 @@ span.orange {
 	background-color: rgba(0,0,0,0.05);
 }
 .properties-file-icon div {
-	width: 240px;
+	width: 242px;
 	height: 240px;
 	position: absolute;
 	top: 0px;
@@ -11335,6 +11336,14 @@ span.orange {
 	background-position: 0 0;
 	background-repeat: no-repeat;
 	margin: 8px;
+}
+.properties-dialog .file-status-icon {
+	left: 13px;
+	top: 13px;
+}
+.properties-dialog .link-icon {
+	left: 225px;
+	top: 13px;
 }
 .properties-file-icon div:nth-child(1) {
 	display: block;
@@ -24604,11 +24613,11 @@ body.pro:after {
 	display: block;
 }
 .toast-notification {
-	width: 480px;
+	width: 500px;
 	position: absolute;
 	bottom: 8px;
 	left: 50%;
-	margin: 0 0 -48px -240px;
+	margin: 0 0 -48px -250px;
 	background-color: #777777;
 	-moz-border-radius: 8px;
 	-webkit-border-radius: 8px;
@@ -24627,7 +24636,7 @@ body.pro:after {
 	-ms-transition: all 500ms ease-in-out;
 	transition: all 500ms ease-in-out;
 	cursor: default;
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	-moz-opacity: 0;
 	-khtml-opacity: 0;
 	opacity: 0;

@@ -3965,19 +3965,19 @@ function accountUI()
         });
 
         if (M.account.reseller) {
-            
+
             // Use 'All' or 'Last 10/100/250' for the dropdown text
             var buttonText = ($.voucherlimit === 'all') ? l[7557] : l['466a'].replace('[X]', $.voucherlimit);
-            
+
             $('.fm-account-reseller-button').removeClass('hidden');
             $('.account-history-dropdown-button.vouchers').text(buttonText);
             $('.account-history-drop-items.voucher10-').text(l['466a'].replace('[X]', 10));
             $('.account-history-drop-items.voucher100-').text(l['466a'].replace('[X]', 100));
             $('.account-history-drop-items.voucher250-').text(l['466a'].replace('[X]', 250));
-            
+
             // Sort vouchers by most recently created at the top
             M.account.vouchers.sort(function(a, b) {
-                
+
                 if (a['date'] < b['date']) {
                     return 1;
                 }
@@ -3985,17 +3985,17 @@ function accountUI()
                     return -1;
                 }
             });
-            
+
             $('.grid-table.vouchers tr').remove();
             var html = '<tr><th>' + l[475] + '</th><th>' + l[7714] + '</th><th>' + l[477] + '</th><th>' + l[488] + '</th></tr>';
-            
+
             $(account.vouchers).each(function(i, el) {
-                
+
                 // Only show the last 10, 100, 250 or if the limit is not set show all vouchers
                 if (($.voucherlimit !== 'all') && (i >= $.voucherlimit)) {
                     return false;
                 }
-                
+
                 var status = l[489];
                 if (el.redeemed > 0 && el.cancelled == 0 && el.revoked == 0)
                     status = l[490] + ' ' + time2date(el.redeemed);
@@ -4003,9 +4003,9 @@ function accountUI()
                     status = l[491] + ' ' + time2date(el.revoked);
                 else if (el.cancelled > 0)
                     status = l[492] + ' ' + time2date(el.cancelled);
-                
+
                 var voucherLink = 'https://mega.nz/#voucher' + htmlentities(el.code);
-                
+
                 html += '<tr><td>' + time2date(el.date) + '</td><td class="selectable">' + voucherLink + '</td><td>&euro; ' + htmlentities(el.amount) + '</td><td>' + status + '</td></tr>';
             });
             $('.grid-table.vouchers').html(html);
@@ -7091,12 +7091,19 @@ function handleDialogTabContent(dialogTabClass, parentTag, dialogPrefix, htmlCon
  */
 function disableReadOnlySharedFolders(dialogName) {
 
-    var nodeId, accessRight,
+    var nodeId, accessRight, rootParentDirId,
+        $mcTreeSub = $("#mctreesub_shares"),
         $ro = $('.' + dialogName + '-dialog-tree-panel.shared-with-me .dialog-content-block span[id^="mctreea_"]');
 
     $ro.each(function(i, v) {
         nodeId = $(v).attr('id').replace('mctreea_', '');
-        accessRight = M.d[nodeId].r;
+
+        // Apply access right of root parent dir to all subfolders
+        rootParentDirId = $("#mctreea_" + nodeId).parentsUntil($mcTreeSub).last().attr('id').replace('mctreeli_', '');
+
+        if (M.d[rootParentDirId]) {
+            accessRight = M.d[rootParentDirId].r;
+        }
 
         if (!accessRight || (accessRight === 0)) {
             $(v).addClass('disabled');
@@ -7632,11 +7639,11 @@ function initCopyrightsDialog(nodesToProcess) {
     $.itemExport = nodesToProcess;
     // If they've already agreed to the copyright warning this session
     if (localStorage.getItem('agreedToCopyrightWarning') !== null) {
-        
+
         // Go straight to Get Link dialog
         var exportLink = new mega.Share.ExportLink({ 'showExportLinkDialog': true, 'updateUI': true, 'nodesToProcess': nodesToProcess });
         exportLink.getExportLink();
-        
+
         return false;
     }
 
@@ -7647,10 +7654,10 @@ function initCopyrightsDialog(nodesToProcess) {
     fm_showoverlay();
     $.copyrightsDialog = 'copyrights';
     $copyrightDialog.show();
-    
+
     // Init click handler for 'I agree' / 'I disagree' buttons
     $copyrightDialog.find('.fm-dialog-button').rebind('click', function() {
-        
+
         // User disagrees with copyright warning
         if ($(this).hasClass('cancel')) {
             closeDialog();
@@ -7658,14 +7665,14 @@ function initCopyrightsDialog(nodesToProcess) {
         else {
             // User agrees, store flag in localStorage so they don't see it again for this session
             localStorage.setItem('agreedToCopyrightWarning', '1');
-            
+
             // Go straight to Get Link dialog
             closeDialog();
             var exportLink = new mega.Share.ExportLink({ 'showExportLinkDialog': true, 'updateUI': true, 'nodesToProcess': nodesToProcess });
             exportLink.getExportLink();
         }
     });
-    
+
     // Init click handler for 'Close' button
     $copyrightDialog.find('.fm-dialog-close').rebind('click', function() {
         closeDialog();
@@ -10203,13 +10210,13 @@ function userFingerprint(userid, next) {
 function showAuthenticityCredentials(user) {
 
     var $fingerprintContainer = $('.contact-fingerprint-txt');
-    
+
     // Compute the fingerprint
     userFingerprint(user, function(fingerprints) {
-        
+
         // Clear old values immediately
         $fingerprintContainer.empty();
-        
+
         // Render the fingerprint into 10 groups of 4 hex digits
         $.each(fingerprints, function(key, value) {
             $('<span>').text(value).appendTo(
@@ -10291,13 +10298,13 @@ function fingerprintDialog(userid) {
 
         // Generate fingerprint
         userFingerprint(user, function(fprint, fprintraw) {
-            
+
             // Authenticate the contact
             authring.setContactAuthenticated(userid, fprintraw, 'Ed25519', authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON);
-            
+
             // Change button state to 'Verified'
             $('.fm-verify').unbind('click').addClass('verified').find('span').text(l[6776]);
-            
+
             closeFngrPrntDialog();
         });
     });
@@ -10364,12 +10371,12 @@ function contactUI() {
         }
         /** To be called on settled authring promise. */
         var _setVerifiedState = function() {
-            
+
             var handle = user.u || user;
             var verificationState = u_authring.Ed25519[handle] || {};
             var isVerified = (verificationState.method
                               >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON);
-            
+
             // Show the user is verified
             if (isVerified) {
                 $('.fm-verify').addClass('verified');

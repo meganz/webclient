@@ -2155,7 +2155,8 @@ function api_getsid2(res, ctx) {
         }
     }
 
-    if (r && typeof emailchange === "object") {
+    // ZZZ comment
+    if (r && typeof emailchange === 'object') {
         emailchange.verifyEmailPassword(new sjcl.cipher.aes(ctx.passwordkey), { k1: res.k, k2: k });
     }
 

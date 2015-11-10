@@ -3,6 +3,12 @@ var emailchange = (function(){
     var $input;
     var context = null;
     
+    /**
+     *  Analize responses from the server and show the error dialog
+     *  _if_ there was any error.
+     *
+     *  @return bool false if there was no error, true otherwise.
+     */
     function checkError(errcode) {
         if (typeof errcode != "number") {
             return false;
@@ -30,6 +36,21 @@ var emailchange = (function(){
         return true;
     }
     
+    /**
+     *  verifyEmailCallback
+     *
+     *  Verify if a given AES-Password (or if none is given, we read from the input)
+     *  is the user's password. If everything is correct, we attempt to verify
+     *  the email.
+     *  
+     *  We use the new email address to generate a new "login hash" (email + password AES),
+     *  without the step the current user won't be able to login with their new
+     *  email address.
+     *
+     *  @param AESObject password   Password AES object (optional)
+     *
+     *  @return void
+     */
     function verifyEmailCallback(passAES) {
         var k1 = context.k1 || u_attr.k;
         var k2 = context.k2 || u_k;
@@ -76,10 +97,24 @@ var emailchange = (function(){
         });
     }
     
+    /**
+     *  Verify Email and Password
+     *
+     *  Verify if verify code is valid. 
+     *
+     *  @param AESObject password   Password AES object (optional)
+     *  @param Array     keys       Hash with k1 (encrypted private key) and k2 (private key). (optional)
+     *  
+     *  @return void
+     */
     ns.verifyEmailPassword = function(passAES, keys) {
-        if (!$input) {
-            $input = $('#verify-password');
+        if (!context) {
+            // The user has no context, it happens when a given user login
+            // and this function exists (verify new email / logout / login again)
+            // but we have no context, so we ignore this requests.
+            return;
         }
+        $input = $input || $('#verify-password');
         passAES = passAES || new sjcl.cipher.aes(prepare_key_pw($input.val()));
         $('.login-register-input.password').addClass('loading').removeClass('incorrect');
         $input.val('');
@@ -98,6 +133,16 @@ var emailchange = (function(){
         }});
     }
     
+    /**
+     *  Main application.
+     *
+     *  Boot the UI to change verify the new email address for the current user.
+     *
+     *  If the user has no session we show the login dialog and we add a listener
+     *  for `verifyEmailPassword` when they successfully login
+     *
+     *  @return html
+     */
     ns.main = function() {
         context = {code: page.substr(6)};
         if (!u_type) {

@@ -2761,6 +2761,8 @@
     "7710": "UUENDAMISE L\u00d5PETAMINE",
     "7711": "Valige muu pakett",
     "7712": "Oma vaut\u0161eri kasutamiseks peate sisse logima v\u00f5i registreeruma. ",
-    "7713": "This operation will clear all MEGA data from your browser cache and reload your account from our servers. This may take a few minutes.",
-    "7714": "Voucher redemption link"
+    "7713": "Sellega eemaldate veeilehitseja m\u00e4lust k\u00f5ik MEGA andmed ja v\u00e4rskendate meie serverist oma kontot.",
+    "7714": "Vaut\u0161eri kasutamise link",
+    "7715": "Email support at resellers@mega.nz",
+    "7716": "Olete juba kinnitamislingi e-posti aadressile saatnud."
 }

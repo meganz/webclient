@@ -2749,7 +2749,7 @@
     "7698": "Matagumpay mong nabago ang iyong profile.",
     "7699": "Inaantay pa ang kumpirmasyon sa e-mail.",
     "7700": "Pumunta sa inyong inbox at i-click ang link upang makumpirma ang inyong bagong email",
-    "7701": "Congratulations, your new e-mail address for this MEGA account is: [X]",
+    "7701": "Kongrats, ang inyong bagong e-mail address para sa MEGA account na ito ay: [X]",
     "7702": "Isa o higit pang items ang tinanggal na.",
     "7703": "Isa o higit pang items ang natanggal na.",
     "7704": "Ang file na ito ay ipinapatanggal.",
@@ -2762,5 +2762,7 @@
     "7711": "Pumili ng ibang plano",
     "7712": "Maglog in o magrehistro para makuha ang inyong voucher.",
     "7713": "This operation will clear all MEGA data from your browser cache and reload your account from our servers. This may take a few minutes.",
-    "7714": "Voucher redemption link"
+    "7714": "Link sa pagkuha ng voucher",
+    "7715": "Email support at resellers@mega.nz",
+    "7716": "You have already sent a confirm link to that address."
 }

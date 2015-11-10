@@ -11054,5 +11054,13 @@
     "7714": {
         "text": "Voucher redemption link",
         "context": "A table column heading on the #resellers page. It describes a link to be given to users who purchase a voucher, then it can be used to redeem the voucher directly. For example: https:\/\/mega.nz\/#voucher6E0U4QA7SFM5DM6RMEJ5."
+    },
+    "7715": {
+        "text": "Email support at resellers@mega.nz",
+        "context": "Text for the \"send email\" button on the Resellers page. It allows the user to contact MEGA's support center. Do not translate the  \"resellers@mega.nz\" email address."
+    },
+    "7716": {
+        "text": "You have already sent a confirm link to that address.",
+        "context": "Error message. Displayed if confirmation link has already been sent to the selected email."
     }
 }

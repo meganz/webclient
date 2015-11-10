@@ -2761,6 +2761,8 @@
     "7710": "\u5168\u9762\u5b8c\u6574\u7684\u5347\u7d1a",
     "7711": "\u9078\u64c7\u5176\u4ed6\u5957\u88dd\u8a08\u756b",
     "7712": "\u8acb\u767b\u5165\u6216\u8a3b\u518a\u4ee5\u4f7f\u7528\u60a8\u7684\u512a\u60e0\u5377",
-    "7713": "This operation will clear all MEGA data from your browser cache and reload your account from our servers. This may take a few minutes.",
-    "7714": "Voucher redemption link"
+    "7713": "\u6b64\u64cd\u4f5c\u5c07\u6e05\u9664\u6240\u6709\u60a8\u700f\u89bd\u5668\u4e2d\u5feb\u53d6\u66ab\u5b58\u7684MEGA\u6578\u64da\uff0c\u4e26\u5f9e\u6211\u5011\u7684\u4f3a\u670d\u5668\u91cd\u65b0\u8f09\u5165\u60a8\u7684\u5e33\u6236\u3002\u9019\u53ef\u80fd\u9700\u8981\u5e7e\u5206\u9418\u7684\u6642\u9593\u3002",
+    "7714": "\u4f7f\u7528\u512a\u60e0\u5377",
+    "7715": "Email support at resellers@mega.nz",
+    "7716": "You have already sent a confirm link to that address."
 }

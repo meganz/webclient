@@ -3193,8 +3193,8 @@ mega.utils.reload = function megaUtilsReload() {
         }
     }
     else {
-        // Show message that this operation will destroy and reload the data stored by MEGA in the browser
-        msgDialog('confirmation', l[761], l[6995], l[6994], function(doIt) {
+        // Show message that this operation will destroy the browser cache and reload the data stored by MEGA
+        msgDialog('confirmation', l[761], l[7713], l[6994], function(doIt) {
             if (doIt) {
                 if (!mBroadcaster.crossTab.master || mBroadcaster.crossTab.slaves.length) {
                     msgDialog('warningb', l[882], l[7157]);

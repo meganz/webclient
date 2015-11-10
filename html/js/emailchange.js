@@ -145,7 +145,7 @@ var emailchange = (function() {
                 // Show change email button
                 $('.fm-account-change-email.disabled')
                     .removeClass('disabled')
-                    .find('span').text('Request email change');
+                    .find('span').text('Request email change');         // ZZZ: Translate this
             
                 if (checkError(res)) {
                     return;
@@ -191,6 +191,7 @@ var emailchange = (function() {
         $input = $input || $('#verify-password');
         var password = $input.val();
         
+        // ZZZ: comment here
         passAES = passAES || new sjcl.cipher.aes(prepare_key_pw(password));
         
         $('.login-register-input.password').addClass('loading').removeClass('incorrect');

@@ -296,7 +296,7 @@ function init_page() {
     }
     else if (page.substr(0, 6) == 'verify') {
         parsepage(pages['change_email']);
-        changeemail.main();
+        emailchange.main();
     }
     else if (page.substr(0, 9) == 'corporate') {
         function doRenderCorpPage() {

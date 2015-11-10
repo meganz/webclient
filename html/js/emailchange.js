@@ -1,5 +1,6 @@
-var changeemail = (function(){
+var emailchange = (function(){
     var ns = {};
+    var $input;
     var context = null;
     
     function checkError(errcode) {
@@ -32,7 +33,7 @@ var changeemail = (function(){
     function verifyEmailCallback(passAES) {
         var k1 = context.k1 || u_attr.k;
         var k2 = context.k2 || u_k;
-        if (decrypt_key(passAES, base64_to_a32(k1)).join(",")  !== (k2).join(",")) {
+        if (!checkMyPassword(passAES, k1, k2)) {
             $('.login-register-input.password').removeClass('loading').addClass('incorrect');
             return;
         }
@@ -68,6 +69,7 @@ var changeemail = (function(){
                 msgDialog('warninga', title, msgbody, false, function() {
                     M.account = null; /* wipe M.account cache */
                     document.location.href = "#fm/account/profile";
+                    Later(accountUI);
                     showToast('settings', l[7698]);
                 });
             }
@@ -75,9 +77,12 @@ var changeemail = (function(){
     }
     
     ns.verifyEmailPassword = function(passAES, keys) {
-        passAES = passAES || new sjcl.cipher.aes(prepare_key_pw($('#verify-password').val()));
+        if (!$input) {
+            $input = $('#verify-password');
+        }
+        passAES = passAES || new sjcl.cipher.aes(prepare_key_pw($input.val()));
         $('.login-register-input.password').addClass('loading').removeClass('incorrect');
-        $('#verify-password').val('');
+        $input.val('');
         api_req({"a":"ersv", "c": context.code}, { callback: function(res) {
             if (checkError(res)) {
                 return;
@@ -100,7 +105,8 @@ var changeemail = (function(){
                 document.location.href = "#login";
             });
         }
-        $('#verify-password').rebind('focus',function(e)
+        $input = $('#verify-password');
+        $input.rebind('focus',function(e)
         {
             $('.login-register-input.password.first').removeClass('incorrect');
             $('.login-register-input.password.confirm').removeClass('incorrect');
@@ -112,7 +118,7 @@ var changeemail = (function(){
             }
         });
     
-        $('#verify-password').rebind('blur',function(e)
+        $input.rebind('blur',function(e)
         {
             $('.login-register-input.password').removeClass('focused');
             if ($(this).val() == '')

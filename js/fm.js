@@ -3620,6 +3620,9 @@ function accountUI()
 
             var email = $('#account-email').val().trim().toLowerCase();
             if (u_attr.email !== email) {
+                // Request change of email
+                // e => new email address
+                // i => requesti (Always has the global variable requesti (last request ID))
                 api_req({
                 a:'se',
                 aa:'a', 
@@ -3628,7 +3631,7 @@ function accountUI()
                 },  {
                     callback : function(res) {
                         if (res === -12) {
-                            return msgDialog('warninga', 'Error', "You have already sent a confirm link to that address."); 
+                            return msgDialog('warninga', l[135], l[7717]);
                         }
 
                         fm_showoverlay();

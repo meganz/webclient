@@ -2155,10 +2155,8 @@ function api_getsid2(res, ctx) {
         }
     }
 
-    if (r && typeof verifyEmail === "object") {
-        verifyEmail.k1 = res.k;
-        verifyEmail.k2 = k;
-        verify_email_passwd(new sjcl.cipher.aes(ctx.passwordkey));
+    if (r && typeof changeemail === "object") {
+        changeemail.verifyEmailPassword(new sjcl.cipher.aes(ctx.passwordkey), { k1: res.k, k2: k });
     }
 
     ctx.result(ctx, r);

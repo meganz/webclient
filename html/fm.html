@@ -15,6 +15,10 @@
 </div>
 <div class="context-menu files-menu hidden">
     <div class="context-menu-section">
+        <a class="context-menu-item do-sort" data-by="ts"><span class="context-menu-icon"></span>Date Created</a>
+        <a class="context-menu-item do-sort" data-by="mtime"><span class="context-menu-icon"></span>Date Modified</a>
+    </div>
+    <div class="context-menu-section">
         <a class="context-menu-item preview-item"><span class="context-menu-icon"></span>[$1899]</a>
         <a class="context-menu-item open-item"><span class="context-menu-icon"></span>[$865]</a>
         <a class="context-menu-item properties-item"><span class="context-menu-icon"></span>[$6859]</a>
@@ -198,11 +202,13 @@
 
             <!--Sorting menu for each section. !-->
             <div class="nw-sorting-menu hidden">
-                <div class="context-menu-section">
+                <div class="context-menu-section sort-by">
                     <div class="sorting-menu-arrow"></div>
                     <div data-by="name" class="sorting-menu-item active">[$86]</div>
                     <div data-by="status" class="sorting-menu-item">[$89]</div>
+                    <div data-by="created" class="sorting-menu-item">[$896]</div>
                     <div data-by="last-interaction" class="sorting-menu-item">[$5904]</div>
+                    <div data-by="fav" class="sorting-menu-item">[$5871]</div>
                     <div class="sorting-item-divider"></div>
                 </div>
                 <div class="context-menu-section">
@@ -598,7 +604,7 @@
                 </div>
 
                 <div class="fm-clearbin-button hidden">
-                    <span>[$7332]</span>
+                    <span>[$6794]</span>
                 </div>
 
                 <div class="fm-import-to-cloudrive hidden">
@@ -673,7 +679,7 @@
             <div class="fm-empty-trashbin hidden">
                 <div class="fm-empty-pad">
                     <div class="fm-empty-trashbin-bg"></div>
-                    <div class="fm-empty-cloud-txt">[$5599]</div>
+                    <div class="fm-empty-cloud-txt">[$7332]</div>
                 </div>
             </div>
             <div class="fm-empty-contacts hidden">
@@ -826,8 +832,9 @@
                 <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table-header">
                     <tr>
                         <th><div class="arrow name desc">[$86]</div></th>
-                    <th><div class="arrow status">[$89]</div></th>
-                    <th><div class="arrow interaction">[$5904]</div></th>
+                    	<th><div class="arrow status">[$89]</div></th>
+                    	<th><div class="arrow interaction">[$5904]</div></th>
+                        <th class="grid-url-header-nw"></th>
                     </tr>
                 </table>
                 <div class="grid-scrolling-table contacts">
@@ -878,6 +885,7 @@
                         <th><div class="arrow name desc">[$86]</div></th>
                         <th><div class="arrow owner">[$5905]</div></th>
                         <th><div class="arrow access">[$5906]</div></th>
+                        <th class="grid-url-header-nw"></th>
                     </tr>
                 </table>
 
@@ -902,16 +910,18 @@
                     <div class="contact-fingerprint-block">
                         <div class="contact-fingerprint-title">[$6872]</div>
                         <div class="contact-fingerprint-txt">
-                            <span>QH7XF</span>
-                            <span>QH7XF</span>
-                            <span>QH7XF</span>
-                            <span>QH7XF</span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
                         </div>
                         <div class="contact-fingerprint-txt">
-                            <span>QH7XF</span>
-                            <span>QH7XF</span>
-                            <span>QH7XF</span>
-                            <span>QH7XF</span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
                         </div>
                         <div class="fm-verify">
                             <span>[$1960]</span>
@@ -927,7 +937,7 @@
 
                     <div class="contact-details-pad">
                         <div class="contact-details-user-name">Andrei.d</div>
-                        <a href="" class="grid-url-arrow"><span></span></a>
+                        <a href="" class="grid-url-arrow"></a>
                         <div class="clear"></div>
                         <div class="contact-details-email">ad@mega.nz</div>
                         <div class="onlinestatus away">
@@ -975,6 +985,7 @@
                                 <th class="grid-first-th" style="width: 30px;"><span class="grid-header-star"></span></th>
                                 <th><div class="arrow name desc">[$86]</div></th>
                                 <th style="width: 270px;"><div class="arrow type">[$5906]</div></th>
+                                <th class="grid-url-header-nw"></th>
                             </tr>
                         </tbody>
                     </table>
@@ -1204,7 +1215,11 @@
                                 <div class="membership-big-txt type">
                                     [$748]
                                 </div>
-                                <div class="membership-medium-txt expiry">[$987] <span class="red">September 1st 2013</span></div>
+                                <div class="membership-medium-txt expiry">
+                                    <a href="#fm/account/history">
+                                        [$987] <span class="red">September 1st 2013</span>
+                                    </a>
+                                </div>
                                 <div class="clear"></div>
                             </div>
                             <div class="membership-medium-txt red-bg pro-upgrade btn-cancel">[$6822]</div>
@@ -1627,6 +1642,7 @@
                                 <div class="account-history-drop-items voucher10- active">Last 10 Vouchers</div>
                                 <div class="account-history-drop-items voucher100-">Last 100 Vouchers</div>
                                 <div class="account-history-drop-items voucher250-">Last 250 Vouchers</div>
+                                <div class="account-history-drop-items voucherAll-">[$7557]</div>
                             </div>
                         </div>
                         <div class="clear"></div>
@@ -1649,7 +1665,7 @@
             </div>
             <div  class="toast-col">
             	<div class="toast-button">
-                	<span>Show me</span>
+                	<span>[$7224]</span>
                 </div>
             </div>
         </div>
@@ -1662,7 +1678,7 @@
             </div>
             <div  class="toast-col">
             	<div class="toast-button">
-                	<span>Show me</span>
+                	<span>[$7224]</span>
                 </div>
             </div>
         </div>

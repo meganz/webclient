@@ -147,6 +147,15 @@ MegaSync.prototype._prepareDownloadUrls = function() {
         'c':'sudo dnf install'
     },
     {
+        'name':'Fedora 23',
+        '32':'Fedora_23/i686/megasync-Fedora_23.i686.rpm',
+        '32n':'Fedora_23/i686/nautilus-megasync-Fedora_23.i686.rpm',
+        '64':'Fedora_23/x86_64/megasync-Fedora_23.x86_64.rpm',
+        '64n':'Fedora_23/x86_64/nautilus-megasync-Fedora_23.x86_64.rpm',
+        'c':'sudo dnf install'
+    },
+
+    {
         'name':'Mint 17',
         '32':'xUbuntu_14.04/i386/megasync-xUbuntu_14.04_i386.deb',
         '32n':'xUbuntu_14.04/i386/nautilus-megasync-xUbuntu_14.04_i386.deb',
@@ -184,6 +193,12 @@ MegaSync.prototype._prepareDownloadUrls = function() {
         '32n':'openSUSE_13.2/i586/nautilus-megasync-openSUSE_13.2.i586.rpm',
         '64':'openSUSE_13.2/x86_64/megasync-openSUSE_13.2.x86_64.rpm',
         '64n':'openSUSE_13.2/x86_64/nautilus-megasync-openSUSE_13.2.x86_64.rpm',
+        'c':'sudo zypper in'
+    },
+    {
+        'name':'openSUSE Leap 42.1',
+        '64':'openSUSE_Leap_42.1/x86_64/megasync-openSUSE_Leap_42.1.x86_64.rpm',
+        '64n':'openSUSE_Leap_42.1/x86_64/nautilus-megasync-openSUSE_Leap_42.1.x86_64.rpm',
         'c':'sudo zypper in'
     },
     {
@@ -238,6 +253,14 @@ MegaSync.prototype._prepareDownloadUrls = function() {
         '32n':'xUbuntu_15.04/i386/nautilus-megasync-xUbuntu_15.04_i386.deb',
         '64':'xUbuntu_15.04/amd64/megasync-xUbuntu_15.04_amd64.deb',
         '64n':'xUbuntu_15.04/amd64/nautilus-megasync-xUbuntu_15.04_amd64.deb',
+        'c':'sudo gdebi'
+    },
+    {
+        'name':'Ubuntu 15.10',
+        '32':'xUbuntu_15.10/i386/megasync-xUbuntu_15.10_i386.deb',
+        '32n':'xUbuntu_15.10/i386/nautilus-megasync-xUbuntu_15.10_i386.deb',
+        '64':'xUbuntu_15.10/amd64/megasync-xUbuntu_15.10_amd64.deb',
+        '64n':'xUbuntu_15.10/amd64/nautilus-megasync-xUbuntu_15.10_amd64.deb',
         'c':'sudo gdebi'
     }];
 

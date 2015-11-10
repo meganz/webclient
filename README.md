@@ -17,7 +17,8 @@ localStorage.dd = 1;	// disables the cryptographic hash verification logic
 ```
 There are also various other localStorage parameters that are useful during development:
 ```
-localStorage.d = 1;		// enables logging
+localStorage.d = 1;		// enables vanilla console logging
+localStorage.minLogLevel = 0;	// enables full console logging via MegaLogger
 localStorage.contextmenu = 1;	// allows you to disable the contextmenu in the FM for element inspection
 ```
 

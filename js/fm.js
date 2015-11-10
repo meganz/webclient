@@ -254,7 +254,6 @@ function treeredraw()
 }
 
 function treePanelType() {
-
     return $.trim($('.nw-fm-left-icon.active').attr('class').replace(/(active|nw-fm-left-icon|ui-droppable)/g, ''));
 }
 
@@ -290,7 +289,6 @@ function treePanelSortElements(type, elements, handlers, ifEq) {
         if (d == 0 && ifEq) {
             return ifEq(a, b);
         }
-
         return d * settings.dir;
     });
 }
@@ -728,6 +726,7 @@ function initUI() {
                 'conversations':  { root: 'chat',      prev: null },
                 'contacts':       { root: 'contacts',  prev: null },
                 'transfers':      { root: 'transfers', prev: null },
+                'settings':       { root: 'settings',  prev: null },
                 'inbox':          { root: M.InboxID,   prev: null },
                 'rubbish-bin':    { root: M.RubbishID, prev: null }
             };
@@ -742,10 +741,23 @@ function initUI() {
         if (activeTab) {
             if (activeTab.root === M.currentrootid) {
                 activeTab.prev = M.currentdirid;
+                M.lastActiveTab = activeClass;
             }
             else if (d) {
                 console.warn('Root mismatch', M.currentrootid, M.currentdirid, activeTab);
             }
+        }
+
+        if ($(this).hasClass('settings')) {
+            if (u_type === 0) {
+                ephemeralDialog(l[7687]);
+            }
+            else {
+                $('.nw-fm-left-icon').removeClass('active');
+                $('.nw-fm-left-icon.settings').addClass('active');
+                document.location.hash = 'fm/account/settings';
+            }
+            return false;
         }
 
         for (var tab in fmTabState) {
@@ -1422,7 +1434,8 @@ function sharedUInode(nodeHandle) {
     var oShares,
         iShareNum = 0,
         bExportLink = false,
-        bAvailShares = false;
+        bAvailShares = false,
+        UiExportLink = new mega.UI.Share.ExportLink();
 
     // Is there a full share or pending share available
     if ((M.d[nodeHandle] && M.d[nodeHandle].shares) || M.ps[nodeHandle]) {
@@ -1438,11 +1451,12 @@ function sharedUInode(nodeHandle) {
         // Do we have export link for selected node?
         if (oShares && oShares.EXP) {
 
-            // List view
-            $('.grid-table.fm #' + nodeHandle + ' .grid-url-field').addClass('linked');
+            UiExportLink.addExportLinkIcon(nodeHandle);
 
-            // Grid view
-            $('#' + nodeHandle + '.file-block').addClass('linked');
+            // Item is taken down, make sure that user is informed
+            if (oShares.EXP.down === 1) {
+                UiExportLink.addTakenDownIcon(nodeHandle);
+            }
 
             bExportLink = true;
         }
@@ -1455,7 +1469,6 @@ function sharedUInode(nodeHandle) {
 
             // Left panel
             $('#treea_' + nodeHandle + ' .nw-fm-tree-folder').addClass('shared-folder');
-            $('#treea_' + nodeHandle).addClass('linked');
 
             bAvailShares = true;
         }
@@ -1480,9 +1493,7 @@ function sharedUInode(nodeHandle) {
 
     // If no export link is available, remove export link from left and right panels (list and block view)
     if (!bExportLink) {
-        $('.grid-table.fm #' + nodeHandle + ' .grid-url-field').removeClass('linked'); // Rigth panel list view
-        $('#' + nodeHandle + '.file-block').removeClass('linked'); // Right panel block view
-        $('#treea_' + nodeHandle).removeClass('linked'); // Left panel
+        UiExportLink.removeExportLinkIcon(nodeHandle);
     }
 }
 
@@ -1542,8 +1553,10 @@ function initAddDialogMultiInputPlugin() {
 
     // Plugin configuration
     var contacts = getContactsEMails();
+    var $this  = $('.add-contact-multiple-input');
+    var $scope = $this.parents('.add-user-popup');
 
-    $('.add-contact-multiple-input').tokenInput(contacts, {
+    $this.tokenInput(contacts, {
         theme: 'mega',
         hintText: l[5908],
         //hintText: '',
@@ -1573,6 +1586,17 @@ function initAddDialogMultiInputPlugin() {
         },
         onHolder: function() {
             errorMsg(l[7414]);
+        },
+        onReady: function() {
+            var $input = $this.parent().find('li input').eq(0);
+            $input.rebind('keyup', function() {
+                var value = $.trim($input.val());
+                if ($scope.find('li.token-input-token-mega').length > 0 || checkMail(value) === false) {
+                    $scope.find('.add-user-popup-button.add').removeClass('disabled');
+                } else {
+                    $scope.find('.add-user-popup-button.add').addClass('disabled');
+                }
+            });
         },
         onAdd: function() {
 
@@ -2088,17 +2112,26 @@ function fmremove() {
         contactcnt = 0,
         removesharecnt = 0;
 
+    // Loop throught selected items
     for (var i in $.selected) {
         var n = M.d[$.selected[i]];
+
+        // ToDo: Not clear what this represents
         if (n && n.p.length === 11) {
             removesharecnt++;
         }
+
+        // ToDo: Replace counting contact id chars with something more reliable
         else if (String($.selected[i]).length === 11) {
             contactcnt++;
         }
+
+        // Folder
         else if (n && n.t) {
             foldercnt++;
         }
+
+        // File
         else {
             filecnt++;
         }
@@ -2109,13 +2142,16 @@ function fmremove() {
             removeShare($.selected[i]);
         }
         M.openFolder('shares', true);
-    } else if (contactcnt) {
+    }
+
+    // Remove contacts from list
+    else if (contactcnt) {
         var t, c = $.selected.length;
 
-        // TODO: Need translation "delete N (users)"
         if (c > 1) {
             t = c + ' ' + l[5569];
-        } else {
+        }
+        else {
             t = '<strong>' + M.d[$.selected[0]].name + '</strong>';
         }
 
@@ -2128,8 +2164,7 @@ function fmremove() {
                         }
                     }
 
-                    M.delNode($.selected[i]);
-                    api_req({a: 'ur2', u: $.selected[i], l: '0', i: requesti});
+                    api_req({ a: 'ur2', u: $.selected[i], l: '0', i: requesti });
                     M.handleEmptyContactGrid();
                 }
             }
@@ -2139,13 +2174,16 @@ function fmremove() {
             $('.fm-del-contacts-number').text($.selected.length);
             $('#msgDialog .fm-del-contact-avatar').attr('class', 'fm-del-contact-avatar');
             $('#msgDialog .fm-del-contact-avatar span').empty();
-        } else {
+        }
+        else {
             var user = M.d[$.selected[0]],
                 avatar = useravatar.contact(user, 'avatar-remove-dialog');
 
             $('#msgDialog .fm-del-contact-avatar').html(avatar);
         }
-    } else if (RootbyId($.selected[0]) === M.RubbishID) {
+    }
+    // Remove/Clean rubbih bin
+    else if (RootbyId($.selected[0]) === M.RubbishID) {
         msgDialog('clear-bin', l[1003], l[76].replace('[X]', (filecnt + foldercnt)) + ' ' + l[77], l[1007], function(e) {
             if (e) {
                 M.clearRubbish(1);
@@ -2155,7 +2193,10 @@ function fmremove() {
             if ($(e).text() === l[1018])
                 $(e).html('<span>'+l[83]+'</span>');
         });
-    } else if (RootbyId($.selected[0]) === 'contacts') {
+    }
+
+    // Remove contacts
+    else if (RootbyId($.selected[0]) === 'contacts') {
         if (localStorage.skipDelWarning) {
             M.copyNodes($.selected, M.RubbishID, 1);
         } else {
@@ -2165,7 +2206,8 @@ function fmremove() {
                 }
             }, true);
         }
-    } else {
+    }
+    else {
         if (localStorage.skipDelWarning) {
             if (M.currentrootid === 'shares') {
                 M.copyNodes($.selected, M.RubbishID, true);
@@ -2173,12 +2215,14 @@ function fmremove() {
             else {
                 M.moveNodes($.selected, M.RubbishID);
             }
-        } else {
+        }
+        else {
 
-                // Additional message in case that there's a shared node
+            // Additional message in case that there's a shared node
             var delShareInfo,
-                // Contains complete directory structure of selected nodes, their ids
-                dirTree = [];
+
+            // Contains complete directory structure of selected nodes, their ids
+            dirTree = [];
 
             var nodes = new mega.Nodes({});
             $.each($.selected, function(index, value){
@@ -2202,7 +2246,7 @@ function fmremove() {
                                 // Remove regular/full share
                                 for (var share in M.d[dirTree[selection]].shares) {
                                     if (M.d[dirTree[selection]].shares.hasOwnProperty(share)) {
-                                        api_req({a: 's2', n:  dirTree[selection], s: [{ u: M.d[dirTree[selection]].shares[share].u, r: ''}], ha: '', i: requesti});
+                                        api_req({ a: 's2', n:  dirTree[selection], s: [{ u: M.d[dirTree[selection]].shares[share].u, r: ''}], ha: '', i: requesti });
                                         M.delNodeShare(dirTree[selection], M.d[dirTree[selection]].shares[share].u);
                                         setLastInteractionWith(dirTree[selection], "0:" + unixtime());
                                     }
@@ -2211,7 +2255,7 @@ function fmremove() {
                                 // Remove pending share
                                 for (var pendingUserId in M.ps[dirTree[selection]]) {
                                     if (M.ps[dirTree[selection]].hasOwnProperty(pendingUserId)) {
-                                        api_req({a: 's2', n:  dirTree[selection], s: [{ u: pendingUserId, r: ''}], ha: '', i: requesti});
+                                        api_req({ a: 's2', n:  dirTree[selection], s: [{ u: pendingUserId, r: ''}], ha: '', i: requesti });
                                         M.deletePendingShare(dirTree[selection], pendingUserId);
                                     }
                                 }
@@ -2392,9 +2436,7 @@ function initContextUI() {
             ephemeralDialog(l[1005]);
         }
         else {
-            fm_showoverlay();
             initCopyrightsDialog($.selected);
-            $('.copyrights-dialog').show();
         }
     });
 
@@ -2496,7 +2538,11 @@ function initContextUI() {
     });
 
     $(c + '.add-star-item').rebind('click', function() {
-        M.favourite($.selected, $.delfav);
+
+        var delFavourite = M.isFavourite($.selected);
+
+        M.favourite($.selected, delFavourite);
+
         if (M.viewmode) {
             $('.file-block').removeClass('ui-selected');
         }
@@ -2838,6 +2884,11 @@ function accountUI()
     if ($('.fmholder').hasClass('transfer-panel-opened')) {
         $.transferClose();
     }
+    if (typeof zxcvbn === 'undefined' && !silent_loading) {
+        silent_loading = accountUI;
+        jsl.push(jsl2['zxcvbn_js']);
+        return jsl_start();
+    }
     M.accountData(function(account)
     {
         var perc, warning, perc_c;
@@ -2896,6 +2947,7 @@ function accountUI()
             $('.fm-account-overview').removeClass('hidden');
         }
         $('.fm-account-blocks .membership-icon.type').removeClass('free pro1 pro2 pro3 pro4');
+
         if (u_attr.p)
         {
             // LITE/PRO account
@@ -2956,7 +3008,10 @@ function accountUI()
                 // one-time or cancelled subscription
                 $('.fm-account-header.typetitle').text(l[746]+':');
                 $('.membership-big-txt.type').text(l[751]);
-                $('.membership-medium-txt.expiry').html(l[987] + ' <span class="red">' + time2date(account.expiry) + '</span>');
+                $('.membership-medium-txt.expiry a').rebind('click', function() {
+                    document.location = $(this).attr('href');
+                });
+                $('.membership-medium-txt.expiry a').html(l[987] + ' <span class="red">' + time2date(account.expiry) + '</span>');
                 $('.fm-account-blocks .btn-cancel').hide();
             }
         }
@@ -3127,12 +3182,19 @@ function accountUI()
 
             var dateTime = htmlentities(time2date(el[0]));
             var browser = browserdetails(el[2]);
+            var browserName = browser.nameTrans;
             var ipAddress = htmlentities(el[3]);
             var country = countrydetails(el[4]);
             var currentSession = el[5];
             var sessionId = el[6];
             var activeSession = el[7];
             var status = '<span class="current-session-txt">' + l[7665] + '</span>';    // Current
+
+            // Show if using an extension e.g. "Chrome Extension on Windows" or "Firefox Extension on Linux"
+            if (browser.isExtension) {
+                browserName = browserName.replace('Firefox', 'Firefox ' + l[7683]);
+                browserName = browserName.replace('Chrome', 'Chrome ' + l[7683]);
+            }
 
             // If not the current session
             if (!currentSession) {
@@ -3150,7 +3212,7 @@ function accountUI()
 
             // Generate row html
             html += '<tr class="' + (currentSession ? "current" : sessionId) +  '">'
-                + '<td><span class="fm-browsers-icon"><img alt="" src="' + staticpath + 'images/browser/' + browser.icon + '" /></span><span class="fm-browsers-txt">' + htmlentities(browser.name) + '</span></td>'
+                + '<td><span class="fm-browsers-icon"><img alt="" src="' + staticpath + 'images/browser/' + browser.icon + '" /></span><span class="fm-browsers-txt">' + htmlentities(browserName) + '</span></td>'
                 + '<td>' + ipAddress + '</td>'
                 + '<td><span class="fm-flags-icon"><img alt="" src="' + staticpath + 'images/flags/' + country.icon + '" style="margin-left: 0px;" /></span><span class="fm-flags-txt">' + htmlentities(country.name) + '</span></td>'
                 + '<td>' + dateTime + '</td>'
@@ -3184,6 +3246,7 @@ function accountUI()
             // Expire all sessions but not the current one
             api_req({ a: 'usr', ko: 1 }, {
                 callback: function() {
+                    M.account = null; /* clear account cache */
                     $activeSessionsRows.find('.settings-logout').remove();
                     $activeSessionsRows.find('.active-session-txt').removeClass('active-session-txt')
                         .addClass('expired-session-txt').text(l[1664]);
@@ -3205,6 +3268,7 @@ function accountUI()
                  */
                 api_req({ a: 'usr', s: [sessionId] }, {
                     callback: function(res, ctx) {
+                        M.account = null; /* clear account cache */
                         $this.find('.settings-logout').remove();
                         $this.find('.active-session-txt').removeClass('active-session-txt')
                             .addClass('expired-session-txt').text(l[1664]);
@@ -3436,6 +3500,7 @@ function accountUI()
             $('.fm-account-save-block').addClass('hidden');
             $('.fm-account-main').removeClass('save');
             initAccountScroll();
+            var pws = zxcvbn($('#account-new-password').val());
 
             if (M.account.dl_maxSlots)
             {
@@ -3490,9 +3555,18 @@ function accountUI()
                         $('#account-password').unbind('keyup.accpwd');
                     });
                 });
-            }
-            else if ($('#account-new-password').val() !== $('#account-confirm-password').val())
-            {
+            } else if (!checkMyPassword($('#account-password').val())) {
+                msgDialog('warninga', l[135], l[724], false, function() {
+                    $('#account-password').val('');
+                    $('#account-password').focus();
+                    $('#account-password').bind('keyup.accpwd', function() {
+                        $('.fm-account-save-block').removeClass('hidden');
+                        $('.fm-account-main').addClass('save');
+                        initAccountScroll();
+                        $('#account-password').unbind('keyup.accpwd');
+                    });
+                });
+            } else if ($('#account-new-password').val() !== $('#account-confirm-password').val()) {
                 msgDialog('warninga', 'Error', l[715], false, function()
                 {
                     $('#account-new-password').val('');
@@ -3500,7 +3574,13 @@ function accountUI()
                     $('#account-new-password').focus();
                 });
             }
-            else if ($('#account-confirm-password').val() !== '' && $('#account-password').val() !== ''
+            else if (pws.score === 0 || pws.entropy < 16) {
+                msgDialog('warninga', 'Error', l[1129], false, function() {
+                    $('#account-new-password').val('');
+                    $('#account-confirm-password').val('');
+                    $('#account-new-password').focus();
+                });
+            } else if ($('#account-confirm-password').val() !== '' && $('#account-password').val() !== ''
                 && $('#account-confirm-password').val() !== $('#account-password').val())
             {
                 loadingDialog.show();
@@ -3582,6 +3662,9 @@ function accountUI()
                 $.voucherlimit = 100;
             else if (c.indexOf('voucher250-') > -1)
                 $.voucherlimit = 250;
+            else if (c.indexOf('voucherAll-') > -1) {
+                $.voucherlimit = 'all';
+            }
             $(this).addClass('active');
             $(this).closest('.account-history-dropdown').addClass('hidden');
             accountUI();
@@ -3885,26 +3968,38 @@ function accountUI()
             });
         });
 
-        if (M.account.reseller)
-        {
+        if (M.account.reseller) {
+
+            // Use 'All' or 'Last 10/100/250' for the dropdown text
+            var buttonText = ($.voucherlimit === 'all') ? l[7557] : l['466a'].replace('[X]', $.voucherlimit);
+
             $('.fm-account-reseller-button').removeClass('hidden');
-            $('.account-history-dropdown-button.vouchers').text(l['466a'].replace('[X]', $.voucherlimit));
+            $('.account-history-dropdown-button.vouchers').text(buttonText);
             $('.account-history-drop-items.voucher10-').text(l['466a'].replace('[X]', 10));
             $('.account-history-drop-items.voucher100-').text(l['466a'].replace('[X]', 100));
             $('.account-history-drop-items.voucher250-').text(l['466a'].replace('[X]', 250));
-            M.account.vouchers.sort(function(a, b)
-            {
-                if (a['date'] < b['date'])
+
+            // Sort vouchers by most recently created at the top
+            M.account.vouchers.sort(function(a, b) {
+
+                if (a['date'] < b['date']) {
                     return 1;
-                else
+                }
+                else {
                     return -1;
+                }
             });
+
             $('.grid-table.vouchers tr').remove();
-            var html = '<tr><th>' + l[475] + '</th><th>' + l[487] + '</th><th>' + l[477] + '</th><th>' + l[488] + '</th></tr>';
-            $(account.vouchers).each(function(i, el)
-            {
-                if (i > $.voucherlimit)
+            var html = '<tr><th>' + l[475] + '</th><th>' + l[7714] + '</th><th>' + l[477] + '</th><th>' + l[488] + '</th></tr>';
+            
+            $(account.vouchers).each(function(i, el) {
+
+                // Only show the last 10, 100, 250 or if the limit is not set show all vouchers
+                if (($.voucherlimit !== 'all') && (i >= $.voucherlimit)) {
                     return false;
+                }
+
                 var status = l[489];
                 if (el.redeemed > 0 && el.cancelled == 0 && el.revoked == 0)
                     status = l[490] + ' ' + time2date(el.redeemed);
@@ -3912,16 +4007,20 @@ function accountUI()
                     status = l[491] + ' ' + time2date(el.revoked);
                 else if (el.cancelled > 0)
                     status = l[492] + ' ' + time2date(el.cancelled);
-                html += '<tr><td>' + time2date(el.date) + '</td><td class="selectable">' + htmlentities(el.code) + '</td><td>&euro; ' + htmlentities(el.amount) + '</td><td>' + status + '</td></tr>';
+
+                var voucherLink = 'https://mega.nz/#voucher' + htmlentities(el.code);
+
+                html += '<tr><td>' + time2date(el.date) + '</td><td class="selectable">' + voucherLink + '</td><td>&euro; ' + htmlentities(el.amount) + '</td><td>' + status + '</td></tr>';
             });
             $('.grid-table.vouchers').html(html);
             $('.fm-account-select.vouchertype select option').remove();
             var prices = [];
-            for (var i in M.account.prices)
+            for (var i in M.account.prices) {
                 prices.push(M.account.prices[i][0]);
+            }
             prices.sort(function(a, b) {
-                return (a - b)
-            })
+                return (a - b);
+            });
             var voucheroptions = '<option value="">' + escapeHTML(l[6875]) + '</option>';
             for (var i in prices)
                 voucheroptions += '<option value="' + htmlentities(prices[i]) + '">&euro;' + htmlentities(prices[i]) + ' voucher</option>';
@@ -4067,17 +4166,19 @@ function accountUI()
     $('#account-new-password').bind('keyup', function(el)
     {
         $('.account-pass-lines').attr('class', 'account-pass-lines');
-        if ($(this).val() !== '')
-        {
-            var pws = checkPassword($(this).val());
-            if (pws <= 25)
-                $('.account-pass-lines').addClass('good1');
-            else if (pws <= 50)
-                $('.account-pass-lines').addClass('good2');
-            else if (pws <= 75)
-                $('.account-pass-lines').addClass('good3');
-            else
+        if ($(this).val() !== '') {
+            var pws = zxcvbn($(this).val());
+            if (pws.score > 3 && pws.entropy > 75) {
                 $('.account-pass-lines').addClass('good4');
+            } else if (pws.score > 2 && pws.entropy > 50) {
+                $('.account-pass-lines').addClass('good3');
+            } else if (pws.score > 1 && pws.entropy > 40) {
+                $('.account-pass-lines').addClass('good2');
+            } else if (pws.score > 0 && pws.entropy > 15) {
+                $('.account-pass-lines').addClass('good1');
+            } else {
+                $('.account-pass-lines').addClass('weak-password');
+            }
         }
     });
 
@@ -4326,8 +4427,14 @@ function gridUI() {
         $('.grid-url-header').text('');
     }
 
-    $('.files-grid-view,.fm-empty-cloud').unbind('contextmenu');
-    $('.files-grid-view,.fm-empty-cloud').bind('contextmenu', function(e) {
+    $('.fm .grid-table-header th').rebind('contextmenu', function(e) {
+        $('.file-block').removeClass('ui-selected');
+        $.selected = [];
+        $.hideTopMenu();
+        return !!contextMenuUI(e, 6);
+    });
+
+    $('.files-grid-view,.fm-empty-cloud').rebind('contextmenu', function(e) {
         $('.file-block').removeClass('ui-selected');
         $.selected = [];
         $.hideTopMenu();
@@ -4341,32 +4448,25 @@ function gridUI() {
         M.favourite(id, $('.grid-table.fm #' + id[0] + ' .grid-status-icon').hasClass('star'));
     });
 
-    $('.grid-table-header .arrow').unbind('click');
-    $('.grid-table-header .arrow').bind('click', function() {
+    $('.context-menu-item.do-sort').rebind('click', function() {
+        M.setLastColumn($(this).data('by'));
+        M.doSort($(this).data('by'), -1);
+        M.renderMain();
+    });
+
+    $('.grid-table-header .arrow').rebind('click', function() {
         var c = $(this).attr('class');
         var d = 1;
         if (c && c.indexOf('desc') > -1)
             d = -1;
-        if (c && c.indexOf('name') > -1)
-            M.doSort('name', d);
-        else if (c && c.indexOf('fav') > -1) {
-            M.doSort('fav', d);
-        } else if (c && c.indexOf('size') > -1)
-            M.doSort('size', d);
-        else if (c && c.indexOf('type') > -1)
-            M.doSort('type', d);
-        else if (c && c.indexOf('date') > -1)
-            M.doSort('date', d);
-        else if (c && c.indexOf('owner') > -1)
-            M.doSort('owner', d);
-        else if (c && c.indexOf('access') > -1)
-            M.doSort('access', d);
-        else if (c && c.indexOf('status') > -1)
-            M.doSort('status', d);
-        else if (c && c.indexOf('interaction') > -1)
-            M.doSort('interaction', d);
-        if (c)
-            M.renderMain();
+
+        for (var e in M.sortRules) {
+            if (c && c.indexOf(e) > -1) {
+                M.doSort(e, d);
+                M.renderMain();
+                break;
+            }
+        }
     });
 
     if (M.currentdirid === 'shares')
@@ -5675,16 +5775,6 @@ function transferPanelUI()
         }
     };
 
-    $('.nw-fm-left-icon.settings .settings-icon').rebind('click', function() {
-        if (u_type === 0) {
-            ephemeralDialog('Transfer settings are for registered users only.');
-        }
-        else {
-            $('.nw-fm-left-icon').removeClass('active');
-            $('.nw-fm-left-icon.settings').addClass('active');
-            document.location.hash = 'fm/account/settings';
-        }
-    });
     $('.transfer-clear-all-icon').rebind('click', function() {
         if (!$(this).hasClass('disabled')) {
             msgDialog('confirmation', 'clear all transfers', l[7225], '', function(e) {
@@ -5756,82 +5846,100 @@ function getDDhelper()
     return $('.dragger-block')[0];
 }
 
+
+/**
+ * menuItems
+ *
+ * Selecte what in context menu will be shown of actions and what not, depends on selected item/s
+ * @returns {menuItems.items|Array}
+ */
 function menuItems() {
 
     var selItem,
         items = [],
+        share = {},
+        exportLink = {},
+        isTakenDown = false,
+        hasExportLink = false,
         sourceRoot = RootbyId($.selected[0]);
 
     if ($.selected.length === 1 && RightsbyID($.selected[0]) > 1) {
-        items['rename'] = 1;
+        items['.rename-item'] = 1;
     }
 
     if (RightsbyID($.selected[0]) > 0) {
-        items['add-star'] = 1;
-        $.delfav = 1;
 
-        for (var i in $.selected) {
-            var n = M.d[$.selected[i]];
-            if (n && !n.fav) {
-                $.delfav = 0;
-                break;
-            }
-        }
+        items['.add-star-item'] = 1;
 
-        if ($.delfav) {
+        if (M.isFavourite($.selected)) {
             $('.add-star-item').html('<span class="context-menu-icon"></span>' + l[5872]);
         }
         else {
             $('.add-star-item').html('<span class="context-menu-icon"/></span>' + l[5871]);
+
         }
     }
 
     selItem = M.d[$.selected[0]];
 
     if (selItem && selItem.p.length === 11) {
-        items['removeshare'] = 1;
+        items['.removeshare-item'] = 1;
     }
     else if (RightsbyID($.selected[0]) > 1) {
-        items['remove'] = 1;
+        items['.remove-item'] = 1;
     }
 
     if (selItem && $.selected.length === 1 && selItem.t) {
-        items['open'] = 1;
+        items['.open-item'] = 1;
     }
 
     if (selItem && $.selected.length === 1 && is_image(selItem)) {
-        items['preview'] = 1;
+        items['.preview-item'] = 1;
     }
 
     if (selItem && sourceRoot === M.RootID && $.selected.length === 1 && selItem.t && !folderlink) {
-        items['sh4r1ng'] = 1;
+        items['.sh4r1ng-item'] = 1;
     }
 
     if (sourceRoot === M.RootID && !folderlink) {
-        items['move'] = 1;
-        items['getlink'] = 1;
-        var share = new mega.Share();
-        if (share.hasExportLink($.selected)) {
-            items['removelink'] = true;
+        items['.move-item'] = 1;
+        items['.getlink-item'] = 1;
+
+        share = new mega.Share();
+        hasExportLink = share.hasExportLink($.selected);
+
+        if (hasExportLink) {
+            items['.removelink-item'] = true;
+        }
+
+        exportLink = new mega.Share.ExportLink();
+        isTakenDown = exportLink.isTakenDown($.selected);
+
+        // If any of selected items is taken donw remove actions from context menu
+        if (isTakenDown) {
+            delete items['.getlink-item'];
+            delete items['.removelink-item'];
+            delete items['.sh4r1ng-item'];
+            delete items['.add-star-item'];
         }
     }
 
     else if (sourceRoot === M.RubbishID && !folderlink) {
-        items['move'] = 1;
+        items['.move-item'] = 1;
     }
 
-    items['download'] = 1;
-    items['zipdownload'] = 1;
-    items['copy'] = 1;
-    items['properties'] = 1;
-    items['refresh'] = 1;
+    items['.download-item'] = 1;
+    items['.zipdownload-item'] = 1;
+    items['.copy-item'] = 1;
+    items['.properties-item'] = 1;
+    items['.refresh-item'] = 1;
 
     if (folderlink) {
-        delete items['properties'];
-        delete items['copy'];
-        delete items['add-star'];
+        delete items['.properties-item'];
+        delete items['.copy-item'];
+        delete items['.add-star-item'];
         if (u_type) {
-            items['import'] = 1;
+            items['.import-item'] = 1;
         }
     }
 
@@ -5880,18 +5988,22 @@ function contextMenuUI(e, ll) {
     else if (ll === 4 || ll === 5) {// contactUI
         $(menuCMI).hide();
         items = menuItems();
-        delete items['download'];
-        delete items['zipdownload'];
-        delete items['copy'];
-        delete items['open'];
+        delete items['.download-item'];
+        delete items['.zipdownload-item-item'];
+        delete items['.copy-item'];
+        delete items['.open-item'];
 
         if (ll === 5) {
-            delete items['properties'];
+            delete items['.properties-item'];
         }
 
         for (var item in items) {
-            $(menuCMI).filter('.' + item + '-item').show();
+            $(menuCMI).filter(item).show();
         }
+    }
+    else if (ll === 6) { // sort menu
+        $('.context-menu-item').hide();
+        $('.context-menu-item.do-sort').show();
     }
     else if (ll) {// Click on item
 
@@ -5948,7 +6060,7 @@ function contextMenuUI(e, ll) {
             || id) {
             items = menuItems();
             for (var item in items) {
-                $(menuCMI).filter('.' + item + '-item').show();
+                $(menuCMI).filter(item).show();
             }
         }
         else {
@@ -6404,7 +6516,7 @@ function treeUIexpand(id, force, moveDialog)
 function sectionUIopen(id) {
     var tmpId;
     if (d) {
-        console.log('sectionUIopen', id);
+        console.log('sectionUIopen', id, folderlink);
     }
 
     $('.nw-fm-left-icon').removeClass('active');
@@ -6434,9 +6546,10 @@ function sectionUIopen(id) {
     $('.nw-fm-left-icon.folder-link').removeClass('active');
 
     if (folderlink) {
-        if (!isValidShareLink()) {
+        // XXX: isValidShareLink won't work properly when navigating from/to a folderlink
+        /*if (!isValidShareLink()) {
             $('.fm-breadcrumbs.folder-link .right-arrow-bg').text('Invalid folder');
-        } else if (id === 'cloud-drive' || id === 'transfers') {
+        } else*/ if (id === 'cloud-drive' || id === 'transfers') {
             $('.fm-main').addClass('active-folder-link');
             $('.fm-right-header').addClass('folder-link');
             $('.nw-fm-left-icon.folder-link').addClass('active');
@@ -7415,7 +7528,10 @@ function initShareDialogMultiInputPlugin() {
             }, 3000);
         }
 
-        $('.share-multiple-input').tokenInput(contacts, {
+        var $input = $('.share-multiple-input');
+        var $scope = $input.parents('.share-dialog');
+
+        $input.tokenInput(contacts, {
             theme: "mega",
             hintText: l[5908],
             // placeholder: "Type in an email or contact",
@@ -7434,8 +7550,20 @@ function initShareDialogMultiInputPlugin() {
             scrollLocation: 'share',
             // Exclude from dropdownlist only emails/names which exists in multi-input (tokens)
             excludeCurrent: true,
+
             onEmailCheck: function() {
                 errorMsg(l[7415]); // Looks like there's a malformed email
+            },
+            onReady: function() {
+                var $this = $scope.find('li input');
+                $this.rebind('keyup', function() {
+                    var value = $.trim($this.val());
+                    if ($scope.find('li.token-input-token-mega').length > 0 || checkMail(value) === false) {
+                        $scope.find('.dialog-share-button').removeClass('disabled');
+                    } else {
+                        $scope.find('.dialog-share-button').addClass('disabled');
+                    }
+                });
             },
             onDoublet: function(u) {
                 errorMsg(l[7413]); // You already have a contact with that email
@@ -7517,27 +7645,51 @@ function initShareDialogMultiInputPlugin() {
 }
 
 /**
- * initCopyrightsDialog
+ * Shows the copyright warning dialog.
  *
- * @param {Array} nodesToProcess Array of strings, nodes ids
+ * @param {Array} nodesToProcess Array of strings, node ids
  */
 function initCopyrightsDialog(nodesToProcess) {
 
-    $.copyrightsDialog = 'copyrights';
+    $.itemExport = nodesToProcess;
+    // If they've already agreed to the copyright warning this session
+    if (localStorage.getItem('agreedToCopyrightWarning') !== null) {
 
-    $('.copyrights-dialog .fm-dialog-button').rebind('click', function() {
-        if (this.className.indexOf('cancel') !== -1) {
+        // Go straight to Get Link dialog
+        var exportLink = new mega.Share.ExportLink({ 'showExportLinkDialog': true, 'updateUI': true, 'nodesToProcess': nodesToProcess });
+        exportLink.getExportLink();
+
+        return false;
+    }
+
+    // Cache selector
+    var $copyrightDialog = $('.copyrights-dialog');
+
+    // Otherwise show the copyright warning dialog
+    fm_showoverlay();
+    $.copyrightsDialog = 'copyrights';
+    $copyrightDialog.show();
+
+    // Init click handler for 'I agree' / 'I disagree' buttons
+    $copyrightDialog.find('.fm-dialog-button').rebind('click', function() {
+
+        // User disagrees with copyright warning
+        if ($(this).hasClass('cancel')) {
             closeDialog();
         }
         else {
+            // User agrees, store flag in localStorage so they don't see it again for this session
+            localStorage.setItem('agreedToCopyrightWarning', '1');
+
+            // Go straight to Get Link dialog
             closeDialog();
             var exportLink = new mega.Share.ExportLink({ 'showExportLinkDialog': true, 'updateUI': true, 'nodesToProcess': nodesToProcess });
             exportLink.getExportLink();
         }
-
     });
 
-    $('.copyrights-dialog .fm-dialog-close').rebind('click', function() {
+    // Init click handler for 'Close' button
+    $copyrightDialog.find('.fm-dialog-close').rebind('click', function() {
         closeDialog();
     });
 }
@@ -8611,7 +8763,7 @@ function getclipboardkeys() {
  * @param {String} notification The text for the toast notification
  */
 function showToast(toastClass, notification) {
-    
+
     var $toast, interval;
 
     $toast = $('.toast-notification.common-toast');
@@ -8702,7 +8854,7 @@ function itemExportLink() {
     var node,
         html = '';
 
-    $.each($.selected, function(index, value) {
+    $.each($.itemExport, function(index, value) {
         node = M.d[value];
         if (node && node.ph) {
             html += itemExportLinkHtml(node);
@@ -9032,7 +9184,17 @@ function propertiesDialog(close)
     }
     $.propertiesDialog = $.dialog = 'properties';
     fm_showoverlay();
-    pd.removeClass('hidden multiple folders-only two-elements shared shared-with-me read-only read-and-write full-access');
+
+    pd.removeClass('hidden multiple folders-only two-elements shared shared-with-me');
+    pd.removeClass('read-only read-and-write full-access taken-down');
+
+    var exportLink = new mega.Share.ExportLink({});
+    var isTakenDown = exportLink.isTakenDown($.selected);
+    if (isTakenDown) {
+        pd.addClass('taken-down');
+        showToast('clipboard', l[7703]);
+    }
+
     $('.properties-elements-counter span').text('');
     $('.fm-dialog.properties-dialog .properties-body').rebind('click', function()
     {
@@ -9215,11 +9377,10 @@ function propertiesDialog(close)
         +'<div class="propreties-dark-txt t11">' + p.t11 + '</div></div></div>';
     $('.properties-txt-pad').html(html);
 
-	if (typeof(p.t10) == 'undefined' && typeof(p.t11) == 'undefined')
-	{
-		$('.properties-small-gray.t10').addClass('hidden');
-		$('.propreties-dark-txt.t11').addClass('hidden');
-	}
+    if (typeof(p.t10) === 'undefined' && typeof(p.t11) === 'undefined') {
+        $('.properties-small-gray.t10').addClass('hidden');
+        $('.propreties-dark-txt.t11').addClass('hidden');
+    }
 
     pd.find('.file-settings-icon').rebind('click context', function(e) {
         if ($(this).attr('class').indexOf('active') == -1) {
@@ -9571,9 +9732,7 @@ function slideshow(id, close)
             ephemeralDialog(l[1005]);
         }
         else {
-            fm_showoverlay();
             initCopyrightsDialog([slideshowid]);
-            $('.copyrights-dialog').show();
         }
     });
 
@@ -10025,7 +10184,7 @@ function sharedfolderUI() {
                 +'<div class="shared-details-info-block">'
                     +'<div class="shared-details-pad">'
                         +'<div class="shared-details-folder-name">'+ htmlentities((c||n).name) +'</div>'
-                        +'<a href="javascript:;" class="grid-url-arrow"><span></span></a>'
+                        +'<a href="javascript:;" class="grid-url-arrow"></a>'
                         +'<div class="shared-folder-access'+ rightsclass + '">' + rights + '</div>'
                         +'<div class="clear"></div>'
                         + avatar
@@ -10066,6 +10225,41 @@ function userFingerprint(userid, next) {
     var fingerprintPromise = crypt.getFingerprintEd25519(user.h || userid);
     fingerprintPromise.done(function (response) {
         next(response.toUpperCase().match(/.{4}/g), response);
+    });
+}
+
+/**
+ * Get and display the fingerprint
+ * @param {Object} user The user object e.g. same as M.u[userHandle]
+ */
+function showAuthenticityCredentials(user) {
+
+    var $fingerprintContainer = $('.contact-fingerprint-txt');
+
+    // Compute the fingerprint
+    userFingerprint(user, function(fingerprints) {
+
+        // Clear old values immediately
+        $fingerprintContainer.empty();
+
+        // Render the fingerprint into 10 groups of 4 hex digits
+        $.each(fingerprints, function(key, value) {
+            $('<span>').text(value).appendTo(
+                $fingerprintContainer.filter(key <= 4 ? ':first' : ':last')
+            );
+        });
+    });
+}
+
+/**
+ * Enables the Verify button
+ * @param {String} userHandle The user handle
+ */
+function enableVerifyFingerprintsButton(userHandle) {
+    $('.fm-verify').removeClass('verified');
+    $('.fm-verify').find('span').text(l[1960] + '...');
+    $('.fm-verify').rebind('click', function() {
+        fingerprintDialog(userHandle);
     });
 }
 
@@ -10127,9 +10321,15 @@ function fingerprintDialog(userid) {
         // Add log to see how often they verify the fingerprints
         api_req({ a: 'log', e: 99602, m: 'Fingerprint verification approved' });
 
+        // Generate fingerprint
         userFingerprint(user, function(fprint, fprintraw) {
+
+            // Authenticate the contact
             authring.setContactAuthenticated(userid, fprintraw, 'Ed25519', authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON);
-            $('.fm-verify').unbind('click').find('span').text('Verified');
+
+            // Change button state to 'Verified'
+            $('.fm-verify').unbind('click').addClass('verified').find('span').text(l[6776]);
+
             closeFngrPrntDialog();
         });
     });
@@ -10181,33 +10381,8 @@ function contactUI() {
             contextMenuUI(e, 4);
         });
 
-        /**
-         * Get and display the fingerprint
-         */
-        var showAuthenticityCredentials = function() {
-            var fprint = $('.contact-fingerprint-txt').empty();
-            userFingerprint(user, function (fprints) {
-                $.each(fprints, function (k, value) {
-                    $('<span>').text(value).appendTo(
-                        fprint.filter(k <= 4 ? ':first' : ':last')
-                    );
-                });
-            });
-        };
-
-        /**
-         * Enables the Verify button
-         */
-        var enableVerifyFingerprintsButton = function() {
-            $('.fm-verify').removeClass('disabled');
-            $('.fm-verify').find('span').text(l[1960] + '...');
-            $('.fm-verify').rebind('click', function() {
-                fingerprintDialog(user);
-            });
-        };
-
         // Display the current fingerpring
-        showAuthenticityCredentials();
+        showAuthenticityCredentials(user);
 
         // Set authentication state of contact from authring.
         var authringPromise = new MegaPromise();
@@ -10221,18 +10396,20 @@ function contactUI() {
         }
         /** To be called on settled authring promise. */
         var _setVerifiedState = function() {
+
             var handle = user.u || user;
             var verificationState = u_authring.Ed25519[handle] || {};
             var isVerified = (verificationState.method
                               >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON);
+
+            // Show the user is verified
             if (isVerified) {
-                // Show the user is verified.
-                $('.fm-verify').addClass('disabled');
+                $('.fm-verify').addClass('verified');
                 $('.fm-verify').find('span').text(l[6776]);
             }
             else {
-                // Otherwise show the Verify button.
-                enableVerifyFingerprintsButton();
+                // Otherwise show the Verify... button.
+                enableVerifyFingerprintsButton(handle);
             }
         };
         authringPromise.done(_setVerifiedState);
@@ -10240,10 +10417,10 @@ function contactUI() {
         // Reset seen or verified fingerprints and re-enable the Verify button
         $('.fm-reset-stored-fingerprint').rebind('click', function() {
             authring.resetFingerprintsForUser(user.u);
-            enableVerifyFingerprintsButton();
+            enableVerifyFingerprintsButton(user.u);
 
             // Refetch the key
-            showAuthenticityCredentials();
+            showAuthenticityCredentials(user);
         });
 
         if (!megaChatIsDisabled) {
@@ -10410,17 +10587,17 @@ function FMResizablePane(element, opts) {
  * @param {String} elementId The name of the id
  */
 function selectText(elementId) {
-    
+
     var range, selection;
     var text = document.getElementById(elementId);
-    
+
     if (document.body.createTextRange) {
         range = document.body.createTextRange();
         range.moveToElementText(text);
         range.select();
     }
     else if (window.getSelection) {
-        selection = window.getSelection();        
+        selection = window.getSelection();
         range = document.createRange();
         range.selectNodeContents(text);
         selection.removeAllRanges();
@@ -10713,6 +10890,10 @@ function removeFromMultiInputDDL(dialog, item) {
                 menu = $('.nw-sorting-menu').removeClass('hidden');
                 type = treePanelType();
 
+                if (type === 'settings') {
+                    type = M.lastActiveTab || 'cloud-drive';
+                }
+
                 // Show all items in sort dialog in case contacts tab is choosen
                 if (type === 'contacts') {
                     menu.find('.sorting-item-divider,.sorting-menu-item').removeClass('hidden');
@@ -10752,7 +10933,11 @@ function removeFromMultiInputDDL(dialog, item) {
                 data = $self.data(),
                 type = treePanelType();
 
-            if ($self.attr('class').indexOf('active') === -1) {
+            if (type === 'settings') {
+                type = M.lastActiveTab || 'cloud-drive';
+            }
+
+            if (!$self.hasClass('active') && $.sortTreePanel[type]) {
                 $self.parent().find('.sorting-menu-item').removeClass('active');
                 $self.addClass('active');
                 $('.nw-sorting-menu').addClass('hidden');

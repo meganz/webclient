@@ -4,6 +4,7 @@ var cn_url = false;
 var init_l = true;
 var pfkey = false;
 var pfid = false;
+var pfhandle = false;
 var n_h = false;
 var u_n = false;
 var n_k_aes = false;
@@ -29,6 +30,7 @@ var account = false;
 var register_txt = false;
 var login_next = false;
 var loggedout = false;
+var flhashchange = false;
 
 var pro_json = '[[["N02zLAiWqRU",1,500,1024,1,"9.99","EUR"],["zqdkqTtOtGc",1,500,1024,12,"99.99","EUR"],["j-r9sea9qW4",2,2048,4096,1,"19.99","EUR"],["990PKO93JQU",2,2048,4096,12,"199.99","EUR"],["bG-i_SoVUd0",3,4096,8182,1,"29.99","EUR"],["e4dkakbTRWQ",3,4096,8182,12,"299.99","EUR"]]]';
 
@@ -168,38 +170,56 @@ function init_page() {
         dlkey = false;
         var ar = page.substr(1, page.length - 1).split('!');
         if (ar[0]) {
-            dlid = ar[0].replace(/[^a-z^A-Z^0-9^_^-]/g, "");
+            dlid = ar[0].replace(/[^\w-]+/g, "");
         }
         if (ar[1]) {
-            dlkey = ar[1].replace(/[^a-z^A-Z^0-9^_^-]/g, "");
+            dlkey = ar[1].replace(/[^\w-]+/g, "");
         }
     }
+    
+    // If they recently tried to redeem their voucher but were not logged in or registered then direct them to the 
+    // #redeem page to complete their purchase. For newly registered users this happens after key creation is complete.
+    if ((localStorage.getItem('voucher') !== null) && (u_type === 3)) {
+        document.location.hash = 'redeem';
+    }
 
+    var wasFolderlink = pfid;
     if (page.substr(0, 2) == 'F!' && page.length > 2) {
         var ar = page.substr(2, page.length - 1).split('!');
         if (ar[0]) {
-            pfid = ar[0].replace(/[^a-z^A-Z^0-9^_^-]/g, "");
+            pfid = ar[0].replace(/[^\w-]+/g, "");
         }
         if (ar[1]) {
-            pfkey = ar[1].replace(/[^a-z^A-Z^0-9^_^-]/g, "");
+            pfkey = ar[1].replace(/[^\w-]+/g, "");
+        }
+        // TODO: Rename pfid, pfkey, and pfhandle around our codebase
+        if (ar[2]) {
+            pfhandle = ar[2].replace(/[^\w-]+/g, "");
         }
         n_h = pfid;
-        if (pfkey) {
-            api_setfolder(n_h);
-            if (waitxhr) {
-                waitsc();
+        if (!flhashchange) {
+            if (pfkey) {
+                api_setfolder(n_h);
+                if (waitxhr) {
+                    waitsc();
+                }
+                u_n = pfid;
             }
-            u_n = pfid;
+            else {
+                return mKeyDialog(pfid, true)
+                    .fail(function() {
+                        location.hash = 'start';
+                    });
+            }
+        }
+        if (pfhandle) {
+            page = 'fm/' + pfhandle;
         }
         else {
-            return mKeyDialog(pfid, true)
-                .fail(function() {
-                    location.hash = 'start';
-                });
+            page = 'fm';
         }
-        page = 'fm';
     }
-    else {
+    else if (!flhashchange || page !== 'fm/transfers') {
         n_h = false;
         if (u_sid) {
             api_setsid(u_sid);
@@ -210,6 +230,7 @@ function init_page() {
         u_n = false;
         pfkey = false;
         pfid = false;
+        pfhandle = false;
     }
     confirmcode = false;
     pwchangecode = false;
@@ -235,7 +256,7 @@ function init_page() {
     }
 
     var fmwasinitialized = !!fminitialized;
-    if ((u_type === 0 || u_type === 3) || pfid || folderlink) {
+    if (((u_type === 0 || u_type === 3) || pfid || folderlink) && (!flhashchange || !pfid)) {
 
         if (is_fm()) {
             // switch between FM & folderlinks (completely reinitialize)
@@ -244,6 +265,10 @@ function init_page() {
                 folderlink = 0;
                 fminitialized = false;
                 loadfm.loaded = false;
+                if (loadfm.loading) {
+                    api_init(wasFolderlink ? 1 : 0, 'cs');
+                    loadfm.loading = false;
+                }
                 if (typeof mDBcls === 'function') {
                     mDBcls();
                 }
@@ -251,7 +276,7 @@ function init_page() {
         }
 
         if (!fminitialized) {
-            if (typeof mDB !== 'undefined' && !pfid) {
+            if (typeof mDB !== 'undefined' && !pfid && !flhashchange) {
                 mDBstart();
             }
             else {
@@ -259,67 +284,7 @@ function init_page() {
             }
         }
     }
-
-    if (page.substr(0, 7) == 'voucher') {
-        loadingDialog.show();
-        var vouchercode = page.substr(7, page.length - 7);
-        api_req({
-            a: 'uavq',
-            v: vouchercode
-        }, {
-            callback: function (res) {
-                if (typeof res == 'number') {
-                    document.location.hash = '';
-                    return false;
-                }
-                else if (res && !res[3]) {
-                    msgDialog('warninga',
-                        'Invalid URL',
-                        'Did you already activate your Pro membership? Please log in to your account.',
-                        false,
-                        function () {
-                            document.location.hash = 'login';
-                        });
-                    return false;
-                }
-                else if (res[0] == 'vGuzSLMU7WA') {
-                    slingshotDialog();
-                }
-                localStorage.voucher = page.replace("voucher", "");
-                if (!u_type) {
-                    if (u_wasloggedin()) {
-                        login_txt = l[1040];
-                        document.location.hash = 'login';
-                    }
-                    else {
-                        register_txt = l[1041];
-                        document.location.hash = 'register';
-                    }
-                }
-                else {
-                    document.location.hash = 'fm/account';
-                }
-            }
-        });
-
-        return false;
-    }
-
-    if (localStorage.voucher && u_type !== false) {
-        api_req({
-            a: 'uavr',
-            v: localStorage.voucher
-        }, {
-            callback: function (res) {
-                if (typeof res != 'number' || res >= 0) {
-                    balance2pro();
-                }
-            }
-        });
-
-        delete localStorage.voucher;
-    }
-
+    
     if (page.substr(0, 10) == 'blogsearch') {
         blogsearch = decodeURIComponent(page.substr(11, page.length - 2));
         if (!blogsearch) {
@@ -329,13 +294,17 @@ function init_page() {
         parsepage(pages['blogarticle']);
         init_blog();
     }
+    else if (page.substr(0, 6) == 'verify') {
+        parsepage(pages['change_email']);
+        emailchange.main();
+    }
     else if (page.substr(0, 9) == 'corporate') {
         function doRenderCorpPage() {
             if (window.corpTemplate) {
-                parsepage(window.corpTemplate)
+                parsepage(window.corpTemplate);
                 topmenuUI();
                 loadingDialog.hide();
-                CMS.loaded('corporate')
+                CMS.loaded('corporate');
                 mainScroll();
                 return;
             }
@@ -785,6 +754,38 @@ function init_page() {
         parsepage(pages['download'], 'download');
         dlinfo(dlid, dlkey, false);
     }
+    
+    /**
+     * If voucher code from url e.g. #voucherZUSA63A8WEYTPSXU4985
+     */
+    else if (page.substr(0, 7) == 'voucher') {
+
+        // Get the voucher code from the URL which is 20 characters in length
+        var voucherCode = page.substr(7, 20);
+        
+        // Store in localStorage to be used by the Pro page or when returning from login
+        localStorage.setItem('voucher', voucherCode);
+        
+        // If not logged in, direct them to login or register first
+        if (!u_type) {
+            login_txt = l[7712];
+            document.location.hash = 'login';
+            return false;
+        }
+        else {
+            // Otherwise go to the Redeem page which will detect the voucher code and show a dialog
+            document.location.hash = 'redeem';
+            return false;
+        }
+    }
+
+    // Load the direct voucher redeem page
+    else if (page.substr(0, 6) == 'redeem') {
+        loadingDialog.show();
+        parsepage(pages['redeem']);
+        redeem.init();
+    }
+    
     else if (is_fm()) {
         var id = false;
         if (page.substr(0, 2) === 'fm') {
@@ -814,7 +815,7 @@ function init_page() {
                 $('.fm-menu-item').hide();
             }
         }
-        else if (!pfid && id && id !== M.currentdirid) {
+        else if ((!pfid || flhashchange) && id && id !== M.currentdirid) {
             M.openFolder(id);
         }
         else {
@@ -907,6 +908,7 @@ function init_page() {
     }
     topmenuUI();
     loggedout = false;
+    flhashchange = false;
 }
 
 var avatars = {};
@@ -1386,7 +1388,7 @@ function topmenuUI() {
                     space: Math.min(100, Math.round(account.space_used / account.space * 100)),
                     bw: Math.round((account.servbw_used + account.downbw_used) / account.bw * 100)
                 };
-               
+
 
                 $('.membership-popup .membership-loading').hide();
                 $('.membership-popup .membership-main-block').show();
@@ -1818,6 +1820,10 @@ window.onhashchange = function() {
     if (silent_loading) {
         document.location.hash = hash;
         return false;
+    }
+
+    if (folderlink) {
+        flhashchange = true;
     }
 
     if (tpage == '#info' && page == 'start') {

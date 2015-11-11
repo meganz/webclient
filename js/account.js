@@ -196,8 +196,10 @@ function u_logout(logout) {
             }
         }
 
-        delete localStorage.signupcode;
-        delete localStorage.registeremail;
+        localStorage.removeItem('signupcode');
+        localStorage.removeItem('registeremail');
+        localStorage.removeItem('agreedToCopyrightWarning');
+        
         if (mDBact) {
             mDBact = false;
             delete localStorage[u_handle + '_mDBactive'];
@@ -311,6 +313,27 @@ function setpwset(confstring, ctx) {
         a: 'up',
         uk: confstring
     }, ctx);
+}
+
+/**
+ *  checkMyPassword
+ *
+ *  Check if the password is the user's password without doing
+ *  any API call, it tries to decrypt the user's private key.
+ *
+ *  @param string|AES   password
+ *  @param array        encrypted private key (optional)
+ *  @param array        private key (optional)
+ *  
+ *
+ *  @return bool
+ */
+function checkMyPassword(password, k1, k2) {
+    if (typeof password === "string") {
+        password = new sjcl.cipher.aes(prepare_key_pw(password));
+    }
+
+    return decrypt_key(password, base64_to_a32(k1 || u_attr.k)).join(",")  === (k2||u_k).join(",");
 }
 
 function changepw(currentpw, newpw, ctx) {
@@ -682,6 +705,7 @@ function getUserAttribute(userhandle, attribute, pub, nonHistoric,
  */
 function setUserAttribute(attribute, value, pub, nonHistoric, callback, ctx,
                           mode) {
+    var logger = MegaLogger.getLogger('account');
     var myCtx = ctx || {};
 
     var saved_value = value;
@@ -716,13 +740,13 @@ function setUserAttribute(attribute, value, pub, nonHistoric, callback, ctx,
     function settleFunction(res) {
         if (typeof res !== 'number') {
             AttribCache.setItem(cacheKey, value);
-
-            console.log('Setting user attribute "'
+            
+            logger.info('Setting user attribute "'
                         + attribute + '", result: ' + res);
             thePromise.resolve(res);
         }
         else {
-            console.log('Error setting user attribute "'
+            logger.warn('Error setting user attribute "'
                         + attribute + '", result: ' + res + '!');
             thePromise.reject(res);
         }

@@ -15,6 +15,10 @@
 </div>
 <div class="context-menu files-menu hidden">
     <div class="context-menu-section">
+        <a class="context-menu-item do-sort" data-by="ts"><span class="context-menu-icon"></span>Date Created</a>
+        <a class="context-menu-item do-sort" data-by="mtime"><span class="context-menu-icon"></span>Date Modified</a>
+    </div>
+    <div class="context-menu-section">
         <a class="context-menu-item preview-item"><span class="context-menu-icon"></span>[$1899]</a>
         <a class="context-menu-item open-item"><span class="context-menu-icon"></span>[$865]</a>
         <a class="context-menu-item properties-item"><span class="context-menu-icon"></span>[$6859]</a>
@@ -170,7 +174,7 @@
             </div>
             <!-- Please add "filled" classname if user have deleted items !-->
             <div class="nw-fm-left-icon rubbish-bin"><div class="nw-fm-left-border"></div><div class="nw-fm-left-tooltip">[$168]</div><div class="rubbish-bin-icon"></div></div>
-            <div class="nw-fm-left-icon settings"><div class="nw-fm-left-border"></div><div class="nw-fm-left-tooltip">[$569]</div><div class="settings-icon"></div></div>
+            <div class="nw-fm-left-icon account"><div class="nw-fm-left-border"></div><div class="nw-fm-left-tooltip">[$823]</div><div class="settings-icon"></div></div>
             <div class="nw-fm-left-icon transfers">
             	<div class="nw-fm-left-border file-transfer-icon"></div>
                 <div class="nw-fm-left-tooltip">[$104]</div>
@@ -198,11 +202,13 @@
 
             <!--Sorting menu for each section. !-->
             <div class="nw-sorting-menu hidden">
-                <div class="context-menu-section">
+                <div class="context-menu-section sort-by">
                     <div class="sorting-menu-arrow"></div>
                     <div data-by="name" class="sorting-menu-item active">[$86]</div>
                     <div data-by="status" class="sorting-menu-item">[$89]</div>
+                    <div data-by="created" class="sorting-menu-item">[$896]</div>
                     <div data-by="last-interaction" class="sorting-menu-item">[$5904]</div>
+                    <div data-by="fav" class="sorting-menu-item">[$5871]</div>
                     <div class="sorting-item-divider"></div>
                 </div>
                 <div class="context-menu-section">
@@ -248,179 +254,26 @@
                     <input type="text" value="[$168]" placeholder="[$168]" />
                     <div class="nw-fm-search-icon"></div>
                 </div>
+                <div class="nw-fm-tree-header account">
+                    <input type="text" value="[$823]" placeholder="[$823]" />
+                    <div class="nw-fm-search-icon"></div>
+                </div>
             </div>
             <div class="fm-tree-panel">
 
-<div class="nw-tree-panel-header">
-       <span>[$5916]</span>
-       <div class="nw-tree-panel-arrows"></div>
-</div>
-<div class="content-panel cloud-drive active">
-</div>
-<div class="content-panel folder-link">
-</div>
-<div class="content-panel inbox">
-</div>
-<div class="content-panel shared-with-me">
-    <ul>
-        <li>
-                       <span class="nw-fm-tree-item contains-folders">
-                          <span class="nw-fm-arrow-icon"></span>
-                          <span class="nw-fm-tree-folder">Folder1</span>
-                       </span>
-
-            <ul>
-                <li>
-                           <span class="nw-fm-tree-item">
-                              <span class="nw-fm-arrow-icon"></span>
-                              <span class="nw-fm-tree-folder">Folder1 Subfolder1</span>
-                           </span>
-                </li>
-            </ul>
-        </li>
-        <li>
-                       <span class="nw-fm-tree-item">
-                          <span class="nw-fm-arrow-icon"></span>
-                          <span class="nw-fm-tree-folder">Folder2</span>
-                       </span>
-        </li>
-        <li>
-                       <span class="nw-fm-tree-item contains-folders">
-                          <span class="nw-fm-arrow-icon"></span>
-                          <span class="nw-fm-tree-folder">Folder3</span>
-                       </span>
-            <ul>
-                <li>
-                           <span class="nw-fm-tree-item">
-                              <span class="nw-fm-arrow-icon"></span>
-                              <span class="nw-fm-tree-folder">Folder3 Subfolder1</span>
-                           </span>
-                </li>
-                <li>
-                           <span class="nw-fm-tree-item contains-folders">
-                              <span class="nw-fm-arrow-icon"></span>
-                              <span class="nw-fm-tree-folder">Folder3 Subfolder2</span>
-                           </span>
-                    <ul>
-                        <li>
-                            <span class="nw-fm-tree-item contains-folders">
-                                <span class="nw-fm-arrow-icon"></span>
-                                <span class="nw-fm-tree-folder">Folder1</span>
-                            </span>
-                            <ul>
-                                <li>
-                                    <span class="nw-fm-tree-item">
-                                        <span class="nw-fm-arrow-icon"></span>
-                                        <span class="nw-fm-tree-folder">Folder1 Subfolder1</span>
-                                    </span>
-                                </li>
-                            </ul>
-                        </li>
-                        <li>
-                            <span class="nw-fm-tree-item">
-                                <span class="nw-fm-arrow-icon"></span>
-                                <span class="nw-fm-tree-folder">Folder2</span>
-                            </span>
-                        </li>
-                        <li>
-                            <span class="nw-fm-tree-item contains-folders">
-                                <span class="nw-fm-arrow-icon"></span>
-                                <span class="nw-fm-tree-folder">Folder3</span>
-                            </span>
-                            <ul>
-                                <li>
-                                    <span class="nw-fm-tree-item">
-                                        <span class="nw-fm-arrow-icon"></span>
-                                        <span class="nw-fm-tree-folder">Folder3 Subfolder1</span>
-                                    </span>
-                                </li>
-                                <li>
-                                    <span class="nw-fm-tree-item contains-folders">
-                                        <span class="nw-fm-arrow-icon"></span>
-                                        <span class="nw-fm-tree-folder">Folder3 Subfolder2</span>
-                                    </span>
-                                    <ul>
-                                        <li>
-                                            <span class="nw-fm-tree-item">
-                                                <span class="nw-fm-arrow-icon"></span>
-                                                <span class="nw-fm-tree-folder">Folder3 Subfolder2 SubSubfolder1</span>
-                                            </span>
-                                        </li>
-                                        <li>
-                                            <span class="nw-fm-tree-item">
-                                                <span class="nw-fm-arrow-icon"></span>
-                                                <span class="nw-fm-tree-folder">Folder3 Subfolder2 SubSubfolder2</span>
-                                            </span>
-                                        </li>
-                                        <li>
-                                            <span class="nw-fm-tree-item">
-                                                <span class="nw-fm-arrow-icon"></span>
-                                                <span class="nw-fm-tree-folder">Folder3 Subfolder2 SubSubfolder3</span>
-                                            </span>
-                                        </li>
-                                        <li>
-                                            <span class="nw-fm-tree-item">
-                                                <span class="nw-fm-arrow-icon"></span>
-                                                <span class="nw-fm-tree-folder">Folder3 Subfolder2 SubSubfolder4</span>
-                                            </span>
-                                        </li>
-                                    </ul>
-                                </li>
-                            </ul>
-                        </li>
-                        <li>
-                            <span class="nw-fm-tree-item">
-                                <span class="nw-fm-arrow-icon"></span>
-                                <span class="nw-fm-tree-folder">Backups</span>
-                            </span>
-                        </li>
-                    </ul>
-                </li>
-           </ul>
-        </li>
-     </ul>
-</div>
-
+                <div class="nw-tree-panel-header">
+                    <span>[$5916]</span>
+                    <div class="nw-tree-panel-arrows"></div>
+                </div>
+                <div class="content-panel cloud-drive active">
+                </div>
+                <div class="content-panel folder-link">
+                </div>
+                <div class="content-panel inbox">
+                </div>
+                <div class="content-panel shared-with-me">
+                </div>
                 <div class="content-panel contacts">
-                    <!-- Please set any status class "online"/"away"/"busy"/"offline" !-->
-                    <!-- Please set "selected" class to select contact !-->
-                    <div class="nw-contact-item offline">
-                        <div class="nw-contact-status"></div>
-                        <div class="nw-contact-avatar">
-                            <img alt="" src="{staticpath}images/mega/default-small-avatar.png" />
-                        </div>
-                        <div class="nw-contact-name">
-                            Andrei.d
-                        </div>
-                    </div>
-                    <div class="nw-contact-item busy">
-                        <div class="nw-contact-status"></div>
-                        <div class="nw-contact-avatar">
-                            <img alt="" src="{staticpath}images/mega/default-small-avatar.png" />
-                        </div>
-                        <div class="nw-contact-name">
-                            Bram van der Kolk
-                        </div>
-                    </div>
-                    <div class="nw-contact-item away">
-                        <div class="nw-contact-status"></div>
-                        <div class="nw-contact-avatar">
-                            <img alt="" src="{staticpath}images/mega/default-small-avatar.png" />
-                        </div>
-                        <div class="nw-contact-name">
-                            Eduardo
-                        </div>
-                    </div>
-                    <div class="nw-contact-item online">
-                        <div class="nw-contact-status"></div>
-                        <div class="nw-contact-avatar">
-                            <img alt="" src="{staticpath}images/mega/default-small-avatar.png" />
-                        </div>
-                        <div class="nw-contact-name">
-                            Cesar Rodas
-                        </div>
-                    </div>
-
                 </div>
                 <div class="content-panel conversations">
                     <div class="conversations-container">
@@ -435,80 +288,23 @@
                     </div>
                 </div>
                 <div class="content-panel rubbish-bin">
-                    <ul>
-                        <li>
-                            <span class="nw-fm-tree-item contains-folders">
-                                <span class="nw-fm-arrow-icon"></span>
-                                <span class="nw-fm-tree-folder">Folder1</span>
-                            </span>
-                            <ul>
-                                <li>
-                                    <span class="nw-fm-tree-item">
-                                        <span class="nw-fm-arrow-icon"></span>
-                                        <span class="nw-fm-tree-folder">Folder1 Subfolder1</span>
-                                    </span>
-                                </li>
-                            </ul>
-                        </li>
-                        <li>
-                            <span class="nw-fm-tree-item">
-                                <span class="nw-fm-arrow-icon"></span>
-                                <span class="nw-fm-tree-folder">Folder2</span>
-                            </span>
-                        </li>
-                        <li>
-                            <span class="nw-fm-tree-item contains-folders">
-                                <span class="nw-fm-arrow-icon"></span>
-                                <span class="nw-fm-tree-folder">Folder3</span>
-                            </span>
-                            <ul>
-                                <li>
-                                    <span class="nw-fm-tree-item">
-                                        <span class="nw-fm-arrow-icon"></span>
-                                        <span class="nw-fm-tree-folder">Folder3 Subfolder1</span>
-                                    </span>
-                                </li>
-                                <li>
-                                    <span class="nw-fm-tree-item contains-folders">
-                                        <span class="nw-fm-arrow-icon"></span>
-                                        <span class="nw-fm-tree-folder">Folder3 Subfolder2</span>
-                                    </span>
-                                    <ul>
-                                        <li>
-                                            <span class="nw-fm-tree-item">
-                                                <span class="nw-fm-arrow-icon"></span>
-                                                <span class="nw-fm-tree-folder">Folder3 Subfolder2 SubSubfolder1</span>
-                                            </span>
-                                        </li>
-                                        <li>
-                                            <span class="nw-fm-tree-item">
-                                                <span class="nw-fm-arrow-icon"></span>
-                                                <span class="nw-fm-tree-folder">Folder3 Subfolder2 SubSubfolder2</span>
-                                            </span>
-                                        </li>
-                                        <li>
-                                            <span class="nw-fm-tree-item">
-                                                <span class="nw-fm-arrow-icon"></span>
-                                                <span class="nw-fm-tree-folder">Folder3 Subfolder2 SubSubfolder3</span>
-                                            </span>
-                                        </li>
-                                        <li>
-                                            <span class="nw-fm-tree-item">
-                                                <span class="nw-fm-arrow-icon"></span>
-                                                <span class="nw-fm-tree-folder">Folder3 Subfolder2 SubSubfolder4</span>
-                                            </span>
-                                        </li>
-                                    </ul>
-                                </li>
-                            </ul>
-                        </li>
-                        <li>
-                            <span class="nw-fm-tree-item">
-                                <span class="nw-fm-arrow-icon"></span>
-                                <span class="nw-fm-tree-folder">[$6867]</span>
-                            </span>
-                        </li>
-                    </ul>
+                </div>
+                <div class="content-panel account">
+                    <div class="fm-account-button overview active">
+                        [$983]
+                    </div>
+                    <div class="fm-account-button profile">
+                        [$984]
+                    </div>
+                    <div class="fm-account-button history">
+                        [$985]
+                    </div>
+                    <div class="fm-account-button settings">
+                        [$823]
+                    </div>
+                    <div class="fm-account-button reseller hidden">
+                        [$6873]
+                    </div>
                 </div>
             </div>
 
@@ -904,16 +700,18 @@
                     <div class="contact-fingerprint-block">
                         <div class="contact-fingerprint-title">[$6872]</div>
                         <div class="contact-fingerprint-txt">
-                            <span>QH7XF</span>
-                            <span>QH7XF</span>
-                            <span>QH7XF</span>
-                            <span>QH7XF</span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
                         </div>
                         <div class="contact-fingerprint-txt">
-                            <span>QH7XF</span>
-                            <span>QH7XF</span>
-                            <span>QH7XF</span>
-                            <span>QH7XF</span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
                         </div>
                         <div class="fm-verify">
                             <span>[$1960]</span>
@@ -1042,210 +840,188 @@
 
         <div class="fm-right-account-block">
             <div class="fm-account-top">
-                <div class="fm-account-top-title">
-                </div>
-                <div class="fm-account-button fm-account-overview-button active">
-                    <span>[$983]</span>
-                </div>
-                <div class="fm-account-button fm-account-profile-button">
-                    <span>[$984]</span>
-                </div>
-                <div class="fm-account-button fm-account-history-button">
-                    <span>[$985]</span>
-                </div>
-                <div class="fm-account-button fm-account-settings-button">
-                    <span>[$823]</span>
-                </div>
-                <div class="fm-account-button fm-account-reseller-button hidden">
-                    <span>[$6873]</span>
-                </div>
+            	<a class="fm-breadcrumbs account">
+                	<span class="right-arrow-bg"></span>
+            	</a>
+            	<a class="fm-breadcrumbs next overview hidden">
+                	<span class="right-arrow-bg">
+                		[$983]
+                	</span>
+            	</a>
+            	<div class="clear"></div>
             </div>
-
-
             <div class="fm-account-save-block hidden">
-                <div class="fm-account-save"><span>[$776]</span></div>
-                <div class="fm-account-cancel"><span>[$82]</span></div>
+                <div class="default-button fm-account-save"><span>[$776]</span></div>
+                <div class="default-button fm-account-cancel red"><span>[$82]</span></div>
                 <div class="clear"></div>
             </div>
 
             <div class="fm-account-main">
 
                 <div class="fm-account-overview fm-account-sections">
-                    <div class="fm-account-blocks">
-                        <div class="fm-account-header">[$427]:</div>
-                        <div class="fm-account-avatar test123">
+                    
+                    <div class="fm-account-blocks avatar-bl">
+                        <div class="fm-account-avatar">
                             <img alt="" src="" />
                         </div>
                         <div class="fm-account-info-block">
                             <div class="membership-big-txt name"></div>
                             <div class="membership-big-txt email"></div>
-                            <div class="membership-medium-txt red-bg editprofile">[$986]</div>
-                            <div class="membership-medium-txt gray-bg cancel-account">[$6181]</div>
-                            <div class="membership-medium-txt red-bg backup-master-key">[$7412]</div>
+                            <div class="default-button editprofile"><span>[$986]</span></div>
+                            <div class="default-button backup-master-key"><span>[$7412]</span></div>
+                            <div class="default-button cancel-account red"><span>[$6181]</span></div>
                             <div class="clear"></div>
                         </div>
-                    </div>
-
-                    <div class="fm-account-blocks storage">
-                      <div class="fm-account-header">[$799]:</div>
-                      <div class="nw-fm-progress-border">
-                        <div class="nw-fm-percentage empty">
-                          <ul>
-                            <li class="nw-fm-chart3 right-c"><p><span></span></p></li>
-                            <li class="nw-fm-chart3 left-c"><p><span></span></p></li>
-                            <li class="nw-fm-chart2 right-c"><p><span></span></p></li>
-                            <li class="nw-fm-chart2 left-c"><p><span></span></p></li>
-                            <li class="nw-fm-chart1 right-c"><p><span></span></p></li>
-                            <li class="nw-fm-chart1 left-c"><p><span></span></p></li>
-                            <li class="nw-fm-chart0 right-c"><p><span></span></p></li>
-                            <li class="nw-fm-chart0 left-c"><p><span></span></p></li>
-                          </ul>
-                        </div>
-                        <div class="nw-fm-percents">
-                          <div class="nw-fm-percents-wrapper"> <span class="perc-txt">0%</span><span class="of-txt">[$5528]</span> <span class="pecents-txt">0</span><span class="gb-txt">GB</span> </div>
-                        </div>
-                      </div>
-                      <div class="nw-fm-bar-info">
-                       <div class="fm-full-sized-block">
-                        <div class="fm-half-sized-block">
-                          <div class="fm-bar-info-txt">
-                            <div class="fm-bar-color bar-color0"></div>
-                            <span class="fm-bar-title">[$164]</span> <span class="fm-bar-size cloud-drive">0 GB</span>
-                          </div>
-                          <div class="fm-bar-info-txt">
-                            <div class="fm-bar-color bar-color1"></div>
-                            <span class="fm-bar-title">[$168]</span> <span class="fm-bar-size rubbish-bin">0 GB</span>
-                          </div>
-                          <div class="fm-bar-info-txt">
-                            <div class="fm-bar-color bar-color2"></div>
-                            <span class="fm-bar-title">[$5542]</span> <span class="fm-bar-size incoming-shares">0 MB</span>
-                          </div>
-                        </div>
-
-                        <div class="fm-half-sized-block">
-                          <div class="fm-bar-info-txt">
-                            <div class="fm-bar-color bar-color3"></div>
-                            <span class="fm-bar-title">[$166]</span> <span class="fm-bar-size inbox">0 GB</span>
-                          </div>
-                          <div class="fm-bar-info-txt">
-                            <div class="fm-bar-color bar-color4"></div>
-                            <span class="fm-bar-title used-info">[$5775]</span> <span class="fm-bar-size used">0 GB</span>
-                          </div>
-                          <div class="fm-bar-info-txt">
-                            <div class="fm-bar-color bar-color5"></div>
-                            <span class="fm-bar-title">[$1352]</span> <span class="fm-bar-size available">0 GB</span>
-                          </div>
-                        </div>
                         <div class="clear"></div>
-                        <div class="nw-fm-line-progress">
-                          <div class="nw-fm-line-progress-pad">
-                             <div class="nw-fm-line-progress-bar nw-fm-bar0"></div>
-                             <div class="nw-fm-line-progress-bar nw-fm-bar1"></div>
-                             <div class="nw-fm-line-progress-bar nw-fm-bar2"></div>
-                             <div class="nw-fm-line-progress-bar nw-fm-bar3"></div>
+                    </div>
+					
+                    <div class="fm-account-bg">
+                        <div class="fm-account-blocks storage">
+                          <div class="fm-account-header">[$799]:</div>
+                          <div class="nw-fm-progress-border">
+                            <div class="nw-fm-percentage empty">
+                              <ul>
+                                <li class="nw-fm-chart3 right-c"><p><span></span></p></li>
+                                <li class="nw-fm-chart3 left-c"><p><span></span></p></li>
+                                <li class="nw-fm-chart2 right-c"><p><span></span></p></li>
+                                <li class="nw-fm-chart2 left-c"><p><span></span></p></li>
+                                <li class="nw-fm-chart1 right-c"><p><span></span></p></li>
+                                <li class="nw-fm-chart1 left-c"><p><span></span></p></li>
+                                <li class="nw-fm-chart0 right-c"><p><span></span></p></li>
+                                <li class="nw-fm-chart0 left-c"><p><span></span></p></li>
+                              </ul>
+                            </div>
+                            <div class="nw-fm-percents">
+                              <div class="nw-fm-percents-wrapper"> <span class="perc-txt">0%</span><span class="of-txt">[$5528]</span> <span class="pecents-txt">0</span><span class="gb-txt">GB</span> </div>
+                            </div>
                           </div>
+                          <div class="nw-fm-bar-info">
+                           <div class="fm-full-sized-block">
+                            <div class="fm-half-sized-block">
+                              <div class="fm-bar-info-txt">
+                                <div class="fm-bar-color bar-color0"></div>
+                                <span class="fm-bar-title">[$164]</span> <span class="fm-bar-size cloud-drive">0 GB</span>
+                              </div>
+                              <div class="fm-bar-info-txt">
+                                <div class="fm-bar-color bar-color1"></div>
+                                <span class="fm-bar-title">[$168]</span> <span class="fm-bar-size rubbish-bin">0 GB</span>
+                              </div>
+                              <div class="fm-bar-info-txt">
+                                <div class="fm-bar-color bar-color2"></div>
+                                <span class="fm-bar-title">[$5542]</span> <span class="fm-bar-size incoming-shares">0 MB</span>
+                              </div>
+                            </div>
+    
+                            <div class="fm-half-sized-block">
+                              <div class="fm-bar-info-txt">
+                                <div class="fm-bar-color bar-color3"></div>
+                                <span class="fm-bar-title">[$166]</span> <span class="fm-bar-size inbox">0 GB</span>
+                              </div>
+                              <div class="fm-bar-info-txt">
+                                <div class="fm-bar-color bar-color4"></div>
+                                <span class="fm-bar-title used-info">[$5775]</span> <span class="fm-bar-size used">0 GB</span>
+                              </div>
+                              <div class="fm-bar-info-txt">
+                                <div class="fm-bar-color bar-color5"></div>
+                                <span class="fm-bar-title">[$1352]</span> <span class="fm-bar-size available">0 GB</span>
+                              </div>
+                            </div>
+                            <div class="clear"></div>
+                            <div class="nw-fm-line-progress">
+                              <div class="nw-fm-line-progress-pad">
+                                 <div class="nw-fm-line-progress-bar nw-fm-bar0"></div>
+                                 <div class="nw-fm-line-progress-bar nw-fm-bar1"></div>
+                                 <div class="nw-fm-line-progress-bar nw-fm-bar2"></div>
+                                 <div class="nw-fm-line-progress-bar nw-fm-bar3"></div>
+                              </div>
+                            </div>
+                           </div>
+                          </div>
+    
                         </div>
-                       </div>
-                      </div>
+    
+                        <div class="fm-account-blocks bandwidth">
+                          <div class="fm-account-header">[$973]:</div>
+                          <div class="nw-fm-progress-border">
+                            <div class="nw-fm-percentage empty">
+                              <ul>
+                                <li class="nw-fm-chart0 right-c"><p><span></span></p></li>
+                                <li class="nw-fm-chart0 left-c"><p><span></span></p></li>
+                              </ul>
+                            </div>
+                            <div class="nw-fm-percents">
+                              <div class="nw-fm-percents-wrapper"> <span class="perc-txt">0%</span><span class="of-txt">[$5528]</span> <span class="pecents-txt">0</span><span class="gb-txt">GB</span> </div>
+                            </div>
+                          </div>
+                          <div class="nw-fm-bar-info">
+    
+                            <div class="fm-full-sized-block">
+                              <div class="fm-bar-info-txt">
+                                <div class="fm-bar-color bar-color4"></div>
+                                <span class="fm-bar-title used-info">[$5775]</span> <span class="fm-bar-size used">0 GB</span>
+                              </div>
+                              <div class="fm-bar-info-txt">
+                                <div class="fm-bar-color bar-color5"></div>
+                                <span class="fm-bar-title">[$1352]</span> <span class="fm-bar-size available">0 GB</span>
+                              </div>
+                              <div class="nw-fm-line-progress">
+                                 <div class="nw-fm-line-progress-pad">
+                                    <div class="nw-fm-line-progress-bar nw-fm-bar0"></div>
+                                 </div>
+                              </div>
+                            </div>
+    
+                          </div>
+    
+                        </div>
 
+                    	<div class="clear account"></div>
                     </div>
 
-                    <div class="fm-account-blocks bandwidth">
-                      <div class="fm-account-header">[$973]:</div>
-                      <div class="nw-fm-progress-border">
-                        <div class="nw-fm-percentage empty">
-                          <ul>
-                            <li class="nw-fm-chart0 right-c"><p><span></span></p></li>
-                            <li class="nw-fm-chart0 left-c"><p><span></span></p></li>
-                          </ul>
-                        </div>
-                        <div class="nw-fm-percents">
-                          <div class="nw-fm-percents-wrapper"> <span class="perc-txt">0%</span><span class="of-txt">[$5528]</span> <span class="pecents-txt">0</span><span class="gb-txt">GB</span> </div>
-                        </div>
-                      </div>
-                      <div class="nw-fm-bar-info">
-
-                        <div class="fm-full-sized-block">
-                          <div class="fm-bar-info-txt">
-                            <div class="fm-bar-color bar-color4"></div>
-                            <span class="fm-bar-title used-info">[$5775]</span> <span class="fm-bar-size used">0 GB</span>
-                          </div>
-                          <div class="fm-bar-info-txt">
-                            <div class="fm-bar-color bar-color5"></div>
-                            <span class="fm-bar-title">[$1352]</span> <span class="fm-bar-size available">0 GB</span>
-                          </div>
-                          <div class="nw-fm-line-progress">
-                             <div class="nw-fm-line-progress-pad">
-                                <div class="nw-fm-line-progress-bar nw-fm-bar0"></div>
-                             </div>
-                          </div>
-                        </div>
-
-                      </div>
-
-                    </div>
-
-                    <div class="clear account"></div>
-
-                    <div class="fm-account-blocks multiple triple">
-                        <div class="fm-account-mutliple-bl">
+                    <div class="fm-account-blocks half-sized first subscription-bl">
+                    	<div class="fm-account-bg">
                             <div class="fm-account-header">[$432]</div>
                             <div class="membership-icon type free"></div>
                             <div class="fm-account-info-block">
                                 <div class="membership-big-txt accounttype">
                                     Pro II
                                 </div>
-                                <div class="membership-medium-txt red-bg pro-upgrade">[$920]</div>
-                                <div class="clear"></div>
-                            </div>
-                        </div>
-
-                        <div class="fm-account-mutliple-bl dates">
-                            <div class="fm-account-header typetitle">[$746]:</div>
-                            <div class="membership-icon-old"></div>
-                            <div class="fm-account-info-block">
-                                <div class="membership-big-txt type">
-                                    [$748]
-                                </div>
                                 <div class="membership-medium-txt expiry">
                                     <a href="#fm/account/history">
                                         [$987] <span class="red">September 1st 2013</span>
                                     </a>
+                                    
                                 </div>
-                                <div class="clear"></div>
+                                
                             </div>
-                            <div class="membership-medium-txt red-bg pro-upgrade btn-cancel">[$6822]</div>
-                        </div>
-
-                        <div class="fm-account-mutliple-bl huge">
+                            <div class="clear"></div>
+                            <div class="subscription-button">
+                            	<div class="default-big-button pro-upgrade"><span>[$920]</span></div>
+                            </div>
+                            <div class="subscription-button">
+                            	<div class="default-big-button btn-cancel hidden"><span>[$6822]</span></div>
+                            </div>
+                            <div class="clear"></div>
+						</div>
+                    </div>
+                    <div class="fm-account-blocks half-sized second">   
+                    	<div class="fm-account-bg">
                             <div class="fm-account-header">[$449]:</div>
-
-                            <div class="fm-account-info-block">
-                                <div class="membership-big-txt balance">
-                                    &euro; 0.00
-                                </div>
-                                <div class="membership-medium-txt red-bg topup">[$450]</div>
-
-                                <div class="membership-medium-txt gray-bg redeem-voucher">[$456]
+                			<div class="membership-big-txt balance">
+                            	 &euro; 0.00
+                            </div>
+                            <div class="half-sized">
+                            	<div class="default-big-button topup"><span>[$450]</span></div>
+							</div>
+                            <div class="half-sized">
+                                <div class="default-big-button redeem-voucher"><span>[$456]</span>
                                     <div class="notification-arrow"></div>
                                 </div>
-                                <div class="clear"></div>
                             </div>
-                        </div>
-                        <div class="clear"></div>
-                    </div>
-
-                    <div class="fm-account-blocks">
-                        <div class="fm-account-header">[$988]</div>
-                        <div class="membership-icon-old contacts"></div>
-                        <div class="fm-account-info-block">
-                            <div class="membership-big-txt contacts"></div>
-                            <div class="membership-medium-txt blue-bg contacts">[$991]</div>
                             <div class="clear"></div>
-                        </div>
-                        <div class="clear"></div>
+                    	</div>
                     </div>
-
+					<div class="clear"></div>
 
 
                     <div class="fm-voucher-popup hidden">
@@ -1262,100 +1038,114 @@
                 </div>
 
                 <div class="fm-account-profile hidden fm-account-sections">
-                    <div class="fm-account-blocks">
-                        <div class="fm-account-header">[$992]:</div>
-                        <div class="fm-account-avatar">
-                            <img alt="" src="" />
+                    <div class="fm-account-blocks avatar-bl">
+                    	<div class="fm-account-avatar">
+                           
                         </div>
                         <div class="fm-account-info-block">
-                            <div class="fm-account-change-avatar"><span>[$993]</span></div>
-                            <div class="fm-account-remove-avatar"><span>[$6974]</span></div>
+                        	<div class="membership-big-txt name"></div>
+                            <div class="membership-big-txt email"></div>
+                            <div class="default-button fm-account-change-avatar"><span>[$993]</span></div>
+                            <div class="default-button fm-account-remove-avatar red"><span>[$6974]</span></div>
                             <div class="clear"></div>
                         </div>
+                        
                     </div>
 
-                    <div class="fm-account-blocks">
+                    <div class="fm-account-blocks profile-form first">
                         <div class="fm-account-header">[$994]:</div>
-                        <div class="fm-account-labels">
-                            <div class="labels-block">
-                                <label for="account-firstname">[$1096] <span class="red">*</span></label>
+                        <div class="account-form-wraper">
+                            <div class="fm-account-labels">
+                                <div class="labels-block">
+                                    <label for="account-firstname">[$1096] <span class="red">*</span></label>
+                                </div>
+                                <div class="labels-block">
+                                    <label for="account-lastname">[$1097] </label>
+                                </div>
+                                <div class="labels-block">
+                                    <label for="account-email">Email <span class="red">*</span></label>
+                                </div>
+                                <div class="labels-block email-confirm-txt"></div>
+                                <div class="labels-block">
+                                    <label >[$995]</label>
+                                </div>
+                                <div class="labels-block">
+                                    <label for="account-country">[$481]</label>
+                                </div>
                             </div>
-                            <div class="labels-block">
-                                <label for="account-lastname">[$1097] </label>
-                            </div>
-                            <div class="labels-block">
-                                <label >[$995]</label>
-                            </div>
-                            <div class="labels-block">
-                                <label for="account-country">[$481]</label>
+                            <div class="fm-accout-inputs-blocks">
+                                <div class="fm-account-input">
+                                    <input type="text" value="" name="account-firstname" id="account-firstname" />
+                                </div>
+                                <div class="fm-account-input">
+                                    <input type="text" value="" name="account-lastname" id="account-lastname" />
+                                </div>
+                                <div class="fm-account-input">
+                                    <input type="text" value="" name="account-email" id="account-email" />
+                                </div>
+                                <div class="fm-account-change-email"><span>[$7697]</span></div>
+                                
+                                <div class="fm-account-select-block">
+                                    <div class="default-select year" id="account-year">
+                                        <span>YYYY</span>
+                                        <div class="default-select-dropdown hidden"><div class="default-select-scroll"></div></div>
+                                    </div>
+                                    <div class="default-select month" id="account-month">
+                                        <span>MM</span>
+                                        <div class="default-select-dropdown hidden"><div class="default-select-scroll"></div></div>
+                                    </div>
+                                    <div class="default-select day" id="account-day">
+                                        <span>DD</span>
+                                        <div class="default-select-dropdown hidden"><div class="default-select-scroll"></div></div>
+                                    </div>
+                                    <div class="clear"></div>
+                                </div>
+                                <div class="fm-account-select-block">
+                                    <div class="default-select country" id="account-country">
+                                        <span>[$996]</span>
+                                        <div class="default-select-dropdown hidden"><div class="default-select-scroll"></div></div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div class="fm-accout-inputs-blocks">
-                            <div class="fm-account-input">
-                                <input type="text" value="" name="account-firstname" id="account-firstname" />
-                            </div>
-                            <div class="fm-account-input">
-                                <input type="text" value="" name="account-lastname" id="account-lastname" />
-                            </div>
-                            <div class="fm-account-select-block">
-                                <div class="fm-account-select year">
-                                    <span class="account-select-txt">YYYY</span>
-                                    <select name="account-year"></select>
-                                </div>
-                                <div class="fm-account-select month">
-                                    <span class="account-select-txt">MM</span>
-                                    <select name="account-year"></select>
-                                </div>
-                                <div class="fm-account-select day">
-                                    <span class="account-select-txt">DD</span>
-                                    <select name="account-year"></select>
-                                </div>
-                                <div class="clear"></div>
-                            </div>
-                            <div class="fm-account-select-block">
-                                <div class="fm-account-select country">
-                                    <span class="account-select-txt">[$996]</span>
-                                    <select name="account-country"></select>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="clear"></div>
                     </div>
 
-                    <div class="fm-account-blocks">
+                    <div class="fm-account-blocks profile-form second">
                         <div class="fm-account-header">[$706]</div>
-                        <div class="fm-account-labels">
-                            <div class="labels-block">
-                                <label for="account-password">[$716]</label>
+                        <div class="account-form-wraper">
+                            <div class="fm-account-labels">
+                                <div class="labels-block">
+                                    <label for="account-password">[$716]</label>
+                                </div>
+                                <div class="labels-block">
+                                    <label for="account-new-password">[$717]</label>
+                                </div>
+                                <div class="labels-block">
+                                    <label for="account-confirm-password">[$718]</label>
+                                </div>
                             </div>
-                            <div class="labels-block">
-                                <label for="account-new-password">[$717]</label>
-                            </div>
-                            <div class="fm-account-pass-lines"></div>
-                            <div class="labels-block">
-                                <label for="account-confirm-password">[$718]</label>
+                            <div class="fm-accout-inputs-blocks">
+                                <div class="fm-account-input">
+                                    <input type="password" value="" name="account-password" id="account-password" />
+                                </div>
+                                <div class="fm-account-input">
+                                    <input type="password" value="" name="account-new-password" id="account-new-password" />
+                                </div>
+                                <div class="account-pass-lines">
+                                    <div class="register-pass-status-line1"></div>
+                                    <div class="register-pass-status-line2"></div>
+                                    <div class="register-pass-status-line3"></div>
+                                    <div class="register-pass-status-line4"></div>
+                                    <div class="clear"></div>
+                                </div>
+                                <div class="fm-account-input">
+                                    <input type="password" value="" name="account-confirm-password" id="account-confirm-password" />
+                                </div>
                             </div>
                         </div>
-                        <div class="fm-accout-inputs-blocks">
-                            <div class="fm-account-input">
-                                <input type="password" value="" name="account-password" id="account-password" />
-                            </div>
-                            <div class="fm-account-input">
-                                <input type="password" value="" name="account-new-password" id="account-new-password" />
-                            </div>
-                            <div class="account-pass-lines">
-                                <div class="register-pass-status-line1"></div>
-                                <div class="register-pass-status-line2"></div>
-                                <div class="register-pass-status-line3"></div>
-                                <div class="register-pass-status-line4"></div>
-                                <div class="clear"></div>
-                            </div>
-                            <div class="fm-account-input">
-                                <input type="password" value="" name="account-confirm-password" id="account-confirm-password" />
-                            </div>
-                        </div>
-                        <div class="clear"></div>
                     </div>
+                    
+                    <div class="clear"></div>
 
                 </div>
                 <div class="fm-account-settings hidden fm-account-sections">
@@ -1597,58 +1387,55 @@
                 </div>
 
                 <div class="fm-account-reseller hidden fm-account-sections">
-                    <div class="fm-account-blocks multiple triple">
-                        <div class="fm-account-mutliple-bl huge">
+                    <div class="fm-account-blocks half-sized first">
+                        <div class="fm-account-bg">
                             <div class="fm-account-header">[$449]:</div>
-                            <div class="fm-account-info-block">
-                                <div class="membership-big-txt balance">
-                                    &euro; 99.99
+                            <div class="membership-big-txt balance">
+                                &euro; 99.99
+                            </div>
+                            <a href="mailto:resellers@mega.nz" class="default-big-button resellerbuy"><span>[$7715]</span></a>
+                        </div>
+                    </div>
+                    <div class="fm-account-blocks half-sized second">
+                        <div class="fm-account-bg">
+                            <div class="fm-account-header">[$6874]</div>
+                            <div class="resellers-voucher-bl">
+                                <div class="default-select vouchertype" id="vouchertype">
+                                    <span>[$6875]</span>
+                                    <div class="default-select-dropdown hidden"><div class="default-select-scroll"></div></div>
                                 </div>
-                                <a href="mailto:resellers@mega.nz" class="membership-medium-txt red-bg resellerbuy">resellers@mega.nz</a>
+                                <div class="fm-account-input voucheramount">
+                                    <input type="text" value="1" name="account-voucheramount" id="account-voucheramount">
+                                </div>
                                 <div class="clear"></div>
                             </div>
-                        </div>
-                        <div class="fm-account-mutliple-bl">
-                            <div class="fm-account-header">[$6874]</div>
-                            <div class="fm-account-select vouchertype">
-                                <span class="account-select-txt">[$6875]</span>
-                                <select name="account-vouchertype">
-                                </select>
-                            </div>
-                           	<div class="fm-account-input voucheramount">
-                                <input type="text" value="1" name="account-voucheramount" id="account-voucheramount">
-                            </div>
-                            <div class="clear"></div>
-                            <div class="membership-medium-txt red-bg vouchercreate">[$6876]</div>
-                        </div>
-                        <div class="clear"></div>
+                            <div class="default-big-button vouchercreate"><span>[$6876]</span></div>
+                        </div>                        
                     </div>
                     
-                    <hr />
-
-                    <div class="fm-account-history-head">
-                        <div class="fm-account-header left">[$459]</div>
-                        <div>
-                            <div class="account-history-dropdown-button vouchers"></div>
-                            <div class="account-history-dropdown hidden">
-                                <div class="account-history-drop-items voucher10- active">Last 10 Vouchers</div>
-                                <div class="account-history-drop-items voucher100-">Last 100 Vouchers</div>
-                                <div class="account-history-drop-items voucher250-">Last 250 Vouchers</div>
+                    <div class="clear"></div>
+					
+                    <div class="resellers-content">
+                        <div class="fm-account-history-head">
+                            <div class="fm-account-header left">[$459]</div>
+                            <div>
+                                <div class="account-history-dropdown-button vouchers"></div>
+                                <div class="account-history-dropdown hidden">
+                                    <div class="account-history-drop-items voucher10- active">Last 10 Vouchers</div>
+                                    <div class="account-history-drop-items voucher100-">Last 100 Vouchers</div>
+                                    <div class="account-history-drop-items voucher250-">Last 250 Vouchers</div>
+                                    <div class="account-history-drop-items voucherAll-">[$7557]</div>
+                                </div>
                             </div>
+                            <div class="clear"></div>
                         </div>
-                        <div class="clear"></div>
-                    </div>
-                    <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table vouchers"></table>
-
+                        <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table vouchers"></table>
+					</div>
                 </div>
-
-
             </div>
-
         </div>
-
     </div>
-    
+    <div class="fm-account-overlay hidden"></div>
     <div class="toast-notification transfer download">
     	<div class="toast-icon"></div>
   		<div class="toast-body">
@@ -1656,7 +1443,7 @@
             </div>
             <div  class="toast-col">
             	<div class="toast-button">
-                	<span>Show me</span>
+                	<span>[$7224]</span>
                 </div>
             </div>
         </div>
@@ -1669,7 +1456,7 @@
             </div>
             <div  class="toast-col">
             	<div class="toast-button">
-                	<span>Show me</span>
+                	<span>[$7224]</span>
                 </div>
             </div>
         </div>

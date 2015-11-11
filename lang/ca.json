@@ -1236,6 +1236,7 @@
     "2435": "La sincronitzaci\u00f3 \"%1\" s'ha deshabilitat perqu\u00e8 la carpeta remota no existeix",
     "2436": "S'ha deshabilitat la sincronitzaci\u00f3 \"%1\" perqu\u00e8 la carpeta remota est\u00e0 a la paperera",
     "2438": "La carpeta (%1) no s'ha pujat perqu\u00e8 \u00e9s massa gran (aquesta versi\u00f3 beta est\u00e0 limitada a %2 carpetes o %3 fitxers).",
+    "2439": "No s'han pujat %1 carpetes perqu\u00e8 eren  massa grans (aquesta versi\u00f3 beta est\u00e0 limitada a %2 carpetes o %3 fitxers).",
     "2440": "La sincronitzaci\u00f3 s'aturar\u00e0.Tot el que s'elimini mentre la sincronitzaci\u00f3 estigui aturada no es propagar\u00e0.",
     "2443": "La carpeta de dest\u00ed est\u00e0 sincronitzada i ja hi tens un fitxer amb el mateix nom (%1).Si continues amb la pujada, el fitxer anterior es sobreescriur\u00e0.N'est\u00e0s segur?",
     "2445": "La carpeta arrel no es pot sincronitzar.Si us plau, tria una sub-carpeta.",
@@ -2764,5 +2765,12 @@
     "7713": "This operation will clear all MEGA data from your browser cache and reload your account from our servers. This may take a few minutes.",
     "7714": "Voucher redemption link",
     "7715": "Email support at resellers@mega.nz",
-    "7716": "You have already sent a confirm link to that address."
+    "7716": "You have already sent a confirm link to that address.",
+    "7717": "You have already requested a confirmation link for that email address.",
+    "7718": "This email address has already been taken. Please contact MEGA support for more information.",
+    "7719": "Your confirmation link for this email has expired. Please click OK to restart the process.",
+    "7720": "You need to be logged in to complete your email change. Please log in again with your current email address and then click on your confirmation link again.",
+    "7730": "Verify your email address",
+    "7731": "Please enter your password to verify your email address",
+    "7732": "Confirm email"
 }

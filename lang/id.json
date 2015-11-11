@@ -1236,6 +1236,7 @@
     "2435": "Sync anda \"%1\" telah dibatalkan karena remote folder tidak tersedia.",
     "2436": "Sync anda \"%1\" telah dibatalkan karena remote folder di dalam rubbish bin",
     "2438": "Folder (%1) tidak diupload karena terlalu besar (beta ini dibatasi sampai %2 folder atau %3 file.",
+    "2439": "%1 folder tidak berhasil di-upload karena mereka terlalu besar (beta ini terbatasi sampai %2 folder atau %3 file.",
     "2440": "Sinkronisasi akan dibatalkan. Penghapusan yang muncul saat sedang tidak berjalan tidak akan diteruskan.Tetap keluar?",
     "2443": "Folder tujuan telah disinkronisasi dan anda sudah memiliki file di dalamnya dengan nama yang sama (%1). Jika anda melanjutkan upload, file sebelumnya akan tertimpa. Apakah anda yakin?",
     "2445": "Root folder tidak dapat di sync. Harap, pilih satu subfolder.",
@@ -2764,5 +2765,12 @@
     "7713": "Operasi ini akan menghapus seluruh data MEGA dari cache browser anda dan mengulang akun anda dari server kami. Ini mungkin akan memakan waktu beberapa menit.",
     "7714": "Link penebusan voucher",
     "7715": "Email support di resellers@mega.nz",
-    "7716": "Anda telah mengirim link konrifmasi ke alamat tersebut."
+    "7716": "Anda telah mengirim link konrifmasi ke alamat tersebut.",
+    "7717": "You have already requested a confirmation link for that email address.",
+    "7718": "This email address has already been taken. Please contact MEGA support for more information.",
+    "7719": "Your confirmation link for this email has expired. Please click OK to restart the process.",
+    "7720": "You need to be logged in to complete your email change. Please log in again with your current email address and then click on your confirmation link again.",
+    "7730": "Verify your email address",
+    "7731": "Please enter your password to verify your email address",
+    "7732": "Confirm email"
 }

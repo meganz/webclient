@@ -1236,6 +1236,7 @@
     "2435": "Votre synchronisation \"%1\" a \u00e9t\u00e9 d\u00e9sactiv\u00e9e parce que le dossier \u00e0 distance n'existe plus",
     "2436": "Votre synchronisation \"%1\" a \u00e9t\u00e9 d\u00e9sactiv\u00e9e parce que le dossier \u00e0 distance est dans la corbeille",
     "2438": "Le dossier (%1) n'a pas \u00e9t\u00e9 upload\u00e9 parce qu'il est trop gros (cette b\u00eata est limit\u00e9e \u00e0 %2 dossiers ou %3 fichiers.)",
+    "2439": "%1 dossiers n'ont pas \u00e9t\u00e9 upload\u00e9s parce qu'ils \u00e9taient trop gros (cette b\u00eata est limit\u00e9e \u00e0 %2 dossiers ou %3 fichiers.)",
     "2440": "La synchronisation va s'arr\u00eater.Les suppressions qui prennent place pendant que la synchronisation n'est pas active ne seront pas propag\u00e9es.",
     "2443": "Le dossier de destination est synchronis\u00e9 et vous avez d\u00e9j\u00e0 un fichier \u00e0 l'int\u00e9rieur qui porte le m\u00eame nom (%1).Si vous continuez l'upload, le fichier pr\u00e9c\u00e9dent sera \u00e9cras\u00e9.",
     "2445": "Le dossier racine (root) ne peut pas \u00eatre synchronis\u00e9. Veuillez s\u00e9lectionner un sous-dossier.",
@@ -2764,5 +2765,12 @@
     "7713": "This operation will clear all MEGA data from your browser cache and reload your account from our servers. This may take a few minutes.",
     "7714": "Voucher redemption link",
     "7715": "Email support at resellers@mega.nz",
-    "7716": "You have already sent a confirm link to that address."
+    "7716": "You have already sent a confirm link to that address.",
+    "7717": "You have already requested a confirmation link for that email address.",
+    "7718": "This email address has already been taken. Please contact MEGA support for more information.",
+    "7719": "Your confirmation link for this email has expired. Please click OK to restart the process.",
+    "7720": "You need to be logged in to complete your email change. Please log in again with your current email address and then click on your confirmation link again.",
+    "7730": "Verify your email address",
+    "7731": "Please enter your password to verify your email address",
+    "7732": "Confirm email"
 }

@@ -1236,6 +1236,7 @@
     "2435": "Va\u0161a sinkronizacija \"%1\" je onemogu\u0107ena zbog toga \u0161to udaljena mapa ne postoji",
     "2436": "Va\u0161a sinkronizacija \"%1\" je onemogu\u0107ena zbog toga \u0161to se odredi\u0161na mapa nalazi u kanti za sme\u0107e",
     "2438": "Mapa (%1) nije uploadana zbog toga jer je prevelika (ova beta je limitirna na %2 mapa ili %3 datoteka).",
+    "2439": "%1 mapa nisu uploadane zato jer su prevelike (ova beta je limitirna na %2 mapa ili %3 datoteka).",
     "2440": "Sinkronizacija \u0107e se zaustaviti.Brisanja koji se javljaju, dok  ne radi se ne\u0107e razmno\u017eavati.Svejedno iza\u0107i?",
     "2443": "Odredi\u0161na mapa je sinkronizirana i ve\u0107 imate datoteku unutar nje sa istim nazivom (%1).Ako nastavite sa uploadom. prija\u0161nja datoteka biti \u0107e prepisana.Da li ste sigurni?",
     "2445": "Root mapa ne mo\u017ee biti sinkronizirana.Molimo da odaberete podmapu.",
@@ -2764,5 +2765,12 @@
     "7713": "This operation will clear all MEGA data from your browser cache and reload your account from our servers. This may take a few minutes.",
     "7714": "Voucher redemption link",
     "7715": "Email support at resellers@mega.nz",
-    "7716": "You have already sent a confirm link to that address."
+    "7716": "You have already sent a confirm link to that address.",
+    "7717": "You have already requested a confirmation link for that email address.",
+    "7718": "This email address has already been taken. Please contact MEGA support for more information.",
+    "7719": "Your confirmation link for this email has expired. Please click OK to restart the process.",
+    "7720": "You need to be logged in to complete your email change. Please log in again with your current email address and then click on your confirmation link again.",
+    "7730": "Verify your email address",
+    "7731": "Please enter your password to verify your email address",
+    "7732": "Confirm email"
 }

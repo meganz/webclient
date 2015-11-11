@@ -136,13 +136,12 @@ var emailchange = (function() {
                 u_attr.email = context.email;
                 context = null; /* wipe variable */
                 
-                $('#account-email').val(u_attr.email);
-                $('.profile-form.first').removeClass('email-confirm');
-                
                 msgDialog('warninga', title, msgBody, false, function() {
                     
-                    // Wipe M.account cache
+                    // Wipe out account cache data (so we can fetch the newest email address)
+                    M.currentdirid = null;
                     M.account = null;
+
                     document.location.href = "#fm/account/profile";
                     showToast('settings', l[7698]);     // You have successfully changed your profile
                 });

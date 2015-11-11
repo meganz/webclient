@@ -2155,7 +2155,10 @@ function api_getsid2(res, ctx) {
         }
     }
 
-    // ZZZ comment
+    // emailchange namespace exists, that means the user
+    // attempted to verify their new email address without a session
+    // therefore we showed them the login dialog. Now we call `emailchange.verify`
+    // so the email verification can continue as expected.
     if (r && typeof emailchange === 'object') {
         emailchange.verify(new sjcl.cipher.aes(ctx.passwordkey), { k1: res.k, k2: k });
     }

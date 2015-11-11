@@ -688,9 +688,9 @@ var ulmanager = {
     ulIdentical: function UM_ul_Identical(file) {
         var nodes = M.c[file.target];
         if (nodes) {
-            for (var i in nodes) {
-                if (nodes.hasOwnProperty(i)) {
-                    var node = M.d[i];
+            for (var node in nodes) {
+                if (nodes.hasOwnProperty(node)) {
+                    node = M.d[node];
 
                     if (node
                             && file.size === node.s

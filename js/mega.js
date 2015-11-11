@@ -5556,8 +5556,17 @@ function fm_getcopynodes(cn, t)
     return a;
 }
 
+/**
+ * Create new folder on the cloud
+ * @param {string} toid The handle where the folder will be created.
+ * @param {mixed} name Either a string with the folder name to create, or an array of them.
+ * @param {mixed} ulparams Either an old-fashion object with a `callback` function or a MegaPromise.
+ * @return {object} The `ulparams`, whatever it is.
+ */
 function createFolder(toid, name, ulparams) {
 
+    // This will be called when the folder creation succeed, pointing
+    // the caller with the handle of the deeper created folder.
     var resolve = function(folderHandle) {
         if (ulparams) {
             if (ulparams instanceof MegaPromise) {
@@ -5570,6 +5579,7 @@ function createFolder(toid, name, ulparams) {
         return ulparams;
     };
 
+    // This will be called when the operation failed.
     var reject = function(error) {
         if (ulparams instanceof MegaPromise) {
             ulparams.reject(error);
@@ -5588,21 +5598,22 @@ function createFolder(toid, name, ulparams) {
             name = undefined;
         }
         else {
-            var stub = function(target, folderName) {
+            // Iterate through the array of folder names, creating one at a time
+            var next = function(target, folderName) {
                 createFolder(target, folderName, new MegaPromise())
                     .done(function(folderHandle) {
                         if (!name.length) {
                             resolve(folderHandle);
                         }
                         else {
-                            stub(folderHandle, name.shift());
+                            next(folderHandle, name.shift());
                         }
                     })
                     .fail(function(error) {
                         reject(error);
                     });
             };
-            stub(toid, name.shift());
+            next(toid, name.shift());
             return ulparams;
         }
     }
@@ -5612,9 +5623,10 @@ function createFolder(toid, name, ulparams) {
     }
 
     if (M.c[toid]) {
-        for (var n in M.c[toid]) {
-            if (M.d[n] && M.d[n].t && M.d[n].name === name) {
-                return resolve(M.d[n].h);
+        // Check if a folder with the same name already exists.
+        for (var handle in M.c[toid]) {
+            if (M.d[handle] && M.d[handle].t && M.d[handle].name === name) {
+                return resolve(M.d[handle].h);
             }
         }
     }

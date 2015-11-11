@@ -46,6 +46,8 @@ CallFeedback.prototype.attachToChat = function(megaChat) {
                             buttons: {
                                 'sendFeedback': {
                                     'type': 'primary',
+                                    'classes': 'default-white-button left',
+                                    'icon': 'refresh-circle',
                                     'text': __("Send Feedback"),
                                     'callback': function() {
                                         var feedbackDialog = mega.ui.FeedbackDialog.singleton(
@@ -65,6 +67,7 @@ CallFeedback.prototype.attachToChat = function(megaChat) {
                                 },
                                 'noThanks': {
                                     'type': 'secondary',
+                                    'classes': 'default-white-button left red',
                                     'text': __("No thanks"),
                                     'callback': function() {
                                         megaRoom.messagesBuff.removeMessageById(msgId);

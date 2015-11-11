@@ -131,12 +131,77 @@ var ConversationMessage = React.createClass({
             textMessage = message.messageHtml;
 
             authorTextDiv = <span className="chat-username">{contact.m}</span>;
+
+
+            if (
+                message instanceof Message ||
+                (typeof(message.userId) !== 'undefined' && message.userId === u_handle)
+            ) {
+                var labelClass = "label text-message";
+                var labelText;
+
+                if (
+                    message.getState() === Message.STATE.NULL
+                ) {
+                    labelClass += " error";
+                    labelText = "error"
+                }
+                else if (
+                    message.getState() === Message.STATE.NOT_SENT
+                ) {
+                    labelClass += " not-sent";
+                    labelText = "not sent"
+                }
+                else if (message.getState() === Message.STATE.SENT) {
+                    labelClass += " sent";
+                    labelText = "sent";
+                }
+                else if (message.getState() === Message.STATE.DELIVERED) {
+                    labelClass += " delivered";
+                    labelText = "delivered";
+                }
+                else if (message.getState() === Message.STATE.NOT_SEEN) {
+                    labelClass += " unread";
+                    labelText = "unread";
+                }
+                else if (message.getState() === Message.STATE.SEEN) {
+                    labelClass += " seen";
+                    labelText = "seen";
+                }
+                else if (message.getState() === Message.STATE.DELETED) {
+                    labelClass += " deleted";
+                    labelText = "deleted";
+                } else {
+                    labelClass += " not-sent";
+                    labelText = "not sent"
+                }
+
+                messageLabel = <span className={labelClass}>{labelText}</span>
+            }
+
+            var displayName = contact.u === u_handle ? __("Me") : generateAvatarMeta(contact.u).fullName;
+
+            return (
+                <div className="message body" data-id={"id" + message.messageId}>
+                    <ContactsUI.Avatar contact={contact} className="message small-rounded-avatar" />
+                    <div className="message content-area">
+                        <div className="message user-card-name">{displayName}</div>
+                        <div className="message date-time">{timestamp}</div>
+
+                        <div className="default-white-button tiny-button">
+                            <i className="tiny-icon grey-down-arrow"></i>
+                        </div>
+
+                        <div className="message text-block" dangerouslySetInnerHTML={{__html:textMessage}}>
+                        </div>
+                    </div>
+                </div>
+            )
         }
         // if this is an inline dialog
         else if (
             message.type
         ) {
-            cssClasses += " inline-dialog chat-notification " + message.type;
             textMessage = getMessageString(message.type);
             if (!textMessage) {
                 console.error("Message with type: ", message.type, "does not have a text string defined. Message: ", message);
@@ -145,132 +210,109 @@ var ConversationMessage = React.createClass({
             }
             // if is an array.
             if (textMessage.splice) {
-                var tmpMsg = textMessage[0].replace("[X]", generateContactName(contact.u));
+                var tmpMsg = textMessage[0].replace("[X]", htmlentities(generateContactName(contact.u)));
 
                 if (message.currentCallCounter) {
-                    tmpMsg += " " + textMessage[1].replace("[X]", secToDuration(message.currentCallCounter)) + " "
+                    tmpMsg += " " + textMessage[1].replace("[X]", "[[ - " + secToDuration(message.currentCallCounter)) + "]] "
                 }
                 textMessage = tmpMsg;
+                textMessage = textMessage
+                    .replace("[[ ", "<span class=\"grey-color\">")
+                    .replace("]]", "</span>");
             } else {
-                textMessage = textMessage.replace("[X]", generateContactName(contact.u));
+                textMessage = textMessage.replace("[X]", htmlentities(generateContactName(contact.u)));
             }
-
-            textMessage = htmlentities(textMessage);
 
             message.textContents = textMessage;
 
             // mapping css icons to msg types
             if (message.type === "call-rejected") {
-                message.cssClass = "rejected-call";
+                message.cssClass = "crossed-handset red";
             }
             else if (message.type === "call-missed") {
-                message.cssClass = "missed-call"
+                message.cssClass = "horizontal-handset yellow"
             }
             else if (message.type === "call-handled-elsewhere") {
-                message.cssClass = "call-from-different-device";
+                message.cssClass = "handset-with-arrow green";
             }
             else if (message.type === "call-failed") {
-                message.cssClass = "rejected-call";
+                message.cssClass = "horizontal-handset red";
+            }
+            else if (message.type === "call-timeout") {
+                message.cssClass = "horizontal-handset yellow";
             }
             else if (message.type === "missing-keys") {
-                message.cssClass = "rejected-call";
+                message.cssClass = "diagonal-handset yellow";
             }
             else if (message.type === "call-failed-media") {
-                message.cssClass = "call-canceled";
+                message.cssClass = "diagonal-handset yellow";
             }
             else if (message.type === "call-canceled") {
-                message.cssClass = "call-ended";
-            } else if (message.type === "incoming-call") {
-                message.cssClass = "incoming-call";
-            } else if (message.type === "outgoing-call") {
-                message.cssClass = "outgoing-call";
-            } else {
+                message.cssClass = "horizontal-handset grey";
+            }
+            else if (message.type === "call-ended") {
+                message.cssClass = "horizontal-handset grey";
+            }
+            else if (message.type === "call-feedback") {
+                message.cssClass = "diagonal-handset grey";
+            }
+            else if (message.type === "call-starting") {
+                message.cssClass = "diagonal-handset blue";
+            }
+            else if (message.type === "call-started") {
+                message.cssClass = "diagonal-handset green";
+            }
+            else if (message.type === "incoming-call") {
+                message.cssClass = "diagonal-handset green";
+            }
+            else if (message.type === "outgoing-call") {
+                message.cssClass = "diagonal-handset blue";
+            }
+            else {
                 message.cssClass = message.type;
             }
-            cssClasses += " " + message.cssClass;
-        }
 
-
-        if (message.cssClasses) {
-            cssClasses += " " + message.cssClasses.join(" ");
-        }
-
-        if (message.buttons) {
-            Object.keys(message.buttons).forEach(function(k) {
-                var button = message.buttons[k];
-                var classes = "fm-chat-file-button " + button.type + "-button fm-chat-inline-dialog-button-" + k;
-                buttons.push(
-                    <div key={k} className={classes} onClick={(() => { button.callback(); })}>
-                        <span>{button.text}</span>
-                    </div>
-                );
-            });
-        }
-
-        if (
-            message instanceof Message ||
-            (typeof(message.userId) !== 'undefined' && message.userId === u_handle)
-        ) {
-            var labelClass = "label text-message";
-            var labelText;
-
-            if (
-                message.getState() === Message.STATE.NULL
-            ) {
-                labelClass += " error";
-                labelText = "error"
-            }
-            else if (
-                message.getState() === Message.STATE.NOT_SENT
-            ) {
-                labelClass += " not-sent";
-                labelText = "not sent"
-            }
-            else if (message.getState() === Message.STATE.SENT) {
-                labelClass += " sent";
-                labelText = "sent";
-            }
-            else if (message.getState() === Message.STATE.DELIVERED) {
-                labelClass += " delivered";
-                labelText = "delivered";
-            }
-            else if (message.getState() === Message.STATE.NOT_SEEN) {
-                labelClass += " unread";
-                labelText = "unread";
-            }
-            else if (message.getState() === Message.STATE.SEEN) {
-                labelClass += " seen";
-                labelText = "seen";
-            }
-            else if (message.getState() === Message.STATE.DELETED) {
-                labelClass += " deleted";
-                labelText = "deleted";
-            } else {
-                labelClass += " not-sent";
-                labelText = "not sent"
+            var buttons = [];
+            if (message.buttons) {
+                Object.keys(message.buttons).forEach(function (k) {
+                    var button = message.buttons[k];
+                    var classes = button.classes;
+                    var icon;
+                    if (button.icon) {
+                       icon = <i className={"small-icon " + button.icon}></i>;
+                    }
+                    buttons.push(
+                        <div className={classes} key={k}  onClick={(() => { button.callback(); })}>
+                            {icon}
+                            {button.text}
+                        </div>
+                    );
+                });
             }
 
-            messageLabel = <span className={labelClass}>{labelText}</span>
-        }
+            var buttonsCode;
+            if(buttons.length > 0) {
+                buttonsCode = <div className="buttons-block">
+                        {buttons}
+                        <div className="clear" />
+                    </div>;
+            }
 
-        var displayName = contact.u === u_handle ? __("Me") : generateAvatarMeta(contact.u).fullName;
-
-        return (
-            <div className="message body" data-id={"id" + message.messageId}>
-                <ContactsUI.Avatar contact={contact} />
-                <div className="message content-area">
-                    <div className="message user-card-name">{displayName}</div>
-                    <div className="message date-time">{timestamp}</div>
-
-                    <div className="default-white-button tiny-button">
-                        <i className="tiny-icon grey-down-arrow"></i>
+            return (
+                <div className="message body" data-id={"id" + message.messageId}>
+                    <div className="feedback round-icon-block">
+                        <i className={"round-icon " + message.cssClass}></i>
                     </div>
 
-                    <div className="message text-block" dangerouslySetInnerHTML={{__html:textMessage}}>
+                    <div className="message content-area">
+                        <div className="message date-time">{timestamp}</div>
+
+                        <div className="message text-block" dangerouslySetInnerHTML={{__html:textMessage}}></div>
+                        {buttonsCode}
                     </div>
                 </div>
-            </div>
-        );
+            )
+        }
     }
 });
 
@@ -306,29 +348,33 @@ var ConversationRightArea = React.createClass({
                     </div>
 
                     <div className="buttons-block">
-                        <div className={"link-button" + (!contact.presence? " disabled" : "")}>
+                        <div className={"link-button" + (!contact.presence? " disabled" : "")} onClick={() => {
+                            room.startAudioCall();
+                        }}>
                             <i className="small-icon audio-call"></i>
-                            Start Audio Call
+                            {__("Start Audio Call")}
                         </div>
-                        <div className={"link-button" + (!contact.presence? " disabled" : "")}>
+                        <div className={"link-button" + (!contact.presence? " disabled" : "")} onClick={() => {
+                            room.startVideoCall();
+                        }}>
                             <i className="small-icon video-call"></i>
-                            Start Video Call
+                            {__("Start Video Call")}
                         </div>
                         <div className="link-button">
                             <i className="small-icon rounded-grey-plus"></i>
-                            Add participant…
+                            {__("Add participant…")}
                         </div>
                         <div className="link-button">
                             <i className="small-icon rounded-grey-up-arrow"></i>
-                            Send Files…
+                            {__("Send Files…")}
                         </div>
                         <div className="link-button">
                             <i className="small-icon shared-grey-folder"></i>
-                            Share Folders
+                            {__("Share Folders")}
                         </div>
                         <div className="link-button red">
                             <i className="small-icon rounded-stop"></i>
-                            Leave Chat
+                            {__("Leave Chat")}
                         </div>
                     </div>
 
@@ -435,7 +481,7 @@ var ConversationPanel = React.createClass({
 
         setTimeout(function()
         {
-            moveCursortoToEnd($('.message-textarea:visible')[0]);
+            moveCursortoToEnd($('.chat-textarea:visible')[0]);
         }, 100);
     },
     onStartCallClicked: function(e) {
@@ -643,7 +689,7 @@ var ConversationPanel = React.createClass({
         var $container = $(self.getDOMNode());
 
         self.$header = $('.fm-right-header[data-room-jid="' + self.props.chatRoom.roomJid.split("@")[0] + '"]', $container);
-        self.$messages = $('.fm-chat-message-scroll[data-roomjid="' + self.props.chatRoom.roomJid + '"]', $container);
+        self.$messages = $('.messages.scroll-area > .jScrollPaneContainer', $container);
 
         var droppableConfig = {
             tolerance: 'pointer',
@@ -671,13 +717,13 @@ var ConversationPanel = React.createClass({
         self.lastScrollHeight = 0;
         self.lastUpdatedScrollHeight = 0;
 
-        self.$messages.jScrollPane({
-            enableKeyboardNavigation:false,
-            showArrows:true,
-            arrowSize:5,
-            animateDuration: 70,
-            maintainPosition: false
-        });
+        //self.$messages.jScrollPane({
+        //    enableKeyboardNavigation:false,
+        //    showArrows:true,
+        //    arrowSize:5,
+        //    animateDuration: 70,
+        //    maintainPosition: false
+        //});
 
         self.$messages.rebind('jsp-user-scroll-y.conversationsPanel', function(e, scrollPositionY, isAtTop, isAtBottom) {
             var $jsp = self.$messages.data("jsp");
@@ -687,7 +733,6 @@ var ConversationPanel = React.createClass({
             }
 
             if (scrollPositionY < 350 && !isAtBottom && self.$messages.is(":visible")) {
-
                 if (
                     self.lastUpdatedScrollHeight !== $jsp.getContentHeight() &&
                     !self.props.chatRoom.messagesBuff.messagesHistoryIsLoading() &&
@@ -853,17 +898,16 @@ var ConversationPanel = React.createClass({
         }
 
         // typeArea resizing
-        var $conversationPanelContainer = self.$messages.parent();
-        var $textarea = $('.message-textarea', $conversationPanelContainer);
+        var $textarea = $('textarea.messages-textarea', $container);
         var textareaHeight =  $textarea.outerHeight();
-        var $hiddenDiv = $('.hiddendiv', $conversationPanelContainer);
-        var $pane = $('.fm-chat-input-scroll', $conversationPanelContainer);
+        var $hiddenDiv = $('.hidden', $container);
+        var $pane = $('.chat-textarea-scroll', $container);
         var $jsp;
 
         if (textareaHeight != $hiddenDiv.outerHeight()) {
             $textarea.css('height', $hiddenDiv.outerHeight());
 
-            if ($('.fm-chat-input-block', $conversationPanelContainer).outerHeight() >= 200) {
+            if ($('.chat-textarea-block', $container).outerHeight() >= 200) {
                 $pane.jScrollPane({
                     enableKeyboardNavigation:false,
                     showArrows:true,
@@ -885,21 +929,21 @@ var ConversationPanel = React.createClass({
         }
 
         //// Important. Please insure we have correct height detection for Chat messages block. We need to check ".fm-chat-input-scroll" instead of ".fm-chat-line-block" height
-        //var scrollBlockHeight = (
-        //    $('.chat-content-block').outerHeight() -
-        //    $('.fm-chat-line-block', $conversationPanelContainer).outerHeight()
-        //);
-        //if (scrollBlockHeight != self.$messages.outerHeight()) {
-        //    self.$messages.css('height', scrollBlockHeight);
-        //    self.refreshUI(true);
-        //} else {
-        //    self.refreshUI(scrollToBottom);
-        //}
+        var scrollBlockHeight = (
+            $('.chat-content-block', $container).outerHeight() -
+            $('.chat-textarea-block', $container).outerHeight()
+        );
+        if (scrollBlockHeight != self.$messages.outerHeight()) {
+            self.$messages.css('height', scrollBlockHeight);
+            self.refreshUI(true);
+        } else {
+            self.refreshUI(scrollToBottom);
+        }
 
         // try to do a .scrollToBottom only once, to trigger the stickToBottom func. of JSP
         if (!self.scrolledToBottom) {
             //TODO: fixme
-            var $messagesPad = $('.fm-chat-message-pad', self.$messages);
+            var $messagesPad = $('.messages.main-pad', self.$messages);
             if (
                 $messagesPad.outerHeight() - 1 > $messagesPad.parent().parent().parent().outerHeight()
             ) {
@@ -1146,7 +1190,14 @@ var ConversationPanel = React.createClass({
                 <div className="chat-content-block">
                     <div className="messages-block">
                         <div className="messages scroll-area">
-                            <utils.JScrollPane>
+                            <utils.JScrollPane options={{
+                                enableKeyboardNavigation:false,
+                                showArrows:true,
+                                arrowSize:5,
+                                animateDuration: 70,
+                                animateScroll: false,
+                                maintainPosition: false
+                            }}>
                                 <div className="messages main-pad">
                                     <div className="messages content-area">
                                         {messagesList}
@@ -1160,10 +1211,10 @@ var ConversationPanel = React.createClass({
                             <div className="chat-textarea">
                                 <i className="small-icon conversations"></i>
                                 <div className="chat-textarea-buttons">
-                                    <div className="button pupup-button" onClick={this.onEmoticonsButtonClick}>
+                                    <div className="button popup-button" onClick={this.onEmoticonsButtonClick}>
                                         <i className="small-icon smiling-face"></i>
                                     </div>
-                                    <div className="button pupup-button">
+                                    <div className="button popup-button">
                                         <i className="small-icon grey-medium-plus"></i>
                                     </div>
                                 </div>

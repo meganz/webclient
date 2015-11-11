@@ -36,26 +36,25 @@ var Avatar = React.createClass({
 
         var $avatar = $(useravatar.contact(contact));
 
-        var classes = this.props.classesName ? this.props.classesName : 'nw-contact-avatar ' + contact.u;
+        var classes = (this.props.className ? this.props.className : 'small-rounded-avatar') + ' ' + contact.u;
 
         var displayedAvatar;
 
         if($avatar.find("img").length > 0) {
-            displayedAvatar = <img src={$("img", $avatar).attr("src")} style={this.props.imgStyles}/>;
+            displayedAvatar = <div className={classes}>
+                <img src={$("img", $avatar).attr("src")} style={this.props.imgStyles}/>
+            </div>;
         } else {
-            displayedAvatar = <span>{$(useravatar.contact(contact)).text()}</span>;
-
             var tempClasses = $avatar.attr('class');
             var colorNum = tempClasses.split("color")[1].split(" ")[0];
             classes += " color" + colorNum;
+
+            displayedAvatar = <div className={classes}>{$(useravatar.contact(contact)).text()}</div>;
+
+
         }
 
-        return (
-            <div className={classes}>
-                <div className="not-supported-yet-nw-verified-icon"></div>
-                {displayedAvatar}
-            </div>
-        )
+        return displayedAvatar;
     }
 });
 

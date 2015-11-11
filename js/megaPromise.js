@@ -82,7 +82,7 @@ MegaPromise.getTraceableReject = function($promise, origPromise) {
             if (typeof console.group === 'function') {
                 console.group('PROMISE REJECTED');
             }
-            console.error('Promise rejected: ', aResult, origPromise);
+            console.debug('Promise rejected: ', aResult, origPromise);
             console.debug('pre-Stack', preStack);
             console.debug('post-Stack', postStack);
             if (typeof console.groupEnd === 'function') {

@@ -23,14 +23,16 @@ var JScrollPane = React.createClass({
             $elem.find('.jspPane').children()
         );
 
-        $elem.jScrollPane({
+        var options = $.extend({}, {
             enableKeyboardNavigation: false,
             showArrows: true,
             arrowSize: 8,
             animateScroll: true,
             container: $('.jspContainer', $elem),
             pane: $('.jspPane', $elem)
-        });
+        }, this.props.options);
+
+        $elem.jScrollPane(options);
 
         $elem.find('.jspContainer').attr('data-reactid', $jspContainerReact.data('reactid'));
         $elem.find('.jspPane').attr('data-reactid', $jspPaneReact.data('reactid'));

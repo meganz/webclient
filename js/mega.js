@@ -435,29 +435,39 @@ function MegaData()
             M.c.contacts[u_handle] = 1;
         }
 
-        for (var u in M.c['contacts'])
-            if (!avatars[u])
-            {
-                api_req({a: 'uga', u: u, ua: '+a'},
-                {
-                    u: u,
-                    callback: function(res, ctx)
-                    {
-                        if (typeof res !== 'number' && res.length > 5)
-                        {
+        var waitingPromises = [];
+        Object.keys(M.c['contacts']).forEach(function(u) {
+            if (!avatars[u]) {
+                waitingPromises.push(
+                    getUserAttribute(u, 'a', true, false, function (res) {
+                        if (typeof res !== 'number' && res.length > 5) {
                             var blob = new Blob([str_to_ab(base64urldecode(res))], {type: 'image/jpeg'});
-                            avatars[ctx.u] = {
+                            avatars[u] = {
                                 data: blob,
                                 url: myURL.createObjectURL(blob)
                             };
                         }
-                        useravatar.loaded(ctx.u);
-                    }
-                });
+                        useravatar.loaded(u);
+                    })
+                    .fail(function() {
+                        delete avatars[u];
+                        useravatar.loaded(u);
+                    })
+                );
             }
+        });
+
+        MegaPromise
+            .allDone(
+                waitingPromises
+            ).always(function() {
+                // trigger UI refresh
+                M.renderAvatars();
+            });
+
 
         delete M.c.contacts[u_handle];
-    }
+    };
 
     this.renderAvatars = function()
     {
@@ -4835,6 +4845,9 @@ function execsc(actionPackets, callback) {
 
                 if (megaChatIsReady) {
                     $.each(actionPacket.u, function (k, v) {
+                        if (v.c !== 0) {
+                            crypt.getPubRSA(v.u);
+                        }
                         megaChat[v.c == 0 ? "processRemovedUser" : "processNewUser"](v.u);
                     });
                 }
@@ -5162,6 +5175,9 @@ function execsc(actionPackets, callback) {
 
             if (megaChatIsReady) {
                 $.each(actionPacket.u, function(k, v) {
+                    if (v.c !== 0) {
+                        crypt.getPubRSA(v.u);
+                    }
                     megaChat[v.c == 0 ? "processRemovedUser" : "processNewUser"](v.u);
                 });
             }
@@ -5171,9 +5187,24 @@ function execsc(actionPackets, callback) {
         }
         else if (actionPacket.a === 'ua' && fminitialized) {
             for (var i in actionPacket.ua) {
+                if (d) {
+                    console.debug(
+                        "Invalidating cache, because of update from action packet:",
+                        actionPacket.u,
+                        actionPacket.ua[i]
+                    );
+                }
+
+                var removeItemPromise = AttribCache.removeItem(
+                    actionPacket.u + "_" + actionPacket.ua[i]
+                );
+
                 if (actionPacket.ua[i] === '+a') {
                     avatars[actionPacket.u] = undefined;
-                    loadavatars = true;
+
+                    removeItemPromise.done(function() {
+                        M.avatars();
+                    });
 
                 } else if (actionPacket.ua[i] == '+puEd255') {
                     // pubEd25519 key was updated!

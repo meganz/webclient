@@ -553,6 +553,8 @@ function generateAvatarMeta(user_hash) {
     return meta;
 }
 
+var AttribCache = new IndexedDBKVStorage('attrib');
+
 /**
  * Retrieves a user attribute.
  *
@@ -598,6 +600,8 @@ function getUserAttribute(userhandle, attribute, pub, nonHistoric,
     // Make the promise to execute the API code.
     var thePromise = new MegaPromise();
 
+    var cacheKey = userhandle + "_" + attribute;
+
     function settleFunction(res) {
         if (typeof res !== 'number') {
             // Decrypt if it's a private attribute container.
@@ -622,6 +626,8 @@ function getUserAttribute(userhandle, attribute, pub, nonHistoric,
 
         // Another conditional, the result value may have been changed.
         if (typeof res !== 'number') {
+            AttribCache.setItem(cacheKey, res);
+
             thePromise.resolve(res);
             logger.info('Attribute "' + attribute + '" for user "'
                         + userhandle + '" is ' + JSON.stringify(res) + '.');
@@ -645,12 +651,19 @@ function getUserAttribute(userhandle, attribute, pub, nonHistoric,
     myCtx.ua = attribute;
     myCtx.callback = settleFunction;
 
-    // @TODO PERF: This may reduce the number of API calls made during the page initialisation if the next line is
-    // replaced with a clever cache (localStorage/sessionStorage/mDB) that will do cache all api_req's related to
-    // attributes and keep it in sync via actionpackets.
+    // check the cache first!
+    AttribCache.getItem(cacheKey)
+        .done(function(v) {
+            thePromise.resolve(v);
+            if (callback) {
+                callback(v, myCtx);
+            }
+        })
+        .fail(function() {
+            // Fire it off.
+            api_req({'a': 'uga', 'u': userhandle, 'ua': attribute}, myCtx);
+        });
 
-    // Fire it off.
-    api_req({'a': 'uga', 'u': userhandle, 'ua': attribute}, myCtx);
 
     return thePromise;
 }
@@ -688,6 +701,8 @@ function setUserAttribute(attribute, value, pub, nonHistoric, callback, ctx,
     var logger = MegaLogger.getLogger('account');
     var myCtx = ctx || {};
 
+    var saved_value = value;
+
     // Prepare all data needed for the call on the Mega API.
     if (mode === undefined) {
         mode = tlvstore.BLOCK_ENCRYPTION_SCHEME.AES_GCM_12_16;
@@ -702,15 +717,23 @@ function setUserAttribute(attribute, value, pub, nonHistoric, callback, ctx,
         attribute = '*' + attribute;
         // The value should be a key/value property container. Let's encode and
         // encrypt it.
-        value = base64urlencode(tlvstore.blockEncrypt(
+        saved_value = base64urlencode(tlvstore.blockEncrypt(
             tlvstore.containerToTlvRecords(value), u_k, mode));
     }
 
     // Make the promise to execute the API code.
     var thePromise = new MegaPromise();
 
+    var cacheKey = u_handle + "_" + attribute;
+
+    AttribCache.removeItem(cacheKey); // clear when the value is being sent to the API server, during that period
+                                      // the value should be retrieved from the server, because of potential
+                                      // race conditions
+
     function settleFunction(res) {
         if (typeof res !== 'number') {
+            AttribCache.setItem(cacheKey, value);
+            
             logger.info('Setting user attribute "'
                         + attribute + '", result: ' + res);
             thePromise.resolve(res);
@@ -733,7 +756,7 @@ function setUserAttribute(attribute, value, pub, nonHistoric, callback, ctx,
 
     // Fire it off.
     var apiCall = {'a': 'up'};
-    apiCall[attribute] = value;
+    apiCall[attribute] = saved_value;
     api_req(apiCall, myCtx);
 
     return thePromise;

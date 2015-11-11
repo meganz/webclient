@@ -4050,7 +4050,8 @@ function accountUI()
         $('.fm-account-remove-avatar,.fm-account-avatar').rebind('click', function() {
             msgDialog('confirmation', l[1756], l[6973], false, function(e) {
                 if (e) {
-                    api_req({'a': 'up', '+a':'none'});
+                    setUserAttribute('a', 'none', true, false);
+
                     delete avatars[u_handle];
                     $('.fm-account-avatar img').attr('src', useravatar.mine());
                     $('.fm-avatar img').attr('src', useravatar.mine());
@@ -4221,7 +4222,7 @@ function avatarDialog(close)
             onCrop: function(croppedDataURI)
             {
                 var data = dataURLToAB(croppedDataURI);
-                api_req({'a': 'up', '+a': base64urlencode(ab_to_str(data))});
+                setUserAttribute('a', base64urlencode(ab_to_str(data)), true, false);
                 var blob = new Blob([data], {type: 'image/jpeg'});
                 avatars[u_handle] =
                     {

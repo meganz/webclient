@@ -1,5 +1,13 @@
 /**
- * ZZZ: Brief description of what the file is for
+ * Verify email: When a user changes their main email address
+ * we send a new email to verify the own this new email address.
+ * This namespace contains the logic to verify the email addres:
+ *
+ * Possible scenarios:
+ *  1. The user already has a session, we ask them their password
+ *  2. The user has no session and we show the login screen
+ *  3. After  1 or 2, we change the user's hash with their password and their new email address
+ *  4. We redirect them to their profile page
  */
 var emailchange = (function() {
     
@@ -13,13 +21,15 @@ var emailchange = (function() {
      * Boot the UI to change verify the new email address for the current user.
      *
      * If the user has no session we show the login dialog and we add a listener
-     * for `verifyEmailPassword` when they successfully login
+     * for `verify` when they successfully login
      */
     ns.main = function() {
         
         context = { code: page.substr(6) };
         
-        // If not logged in, display warning dialog with message 'ZZZ...'
+        // If not logged in, display warning dialog explaining the user
+        // they need to login. When the user is logged in successfully
+        // `verify` is called.
         if (!u_type) {
             return msgDialog('warninga', l[135], l[7720],  false, function() {
                 document.location.href = "#login";
@@ -32,33 +42,18 @@ var emailchange = (function() {
             $('.login-register-input.password.first').removeClass('incorrect');
             $('.login-register-input.password.confirm').removeClass('incorrect');
             $('.login-register-input.password').addClass('focused');
-            
-            // If the password is equal to our placeholder
-            if ($input.val() == l[909]) {
-                $input.val('');
-                $input[0].type = 'password';
-            }
         });
     
-        // If they click out of the text box, replace the placeholder text if not set
-        $input.rebind('blur', function() {
-            
-            $('.login-register-input.password').removeClass('focused');
-            
-            if ($input.val() == '') {
-                $input.val(l[909]);             // Password
-                $input[0].type = 'text';
-            }
-        });        
-    
-        $('#verify-password').rebind('keyup', function(event) {
+        $input.rebind('keyup', function(event) {
+
             if (event.keyCode == 13) {
-                ns.verifyEmailPassword();
+                ns.verify();
             }
         });
         
         $('.restore-verify-button').rebind('click', function() {
-            ns.verifyEmailPassword();
+
+            ns.verify();
         });
     };
     
@@ -71,26 +66,16 @@ var emailchange = (function() {
      */
     function checkError(response) {
         
-        if (typeof response !== 'number') {
+        // If response is anything but a number or zero there is no error
+        if (typeof response !== 'number' || response === 0) {
             return false;
         }
         
         var title = l[135];     // Error
-        var msgBody = l[7719];  // ZZZ: Some string
+        var msgBody = l[7719];  // Your confirmation link for this email has expired...
     
-        // ZZZ: Remove switch statement
-        switch (response) {
-            case 0:
-                return false;
-
-            case EEXIST:
-                title   = l[135];
-                msgBody = l[7718];
-                break;
-            case EEXPIRED:
-            default:
-                title   = l[135];
-                msgBody = l[7719];
+        if (response === EEXIST) {
+            msgBody = l[7718]; // This email address has already been taken...
         }
         
         context = null; // wipe variable
@@ -116,7 +101,7 @@ var emailchange = (function() {
      */
     function verifyEmailCallback(passAES) {
         
-        var encryptedKey = context.k1 || u_attr.k;
+        var encryptedKey  = context.k1 || u_attr.k;
         var privateRsaKey = context.k2 || u_k;
         
         // If the password is incorrect, then quit out
@@ -131,7 +116,7 @@ var emailchange = (function() {
             c: context.code,
             e: context.email,
             uh: stringhash(context.email, passAES),     // User Hash
-            r: 1,                                       // ZZZ what does this mean?
+            r: 1,                                       // Replace the email address
             i: requesti
         };
         
@@ -142,11 +127,6 @@ var emailchange = (function() {
             callback: function(res) {
                 loadingDialog.hide();
                 
-                // Show change email button
-                $('.fm-account-change-email.disabled')
-                    .removeClass('disabled')
-                    .find('span').text('Request email change');         // ZZZ: Translate this
-            
                 if (checkError(res)) {
                     return;
                 }
@@ -164,9 +144,6 @@ var emailchange = (function() {
                     // Wipe M.account cache
                     M.account = null;
                     document.location.href = "#fm/account/profile";
-                    
-                    // Renders the account profile (ZZZ check why Later function needed)
-                    Later(accountUI);
                     showToast('settings', l[7698]);     // You have successfully changed your profile
                 });
             }
@@ -179,7 +156,7 @@ var emailchange = (function() {
      * @param {Object} passAES The password AES object (optional)
      * @param {Array} keys The hash with key 1 (encrypted private key) and key 2 (private key). (optional)
      */
-    ns.verifyEmailPassword = function(passAES, keys) {
+    ns.verify = function(passAES, keys) {
         
         // The user has no context, it happens when a given user login
         // and this function exists (verify new email / logout / login again)
@@ -191,7 +168,8 @@ var emailchange = (function() {
         $input = $input || $('#verify-password');
         var password = $input.val();
         
-        // ZZZ: comment here
+        // Use passAES (AES object with the user's password as the key)
+        // *or* whatever the user typed in `$input`.
         passAES = passAES || new sjcl.cipher.aes(prepare_key_pw(password));
         
         $('.login-register-input.password').addClass('loading').removeClass('incorrect');

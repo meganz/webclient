@@ -1236,6 +1236,7 @@
     "2435": "Va\u0161a sinhronizacija \"%1\" je onemogu\u0107ena jer folder na daljinu ne postoji",
     "2436": "Va\u0161a sinhronizacija \"%1\" je onemogu\u0107ena zato \u0161to daljinski folder nije u korpi",
     "2438": "Folder (%1) nije otpremljen jer je previ\u0161e veliki (ova beta je ograni\u010dena na %2 foldera ili %3 fajlova.",
+    "2439": "%1 foldera nije otpremljeno jer su previ\u0161e veliki (ova beta je ograni\u010dena na %2 foldera ili %3 fajlova.",
     "2440": "Sinhronizacija \u0107e se zaustaviti.Brisanja koja se dese zbog nepokretanja ne\u0107e se \u0161iriti.",
     "2443": "Destinacijski folder je sinhronizovan i Vi ve\u0107 imate fajlunutar njega pod istim imenom (%1).Ukoliko nastavite sa otpremanjem, prethodni fajl \u0107e biti prebrisan.",
     "2445": "Root folder ne mo\u017ee biti sinhronizovan. Molimo Vas da selektujete subfolder.",
@@ -2764,5 +2765,12 @@
     "7713": "This operation will clear all MEGA data from your browser cache and reload your account from our servers. This may take a few minutes.",
     "7714": "Voucher redemption link",
     "7715": "Email support at resellers@mega.nz",
-    "7716": "You have already sent a confirm link to that address."
+    "7716": "You have already sent a confirm link to that address.",
+    "7717": "You have already requested a confirmation link for that email address.",
+    "7718": "This email address has already been taken. Please contact MEGA support for more information.",
+    "7719": "Your confirmation link for this email has expired. Please click OK to restart the process.",
+    "7720": "You need to be logged in to complete your email change. Please log in again with your current email address and then click on your confirmation link again.",
+    "7730": "Verify your email address",
+    "7731": "Please enter your password to verify your email address",
+    "7732": "Confirm email"
 }

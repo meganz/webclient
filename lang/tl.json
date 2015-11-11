@@ -1236,6 +1236,7 @@
     "2435": "Ang inyong \"%1\" ay ipinatigil dahil ang remote folder ay hindi matagpuan",
     "2436": "Ang inyong \"%1\" ay itinigil dahil ang remote folder ay nasa basurahan na.",
     "2438": "Ang folder (%1) ay hindi na-upload dahil masyado itong malaki (ang betang ito ay limitado %2 folders o %3 files.",
+    "2439": "%1 folders ang hindi na-upload dahil masyado itong malaki (ang betang ito ay limitado sa %2 folders o %3 files.",
     "2440": "Titigil ang synchronization.Ang mga pagpapahing magaganap habang hindi ito tumatakbo ay hindi magpapatuloy.",
     "2443": "Ang patutunguhang folder ay synced na at meron ka ng file sa loob nito na may kaparehas na pangalang  (%1). Kung ikaw ay magpapatuloy pa sa iyong upload, ang datihang file ay mapatungan. SIgurado ka ba?",
     "2445": "Ang root folder ay hindi mai-sync. Pakiusap, pumili ulit ng subfolder.",
@@ -2761,8 +2762,15 @@
     "7710": "KUMPLETONG UPGRADE",
     "7711": "Pumili ng ibang plano",
     "7712": "Maglog in o magrehistro para makuha ang inyong voucher.",
-    "7713": "This operation will clear all MEGA data from your browser cache and reload your account from our servers. This may take a few minutes.",
+    "7713": "Ang gawaing ito ay magtatanggal ng lahat ng MEGA data sa inyong browser cache at ire-reload ang inyong account sa aming servers. Sandali lamang.",
     "7714": "Link sa pagkuha ng voucher",
-    "7715": "Email support at resellers@mega.nz",
-    "7716": "You have already sent a confirm link to that address."
+    "7715": "Para sa karagdagang kaalaman, mag-email sa resellers@mega.nz",
+    "7716": "Nagpadala ka na ng kumpirmasyon sa address na ito.",
+    "7717": "Ikaw ay humingi na ng kumpirmasyon sa email address na ito.",
+    "7718": "This email address has already been taken. Please contact MEGA support for more information.",
+    "7719": "Your confirmation link for this email has expired. Please click OK to restart the process.",
+    "7720": "You need to be logged in to complete your email change. Please log in again with your current email address and then click on your confirmation link again.",
+    "7730": "Verify your email address",
+    "7731": "Please enter your password to verify your email address",
+    "7732": "Confirm email"
 }

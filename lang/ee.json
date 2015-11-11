@@ -1236,6 +1236,7 @@
     "2435": "Teie s\u00fcnkroniseering \"%1\" on keelatud, sest sihtkausta pole olemas",
     "2436": "Teie \"%1\" on keelatud, sest sihtkaust asub pr\u00fcgikastis",
     "2438": "Kausta (%1) ei laetud \u00fcles liiga suure mahu t\u00f5ttu (antud beta piiranguks on %2 kausta ja %3 faili.",
+    "2439": "%1 kausta ei laetud \u00fcles nende liiga suure mahu t\u00f5ttu (antud beta piiranguks on %2 kausta ja %3 faili.",
     "2440": "S\u00fcnkroniseerimine peatub.S\u00fcnkroniseerimise mittet\u00f6\u00f6tamise ajal kustutamine ei j\u00f5ustu.",
     "2443": "Sihtkausta s\u00fcnkroniseeritakse ja Teil on juba samanimeline fail (%1) seal. \u00dcleslaadimise j\u00e4tkamisel asendatakse eelmine fail.",
     "2445": "K\u00f5vaketta kausta ei saa s\u00fcnkroniseerida.Palun valige alamkaust.",
@@ -2763,6 +2764,13 @@
     "7712": "Oma vaut\u0161eri kasutamiseks peate sisse logima v\u00f5i registreeruma. ",
     "7713": "Sellega eemaldate veeilehitseja m\u00e4lust k\u00f5ik MEGA andmed ja v\u00e4rskendate meie serverist oma kontot.",
     "7714": "Vaut\u0161eri kasutamise link",
-    "7715": "Email support at resellers@mega.nz",
-    "7716": "Olete juba kinnitamislingi e-posti aadressile saatnud."
+    "7715": "Abi saate e-posti aadressilt resellers@mega.nz",
+    "7716": "Olete juba kinnitamislingi e-posti aadressile saatnud.",
+    "7717": "Olete juba sellele e-posti aadressile n\u00f5udnud kinnitamislingi saatmist.",
+    "7718": "This email address has already been taken. Please contact MEGA support for more information.",
+    "7719": "Your confirmation link for this email has expired. Please click OK to restart the process.",
+    "7720": "You need to be logged in to complete your email change. Please log in again with your current email address and then click on your confirmation link again.",
+    "7730": "Verify your email address",
+    "7731": "Please enter your password to verify your email address",
+    "7732": "Confirm email"
 }

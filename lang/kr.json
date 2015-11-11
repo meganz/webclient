@@ -1236,6 +1236,7 @@
     "2435": "\uc6d0\uaca9 \ud3f4\ub354\uac00 \uc874\uc7ac\ud558\uc9c0 \uc54a\uc544\uc11c \"%1\"\uc758 \ub3d9\uae30\ud654\uac00 \ud574\uc81c\ub418\uc5c8\uc2b5\ub2c8\ub2e4",
     "2436": "\uc6d0\uaca9 \ud3f4\ub354\uac00 \ud734\uc9c0\ud1b5\uc5d0 \uc788\uc5b4\uc11c \"%1\"\uc758 \ub3d9\uae30\ud654\uac00 \ud574\uc81c\ub418\uc5c8\uc2b5\ub2c8\ub2e4",
     "2438": "\ud3f4\ub354(%1)\uac00 \ub108\ubb34 \ucee4\uc11c \uc5c5\ub85c\ub4dc \ub418\uc9c0 \uc54a\uc558\uc2b5\ub2c8\ub2e4 (\uc774 \ubca0\ud0c0\ub294 %2\uac1c\uc758 \ud3f4\ub354 \ub610\ub294 %3\uac1c\uc758 \ud30c\uc77c\ub85c \uc81c\ud55c\ub418\uc5b4\uc788\uc2b5\ub2c8\ub2e4.)",
+    "2439": "%1 \ud3f4\ub354\uac00 \ub108\ubb34 \ucee4\uc11c \uc5c5\ub85c\ub4dc \ub418\uc9c0 \uc54a\uc558\uc2b5\ub2c8\ub2e4. (\uc774 \ubca0\ud0c0\ub294 %2\uac1c\uc758 \ud3f4\ub354 \ub610\ub294 %3\uac1c\uc758 \ud30c\uc77c\ub85c \uc81c\ud55c\ub418\uc5b4\uc788\uc2b5\ub2c8\ub2e4.)",
     "2440": "\ub3d9\uae30\ud654\uac00 \uba48\ucd9c \uac83\uc785\ub2c8\ub2e4.\uc791\ub3d9\uc911\uc774\uc9c0 \uc54a\uc744 \ub54c \uc774\ub8e8\uc5b4\uc9c4 \uc0ad\uc81c\ub294 \uc804\ub2ec\ub418\uc9c0 \uc54a\uc744 \uac83\uc785\ub2c8\ub2e4.",
     "2443": "\ub300\uc0c1 \ud3f4\ub354\uac00 \ub3d9\uae30\ud654\ub418\uc5c8\uace0 \uc548\uc5d0 \uac19\uc740 \uc774\ub984\uc744 \uac00\uc9c4 \ud30c\uc77c\uc774 \uc788\uc2b5\ub2c8\ub2e4. (%1)\uc5c5\ub85c\ub4dc\ub97c \uacc4\uc18d\ud558\uba74 \uc774\uc804 \ud30c\uc77c\uc740 \ub36e\uc5b4\uc4f0\uc785\ub2c8\ub2e4.\ud655\uc2e4\ud569\ub2c8\uae4c?",
     "2445": "\ub8e8\ud2b8 \ud3f4\ub354\ub294 \ub3d9\uae30\ud654\ud560 \uc218 \uc5c6\uc2b5\ub2c8\ub2e4. \uc11c\ube0c\ud3f4\ub354\ub97c \uc120\ud0dd\ud558\uc138\uc694.",
@@ -2764,5 +2765,12 @@
     "7713": "This operation will clear all MEGA data from your browser cache and reload your account from our servers. This may take a few minutes.",
     "7714": "Voucher redemption link",
     "7715": "Email support at resellers@mega.nz",
-    "7716": "You have already sent a confirm link to that address."
+    "7716": "You have already sent a confirm link to that address.",
+    "7717": "You have already requested a confirmation link for that email address.",
+    "7718": "This email address has already been taken. Please contact MEGA support for more information.",
+    "7719": "Your confirmation link for this email has expired. Please click OK to restart the process.",
+    "7720": "You need to be logged in to complete your email change. Please log in again with your current email address and then click on your confirmation link again.",
+    "7730": "Verify your email address",
+    "7731": "Please enter your password to verify your email address",
+    "7732": "\uc774\uba54\uc77c \ud655\uc778"
 }

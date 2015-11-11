@@ -1236,6 +1236,7 @@
     "2435": "Ihr Sync \"%1\" wurde deaktiviert, weil der Zielordner in Ihrem Cloud Drive nicht  mehr vorhanden ist.",
     "2436": "Ihr Sync \"%1\" wurde deaktiviert, weil der Zielordner in Ihren Cloud-Papierkorb verschoben wurde.",
     "2438": "Der Ordner (%1) wurde wegen seiner Gr\u00f6\u00dfe \u00fcbersprungen. Diese Beta ist auf %2 Ordner und %3 Dateien begrenzt.",
+    "2439": "%1 Ordner wurden wegen ihrer Gr\u00f6\u00dfe \u00fcbersprungen. Diese Beta ist auf %2 Ordner und %3 Dateien begrenzt.",
     "2440": "Die Synchronisation wird angehalten.Lokale Datei- und Ordnerl\u00f6schungen werden bis zu ihrer Fortsetzung nicht repliziert.",
     "2443": "Der Zielordner wird synchronisiert und enth\u00e4lt bereits eine Datei desselben Namens (%1).Falls Sie den Upload fortsetzen, wird diese Datei \u00fcberschrieben.Sind Sie sicher?",
     "2445": "Der Wurzelordner kann nicht synchronisiert werden. Bitte w\u00e4hlen Sie einen Unterordner.",
@@ -2764,5 +2765,12 @@
     "7713": "Alle lokal gespeicherten Daten werden aus Ihrem Browsercache gel\u00f6scht und von unseren Servern neu geladen. Dies kann einige Minuten in Anspruch nehmen.",
     "7714": "Voucher redemption link",
     "7715": "Kontaktieren Sie resellers@mega.nz",
-    "7716": "Sie haben bereits einen Best\u00e4tigungslink an diese Adresse geschickt."
+    "7716": "Sie haben bereits einen Best\u00e4tigungslink an diese Adresse geschickt.",
+    "7717": "You have already requested a confirmation link for that email address.",
+    "7718": "This email address has already been taken. Please contact MEGA support for more information.",
+    "7719": "Your confirmation link for this email has expired. Please click OK to restart the process.",
+    "7720": "You need to be logged in to complete your email change. Please log in again with your current email address and then click on your confirmation link again.",
+    "7730": "Verify your email address",
+    "7731": "Please enter your password to verify your email address",
+    "7732": "Confirm email"
 }

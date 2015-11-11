@@ -1236,6 +1236,7 @@
     "2435": "Tava sinhroniz\u0101cija \"%1\" tika atcelta, jo att\u0101lin\u0101ta mape neeksist\u0113",
     "2436": "Tava sinhroniz\u0101cija \"%1\" tika atcelta, jo att\u0101lin\u0101t\u0101 mape atrodas miskast\u0113",
     "2438": "\u0160\u012b mape (%1) netika aug\u0161upiel\u0101d\u0113ta, jo t\u0101 ir p\u0101r\u0101k liela (\u0161\u012b beta versija ir ierobe\u017eota l\u012bdz %2 map\u0113m vai %3 failiem.",
+    "2439": "%1 mapes netika aug\u0161upiel\u0101d\u0113tas, jo t\u0101s ir p\u0101r\u0101k lielas (\u0161\u012b beta versija ir ierobe\u017eota l\u012bdz %2 map\u0113m vai %3 failiem.",
     "2440": "Sinhroniz\u0101cija apst\u0101sies.Dz\u0113\u0161anas darb\u012bbas, kuras tiks veiktas, kam\u0113r tas nedarbojas netiks izplat\u012btas. ",
     "2443": "M\u0113r\u0137a mape tiek sinhroniz\u0113ta, un jums jau ir failsiek\u0161ien\u0113 ar t\u0101du pa\u0161u nosaukumu (%1).Ja j\u016bs turpiniet aug\u0161upiel\u0101di, tad iepriek\u0161\u0113jaisfails tiks p\u0101rrakst\u012bts. Vai esi p\u0101rliecin\u0101ts? ",
     "2445": "Galven\u0101 mape nevar tikt sinhroniz\u0113ta.L\u016bdzu, izv\u0113lieties apak\u0161mapi.",
@@ -2764,5 +2765,12 @@
     "7713": "This operation will clear all MEGA data from your browser cache and reload your account from our servers. This may take a few minutes.",
     "7714": "Voucher redemption link",
     "7715": "Email support at resellers@mega.nz",
-    "7716": "You have already sent a confirm link to that address."
+    "7716": "You have already sent a confirm link to that address.",
+    "7717": "You have already requested a confirmation link for that email address.",
+    "7718": "This email address has already been taken. Please contact MEGA support for more information.",
+    "7719": "Your confirmation link for this email has expired. Please click OK to restart the process.",
+    "7720": "You need to be logged in to complete your email change. Please log in again with your current email address and then click on your confirmation link again.",
+    "7730": "Verify your email address",
+    "7731": "Please enter your password to verify your email address",
+    "7732": "Confirm email"
 }

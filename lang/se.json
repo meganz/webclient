@@ -1236,6 +1236,7 @@
     "2435": "Din sync \"%1\" har inaktiveratseftersom fj\u00e4rrmappen existerar inte",
     "2436": "Din sync \"%1\" har inaktiveratseftersom fj\u00e4rrmappen \u00e4r i papperskorgen",
     "2438": "Mappen (%1) var inte laddat upp eftersom det \u00e4r f\u00f6r stor (detta beta \u00e4r begr\u00e4nsad till %2 mappar eller %3 filer.",
+    "2439": "%1 mappar inte upp eftersom de \u00e4r f\u00f6r stora (denna beta \u00e4r begr\u00e4nsad till %2 mappar eller %3 filer.",
     "2440": "Synkroniseringen kommer att sluta.Strykningar som uppst\u00e5r n\u00e4r det inte k\u00f6rs kommer inte fortplantas.Avsluta \u00e4nd\u00e5?",
     "2443": "Destinationsmappen synkroniseras och du redan har en fil inuti med samma namn (%1).Om du forts\u00e4tter uppladdningen, kommer den tidigare filen \u00f6ver.",
     "2445": "Rotmappen kan inte synkroniseras.V\u00e4lj en undermapp.",
@@ -2764,5 +2765,12 @@
     "7713": "This operation will clear all MEGA data from your browser cache and reload your account from our servers. This may take a few minutes.",
     "7714": "Voucher redemption link",
     "7715": "Email support at resellers@mega.nz",
-    "7716": "You have already sent a confirm link to that address."
+    "7716": "You have already sent a confirm link to that address.",
+    "7717": "You have already requested a confirmation link for that email address.",
+    "7718": "This email address has already been taken. Please contact MEGA support for more information.",
+    "7719": "Your confirmation link for this email has expired. Please click OK to restart the process.",
+    "7720": "You need to be logged in to complete your email change. Please log in again with your current email address and then click on your confirmation link again.",
+    "7730": "Verify your email address",
+    "7731": "Please enter your password to verify your email address",
+    "7732": "Confirm email"
 }

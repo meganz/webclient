@@ -3403,7 +3403,7 @@ function MegaData()
             }
             if (typeof mDB === 'object' && !pfkey) {
                 if (!u_sharekeys[h]) {
-                    console.error('INVALID OPERATION -- No share key for handle "%s"', h);
+                    console.warn('INVALID OPERATION -- No share key for handle "%s"', h);
                 }
                 else {
                     mDBadd('ok', {

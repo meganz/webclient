@@ -1236,6 +1236,7 @@
     "2435": "J\u016bs\u0173 sinchonizacija \"%1\" buvo i\u0161jungta, kadangi nutol\u0119s aplankas neegzistuoja. ",
     "2436": "J\u016bs\u0173 sinchronizacija \"%1\" buvo i\u0161jungta, kadangi nutol\u0119s aplankas yra \u0161iuk\u0161li\u0173 de\u017e\u0117je",
     "2438": "Aplankas (%1) nebuvo \u012fkeltas, kadangi jis yra per didelis (beta yra limituotas iki %2 aplankams bei %3 failams.",
+    "2439": "%1 aplankai(-\u0173) nebuvo \u012fkelti, nes jie yra per dideli (\u0161i beta versija ribojama iki %2 aplank\u0173 arba %3 fail\u0173.",
     "2440": "Sinchronizacija sustos. I\u0161trynimai atsirad\u0119 sinchronizacijai neveikiant nebus pakartoti.",
     "2443": "Galutinis aplankas buvo sinchronizuotas ir failas perkeltas \u012f j\u012f tuo pa\u010diu pavadinimu (%1). Jei t\u0119site \u012fk\u0117lim\u0105 failas bus perra\u0161ytas. Ar esate tikri, jog norite t\u0119sti?",
     "2445": "Pagrindinis aplankas negali b\u016bti sinchonizuotas. Pra\u0161ome pasirinkti poaplank\u012f.",
@@ -2764,5 +2765,12 @@
     "7713": "This operation will clear all MEGA data from your browser cache and reload your account from our servers. This may take a few minutes.",
     "7714": "Voucher redemption link",
     "7715": "Email support at resellers@mega.nz",
-    "7716": "You have already sent a confirm link to that address."
+    "7716": "You have already sent a confirm link to that address.",
+    "7717": "You have already requested a confirmation link for that email address.",
+    "7718": "This email address has already been taken. Please contact MEGA support for more information.",
+    "7719": "Your confirmation link for this email has expired. Please click OK to restart the process.",
+    "7720": "You need to be logged in to complete your email change. Please log in again with your current email address and then click on your confirmation link again.",
+    "7730": "Verify your email address",
+    "7731": "Please enter your password to verify your email address",
+    "7732": "Confirm email"
 }

@@ -569,19 +569,19 @@ var crypt = (function () {
 
         return;
     };
-    
-    
+
+
     /**
      * Converts a string to a hexadecimal string
      * @param {String} text The string to convert
      * @returns {String} Returns the string as hexadecimal string e.g. ac9da63...
      */
     ns.stringToHex = function(text) {
-        
+
         var bytes = asmCrypto.string_to_bytes(text);
         var hex = asmCrypto.bytes_to_hex(bytes);
-        
-        return hex;        
+
+        return hex;
     };
 
 
@@ -605,18 +605,18 @@ var crypt = (function () {
     ns._showFingerprintMismatchException = function(userHandle, keyType,
                                                     method, prevFingerprint,
                                                     newFingerprint) {
-        
+
         // Keep format consistent
         prevFingerprint = (prevFingerprint.length === 40) ? prevFingerprint : ns.stringToHex(prevFingerprint);
         newFingerprint = (newFingerprint.length === 40) ? newFingerprint : ns.stringToHex(newFingerprint);
-        
+
         // Show warning dialog
         mega.ui.CredentialsWarningDialog.singleton(userHandle, keyType, prevFingerprint, newFingerprint);
-        
+
         // Remove the cached key, so the key will be fetched and checked against
         // the stored fingerprint again next time.
         delete ns.getPubKeyCacheMapping(keyType)[userHandle];
-        
+
         logger.warn(keyType + ' fingerprint does not match the previously authenticated one!\n'
             + 'Previous fingerprint: ' + prevFingerprint
             + '.\nNew fingerprint: ' + newFingerprint + '.');
@@ -2155,6 +2155,14 @@ function api_getsid2(res, ctx) {
         }
     }
 
+    // emailchange namespace exists, that means the user
+    // attempted to verify their new email address without a session
+    // therefore we showed them the login dialog. Now we call `emailchange.verify`
+    // so the email verification can continue as expected.
+    if (r && typeof emailchange === 'object') {
+        emailchange.verify(new sjcl.cipher.aes(ctx.passwordkey), { k1: res.k, k2: k });
+    }
+
     ctx.result(ctx, r);
 }
 
@@ -2398,8 +2406,6 @@ function api_setshare1(ctx, params) {
 
     /** Callback for API interactions. */
     ctx.callback = function (res, ctx) {
-        var n;
-
         if (!ctx.maxretry) {
             masterPromise.reject(res);
 
@@ -2410,7 +2416,7 @@ function api_setshare1(ctx, params) {
 
         if (typeof res === 'object') {
             if (res.ok) {
-                // sharekey clash: set & try again
+                logger.debug('Share key clash: Set returned key and try again.');
                 ctx.req.ok = res.ok;
                 u_sharekeys[ctx.node] = decrypt_key(u_k_aes, base64_to_a32(res.ok));
                 ctx.req.ha = crypto_handleauth(ctx.node);
@@ -2423,20 +2429,24 @@ function api_setshare1(ctx, params) {
                             u_pubkeys[ctx.req.s[i].u]));
                     }
                 }
+                logger.info('Retrying share operation.')
                 api_req(ctx.req, ctx);
 
                 return;
             }
             else {
+                logger.info('Share succeeded.');
                 masterPromise.resolve(res);
 
                 return;
             }
         }
 
+        logger.info('Retrying share operation.')
         api_req(ctx.req, ctx);
     };
 
+    logger.info('Invoking share operation.')
     api_req(ctx.req, ctx);
 
     return masterPromise;

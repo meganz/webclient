@@ -80,7 +80,7 @@ function MegaDB(name, suffix, schema, options) {
             });
     }
     function __dbOpen() {
-        mega.flags = MEGAFLAG_MDBOPEN;
+        mega.flags |= MEGAFLAG_MDBOPEN;
         dbOpenOptions.version = version;
 
         self.logger.debug('Opening DB', version, dbOpenOptions);

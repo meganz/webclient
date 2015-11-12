@@ -1351,6 +1351,8 @@ else if (!b_u)
         'cancel_js': {f:'html/js/cancel.js', n: 'cancel_js', j:1},
         'reset': {f:'html/reset.html', n: 'reset', j:0},
         'reset_js': {f:'html/js/reset.js', n: 'reset_js', j:1},
+        'change_email_js': {f:'html/js/emailchange.js', n: 'change_email_js', j:1},
+        'change_email': {f:'html/emailchange.html', n: 'change_email', j:0},
         'filesaver': {f:'js/vendor/filesaver.js', n: 'filesaver', j:1},
         'recovery': {f:'html/recovery.html', n: 'recovery', j:0},
         'recovery_js': {f:'html/js/recovery.js', n: 'recovery_js', j:1},
@@ -1367,7 +1369,9 @@ else if (!b_u)
         'contact': {f:'html/contact.html', n: 'contact', j:0},
         'privacycompany': {f:'html/privacycompany.html', n: 'privacycompany', j:0},
         'chrome': {f:'html/chrome.html', n: 'chrome', j:0},
-        'zxcvbn_js': {f:'js/vendor/zxcvbn.js', n: 'zxcvbn_js', j:1}
+        'zxcvbn_js': {f:'js/vendor/zxcvbn.js', n: 'zxcvbn_js', j:1},        
+        'redeem': {f:'html/redeem.html', n: 'redeem', j:0},
+        'redeem_js': {f:'html/js/redeem.js', n: 'redeem_js', j:1}
     };
 
     var subpages =
@@ -1378,6 +1382,7 @@ else if (!b_u)
         'backup': ['backup','backup_js','filesaver'],
         'recovery': ['recovery','recovery_js'],
         'reset': ['reset','reset_js'],
+        'verify': ['change_email', 'change_email_js'],
         'cancel': ['cancel', 'cancel_js'],
         'blog': ['blog','blog_js','blogarticle','blogarticle_js'],
         'register': ['register','register_js'],
@@ -1398,7 +1403,8 @@ else if (!b_u)
         'help': ['help_js'],
         'chrome': ['chrome'],
         'plugin': ['chrome','firefox'],
-        'recover': ['reset','reset_js']
+        'recover': ['reset','reset_js'],
+        'redeem': ['redeem','redeem_js']
     };
 
     if (page)

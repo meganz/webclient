@@ -24,7 +24,11 @@
 <div class="fm-dialog-overlay hidden"></div>
 
 
-
+<div class="fm-dialog awaiting-confirmation hidden">
+    <div class="reg-success-icon"></div>
+    <div class="reg-success-header">[$7699]</div>
+    <div class="reg-success-txt">[$7700]</div>
+</div>
 
 <div class="fm-dialog reset-success hidden">
     <div class="nw-fm-dialog-title">[$1585]</div>
@@ -618,6 +622,7 @@
            </div>
         </div>
         <span class="file-status-icon"></span>
+        <span class="link-icon"></span>
         <div class="properties-elements-counter"><span></span></div>
         <div class="properties-file-icon">
         </div>
@@ -1535,10 +1540,9 @@
             <div class="fm-account-input">
                 <input class="state-province" type="text" value="" placeholder="[$653]">
             </div>
-            <div class="fm-account-select">
-                <span class="account-select-txt">[$481]</span>
-                <select class="countries">
-                </select>
+            <div class="default-select countries" id="countries">
+                <span>[$481]</span>
+                <div class="default-select-dropdown hidden"><div class="default-select-scroll"></div></div>
             </div>
             <div class="fm-account-input code">
                 <input class="post-code" type="text" value="" placeholder="Postal Code">
@@ -1570,15 +1574,15 @@
                 <input class="credit-card-number" type="text" value="" placeholder="Credit Card Number" >
             </div>
             <div class="payment-short-bl triplex first">
-                <div class="fm-account-select"> <span class="account-select-txt">[$913]</span>
-                    <select class="expiry-date-month">
-                    </select>
+                <div class="default-select expiry-date-month" id="expiry-date-month">
+                	<span>[$913]</span>
+                	<div class="default-select-dropdown hidden"><div class="default-select-scroll"></div></div>
                 </div>
             </div>
             <div class="payment-short-bl triplex second">
-                <div class="fm-account-select"> <span class="account-select-txt">[$932]</span>
-                    <select class="expiry-date-year">
-                    </select>
+                <div class="default-select expiry-date-year" id="expiry-date-year">
+                	<span>[$932]</span>
+                	<div class="default-select-dropdown hidden"><div class="default-select-scroll"></div></div>
                 </div>
             </div>
             <div class="payment-short-bl triplex third">
@@ -2125,5 +2129,53 @@
         <div class="fm-dialog-button accept"><span>[$7645]</span></div>
         <div class="fm-dialog-button cancel"><span>[$7646]</span></div>
         <div class="clear"></div>
+    </div>
+</div>
+
+<div class="voucher-redeem-dialog hidden">
+    <div class="payment-close">
+        <div class="payment-close-icon"></div>
+        <span></span>
+    </div>
+    <div class="account-information">
+        <div class="left-information">            
+            <div class="reg-st3-membership-bl">
+                <div class="membership-pad-bl">
+                    <div class="membership-gray-block">
+                        <div class="reg-st3-membership-icon"></div>
+                        <div class="reg-st3-bott-title plan-name"></div>
+                        <div class="reg-st3-bott-title price">
+                            <span class="num"><span class="dollars"></span><span class="small"><span class="cents"></span> &euro;</span></span><span class="period">/[$913]</span>
+                        </div>
+                    </div>
+                    <div class="reg-st3-storage">
+                        <div class="reg-st3-big-txt">
+                            <span class="quota-amount"></span> <span class="quota-unit"></span>
+                        </div>
+                        <div class="reg-st3-mid-txt">[$495]</div>
+                        <div class="clear"></div>
+                    </div>
+                    <div class="reg-st3-bandwidth">
+                        <div class="reg-st3-big-txt">
+                            <span class="quota-amount"></span> <span class="quota-unit"></span>
+                        </div>
+                        <div class="reg-st3-mid-txt">[$496]</div>
+                        <div class="clear"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="right-information">
+            <div class="title-text">[$7706]</div>
+            <div class="balance-text">[$7707]</div>
+            <div class="complete-upgrade-text">
+                [$7708]<br>
+                [$7709]
+            </div>
+            <div class="buttons">
+                <div class="complete-upgrade-button" data-plan-id="">[$7710]</div>
+                <div class="choose-plan-button">[$7711]</div>
+            </div>
+        </div>
     </div>
 </div>

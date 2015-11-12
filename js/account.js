@@ -315,6 +315,27 @@ function setpwset(confstring, ctx) {
     }, ctx);
 }
 
+/**
+ *  checkMyPassword
+ *
+ *  Check if the password is the user's password without doing
+ *  any API call, it tries to decrypt the user's private key.
+ *
+ *  @param string|AES   password
+ *  @param array        encrypted private key (optional)
+ *  @param array        private key (optional)
+ *  
+ *
+ *  @return bool
+ */
+function checkMyPassword(password, k1, k2) {
+    if (typeof password === "string") {
+        password = new sjcl.cipher.aes(prepare_key_pw(password));
+    }
+
+    return decrypt_key(password, base64_to_a32(k1 || u_attr.k)).join(",")  === (k2||u_k).join(",");
+}
+
 function changepw(currentpw, newpw, ctx) {
     var pw_aes = new sjcl.cipher.aes(prepare_key_pw(newpw));
 

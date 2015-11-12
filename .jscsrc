@@ -38,7 +38,7 @@
     "requireSpaceAfterBinaryOperators": true,
 
     "disallowMultipleVarDecl": true,
-
+    "disallowTrailingWhitespace": "ignoreEmptyLines",
     "disallowSpacesInsideParentheses": true,
     "disallowEmptyBlocks": true,
 

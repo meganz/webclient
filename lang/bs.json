@@ -1241,7 +1241,7 @@
     "2443": "Destinacijski folder je sinhronizovan i Vi ve\u0107 imate fajlunutar njega pod istim imenom (%1).Ukoliko nastavite sa otpremanjem, prethodni fajl \u0107e biti prebrisan.",
     "2445": "Root folder ne mo\u017ee biti sinhronizovan. Molimo Vas da selektujete subfolder.",
     "2447": "Nisu prona\u0111eni validni MEGA linkovi (linkovi foldera nisu podr\u017eani do sada).",
-    "2461": "I agree with the MEGA <a href=\"https:\/\/mega.nz\/#terms\">Terms of Service<\/a>",
+    "2461": "I agree with the MEGA <a href=\"https:\/\/mega.co.nz\/#terms\">Terms of Service<\/a>",
     "2464": "Molimo Vas da ukucate Va\u0161u e-mail adresu",
     "2465": "Molimo Vas da ukucate va\u017ee\u0107u e-mail adresu",
     "2466": "Molimo Vas unesite \u0161ifru",
@@ -2772,5 +2772,7 @@
     "7720": "You need to be logged in to complete your email change. Please log in again with your current email address and then click on your confirmation link again.",
     "7730": "Verify your email address",
     "7731": "Please enter your password to verify your email address",
-    "7732": "Confirm email"
+    "7732": "Confirm email",
+    "7740": "The rubbish bin is empty",
+    "7741": "Clear the rubbish bin"
 }

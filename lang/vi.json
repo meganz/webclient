@@ -2770,7 +2770,9 @@
     "7718": "This email address has already been taken. Please contact MEGA support for more information.",
     "7719": "Your confirmation link for this email has expired. Please click OK to restart the process.",
     "7720": "You need to be logged in to complete your email change. Please log in again with your current email address and then click on your confirmation link again.",
-    "7730": "Verify your email address",
-    "7731": "Please enter your password to verify your email address",
-    "7732": "Confirm email"
+    "7730": "X\u00e1c th\u1ef1c \u0111\u1ecba ch\u1ec9 email c\u1ee7a b\u1ea1n",
+    "7731": "Xin nh\u1eadp m\u1eadt kh\u1ea9u \u0111\u1ec3 x\u00e1c th\u1ef1c \u0111\u00e2y l\u00e0 email c\u1ee7a b\u1ea1n",
+    "7732": "X\u00e1c nh\u1eadn thay \u0111\u1ed5i email",
+    "7740": "The rubbish bin is empty",
+    "7741": "Clear the rubbish bin"
 }

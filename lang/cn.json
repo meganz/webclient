@@ -1241,7 +1241,7 @@
     "2443": "The destination folder is synced and you already have a file inside it with the same name (%1).If you continue the upload, the previous file will be overwritten.Are you sure?",
     "2445": "\u6839\u76ee\u5f55\u6587\u4ef6\u5939\u65e0\u6cd5\u88ab\u540c\u6b65.\u8bf7\u9009\u62e9\u4e00\u4e2a\u5b50\u6587\u4ef6\u5939.",
     "2447": "No valid MEGA links found. (Folder links aren't yet supported)",
-    "2461": "I agree with the MEGA <a href=\"https:\/\/mega.nz\/#terms\">Terms of Service<\/a>",
+    "2461": "I agree with the MEGA <a href=\"https:\/\/mega.co.nz\/#terms\">Terms of Service<\/a>",
     "2464": "\u8bf7\u8f93\u5165\u60a8\u7684 e-mail \u5730\u5740",
     "2465": "\u8bf7\u8f93\u51651\u4e2a\u6709\u6548\u7684 e-mail \u5730\u5740",
     "2466": "\u8bf7\u8f93\u5165\u60a8\u7684\u5bc6\u7801",
@@ -2772,5 +2772,7 @@
     "7720": "You need to be logged in to complete your email change. Please log in again with your current email address and then click on your confirmation link again.",
     "7730": "Verify your email address",
     "7731": "Please enter your password to verify your email address",
-    "7732": "Confirm email"
+    "7732": "Confirm email",
+    "7740": "The rubbish bin is empty",
+    "7741": "Clear the rubbish bin"
 }

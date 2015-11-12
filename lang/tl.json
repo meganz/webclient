@@ -2767,10 +2767,12 @@
     "7715": "Para sa karagdagang kaalaman, mag-email sa resellers@mega.nz",
     "7716": "Nagpadala ka na ng kumpirmasyon sa address na ito.",
     "7717": "Ikaw ay humingi na ng kumpirmasyon sa email address na ito.",
-    "7718": "This email address has already been taken. Please contact MEGA support for more information.",
-    "7719": "Your confirmation link for this email has expired. Please click OK to restart the process.",
+    "7718": "Ginagamit na ang email na ito. I-contact ang MEGA para sa karagdagang impormasyon.",
+    "7719": "Ang link ng kumpirmasyon sa email na ito sy lumipas na. I-click ang OK upang masimulan muli ang proseso.",
     "7720": "You need to be logged in to complete your email change. Please log in again with your current email address and then click on your confirmation link again.",
-    "7730": "Verify your email address",
-    "7731": "Please enter your password to verify your email address",
-    "7732": "Confirm email"
+    "7730": "I-verify ang email address",
+    "7731": "Ilagay ang password upang ma-verify ang inyong email address",
+    "7732": "Kumpirmahin ang email",
+    "7740": "The rubbish bin is empty",
+    "7741": "Clear the rubbish bin"
 }

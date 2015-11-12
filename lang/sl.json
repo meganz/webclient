@@ -2767,10 +2767,12 @@
     "7715": "Po\u0161ljite e-po\u0161to za podporo na resellers@mega.nz",
     "7716": "Na ta naslov ste \u017ee poslali potrditveno povezavo.",
     "7717": "Za ta e-po\u0161tni naslov ste \u017ee zahtevali potrditveno povezavo.",
-    "7718": "This email address has already been taken. Please contact MEGA support for more information.",
-    "7719": "Your confirmation link for this email has expired. Please click OK to restart the process.",
-    "7720": "You need to be logged in to complete your email change. Please log in again with your current email address and then click on your confirmation link again.",
-    "7730": "Verify your email address",
-    "7731": "Please enter your password to verify your email address",
-    "7732": "Confirm email"
+    "7718": "Ta e-po\u0161tni naslov je \u017ee uporabljen. Prosim, kontaktirajte MEGA podporo za ve\u010d informacij.",
+    "7719": "Potrjevalna povezava iz te e-po\u0161te je potekla. Prosim, pritisnite OK za ponovni zagon procesa.",
+    "7720": "Morate biti prijavljeni, da lahko zaklju\u010dite postopek spremembe e-po\u0161te. Prosim, ponovno se prijavite s trenutnim e-po\u0161tnim naslovom in potem ponovno kliknite na potrjevalno povezavo.",
+    "7730": "Preverite svoj e-po\u0161tni ra\u010dun",
+    "7731": "Prosim, vnesite svoje geslo za preverjanje e-po\u0161tnega naslova",
+    "7732": "Potrdite e-po\u0161to",
+    "7740": "The rubbish bin is empty",
+    "7741": "Clear the rubbish bin"
 }
